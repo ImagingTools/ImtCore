@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CUserCollectionControllerComp.h>
+#include <imtauthgql/imtauthgql.h>
 
 // Qt includes
 #include <QSet>
@@ -15,6 +16,11 @@
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/CUserInfo.h>
 #include <imtgql/IGqlContext.h>
+#include <imtauth/ITenantManager.h>
+#include <imtauth/ITenantEntityBindingManager.h>
+#include <imtauth/IPersonalAccessTokenManager.h>
+#include <imtauth/ITenantInvitation.h>
+#include <imtauth/ISession.h>
 
 
 namespace imtauthgql
@@ -230,7 +236,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserCollectionControllerComp::On
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QString("Unable to get element meta info for user '%1'. Error: User does not exists");
+		errorMessage = QString("Unable to get element meta info for user '%1'. Error: User does not exists").arg(objectId);
 		return response;
 	}
 
@@ -658,86 +664,37 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 			const istd::IChangeable& object,
 			const imtgql::CGqlRequest& gqlRequest) const
 {
-	istd::IChangeableUniquePtr adaptedObjectPtr = BaseClass::CreateAdaptedObjectData(objectId, object, gqlRequest);
+	istd::IChangeableUniquePtr baseAdaptedPtr = BaseClass::CreateAdaptedObjectData(objectId, object, gqlRequest);
 
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	if (gqlContextPtr == nullptr || !m_delegatedAccessCompPtr.IsValid() || !m_membershipManagerCompPtr.IsValid()){
-		return adaptedObjectPtr;
+	if (gqlContextPtr == nullptr){
+		return baseAdaptedPtr;
 	}
 
 	QByteArray currentTenantId = gqlContextPtr->GetTenantId();
 	QByteArray currentProductId = gqlContextPtr->GetProductId();
-	if (currentTenantId.isEmpty() || currentProductId.isEmpty()){
-		return adaptedObjectPtr;
+
+	// Delegate to the shared tenant adaptation logic (also used by profile).
+	imtauth::ITenantEntityBindingManager* bindingPtr = m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr;
+	imtauth::IDelegatedAccess* delegatedPtr = m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr;
+	imtauth::ITenantMembershipManager* membershipPtr = m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr;
+	imtauth::IRoleInfoProvider* roleProviderPtr = m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr;
+
+	istd::IChangeableUniquePtr tenantAdapted = AdaptUserForTenant(
+				objectId,
+				object,
+				currentTenantId,
+				currentProductId,
+				bindingPtr,
+				delegatedPtr,
+				membershipPtr,
+				roleProviderPtr);
+
+	if (!tenantAdapted.IsValid()){
+		return baseAdaptedPtr;
 	}
 
-	auto userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(&object);
-	if (userInfoPtr == nullptr){
-		return adaptedObjectPtr;
-	}
-
-	bool hasDirectMembership = false;
-	QByteArrayList homeTenantIds;
-	const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
-		m_membershipManagerCompPtr->GetMembershipsByUser(objectId);
-	for (const QByteArray& membershipId : membershipIds){
-		imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-		if (!membershipPtr.IsValid() || !membershipPtr->IsActive()){
-			continue;
-		}
-		QByteArray tenantId = membershipPtr->GetTenantId();
-		if (tenantId == currentTenantId){
-			hasDirectMembership = true;
-			break;
-		}
-		if (!tenantId.isEmpty()){
-			homeTenantIds.append(tenantId);
-		}
-	}
-
-	if (hasDirectMembership){
-		return adaptedObjectPtr;
-	}
-
-	QSet<QByteArray> delegatedRoleIdSet;
-	for (const QByteArray& homeTenantId : homeTenantIds){
-		QByteArrayList roleIds = m_delegatedAccessCompPtr->GetDelegatedRoles(homeTenantId, currentTenantId);
-		for (const QByteArray& roleId : roleIds){
-			if (!roleId.isEmpty()){
-				// Only keep roles that belong to the current product context.
-				if (m_roleInfoProviderCompPtr.IsValid()){
-					imtauth::IRoleUniquePtr roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(roleId);
-					if (!roleInfoPtr.IsValid() || roleInfoPtr->GetProductId() != currentProductId){
-						continue;
-					}
-				}
-				// If role metadata is unavailable, keep the tenant-scoped role.
-				delegatedRoleIdSet.insert(roleId);
-			}
-		}
-	}
-
-	if (delegatedRoleIdSet.isEmpty()){
-		return adaptedObjectPtr;
-	}
-
-	const QByteArrayList delegatedRoleIds(delegatedRoleIdSet.begin(), delegatedRoleIdSet.end());
-
-	if (!adaptedObjectPtr.IsValid()){
-		adaptedObjectPtr = object.CloneMe();
-	}
-
-	auto adaptedUserInfoPtr = dynamic_cast<imtauth::IUserInfo*>(adaptedObjectPtr.GetPtr());
-	if (adaptedUserInfoPtr == nullptr){
-		QString warningMessage = QString("Unable to enrich user '%1' with the delegated roles. Error: User cloning failed").arg(qPrintable(objectId));
-		SendWarningMessage(0, warningMessage, "CUserCollectionControllerComp");
-
-		return adaptedObjectPtr;
-	}
-
-	adaptedUserInfoPtr->SetRoles(currentProductId, delegatedRoleIds);
-
-	return adaptedObjectPtr;
+	return tenantAdapted;
 }
 
 
@@ -814,6 +771,94 @@ QJsonObject CUserCollectionControllerComp::InsertObject(
 	}
 
 	return result;
+}
+
+
+// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
+bool CUserCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	if (m_tenantManagerCompPtr.IsValid()){
+		for (const QByteArray& userId : elementIds){
+			QByteArrayList tenantIds = m_tenantManagerCompPtr->GetTenantIds();
+			for (const QByteArray& tenantId : tenantIds){
+				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+				if (tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId){
+					errorMessage = QString("Cannot delete user '%1' who owns tenant '%2'. Transfer ownership first.")
+						.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId));
+					return false;
+				}
+			}
+		}
+	}
+	return BaseClass::OnBeforeRemoveElements(elementIds, gqlRequest, errorMessage);
+}
+
+void CUserCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const
+{
+	for (const QByteArray& userId : elementIds){
+		// 1. Clean TenantMemberships directly (bypasses owner protection; owner deletes are blocked in OnBefore)
+		QByteArrayList memIds;
+		if (m_membershipManagerCompPtr.IsValid()){
+			memIds = m_membershipManagerCompPtr->GetMembershipsByUser(userId);
+		}
+		if (m_membershipCollectionCompPtr.IsValid() && !memIds.isEmpty()){
+			m_membershipCollectionCompPtr->RemoveElements(memIds);
+		}
+
+		// 2. Force-clean any remaining TenantEntityBindings for this user (e.g. non-mem cases)
+		if (m_bindingManagerCompPtr.IsValid()){
+			m_bindingManagerCompPtr->RemoveAllBindingsForEntity(QByteArrayLiteral("Users"), userId);
+		}
+
+		// 3. Clean TenantInvitations where user is involved (as target, inviter or revoker)
+		if (m_invitationCollectionCompPtr.IsValid()){
+			QByteArrayList all = m_invitationCollectionCompPtr->GetElementIds();
+			QByteArrayList toRemove;
+			for (const QByteArray& iid : all){
+				imtbase::IObjectCollection::DataPtr dptr;
+				if (m_invitationCollectionCompPtr->GetObjectData(iid, dptr)){
+					const imtauth::ITenantInvitation* inv = dynamic_cast<const imtauth::ITenantInvitation*>(dptr.GetPtr());
+					if (inv != nullptr &&
+						(inv->GetUserId() == userId ||
+						 inv->GetInvitedByUserId() == userId ||
+						 inv->GetRevokedByUserId() == userId)){
+						toRemove.append(iid);
+					}
+				}
+			}
+			if (!toRemove.isEmpty()){
+				m_invitationCollectionCompPtr->RemoveElements(toRemove);
+			}
+		}
+
+		// 4. Clean PersonalAccessTokens for the user
+		if (m_personalAccessTokenManagerCompPtr.IsValid()){
+			QByteArrayList tids = m_personalAccessTokenManagerCompPtr->GetTokenIds(userId);
+			for (const QByteArray& tid : tids){
+				m_personalAccessTokenManagerCompPtr->DeleteToken(tid);
+			}
+		}
+
+		// 5. Clean UserSessions for the user
+		if (m_sessionCollectionCompPtr.IsValid()){
+			QByteArrayList all = m_sessionCollectionCompPtr->GetElementIds();
+			QByteArrayList toRemove;
+			for (const QByteArray& sid : all){
+				imtbase::IObjectCollection::DataPtr dptr;
+				if (m_sessionCollectionCompPtr->GetObjectData(sid, dptr)){
+					const imtauth::ISession* sess = dynamic_cast<const imtauth::ISession*>(dptr.GetPtr());
+					if (sess != nullptr && sess->GetUserId() == userId){
+						toRemove.append(sid);
+					}
+				}
+			}
+			if (!toRemove.isEmpty()){
+				m_sessionCollectionCompPtr->RemoveElements(toRemove);
+			}
+		}
+	}
+
+	BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
 }
 
 

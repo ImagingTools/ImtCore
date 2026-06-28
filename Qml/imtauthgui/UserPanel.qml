@@ -42,11 +42,11 @@ Item {
 			root.__loadOrganizations();
 		}
 
-		function onTenantInvitationAccepted(notification){
+		function onTenantInvitationAccepted(tenantId, membershipId){
 			root.__loadOrganizations();
 		}
 
-		function onTenantInvitationRejected(notification){
+		function onTenantInvitationRejected(tenantId, membershipId){
 			root.__loadOrganizations();
 		}
 	}
@@ -160,6 +160,18 @@ Item {
 		}
 	}
 
+	Rectangle {
+		id: invitationBadge
+		anchors.top: loginButton.top
+		anchors.right: loginButton.right
+		width: Style.spacingM
+		height: width
+		visible: AuthorizationController.pendingInvitationsCount > 0
+		radius: width/2
+		color: Style.imaginToolsAccentColor
+		z: parent.z + 1
+	}
+
 	ListModel {
 		id: contextMenuModel;
 		
@@ -169,8 +181,10 @@ Item {
 		
 		function fillModel(){
 			var currentTenantId = AuthorizationController.currentTenantId || "";
+			var hasInvitations = AuthorizationController.pendingInvitationsCount > 0;
+			var profileName = hasInvitations ? qsTr("Profile") + " ●" : qsTr("Profile");
 			contextMenuModel.clear();
-			contextMenuModel.append({"id": "Profile", "name": qsTr("Profile"), "icon": "Icons/Account", "isEnabled": true});
+			contextMenuModel.append({"id": "Profile", "name": profileName, "icon": "Icons/Account", "isEnabled": true});
 			contextMenuModel.append({"id": "", "name": "", "Icon": ""});
 
 			for (var i = 0; i < root.__organizationsList.length; i++) {

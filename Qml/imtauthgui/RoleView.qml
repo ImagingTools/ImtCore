@@ -17,41 +17,40 @@ ViewBase {
 	property string productId: "";
 	property string tenantId: "";
 	property var permissionsProvider: null;
-	property string __lastRequestedProductId: ""
-	property string __lastRequestedTenantId: ""
-	property bool __pendingPermissionsRequest: false
-	
+
+	property bool __permissionsRequested: false
+	property var __receivedPermissions: null
+	property bool __completed: false
+
 	property RoleData roleData: model;
 
 	Component.onCompleted: {
-		container.__pendingPermissionsRequest = true
-		container.__requestPermissions(true)
-		container.__rebuildPermissionsTree()
+		container.__completed = true
+		container.__requestPermissionsOnce()
 	}
 
 	onProductIdChanged: {
-		container.__pendingPermissionsRequest = true
-		container.__requestPermissions(true)
+		if (!container.__completed)
+			return
+		container.__permissionsRequested = false
+		container.__receivedPermissions = null
+		container.__requestPermissionsOnce()
 	}
 
 	onTenantIdChanged: {
-		container.__pendingPermissionsRequest = true
-		container.__requestPermissions(true)
-	}
-
-	onVisibleChanged: {
-		if (container.visible) {
-			container.__pendingPermissionsRequest = false
-			container.__requestPermissions(true)
-		}
+		if (!container.__completed)
+			return
+		container.__permissionsRequested = false
+		container.__receivedPermissions = null
+		container.__requestPermissionsOnce()
 	}
 
 	onPermissionsProviderChanged: {
-		container.__lastRequestedProductId = ""
-		container.__lastRequestedTenantId = ""
-		container.__pendingPermissionsRequest = true
-		container.__requestPermissions(true)
-		container.__rebuildPermissionsTree()
+		if (!container.__completed)
+			return
+		container.__permissionsRequested = false
+		container.__receivedPermissions = null
+		container.__requestPermissionsOnce()
 	}
 
 	Connections {
@@ -62,7 +61,8 @@ ViewBase {
 			var actualTenantId = sourceTenantId || ""
 			if (expectedTenantId !== actualTenantId)
 				return
-			container.__rebuildPermissionsTree()
+			container.__receivedPermissions = permissions
+			container.__populatePermissionsTree()
 		}
 	}
 
@@ -70,60 +70,30 @@ ViewBase {
 		target: permissionsTableElementView
 
 		function onBottomItemChanged() {
-			container.__requestPermissions(false)
-			container.__rebuildPermissionsTree()
+			container.__populatePermissionsTree()
 		}
 	}
 
-	function __requestPermissions(force) {
+	function __requestPermissionsOnce() {
 		if (!container.permissionsProvider)
-			return false
-
+			return
 		if (container.productId === "")
-			return false
-
-		if (!container.visible && !force) {
-			container.__pendingPermissionsRequest = true
-			return false
-		}
-
-		var requestTenantId = container.tenantId || ""
-		if (container.permissionsProvider.loading
-				&& container.__lastRequestedProductId === container.productId
-				&& container.__lastRequestedTenantId === requestTenantId)
-			return true
-
-		if (!force
-				&& container.__lastRequestedProductId === container.productId
-				&& container.__lastRequestedTenantId === requestTenantId)
-			return true
-
+			return
+		if (container.__permissionsRequested)
+			return
+		container.__permissionsRequested = true
 		container.permissionsProvider.productId = container.productId
-		container.__lastRequestedProductId = container.productId
-		container.__lastRequestedTenantId = requestTenantId
-		container.__pendingPermissionsRequest = false
-		container.permissionsProvider.requestPermissions(requestTenantId, force === true)
-		return true
-	}
-
-	function __activePermissions() {
-		if (!container.permissionsProvider)
-			return []
-
 		var requestTenantId = container.tenantId || ""
-		if (requestTenantId !== "") {
-			if (container.permissionsProvider.tenantPermissionsTenantId !== requestTenantId)
-				return container.permissionsProvider.permissions || []
-			return container.permissionsProvider.tenantPermissions || []
-		}
-
-		return container.permissionsProvider.allPermissions || []
+		container.permissionsProvider.requestPermissions(requestTenantId)
 	}
 
-	function __rebuildPermissionsTree() {
+	function __populatePermissionsTree() {
 		if (!permissionsTableElementView.bottomItem)
 			return
-		permissionsTableElementView.bottomItem.rebuildFromFlatArray(container.__activePermissions())
+		var perms = container.__receivedPermissions
+		if (!perms)
+			return
+		permissionsTableElementView.bottomItem.rebuildFromFlatArray(perms)
 		if (container.roleData)
 			container.doUpdateGuiPermissions()
 	}

@@ -189,49 +189,49 @@ DocumentViewBase {
 					container.documentManager.closeDocument(container.documentId)
 			}
 		}
-		function onSubscriptionInvitationAccepted(notification) {
+		function onSubscriptionInvitationAccepted(tenantId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification.tenantId === container.tenantData.m_id) {
+			if (tenantId === container.tenantData.m_id) {
 				PopupManager.addSuccessMessage(qsTr("Invitation accepted"), true)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-		function onSubscriptionInvitationRejected(notification) {
+		function onSubscriptionInvitationRejected(tenantId, membershipId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification.tenantId === container.tenantData.m_id) {
+			if (tenantId === container.tenantData.m_id) {
 				PopupManager.addInfoMessage(qsTr("Invitation rejected"), true)
-				stateManager_.removePendingInvitation(notification.membershipId)
+				stateManager_.removePendingInvitation(membershipId)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-		function onSubscriptionOwnershipTransferred(notification) {
+		function onSubscriptionOwnershipTransferred(tenantId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification.tenantId === container.tenantData.m_id) {
+			if (tenantId === container.tenantData.m_id) {
 				PopupManager.addInfoMessage(qsTr("Ownership transferred"), true)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-		function onSubscriptionMembershipRoleChanged(notification) {
+		function onSubscriptionMembershipRoleChanged(tenantId, userId, role) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification.tenantId === container.tenantData.m_id) {
+			if (tenantId === container.tenantData.m_id) {
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-		function onSubscriptionMembershipRemoved(notification) {
+		function onSubscriptionMembershipRemoved(tenantId, userId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification.tenantId === container.tenantData.m_id) {
+			if (tenantId === container.tenantData.m_id) {
 				// If the removed member is the current user, force-close the document
 				var currentUserId = container.tenantData.m_currentUserId || ""
-				if (currentUserId && notification.userId === currentUserId) {
+				if (currentUserId && userId === currentUserId) {
 					PopupManager.addInfoMessage(qsTr("You have been removed from this organization. Closing editor."), true)
 					if (AuthorizationController.currentTenantId === container.tenantData.m_id)
 						AuthorizationController.selectTenant("")
@@ -252,28 +252,28 @@ DocumentViewBase {
 	Connections {
 		target: AuthorizationController
 
-		function onTenantInvitationAccepted(notification) {
+		function onTenantInvitationAccepted(tenantId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification && notification.tenantId === container.tenantData.m_id) {
+			if (tenantId === container.tenantData.m_id) {
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-		function onTenantInvitationRejected(notification) {
+		function onTenantInvitationRejected(tenantId, membershipId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification && notification.tenantId === container.tenantData.m_id) {
-				if (notification.membershipId)
-					stateManager_.removePendingInvitation(notification.membershipId)
+			if (tenantId === container.tenantData.m_id) {
+				if (membershipId)
+					stateManager_.removePendingInvitation(membershipId)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-		function onTenantOwnershipTransferred(notification) {
+		function onTenantOwnershipTransferred(tenantId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification && notification.tenantId === container.tenantData.m_id) {
+			if (tenantId === container.tenantData.m_id) {
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}

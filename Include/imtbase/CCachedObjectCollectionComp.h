@@ -13,10 +13,11 @@
 #include <istd/TComposedFactory.h>
 #include <icomp/CComponentBase.h>
 #include <istd/TDelPtr.h>
-#include <imod/TSingleModelObserverBase.h>
+#include <imod/CMultiModelDispatcherBase.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IObjectCollectionCacheController.h>
 
 
 namespace imtbase
@@ -29,19 +30,22 @@ namespace imtbase
 */
 class CCachedObjectCollectionComp:
 			public icomp::CComponentBase,
-			public imod::TSingleModelObserverBase<istd::IChangeable>,
-			virtual public imtbase::IObjectCollection
+			private imod::CMultiModelDispatcherBase,
+			virtual public imtbase::IObjectCollection,
+			virtual public imtbase::IObjectCollectionCacheController
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
-	typedef imod::TSingleModelObserverBase<istd::IChangeable> BaseClass2;
+	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CCachedObjectCollectionComp);
 		I_REGISTER_INTERFACE(IObjectCollection);
 		I_REGISTER_INTERFACE(IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(ICollectionInfo);
+		I_REGISTER_INTERFACE(IObjectCollectionCacheController);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Base collection containing real data", true, "ObjectCollection");
 		I_ASSIGN_TO(m_objectCollectionModelCompPtr, m_objectCollectionCompPtr, true);
+		I_ASSIGN_MULTI_0(m_invalidationModels, "InvalidationModels", "Additional models to observe; a change in any of them will trigger cache invalidation (the ObjectCollection's model is always observed too)", false);
 		I_ASSIGN(m_metaInfoCacheLimitAttrPtr, "MetaInfoCacheLimit", "Maximal count of filter combinations stored in the ring buffer (meta info cache)", true, 1000);
 		I_ASSIGN(m_objectCacheLimitAttrPtr, "ObjectCacheLimit", "Maximal count of the data objects in the ring buffer (cache)", true, 100);
 	I_END_COMPONENT;
@@ -51,9 +55,6 @@ public:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
-
-	// reimplemented (imod::CSingleModelObserverBase)
-	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (IObjectCollection)
 	virtual const IRevisionController* GetRevisionController() const override;
@@ -93,6 +94,9 @@ public:
 	virtual QByteArray GetObjectTypeId(const Id& objectId) const override;
 	virtual idoc::MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
 
+	// reimplemented (IObjectCollectionCacheController)
+	virtual void InvalidateCache() override;
+
 	// reimplemented (ICollectionInfo)
 	virtual int GetElementsCount(
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
@@ -115,6 +119,9 @@ public:
 	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true, ilog::IMessageConsumer* logPtr = nullptr) override;
 
 protected:
+	// reimplemented (imod::CMultiModelDispatcherBase)
+	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+
 	struct FilteredCollection
 	{
 		FilteredCollection(int aOffset, int aCount, const QByteArray& aSelectionParamsData, IObjectCollectionUniquePtr&& aCachePtr)
@@ -143,6 +150,7 @@ protected:
 private:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imod::IModel, m_objectCollectionModelCompPtr);
+	I_MULTIREF(imod::IModel, m_invalidationModels);
 	I_ATTR(int, m_metaInfoCacheLimitAttrPtr);
 	I_ATTR(int, m_objectCacheLimitAttrPtr);
 

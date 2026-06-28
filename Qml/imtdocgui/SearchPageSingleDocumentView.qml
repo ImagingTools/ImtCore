@@ -6,7 +6,7 @@ import imtdocgui 1.0
 SingleDocumentWorkspacePageView {
     id: documentManager;
 
-    onDocumentServiceViewChanged: {
+    onDocumentManagerViewChanged: {
         if (documentManagerView){
             documentManagerView.initialItemTitleVisible = false;
         }

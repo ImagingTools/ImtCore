@@ -38,7 +38,8 @@ protected:
 		const iprm::IParamsSet* paramsPtr,
 		const istd::IPolymorphic* inputPtr,
 		istd::IChangeable* outputPtr,
-		ibase::IProgressManager* progressManagerPtr = nullptr) override;
+		ibase::IProgressManager* progressManagerPtr = nullptr,
+		istd::IChangeable* processingReportPtr = nullptr) override;
 
 private:
 	bool CreateCode();
@@ -51,7 +52,6 @@ private:
 
 
 } // namespace imtsdlgenqml
-
 
 
 

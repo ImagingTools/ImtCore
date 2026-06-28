@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6418" Description="ACF"/>
-            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -15,7 +15,7 @@
         <Element ComponentName="TenantCollectionDocumentService" X="200" Y="425" Note=""/>
         <Element ComponentName="TenantConnectionManager" X="975" Y="525" Note=""/>
         <Element ComponentName="TenantContractManager" X="625" Y="600" Note=""/>
-        <Element ComponentName="TenantEntityBindingManager" X="745" Y="190" Note=""/>
+        <Element ComponentName="TenantEntityBindingManager" X="750" Y="200" Note=""/>
         <Element ComponentName="TenantGrantManager" X="250" Y="600" Note=""/>
         <Element ComponentName="TenantManager" X="600" Y="300" Note=""/>
         <Element ComponentName="TenantMembershipManager" X="1000" Y="300" Note=""/>
