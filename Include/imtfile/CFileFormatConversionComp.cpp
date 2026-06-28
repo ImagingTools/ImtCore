@@ -10,8 +10,7 @@ int CFileFormatConversionComp::ConvertFiles(
 			const QString& inputPath,
 			QString& outputPath,
 			const iprm::IParamsSet* /*paramsPtr*/,
-			ibase::IProgressManager* progressManagerPtr,
-			istd::IChangeable* /*processingReportPtr*/) const
+			ibase::IProgressManager* progressManagerPtr) const
 {
 	if (m_persistenceCompPtr.IsValid() && m_workingObjectCompPtr.IsValid()){
 		if (m_workingObjectCompPtr->ResetData()){
@@ -30,5 +29,4 @@ int CFileFormatConversionComp::ConvertFiles(
 
 
 } // namespace imtfile
-
 
