@@ -35,6 +35,7 @@ public:
 	virtual bool RemoveAllBindingsForTenant(const QByteArray& tenantId, const QByteArray& entityType) override;
 	virtual bool HasBinding(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId) const override;
 	virtual QByteArrayList GetEntityIds(const QByteArray& tenantId, const QByteArray& entityType) const override;
+	virtual bool HasAnyTenantBinding(const QByteArray& entityType, const QByteArray& entityId) const override;
 
 private:
 	QByteArrayList FindBindingIds(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId) const;

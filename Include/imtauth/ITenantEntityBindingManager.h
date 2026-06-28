@@ -58,6 +58,12 @@ public:
 		Get all entity IDs of a given type bound to a tenant.
 	*/
 	virtual QByteArrayList GetEntityIds(const QByteArray& tenantId, const QByteArray& entityType) const = 0;
+
+	/**
+		Returns true if the entity has at least one binding to any tenant
+		(i.e., the entity is tenant-scoped and not global/unbound).
+	*/
+	virtual bool HasAnyTenantBinding(const QByteArray& entityType, const QByteArray& entityId) const = 0;
 };
 
 
