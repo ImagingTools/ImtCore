@@ -20,7 +20,7 @@ QtObject {
 	
 	signal userModeChanged(string userMode);
 	signal superuserExistResult(string status, string error);
-	signal loginFailed();
+	signal loginFailed(string message);
 	
 	signal loggedIn();
 	signal loggedOut();
@@ -318,7 +318,7 @@ QtObject {
 		}
 		
 		onFailed: {
-			root.loginFailed();
+			root.loginFailed(message || "");
 		}
 	}
 	

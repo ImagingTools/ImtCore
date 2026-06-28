@@ -11,6 +11,14 @@ import {
 input SearchInput
 {
 	text: String
+	# If provided (non-empty), targets a specific search group (SearchResult.id from one ISearchController).
+	# Pagination (offset/count) applies only within the targeted group's items.
+	# If empty: response includes ALL SearchResult (one per connected ISearchController that has matches),
+	# with totalCount for each. Items are empty except for the first controller's initial page
+	# (using the provided offset/count). This means "show data from first".
+	searchResultId: ID
+	offset: Int
+	count: Int
 }
 
 type ResultItem
@@ -24,8 +32,14 @@ type ResultItem
 
 type SearchResult
 {
+	# Identifier of the group/category (matches ISearchController::GetControllerId)
 	id: ID
 	name: String
+	# Total matches in this group (from ISearchController::GetMatchCount). Always populated.
+	totalCount: Int
+	# Items for this group. 
+	# - In discovery response (no searchResultId): typically empty to avoid loading large data.
+	# - In paged response (searchResultId provided): contains the requested page [offset .. offset+count).
 	items: [ResultItem]
 }
 
@@ -35,6 +49,11 @@ type SearchResults
 }
 
 type Query {
+	# Global search with group-aware pagination.
+	# - Call without searchResultId: returns list of groups (categories) with their totalCount (cheap discovery).
+	#   items will be empty (or minimal).
+	# - Call with searchResultId + offset/count: returns exactly one group with paged items inside it.
+	# This ensures large result sets are never loaded fully; pagination is always per-group.
 	Search (input: SearchInput): SearchResults!
 }
 

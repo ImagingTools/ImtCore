@@ -59,6 +59,12 @@ QtObject {
         function getHeaders(){
             return container.getHeaders();
         }
+
+        // Suppress the generic ModalDialog error for credential failures.
+        // Emit failed so the login page shows a non-modal message near the button.
+        function onError(message, type){
+            container.failed(message || "");
+        }
     }
 
     property GqlModel authorizationGqlModel: GqlModel {}
