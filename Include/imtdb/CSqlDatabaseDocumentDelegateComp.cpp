@@ -308,10 +308,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectSetQuery(
 	}
 	QByteArray retVal = QString("UPDATE %0 \"%1\" as root SET \"%2\" = 'Disabled' WHERE \"%2\" = 'Active'").arg(schemaPrefix, QString::fromUtf8(*m_tableNameAttrPtr), QString::fromUtf8(s_stateColumn)).toUtf8();
 
+	QByteArrayList conditionList;
 	if (paramsPtr != nullptr){
 		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
 		if (complexFilterParamPtr.IsValid()){
-			QByteArrayList conditionList;
 			QString textFilterQuery;
 			QString objectFilterQuery;
 			QString timeFilterQuery;
@@ -337,6 +337,24 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectSetQuery(
 
 			retVal += QByteArrayLiteral(" AND (") += conditionList.join(" AND ") +  QByteArrayLiteral(")");
 		}
+	}
+
+	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+	if (useTenantBindings){
+		const QString bindingsTableName = CreateTenantBindingTableName();
+		const QString escapedEntityType = SqlEncode(QString::fromUtf8(GetTableName()));
+		QString bindingsDelete = QString("DELETE FROM %1 WHERE \"EntityType\" = '%2';")
+				.arg(bindingsTableName, escapedEntityType);
+		if (!conditionList.isEmpty()){
+			const QString tableName = QString::fromUtf8(*m_tableNameAttrPtr);
+			const QString idCol = QString::fromUtf8(s_documentIdColumn);
+			const QString stateCol = QString::fromUtf8(s_stateColumn);
+			QString idSelect = QString("SELECT \"%1\" FROM %2\"%3\" as root WHERE \"%4\" = 'Active' AND (%5)")
+					.arg(idCol, schemaPrefix, tableName, stateCol, QString::fromUtf8(conditionList.join(" AND ")));
+			bindingsDelete = QString("DELETE FROM %1 WHERE \"EntityType\" = '%2' AND \"EntityId\" IN (%3);")
+					.arg(bindingsTableName, escapedEntityType, idSelect);
+		}
+		retVal += QByteArrayLiteral(";") + bindingsDelete.toUtf8();
 	}
 
 	return retVal;

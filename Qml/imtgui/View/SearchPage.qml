@@ -19,7 +19,6 @@ Item {
 	property bool loadingMore: false
 	property string pendingRequestKey: ""
 	property var tabDataArrays: ({})
-	property var tabDataArrays: ({})
 
 	// Accumulating model for paged items of the currently active group/tab.
 	// We use ListModel to support append on loadMore (plain list assignment would lose previous pages).
