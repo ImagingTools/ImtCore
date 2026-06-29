@@ -256,7 +256,7 @@ Rectangle {
 					width: Style.buttonWidthM
 					height: Style.buttonHeightM
 					radius: Style.radiusS
-					color: "#8957e5"
+					color: Style.statusClosedColor
 
 					Text {
 						anchors.centerIn: parent
@@ -304,7 +304,7 @@ Rectangle {
 					width: Style.buttonWidthM
 					height: Style.buttonHeightM
 					radius: Style.radiusS
-					color: "#1a7f37"
+					color: Style.statusOpenColor
 
 					Text {
 						anchors.centerIn: parent

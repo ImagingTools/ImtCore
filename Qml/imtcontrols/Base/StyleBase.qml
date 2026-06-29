@@ -344,6 +344,76 @@ StyleComponents {
 	property string greenColor: "#00ff00";
 	property string lightBlueColor: "#69b8e3";
 
+		//semantic status colors
+	property string successColor: "#3FB950";
+	property string dangerColor: "#DA3633";
+	property string warningColor: "#D29922";
+
+		//status colors
+	property string statusOpenColor: "#1a7f37";
+	property string statusClosedColor: "#8957e5";
+
+		//priority colors
+	property string priorityLowColor: "#3FB950";
+	property string priorityMediumColor: "#D29922";
+	property string priorityHighColor: "#DB6D28";
+	property string priorityCriticalColor: "#F85149";
+
+		//bubble / chat colors
+	property string bubbleColor: "#DFECF9";
+	property string otherBubbleColor: "#F1F3F7";
+	property string myBubbleColor: "#EAF3FF";
+
+		//section / card
+	property string sectionLabelColor: "#8C95A6";
+	property string cardBorderColorFaded: "#d0d0d266";
+
+		//accent background
+	property string accentBgLightColor: "#DFECF9";
+	property string accentBorderLightColor: "#B4D3F2";
+	property string accentBadgeBgColor: "#E5F0FB";
+
+		//hover backgrounds
+	property string hoverBgColor: "#F0F2F5";
+	property string hoverBgActiveColor: "#E6F4EA";
+
+		//attachment backgrounds
+	property string focusedAttachmentBgColor: "#ECF3FF";
+	property string imageAttachmentBgColor: "#EEF2F8";
+	property string fileAttachmentBgColor: "#F6F8FC";
+
+		//composite colors
+	property string compositeColor: "#bcd2e8";
+	property string compositeSelectedColor: "#1167b1";
+
+		//notification backgrounds
+	property string notificationAssigneeBgColor: "#d4edda";
+	property string notificationDefaultBgColor: "#d6eaf8";
+
+		//message type backgrounds
+	property string messageErrorBgColor: "#ffcccc";
+	property string messageWarningBgColor: "#fff4cc";
+	property string messageInfoBgColor: "#cce5ff";
+	property string messageSuccessBgColor: "#ccffcc";
+
+		//alert
+	property string alertBgColor: "#f9dedc";
+
+		//overlay
+	property string overlayDimColor: "#80000000";
+
+		//chart colors
+	property string chartAxisColor: "#999999";
+	property string chartGridColor: "#dddddd";
+	property string chartFallbackColor: "#cccccc";
+
+		//indicator colors
+	property string indicatorActiveColor: "#3FB950";
+	property string indicatorInactiveColor: "#8C95A6";
+
+		//input background
+	property string inputBgInactiveColor: "#FAFBFC";
+
 	//other parameters
 	property real maximumFlickVelocity: 75
 	property bool enableHoverEffect: true

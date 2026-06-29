@@ -23,7 +23,7 @@ Item {
 
 
 	property string color_positive: Style.positiveAccentColor;
-	property string backgroundColor: "#000000";
+	property string backgroundColor: Style.baseColorInverted;
 
 	property bool hasTooltip: true;
 
@@ -93,7 +93,7 @@ Item {
 		fontPixelSize:  Style.fontSizeM;
 
 		color: Style.color_buttonText;
-		fontColor: "#ffffff";
+		fontColor: Style.baseColor;
 
 		borderColor: Style.color_elementBorder;
 		property string shownValPos: Math.trunc((barChart.positiveValue + barChart.addToValue)*1000)/1000;

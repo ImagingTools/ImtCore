@@ -8,7 +8,7 @@ import imtcontrols 1.0
 BoundingBox {
 	id: polylineShape;
 
-	property string color: "#000000";
+	property string color: Style.baseColorInverted;
 	property string selectionColor: DesignScheme.selectionColor;
 	property var colorList: [];
 	property int lineWidth: 1;
@@ -80,8 +80,8 @@ BoundingBox {
 				ctx.beginPath()
 
 				if(invalidPointIndexArr.indexOf(i) > -1){
-					ctx.strokeStyle = "#ff0000"
-					ctx.fillStyle = "#ff0000"
+					ctx.strokeStyle = Style.errorTextColor
+					ctx.fillStyle = Style.errorTextColor
 				}
 				else if(isSelected){
 					ctx.strokeStyle = DesignScheme.selectionColor
@@ -128,7 +128,7 @@ BoundingBox {
 				DesignScheme.drawEditPoint(ctx, point)
 			}
 			else {
-				DesignScheme.drawEditPoint(ctx, point, "#ff0000")
+				DesignScheme.drawEditPoint(ctx, point, Style.errorTextColor)
 			}
 		}
 	}

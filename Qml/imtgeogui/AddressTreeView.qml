@@ -290,7 +290,7 @@ Rectangle{
 		textColor: treeBody.textColor
 		selectionRadius: 4;
 		scrollIndicatorColor: Style.firstColor;
-		scrollBackgroundColor: "#ffffff";
+		scrollBackgroundColor: Style.baseColor;
 		additionalDelegateComp: treeBody.additionalDelegateComp
 
 		property int indexToMove: -1;

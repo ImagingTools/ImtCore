@@ -114,7 +114,7 @@ Item {
     property string disabledTextColor:       Style.inactiveTextColor
     property string headerBackgroundColor:   Style.alternateBaseColor
     property string gridLineColor:           Style.borderColor2
-    property string editorErrorColor:        "#d04848"
+    property string editorErrorColor:        Style.errorTextColor
 
     // ─── Public readonly state ─────────────────────────────────────────────
 

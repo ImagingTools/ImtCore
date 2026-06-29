@@ -25,9 +25,9 @@ Rectangle{
 	property real minSize: secondSize;
 	property real secondSize: Style.controlHeightS;
 	property int indicatorRadius: radius;
-    property string backgroundColor: decorator_ ? "transparent" : Style.scrollBackgroundColor !== undefined ? Style.scrollBackgroundColor  : "#efefef";
-    property string indicatorColor: decorator_ ? "transparent" : Style.scrollIndicatorColor !== undefined ? Style.scrollIndicatorColor : "lightgray";
-    property string highlightColor: decorator_ ? "transparent" : Style.scrollHighlightColor !== undefined ? Style.scrollHighlightColor : "lightgray";
+    property string backgroundColor: decorator_ ? "transparent" : Style.scrollBackgroundColor !== undefined ? Style.scrollBackgroundColor  : Style.imagingToolsGradient0;
+    property string indicatorColor: decorator_ ? "transparent" : Style.scrollIndicatorColor !== undefined ? Style.scrollIndicatorColor : Style.imagingToolsGradient3;
+    property string highlightColor: decorator_ ? "transparent" : Style.scrollHighlightColor !== undefined ? Style.scrollHighlightColor : Style.imagingToolsGradient0;
 
     property bool canFade: false;
     property bool isMoving: false;
