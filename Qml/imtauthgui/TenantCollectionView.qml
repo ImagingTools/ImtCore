@@ -558,6 +558,7 @@ RemoteCollectionView {
 				if (buttonId == Enums.yes) {
 					if (tenantId && tenantId !== AuthorizationController.currentTenantId) {
 						container.__pendingOpenTenantAfterSwitchId = tenantId
+						container.__skipCloseOnSwitch = true
 						container.switchToTenant(tenantId)
 					} else {
 						container.openTenantDocument(tenantId)
@@ -593,6 +594,8 @@ RemoteCollectionView {
 		}
 
 		function onTenantSelectionFailed(errorMessage) {
+			container.__skipCloseOnSwitch = false
+
 			if (container.__pendingCreateNewTenantDocumentAfterSwitch) {
 				container.__pendingCreateNewTenantDocumentAfterSwitch = false
 				if (errorMessage && errorMessage !== "") {
@@ -635,6 +638,7 @@ RemoteCollectionView {
 			onFinished: {
 				if (buttonId == Enums.yes) {
 					container.__pendingCreateNewTenantDocumentAfterSwitch = true
+					container.__skipCloseOnSwitch = true
 					container.switchToTenant("")
 				}
 			}
@@ -811,15 +815,6 @@ RemoteCollectionView {
 						if (isNewTenant){
 							if (tenantEditor.representationController){
 								tenantEditor.representationController.updateRepresentationFromDocument()
-							}
-						}
-					}
-					onIsNewTenantChanged: {
-						if (!isNewTenant){
-							var tenantId = tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
-							if (tenantId && tenantId !== AuthorizationController.currentTenantId){
-								container.__skipCloseOnSwitch = true
-								container.switchToTenant(tenantId)
 							}
 						}
 					}

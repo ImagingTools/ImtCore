@@ -70,6 +70,7 @@ Rectangle {
 		target: AuthorizationController;
 		
 		function onLoggedOut(){
+			thumbnailDecoratorContainer.showPage(thumbnailDecoratorContainer.authorizationPageComp);
 			thumbnailDecoratorContainer.onLogout();
 		}
 	}

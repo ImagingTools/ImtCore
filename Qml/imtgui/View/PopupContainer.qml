@@ -200,6 +200,7 @@ Item {
 		}
 
 		popupModel.insert(0, { "type": type, "text": text, "closable": autoClose, "id": id })
+		messageListView.positionViewAtBeginning()
 		__enforceMaxCount()
 	}
 
@@ -221,6 +222,7 @@ Item {
 		__customComponents[id] = customComponent
 		__customProperties[id] = properties
 		popupModel.insert(0, { "type": type, "text": text, "closable": autoClose, "id": id })
+		messageListView.positionViewAtBeginning()
 		__enforceMaxCount()
 	}
 
@@ -233,6 +235,7 @@ Item {
 		if (existingIndex >= 0){
 			popupModel.remove(existingIndex)
 			popupModel.insert(existingIndex, { "type": type, "text": text, "closable": autoClose, "id": id })
+			messageListView.positionViewAtBeginning()
 		}
 	}
 
@@ -246,6 +249,7 @@ Item {
 			if (__customProperties.hasOwnProperty(id)){
 				delete __customProperties[id]
 			}
+			messageListView.positionViewAtBeginning()
 		}
 	}
 
@@ -270,6 +274,6 @@ Item {
 		popupModel.clear()
 		__customComponents = {}
 		__customProperties = {}
+		messageListView.positionViewAtBeginning()
 	}
 }
-

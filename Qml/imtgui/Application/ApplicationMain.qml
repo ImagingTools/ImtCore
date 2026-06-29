@@ -148,6 +148,17 @@ Item {
 	signal settingsSaveFailed();
 	
 	Component.onCompleted: {
+		if (typeof String.prototype.arg !== "function") {
+			String.prototype.arg = function() {
+				var result = String(this)
+				for (var i = 0; i < arguments.length; i++) {
+					var placeholder = "%" + (i + 1)
+					result = result.split(placeholder).join(String(arguments[i]))
+				}
+				return result
+			}
+		}
+
 		setDecorators()
 		timer.onTriggeredFunc();
 	}
@@ -645,5 +656,3 @@ Item {
 		}
 	}
 }
-
-

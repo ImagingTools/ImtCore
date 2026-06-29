@@ -35,6 +35,7 @@ import imtgui 1.0
 */
 PopupView {
 	id: root
+	forceFocus: false
 
 	width: root.embedded ? (parent ? parent.width : itemWidth) : (itemWidth + 2 * Style.marginL)
 	height: root.embedded ? contentColumn.height : Math.min(contentColumn.height + 2 * Style.marginL, root.__maxPopupHeight)
