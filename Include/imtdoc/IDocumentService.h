@@ -146,6 +146,7 @@ public:
 
 	struct DocumentInfo
 	{
+		bool initialState = false; ///< \c true when the document was restored from archive and needs server update.
 		QByteArray typeId;        ///< Registered object type-ID of the document.
 		QUrl url;                 ///< Source URL (e.g.\ \c collection://\<objectId\>).
 		QString name;             ///< Human-readable document name.

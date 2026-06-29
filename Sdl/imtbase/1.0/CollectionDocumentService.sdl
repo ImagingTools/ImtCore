@@ -51,6 +51,7 @@ type DocumentId {
 }
 
 type DocumentInfo {
+	initialState: Bool!
 	documentId: ID!
 	documentName: String!
 	objectTypeId: ID!

@@ -197,6 +197,7 @@ protected:
 	*/
 	struct WorkingDocument
 	{
+		bool initialState = false;                 ///< \c true when the document was restored from archive or freshly created and needs server update.
 		QByteArray objectId;                       ///< Backing collection element ID (empty for unsaved documents).
 		QByteArray typeId;                         ///< Registered object type-ID.
 		QUrl url;                                  ///< Source URL (mirrors the open URL).

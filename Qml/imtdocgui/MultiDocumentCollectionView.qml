@@ -154,6 +154,7 @@ Item {
 				let objectTypeId = documentInfo.m_objectTypeId
 				let isDirty = documentInfo.m_isDirty
 				let hasNameProvider = documentInfo.m_hasNameProvider
+				let initialState = documentInfo.m_initialState
 
 				workspaceView.documentManager.setAutoNamedTypeId(objectTypeId, hasNameProvider)
 
@@ -168,6 +169,11 @@ Item {
 
 				workspaceView.documentManager.getUndoInfo(documentId)
 				workspaceView.documentManager.documentManagerChanged(EDocumentOperationEnum.s_documentChanged, objectId, documentId, documentName)
+
+				if (initialState){
+					workspaceView.documentManager.setDocumentIsLoading(documentId, true)
+					workspaceView.documentManager.setDocumentIsLoading(documentId, false)
+				}
 			}
 
 			globalLoading.stop()

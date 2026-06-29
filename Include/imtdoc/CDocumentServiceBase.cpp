@@ -10,6 +10,8 @@
 // ACF includes
 #include <imod/IModel.h>
 #include <imod/IObserver.h>
+#include <iser/IArchive.h>
+#include <iser/CArchiveTag.h>
 
 // ImtCore includes
 #include <imtdoc/CDocumentChangedEvent.h>
@@ -173,6 +175,7 @@ IDocumentService::DocumentList CDocumentServiceBase::GetOpenedDocumentList(const
 			info.isDirty = workingDocument.isDirty;
 			info.hasNameProvider = HasDocumentNameProvider(workingDocument.typeId);
 			info.isLoading = workingDocument.isLoading;
+			info.initialState = workingDocument.initialState;
 
 			list.append(info);
 		}
@@ -201,6 +204,7 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 		doc.typeId = params.documentTypeId;
 		doc.undoManagerPtr = undoManagerPtr;
 		doc.isDirty = true;
+		doc.initialState = true;
 		doc.name = params.documentName;
 		doc.isLoading = true;
 		documentName = doc.name;
@@ -532,6 +536,8 @@ IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentData(
 		return OS_FAILED;
 	}
 
+	workingDocumentPtr->initialState = false;
+
 	bool isCopySuccessful = workingDocumentPtr->objectPtr->CopyFrom(document);
 
 	return isCopySuccessful ? OS_OK : OS_FAILED;
@@ -623,9 +629,146 @@ IDocumentService::OperationStatus CDocumentServiceBase::UnregisterDocumentObserv
 
 // reimplemented (iser::ISerializable)
 
-bool CDocumentServiceBase::Serialize(iser::IArchive& /*archive*/)
+bool CDocumentServiceBase::Serialize(iser::IArchive& archive)
 {
-	return false;
+	QMutexLocker locker(&m_mutex);
+
+	bool retVal = true;
+
+	iser::CArchiveTag documentsTag("OpenedDocuments", "Opened documents", iser::CArchiveTag::TT_MULTIPLE);
+	iser::CArchiveTag documentTag("Document", "Document", iser::CArchiveTag::TT_GROUP, &documentsTag);
+
+	int documentCount = 0;
+
+	if (archive.IsStoring()){
+		for (auto userIt = m_userDocuments.constBegin(); userIt != m_userDocuments.constEnd(); ++userIt){
+			documentCount += userIt.value().count();
+		}
+	}
+
+	retVal = retVal && archive.BeginMultiTag(documentsTag, documentTag, documentCount);
+
+	if (archive.IsStoring()){
+		for (auto userIt = m_userDocuments.constBegin(); userIt != m_userDocuments.constEnd(); ++userIt){
+			const QByteArray& userId = userIt.key();
+			const WorkingDocumentList& documents = userIt.value();
+
+			for (auto docIt = documents.constBegin(); docIt != documents.constEnd(); ++docIt){
+				const QByteArray& documentId = docIt.key();
+				const WorkingDocument& doc = docIt.value();
+
+				retVal = retVal && archive.BeginTag(documentTag);
+
+				QByteArray userIdCopy = userId;
+				QByteArray documentIdCopy = documentId;
+				QByteArray objectIdCopy = doc.objectId;
+				QByteArray typeIdCopy = doc.typeId;
+				QString urlStr = doc.url.toString();
+				QString nameCopy = doc.name;
+
+				iser::CArchiveTag userIdTag("UserId", "User ID", iser::CArchiveTag::TT_LEAF);
+				retVal = retVal && archive.BeginTag(userIdTag);
+				retVal = retVal && archive.Process(userIdCopy);
+				retVal = retVal && archive.EndTag(userIdTag);
+
+				iser::CArchiveTag documentIdTag("DocumentId", "Document ID", iser::CArchiveTag::TT_LEAF);
+				retVal = retVal && archive.BeginTag(documentIdTag);
+				retVal = retVal && archive.Process(documentIdCopy);
+				retVal = retVal && archive.EndTag(documentIdTag);
+
+				iser::CArchiveTag objectIdTag("ObjectId", "Object ID", iser::CArchiveTag::TT_LEAF);
+				retVal = retVal && archive.BeginTag(objectIdTag);
+				retVal = retVal && archive.Process(objectIdCopy);
+				retVal = retVal && archive.EndTag(objectIdTag);
+
+				iser::CArchiveTag typeIdTag("TypeId", "Type ID", iser::CArchiveTag::TT_LEAF);
+				retVal = retVal && archive.BeginTag(typeIdTag);
+				retVal = retVal && archive.Process(typeIdCopy);
+				retVal = retVal && archive.EndTag(typeIdTag);
+
+				iser::CArchiveTag urlTag("Url", "Url", iser::CArchiveTag::TT_LEAF);
+				retVal = retVal && archive.BeginTag(urlTag);
+				retVal = retVal && archive.Process(urlStr);
+				retVal = retVal && archive.EndTag(urlTag);
+
+				iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
+				retVal = retVal && archive.BeginTag(nameTag);
+				retVal = retVal && archive.Process(nameCopy);
+				retVal = retVal && archive.EndTag(nameTag);
+
+				retVal = retVal && archive.EndTag(documentTag);
+			}
+		}
+	}
+	else{
+		for (int i = 0; i < documentCount; ++i){
+			retVal = retVal && archive.BeginTag(documentTag);
+
+			QByteArray userId;
+			QByteArray documentId;
+			QByteArray objectId;
+			QByteArray typeId;
+			QString urlStr;
+			QString name;
+
+			iser::CArchiveTag userIdTag("UserId", "User ID", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(userIdTag);
+			retVal = retVal && archive.Process(userId);
+			retVal = retVal && archive.EndTag(userIdTag);
+
+			iser::CArchiveTag documentIdTag("DocumentId", "Document ID", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(documentIdTag);
+			retVal = retVal && archive.Process(documentId);
+			retVal = retVal && archive.EndTag(documentIdTag);
+
+			iser::CArchiveTag objectIdTag("ObjectId", "Object ID", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(objectIdTag);
+			retVal = retVal && archive.Process(objectId);
+			retVal = retVal && archive.EndTag(objectIdTag);
+
+			iser::CArchiveTag typeIdTag("TypeId", "Type ID", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(typeIdTag);
+			retVal = retVal && archive.Process(typeId);
+			retVal = retVal && archive.EndTag(typeIdTag);
+
+			iser::CArchiveTag urlTag("Url", "Url", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(urlTag);
+			retVal = retVal && archive.Process(urlStr);
+			retVal = retVal && archive.EndTag(urlTag);
+
+			iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
+			retVal = retVal && archive.BeginTag(nameTag);
+			retVal = retVal && archive.Process(name);
+			retVal = retVal && archive.EndTag(nameTag);
+
+			retVal = retVal && archive.EndTag(documentTag);
+
+			if (retVal){
+				istd::IChangeableUniquePtr objectPtr = CreateObject(typeId);
+				idoc::IUndoManagerUniquePtr undoManagerPtr = CreateUndoManager();
+
+				if (!objectPtr.IsValid() || !undoManagerPtr.IsValid()){
+					continue;
+				}
+
+				WorkingDocument& doc = m_userDocuments[userId][documentId];
+				doc.objectId = objectId;
+				doc.typeId = typeId;
+				doc.url = QUrl(urlStr);
+				doc.name = name;
+				doc.isDirty = false;
+				doc.initialState = true;
+				doc.objectPtr = istd::IChangeableSharedPtr(objectPtr.release());
+				doc.undoManagerPtr = idoc::IUndoManagerSharedPtr(undoManagerPtr.release());
+
+				InitializeDocumentObservers(doc, userId);
+			}
+		}
+	}
+
+	retVal = retVal && archive.EndTag(documentsTag);
+
+	return retVal;
 }
 
 

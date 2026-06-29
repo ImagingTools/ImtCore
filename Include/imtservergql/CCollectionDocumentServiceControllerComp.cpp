@@ -45,6 +45,7 @@ CDM::CDocumentList CCollectionDocumentServiceControllerComp::OnGetOpenedDocument
 			sdlInfo.objectTypeId = info.typeId;
 			sdlInfo.isDirty = info.isDirty;
 			sdlInfo.hasNameProvider = info.hasNameProvider;
+			sdlInfo.initialState = info.initialState;
 
 			retVal.documentList->append(sdlInfo);
 		}
@@ -102,6 +103,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnCreateNewDocument
 		retVal.isDirty = true;
 		retVal.hasNameProvider = false;
 		retVal.isLoading = false;
+		retVal.initialState = true;
 
 		imtdoc::IDocumentService::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
 		for (const imtdoc::IDocumentService::DocumentListItem& info : list){
@@ -161,6 +163,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 		retVal.isDirty = false;
 		retVal.hasNameProvider = false;
 		retVal.isLoading = true;
+		retVal.initialState = false;
 
 		imtdoc::IDocumentService::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
 		for (const imtdoc::IDocumentService::DocumentListItem& info : list){
