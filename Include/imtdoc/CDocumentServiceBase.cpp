@@ -758,8 +758,8 @@ bool CDocumentServiceBase::Serialize(iser::IArchive& archive)
 				doc.name = name;
 				doc.isDirty = false;
 				doc.initialState = true;
-				doc.objectPtr = istd::IChangeableSharedPtr(objectPtr.release());
-				doc.undoManagerPtr = idoc::IUndoManagerSharedPtr(undoManagerPtr.release());
+				doc.objectPtr = istd::IChangeableSharedPtr(objectPtr.PopInterfacePtr());
+				doc.undoManagerPtr = idoc::IUndoManagerSharedPtr(undoManagerPtr.PopInterfacePtr());
 
 				InitializeDocumentObservers(doc, userId);
 			}
