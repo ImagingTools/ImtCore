@@ -180,7 +180,101 @@ QString CObjectCollectionControllerCompBase::GetControllerName() const
 }
 
 
-const imtbase::ISearchResults* CObjectCollectionControllerCompBase::Search(const QString& text) const
+void CObjectCollectionControllerCompBase::BuildSearchComplexFilter(const QString& text, sdl::V1_0::imtbase::CComplexCollectionFilter& outFilter) const
+{
+	if (!m_headersProviderCompPtr.IsValid()){
+		return;
+	}
+
+	typename imtcol::ICollectionHeadersProvider::HeaderIds headerIds = m_headersProviderCompPtr->GetHeaderIds();
+
+	sdl::V1_0::imtbase::CGroupFilter groupFilter;
+	groupFilter.logicalOperation = sdl::V1_0::imtbase::LogicalOperation::Or;
+
+	QList<sdl::V1_0::imtbase::FieldFilterUnion> fieldList;
+	for (const QByteArray& headerId : headerIds){
+		typename imtcol::ICollectionHeadersProvider::HeaderInfo headerInfo;
+		if (m_headersProviderCompPtr->GetHeaderInfo(headerId, headerInfo)){
+			if (headerInfo.filterable){
+				sdl::V1_0::imtbase::CFieldFilter fieldFilter;
+				fieldFilter.fieldId = headerInfo.headerId;
+				fieldFilter.filterValue = text;
+				fieldFilter.filterValueType = sdl::V1_0::imtbase::ValueType::String;
+
+				imtsdl::TElementList<sdl::V1_0::imtbase::FilterOperation> filterOperations;
+				filterOperations << sdl::V1_0::imtbase::FilterOperation::Contains;
+				fieldFilter.filterOperations = filterOperations;
+
+				fieldList << sdl::V1_0::imtbase::FieldFilterUnion(fieldFilter);
+			}
+		}
+	}
+
+	groupFilter.fieldFilters.Emplace().FromList(fieldList);
+	outFilter.fieldsFilter = groupFilter;
+}
+
+int CObjectCollectionControllerCompBase::GetMatchCount(const QString& text) const
+{
+	if (!m_headersProviderCompPtr.IsValid()){
+		return 0;
+	}
+
+	QMap<int, QByteArray> commandIds = GetSupportedCommandIds();
+	QByteArray listCommandId = commandIds.value(OT_LIST);
+	if (listCommandId.isEmpty()){
+		return 0;
+	}
+
+	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_QUERY, listCommandId);
+
+	// copy minimal context if available
+	imtgql::IGqlRequestProvider* gqlRequestProviderPtr = QueryInterface<imtgql::IGqlRequestProvider>(const_cast<CObjectCollectionControllerCompBase*>(this));
+	if (gqlRequestProviderPtr != nullptr){
+		const imtgql::IGqlRequest* gqlRequestPtr = gqlRequestProviderPtr->GetGqlRequest();
+		if (gqlRequestPtr != nullptr){
+			istd::TUniqueInterfacePtr<imtgql::IGqlContext> gqlContextPtr;
+			gqlContextPtr.MoveCastedPtr(gqlRequestPtr->GetRequestContext()->CloneMe());
+			if (gqlContextPtr.IsValid()){
+				gqlRequest.SetGqlContext(gqlContextPtr.PopInterfacePtr());
+			}
+		}
+	}
+
+	QString errorMessage;
+	bool ok = CheckPermissions(gqlRequest, errorMessage);
+	if (!ok){
+		return 0;
+	}
+
+	sdl::V1_0::imtbase::CComplexCollectionFilter complexFilter;
+	BuildSearchComplexFilter(text, complexFilter);
+
+	imtgql::CGqlParamObject input;
+	imtgql::CGqlParamObject viewParams;
+	viewParams.InsertParam("offset", 0);
+	viewParams.InsertParam("count", 0);
+
+	imtgql::CGqlParamObject complexFilterGqlOblect;
+	if (complexFilter.WriteToGraphQlObject(complexFilterGqlOblect)){
+		viewParams.InsertParam("filterModel", complexFilterGqlOblect);
+	}
+
+	input.InsertParam("viewParams", viewParams);
+	gqlRequest.AddParam("input", input);
+
+	QJsonObject resultObj = GetElementsCount(gqlRequest, errorMessage);
+	if (resultObj.isEmpty()){
+		return 0;
+	}
+
+	QJsonObject dataObj = resultObj.value(QStringLiteral("data")).toObject();
+	int cnt = dataObj.value(QStringLiteral("itemsCount")).toInt();
+	return cnt;
+}
+
+const imtbase::ISearchResults* CObjectCollectionControllerCompBase::Search(
+	const QString& text, int offset, int count) const
 {
 	if (!m_headersProviderCompPtr.IsValid()){
 		return nullptr;
@@ -215,39 +309,14 @@ const imtbase::ISearchResults* CObjectCollectionControllerCompBase::Search(const
 		return nullptr;
 	}
 
-	typename imtcol::ICollectionHeadersProvider::HeaderIds headerIds = m_headersProviderCompPtr->GetHeaderIds();
-
 	sdl::V1_0::imtbase::CComplexCollectionFilter complexFilter;
-
-	sdl::V1_0::imtbase::CGroupFilter groupFilter;
-	groupFilter.logicalOperation = sdl::V1_0::imtbase::LogicalOperation::Or;
-
-	QList<sdl::V1_0::imtbase::FieldFilterUnion> fieldList;
-	for (const QByteArray& headerId : headerIds){
-		typename imtcol::ICollectionHeadersProvider::HeaderInfo headerInfo;
-		if (m_headersProviderCompPtr->GetHeaderInfo(headerId, headerInfo)){
-			if (headerInfo.filterable){
-				sdl::V1_0::imtbase::CFieldFilter fieldFilter;
-				fieldFilter.fieldId = headerInfo.headerId;
-				fieldFilter.filterValue = text;
-				fieldFilter.filterValueType = sdl::V1_0::imtbase::ValueType::String;
-
-				imtsdl::TElementList<sdl::V1_0::imtbase::FilterOperation> filterOperations;
-				filterOperations << sdl::V1_0::imtbase::FilterOperation::Contains;
-				fieldFilter.filterOperations = filterOperations;
-
-				fieldList << sdl::V1_0::imtbase::FieldFilterUnion(fieldFilter);
-			}
-		}
-	}
-
-	groupFilter.fieldFilters.Emplace().FromList(fieldList);
-	complexFilter.fieldsFilter = groupFilter;
+	BuildSearchComplexFilter(text, complexFilter);
 
 	imtgql::CGqlParamObject input;
 	imtgql::CGqlParamObject viewParams;
-	viewParams.InsertParam("offset", 0);
-	viewParams.InsertParam("count", -1);
+	viewParams.InsertParam("offset", offset);
+	int effCount = (count > 0 ? count : 30);
+	viewParams.InsertParam("count", effCount);
 
 	imtgql::CGqlParamObject complexFilterGqlOblect;
 	if (complexFilter.WriteToGraphQlObject(complexFilterGqlOblect)){
@@ -275,9 +344,6 @@ const imtbase::ISearchResults* CObjectCollectionControllerCompBase::Search(const
 	}
 
 	QJsonArray itemsArray = dataObj.value(QStringLiteral("items")).toArray();
-	if (itemsArray.isEmpty()){
-		return nullptr;
-	}
 
 	imtbase::CSearchResults* searchResultsPtr = new imtbase::CSearchResults();
 	for (int i = 0; i < itemsArray.count(); i++){
@@ -1466,20 +1532,22 @@ QJsonObject CObjectCollectionControllerCompBase::CreateInternalResponse(
 
 bool CObjectCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
-	bool isSupported = BaseClass::IsRequestSupported(gqlRequest);
-	if (isSupported){
-		const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
-		if (inputParamPtr == nullptr){
-			return false;
-		}
-
-		if (m_collectionIdAttrPtr.IsValid() && *m_collectionIdAttrPtr != ""){
-			QByteArray collectionId = inputParamPtr->GetParamArgumentValue("collectionId").toByteArray();
-			return *m_collectionIdAttrPtr == collectionId;
-		}
+	if (!BaseClass::IsRequestSupported(gqlRequest)){
+		return false;
 	}
 
-	return false;
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject(QByteArrayLiteral("input"));
+	if (inputParamPtr == nullptr){
+		return false;
+	}
+
+	if (m_collectionIdAttrPtr.IsValid() && !(*m_collectionIdAttrPtr).isEmpty()){
+		const QByteArray collectionId = inputParamPtr->GetParamArgumentValue(QByteArrayLiteral("collectionId")).toByteArray();
+
+		return *m_collectionIdAttrPtr == collectionId;
+	}
+
+	return true;
 }
 
 

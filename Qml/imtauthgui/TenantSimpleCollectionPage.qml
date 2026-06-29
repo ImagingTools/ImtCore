@@ -55,6 +55,10 @@ ViewBase {
 	function updateModel() {}
 
 	function refresh() {
+		if (!root.visible) {
+			root.__refreshPending = true
+			return
+		}
 		if (dataProvider)
 			dataProvider.fetch(__lastFilterText)
 	}
@@ -109,18 +113,30 @@ ViewBase {
 	property var selectionManager: null
 	property string __lastFilterText: ""
 	property var __listItems: []
+	property bool __refreshPending: false
 
 	property var dataProvider: null
 	onDataProviderChanged: {
-		if (dataProvider)
+		if (dataProvider && root.visible)
 			dataProvider.fetch(__lastFilterText)
+		else if (dataProvider)
+			root.__refreshPending = true
+	}
+	onVisibleChanged: {
+		if (root.visible && root.__refreshPending) {
+			root.__refreshPending = false
+			root.refresh()
+		}
 	}
 	readonly property string filterText: __lastFilterText
 
 	Connections {
 		target: root.dataProvider
 		function onDataChanged() {
-			root.__listItems = root.dataProvider.items
+			if (root.visible)
+				root.__listItems = root.dataProvider.items
+			else
+				root.__refreshPending = true
 		}
 	}
 

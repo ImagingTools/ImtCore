@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6418" Description="ACF"/>
-            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -507,6 +507,7 @@
         <Component ExportedId="CrossOrgGrantManager" ComponentId="TenantGrantManager/CrossOrgGrantManager"/>
         <Component ExportedId="DelegatedAccessResolver" ComponentId="DelegatedAccessResolver"/>
         <Component ExportedId="TenantConnectionRequestManager" ComponentId="TenantConnectionManager/TenantConnectionRequestManager"/>
+        <Component ExportedId="TenantEntityBindingManager" ComponentId="TenantEntityBindingManager/TenantEntityBindingManager"/>
         <Component ExportedId="TenantInvitationManager" ComponentId="TenantMembershipManager/TenantInvitationManager"/>
         <Component ExportedId="TenantManager" ComponentId="TenantManager/TenantManager"/>
         <Component ExportedId="TenantMembershipManager" ComponentId="TenantMembershipManager/TenantMembershipManager"/>

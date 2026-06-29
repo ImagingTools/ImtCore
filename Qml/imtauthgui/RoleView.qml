@@ -17,29 +17,40 @@ ViewBase {
 	property string productId: "";
 	property string tenantId: "";
 	property var permissionsProvider: null;
-	property string __lastRequestedProductId: ""
-	property string __lastRequestedTenantId: ""
-	
+
+	property bool __permissionsRequested: false
+	property var __receivedPermissions: null
+	property bool __completed: false
+
 	property RoleData roleData: model;
 
 	Component.onCompleted: {
-		container.__requestPermissions(true)
-		container.__rebuildPermissionsTree()
+		container.__completed = true
+		container.__requestPermissionsOnce()
 	}
 
 	onProductIdChanged: {
-		container.__requestPermissions(true)
+		if (!container.__completed)
+			return
+		container.__permissionsRequested = false
+		container.__receivedPermissions = null
+		container.__requestPermissionsOnce()
 	}
 
 	onTenantIdChanged: {
-		container.__requestPermissions(true)
+		if (!container.__completed)
+			return
+		container.__permissionsRequested = false
+		container.__receivedPermissions = null
+		container.__requestPermissionsOnce()
 	}
 
 	onPermissionsProviderChanged: {
-		container.__lastRequestedProductId = ""
-		container.__lastRequestedTenantId = ""
-		container.__requestPermissions(true)
-		container.__rebuildPermissionsTree()
+		if (!container.__completed)
+			return
+		container.__permissionsRequested = false
+		container.__receivedPermissions = null
+		container.__requestPermissionsOnce()
 	}
 
 	Connections {
@@ -50,49 +61,39 @@ ViewBase {
 			var actualTenantId = sourceTenantId || ""
 			if (expectedTenantId !== actualTenantId)
 				return
-			container.__rebuildPermissionsTree()
+			container.__receivedPermissions = permissions
+			container.__populatePermissionsTree()
 		}
 	}
 
-	function __requestPermissions(force) {
-		if (!container.permissionsProvider)
-			return false
+	Connections {
+		target: permissionsTableElementView
 
+		function onBottomItemChanged() {
+			container.__populatePermissionsTree()
+		}
+	}
+
+	function __requestPermissionsOnce() {
+		if (!container.permissionsProvider)
+			return
 		if (container.productId === "")
-			return false
-
-		var requestTenantId = container.tenantId || ""
-		if (!force
-				&& container.__lastRequestedProductId === container.productId
-				&& container.__lastRequestedTenantId === requestTenantId
-				&& container.permissionsProvider.loading)
-			return true
-
+			return
+		if (container.__permissionsRequested)
+			return
+		container.__permissionsRequested = true
 		container.permissionsProvider.productId = container.productId
-		container.__lastRequestedProductId = container.productId
-		container.__lastRequestedTenantId = requestTenantId
-		container.permissionsProvider.requestPermissions(requestTenantId)
-		return true
-	}
-
-	function __activePermissions() {
-		if (!container.permissionsProvider)
-			return []
-
 		var requestTenantId = container.tenantId || ""
-		if (requestTenantId !== "") {
-			if (container.permissionsProvider.tenantPermissionsTenantId !== requestTenantId)
-				return []
-			return container.permissionsProvider.tenantPermissions || []
-		}
-
-		return container.permissionsProvider.allPermissions || []
+		container.permissionsProvider.requestPermissions(requestTenantId)
 	}
 
-	function __rebuildPermissionsTree() {
+	function __populatePermissionsTree() {
 		if (!permissionsTableElementView.bottomItem)
 			return
-		permissionsTableElementView.bottomItem.rebuildFromFlatArray(container.__activePermissions())
+		var perms = container.__receivedPermissions
+		if (!perms)
+			return
+		permissionsTableElementView.bottomItem.rebuildFromFlatArray(perms)
 		if (container.roleData)
 			container.doUpdateGuiPermissions()
 	}
@@ -288,13 +289,22 @@ ViewBase {
 				ElementView {
 					id: permissionsTableElementView
 					width: parent.width
+					border.width: 0
+					color: "transparent"
+					radius: 0
+					contentMargin: Style.marginL
+					contentSpacing: 0
+					height: contentHeight
 					bottomComp: Component {
 						PermissionsTableView {
 							id: permissionsTableView
-							height: 500
-							anchors.horizontalCenter: parent.horizontalCenter
+							width: parent.width
+							height: preferredHeight
 							showControlPanel: true
 							treeToScrollbarSpacing: 0
+							controlPanelTopMargin: Style.marginL
+							treeTopMargin: Style.marginL
+							treeBottomMargin: Style.marginL
 		
 							onSelectionChanged: {
 								container.doUpdateModel()
@@ -328,6 +338,8 @@ ViewBase {
 		}
 
 		if (permissionsTableElementView.bottomItem){
+			// Only leaf permission IDs must be stored (groups/parents are excluded even
+			// when tristate check selected the whole subtree).
 			var selectedPermissionIds = permissionsTableElementView.bottomItem.getCheckedIds()
 			container.roleData.m_permissions = selectedPermissionIds.join(';')
 		}

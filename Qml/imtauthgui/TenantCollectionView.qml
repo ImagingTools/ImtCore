@@ -76,16 +76,16 @@ RemoteCollectionView {
 
 	Connections {
 		target: container.tenantManagementApiClient
-		function onSubscriptionInvitationReceived(notification) {
+		function onSubscriptionInvitationReceived(tenantId, tenantName, role) {
 			container.doUpdateGui()
 		}
-		function onSubscriptionInvitationAccepted(notification) {
+		function onSubscriptionInvitationAccepted(tenantId, membershipId) {
 			container.doUpdateGui()
 		}
-		function onSubscriptionInvitationRejected(notification) {
+		function onSubscriptionInvitationRejected(tenantId, membershipId) {
 			container.doUpdateGui()
 		}
-		function onSubscriptionOwnershipTransferred(notification) {
+		function onSubscriptionOwnershipTransferred(tenantId) {
 			container.doUpdateGui()
 		}
 	}
@@ -142,13 +142,7 @@ RemoteCollectionView {
 					if (m_success) {
 						container.doUpdateGui()
 						// Fan out so any TenantEditor open on this tenant reloads.
-						AuthorizationController.tenantInvitationAccepted({
-							"membershipId": "",
-							"userId": AuthorizationController.userTokenProvider ? AuthorizationController.userTokenProvider.userId : "",
-							"tenantId": container.__pendingAcceptTenantId,
-							"tenantName": "",
-							"role": ""
-						})
+						AuthorizationController.tenantInvitationAccepted(container.__pendingAcceptTenantId, "")
 					} else if (m_errorMessage && m_errorMessage !== "") {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 					}
@@ -170,13 +164,7 @@ RemoteCollectionView {
 				onFinished: {
 					if (m_success) {
 						container.doUpdateGui()
-						AuthorizationController.tenantInvitationRejected({
-							"membershipId": "",
-							"userId": AuthorizationController.userTokenProvider ? AuthorizationController.userTokenProvider.userId : "",
-							"tenantId": container.__pendingRejectTenantId,
-							"tenantName": "",
-							"role": ""
-						})
+						AuthorizationController.tenantInvitationRejected(container.__pendingRejectTenantId, "")
 					} else if (m_errorMessage && m_errorMessage !== "") {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 					}

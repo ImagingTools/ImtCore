@@ -610,7 +610,7 @@ Item {
 		}
 
 		function onTenantSelected(tenantId){
-			// application.updateAllModels();
+			application.updateAllModels();
 		}
 		
 		function onLoggedOut(){

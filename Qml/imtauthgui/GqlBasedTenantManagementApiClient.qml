@@ -94,12 +94,12 @@ QtObject {
 	signal requestFailed(string message)
 
 	// --- Real-time membership subscription notifications ---
-	signal subscriptionInvitationReceived(var notification)
-	signal subscriptionInvitationAccepted(var notification)
-	signal subscriptionInvitationRejected(var notification)
-	signal subscriptionOwnershipTransferred(var notification)
-	signal subscriptionMembershipRoleChanged(var notification)
-	signal subscriptionMembershipRemoved(var notification)
+	signal subscriptionInvitationReceived(string tenantId, string tenantName, string role)
+	signal subscriptionInvitationAccepted(string tenantId, string membershipId)
+	signal subscriptionInvitationRejected(string tenantId, string membershipId)
+	signal subscriptionOwnershipTransferred(string tenantId)
+	signal subscriptionMembershipRoleChanged(string tenantId, string userId, string role)
+	signal subscriptionMembershipRemoved(string tenantId, string userId)
 
 	signal crossTenantMessageSent(string messageId)
 	signal crossTenantMessageStatusUpdated(string messageId)
@@ -141,47 +141,27 @@ QtObject {
 			provider.fetch("")
 	}
 
-	// --- Subscription client for membership notifications ---
-	property SubscriptionClient __membershipSubscription: SubscriptionClient {
-		gqlCommandId: "OnMembershipNotification"
+	// --- Relay membership notifications from AuthorizationController to local signals ---
+	property Connections __membershipNotificationRelay: Connections {
+		target: AuthorizationController
 
-		function getHeaders() { return {} }
-
-		onMessageReceived: {
-			if (!data) return
-			var notificationType = ""
-			if (data.containsKey("notificationType"))
-				notificationType = data.getData("notificationType")
-
-			var notification = {
-				"membershipId": data.containsKey("membershipId") ? data.getData("membershipId") : "",
-				"userId": data.containsKey("userId") ? data.getData("userId") : "",
-				"tenantId": data.containsKey("tenantId") ? data.getData("tenantId") : "",
-				"tenantName": data.containsKey("tenantName") ? data.getData("tenantName") : "",
-				"role": data.containsKey("role") ? data.getData("role") : ""
-			}
-
-			if (notificationType === "InvitationReceived" || notificationType === 0) {
-				var tName = notification.tenantName ? notification.tenantName : qsTr("a tenant")
-				PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), true)
-				AuthorizationController.tenantInvitationReceived(notification)
-				root.subscriptionInvitationReceived(notification)
-			} else if (notificationType === "InvitationAccepted" || notificationType === 1) {
-				AuthorizationController.tenantInvitationAccepted(notification)
-				root.subscriptionInvitationAccepted(notification)
-			} else if (notificationType === "InvitationRejected" || notificationType === 2) {
-				AuthorizationController.tenantInvitationRejected(notification)
-				root.subscriptionInvitationRejected(notification)
-			} else if (notificationType === "OwnershipTransferred" || notificationType === 3) {
-				AuthorizationController.tenantOwnershipTransferred(notification)
-				root.subscriptionOwnershipTransferred(notification)
-			} else if (notificationType === "MembershipRoleChanged" || notificationType === 4) {
-				AuthorizationController.tenantMembershipRoleChanged(notification)
-				root.subscriptionMembershipRoleChanged(notification)
-			} else if (notificationType === "MembershipRemoved" || notificationType === 5) {
-				AuthorizationController.tenantMembershipRemoved(notification)
-				root.subscriptionMembershipRemoved(notification)
-			}
+		function onTenantInvitationReceived(tenantId, tenantName, role) {
+			root.subscriptionInvitationReceived(tenantId, tenantName, role)
+		}
+		function onTenantInvitationAccepted(tenantId, membershipId) {
+			root.subscriptionInvitationAccepted(tenantId, membershipId)
+		}
+		function onTenantInvitationRejected(tenantId, membershipId) {
+			root.subscriptionInvitationRejected(tenantId, membershipId)
+		}
+		function onTenantOwnershipTransferred(tenantId) {
+			root.subscriptionOwnershipTransferred(tenantId)
+		}
+		function onTenantMembershipRoleChanged(tenantId, userId, role) {
+			root.subscriptionMembershipRoleChanged(tenantId, userId, role)
+		}
+		function onTenantMembershipRemoved(tenantId, userId) {
+			root.subscriptionMembershipRemoved(tenantId, userId)
 		}
 	}
 

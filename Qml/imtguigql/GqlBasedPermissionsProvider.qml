@@ -10,14 +10,17 @@ import imtauthgui 1.0
 /**
  * GqlBasedPermissionsProvider
  *
- * SDL/GQL implementation of PermissionsProvider.
- * Sends GetProductPermissions with optional tenantId and stores both
- * product-wide and tenant-scoped caches.
+ * Dumb SDL/GQL implementation of PermissionsProvider.
+ * When requestPermissions(tenantId) is called it validates productId and sends
+ * the GetProductPermissions query. No in-memory cache short-circuits, no
+ * force/dedup logic. Response handling stores results and emits signals.
  */
 PermissionsProvider {
-    id: gqlPermissionsProvider
+    id: root
 
     property GetProductPermissionsInput __requestInput: GetProductPermissionsInput {}
+    // Remember the tenant for the in-flight request (response payload does not echo it).
+    // Used only to route result into correct scoped properties and emit the right signals.
     property string __pendingTenantId: ""
 
     property GqlSdlRequestSender __requestSender: GqlSdlRequestSender {
@@ -26,12 +29,12 @@ PermissionsProvider {
         sdlObjectComp: Component {
             GetProductPermissionsPayload {
                 onFinished: {
-                    gqlPermissionsProvider.loading = false
+                    root.loading = false
                     if (m_errorMessage && m_errorMessage !== "") {
-                        gqlPermissionsProvider.lastError = m_errorMessage
-                        gqlPermissionsProvider.requestFailed(m_errorMessage, gqlPermissionsProvider.__pendingTenantId)
+                        root.lastError = m_errorMessage
+                        root.requestFailed(m_errorMessage, root.__pendingTenantId)
                     } else {
-                        gqlPermissionsProvider.__storePermissions(m_groups, gqlPermissionsProvider.__pendingTenantId)
+                        root.__storePermissions(m_groups, root.__pendingTenantId)
                     }
                 }
             }
@@ -39,21 +42,23 @@ PermissionsProvider {
     }
 
     function requestPermissions(tenantId) {
-        if (gqlPermissionsProvider.productId === "") {
+        if (root.productId === "") {
             var message = "Unable to request permissions. Product-ID is empty"
-            gqlPermissionsProvider.lastError = message
-            gqlPermissionsProvider.requestFailed(message, tenantId || "")
+            root.lastError = message
+            root.requestFailed(message, tenantId || "")
             return
         }
 
-        gqlPermissionsProvider.loading = true
-        gqlPermissionsProvider.lastError = ""
-        gqlPermissionsProvider.__pendingTenantId = tenantId || ""
+        var requestedTenantId = tenantId || ""
 
-        gqlPermissionsProvider.__requestInput.m_productId = gqlPermissionsProvider.productId
-        gqlPermissionsProvider.__requestInput.m_tenantId = gqlPermissionsProvider.__pendingTenantId
-        gqlPermissionsProvider.requestStarted(gqlPermissionsProvider.__pendingTenantId)
-        gqlPermissionsProvider.__requestSender.send(gqlPermissionsProvider.__requestInput)
+        root.loading = true
+        root.lastError = ""
+        root.__pendingTenantId = requestedTenantId
+
+        root.__requestInput.m_productId = root.productId
+        root.__requestInput.m_tenantId = requestedTenantId
+        root.requestStarted(requestedTenantId)
+        root.__requestSender.send(root.__requestInput)
     }
 
     function __parseGroups(groupsList) {
@@ -90,17 +95,17 @@ PermissionsProvider {
     }
 
     function __storePermissions(groupsList, tenantId) {
-        var parsedPermissions = gqlPermissionsProvider.__parseGroups(groupsList)
-        gqlPermissionsProvider.permissions = parsedPermissions
-        gqlPermissionsProvider.permissionsReceived(parsedPermissions, tenantId)
+        var parsedPermissions = root.__parseGroups(groupsList)
+        root.permissions = parsedPermissions
+        root.permissionsReceived(parsedPermissions, tenantId)
 
         if (tenantId && tenantId !== "") {
-            gqlPermissionsProvider.tenantPermissionsTenantId = tenantId
-            gqlPermissionsProvider.tenantPermissions = parsedPermissions
-            gqlPermissionsProvider.tenantPermissionsReceived(tenantId)
+            root.tenantPermissionsTenantId = tenantId
+            root.tenantPermissions = parsedPermissions
+            root.tenantPermissionsReceived(tenantId)
         } else {
-            gqlPermissionsProvider.allPermissions = parsedPermissions
-            gqlPermissionsProvider.allPermissionsReceived()
+            root.allPermissions = parsedPermissions
+            root.allPermissionsReceived()
         }
     }
 }

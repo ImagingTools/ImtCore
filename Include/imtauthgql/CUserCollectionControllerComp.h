@@ -8,6 +8,12 @@
 #include <imtauth/IUserGroupInfoProvider.h>
 #include <imtauth/IDelegatedAccess.h>
 #include <imtauth/ITenantMembershipManager.h>
+#include <imtauth/ITenantManager.h>
+#include <imtauth/ITenantEntityBindingManager.h>
+#include <imtauth/IPersonalAccessTokenManager.h>
+#include <imtbase/IObjectCollection.h>
+#include <imtauth/ITenantInvitation.h>
+#include <imtauth/ISession.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users_fwd.h>
 
 
@@ -27,6 +33,12 @@ public:
 		I_ASSIGN(m_hashCalculatorCompPtr, "HashCalculator", "Hash calculator", true, "HashCalculator");
 		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Optional delegated access resolver used to enrich the user with roles delegated via cross-org grants", false, "DelegatedAccessResolver");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for auto-adding membership on user creation", false, "MembershipManager");
+		I_ASSIGN(m_membershipCollectionCompPtr, "MembershipCollection", "Membership collection for direct purge of user memberships on delete", false, "MembershipCollection");
+		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager to prevent deletion of tenant owners", false, "TenantManager");
+		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for cleanup on user delete", false, "TenantEntityBindingManager");
+		I_ASSIGN(m_invitationCollectionCompPtr, "InvitationCollection", "Tenant invitation collection for purging references on user delete", false, "InvitationCollection");
+		I_ASSIGN(m_personalAccessTokenManagerCompPtr, "PersonalAccessTokenManager", "PAT manager to remove tokens of deleted user", false, "PersonalAccessTokenManager");
+		I_ASSIGN(m_sessionCollectionCompPtr, "SessionCollection", "Session collection for purging user sessions on delete", false, "SessionCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -77,6 +89,10 @@ protected:
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
+	// reimplemented (imtservergql::CObjectCollectionControllerCompBase) for tenant-dependent cleanup
+	virtual bool OnBeforeRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual void OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const override;
+
 protected:
 	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
 	I_REF(imtauth::IUserGroupInfoProvider, m_userGroupInfoProviderCompPtr);
@@ -84,6 +100,12 @@ protected:
 	I_REF(imtcrypt::IHashGenerator, m_hashCalculatorCompPtr);
 	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
+	I_REF(imtbase::IObjectCollection, m_membershipCollectionCompPtr);
+	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
+	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
+	I_REF(imtbase::IObjectCollection, m_invitationCollectionCompPtr);
+	I_REF(imtauth::IPersonalAccessTokenManager, m_personalAccessTokenManagerCompPtr);
+	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);
 };
 
 

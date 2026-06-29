@@ -440,6 +440,16 @@ Item {
 				}
 
 				setCurrentIndex(0)
+
+				// Align overlay state with current document-service state in case
+				// start/stopLoading signals were emitted before this tab was initialized.
+				if (workspaceView.documentManager
+						&& workspaceView.documentManager.documentIsLoading(documentId)){
+					loading.start()
+				}
+				else{
+					loading.stop()
+				}
 			}
 
 			onPageAdded: {

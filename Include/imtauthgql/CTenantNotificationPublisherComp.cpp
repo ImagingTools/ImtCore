@@ -397,6 +397,17 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 									current.roleId});
 							}
 						}
+						else if (current.status == imtauth::ITenantInvitation::TIS_REVOKED){
+							// Notify the invitee that the invitation was revoked by the sender
+							pendingNotifications.append({
+								current.userId,
+								sdl::V1_0::imtauth::EMembershipNotificationType::InvitationRevoked,
+								invitationId,
+								current.userId,
+								current.tenantId,
+								tenantName,
+								current.roleId});
+						}
 					}
 				}
 			}

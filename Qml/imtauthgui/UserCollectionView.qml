@@ -48,11 +48,7 @@ RemoteCollectionView {
 			}
 		}
 	}
-	
-	function handleSubscription(dataModel){
-		userCollectionViewContainer.doUpdateGui();
-	}
-	
+
 	Component {
 		id: systemInfoDelegateFilterComp
 		FieldFilterDelegate {

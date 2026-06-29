@@ -44,6 +44,12 @@ QtObject {
 					}
 				}
 			}
+
+			if (view.objectName === "DocumentViewBase"){
+				if (view.representationController !== undefined){
+					view.representationController = representationController
+				}
+			}
 		}
 	}
 
@@ -208,8 +214,13 @@ QtObject {
 
 	function onModelDataChanged(view, model){
 		if (registeredViews.includes(view)){
-			_internal.initiatingView = view
 			let index = registeredViews.indexOf(view)
+			if (_internal.updateCounters[index] > 0){
+				// Change originates from representation load (updateRepresentationFromDocument),
+				// must not trigger reverse updateDocumentFromRepresentation.
+				return
+			}
+			_internal.initiatingView = view
 			registeredRepresentation[index].updateDocumentFromRepresentation()
 		}
 	}

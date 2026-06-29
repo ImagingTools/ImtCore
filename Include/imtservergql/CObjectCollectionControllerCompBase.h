@@ -96,7 +96,8 @@ public:
 	// reimplemented (ISearchController)
 	virtual QByteArray GetControllerId() const override;
 	virtual QString GetControllerName() const override;
-	virtual const imtbase::ISearchResults* Search(const QString& text) const override;
+	virtual int GetMatchCount(const QString& text) const override;
+	virtual const imtbase::ISearchResults* Search(const QString& text, int offset, int count) const override;
 
 	// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
 	virtual sdl::V1_0::imtbase::CDuplicateElementsPayload OnDuplicateElements(
@@ -315,6 +316,10 @@ protected:
 				sdl::V1_0::imtbase::CDocumentCollectionFilter& documentFilter,
 				iprm::CParamsSet& filterParams) const;
 	virtual QString ConvertMetaInfoToString(int infoType, const QVariant& metaInfoValue) const;
+
+protected:
+	// Helper to build the OR-contains filter used by search (shared by count + paged item fetch).
+	void BuildSearchComplexFilter(const QString& text, sdl::V1_0::imtbase::CComplexCollectionFilter& outFilter) const;
 	bool GetParamsSetFromRepresentation(sdl::V1_0::imtbase::CParamsSet& representation, iprm::IParamsSet& paramsSet) const;
 	bool RegisterFilterToSelectionParams(
 				iser::ISerializable& filterParam,
