@@ -166,20 +166,15 @@ bool CPointsBasedObject::Serialize(iser::IArchive& archive)
 
 	// data
 
-	if (archive.IsStoring()){
-		retVal = retVal && archive.BeginTag(dataTag);
-		retVal = retVal && archive.ProcessData(m_data.data(), int(m_data.size()));
-		retVal = retVal && archive.EndTag(dataTag);
-	}
-	else{
+	if (!archive.IsStoring()){
 		int dataSize = GetDataSize();
 		m_data.clear();
 		m_data.resize(dataSize);
-
-		retVal = retVal && archive.BeginTag(dataTag);
-		retVal = retVal && archive.ProcessData(m_data.data(), int(m_data.size()));
-		retVal = retVal && archive.EndTag(dataTag);
 	}
+
+	retVal = retVal && archive.BeginTag(dataTag);
+	retVal = retVal && archive.ProcessData(m_data.data(), int(m_data.size()));
+	retVal = retVal && archive.EndTag(dataTag);
 
 	return retVal;
 }
@@ -584,5 +579,4 @@ int CPointsBasedObject::GetBufferSize(PointFormat pointFormat, int pointsCount)
 
 
 } // namespace imt3d
-
 
