@@ -6,6 +6,5 @@ CREATE TABLE IF NOT EXISTS "TenantEntityBindings"
     "EntityId"        TEXT NOT NULL,
     "CreatedAt"       TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "CreatedByUserId" TEXT,
-    FOREIGN KEY ("TenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE,
     UNIQUE ("TenantId", "EntityType", "EntityId")
 );
