@@ -2,11 +2,8 @@ const Item = require("./Item")
 const Bool = require("../QtQml/Bool")
 const Var = require("../QtQml/Var")
 const Signal = require("../QtQml/Signal")
+const JQApplication = require("../core/JQApplication")
 
-/**
- * DropArea — accepts drag-and-drop events on a rectangular region.
- * Wraps HTML5 dragover / drop / dragenter / dragleave events.
- */
 class DropArea extends Item {
     static meta = Object.assign({}, Item.meta, {
         containsDrag: { type: Bool, value: false },
@@ -22,92 +19,82 @@ class DropArea extends Item {
         positionChanged: { type: Signal, args: ['drag'] },
     })
 
+    __drags = new Set()
+
     static create(parent, ...args) {
         let obj = super.create(parent, ...args)
-        obj.__installDropHandlers()
+        JQApplication.MouseController.addDropArea(obj)
         return obj
     }
 
-    __installDropHandlers() {
-        let dom = this.__DOM
-        dom.addEventListener('dragenter', (e) => {
-            e.preventDefault()
-            let dragInfo = this.__buildDragInfo(e)
-            if (!this.__acceptsDrag(dragInfo)) return
-            this.containsDrag = true
-            this.drag = dragInfo
-            this.entered(dragInfo)
-        })
+    __acceptsDragTarget(dragTarget) {
+        let keys = this.keys
+        if(!keys || (Array.isArray(keys) && keys.length === 0)) return true
 
-        dom.addEventListener('dragover', (e) => {
-            e.preventDefault()
-            let dragInfo = this.__buildDragInfo(e)
-            if (!this.__acceptsDrag(dragInfo)) return
-            this.drag = dragInfo
-            this.positionChanged(dragInfo)
-        })
-
-        dom.addEventListener('dragleave', (e) => {
-            // Only fire exited if truly leaving this element (not entering a child)
-            if (!dom.contains(e.relatedTarget)) {
-                this.containsDrag = false
-                this.drag = undefined
-                this.exited()
+        let dragKeys = []
+        if(dragTarget && dragTarget.Drag && dragTarget.Drag.keys !== undefined && dragTarget.Drag.keys !== null){
+            if(Array.isArray(dragTarget.Drag.keys)){
+                dragKeys = dragTarget.Drag.keys
+            } else if(typeof dragTarget.Drag.keys === 'string'){
+                dragKeys = dragTarget.Drag.keys.split(',').map(v => v.trim()).filter(Boolean)
+            } else {
+                dragKeys = [dragTarget.Drag.keys]
             }
-        })
+        }
 
-        dom.addEventListener('drop', (e) => {
-            e.preventDefault()
-            let dropInfo = this.__buildDropInfo(e)
+        if(!Array.isArray(keys)){
+            keys = [keys]
+        }
+
+        for(let key of keys){
+            if(dragKeys.includes(key)) return true
+        }
+
+        return false
+    }
+
+    __enterOrMove(dragTarget){
+        if(!dragTarget) return
+
+        if(!this.__drags.has(dragTarget)){
+            this.__drags.add(dragTarget)
+            this.containsDrag = true
+            this.drag = dragTarget
+            this.entered(dragTarget)
+        } else {
+            this.drag = dragTarget
+            this.positionChanged(dragTarget)
+        }
+    }
+
+    __drop(dragTarget){
+        if(!dragTarget) return
+
+        this.__drags.delete(dragTarget)
+        if(this.__drags.size === 0){
             this.containsDrag = false
             this.drag = undefined
-            this.dropped(dropInfo)
-        })
-    }
-
-    __buildDragInfo(e) {
-        let rect = this.__DOM.getBoundingClientRect()
-        return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-            keys: this.__extractKeys(e),
-            accepted: true,
-            source: e.relatedTarget || null,
         }
+
+        this.dropped(dragTarget)
     }
 
-    __buildDropInfo(e) {
-        let rect = this.__DOM.getBoundingClientRect()
-        let data = {}
-        if (e.dataTransfer && e.dataTransfer.types) {
-            for (let t of e.dataTransfer.types) {
-                data[t] = e.dataTransfer.getData(t)
+    __exit(dragTarget){
+        if(!dragTarget) return
+
+        if(this.__drags.has(dragTarget)){
+            this.__drags.delete(dragTarget)
+            if(this.__drags.size === 0){
+                this.containsDrag = false
+                this.drag = undefined
             }
-        }
-        return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-            keys: this.__extractKeys(e),
-            text: e.dataTransfer ? e.dataTransfer.getData('text/plain') : '',
-            urls: e.dataTransfer ? e.dataTransfer.getData('text/uri-list').split('\n').filter(Boolean) : [],
-            data: data,
-            accepted: true,
+            this.exited()
         }
     }
 
-    __extractKeys(e) {
-        if (!e.dataTransfer || !e.dataTransfer.types) return []
-        return Array.from(e.dataTransfer.types)
-    }
-
-    __acceptsDrag(dragInfo) {
-        let keys = this.keys
-        if (!keys || !keys.length) return true
-        let dragKeys = dragInfo.keys || []
-        for (let k of keys) {
-            if (dragKeys.includes(k)) return true
-        }
-        return false
+    __destroy(){
+        JQApplication.MouseController.removeDropArea(this)
+        super.__destroy()
     }
 }
 

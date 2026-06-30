@@ -3,6 +3,7 @@ const Int = require("../QtQml/Int")
 const Real = require("../QtQml/Real")
 const Bool = require("../QtQml/Bool")
 const String = require("../QtQml/String")
+const Drag = require("../QtQml/Drag")
 const Signal = require("../QtQml/Signal")
 const QtEnums = require("../Qt/enums")
 const JQApplication = require("../core/JQApplication")
@@ -20,6 +21,7 @@ class MouseArea extends Item {
         mouseX: { type: Real, value: 0, },
         mouseY: { type: Real, value: 0, },
         cursorShape: { type: String, value: QtEnums.ArrowCursor, },
+        drag: { type: Drag },
 
         acceptedButtonsChanged: { type:Signal, args:[] },
         containsMouseChanged: { type:Signal, args:[] },
@@ -32,6 +34,7 @@ class MouseArea extends Item {
         mouseXChanged: { type:Signal, args:[] },
         mouseYChanged: { type:Signal, args:[] },
         cursorShapeChanged: { type:Signal, args:[] },
+        dragChanged: { type:Signal, args:[] },
 
 		entered: { type:Signal, args:[] },
 		exited: { type:Signal, args:[] },
@@ -48,6 +51,7 @@ class MouseArea extends Item {
     static create(parent, ...args){
         let obj = super.create(parent, ...args)
         obj.__DOM.classList.add('MouseArea')
+
         JQApplication.MouseController.add(obj)
         return obj
     }
@@ -99,6 +103,10 @@ class MouseArea extends Item {
             // console.log(this)
             JQApplication.setCursor(this.cursorShape)
             this.positionChanged(mouse)
+
+            if(mouse.target === this && this.__pressed){
+                JQApplication.MouseController.__updateMouseAreaDrag(this, mouse)
+            }
         }
     }
 
