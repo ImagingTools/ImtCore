@@ -29,7 +29,7 @@ const options = program.opts()
 
 function compile(options){
     if(options.mode === 'html'){
-        
+        console.time('JQML3: compile html')
         let icon = `<link rel="${options.name} icon" type="image" href="${options.icon}">`
         let html = `
         <!DOCTYPE html>
@@ -48,6 +48,7 @@ function compile(options){
         `
 
         fs.writeFileSync(options.output + `/${options.name}.html`, html)
+        console.timeEnd('JQML3: compile html')
         return
     }
 
@@ -89,8 +90,10 @@ function compile(options){
             }
     }
 
+    console.time('JQML3: include config files')
     const config = JSON.parse(envFill(fs.readFileSync(configFilePath, { encoding: 'utf8', flag: 'r' })))
     includeFiles(config, configDirPath)
+    console.timeEnd('JQML3: include config files')
 
     const BaseModules = {
         Qt,
@@ -2047,7 +2050,7 @@ function compile(options){
     let mainData = fs.readFileSync(path.resolve(__dirname, '../dist/main.js'), { encoding: 'utf8', flag: 'r' })
     fullCode.add(mainData)
 
-    if (config.dirs.length) console.log(`JQ: preparation of third party modules`)
+    console.time('JQML3: preparation of third party modules')
 
     let counter = {
 
@@ -2071,7 +2074,7 @@ function compile(options){
                 if (type === 'module') {
                     moduleName = name
 
-                    console.log(`    > ${name}`)
+                    console.log(`${name}`)
 
                     if (JQModules[name]) continue
 
@@ -2127,22 +2130,23 @@ function compile(options){
         }
         counter[moduleName] = count
     }
+    console.timeEnd('JQML3: preparation of third party modules')
 
-    console.log(`JQ: preparation of single files`)
+    console.time('JQML3: preparation of single files')
     if(startConfig.single){
         for (let fileName of getFiles(entryDirAbsolutePath)) {
             let qmlFile = new QmlFile(fileName)
             SingleFiles[fileName.split(/[\/\\]+/g).pop().replace('.qml', '')] = qmlFile
         }
     } else {
-        console.log(`JQ: entry point is ${startConfig.moduleName} module`)
+        console.log(`JQML3: entry point is ${startConfig.moduleName} module`)
     }
+    console.timeEnd('JQML3: preparation of single files')
 
-    console.log(`JQ: compilation of single files`)
-
+    console.time('JQML3: compilation of single files')
 
     for (let className in Singletons) {
-        console.log(`    > ${className}.qml (Singleton)`)
+        console.log(`${className}.qml (Singleton)`)
         compiledFiles.push({
             file: Singletons[className],
             code: Singletons[className].toCode(),
@@ -2153,7 +2157,7 @@ function compile(options){
         if (SingleFiles[className].singleton) {
             continue
         }
-        console.log(`    > ${className}.qml`)
+        console.log(`${className}.qml`)
         compiledFiles.push({
             file: SingleFiles[className],
             code: SingleFiles[className].toCode(),
@@ -2161,10 +2165,13 @@ function compile(options){
         })
     }
 
-    if (config.dirs.length) console.log(`JQ: compilation of third party modules`)
+    console.timeEnd('JQML3: compilation of single files')
+
+    console.time('JQML3: compilation of third party modules')
+
     for (let moduleName in JQModules) {
         if (!BaseModules[moduleName]) {
-            console.log(`    > ${moduleName} (${counter[moduleName] + ' files'})`)
+            console.log(`${moduleName} (${counter[moduleName] + ' files'})`)
             fullCode.add(`JQModules.${moduleName}={};`)
         }
     }
@@ -2198,6 +2205,7 @@ function compile(options){
             fullCode.add(`Object.defineProperty(JQModules.${moduleName},'${className}',{get:()=>{return JQModules.${moduleName}.${className}_v${file.version}}})`)
         }
     }
+    console.timeEnd('JQML3: compilation of third party modules')
 
     function getFiles(dir, _files) {
         _files = _files || []
@@ -2213,6 +2221,7 @@ function compile(options){
 
 
 
+    console.time('JQML3: sorting of compiled files')
     while (compiledFiles.length) {
         let compiledFile = compiledFiles.shift()
         if(compiledFile.file instanceof QmlFile && compiledFile.file.singleton){
@@ -2258,6 +2267,7 @@ function compile(options){
         }
         
     }
+    console.timeEnd('JQML3: sorting of compiled files')
 
 
     if(options.mode === 'js'){
