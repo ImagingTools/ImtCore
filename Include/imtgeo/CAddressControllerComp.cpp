@@ -162,11 +162,13 @@ istd::IChangeableUniquePtr CAddressControllerComp::CreateObjectFromRequest(
 	}
 
 	if (itemObj.contains(QStringLiteral("latitude"))){
-		addressInfoPtr->SetLatitude(itemObj.value(QStringLiteral("latitude")).toDouble());
+		const double latitude = itemObj.value(QStringLiteral("latitude")).toVariant().toDouble();
+		addressInfoPtr->SetLatitude(latitude);
 	}
 
 	if (itemObj.contains(QStringLiteral("longitude"))){
-		addressInfoPtr->SetLongitude(itemObj.value(QStringLiteral("longitude")).toDouble());
+		const double longitude = itemObj.value(QStringLiteral("longitude")).toVariant().toDouble();
+		addressInfoPtr->SetLongitude(longitude);
 	}
 
 	return addressInfoPtr.PopPtr();

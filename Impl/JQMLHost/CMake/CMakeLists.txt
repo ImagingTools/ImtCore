@@ -46,6 +46,7 @@ target_link_libraries(${PROJECT_NAME}
 	imtgui
 	imtguigql
 	imtauth
+	imtauthdb
 	imtauthgui
 	imtlic
 	imtlicgui
