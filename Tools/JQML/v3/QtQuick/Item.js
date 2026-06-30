@@ -11,6 +11,7 @@ const SpecialProperty = require("../QtQml/SpecialProperty")
 const KeyNavigation = require("../QtQml/KeyNavigation")
 const Anchors = require("../QtQml/Anchors")
 const AnchorLine = require("../QtQml/AnchorLine")
+const Drag = require("../QtQml/Drag")
 const Layout = require("./Layouts/Layout")
 const Property = require("../QtQml/Property")
 
@@ -42,10 +43,12 @@ class Item extends QtObject {
         focus: { type: Bool, value: false},
         activeFocus: { type: Bool, value: false},
         clip: { type: Bool, value: false},
+        activeFocusOnTab: { type: Bool, value: false},
 
         Layout: {type:Layout},
 
         KeyNavigation: {type:KeyNavigation},
+        Drag: {type:Drag},
         anchors: {type:Anchors},
         left: {type:AnchorLine, value: AnchorLine.Left},
         right: {type:AnchorLine, value: AnchorLine.Right},
@@ -79,6 +82,7 @@ class Item extends QtObject {
         focusChanged: {type:Signal, args:[]},
         activeFocusChanged: {type:Signal, args:[]},
         clipChanged: {type:Signal, args:[]},
+        activeFocusOnTabChanged: {type:Signal, args:[]},
 
         'Keys.asteriskPressed': {type:Signal, args: ['event'] },
         'Keys.backPressed': {type:Signal, args: ['event'] },
@@ -526,6 +530,100 @@ class Item extends QtObject {
             return res
         } else {
             return res
+        }
+    }
+
+    __getFirstFocusableDescendant(){
+        let current = this
+
+        while(current && current.children && current.children.length){
+            let nextChild = null
+            for(let child of current.children){
+                if(child && !child.__destroyed){
+                    nextChild = child
+                    break
+                }
+            }
+
+            if(!nextChild) break
+            current = nextChild
+        }
+
+        return current
+    }
+
+    __getLastFocusableDescendant(){
+        let current = this
+
+        while(current && current.children && current.children.length){
+            let nextChild = null
+            for(let i = current.children.length - 1; i >= 0; i--){
+                let child = current.children[i]
+                if(child && !child.__destroyed){
+                    nextChild = child
+                    break
+                }
+            }
+
+            if(!nextChild) break
+            current = nextChild
+        }
+
+        return current
+    }
+
+    __getNextPreorderItem(){
+        if(this.children && this.children.length){
+            let firstChild = this.__getFirstFocusableDescendant()
+            if(firstChild && firstChild !== this){
+                return firstChild
+            }
+        }
+
+        let current = this
+
+        while(current){
+            let parent = current.parent
+            if(!parent) return null
+
+            let siblings = parent.children || []
+            let index = siblings.indexOf(current)
+
+            for(let i = index + 1; i < siblings.length; i++){
+                let sibling = siblings[i]
+                if(sibling && !sibling.__destroyed){
+                    return sibling.__getFirstFocusableDescendant ? sibling.__getFirstFocusableDescendant() : sibling
+                }
+            }
+
+            current = parent
+        }
+
+        return null
+    }
+
+    __getPreviousPreorderItem(){
+        let parent = this.parent
+        if(!parent) return null
+
+        let siblings = parent.children || []
+        let index = siblings.indexOf(this)
+
+        for(let i = index - 1; i >= 0; i--){
+            let sibling = siblings[i]
+            if(sibling && !sibling.__destroyed){
+                return sibling.__getLastFocusableDescendant ? sibling.__getLastFocusableDescendant() : sibling
+            }
+        }
+
+        return parent
+    }
+
+    nextItemInFocusChain(forward = true){
+        if(forward){
+            return this.__getNextPreorderItem()
+        } else {
+            return this.__getPreviousPreorderItem()
         }
     }
 

@@ -223,15 +223,14 @@ class ListModel extends QtObject {
         if (from + n > this.count) return false
         if (to < 0 || to > this.count) return false
 
-        // No-op cases.
-        if (from === to || to === from + n) return true
+        // No-op case.
+        if (from === to) return true
 
         let moved = this.data.__splice(from, n)
 
-        // Qt-like behavior: destination is interpreted on original indexes.
-        // After removing a block before destination, shift destination left.
+        // Destination index is interpreted in resulting model coordinates.
+        // Example: move(0, 1, 1) swaps first two items.
         let insertAt = to
-        if (insertAt > from) insertAt -= n
 
         for (let i = 0; i < moved.length; i++){
             this.data.__splice(insertAt + i, 0, moved[i])

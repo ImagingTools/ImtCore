@@ -291,23 +291,24 @@ function compile(options){
         qmlprop(meta) {
             if (meta[2][0] === "block" || (meta[2][1] && meta[2][1][0] === "assign")) {
                 if (meta[1][0] === "dot") {
-                    let name = meta[1].slice(1)
+                    let name = this.normalizePathName(meta[1])
+                    let nameText = name.join('.')
 
-                    if (name[1].slice(0, 2) === 'on') {
+                    if (name[1] && name[1].slice(0, 2) === 'on') {
                         this.connectedSignals.push({
-                            slotName: `['${name.join('.')}']`,
+                            slotName: `['${nameText}']`,
                             args: [],
                             source: meta[2],
                         })
                     } else {
                         if (meta[2][1][0] === 'qmlelem') {
                             this.assignProperties.push({
-                                name: name.join('.'),
+                                name: nameText,
                                 value: new Instruction(null, '', meta[2][1][1], meta[2][1][3], meta[2][1][2], this.qmlFile, meta[2][1].info, this),
                             })
                         } else {
                             this.assignProperties.push({
-                                name: name.join('.'),
+                                name: nameText,
                                 value: meta[2],
                             })
                         }
@@ -338,7 +339,7 @@ function compile(options){
                     }
                 }
             } else if (meta[1][0] === "dot") {
-                let name = meta[1].slice(1).join('.')
+                let name = this.normalizePathName(meta[1]).join('.')
                 this.assignProperties.push({
                     name: name,
                     value: meta[2],
@@ -475,6 +476,30 @@ function compile(options){
                     }
                 }
             }
+        }
+
+        flattenPath(name) {
+            if (Array.isArray(name)) {
+                if (name[0] === 'dot') {
+                    return [...this.flattenPath(name[1]), ...this.flattenPath(name[2])]
+                }
+
+                let result = []
+                for (let item of name) {
+                    result.push(...this.flattenPath(item))
+                }
+                return result
+            }
+
+            if (name === undefined || name === null) {
+                return []
+            }
+
+            return String(name).split('.')
+        }
+
+        normalizePathName(name) {
+            return this.flattenPath(name).filter(part => part !== '')
         }
 
         prepare(tree, stat = { isCompute: false, thisKey: '__self', value: new SourceNode(), local: [] }, endSymbol = true) {
@@ -1253,19 +1278,20 @@ function compile(options){
             let classCode =  new SourceNode()
 
             for (let assignProperty of this.assignProperties) {
-                let path = this.resolve(assignProperty.name.split('.')[0], this.name)
+                let assignNames = this.normalizePathName(assignProperty.name)
+                let assignName = assignNames.join('.')
+                let path = this.resolve(assignNames[0], this.name)
                 if (!path) {
-                    console.log(`${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignProperty.name.length - 1}: warning: ${assignProperty.name} is not founded`)
+                    console.log(`${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignName.length - 1}: warning: ${assignName} is not founded`)
                 }
 
-                let assignNames = assignProperty.name.split('.')
                 if (path && assignNames.length === 1 && path.modifiers && path.modifiers.readonly && !assignProperty.fromDefinition) {
-                    throw new Error(`${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignProperty.name.length - 1}: error: Cannot assign to read-only property "${assignProperty.name}"`)
+                    throw new Error(`${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignName.length - 1}: error: Cannot assign to read-only property "${assignName}"`)
                 }
 
                 if (assignProperty.value instanceof Instruction) {
                     if (!path) {
-                        throw `${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignProperty.name.length - 1}: error: ${assignProperty.name} is not founded`
+                        throw `${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignName.length - 1}: error: ${assignName} is not founded`
                     }
 
                     let resultCode
@@ -1393,7 +1419,7 @@ function compile(options){
                     }
 
                 } else {
-                    let names = assignProperty.name.split('.')
+                    let names = assignNames
 
                     let stat = this.prepare(assignProperty.value, { isCompute: false, thisKey: this.name, value: new SourceNode(), local: [] })
                     if (stat.isCompute) {
@@ -1403,43 +1429,55 @@ function compile(options){
                             // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',function(){return ${stat.value}},function(newVal){${stat.value}=newVal})`)
                             let aliasPath = stat.value.toString().split('.')
                             // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',${aliasPath.slice(0, aliasPath.length - 1).join('.')}, '${aliasPath[aliasPath.length-1]}')`)
-                            aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',()=>{return ${aliasPath.slice(0, aliasPath.length - 1).join('.')}}, '${aliasPath[aliasPath.length-1]}')`)
+                            aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignName}',()=>{return ${aliasPath.slice(0, aliasPath.length - 1).join('.')}}, '${aliasPath[aliasPath.length-1]}')`)
                             // code.add(`${this.name}.__getDataQml('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},properties)`)
                             aliasCode.add('\n')
                         } else {
                             // lazyCode.add(`'${assignProperty.name}': function(){return ${stat.value}},`)
                             let isReturn = stat.value.toString().indexOf('return ') >= 0
                             if(names.length > 1){
-                                lazyCode.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=function(){${isReturn ? '' : 'return '}${stat.value}}`)
-                                lazyCode.add('\n')
-                                lazyCode.add(`${this.name}.__properties['${names[0]}']='JQGroup'`)
-                                lazyCode.add('\n')
+                                if(names.length === 2){
+                                    lazyCode.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=function(){${isReturn ? '' : 'return '}${stat.value}}`)
+                                    lazyCode.add('\n')
+                                    lazyCode.add(`${this.name}.__properties['${names[0]}']='JQGroup'`)
+                                    lazyCode.add('\n')
+                                } else {
+                                    lazyCode.add(`${this.name}.__properties['${assignName}']=function(){${isReturn ? '' : 'return '}${stat.value}}`)
+                                    lazyCode.add('\n')
+                                }
                             } else {
-                                lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=function(){${isReturn ? '' : 'return '}${stat.value}}`)
+                                lazyCode.add(`${this.name}.__properties['${assignName}']=function(){${isReturn ? '' : 'return '}${stat.value}}`)
                                 lazyCode.add('\n')
                             }
                             
                         }
                     } else {
                         if(names.length > 1){
-                            code.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=${stat.value}`)
-                            code.add('\n')
-                            code.add(`${this.name}['${names[0]}'].__updateProperties()`)
-                            code.add('\n')
+                            if(names.length === 2){
+                                code.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=${stat.value}`)
+                                code.add('\n')
+                                code.add(`${this.name}['${names[0]}'].__updateProperties()`)
+                                code.add('\n')
+                            } else {
+                                code.add(`${this.name}.__properties['${assignName}']=${stat.value}`)
+                                code.add('\n')
+                                code.add(`${this.name}.__updateProperties()`)
+                                code.add('\n')
+                            }
                         } else {
-                            let defineProperty = this.checkDefineProperty(assignProperty.name)
+                            let defineProperty = this.checkDefineProperty(assignName)
                             if(defineProperty){
                                 if(defineProperty.modifiers && defineProperty.modifiers.readonly){
-                                    classCode.add(`${this.name}.${assignProperty.name}=()=>{return ${stat.value}}`)
+                                    classCode.add(`${this.name}.${assignName}=()=>{return ${stat.value}}`)
                                     classCode.add('\n')
                                 } else {
-                                    classCode.add(`${this.name}.${assignProperty.name}=${stat.value}`)
+                                    classCode.add(`${this.name}.${assignName}=${stat.value}`)
                                     classCode.add('\n')
                                 }
                                 
                             } else {
                                 // lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=${stat.value}`)
-                                lazyCode.add(`${this.name}.${assignProperty.name}=${stat.value}`)
+                                lazyCode.add(`${this.name}.${assignName}=${stat.value}`)
                                 lazyCode.add('\n')
                             }
                             
