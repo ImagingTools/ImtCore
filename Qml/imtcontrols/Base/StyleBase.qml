@@ -638,6 +638,12 @@ StyleComponents {
 	function parseStyleTheme(themeType){
 		if (themeType.containsKey("source")){
 			let dataSource = themeType.getData("source");
+
+			let styleData = dataSource.getData("Style");
+			if (styleData.containsKey("Name")){
+				styleContainer.theme = styleData.getData("Name");
+			}
+
 			styleContainer.borderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", dataSource);
 			styleContainer.baseColor = styleContainer.getThemeColor("ActiveColors", "Base", dataSource);
 			styleContainer.alternateBaseColor = styleContainer.getThemeColor("ActiveColors", "AlternateBase", dataSource);
