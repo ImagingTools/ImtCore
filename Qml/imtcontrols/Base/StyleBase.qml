@@ -32,10 +32,10 @@ StyleComponents {
 	property string language;//deprecated?
 
 	//Font properties
-	property string mainFontSource: "../../../Fonts/Ubuntu-Light.ttf";
-	property string boldFontSource: "../../../Fonts/Ubuntu-Medium.ttf";
-	property string fontFamily: "Verdana";
-	property string fontFamilyBold: "Verdana";
+	property string mainFontSource: "../../../Fonts/Roboto-Regular.ttf";
+	property string boldFontSource: "../../../Fonts/Roboto-Medium.ttf";
+	property string fontFamily: "Roboto";
+	property string fontFamilyBold: "Roboto";
 
 	property alias mainFontLoader: mainFont;
 	property alias boldFontLoader: boldFont;
