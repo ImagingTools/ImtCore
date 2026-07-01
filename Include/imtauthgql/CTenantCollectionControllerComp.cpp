@@ -152,6 +152,12 @@ void CTenantCollectionControllerComp::SetAdditionalFilters(
 		return;
 	}
 
+	// System administrators get a global view: do not restrict the tenant list
+	// to the caller's own memberships/ownership.
+	if (userInfoPtr->IsAdmin()){
+		return;
+	}
+
 	iprm::CIdParam* userIdParamPtr = new iprm::CIdParam();
 	userIdParamPtr->SetId(userId);
 	filterParamsPtr->SetEditableParameter("UserId", userIdParamPtr, true);

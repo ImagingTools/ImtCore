@@ -900,6 +900,11 @@ sdl::V1_0::imtauth::CGetCrossOrgGrantsPayload CTenantManagerControllerComp::OnGe
 	QSet<QByteArray> seenIds;
 	const imtauth::CrossOrgGrants outgoing = m_grantManagerCompPtr->GetGrantsBySourceTenant(tenantId);
 	for (const imtauth::CrossOrgGrantInfo& info : outgoing){
+		// Revoked (soft-deleted) grants are inactive and must not appear in the
+		// delegation listing.
+		if (!info.isActive){
+			continue;
+		}
 		if (!seenIds.contains(info.grantId)){
 			seenIds.insert(info.grantId);
 			response.grants->push_back(GrantInfoToData(info));
@@ -908,6 +913,9 @@ sdl::V1_0::imtauth::CGetCrossOrgGrantsPayload CTenantManagerControllerComp::OnGe
 
 	const imtauth::CrossOrgGrants incoming = m_grantManagerCompPtr->GetGrantsByTargetTenant(tenantId);
 	for (const imtauth::CrossOrgGrantInfo& info : incoming){
+		if (!info.isActive){
+			continue;
+		}
 		if (!seenIds.contains(info.grantId)){
 			seenIds.insert(info.grantId);
 			response.grants->push_back(GrantInfoToData(info));
