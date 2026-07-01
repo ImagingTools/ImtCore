@@ -2,12 +2,12 @@
 #pragma once
 
 
+// ACF includes
+#include <iqt/ITranslationManager.h>
+
 // ImtCore includes
 #include <imtauth/ITenantManager.h>
 #include <imtlic/IProductInfo.h>
-#include <imtlic/CFeatureInfo.h>
-#include <imtsdl/TElementList.h>
-#include <iqt/ITranslationManager.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions_fwd.h>
 
 

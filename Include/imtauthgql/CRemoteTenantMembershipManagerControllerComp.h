@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships_fwd.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions_fwd.h>
 
 
 namespace imtauthgql
@@ -55,6 +56,11 @@ protected:
 				const sdl::V1_0::imtauth::CGetMyTenantInvitationsGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+
+	virtual sdl::V1_0::imtauth::CGetOrganizationPermissionsPayload OnGetOrganizationPermissions(
+				const sdl::V1_0::imtauth::CGetOrganizationPermissionsGqlRequest& request,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CAddMembershipPayload OnAddMembership(
 				const sdl::V1_0::imtauth::CAddMembershipGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,
@@ -83,8 +89,8 @@ protected:
 				const sdl::V1_0::imtauth::CRemoveMembershipGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CUpdateMembershipRolePayload OnUpdateMembershipRole(
-				const sdl::V1_0::imtauth::CUpdateMembershipRoleGqlRequest& request,
+	virtual sdl::V1_0::imtauth::CUpdateMembershipPermissionsPayload OnUpdateMembershipPermissions(
+				const sdl::V1_0::imtauth::CUpdateMembershipPermissionsGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CTransferTenantOwnershipPayload OnTransferTenantOwnership(

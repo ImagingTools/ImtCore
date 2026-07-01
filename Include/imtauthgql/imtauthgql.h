@@ -807,6 +807,87 @@ inline void BuildPermissionGroups(
 
 
 /**
+	Build permission groups from an IFeatureInfoProvider (used for organization-specific permissions).
+	Follows the same flattening logic as BuildPermissionGroups.
+*/
+template<typename TGroup, typename TEntry>
+inline void BuildPermissionGroupsFromProvider(
+			const imtlic::IFeatureInfoProvider* providerPtr,
+			const iqt::ITranslationManager* translationManagerPtr,
+			imtsdl::TElementList<TGroup>& groups,
+			const QByteArray& languageId,
+			const QSet<QByteArray>* allowedPermissionsPtr)
+{
+	if (providerPtr == nullptr){
+		return;
+	}
+
+	const imtbase::ICollectionInfo& coll = providerPtr->GetFeatureList();
+	imtbase::ICollectionInfo::Ids elementIds = coll.GetElementIds();
+	for (const auto& elementId : elementIds){
+		imtlic::IFeatureInfoSharedPtr featPtr = providerPtr->GetFeatureInfo(elementId);
+		if (!featPtr.IsValid()) continue;
+
+		const imtlic::CFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(featPtr.GetPtr());
+		if (featureInfoPtr == nullptr || !featureInfoPtr->IsPermission()){
+			continue;
+		}
+
+		QByteArray groupId = featureInfoPtr->GetFeatureId();
+		QString groupName = featureInfoPtr->GetFeatureName();
+		if (translationManagerPtr != nullptr){
+			groupName = iqt::GetTranslation(translationManagerPtr, groupName.toUtf8(), languageId, QByteArrayLiteral("Feature"));
+		}
+
+		TGroup group;
+		group.groupId = groupId;
+		group.groupName = groupName;
+		group.entries.Emplace();
+
+		const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
+		bool hasEntries = false;
+		const bool groupSelected = (allowedPermissionsPtr != nullptr && allowedPermissionsPtr->contains(groupId));
+
+		if (subFeatures.isEmpty()){
+			hasEntries = CollectPermissionEntries<TEntry>(
+					*featureInfoPtr,
+					*group.entries,
+					languageId,
+					allowedPermissionsPtr,
+					QString(),
+					translationManagerPtr,
+					groupSelected);
+		}
+		else{
+			for (int i = 0; i < subFeatures.count(); i++){
+				const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr = subFeatures.at(i);
+				if (!subFeaturePtr.IsValid()) continue;
+				const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(subFeaturePtr.GetPtr());
+				if (subFeatureInfoPtr != nullptr){
+					if (CollectPermissionEntries<TEntry>(
+							*subFeatureInfoPtr,
+							*group.entries,
+							languageId,
+							allowedPermissionsPtr,
+							QString(),
+							translationManagerPtr,
+							groupSelected)){
+						hasEntries = true;
+					}
+				}
+			}
+		}
+
+		if (allowedPermissionsPtr != nullptr && !hasEntries){
+			continue;
+		}
+
+		groups.append(group);
+	}
+}
+
+
+/**
 	Create an optional tenant filter param from a tenant id.
 	Empty tenant id is allowed and represents NoOrganization context.
 	The returned pointer is owned by the caller (ParamsSet takes ownership via SetEditableParameter).

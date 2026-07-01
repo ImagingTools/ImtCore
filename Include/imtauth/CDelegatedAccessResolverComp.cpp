@@ -108,12 +108,9 @@ bool CDelegatedAccessResolverComp::HasDelegatedRole(
 		return false;
 	}
 
-	// 1. Check direct membership role first
+	// 1. Check direct membership
 	if (m_membershipManagerCompPtr->IsMember(userId, targetTenantId)){
-		if (roleId.isEmpty()){
-			return true;
-		}
-		return m_membershipManagerCompPtr->HasMinimumRole(userId, targetTenantId, roleId);
+		return true;
 	}
 
 	// 2. Check delegated access via cross-org grant

@@ -16,7 +16,6 @@ namespace imtauth
 // public methods
 
 CTenantMembership::CTenantMembership():
-	m_environmentRole(TER_MEMBER),
 	m_isActive(true)
 {
 }
@@ -72,39 +71,6 @@ void CTenantMembership::SetTenantId(const QByteArray& tenantId)
 }
 
 
-TenantEnvironmentRole CTenantMembership::GetEnvironmentRole() const
-{
-	return m_environmentRole;
-}
-
-
-void CTenantMembership::SetEnvironmentRole(TenantEnvironmentRole role)
-{
-	if (m_environmentRole != role){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_environmentRole = role;
-	}
-}
-
-
-QByteArray CTenantMembership::GetRoleId() const
-{
-	return TenantEnvironmentRoleToString(m_environmentRole).toUtf8();
-}
-
-
-void CTenantMembership::SetRoleId(const QByteArray& roleId)
-{
-	TenantEnvironmentRole newRole = TenantEnvironmentRoleFromString(QString::fromUtf8(roleId));
-	if (m_environmentRole != newRole){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_environmentRole = newRole;
-	}
-}
-
-
 QString CTenantMembership::GetJoinedAt() const
 {
 	return m_joinedAt;
@@ -133,6 +99,21 @@ void CTenantMembership::SetActive(bool isActive)
 		istd::CChangeNotifier notifier(this);
 
 		m_isActive = isActive;
+	}
+}
+
+
+QByteArrayList CTenantMembership::GetOrganizationPermissions() const
+{
+	return m_organizationPermissions;
+}
+
+
+void CTenantMembership::SetOrganizationPermissions(const QByteArrayList& permissions)
+{
+	if (m_organizationPermissions != permissions){
+		istd::CChangeNotifier notifier(this);
+		m_organizationPermissions = permissions;
 	}
 }
 
@@ -176,15 +157,6 @@ bool CTenantMembership::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_tenantId);
 	retVal = retVal && archive.EndTag(tenantIdTag);
 
-	iser::CArchiveTag roleTag("Role", "Role", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(roleTag);
-	QByteArray roleStr = TenantEnvironmentRoleToString(m_environmentRole).toUtf8();
-	retVal = retVal && archive.Process(roleStr);
-	if (!archive.IsStoring()){
-		m_environmentRole = TenantEnvironmentRoleFromString(QString::fromUtf8(roleStr));
-	}
-	retVal = retVal && archive.EndTag(roleTag);
-
 	iser::CArchiveTag joinedAtTag("JoinedAt", "Joined at", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(joinedAtTag);
 	retVal = retVal && archive.Process(m_joinedAt);
@@ -194,6 +166,8 @@ bool CTenantMembership::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(isActiveTag);
 	retVal = retVal && archive.Process(m_isActive);
 	retVal = retVal && archive.EndTag(isActiveTag);
+
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_organizationPermissions, "OrganizationPermissions", "OrganizationPermission");
 
 	iser::CArchiveTag updatedAtTag("UpdatedAt", "Updated at", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(updatedAtTag);
@@ -215,10 +189,10 @@ bool CTenantMembership::CopyFrom(const IChangeable& object, CompatibilityMode /*
 		m_membershipId = sourcePtr->m_membershipId;
 		m_userId = sourcePtr->m_userId;
 		m_tenantId = sourcePtr->m_tenantId;
-		m_environmentRole = sourcePtr->m_environmentRole;
 		m_joinedAt = sourcePtr->m_joinedAt;
 		m_updatedAt = sourcePtr->m_updatedAt;
 		m_isActive = sourcePtr->m_isActive;
+		m_organizationPermissions = sourcePtr->m_organizationPermissions;
 
 		return true;
 	}
@@ -245,10 +219,10 @@ bool CTenantMembership::ResetData(CompatibilityMode /*mode*/)
 	m_membershipId.clear();
 	m_userId.clear();
 	m_tenantId.clear();
-	m_environmentRole = TER_MEMBER;
 	m_joinedAt.clear();
 	m_updatedAt.clear();
 	m_isActive = true;
+	m_organizationPermissions.clear();
 
 	return true;
 }

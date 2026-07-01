@@ -27,6 +27,12 @@ QtObject {
     property var tenantPermissions: []
     property string tenantPermissionsTenantId: ""
 
+    // Special organization-only permissions tree (independent of product features)
+    property var organizationPermissions: []
+    // Assigned permissions for the last requested member (populated when userId passed to requestOrganizationPermissions)
+    property var memberOrganizationPermissions: []
+    signal organizationPermissionsReceived()
+
     signal requestStarted(string tenantId)
     signal permissionsReceived(var permissions, string tenantId)
     signal allPermissionsReceived()
@@ -40,11 +46,15 @@ QtObject {
         requestPermissions("")
     }
 
+    function requestOrganizationPermissions(tenantId, userId) {}
+
     function clearCache() {
         permissions = []
         allPermissions = []
         tenantPermissions = []
         tenantPermissionsTenantId = ""
+        organizationPermissions = []
+        memberOrganizationPermissions = []
         lastError = ""
     }
 

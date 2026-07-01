@@ -52,7 +52,6 @@ void CTenantNotificationPublisherComp::OnComponentCreated()
 					CachedMembership entry;
 					entry.userId = membershipPtr->GetUserId();
 					entry.tenantId = membershipPtr->GetTenantId();
-					entry.roleId = membershipPtr->GetRoleId();
 					entry.isActive = membershipPtr->IsActive();
 					m_cachedMemberships.insert(membershipId, entry);
 				}
@@ -80,7 +79,6 @@ void CTenantNotificationPublisherComp::OnComponentCreated()
 					CachedInvitation entry;
 					entry.userId = invitationPtr->GetUserId();
 					entry.tenantId = invitationPtr->GetTenantId();
-					entry.roleId = invitationPtr->GetRoleId();
 					entry.invitedByUserId = invitationPtr->GetInvitedByUserId();
 					entry.status = invitationPtr->GetStatus();
 					m_cachedInvitations.insert(invitationId, entry);
@@ -144,7 +142,6 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 					CachedMembership current;
 					current.userId = membershipPtr->GetUserId();
 					current.tenantId = membershipPtr->GetTenantId();
-					current.roleId = membershipPtr->GetRoleId();
 					current.isActive = membershipPtr->IsActive();
 					currentState.insert(membershipId, current);
 				}
@@ -167,7 +164,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 								cached.userId,
 								cached.tenantId,
 								QString(),
-								cached.roleId});
+								QByteArray()});
 						}
 					}
 					else{
@@ -181,7 +178,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 								cached.userId,
 								cached.tenantId,
 								QString(),
-								cached.roleId});
+								QByteArray()});
 						}
 						// Also notify the tenant owner so the members view updates.
 						QByteArray ownerUserId = FindTenantOwnerUserId(cached.tenantId);
@@ -193,7 +190,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 								cached.userId,
 								cached.tenantId,
 								QString(),
-								cached.roleId});
+								QByteArray()});
 						}
 					}
 				}
@@ -210,32 +207,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 								current.userId,
 								current.tenantId,
 								QString(),
-								current.roleId});
-						}
-					}
-					// Role changed on an active membership → notify the affected
-					// user AND the tenant owner so both sides refresh their UI.
-					if (cached.isActive && current.isActive && cached.roleId != current.roleId){
-						if (!current.userId.isEmpty()){
-							pendingNotifications.append({
-								current.userId,
-								sdl::V1_0::imtauth::EMembershipNotificationType::MembershipRoleChanged,
-								membershipId,
-								current.userId,
-								current.tenantId,
-								QString(),
-								current.roleId});
-						}
-						QByteArray ownerUserId = FindTenantOwnerUserId(current.tenantId);
-						if (!ownerUserId.isEmpty() && ownerUserId != current.userId){
-							pendingNotifications.append({
-								ownerUserId,
-								sdl::V1_0::imtauth::EMembershipNotificationType::MembershipRoleChanged,
-								membershipId,
-								current.userId,
-								current.tenantId,
-								QString(),
-								current.roleId});
+								QByteArray()});
 						}
 					}
 				}
@@ -260,7 +232,6 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 							CachedMembership newEntry;
 							newEntry.userId = membershipPtr->GetUserId();
 							newEntry.tenantId = membershipPtr->GetTenantId();
-							newEntry.roleId = membershipPtr->GetRoleId();
 							newEntry.isActive = membershipPtr->IsActive();
 							currentState.insert(membershipId, newEntry);
 						}
@@ -300,7 +271,6 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 						CachedInvitation entry;
 						entry.userId = invitationPtr->GetUserId();
 						entry.tenantId = invitationPtr->GetTenantId();
-						entry.roleId = invitationPtr->GetRoleId();
 						entry.invitedByUserId = invitationPtr->GetInvitedByUserId();
 						entry.status = invitationPtr->GetStatus();
 						currentInvitations.insert(invitationId, entry);
@@ -330,7 +300,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 							current.userId,
 							current.tenantId,
 							tenantName,
-							current.roleId});
+							QByteArray()});
 					}
 				}
 				else{
@@ -356,7 +326,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 									current.userId,
 									current.tenantId,
 									tenantName,
-									current.roleId});
+									QByteArray()});
 							}
 							// Also notify the inviter (when different from owner)
 							// so admins who created the invitation see the result.
@@ -369,7 +339,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 									current.userId,
 									current.tenantId,
 									tenantName,
-									current.roleId});
+									QByteArray()});
 							}
 						}
 						else if (current.status == imtauth::ITenantInvitation::TIS_REJECTED){
@@ -382,7 +352,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 									current.userId,
 									current.tenantId,
 									tenantName,
-									current.roleId});
+									QByteArray()});
 							}
 							// Also notify the inviter (when different from owner).
 							if (!current.invitedByUserId.isEmpty()
@@ -394,7 +364,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 									current.userId,
 									current.tenantId,
 									tenantName,
-									current.roleId});
+									QByteArray()});
 							}
 						}
 						else if (current.status == imtauth::ITenantInvitation::TIS_REVOKED){
@@ -406,7 +376,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 								current.userId,
 								current.tenantId,
 								tenantName,
-								current.roleId});
+								QByteArray()});
 						}
 					}
 				}

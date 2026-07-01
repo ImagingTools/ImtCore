@@ -45,7 +45,7 @@ inline bool HasDelegatedTenantAccess(
 	}
 
 	// 2. Direct membership
-	if (membershipManager.HasMinimumRole(userId, targetTenantId, QByteArray())){
+	if (membershipManager.IsMember(userId, targetTenantId)){
 		return true;
 	}
 
@@ -88,8 +88,8 @@ inline bool HasDelegatedTenantRole(
 		return true;
 	}
 
-	// 2. Direct membership with required role
-	if (membershipManager.HasMinimumRole(userId, targetTenantId, roleId)){
+	// 2. Direct membership
+	if (membershipManager.IsMember(userId, targetTenantId)){
 		return true;
 	}
 

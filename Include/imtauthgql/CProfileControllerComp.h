@@ -55,7 +55,6 @@ protected:
 private:
 	imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CreateOrganizationList(
 				const QByteArray& userId) const;
-	QString TenantMembershipRoleToString(const QByteArray& roleId) const;
 protected:
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
