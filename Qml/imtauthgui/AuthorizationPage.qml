@@ -37,6 +37,20 @@ Rectangle {
 
 	Component.onCompleted: {
 		decoratorPause.start();
+
+		authPageContainer.state = "unauthorized";
+		authPageContainer.isAuthenticating = false;
+
+		passwordTextInput.text = "";
+		
+		// Restore username from AuthorizationController if "Remember me" is checked
+		if (authPageContainer.rememberMe && AuthorizationController.lastUser !== "") {
+			loginTextInput.text = AuthorizationController.lastUser;
+		}
+		else {
+			loginTextInput.text = "";
+		}
+		loginTextInput.forceActiveFocus();
 	}
 
 	LocalizationEvent {
@@ -51,18 +65,6 @@ Rectangle {
 
 	onVisibleChanged: {
 		if (authPageContainer.visible){
-			authPageContainer.state = "unauthorized";
-			authPageContainer.isAuthenticating = false;
-
-			passwordTextInput.text = "";
-			
-			// Restore username from AuthorizationController if "Remember me" is checked
-			if (authPageContainer.rememberMe && AuthorizationController.lastUser !== "") {
-				loginTextInput.text = AuthorizationController.lastUser;
-			}
-			else {
-				loginTextInput.text = "";
-			}
 			loginTextInput.forceActiveFocus();
 		}
 	}
@@ -112,6 +114,7 @@ Rectangle {
 
 		onFinished: {
 			authPageContainer.setDecorators();
+			loginTextInput.forceActiveFocus();
 		}
 	}
 

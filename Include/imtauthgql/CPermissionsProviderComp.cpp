@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CPermissionsProviderComp.h>
-#include <imtauthgql/imtauthgql.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions.h>
 
 
 // ImtCore includes
-#include <imtgql/IGqlContext.h>
+#include <imtauthgql/imtauthgql.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions.h>
 
 
 namespace imtauthgql
@@ -82,4 +81,6 @@ sdl::V1_0::imtauth::CGetProductPermissionsPayload CPermissionsProviderComp::OnGe
 
 	return response;
 }
+
+
 } // namespace imtauthgql

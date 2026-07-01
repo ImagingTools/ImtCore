@@ -295,6 +295,9 @@
                     <AttributeInfo Id="BindingManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantEntityBindingManager"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DelegatedAccess" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DelegatedAccessResolver"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="InvitationRepository" Type="Reference" ExportId="InvitationRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

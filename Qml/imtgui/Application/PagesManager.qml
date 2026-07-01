@@ -44,18 +44,19 @@ Item {
 
         onPagesModelChanged: {
             container.pageModel = pagesProvider.pagesModel;
+            // Always assign the current model to the Repeater so that
+            // the page delegates (and their Loaders) are created from
+            // the exact same page list that MenuPanel is using.
+            // This prevents desync where menu shows page A but Loader
+            // shows stale content from page B (e.g. after tenant switch
+            // even when page count happens to be the same).
+            pagesData.model = pagesProvider.pagesModel;
 
-            let updateRepeaterModel = true;
-
-            if (pagesData.model){
-                let countPages = pagesData.model.getItemsCount();
-                if (pagesProvider.pagesModel.getItemsCount() === countPages){
-                    updateRepeaterModel = false;
-                }
-            }
-
-            if (updateRepeaterModel){
-                pagesData.model = pagesProvider.pagesModel;
+            // Explicitly ensure the active page content is loaded from
+            // the fresh model (in case visible/onCompleted timing is
+            // affected by the model replacement).
+            if (container.activePageIndex >= 0) {
+                container.loadPageContent(container.activePageIndex);
             }
         }
     }

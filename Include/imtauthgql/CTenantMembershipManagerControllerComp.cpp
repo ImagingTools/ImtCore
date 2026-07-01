@@ -3,10 +3,13 @@
 
 // ImtCore includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions.h>
 #include <imtauth/ITenantInfo.h>
 #include <imtauth/DelegatedTenantAccessUtils.h>
 #include <imtgql/IGqlContext.h>
 #include <imtbase/imtbase.h>
+#include <imtauthgql/imtauthgql.h>
+#include <iqt/ITranslationManager.h>
 
 
 namespace
@@ -35,7 +38,6 @@ sdl::V1_0::imtauth::CTenantInvitationData ToTenantInvitationData(
 	data.id = invitation.GetInvitationId();
 	data.userId = invitation.GetUserId();
 	data.tenantId = invitation.GetTenantId();
-	data.role = invitation.GetRoleId();
 	data.status = static_cast<sdl::V1_0::imtauth::TenantInvitationStatus>(status);
 	data.invitedByUserId = invitation.GetInvitedByUserId();
 	data.createdAt = invitation.GetCreatedAt();
@@ -84,13 +86,13 @@ bool HasTenantAccess(
 	}
 
 	// Non-owners must be active members of the tenant.
-	return membershipManager.HasMinimumRole(userId, tenantId, QByteArray());
+	return membershipManager.IsMember(userId, tenantId);
 }
 
 
 /**
 	Check if the user can manage members (create invitations, remove members, change roles).
-	Only Creator, Owner, or Admin can manage members.
+	Owner and Creator always have access; active members with relevant org permissions are also allowed.
 */
 bool CanManageMembers(
 		const imtauth::ITenantManager& tenantManager,
@@ -106,9 +108,16 @@ bool CanManageMembers(
 		}
 	}
 
-	// Check Admin role
-	QByteArray adminRoleId = imtauth::TenantEnvironmentRoleToString(imtauth::TER_ADMIN).toUtf8();
-	return membershipManager.HasMinimumRole(userId, tenantId, adminRoleId);
+	// Check via organization permissions (replacing Admin env role)
+	imtauth::ITenantMembershipUniquePtr msPtr = membershipManager.FindMembership(userId, tenantId);
+	if (msPtr.IsValid() && msPtr->IsActive()){
+		QByteArrayList orgP = msPtr->GetOrganizationPermissions();
+		if (orgP.contains("EditOrganizationMember") || orgP.contains("InviteOrganizationMember") ||
+		    orgP.contains("ExcludeOrganizationMember") || orgP.contains("ChangeOrganizationMemberRole")){
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -261,10 +270,11 @@ sdl::V1_0::imtauth::CGetMembershipPayload CTenantMembershipManagerControllerComp
 	membershipData.id = membershipPtr->GetMembershipId();
 	membershipData.userId = membershipPtr->GetUserId();
 	membershipData.tenantId = membershipPtr->GetTenantId();
-	membershipData.role = membershipPtr->GetRoleId();
+
 	membershipData.isActive = membershipPtr->IsActive();
 	membershipData.joinedAt = membershipPtr->GetJoinedAt();
 	membershipData.updatedAt = membershipPtr->GetUpdatedAt();
+	membershipData.organizationPermissions.Emplace().FromList(membershipPtr->GetOrganizationPermissions());
 
 	response.membership = membershipData;
 
@@ -305,10 +315,11 @@ sdl::V1_0::imtauth::CFindMembershipPayload CTenantMembershipManagerControllerCom
 	membershipData.id = membershipPtr->GetMembershipId();
 	membershipData.userId = membershipPtr->GetUserId();
 	membershipData.tenantId = membershipPtr->GetTenantId();
-	membershipData.role = membershipPtr->GetRoleId();
+
 	membershipData.isActive = membershipPtr->IsActive();
 	membershipData.joinedAt = membershipPtr->GetJoinedAt();
 	membershipData.updatedAt = membershipPtr->GetUpdatedAt();
+	membershipData.organizationPermissions.Emplace().FromList(membershipPtr->GetOrganizationPermissions());
 
 	response.membership = membershipData;
 
@@ -366,12 +377,7 @@ sdl::V1_0::imtauth::CHasMinimumRolePayload CTenantMembershipManagerControllerCom
 		tenantId = *arguments.input->tenantId;
 	}
 
-	QByteArray minimumRoleId;
-	if (arguments.input && arguments.input->minimumRole){
-		minimumRoleId = (*arguments.input->minimumRole);
-	}
-
-	response.hasRole = m_membershipManagerCompPtr->HasMinimumRole(userId, tenantId, minimumRoleId);
+	response.hasRole = m_membershipManagerCompPtr->IsMember(userId, tenantId);
 
 	return response;
 }
@@ -462,6 +468,50 @@ sdl::V1_0::imtauth::CGetMyTenantInvitationsPayload CTenantMembershipManagerContr
 }
 
 
+sdl::V1_0::imtauth::CGetOrganizationPermissionsPayload CTenantMembershipManagerControllerComp::OnGetOrganizationPermissions(
+			const sdl::V1_0::imtauth::CGetOrganizationPermissionsGqlRequest& request,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& /*errorMessage*/) const
+{
+	sdl::V1_0::imtauth::CGetOrganizationPermissionsPayload response;
+
+	if (!m_organizationsProviderCompPtr.IsValid()){
+		return response;
+	}
+
+	QByteArray languageId;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		languageId = gqlContextPtr->GetLanguageId();
+	}
+
+	response.groups.Emplace();
+	BuildPermissionGroupsFromProvider<sdl::V1_0::imtauth::CPermissionGroup, sdl::V1_0::imtauth::CPermissionEntry>(
+			m_organizationsProviderCompPtr.GetPtr(),
+			m_translationManagerCompPtr.IsValid() ? m_translationManagerCompPtr.GetPtr() : nullptr,
+			*response.groups,
+			languageId,
+			nullptr);
+
+	sdl::V1_0::imtauth::GetOrganizationPermissionsRequestArguments arguments = request.GetRequestedArguments();
+	if (arguments.input && arguments.input->userId && arguments.input->tenantId
+			&& m_membershipManagerCompPtr.IsValid())
+	{
+		const QByteArray userId = *arguments.input->userId;
+		const QByteArray tenantId = *arguments.input->tenantId;
+		if (!userId.isEmpty() && !tenantId.isEmpty()){
+			imtauth::ITenantMembershipUniquePtr membershipPtr =
+					m_membershipManagerCompPtr->FindMembership(userId, tenantId);
+			if (membershipPtr.IsValid()){
+				response.memberPermissions.Emplace().FromList(membershipPtr->GetOrganizationPermissions());
+			}
+		}
+	}
+
+	return response;
+}
+
+
 sdl::V1_0::imtauth::CAddMembershipPayload CTenantMembershipManagerControllerComp::OnAddMembership(
 	const sdl::V1_0::imtauth::CAddMembershipGqlRequest& request,
 	const ::imtgql::CGqlRequest& gqlRequest,
@@ -476,16 +526,12 @@ sdl::V1_0::imtauth::CAddMembershipPayload CTenantMembershipManagerControllerComp
 
 	QByteArray userId;
 	QByteArray tenantId;
-	QByteArray roleId;
 	sdl::V1_0::imtauth::AddMembershipRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input && arguments.input->userId){
 		userId = *arguments.input->userId;
 	}
 	if (arguments.input && arguments.input->tenantId){
 		tenantId = *arguments.input->tenantId;
-	}
-	if (arguments.input && arguments.input->role){
-		roleId = (*arguments.input->role);
 	}
 
 	QByteArray contextUserId = ContextUserId(gqlRequest);
@@ -494,13 +540,12 @@ sdl::V1_0::imtauth::CAddMembershipPayload CTenantMembershipManagerControllerComp
 		return response;
 	}
 
-	// Only Creator/Owner/Admin can add members
 	if (!CanManageMembers(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
-		response.errorMessage = QStringLiteral("Only Admin, Owner, or Creator can add members");
+		response.errorMessage = QStringLiteral("Insufficient organization permissions to add members");
 		return response;
 	}
 
-	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(userId, tenantId, roleId);
+	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(userId, tenantId);
 
 	if (membershipId.isEmpty()){
 		response.errorMessage = QStringLiteral("Failed to add membership");
@@ -547,11 +592,10 @@ sdl::V1_0::imtauth::CRemoveMembershipPayload CTenantMembershipManagerControllerC
 			response.errorMessage = QStringLiteral("Access denied");
 			return response;
 		}
-		// Only Creator/Owner/Admin can remove other members; regular members can only remove themselves
 		bool isSelfRemoval = (membershipPtr->GetUserId() == contextUserId);
 		if (!isSelfRemoval && !CanManageMembers(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
 			response.success = false;
-			response.errorMessage = QStringLiteral("Only Admin, Owner, or Creator can remove other members");
+			response.errorMessage = QStringLiteral("Insufficient organization permissions to remove other members");
 			return response;
 		}
 	}
@@ -580,16 +624,12 @@ sdl::V1_0::imtauth::CCreateTenantInvitationPayload CTenantMembershipManagerContr
 
 	QByteArray userId;
 	QByteArray tenantId;
-	QByteArray roleId;
 	sdl::V1_0::imtauth::CreateTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input && arguments.input->userId){
 		userId = *arguments.input->userId;
 	}
 	if (arguments.input && arguments.input->tenantId){
 		tenantId = *arguments.input->tenantId;
-	}
-	if (arguments.input && arguments.input->role){
-		roleId = (*arguments.input->role);
 	}
 
 	QByteArray contextUserId = ContextUserId(gqlRequest);
@@ -598,13 +638,12 @@ sdl::V1_0::imtauth::CCreateTenantInvitationPayload CTenantMembershipManagerContr
 		return response;
 	}
 
-	// Only Creator/Owner/Admin can create invitations
 	if (!CanManageMembers(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
-		response.errorMessage = QStringLiteral("Only Admin, Owner, or Creator can invite members");
+		response.errorMessage = QStringLiteral("Insufficient organization permissions to invite members");
 		return response;
 	}
 
-	QByteArray invitationId = m_invitationManagerCompPtr->CreateInvitation(contextUserId, userId, tenantId, roleId);
+	QByteArray invitationId = m_invitationManagerCompPtr->CreateInvitation(contextUserId, userId, tenantId);
 	if (invitationId.isEmpty()){
 		response.errorMessage = QStringLiteral("Failed to create tenant invitation");
 		return response;
@@ -706,6 +745,12 @@ sdl::V1_0::imtauth::CRevokeTenantInvitationPayload CTenantMembershipManagerContr
 		return response;
 	}
 
+	if (m_tenantManagerCompPtr.IsValid() && !CanManageMembers(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, invitationPtr->GetTenantId())){
+		response.success = false;
+		response.errorMessage = QStringLiteral("Insufficient organization permissions to revoke invitations");
+		return response;
+	}
+
 	bool success = m_invitationManagerCompPtr->RevokeInvitation(invitationId, contextUserId);
 	response.success = success;
 	if (!success){
@@ -745,6 +790,13 @@ sdl::V1_0::imtauth::CResendTenantInvitationPayload CTenantMembershipManagerContr
 		return response;
 	}
 
+	QByteArray resendContextUser = ContextUserId(gqlRequest);
+	if (m_tenantManagerCompPtr.IsValid() && !CanManageMembers(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), resendContextUser, invitationPtr->GetTenantId())){
+		response.success = false;
+		response.errorMessage = QStringLiteral("Insufficient organization permissions to resend invitations");
+		return response;
+	}
+
 	bool success = m_invitationManagerCompPtr->ResendInvitation(invitationId);
 	response.success = success;
 	if (!success){
@@ -754,12 +806,12 @@ sdl::V1_0::imtauth::CResendTenantInvitationPayload CTenantMembershipManagerContr
 }
 
 
-sdl::V1_0::imtauth::CUpdateMembershipRolePayload CTenantMembershipManagerControllerComp::OnUpdateMembershipRole(
-	const sdl::V1_0::imtauth::CUpdateMembershipRoleGqlRequest& request,
+sdl::V1_0::imtauth::CUpdateMembershipPermissionsPayload CTenantMembershipManagerControllerComp::OnUpdateMembershipPermissions(
+	const sdl::V1_0::imtauth::CUpdateMembershipPermissionsGqlRequest& request,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
-	sdl::V1_0::imtauth::CUpdateMembershipRolePayload response;
+	sdl::V1_0::imtauth::CUpdateMembershipPermissionsPayload response;
 
 	if (!m_membershipManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'MembershipManager' was not set", "CTenantMembershipManagerControllerComp");
@@ -767,21 +819,21 @@ sdl::V1_0::imtauth::CUpdateMembershipRolePayload CTenantMembershipManagerControl
 	}
 
 	QByteArray membershipId;
-	QByteArray roleId;
-	sdl::V1_0::imtauth::UpdateMembershipRoleRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::UpdateMembershipPermissionsRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input && arguments.input->membershipId){
 		membershipId = *arguments.input->membershipId;
 	}
-	if (arguments.input && arguments.input->role){
-		roleId = (*arguments.input->role);
+
+	QByteArrayList permissions;
+	if (arguments.input && arguments.input->permissions){
+		permissions = arguments.input->permissions->ToList();
 	}
 
-	// Resolve tenant from membership for permission check and owner guard
+	// Resolve tenant for access check
 	imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
 	if (membershipPtr.IsValid()){
 		QByteArray tenantId = membershipPtr->GetTenantId();
 
-		// Permission check: ManageMembers
 		QByteArray contextUserId = ContextUserId(gqlRequest);
 		if (m_tenantManagerCompPtr.IsValid() && !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, ContextTenantId(gqlRequest), tenantId)){
 			response.success = false;
@@ -789,29 +841,31 @@ sdl::V1_0::imtauth::CUpdateMembershipRolePayload CTenantMembershipManagerControl
 			return response;
 		}
 
-		// Only Creator/Owner/Admin can change member roles
-		if (m_tenantManagerCompPtr.IsValid() && !CanManageMembers(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
-			response.success = false;
-			response.errorMessage = QStringLiteral("Only Admin, Owner, or Creator can change member roles");
-			return response;
-		}
-
-		// Check if membership is the owner — owner's role is managed via TransferOwnership, not UpdateMembershipRole
-		if (m_tenantManagerCompPtr.IsValid()){
-			imtauth::ITenantInfoUniquePtr tenantInfoPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
-			if (tenantInfoPtr.IsValid() && tenantInfoPtr->GetOwnerId() == membershipPtr->GetUserId()){
+		// Server-side protection for org perms assignment: only high-priv or users with relevant org perms in *their* membership
+		imtauth::ITenantInfoUniquePtr tPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+		bool isHighPriv = tPtr.IsValid() && (tPtr->GetOwnerId() == contextUserId || tPtr->GetCreatorId() == contextUserId);
+		if (!isHighPriv){
+			imtauth::ITenantMembershipUniquePtr actorMs = m_membershipManagerCompPtr->FindMembership(contextUserId, tenantId);
+			if (actorMs.IsValid() && actorMs->IsActive()){
+				QByteArrayList actorOrgs = actorMs->GetOrganizationPermissions();
+				if (!actorOrgs.contains("EditOrganizationMember") && !actorOrgs.contains("ChangeOrganizationMemberRole")){
+					response.success = false;
+					response.errorMessage = QStringLiteral("Insufficient organization permissions to update member organization permissions");
+					return response;
+				}
+			} else {
 				response.success = false;
-				response.errorMessage = QStringLiteral("Cannot change the Owner role");
+				response.errorMessage = QStringLiteral("Access denied");
 				return response;
 			}
 		}
 	}
 
-	bool success = m_membershipManagerCompPtr->UpdateMembershipRole(membershipId, roleId);
+	bool success = m_membershipManagerCompPtr->UpdateMembershipOrganizationPermissions(membershipId, permissions);
 
 	response.success = success;
 	if (!success){
-		response.errorMessage = QStringLiteral("Failed to update membership role");
+		response.errorMessage = QStringLiteral("Failed to update membership organization permissions");
 	}
 
 	return response;

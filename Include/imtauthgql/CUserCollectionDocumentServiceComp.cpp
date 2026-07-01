@@ -12,6 +12,8 @@
 #include <imtauth/IUserInfo.h>
 #include <imtdoc/CDocumentSavedEvent.h>
 #include <imtgql/IGqlContext.h>
+#include <imtauthgql/imtauthgql.h>
+#include <istd/IChangeable.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/UserCollectionDocumentService.h>
@@ -56,6 +58,40 @@ sdl::V1_0::imtauth::CUserData CUserCollectionDocumentServiceComp::OnGetUserRepre
 		return sdl::V1_0::imtauth::CUserData();
 	}
 
+	// Apply tenant isolation (same as collection/profile paths) so that only
+	// roles/groups/permissions bound to the request's tenant (or globals for
+	// No Organization) are returned. This prevents leaking IDs from other tenants.
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	QByteArray currentTenantId;
+	QByteArray currentProductId;
+	if (gqlContextPtr != nullptr){
+		currentTenantId = gqlContextPtr->GetTenantId();
+		currentProductId = gqlContextPtr->GetProductId();
+	}
+
+	imtauth::ITenantEntityBindingManager* bindingPtr = m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr;
+	imtauth::IDelegatedAccess* delegatedPtr = m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr;
+	imtauth::ITenantMembershipManager* membershipPtr = m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr;
+	imtauth::IRoleInfoProvider* roleProviderPtr = m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr;
+
+	istd::IChangeableUniquePtr tenantAdapted = AdaptUserForTenant(
+				userPtr->GetObjectUuid(),
+				*static_cast<const istd::IChangeable*>(documentPtr.GetPtr()),
+				currentTenantId,
+				currentProductId,
+				bindingPtr,
+				delegatedPtr,
+				membershipPtr,
+				roleProviderPtr);
+
+	const imtauth::IUserInfo* effectiveUserPtr = userPtr;
+	if (tenantAdapted.IsValid()){
+		effectiveUserPtr = dynamic_cast<const imtauth::IUserInfo*>(tenantAdapted.GetPtr());
+		if (effectiveUserPtr == nullptr){
+			effectiveUserPtr = userPtr;
+		}
+	}
+
 	sdl::V1_0::imtauth::CUserData response;
 	response.id = userPtr->GetObjectUuid();
 	response.name = userPtr->GetName();
@@ -63,18 +99,19 @@ sdl::V1_0::imtauth::CUserData CUserCollectionDocumentServiceComp::OnGetUserRepre
 	response.email = userPtr->GetMail();
 
 	response.groups.Emplace();
-	for (const QByteArray& groupId : userPtr->GetGroups()){
+	for (const QByteArray& groupId : effectiveUserPtr->GetGroups()){
 		response.groups->push_back(groupId);
 	}
 
 	// Roles and permissions across all products this user has any role in.
+	// (filtered by AdaptUserForTenant for current tenant/product context)
 	response.roles.Emplace();
 	response.permissions.Emplace();
-	for (const QByteArray& productId : userPtr->GetProducts()){
-		for (const QByteArray& roleId : userPtr->GetRoles(productId)){
+	for (const QByteArray& productId : effectiveUserPtr->GetProducts()){
+		for (const QByteArray& roleId : effectiveUserPtr->GetRoles(productId)){
 			response.roles->push_back(roleId);
 		}
-		for (const QByteArray& permissionId : userPtr->GetLocalPermissions(productId)){
+		for (const QByteArray& permissionId : effectiveUserPtr->GetLocalPermissions(productId)){
 			response.permissions->push_back(permissionId);
 		}
 	}
@@ -129,6 +166,20 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	}
 
 	QByteArray userLogin = GetUserId(gqlRequest);
+
+	// For tenant-aware delta updates of roles/groups/perms we need the binding manager
+	// (prevents stripping assignments from other tenants and rejects cross-tenant IDs).
+	imtauth::ITenantEntityBindingManager* bindingPtr = m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr;
+	const QByteArray rolesEntity = QByteArrayLiteral("Roles");
+	const QByteArray groupsEntity = QByteArrayLiteral("Groups");
+	const QByteArray permsEntity = QByteArrayLiteral("Permissions");
+
+	auto shouldKeepForTenant = [&](const QByteArray& entityType, const QByteArray& entityId) -> bool {
+		if (tenantId.isEmpty() || bindingPtr == nullptr || entityId.isEmpty()){
+			return true;
+		}
+		return ShouldKeepEntityForTenant(bindingPtr, tenantId, entityType, entityId);
+	};
 
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
@@ -226,16 +277,20 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	}
 
 	if (userData.groups){
-		// Sync group membership: add new groups, remove ones that disappeared.
+		// Tenant-isolated group sync: only add/remove groups that are visible
+		// for the current tenant. Assignments from other tenants are preserved.
 		imtauth::IUserGroupInfo::GroupIds currentGroups = userPtr->GetGroups();
 		QList<QByteArray> newGroupsList;
 		for (const auto& groupIdPtr : *userData.groups){
 			if (groupIdPtr){
-				newGroupsList.append(*groupIdPtr);
+				QByteArray gid = *groupIdPtr;
+				if (shouldKeepForTenant(groupsEntity, gid)){
+					newGroupsList.append(gid);
+				}
 			}
 		}
 		for (const QByteArray& currentGroupId : currentGroups){
-			if (!newGroupsList.contains(currentGroupId)){
+			if (shouldKeepForTenant(groupsEntity, currentGroupId) && !newGroupsList.contains(currentGroupId)){
 				userPtr->RemoveFromGroup(currentGroupId);
 			}
 		}
@@ -248,24 +303,57 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 
 	if (userData.roles && userData.productId){
 		QByteArray productId = *userData.productId;
-		imtauth::IUserBaseInfo::RoleIds roleIds;
+		imtauth::IUserBaseInfo::RoleIds incomingRoles;
 		for (const auto& roleIdPtr : *userData.roles){
 			if (roleIdPtr){
-				roleIds.append(*roleIdPtr);
+				QByteArray rid = *roleIdPtr;
+				if (shouldKeepForTenant(rolesEntity, rid)){
+					incomingRoles.append(rid);
+				}
 			}
 		}
-		userPtr->SetRoles(productId, roleIds);
+		// Delta update only for tenant-visible roles to avoid overwriting
+		// role assignments that belong to other tenants for the same product.
+		imtauth::IUserBaseInfo::RoleIds currentRoles = userPtr->GetRoles(productId);
+		imtauth::IUserBaseInfo::RoleIds finalRoles;
+		for (const QByteArray& cr : currentRoles){
+			if (!shouldKeepForTenant(rolesEntity, cr) || incomingRoles.contains(cr)){
+				finalRoles.append(cr);
+			}
+		}
+		for (const QByteArray& nr : incomingRoles){
+			if (!finalRoles.contains(nr)){
+				finalRoles.append(nr);
+			}
+		}
+		userPtr->SetRoles(productId, finalRoles);
 	}
 
 	if (userData.permissions && userData.productId){
 		QByteArray productId = *userData.productId;
-		imtauth::IUserBaseInfo::FeatureIds permissions;
+		imtauth::IUserBaseInfo::FeatureIds incomingPerms;
 		for (const auto& permissionIdPtr : *userData.permissions){
 			if (permissionIdPtr){
-				permissions.append(*permissionIdPtr);
+				QByteArray pid = *permissionIdPtr;
+				if (shouldKeepForTenant(permsEntity, pid)){
+					incomingPerms.append(pid);
+				}
 			}
 		}
-		userPtr->SetLocalPermissions(productId, permissions);
+		// Delta update only for tenant-visible permissions.
+		imtauth::IUserBaseInfo::FeatureIds currentPerms = userPtr->GetLocalPermissions(productId);
+		imtauth::IUserBaseInfo::FeatureIds finalPerms;
+		for (const QByteArray& cp : currentPerms){
+			if (!shouldKeepForTenant(permsEntity, cp) || incomingPerms.contains(cp)){
+				finalPerms.append(cp);
+			}
+		}
+		for (const QByteArray& np : incomingPerms){
+			if (!finalPerms.contains(np)){
+				finalPerms.append(np);
+			}
+		}
+		userPtr->SetLocalPermissions(productId, finalPerms);
 	}
 
 	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
@@ -325,7 +413,7 @@ bool CUserCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* eventP
 		return true;
 	}
 
-	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(newUserId, tenantId, "Member");
+	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(newUserId, tenantId);
 	if (membershipId.isEmpty()){
 		SendWarningMessage(0, QString("Auto-membership creation failed for user '%1' in tenant '%2'").arg(QString::fromUtf8(newUserId), QString::fromUtf8(tenantId)), "CUserCollectionDocumentServiceComp");
 	}

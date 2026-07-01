@@ -39,9 +39,6 @@ istd::IChangeableUniquePtr CTenantMembershipDbDelegateComp::CreateObjectFromReco
 	if (record.contains("TenantId")){
 		membershipPtr->SetTenantId(imtdb::VariantToByteArray(record.value("TenantId")));
 	}
-	if (record.contains("Role")){
-		membershipPtr->SetRoleId(record.value("Role").toByteArray());
-	}
 	if (record.contains("IsActive")){
 		membershipPtr->SetActive(record.value("IsActive").toBool());
 	}
@@ -54,6 +51,20 @@ istd::IChangeableUniquePtr CTenantMembershipDbDelegateComp::CreateObjectFromReco
 		QVariant val = record.value("UpdatedAt");
 		QDateTime dt = val.toDateTime();
 		membershipPtr->SetUpdatedAt(dt.isValid() ? dt.toString(Qt::ISODateWithMs) : val.toString());
+	}
+
+	// Load org-specific permissions for the membership (pipe-separated in OrgPermissions column)
+	if (record.contains("OrgPermissions")){
+		QString permsStr = record.value("OrgPermissions").toString();
+		QByteArrayList perms;
+		if (!permsStr.isEmpty()){
+			QStringList parts = permsStr.split('|', Qt::SkipEmptyParts);
+			for (const QString& p : parts){
+				QByteArray np = p.trimmed().toUtf8();
+				if (!np.isEmpty()) perms << np;
+			}
+		}
+		membershipPtr->SetOrganizationPermissions(perms);
 	}
 
 	return membershipPtr;
@@ -82,21 +93,23 @@ CTenantMembershipDbDelegateComp::NewObjectQuery CTenantMembershipDbDelegateComp:
 
 	QString userId = membershipPtr != nullptr ? imtdb::EscapeSql(QString::fromUtf8(membershipPtr->GetUserId())) : QString();
 	QString tenantId = membershipPtr != nullptr ? imtdb::EscapeSql(QString::fromUtf8(membershipPtr->GetTenantId())) : QString();
-	QString roleId = membershipPtr != nullptr ? imtdb::EscapeSql(QString::fromUtf8(membershipPtr->GetRoleId())) : QString();
 	bool isActive = membershipPtr != nullptr ? membershipPtr->IsActive() : true;
 	QString now = imtdb::UtcNow();
 
+	QByteArrayList orgPerms = membershipPtr != nullptr ? membershipPtr->GetOrganizationPermissions() : QByteArrayList();
+	QString orgPermsStr = orgPerms.isEmpty() ? QString() : QString::fromUtf8(orgPerms.join('|'));
+
 	result.query = QString(
-		"INSERT INTO \"%1\" (\"Id\", \"UserId\", \"TenantId\", \"Role\", \"IsActive\", \"JoinedAt\", \"UpdatedAt\") "
-		"VALUES ('%2', '%3', '%4', '%5', %6, '%7', '%8');")
+		"INSERT INTO \"%1\" (\"Id\", \"UserId\", \"TenantId\", \"IsActive\", \"JoinedAt\", \"UpdatedAt\", \"OrgPermissions\") "
+		"VALUES ('%2', '%3', '%4', %5, '%6', '%7', '%8');")
 		.arg(*m_tableNameAttrPtr,
 			 id,
 			 userId,
 			 tenantId,
-			 roleId,
 			 isActive ? "true" : "false",
 			 now,
-			 now).toUtf8();
+			 now,
+			 imtdb::EscapeSql(orgPermsStr)).toUtf8();
 
 	return result;
 }
@@ -117,16 +130,19 @@ QByteArray CTenantMembershipDbDelegateComp::CreateUpdateObjectQuery(
 	QString escapedId = imtdb::EscapeSql(QString::fromUtf8(objectId));
 	QString now = imtdb::UtcNow();
 
+	QByteArrayList orgPerms = membershipPtr->GetOrganizationPermissions();
+	QString orgPermsStr = orgPerms.isEmpty() ? QString() : QString::fromUtf8(orgPerms.join('|'));
+
 	return QString(
 		"UPDATE \"%1\" SET "
-		"\"Role\"='%2', "
-		"\"IsActive\"=%3, "
-		"\"UpdatedAt\"='%4' "
+		"\"IsActive\"=%2, "
+		"\"UpdatedAt\"='%3', "
+		"\"OrgPermissions\"='%4' "
 		"WHERE \"Id\"='%5';")
 		.arg(*m_tableNameAttrPtr,
-			 imtdb::EscapeSql(QString::fromUtf8(membershipPtr->GetRoleId())),
 			 membershipPtr->IsActive() ? "true" : "false",
 			 now,
+			 imtdb::EscapeSql(orgPermsStr),
 			 escapedId).toUtf8();
 }
 

@@ -69,9 +69,6 @@ istd::IChangeableUniquePtr CTenantInvitationDbDelegateComp::CreateObjectFromReco
 	if (record.contains("TenantId")){
 		invitationPtr->SetTenantId(imtdb::VariantToByteArray(record.value("TenantId")));
 	}
-	if (record.contains("Role")){
-		invitationPtr->SetRoleId(record.value("Role").toByteArray());
-	}
 	if (record.contains("Status")){
 		invitationPtr->SetStatus(static_cast<imtauth::ITenantInvitation::TenantInvitationStatus>(record.value("Status").toInt()));
 	}
@@ -114,7 +111,6 @@ CTenantInvitationDbDelegateComp::NewObjectQuery CTenantInvitationDbDelegateComp:
 	QString tenantId = imtdb::EscapeSql(QString::fromUtf8(invitationPtr->GetTenantId()));
 	QString invitedByUserId = imtdb::EscapeSql(QString::fromUtf8(invitationPtr->GetInvitedByUserId()));
 	QString revokedByUserId = NullableSqlText(QString::fromUtf8(invitationPtr->GetRevokedByUserId()));
-	QString roleId = imtdb::EscapeSql(QString::fromUtf8(invitationPtr->GetRoleId()));
 	int status = static_cast<int>(invitationPtr->GetStatus());
 	QString createdAt = !invitationPtr->GetCreatedAt().isEmpty() ? imtdb::EscapeSql(invitationPtr->GetCreatedAt()) : imtdb::UtcNow();
 	QString updatedAt = !invitationPtr->GetUpdatedAt().isEmpty() ? imtdb::EscapeSql(invitationPtr->GetUpdatedAt()) : createdAt;
@@ -125,13 +121,12 @@ CTenantInvitationDbDelegateComp::NewObjectQuery CTenantInvitationDbDelegateComp:
 	QString lastSentAt = imtdb::EscapeSql(invitationPtr->GetLastSentAt());
 
 	result.query = QString(
-		"INSERT INTO \"%1\" (\"Id\", \"UserId\", \"TenantId\", \"Role\", \"Status\", \"InvitedByUserId\", \"CreatedAt\", \"UpdatedAt\", \"ExpiresAt\", \"AcceptedAt\", \"RejectedAt\", \"RevokedAt\", \"RevokedByUserId\", \"LastSentAt\") "
-		"VALUES ('%2', '%3', '%4', '%5', %6, '%7', '%8', '%9', '%10', %11, %12, %13, %14, '%15');")
+		"INSERT INTO \"%1\" (\"Id\", \"UserId\", \"TenantId\", \"Status\", \"InvitedByUserId\", \"CreatedAt\", \"UpdatedAt\", \"ExpiresAt\", \"AcceptedAt\", \"RejectedAt\", \"RevokedAt\", \"RevokedByUserId\", \"LastSentAt\") "
+		"VALUES ('%2', '%3', '%4', %5, '%6', '%7', '%8', '%9', %10, %11, %12, %13, '%14');")
 		.arg(*m_tableNameAttrPtr)
 		.arg(id)
 		.arg(userId)
 		.arg(tenantId)
-		.arg(roleId)
 		.arg(QString::number(status))
 		.arg(invitedByUserId)
 		.arg(createdAt)
@@ -161,18 +156,16 @@ QByteArray CTenantInvitationDbDelegateComp::CreateUpdateObjectQuery(
 
 	return QString(
 		"UPDATE \"%1\" SET "
-		"\"Role\"=%2, "
-		"\"Status\"=%3, "
-		"\"UpdatedAt\"='%4', "
-		"\"ExpiresAt\"='%5', "
-		"\"AcceptedAt\"=%6, "
-		"\"RejectedAt\"=%7, "
-		"\"RevokedAt\"=%8, "
-		"\"RevokedByUserId\"=%9, "
-		"\"LastSentAt\"='%10' "
-		"WHERE \"Id\"='%11';")
+		"\"Status\"=%2, "
+		"\"UpdatedAt\"='%3', "
+		"\"ExpiresAt\"='%4', "
+		"\"AcceptedAt\"=%5, "
+		"\"RejectedAt\"=%6, "
+		"\"RevokedAt\"=%7, "
+		"\"RevokedByUserId\"=%8, "
+		"\"LastSentAt\"='%9' "
+		"WHERE \"Id\"='%10';")
 		.arg(*m_tableNameAttrPtr)
-		.arg(QString("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(invitationPtr->GetRoleId()))))
 		.arg(QString::number(static_cast<int>(invitationPtr->GetStatus())))
 		.arg(imtdb::EscapeSql(invitationPtr->GetUpdatedAt()))
 		.arg(imtdb::EscapeSql(invitationPtr->GetExpiresAt()))

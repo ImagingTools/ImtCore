@@ -128,7 +128,7 @@ ITenantMembershipUniquePtr CTenantMembershipManagerComp::FindMembership(const QB
 }
 
 
-QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId, const QByteArray& tenantId, const QByteArray& roleId)
+QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId, const QByteArray& tenantId)
 {
 	if (!m_membershipCollectionCompPtr.IsValid() || !m_membershipFactoryCompPtr.IsValid()){
 		SendErrorMessage(0, "Membership collection or factory not configured", "CTenantMembershipManagerComp");
@@ -163,7 +163,6 @@ QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId,
 	membershipPtr->SetMembershipId(membershipId);
 	membershipPtr->SetUserId(userId);
 	membershipPtr->SetTenantId(tenantId);
-	membershipPtr->SetRoleId(roleId);  // Backward-compatible: parses string to enum
 	membershipPtr->SetActive(true);
 	membershipPtr->SetJoinedAt(now);
 
@@ -179,8 +178,8 @@ QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId,
 		m_bindingManagerCompPtr->AddBinding(tenantId, entityType, userId);
 	}
 
-	SendInfoMessage(0, QString("Added membership for user '%1' in tenant '%2' with role '%3'")
-		.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId), QString::fromUtf8(roleId)), "CTenantMembershipManagerComp");
+	SendInfoMessage(0, QString("Added membership for user '%1' in tenant '%2'")
+		.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId)), "CTenantMembershipManagerComp");
 
 	return membershipId;
 }
@@ -239,15 +238,10 @@ bool CTenantMembershipManagerComp::RemoveMembership(const QByteArray& membership
 }
 
 
-bool CTenantMembershipManagerComp::UpdateMembershipRole(const QByteArray& membershipId, const QByteArray& newRoleId)
+bool CTenantMembershipManagerComp::UpdateMembershipOrganizationPermissions(const QByteArray& membershipId, const QByteArrayList& permissions)
 {
 	if (!m_membershipCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "Membership collection not configured", "CTenantMembershipManagerComp");
-		return false;
-	}
-
-	if (IsOwnerMembership(membershipId)){
-		SendErrorMessage(0, QString("Cannot change the role of the tenant owner (membership '%1')").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
 		return false;
 	}
 
@@ -265,14 +259,14 @@ bool CTenantMembershipManagerComp::UpdateMembershipRole(const QByteArray& member
 
 	istd::CChangeNotifier changeNotifier(this);
 
-	membershipPtr->SetRoleId(newRoleId);
+	membershipPtr->SetOrganizationPermissions(permissions);
 
 	if (!m_membershipCollectionCompPtr->SetObjectData(membershipId, *membershipPtr)){
-		SendErrorMessage(0, QString("Failed to update membership '%1'").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
+		SendErrorMessage(0, QString("Failed to update membership '%1' permissions").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
 		return false;
 	}
 
-	SendInfoMessage(0, QString("Updated membership '%1' role to '%2'").arg(QString::fromUtf8(membershipId), QString::fromUtf8(newRoleId)), "CTenantMembershipManagerComp");
+	SendInfoMessage(0, QString("Updated organization permissions for membership '%1'").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
 
 	return true;
 }
@@ -282,35 +276,6 @@ bool CTenantMembershipManagerComp::IsMember(const QByteArray& userId, const QByt
 {
 	ITenantMembershipUniquePtr membershipPtr = FindMembership(userId, tenantId);
 	return membershipPtr.IsValid() && membershipPtr->IsActive();
-}
-
-
-bool CTenantMembershipManagerComp::HasMinimumRole(const QByteArray& userId, const QByteArray& tenantId, const QByteArray& minimumRoleId) const
-{
-	// Check if user is the tenant owner (owner is identified via ITenantInfo::GetOwnerId)
-	if (m_tenantManagerCompPtr.IsValid()){
-		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
-		if (tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId){
-			return true; // Owner has all roles
-		}
-	}
-
-	ITenantMembershipUniquePtr membershipPtr = FindMembership(userId, tenantId);
-	if (!membershipPtr.IsValid()){
-		return false;
-	}
-	if (!membershipPtr->IsActive()){
-		return false;
-	}
-
-	// If no specific role is required, just being a member is enough
-	if (minimumRoleId.isEmpty()){
-		return true;
-	}
-
-	// Compare using enum hierarchy (higher value = higher privilege)
-	TenantEnvironmentRole requiredRole = TenantEnvironmentRoleFromString(QString::fromUtf8(minimumRoleId));
-	return membershipPtr->GetEnvironmentRole() >= requiredRole;
 }
 
 

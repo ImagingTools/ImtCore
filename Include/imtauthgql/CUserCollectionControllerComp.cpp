@@ -765,7 +765,7 @@ QJsonObject CUserCollectionControllerComp::InsertObject(
 		return result;
 	}
 
-	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(newUserId, tenantId, "Member");
+	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(newUserId, tenantId);
 	if (membershipId.isEmpty()){
 		SendWarningMessage(0, QString("Auto-membership creation failed for user '%1' in tenant '%2'").arg(QString::fromUtf8(newUserId), QString::fromUtf8(tenantId)), "CUserCollectionControllerComp");
 	}

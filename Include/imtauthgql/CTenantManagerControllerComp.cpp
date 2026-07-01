@@ -63,7 +63,7 @@ bool HasTenantIsolationAccess(
 		return true;
 	}
 
-	if (membershipManagerPtr != nullptr && membershipManagerPtr->HasMinimumRole(userId, tenantId, QByteArray())){
+	if (membershipManagerPtr != nullptr && membershipManagerPtr->IsMember(userId, tenantId)){
 		return true;
 	}
 
@@ -124,6 +124,7 @@ bool HasTenantManageAccess(
 			const imtauth::ITenantMembershipManager* membershipManagerPtr,
 			const imtgql::CGqlRequest& gqlRequest,
 			const QByteArray& tenantId,
+			const QByteArray& requiredOrgPermission,
 			QString& errorMessage)
 {
 	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
@@ -159,9 +160,11 @@ bool HasTenantManageAccess(
 		return true;
 	}
 
-	const QByteArray adminRoleId = imtauth::TenantEnvironmentRoleToString(imtauth::TER_ADMIN).toUtf8();
-	if (membershipManagerPtr != nullptr && membershipManagerPtr->HasMinimumRole(userId, tenantId, adminRoleId)){
-		return true;
+	if (!requiredOrgPermission.isEmpty() && membershipManagerPtr != nullptr){
+		imtauth::ITenantMembershipUniquePtr msPtr = membershipManagerPtr->FindMembership(userId, tenantId);
+		if (msPtr.IsValid() && msPtr->IsActive() && msPtr->GetOrganizationPermissions().contains(requiredOrgPermission)){
+			return true;
+		}
 	}
 
 	errorMessage = QStringLiteral("Access denied: insufficient permissions to manage tenant");
@@ -343,6 +346,20 @@ sdl::V1_0::imtauth::CGetTenantPayload CTenantManagerControllerComp::OnGetTenant(
 	tenantData.parentTenantId = tenantInfoPtr->GetParentTenantId();
 	tenantData.isSystemTenant = (tenantInfoPtr->GetTenantId() == imtauth::GetSystemTenantId());
 
+	const imtgql::IGqlContext* ctx = gqlRequest.GetRequestContext();
+	if (ctx != nullptr){
+		tenantData.currentUserId = ctx->GetUserId();
+	}
+
+	// Populate the organization permissions available to the current user in this tenant
+	if (m_membershipManagerCompPtr.IsValid() && tenantData.currentUserId.has_value()){
+		QByteArray currentUid = *tenantData.currentUserId;
+		imtauth::ITenantMembershipUniquePtr myMs = m_membershipManagerCompPtr->FindMembership(currentUid, tenantId);
+		if (myMs.IsValid()){
+			tenantData.currentUserOrganizationPermissions.Emplace().FromList(myMs->GetOrganizationPermissions());
+		}
+	}
+
 	// Populate members (id + name) from TenantMemberships
 	if (m_membershipManagerCompPtr.IsValid()){
 		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
@@ -500,7 +517,7 @@ sdl::V1_0::imtauth::CCreateTenantPayload CTenantManagerControllerComp::OnCreateT
 	}
 
 	if (m_membershipManagerCompPtr.IsValid() && !ownerId.isEmpty()){
-		m_membershipManagerCompPtr->AddMembership(ownerId, tenantId, QByteArray());
+		m_membershipManagerCompPtr->AddMembership(ownerId, tenantId);
 	}
 
 	response.tenantId = tenantId;
@@ -544,6 +561,7 @@ sdl::V1_0::imtauth::CRemoveTenantPayload CTenantManagerControllerComp::OnRemoveT
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
+				QByteArray(),
 				accessError)){
 		response.errorMessage = accessError;
 		response.success = false;
@@ -603,6 +621,7 @@ sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateT
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
+				QByteArrayLiteral("EditOrganization"),
 				accessError)){
 		response.errorMessage = accessError;
 		response.success = false;
@@ -686,7 +705,7 @@ sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateT
 		// Add memberships for new users
 		for (const QByteArray& uid : newUserIds){
 			if (!currentUserIds.contains(uid)){
-				m_membershipManagerCompPtr->AddMembership(uid, tenantId, QByteArray());
+				m_membershipManagerCompPtr->AddMembership(uid, tenantId);
 			}
 		}
 	}
@@ -738,6 +757,7 @@ sdl::V1_0::imtauth::CSetTenantActivePayload CTenantManagerControllerComp::OnSetT
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				tenantId,
+				QByteArray(),
 				accessError)){
 		response.errorMessage = accessError;
 		response.success = false;
@@ -944,6 +964,7 @@ sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload CTenantManagerControllerComp::On
 				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
 				gqlRequest,
 				sourceTenantId,
+				QByteArrayLiteral("ConnectOrganization"),
 				accessError)){
 		response.errorMessage = accessError;
 		return response;

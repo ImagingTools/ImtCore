@@ -127,6 +127,7 @@ Rectangle {
 	function clearModels(){
 		menuPanel.model.clear();
 		menuPanel.activePageIndex = -1;
+		menuPanel.activePageId = "";
 		allPages.model = 0;
 		topAlignmentPages.model = 0;
 		bottomAlignmentPages.model = 0;
@@ -146,14 +147,29 @@ Rectangle {
 			return;
 		}
 
+		let savedActivePageId = menuPanel.activePageIndex >= 0 ? menuPanel.activePageId : "";
+		let targetIndex = 0;
+		if (savedActivePageId !== "" && model.getItemsCount() > 0){
+			for (let i = 0; i < model.getItemsCount(); i++){
+				let id = model.getData("id", i);
+				if (id === savedActivePageId){
+					targetIndex = i;
+					break;
+				}
+			}
+		}
+
 		topPagesModel.clear();
 		bottomPagesModel.clear();
 
 		allPages.model = 0;
 		topAlignmentPages.model = 0;
 		bottomAlignmentPages.model = 0;
-		menuPanel.activePageIndex = 0;
-		menuPanel.activePageId = "";
+
+		if (model.getItemsCount() > 0){
+			menuPanel.activePageIndex = targetIndex;
+			menuPanel.activePageId = model.getData("id", targetIndex);
+		}
 
 		for (let i = 0; i < model.getItemsCount(); i++){
 			if (model.containsKey("alignment", i)){
@@ -172,10 +188,6 @@ Rectangle {
 		allPages.model = model;
 		topAlignmentPages.model = topPagesModel;
 		bottomAlignmentPages.model = bottomPagesModel;
-
-        if (model.getItemsCount() > 0){
-            menuPanel.activePageId = model.getData("id",0);
-        }
 	}
 
 	function setActivePage(pageId){

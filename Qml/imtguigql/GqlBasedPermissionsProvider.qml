@@ -5,6 +5,7 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtguigql 1.0
 import imtauthPermissionsSdl 1.0
+import imtauthTenantMembershipsSdl 1.0
 import imtauthgui 1.0
 
 /**
@@ -19,9 +20,11 @@ PermissionsProvider {
     id: root
 
     property GetProductPermissionsInput __requestInput: GetProductPermissionsInput {}
+    property GetOrganizationPermissionsInput __orgRequestInput: GetOrganizationPermissionsInput {}
     // Remember the tenant for the in-flight request (response payload does not echo it).
     // Used only to route result into correct scoped properties and emit the right signals.
     property string __pendingTenantId: ""
+    property string __pendingOrgTenantId: ""
 
     property GqlSdlRequestSender __requestSender: GqlSdlRequestSender {
         gqlCommandId: ImtauthPermissionsSdlCommandIds.s_getProductPermissions
@@ -59,6 +62,34 @@ PermissionsProvider {
         root.__requestInput.m_tenantId = requestedTenantId
         root.requestStarted(requestedTenantId)
         root.__requestSender.send(root.__requestInput)
+    }
+
+    property GqlSdlRequestSender __orgRequestSender: GqlSdlRequestSender {
+        gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_getOrganizationPermissions
+
+        sdlObjectComp: Component {
+            GetOrganizationPermissionsPayload {
+                onFinished: {
+                    root.loading = false
+                    if (m_errorMessage && m_errorMessage !== "") {
+                        root.lastError = m_errorMessage
+                        root.requestFailed(m_errorMessage, root.__pendingOrgTenantId)
+                    } else {
+                        root.__storeOrganizationPermissions(m_groups, m_memberPermissions, root.__pendingOrgTenantId)
+                    }
+                }
+            }
+        }
+    }
+
+    function requestOrganizationPermissions(tenantId, userId) {
+        root.loading = true
+        root.lastError = ""
+        root.__pendingOrgTenantId = tenantId || ""
+        root.__orgRequestInput.m_tenantId = root.__pendingOrgTenantId
+        root.__orgRequestInput.m_userId = userId || ""
+        root.requestStarted(root.__pendingOrgTenantId)
+        root.__orgRequestSender.send(root.__orgRequestInput)
     }
 
     function __parseGroups(groupsList) {
@@ -107,5 +138,17 @@ PermissionsProvider {
             root.allPermissions = parsedPermissions
             root.allPermissionsReceived()
         }
+    }
+
+    function __storeOrganizationPermissions(groupsList, memberPermsList, tenantId) {
+        var parsed = root.__parseGroups(groupsList)
+        root.organizationPermissions = parsed
+
+        // m_memberPermissions is a plain JS array ([ID] maps to var [])
+        root.memberOrganizationPermissions = Array.isArray(memberPermsList)
+            ? memberPermsList.filter(function(s) { return s && s.length > 0 })
+            : []
+
+        root.organizationPermissionsReceived()
     }
 }

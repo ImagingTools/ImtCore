@@ -335,6 +335,9 @@ FocusScope {
                 return;
             }
             _ensureContentRoot();
+            // Set opening=true BEFORE attach() so that refresh() inside attach()
+            // sees popup.opened=true and correctly shows the modal dim overlay.
+            opening = true;
             OverlayManager.attach(popup, targetRoot);
 
             // Auto-detect parent popup if not explicitly set.
@@ -358,8 +361,6 @@ FocusScope {
                 var c = popup.parent.mapToItem(overlay, popup.parent.width/2, popup.parent.height/2);
                 popup._cursorPos = c;
             }
-
-            opening = true;
             contentRoot.opacity = 0;
             contentRoot.scale = 0.9;
             contentRoot.visible = true;
@@ -453,6 +454,9 @@ FocusScope {
                 y: popup ? popup.topPadding  : 0
                 width: popup ? popup.availableWidth  : 0
                 height: popup ? popup.availableHeight : 0
+                // Clip prevents ListView/tree content from rendering outside popup
+                // bounds and visually covering the modal dim overlay.
+                clip: true
             }
             property alias contentSlot: contentSlot_
 

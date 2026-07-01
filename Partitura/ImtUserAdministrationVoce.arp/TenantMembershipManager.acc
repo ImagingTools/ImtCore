@@ -2,14 +2,19 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6418" Description="ACF"/>
-            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="OrganizationsPermissionsProvider" PackageId="ImtAuthPck" ComponentId="OrganizationsPermissionsProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="TenantInvitationInfo" PackageId="ImtAuthPck" ComponentId="TenantInvitationInfo">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
@@ -74,6 +79,9 @@
         <Element Id="TenantMembershipManagerController" PackageId="ImtAuthGqlPck" ComponentId="TenantMembershipManagerController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="DelegatedAccess" Type="Reference" ExportId="DelegatedAccess">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="InvitationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantInvitationManager"/>
                     </AttributeInfo>
@@ -82,6 +90,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantMembershipManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OrganizationsProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="OrganizationsPermissionsProvider"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
                         <Data IsEnabled="false"/>

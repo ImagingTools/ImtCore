@@ -39,6 +39,7 @@ public:
 	virtual bool RemoveRelationshipId(const QByteArray& relationshipId) override;
 	virtual QByteArrayList GetTenantPermissions() const override;
 	virtual void SetTenantPermissions(const QByteArrayList& permissions) override;
+
 	virtual QByteArray GetParentTenantId() const override;
 	virtual void SetParentTenantId(const QByteArray& parentTenantId) override;
 
