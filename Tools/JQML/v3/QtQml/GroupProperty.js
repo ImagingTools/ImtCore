@@ -57,11 +57,13 @@ class GroupProperty extends QBaseObject {
             value.__complete()
         }
 
-        if(path.length === 2){
-            this.__proxy[path[0]][path[1]] = value
-        } else {
-            this.__proxy[path[0]] = value
+        let target = this.__proxy
+        for(let i = 0; i < path.length - 1; i++){
+            target = target[path[i]]
+            if(!target) return
         }
+
+        target[path[path.length - 1]] = value
     }
   
     __updateProperties(){

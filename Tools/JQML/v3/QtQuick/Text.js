@@ -2,6 +2,7 @@ const Item = require('./Item')
 const Property = require('../QtQml/Property')
 const String = require('../QtQml/String')
 const Color = require('../QtQml/Color')
+const Int = require('../QtQml/Int')
 const Real = require('../QtQml/Real')
 const Geometry = require('../QtQml/Geometry')
 const Font = require('../QtQml/Font')
@@ -50,6 +51,7 @@ class Text extends Item {
         textFormat: { type: Property, value: Text.AutoText},
         elide: { type: Property, value: Text.ElideNone},
         lineHeight: { type: Real, value: 0},
+        maximumLineCount: { type: Int, value: Number.MAX_SAFE_INTEGER},
 
         textChanged: {type:Signal, args:[]},
         colorChanged: {type:Signal, args:[]},
@@ -62,6 +64,7 @@ class Text extends Item {
         textFormatChanged: {type:Signal, args:[]},
         elideChanged: {type:Signal, args:[]},
         lineHeightChanged: {type:Signal, args:[]},
+        maximumLineCountChanged: {type:Signal, args:[]},
 
         lineLaidOut: {type:Signal, args:['line']},
         linkActivated: {type:Signal, args:['link']},

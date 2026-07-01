@@ -57,6 +57,7 @@ class TextInput extends Item {
         selectedText: { type: String, value: ''},
         selectByMouse: { type: Bool, value: true},
         passwordCharacter: { type: String, value: ''},
+        cursorPosition: { type: Int, value: 0},
 
         textChanged: {type:Signal, args:[]},
         colorChanged: {type:Signal, args:[]},
@@ -85,6 +86,7 @@ class TextInput extends Item {
         selectedTextChanged: {type:Signal, args:[]},
         selectByMouseChanged: {type:Signal, args:[]},
         passwordCharacterChanged: {type:Signal, args:[]},
+        cursorPositionChanged: {type:Signal, args:[]},
 
         accepted: {type:Signal, args:[]},
         editingFinished: {type:Signal, args:[]},

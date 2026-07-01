@@ -25,6 +25,12 @@ class TextEdit extends Item {
     static WrapAnywhere = 2
     static Wrap = 3
 
+    static AutoText = 0
+    static PlainText = 1
+    static StyledText = 2
+    static RichText = 3
+    static MarkdownText = 4
+
     static meta = Object.assign({}, Item.meta, {
         text: { type: String, value: ''},
         color: { type: Color, value: 'black'},
@@ -49,6 +55,7 @@ class TextEdit extends Item {
         bottomPadding: { type: Real, value: 0},
         selectedText: { type: String, value: ''},
         selectByMouse: { type: Bool, value: true},
+        textFormat:{ type: Int, value: TextEdit.PlainText},
 
         textChanged: {type:Signal, args:[]},
         colorChanged: {type:Signal, args:[]},
@@ -73,6 +80,7 @@ class TextEdit extends Item {
         bottomPaddingChanged: {type:Signal, args:[]},
         selectedTextChanged: {type:Signal, args:[]},
         selectByMouseChanged: {type:Signal, args:[]},
+        textFormatChanged: {type:Signal, args:[]},
 
         editingFinished: {type:Signal, args:[]},
     })

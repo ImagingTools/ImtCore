@@ -67,13 +67,15 @@ Column {
 		name: qsTr("Latitude");
 		width: parent.width
 
-		textInputValidator: DoubleValidator{}
+		textInputValidator: RegularExpressionValidator {
+			regularExpression: /^-?\d*[.,]?\d*$/
+		}
 
 		onTextChanged: {
-			let newText = nameField.text.trim().replace(',','.')
-			let oldText = container.model.getData("latitude", 0)
-			if (oldText !== newText){
-				container.model.setData("latitude", latitudeField.text, 0)
+			let normalized = text.replace(',', '.')
+			let value = parseFloat(normalized)
+			if (!isNaN(value)) {
+				container.model.setData("latitude", value, 0)
 			}
 		}
 	}
@@ -83,13 +85,15 @@ Column {
 		name: qsTr("Longitude");
 		width: parent.width
 
-		textInputValidator: DoubleValidator{}
+		textInputValidator: RegularExpressionValidator {
+			regularExpression: /^-?\d*[.,]?\d*$/
+		}
 
 		onTextChanged: {
-			let newText = nameField.text.trim().replace(',','.')
-			let oldText = container.model.getData("longitude", 0)
-			if (oldText !== newText){
-				container.model.setData("longitude", longitudeField.text, 0)
+			let normalized = text.replace(',', '.')
+			let value = parseFloat(normalized)
+			if (!isNaN(value)) {
+				container.model.setData("longitude", value, 0)
 			}
 		}
 	}

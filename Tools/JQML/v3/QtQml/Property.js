@@ -28,13 +28,13 @@ class Property extends BaseObject {
             try {
                 target[name] = this.typeCasting(value.call(target))
             } catch(error) {
-                if(location.hash === '#jqdebug')console.error(error)
+                if(location.hash === '#jqdebugdetail')console.error(error)
             }
         } else {
             try {
                 target[name] = this.typeCasting(value)
             } catch (error) {
-                if(location.hash === '#jqdebug')console.error(error)
+                if(location.hash === '#jqdebugdetail')console.error(error)
             }
         }  
 
@@ -140,7 +140,7 @@ class Property extends BaseObject {
                 })
                 target[name] = this.typeCasting(value.call(target))
             } catch(error) {
-                if(location.hash === '#jqdebug')console.error(error)
+                if(location.hash === '#jqdebugdetail')console.error(error)
             } finally {
                 global.queueFlag.pop()
                 this.queueLink.pop()
@@ -149,7 +149,7 @@ class Property extends BaseObject {
             try {
                 target[name] = this.typeCasting(value)
             } catch (error) {
-                if(location.hash === '#jqdebug')console.error(error)
+                if(location.hash === '#jqdebugdetail')console.error(error)
             }
         }  
 
