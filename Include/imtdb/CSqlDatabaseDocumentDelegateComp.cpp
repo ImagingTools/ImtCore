@@ -1232,9 +1232,9 @@ void CSqlDatabaseDocumentDelegateComp::EnsureTenantBindingTableExists() const
 QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode) const
 {
 	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
-	if (!useTenantBindings && tenantId.isEmpty()){
+	if (!useTenantBindings){
 		// Delegate is configured not to use TenantEntityBindings for ownership (e.g. Users).
-		// In No Organization mode (empty tenantId) we must not apply any binding-based restriction.
+		// No binding-based tenant scoping filter is applied for such collections (global view).
 		return QString();
 	}
 

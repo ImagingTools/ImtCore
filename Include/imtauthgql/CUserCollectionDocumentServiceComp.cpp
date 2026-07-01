@@ -301,8 +301,11 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		}
 	}
 
-	if (userData.roles && userData.productId){
-		QByteArray productId = *userData.productId;
+	if (userData.roles){
+		QByteArray productId;
+		if (userData.productId){
+			productId = *userData.productId;
+		}
 		imtauth::IUserBaseInfo::RoleIds incomingRoles;
 		for (const auto& roleIdPtr : *userData.roles){
 			if (roleIdPtr){
@@ -329,8 +332,11 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		userPtr->SetRoles(productId, finalRoles);
 	}
 
-	if (userData.permissions && userData.productId){
-		QByteArray productId = *userData.productId;
+	if (userData.permissions){
+		QByteArray productId;
+		if (userData.productId){
+			productId = *userData.productId;
+		}
 		imtauth::IUserBaseInfo::FeatureIds incomingPerms;
 		for (const auto& permissionIdPtr : *userData.permissions){
 			if (permissionIdPtr){
