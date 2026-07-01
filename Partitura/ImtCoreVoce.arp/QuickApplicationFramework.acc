@@ -109,13 +109,13 @@
                     <AttributeInfo Id="AppendToExisting" Type="Boolean" ExportId="AppendToExisting">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="LogFile" Type="Reference" ExportId="">
+                    <AttributeInfo Id="LogFile" Type="Reference" ExportId="LogFilePath">
                         <Data IsEnabled="true" Value="LogFilePath"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SlaveMessageConsumer" Type="Reference" ExportId="SlaveMessageConsumer">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UseCategory" Type="Boolean" ExportId="">
+                    <AttributeInfo Id="UseCategory" Type="Boolean" ExportId="UseCategory">
                         <Data IsEnabled="true" Value="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UseCode" Type="Boolean" ExportId="">
