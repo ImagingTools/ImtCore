@@ -443,10 +443,6 @@ CImtStyle::CImtStyle()
 	m_wasStyleSheetInitialized(false),
 	m_blockerCount(0)
 {
-	QFontDatabase::addApplicationFont(":/Fonts/Roboto-Light.ttf");
-	QFontDatabase::addApplicationFont(":/Fonts/Roboto-Regular.ttf");
-	QFontDatabase::addApplicationFont(":/Fonts/Roboto-Medium.ttf");
-	QFontDatabase::addApplicationFont(":/Fonts/Roboto-Bold.ttf");
 }
 
 
