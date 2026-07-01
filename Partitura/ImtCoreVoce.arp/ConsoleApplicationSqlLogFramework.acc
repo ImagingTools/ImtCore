@@ -34,6 +34,9 @@
                     <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="ComponentsToInitialize">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="LogFilePath" Type="Reference" ExportId="LogFilePath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="LogLocationType" Type="Integer" ExportId="LogLocationType">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -51,6 +54,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="SlaveMessageConsumer" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="LogDatabase"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UseCategory" Type="Boolean" ExportId="UseCategory">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
