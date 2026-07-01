@@ -292,54 +292,34 @@ function compile(options){
 
         }
         qmlprop(meta) {
-            if (meta[2][0] === "block" || (meta[2][1] && meta[2][1][0] === "assign")) {
+            let isSignalHandlerBody = meta[2][0] === "block" || meta[2][0] === "stat" || (meta[2][1] && meta[2][1][0] === "assign")
+            let isSignalHandlerName = false
+
+            if (meta[1][0] === "dot") {
+                let name = this.normalizePathName(meta[1])
+                isSignalHandlerName = name.length > 1 && name[name.length - 1].slice(0, 2) === 'on'
+            } else {
+                isSignalHandlerName = typeof meta[1] === 'string' && meta[1].slice(0, 2) === 'on'
+            }
+
+            if (isSignalHandlerName && isSignalHandlerBody) {
                 if (meta[1][0] === "dot") {
                     let name = this.normalizePathName(meta[1])
                     let nameText = name.join('.')
 
-                    if (name[1] && name[1].slice(0, 2) === 'on') {
-                        this.connectedSignals.push({
-                            slotName: `['${nameText}']`,
-                            args: [],
-                            source: meta[2],
-                        })
-                    } else {
-                        if (meta[2][1][0] === 'qmlelem') {
-                            this.assignProperties.push({
-                                name: nameText,
-                                value: new Instruction(null, '', meta[2][1][1], meta[2][1][3], meta[2][1][2], this.qmlFile, meta[2][1].info, this),
-                            })
-                        } else {
-                            this.assignProperties.push({
-                                name: nameText,
-                                value: meta[2],
-                            })
-                        }
-                    }
+                    this.connectedSignals.push({
+                        slotName: `['${nameText}']`,
+                        args: [],
+                        source: meta[2],
+                    })
                 } else {
                     let name = meta[1]
 
-                    if (name.slice(0, 2) === 'on') {
-                        let signalName = name.slice(2)
-                        signalName = signalName[0].toLowerCase() + signalName.slice(1)
-                        this.connectedSignals.push({
-                            slotName: name,
-                            args: [], // Нужно отследить количество аргументов
-                            source: meta[2],
-                        })
-                    } else {
-                        if (meta[2][1][0] === 'qmlelem') {
-                            this.assignProperties.push({
-                                name: name.join('.'),
-                                value: new Instruction(null, '', meta[2][1][1], meta[2][1][3], meta[2][1][2], this.qmlFile, meta[2][1].info, this),
-                            })
-                        } else {
-                            this.assignProperties.push({
-                                name: name,
-                                value: meta[2],
-                            })
-                        }
-                    }
+                    this.connectedSignals.push({
+                        slotName: name,
+                        args: [], // Нужно отследить количество аргументов
+                        source: meta[2],
+                    })
                 }
             } else if (meta[1][0] === "dot") {
                 let name = this.normalizePathName(meta[1]).join('.')
@@ -394,10 +374,35 @@ function compile(options){
             Enums[meta[1]] = meta[2]
         }
 
+        resolveImportedName(name) {
+            for (let i = this.qmlFile.imports.length - 1; i >= 0; i--) {
+                let imp = this.qmlFile.imports[i]
+                if (imp.as && imp.as === name) {
+                    let path = `JQModules.${imp.path}`
+                    if (imp.version !== undefined) {
+                        try {
+                            let imported = eval(path + '_v' + imp.version)
+                            if (imported) return { source: path + '_v' + imp.version, obj: imported }
+                        } catch { }
+                    }
+                    try {
+                        let imported = eval(path)
+                        if (imported) return { source: path, obj: imported }
+                    } catch { }
+                }
+            }
+            return null
+        }
+
         resolve(name, thisKey) {
             let res = this.resolveInner(name, thisKey)
             if (res) {
                 return res
+            }
+
+            let importedName = this.resolveImportedName(name)
+            if (importedName) {
+                return importedName
             } else {
                 let recursive = (result = [], name, target) => {
                     for (let key in target) {
@@ -625,6 +630,8 @@ function compile(options){
 
                         if (stat.dotObj) {
                             let path = ''
+                            let originalDotObj = stat.dotObj  // Save original before it gets modified
+                            
                             if (stat.dotObj instanceof JSFile) {
                                 if (stat.dotObj.meta.exports.indexOf(tree[2] >= 0)) {
                                     path = {}
@@ -654,7 +661,27 @@ function compile(options){
                                 path = null
                                 stat.dotObj = null
                             }
+                            
+                            // Check for native JavaScript builtin types before warning
+                            let isNativeBuiltin = false
                             if (path === undefined || path === null) {
+                                // Check if original was a native builtin type
+                                if (typeof originalDotObj === "function" && 
+                                    (originalDotObj === Date || originalDotObj === String || originalDotObj === Number || 
+                                     originalDotObj === Array || originalDotObj === Boolean || originalDotObj === Object || 
+                                     originalDotObj === RegExp || originalDotObj === Function)) {
+                                    // Check if the method exists on the prototype
+                                    try {
+                                        if (tree[2] in originalDotObj.prototype) {
+                                            isNativeBuiltin = true
+                                        }
+                                    } catch (e) {}
+                                }
+                            }
+                            
+                            let isThisContext = tree[1] && tree[1][0] === 'name' && tree[1][1] === 'this'
+
+                            if ((path === undefined || path === null) && !isNativeBuiltin && !isThisContext) {
                                 console.log(`${this.qmlFile.fileName}:${tree.info.line + 1}:${tree.info.col + 1}: warning: ${tree[2]} is not founded`)
                             }
                         }

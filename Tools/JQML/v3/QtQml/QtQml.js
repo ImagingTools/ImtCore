@@ -49,13 +49,21 @@ module.exports = {
 
     Models: require("./Models/Models"),
 
-    XMLHttpRequest: {
-        UNSENT: 0,
-        OPENED: 1,
-        HEADERS_RECEIVED: 2,
-        LOADING: 3,
-        DONE: 4,
-    },
+    XMLHttpRequest: new Proxy({}, {
+        has: function(target, prop) {
+            return true
+        },
+        get: function(target, prop) {
+            return new Proxy({}, {
+                has: function(target, prop) {
+                    return true
+                },
+                get: function(target, prop) {
+                    return {}
+                }
+            })
+        }
+    }),
     FileReader: {
         EMPTY: 0,
         LOADING: 1,
