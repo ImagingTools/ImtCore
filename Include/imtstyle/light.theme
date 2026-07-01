@@ -1,13 +1,13 @@
 {
 	"ColorPalette": {
-		"Surface": "#FEF7FF",
-		"SurfaceContainer": "#F3EDF7",
-		"SurfaceContainerLow": "#F7F2FA",
-		"SurfaceContainerHigh": "#ECE6F0",
-		"SurfaceContainerHighest": "#E6E0E9",
-		"SurfaceVariant": "#E7E0EC",
-		"OnSurface": "#1D1B20",
-		"OnSurfaceVariant": "#49454F",
+		"Surface": "#FFFFFF",
+		"SurfaceContainer": "#F2F2F2",
+		"SurfaceContainerLow": "#F7F7F7",
+		"SurfaceContainerHigh": "#EBEBEB",
+		"SurfaceContainerHighest": "#E5E5E5",
+		"SurfaceVariant": "#E6E6E6",
+		"OnSurface": "#1D1D1D",
+		"OnSurfaceVariant": "#4A4A4A",
 		"Primary": "#6750A4",
 		"OnPrimary": "#FFFFFF",
 		"PrimaryContainer": "#EADDFF",
@@ -21,16 +21,16 @@
 		"OnError": "#FFFFFF",
 		"ErrorContainer": "#F9DEDC",
 		"OnErrorContainer": "#410E0B",
-		"Outline": "#79747E",
-		"OutlineVariant": "#CAC4D0",
-		"InverseSurface": "#322F35",
-		"InverseOnSurface": "#F5EFF7",
+		"Outline": "#797979",
+		"OutlineVariant": "#CACACA",
+		"InverseSurface": "#323232",
+		"InverseOnSurface": "#F5F5F5",
 		"InversePrimary": "#D0BCFF",
-		"ImagingToolsGradient0": "#FEF7FF",
-		"ImagingToolsGradient1": "#F3EDF7",
-		"ImagingToolsGradient2": "#ECE6F0",
-		"ImagingToolsGradient3": "#E6E0E9",
-		"ImagingToolsGradient4": "#CAC4D0",
+		"ImagingToolsGradient0": "#FFFFFF",
+		"ImagingToolsGradient1": "#F2F2F2",
+		"ImagingToolsGradient2": "#EBEBEB",
+		"ImagingToolsGradient3": "#E5E5E5",
+		"ImagingToolsGradient4": "#CACACA",
 		"Green": "#386A20",
 		"LightYellow": "#FFD54F",
 		"InformationCategoryNoneBackground": "#C8E6C9",
@@ -63,14 +63,14 @@
 		}
 		],
 		"ToolButtonGradient": {
-			"Start": "#F7F2FA",
-			"End": "#F3EDF7"
+			"Start": "#F7F7F7",
+			"End": "#F2F2F2"
 		},
 		"PressedToolButtonGradient": {
-			"Start": "#ECE6F0",
-			"End": "#ECE6F0"
+			"Start": "#EBEBEB",
+			"End": "#EBEBEB"
 		},
-		"ToolButtonBorderColor": "#CAC4D0",
+		"ToolButtonBorderColor": "#CACACA",
 		"ActiveColors": {
 			"Background": "SurfaceContainer",
 			"Background2": "Surface",
