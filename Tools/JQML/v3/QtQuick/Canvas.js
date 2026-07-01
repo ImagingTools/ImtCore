@@ -162,6 +162,7 @@ class Canvas extends Item {
                 img.onload = ()=>{
                     image = img
                     this.__cache[path] = img
+                    this.imageLoaded()
                 }
                 img.onerror = ()=>{
                     img.remove()
