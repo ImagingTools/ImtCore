@@ -85,6 +85,10 @@ protected:
 				const istd::IChangeable& object,
 				const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual QJsonObject InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual void SetAdditionalFilters(
+				const imtgql::CGqlRequest& gqlRequest,
+				const imtgql::CGqlParamObject& viewParamsGql,
+				iprm::CParamsSet* filterParamsPtr) const override;
 
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;

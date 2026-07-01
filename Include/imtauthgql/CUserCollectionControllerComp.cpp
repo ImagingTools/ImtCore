@@ -862,4 +862,53 @@ void CUserCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& 
 }
 
 
+void CUserCollectionControllerComp::SetAdditionalFilters(
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtgql::CGqlParamObject& /*viewParamsGql*/,
+			iprm::CParamsSet* filterParamsPtr) const
+{
+	if (filterParamsPtr == nullptr){
+		return;
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return;
+	}
+
+	// No tenant selected (No Organization): users are visible system-wide, no restriction.
+	QByteArray tenantId = gqlContextPtr->GetTenantId();
+	if (tenantId.isEmpty()){
+		return;
+	}
+
+	if (!m_membershipManagerCompPtr.IsValid()){
+		return;
+	}
+
+	// A tenant is selected: restrict the list to active members of that tenant only.
+	imtbase::CComplexCollectionFilter::FilterExpression filterExpr;
+	filterExpr.logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;
+
+	QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
+	for (const QByteArray& membershipId : membershipIds){
+		imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+		if (membershipPtr.IsValid() && membershipPtr->IsActive()){
+			filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter(
+						"DocumentId", QVariant(membershipPtr->GetUserId()), imtbase::IComplexCollectionFilter::FO_EQUAL);
+		}
+	}
+
+	if (filterExpr.fieldFilters.isEmpty()){
+		// No active members: force an empty result instead of falling through to "no filter".
+		filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter(
+					"DocumentId", QVariant(QString()), imtbase::IComplexCollectionFilter::FO_EQUAL);
+	}
+
+	imtbase::CComplexCollectionFilter* complexFilterPtr = new imtbase::CComplexCollectionFilter();
+	complexFilterPtr->SetFilterExpression(filterExpr);
+	filterParamsPtr->SetEditableParameter("ComplexFilter", complexFilterPtr, true);
+}
+
+
 } // namespace imtauth
