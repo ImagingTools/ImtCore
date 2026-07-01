@@ -13,6 +13,26 @@ module.exports = {
         return true
     },
 
+    __activateTabFocusTarget(target, forward){
+        if(!target || typeof target.nextItemInFocusChain !== 'function') return false
+
+        let current = target
+        let steps = 0
+
+        while(steps < 1000){
+            current = current.nextItemInFocusChain(forward)
+            if(!current || current === target) return false
+
+            if(current.activeFocusOnTab && current.enabled && current.visible){
+                return this.__activateKeyNavigationTarget(current)
+            }
+
+            steps++
+        }
+
+        return false
+    },
+
     add: function (obj) {
         this.shortcuts.push(obj)
     },
@@ -72,6 +92,16 @@ module.exports = {
                 obj['Keys.pressed'](e)
                 if (e.accepted) return
 
+                if (e.key === 'Tab' && e.shiftKey) {
+                    e.accepted = false
+                    obj['Keys.backtabPressed'](e)
+                    if (e.accepted) return
+                } else if (e.key === 'Tab') {
+                    e.accepted = false
+                    obj['Keys.tabPressed'](e)
+                    if (e.accepted) return
+                }
+
                 if (e.key === 'ArrowLeft') {
                     e.accepted = false
                     obj['Keys.leftPressed'](e)
@@ -106,6 +136,14 @@ module.exports = {
                     e.accepted = false
                     obj['Keys.spacePressed'](e)
                     if (e.accepted) return
+                }
+            }
+
+            if (e.key === 'Tab') {
+                let tabTarget = elements.length > 0 ? elements[elements.length - 1] : null
+                if (this.__activateTabFocusTarget(tabTarget, !e.shiftKey)){
+                    e.preventDefault()
+                    return
                 }
             }
 

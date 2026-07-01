@@ -9,7 +9,8 @@ class Signal extends BaseObject {
      */
     static get(target, name){
         let f = (...args)=>{
-            if(target.signalsBlocked()) return
+            if(target.signalsBlocked() || target.__destroyed) return
+            JQApplication.beginUpdate()
 
             let slotName = 'SLOT_' + name
 
@@ -56,6 +57,7 @@ class Signal extends BaseObject {
             }
             global.queueFlag.pop()
             global.signalTargets.pop()
+            JQApplication.endUpdate()
         }
 
         f.connect = (...args)=>{
