@@ -113,6 +113,7 @@ class QmlWheelEvent {
 
 module.exports = {
     objects: new Set(),
+    dropAreas: new Set(),
 
     buttons: {
         0: {
@@ -144,6 +145,12 @@ module.exports = {
 
     add: function(obj){
         this.objects.add(obj)
+    },
+    addDropArea: function(obj){
+        this.dropAreas.add(obj)
+    },
+    removeDropArea: function(obj){
+        this.dropAreas.delete(obj)
     },
     remove: function(obj){
         this.objects.delete(obj)
@@ -177,6 +184,162 @@ module.exports = {
         }
 
         return result
+    },
+
+    getDropAreaFromPoint: function(x, y){
+        for(let obj of this.dropAreas){
+            if(!obj || obj.__destroyed) continue
+            let dom = obj.__getDOM()
+            dom.classList.add("pointer")
+        }
+
+        let result = null
+        for(let el of document.elementsFromPoint(x, y)){
+            if(this.dropAreas.has(el.qml) && !el.qml.__destroyed && el.qml.enabled && el.qml.visible){
+                result = el.qml
+                break
+            }
+        }
+
+        for(let obj of this.dropAreas){
+            if(!obj || obj.__destroyed) continue
+            let dom = obj.__getDOM()
+            dom.classList.remove("pointer")
+        }
+
+        return result
+    },
+
+    __getMouseAreaDragTarget: function(mouseArea){
+        if(!mouseArea || mouseArea.__destroyed) return null
+
+        let drag = mouseArea.drag
+        if(!drag || typeof drag !== 'object') return null
+
+        return drag.target || null
+    },
+
+    __setMouseAreaDragActive: function(mouseArea, active){
+        if(!mouseArea || mouseArea.__destroyed) return
+
+        let drag = mouseArea.drag
+        if(!drag || typeof drag !== 'object') return
+
+        drag.active = active
+    },
+
+    __getDragHotSpot: function(dragTarget){
+        let hotX = 0
+        let hotY = 0
+
+        if(dragTarget && dragTarget.Drag && dragTarget.Drag.hotSpot){
+            hotX = Number(dragTarget.Drag.hotSpot.x)
+            hotY = Number(dragTarget.Drag.hotSpot.y)
+            if(!Number.isFinite(hotX)) hotX = 0
+            if(!Number.isFinite(hotY)) hotY = 0
+        }
+
+        return { x: hotX, y: hotY }
+    },
+
+    __findDropAreaForDragTarget: function(dragTarget){
+        if(!dragTarget || !dragTarget.__DOM) return null
+
+        let rect = dragTarget.__DOM.getBoundingClientRect()
+        let hotSpot = this.__getDragHotSpot(dragTarget)
+
+        let points = [
+            [rect.left + hotSpot.x, rect.top + hotSpot.y],
+            [rect.left + hotSpot.x, rect.bottom - hotSpot.y],
+            [rect.right - hotSpot.x, rect.top + hotSpot.y],
+            [rect.right - hotSpot.x, rect.bottom - hotSpot.y],
+        ]
+
+        for(let p of points){
+            let dropArea = this.getDropAreaFromPoint(p[0], p[1])
+            if(dropArea && typeof dropArea.__acceptsDragTarget === 'function' && dropArea.__acceptsDragTarget(dragTarget)){
+                return dropArea
+            }
+        }
+
+        return null
+    },
+
+    __updateDropAreasForDragTarget: function(dragTarget){
+        if(!dragTarget) return
+
+        let activeDropArea = this.__findDropAreaForDragTarget(dragTarget)
+
+        if(activeDropArea && typeof activeDropArea.__enterOrMove === 'function'){
+            activeDropArea.__enterOrMove(dragTarget)
+        }
+
+        for(let dropArea of this.dropAreas){
+            if(!dropArea || dropArea.__destroyed || dropArea === activeDropArea) continue
+            if(typeof dropArea.__exit === 'function'){
+                dropArea.__exit(dragTarget)
+            }
+        }
+    },
+
+    __finishDropAreasForDragTarget: function(dragTarget){
+        if(!dragTarget) return
+
+        let activeDropArea = this.__findDropAreaForDragTarget(dragTarget)
+
+        for(let dropArea of this.dropAreas){
+            if(!dropArea || dropArea.__destroyed) continue
+            if(typeof dropArea.__exit === 'function'){
+                dropArea.__exit(dragTarget)
+            }
+        }
+
+        if(activeDropArea && typeof activeDropArea.__drop === 'function'){
+            activeDropArea.__drop(dragTarget)
+        }
+    },
+
+    __updateMouseAreaDrag: function(mouseArea, mouse){
+        if(!mouseArea || !mouse || !mouse.pressed) return
+
+        let drag = mouseArea.drag
+        if(!drag || typeof drag !== 'object') return
+
+        let dragTarget = this.__getMouseAreaDragTarget(mouseArea)
+        if(!dragTarget) return
+
+        this.__setMouseAreaDragActive(mouseArea, true)
+
+        let axis = Number(drag.axis)
+        if(!Number.isFinite(axis)) axis = 2
+
+        let dragTargetActive = !(dragTarget.Drag && dragTarget.Drag.active !== undefined) || !!dragTarget.Drag.active
+        if(dragTargetActive){
+            if(axis === 2 || axis === 0){
+                dragTarget.x -= mouse.moveX
+                if(Number.isFinite(Number(drag.minimumX)) && dragTarget.x < Number(drag.minimumX)) dragTarget.x = Number(drag.minimumX)
+                if(Number.isFinite(Number(drag.maximumX)) && dragTarget.x > Number(drag.maximumX)) dragTarget.x = Number(drag.maximumX)
+            }
+
+            if(axis === 2 || axis === 1){
+                dragTarget.y -= mouse.moveY
+                if(Number.isFinite(Number(drag.minimumY)) && dragTarget.y < Number(drag.minimumY)) dragTarget.y = Number(drag.minimumY)
+                if(Number.isFinite(Number(drag.maximumY)) && dragTarget.y > Number(drag.maximumY)) dragTarget.y = Number(drag.maximumY)
+            }
+        }
+
+        this.__updateDropAreasForDragTarget(dragTarget)
+    },
+
+    __finishMouseAreaDrag: function(mouseArea){
+        if(!mouseArea || mouseArea.__destroyed) return
+
+        let dragTarget = this.__getMouseAreaDragTarget(mouseArea)
+        this.__setMouseAreaDragActive(mouseArea, false)
+
+        if(dragTarget){
+            this.__finishDropAreasForDragTarget(dragTarget)
+        }
     },
 
     init: function(){   
@@ -300,6 +463,7 @@ module.exports = {
                 if(this.event.target) {
                     this.event.relative(this.event.target)
                     this.event.target.__onMouseUp(this.event)
+                    this.__finishMouseAreaDrag(this.event.target)
                 }
             }
         })
@@ -350,6 +514,8 @@ module.exports = {
 
     click: function(e){
         if(this.event && this.event.target){
+            if(this.event.target.__destroyed) return
+            
             let event = this.event
             JQApplication.beginUpdate()
 

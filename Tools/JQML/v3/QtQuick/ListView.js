@@ -42,6 +42,7 @@ class ListView extends Flickable {
         footerItem: { type: Var, value: null},
         header: { type: Variant, typeTarget: Component, value: undefined},
         headerItem: { type: Var, value: null},
+        keyNavigationEnabled: { type: Bool, value: true },
 
         modelChanged: { type: Signal, args: [] },
         delegateChanged: { type: Signal, args: [] },
@@ -61,11 +62,14 @@ class ListView extends Flickable {
         headerChanged: { type: Signal, args: [] },
         footerItemChanged: { type: Signal, args: [] },
         headerItemChanged: { type: Signal, args: [] },
+        keyNavigationEnabledChanged: { type: Signal, args: [] },
     })
 
     __items = []
     __cache = []
     __changeSet = []
+    __keyNavigationEnabledExplicit = false
+    __syncingKeyNavigationEnabled = false
 
     __middleWidth = 0
     __middleHeight = 0
@@ -80,6 +84,24 @@ class ListView extends Flickable {
     __complete() {
         this.__initView(true)
         super.__complete()
+    }
+
+    __updateProperties(){
+        let hasExplicitKeyNavigationEnabled = this.__properties && Object.prototype.hasOwnProperty.call(this.__properties, 'keyNavigationEnabled')
+
+        if(!hasExplicitKeyNavigationEnabled && !this.__keyNavigationEnabledExplicit){
+            this.__syncKeyNavigationEnabledFromInteractive()
+        }
+
+        super.__updateProperties()
+    }
+
+    __syncKeyNavigationEnabledFromInteractive(){
+        if(this.keyNavigationEnabled === this.interactive) return
+
+        this.__syncingKeyNavigationEnabled = true
+        this.keyNavigationEnabled = this.interactive
+        this.__syncingKeyNavigationEnabled = false
     }
 
     indexAt(x, y) {
@@ -133,6 +155,41 @@ class ListView extends Flickable {
 
     }
 
+    __moveCurrentIndex(direction){
+        let length = this.count
+        if(length <= 0) return false
+
+        let currentIndex = this.currentIndex
+        let nextIndex = currentIndex
+
+        if(currentIndex < 0){
+            nextIndex = direction > 0 ? 0 : length - 1
+        } else {
+            nextIndex = currentIndex + direction
+            if(nextIndex < 0) nextIndex = 0
+            if(nextIndex >= length) nextIndex = length - 1
+        }
+
+        if(nextIndex !== currentIndex){
+            this.currentIndex = nextIndex
+        }
+
+        if(this.currentItem && typeof this.currentItem.forceActiveFocus === 'function'){
+            this.currentItem.forceActiveFocus()
+        }
+
+        this.positionViewAtIndex(nextIndex, ListView.Contain)
+        return true
+    }
+
+    incrementCurrentIndex(){
+        return this.__moveCurrentIndex(1)
+    }
+
+    decrementCurrentIndex(){
+        return this.__moveCurrentIndex(-1)
+    }
+
     SLOT_modelChanged(oldValue, newVlaue) {
         this.__clear()
 
@@ -150,6 +207,42 @@ class ListView extends Flickable {
     SLOT_delegateChanged() {
         this.__clear()
         this.__initView(this.__completed)
+    }
+
+    'SLOT_Keys.pressed'(event){
+        if(!this.keyNavigationEnabled || !event) return
+
+        let handled = false
+
+        if(this.orientation === ListView.Horizontal){
+            if(event.key === 'ArrowLeft'){
+                handled = this.decrementCurrentIndex()
+            } else if(event.key === 'ArrowRight'){
+                handled = this.incrementCurrentIndex()
+            }
+        } else {
+            if(event.key === 'ArrowUp'){
+                handled = this.decrementCurrentIndex()
+            } else if(event.key === 'ArrowDown'){
+                handled = this.incrementCurrentIndex()
+            }
+        }
+
+        if(handled){
+            event.accepted = true
+        }
+    }
+
+    SLOT_interactiveChanged(oldValue, newValue){
+        if(this.__keyNavigationEnabledExplicit) return
+
+        this.__syncKeyNavigationEnabledFromInteractive()
+    }
+
+    SLOT_keyNavigationEnabledChanged(oldValue, newValue){
+        if(this.__syncingKeyNavigationEnabled) return
+
+        this.__keyNavigationEnabledExplicit = true
     }
 
     __clear() {
