@@ -257,9 +257,9 @@ StyleComponents {
 	property string baseColor: "white";
 	property string baseColorInverted: "black";
 	property string mainColor: "#e6e6e8";
-	property string firstColor: "#4682B4";
+	property string firstColor: "#467db4";
 	property string secondColor: "#F18C16";
-	property string firstColorHighlight: "#B0C4DE";
+	property string firstColorHighlight: "#b0c7de";
 	property string colorMenuPanel: imagingToolsGradient1;
 
 		//error
@@ -274,12 +274,12 @@ StyleComponents {
 
 		//text
 	property string textColor: "#335777";
-	property string titleColor: "#055A85";
+	property string titleColor: "#054585";
 	property string subtitleColor: "#6A6E6F";
-	property string textSelectedColor: "#0078d7";
+	property string textSelectedColor: "#006bd7";
 	property string inactiveTextColor: "#aaaaaa";
 	property string placeHolderTextColor : '#AAA'
-	property string linkColor: "#0078D7";
+	property string linkColor: "#006BD7";
 	property string selectedLinkFromColor: "#1974d2";
 	property string selectedLinkToColor: "#51AC2A";
 
@@ -305,7 +305,7 @@ StyleComponents {
 		//selected
 	property string selectedColor: "#e3eefa";
 	property string tabSelectedColor: "#FF4500";
-	property string iconColorOnSelected: "#1a76e7";
+	property string iconColorOnSelected: "#1a80e7";
 
 		//button
 	property string buttonColor: "#dddddd";
@@ -342,7 +342,7 @@ StyleComponents {
 		//simple colors
 	property string grayColor: "#C2CEDB";
 	property string greenColor: "#00ff00";
-	property string lightBlueColor: "#69b8e3";
+	property string lightBlueColor: "#69a6e3";
 
 		//semantic status colors
 	property string successColor: "#3FB950";
@@ -378,17 +378,17 @@ StyleComponents {
 	property string hoverBgActiveColor: "#E6F4EA";
 
 		//attachment backgrounds
-	property string focusedAttachmentBgColor: "#ECF3FF";
-	property string imageAttachmentBgColor: "#EEF2F8";
-	property string fileAttachmentBgColor: "#F6F8FC";
+	property string focusedAttachmentBgColor: "#edf6ff";
+	property string imageAttachmentBgColor: "#eef3f8";
+	property string fileAttachmentBgColor: "#f6f9fc";
 
 		//composite colors
 	property string compositeColor: "#bcd2e8";
-	property string compositeSelectedColor: "#1167b1";
+	property string compositeSelectedColor: "#1161b1";
 
 		//notification backgrounds
 	property string notificationAssigneeBgColor: "#d4edda";
-	property string notificationDefaultBgColor: "#d6eaf8";
+	property string notificationDefaultBgColor: "#d6e7f8";
 
 		//message type backgrounds
 	property string messageErrorBgColor: "#ffcccc";
