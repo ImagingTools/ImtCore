@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ImtCore — Light Theme Preview</title>
+<style>
+:root {
+	/* ColorPalette */
+	--surface: #FFFFFF;
+	--surface-container: #F2F2F2;
+	--surface-container-low: #F7F7F7;
+	--surface-container-high: #EBEBEB;
+	--surface-container-highest: #E5E5E5;
+	--surface-variant: #E6E6E6;
+	--on-surface: #335777;
+	--on-surface-variant: #6084A4;
+	--primary: #3672A8;
+	--on-primary: #FFFFFF;
+	--primary-container: #D4E4F6;
+	--on-primary-container: #0D3A5E;
+	--secondary: #5A6C7E;
+	--on-secondary: #FFFFFF;
+	--secondary-container: #DEE7F0;
+	--tertiary: #7D5260;
+	--tertiary-container: #FFD8E4;
+	--error: #B3261E;
+	--on-error: #FFFFFF;
+	--error-container: #F9DEDC;
+	--on-error-container: #410E0B;
+	--outline: #797979;
+	--outline-variant: #CACACA;
+	--inverse-surface: #323232;
+	--inverse-on-surface: #F5F5F5;
+	--green: #386A20;
+	--light-yellow: #FFD54F;
+
+	/* Resolved ActiveColors */
+	--background: var(--surface-container);
+	--background2: var(--surface);
+	--text: var(--on-surface);
+	--button: var(--surface-container-high);
+	--button-border: var(--outline);
+	--button-text: var(--on-surface);
+	--button-hover: var(--surface-container-high);
+	--button-pressed: var(--surface);
+	--highlight: var(--primary);
+	--highlighted-text: var(--on-primary);
+	--selected: var(--secondary-container);
+	--item-selected: var(--secondary-container);
+	--link: var(--primary);
+	--border-color: var(--outline-variant);
+	--shadow: var(--outline);
+	--error-text: var(--error);
+	--alternate-base: var(--surface-container-low);
+
+	/* Inactive */
+	--inactive-text: var(--on-surface-variant);
+	--inactive-button: var(--surface-container-high);
+	--inactive-button-text: var(--on-surface-variant);
+
+	/* Disabled */
+	--disabled-text: var(--outline-variant);
+	--disabled-button-text: var(--outline-variant);
+
+	/* Table */
+	--table-header: var(--surface-container-highest);
+	--table-header-border: var(--outline-variant);
+	--table-cell: var(--surface);
+	--table-cell-border: var(--surface-container-highest);
+
+	/* Scroll */
+	--scroll-bg: var(--surface-container-low);
+	--scroll-indicator: var(--outline-variant);
+
+	/* ToolButton */
+	--tool-btn-start: #F7F7F7;
+	--tool-btn-end: #F2F2F2;
+	--tool-btn-pressed-start: #EBEBEB;
+	--tool-btn-pressed-end: #EBEBEB;
+	--tool-btn-border: #CACACA;
+
+	/* Information categories */
+	--info-none-bg: #C8E6C9;
+	--info-none-fg: #1B5E20;
+	--info-info-bg: #BBDEFB;
+	--info-info-fg: #0D47A1;
+	--info-warn-bg: #FFF9C4;
+	--info-warn-fg: #F57F17;
+	--info-error-bg: #F9DEDC;
+	--info-error-fg: #B3261E;
+	--info-critical-bg: #B3261E;
+	--info-critical-fg: #FFFFFF;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+	font-family: "Roboto", "Noto Sans", "Helvetica", sans-serif;
+	font-size: 14px;
+	letter-spacing: 0.25px;
+	color: var(--text);
+	background: var(--background);
+}
+
+.page {
+	max-width: 960px;
+	margin: 0 auto;
+	padding: 32px 24px;
+}
+
+h1 {
+	font-size: 28px;
+	font-weight: 400;
+	margin-bottom: 8px;
+}
+
+h2 {
+	font-size: 20px;
+	font-weight: 400;
+	margin-top: 32px;
+	margin-bottom: 12px;
+	color: var(--primary);
+}
+
+h3 {
+	font-size: 16px;
+	font-weight: 500;
+	margin-top: 20px;
+	margin-bottom: 8px;
+}
+
+.subtitle {
+	color: var(--inactive-text);
+	margin-bottom: 24px;
+}
+
+/* ---- Color Palette ---- */
+.palette {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 16px;
+}
+
+.swatch {
+	width: 100px;
+	height: 60px;
+	border-radius: 8px;
+	border: 1px solid var(--border-color);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-end;
+	padding: 4px;
+	font-size: 10px;
+}
+
+.swatch span {
+	background: rgba(255,255,255,0.7);
+	border-radius: 3px;
+	padding: 1px 4px;
+	color: #333;
+}
+
+/* ---- Buttons ---- */
+.button-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	align-items: center;
+	margin-bottom: 16px;
+}
+
+button, .btn {
+	font-family: inherit;
+	font-size: 13px;
+	letter-spacing: 0.25px;
+	padding: 6px 20px;
+	border-radius: 4px;
+	border: 1px solid var(--button-border);
+	background: var(--button);
+	color: var(--button-text);
+	cursor: pointer;
+	height: 30px;
+	line-height: 1;
+}
+
+button:hover {
+	background: var(--button-hover);
+}
+
+button:active {
+	background: var(--button-pressed);
+}
+
+button.primary {
+	background: var(--primary);
+	color: var(--on-primary);
+	border-color: var(--primary);
+}
+
+button.primary:hover {
+	opacity: 0.9;
+}
+
+button.accent {
+	background: var(--highlight);
+	color: var(--highlighted-text);
+	border-color: var(--highlight);
+}
+
+button:disabled {
+	background: var(--inactive-button);
+	color: var(--disabled-button-text);
+	border-color: var(--border-color);
+	cursor: default;
+}
+
+/* ---- Inputs ---- */
+.input-group {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	margin-bottom: 16px;
+	align-items: flex-start;
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.field label {
+	font-size: 12px;
+	color: var(--inactive-text);
+}
+
+input[type="text"], input[type="password"], input[type="number"],
+select, textarea {
+	font-family: inherit;
+	font-size: 13px;
+	padding: 5px 8px;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	background: var(--background2);
+	color: var(--text);
+	outline: none;
+	min-width: 180px;
+}
+
+input:focus, select:focus, textarea:focus {
+	border-color: var(--primary);
+}
+
+input:disabled {
+	background: var(--surface-container-high);
+	color: var(--disabled-text);
+}
+
+textarea {
+	min-height: 60px;
+	resize: vertical;
+}
+
+/* ---- Checkbox / Radio ---- */
+.check-group {
+	display: flex;
+	gap: 24px;
+	flex-wrap: wrap;
+	margin-bottom: 16px;
+	align-items: center;
+}
+
+.check-group label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	cursor: pointer;
+}
+
+input[type="checkbox"], input[type="radio"] {
+	accent-color: var(--primary);
+	width: 16px;
+	height: 16px;
+}
+
+/* ---- Table ---- */
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-bottom: 16px;
+}
+
+thead th {
+	background: var(--table-header);
+	border-bottom: 2px solid var(--table-header-border);
+	text-align: left;
+	padding: 8px 12px;
+	font-weight: 600;
+	font-size: 12px;
+	color: var(--text);
+}
+
+tbody td {
+	padding: 8px 12px;
+	border-bottom: 1px solid var(--table-cell-border);
+	background: var(--table-cell);
+	font-size: 13px;
+}
+
+tbody tr:hover td {
+	background: var(--selected);
+}
+
+tbody tr.selected td {
+	background: var(--item-selected);
+	color: var(--on-primary-container);
+}
+
+/* ---- Tabs ---- */
+.tabs {
+	display: flex;
+	border-bottom: 2px solid var(--border-color);
+	margin-bottom: 16px;
+}
+
+.tab {
+	padding: 8px 20px;
+	cursor: pointer;
+	font-size: 13px;
+	color: var(--inactive-text);
+	border-bottom: 2px solid transparent;
+	margin-bottom: -2px;
+}
+
+.tab:hover {
+	color: var(--text);
+}
+
+.tab.active {
+	color: var(--primary);
+	border-bottom-color: var(--primary);
+}
+
+/* ---- Cards ---- */
+.card-row {
+	display: flex;
+	gap: 16px;
+	flex-wrap: wrap;
+	margin-bottom: 16px;
+}
+
+.card {
+	background: var(--background2);
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+	padding: 16px;
+	min-width: 200px;
+	flex: 1;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.card h3 {
+	margin-top: 0;
+}
+
+.card p {
+	font-size: 13px;
+	color: var(--inactive-text);
+	margin-top: 4px;
+}
+
+/* ---- Progress / Indicator ---- */
+.progress-bar {
+	width: 100%;
+	height: 6px;
+	background: var(--surface-container-high);
+	border-radius: 3px;
+	overflow: hidden;
+	margin-bottom: 16px;
+}
+
+.progress-bar .fill {
+	height: 100%;
+	background: var(--primary);
+	border-radius: 3px;
+}
+
+/* ---- Badges ---- */
+.badge-row {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	margin-bottom: 16px;
+}
+
+.badge {
+	display: inline-block;
+	padding: 3px 10px;
+	border-radius: 12px;
+	font-size: 11px;
+	font-weight: 500;
+}
+
+.badge.info { background: var(--info-info-bg); color: var(--info-info-fg); }
+.badge.success { background: var(--info-none-bg); color: var(--info-none-fg); }
+.badge.warning { background: var(--info-warn-bg); color: var(--info-warn-fg); }
+.badge.error { background: var(--info-error-bg); color: var(--info-error-fg); }
+.badge.critical { background: var(--info-critical-bg); color: var(--info-critical-fg); }
+
+/* ---- Tooltip simulation ---- */
+.tooltip-demo {
+	display: inline-block;
+	position: relative;
+	padding: 6px 14px;
+	background: var(--inverse-surface);
+	color: var(--inverse-on-surface);
+	border-radius: 4px;
+	font-size: 12px;
+	margin-bottom: 16px;
+}
+
+/* ---- Links ---- */
+a {
+	color: var(--link);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+/* ---- Scrollbar demo ---- */
+.scroll-demo {
+	height: 80px;
+	overflow-y: auto;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	padding: 8px;
+	background: var(--background2);
+	margin-bottom: 16px;
+}
+
+.scroll-demo::-webkit-scrollbar {
+	width: 8px;
+}
+.scroll-demo::-webkit-scrollbar-track {
+	background: var(--scroll-bg);
+}
+.scroll-demo::-webkit-scrollbar-thumb {
+	background: var(--scroll-indicator);
+	border-radius: 4px;
+}
+
+/* ---- Gradient header ---- */
+.gradient-header {
+	background: linear-gradient(180deg, var(--tool-btn-start) 0%, var(--tool-btn-end) 97%, var(--surface-container-highest) 98%, var(--tool-btn-border) 100%);
+	padding: 12px 24px;
+	border-radius: 6px;
+	margin-bottom: 16px;
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.gradient-header .tool-btn {
+	padding: 4px 14px;
+	border-radius: 4px;
+	border: 1px solid var(--tool-btn-border);
+	background: linear-gradient(180deg, var(--tool-btn-start), var(--tool-btn-end));
+	color: var(--button-text);
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.gradient-header .tool-btn:active {
+	background: linear-gradient(180deg, var(--tool-btn-pressed-start), var(--tool-btn-pressed-end));
+}
+
+/* ---- Section separator ---- */
+hr {
+	border: none;
+	border-top: 1px solid var(--border-color);
+	margin: 24px 0;
+}
+</style>
+</head>
+<body>
+<div class="page">
+	<h1>Light Theme Preview</h1>
+	<p class="subtitle">ImagingTools Design System — Color palette and UI elements</p>
+
+	<!-- Gradient Header -->
+	<h2>Application Header</h2>
+	<div class="gradient-header">
+		<span style="font-weight:500;">ImtControlsGallery</span>
+		<button class="tool-btn">Light theme</button>
+		<button class="tool-btn">Acf style</button>
+	</div>
+
+	<!-- Color Palette -->
+	<h2>Color Palette</h2>
+	<div class="palette">
+		<div class="swatch" style="background:#FFFFFF;"><span>Surface</span></div>
+		<div class="swatch" style="background:#F2F2F2;"><span>Container</span></div>
+		<div class="swatch" style="background:#F7F7F7;"><span>ContainerLow</span></div>
+		<div class="swatch" style="background:#EBEBEB;"><span>ContainerHigh</span></div>
+		<div class="swatch" style="background:#E5E5E5;"><span>Highest</span></div>
+		<div class="swatch" style="background:#335777;"><span style="color:#fff;">OnSurface</span></div>
+		<div class="swatch" style="background:#6084A4;"><span style="color:#fff;">OnSurfaceVar</span></div>
+		<div class="swatch" style="background:#3672A8;"><span style="color:#fff;">Primary</span></div>
+		<div class="swatch" style="background:#D4E4F6;"><span>PrimaryContainer</span></div>
+		<div class="swatch" style="background:#5A6C7E;"><span style="color:#fff;">Secondary</span></div>
+		<div class="swatch" style="background:#DEE7F0;"><span>SecondaryContainer</span></div>
+		<div class="swatch" style="background:#7D5260;"><span style="color:#fff;">Tertiary</span></div>
+		<div class="swatch" style="background:#B3261E;"><span style="color:#fff;">Error</span></div>
+		<div class="swatch" style="background:#797979;"><span style="color:#fff;">Outline</span></div>
+		<div class="swatch" style="background:#CACACA;"><span>OutlineVariant</span></div>
+		<div class="swatch" style="background:#386A20;"><span style="color:#fff;">Green</span></div>
+		<div class="swatch" style="background:#FFD54F;"><span>LightYellow</span></div>
+	</div>
+
+	<hr>
+
+	<!-- Buttons -->
+	<h2>Buttons</h2>
+	<div class="button-row">
+		<button>Default</button>
+		<button class="primary">Primary</button>
+		<button class="accent">Accent</button>
+		<button disabled>Disabled</button>
+	</div>
+
+	<hr>
+
+	<!-- Inputs -->
+	<h2>Inputs</h2>
+	<div class="input-group">
+		<div class="field">
+			<label>Text Field</label>
+			<input type="text" placeholder="Enter text...">
+		</div>
+		<div class="field">
+			<label>Password</label>
+			<input type="password" value="password">
+		</div>
+		<div class="field">
+			<label>Number</label>
+			<input type="number" value="42">
+		</div>
+		<div class="field">
+			<label>Disabled</label>
+			<input type="text" value="Disabled" disabled>
+		</div>
+	</div>
+
+	<div class="input-group">
+		<div class="field">
+			<label>Select</label>
+			<select>
+				<option>Option 1</option>
+				<option>Option 2</option>
+				<option>Option 3</option>
+			</select>
+		</div>
+		<div class="field">
+			<label>Textarea</label>
+			<textarea placeholder="Multiline text..."></textarea>
+		</div>
+	</div>
+
+	<h3>Checkboxes &amp; Radios</h3>
+	<div class="check-group">
+		<label><input type="checkbox" checked> Checked</label>
+		<label><input type="checkbox"> Unchecked</label>
+		<label><input type="checkbox" disabled checked> Disabled</label>
+		<label><input type="radio" name="r1" checked> Option A</label>
+		<label><input type="radio" name="r1"> Option B</label>
+	</div>
+
+	<hr>
+
+	<!-- Tabs -->
+	<h2>Tabs</h2>
+	<div class="tabs">
+		<div class="tab active">Overview</div>
+		<div class="tab">Details</div>
+		<div class="tab">Settings</div>
+	</div>
+
+	<hr>
+
+	<!-- Table -->
+	<h2>Table</h2>
+	<table>
+		<thead>
+			<tr><th>Name</th><th>Status</th><th>Value</th><th>Date</th></tr>
+		</thead>
+		<tbody>
+			<tr><td>Document A</td><td>Active</td><td>128</td><td>2026-07-01</td></tr>
+			<tr class="selected"><td>Document B</td><td>Selected</td><td>256</td><td>2026-06-30</td></tr>
+			<tr><td>Document C</td><td>Pending</td><td>64</td><td>2026-06-29</td></tr>
+			<tr><td>Document D</td><td>Archived</td><td>512</td><td>2026-06-28</td></tr>
+		</tbody>
+	</table>
+
+	<hr>
+
+	<!-- Cards -->
+	<h2>Cards</h2>
+	<div class="card-row">
+		<div class="card">
+			<h3>Surface Card</h3>
+			<p>Content on a Surface background with standard text color.</p>
+		</div>
+		<div class="card">
+			<h3>Information</h3>
+			<p>Secondary information displayed in OnSurfaceVariant color.</p>
+		</div>
+		<div class="card">
+			<h3>Actions</h3>
+			<p><a href="#">Primary link</a> for navigation or actions.</p>
+		</div>
+	</div>
+
+	<hr>
+
+	<!-- Progress -->
+	<h2>Progress</h2>
+	<div class="progress-bar"><div class="fill" style="width:65%;"></div></div>
+
+	<hr>
+
+	<!-- Badges -->
+	<h2>Information Categories</h2>
+	<div class="badge-row">
+		<span class="badge success">Success</span>
+		<span class="badge info">Info</span>
+		<span class="badge warning">Warning</span>
+		<span class="badge error">Error</span>
+		<span class="badge critical">Critical</span>
+	</div>
+
+	<hr>
+
+	<!-- Tooltip -->
+	<h2>Tooltip</h2>
+	<div class="tooltip-demo">Tooltip preview (InverseSurface + InverseOnSurface)</div>
+
+	<hr>
+
+	<!-- Scrollable area -->
+	<h2>Scrollable Area</h2>
+	<div class="scroll-demo">
+		<p>Line 1 — Scrollable content area</p>
+		<p>Line 2 — With custom scrollbar colors</p>
+		<p>Line 3 — ScrollBackground: SurfaceContainerLow</p>
+		<p>Line 4 — ScrollIndicator: OutlineVariant</p>
+		<p>Line 5 — Additional content</p>
+		<p>Line 6 — More content for scrolling</p>
+		<p>Line 7 — End of content</p>
+	</div>
+
+	<hr>
+
+	<p style="font-size:11px; color:var(--inactive-text); text-align:center; margin-top:24px;">
+		Generated from <code>Include/imtstyle/light.theme</code> — ImagingTools Design System
+	</p>
+</div>
+</body>
+</html>
