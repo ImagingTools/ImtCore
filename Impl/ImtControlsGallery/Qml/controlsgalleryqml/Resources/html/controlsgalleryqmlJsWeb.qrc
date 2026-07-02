@@ -1,8 +1,6 @@
 <RCC>
     <qresource prefix="/html">
         <file alias="index.html">index.html</file>
-        <file alias="index_light.html">index_light.html</file>
-        <file alias="index_dark.html">index_dark.html</file>
 	<file alias="Times New Roman.ttf">Times New Roman.ttf</file>
 	<file alias="Icon.js">Icon.js</file>
         <file alias="GraphQLRequest.js">GraphQLRequest.js</file>
