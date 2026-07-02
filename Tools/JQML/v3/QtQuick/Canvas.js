@@ -78,7 +78,7 @@ class Canvas extends Item {
                         img.remove()
                     }
 
-                    img.src = path.replaceAll('//','/')
+                    img.src = path.replace(/(?<!:)\/{2,}/g, '/')
                 }
                 
             } else {
@@ -105,7 +105,7 @@ class Canvas extends Item {
                         img.remove()
                     }
 
-                    img.src = path.replaceAll('//','/')
+                    img.src = path.replace(/(?<!:)\/{2,}/g, '/')
                 }
                 
             } else {
@@ -168,7 +168,7 @@ class Canvas extends Item {
                     img.remove()
                 }
 
-                img.src = path.replaceAll('//','/')
+                img.src = path.replace(/(?<!:)\/{2,}/g, '/')
             }
             
         }
