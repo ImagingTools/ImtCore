@@ -529,7 +529,12 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const
 {
-	filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter, CComplexCollectionFilterConverter::SC_POSTGRES);
+	const bool isSQLite = m_databaseEngineCompPtr.IsValid() &&
+						  m_databaseEngineCompPtr->GetDatabaseDriverId() == "QSQLITE";
+
+	filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(
+				collectionFilter,
+				isSQLite ? CComplexCollectionFilterConverter::SC_GENERAL : CComplexCollectionFilterConverter::SC_POSTGRES);
 
 	return true;
 }

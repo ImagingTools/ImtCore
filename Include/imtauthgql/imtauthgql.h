@@ -985,7 +985,10 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	}
 
 	const QByteArray rolesEntity = QByteArrayLiteral("Roles");
-	const QByteArray groupsEntity = QByteArrayLiteral("Groups");
+	// Must match the Groups collection's SQL table name ("UserGroups"), since
+	// CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery stores
+	// TenantEntityBindings.EntityType as GetTableName(), not the collection ID.
+	const QByteArray groupsEntity = QByteArrayLiteral("UserGroups");
 	const QByteArray permsEntity = QByteArrayLiteral("Permissions");
 
 	// Filter roles/groups/permissions according to tenant context.
