@@ -171,7 +171,10 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	// (prevents stripping assignments from other tenants and rejects cross-tenant IDs).
 	imtauth::ITenantEntityBindingManager* bindingPtr = m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr;
 	const QByteArray rolesEntity = QByteArrayLiteral("Roles");
-	const QByteArray groupsEntity = QByteArrayLiteral("Groups");
+	// Must match the Groups collection's SQL table name ("UserGroups"), since
+	// CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery stores
+	// TenantEntityBindings.EntityType as GetTableName(), not the collection ID.
+	const QByteArray groupsEntity = QByteArrayLiteral("UserGroups");
 	const QByteArray permsEntity = QByteArrayLiteral("Permissions");
 
 	auto shouldKeepForTenant = [&](const QByteArray& entityType, const QByteArray& entityId) -> bool {
