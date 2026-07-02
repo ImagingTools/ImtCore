@@ -158,7 +158,7 @@ class Canvas extends Item {
         if(typeof image === 'string'){
             let path = JQApplication.rootPath+'/'+image.replaceAll('../','')
             if(!this.__cache[path]){
-                let img = sourceSize ? new Image(sourceSize.width, sourceSize.height) : new Image()
+                let img = new Image()
                 img.onload = ()=>{
                     image = img
                     this.__cache[path] = img
