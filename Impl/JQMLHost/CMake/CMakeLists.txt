@@ -54,6 +54,8 @@ target_link_libraries(${PROJECT_NAME}
 	imtqml
 	imtcol
 	imtgql
+	imtchatdb
+	imtdeskdb
 	imtclientgql
 	imtserverapp
 	imtservice
