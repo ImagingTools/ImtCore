@@ -178,6 +178,8 @@ class Alias extends Property {
                     func: value,
                 })
                 currentValue = value.call(target)
+            } catch(error) {
+                if(location.hash === '#jqdebugdetail') console.error(error)
             } finally {
                 global.queueFlag.pop()
                 this.queueLink.pop()

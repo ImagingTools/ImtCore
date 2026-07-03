@@ -13,7 +13,7 @@ class DoubleValidator extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
         bottom: { type: Real, value: -Infinity},
         top: { type: Real, value: Infinity},
-        locale: { type: String, value: false},
+        locale: { type: String, value: ''},
         decimals: { type: Real, value: 1000},
         notation: { type: Real, value: DoubleValidator.ScientificNotation},
 
