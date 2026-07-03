@@ -1059,7 +1059,10 @@ function compile(options){
                         stat.isCompute = true
                         let obj = null
 
-                        if (this.qmlFile.context[tree.info[0].value]) {
+                        let path = this.resolve(tree.info[0].value, stat.thisKey)
+                        if(path){
+                            stat.value.add(path.source)
+                        } else if (this.qmlFile.context[tree.info[0].value]) {
                             stat.value.add(`${stat.thisKey}.__${this.qmlFile.getContextName()}.${tree.info[0].value}`)
                             obj = this.qmlFile.context[tree.info[0].value]
                         } else if (tree.info[0].value === 'parent') {
@@ -1458,7 +1461,7 @@ function compile(options){
                             // console.log(assignProperty.name, stat.value.toString())
                             // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',function(){return ${stat.value}},function(newVal){${stat.value}=newVal})`)
                             let aliasPath = stat.value.toString().split('.')
-                            // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',${aliasPath.slice(0, aliasPath.length - 1).join('.')}, '${aliasPath[aliasPath.length-1]}')`)
+                                                        // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',${aliasPath.slice(0, aliasPath.length - 1).join('.')}, '${aliasPath[aliasPath.length-1]}')`)
                             aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignName}',()=>{return ${aliasPath.slice(0, aliasPath.length - 1).join('.')}}, '${aliasPath[aliasPath.length-1]}')`)
                             // code.add(`${this.name}.__getDataQml('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},properties)`)
                             aliasCode.add('\n')
