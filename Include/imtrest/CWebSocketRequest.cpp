@@ -193,7 +193,9 @@ void CWebSocketRequest::RegisterRequestEventHandler(IRequestEventHandler* reques
 {
 	Q_ASSERT(requestEventHandler != nullptr);
 
-	m_requestEventHandlers.append(requestEventHandler);
+	if (requestEventHandler != nullptr && !m_requestEventHandlers.contains(requestEventHandler)){
+		m_requestEventHandlers.append(requestEventHandler);
+	}
 }
 
 

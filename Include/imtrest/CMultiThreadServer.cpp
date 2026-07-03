@@ -86,8 +86,8 @@ bool CMultiThreadServer::SendResponse(const QByteArray& requestId, ConstResponse
 {
 	QReadLocker threadListLock(&m_threadSocketListGuard);
 
-	for (CSocketThread* socket : m_threadSocketList){
-		if (socket->GetRequestId() == requestId){
+	for (const QPointer<CSocketThread>& socket : m_threadSocketList){
+		if (!socket.isNull() && socket->GetRequestId() == requestId){
 			return socket->SendResponse(response);
 		}
 	}
@@ -100,8 +100,8 @@ bool CMultiThreadServer::SendRequest(const QByteArray& requestId, ConstRequestPt
 {
 	QReadLocker threadListLock(&m_threadSocketListGuard);
 
-	for (CSocketThread* socket : m_threadSocketList){
-		if (socket->GetRequestId() == requestId){
+	for (const QPointer<CSocketThread>& socket : m_threadSocketList){
+		if (!socket.isNull() && socket->GetRequestId() == requestId){
 			return socket->SendRequest(request);
 		}
 	}
@@ -131,15 +131,21 @@ void CMultiThreadServer::Disconnected(QByteArray requestId)
 		}
 	}
 
-	if (m_descriptorList.isEmpty()){
-		return;
+	{
+		QMutexLocker lock(&m_descriptorListMutex);
+		if (m_descriptorList.isEmpty()){
+			return;
+		}
 	}
 
 	qintptr descriptor = PopSocketDescriptor();
 	CSocketThread* threadSocket = new CSocketThread(descriptor, m_isSecureConnection, m_sslConfiguration, this);
 
 	m_threadSocketList.append(threadSocket);
-	connect(threadSocket, &CSocketThread::SocketDisconnected, this, &CMultiThreadServer::Disconnected, Qt::DirectConnection);
+	// Qt::QueuedConnection is mandatory here: SocketDisconnected is emitted from the socket thread
+	// and Disconnected() calls quit()/wait()/deleteLater() on that thread. With a direct connection
+	// the thread would wait on itself and delete a still running QThread (sporadic crash).
+	connect(threadSocket, &CSocketThread::SocketDisconnected, this, &CMultiThreadServer::Disconnected, Qt::QueuedConnection);
 
 	threadSocket->start();
 }

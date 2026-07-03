@@ -116,11 +116,15 @@ void CWorkerManagerComp::OnFinish(const IRequest* request, const QByteArray& sub
 
 void CWorkerManagerComp::AboutToQuit()
 {
+	QMutexLocker loc(&m_requestListMutex);
+
 	for (CWorkerThread* workerPtr : m_workerList){
 		workerPtr->quit();
 		workerPtr->wait(1000);
 		workerPtr->deleteLater();
 	}
+
+	m_workerList.clear();
 
 	qDeleteAll(m_requestList);
 	m_requestList.clear();

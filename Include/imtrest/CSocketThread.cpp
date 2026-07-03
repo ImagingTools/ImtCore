@@ -102,12 +102,16 @@ imtrest::IRequestUniquePtr CSocketThread::CreateRequest() const
 
 void CSocketThread::run()
 {
-	if (m_server == nullptr){
+	if (m_server == nullptr || m_enginePtr == nullptr){
 		return;
 	}
 
 	imtrest::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*this);
 	Q_ASSERT(newRequestPtr.IsValid());
+	if (!newRequestPtr.IsValid()){
+		return;
+	}
+
 	m_requestId = newRequestPtr->GetRequestId();
 
 	m_socket.SetPtr(new CSocket(this, newRequestPtr.PopInterfacePtr(), m_isSecureConnection, m_sslConfiguration, m_socketDescriptor));

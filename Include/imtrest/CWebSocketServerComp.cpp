@@ -145,6 +145,11 @@ void CWebSocketServerComp::OnModelChanged(int /*modelId*/, const istd::IChangeab
 		while (m_webSocketThreadList.count() > 0){
 			imtrest::CWebSocketThread* webSocketThread = m_webSocketThreadList.back();
 			webSocketThread->disconnect();
+			if (webSocketThread->isRunning()){
+				webSocketThread->quit();
+				webSocketThread->wait();
+			}
+			webSocketThread->deleteLater();
 			m_webSocketThreadList.pop_back();
 		}
 		StopServer();
@@ -213,7 +218,9 @@ bool CWebSocketServerComp::StartServer()
 
 bool CWebSocketServerComp::StopServer()
 {
-	m_webSocketServerPtr->close();
+	if (m_webSocketServerPtr.IsValid()){
+		m_webSocketServerPtr->close();
+	}
 
 	return true;
 }
@@ -221,7 +228,7 @@ bool CWebSocketServerComp::StopServer()
 
 IServer::ServerStatus CWebSocketServerComp::GetServerStatus() const
 {
-	if (m_webSocketServerPtr->isListening()){
+	if (m_webSocketServerPtr.IsValid() && m_webSocketServerPtr->isListening()){
 		return SS_LISTENING;
 	}
 
@@ -362,15 +369,29 @@ void CWebSocketServerComp::OnSocketDisconnected()
 		m_subscriberEngineCompPtr->UnRegisterSubscriber(socketObjectPtr);
 	}
 
-	for (const QByteArray& key: m_senders.keys()){
-		if (socketObjectPtr == m_senders[key]->GetSocket().data()){
-			m_senders.remove(key);
+	// Collect and remove the senders under the write lock; SendResponse/SendRequest
+	// access m_senders concurrently from publisher threads via the read lock.
+	QList<QByteArray> removedClientIds;
+	{
+		QWriteLocker locker(&m_sendersLock);
 
-			istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));
-			loginChangeSet.SetChangeInfo("ClientId", key);
-			istd::CChangeNotifier notifier(this, &loginChangeSet);
-			m_senderLoginStatusMap.remove(key);
+		for (auto it = m_senders.begin(); it != m_senders.end();){
+			if (socketObjectPtr == it.value()->GetSocket().data()){
+				removedClientIds.append(it.key());
+				it = m_senders.erase(it);
+			}
+			else{
+				++it;
+			}
 		}
+	}
+
+	// Notify about the logout outside of the lock to avoid deadlocks in model observers:
+	for (const QByteArray& key: removedClientIds){
+		istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));
+		loginChangeSet.SetChangeInfo("ClientId", key);
+		istd::CChangeNotifier notifier(this, &loginChangeSet);
+		m_senderLoginStatusMap.remove(key);
 	}
 
 	socketObjectPtr->deleteLater();

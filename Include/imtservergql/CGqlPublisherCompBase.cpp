@@ -97,9 +97,30 @@ bool CGqlPublisherCompBase::UnregisterSubscription(const QByteArray& subscriptio
 
 void CGqlPublisherCompBase::OnRequestDestroyed(imtrest::IRequest* request)
 {
-	imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<imtrest::CWebSocketRequest*>(request);
-	if (webSocketRequestPtr != nullptr){
-		UnregisterSubscription(webSocketRequestPtr->GetQueryId());
+	if (request == nullptr){
+		return;
+	}
+
+	// Remove all subscription entries that still reference the destroyed network request.
+	// Matching by pointer (instead of only by query-ID) guarantees that no dangling
+	// request pointers remain registered after a connection loss.
+	QMutexLocker locker(&m_mutex);
+
+	for (int i = m_registeredSubscribers.size() - 1; i >= 0; --i){
+		QMap<QByteArray, const imtrest::IRequest*>& networkRequests = m_registeredSubscribers[i].networkRequests;
+
+		for (auto it = networkRequests.begin(); it != networkRequests.end();){
+			if (it.value() == request){
+				it = networkRequests.erase(it);
+			}
+			else{
+				++it;
+			}
+		}
+
+		if (networkRequests.isEmpty()){
+			m_registeredSubscribers.removeAt(i);
+		}
 	}
 }
 
@@ -165,22 +186,24 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 	struct Target { QByteArray id; const imtrest::IRequest* req; };
 	QList<Target> targets;
 
-	{
-		QMutexLocker locker(&m_mutex);
-		for (const auto& entry : m_registeredSubscribers) {
-			if (entry.gqlRequest.GetCommandId() == commandId) {
+	// The mutex must stay locked while pushing the data: OnRequestDestroyed synchronizes
+	// on the same mutex, so a network request cannot be destroyed (e.g. on connection loss
+	// in another thread) while it is dereferenced here. Sending is non-blocking (the
+	// dispatcher only queues the data), so holding the lock is cheap.
+	QMutexLocker locker(&m_mutex);
 
-				// Apply filtering (predicate) to this subscriber's unique variables
-				if (!predicate || predicate(entry.gqlRequest)) {
-					for (auto it = entry.networkRequests.constBegin(); it != entry.networkRequests.constEnd(); ++it) {
-						targets.append({it.key(), it.value()});
-					}
+	for (const auto& entry : m_registeredSubscribers) {
+		if (entry.gqlRequest.GetCommandId() == commandId) {
+
+			// Apply filtering (predicate) to this subscriber's unique variables
+			if (!predicate || predicate(entry.gqlRequest)) {
+				for (auto it = entry.networkRequests.constBegin(); it != entry.networkRequests.constEnd(); ++it) {
+					targets.append({it.key(), it.value()});
 				}
 			}
 		}
 	}
 
-	// push data to subscribers outside the lock to keep the server responsive
 	for (const auto& target : targets) {
 		bool retVal = PushDataToSubscriber(target.id, commandId, data, *target.req);
 
