@@ -2,6 +2,7 @@ const QtObject = require("../QtQml/QtObject")
 const String = require("../QtQml/String")
 const Real = require("../QtQml/Real")
 const Signal = require("../QtQml/Signal")
+const QtFunctions = require("../Qt/functions")
 
 class DoubleValidator extends QtObject {
     static StandardNotation = 0
@@ -24,7 +25,7 @@ class DoubleValidator extends QtObject {
     })
 
     getRegExpForNotation() {
-        switch (this.getPropertyValue('notation')) {
+        switch (this.notation) {
           case DoubleValidator.ScientificNotation:
             return DoubleValidator.ScientificRegExp
           case DoubleValidator.StandardNotation:
@@ -42,37 +43,37 @@ class DoubleValidator extends QtObject {
     validate(str) {
         if(!str) return false
 
-        let locale = this.getPropertyValue('locale').replaceAll('_', '-')
-        let delimiter = this.getPropertyValue('context').getPropertyValue('delimiter')
+        let locale = this.locale.replaceAll('_', '-')
+        let decimalPoint = QtFunctions.locale().decimalPoint
 
-        let regexp = new RegExp(`^-*[0-9]*[${delimiter}]*[0-9]*$`)
+        let regexp = new RegExp(`^-*[0-9]*[${decimalPoint}]*[0-9]*$`)
         if(!regexp.test(str)) return false
 
-        let value = Number(str.replaceAll(delimiter,'.'))
+        let value = Number(str.replaceAll(decimalPoint,'.'))
         if(isNaN(value)) return false
 
-        let decimals = str.indexOf(delimiter) >= 0 ? str.split(delimiter)[1] : []
+        let decimals = str.indexOf(decimalPoint) >= 0 ? str.split(decimalPoint)[1] : []
 
-        return (this.getPropertyValue('bottom') <= value && this.getPropertyValue('top') >= value) && decimals.length <= this.getPropertyValue('decimals')
+        return (this.bottom <= value && top >= value) && decimals.length <= decimals
     }
 
     hasPartialMatch(str){
         if(!str) return true
 
-        let locale = this.getPropertyValue('locale').replaceAll('_', '-')
-        let delimiter = this.getPropertyValue('context').getPropertyValue('delimiter')
+        let locale = this.locale.replaceAll('_', '-')
+        let decimalPoint = QtFunctions.locale().decimalPoint
 
-        if(this.getPropertyValue('bottom') < 0 || this.getPropertyValue('top') < 0){
+        if(this.bottom < 0 || top < 0){
             if(str === '-') return true
         }
 
-        let regexp = new RegExp(`^-*[0-9]*[${delimiter}]*[0-9]*$`)
+        let regexp = new RegExp(`^-*[0-9]*[${decimalPoint}]*[0-9]*$`)
         if(!regexp.test(str)) return false
 
-        let value = Number(str.replaceAll(delimiter,'.'))
+        let value = Number(str.replaceAll(decimalPoint,'.'))
         if(isNaN(value)) return false
-        let decimals = str.indexOf(delimiter) >= 0 ? str.split(delimiter)[1] : []
-        return decimals.length <= this.getPropertyValue('decimals')
+        let decimals = str.indexOf(decimalPoint) >= 0 ? str.split(decimalPoint)[1] : []
+        return decimals.length <= decimals
     }
 }
 
