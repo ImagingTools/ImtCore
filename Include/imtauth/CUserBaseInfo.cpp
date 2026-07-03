@@ -122,6 +122,27 @@ IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& produc
 		}
 	}
 
+	// Local (directly assigned, not role-based) permissions are always part of the
+	// effective permission set - independent of whether a role provider is available.
+	FeatureIds localPermissions;
+	if (productId.isEmpty()){
+		for (auto it = m_permissionsMap.cbegin(); it != m_permissionsMap.cend(); ++it){
+			localPermissions += it.value();
+		}
+	}
+	else{
+		auto it = m_permissionsMap.constFind(productId);
+		if (it != m_permissionsMap.cend()){
+			localPermissions = it.value();
+		}
+	}
+
+	for (const QByteArray& perm : std::as_const(localPermissions)){
+		if (!allPermissions.contains(perm)){
+			allPermissions << perm;
+		}
+	}
+
 	return allPermissions;
 }
 
