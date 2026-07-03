@@ -20,6 +20,7 @@ PermissionsProvider {
     id: root
 
     property GetProductPermissionsInput __requestInput: GetProductPermissionsInput {}
+    property GetUserPermissionsInput __userRequestInput: GetUserPermissionsInput {}
     property GetOrganizationPermissionsInput __orgRequestInput: GetOrganizationPermissionsInput {}
     // Remember the tenant for the in-flight request (response payload does not echo it).
     // Used only to route result into correct scoped properties and emit the right signals.
@@ -62,6 +63,39 @@ PermissionsProvider {
         root.__requestInput.m_tenantId = requestedTenantId
         root.requestStarted(requestedTenantId)
         root.__requestSender.send(root.__requestInput)
+    }
+
+    property GqlSdlRequestSender __userRequestSender: GqlSdlRequestSender {
+        gqlCommandId: ImtauthPermissionsSdlCommandIds.s_getUserPermissions
+
+        sdlObjectComp: Component {
+            GetProductPermissionsPayload {
+                onFinished: {
+                    root.loading = false
+                    if (m_errorMessage && m_errorMessage !== "") {
+                        root.lastError = m_errorMessage
+                        root.requestFailed(m_errorMessage, "")
+                    } else {
+                        root.__storeUserPermissions(m_groups)
+                    }
+                }
+            }
+        }
+    }
+
+    function requestUserPermissions() {
+        if (root.productId === "") {
+            var message = "Unable to request permissions. Product-ID is empty"
+            root.lastError = message
+            root.requestFailed(message, "")
+            return
+        }
+
+        root.loading = true
+        root.lastError = ""
+        root.__userRequestInput.m_productId = root.productId
+        root.requestStarted("")
+        root.__userRequestSender.send(root.__userRequestInput)
     }
 
     property GqlSdlRequestSender __orgRequestSender: GqlSdlRequestSender {
@@ -138,6 +172,13 @@ PermissionsProvider {
             root.allPermissions = parsedPermissions
             root.allPermissionsReceived()
         }
+    }
+
+    function __storeUserPermissions(groupsList) {
+        var parsedPermissions = root.__parseGroups(groupsList)
+        root.permissions = parsedPermissions
+        root.userPermissions = parsedPermissions
+        root.userPermissionsReceived()
     }
 
     function __storeOrganizationPermissions(groupsList, memberPermsList, tenantId) {

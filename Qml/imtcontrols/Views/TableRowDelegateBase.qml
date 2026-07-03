@@ -5,7 +5,11 @@ import imtcontrols 1.0
 
 Rectangle {
 	id: tableDelegateContainer;
-	
+
+	// Test instrumentation: makes every collection row addressable by index for GUI tests
+	// (Tests/ProLifeGui). Inert - objectName has no runtime/visual effect.
+	objectName: "TableRow_" + rowIndex;
+
 	width: Style.sizeHintXXXL;
 	height: minHeight;
 	property real minHeight: Style.controlHeightL;
@@ -319,10 +323,11 @@ Rectangle {
 	
 	MouseArea {
 		id: ma;
-		
+		objectName: "MouseArea";
+
 		anchors.fill: parent;
 		hoverEnabled: true;
-		
+
 		acceptedButtons: Qt.AllButtons;
 
 		onClicked: {

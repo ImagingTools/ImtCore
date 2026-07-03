@@ -7,6 +7,9 @@ import imtcontrols 1.0
 Row {
 	id: paginationContainer;
 
+	// Test instrumentation (Tests/ProLifeGui). Inert.
+	objectName: "Pagination";
+
 	height: visible ? Style.controlHeightS : 0;
 	spacing: Style.spacingL;
 
@@ -98,6 +101,7 @@ Row {
 
 	Button {
 		id: buttonDecr;
+		objectName: "PrevPageButton";
 
 		anchors.verticalCenter: parent.verticalCenter;
 
@@ -162,6 +166,7 @@ Row {
 
 	Button {
 		id: buttonIncr;
+		objectName: "NextPageButton";
 
 		anchors.verticalCenter: parent.verticalCenter;
 
@@ -223,6 +228,7 @@ Row {
 		
 		ComboBox {
 			id: comboBox
+			objectName: "PageSizeCombo"
 			width: 65
 			height: Style.buttonHeightXS
 

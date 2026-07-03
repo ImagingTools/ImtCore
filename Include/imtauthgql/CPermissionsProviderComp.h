@@ -32,6 +32,10 @@ protected:
 				const sdl::V1_0::imtauth::CGetProductPermissionsGqlRequest& getProductPermissionsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CGetProductPermissionsPayload OnGetUserPermissions(
+				const sdl::V1_0::imtauth::CGetUserPermissionsGqlRequest& getUserPermissionsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 protected:
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
