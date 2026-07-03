@@ -1057,7 +1057,7 @@ function compile(options){
                     }
                     case 'qmlaliasdef': {
                         stat.isCompute = true
-                        let obj = this.resolve(tree.info[0].value, stat.thisKey)
+                        let obj = null
 
                         if (this.qmlFile.context[tree.info[0].value]) {
                             stat.value.add(`${stat.thisKey}.__${this.qmlFile.getContextName()}.${tree.info[0].value}`)
