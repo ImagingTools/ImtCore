@@ -1057,7 +1057,7 @@ function compile(options){
                     }
                     case 'qmlaliasdef': {
                         stat.isCompute = true
-                        let obj = null
+                        let obj = this.resolve(tree.info[0].value, stat.thisKey)
 
                         if (this.qmlFile.context[tree.info[0].value]) {
                             stat.value.add(`${stat.thisKey}.__${this.qmlFile.getContextName()}.${tree.info[0].value}`)
@@ -1458,7 +1458,7 @@ function compile(options){
                             // console.log(assignProperty.name, stat.value.toString())
                             // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',function(){return ${stat.value}},function(newVal){${stat.value}=newVal})`)
                             let aliasPath = stat.value.toString().split('.')
-                            // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',${aliasPath.slice(0, aliasPath.length - 1).join('.')}, '${aliasPath[aliasPath.length-1]}')`)
+                                                        // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',${aliasPath.slice(0, aliasPath.length - 1).join('.')}, '${aliasPath[aliasPath.length-1]}')`)
                             aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignName}',()=>{return ${aliasPath.slice(0, aliasPath.length - 1).join('.')}}, '${aliasPath[aliasPath.length-1]}')`)
                             // code.add(`${this.name}.__getDataQml('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},properties)`)
                             aliasCode.add('\n')
@@ -2067,7 +2067,12 @@ function compile(options){
         }
 
         toCode() {
-            return `function(){${this.meta.source}; return {${this.meta.exports.join(',')}}}()`
+            if(this.meta.exports.length > 1){
+                return `function(){${this.meta.source}; return {${this.meta.exports.join(',')}}}()`
+            } else {
+                return `function(){${this.meta.source}; return ${this.meta.exports.join(',')}}()`
+            }
+            
         }
     }
 
