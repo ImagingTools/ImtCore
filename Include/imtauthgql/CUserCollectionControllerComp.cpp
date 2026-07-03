@@ -690,11 +690,29 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 				membershipPtr,
 				roleProviderPtr);
 
-	if (!tenantAdapted.IsValid()){
-		return baseAdaptedPtr;
+	if (tenantAdapted.IsValid()){
+		return tenantAdapted;
 	}
 
-	return tenantAdapted;
+	// AdaptUserForTenant returned invalid meaning no tenant filtering was needed
+	// (e.g. the user only has global / non-tenant-bound roles). The original object
+	// still carries only role IDs, which a provider-less consumer (auth gateway,
+	// client UI) cannot expand into permissions. Materialize the resolved permissions
+	// into local permissions so they survive serialization.
+	const imtauth::IUserInfo* srcUserPtr = dynamic_cast<const imtauth::IUserInfo*>(&object);
+	if (srcUserPtr != nullptr && !currentProductId.isEmpty()){
+		imtauth::IUserInfo::FeatureIds resolvedPermissions = srcUserPtr->GetPermissions(currentProductId);
+		if (!resolvedPermissions.isEmpty()){
+			istd::IChangeableUniquePtr clonedPtr = object.CloneMe();
+			imtauth::IUserInfo* mutableUserPtr = dynamic_cast<imtauth::IUserInfo*>(clonedPtr.GetPtr());
+			if (mutableUserPtr != nullptr){
+				mutableUserPtr->SetLocalPermissions(currentProductId, resolvedPermissions);
+				return clonedPtr;
+			}
+		}
+	}
+
+	return baseAdaptedPtr;
 }
 
 

@@ -83,4 +83,72 @@ sdl::V1_0::imtauth::CGetProductPermissionsPayload CPermissionsProviderComp::OnGe
 }
 
 
+sdl::V1_0::imtauth::CGetProductPermissionsPayload CPermissionsProviderComp::OnGetUserPermissions(
+			const sdl::V1_0::imtauth::CGetUserPermissionsGqlRequest& getUserPermissionsRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::V1_0::imtauth::CGetProductPermissionsPayload response;
+
+	if (!m_productInfoCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'FeatureContainer' was not set", "CPermissionsProviderComp");
+		return response;
+	}
+
+	auto arguments = getUserPermissionsRequest.GetRequestedArguments();
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
+
+	if (!arguments.input->productId || arguments.input->productId->isEmpty()){
+		errorMessage = QString("Unable to get permissions. Product-ID is empty.");
+		SendErrorMessage(0, errorMessage, "CPermissionsProviderComp");
+		response.errorMessage = errorMessage;
+		return response;
+	}
+
+	QByteArray productId = *arguments.input->productId;
+
+	QByteArray languageId;
+	const imtauth::IUserInfo* userInfoPtr = nullptr;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		languageId = gqlContextPtr->GetLanguageId();
+		userInfoPtr = gqlContextPtr->GetUserInfo();
+	}
+
+	if (userInfoPtr == nullptr){
+		errorMessage = QString("Unable to get user permissions. No authenticated user.");
+		SendErrorMessage(0, errorMessage, "CPermissionsProviderComp");
+		response.errorMessage = errorMessage;
+		return response;
+	}
+
+	// Superuser/administrator sees the full permission tree.
+	QSet<QByteArray> allowedPermissions;
+	const QSet<QByteArray>* allowedPermissionsPtr = nullptr;
+	if (!userInfoPtr->IsAdmin()){
+		const imtauth::IUserInfo::FeatureIds userPermissions = userInfoPtr->GetPermissions(productId);
+		for (const QByteArray& permissionId : userPermissions){
+			QByteArray normalizedPermissionId = permissionId.trimmed();
+			if (!normalizedPermissionId.isEmpty()){
+				allowedPermissions.insert(normalizedPermissionId);
+			}
+		}
+		allowedPermissionsPtr = &allowedPermissions;
+	}
+
+	response.groups.Emplace();
+	BuildPermissionGroups<sdl::V1_0::imtauth::CPermissionGroup, sdl::V1_0::imtauth::CPermissionEntry>(
+			m_productInfoCompPtr.GetPtr(),
+			m_translationManagerCompPtr.IsValid() ? m_translationManagerCompPtr.GetPtr() : nullptr,
+			*response.groups,
+			languageId,
+			allowedPermissionsPtr);
+
+	return response;
+}
+
+
 } // namespace imtauthgql

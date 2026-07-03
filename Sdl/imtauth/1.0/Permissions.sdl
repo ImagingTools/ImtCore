@@ -40,6 +40,13 @@ input GetProductPermissionsInput {
 	tenantId: ID
 }
 
+# Input for requesting the permissions available to the currently authenticated user.
+# Superusers/administrators receive the full product permission tree.
+input GetUserPermissionsInput {
+	productId: ID!
+}
+
 type Query {
 	GetProductPermissions (input: GetProductPermissionsInput): GetProductPermissionsPayload!
+	GetUserPermissions (input: GetUserPermissionsInput): GetProductPermissionsPayload!
 }
