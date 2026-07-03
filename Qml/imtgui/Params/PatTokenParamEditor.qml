@@ -348,22 +348,24 @@ ParamEditorBase {
 				
 				Dialog {
 					id: addDialog
-					title: qsTr("Add PAT Token")
-					width: Style.sizeHintXL
+					title: qsTr("New Personal Access Token")
+					width: 780
+					height: 720
 					
 					property string tokenName: ""
 					property string tokenDescription: ""
-					property string expiresAt: "" // "" = no expiration
+					property string expiresAt: ""
+					property var selectedScopes: []
 					
 					Component.onCompleted: {
 						clearButtons()
-						addButton(Enums.apply, qsTr("Add"), false)
+						addButton(Enums.apply, qsTr("Generate Token"), false)
 						addButton(Enums.cancel, qsTr("Cancel"), true)
 					}
 					
 					onFinished: {
 						if (buttonId === Enums.apply){
-							patTokenEditor.addNewToken(tokenName.trim(), tokenDescription, [], expiresAt)
+							patTokenEditor.addNewToken(tokenName.trim(), tokenDescription, selectedScopes, expiresAt)
 						}
 					}
 					
@@ -371,109 +373,279 @@ ParamEditorBase {
 						Item {
 							id: contentItem
 							width: addDialog.width
-							height: groupElementView.height
+							height: 600
 
 							function checkAddButtonEnabled(){
-								let enabled = nameInputElementView.text !== "" && expirationCb.currentIndex >= 0
-								addDialog.setButtonEnabled(Enums.apply, enabled)
+								var hasName = nameInputElementView.text !== ""
+								var hasExpiration = expirationCb.currentIndex >= 0
+								var checkedIds = scopesPermissionsView.getCheckedIds()
+								var hasScopes = checkedIds.length > 0
+								addDialog.selectedScopes = checkedIds
+								addDialog.setButtonEnabled(Enums.apply, hasName && hasExpiration && hasScopes)
+
+								if (!hasName)
+									validationHint.text = qsTr("Enter a token name to continue")
+								else if (!hasScopes)
+									validationHint.text = qsTr("Select at least one permission")
+								else
+									validationHint.text = ""
 							}
-						
-							GroupElementView {
-								id: groupElementView
-								anchors.horizontalCenter: parent.horizontalCenter
-								width: parent.width - 2*Style.marginL
 
-								TextInputElementView {
-									id: nameInputElementView
-									width: parent.width
-									name: qsTr("Token Name")
-									description: qsTr("A descriptive name for this token")
-									showErrorWhenInvalid: true
-									textInputValidator: notEmptyRegexp
-									errorText: qsTr("Please enter the token name")
-									text: addDialog.tokenName
-									controlWidth: 300
-									onEditingFinished: {
-										addDialog.tokenName = text
-										contentItem.checkAddButtonEnabled()
-									}
-									
-									RegularExpressionValidator {
-										id: notEmptyRegexp;
-										regularExpression: /^(?!\s*$).+/;
-									}
+							property bool scopesLoading: true
+							property bool scopesEmpty: false
+
+							GqlBasedPermissionsProvider {
+								id: dialogPermissionsProvider
+								productId: AuthorizationController.productId
+								onUserPermissionsReceived: {
+									scopesPermissionsView.rebuildFromFlatArray(userPermissions)
+									scopesPermissionsView.expandAll()
+									contentItem.scopesEmpty = !userPermissions || userPermissions.length === 0
+									contentItem.scopesLoading = false
 								}
-
-								TextInputElementView {
-									width: parent.width
-									name: qsTr("Description")
-									description: qsTr("Optional description for this token")
-									text: addDialog.tokenDescription
-									controlWidth: 300
-									onEditingFinished: {
-										addDialog.tokenDescription = text
-										contentItem.checkAddButtonEnabled()
-									}
+								onRequestFailed: {
+									contentItem.scopesEmpty = true
+									contentItem.scopesLoading = false
 								}
+							}
 
-								ComboBoxElementView {
-									id: expirationCb
-									width: parent.width
-									name: qsTr("Expiration")
-									controlWidth: 300
-									description: qsTr("The token will expire on the selected date")
-									model: expirationModel
-									currentIndex: 1
-									TreeItemModel {
-										id: expirationModel
-										Component.onCompleted: {
-											let index = expirationModel.insertNewItem()
-											expirationModel.setData("id", "7", index)
-											expirationModel.setData("name", "7 Days", index)
+							Component.onCompleted: {
+								contentItem.scopesLoading = true
+								dialogPermissionsProvider.requestUserPermissions()
+							}
 
-											index = expirationModel.insertNewItem()
-											expirationModel.setData("id", "30", index)
-											expirationModel.setData("name", "30 Days", index)
-											
-											index = expirationModel.insertNewItem()
-											expirationModel.setData("id", "60", index)
-											expirationModel.setData("name", "60 Days", index)
-											
-											index = expirationModel.insertNewItem()
-											expirationModel.setData("id", "90", index)
-											expirationModel.setData("name", "90 Days", index)
+							// --- Top section: token metadata (compact horizontal grid) ---
+							Item {
+								id: formSection
+								anchors.left: parent.left
+								anchors.right: parent.right
+								anchors.top: parent.top
+								anchors.leftMargin: Style.marginXL
+								anchors.rightMargin: Style.marginXL
+								anchors.topMargin: Style.marginL
+								height: formRow.height + descriptionRow.height + Style.marginM
 
-											index = expirationModel.insertNewItem()
-											expirationModel.setData("id", "unlimited", index)
-											expirationModel.setData("name", "No Expiration", index)
+								// Row 1: Name + Expiration side by side
+								Row {
+									id: formRow
+									anchors.left: parent.left
+									anchors.right: parent.right
+									anchors.top: parent.top
+									spacing: Style.marginXL
+
+									Column {
+										width: (formRow.width - Style.marginXL) * 0.6
+										spacing: Style.marginXS
+
+										BaseText {
+											text: qsTr("Token Name")
+											font.pixelSize: Style.fontSizeM
+											font.bold: true
+										}
+										CustomTextField {
+											id: nameInputElementView
+											width: parent.width
+											height: Style.controlHeightM
+											placeHolderText: qsTr("e.g. CI/CD Pipeline, API Client...")
+											text: addDialog.tokenName
+											onEditingFinished: {
+												addDialog.tokenName = text
+												contentItem.checkAddButtonEnabled()
+											}
+											RegularExpressionValidator {
+												id: notEmptyRegexp
+												regularExpression: /^(?!\s*$).+/
+											}
 										}
 									}
 
-									function computeExpiresAtIso() {
-										var id = expirationModel.getData("id", currentIndex)
-									
-										if (id === "unlimited")
-											return ""
-									
-										if (id === "" || id === undefined || id === null)
-											return ""
-									
-										let days = Number(id)
-										if (days <= 0)
-											return ""
-									
-										let d = new Date()
-										d.setDate(d.getDate() + days)
-										return d.toISOString()//.slice(0, 10)
+									Column {
+										width: (formRow.width - Style.marginXL) * 0.4
+										spacing: Style.marginXS
+
+										BaseText {
+											text: qsTr("Expiration")
+											font.pixelSize: Style.fontSizeM
+											font.bold: true
+										}
+										ComboBox {
+											id: expirationCb
+											width: parent.width
+											height: Style.controlHeightM
+											model: expirationModel
+											currentIndex: 1
+											TreeItemModel {
+												id: expirationModel
+												Component.onCompleted: {
+													var index = expirationModel.insertNewItem()
+													expirationModel.setData("id", "7", index)
+													expirationModel.setData("name", qsTr("7 Days"), index)
+
+													index = expirationModel.insertNewItem()
+													expirationModel.setData("id", "30", index)
+													expirationModel.setData("name", qsTr("30 Days"), index)
+
+													index = expirationModel.insertNewItem()
+													expirationModel.setData("id", "60", index)
+													expirationModel.setData("name", qsTr("60 Days"), index)
+
+													index = expirationModel.insertNewItem()
+													expirationModel.setData("id", "90", index)
+													expirationModel.setData("name", qsTr("90 Days"), index)
+
+													index = expirationModel.insertNewItem()
+													expirationModel.setData("id", "unlimited", index)
+													expirationModel.setData("name", qsTr("No Expiration"), index)
+												}
+											}
+
+											function computeExpiresAtIso() {
+												var id = expirationModel.getData("id", currentIndex)
+												if (id === "unlimited" || id === "" || id === undefined || id === null)
+													return ""
+												var days = Number(id)
+												if (days <= 0)
+													return ""
+												var d = new Date()
+												d.setDate(d.getDate() + days)
+												return d.toISOString()
+											}
+
+											onCurrentIndexChanged: {
+												addDialog.expiresAt = computeExpiresAtIso()
+												contentItem.checkAddButtonEnabled()
+											}
+
+											Component.onCompleted: {
+												addDialog.expiresAt = computeExpiresAtIso()
+											}
+										}
 									}
-								
-									onCurrentIndexChanged: {
-										addDialog.expiresAt = computeExpiresAtIso()
-										contentItem.checkAddButtonEnabled()
+								}
+
+								// Row 2: Description (full width)
+								Column {
+									id: descriptionRow
+									anchors.left: parent.left
+									anchors.right: parent.right
+									anchors.top: formRow.bottom
+									anchors.topMargin: Style.marginM
+									spacing: Style.marginXS
+
+									BaseText {
+										text: qsTr("Description (optional)")
+										font.pixelSize: Style.fontSizeM
+										color: Style.inactiveTextColor
 									}
-								
-									Component.onCompleted: {
-										addDialog.expiresAt = computeExpiresAtIso()
+									CustomTextField {
+										width: parent.width
+										height: Style.controlHeightM
+										placeHolderText: qsTr("What will this token be used for?")
+										text: addDialog.tokenDescription
+										onEditingFinished: {
+											addDialog.tokenDescription = text
+										}
+									}
+								}
+							}
+
+							BaseText {
+								id: validationHint
+								anchors.left: parent.left
+								anchors.right: parent.right
+								anchors.top: formSection.bottom
+								anchors.leftMargin: Style.marginXL
+								anchors.rightMargin: Style.marginXL
+								anchors.topMargin: Style.marginS
+								font.pixelSize: Style.fontSizeS
+								color: Style.errorTextColor
+								text: qsTr("Enter a token name to continue")
+								height: text !== "" ? implicitHeight : 0
+								visible: text !== ""
+							}
+
+// --- Bottom section: Permissions tree (takes all remaining space) ---
+									Item {
+										id: scopesSection
+										anchors.left: parent.left
+										anchors.right: parent.right
+										anchors.top: validationHint.visible ? validationHint.bottom : formSection.bottom
+										anchors.bottom: parent.bottom
+										anchors.leftMargin: Style.marginXL
+										anchors.rightMargin: Style.marginXL
+										anchors.topMargin: Style.marginL
+								anchors.bottomMargin: Style.marginS
+
+								Row {
+									id: scopesHeader
+									anchors.left: parent.left
+									anchors.right: parent.right
+									anchors.top: parent.top
+									spacing: Style.marginS
+
+									BaseText {
+										text: qsTr("Select Permissions")
+										font.pixelSize: Style.fontSizeL
+										font.bold: true
+										anchors.verticalCenter: parent.verticalCenter
+									}
+									BaseText {
+										text: qsTr("— grant only the access this token needs")
+										font.pixelSize: Style.fontSizeS
+										color: Style.inactiveTextColor
+										anchors.verticalCenter: parent.verticalCenter
+										visible: !contentItem.scopesLoading && !contentItem.scopesEmpty
+									}
+								}
+
+								Rectangle {
+									id: scopesArea
+									anchors.left: parent.left
+									anchors.right: parent.right
+									anchors.top: scopesHeader.bottom
+									anchors.topMargin: Style.marginS
+									anchors.bottom: parent.bottom
+									color: Style.baseColor
+									border.width: 1
+									border.color: Style.borderColor
+									radius: Style.radiusM
+									clip: true
+
+									PermissionsTableView {
+										id: scopesPermissionsView
+										anchors.fill: parent
+										anchors.leftMargin: Style.marginM
+										anchors.rightMargin: Style.marginM
+										anchors.topMargin: Style.marginXS
+										anchors.bottomMargin: Style.marginS
+										controlPanelTopMargin: Style.marginS
+										treeTopMargin: Style.marginXS
+										treeBottomMargin: Style.marginS
+										readOnly: false
+										showControlPanel: true
+										visible: !contentItem.scopesLoading && !contentItem.scopesEmpty
+										onSelectionChanged: contentItem.checkAddButtonEnabled()
+									}
+
+									Loading {
+										anchors.centerIn: parent
+										width: 48
+										height: 48
+										indicatorSize: 40
+										color: "transparent"
+										background.color: "transparent"
+										visible: contentItem.scopesLoading
+									}
+
+									BaseText {
+										anchors.centerIn: parent
+										width: parent.width - 2*Style.marginXL
+										horizontalAlignment: Text.AlignHCenter
+										wrapMode: Text.WordWrap
+										text: qsTr("No permissions available to assign to this token.")
+										font.pixelSize: Style.fontSizeM
+										color: Style.inactiveTextColor
+										visible: !contentItem.scopesLoading && contentItem.scopesEmpty
 									}
 								}
 							}

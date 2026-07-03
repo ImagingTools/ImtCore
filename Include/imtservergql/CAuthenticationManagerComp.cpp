@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QDateTime>
 #include <QtCore/QMutexLocker>
+#include <QtCore/QSet>
 
 // ACF includes
 #include <iprm/TParamsPtr.h>
@@ -86,7 +87,48 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 		imtbase::IObjectCollection::DataPtr userDataPtr;
 		if (m_userCollectionCompPtr->GetObjectData(resolvedUserId, userDataPtr)){
 			const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
-			gqlContextPtr->SetUserInfo(userInfoPtr);
+
+			if (isPat && userInfoPtr != nullptr){
+				// For PAT: restrict the user's permissions to the intersection with the
+				// token's scopes. GetPermissions() now returns role- and local-permission
+				// derived permissions combined, so writing the intersection into local
+				// permissions (after stripping roles/groups) is enough to make
+				// GetPermissions() - the method every permission check in this codebase
+				// actually reads - report exactly that intersection. An empty scope list
+				// yields zero permissions (fail closed), not the full unrestricted user.
+				imtauth::IUserInfo::FeatureIds fullPermissions = userInfoPtr->GetPermissions(productId);
+				QSet<QByteArray> scopeSet(scopes.begin(), scopes.end());
+				imtauth::IUserInfo::FeatureIds effectivePermissions;
+				for (const QByteArray& perm : fullPermissions){
+					if (scopeSet.contains(perm)){
+						effectivePermissions.append(perm);
+					}
+				}
+
+				istd::IChangeableUniquePtr clonedPtr = userInfoPtr->CloneMe();
+				imtauth::IUserInfo* mutableUserPtr = dynamic_cast<imtauth::IUserInfo*>(clonedPtr.GetPtr());
+				if (mutableUserPtr != nullptr){
+					// Strip roles/groups so no other code path can expand them back into
+					// unrestricted permissions; only the explicit scoped list applies.
+					const QByteArrayList products = mutableUserPtr->GetProducts();
+					for (const QByteArray& prod : products){
+						mutableUserPtr->SetRoles(prod, imtauth::IUserBaseInfo::RoleIds());
+					}
+					const imtauth::IUserGroupInfo::GroupIds groupIds = mutableUserPtr->GetGroups();
+					for (const QByteArray& groupId : groupIds){
+						mutableUserPtr->RemoveFromGroup(groupId);
+					}
+					mutableUserPtr->SetLocalPermissions(productId, effectivePermissions);
+
+					gqlContextPtr->SetUserInfo(mutableUserPtr);
+				}
+				else{
+					gqlContextPtr->SetUserInfo(nullptr);
+				}
+			}
+			else{
+				gqlContextPtr->SetUserInfo(userInfoPtr);
+			}
 		}
 	}
 

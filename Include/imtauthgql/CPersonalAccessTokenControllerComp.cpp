@@ -272,6 +272,12 @@ sdl::V1_0::imtauth::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCr
 		return response;
 	}
 
+	if (scopes.isEmpty()){
+		errorMessage = "Invalid request: at least one permission scope is required";
+		response.message = errorMessage;
+		return response;
+	}
+
 	// Create token
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result = 
 		m_tokenManagerCompPtr->CreateToken(userId, name, description, scopes, expiresAt);
