@@ -123,6 +123,9 @@ class Property extends BaseObject {
      * @param {Object} meta
      */
     static set(target, name, value, meta){
+        if(target.constructor.meta[name].modifiers && target.constructor.meta[name].modifiers.readonly){
+            target[`__${name}__init`] = true
+        }
         // if(target.constructor.meta[name].modifiers && target.constructor.meta[name].modifiers.readonly && (!target.__properties || !target.__properties[name]) && typeof value !== 'function') {
         //     throw new Error(`Cannot assign to read-only property "${name}"`)
         // }
@@ -169,7 +172,7 @@ class Property extends BaseObject {
      * @param {Object} meta
      */
     static reset(target, name, value, meta){
-        if(target.constructor.meta[name].modifiers && target.constructor.meta[name].modifiers.readonly && (!target.__properties || !target.__properties[name]) && typeof value !== 'function') {
+        if(target.constructor.meta[name].modifiers && target.constructor.meta[name].modifiers.readonly && (!target.__properties || !target.__properties[name]) && typeof value !== 'function' && target[`__${name}__init`]) {
             throw new Error(`Cannot assign to read-only property "${name}"`)
         }
             
