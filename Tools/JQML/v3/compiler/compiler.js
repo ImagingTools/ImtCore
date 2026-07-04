@@ -1301,15 +1301,31 @@ function compile(options){
             return undefined
         }
 
+        checkAssignProperty(name){
+            for(let assignProperty of this.assignProperties){
+                if(name === assignProperty.name) return assignProperty
+            }
+
+            return undefined
+        }
+
         getProperties() {
             let code = new SourceNode()
             let lazyCode = new SourceNode()
             let aliasCode = new SourceNode()
             let classCode =  new SourceNode()
 
+            for(let defineProperty of this.defineProperties){
+                if(!this.checkAssignProperty(defineProperty.name) && defineProperty.modifiers && defineProperty.modifiers.readonly){
+                    code.add(`${this.name}['__${defineProperty.name}__init']=true`)
+                }
+            }
+
             for (let assignProperty of this.assignProperties) {
                 let assignNames = this.normalizePathName(assignProperty.name)
                 let assignName = assignNames.join('.')
+
+                console.log('assignName =', assignName)
                 let path = this.resolve(assignNames[0], this.name)
                 if (!path) {
                     console.log(`${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignName.length - 1}: warning: ${assignName} is not founded`)
