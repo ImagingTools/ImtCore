@@ -83,6 +83,10 @@ class Var extends Property {
      * @param {Object} meta
      */
     static set(target, name, value, meta){
+        if(target.constructor.meta[name].modifiers && target.constructor.meta[name].modifiers.readonly){
+            target[`__${name}__init`] = true
+        }
+        
         let oldValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
 
         if(typeof value === 'function'){
