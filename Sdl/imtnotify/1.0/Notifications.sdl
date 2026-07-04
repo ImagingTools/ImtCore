@@ -1,0 +1,178 @@
+schema {
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+	namespace: imtnotify
+	version: 1.0
+}
+
+import {
+	"../../imtbase/1.0/ImtCollection.sdl"
+}
+
+# --- Enums ---
+
+# Visual severity of a notification. Drives the accent colour of the list
+# item and of the global popup card.
+enum NotificationSeverity {
+	Info
+	Success
+	Warning
+	Critical
+}
+
+# Ordering applied server-side to the notification feed.
+enum NotificationSortOrder {
+	NewestFirst
+	OldestFirst
+}
+
+# --- Collection representations ---
+
+# Lightweight representation used by the Events list and the menu indicator.
+# sourceType / sourceId identify the producing entity so the client can deep-link
+# to it via NavigationController (contextTypeId / contextId), mirroring Search.
+type NotificationItemData {
+	id: ID!
+	category: String
+	title: String!
+	preview: String
+	iconName: String
+	severity: NotificationSeverity
+	isRead: Boolean
+	sourceType: String
+	sourceId: ID
+	targetRoute: String
+	createdAt: String
+}
+
+# Full representation used when opening a single notification.
+type NotificationData {
+	id: ID!
+	recipientId: ID!
+	category: String
+	title: String!
+	body: String
+	iconName: String
+	severity: NotificationSeverity
+	isRead: Boolean
+	sourceType: String
+	sourceId: ID
+	targetRoute: String
+	metadata: String
+	createdAt: String
+	updatedAt: String
+}
+
+input NotificationsListInput {
+	# When set, only notifications addressed to this recipient are returned.
+	# Ignored for authenticated requests, which are always scoped to the caller.
+	recipientId: ID
+	# When true, only unread notifications are returned.
+	unreadOnly: Boolean
+	# When set, only notifications of this producer category are returned.
+	category: String
+	# Severity filter as an INotification severity index (Info=0 … Critical=3);
+	# -1 (or omitted) means any severity.
+	severity: Int
+	# Server-side ordering; defaults to NewestFirst.
+	sortOrder: NotificationSortOrder
+	# Pagination (offset / count) via CollectionViewParams.
+	viewParams: CollectionViewParams
+}
+
+type NotificationsListPayload {
+	items: [NotificationItemData]
+	unreadCount: Int
+	# Total number of notifications matching the filter (before pagination),
+	# used by the client to decide whether more pages can be loaded.
+	totalCount: Int
+	notification: NotificationItem
+}
+
+input NotificationItemInput {
+	id: ID!
+}
+
+input UnreadNotificationsCountInput {
+	recipientId: ID
+}
+
+type UnreadNotificationsCountPayload {
+	unreadCount: Int!
+}
+
+# --- Mutations ---
+
+input MarkNotificationReadInput {
+	id: ID!
+	isRead: Boolean
+}
+
+input MarkAllNotificationsReadInput {
+	recipientId: ID
+}
+
+type MarkAllNotificationsReadPayload {
+	updatedCount: Int!
+}
+
+input DeleteNotificationInput {
+	id: ID!
+}
+
+# Generic entry point that lets any server-side feature raise a notification
+# without depending on the imtnotify GraphQL layer directly. Primarily used by
+# tests and by lightweight integrations; first-class producers use the
+# imtnotify::INotificationService C++ interface instead.
+input RaiseNotificationInput {
+	recipientId: ID!
+	category: String
+	title: String!
+	body: String
+	iconName: String
+	severity: NotificationSeverity
+	sourceType: String
+	sourceId: ID
+	targetRoute: String
+	metadata: String
+}
+
+# --- Subscription ---
+
+# Payload pushed live to a connected client when a new notification is
+# addressed to its authenticated user.
+type NotificationPush {
+	id: ID!
+	recipientId: ID!
+	category: String
+	title: String!
+	preview: String
+	iconName: String
+	severity: NotificationSeverity
+	sourceType: String
+	sourceId: ID
+	targetRoute: String
+	createdAt: String
+}
+
+input NotificationSubscriptionInput {
+	recipientId: ID
+}
+
+type Query {
+	NotificationsList (input: NotificationsListInput): NotificationsListPayload!
+	NotificationItem (input: NotificationItemInput): NotificationData!
+	UnreadNotificationsCount (input: UnreadNotificationsCountInput): UnreadNotificationsCountPayload!
+}
+
+type Mutation {
+	MarkNotificationRead (input: MarkNotificationReadInput): UpdatedNotificationPayload!
+	MarkAllNotificationsRead (input: MarkAllNotificationsReadInput): MarkAllNotificationsReadPayload!
+	DeleteNotification (input: DeleteNotificationInput): RemovedNotificationPayload!
+	RaiseNotification (input: RaiseNotificationInput): AddedNotificationPayload!
+}
+
+type Subscription {
+	OnNotificationReceived (input: NotificationSubscriptionInput): NotificationPush!
+}

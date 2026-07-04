@@ -21,6 +21,7 @@ target_link_libraries(${PROJECT_NAME}
 	imt2dsdl
 	imtchatsdl
 	imtdesksdl
+	imtnotifysdl
 	imtpaysdl)
 
 #------ QML modules (from ImtCore/Qml) ------
@@ -34,7 +35,9 @@ target_link_libraries(${PROJECT_NAME}
 	imtauthguiqml
 	imtlicguiqml
 	imtchatguiqml
-	imtdeskguiqml)
+	imtdeskguiqml
+	imtnotifyguiqml
+	imtnotifyguigqlqml)
 
 #------ Core ImtCore libraries ------
 target_link_libraries(${PROJECT_NAME}
@@ -63,7 +66,8 @@ target_link_libraries(${PROJECT_NAME}
 	imtrest
 	imtapp
 	imtchat
-	imtdesk)
+	imtdesk
+	imtnotify)
 
 #------ Qt modules ------
 target_link_libraries(${PROJECT_NAME}

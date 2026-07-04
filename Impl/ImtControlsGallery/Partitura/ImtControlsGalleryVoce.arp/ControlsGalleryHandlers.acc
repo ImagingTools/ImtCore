@@ -52,6 +52,7 @@
                                 <Value>Pages/GridViewPage</Value>
                                 <Value>Pages/TestPage</Value>
                                 <Value>Pages/SdlTestPage</Value>
+                                <Value>Pages/EventsPage</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

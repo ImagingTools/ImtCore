@@ -115,6 +115,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_dependencies(imtpaysdl imtbasesdl)
 		add_subdirectory("${SDL_DIR}/imtchat/CMake" "${AUX_INCLUDE_DIR}/imtchatsdl")
 		add_subdirectory("${SDL_DIR}/imtdesk/CMake" "${AUX_INCLUDE_DIR}/imtdesksdl")
+		add_subdirectory("${SDL_DIR}/imtnotify/CMake" "${AUX_INCLUDE_DIR}/imtnotifysdl")
+		add_dependencies(imtnotifysdl imtbasesdl)
 	endif()
 
 	#-------- Libraries --------
@@ -160,6 +162,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake" "${AUX_INCLUDE_DIR}/imtauthdb")
 	add_subdirectory("${INCLUDE_DIR}/imtchat/CMake" "${AUX_INCLUDE_DIR}/imtchat")
 	add_subdirectory("${INCLUDE_DIR}/imtdesk/CMake" "${AUX_INCLUDE_DIR}/imtdesk")
+	add_subdirectory("${INCLUDE_DIR}/imtnotify/CMake" "${AUX_INCLUDE_DIR}/imtnotify")
+	add_dependencies(imtnotify imtbase)
 	add_subdirectory("${INCLUDE_DIR}/imtservice/CMake" "${AUX_INCLUDE_DIR}/imtservice")
 	add_subdirectory("${INCLUDE_DIR}/imtserverapp/CMake" "${AUX_INCLUDE_DIR}/imtserverapp")
 	add_dependencies(imtserverapp imtbasesdl)
@@ -198,6 +202,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_subdirectory("${INCLUDE_DIR}/imthypedb/CMake" "${AUX_INCLUDE_DIR}/imthypedb")
 		add_subdirectory("${INCLUDE_DIR}/imtchatdb/CMake" "${AUX_INCLUDE_DIR}/imtchatdb")
 		add_subdirectory("${INCLUDE_DIR}/imtdeskdb/CMake" "${AUX_INCLUDE_DIR}/imtdeskdb")
+		add_subdirectory("${INCLUDE_DIR}/imtnotifydb/CMake" "${AUX_INCLUDE_DIR}/imtnotifydb")
+		add_dependencies(imtnotifydb imtnotify imtdb imtbase)
 	endif()
 
 	if(DEFINED USE_MDBX AND USE_MDBX)
@@ -212,6 +218,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_dependencies(imtauthgui DesignTokenCreator)
 		add_subdirectory("${INCLUDE_DIR}/imtchatgql/CMake" "${AUX_INCLUDE_DIR}/imtchatgql")
 		add_subdirectory("${INCLUDE_DIR}/imtdeskgql/CMake" "${AUX_INCLUDE_DIR}/imtdeskgql")
+		add_subdirectory("${INCLUDE_DIR}/imtnotifygql/CMake" "${AUX_INCLUDE_DIR}/imtnotifygql")
+		add_dependencies(imtnotifygql imtnotify imtnotifysdl imtservergql imtgql imtbase)
 		add_subdirectory("${QML_DIR}/imtdocgui/CMake" "${AUX_INCLUDE_DIR}/imtdocguiqml")
 		add_subdirectory("${QML_DIR}/imtauthgui/CMake" "${AUX_INCLUDE_DIR}/imtauthguiqml")
 		add_subdirectory("${QML_DIR}/imtcolgui/CMake" "${AUX_INCLUDE_DIR}/imtcolguiqml")
@@ -225,6 +233,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_subdirectory("${QML_DIR}/imtgeogui/CMake" "${AUX_INCLUDE_DIR}/imtgeoguiqml")
 		add_subdirectory("${QML_DIR}/imtdeskgui/CMake" "${AUX_INCLUDE_DIR}/imtdeskguiqml")
 		add_subdirectory("${QML_DIR}/imtchatgui/CMake" "${AUX_INCLUDE_DIR}/imtchatguiqml")
+		add_subdirectory("${QML_DIR}/imtnotifygui/CMake" "${AUX_INCLUDE_DIR}/imtnotifyguiqml")
+		add_subdirectory("${QML_DIR}/imtnotifyguigql/CMake" "${AUX_INCLUDE_DIR}/imtnotifyguigqlqml")
 	endif()
 
 	#-------- Packages --------
@@ -258,6 +268,9 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 		add_subdirectory("${IMPL_DIR}/ImtDeskPck/CMake" "${AUX_INCLUDE_DIR}/ImtDeskPck")
 		add_dependencies(ImtDeskPck imtbase imtdesk)
+
+		add_subdirectory("${IMPL_DIR}/ImtNotifyPck/CMake" "${AUX_INCLUDE_DIR}/ImtNotifyPck")
+		add_dependencies(ImtNotifyPck imtbase imtnotify)
 
 		if(NOT DEFINED USE_QTQML OR USE_QTQML)
 			add_subdirectory("${IMPL_DIR}/ImtAuthGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGuiPck")
@@ -381,6 +394,9 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 			add_subdirectory("${IMPL_DIR}/ImtDeskDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtDeskDbPck")
 			add_dependencies(ImtDeskDbPck imtdeskdb imtdb imtdesk)
+
+			add_subdirectory("${IMPL_DIR}/ImtNotifyDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtNotifyDbPck")
+			add_dependencies(ImtNotifyDbPck imtnotifydb imtdb imtnotify)
 		endif()
 
 		if(NOT DEFINED USE_QT3D OR USE_QT3D)
@@ -406,8 +422,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		if(WIN32 AND (NOT DEFINED USE_JQML_HOST OR USE_JQML_HOST))
 			add_subdirectory("${IMPL_DIR}/JQMLHost/CMake" "${AUX_INCLUDE_DIR}/JQMLHost")
 			add_dependencies(JQMLHost
-				imtbasesdl imtappsdl imtauthsdl imtlicsdl imtcolorsdl imt2dsdl imtchatsdl imtdesksdl imtpaysdl
-				imtcontrolsqml imtstylecontrolsqml imtguiqml imtguigqlqml imtcolguiqml imtdocguiqml imtauthguiqml imtlicguiqml imtchatguiqml imtdeskguiqml
+				imtbasesdl imtappsdl imtauthsdl imtlicsdl imtcolorsdl imt2dsdl imtchatsdl imtdesksdl imtnotifysdl imtpaysdl
+				imtcontrolsqml imtstylecontrolsqml imtguiqml imtguigqlqml imtcolguiqml imtdocguiqml imtauthguiqml imtlicguiqml imtchatguiqml imtdeskguiqml imtnotifyguiqml imtnotifyguigqlqml
 				imtqml imtgui imtguigql imtauth imtauthgui imtstyle imtbase)
 			imt_chain_windeploy_target(JQMLHost)
 		endif()
@@ -426,6 +442,9 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 				add_subdirectory("${IMPL_DIR}/ImtDeskGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtDeskGqlPck")
 				add_dependencies(ImtDeskGqlPck imtdeskgql imtdb imtdesk)
+
+				add_subdirectory("${IMPL_DIR}/ImtNotifyGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtNotifyGqlPck")
+				add_dependencies(ImtNotifyGqlPck imtnotifygql imtdb imtnotify)
 			endif()
 		endif()
 	endif()
@@ -467,6 +486,9 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 		add_subdirectory("${TESTS_DIR}/PersonalAccessTokenTest/CMake" "${AUX_INCLUDE_DIR}/PersonalAccessTokenTest")
 		add_dependencies(PersonalAccessTokenTest imtbase imtauth)
+
+		add_subdirectory("${TESTS_DIR}/NotificationTest/CMake" "${AUX_INCLUDE_DIR}/NotificationTest")
+		add_dependencies(NotificationTest imtbase imtnotify)
 
 		add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceTest")
 		add_dependencies(CollectionDocumentServiceTest imtbase imtdoc)

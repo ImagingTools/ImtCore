@@ -23,6 +23,11 @@ Rectangle {
 
 	property int activePageIndex: -1;
 
+	// Map of pageId -> pending item count, driving the per-page notification
+	// badge (e.g. the Events / Activity indicator). Updated via the
+	// "UpdatePageBadge" application event.
+	property var pageBadges: ({});
+
 	property TreeItemModel model: TreeItemModel {};
 
 	// Model for pages with top alignment
@@ -43,6 +48,7 @@ Rectangle {
 	Component.onCompleted: {
 		Events.subscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
 		Events.subscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
+		Events.subscribeEvent("UpdatePageBadge", menuPanel.updateBadge);
 		Events.subscribeEvent("ChangePage", menuPanel.setActivePage);
 		Events.subscribeEvent("CollapseMenu", menuPanel.setCollapsed);
 		Events.subscribeEvent("ExpandMenu", menuPanel.setCollapsed);
@@ -51,10 +57,24 @@ Rectangle {
 	Component.onDestruction: {
 		Events.unSubscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
 		Events.unSubscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
+		Events.unSubscribeEvent("UpdatePageBadge", menuPanel.updateBadge);
 		Events.unSubscribeEvent("ChangePage", menuPanel.setActivePage);
 		Events.unSubscribeEvent("CollapseMenu", menuPanel.setCollapsed);
 		Events.unSubscribeEvent("ExpandMenu", menuPanel.setCollapsed);
 
+	}
+
+	// data: { id: <pageId>, count: <int> }
+	function updateBadge(data){
+		if (!data || !('id' in data)){
+			return;
+		}
+
+		let count = ('count' in data) ? data["count"] : 0;
+		let badges = menuPanel.pageBadges;
+		badges[data["id"]] = count;
+		// Reassign so the property-change notification fires for bindings.
+		menuPanel.pageBadges = badges;
 	}
 
 	onActivePageIdChanged: {
@@ -221,6 +241,8 @@ Rectangle {
 			selected: menuPanel.activePageIndex === model.index;
 			property string pageId: model["id"];
 
+			badgeCount: menuPanel.pageBadges[model["id"]] ? menuPanel.pageBadges[model["id"]] : 0;
+
 			onClicked: {
 				menuPanel.setActivePage(model.id)
 			}
@@ -331,6 +353,7 @@ Rectangle {
 					iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
 															"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
 					selected: menuPanel.activePageIndex <= topAlignmentPages.count - 1 ? model.index === menuPanel.activePageIndex : false;
+					badgeCount: menuPanel.pageBadges[model["id"]] ? menuPanel.pageBadges[model["id"]] : 0;
 					onClicked: {
 						menuPanel.setActivePage(model.id)
 					}
@@ -360,6 +383,7 @@ Rectangle {
 					iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
 															"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
 					selected: menuPanel.activePageIndex > topAlignmentPages.count - 1 ? menuPanel.activePageIndex - topAlignmentPages.count === model.index : false;
+					badgeCount: menuPanel.pageBadges[model["id"]] ? menuPanel.pageBadges[model["id"]] : 0;
 					onClicked: {
 						menuPanel.setActivePage(model.id)
 					}

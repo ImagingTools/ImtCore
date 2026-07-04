@@ -538,6 +538,17 @@ macro(getImtChatQmlWebDirs webdirs buildwebdir)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtchatConversationCollectionDocumentServiceSdl)
 endmacro(getImtChatQmlWebDirs)
 
+macro(getImtNotifyQmlWebDirs webdirs buildwebdir)
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtnotifygui)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtnotifygui)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtnotifyguigql)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtnotifyguigql)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtnotifysdl/SDL/1.0/QML/imtnotifyNotificationsSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtnotifyNotificationsSdl)
+endmacro(getImtNotifyQmlWebDirs)
+
 macro(getImtCoreQmlWebDirs webdirs buildwebdir)
 	set(useImtControlsStyle TRUE)
 	if(${ARGC} GREATER 2)
@@ -550,4 +561,5 @@ macro(getImtCoreQmlWebDirs webdirs buildwebdir)
 	getImtGeoQmlWebDirs(${webdirs} ${buildwebdir})
 	getImtDeskQmlWebDirs(${webdirs} ${buildwebdir})
 	getImtChatQmlWebDirs(${webdirs} ${buildwebdir})
+	getImtNotifyQmlWebDirs(${webdirs} ${buildwebdir})
 endmacro(getImtCoreQmlWebDirs)

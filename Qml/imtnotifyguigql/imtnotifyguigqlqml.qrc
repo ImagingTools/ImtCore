@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/qml">
+	    <file alias="imtnotifyguigql/qmldir">qmldir</file>
+		<file alias="imtnotifyguigql/GqlNotificationApiClient.qml">GqlNotificationApiClient.qml</file>
+    </qresource>
+</RCC>
