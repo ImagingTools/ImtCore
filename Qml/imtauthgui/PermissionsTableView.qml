@@ -217,7 +217,13 @@ Item {
 			}
 
 			result.push(TreeModelBuilder.node({
-				key: group.groupId || ("group_" + gi),
+				// Prefixed so this synthetic group wrapper can never collide with a
+				// leaf entry's key. A top-level feature without children is sent by
+				// the server as a group whose single entry reuses the same
+				// permissionId as the groupId; BasicTreeView keys its whole tree in
+				// one flat map, so an identical key on parent and child turns the
+				// node into its own child and __appendBranchIterative loops forever.
+				key: "__group__:" + (group.groupId || ("group_" + gi)),
 				text: group.groupName || "",
 				checkable: true,
 				expanded: true,
@@ -268,7 +274,12 @@ Item {
 			__collectFlattened(directChildren, "", groupChildren)
 
 			flatGrouped.push(TreeModelBuilder.node({
-				key: topNode.id || ("group_" + gi),
+				// See the identical comment in rebuildFromFlatArray(): the group
+				// wrapper's key must never collide with a descendant's key, or
+				// BasicTreeView's flat node map turns it into its own child and
+				// hangs. Prefixed defensively even though this path only hits it
+				// if the source tree itself reuses topNode.id on a descendant.
+				key: "__group__:" + (topNode.id || ("group_" + gi)),
 				text: topNode.name || "",
 				checkable: true,
 				expanded: true,
@@ -383,7 +394,11 @@ Item {
 			__collectFlattenedFromNodes(directChildren, "", groupChildren)
 
 			flatGrouped.push(TreeModelBuilder.node({
-				key: topNode.key || ("group_" + gi),
+				// See the identical comment in rebuildFromFlatArray(): the group
+				// wrapper's key must never collide with a descendant's key, or
+				// BasicTreeView's flat node map turns it into its own child and
+				// hangs.
+				key: "__group__:" + (topNode.key || ("group_" + gi)),
 				text: topNode.text || "",
 				checkable: true,
 				expanded: true,
