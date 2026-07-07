@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6379" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Server-side assembly of the Events (Activity) notification system:
+SQL-backed collection, service, GraphQL controller and live publisher.</Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="NotificationFactory" PackageId="ImtNotifyPck" ComponentId="Notification">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="NotificationTypes" PackageId="BasePck" ComponentId="SelectionConstraints">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Notification</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Notification</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="NotificationDatabaseDelegate" PackageId="ImtNotifyDbPck" ComponentId="NotificationDbDelegate">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CreateTableScriptPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="CreateNotificationsTable.sql"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="NotificationFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="NotificationFactory"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Id"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="NotificationTypes"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TableName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Notifications"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="NotificationsCollection" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="DatabaseAccessSettings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="NotificationDatabaseDelegate"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="NotificationService" PackageId="ImtNotifyPck" ComponentId="NotificationService">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="NotificationCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="NotificationsCollection"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="NotificationFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="NotificationFactory"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Notification"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="NotificationsController" PackageId="ImtNotifyGqlPck" ComponentId="NotificationsController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="NotificationCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="NotificationsCollection"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="NotificationService" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="NotificationService"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="NotificationPublisher" PackageId="ImtNotifyGqlPck" ComponentId="NotificationPublisher">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="OnNotificationReceived"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="NotificationCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="NotificationsCollection"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="NotificationsCollection"/>
+        <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="NotificationsCollection"/>
+        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="NotificationsCollection"/>
+        <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="NotificationsCollection"/>
+        <Interface InterfaceId="imtnotify::INotificationService" ComponentId="NotificationService"/>
+        <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="NotificationPublisher"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="NotificationsCollection" ComponentId="NotificationsCollection"/>
+        <Component ExportedId="NotificationService" ComponentId="NotificationService"/>
+        <Component ExportedId="NotificationsController" ComponentId="NotificationsController"/>
+        <Component ExportedId="NotificationPublisher" ComponentId="NotificationPublisher"/>
+    </ExportedComponents>
+</Acf>

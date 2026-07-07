@@ -71,15 +71,15 @@ type ValidateTokenPayload
 }
 
 type Query {
-	GetTokenList (input: UserIdInput): PersonalAccessTokenList!
-	GetToken (input: InputId): PersonalAccessToken!
-	ValidateToken (input: ValidateTokenInput): ValidateTokenPayload!
+	GetTokenList (input: UserIdInput!): PersonalAccessTokenList!
+	GetToken (input: InputId!): PersonalAccessToken!
+	ValidateToken (input: ValidateTokenInput!): ValidateTokenPayload!
 }
 
 type Mutation {
-	CreateToken (input: CreateTokenInput): CreateTokenPayload!
-	RevokeToken (input: InputId): RevokeTokenPayload!
-	DeleteToken (input: InputId): DeleteTokenPayload!
+	CreateToken (input: CreateTokenInput!): CreateTokenPayload!
+	RevokeToken (input: InputId!): RevokeTokenPayload!
+	DeleteToken (input: InputId!): DeleteTokenPayload!
 }
 
 

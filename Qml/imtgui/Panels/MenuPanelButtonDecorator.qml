@@ -60,6 +60,44 @@ DecoratorBase {
             sourceSize.width: width;
         }
 
+        // Notification indicator: a small badge on the top-right of the icon
+        // that "glows" (pulses) while there are pending items on this page.
+        Rectangle {
+            id: badge;
+
+            property int count: leftPanelElement.baseElement && leftPanelElement.baseElement.badgeCount ? leftPanelElement.baseElement.badgeCount : 0;
+
+            anchors.right: image.right;
+            anchors.rightMargin: -width / 3;
+            anchors.top: image.top;
+            anchors.topMargin: -height / 4;
+
+            height: Style.iconSizeS;
+            width: Math.max(height, badgeText.width + Style.marginS);
+            radius: height / 2;
+
+            color: Style.negativeAccentColor;
+            visible: badge.count > 0;
+            z: image.z + 1;
+
+            Text {
+                id: badgeText;
+                anchors.centerIn: parent;
+                text: badge.count > 99 ? "99+" : badge.count;
+                color: Style.baseColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSizeXS !== undefined ? Style.fontSizeXS : Style.fontSizeS;
+                font.bold: true;
+            }
+
+            SequentialAnimation on scale {
+                running: badge.visible;
+                loops: Animation.Infinite;
+                NumberAnimation { from: 1.0; to: 1.2; duration: 700; easing.type: Easing.InOutQuad }
+                NumberAnimation { from: 1.2; to: 1.0; duration: 700; easing.type: Easing.InOutQuad }
+            }
+        }
+
         Text {
             id: description;
             anchors.top: image.bottom;

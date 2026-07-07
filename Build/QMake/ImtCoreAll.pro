@@ -108,6 +108,10 @@ SUBDIRS += imtdesksdl
 imtdesksdl.file = ../../Sdl/imtdesk/QMake/imtdesksdl.pro
 imtdesksdl.depends = imtbasesdl
 
+SUBDIRS += imtnotifysdl
+imtnotifysdl.file = ../../Sdl/imtnotify/QMake/imtnotifysdl.pro
+imtnotifysdl.depends = imtbasesdl
+
 SUBDIRS += imtpaysdl
 imtpaysdl.file = ../../Sdl/imtpay/QMake/imtpaysdl.pro
 imtpaysdl.depends = imtbasesdl
@@ -259,6 +263,10 @@ imtchat.file = ../../Include/imtchat/QMake/imtchat.pro
 SUBDIRS += imtdesk
 imtdesk.file = ../../Include/imtdesk/QMake/imtdesk.pro
 
+SUBDIRS += imtnotify
+imtnotify.file = ../../Include/imtnotify/QMake/imtnotify.pro
+imtnotify.depends = imtbase
+
 SUBDIRS += imtchatgql
 imtchatgql.file = ../../Include/imtchatgql/QMake/imtchatgql.pro
 imtchatgql.depends = imtchatsdl
@@ -267,11 +275,19 @@ SUBDIRS += imtdeskgql
 imtdeskgql.file = ../../Include/imtdeskgql/QMake/imtdeskgql.pro
 imtdeskgql.depends = imtdesksdl
 
+SUBDIRS += imtnotifygql
+imtnotifygql.file = ../../Include/imtnotifygql/QMake/imtnotifygql.pro
+imtnotifygql.depends = imtnotifysdl imtnotify imtservergql imtgql imtbase
+
 SUBDIRS += imtchatdb
 imtchatdb.file = ../../Include/imtchatdb/QMake/imtchatdb.pro
 
 SUBDIRS += imtdeskdb
 imtdeskdb.file = ../../Include/imtdeskdb/QMake/imtdeskdb.pro
+
+SUBDIRS += imtnotifydb
+imtnotifydb.file = ../../Include/imtnotifydb/QMake/imtnotifydb.pro
+imtnotifydb.depends = imtnotify imtdb imtbase
 
 # GUI libraries
 SUBDIRS += imtgui
@@ -339,6 +355,14 @@ imtdeskguiqml.depends = imtdesksdl
 SUBDIRS += imtchatguiqml
 imtchatguiqml.file = ../../Qml/imtchatgui/QMake/imtchatguiqml.pro
 imtchatguiqml.depends = imtchatsdl
+
+SUBDIRS += imtnotifyguiqml
+imtnotifyguiqml.file = ../../Qml/imtnotifygui/QMake/imtnotifyguiqml.pro
+imtnotifyguiqml.depends = imtnotifysdl
+
+SUBDIRS += imtnotifyguigqlqml
+imtnotifyguigqlqml.file = ../../Qml/imtnotifyguigql/QMake/imtnotifyguigqlqml.pro
+imtnotifyguigqlqml.depends = imtnotifysdl
 
 SUBDIRS += imtgeoguiqml
 imtgeoguiqml.file = ../../Qml/imtgeogui/QMake/imtgeoguiqml.pro
@@ -524,6 +548,10 @@ SUBDIRS += ImtDeskPck
 ImtDeskPck.file = ../../Impl/ImtDeskPck/QMake/ImtDeskPck.pro
 ImtDeskPck.depends = imtbase imtdesk
 
+SUBDIRS += ImtNotifyPck
+ImtNotifyPck.file = ../../Impl/ImtNotifyPck/QMake/ImtNotifyPck.pro
+ImtNotifyPck.depends = imtbase imtnotify
+
 SUBDIRS += ImtChatDbPck
 ImtChatDbPck.file = ../../Impl/ImtChatDbPck/QMake/ImtChatDbPck.pro
 ImtChatDbPck.depends = imtchatdb imtdb imtchat imtbase imtcol
@@ -532,6 +560,10 @@ SUBDIRS += ImtDeskDbPck
 ImtDeskDbPck.file = ../../Impl/ImtDeskDbPck/QMake/ImtDeskDbPck.pro
 ImtDeskDbPck.depends = imtdeskdb imtdb imtdesk imtbase imtcol
 
+SUBDIRS += ImtNotifyDbPck
+ImtNotifyDbPck.file = ../../Impl/ImtNotifyDbPck/QMake/ImtNotifyDbPck.pro
+ImtNotifyDbPck.depends = imtnotifydb imtdb imtnotify imtbase imtcol
+
 SUBDIRS += ImtChatGqlPck
 ImtChatGqlPck.file = ../../Impl/ImtChatGqlPck/QMake/ImtChatGqlPck.pro
 ImtChatGqlPck.depends = imtchatgql imtdb imtchat imtchatsdl imtservergql imtserverapp
@@ -539,6 +571,10 @@ ImtChatGqlPck.depends = imtchatgql imtdb imtchat imtchatsdl imtservergql imtserv
 SUBDIRS += ImtDeskGqlPck
 ImtDeskGqlPck.file = ../../Impl/ImtDeskGqlPck/QMake/ImtDeskGqlPck.pro
 ImtDeskGqlPck.depends = imtdeskgql imtdb imtdesk imtdesksdl imtservergql imtserverapp imtdoc
+
+SUBDIRS += ImtNotifyGqlPck
+ImtNotifyGqlPck.file = ../../Impl/ImtNotifyGqlPck/QMake/ImtNotifyGqlPck.pro
+ImtNotifyGqlPck.depends = imtnotifygql imtdb imtnotify imtnotifysdl imtservergql imtserverapp
 
 SUBDIRS += ImtGeoPck
 ImtGeoPck.file = ../../Impl/ImtGeoPck/QMake/ImtGeoPck.pro

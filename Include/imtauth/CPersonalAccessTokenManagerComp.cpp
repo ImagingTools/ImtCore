@@ -218,7 +218,7 @@ bool CPersonalAccessTokenManagerComp::RevokeToken(const QByteArray& tokenId)
 	}
 
 	IPersonalAccessToken* tokenPtr = dynamic_cast<IPersonalAccessToken*>(dataPtr.GetPtr());
-	if (!tokenPtr->IsValid()){
+	if (tokenPtr == nullptr){
 		SendErrorMessage(0, "Invalid token object", "CPersonalAccessTokenManagerComp");
 		return false;
 	}

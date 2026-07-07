@@ -6,6 +6,8 @@ import imtguigql 1.0
 import imtcontrols 1.0
 import imtauthgui 1.0
 import imtauthUsersSdl 1.0
+import imtnotifygui 1.0
+import imtnotifyguigql 1.0
 
 
 Item {
@@ -260,6 +262,10 @@ Item {
 		id: subscriptionManager_;
 		active: application.useWebSocketSubscription;
 	}
+
+	// Concrete GQL transport for the Events (Activity) feature. Injected into
+	// the transport-agnostic ActivityController; owns all notification GQL.
+	property GqlNotificationApiClient notificationApiClient: GqlNotificationApiClient {}
 
 	// Global ticket notification subscriptions — always active regardless of
 	// which page is currently selected in MenuPanel.  Previously these lived
@@ -607,6 +613,12 @@ Item {
 			// a valid auth token for the logged-in user.
 			ticketMessageSubscription.registerSubscription();
 			ticketAssigneeSubscription.registerSubscription();
+
+			// Inject the concrete transport, then start the generic Events
+			// (Activity) controller: subscribes to the live notification feed,
+			// loads the unread count and drives the menu indicator + popup.
+			ActivityController.apiClient = notificationApiClient;
+			ActivityController.start();
 		}
 
 		function onTenantSelected(tenantId){
@@ -618,6 +630,9 @@ Item {
 			// SubscriptionManager.clear() wipes the model.
 			ticketMessageSubscription.unRegisterSubscription();
 			ticketAssigneeSubscription.unRegisterSubscription();
+
+			// Stop the Events (Activity) controller and clear its indicator.
+			ActivityController.stop();
 
 			thumbnailDecorator.stopLoading();
 			application.firstModelsInit(true);

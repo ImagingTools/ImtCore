@@ -17,6 +17,10 @@ ControlBase {
     property bool selected: false;
     property bool highlighted: ma.containsMouse && container.enabled;
 
+    // Number of pending items shown as a notification badge on the icon
+    // (0 = no badge). Driven by the "UpdatePageBadge" application event.
+    property int badgeCount: 0;
+
     property real imageDecrease: 0.63;
     property real imageSelectedCoeff: 0.73;
 	property real fontSize: Style.fontSizeS;

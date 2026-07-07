@@ -1,0 +1,8 @@
+module imtnotifygui
+
+singleton ActivityController 1.0 ActivityController.qml
+NotificationApiClient 1.0 NotificationApiClient.qml
+ActivityPage 1.0 ActivityPage.qml
+NotificationDelegate 1.0 NotificationDelegate.qml
+NotificationFilterBar 1.0 NotificationFilterBar.qml
+NotificationPopup 1.0 NotificationPopup.qml

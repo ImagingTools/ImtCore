@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/qml">
+	    <file alias="imtnotifygui/qmldir">qmldir</file>
+		<file alias="imtnotifygui/ActivityController.qml">ActivityController.qml</file>
+		<file alias="imtnotifygui/NotificationApiClient.qml">NotificationApiClient.qml</file>
+		<file alias="imtnotifygui/ActivityPage.qml">ActivityPage.qml</file>
+		<file alias="imtnotifygui/NotificationDelegate.qml">NotificationDelegate.qml</file>
+		<file alias="imtnotifygui/NotificationFilterBar.qml">NotificationFilterBar.qml</file>
+		<file alias="imtnotifygui/NotificationPopup.qml">NotificationPopup.qml</file>
+    </qresource>
+</RCC>
