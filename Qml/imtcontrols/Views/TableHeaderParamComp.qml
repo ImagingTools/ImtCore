@@ -126,6 +126,10 @@ Dialog {
 
 					ToolButton {
 						id: upButton;
+						// These 4 ToolButtons are icon-only (text: ""), so Button.qml's default
+						// objectName ("" + "Button") would make them indistinguishable from each
+						// other - name them explicitly for GUI test/automation addressability.
+						objectName: "MoveColumnUpButton";
 						enabled: false;
 						width: buttonRow.height;
 						height: width;
@@ -153,6 +157,7 @@ Dialog {
 
 					ToolButton {
 						id: downButton;
+						objectName: "MoveColumnDownButton";
 						enabled: false;
 						width: buttonRow.height;
 						height: width;
@@ -180,6 +185,7 @@ Dialog {
 
 					ToolButton {
 						id: resetButton;
+						objectName: "ResetColumnsButton";
 						enabled: true;
 						width: buttonRow.height;
 						height: width;
@@ -195,6 +201,7 @@ Dialog {
 
 				ToolButton {
 					id: fitToWidthButton;
+					objectName: "FitToWidthButton";
 
 					anchors.verticalCenter: buttonRow.verticalCenter;
 					anchors.right: buttonRow.visible ? parent.right : undefined;
