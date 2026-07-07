@@ -28,8 +28,8 @@ public:
 		I_ASSIGN(m_gqlRequestProviderCompPtr, "GqlRequestProvider", "GraphQL request provider", false, "GqlRequestProvider");
 		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product ID", false, "");
 		I_ASSIGN(m_roleInfoFactCompPtr, "RoleFactory", "Factory used for creation of the new role instance", true, "RoleFactory");
-		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", true, "DelegatedAccessResolver");
-		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager", true, "TenantMembershipManager");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
+		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
 	I_END_COMPONENT;
 
 protected:
