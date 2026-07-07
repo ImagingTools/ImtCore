@@ -92,14 +92,15 @@ class Canvas extends Item {
                 let path = JQApplication.rootPath+'/'+args[0].replaceAll('../','')
                 if(this.__cache[path]){
                     args[0] = this.__cache[path]
-                    originCreatePattern.call(ctx, ...args)
+                    return originCreatePattern.call(ctx, ...args)
                 } else {
                     let img = new Image();
                     img.onload = ()=>{
                         args[0] = img
-                        originCreatePattern.call(ctx, ...args)
                         this.__cache[path] = img
                         this.requestPaint()
+
+                        return originCreatePattern.call(ctx, ...args)
                     }
                     img.onerror = ()=>{
                         img.remove()
@@ -109,7 +110,7 @@ class Canvas extends Item {
                 }
                 
             } else {
-                originCreatePattern.call(ctx, ...args)
+                return originCreatePattern.call(ctx, ...args)
             }
             
         }
