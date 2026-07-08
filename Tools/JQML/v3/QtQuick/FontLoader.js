@@ -18,6 +18,34 @@ class FontLoader extends QtObject {
         sourceChanged: { type:Signal, args:[] },
         statusChanged: { type:Signal, args:[] },
     })
+
+     SLOT_sourceChanged(oldValue, newValue){
+        if(this.__font) document.fonts.delete(this.__font)
+
+        let url
+
+        if(newValue.startsWith('data:') || newValue.startsWith('http:') || newValue.startsWith('https://')){
+            url = newValue
+        } else {
+            url = JQApplication.rootPath + newValue.replaceAll('qrc:/','').replaceAll('../','')
+        }
+
+        let name = newValue.split('/').pop().split('.')[0]
+
+        this.__font = new FontFace(name, `url('${url.replace(/(?<!:)\/{2,}/g, '/')}')`)
+        this.__font.load().then(()=>{
+            document.fonts.add(this.__font)
+            this.name = name
+        },
+        (error)=>{
+            console.log(error)
+        })
+    }
+    
+    __destroy(){
+        document.fonts.delete(this.__font)
+        super.__destroy()
+    }
 }
 
 
