@@ -8,8 +8,8 @@
 		"SurfaceVariant": "#49454F",
 		"OnSurface": "#E6E0E9",
 		"OnSurfaceVariant": "#CAC4D0",
-		"Primary": "#A4C8E8",
-		"OnPrimary": "#0D3A5E",
+		"Primary": "#7060AA",
+		"OnPrimary": "#D4E4F6",
 		"PrimaryContainer": "#2A5A88",
 		"OnPrimaryContainer": "#D4E4F6",
 		"Secondary": "#B8C8D8",
@@ -234,5 +234,4 @@
 		}
 	}
 }
-
 
