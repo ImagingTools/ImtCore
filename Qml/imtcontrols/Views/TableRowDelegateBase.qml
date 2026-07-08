@@ -362,10 +362,15 @@ Rectangle {
 	
 	Component{
 		id: checkBox;
-		
+
 		CheckBox {
+			// Test instrumentation: distinguishes this row-level check toggle from the row's own
+			// "MouseArea" (both live under the same "TableRow_<index>" container) so GUI tests can
+			// address it unambiguously via [objectName="TableRow_i"] [objectName="RowCheckBox"]
+			// [objectName="MouseArea"]. Inert - no runtime/visual effect.
+			objectName: "RowCheckBox";
 			z: 1000;
-			
+
 			anchors.verticalCenter: parent.verticalCenter;
 			anchors.left: parent.left;
 			anchors.leftMargin: Style.marginM;

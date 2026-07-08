@@ -33,7 +33,7 @@ public:
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager", false, "TenantManager");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
 		I_ASSIGN(m_crossOrgGrantCompPtr, "CrossOrgGrantManager", "Cross-org grant manager for delegated access", false, "CrossOrgGrantManager");
-		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", true, "DelegatedAccessResolver");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
 		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for tenant-scoped adaptation of user roles/groups/permissions", false, "TenantEntityBindingManager");
 		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider (used for delegated role product validation)", false, "RoleInfoProvider");
 	I_END_COMPONENT;

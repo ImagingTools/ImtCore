@@ -7,6 +7,12 @@ import imtcontrols 1.0
 Item {
 	id: delegateContainer;
 
+	// Test instrumentation: makes a cell addressable by its column/header id, e.g. for masking
+	// non-deterministic columns (Added/Last Modified timestamps) in screenshot tests
+	// (Tests/ProLifeGui). Inert - objectName has no runtime/visual effect. Mirrors the existing
+	// TableRowDelegateBase "TableRow_<index>" and TableHeaderDelegate "<headerId>" instrumentation.
+	objectName: delegateContainer.cellHeaderId;
+
 	property TableRowDelegateBase rowDelegate: null;
 	property var table: rowDelegate && rowDelegate.tableItem ? rowDelegate.tableItem : null
 
