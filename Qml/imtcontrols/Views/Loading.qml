@@ -3,6 +3,13 @@ import Acf 1.0
 
 Rectangle {
 	id: root;
+	// Test instrumentation: same objectName as BusyIndicator.qml (a separate, parallel spinner
+	// component) so GUI tests can wait for "whichever busy indicator is currently showing" without
+	// needing to know which of the two a given view uses. Its rotation animation (a Timer mutating
+	// `rotation` every 10ms) never touches objectName/visible/childList, so a MutationObserver-based
+	// "DOM went quiet" wait can resolve while it's still visibly spinning. Inert - no runtime/visual
+	// effect.
+	objectName: "BusyIndicator";
 
 	property int indicatorSize: 50;
 	property alias background: backgroundRec;
