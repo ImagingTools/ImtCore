@@ -23,6 +23,7 @@ ParamEditorBase {
 
 	function addNewToken(name, description, scopes, expiresAt){
 		createTokenInput.m_userId = AuthorizationController.getUserId()
+		createTokenInput.m_productId = AuthorizationController.productId
 		createTokenInput.m_name = name
 		createTokenInput.m_description = description
 		createTokenInput.m_scopes = scopes

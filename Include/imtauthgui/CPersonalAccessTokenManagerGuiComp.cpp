@@ -2,8 +2,8 @@
 
 
 // Qt includes
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
+#include <QtWidgets/QMessageBox>
 #include <QtCore/QDateTime>
 
 // ImtCore includes
@@ -266,20 +266,14 @@ void CPersonalAccessTokenManagerGuiComp::OnCreateTokenClicked()
 		return;
 	}
 	
-	// Get product ID the token is scoped to (optional, enables cross-product tokens)
-	QString productIdText = QInputDialog::getText(GetWidget(), "Create Token",
-		"Product ID (leave empty for no specific product):", QLineEdit::Normal, "", &ok);
-	
-	if (!ok) {
-		return;
-	}
-	
-	QByteArray productId = productIdText.toUtf8();
-	
 	// For now, create token with no scopes and no expiration
 	// In a real implementation, you would have a dialog for selecting scopes and expiration
 	QByteArrayList scopes;
 	QDateTime expiresAt; // Invalid QDateTime means no expiration
+	QByteArray productId;
+	if (m_productIdAttrPtr.IsValid()) {
+		productId = *m_productIdAttrPtr;
+	}
 	
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result =
 		managerPtr->CreateToken(m_currentUserId, productId, name, description, scopes, expiresAt);
@@ -368,5 +362,4 @@ void CPersonalAccessTokenManagerGuiComp::OnRefreshClicked()
 
 
 } // namespace imtauthgui
-
 
