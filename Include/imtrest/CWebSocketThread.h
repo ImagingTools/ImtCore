@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QThread>
 #include <QtCore/QMutex>
+#include <QtCore/QStringList>
 
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
@@ -31,9 +32,18 @@ public:
 
 public Q_SLOTS:
 	void OnWebSocketTextMessage(const QString& textMessage);
+	void OnBinaryMessage(const QByteArray& dataMessage);
+	void OnDisconnected();
+	void OnError(QAbstractSocket::SocketError error);
 
 private:
+	void HandleDisconnect();
+
 	CWebSocketThread* m_parent;
+	QStringList m_pendingMessages;
+	bool m_isProcessing;
+	bool m_isDisconnectPending;
+	bool m_isDisconnected;
 };
 
 
@@ -55,6 +65,7 @@ public:
 	void SetSocketStatus(Status socketStatus);
 	Status GetSocketStatus();
 	QByteArray GetRequestId();
+	void NotifySocketDisconnected();
 	// imtrest::IRequestServlet* GetRequestServlet();
 
 	[[nodiscard]] bool IsSecureConnection() const;
@@ -67,7 +78,6 @@ public Q_SLOTS:
 	void OnWebSocketTextMessage(const QString& textMessage);
 
 private Q_SLOTS:
-	void OnSocketDisconnected();
 	void OnWebSocketBinaryMessage(const QByteArray& dataMessage);
 	void OnError(QAbstractSocket::SocketError error);
 	void OnTimeout();
@@ -78,14 +88,18 @@ Q_SIGNALS:
 	void SendTextMessage(const QByteArray& data) const;
 
 private:
+	friend class CWebSocket;
+
 	QPointer<QWebSocket> GetValidWebSocket() const;
 
 	CWebSocketServerComp* m_server;
 	imtrest::IProtocolEngine* m_enginePtr;
 	mutable QMutex m_socketDescriptorMutex;
 	mutable QMutex m_statusMutex;
+	mutable QMutex m_socketMutex;
 	Status m_status;
 	QPointer<QWebSocket> m_socket;
+	QPointer<CWebSocket> m_handlerPtr;
 	bool m_isSecureConnection;
 
 	imtrest::IProtocolEngine* m_httpEnginePtr;

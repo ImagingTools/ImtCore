@@ -139,8 +139,8 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	}
 
 	// Capture all data from the request immediately - the CWebSocketRequest is parented
-	// to QWebSocket via setParent(m_socket) in CWebSocketThread, so it can be
-	// cascade-destroyed if the socket disconnects during processing.
+	// to the in-thread handler object in CWebSocketThread and is deleted in its
+	// disconnect handling, so no data must be accessed after a potential disconnect.
 	// The wire-level subscription-ID is the client chosen graphql-ws "id" (query-ID); it is used
 	// in the payloads sent back to the client. The server generated request-ID (UUID) is used
 	// for dispatching (sender registration), see CGqlPublisherCompBase::PushDataToSubscriber.

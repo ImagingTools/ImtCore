@@ -57,6 +57,9 @@ void CWebSocketServerComp::RegisterSender(const QByteArray& clientId, QWebSocket
 	QWriteLocker locker(&m_sendersLock);
 
 	QSharedPointer<CWebSocketSender> socketSender(new CWebSocketSender(webSocketPtr));
+	// The sender may be created from a connection thread; move it to the main thread
+	// so its destruction (from the main-thread senders map) is thread-consistent.
+	// Sending itself is dispatched to the socket's thread inside CWebSocketSender.
 	QThread* mainThread = QCoreApplication::instance()->thread();
 	if (mainThread == nullptr){
 		Q_ASSERT(false);
@@ -69,6 +72,16 @@ void CWebSocketServerComp::RegisterSender(const QByteArray& clientId, QWebSocket
 
 void CWebSocketServerComp::SetConnectionStatus(const QByteArray& clientId)
 {
+	// This method can be called from a connection thread; the model change
+	// notification must be emitted from the component's thread:
+	if (QThread::currentThread() != thread()){
+		QMetaObject::invokeMethod(
+					this,
+					[this, clientId](){ SetConnectionStatus(clientId); },
+					Qt::QueuedConnection);
+		return;
+	}
+
 	imtcom::IConnectionStatusProvider::ConnectionStatus loginStatus = imtcom::IConnectionStatusProvider::CS_CONNECTED;
 
 	istd::IChangeable::ChangeSet loginChangeSet(loginStatus, QString("Login"));
@@ -415,13 +428,26 @@ void CWebSocketServerComp::OnTimeout()
 			subProtocolId = webSocketPtr->subprotocol();
 		#endif
 
+			QString keepAliveMessage;
 			if (subProtocolId == "graphql-transport-ws"){
 				//optional ToDo: Remember send ping and disconnect websocket if no pong is received
-				webSocketPtr->sendTextMessage(QString(R"({"type": "ping"})"));
+				keepAliveMessage = QString(R"({"type": "ping"})");
 			}
 			else{
-				webSocketPtr->sendTextMessage(QString(R"({"type": "ka"})"));
+				keepAliveMessage = QString(R"({"type": "ka"})");
 			}
+
+			// The socket lives in its connection thread; dispatch the send call there:
+			QPointer<QWebSocket> socketGuard(webSocketPtr);
+			QMetaObject::invokeMethod(
+						webSocketPtr,
+						[socketGuard, keepAliveMessage]()
+						{
+							if (!socketGuard.isNull() && socketGuard->isValid()){
+								socketGuard->sendTextMessage(keepAliveMessage);
+							}
+						},
+						Qt::QueuedConnection);
 
 			sendedSockets.append(webSocketPtr);
 		}

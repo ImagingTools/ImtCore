@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QMutableListIterator>
+#include <QtCore/QCoreApplication>
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
@@ -21,12 +22,86 @@ CWebSocket::CWebSocket(CWebSocketThread *parent)
 	Q_ASSERT(parent);
 
 	m_parent = parent;
+	m_isProcessing = false;
+	m_isDisconnectPending = false;
+	m_isDisconnected = false;
 }
 
 
 void CWebSocket::OnWebSocketTextMessage(const QString& textMessage)
 {
+	// Ignore messages delivered after the disconnect handling:
+	if (m_isDisconnected){
+		return;
+	}
+
+	// Serialize the message processing: if the processing pumps a nested event loop
+	// (e.g. a remote authorization validation waiting for a reply), the next queued
+	// message of this socket could be delivered re-entrantly; defer it instead.
+	if (m_isProcessing){
+		m_pendingMessages.append(textMessage);
+		return;
+	}
+
+	m_isProcessing = true;
+
 	m_parent->OnWebSocketTextMessage(textMessage);
+
+	while (!m_pendingMessages.isEmpty() && !m_isDisconnectPending){
+		QString pendingMessage = m_pendingMessages.takeFirst();
+		m_parent->OnWebSocketTextMessage(pendingMessage);
+	}
+
+	m_isProcessing = false;
+
+	if (m_isDisconnectPending){
+		m_isDisconnectPending = false;
+		HandleDisconnect();
+	}
+}
+
+
+void CWebSocket::OnBinaryMessage(const QByteArray& dataMessage)
+{
+	m_parent->OnWebSocketBinaryMessage(dataMessage);
+}
+
+
+void CWebSocket::OnDisconnected()
+{
+	// If the disconnect is delivered from a nested event loop while a message is
+	// being processed, defer the cleanup until the processing has finished, so that
+	// no network request is deleted while it is still in use.
+	if (m_isProcessing){
+		m_isDisconnectPending = true;
+		return;
+	}
+
+	HandleDisconnect();
+}
+
+
+void CWebSocket::OnError(QAbstractSocket::SocketError error)
+{
+	m_parent->OnError(error);
+}
+
+
+// private methods
+
+void CWebSocket::HandleDisconnect()
+{
+	m_isDisconnected = true;
+
+	// Explicitly clean up subscription requests parented to this handler.
+	// Their destructors call OnRequestDestroyed on publishers, cleanly
+	// unregistering subscriptions before the QWebSocket is destroyed.
+	QList<CWebSocketRequest*> requests = findChildren<CWebSocketRequest*>(QString(), Qt::FindDirectChildrenOnly);
+	qDeleteAll(requests);
+
+	m_pendingMessages.clear();
+
+	m_parent->NotifySocketDisconnected();
 }
 
 
@@ -44,28 +119,47 @@ CWebSocketThread::CWebSocketThread(CWebSocketServerComp* parent)
 	m_requestServerHandlerPtr = m_server->GetRequestServerServlet();
 	m_requestClientHandlerPtr = m_server->GetRequestClientServlet();
 	m_productId = m_server->GetProductId();
-	connect(this, &CWebSocketThread::SendTextMessage, this, &CWebSocketThread::OnSendTextMessage);
+	// Direct connection: the signal is only emitted from the connection thread,
+	// where the socket lives; the slot must run there as well.
+	connect(this, &CWebSocketThread::SendTextMessage, this, &CWebSocketThread::OnSendTextMessage, Qt::DirectConnection);
 }
 
 
 void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 {
-	m_socket = webSocketPtr;
+	{
+		QMutexLocker lock(&m_socketMutex);
+		m_socket = webSocketPtr;
+	}
+
+	// Delete the handler of a previous connection; it was moved back to the main
+	// thread in NotifySocketDisconnected, so deleteLater is processed there:
+	if (!m_handlerPtr.isNull()){
+		m_handlerPtr->deleteLater();
+		m_handlerPtr = nullptr;
+	}
 
 	if (webSocketPtr != nullptr){
-		// All connects are done here in the main thread before the thread is started,
-		// so that no signal emitted during connection setup can be missed.
+		// The socket and a handler object are moved into this thread, so that the
+		// complete message processing (including a possibly blocking authorization
+		// validation pumping a nested event loop) runs in the connection thread and
+		// cannot stall or re-enter the main event loop.
 		// textMessageReceived is connected with Qt::QueuedConnection: the signal is
-		// emitted while QWebSocket is still decoding the incoming frame, and processing
-		// a message directly from this context can re-enter the socket via a nested
-		// event loop (e.g. during authorization) and destroy objects the frame decoder
-		// still uses. Qt copies the QString into the queued event, so this is safe.
-		connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CWebSocketThread::OnWebSocketTextMessage, Qt::QueuedConnection);
-		connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage);
-		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected);
+		// emitted while QWebSocket is still decoding the incoming frame; processing
+		// the message directly from that context could destroy objects the frame
+		// decoder still uses. Qt copies the QString into the queued event.
+		m_handlerPtr = new CWebSocket(this);
+
+		connect(webSocketPtr, &QWebSocket::textMessageReceived, m_handlerPtr.data(), &CWebSocket::OnWebSocketTextMessage, Qt::QueuedConnection);
+		connect(webSocketPtr, &QWebSocket::binaryMessageReceived, m_handlerPtr.data(), &CWebSocket::OnBinaryMessage);
+		connect(webSocketPtr, &QWebSocket::disconnected, m_handlerPtr.data(), &CWebSocket::OnDisconnected);
 #if (QT_VERSION >= 0x060500)
-		connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError);
+		connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), m_handlerPtr.data(), &CWebSocket::OnError);
 #endif
+
+		webSocketPtr->setParent(nullptr);
+		webSocketPtr->moveToThread(this);
+		m_handlerPtr->moveToThread(this);
 	}
 
 	start();
@@ -74,6 +168,8 @@ void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 
 const QWebSocket* CWebSocketThread::GetWebSocket() const
 {
+	QMutexLocker lock(&m_socketMutex);
+
 	return m_socket;
 }
 
@@ -117,8 +213,8 @@ void CWebSocketThread::run()
 		return;
 	}
 
-	// The socket signal connections are established in SetWebSocket (main thread)
-	// before the thread is started.
+	// The socket and the handler object were moved into this thread in SetWebSocket;
+	// the event loop below delivers their signals in this thread.
 
 	exec();
 }
@@ -152,12 +248,11 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 		imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
 		if (methodType == CWebSocketRequest::MT_START || methodType == CWebSocketRequest::MT_SUBSCRIBE){
 			newRequestPtr.PopPtr();
-			// Parent to CWebSocketThread instead of QWebSocket to avoid cascade-deletion.
-			// When auth validation (ValidateJwt, ValidateToken) triggers Qt event processing,
-			// pending deleteLater() for old QWebSockets fires, cascade-deleting children.
-			// By parenting to the thread, CWebSocketRequests survive socket destruction.
-			// Cleanup happens explicitly in OnSocketDisconnected.
-			webSocketRequest->setParent(this);
+			// Parent to the in-thread handler object instead of the QWebSocket to avoid
+			// cascade-deletion while the request is still processed. The handler lives in
+			// the connection thread (same thread as this code) and deletes the requests
+			// explicitly in its disconnect handling, which notifies the publishers.
+			webSocketRequest->setParent(m_handlerPtr.data());
 			if (m_server != nullptr && !webSocketPtr.isNull()){
 				m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr.data());
 			}
@@ -231,15 +326,27 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 
 // private slots
 
-void CWebSocketThread::OnSocketDisconnected()
+void CWebSocketThread::NotifySocketDisconnected()
 {
-	// Explicitly clean up subscription requests parented to this thread.
-	// Their destructors call OnRequestDestroyed on publishers, cleanly
-	// unregistering subscriptions before the QWebSocket is destroyed.
-	QList<CWebSocketRequest*> requests = findChildren<CWebSocketRequest*>(QString(), Qt::FindDirectChildrenOnly);
-	qDeleteAll(requests);
+	QPointer<QWebSocket> webSocketPtr;
 
-	m_socket = nullptr;
+	{
+		QMutexLocker lock(&m_socketMutex);
+		webSocketPtr = m_socket;
+		m_socket = nullptr;
+	}
+
+	// Push the socket and the handler back to the main thread, so that pending
+	// deleteLater events (posted by CWebSocketServerComp::OnSocketDisconnected)
+	// can still be processed after this thread's event loop has finished:
+	QThread* mainThreadPtr = QCoreApplication::instance()->thread();
+	if (!webSocketPtr.isNull()){
+		webSocketPtr->moveToThread(mainThreadPtr);
+	}
+	if (!m_handlerPtr.isNull()){
+		m_handlerPtr->moveToThread(mainThreadPtr);
+	}
+
 	exit();
 }
 
@@ -262,8 +369,8 @@ void CWebSocketThread::OnError(QAbstractSocket::SocketError error)
 		return;
 	}
 
-	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
-	if (webSocketPtr != nullptr && m_server != nullptr){
+	QPointer<QWebSocket> webSocketPtr = GetValidWebSocket();
+	if (!webSocketPtr.isNull() && m_server != nullptr){
 		QString errorMessage = QString("Web socket server error: '%1'").arg(webSocketPtr->errorString());
 
 		m_server->SendErrorMessage(0, errorMessage, "CWebSocketServerComp");
@@ -283,7 +390,13 @@ void CWebSocketThread::OnTimeout()
 
 QPointer<QWebSocket> CWebSocketThread::GetValidWebSocket() const
 {
-	QPointer<QWebSocket> webSocketPtr = m_socket;
+	QPointer<QWebSocket> webSocketPtr;
+
+	{
+		QMutexLocker lock(&m_socketMutex);
+		webSocketPtr = m_socket;
+	}
+
 	if (webSocketPtr.isNull() || !webSocketPtr->isValid()){
 		return {};
 	}
@@ -324,8 +437,9 @@ void CWebSocketThread::OnSslErrors(const QList<QSslError> &errors)
 
 void CWebSocketThread::OnSendTextMessage(const QByteArray& data) const
 {
-	if (!m_socket.isNull()){
-		m_socket->sendTextMessage(data);
+	QPointer<QWebSocket> webSocketPtr = GetValidWebSocket();
+	if (!webSocketPtr.isNull()){
+		webSocketPtr->sendTextMessage(data);
 	}
 }
 

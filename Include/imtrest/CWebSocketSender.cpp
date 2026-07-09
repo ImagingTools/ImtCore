@@ -18,7 +18,23 @@ namespace imtrest
 
 CWebSocketSender::CWebSocketSender(QWebSocket* webSocketPtr): m_webSocketPtr(webSocketPtr)
 {
-	QObject::connect(this, &CWebSocketSender::SendTextMessage, this, &CWebSocketSender::OnSendTextMessage, Qt::ConnectionType::QueuedConnection);
+	if (webSocketPtr != nullptr){
+		// The socket is used as receiver context: the queued delivery executes
+		// sendTextMessage in the thread the socket currently lives in, which is
+		// required because QWebSocket is not thread-safe.
+		QPointer<QWebSocket> socketGuard(webSocketPtr);
+		QObject::connect(
+					this,
+					&CWebSocketSender::SendTextMessage,
+					webSocketPtr,
+					[socketGuard](const QByteArray& data)
+					{
+						if (!socketGuard.isNull() && socketGuard->isValid()){
+							socketGuard->sendTextMessage(data);
+						}
+					},
+					Qt::ConnectionType::QueuedConnection);
+	}
 }
 
 
