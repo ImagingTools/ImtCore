@@ -44,6 +44,11 @@ public:
 	virtual void OnRequestDestroyed(imtrest::IRequest* request) override;
 
 protected:
+	bool UnregisterSubscription(const QByteArray& subscriptionId, const imtrest::IRequest& networkRequest);
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentDestroyed() override;
+
 	virtual bool PushDataToSubscriber(const QByteArray& subscriptionId, const QByteArray& commandId, const QByteArray& data, const imtrest::IRequest& networkRequest, const bool useAwsStyle = true) const;
 	virtual bool PublishData(const QByteArray& commandId, const QByteArray& data) const;
 	virtual bool PublishDataFiltered(

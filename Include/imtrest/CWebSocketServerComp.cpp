@@ -145,6 +145,11 @@ void CWebSocketServerComp::OnModelChanged(int /*modelId*/, const istd::IChangeab
 		while (m_webSocketThreadList.count() > 0){
 			imtrest::CWebSocketThread* webSocketThread = m_webSocketThreadList.back();
 			webSocketThread->disconnect();
+			if (webSocketThread->isRunning()){
+				webSocketThread->quit();
+				webSocketThread->wait();
+			}
+			webSocketThread->deleteLater();
 			m_webSocketThreadList.pop_back();
 		}
 		StopServer();
@@ -213,7 +218,9 @@ bool CWebSocketServerComp::StartServer()
 
 bool CWebSocketServerComp::StopServer()
 {
-	m_webSocketServerPtr->close();
+	if (m_webSocketServerPtr.IsValid()){
+		m_webSocketServerPtr->close();
+	}
 
 	return true;
 }
@@ -221,7 +228,7 @@ bool CWebSocketServerComp::StopServer()
 
 IServer::ServerStatus CWebSocketServerComp::GetServerStatus() const
 {
-	if (m_webSocketServerPtr->isListening()){
+	if (m_webSocketServerPtr.IsValid() && m_webSocketServerPtr->isListening()){
 		return SS_LISTENING;
 	}
 
@@ -333,6 +340,10 @@ void CWebSocketServerComp::HandleNewConnections()
 			SendVerboseMessage("Unsupported subprotocol: " + subprotocol, "CWebSocketServerComp");
 		}
 #endif
+		// Connect the disconnected signal before the socket is handed over to a thread,
+		// so that no early disconnect can be missed:
+		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
+
 		bool find = false;
 		for (CWebSocketThread* webSocketThreadPtr: m_webSocketThreadList){
 			if (!webSocketThreadPtr->isRunning()){
@@ -348,7 +359,6 @@ void CWebSocketServerComp::HandleNewConnections()
 			m_webSocketThreadList.append(webSocketThreadPtr);
 			webSocketThreadPtr->SetWebSocket(webSocketPtr);
 		}
-		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
 	}
 }
 
@@ -362,15 +372,31 @@ void CWebSocketServerComp::OnSocketDisconnected()
 		m_subscriberEngineCompPtr->UnRegisterSubscriber(socketObjectPtr);
 	}
 
-	for (const QByteArray& key: m_senders.keys()){
-		if (socketObjectPtr == m_senders[key]->GetSocket().data()){
-			m_senders.remove(key);
+	// Remove the senders of the disconnected socket under the write lock
+	// (SendResponse/SendRequest read the map concurrently from worker threads).
+	// The logout notifications are emitted outside the lock to avoid deadlocks
+	// with observers that call back into this component.
+	QList<QByteArray> removedKeys;
 
-			istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));
-			loginChangeSet.SetChangeInfo("ClientId", key);
-			istd::CChangeNotifier notifier(this, &loginChangeSet);
-			m_senderLoginStatusMap.remove(key);
+	{
+		QWriteLocker locker(&m_sendersLock);
+
+		for (auto it = m_senders.begin(); it != m_senders.end();){
+			if (socketObjectPtr == it.value()->GetSocket().data()){
+				removedKeys.append(it.key());
+				m_senderLoginStatusMap.remove(it.key());
+				it = m_senders.erase(it);
+			}
+			else{
+				++it;
+			}
 		}
+	}
+
+	for (const QByteArray& key: removedKeys){
+		istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));
+		loginChangeSet.SetChangeInfo("ClientId", key);
+		istd::CChangeNotifier notifier(this, &loginChangeSet);
 	}
 
 	socketObjectPtr->deleteLater();

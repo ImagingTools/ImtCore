@@ -342,7 +342,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 	}
 	else if (methodType == imtrest::CWebSocketRequest::MT_QUERY_DATA){
 		QWriteLocker writeLock(&m_queryDataMapLock);
-		m_queryDataMap.insert(webSocketRequest->GetRequestId(), webSocketRequest->GetBody());
+		m_queryDataMap.insert(webSocketRequest->GetQueryId(), webSocketRequest->GetBody());
 		writeLock.unlock();
 
 		emit EmitQueryDataReceived(1);
@@ -370,7 +370,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 				for (QString& key: headers.keys()){
 					newHttpRequestPtr->SetHeader(key.toUtf8().toLower(), headers.value(key).toString().toUtf8());
 				}
-				newHttpRequestPtr->SetHeader("id", webSocketRequest->GetRequestId());
+				newHttpRequestPtr->SetHeader("id", webSocketRequest->GetQueryId());
 				newHttpRequestPtr->SetBody(body);
 				newHttpRequestPtr->SetMethodType(imtrest::CHttpRequest::MT_POST);
 				newHttpRequestPtr->SetCommandId("/" + *m_productId + "/graphql");

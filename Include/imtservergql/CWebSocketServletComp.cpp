@@ -141,7 +141,10 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	// Capture all data from the request immediately - the CWebSocketRequest is parented
 	// to QWebSocket via setParent(m_socket) in CWebSocketThread, so it can be
 	// cascade-destroyed if the socket disconnects during processing.
-	const QByteArray subscriptionId = webSocketRequest->GetRequestId();
+	// The wire-level subscription-ID is the client chosen graphql-ws "id" (query-ID); it is used
+	// in the payloads sent back to the client. The server generated request-ID (UUID) is used
+	// for dispatching (sender registration), see CGqlPublisherCompBase::PushDataToSubscriber.
+	const QByteArray subscriptionId = webSocketRequest->GetQueryId();
 	QByteArray body = request.GetBody();
 	const QJsonDocument document = QJsonDocument::fromJson(body);
 	if (document.isNull() || !document.isObject()) {
@@ -268,7 +271,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 	for (int index = 0; index < m_gqlSubscriberControllersCompPtr.GetCount(); index++){
 		imtgql::IGqlSubscriberController* controllerPtr = m_gqlSubscriberControllersCompPtr[index];
 		if (controllerPtr != nullptr){
-			QByteArray subscriptionId = webSocketRequest->GetRequestId();
+			QByteArray subscriptionId = webSocketRequest->GetQueryId();
 			if (controllerPtr->UnregisterSubscription(subscriptionId)){
 				QByteArray data = QString(R"({"type": "complete","id": "%1"})").arg(QString(subscriptionId)).toUtf8();
 				return CreateDataResponse(data, request);

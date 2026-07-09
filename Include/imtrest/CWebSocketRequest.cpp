@@ -159,7 +159,10 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 		m_type = MT_KEEP_ALIVE_ACK;
 	}
 
-	m_queryId = m_requestId = object.value("id").toString().toUtf8();
+	// Keep the server generated UUID in m_requestId: the message "id" is chosen by the client
+	// and is only unique per connection (graphql-ws), so using it as the request-ID caused
+	// cross-client collisions in the sender map and in the subscription registry.
+	m_queryId = object.value("id").toString().toUtf8();
 	m_clientId = object.value("clientid").toString().toUtf8();
 }
 
@@ -185,7 +188,7 @@ void CWebSocketRequest::SetMethodType(MethodType methodType)
 
 QByteArray CWebSocketRequest::GetQueryId() const
 {
-	return m_requestId;
+	return m_queryId;
 }
 
 
@@ -193,7 +196,15 @@ void CWebSocketRequest::RegisterRequestEventHandler(IRequestEventHandler* reques
 {
 	Q_ASSERT(requestEventHandler != nullptr);
 
-	m_requestEventHandlers.append(requestEventHandler);
+	if (requestEventHandler != nullptr && !m_requestEventHandlers.contains(requestEventHandler)){
+		m_requestEventHandlers.append(requestEventHandler);
+	}
+}
+
+
+void CWebSocketRequest::UnregisterRequestEventHandler(IRequestEventHandler* requestEventHandler)
+{
+	m_requestEventHandlers.removeAll(requestEventHandler);
 }
 
 

@@ -69,7 +69,9 @@ CSocket::~CSocket()
 {
 	if (!m_socket.isNull()){
 		m_socket->abort();
-		m_socket->deleteLater();
+		// The destructor runs after the socket thread's event loop has finished;
+		// deleteLater() would never be processed and the QTcpSocket would leak.
+		delete m_socket.data();
 	}
 }
 
@@ -112,6 +114,9 @@ void CSocket::HandleReadyRead()
 
 	if (!m_requestPtr.IsValid()){
 		m_requestPtr.SetPtr(m_rootSocket->CreateRequest().PopInterfacePtr());
+		if (!m_requestPtr.IsValid()){
+			return;
+		}
 	}
 
 	if (!m_socket->isOpen()){

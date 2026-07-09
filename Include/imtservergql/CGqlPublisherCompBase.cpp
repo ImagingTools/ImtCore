@@ -97,14 +97,111 @@ bool CGqlPublisherCompBase::UnregisterSubscription(const QByteArray& subscriptio
 
 void CGqlPublisherCompBase::OnRequestDestroyed(imtrest::IRequest* request)
 {
-	imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<imtrest::CWebSocketRequest*>(request);
-	if (webSocketRequestPtr != nullptr){
-		UnregisterSubscription(webSocketRequestPtr->GetQueryId());
+	if (request == nullptr){
+		return;
+	}
+
+	// Remove all subscription entries that still reference the destroyed network request.
+	// Matching by pointer (instead of only by query-ID) guarantees that no dangling
+	// request pointers remain registered after a connection loss: graphql-ws IDs are
+	// only unique per connection, so an ID based removal could remove the entry of
+	// another client and leave a dangling pointer behind.
+	QMutexLocker locker(&m_mutex);
+
+	for (int i = m_registeredSubscribers.size() - 1; i >= 0; --i){
+		QMap<QByteArray, const imtrest::IRequest*>& networkRequests = m_registeredSubscribers[i].networkRequests;
+
+		for (auto it = networkRequests.begin(); it != networkRequests.end();){
+			if (it.value() == request){
+				it = networkRequests.erase(it);
+			}
+			else{
+				++it;
+			}
+		}
+
+		if (networkRequests.isEmpty()){
+			m_registeredSubscribers.removeAt(i);
+		}
 	}
 }
 
 
 // protected methods
+
+bool CGqlPublisherCompBase::UnregisterSubscription(const QByteArray& subscriptionId, const imtrest::IRequest& networkRequest)
+{
+	bool retVal = false;
+	bool requestStillReferenced = false;
+
+	{
+		QMutexLocker locker(&m_mutex);
+
+		for (int i = m_registeredSubscribers.size() - 1; i >= 0; --i){
+			QMap<QByteArray, const imtrest::IRequest*>& networkRequests = m_registeredSubscribers[i].networkRequests;
+
+			for (auto it = networkRequests.begin(); it != networkRequests.end();){
+				if (it.key() == subscriptionId && it.value() == &networkRequest){
+					it = networkRequests.erase(it);
+					retVal = true;
+				}
+				else{
+					if (it.value() == &networkRequest){
+						requestStillReferenced = true;
+					}
+					++it;
+				}
+			}
+
+			if (networkRequests.isEmpty()){
+				m_registeredSubscribers.removeAt(i);
+			}
+		}
+	}
+
+	// Deregister this publisher as event handler if the request has no remaining
+	// subscriptions here; otherwise a stale handler would be called on request
+	// destruction after this publisher stopped tracking the request.
+	if (retVal && !requestStillReferenced){
+		const imtrest::CWebSocketRequest* constWebSocketRequestPtr = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
+		imtrest::CWebSocketRequest* webSocketRequestPtr = const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequestPtr);
+		if (webSocketRequestPtr != nullptr){
+			webSocketRequestPtr->UnregisterRequestEventHandler(this);
+		}
+	}
+
+	return retVal;
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CGqlPublisherCompBase::OnComponentDestroyed()
+{
+	// Deregister this publisher from all still living network requests: the requests are
+	// owned by the socket threads and can outlive this component; without deregistration
+	// their destructors would call OnRequestDestroyed on a destroyed publisher.
+	QList<RequestNetworks> registeredSubscribers;
+
+	{
+		QMutexLocker locker(&m_mutex);
+		registeredSubscribers = m_registeredSubscribers;
+		m_registeredSubscribers.clear();
+	}
+
+	for (const RequestNetworks& entry : registeredSubscribers){
+		for (const imtrest::IRequest* networkRequestPtr : entry.networkRequests){
+			const imtrest::CWebSocketRequest* constWebSocketRequestPtr = dynamic_cast<const imtrest::CWebSocketRequest*>(networkRequestPtr);
+			imtrest::CWebSocketRequest* webSocketRequestPtr = const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequestPtr);
+			if (webSocketRequestPtr != nullptr){
+				webSocketRequestPtr->UnregisterRequestEventHandler(this);
+			}
+		}
+	}
+
+	BaseClass::OnComponentDestroyed();
+}
+
 
 bool CGqlPublisherCompBase::PushDataToSubscriber(
 			const QByteArray& subscriptionId,
@@ -162,31 +259,33 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 	const QByteArray& data,
 	std::function<bool(const imtgql::CGqlRequest&)> predicate) const
 {
-	struct Target { QByteArray id; const imtrest::IRequest* req; };
-	QList<Target> targets;
+	// The mutex must stay locked while pushing the data: OnRequestDestroyed synchronizes
+	// on the same mutex, so a network request cannot be destroyed (e.g. on connection loss
+	// in another thread) while it is dereferenced here. Sending is non-blocking (the
+	// dispatcher only queues the data), so holding the lock is cheap.
+	QMutexLocker locker(&m_mutex);
 
-	{
-		QMutexLocker locker(&m_mutex);
-		for (const auto& entry : m_registeredSubscribers) {
-			if (entry.gqlRequest.GetCommandId() == commandId) {
-
-				// Apply filtering (predicate) to this subscriber's unique variables
-				if (!predicate || predicate(entry.gqlRequest)) {
-					for (auto it = entry.networkRequests.constBegin(); it != entry.networkRequests.constEnd(); ++it) {
-						targets.append({it.key(), it.value()});
-					}
-				}
-			}
+	for (const auto& entry : m_registeredSubscribers) {
+		if (entry.gqlRequest.GetCommandId() != commandId) {
+			continue;
 		}
-	}
 
-	// push data to subscribers outside the lock to keep the server responsive
-	for (const auto& target : targets) {
-		bool retVal = PushDataToSubscriber(target.id, commandId, data, *target.req);
+		// Apply filtering (predicate) to this subscriber's unique variables
+		if (predicate && !predicate(entry.gqlRequest)) {
+			continue;
+		}
 
-		if (!retVal){
-			QString message = QString("Unable to notify subscriber about the changes. Subscription-ID: '%1', '%2'").arg(qPrintable(commandId), qPrintable(data));
-			SendErrorMessage(0, message, "CGqlPublisherCompBase");
+		for (auto it = entry.networkRequests.constBegin(); it != entry.networkRequests.constEnd(); ++it) {
+			const imtrest::IRequest* networkRequestPtr = it.value();
+			if (networkRequestPtr == nullptr) {
+				continue;
+			}
+
+			bool retVal = PushDataToSubscriber(it.key(), commandId, data, *networkRequestPtr);
+			if (!retVal){
+				QString message = QString("Unable to notify subscriber about the changes. Subscription-ID: '%1', '%2'").arg(qPrintable(commandId), qPrintable(data));
+				SendErrorMessage(0, message, "CGqlPublisherCompBase");
+			}
 		}
 	}
 

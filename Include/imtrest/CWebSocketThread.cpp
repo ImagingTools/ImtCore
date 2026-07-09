@@ -53,7 +53,19 @@ void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 	m_socket = webSocketPtr;
 
 	if (webSocketPtr != nullptr){
-		connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CWebSocketThread::OnWebSocketTextMessage);
+		// All connects are done here in the main thread before the thread is started,
+		// so that no signal emitted during connection setup can be missed.
+		// textMessageReceived is connected with Qt::QueuedConnection: the signal is
+		// emitted while QWebSocket is still decoding the incoming frame, and processing
+		// a message directly from this context can re-enter the socket via a nested
+		// event loop (e.g. during authorization) and destroy objects the frame decoder
+		// still uses. Qt copies the QString into the queued event, so this is safe.
+		connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CWebSocketThread::OnWebSocketTextMessage, Qt::QueuedConnection);
+		connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage);
+		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected);
+#if (QT_VERSION >= 0x060500)
+		connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError);
+#endif
 	}
 
 	start();
@@ -105,13 +117,8 @@ void CWebSocketThread::run()
 		return;
 	}
 
-	connect(webSocketPtr.data(), &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage);
-	connect(webSocketPtr.data(), &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected);
-#if (QT_VERSION >= 0x060500)
-	connect(webSocketPtr.data(), QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError);
-#else
-//	connect(webSocketPtr.data(), QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &CWebSocketThread::OnError);
-#endif
+	// The socket signal connections are established in SetWebSocket (main thread)
+	// before the thread is started.
 
 	exec();
 }

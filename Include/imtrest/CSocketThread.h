@@ -74,6 +74,7 @@ private:
 	const QSslConfiguration& m_sslConfiguration;
 
 	mutable QByteArray m_requestId;
+	mutable QMutex m_requestIdMutex;
 };
 
 

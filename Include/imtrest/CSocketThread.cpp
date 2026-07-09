@@ -61,7 +61,12 @@ CSocketThread::Status CSocketThread::GetSocketStatus()
 
 QByteArray CSocketThread::GetRequestId()
 {
-	return m_requestId;
+	// m_requestId is written from the socket thread and read from worker threads
+	// (request dispatch in CMultiThreadServer); the mutex prevents reading a
+	// QByteArray that is concurrently reassigned.
+	QMutexLocker lock(&m_requestIdMutex);
+
+	return QByteArray(m_requestId.constData(), m_requestId.size());
 }
 
 
@@ -91,6 +96,7 @@ imtrest::IRequestUniquePtr CSocketThread::CreateRequest() const
 
 	imtrest::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*this);
 	if (newRequestPtr.IsValid()){
+		QMutexLocker lock(&m_requestIdMutex);
 		m_requestId = newRequestPtr->GetRequestId();
 	}
 
@@ -102,13 +108,20 @@ imtrest::IRequestUniquePtr CSocketThread::CreateRequest() const
 
 void CSocketThread::run()
 {
-	if (m_server == nullptr){
+	if (m_server == nullptr || m_enginePtr == nullptr){
 		return;
 	}
 
 	imtrest::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*this);
 	Q_ASSERT(newRequestPtr.IsValid());
-	m_requestId = newRequestPtr->GetRequestId();
+	if (!newRequestPtr.IsValid()){
+		return;
+	}
+
+	{
+		QMutexLocker lock(&m_requestIdMutex);
+		m_requestId = newRequestPtr->GetRequestId();
+	}
 
 	m_socket.SetPtr(new CSocket(this, newRequestPtr.PopInterfacePtr(), m_isSecureConnection, m_sslConfiguration, m_socketDescriptor));
 

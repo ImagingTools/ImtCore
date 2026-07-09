@@ -57,7 +57,10 @@ bool CPublisherSubscriberBridgeComp::RegisterSubscription(
 	// Register with the upstream subscription manager (forwards to remote server with user context)
 	QByteArray upstreamSubscriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(upstreamRequest, this);
 	if (upstreamSubscriptionId.isEmpty()){
-		BaseClass::UnregisterSubscription(subscriptionId);
+		// Roll back the local registration including the request event handler
+		// registration done by the base class (scoped to this exact request to
+		// avoid removing a colliding subscription of another client):
+		BaseClass::UnregisterSubscription(subscriptionId, networkRequest);
 		errorMessage = QStringLiteral("Failed to register upstream subscription");
 		return false;
 	}

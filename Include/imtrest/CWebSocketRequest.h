@@ -63,6 +63,7 @@ public:
 	void SetMethodType(MethodType methodType);
 	QByteArray GetQueryId() const;
 	void RegisterRequestEventHandler(IRequestEventHandler* requestEventHandler);
+	void UnregisterRequestEventHandler(IRequestEventHandler* requestEventHandler);
 	void SetCommandId(const QByteArray& commandId);
 
 	// reimplemented (IRequest)
