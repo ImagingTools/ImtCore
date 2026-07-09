@@ -56,6 +56,11 @@ istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjec
 		tokenPtr->SetUserId(userId);
 	}
 
+	if (record.contains("ProductId")){
+		const QByteArray productId = imtdb::VariantToByteArray(record.value("ProductId"));
+		tokenPtr->SetProductId(productId);
+	}
+
 	if (record.contains("Name")){
 		const QString name = record.value("Name").toString();
 		tokenPtr->SetName(name);
@@ -144,6 +149,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CPersonalAccessTokenDatabaseDeleg
 	QString name = tokenPtr->GetName();
 	QString description = tokenPtr->GetDescription();
 	QString userId = QString::fromUtf8(tokenPtr->GetUserId());
+	QString productId = QString::fromUtf8(tokenPtr->GetProductId());
 	QString tokenHash = QString::fromUtf8(tokenPtr->GetTokenHash());
 	QString scopesStr;
 	QString createdAt = tokenPtr->GetCreatedAt().toUTC().toString(Qt::ISODate);
@@ -170,18 +176,20 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CPersonalAccessTokenDatabaseDeleg
 	const QString createdAtSql = createdAt.isEmpty() ? "NULL" : QString("'%1'").arg(createdAt);
 	const QString lastUsedAtSql = lastUsedAt.isEmpty() ? "NULL" : QString("'%1'").arg(lastUsedAt);
 	const QString expiresAtSql = expiresAt.isEmpty() ? "NULL" : QString("'%1'").arg(expiresAt);
+	const QString productIdSql = productId.isEmpty() ? "NULL" : QString("'%1'").arg(SqlEncode(productId));
 	const QString revokedSql = revoked ? "TRUE" : "FALSE";
 
 	NewObjectQuery retVal;
 
 	retVal.query = QString(
 			"INSERT INTO \"PersonalAccessTokens\""
-			"(\"Id\", \"Name\", \"Description\", \"UserId\", \"TokenHash\", \"Scopes\", \"CreatedAt\", \"LastUsedAt\", \"ExpiresAt\", \"Revoked\") "
-			"VALUES('%1', '%2', '%3', '%4', '%5', '%6', %7, %8, %9, %10);")
+			"(\"Id\", \"Name\", \"Description\", \"UserId\", \"ProductId\", \"TokenHash\", \"Scopes\", \"CreatedAt\", \"LastUsedAt\", \"ExpiresAt\", \"Revoked\") "
+			"VALUES('%1', '%2', '%3', '%4', %5, '%6', '%7', %8, %9, %10, %11);")
 		.arg(SqlEncode(QString::fromUtf8(tokenId)))
 		.arg(SqlEncode(name))
 		.arg(SqlEncode(description))
 		.arg(SqlEncode(userId))
+		.arg(productIdSql)
 		.arg(SqlEncode(tokenHash))
 		.arg(SqlEncode(scopesStr))
 		.arg(createdAtSql)
@@ -209,6 +217,7 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateUpdateObjectQuery(
 	const QString name = tokenPtr->GetName();
 	const QString description = tokenPtr->GetDescription();
 	const QString userId = QString::fromUtf8(tokenPtr->GetUserId());
+	const QString productId = QString::fromUtf8(tokenPtr->GetProductId());
 	const QString tokenHash = QString::fromUtf8(tokenPtr->GetTokenHash());
 
 	QString scopesStr;
@@ -232,6 +241,7 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	const QString lastUsedAtSql = lastUsedAt.isEmpty() ? "NULL" : QString("'%1'").arg(lastUsedAt);
 	const QString expiresAtSql = expiresAt.isEmpty() ? "NULL" : QString("'%1'").arg(expiresAt);
+	const QString productIdSql = productId.isEmpty() ? "NULL" : QString("'%1'").arg(SqlEncode(productId));
 	const QString revokedSql = revoked ? "TRUE" : "FALSE";
 
 	const QByteArray retVal = QString(
@@ -239,15 +249,17 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateUpdateObjectQuery(
 		"\"Name\"='%1', "
 		"\"Description\"='%2', "
 		"\"UserId\"='%3', "
-		"\"TokenHash\"='%4', "
-		"\"Scopes\"='%5', "
-		"\"LastUsedAt\"=%6, "
-		"\"ExpiresAt\"=%7, "
-		"\"Revoked\"=%8 "
-		"WHERE \"Id\"='%9';")
+		"\"ProductId\"=%4, "
+		"\"TokenHash\"='%5', "
+		"\"Scopes\"='%6', "
+		"\"LastUsedAt\"=%7, "
+		"\"ExpiresAt\"=%8, "
+		"\"Revoked\"=%9 "
+		"WHERE \"Id\"='%10';")
 		.arg(SqlEncode(name))
 		.arg(SqlEncode(description))
 		.arg(SqlEncode(userId))
+		.arg(productIdSql)
 		.arg(SqlEncode(tokenHash))
 		.arg(SqlEncode(scopesStr))
 		.arg(lastUsedAtSql)

@@ -20,6 +20,7 @@ namespace imtauthgql
 
 imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonalAccessTokenManagerComp::CreateToken(
 			const QByteArray& userId,
+			const QByteArray& productId,
 			const QString& name,
 			const QString& description,
 			const QByteArrayList& scopes,
@@ -31,6 +32,10 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 	arguments.input.emplace();
 	arguments.input->userId = userId;
 	arguments.input->name = name;
+
+	if (!productId.isEmpty()){
+		arguments.input->productId = productId;
+	}
 	
 	if (!description.isEmpty()){
 		arguments.input->description = description;
@@ -170,6 +175,10 @@ imtauth::IPersonalAccessTokenSharedPtr CClientRequestPersonalAccessTokenManagerC
 
 	if (payload.userId.HasValue()){
 		tokenPtr->SetUserId(*payload.userId);
+	}
+
+	if (payload.productId.HasValue()){
+		tokenPtr->SetProductId(*payload.productId);
 	}
 
 	if (payload.name.HasValue()){

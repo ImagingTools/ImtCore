@@ -49,6 +49,22 @@ void CPersonalAccessToken::SetUserId(const QByteArray& userId)
 }
 
 
+QByteArray CPersonalAccessToken::GetProductId() const
+{
+	return m_productId;
+}
+
+
+void CPersonalAccessToken::SetProductId(const QByteArray& productId)
+{
+	if (m_productId != productId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_productId = productId;
+	}
+}
+
+
 QString CPersonalAccessToken::GetName() const
 {
 	return m_name;
@@ -211,6 +227,11 @@ bool CPersonalAccessToken::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_userId);
 	retVal = retVal && archive.EndTag(userIdTag);
 
+	static iser::CArchiveTag productIdTag("ProductId", "Product identifier");
+	retVal = retVal && archive.BeginTag(productIdTag);
+	retVal = retVal && archive.Process(m_productId);
+	retVal = retVal && archive.EndTag(productIdTag);
+
 	static iser::CArchiveTag nameTag("Name", "Token name");
 	retVal = retVal && archive.BeginTag(nameTag);
 	retVal = retVal && archive.Process(m_name);
@@ -263,6 +284,7 @@ bool CPersonalAccessToken::CopyFrom(const istd::IChangeable& object, Compatibili
 
 	m_id = tokenPtr->m_id;
 	m_userId = tokenPtr->m_userId;
+	m_productId = tokenPtr->m_productId;
 	m_name = tokenPtr->m_name;
 	m_description = tokenPtr->m_description;
 	m_tokenHash = tokenPtr->m_tokenHash;
@@ -284,6 +306,7 @@ bool CPersonalAccessToken::IsEqual(const IChangeable& object) const
 
 		retVal = retVal && (m_id == sourcePtr->m_id);
 		retVal = retVal && (m_userId == sourcePtr->m_userId);
+		retVal = retVal && (m_productId == sourcePtr->m_productId);
 		retVal = retVal && (m_name == sourcePtr->m_name);
 		retVal = retVal && (m_description == sourcePtr->m_description);
 		retVal = retVal && (m_tokenHash == sourcePtr->m_tokenHash);
@@ -315,6 +338,7 @@ bool CPersonalAccessToken::ResetData(CompatibilityMode /*mode*/)
 {
 	m_id.clear();
 	m_userId.clear();
+	m_productId.clear();
 	m_name.clear();
 	m_description.clear();
 	m_tokenHash.clear();

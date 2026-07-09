@@ -48,6 +48,20 @@ public:
 	virtual void SetUserId(const QByteArray& userId) = 0;
 	
 	/**
+		Get product identifier this token is scoped to.
+		A personal access token is valid only for the product identified by this ID,
+		enabling cross-product token management.
+		\return Product ID, or empty if the token is not bound to a specific product
+	*/
+	virtual QByteArray GetProductId() const = 0;
+	
+	/**
+		Set product identifier this token is scoped to.
+		\param productId Product ID to set, or empty to not bind the token to a product
+	*/
+	virtual void SetProductId(const QByteArray& productId) = 0;
+	
+	/**
 		Get human-readable token name.
 		\return Token name
 	*/
