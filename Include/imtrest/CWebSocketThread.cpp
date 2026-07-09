@@ -53,7 +53,18 @@ void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 	m_socket = webSocketPtr;
 
 	if (webSocketPtr != nullptr){
-		connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CWebSocketThread::OnWebSocketTextMessage);
+		// Qt::QueuedConnection is deliberate (not the default Auto/Direct). OnWebSocketTextMessage does
+		// heavy work - GraphQL request processing and, for START/SUBSCRIBE, auth validation that itself
+		// PUMPS the Qt event loop (see the OnWebSocketTextMessage comment about deleteLater() firing
+		// during auth). With a direct connection that whole thing runs SYNCHRONOUSLY inside QWebSocket's
+		// own frame-decode call stack, so the nested event pump can process a pending deleteLater() for
+		// this very socket (or another) and free it while its frame decoder is still on the stack above
+		// us - a use-after-free crash reproduced live under load (main thread, faulting instruction
+		// `lock xadd [rax]` with rax = 0xdddddddd... inside Qt6WebSocketsd frame decoding). A queued
+		// connection lets QWebSocket finish decoding the current frame and unwind back to the event loop
+		// BEFORE we run, so no socket is mid-decode when our processing (and its nested pump) executes.
+		// Qt deep-copies the QString argument into the queued event, so the payload stays valid too.
+		connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CWebSocketThread::OnWebSocketTextMessage, Qt::QueuedConnection);
 	}
 
 	start();
