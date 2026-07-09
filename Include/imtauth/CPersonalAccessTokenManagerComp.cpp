@@ -24,6 +24,7 @@ namespace imtauth
 
 IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp::CreateToken(
 			const QByteArray& userId,
+			const QByteArray& productId,
 			const QString& name,
 			const QString& description,
 			const QByteArrayList& scopes,
@@ -58,6 +59,7 @@ IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp
 
 	tokenPtr->SetId(tokenId);
 	tokenPtr->SetUserId(userId);
+	tokenPtr->SetProductId(productId);
 	tokenPtr->SetName(name);
 	tokenPtr->SetDescription(description);
 	tokenPtr->SetTokenHash(tokenHash);

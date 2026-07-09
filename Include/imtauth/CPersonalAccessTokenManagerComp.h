@@ -30,6 +30,7 @@ public:
 	// reimplemented (imtauth::IPersonalAccessTokenManager)
 	virtual TokenCreationResult CreateToken(
 		const QByteArray& userId,
+		const QByteArray& productId,
 		const QString& name,
 		const QString& description,
 		const QByteArrayList& scopes,

@@ -266,13 +266,23 @@ void CPersonalAccessTokenManagerGuiComp::OnCreateTokenClicked()
 		return;
 	}
 	
+	// Get product ID the token is scoped to (optional, enables cross-product tokens)
+	QString productIdText = QInputDialog::getText(GetWidget(), "Create Token",
+		"Product ID (leave empty for no specific product):", QLineEdit::Normal, "", &ok);
+	
+	if (!ok) {
+		return;
+	}
+	
+	QByteArray productId = productIdText.toUtf8();
+	
 	// For now, create token with no scopes and no expiration
 	// In a real implementation, you would have a dialog for selecting scopes and expiration
 	QByteArrayList scopes;
 	QDateTime expiresAt; // Invalid QDateTime means no expiration
 	
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result =
-		managerPtr->CreateToken(m_currentUserId, name, description, scopes, expiresAt);
+		managerPtr->CreateToken(m_currentUserId, productId, name, description, scopes, expiresAt);
 	
 	if (result.success) {
 		// Show the raw token to the user (this is the only time they can see it)

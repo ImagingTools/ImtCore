@@ -39,6 +39,7 @@ void CPersonalAccessTokenTest::testTokenCreation()
 	
 	// Create a token
 	QByteArray userId = "test_user_123";
+	QByteArray productId = "test_product_abc";
 	QString name = "Test Token";
 	QString description = "A test token for unit testing";
 	QByteArrayList scopes;
@@ -46,7 +47,7 @@ void CPersonalAccessTokenTest::testTokenCreation()
 	QDateTime expiresAt = QDateTime::currentDateTimeUtc().addDays(30);
 	
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result = 
-		m_tokenManagerPtr->CreateToken(userId, name, description, scopes, expiresAt);
+		m_tokenManagerPtr->CreateToken(userId, productId, name, description, scopes, expiresAt);
 	
 	QVERIFY2(result.success, "Failed to create token");
 	QVERIFY2(!result.tokenId.isEmpty(), "Token ID is empty");
@@ -57,6 +58,7 @@ void CPersonalAccessTokenTest::testTokenCreation()
 	imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerPtr->GetToken(result.tokenId);
 	QVERIFY2(tokenPtr.IsValid(), "Failed to retrieve created token");
 	QCOMPARE(tokenPtr->GetUserId(), userId);
+	QCOMPARE(tokenPtr->GetProductId(), productId);
 	QCOMPARE(tokenPtr->GetName(), name);
 }
 
@@ -72,7 +74,7 @@ void CPersonalAccessTokenTest::testTokenValidation()
 	scopes << "read:api";
 	
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result = 
-		m_tokenManagerPtr->CreateToken(userId, name, "", scopes, QDateTime());
+		m_tokenManagerPtr->CreateToken(userId, QByteArray(), name, "", scopes, QDateTime());
 	
 	QVERIFY2(result.success, "Failed to create token for validation test");
 	
@@ -104,7 +106,7 @@ void CPersonalAccessTokenTest::testTokenRevocation()
 	scopes << "write:api";
 	
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result = 
-		m_tokenManagerPtr->CreateToken(userId, name, "", scopes, QDateTime());
+		m_tokenManagerPtr->CreateToken(userId, QByteArray(), name, "", scopes, QDateTime());
 	
 	QVERIFY2(result.success, "Failed to create token for revocation test");
 	
@@ -138,7 +140,7 @@ void CPersonalAccessTokenTest::testTokenExpiration()
 	QDateTime expiresAt = QDateTime::currentDateTimeUtc().addSecs(-3600); // Expired 1 hour ago
 	
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result = 
-		m_tokenManagerPtr->CreateToken(userId, name, "", scopes, expiresAt);
+		m_tokenManagerPtr->CreateToken(userId, QByteArray(), name, "", scopes, expiresAt);
 	
 	QVERIFY2(result.success, "Failed to create token for expiration test");
 	
@@ -153,7 +155,7 @@ void CPersonalAccessTokenTest::testTokenExpiration()
 	// Create a token that hasn't expired yet
 	QDateTime futureExpiry = QDateTime::currentDateTimeUtc().addDays(7);
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult validResult = 
-		m_tokenManagerPtr->CreateToken(userId, "Valid Token", "", scopes, futureExpiry);
+		m_tokenManagerPtr->CreateToken(userId, QByteArray(), "Valid Token", "", scopes, futureExpiry);
 	
 	QVERIFY2(validResult.success, "Failed to create non-expired token");
 	
@@ -176,11 +178,11 @@ void CPersonalAccessTokenTest::testGetTokenIds()
 	scopes << "read:api";
 	
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result1 = 
-		m_tokenManagerPtr->CreateToken(userId, name1, "", scopes, QDateTime());
+		m_tokenManagerPtr->CreateToken(userId, QByteArray(), name1, "", scopes, QDateTime());
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result2 = 
-		m_tokenManagerPtr->CreateToken(userId, name2, "", scopes, QDateTime());
+		m_tokenManagerPtr->CreateToken(userId, QByteArray(), name2, "", scopes, QDateTime());
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result3 = 
-		m_tokenManagerPtr->CreateToken(userId, name3, "", scopes, QDateTime());
+		m_tokenManagerPtr->CreateToken(userId, QByteArray(), name3, "", scopes, QDateTime());
 	
 	QVERIFY2(result1.success, "Failed to create token 1");
 	QVERIFY2(result2.success, "Failed to create token 2");
@@ -214,7 +216,7 @@ void CPersonalAccessTokenTest::testUpdateLastUsedAt()
 	scopes << "read:api";
 	
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result = 
-		m_tokenManagerPtr->CreateToken(userId, name, "", scopes, QDateTime());
+		m_tokenManagerPtr->CreateToken(userId, QByteArray(), name, "", scopes, QDateTime());
 	
 	QVERIFY2(result.success, "Failed to create token for last used test");
 	
@@ -259,7 +261,7 @@ void CPersonalAccessTokenTest::testDeleteToken()
 	scopes << "read:api";
 	
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result = 
-		m_tokenManagerPtr->CreateToken(userId, name, "", scopes, QDateTime());
+		m_tokenManagerPtr->CreateToken(userId, QByteArray(), name, "", scopes, QDateTime());
 	
 	QVERIFY2(result.success, "Failed to create token for delete test");
 	
