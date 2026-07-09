@@ -77,8 +77,8 @@
 			"Foreground": "OnSurface",
 			"Base": "Surface",
 			"AlternateBase": "SurfaceContainerLow",
-			"ToolTipBase": "InverseSurface",
-			"ToolTipText": "InverseOnSurface",
+			"ToolTipBase": "PrimaryContainer",
+			"ToolTipText": "OnPrimaryContainer",
 			"Text": "OnSurface",
 			"Button": "SurfaceContainerHigh",
 			"ErrorText": "Error",
@@ -118,8 +118,8 @@
 			"Foreground": "OnSurfaceVariant",
 			"Base": "Surface",
 			"AlternateBase": "SurfaceContainerLow",
-			"ToolTipBase": "InverseSurface",
-			"ToolTipText": "InverseOnSurface",
+			"ToolTipBase": "PrimaryContainer",
+			"ToolTipText": "OnPrimaryContainer",
 			"Text": "OnSurfaceVariant",
 			"Button": "SurfaceContainerHigh",
 			"ButtonText": "OnSurfaceVariant",
@@ -142,8 +142,8 @@
 			"Foreground": "OnSurfaceVariant",
 			"Base": "Surface",
 			"AlternateBase": "SurfaceContainerLow",
-			"ToolTipBase": "InverseSurface",
-			"ToolTipText": "InverseOnSurface",
+			"ToolTipBase": "PrimaryContainer",
+			"ToolTipText": "OnPrimaryContainer",
 			"Text": "OutlineVariant",
 			"Button": "SurfaceContainerHigh",
 			"ButtonText": "OutlineVariant",
@@ -166,8 +166,8 @@
 			"Foreground": "OnSurfaceVariant",
 			"Base": "Surface",
 			"AlternateBase": "SurfaceContainerLow",
-			"ToolTipBase": "InverseSurface",
-			"ToolTipText": "InverseOnSurface",
+			"ToolTipBase": "PrimaryContainer",
+			"ToolTipText": "OnPrimaryContainer",
 			"Text": "OutlineVariant",
 			"Button": "SurfaceContainerHigh",
 			"ButtonText": "OutlineVariant",
@@ -234,4 +234,3 @@
 		}
 	}
 }
-

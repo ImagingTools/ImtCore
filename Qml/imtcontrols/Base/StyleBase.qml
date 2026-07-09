@@ -274,6 +274,8 @@ StyleComponents {
 
 		//text
 	property string textColor: "#335777";
+	property string tooltipBaseColor: baseColor;
+	property string tooltipTextColor: textColor;
 	property string titleColor: "#054585";
 	property string subtitleColor: "#6A6E6F";
 	property string textSelectedColor: "#006bd7";
@@ -651,6 +653,8 @@ StyleComponents {
 			styleContainer.backgroundColor2 = styleContainer.getThemeColor("ActiveColors", "Background2", dataSource);
 
 			styleContainer.textColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource);
+			styleContainer.tooltipBaseColor = styleContainer.getThemeColor("ActiveColors", "ToolTipBase", dataSource);
+			styleContainer.tooltipTextColor = styleContainer.getThemeColor("ActiveColors", "ToolTipText", dataSource);
 			styleContainer.textSelectedColor = styleContainer.getThemeColor("ActiveColors", "TextSelectedBackground", dataSource);
 			styleContainer.shadowColor = styleContainer.getThemeColor("ActiveColors", "Shadow", dataSource);
 
