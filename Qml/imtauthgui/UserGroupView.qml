@@ -116,24 +116,31 @@ ViewBase {
 				
 				TextInputElementView {
 					id: nameInput;
-					
+
+					// Test instrumentation: matches the AccountEditor/DeviceEditor/etc. convention of
+					// an explicit per-field objectName on the ElementView usage site. Inert.
+					objectName: "GroupNameInput";
+
 					name: qsTr("Group Name");
 					placeHolderText: qsTr("Enter the name");
-					
+
 					onEditingFinished: {
 						container.doUpdateModel();
 					}
-					
+
 					KeyNavigation.tab: descriptionInput;
 					KeyNavigation.backtab: roleSelectableCollectionEditor;
 				}
-				
+
 				TextInputElementView {
 					id: descriptionInput;
-					
+
+					// Test instrumentation - see nameInput's comment above. Inert.
+					objectName: "GroupDescriptionInput";
+
 					name: qsTr("Description");
 					placeHolderText: qsTr("Enter the description");
-					
+
 					onEditingFinished: {
 						container.doUpdateModel();
 					}

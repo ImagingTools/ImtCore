@@ -373,6 +373,34 @@ void CGqlRequestTest::CreateArrayQuery()
 }
 
 
+void CGqlRequestTest::CreateStringEscapesRoundTrip()
+{
+	imtgql::CGqlRequest request(imtgql::IGqlRequest::RT_MUTATION);
+	request.SetCommandId("UpdateServiceSettings");
+
+	imtgql::CGqlParamObject inputObject;
+	inputObject.InsertParam("serviceId", QStringLiteral("service-1"));
+
+	const QString expectedContent = QStringLiteral("Line1\nLine2\r\nLine3\tTab\\Slash\"Quote");
+	inputObject.InsertParam("content", expectedContent);
+	request.AddParam("input", inputObject);
+
+	const QByteArray query = request.GetQuery();
+
+	qsizetype errorPosition = -1;
+	imtgql::CGqlRequest parsedRequest;
+	const bool isParsed = parsedRequest.ParseQuery(query, errorPosition);
+	QVERIFY(isParsed);
+	QVERIFY(errorPosition < 0);
+
+	const imtgql::CGqlParamObject* parsedInput = parsedRequest.GetParamObject("input");
+	QVERIFY(parsedInput != nullptr);
+
+	const QString parsedContent = parsedInput->GetParamArgumentValue("content").toString();
+	QCOMPARE(parsedContent, expectedContent);
+}
+
+
 void CGqlRequestTest::CreateUnionRequest()
 {
 	imtgql::CGqlRequest request;

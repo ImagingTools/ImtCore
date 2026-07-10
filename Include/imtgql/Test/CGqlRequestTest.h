@@ -14,6 +14,7 @@ private slots:
 	void initTestCase();
 
 	void CreateArrayQuery();
+	void CreateStringEscapesRoundTrip();
 	void CreateUnionRequest();
 	void ParseUnionFields();
 

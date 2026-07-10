@@ -55,6 +55,10 @@ Column {
 		TextInputElementView {
 			id: usernameInput_;
 
+			// Test instrumentation: matches the AccountEditor/DeviceEditor/etc. convention of an
+			// explicit per-field objectName on the ElementView usage site. Inert.
+			objectName: "UsernameInput";
+
 			name: qsTr("Username");
 			placeHolderText: qsTr("Enter the username");
 			readOnly: container.readOnly;
@@ -82,6 +86,9 @@ Column {
 		TextInputElementView {
 			id: nameInput_;
 
+			// Test instrumentation - see usernameInput_'s comment above. Inert.
+			objectName: "UserNameInput";
+
 			name: qsTr("Name");
 			placeHolderText: qsTr("Enter the name");
 			readOnly: container.readOnly;
@@ -108,6 +115,9 @@ Column {
 
 		TextInputElementView {
 			id: mailInput_;
+
+			// Test instrumentation - see usernameInput_'s comment above. Inert.
+			objectName: "MailInput";
 
 			name: qsTr("Email Address");
 			textInputValidator: mailValid;
@@ -180,6 +190,8 @@ Column {
 
 		TextInputElementView {
 			id: passwordInput_;
+			// Test instrumentation - see usernameInput_'s comment above. Inert.
+			objectName: "PasswordInput";
 			name: qsTr("Password");
 			placeHolderText: qsTr("Enter the password");
 			echoMode: TextInput.Password;
@@ -195,6 +207,8 @@ Column {
 
 		TextInputElementView {
 			id: confirmPassword;
+			// Test instrumentation - see usernameInput_'s comment above. Inert.
+			objectName: "ConfirmPasswordInput";
 			name: qsTr("Confirm password");
 			echoMode: TextInput.Password;
 			placeHolderText: qsTr("Confirm password");
