@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS "PersonalAccessTokens"
     "Name"       text        NOT NULL,
     "Description" text       NOT NULL DEFAULT '',
     "UserId"     uuid        NOT NULL,
-    "ProductId"  uuid,
+    "ProductId"  text,
     "TokenHash"  bytea       NOT NULL,
     -- Code stores scopes as comma-separated string; keep as text for compatibility
     "Scopes"     text        NOT NULL DEFAULT '',

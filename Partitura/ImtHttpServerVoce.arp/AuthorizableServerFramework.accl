@@ -14,7 +14,6 @@
         <Element ComponentName="HttpServerFramework" X="225" Y="100" Note=""/>
         <Element ComponentName="IdentifiableProductInfo" X="1000" Y="800" Note=""/>
         <Element ComponentName="PermissionsController" X="600" Y="800" Note=""/>
-        <Element ComponentName="PersonalAccessTokenController" X="275" Y="450" Note=""/>
         <Element ComponentName="PumaClientEngine" X="1000" Y="475" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="975" Y="50" Note=""/>
         <Element ComponentName="UserActionController" X="200" Y="300" Note=""/>
