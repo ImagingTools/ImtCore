@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="ClientRequestPersonalAccessTokenManager" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestPersonalAccessTokenManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PersonalAccessTokenFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="PersonalAccessToken"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="PersonalAccessToken" PackageId="ImtAuthPck" ComponentId="PersonalAccessToken">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtauth::IPersonalAccessTokenManager" ComponentId="ClientRequestPersonalAccessTokenManager"/>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="ClientRequestPersonalAccessTokenManager"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="ClientRequestPersonalAccessTokenManager"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="ClientRequestPersonalAccessTokenManager"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ClientRequestPersonalAccessTokenManager"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

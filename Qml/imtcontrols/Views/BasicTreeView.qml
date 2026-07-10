@@ -1573,15 +1573,18 @@ Item {
     }
 
     function expandAll() {
+        var changed = false
         for (var key in __nodes) {
             var n = __nodes[key]
             if (n && n.childrenKeys.length > 0 && !n.expanded) {
                 n.expanded = true
                 __expandedState[key] = true
                 if (n.sourceItem) n.sourceItem.expanded = true
+                changed = true
             }
         }
-        buildVisibleTree()
+        if (changed)
+            buildVisibleTree()
     }
 
     function collapseAll() {
