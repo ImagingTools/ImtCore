@@ -162,31 +162,43 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 	const QByteArray& data,
 	std::function<bool(const imtgql::CGqlRequest&)> predicate) const
 {
-	struct Target { QByteArray id; const imtrest::IRequest* req; };
-	QList<Target> targets;
+	// The push MUST run while holding m_mutex, not after releasing it. Each stored
+	// const imtrest::IRequest* is a raw pointer to a CWebSocketRequest that is parented to its
+	// QWebSocket and cascade-destroyed the instant that socket disconnects; CWebSocketRequest's dtor
+	// calls OnRequestDestroyed() -> UnregisterSubscription(), which removes the entry under THIS same
+	// m_mutex before the object's memory is freed. A previous version copied the raw pointers into a
+	// local list, released the lock "to keep the server responsive", and dereferenced them afterwards -
+	// a socket disconnect on another thread could then free a request in that gap, so *req became a
+	// use-after-free (reproduced live: server crash under concurrent load / many workers, with the last
+	// flushed log line being the WebSocket lifetime guard in CWebSocketServletComp). Publishing under
+	// the lock closes that window: the dtor's UnregisterSubscription blocks on m_mutex until this push
+	// completes, so every request stays alive for the whole call. This is deadlock-free - the actual
+	// send in PushDataToSubscriber is a non-blocking emit() over a Qt::QueuedConnection to the socket
+	// thread (CWebSocketSender), never a blocking cross-thread wait - and it matches how the sibling
+	// CPublisherSubscriberBridgeComp already publishes (push while holding the same mutex).
+	QMutexLocker locker(&m_mutex);
 
-	{
-		QMutexLocker locker(&m_mutex);
-		for (const auto& entry : m_registeredSubscribers) {
-			if (entry.gqlRequest.GetCommandId() == commandId) {
-
-				// Apply filtering (predicate) to this subscriber's unique variables
-				if (!predicate || predicate(entry.gqlRequest)) {
-					for (auto it = entry.networkRequests.constBegin(); it != entry.networkRequests.constEnd(); ++it) {
-						targets.append({it.key(), it.value()});
-					}
-				}
-			}
+	for (const auto& entry : m_registeredSubscribers) {
+		if (entry.gqlRequest.GetCommandId() != commandId) {
+			continue;
 		}
-	}
 
-	// push data to subscribers outside the lock to keep the server responsive
-	for (const auto& target : targets) {
-		bool retVal = PushDataToSubscriber(target.id, commandId, data, *target.req);
+		// Apply filtering (predicate) to this subscriber's unique variables
+		if (predicate && !predicate(entry.gqlRequest)) {
+			continue;
+		}
 
-		if (!retVal){
-			QString message = QString("Unable to notify subscriber about the changes. Subscription-ID: '%1', '%2'").arg(qPrintable(commandId), qPrintable(data));
-			SendErrorMessage(0, message, "CGqlPublisherCompBase");
+		for (auto it = entry.networkRequests.constBegin(); it != entry.networkRequests.constEnd(); ++it) {
+			const imtrest::IRequest* networkRequestPtr = it.value();
+			if (networkRequestPtr == nullptr) {
+				continue;
+			}
+
+			bool retVal = PushDataToSubscriber(it.key(), commandId, data, *networkRequestPtr);
+			if (!retVal){
+				QString message = QString("Unable to notify subscriber about the changes. Subscription-ID: '%1', '%2'").arg(qPrintable(commandId), qPrintable(data));
+				SendErrorMessage(0, message, "CGqlPublisherCompBase");
+			}
 		}
 	}
 
