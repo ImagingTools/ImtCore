@@ -15,6 +15,7 @@ static sdl::V1_0::imtauth::CPersonalAccessToken ConvertToSdlToken(
 
 	sdlToken.id = token.GetId();
 	sdlToken.userId = token.GetUserId();
+	sdlToken.productId = token.GetProductId();
 	sdlToken.name = token.GetName();
 	sdlToken.description = token.GetDescription();
 	sdlToken.tokenHash = token.GetTokenHash();
@@ -233,6 +234,11 @@ sdl::V1_0::imtauth::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCr
 		userId = *inputArgument.userId;
 	}
 
+	QByteArray productId;
+	if (inputArgument.productId){
+		productId = *inputArgument.productId;
+	}
+
 	QString name;
 	if (inputArgument.name){
 		name = *inputArgument.name;
@@ -280,7 +286,7 @@ sdl::V1_0::imtauth::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCr
 
 	// Create token
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result = 
-		m_tokenManagerCompPtr->CreateToken(userId, name, description, scopes, expiresAt);
+		m_tokenManagerCompPtr->CreateToken(userId, productId, name, description, scopes, expiresAt);
 
 	response.success = result.success;
 

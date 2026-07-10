@@ -2,8 +2,8 @@
 
 
 // Qt includes
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
+#include <QtWidgets/QMessageBox>
 #include <QtCore/QDateTime>
 
 // ImtCore includes
@@ -270,9 +270,13 @@ void CPersonalAccessTokenManagerGuiComp::OnCreateTokenClicked()
 	// In a real implementation, you would have a dialog for selecting scopes and expiration
 	QByteArrayList scopes;
 	QDateTime expiresAt; // Invalid QDateTime means no expiration
+	QByteArray productId;
+	if (m_productIdAttrPtr.IsValid()) {
+		productId = *m_productIdAttrPtr;
+	}
 	
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result =
-		managerPtr->CreateToken(m_currentUserId, name, description, scopes, expiresAt);
+		managerPtr->CreateToken(m_currentUserId, productId, name, description, scopes, expiresAt);
 	
 	if (result.success) {
 		// Show the raw token to the user (this is the only time they can see it)
@@ -358,5 +362,4 @@ void CPersonalAccessTokenManagerGuiComp::OnRefreshClicked()
 
 
 } // namespace imtauthgui
-
 

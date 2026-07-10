@@ -46,6 +46,7 @@ public:
 		and should be saved by the caller as it cannot be retrieved later.
 
 		\param userId User ID who owns the token
+		\param productId Product ID the token is scoped to (empty for no specific product)
 		\param name Human-readable name for the token
 		\param description Description of the token's purpose
 		\param scopes List of permission scopes to grant to this token
@@ -54,6 +55,7 @@ public:
 	*/
 	virtual TokenCreationResult CreateToken(
 		const QByteArray& userId,
+		const QByteArray& productId,
 		const QString& name,
 		const QString& description,
 		const QByteArrayList& scopes,

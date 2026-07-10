@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS UserSettings (
+    UserId TEXT PRIMARY KEY,
+    Settings TEXT NOT NULL
+);

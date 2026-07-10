@@ -408,7 +408,6 @@ StyleComponents {
 		if (sourceDecorators.styleId){
 			styleContainer.styleId = sourceDecorators.styleId
 		}
-
 		if (sourceDecorators.menuPanelButtonDecorator){
 			styleContainer.menuPanelButtonDecorator = sourceDecorators.menuPanelButtonDecorator
 		}
@@ -420,6 +419,9 @@ StyleComponents {
 		}
 		if (sourceDecorators.filterPanelDecorator){
 			styleContainer.filterPanelDecorator = sourceDecorators.filterPanelDecorator
+		}
+		if (sourceDecorators.metaInfoPanelDecorator){
+			styleContainer.metaInfoPanelDecorator = sourceDecorators.metaInfoPanelDecorator
 		}
 		if (sourceDecorators.bottomPanelDecorator){
 			styleContainer.bottomPanelDecorator = sourceDecorators.bottomPanelDecorator

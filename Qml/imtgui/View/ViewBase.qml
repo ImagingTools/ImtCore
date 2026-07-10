@@ -34,6 +34,9 @@ Item {
 	property bool commandsSeparatorVisible: true
 	property int commandsPanelHeight: Style.controlHeightM + 2 * Style.marginM
 
+	property real viewContentY: viewContent.y
+	property real viewContentRightMargin: 0
+
 	signal commandsModelChanged(var commandsModel)
 	signal commandActivated(string commandId)
 	signal modelDataChanged(var view, var model)
@@ -129,6 +132,7 @@ Item {
 		anchors.top: separator.bottom;
 		anchors.left: parent.left;
 		anchors.right: parent.right;
+		anchors.rightMargin: viewBase.viewContentRightMargin
 		anchors.bottom: parent.bottom;
 		objectName: "ViewBase";
 		color: viewBase.contentColor;

@@ -38,6 +38,17 @@ Rectangle {
 		registeredViewDelegates[parameterTypeId] = viewComp
 	}
 	
+	Loader{
+		id: decaratorLoader
+		anchors.fill: parent
+		sourceComponent: Style.metaInfoPanelDecorator
+		onItemChanged: {
+			if(item && item.color !==undefined){
+				container.color = item.color
+			}
+		}
+	}
+
 	Component {
 		id: metaInfoViewDelegateBaseComp
 		MetaInfoTextDelegate {
@@ -73,7 +84,7 @@ Rectangle {
 			anchors.right: parent.right;
 			anchors.rightMargin: Style.marginM;
 			visible: container.contentVisible;
-			spacing: Style.spacingM
+			spacing: Style.spacingL
 
 			Repeater {
 				id: repeaterColumn;
@@ -90,7 +101,7 @@ Rectangle {
 						font.pixelSize: Style.fontSizeM;
 						font.family: Style.fontFamilyBold;
 						font.bold: true;
-						color: Style.lightBlueColor;
+						color: Style.textColor;
 						elide: Text.ElideRight;
 						wrapMode: Text.WrapAnywhere;
 						text: model.item.m_name;
@@ -112,7 +123,12 @@ Rectangle {
 	}
 	
 	Rectangle {
-		anchors.fill: parent;
+		anchors.top: parent.top;
+		anchors.bottom: parent.bottom;
+		anchors.left: parent.left;
+		anchors.leftMargin: Style.marginS;
+		anchors.right: parent.right;
+		anchors.rightMargin: Style.marginS;
 		color: parent.color;
 		visible: loading.visible;
 	}
@@ -120,7 +136,10 @@ Rectangle {
 	Loading {
 		id: loading;
 		anchors.top: parent.top;
-		width: parent.width;
+		anchors.left: parent.left;
+		anchors.leftMargin: Style.marginS;
+		anchors.right: parent.right;
+		anchors.rightMargin: Style.marginS;
 		height: Style.sizeHintXXS;
 		indicatorSize: Style.controlHeightS;
 		background.color: container.color;
