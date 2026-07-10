@@ -62,7 +62,7 @@ class Canvas extends Item {
         let originCreatePattern = ctx.createPattern
         ctx.drawImage = (...args)=>{
             if(typeof args[0] === 'string'){
-                let path = JQApplication.rootPath+'/'+args[0].replaceAll('../','')
+                let path = args[0].startsWith('data:image') ? args[0] : JQApplication.rootPath+'/'+args[0].replaceAll('../','')
                 if(this.__cache[path]){
                     args[0] = this.__cache[path]
                     originDrawImage.call(ctx, ...args)
@@ -89,7 +89,7 @@ class Canvas extends Item {
 
         ctx.createPattern = (...args)=>{
             if(typeof args[0] === 'string'){
-                let path = JQApplication.rootPath+'/'+args[0].replaceAll('../','')
+                let path = args[0].startsWith('data:image') ? args[0] : JQApplication.rootPath+'/'+args[0].replaceAll('../','')
                 if(this.__cache[path]){
                     args[0] = this.__cache[path]
                     return originCreatePattern.call(ctx, ...args)
@@ -150,16 +150,21 @@ class Canvas extends Item {
 
     }
     isImageLoaded(image){
-
+        if(typeof image === 'string'){
+            let path = image.startsWith('data:image') ? image : JQApplication.rootPath+'/'+image.replaceAll('../','')
+            return this.__cache[path]
+        }
+        return false
     }
     isImageLoading(image){
 
     }
-    loadImage(image){
+    loadImage(image, sourceSize){
         if(typeof image === 'string'){
-            let path = JQApplication.rootPath+'/'+image.replaceAll('../','')
+            let path = image.startsWith('data:image') ? image : JQApplication.rootPath+'/'+image.replaceAll('../','')
+            
             if(!this.__cache[path]){
-                let img = new Image()
+                let img = sourceSize ? new Image(sourceSize.width, sourceSize.height) : new Image()
                 img.onload = ()=>{
                     image = img
                     this.__cache[path] = img
