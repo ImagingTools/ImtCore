@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS "PersonalAccessTokens"
     "Name"       text        NOT NULL,
     "Description" text       NOT NULL DEFAULT '',
     "UserId"     uuid        NOT NULL,
+    "ProductId"  uuid,
     "TokenHash"  bytea       NOT NULL,
     -- Code stores scopes as comma-separated string; keep as text for compatibility
     "Scopes"     text        NOT NULL DEFAULT '',
@@ -16,6 +17,9 @@ CREATE TABLE IF NOT EXISTS "PersonalAccessTokens"
 -- Helpful indexes (optional)
 CREATE INDEX IF NOT EXISTS "IX_PersonalAccessTokens_UserId"
     ON "PersonalAccessTokens" ("UserId");
+
+CREATE INDEX IF NOT EXISTS "IX_PersonalAccessTokens_ProductId"
+    ON "PersonalAccessTokens" ("ProductId");
 
 CREATE INDEX IF NOT EXISTS "IX_PersonalAccessTokens_Revoked"
     ON "PersonalAccessTokens" ("Revoked");

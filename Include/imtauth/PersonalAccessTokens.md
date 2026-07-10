@@ -71,6 +71,7 @@ The PersonalAccessTokens.sdl schema defines the following operations:
 mutation {
   CreatePersonalAccessToken(input: {
     userId: "user123"
+    productId: "product-office-suite"
     name: "My API Token"
     description: "Token for CI/CD pipeline"
     scopes: ["read:users", "write:data"]
@@ -113,6 +114,7 @@ query {
     items {
       id
       userId
+      productId
       name
       description
       scopes
@@ -147,6 +149,7 @@ imtauth::IPersonalAccessTokenManager* tokenManager = ...;
 
 // Create a token
 QByteArray userId = "user123";
+QByteArray productId = "product-office-suite";
 QString name = "My API Token";
 QString description = "Token for automated scripts";
 QByteArrayList scopes;
@@ -154,7 +157,7 @@ scopes << "read:api" << "write:data";
 QDateTime expiresAt = QDateTime::currentDateTimeUtc().addDays(90);
 
 auto result = tokenManager->CreateToken(
-    userId, name, description, scopes, expiresAt);
+    userId, productId, name, description, scopes, expiresAt);
 
 if (result.success) {
     qDebug() << "Token created:" << result.tokenId;
@@ -207,6 +210,7 @@ CREATE TABLE PersonalAccessTokens (
     Name TEXT,
     Description TEXT,
     UserId TEXT NOT NULL,
+    ProductId TEXT,
     TokenHash TEXT NOT NULL,
     Scopes TEXT,
     CreatedAt TEXT NOT NULL,
@@ -217,6 +221,7 @@ CREATE TABLE PersonalAccessTokens (
 );
 
 CREATE INDEX idx_pat_user_id ON PersonalAccessTokens(UserId);
+CREATE INDEX idx_pat_product_id ON PersonalAccessTokens(ProductId);
 CREATE INDEX idx_pat_token_hash ON PersonalAccessTokens(TokenHash);
 CREATE INDEX idx_pat_created_at ON PersonalAccessTokens(CreatedAt);
 ```

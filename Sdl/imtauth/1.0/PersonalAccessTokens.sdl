@@ -14,6 +14,7 @@ type PersonalAccessToken
 {
 	id: ID!
 	userId: ID!
+	productId: ID
 	name: String!
 	description: String
 	tokenHash: ID!
@@ -39,6 +40,7 @@ input UserIdInput {
 
 input CreateTokenInput {
 	userId: ID!
+	productId: ID
 	name: String!
 	description: String
 	scopes: [ID]

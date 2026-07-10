@@ -266,7 +266,9 @@ Item {
 		anchors.top: parent.top;
 		anchors.bottom: parent.bottom;
 		anchors.left: parent.left;
-		anchors.right: collectionMetaInfo.left;
+		anchors.right: parent.right;
+
+		viewContentRightMargin: collectionMetaInfo.width
 
 		headerRightClickEnabled: root.headerRightClickEnabled;
 		commandsPanelVisible: root.commandsPanelVisible;
@@ -497,6 +499,7 @@ Item {
 		id: collectionMetaInfo;
 		
 		anchors.top: parent.top;
+		anchors.topMargin: container.viewContentY
 		anchors.right: parent.right;
 		
 		width: visible ? root.metaInfoWidth : 0;

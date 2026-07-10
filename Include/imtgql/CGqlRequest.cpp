@@ -772,9 +772,9 @@ QByteArray CGqlRequest::AddObjectParamValue(const QVariant& value) const
 		QByteArray data = value.toByteArray();
 		data = data.replace("\\", "\\\\\\\\");
 		data = data.replace("\"", "\\\\\\\"");
-		data = data.replace('\n', "\\\\\\\n");
-		data = data.replace('\r', "\\\\\\\r");
-		data = data.replace('\t', "\\\\\\\t");
+		data = data.replace('\n', "\\\\n");
+		data = data.replace('\r', "\\\\r");
+		data = data.replace('\t', "\\\\t");
 		retVal += data;
 		retVal += QByteArrayLiteral("\\\"");
 	}

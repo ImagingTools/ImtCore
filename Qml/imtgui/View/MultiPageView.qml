@@ -250,6 +250,13 @@ Item {
                 delegate: Item {
                     id: navDelegate
 
+                    // Test instrumentation: every MultiPageView consumer (e.g. Administration's
+                    // Roles/Users/Groups) gets a per-nav-item selector keyed by the same pageId passed
+                    // to addPage()/addSubPage() - previously this delegate had no objectName at all, so
+                    // subpage navigation was only clickable by visible text. Inert - no runtime/visual
+                    // effect.
+                    objectName: "Page_" + model.id;
+
                     readonly property bool __isParentWithSubs: root.hasSubPages(model.id)
                     readonly property bool __isSubpage: model.isSubpage
                     readonly property string __parentId: model.parentId || ""
@@ -318,6 +325,10 @@ Item {
 
                         MouseArea {
                             id: navMouseArea
+
+                            // Test instrumentation: matches the "[objectName=Page_x] [objectName=MouseArea]"
+                            // click convention used everywhere else in this codebase. Inert.
+                            objectName: "MouseArea";
 
                             anchors.fill: parent
                             hoverEnabled: true
