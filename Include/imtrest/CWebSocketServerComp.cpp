@@ -401,11 +401,6 @@ void CWebSocketServerComp::OnSocketDisconnected()
 	socketObjectPtr->deleteLater();
 }
 
-void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
-{
-	emit
-}
-
 
 void CWebSocketServerComp::OnTimeout()
 {

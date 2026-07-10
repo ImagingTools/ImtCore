@@ -121,13 +121,9 @@ private:
 private Q_SLOTS:
 	void HandleNewConnections();
 	void OnSocketDisconnected();
-	void OnWebSocketTextMessage(const QString& textMessage);
 	void OnTimeout();
 	void OnAcceptError(QAbstractSocket::SocketError socketError);
 	void OnSslErrors(const QList<QSslError> &errors);
-
-Q_SIGNALS:
-	void WebSocketTextMessageSignal(const QByteArray& data) const;
 
 protected:
 	QTimer m_timer;
