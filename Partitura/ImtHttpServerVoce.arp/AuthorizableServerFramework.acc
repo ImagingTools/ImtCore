@@ -17,10 +17,13 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PersonalAccessTokenController/PersonalAccessTokenManager"/>
+                        <Data IsEnabled="true" Value="PumaClientEngine/RemotePersonalAccessTokenController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SlaveJwtSessionController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaClientEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine/RemoteTenantController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
@@ -41,7 +44,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>UserActionController</Value>
-                                <Value>PersonalAccessTokenController</Value>
                                 <Value>DeskController</Value>
                                 <Value>PumaClientEngine</Value>
                                 <Value>PermissionsController</Value>
@@ -144,27 +146,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="PersonalAccessTokenController" PackageId="ImtAuthVoce" ComponentId="PersonalAccessTokenController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

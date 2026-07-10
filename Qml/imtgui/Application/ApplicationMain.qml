@@ -248,10 +248,6 @@ Item {
 		}
 	}
 	
-	PatTokenSettingsController {
-		id: patTokenSettingsController
-	}
-	
 	PageAboutProvider {
 		id: pageAboutProvider
 	}
@@ -520,9 +516,6 @@ Item {
 			if (application.serverConnected){
 				settingsController.registerParamsSetController("General", qsTr("General"), userSettingsController)
 				settingsController.registerParamsSetController("About", qsTr("About"), pageAboutProvider)
-
-				// Register PAT tokens settings (always available)
-				settingsController.registerParamsSetController("PatTokens", qsTr("PAT Tokens"), patTokenSettingsController)
 			}
 		}
 	}

@@ -8,10 +8,8 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="PersonalAccessToken" X="600" Y="100" Note=""/>
-        <Element ComponentName="PersonalAccessTokenController" X="250" Y="100" Note=""/>
-        <Element ComponentName="PersonalAccessTokenManager" X="1000" Y="100" Note=""/>
-        <Element ComponentName="PersonalAccessTokenSqlRepository" X="575" Y="500" Note=""/>
+        <Element ComponentName="ClientRequestPersonalAccessTokenManager" X="550" Y="100" Note=""/>
+        <Element ComponentName="PersonalAccessToken" X="550" Y="300" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
