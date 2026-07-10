@@ -59,8 +59,16 @@ endfunction()
 
 include_directories("${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles")
 include_directories("${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}")
-include_directories("${IMTCOREDIR}/Include")
-include_directories("${IMTCOREDIR}/Impl")
+
+# The Sdl source tree carries hand-written headers (e.g. imtpay/) that are not part of the
+# per-target INCLUDE_DIR/IMPL_DIR exposed by acf_register_library, so it stays unconditional.
 include_directories("${IMTCOREDIR}/Sdl")
 
-link_directories("${IMTCOREDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}")
+# Legacy mode: global include/link dirs for repos that haven't migrated to
+# find_package(ImtCore) + target-based deps yet. Skipped when ACF_MODERN_CMAKE is ON.
+if(NOT ACF_MODERN_CMAKE)
+	include_directories("${IMTCOREDIR}/Include")
+	include_directories("${IMTCOREDIR}/Impl")
+
+	link_directories("${IMTCOREDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}")
+endif()

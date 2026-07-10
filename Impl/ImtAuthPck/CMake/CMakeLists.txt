@@ -2,9 +2,7 @@ project(ImtAuthPck LANGUAGES CXX)
 
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
 
-target_link_libraries(${PROJECT_NAME} imtauth imtlic imtbase imtrest imtserverapp)
-include(${ACFDIR}/Config/CMake/AcfQt.cmake)
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
+target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE} imtauth imtlic imtbase imtrest imtserverapp)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-acf_use_qt_graphics_modules()
+target_link_libraries(${PROJECT_NAME} ${ACF_QT_MODULE_LINK_SCOPE} Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg)

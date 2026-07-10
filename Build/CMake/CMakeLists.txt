@@ -25,7 +25,47 @@ if(NOT DEFINED IMTCOREDIR_BUILD)
 	set(IMTCOREDIR_BUILD "${IMTCOREDIR}")
 endif()
 
+# Enable modern target-based architecture:
+# find_package(IAcf) provides Acf::/AcfSln::/IAcf:: imported targets with transitive
+# include dirs and link deps. Legacy global include_directories()/link_directories() in the
+# Env chain are skipped.
+set(ACF_MODERN_CMAKE ON CACHE BOOL "Enable modern target-based architecture")
+
+# Collect ImtCore libraries in their own export set so they are published as the
+# ImtCore:: package. Read by StaticConfig.cmake / acf_register_library().
+set(ACF_PACKAGE_NAME "ImtCore")
+
 include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
+
+if(ACF_MODERN_CMAKE)
+	acf_define_link_scope_var(ACF_QT_MODULE_LINK_SCOPE "PRIVATE" "Link scope used for Qt module dependencies")
+	acf_define_link_scope_var(ACF_LIBRARY_LINK_SCOPE "PUBLIC" "Link scope used by ImtCore inter-library dependencies")
+	acf_define_link_scope_var(ACF_PACKAGE_LINK_SCOPE "PRIVATE" "Link scope used by package (Pck) libraries linking their dependencies")
+	acf_define_link_scope_var(ACF_APPLICATION_LINK_SCOPE "PRIVATE" "Link scope used by executables linking their dependencies")
+endif()
+
+# Discover the IAcf package published by its build tree. IAcf transitively pulls in the
+# AcfSln and Acf packages (find_dependency(Acf)/find_dependency(AcfSln) in IAcfConfig.cmake),
+# so the Acf::/AcfSln::/IAcf:: imported targets referenced by the ImtCore dependency graph
+# resolve. Acf_DIR/AcfSln_DIR are set as well so those transitive find_dependency() calls locate
+# the sibling build trees. In a composite build (Acf, AcfSln, IAcf and ImtCore in the same CMake
+# tree) their alias targets are already visible - skip find_package to avoid requiring the
+# not-yet-generated *Targets.cmake export files.
+if(ACF_MODERN_CMAKE AND NOT TARGET Acf::istd)
+	if(NOT DEFINED ACFDIR_BUILD)
+		set(ACFDIR_BUILD "${ACFDIR}")
+	endif()
+	if(NOT DEFINED ACFSLNDIR_BUILD)
+		set(ACFSLNDIR_BUILD "${ACFSLNDIR}")
+	endif()
+	if(NOT DEFINED IACFDIR_BUILD)
+		set(IACFDIR_BUILD "${IACFDIR}")
+	endif()
+	set(Acf_DIR "${ACFDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}/cmake" CACHE PATH "Path to the Acf build-tree CMake package")
+	set(AcfSln_DIR "${ACFSLNDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}/cmake" CACHE PATH "Path to the AcfSln build-tree CMake package")
+	set(IAcf_DIR "${IACFDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}/cmake" CACHE PATH "Path to the IAcf build-tree CMake package")
+	find_package(IAcf REQUIRED GLOBAL)
+endif()
 include(${IMTCOREDIR}/Config/CMake/PartituraUpgrade.cmake)
 if (NOT ANDROID)
 	imt_core_upgrade_partitura("${CMAKE_CURRENT_LIST_DIR}/../..")
@@ -475,4 +515,15 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 	endif() # BUILD_TESTING
 endif() # NOT ONLYTOOLS
+
+# Declare target-based deps so include paths/link order propagate transitively across ImtCore
+# libraries and onto the underlying Acf::/AcfSln::/IAcf:: libraries. Guarded on the modern
+# packaging machinery (acf_register_library from Acf) so the file no-ops under the legacy shim.
+if(COMMAND acf_register_library)
+	include("${IMTCOREDIR}/Config/CMake/ImtCoreLibraryDependencies.cmake")
+
+	# Export ImtCore libraries as a find_package(ImtCore) package (build + install tree) so
+	# downstream modules consume them via ImtCore::<lib> targets instead of env vars/manual paths.
+	include("${IMTCOREDIR}/Config/CMake/ImtCorePackageExport.cmake")
+endif()
 

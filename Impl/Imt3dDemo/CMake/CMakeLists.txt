@@ -5,16 +5,13 @@ if(APPLE)
 endif()
 
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
-include(${ACFDIR}/Config/CMake/AcfQt.cmake)
-include(${ACFDIR}/Config/CMake/AcfStd.cmake)
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME} imt3dgui imt3dview imt3d imtbase)
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Qml Qt${QT_VERSION_MAJOR}::Quick Qt${QT_VERSION_MAJOR}::QuickControls2)
+target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE} imt3dgui imt3dview imt3d imtbase)
+target_link_libraries(${PROJECT_NAME} ${ACF_QT_MODULE_LINK_SCOPE} Qt${QT_VERSION_MAJOR}::Qml Qt${QT_VERSION_MAJOR}::Quick Qt${QT_VERSION_MAJOR}::QuickControls2)
 
 if(QT_VERSION_MAJOR EQUAL 6)
-	target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
+	target_link_libraries(${PROJECT_NAME} ${ACF_QT_MODULE_LINK_SCOPE} Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
 endif()
 
 if(WIN32)

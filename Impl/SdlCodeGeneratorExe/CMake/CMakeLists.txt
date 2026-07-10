@@ -18,14 +18,14 @@ include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	imtsdlgencpp
 	imtsdlgenqml
 	imtsdl
 	imtfile
 	imtbase
-	i2d ##<
-)
+	Acf::i2d
+	##<)
 
 if(WIN32)
 	set(files \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")

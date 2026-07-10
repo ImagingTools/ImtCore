@@ -3,7 +3,8 @@ project(imthypegui LANGUAGES CXX)
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-acf_use_qt_graphics_modules()
+target_link_libraries(${PROJECT_NAME} ${ACF_QT_MODULE_LINK_SCOPE} Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg)
+
 
 ADD_DEFINITIONS(-DUNICODE)
 ADD_DEFINITIONS(-D_UNICODE)

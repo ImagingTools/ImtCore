@@ -4,21 +4,19 @@ message(VERBOSE "QT_VERSION_MAJOR ${QT_VERSION_MAJOR}")
 
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
-include(${ACFDIR}/Config/CMake/AcfQt.cmake)
-include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE}
 	imtrepo
 	imtrest
 	imtcom
 	imtbase
 	imtbasesdl
-	idoc
-	iqt
-	i2d
-	istd
+	Acf::idoc
+	Acf::iqt
+	Acf::i2d
+	Acf::istd
 	Qt${QT_VERSION_MAJOR}::WebSockets)
 
 if (WIN32)

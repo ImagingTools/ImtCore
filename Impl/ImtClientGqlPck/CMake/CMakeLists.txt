@@ -7,10 +7,10 @@ include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 if(NOT DEFINED USE_QTQML OR USE_QTQML)
-	target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::QuickWidgets)
+	target_link_libraries(${PROJECT_NAME} ${ACF_QT_MODULE_LINK_SCOPE} Qt${QT_VERSION_MAJOR}::QuickWidgets)
 endif()
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE}
 	imtclientgql
 	imtservergql
 	imtserverapp
@@ -19,12 +19,8 @@ target_link_libraries(${PROJECT_NAME}
 	imtcom
 	imtbasesdl
 	imtbase
-	i2d
-	iqt
-)
+	Acf::i2d
+	Acf::iqt)
 
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
-include(${ACFDIR}/Config/CMake/AcfStd.cmake)
-include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 
 

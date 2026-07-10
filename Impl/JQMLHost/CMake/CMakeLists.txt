@@ -5,14 +5,11 @@ if(APPLE)
 endif()
 
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
-include(${ACFDIR}/Config/CMake/AcfQt.cmake)
-include(${ACFDIR}/Config/CMake/AcfStd.cmake)
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 #------ SDL-generated QML libraries ------
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	imtbasesdl
 	imtappsdl
 	imtauthsdl
@@ -24,7 +21,7 @@ target_link_libraries(${PROJECT_NAME}
 	imtpaysdl)
 
 #------ QML modules (from ImtCore/Qml) ------
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	imtcontrolsqml
 	imtstylecontrolsqml
 	imtguiqml
@@ -37,7 +34,7 @@ target_link_libraries(${PROJECT_NAME}
 	imtdeskguiqml)
 
 #------ Core ImtCore libraries ------
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	imtbase
 	ImtCoreLoc
 	AcfLoc
@@ -68,7 +65,7 @@ target_link_libraries(${PROJECT_NAME}
 	imtdesk)
 
 #------ Qt modules ------
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} ${ACF_QT_MODULE_LINK_SCOPE}
 	Qt${QT_VERSION_MAJOR}::Qml
 	Qt${QT_VERSION_MAJOR}::Quick
 	Qt${QT_VERSION_MAJOR}::QuickControls2

@@ -3,9 +3,7 @@ project(ImtGuiPck LANGUAGES CXX)
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-target_link_libraries(${PROJECT_NAME} imeas iproc iedge iqtdoc)
-target_link_libraries(${PROJECT_NAME} imtgui imtcol iauth imtloggui imtbase imtwidgets i2d iqt2d imtstyle)
+target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE} AcfSln::imeas AcfSln::iproc AcfSln::iedge Acf::iqtdoc)
+target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE} imtgui imtcol AcfSln::iauth imtloggui imtbase imtwidgets Acf::i2d Acf::iqt2d imtstyle)
 
-include(${ACFDIR}/Config/CMake/AcfQt.cmake)
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 

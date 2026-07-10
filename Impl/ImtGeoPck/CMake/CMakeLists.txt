@@ -6,10 +6,9 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Sql REQUIRED)
 
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
-include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE}
 	imtgeo
 	imtguigql
 	imtservergql
@@ -19,12 +18,10 @@ target_link_libraries(${PROJECT_NAME}
 	imtbasesdl
 	imtdb
 	imtbase
-	i2d
-	iqt
-	Qt${QT_VERSION_MAJOR}::Sql
-)
+	Acf::i2d
+	Acf::iqt
+	Qt${QT_VERSION_MAJOR}::Sql)
 
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 
 if(WIN32)
 	set(files \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.arp\")
