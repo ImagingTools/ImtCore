@@ -188,7 +188,13 @@ ViewBase {
 				
 				TextInputElementView {
 					id: roleNameInput;
-					
+
+					// Test instrumentation: matches the AccountEditor/DeviceEditor/etc. convention of
+					// an explicit per-field objectName on the ElementView usage site (the shared
+					// TextInputElementView/CustomTextField components only ever carry the generic
+					// "TextField"/"TextInput"). Inert - no runtime/visual effect.
+					objectName: "RoleNameInput";
+
 					name: qsTr("Role Name");
 					placeHolderText: qsTr("Enter the role name");
 					
@@ -210,9 +216,12 @@ ViewBase {
 				
 				TextInputElementView {
 					id: roleIdInput;
-					
+
+					// Test instrumentation - see roleNameInput's comment above. Inert.
+					objectName: "RoleIdInput";
+
 					readOnly: true;
-					
+
 					name: qsTr("Role-ID");
 					
 					KeyNavigation.tab: descriptionInput;
@@ -221,10 +230,13 @@ ViewBase {
 				
 				TextInputElementView {
 					id: descriptionInput;
-					
+
+					// Test instrumentation - see roleNameInput's comment above. Inert.
+					objectName: "RoleDescriptionInput";
+
 					name: qsTr("Description");
 					placeHolderText: qsTr("Enter the description");
-					
+
 					onEditingFinished: {
 						let oldText = container.roleData.m_description;
 						if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
