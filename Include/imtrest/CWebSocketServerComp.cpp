@@ -333,22 +333,28 @@ void CWebSocketServerComp::HandleNewConnections()
 			SendVerboseMessage("Unsupported subprotocol: " + subprotocol, "CWebSocketServerComp");
 		}
 #endif
-		bool find = false;
-		for (CWebSocketThread* webSocketThreadPtr: m_webSocketThreadList){
-			if (!webSocketThreadPtr->isRunning()){
-				webSocketThreadPtr->SetWebSocket(webSocketPtr);
-				find = true;
+		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
+
+		// bool find = false;
+		CWebSocketThread* webSocketThreadPtr = nullptr;
+		for (CWebSocketThread* webSocketThreadItemPtr: m_webSocketThreadList){
+			if (!webSocketThreadItemPtr->isRunning()){
+				webSocketThreadItemPtr->SetWebSocket(webSocketPtr);
+				webSocketThreadPtr = webSocketThreadItemPtr;
 
 				break;
 			}
 		}
 
-		if (!find){
-			CWebSocketThread* webSocketThreadPtr = new CWebSocketThread(this);
+		if (webSocketThreadPtr == nullptr){
+			webSocketThreadPtr = new CWebSocketThread(this);
 			m_webSocketThreadList.append(webSocketThreadPtr);
 			webSocketThreadPtr->SetWebSocket(webSocketPtr);
 		}
-		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
+
+		connect(webSocketPtr, &QWebSocket::textMessageReceived, webSocketThreadPtr, &CWebSocketThread::TextMessageReceived);
+		connect(webSocketPtr, &QWebSocket::disconnected, webSocketThreadPtr, &CWebSocketThread::SocketDisconnected);
+		connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), webSocketThreadPtr, &CWebSocketThread::SocketError);
 	}
 }
 
@@ -393,6 +399,11 @@ void CWebSocketServerComp::OnSocketDisconnected()
 	}
 
 	socketObjectPtr->deleteLater();
+}
+
+void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
+{
+	emit
 }
 
 
