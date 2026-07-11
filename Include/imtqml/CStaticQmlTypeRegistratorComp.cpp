@@ -14,6 +14,7 @@
 #include <imtqml/CGqlModel.h>
 #include <imtqml/CGqlRequest.h>
 #include <imtqml/CNetworkEventInterceptor.h>
+#include <imtqml/CObjectViewModel.h>
 #include <imtqml/CQmlProcess.h>
 #include <imtqml/CRemoteFileController.h>
 
@@ -64,6 +65,8 @@ void CStaticQmlTypeRegistratorComp::OnComponentCreated()
 	}
 	if (!m_registerCDataModelControllerAttrPtr.IsValid() || *m_registerCDataModelControllerAttrPtr){
 		qmlRegisterType<imtqml::CDataModelController>("com.imtcore.imtqml", 1, 0, "DataModelController");
+		qmlRegisterUncreatableType<imtqml::CObjectViewModel>("com.imtcore.imtqml", 1, 0, "ObjectViewModel",
+				QStringLiteral("ObjectViewModel is owned by DataModelController - use its viewModel property"));
 	}
 }
 

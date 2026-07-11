@@ -48,6 +48,7 @@ class IDataModelBridge: virtual public istd::IPolymorphic
 public:
 	typedef std::function<void(QVariant /*model*/, QString /*errorMessage*/)> GetModelCallback;
 	typedef std::function<void(QString /*errorMessage*/)> SetModelCallback;
+	typedef std::function<void(QVariant /*model*/)> ModelUpdateCallback;
 
 	/**
 		\brief Returns \c true if this bridge is able to serve the
@@ -77,6 +78,39 @@ public:
 			const QVariantMap& parameters,
 			const QVariant& model,
 			SetModelCallback callback) = 0;
+
+	/**
+		\brief Subscribe for live updates of the model identified by
+		\c modelId.
+
+		\details
+		Whenever the underlying data model changes, \c callback is
+		invoked on the GUI thread with the fresh model value. The
+		desktop bridge implements this via an in-process
+		\c imod::IObserver; the GraphQL bridge via a WebSocket
+		subscription. Returns an opaque subscription ID (> 0) to be
+		passed to \c UnsubscribeModel, or 0 if live updates are not
+		supported by this bridge (the default implementation).
+	*/
+	virtual int SubscribeModel(
+			const QString& modelId,
+			const QVariantMap& parameters,
+			ModelUpdateCallback callback)
+	{
+		Q_UNUSED(modelId);
+		Q_UNUSED(parameters);
+		Q_UNUSED(callback);
+		return 0;
+	}
+
+	/**
+		\brief Cancel a live-update subscription created by
+		\c SubscribeModel. Passing 0 or an unknown ID is a no-op.
+	*/
+	virtual void UnsubscribeModel(int subscriptionId)
+	{
+		Q_UNUSED(subscriptionId);
+	}
 };
 
 

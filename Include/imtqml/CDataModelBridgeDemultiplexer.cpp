@@ -2,6 +2,10 @@
 #include <imtqml/CDataModelBridgeDemultiplexer.h>
 
 
+// Qt includes
+#include <QtCore/QMap>
+
+
 namespace imtqml
 {
 
@@ -90,6 +94,43 @@ void CDataModelBridgeDemultiplexer::SetModel(
 		return;
 	}
 	delegatePtr->SetModel(modelId, parameters, model, callback);
+}
+
+
+int CDataModelBridgeDemultiplexer::SubscribeModel(
+		const QString& modelId,
+		const QVariantMap& parameters,
+		ModelUpdateCallback callback)
+{
+	IDataModelBridge* delegatePtr = FindDelegate(modelId);
+	if (delegatePtr == nullptr){
+		return 0;
+	}
+
+	int delegateSubscriptionId = delegatePtr->SubscribeModel(modelId, parameters, callback);
+	if (delegateSubscriptionId == 0){
+		return 0;
+	}
+
+	int subscriptionId = m_nextSubscriptionId++;
+	m_subscriptions.insert(subscriptionId, SubscriptionInfo{delegatePtr, delegateSubscriptionId});
+
+	return subscriptionId;
+}
+
+
+void CDataModelBridgeDemultiplexer::UnsubscribeModel(int subscriptionId)
+{
+	auto it = m_subscriptions.find(subscriptionId);
+	if (it == m_subscriptions.end()){
+		return;
+	}
+
+	if (it->delegatePtr != nullptr){
+		it->delegatePtr->UnsubscribeModel(it->delegateSubscriptionId);
+	}
+
+	m_subscriptions.erase(it);
 }
 
 

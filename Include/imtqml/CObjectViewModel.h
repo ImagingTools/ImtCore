@@ -1,0 +1,126 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#pragma once
+
+
+// Qt includes
+#include <QtCore/QVariantMap>
+#include <QtQml/QQmlPropertyMap>
+
+
+namespace imtqml
+{
+
+
+/**
+	\brief Declarative QObject-based ViewModel used by QML editors to
+	bind data-model fields via property bindings.
+
+	\details
+	\c CObjectViewModel is the QML-facing representation of a single
+	data-model object. It is based on \c QQmlPropertyMap, so every
+	model field appears as a regular QML property with automatic
+	change notification — QML editors bind their input controls
+	directly to these properties instead of implementing imperative
+	\c updateGui() / \c updateModel() function pairs.
+
+	Two data flows are strictly separated:
+
+	- \b Source \b updates (bridge / transport → ViewModel): use
+	  \c SetSourceValues(). Source updates reset the dirty state,
+	  refresh the revert snapshot and do NOT emit \c valueEdited —
+	  this is the single, central place where the update-feedback
+	  loop is broken. QML never needs blocker logic
+	  (\c blockingUpdateModel, \c UpdateBlocker etc.).
+	- \b User \b edits (QML → ViewModel): plain property writes from
+	  QML. They mark the ViewModel dirty and emit \c valueEdited so
+	  that a controller or bridge can write the change back to the
+	  underlying data model (immediately in live mode, or on
+	  \c submit() in form mode).
+
+	The type is registered to QML by \c CStaticQmlTypeRegistratorComp
+	under \c com.imtcore.imtqml 1.0 as \c ObjectViewModel. Instances
+	are typically created and owned by \c CDataModelController and
+	consumed in QML through its \c viewModel property.
+
+	\sa CDataModelController, IDataModelBridge
+*/
+class CObjectViewModel: public QQmlPropertyMap
+{
+	Q_OBJECT
+	Q_PROPERTY(bool isDirty READ IsDirty NOTIFY isDirtyChanged)
+
+public:
+	typedef QQmlPropertyMap BaseClass;
+
+	explicit CObjectViewModel(QObject* parent = nullptr);
+
+	/**
+		\brief Returns \c true if the ViewModel contains user edits
+		that were not yet written back to the data model.
+	*/
+	bool IsDirty() const;
+
+	/**
+		\brief Replace / merge the ViewModel content with values
+		coming from the data source (bridge, transport, observer).
+
+		\details
+		This is the ONLY entry point for source-driven updates.
+		It updates the properties, takes a new revert snapshot,
+		clears the dirty state and suppresses \c valueEdited
+		notifications, so no echo is sent back to the source.
+	*/
+	void SetSourceValues(const QVariantMap& values);
+
+	/**
+		\brief Returns the current values of all properties.
+	*/
+	QVariantMap GetValues() const;
+
+	/**
+		\brief Returns only the values changed by the user since the
+		last \c SetSourceValues() / \c MarkClean() call.
+	*/
+	QVariantMap GetChangedValues() const;
+
+	/**
+		\brief Marks the current state as clean (e.g. after a
+		successful submit) and refreshes the revert snapshot.
+	*/
+	void MarkClean();
+
+public Q_SLOTS:
+	/**
+		\brief Discards all user edits and restores the values of the
+		last source update.
+	*/
+	void revert();
+
+Q_SIGNALS:
+	void isDirtyChanged(bool isDirty);
+
+	/**
+		\brief Emitted for user/QML edits only — never for source
+		updates applied via \c SetSourceValues().
+	*/
+	void valueEdited(const QString& key, const QVariant& value);
+
+protected:
+	// reimplemented (QQmlPropertyMap)
+	virtual QVariant updateValue(const QString& key, const QVariant& input) override;
+
+private:
+	void SetIsDirty(bool isDirty);
+
+private:
+	QVariantMap m_snapshot;
+	QVariantMap m_changedValues;
+	bool m_isDirty = false;
+	bool m_isSourceUpdate = false;
+};
+
+
+} // namespace imtqml
+
+
+Q_DECLARE_METATYPE(imtqml::CObjectViewModel*)

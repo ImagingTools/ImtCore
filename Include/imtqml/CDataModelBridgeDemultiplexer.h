@@ -5,6 +5,9 @@
 // ACF includes
 #include <icomp/CComponentBase.h>
 
+// Qt includes
+#include <QtCore/QMap>
+
 // ImtCore includes
 #include <imtqml/IDataModelBridge.h>
 
@@ -81,11 +84,27 @@ public:
 			const QVariant& model,
 			SetModelCallback callback) override;
 
+	virtual int SubscribeModel(
+			const QString& modelId,
+			const QVariantMap& parameters,
+			ModelUpdateCallback callback) override;
+
+	virtual void UnsubscribeModel(int subscriptionId) override;
+
 private:
 	IDataModelBridge* FindDelegate(const QString& modelId) const;
 
 private:
+	struct SubscriptionInfo
+	{
+		IDataModelBridge* delegatePtr = nullptr;
+		int delegateSubscriptionId = 0;
+	};
+
 	I_MULTIREF(IDataModelBridge, m_modelDelegateCompPtr);
+
+	QMap<int, SubscriptionInfo> m_subscriptions;
+	int m_nextSubscriptionId = 1;
 
 	static CDataModelBridgeDemultiplexer* s_instancePtr;
 };

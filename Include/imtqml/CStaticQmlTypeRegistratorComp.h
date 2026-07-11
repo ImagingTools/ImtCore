@@ -21,6 +21,8 @@ namespace imtqml
 			\c imtqml::CQmlProcess as \b com.imtcore.imtqml.1.0.Process
 			\c imtqml::CDocumentServiceController as \b com.imtcore.imtqml.1.0.DocumentServiceController
 			\c imtqml::CDataModelController as \b com.imtcore.imtqml.1.0.DataModelController
+		\a uncreatable types
+			\c imtqml::CObjectViewModel as \b com.imtcore.imtqml.1.0.ObjectViewModel (owned by DataModelController)
 		\a singleton types
 			\c imtqml::CNetworkEventInterceptor as \b com.imtcore.imtqml.1.0.NetworkEventInterceptor
 
