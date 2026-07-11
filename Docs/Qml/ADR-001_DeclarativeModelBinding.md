@@ -58,8 +58,12 @@ The layered architecture (bottom-up):
      local `imod` model. The `imod::IObserver` mechanics stay fully
      encapsulated inside the bridge; write-back happens in a single
      `BeginChanges`/`EndChanges` transaction (`istd::CChangeNotifier`).
-   - GraphQL bridge (follow-up): implements the same interface with Query
-     (get), Mutation (set) and GraphQL Subscription over WebSocket (live).
+   - GraphQL bridge (`CGqlDataModelBridgeComp`): implements the same
+     interface with Query (get), Mutation (set) and GraphQL Subscription
+     over WebSocket (live) on top of `imtclientgql` (async client +
+     subscription manager). All callbacks are marshalled to the GUI
+     thread; payloads are decoded generically from the response `data`
+     object.
 
 4. **Controller (`imtqml::CDataModelController`):** the single QML entry
    point: `modelId`, `parameters`, `viewModel`, `isLoading`, `error`,
@@ -108,9 +112,11 @@ The layered architecture (bottom-up):
 
 - Extend the `imtsdlgenqml` code generator to emit typed ViewModels
   (properties, list roles, dirty/validation state) from SDL definitions.
-- Implement the GraphQL bridge (Query/Mutation/Subscription) on top of
-  `imtclientgql` / `CGqlClientBridge`, generating queries from SDL metadata
-  instead of `GraphQLRequest.js` string building.
+- ~~Implement the GraphQL bridge (Query/Mutation/Subscription) on top of
+  `imtclientgql`~~ — done: `imtqml::CGqlDataModelBridgeComp` (async client
+  + subscription manager, GUI-thread callback contract). Generating
+  queries from SDL metadata instead of the attribute-configured field
+  lists remains open.
 - Unify list adapters with roles on top of `TListModelBase` /
   `TSdlAbstractListModel`.
 - Migrate editors module by module (see the migration guide) and finally

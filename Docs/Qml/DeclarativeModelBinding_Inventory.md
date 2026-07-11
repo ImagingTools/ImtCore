@@ -72,6 +72,13 @@ Regenerate: `grep -rln "blockingUpdateModel" Qml --include="*.qml"`
   `CTreeItemModel` response in `onStateChanged` handlers
 - `Include/imtqml/CGqlModel.*` — HTTP transport + tree-model response
 
+Replacement available: `imtqml::CGqlDataModelBridgeComp` implements
+`IDataModelBridge` over `imtclientgql` (query = GetModel, mutation =
+SetModel, WebSocket subscription = SubscribeModel), so declarative editors
+reach GraphQL through `CDataModelBridgeDemultiplexer` without any of the
+above QML plumbing. The legacy types stay as deprecated facades until the
+`imtcolgui` / `imtguigql` consumers are migrated.
+
 ## Migration order (Phase 4 of the plan)
 
 1. `imtauthgui` editors (largest inventory, pilot: `UserGeneralEditor.qml`)

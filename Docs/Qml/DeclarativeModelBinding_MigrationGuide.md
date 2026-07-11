@@ -168,6 +168,30 @@ slot of `CDataModelBridgeDemultiplexer`. Write-back runs inside a single
 `BeginChanges`/`EndChanges` transaction; model changes are pushed to all
 `live` controllers automatically.
 
+## Providing the GraphQL bridge (web)
+
+For the web transport no subclassing is needed — configure a
+`imtqml::CGqlDataModelBridgeComp` instance per model in the partitura:
+
+- `ModelId`: same identifier as on the desktop (e.g. `imtauth.User`), so
+  the QML screens stay transport-independent.
+- `GqlClient`: reference to the `imtclientgql::IAsyncGqlClient`
+  (e.g. `CAsyncApiClientComp`).
+- `SubscriptionManager` (optional): reference to the
+  `imtclientgql::IGqlSubscriptionManager` for `live` controllers.
+- `QueryCommandId` / `MutationCommandId` / `SubscriptionCommandId`: the
+  GraphQL operations serving the model (e.g. `GetUser` / `SetUser` /
+  `UserChanged`).
+- `Fields`: payload fields to select; nested objects via dotted paths
+  (e.g. `address.city`). `MutationFields` defaults to `success`.
+
+Plug the bridge into the same `ModelDelegates` slot of
+`CDataModelBridgeDemultiplexer`. The controller `parameters` map becomes
+the GraphQL `input` argument object; ViewModel edits are merged into the
+mutation input on `submit()`. All callbacks are delivered on the GUI
+thread — the editor QML is byte-for-byte identical to the desktop
+variant.
+
 ## Checklist per migrated editor
 
 - [ ] No `function updateGui()` / `function updateModel()` left
