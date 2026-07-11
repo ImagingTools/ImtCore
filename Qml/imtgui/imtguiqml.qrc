@@ -56,6 +56,7 @@
         <file alias="imtgui/View/SearchAddressComp.qml">View/SearchAddressComp.qml</file>
         <file alias="imtgui/View/SearchCompLegacy.qml">View/SearchCompLegacy.qml</file>
         <file alias="imtgui/View/ViewBase.qml">View/ViewBase.qml</file>
+        <file alias="imtgui/View/DeclarativeViewBase.qml">View/DeclarativeViewBase.qml</file>
         <file alias="imtgui/View/ViewCommandsDelegateBase.qml">View/ViewCommandsDelegateBase.qml</file>
         <file alias="imtgui/View/LogView.qml">View/LogView.qml</file>
         <file alias="imtgui/View/TextInputElementView.qml">View/TextInputElementView.qml</file>

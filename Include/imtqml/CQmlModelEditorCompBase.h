@@ -10,6 +10,13 @@ namespace imtqml
 {
 
 
+/**
+	\deprecated Part of the imperative \c setRepresentation /
+	\c representationChanged editor contract. New code should use the
+	declarative binding stack instead: \c CObjectViewModel +
+	\c CDataModelController + \c IDataModelBridge. See
+	Docs/Qml/DeclarativeModelBinding_MigrationGuide.md.
+*/
 class CQmlModelEditorCompBase: public CQmlGuiCompBase
 {
 	Q_OBJECT

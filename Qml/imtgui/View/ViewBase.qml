@@ -5,6 +5,14 @@ import imtgui 1.0
 import imtdocgui 1.0
 import imtcontrols 1.0
 
+/*!
+	\deprecated The imperative updateGui()/updateModel()/doUpdateGui()
+	contract with blockingUpdateModel guards mirrors the widget-world
+	Model-Observer pattern and should not be used for new editors.
+	Use DeclarativeViewBase with an ObjectViewModel provided by a
+	DataModelController instead. See
+	Docs/Qml/DeclarativeModelBinding_MigrationGuide.md.
+*/
 Item {
 	id: viewBase;
 

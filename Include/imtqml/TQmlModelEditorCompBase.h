@@ -16,6 +16,16 @@ namespace imtqml
 {
 
 
+/**
+	\deprecated This class implements the imperative widget-world
+	Model-Observer pattern (JSON representation pushed into QML via
+	\c setRepresentation / pulled via \c getRepresentation with
+	manual \c UpdateBlocker echo suppression). New code should use
+	the declarative binding stack instead: \c CObjectViewModel +
+	\c CDataModelController + \c IDataModelBridge
+	(e.g. \c TLocalDataModelBridgeComp). See
+	Docs/Qml/DeclarativeModelBinding_MigrationGuide.md.
+*/
 template<typename ModelInterface>
 class TQmlModelEditorCompBase:
 			public CQmlModelEditorCompBase,

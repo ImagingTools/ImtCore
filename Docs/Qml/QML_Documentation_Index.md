@@ -10,6 +10,9 @@ Willkommen zur QML- und JQML-Dokumentation des ImtCore SDK. Diese Dokumentation 
 | **[Modul-Referenz](QML_Module_Reference.md)** | Detaillierte Referenz aller QML-Module und Komponenten | Nachschlagewerk |
 | **[JQML Guide](QML_JQML_Guide.md)** | JQML-Versionen, Web-Kompilierung, Cross-Platform-Entwicklung | Web-Deployment |
 | **[Komponenten-Tutorials](QML_Component_Tutorials.md)** | Praktische Tutorials für häufige UI-Muster | Praxis-Beispiele |
+| **[ADR-001 Declarative Model Binding](ADR-001_DeclarativeModelBinding.md)** | Architektur-Entscheidung: deklaratives Model-Binding (Desktop + Web) | Architektur |
+| **[Model-Binding Migration Guide](DeclarativeModelBinding_MigrationGuide.md)** | Migration imperativer Editoren auf ViewModel-Bindings | Migration |
+| **[Model-Binding Inventory](DeclarativeModelBinding_Inventory.md)** | Bestandsaufnahme der imperativen Muster | Migration |
 
 ---
 

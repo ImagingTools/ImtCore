@@ -14,6 +14,15 @@ namespace imtqml
 {
 
 
+/**
+	\deprecated This class wires an imperative per-editor QmlAdapter
+	that pushes data directly into the QQuickItem (widget-world
+	Model-Observer pattern). New code should use the declarative
+	binding stack instead: \c CObjectViewModel +
+	\c CDataModelController + \c IDataModelBridge
+	(e.g. \c TLocalDataModelBridgeComp). See
+	Docs/Qml/DeclarativeModelBinding_MigrationGuide.md.
+*/
 template <class QmlAdapter, class ModelInterface>
 class TQmlGuiObserverCompWrap: public iqtgui::TGuiObserverWrap<
 	CQmlGuiCompBase,
