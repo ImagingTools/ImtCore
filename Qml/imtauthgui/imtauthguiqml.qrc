@@ -39,6 +39,7 @@
         <file alias="imtauthgui/ProfileAccessPage.qml">ProfileAccessPage.qml</file>
         <file alias="imtauthgui/ProfileNoticeBanner.qml">ProfileNoticeBanner.qml</file>
         <file alias="imtauthgui/UserGeneralEditor.qml">UserGeneralEditor.qml</file>
+        <file alias="imtauthgui/UserGeneralDeclarativeEditor.qml">UserGeneralDeclarativeEditor.qml</file>
         <file alias="imtauthgui/PasswordRecoveryDialog.qml">PasswordRecoveryDialog.qml</file>
 	<file alias="imtauthgui/UserSettingsController.qml">UserSettingsController.qml</file>
 	<file alias="imtauthgui/UserActionCollectionView.qml">UserActionCollectionView.qml</file>

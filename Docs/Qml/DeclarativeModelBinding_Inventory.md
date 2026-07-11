@@ -82,6 +82,16 @@ above QML plumbing. The legacy types stay as deprecated facades until the
 ## Migration order (Phase 4 of the plan)
 
 1. `imtauthgui` editors (largest inventory, pilot: `UserGeneralEditor.qml`)
+   — **in progress**: declarative pilot `UserGeneralDeclarativeEditor.qml`
+   added alongside the imperative editor (facade coexistence). It binds
+   the general user fields (`username`, `name`, `email`) of the
+   `imtauth.User` model through `DeclarativeViewBase` +
+   `DataModelController`; no `updateGui()`/`updateModel()` /
+   `emitUpdateModel()` / `blockingUpdateModel` logic remains. The
+   password-change flow (dedicated `ChangePassword` mutation via
+   `AuthorizationController`) and the roles/groups/system-info blocks of
+   `UserView.qml` are not yet migrated; the imperative `UserGeneralEditor`
+   stays until `UserView` is switched over.
 2. `imtdocgui` document lifecycle (`DocumentService`, `DocumentDecorator`,
    `UndoRedoManager`) — controller-centric lifecycle, remove view
    registration and `setBlockingUpdateModel` choreography

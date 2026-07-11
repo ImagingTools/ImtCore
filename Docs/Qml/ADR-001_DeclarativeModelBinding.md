@@ -120,4 +120,7 @@ The layered architecture (bottom-up):
 - Unify list adapters with roles on top of `TListModelBase` /
   `TSdlAbstractListModel`.
 - Migrate editors module by module (see the migration guide) and finally
-  remove the deprecated imperative bases.
+  remove the deprecated imperative bases. Started (Phase 4, item 1):
+  `Qml/imtauthgui/UserGeneralDeclarativeEditor.qml` is the declarative
+  pilot for the `imtauth.User` general fields, added next to the
+  imperative `UserGeneralEditor.qml` (facade coexistence).

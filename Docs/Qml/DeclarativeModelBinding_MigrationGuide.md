@@ -192,6 +192,18 @@ mutation input on `submit()`. All callbacks are delivered on the GUI
 thread — the editor QML is byte-for-byte identical to the desktop
 variant.
 
+## Worked pilot
+
+`Qml/imtauthgui/UserGeneralDeclarativeEditor.qml` is the first migrated
+editor (Phase 4, item 1). It edits the general fields of the
+`imtauth.User` model (`username`, `name`, `email`) purely through
+bindings to `editor.model` and ViewModel setters in
+`onEditingFinished`, with `DeclarativeViewBase` + an inline
+`DataModelController { modelId: "imtauth.User" }`. It is added next to
+the imperative `UserGeneralEditor.qml` (facade coexistence); the latter
+is removed only once `UserView.qml` and the password-change flow are
+migrated too.
+
 ## Checklist per migrated editor
 
 - [ ] No `function updateGui()` / `function updateModel()` left
