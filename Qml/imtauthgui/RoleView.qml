@@ -24,12 +24,23 @@ ViewBase {
 
 	property RoleData roleData: model;
 
+	onRoleDataChanged: {
+		if (!container.roleData)
+			return
+		if (container.productId !== "")
+			container.roleData.m_productId = container.productId;
+		generalGroup.applyModelValues();
+		container.doUpdateGuiPermissions();
+	}
+
 	Component.onCompleted: {
 		container.__completed = true
 		container.__requestPermissionsOnce()
 	}
 
 	onProductIdChanged: {
+		if (container.roleData && container.productId !== "")
+			container.roleData.m_productId = container.productId;
 		if (!container.__completed)
 			return
 		container.__permissionsRequested = false
@@ -99,24 +110,8 @@ ViewBase {
 	}
 
 	function updateGui(){
-		generalGroup.updateGui();
+		generalGroup.applyModelValues();
 		container.doUpdateGuiPermissions()
-	}
-	
-	function updateModel(){
-		if (!container.roleData){
-			return
-		}
-
-		if (container.productId === ""){
-			console.error("Unable to update a role model. Product-ID is empty");
-			return;
-		}
-		
-		generalGroup.updateModel();
-		container.doUpdateModelPermissions()
-		
-		roleData.m_productId = container.productId;
 	}
 
 	DocumentHistoryPanel {
@@ -198,15 +193,15 @@ ViewBase {
 					name: qsTr("Role Name");
 					placeHolderText: qsTr("Enter the role name");
 					
+					text: container.roleData ? container.roleData.m_name : "";
 					onEditingFinished: {
 						if (!container.roleData){
 							return
 						}
 
-						let oldText = container.roleData.m_name;
-						if (oldText && oldText !== roleNameInput.text || !oldText && roleNameInput.text !== ""){
-							roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
-							container.doUpdateModel();
+						if (container.roleData.m_name !== roleNameInput.text){
+							container.roleData.m_name = roleNameInput.text;
+							container.roleData.m_roleId = roleNameInput.text.replace(/\s+/g, '');
 						}
 					}
 					
@@ -224,6 +219,8 @@ ViewBase {
 
 					name: qsTr("Role-ID");
 					
+					text: container.roleData ? container.roleData.m_roleId : "";
+					
 					KeyNavigation.tab: descriptionInput;
 					KeyNavigation.backtab: roleNameInput;
 				}
@@ -237,10 +234,10 @@ ViewBase {
 					name: qsTr("Description");
 					placeHolderText: qsTr("Enter the description");
 
+					text: container.roleData ? container.roleData.m_description : "";
 					onEditingFinished: {
-						let oldText = container.roleData.m_description;
-						if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
-							container.doUpdateModel();
+						if (container.roleData && container.roleData.m_description !== descriptionInput.text){
+							container.roleData.m_description = descriptionInput.text;
 						}
 					}
 					
@@ -255,18 +252,15 @@ ViewBase {
 					addButtonText: qsTr("Add Parent Role")
 					showCount: true
 					onSelectionChanged: {
-						container.doUpdateModel()
+						generalGroup.writeParentRoles()
 					}
 				}
 
-				function updateGui(){
+				function applyModelValues(){
 					if (!container.roleData){
 						return
 					}
 
-					roleIdInput.text = container.roleData.m_roleId;
-					roleNameInput.text = container.roleData.m_name;
-					descriptionInput.text = container.roleData.m_description;
 					var ids = container.roleData.m_parentRoles ? container.roleData.m_parentRoles.slice() : []
 					var arr = []
 					for (var i = 0; i < ids.length; i++)
@@ -274,14 +268,11 @@ ViewBase {
 					roleSelectableCollectionEditor.items = arr
 				}
 				
-				function updateModel(){
+				function writeParentRoles(){
 					if (!container.roleData){
 						return
 					}
 
-					container.roleData.m_roleId = roleIdInput.text;
-					container.roleData.m_name = roleNameInput.text;
-					container.roleData.m_description = descriptionInput.text;
 					var arr = []
 					for (var i = 0; i < roleSelectableCollectionEditor.items.length; i++)
 						arr.push(roleSelectableCollectionEditor.items[i].id)
@@ -319,7 +310,7 @@ ViewBase {
 							treeBottomMargin: Style.marginL
 		
 							onSelectionChanged: {
-								container.doUpdateModel()
+								container.doUpdateModelPermissions()
 							}
 						}
 					}

@@ -23,6 +23,24 @@ namespace imtauthgui
 {
 
 
+/*!
+	\brief Controller object exposed to the administration QML UI.
+
+	Replaces the retired QMetaObject::invokeMethod callbacks
+	("login"/"logout"/"onCommandActivated") with signals the QML side
+	consumes declaratively via Connections.
+*/
+class CAdministrationUiController: public QObject
+{
+	Q_OBJECT
+
+Q_SIGNALS:
+	void loggedIn(const QString& username, const QString& password);
+	void loggedOut();
+	void commandActivated(const QString& commandId);
+};
+
+
 class CAdministrationObserverQmlComp:
 			public QObject,
 			public iqtgui::TMakeIconProviderCompWrap<ilog::CLoggerComponentBase>,
@@ -73,6 +91,7 @@ private:
 	imtbase::TModelUpdateBinder<iprm::IEnableableParam, CAdministrationObserverQmlComp> m_quickItemCreatedObserver;
 	imtbase::TModelUpdateBinder<imtcom::IServerConnectionInterface, CAdministrationObserverQmlComp> m_serverConnectionParamObserver;
 	iqtgui::CHierarchicalCommand m_commandsList;
+	CAdministrationUiController m_uiController;
 };
 
 

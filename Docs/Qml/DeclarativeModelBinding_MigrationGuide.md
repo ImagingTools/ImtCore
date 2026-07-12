@@ -285,24 +285,14 @@ variant.
 
 ## Worked pilots
 
-The first migrated editors (Phase 4, item 1) live in `Qml/imtauthgui`,
-added next to their imperative counterparts (facade coexistence):
-
-- `UserGeneralDeclarativeEditor.qml` — general fields of `imtauth.User`
-  (`username`, `name`, `email`).
-- `TenantGeneralDeclarativePage.qml` — general fields of
-  `imtauth.Tenant` (`name`, `description`, `isActive`).
-
-Both edit purely through bindings to `editor.model` and ViewModel
-setters in the control handlers, with `DeclarativeViewBase` + an inline
-`DataModelController { modelId: "..." }`.
-
-The list-adapter follow-up added a collection pilot next to them:
-
-- `TenantPermissionsDeclarativePage.qml` — the `tenantPermissions` list
-  of `imtauth.Tenant`, bound via a `Repeater` on the `CListViewModel`
-  role adapter (`model.tenantPermissions`), editing through the adapter
-  `append` / `remove` slots.
+The pilot facades were folded back in Phase 5 (WP1): the declarative
+write-through pattern now lives directly in the plain editor files under
+`Qml/imtauthgui` (`UserGeneralEditor.qml`, `TenantGeneralPage.qml`,
+`TenantPermissionsPage.qml`, `UserView.qml`, `RoleView.qml`,
+`UserGroupView.qml`, `CrossOrgGrantView.qml`, `RelationshipView.qml`).
+Displays are property bindings on the model, writes happen directly in
+the control handlers — there is no updateGui()/updateModel()
+choreography and no update-blocking guard left in the module.
 
 ## Checklist per migrated editor
 

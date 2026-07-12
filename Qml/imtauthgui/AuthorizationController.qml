@@ -393,7 +393,7 @@ QtObject {
 	}
 	
 	function updateUserManagementModel(){
-		userManagementProvider.updateModel();
+		userManagementProvider.refresh();
 	}
 	
 	function loggedUserIsSuperuser(){

@@ -21,7 +21,7 @@ QtObject {
         return userMode === "NO_USER_MANAGEMENT";
     }
 
-    function updateModel(){
+    function refresh(){
         userMode = "";
         request.send();
     }

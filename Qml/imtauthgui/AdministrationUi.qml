@@ -13,8 +13,26 @@ SingleDocumentWorkspacePageView {
 
     property string productId;
     property string webSocketUrl;
+    property QtObject administrationController: null;
 
     signal commandsModelChanged(var commandsModel);
+    signal commandActivated(string commandId);
+
+    Connections {
+        target: container.administrationController;
+
+        function onLoggedIn(username, password){
+            container.login(username, password);
+        }
+
+        function onLoggedOut(){
+            container.logout();
+        }
+
+        function onCommandActivated(commandId){
+            container.commandActivated(commandId);
+        }
+    }
 
     Component.onCompleted: {
         Style.setDecorators(decorators_)

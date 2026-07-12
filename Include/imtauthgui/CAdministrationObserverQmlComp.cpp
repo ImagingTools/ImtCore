@@ -117,12 +117,7 @@ void CAdministrationObserverQmlComp::OnTriggered()
 	if (commandPtr != nullptr){
 		QByteArray commandId = commandPtr->GetCommandId();
 
-		if (m_quickObjectCompPtr.IsValid()){
-			QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
-			if (quickItem != nullptr){
-				QMetaObject::invokeMethod(quickItem, "onCommandActivated", Q_ARG(QVariant, QVariant::fromValue(commandId)));
-			}
-		}
+		Q_EMIT m_uiController.commandActivated(QString::fromUtf8(commandId));
 	}
 }
 
@@ -131,23 +126,15 @@ void CAdministrationObserverQmlComp::OnTriggered()
 void CAdministrationObserverQmlComp::OnLoginUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/, const iauth::ILogin* objectPtr)
 {
 	if (objectPtr != nullptr){
-		if (m_quickObjectCompPtr.IsValid()){
-			QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
-			if (quickItem != nullptr){
-				iauth::CUser* loggedUserPtr = objectPtr->GetLoggedUser();
-				if (loggedUserPtr == nullptr){
-					QMetaObject::invokeMethod(quickItem, "logout");
-				}
-				else{
-					QString username = loggedUserPtr->GetUserName();
-					QString password = loggedUserPtr->GetPassword();
+		iauth::CUser* loggedUserPtr = objectPtr->GetLoggedUser();
+		if (loggedUserPtr == nullptr){
+			Q_EMIT m_uiController.loggedOut();
+		}
+		else{
+			QString username = loggedUserPtr->GetUserName();
+			QString password = loggedUserPtr->GetPassword();
 
-					QMetaObject::invokeMethod(	quickItem,
-												"login",
-												Q_ARG(QVariant, QVariant::fromValue(username)),
-												Q_ARG(QVariant, QVariant::fromValue(password)));
-				}
-			}
+			Q_EMIT m_uiController.loggedIn(username, password);
 		}
 	}
 }
@@ -158,6 +145,8 @@ void CAdministrationObserverQmlComp::OnQuickItemCreatedUpdate(const istd::IChang
 	if (m_quickObjectCompPtr.IsValid()){
 		QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
 		if (quickItem != nullptr){
+			quickItem->setProperty("administrationController", QVariant::fromValue<QObject*>(&m_uiController));
+
 			OnLoginUpdate(changeSet, m_loginCompPtr.GetPtr());
 
 			QByteArray productId;

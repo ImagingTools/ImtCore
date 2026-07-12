@@ -71,7 +71,7 @@ ViewBase {
 		permissionsPage.__applyTenantSelection()
 	}
 
-	function updateGuiFromApiData() {
+	function updateGui() {
 		if (!permissionsPage.tenantData)
 			return
 

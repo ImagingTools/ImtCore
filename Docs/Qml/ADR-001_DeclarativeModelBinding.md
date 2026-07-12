@@ -133,15 +133,13 @@ The layered architecture (bottom-up):
   bind a `ListView` / `Repeater` to `model.<field>` and edit through the
   adapter slots (`append` / `insert` / `remove` / `setProperty`).
 - Migrate editors module by module (see the migration guide) and finally
-  remove the deprecated imperative bases. Started (Phase 4, item 1):
-  the declarative scalar-editor facades for `imtauth.User`
-  (`Qml/imtauthgui/UserGeneralDeclarativeEditor.qml`) and `imtauth.Tenant`
-  (`Qml/imtauthgui/TenantGeneralDeclarativePage.qml`) are added next to
-  the imperative editors (facade coexistence). The list-adapter
-  follow-up landed, so collection editors are migratable now too: the
-  declarative collection pilot
-  (`Qml/imtauthgui/TenantPermissionsDeclarativePage.qml`) binds the
-  `tenantPermissions` list of `imtauth.Tenant` through `CListViewModel`.
+  remove the deprecated imperative bases. Started (Phase 4, item 1) with
+  declarative scalar-editor facades for `imtauth.User` and
+  `imtauth.Tenant` next to the imperative editors (facade coexistence),
+  plus the declarative collection pilot for the `tenantPermissions` list
+  bound through `CListViewModel`. In Phase 5 (WP1) the facades were
+  folded back: the plain `Qml/imtauthgui` editors now use the
+  declarative write-through pattern directly.
   The `imtdocgui` lifecycle / C++ observer choreography (Phase 4
   items 2–4) stays imperative until the downstream partitura bridge
   wiring lands; the imperative bases are removed in Phase 5.

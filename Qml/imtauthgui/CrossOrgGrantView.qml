@@ -11,7 +11,7 @@ import imtguigql 1.0
  * CrossOrgGrantView
  *
  * ViewBase-inherited editor for creating/editing cross-org grants.
- * Follows the document service pattern (updateGui/updateModel).
+ * Follows the declarative write-through pattern (bindings + writeModelValues).
  * Simplified model: TargetTenant, Roles (multi-select), Description, Expires.
  */
 ViewBase {
@@ -78,7 +78,7 @@ ViewBase {
 		container.__loadingGui = false
 	}
 
-	function updateModel() {
+	function writeModelValues() {
 		if (!container.grantData) {
 			return
 		}
@@ -144,7 +144,7 @@ ViewBase {
 					placeHolderText: qsTr("Auto-generated from tenant and roles if left empty")
 					readOnly: container.isReadOnly
 					onEditingFinished: {
-						container.doUpdateModel()
+						container.writeModelValues()
 					}
 				}
 
@@ -184,7 +184,7 @@ ViewBase {
 								onClicked: {
 									container.__selectedTargetTenantId = ""
 									container.__selectedTargetTenantName = ""
-									container.doUpdateModel()
+									container.writeModelValues()
 								}
 							}
 						}
@@ -199,7 +199,7 @@ ViewBase {
 					showCount: true
 					editable: !container.isReadOnly
 					onSelectionChanged: {
-						container.doUpdateModel()
+						container.writeModelValues()
 					}
 				}
 
@@ -209,7 +209,7 @@ ViewBase {
 					placeHolderText: qsTr("Optional description")
 					readOnly: container.isReadOnly
 					onEditingFinished: {
-						container.doUpdateModel()
+						container.writeModelValues()
 					}
 				}
 
@@ -223,7 +223,7 @@ ViewBase {
 							return
 
 						container.__isActive = checked
-						container.doUpdateModel()
+						container.writeModelValues()
 					}
 				}
 
@@ -281,7 +281,7 @@ ViewBase {
 							return
 
 						container.__selectedExpiresAt = expirationCb.computeExpiresAtIso()
-						container.doUpdateModel()
+						container.writeModelValues()
 					}
 				}
 			}
@@ -301,7 +301,7 @@ ViewBase {
 				container.__selectedTargetTenantId = itemId
 				container.__selectedTargetTenantName = dataProvider
 					? dataProvider.getSelectedItemText(itemId) : ""
-				container.doUpdateModel()
+				container.writeModelValues()
 			}
 		}
 	}

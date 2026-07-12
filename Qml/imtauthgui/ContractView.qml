@@ -31,12 +31,6 @@ ViewBase {
 
 	signal contractCreated()
 
-	function updateGui() {
-	}
-
-	function updateModel() {
-	}
-
 	function submitContract() {
 		if (!container.__selectedRelationshipId || !container.__selectedTargetTenantId) {
 			ModalDialogManager.showInfoDialog(qsTr("Relationship and counterparty tenant are required."))

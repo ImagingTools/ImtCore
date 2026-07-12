@@ -24,12 +24,6 @@ property var apiClient: null
 property var tenantData: null
 property var messageData: null
 
-function updateGui() {
-}
-
-function updateModel() {
-}
-
 readonly property bool __isOutgoing: container.tenantData
 && container.messageData
 && container.messageData.sourceTenantId === container.tenantData.m_id

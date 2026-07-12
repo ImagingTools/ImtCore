@@ -25,6 +25,12 @@ DocumentViewBase {
 		? (container.userData.m_name || container.userData.m_username || container.userData.m_id)
 		: ""
 	
+	function updateGui(){
+		systemInfoGroup.applyModelSelection();
+		rolesGroup.applyModelSelection();
+		groupsBlock.applyModelSelection();
+	}
+	
 	function getHeaders(){
 		return {}
 	}
@@ -214,10 +220,10 @@ DocumentViewBase {
 						id: headersModel2;
 						
 						Component.onCompleted: {
-							updateModel();
+							rebuildHeaders();
 						}
 						
-						function updateModel(){
+						function rebuildHeaders(){
 							headersModel2.clear();
 							
 							let index = headersModel2.insertNewItem();

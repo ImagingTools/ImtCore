@@ -13,22 +13,19 @@ ViewBase {
 	property GroupData groupData: model;
 	property string productId;
 
-	function updateGui(){
-		generalGroup.updateGui();
-		usersGroup.updateGui();
-		rolesGroup.updateGui();
-	}
-	
-	function updateModel(){
-		if (!container.groupData){
+	onGroupDataChanged: {
+		if (!container.groupData)
 			return
-		}
+		container.groupData.m_productId = container.productId;
+		generalGroup.applyModelSelection();
+		usersGroup.applyModelSelection();
+		rolesGroup.applyModelSelection();
+	}
 
-		generalGroup.updateModel();
-		usersGroup.updateModel();
-		rolesGroup.updateModel();
-		
-		groupData.m_productId = productId;
+	function updateGui(){
+		generalGroup.applyModelSelection();
+		usersGroup.applyModelSelection();
+		rolesGroup.applyModelSelection();
 	}
 	
 	function getHeaders(){
@@ -124,8 +121,11 @@ ViewBase {
 					name: qsTr("Group Name");
 					placeHolderText: qsTr("Enter the name");
 
+					text: container.groupData ? container.groupData.m_name : "";
 					onEditingFinished: {
-						container.doUpdateModel();
+						if (container.groupData && container.groupData.m_name !== nameInput.text){
+							container.groupData.m_name = nameInput.text;
+						}
 					}
 
 					KeyNavigation.tab: descriptionInput;
@@ -141,8 +141,11 @@ ViewBase {
 					name: qsTr("Description");
 					placeHolderText: qsTr("Enter the description");
 
+					text: container.groupData ? container.groupData.m_description : "";
 					onEditingFinished: {
-						container.doUpdateModel();
+						if (container.groupData && container.groupData.m_description !== descriptionInput.text){
+							container.groupData.m_description = descriptionInput.text;
+						}
 					}
 					
 					KeyNavigation.tab: groupSelectableCollectionEditor;
@@ -156,16 +159,14 @@ ViewBase {
 						addButtonText: qsTr("Add Parent Group")
 						showCount: true
 						onSelectionChanged: {
-							container.doUpdateModel()
+							generalGroup.writeModelSelection()
 						}
 					}
 
-				function updateGui(){
+				function applyModelSelection(){
 					if (!container.groupData){
 						return
 					}
-					nameInput.text = container.groupData.m_name;
-					descriptionInput.text = container.groupData.m_description;
 					var ids = container.groupData.m_parentGroups ? container.groupData.m_parentGroups.slice() : []
 					var arr = []
 					for (var i = 0; i < ids.length; i++)
@@ -173,12 +174,10 @@ ViewBase {
 					groupSelectableCollectionEditor.items = arr
 				}
 				
-				function updateModel(){
+				function writeModelSelection(){
 					if (!container.groupData){
 						return
 					}
-					container.groupData.m_description = descriptionInput.text;
-					container.groupData.m_name = nameInput.text;
 					var arr = []
 					for (var i = 0; i < groupSelectableCollectionEditor.items.length; i++)
 						arr.push(groupSelectableCollectionEditor.items[i].id)
@@ -198,11 +197,11 @@ ViewBase {
 						addButtonText: qsTr("Add User")
 						showCount: true
 						onSelectionChanged: {
-							container.doUpdateModel()
+							usersGroup.writeModelSelection()
 						}
 					}
 				
-				function updateGui(){
+				function applyModelSelection(){
 					if (!container.groupData){
 						return
 					}
@@ -213,7 +212,7 @@ ViewBase {
 					userSelectableCollectionEditor.items = arr
 				}
 				
-				function updateModel(){
+				function writeModelSelection(){
 					if (!container.groupData){
 						return
 					}
@@ -236,11 +235,11 @@ ViewBase {
 						addButtonText: qsTr("Add Role")
 						showCount: true
 						onSelectionChanged: {
-							container.doUpdateModel()
+							rolesGroup.writeModelSelection()
 						}
 					}
 
-				function updateGui(){
+				function applyModelSelection(){
 					if (!container.groupData){
 						return
 					}
@@ -251,7 +250,7 @@ ViewBase {
 					roleSelectableCollectionEditor.items = arr
 				}
 				
-				function updateModel(){
+				function writeModelSelection(){
 					if (!container.groupData){
 						return
 					}

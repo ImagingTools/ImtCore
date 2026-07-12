@@ -82,15 +82,11 @@ above QML plumbing. The legacy types stay as deprecated facades until the
 ## Migration order (Phase 4 of the plan)
 
 1. `imtauthgui` editors (largest inventory, pilot: `UserGeneralEditor.qml`).
-   Declarative facades added alongside the imperative editors (facade
-   coexistence — the imperative editors stay until Phase 5):
-   - `UserGeneralDeclarativeEditor.qml` — scalar user fields
-     (`username`, `name`, `email`) of `imtauth.User`.
-   - `TenantGeneralDeclarativePage.qml` — scalar tenant fields
-     (`name`, `description`, `isActive`) of `imtauth.Tenant`.
-   - `TenantPermissionsDeclarativePage.qml` — the `tenantPermissions`
-     list of `imtauth.Tenant`, bound through the `CListViewModel` list
-     adapter (collection pilot; see below).
+   Declarative facades were first added alongside the imperative editors
+   (facade coexistence) and folded back into the plain editor files in
+   Phase 5 (WP1): `UserGeneralEditor.qml`, `TenantGeneralPage.qml` and
+   `TenantPermissionsPage.qml` now carry the declarative write-through
+   pattern directly.
 
    **Scalar and list/collection editors are both migratable now.** With
    the ViewModel *list adapters with roles* follow-up in place

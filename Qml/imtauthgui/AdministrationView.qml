@@ -121,7 +121,7 @@ Item {
             MainDocumentService.registerDocumentService("Administration/Users", administrationContainer.documentManager)
             MainDocumentService.registerDocumentService("Administration/Groups", administrationContainer.documentManager)
             
-            updateModel();
+            updatePages();
         }
 
         property bool block: false
@@ -135,7 +135,7 @@ Item {
             }
         }
 
-        function updateModel(){
+        function updatePages(){
             multiPageView.clear();
 
             let ok = PermissionsController.checkPermission("ViewRoles");

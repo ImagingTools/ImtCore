@@ -15,7 +15,8 @@ import imtauthgui 1.0
  *
  * Used inside the document service flow (TenantDocumentEditorShell).
  * The document framework calls updateGui() to populate the form from
- * the representationModel and updateModel() to write form values back.
+ * the representationModel; the controls write their values back to the
+ * model directly via writeModelValues().
  * Saving is handled by the shell's Save button which triggers the
  * bilateral proposal flow via CRelationshipCollectionDocumentServiceComp.
  *
@@ -87,7 +88,7 @@ ViewBase {
 		relDescriptionInput.text = container.relationshipData.m_description || ""
 	}
 
-	function updateModel() {
+	function writeModelValues() {
 		if (!container.relationshipData) {
 			return
 		}
@@ -190,7 +191,7 @@ ViewBase {
 								onClicked: {
 									container.__selectedPartnerTenantId = ""
 									container.__selectedPartnerTenantName = ""
-									container.doUpdateModel()
+									container.writeModelValues()
 								}
 							}
 						}
@@ -203,7 +204,7 @@ ViewBase {
 					model: roleModel
 					currentIndex: 2
 					onCurrentIndexChanged: {
-						container.doUpdateModel()
+						container.writeModelValues()
 					}
 				}
 
@@ -213,7 +214,7 @@ ViewBase {
 					model: roleModel
 					currentIndex: 2
 					onCurrentIndexChanged: {
-						container.doUpdateModel()
+						container.writeModelValues()
 					}
 				}
 
@@ -222,7 +223,7 @@ ViewBase {
 					name: qsTr("Scope")
 					placeHolderText: qsTr("Optional — empty applies to all resources")
 					onEditingFinished: {
-						container.doUpdateModel()
+						container.writeModelValues()
 					}
 				}
 
@@ -231,7 +232,7 @@ ViewBase {
 					name: qsTr("Description")
 					placeHolderText: qsTr("Optional description")
 					onEditingFinished: {
-						container.doUpdateModel()
+						container.writeModelValues()
 					}
 				}
 			}
@@ -259,7 +260,7 @@ ViewBase {
 				container.__selectedPartnerTenantId = itemId
 				container.__selectedPartnerTenantName = dataProvider
 					? dataProvider.getSelectedItemText(itemId) : ""
-				container.doUpdateModel()
+				container.writeModelValues()
 			}
 		}
 	}

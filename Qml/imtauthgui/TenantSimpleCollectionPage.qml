@@ -51,9 +51,6 @@ ViewBase {
 	property var deletePermissionIds: []
 	function removeItems(ids) {}
 
-	function updateGui() {}
-	function updateModel() {}
-
 	function refresh() {
 		if (!root.visible) {
 			root.__refreshPending = true
