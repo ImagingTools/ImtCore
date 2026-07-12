@@ -9,7 +9,8 @@ ADR-001_DeclarativeModelBinding.md.
 
 - `ObjectViewModel` (`imtqml::CObjectViewModel`) — QML-facing ViewModel; every
   model field is a QML property with change notification, dirty tracking and
-  central echo suppression.
+  central echo suppression. List-valued fields are exposed as a
+  `ListViewModel` (`imtqml::CListViewModel`) role adapter.
 - `DataModelController` (`imtqml::CDataModelController`) — the only QML entry
   point: `modelId`, `parameters`, `viewModel`, `isLoading`, `error`,
   `isDirty`, `live`, `autoSubmit`, `getModel()`, `submit()`, `revert()`.
@@ -90,6 +91,66 @@ CheckBox {
 	onClicked: editor.model.isEnabled = checked
 }
 ```
+
+### List / collection field
+
+A list-valued field is exposed by the ViewModel as a `ListViewModel`
+role adapter (`imtqml::CListViewModel`), reachable as `model.<field>`.
+Bind a `ListView` / `Repeater` to it; each element field is a named
+role, and the whole element is available through the `modelData` role
+(use it for scalar / multi-select id lists). Edits go through the
+adapter slots — no field-by-field row copying.
+
+Before (imperative, rebuild + re-read the whole collection):
+
+```qml
+function updateGui(){
+	permissionsView.rebuildFromFlatArray(container.tenantData.m_tenantPermissions)
+}
+
+function updateModel(){
+	container.tenantData.m_tenantPermissions = permissionsView.getCheckedIds()
+}
+```
+
+After (declarative):
+
+```qml
+Repeater {
+	id: permissionsRepeater_
+
+	model: editor.model ? editor.model.tenantPermissions : null
+
+	Row {
+		BaseText {
+			text: model.modelData
+		}
+
+		Button {
+			text: qsTr("Remove")
+			onClicked: editor.model.tenantPermissions.remove(index)
+		}
+	}
+}
+
+Button {
+	text: qsTr("Add")
+	onClicked: editor.model.tenantPermissions.append(newPermissionInput_.text)
+}
+```
+
+For object lists, bind delegate fields to the named roles and write a
+single field with `setProperty`:
+
+```qml
+TextInput {
+	text: model.displayName
+	onEditingFinished: editor.model.members.setProperty(index, "displayName", text)
+}
+```
+
+The adapter marks the ViewModel dirty and drives write-back exactly like
+a scalar edit; `submit()` / `revert()` cover the collection too.
 
 ### Form mode vs. live mode
 
@@ -204,9 +265,14 @@ added next to their imperative counterparts (facade coexistence):
 
 Both edit purely through bindings to `editor.model` and ViewModel
 setters in the control handlers, with `DeclarativeViewBase` + an inline
-`DataModelController { modelId: "..." }`. They cover the scalar-only
-editors — collection editors (roles/groups/permissions/members) wait for
-the ViewModel *list adapters with roles* follow-up (see ADR-001).
+`DataModelController { modelId: "..." }`.
+
+The list-adapter follow-up added a collection pilot next to them:
+
+- `TenantPermissionsDeclarativePage.qml` — the `tenantPermissions` list
+  of `imtauth.Tenant`, bound via a `Repeater` on the `CListViewModel`
+  role adapter (`model.tenantPermissions`), editing through the adapter
+  `append` / `remove` slots.
 
 ## Checklist per migrated editor
 

@@ -58,6 +58,7 @@ TenantMemberDelegate 1.0 TenantMemberDelegate.qml
 TenantRolesPage 1.0 TenantRolesPage.qml
 TenantGroupsPage 1.0 TenantGroupsPage.qml
 TenantPermissionsPage 1.0 TenantPermissionsPage.qml
+TenantPermissionsDeclarativePage 1.0 TenantPermissionsDeclarativePage.qml
 TenantCrossOrgGrantsPage 1.0 TenantCrossOrgGrantsPage.qml
 TenantContractsPage 1.0 TenantContractsPage.qml
 TenantConnectionCodePage 1.0 TenantConnectionCodePage.qml

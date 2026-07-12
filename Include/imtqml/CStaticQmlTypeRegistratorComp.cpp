@@ -13,6 +13,7 @@
 #include <imtqml/CFileIO.h>
 #include <imtqml/CGqlModel.h>
 #include <imtqml/CGqlRequest.h>
+#include <imtqml/CListViewModel.h>
 #include <imtqml/CNetworkEventInterceptor.h>
 #include <imtqml/CObjectViewModel.h>
 #include <imtqml/CQmlProcess.h>
@@ -67,6 +68,8 @@ void CStaticQmlTypeRegistratorComp::OnComponentCreated()
 		qmlRegisterType<imtqml::CDataModelController>("com.imtcore.imtqml", 1, 0, "DataModelController");
 		qmlRegisterUncreatableType<imtqml::CObjectViewModel>("com.imtcore.imtqml", 1, 0, "ObjectViewModel",
 				QStringLiteral("ObjectViewModel is owned by DataModelController - use its viewModel property"));
+		qmlRegisterUncreatableType<imtqml::CListViewModel>("com.imtcore.imtqml", 1, 0, "ListViewModel",
+				QStringLiteral("ListViewModel is owned by ObjectViewModel - reach it through a collection field property"));
 	}
 }
 

@@ -21,7 +21,8 @@ import imtcontrols 1.0
 	The editor is transport-independent: the same QML works against the
 	desktop bridge and the GraphQL bridge; only the plugged bridge
 	differs. Collection fields (members, invitations, tenantPermissions)
-	stay in the imperative editor until the list-adapter follow-up lands.
+	are handled declaratively via the CListViewModel list adapter; see
+	the collection pilot TenantPermissionsDeclarativePage.
 */
 DeclarativeViewBase {
 	id: editor;

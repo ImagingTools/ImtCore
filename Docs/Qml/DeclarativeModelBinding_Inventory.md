@@ -88,18 +88,23 @@ above QML plumbing. The legacy types stay as deprecated facades until the
      (`username`, `name`, `email`) of `imtauth.User`.
    - `TenantGeneralDeclarativePage.qml` — scalar tenant fields
      (`name`, `description`, `isActive`) of `imtauth.Tenant`.
+   - `TenantPermissionsDeclarativePage.qml` — the `tenantPermissions`
+     list of `imtauth.Tenant`, bound through the `CListViewModel` list
+     adapter (collection pilot; see below).
 
-   **Scalar-only editors are the migratable set today.** The remaining
-   `imtauthgui` editors are blocked and are intentionally not migrated in
-   this phase:
+   **Scalar and list/collection editors are both migratable now.** With
+   the ViewModel *list adapters with roles* follow-up in place
+   (`imtqml::CListViewModel`, routed by `CObjectViewModel` per list
+   field), collection editors bind a `ListView` / `Repeater` to
+   `model.<field>` and edit through the adapter slots. The remaining
+   `imtauthgui` editors are migrated module by module in later steps;
+   these are intentionally not migrated in this phase:
    - *List/collection editors* — `UserView` roles/groups/system-info,
      `RoleView` (parentRoles/permissions), `UserGroupView`,
      `CrossOrgGrantView` (roleIds), `RelationshipView` (roles/scope),
-     `TenantPermissionsPage` (tenantPermissions). These need the
-     ViewModel *list adapters with roles* follow-up (tracked separately
-     in ADR-001, "Follow-up work"); `CObjectViewModel` currently exposes
-     scalar `QVariant` properties only, so a faithful multi-select /
-     table binding is not yet expressible.
+     `TenantPermissionsPage` (tenantPermissions). These are now
+     expressible with `CListViewModel` (see the pilot); the pilot
+     covers `tenantPermissions`, the rest follow the same pattern.
    - *Non-field views* — `AdministrationView`, `UserManagementProvider`
      (page/permission orchestration, not field copying),
      `ContractView` / `MessageView` / `TenantSimpleCollectionPage`
@@ -124,9 +129,10 @@ above QML plumbing. The legacy types stay as deprecated facades until the
    Phase 5 once the declarative controller lifecycle owns undo/redo.
 3. `imtcolgui` / `imtguigql` — move `GqlRequestSender` /
    `GqlBasedDataModelController` users onto the GraphQL bridge; keep the old
-   QML types as deprecated facades. **Not migrated:** blocked on the same
-   list-adapter follow-up (collection views are list-centric) and on the
-   downstream partitura wiring for `CGqlDataModelBridgeComp`.
+   QML types as deprecated facades. **Not migrated:** the list-adapter
+   follow-up (`CListViewModel`) is now available for the list-centric
+   collection views, so this is blocked only on the downstream partitura
+   wiring for `CGqlDataModelBridgeComp`.
 4. `CCommandsObserverQmlComp`, `CDocumentServiceController` — replace
    `invokeMethod` name calls with ViewModel properties/signals. **Not
    migrated:** paired with item 2; the imperative `invokeMethod` contract

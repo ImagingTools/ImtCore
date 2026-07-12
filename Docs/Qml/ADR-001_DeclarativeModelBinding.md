@@ -49,6 +49,13 @@ The layered architecture (bottom-up):
    - *User edits* are plain property writes from QML; they mark the ViewModel
      dirty and emit `valueEdited` for write-back.
 
+   List-valued fields are exposed as an `imtqml::CListViewModel` role adapter
+   (`QAbstractListModel`) instead of a scalar property: a `ListView` /
+   `Repeater` binds to the field, each element field is a named role (plus a
+   `modelData` role for scalar / multi-select lists), and the same source /
+   user flow separation applies (source updates via `SetSourceValues()`, user
+   edits via `append` / `insert` / `remove` / `setProperty`).
+
 3. **Transport / bridge layer (`imtqml::IDataModelBridge` +
    `CDataModelBridgeDemultiplexer`):** the single gateway. The interface
    supports `GetModel` (fetch), `SetModel` (store) and
@@ -117,15 +124,24 @@ The layered architecture (bottom-up):
   + subscription manager, GUI-thread callback contract). Generating
   queries from SDL metadata instead of the attribute-configured field
   lists remains open.
-- Unify list adapters with roles on top of `TListModelBase` /
-  `TSdlAbstractListModel`.
+- ~~Unify list adapters with roles on top of `TListModelBase` /
+  `TSdlAbstractListModel`.~~ — done: `imtqml::CListViewModel` is a
+  role-based `QAbstractListModel` list adapter with the same
+  source/user flow separation as `CObjectViewModel`. `CObjectViewModel`
+  routes every list-valued field into a lazily-created, reused
+  `CListViewModel` exposed as the field property, so collection editors
+  bind a `ListView` / `Repeater` to `model.<field>` and edit through the
+  adapter slots (`append` / `insert` / `remove` / `setProperty`).
 - Migrate editors module by module (see the migration guide) and finally
   remove the deprecated imperative bases. Started (Phase 4, item 1):
   the declarative scalar-editor facades for `imtauth.User`
   (`Qml/imtauthgui/UserGeneralDeclarativeEditor.qml`) and `imtauth.Tenant`
   (`Qml/imtauthgui/TenantGeneralDeclarativePage.qml`) are added next to
-  the imperative editors (facade coexistence). Collection editors and the
-  `imtdocgui` lifecycle / C++ observer choreography (Phase 4 items 2–4)
-  stay imperative until the list-adapter follow-up and the downstream
-  partitura bridge wiring land; the imperative bases are removed in
-  Phase 5.
+  the imperative editors (facade coexistence). The list-adapter
+  follow-up landed, so collection editors are migratable now too: the
+  declarative collection pilot
+  (`Qml/imtauthgui/TenantPermissionsDeclarativePage.qml`) binds the
+  `tenantPermissions` list of `imtauth.Tenant` through `CListViewModel`.
+  The `imtdocgui` lifecycle / C++ observer choreography (Phase 4
+  items 2–4) stays imperative until the downstream partitura bridge
+  wiring lands; the imperative bases are removed in Phase 5.

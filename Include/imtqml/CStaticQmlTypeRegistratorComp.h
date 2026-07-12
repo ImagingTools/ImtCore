@@ -23,6 +23,7 @@ namespace imtqml
 			\c imtqml::CDataModelController as \b com.imtcore.imtqml.1.0.DataModelController
 		\a uncreatable types
 			\c imtqml::CObjectViewModel as \b com.imtcore.imtqml.1.0.ObjectViewModel (owned by DataModelController)
+			\c imtqml::CListViewModel as \b com.imtcore.imtqml.1.0.ListViewModel (owned by ObjectViewModel)
 		\a singleton types
 			\c imtqml::CNetworkEventInterceptor as \b com.imtcore.imtqml.1.0.NetworkEventInterceptor
 

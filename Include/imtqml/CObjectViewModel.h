@@ -3,8 +3,12 @@
 
 
 // Qt includes
+#include <QtCore/QHash>
 #include <QtCore/QVariantMap>
 #include <QtQml/QQmlPropertyMap>
+
+// ImtCore includes
+#include <imtqml/CListViewModel.h>
 
 
 namespace imtqml
@@ -37,12 +41,22 @@ namespace imtqml
 	  underlying data model (immediately in live mode, or on
 	  \c submit() in form mode).
 
+	List / collection fields (a field whose source value is a
+	\c QVariantList) are not exposed as plain scalar properties but as
+	a dedicated \c CListViewModel role adapter, created lazily on the
+	first source update and reused across updates so QML bindings stay
+	stable. The property value for such a key is the adapter object, so
+	a \c ListView / \c Repeater binds to \c model.<field> while scalar
+	controls keep binding to \c model.<scalarField>. Edits made through
+	the adapter mark the ViewModel dirty and are written back exactly
+	like scalar edits (through \c GetValues() / \c GetChangedValues()).
+
 	The type is registered to QML by \c CStaticQmlTypeRegistratorComp
 	under \c com.imtcore.imtqml 1.0 as \c ObjectViewModel. Instances
 	are typically created and owned by \c CDataModelController and
 	consumed in QML through its \c viewModel property.
 
-	\sa CDataModelController, IDataModelBridge
+	\sa CDataModelController, CListViewModel, IDataModelBridge
 */
 class CObjectViewModel: public QQmlPropertyMap
 {
@@ -84,6 +98,12 @@ public:
 	QVariantMap GetChangedValues() const;
 
 	/**
+		\brief Returns the list adapter bound to \c key, or \c nullptr
+		if the key does not hold a collection field.
+	*/
+	CListViewModel* GetListAdapter(const QString& key) const;
+
+	/**
 		\brief Marks the current state as clean (e.g. after a
 		successful submit) and refreshes the revert snapshot.
 	*/
@@ -111,10 +131,13 @@ protected:
 
 private:
 	void SetIsDirty(bool isDirty);
+	CListViewModel* GetOrCreateListAdapter(const QString& key);
+	void OnListAdapterChanged(const QString& key);
 
 private:
 	QVariantMap m_snapshot;
 	QVariantMap m_changedValues;
+	QHash<QString, CListViewModel*> m_listAdapters;
 	bool m_isDirty = false;
 	bool m_isSourceUpdate = false;
 };

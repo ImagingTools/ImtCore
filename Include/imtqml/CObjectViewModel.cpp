@@ -25,6 +25,12 @@ void CObjectViewModel::SetSourceValues(const QVariantMap& values)
 	m_isSourceUpdate = true;
 
 	for (auto it = values.constBegin(); it != values.constEnd(); ++it){
+		if (it.value().typeId() == QMetaType::QVariantList){
+			CListViewModel* adapter = GetOrCreateListAdapter(it.key());
+			adapter->SetSourceValues(it.value().toList());
+			continue;
+		}
+
 		if (value(it.key()) != it.value()){
 			insert(it.key(), it.value());
 		}
@@ -38,13 +44,25 @@ void CObjectViewModel::SetSourceValues(const QVariantMap& values)
 }
 
 
+CListViewModel* CObjectViewModel::GetListAdapter(const QString& key) const
+{
+	return m_listAdapters.value(key, nullptr);
+}
+
+
 QVariantMap CObjectViewModel::GetValues() const
 {
 	QVariantMap retVal;
 
 	const QStringList propertyKeys = keys();
 	for (const QString& key: propertyKeys){
-		retVal.insert(key, value(key));
+		CListViewModel* adapter = m_listAdapters.value(key, nullptr);
+		if (adapter != nullptr){
+			retVal.insert(key, adapter->GetValues());
+		}
+		else{
+			retVal.insert(key, value(key));
+		}
 	}
 
 	return retVal;
@@ -59,6 +77,10 @@ QVariantMap CObjectViewModel::GetChangedValues() const
 
 void CObjectViewModel::MarkClean()
 {
+	for (CListViewModel* adapter: m_listAdapters){
+		adapter->MarkClean();
+	}
+
 	m_snapshot = GetValues();
 	m_changedValues.clear();
 	SetIsDirty(false);
@@ -98,6 +120,44 @@ void CObjectViewModel::SetIsDirty(bool isDirty)
 		m_isDirty = isDirty;
 		Q_EMIT isDirtyChanged(m_isDirty);
 	}
+}
+
+
+CListViewModel* CObjectViewModel::GetOrCreateListAdapter(const QString& key)
+{
+	CListViewModel* adapter = m_listAdapters.value(key, nullptr);
+	if (adapter != nullptr){
+		return adapter;
+	}
+
+	adapter = new CListViewModel(this);
+	m_listAdapters.insert(key, adapter);
+
+	connect(adapter, &CListViewModel::changed, this, [this, key](){
+		OnListAdapterChanged(key);
+	});
+
+	// Expose the adapter object as the property value so QML views can
+	// bind to model.<key>; done once, so bindings stay stable across
+	// source updates.
+	insert(key, QVariant::fromValue(adapter));
+
+	return adapter;
+}
+
+
+void CObjectViewModel::OnListAdapterChanged(const QString& key)
+{
+	CListViewModel* adapter = m_listAdapters.value(key, nullptr);
+	if (adapter == nullptr){
+		return;
+	}
+
+	const QVariant values = QVariant::fromValue(adapter->GetValues());
+	m_changedValues.insert(key, values);
+	SetIsDirty(true);
+
+	Q_EMIT valueEdited(key, values);
 }
 
 
