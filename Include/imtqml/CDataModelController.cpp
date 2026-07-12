@@ -110,6 +110,10 @@ const QString& CDataModelController::GetError() const
 
 bool CDataModelController::IsDirty() const
 {
+	if (m_viewModelPtr == nullptr){
+		return false;
+	}
+
 	return m_viewModelPtr->IsDirty();
 }
 
@@ -209,7 +213,9 @@ void CDataModelController::setModel(const QVariant& model)
 				}
 				self->SetError(QString{});
 				self->UpdateCachedModel(model);
-				self->m_viewModelPtr->MarkClean();
+				if (self->m_viewModelPtr != nullptr){
+					self->m_viewModelPtr->MarkClean();
+				}
 				Q_EMIT self->modelSet();
 			});
 }
@@ -217,12 +223,20 @@ void CDataModelController::setModel(const QVariant& model)
 
 void CDataModelController::submit()
 {
+	if (m_viewModelPtr == nullptr){
+		return;
+	}
+
 	setModel(QVariant::fromValue(m_viewModelPtr->GetValues()));
 }
 
 
 void CDataModelController::revert()
 {
+	if (m_viewModelPtr == nullptr){
+		return;
+	}
+
 	m_viewModelPtr->revert();
 }
 
@@ -262,7 +276,7 @@ void CDataModelController::ApplySourceModel(const QVariant& model)
 {
 	UpdateCachedModel(model);
 
-	if (model.canConvert<QVariantMap>()){
+	if (m_viewModelPtr != nullptr && model.canConvert<QVariantMap>()){
 		m_viewModelPtr->SetSourceValues(model.toMap());
 	}
 }
