@@ -200,6 +200,11 @@ I_EXPORT_COMPONENT(
 			"User group params set joiner",
 			"User Group Params Set Joiner");
 
+I_EXPORT_COMPONENT(
+			FileSystemController,
+			"File system controller for browsing the folder hierarchy",
+			"File System Controller Folder Browser");
+
 
 } // namespace ImtServerGqlPck
 
