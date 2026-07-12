@@ -121,6 +121,11 @@ The layered architecture (bottom-up):
   `TSdlAbstractListModel`.
 - Migrate editors module by module (see the migration guide) and finally
   remove the deprecated imperative bases. Started (Phase 4, item 1):
-  `Qml/imtauthgui/UserGeneralDeclarativeEditor.qml` is the declarative
-  pilot for the `imtauth.User` general fields, added next to the
-  imperative `UserGeneralEditor.qml` (facade coexistence).
+  the declarative scalar-editor facades for `imtauth.User`
+  (`Qml/imtauthgui/UserGeneralDeclarativeEditor.qml`) and `imtauth.Tenant`
+  (`Qml/imtauthgui/TenantGeneralDeclarativePage.qml`) are added next to
+  the imperative editors (facade coexistence). Collection editors and the
+  `imtdocgui` lifecycle / C++ observer choreography (Phase 4 items 2–4)
+  stay imperative until the list-adapter follow-up and the downstream
+  partitura bridge wiring land; the imperative bases are removed in
+  Phase 5.

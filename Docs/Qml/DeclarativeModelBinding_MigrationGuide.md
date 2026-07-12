@@ -192,17 +192,21 @@ mutation input on `submit()`. All callbacks are delivered on the GUI
 thread — the editor QML is byte-for-byte identical to the desktop
 variant.
 
-## Worked pilot
+## Worked pilots
 
-`Qml/imtauthgui/UserGeneralDeclarativeEditor.qml` is the first migrated
-editor (Phase 4, item 1). It edits the general fields of the
-`imtauth.User` model (`username`, `name`, `email`) purely through
-bindings to `editor.model` and ViewModel setters in
-`onEditingFinished`, with `DeclarativeViewBase` + an inline
-`DataModelController { modelId: "imtauth.User" }`. It is added next to
-the imperative `UserGeneralEditor.qml` (facade coexistence); the latter
-is removed only once `UserView.qml` and the password-change flow are
-migrated too.
+The first migrated editors (Phase 4, item 1) live in `Qml/imtauthgui`,
+added next to their imperative counterparts (facade coexistence):
+
+- `UserGeneralDeclarativeEditor.qml` — general fields of `imtauth.User`
+  (`username`, `name`, `email`).
+- `TenantGeneralDeclarativePage.qml` — general fields of
+  `imtauth.Tenant` (`name`, `description`, `isActive`).
+
+Both edit purely through bindings to `editor.model` and ViewModel
+setters in the control handlers, with `DeclarativeViewBase` + an inline
+`DataModelController { modelId: "..." }`. They cover the scalar-only
+editors — collection editors (roles/groups/permissions/members) wait for
+the ViewModel *list adapters with roles* follow-up (see ADR-001).
 
 ## Checklist per migrated editor
 

@@ -81,22 +81,54 @@ above QML plumbing. The legacy types stay as deprecated facades until the
 
 ## Migration order (Phase 4 of the plan)
 
-1. `imtauthgui` editors (largest inventory, pilot: `UserGeneralEditor.qml`)
-   — **in progress**: declarative pilot `UserGeneralDeclarativeEditor.qml`
-   added alongside the imperative editor (facade coexistence). It binds
-   the general user fields (`username`, `name`, `email`) of the
-   `imtauth.User` model through `DeclarativeViewBase` +
-   `DataModelController`; no `updateGui()`/`updateModel()` /
-   `emitUpdateModel()` / `blockingUpdateModel` logic remains. The
-   password-change flow (dedicated `ChangePassword` mutation via
-   `AuthorizationController`) and the roles/groups/system-info blocks of
-   `UserView.qml` are not yet migrated; the imperative `UserGeneralEditor`
-   stays until `UserView` is switched over.
+1. `imtauthgui` editors (largest inventory, pilot: `UserGeneralEditor.qml`).
+   Declarative facades added alongside the imperative editors (facade
+   coexistence — the imperative editors stay until Phase 5):
+   - `UserGeneralDeclarativeEditor.qml` — scalar user fields
+     (`username`, `name`, `email`) of `imtauth.User`.
+   - `TenantGeneralDeclarativePage.qml` — scalar tenant fields
+     (`name`, `description`, `isActive`) of `imtauth.Tenant`.
+
+   **Scalar-only editors are the migratable set today.** The remaining
+   `imtauthgui` editors are blocked and are intentionally not migrated in
+   this phase:
+   - *List/collection editors* — `UserView` roles/groups/system-info,
+     `RoleView` (parentRoles/permissions), `UserGroupView`,
+     `CrossOrgGrantView` (roleIds), `RelationshipView` (roles/scope),
+     `TenantPermissionsPage` (tenantPermissions). These need the
+     ViewModel *list adapters with roles* follow-up (tracked separately
+     in ADR-001, "Follow-up work"); `CObjectViewModel` currently exposes
+     scalar `QVariant` properties only, so a faithful multi-select /
+     table binding is not yet expressible.
+   - *Non-field views* — `AdministrationView`, `UserManagementProvider`
+     (page/permission orchestration, not field copying),
+     `ContractView` / `MessageView` / `TenantSimpleCollectionPage`
+     (already empty `updateGui`/`updateModel` stubs).
+   - *Special flows* — the password-change flow of `UserGeneralEditor`
+     uses a dedicated `ChangePassword` mutation via
+     `AuthorizationController`, not model write-back, and stays imperative.
+   - *Concrete bridge wiring* (`ModelId "imtauth.User"` /
+     `"imtauth.Tenant"` on a `TLocalDataModelBridgeComp` subclass or a
+     configured `CGqlDataModelBridgeComp`, plugged into
+     `CDataModelBridgeDemultiplexer`) is composed in the **downstream
+     product partitura**, not in ImtCore — ImtCore has no concrete
+     imperative editor users either (see §1). ImtCore ships the reusable
+     declarative facades; products switch their screens over and provide
+     the bridge.
+
 2. `imtdocgui` document lifecycle (`DocumentService`, `DocumentDecorator`,
    `UndoRedoManager`) — controller-centric lifecycle, remove view
-   registration and `setBlockingUpdateModel` choreography
+   registration and `setBlockingUpdateModel` choreography. **Not migrated:**
+   this is a replacement refactor of deeply interlocked view-registration /
+   undo-redo choreography; under the facade strategy it is removed only in
+   Phase 5 once the declarative controller lifecycle owns undo/redo.
 3. `imtcolgui` / `imtguigql` — move `GqlRequestSender` /
    `GqlBasedDataModelController` users onto the GraphQL bridge; keep the old
-   QML types as deprecated facades
+   QML types as deprecated facades. **Not migrated:** blocked on the same
+   list-adapter follow-up (collection views are list-centric) and on the
+   downstream partitura wiring for `CGqlDataModelBridgeComp`.
 4. `CCommandsObserverQmlComp`, `CDocumentServiceController` — replace
-   `invokeMethod` name calls with ViewModel properties/signals
+   `invokeMethod` name calls with ViewModel properties/signals. **Not
+   migrated:** paired with item 2; the imperative `invokeMethod` contract
+   stays until the `imtdocgui` lifecycle is switched over in Phase 5.
+
