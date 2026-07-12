@@ -80,6 +80,8 @@ void CDataModelController::SetParameters(const QVariantMap& parameters)
 	if (m_parameters != parameters){
 		m_parameters = parameters;
 		Q_EMIT parametersChanged(m_parameters);
+
+		UpdateSubscription();
 	}
 }
 

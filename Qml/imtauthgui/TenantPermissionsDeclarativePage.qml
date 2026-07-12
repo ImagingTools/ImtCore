@@ -121,8 +121,11 @@ DeclarativeViewBase {
 						id: addButton_;
 
 						text: qsTr("Add");
-						enabled: !editor.readOnly && newPermissionInput_.text !== "";
-						onClicked: editor.model.tenantPermissions.append(newPermissionInput_.text);
+						enabled: !editor.readOnly && editor.model !== null && newPermissionInput_.text !== "";
+						onClicked: {
+							editor.model.tenantPermissions.append(newPermissionInput_.text);
+							newPermissionInput_.text = "";
+						}
 					}
 				}
 			}
