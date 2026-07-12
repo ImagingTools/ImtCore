@@ -1,0 +1,30 @@
+schema {
+	namespace: imtbase
+	version: 1.0
+	query: Query
+}
+
+input GetFileSystemEntriesInput
+{
+	path: String
+}
+
+type FileSystemEntry
+{
+	name: String!
+	path: String!
+	isDir: Boolean!
+	size: Int
+	lastModified: String
+}
+
+type GetFileSystemEntriesPayload
+{
+	path: String!
+	parentPath: String
+	entries: [FileSystemEntry!]!
+}
+
+type Query {
+	GetFileSystemEntries(input: GetFileSystemEntriesInput): GetFileSystemEntriesPayload!
+}
