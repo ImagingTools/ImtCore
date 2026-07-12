@@ -1,12 +1,6 @@
 module imtcolgui
 
 CollectionDataProvider 1.0 CollectionDataProvider.qml
-CollectionStructure 1.0 CollectionStructure.qml
-CollectionStructureBase 1.0 CollectionStructureBase.qml
-CollectionStructureBaseGqlModels 1.0 CollectionStructureBaseGqlModels.qml
-CollectionStructureCommandsDelegateBase 1.0 CollectionStructureCommandsDelegateBase.qml
-CollectionStructureCommandsObserver 1.0 CollectionStructureCommandsObserver.qml
-CollectionStructureDataProvider 1.0 CollectionStructureDataProvider.qml
 CollectionView 1.0 CollectionView.qml
 CollectionViewBase 1.0 CollectionViewBase.qml
 CollectionViewBaseGqlModels 1.0 CollectionViewBaseGqlModels.qml

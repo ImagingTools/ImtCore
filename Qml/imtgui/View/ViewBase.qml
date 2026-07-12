@@ -8,6 +8,14 @@ import imtcontrols 1.0
 Item {
 	id: viewBase;
 
+	// Children declared inside `ViewBase { ... }` by a subclass/consumer are
+	// routed straight into the content area below the commands panel,
+	// instead of becoming direct children of viewBase itself (which also
+	// hosts the alert panel / commands panel / separator chrome). Replaces a
+	// manual Component.onCompleted loop that reparented every child except
+	// the three chrome elements (identified by an objectName marker).
+	default property alias content: viewContent.data
+
 	property string viewTypeId
 	property string viewId
 	property var model: null
@@ -92,16 +100,14 @@ Item {
 		anchors.right: parent.right;
 		height: visible ? Style.controlHeightL: 0;
 		visible: alertPanel.item != null && alertPanel.item !== undefined;
-		objectName: "ViewBase";
 	}
-	
+
 	Item {
 		id: headerViewItem;
 		anchors.top: alertPanel.bottom;
 		anchors.left: parent.left;
 		anchors.right: parent.right;
 		height: visible ? viewBase.commandsPanelHeight : 0;
-		objectName: "ViewBase";
 		visible: !viewBase.commandsPanelVisible ? false : headerViewLoader.item && viewBase.commandsController != null;
 		
 		Loader {
@@ -124,9 +130,8 @@ Item {
 		height: visible ? 1 : 0;
 		color: Style.borderColor;
 		visible: !viewBase.commandsPanelVisible ? false : headerViewLoader.item && viewBase.commandsController != null && viewBase.commandsSeparatorVisible
-		objectName: "ViewBase";
 	}
-	
+
 	Rectangle {
 		id: viewContent;
 		anchors.top: separator.bottom;
@@ -134,23 +139,14 @@ Item {
 		anchors.right: parent.right;
 		anchors.rightMargin: viewBase.viewContentRightMargin
 		anchors.bottom: parent.bottom;
-		objectName: "ViewBase";
 		color: viewBase.contentColor;
 	}
-	
+
 	Component.onCompleted: {
-		for (let i = 0; i < viewBase.children.length; i++){
-			if (viewBase.children[i].objectName !== "ViewBase"){
-				let element = viewBase.children[i];
-				element.parent = viewContent;
-				i--;
-			}
-		}
-		
 		if (commandsControllerComp){
 			commandsController = commandsControllerComp.createObject(viewBase);
 		}
-		
+
 		if (commandsDelegateComp){
 			commandsDelegate = commandsDelegateComp.createObject(viewBase);
 		}

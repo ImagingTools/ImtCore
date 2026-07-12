@@ -67,6 +67,14 @@ ElementView {
 	controlComp: Component {
 		Text {
 			id: addBtn
+
+			// Test instrumentation: this reusable control has no objectName of its own (it's a plain
+			// Text with a MouseArea, not a Button-derived control that would auto-derive one from
+			// `text`), and it's used more than once per document (e.g. UserView.qml's "Roles" AND
+			// "Groups" sections) - derive a distinct name from `label` (e.g. "AddRoles"/"AddGroups") so
+			// each usage is addressable. Inert - no runtime/visual effect.
+			objectName: "Add" + itemSelectElementView.label.replace(/[^A-Za-z0-9]/g, "")
+
 			visible: itemSelectElementView.editable
 			text: "+ " + itemSelectElementView.addButtonText
 			font.pixelSize: Style.fontSizeM

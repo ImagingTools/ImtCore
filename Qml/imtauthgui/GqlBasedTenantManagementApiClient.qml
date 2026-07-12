@@ -25,8 +25,9 @@ import imtauthgui 1.0
  *
  * GQL/SDL implementation of the abstract TenantManagementApiClient contract.
  * This is the ONLY place that imports the membership / roles / groups / users SDL
- * modules and owns GqlSdlRequestSender / GqlBasedCollectionDocumentService /
- * GqlBasedCommandsController instances for these operations.
+ * modules and owns GqlSdlRequestSender / DocumentService (with a
+ * GqlDocumentServiceBackend) / GqlBasedCommandsController instances for
+ * these operations.
  *
  * Pages depend only on the abstract contract; the orchestrator (TenantEditor)
  * injects this concrete client.
@@ -1665,32 +1666,32 @@ QtObject {
 	// =========================================================================
 	// Document services (Roles / Groups / Users)
 	//
-	// These three services drive the SingleDocumentWorkspaceShellView in the
+	// These three services drive the SingleDocumentWorkspace in the
 	// Roles / Groups / Members pages. The pages themselves do NOT instantiate
-	// any GqlBasedCollectionDocumentService / SingleDocumentTypeRegistrar /
+	// any DocumentService / SingleDocumentTypeRegistrar /
 	// DocumentRepresentationController — they only consume the abstract
 	// `roleDocumentManager` / `groupDocumentManager` / `userDocumentManager`
 	// properties.
 	// =========================================================================
 
-	property GqlBasedCollectionDocumentService __roleDocumentService: GqlBasedCollectionDocumentService {
-		collectionId: "Roles"
+	property DocumentService __roleDocumentService: DocumentService {
+		backend: GqlDocumentServiceBackend { collectionId: "Roles" }
 	}
 
-	property GqlBasedCollectionDocumentService __groupDocumentService: GqlBasedCollectionDocumentService {
-		collectionId: "Groups"
+	property DocumentService __groupDocumentService: DocumentService {
+		backend: GqlDocumentServiceBackend { collectionId: "Groups" }
 	}
 
-	property GqlBasedCollectionDocumentService __userDocumentService: GqlBasedCollectionDocumentService {
-		collectionId: "Users"
+	property DocumentService __userDocumentService: DocumentService {
+		backend: GqlDocumentServiceBackend { collectionId: "Users" }
 	}
 
-	property GqlBasedCollectionDocumentService __relationshipDocumentService: GqlBasedCollectionDocumentService {
-		collectionId: "TenantRelationships"
+	property DocumentService __relationshipDocumentService: DocumentService {
+		backend: GqlDocumentServiceBackend { collectionId: "TenantRelationships" }
 	}
 
-	property GqlBasedCollectionDocumentService __crossOrgGrantDocumentService: GqlBasedCollectionDocumentService {
-		collectionId: "CrossOrgGrants"
+	property DocumentService __crossOrgGrantDocumentService: DocumentService {
+		backend: GqlDocumentServiceBackend { collectionId: "CrossOrgGrants" }
 	}
 
 	property FilterableSelectGqlDataProvider crossOrgGrantsListDataProvider: FilterableSelectGqlDataProvider {
@@ -1896,16 +1897,9 @@ QtObject {
 				}
 			}
 
-			onUserDataChanged: {
-				if (userData && root.userDocumentManager){
-					userEditor.isNew = root.userDocumentManager.documentIsNew(userEditor.documentId)
-				}
-			}
-
-			onDocumentSaved: {
-				userEditor.isNew = false
-				userEditor.checkChangePasswordLogic()
-			}
+			// isNew is inherited from DocumentViewBase (driven by document.isNew)
+			// and UserView itself already reacts to both isNew and documentSaved
+			// (checkChangePasswordLogic) — no manual bookkeeping needed here.
 		}
 	}
 

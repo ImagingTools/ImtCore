@@ -18,14 +18,23 @@ RemoteCollectionView {
 	property string productId;
 	property var documentManager: null;
 	
-	commandsDelegateComp: Component {DocumentCollectionViewDelegate {
+	commandsDelegateComp: Component {DocCollectionViewDelegate {
 			collectionView: userGroupCollectionViewContainer;
 			documentManagerId: "Administration/Groups"
-			documentTypeIds: ["Group"]
-			documentDataControllersComp: [documentDataControllerComp]
-			documentViewsComp: [userGroupDocumentComp]
 			isSingleDocumentMode: true
-	
+
+			Component.onCompleted: {
+				registerDocumentType("Group", qsTr("Group"))
+				addDocumentView("Group", "GroupEditor", userGroupDocumentComp, groupControllerComp)
+			}
+
+			onDocumentManagerChanged: {
+				if (documentManager){
+					userGroupCollectionViewContainer.documentManager = documentManager
+					documentManager.backend.registerDocumentDataController("Group", documentDataControllerComp)
+				}
+			}
+
 			function updateStateBaseCommands(selection, commandsController, elementsModel){
 				let isEnabled = selection.length > 0;
 				if(commandsController){
@@ -66,11 +75,19 @@ RemoteCollectionView {
 	}
 	
 	Component {
+		id: groupControllerComp
+
+		InProcessDocumentRepresentationController {
+			backend: MainDocumentService.getDocumentService("Administration/Groups").backend
+		}
+	}
+
+	Component {
 		id: documentDataControllerComp;
-		
+
 		GqlRequestDocumentDataController {
 			id: requestDocumentDataController
-			
+
 			property GroupData groupData: documentModel;
 
 			typeId: "Group";

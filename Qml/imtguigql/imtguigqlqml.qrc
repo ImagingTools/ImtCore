@@ -3,7 +3,6 @@
         <file alias="web/GraphQLRequest.js">../web/GraphQLRequest.js</file>
         <file alias="web/FileUploader.js">../web/FileUploader.js</file>
         <file alias="imtguigql/qmldir">qmldir</file>
-        <file alias="imtguigql/GqlDocumentDataController.qml">GqlDocumentDataController.qml</file>
         <file alias="imtguigql/ComboBoxGql.qml">ComboBoxGql.qml</file>
         <file alias="imtguigql/ComboBoxGqlLegacy.qml">ComboBoxGqlLegacy.qml</file>
         <file alias="imtguigql/ComboBoxGqlSimple.qml">ComboBoxGqlSimple.qml</file>
@@ -31,7 +30,7 @@
         <file alias="imtguigql/GqlBasedDataModelProvider.qml">GqlBasedDataModelProvider.qml</file>
         <file alias="imtguigql/GqlBasedDataModelController.qml">GqlBasedDataModelController.qml</file>
         <file alias="imtguigql/GqlBasedOptionManager.qml">GqlBasedOptionManager.qml</file>
-	<file alias="imtguigql/GqlBasedCollectionDocumentService.qml">GqlBasedCollectionDocumentService.qml</file>
+	<file alias="imtguigql/GqlDocumentServiceBackend.qml">GqlDocumentServiceBackend.qml</file>
 	<file alias="imtguigql/GqlCollectionDocManagerPageView.qml">GqlCollectionDocManagerPageView.qml</file>
 	<file alias="imtguigql/GqlSingleDocCollectionPageView.qml">GqlSingleDocCollectionPageView.qml</file>
 	<file alias="imtguigql/GqlSingleDocumentPageView.qml">GqlSingleDocumentPageView.qml</file>

@@ -17,15 +17,20 @@ QtObject {
 	signal representationUpdated(string documentId, var representation)
 	signal updateRepresentationFailed(string documentId, string message)
 
+	// Subclasses (declared as a Component per document type/view, see
+	// EditorRegistry) must override both functions below. There is no
+	// working default implementation: silently reporting success without
+	// fetching or storing any data would hide a real integration bug
+	// instead of surfacing it.
 	function updateRepresentationFromDocument(){
-		startUpdateRepresentation(documentId, representationModel)
-		console.warn("updateRepresentationFromDocument() should be implemented in a subclass")
-		representationUpdated(documentId, representationModel)
+		let message = "updateRepresentationFromDocument() is not implemented for this document type"
+		console.error(message)
+		updateRepresentationFailed(documentId, message)
 	}
 
 	function updateDocumentFromRepresentation(){
-		startUpdateDocument(documentId)
-		console.warn("updateDocumentFromRepresentation() should be implemented in a subclass")
-		documentUpdated(documentId)
+		let message = "updateDocumentFromRepresentation() is not implemented for this document type"
+		console.error(message)
+		updateDocumentFailed(documentId, message)
 	}
 }

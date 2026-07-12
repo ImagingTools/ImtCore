@@ -23,9 +23,9 @@ QtObject {
 	property string tenantId: ""
 
 	// --- Document services for the per-type document workflow ---
-	// Concrete implementations expose DocumentServiceBase-compatible managers and
+	// Concrete implementations expose DocumentService-compatible managers and
 	// the typeId / Component pieces that pages need to drive the
-	// SingleDocumentWorkspaceShellView. Pages MUST NOT instantiate any concrete
+	// SingleDocumentWorkspace. Pages MUST NOT instantiate any concrete
 	// service or registrar themselves.
 	property var roleDocumentManager: null
 	property var groupDocumentManager: null

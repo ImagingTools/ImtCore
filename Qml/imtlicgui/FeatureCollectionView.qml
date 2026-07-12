@@ -14,15 +14,26 @@ RemoteCollectionView {
 	id: featureCollectionViewContainer;
 	
 	visibleMetaInfo: false;
-	
+
+	// Requires a page host (e.g. CollectionWorkspacePageView) to be
+	// instantiated somewhere with pageId == "Features", so that
+	// MainDocumentService.getDocumentService("Features") below resolves to
+	// a real DocumentService instead of undefined.
 	collectionId: "Features";
 	documentCollectionFilter: null
-	commandsDelegateComp: Component {DocumentCollectionViewDelegate {
+	commandsDelegateComp: Component {DocCollectionViewDelegate {
 			collectionView: featureCollectionViewContainer;
-			documentTypeIds: ["Feature"]
-			documentViewTypeIds: ["FeatureEditor"]
-			documentViewsComp: [featureDocumentComp]
-			documentDataControllersComp: [dataControllerComp]
+
+			Component.onCompleted: {
+				registerDocumentType("Feature", qsTr("Feature"))
+				addDocumentView("Feature", "FeatureEditor", featureDocumentComp, featureControllerComp)
+			}
+
+			onDocumentManagerChanged: {
+				if (documentManager){
+					documentManager.backend.registerDocumentDataController("Feature", dataControllerComp)
+				}
+			}
 		}
 	}
 	
@@ -56,13 +67,21 @@ RemoteCollectionView {
 	}
 	
 	Component {
+		id: featureControllerComp
+
+		InProcessDocumentRepresentationController {
+			backend: MainDocumentService.getDocumentService(featureCollectionViewContainer.collectionId).backend
+		}
+	}
+
+	Component {
 		id: dataControllerComp;
-		
+
 		GqlRequestDocumentDataController {
 			id: requestDocumentDataController
-			
+
 			property FeatureData featureData: documentModel
-			
+
 			gqlGetCommandId: ImtlicFeaturesSdlCommandIds.s_getFeatureItem;
 			gqlUpdateCommandId: ImtlicFeaturesSdlCommandIds.s_updateFeature;
 			gqlAddCommandId: ImtlicFeaturesSdlCommandIds.s_addFeature;

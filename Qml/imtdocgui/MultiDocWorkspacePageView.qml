@@ -1,28 +1,16 @@
 import QtQuick 2.12
-import Acf 1.0
-import com.imtcore.imtqml 1.0
-import imtcontrols 1.0
 import imtdocgui 1.0
-import imtgui 1.0
 
-DocumentWorkspacePageView {
-	id: multiDocPageView
+// Generic tab-strip document page, referenced by Partitura configuration
+// (qrc:/qml/imtdocgui/MultiDocWorkspacePageView.qml) — keep this file at
+// this path/name even though its internals are new-architecture. Hosts a
+// client-managed DocumentService (LocalDocumentServiceBackend): the actual
+// document types are registered later, from wherever embeds a collection
+// view that resolves this page via MainDocumentService.getDocumentService(pageId).
+DocumentServicePageView {
+	id: root
 
-	documentManagerView: documentManagerView_
-	
-	onStartItemSourceCompChanged: {
-		if (startItemSourceComp){
-			documentManagerView_.addFixedView(startItemSourceComp, pageName, "", true)
-		}
-	}
-	
-	function setDocumentName(documentId, name){
-		documentManagerView_.setDocumentName(documentId, name)
-	}
-	
-	MultiDocWorkspaceView {
-		id: documentManagerView_
-		anchors.fill: parent
-		documentManager: multiDocPageView.documentManager
+	backendComp: Component {
+		LocalDocumentServiceBackend {}
 	}
 }

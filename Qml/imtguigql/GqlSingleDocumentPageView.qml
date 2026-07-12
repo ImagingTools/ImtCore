@@ -1,22 +1,18 @@
 import QtQuick 2.12
-import Acf 1.0
-import com.imtcore.imtqml 1.0
-import imtcontrols 1.0
 import imtguigql 1.0
 import imtgui 1.0
 import imtdocgui 1.0
 
 // Page wrapper that hosts a single document inside a workspace driven by
-// the regular GqlBasedCollectionDocumentService (and therefore the
-// server-side CollectionDocumentManager). No CollectionView is shown; the
-// page is intended to navigate directly to a known object inside the
-// collection.
+// DocumentService (and therefore the server-side CollectionDocumentManager).
+// No CollectionView is shown; the page is intended to navigate directly to a
+// known object inside the collection.
 //
 // Routing: parameters can be supplied either as page-properties on the
 // PageContainer (collectionId / objectId / objectTypeId / createNew) or
 // through a NavigableItem path "<collectionId>/<typeId>/<objectId>" — the
 // page wires both up.
-PageContainer {
+DocumentManagerPageBase {
 	id: root
 
 	// Identifier of the collection on the server. Defaults to pageId so
@@ -35,13 +31,15 @@ PageContainer {
 	// instead of opening an existing one.
 	property bool createNew: false
 
-	// Shared service instance driving the workspace. Reuses
-	// GqlBasedCollectionDocumentService so that this page benefits from
-	// the existing server pipeline (subscriptions, open/save/close,
-	// undo/redo) without duplicating any business logic.
-	property DocumentServiceBase documentManager: GqlBasedCollectionDocumentService {
-		collectionId: root.collectionId
+	backendComp: Component {
+		GqlDocumentServiceBackend {
+			collectionId: root.collectionId
+		}
 	}
+
+	// There is no CollectionView to name here - override the base's
+	// default (which forwards to documentManager.setDocumentName).
+	function setDocumentName(documentId, name){}
 
 	Component.onCompleted: {
 		console.log("GqlSingleDocumentPageView.qml onCompleted", root.pageId,
@@ -49,36 +47,6 @@ PageContainer {
 					"objectTypeId=", root.objectTypeId,
 					"objectId=", root.objectId)
 	}
-
-	onPageIdChanged: {
-		if (pageId !== ""){
-			MainDocumentService.registerDocumentService(pageId, documentManager)
-		}
-	}
-
-	onStartItemSourceCompChanged: {
-		if (startItemSourceComp){
-			// Backwards-compat hook (matches the convention of other gql
-			// page wrappers). For single-document pages there is no
-			// CollectionView to inject; the startItem (if any) is ignored.
-		}
-	}
-
-	onVisibleChanged: {
-		checkCreation()
-	}
-
-	onStartItemSourceChanged: {
-		checkCreation()
-	}
-
-	function checkCreation(){
-		if (!startItemIsCreated()){
-			createStartItemComp()
-		}
-	}
-
-	function setDocumentName(documentId, name){}
 
 	// Programmatic open helper: callers can switch the rendered document
 	// without rebuilding the page.
@@ -122,7 +90,7 @@ PageContainer {
 		}
 	}
 
-	SingleDocumentWorkspaceShellView {
+	SingleDocumentWorkspace {
 		id: workspaceView_
 		anchors.fill: parent
 		documentManager: root.documentManager

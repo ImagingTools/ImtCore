@@ -7,10 +7,16 @@ import imtgui 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
 import controlsgalleryContactInfosSdl 1.0
-import controlsgalleryContactInfoCollectionDocumentManagerSdl 1.0
-import imtbaseCollectionDocumentManagerSdl 1.0
+import controlsgalleryContactInfoCollectionDocumentServiceSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 import imtbaseUndoManagerSdl 1.0
 
+// Demonstrates that DocumentService is transport-agnostic: the exact same
+// ContactInfoEditor view is driven by two independent DocumentService
+// instances that differ only in which backend is injected — one talks to
+// the server over GraphQL, the other keeps everything in memory on the
+// client. Neither the editor nor DocumentService itself knows or cares
+// which one it is.
 Rectangle {
 	id: testPage;
 
@@ -18,86 +24,163 @@ Rectangle {
 	clip: true;
 	color: Style.baseColor
 
+	Component {
+		id: contactInfoEditorComp
 
-	MultiDocumentCollectionView {
-		anchors.fill: parent;
-		documentManager: GqlBasedCollectionDocumentManager {
-			collectionId: "ContactInfos"
-			Component.onCompleted: {
-				registerDocumentViewData("ContactInfo", "ContactInfoEditor", contactInfoEditorComp, contactInfoDataControllerFactory)
-				createDocument("ContactInfo")
+		ContactInfoEditor {
+			id: contactInfoEditor
+			commandsControllerComp: Component {
+				GqlBasedCommandsController {
+					typeId: "ContactInfo"
+				}
+			}
+		}
+	}
+
+	Row {
+		anchors.fill: parent
+		spacing: 1
+
+		// --- Left pane: server-backed contacts (GraphQL) ---------------------
+		Column {
+			width: (parent.width - parent.spacing) / 2
+			height: parent.height
+
+			Text {
+				width: parent.width
+				height: Style.controlHeightL
+				verticalAlignment: Text.AlignVCenter
+				horizontalAlignment: Text.AlignHCenter
+				font.pixelSize: Style.fontSizeL
+				color: Style.titleColor
+				text: qsTr("Server-backed (GraphQL)")
 			}
 
-			Component {
-				id: contactInfoEditorComp
-				
-				ContactInfoEditor {
-					id: contactInfoEditor
-					commandsControllerComp: Component {
-						GqlBasedCommandsController {
-							typeId: "ContactInfo"
+			DocumentTabsWorkspace {
+				width: parent.width
+				height: parent.height - Style.controlHeightL
+				documentManager: DocumentService {
+					id: gqlContactService
+					backend: GqlDocumentServiceBackend {
+						collectionId: "ContactInfos"
+					}
+					Component.onCompleted: {
+						registerDocumentViewData("ContactInfo", "ContactInfoEditor", contactInfoEditorComp, gqlContactControllerComp)
+						createDocument("ContactInfo")
+					}
+
+					Component {
+						id: gqlContactControllerComp
+
+						DocumentRepresentationController {
+							id: root
+
+							representationModel: ContactInfoData {}
+
+							function updateRepresentationFromDocument(){
+								startUpdateRepresentation(documentId, representationModel)
+
+								documentIdInput.m_id = documentId
+								getContactInfoRequest.send(documentIdInput)
+							}
+
+							function updateDocumentFromRepresentation(){
+								startUpdateDocument(documentId)
+
+								updateContactInfoInput.m_documentId = documentId
+								updateContactInfoInput.m_contactInfo = representationModel
+
+								updateContactInfoRequest.send(updateContactInfoInput)
+							}
+
+							property DocumentId documentIdInput: DocumentId {}
+							property GqlSdlRequestSender getContactInfoRequest: GqlSdlRequestSender {
+								gqlCommandId: ControlsgalleryContactInfoCollectionDocumentServiceSdlCommandIds.s_getContactInfoRepresentation
+								sdlObjectComp: Component {
+									ContactInfoData {
+										onFinished: {
+											root.representationModel.copyFrom(this)
+											root.representationUpdated(root.documentId, root.representationModel)
+										}
+									}
+								}
+
+								function onError(message, type){
+									root.updateRepresentationFailed(root.documentId, message)
+								}
+							}
+
+							property UpdateContactInfoInput updateContactInfoInput: UpdateContactInfoInput {}
+							property GqlSdlRequestSender updateContactInfoRequest: GqlSdlRequestSender {
+								gqlCommandId: ControlsgalleryContactInfoCollectionDocumentServiceSdlCommandIds.s_updateContactInfoFromRepresentation
+								requestType: 1
+								sdlObjectComp: Component {
+									DocumentOperationStatus {
+										onFinished: {
+											if (m_status === "Success"){
+												root.documentUpdated(root.documentId)
+											}
+										}
+									}
+								}
+
+								function onError(message, type){
+									root.updateDocumentFailed(root.documentId, message)
+								}
+							}
 						}
 					}
 				}
 			}
-			
-			Component {
-				id: contactInfoDataControllerFactory
+		}
 
-				DocumentRepresentationController {
-					id: root
+		Rectangle {
+			width: 1
+			height: parent.height
+			color: Style.borderColor
+		}
 
-					representationModel: ContactInfoData {}
+		// --- Right pane: purely local contacts (no network at all) -----------
+		Column {
+			width: (parent.width - parent.spacing) / 2
+			height: parent.height
 
-					function updateRepresentationFromDocument(){
-						startUpdateRepresentation(documentId, representationModel)
+			Text {
+				width: parent.width
+				height: Style.controlHeightL
+				verticalAlignment: Text.AlignVCenter
+				horizontalAlignment: Text.AlignHCenter
+				font.pixelSize: Style.fontSizeL
+				color: Style.titleColor
+				text: qsTr("Local (in-memory, no server)")
+			}
 
-						documentIdInput.m_id = documentId
-						getContactInfoRequest.send(documentIdInput)
-					}
-
-					function updateDocumentFromRepresentation(){
-						startUpdateDocument(documentId)
-
-						updateContactInfoInput.m_documentId = documentId
-						updateContactInfoInput.m_contactInfo = representationModel
-
-						updateContactInfoRequest.send(updateContactInfoInput)
-					}
-
-					property DocumentId documentIdInput: DocumentId {}
-					property GqlSdlRequestSender getContactInfoRequest: GqlSdlRequestSender {
-						gqlCommandId: ControlsgalleryContactInfoCollectionDocumentManagerSdlCommandIds.s_getContactInfoRepresentation
-						sdlObjectComp: Component {
-							ContactInfoData {
-								onFinished: {
-									root.representationModel.copyFrom(this)
-									root.representationUpdated(root.documentId, root.representationModel)
-								}
-							}
+			DocumentTabsWorkspace {
+				width: parent.width
+				height: parent.height - Style.controlHeightL
+				documentManager: DocumentService {
+					id: localContactService
+					backend: LocalDocumentServiceBackend {
+						id: localContactBackend
+						Component.onCompleted: {
+							registerDocumentType("ContactInfo", contactInfoDataComp)
 						}
 
-						function onError(message, type){
-							root.updateRepresentationFailed(root.documentId, message)
+						Component {
+							id: contactInfoDataComp
+							ContactInfoData {}
 						}
 					}
+					Component.onCompleted: {
+						registerDocumentViewData("ContactInfo", "ContactInfoEditor", contactInfoEditorComp, localContactControllerComp)
+						createDocument("ContactInfo")
+					}
 
-					property UpdateContactInfoInput updateContactInfoInput: UpdateContactInfoInput {}
-					property GqlSdlRequestSender updateContactInfoRequest: GqlSdlRequestSender {
-						gqlCommandId: ControlsgalleryContactInfoCollectionDocumentManagerSdlCommandIds.s_updateContactInfoFromRepresentation
-						requestType: 1
-						sdlObjectComp: Component {
-							DocumentOperationStatus {
-								onFinished: {
-									if (m_status === "Success"){
-										root.documentUpdated(root.documentId)
-									}
-								}
-							}
-						}
+					Component {
+						id: localContactControllerComp
 
-						function onError(message, type){
-							root.updateDocumentFailed(root.documentId, message)
+						InProcessDocumentRepresentationController {
+							backend: localContactBackend
 						}
 					}
 				}

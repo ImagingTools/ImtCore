@@ -9,7 +9,7 @@ import imtcontrols 1.0
 import imtlicProductsSdl 1.0
 import imtguigql 1.0
 
-DocumentCollectionViewDelegate {
+DocCollectionViewDelegate {
 	id: container;
 	
 	removeDialogTitle: qsTr("Deleting a product");

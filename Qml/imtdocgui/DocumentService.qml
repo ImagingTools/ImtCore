@@ -1,806 +1,741 @@
 import QtQuick 2.12
-import Acf 1.0
-import imtgui 1.0
-import imtcontrols 1.0
 
+// Unified, transport-agnostic document service for multi-user collection
+// documents. Replaces the DocumentServiceBase / GqlBasedCollectionDocumentService
+// inheritance pair: instead of subclassing to plug in GraphQL, a transport
+// delegate is injected via the `backend` property (dependency injection).
+//
+// `backend` must implement:
+//   getOpenedDocumentList(callback)
+//   openDocument(typeId, objectId, callback)
+//   createDocument(typeId, proposedSourceDocumentId, callback)
+//   saveDocument(documentId, documentName, callback)
+//   closeDocument(documentId, callback)
+//   doUndo(documentId, steps, callback)
+//   doRedo(documentId, steps, callback)
+//   resetUndo(documentId, callback)
+//   getUndoInfo(documentId, callback)
+//   signal documentEvent(operation, objectId, documentId, documentName, isDirty, isLoading)
+//   signal undoChanged(documentId, undoSteps, redoSteps, isDirty)
+// See GqlDocumentServiceBackend (network, multi-user) and
+// LocalDocumentServiceBackend (in-process, client-managed) for the two
+// concrete implementations.
 QtObject {
-	id: documentManager
+	id: root
 
-	property string defaultDocumentName: qsTr("<no name>")
-	property int documentsCount: documentsModel.count
-	property Item activeView // Document Manager view
-	property string typeId // Document Manager type-ID
-
-	property ListModel documentsModel: ListModel {
-		dynamicRoles: true
+	property var backend: null
+	property EditorRegistry editors: EditorRegistry {
+		onViewRegistered: root.documentViewRegistered(documentTypeId, viewTypeId)
 	}
+	property DocumentInteractionController interaction: DocumentInteractionController {}
+	property DocumentEditorHost editorHost: DocumentEditorHost { documentService: root }
+	property Component __documentComp: Component { Document {} }
 
-	/*!
-		This signal is committed when the user closes the document. The corresponding handler is
-		\c onDocumentClosed.
-	*/
+	// Set by the hosting workspace to track which view currently has focus.
+	property var __activeView: null
+
+	signal documentAdded(string documentId, string typeId)
+	signal documentAlreadyOpened(string documentId, string typeId)
 	signal documentClosed(string documentId)
+	signal documentReady(string documentId)
+	signal documentViewRegistered(string documentTypeId, string viewTypeId)
 
-	/*!
-		This signal is detected when the user opens or creates a new document. The corresponding handler is
-		\c onDocumentAdded.
-	*/
-	signal documentAdded(string documentId)
+	// Emitted when a document changed on the server for a reason other than
+	// this session's own in-flight request (e.g. another user's edit).
+	// DocumentViewBinder listens to this to re-pull representations.
+	signal documentChangedRemotely(string documentId)
 
-	/*!
-		This signal is detected when the user saves the document. The corresponding handler is
-		\c onDocumentSaved.
-	*/
-	signal documentSaved(string documentId)
-	signal documentSavingStarted(string documentId)
-	signal documentSavingFailed(string documentId, string message)
-	
-	/*!
-		This signal is detected when the document becomes modified. The corresponding handler is
-		\c onDocumentIsDirtyChanged.
-	*/
-	signal documentIsDirtyChanged(string documentId, bool isDirty)
-	
-	signal documentOpeningStarted(string documentId)
-	signal documentOpened(string documentId)
-	signal documentOpeningFailed(string documentId, string message)
-	
-	// callback(undefined) - cancel, callback(false) - close, callback(true) - save and close
-	signal tryCloseDirtyDocument(string documentId, var callback)
+	signal documentGuiUpdated(string documentId, var representationModel)
+	signal updateRepresentationFailed(string documentId, string message)
+	signal updateDocumentFailed(string documentId, string message)
 
-	signal documentTypeIdRegistered(string documentTypeId)
-	
-	function getActiveView()
-	{
-		return activeView;
+	// operation: "open" | "create" | "save" | "close" | "undo" | "redo" |
+	//            "resetUndo" | "getUndoInfo" | "getOpenedDocumentList"
+	signal operationFailed(string documentId, string operation, string message)
+
+	property QtObject __internal: QtObject {
+		property var openedDocuments: []            // Document[]
+		property var autoNamedTypeIds: ({})          // typeId -> hasProvider
+		property var cachedNames: ({})                // documentId -> name (race guard)
+		property var cachedObjectIds: ({})             // documentId -> objectId (race guard)
+		property var pendingDataLoaded: ({})           // documentId -> true (race guard)
 	}
 
-	function getTypeId()
-	{
-		return typeId
+	onBackendChanged: {
+		if (backend){
+			__restoreSession()
+		}
 	}
 
-	function getDocumentTypeId(documentId)
-	{
-		for (let documentIndex = 0; documentIndex < documentsModel.count; ++documentIndex){
-			let id = documentsModel.get(documentIndex).id;
-			if (id === documentId){
-				return documentsModel.get(documentIndex).typeId;
-			}
+	Connections {
+		target: root.backend
+
+		function onDocumentEvent(operation, objectId, documentId, documentName, isDirty, isLoading){
+			root.__onBackendDocumentEvent(operation, objectId, documentId, documentName, isDirty, isLoading)
 		}
 
-		return String();
+		function onUndoChanged(documentId, undoSteps, redoSteps, isDirty){
+			let doc = root.__findDocument(documentId)
+			if (!doc){
+				return
+			}
+			doc.undoSteps = undoSteps
+			doc.redoSteps = redoSteps
+			doc.isDirty = isDirty
+		}
 	}
 
-	function getSupportedDocumentTypeIds(){
-		return Object.keys(internal.m_registeredView)
+	// ---- Session restore -----------------------------------------------
+
+	// True while the initial list of already-open documents (session
+	// restore) is being fetched. Workspaces bind their top-level loading
+	// overlay to this instead of listening for dedicated start/stop signals.
+	property bool restoringSession: false
+
+	function __restoreSession(){
+		restoringSession = true
+
+		backend.getOpenedDocumentList(function(result){
+			restoringSession = false
+
+			if (!result.ok){
+				root.operationFailed("", "getOpenedDocumentList", result.message || "")
+				root.interaction.showError(result.message || "")
+				return
+			}
+
+			for (let i = 0; i < result.documents.length; ++i){
+				let info = result.documents[i]
+				root.__setAutoNamedTypeId(info.typeId, info.hasNameProvider)
+
+				let doc = root.__createDocument(info.documentId, info.typeId, info.objectId === "")
+				doc.objectId = info.objectId
+				doc.name = info.name
+				doc.isDirty = info.isDirty
+				doc.dataReady = !info.isLoading
+
+				root.documentAdded(doc.documentId, doc.typeId)
+				root.getUndoInfo(doc.documentId)
+			}
+		})
+	}
+
+	// ---- Backend event handling ------------------------------------------
+
+	function __onBackendDocumentEvent(operation, objectId, documentId, documentName, isDirty, isLoading){
+		if (operation === "DocumentDataLoaded"){
+			let doc = root.__findDocument(documentId)
+			if (doc){
+				root.__markDataReady(doc)
+			}
+			else{
+				__internal.pendingDataLoaded[documentId] = true
+			}
+			return
+		}
+
+		if (operation === "DocumentClosed"){
+			root.__removeDocument(documentId)
+			return
+		}
+
+		if (operation === "DocumentRenamed" || operation === "NewDocumentCreated" || operation === "DocumentOpened"){
+			root.setDocumentName(documentId, documentName)
+			return
+		}
+
+		if (operation === "DocumentChanged"){
+			root.documentChangedRemotely(documentId)
+		}
+
+		// DocumentSaved / DocumentSavedAs: the authoritative name/state is
+		// already applied via the direct mutation response; re-applying it
+		// from the subscription payload here has been observed to corrupt
+		// non-ASCII names, so it is intentionally skipped.
+	}
+
+	// ---- Registry lookups --------------------------------------------------
+
+	function __findDocument(documentId){
+		for (let i = 0; i < __internal.openedDocuments.length; ++i){
+			if (__internal.openedDocuments[i].documentId === documentId){
+				return __internal.openedDocuments[i]
+			}
+		}
+		return null
+	}
+
+	function __createDocument(documentId, typeId, isNew){
+		let existing = __findDocument(documentId)
+		if (existing){
+			return existing
+		}
+
+		let doc = __documentComp.createObject(root, {defaultName: root.getDefaultDocumentName()})
+		doc.documentId = documentId
+		doc.typeId = typeId
+		doc.isNew = !!isNew
+
+		if (documentId in __internal.cachedNames){
+			doc.name = __internal.cachedNames[documentId]
+			delete __internal.cachedNames[documentId]
+		}
+		if (documentId in __internal.cachedObjectIds){
+			doc.objectId = __internal.cachedObjectIds[documentId]
+			delete __internal.cachedObjectIds[documentId]
+		}
+		if (documentId in __internal.pendingDataLoaded){
+			delete __internal.pendingDataLoaded[documentId]
+			doc.dataReady = true
+		}
+
+		__internal.openedDocuments.push(doc)
+
+		doc.becameReady.connect(function(){
+			root.documentReady(doc.documentId)
+		})
+
+		return doc
+	}
+
+	function __removeDocument(documentId){
+		let index = -1
+		for (let i = 0; i < __internal.openedDocuments.length; ++i){
+			if (__internal.openedDocuments[i].documentId === documentId){
+				index = i
+				break
+			}
+		}
+		if (index < 0){
+			return
+		}
+
+		let doc = __internal.openedDocuments[index]
+		let binders = doc.binders.slice()
+		for (let i = 0; i < binders.length; ++i){
+			binders[i].dispose()
+		}
+
+		delete __internal.pendingDataLoaded[documentId]
+		delete __internal.cachedObjectIds[documentId]
+		__internal.openedDocuments.splice(index, 1)
+		doc.destroy()
+
+		documentClosed(documentId)
+	}
+
+	function __markDataReady(doc){
+		if (doc.isClosing){
+			return
+		}
+
+		doc.dataReady = true
+
+		for (let i = 0; i < doc.binders.length; ++i){
+			let binder = doc.binders[i]
+			if (doc.isNew){
+				binder.sync.paintFromCurrentModel()
+			}
+			else{
+				binder.sync.pull()
+			}
+		}
+	}
+
+	function __setAutoNamedTypeId(typeId, hasProvider){
+		__internal.autoNamedTypeIds[typeId] = !!hasProvider
+	}
+
+	// ---- Public query API (documentId-parametrized, kept for the many
+	//      product editors/collection views that address documents by ID) ----
+
+	function documentIsOpened(documentId){
+		return __findDocument(documentId) !== null
+	}
+
+	function documentIsNew(documentId){
+		let doc = __findDocument(documentId)
+		return doc ? doc.isNew : true
+	}
+
+	function documentIsDirty(documentId){
+		let doc = __findDocument(documentId)
+		return doc ? doc.isDirty : false
+	}
+
+	function documentIsLoading(documentId){
+		let doc = __findDocument(documentId)
+		return doc ? doc.loading : false
+	}
+
+	function getDocument(documentId){
+		return __findDocument(documentId)
 	}
 
 	function getDocumentName(documentId){
-		for (let documentIndex = 0; documentIndex < documentsModel.count; ++documentIndex){
-			let id = documentsModel.get(documentIndex).id;
-			if (id === documentId){
-				return documentsModel.get(documentIndex).name;
+		let doc = __findDocument(documentId)
+		return doc ? doc.name : ""
+	}
+
+	function setDocumentName(documentId, name){
+		let doc = __findDocument(documentId)
+		if (!doc){
+			__internal.cachedNames[documentId] = name
+			return
+		}
+		doc.name = name
+	}
+
+	function getDocumentTypeId(documentId){
+		let doc = __findDocument(documentId)
+		return doc ? doc.typeId : ""
+	}
+
+	function getDocumentObjectId(documentId){
+		let doc = __findDocument(documentId)
+		return doc ? doc.objectId : ""
+	}
+
+	function setDocumentObjectId(documentId, objectId){
+		let doc = __findDocument(documentId)
+		if (!doc){
+			__internal.cachedObjectIds[documentId] = objectId
+			return
+		}
+		doc.objectId = objectId
+	}
+
+	function getDocumentIdByObjectId(objectId){
+		for (let i = 0; i < __internal.openedDocuments.length; ++i){
+			if (__internal.openedDocuments[i].objectId === objectId){
+				return __internal.openedDocuments[i].documentId
 			}
 		}
 		return ""
 	}
 
-	function registerDocumentValidator(documentTypeId, validatorComp){
-		if (!documentIsRegistered(documentTypeId)){
-			console.error("Unable to register validator. Document with documentTypeId: ", documentTypeId, " unregistered!");
-
-			return false;
-		}
-
-		internal.m_registeredValidators[documentTypeId] = validatorComp;
-
-		return true;
-	}
-
-
-	function registerDocumentDataController(documentTypeId, dataControllerComp){
-		internal.m_registeredDataControllers[documentTypeId] = dataControllerComp;
-
-		return true;
-	}
-
-	function unRegisterDocumentDataController(documentTypeId){
-		delete internal.m_registeredDataControllers[documentTypeId]
-
-		return true;
-	}
-
-
-	function registerDocumentView(documentTypeId, viewComp)
-	{
-		if (documentTypeId === "" || !viewComp){
-			return false;
-		}
-
-		internal.m_registeredView[documentTypeId] = viewComp
-
-		documentTypeIdRegistered(documentTypeId)
-
-		return true
-	}
-
-	function unRegisterDocumentTypeId(documentTypeId)
-	{
-		if (!documentIsRegistered(documentTypeId)){
-			return false;
-		}
-
-		delete internal.m_registeredView.documentTypeId
-
-		return true
-	}
-
-
-	function getDocumentViewComp(documentTypeId)
-	{
-		if (!documentIsRegistered(documentTypeId)){
-			return null;
-		}
-
-		return internal.m_registeredView[documentTypeId]
-	}
-
-
-	function getDocumentViewCompByDocumentId(documentId)
-	{
-		for (let i = 0; i < documentsModel.count; i++){
-			let documentData = documentsModel.get(i).documentData;
-			if (documentData && documentData.documentId === documentId){
-				return documentData.viewComp;
-			}
-		}
-	}
-
-
-	function getDocumentValidator(documentTypeId){
-		if (documentTypeId in internal.m_registeredValidators){
-			let validatorComp = internal.m_registeredValidators[documentTypeId];
-
-			return validatorComp.createObject(documentManager);
-		}
-
-		return null;
-	}
-
-
-	function documentIsRegistered(documentTypeId)
-	{
-		return documentTypeId in internal.m_registeredView;
-	}
-
-
-	function dataControllerIsRegistered(documentTypeId)
-	{
-		return documentTypeId in internal.m_registeredDataControllers;
-	}
-
-
-	function getDocumentDataController(documentTypeId)
-	{
-		if (!dataControllerIsRegistered(documentTypeId)){
-			console.warn("Data controller for documents with type-ID: ", documentTypeId, " is unregistered!");
-
-			return defaultDataController.createObject(documentManager);
-		}
-
-		let dataControllerComp = internal.m_registeredDataControllers[documentTypeId];
-		return dataControllerComp.createObject(documentManager);
-	}
-
-
-	function insertNewDocument(documentTypeId, name)
-	{
-		let documentId = UuidGenerator.generateUUID()
-		let documentData = createTemplateDocument(documentId, documentTypeId);
-		if (!documentData){
-			return false;
-		}
-
-		addDocumentToModel(documentId, name, documentTypeId, documentData);
-
-		if (documentData.documentDataController){
-			documentData.documentDataController.createDocumentModel();
-		}
-
-		return true;
-	}
-
-	function getDocumentData(index){
-		if (index < 0 || index >= documentsModel.count){
-			return null;
-		}
-
-		return documentsModel.get(index).documentData;
-	}
-
-	function getDocumentDataById(documentId){
-		for (let i = 0; i < documentsModel.count; i++){
-			let documentData = documentsModel.get(i).documentData;
-			if (documentData && documentData.documentId === documentId){
-				return documentData;
-			}
-		}
-
-		return null;
-	}
-
-	function createTemplateDocument(documentId, documentTypeId){
-		let singleDocumentData = singleDocumentDataComp.createObject(documentManager);
-		if (singleDocumentData){
-			singleDocumentData.documentId = documentId;
-			singleDocumentData.documentTypeId = documentTypeId;
-
-			let viewComp = getDocumentViewComp(documentTypeId);
-			if (!viewComp){
-				console.error("Unable to create view for document with type-ID '"+documentTypeId+"'")
-				return null
-			}
-
-			singleDocumentData.viewComp = viewComp;
-
-			let documentDataController = getDocumentDataController(documentTypeId);
-			if (documentDataController){
-				documentDataController.documentId = singleDocumentData.documentId;
-				singleDocumentData.documentDataController = documentDataController;
-			}
-
-			let documentValidator = getDocumentValidator(documentTypeId);
-			if (documentValidator){
-				singleDocumentData.documentValidator = documentValidator;
-			}
-
-			return singleDocumentData;
-		}
-
-		return null;
-	}
-
-	function openDocument(documentId, documentTypeId, name)
-	{
-		console.debug("DocumentService.qml openDocument", documentId, documentTypeId, name)
-		let index = getDocumentIndexByDocumentId(documentId);
-		if (index >= 0){
-			// already opened
-			documentAdded(documentId);
-
-			return;
-		}
-
-		documentOpeningStarted(documentId, documentTypeId)
-
-		let documentData = createTemplateDocument(documentId, documentTypeId);
-		if (!documentData){
-			return false;
-		}
-
-		documentData.isNew = false;
-
-		let onResult = function(){
-			addDocumentToModel(documentId, name, documentTypeId, documentData);
-
-			documentData.documentDataController.modelChanged.disconnect(onResult);
-		}
-
-		if (documentData.documentDataController){
-			documentData.documentDataController.modelChanged.connect(onResult);
-			documentData.documentDataController.updateDocumentModel();
-		}
-		else{
-			documentOpeningFailed(documentId, qsTr("Unable to get a model for document. Error: Document data controller is invalid"))
-		}
-
-		return true;
-	}
-
-	function addDocumentToModel(documentId, name, documentTypeId, documentData)
-	{
-		documentsModel.append({
-								"id": documentId,
-								"name": name,
-								"typeId": documentTypeId,
-								"documentData": documentData,
-								"isNew": documentData.isNew
-							});
-
-		documentAdded(documentId);
-	}
-
-	/*!
-		Save document by ID.
-		\param      documentId           UUID of the document
-	*/
-	function saveDocument(documentId)
-	{
-		let index = getDocumentIndexByDocumentId(documentId);
-		if (index >= 0){
-			let isNew = documentsModel.get(index).isNew;
-			let document = documentsModel.get(index).documentData;
-			if (document.isDirty){
-				documentSavingStarted(documentId)
-
-				if (document.view){
-					if (!document.view.readOnly){
-						document.view.doUpdateModel();
-					}
-				}
-
-				let data = {}
-				let documentIsValid = documentManager.documentIsValid(document, data);
-				if (!documentIsValid){
-					documentSavingFailed(documentId, data.message)
-
-					return;
-				}
-
-				if (document.documentDataController){
-					if (isNew){
-						document.documentDataController.insertDocument();
-					}
-					else{
-						document.documentDataController.saveDocument();
-					}
-				}
-			}
-		}
-	}
-
-
-	function onDocumentSaved(documentId)
-	{
-		if (internal.m_closingDocuments.includes(documentId)){
-			closeDocument(documentId);
-		}
-
-		let documentIndex = getDocumentIndexByDocumentId(documentId);
-		if (documentIndex >= 0){
-			let documentData = documentsModel.get(documentIndex).documentData;
-			if (documentData && documentData.isNew){
-				documentData.isNew = false
-				documentsModel.setProperty(documentIndex, "isNew", false);
-			}
-		}
-
-		documentManager.documentSaved(documentId);
-	}
-
-
-	function getDocumentIndexByDocumentId(documentId){
-		for (let i = 0; i < documentsModel.count; i++){
-			let documentData = documentsModel.get(i).documentData;
-			if (documentData && documentData.documentId === documentId){
-				return i;
-			}
-		}
-
-		return -1;
-	}
-
-
-	function getDocumentDataByView(view){
-		for (let i = 0; i < documentsModel.count; i++){
-			let documentData = documentsModel.get(i).documentData;
-			if (documentData && documentData.view === view){
-				return documentData;
-			}
-		}
-
-		return null;
-	}
-	
-	function documentIsNew(documentId){
-		let documentIndex = getDocumentIndexByDocumentId(documentId);
-		if (documentIndex >= 0){
-			let documentData = documentsModel.get(documentIndex).documentData;
-			if (documentData){
-				return documentData.isNew
-			}
-		}
-		
-		return false
-	}
-	
-	function documentIsDirty(documentId){
-		let documentIndex = getDocumentIndexByDocumentId(documentId);
-		if (documentIndex >= 0){
-			let documentData = documentsModel.get(documentIndex).documentData;
-			if (documentData){
-				return documentData.isDirty
-			}
-		}
-		
-		return false
-	}
-
-	// soon
-	function saveDirtyDocuments(beQuiet, ignoredPtr)
-	{
-	}
-
-
-	/*!
-		Close document by document index.
-
-		\param      documentIndex    index of the document from the model of all open documents
-		\param      force            if true - document will be closed without isDirty checking
-	*/
-	function closeDocumentByIndex(documentIndex, force)
-	{
-		if (documentIndex < 0 || documentIndex >= documentsModel.count){
-			console.error("Unable to close document with index: ", documentIndex);
-
-			return;
-		}
-
-		if (!force){
-			force = false;
-		}
-
-		let documentData = documentsModel.get(documentIndex).documentData;
-
-		if (documentData.isDirty && !force){
-			let callback = function(result){
-				if (result === true){
-					internal.m_closingDocuments.push(documentData.documentId);
-					documentManager.saveDocument(documentData.documentId);
-				}
-				else if (result === false){
-					documentData.isDirty = false;
-
-					documentManager.closeDocumentByIndex(documentIndex);
-				}
-			}
-			
-			tryCloseDirtyDocument(documentData.documentId, callback)
-
-			// ModalDialogManager.openDialog(saveDialog, {}, "", callback);
-		}
-		else{
-			let index = internal.m_closingDocuments.indexOf(documentData.documentId);
-			if (index !== -1){
-				internal.m_closingDocuments.splice(index, 1);
-			}
-
-			let documentId = documentData.documentId;
-			documentData.destroy();
-
-			documentsModel.remove(documentIndex);
-
-			documentClosed(documentId);
-		}
-	}
-
-
-	function closeDocument(documentId, force)
-	{
-		let index = getDocumentIndexByDocumentId(documentId);
-
-		closeDocumentByIndex(index, force);
-	}
-
-
-	function documentIsValid(documentData, data){
-		if (!documentData){
-			return false;
-		}
-
-		if (!data){
-			data = {}
-		}
-
-		if (documentData.view){
-			data["editor"] = documentData.view;
-		}
-
-		return documentData.documentValidator.isValid(data);
-	}
-
-	function closeAllDocuments(){
-		let openedDocumentIds = getOpenedDocumentIds()
-		for (let i = 0; i < openedDocumentIds.length; ++i){
-			closeDocument(openedDocumentIds[i], true)
-		}
-	}
-
 	function getOpenedDocumentIds(){
-		let result = []
-
-		for (let i = 0; i < documentsModel.count; i++){
-			let documentData = documentsModel.get(i).documentData;
-			if (documentData && documentData.documentId){
-				result.push(documentData.documentId);
-			}
-		}
-
-		return result;
+		return __internal.openedDocuments.map(doc => doc.documentId)
 	}
 
-	function setupDocumentView(documentId, view){
-		let documentData = getDocumentDataById(documentId)
-		if (documentData){
-			if (view.documentId !== undefined){
-				view.documentId = documentId;
-			}
-
-			if (view.documentTypeId !== undefined){
-				view.documentTypeId = getDocumentTypeId(documentId);
-			}
-
-			if (view.documentManager !== undefined){
-				view.documentManager = documentManager;
-			}
-
-			documentData.view = view;
-
-			if (view.viewRegistered !== undefined){
-				view.viewRegistered();
-			}
-
-			return true;
-		}
-
-		return false;
-	}
-	
-	function setBlockUndoManager(documentId, isBlock){
-		let documentIndex = getDocumentIndexByDocumentId(documentId);
-		if (documentIndex >= 0){
-			let documentData = documentsModel.get(documentIndex).documentData;
-			if (documentData.undoManager){
-				documentData.undoManager.setBlockingUpdateModel(isBlock)
-			}
+	// Closes every currently open document. Each close still goes through
+	// the normal dirty-confirmation flow (see closeDocument), so this is
+	// "request everything closed", not a forced/silent close.
+	function closeAllDocuments(){
+		let ids = getOpenedDocumentIds()
+		for (let i = 0; i < ids.length; ++i){
+			closeDocument(ids[i])
 		}
 	}
-	
-	function clearUndoManager(documentId){
-		let documentIndex = getDocumentIndexByDocumentId(documentId);
-		if (documentIndex >= 0){
-			let documentData = documentsModel.get(documentIndex).documentData;
-			if (documentData.undoManager){
-				documentData.undoManager.resetUndo()
-				return true
-			}
-		}
-		
-		return false
+
+	function getDefaultDocumentName(){
+		return qsTr("<no name>")
 	}
 
-	property Component singleDocumentDataComp: Component{
-		QtObject {
-			id: singleDocumentData;
-			// index of the document in document manager
-			property bool isNew: true;
-			property string documentId;
-			property string documentTypeId;
-			property var documentDataController: null;
-			property DocumentValidator documentValidator: DocumentValidator {};
+	function hasDocumentNameProvider(typeId){
+		return typeId in __internal.autoNamedTypeIds && __internal.autoNamedTypeIds[typeId]
+	}
 
-			property UndoRedoManager undoManager: UndoRedoManager {
-				onUndo: {
-					singleDocumentData.checkDocumentModel();
-					singleDocumentData.updateGui();
-				}
+	function setDocumentSaveNameResolver(documentId, resolver){
+		let doc = __findDocument(documentId)
+		if (doc){
+			doc.nameResolver = (typeof resolver === "function") ? resolver : null
+		}
+	}
 
-				onRedo: {
-					singleDocumentData.checkDocumentModel()
-					singleDocumentData.updateGui();
-				}
+	function clearDocumentSaveNameResolver(documentId){
+		let doc = __findDocument(documentId)
+		if (doc){
+			doc.nameResolver = null
+		}
+	}
 
-				onModelChanged: {
-					let undoSteps = getAvailableUndoSteps();
-					let redoSteps = getAvailableRedoSteps();
+	// ---- Editor registry pass-through ----------------------------------
 
-					if (singleDocumentData.view && singleDocumentData.view.commandsController){
-						singleDocumentData.view.commandsController.setCommandIsEnabled("Undo", undoSteps > 0);
-						singleDocumentData.view.commandsController.setCommandIsEnabled("Redo", redoSteps > 0);
-					}
-				}
-			};
+	function registerDocumentViewData(documentTypeId, viewTypeId, viewEditorComp, representationControllerComp){
+		editors.register(documentTypeId, viewTypeId, viewEditorComp, representationControllerComp)
+	}
 
-			property Component viewComp;
-			property ViewBase view;
-			property bool isDirty: false;
-			property bool modelReceived: false;
-			property bool modelInitialized: false;
-			property bool viewRegistered: false;
+	function getSupportedDocumentTypeIds(){
+		return editors.getSupportedTypeIds()
+	}
 
-			Component.onDestruction: {
-				if (documentDataController){
-					documentDataController.destroy();
-				}
+	function getSupportedDocumentViewTypeIds(documentTypeId){
+		return editors.getSupportedViewTypeIds(documentTypeId)
+	}
 
-				if (documentValidator){
-					documentValidator.destroy();
-				}
+	function getDocumentEditorFactory(documentTypeId, viewTypeId){
+		return editors.getEditorFactory(documentTypeId, viewTypeId)
+	}
 
-				if (undoManager){
-					undoManager.destroy();
-				}
+	function getDocumentRepresentationControllerFactory(documentTypeId, viewTypeId){
+		return editors.getRepresentationControllerFactory(documentTypeId, viewTypeId)
+	}
+
+	function getViewTypeIdByViewFactory(documentTypeId, viewFactory){
+		return editors.getViewTypeIdByEditorFactory(documentTypeId, viewFactory)
+	}
+
+	// ---- View instance lifecycle (used by DocumentEditorHost) ----------
+
+	function registerDocumentView(documentId, viewTypeId, view, controller){
+		let doc = __findDocument(documentId)
+		if (!doc){
+			console.error("DocumentService: cannot register view for unknown document '" + documentId + "'")
+			return
+		}
+
+		// Binder (and its Connections to this service's documentReady signal)
+		// must exist BEFORE addView() can flip the document to ready: addView
+		// may synchronously complete document.ready when data was already
+		// loaded, and documentReady must not fire into a binder that isn't
+		// wired up yet.
+		let binder = documentViewBinderComp.createObject(root, {
+			documentService: root,
+			document: doc,
+			view: view,
+			controller: controller
+		})
+		doc.binders.push(binder)
+
+		doc.addView(viewTypeId, view)
+
+		binder.initialize(!doc.isNew && doc.dataReady)
+	}
+
+	property Component documentViewBinderComp: Component {
+		DocumentViewBinder {}
+	}
+
+	function getDocumentViewInstance(documentId, viewTypeId){
+		let doc = __findDocument(documentId)
+		if (!doc){
+			console.error("Unable to get view for document '" + documentId + "'. Error: Document not found")
+			return null
+		}
+
+		let view = doc.getView(viewTypeId)
+		if (!view){
+			console.error("Unable to get view for document '" + documentId + "'. Error: View '" + viewTypeId + "' not found")
+		}
+		return view
+	}
+
+	function getDocumentServiceActiveView(){
+		return __activeView
+	}
+
+	function setDocumentServiceActiveView(view){
+		__activeView = view
+	}
+
+	// ---- Open / create ---------------------------------------------------
+
+	function openDocument(typeId, objectId){
+		let existingDocumentId = getDocumentIdByObjectId(objectId)
+		if (existingDocumentId !== ""){
+			documentAlreadyOpened(existingDocumentId, typeId)
+			return
+		}
+
+		backend.openDocument(typeId, objectId, function(result){
+			if (!result.ok){
+				root.operationFailed("", "open", result.message || "")
+				root.interaction.showError(result.message || "")
+				return
 			}
 
-			onViewChanged: {
-				viewRegistered = view != undefined && view != null
-				
-				if (viewRegistered && view.commandsDelegate){
-					view.commandsDelegate.commandActivated.connect(singleDocumentData.viewCommandHandle);
-				}
+			root.__setAutoNamedTypeId(result.typeId, result.hasNameProvider)
+			let doc = root.__createDocument(result.documentId, result.typeId, false)
+			doc.name = result.name
+			doc.objectId = result.objectId
+			doc.isDirty = !!result.isDirty
+			doc.dataReady = !result.isLoading
 
-				if (modelReceived && !modelInitialized){
-					initModelForView()
-				}
+			root.documentAdded(doc.documentId, doc.typeId)
+		})
+	}
+
+	function createDocument(typeId, proposedSourceDocumentId){
+		backend.createDocument(typeId, proposedSourceDocumentId || "", function(result){
+			if (!result.ok){
+				root.operationFailed("", "create", result.message || "")
+				root.interaction.showError(result.message || "")
+				return
 			}
 
-			function updateGui(){
-				if (singleDocumentData.view){
-					singleDocumentData.view.doUpdateGui();
-				}
+			root.__setAutoNamedTypeId(result.typeId, result.hasNameProvider)
+			let doc = root.__createDocument(result.documentId, result.typeId, true)
+			doc.name = result.name
+			if (result.objectId){
+				doc.objectId = result.objectId
 			}
+			doc.isDirty = !!result.isDirty
+			doc.dataReady = !result.isLoading
 
-			function updateModel(){
-				if (singleDocumentData.view){
-					singleDocumentData.view.doUpdateModel();
-				}
-			}
+			root.documentAdded(doc.documentId, doc.typeId)
+		})
+	}
 
-			function initModelForView(){
-				console.log("initModelForView")
-				if (!singleDocumentData.view){
-					console.error("Unable to init model for view. Error: View is invalid")
-					return;
-				}
+	// Unified entry point: creates a new document when objectId is empty,
+	// otherwise opens the existing collection object.
+	function openOrCreateByObjectId(typeId, objectId, proposedSourceDocumentId){
+		if (!objectId || objectId === ""){
+			createDocument(typeId, proposedSourceDocumentId)
+		}
+		else{
+			openDocument(typeId, objectId)
+		}
+	}
 
-				if (!singleDocumentData.documentDataController || !singleDocumentData.documentDataController.documentModel){
-					documentManager.documentOpeningFailed(singleDocumentData.documentId, qsTr("Internal error"))
-					return;
-				}
-				
-				let documentModel = singleDocumentData.documentDataController.documentModel;
 
-				singleDocumentData.documentId = singleDocumentData.documentDataController.getDocumentId();
+	// ---- Save --------------------------------------------------------------
 
-				singleDocumentData.blockingUpdateModel = true;
-
-				singleDocumentData.view.model = documentModel;
-
-				if (singleDocumentData.isNew){
-					singleDocumentData.updateModel();
-				}
-				else{
-					singleDocumentData.updateGui();
-				}
-
-				singleDocumentData.blockingUpdateModel = false;
-
-				singleDocumentData.undoManager.registerModel(documentModel);
-				singleDocumentData.documentValidator.documentModel = documentModel;
-
-				singleDocumentData.modelInitialized = true
-				singleDocumentData.modelConnections.target = singleDocumentData.documentDataController.documentModel
-				singleDocumentData.modelConnections.enabled = true;
-				
-				documentManager.documentOpened(singleDocumentData.documentId)
-			}
-
-			property Connections dataControllerConnections: Connections {
-				target: singleDocumentData.documentDataController;
-
-				function onSaved(documentId){
-					singleDocumentData.isDirty = false;
-
-					let documentModel = singleDocumentData.documentDataController.documentModel;
-					if (singleDocumentData.undoManager){
-						singleDocumentData.undoManager.setStandardModel(documentModel);
-					}
-
-					documentManager.onDocumentSaved(documentId);
-				}
-
-				function onModelChanged(){
-					singleDocumentData.modelReceived = true
-					
-					if (singleDocumentData.viewRegistered){
-						singleDocumentData.initModelForView()
-					}
-				}
-
-				function onError(){
-					documentManager.documentOpeningFailed(singleDocumentData.documentId, qsTr("Internal error"))
-				}
-			}
-
-			property Connections modelConnections: Connections {
-				enabled: false;
-
-				function onModelChanged(){
-					if (singleDocumentData.blockingUpdateModel){
-						return;
-					}
-
-					if (singleDocumentData.undoManager && singleDocumentData.undoManager.isTransaction()){
-						return;
-					}
-					singleDocumentData.isDirty = documentManager.documentIsValid(singleDocumentData);
-				}
-			}
-
-			property bool blockingUpdateModel: false;
-
-			onBlockingUpdateModelChanged: {
-				if (undoManager){
-					undoManager.setBlockingUpdateModel(blockingUpdateModel);
-				}
-			}
-
-			signal viewAdded(var view);
-			signal viewRemoved(var view);
-
-			onDocumentIdChanged: {
-				if (documentDataController){
-					documentDataController.documentId = documentId;
-				}
-			}
-
-			onIsDirtyChanged: {
-				if (view){
-					if (view.commandsController){
-						view.commandsController.setCommandIsEnabled("Save", isDirty);
-					}
-
-					if (view.commandsView){
-						if (view.commandsView.setPositiveAccentCommandIds !== undefined){
-							view.commandsView.setPositiveAccentCommandIds(["Save"]);
-						}
-					}
-				}
-
-				documentManager.documentIsDirtyChanged(documentId, isDirty);
-			}
-
-			// Processing commands that came from the view
-			function viewCommandHandle(commandId){
-				if (singleDocumentData.undoManager){
-					singleDocumentData.undoManager.commandHandle(commandId);
-				}
-				singleDocumentData.commandHandle(commandId);
-			}
-
-			function commandHandle(commandId){
-				if (!documentManager){
-					return;
-				}
-
-				if (commandId === "Close"){
-					documentManager.closeDocument(documentId);
-				}
-				else if (commandId === "Save"){
-					documentManager.saveDocument(documentId);
-				}
-			}
-
-			function checkDocumentModel(){
-				let currentStateModel = undoManager.getStandardModel();
-				if (currentStateModel){
-					let documentModel = singleDocumentData.documentDataController.documentModel
-					let isEqual = currentStateModel.isEqualWithModel(documentModel);
-					isDirty = !isEqual && documentManager.documentIsValid(singleDocumentData);
-				}
+	// Pushes any in-progress GUI edit into the representation model before
+	// save/validate look at it. Without this, an edit still sitting in a
+	// focused input (e.g. the user typed a new name and hit Save without
+	// tabbing out first, so no editingFinished ever fired) would be silently
+	// dropped: save() would persist the model's last-pushed value instead of
+	// what's currently on screen.
+	function __flushViews(doc){
+		for (let i = 0; i < doc.binders.length; ++i){
+			let view = doc.binders[i].view
+			if (view && typeof view.doUpdateModel === "function"){
+				view.doUpdateModel()
 			}
 		}
 	}
 
-	property Component defaultDataController: Component {
-		DocumentDataController {}
+	// Consults validate() on every view bound to `doc` (see DocumentViewBase).
+	// The first view to report itself invalid blocks the save.
+	function __validateDocument(doc){
+		for (let i = 0; i < doc.binders.length; ++i){
+			let view = doc.binders[i].view
+			if (!view || typeof view.validate !== "function"){
+				continue
+			}
+
+			let result = view.validate()
+			if (result && result.valid === false){
+				return {valid: false, message: result.message || qsTr("Document is not valid")}
+			}
+		}
+
+		return {valid: true, message: ""}
 	}
 
-	property QtObject internal: QtObject {
-		property var m_registeredView: ({});
-		property var m_registeredDataControllers: ({});
-		property var m_registeredValidators: ({});
-		property var m_closingDocuments: [];
+	function save(documentId, explicitName){
+		let doc = __findDocument(documentId)
+		if (!doc){
+			return
+		}
+
+		__flushViews(doc)
+
+		let validation = __validateDocument(doc)
+		if (!validation.valid){
+			root.operationFailed(documentId, "save", validation.message)
+			root.interaction.showError(validation.message)
+			return
+		}
+
+		if (hasDocumentNameProvider(doc.typeId)){
+			__sendSave(doc, "")
+			return
+		}
+
+		// Consult the resolver (if any) before falling back to the explicit/
+		// existing name. This lets workspaces that disable interactive name
+		// input (documentNameInputEnabled=false) always resolve a name here
+		// without ever reaching the dialog below.
+		let resolvedName = doc.resolveNameForSave(explicitName || doc.name)
+		if (resolvedName){
+			__sendSave(doc, resolvedName)
+			return
+		}
+
+		interaction.requestDocumentName(documentId, function(chosenName){
+			if (!chosenName){
+				return
+			}
+			doc.name = chosenName
+			root.__sendSave(doc, doc.resolveNameForSave(chosenName))
+		})
+	}
+
+	// Kept as an alias so existing call sites (`documentManager.saveDocument(id, name)`)
+	// keep working without change.
+	function saveDocument(documentId, documentName){
+		save(documentId, documentName)
+	}
+
+	function __sendSave(doc, name){
+		doc.busy = true
+		backend.saveDocument(doc.documentId, name, function(result){
+			doc.busy = false
+
+			if (!result.ok){
+				root.operationFailed(doc.documentId, "save", result.message || "")
+				root.interaction.showError(result.message || "")
+				return
+			}
+
+			doc.isNew = false
+			if (result.documentName){
+				doc.name = result.documentName
+			}
+			// Refresh the dirty/undo-step counters explicitly rather than
+			// relying solely on a backend push: a save changes what "clean"
+			// means (the baseline moves), and not every backend proactively
+			// notifies about that (the local backend in particular doesn't).
+			root.getUndoInfo(doc.documentId)
+			root.documentSaved(doc.documentId)
+		})
+	}
+
+	// ---- Close -------------------------------------------------------------
+
+	// force=true skips the dirty-confirmation dialog entirely and discards
+	// any unsaved changes: used when the underlying object was already
+	// deleted/replaced server-side (nothing left to save against) or when a
+	// caller needs an unconditional close (e.g. switching tenants).
+	function closeDocument(documentId, force){
+		let doc = __findDocument(documentId)
+		if (!doc){
+			return
+		}
+
+		if (force){
+			root.__doClose(doc)
+			return
+		}
+
+		let proceed = function(shouldSaveFirst){
+			if (shouldSaveFirst === undefined){
+				return // user cancelled
+			}
+
+			if (!shouldSaveFirst){
+				root.__doClose(doc)
+				return
+			}
+
+			let onSaved = function(savedDocumentId){
+				if (savedDocumentId !== documentId){
+					return
+				}
+				root.documentSaved.disconnect(onSaved)
+				root.operationFailed.disconnect(onSaveFailed)
+				root.__doClose(doc)
+			}
+			let onSaveFailed = function(failedDocumentId, operation, message){
+				if (failedDocumentId !== documentId || operation !== "save"){
+					return
+				}
+				root.documentSaved.disconnect(onSaved)
+				root.operationFailed.disconnect(onSaveFailed)
+			}
+			root.documentSaved.connect(onSaved)
+			root.operationFailed.connect(onSaveFailed)
+			save(documentId)
+		}
+
+		if (doc.isDirty){
+			interaction.confirmCloseDirty(proceed)
+		}
+		else{
+			proceed(false)
+		}
+	}
+
+	// Internal signal used only to observe save completion from closeDocument's
+	// save-then-close flow without re-entrant polling.
+	signal documentSaved(string documentId)
+
+	function __doClose(doc){
+		doc.isClosing = true
+		doc.busy = true
+
+		backend.closeDocument(doc.documentId, function(result){
+			if (!result.ok){
+				doc.busy = false
+				doc.isClosing = false
+				root.operationFailed(doc.documentId, "close", result.message || "")
+				root.interaction.showError(result.message || "")
+				return
+			}
+
+			root.__removeDocument(doc.documentId)
+		})
+	}
+
+	// ---- Undo / redo ---------------------------------------------------
+
+	function doUndo(documentId, steps){
+		let doc = __findDocument(documentId)
+		if (!doc){
+			return
+		}
+		doc.busy = true
+		backend.doUndo(documentId, steps, function(result){
+			doc.busy = false
+			if (!result.ok){
+				root.operationFailed(documentId, "undo", result.message || "")
+				root.interaction.showError(result.message || "")
+				return
+			}
+			root.getUndoInfo(documentId)
+		})
+	}
+
+	function doRedo(documentId, steps){
+		let doc = __findDocument(documentId)
+		if (!doc){
+			return
+		}
+		doc.busy = true
+		backend.doRedo(documentId, steps, function(result){
+			doc.busy = false
+			if (!result.ok){
+				root.operationFailed(documentId, "redo", result.message || "")
+				root.interaction.showError(result.message || "")
+				return
+			}
+			root.getUndoInfo(documentId)
+		})
+	}
+
+	function resetUndo(documentId){
+		let doc = __findDocument(documentId)
+		if (!doc){
+			return
+		}
+		backend.resetUndo(documentId, function(result){
+			if (!result.ok){
+				root.operationFailed(documentId, "resetUndo", result.message || "")
+				root.interaction.showError(result.message || "")
+				return
+			}
+			root.getUndoInfo(documentId)
+		})
+	}
+
+	function getUndoInfo(documentId){
+		backend.getUndoInfo(documentId, function(result){
+			let doc = root.__findDocument(documentId)
+			if (!doc){
+				return
+			}
+			if (!result.ok){
+				// Not surfaced as a dialog: this runs automatically after every
+				// undo/redo and for every document during session restore, so a
+				// modal here would fire far more often than a real user action.
+				root.operationFailed(documentId, "getUndoInfo", result.message || "")
+				return
+			}
+			doc.undoSteps = result.undoSteps
+			doc.redoSteps = result.redoSteps
+			doc.isDirty = result.isDirty
+		})
 	}
 }

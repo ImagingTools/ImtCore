@@ -2,12 +2,6 @@
     <qresource prefix="/qml">
 	    <file alias="imtcolgui/qmldir">qmldir</file>
 		<file alias="imtcolgui/CollectionDataProvider.qml">CollectionDataProvider.qml</file>
-		<file alias="imtcolgui/CollectionStructure.qml">CollectionStructure.qml</file>
-		<file alias="imtcolgui/CollectionStructureBase.qml">CollectionStructureBase.qml</file>
-		<file alias="imtcolgui/CollectionStructureBaseGqlModels.qml">CollectionStructureBaseGqlModels.qml</file>
-		<file alias="imtcolgui/CollectionStructureCommandsDelegateBase.qml">CollectionStructureCommandsDelegateBase.qml</file>
-		<file alias="imtcolgui/CollectionStructureCommandsObserver.qml">CollectionStructureCommandsObserver.qml</file>
-		<file alias="imtcolgui/CollectionStructureDataProvider.qml">CollectionStructureDataProvider.qml</file>
 		<file alias="imtcolgui/CollectionView.qml">CollectionView.qml</file>
 		<file alias="imtcolgui/CollectionViewBase.qml">CollectionViewBase.qml</file>
 		<file alias="imtcolgui/CollectionViewBaseGqlModels.qml">CollectionViewBaseGqlModels.qml</file>

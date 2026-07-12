@@ -10,14 +10,44 @@ import imtbaseDocumentRevisionSdl 1.0
 CollectionViewCommandsDelegateBase{
 	id: commandsDelegate
 	
-	property DocumentServiceBase documentManager: null
+	property DocumentService documentManager: null
 	property string documentManagerId: collectionId
+
+	// When true, opening/creating a document closes every other document
+	// already open on this documentManager first — for editors backed by a
+	// single-document breadcrumb workspace rather than a tab strip, where
+	// only one document makes sense open at a time.
+	property bool isSingleDocumentMode: false
 
 	property var documentConfigs: ({})
 
 	QtObject {
 		id: internal
 		property var registeredDocumentViews: []
+	}
+
+	// If a row this delegate has open for editing gets removed from the
+	// collection (e.g. by another user), close its editor instead of
+	// leaving it open on data that no longer exists server-side.
+	Connections {
+		target: commandsDelegate.collectionView && commandsDelegate.collectionView.dataController
+					? commandsDelegate.collectionView.dataController : null
+
+		function onRemoved(objectIds){
+			if (!commandsDelegate.documentManager){
+				return
+			}
+
+			for (let i = 0; i < objectIds.length; ++i){
+				let documentId = commandsDelegate.documentManager.getDocumentIdByObjectId(objectIds[i])
+				if (documentId !== ""){
+					// force: the row backing this document was just deleted
+					// server-side, so there is nothing left to save changes
+					// against - prompting to save would only error out.
+					commandsDelegate.documentManager.closeDocument(documentId, true)
+				}
+			}
+		}
 	}
 
 	function registerDocumentType(typeId, typeName){
@@ -68,15 +98,25 @@ CollectionViewCommandsDelegateBase{
 		}
 	}
 
-	onDocumentManagerIdChanged:{
-		if (documentManagerId !== ""){
-			documentManager = MainDocumentService.getDocumentService(documentManagerId)
-		}
-	}
+	// Connections (not onXChanged:) so that a consumer instantiating this
+	// delegate can still safely declare its own onDocumentManagerIdChanged/
+	// onDocumentManagerChanged handlers (e.g. to register a data controller
+	// once documentManager resolves) without silently replacing this logic:
+	// on<Signal>: is a single property slot per object and a later
+	// declaration at the instantiation site would otherwise override it.
+	Connections {
+		target: commandsDelegate
 
-	onDocumentManagerChanged:{
-		if (documentManager){
-			registerDocumentTypes()
+		function onDocumentManagerIdChanged(){
+			if (commandsDelegate.documentManagerId !== ""){
+				commandsDelegate.documentManager = MainDocumentService.getDocumentService(commandsDelegate.documentManagerId)
+			}
+		}
+
+		function onDocumentManagerChanged(){
+			if (commandsDelegate.documentManager){
+				commandsDelegate.registerDocumentTypes()
+			}
 		}
 	}
 
@@ -146,7 +186,18 @@ CollectionViewCommandsDelegateBase{
 			let itemId = elementsModel.getData("id", indexes[i]);
 			let typeId = elementsModel.getData("typeId", indexes[i]);
 
+			if (isSingleDocumentMode){
+				__closeAllOpenDocuments()
+			}
+
 			documentManager.openDocument(typeId, itemId)
+		}
+	}
+
+	function __closeAllOpenDocuments(){
+		let openedDocumentIds = documentManager.getOpenedDocumentIds()
+		for (let i = 0; i < openedDocumentIds.length; ++i){
+			documentManager.closeDocument(openedDocumentIds[i])
 		}
 	}
 
@@ -160,6 +211,10 @@ CollectionViewCommandsDelegateBase{
 		if (documentTypeIds.length === 0){
 			console.error("Unable to create new document. Type-ID is empty")
 			return
+		}
+
+		if (isSingleDocumentMode){
+			__closeAllOpenDocuments()
 		}
 
 		if (documentTypeIds.length > 1){

@@ -21,18 +21,24 @@ RemoteCollectionView {
 	
 	property string productId;
 	property var documentManager: null;
-	
-	signal saved();
-	
-	commandsDelegateComp: Component {DocumentCollectionViewDelegate {
+
+	commandsDelegateComp: Component {DocCollectionViewDelegate {
 			collectionView: userCollectionViewContainer;
 			documentManagerId: "Administration/Users"
-			documentTypeIds: ["User"];
-			documentViewsComp: [userDocumentComp];
-			documentDataControllersComp: [documentDataControllerComp];
-			documentValidatorsComp: [documentValidator];
 			isSingleDocumentMode: true
-			
+
+			Component.onCompleted: {
+				registerDocumentType("User", qsTr("User"))
+				addDocumentView("User", "UserEditor", userDocumentComp, userControllerComp)
+			}
+
+			onDocumentManagerChanged: {
+				if (documentManager){
+					userCollectionViewContainer.documentManager = documentManager
+					documentManager.backend.registerDocumentDataController("User", documentDataControllerComp)
+				}
+			}
+
 			function updateStateBaseCommands(selection, commandsController, elementsModel){
 				let isEnabled = selection.length > 0;
 				if(commandsController){
@@ -246,136 +252,62 @@ RemoteCollectionView {
 	}
 	
 	Component {
-		id: documentValidator;
-		DocumentValidator {
-			property UserData userData: documentModel;
-			property MailRegExpValidator mailRegExp: MailRegExpValidator {};
-			
-			property var regExp: new RegExp(mailRegExp.regularExpression)
-			
-			function isValid(data){
-				if (!data.editor){
-					return false;
-				}
-				
-				if (!userData){
-					return false;
-				}
-				
-				if (userData.m_name === ""){
-					return false;
-				}
-				
-				if (userData.m_username === ""){
-					return false;
-				}
-				
-				let emptyPasswordIsOk = false
-				if (userData.hasSystemInfos()){
-					for (let i = 0; i < userData.m_systemInfos.count; i++){
-						let systemId = userData.m_systemInfos.get(i).item.m_id;
-						if (systemId !== ""){
-							emptyPasswordIsOk = true
-							break
-						}
-					}
-				}
-
-				if (userData.m_password === "" && !emptyPasswordIsOk){
-					return false;
-				}
-				
-				if (!regExp.test(userData.m_email)){
-					return false;
-				}
-				
-				if (userCollectionViewContainer.documentManager){
-					if (userCollectionViewContainer.documentManager.documentIsNew(userData.m_id)){
-						let passwordText1 = data.editor.passwordInput.text;
-						let passwordText2 = data.editor.passwordInputConfirm.text;
-						if (passwordText1 !== passwordText2){
-							return false;
-						}
-					}
-				}
-				
-				return true;
-			}
-		}
-	}
-	
-	Component {
 		id: userDocumentComp;
-		
+
 		UserView {
 			id: userEditor;
 
 			productId: userCollectionViewContainer.productId;
-			
-			Component.onCompleted: {
-				userCollectionViewContainer.saved.connect(userEditor.onSaved);
-			}
-			
-			onUserDataChanged: {
-				if (userData){
-					if (userCollectionViewContainer.documentManager){
-						userEditor.isNew = userCollectionViewContainer.documentManager.documentIsNew(userData.m_id)
-					}
-				}
-			}
-			
+
 			commandsDelegateComp: Component {ViewCommandsDelegateBase {
 					view: userEditor;
 				}
 			}
-			
+
 			commandsControllerComp: Component {GqlBasedCommandsController {
 					typeId: "User";
 				}
 			}
-			
-			function onSaved(){
-				if (userEditor){
-					userEditor.isNew = false
-					userEditor.checkChangePasswordLogic();
-				}
-			}
-			
+
 			function getHeaders(){
 				return userCollectionViewContainer.getHeaders()
 			}
 		}
 	}
-	
+
+	Component {
+		id: userControllerComp
+
+		InProcessDocumentRepresentationController {
+			backend: MainDocumentService.getDocumentService("Administration/Users").backend
+		}
+	}
+
 	Component {
 		id: documentDataControllerComp;
-		
+
 		GqlRequestDocumentDataController {
 			id: requestDocumentDataController
-			
+
 			property UserData userData: documentModel;
-			
+
 			typeId: "User";
 			documentName: userData ? userData.m_name: "";
-			
+
 			gqlGetCommandId: ImtauthUsersSdlCommandIds.s_userItem;
 			gqlUpdateCommandId: ImtauthUsersSdlCommandIds.s_userUpdate;
 			gqlAddCommandId: ImtauthUsersSdlCommandIds.s_userAdd;
-			
+
 			Component.onCompleted: {
 				getRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, userCollectionViewContainer.productId);
 				addRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, userCollectionViewContainer.productId);
 				updateRequestInputParam.InsertField(UserItemInputTypeMetaInfo.s_productId, userCollectionViewContainer.productId);
 			}
-			
+
 			documentModelComp: Component {
 				UserData {}
 			}
-			
-			onSaved: {
-				userCollectionViewContainer.saved();
-			}
-			
+
 			function getHeaders(){
 				return userCollectionViewContainer.getHeaders();
 			}

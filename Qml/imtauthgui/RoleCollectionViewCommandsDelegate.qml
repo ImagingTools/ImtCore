@@ -6,15 +6,12 @@ import imtcolgui 1.0
 import imtcontrols 1.0
 import imtdocgui 1.0
 
-DocumentCollectionViewDelegate {
+DocCollectionViewDelegate {
 	id: container;
-	
+
 	removeDialogTitle: qsTr("Deleting a role");
 	removeMessage: qsTr("Delete the selected role ?");
-	
-	documentTypeIds: ["Role"];
-	documentViewTypeIds: ["RoleEditor"];
-	
+
 	function updateStateBaseCommands(selection, commandsController, elementsModel){
 		let isEnabled = selection.length > 0;
 		if(commandsController){

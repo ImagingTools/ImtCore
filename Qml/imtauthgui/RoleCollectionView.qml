@@ -21,10 +21,18 @@ RemoteCollectionView {
 	commandsDelegateComp: Component {RoleCollectionViewCommandsDelegate {
 			collectionView: roleCollectionViewContainer;
 			documentManagerId: "Administration/Roles"
-			documentTypeIds: ["Role"]
-			documentViewsComp: [roleDocumentComp];
-			documentDataControllersComp: [dataControllerComp];
 			isSingleDocumentMode: true
+
+			Component.onCompleted: {
+				registerDocumentType("Role", qsTr("Role"))
+				addDocumentView("Role", "RoleEditor", roleDocumentComp, roleControllerComp)
+			}
+
+			onDocumentManagerChanged: {
+				if (documentManager){
+					documentManager.backend.registerDocumentDataController("Role", dataControllerComp)
+				}
+			}
 
 			function getHeaders(){
 				return roleCollectionViewContainer.getHeaders()
@@ -95,11 +103,19 @@ RemoteCollectionView {
 		}
 	}
 	Component {
+		id: roleControllerComp
+
+		InProcessDocumentRepresentationController {
+			backend: MainDocumentService.getDocumentService("Administration/Roles").backend
+		}
+	}
+
+	Component {
 		id: dataControllerComp;
-		
+
 		GqlRequestDocumentDataController {
 			id: requestDocumentDataController
-			
+
 			property RoleData roleData: documentModel;
 			
 			typeId: "Role";

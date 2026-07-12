@@ -15,11 +15,12 @@ DocumentViewBase {
 
 	property UserData userData: model;
 	property string productId;
-	
+
 	property alias passwordInput: userGeneralEditor.passwordInput;
 	property alias passwordInputConfirm: userGeneralEditor.confirmPasswordInput;
-	
-	property bool isNew: true
+
+	// isNew is inherited from DocumentViewBase (driven by document.isNew) —
+	// no more manual tracking via documentManager.documentIsNew(id).
 	readonly property bool hasValidUserId: container.userData && container.userData.m_id && container.userData.m_id !== ""
 	readonly property string contextEntityDisplayName: container.userData
 		? (container.userData.m_name || container.userData.m_username || container.userData.m_id)
@@ -47,11 +48,57 @@ DocumentViewBase {
 	function getHeaders(){
 		return {}
 	}
-	
+
+	property MailRegExpValidator mailRegExp: MailRegExpValidator {}
+	readonly property var __emailRegExp: new RegExp(mailRegExp.regularExpression)
+
+	// Moved here from UserCollectionView's stand-alone DocumentValidator:
+	// validation naturally belongs on the view that owns the fields being
+	// checked (in particular the password-confirmation cross-check, which
+	// needs direct access to this view's own input controls).
+	function validate(){
+		if (!userData){
+			return {valid: false, message: qsTr("User data is invalid")}
+		}
+		if (userData.m_name === ""){
+			return {valid: false, message: qsTr("Please enter a name")}
+		}
+		if (userData.m_username === ""){
+			return {valid: false, message: qsTr("Please enter a username")}
+		}
+
+		let emptyPasswordIsOk = false
+		if (userData.hasSystemInfos()){
+			for (let i = 0; i < userData.m_systemInfos.count; i++){
+				if (userData.m_systemInfos.get(i).item.m_id !== ""){
+					emptyPasswordIsOk = true
+					break
+				}
+			}
+		}
+		if (userData.m_password === "" && !emptyPasswordIsOk){
+			return {valid: false, message: qsTr("Please enter a password")}
+		}
+
+		if (!__emailRegExp.test(userData.m_email)){
+			return {valid: false, message: qsTr("Please enter a valid email address")}
+		}
+
+		if (container.isNew && passwordInput.text !== passwordInputConfirm.text){
+			return {valid: false, message: qsTr("Passwords do not match")}
+		}
+
+		return {valid: true, message: ""}
+	}
+
+	onDocumentSaved: {
+		checkChangePasswordLogic();
+	}
+
 	onIsNewChanged: {
 		checkChangePasswordLogic();
 	}
-	
+
 	onUserDataChanged: {
 		if (!userData){
 			return;

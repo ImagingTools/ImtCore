@@ -9,7 +9,7 @@ import imtdocgui 1.0
 /**
  * TenantDocumentEditorShell
  *
- * Shared wrapper around `SingleDocumentWorkspaceShellView` used by the
+ * Shared wrapper around `SingleDocumentWorkspace` used by the
  * Role / Group / User create+edit screens inside the TenantEditor sub-pages
  * (TenantRolesPage / TenantGroupsPage / TenantMembersPage).
  *
@@ -52,7 +52,7 @@ Item {
 
 	signal closed()
 
-	SingleDocumentWorkspaceShellView {
+	SingleDocumentWorkspace {
 		id: shell
 		anchors.top: parent.top
 		anchors.bottom: parent.bottom

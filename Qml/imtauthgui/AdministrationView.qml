@@ -26,18 +26,6 @@ Item {
         Events.unSubscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
     }
     
-    onDocumentManagerChanged: {
-        if (documentManager){
-            if (documentManager.activeView){
-                documentManager.activeView.visualStatusProvider = visualStatusProvider
-            }
-        }
-    }
-    
-    GqlBasedObjectVisualStatusProvider {
-        id: visualStatusProvider
-    }
-
     function onLocalizationChanged(language){
         let rolesIndex = multiPageView.getIndexById("Roles");
         if (rolesIndex >= 0){
@@ -109,7 +97,7 @@ Item {
                 if (restPath.length >= 2){
                     let documentTypeId = restPath[0]
                     let documentId = restPath[1]
-                    administrationContainer.documentManager.openDocument(documentId, documentTypeId)
+                    administrationContainer.documentManager.openDocument(documentTypeId, documentId)
                 }
 
                 multiPageView.block = false
@@ -128,7 +116,6 @@ Item {
         onCurrentIndexChanged: {
             if (currentIndex >= 0 && multiPageView.pagesModel.count > currentIndex){
                 let pageId = multiPageView.pagesModel.get(currentIndex).id
-                visualStatusProvider.collectionId = pageId
                 if (!block){
                     NavigationController.push("Administration/" + pageId)
                 }

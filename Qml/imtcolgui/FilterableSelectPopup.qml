@@ -36,6 +36,10 @@ import imtgui 1.0
 PopupView {
 	id: root
 
+	// Test instrumentation: PopupView has no objectName of its own. Only one of these is ever open at a
+	// time (it's a modal picker), so a generic name is unambiguous. Inert - no runtime/visual effect.
+	objectName: "FilterableSelectPopup"
+
 	width: root.embedded ? (parent ? parent.width : itemWidth) : (itemWidth + 2 * Style.marginL)
 	height: root.embedded ? contentColumn.height : Math.min(contentColumn.height + 2 * Style.marginL, root.__maxPopupHeight)
 
@@ -511,11 +515,7 @@ PopupView {
 					id: selectedListContainer
 
 					width: parent.width
-					height: {
-						var totalHeight = root.__internal.selectedItemsCount * root.itemHeight
-						var maxHeight = root.maxSelectedGroupItems * root.itemHeight
-						return Math.min(totalHeight, maxHeight)
-					}
+					height: Math.min(root.__internal.selectedItemsCount * root.itemHeight, root.maxSelectedGroupItems * root.itemHeight)
 
 					ListView {
 						id: selectedListView
@@ -526,6 +526,8 @@ PopupView {
 						model: root.__internal.selectedItemsCount
 
 						delegate: Item {
+							id: selectedItemDelegate
+
 							width: selectedListView.width
 							height: root.itemHeight
 
@@ -556,7 +558,7 @@ PopupView {
 									visible: root.showCheckBox
 									checkState: Qt.Checked
 									function nextCheckState() {
-										var si = parent.parent.__selItem
+										var si = selectedItemDelegate.__selItem
 										if (si){
 											root.__handleRemoveSelectedItem(si[root.idRole])
 										}
@@ -568,10 +570,7 @@ PopupView {
 									anchors.verticalCenter: parent.verticalCenter
 									font.pixelSize: root.textSize
 									color: root.fontColor
-									text: {
-										var si = parent.parent.__selItem
-										return si ? String(si[root.textRole] || "") : ""
-									}
+									text: selectedItemDelegate.__selItem ? String(selectedItemDelegate.__selItem[root.textRole] || "") : ""
 									elide: Text.ElideRight
 									width: parent.width - parent.spacing - (root.showCheckBox ? Style.itemSizeS + parent.spacing : 0)
 								}
@@ -591,7 +590,7 @@ PopupView {
 								iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 
 								onClicked: {
-									var si = parent.__selItem
+									var si = selectedItemDelegate.__selItem
 									if (si){
 										root.__handleRemoveSelectedItem(si[root.idRole])
 									}
