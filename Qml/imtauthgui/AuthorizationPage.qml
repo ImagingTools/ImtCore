@@ -587,10 +587,6 @@ Rectangle {
 							id: userGeneralEditor;
 							width: flickable.width;
 							userData: userDataModel;
-
-							onEmitUpdateModel: {
-								userGeneralEditor.updateModel();
-							}
 						}
 					}
 				}

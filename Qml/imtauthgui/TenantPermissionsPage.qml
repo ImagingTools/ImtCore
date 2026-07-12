@@ -67,7 +67,11 @@ ViewBase {
 		permissionsTableView.applySelection(selectedPermissionsIds)
 	}
 
-	function updateGui() {
+	onTenantDataChanged: {
+		permissionsPage.__applyTenantSelection()
+	}
+
+	function updateGuiFromApiData() {
 		if (!permissionsPage.tenantData)
 			return
 
@@ -79,7 +83,7 @@ ViewBase {
 		__applyTenantSelection()
 	}
 
-	function updateModel() {
+	function writeModelSelection() {
 		if (!permissionsPage.tenantData)
 			return
 
@@ -87,9 +91,7 @@ ViewBase {
 
 		if (!permissionsPage.tenantData.hasTenantPermissions())
 			permissionsPage.tenantData.emplaceTenantPermissions()
-		permissionsPage.tenantData.m_tenantPermissions = []
-		for (var k = 0; k < selectedPermissionIds.length; k++)
-			permissionsPage.tenantData.m_tenantPermissions.push(selectedPermissionIds[k])
+		permissionsPage.tenantData.m_tenantPermissions = selectedPermissionIds
 	}
 
 	Item {
@@ -139,7 +141,7 @@ ViewBase {
 		treeToScrollbarSpacing: 0
 
 		onSelectionChanged: {
-			permissionsPage.doUpdateModel()
+			permissionsPage.writeModelSelection()
 		}
 	}
 }

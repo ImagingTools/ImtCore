@@ -53,27 +53,11 @@ DocumentViewBase {
 		apiClient: container.apiClient
 	}
 
-	function updateGui() {
+	onTenantDataChanged: {
+		if (!container.tenantData)
+			return
 		stateManager_.loadMembersFromModel()
 		stateManager_.loadInvitationsFromModel()
-		var generalPage = multiPageView.getPageByIndex(0)
-		if (generalPage)
-			generalPage.doUpdateGui()
-		var permissionsPage = multiPageView.getPageById("Permissions")
-		if (permissionsPage)
-			permissionsPage.doUpdateGui()
-	}
-
-	function updateModel() {
-		var generalPage = multiPageView.getPageByIndex(0)
-		if (generalPage)
-			generalPage.doUpdateModel()
-		if (container.tenantData) {
-			stateManager_.syncMembersToModel()
-			var permissionsPage = multiPageView.getPageById("Permissions")
-			if (permissionsPage)
-				permissionsPage.doUpdateModel()
-		}
 	}
 
 	// --- Multi-page navigation ---

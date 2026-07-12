@@ -73,14 +73,6 @@ Rectangle {
 			userData: userDataModel;
 			canHideGroup: false;
 			usernameInput.readOnly: true;
-
-			onEmitUpdateModel: {
-				updateModel();
-			}
-
-			onUserDataChanged: {
-				updateGui();
-			}
 		}
 
 		Item {

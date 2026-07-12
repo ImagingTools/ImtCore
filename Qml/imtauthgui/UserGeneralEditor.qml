@@ -13,9 +13,6 @@ Column {
 	property UserData userData;
 	property bool readOnly: false;
 
-	signal emitUpdateModel();
-	signal emitUpdateGui();
-
 	property alias usernameInput: usernameInput_;
 	property alias nameInput: nameInput_;
 	property alias mailInput: mailInput_;
@@ -24,28 +21,6 @@ Column {
 	property alias changePasswordButton: changePasswordButton_;
 
 	property bool canHideGroup: true;
-
-	function updateGui(){
-		if (!container.userData){
-			return
-		}
-
-		usernameInput_.text = container.userData.m_username;
-		nameInput_.text = container.userData.m_name;
-		mailInput_.text = container.userData.m_email;
-		passwordInput_.text = container.userData.m_password;
-	}
-
-	function updateModel(){
-		if (!container.userData){
-			return
-		}
-
-		container.userData.m_username = usernameInput_.text;
-		container.userData.m_name = nameInput_.text;
-		container.userData.m_email = mailInput_.text;
-		container.userData.m_password = passwordInput_.text;
-	}
 
 	GroupElementView {
 		id: generalGroup;
@@ -66,11 +41,10 @@ Column {
 			errorText: qsTr("Please enter the username");
 			textInputValidator: notEmptyRegexp;
 
+			text: container.userData ? container.userData.m_username : "";
 			onEditingFinished: {
-				let oldText = container.userData.m_username;
-				if (oldText && oldText !== usernameInput_.text || !oldText && usernameInput_.text !== ""){
-
-					container.emitUpdateModel();
+				if (container.userData && container.userData.m_username !== usernameInput_.text){
+					container.userData.m_username = usernameInput_.text;
 				}
 			}
 
@@ -96,10 +70,10 @@ Column {
 			errorText: qsTr("Please enter the name");
 			textInputValidator: notEmptyRegexp;
 
+			text: container.userData ? container.userData.m_name : "";
 			onEditingFinished: {
-				let oldText = container.userData.m_name;
-				if (oldText && oldText !== nameInput_.text || !oldText && nameInput_.text !== ""){
-					container.emitUpdateModel();
+				if (container.userData && container.userData.m_name !== nameInput_.text){
+					container.userData.m_name = nameInput_.text;
 				}
 			}
 
@@ -126,8 +100,12 @@ Column {
 			readOnly: container.readOnly;
 			showErrorWhenInvalid: true;
 			errorText: qsTr("Please enter the email");
+
+			text: container.userData ? container.userData.m_email : "";
 			onEditingFinished: {
-				container.emitUpdateModel();
+				if (container.userData && container.userData.m_email !== mailInput_.text){
+					container.userData.m_email = mailInput_.text;
+				}
 			}
 
 			KeyNavigation.tab: passwordInput_.visible ? passwordInput_ : usernameInput_;
@@ -182,9 +160,8 @@ Column {
 
 			confirmPassword.bottomComp = emptyComp;
 
-			let oldText = container.userData.m_password;
-			if (oldText && oldText !== passwordInput_.text || !oldText && passwordInput_.text !== ""){
-				container.emitUpdateModel();
+			if (container.userData && container.userData.m_password !== passwordInput_.text){
+				container.userData.m_password = passwordInput_.text;
 			}
 		}
 
@@ -197,6 +174,7 @@ Column {
 			echoMode: TextInput.Password;
 			readOnly: container.readOnly;
 			visible: passwordGroup.visible;
+			text: container.userData ? container.userData.m_password : "";
 			onEditingFinished: {
 				passwordGroup.checkPassword();
 			}

@@ -223,6 +223,7 @@ QtObject {
 		}
 		stateManager.pendingMembers = arr
 		stateManager.__membersModifiedLocally = true
+		stateManager.syncMembersToModel()
 	}
 
 	function removePendingInvitation(invitationId) {

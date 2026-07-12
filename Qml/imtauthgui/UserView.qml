@@ -25,25 +25,6 @@ DocumentViewBase {
 		? (container.userData.m_name || container.userData.m_username || container.userData.m_id)
 		: ""
 	
-	function updateGui(){
-		userGeneralEditor.updateGui();
-		rolesGroup.updateGui();
-		groupsBlock.updateGui();
-		systemInfoGroup.updateGui();
-	}
-	
-	function updateModel(){
-		if (!container.userData){
-			return
-		}
-
-		userGeneralEditor.updateModel();
-		rolesGroup.updateModel();
-		groupsBlock.updateModel();
-		systemInfoGroup.updateModel();
-		userData.m_productId = container.productId;
-	}
-	
 	function getHeaders(){
 		return {}
 	}
@@ -57,7 +38,7 @@ DocumentViewBase {
 			return;
 		}
 		
-		setBlockingUpdateModel(true);
+		userData.m_productId = container.productId;
 		
 		let ok = false
 		if (systemInfoTable.table && userData.hasSystemInfos()){
@@ -71,11 +52,27 @@ DocumentViewBase {
 			systemInfoGroup.visible = false;
 		}
 		
+		systemInfoGroup.applyModelSelection();
+		rolesGroup.applyModelSelection();
+		groupsBlock.applyModelSelection();
+		
 		checkChangePasswordLogic();
 		
 		checkSystemId();
+	}
+	
+	function writeSystemInfoSelection(){
+		if (!userData){
+			return;
+		}
 		
-		setBlockingUpdateModel(false);
+		let indexes = systemInfoTable.table.getCheckedItems();
+		
+		if (userData.m_systemInfos){
+			for (let i = 0; i < userData.m_systemInfos.count; i++){
+				userData.m_systemInfos.get(i).item.m_enabled = indexes.includes(i)
+			}
+		}
 	}
 	
 	function checkChangePasswordLogic(){
@@ -197,14 +194,6 @@ DocumentViewBase {
 				id: userGeneralEditor;
 				width: parent.width;
 				userData: container.userData;
-				
-				onEmitUpdateModel: {
-					container.doUpdateModel();
-				}
-				
-				onEmitUpdateGui: {
-					container.doUpdateGui();
-				}
 			}
 			
 			GroupHeaderView {
@@ -264,7 +253,7 @@ DocumentViewBase {
 								systemInfoGroup.block = false;
 							}
 							
-							container.doUpdateModel();
+							container.writeSystemInfoSelection();
 							container.checkSystemId();
 						}
 					}
@@ -272,7 +261,7 @@ DocumentViewBase {
 				
 				property bool block: false;
 				
-				function updateGui(){
+				function applyModelSelection(){
 					if (!container.userData){
 						return;
 					}
@@ -282,6 +271,7 @@ DocumentViewBase {
 					}
 					
 					if (systemInfoTable.table){
+						systemInfoGroup.block = true;
 						systemInfoTable.table.uncheckAll();
 						let systemInfosModel = container.userData.m_systemInfos;
 						if (systemInfosModel){
@@ -292,20 +282,7 @@ DocumentViewBase {
 								}
 							}
 						}
-					}
-				}
-				
-				function updateModel(){
-					if (!container.userData){
-						return;
-					}
-					
-					let indexes = systemInfoTable.table.getCheckedItems();
-					
-					if (container.userData.m_systemInfos){
-						for (let i = 0; i < container.userData.m_systemInfos.count; i++){
-							container.userData.m_systemInfos.get(i).item.m_enabled = indexes.includes(i)
-						}
+						systemInfoGroup.block = false;
 					}
 				}
 			}
@@ -329,11 +306,11 @@ DocumentViewBase {
 						addButtonText: qsTr("Add Role")
 						showCount: true
 						onSelectionChanged: {
-							container.doUpdateModel()
+							rolesGroup.writeModelSelection()
 						}
 					}
 
-				function updateGui(){
+				function applyModelSelection(){
 					if (!container.userData){
 						return
 					}
@@ -345,7 +322,7 @@ DocumentViewBase {
 					roleSelectableCollectionEditor.items = arr
 				}
 				
-				function updateModel(){
+				function writeModelSelection(){
 					if (!container.userData){
 						return
 					}
@@ -376,11 +353,11 @@ DocumentViewBase {
 						addButtonText: qsTr("Add Group")
 						showCount: true
 						onSelectionChanged: {
-							container.doUpdateModel()
+							groupsBlock.writeModelSelection()
 						}
 					}
 
-				function updateGui(){
+				function applyModelSelection(){
 					if (!container.userData){
 						return
 					}
@@ -392,7 +369,7 @@ DocumentViewBase {
 					groupSelectableCollectionEditor.items = arr
 				}
 				
-				function updateModel(){
+				function writeModelSelection(){
 					if (!container.userData){
 						return
 					}

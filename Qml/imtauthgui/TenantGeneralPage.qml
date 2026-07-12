@@ -37,22 +37,6 @@ ViewBase {
 		? (generalPage.stateManager.isNewTenant || generalPage.stateManager.canEditOrganization)
 		: false
 
-	function updateGui() {
-		if (!generalPage.tenantData) return
-		nameInput.text = generalPage.tenantData.m_name || ""
-		descriptionInput.text = generalPage.tenantData.m_description || ""
-		isActiveSwitch.checked = generalPage.tenantData.m_isActive !== undefined
-			? generalPage.tenantData.m_isActive
-			: true
-	}
-
-	function updateModel() {
-		if (!generalPage.tenantData) return
-		generalPage.tenantData.m_name = nameInput.text
-		generalPage.tenantData.m_description = descriptionInput.text
-		generalPage.tenantData.m_isActive = isActiveSwitch.checked
-	}
-
 	Flickable {
 		anchors.fill: parent
 		anchors.topMargin: Style.marginXL
@@ -114,9 +98,10 @@ ViewBase {
 							readOnly: !generalPage.__canEditName
 							placeHolderText: qsTr("Enter the tenant name")
 
+							text: generalPage.tenantData ? (generalPage.tenantData.m_name || "") : ""
 							onEditingFinished: {
 								if (generalPage.tenantData && generalPage.tenantData.m_name !== nameInput.text)
-									generalPage.doUpdateModel()
+									generalPage.tenantData.m_name = nameInput.text
 							}
 						}
 					}
@@ -139,9 +124,10 @@ ViewBase {
 							readOnly: !generalPage.__canEditDescription
 							placeHolderText: qsTr("Enter the description")
 
+							text: generalPage.tenantData ? (generalPage.tenantData.m_description || "") : ""
 							onEditingFinished: {
 								if (generalPage.tenantData && generalPage.tenantData.m_description !== descriptionInput.text)
-									generalPage.doUpdateModel()
+									generalPage.tenantData.m_description = descriptionInput.text
 							}
 						}
 					}
@@ -160,7 +146,13 @@ ViewBase {
 				SwitchCustom {
 					id: isActiveSwitch
 					readOnly: !generalPage.__canEditIsActive
-					onCheckedChanged: generalPage.doUpdateModel()
+					checked: generalPage.tenantData && generalPage.tenantData.m_isActive !== undefined
+						? generalPage.tenantData.m_isActive
+						: true
+					onCheckedChanged: {
+						if (generalPage.tenantData && generalPage.tenantData.m_isActive !== isActiveSwitch.checked)
+							generalPage.tenantData.m_isActive = isActiveSwitch.checked
+					}
 				}
 
 				Text {
