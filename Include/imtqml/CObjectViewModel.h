@@ -62,6 +62,7 @@ class CObjectViewModel: public QQmlPropertyMap
 {
 	Q_OBJECT
 	Q_PROPERTY(bool isDirty READ IsDirty NOTIFY isDirtyChanged)
+	Q_PROPERTY(bool hasErrors READ HasErrors NOTIFY fieldErrorsChanged)
 
 public:
 	typedef QQmlPropertyMap BaseClass;
@@ -73,6 +74,32 @@ public:
 		that were not yet written back to the data model.
 	*/
 	bool IsDirty() const;
+
+	/**
+		\brief Returns \c true if at least one field currently carries a
+		non-empty validation error message.
+
+		\sa SetFieldErrors(), fieldError()
+	*/
+	bool HasErrors() const;
+
+	/**
+		\brief Replace the per-field validation errors of the ViewModel.
+
+		\details
+		Validation results are produced outside the ViewModel (e.g. by a
+		controller or bridge after a submit / server round-trip) and are
+		pushed in as a map of field key to error message. An empty or
+		absent message means the field is valid. QML editors read the
+		message for a field through \c fieldError() to drive
+		\c errorText / \c showErrorWhenInvalid from the ViewModel instead
+		of a purely client-side validator.
+
+		Passing an empty map clears all field errors. Field errors are
+		also cleared automatically on the next \c SetSourceValues(), since
+		a fresh source snapshot invalidates previous validation results.
+	*/
+	void SetFieldErrors(const QVariantMap& errors);
 
 	/**
 		\brief Replace / merge the ViewModel content with values
@@ -116,8 +143,25 @@ public Q_SLOTS:
 	*/
 	void revert();
 
+	/**
+		\brief Returns the validation error message for \a key, or an
+		empty string if the field is valid.
+
+		\details
+		Exposed as a slot so QML editors can bind
+		\c errorText: model ? model.fieldError("username") : "".
+	*/
+	QString fieldError(const QString& key) const;
+
 Q_SIGNALS:
 	void isDirtyChanged(bool isDirty);
+
+	/**
+		\brief Emitted whenever the per-field validation errors change
+		(via \c SetFieldErrors() or when they are cleared by a source
+		update).
+	*/
+	void fieldErrorsChanged();
 
 	/**
 		\brief Emitted for user/QML edits only — never for source
@@ -137,6 +181,7 @@ private:
 private:
 	QVariantMap m_snapshot;
 	QVariantMap m_changedValues;
+	QVariantMap m_fieldErrors;
 	QHash<QString, CListViewModel*> m_listAdapters;
 	bool m_isDirty = false;
 	bool m_isSourceUpdate = false;

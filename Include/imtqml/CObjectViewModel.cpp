@@ -20,6 +20,30 @@ bool CObjectViewModel::IsDirty() const
 }
 
 
+bool CObjectViewModel::HasErrors() const
+{
+	for (auto it = m_fieldErrors.constBegin(); it != m_fieldErrors.constEnd(); ++it){
+		if (!it.value().toString().isEmpty()){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+void CObjectViewModel::SetFieldErrors(const QVariantMap& errors)
+{
+	if (m_fieldErrors == errors){
+		return;
+	}
+
+	m_fieldErrors = errors;
+
+	Q_EMIT fieldErrorsChanged();
+}
+
+
 void CObjectViewModel::SetSourceValues(const QVariantMap& values)
 {
 	m_isSourceUpdate = true;
@@ -41,6 +65,11 @@ void CObjectViewModel::SetSourceValues(const QVariantMap& values)
 	m_snapshot = GetValues();
 	m_changedValues.clear();
 	SetIsDirty(false);
+
+	if (!m_fieldErrors.isEmpty()){
+		m_fieldErrors.clear();
+		Q_EMIT fieldErrorsChanged();
+	}
 }
 
 
@@ -92,6 +121,12 @@ void CObjectViewModel::MarkClean()
 void CObjectViewModel::revert()
 {
 	SetSourceValues(m_snapshot);
+}
+
+
+QString CObjectViewModel::fieldError(const QString& key) const
+{
+	return m_fieldErrors.value(key).toString();
 }
 
 

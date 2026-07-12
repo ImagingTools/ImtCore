@@ -203,6 +203,36 @@ Text {
 }
 ```
 
+### Field-level validation (ViewModel-driven errors)
+
+Client-side validators (`textInputValidator` + `showErrorWhenInvalid`)
+cover format checks locally. Validation results produced outside the
+editor — e.g. a bridge / server round-trip on `submit()` — are pushed
+into the ViewModel with `SetFieldErrors()` (C++
+`imtqml::CObjectViewModel`), a map of field key to error message
+(empty / absent message = valid). The errors are cleared automatically
+on the next source update. QML reads the message per field and prefers
+it over the local default text:
+
+```qml
+TextInputElementView {
+	id: usernameInput_
+
+	showErrorWhenInvalid: true
+	errorText: editor.model && editor.model.fieldError("username") !== ""
+		? editor.model.fieldError("username")
+		: qsTr("Please enter the username")
+
+	text: editor.model ? editor.model.username : ""
+	onEditingFinished: editor.model.username = usernameInput_.text
+}
+```
+
+`model.hasErrors` reports whether any field is currently invalid (useful
+to gate an apply button). Surfacing a server error independently of the
+local validator's `acceptableInput` state is a follow-up that needs a
+control-level error flag on the ElementViews.
+
 ## Providing the desktop bridge (C++)
 
 Per model, derive from `TLocalDataModelBridgeComp<ModelInterface>` and

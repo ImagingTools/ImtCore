@@ -53,7 +53,7 @@ DeclarativeViewBase {
 				placeHolderText: qsTr("Enter the username");
 				readOnly: editor.readOnly;
 				showErrorWhenInvalid: true;
-				errorText: qsTr("Please enter the username");
+				errorText: editor.model && editor.model.fieldError("username") !== "" ? editor.model.fieldError("username") : qsTr("Please enter the username");
 				textInputValidator: notEmptyRegexp;
 
 				text: editor.model ? editor.model.username : "";
@@ -76,7 +76,7 @@ DeclarativeViewBase {
 				placeHolderText: qsTr("Enter the name");
 				readOnly: editor.readOnly;
 				showErrorWhenInvalid: true;
-				errorText: qsTr("Please enter the name");
+				errorText: editor.model && editor.model.fieldError("name") !== "" ? editor.model.fieldError("name") : qsTr("Please enter the name");
 				textInputValidator: notEmptyRegexp;
 
 				text: editor.model ? editor.model.name : "";
@@ -100,7 +100,7 @@ DeclarativeViewBase {
 				placeHolderText: qsTr("Enter the email");
 				readOnly: editor.readOnly;
 				showErrorWhenInvalid: true;
-				errorText: qsTr("Please enter the email");
+				errorText: editor.model && editor.model.fieldError("email") !== "" ? editor.model.fieldError("email") : qsTr("Please enter the email");
 				textInputValidator: mailValid;
 
 				text: editor.model ? editor.model.email : "";
