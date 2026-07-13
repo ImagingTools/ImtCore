@@ -20,14 +20,14 @@ class IJobSchedulerParams: virtual public iser::ISerializable
 {
 public:
 	/**
-		Get processing priority [0...1].
+		Get processing priority [0.0 ... 1.0].
 	*/
 	virtual double GetPriority() const = 0;
 
 	/**
-		Set processing priority [0...1].
+		Set processing priority [0.0 ... 1.0].
 	*/
-	virtual void SetPriority(double prioority) = 0;
+	virtual void SetPriority(double priority) = 0;
 
 	/**
 		Get the predecessor job-ID.

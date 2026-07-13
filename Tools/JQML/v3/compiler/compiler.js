@@ -1359,8 +1359,22 @@ function compile(options){
 
                         let properties = assignProperty.value.getProperties()
 
+                        let baseClassProperties = []
+                        let baseClassSlots = []
+                        let baseClassMeta = ''
+                        if (childTypeInfo.typeBase.isAssignableFrom(JQModules.QtQml.BaseClass)){
+                            for(let defineProperty of this.defineProperties){
+                                if(defineProperty.name.slice(0,2) == 'm_'){
+                                    baseClassProperties.push(`'${defineProperty.name}'`)
+                                    baseClassSlots.push(`SLOT_${defineProperty.name}Changed(o,n){if (this.enableNotifications) this._internal.internalModelChanged('${defineProperty.name}', this)}`)
+                                }
+                            }
+                            baseClassMeta = `static cachedPoperties = new Set(${childTypeInfo.path}.cachedPoperties.union(new Set([${baseClassProperties.join(',')}])))`
+                        }  
+
                         resultCode.add(`(class ${assignProperty.value.className} extends ${childTypeInfo.path} {
                             static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})
+                            ${baseClassMeta}
                             static create(parent,properties={},context={},isRoot=true){
 
                             let __context = JQContext.create(context)
@@ -1413,6 +1427,10 @@ function compile(options){
                         resultCode.add('\n')
 
                         resultCode.add(assignProperty.value.getMethods())
+
+                        resultCode.add('\n')
+
+                        resultCode.add(baseClassSlots.join('\n'))
 
                         resultCode.add('\n')
                         resultCode.add(assignProperty.value.getConnectedSignals())
@@ -1707,8 +1725,22 @@ function compile(options){
 
             let properties = this.children[0].getProperties()
 
+            let baseClassProperties = []
+            let baseClassSlots = []
+            let baseClassMeta = ''
+            if (childTypeInfo.typeBase.isAssignableFrom(JQModules.QtQml.BaseClass)){
+                for(let defineProperty of this.defineProperties){
+                    if(defineProperty.name.slice(0,2) == 'm_'){
+                        baseClassProperties.push(`'${defineProperty.name}'`)
+                        baseClassSlots.push(`SLOT_${defineProperty.name}Changed(o,n){if (this.enableNotifications) this._internal.internalModelChanged('${defineProperty.name}', this)}`)
+                    }
+                }
+                baseClassMeta = `static cachedPoperties = new Set(${childTypeInfo.path}.cachedPoperties.union(new Set([${baseClassProperties.join(',')}])))`
+            }  
+
             code.add(`(class ${this.children[0].className} extends ${childTypeInfo.path} {
                 static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})
+                ${baseClassMeta}
                 static create(parent,properties={},context={},isRoot=true){
 
                 let __context = JQContext.create(context)
@@ -1767,6 +1799,11 @@ function compile(options){
             code.add(this.children[0].getMethods())
 
             code.add('\n')
+
+            code.add(baseClassSlots.join('\n'))
+
+            code.add('\n')
+            
             code.add(this.children[0].getConnectedSignals())
 
             code.add('\n')
@@ -1821,8 +1858,22 @@ function compile(options){
                 id = this.id ? this.name+'.__' + this.qmlFile.getContextName() + '.'+this.id+'='+this.name : ''
             }
 
+            let baseClassProperties = []
+            let baseClassSlots = []
+            let baseClassMeta = ''
+            if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.BaseClass)){
+                for(let defineProperty of this.defineProperties){
+                    if(defineProperty.name.slice(0,2) == 'm_'){
+                        baseClassProperties.push(`'${defineProperty.name}'`)
+                        baseClassSlots.push(`SLOT_${defineProperty.name}Changed(o,n){if (this.enableNotifications) this._internal.internalModelChanged('${defineProperty.name}', this)}`)
+                    }
+                }
+                baseClassMeta = `static cachedPoperties = new Set(${typeInfo.path}.cachedPoperties.union(new Set([${baseClassProperties.join(',')}])))`
+            }     
+
             code.add(`let ${this.name}=(__root.cachedComponents['${this.qmlFile.getName()}__${this.name}'] || __root.cachedComponent('${this.qmlFile.getName()}__${this.name}',class ${this.className} extends ${typeInfo.path} {
                 static meta = Object.assign({}, ${typeInfo.path}.meta, ${meta})
+                ${baseClassMeta}
                 static create(parent,properties={},context={},isRoot=true){
                     let ${this.name} = super.create(parent,properties,context,isRoot)
                     ${this.name}.__${this.qmlFile.getContextName()} = context
@@ -1838,6 +1889,9 @@ function compile(options){
 
             code.add(`return ${this.name}}`)
             code.add(this.getMethods())
+            code.add('\n')
+            code.add(baseClassSlots.join('\n'))
+            code.add('\n')
             code.add(this.getConnectedSignals())
             code.add(`})).create(${this.parent ? this.parent.name : 'null'},{JQAbstractModel:()=>{return ${this.targetContext.name}.JQAbstractModel}},${this.targetContext.name}.__${this.qmlFile.getContextName()},false)`)
 
@@ -1982,8 +2036,22 @@ function compile(options){
 
             let properties = this.instruction.getProperties()
 
+            let baseClassProperties = []
+            let baseClassSlots = []
+            let baseClassMeta = ''
+            if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.BaseClass)){
+                for(let defineProperty of this.instruction.defineProperties){
+                    if(defineProperty.name.slice(0,2) == 'm_'){
+                        baseClassProperties.push(`'${defineProperty.name}'`)
+                        baseClassSlots.push(`SLOT_${defineProperty.name}Changed(o,n){if (this.enableNotifications) this._internal.internalModelChanged('${defineProperty.name}', this)}`)
+                    }
+                }
+                baseClassMeta = `static cachedPoperties = new Set(${typeInfo.path}.cachedPoperties.union(new Set([${baseClassProperties.join(',')}])))`
+            }
+
             code.add(`static cachedComponents = {}
                 static meta = Object.assign({}, ${typeInfo.path}.meta, ${meta})
+                ${baseClassMeta}
 
                 __removeObjectName(){removeObjectName('${this.instruction.className}')}
                 __addObjectName(){addObjectName('${this.instruction.className}')}
@@ -2043,6 +2111,9 @@ function compile(options){
 
             code.add('\n')
             code.add(this.instruction.getConnectedSignals())
+            code.add('\n')
+
+            code.add(baseClassSlots.join('\n'))
 
             code.add('\n')
 

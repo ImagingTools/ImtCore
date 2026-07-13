@@ -26,7 +26,7 @@ namespace imthype
 
 /**
 	Base implementation of a controller for the job execution.
-	This impementation works using polling of the underlaying job manager.
+	This implementation works using polling of the underlying job manager.
 	If a job in the job queue becomes the status \c PS_WAITING_FOR_PROCESSING,
 	the controller takes the job item and starts the job execution in a separate thread.
 */
