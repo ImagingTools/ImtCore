@@ -10,6 +10,7 @@
 #include <istd/TOptDelPtr.h>
 #include <istd/CSystem.h>
 #include <istd/CCrcCalculator.h>
+#include <iser/IVersionInfo.h>
 #include <iprm/TParamsPtr.h>
 #include <iser/CJsonMemWriteArchive.h>
 
@@ -24,6 +25,8 @@ namespace imtdb
 
 static const QByteArray s_documentIdColumn = "DocumentId";
 static const QByteArray s_idColumn = "Id";
+static const QByteArray s_ownerNameColumn = "OwnerName";
+static const QByteArray s_softwareVersionColumn = "SoftwareVersion";
 
 
 // public methods
@@ -44,6 +47,41 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::GetSelectionQuery(
 	}
 
 	return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
+}
+
+
+QString CSqlDatabaseDocumentDelegateLegacyComp::GetRevisionUserName(const imtbase::IOperationContext* operationContextPtr) const
+{
+	if (operationContextPtr != nullptr){
+		const imtbase::IOperationContext::IdentifableObjectInfo ownerInfo = operationContextPtr->GetOperationOwnerId();
+		if (!ownerInfo.name.isEmpty()){
+			return ownerInfo.name;
+		}
+	}
+
+	if (m_loginCompPtr.IsValid()){
+		const iauth::CUser* userPtr = m_loginCompPtr->GetLoggedUser();
+		if (userPtr != nullptr){
+			return userPtr->GetUserName();
+		}
+	}
+
+	return QString();
+}
+
+
+QString CSqlDatabaseDocumentDelegateLegacyComp::GetRevisionSoftwareVersion() const
+{
+	if (!m_versionInfoCompPtr.IsValid()){
+		return QString();
+	}
+
+	quint32 versionNumber = 0;
+	if (m_versionInfoCompPtr->GetVersionNumber(*m_mainSoftwareVersionIdAttrPtr, versionNumber)){
+		return m_versionInfoCompPtr->GetEncodedVersionName(*m_mainSoftwareVersionIdAttrPtr, versionNumber);
+	}
+
+	return QString();
 }
 
 
@@ -92,7 +130,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateLegac
 			const QString& objectName,
 			const QString& objectDescription,
 			const istd::IChangeable* valuePtr,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	NewObjectQuery retVal;
 
@@ -146,17 +184,25 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateLegac
 				.toUtf8();
 
 	// Insert new entry into the document data revision table:
-	retVal.query += QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"%3\", \"RevisionNumber\", \"Comment\", \"LastModified\", \"Checksum\") VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
-				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
+	QString revisionColumns = QString("\"Id\", \"%1\", \"%2\", \"RevisionNumber\", \"Comment\", \"LastModified\", \"Checksum\"")
 				.arg(qPrintable(s_documentIdColumn))
-				.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
+				.arg(qPrintable(*m_documentContentColumnIdAttrPtr));
+	QString revisionValues = QString("'%1', '%2', '%3', '%4', '%5', '%6', %7")
 				.arg(qPrintable(revisionUuid))
 				.arg(qPrintable(objectId))
 				.arg(qPrintable(documentContent.toBase64()))
 				.arg(1)
-				.arg(QObject::tr("Initial revision"))
+				.arg(SqlEncode(QObject::tr("Initial revision")))
 				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-				.arg(checksum)
+				.arg(checksum);
+	revisionColumns += QString(", \"%1\"").arg(qPrintable(s_ownerNameColumn));
+	revisionValues += QString(", '%1'").arg(SqlEncode(GetRevisionUserName(operationContextPtr)));
+	revisionColumns += QString(", \"%1\"").arg(qPrintable(s_softwareVersionColumn));
+	revisionValues += QString(", '%1'").arg(SqlEncode(GetRevisionSoftwareVersion()));
+	retVal.query += QString("INSERT INTO \"%1\"(%2) VALUES(%3);")
+				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
+				.arg(revisionColumns)
+				.arg(revisionValues)
 				.toUtf8();
 
 	if (m_metaInfoTableDelegateCompPtr.IsValid()){
@@ -280,17 +326,25 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateUpdateObjectQuery(
 					.toUtf8();
 
 		QString operationComment = operationContextPtr != nullptr ? operationContextPtr->GetOperationDescription() : QString();
-		retVal += QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"%3\", \"RevisionNumber\", \"Comment\", \"LastModified\", \"Checksum\") VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
-					.arg(qPrintable(*m_revisionsTableNameAttrPtr))
+		QString revisionColumns = QString("\"Id\", \"%1\", \"%2\", \"RevisionNumber\", \"Comment\", \"LastModified\", \"Checksum\"")
 					.arg(qPrintable(s_documentIdColumn))
-					.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
+					.arg(qPrintable(*m_documentContentColumnIdAttrPtr));
+		QString revisionValues = QString("'%1', '%2', '%3', '%4', '%5', '%6', %7")
 					.arg(qPrintable(revisionUuid))
 					.arg(qPrintable(objectId))
 					.arg(qPrintable(documentContent.toBase64()))
 					.arg(revisionsCount + 1)
 					.arg(SqlEncode(operationComment))
 					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-					.arg(checksum)
+					.arg(checksum);
+		revisionColumns += QString(", \"%1\"").arg(qPrintable(s_ownerNameColumn));
+		revisionValues += QString(", '%1'").arg(SqlEncode(GetRevisionUserName(operationContextPtr)));
+		revisionColumns += QString(", \"%1\"").arg(qPrintable(s_softwareVersionColumn));
+		revisionValues += QString(", '%1'").arg(SqlEncode(GetRevisionSoftwareVersion()));
+		retVal += QString("INSERT INTO \"%1\"(%2) VALUES(%3);")
+					.arg(qPrintable(*m_revisionsTableNameAttrPtr))
+					.arg(revisionColumns)
+					.arg(revisionValues)
 					.toUtf8();
 
 		if (m_metaInfoTableDelegateCompPtr.IsValid()){
@@ -369,7 +423,9 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateLegac
 		return imtbase::IRevisionController::RevisionInfoList();
 	}
 
-	QString revisionListQuery = QString("SELECT \"RevisionNumber\", \"LastModified\", \"Comment\" from \"%1\" WHERE \"%2\" = '%3' ORDER BY \"RevisionNumber\" DESC")
+	QString revisionListQuery = QString("SELECT \"RevisionNumber\", \"LastModified\", \"Comment\", \"%1\", \"%2\" from \"%3\" WHERE \"%4\" = '%5' ORDER BY \"RevisionNumber\" DESC")
+			.arg(qPrintable(s_ownerNameColumn))
+				.arg(qPrintable(s_softwareVersionColumn))
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(qPrintable(s_documentIdColumn))
 				.arg(qPrintable(objectId));
@@ -399,6 +455,9 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateLegac
 		if (revisionRecord.contains("Comment")){
 			revisionInfo.comment = revisionRecord.value("Comment").toString();
 		}
+
+		revisionInfo.user = revisionRecord.value(QString::fromUtf8(s_ownerNameColumn)).toString();
+		revisionInfo.softwareVersion = revisionRecord.value(QString::fromUtf8(s_softwareVersionColumn)).toString();
 
 		revisionInfo.isRevisionAvailable = true;
 
@@ -762,8 +821,8 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateOperationDescriptionQue
 			return QString(R"(UPDATE "%1" SET "OwnerId" = '%2', "OwnerName" = '%3', "OperationDescription" = '%4' WHERE "IsActive" = true AND "DocumentId" = '%5')")
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(objectInfo.id))
-				.arg(objectInfo.name)
-				.arg(operationDescription)
+				.arg(SqlEncode(objectInfo.name))
+				.arg(SqlEncode(operationDescription))
 				.arg(qPrintable(objectId))
 				.toUtf8();
 		}
@@ -795,5 +854,3 @@ const ifile::IDeviceBasedPersistence* CSqlDatabaseDocumentDelegateLegacyComp::Fi
 
 
 } // namespace imtdb
-
-

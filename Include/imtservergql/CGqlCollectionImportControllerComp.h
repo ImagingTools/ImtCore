@@ -8,7 +8,7 @@
 // ImtCore includes
 #include <imtservergql/ICollectionImportController.h>
 #include <imthype/IJobQueueManager.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/CollectionImport.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/CollectionImport_fwd.h>
 
 
 namespace imtservergql
