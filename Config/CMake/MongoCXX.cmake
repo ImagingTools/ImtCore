@@ -23,24 +23,24 @@ set (OPENSSL_ROOT_DIR "${IMTCOREDIR}/3rdParty/openssl/1.1/")
 
 
 include_directories(${IMTCOREDIR}/3rdParty/mongocxx/mongo-cxx-driver-3.7.0/include)
-target_link_libraries(${PROJECT_NAME} "${IMTCOREDIR}/3rdParty/mongocxx/mongo-cxx-driver-3.7.0/lib/Debug_VC17_x64/bsoncxx-static.lib")
-target_link_libraries(${PROJECT_NAME} "${IMTCOREDIR}/3rdParty/mongocxx/mongo-cxx-driver-3.7.0/lib/Debug_VC17_x64/mongocxx-static.lib")
+target_link_libraries(${PROJECT_NAME} ${ACF_LIBRARY_LINK_SCOPE} "${IMTCOREDIR}/3rdParty/mongocxx/mongo-cxx-driver-3.7.0/lib/Debug_VC17_x64/bsoncxx-static.lib")
+target_link_libraries(${PROJECT_NAME} ${ACF_LIBRARY_LINK_SCOPE} "${IMTCOREDIR}/3rdParty/mongocxx/mongo-cxx-driver-3.7.0/lib/Debug_VC17_x64/mongocxx-static.lib")
 
 include_directories(${IMTCOREDIR}/3rdParty/mongoc/mongo-c-driver-1.23.2/include/libbson-1.0)
-target_link_libraries(${PROJECT_NAME} "${IMTCOREDIR}/3rdParty/mongoc/mongo-c-driver-1.23.2/lib/Debug_VC17_x64/bson-static-1.0.lib")
+target_link_libraries(${PROJECT_NAME} ${ACF_LIBRARY_LINK_SCOPE} "${IMTCOREDIR}/3rdParty/mongoc/mongo-c-driver-1.23.2/lib/Debug_VC17_x64/bson-static-1.0.lib")
 
 include_directories(${IMTCOREDIR}/3rdParty/mongoc/mongo-c-driver-1.23.2/include/libmongoc-1.0)
-target_link_libraries(${PROJECT_NAME} "${IMTCOREDIR}/3rdParty/mongoc/mongo-c-driver-1.23.2/lib/Debug_VC17_x64/mongoc-static-1.0.lib")
+target_link_libraries(${PROJECT_NAME} ${ACF_LIBRARY_LINK_SCOPE} "${IMTCOREDIR}/3rdParty/mongoc/mongo-c-driver-1.23.2/lib/Debug_VC17_x64/mongoc-static-1.0.lib")
 
 
 include_directories(${IMTCOREDIR}/3rdParty/icu/icu-72.1/include)
-target_link_libraries(${PROJECT_NAME} "${IMTCOREDIR}/3rdParty/icu/icu-72.1/lib/Debug_VC17_x64/sicudtd.lib")
-target_link_libraries(${PROJECT_NAME} "${IMTCOREDIR}/3rdParty/icu/icu-72.1/lib/Debug_VC17_x64/sicuucd.lib")
+target_link_libraries(${PROJECT_NAME} ${ACF_LIBRARY_LINK_SCOPE} "${IMTCOREDIR}/3rdParty/icu/icu-72.1/lib/Debug_VC17_x64/sicudtd.lib")
+target_link_libraries(${PROJECT_NAME} ${ACF_LIBRARY_LINK_SCOPE} "${IMTCOREDIR}/3rdParty/icu/icu-72.1/lib/Debug_VC17_x64/sicuucd.lib")
 
 include_directories(${IMTCOREDIR}/3rdParty/zlib/zlib-1.2.13/include)
-target_link_libraries(${PROJECT_NAME} "${IMTCOREDIR}/3rdParty/zlib/zlib-1.2.13/lib/Debug_VC17_x64/zlib.lib")
+target_link_libraries(${PROJECT_NAME} ${ACF_LIBRARY_LINK_SCOPE} "${IMTCOREDIR}/3rdParty/zlib/zlib-1.2.13/lib/Debug_VC17_x64/zlib.lib")
 
 include_directories(${IMTCOREDIR}/3rdParty/zstd/zstd-1.5.4/include)
-target_link_libraries(${PROJECT_NAME} "${IMTCOREDIR}/3rdParty/zstd/zstd-1.5.4/lib/Debug_VC17_x64/zstd_static.lib")
+target_link_libraries(${PROJECT_NAME} ${ACF_LIBRARY_LINK_SCOPE} "${IMTCOREDIR}/3rdParty/zstd/zstd-1.5.4/lib/Debug_VC17_x64/zstd_static.lib")
 
-target_link_libraries(${PROJECT_NAME} Ws2_32 crypt32 secur32 dnsapi advapi32 bcrypt shlwapi)
+target_link_libraries(${PROJECT_NAME} ${ACF_LIBRARY_LINK_SCOPE} Ws2_32 crypt32 secur32 dnsapi advapi32 bcrypt shlwapi)

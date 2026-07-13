@@ -10,6 +10,6 @@ if(WIN32)
 	
 	include_directories("${PYTHON38DIR}/include")
 	link_directories("${PYTHON38DIR}/libs")
-	target_link_libraries(${PROJECT_NAME} ${PYTHON38DIR}/libs/python38.lib)
+	target_link_libraries(${PROJECT_NAME} ${ACF_LIBRARY_LINK_SCOPE} ${PYTHON38DIR}/libs/python38.lib)
 endif()
 
