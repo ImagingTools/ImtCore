@@ -426,14 +426,14 @@ ViewBase {
 							width: approveBtnText.contentWidth + Style.marginL * 2
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: connectPage.processingRequestId === modelData.id ? Style.inactiveTextColor : Style.successColor
+							color: connectPage.processingRequestId === modelData.id ? Style.inactiveTextColor : "#3FB950"
 
 							Text {
 								id: approveBtnText
 								anchors.centerIn: parent
 								text: connectPage.processingRequestId === modelData.id ? qsTr("Approving...") : qsTr("Approve")
 								font.pixelSize: Style.fontSizeS
-								color: Style.baseColor
+								color: "#FFFFFF"
 							}
 
 							MouseArea {
@@ -456,14 +456,14 @@ ViewBase {
 							width: rejectBtnText.contentWidth + Style.marginL * 2
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: connectPage.processingRequestId === modelData.id ? Style.inactiveTextColor : Style.dangerColor
+							color: connectPage.processingRequestId === modelData.id ? Style.inactiveTextColor : "#DA3633"
 
 							Text {
 								id: rejectBtnText
 								anchors.centerIn: parent
 								text: connectPage.processingRequestId === modelData.id ? qsTr("Rejecting...") : qsTr("Reject")
 								font.pixelSize: Style.fontSizeS
-								color: Style.baseColor
+								color: "#FFFFFF"
 							}
 
 							MouseArea {
@@ -582,7 +582,7 @@ ViewBase {
 								anchors.centerIn: parent
 								text: qsTr("Cancel")
 								font.pixelSize: Style.fontSizeS
-								color: Style.baseColor
+								color: "#FFFFFF"
 							}
 
 							MouseArea {
@@ -690,14 +690,14 @@ ViewBase {
 							width: removeBtnText.contentWidth + Style.marginL * 2
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: Style.dangerColor
+							color: "#DA3633"
 
 							Text {
 								id: removeBtnText
 								anchors.centerIn: parent
 								text: qsTr("Remove")
 								font.pixelSize: Style.fontSizeS
-								color: Style.baseColor
+								color: "#FFFFFF"
 							}
 
 							MouseArea {

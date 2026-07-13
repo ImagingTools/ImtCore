@@ -30,7 +30,7 @@ Item {
 
 			width: parent ? parent.width : Style.sizeHintXS
 			height: Style.sizeHintBXS
-			color: messageType === "error" ? Style.messageErrorBgColor : messageType === "warning" ? Style.messageWarningBgColor : messageType === "info" ? Style.messageInfoBgColor : Style.messageSuccessBgColor
+			color: messageType === "error" ? "#ffcccc" : messageType === "warning" ? "#fff4cc" : messageType === "info" ? "#cce5ff" : "#ccffcc"
 			radius: Style.radiusM
 			border.color: Style.borderColor2
 
@@ -71,7 +71,7 @@ Item {
 				width: 24
 				height: 24
 				radius: 12
-				color: closeMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
+				color: closeMouseArea.containsMouse ? "#dddddd" : "transparent"
 
 				BaseText {
 					anchors.centerIn: parent

@@ -294,8 +294,8 @@ Item {
 			width: parent ? parent.width : Style.sizeHintXS
 			height: contentColumn.height + 2 * Style.marginL
 			radius: Style.radiusM
-			border.color: Style.borderColor
-			color: ticketPopupRoot.notificationType === "assignee" ? Style.notificationAssigneeBgColor : Style.notificationDefaultBgColor
+			border.color: "#bbbbbb"
+			color: ticketPopupRoot.notificationType === "assignee" ? "#d4edda" : "#d6eaf8"
 
 			MouseArea {
 				anchors.fill: parent
@@ -308,7 +308,7 @@ Item {
 						ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
 				}
 				onEntered: ticketPopupRoot.border.color = Style.highlightColor
-				onExited: ticketPopupRoot.border.color = Style.borderColor
+				onExited: ticketPopupRoot.border.color = "#bbbbbb"
 			}
 
 			Column {
@@ -353,7 +353,7 @@ Item {
 				BaseText {
 					width: parent.width
 					text: ticketPopupRoot.preview.split("\n").join(" ")
-					color: Style.subtitleColor
+					color: "#666666"
 					elide: Text.ElideRight
 					maximumLineCount: 1
 					visible: ticketPopupRoot.preview !== ""
@@ -362,7 +362,7 @@ Item {
 				// Hint
 				BaseText {
 					text: qsTr("Click to open →")
-					color: Style.inactiveTextColor
+					color: "#999999"
 				}
 			}
 

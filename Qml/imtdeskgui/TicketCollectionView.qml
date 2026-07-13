@@ -48,16 +48,16 @@ RemoteCollectionView {
 			id: priorityDelegate
 
 			readonly property var _priorityColors: ({
-				"Low": Style.priorityLowColor,
-				"Medium": Style.priorityMediumColor,
-				"High": Style.priorityHighColor,
-				"Critical": Style.priorityCriticalColor
+				"Low": "#3FB950",       // green
+				"Medium": "#D29922",    // amber
+				"High": "#DB6D28",      // orange
+				"Critical": "#F85149"   // red
 			})
 
 			onReused: {
 				var val = priorityDelegate.getValue()
 				priorityLabel.text = val ? qsTr(String(val)) : ""
-				priorityCircle.color = _priorityColors[val] || Style.indicatorInactiveColor
+				priorityCircle.color = _priorityColors[val] || "#8C95A6"
 			}
 
 			Row {
@@ -72,7 +72,7 @@ RemoteCollectionView {
 					width: 10
 					height: 10
 					radius: width / 2
-					color: Style.indicatorInactiveColor
+					color: "#8C95A6"
 				}
 
 				Text {

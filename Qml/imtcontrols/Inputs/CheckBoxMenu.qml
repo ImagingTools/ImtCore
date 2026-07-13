@@ -348,8 +348,8 @@ FocusScope{
 						width: parent.width - Style.marginM;
                         height: parent.height - 2*parent.border.width;
                         radius: parent.radius;
-                        color: Style.baseColor;
-                        fontColor: Style.baseColorInverted;
+                        color: "#ffffff";
+                        fontColor: "#000000";
                         textSize: Style.fontSizeM;
                         borderColorConst: "transparent";
                         placeHolderText: "Поиск";

@@ -4,10 +4,6 @@
 	<file alias="Acf/Style.qml">Qml/Acf/Style.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
-        <file alias="Roboto-Light.ttf">Qml/Fonts/Roboto-Light.ttf</file>
-        <file alias="Roboto-Regular.ttf">Qml/Fonts/Roboto-Regular.ttf</file>
-        <file alias="Roboto-Medium.ttf">Qml/Fonts/Roboto-Medium.ttf</file>
-        <file alias="Roboto-Bold.ttf">Qml/Fonts/Roboto-Bold.ttf</file>
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>
         <file alias="Ubuntu-Medium.ttf">Qml/Fonts/Ubuntu-Medium.ttf</file>
         <file alias="Ubuntu-Bold.ttf">Qml/Fonts/Ubuntu-Bold.ttf</file>

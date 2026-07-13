@@ -247,8 +247,8 @@ void CDesignTokenBasedResourceProviderComp::CreateDefaultPalettes()
 	dark.palette.setColor(QPalette::WindowText, Qt::white);
 	dark.palette.setColor(QPalette::Base, QColor(33, 33, 33));
 	dark.palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
-	dark.palette.setColor(QPalette::ToolTipBase, QColor("#4A3D73"));
-	dark.palette.setColor(QPalette::ToolTipText, QColor("#E5DEFF"));
+	dark.palette.setColor(QPalette::ToolTipBase, Qt::gray);
+	dark.palette.setColor(QPalette::ToolTipText, Qt::lightGray);
 	dark.palette.setColor(QPalette::Text, Qt::lightGray);
 	dark.palette.setColor(QPalette::Button, QColor(53, 53, 53));
 	dark.palette.setColor(QPalette::ButtonText, Qt::lightGray);
@@ -312,4 +312,5 @@ bool CDesignTokenBasedResourceProviderComp::StringToColor(const QString& colorSt
 
 
 } // namespace imtstyle
+
 

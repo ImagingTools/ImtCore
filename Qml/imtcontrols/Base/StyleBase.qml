@@ -32,10 +32,10 @@ StyleComponents {
 	property string language;//deprecated?
 
 	//Font properties
-	property string mainFontSource: "../../../Fonts/Roboto-Regular.ttf";
-	property string boldFontSource: "../../../Fonts/Roboto-Medium.ttf";
-	property string fontFamily: "Roboto";
-	property string fontFamilyBold: "Roboto";
+	property string mainFontSource: "../../../Fonts/Ubuntu-Light.ttf";
+	property string boldFontSource: "../../../Fonts/Ubuntu-Medium.ttf";
+	property string fontFamily: "Verdana";
+	property string fontFamilyBold: "Verdana";
 
 	property alias mainFontLoader: mainFont;
 	property alias boldFontLoader: boldFont;
@@ -257,9 +257,9 @@ StyleComponents {
 	property string baseColor: "white";
 	property string baseColorInverted: "black";
 	property string mainColor: "#e6e6e8";
-	property string firstColor: "#467db4";
+	property string firstColor: "#4682B4";
 	property string secondColor: "#F18C16";
-	property string firstColorHighlight: "#b0c7de";
+	property string firstColorHighlight: "#B0C4DE";
 	property string colorMenuPanel: imagingToolsGradient1;
 
 		//error
@@ -274,14 +274,12 @@ StyleComponents {
 
 		//text
 	property string textColor: "#335777";
-	property string tooltipBaseColor: baseColor;
-	property string tooltipTextColor: textColor;
-	property string titleColor: "#054585";
+	property string titleColor: "#055A85";
 	property string subtitleColor: "#6A6E6F";
-	property string textSelectedColor: "#006bd7";
+	property string textSelectedColor: "#0078d7";
 	property string inactiveTextColor: "#aaaaaa";
 	property string placeHolderTextColor : '#AAA'
-	property string linkColor: "#006BD7";
+	property string linkColor: "#0078D7";
 	property string selectedLinkFromColor: "#1974d2";
 	property string selectedLinkToColor: "#51AC2A";
 
@@ -307,7 +305,7 @@ StyleComponents {
 		//selected
 	property string selectedColor: "#e3eefa";
 	property string tabSelectedColor: "#FF4500";
-	property string iconColorOnSelected: "#1a80e7";
+	property string iconColorOnSelected: "#1a76e7";
 
 		//button
 	property string buttonColor: "#dddddd";
@@ -344,77 +342,7 @@ StyleComponents {
 		//simple colors
 	property string grayColor: "#C2CEDB";
 	property string greenColor: "#00ff00";
-	property string lightBlueColor: "#69a6e3";
-
-		//semantic status colors
-	property string successColor: "#3FB950";
-	property string dangerColor: "#DA3633";
-	property string warningColor: "#D29922";
-
-		//status colors
-	property string statusOpenColor: "#1a7f37";
-	property string statusClosedColor: "#8957e5";
-
-		//priority colors
-	property string priorityLowColor: "#3FB950";
-	property string priorityMediumColor: "#D29922";
-	property string priorityHighColor: "#DB6D28";
-	property string priorityCriticalColor: "#F85149";
-
-		//bubble / chat colors
-	property string bubbleColor: "#DFECF9";
-	property string otherBubbleColor: "#F1F3F7";
-	property string myBubbleColor: "#EAF3FF";
-
-		//section / card
-	property string sectionLabelColor: "#8C95A6";
-	property string cardBorderColorFaded: "#d0d0d266";
-
-		//accent background
-	property string accentBgLightColor: "#DFECF9";
-	property string accentBorderLightColor: "#B4D3F2";
-	property string accentBadgeBgColor: "#E5F0FB";
-
-		//hover backgrounds
-	property string hoverBgColor: "#F0F2F5";
-	property string hoverBgActiveColor: "#E6F4EA";
-
-		//attachment backgrounds
-	property string focusedAttachmentBgColor: "#edf6ff";
-	property string imageAttachmentBgColor: "#eef3f8";
-	property string fileAttachmentBgColor: "#f6f9fc";
-
-		//composite colors
-	property string compositeColor: "#bcd2e8";
-	property string compositeSelectedColor: "#1161b1";
-
-		//notification backgrounds
-	property string notificationAssigneeBgColor: "#d4edda";
-	property string notificationDefaultBgColor: "#d6e7f8";
-
-		//message type backgrounds
-	property string messageErrorBgColor: "#ffcccc";
-	property string messageWarningBgColor: "#fff4cc";
-	property string messageInfoBgColor: "#cce5ff";
-	property string messageSuccessBgColor: "#ccffcc";
-
-		//alert
-	property string alertBgColor: "#f9dedc";
-
-		//overlay
-	property string overlayDimColor: "#80000000";
-
-		//chart colors
-	property string chartAxisColor: "#999999";
-	property string chartGridColor: "#dddddd";
-	property string chartFallbackColor: "#cccccc";
-
-		//indicator colors
-	property string indicatorActiveColor: "#3FB950";
-	property string indicatorInactiveColor: "#8C95A6";
-
-		//input background
-	property string inputBgInactiveColor: "#FAFBFC";
+	property string lightBlueColor: "#69b8e3";
 
 	//other parameters
 	property real maximumFlickVelocity: 75
@@ -640,12 +568,6 @@ StyleComponents {
 	function parseStyleTheme(themeType){
 		if (themeType.containsKey("source")){
 			let dataSource = themeType.getData("source");
-
-			let styleData = dataSource.getData("Style");
-			if (styleData.containsKey("Name")){
-				styleContainer.theme = styleData.getData("Name");
-			}
-
 			styleContainer.borderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", dataSource);
 			styleContainer.baseColor = styleContainer.getThemeColor("ActiveColors", "Base", dataSource);
 			styleContainer.alternateBaseColor = styleContainer.getThemeColor("ActiveColors", "AlternateBase", dataSource);
@@ -653,8 +575,6 @@ StyleComponents {
 			styleContainer.backgroundColor2 = styleContainer.getThemeColor("ActiveColors", "Background2", dataSource);
 
 			styleContainer.textColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource);
-			styleContainer.tooltipBaseColor = styleContainer.getThemeColor("ActiveColors", "ToolTipBase", dataSource);
-			styleContainer.tooltipTextColor = styleContainer.getThemeColor("ActiveColors", "ToolTipText", dataSource);
 			styleContainer.textSelectedColor = styleContainer.getThemeColor("ActiveColors", "TextSelectedBackground", dataSource);
 			styleContainer.shadowColor = styleContainer.getThemeColor("ActiveColors", "Shadow", dataSource);
 

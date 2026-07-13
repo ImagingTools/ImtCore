@@ -25,12 +25,12 @@ ControlBase {
 
     property int fontPixelSize: Style.fontSizeM;
     property bool fontBold: false;
-    property string fontColor: Style.tooltipTextColor;
+    property string fontColor: Style.textColor;
     property int textMargin: Style.marginXS;
     property int horizontalAlignment: Text.AlignHCenter;
 
 	property int radius: Style.radiusM;
-    property string color: Style.tooltipBaseColor;
+    property string color: Style.baseColor;
     property int borderWidth: 1;
     property string borderColor: Style.borderColor;
 

@@ -6,8 +6,8 @@ Item{
 	id: chart
 
 	property var bars: [] // [{ label: "29 Oct", segments: [{label:"Trial", value:10, color:"#4CAF50"}, ...]}]
-	property color axisColor: Style.chartAxisColor
-	property color gridColor: Style.chartGridColor
+	property color axisColor: "#999"
+	property color gridColor: "#ddd"
 	property color textColor: Style.textColor
 	property real barWidth: 28
 	property bool showValues: false
@@ -36,7 +36,7 @@ Item{
 			for (let seg of bar.segments || []) {
 				if (!map[seg.label]) {
 					map[seg.label] = {
-						color: seg.color || Style.chartFallbackColor,
+						color: seg.color || "#ccc",
 						total: 0
 					}
 				}
@@ -166,7 +166,7 @@ Item{
 					if (isHighlighted){
 						ctx.fillStyle = Functions.darkenColor(seg.color,1.4)
 					} else{
-						ctx.fillStyle = seg.color || Style.chartFallbackColor
+						ctx.fillStyle = seg.color || "#ccc"
 					}
 
 					ctx.fillRect(x, y, barWidth, segHeight)
@@ -238,7 +238,7 @@ Item{
 				Text{
 					id: labelText
 					text: modelData.label + " (" + modelData.total + ")"
-					color: chart.legendClickable ? Style.linkColor : chart.textColor
+					color: chart.legendClickable ? "#0b5ed7":chart.textColor
 					font.pixelSize: Style.fontSizeS
 					anchors.verticalCenter: parent.verticalCenter
 

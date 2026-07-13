@@ -727,21 +727,21 @@ DocumentViewBase {
 		readonly property string cardBorderColor: Style.borderColor
 		// Pre-faded variant of cardBorderColor used by inputs to render a subtle
 		// (~40% opacity, alpha 0x66) border in their unfocused state.
-		readonly property string cardBorderColorFaded: Style.cardBorderColorFaded
+		readonly property string cardBorderColorFaded: "#d0d0d266"
 		readonly property string pageBgColor: Style.backgroundColor2
-		readonly property string accentColor: Style.imaginToolsAccentColor
+		readonly property string accentColor: "#5b8fd6"
 		readonly property string labelColor: Style.textColor
 		readonly property real avatarSize: 36
 		readonly property real accentDividerHeight: 2
 		readonly property real badgeHeight: 22
-		readonly property string accentBgLight: Style.accentBgLightColor
-		readonly property string accentBorderLight: Style.accentBorderLightColor
-		readonly property string accentBadgeBg: Style.accentBadgeBgColor
+		readonly property string accentBgLight: "#DFECF9"
+		readonly property string accentBorderLight: "#B4D3F2"
+		readonly property string accentBadgeBg: "#E5F0FB"
 		readonly property string chatBgColor: Style.baseColor
-		readonly property string bubbleColor: Style.bubbleColor
-		readonly property string otherBubbleColor: Style.otherBubbleColor
-		readonly property string myBubbleColor: Style.myBubbleColor
-		readonly property string sectionLabelColor: Style.sectionLabelColor
+		readonly property string bubbleColor: "#DFECF9"
+		readonly property string otherBubbleColor: "#F1F3F7"
+		readonly property string myBubbleColor: "#EAF3FF"
+		readonly property string sectionLabelColor: "#8C95A6"
 		readonly property string timestampColor: Style.inactiveTextColor
 		readonly property real columnGap: Style.spacingL
 		readonly property real avatarOverlap: -8
@@ -752,9 +752,9 @@ DocumentViewBase {
 		readonly property real imageAttachmentHeight: 96
 		readonly property real fileAttachmentMaxWidth: 240
 		readonly property real fileAttachmentHeight: 44
-		readonly property string focusedAttachmentBgColor: Style.focusedAttachmentBgColor
-		readonly property string imageAttachmentBgColor: Style.imageAttachmentBgColor
-		readonly property string fileAttachmentBgColor: Style.fileAttachmentBgColor
+		readonly property string focusedAttachmentBgColor: "#ECF3FF"
+		readonly property string imageAttachmentBgColor: "#EEF2F8"
+		readonly property string fileAttachmentBgColor: "#F6F8FC"
 		readonly property string chatHintBgColor: editView.cardColor
 		// Fixed widths for top groups (left = Title/Desc/Context and Messages, right = Properties)
 		readonly property real detailsWidth: 700
@@ -850,7 +850,7 @@ DocumentViewBase {
 									width: visible ? 28 : 0
 									height: width
 									radius: width / 2
-									color: titleEditBtnMa.containsMouse ? Style.hoverBgColor : "transparent"
+									color: titleEditBtnMa.containsMouse ? "#F0F2F5" : "transparent"
 									anchors.verticalCenter: parent.verticalCenter
 									
 									Image {
@@ -943,7 +943,7 @@ DocumentViewBase {
 									width: visible ? 28 : 0
 									height: width
 									radius: width/2
-									color: titleCloseBtnMa.containsMouse ? Style.hoverBgActiveColor : Style.hoverBgColor
+									color: titleCloseBtnMa.containsMouse ? "#E6F4EA" : "#F0F2F5"
 									anchors.verticalCenter: parent.verticalCenter
 									
 									Image {
@@ -974,7 +974,7 @@ DocumentViewBase {
 									width: visible ? 28 : 0
 									height: width
 									radius: width/2
-									color: titleConfirmBtnMa.containsMouse ? Style.hoverBgActiveColor : Style.hoverBgColor
+									color: titleConfirmBtnMa.containsMouse ? "#E6F4EA" : "#F0F2F5"
 									anchors.verticalCenter: parent.verticalCenter
 									
 									Image {
@@ -1897,7 +1897,7 @@ DocumentViewBase {
 									radius: 13
 									border.width: 2
 									border.color: editView.cardColor
-									color: modelData.id === root.currentUserId ? editView.accentColor : Style.sectionLabelColor
+									color: modelData.id === root.currentUserId ? editView.accentColor : "#9AA5B8"
 									
 									Text {
 										anchors.centerIn: parent
@@ -2110,7 +2110,7 @@ DocumentViewBase {
 														width: editView.avatarSize
 														height: editView.avatarSize
 														radius: editView.avatarSize / 2
-														color: commentDelegate.isMe ? editView.accentColor : Style.sectionLabelColor
+														color: commentDelegate.isMe ? editView.accentColor : "#9AA5B8"
 														
 														Text {
 															anchors.centerIn: parent
@@ -2163,7 +2163,7 @@ DocumentViewBase {
 													width: parent.width
 													height: replyBubbleCol.height + Style.paddingS
 													radius: Style.radiusM
-													color: replyIndicatorMA.containsMouse ? Style.accentBorderLightColor : Style.accentBgLightColor
+													color: replyIndicatorMA.containsMouse ? "#C7D2E6" : "#D7DFEE"
 													
 													MouseArea {
 														id: replyIndicatorMA
@@ -2749,14 +2749,14 @@ DocumentViewBase {
 									   ? (sendBtnMa.pressed ? Qt.darker(editView.accentColor, 1.15)
 															: sendBtnMa.containsMouse ? Qt.lighter(editView.accentColor, 1.1)
 																					  : editView.accentColor)
-									   : Style.borderColor
+									   : "#D0D5DD"
 								
 								Text {
 									id: sendBtnText
 									anchors.centerIn: parent
 									text: root.uploadsInProgress > 0 ? qsTr("Uploading...") : qsTr("Send")
 									font.pixelSize: Style.fontSizeM
-									color: commentButton.enabled ? Style.baseColor : Style.sectionLabelColor
+									color: commentButton.enabled ? Style.baseColor : "#98A2B3"
 								}
 								
 								// Hidden functional Button for enabled state

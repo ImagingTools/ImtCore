@@ -271,14 +271,14 @@ RemoteCollectionView {
 							width: acceptBtnLabel.contentWidth + 2 * Style.marginL
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: Style.successColor
+							color: "#3FB950"
 
 							Text {
 								id: acceptBtnLabel
 								anchors.centerIn: parent
 								text: qsTr("Accept")
 								font.pixelSize: Style.fontSizeS
-								color: Style.baseColor
+								color: "#FFFFFF"
 							}
 
 							MouseArea {
@@ -297,14 +297,14 @@ RemoteCollectionView {
 							width: rejectBtnLabel.contentWidth + 2 * Style.marginL
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: Style.dangerColor
+							color: "#DA3633"
 
 							Text {
 								id: rejectBtnLabel
 								anchors.centerIn: parent
 								text: qsTr("Reject")
 								font.pixelSize: Style.fontSizeS
-								color: Style.baseColor
+								color: "#FFFFFF"
 							}
 
 							MouseArea {
@@ -387,7 +387,7 @@ RemoteCollectionView {
 			onReused: {
 				var val = isActiveDelegate.getValue()
 				isActiveLabel.text = val ? qsTr("Active") : qsTr("Inactive")
-				isActiveIndicator.color = val ? Style.indicatorActiveColor : Style.indicatorInactiveColor
+				isActiveIndicator.color = val ? "#3FB950" : "#8C95A6"
 			}
 
 			Row {
@@ -402,7 +402,7 @@ RemoteCollectionView {
 					width: 10
 					height: 10
 					radius: width / 2
-					color: Style.indicatorInactiveColor
+					color: "#8C95A6"
 				}
 
 				Text {

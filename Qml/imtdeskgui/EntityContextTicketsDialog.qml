@@ -34,7 +34,7 @@ Dialog {
 	readonly property string cardBorderColor: Style.borderColor
 	readonly property string pageBgColor: Style.backgroundColor2
 	readonly property string accentColor: Style.imaginToolsAccentColor
-	readonly property string sectionLabelColor: Style.sectionLabelColor
+	readonly property string sectionLabelColor: "#8C95A6"
 
 	signal ticketCreated()
 	signal ticketCreateFailed(string message)
@@ -273,7 +273,7 @@ Dialog {
 									width: ticketCountText.contentWidth + Style.paddingS * 2
 									height: 22
 									radius: 11
-									color: Style.accentBadgeBgColor
+									color: "#E5F0FB"
 									anchors.verticalCenter: parent.verticalCenter
 
 									Text {
@@ -310,7 +310,7 @@ Dialog {
 									delegate: Rectangle {
 										width: ticketsListView.width
 										height: ticketDelegateCol.height + Style.paddingS * 2
-										color: ticketDelegateMa.containsMouse ? Style.fileAttachmentBgColor : "transparent"
+										color: ticketDelegateMa.containsMouse ? "#F6F8FC" : "transparent"
 										radius: Style.radiusS
 
 										Column {

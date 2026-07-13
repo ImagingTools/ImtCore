@@ -20,9 +20,9 @@ Rectangle{
 	property real minSize: secondSize;
 	property real secondSize: Style.controlHeightS;
 	property int indicatorRadius: Style.radiusS;
-    property string backgroundColor: Style.scrollBackgroundColor !== undefined ? Style.scrollBackgroundColor  : Style.imagingToolsGradient0;
-    property string indicatorColor: Style.scrollIndicatorColor !== undefined ? Style.scrollIndicatorColor : Style.imagingToolsGradient3;
-    property string highlightColor: Style.scrollHighlightColor !== undefined ? Style.scrollHighlightColor : Style.imagingToolsGradient0;
+    property string backgroundColor: Style.scrollBackgroundColor !== undefined ? Style.scrollBackgroundColor  : "#efefef";
+    property string indicatorColor: Style.scrollIndicatorColor !== undefined ? Style.scrollIndicatorColor : "lightgray";
+    property string highlightColor: Style.scrollHighlightColor !== undefined ? Style.scrollHighlightColor : "lightgray";
 
     property bool canFade: false;
     property bool isMoving: false;

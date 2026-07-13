@@ -1,6 +1,6 @@
 QWidget {
-	font-family: "Roboto";
-	font-size: 10pt;
+	font-family: "Barlow";
+	font-size: 8pt;
 }
 
 QWidget#ResultFrame {

@@ -10,7 +10,7 @@ Rectangle {
 	width: Style.sizeHintL;
 	height: Style.controlHeightL;
 
-    color: Style.alertBgColor;
+    color: "#f9dedc";
 
 	property int margin: Style.marginM;
     property string message: "";

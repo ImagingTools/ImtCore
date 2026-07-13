@@ -27,9 +27,9 @@ ListView{
 
 	property ListModel dayOfWeekModel: ListModel{};
 
-	property string color: Style.baseColor;
-	property string cellColor: Style.baseColor;
-	property string fontColor_cell: Style.baseColorInverted;
+	property string color: "#ffffff";
+	property string cellColor: "#ffffff";
+	property string fontColor_cell: "#000000";
 	property int fontSize_cell: 12;
 
 	property int gridCellWidth: Math.trunc(width/7);

@@ -145,7 +145,7 @@ Rectangle {
 							width: 10
 							height: 10
 							radius: 5
-							color: (model.status || 0) === 0 ? Style.statusOpenColor : Style.statusClosedColor
+							color: (model.status || 0) === 0 ? "#1a7f37" : "#8957e5"
 							anchors.verticalCenter: parent.verticalCenter
 						}
 

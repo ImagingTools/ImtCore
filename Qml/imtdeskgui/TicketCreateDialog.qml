@@ -97,7 +97,7 @@ Rectangle {
 					radius: Style.radiusM
 					border.color: descriptionInput.activeFocus ? Style.imaginToolsAccentColor : Style.borderColor
 					border.width: descriptionInput.activeFocus ? 2 : 1
-					color: descriptionInput.activeFocus ? Style.baseColor : Style.inputBgInactiveColor
+					color: descriptionInput.activeFocus ? Style.baseColor : "#FAFBFC"
 
 					Flickable {
 						id: descFlick
@@ -224,7 +224,7 @@ Rectangle {
 					width: Style.buttonWidthM
 					height: Style.buttonHeightM
 					radius: Style.radiusS
-					color: titleInput.text.trim().length > 0 ? Style.statusOpenColor : Style.buttonInactiveColor
+					color: titleInput.text.trim().length > 0 ? "#1a7f37" : Style.buttonInactiveColor
 
 					Text {
 						anchors.centerIn: parent

@@ -30,7 +30,7 @@ TableCellDelegateBase {
 		font.pixelSize: Style.fontSizeM
 		font.family: Style.fontFamily
 		elide: Text.ElideRight
-		color: Style.linkColor
+		color: "#0b5ed7"
 		text: objectLinkDelegate.text
 	}
 	
