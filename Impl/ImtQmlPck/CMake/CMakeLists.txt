@@ -4,9 +4,10 @@ include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME} ${ACF_QT_MODULE_LINK_SCOPE} Qt${QT_VERSION_MAJOR}::QuickWidgets)
-target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE} imtbasesdl)
-target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE} imtqml imtgui imtgql imtauth imtdb imtserverapp imtcom imtbase imtservergql)
+target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE}
+	imtqml
+	imtbasesdl
+	imtserverapp)
 
 if(WIN32)
 	target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE} User32 Advapi32)
@@ -14,4 +15,3 @@ if(WIN32)
 	set(files \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.arp\")
 	windeploy(${PROJECT_NAME} "" "${files}")
 endif()
-

@@ -102,7 +102,7 @@ add_dependencies(ImtDdlPck imtddl)
 
 #------ DesignToken ------
 add_subdirectory("${IMPL_DIR}/DesignTokenCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DesignTokenCreator")
-add_dependencies(DesignTokenCreator imtbase imtdesign)
+add_dependencies(DesignTokenCreator imtbase)
 imt_chain_windeploy_target(DesignTokenCreator)
 
 #------ DDLCodeCreator ------

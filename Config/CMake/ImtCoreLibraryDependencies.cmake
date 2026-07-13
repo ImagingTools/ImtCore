@@ -18,16 +18,10 @@
 # CMake forbids mixing the plain and keyword signatures on the same target. For
 # static libraries the dependency still propagates transitively to consumers.
 #
-# The dependencies below are derived from the #include graph of each library and
-# the historical explicit target_link_libraries() lists. Dependencies onto the
-# underlying ACF / ACF-Solutions / IAcf foundations are expressed through the
-# Acf::<lib> / AcfSln::<lib> / IAcf::<lib> imported targets; entries whose target
-# does not exist in the current configuration (for example when the foundations
-# are still consumed through the legacy environment-variable shim rather than
-# find_package, or when a feature-gated library is not built) are silently
-# ignored. A few libraries are mutually dependent (e.g. imtbase <-> imtstyle and
-# imt3d <-> imt3dgui); CMake explicitly allows cyclic dependencies between static
-# libraries.
+# Dependencies are declared *minimally*: each library lists only its direct
+# dependencies; transitive dependencies propagate automatically through the
+# graph. Do not add a dependency that is already reachable through another
+# listed target.
 #
 # Included once, centrally, from Build/CMake/CMakeLists.txt after all library
 # targets have been created.
@@ -49,73 +43,102 @@ function(imt_declare_library_dependencies target)
 	endforeach()
 endfunction()
 
-imt_declare_library_dependencies(imt3d              	Acf::i3d Acf::icomp Acf::idoc Acf::ifile Acf::iimg Acf::ilog Acf::imath Acf::iser Acf::istd AcfSln::icalib)
-imt_declare_library_dependencies(imt3dgui           	Acf::ibase Acf::imod Acf::iqtgui Acf::istd imt3d imt3dview)
-imt_declare_library_dependencies(imt3dview          	Acf::icomp Acf::imod Acf::istd imt3d imt3dgui)
-imt_declare_library_dependencies(imtapp             	Acf::icomp Acf::ifile Acf::iser Acf::istd imtbase)
-imt_declare_library_dependencies(imtauth            	Acf::icomp Acf::idoc Acf::ifile Acf::iimg Acf::ilog Acf::imod Acf::iprm Acf::iqt Acf::iser Acf::istd AcfSln::iauth imtbase imtcrypt imtdoc imtlic imtmail)
-imt_declare_library_dependencies(imtauthdb          	Acf::icomp Acf::idoc Acf::imod Acf::iprm Acf::iser Acf::istd imtauth imtbase imtdb imtgql imtlic)
-imt_declare_library_dependencies(imtauthgql         	Acf::ibase Acf::icomp Acf::ilog Acf::imod Acf::iprm Acf::iqt Acf::iser Acf::istd AcfSln::iauth imtauth imtauthsdl imtbase imtbasesdl imtclientgql imtcrypt imtdb imtdoc imtgql imtlic imtqml imtrest imtsdl imtserverapp imtservergql)
-imt_declare_library_dependencies(imtauthgui         	Acf::ibase Acf::ifile Acf::ifilegui Acf::iimg Acf::ilog Acf::imod Acf::iprm Acf::iqt Acf::iqtgui Acf::istd AcfSln::iauth imtauth imtbase imtcom imtgui imtqml)
+# Declare Qt module dependencies for an ImtCore library. Uses the
+# ACF_QT_MODULE_LINK_SCOPE variable (typically PRIVATE) rather than
+# ACF_LIBRARY_LINK_SCOPE. Entries whose target does not exist are silently
+# ignored (for example optional Qt modules on specific platforms).
+function(imt_declare_qt_dependencies target)
+	if(NOT TARGET ${target})
+		return()
+	endif()
+
+	foreach(dependency IN LISTS ARGN)
+		if(TARGET ${dependency})
+			target_link_libraries(${target} ${ACF_QT_MODULE_LINK_SCOPE} ${dependency})
+		endif()
+	endforeach()
+endfunction()
+
+# ---------------------------------------------------------------------------
+# Inter-library dependencies (minimal direct deps only; transitive propagation
+# is relied upon for indirect deps).
+#
+# Key transitive chains (for reference when adding new entries):
+#   imtbase → Acf::{ibase,icomp,idoc,ifile,ilog,imod,iprm,iqt,iser,istd}
+#             AcfSln::{iauth,icomm,iinsp,imeas} imtfile imtstyle
+#   imtfile → Acf::{ifile,ilog,istd} AcfSln::ifileproc
+#   imtauth → imtbase imtcrypt imtdoc imtlic imtmail + Acf::iimg
+#   imtdb   → imtapp imtauth imtcol imtrest
+#   imtrest → imtclientgql imtcom imtservergql
+# ---------------------------------------------------------------------------
+
+imt_declare_library_dependencies(imt3d              	Acf::i3d Acf::iimg Acf::imath AcfSln::icalib)
+imt_declare_library_dependencies(imt3dgui           	Acf::iqtgui imt3d imt3dview)
+imt_declare_library_dependencies(imt3dview          	imt3d imt3dgui)
+imt_declare_library_dependencies(imtapp             	imtbase)
+imt_declare_library_dependencies(imtauth            	Acf::iimg imtbase imtcrypt imtdoc imtlic imtmail)
+imt_declare_library_dependencies(imtauthdb          	imtauth imtdb imtgql)
+imt_declare_library_dependencies(imtauthgql         	imtauthsdl imtbasesdl imtclientgql imtdb imtqml imtrest imtserverapp imtservergql)
+imt_declare_library_dependencies(imtauthgui         	Acf::ifilegui Acf::iqtgui imtauth imtcom imtgui imtqml)
 imt_declare_library_dependencies(imtbase            	Acf::ibase Acf::icomp Acf::idoc Acf::ifile Acf::ilog Acf::imod Acf::iprm Acf::iqt Acf::iser Acf::istd AcfSln::iauth AcfSln::icomm AcfSln::iinsp AcfSln::imeas imtfile imtstyle)
-imt_declare_library_dependencies(imtchat            	Acf::icomp Acf::iser Acf::istd imtbase imtdb imtrest)
-imt_declare_library_dependencies(imtchatdb          	Acf::imod Acf::iprm imtbase imtchat imtdb)
-imt_declare_library_dependencies(imtchatgql         	Acf::istd imtbase imtbasesdl imtchat imtchatsdl imtdoc imtgql imtservergql)
-imt_declare_library_dependencies(imtclientgql       	Acf::ibase Acf::icomp Acf::idoc Acf::ilog Acf::imod Acf::iprm Acf::iser Acf::istd imtauth imtbase imtbasesdl imtcom imtgql imtrest imtservergql)
-imt_declare_library_dependencies(imtcol             	Acf::icomp Acf::ilog Acf::iser Acf::istd imtbase)
-imt_declare_library_dependencies(imtcom             	Acf::icomp Acf::ifile Acf::ilog Acf::iprm Acf::iser Acf::istd imtbase imtclientgql imtgql imtrest)
-imt_declare_library_dependencies(imtcrypt           	Acf::icomp Acf::ifile Acf::ilog Acf::imod Acf::iprm Acf::istd imtbase)
-imt_declare_library_dependencies(imtdb              	Acf::icomp Acf::idoc Acf::ifile Acf::ilog Acf::imod Acf::iprm Acf::iser Acf::istd imtapp imtauth imtbase imtcol imtrest)
-imt_declare_library_dependencies(imtdbgql           	Acf::idoc Acf::iprm Acf::istd imtbase imtcom imtdb imtgql imtrest imtservergql)
-imt_declare_library_dependencies(imtdbgui           	Acf::iprm Acf::iqtgui Acf::istd imtbase imtdb)
+imt_declare_library_dependencies(imtchat            	imtbase imtdb imtrest)
+imt_declare_library_dependencies(imtchatdb          	imtchat imtdb)
+imt_declare_library_dependencies(imtchatgql         	imtbasesdl imtchat imtchatsdl imtdoc imtgql imtservergql)
+imt_declare_library_dependencies(imtclientgql       	imtauth imtbasesdl imtcom imtgql imtservergql)
+imt_declare_library_dependencies(imtcol             	imtbase)
+imt_declare_library_dependencies(imtcom             	imtbase imtclientgql imtgql imtrest)
+imt_declare_library_dependencies(imtcrypt           	imtbase)
+imt_declare_library_dependencies(imtdb              	imtapp imtauth imtcol imtrest)
+imt_declare_library_dependencies(imtdbgql           	imtcom imtdb imtgql imtrest imtservergql)
+imt_declare_library_dependencies(imtdbgui           	Acf::iqtgui imtdb)
 imt_declare_library_dependencies(imtddl             	Acf::ilog Acf::iprm Acf::istd AcfSln::iproc)
-imt_declare_library_dependencies(imtdesign          	Acf::ifile Acf::ilog Acf::iprm Acf::istd imtbase imtstyle)
-imt_declare_library_dependencies(imtdesk            	Acf::icomp Acf::iser Acf::istd imtauth imtbase imtdoc)
-imt_declare_library_dependencies(imtdeskdb          	Acf::icomp Acf::iprm imtauth imtbase imtdb imtdesk imtgql)
-imt_declare_library_dependencies(imtdeskgql         	Acf::ibase Acf::imod Acf::iprm Acf::istd imtauth imtbase imtchat imtdesk imtdesksdl imtdoc imtgql imtservergql)
-imt_declare_library_dependencies(imtdev             	Acf::iattr Acf::icomp Acf::idoc Acf::ifile Acf::ilog Acf::imod Acf::iprm Acf::iser Acf::istd imtbase)
-imt_declare_library_dependencies(imtdevgui          	Acf::iprm Acf::iqtgui Acf::iwidgets imtbase imtdev)
-imt_declare_library_dependencies(imtdoc             	Acf::idoc Acf::ilog Acf::imod Acf::iser Acf::istd imtbase)
+imt_declare_library_dependencies(imtdesign          	imtbase)
+imt_declare_library_dependencies(imtdesk            	imtauth imtdoc)
+imt_declare_library_dependencies(imtdeskdb          	imtdb imtdesk imtgql)
+imt_declare_library_dependencies(imtdeskgql         	imtchat imtdesk imtdesksdl imtdoc imtgql imtservergql)
+imt_declare_library_dependencies(imtdev             	Acf::iattr imtbase)
+imt_declare_library_dependencies(imtdevgui          	Acf::iqtgui Acf::iwidgets imtdev)
+imt_declare_library_dependencies(imtdoc             	imtbase)
 imt_declare_library_dependencies(imtej              	Acf::iprm Acf::iqt Acf::istd)
 imt_declare_library_dependencies(imtfile            	Acf::ifile Acf::ilog Acf::istd AcfSln::ifileproc)
-imt_declare_library_dependencies(imtgeo             	Acf::idoc Acf::imod Acf::iprm Acf::iser Acf::istd imtbase imtcol imtdb imtservergql)
-imt_declare_library_dependencies(imtgql             	Acf::iqt Acf::iser Acf::istd imtappsdl imtauth imtbase imtcom imtrest)
-imt_declare_library_dependencies(imtgqltest         	Acf::ipackage Acf::istd imtbase imtcom imtdb imtgql imtrest)
-imt_declare_library_dependencies(imtgui             	Acf::iattr Acf::ibase Acf::icomp Acf::idoc Acf::ifile Acf::ifilegui Acf::ilog Acf::imod Acf::iprm Acf::iqtdoc Acf::iqtgui Acf::iser Acf::istd Acf::iwidgets AcfSln::iauth AcfSln::imeas imtbase imtcol imtstyle imtwidgets)
-imt_declare_library_dependencies(imtguigql          	Acf::iprm imtservergql)
+imt_declare_library_dependencies(imtgeo             	imtcol imtdb imtservergql)
+imt_declare_library_dependencies(imtgql             	imtappsdl imtauth imtcom imtrest)
+imt_declare_library_dependencies(imtgqltest         	Acf::ipackage imtcom imtdb imtgql imtrest)
+imt_declare_library_dependencies(imtgui             	Acf::iattr Acf::ifilegui Acf::iqtdoc Acf::iqtgui Acf::iwidgets imtbase imtcol imtwidgets)
+imt_declare_library_dependencies(imtguigql          	imtservergql)
 imt_declare_library_dependencies(imthttp            	imtcom)
-imt_declare_library_dependencies(imthype            	Acf::ibase Acf::icomp Acf::idoc Acf::ilog Acf::imod Acf::iprm Acf::iser Acf::istd AcfSln::iinsp AcfSln::iproc imtbase)
-imt_declare_library_dependencies(imthypedb          	Acf::iser imtbase imtdb imthype)
-imt_declare_library_dependencies(imthypegui         	Acf::ibase Acf::ifile Acf::iimg Acf::imod Acf::iprm Acf::iqtgui Acf::istd imtbase imtgui imthype imtwidgets)
-imt_declare_library_dependencies(imtimg             	Acf::idoc Acf::iimg Acf::imod imtbase)
-imt_declare_library_dependencies(imtlic             	Acf::icomp Acf::idoc Acf::ifile Acf::ilog Acf::imod Acf::iprm Acf::iqt Acf::iser Acf::istd AcfSln::iauth imtbase imtcrypt imtrest)
-imt_declare_library_dependencies(imtlicdb           	Acf::iprm imtbase imtdb imtlic)
-imt_declare_library_dependencies(imtlicgql          	Acf::icomp Acf::ifile Acf::ilog Acf::iprm Acf::istd imtauth imtbase imtdb imtgui imtguigql imtlic imtlicsdl imtservergql imtwidgets)
-imt_declare_library_dependencies(imtlicgui          	Acf::ifile Acf::ifilegui Acf::ilog Acf::imod Acf::iprm Acf::iqtgui Acf::iser Acf::istd imtauth imtbase imtcrypt imtgui imtlic)
-imt_declare_library_dependencies(imtlog             	Acf::ibase Acf::icomp Acf::ifile Acf::ilog Acf::imod Acf::iser Acf::istd AcfSln::iauth imtbase imtfile)
-imt_declare_library_dependencies(imtloggui          	Acf::ibase Acf::icomp Acf::idoc Acf::ilog Acf::imod Acf::iprm Acf::iqtgui Acf::iser Acf::istd Acf::iwidgets AcfSln::imeas imtbase imtlog)
+imt_declare_library_dependencies(imthype            	Acf::iimg AcfSln::iinsp AcfSln::iproc imtbase)
+imt_declare_library_dependencies(imthypedb          	imtdb imthype)
+imt_declare_library_dependencies(imthypegui         	Acf::iqtgui imtgui imthype imtwidgets)
+imt_declare_library_dependencies(imtimg             	Acf::iimg imtbase)
+imt_declare_library_dependencies(imtlic             	imtbase imtcrypt imtrest)
+imt_declare_library_dependencies(imtlicdb           	imtdb imtlic)
+imt_declare_library_dependencies(imtlicgql          	imtguigql imtlic imtlicsdl imtservergql imtwidgets)
+imt_declare_library_dependencies(imtlicgui          	Acf::ifilegui Acf::iqtgui imtauth imtcrypt imtgui imtlic)
+imt_declare_library_dependencies(imtlog             	imtbase imtfile)
+imt_declare_library_dependencies(imtloggui          	Acf::iqtgui Acf::iwidgets imtlog)
 imt_declare_library_dependencies(imtmail            	Acf::icomp Acf::ilog Acf::iprm Acf::iser Acf::istd)
-imt_declare_library_dependencies(imtmdbx            	Acf::icomp Acf::ifile Acf::ilog Acf::imod Acf::iprm Acf::istd imtauth imtbase imtbasesdl imtdb imtserverapp)
-imt_declare_library_dependencies(imtmongo           	Acf::idoc Acf::ifile Acf::ilog Acf::imod Acf::iprm Acf::istd imtbase imtdb)
+imt_declare_library_dependencies(imtmdbx            	imtauth imtbasesdl imtdb imtserverapp)
+imt_declare_library_dependencies(imtmongo           	imtdb)
 imt_declare_library_dependencies(imtoas             	Acf::istd)
 imt_declare_library_dependencies(imtpy              	Acf::iattr Acf::ibase Acf::icomp Acf::ifile Acf::ilog Acf::iprm AcfSln::iproc)
-imt_declare_library_dependencies(imtqml             	Acf::ibase Acf::icomp Acf::idoc Acf::ilog Acf::imod Acf::iprm Acf::iqt Acf::iqtgui Acf::istd imtbase imtclientgql imtcom imtdoc imtgql)
+imt_declare_library_dependencies(imtqml             	Acf::iqtgui imtbase imtclientgql imtcom imtdoc imtgql)
 imt_declare_library_dependencies(imtqml2d           	Acf::i2d Acf::iimg Acf::imod)
-imt_declare_library_dependencies(imtrepo            	Acf::idoc Acf::ifile Acf::ilog Acf::imod Acf::iser Acf::istd AcfSln::iauth imtbase imtfile)
-imt_declare_library_dependencies(imtreport          	Acf::i2d Acf::ibase Acf::icmm Acf::icomp Acf::idoc Acf::iimg Acf::imod Acf::iprm Acf::iser Acf::istd)
-imt_declare_library_dependencies(imtreportgui       	Acf::i2d Acf::ibase Acf::icomp Acf::ifile Acf::ilog Acf::iqtgui imtreport)
-imt_declare_library_dependencies(imtrest            	Acf::ibase Acf::icomp Acf::ifile Acf::ilog Acf::imod Acf::iprm Acf::iser Acf::istd imtbase imtclientgql imtcom imtservergql)
-imt_declare_library_dependencies(imtsdl             	Acf::icomp Acf::ifile Acf::ilog Acf::imod Acf::iprm Acf::iser Acf::istd AcfSln::iproc imtbase)
-imt_declare_library_dependencies(imtsdlgencpp       	Acf::icomp Acf::ifile Acf::ilog Acf::iprm Acf::istd AcfSln::iproc imtbase imtsdl imtservergql)
-imt_declare_library_dependencies(imtsdlgenqml       	Acf::ifile Acf::ilog Acf::iprm Acf::iser Acf::istd AcfSln::iproc imtsdl)
-imt_declare_library_dependencies(imtserverapp       	Acf::icmm Acf::icomp Acf::idoc Acf::ifile Acf::ilog Acf::imod Acf::iprm Acf::iqt Acf::iser Acf::istd imtapp imtauth imtbase imtclientgql imtcol imtcom imtdb imtgql imtlic imtqml imtrest imtsdl imtservice)
-imt_declare_library_dependencies(imtservergql       	Acf::ibase Acf::icomp Acf::idoc Acf::ifile Acf::ilog Acf::imod Acf::iprm Acf::iqt Acf::iser Acf::istd imtauth imtauthgql imtbase imtbasesdl imtclientgql imtcol imtcom imtdoc imtgql imthype imtrest imtserverapp)
-imt_declare_library_dependencies(imtservice         	Acf::ibase Acf::icomp Acf::ilog Acf::iser Acf::istd imtbase imtcom)
-imt_declare_library_dependencies(imtstyle           	Acf::ibase Acf::icomp Acf::ilog Acf::imod Acf::iprm Acf::iqt Acf::iqtgui Acf::istd imtbase imtdesign)
-imt_declare_library_dependencies(imttest            	Acf::idoc Acf::imod Acf::iser Acf::istd imtbase imtdb)
-imt_declare_library_dependencies(imtupdate          	Acf::ibase Acf::ifile Acf::ilog Acf::imod Acf::iprm Acf::iser Acf::istd imtbase)
+imt_declare_library_dependencies(imtrepo            	imtbase imtfile)
+imt_declare_library_dependencies(imtreport          	Acf::i2d Acf::icmm Acf::icomp Acf::idoc Acf::iimg Acf::imod Acf::iprm Acf::iser Acf::istd)
+imt_declare_library_dependencies(imtreportgui       	Acf::iqtgui imtreport)
+imt_declare_library_dependencies(imtrest            	imtbase imtclientgql imtcom imtservergql)
+imt_declare_library_dependencies(imtsdl             	AcfSln::iproc imtbase)
+imt_declare_library_dependencies(imtsdlgencpp       	AcfSln::iproc imtsdl imtservergql)
+imt_declare_library_dependencies(imtsdlgenqml       	AcfSln::iproc imtsdl)
+imt_declare_library_dependencies(imtserverapp       	Acf::icmm imtapp imtclientgql imtcol imtcom imtdb imtgql imtlic imtqml imtrest imtsdl imtservice)
+imt_declare_library_dependencies(imtservergql       	imtauthgql imtbasesdl imtclientgql imtcol imtcom imtdoc imtgql imthype imtrest imtserverapp)
+imt_declare_library_dependencies(imtservice         	imtbase imtcom)
+imt_declare_library_dependencies(imtstyle           	Acf::iqtgui imtbase imtdesign)
+imt_declare_library_dependencies(imttest            	imtdb)
+imt_declare_library_dependencies(imtupdate          	imtbase)
 imt_declare_library_dependencies(imtwidgets         	Acf::iwidgets)
-imt_declare_library_dependencies(imtzip             	Acf::icomp imtfile)
+imt_declare_library_dependencies(imtzip             	imtfile)
 
 # ---------------------------------------------------------------------------
 # SDL (schema-generated) libraries. Their generated C++ pulls in the Acf base
@@ -149,3 +172,41 @@ imt_declare_library_dependencies(imtgeoguiqml       	imtqml imtgui imtgeo)
 imt_declare_library_dependencies(imtguiqml          	imtqml imtgui)
 imt_declare_library_dependencies(imtguigqlqml       	imtqml imtgui imtguigql)
 imt_declare_library_dependencies(imtlicguiqml       	imtqml imtgui imtlicgui)
+
+# ---------------------------------------------------------------------------
+# Qt module dependencies. These are the Qt modules that each static library
+# requires directly (headers and/or symbols). The scope is controlled by
+# ACF_QT_MODULE_LINK_SCOPE (typically PRIVATE for in-tree builds).
+# ---------------------------------------------------------------------------
+imt_declare_qt_dependencies(imt3d           	Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg)
+imt_declare_qt_dependencies(imt3dgui        	Qt${QT_VERSION_MAJOR}::OpenGL Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
+imt_declare_qt_dependencies(imtauth         	Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg)
+imt_declare_qt_dependencies(imtauthdb       	Qt${QT_VERSION_MAJOR}::Sql)
+imt_declare_qt_dependencies(imtauthgql      	Qt${QT_VERSION_MAJOR}::Sql)
+imt_declare_qt_dependencies(imtchat         	Qt${QT_VERSION_MAJOR}::Sql)
+imt_declare_qt_dependencies(imtchatdb       	Qt${QT_VERSION_MAJOR}::Sql)
+imt_declare_qt_dependencies(imtclientgql    	Qt${QT_VERSION_MAJOR}::WebSockets)
+imt_declare_qt_dependencies(imtdb           	Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg Qt${QT_VERSION_MAJOR}::Sql)
+imt_declare_qt_dependencies(imtdbgql        	Qt${QT_VERSION_MAJOR}::WebSockets)
+imt_declare_qt_dependencies(imtdesign       	Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg)
+imt_declare_qt_dependencies(imtej           	Qt${QT_VERSION_MAJOR}::PrintSupport)
+imt_declare_qt_dependencies(imtgeo          	Qt${QT_VERSION_MAJOR}::Positioning Qt${QT_VERSION_MAJOR}::Core)
+if(QT_VERSION_MAJOR EQUAL 5)
+	imt_declare_qt_dependencies(imtgeo      	Qt${QT_VERSION_MAJOR}::Location)
+endif()
+imt_declare_qt_dependencies(imtgql          	Qt${QT_VERSION_MAJOR}::WebSockets)
+imt_declare_qt_dependencies(imthypegui      	Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg)
+imt_declare_qt_dependencies(imtlicdb        	Qt${QT_VERSION_MAJOR}::Sql)
+imt_declare_qt_dependencies(imtloggui       	Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg)
+imt_declare_qt_dependencies(imtdeskdb       	Qt${QT_VERSION_MAJOR}::Sql)
+imt_declare_qt_dependencies(imthypedb       	Qt${QT_VERSION_MAJOR}::Sql)
+imt_declare_qt_dependencies(imtqml          	Qt${QT_VERSION_MAJOR}::Quick Qt${QT_VERSION_MAJOR}::Qml Qt${QT_VERSION_MAJOR}::QuickWidgets Qt${QT_VERSION_MAJOR}::Concurrent)
+imt_declare_qt_dependencies(imtreportgui    	Qt${QT_VERSION_MAJOR}::PrintSupport)
+imt_declare_qt_dependencies(imtrest         	Qt${QT_VERSION_MAJOR}::WebSockets)
+imt_declare_qt_dependencies(imtservergql    	Qt${QT_VERSION_MAJOR}::WebSockets)
+imt_declare_qt_dependencies(imtstyle        	Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg)
+imt_declare_qt_dependencies(imttest         	Qt${QT_VERSION_MAJOR}::Sql)
+imt_declare_qt_dependencies(imtupdate       	Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg)
+if(QT_VERSION_MAJOR EQUAL 6)
+	imt_declare_qt_dependencies(imtzip      	Qt${QT_VERSION_MAJOR}::Core5Compat)
+endif()

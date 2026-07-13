@@ -4,10 +4,8 @@ include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Positioning REQUIRED)
-target_link_libraries(${PROJECT_NAME} ${ACF_QT_MODULE_LINK_SCOPE} Qt${QT_DEFAULT_MAJOR_VERSION}::Positioning)
-target_link_libraries(${PROJECT_NAME} ${ACF_QT_MODULE_LINK_SCOPE} Qt${QT_VERSION_MAJOR}::Core)
 
 if(QT_VERSION_MAJOR EQUAL 5)
 	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Location REQUIRED)
-	target_link_libraries(${PROJECT_NAME} ${ACF_QT_MODULE_LINK_SCOPE} Qt${QT_DEFAULT_MAJOR_VERSION}::Location)
 endif()
+

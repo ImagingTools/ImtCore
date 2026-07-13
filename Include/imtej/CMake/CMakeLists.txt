@@ -8,4 +8,3 @@ include(${IMTCOREDIR}/Config/CMake/EjExport.cmake)
 #include(${IMTCOREDIR}/Config/CMake/EjMiniZipper.cmake)
 
 
-target_link_libraries(${PROJECT_NAME} ${ACF_QT_MODULE_LINK_SCOPE} Qt${QT_VERSION_MAJOR}::PrintSupport)
