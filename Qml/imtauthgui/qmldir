@@ -29,6 +29,13 @@ RoleCollectionDataProvider 1.0 RoleCollectionDataProvider.qml
 GroupCollectionDataProvider 1.0 GroupCollectionDataProvider.qml
 UserCollectionDataProvider 1.0 UserCollectionDataProvider.qml
 ProfileView 1.0 ProfileView.qml
+ProfileApiClient 1.0 ProfileApiClient.qml
+GqlBasedProfileApiClient 1.0 GqlBasedProfileApiClient.qml
+ProfileGeneralPage 1.0 ProfileGeneralPage.qml
+ProfileOrganizationsPage 1.0 ProfileOrganizationsPage.qml
+ProfileTokensPage 1.0 ProfileTokensPage.qml
+ProfileAccessPage 1.0 ProfileAccessPage.qml
+ProfileNoticeBanner 1.0 ProfileNoticeBanner.qml
 RoleCollectionView 1.0 RoleCollectionView.qml
 UserCollectionView 1.0 UserCollectionView.qml
 UserGroupCollectionView 1.0 UserGroupCollectionView.qml

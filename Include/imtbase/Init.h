@@ -106,6 +106,8 @@ public:
 	static void InitImtCoreResources()
 	{
 		Q_INIT_RESOURCE(imtauthdb);
+		Q_INIT_RESOURCE(imtchatdb);
+		Q_INIT_RESOURCE(imtdeskdb);
 
 		Q_INIT_RESOURCE(imtbase);
 		Q_INIT_RESOURCE(imtstylecontrolsqml);

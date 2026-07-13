@@ -101,6 +101,11 @@ I_EXPORT_COMPONENT(
 			"Collection Permissions Provider");
 
 I_EXPORT_COMPONENT(
+			OrganizationsPermissionsProvider,
+			"Organizations permissions provider",
+			"Organizations Permissions Provider");
+
+I_EXPORT_COMPONENT(
 			CheckPermissionOr,
 			"Check Permission Or",
 			"Check Permission Or");

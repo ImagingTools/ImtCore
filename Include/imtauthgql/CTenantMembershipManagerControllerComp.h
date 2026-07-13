@@ -10,7 +10,10 @@
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantInvitationManager.h>
 #include <imtauth/IDelegatedAccess.h>
+#include <imtlic/IFeatureInfoProvider.h>
+#include <iqt/ITranslationManager.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships_fwd.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions_fwd.h>
 
 
 namespace imtauthgql
@@ -27,6 +30,8 @@ public:
 		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Tenant invitation manager providing invitation lifecycle operations", true, "TenantInvitationManager");
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for resolving tenant names", false, "TenantManager");
 		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Optional delegated access resolver for cross-org grant read access", false, "DelegatedAccessResolver");
+		I_ASSIGN(m_organizationsProviderCompPtr, "OrganizationsProvider", "Provider of organization-only permission features", false, "OrganizationsPermissionsProvider");
+		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
 protected:
@@ -63,6 +68,12 @@ protected:
 				const sdl::V1_0::imtauth::CGetMyTenantInvitationsGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+
+	virtual sdl::V1_0::imtauth::CGetOrganizationPermissionsPayload OnGetOrganizationPermissions(
+				const sdl::V1_0::imtauth::CGetOrganizationPermissionsGqlRequest& request,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+
 	virtual sdl::V1_0::imtauth::CAddMembershipPayload OnAddMembership(
 				const sdl::V1_0::imtauth::CAddMembershipGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,
@@ -91,8 +102,8 @@ protected:
 				const sdl::V1_0::imtauth::CRemoveMembershipGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CUpdateMembershipRolePayload OnUpdateMembershipRole(
-				const sdl::V1_0::imtauth::CUpdateMembershipRoleGqlRequest& request,
+	virtual sdl::V1_0::imtauth::CUpdateMembershipPermissionsPayload OnUpdateMembershipPermissions(
+				const sdl::V1_0::imtauth::CUpdateMembershipPermissionsGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CTransferTenantOwnershipPayload OnTransferTenantOwnership(
@@ -105,6 +116,8 @@ private:
 	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
+	I_REF(imtlic::IFeatureInfoProvider, m_organizationsProviderCompPtr);
+	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 };
 
 

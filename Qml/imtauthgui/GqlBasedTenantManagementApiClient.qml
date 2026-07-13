@@ -67,7 +67,6 @@ QtObject {
 	signal invitationResent(string invitationId)
 
 	signal ownershipTransferred()
-	signal memberRoleChanged(string userId, string role)
 	signal memberRemoved(string userId)
 
 	signal roleCreated()
@@ -129,6 +128,10 @@ QtObject {
 
 		function onTenantPermissionsReceived(sourceTenantId) {
 			root.tenantPermissionsReceived()
+		}
+
+		function onOrganizationPermissionsReceived() {
+			root.organizationPermissionsReceived()
 		}
 	}
 
@@ -331,10 +334,9 @@ QtObject {
 	// Public methods (override the abstract stubs)
 	// =========================================================================
 
-	function createInvitation(tenantId, userId, role) {
+	function createInvitation(tenantId, userId) {
 		root.__createInvitationInput.m_tenantId = tenantId || ""
 		root.__createInvitationInput.m_userId = userId || ""
-		root.__createInvitationInput.m_role = role || "Member"
 		root.__createInvitationSender.send(root.__createInvitationInput)
 	}
 
@@ -356,15 +358,24 @@ QtObject {
 		root.__transferOwnershipSender.send(root.__transferOwnershipInput)
 	}
 
-	property string __pendingChangeRoleUserId: ""
-	property string __pendingChangeRoleNewRole: ""
+	function setMemberOrganizationPermissionsByUser(tenantId, userId, permissions) {
+		root.__pendingOrgPermsUserId = userId || ""
+		root.__pendingOrgPermsList = permissions || []
+		root.__findMembershipForOrgPermsInput.m_userId = userId
+		root.__findMembershipForOrgPermsInput.m_tenantId = tenantId
+		root.__findMembershipForOrgPermsSender.send(root.__findMembershipForOrgPermsInput)
+	}
 
-	function setMemberRole(tenantId, userId, role) {
-		root.__pendingChangeRoleUserId = userId || ""
-		root.__pendingChangeRoleNewRole = role || ""
-		root.__findMembershipForRoleInput.m_userId = userId
-		root.__findMembershipForRoleInput.m_tenantId = tenantId
-		root.__findMembershipForRoleSender.send(root.__findMembershipForRoleInput)
+	// pending for chaining find -> set org perms
+	property string __pendingOrgPermsUserId: ""
+	property var __pendingOrgPermsList: null
+
+	function setMemberOrganizationPermissions(membershipId, permissionsList) {
+		root.__updateMembershipPermissionsInput.m_membershipId = membershipId || ""
+		// permissionsList should be array of strings
+		// The SDL input expects list, set it
+		root.__updateMembershipPermissionsInput.m_permissions = permissionsList || []
+		root.__updateMembershipPermissionsSender.send(root.__updateMembershipPermissionsInput)
 	}
 
 	function removeMember(tenantId, userId) {
@@ -407,8 +418,8 @@ QtObject {
 		}
 	}
 
-	property FindMembershipInput __findMembershipForRoleInput: FindMembershipInput {}
-	property GqlSdlRequestSender __findMembershipForRoleSender: GqlSdlRequestSender {
+	property FindMembershipInput __findMembershipForOrgPermsInput: FindMembershipInput {}
+	property GqlSdlRequestSender __findMembershipForOrgPermsSender: GqlSdlRequestSender {
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_findMembership
 
 		sdlObjectComp: Component {
@@ -417,15 +428,35 @@ QtObject {
 					if (m_errorMessage && m_errorMessage !== "") {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 						root.requestFailed(m_errorMessage)
-					} else if (m_membership && m_membership.m_id) {
-						root.__updateMembershipRoleInput.m_membershipId = m_membership.m_id
-						root.__updateMembershipRoleInput.m_role = root.__pendingChangeRoleNewRole
-						root.__updateMembershipRoleSender.send(root.__updateMembershipRoleInput)
+					} else if (root.__pendingOrgPermsUserId && root.__pendingOrgPermsList !== null && m_membership && m_membership.m_id) {
+						root.setMemberOrganizationPermissions(m_membership.m_id, root.__pendingOrgPermsList)
+						root.__pendingOrgPermsUserId = ""
+						root.__pendingOrgPermsList = null
 					}
 				}
 			}
 		}
 	}
+
+	// Support updating org permissions on a specific membership
+	property UpdateMembershipPermissionsInput __updateMembershipPermissionsInput: UpdateMembershipPermissionsInput {}
+	property GqlSdlRequestSender __updateMembershipPermissionsSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_updateMembershipPermissions
+
+		sdlObjectComp: Component {
+			UpdateMembershipPermissionsPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+					} else {
+						root.memberPermissionsUpdated()
+					}
+				}
+			}
+		}
+	}
+	signal memberPermissionsUpdated()
 
 	property RemoveMembershipInput __removeMembershipInput: RemoveMembershipInput {}
 	property GqlSdlRequestSender __removeMembershipSender: GqlSdlRequestSender {
@@ -440,25 +471,6 @@ QtObject {
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.memberRemoved(root.__findMembershipForRemoveInput.m_userId)
-					}
-				}
-			}
-		}
-	}
-
-	property UpdateMembershipRoleInput __updateMembershipRoleInput: UpdateMembershipRoleInput {}
-	property GqlSdlRequestSender __updateMembershipRoleSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_updateMembershipRole
-
-		sdlObjectComp: Component {
-			UpdateMembershipRolePayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.memberRoleChanged(root.__pendingChangeRoleUserId, root.__pendingChangeRoleNewRole)
 					}
 				}
 			}
@@ -523,6 +535,12 @@ QtObject {
 	property var tenantPermissions: root.__permissionsProvider ? root.__permissionsProvider.tenantPermissions : []
 	signal tenantPermissionsReceived()
 
+	// Organization-only special permissions tree
+	property var organizationPermissions: root.__permissionsProvider ? root.__permissionsProvider.organizationPermissions : []
+	// Assigned permissions for the last requested member (populated when userId passed to fetchOrganizationPermissions)
+	property var memberOrganizationPermissions: root.__permissionsProvider ? root.__permissionsProvider.memberOrganizationPermissions : []
+	signal organizationPermissionsReceived()
+
 	function setRolePermissionsTenantId(tenantId) {
 		root.rolePermissionsTenantId = tenantId || ""
 	}
@@ -539,6 +557,12 @@ QtObject {
 			return
 		root.__permissionsProvider.productId = root.productId || ""
 		root.__permissionsProvider.requestPermissions(tenantId || root.tenantId || "")
+	}
+
+	function fetchOrganizationPermissions(tenantId, userId) {
+		if (!root.__permissionsProvider)
+			return
+		root.__permissionsProvider.requestOrganizationPermissions(tenantId || root.tenantId || "", userId || "")
 	}
 
 	// =========================================================================

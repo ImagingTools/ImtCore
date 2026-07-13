@@ -81,7 +81,6 @@ private:
 	{
 		QByteArray userId;
 		QByteArray tenantId;
-		QByteArray roleId;
 		bool isActive;
 	};
 
@@ -94,7 +93,6 @@ private:
 	{
 		QByteArray userId;
 		QByteArray tenantId;
-		QByteArray roleId;
 		QByteArray invitedByUserId;
 		imtauth::ITenantInvitation::TenantInvitationStatus status;
 	};

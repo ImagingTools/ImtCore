@@ -33,7 +33,7 @@ public:
 	virtual InvitationIds GetInvitationsByUser(const QByteArray& userId, const Statuses& statuses = Statuses()) const override;
 	virtual ITenantInvitationUniquePtr GetInvitation(const QByteArray& invitationId) const override;
 	virtual ITenantInvitationUniquePtr FindPendingInvitation(const QByteArray& userId, const QByteArray& tenantId) const override;
-	virtual QByteArray CreateInvitation(const QByteArray& invitedByUserId, const QByteArray& userId, const QByteArray& tenantId, const QByteArray& roleId) override;
+	virtual QByteArray CreateInvitation(const QByteArray& invitedByUserId, const QByteArray& userId, const QByteArray& tenantId) override;
 	virtual QByteArray AcceptInvitation(const QByteArray& invitationId, const QByteArray& userId) override;
 	virtual bool RejectInvitation(const QByteArray& invitationId, const QByteArray& userId) override;
 	virtual bool RevokeInvitation(const QByteArray& invitationId, const QByteArray& revokedByUserId) override;

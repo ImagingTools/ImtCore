@@ -10,6 +10,9 @@
 #include <imtbase/ICollectionInfo.h>
 #include <imtbase/IReferenceCollection.h>
 
+// Acula includes
+#include <imthype/IJobStatusSink.h>
+
 
 namespace iprm
 {
@@ -36,65 +39,18 @@ class IJobOutput;
 /**
 	Interface for controlling the job processing queue.
 	Job list itself is described by imtbase::ICollectionInfo interface.
+
+	This is the client-facing interface: it bundles queue control (submit,
+	cancel, resume, remove), the read-only queries about jobs, and the
+	parameter/task factory helpers. The mutating runtime-state operations used
+	by the job executor are inherited from \c IJobStatusSink.
 */
-class IJobQueueManager: virtual public imtbase::ICollectionInfo
+class IJobQueueManager:
+			virtual public imtbase::ICollectionInfo,
+			virtual public IJobStatusSink
 {
 public:
 	typedef iprm::IParamsSetSharedPtr ParamsPtr;
-
-	/**
-		Processing status of a single job in the queue.
-	*/
-	enum ProcessingStatus
-	{
-		/**
-			No status.
-		*/
-		PS_NONE,
-		
-		/**
-			Job is waiting for accepting by the processing pipeline.
-		*/
-		PS_WAITING_FOR_ACCEPTING,
-
-		/**
-			JoB was accepted by the job dispatcher and now wating for its execution.
-		*/
-		PS_WAITING_FOR_PROCESSING,
-
-		/**
-			Job is running.
-		*/
-		PS_RUNNING,
-
-		/**
-			Job is canceling.
-		*/
-		PS_CANCELING,
-
-		/**
-			Job results are beeing transported to the job requester.
-		*/
-		PS_RETRIEVING_RESULTS,
-
-		/**
-			Job was canceled.
-		*/
-		PS_CANCELED,
-
-		/**
-			Job request was rejected by the processing pipeline.
-		*/
-		PS_REJECTED,
-
-		/**
-			Job was finished.
-			The job result can be requested.
-		*/
-		PS_FINISHED
-	};
-
-	I_DECLARE_ENUM(ProcessingStatus, PS_NONE, PS_WAITING_FOR_ACCEPTING, PS_WAITING_FOR_PROCESSING, PS_RUNNING, PS_CANCELING, PS_RETRIEVING_RESULTS, PS_CANCELED, PS_REJECTED, PS_FINISHED);
 
 	struct JobStatusInfo: public NotifierInfo
 	{
@@ -151,7 +107,7 @@ public:
 		You can use the returned UUID for controlling the job execution and retrieving results.
 		\param contextId					ID of the job context.
 		\param typeId						Type-ID for the job. Will be used for pairing the corresponding job worker.
-		\param input						List of job inputs given as a collection of object links. Each input object should be persistency placed into a storage (IObjectCollection) bevor call this method.
+		\param input						List of job inputs given as a collection of object links. Each input object should be persistently placed into a storage (IObjectCollection) before calling this method.
 		\param jobProcessingParamsPtr		Processing parameters for the job (so called job ticket).
 		\param schedulerParamsPtr			Parameters of the job scheduler (optional).
 		\param logPtr						Job related log.
@@ -201,19 +157,9 @@ public:
 	virtual ProcessingStatus GetProcessingStatus(const QByteArray& jobId) const = 0;
 
 	/**
-		Set job processing status for the job with a given ID \c jobId.
-	*/
-	virtual bool SetProcessingStatus(const QByteArray& jobId, ProcessingStatus status) = 0;
-	
-	/**
-		Get progress of the runnung job.
+		Get progress of the running job in the normalized range [0.0 ... 1.0].
 	*/
 	virtual double GetProgress(const QByteArray& jobId) const = 0;
-
-	/**
-		Set progress of the runnung job.
-	*/
-	virtual bool SetProgress(const QByteArray& jobId, double progress) = 0;
 
 	/**
 		Get result information for a finished job.
@@ -221,13 +167,6 @@ public:
 		\note The method works only for finished jobs. 
 	*/
 	virtual bool GetJobResult(const QByteArray& jobId, IJobOutput& result) const = 0;
-
-	/**
-		Set result information for a finished job.
-		\return \c true if the job results could be set or \c false otherwise.
-		\note The method works only for finished jobs. 
-	*/
-	virtual bool SetJobResult(const QByteArray& jobId, const IJobOutput& result) = 0;
 };
 
 

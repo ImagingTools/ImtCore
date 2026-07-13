@@ -97,12 +97,9 @@ iprm::IParamsSetSharedPtr CJobTicket::GetParams() const
 
 iprm::IParamsSetSharedPtr CJobTicket::CreateParams() const
 {
-	iprm::IParamsSetSharedPtr retVal;
-	if (m_paramsFactory){
-		retVal = m_paramsFactory(m_contextId, m_typeId);
-	}
-
-	return retVal;
+	// The pure data ticket does not know the concrete parameter type.
+	// Concrete components (e.g. CJobTicketComp) override this to use a factory.
+	return iprm::IParamsSetSharedPtr();
 }
 
 
@@ -172,12 +169,6 @@ void CJobTicket::SetInput(const imtbase::IReferenceCollection& input)
 }
 
 
-void CJobTicket::SetParamsFactory(const ParamsFactoryFunction& factory)
-{
-	m_paramsFactory = factory;
-}
-
-
 // reimplemented (iser::ISerializable)
 
 bool CJobTicket::Serialize(iser::IArchive& archive)
@@ -226,9 +217,9 @@ bool CJobTicket::Serialize(iser::IArchive& archive)
 	// Handle params serialization/deserialization
 	static iser::CArchiveTag paramsTag("Configuration", "Processing parameters", iser::CArchiveTag::TT_GROUP);
 	if (retVal && archive.BeginTag(paramsTag)){
-		// Create params object during deserialization if factory is set
-		if (m_paramsFactory && !archive.IsStoring() && !m_paramsPtr.IsValid()){
-			m_paramsPtr = m_paramsFactory(m_contextId, m_typeId);
+		// Create params object during deserialization using the (virtual) factory hook.
+		if (!archive.IsStoring() && !m_paramsPtr.IsValid()){
+			m_paramsPtr = CreateParams();
 		}
 		
 		if (m_paramsPtr.IsValid()){
@@ -264,7 +255,6 @@ bool CJobTicket::CopyFrom(const IChangeable &object, CompatibilityMode mode)
 		m_results = sourcePtr->m_results;
 		m_input = sourcePtr->m_input;
 		m_paramsPtr = sourcePtr->m_paramsPtr;
-		m_paramsFactory = sourcePtr->m_paramsFactory;
 
 		return true;
 	}

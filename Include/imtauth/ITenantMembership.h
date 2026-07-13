@@ -17,48 +17,6 @@ namespace imtauth
 
 
 /**
-	Environment roles for tenant members.
-	Determines the level of access a user has within a tenant.
-	Priority order: Creator > Owner > Admin > Member.
-*/
-enum TenantEnvironmentRole
-{
-	TER_MEMBER = 0,		///< Read-only access, can only leave the organization
-	TER_ADMIN,			///< Can manage members (invite/remove) and change roles
-	TER_OWNER,			///< Superuser within the tenant (all permissions except changing Creator)
-	TER_CREATOR			///< Immutable creator — full access including Permissions management
-};
-
-
-/**
-	Convert a TenantEnvironmentRole enum value to its string representation.
-*/
-inline QString TenantEnvironmentRoleToString(TenantEnvironmentRole role)
-{
-	switch (role){
-		case TER_CREATOR:	return QStringLiteral("Creator");
-		case TER_OWNER:		return QStringLiteral("Owner");
-		case TER_ADMIN:		return QStringLiteral("Admin");
-		case TER_MEMBER:
-		default:			return QStringLiteral("Member");
-	}
-}
-
-
-/**
-	Convert a string to a TenantEnvironmentRole enum value.
-	Unrecognized strings default to TER_MEMBER.
-*/
-inline TenantEnvironmentRole TenantEnvironmentRoleFromString(const QString& roleStr)
-{
-	if (roleStr == QLatin1String("Creator"))	return TER_CREATOR;
-	if (roleStr == QLatin1String("Owner"))		return TER_OWNER;
-	if (roleStr == QLatin1String("Admin"))		return TER_ADMIN;
-	return TER_MEMBER;
-}
-
-
-/**
 	Interface describing a membership — the relationship between a User and a Tenant.
 	This is the missing entity that explicitly models "User X belongs to Tenant Y with Role Z".
 
@@ -108,28 +66,6 @@ public:
 	virtual void SetTenantId(const QByteArray& tenantId) = 0;
 
 	/**
-		Get the environment role of the user within the tenant.
-	*/
-	virtual TenantEnvironmentRole GetEnvironmentRole() const = 0;
-
-	/**
-		Set the environment role of the user within the tenant.
-	*/
-	virtual void SetEnvironmentRole(TenantEnvironmentRole role) = 0;
-
-	/**
-		Get the role as a string ID (for backward compatibility with DB/SDL).
-		Returns the string representation of the environment role.
-	*/
-	virtual QByteArray GetRoleId() const = 0;
-
-	/**
-		Set the role from a string ID (for backward compatibility with DB/SDL).
-		Parses the string and sets the environment role accordingly.
-	*/
-	virtual void SetRoleId(const QByteArray& roleId) = 0;
-
-	/**
 		Get the date when the user joined the tenant.
 	*/
 	virtual QString GetJoinedAt() const = 0;
@@ -148,6 +84,18 @@ public:
 		Set active state of the membership.
 	*/
 	virtual void SetActive(bool isActive) = 0;
+
+	/**
+		Get additional organization-specific permissions granted directly to this membership (member within the org).
+		These control the capabilities (replacing the old EnvironmentRole concept).
+		Typically populated from the OrganizationsPermissionsProvider (e.g. EditOrganizationMember, ViewOrganizationRoles, etc.).
+	*/
+	virtual QByteArrayList GetOrganizationPermissions() const = 0;
+
+	/**
+		Set additional organization-specific permissions for this membership.
+	*/
+	virtual void SetOrganizationPermissions(const QByteArrayList& permissions) = 0;
 
 	/**
 		Get the last update timestamp.

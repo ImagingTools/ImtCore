@@ -37,6 +37,20 @@ Rectangle {
 
 	Component.onCompleted: {
 		decoratorPause.start();
+
+		authPageContainer.state = "unauthorized";
+		authPageContainer.isAuthenticating = false;
+
+		passwordTextInput.text = "";
+		
+		// Restore username from AuthorizationController if "Remember me" is checked
+		if (authPageContainer.rememberMe && AuthorizationController.lastUser !== "") {
+			loginTextInput.text = AuthorizationController.lastUser;
+		}
+		else {
+			loginTextInput.text = "";
+		}
+		loginTextInput.forceActiveFocus();
 	}
 
 	LocalizationEvent {
@@ -51,18 +65,6 @@ Rectangle {
 
 	onVisibleChanged: {
 		if (authPageContainer.visible){
-			authPageContainer.state = "unauthorized";
-			authPageContainer.isAuthenticating = false;
-
-			passwordTextInput.text = "";
-			
-			// Restore username from AuthorizationController if "Remember me" is checked
-			if (authPageContainer.rememberMe && AuthorizationController.lastUser !== "") {
-				loginTextInput.text = AuthorizationController.lastUser;
-			}
-			else {
-				loginTextInput.text = "";
-			}
 			loginTextInput.forceActiveFocus();
 		}
 	}
@@ -112,6 +114,7 @@ Rectangle {
 
 		onFinished: {
 			authPageContainer.setDecorators();
+			loginTextInput.forceActiveFocus();
 		}
 	}
 
@@ -152,7 +155,7 @@ Rectangle {
 				id: headerRec;
 
 				width: loginContainer.width;
-				height: 80;
+				height: Math.max(80, welcomeText.implicitHeight + 56);
 
 				color: loginContainer.color;
 				radius: loginContainer.radius;
@@ -162,11 +165,19 @@ Rectangle {
 
 					anchors.top: parent.top;
 					anchors.topMargin: 30;
-					anchors.horizontalCenter: parent.horizontalCenter;
+					anchors.left: parent.left;
+					anchors.right: parent.right;
+					anchors.leftMargin: Style.marginXL;
+					anchors.rightMargin: Style.marginXL;
 
 					color: Style.textColor;
 					font.family: Style.fontFamily;
 					font.pixelSize: Style.fontSizeXXL;
+
+					horizontalAlignment: Text.AlignHCenter;
+					wrapMode: Text.Wrap;
+					maximumLineCount: 2;
+					elide: Text.ElideRight;
 
 					text: authPageContainer.appName !== "" ? qsTr("Welcome to") + " " + authPageContainer.appName : qsTr("Welcome");
 				}
@@ -177,7 +188,7 @@ Rectangle {
 			id: headerItem;
 
 			width: parent.width;
-			height: 70;
+			height: headerLoader.item ? headerLoader.item.height : 70;
 
 			Loader{
 				id: headerLoader;
@@ -187,9 +198,7 @@ Rectangle {
 				sourceComponent: Style.authorizationHeaderDecorator !== undefined ? Style.authorizationHeaderDecorator: headerDefaultComp;
 
 				onLoaded:{
-					headerItem.height = headerLoader.item.height;
 					headerLoader.width = headerLoader.item.width;
-					headerLoader.height = headerLoader.item.height;
 				}
 			}
 		}

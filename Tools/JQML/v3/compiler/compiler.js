@@ -1301,15 +1301,30 @@ function compile(options){
             return undefined
         }
 
+        checkAssignProperty(name){
+            for(let assignProperty of this.assignProperties){
+                if(name === assignProperty.name) return assignProperty
+            }
+
+            return undefined
+        }
+
         getProperties() {
             let code = new SourceNode()
             let lazyCode = new SourceNode()
             let aliasCode = new SourceNode()
             let classCode =  new SourceNode()
 
+            for(let defineProperty of this.defineProperties){
+                if(!this.checkAssignProperty(defineProperty.name) && defineProperty.modifiers && defineProperty.modifiers.readonly){
+                    code.add(`${this.name}['__${defineProperty.name}__init']=true\n`)
+                }
+            }
+
             for (let assignProperty of this.assignProperties) {
                 let assignNames = this.normalizePathName(assignProperty.name)
                 let assignName = assignNames.join('.')
+
                 let path = this.resolve(assignNames[0], this.name)
                 if (!path) {
                     console.log(`${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignName.length - 1}: warning: ${assignName} is not founded`)
@@ -1344,8 +1359,22 @@ function compile(options){
 
                         let properties = assignProperty.value.getProperties()
 
+                        let baseClassProperties = []
+                        let baseClassSlots = []
+                        let baseClassMeta = ''
+                        if (childTypeInfo.typeBase.isAssignableFrom(JQModules.QtQml.BaseClass)){
+                            for(let defineProperty of this.defineProperties){
+                                if(defineProperty.name.slice(0,2) == 'm_'){
+                                    baseClassProperties.push(`'${defineProperty.name}'`)
+                                    baseClassSlots.push(`SLOT_${defineProperty.name}Changed(o,n){if (this.enableNotifications) this._internal.internalModelChanged('${defineProperty.name}', this)}`)
+                                }
+                            }
+                            baseClassMeta = `static cachedPoperties = new Set(${childTypeInfo.path}.cachedPoperties.union(new Set([${baseClassProperties.join(',')}])))`
+                        }  
+
                         resultCode.add(`(class ${assignProperty.value.className} extends ${childTypeInfo.path} {
                             static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})
+                            ${baseClassMeta}
                             static create(parent,properties={},context={},isRoot=true){
 
                             let __context = JQContext.create(context)
@@ -1398,6 +1427,10 @@ function compile(options){
                         resultCode.add('\n')
 
                         resultCode.add(assignProperty.value.getMethods())
+
+                        resultCode.add('\n')
+
+                        resultCode.add(baseClassSlots.join('\n'))
 
                         resultCode.add('\n')
                         resultCode.add(assignProperty.value.getConnectedSignals())
@@ -1458,7 +1491,7 @@ function compile(options){
                             // console.log(assignProperty.name, stat.value.toString())
                             // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',function(){return ${stat.value}},function(newVal){${stat.value}=newVal})`)
                             let aliasPath = stat.value.toString().split('.')
-                            // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',${aliasPath.slice(0, aliasPath.length - 1).join('.')}, '${aliasPath[aliasPath.length-1]}')`)
+                                                        // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',${aliasPath.slice(0, aliasPath.length - 1).join('.')}, '${aliasPath[aliasPath.length-1]}')`)
                             aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignName}',()=>{return ${aliasPath.slice(0, aliasPath.length - 1).join('.')}}, '${aliasPath[aliasPath.length-1]}')`)
                             // code.add(`${this.name}.__getDataQml('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},properties)`)
                             aliasCode.add('\n')
@@ -1692,8 +1725,22 @@ function compile(options){
 
             let properties = this.children[0].getProperties()
 
+            let baseClassProperties = []
+            let baseClassSlots = []
+            let baseClassMeta = ''
+            if (childTypeInfo.typeBase.isAssignableFrom(JQModules.QtQml.BaseClass)){
+                for(let defineProperty of this.defineProperties){
+                    if(defineProperty.name.slice(0,2) == 'm_'){
+                        baseClassProperties.push(`'${defineProperty.name}'`)
+                        baseClassSlots.push(`SLOT_${defineProperty.name}Changed(o,n){if (this.enableNotifications) this._internal.internalModelChanged('${defineProperty.name}', this)}`)
+                    }
+                }
+                baseClassMeta = `static cachedPoperties = new Set(${childTypeInfo.path}.cachedPoperties.union(new Set([${baseClassProperties.join(',')}])))`
+            }  
+
             code.add(`(class ${this.children[0].className} extends ${childTypeInfo.path} {
                 static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})
+                ${baseClassMeta}
                 static create(parent,properties={},context={},isRoot=true){
 
                 let __context = JQContext.create(context)
@@ -1752,6 +1799,11 @@ function compile(options){
             code.add(this.children[0].getMethods())
 
             code.add('\n')
+
+            code.add(baseClassSlots.join('\n'))
+
+            code.add('\n')
+            
             code.add(this.children[0].getConnectedSignals())
 
             code.add('\n')
@@ -1806,8 +1858,22 @@ function compile(options){
                 id = this.id ? this.name+'.__' + this.qmlFile.getContextName() + '.'+this.id+'='+this.name : ''
             }
 
+            let baseClassProperties = []
+            let baseClassSlots = []
+            let baseClassMeta = ''
+            if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.BaseClass)){
+                for(let defineProperty of this.defineProperties){
+                    if(defineProperty.name.slice(0,2) == 'm_'){
+                        baseClassProperties.push(`'${defineProperty.name}'`)
+                        baseClassSlots.push(`SLOT_${defineProperty.name}Changed(o,n){if (this.enableNotifications) this._internal.internalModelChanged('${defineProperty.name}', this)}`)
+                    }
+                }
+                baseClassMeta = `static cachedPoperties = new Set(${typeInfo.path}.cachedPoperties.union(new Set([${baseClassProperties.join(',')}])))`
+            }     
+
             code.add(`let ${this.name}=(__root.cachedComponents['${this.qmlFile.getName()}__${this.name}'] || __root.cachedComponent('${this.qmlFile.getName()}__${this.name}',class ${this.className} extends ${typeInfo.path} {
                 static meta = Object.assign({}, ${typeInfo.path}.meta, ${meta})
+                ${baseClassMeta}
                 static create(parent,properties={},context={},isRoot=true){
                     let ${this.name} = super.create(parent,properties,context,isRoot)
                     ${this.name}.__${this.qmlFile.getContextName()} = context
@@ -1823,6 +1889,9 @@ function compile(options){
 
             code.add(`return ${this.name}}`)
             code.add(this.getMethods())
+            code.add('\n')
+            code.add(baseClassSlots.join('\n'))
+            code.add('\n')
             code.add(this.getConnectedSignals())
             code.add(`})).create(${this.parent ? this.parent.name : 'null'},{JQAbstractModel:()=>{return ${this.targetContext.name}.JQAbstractModel}},${this.targetContext.name}.__${this.qmlFile.getContextName()},false)`)
 
@@ -1967,8 +2036,22 @@ function compile(options){
 
             let properties = this.instruction.getProperties()
 
+            let baseClassProperties = []
+            let baseClassSlots = []
+            let baseClassMeta = ''
+            if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.BaseClass)){
+                for(let defineProperty of this.instruction.defineProperties){
+                    if(defineProperty.name.slice(0,2) == 'm_'){
+                        baseClassProperties.push(`'${defineProperty.name}'`)
+                        baseClassSlots.push(`SLOT_${defineProperty.name}Changed(o,n){if (this.enableNotifications) this._internal.internalModelChanged('${defineProperty.name}', this)}`)
+                    }
+                }
+                baseClassMeta = `static cachedPoperties = new Set(${typeInfo.path}.cachedPoperties.union(new Set([${baseClassProperties.join(',')}])))`
+            }
+
             code.add(`static cachedComponents = {}
                 static meta = Object.assign({}, ${typeInfo.path}.meta, ${meta})
+                ${baseClassMeta}
 
                 __removeObjectName(){removeObjectName('${this.instruction.className}')}
                 __addObjectName(){addObjectName('${this.instruction.className}')}
@@ -2028,6 +2111,9 @@ function compile(options){
 
             code.add('\n')
             code.add(this.instruction.getConnectedSignals())
+            code.add('\n')
+
+            code.add(baseClassSlots.join('\n'))
 
             code.add('\n')
 
@@ -2067,7 +2153,12 @@ function compile(options){
         }
 
         toCode() {
-            return `function(){${this.meta.source}; return {${this.meta.exports.join(',')}}}()`
+            if(this.meta.exports.length > 1){
+                return `function(){${this.meta.source}; return {${this.meta.exports.join(',')}}}()`
+            } else {
+                return `function(){${this.meta.source}; return ${this.meta.exports.join(',')}}()`
+            }
+            
         }
     }
 

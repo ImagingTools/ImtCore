@@ -23,9 +23,20 @@ QtObject {
     // Cached product-wide permissions (requestPermissions("")).
     property var allPermissions: []
 
+    // Cached permissions available to the currently authenticated user
+    // (superuser sees the full product tree). Filled by requestUserPermissions().
+    property var userPermissions: []
+    signal userPermissionsReceived()
+
     // Cached tenant-scoped permissions (requestPermissions(tenantId)).
     property var tenantPermissions: []
     property string tenantPermissionsTenantId: ""
+
+    // Special organization-only permissions tree (independent of product features)
+    property var organizationPermissions: []
+    // Assigned permissions for the last requested member (populated when userId passed to requestOrganizationPermissions)
+    property var memberOrganizationPermissions: []
+    signal organizationPermissionsReceived()
 
     signal requestStarted(string tenantId)
     signal permissionsReceived(var permissions, string tenantId)
@@ -40,11 +51,19 @@ QtObject {
         requestPermissions("")
     }
 
+    // Request only the permissions available to the current user (su sees all).
+    function requestUserPermissions() {}
+
+    function requestOrganizationPermissions(tenantId, userId) {}
+
     function clearCache() {
         permissions = []
         allPermissions = []
+        userPermissions = []
         tenantPermissions = []
         tenantPermissionsTenantId = ""
+        organizationPermissions = []
+        memberOrganizationPermissions = []
         lastError = ""
     }
 

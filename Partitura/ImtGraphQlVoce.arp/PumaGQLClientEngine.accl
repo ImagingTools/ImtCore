@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6397" Description="ACF"/>
-            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -18,6 +18,7 @@
         <Element ComponentName="RemoteCollectionDocumentServiceController" X="600" Y="150" Note=""/>
         <Element ComponentName="RemoteControllers" X="150" Y="600" Note=""/>
         <Element ComponentName="RemoteJwtSessionController" X="175" Y="325" Note=""/>
+        <Element ComponentName="RemotePersonalAccessTokenController" X="200" Y="425" Note=""/>
         <Element ComponentName="RemoteProfileController" X="775" Y="675" Note=""/>
         <Element ComponentName="RemoteRepositories" X="1000" Y="275" Note=""/>
         <Element ComponentName="RemoteTenantController" X="750" Y="525" Note=""/>
@@ -26,6 +27,14 @@
         <Element ComponentName="UserInfo" X="1050" Y="650" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
+        <EmbededRegistry Id="DocumentRevision">
+            <PositionMap>
+                <Element ComponentName="CheckPermissionOr" X="900" Y="200" Note=""/>
+                <Element ComponentName="RemoteDocumentRevisionController" X="575" Y="75" Note=""/>
+                <Element ComponentName="RevisionPermissions" X="250" Y="200" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="RemoteControllers">
             <PositionMap>
                 <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
@@ -36,14 +45,6 @@
                 <Element ComponentName="RemoteRepresentationController" X="250" Y="300" Note=""/>
                 <Element ComponentName="RemoteUserController" X="150" Y="175" Note=""/>
                 <Element ComponentName="RoleRemoteCollectionController" X="1000" Y="550" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="DocumentRevision">
-            <PositionMap>
-                <Element ComponentName="CheckPermissionOr" X="900" Y="200" Note=""/>
-                <Element ComponentName="RemoteDocumentRevisionController" X="575" Y="75" Note=""/>
-                <Element ComponentName="RevisionPermissions" X="250" Y="200" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

@@ -187,9 +187,12 @@ Item {
 		tabView.setTabName(documentId, name)
 	}
 
-	function addFixedView(viewComp, name, id, forceFocus){
+	function addFixedView(viewComp, name, id, forceFocus, pinned){
 		if (!forceFocus){
 			forceFocus = false
+		}
+		if (pinned === undefined){
+			pinned = true
 		}
 
 		if (!id || id === ""){
@@ -202,7 +205,7 @@ Item {
 			return
 		}
 
-		tabView.addTab(id, name, viewComp, "", "", true, true)
+		tabView.addTab(id, name, viewComp, "", "", true, pinned)
 
 		if (forceFocus){
 			tabView.currentIndex = tabView.tabModel.count - 1

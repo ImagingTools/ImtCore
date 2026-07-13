@@ -39,6 +39,8 @@ Rectangle {
 
 	property bool centered: Style.menuPanelCentered !== undefined ? Style.menuPanelCentered : false;
 	property bool collapsed: false
+	property real menuDefaultWidth: 0
+
 
 	Component.onCompleted: {
 		Events.subscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
@@ -127,6 +129,7 @@ Rectangle {
 	function clearModels(){
 		menuPanel.model.clear();
 		menuPanel.activePageIndex = -1;
+		menuPanel.activePageId = "";
 		allPages.model = 0;
 		topAlignmentPages.model = 0;
 		bottomAlignmentPages.model = 0;
@@ -141,9 +144,31 @@ Rectangle {
 		updateGui();
 	}
 
+	onCollapsedChanged: {
+		if(collapsed){
+			menuDefaultWidth = menuPanel.width
+			menuPanel.width = Style.menuPanelMinWidth
+		}
+		else {
+			menuPanel.width = menuDefaultWidth
+		}
+	}
+
 	function updateGui(){
 		if (!model){
 			return;
+		}
+
+		let savedActivePageId = menuPanel.activePageIndex >= 0 ? menuPanel.activePageId : "";
+		let targetIndex = 0;
+		if (savedActivePageId !== "" && model.getItemsCount() > 0){
+			for (let i = 0; i < model.getItemsCount(); i++){
+				let id = model.getData("id", i);
+				if (id === savedActivePageId){
+					targetIndex = i;
+					break;
+				}
+			}
 		}
 
 		topPagesModel.clear();
@@ -152,8 +177,11 @@ Rectangle {
 		allPages.model = 0;
 		topAlignmentPages.model = 0;
 		bottomAlignmentPages.model = 0;
-		menuPanel.activePageIndex = 0;
-		menuPanel.activePageId = "";
+
+		if (model.getItemsCount() > 0){
+			menuPanel.activePageIndex = targetIndex;
+			menuPanel.activePageId = model.getData("id", targetIndex);
+		}
 
 		for (let i = 0; i < model.getItemsCount(); i++){
 			if (model.containsKey("alignment", i)){
@@ -172,10 +200,6 @@ Rectangle {
 		allPages.model = model;
 		topAlignmentPages.model = topPagesModel;
 		bottomAlignmentPages.model = bottomPagesModel;
-
-        if (model.getItemsCount() > 0){
-            menuPanel.activePageId = model.getData("id",0);
-        }
 	}
 
 	function setActivePage(pageId){
@@ -230,52 +254,78 @@ Rectangle {
 		}
 	}
 
-	ToolButton {
-		id: collapseButton;
-
-		anchors.top: parent.top
-		anchors.right: parent.right
-		anchors.topMargin: Style.marginXS
-		anchors.rightMargin: Style.marginXS
-
-		width: height;
-		height: Style.buttonHeightXXS - 2;
-		z:100
-
-		visible: false//Style.enableMenuPanelCollapse && !collapsed
-
-		//iconSource: "../../../" + Style.getIconPath(!menuPanel.collapsed ? "Icons/Collapse" : "Icons/Expand", Icon.State.On, Icon.Mode.Normal);
-		iconSource: "../../../" + Style.getIconPath("Icons/Close" , Icon.State.On, Icon.Mode.Normal);
-
-		//tooltipText: !menuPanel.collapsed ? qsTr("Collapse") : qsTr("Expand");
-		property real menuDefaultWidth: 0
-		property bool collapsed: menuPanel.collapsed
-		onCollapsedChanged: {
-			if(collapsed){
-				menuDefaultWidth = menuPanel.width
-				menuPanel.width = Style.menuPanelMinWidth
-			}
-			else {
-				menuPanel.width = menuDefaultWidth
-			}
-		}
-		onClicked: {
-			//menuPanel.collapsed = !menuPanel.collapsed
-			menuPanel.collapsed = true
-		}
-	}
-
 	Loader{
 		anchors.fill: parent
 		sourceComponent: Style.menuPanelDecorator//backgroundComp
 	}
 
 
+	Button{
+		id: menuButton
+
+		anchors.top: parent.top
+		anchors.left: parent.left
+		anchors.topMargin: Style.marginS
+		anchors.leftMargin: (Style.menuPanelMinWidth - height)/2
+
+		visible: Style.enableMenuPanelCollapse
+
+		height: Style.controlHeightS
+
+		decorator: Component{
+			DecoratorBase{
+				id: dec;
+
+				height: menuButton.height
+				width: menuButtonText.text ? image.width + menuButtonText.width + menuButtonText.anchors.leftMargin : image.width
+
+				Image{
+					id: image;
+
+					width: height;
+					height: menuButton.height;
+
+					sourceSize.width: width;
+					sourceSize.height: height;
+
+					source: menuButton.iconSource;
+				}
+
+				BaseText{
+					id: menuButtonText
+
+					anchors.left: image.right
+					anchors.leftMargin: Style.marginM
+					anchors.verticalCenter: parent.verticalCenter
+
+					text: menuButton.collapsed ? "" : qsTr("Collapse Menu")
+					color: Style.inactiveTextColor
+				}
+			}
+		}
+
+		text: collapsed ? "" : qsTr("Collapse Menu")
+
+		iconSource: "../../../../" + Style.getIconPath("Icons/Menu", Icon.State.Off, Icon.Mode.Disabled);
+
+		property bool collapsed: false
+
+		onClicked: {
+			if(!collapsed){
+				Events.sendEvent("CollapseMenu", true)
+			}
+			else {
+				Events.sendEvent("ExpandMenu", false)
+			}
+			collapsed = !collapsed
+		}
+	}
 
 	Flickable{
 		id: allPagesFlick;
 
-		anchors.top: menuPanel.top;
+		anchors.top: menuButton.visible ? menuButton.bottom : menuPanel.top;
+		anchors.topMargin: menuButton.visible ? Style.marginL: 0
 		anchors.left: menuPanel.left;
 		anchors.right: menuPanel.right;
 		anchors.bottom: menuPanel.bottom;
@@ -299,11 +349,14 @@ Rectangle {
 	Column{
 		id: topAlignmentColumn;
 
-		anchors.top: menuPanel.top;
+		anchors.top: menuButton.visible ? menuButton.bottom: menuPanel.top;
 		anchors.left: menuPanel.left;
 		anchors.right: menuPanel.right;
 
-		anchors.topMargin: Style.menuPanelTopMargin !==undefined ? Style.menuPanelTopMargin : !menuPanel.centered ? 0 : parent.height - bottomAlignmentColumn.height - height > 0 ? (parent.height - bottomAlignmentColumn.height - height)/2 : 0 ;
+		anchors.topMargin: Style.menuPanelTopMargin !==undefined ? Style.menuPanelTopMargin :
+																   menuButton.visible ? Style.marginL :
+																						!menuPanel.centered ? 0 :
+																											  parent.height - bottomAlignmentColumn.height -  height > 0 ? (parent.height - bottomAlignmentColumn.height - height)/2 : 0
 
 		visible: !allPagesFlick.visible;
 
@@ -354,7 +407,5 @@ Rectangle {
 				}
 			}
 		}
-
 	}
-
 }

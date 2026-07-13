@@ -33,7 +33,7 @@ public:
 		\param [in] input				List of IDs for identifying input objects in the storage
 		\param [in] params				Processing parameters
 		\param [out] output				Result of job processing. Will be filled by the method implementation.
-		\param [out] progressManagerPtr	(Optionally) Progress manager used for receiving informaton about job progress and cancelation.
+		\param [out] progressManagerPtr	(Optionally) Progress manager used for receiving information about job progress and cancellation.
 		\return processing result \sa iproc::IProcessor::TaskState
 	*/
 	virtual int ExecuteTask(

@@ -6,7 +6,6 @@ import imtcontrols 1.0
 import imtauthUsersSdl 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
-import imtdeskgui 1.0
 
 DocumentViewBase {
 	id: container;

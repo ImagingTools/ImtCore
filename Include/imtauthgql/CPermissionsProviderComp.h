@@ -2,12 +2,12 @@
 #pragma once
 
 
+// ACF includes
+#include <iqt/ITranslationManager.h>
+
 // ImtCore includes
 #include <imtauth/ITenantManager.h>
 #include <imtlic/IProductInfo.h>
-#include <imtlic/CFeatureInfo.h>
-#include <imtsdl/TElementList.h>
-#include <iqt/ITranslationManager.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions_fwd.h>
 
 
@@ -30,6 +30,10 @@ protected:
 	// reimplemented (sdl::V1_0::imtauth::CPermissionsGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CGetProductPermissionsPayload OnGetProductPermissions(
 				const sdl::V1_0::imtauth::CGetProductPermissionsGqlRequest& getProductPermissionsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CGetProductPermissionsPayload OnGetUserPermissions(
+				const sdl::V1_0::imtauth::CGetUserPermissionsGqlRequest& getUserPermissionsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

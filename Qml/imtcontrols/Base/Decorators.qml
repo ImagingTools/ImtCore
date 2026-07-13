@@ -12,6 +12,7 @@ StyleComponents {
 	subMenuPanelButtonDecorator: subMenuPanelButtonDecoratorComp
 	menuPanelDecorator: Component{Item{}}
 	filterPanelDecorator: filterPanelDecoratorComp
+	metaInfoPanelDecorator: Component{Item{}}
 	// bottomPanelDecorator: bottomPanelDecoratorComp
 	topButtonDecorator: topButtonDecoratorComp
 	topPanelDecorator: topPanelDecoratorComp

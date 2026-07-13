@@ -21,16 +21,7 @@ class BaseModel extends ListModel {
 	}
 
 	getProperties(item){
-		let meta = item.__self.constructor.meta
-		let list = []
-
-		for (let key in meta) {
-			if ((meta[key].type !== Signal && key[0] === 'm' && key[1] === '_') || (key === '__typename')) {
-				list.push(key)
-			}
-		}
-
-		return list
+		return item.getProperties()
 	}
 
 	toJson(){
@@ -40,8 +31,8 @@ class BaseModel extends ListModel {
 			let list = this.getProperties(item)
 
 			json += '{'
-			for(let j = 0; j < list.length; j++){
-				let key = list[j]
+			let j = 0
+			for(let key of list){
 				if (item[key] == null){
 					json += '"' + item.getJSONKeyForProperty(key) + '": null'
 				}
@@ -81,7 +72,8 @@ class BaseModel extends ListModel {
 
 					json += '"' + item.getJSONKeyForProperty(key) + '":' + (typeof item[key] === 'string' ? '"' + safeValue + '"' : value)
 				}
-				if(j < list.length - 1) json += ','
+				if(j < list.size - 1) json += ','
+				j++
 			}
 			json +='}'
 
@@ -98,8 +90,8 @@ class BaseModel extends ListModel {
 			let list = this.getProperties(item)
 
 			graphQL += '{'
-			for(let j = 0; j < list.length; j++){
-				let key = list[j]
+			let j = 0
+			for(let key of list){
 				if (item[key] == null){
 					graphQL += item.getJSONKeyForProperty(key) + ':null'
 				}
@@ -135,7 +127,8 @@ class BaseModel extends ListModel {
 
 					graphQL += item.getJSONKeyForProperty(key) + ':' + (typeof item[key] === 'string' ? '"' + this.escapeSpecialChars(item[key]) + '"' : value)
 				}
-				if(j < list.length - 1) graphQL += ','
+				if(j < list.size - 1) graphQL += ','
+				j++
 			}
 			graphQL +='}'
 
@@ -204,7 +197,6 @@ class BaseModel extends ListModel {
 
 	addElement(element){
 		element.owner = this.owner
-		element.connectProperties()
 		this.append({item: element})
 		if (this.owner){
 			if (this.owner._internal && this.owner._internal.isTransaction){
@@ -263,7 +255,6 @@ class BaseModel extends ListModel {
 
 	insertElement(index, element){
 		element.owner = this.owner
-		element.connectProperties()
 		this.insert(index, {item: element})
 		if (this.owner){
 			if (this.owner._internal && this.owner._internal.isTransaction){

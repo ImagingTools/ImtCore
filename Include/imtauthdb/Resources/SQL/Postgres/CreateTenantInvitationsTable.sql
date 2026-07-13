@@ -2,7 +2,6 @@ CREATE TABLE IF NOT EXISTS "TenantInvitations" (
 "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 "UserId" UUID NOT NULL,
 "TenantId" UUID NOT NULL,
-"Role" TEXT NOT NULL,
 "Status" INTEGER NOT NULL,
 "InvitedByUserId" UUID NOT NULL,
 "CreatedAt" TIMESTAMP NOT NULL,

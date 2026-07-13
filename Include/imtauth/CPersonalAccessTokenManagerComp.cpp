@@ -24,6 +24,7 @@ namespace imtauth
 
 IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp::CreateToken(
 			const QByteArray& userId,
+			const QByteArray& productId,
 			const QString& name,
 			const QString& description,
 			const QByteArrayList& scopes,
@@ -58,6 +59,7 @@ IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp
 
 	tokenPtr->SetId(tokenId);
 	tokenPtr->SetUserId(userId);
+	tokenPtr->SetProductId(productId);
 	tokenPtr->SetName(name);
 	tokenPtr->SetDescription(description);
 	tokenPtr->SetTokenHash(tokenHash);
@@ -107,7 +109,7 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 		}
 
 		IPersonalAccessToken* tokenPtr = dynamic_cast<IPersonalAccessToken*>(dataPtr.GetPtr());
-		if (!tokenPtr->IsValid()){
+		if (!tokenPtr){
 			continue;
 		}
 
@@ -218,7 +220,7 @@ bool CPersonalAccessTokenManagerComp::RevokeToken(const QByteArray& tokenId)
 	}
 
 	IPersonalAccessToken* tokenPtr = dynamic_cast<IPersonalAccessToken*>(dataPtr.GetPtr());
-	if (!tokenPtr->IsValid()){
+	if (!tokenPtr){
 		SendErrorMessage(0, "Invalid token object", "CPersonalAccessTokenManagerComp");
 		return false;
 	}
@@ -252,7 +254,7 @@ bool CPersonalAccessTokenManagerComp::UpdateLastUsedAt(const QByteArray& tokenId
 	}
 
 	IPersonalAccessToken* tokenPtr = dynamic_cast<IPersonalAccessToken*>(dataPtr.GetPtr());
-	if (!tokenPtr->IsValid()){
+	if (!tokenPtr){
 		return false;
 	}
 

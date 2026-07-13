@@ -120,7 +120,7 @@ DocumentViewBase {
 		}
 	}
 
-	// Re-build pages when role / ownership state flips.
+	// Re-build pages whenever anything controlling page visibility changes.
 	Connections {
 		target: stateManager_
 		function onIsNewTenantChanged() {
@@ -130,13 +130,7 @@ DocumentViewBase {
 				stateManager_.loadInvitationsFromModel()
 			}
 		}
-		function onIsOwnerChanged() {
-			if (!stateManager_.isNewTenant) multiPageView.updatePages()
-		}
-		function onIsCreatorChanged() {
-			if (!stateManager_.isNewTenant) multiPageView.updatePages()
-		}
-		function onCanManageMembersChanged() {
+		function onPagesConfigKeyChanged() {
 			if (!stateManager_.isNewTenant) multiPageView.updatePages()
 		}
 	}
