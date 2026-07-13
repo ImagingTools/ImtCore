@@ -29,10 +29,8 @@ public:
 		I_ASSIGN(m_jobParamsFactPtr, "JobParamsFactory", "Factory used for creation of job params instance", true, "JobParamsFactory");
 	I_END_COMPONENT;
 
-protected:
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed() override;
+	// reimplemented (imthype::IJobTicket)
+	virtual iprm::IParamsSetSharedPtr CreateParams() const override;
 
 private:
 	I_FACT(iprm::IParamsSet, m_jobParamsFactPtr);

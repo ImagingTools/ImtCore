@@ -6,28 +6,15 @@ namespace imthype
 {
 
 
-// protected methods
+// reimplemented (imthype::IJobTicket)
 
-// reimplemented (icomp::CComponentBase)
-
-void CJobTicketComp::OnComponentCreated()
+iprm::IParamsSetSharedPtr CJobTicketComp::CreateParams() const
 {
-	BaseClass::OnComponentCreated();
-
-	// Set up the params factory if available
 	if (m_jobParamsFactPtr.IsValid()){
-		SetParamsFactory([this](const QByteArray& contextId, const QByteArray& typeId) -> iprm::IParamsSetSharedPtr {
-			Q_UNUSED(contextId);
-			Q_UNUSED(typeId);
-			return m_jobParamsFactPtr.CreateInstance();
-		});
+		return m_jobParamsFactPtr.CreateInstance();
 	}
-}
 
-
-void CJobTicketComp::OnComponentDestroyed()
-{
-	BaseClass::OnComponentDestroyed();
+	return iprm::IParamsSetSharedPtr();
 }
 
 
