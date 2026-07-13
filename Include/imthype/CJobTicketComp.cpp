@@ -18,22 +18,6 @@ iprm::IParamsSetSharedPtr CJobTicketComp::CreateParams() const
 }
 
 
-// protected methods
-
-// reimplemented (icomp::CComponentBase)
-
-void CJobTicketComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-}
-
-
-void CJobTicketComp::OnComponentDestroyed()
-{
-	BaseClass::OnComponentDestroyed();
-}
-
-
 } // namespace imthype
 
 

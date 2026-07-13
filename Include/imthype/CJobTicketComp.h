@@ -32,11 +32,6 @@ public:
 	// reimplemented (imthype::IJobTicket)
 	virtual iprm::IParamsSetSharedPtr CreateParams() const override;
 
-protected:
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed() override;
-
 private:
 	I_FACT(iprm::IParamsSet, m_jobParamsFactPtr);
 };
