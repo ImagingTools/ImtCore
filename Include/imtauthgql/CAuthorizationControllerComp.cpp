@@ -381,6 +381,7 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 			QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CPermissionList response;
+	response.permissions.emplace();
 
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Component 'UserCollection' was not set", "CAuthorizationControllerComp");
