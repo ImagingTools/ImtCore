@@ -78,7 +78,7 @@ const handler = {
 
                 if(connection.slot.meta && !connection.slot.meta.destruction){
                     let destructionFunc = ()=>{
-                        this.removeConnection(connectionObj)
+                        Signal.removeConnection(connectionObj)
                     }
                     destructionFunc.meta = {
                         name: connection.slot.meta.name,
@@ -105,7 +105,7 @@ const handler = {
 
                 if(connection.slot.meta && !connection.slot.meta.destruction){
                     let destructionFunc = ()=>{
-                        this.removeConnection(connectionObj)
+                        Signal.removeConnection(connectionObj)
                     }
                     destructionFunc.meta = {
                         name: connection.slot.meta.name,
@@ -137,7 +137,7 @@ const handler = {
 
                 if(connection.slot.meta && !connection.slot.meta.destruction){
                     let destructionFunc = ()=>{
-                        this.removeConnection(connectionObj)
+                        Signal.removeConnection(connectionObj)
                     }
                     destructionFunc.meta = {
                         name: connection.slot.meta.name,
@@ -162,7 +162,7 @@ const handler = {
 
                             if(connection.slot.meta && !connection.slot.meta.destruction){
                                 let destructionFunc = ()=>{
-                                    this.removeConnection(connectionObj)
+                                    Signal.removeConnection(connectionObj)
                                 }
                                 destructionFunc.meta = {
                                     name: connection.slot.meta.name,
@@ -181,7 +181,7 @@ const handler = {
 
                             if(connection.slot.meta && !connection.slot.meta.destruction){
                                 let destructionFunc = ()=>{
-                                    this.removeConnection(connectionObj)
+                                    Signal.removeConnection(connectionObj)
                                 }
                                 destructionFunc.meta = {
                                     name: connection.slot.meta.name,
@@ -204,7 +204,7 @@ const handler = {
 
                             if(connection.slot.meta && !connection.slot.meta.destruction){
                                 let destructionFunc = ()=>{
-                                    this.removeConnection(connectionObj)
+                                    Signal.removeConnection(connectionObj)
                                 }
                                 destructionFunc.meta = {
                                     name: connection.slot.meta.name,
@@ -222,7 +222,7 @@ const handler = {
 
                             if(connection.slot.meta && !connection.slot.meta.destruction){
                                 let destructionFunc = ()=>{
-                                    this.removeConnection(connectionObj)
+                                    Signal.removeConnection(connectionObj)
                                 }
                                 destructionFunc.meta = {
                                     name: connection.slot.meta.name,
