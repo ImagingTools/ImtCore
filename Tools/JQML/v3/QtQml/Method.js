@@ -8,12 +8,16 @@ class Method extends BaseObject {
      * @returns {Object}
      */
     static get(target, name){
-        let f = target[name].bind(target.__proxy)
-        f.meta = {
-            parent: target,
-            name: name
+        if(!target[`CACHED_FUNC_${name}`]){
+            let f = target[name].bind(target.__proxy)
+            f.meta = {
+                parent: target,
+                name: name
+            }
+            target[`CACHED_FUNC_${name}`] = f
         }
-        return f
+
+        return target[`CACHED_FUNC_${name}`]
     }
 
     /**
