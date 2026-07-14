@@ -191,10 +191,23 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	// If no handler supported the request (isSuccessful is still false)
 	// or if the loop never ran/serialization failed.
 	if (!isSuccessful){
-		SendErrorMessage(0, QStringLiteral("Invalid command request:'%1'").arg(QString(gqlCommand)), QStringLiteral("GraphQL - servlet"));
+		QString invalidCommandMessage;
+		if (gqlCommand.isEmpty()){
+			invalidCommandMessage = QStringLiteral("Invalid GraphQL command");
+		}
+		else{
+			invalidCommandMessage = QStringLiteral("Invalid command request: '%1'").arg(QString(gqlCommand));
+		}
 
-		 // Return 400 because this is a transport/routing failure, not a business logic error.
-		return GenerateError(StatusCode::SC_BAD_REQUEST, responseData, request);
+		SendErrorMessage(0, invalidCommandMessage, QStringLiteral("GraphQL - servlet"));
+
+		// Return 400 because this is a transport/routing failure, not a business logic error.
+		QByteArray errorJson = BuildGqlErrorJson(gqlCommand, invalidCommandMessage, QStringLiteral("Error"));
+		return CreateResponse(
+					StatusCode::SC_BAD_REQUEST,
+					errorJson,
+					request,
+					QByteArrayLiteral("application/json; charset=utf-8"));
 	}
 
 	// Fallback for unexpected internal state

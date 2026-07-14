@@ -14,6 +14,7 @@ private slots:
 	void initTestCase();
 
 	void CreateArrayQuery();
+	void CreateStringEscapesRoundTrip();
 	void CreateUnionRequest();
 	void ParseUnionFields();
 
@@ -25,6 +26,7 @@ private slots:
 	void ParseArrayOfObjectArraysQuery();
 	void ParseObjectQuery();
 	void ParseArrayQuery();
+	void ParseArrayEnumTokens();
 	void ParseComplexTest();
 	void ParseQueryWithVariables();
 	void ParseQueryWithOperationName();

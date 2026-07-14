@@ -13,14 +13,16 @@ Rectangle {
 
 	property string state:"";
 
-	property int mainRadius: Style.radiusS;
-	property string mainColor: Style.backgroundColor;
+	property int mainRadius: Style.radiusL;
+	property string mainColor: Style.backgroundColor2
 
 	property bool canRecoveryPassword: true;
 	property bool canRegisterUser: true;
 
 	property string appName: context ? context.appName : ""
 	
+	property bool isAuthenticating: false;
+
 	signal login(string login, string password)
 	signal registerUser(var userData)
 
@@ -35,6 +37,20 @@ Rectangle {
 
 	Component.onCompleted: {
 		decoratorPause.start();
+
+		authPageContainer.state = "unauthorized";
+		authPageContainer.isAuthenticating = false;
+
+		passwordTextInput.text = "";
+		
+		// Restore username from AuthorizationController if "Remember me" is checked
+		if (authPageContainer.rememberMe && AuthorizationController.lastUser !== "") {
+			loginTextInput.text = AuthorizationController.lastUser;
+		}
+		else {
+			loginTextInput.text = "";
+		}
+		loginTextInput.forceActiveFocus();
 	}
 
 	LocalizationEvent {
@@ -44,24 +60,28 @@ Rectangle {
 	}
 
 	function onLocalizationChanged(language){
-		titleLogin.text = qsTr("Login")
+		titleLogin.text = qsTr("Username")
 	}
 
 	onVisibleChanged: {
 		if (authPageContainer.visible){
-			authPageContainer.state = "unauthorized";
+			loginTextInput.forceActiveFocus();
+		}
+	}
 
+	Connections {
+		target: AuthorizationController;
+
+		function onLoginFailed(message){
+			authPageContainer.isAuthenticating = false;
+			// Clear password on error (common good UX: don't leave bad credentials; username stays)
 			passwordTextInput.text = "";
-			
-			// Restore username from AuthorizationController if "Remember me" is checked
-			if (authPageContainer.rememberMe && AuthorizationController.lastUser !== "") {
-				loginTextInput.text = AuthorizationController.lastUser;
-				passwordTextInput.forceActiveFocus();
-			}
-			else {
-				loginTextInput.text = "";
-				loginTextInput.forceActiveFocus();
-			}
+			errorMessage.text = (message && message !== "") ? message : qsTr("Username or password is incorrect");
+			passwordTextInput.forceActiveFocus();
+		}
+
+		function onLoggedIn(){
+			authPageContainer.isAuthenticating = false;
 		}
 	}
 
@@ -94,6 +114,7 @@ Rectangle {
 
 		onFinished: {
 			authPageContainer.setDecorators();
+			loginTextInput.forceActiveFocus();
 		}
 	}
 
@@ -118,10 +139,12 @@ Rectangle {
 
 		width: Style.sizeHintM;
 		//height: 380;
-		height: bodyColumn.height + headerItem.height;
+		height: bodyColumn.height + headerItem.height + Style.marginL;
 
 		radius: authPageContainer.mainRadius;
 		color: authPageContainer.mainColor;
+		border.width: 1;
+		border.color: Style.borderColor;
 
 		clip: true;
 
@@ -132,7 +155,7 @@ Rectangle {
 				id: headerRec;
 
 				width: loginContainer.width;
-				height: 80;
+				height: Math.max(80, welcomeText.implicitHeight + 56);
 
 				color: loginContainer.color;
 				radius: loginContainer.radius;
@@ -143,11 +166,18 @@ Rectangle {
 					anchors.top: parent.top;
 					anchors.topMargin: 30;
 					anchors.left: parent.left;
-					anchors.leftMargin: (parent.width - welcomeText.width)/2;
+					anchors.right: parent.right;
+					anchors.leftMargin: Style.marginXL;
+					anchors.rightMargin: Style.marginXL;
 
 					color: Style.textColor;
 					font.family: Style.fontFamily;
 					font.pixelSize: Style.fontSizeXXL;
+
+					horizontalAlignment: Text.AlignHCenter;
+					wrapMode: Text.Wrap;
+					maximumLineCount: 2;
+					elide: Text.ElideRight;
 
 					text: authPageContainer.appName !== "" ? qsTr("Welcome to") + " " + authPageContainer.appName : qsTr("Welcome");
 				}
@@ -158,7 +188,7 @@ Rectangle {
 			id: headerItem;
 
 			width: parent.width;
-			height: 70;
+			height: headerLoader.item ? headerLoader.item.height : 70;
 
 			Loader{
 				id: headerLoader;
@@ -168,9 +198,7 @@ Rectangle {
 				sourceComponent: Style.authorizationHeaderDecorator !== undefined ? Style.authorizationHeaderDecorator: headerDefaultComp;
 
 				onLoaded:{
-					headerItem.height = headerLoader.item.height;
 					headerLoader.width = headerLoader.item.width;
-					headerLoader.height = headerLoader.item.height;
 				}
 			}
 		}
@@ -180,9 +208,10 @@ Rectangle {
 			id: bodyColumn;
 
 			anchors.top: headerItem.bottom;
+			anchors.topMargin: Style.marginL;
 			anchors.horizontalCenter: parent.horizontalCenter;
 
-			spacing: Style.marginM;
+			spacing: Style.marginL;
 
 			Text {
 				id: titleLogin;
@@ -191,7 +220,7 @@ Rectangle {
 				font.family: Style.fontFamilyBold;
 				font.pixelSize: Style.fontSizeM;
 
-				text: qsTr("Login");
+				text: qsTr("Username");
 
 				Loader{
 					id: titleDecoratorLoader1;
@@ -209,7 +238,8 @@ Rectangle {
 				width: Style.sizeHintXS;
 				height: Style.controlHeightM;
 
-				placeHolderText: qsTr("Enter the login");
+				readOnly: authPageContainer.isAuthenticating;
+				placeHolderText: qsTr("Enter your username");
 				KeyNavigation.tab: passwordTextInput;
 				KeyNavigation.backtab: passwordTextInput;
 
@@ -220,10 +250,10 @@ Rectangle {
 				}
 
 				onAccepted: {
-					if (passwordTextInput.text != "" && loginTextInput.text != ""){
+					if (!authPageContainer.isAuthenticating && passwordTextInput.text != "" && loginTextInput.text != ""){
 						loginButton.clicked();
 					}
-					else if(loginTextInput.text != ""){
+					else if(!authPageContainer.isAuthenticating && loginTextInput.text != ""){
 						passwordTextInput.forceActiveFocus();
 					}
 				}
@@ -262,7 +292,8 @@ Rectangle {
 				width: Style.sizeHintXS;
 				height: Style.controlHeightM;
 
-				placeHolderText: qsTr("Enter the password");
+				readOnly: authPageContainer.isAuthenticating;
+				placeHolderText: qsTr("Enter your password");
 				echoMode: TextInput.Password;
 
 				KeyNavigation.tab: loginTextInput;
@@ -275,7 +306,7 @@ Rectangle {
 				}
 
 				onAccepted: {
-					if (passwordTextInput.text != "" && loginTextInput.text != ""){
+					if (!authPageContainer.isAuthenticating && passwordTextInput.text != "" && loginTextInput.text != ""){
 						loginButton.clicked();
 					}
 				}
@@ -300,6 +331,7 @@ Rectangle {
 					height: Math.min(24, parent.height - 10);
 					width: height;
 					z: 20
+					enabled: !authPageContainer.isAuthenticating
 
 					iconSource: passwordTextInput.echoMode == TextInput.Password ? "../../../" + Style.getIconPath("Icons/ShownPassword", Icon.State.On, Icon.Mode.Normal) :
 																				   "../../../" + Style.getIconPath("Icons/HiddenPassword", Icon.State.On, Icon.Mode.Normal) ;
@@ -315,25 +347,38 @@ Rectangle {
 				}
 			}
 
-			Item{
-				id: passwordRecoveryItem;
-
+			// Modern compact row: Remember me (left) + Password recovery (right)
+			// This is a common clean pattern in contemporary login forms.
+			Item {
+				id: optionsRow;
 				width: parent.width;
-				height: titlePasswordRecovery.height;
+				height: rememberMeCheckBox.height + 2;
+				visible: true;   // remember is always present; recovery visibility is handled on children
 
-				visible: authPageContainer.canRecoveryPassword;
+				CheckBox {
+					id: rememberMeCheckBox;
+					objectName: "RememberMeCheckBox"
+					anchors.left: parent.left;
+					anchors.verticalCenter: parent.verticalCenter;
+					checkState: Qt.Checked;
+					enabled: !authPageContainer.isAuthenticating;
+
+					text: qsTr("Remember me");
+				}
 
 				Text {
 					id: titlePasswordRecovery;
 
 					anchors.right: parent.right;
+					anchors.verticalCenter: parent.verticalCenter;
+					visible: authPageContainer.canRecoveryPassword;
 
-					color: Style.textColor;
+					color: Style.linkColor;
 					font.family: Style.fontFamilyBold;
 					font.pixelSize: Style.fontSizeM;
 					font.underline: true;
 
-					text: qsTr("Password recovery");
+					text: qsTr("Forgot password?");
 
 					Loader{
 						id: titleDecoratorLoader3;
@@ -347,8 +392,9 @@ Rectangle {
 				MouseArea{
 					id: passwordRecoveryMA;
 
-					anchors.fill: parent;
-
+					anchors.fill: titlePasswordRecovery;
+					visible: authPageContainer.canRecoveryPassword;
+					enabled: !authPageContainer.isAuthenticating;
 					cursorShape: Qt.PointingHandCursor;
 					hoverEnabled: true;
 					onClicked: {
@@ -357,38 +403,100 @@ Rectangle {
 				}
 			}
 
-			Item{
-				id: rememberMeItem;
+			Item {
+				id: buttonItem;
 
 				width: parent.width;
-				height: rememberMeCheckBox.height;
+				height: buttonContent.height + Style.marginL;
+				// Extra bottom space so the Sign in button is not pressed against the bottom of the card.
 
-				CheckBox {
-					id: rememberMeCheckBox;
-					objectName: "RememberMeCheckBox"
-					checkState: Qt.Checked
+				Column {
+					id: buttonContent;
+					anchors.centerIn: parent;
+					spacing: Style.marginM;
+					width: parent.width;
 
-					text: qsTr("Remember me");
+					Button {
+						id: loginButton;
+						objectName: "LoginButton"
+						anchors.horizontalCenter: parent.horizontalCenter;
+
+						width: Style.buttonWidthXXL;
+						height: Style.controlHeightM;
+
+						enabled: !authPageContainer.isAuthenticating && loginTextInput.text != "" && passwordTextInput.text != "";
+
+						text: qsTr("Sign in");
+
+						onClicked: {
+							errorMessage.text = "";
+							authPageContainer.isAuthenticating = true;
+							authPageContainer.login(loginTextInput.text, passwordTextInput.text)
+						}
+
+						// Loading indicator moved inside the button for better UX
+						Loading {
+							id: loginLoadingIndicator;
+							visible: authPageContainer.isAuthenticating;
+							anchors.right: parent.right;
+							anchors.rightMargin: 8;
+							anchors.verticalCenter: parent.verticalCenter;
+							width: 18;
+							height: 18;
+							color: "transparent";
+							background.color: "transparent";
+							indicatorSize: 14;
+							z: 20;
+						}
+					}
+
+					// Fixed-height container for error placed right under the Sign in button.
+					// The reserved space ensures the login card height never jumps when an error is shown/hidden.
+					Item {
+						id: errorContainer;
+						width: parent.width;
+						height: Style.controlHeightS + Style.marginS;
+
+						Text {
+							id: errorMessage;
+
+							anchors.top: parent.top;
+							anchors.topMargin: 2;
+							anchors.horizontalCenter: parent.horizontalCenter;
+							width: parent.width;
+
+							color: Style.errorTextColor;
+							font.family: Style.fontFamily;
+							font.pixelSize: Style.fontSizeM;
+
+							visible: text !== "";
+							horizontalAlignment: Text.AlignHCenter;
+							wrapMode: Text.Wrap;
+						}
+					}
 				}
-			}
+			}// buttonItem
 
-			Item{
+			// Register link placed below the main button - cleaner modern pattern
+			// (less clutter above the primary action).
+			Item {
 				id: registerItem;
 				width: parent.width;
-				height: registerUserText.height;
+				height: registerUserText.height + Style.marginM;
 				visible: authPageContainer.canRegisterUser;
 
 				Text {
 					id: registerUserText;
 
-					anchors.right: parent.right;
+					anchors.horizontalCenter: parent.horizontalCenter;
+					anchors.bottom: parent.bottom;
 
-					color: Style.textColor;
+					color: Style.linkColor;
 					font.family: Style.fontFamilyBold;
 					font.pixelSize: Style.fontSizeM;
 					font.underline: true;
 
-					text: qsTr("Register");
+					text: qsTr("Sign up");
 
 					Loader{
 						sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
@@ -400,6 +508,7 @@ Rectangle {
 				MouseArea{
 					anchors.fill: registerUserText;
 					objectName: "RegisterUser"
+					enabled: !authPageContainer.isAuthenticating;
 					cursorShape: Qt.PointingHandCursor;
 					hoverEnabled: true;
 					onClicked: {
@@ -408,56 +517,12 @@ Rectangle {
 				}
 			}
 
-			Item{
-				id: errorMessageItem;
-
-				width: parent.width;
-				height: Style.controlHeightS;
-
-				Text {
-					id: errorMessage;
-
-					anchors.verticalCenter: parent.verticalCenter;
-					anchors.horizontalCenter: parent.horizontalCenter;
-
-					color:  Style.errorTextColor;
-					font.family: Style.fontFamily;
-					font.pixelSize: Style.fontSizeM;
-
-					visible: text !== "";
-				}
-			}
-
+			// Small bottom spacer so the last element (button or Register) never feels
+			// pressed against the bottom edge of the card. Modern cards need breathing room.
 			Item {
-				id: buttonItem;
-
-				width: parent.width;
-				height: 70;
-
-				Button{
-					id: loginButton;
-					objectName: "LoginButton"
-					
-					anchors.centerIn: parent;
-					width: Style.buttonWidthXXL;
-					height: Style.controlHeightM;
-
-					property int loadingCount: 0;//for web
-					function setItemPropertiesAdd(){
-						if(loginButton.loadingCount > 0){
-							loginButton.width = 0;
-						}
-					}
-
-					enabled: loginTextInput.text != "" && passwordTextInput.text != "";
-
-					text: qsTr("Login");
-
-					onClicked: {
-						authPageContainer.login(loginTextInput.text, passwordTextInput.text)
-					}
-				}
-			}//
+				width: 1;
+				height: Style.marginM;
+			}
 		}//bodyColumn
 	}
 
@@ -472,7 +537,7 @@ Rectangle {
 			id: registerDialog;
 			width: Style.sizeHintXXL;
 			height: ModalDialogManager.activeView.height - 100;
-			title: qsTr("User Registration");
+			title: qsTr("Sign up");
 			canMove: false;
 
 			UserData {
@@ -481,7 +546,7 @@ Rectangle {
 			}
 
 			Component.onCompleted: {
-				addButton(Enums.save, qsTr("Register"), true);
+				addButton(Enums.save, qsTr("Sign up"), true);
 				addButton(Enums.close, qsTr("Close"), true);
 			}
 

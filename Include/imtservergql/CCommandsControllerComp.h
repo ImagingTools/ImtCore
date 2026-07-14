@@ -4,17 +4,17 @@
 
 // ImtCore includes
 #include <imtserverapp/IGuiElementContainer.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Commands.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Commands_fwd.h>
 
 
 namespace imtservergql
 {
 
 
-class CCommandsControllerComp: public sdl::imtbase::Commands::CGraphQlHandlerCompBase
+class CCommandsControllerComp: public sdl::V1_0::imtbase::CCommandsGqlHandlerCompBase
 {
 public:
-	typedef sdl::imtbase::Commands::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtbase::CCommandsGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCommandsControllerComp);
 		I_ASSIGN(m_guiElementContainerCompPtr, "GuiElementContainer", "GUI element  container", true, "GuiElementContainer");
@@ -22,10 +22,10 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtbase::Commands::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtbase::CCommandsGqlHandlerCompBase)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
-	virtual sdl::imtbase::Commands::CGuiElementContainer OnGetCommands(
-				const sdl::imtbase::Commands::CGetCommandsGqlRequest& getCommandsRequest,
+	virtual sdl::V1_0::imtbase::CGuiElementContainer OnGetCommands(
+				const sdl::V1_0::imtbase::CGetCommandsGqlRequest& getCommandsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
@@ -33,12 +33,12 @@ protected:
 private:
 	bool GetRepresentationFromGuiElementContainer(
 			const imtserverapp::IGuiElementContainer& guiElementContainer,
-			sdl::imtbase::Commands::CGuiElementContainer::V1_0& representation,
+			sdl::V1_0::imtbase::CGuiElementContainer& representation,
 			const QByteArray& languageId,
 			const imtauth::IUserInfo* userInfoPtr) const;
 	bool GetRepresentationFromGuiElement(
 	const imtserverapp::IGuiElementModel& guiElementModel,
-	sdl::imtbase::Commands::CGuiElementModel::V1_0& representation,
+	sdl::V1_0::imtbase::CGuiElementModel& representation,
 	const QByteArray& languageId) const;
 	QString TranslateName(const QString& name, const QString& context, const QByteArray& languageId) const;
 	

@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6397" Description="ACF"/>
-            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -273,6 +273,9 @@
                     <AttributeInfo Id="CommandPermissions" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserPermissions"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DelegatedAccess" Type="Reference" ExportId="DelegatedAccess">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="HashCalculator" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="HashCalculator"/>
                     </AttributeInfo>
@@ -343,6 +346,27 @@
                         <Data IsEnabled="true" Value="UserInfo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserGroupInfoProvider" Type="Reference" ExportId="UserGroupInfoProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="MembershipManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MembershipCollection" Type="Reference" ExportId="MembershipCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BindingManager" Type="Reference" ExportId="BindingManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="InvitationCollection" Type="Reference" ExportId="InvitationCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="PersonalAccessTokenManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="SessionCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">

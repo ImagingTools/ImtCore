@@ -5,7 +5,7 @@ schema {
 }
 
 import {
-	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+	"../../imtbase/1.0/ImtCollection.sdl"
 }
 
 input GetUserActionsInput {

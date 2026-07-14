@@ -12,6 +12,13 @@ class MouseController {
     oldList = []
     timestamp = 0
     dropAreaList = []
+    buttonTimestamp = {
+        0: 0,
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+    }
 
     constructor(){
         window.addEventListener('mousemove', (e)=>{
@@ -64,7 +71,21 @@ class MouseController {
     }
 
     getDropArea(x, y){
+        for(let dropArea of this.dropAreaList){
+            dropArea.setStyle({
+                pointerEvents: 'auto',
+                touchAction: 'auto',
+            })
+        }
+
         let elements = document.elementsFromPoint(x, y)
+
+        for(let dropArea of this.dropAreaList){
+            dropArea.setStyle({
+                pointerEvents: 'none',
+                touchAction: 'none',
+            })
+        }
 
         for(let element of elements){
             if(element.id && UIDList[element.id] && UIDList[element.id].$droparea && UIDList[element.id].getPropertyValue('enabled') && UIDList[element.id].getPropertyValue('visible')){
@@ -186,8 +207,8 @@ class MouseController {
         this.target = null
         this.dblClicked = false
         let timestamp = (new Date()).getTime()
-        if(timestamp - this.timestamp < 300) this.dblClicked = true
-        this.timestamp = timestamp
+        if(timestamp - this.buttonTimestamp[button] < 300) this.dblClicked = true
+        this.buttonTimestamp[button] = timestamp
         this.originX = x
         this.originY = y
         this.moveX = x
@@ -776,6 +797,9 @@ class KeyboardController {
 
                     let parent = obj
                     while(parent){
+                        if(!parent.$properties){
+                            break
+                        }
                         if(parent.$properties.KeyNavigation){
                     
                             if(event.key === Qt.Key_Shift || event.key === Qt.Key_Control || event.key === Qt.Key_Alt) return
@@ -991,11 +1015,15 @@ class TextFontController {
     constructor(){
         this.container = document.createElement('div')
         this.container.style.position = 'absolute'
-        this.container.style.display = 'inline'
-        this.container.style.opacity = 0
+        this.container.style.left = '-100000px'
+        this.container.style.top = '0'
+        this.container.style.display = 'inline-block'
+        this.container.style.visibility = 'hidden'
+        this.container.style.pointerEvents = 'none'
         this.container.style.lineHeight = 'normal'
 
         this.content = document.createElement('span')
+        this.content.style.display = 'inline-block'
         this.container.appendChild(this.content)
 
         document.body.appendChild(this.container)
@@ -1007,10 +1035,24 @@ class TextFontController {
     measureTextFast(text, font){
         this.ctx.font = `${font.italic ? 'italic ' : ''}${font.bold ? 'bold ' : ''}${font.pixelSize}px ${font.family}`
         let textMetrics = this.ctx.measureText(text)
+
+        let width = textMetrics.width
+        if(Number.isFinite(textMetrics.actualBoundingBoxLeft) && Number.isFinite(textMetrics.actualBoundingBoxRight)){
+            width = Math.max(width, textMetrics.actualBoundingBoxLeft + textMetrics.actualBoundingBoxRight)
+        }
+
+        let height = 0
+        if(Number.isFinite(textMetrics.fontBoundingBoxAscent) && Number.isFinite(textMetrics.fontBoundingBoxDescent)){
+            height = textMetrics.fontBoundingBoxAscent + textMetrics.fontBoundingBoxDescent
+        } else if(Number.isFinite(textMetrics.actualBoundingBoxAscent) && Number.isFinite(textMetrics.actualBoundingBoxDescent)){
+            height = textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent
+        } else {
+            height = Math.ceil(font.pixelSize * 1.2)
+        }
         
         return {
-            width: textMetrics.width,
-            height: textMetrics.fontBoundingBoxAscent + textMetrics.fontBoundingBoxDescent,
+            width: Math.ceil(width + 1),
+            height: Math.ceil(height + 1),
             isHTML: false,
         }
     }
@@ -1025,7 +1067,9 @@ class TextFontController {
             let result = text.match(TextFontController.regexp)
             if(result){
                 for(let res of result){
-                    if(TextFontController.tags.indexOf(res) >= 0){
+                    let tagMatch = res.match(/^<\s*\/?\s*([a-z0-9]+)/i)
+                    let tag = tagMatch ? `<${tagMatch[1].toLowerCase()}>` : res.toLowerCase()
+                    if(TextFontController.tags.indexOf(tag) >= 0){
                         isHTML = true
                         break
                     }
@@ -1064,21 +1108,26 @@ class TextFontController {
 
         if(elide === TextFontController.ElideRight){
             this.content.style.textOverflow = 'ellipsis'
-            this.content.style.overflow = 'auto'
+            this.content.style.overflow = 'hidden'
+            this.content.style.whiteSpace = 'nowrap'
         } else {
             this.content.style.textOverflow = 'unset'
             this.content.style.overflow = 'unset'
+            this.content.style.whiteSpace = 'inherit'
         }
 
         if(isHTML){
             this.content.innerHTML = text
         } else {
-            this.content.innerText = text
+            this.content.textContent = text
         }
         
         let rect = this.content.getBoundingClientRect()
-        rect.isHTML = isHTML
-        return rect
+        return {
+            width: Math.ceil(Math.max(rect.width, this.content.scrollWidth) + 1),
+            height: Math.ceil(Math.max(rect.height, this.content.scrollHeight) + 1),
+            isHTML: isHTML,
+        }
     }
 }
 class AnimationController {

@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="CrossOrgGrantCollectionDocumentService" PackageId="ImtAuthGqlPck" ComponentId="CrossOrgGrantCollectionDocumentService">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionDocumentService" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CrossOrgGrantsDocumentService"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantCollection" Type="Reference" ExportId="TenantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CrossOrgGrantDocumentValidator" PackageId="ImtAuthPck" ComponentId="CrossOrgGrantDocumentValidator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="CrossOrgGrantInfo" PackageId="ImtAuthPck" ComponentId="CrossOrgGrantInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="CrossOrgGrantItemInfoProvider" PackageId="ImtAuthGqlPck" ComponentId="CrossOrgGrantItemInfoProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GrantCollection" Type="Reference" ExportId="CrossOrgGrantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantCollection" Type="Reference" ExportId="TenantCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CrossOrgGrantManager" PackageId="ImtAuthPck" ComponentId="CrossOrgGrantManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GrantCollection" Type="Reference" ExportId="CrossOrgGrantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GrantFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="CrossOrgGrantInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CrossOrgGrantsDocumentService" PackageId="ImtCollectionVoce" ComponentId="CollectionDocumentService">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Collection" Type="Reference" ExportId="CrossOrgGrantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="CrossOrgGrants"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentValidators" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CrossOrgGrantDocumentValidator</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsSingleCopyMode" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CrossOrgGrantInfo</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypeIdList" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CrossOrgGrant</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CrossTenantMessageBroker" PackageId="ImtAuthPck" ComponentId="CrossTenantMessageBroker">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="CrossTenantMessageRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MessageFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="CrossTenantMessageInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Projection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CrossTenantMessageProjection"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CrossTenantMessageInfo" PackageId="ImtAuthPck" ComponentId="CrossTenantMessageInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="CrossTenantMessageNotificationPublisher" PackageId="ImtAuthGqlPck" ComponentId="CrossTenantMessageNotificationPublisher">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>OnCrossTenantMessageNotification</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MessageBroker" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CrossTenantMessageBroker"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CrossTenantMessageProjection" PackageId="ImtAuthPck" ComponentId="CrossTenantMessageProjection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="FilterableSelectController" PackageId="ImtServerGqlPck" ComponentId="FilterableSelectController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="CrossOrgGrants"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="CrossOrgGrantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectParamsFiller" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CrossOrgGrantItemInfoProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParamSetRepresentationController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GrantParamsRepresentation"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantFilterEnabled" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GrantCommandsController" PackageId="ImtGraphQlVoce" ComponentId="StandardDocumentCommandsController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="CrossOrgGrant"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GrantDemultiplexer" PackageId="ImtServerGqlPck" ComponentId="GraphQLDemultiplexer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GqlRequestHandlers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CrossOrgGrantsDocumentService</Value>
+                                <Value>CrossOrgGrantCollectionDocumentService</Value>
+                                <Value>GrantCommandsController</Value>
+                                <Value>FilterableSelectController</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GrantParamsRepresentation" PackageId="" ComponentId="GrantParamsRepresentation">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SlaveSubscriberController" PackageId="ImtServerGqlPck" ComponentId="SlaveSubscriberController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubscriberController" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CrossOrgGrantsDocumentService</Value>
+                                <Value>CrossTenantMessageNotificationPublisher</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList>
+        <EmbeddedRegistry Id="GrantParamsRepresentation">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="DirectionRepresentationController" PackageId="ImtServerAppPck" ComponentId="TextParamRepresentationController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ModelId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="direction"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Name" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="Direction"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="ExpiresAtRepresentationController" PackageId="ImtServerAppPck" ComponentId="TextParamRepresentationController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ModelId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="expiresAt"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Name" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="Expires At"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="ParamsSetRepresentation" PackageId="ImtServerAppPck" ComponentId="ParamSetRepresentationController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ModelId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="Params"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Name" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="Params"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ParamRepresentationControllers" Type="Reference[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>TargetTenantRepresentationController</Value>
+                                            <Value>RolesRepresentationController</Value>
+                                            <Value>ExpiresAtRepresentationController</Value>
+                                            <Value>DirectionRepresentationController</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="RolesRepresentationController" PackageId="ImtServerAppPck" ComponentId="TextParamRepresentationController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ModelId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="roles"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Name" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="Roles"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="TargetTenantRepresentationController" PackageId="ImtServerAppPck" ComponentId="TextParamRepresentationController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ModelId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="targetTenant"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Name" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="TargetT enant"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces>
+                    <Interface InterfaceId="imtserverapp::IJsonRepresentationController" ComponentId="ParamsSetRepresentation"/>
+                </ExportedInterfaces>
+                <ExportedComponents/>
+            </Data>
+        </EmbeddedRegistry>
+    </EmbeddedRegistriesList>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="GrantDemultiplexer"/>
+        <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="SlaveSubscriberController"/>
+        <Interface InterfaceId="imtserverapp::IGuiElementContainer" ComponentId="GrantCommandsController"/>
+        <Interface InterfaceId="imtserverapp::IRepresentationController" ComponentId="GrantCommandsController"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="CrossOrgGrantManager" ComponentId="CrossOrgGrantManager"/>
+        <Component ExportedId="CrossTenantMessageBroker" ComponentId="CrossTenantMessageBroker"/>
+        <Component ExportedId="CrossTenantMessageProjection" ComponentId="CrossTenantMessageProjection"/>
+    </ExportedComponents>
+</Acf>

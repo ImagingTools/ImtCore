@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -29,6 +29,15 @@
         <Element Id="ProfileController" PackageId="ImtAuthGqlPck" ComponentId="ProfileController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="BindingManager" Type="Reference" ExportId="BindingManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CrossOrgGrantManager" Type="Reference" ExportId="CrossOrgGrantManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DelegatedAccess" Type="Reference" ExportId="DelegatedAccess">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GroupCollection" Type="Reference" ExportId="GroupCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -38,10 +47,10 @@
                     <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="TenantMembershipManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ProductInfo" Type="Reference" ExportId="FeatureContainer">
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleCollection">
+                    <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="RoleInfoProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">

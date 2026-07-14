@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
+#include <imtbase/imtbase.h>
 
 
 namespace imtauth
@@ -41,6 +42,11 @@ ITenantInfoUniquePtr CTenantManagerComp::GetTenant(const QByteArray& tenantId) c
 		return nullptr;
 	}
 
+	if (!imtbase::isValidUuid(tenantId)){
+		SendErrorMessage(0, QString("Invalid tenant id '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+		return nullptr;
+	}
+
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_tenantCollectionCompPtr->GetObjectData(tenantId, dataPtr)){
 		return nullptr;
@@ -61,6 +67,17 @@ ITenantInfoUniquePtr CTenantManagerComp::GetTenant(const QByteArray& tenantId) c
 	}
 
 	return clonedTenant;
+}
+
+
+QByteArrayList CTenantManagerComp::GetTenantPermissions(const QByteArray& tenantId) const
+{
+	ITenantInfoUniquePtr tenantPtr = GetTenant(tenantId);
+	if (!tenantPtr.IsValid()){
+		return QByteArrayList();
+	}
+
+	return tenantPtr->GetTenantPermissions();
 }
 
 
@@ -92,13 +109,24 @@ QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QSt
 	tenantPtr->SetCreatedAt(now);
 	tenantPtr->SetUpdatedAt(now);
 
+	// Grant the tenant a default set of permissions that its roles are allowed to
+	// use. Roles created within a tenant context may only reference permissions
+	// present in this set (see CRoleDocumentValidatorComp); without a default set
+	// a fresh tenant could not grant its roles any RBAC permission at all.
+	static const QByteArrayList defaultTenantPermissions = {
+		QByteArrayLiteral("ViewUsers"), QByteArrayLiteral("AddUser"), QByteArrayLiteral("UserUpdate"), QByteArrayLiteral("RemoveUser"), QByteArrayLiteral("UserItem"),
+		QByteArrayLiteral("ViewRoles"), QByteArrayLiteral("AddRole"), QByteArrayLiteral("RoleUpdate"), QByteArrayLiteral("RemoveRole"), QByteArrayLiteral("RoleItem"),
+		QByteArrayLiteral("ViewGroups"), QByteArrayLiteral("AddGroup"), QByteArrayLiteral("GroupUpdate"), QByteArrayLiteral("RemoveGroup"), QByteArrayLiteral("GroupItem")
+	};
+	tenantPtr->SetTenantPermissions(defaultTenantPermissions);
+
 	QByteArray retVal = m_tenantCollectionCompPtr->InsertNewObject("Tenant", tenantName, description, tenantPtr.GetPtr(), tenantId);
 	if (retVal.isEmpty()){
 		SendErrorMessage(0, "Failed to store tenant in collection", "CTenantManagerComp");
 		return QByteArray();
 	}
 
-	SendInfoMessage(0, QString("Created tenant '%1' (id: %2)").arg(tenantName, QString::fromUtf8(tenantId), "CTenantManagerComp"));
+	SendInfoMessage(0, QString("Created tenant '%1' (id: %2)").arg(tenantName, QString::fromUtf8(tenantId)), "CTenantManagerComp");
 
 	return tenantId;
 }
@@ -195,6 +223,95 @@ bool CTenantManagerComp::SetTenantActive(const QByteArray& tenantId, bool isActi
 	SendInfoMessage(0, QString("Set tenant '%1' active=%2").arg(QString::fromUtf8(tenantId)).arg(isActive), "CTenantManagerComp");
 
 	return true;
+}
+
+
+bool CTenantManagerComp::SetTenantHierarchy(const QByteArray& tenantId, const QByteArray& parentTenantId)
+{
+	if (!m_tenantCollectionCompPtr.IsValid()){
+		SendErrorMessage(0, "Tenant collection not configured", "CTenantManagerComp");
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!m_tenantCollectionCompPtr->GetObjectData(tenantId, dataPtr)){
+		SendErrorMessage(0, QString("Tenant '%1' not found").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+		return false;
+	}
+
+	ITenantInfo* tenantPtr = dynamic_cast<ITenantInfo*>(dataPtr.GetPtr());
+	if (tenantPtr == nullptr){
+		SendErrorMessage(0, "Invalid tenant object", "CTenantManagerComp");
+		return false;
+	}
+
+	istd::CChangeNotifier changeNotifier(this);
+
+	tenantPtr->SetParentTenantId(parentTenantId);
+
+	tenantPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+
+	if (!m_tenantCollectionCompPtr->SetObjectData(tenantId, *tenantPtr)){
+		SendErrorMessage(0, QString("Failed to set hierarchy for tenant '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+		return false;
+	}
+
+	SendInfoMessage(0, QString("Set hierarchy for tenant '%1' (parent: %2)").arg(
+		QString::fromUtf8(tenantId), parentTenantId.isEmpty() ? "none" : QString::fromUtf8(parentTenantId)), "CTenantManagerComp");
+
+	return true;
+}
+
+
+bool CTenantManagerComp::EnsureSystemTenant()
+{
+	if (!m_tenantCollectionCompPtr.IsValid() || !m_tenantFactoryCompPtr.IsValid()){
+		SendErrorMessage(0, "Tenant collection or factory not configured", "CTenantManagerComp");
+		return false;
+	}
+
+	QByteArray systemTenantId = imtauth::GetSystemTenantId();
+
+	// Check if System-Tenant already exists
+	ITenantInfoUniquePtr existingTenant = GetTenant(systemTenantId);
+	if (existingTenant.IsValid()){
+		SendInfoMessage(0, "System-Tenant already exists", "CTenantManagerComp");
+		return true;
+	}
+
+	// Create the System-Tenant
+	istd::CChangeNotifier changeNotifier(this);
+
+	ITenantInfoUniquePtr tenantPtr = m_tenantFactoryCompPtr.CreateInstance();
+	if (!tenantPtr.IsValid()){
+		SendErrorMessage(0, "Failed to create System-Tenant object", "CTenantManagerComp");
+		return false;
+	}
+
+	QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+
+	tenantPtr->SetTenantId(systemTenantId);
+	tenantPtr->SetTenantName(QStringLiteral("System"));
+	tenantPtr->SetTenantDescription(QStringLiteral("Root system tenant"));
+	tenantPtr->SetActive(true);
+	tenantPtr->SetCreatedAt(now);
+	tenantPtr->SetUpdatedAt(now);
+
+	QByteArray retVal = m_tenantCollectionCompPtr->InsertNewObject("Tenant", QStringLiteral("System"), QStringLiteral("Root system tenant"), tenantPtr.GetPtr(), systemTenantId);
+	if (retVal.isEmpty()){
+		SendErrorMessage(0, "Failed to store System-Tenant in collection", "CTenantManagerComp");
+		return false;
+	}
+
+	SendInfoMessage(0, "System-Tenant created successfully", "CTenantManagerComp");
+
+	return true;
+}
+
+
+QByteArray CTenantManagerComp::GetSystemTenantId() const
+{
+	return imtauth::GetSystemTenantId();
 }
 
 

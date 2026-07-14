@@ -57,13 +57,11 @@ class Rectangle extends Item {
     }
 
     SLOT_colorChanged(oldValue, newValue){
-        // this.__setDOMStyle({
-        //     backgroundColor: newValue
-        // })
+        let alphaMultiplier = newValue === 'transparent' ? 0 : this.opacity
         let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
         this.__setDOMStyle({
-            opacity: 1,
-            backgroundColor: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+            opacity: this.opacity > 0 ? 1 : 0,
+            backgroundColor: `rgba(${rgba.r},${rgba.g},${rgba.b},${rgba.a * alphaMultiplier})`
         })
     }
 
@@ -76,10 +74,11 @@ class Rectangle extends Item {
     }
 
     SLOT_opacityChanged(oldValue, newValue){
+        let alphaMultiplier = this.color === 'transparent' ? 0 : newValue
         let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
         this.__setDOMStyle({
             opacity: newValue > 0 ? 1 : 0,
-            backgroundColor: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * newValue})`
+            backgroundColor: `rgba(${rgba.r},${rgba.g},${rgba.b},${rgba.a * alphaMultiplier})`
         })
     }
 

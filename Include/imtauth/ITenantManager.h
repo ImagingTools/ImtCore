@@ -18,10 +18,34 @@ class ITenantManager: virtual public istd::IChangeable
 public:
 	virtual QByteArrayList GetTenantIds() const = 0;
 	virtual ITenantInfoUniquePtr GetTenant(const QByteArray& tenantId) const = 0;
+	virtual QByteArrayList GetTenantPermissions(const QByteArray& tenantId) const = 0;
 	virtual QByteArray CreateTenant(const QString& tenantName, const QString& description = QString(), const QByteArray& ownerId = QByteArray()) = 0;
 	virtual bool RemoveTenant(const QByteArray& tenantId) = 0;
 	virtual bool UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId = QByteArray(), bool updateOwner = false) = 0;
 	virtual bool SetTenantActive(const QByteArray& tenantId, bool isActive) = 0;
+
+	/**
+		Set hierarchy fields on an existing tenant.
+		Calculates depth and materialized path based on the parent tenant.
+		\param tenantId The tenant to update.
+		\param parentTenantId The parent tenant ID (empty to make top-level).
+		\return true if hierarchy was set successfully.
+	*/
+	virtual bool SetTenantHierarchy(const QByteArray& tenantId, const QByteArray& parentTenantId) = 0;
+
+	/**
+		Get the System-Tenant ID.
+		Returns the well-known System-Tenant ID constant.
+	*/
+	virtual QByteArray GetSystemTenantId() const = 0;
+
+	/**
+		Ensure the System-Tenant exists.
+		Creates the System-Tenant if it does not already exist.
+		Should be called during server bootstrap/initialization.
+		\return true if the System-Tenant exists or was successfully created.
+	*/
+	virtual bool EnsureSystemTenant() = 0;
 };
 
 

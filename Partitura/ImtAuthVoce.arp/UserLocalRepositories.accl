@@ -2,15 +2,26 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="DatabaseUserSettings" X="1050" Y="525" Note=""/>
+        <Element ComponentName="SQLiteContractRepository" X="1025" Y="50" Note=""/>
+        <Element ComponentName="SQLiteCrossOrgGrantRepository" X="600" Y="225" Note=""/>
+        <Element ComponentName="SQLiteCrossTenantMessageRepository" X="975" Y="225" Note=""/>
+        <Element ComponentName="SQLiteOrderRequestRepository" X="200" Y="225" Note=""/>
         <Element ComponentName="SQLiteRoleRepository" X="250" Y="125" Note=""/>
+        <Element ComponentName="SQLiteTenantConnectionCodeRepository" X="200" Y="775" Note=""/>
+        <Element ComponentName="SQLiteTenantConnectionRepository" X="175" Y="675" Note=""/>
+        <Element ComponentName="SQLiteTenantConnectionRequestRepository" X="475" Y="50" Note=""/>
+        <Element ComponentName="SQLiteTenantEntityBindingRepository" X="1000" Y="675" Note=""/>
         <Element ComponentName="SQLiteTenantInvitationRepository" X="675" Y="475" Note=""/>
         <Element ComponentName="SQLiteTenantMembershipRepository" X="700" Y="775" Note=""/>
+        <Element ComponentName="SQLiteTenantRelationshipProposalRepository" X="600" Y="675" Note=""/>
+        <Element ComponentName="SQLiteTenantRelationshipRepository" X="225" Y="450" Note=""/>
         <Element ComponentName="SQLiteTenantRepository" X="700" Y="600" Note=""/>
         <Element ComponentName="SQLiteUserGroupRepository" X="250" Y="600" Note=""/>
         <Element ComponentName="SQLiteUserRepository" X="250" Y="350" Note=""/>

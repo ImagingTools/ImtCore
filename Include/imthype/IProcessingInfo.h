@@ -13,8 +13,8 @@ namespace imthype
 
 /**
 	This interface describes processing information for a job.
-	The \c istd::IInformationProvder interface represents the status of the entire job.
-	Additionaly you can get access to the procesing information using \c GetProcesinginfo method
+	The \c istd::IInformationProvider interface represents the status of the entire job.
+	Additionally you can get access to the processing information using \c GetProcessingInfo method
 	or get the processing log.
 */
 class IProcessingInfo: virtual public istd::IInformationProvider, virtual public iser::ISerializable

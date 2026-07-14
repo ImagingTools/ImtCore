@@ -88,10 +88,12 @@ class BaseClass extends QtObject {
         enableNotifications: { type: Bool, value: true },
 		propertiesIsConnected: { type: Bool, value: false },
 		owner: { type: Var, value: null },
+		_internal: { type: Var, value: null },
 
 		enableNotificationsChanged: {type:Signal, args:[]},
 		propertiesIsConnectedChanged: {type:Signal, args:[]},
 		ownerChanged: {type:Signal, args:[]},
+		_internalChanged: {type:Signal, args:[]},
 
 		modelChanged: { type:Signal, args: ['changeSet'] },
 		finished: { type:Signal, args: [] },
@@ -106,6 +108,8 @@ class BaseClass extends QtObject {
 		return proxy
 	}
 
+	static cachedPoperties = new Set(['__typename'])
+
 	SLOT_modelChanged(changeSet){
 		if (this.owner && this.owner.enableNotifications && this.owner.modelChanged) {
 			if (this.owner._internal.isTransaction){
@@ -116,11 +120,6 @@ class BaseClass extends QtObject {
 				this.owner.modelChanged(changeSet)
 			}
 		}
-	}
-
-	__complete() {
-		this.connectProperties()
-		super.__complete()
 	}
 
 	// SLOT_modelChanged(changeSet){
@@ -140,7 +139,7 @@ class BaseClass extends QtObject {
 	removeKey(key){
 		let selfKeys = this.getProperties()
 
-		if (selfKeys.includes(key)) {
+		if (selfKeys.has(key)) {
 			if (this[key] && this[key].destroy){
 				this[key].destroy()
 			}
@@ -151,21 +150,7 @@ class BaseClass extends QtObject {
 		this._internal.removed.push(key)
 	}
 
-	connectProperties() {
-		if (this.propertiesIsConnected) {
-			return
-		}
-
-		let list = this.getProperties()
-
-		for (let name of list) {
-			Signal.get(this, name + 'Changed').connect(()=>{
-				if (this.enableNotifications) this._internal.internalModelChanged(name, self)
-			})
-		}
-
-		this.propertiesIsConnected = true
-	}
+	connectProperties() {}
 
 	createMe() {
 		return BaseClass.create()
@@ -179,14 +164,12 @@ class BaseClass extends QtObject {
 		let selfKeys = this.getProperties()
 		let sourceKeys = model.getProperties()
 
-		if (selfKeys.length !== sourceKeys.length) {
+		if (selfKeys.size !== sourceKeys.size) {
 			return false;
 		}
 
-		for (let i = 0; i < selfKeys.length; i++) {
-			let key = selfKeys[i]
-
-			if (!sourceKeys.includes(key)) {
+		for (let key of selfKeys) {
+			if (!sourceKeys.has(key)) {
 				return false
 			}
 
@@ -228,7 +211,6 @@ class BaseClass extends QtObject {
 	copyMe() {
 		let obj = this.createMe()
 		obj.fromJSON(this.toJson())
-		obj.connectProperties()
 
 		return obj
 	}
@@ -255,6 +237,10 @@ class BaseClass extends QtObject {
 	}
 
 	getProperties() {
+		return this.__self.constructor.cachedPoperties
+	}
+
+	getProperties2() {
 		let meta = this.__self.constructor.meta
 		let list = []
 
@@ -272,12 +258,9 @@ class BaseClass extends QtObject {
 	}
 
 	toJson() {
-		let list = this.getProperties()
-
 		let json = '{'
 		let isFirst = true
-		for (let i = 0; i < list.length; i++) {
-			let key = list[i]
+		for (let key of this.getProperties()) {
 			if(key === '__typename' && this[key] === '') continue
 
 			if (this[key] == null && this._internal.containceInRemoved(key)){
@@ -331,12 +314,9 @@ class BaseClass extends QtObject {
 	}
 
 	toGraphQL() {
-		let list = this.getProperties()
-
 		let graphQL = '{'
 		let isFirst = true
-		for (let i = 0; i < list.length; i++) {
-			let key = list[i]
+		for (let key of this.getProperties()) {
 			if (this[key] == null && this._internal.containceInRemoved(key)){
 				continue
 			}
@@ -458,7 +438,6 @@ class BaseClass extends QtObject {
 							obj.fromObject(sourceObjectInner)
 							this[_key].append({ item: obj })
 							obj.owner = this
-							obj.connectProperties()
 						}
 					}
 					else {
@@ -482,7 +461,6 @@ class BaseClass extends QtObject {
 					this[_key] = obj
 
 					obj.owner = this
-					obj.connectProperties()
 				}
 			} else {
 				this[_key] = sourceObject[key]

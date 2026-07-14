@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.12
+import imtauthgui 1.0
 
 /**
  * TenantEditorStateManager
@@ -31,6 +32,13 @@ QtObject {
 	property var receivedGroupData: null
 	property var receivedUserData: null
 
+	// Current user's organization-level permissions for this tenant.
+	// Stored as a plain [ID] array in TenantData; exposed here so all canXxx
+	// bindings react when the array is replaced by a fresh server response.
+	readonly property var __currentUserOrgPerms: stateManager.tenantData
+		? (stateManager.tenantData.m_currentUserOrganizationPermissions || [])
+		: []
+
 	// --- Computed role / permission flags ---
 	readonly property bool isNewTenant: stateManager.tenantData
 		? (!stateManager.tenantData.m_id || stateManager.tenantData.m_id === "")
@@ -48,42 +56,80 @@ QtObject {
 		? stateManager.tenantData.m_currentUserId === stateManager.tenantData.m_ownerId
 		: false
 
-	readonly property bool isAdmin: stateManager.getUserRole(
-		stateManager.tenantData ? stateManager.tenantData.m_currentUserId : "") === "Admin"
+	// Full-access users are owner or creator; members with specific org permissions
+	// are controlled granularly via __currentUserOrgPerms, not through isAdmin.
+	readonly property bool isAdmin: stateManager.isOwner || stateManager.isCreator
 
-	readonly property bool canManageMembers: stateManager.isCreator || stateManager.isOwner || stateManager.isAdmin
+	readonly property bool canChangeOrganizationName: stateManager.hasPermission("ChangeOrganizationName")
+	readonly property bool canChangeOrganizationDescription: stateManager.hasPermission("ChangeOrganizationDescription")
+	readonly property bool canEditOrganization: stateManager.hasAnyPermission(["EditOrganization", "ChangeOrganizationName", "ChangeOrganizationDescription"])
+
+	readonly property bool canViewOrganizationMembers: stateManager.hasPermission("ViewOrganizationMembers")
+	readonly property bool canInviteOrganizationMember: stateManager.hasPermission("InviteOrganizationMember")
+	readonly property bool canExcludeOrganizationMember: stateManager.hasPermission("ExcludeOrganizationMember")
+	readonly property bool canChangeOrganizationMember: stateManager.hasPermission("ChangeOrganizationMember")
+	readonly property bool canChangeOrganizationMemberRole: stateManager.hasPermission("ChangeOrganizationMemberRole")
+	readonly property bool canManageOrganizationMembers: stateManager.hasAnyPermission(["EditOrganizationMember", "InviteOrganizationMember", "ExcludeOrganizationMember", "ChangeOrganizationMemberRole"])
+
+	readonly property bool canViewOrganizationRoles: stateManager.hasPermission("ViewOrganizationRoles")
+	readonly property bool canManageOrganizationRoles: stateManager.hasAnyPermission(["EditOrganizationRole", "ChangeOrganizationRole", "RemoveOrganizationRole", "AddOrganizationRole"])
+
+	readonly property bool canViewOrganizationGroups: stateManager.hasPermission("ViewOrganizationGroups")
+	readonly property bool canManageOrganizationGroups: stateManager.hasAnyPermission(["EditOrganizationGroup", "ChangeOrganizationGroup", "RemoveOrganizationGroup", "AddOrganizationGroup"])
+
+	readonly property bool canViewOrganizationPermissions: stateManager.hasPermission("ViewOrganizationPermissions")
+	readonly property bool canEditOrganizationMemberPermissions: stateManager.hasPermission("EditOrganizationMemberPermissions")
+
+	readonly property bool canViewOrganizationConnections: stateManager.hasPermission("ViewOrganizationConnections")
+	readonly property bool canViewOrganizationConnectionCode: stateManager.hasPermission("ViewOrganizationConnectionCode")
+	readonly property bool canConnectOrganization: stateManager.hasPermission("ConnectOrganization")
+	readonly property bool canRemoveOrganizationConnection: stateManager.hasPermission("RemoveOrganizationConnection")
+	readonly property bool canManageOrganizationConnections: stateManager.hasAnyPermission(["EditOrganizationConnection", "ConnectOrganization", "RemoveOrganizationConnection"])
+
+	// Computed key for page-list change detection.
+	// Changes whenever any page-controlling permission flips (add or remove).
+	// TenantEditor watches onPagesConfigKeyChanged to know when to rebuild the page list.
+	readonly property string pagesConfigKey:
+		(isNewTenant ? "N" : "") +
+		(canViewOrganizationMembers ? "M" : "") +
+		(canViewOrganizationRoles ? "R" : "") +
+		(canViewOrganizationGroups ? "G" : "") +
+		(canViewOrganizationPermissions ? "P" : "") +
+		(isCreator ? "CR" : "") +
+		(isOwner ? "O" : "") +
+		(canViewOrganizationConnections ? "VC" : "") +
+		(canViewOrganizationConnectionCode ? "VCC" : "") +
+		(canConnectOrganization ? "CO" : "")
+
+	readonly property bool canManageMembers: stateManager.canManageOrganizationMembers
+		|| stateManager.canManageOrganizationRoles
+		|| stateManager.canManageOrganizationGroups
+		|| stateManager.canEditOrganization
+		|| stateManager.canManageOrganizationConnections
 	readonly property bool isReadOnly: !stateManager.isNewTenant && !stateManager.canManageMembers
 
 	// --- Pure logic helpers ---
 
-	function getUserRole(userId) {
-		if (!stateManager.tenantData || !userId)
-			return "Member"
-		var roles = stateManager.tenantData.m_memberRoles
-		if (!roles) return "Member"
-		var count = roles.count || roles.length || 0
-		for (var i = 0; i < count; i++) {
-			var entry = roles.get ? roles.get(i).item : roles[i]
-			if (entry && entry.m_userId === userId)
-				return entry.m_role || "Member"
-		}
-		return "Member"
+	// Client-side checks are UX hints only; server must enforce permissions on every operation.
+	// Org-level permissions (ViewOrganizationMembers, EditOrganizationMember, etc.) are
+	// distinct from product-level role permissions and are served via
+	// TenantData.currentUserOrganizationPermissions, NOT via PermissionsController.
+	function hasPermission(permissionId) {
+		if (!permissionId || permissionId === "")
+			return false
+		if (stateManager.isNewTenant || stateManager.isCreator || stateManager.isOwner || stateManager.isAdmin)
+			return true
+		return stateManager.__currentUserOrgPerms.indexOf(permissionId) !== -1
 	}
 
-	function setUserRole(userId, role) {
-		if (!stateManager.tenantData || !userId)
-			return
-		var roles = stateManager.tenantData.m_memberRoles
-		if (!roles) return
-		var count = roles.count || roles.length || 0
-		for (var i = 0; i < count; i++) {
-			var entry = roles.get ? roles.get(i).item : roles[i]
-			if (entry && entry.m_userId === userId) {
-				entry.m_role = role
-				stateManager.pendingMembersChanged()
-				return
-			}
+	function hasAnyPermission(permissionIds) {
+		if (!permissionIds || permissionIds.length === 0)
+			return false
+		for (var i = 0; i < permissionIds.length; i++) {
+			if (stateManager.hasPermission(permissionIds[i]))
+				return true
 		}
+		return false
 	}
 
 	function formatDateTime(value) {
@@ -122,18 +168,6 @@ QtObject {
 		if (!stateManager.tenantData)
 			return
 		var serverMembers = stateManager.tenantData.m_members
-		var serverRoles = stateManager.tenantData.m_memberRoles
-
-		// Build userId → role lookup from memberRoles
-		var roleMap = {}
-		if (serverRoles) {
-			var roleCount = serverRoles.count || 0
-			for (var r = 0; r < roleCount; r++) {
-				var re = serverRoles.get(r).item
-				if (re)
-					roleMap[re.m_userId || ""] = re.m_role || ""
-			}
-		}
 
 		var members = []
 		if (serverMembers) {
@@ -142,7 +176,11 @@ QtObject {
 				var m = serverMembers.get(i).item
 				if (m) {
 					var userId = m.m_id || ""
-					members.push({ id: userId, name: m.m_name || userId, role: roleMap[userId] || "" })
+					members.push({
+						id: userId,
+						name: m.m_name || userId,
+						organizationPermissions: []
+					})
 				}
 			}
 		}
@@ -208,7 +246,7 @@ QtObject {
 		for (var k = 0; k < selectedItems.length; k++) {
 			var selected = selectedItems[k]
 			if (selected && selected.id && !activeIds[selected.id]) {
-				stateManager.apiClient.createInvitation(tenantId, selected.id, "Member")
+				stateManager.apiClient.createInvitation(tenantId, selected.id)
 			}
 		}
 	}

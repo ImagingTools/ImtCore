@@ -4,32 +4,32 @@
 
 // ImtCore includes
 #include <imtdoc/IDocumentService.h>
-#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
+#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService_fwd.h>
 
 // Generated includes
-#include <GeneratedFiles/imtchatsdl/SDL/1.0/CPP/ConversationCollectionDocumentService.h>
+#include <GeneratedFiles/imtchatsdl/SDL/1.0/CPP/ConversationCollectionDocumentService_fwd.h>
 
 
 namespace imtchatgql
 {
 
 
-class CConversationCollectionDocumentServiceComp: public sdl::imtchat::ConversationCollectionDocumentService::CGraphQlHandlerCompBase
+class CConversationCollectionDocumentServiceComp: public sdl::V1_0::imtchat::CConversationCollectionDocumentServiceGqlHandlerCompBase
 {
 public:
-	typedef sdl::imtchat::ConversationCollectionDocumentService::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtchat::CConversationCollectionDocumentServiceGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CConversationCollectionDocumentServiceComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", false, "CollectionDocumentService");
 	I_END_COMPONENT
 
 protected:
-	virtual sdl::imtchat::ImtChat::CConversationData OnGetConversationRepresentation(
-				const sdl::imtchat::ConversationCollectionDocumentService::CGetConversationRepresentationGqlRequest& getConversationRepresentationRequest,
+	virtual sdl::V1_0::imtchat::CConversationData OnGetConversationRepresentation(
+				const sdl::V1_0::imtchat::CGetConversationRepresentationGqlRequest& getConversationRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus OnUpdateConversationFromRepresentation(
-				const sdl::imtchat::ConversationCollectionDocumentService::CUpdateConversationFromRepresentationGqlRequest& updateConversationFromRepresentationRequest,
+	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnUpdateConversationFromRepresentation(
+				const sdl::V1_0::imtchat::CUpdateConversationFromRepresentationGqlRequest& updateConversationFromRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

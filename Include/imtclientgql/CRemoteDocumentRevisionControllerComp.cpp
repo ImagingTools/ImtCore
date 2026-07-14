@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtclientgql/CRemoteDocumentRevisionControllerComp.h>
 
+// ImtCore includes
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentRevision.h>
+
 
 namespace imtclientgql
 {
@@ -8,50 +11,50 @@ namespace imtclientgql
 
 // protected methods
 
-// reimplemented (sdl::imtbase::DocumentRevision::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CDocumentRevisionGqlHandlerCompBase)
 
-sdl::imtbase::DocumentRevision::CRevisionInfoList CRemoteDocumentRevisionControllerComp::OnGetRevisionInfoList(
-			const sdl::imtbase::DocumentRevision::CGetRevisionInfoListGqlRequest& /*getRevisionInfoListRequest*/,
+sdl::V1_0::imtbase::CRevisionInfoList CRemoteDocumentRevisionControllerComp::OnGetRevisionInfoList(
+			const sdl::V1_0::imtbase::CGetRevisionInfoListGqlRequest& /*getRevisionInfoListRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::DocumentRevision::CRevisionInfoList>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CRevisionInfoList>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::DocumentRevision::CBackupRevisionResponse CRemoteDocumentRevisionControllerComp::OnBackupRevision(
-			const sdl::imtbase::DocumentRevision::CBackupRevisionGqlRequest& /*backupRevisionRequest*/,
+sdl::V1_0::imtbase::CBackupRevisionResponse CRemoteDocumentRevisionControllerComp::OnBackupRevision(
+			const sdl::V1_0::imtbase::CBackupRevisionGqlRequest& /*backupRevisionRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::DocumentRevision::CBackupRevisionResponse>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CBackupRevisionResponse>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::DocumentRevision::CRestoreRevisionResponse CRemoteDocumentRevisionControllerComp::OnRestoreRevision(
-			const sdl::imtbase::DocumentRevision::CRestoreRevisionGqlRequest& /*restoreRevisionRequest*/,
+sdl::V1_0::imtbase::CRestoreRevisionResponse CRemoteDocumentRevisionControllerComp::OnRestoreRevision(
+			const sdl::V1_0::imtbase::CRestoreRevisionGqlRequest& /*restoreRevisionRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::DocumentRevision::CRestoreRevisionResponse>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CRestoreRevisionResponse>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::DocumentRevision::CExportRevisionResponse CRemoteDocumentRevisionControllerComp::OnExportRevision(
-			const sdl::imtbase::DocumentRevision::CExportRevisionGqlRequest& /*exportRevisionRequest*/,
+sdl::V1_0::imtbase::CExportRevisionResponse CRemoteDocumentRevisionControllerComp::OnExportRevision(
+			const sdl::V1_0::imtbase::CExportRevisionGqlRequest& /*exportRevisionRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::DocumentRevision::CExportRevisionResponse>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CExportRevisionResponse>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::DocumentRevision::CDeleteRevisionResponse CRemoteDocumentRevisionControllerComp::OnDeleteRevision(
-			const sdl::imtbase::DocumentRevision::CDeleteRevisionGqlRequest& /*deleteRevisionRequest*/,
+sdl::V1_0::imtbase::CDeleteRevisionResponse CRemoteDocumentRevisionControllerComp::OnDeleteRevision(
+			const sdl::V1_0::imtbase::CDeleteRevisionGqlRequest& /*deleteRevisionRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::DocumentRevision::CDeleteRevisionResponse>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CDeleteRevisionResponse>(gqlRequest, errorMessage);
 }
 
 
@@ -70,7 +73,7 @@ bool CRemoteDocumentRevisionControllerComp::IsRequestSupported(const imtgql::CGq
 	}
 
 	QByteArray collectionId = inputObjectPtr->GetParamArgumentValue(
-				sdl::imtbase::DocumentRevision::CGetRevisionInfoListInput::V1_0::GetRevisionInfoListInputFields::CollectionId.toUtf8()).toByteArray();
+				sdl::V1_0::imtbase::CGetRevisionInfoListInput::GetRevisionInfoListInputFields::CollectionId.toUtf8()).toByteArray();
 	if (collectionId.isEmpty()){
 		return false;
 	}
@@ -80,5 +83,4 @@ bool CRemoteDocumentRevisionControllerComp::IsRequestSupported(const imtgql::CGq
 
 
 } // namespace imtclientgql
-
 

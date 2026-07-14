@@ -9,9 +9,6 @@
 #include <imtauthdb/CUsersSessionsDatabaseDelegateComp.h>
 #include <imtauthdb/CUsersSettingsDatabaseDelegateComp.h>
 #include <imtauthdb/CSuperuserProviderComp.h>
-#include <imtauthdb/CSqliteUserGroupDatabaseDelegateComp.h>
-#include <imtauthdb/CSqliteUserDatabaseDelegateComp.h>
-#include <imtauthdb/CSqliteRoleDatabaseDelegateComp.h>
 #include <imtauthdb/CUsersSqlPathExtractorComp.h>
 #include <imtauthdb/CUserActionDatabaseDelegateComp.h>
 #include <imtauthdb/CPersonalAccessTokenDatabaseDelegateComp.h>
@@ -19,9 +16,19 @@
 #include <imtauthdb/COidcTokenDbDelegateComp.h>
 #include <imtauthdb/CTenantDbDelegateComp.h>
 #include <imtauthdb/CTenantMembershipDbDelegateComp.h>
+#include <imtauthdb/CTenantEntityBindingDbDelegateComp.h>
 #include <imtauthdb/CTenantInvitationDbDelegateComp.h>
 #include <imtauthdb/CExternalIdentityDbDelegateComp.h>
 
+#include <imtauthdb/CCrossOrgGrantDbDelegateComp.h>
+#include <imtauthdb/CContractDbDelegateComp.h>
+#include <imtauthdb/CTenantConnectionRequestDbDelegateComp.h>
+#include <imtauthdb/CTenantConnectionCodeDbDelegateComp.h>
+#include <imtauthdb/CTenantConnectionDbDelegateComp.h>
+#include <imtauthdb/CTenantRelationshipProposalDbDelegateComp.h>
+#include <imtauthdb/CTenantRelationshipDbDelegateComp.h>
+#include <imtauthdb/CCrossTenantMessageDbDelegateComp.h>
+#include <imtauthdb/COrderRequestDbDelegateComp.h>
 
 /**
 	ImtAuthDbPck package
@@ -32,14 +39,14 @@ namespace ImtAuthDbPck
 
 typedef imtauthdb::CRoleDatabaseDelegateComp RoleDatabaseDelegate;
 typedef imtauthdb::CUserDatabaseDelegateComp UserDatabaseDelegate;
-typedef imtauthdb::CSqliteUserDatabaseDelegateComp SqliteUserDatabaseDelegate;
+typedef imtauthdb::CUserDatabaseDelegateComp SqliteUserDatabaseDelegate;
 typedef imtauthdb::CUserGroupDatabaseDelegateComp UserGroupDatabaseDelegate;
-typedef imtauthdb::CSqliteUserGroupDatabaseDelegateComp SqliteUserGroupDatabaseDelegate;
+typedef imtauthdb::CUserGroupDatabaseDelegateComp SqliteUserGroupDatabaseDelegate;
 typedef imtauthdb::CUsersSessionsDatabaseDelegateComp UsersSessionsDatabaseDelegate;
 typedef imtauthdb::CUsersSettingsDatabaseDelegateComp UsersSettingsDatabaseDelegate;
 typedef imtauthdb::CSuperuserProviderComp SuperuserProvider;
 typedef imtauthdb::CRoleDatabaseDelegateComp SqlJsonRoleDatabaseDelegate;
-typedef imtauthdb::CSqliteRoleDatabaseDelegateComp SqliteJsonRoleDatabaseDelegate;
+typedef imtauthdb::CRoleDatabaseDelegateComp SqliteJsonRoleDatabaseDelegate;
 typedef imtauthdb::CUsersSqlPathExtractorComp UsersSqlPathExtractor;
 typedef imtauthdb::CUserActionDatabaseDelegateComp UserActionDatabaseDelegate;
 typedef imtauthdb::CPersonalAccessTokenDatabaseDelegateComp PersonalAccessTokenDatabaseDelegate;
@@ -47,8 +54,18 @@ typedef imtauthdb::COidcClientDbDelegateComp OidcClientDatabaseDelegate;
 typedef imtauthdb::COidcTokenDbDelegateComp OidcTokenDatabaseDelegate;
 typedef imtauthdb::CTenantDbDelegateComp TenantDatabaseDelegate;
 typedef imtauthdb::CTenantMembershipDbDelegateComp TenantMembershipDatabaseDelegate;
+typedef imtauthdb::CTenantEntityBindingDbDelegateComp TenantEntityBindingDatabaseDelegate;
 typedef imtauthdb::CTenantInvitationDbDelegateComp TenantInvitationDatabaseDelegate;
 typedef imtauthdb::CExternalIdentityDbDelegateComp ExternalIdentityDatabaseDelegate;
+typedef imtauthdb::CCrossOrgGrantDbDelegateComp CrossOrgGrantDatabaseDelegate;
+typedef imtauthdb::CContractDbDelegateComp ContractDatabaseDelegate;
+typedef imtauthdb::CTenantConnectionRequestDbDelegateComp TenantConnectionRequestDatabaseDelegate;
+typedef imtauthdb::CTenantConnectionCodeDbDelegateComp TenantConnectionCodeDatabaseDelegate;
+typedef imtauthdb::CTenantConnectionDbDelegateComp TenantConnectionDatabaseDelegate;
+typedef imtauthdb::CTenantRelationshipProposalDbDelegateComp TenantRelationshipProposalDatabaseDelegate;
+typedef imtauthdb::CTenantRelationshipDbDelegateComp TenantRelationshipDatabaseDelegate;
+typedef imtauthdb::CCrossTenantMessageDbDelegateComp CrossTenantMessageDatabaseDelegate;
+typedef imtauthdb::COrderRequestDbDelegateComp OrderRequestDatabaseDelegate;
 
 
 } // namespace ImtAuthDbPck

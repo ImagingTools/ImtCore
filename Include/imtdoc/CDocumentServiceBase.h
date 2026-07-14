@@ -177,7 +177,8 @@ protected:
 	virtual bool ValidateDocumentData(
 		const WorkingDocument& document,
 		OperationStatus& status,
-		QString* errorMessage = nullptr) const;
+		QString* errorMessage = nullptr,
+		const imtbase::IOperationContext* operationContextPtr = nullptr) const;
 	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentServiceEventHandlers() const;
 
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const = 0;

@@ -49,7 +49,7 @@ Rectangle {
 			// Header: #number + title
 			Column {
 				width: parent.width - Style.paddingL * 2
-				spacing: Style.paddingXS
+				spacing: Style.paddingS
 
 				Row {
 					width: parent.width
@@ -58,7 +58,7 @@ Rectangle {
 					Text {
 						text: "#" + ticketViewRoot.number
 						font.pixelSize: Style.fontSizeL
-						color: Style.textSecondaryColor
+						color: Style.buttonInactiveTextColor
 						visible: ticketViewRoot.number > 0
 					}
 
@@ -66,7 +66,7 @@ Rectangle {
 						text: ticketViewRoot.title
 						font.pixelSize: Style.fontSizeL
 						font.bold: true
-						color: Style.textPrimaryColor
+						color: Style.imaginToolsAccentColor
 						wrapMode: Text.Wrap
 						width: parent.width - (ticketViewRoot.number > 0 ? Style.paddingS + Style.fontSizeL * 3 : 0)
 					}
@@ -74,7 +74,7 @@ Rectangle {
 
 				// Status + State Reason badges row
 				Row {
-					spacing: Style.paddingXS
+					spacing: Style.paddingS
 
 					TicketBadge {
 						badgeType: "status"
@@ -96,7 +96,7 @@ Rectangle {
 				// Lock indicator
 				Row {
 					visible: ticketViewRoot.locked
-					spacing: Style.paddingXS
+					spacing: Style.paddingS
 
 					Text {
 						text: "🔒"
@@ -108,7 +108,7 @@ Rectangle {
 							? qsTr("Locked: %1").arg(ticketViewRoot.lockReason)
 							: qsTr("This ticket is locked")
 						font.pixelSize: Style.fontSizeXS
-						color: Style.textSecondaryColor
+						color: Style.buttonInactiveTextColor
 					}
 				}
 			}
@@ -117,16 +117,16 @@ Rectangle {
 			Row {
 				visible: ticketViewRoot.labels.length > 0
 				width: parent.width - Style.paddingL * 2
-				spacing: Style.paddingXS
+				spacing: Style.paddingS
 
 				Repeater {
 					model: ticketViewRoot.labels
 
 					Rectangle {
-						height: Style.chipHeight
+						height: Style.sizeHintL
 						width: labelText.width + Style.paddingM * 2
 						radius: height / 2
-						color: modelData.color || Style.tagBackgroundColor
+						color: modelData.color || Style.backgroundColor
 
 						Text {
 							id: labelText
@@ -144,7 +144,6 @@ Rectangle {
 			Rectangle {
 				width: parent.width - Style.paddingL * 2
 				height: descText.height + Style.paddingM * 2
-				color: Style.surfaceColor
 				radius: Style.radiusS
 
 				Text {
@@ -158,8 +157,8 @@ Rectangle {
 						: qsTr("(No description provided)")
 					font.pixelSize: Style.fontSizeS
 					color: ticketViewRoot.description.length > 0
-						? Style.textPrimaryColor
-						: Style.textSecondaryColor
+						? Style.imaginToolsAccentColor
+						: Style.buttonInactiveTextColor
 					wrapMode: Text.Wrap
 				}
 			}
@@ -171,52 +170,52 @@ Rectangle {
 
 				Row {
 					spacing: Style.paddingL
-					Text { text: qsTr("Type:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor; width: 100 }
+					Text { text: qsTr("Type:"); font.pixelSize: Style.fontSizeXS; color: Style.buttonInactiveTextColor; width: 100 }
 					Text {
 						text: ticketViewRoot.ticketTypeLabel(ticketViewRoot.ticketType)
 						font.pixelSize: Style.fontSizeXS
-						color: Style.textPrimaryColor
+						color: Style.imaginToolsAccentColor
 					}
 				}
 
 				Row {
 					spacing: Style.paddingL
-					Text { text: qsTr("Reporter:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor; width: 100 }
+					Text { text: qsTr("Reporter:"); font.pixelSize: Style.fontSizeXS; color: Style.buttonInactiveTextColor; width: 100 }
 					Text {
 						text: ticketViewRoot.reporterName || ticketViewRoot.reporterId || "—"
 						font.pixelSize: Style.fontSizeXS
-						color: Style.textPrimaryColor
+						color: Style.imaginToolsAccentColor
 					}
 				}
 
 				Row {
 					spacing: Style.paddingL
-					Text { text: qsTr("Assignees:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor; width: 100 }
+					Text { text: qsTr("Assignees:"); font.pixelSize: Style.fontSizeXS; color: Style.buttonInactiveTextColor; width: 100 }
 					Text {
 						text: ticketViewRoot.assigneeName || (ticketViewRoot.assigneeIds.length > 0 ? ticketViewRoot.assigneeIds.join(", ") : "") || qsTr("No one assigned")
 						font.pixelSize: Style.fontSizeXS
-						color: Style.textPrimaryColor
+						color: Style.imaginToolsAccentColor
 					}
 				}
 
 				Row {
 					spacing: Style.paddingL
-					Text { text: qsTr("Created:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor; width: 100 }
+					Text { text: qsTr("Created:"); font.pixelSize: Style.fontSizeXS; color: Style.buttonInactiveTextColor; width: 100 }
 					Text {
 						text: ticketViewRoot.createdAt || "—"
 						font.pixelSize: Style.fontSizeXS
-						color: Style.textPrimaryColor
+						color: Style.imaginToolsAccentColor
 					}
 				}
 
 				Row {
 					visible: ticketViewRoot.closedAt.length > 0
 					spacing: Style.paddingL
-					Text { text: qsTr("Closed:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor; width: 100 }
+					Text { text: qsTr("Closed:"); font.pixelSize: Style.fontSizeXS; color: Style.buttonInactiveTextColor; width: 100 }
 					Text {
 						text: ticketViewRoot.closedAt
 						font.pixelSize: Style.fontSizeXS
-						color: Style.textPrimaryColor
+						color: Style.imaginToolsAccentColor
 					}
 				}
 			}
@@ -225,23 +224,22 @@ Rectangle {
 			Row {
 				visible: ticketViewRoot.tags.length > 0
 				width: parent.width - Style.paddingL * 2
-				spacing: Style.paddingXS
+				spacing: Style.paddingS
 
 				Repeater {
 					model: ticketViewRoot.tags
 
 					Rectangle {
-						height: Style.chipHeight
 						width: tagText.width + Style.paddingM * 2
 						radius: height / 2
-						color: Style.tagBackgroundColor
+						color: Style.backgroundColor
 
 						Text {
 							id: tagText
 							anchors.centerIn: parent
 							text: modelData
 							font.pixelSize: Style.fontSizeXS
-							color: Style.textPrimaryColor
+							color: Style.imaginToolsAccentColor
 						}
 					}
 				}
@@ -283,13 +281,13 @@ Rectangle {
 					height: Style.buttonHeightM
 					radius: Style.radiusS
 					color: "transparent"
-					border.color: Style.textSecondaryColor
+					border.color: Style.buttonInactiveTextColor
 
 					Text {
 						anchors.centerIn: parent
 						text: qsTr("Close as not planned")
 						font.pixelSize: Style.fontSizeXS
-						color: Style.textSecondaryColor
+						color: Style.buttonInactiveTextColor
 					}
 
 					MouseArea {
@@ -331,13 +329,13 @@ Rectangle {
 					height: Style.buttonHeightM
 					radius: Style.radiusS
 					color: "transparent"
-					border.color: Style.accentColor
+					border.color: Style.imaginToolsAccentColor
 
 					Text {
 						anchors.centerIn: parent
 						text: qsTr("Open Chat")
 						font.pixelSize: Style.fontSizeXS
-						color: Style.accentColor
+						color: Style.imaginToolsAccentColor
 					}
 
 					MouseArea {

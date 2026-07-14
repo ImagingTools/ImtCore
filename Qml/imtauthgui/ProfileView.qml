@@ -1,314 +1,252 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.15
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
-import imtguigql 1.0
 import imtcontrols 1.0
 import imtauthgui 1.0
-import imtauthProfileSdl 1.0
 
+/**
+ * ProfileView
+ *
+ * Thin orchestrator for the user Profile. Composes a MultiPageView over the
+ * profile pages (General / Organizations / Access Tokens / Roles & Permissions)
+ * above an identity banner. It kicks off the initial profile / organizations
+ * fetch and relays cross-cutting concerns (loading, errors, reload triggers) —
+ * each page owns and reads its own slice of data directly from `apiClient`
+ * rather than having it forwarded down through this container.
+ *
+ * The view itself does NOT depend on any concrete transport (no GQL/SDL imports).
+ * The concrete client (GqlBasedProfileApiClient) is injected by the embedding view
+ * (UserPanel) via `apiClient`, mirroring the TenantEditor + apiClient pattern.
+ */
 ViewBase {
-	id: container;
-	property ProfileData profileData: model ? model : null;
-	
-	Connections {
-		target: container.profileData;
-		
-		function onModelChanged(){
-			saveElementView.buttonEnabled = true;
-		}
+	id: container
+
+	commandsPanelVisible: false
+	contentColor: Style.baseColor
+
+	/**
+	 * Injected transport implementing the ProfileApiClient contract.
+	 * Must be set by the embedding view before the view becomes active.
+	 */
+	property var apiClient: null
+
+	// Only used to paint the identity banner (avatar + name); each page
+	// independently subscribes to the same apiClient signal for its own data.
+	property var __headerProfile: null
+
+	readonly property string __displayName: container.__headerProfile
+		? (container.__headerProfile.m_name || container.__headerProfile.m_username || "")
+		: ""
+
+	function __initialsOf(text) {
+		if (!text || text === "")
+			return "?"
+		var parts = text.trim().split(/\s+/)
+		if (parts.length === 1)
+			return parts[0].substring(0, 2).toUpperCase()
+		return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase()
 	}
-	
-	onProfileDataChanged: {
-		doUpdateGui();
-	}
-	
+
 	Component.onCompleted: {
-		getProfileRequest.send();
+		if (container.apiClient)
+			container.__headerProfile = container.apiClient.lastProfile
+		container.__reload()
 	}
-	
-	function updateGui(){
-		usernameView.text = profileData.m_username;
-		nameInput.text = profileData.m_name;
-		mailInput.text = profileData.m_email;
-		
-		permissionsTable.table.elements = profileData.m_permissions;
-		rolesTable.table.elements = profileData.m_roles;
-		groupsTable.table.elements = profileData.m_groups;
-	}
-	
-	function updateModel(){
-		profileData.m_name = nameInput.text
-		profileData.m_email = mailInput.text
-	}
-	
-	
-	GqlSdlRequestSender {
-		id: getProfileRequest;
-		gqlCommandId: ImtauthProfileSdlCommandIds.s_getProfile;
-		sdlObjectComp: Component { ProfileData {}}
-		inputObjectComp: Component { GetProfileInput {
-				m_id: AuthorizationController.userTokenProvider.userId;
-				m_productId: AuthorizationController.productId;
-			}}
-		onFinished: {
-			container.model = sdlObject;
+
+	// apiClient is injected via a property binding (UserPanel -> Dialog.contentComp
+	// -> ProfileView), several Loader layers deep. If that binding hasn't settled
+	// by the time Component.onCompleted runs, __reload() below silently no-ops
+	// (guarded) and the initial fetch would never happen — so also react the
+	// moment apiClient actually becomes available.
+	onApiClientChanged: {
+		console.log("onApiClientChanged", apiClient)
+		if (container.apiClient) {
+			container.__headerProfile = container.apiClient.lastProfile
+			container.__reload()
 		}
 	}
-	
-	GqlSdlRequestSender {
-		id: setProfileRequest;
-		gqlCommandId: ImtauthProfileSdlCommandIds.s_setProfile;
-		sdlObjectComp: Component { SetProfileResponse {}}
-		inputObjectComp: Component { SetProfileInput {
-				m_id: container.profileData.m_id;
-				m_name: container.profileData.m_name;
-				m_email: container.profileData.m_email;
-			}}
-		
-		onFinished: {
-			saveElementView.buttonEnabled = false;
+
+	function __reload() {
+		console.log("__reload", container.apiClient)
+		if (!container.apiClient)
+			return
+		container.apiClient.getProfile()
+		container.apiClient.getOrganizations()
+	}
+
+	Connections {
+		target: container.apiClient ? container.apiClient : null
+
+		// Besides updating the banner, explicitly push the freshly received data
+		// into any already-loaded pages. Each page also listens to the apiClient
+		// directly, but pushing it here too removes any dependency on exactly one
+		// propagation path succeeding — in particular it fixes the case where the
+		// very first fetch after opening the dialog resolves before that
+		// redundancy would otherwise matter.
+		function onProfileReceived(profile) {
+			container.__headerProfile = profile
+			var generalPage = multiPageView.getPageById("General")
+			if (generalPage && generalPage.applyProfile)
+				generalPage.applyProfile(profile)
+			var accessPage = multiPageView.getPageById("Access")
+			if (accessPage && accessPage.applyProfile)
+				accessPage.applyProfile(profile)
 		}
+		function onOrganizationsReceived(list) {
+			var orgPage = multiPageView.getPageById("Organizations")
+			if (orgPage && orgPage.applyOrganizations)
+				orgPage.applyOrganizations(list)
+		}
+		function onProfileSaved() {
+			// Refresh from the server's confirmed state — this is the only point
+			// where the banner (and General page) should pick up the new name /
+			// email, not while the user is still typing. The "Profile saved"
+			// notification itself is shown locally by ProfileGeneralPage.
+			container.apiClient.getProfile()
+		}
+		function onInvitationAccepted() {
+			container.apiClient.getOrganizations()
+		}
+		function onInvitationRejected() {
+			container.apiClient.getOrganizations()
+		}
+		function onLeftTenant(tenantId) {
+			container.apiClient.getOrganizations()
+		}
+		// profileOperationFailed / organizationOperationFailed / tokenOperationFailed
+		// are shown as in-dialog banners local to the page that triggered them
+		// (General / Organizations / Access Tokens respectively), not here.
 	}
-	
-	CustomScrollbar {
-		id: scrollbar;
-		
-		z: parent.z + 1;
-		
-		anchors.right: parent.right;
-		anchors.top: flickable.top;
-		anchors.bottom: flickable.bottom;
-		
-		secondSize: Style.marginM;
-		targetItem: flickable;
+
+	// Refresh when the active tenant / membership state changes (same triggers as
+	// the previous inline implementation).
+	Connections {
+		target: AuthorizationController
+
+		function onTenantSelected(tenantId) { container.__reload() }
+		function onTenantInvitationAccepted(tenantId, membershipId) { container.__reload() }
+		function onTenantInvitationRejected(tenantId, membershipId) { container.__reload() }
+		function onTenantOwnershipTransferred(tenantId) { container.__reload() }
+		function onTenantMembershipRoleChanged(tenantId, userId, role) { container.__reload() }
+		function onTenantMembershipRemoved(tenantId, userId) { container.__reload() }
 	}
-	
-	CustomScrollbar{
-		id: scrollHoriz;
-		
-		z: parent.z + 1;
-		
-		anchors.left: flickable.left;
-		anchors.right: flickable.right;
-		anchors.bottom: flickable.bottom;
-		
-		secondSize: Style.marginM;
-		
-		vertical: false;
-		targetItem: flickable;
-	}
-	
-	Flickable {
-		id: flickable;
-		anchors.top: parent.top;
-		anchors.topMargin: Style.marginXL;
-		anchors.bottom: parent.bottom;
-		anchors.bottomMargin: Style.marginXL;
-		anchors.left: parent.left;
-		anchors.leftMargin: Style.marginXL;
-		anchors.right: scrollbar.left;
-		anchors.rightMargin: Style.marginXL;
-		contentWidth: bodyColumn.width;
-		contentHeight: bodyColumn.height + 2 * Style.marginXL;
-		boundsBehavior: Flickable.StopAtBounds;
-		clip: true;
-		
-		Column {
-			id: bodyColumn;
-			width: Style.sizeHintXXL;
-			spacing: Style.marginXL;
-			
-			GroupHeaderView {
-				width: parent.width;
-				title: qsTr("General");
-				groupView: generalGroup;
-			}
-			
-			GroupElementView {
-				id: generalGroup;
-				width: parent.width;
-				
-				TextInputElementView {
-					id: usernameView;
-					name: qsTr("Username");
-					readOnly: true;
-					
-					KeyNavigation.tab: nameInput;
-					KeyNavigation.backtab: mailInput;
-				}
-				
-				TextInputElementView {
-					id: nameInput;
-					
-					name: qsTr("Name");
-					placeHolderText: qsTr("Enter the name");
-					readOnly: container.readOnly;
-					
-					KeyNavigation.tab: mailInput;
-					KeyNavigation.backtab: usernameView;
-					
-					onEditingFinished: {
-						container.doUpdateModel();
-					}
-				}
-				
-				RegularExpressionValidator {
-					id: mailValid;
-					
-					regularExpression: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-				}
-				
-				TextInputElementView {
-					id: mailInput;
-					
-					name: qsTr("Email Address");
-					textInputValidator: mailValid;
-					
-					placeHolderText: qsTr("Enter the email");
-					readOnly: container.readOnly;
-					KeyNavigation.tab: usernameView;
-					KeyNavigation.backtab: nameInput;
-					onEditingFinished: {
-						container.doUpdateModel();
-					}
-				}
-				
-				ButtonElementView {
-					id: saveElementView;
-					text: qsTr("Save");
-					buttonEnabled: false;
-					onClicked: {
-						setProfileRequest.send();
-					}
+
+	// --- Identity banner ---
+	Item {
+		id: identityBanner
+		anchors.top: parent.top
+		anchors.left: parent.left
+		anchors.right: parent.right
+		height: avatarRow.height + 2 * Style.marginL
+
+		Row {
+			id: avatarRow
+			anchors.left: parent.left
+			anchors.verticalCenter: parent.verticalCenter
+			anchors.leftMargin: Style.marginXL
+			spacing: Style.marginM
+
+			Rectangle {
+				width: 44
+				height: 44
+				radius: width / 2
+				color: Style.imaginToolsAccentColor
+				anchors.verticalCenter: parent.verticalCenter
+
+				Text {
+					anchors.centerIn: parent
+					text: container.__initialsOf(container.__displayName)
+					color: Style.baseColor
+					font.family: Style.fontFamilyBold
+					font.pixelSize: Style.fontSizeM
+					font.bold: true
 				}
 			}
-			
-			ElementView {
-				id: changePasswordButton;
-				name: qsTr("Change password");
-				visible: container.profileData ? container.profileData.m_systemId === "" : false;
-				
-				controlComp: Component {
-					Button {
-						width: Style.buttonWidthXXL;
-						height: Style.controlHeightM;
-						text: qsTr("Change");
-						onClicked: {
-							ModalDialogManager.openDialog(changePasswordComp, {});
-						}
-					}
+
+			Column {
+				anchors.verticalCenter: parent.verticalCenter
+				spacing: 2
+
+				Text {
+					text: container.__displayName !== "" ? container.__displayName : qsTr("My Account")
+					color: Style.textColor
+					font.family: Style.fontFamilyBold
+					font.pixelSize: Style.fontSizeL
+					font.bold: true
+					elide: Text.ElideRight
 				}
-				
-				Component {
-					id: changePasswordComp;
-					ChangePasswordDialog {
-						title: qsTr("Change Password");
-						currentPasswordInputVisible: !AuthorizationController.loggedUserIsSuperuser();
-						
-						onFinished: {
-							if (buttonId == Enums.save){
-								AuthorizationController.changePassword(container.profileData.m_username, contentItem.oldPassword, contentItem.newPassword);
-							}
-						}
-					}
-				}
-			}
-			
-			GroupHeaderView {
-				width: parent.width;
-				title: qsTr("Roles");
-				groupView: rolesGroup;
-				visible: rolesGroup.visible;
-			}
-			
-			GroupElementView {
-				id: rolesGroup;
-				
-				width: parent.width;
-				visible: rolesTable.table ? rolesTable.table.elementsCount : false;
-				
-				TableElementView {
-					id: rolesTable;
-				}
-			}
-			
-			GroupHeaderView {
-				width: parent.width;
-				title: qsTr("Groups");
-				groupView: groupsBlock;
-				visible: groupsBlock.visible;
-			}
-			
-			GroupElementView {
-				id: groupsBlock;
-				width: parent.width;
-				visible: groupsTable.table ? groupsTable.table.elementsCount > 0 : false;
-				
-				TableElementView {
-					id: groupsTable;
-				}
-			}
-			
-			GroupHeaderView {
-				width: parent.width;
-				title: qsTr("Permissions");
-				groupView: permissionsBlock;
-				visible: permissionsBlock.visible;
-			}
-			
-			GroupElementView {
-				id: permissionsBlock;
-				width: parent.width;
-				visible: permissionsTable.table ? permissionsTable.table.elementsCount > 0: false
-				
-				TableElementView {
-					id: permissionsTable;
+
+				Text {
+					visible: container.__headerProfile ? container.__headerProfile.m_email !== "" : false
+					text: container.__headerProfile ? container.__headerProfile.m_email : ""
+					color: Style.inactiveTextColor
+					font.family: Style.fontFamily
+					font.pixelSize: Style.fontSizeS
 				}
 			}
 		}
 	}
-	
-	TreeItemModel {
-		id: headersModel;
-		
-		function updateHeaders(){
-			headersModel.clear();
-			
-			let index = headersModel.insertNewItem();
-			
-			headersModel.setData("id", "name", index);
-			headersModel.setData("name", qsTr("Name"), index);
-			
-			index = headersModel.insertNewItem();
-			
-			headersModel.setData("id", "description", index);
-			headersModel.setData("name", qsTr("Description"), index);
-			
-			headersModel.refresh();
-			
-			if (rolesTable.table){
-				rolesTable.table.headers = headersModel;
-			}
-			
-			if (permissionsTable.table){
-				permissionsTable.table.headers = headersModel;
-			}
-			
-			if (groupsTable.table){
-				groupsTable.table.headers = headersModel;
-			}
-		}
-		
+
+	Rectangle {
+		id: bannerSeparator
+		anchors.top: identityBanner.bottom
+		anchors.left: parent.left
+		anchors.right: parent.right
+		height: 1
+		color: Style.borderColor
+	}
+
+	MultiPageView {
+		id: multiPageView
+		anchors.top: bannerSeparator.bottom
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.bottom: parent.bottom
+		panelWidth: Style.sizeHintXXS
+
 		Component.onCompleted: {
-			updateHeaders();
+			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
+			multiPageView.addPage("Organizations", qsTr("Organizations"), organizationsPageComp, "Icons/Organization")
+			multiPageView.addPage("AccessTokens", qsTr("Access Tokens"), tokensPageComp, "Icons/Key")
+			multiPageView.addPage("Access", qsTr("Roles & Permissions"), accessPageComp, "Icons/Role")
+			multiPageView.currentIndex = 0
 		}
 	}
-	
+
+	Component {
+		id: generalPageComp
+		ProfileGeneralPage {
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: organizationsPageComp
+		ProfileOrganizationsPage {
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: tokensPageComp
+		ProfileTokensPage {
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: accessPageComp
+		ProfileAccessPage {
+			apiClient: container.apiClient
+		}
+	}
+
 	Loading {
-		id: loading;
-		anchors.fill: parent;
-		visible: getProfileRequest.state == "Loading" || setProfileRequest.state == "Loading";
-		background.color: Style.backgroundColor2;
+		id: loading
+		anchors.fill: parent
+		visible: container.apiClient ? container.apiClient.loading : false
+		background.color: Style.backgroundColor2
 	}
 }

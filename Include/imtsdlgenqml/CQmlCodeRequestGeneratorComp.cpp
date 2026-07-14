@@ -31,7 +31,8 @@ iproc::IProcessor::TaskState CQmlCodeRequestGeneratorComp::DoProcessing(
 			const iprm::IParamsSet* /*paramsPtr*/,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,
-			ibase::IProgressManager* /*progressManagerPtr*/)
+			ibase::IProgressManager* /*progressManagerPtr*/,
+			istd::IChangeable* /*processingReportPtr*/)
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlRequestListCompPtr.IsValid());
@@ -175,7 +176,7 @@ iproc::IProcessor::TaskState CQmlCodeRequestGeneratorComp::DoProcessing(
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, 1);
-		stream << QStringLiteral("gqlCommandId: \"") << sdlRequest.GetName() << QStringLiteral("\"");
+		stream << QStringLiteral("getCommandId: \"") << sdlRequest.GetName() << QStringLiteral("\"");
 		FeedStream(stream, 1, false);
 
 		if (!inputArguments.isEmpty()){
@@ -216,7 +217,7 @@ iproc::IProcessor::TaskState CQmlCodeRequestGeneratorComp::DoProcessing(
 		}
 
 		FeedStreamHorizontally(stream, 2);
-		stream << functionName << QStringLiteral("Base()");
+		stream << functionName << QStringLiteral("()");
 		FeedStream(stream, 1, false);
 		FeedStreamHorizontally(stream, 1);
 		stream << QStringLiteral("}");
@@ -312,5 +313,4 @@ QString CQmlCodeRequestGeneratorComp::GetQmlImportDeclarationByField(const imtsd
 
 
 } // namespace imtsdlgenqml
-
 

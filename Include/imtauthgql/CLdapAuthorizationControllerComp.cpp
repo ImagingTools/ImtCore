@@ -10,6 +10,9 @@
 #pragma comment(lib, "netapi32.lib")
 #endif
 
+// Qt includes
+#include <QtCore/QMutexLocker>
+
 // ACF includes
 #include <iprm/CTextParam.h>
 #include <iprm/CParamsSet.h>
@@ -19,6 +22,7 @@
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CLdapUserCollectionControllerComp.h>
 #include <imtbase/CComplexCollectionFilter.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
 namespace imtauthgql
@@ -47,6 +51,33 @@ QByteArray CLdapAuthorizationControllerComp::CheckExistsRole(const QByteArray& p
 	}
 
 	return QByteArray();
+}
+
+
+QByteArray CLdapAuthorizationControllerComp::EnsureRoleExists(
+	const QByteArray& productId,
+	RoleType roleType,
+	const QByteArray& roleId,
+	const QString& roleName,
+	const QString& description) const
+{
+	// Guard the lookup and the insert against the role collection as one critical
+	// section, so concurrent first-logins cannot both read a missing role and each
+	// write a duplicate for the same product.
+	QMutexLocker locker(&m_roleCollectionMutex);
+
+	QByteArray existingRoleId = CheckExistsRole(productId, roleType);
+	if (!existingRoleId.isEmpty()){
+		return existingRoleId;
+	}
+
+	return InsertNewIdentifiableRoleInfo(
+		roleId,
+		roleName,
+		description,
+		productId,
+		roleType == RT_DEFAULT,
+		roleType == RT_GUEST);
 }
 
 
@@ -176,8 +207,8 @@ QByteArray CLdapAuthorizationControllerComp::GetUserObjectIdBySid(const QByteArr
 }
 
 
-sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAuthorization(
-			const sdl::imtauth::Authorization::CAuthorizationGqlRequest& authorizationRequest,
+sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAuthorization(
+			const sdl::V1_0::imtauth::CAuthorizationGqlRequest& authorizationRequest,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -185,13 +216,13 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 		bool enabled = m_enableableParamCompPtr->IsEnabled();
 		if (enabled){
 
-			sdl::imtauth::Authorization::AuthorizationRequestArguments arguments = authorizationRequest.GetRequestedArguments();
-			if (!arguments.input.Version_1_0.has_value()){
+			sdl::V1_0::imtauth::AuthorizationRequestArguments arguments = authorizationRequest.GetRequestedArguments();
+			if (!arguments.input.has_value()){
 				Q_ASSERT(false);
-				return sdl::imtauth::Authorization::CAuthorizationPayload();
+				return sdl::V1_0::imtauth::CAuthorizationPayload();
 			}
 
-			sdl::imtauth::Authorization::CAuthorizationInput::V1_0 inputArgument = *arguments.input.Version_1_0;
+			sdl::V1_0::imtauth::CAuthorizationInput inputArgument = *arguments.input;
 
 			QByteArray login;
 			if (inputArgument.login){
@@ -221,15 +252,9 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 
 			bool ok = CheckCredential(*m_systemIdAttrPtr, login, password);
 			if (ok){
-				QByteArray guestRoleId = CheckExistsRole(productId, RT_GUEST);
-				if (guestRoleId.isEmpty()){
-					InsertNewIdentifiableRoleInfo("Guest", "Guest", "Guest role", productId, false, true);
-				}
+				EnsureRoleExists(productId, RT_GUEST, "Guest", "Guest", "Guest role");
 
-				QByteArray defaultRoleId = CheckExistsRole(productId, RT_DEFAULT);
-				if (defaultRoleId.isEmpty()){
-					defaultRoleId = InsertNewIdentifiableRoleInfo("Default", "Default", "Default role", productId, true, false);
-				}
+				QByteArray defaultRoleId = EnsureRoleExists(productId, RT_DEFAULT, "Default", "Default", "Default role");
 
 				istd::TUniqueInterfacePtr<imtauth::CIdentifiableUserInfo> userInfoPtr;
 				if (userObjectId.isEmpty()){
@@ -259,7 +284,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 					QByteArray retVal = m_userCollectionCompPtr->InsertNewObject("User", userInfoPtr->GetName(), "", userInfoPtr.GetPtr(), userObjectId);
 					if (retVal.isEmpty()){
 						errorMessage = QString("Unable to insert LDAP user to the collection");
-						return sdl::imtauth::Authorization::CAuthorizationPayload();
+						return sdl::V1_0::imtauth::CAuthorizationPayload();
 					}
 				}
 				else{
@@ -311,13 +336,13 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 
 				if (userInfoPtr.IsValid()){
 					userInfoPtr->SetId(login);
-					sdl::imtauth::Authorization::CAuthorizationPayload retVal;
+					sdl::V1_0::imtauth::CAuthorizationPayload retVal;
 					retVal = CreateAuthorizationSuccessfulResponse(*userInfoPtr.GetPtr(), *m_systemIdAttrPtr, productId, errorMessage);
 
 					return retVal;
 				}
 
-				sdl::imtauth::Authorization::CAuthorizationPayload retVal;
+				sdl::V1_0::imtauth::CAuthorizationPayload retVal;
 				retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 
 				return retVal;

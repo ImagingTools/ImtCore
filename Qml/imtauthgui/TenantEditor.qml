@@ -80,18 +80,36 @@ DocumentViewBase {
 	MultiPageView {
 		id: multiPageView
 		anchors.fill: parent
+		panelWidth: Style.sizeHintXXS
 
 		function updatePages() {
 			multiPageView.clear()
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
 			if (!stateManager_.isNewTenant) {
-				multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
-				if (stateManager_.canManageMembers) {
+				if (stateManager_.canViewOrganizationMembers)
+					multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
+				if (stateManager_.canViewOrganizationRoles) {
 					multiPageView.addPage("Roles", qsTr("Roles"), rolesPageComp, "Icons/Role")
-					multiPageView.addPage("Groups", qsTr("Groups"), groupsPageComp, "Icons/MultipleUser")
+				}
+				if (stateManager_.canViewOrganizationGroups) {
+					multiPageView.addPage("Groups", qsTr("Groups"), groupsPageComp, "Icons/Organization")
+				}
+				if (stateManager_.canViewOrganizationPermissions) {
+					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Key")
 				}
 				if (stateManager_.isCreator) {
-					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Role")
+					multiPageView.addPage("CrossOrgGrants", qsTr("Grants"), crossOrgGrantsPageComp, "Icons/Crown")
+					// multiPageView.addPage("Contracts", qsTr("Contracts"), contractsPageComp, "Icons/Assignment")
+				}
+				if (stateManager_.canViewOrganizationConnections || stateManager_.canViewOrganizationConnectionCode || stateManager_.canConnectOrganization) {
+					multiPageView.addPage("Relationships", qsTr("Relationships"), null, "Icons/Participant")
+					if (stateManager_.canViewOrganizationConnectionCode)
+						multiPageView.addSubPage("Relationships", "ConnectionCode", qsTr("Connection Code"), connectionCodePageComp)
+					if (stateManager_.canConnectOrganization || stateManager_.canViewOrganizationConnections)
+						multiPageView.addSubPage("Relationships", "ConnectOrganization", qsTr("Connect Organization"), connectOrganizationPageComp)
+					if (stateManager_.canViewOrganizationConnections)
+						multiPageView.addSubPage("Relationships", "MyRelationships", qsTr("My Relationships"), myConnectionsPageComp)
+					// multiPageView.addPage("Messages", qsTr("Messages"), messagesPageComp, "Icons/Message")
 				}
 			}
 			multiPageView.currentIndex = 0
@@ -102,7 +120,7 @@ DocumentViewBase {
 		}
 	}
 
-	// Re-build pages when role / ownership state flips.
+	// Re-build pages whenever anything controlling page visibility changes.
 	Connections {
 		target: stateManager_
 		function onIsNewTenantChanged() {
@@ -112,18 +130,20 @@ DocumentViewBase {
 				stateManager_.loadInvitationsFromModel()
 			}
 		}
-		function onIsOwnerChanged() {
-			if (!stateManager_.isNewTenant) multiPageView.updatePages()
-		}
-		function onIsCreatorChanged() {
-			if (!stateManager_.isNewTenant) multiPageView.updatePages()
-		}
-		function onCanManageMembersChanged() {
+		function onPagesConfigKeyChanged() {
 			if (!stateManager_.isNewTenant) multiPageView.updatePages()
 		}
 	}
 
 	// --- Refresh the document when the server confirms membership changes ---
+	Connections {
+		target: container.apiClient ? container.apiClient.userDocumentManager : null
+		function onDocumentSaved(documentId) {
+			if (!stateManager_.isNewTenant && container.representationController)
+				container.representationController.updateRepresentationFromDocument()
+		}
+	}
+
 	Connections {
 		target: container.apiClient
 		function onInvitationCreated() {
@@ -150,46 +170,69 @@ DocumentViewBase {
 			if (!stateManager_.isNewTenant && container.representationController)
 				container.representationController.updateRepresentationFromDocument()
 		}
-		function onSubscriptionInvitationAccepted(notification) {
+		function onMemberRemoved(userId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification.tenantId === container.tenantData.m_id) {
+			// If the current user left/was removed, force-close the editor
+			var currentUserId = container.tenantData.m_currentUserId || ""
+			if (currentUserId && userId === currentUserId) {
+				PopupManager.addInfoMessage(qsTr("You have left this organization. Closing editor."), true)
+				if (AuthorizationController.currentTenantId === container.tenantData.m_id)
+					AuthorizationController.selectTenant("")
+				if (container.documentManager && container.documentId)
+					container.documentManager.closeDocument(container.documentId)
+			}
+		}
+		function onSubscriptionInvitationAccepted(tenantId) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (tenantId === container.tenantData.m_id) {
 				PopupManager.addSuccessMessage(qsTr("Invitation accepted"), true)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-		function onSubscriptionInvitationRejected(notification) {
+		function onSubscriptionInvitationRejected(tenantId, membershipId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification.tenantId === container.tenantData.m_id) {
+			if (tenantId === container.tenantData.m_id) {
 				PopupManager.addInfoMessage(qsTr("Invitation rejected"), true)
-				stateManager_.removePendingInvitation(notification.membershipId)
+				stateManager_.removePendingInvitation(membershipId)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-		function onSubscriptionOwnershipTransferred(notification) {
+		function onSubscriptionOwnershipTransferred(tenantId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification.tenantId === container.tenantData.m_id) {
+			if (tenantId === container.tenantData.m_id) {
 				PopupManager.addInfoMessage(qsTr("Ownership transferred"), true)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-		function onSubscriptionMembershipRoleChanged(notification) {
+		function onSubscriptionMembershipRoleChanged(tenantId, userId, role) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification.tenantId === container.tenantData.m_id) {
+			if (tenantId === container.tenantData.m_id) {
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-		function onSubscriptionMembershipRemoved(notification) {
+		function onSubscriptionMembershipRemoved(tenantId, userId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification.tenantId === container.tenantData.m_id) {
+			if (tenantId === container.tenantData.m_id) {
+				// If the removed member is the current user, force-close the document
+				var currentUserId = container.tenantData.m_currentUserId || ""
+				if (currentUserId && userId === currentUserId) {
+					PopupManager.addInfoMessage(qsTr("You have been removed from this organization. Closing editor."), true)
+					if (AuthorizationController.currentTenantId === container.tenantData.m_id)
+						AuthorizationController.selectTenant("")
+					if (container.documentManager && container.documentId)
+						container.documentManager.closeDocument(container.documentId)
+					return
+				}
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
@@ -203,28 +246,28 @@ DocumentViewBase {
 	Connections {
 		target: AuthorizationController
 
-		function onTenantInvitationAccepted(notification) {
+		function onTenantInvitationAccepted(tenantId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification && notification.tenantId === container.tenantData.m_id) {
+			if (tenantId === container.tenantData.m_id) {
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-		function onTenantInvitationRejected(notification) {
+		function onTenantInvitationRejected(tenantId, membershipId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification && notification.tenantId === container.tenantData.m_id) {
-				if (notification.membershipId)
-					stateManager_.removePendingInvitation(notification.membershipId)
+			if (tenantId === container.tenantData.m_id) {
+				if (membershipId)
+					stateManager_.removePendingInvitation(membershipId)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-		function onTenantOwnershipTransferred(notification) {
+		function onTenantOwnershipTransferred(tenantId) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification && notification.tenantId === container.tenantData.m_id) {
+			if (tenantId === container.tenantData.m_id) {
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
@@ -278,6 +321,68 @@ DocumentViewBase {
 
 		TenantPermissionsPage {
 			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: crossOrgGrantsPageComp
+
+		TenantCrossOrgGrantsPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: contractsPageComp
+
+		TenantContractsPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: connectionCodePageComp
+
+		TenantConnectionCodePage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: connectOrganizationPageComp
+
+		TenantConnectOrganizationPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: myConnectionsPageComp
+
+		TenantMyConnectionsPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: messagesPageComp
+
+		TenantMessagesPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
 		}
 	}
 }

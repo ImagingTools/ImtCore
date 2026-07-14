@@ -2,7 +2,7 @@
 #pragma once
 
 // ACF include
-#include <istd/TSharedNullable.h>
+#include <istd/TNullableValue.h>
 
 
 namespace imtsdl
@@ -10,10 +10,10 @@ namespace imtsdl
 
 
 /**
-	This is a comfort wrap for \c QList<istd::TSharedNullable>
+	This is a comfort wrap for \c QList<istd::TNullableValue>
 */
 template <class T>
-class TElementList: public QList<istd::TSharedNullable<T>>
+class TElementList: public QList<istd::TNullableValue<T>>
 {
 public:
 	TElementList();
@@ -42,7 +42,7 @@ template <class T>
 inline QList<T> TElementList<T>::ToList() const
 {
 	QList<T> retVal;
-	for (const istd::TSharedNullable<T>& element: *this){
+	for (const istd::TNullableValue<T>& element: *this){
 		if (element){
 			retVal << *element;
 		}
@@ -58,7 +58,7 @@ inline void TElementList<T>::FromList(const QList<T>& source)
 	this->clear();
 
 	for (const T& element: source){
-		this->append(istd::TSharedNullable<T>(element));
+		this->append(istd::TNullableValue<T>(element));
 	}
 }
 

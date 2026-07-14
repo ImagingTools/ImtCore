@@ -10,6 +10,7 @@ import imtauthgui 1.0
 import imtauthUsersSdl 1.0
 import imtauthAuthorizationSdl 1.0
 import imtauthSessionsSdl 1.0
+import imtauthTenantMembershipsSdl 1.0
 import Qt.labs.settings 1.0
 
 QtObject {
@@ -19,7 +20,7 @@ QtObject {
 	
 	signal userModeChanged(string userMode);
 	signal superuserExistResult(string status, string error);
-	signal loginFailed();
+	signal loginFailed(string message);
 	
 	signal loggedIn();
 	signal loggedOut();
@@ -34,12 +35,13 @@ QtObject {
 	// Emitted by membership-aware views (e.g. TenantCollectionView) so other
 	// components anywhere in the app (e.g. an open TenantEditor) can react and
 	// reload without being directly coupled to the originating view.
-	signal tenantInvitationReceived(var notification);
-	signal tenantInvitationAccepted(var notification);
-	signal tenantInvitationRejected(var notification);
-	signal tenantOwnershipTransferred(var notification);
-	signal tenantMembershipRoleChanged(var notification);
-	signal tenantMembershipRemoved(var notification);
+	signal tenantInvitationReceived(string tenantId, string tenantName, string role);
+	signal tenantInvitationAccepted(string tenantId, string membershipId);
+	signal tenantInvitationRejected(string tenantId, string membershipId);
+	signal tenantOwnershipTransferred(string tenantId);
+	signal tenantMembershipRoleChanged(string tenantId, string userId, string role);
+	signal tenantMembershipRemoved(string tenantId, string userId);
+	signal tenantInvitationRevoked(string tenantId, string invitationId);
 
 	// Properties to store remember me state and credentials
 	property bool rememberMe: false
@@ -47,6 +49,59 @@ QtObject {
 	property string storedRefreshToken: ""
 	property string currentTenantId: ""
 	property string currentTenantName: ""
+	property var __permissionsRefreshCallback: null
+	property bool __tenantRemovalSwitchInProgress: false
+
+	// --- Pending invitations tracking ---
+	property int pendingInvitationsCount: 0
+	property var pendingInvitations: []
+
+	function refreshPendingInvitations() {
+		if (!root.userTokenProvider.accessToken || root.userTokenProvider.accessToken === "")
+			return
+		__pendingInvitationsRequest.send(__pendingInvitationsInput)
+	}
+
+	function __updatePendingInvitations(invitationsList) {
+		var list = []
+		if (invitationsList) {
+			for (var i = 0; i < invitationsList.count; i++) {
+				var inv = invitationsList.get(i).item
+				if (inv) {
+					list.push({
+						"id": inv.m_id || "",
+						"tenantId": inv.m_tenantId || "",
+						"tenantName": inv.m_tenantName || "",
+						"role": inv.m_role || "",
+						"invitedByUserId": inv.m_invitedByUserId || "",
+						"createdAt": inv.m_createdAt || ""
+					})
+				}
+			}
+		}
+		root.pendingInvitations = list
+		root.pendingInvitationsCount = list.length
+	}
+
+	property GetMyTenantInvitationsInput __pendingInvitationsInput: GetMyTenantInvitationsInput {
+		m_statuses: ["Pending"]
+	}
+
+	property GqlSdlRequestSender __pendingInvitationsRequest: GqlSdlRequestSender {
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_getMyTenantInvitations
+
+		sdlObjectComp: Component {
+			GetMyTenantInvitationsPayload {
+				onFinished: {
+					root.__updatePendingInvitations(m_invitations)
+				}
+			}
+		}
+
+		function onError(message, type) {
+			// Silently ignore errors for invitation polling
+		}
+	}
 
 	property Settings storage: Settings {
 		category: "AuthorizationController"
@@ -62,6 +117,63 @@ QtObject {
 	onLastUserChanged: saveLoginSettings()
 	onStoredRefreshTokenChanged: saveLoginSettings()
 
+	// Refresh pending invitations on relevant events (including when sender revokes)
+	onLoggedIn: {
+		refreshPendingInvitations()
+		__membershipSubscription.registerSubscription()
+		tenantCollectionListener.registerSubscription()
+	}
+	onLoggedOut: {
+		__membershipSubscription.unRegisterSubscription()
+		tenantCollectionListener.unRegisterSubscription()
+	}
+	onTenantInvitationReceived: refreshPendingInvitations()
+	onTenantInvitationAccepted: refreshPendingInvitations()
+	onTenantInvitationRejected: refreshPendingInvitations()
+	onTenantInvitationRevoked: refreshPendingInvitations()
+
+	// --- Subscription client for membership notifications ---
+	property SubscriptionClient __membershipSubscription: SubscriptionClient {
+		gqlCommandId: "OnMembershipNotification"
+		autoSubscribe: false
+
+		function getHeaders() { return {} }
+
+		onMessageReceived: {
+			if (!data) return
+			var notificationType = data.containsKey("notificationType") ? data.getData("notificationType") : ""
+			var membershipId = data.containsKey("membershipId") ? data.getData("membershipId") : ""
+			var userId = data.containsKey("userId") ? data.getData("userId") : ""
+			var tenantId = data.containsKey("tenantId") ? data.getData("tenantId") : ""
+			var tenantName = data.containsKey("tenantName") ? data.getData("tenantName") : ""
+			var role = data.containsKey("role") ? data.getData("role") : ""
+			var tName = tenantName ? tenantName : qsTr("a tenant")
+
+			if (notificationType === "InvitationReceived" || notificationType === 0) {
+				PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), false)
+				root.tenantInvitationReceived(tenantId, tenantName, role)
+			} else if (notificationType === "InvitationAccepted" || notificationType === 1) {
+				PopupManager.addInfoMessage(qsTr("Invitation accepted for \"%1\"").arg(tName), false)
+				root.tenantInvitationAccepted(tenantId, membershipId)
+			} else if (notificationType === "InvitationRejected" || notificationType === 2) {
+				PopupManager.addInfoMessage(qsTr("Invitation rejected for \"%1\"").arg(tName), false)
+				root.tenantInvitationRejected(tenantId, membershipId)
+			} else if (notificationType === "OwnershipTransferred" || notificationType === 3) {
+				PopupManager.addInfoMessage(qsTr("Ownership transferred for \"%1\"").arg(tName), false)
+				root.tenantOwnershipTransferred(tenantId)
+			} else if (notificationType === "MembershipRoleChanged" || notificationType === 4) {
+				PopupManager.addInfoMessage(qsTr("Role changed in \"%1\"").arg(tName), false)
+				root.tenantMembershipRoleChanged(tenantId, userId, role)
+			} else if (notificationType === "MembershipRemoved" || notificationType === 5) {
+				PopupManager.addInfoMessage(qsTr("Removed from \"%1\"").arg(tName), false)
+				root.tenantMembershipRemoved(tenantId, userId)
+			} else if (notificationType === "InvitationRevoked" || notificationType === 6) {
+				PopupManager.addInfoMessage(qsTr("Invitation to join \"%1\" was revoked").arg(tName), false)
+				root.tenantInvitationRevoked(tenantId, membershipId)
+			}
+		}
+	}
+
 	onProductIdChanged: {
 		if (Qt.platform.os !== "web" && productId !== ""){
 			userTokenProvider.authorizationGqlModel.SetProductId(productId)
@@ -73,6 +185,43 @@ QtObject {
 		root.rememberMe = (rememberMeStr === "true");
 		root.lastUser = storage.value("Login_lastUser", "");
 		root.storedRefreshToken = storage.value("Login_storedRefreshToken", "");
+	}
+
+	function normalizePermissions(rawPermissions) {
+		if (rawPermissions === undefined || rawPermissions === null)
+			return [];
+
+		if (Array.isArray(rawPermissions))
+			return rawPermissions;
+
+		if (typeof rawPermissions === "string") {
+			let value = rawPermissions.trim();
+			if (value === "")
+				return [];
+
+			if (value.indexOf(";") >= 0)
+				return value.split(";").filter(function(item){ return item !== ""; });
+
+			if (value.indexOf(",") >= 0)
+				return value.split(",").filter(function(item){ return item !== ""; });
+
+			return [value];
+		}
+
+		return [];
+	}
+
+	function refreshPermissions(callback) {
+		if (!root.userTokenProvider.accessToken || root.userTokenProvider.accessToken === "") {
+			root.userTokenProvider.permissions = [];
+			if (callback)
+				callback(true);
+			return;
+		}
+
+		root.__permissionsRefreshCallback = callback || null;
+		getPermissionsInput.m_accessToken = root.userTokenProvider.accessToken;
+		getPermissionsGqlSender.send(getPermissionsInput);
 	}
 	
 	function saveLoginSettings() {
@@ -131,7 +280,9 @@ QtObject {
 						AuthorizationController.readDataFromStorage();
 						AuthorizationController.setAccessToken(token);
 						AuthorizationController.setRefreshToken(refreshToken);
-						AuthorizationController.loggedIn();
+							AuthorizationController.refreshPermissions(function(){
+								AuthorizationController.loggedIn();
+							});
 						
 						return;
 					}
@@ -160,12 +311,14 @@ QtObject {
 				root.setAccessToken(accessToken);
 				root.setRefreshToken(refreshToken);
 			}
-			
-			root.loggedIn();
+
+			root.refreshPermissions(function(){
+				root.loggedIn();
+			});
 		}
 		
 		onFailed: {
-			root.loginFailed();
+			root.loginFailed(message || "");
 		}
 	}
 	
@@ -176,7 +329,7 @@ QtObject {
 		userTokenProvider.login = storage.value("login", "");
 		userTokenProvider.systemId = storage.value("systemId", "");
 		userTokenProvider.productId = storage.value("productId", "");
-		userTokenProvider.permissions = storage.value("permissions", "");
+		userTokenProvider.permissions = normalizePermissions(storage.value("permissions", ""));
 		root.currentTenantId = storage.value("tenantId", "");
 		root.currentTenantName = storage.value("tenantName", "");
 	}
@@ -188,7 +341,7 @@ QtObject {
 		storage.setValue("login", userTokenProvider.login);
 		storage.setValue("systemId", userTokenProvider.systemId);
 		storage.setValue("productId", userTokenProvider.productId);
-		storage.setValue("permissions", userTokenProvider.permissions);
+		storage.setValue("permissions", normalizePermissions(userTokenProvider.permissions).join(';'));
 		storage.setValue("tenantId", root.currentTenantId);
 		storage.setValue("tenantName", root.currentTenantName);
 	}
@@ -273,6 +426,8 @@ QtObject {
 		userTokenProvider.permissions = []
 		currentTenantId = ""
 		currentTenantName = ""
+		pendingInvitations = []
+		pendingInvitationsCount = 0
 		setAccessToken("");
 		setRefreshToken("");
 		
@@ -318,11 +473,54 @@ QtObject {
 		return currentTenantId
 	}
 
+	function _isCurrentTenantRemoved(changeInfo) {
+		if (!changeInfo || changeInfo.operation !== "removed")
+			return false
+
+		if (!root.currentTenantId || root.currentTenantId === "")
+			return false
+
+		var removedIds = changeInfo.itemIds || []
+		for (var i = 0; i < removedIds.length; i++) {
+			if (removedIds[i] === root.currentTenantId)
+				return true
+		}
+
+		return false
+	}
+
+	function _handleRemovedTenant(changeInfo) {
+		if (!_isCurrentTenantRemoved(changeInfo))
+			return
+
+		if (root.__tenantRemovalSwitchInProgress)
+			return
+
+		root.__tenantRemovalSwitchInProgress = true
+		ModalDialogManager.showInfoDialog(qsTr("The current organization has been deleted. Switching to no organization."))
+		root.selectTenant("")
+	}
+
 	function selectTenant(tenantId){
 		selectTenantInput.m_tenantId = tenantId
 		selectTenantGqlSender.send(selectTenantInput)
 	}
-	
+
+	property RemoteCollectionChangeListener tenantCollectionListener: RemoteCollectionChangeListener {
+		collectionId: "Tenants"
+		currentUserId: root.userTokenProvider.userId
+		autoSubscribe: false
+
+		onRemoved: {
+			console.log("RemoteCollectionChangeListener onRemoved", changeInfo)
+			root._handleRemovedTenant(changeInfo)
+		}
+
+		function getHeaders() {
+			return {}
+		}
+	}
+
 	function isStrongUserManagement(){
 		return userManagementProvider.userMode === "STRONG_USER_MANAGEMENT";
 	}
@@ -404,6 +602,30 @@ QtObject {
 			}
 		}
 	}
+
+	property TokenInput getPermissionsInput: TokenInput {}
+	property GqlSdlRequestSender getPermissionsGqlSender: GqlSdlRequestSender {
+		requestType: 1;
+		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_getPermissions;
+
+		sdlObjectComp: Component {
+			PermissionList {
+				onFinished: {
+					root.userTokenProvider.permissions = root.normalizePermissions(m_permissions);
+
+					if (Qt.platform.os === "web"){
+						root.saveDataToStorage();
+					}
+
+					if (root.__permissionsRefreshCallback){
+						let callback = root.__permissionsRefreshCallback;
+						root.__permissionsRefreshCallback = null;
+						callback(true);
+					}
+				}
+			}
+		}
+	}
 	
 	property GqlSdlRequestSender refreshTokenGqlSender: GqlSdlRequestSender {
 		requestType: 1;
@@ -431,6 +653,8 @@ QtObject {
 							XMLHttpRequest.QMLAuthRefreshToken = m_userSession.m_refreshToken
 							root.saveDataToStorage()
 						}
+
+						root.refreshPermissions();
 					}
 				}
 			}
@@ -467,8 +691,10 @@ QtObject {
 						
 						// Save updated refresh token
 						root.saveRefreshTokenIfRememberMe();
-						
-						root.loggedIn();
+
+						root.refreshPermissions(function(){
+							root.loggedIn();
+						});
 					}
 					else {
 						// Refresh token login failed, clear stored token
@@ -488,6 +714,7 @@ QtObject {
 			SelectTenantPayload {
 				onFinished: {
 					if (m_ok && m_userSession){
+						root.__tenantRemovalSwitchInProgress = false
 						root.userTokenProvider.accessToken = m_userSession.m_accessToken;
 						root.userTokenProvider.refreshToken = m_userSession.m_refreshToken;
 						root.currentTenantId = m_userSession.m_tenantId || "";
@@ -503,9 +730,24 @@ QtObject {
 							root.saveDataToStorage()
 						}
 
-						root.tenantSelected(root.currentTenantId);
+						root.refreshPermissions(function(){
+							root.tenantSelected(root.currentTenantId);
+						});
 					}
 					else{
+						if (root.__tenantRemovalSwitchInProgress && root.selectTenantInput.m_tenantId === "") {
+							root.__tenantRemovalSwitchInProgress = false
+							root.currentTenantId = ""
+							root.currentTenantName = ""
+							if (Qt.platform.os === "web")
+								root.saveDataToStorage()
+							root.refreshPermissions(function(){
+								root.tenantSelected("")
+							})
+							return
+						}
+
+						root.__tenantRemovalSwitchInProgress = false
 						root.tenantSelectionFailed(m_errorMessage || "");
 					}
 				}

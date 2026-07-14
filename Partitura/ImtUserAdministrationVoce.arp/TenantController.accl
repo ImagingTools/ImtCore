@@ -2,31 +2,42 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6397" Description="ACF"/>
-            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CollectionHeadersProvider" X="1000" Y="50" Note=""/>
-        <Element ComponentName="Demultiplexer" X="600" Y="50" Note=""/>
-        <Element ComponentName="DocumentCommandsController" X="900" Y="300" Note=""/>
-        <Element ComponentName="SlaveSubscriberController" X="800" Y="650" Note=""/>
-        <Element ComponentName="TenantCollectionChangeNotifier" X="1000" Y="775" Note=""/>
-        <Element ComponentName="TenantCollectionDocumentService" X="500" Y="550" Note=""/>
-        <Element ComponentName="TenantExclusionParamsSetJoiner" X="450" Y="425" Note=""/>
-        <Element ComponentName="TenantInfo" X="75" Y="675" Note=""/>
-        <Element ComponentName="TenantInvitationInfo" X="200" Y="50" Note=""/>
-        <Element ComponentName="TenantInvitationManager" X="125" Y="125" Note=""/>
-        <Element ComponentName="TenantManager" X="150" Y="600" Note=""/>
-        <Element ComponentName="TenantManagerController" X="825" Y="425" Note=""/>
-        <Element ComponentName="TenantMembershipInfo" X="175" Y="375" Note=""/>
-        <Element ComponentName="TenantMembershipManager" X="175" Y="275" Note=""/>
-        <Element ComponentName="TenantMembershipManagerController" X="1025" Y="475" Note=""/>
-        <Element ComponentName="TenantNotificationPublisher" X="500" Y="775" Note=""/>
-        <Element ComponentName="TenantsCommandsController" X="500" Y="250" Note=""/>
-        <Element ComponentName="TenantsListController" X="1000" Y="175" Note=""/>
-        <Element ComponentName="UserFilterableSelectController" X="475" Y="350" Note="In order to be able to see all the users who are not in our tenant"/>
+        <Element ComponentName="DelegatedAccessResolver" X="225" Y="225" Note=""/>
+        <Element ComponentName="Demultiplexer" X="600" Y="75" Note=""/>
+        <Element ComponentName="SlaveSubscriberController" X="650" Y="750" Note=""/>
+        <Element ComponentName="TenantCollectionController" X="200" Y="75" Note=""/>
+        <Element ComponentName="TenantCollectionDocumentService" X="200" Y="425" Note=""/>
+        <Element ComponentName="TenantConnectionManager" X="975" Y="525" Note=""/>
+        <Element ComponentName="TenantContractManager" X="625" Y="600" Note=""/>
+        <Element ComponentName="TenantEntityBindingManager" X="750" Y="200" Note=""/>
+        <Element ComponentName="TenantGrantManager" X="250" Y="600" Note=""/>
+        <Element ComponentName="TenantManager" X="600" Y="300" Note=""/>
+        <Element ComponentName="TenantMembershipManager" X="1000" Y="300" Note=""/>
+        <Element ComponentName="UserFilterableSelectController" X="1000" Y="75" Note=""/>
     </PositionMap>
-    <EmbeddedRegistries/>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="UserFilterableSelectController">
+            <PositionMap>
+                <Element ComponentName="TenantExclusionParamsSetJoiner" X="625" Y="350" Note=""/>
+                <Element ComponentName="UserFilterableSelectController" X="600" Y="100" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="TenantManager">
+            <PositionMap>
+                <Element ComponentName="TenantInfo" X="250" Y="550" Note=""/>
+                <Element ComponentName="TenantManager" X="600" Y="350" Note=""/>
+                <Element ComponentName="TenantManagerController" X="950" Y="550" Note=""/>
+                <Element ComponentName="TenantNotificationPublisher" X="600" Y="125" Note=""/>
+                <Element ComponentName="TenantRelationshipProposalInfo" X="1025" Y="400" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
 </Acf>

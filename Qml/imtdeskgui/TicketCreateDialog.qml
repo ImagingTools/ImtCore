@@ -38,7 +38,7 @@ Rectangle {
 	Rectangle {
 		id: dialogCard
 		anchors.centerIn: parent
-		width: Math.min(parent.width * 0.9, Style.dialogWidthM)
+		width: Math.min(parent.width * 0.9, Style.sizeHintXS)
 		height: dialogColumn.height + Style.paddingL * 2
 		radius: Style.radiusM
 		color: Style.backgroundColor
@@ -56,7 +56,7 @@ Rectangle {
 				text: qsTr("New Issue")
 				font.pixelSize: Style.fontSizeL
 				font.bold: true
-				color: Style.textPrimaryColor
+				color: Style.imaginToolsAccentColor
 			}
 
 			// Title field
@@ -160,12 +160,12 @@ Rectangle {
 
 				Column {
 					width: (parent.width - Style.paddingM) / 2
-					spacing: Style.paddingXS
+					spacing: Style.paddingS
 
 					Text {
 						text: qsTr("Type")
 						font.pixelSize: Style.fontSizeXS
-						color: Style.textSecondaryColor
+						color: Style.textColor
 					}
 
 					ComboBox {
@@ -177,12 +177,12 @@ Rectangle {
 
 				Column {
 					width: (parent.width - Style.paddingM) / 2
-					spacing: Style.paddingXS
+					spacing: Style.paddingS
 
 					Text {
 						text: qsTr("Priority")
 						font.pixelSize: Style.fontSizeXS
-						color: Style.textSecondaryColor
+						color: Style.buttonInactiveTextColor
 					}
 
 					ComboBox {
@@ -203,13 +203,13 @@ Rectangle {
 					height: Style.buttonHeightM
 					radius: Style.radiusS
 					color: "transparent"
-					border.color: Style.separatorColor
+					border.color: Style.borderColor2
 
 					Text {
 						anchors.centerIn: parent
 						text: qsTr("Cancel")
 						font.pixelSize: Style.fontSizeS
-						color: Style.textPrimaryColor
+						color: Style.imaginToolsAccentColor
 					}
 
 					MouseArea {
@@ -224,7 +224,7 @@ Rectangle {
 					width: Style.buttonWidthM
 					height: Style.buttonHeightM
 					radius: Style.radiusS
-					color: titleInput.text.trim().length > 0 ? "#1a7f37" : Style.disabledColor
+					color: titleInput.text.trim().length > 0 ? "#1a7f37" : Style.buttonInactiveColor
 
 					Text {
 						anchors.centerIn: parent

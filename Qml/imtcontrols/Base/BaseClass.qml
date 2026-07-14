@@ -102,11 +102,17 @@ QtObject {
 
 	function removeKey(key){
 		let selfKeys = this.getProperties()
-
+	
 		if (selfKeys.includes(key)) {
-			// this[key].destroy()
-			this[key] = null
+			let currentVal = this[key]
+			if (currentVal !== null && typeof currentVal === "object") {
+				if (currentVal.destroy){
+					currentVal.destroy()
+				}
+				this[key] = null
+			}
 		}
+	
 		this._internal.removed.push(key)
 	}
 
@@ -409,47 +415,54 @@ QtObject {
 
 	function fromObject(sourceObject){
 		beginChanges()
+	
 		for(let objKey of this.getProperties()){
-			if (!(this.getJSONKeyForProperty(objKey) in sourceObject)){
-				if(this[objKey] && typeof this[objKey] === "object"){
-					if (this[objKey].clear){
-						this[objKey].clear()
-					}
-					if (this[objKey].destroy){
-						this[objKey].destroy()
-					}
+			let jsonKey = this.getJSONKeyForProperty(objKey)
+			if (jsonKey in sourceObject){
+				continue
+			}
+	
+			let currentVal = this[objKey]
+			let currentType = typeof currentVal
+	
+			if(currentVal !== null && currentType === "object"){
+				if (currentVal.clear){
+					currentVal.clear()
 				}
-				if(typeof this[objKey] === "object"){
-					this[objKey] = null
+				if (currentVal.destroy){
+					currentVal.destroy()
 				}
+				this[objKey] = null
 			}
 		}
-
+	
 		for(let key in sourceObject){
-			let _key = "m_" + key[0].toLowerCase() + key.slice(1,key.length)
-			if (sourceObject[key] === null){
+			let _key = "m_" + key[0].toLowerCase() + key.slice(1, key.length)
+	
+			if(sourceObject[key] === null){
 				this[_key] = null
 			}
 			else if(typeof sourceObject[key] === "object"){
 				if(Array.isArray(sourceObject[key])){
 					let component = this.createComponent(_key)
-
-					if (this[_key]) {
-						if (this[_key].clear) {
+	
+					if(this[_key]){
+						if(this[_key].clear){
 							this[_key].clear()
 						}
-					} else {
-						if (component) {
+					}
+					else{
+						if(component){
 							let obj = Qt.createComponent('BaseModel.qml').createObject(this)
 							obj.owner = this
 							this[_key] = obj
 						}
 					}
-
-					if (component){
+	
+					if(component){
 						for(let sourceObjectInner of sourceObject[key]){
 							let sourceTypename
-							if (sourceObjectInner['__typename']){
+							if(sourceObjectInner['__typename']){
 								sourceTypename = sourceObjectInner['__typename']
 							}
 							let obj = this.createElement(_key, sourceTypename).createObject(this)
@@ -462,16 +475,17 @@ QtObject {
 					else{
 						this[_key] = sourceObject[key]
 					}
-				} else {
+				}
+				else{
 					let obj
-					if (!this[_key]){
+					if(!this[_key]){
 						let sourceData = sourceObject[key]
 						let sourceTypename
-						if (sourceData['__typename']){
+						if(sourceData['__typename']){
 							sourceTypename = sourceData['__typename']
 						}
 						let component = this.createComponent(_key, sourceTypename)
-						if (component){
+						if(component){
 							obj = component.createObject(this)
 						}
 						else{
@@ -481,23 +495,25 @@ QtObject {
 					else{
 						obj = this[_key]
 					}
-
-					obj.fromObject(sourceObject[key])
-					this[_key] = obj
-
-					obj.owner = this
-					obj.connectProperties()
+	
+					if(obj){
+						obj.fromObject(sourceObject[key])
+						this[_key] = obj
+						obj.owner = this
+						obj.connectProperties()
+					}
 				}
-			} else {
-				if (key != '__typename'){
+			}
+			else{
+				if(key !== '__typename'){
 					this[_key] = sourceObject[key]
 				}
 			}
 		}
-
+	
 		endChanges()
 		finished()
-		
+	
 		return true
 	}
 }

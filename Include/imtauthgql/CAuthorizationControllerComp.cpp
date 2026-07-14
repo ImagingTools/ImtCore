@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CAuthorizationControllerComp.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
 // ACF includes
@@ -9,6 +10,7 @@
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CUserConnectionInfo.h>
+#include <imtauth/ITenantInfo.h>
 
 
 namespace imtauthgql
@@ -75,24 +77,68 @@ bool CAuthorizationControllerComp::CheckCredential(
 }
 
 
-sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::CreateInvalidLoginOrPasswordResponse(
+QByteArrayList CAuthorizationControllerComp::CalculateGlobalPermissions(
+			const imtauth::IUserInfo& userInfo,
+			const QByteArray& userId,
+			const QByteArray& productId) const
+{
+	QSet<QByteArray> userPermissionsSet;
+	for (const QByteArray& permissionId : userInfo.GetPermissions(productId)){
+		if (!permissionId.isEmpty()){
+			userPermissionsSet.insert(permissionId);
+		}
+	}
+
+	QSet<QByteArray> tenantPermissionsSet;
+	if (m_tenantMembershipManagerCompPtr.IsValid() && m_tenantManagerCompPtr.IsValid()){
+		QSet<QByteArray> tenantIds;
+		const QByteArrayList membershipIds = m_tenantMembershipManagerCompPtr->GetMembershipsByUser(userId);
+		for (const QByteArray& membershipId : membershipIds){
+			imtauth::ITenantMembershipUniquePtr membershipPtr = m_tenantMembershipManagerCompPtr->GetMembership(membershipId);
+			if (membershipPtr.IsValid() && membershipPtr->IsActive() && !membershipPtr->GetTenantId().isEmpty()){
+				tenantIds.insert(membershipPtr->GetTenantId());
+			}
+		}
+
+		for (const QByteArray& tenantId : std::as_const(tenantIds)){
+			for (const QByteArray& permissionId : m_tenantManagerCompPtr->GetTenantPermissions(tenantId)){
+				if (!permissionId.isEmpty()){
+					tenantPermissionsSet.insert(permissionId);
+				}
+			}
+		}
+	}
+
+	QByteArrayList globalPermissions;
+	for (const QByteArray& permissionId : std::as_const(userPermissionsSet)){
+		if (!tenantPermissionsSet.contains(permissionId)){
+			globalPermissions.push_back(permissionId);
+		}
+	}
+
+	std::sort(globalPermissions.begin(), globalPermissions.end());
+	return globalPermissions;
+}
+
+
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateInvalidLoginOrPasswordResponse(
 			const QByteArray& login,
 			QString& errorMessage) const
 {
 	errorMessage = QT_TR_NOOP(QString("Invalid login or password. Login: '%1'").arg(qPrintable(login)));
 	SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
 
-	return sdl::imtauth::Authorization::CAuthorizationPayload();
+	return sdl::V1_0::imtauth::CAuthorizationPayload();
 }
 
 
-sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::CreateAuthorizationSuccessfulResponse(
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAuthorizationSuccessfulResponse(
 			imtauth::CUserInfo& userInfo,
 			const QByteArray& systemId,
 			const QByteArray& productId,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Authorization::CAuthorizationPayload payload;
+	sdl::V1_0::imtauth::CAuthorizationPayload payload;
 
 	QByteArray login = userInfo.GetId();
 	QByteArray objectId = GetUserObjectId(login);
@@ -104,27 +150,27 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 
 	QByteArray tokenValue = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
-	payload.Version_1_0.emplace();
+	payload.token = tokenValue;
+	payload.username = login;
+	payload.userId = objectId;
+	payload.systemId = systemId;
 
-	payload.Version_1_0->token = tokenValue;
-	payload.Version_1_0->username = login;
-	payload.Version_1_0->userId = objectId;
-	payload.Version_1_0->systemId = systemId;
-
+	// During initial Authorization/UserToken flow tenant is not selected yet.
+	// Return only non-tenant (global) permissions here; tenant-scoped permissions
+	// are returned by GetPermissions after tenant selection.
+	// Global permissions are calculated as all user permissions minus the union
+	// of permissions from all tenants доступных пользователю.
 	if (!productId.isEmpty()){
-		imtauth::IUserInfo::FeatureIds permissionIds = userInfo.GetPermissions(productId);
-		QByteArrayList uniqueList = QSet<QByteArray>(permissionIds.begin(), permissionIds.end()).values();
-		std::sort(uniqueList.begin(), uniqueList.end());
-		QByteArray permissions = uniqueList.join(';');
-		(*payload.Version_1_0).permissions = permissions;
+		QByteArrayList globalPermissions = CalculateGlobalPermissions(userInfo, objectId, productId);
+		payload.permissions = globalPermissions.join(';');
 	}
 
 	if (m_jwtSessionControllerCompPtr.IsValid()){
 		imtauth::IJwtSessionController::UserSession userSession;
 		if (m_jwtSessionControllerCompPtr->CreateNewSession(objectId, QByteArray(), userSession)){
-			payload.Version_1_0->refreshToken = userSession.refreshToken;
-			payload.Version_1_0->token = userSession.accessToken;
-			payload.Version_1_0->userId = userSession.userId;
+			payload.refreshToken = userSession.refreshToken;
+			payload.token = userSession.accessToken;
+			payload.userId = userSession.userId;
 		}
 	}
 
@@ -167,37 +213,37 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 }
 
 
-// reimplemented (sdl::imtauth::Authorization::V1_0::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CAuthorizationGqlHandlerCompBase)
 
-sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::OnAuthorization(
-			const sdl::imtauth::Authorization::CAuthorizationGqlRequest& authorizationRequest,
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthorization(
+			const sdl::V1_0::imtauth::CAuthorizationGqlRequest& authorizationRequest,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Component 'UserCollection' was not set", "CAuthorizationControllerComp");
-		return sdl::imtauth::Authorization::CAuthorizationPayload();
+		return sdl::V1_0::imtauth::CAuthorizationPayload();
 	}
 
-	sdl::imtauth::Authorization::CAuthorizationInput inputArgument = authorizationRequest.GetRequestedArguments().input;
-	if (!inputArgument.Version_1_0.has_value()){
+	istd::TNullableValue<sdl::V1_0::imtauth::CAuthorizationInput> inputArgument = *authorizationRequest.GetRequestedArguments().input;
+	if (!inputArgument.has_value()){
 		Q_ASSERT(false);
-		return sdl::imtauth::Authorization::CAuthorizationPayload();
+		return sdl::V1_0::imtauth::CAuthorizationPayload();
 	}
 
 	QByteArray login;
-	if (inputArgument.Version_1_0->login){
-		login = inputArgument.Version_1_0->login->toUtf8();
+	if (inputArgument->login){
+		login = inputArgument->login->toUtf8();
 	}
 
 	QByteArray productId;
-	if (inputArgument.Version_1_0->productId){
-		productId = *inputArgument.Version_1_0->productId;
+	if (inputArgument->productId){
+		productId = *inputArgument->productId;
 	}
 
 	QByteArray password;
-	if (inputArgument.Version_1_0->password){
-		password = inputArgument.Version_1_0->password->toUtf8();
+	if (inputArgument->password){
+		password = inputArgument->password->toUtf8();
 	}
 
 	QByteArray userObjectId = GetUserObjectId(login);
@@ -235,35 +281,35 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 }
 
 
-sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::OnUserToken(
-			const sdl::imtauth::Authorization::CUserTokenGqlRequest& userTokenRequest,
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserToken(
+			const sdl::V1_0::imtauth::CUserTokenGqlRequest& userTokenRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Component 'UserCollection' was not set", "CAuthorizationControllerComp");
-		return sdl::imtauth::Authorization::CAuthorizationPayload();
+		return sdl::V1_0::imtauth::CAuthorizationPayload();
 	}
 
-	sdl::imtauth::Authorization::CAuthorizationInput inputArgument = userTokenRequest.GetRequestedArguments().input;
-	if (!inputArgument.Version_1_0.has_value()){
+	istd::TNullableValue<sdl::V1_0::imtauth::CAuthorizationInput> inputArgument = userTokenRequest.GetRequestedArguments().input;
+	if (!inputArgument.has_value()){
 		Q_ASSERT(false);
-		return sdl::imtauth::Authorization::CAuthorizationPayload();
+		return sdl::V1_0::imtauth::CAuthorizationPayload();
 	}
-	
+
 	QByteArray login;
-	if (inputArgument.Version_1_0->login){
-		login = inputArgument.Version_1_0->login->toUtf8();
+	if (inputArgument->login){
+		login = inputArgument->login->toUtf8();
 	}
 	
 	QByteArray productId;
-	if (inputArgument.Version_1_0->productId){
-		productId = *inputArgument.Version_1_0->productId;
+	if (inputArgument->productId){
+		productId = *inputArgument->productId;
 	}
 	
 	QByteArray password;
-	if (inputArgument.Version_1_0->password){
-		password = inputArgument.Version_1_0->password->toUtf8();
+	if (inputArgument->password){
+		password = inputArgument->password->toUtf8();
 	}
 
 	QByteArray userObjectId = GetUserObjectId(login);
@@ -301,12 +347,12 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 }
 
 
-sdl::imtauth::Authorization::CLogoutPayload CAuthorizationControllerComp::OnLogout(
-			const sdl::imtauth::Authorization::CLogoutGqlRequest& logoutRequest,
+sdl::V1_0::imtauth::CLogoutPayload CAuthorizationControllerComp::OnLogout(
+			const sdl::V1_0::imtauth::CLogoutGqlRequest& logoutRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Authorization::CLogoutPayload response;
+	sdl::V1_0::imtauth::CLogoutPayload response;
 	const imtgql::IGqlContext* gqlContextPtr = logoutRequest.GetRequestContext();
 	if (gqlContextPtr == nullptr){
 		errorMessage = QString("Unable to logout user with token '%1'. Error: GraphQL context is invalid");
@@ -314,31 +360,28 @@ sdl::imtauth::Authorization::CLogoutPayload CAuthorizationControllerComp::OnLogo
 		return response;
 	}
 
-	response.Version_1_0.emplace();
-
-	sdl::imtauth::Authorization::CTokenInput arguments = logoutRequest.GetRequestedArguments().input;
-
 	QByteArray accessToken = gqlContextPtr->GetToken();
 	if (m_jwtSessionControllerCompPtr.IsValid()){
 		QByteArray sessionId = m_jwtSessionControllerCompPtr->GetSessionFromJwt(accessToken);
 		if (!m_jwtSessionControllerCompPtr->RemoveSession(sessionId)){
-			response.Version_1_0->ok = false;
+			response.ok = false;
 			return response;
 		}
 	}
 
-	response.Version_1_0->ok = true;
+	response.ok = true;
 
 	return response;
 }
 
 
-sdl::imtauth::Authorization::CPermissionList CAuthorizationControllerComp::OnGetPermissions(
-			const sdl::imtauth::Authorization::CGetPermissionsGqlRequest& getPermissionsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissions(
+			const sdl::V1_0::imtauth::CGetPermissionsGqlRequest& getPermissionsRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Authorization::CPermissionList response;
+	sdl::V1_0::imtauth::CPermissionList response;
+	response.permissions.emplace();
 
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Component 'UserCollection' was not set", "CAuthorizationControllerComp");
@@ -350,18 +393,33 @@ sdl::imtauth::Authorization::CPermissionList CAuthorizationControllerComp::OnGet
 		return response;
 	}
 
-	sdl::imtauth::Authorization::CTokenInput arguments = getPermissionsRequest.GetRequestedArguments().input;
-	if (!arguments.Version_1_0.HasValue()){
-		Q_ASSERT(false);
+	istd::TNullableValue<sdl::V1_0::imtauth::CTokenInput> arguments = getPermissionsRequest.GetRequestedArguments().input;
+	if (!arguments.HasValue()){
+		SendWarningMessage(0, "GetPermissions called without input arguments", "imtauthgql::CAuthorizationControllerComp");
 		return response;
 	}
 
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+
 	QByteArray token;
-	if (arguments.Version_1_0->accessToken.HasValue()){
-		token = *arguments.Version_1_0->accessToken;
+	if (arguments->accessToken.HasValue()){
+		token = *arguments->accessToken;
+	}
+	if (token.isEmpty() && gqlContextPtr != nullptr){
+		token = gqlContextPtr->GetToken();
 	}
 
 	QByteArray userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
+	QByteArray tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(token);
+	if (userId.isEmpty()){
+		SendWarningMessage(0, "GetPermissions called with invalid or expired token", "imtauthgql::CAuthorizationControllerComp");
+		return response;
+	}
+
+	QByteArray productId;
+	if (gqlContextPtr != nullptr){
+		productId = gqlContextPtr->GetProductId();
+	}
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -370,13 +428,42 @@ sdl::imtauth::Authorization::CPermissionList CAuthorizationControllerComp::OnGet
 	}
 
 	if (userInfoPtr == nullptr){
-		Q_ASSERT(false);
+		SendWarningMessage(0, "GetPermissions cannot resolve user for provided token", "imtauthgql::CAuthorizationControllerComp");
 		return response;
 	}
 
-	response.Version_1_0.Emplace();
-	QByteArrayList permissions = userInfoPtr->GetPermissions();
-	response.Version_1_0->permissions.Emplace().FromList(permissions);
+	QByteArrayList userPermissions = productId.isEmpty()
+		? userInfoPtr->GetPermissions()
+		: userInfoPtr->GetPermissions(productId);
+
+	// Empty tenantId means global (non-tenant) scope.
+	if (tenantId.isEmpty()){
+		QByteArrayList globalPermissions = CalculateGlobalPermissions(*userInfoPtr, userId, productId);
+		response.permissions.Emplace().FromList(globalPermissions);
+		return response;
+	}
+
+	QByteArrayList tenantPermissions;
+	if (m_tenantManagerCompPtr.IsValid()){
+		tenantPermissions = m_tenantManagerCompPtr->GetTenantPermissions(tenantId);
+	}
+
+	QByteArrayList permissions;
+	if (tenantPermissions.isEmpty()){
+		permissions = userPermissions;
+	}
+	else{
+		QSet<QByteArray> tenantSet(tenantPermissions.begin(), tenantPermissions.end());
+		for (const QByteArray& permissionId : userPermissions){
+			if (tenantSet.contains(permissionId)){
+				permissions.push_back(permissionId);
+			}
+		}
+	}
+
+	permissions = QSet<QByteArray>(permissions.begin(), permissions.end()).values();
+	std::sort(permissions.begin(), permissions.end());
+	response.permissions.Emplace().FromList(permissions);
 
 	return response;
 }

@@ -16,7 +16,8 @@ namespace imtauth
 // public methods
 
 CTenantInfo::CTenantInfo():
-	m_isActive(true)
+	m_isActive(true),
+	m_depth(0)
 {
 }
 
@@ -151,40 +152,41 @@ void CTenantInfo::SetUpdatedAt(const QString& updatedAt)
 }
 
 
-ITenantInfo::TenantRelationships CTenantInfo::GetRelationships() const
+QByteArrayList CTenantInfo::GetRelationshipIds() const
 {
-	return m_relationships;
+	return m_relationshipIds;
 }
 
 
-void CTenantInfo::SetRelationships(const TenantRelationships& relationships)
+void CTenantInfo::SetRelationshipIds(const QByteArrayList& relationshipIds)
 {
-	if (m_relationships != relationships){
+	if (m_relationshipIds != relationshipIds){
 		istd::CChangeNotifier notifier(this);
 
-		m_relationships = relationships;
+		m_relationshipIds = relationshipIds;
 	}
 }
 
 
-void CTenantInfo::AddRelationship(const TenantRelationship& relationship)
+void CTenantInfo::AddRelationshipId(const QByteArray& relationshipId)
 {
-	istd::CChangeNotifier notifier(this);
+	if (!m_relationshipIds.contains(relationshipId)){
+		istd::CChangeNotifier notifier(this);
 
-	m_relationships.append(relationship);
+		m_relationshipIds.append(relationshipId);
+	}
 }
 
 
-bool CTenantInfo::RemoveRelationship(const QByteArray& relationshipId)
+bool CTenantInfo::RemoveRelationshipId(const QByteArray& relationshipId)
 {
-	for (int i = 0; i < m_relationships.size(); ++i){
-		if (m_relationships[i].relationshipId == relationshipId){
-			istd::CChangeNotifier notifier(this);
+	int idx = m_relationshipIds.indexOf(relationshipId);
+	if (idx >= 0){
+		istd::CChangeNotifier notifier(this);
 
-			m_relationships.removeAt(i);
+		m_relationshipIds.removeAt(idx);
 
-			return true;
-		}
+		return true;
 	}
 
 	return false;
@@ -204,6 +206,60 @@ void CTenantInfo::SetTenantPermissions(const QByteArrayList& permissions)
 
 		m_tenantPermissions = permissions;
 	}
+}
+
+
+QByteArray CTenantInfo::GetParentTenantId() const
+{
+	return m_parentTenantId;
+}
+
+
+void CTenantInfo::SetParentTenantId(const QByteArray& parentTenantId)
+{
+	if (m_parentTenantId != parentTenantId){
+		istd::CChangeNotifier notifier(this);
+
+		m_parentTenantId = parentTenantId;
+	}
+}
+
+
+int CTenantInfo::GetDepth() const
+{
+	return m_depth;
+}
+
+
+void CTenantInfo::SetDepth(int depth)
+{
+	if (m_depth != depth){
+		istd::CChangeNotifier notifier(this);
+
+		m_depth = depth;
+	}
+}
+
+
+QString CTenantInfo::GetMaterializedPath() const
+{
+	return m_materializedPath;
+}
+
+
+void CTenantInfo::SetMaterializedPath(const QString& path)
+{
+	if (m_materializedPath != path){
+		istd::CChangeNotifier notifier(this);
+
+		m_materializedPath = path;
+	}
+}
+
+
+bool CTenantInfo::IsSystemTenant() const
+{
+	return m_tenantId == GetSystemTenantId();
 }
 
 
@@ -255,57 +311,24 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_updatedAt);
 	retVal = retVal && archive.EndTag(updatedAtTag);
 
-	iser::CArchiveTag relationshipsTag("Relationships", "Relationships", iser::CArchiveTag::TT_GROUP);
-	if (archive.BeginTag(relationshipsTag)){
-		int count = m_relationships.size();
-		retVal = retVal && archive.Process(count);
-
-		if (archive.IsStoring()){
-			for (int i = 0; i < count; ++i){
-				iser::CArchiveTag relTag("Relationship", "Relationship", iser::CArchiveTag::TT_GROUP);
-				retVal = retVal && archive.BeginTag(relTag);
-
-				QByteArray relId = m_relationships[i].relationshipId;
-				QByteArray targetId = m_relationships[i].targetTenantId;
-				int role = static_cast<int>(m_relationships[i].role);
-				QString desc = m_relationships[i].description;
-				QString created = m_relationships[i].createdAt;
-
-				retVal = retVal && archive.Process(relId);
-				retVal = retVal && archive.Process(targetId);
-				retVal = retVal && archive.Process(role);
-				retVal = retVal && archive.Process(desc);
-				retVal = retVal && archive.Process(created);
-
-				retVal = retVal && archive.EndTag(relTag);
-			}
-		}
-		else{
-			m_relationships.clear();
-			for (int i = 0; i < count; ++i){
-				iser::CArchiveTag relTag("Relationship", "Relationship", iser::CArchiveTag::TT_GROUP);
-				retVal = retVal && archive.BeginTag(relTag);
-
-				TenantRelationship rel;
-				int role = 0;
-
-				retVal = retVal && archive.Process(rel.relationshipId);
-				retVal = retVal && archive.Process(rel.targetTenantId);
-				retVal = retVal && archive.Process(role);
-				retVal = retVal && archive.Process(rel.description);
-				retVal = retVal && archive.Process(rel.createdAt);
-
-				rel.role = static_cast<TenantRelationshipRole>(role);
-				m_relationships.append(rel);
-
-				retVal = retVal && archive.EndTag(relTag);
-			}
-		}
-
-		retVal = retVal && archive.EndTag(relationshipsTag);
-	}
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_relationshipIds, "RelationshipIds", "RelationshipId");
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_tenantPermissions, "TenantPermissions", "TenantPermission");
+
+	iser::CArchiveTag parentTenantIdTag("ParentTenantId", "Parent Tenant ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(parentTenantIdTag);
+	retVal = retVal && archive.Process(m_parentTenantId);
+	retVal = retVal && archive.EndTag(parentTenantIdTag);
+
+	iser::CArchiveTag depthTag("Depth", "Depth", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(depthTag);
+	retVal = retVal && archive.Process(m_depth);
+	retVal = retVal && archive.EndTag(depthTag);
+
+	iser::CArchiveTag materializedPathTag("MaterializedPath", "Materialized path", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(materializedPathTag);
+	retVal = retVal && archive.Process(m_materializedPath);
+	retVal = retVal && archive.EndTag(materializedPathTag);
 
 	return retVal;
 }
@@ -327,8 +350,11 @@ bool CTenantInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 		m_isActive = sourcePtr->m_isActive;
 		m_createdAt = sourcePtr->m_createdAt;
 		m_updatedAt = sourcePtr->m_updatedAt;
-		m_relationships = sourcePtr->m_relationships;
+		m_relationshipIds = sourcePtr->m_relationshipIds;
 		m_tenantPermissions = sourcePtr->m_tenantPermissions;
+		m_parentTenantId = sourcePtr->m_parentTenantId;
+		m_depth = sourcePtr->m_depth;
+		m_materializedPath = sourcePtr->m_materializedPath;
 
 		return true;
 	}
@@ -360,8 +386,11 @@ bool CTenantInfo::ResetData(CompatibilityMode /*mode*/)
 	m_isActive = true;
 	m_createdAt.clear();
 	m_updatedAt.clear();
-	m_relationships.clear();
+	m_relationshipIds.clear();
 	m_tenantPermissions.clear();
+	m_parentTenantId.clear();
+	m_depth = 0;
+	m_materializedPath.clear();
 
 	return true;
 }

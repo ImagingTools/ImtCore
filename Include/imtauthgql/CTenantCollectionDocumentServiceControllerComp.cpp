@@ -2,14 +2,16 @@
 #include <imtauthgql/CTenantCollectionDocumentServiceControllerComp.h>
 
 // ImtCore includes
+#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
 #include <imtgql/IGqlContext.h>
+#include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
 
 
 namespace imtauthgql
 {
 
 
-namespace CDM = sdl::imtbase::CollectionDocumentService;
+namespace CDM = sdl::V1_0::imtbase;
 
 
 CDM::CDocumentList CTenantCollectionDocumentServiceControllerComp::OnGetOpenedDocumentList(
@@ -31,13 +33,12 @@ CDM::CDocumentList CTenantCollectionDocumentServiceControllerComp::OnGetOpenedDo
 	// If no tenant is selected, return an empty list — user cannot edit any tenant
 	// If a tenant is selected, only return documents matching that tenant
 	CDM::CDocumentList filteredList;
-	filteredList.Version_1_0.emplace();
-	filteredList.Version_1_0->documentList.emplace();
+	filteredList.documentList.emplace();
 
-	if (!sessionTenantId.isEmpty() && fullList.Version_1_0 && fullList.Version_1_0->documentList){
-		for (const auto& docInfo : *fullList.Version_1_0->documentList){
+	if (!sessionTenantId.isEmpty() && fullList.documentList){
+		for (const auto& docInfo : *fullList.documentList){
 			if (docInfo && docInfo->objectId && *docInfo->objectId == sessionTenantId){
-				filteredList.Version_1_0->documentList->append(docInfo);
+				filteredList.documentList->append(docInfo);
 			}
 		}
 	}
@@ -83,8 +84,13 @@ CDM::CDocumentInfo CTenantCollectionDocumentServiceControllerComp::OnOpenDocumen
 
 		// Extract the objectId (tenantId) being opened from the request arguments
 		const auto& arguments = openDocumentRequest.GetRequestedArguments();
-		if (arguments.input.Version_1_0 && arguments.input.Version_1_0->id){
-			QByteArray requestedTenantId = *arguments.input.Version_1_0->id;
+		if (!arguments.input.has_value()){
+			Q_ASSERT(false);
+			return CDM::CDocumentInfo();
+		}
+
+		if (arguments.input->id){
+			QByteArray requestedTenantId = *arguments.input->id;
 			if (!requestedTenantId.isEmpty() && requestedTenantId != sessionTenantId){
 				errorMessage = QStringLiteral("Cannot edit a tenant you are not currently switched to. Please switch to this organization first.");
 				return CDM::CDocumentInfo();

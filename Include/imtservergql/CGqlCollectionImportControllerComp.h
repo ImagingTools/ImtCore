@@ -8,21 +8,21 @@
 // ImtCore includes
 #include <imtservergql/ICollectionImportController.h>
 #include <imthype/IJobQueueManager.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/CollectionImport.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/CollectionImport_fwd.h>
 
 
 namespace imtservergql
 {
 
 
-namespace collectionImport = sdl::imtbase::CollectionImport;
+namespace collectionImport = sdl::V1_0::imtbase;
 
 
-class CGqlCollectionImportControllerComp: public collectionImport::CGraphQlHandlerCompBase
+class CGqlCollectionImportControllerComp: public collectionImport::CCollectionImportGqlHandlerCompBase
 {
 	Q_DECLARE_TR_FUNCTIONS(CGqlCollectionImportControllerComp)
 public:
-	typedef collectionImport::CGraphQlHandlerCompBase BaseClass;
+	typedef collectionImport::CCollectionImportGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlCollectionImportControllerComp);
 		I_ASSIGN(m_collectionImportControllerCompPtr, "CollectionImportController", "Collection import controller", false, "CollectionImportController");
@@ -38,7 +38,7 @@ public:
 	static QByteArray GetCancelSessionId(const GqlRequest& request);
 
 protected:
-	// reimplemented (sdl::imtbase::CollectionImport::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtbase::CCollectionImportGqlHandlerCompBase)
 	virtual collectionImport::CSessionStatus OnBeginCollectionImportSession(
 		const collectionImport::CBeginCollectionImportSessionGqlRequest& request,
 		const ::imtgql::CGqlRequest& gqlRequest,
@@ -60,8 +60,9 @@ bool CGqlCollectionImportControllerComp::FillSessionInfo(
 	QString& errorMessage)
 {
 	auto sdlImportParams = request.GetRequestedArguments().input;
-	if (sdlImportParams.Version_1_0){
-		auto sdlImportParamsV1_0 = *sdlImportParams.Version_1_0;
+
+	if (sdlImportParams){
+		auto sdlImportParamsV1_0 = *sdlImportParams;
 
 		if (sdlImportParamsV1_0.sessionId && sdlImportParamsV1_0.collectionId && sdlImportParamsV1_0.fileList && sdlImportParamsV1_0.fileList->count() > 0){
 			sessionInfo.sessionId = *sdlImportParamsV1_0.sessionId;
@@ -104,8 +105,8 @@ QByteArray CGqlCollectionImportControllerComp::GetCancelSessionId(
 	const GqlRequest& request)
 {
 	auto sdlSessionId = request.GetRequestedArguments().input;
-	if (sdlSessionId.Version_1_0 && sdlSessionId.Version_1_0->sessionId){
-		QByteArray sessionId = *sdlSessionId.Version_1_0->sessionId;
+	if (sdlSessionId && sdlSessionId->sessionId){
+		QByteArray sessionId = *sdlSessionId->sessionId;
 
 		return sessionId;
 	}

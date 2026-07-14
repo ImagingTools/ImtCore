@@ -20,19 +20,19 @@ class IntValidator extends QtObject {
         let value = Number(str)
         if(isNaN(value)) return false
 
-        return (this.getPropertyValue('bottom') <= value && this.getPropertyValue('top') >= value)
+        return (this.bottom <= value && this.top >= value)
     }
 
     hasPartialMatch(str){
         if(!str) return true
 
-        if(this.getPropertyValue('bottom') < 0 || this.getPropertyValue('top') < 0){
+        if(this.bottom < 0 || this.top < 0){
             if(str === '-') return true
         }
         let value = Number(str)
         if(isNaN(value)) return false
 
-        return (this.getPropertyValue('bottom') <= value && this.getPropertyValue('top') >= value) || (str.length - (this.getPropertyValue('top')-1).toString().length === 1)
+        return (this.bottom <= value && this.top >= value) || (str.length - (this.top-1).toString().length === 1)
     }
 }
 

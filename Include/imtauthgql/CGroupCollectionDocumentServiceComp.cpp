@@ -9,6 +9,9 @@
 #include <imtauth/CUserGroupInfo.h>
 #include <imtauth/IUserGroupInfo.h>
 
+// Generated includes
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/GroupCollectionDocumentService.h>
+
 
 namespace imtauthgql
 {
@@ -16,67 +19,60 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (CGraphQlHandlerCompBase)
+// reimplemented (CGroupCollectionDocumentServiceGqlHandlerCompBase)
 
-sdl::imtauth::Groups::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroupRepresentation(
-		const sdl::imtauth::GroupCollectionDocumentService::CGetGroupRepresentationGqlRequest& getGroupRepresentationRequest,
+sdl::V1_0::imtauth::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroupRepresentation(
+		const sdl::V1_0::imtauth::CGetGroupRepresentationGqlRequest& getGroupRepresentationRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	sdl::imtauth::GroupCollectionDocumentService::GetGroupRepresentationRequestArguments arguments = getGroupRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtauth::Groups::CGroupData();
-	}
-
+	sdl::V1_0::imtauth::GetGroupRepresentationRequestArguments arguments = getGroupRepresentationRequest.GetRequestedArguments();
 	QByteArray userId = GetUserId(gqlRequest);
 
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->id){
-		objectId = *arguments.input.Version_1_0->id;
+	if (arguments.input->id){
+		objectId = *arguments.input->id;
 	}
 
 	if (objectId.isEmpty()){
 		errorMessage = QStringLiteral("Missing document ID");
-		return sdl::imtauth::Groups::CGroupData();
+		return sdl::V1_0::imtauth::CGroupData();
 	}
 
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userId, objectId, documentPtr);
 	if (!documentPtr.IsValid()){
 		errorMessage = QStringLiteral("Document not found");
-		return sdl::imtauth::Groups::CGroupData();
+		return sdl::V1_0::imtauth::CGroupData();
 	}
 
 	const imtauth::CIdentifiableUserGroupInfo* groupPtr = dynamic_cast<const imtauth::CIdentifiableUserGroupInfo*>(documentPtr.GetPtr());
 	if (groupPtr == nullptr){
 		errorMessage = QStringLiteral("Invalid document type");
-		return sdl::imtauth::Groups::CGroupData();
+		return sdl::V1_0::imtauth::CGroupData();
 	}
 
-	sdl::imtauth::Groups::CGroupData response;
-	response.Version_1_0.Emplace();
+	sdl::V1_0::imtauth::CGroupData response;
+	response.id = groupPtr->GetObjectUuid();
+	response.name = groupPtr->GetName();
+	response.description = groupPtr->GetDescription();
 
-	response.Version_1_0->id = groupPtr->GetObjectUuid();
-	response.Version_1_0->name = groupPtr->GetName();
-	response.Version_1_0->description = groupPtr->GetDescription();
-
-	response.Version_1_0->users.Emplace();
+	response.users.Emplace();
 	for (const QByteArray& userIdInGroup : groupPtr->GetUsers()){
-		response.Version_1_0->users->push_back(userIdInGroup);
+		response.users->push_back(userIdInGroup);
 	}
 
-	response.Version_1_0->parentGroups.Emplace();
+	response.parentGroups.Emplace();
 	for (const QByteArray& parentGroupId : groupPtr->GetParentGroups()){
-		response.Version_1_0->parentGroups->push_back(parentGroupId);
+		response.parentGroups->push_back(parentGroupId);
 	}
 
 	// Roles are productId-scoped on IUserBaseInfo; without a tenant context
 	// here we expose all products' roles concatenated.
-	response.Version_1_0->roles.Emplace();
+	response.roles.Emplace();
 	for (const QByteArray& productId : groupPtr->GetProducts()){
 		for (const QByteArray& roleId : groupPtr->GetRoles(productId)){
-			response.Version_1_0->roles->push_back(roleId);
+			response.roles->push_back(roleId);
 		}
 	}
 
@@ -84,24 +80,18 @@ sdl::imtauth::Groups::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroup
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CGroupCollectionDocumentServiceComp::OnUpdateGroupFromRepresentation(
-		const sdl::imtauth::GroupCollectionDocumentService::CUpdateGroupFromRepresentationGqlRequest& updateGroupFromRepresentationRequest,
+sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp::OnUpdateGroupFromRepresentation(
+		const sdl::V1_0::imtauth::CUpdateGroupFromRepresentationGqlRequest& updateGroupFromRepresentationRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	sdl::imtauth::GroupCollectionDocumentService::UpdateGroupFromRepresentationRequestArguments arguments = updateGroupFromRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus();
-	}
-
-	sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus response;
-	response.Version_1_0.Emplace();
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Failed;
+	sdl::V1_0::imtauth::UpdateGroupFromRepresentationRequestArguments arguments = updateGroupFromRepresentationRequest.GetRequestedArguments();
+	sdl::V1_0::imtbase::CDocumentOperationStatus response;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.Version_1_0->documentId){
-		documentId = *arguments.input.Version_1_0->documentId;
+	if (arguments.input->documentId){
+		documentId = *arguments.input->documentId;
 	}
 
 	if (documentId.isEmpty()){
@@ -114,19 +104,19 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CGroupCollecti
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
 	imtauth::CIdentifiableUserGroupInfo* groupPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(documentPtr.GetPtr());
 	if (groupPtr == nullptr){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
-	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
-	if (arguments.input.Version_1_0->group){
-		groupData = *arguments.input.Version_1_0->group;
+	sdl::V1_0::imtauth::CGroupData groupData;
+	if (arguments.input->group){
+		groupData = *arguments.input->group;
 	}
 
 	if (groupData.id){
@@ -175,7 +165,7 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CGroupCollecti
 
 	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
 
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Success;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;
 }

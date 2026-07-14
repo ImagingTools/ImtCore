@@ -43,7 +43,7 @@ void CCodeGeneratorExecutorComp:: OnComponentCreated()
 	if (m_sdlArgumentParserCompPtr->IsSchemaDependencyModeEnabled()){
 		iprm::CParamsSet outputParams;
 		int collectionResult =
-			m_sdlSchemaDependenciesCollectorCompPtr->DoProcessing(nullptr, nullptr, &outputParams);
+			m_sdlSchemaDependenciesCollectorCompPtr->DoProcessing(nullptr, nullptr, &outputParams, nullptr, nullptr);
 		if (collectionResult != iproc::IProcessor::TS_OK){
 			SendErrorMessage(
 				0, QString("Unable to collect dependencies for schema: '%1'")
@@ -90,7 +90,7 @@ void CCodeGeneratorExecutorComp:: OnComponentCreated()
 	// first parse schema and get complete path to output
 	iprm::CParamsSet outputParamsSet;
 	int parsingResult =
-		m_gqlSchemaParser->DoProcessing(nullptr, nullptr, &outputParamsSet);
+		m_gqlSchemaParser->DoProcessing(nullptr, nullptr, &outputParamsSet, nullptr, nullptr);
 	if (parsingResult != iproc::IProcessor::TS_OK){
 		SendErrorMessage(
 			0, QString("Unable to parse schema '%1'")
@@ -107,7 +107,7 @@ void CCodeGeneratorExecutorComp:: OnComponentCreated()
 	// PrepareParams(params) -> void;
 
 	if (m_cxxProcessorCompPtr.IsValid() && m_sdlArgumentParserCompPtr->IsCppEnabled()){
-		iproc::IProcessor::TaskState execResult = m_cxxProcessorCompPtr->DoProcessing(&params, nullptr, nullptr, nullptr);
+		iproc::IProcessor::TaskState execResult = m_cxxProcessorCompPtr->DoProcessing(&params, nullptr, nullptr, nullptr, nullptr);
 		if (execResult != iproc::IProcessor::TS_OK){
 			qApp->exit(4);
 
@@ -116,7 +116,7 @@ void CCodeGeneratorExecutorComp:: OnComponentCreated()
 	}
 
 	if (m_qmlProcessorCompPtr.IsValid() && m_sdlArgumentParserCompPtr->IsQmlEnabled()){
-		iproc::IProcessor::TaskState execResult = m_qmlProcessorCompPtr->DoProcessing(&params, nullptr, nullptr, nullptr);
+		iproc::IProcessor::TaskState execResult = m_qmlProcessorCompPtr->DoProcessing(&params, nullptr, nullptr, nullptr, nullptr);
 		if (execResult != iproc::IProcessor::TS_OK){
 			qApp->exit(5);
 
@@ -131,4 +131,3 @@ void CCodeGeneratorExecutorComp:: OnComponentCreated()
 
 
 } // namespace imtsdl
-

@@ -1,9 +1,14 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CFilterableSelectControllerComp.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FilterableSelect.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h>
 
 
 // STL includes
 #include <cmath>
+
+// Qt includes
+#include <QtCore/QJsonObject>
 
 // ACF includes
 #include <istd/TDelPtr.h>
@@ -43,12 +48,12 @@ bool CFilterableSelectControllerComp::IsRequestSupported(const imtgql::CGqlReque
 }
 
 
-sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectControllerComp::OnGetSelectableItems(
-			const sdl::imtbase::FilterableSelect::CGetSelectableItemsGqlRequest& getSelectableItemsRequest,
+sdl::V1_0::imtbase::CGetSelectableItemsPayload CFilterableSelectControllerComp::OnGetSelectableItems(
+			const sdl::V1_0::imtbase::CGetSelectableItemsGqlRequest& getSelectableItemsRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload response;
+	sdl::V1_0::imtbase::CGetSelectableItemsPayload response;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QStringLiteral("Object collection is not set");
@@ -56,16 +61,8 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 		return response;
 	}
 
-	sdl::imtbase::FilterableSelect::GetSelectableItemsRequestArguments arguments = getSelectableItemsRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		errorMessage = QStringLiteral("Invalid request arguments");
-		SendErrorMessage(0, errorMessage, "CFilterableSelectControllerComp");
-		return response;
-	}
-
-	response.Version_1_0.emplace();
-
-	imtsdl::TElementList<sdl::imtbase::FilterableSelect::CSelectableItemData::V1_0> itemsList;
+	sdl::V1_0::imtbase::GetSelectableItemsRequestArguments arguments = getSelectableItemsRequest.GetRequestedArguments();
+	imtsdl::TElementList<sdl::V1_0::imtbase::CSelectableItemData> itemsList;
 
 	// Normal paginated fetch mode
 	int offset = 0;
@@ -80,8 +77,8 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 	}
 
 	// Exclude selected IDs: create CDocumentIdFilter with CT_NOT_IN
-	if (arguments.input.Version_1_0->excludeIds && !arguments.input.Version_1_0->excludeIds->empty()){
-		const auto& excludeIdsList = *arguments.input.Version_1_0->excludeIds;
+	if (arguments.input && arguments.input->excludeIds && !arguments.input->excludeIds->empty()){
+		const auto& excludeIdsList = *arguments.input->excludeIds;
 		QByteArrayList documentIds;
 		for (size_t i = 0; i < excludeIdsList.size(); ++i){
 			QByteArray docId = *excludeIdsList[i];
@@ -97,8 +94,8 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 		}
 	}
 
-	if (arguments.input.Version_1_0->viewParams){
-		auto& viewParams = *arguments.input.Version_1_0->viewParams;
+	if (arguments.input && arguments.input->viewParams){
+		auto& viewParams = *arguments.input->viewParams;
 		if (viewParams.offset){
 			offset = *viewParams.offset;
 		}
@@ -136,7 +133,7 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 			continue;
 		}
 
-		sdl::imtbase::FilterableSelect::CSelectableItemData::V1_0 itemRepresentation;
+		sdl::V1_0::imtbase::CSelectableItemData itemRepresentation;
 		itemRepresentation.id = objectId;
 
 		QByteArray objectTypeId = iteratorPtr->GetObjectTypeId();
@@ -150,10 +147,32 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 		QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 		itemRepresentation.description = description;
 
+		// Fill additional parameters from info provider
+		iprm::CParamsSet itemParamsSet;
+		if (m_objectParamsFillerCompPtr.IsValid()){
+			QByteArray contextTenantId;
+			const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+			if (gqlContextPtr != nullptr){
+				contextTenantId = gqlContextPtr->GetTenantId();
+			}
+			m_objectParamsFillerCompPtr->FillParams(objectId, itemParamsSet, contextTenantId);
+		}
+
+		// Convert iprm::IParamsSet to SDL CParamsSet via representation controller
+		if (m_paramSetRepresentationControllerCompPtr.IsValid()){
+			QJsonObject paramsJsonObject;
+			if (m_paramSetRepresentationControllerCompPtr->GetRepresentationFromDataModel(itemParamsSet, paramsJsonObject)){
+				sdl::V1_0::imtbase::CParamsSet sdlParamsSet;
+				if (sdlParamsSet.ReadFromJsonObject(paramsJsonObject)){
+					itemRepresentation.params = sdlParamsSet;
+				}
+			}
+		}
+
 		itemsList << itemRepresentation;
 	}
 
-	response.Version_1_0->items = itemsList;
+	response.items = itemsList;
 
 	int elementsCount = iteratorPtr->GetElementsCount();
 	int pagesCount = (count > 0) ? static_cast<int>(std::ceil(elementsCount / static_cast<double>(count))) : 1;
@@ -161,10 +180,10 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 		pagesCount = 1;
 	}
 
-	sdl::imtbase::ImtCollection::CNotificationItem::V1_0 notification;
+	sdl::V1_0::imtbase::CNotificationItem notification;
 	notification.pagesCount = pagesCount;
 	notification.totalCount = elementsCount;
-	response.Version_1_0->notification = notification;
+	response.notification = notification;
 
 	return response;
 }

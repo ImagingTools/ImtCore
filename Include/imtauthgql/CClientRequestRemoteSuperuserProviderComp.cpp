@@ -17,10 +17,10 @@ namespace imtauthgql
 
 imtauth::ISuperuserProvider::ExistsStatus CClientRequestRemoteSuperuserProviderComp::SuperuserExists(QString& errorMessage) const
 {
-	namespace userssdl = sdl::imtauth::Users;
+	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::CheckSuperuserExistsRequestArguments arguments;
-	arguments.input.Version_1_0 = userssdl::CCheckSuperuserInput::V1_0();
+	arguments.input.emplace();
 
 	imtgql::CGqlRequest gqlRequest;
 	if (userssdl::CCheckSuperuserExistsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -31,21 +31,17 @@ imtauth::ISuperuserProvider::ExistsStatus CClientRequestRemoteSuperuserProviderC
 			return imtauth::ISuperuserProvider::ES_UNKNOWN;
 		}
 
-		if (!response.Version_1_0){
-			return imtauth::ISuperuserProvider::ES_UNKNOWN;
-		}
-
-		if (response.Version_1_0->message){
-			errorMessage = *response.Version_1_0->message;
+		if (response.message){
+			errorMessage = *response.message;
 		}
 
 		imtauth::ISuperuserProvider::ExistsStatus retVal = imtauth::ISuperuserProvider::ES_UNKNOWN;
-		if (response.Version_1_0->status){
-			sdl::imtauth::Users::ExistsStatus status = *response.Version_1_0->status;
-			if (status == sdl::imtauth::Users::ExistsStatus::EXISTS){
+		if (response.status){
+			sdl::V1_0::imtauth::ExistsStatus status = *response.status;
+			if (status == sdl::V1_0::imtauth::ExistsStatus::EXISTS){
 				retVal = imtauth::ISuperuserProvider::ES_EXISTS;
 			}
-			else if (status == sdl::imtauth::Users::ExistsStatus::NOT_EXISTS){
+			else if (status == sdl::V1_0::imtauth::ExistsStatus::NOT_EXISTS){
 				retVal = imtauth::ISuperuserProvider::ES_NOT_EXISTS;
 			}
 		}

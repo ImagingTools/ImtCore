@@ -58,6 +58,7 @@ public:
 		Q_INIT_RESOURCE(imtauthSessionsSdl);
 		Q_INIT_RESOURCE(imtauthAuthorizationOptionsSdl);
 		Q_INIT_RESOURCE(imtauthAuthorizationSdl);
+		Q_INIT_RESOURCE(imtauthPermissionsSdl);
 		Q_INIT_RESOURCE(imtappApplicationSdl);
 		Q_INIT_RESOURCE(imtcolorLabSdl);
 		Q_INIT_RESOURCE(imtcolorRgbColorHexSdl);
@@ -74,8 +75,10 @@ public:
 		Q_INIT_RESOURCE(imtauthTenantMembershipsSdl);
 		Q_INIT_RESOURCE(imtauthTenantCollectionDocumentServiceSdl);
 		Q_INIT_RESOURCE(imtauthRoleCollectionDocumentServiceSdl);
+		Q_INIT_RESOURCE(imtauthRelationshipCollectionDocumentServiceSdl);
 		Q_INIT_RESOURCE(imtauthGroupCollectionDocumentServiceSdl);
 		Q_INIT_RESOURCE(imtauthUserCollectionDocumentServiceSdl);
+		Q_INIT_RESOURCE(imtauthCrossOrgGrantCollectionDocumentServiceSdl);
 	}
 
 	static void InitQml()
@@ -102,6 +105,10 @@ public:
 
 	static void InitImtCoreResources()
 	{
+		Q_INIT_RESOURCE(imtauthdb);
+		Q_INIT_RESOURCE(imtchatdb);
+		Q_INIT_RESOURCE(imtdeskdb);
+
 		Q_INIT_RESOURCE(imtbase);
 		Q_INIT_RESOURCE(imtstylecontrolsqml);
 

@@ -12,11 +12,11 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::Settings::CTextParam::V1_0>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CTextParam>)
 
 QByteArray CTextViewRepresentationControllerComp::GetTypeId() const
 {
-	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::TextView.toUtf8();
+	return sdl::V1_0::imtbase::CParamTypeIds::ParamTypeIdsFields::TextView.toUtf8();
 }
 
 

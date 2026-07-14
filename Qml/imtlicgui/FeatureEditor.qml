@@ -455,6 +455,7 @@ ViewBase {
 			z: parent.z + 1;
 			anchors.right: parent.right;
 			anchors.top: tableView_.top;
+			anchors.topMargin: tableView_.showHeader ? tableView_.headerHeight + 1 : 0;
 			anchors.bottom: tableView_.bottom;
 			secondSize: Style.marginM;
 			targetItem: tableView_.contentListView;
@@ -595,6 +596,7 @@ ViewBase {
 			z: parent.z + 1;
 			anchors.right: parent.right;
 			anchors.top: featureDependenciesView.top;
+			anchors.topMargin: featureDependenciesView.showHeader ? featureDependenciesView.headerHeight + 1 : 0;
 			anchors.bottom: featureDependenciesView.bottom;
 			secondSize: Style.marginM;
 			targetItem: featureDependenciesView.contentListView;

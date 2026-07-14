@@ -2,24 +2,22 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6397" Description="ACF"/>
-            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="AuthenticationManager" X="700" Y="325" Note=""/>
-        <Element ComponentName="DatabaseEngine" X="150" Y="600" Note=""/>
-        <Element ComponentName="DatabaseUserSettings" X="250" Y="425" Note=""/>
-        <Element ComponentName="Demultiplexer" X="600" Y="475" Note=""/>
+        <Element ComponentName="Demultiplexer" X="480" Y="660" Note=""/>
         <Element ComponentName="DeskController" X="600" Y="100" Note=""/>
-        <Element ComponentName="HttpServerFramework" X="150" Y="100" Note=""/>
-        <Element ComponentName="IdentifiableProductInfo" X="1000" Y="600" Note=""/>
-        <Element ComponentName="PermissionsController" X="600" Y="750" Note=""/>
-        <Element ComponentName="PersonalAccessTokenController" X="575" Y="601.414213562" Note=""/>
+        <Element ComponentName="HttpServerFramework" X="225" Y="100" Note=""/>
+        <Element ComponentName="IdentifiableProductInfo" X="1000" Y="800" Note=""/>
+        <Element ComponentName="PermissionsController" X="600" Y="800" Note=""/>
         <Element ComponentName="PumaClientEngine" X="1000" Y="475" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="975" Y="50" Note=""/>
-        <Element ComponentName="UserActionController" X="275" Y="275" Note=""/>
+        <Element ComponentName="UserActionController" X="200" Y="300" Note=""/>
+        <Element ComponentName="UserSettingsRepository" X="720" Y="440" Note=""/>
         <Element ComponentName="WebSocketServerFramework" X="975" Y="175" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>

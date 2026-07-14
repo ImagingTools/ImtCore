@@ -8,9 +8,9 @@ import imtcontrols 1.0
 Rectangle {
 	id: chatSearchBarRoot
 	objectName: "ChatSearchBar"
-	color: Style.inputBackgroundColor
+	color: Style.backgroundColor
 	radius: Style.radiusS
-	height: Style.inputHeightS
+	height: Style.buttonHeightM
 
 	property string placeholderText: qsTr("Search...")
 	property string searchText: textInput.text
@@ -20,30 +20,29 @@ Rectangle {
 	Row {
 		anchors.fill: parent
 		anchors.leftMargin: Style.paddingS
-		anchors.rightMargin: Style.paddingXS
-		spacing: Style.paddingXS
+		anchors.rightMargin: Style.paddingS
+		spacing: Style.paddingS
 
 		// Search icon
 		Text {
 			text: "🔍"
 			font.pixelSize: Style.fontSizeS
 			anchors.verticalCenter: parent.verticalCenter
-			color: Style.textSecondaryColor
+			color: Style.buttonInactiveTextColor
 		}
 
 		TextInput {
 			id: textInput
-			width: parent.width - Style.paddingS - Style.iconSizeXS - clearBtn.width - Style.paddingXS * 2
+			width: parent.width - Style.paddingS - Style.iconSizeXS - clearBtn.width - Style.paddingS * 2
 			anchors.verticalCenter: parent.verticalCenter
 			font.pixelSize: Style.fontSizeXS
-			color: Style.textPrimaryColor
+			color: Style.imaginToolsAccentColor
 			clip: true
 			selectByMouse: true
 
 			Text {
 				anchors.fill: parent
 				text: chatSearchBarRoot.placeholderText
-				color: Style.textPlaceholderColor
 				font.pixelSize: Style.fontSizeXS
 				verticalAlignment: Text.AlignVCenter
 				visible: textInput.text.length === 0
@@ -64,7 +63,7 @@ Rectangle {
 			visible: textInput.text.length > 0
 			text: "×"
 			font.pixelSize: Style.fontSizeM
-			color: Style.textSecondaryColor
+			color: Style.buttonInactiveTextColor
 			anchors.verticalCenter: parent.verticalCenter
 
 			MouseArea {

@@ -9,17 +9,19 @@
 #include <imtauth/ICredentialController.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauth/IJwtSessionController.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
+#include <imtauth/ITenantManager.h>
+#include <imtauth/ITenantMembershipManager.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization_fwd.h>
 
 
 namespace imtauthgql
 {
 
 
-class CAuthorizationControllerComp: public sdl::imtauth::Authorization::CGraphQlHandlerCompBase
+class CAuthorizationControllerComp: public sdl::V1_0::imtauth::CAuthorizationGqlHandlerCompBase
 {
 public:
-	typedef sdl::imtauth::Authorization::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CAuthorizationGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CAuthorizationControllerComp);
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", true, "UserCollection");
@@ -27,34 +29,37 @@ public:
 		I_ASSIGN_MULTI_0(m_credentialControllersCompPtr, "CredentialControllers", "Credential Controllers", true);
 		I_ASSIGN_MULTI_0(m_systemIdsAttrPtr, "SystemIds", "System-IDs", true);
 		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "JWT session controller", false, "JwtSessionController");
+		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager", false, "TenantManager");
+		I_ASSIGN(m_tenantMembershipManagerCompPtr, "TenantMembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
 	I_END_COMPONENT;
 
 protected:
 	bool ParseDataFromGqlRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& login, QByteArray& password, QByteArray& productId) const;
 	QByteArray GetUserObjectId(const QByteArray& login) const;
 	bool CheckCredential(const QByteArray& systemId, const QByteArray& login, const QByteArray& password) const;
-	sdl::imtauth::Authorization::CAuthorizationPayload CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const;
-	sdl::imtauth::Authorization::CAuthorizationPayload CreateAuthorizationSuccessfulResponse(
+	QByteArrayList CalculateGlobalPermissions(const imtauth::IUserInfo& userInfo, const QByteArray& userId, const QByteArray& productId) const;
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const;
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateAuthorizationSuccessfulResponse(
 				imtauth::CUserInfo& userInfo,
 				const QByteArray& systemId,
 				const QByteArray& productId,
 				QString& errorMessage) const;
 
-	// reimplemented (sdl::imtauth::Authorization::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Authorization::CAuthorizationPayload OnAuthorization(
-				const sdl::imtauth::Authorization::CAuthorizationGqlRequest& authorizationRequest,
+	// reimplemented (sdl::V1_0::imtauth::CAuthorizationGqlHandlerCompBase)
+	virtual sdl::V1_0::imtauth::CAuthorizationPayload OnAuthorization(
+				const sdl::V1_0::imtauth::CAuthorizationGqlRequest& authorizationRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Authorization::CAuthorizationPayload OnUserToken(
-				const sdl::imtauth::Authorization::CUserTokenGqlRequest& userTokenRequest,
+	virtual sdl::V1_0::imtauth::CAuthorizationPayload OnUserToken(
+				const sdl::V1_0::imtauth::CUserTokenGqlRequest& userTokenRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Authorization::CLogoutPayload OnLogout(
-				const sdl::imtauth::Authorization::CLogoutGqlRequest& logoutRequest,
+	virtual sdl::V1_0::imtauth::CLogoutPayload OnLogout(
+				const sdl::V1_0::imtauth::CLogoutGqlRequest& logoutRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Authorization::CPermissionList OnGetPermissions(
-				const sdl::imtauth::Authorization::CGetPermissionsGqlRequest& getPermissionsRequest,
+	virtual sdl::V1_0::imtauth::CPermissionList OnGetPermissions(
+				const sdl::V1_0::imtauth::CGetPermissionsGqlRequest& getPermissionsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
@@ -65,6 +70,8 @@ protected:
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userConnectionCollectionCompPtr);
 	I_REF(imtauth::IJwtSessionController, m_jwtSessionControllerCompPtr);
+	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
+	I_REF(imtauth::ITenantMembershipManager, m_tenantMembershipManagerCompPtr);
 	I_MULTIREF(imtauth::ICredentialController, m_credentialControllersCompPtr);
 	I_MULTIATTR(QByteArray, m_systemIdsAttrPtr);
 };

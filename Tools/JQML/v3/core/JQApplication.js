@@ -109,6 +109,35 @@ module.exports = {
             }
         }
 
+        if (!String.prototype.includes) {
+            String.prototype.includes = function(search, start) {
+                if (typeof start !== 'number') start = 0
+                if (start + search.length > this.length) return false
+                return this.indexOf(search, start) !== -1
+            }
+        }
+
+        if (!Array.prototype.includes) {
+            Array.prototype.includes = function(search, start) {
+                if (this == null) throw new TypeError('Array.prototype.includes called on null or undefined')
+
+                let obj = Object(this)
+                let len = obj.length >>> 0
+                if (len === 0) return false
+
+                let fromIndex = start | 0
+                let k = Math.max(fromIndex >= 0 ? fromIndex : len - Math.abs(fromIndex), 0)
+
+                while (k < len) {
+                    let current = obj[k]
+                    if (current === search || (current !== current && search !== search)) return true
+                    k++
+                }
+
+                return false
+            }
+        }
+
         RegExp.prototype.toPartialMatchRegex = function() {
             "use strict";
             
@@ -316,14 +345,15 @@ module.exports = {
                 font-size: 14px;
                 font-family: 'Segoe UI';
             }
-            .TextInput .impl, .TextEdit .impl {
+            .TextInput > .impl, .TextEdit > .impl {
                 display: flex;
                 width: 100%;
                 height: 100%;
                 flex-direction: column;
                 z-index: 1;
                 pointer-events: all;
-            }
+                user-select: text;
+            }  
             .Image {
                 background-repeat: no-repeat;
                 background-position: center;
@@ -337,6 +367,7 @@ module.exports = {
             }
             .Flow {
                 flex-wrap: wrap;
+                align-content: flex-start;
             }    
             .Row > *{
                 position: relative;
@@ -357,13 +388,13 @@ module.exports = {
                 display: none;
             }
 
-            .Map > *{
-                pointer-events: all;
-            }
-
             *[invisible] {
                 display: none;
             }
+                
+            *[cached] {
+                display: none;
+            }    
         </style>`)
 
         this.root = JQModules.QtQuick.Item.create()
@@ -397,23 +428,63 @@ module.exports = {
     objectsAwaitingUpdate: new Set(),
     updateLayers: [],
     initLayers: [],
+    callLayers: [],
     deleteObjects: [],
 
     focusTree: [],
-    pendingFocusTree: null,  // deferred during beginUpdate/endUpdate
-    setFocusTree(tree){
-        // Qt semantics: when multiple siblings request focus synchronously,
-        // the FIRST one wins. Use a microtask to batch; first request is kept.
-        if(this.pendingFocusTree !== null){
-            // Another request already queued — ignore (first wins)
-            return
-        }
-        this.pendingFocusTree = tree
-        Promise.resolve().then(()=>{
-            let t = this.pendingFocusTree
+    pendingFocusTree: null,
+    pendingFocusOwner: null,
+    pendingFocusLosers: [],
+    pendingFocusFlushScheduled: false,
+    setFocusTree(tree, options = {}){
+        if(!tree || !tree.length) return false
+
+        let owner = options.owner || tree[0]
+        let immediate = options.immediate === true
+        let firstWins = options.firstWins === true
+
+        if(immediate){
             this.pendingFocusTree = null
-            if(t) this._applyFocusTree(t)
-        })
+            this.pendingFocusOwner = null
+            this._applyFocusTree(tree.slice())
+            this._clearPendingFocusLosers()
+            return true
+        }
+
+        if(firstWins && !this.updateLayers.length){
+            this.pendingFocusTree = null
+            this.pendingFocusOwner = null
+            this._applyFocusTree(tree.slice())
+            this._clearPendingFocusLosers()
+            return true
+        }
+
+        if(firstWins && this.pendingFocusTree !== null){
+            // First request in a synchronous batch wins.
+            if(owner && owner !== this.pendingFocusOwner && this.pendingFocusLosers.indexOf(owner) < 0){
+                this.pendingFocusLosers.push(owner)
+            }
+            return false
+        }
+
+        this.pendingFocusTree = tree.slice()
+        this.pendingFocusOwner = owner
+
+        if(!this.updateLayers.length && !this.pendingFocusFlushScheduled){
+            this.pendingFocusFlushScheduled = true
+            Promise.resolve().then(()=>{
+                this.pendingFocusFlushScheduled = false
+                if(this.pendingFocusTree){
+                    let pendingFocusTree = this.pendingFocusTree
+                    this.pendingFocusTree = null
+                    this.pendingFocusOwner = null
+                    this._applyFocusTree(pendingFocusTree)
+                }
+                this._clearPendingFocusLosers()
+            })
+        }
+
+        return true
     },
 
     _applyFocusTree(tree){
@@ -436,7 +507,18 @@ module.exports = {
         }
         
         this.root.__setFocusTree(unionTree)
+
         this.focusTree = unionTree
+    },
+
+    _clearPendingFocusLosers(){
+        let losers = this.pendingFocusLosers
+        this.pendingFocusLosers = []
+        for(let loser of losers){
+            if(loser && !loser.__destroyed && loser.focus){
+                loser.focus = false
+            }
+        }
     },
 
     setCursor(cursorShape){
@@ -460,6 +542,7 @@ module.exports = {
     beginUpdate: function(){
         this.updateLayers.push([])
         this.initLayers.push([])
+        this.callLayers.push([])
     },
 
     deleteLater: function(obj){
@@ -493,6 +576,14 @@ module.exports = {
         }
     },
 
+    callLater(func){
+        if(this.callLayers.length){
+            this.callLayers[this.callLayers.length-1].push(func)
+        } else {
+            func()
+        }
+    },
+
     quit: function(){
         this.isQuitting = true
         if(typeof window !== 'undefined') window.__jqmlQuit = true
@@ -501,6 +592,7 @@ module.exports = {
     endUpdate: function(){
         let layer = this.updateLayers.pop()
         let initLayer = this.initLayers.pop()
+        let callLayer = this.callLayers.pop()
 
         if(initLayer){
             for(let obj of initLayer){
@@ -514,8 +606,22 @@ module.exports = {
                 if(!obj.__destroyed) obj.__endUpdate()
             }
         } 
+
+        if(callLayer){
+            for(let func of callLayer){
+                func()
+            }
+        }
         
         if(this.updateLayers.length === 0){
+            if(this.pendingFocusTree){
+                let pendingFocusTree = this.pendingFocusTree
+                this.pendingFocusTree = null
+                this.pendingFocusOwner = null
+                this._applyFocusTree(pendingFocusTree)
+            }
+            this._clearPendingFocusLosers()
+
             let objects = this.deleteObjects.slice()
             this.deleteObjects = []
             for(let obj of objects){

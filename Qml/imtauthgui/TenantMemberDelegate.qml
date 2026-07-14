@@ -17,7 +17,7 @@ import imtauthgui 1.0
  * Action requests are surfaced as signals so the parent (TenantMembersPage)
  * can pop the appropriate menu and call the api client.
  */
-Rectangle {
+TenantCollectionItemDelegateBase {
 	id: row
 
 	// --- Inputs ---
@@ -25,15 +25,14 @@ Rectangle {
 	property var memberData: ({})
 	property var tenantData: null
 	property var stateManager: null
-	property bool canManageMembers: false
 	property bool isOwner: false
-	property var selectionManager: null
-	property bool showCheckBox: false
 
 	// --- Outputs (action requests) ---
 	signal memberActionsRequested(var menuItems, string userId, string userName,
-	                              bool isOwnerTarget, bool isCurrentUserTarget)
-	signal inviteActionsRequested(var menuItems, string invitationId, string userName)
+	                              bool isOwnerTarget, bool isCurrentUserTarget,
+	                              real menuX, real menuY)
+	signal inviteActionsRequested(var menuItems, string invitationId, string userName,
+	                              real menuX, real menuY)
 	signal memberEditRequested(string userId, string userName)
 
 	readonly property bool isMember: row.kind === "member"
@@ -46,10 +45,6 @@ Rectangle {
 	readonly property bool isCurrentUser: row.isMember && row.tenantData
 		&& row.tenantData.m_currentUserId
 		&& row.memberData.id === row.tenantData.m_currentUserId
-	readonly property string memberRole: row.isMemberOwner
-		? "Owner"
-		: (row.stateManager ? row.stateManager.getUserRole(row.memberData.id) : "Member")
-
 	readonly property bool isExpired: !row.isMember && row.stateManager
 		? row.stateManager.isInvitationExpired(row.memberData.expiresAt)
 		: false
@@ -58,50 +53,27 @@ Rectangle {
 	readonly property string effectiveStatus: row.isExpired
 		? "Expired"
 		: row.isRevoked ? "Revoked" : "Pending"
+	readonly property bool canEditMember: row.stateManager ? row.stateManager.canChangeOrganizationMember : false
+	readonly property bool canChangeMemberRole: row.stateManager ? row.stateManager.canChangeOrganizationMemberRole : false
+	readonly property bool canManageOrganizationMembers: row.stateManager ? row.stateManager.canManageOrganizationMembers : false
+	readonly property bool canRemoveMember: row.stateManager ? row.stateManager.canExcludeOrganizationMember : false
+	readonly property bool canInviteMember: row.stateManager ? row.stateManager.canInviteOrganizationMember : false
 
 	readonly property string selectionId: row.isMember ? (row.memberData.id || "") : ("inv_" + (row.memberData.id || ""))
-	readonly property bool isSelected: row.selectionManager ? row.selectionManager.isSelected(row.selectionId) : false
+	itemId: row.selectionId
+	enableDefaultDoubleClickEdit: false
+	showDefaultActionsMenu: false
 
-	height: contentRow.implicitHeight + Style.marginL * 2
-	radius: 0
-	color: row.isSelected ? Style.selectedColor
-		: rowMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
-
-	MouseArea {
-		id: rowMouseArea
-		anchors.fill: parent
-		hoverEnabled: true
-		acceptedButtons: Qt.LeftButton
-		onDoubleClicked: {
-			if (row.isMember && row.canManageMembers) {
-				row.memberEditRequested(row.memberData.id, row.memberData.name || row.memberData.id || "")
-			}
+	onItemDoubleClicked: {
+		if (row.isMember && row.canEditMember) {
+			row.memberEditRequested(row.memberData.id, row.memberData.name || row.memberData.id || "")
 		}
 	}
 
 	Row {
 		id: contentRow
-		anchors.left: parent.left
-		anchors.right: parent.right
-		anchors.verticalCenter: parent.verticalCenter
-		anchors.margins: Style.marginM
+		width: parent.width
 		spacing: Style.marginM
-
-		// ----- CheckBox -----
-		CheckBox {
-			visible: row.showCheckBox
-			anchors.verticalCenter: parent.verticalCenter
-			height: Style.itemSizeS
-			width: visible ? Style.itemSizeS : 0
-			checkState: row.isSelected ? Qt.Checked : Qt.Unchecked
-			onCheckStateChanged: {
-				if (!row.selectionManager) return
-				var shouldBeSelected = (checkState === Qt.Checked)
-				var currentlySelected = row.selectionManager.isSelected(row.selectionId)
-				if (shouldBeSelected !== currentlySelected)
-					row.selectionManager.toggleSelect(row.selectionId)
-			}
-		}
 
 		// ----- Avatar -----
 		Rectangle {
@@ -154,7 +126,6 @@ Rectangle {
 			anchors.verticalCenter: parent.verticalCenter
 			spacing: 2
 			width: parent.width
-				- (row.showCheckBox ? Style.itemSizeS + parent.spacing : 0)
 				- avatar.width
 				- badgesItem.width
 				- actionsItem.width
@@ -218,11 +189,11 @@ Rectangle {
 				spacing: Style.marginXS
 
 				StatusBadge {
-					visible: row.isMember
-					text: row.memberRole
-					badgeColor: (row.isMemberOwner || row.isMemberCreator) ? Style.selectedColor : Style.baseColor
-					badgeBorderColor: (row.isMemberOwner || row.isMemberCreator) ? Style.secondColor : Style.borderColor
-					textColor: (row.isMemberOwner || row.isMemberCreator) ? Style.secondColor : Style.textColor
+					visible: row.isMember && (row.isMemberOwner || row.isMemberCreator)
+					text: row.isMemberOwner ? qsTr("Owner") : qsTr("Creator")
+					badgeColor: Style.selectedColor
+					badgeBorderColor: Style.secondColor
+					textColor: Style.secondColor
 				}
 
 				StatusBadge {
@@ -231,6 +202,21 @@ Rectangle {
 					badgeColor: Style.selectedColor
 					badgeBorderWidth: 0
 					textColor: Style.textColor
+				}
+
+				StatusBadge {
+					readonly property int __permCount: row.isMember
+						&& row.memberData
+						&& Array.isArray(row.memberData.organizationPermissions)
+						? row.memberData.organizationPermissions.length : 0
+					visible: row.isMember && __permCount > 0
+					text: qsTr("%1 perm%2").arg(__permCount).arg(__permCount === 1 ? "" : "s")
+					badgeColor: Style.baseColor
+					badgeBorderColor: Style.borderColor
+					textColor: Style.inactiveTextColor
+					horizontalPadding: Style.marginS
+					verticalPadding: Style.marginXS
+					fontPixelSize: Style.fontSizeXS
 				}
 
 				StatusBadge {
@@ -258,11 +244,12 @@ Rectangle {
 			anchors.verticalCenter: parent.verticalCenter
 
 			readonly property bool __hasActions: row.isMember
-				? ((row.canManageMembers && !row.isCurrentUser && !row.isMemberOwner && !row.isMemberCreator)
+				? (((row.canChangeMemberRole || row.canRemoveMember || row.isOwner) && !row.isCurrentUser && !row.isMemberOwner && !row.isMemberCreator)
 				   || (row.isCurrentUser && !row.isMemberOwner && !row.isMemberCreator))
-				: (row.canManageMembers && row.effectiveStatus === "Pending")
+				: ((row.canInviteMember || row.canRemoveMember) && row.effectiveStatus === "Pending")
 
 			ToolButton {
+				id: actionsButton
 				visible: actionsItem.__hasActions
 				anchors.centerIn: parent
 				tooltipText: qsTr("Actions")
@@ -275,12 +262,15 @@ Rectangle {
 				}
 
 				onClicked: {
+					var btnPos = actionsButton.mapToItem(null, 0, actionsButton.height)
 					if (row.isMember) {
 						var menuItems = []
-						if (row.canManageMembers && !row.isCurrentUser) {
+						if (!row.isCurrentUser) {
 							if (!row.isMemberOwner && !row.isMemberCreator) {
-								menuItems.push({ text: qsTr("Change Environment Role"), action: "changeRole" })
-								menuItems.push({ text: qsTr("Exclude from Tenant"), action: "remove" })
+								if (row.canChangeMemberRole || row.canManageOrganizationMembers)
+									menuItems.push({ text: qsTr("Manage Organization Permissions"), action: "managePermissions" })
+								if (row.canRemoveMember)
+									menuItems.push({ text: qsTr("Exclude from Tenant"), action: "remove" })
 							}
 							if (row.isOwner && !row.isMemberOwner && !row.isMemberCreator) {
 								menuItems.push({ text: qsTr("Transfer Ownership"), action: "transfer" })
@@ -294,28 +284,23 @@ Rectangle {
 							row.memberData.id,
 							row.memberData.name || row.memberData.id,
 							row.isMemberOwner,
-							row.isCurrentUser)
+							row.isCurrentUser,
+							btnPos.x, btnPos.y)
 					} else {
-						var inviteMenuItems = [
-							{ text: qsTr("Resend Invitation"), action: "resend" },
-							{ text: qsTr("Revoke Invitation"), action: "revoke" }
-						]
+						var inviteMenuItems = []
+						if (row.canInviteMember)
+							inviteMenuItems.push({ text: qsTr("Resend Invitation"), action: "resend" })
+						if (row.canRemoveMember)
+							inviteMenuItems.push({ text: qsTr("Revoke Invitation"), action: "revoke" })
+						if (inviteMenuItems.length === 0)
+							return
 						row.inviteActionsRequested(inviteMenuItems,
 							row.memberData.id,
-							row.memberData.userName || row.memberData.userId || "")
+							row.memberData.userName || row.memberData.userId || "",
+							btnPos.x, btnPos.y)
 					}
 				}
 			}
 		}
-	}
-
-	// Bottom separator line
-	Rectangle {
-		anchors.bottom: parent.bottom
-		anchors.left: parent.left
-		anchors.right: parent.right
-		height: 1
-		color: Style.borderColor
-		opacity: 0.5
 	}
 }

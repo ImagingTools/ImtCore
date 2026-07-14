@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CClientRequestPersonalAccessTokenManagerComp.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/PersonalAccessTokens.h>
 
 
 // Qt includes
@@ -8,57 +9,89 @@
 // ACF includes
 #include <istd/CChangeNotifier.h>
 
+// ImtCore includes
+#include <imtgql/CGqlRequest.h>
+#include <imtgql/CGqlContext.h>
+#include <imtgql/CGqlRequestContextManager.h>
+
 
 namespace imtauthgql
 {
 
 
-// public methods
+namespace
+{
+
+
+void AttachCurrentContext(imtgql::CGqlRequest& gqlRequest)
+{
+	imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
+	if (gqlContextPtr == nullptr){
+		return;
+	}
+
+	istd::IChangeableUniquePtr clonedPtr = gqlContextPtr->CloneMe();
+	imtgql::IGqlContextUniquePtr castedPtr;
+	castedPtr.MoveCastedPtr(std::move(clonedPtr));
+	gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(castedPtr));
+}
+
+
+} // anonymous namespace
+
 
 // reimplemented (imtauth::IPersonalAccessTokenManager)
 
 imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonalAccessTokenManagerComp::CreateToken(
 			const QByteArray& userId,
+			const QByteArray& productId,
 			const QString& name,
 			const QString& description,
 			const QByteArrayList& scopes,
 			const QDateTime& expiresAt)
 {
-	namespace tokensdl = sdl::imtauth::PersonalAccessTokens;
-
-	tokensdl::CreateTokenRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->userId = userId;
-	arguments.input.Version_1_0->name = name;
-	
-	if (!description.isEmpty()){
-		arguments.input.Version_1_0->description = description;
-	}
-	
-	if (!scopes.isEmpty()){
-		arguments.input.Version_1_0->scopes.Emplace();
-		arguments.input.Version_1_0->scopes->FromList(scopes);
-	}
-	
-	if (expiresAt.isValid()){
-		arguments.input.Version_1_0->expiresAt = expiresAt.toUTC().toString(Qt::ISODate);
-	}
-
-	tokensdl::CCreateTokenPayload payload;
-	bool ok = SendModelRequestInternal<tokensdl::CreateTokenRequestArguments, tokensdl::CCreateTokenPayload, tokensdl::CCreateTokenGqlRequest>(arguments, payload);
+	namespace tokensdl = sdl::V1_0::imtauth;
 
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result;
 	result.success = false;
 
-	if (!ok){
+	tokensdl::CreateTokenRequestArguments arguments;
+	arguments.input.emplace();
+	arguments.input->userId = userId;
+	arguments.input->name = name;
+
+	if (!productId.isEmpty()){
+		arguments.input->productId = productId;
+	}
+
+	if (!description.isEmpty()){
+		arguments.input->description = description;
+	}
+
+	if (!scopes.isEmpty()){
+		arguments.input->scopes.Emplace();
+		arguments.input->scopes->FromList(scopes);
+	}
+
+	if (expiresAt.isValid()){
+		arguments.input->expiresAt = expiresAt.toUTC().toString(Qt::ISODate);
+	}
+
+	imtgql::CGqlRequest gqlRequest;
+	AttachCurrentContext(gqlRequest);
+	if (!tokensdl::CCreateTokenGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return result;
 	}
 
-	if (!payload.Version_1_0->success.HasValue() || !*payload.Version_1_0->success){
+	tokensdl::CCreateTokenGqlRequest createTokenRequest(gqlRequest, false);
+
+	QString errorMessage;
+	tokensdl::CCreateTokenPayload payload = OnCreateToken(createTokenRequest, gqlRequest, errorMessage);
+	if (!payload.success.has_value() || !*payload.success){
 		return result;
 	}
 
-	if (!payload.Version_1_0->id.HasValue() || !payload.Version_1_0->token.HasValue()){
+	if (!payload.id.has_value() || !payload.token.has_value()){
 		return result;
 	}
 
@@ -66,8 +99,8 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 	istd::CChangeNotifier changeNotifier(this);
 
 	result.success = true;
-	result.tokenId = *payload.Version_1_0->id;
-	result.rawToken = *payload.Version_1_0->token;
+	result.tokenId = *payload.id;
+	result.rawToken = *payload.token;
 
 	return result;
 }
@@ -75,34 +108,35 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 
 bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes) const
 {
-	namespace tokensdl = sdl::imtauth::PersonalAccessTokens;
+	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::ValidateTokenRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->token = rawToken;
+	arguments.input.emplace();
+	arguments.input->token = rawToken;
 
-	tokensdl::CValidateTokenPayload payload;
-	bool ok = SendModelRequestInternal<tokensdl::ValidateTokenRequestArguments, tokensdl::CValidateTokenPayload, tokensdl::CValidateTokenGqlRequest>(arguments, payload);
-	if (!ok){
+	imtgql::CGqlRequest gqlRequest;
+	AttachCurrentContext(gqlRequest);
+	if (!tokensdl::CValidateTokenGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
 
-	if (!payload.Version_1_0->valid.HasValue() || !*payload.Version_1_0->valid){
+	tokensdl::CValidateTokenGqlRequest validateTokenRequest(gqlRequest, false);
+
+	QString errorMessage;
+	tokensdl::CValidateTokenPayload payload = OnValidateToken(validateTokenRequest, gqlRequest, errorMessage);
+	if (!payload.valid.has_value() || !*payload.valid){
 		return false;
 	}
 
-	if (payload.Version_1_0->userId.HasValue()){
-		userId = *payload.Version_1_0->userId;
+	if (payload.userId.has_value()){
+		userId = *payload.userId;
 	}
 
-	if (payload.Version_1_0->scopes.HasValue()){
-		scopes = payload.Version_1_0->scopes->ToList();
+	if (payload.scopes.has_value()){
+		scopes = payload.scopes->ToList();
 	}
 
-	// Note: The SDL schema's ValidateTokenPayload does not include a tokenId field.
-	// This is a limitation of the GraphQL client implementation. The tokenId would
-	// need to be added to the ValidateTokenPayload type in PersonalAccessTokens.sdl
-	// to support this parameter. For now, we return an empty tokenId.
+	// The SDL schema's ValidateTokenPayload does not include a tokenId field
 	tokenId = QByteArray();
 
 	return true;
@@ -111,26 +145,30 @@ bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArra
 
 QByteArrayList CClientRequestPersonalAccessTokenManagerComp::GetTokenIds(const QByteArray& userId) const
 {
-	namespace tokensdl = sdl::imtauth::PersonalAccessTokens;
+	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::GetTokenListRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->userId = userId;
+	arguments.input.emplace();
+	arguments.input->userId = userId;
 
-	tokensdl::CPersonalAccessTokenList payload;
-	bool ok = SendModelRequestInternal<tokensdl::GetTokenListRequestArguments, tokensdl::CPersonalAccessTokenList, tokensdl::CGetTokenListGqlRequest>(arguments, payload);
-	if (!ok){
+	imtgql::CGqlRequest gqlRequest;
+	AttachCurrentContext(gqlRequest);
+	if (!tokensdl::CGetTokenListGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return QByteArrayList();
 	}
 
-	if (!payload.Version_1_0->tokens.HasValue()){
+	tokensdl::CGetTokenListGqlRequest getTokenListRequest(gqlRequest, false);
+
+	QString errorMessage;
+	tokensdl::CPersonalAccessTokenList payload = OnGetTokenList(getTokenListRequest, gqlRequest, errorMessage);
+	if (!payload.tokens.has_value()){
 		return QByteArrayList();
 	}
 
 	QByteArrayList tokenIds;
-	const auto& tokensList = payload.Version_1_0->tokens->ToList();
+	const auto& tokensList = payload.tokens->ToList();
 	for (const auto& token : tokensList){
-		if (token.id.HasValue()){
+		if (token.id.has_value()){
 			tokenIds << *token.id;
 		}
 	}
@@ -141,19 +179,27 @@ QByteArrayList CClientRequestPersonalAccessTokenManagerComp::GetTokenIds(const Q
 
 imtauth::IPersonalAccessTokenSharedPtr CClientRequestPersonalAccessTokenManagerComp::GetToken(const QByteArray& tokenId) const
 {
+	namespace tokensdl = sdl::V1_0::imtauth;
+
 	if (!m_tokenFactoryCompPtr.IsValid()){
 		return nullptr;
 	}
 
-	namespace tokensdl = sdl::imtauth::PersonalAccessTokens;
-
 	tokensdl::GetTokenRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = tokenId;
+	arguments.input.emplace();
+	arguments.input->id = tokenId;
 
-	tokensdl::CPersonalAccessToken payload;
-	bool ok = SendModelRequestInternal<tokensdl::GetTokenRequestArguments, tokensdl::CPersonalAccessToken, tokensdl::CGetTokenGqlRequest>(arguments, payload);
-	if (!ok){
+	imtgql::CGqlRequest gqlRequest;
+	AttachCurrentContext(gqlRequest);
+	if (!tokensdl::CGetTokenGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		return nullptr;
+	}
+
+	tokensdl::CGetTokenGqlRequest getTokenRequest(gqlRequest, false);
+
+	QString errorMessage;
+	tokensdl::CPersonalAccessToken payload = OnGetToken(getTokenRequest, gqlRequest, errorMessage);
+	if (!payload.id.has_value()){
 		return nullptr;
 	}
 
@@ -162,48 +208,37 @@ imtauth::IPersonalAccessTokenSharedPtr CClientRequestPersonalAccessTokenManagerC
 		return nullptr;
 	}
 
-	// Populate token from SDL payload
-	if (payload.Version_1_0->id.HasValue()){
-		tokenPtr->SetId(*payload.Version_1_0->id);
-	}
+	tokenPtr->SetId(*payload.id);
 
-	if (payload.Version_1_0->userId.HasValue()){
-		tokenPtr->SetUserId(*payload.Version_1_0->userId);
+	if (payload.userId.has_value()){
+		tokenPtr->SetUserId(*payload.userId);
 	}
-
-	if (payload.Version_1_0->name.HasValue()){
-		tokenPtr->SetName(*payload.Version_1_0->name);
+	if (payload.productId.has_value()){
+		tokenPtr->SetProductId(*payload.productId);
 	}
-
-	if (payload.Version_1_0->description.HasValue()){
-		tokenPtr->SetDescription(*payload.Version_1_0->description);
+	if (payload.name.has_value()){
+		tokenPtr->SetName(*payload.name);
 	}
-
-	if (payload.Version_1_0->tokenHash.HasValue()){
-		tokenPtr->SetTokenHash(*payload.Version_1_0->tokenHash);
+	if (payload.description.has_value()){
+		tokenPtr->SetDescription(*payload.description);
 	}
-
-	if (payload.Version_1_0->scopes.HasValue()){
-		tokenPtr->SetScopes(payload.Version_1_0->scopes->ToList());
+	if (payload.tokenHash.has_value()){
+		tokenPtr->SetTokenHash(*payload.tokenHash);
 	}
-
-	if (payload.Version_1_0->createdAt.HasValue()){
-		QDateTime createdAt = QDateTime::fromString(*payload.Version_1_0->createdAt, Qt::ISODate).toUTC();
-		tokenPtr->SetCreatedAt(createdAt);
+	if (payload.scopes.has_value()){
+		tokenPtr->SetScopes(payload.scopes->ToList());
 	}
-
-	if (payload.Version_1_0->lastUsedAt.HasValue()){
-		QDateTime lastUsedAt = QDateTime::fromString(*payload.Version_1_0->lastUsedAt, Qt::ISODate).toUTC();
-		tokenPtr->SetLastUsedAt(lastUsedAt);
+	if (payload.createdAt.has_value()){
+		tokenPtr->SetCreatedAt(QDateTime::fromString(*payload.createdAt, Qt::ISODate).toUTC());
 	}
-
-	if (payload.Version_1_0->expiresAt.HasValue()){
-		QDateTime expiresAt = QDateTime::fromString(*payload.Version_1_0->expiresAt, Qt::ISODate).toUTC();
-		tokenPtr->SetExpiresAt(expiresAt);
+	if (payload.lastUsedAt.has_value()){
+		tokenPtr->SetLastUsedAt(QDateTime::fromString(*payload.lastUsedAt, Qt::ISODate).toUTC());
 	}
-
-	if (payload.Version_1_0->revoked.HasValue()){
-		tokenPtr->SetRevoked(*payload.Version_1_0->revoked);
+	if (payload.expiresAt.has_value()){
+		tokenPtr->SetExpiresAt(QDateTime::fromString(*payload.expiresAt, Qt::ISODate).toUTC());
+	}
+	if (payload.revoked.has_value()){
+		tokenPtr->SetRevoked(*payload.revoked);
 	}
 
 	return imtauth::IPersonalAccessTokenSharedPtr::CreateFromUnique(tokenPtr);
@@ -212,24 +247,28 @@ imtauth::IPersonalAccessTokenSharedPtr CClientRequestPersonalAccessTokenManagerC
 
 bool CClientRequestPersonalAccessTokenManagerComp::RevokeToken(const QByteArray& tokenId)
 {
-	namespace tokensdl = sdl::imtauth::PersonalAccessTokens;
+	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::RevokeTokenRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = tokenId;
+	arguments.input.emplace();
+	arguments.input->id = tokenId;
 
-	tokensdl::CRevokeTokenPayload payload;
-	bool ok = SendModelRequestInternal<tokensdl::RevokeTokenRequestArguments, tokensdl::CRevokeTokenPayload, tokensdl::CRevokeTokenGqlRequest>(arguments, payload);
-	if (!ok){
+	imtgql::CGqlRequest gqlRequest;
+	AttachCurrentContext(gqlRequest);
+	if (!tokensdl::CRevokeTokenGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
 
-	if (!payload.Version_1_0->success.HasValue()){
+	tokensdl::CRevokeTokenGqlRequest revokeTokenRequest(gqlRequest, false);
+
+	QString errorMessage;
+	tokensdl::CRevokeTokenPayload payload = OnRevokeToken(revokeTokenRequest, gqlRequest, errorMessage);
+	if (!payload.success.has_value()){
 		return false;
 	}
 
-	bool success = *payload.Version_1_0->success;
-	
+	bool success = *payload.success;
+
 	// Notify observers if the operation succeeded
 	if (success){
 		istd::CChangeNotifier changeNotifier(this);
@@ -241,17 +280,8 @@ bool CClientRequestPersonalAccessTokenManagerComp::RevokeToken(const QByteArray&
 
 bool CClientRequestPersonalAccessTokenManagerComp::UpdateLastUsedAt(const QByteArray& tokenId)
 {
-	// Note: UpdateLastUsedAt is not supported in the GraphQL client implementation.
-	// This operation is typically handled server-side during token validation and does
-	// not have a corresponding GraphQL mutation in the PersonalAccessTokens.sdl schema.
-	// 
-	// In a typical deployment:
-	// - The server automatically updates lastUsedAt when ValidateToken is called
-	// - Clients do not need to explicitly call this method
-	// 
-	// If explicit client-side control of lastUsedAt is required, a new mutation
-	// would need to be added to the SDL schema.
-	
+	// UpdateLastUsedAt has no corresponding mutation in the PersonalAccessTokens.sdl schema;
+	// the server updates lastUsedAt automatically when ValidateToken is called.
 	Q_UNUSED(tokenId);
 	return false;
 }
@@ -259,24 +289,28 @@ bool CClientRequestPersonalAccessTokenManagerComp::UpdateLastUsedAt(const QByteA
 
 bool CClientRequestPersonalAccessTokenManagerComp::DeleteToken(const QByteArray& tokenId)
 {
-	namespace tokensdl = sdl::imtauth::PersonalAccessTokens;
+	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::DeleteTokenRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = tokenId;
+	arguments.input.emplace();
+	arguments.input->id = tokenId;
 
-	tokensdl::CDeleteTokenPayload payload;
-	bool ok = SendModelRequestInternal<tokensdl::DeleteTokenRequestArguments, tokensdl::CDeleteTokenPayload, tokensdl::CDeleteTokenGqlRequest>(arguments, payload);
-	if (!ok){
+	imtgql::CGqlRequest gqlRequest;
+	AttachCurrentContext(gqlRequest);
+	if (!tokensdl::CDeleteTokenGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
 
-	if (!payload.Version_1_0->success.HasValue()){
+	tokensdl::CDeleteTokenGqlRequest deleteTokenRequest(gqlRequest, false);
+
+	QString errorMessage;
+	tokensdl::CDeleteTokenPayload payload = OnDeleteToken(deleteTokenRequest, gqlRequest, errorMessage);
+	if (!payload.success.has_value()){
 		return false;
 	}
 
-	bool success = *payload.Version_1_0->success;
-	
+	bool success = *payload.success;
+
 	// Notify observers if the operation succeeded
 	if (success){
 		istd::CChangeNotifier changeNotifier(this);
@@ -294,5 +328,60 @@ bool CClientRequestPersonalAccessTokenManagerComp::Serialize(iser::IArchive& /*a
 }
 
 
-} // namespace imtauthgql
+// reimplemented (sdl::V1_0::imtauth::CPersonalAccessTokensGqlHandlerCompBase)
 
+sdl::V1_0::imtauth::CPersonalAccessTokenList CClientRequestPersonalAccessTokenManagerComp::OnGetTokenList(
+			const sdl::V1_0::imtauth::CGetTokenListGqlRequest& /*getTokenListRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CPersonalAccessTokenList>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CPersonalAccessToken CClientRequestPersonalAccessTokenManagerComp::OnGetToken(
+			const sdl::V1_0::imtauth::CGetTokenGqlRequest& /*getTokenRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CPersonalAccessToken>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CValidateTokenPayload CClientRequestPersonalAccessTokenManagerComp::OnValidateToken(
+			const sdl::V1_0::imtauth::CValidateTokenGqlRequest& /*validateTokenRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CValidateTokenPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CCreateTokenPayload CClientRequestPersonalAccessTokenManagerComp::OnCreateToken(
+			const sdl::V1_0::imtauth::CCreateTokenGqlRequest& /*createTokenRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CCreateTokenPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CRevokeTokenPayload CClientRequestPersonalAccessTokenManagerComp::OnRevokeToken(
+			const sdl::V1_0::imtauth::CRevokeTokenGqlRequest& /*revokeTokenRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CRevokeTokenPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CDeleteTokenPayload CClientRequestPersonalAccessTokenManagerComp::OnDeleteToken(
+			const sdl::V1_0::imtauth::CDeleteTokenGqlRequest& /*deleteTokenRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CDeleteTokenPayload>(gqlRequest, errorMessage);
+}
+
+
+} // namespace imtauthgql

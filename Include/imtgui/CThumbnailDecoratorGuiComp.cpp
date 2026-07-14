@@ -500,13 +500,8 @@ void CThumbnailDecoratorGuiComp::OnGuiDesignChanged()
 		NextPageButton->setIcon(GetIcon(":/Icons/Right"));
 		PreferencesButton->setIcon(GetIcon(":/Icons/Settings"));
 
-		AppLogoFrame->hide();
-
-		QIcon appLogo = GetIcon(*m_appLogoPathAttrPtr);
-
-		if (!appLogo.isNull()){
-			AppLogo->setPixmap(appLogo.pixmap(1000, AppLogo->height() - 12));
-			AppLogoFrame->show();
+		if (!UpdateAppLogoAspectRatio()){
+			AppLogoFrame->hide();
 		}
 	}
 }
@@ -1434,6 +1429,31 @@ void CThumbnailDecoratorGuiComp::UpdateAdditionalCommands()
 	}
 
 	UpdateAdditionalCommandsEnabled();
+}
+
+
+bool CThumbnailDecoratorGuiComp::UpdateAppLogoAspectRatio()
+{
+	QIcon appLogo = GetIcon(*m_appLogoPathAttrPtr);
+	if (appLogo.isNull()) {
+		return false;
+	}
+
+	int targetHeight = AppLogoFrame->height();
+	if (targetHeight <= 0) targetHeight = 24;
+
+	double aspectRatio = 1.0;
+	QList<QSize> sizes = appLogo.availableSizes();
+	if (!sizes.isEmpty() && sizes.first().height() > 0) {
+		aspectRatio = static_cast<double>(sizes.first().width()) / sizes.first().height();
+	}
+
+	QSize finalSize(static_cast<int>(targetHeight * aspectRatio), targetHeight);
+
+	AppLogo->setPixmap(appLogo.pixmap(finalSize));
+	AppLogo->setFixedSize(finalSize);
+
+	return true;
 }
 
 

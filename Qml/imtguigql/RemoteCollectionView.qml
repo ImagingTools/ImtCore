@@ -20,9 +20,15 @@ CollectionView {
 	property var additionalFieldIds: ["id", "name"]
 	property var requestedFields: []
 
-	property alias subscriptionCommandId: subscriptionClient.gqlCommandId
+	property alias subscriptionCommandId: collectionChangeListener.gqlCommandId
 
 	signal removed(string objectId)
+	signal collectionChanged(var changeInfo)
+	signal collectionInserted(var changeInfo)
+	signal collectionUpdated(var changeInfo)
+	signal collectionRemoved(var changeInfo)
+	signal collectionLocalChanged(var changeInfo)
+	signal collectionRemoteChanged(var changeInfo)
 
 	commandsControllerComp: Component {
 		GqlBasedCommandsController {
@@ -37,12 +43,6 @@ CollectionView {
 	onHeadersChanged: {
 		if (table.headers.getItemsCount() > 0 && tableViewParamsStoredServer){
 			tableViewParamController.getModel();
-		}
-	}
-
-	onCollectionIdChanged: {
-		if (collectionId !== ""){
-			subscriptionClient.gqlCommandId = "On" + root.collectionId + "CollectionChanged";
 		}
 	}
 
@@ -85,7 +85,6 @@ CollectionView {
 	}
 
 	Component.onCompleted: {
-		console.log("RemoteCollectionView.qml onCompleted", table)
 		table.setSortingInfo("timeStamp", "DESC")
 		table.saveWidth.connect(root.tableViewParamsAccepted)
 		Events.subscribeEvent("UpdateAllModels", root.receiveRemoteChanges);
@@ -123,6 +122,13 @@ CollectionView {
 
 			root.doUpdateGui();
 			root.setAlertPanel(undefined);
+		}
+	}
+
+	Connections {
+		target: AuthorizationController
+		function onTenantSelected(tenantId){
+			root.doUpdateGui()
 		}
 	}
 
@@ -180,43 +186,51 @@ CollectionView {
 		}
 	}
 
-	function handleSubscription(dataModel){
-		if (!dataModel){
-			return;
-		}
-
-		if (dataModel.containsKey("operationContext")){
-			let operationContextInfo = dataModel.getData("operationContext");
-			if (!operationContextInfo){
-				return;
-			}
-			
-			if (operationContextInfo.containsKey("ownerId")){
-				let ownerId = operationContextInfo.getData("ownerId");
-				let currentUserId = AuthorizationController.getUserId();
-				if (ownerId === currentUserId){
-					root.doUpdateGui();
-				}
-				else{
-					root.hasRemoteChanges = true;
-				}
-			}
-		}
-		else{
-			root.doUpdateGui();
+	function handleSubscription(dataModel, changeInfo) {
+		if (changeInfo && changeInfo.valid && changeInfo.isLocalChange) {
+			root.doUpdateGui()
+		} else if (changeInfo && changeInfo.valid && changeInfo.isRemoteChange) {
+			if (root.showRemoteChangesAlert)
+				root.hasRemoteChanges = true
+			else
+				root.doUpdateGui()
+		} else {
+			root.doUpdateGui()
 		}
 	}
 
-	SubscriptionClient {
-		id: subscriptionClient;
+	RemoteCollectionChangeListener {
+		id: collectionChangeListener
+		collectionId: root.collectionId
+		currentUserId: AuthorizationController.getUserId()
 
-		function getHeaders(){
-			return root.getHeaders();
+		function getHeaders() {
+			return root.getHeaders()
 		}
 
-		onMessageReceived: {
-			console.log("RemoteCollectionView.qml onMessageReceived", root.collectionId)
-			root.handleSubscription(data);
+		onChanged: {
+			root.collectionChanged(changeInfo)
+			root.handleSubscription(rawData, changeInfo)
+		}
+
+		onInserted: {
+			root.collectionInserted(changeInfo)
+		}
+
+		onUpdated: {
+			root.collectionUpdated(changeInfo)
+		}
+
+		onRemoved: {
+			root.collectionRemoved(changeInfo)
+		}
+
+		onLocalChanged: {
+			root.collectionLocalChanged(changeInfo)
+		}
+
+		onRemoteChanged: {
+			root.collectionRemoteChanged(changeInfo)
 		}
 	}
 }

@@ -290,8 +290,6 @@ Item {
                 if (buttonId == "Ok"){
                     renameQuery.rename(inputValue);
                 }
-
-                containerBase.tableData.forceActiveFocus();
             }
         }
     }
@@ -313,19 +311,6 @@ Item {
         id: setDescriptionDialog;
         InputDialog {
             title: qsTr("Set description");
-            onFinished: {
-                let elements = containerBase.tableData.elements;
-                let indexes = containerBase.tableData.getSelectedIndexes();
-                if (indexes.length === 1){
-                    elements.setData(containerBase.descriptionFieldId, inputValue, indexes[0]);
-                }
-
-                if (buttonId == "Ok"){
-                    setDescriptionQuery.setDescription(inputValue);
-                }
-
-                containerBase.tableData.forceActiveFocus();
-            }
         }
     }
 
@@ -380,55 +365,6 @@ Item {
                 var gqlData = query.GetQuery();
                 console.log("removeModel query ", gqlData);
                 this.setGqlQuery(gqlData);
-            }
-        }
-
-        onStateChanged: {
-            console.log("State:", this.state, removeModel);
-            if (this.state === "Ready"){
-
-                var dataModelLocal;
-                if (removeModel.containsKey("errors")){
-                    dataModelLocal = removeModel.getData("errors");
-
-                    if (dataModelLocal.containsKey(containerBase.removeGqlCommand)){
-                        dataModelLocal = dataModelLocal.getData(containerBase.removeGqlCommand);
-                    }
-
-                    let message = ""
-                    if (dataModelLocal.containsKey("message")){
-                        message = dataModelLocal.getData("message");
-                    }
-
-                    let type;
-                    if (dataModelLocal.containsKey("type")){
-                        type = dataModelLocal.getData("type");
-                    }
-
-                    ModalDialogManager.showWarningDialog(message)
-
-                    return;
-                }
-
-                if (removeModel.containsKey("data")){
-                    dataModelLocal = removeModel.getData("data");
-
-                    if (dataModelLocal.containsKey(containerBase.removeGqlCommand)){
-                        dataModelLocal = dataModelLocal.getData(containerBase.removeGqlCommand);
-
-                        if (dataModelLocal.containsKey("removedNotification")){
-                            dataModelLocal = dataModelLocal.getData("removedNotification");
-
-                            containerBase.tableData.selectedIndex = -1;
-
-                            if (dataModelLocal.containsKey("id")){
-                                var itemId = dataModelLocal.getData("id");
-
-                                containerBase.removed(itemId);
-                            }
-                        }
-                    }
-                }
             }
         }
     }

@@ -31,7 +31,10 @@ class GroupProperty extends QBaseObject {
             target.__proxy[name][key] = _value[key]
         }
 
-        // if(target['SLOT_' + name + 'Changed']) target['SLOT_' + name + 'Changed'](target[name], target[name])
+        let signal = Signal.get(target, name + 'Changed')
+        if(signal){
+            signal()
+        }
         
         return true
     }
@@ -54,11 +57,13 @@ class GroupProperty extends QBaseObject {
             value.__complete()
         }
 
-        if(path.length === 2){
-            this.__proxy[path[0]][path[1]] = value
-        } else {
-            this.__proxy[path[0]] = value
+        let target = this.__proxy
+        for(let i = 0; i < path.length - 1; i++){
+            target = target[path[i]]
+            if(!target) return
         }
+
+        target[path[path.length - 1]] = value
     }
   
     __updateProperties(){

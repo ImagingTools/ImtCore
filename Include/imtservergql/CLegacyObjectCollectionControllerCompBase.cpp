@@ -1438,7 +1438,7 @@ void CLegacyObjectCollectionControllerCompBase::PrepareFilters(
 
 	const imtgql::CGqlParamObject* complexFilterModelPtr = viewParamsGql.GetParamArgumentObjectPtr("filterModel");
 	if (complexFilterModelPtr != nullptr){
-		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 complexFilterSdl;
+		sdl::V1_0::imtbase::CComplexCollectionFilter complexFilterSdl;
 		bool isComplexFilterOk = complexFilterSdl.ReadFromGraphQlObject(*complexFilterModelPtr);
 
 		if (isComplexFilterOk){

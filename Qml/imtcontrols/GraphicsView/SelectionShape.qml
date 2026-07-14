@@ -66,18 +66,8 @@ BoundingBox {
 
 	}
 
-	// function getPoint(params_){
-	// 	if(coordinate == undefined){
-	// 		coordinate = {}
-	// 		coordinate.x = params_.point.x
-	// 		coordinate.y = params_.point.y
-	// 		//coordinate = params_.point
-	// 		return coordinate
-	// 	}
-	// 	else {
-	// 		return coordinate
-	// 	}
-
-	// }
+	function getPoint(params_){
+		return {}
+	}
 }
 

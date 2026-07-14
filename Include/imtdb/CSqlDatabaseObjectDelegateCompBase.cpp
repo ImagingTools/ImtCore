@@ -159,11 +159,25 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 
 	QString baseSelelectionQuery = GetBaseSelectionQuery();
 
-	// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
-	QString retVal = "(" + baseSelelectionQuery;
-	retVal += QString(" ") + filterQuery;
-	retVal += QString(" ") + qPrintable(paginationQuery) + ")";
-	retVal += QString(" ") + sortQuery;
+	// SQLite does not support a top-level parenthesized SELECT statement, so skip the
+	// Qt '%<NUMBER>%' bug workaround wrapping on SQLite — it only affects Postgres drivers.
+	const bool isSQLite = m_databaseEngineCompPtr.IsValid() &&
+						  m_databaseEngineCompPtr->GetDatabaseDriverId() == "QSQLITE";
+
+	QString retVal;
+	if (isSQLite){
+		retVal = baseSelelectionQuery;
+		retVal += QString(" ") + filterQuery;
+		retVal += QString(" ") + sortQuery;
+		retVal += QString(" ") + qPrintable(paginationQuery);
+	}
+	else{
+		// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
+		retVal = "(" + baseSelelectionQuery;
+		retVal += QString(" ") + filterQuery;
+		retVal += QString(" ") + qPrintable(paginationQuery) + ")";
+		retVal += QString(" ") + sortQuery;
+	}
 
 	return retVal.toUtf8();
 }
@@ -399,7 +413,14 @@ bool CSqlDatabaseObjectDelegateCompBase::CreatePaginationQuery(int offset, int c
 	paginationQuery.clear();
 
 	if (offset >= 0 && count > 0){
-		paginationQuery = QStringLiteral("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count).toUtf8();
+		const bool isSQLite = m_databaseEngineCompPtr.IsValid() &&
+							  m_databaseEngineCompPtr->GetDatabaseDriverId() == "QSQLITE";
+		if (isSQLite){
+			paginationQuery = QString("LIMIT %1 OFFSET %2").arg(count).arg(offset).toUtf8();
+		}
+		else{
+			paginationQuery = QStringLiteral("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count).toUtf8();
+		}
 	}
 
 	return true;
@@ -508,7 +529,12 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const
 {
-	filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter, CComplexCollectionFilterConverter::SC_POSTGRES);
+	const bool isSQLite = m_databaseEngineCompPtr.IsValid() &&
+						  m_databaseEngineCompPtr->GetDatabaseDriverId() == "QSQLITE";
+
+	filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(
+				collectionFilter,
+				isSQLite ? CComplexCollectionFilterConverter::SC_GENERAL : CComplexCollectionFilterConverter::SC_POSTGRES);
 
 	return true;
 }
@@ -722,18 +748,38 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTableIfNeeded()
 	createTableQuery.replace("${TableName}", tableName.toUtf8());
 
 	QSqlError sqlError;
-	m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
+	QByteArray executedQuery = createTableQuery;
+	const bool isSqlite = m_databaseEngineCompPtr->GetDatabaseDriverId().compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	if (isSqlite){
+		sqlError = QSqlError();
+		const QList<QByteArray> statements = createTableQuery.split(';');
+		for (QByteArray statement : statements){
+			statement = statement.trimmed();
+			if (statement.isEmpty()){
+				continue;
+			}
+
+			executedQuery = statement;
+			m_databaseEngineCompPtr->ExecSqlQuery(statement, &sqlError);
+			if (sqlError.type() != QSqlError::NoError){
+				break;
+			}
+		}
+	}
+	else{
+		m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
+	}
 
 	if (sqlError.type() != QSqlError::NoError){
 		qCritical() << __FILE__ << __LINE__
 					<< "\n\t| Table could not be created"
 					<< "\n\t| Error: " << sqlError
-					<< "\n\t| Query: " << createTableQuery;
+					<< "\n\t| Query: " << executedQuery;
 
 		SendErrorMessage(0, QString::fromUtf8(QT_TR_NOOP("\n\t| Table could not be created"
 														"\n\t| Error: %1"
 														"\n\t| Query: %2"))
-								.arg(sqlError.text(), qPrintable(createTableQuery)));
+								.arg(sqlError.text(), qPrintable(executedQuery)));
 		return false;
 	}
 

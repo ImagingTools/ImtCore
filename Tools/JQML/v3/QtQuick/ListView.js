@@ -42,6 +42,7 @@ class ListView extends Flickable {
         footerItem: { type: Var, value: null},
         header: { type: Variant, typeTarget: Component, value: undefined},
         headerItem: { type: Var, value: null},
+        keyNavigationEnabled: { type: Bool, value: true },
 
         modelChanged: { type: Signal, args: [] },
         delegateChanged: { type: Signal, args: [] },
@@ -61,11 +62,14 @@ class ListView extends Flickable {
         headerChanged: { type: Signal, args: [] },
         footerItemChanged: { type: Signal, args: [] },
         headerItemChanged: { type: Signal, args: [] },
+        keyNavigationEnabledChanged: { type: Signal, args: [] },
     })
 
     __items = []
     __cache = []
     __changeSet = []
+    __keyNavigationEnabledExplicit = false
+    __syncingKeyNavigationEnabled = false
 
     __middleWidth = 0
     __middleHeight = 0
@@ -73,12 +77,31 @@ class ListView extends Flickable {
     __updatePrimaryProperties(){
         super.__updatePrimaryProperties()
         this.__updateProperty('delegate')
+        this.__updateProperty('currentIndex')
         this.__initView(true)
     }
 
     __complete() {
         this.__initView(true)
         super.__complete()
+    }
+
+    __updateProperties(){
+        let hasExplicitKeyNavigationEnabled = this.__properties && Object.prototype.hasOwnProperty.call(this.__properties, 'keyNavigationEnabled')
+
+        if(!hasExplicitKeyNavigationEnabled && !this.__keyNavigationEnabledExplicit){
+            this.__syncKeyNavigationEnabledFromInteractive()
+        }
+
+        super.__updateProperties()
+    }
+
+    __syncKeyNavigationEnabledFromInteractive(){
+        if(this.keyNavigationEnabled === this.interactive) return
+
+        this.__syncingKeyNavigationEnabled = true
+        this.keyNavigationEnabled = this.interactive
+        this.__syncingKeyNavigationEnabled = false
     }
 
     indexAt(x, y) {
@@ -132,6 +155,41 @@ class ListView extends Flickable {
 
     }
 
+    __moveCurrentIndex(direction){
+        let length = this.count
+        if(length <= 0) return false
+
+        let currentIndex = this.currentIndex
+        let nextIndex = currentIndex
+
+        if(currentIndex < 0){
+            nextIndex = direction > 0 ? 0 : length - 1
+        } else {
+            nextIndex = currentIndex + direction
+            if(nextIndex < 0) nextIndex = 0
+            if(nextIndex >= length) nextIndex = length - 1
+        }
+
+        if(nextIndex !== currentIndex){
+            this.currentIndex = nextIndex
+        }
+
+        if(this.currentItem && typeof this.currentItem.forceActiveFocus === 'function'){
+            this.currentItem.forceActiveFocus()
+        }
+
+        this.positionViewAtIndex(nextIndex, ListView.Contain)
+        return true
+    }
+
+    incrementCurrentIndex(){
+        return this.__moveCurrentIndex(1)
+    }
+
+    decrementCurrentIndex(){
+        return this.__moveCurrentIndex(-1)
+    }
+
     SLOT_modelChanged(oldValue, newVlaue) {
         this.__clear()
 
@@ -149,6 +207,42 @@ class ListView extends Flickable {
     SLOT_delegateChanged() {
         this.__clear()
         this.__initView(this.__completed)
+    }
+
+    'SLOT_Keys.pressed'(event){
+        if(!this.keyNavigationEnabled || !event) return
+
+        let handled = false
+
+        if(this.orientation === ListView.Horizontal){
+            if(event.key === 'ArrowLeft'){
+                handled = this.decrementCurrentIndex()
+            } else if(event.key === 'ArrowRight'){
+                handled = this.incrementCurrentIndex()
+            }
+        } else {
+            if(event.key === 'ArrowUp'){
+                handled = this.decrementCurrentIndex()
+            } else if(event.key === 'ArrowDown'){
+                handled = this.incrementCurrentIndex()
+            }
+        }
+
+        if(handled){
+            event.accepted = true
+        }
+    }
+
+    SLOT_interactiveChanged(oldValue, newValue){
+        if(this.__keyNavigationEnabledExplicit) return
+
+        this.__syncKeyNavigationEnabledFromInteractive()
+    }
+
+    SLOT_keyNavigationEnabledChanged(oldValue, newValue){
+        if(this.__syncingKeyNavigationEnabled) return
+
+        this.__keyNavigationEnabledExplicit = true
     }
 
     __clear() {
@@ -183,6 +277,23 @@ class ListView extends Flickable {
         this.blockSignals(false)
 
         this.count = 0
+        this.currentItem = undefined
+    }
+
+    __normalizeCurrentIndex(length) {
+        let index = this.currentIndex
+
+        if (length <= 0) {
+            index = -1
+        } else if (index < -1) {
+            index = -1
+        } else if (index >= length) {
+            index = length - 1
+        }
+
+        if (index !== this.currentIndex) {
+            this.currentIndex = index
+        }
     }
 
     __getItemInfo(index) {
@@ -279,8 +390,6 @@ class ListView extends Flickable {
             this.__cache.push(item) 
 
             if(item instanceof JQModules.QtQuick.Item) {
-                this.contentItem.__getDOM().removeChild(item.__getDOM())
-
                 item['ListView.pooled']()
             }
         } else {
@@ -406,6 +515,10 @@ class ListView extends Flickable {
             item.y = itemInfo.y
         }
 
+        if (index === this.currentIndex) {
+            this.currentItem = item
+        }
+
         return item
     }
 
@@ -431,6 +544,7 @@ class ListView extends Flickable {
             }
 
             this.__self.count = length
+            this.__normalizeCurrentIndex(length)
 
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)
@@ -454,6 +568,49 @@ class ListView extends Flickable {
         this.__changeSet.push(changeSet)
         if (this.model && typeof this.model === 'object') {
             this.count = this.model.count
+        }
+    }
+
+    __normalizeItemsIndex(startIndex = 0) {
+        for (let i = startIndex; i < this.__items.length; i++) {
+            let item = this.__items[i]
+            if (!item) continue
+
+            if (item.JQAbstractModel && item.JQAbstractModel.index !== i) {
+                item.JQAbstractModel.index = i
+            }
+        }
+    }
+
+    __realignItems(startIndex = 0) {
+        let previousItem = undefined
+
+        if (startIndex > 0) {
+            for (let i = startIndex - 1; i >= 0; i--) {
+                if (this.__items[i]) {
+                    previousItem = this.__items[i]
+                    break
+                }
+            }
+        }
+
+        for (let i = startIndex; i < this.__items.length; i++) {
+            let item = this.__items[i]
+            if (!item) continue
+
+            if (this.orientation === ListView.Horizontal) {
+                let x = previousItem
+                    ? previousItem.x + previousItem.width + this.spacing
+                    : this.originX + (this.__middleWidth + this.spacing) * i
+                if (item.x !== x) item.x = x
+            } else {
+                let y = previousItem
+                    ? previousItem.y + previousItem.height + this.spacing
+                    : this.originY + (this.__middleHeight + this.spacing) * i
+                if (item.y !== y) item.y = y
+            }
+
+            previousItem = item
         }
     }
 
@@ -486,6 +643,8 @@ class ListView extends Flickable {
 
             let changeSet = this.__changeSet
             this.__changeSet = []
+            let layoutFrom = undefined
+            let currentIndex = this.currentIndex
 
             if(changeSet.length > 0){
                 let i = 0
@@ -523,12 +682,45 @@ class ListView extends Flickable {
                             }
                         }
                     }
+
+                    if (currentIndex >= leftTop) {
+                        currentIndex += (bottomRight - leftTop)
+                    }
+
+                    if (layoutFrom === undefined || leftTop < layoutFrom) {
+                        layoutFrom = leftTop
+                    }
                 } else if (role === 'remove') {
                     let removed = this.__items.splice(leftTop, bottomRight - leftTop)
                     for (let r of removed) {
                         if (r) this.__toCache(r)
                     }
+
+                    if (currentIndex >= leftTop && currentIndex < bottomRight) {
+                        currentIndex = leftTop
+                    } else if (currentIndex >= bottomRight) {
+                        currentIndex -= (bottomRight - leftTop)
+                    }
+
+                    if (layoutFrom === undefined || leftTop < layoutFrom) {
+                        layoutFrom = leftTop
+                    }
                 }
+            }
+
+            if (length <= 0) {
+                currentIndex = -1
+            } else if (currentIndex >= length) {
+                currentIndex = length - 1
+            }
+
+            if (currentIndex !== this.currentIndex) {
+                this.currentIndex = currentIndex
+            }
+
+            if (layoutFrom !== undefined) {
+                this.__normalizeItemsIndex(layoutFrom)
+                this.__realignItems(layoutFrom)
             }
 
             let firstIndex = 0
@@ -567,6 +759,20 @@ class ListView extends Flickable {
 
             JQApplication.endUpdate()
             delete this.__updating
+        }
+    }
+
+    SLOT_currentIndexChanged(oldValue, newValue) {
+        if (newValue < 0) {
+            if (this.currentItem !== undefined) {
+                this.currentItem = undefined
+            }
+            return
+        }
+
+        let item = this.itemAtIndex(newValue)
+        if (item !== this.currentItem) {
+            this.currentItem = item
         }
     }
 
@@ -634,7 +840,11 @@ class ListView extends Flickable {
     }
 
     __updateGeometry() {
-        if (!this.__items.length) return
+        if (!this.__items.length) {
+            Geometry.setAuto(this.__self, 'contentWidth', 0, this.__self.constructor.meta.contentWidth)
+            Geometry.setAuto(this.__self, 'contentHeight', 0, this.__self.constructor.meta.contentHeight)
+            return
+        }
 
         let model = this.model
         if (Array.isArray(model)) {

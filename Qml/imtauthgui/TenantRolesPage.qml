@@ -23,21 +23,92 @@ TenantSimpleCollectionPage {
 	documentManager: apiClient ? apiClient.roleDocumentManager : null
 	objectTypeId: apiClient ? apiClient.roleObjectTypeId : ""
 	dataProvider: apiClient ? apiClient.roleListDataProvider : null
+	managePermissionIds: ["EditOrganizationRole", "ChangeOrganizationRole", "RemoveOrganizationRole", "AddOrganizationRole"]
+	createPermissionIds: ["AddOrganizationRole", "EditOrganizationRole"]
+	editPermissionIds: ["ChangeOrganizationRole", "EditOrganizationRole"]
+	deletePermissionIds: ["RemoveOrganizationRole", "EditOrganizationRole"]
+	property string __lastPermissionsTenantId: ""
 
-	function removeItem(id) {
+	function removeItems(ids) {
 		if (rolesPage.apiClient)
-			rolesPage.apiClient.removeRole(id)
+			rolesPage.apiClient.removeRoles((ids))
+	}
+
+	function __resolvedTenantId() {
+		if (rolesPage.tenantData && rolesPage.tenantData.m_id)
+			return rolesPage.tenantData.m_id
+		return ""
+	}
+
+	function __requestTenantPermissions(force) {
+		if (!rolesPage.apiClient)
+			return false
+
+		var tenantId = rolesPage.__resolvedTenantId()
+		if (tenantId === "")
+			return false
+
+		if (!force
+				&& rolesPage.__lastPermissionsTenantId === tenantId)
+			return true
+
+		rolesPage.__lastPermissionsTenantId = tenantId
+		if (rolesPage.apiClient.setRolePermissionsTenantId)
+			rolesPage.apiClient.setRolePermissionsTenantId(tenantId)
+		else
+			rolesPage.apiClient.rolePermissionsTenantId = tenantId
+		return true
+	}
+
+	function __scheduleTenantPermissionsRequest(force) {
+		if (rolesPage.__requestTenantPermissions(force)) {
+			permissionsRetryTimer.stop()
+			return
+		}
+		permissionsRetryTimer.restart()
+	}
+
+	Timer {
+		id: permissionsRetryTimer
+		interval: 250
+		repeat: true
+		running: false
+		onTriggered: {
+			if (!rolesPage.visible)
+				return
+			if (rolesPage.__requestTenantPermissions(false))
+				permissionsRetryTimer.stop()
+		}
 	}
 
 	onApiClientChanged: {
-		if (rolesPage.apiClient)
-			rolesPage.apiClient.fetchPermissions()
+		rolesPage.__lastPermissionsTenantId = ""
+		rolesPage.__scheduleTenantPermissionsRequest(true)
+	}
+
+	onVisibleChanged: {
+		if (visible)
+			rolesPage.__scheduleTenantPermissionsRequest(false)
+		else
+			permissionsRetryTimer.stop()
+	}
+
+	Component.onCompleted: {
+		rolesPage.__scheduleTenantPermissionsRequest(true)
 	}
 
 	Connections {
 		target: rolesPage.apiClient
-		function onRoleRemoved(roleId) {
+		function onRolesRemoved() {
 			rolesPage.refresh()
+		}
+	}
+
+	Connections {
+		target: rolesPage.tenantData
+		function onM_idChanged() {
+			rolesPage.__lastPermissionsTenantId = ""
+			rolesPage.__scheduleTenantPermissionsRequest(true)
 		}
 	}
 }

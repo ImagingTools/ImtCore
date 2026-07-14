@@ -20,6 +20,10 @@ ViewBase {
 	}
 	
 	function updateModel(){
+		if (!container.groupData){
+			return
+		}
+
 		generalGroup.updateModel();
 		usersGroup.updateModel();
 		rolesGroup.updateModel();
@@ -112,24 +116,31 @@ ViewBase {
 				
 				TextInputElementView {
 					id: nameInput;
-					
+
+					// Test instrumentation: matches the AccountEditor/DeviceEditor/etc. convention of
+					// an explicit per-field objectName on the ElementView usage site. Inert.
+					objectName: "GroupNameInput";
+
 					name: qsTr("Group Name");
 					placeHolderText: qsTr("Enter the name");
-					
+
 					onEditingFinished: {
 						container.doUpdateModel();
 					}
-					
+
 					KeyNavigation.tab: descriptionInput;
 					KeyNavigation.backtab: roleSelectableCollectionEditor;
 				}
-				
+
 				TextInputElementView {
 					id: descriptionInput;
-					
+
+					// Test instrumentation - see nameInput's comment above. Inert.
+					objectName: "GroupDescriptionInput";
+
 					name: qsTr("Description");
 					placeHolderText: qsTr("Enter the description");
-					
+
 					onEditingFinished: {
 						container.doUpdateModel();
 					}
@@ -138,7 +149,7 @@ ViewBase {
 					KeyNavigation.backtab: nameInput;
 				}
 				
-				ItemSelectElementView {
+				GqlBasedItemSelectElementView {
 					id: groupSelectableCollectionEditor
 					collectionId: "Groups"
 						label: qsTr("Parent Groups")
@@ -150,6 +161,9 @@ ViewBase {
 					}
 
 				function updateGui(){
+					if (!container.groupData){
+						return
+					}
 					nameInput.text = container.groupData.m_name;
 					descriptionInput.text = container.groupData.m_description;
 					var ids = container.groupData.m_parentGroups ? container.groupData.m_parentGroups.slice() : []
@@ -160,6 +174,9 @@ ViewBase {
 				}
 				
 				function updateModel(){
+					if (!container.groupData){
+						return
+					}
 					container.groupData.m_description = descriptionInput.text;
 					container.groupData.m_name = nameInput.text;
 					var arr = []
@@ -174,7 +191,7 @@ ViewBase {
 				
 				width: parent.width;
 				
-				ItemSelectElementView {
+				GqlBasedItemSelectElementView {
 					id: userSelectableCollectionEditor
 					collectionId: "Users"
 						label: qsTr("Users")
@@ -186,6 +203,9 @@ ViewBase {
 					}
 				
 				function updateGui(){
+					if (!container.groupData){
+						return
+					}
 					var ids = container.groupData.m_users ? container.groupData.m_users.slice() : []
 					var arr = []
 					for (var i = 0; i < ids.length; i++)
@@ -194,6 +214,9 @@ ViewBase {
 				}
 				
 				function updateModel(){
+					if (!container.groupData){
+						return
+					}
 					var arr = []
 					for (var i = 0; i < userSelectableCollectionEditor.items.length; i++)
 						arr.push(userSelectableCollectionEditor.items[i].id)
@@ -206,7 +229,7 @@ ViewBase {
 				
 				width: parent.width;
 				
-				ItemSelectElementView {
+				GqlBasedItemSelectElementView {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
 						label: qsTr("Roles")
@@ -218,6 +241,9 @@ ViewBase {
 					}
 
 				function updateGui(){
+					if (!container.groupData){
+						return
+					}
 					var ids = container.groupData.m_roles ? container.groupData.m_roles.slice() : []
 					var arr = []
 					for (var i = 0; i < ids.length; i++)
@@ -226,6 +252,9 @@ ViewBase {
 				}
 				
 				function updateModel(){
+					if (!container.groupData){
+						return
+					}
 					var arr = []
 					for (var i = 0; i < roleSelectableCollectionEditor.items.length; i++)
 						arr.push(roleSelectableCollectionEditor.items[i].id)

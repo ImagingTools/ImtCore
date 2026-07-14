@@ -9,6 +9,7 @@
 #include <istd/TDelPtr.h>
 
 // ImtCore includes
+#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/ImtDesk.h>
 #include <imtauth/imtauth.h>
 #include <imtdeskgql/imtdeskgql.h>
 #include <imtdeskgql/TicketPermissions.h>
@@ -57,32 +58,27 @@ namespace imtdeskgql
 {
 
 
-sdl::imtdesk::ImtDesk::CEntityContextTicketsPayload CEntityContextTicketsControllerComp::OnEntityContextTickets(
-			const sdl::imtdesk::ImtDesk::CEntityContextTicketsGqlRequest& entityContextTicketsRequest,
+sdl::V1_0::imtdesk::CEntityContextTicketsPayload CEntityContextTicketsControllerComp::OnEntityContextTickets(
+			const sdl::V1_0::imtdesk::CEntityContextTicketsGqlRequest& entityContextTicketsRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtdesk::ImtDesk::CEntityContextTicketsPayload response;
+	sdl::V1_0::imtdesk::CEntityContextTicketsPayload response;
 
 	if (!m_ticketCollectionCompPtr.IsValid() || !m_entityReferenceStorageCompPtr.IsValid()){
 		errorMessage = QStringLiteral("Ticket collection is not configured");
 		return response;
 	}
 
-	sdl::imtdesk::ImtDesk::EntityContextTicketsRequestArguments arguments = entityContextTicketsRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		errorMessage = QStringLiteral("Invalid request input");
-		return response;
-	}
-
+	sdl::V1_0::imtdesk::EntityContextTicketsRequestArguments arguments = entityContextTicketsRequest.GetRequestedArguments();
 	QString entityType;
-	if (arguments.input.Version_1_0->entityType){
-		entityType = *arguments.input.Version_1_0->entityType;
+	if (arguments.input->entityType){
+		entityType = *arguments.input->entityType;
 	}
 
 	QByteArray entityId;
-	if (arguments.input.Version_1_0->entityId){
-		entityId = *arguments.input.Version_1_0->entityId;
+	if (arguments.input->entityId){
+		entityId = *arguments.input->entityId;
 	}
 
 	if (entityType.isEmpty() || entityId.isEmpty()){
@@ -92,12 +88,12 @@ sdl::imtdesk::ImtDesk::CEntityContextTicketsPayload CEntityContextTicketsControl
 
 	int offset = 0;
 	int count = 250;
-	if (arguments.input.Version_1_0->viewParams){
-		if (arguments.input.Version_1_0->viewParams->offset){
-			offset = qMax(0, *arguments.input.Version_1_0->viewParams->offset);
+	if (arguments.input->viewParams){
+		if (arguments.input->viewParams->offset){
+			offset = qMax(0, *arguments.input->viewParams->offset);
 		}
-		if (arguments.input.Version_1_0->viewParams->count){
-			count = qMax(1, *arguments.input.Version_1_0->viewParams->count);
+		if (arguments.input->viewParams->count){
+			count = qMax(1, *arguments.input->viewParams->count);
 		}
 	}
 
@@ -109,7 +105,7 @@ sdl::imtdesk::ImtDesk::CEntityContextTicketsPayload CEntityContextTicketsControl
 		return response;
 	}
 
-	QList<sdl::imtdesk::ImtDesk::CTicketItemData::V1_0> itemList;
+	QList<sdl::V1_0::imtdesk::CTicketItemData> itemList;
 	int matchedCount = 0;
 	while (iteratorPtr->Next()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
@@ -139,7 +135,7 @@ sdl::imtdesk::ImtDesk::CEntityContextTicketsPayload CEntityContextTicketsControl
 			break;
 		}
 
-		sdl::imtdesk::ImtDesk::CTicketItemData::V1_0 itemData;
+		sdl::V1_0::imtdesk::CTicketItemData itemData;
 		itemData.id = ticketPtr->GetId();
 		itemData.typeId = iteratorPtr->GetObjectTypeId();
 		itemData.number = ticketPtr->GetNumber();
@@ -158,56 +154,50 @@ sdl::imtdesk::ImtDesk::CEntityContextTicketsPayload CEntityContextTicketsControl
 		++matchedCount;
 	}
 
-	response.Version_1_0.Emplace();
 	if (!itemList.isEmpty()){
-		response.Version_1_0->items.Emplace().FromList(itemList);
+		response.items.Emplace().FromList(itemList);
 	}
 
 	return response;
 }
 
 
-sdl::imtdesk::ImtDesk::CCreateEntityContextTicketPayload CEntityContextTicketsControllerComp::OnCreateEntityContextTicket(
-			const sdl::imtdesk::ImtDesk::CCreateEntityContextTicketGqlRequest& createEntityContextTicketRequest,
+sdl::V1_0::imtdesk::CCreateEntityContextTicketPayload CEntityContextTicketsControllerComp::OnCreateEntityContextTicket(
+			const sdl::V1_0::imtdesk::CCreateEntityContextTicketGqlRequest& createEntityContextTicketRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtdesk::ImtDesk::CCreateEntityContextTicketPayload response;
+	sdl::V1_0::imtdesk::CCreateEntityContextTicketPayload response;
 
 	if (!m_ticketCollectionCompPtr.IsValid() || !m_ticketFactCompPtr.IsValid() || !m_entityReferenceStorageCompPtr.IsValid()){
 		errorMessage = QStringLiteral("Ticket creation dependencies are not configured");
 		return response;
 	}
 
-	sdl::imtdesk::ImtDesk::CreateEntityContextTicketRequestArguments arguments = createEntityContextTicketRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		errorMessage = QStringLiteral("Invalid request input");
-		return response;
-	}
-
+	sdl::V1_0::imtdesk::CreateEntityContextTicketRequestArguments arguments = createEntityContextTicketRequest.GetRequestedArguments();
 	QString entityType;
-	if (arguments.input.Version_1_0->entityType){
-		entityType = *arguments.input.Version_1_0->entityType;
+	if (arguments.input->entityType){
+		entityType = *arguments.input->entityType;
 	}
 
 	QByteArray entityId;
-	if (arguments.input.Version_1_0->entityId){
-		entityId = *arguments.input.Version_1_0->entityId;
+	if (arguments.input->entityId){
+		entityId = *arguments.input->entityId;
 	}
 
 	QString title;
-	if (arguments.input.Version_1_0->title){
-		title = *arguments.input.Version_1_0->title;
+	if (arguments.input->title){
+		title = *arguments.input->title;
 	}
 
 	QString description;
-	if (arguments.input.Version_1_0->description){
-		description = *arguments.input.Version_1_0->description;
+	if (arguments.input->description){
+		description = *arguments.input->description;
 	}
 
 	QString entityDisplayName = QString::fromUtf8(entityId);
-	if (arguments.input.Version_1_0->entityDisplayName && !arguments.input.Version_1_0->entityDisplayName->isEmpty()){
-		entityDisplayName = *arguments.input.Version_1_0->entityDisplayName;
+	if (arguments.input->entityDisplayName && !arguments.input->entityDisplayName->isEmpty()){
+		entityDisplayName = *arguments.input->entityDisplayName;
 	}
 
 	if (entityType.isEmpty() || entityId.isEmpty() || title.trimmed().isEmpty()){
@@ -269,8 +259,7 @@ sdl::imtdesk::ImtDesk::CCreateEntityContextTicketPayload CEntityContextTicketsCo
 		}
 	}
 
-	response.Version_1_0.Emplace();
-	response.Version_1_0->id = createdId;
+	response.id = createdId;
 	return response;
 }
 

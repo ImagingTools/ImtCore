@@ -29,7 +29,7 @@ const options = program.opts()
 
 function compile(options){
     if(options.mode === 'html'){
-        
+        console.time('JQML3: compile html')
         let icon = `<link rel="${options.name} icon" type="image" href="${options.icon}">`
         let html = `
         <!DOCTYPE html>
@@ -48,6 +48,7 @@ function compile(options){
         `
 
         fs.writeFileSync(options.output + `/${options.name}.html`, html)
+        console.timeEnd('JQML3: compile html')
         return
     }
 
@@ -65,6 +66,7 @@ function compile(options){
     const env = process.env
     const configFilePath = path.normalize(options.config.trim())
     const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
+
 
     function envFill(source) {
         let result = source
@@ -88,8 +90,10 @@ function compile(options){
             }
     }
 
+    console.time('JQML3: include config files')
     const config = JSON.parse(envFill(fs.readFileSync(configFilePath, { encoding: 'utf8', flag: 'r' })))
     includeFiles(config, configDirPath)
+    console.timeEnd('JQML3: include config files')
 
     const BaseModules = {
         Qt,
@@ -136,6 +140,7 @@ function compile(options){
         children = []
         name = ''
         isRoot = false
+        defaultProperty = ''
 
         constructor(parent, className, _extends, meta, on, qmlFile, info, targetContext) {
             if (qmlFile.elementsCount === 0) this.isRoot = true
@@ -152,13 +157,21 @@ function compile(options){
                     if(typeof this[m[0]] === 'function'){
                         this[m[0]](m)
                     } else {
-                        
+                        console.log(`Unknown meta type: ${m[0]}`)
                     }
                     
                 }
             }
         }
+        qmldefaultprop(meta) {
+            if(typeof this[meta[1][0]] === 'function'){
+                this[meta[1][0]](meta[1])
+            } else {
+                console.log(`Unknown meta type: ${meta[1][0]}`)
+            }
 
+            this.defaultProperty = meta[1][1]
+        }
         qmlelem(meta) {
             this.children.push(new Instruction(this, '', meta[1], meta[3], meta[2], this.qmlFile, meta.info, this))
         }
@@ -279,56 +292,37 @@ function compile(options){
 
         }
         qmlprop(meta) {
-            if (meta[2][0] === "block" || (meta[2][1] && meta[2][1][0] === "assign")) {
-                if (meta[1][0] === "dot") {
-                    let name = meta[1].slice(1)
+            let isSignalHandlerBody = meta[2][0] === "block" || meta[2][0] === "stat" || (meta[2][1] && meta[2][1][0] === "assign")
+            let isSignalHandlerName = false
 
-                    if (name[1].slice(0, 2) === 'on') {
-                        this.connectedSignals.push({
-                            slotName: `['${name.join('.')}']`,
-                            args: [],
-                            source: meta[2],
-                        })
-                    } else {
-                        if (meta[2][1][0] === 'qmlelem') {
-                            this.assignProperties.push({
-                                name: name.join('.'),
-                                value: new Instruction(null, '', meta[2][1][1], meta[2][1][3], meta[2][1][2], this.qmlFile, meta[2][1].info, this),
-                            })
-                        } else {
-                            this.assignProperties.push({
-                                name: name.join('.'),
-                                value: meta[2],
-                            })
-                        }
-                    }
+            if (meta[1][0] === "dot") {
+                let name = this.normalizePathName(meta[1])
+                isSignalHandlerName = name.length > 1 && name[name.length - 1].slice(0, 2) === 'on'
+            } else {
+                isSignalHandlerName = typeof meta[1] === 'string' && meta[1].slice(0, 2) === 'on'
+            }
+
+            if (isSignalHandlerName && isSignalHandlerBody) {
+                if (meta[1][0] === "dot") {
+                    let name = this.normalizePathName(meta[1])
+                    let nameText = name.join('.')
+
+                    this.connectedSignals.push({
+                        slotName: `['${nameText}']`,
+                        args: [],
+                        source: meta[2],
+                    })
                 } else {
                     let name = meta[1]
 
-                    if (name.slice(0, 2) === 'on') {
-                        let signalName = name.slice(2)
-                        signalName = signalName[0].toLowerCase() + signalName.slice(1)
-                        this.connectedSignals.push({
-                            slotName: name,
-                            args: [], // Нужно отследить количество аргументов
-                            source: meta[2],
-                        })
-                    } else {
-                        if (meta[2][1][0] === 'qmlelem') {
-                            this.assignProperties.push({
-                                name: name.join('.'),
-                                value: new Instruction(null, '', meta[2][1][1], meta[2][1][3], meta[2][1][2], this.qmlFile, meta[2][1].info, this),
-                            })
-                        } else {
-                            this.assignProperties.push({
-                                name: name,
-                                value: meta[2],
-                            })
-                        }
-                    }
+                    this.connectedSignals.push({
+                        slotName: name,
+                        args: [], // Нужно отследить количество аргументов
+                        source: meta[2],
+                    })
                 }
             } else if (meta[1][0] === "dot") {
-                let name = meta[1].slice(1).join('.')
+                let name = this.normalizePathName(meta[1]).join('.')
                 this.assignProperties.push({
                     name: name,
                     value: meta[2],
@@ -380,10 +374,35 @@ function compile(options){
             Enums[meta[1]] = meta[2]
         }
 
+        resolveImportedName(name) {
+            for (let i = this.qmlFile.imports.length - 1; i >= 0; i--) {
+                let imp = this.qmlFile.imports[i]
+                if (imp.as && imp.as === name) {
+                    let path = `JQModules.${imp.path}`
+                    if (imp.version !== undefined) {
+                        try {
+                            let imported = eval(path + '_v' + imp.version)
+                            if (imported) return { source: path + '_v' + imp.version, obj: imported }
+                        } catch { }
+                    }
+                    try {
+                        let imported = eval(path)
+                        if (imported) return { source: path, obj: imported }
+                    } catch { }
+                }
+            }
+            return null
+        }
+
         resolve(name, thisKey) {
             let res = this.resolveInner(name, thisKey)
             if (res) {
                 return res
+            }
+
+            let importedName = this.resolveImportedName(name)
+            if (importedName) {
+                return importedName
             } else {
                 let recursive = (result = [], name, target) => {
                     for (let key in target) {
@@ -465,6 +484,30 @@ function compile(options){
                     }
                 }
             }
+        }
+
+        flattenPath(name) {
+            if (Array.isArray(name)) {
+                if (name[0] === 'dot') {
+                    return [...this.flattenPath(name[1]), ...this.flattenPath(name[2])]
+                }
+
+                let result = []
+                for (let item of name) {
+                    result.push(...this.flattenPath(item))
+                }
+                return result
+            }
+
+            if (name === undefined || name === null) {
+                return []
+            }
+
+            return String(name).split('.')
+        }
+
+        normalizePathName(name) {
+            return this.flattenPath(name).filter(part => part !== '')
         }
 
         prepare(tree, stat = { isCompute: false, thisKey: '__self', value: new SourceNode(), local: [] }, endSymbol = true) {
@@ -587,6 +630,8 @@ function compile(options){
 
                         if (stat.dotObj) {
                             let path = ''
+                            let originalDotObj = stat.dotObj  // Save original before it gets modified
+                            
                             if (stat.dotObj instanceof JSFile) {
                                 if (stat.dotObj.meta.exports.indexOf(tree[2] >= 0)) {
                                     path = {}
@@ -616,7 +661,27 @@ function compile(options){
                                 path = null
                                 stat.dotObj = null
                             }
+                            
+                            // Check for native JavaScript builtin types before warning
+                            let isNativeBuiltin = false
                             if (path === undefined || path === null) {
+                                // Check if original was a native builtin type
+                                if (typeof originalDotObj === "function" && 
+                                    (originalDotObj === Date || originalDotObj === String || originalDotObj === Number || 
+                                     originalDotObj === Array || originalDotObj === Boolean || originalDotObj === Object || 
+                                     originalDotObj === RegExp || originalDotObj === Function)) {
+                                    // Check if the method exists on the prototype
+                                    try {
+                                        if (tree[2] in originalDotObj.prototype) {
+                                            isNativeBuiltin = true
+                                        }
+                                    } catch (e) {}
+                                }
+                            }
+                            
+                            let isThisContext = tree[1] && tree[1][0] === 'name' && tree[1][1] === 'this'
+
+                            if ((path === undefined || path === null) && !isNativeBuiltin && !isThisContext) {
                                 console.log(`${this.qmlFile.fileName}:${tree.info.line + 1}:${tree.info.col + 1}: warning: ${tree[2]} is not founded`)
                             }
                         }
@@ -1175,7 +1240,12 @@ function compile(options){
                             if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.SDLObject)) {
                                 meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty, modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
                             } else {
-                                meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
+                                if (typeof defineProperty.value === 'object' && defineProperty.value !== null) {
+                                    meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
+                                } else {
+                                    meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:${defineProperty.value}, modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
+                                }
+                                
                             }
                             
                         }
@@ -1231,26 +1301,42 @@ function compile(options){
             return undefined
         }
 
+        checkAssignProperty(name){
+            for(let assignProperty of this.assignProperties){
+                if(name === assignProperty.name) return assignProperty
+            }
+
+            return undefined
+        }
+
         getProperties() {
             let code = new SourceNode()
             let lazyCode = new SourceNode()
             let aliasCode = new SourceNode()
             let classCode =  new SourceNode()
 
+            for(let defineProperty of this.defineProperties){
+                if(!this.checkAssignProperty(defineProperty.name) && defineProperty.modifiers && defineProperty.modifiers.readonly){
+                    code.add(`${this.name}['__${defineProperty.name}__init']=true\n`)
+                }
+            }
+
             for (let assignProperty of this.assignProperties) {
-                let path = this.resolve(assignProperty.name.split('.')[0], this.name)
+                let assignNames = this.normalizePathName(assignProperty.name)
+                let assignName = assignNames.join('.')
+
+                let path = this.resolve(assignNames[0], this.name)
                 if (!path) {
-                    console.log(`${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignProperty.name.length - 1}: warning: ${assignProperty.name} is not founded`)
+                    console.log(`${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignName.length - 1}: warning: ${assignName} is not founded`)
                 }
 
-                let assignNames = assignProperty.name.split('.')
                 if (path && assignNames.length === 1 && path.modifiers && path.modifiers.readonly && !assignProperty.fromDefinition) {
-                    throw new Error(`${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignProperty.name.length - 1}: error: Cannot assign to read-only property "${assignProperty.name}"`)
+                    throw new Error(`${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignName.length - 1}: error: Cannot assign to read-only property "${assignName}"`)
                 }
 
                 if (assignProperty.value instanceof Instruction) {
                     if (!path) {
-                        throw `${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignProperty.name.length - 1}: error: ${assignProperty.name} is not founded`
+                        throw `${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignName.length - 1}: error: ${assignName} is not founded`
                     }
 
                     let resultCode
@@ -1273,8 +1359,22 @@ function compile(options){
 
                         let properties = assignProperty.value.getProperties()
 
+                        let baseClassProperties = []
+                        let baseClassSlots = []
+                        let baseClassMeta = ''
+                        if (childTypeInfo.typeBase.isAssignableFrom(JQModules.QtQml.BaseClass)){
+                            for(let defineProperty of this.defineProperties){
+                                if(defineProperty.name.slice(0,2) == 'm_'){
+                                    baseClassProperties.push(`'${defineProperty.name}'`)
+                                    baseClassSlots.push(`SLOT_${defineProperty.name}Changed(o,n){if (this.enableNotifications) this._internal.internalModelChanged('${defineProperty.name}', this)}`)
+                                }
+                            }
+                            baseClassMeta = `static cachedPoperties = new Set(${childTypeInfo.path}.cachedPoperties.union(new Set([${baseClassProperties.join(',')}])))`
+                        }  
+
                         resultCode.add(`(class ${assignProperty.value.className} extends ${childTypeInfo.path} {
                             static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})
+                            ${baseClassMeta}
                             static create(parent,properties={},context={},isRoot=true){
 
                             let __context = JQContext.create(context)
@@ -1329,6 +1429,10 @@ function compile(options){
                         resultCode.add(assignProperty.value.getMethods())
 
                         resultCode.add('\n')
+
+                        resultCode.add(baseClassSlots.join('\n'))
+
+                        resultCode.add('\n')
                         resultCode.add(assignProperty.value.getConnectedSignals())
 
                         resultCode.add('\n')
@@ -1378,7 +1482,7 @@ function compile(options){
                     }
 
                 } else {
-                    let names = assignProperty.name.split('.')
+                    let names = assignNames
 
                     let stat = this.prepare(assignProperty.value, { isCompute: false, thisKey: this.name, value: new SourceNode(), local: [] })
                     if (stat.isCompute) {
@@ -1387,44 +1491,56 @@ function compile(options){
                             // console.log(assignProperty.name, stat.value.toString())
                             // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',function(){return ${stat.value}},function(newVal){${stat.value}=newVal})`)
                             let aliasPath = stat.value.toString().split('.')
-                            // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',${aliasPath.slice(0, aliasPath.length - 1).join('.')}, '${aliasPath[aliasPath.length-1]}')`)
-                            aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',()=>{return ${aliasPath.slice(0, aliasPath.length - 1).join('.')}}, '${aliasPath[aliasPath.length-1]}')`)
+                                                        // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',${aliasPath.slice(0, aliasPath.length - 1).join('.')}, '${aliasPath[aliasPath.length-1]}')`)
+                            aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignName}',()=>{return ${aliasPath.slice(0, aliasPath.length - 1).join('.')}}, '${aliasPath[aliasPath.length-1]}')`)
                             // code.add(`${this.name}.__getDataQml('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},properties)`)
                             aliasCode.add('\n')
                         } else {
                             // lazyCode.add(`'${assignProperty.name}': function(){return ${stat.value}},`)
                             let isReturn = stat.value.toString().indexOf('return ') >= 0
                             if(names.length > 1){
-                                lazyCode.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=function(){${isReturn ? '' : 'return '}${stat.value}}`)
-                                lazyCode.add('\n')
-                                lazyCode.add(`${this.name}.__properties['${names[0]}']='JQGroup'`)
-                                lazyCode.add('\n')
+                                if(names.length === 2){
+                                    lazyCode.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=function(){${isReturn ? '' : 'return '}${stat.value}}`)
+                                    lazyCode.add('\n')
+                                    lazyCode.add(`${this.name}.__properties['${names[0]}']='JQGroup'`)
+                                    lazyCode.add('\n')
+                                } else {
+                                    lazyCode.add(`${this.name}.__properties['${assignName}']=function(){${isReturn ? '' : 'return '}${stat.value}}`)
+                                    lazyCode.add('\n')
+                                }
                             } else {
-                                lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=function(){${isReturn ? '' : 'return '}${stat.value}}`)
+                                lazyCode.add(`${this.name}.__properties['${assignName}']=function(){${isReturn ? '' : 'return '}${stat.value}}`)
                                 lazyCode.add('\n')
                             }
                             
                         }
                     } else {
                         if(names.length > 1){
-                            code.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=${stat.value}`)
-                            code.add('\n')
-                            code.add(`${this.name}['${names[0]}'].__updateProperties()`)
-                            code.add('\n')
+                            if(names.length === 2){
+                                code.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=${stat.value}`)
+                                code.add('\n')
+                                code.add(`${this.name}['${names[0]}'].__updateProperties()`)
+                                code.add('\n')
+                            } else {
+                                code.add(`${this.name}.__properties['${assignName}']=${stat.value}`)
+                                code.add('\n')
+                                code.add(`${this.name}.__updateProperties()`)
+                                code.add('\n')
+                            }
                         } else {
-                            let defineProperty = this.checkDefineProperty(assignProperty.name)
+                            let defineProperty = this.checkDefineProperty(assignName)
                             if(defineProperty){
                                 if(defineProperty.modifiers && defineProperty.modifiers.readonly){
-                                    classCode.add(`${this.name}.${assignProperty.name}=()=>{return ${stat.value}}`)
+                                    classCode.add(`${this.name}.${assignName}=()=>{return ${stat.value}}`)
                                     classCode.add('\n')
                                 } else {
-                                    classCode.add(`${this.name}.${assignProperty.name}=${stat.value}`)
+                                    classCode.add(`${this.name}.${assignName}=${stat.value}`)
                                     classCode.add('\n')
                                 }
                                 
                             } else {
                                 // lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=${stat.value}`)
-                                lazyCode.add(`${this.name}.${assignProperty.name}=${stat.value}`)
+                                lazyCode.add(`${this.name}.${assignName}=${stat.value}`)
                                 lazyCode.add('\n')
                             }
                             
@@ -1609,8 +1725,22 @@ function compile(options){
 
             let properties = this.children[0].getProperties()
 
+            let baseClassProperties = []
+            let baseClassSlots = []
+            let baseClassMeta = ''
+            if (childTypeInfo.typeBase.isAssignableFrom(JQModules.QtQml.BaseClass)){
+                for(let defineProperty of this.defineProperties){
+                    if(defineProperty.name.slice(0,2) == 'm_'){
+                        baseClassProperties.push(`'${defineProperty.name}'`)
+                        baseClassSlots.push(`SLOT_${defineProperty.name}Changed(o,n){if (this.enableNotifications) this._internal.internalModelChanged('${defineProperty.name}', this)}`)
+                    }
+                }
+                baseClassMeta = `static cachedPoperties = new Set(${childTypeInfo.path}.cachedPoperties.union(new Set([${baseClassProperties.join(',')}])))`
+            }  
+
             code.add(`(class ${this.children[0].className} extends ${childTypeInfo.path} {
                 static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})
+                ${baseClassMeta}
                 static create(parent,properties={},context={},isRoot=true){
 
                 let __context = JQContext.create(context)
@@ -1669,6 +1799,11 @@ function compile(options){
             code.add(this.children[0].getMethods())
 
             code.add('\n')
+
+            code.add(baseClassSlots.join('\n'))
+
+            code.add('\n')
+            
             code.add(this.children[0].getConnectedSignals())
 
             code.add('\n')
@@ -1706,6 +1841,16 @@ function compile(options){
 
             let id = ''
 
+            let defaultBlock = ''
+            if(this.parent) {
+                let parentTypeInfo = this.parent.getTypeInfo(this.parent.extends)
+                if(parentTypeInfo.type instanceof QmlFile){
+                    if(parentTypeInfo.type.instruction.defaultProperty)
+                    defaultBlock = `${this.parent.name}.${parentTypeInfo.type.instruction.defaultProperty}.push(${this.name})`
+                }
+                
+            }
+
             if(typeof this.id === 'object') {
                 let stat = this.prepare(this.id, { isCompute: false, thisKey: this.name, value: new SourceNode(), local: [] })
                 id = stat.value.toString()   
@@ -1713,12 +1858,28 @@ function compile(options){
                 id = this.id ? this.name+'.__' + this.qmlFile.getContextName() + '.'+this.id+'='+this.name : ''
             }
 
+            let baseClassProperties = []
+            let baseClassSlots = []
+            let baseClassMeta = ''
+            if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.BaseClass)){
+                for(let defineProperty of this.defineProperties){
+                    if(defineProperty.name.slice(0,2) == 'm_'){
+                        baseClassProperties.push(`'${defineProperty.name}'`)
+                        baseClassSlots.push(`SLOT_${defineProperty.name}Changed(o,n){if (this.enableNotifications) this._internal.internalModelChanged('${defineProperty.name}', this)}`)
+                    }
+                }
+                baseClassMeta = `static cachedPoperties = new Set(${typeInfo.path}.cachedPoperties.union(new Set([${baseClassProperties.join(',')}])))`
+            }     
+
             code.add(`let ${this.name}=(__root.cachedComponents['${this.qmlFile.getName()}__${this.name}'] || __root.cachedComponent('${this.qmlFile.getName()}__${this.name}',class ${this.className} extends ${typeInfo.path} {
                 static meta = Object.assign({}, ${typeInfo.path}.meta, ${meta})
+                ${baseClassMeta}
                 static create(parent,properties={},context={},isRoot=true){
                     let ${this.name} = super.create(parent,properties,context,isRoot)
                     ${this.name}.__${this.qmlFile.getContextName()} = context
-                    ${id}`)
+                    ${id}
+                    `)
+                    
 
             code.add('\n')
 
@@ -1728,6 +1889,9 @@ function compile(options){
 
             code.add(`return ${this.name}}`)
             code.add(this.getMethods())
+            code.add('\n')
+            code.add(baseClassSlots.join('\n'))
+            code.add('\n')
             code.add(this.getConnectedSignals())
             code.add(`})).create(${this.parent ? this.parent.name : 'null'},{JQAbstractModel:()=>{return ${this.targetContext.name}.JQAbstractModel}},${this.targetContext.name}.__${this.qmlFile.getContextName()},false)`)
 
@@ -1747,6 +1911,10 @@ function compile(options){
             code.add('\n')
             
             code.add(`${this.name}.__${this.className}__${this.name}=true`)
+
+            code.add('\n')
+
+            code.add(defaultBlock)
 
             code.add('\n')
 
@@ -1868,9 +2036,22 @@ function compile(options){
 
             let properties = this.instruction.getProperties()
 
-            code.add(`static cachedComponents = {}
+            let baseClassProperties = []
+            let baseClassSlots = []
+            let baseClassMeta = ''
+            if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.BaseClass)){
+                for(let defineProperty of this.instruction.defineProperties){
+                    if(defineProperty.name.slice(0,2) == 'm_'){
+                        baseClassProperties.push(`'${defineProperty.name}'`)
+                        baseClassSlots.push(`SLOT_${defineProperty.name}Changed(o,n){if (this.enableNotifications) this._internal.internalModelChanged('${defineProperty.name}', this)}`)
+                    }
+                }
+                baseClassMeta = `static cachedPoperties = new Set(${typeInfo.path}.cachedPoperties.union(new Set([${baseClassProperties.join(',')}])))`
+            }
 
+            code.add(`static cachedComponents = {}
                 static meta = Object.assign({}, ${typeInfo.path}.meta, ${meta})
+                ${baseClassMeta}
 
                 __removeObjectName(){removeObjectName('${this.instruction.className}')}
                 __addObjectName(){addObjectName('${this.instruction.className}')}
@@ -1930,6 +2111,9 @@ function compile(options){
 
             code.add('\n')
             code.add(this.instruction.getConnectedSignals())
+            code.add('\n')
+
+            code.add(baseClassSlots.join('\n'))
 
             code.add('\n')
 
@@ -1969,7 +2153,12 @@ function compile(options){
         }
 
         toCode() {
-            return `function(){${this.meta.source}; return {${this.meta.exports.join(',')}}}()`
+            if(this.meta.exports.length > 1){
+                return `function(){${this.meta.source}; return {${this.meta.exports.join(',')}}}()`
+            } else {
+                return `function(){${this.meta.source}; return ${this.meta.exports.join(',')}}()`
+            }
+            
         }
     }
 
@@ -1979,11 +2168,17 @@ function compile(options){
     let mainData = fs.readFileSync(path.resolve(__dirname, '../dist/main.js'), { encoding: 'utf8', flag: 'r' })
     fullCode.add(mainData)
 
-    if (config.dirs.length) console.log(`JQ: preparation of third party modules`)
+    console.time('JQML3: preparation of third party modules')
 
     let counter = {
 
     }
+
+    let startConfig = {
+        single: true,
+        moduleName: '',
+    }
+    let entryDirAbsolutePath = path.resolve(configDirPath, options.entry.replaceAll(/.\w+\.qml/g, ''))
 
     for (let dirPath of config.dirs) {
         let absolutePath = path.resolve(configDirPath, dirPath)
@@ -1997,7 +2192,7 @@ function compile(options){
                 if (type === 'module') {
                     moduleName = name
 
-                    console.log(`    > ${name}`)
+                    console.log(`${name}`)
 
                     if (JQModules[name]) continue
 
@@ -2047,21 +2242,29 @@ function compile(options){
                 JQModules[moduleName][className + '_v' + version] = qmlFile
             }
         }
-
+        if(entryDirAbsolutePath === absolutePath) {
+            startConfig.single = false
+            startConfig.moduleName = moduleName
+        }
         counter[moduleName] = count
     }
+    console.timeEnd('JQML3: preparation of third party modules')
 
-    console.log(`JQ: preparation of single files`)
-    for (let fileName of getFiles(options.entry.replaceAll(/.\w+\.qml/g, ''))) {
-        let qmlFile = new QmlFile(fileName)
-        SingleFiles[fileName.split(/[\/\\]+/g).pop().replace('.qml', '')] = qmlFile
+    console.time('JQML3: preparation of single files')
+    if(startConfig.single){
+        for (let fileName of getFiles(entryDirAbsolutePath)) {
+            let qmlFile = new QmlFile(fileName)
+            SingleFiles[fileName.split(/[\/\\]+/g).pop().replace('.qml', '')] = qmlFile
+        }
+    } else {
+        console.log(`JQML3: entry point is ${startConfig.moduleName} module`)
     }
+    console.timeEnd('JQML3: preparation of single files')
 
-    console.log(`JQ: compilation of single files`)
-
+    console.time('JQML3: compilation of single files')
 
     for (let className in Singletons) {
-        console.log(`    > ${className}.qml (Singleton)`)
+        console.log(`${className}.qml (Singleton)`)
         compiledFiles.push({
             file: Singletons[className],
             code: Singletons[className].toCode(),
@@ -2072,7 +2275,7 @@ function compile(options){
         if (SingleFiles[className].singleton) {
             continue
         }
-        console.log(`    > ${className}.qml`)
+        console.log(`${className}.qml`)
         compiledFiles.push({
             file: SingleFiles[className],
             code: SingleFiles[className].toCode(),
@@ -2080,10 +2283,13 @@ function compile(options){
         })
     }
 
-    if (config.dirs.length) console.log(`JQ: compilation of third party modules`)
+    console.timeEnd('JQML3: compilation of single files')
+
+    console.time('JQML3: compilation of third party modules')
+
     for (let moduleName in JQModules) {
         if (!BaseModules[moduleName]) {
-            console.log(`    > ${moduleName} (${counter[moduleName] + ' files'})`)
+            console.log(`${moduleName} (${counter[moduleName] + ' files'})`)
             fullCode.add(`JQModules.${moduleName}={};`)
         }
     }
@@ -2117,6 +2323,7 @@ function compile(options){
             fullCode.add(`Object.defineProperty(JQModules.${moduleName},'${className}',{get:()=>{return JQModules.${moduleName}.${className}_v${file.version}}})`)
         }
     }
+    console.timeEnd('JQML3: compilation of third party modules')
 
     function getFiles(dir, _files) {
         _files = _files || []
@@ -2132,6 +2339,7 @@ function compile(options){
 
 
 
+    console.time('JQML3: sorting of compiled files')
     while (compiledFiles.length) {
         let compiledFile = compiledFiles.shift()
         if(compiledFile.file instanceof QmlFile && compiledFile.file.singleton){
@@ -2177,6 +2385,7 @@ function compile(options){
         }
         
     }
+    console.timeEnd('JQML3: sorting of compiled files')
 
 
     if(options.mode === 'js'){
@@ -2188,7 +2397,7 @@ function compile(options){
                 } else {
                     JQApplication.rootPath = '${options.root}'
                 }
-                ${options.entry.split(/[\/\\]+/g).pop().replace('.qml', '')}.create(JQApplication.root);
+                ${startConfig.single ? '' : 'JQModules.' + startConfig.moduleName + '.'}${options.entry.split(/[\/\\]+/g).pop().replace('.qml', '')}.create(JQApplication.root);
                 console.timeEnd('build')})`)
         }
 

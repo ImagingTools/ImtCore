@@ -6,9 +6,8 @@ import imtcontrols 1.0
 import imtauthUsersSdl 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
-import imtdeskgui 1.0
 
-ViewBase {
+DocumentViewBase {
 	id: container;
 	
 	anchors.fill: parent;
@@ -34,6 +33,10 @@ ViewBase {
 	}
 	
 	function updateModel(){
+		if (!container.userData){
+			return
+		}
+
 		userGeneralEditor.updateModel();
 		rolesGroup.updateModel();
 		groupsBlock.updateModel();
@@ -319,7 +322,7 @@ ViewBase {
 				
 				width: parent.width;
 
-				ItemSelectElementView {
+				GqlBasedItemSelectElementView {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
 						label: qsTr("Roles")
@@ -331,6 +334,10 @@ ViewBase {
 					}
 
 				function updateGui(){
+					if (!container.userData){
+						return
+					}
+
 					var ids = container.userData.m_roles ? container.userData.m_roles.slice() : []
 					var arr = []
 					for (var i = 0; i < ids.length; i++)
@@ -339,6 +346,10 @@ ViewBase {
 				}
 				
 				function updateModel(){
+					if (!container.userData){
+						return
+					}
+
 					var arr = []
 					for (var i = 0; i < roleSelectableCollectionEditor.items.length; i++)
 						arr.push(roleSelectableCollectionEditor.items[i].id)
@@ -358,7 +369,7 @@ ViewBase {
 				
 				width: parent.width;
 
-				ItemSelectElementView {
+				GqlBasedItemSelectElementView {
 					id: groupSelectableCollectionEditor
 					collectionId: "Groups"
 						label: qsTr("Groups")
@@ -370,6 +381,10 @@ ViewBase {
 					}
 
 				function updateGui(){
+					if (!container.userData){
+						return
+					}
+
 					var ids = container.userData.m_groups ? container.userData.m_groups.slice() : []
 					var arr = []
 					for (var i = 0; i < ids.length; i++)
@@ -378,6 +393,10 @@ ViewBase {
 				}
 				
 				function updateModel(){
+					if (!container.userData){
+						return
+					}
+
 					var arr = []
 					for (var i = 0; i < groupSelectableCollectionEditor.items.length; i++)
 						arr.push(groupSelectableCollectionEditor.items[i].id)

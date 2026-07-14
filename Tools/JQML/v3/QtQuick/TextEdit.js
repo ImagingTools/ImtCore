@@ -25,6 +25,12 @@ class TextEdit extends Item {
     static WrapAnywhere = 2
     static Wrap = 3
 
+    static AutoText = 0
+    static PlainText = 1
+    static StyledText = 2
+    static RichText = 3
+    static MarkdownText = 4
+
     static meta = Object.assign({}, Item.meta, {
         text: { type: String, value: ''},
         color: { type: Color, value: 'black'},
@@ -49,6 +55,7 @@ class TextEdit extends Item {
         bottomPadding: { type: Real, value: 0},
         selectedText: { type: String, value: ''},
         selectByMouse: { type: Bool, value: true},
+        textFormat:{ type: Int, value: TextEdit.PlainText},
 
         textChanged: {type:Signal, args:[]},
         colorChanged: {type:Signal, args:[]},
@@ -73,6 +80,7 @@ class TextEdit extends Item {
         bottomPaddingChanged: {type:Signal, args:[]},
         selectedTextChanged: {type:Signal, args:[]},
         selectByMouseChanged: {type:Signal, args:[]},
+        textFormatChanged: {type:Signal, args:[]},
 
         editingFinished: {type:Signal, args:[]},
     })
@@ -111,6 +119,11 @@ class TextEdit extends Item {
 
         impl.onfocus = ()=>{
             this.forceActiveFocus()
+            if(!this.activeFocus) this.activeFocus = true
+
+            if(this.parent instanceof JQModules.QtQuick.FocusScope && !this.parent.activeFocus){
+                this.parent.activeFocus = true
+            }
         }
 
         impl.onblur = ()=>{
@@ -118,13 +131,13 @@ class TextEdit extends Item {
         }
 
         impl.onkeydown = (e)=>{
-            if(e.code === QtEnums.Key_C && e.ctrlKey){
+            if(e.keyCode === QtEnums.Key_C && e.ctrlKey){
                 e.stopPropagation()
-            } else if(e.code === QtEnums.Key_V && e.ctrlKey){
+            } else if(e.keyCode === QtEnums.Key_V && e.ctrlKey){
                 e.stopPropagation()
-            } else if(e.code === QtEnums.Key_X && e.ctrlKey){
+            } else if(e.keyCode === QtEnums.Key_X && e.ctrlKey){
                 e.stopPropagation()
-            } else if(e.code === QtEnums.Key_A && e.ctrlKey){
+            } else if(e.keyCode === QtEnums.Key_A && e.ctrlKey){
                 e.stopPropagation()
                 this.selectAll()
             } else if(e.key === QtEnums.Key_Enter){
@@ -142,6 +155,12 @@ class TextEdit extends Item {
         return impl
     }
 
+    __onMouseDown(mouse){
+        if(this.enabled && this.visible && this.__impl){
+            this.__impl.focus()
+        }
+    }
+
     __setImplStyle(style){
         if(this.__impl) {
             for(let name in style){
@@ -157,11 +176,6 @@ class TextEdit extends Item {
 
     SLOT_focusChanged(oldValue, newValue){
         super.SLOT_focusChanged(oldValue, newValue)
-        if(newValue){
-            if(!(this.parent instanceof JQModules.QtQuick.FocusScope)){
-                this.activeFocus = true
-            }
-        }
     }
 
     SLOT_horizontalAlignmentChanged(oldValue, newValue){
@@ -377,6 +391,21 @@ class TextEdit extends Item {
     }
     undo(){
 
+    }
+
+    __onMouseDown(mouse){
+        if(!this.enabled || !this.visible) return
+
+        if(!mouse.target){
+            mouse.target = this
+        }
+    }
+    __onMouseUp(mouse){
+        if(!this.enabled || !this.visible) return
+
+        if(mouse.target === this){
+            mouse.target = null
+        }
     }
 
 

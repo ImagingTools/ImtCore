@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtserverapp/CIdParamRepresentationControllerComp.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings.h>
 
 
 // ACF includes
@@ -12,11 +13,11 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CParamsSet>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CParamsSet>)
 
 QByteArray CIdParamRepresentationControllerComp::GetTypeId() const
 {
-	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::IdParam.toUtf8();
+	return sdl::V1_0::imtbase::CParamTypeIds::ParamTypeIdsFields::IdParam.toUtf8();
 }
 
 
@@ -29,7 +30,7 @@ bool CIdParamRepresentationControllerComp::IsModelSupported(const istd::IChangea
 
 
 bool CIdParamRepresentationControllerComp::GetSdlRepresentationFromDataModel(
-			sdl::imtbase::ImtBaseTypes::CIdParam::V1_0& sdlRepresentation,
+			sdl::V1_0::imtbase::CIdParam& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
@@ -46,7 +47,7 @@ bool CIdParamRepresentationControllerComp::GetSdlRepresentationFromDataModel(
 
 bool CIdParamRepresentationControllerComp::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const sdl::imtbase::ImtBaseTypes::CIdParam::V1_0& sdlRepresentation) const
+			const sdl::V1_0::imtbase::CIdParam& sdlRepresentation) const
 {
 	iprm::IIdParam* idParamPtr = dynamic_cast<iprm::IIdParam*>(&dataModel);
 	if (idParamPtr == nullptr){

@@ -19,6 +19,17 @@ namespace imtauth
 	Interface for describing a tenant.
 	\ingroup Tenant
 */
+/**
+	Get the well-known System-Tenant ID.
+	The System-Tenant is the root tenant that is automatically created at server startup.
+	All users implicitly belong to the System-Tenant.
+*/
+inline const QByteArray& GetSystemTenantId()
+{
+	static const QByteArray s_id = QByteArrayLiteral("00000000-0000-0000-0000-000000000001");
+	return s_id;
+}
+
 class ITenantInfo: virtual public iser::IObject
 {
 public:
@@ -28,49 +39,9 @@ public:
 		MIT_TENANT_NAME,
 		MIT_TENANT_DESCRIPTION,
 		MIT_TENANT_IS_ACTIVE,
-		MIT_TENANT_OWNER_ID
+		MIT_TENANT_OWNER_ID,
+		MIT_PARENT_TENANT_ID
 	};
-
-	/**
-		Tenant relationship roles.
-	*/
-	enum TenantRelationshipRole
-	{
-		Parent = 0,
-		Child,
-		Partner,
-		Supplier,
-		Customer,
-		Affiliate
-	};
-
-	/**
-		Structure describing a relationship between tenants.
-	*/
-	struct TenantRelationship
-	{
-		QByteArray relationshipId;
-		QByteArray targetTenantId;
-		TenantRelationshipRole role;
-		QString description;
-		QString createdAt;
-
-		bool operator==(const TenantRelationship& other) const
-		{
-			return relationshipId == other.relationshipId
-				&& targetTenantId == other.targetTenantId
-				&& role == other.role
-				&& description == other.description
-				&& createdAt == other.createdAt;
-		}
-
-		bool operator!=(const TenantRelationship& other) const
-		{
-			return !(*this == other);
-		}
-	};
-
-	typedef QList<TenantRelationship> TenantRelationships;
 
 	/**
 		Get tenant ID.
@@ -155,24 +126,24 @@ public:
 	virtual void SetUpdatedAt(const QString& updatedAt) = 0;
 
 	/**
-		Get all relationships for this tenant.
+		Get relationship IDs associated with this tenant.
 	*/
-	virtual TenantRelationships GetRelationships() const = 0;
+	virtual QByteArrayList GetRelationshipIds() const = 0;
 
 	/**
-		Set relationships for this tenant.
+		Set relationship IDs for this tenant.
 	*/
-	virtual void SetRelationships(const TenantRelationships& relationships) = 0;
+	virtual void SetRelationshipIds(const QByteArrayList& relationshipIds) = 0;
 
 	/**
-		Add a relationship to this tenant.
+		Add a relationship ID to this tenant.
 	*/
-	virtual void AddRelationship(const TenantRelationship& relationship) = 0;
+	virtual void AddRelationshipId(const QByteArray& relationshipId) = 0;
 
 	/**
-		Remove a relationship by its ID.
+		Remove a relationship ID from this tenant.
 	*/
-	virtual bool RemoveRelationship(const QByteArray& relationshipId) = 0;
+	virtual bool RemoveRelationshipId(const QByteArray& relationshipId) = 0;
 
 	/**
 		Get the list of permissions available for this tenant.
@@ -183,6 +154,17 @@ public:
 		Set the list of permissions available for this tenant.
 	*/
 	virtual void SetTenantPermissions(const QByteArrayList& permissions) = 0;
+
+	/**
+		Get parent tenant ID.
+		Empty if this is a top-level tenant or the System-Tenant.
+	*/
+	virtual QByteArray GetParentTenantId() const = 0;
+
+	/**
+		Set parent tenant ID.
+	*/
+	virtual void SetParentTenantId(const QByteArray& parentTenantId) = 0;
 };
 
 

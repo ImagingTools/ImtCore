@@ -101,6 +101,11 @@ I_EXPORT_COMPONENT(
 			"Remote Commands Controller");
 
 I_EXPORT_COMPONENT(
+			RemoteFileSystemController,
+			"Remote file system controller redirecting requests to a file service on another machine",
+			"Remote File System Controller Folder Browser");
+
+I_EXPORT_COMPONENT(
 			RemoteFilterableSelectController,
 			"Remote filterable select controller",
 			"Remote Filterable Select Controller");

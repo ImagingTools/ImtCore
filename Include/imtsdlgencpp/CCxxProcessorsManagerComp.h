@@ -87,7 +87,8 @@ public:
 				const iprm::IParamsSet* paramsPtr,
 				const istd::IPolymorphic* inputPtr,
 				istd::IChangeable* outputPtr,
-				ibase::IProgressManager* progressManagerPtr = nullptr) override;
+				ibase::IProgressManager* progressManagerPtr = nullptr,
+				istd::IChangeable* processingReportPtr = nullptr) override;
 
 private:
 	[[nodiscard]] bool BeginHeaderFile(const iprm::IParamsSet& entryParams, QFile& headerFile, const iprm::IParamsSet* paramsPtr) const;
@@ -114,6 +115,13 @@ private:
 				const EntryFileMap& headerFiles,
 				const EntryFileMap& sourceFiles,
 				const iprm::IParamsSet* paramsPtr) const;
+
+	/**
+		Generates a forward declaration header file containing forward declarations
+		for all generated classes (types, unions, document types).
+		This enables consumers to use forward declarations instead of heavy full includes.
+	*/
+	[[nodiscard]] bool GenerateForwardDeclarationFile(const iprm::IParamsSet* paramsPtr) const;
 
 	/**
 		Creates files for all types if split doesn't enabled, key[EntryName] will be empty, and only one pointer will be created and returned
@@ -144,7 +152,6 @@ private:
 
 
 } // namespace imtsdlgencpp
-
 
 
 

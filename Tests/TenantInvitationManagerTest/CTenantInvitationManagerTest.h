@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+﻿// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
 // Qt includes
@@ -30,7 +30,6 @@ struct MockInvitation
 	QByteArray id;
 	QByteArray userId;
 	QByteArray tenantId;
-	QByteArray roleId;
 	TenantInvitationStatus status = TIS_PENDING;
 	QByteArray invitedByUserId;
 	QDateTime createdAt;
@@ -95,7 +94,7 @@ public:
 		return nullptr;
 	}
 
-	QByteArray CreateInvitation(const QByteArray& invitedByUserId, const QByteArray& userId, const QByteArray& tenantId, const QByteArray& roleId)
+	QByteArray CreateInvitation(const QByteArray& invitedByUserId, const QByteArray& userId, const QByteArray& tenantId)
 	{
 		// UNIQUE constraint: only one pending invitation per user+tenant
 		for (auto it = m_invitations.constBegin(); it != m_invitations.constEnd(); ++it){

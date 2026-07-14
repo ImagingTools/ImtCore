@@ -21,6 +21,7 @@ class Loader extends Item {
         status: {type:Real, value:Loader.Null, },
         progress: {type:Real, value:0, },
         asynchronous: {type:Bool, value:false, },
+        active: {type:Bool, value:true, },
 
         itemChanged: {type:Signal, args:[]},
         sourceChanged: {type:Signal, args:[]},
@@ -28,6 +29,7 @@ class Loader extends Item {
         statusChanged: {type:Signal, args:[]},
         progressChanged: {type:Signal, args:[]},
         asynchronousChanged: {type:Signal, args:[]},
+        activeChanged: {type:Signal, args:[]},
 
         loaded: {type:Signal, args:[]},
     })
@@ -35,6 +37,46 @@ class Loader extends Item {
     __updatePrimaryProperties(){
         super.__updatePrimaryProperties()
         this.__updateProperty('sourceComponent')
+    }
+
+    setSource(source, properties = undefined){
+        if(properties && typeof properties === 'object'){
+            this.__cachedInitialProperties = Object.assign({}, properties)
+        } else {
+            delete this.__cachedInitialProperties
+        }
+
+        this.__settingSourceByMethod = true
+        this.sourceComponent = undefined
+        this.source = source || ''
+        this.__settingSourceByMethod = false
+    }
+
+    __loadFromCurrentSource(){
+        if(!this.active){
+            this.item = null
+            this.status = Loader.Null
+            this.progress = 0
+            return
+        }
+
+        if(this.sourceComponent){
+            this.__reloadingCurrentSource = true
+            this.SLOT_sourceComponentChanged(this.sourceComponent, this.sourceComponent)
+            this.__reloadingCurrentSource = false
+            return
+        }
+
+        if(this.source){
+            this.__reloadingCurrentSource = true
+            this.SLOT_sourceChanged(this.source, this.source)
+            this.__reloadingCurrentSource = false
+            return
+        }
+
+        this.item = null
+        this.status = Loader.Null
+        this.progress = 0
     }
 
     __complete(){
@@ -100,11 +142,25 @@ class Loader extends Item {
 
     SLOT_sourceComponentChanged(oldValue, newValue){
         delete this.__lazyItem
+
+        if(!this.__settingSourceByMethod && !this.__reloadingCurrentSource){
+            delete this.__cachedInitialProperties
+        }
+
+        if(!this.active){
+            this.item = null
+            this.status = Loader.Null
+            this.progress = 0
+            return
+        }
+
         this.status = Loader.Loading
 
         if(newValue){
             this.__updateProperty('visible')
-            let item = this.sourceComponent.createObject(this, {}, true)
+            let initialProperties = this.__cachedInitialProperties || {}
+            delete this.__cachedInitialProperties
+            let item = this.sourceComponent.createObject(this, initialProperties, true)
 
             if(item){
                 if(this.__completed || this.__propertiesUpdated){
@@ -129,6 +185,18 @@ class Loader extends Item {
 
     SLOT_sourceChanged(oldValue, newValue){
         delete this.__lazyItem
+
+        if(!this.__settingSourceByMethod && !this.__reloadingCurrentSource){
+            delete this.__cachedInitialProperties
+        }
+
+        if(!this.active){
+            this.item = null
+            this.status = Loader.Null
+            this.progress = 0
+            return
+        }
+
         this.status = Loader.Loading
         if(this.item) this.item.destroy()
 
@@ -187,6 +255,14 @@ class Loader extends Item {
                 }
             }
 
+            if(!cls || !cls.isAssignableFrom){
+                try {
+                    cls = eval(className)
+                } catch (error) {
+        
+                }
+            }
+
             if(!cls){
                 console.error(`Loader: "${this.source}" is not founded | className: ${className} | modules:`, Object.keys(JQModules))
                 this.item = null
@@ -195,7 +271,9 @@ class Loader extends Item {
             }
 
             this.__updateProperty('visible')
-            let item = cls.create(this)
+            let initialProperties = this.__cachedInitialProperties || {}
+            delete this.__cachedInitialProperties
+            let item = cls.create(this, initialProperties)
 
             if(item){
                 if(this.__completed){
@@ -217,6 +295,18 @@ class Loader extends Item {
         }
 
         
+    }
+
+    SLOT_activeChanged(oldValue, newValue){
+        if(newValue === false){
+            delete this.__lazyItem
+            this.item = null
+            this.status = Loader.Null
+            this.progress = 0
+            return
+        }
+
+        this.__loadFromCurrentSource()
     }
 
     SLOT_widthChanged(oldValue, newValue){

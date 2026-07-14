@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="OrganizationsPermissionsProvider" PackageId="ImtAuthPck" ComponentId="OrganizationsPermissionsProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TenantInvitationInfo" PackageId="ImtAuthPck" ComponentId="TenantInvitationInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TenantInvitationManager" PackageId="ImtAuthPck" ComponentId="TenantInvitationManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="InvitationCollection" Type="Reference" ExportId="InvitationRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="InvitationFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="TenantInvitationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantMembershipManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TenantMembershipInfo" PackageId="ImtAuthPck" ComponentId="TenantMembershipInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TenantMembershipManager" PackageId="ImtAuthPck" ComponentId="TenantMembershipManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="BindingEntityType" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Users"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BindingManager" Type="Reference" ExportId="BindingManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MembershipCollection" Type="Reference" ExportId="TenantMembershipRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MembershipFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="TenantMembershipInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TenantMembershipManagerController" PackageId="ImtAuthGqlPck" ComponentId="TenantMembershipManagerController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DelegatedAccess" Type="Reference" ExportId="DelegatedAccess">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="InvitationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantInvitationManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantMembershipManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OrganizationsProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="OrganizationsPermissionsProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="TenantMembershipManagerController"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="TenantInvitationManager" ComponentId="TenantInvitationManager"/>
+        <Component ExportedId="TenantMembershipManager" ComponentId="TenantMembershipManager"/>
+    </ExportedComponents>
+</Acf>

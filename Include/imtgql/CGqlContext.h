@@ -33,6 +33,8 @@ public:
 	virtual void SetTenantId(const QByteArray& tenantId) override;
 	virtual const imtauth::IUserInfo* GetUserInfo() const override;
 	virtual void SetUserInfo(const imtauth::IUserInfo* userInfoPtr) override;
+	virtual bool IsTenantOwner() const override;
+	virtual void SetIsTenantOwner(bool isTenantOwner) override;
 	virtual Headers GetHeaders() const override;
 	virtual void SetHeaders(const Headers& headers) override;
 
@@ -54,6 +56,7 @@ private:
 	QByteArray m_token;
 	QByteArrayList m_scopes;
 	istd::TSharedInterfacePtr<imtauth::IUserInfo> m_userInfoPtr;
+	bool m_isTenantOwner;
 	Headers m_headers;
 };
 

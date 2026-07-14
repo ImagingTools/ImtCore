@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtsdlgencpp/CGqlHandlerBaseClassGeneratorComp.h>
 
-
 // Qt includes
+#include <QtCore/QFileInfo>
 #include <QtCore/QTextStream>
 
-
-//Acf includes
+// ACF includes
 #include <istd/CSystem.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/COptionsManager.h>
@@ -42,7 +41,7 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessEntry(
 	}
 
 	bool retVal = true;
-	if (headerDevicePtr != nullptr){
+	if (headerDevicePtr != nullptr && sourceDevicePtr == nullptr){
 		retVal = retVal && ProcessHeaderClassFile(sdlEntry, headerDevicePtr);
 	}
 	if (sourceDevicePtr != nullptr){
@@ -68,8 +67,11 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSd
 {
 	QTextStream ifStream(headerDevicePtr);
 
+	const QString schemaFileName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).baseName();
+	const QString className = QStringLiteral("C") + schemaFileName + QStringLiteral("GqlHandlerCompBase");
+
 	// class begin
-	ifStream << QStringLiteral("class CGraphQlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp");
+	ifStream << QStringLiteral("class ") << className << QStringLiteral(": public ::imtservergql::CPermissibleGqlRequestHandlerComp");
 	FeedStream(ifStream, 1, false);
 
 	ifStream << QStringLiteral("{");
@@ -84,7 +86,7 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSd
 	FeedStream(ifStream, 2, false);
 
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("I_BEGIN_BASE_COMPONENT(CGraphQlHandlerCompBase)");
+	ifStream << QStringLiteral("I_BEGIN_BASE_COMPONENT(") << className << QStringLiteral(")");
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream, 1);
@@ -177,7 +179,8 @@ void CGqlHandlerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream
 
 void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTextStream& stream, uint hIndents) const
 {
-	const QString className = QStringLiteral("CGraphQlHandlerCompBase");
+	const QString schemaFileName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).baseName();
+	const QString className = QStringLiteral("C") + schemaFileName + QStringLiteral("GqlHandlerCompBase");
 	const imtsdl::SdlRequestList requestList = m_sdlRequestListCompPtr->GetRequests(true);
 
 	// add IsRequestSupported() method
@@ -411,4 +414,3 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 
 
 } // namespace imtsdlgencpp
-

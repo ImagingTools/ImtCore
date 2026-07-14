@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="CollectionDocumentService" PackageId="ImtCollectionVoce" ComponentId="CollectionDocumentService">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Collection" Type="Reference" ExportId="TenantRelationshipRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="TenantRelationships"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsSingleCopyMode" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TenantRelationshipInfo</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypeIdList" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TenantRelationship</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UndoManager" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="SerializedUndoManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentValidators" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RelationshipDocumentValidator</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Demultiplexer" PackageId="ImtServerGqlPck" ComponentId="GraphQLDemultiplexer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GqlRequestHandlers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RelationshipCollectionDocumentService</Value>
+                                <Value>CollectionDocumentService</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RelationshipCollectionDocumentService" PackageId="ImtAuthGqlPck" ComponentId="RelationshipCollectionDocumentService">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionDocumentService" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CollectionDocumentService"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConnectionCollection" Type="Reference" ExportId="TenantConnectionRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantCollection" Type="Reference" ExportId="TenantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SerializedUndoManager" PackageId="BasePck" ComponentId="SerializedUndoManager">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TenantRelationshipInfo" PackageId="ImtAuthPck" ComponentId="TenantRelationshipInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="RelationshipDocumentValidator" PackageId="ImtAuthGqlPck" ComponentId="RelationshipDocumentValidator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="CollectionDocumentService"/>
+        <Interface InterfaceId="imtdoc::IDocumentService" ComponentId="CollectionDocumentService"/>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
+        <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="CollectionDocumentService"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="CollectionDocumentService"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="CollectionDocumentService"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

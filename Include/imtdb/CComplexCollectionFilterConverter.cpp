@@ -31,6 +31,16 @@ QMap<imtbase::IComplexCollectionFilter::FieldOperation, QString> boolOperations(
 	{imtbase::IComplexCollectionFilter::FO_EQUAL, "="},
 	{imtbase::IComplexCollectionFilter::FO_NOT_EQUAL, "!="}});
 
+QSet<int> dateTypes({ QMetaType::QDateTime, QMetaType::QDate });
+QMap<imtbase::IComplexCollectionFilter::FieldOperation, QString> dateOperations({
+	{ imtbase::IComplexCollectionFilter::FO_EQUAL,		 QStringLiteral("=")	},
+	{ imtbase::IComplexCollectionFilter::FO_NOT_EQUAL,	 QStringLiteral("!=")	},
+	{ imtbase::IComplexCollectionFilter::FO_LESS,		 QStringLiteral("<")	},
+	{ imtbase::IComplexCollectionFilter::FO_GREATER,	 QStringLiteral(">")	},
+	{ imtbase::IComplexCollectionFilter::FO_NOT_LESS,	 QStringLiteral(">=")	},
+	{ imtbase::IComplexCollectionFilter::FO_NOT_GREATER, QStringLiteral("<=")	}
+});
+
 QSet<imtbase::IComplexCollectionFilter::FieldOperation> arrayOperations({
 	imtbase::IComplexCollectionFilter::FO_ARRAY_HAS_ANY,
 	imtbase::IComplexCollectionFilter::FO_ARRAY_NOT_HAS_ANY,
@@ -160,6 +170,19 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 		QString columnExpr = sqlContext == SC_POSTGRES ? QString("coalesce((\"%1\")::bool, false)").arg(qPrintable(filter.fieldId))
 										: QString("\"%1\"").arg(qPrintable(filter.fieldId));
 		retVal = QString("%1 %2 %3").arg(columnExpr, boolOperations[filter.filterOperation], value ? "true" : "false");
+	}
+	else if (dateTypes.contains(filter.filterValue.typeId()) && dateOperations.contains(filter.filterOperation)){
+		QString filterValue;
+		if (filter.filterValue.typeId() == QMetaType::QDateTime){
+			filterValue = filter.filterValue.toDateTime().toString(Qt::ISODateWithMs);
+		}
+		else{
+			filterValue = filter.filterValue.toDate().toString(Qt::ISODate);
+		}
+
+		QString columnExpr = sqlContext == SC_POSTGRES ? QStringLiteral(R"(("%1")::timestamp)").arg(QString::fromUtf8(filter.fieldId))
+														: QStringLiteral(R"("%1")").arg(QString::fromUtf8(filter.fieldId));
+		retVal = QStringLiteral("%1 %2 '%3'").arg(columnExpr, dateOperations[filter.filterOperation], filterValue);
 	}
 	else if (sqlContext == SC_POSTGRES && arrayOperations.contains(filter.filterOperation)){
 		const QString columnExpr = QString("\"%1\"").arg(qPrintable(filter.fieldId));

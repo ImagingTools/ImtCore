@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -80,17 +80,44 @@
         <Element Id="TenantDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="TenantDatabaseDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AutoCreateCrossOrgGrantsTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AutoCreateInvitationsTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AutoCreateMembershipsTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="AutoCreatePermissionsTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AutoCreateRelationshipsTable" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="CreateCrossOrgGrantsTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/SQL/SQLite/CreateCrossOrgGrantsTable.sql"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CreateInvitationsTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/SQL/SQLite/CreateTenantInvitationsTable.sql"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CreateMembershipsTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/SQL/SQLite/CreateTenantMembershipsTable.sql"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CreatePermissionsTableScriptPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value=":/SQL/SQLite/CreateTenantPermissionsTable.sql"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="CreateRelationshipsTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/SQL/SQLite/CreateTenantRelationshipsTable.sql"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value=":/SQL/SQLite/CreateTenantsTable.sql"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CrossOrgGrantsTableName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="CrossOrgGrants"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
@@ -103,6 +130,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="PermissionsTableName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="TenantPermissions"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RelationshipsTableName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="TenantRelationships"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TableName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Tenants"/>

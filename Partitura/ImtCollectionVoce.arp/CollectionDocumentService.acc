@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -16,6 +16,9 @@
                     <AttributeInfo Id="Collection" Type="Reference" ExportId="Collection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DocumentNameProviders" Type="Reference[]" ExportId="DocumentNameProviders">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DocumentServiceEventHandler" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -23,9 +26,6 @@
                                 <Value>EventHandlerDemultiplexer</Value>
                             </Values>
                         </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DocumentNameProviders" Type="Reference[]" ExportId="DocumentNameProviders">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DocumentValidators" Type="Reference[]" ExportId="DocumentValidators">
                         <Data IsEnabled="false"/>

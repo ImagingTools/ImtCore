@@ -66,6 +66,18 @@ QSet<QString> CSqlDatabaseDocumentDelegateComp::s_filterableColumns ={
 
 // public methods
 
+// reimplemented (icomp::CComponentBase)
+
+void CSqlDatabaseDocumentDelegateComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+	if (useTenantBindings){
+		EnsureTenantBindingTableExists();
+	}
+}
+
+
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
 QByteArray CSqlDatabaseDocumentDelegateComp::GetCountQuery(const iprm::IParamsSet* paramsPtr) const
@@ -100,6 +112,41 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 {
 	if (!objectId.isEmpty()){
 		return GetObjectSelectionQuery(objectId, paramsPtr);
+	}
+
+	if (IsSQLite()){
+		QString sortQuery;
+		QString filterQuery;
+		if (count == 0){
+			return QByteArray();
+		}
+		if (paramsPtr != nullptr){
+			if (!CreateFilterQuery(*paramsPtr, filterQuery)){
+				return QByteArray();
+			}
+
+			iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
+			if (complexFilterParamPtr.IsValid()){
+				if (!CreateSortQuery(*complexFilterParamPtr, sortQuery)){
+					return QByteArray();
+				}
+			}
+		}
+
+		QByteArray paginationQuery;
+		if (!CreatePaginationQuery(offset, count, paginationQuery)){
+			return QByteArray();
+		}
+
+		QString baseSelectionQuery = GetBaseSelectionQuery();
+
+		// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
+		QString retVal = baseSelectionQuery;
+		retVal += QString(" ") + filterQuery;
+		retVal += QString(" ") + sortQuery;
+		retVal += QString(" ") + qPrintable(paginationQuery);
+
+		return retVal.toUtf8();
 	}
 
 	QByteArray selectionQuery = BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
@@ -241,6 +288,11 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectsQuery(
 								QString::fromUtf8(s_documentIdColumn),
 								quotedIds);
 
+	QByteArray bindingDeleteQuery = CreateTenantBindingDeleteQuery(objectIds);
+	if (!bindingDeleteQuery.isEmpty()){
+		query += QString::fromUtf8(bindingDeleteQuery);
+	}
+
 	return query.toUtf8();
 }
 
@@ -256,10 +308,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectSetQuery(
 	}
 	QByteArray retVal = QString("UPDATE %0 \"%1\" as root SET \"%2\" = 'Disabled' WHERE \"%2\" = 'Active'").arg(schemaPrefix, QString::fromUtf8(*m_tableNameAttrPtr), QString::fromUtf8(s_stateColumn)).toUtf8();
 
+	QByteArrayList conditionList;
 	if (paramsPtr != nullptr){
 		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
 		if (complexFilterParamPtr.IsValid()){
-			QByteArrayList conditionList;
 			QString textFilterQuery;
 			QString objectFilterQuery;
 			QString timeFilterQuery;
@@ -285,6 +337,24 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectSetQuery(
 
 			retVal += QByteArrayLiteral(" AND (") += conditionList.join(" AND ") +  QByteArrayLiteral(")");
 		}
+	}
+
+	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+	if (useTenantBindings){
+		const QString bindingsTableName = CreateTenantBindingTableName();
+		const QString escapedEntityType = SqlEncode(QString::fromUtf8(GetTableName()));
+		QString bindingsDelete = QString("DELETE FROM %1 WHERE \"EntityType\" = '%2';")
+				.arg(bindingsTableName, escapedEntityType);
+		if (!conditionList.isEmpty()){
+			const QString tableName = QString::fromUtf8(*m_tableNameAttrPtr);
+			const QString idCol = QString::fromUtf8(s_documentIdColumn);
+			const QString stateCol = QString::fromUtf8(s_stateColumn);
+			QString idSelect = QString("SELECT \"%1\" FROM %2\"%3\" as root WHERE \"%4\" = 'Active' AND (%5)")
+					.arg(idCol, schemaPrefix, tableName, stateCol, QString::fromUtf8(conditionList.join(" AND ")));
+			bindingsDelete = QString("DELETE FROM %1 WHERE \"EntityType\" = '%2' AND \"EntityId\" IN (%3);")
+					.arg(bindingsTableName, escapedEntityType, idSelect);
+		}
+		retVal += QByteArrayLiteral(";") + bindingsDelete.toUtf8();
 	}
 
 	return retVal;
@@ -925,7 +995,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 						valuesClause
 					);
 
-	if (!tenantId.isEmpty()){
+	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+	if (!tenantId.isEmpty() && useTenantBindings){
 		query += CreateTenantBindingInsertQuery(tenantId, objectId, operationContextPtr);
 	}
 
@@ -1035,7 +1106,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRevisionInfoQuery(
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const QVariantMap& paramMap) const
 {
-	QString revisionInfo = QStringLiteral(R"(jsonb_build_object()");
+	const bool isSqlite = IsSQLite();
+	QString revisionInfo = isSqlite
+				? QStringLiteral(R"(json_object()")
+				: QStringLiteral(R"(jsonb_build_object()");
 
 	const QStringList keys = paramMap.keys();
 
@@ -1099,50 +1173,39 @@ QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingTableName() const
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingTableInitializationQuery() const
 {
-	const QByteArray databaseDriverId = m_databaseEngineCompPtr.IsValid() ? m_databaseEngineCompPtr->GetDatabaseDriverId() : QByteArray();
-	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
-	const QString bindingsTableName = CreateTenantBindingTableName();
-
-	if (isSqlite){
-		return QString(
-					"CREATE TABLE IF NOT EXISTS %1 "
-					"(\"Id\" TEXT PRIMARY KEY, "
-					"\"TenantId\" TEXT NOT NULL, "
-					"\"EntityType\" TEXT NOT NULL, "
-					"\"EntityId\" TEXT NOT NULL, "
-					"\"CreatedAt\" TEXT NOT NULL, "
-					"\"CreatedByUserId\" TEXT, "
-					"\"Scope\" TEXT, "
-					"UNIQUE (\"TenantId\", \"EntityType\", \"EntityId\"));"
-					"CREATE INDEX IF NOT EXISTS \"IX_TenantEntityBindings_TenantId\" "
-					"ON %1 (\"TenantId\");"
-					"CREATE INDEX IF NOT EXISTS \"IX_TenantEntityBindings_Entity\" "
-					"ON %1 (\"EntityType\", \"EntityId\");")
-				.arg(bindingsTableName)
-				.toUtf8();
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return QByteArray();
 	}
 
-	return QString(
-				"CREATE TABLE IF NOT EXISTS %1 "
-				"(\"Id\" TEXT PRIMARY KEY, "
-				"\"TenantId\" TEXT NOT NULL, "
-				"\"EntityType\" TEXT NOT NULL, "
-				"\"EntityId\" TEXT NOT NULL, "
-				"\"CreatedAt\" timestamp without time zone NOT NULL, "
-				"\"CreatedByUserId\" TEXT, "
-				"\"Scope\" TEXT, "
-				"CONSTRAINT \"UQ_TenantEntityBindings_Tenant_Entity\" UNIQUE (\"TenantId\", \"EntityType\", \"EntityId\"));"
-				"CREATE INDEX IF NOT EXISTS \"IX_TenantEntityBindings_TenantId\" "
-				"ON %1 (\"TenantId\");"
-				"CREATE INDEX IF NOT EXISTS \"IX_TenantEntityBindings_Entity\" "
-				"ON %1 (\"EntityType\", \"EntityId\");")
-			.arg(bindingsTableName)
-			.toUtf8();
+	const QString scriptPath = GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateTenantEntityBindingsTable.sql"));
+	QFile scriptFile(scriptPath);
+	if (!scriptFile.open(QFile::ReadOnly)){
+		qWarning() << __FILE__ << __LINE__
+				   << "\n\t| CreateTenantEntityBindingsTable.sql could not be loaded from" << scriptPath;
+		return QByteArray();
+	}
+
+	QByteArray createTableQuery = scriptFile.readAll();
+	scriptFile.close();
+
+	const QByteArray tableScheme = GetTableScheme();
+	if (!tableScheme.isEmpty()){
+		createTableQuery.replace("${TableScheme}", tableScheme);
+	}
+	else{
+		createTableQuery.replace("${TableScheme}", "public");
+	}
+
+	return createTableQuery;
 }
 
 
 void CSqlDatabaseDocumentDelegateComp::EnsureTenantBindingTableExists() const
 {
+	if (m_tenantBindingTableInitialized){
+		return;
+	}
+
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return;
 	}
@@ -1159,12 +1222,22 @@ void CSqlDatabaseDocumentDelegateComp::EnsureTenantBindingTableExists() const
 		qWarning() << __FILE__ << __LINE__
 					<< "\n\t| TenantEntityBindings table could not be initialized"
 					<< "\n\t| Error: " << sqlError;
+		return;
 	}
+
+	m_tenantBindingTableInitialized = true;
 }
 
 
 QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode) const
 {
+	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+	if (!useTenantBindings){
+		// Delegate is configured not to use TenantEntityBindings for ownership (e.g. Users).
+		// No binding-based tenant scoping filter is applied for such collections (global view).
+		return QString();
+	}
+
 	const QString bindingsTableName = CreateTenantBindingTableName();
 	const QString escapedEntityType = SqlEncode(QString::fromUtf8(GetTableName()));
 	const QByteArray databaseDriverId = m_databaseEngineCompPtr.IsValid() ? m_databaseEngineCompPtr->GetDatabaseDriverId() : QByteArray();
@@ -1193,7 +1266,11 @@ QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const Q
 		return QString("EXISTS (%1)").arg(bindingsLookup);
 	}
 
-	return QString("NOT EXISTS (%1)").arg(bindingsLookup);
+	// NoOrganization mode: empty TenantId binding and missing binding are equivalent.
+	// Keep only records that have no non-empty tenant binding.
+	QString nonEmptyTenantBindingsLookup = bindingsLookup
+			+ QString(" AND COALESCE(tenantBindings.\"TenantId\", '') <> ''");
+	return QString("NOT EXISTS (%1)").arg(nonEmptyTenantBindingsLookup);
 }
 
 
@@ -1202,7 +1279,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery(
 			const QByteArray& entityId,
 			const imtbase::IOperationContext* operationContextPtr) const
 {
-	if (tenantId.isEmpty() || entityId.isEmpty()){
+	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+	if (!useTenantBindings || tenantId.isEmpty() || entityId.isEmpty()){
 		return QByteArray();
 	}
 
@@ -1240,6 +1318,28 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery(
 }
 
 
+QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingDeleteQuery(const QByteArrayList& entityIds) const
+{
+	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+	if (!useTenantBindings || entityIds.isEmpty()){
+		return QByteArray();
+	}
+
+	QStringList quotedIds;
+	for (const QByteArray& id : entityIds){
+		quotedIds.append(QString("'%1'").arg(SqlEncode(QString::fromUtf8(id))));
+	}
+
+	const QString query = QString("DELETE FROM %1 WHERE \"EntityType\" = '%2' AND \"EntityId\" IN (%3);")
+			.arg(
+					CreateTenantBindingTableName(),
+					SqlEncode(QString::fromUtf8(GetTableName())),
+					quotedIds.join(','));
+
+	return query.toUtf8();
+}
+
+
 // reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 
 QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
@@ -1257,6 +1357,33 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 	QString customColumns = GetCustomColumnsQuery();
 	if (!customColumns.isEmpty()){
 		customColumns = QStringLiteral(", ") + customColumns;
+	}
+
+	if (IsSQLite()){
+		QString query = QString(R"(
+			SELECT
+				root.*,
+				root1."TimeStamp" AS "Added" %4
+			FROM %1"%2" AS root
+			LEFT JOIN (
+				SELECT root1."DocumentId", root1."TimeStamp"
+				FROM %1"%2" AS root1
+				WHERE root1."RevisionInfo" IS NOT NULL
+				  AND CAST(json_extract(root1."RevisionInfo", '$.RevisionNumber') AS INTEGER) = 1
+				ORDER BY root1."TimeStamp" DESC
+				LIMIT 1
+			) AS root1
+			ON root1."DocumentId" = root."DocumentId"
+			%3
+			)")
+				.arg(
+					schema,
+					tableName,
+					joinTablesQuery.isEmpty() ? "" : QString::fromUtf8(joinTablesQuery),
+					customColumns
+					);
+
+		return query;
 	}
 
 	QString query = QStringLiteral(R"(
@@ -1339,6 +1466,23 @@ bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(
 				metaInfo,
 				typeId
 				);
+}
+
+
+bool CSqlDatabaseDocumentDelegateComp::CreatePaginationQuery(int offset, int count, QByteArray& paginationQuery) const
+{
+	paginationQuery.clear();
+
+	if (offset >= 0 && count > 0){
+		if (IsSQLite()){
+			paginationQuery = QString("LIMIT %1 OFFSET %2").arg(count).arg(offset).toUtf8();
+		}
+		else{
+			paginationQuery = QStringLiteral("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count).toUtf8();
+		}
+	}
+
+	return true;
 }
 
 
@@ -1458,10 +1602,12 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 	if (paramIds.contains("TenantFilter")){
 		iprm::TParamsPtr<imtauth::ITenantFilterParam> tenantFilterPtr(&filterParams, "TenantFilter");
 		if (tenantFilterPtr.IsValid()){
-			EnsureTenantBindingTableExists();
-
 			QByteArray tenantId = tenantFilterPtr->GetTenantId();
 			imtauth::TenantFilterMode filterMode = tenantFilterPtr->GetFilterMode();
+			bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+			if (useTenantBindings || !tenantId.isEmpty()){
+				EnsureTenantBindingTableExists();
+			}
 			tenantFilterQuery = CreateTenantBindingFilterQuery(tenantId, filterMode);
 		}
 	}
@@ -1609,6 +1755,94 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(
 
 bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& timeFieldId) const
 {
+	if (IsSQLite()){
+		QString addedStrQuery = QString(R"((SELECT "TimeStamp" FROM "%1" as temp WHERE %2 = 1 AND root."DocumentId" = temp."DocumentId" LIMIT 1))")
+		.arg(
+			qPrintable(*m_tableNameAttrPtr),
+			CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int)
+			);
+
+		switch (timeFilter.GetTimeUnit()){
+		case imtbase::ITimeFilterParam::TU_CUSTOM:
+			break;
+		case imtbase::ITimeFilterParam::TU_HOUR:
+			switch (timeFilter.GetInterpretationMode()){
+			case imtbase::ITimeFilterParam::IM_CURRENT:
+				timeFilterQuery += QString(R"((strftime('%Y-%m-%d %H', %1) = strftime('%Y-%m-%d %H', 'now')))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_LAST:
+				timeFilterQuery += QString(R"((strftime('%Y-%m-%d %H', %1) = strftime('%Y-%m-%d %H', datetime('now', '-1 hour'))))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_FOR:
+				timeFilterQuery += QString(R"((%1 >= datetime('now', '-1 hour') AND %1 <= datetime('now')))").arg(addedStrQuery);
+				break;
+			}
+			break;
+		case imtbase::ITimeFilterParam::TU_DAY:
+			switch (timeFilter.GetInterpretationMode()){
+			case imtbase::ITimeFilterParam::IM_CURRENT:
+				timeFilterQuery += QString(R"((date(%1) = date('now')))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_LAST:
+				timeFilterQuery += QString(R"((date(%1) = date('now', '-1 day')))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_FOR:
+				timeFilterQuery += QString(R"((%1 >= datetime('now', '-1 day') AND %1 <= datetime('now')))").arg(addedStrQuery);
+				break;
+			}
+			break;
+		case imtbase::ITimeFilterParam::TU_WEEK:
+			switch (timeFilter.GetInterpretationMode()){
+			case imtbase::ITimeFilterParam::IM_CURRENT:
+				timeFilterQuery += QString(R"(strftime('%Y-%W', %1) = strftime('%Y-%W', 'now'))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_LAST:
+				timeFilterQuery += QString(R"(strftime('%Y-%W', %1) = strftime('%Y-%W', datetime('now', '-7 days')))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_FOR:
+				timeFilterQuery += QString(R"((%1 >= datetime('now', '-7 days') AND %1 <= datetime('now')))").arg(addedStrQuery);
+				break;
+			}
+			break;
+		case imtbase::ITimeFilterParam::TU_MONTH:
+			switch (timeFilter.GetInterpretationMode()){
+			case imtbase::ITimeFilterParam::IM_CURRENT:
+				timeFilterQuery += QString(R"(strftime('%Y-%m', %1) = strftime('%Y-%m', 'now'))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_LAST:
+				timeFilterQuery += QString(R"(strftime('%Y-%m', %1) = strftime('%Y-%m', datetime('now', '-1 month')))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_FOR:
+				timeFilterQuery += QString(R"((%1 >= datetime('now', '-1 month') AND %1 <= datetime('now')))").arg(addedStrQuery);
+				break;
+			}
+			break;
+		case imtbase::ITimeFilterParam::TU_YEAR:
+			switch (timeFilter.GetInterpretationMode()){
+			case imtbase::ITimeFilterParam::IM_CURRENT:
+				timeFilterQuery += QString(R"(strftime('%Y', %1) = strftime('%Y', 'now'))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_LAST:
+				timeFilterQuery += QString(R"(strftime('%Y', %1) = strftime('%Y', datetime('now', '-1 year')))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_FOR:
+				timeFilterQuery += QString(R"((%1 >= datetime('now', '-1 year') AND %1 <= datetime('now')))").arg(addedStrQuery);
+				break;
+			}
+			break;
+		}
+
+		if (timeFilterQuery.isEmpty()){
+			imtbase::CTimeRange timeRange = timeFilter.GetTimeRange();
+			if (!timeRange.IsNull()){
+				timeFilterQuery += QString(R"(date(%0) >= date('%1') AND date(%0) <= date('%2'))")
+				.arg(addedStrQuery, timeRange.GetBeginTime().toString(Qt::ISODate), timeRange.GetEndTime().toString(Qt::ISODate));
+			}
+		}
+
+		return true;
+	}
+
 	switch (timeFilter.GetTimeUnit()){
 	case imtbase::ITimeFilterParam::TU_CUSTOM:
 		break;
@@ -1695,9 +1929,17 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITim
 
 bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const
 {
-	filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter, CComplexCollectionFilterConverter::SC_POSTGRES);
-	if (!filterQuery.isEmpty()) {
-		SubstituteFieldIds(filterQuery);
+	if (IsSQLite()){
+		filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter);
+		if (!filterQuery.isEmpty()){
+			SubstituteFieldIds(filterQuery, false);
+		}
+	}
+	else{
+		filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter, CComplexCollectionFilterConverter::SC_POSTGRES);
+		if (!filterQuery.isEmpty()) {
+			SubstituteFieldIds(filterQuery);
+		}
 	}
 
 	return true;
@@ -1866,6 +2108,38 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 		schemaPrefix = QStringLiteral("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
 	}
 
+	if (IsSQLite()){
+		return QString(R"(
+		SELECT
+			root.*,
+			root1."TimeStamp" AS "Added"
+		FROM %0 "%1" AS root
+		LEFT JOIN %0 "%1" AS root1
+			ON root1."%3" = root."%3"
+		   AND %6 = 1
+		WHERE (%2)
+		  AND root."%3" = '%4'
+		ORDER BY %5 DESC;
+	)")
+				.arg(
+					schemaPrefix,
+					QString::fromUtf8(*m_tableNameAttrPtr),
+					documentFilterQuery,
+					QString::fromUtf8(s_documentIdColumn),
+					QString::fromUtf8(objectId),
+					CreateJsonExtractSql(
+						s_revisionInfoColumn,
+						s_revisionNumberKey,
+						QMetaType::Int,
+						"root"),
+					CreateJsonExtractSql(
+						s_revisionInfoColumn,
+						s_revisionNumberKey,
+						QMetaType::Int,
+						"root1"))
+				.toUtf8();
+	}
+
 	return QStringLiteral(R"(
 			SELECT root.*, root1."TimeStamp" as "Added"
 			FROM %1 "%2" as root
@@ -2007,6 +2281,17 @@ bool CSqlDatabaseDocumentDelegateComp::IsArrayOperation(
 				);
 
 	return reFunctions.match(query).hasMatch();
+}
+
+
+bool CSqlDatabaseDocumentDelegateComp::IsSQLite() const
+{
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return false;
+	}
+
+	return m_databaseEngineCompPtr->GetDatabaseDriverId().compare(
+				QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
 }
 
 

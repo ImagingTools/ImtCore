@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CTenantCollectionControllerComp.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
 // ACF includes
@@ -17,12 +18,12 @@ namespace imtauthgql
 {
 
 
-// reimplemented (sdl::imtauth::Tenants::CTenantCollectionControllerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CTenantCollectionControllerCompBase)
 
 bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::imtauth::Tenants::CGetTenantListGqlRequest& getTenantListRequest,
-			sdl::imtauth::Tenants::CTenantItemData::V1_0& representationObject,
+			const sdl::V1_0::imtauth::CGetTenantListGqlRequest& getTenantListRequest,
+			sdl::V1_0::imtauth::CTenantItemData& representationObject,
 			QString& errorMessage) const
 {
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
@@ -40,7 +41,7 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtauth::Tenants::GetTenantListRequestInfo requestInfo = getTenantListRequest.GetRequestInfo();
+	sdl::V1_0::imtauth::GetTenantListRequestInfo requestInfo = getTenantListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.id = QByteArray(objectId);
@@ -86,16 +87,18 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.membersCount = activeMembersCount;
 	}
 
+	QString tenantRelationScope;
 	if (requestInfo.items.isTenantRelationScopeRequested){
 		QVariant scope = objectCollectionIterator.GetElementInfo("TenantRelationScope");
 		if (scope.isValid() && !scope.isNull()){
-			representationObject.tenantRelationScope = scope.toString();
+			tenantRelationScope = scope.toString();
+			representationObject.tenantRelationScope = tenantRelationScope;
 		}
 	}
 
-	if ((requestInfo.items.isInvitationIdRequested || requestInfo.items.isInvitedByNameRequested)
-		&& representationObject.tenantRelationScope == "Invited"
-		&& m_invitationManagerCompPtr.IsValid()){
+	if ((requestInfo.items.isInvitationIdRequested || requestInfo.items.isInvitedByNameRequested) &&
+				tenantRelationScope== "Invited" &&
+				m_invitationManagerCompPtr.IsValid()){
 		const imtgql::IGqlContext* gqlContextPtr = getTenantListRequest.GetRequestContext();
 		if (gqlContextPtr != nullptr){
 			QByteArray userId = gqlContextPtr->GetUserId();
@@ -111,6 +114,14 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 				}
 			}
 		}
+	}
+
+	if (requestInfo.items.isParentTenantIdRequested){
+		representationObject.parentTenantId = tenantInfoPtr->GetParentTenantId();
+	}
+
+	if (requestInfo.items.isIsSystemTenantRequested){
+		representationObject.isSystemTenant = (tenantInfoPtr->GetTenantId() == imtauth::GetSystemTenantId());
 	}
 
 	return true;
@@ -136,12 +147,14 @@ void CTenantCollectionControllerComp::SetAdditionalFilters(
 		return;
 	}
 
-	if (userInfoPtr->IsAdmin()){
-		// return;
-	}
-
 	QByteArray userId = gqlContextPtr->GetUserId();
 	if (userId.isEmpty()){
+		return;
+	}
+
+	// System administrators get a global view: do not restrict the tenant list
+	// to the caller's own memberships/ownership.
+	if (userInfoPtr->IsAdmin()){
 		return;
 	}
 

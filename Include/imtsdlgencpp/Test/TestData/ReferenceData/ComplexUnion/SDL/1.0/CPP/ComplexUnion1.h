@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ComplexUnion1_fwd.h"
 
 #ifdef QT_QML_LIB
 #include <QtQml/QQmlEngine>
@@ -14,7 +15,7 @@
 #include <QtCore/QMetaEnum>
 
 // ACF includes
-#include <istd/TSharedNullable.h>
+#include <istd/TNullableValue.h>
 
 // ImtCore includes
 #include <imtbase/CItemModelBase.h>
@@ -25,8 +26,13 @@
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
 
-namespace sdl::complextest::ComplexUnion1
+namespace sdl::V1_0::complextest
 {
+
+
+inline namespace ComplexUnion1SdlEnums
+{
+
 
 
 Q_NAMESPACE
@@ -408,118 +414,67 @@ signals:
 
 
 
+} // inline namespace ComplexUnion1SdlEnums
+
+
 class CPoint
 {
 public:
-	enum ProtocolVersion
+	struct PointFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString X = "X";
+		static const inline QString Y = "Y";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct PointFields
-		{
-			static const inline QString X = "X";
-			static const inline QString Y = "Y";
-		};
+	istd::TNullableValue<double> X;
+	istd::TNullableValue<double> Y;
 
-		istd::TSharedNullable<double> X;
-		istd::TSharedNullable<double> Y;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
-
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
+	[[nodiscard]] bool operator==(const CPoint& other) const;
+	[[nodiscard]] bool operator!=(const CPoint& other) const {return !(operator==(other));}
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
-
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 };
 
 class CGeometry
 {
 public:
-	enum ProtocolVersion
+	struct GeometryFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString GeometryType = "GeometryType";
+		static const inline QString Radius = "Radius";
+		static const inline QString Points = "Points";
+		static const inline QString RequiredPoints = "RequiredPoints";
+		static const inline QString OptionalPoints = "OptionalPoints";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct GeometryFields
-		{
-			static const inline QString GeometryType = "GeometryType";
-			static const inline QString Radius = "Radius";
-			static const inline QString Points = "Points";
-			static const inline QString RequiredPoints = "RequiredPoints";
-			static const inline QString OptionalPoints = "OptionalPoints";
-		};
+	istd::TNullableValue<GeometryType> GeometryType;
+	istd::TNullableValue<double> Radius;
+	istd::TNullableValue<imtsdl::TElementList<CPoint>> Points;
+	istd::TNullableValue<imtsdl::TElementList<CPoint>> RequiredPoints;
+	istd::TNullableValue<imtsdl::TElementList<CPoint>> OptionalPoints;
 
-		istd::TSharedNullable<GeometryType> GeometryType;
-		istd::TSharedNullable<double> Radius;
-		istd::TSharedNullable<imtsdl::TElementList<CPoint::V1_0>> Points;
-		istd::TSharedNullable<imtsdl::TElementList<CPoint::V1_0>> RequiredPoints;
-		istd::TSharedNullable<imtsdl::TElementList<CPoint::V1_0>> OptionalPoints;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
-
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
+	[[nodiscard]] bool operator==(const CGeometry& other) const;
+	[[nodiscard]] bool operator!=(const CGeometry& other) const {return !(operator==(other));}
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
-
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 };
 
 
@@ -563,26 +518,26 @@ protected:
 
 
 
-class CPointObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion1::CPoint::V1_0, sdl::complextest::ComplexUnion1::CPointObject>
+class CPointObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CPoint, sdl::V1_0::complextest::CPointObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion1::CPoint::V1_0, sdl::complextest::ComplexUnion1::CPointObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CPoint, sdl::V1_0::complextest::CPointObject> BaseClass;
 
 	explicit CPointObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion1::CPointObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion1::CPointObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CPointObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CPointObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion1::CPointObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CPointObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion1::CPointObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion1::CPointObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CPointObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CPointObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -658,26 +613,26 @@ protected:
 
 
 
-class CGeometryObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion1::CGeometry::V1_0, sdl::complextest::ComplexUnion1::CGeometryObject>
+class CGeometryObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CGeometry, sdl::V1_0::complextest::CGeometryObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion1::CGeometry::V1_0, sdl::complextest::ComplexUnion1::CGeometryObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CGeometry, sdl::V1_0::complextest::CGeometryObject> BaseClass;
 
 	explicit CGeometryObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion1::CGeometryObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion1::CGeometryObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CGeometryObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CGeometryObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion1::CGeometryObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CGeometryObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion1::CGeometryObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion1::CGeometryObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CGeometryObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CGeometryObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -688,7 +643,7 @@ signals:
 
 
 #ifdef QT_QML_LIB
-[[maybe_unused]] static void RegisterQmlTypes()
+[[maybe_unused]] static void RegisterComplexUnion1QmlTypes()
 {
 	qmlRegisterType<CPointObject>("complextestComplexUnion1Sdl", 1, 0, "Point");
 	qmlRegisterType<CGeometryObject>("complextestComplexUnion1Sdl", 1, 0, "Geometry");
@@ -730,10 +685,8 @@ signals:
 }
 #endif
 
-} // namespace sdl::complextest::ComplexUnion1
+} // namespace sdl::V1_0::complextest
 
 
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion1::CPoint::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion1::CPoint);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion1::CGeometry::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion1::CGeometry);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CPoint);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CGeometry);

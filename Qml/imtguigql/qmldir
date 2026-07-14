@@ -1,5 +1,7 @@
 module imtguigql
 
+RemoteCollectionChangeListener 1.0 RemoteCollectionChangeListener.qml
+
 GqlDocumentDataController 1.0 GqlDocumentDataController.qml
 ComboBoxGql 1.0 ComboBoxGql.qml
 ComboBoxGqlLegacy 1.0 ComboBoxGqlLegacy.qml
@@ -37,3 +39,6 @@ GqlSingleDocumentPageView 1.0 GqlSingleDocumentPageView.qml
 RemoteCollectionViewDialog 1.0 RemoteCollectionViewDialog.qml
 SelectableCollectionEditor 1.0 SelectableCollectionEditor.qml
 FilterableSelectGqlDataProvider 1.0 FilterableSelectGqlDataProvider.qml
+GqlBasedItemSelectElementView 1.0 GqlBasedItemSelectElementView.qml
+FileSystemBrowserDialog 1.0 FileSystemBrowserDialog.qml
+ServerPathPicker 1.0 ServerPathPicker.qml

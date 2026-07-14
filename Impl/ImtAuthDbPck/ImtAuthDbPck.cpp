@@ -102,6 +102,11 @@ I_EXPORT_COMPONENT(
 			"Tenant Membership Database Delegate");
 
 I_EXPORT_COMPONENT(
+			TenantEntityBindingDatabaseDelegate,
+			"SQL delegate for tenant entity bindings (hydration, INSERT/DELETE)",
+			"Tenant Entity Binding Database Delegate");
+
+I_EXPORT_COMPONENT(
 			TenantInvitationDatabaseDelegate,
 			"SQL delegate for tenant invitations (hydration, INSERT/UPDATE/DELETE)",
 			"Tenant Invitation Database Delegate");
@@ -110,6 +115,49 @@ I_EXPORT_COMPONENT(
 			ExternalIdentityDatabaseDelegate,
 			"SQL delegate for external identities (hydration, INSERT/UPDATE/DELETE)",
 			"External Identity Database Delegate");
+			CrossOrgGrantDatabaseDelegate,
+			"SQL delegate for cross-org grants (hydration, INSERT/UPDATE/DELETE)",
+			"Cross Org Grant Database Delegate");
+
+I_EXPORT_COMPONENT(
+			ContractDatabaseDelegate,
+			"SQL delegate for cooperation contracts (hydration, INSERT/UPDATE/DELETE)",
+			"Contract Database Delegate");
+
+I_EXPORT_COMPONENT(
+			TenantConnectionRequestDatabaseDelegate,
+			"SQL delegate for tenant connection requests (hydration, INSERT/UPDATE/DELETE)",
+			"Tenant Connection Request Database Delegate");
+
+I_EXPORT_COMPONENT(
+			TenantConnectionCodeDatabaseDelegate,
+			"SQL delegate for tenant connection codes (hydration, INSERT/UPDATE/DELETE)",
+			"Tenant Connection Code Database Delegate");
+
+I_EXPORT_COMPONENT(
+			TenantConnectionDatabaseDelegate,
+			"SQL delegate for tenant connections (hydration, INSERT/UPDATE/DELETE)",
+			"Tenant Connection Database Delegate");
+
+I_EXPORT_COMPONENT(
+			TenantRelationshipProposalDatabaseDelegate,
+			"SQL delegate for relationship proposals (hydration, INSERT/UPDATE/DELETE)",
+			"Tenant Relationship Proposal Database Delegate");
+
+I_EXPORT_COMPONENT(
+			TenantRelationshipDatabaseDelegate,
+			"SQL delegate for tenant relationships (hydration, INSERT/UPDATE/DELETE)",
+			"Tenant Relationship Database Delegate");
+
+I_EXPORT_COMPONENT(
+			CrossTenantMessageDatabaseDelegate,
+			"SQL delegate for cross-tenant messages (hydration, INSERT/UPDATE/DELETE)",
+			"Cross Tenant Message Database Delegate");
+
+I_EXPORT_COMPONENT(
+			OrderRequestDatabaseDelegate,
+			"SQL delegate for order requests (hydration, INSERT/UPDATE/DELETE)",
+			"Order Request Database Delegate");
 
 } // namespace ImtAuthDbPck
 

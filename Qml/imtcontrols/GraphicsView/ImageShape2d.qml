@@ -3,16 +3,46 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 
 BoundingBox {
-
+	id: root
 	property real width: 0;
 	property real height: 0;
 
 	property string imageSource: "";
 
+	/*!
+	 * Optional reference to a CQmlImageShape C++ object.
+	 * When set, the image is loaded from the IBitmap-backed image provider.
+	 */
+	property var bitmapShape: null;
+
+	onBitmapShapeChanged: {
+		if(bitmapShape && bitmapShape.imageUrl){
+			root.imageSource = bitmapShape.imageUrl;
+			if(viewItem){
+				viewItem.loadImage(root.imageSource);
+				viewItem.requestPaint();
+			}
+		}
+	}
+
+	property Connections connections: Connections {
+		target: root.bitmapShape
+		enabled: root.bitmapShape !== null
+		function onImageChanged(){
+			if(root.bitmapShape.imageUrl){
+				root.imageSource = root.bitmapShape.imageUrl;
+				if(root.viewItem){
+					root.viewItem.loadImage(root.imageSource);
+					root.viewItem.requestPaint();
+				}
+			}
+		}
+	}
+
 	function draw(ctx, transformMatrixArg) {
 		let params_ = getParams();
 		if(params_.source !== undefined){
-			imageSource = params_.source
+			root.imageSource = params_.source
 		}
 		let x1 = params_.point !== undefined ? params_.point.x : points[0].x;
 		let y1 = params_.point !== undefined ? params_.point.y : points[0].y;
@@ -32,10 +62,10 @@ BoundingBox {
 		height_ = y2 - y1
 
 		if(width_ > 0 && height_ > 0){
-			ctx.drawImage(imageSource, x1,y1, width_, height_)
+			ctx.drawImage(root.imageSource, x1,y1, width_, height_)
 		}
 		else {
-			ctx.drawImage(imageSource, x1,y1)
+			ctx.drawImage(root.imageSource, x1,y1)
 		}
 	}
 

@@ -42,6 +42,7 @@
 #include <imtauthgql/CClientRequestRoleInfoProviderComp.h>
 #include <imtauthgql/CClientRequestGroupInfoProviderComp.h>
 #include <imtauthgql/CTokenBasedPermissionsProviderComp.h>
+#include <imtauthgql/CPermissionsProviderComp.h>
 #include <imtauthgql/CPersonalAccessTokenControllerComp.h>
 #include <imtauthgql/CClientRequestPersonalAccessTokenManagerComp.h>
 #include <imtauthgql/CTenantCollectionControllerComp.h>
@@ -56,10 +57,18 @@
 #include <imtauthgql/CTenantManagerControllerComp.h>
 #include <imtauthgql/CTenantMembershipManagerControllerComp.h>
 #include <imtauthgql/CTenantNotificationPublisherComp.h>
+#include <imtauthgql/CCrossTenantMessageNotificationPublisherComp.h>
+#include <imtauthgql/CConnectionCodesNotificationPublisherComp.h>
+#include <imtauthgql/CTenantConnectionsSelectControllerComp.h>
+#include <imtauthgql/CTenantRelationshipsSelectControllerComp.h>
 #include <imtauthgql/CRemoteTenantCollectionDocumentServiceControllerComp.h>
 #include <imtauthgql/CRoleCollectionDocumentServiceComp.h>
+#include <imtauthgql/CRelationshipCollectionDocumentServiceComp.h>
 #include <imtauthgql/CGroupCollectionDocumentServiceComp.h>
 #include <imtauthgql/CUserCollectionDocumentServiceComp.h>
+#include <imtauthgql/CCrossOrgGrantCollectionDocumentServiceComp.h>
+#include <imtauthgql/CCrossOrgGrantItemInfoProviderComp.h>
+#include <imtauthgql/CTenantRelationshipItemInfoProviderComp.h>
 
 
 /**
@@ -104,6 +113,7 @@ typedef imtauthgql::CClientRequestUserInfoProviderComp ClientRequestUserInfoProv
 typedef imtauthgql::CClientRequestRoleInfoProviderComp ClientRequestRoleInfoProvider;
 typedef imtauthgql::CClientRequestGroupInfoProviderComp ClientRequestGroupInfoProvider;
 typedef imtauthgql::CTokenBasedPermissionsProviderComp ClientRequestTokenBasedPermissionsProvider;
+typedef imtauthgql::CPermissionsProviderComp PermissionsProvider;
 typedef imtauthgql::CPersonalAccessTokenControllerComp PersonalAccessTokenController;
 typedef icomp::TModelCompWrap<imtauthgql::CClientRequestPersonalAccessTokenManagerComp> ClientRequestPersonalAccessTokenManager;
 typedef imtauthgql::CTenantCollectionControllerComp TenantCollectionController;
@@ -118,10 +128,18 @@ typedef imtauthgql::CRemoteTenantMembershipManagerControllerComp RemoteTenantMem
 typedef imtauthgql::CTenantManagerControllerComp TenantManagerController;
 typedef imtauthgql::CTenantMembershipManagerControllerComp TenantMembershipManagerController;
 typedef imtauthgql::CTenantNotificationPublisherComp TenantNotificationPublisher;
+typedef imtauthgql::CCrossTenantMessageNotificationPublisherComp CrossTenantMessageNotificationPublisher;
+typedef imtauthgql::CConnectionCodesNotificationPublisherComp ConnectionCodesNotificationPublisher;
+typedef imtauthgql::CTenantConnectionsSelectControllerComp TenantConnectionsSelectController;
+typedef imtauthgql::CTenantRelationshipsSelectControllerComp TenantRelationshipsSelectController;
 typedef imtauthgql::CRemoteTenantCollectionDocumentServiceControllerComp RemoteTenantCollectionDocumentService;
 typedef imtauthgql::CRoleCollectionDocumentServiceComp RoleCollectionDocumentService;
+typedef imtauthgql::CRelationshipCollectionDocumentServiceComp RelationshipCollectionDocumentService;
 typedef imtauthgql::CGroupCollectionDocumentServiceComp GroupCollectionDocumentService;
 typedef imtauthgql::CUserCollectionDocumentServiceComp UserCollectionDocumentService;
+typedef imtauthgql::CCrossOrgGrantCollectionDocumentServiceComp CrossOrgGrantCollectionDocumentService;
+typedef imtauthgql::CCrossOrgGrantItemInfoProviderComp CrossOrgGrantItemInfoProvider;
+typedef imtauthgql::CTenantRelationshipItemInfoProviderComp TenantRelationshipItemInfoProvider;
 
 
 } // namespace ImtAuthGqlPck

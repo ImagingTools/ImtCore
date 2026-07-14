@@ -57,6 +57,7 @@ class TextInput extends Item {
         selectedText: { type: String, value: ''},
         selectByMouse: { type: Bool, value: true},
         passwordCharacter: { type: String, value: ''},
+        cursorPosition: { type: Int, value: 0},
 
         textChanged: {type:Signal, args:[]},
         colorChanged: {type:Signal, args:[]},
@@ -85,6 +86,7 @@ class TextInput extends Item {
         selectedTextChanged: {type:Signal, args:[]},
         selectByMouseChanged: {type:Signal, args:[]},
         passwordCharacterChanged: {type:Signal, args:[]},
+        cursorPositionChanged: {type:Signal, args:[]},
 
         accepted: {type:Signal, args:[]},
         editingFinished: {type:Signal, args:[]},
@@ -111,6 +113,11 @@ class TextInput extends Item {
 
         impl.onfocus = ()=>{
             this.forceActiveFocus()
+            if(!this.activeFocus) this.activeFocus = true
+
+            if(this.parent instanceof JQModules.QtQuick.FocusScope && !this.parent.activeFocus){
+                this.parent.activeFocus = true
+            }
         }
 
         impl.onblur = ()=>{
@@ -118,34 +125,34 @@ class TextInput extends Item {
         }
 
         impl.onkeydown = (e)=>{
-            let selection = document.getSelection()
+            this.__syncSelectionFromDOM()
 
-            if(selection.rangeCount && this.text !== ''){
-                let range = selection.getRangeAt(0)
-
-                this.selectionStart = range.startOffset
-                this.selectionEnd = range.endOffset
-            } else {
-                this.selectionStart = 0
-                this.selectionEnd = 0
-            }
-
-            if(e.code === QtEnums.Key_C && e.ctrlKey){
+            if(e.keyCode === QtEnums.Key_C && e.ctrlKey){
                 e.preventDefault()
                 e.stopPropagation()
                 this.copy()
-            } else if(e.code === QtEnums.Key_V && e.ctrlKey){
+            } else if(e.keyCode === QtEnums.Key_V && e.ctrlKey){
                 e.preventDefault()
                 e.stopPropagation()
                 this.paste()
-            } else if(e.code === QtEnums.Key_X && e.ctrlKey){
+            } else if(e.keyCode === QtEnums.Key_X && e.ctrlKey){
                 e.preventDefault()
                 e.stopPropagation()
                 this.cut()
-            } else if(e.code === QtEnums.Key_A && e.ctrlKey){
+            } else if(e.keyCode === QtEnums.Key_A && e.ctrlKey){
                 e.preventDefault()
                 e.stopPropagation()
                 this.selectAll()
+            } else if(e.key === QtEnums.Key_Backspace){
+                e.preventDefault()
+                e.stopPropagation()
+                this.__deleteWithDirection(false)
+                this.textEdited()
+            } else if(e.key === QtEnums.Key_Delete){
+                e.preventDefault()
+                e.stopPropagation()
+                this.__deleteWithDirection(true)
+                this.textEdited()
             } else if(e.key === QtEnums.Key_Enter){
                 e.preventDefault()
                 e.stopPropagation()
@@ -165,16 +172,33 @@ class TextInput extends Item {
                 }
             }
         }
+
+        impl.onbeforeinput = ()=>{
+            this.__syncSelectionFromDOM()
+            this.__beforeInputSelectionStart = this.selectionStart
+            this.__beforeInputSelectionEnd = this.selectionEnd
+        }
+
         impl.oninput = (e)=>{
+            let inputSelectionStart = Number.isFinite(this.__beforeInputSelectionStart) ? this.__beforeInputSelectionStart : this.selectionStart
+            let inputSelectionEnd = Number.isFinite(this.__beforeInputSelectionEnd) ? this.__beforeInputSelectionEnd : this.selectionEnd
+            this.__beforeInputSelectionStart = undefined
+            this.__beforeInputSelectionEnd = undefined
+
             let selection = document.getSelection()
             selection.removeAllRanges()
 
             let buff = this.text.split('') 
             switch(e.inputType){
                 case 'insertText': {
-                    buff.splice(this.selectionStart, this.selectionEnd-this.selectionStart, e.data)
-                    this.text = buff.join('')
-                    this.select(this.selectionEnd+1-(this.selectionEnd-this.selectionStart), this.selectionEnd+1-(this.selectionEnd-this.selectionStart))
+                    let previousText = this.text
+                    let insertedText = e.data == null ? '' : e.data
+                    let result = this.__applyTextInsertWithLimit(inputSelectionStart, inputSelectionEnd, insertedText)
+                    this.text = result.newText
+                    if(this.text === previousText){
+                        this.__renderImplText()
+                    }
+                    this.select(Math.min(result.cursor, this.text.length), Math.min(result.cursor, this.text.length))
                     break
                 }
                 case 'insertFromPaste': {
@@ -186,26 +210,36 @@ class TextInput extends Item {
                     break
                 }
                 case 'deleteContentBackward': {
-                    let data = []
-                    if(this.selectionStart === this.selectionEnd){
-                        data = buff.splice(this.selectionStart-1, this.selectionEnd-(this.selectionStart-1))
+                    let cursor = inputSelectionStart
+                    if(inputSelectionStart === inputSelectionEnd){
+                        if(inputSelectionStart === 0){
+                            this.__renderImplText()
+                            this.select(0, 0)
+                            break
+                        }
+                        buff.splice(inputSelectionStart-1, 1)
+                        cursor = inputSelectionStart-1
                     } else {
-                        data = buff.splice(this.selectionStart, this.selectionEnd-this.selectionStart)
+                        buff.splice(inputSelectionStart, inputSelectionEnd-inputSelectionStart)
                     }
                     this.text = buff.join('')
-                    this.select(this.selectionEnd, this.selectionEnd)
+                    this.select(cursor, cursor)
                     break
                 }
                 case 'deleteContentForward': {
-                    let data = []
-                    if(this.selectionStart === this.selectionEnd){
-                        data = buff.splice(this.selectionStart, this.selectionEnd+1-this.selectionStart)
+                    let cursor = inputSelectionStart
+                    if(inputSelectionStart === inputSelectionEnd){
+                        if(inputSelectionStart >= buff.length){
+                            this.__renderImplText()
+                            this.select(inputSelectionStart, inputSelectionStart)
+                            break
+                        }
+                        buff.splice(inputSelectionStart, 1)
                     } else {
-                        data = buff.splice(this.selectionStart, this.selectionEnd-this.selectionStart)
+                        buff.splice(inputSelectionStart, inputSelectionEnd-inputSelectionStart)
                     }
                     this.text = buff.join('')
-                    let offset = data.length > 1 ? data.length : 0
-                    this.select(this.selectionEnd-offset, this.selectionEnd-offset)
+                    this.select(cursor, cursor)
                     break
                 }
             }
@@ -214,6 +248,12 @@ class TextInput extends Item {
         }
 
         return impl
+    }
+
+    __onMouseDown(mouse){
+        if(this.activeFocusOnPress && this.enabled && this.visible && this.__impl){
+            this.__impl.focus()
+        }
     }
 
     __setImplStyle(style){
@@ -244,17 +284,99 @@ class TextInput extends Item {
         }
     }
 
+    __getMaximumLength(){
+        let maximumLength = Number.isFinite(this.maximumLength) ? Math.floor(this.maximumLength) : 32767
+        if(maximumLength < 0) maximumLength = 0
+        return maximumLength
+    }
+
+    __applyTextInsertWithLimit(start, end, insertedText){
+        let safeStart = Math.max(0, Math.min(start, this.text.length))
+        let safeEnd = Math.max(safeStart, Math.min(end, this.text.length))
+        let maximumLength = this.__getMaximumLength()
+        let availableLength = maximumLength - (this.text.length - (safeEnd - safeStart))
+        if(availableLength < 0) availableLength = 0
+
+        let safeInsertedText = insertedText == null ? '' : insertedText.toString()
+        if(safeInsertedText.length > availableLength){
+            safeInsertedText = safeInsertedText.slice(0, availableLength)
+        }
+
+        let newText = this.text.slice(0, safeStart) + safeInsertedText + this.text.slice(safeEnd)
+        let cursor = safeStart + safeInsertedText.length
+        return { newText, cursor }
+    }
+
+    __syncSelectionFromDOM(){
+        let selection = document.getSelection()
+        if(!selection || !selection.rangeCount){
+            this.selectionStart = 0
+            this.selectionEnd = 0
+            return
+        }
+
+        let range = selection.getRangeAt(0)
+        if(!this.__impl.contains(range.startContainer) || !this.__impl.contains(range.endContainer)){
+            this.selectionStart = 0
+            this.selectionEnd = 0
+            return
+        }
+
+        let start = range.startOffset
+        let end = range.endOffset
+        if(range.startContainer === this.__impl){
+            start = range.startOffset === 0 ? 0 : this.text.length
+        }
+        if(range.endContainer === this.__impl){
+            end = range.endOffset === 0 ? 0 : this.text.length
+        }
+
+        this.selectionStart = Math.max(0, Math.min(start, this.text.length))
+        this.selectionEnd = Math.max(this.selectionStart, Math.min(end, this.text.length))
+    }
+
+    __deleteWithDirection(isForward){
+        let start = this.selectionStart
+        let end = this.selectionEnd
+
+        if(start === end){
+            if(isForward){
+                if(start >= this.text.length){
+                    this.select(start, start)
+                    return
+                }
+                end = start + 1
+            } else {
+                if(start === 0){
+                    this.select(0, 0)
+                    return
+                }
+                start = start - 1
+            }
+        }
+
+        this.text = this.text.slice(0, start) + this.text.slice(end, this.text.length)
+        this.select(start, start)
+    }
+
+    SLOT_readOnlyChanged(oldValue, newValue){
+        this.__impl.setAttribute('contenteditable', !newValue)
+    }
+
     SLOT_validatorChanged(oldValue, newValue){
         this.__checkValidator()
     }
 
+    SLOT_maximumLengthChanged(oldValue, newValue){
+        let maximumLength = this.__getMaximumLength()
+        if(this.text.length > maximumLength){
+            this.text = this.text.slice(0, maximumLength)
+            this.select(maximumLength, maximumLength)
+        }
+    }
+
     SLOT_focusChanged(oldValue, newValue){
         super.SLOT_focusChanged(oldValue, newValue)
-        if(newValue){
-            if(!(this.parent instanceof JQModules.QtQuick.FocusScope)){
-                this.activeFocus = true
-            }
-        }
     }
 
     SLOT_horizontalAlignmentChanged(oldValue, newValue){
@@ -341,7 +463,7 @@ class TextInput extends Item {
         }
     }
 
-    SLOT_textChanged(oldValue, newValue){
+    __renderImplText(){
         if(this.text === ''){
             this.__impl.innerHTML = '&#8203'
             return
@@ -352,10 +474,16 @@ class TextInput extends Item {
         } else {
             this.__impl.innerText = this.text
         }
+    }
 
-        if(this.activeFocus){
-            this.select(this.text.length-1, this.text.length)
+    SLOT_textChanged(oldValue, newValue){
+        let maximumLength = this.__getMaximumLength()
+        if(this.text.length > maximumLength){
+            this.text = this.text.slice(0, maximumLength)
+            return
         }
+
+        this.__renderImplText()
 
         this.__checkValidator()
 
@@ -411,7 +539,8 @@ class TextInput extends Item {
         return this.text.slice(start, end)
     }
     insert(position, text){
-        this.text = this.text.slice(0, position) + text + this.text.slice(position, this.text.length)
+        let result = this.__applyTextInsertWithLimit(position, position, text)
+        this.text = result.newText
     }
     isRightToLeft(start, end){
 
@@ -421,10 +550,9 @@ class TextInput extends Item {
     }
     paste(){
         navigator.clipboard.readText().then((text) => {
-            let buff = this.text.split('')
-            let replaced = buff.splice(this.selectionStart, this.selectionEnd-this.selectionStart, text)
-            this.text = buff.join('')
-            this.select(this.selectionEnd-replaced.length+text.length, this.selectionEnd-replaced.length+text.length)
+            let result = this.__applyTextInsertWithLimit(this.selectionStart, this.selectionEnd, text)
+            this.text = result.newText
+            this.select(result.cursor, result.cursor)
         })
     }
     positionAt(x, y, position){
@@ -463,6 +591,21 @@ class TextInput extends Item {
     }
     undo(){
 
+    }
+
+    __onMouseDown(mouse){
+        if(!this.enabled || !this.visible) return
+
+        if(!mouse.target){
+            mouse.target = this
+        }
+    }
+    __onMouseUp(mouse){
+        if(!this.enabled || !this.visible) return
+
+        if(mouse.target === this){
+            mouse.target = null
+        }
     }
 
     __destroy(){

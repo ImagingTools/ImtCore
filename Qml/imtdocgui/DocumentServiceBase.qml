@@ -3,6 +3,19 @@ import QtQuick 2.12
 QtObject {
 	id: root
 
+	// Override properties: assign a function to replace the default
+	// implementation of the corresponding operation in subclasses.
+	// The override receives the same arguments as the original function.
+	// Use the handle* helper functions below to process responses.
+	property var getOpenedDocumentListOverride: null
+	property var openDocumentOverride: null
+	property var createDocumentOverride: null
+	property var saveDocumentOverride: null
+	property var closeDocumentOverride: null
+	property var doUndoOverride: null
+	property var doRedoOverride: null
+	property var getUndoInfoOverride: null
+
 	signal startGetOpenedDocumentList()
 	signal openedDocumentListReceived(var documentListInfo)
 	signal openedDocumentListReceiveFailed(string message)
@@ -49,6 +62,7 @@ QtObject {
 	signal startUpdateRepresentation(string documentId, var representation)
 	signal documentRepresentationUpdated(string documentId, var representation)
 	signal updateRepresentationFailed(string documentId, string message)
+	signal updateDocumentFailed(string documentId, string message)
 	signal documentGuiUpdated(string documentId, var representation)
 
 	// callback(undefined) - cancel, callback(false) - close, callback(true) - save and close
@@ -103,6 +117,42 @@ QtObject {
 
 	function saveDocument(documentId){
 		console.warn("saveDocument() should be implemented in a subclass")
+	}
+
+	function setDocumentSaveNameResolver(documentId, resolver){
+		if (!documentId){
+			return
+		}
+		if (typeof resolver === "function"){
+			__internal.documentSaveNameResolvers[documentId] = resolver
+		}
+		else{
+			delete __internal.documentSaveNameResolvers[documentId]
+		}
+	}
+
+	function clearDocumentSaveNameResolver(documentId){
+		if (!documentId){
+			return
+		}
+		delete __internal.documentSaveNameResolvers[documentId]
+	}
+
+	function resolveDocumentNameForSave(documentId, fallbackName){
+		let resolvedName = fallbackName || ""
+		if (!documentId){
+			return resolvedName
+		}
+
+		let resolver = __internal.documentSaveNameResolvers[documentId]
+		if (typeof resolver === "function"){
+			let dynamicName = resolver(documentId)
+			if (dynamicName){
+				resolvedName = dynamicName
+			}
+		}
+
+		return resolvedName
 	}
 
 	function closeDocument(documentId){
@@ -270,6 +320,7 @@ QtObject {
 	function setDocumentObjectId(documentId, objectId){
 		let index = getDocumentIndexByDocumentId(documentId)
 		if (index < 0){
+			__internal.cachedDocumentObjectIds[documentId] = objectId
 			return
 		}
 
@@ -381,7 +432,13 @@ QtObject {
 			else{
 				let decorator = docData.documentDecorator
 				for (let i = 0; i < decorator.registeredViews.length; ++i){
-					decorator.registeredViews[i].setBlockingUpdateModel(false)
+					let cnt = 0
+					if (decorator._internal && decorator._internal.updateCounters && decorator._internal.updateCounters.length > i){
+						cnt = decorator._internal.updateCounters[i] || 0
+					}
+					if (cnt <= 0){
+						decorator.registeredViews[i].setBlockingUpdateModel(false)
+					}
 					decorator.registeredViews[i].doUpdateGui()
 				}
 			}
@@ -477,10 +534,93 @@ QtObject {
 		return typeId in __internal.autoNamedTypeIds && __internal.autoNamedTypeIds[typeId]
 	}
 
+	// ---- Response handler API ----
+	// Call these from custom override implementations or onFinished handlers
+	// to apply the standard DocumentService state transitions.
+
+	function handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty){
+		setAutoNamedTypeId(objectTypeId, hasNameProvider)
+		setDocumentName(documentId, documentName)
+		__internal.createDocumentData(documentId, objectTypeId, false)
+		setDocumentObjectId(documentId, objectId)
+		setDocumentIsLoading(documentId, true)
+		documentOpened(documentId, objectTypeId)
+		if (isDirty)
+			setDocumentIsDirty(documentId, true)
+	}
+
+	function handleDocumentCreated(documentId, objectTypeId, documentName, hasNameProvider, proposedObjectId, isDirty){
+		setAutoNamedTypeId(objectTypeId, hasNameProvider)
+		setDocumentName(documentId, documentName)
+		__internal.createDocumentData(documentId, objectTypeId, true)
+		if (proposedObjectId && proposedObjectId !== "")
+			setDocumentObjectId(documentId, proposedObjectId)
+		documentCreated(documentId, objectTypeId)
+		if (isDirty)
+			setDocumentIsDirty(documentId, true)
+		setDocumentIsLoading(documentId, false)
+	}
+
+	function handleSaveDocumentResult(documentId, status, message, documentName){
+		if (status === "Success"){
+			documentSaved(documentId)
+			if (documentName !== undefined && documentName !== ""){
+				setDocumentName(documentId, documentName)
+			}
+		}
+		else{
+			let msg = (message !== undefined && message !== "") ? message : status
+			saveDocumentFailed(documentId, msg)
+		}
+	}
+
+	function handleCloseDocumentResult(documentId, status){
+		if (status === "Success"){
+			documentClosed(documentId)
+		}
+		else{
+			let msg = status
+			if (status === "InvalidUserId") msg = qsTr("Invalid user-ID")
+			else if (status === "InvalidDocumentId") msg = qsTr("Invalid document-ID")
+			else if (status === "Failed") msg = qsTr("Close document failed")
+			closeDocumentFailed(documentId, msg)
+		}
+	}
+
+	function handleUndoResult(documentId, status){
+		if (status === "Success"){
+			undoDone(documentId)
+		}
+		else{
+			let msg = status
+			if (status === "InvalidUserId") msg = qsTr("Invalid user-ID")
+			else if (status === "InvalidDocumentId") msg = qsTr("Invalid document-ID")
+			else if (status === "Failed") msg = qsTr("Undo failed")
+			else if (status === "InvalidStepCount") msg = qsTr("Invalid step count")
+			undoFailed(documentId, msg)
+		}
+	}
+
+	function handleRedoResult(documentId, status){
+		if (status === "Success"){
+			redoDone(documentId)
+		}
+		else{
+			let msg = status
+			if (status === "InvalidUserId") msg = qsTr("Invalid user-ID")
+			else if (status === "InvalidDocumentId") msg = qsTr("Invalid document-ID")
+			else if (status === "Failed") msg = qsTr("Redo failed")
+			else if (status === "InvalidStepCount") msg = qsTr("Invalid step count")
+			redoFailed(documentId, msg)
+		}
+	}
+
 	property QtObject __internal: QtObject {
 		property var documentTypeEditors: ({}) // DocumentTypeId -> [{View Type 1}, {View Type 2}]
 		property var openedDocuments: [] // Array of objects {id, name, model, view, isDirty}
 		property var cachedDocumentNames: ({}) // DocumentId -> Name
+		property var cachedDocumentObjectIds: ({}) // DocumentId -> ObjectId
+		property var documentSaveNameResolvers: ({}) // DocumentId -> function(documentId): string
 		property var pendingDataLoaded: ({}) // DocumentId -> true for early DocumentDataLoaded notifications
 		property var autoNamedTypeIds: ({}) // TypeId -> true for types with automatic name providers
 		property var documentManagerActiveView: null
@@ -519,12 +659,6 @@ QtObject {
 					representationController.documentId = id
 					representationController.view = view
 
-					if (view.objectName === "DocumentViewBase"){
-						if (view.representationController !== undefined){
-							view.representationController = representationController
-						}
-					}
-
 					documentDecorator.registerView(view, representationController, !isNew && !isLoading)
 				}
 
@@ -549,6 +683,11 @@ QtObject {
 				delete root.__internal.cachedDocumentNames[id]
 			}
 
+			if (id in root.__internal.cachedDocumentObjectIds){
+				documentData.objectId = root.__internal.cachedDocumentObjectIds[id]
+				delete root.__internal.cachedDocumentObjectIds[id]
+			}
+
 			if (!isNew){
 				isNew = false
 			}
@@ -565,6 +704,8 @@ QtObject {
 
 			delete pendingDataLoaded[documentId]
 			delete readyEmitted[documentId]
+			delete cachedDocumentObjectIds[documentId]
+			delete documentSaveNameResolvers[documentId]
 			openedDocuments.splice(index, 1)
 		}
 

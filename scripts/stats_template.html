@@ -585,6 +585,10 @@
                         <div class="label">Avg Methods/Class</div>
                     </div>
                 </div>
+                <div id="srp-files-section" class="subsection" style="display: none;">
+                    <h4>Problematic Files</h4>
+                    <div class="large-files-list" id="srp-files-list"></div>
+                </div>
             </div>
 
             <div class="subsection">
@@ -595,6 +599,10 @@
                         <div class="value" id="deep-inheritance-count">-</div>
                         <div class="label">Deep Inheritance (>4 levels)</div>
                     </div>
+                </div>
+                <div id="lsp-files-section" class="subsection" style="display: none;">
+                    <h4>Problematic Files</h4>
+                    <div class="large-files-list" id="lsp-files-list"></div>
                 </div>
             </div>
 
@@ -610,6 +618,10 @@
                         <div class="value" id="avg-methods-per-interface">-</div>
                         <div class="label">Avg Methods/Interface</div>
                     </div>
+                </div>
+                <div id="isp-files-section" class="subsection" style="display: none;">
+                    <h4>Problematic Files</h4>
+                    <div class="large-files-list" id="isp-files-list"></div>
                 </div>
             </div>
 
@@ -629,6 +641,10 @@
                         <div class="value" id="abstraction-ratio">-</div>
                         <div class="label">Abstraction Ratio</div>
                     </div>
+                </div>
+                <div id="dip-files-section" class="subsection" style="display: none;">
+                    <h4>Problematic Files (abstraction ratio &lt; 0.3)</h4>
+                    <div class="large-files-list" id="dip-files-list"></div>
                 </div>
             </div>
         </div>
@@ -742,11 +758,11 @@
         </div>
 
         <div class="footer">
-            <p>Generated from the <a href="https://github.com/ImagingTools/ImtCore" target="_blank">ImtCore Repository</a></p>
+            <p>Generated from the <a href="https://github.com/ImagingTools/ImtCore" target="_blank" rel="noopener noreferrer">ImtCore Repository</a></p>
             <p>Imaging Tools Core Library (ImtCore)</p>
             <p>
-                <a href="https://imagingtools.github.io/ImtCore/" target="_blank">API Documentation</a> | 
-                <a href="https://github.com/ImagingTools/ImtCore/blob/main/README.md" target="_blank">README</a>
+                <a href="https://imagingtools.github.io/ImtCore/" target="_blank" rel="noopener noreferrer">API Documentation</a> | 
+                <a href="https://github.com/ImagingTools/ImtCore/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a>
             </p>
         </div>
     </div>
@@ -928,6 +944,95 @@
             document.getElementById('abstract-deps').textContent = abstractDeps.toLocaleString();
             document.getElementById('concrete-deps').textContent = concreteDeps.toLocaleString();
             document.getElementById('abstraction-ratio').textContent = abstractionRatio;
+
+            // Display SRP problematic files
+            if (largeClasses.length > 0) {
+                document.getElementById('srp-files-section').style.display = 'block';
+                const srpList = document.getElementById('srp-files-list');
+                srpList.innerHTML = '';
+                largeClasses.sort((a, b) => b.methods - a.methods).slice(0, 20).forEach(item => {
+                    const el = document.createElement('div');
+                    el.className = 'file-item';
+                    el.innerHTML = `
+                        <div class="filename">${item.class} — ${item.file}</div>
+                        <div class="line-count">${item.methods} methods</div>
+                    `;
+                    srpList.appendChild(el);
+                });
+                if (largeClasses.length > 20) {
+                    const moreItem = document.createElement('p');
+                    moreItem.className = 'more-items-text';
+                    moreItem.textContent = `... and ${largeClasses.length - 20} more`;
+                    srpList.appendChild(moreItem);
+                }
+            }
+
+            // Display LSP problematic files
+            if (deepInheritance.length > 0) {
+                document.getElementById('lsp-files-section').style.display = 'block';
+                const lspList = document.getElementById('lsp-files-list');
+                lspList.innerHTML = '';
+                deepInheritance.sort((a, b) => b.depth - a.depth).slice(0, 20).forEach(item => {
+                    const el = document.createElement('div');
+                    el.className = 'file-item';
+                    el.innerHTML = `
+                        <div class="filename">${item.class} — ${item.file}</div>
+                        <div class="line-count">depth ${item.depth}</div>
+                    `;
+                    lspList.appendChild(el);
+                });
+                if (deepInheritance.length > 20) {
+                    const moreItem = document.createElement('p');
+                    moreItem.className = 'more-items-text';
+                    moreItem.textContent = `... and ${deepInheritance.length - 20} more`;
+                    lspList.appendChild(moreItem);
+                }
+            }
+
+            // Display ISP problematic files
+            if (largeInterfaces.length > 0) {
+                document.getElementById('isp-files-section').style.display = 'block';
+                const ispList = document.getElementById('isp-files-list');
+                ispList.innerHTML = '';
+                largeInterfaces.sort((a, b) => b.methods - a.methods).slice(0, 20).forEach(item => {
+                    const el = document.createElement('div');
+                    el.className = 'file-item';
+                    el.innerHTML = `
+                        <div class="filename">${item.interface} — ${item.file}</div>
+                        <div class="line-count">${item.methods} methods</div>
+                    `;
+                    ispList.appendChild(el);
+                });
+                if (largeInterfaces.length > 20) {
+                    const moreItem = document.createElement('p');
+                    moreItem.className = 'more-items-text';
+                    moreItem.textContent = `... and ${largeInterfaces.length - 20} more`;
+                    ispList.appendChild(moreItem);
+                }
+            }
+
+            // Display DIP problematic files
+            const lowAbstractionFiles = stats.solid_metrics?.dependency_inversion?.low_abstraction_files || [];
+            if (lowAbstractionFiles.length > 0) {
+                document.getElementById('dip-files-section').style.display = 'block';
+                const dipList = document.getElementById('dip-files-list');
+                dipList.innerHTML = '';
+                lowAbstractionFiles.sort((a, b) => a.ratio - b.ratio).slice(0, 20).forEach(item => {
+                    const el = document.createElement('div');
+                    el.className = 'file-item';
+                    el.innerHTML = `
+                        <div class="filename">${item.file}</div>
+                        <div class="line-count">ratio ${item.ratio}</div>
+                    `;
+                    dipList.appendChild(el);
+                });
+                if (lowAbstractionFiles.length > 20) {
+                    const moreItem = document.createElement('p');
+                    moreItem.className = 'more-items-text';
+                    moreItem.textContent = `... and ${lowAbstractionFiles.length - 20} more`;
+                    dipList.appendChild(moreItem);
+                }
+            }
 
             // Code Structure
             const includeDeps = Object.keys(stats.code_structure?.include_dependencies || {}).length;

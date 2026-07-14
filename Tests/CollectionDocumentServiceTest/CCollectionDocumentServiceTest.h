@@ -582,7 +582,8 @@ protected:
 	virtual bool ValidateDocumentData(
 		const WorkingDocument& /*document*/,
 		OperationStatus& status,
-		QString* errorMessage = nullptr) const override
+		QString* errorMessage = nullptr,
+		const imtbase::IOperationContext* /*operationContextPtr*/ = nullptr) const override
 	{
 		if (m_validateShouldFail) {
 			status = OS_INVALID_DOCUMENT_DATA;

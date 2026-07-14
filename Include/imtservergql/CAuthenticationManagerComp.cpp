@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QDateTime>
 #include <QtCore/QMutexLocker>
+#include <QtCore/QSet>
 
 // ACF includes
 #include <iprm/TParamsPtr.h>
@@ -72,13 +73,62 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 		gqlContextPtr->SetScopes(scopes);
 	}
 
+	// Resolve tenant ownership flag
+	if (m_tenantManagerCompPtr.IsValid() && !tenantId.isEmpty() && !resolvedUserId.isEmpty()){
+		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+		if (tenantPtr.IsValid() && tenantPtr->GetOwnerId() == resolvedUserId){
+			gqlContextPtr->SetIsTenantOwner(true);
+		}
+	}
+
 	imtgql::CGqlRequestContextManager::SetContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr.GetPtr()));
 
 	if (m_userCollectionCompPtr.IsValid() && !resolvedUserId.isEmpty()){
 		imtbase::IObjectCollection::DataPtr userDataPtr;
 		if (m_userCollectionCompPtr->GetObjectData(resolvedUserId, userDataPtr)){
 			const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
-			gqlContextPtr->SetUserInfo(userInfoPtr);
+
+			if (isPat && userInfoPtr != nullptr){
+				// For PAT: restrict the user's permissions to the intersection with the
+				// token's scopes. GetPermissions() now returns role- and local-permission
+				// derived permissions combined, so writing the intersection into local
+				// permissions (after stripping roles/groups) is enough to make
+				// GetPermissions() - the method every permission check in this codebase
+				// actually reads - report exactly that intersection. An empty scope list
+				// yields zero permissions (fail closed), not the full unrestricted user.
+				imtauth::IUserInfo::FeatureIds fullPermissions = userInfoPtr->GetPermissions(productId);
+				QSet<QByteArray> scopeSet(scopes.begin(), scopes.end());
+				imtauth::IUserInfo::FeatureIds effectivePermissions;
+				for (const QByteArray& perm : fullPermissions){
+					if (scopeSet.contains(perm)){
+						effectivePermissions.append(perm);
+					}
+				}
+
+				istd::IChangeableUniquePtr clonedPtr = userInfoPtr->CloneMe();
+				imtauth::IUserInfo* mutableUserPtr = dynamic_cast<imtauth::IUserInfo*>(clonedPtr.GetPtr());
+				if (mutableUserPtr != nullptr){
+					// Strip roles/groups so no other code path can expand them back into
+					// unrestricted permissions; only the explicit scoped list applies.
+					const QByteArrayList products = mutableUserPtr->GetProducts();
+					for (const QByteArray& prod : products){
+						mutableUserPtr->SetRoles(prod, imtauth::IUserBaseInfo::RoleIds());
+					}
+					const imtauth::IUserGroupInfo::GroupIds groupIds = mutableUserPtr->GetGroups();
+					for (const QByteArray& groupId : groupIds){
+						mutableUserPtr->RemoveFromGroup(groupId);
+					}
+					mutableUserPtr->SetLocalPermissions(productId, effectivePermissions);
+
+					gqlContextPtr->SetUserInfo(mutableUserPtr);
+				}
+				else{
+					gqlContextPtr->SetUserInfo(nullptr);
+				}
+			}
+			else{
+				gqlContextPtr->SetUserInfo(userInfoPtr);
+			}
 		}
 	}
 
@@ -149,20 +199,11 @@ imtauth::IJwtSessionController::JwtState CAuthenticationManagerComp::ValidateJwt
 	}
 
 	// Cache miss — delegate to the slave and populate the cache.
-	JwtState state;
-	{
-		QMutexLocker locker(&m_tokenValidationMutex);
-		state = m_slaveJwtSessionControllerCompPtr->ValidateJwt(jwt);
-	}
+	JwtState state = m_slaveJwtSessionControllerCompPtr->ValidateJwt(jwt);
 
 	if (state == JwtState::JS_OK){
-		QByteArray resolvedUserId;
-		QByteArray resolvedTenantId;
-		{
-			QMutexLocker locker(&m_tokenValidationMutex);
-			resolvedUserId = m_slaveJwtSessionControllerCompPtr->GetUserFromJwt(jwt);
-			resolvedTenantId = m_slaveJwtSessionControllerCompPtr->GetTenantFromJwt(jwt);
-		}
+		QByteArray resolvedUserId = m_slaveJwtSessionControllerCompPtr->GetUserFromJwt(jwt);
+		QByteArray resolvedTenantId = m_slaveJwtSessionControllerCompPtr->GetTenantFromJwt(jwt);
 		StoreCachedToken(jwt, resolvedUserId, resolvedTenantId, QByteArray(), QByteArrayList(), false);
 	}
 
@@ -319,22 +360,19 @@ bool CAuthenticationManagerComp::ResolveUserId(
 		bool isTokenValid = false;
 		isPat = true;
 		scopes.clear();
-		{
-			QMutexLocker locker(&m_tokenValidationMutex);
-			if (!m_patManagerCompPtr.IsValid()){
-				errorMessage = QStringLiteral("Personal access token manager is not configured.");
-				status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
-				return false;
-			}
+		if (!m_patManagerCompPtr.IsValid()){
+			errorMessage = QStringLiteral("Personal access token manager is not configured.");
+			status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
+			return false;
+		}
 
-			if (!m_patManagerCompPtr->ValidateToken(token, userId, tokenId, scopes)){
-				errorMessage = QStringLiteral("Invalid personal access token.");
-				status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
-			}
-			else{
-				isTokenValid = true;
-				m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
-			}
+		if (!m_patManagerCompPtr->ValidateToken(token, userId, tokenId, scopes)){
+			errorMessage = QStringLiteral("Invalid personal access token.");
+			status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
+		}
+		else{
+			isTokenValid = true;
+			m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
 		}
 
 		if (!isTokenValid){
@@ -348,19 +386,16 @@ bool CAuthenticationManagerComp::ResolveUserId(
 	isPat = false;
 	using JwtState = imtauth::IJwtSessionController::JwtState;
 	JwtState state = JwtState::JS_NONE;
-	{
-		QMutexLocker locker(&m_tokenValidationMutex);
-		if (!m_slaveJwtSessionControllerCompPtr.IsValid()){
-			errorMessage = QStringLiteral("JWT session controller is not configured.");
-			status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
-			return false;
-		}
+	if (!m_slaveJwtSessionControllerCompPtr.IsValid()){
+		errorMessage = QStringLiteral("JWT session controller is not configured.");
+		status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
+		return false;
+	}
 
-		state = m_slaveJwtSessionControllerCompPtr->ValidateJwt(token);
-		if (state == JwtState::JS_OK){
-			userId = m_slaveJwtSessionControllerCompPtr->GetUserFromJwt(token);
-			tenantId = m_slaveJwtSessionControllerCompPtr->GetTenantFromJwt(token);
-		}
+	state = m_slaveJwtSessionControllerCompPtr->ValidateJwt(token);
+	if (state == JwtState::JS_OK){
+		userId = m_slaveJwtSessionControllerCompPtr->GetUserFromJwt(token);
+		tenantId = m_slaveJwtSessionControllerCompPtr->GetTenantFromJwt(token);
 	}
 
 	if (state == JwtState::JS_EXPIRED){
@@ -456,7 +491,6 @@ void CAuthenticationManagerComp::InvalidateTokenCache(const QByteArray& token) c
 
 imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContextInstance() const
 {
-	QMutexLocker locker(&m_contextCreationMutex);
 	return m_gqlContextFactCompPtr.CreateInstance();
 }
 

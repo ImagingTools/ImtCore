@@ -10,6 +10,8 @@ Column {
 	spacing: Style.marginXL;
 	property var model;
 
+	property bool isValid: nameField.text ? nameField.text.trim().length > 0 : false;
+
 	property var addressTypeNames: [qsTr("Country"), qsTr("Region"), qsTr("Area"),
 		qsTr("City"), qsTr("Settlement"), qsTr("District"),
 		qsTr("Street"), qsTr("Building"), qsTr("Apartment"),
@@ -17,29 +19,21 @@ Column {
 	property TreeItemModel typesModel: TreeItemModel{}
 
 	Component.onCompleted: {
-		for (var i = 0; i < container.addressTypeNames.length; i++){
+		for (let i = 0; i < container.addressTypeNames.length; i++){
 			container.typesModel.insertNewItem();
 			container.typesModel.setData("id", String(i), i);
-			container.typesModel.setData("name", container.addressTypeNames[i], i);//
+			container.typesModel.setData("name", container.addressTypeNames[i], i);
 		}
 
 		typeComboBox.model = container.typesModel;
 		updateGui()
 	}
 
-	function updateModel(){
-		container.model.setData("TypeId", typeComboBox.currentIndex, 0)
-		container.model.setData("TypeValue", container.typesModel.getData("name", typeComboBox.currentIndex), 0)
-		container.model.setData("Name", nameField.text, 0)
-		container.model.setData("Latitude", latitudeField.text, 0)
-		container.model.setData("Longitude", longitudeField.text, 0)
-	}
-
 	function updateGui(){
-		typeComboBox.currentIndex = container.model.getData("TypeId", 0)
-		nameField.text = container.model.getData("Name", 0)
-		latitudeField.text = container.model.getData("Latitude", 0)
-		longitudeField.text = container.model.getData("Longitude", 0)
+		typeComboBox.currentIndex = container.model.getData("typeId", 0)
+		nameField.text = container.model.getData("name", 0)
+		latitudeField.text = container.model.getData("latitude", 0)
+		longitudeField.text = container.model.getData("longitude", 0)
 	}
 
 	ComboBoxElementView {
@@ -48,9 +42,9 @@ Column {
 		width: parent.width
 
 		onCurrentIndexChanged: {
-			let oldIndex = container.model.getData("TypeId", 0)
+			let oldIndex = container.model.getData("typeId", 0)
 			if (oldIndex !== typeComboBox.currentIndex){
-				container.updateModel();
+				container.model.setData("typeId", typeComboBox.currentIndex, 0)
 			}
 		}
 	}
@@ -60,10 +54,10 @@ Column {
 		name: qsTr("Name");
 		width: parent.width
 
-		onEditingFinished: {
-			let oldText = container.model.getData("Name", 0)
+		onTextChanged: {
+			let oldText = container.model.getData("name", 0)
 			if (oldText !== nameField.text){
-				container.updateModel();
+				container.model.setData("name", nameField.text, 0)
 			}
 		}
 	}
@@ -73,10 +67,15 @@ Column {
 		name: qsTr("Latitude");
 		width: parent.width
 
-		onEditingFinished: {
-			let oldText = container.model.getData("Latitude", 0)
-			if (oldText !== latitudeField.text){
-				container.updateModel();
+		textInputValidator: RegularExpressionValidator {
+			regularExpression: /^-?\d*[.,]?\d*$/
+		}
+
+		onTextChanged: {
+			let normalized = text.replace(',', '.')
+			let value = parseFloat(normalized)
+			if (!isNaN(value)) {
+				container.model.setData("latitude", value, 0)
 			}
 		}
 	}
@@ -86,10 +85,15 @@ Column {
 		name: qsTr("Longitude");
 		width: parent.width
 
-		onEditingFinished: {
-			let oldText = container.model.getData("Longitude", 0)
-			if (oldText !== longitudeField.text){
-				container.updateModel();
+		textInputValidator: RegularExpressionValidator {
+			regularExpression: /^-?\d*[.,]?\d*$/
+		}
+
+		onTextChanged: {
+			let normalized = text.replace(',', '.')
+			let value = parseFloat(normalized)
+			if (!isNaN(value)) {
+				container.model.setData("longitude", value, 0)
 			}
 		}
 	}

@@ -226,6 +226,8 @@ private Q_SLOTS:
 	void on_DashboardButton_clicked();
 	void on_PreferencesButton_clicked();
 	void UpdateCommands();
+	bool UpdateAppLogoAspectRatio();
+
 
 Q_SIGNALS:
 	void EmitUpdateCommands();

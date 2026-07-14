@@ -57,11 +57,15 @@ public:
 		I_REGISTER_INTERFACE(imtbase::IRevisionController);
 		I_REGISTER_INTERFACE(imtdb::IDependentMetaInfoController);
 		I_ASSIGN(m_useDataMetaInfoAttrPtr, "UseDataMetaInfo", "If true - documents will be searched and sorted by the 'DataMetaInfo' column,\n else - otherwise according to the contents of the 'Document' column", true, false);
+		I_ASSIGN(m_useTenantEntityBindingsAttrPtr, "UseTenantEntityBindings", "If true - the delegate auto-creates bindings in TenantEntityBindings on object insert/update and applies tenant binding filters. Set false (e.g. for Users) to disable auto-binding creation and binding-based tenant filters (global list view).", true, true);
 		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Creator of metainformation of object data", false, "MetaInfoCreator");
 		I_ASSIGN(m_jsonBasedMetaInfoDelegateCompPtr, "JsonBasedMetaInfoDelegate", "Delegate for converting document metainfo to JSON representation", false, "JsonBasedMetaInfoDelegate");
 		I_ASSIGN(m_sqlJsonXPathExtractorCompPtr, "SqlJsonXPathExtractor", "SQL json X-Path extractor", false, "SqlJsonXPathExtractor");
 	I_END_COMPONENT
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual QByteArray GetCountQuery(const iprm::IParamsSet* paramsPtr = nullptr) const override;
@@ -162,11 +166,13 @@ protected:
 	virtual void EnsureTenantBindingTableExists() const;
 	virtual QString CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode = imtauth::TFM_INCLUDE) const;
 	virtual QByteArray CreateTenantBindingInsertQuery(const QByteArray& tenantId, const QByteArray& entityId, const imtbase::IOperationContext* operationContextPtr) const;
+	virtual QByteArray CreateTenantBindingDeleteQuery(const QByteArrayList& entityIds) const;
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual QString GetBaseSelectionQuery() const override;
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
+	virtual bool CreatePaginationQuery(int offset, int count, QByteArray& paginationQuery) const override;
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual bool CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const override;
 	virtual bool CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const override;
@@ -185,13 +191,16 @@ protected:
 	virtual bool CreateDocumentCollectionFilterQuery(const imtcol::IDocumentCollectionFilter& documentCollectionFilter, QString& documentFilterQuery) const;
 	virtual bool CreateDocumentIdFilterQuery(const imtcol::IDocumentIdFilter& documentIdFilter, QString& documentIdFilterQuery) const;
 	bool IsArrayOperation(const QString& query, const QString& field) const;
+	bool IsSQLite() const;
 
 protected:
 	I_ATTR(bool, m_useDataMetaInfoAttrPtr);
+	I_ATTR(bool, m_useTenantEntityBindingsAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);
 	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 	I_REF(imtdb::IJsonBasedMetaInfoDelegate, m_jsonBasedMetaInfoDelegateCompPtr);
 	I_REF(imtdb::ISqlJsonXPathExtractor, m_sqlJsonXPathExtractorCompPtr);
+	mutable bool m_tenantBindingTableInitialized = false;
 };
 
 

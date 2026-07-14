@@ -69,8 +69,11 @@ function jsonPath(obj, expr, arg) {
          }
       },
       eval: function(x, _v, _vname) {
-         try { return $ && _v && eval(x.replace(/(^|[^\\])@/g, "$1_v").replace(/\\@/g, "@")); }  // issue 7 : resolved ..
-         catch(e) { throw new SyntaxError("jsonPath: " + e.message + ": " + x.replace(/(^|[^\\])@/g, "$1_v").replace(/\\@/g, "@")); }  // issue 7 : resolved ..
+         try {
+            var code = x.replace(/(^|[^\\])@/g, "$1_v").replace(/\\@/g, "@");
+            return $ && _v && (new Function("_v", "_vname", "$", "return (" + code + ");"))(_v, _vname, $);
+         }
+         catch(e) { throw new SyntaxError("jsonPath: " + e.message + ": " + x.replace(/(^|[^\\])@/g, "$1_v").replace(/\\@/g, "@")); }
       }
    };
 

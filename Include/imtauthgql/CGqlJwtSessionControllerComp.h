@@ -9,74 +9,77 @@
 #include <imtauth/IJwtSessionController.h>
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
+#include <imtauth/IDelegatedAccess.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions_fwd.h>
 
 
 namespace imtauthgql
 {
 
 
-class CGqlJwtSessionControllerComp: public sdl::imtauth::Sessions::CGraphQlHandlerCompBase
+class CGqlJwtSessionControllerComp: public sdl::V1_0::imtauth::CSessionsGqlHandlerCompBase
 {
 public:
-	typedef sdl::imtauth::Sessions::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CSessionsGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlJwtSessionControllerComp);
 		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "Json Web Token session controller", false, "JwtSessionController");
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager", false, "TenantManager");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtauth::Sessions::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Sessions::CValidateSessionPayload OnValidateSession(
-		const sdl::imtauth::Sessions::CValidateSessionGqlRequest& validateSessionRequest,
+	// reimplemented (sdl::V1_0::imtauth::CSessionsGqlHandlerCompBase)
+	virtual sdl::V1_0::imtauth::CValidateSessionPayload OnValidateSession(
+		const sdl::V1_0::imtauth::CValidateSessionGqlRequest& validateSessionRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtauth::Sessions::CValidateJwtPayload OnValidateJwt(
-		const sdl::imtauth::Sessions::CValidateJwtGqlRequest& validateJwtRequest,
+	virtual sdl::V1_0::imtauth::CValidateJwtPayload OnValidateJwt(
+		const sdl::V1_0::imtauth::CValidateJwtGqlRequest& validateJwtRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtauth::Sessions::CGetSessionPayload OnGetSession(
-		const sdl::imtauth::Sessions::CGetSessionGqlRequest& getSessionRequest,
+	virtual sdl::V1_0::imtauth::CGetSessionPayload OnGetSession(
+		const sdl::V1_0::imtauth::CGetSessionGqlRequest& getSessionRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtauth::Sessions::CRefreshTokenPayload OnRefreshToken(
-		const sdl::imtauth::Sessions::CRefreshTokenGqlRequest& refreshTokenRequest,
+	virtual sdl::V1_0::imtauth::CRefreshTokenPayload OnRefreshToken(
+		const sdl::V1_0::imtauth::CRefreshTokenGqlRequest& refreshTokenRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtauth::Sessions::CCreateNewSessionPayload OnCreateNewSession(
-		const sdl::imtauth::Sessions::CCreateNewSessionGqlRequest& createNewSessionRequest,
+	virtual sdl::V1_0::imtauth::CCreateNewSessionPayload OnCreateNewSession(
+		const sdl::V1_0::imtauth::CCreateNewSessionGqlRequest& createNewSessionRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtauth::Sessions::CSelectTenantPayload OnSelectTenant(
-		const sdl::imtauth::Sessions::CSelectTenantGqlRequest& selectTenantRequest,
+	virtual sdl::V1_0::imtauth::CSelectTenantPayload OnSelectTenant(
+		const sdl::V1_0::imtauth::CSelectTenantGqlRequest& selectTenantRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtauth::Sessions::CRemoveSessionPayload OnRemoveSession(
-		const sdl::imtauth::Sessions::CRemoveSessionGqlRequest& removeSessionRequest,
+	virtual sdl::V1_0::imtauth::CRemoveSessionPayload OnRemoveSession(
+		const sdl::V1_0::imtauth::CRemoveSessionGqlRequest& removeSessionRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtauth::Sessions::CGetUserFromJwtPayload OnGetUserFromJwt(
-		const sdl::imtauth::Sessions::CGetUserFromJwtGqlRequest& getUserFromJwtRequest,
+	virtual sdl::V1_0::imtauth::CGetUserFromJwtPayload OnGetUserFromJwt(
+		const sdl::V1_0::imtauth::CGetUserFromJwtGqlRequest& getUserFromJwtRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtauth::Sessions::CGetTenantFromJwtPayload OnGetTenantFromJwt(
-		const sdl::imtauth::Sessions::CGetTenantFromJwtGqlRequest& getTenantFromJwtRequest,
+	virtual sdl::V1_0::imtauth::CGetTenantFromJwtPayload OnGetTenantFromJwt(
+		const sdl::V1_0::imtauth::CGetTenantFromJwtGqlRequest& getTenantFromJwtRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
 
 private:
 	QByteArray GetAuthenticatedUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
 	bool CanUseTenant(const QByteArray& userId, const QByteArray& tenantId, QString& errorMessage) const;
-	sdl::imtauth::Sessions::CUserSession::V1_0 CreateUserSessionData(
+	sdl::V1_0::imtauth::CUserSession CreateUserSessionData(
 			const imtauth::IJwtSessionController::UserSession& userSession) const;
 
 protected:
 	I_REF(imtauth::IJwtSessionController, m_jwtSessionControllerCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
+	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 };
 

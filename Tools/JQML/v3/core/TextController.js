@@ -17,14 +17,26 @@ module.exports = {
     tags: ['<a>','<abbr>','<address>','<area>','<article>','<aside>','<audio>','<b>','<base>','<bdi>','<bdo>','<blockquote>','<body>','<br>','<button>','<canvas>','<caption>','<cite>','<code>','<col>','<colgroup>','<data>','<datalist>','<dd>','<del>','<details>','<dfn>','<dialog>','<div>','<dl>','<dt>','<em>','<embed>','<fieldset>','<figcaption>','<figure>','<footer>','<form>','<h1>','<h2>','<h3>','<h4>','<h5>','<h6>','<head>','<header>','<hr>','<html>','<i>','<iframe>','<img>','<input>','<ins>','<kbd>','<label>','<legend>','<li>','<link>','<main>','<map>','<mark>','<meta>','<meter>','<nav>','<noscript>','<object>','<ol>','<optgroup>','<option>','<output>','<p>','<param>','<picture>','<pre>','<progress>','<q>','<ruby>','<rb>','<rt>','<rtc>','<rp>','<s>','<samp>','<script>','<section>','<select>','<small>','<source>','<span>','<strong>','<style>','<sub>','<summary>','<sup>','<table>','<tbody>','<td>','<template>','<textarea>','<tfoot>','<th>','<thead>','<time>','<title>','<tr>','<track>','<u>','<ul>','<var>','<video>','<wbr>'],
     regexp: /<[^<>]+>/g,
 
+    getFontFamily(font){
+        if(font && typeof font.family === 'string'){
+            let family = font.family.trim()
+            if(family) return family
+        }
+        return 'sans-serif'
+    },
+
     init: function(){
         this.container = document.createElement('div')
         this.container.style.position = 'absolute'
-        this.container.style.display = 'inline'
-        this.container.style.opacity = 0
+        this.container.style.left = '-100000px'
+        this.container.style.top = '0'
+        this.container.style.display = 'inline-block'
+        this.container.style.visibility = 'hidden'
+        this.container.style.pointerEvents = 'none'
         this.container.style.lineHeight = 'normal'
 
         this.content = document.createElement('span')
+        this.content.style.display = 'inline-block'
         this.container.appendChild(this.content)
 
         document.body.appendChild(this.container)
@@ -34,39 +46,37 @@ module.exports = {
     },
 
     measureTextFast(text, font){
-        this.ctx.font = `${font.italic ? 'italic ' : ''}${font.bold ? 'bold ' : ''}${font.pixelSize}px ${font.family}`
+        let fontFamily = this.getFontFamily(font)
+        this.ctx.font = `${font.italic ? 'italic ' : ''}${font.bold ? 'bold ' : ''}${font.pixelSize}px ${fontFamily}`
         let textMetrics = this.ctx.measureText(text)
+
+        let width = textMetrics.width
+        if(Number.isFinite(textMetrics.actualBoundingBoxLeft) && Number.isFinite(textMetrics.actualBoundingBoxRight)){
+            width = Math.max(width, textMetrics.actualBoundingBoxLeft + textMetrics.actualBoundingBoxRight)
+        }
+
+        let height = 0
+        if(Number.isFinite(textMetrics.fontBoundingBoxAscent) && Number.isFinite(textMetrics.fontBoundingBoxDescent)){
+            height = textMetrics.fontBoundingBoxAscent + textMetrics.fontBoundingBoxDescent
+        } else if(Number.isFinite(textMetrics.actualBoundingBoxAscent) && Number.isFinite(textMetrics.actualBoundingBoxDescent)){
+            height = textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent
+        } else {
+            height = Math.ceil(font.pixelSize * 1.2)
+        }
         
         return {
-            width: textMetrics.width,
-            height: textMetrics.fontBoundingBoxAscent + textMetrics.fontBoundingBoxDescent,
+            width: Math.ceil(width + 1),
+            height: Math.ceil(height + 1),
             isHTML: false,
         }
     },
 
     measureText: function(text, font, maxWidth, wrapMode, isHTML, elide){
-        // let isHTML = false
-        // if(textFormat === undefined || textFormat === PlainText){
-        //     isHTML = false
-        // } else if(textFormat === AutoText){
-        //     isHTML = false
-        //     let result = text.match(this.regexp)
-        //     if(result){
-        //         for(let res of result){
-        //             if(this.tags.indexOf(res) >= 0){
-        //                 isHTML = true
-        //                 break
-        //             }
-        //         }
-                
-        //     } else {
-        //         isHTML = false
-        //     }
-        // } else {
-        //     isHTML = true
-        // }
+        if(!isHTML && maxWidth === 0 && elide === ElideNone){
+            return this.measureTextFast(text, font)
+        }
 
-        this.container.style.fontFamily = font.family
+        this.container.style.fontFamily = this.getFontFamily(font)
         this.container.style.fontSize = font.pixelSize+'px'
         this.container.style.fontWeight = font.bold ? 'bold' : 'normal'
         this.container.style.fontStyle = font.italic ? 'italic' : 'normal'
@@ -86,22 +96,27 @@ module.exports = {
             this.container.style.wordBreak = 'unset';
         }
 
-        if(elide === Text.ElideRight){
+        if(elide === ElideRight){
             this.content.style.textOverflow = 'ellipsis'
-            this.content.style.overflow = 'auto'
+            this.content.style.overflow = 'hidden'
+            this.content.style.whiteSpace = 'nowrap'
         } else {
             this.content.style.textOverflow = 'unset'
             this.content.style.overflow = 'unset'
+            this.content.style.whiteSpace = 'inherit'
         }
  
         if(isHTML){
             this.content.innerHTML = text
         } else {
-            this.content.innerText = text
+            this.content.textContent = text
         }
         
         let rect = this.content.getBoundingClientRect()
-        rect.isHTML = isHTML
-        return rect
+        return {
+            width: Math.ceil(Math.max(rect.width, this.content.scrollWidth) + 1),
+            height: Math.ceil(Math.max(rect.height, this.content.scrollHeight) + 1),
+            isHTML: isHTML,
+        }
     }
 }

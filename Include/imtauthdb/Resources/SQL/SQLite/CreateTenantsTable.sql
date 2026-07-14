@@ -7,9 +7,6 @@ CREATE TABLE IF NOT EXISTS "Tenants"
     "CreatorId"   TEXT NOT NULL DEFAULT '',
     "IsActive"    INTEGER NOT NULL DEFAULT 1,
     "CreatedAt"   TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "UpdatedAt"   TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "UpdatedAt"   TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "ParentTenantId" TEXT DEFAULT NULL
 );
-CREATE INDEX IF NOT EXISTS "IX_Tenants_Name" ON "Tenants" ("Name");
-CREATE INDEX IF NOT EXISTS "IX_Tenants_OwnerId" ON "Tenants" ("OwnerId");
-CREATE INDEX IF NOT EXISTS "IX_Tenants_CreatorId" ON "Tenants" ("CreatorId");
-CREATE INDEX IF NOT EXISTS "IX_Tenants_IsActive" ON "Tenants" ("IsActive");

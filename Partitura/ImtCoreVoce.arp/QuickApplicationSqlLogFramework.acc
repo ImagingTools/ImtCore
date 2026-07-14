@@ -4,29 +4,35 @@
         <VersionInfos>
             <Version Id="0" Number="6154" Description="ACF"/>
             <Version Id="1" Number="2274" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395778" Description="Qt Framework"/>
+            <Version Id="1023" Number="396033" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Base framework for a console application</Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="CollectionBasedMessageConsumer" PackageId="ImtLogPck" ComponentId="CollectionBasedMessageConsumer">
+        <Element Id="LogDatabase" PackageId="ImtDatabaseVoce" ComponentId="SqLiteLogDatabase">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="LogSqlRepository"/>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QuickApplicationFramework/ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PathLocationType" Type="Integer" ExportId="LogLocationType">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="QuickApplicationFramework/RuntimeStatus"/>
                     </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="LogSqlRepository" PackageId="ImtDatabaseVoce" ComponentId="LogSqlRepository">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SqLiteDatabaseEngine"/>
+                    <AttributeInfo Id="SlaveMessageConsumer" Type="Reference" ExportId="SlaveMessageConsumer">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SqlLogFilePath" Type="String" ExportId="SqlLogFilePath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -58,6 +64,9 @@
                     <AttributeInfo Id="ComponentsToPreInitialize" Type="Reference[]" ExportId="ComponentsToPreInitialize">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="LogFilePath" Type="Reference" ExportId="LogFilePath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="LogLocationType" Type="Integer" ExportId="LogLocationType">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -74,21 +83,12 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SlaveMessageConsumer" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="CollectionBasedMessageConsumer"/>
+                        <Data IsEnabled="true" Value="LogDatabase"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                    <AttributeInfo Id="UseCategory" Type="Boolean" ExportId="UseCategory">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="SqLiteDatabaseEngine" PackageId="ImtCoreVoce" ComponentId="SqLiteDatabaseEngine">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="QuickApplicationFramework/ApplicationInfo"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DatabaseSqlFilePath" Type="String" ExportId="SqlLogFilePath">
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -101,9 +101,11 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ApplicationInfo" ComponentId="QuickApplicationFramework/ApplicationInfo"/>
-        <Component ExportedId="DatabaseFilePath" ComponentId="SqLiteDatabaseEngine/DatabaseFilePath"/>
+        <Component ExportedId="DatabaseFilePath" ComponentId="LogDatabase/DatabaseFilePath"/>
         <Component ExportedId="Log" ComponentId="QuickApplicationFramework/Log"/>
+        <Component ExportedId="LogDatabase" ComponentId="LogDatabase/LogDatabase"/>
         <Component ExportedId="LogFilePath" ComponentId="QuickApplicationFramework/LogFilePath"/>
+        <Component ExportedId="LogSystemLocation" ComponentId="QuickApplicationFramework/LogSystemLocation"/>
         <Component ExportedId="RuntimeStatus" ComponentId="QuickApplicationFramework/RuntimeStatus"/>
     </ExportedComponents>
 </Acf>

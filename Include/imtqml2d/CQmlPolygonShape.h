@@ -17,13 +17,13 @@ namespace imtqml2d
 {
 
 
-class CQmlPolygonShape: public sdl::imtsdl2d::imt2d::CPolygon2d, public imod::TSingleModelObserverBase<i2d::CPolygon>
+class CQmlPolygonShape: public sdl::V1_0::imtsdl2d::CPolygon2d, public imod::TSingleModelObserverBase<i2d::CPolygon>
 {
 	Q_OBJECT
 
 public:
 	typedef imod::CSingleModelObserverBase BaseClass;
-	typedef sdl::imtsdl2d::imt2d::CPolygon2d BaseClass2;
+	typedef sdl::V1_0::imtsdl2d::CPolygon2d BaseClass2;
 
 	[[nodiscard]] bool IsValid() const;
 
@@ -33,7 +33,7 @@ public:
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented CPolygon2d
-	virtual void SetPoints(const QList<sdl::imtsdl2d::imt2d::CPoint2d>& newPoints) override;
+	virtual void SetPoints(const QList<sdl::V1_0::imtsdl2d::CPoint2d>& newPoints) override;
 	virtual void SetIsClosed(bool newIsClosed) override;
 };
 

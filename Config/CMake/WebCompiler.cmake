@@ -249,6 +249,8 @@ function(jq_compile_web)
 		endif()
 	endif()
 
+	message("NODE_EXE_JQ ${NODE_EXE}")
+
 	list(LENGTH webdirs DIRS_COUNT)
 
 	set(INDEX 0)
@@ -278,7 +280,7 @@ function(jq_compile_web)
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
 		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/v3/preparesources.py ${webdirs_n}
 		WORKING_DIRECTORY ${IMTCOREDIR}/Tools/JQML/v3
-		COMMAND ${CMAKE_COMMAND} -E env
+		COMMAND ${CMAKE_COMMAND} -E env ${envvar}
 		TARGETNAME=${TARGETNAME}
 		${NODE_EXE}
 		${IMTCOREDIR}/Tools/JQML/v3/compiler/compiler.js
@@ -297,7 +299,7 @@ function(jq_compile_web)
 		${buildwebdir}/Resources/index.js
 		POST_BUILD
 		WORKING_DIRECTORY ${IMTCOREDIR}/Tools/JQML/v3
-		COMMAND ${CMAKE_COMMAND} -E env
+		COMMAND ${CMAKE_COMMAND} -E env ${envvar}
 		TARGETNAME=${TARGETNAME}
 		${NODE_EXE}
 		${IMTCOREDIR}/Tools/JQML/v3/compiler/compiler.js
@@ -460,6 +462,9 @@ macro(getImtAuthQmlWebDirs webdirs buildwebdir)
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthGroupsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthGroupsSdl)
 
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthRelationshipCollectionDocumentServiceSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthRelationshipCollectionDocumentServiceSdl)
+
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthRolesSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthRolesSdl)
 
@@ -481,6 +486,9 @@ macro(getImtAuthQmlWebDirs webdirs buildwebdir)
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthPersonalAccessTokensSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthPersonalAccessTokensSdl)
 
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthPermissionsSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthPermissionsSdl)
+
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthTenantsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthTenantsSdl)
 
@@ -498,6 +506,9 @@ macro(getImtAuthQmlWebDirs webdirs buildwebdir)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthTenantMembershipsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthTenantMembershipsSdl)
+	
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthCrossOrgGrantCollectionDocumentServiceSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthCrossOrgGrantCollectionDocumentServiceSdl)
 endmacro(getImtAuthQmlWebDirs)
 
 macro(getImtGeoQmlWebDirs webdirs buildwebdir)

@@ -11,19 +11,19 @@ namespace imtserverapp
 {
 
 
-class CParamSetRepresentationController: public imtserverapp::TJsonRepresentationControllerWrap<sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0>
+class CParamSetRepresentationController: public imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CParamsSet>
 {
 public:
-	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CParamsSet>)
+	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CParamsSet>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetSdlRepresentationFromDataModel(
-				sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& sdlRepresentation,
+				sdl::V1_0::imtbase::CParamsSet& sdlRepresentation,
 				const istd::IChangeable& dataModel,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual bool GetDataModelFromSdlRepresentation(
 				istd::IChangeable& dataModel,
-				const sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& sdlRepresentation) const override;
+				const sdl::V1_0::imtbase::CParamsSet& sdlRepresentation) const override;
 
 	bool RegisterSubController(const imtserverapp::IJsonRepresentationController& controller) const;
 

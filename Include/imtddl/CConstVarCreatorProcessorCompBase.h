@@ -35,7 +35,8 @@ protected:
 		const iprm::IParamsSet* paramsPtr,
 		const istd::IPolymorphic* inputPtr,
 		istd::IChangeable* outputPtr,
-		ibase::IProgressManager* progressManagerPtr = NULL) override;
+		ibase::IProgressManager* progressManagerPtr = NULL,
+		istd::IChangeable* processingReportPtr = NULL) override;
 
 protected:
 //	I_REF(IDdlCodeCreatorArgumentsParser, m_argumentParserAttrPtr);
@@ -43,4 +44,3 @@ protected:
 
 
 } // namespace imtddl
-

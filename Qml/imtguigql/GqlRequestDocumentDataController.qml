@@ -73,6 +73,27 @@ QtObject {
 	onError: {
 		ModalDialogManager.showWarningDialog(message)
 	}
+
+	function parseGqlErrors(responseObj) {
+		if (!("errors" in responseObj)) {
+			return null;
+		}
+
+		let errorsArray = responseObj["errors"];
+		if (Array.isArray(errorsArray)) {
+			if (errorsArray.length === 0) {
+				return null;
+			}
+			let firstError = errorsArray[0];
+			let message = firstError["message"] || "";
+			let type = (firstError["extensions"] && firstError["extensions"]["type"]) || "";
+			return { message: message, type: type };
+		}
+
+		let message = errorsArray["message"] || "";
+		let type = errorsArray["type"] || "";
+		return { message: message, type: type };
+	}
 	
 	function setupGetRequestInputData(){
 		getRequestInputParam.InsertField ("id", getDocumentId());
@@ -150,7 +171,6 @@ QtObject {
 
 	property SubscriptionClient subscriptionClient: SubscriptionClient {
 		onMessageReceived: {
-			container.hasRemoteChanges = true;
 		}
 	}
 
@@ -181,24 +201,9 @@ QtObject {
 					return;
 				}
 
-				if ("errors" in responseObj){
-					let errorsObject = responseObj["errors"];
-					if (container.gqlUpdateCommandId in errorsObject){
-						errorsObject = errorsObject[container.gqlUpdateCommandId]
-					}
-
-					let message = ""
-					if ("message" in errorsObject){
-						message = errorsObject["message"];
-					}
-
-					let type;
-					if ("type" in errorsObject){
-						type = errorsObject["type"];
-					}
-
-					container.error(message, type);
-
+				let parsedError = container.parseGqlErrors(responseObj);
+				if (parsedError) {
+					container.error(parsedError.message, parsedError.type);
 					return;
 				}
 
@@ -254,24 +259,9 @@ QtObject {
 					return;
 				}
 
-				if ("errors" in responseObj){
-					let errorsObject = responseObj["errors"];
-					if (container.gqlGetCommandId in errorsObject){
-						errorsObject = errorsObject[container.gqlGetCommandId]
-					}
-
-					let message = ""
-					if ("message" in errorsObject){
-						message = errorsObject["message"];
-					}
-
-					let type;
-					if ("type" in errorsObject){
-						type = errorsObject["type"];
-					}
-
-					container.error(message, type);
-
+				let parsedError = container.parseGqlErrors(responseObj);
+				if (parsedError) {
+					container.error(parsedError.message, parsedError.type);
 					return;
 				}
 
@@ -316,24 +306,9 @@ QtObject {
 					return;
 				}
 
-				if ("errors" in responseObj){
-					let errorsObject = responseObj["errors"];
-					if (container.gqlAddCommandId in errorsObject){
-						errorsObject = errorsObject[container.gqlAddCommandId]
-					}
-
-					let message = ""
-					if ("message" in errorsObject){
-						message = errorsObject["message"];
-					}
-
-					let type;
-					if ("type" in errorsObject){
-						type = errorsObject["type"];
-					}
-
-					container.error(message, type);
-
+				let parsedError = container.parseGqlErrors(responseObj);
+				if (parsedError) {
+					container.error(parsedError.message, parsedError.type);
 					return;
 				}
 
@@ -356,4 +331,3 @@ QtObject {
 		}
 	}
 }
-

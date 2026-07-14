@@ -11,19 +11,63 @@ import com.imtcore.imtqml 1.0
  * This file MUST NOT import imtguigql or any GQL module.
  */
 QtObject {
-    id: permissionsProvider;
+    id: permissionsProvider
 
-    property string productId: "";
-    property TreeItemModel permissionsModel: TreeItemModel {};
+    property string productId: ""
+    property bool loading: false
+    property string lastError: ""
 
-    function updateModel(){
-        if (permissionsProvider.productId == ""){
-            console.error("Unable to update model for permissions. Error: Product-ID is empty")
-            return;
-        }
+    // Latest request result regardless of request scope.
+    property var permissions: []
+
+    // Cached product-wide permissions (requestPermissions("")).
+    property var allPermissions: []
+
+    // Cached permissions available to the currently authenticated user
+    // (superuser sees the full product tree). Filled by requestUserPermissions().
+    property var userPermissions: []
+    signal userPermissionsReceived()
+
+    // Cached tenant-scoped permissions (requestPermissions(tenantId)).
+    property var tenantPermissions: []
+    property string tenantPermissionsTenantId: ""
+
+    // Special organization-only permissions tree (independent of product features)
+    property var organizationPermissions: []
+    // Assigned permissions for the last requested member (populated when userId passed to requestOrganizationPermissions)
+    property var memberOrganizationPermissions: []
+    signal organizationPermissionsReceived()
+
+    signal requestStarted(string tenantId)
+    signal permissionsReceived(var permissions, string tenantId)
+    signal allPermissionsReceived()
+    signal tenantPermissionsReceived(string tenantId)
+    signal requestFailed(string message, string tenantId)
+
+    // tenantId == "" means product-wide permissions request.
+    function requestPermissions(tenantId) {}
+
+    function requestAllPermissions() {
+        requestPermissions("")
     }
 
-    function getHeaders(){
-        return {};
+    // Request only the permissions available to the current user (su sees all).
+    function requestUserPermissions() {}
+
+    function requestOrganizationPermissions(tenantId, userId) {}
+
+    function clearCache() {
+        permissions = []
+        allPermissions = []
+        userPermissions = []
+        tenantPermissions = []
+        tenantPermissionsTenantId = ""
+        organizationPermissions = []
+        memberOrganizationPermissions = []
+        lastError = ""
+    }
+
+    function getHeaders() {
+        return {}
     }
 }

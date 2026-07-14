@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtlicgql/CProductCollectionControllerComp.h>
 
-
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
+#include <GeneratedFiles/imtlicsdl/SDL/1.0/CPP/Products.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtlic/CLicenseDefinition.h>
 #include <imtlic/CProductInfo.h>
@@ -20,18 +21,18 @@ namespace imtlicgql
 // protected methods
 
 
-sdl::imtbase::ImtCollection::CImportObjectPayload CProductCollectionControllerComp::OnImportObject(
-			const sdl::imtbase::ImtCollection::CImportObjectGqlRequest& importObjectRequest,
+sdl::V1_0::imtbase::CImportObjectPayload CProductCollectionControllerComp::OnImportObject(
+			const sdl::V1_0::imtbase::CImportObjectGqlRequest& importObjectRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CImportObjectPayload response = BaseClass::OnImportObject(importObjectRequest, gqlRequest, errorMessage);
-	if (response.Version_1_0 && response.Version_1_0->success){
-		bool success = *response.Version_1_0->success;
+	sdl::V1_0::imtbase::CImportObjectPayload response = BaseClass::OnImportObject(importObjectRequest, gqlRequest, errorMessage);
+	if (response.success){
+		bool success = *response.success;
 		if (success){
 			QByteArray objectId;
-			if (response.Version_1_0->objectId){
-				objectId = *response.Version_1_0->objectId;
+			if (response.objectId){
+				objectId = *response.objectId;
 			}
 
 			imtbase::IObjectCollection::DataPtr dataPtr;
@@ -97,12 +98,12 @@ void CProductCollectionControllerComp::OnAfterSetObjectName(
 }
 
 
-// reimplemented (sdl::imtlic::Products::CProductCollectionControllerCompBase)
+// reimplemented (sdl::V1_0::imtlic::CProductCollectionControllerCompBase)
 
 bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::imtlic::Products::CProductsListGqlRequest& productsListRequest,
-			sdl::imtlic::Products::CProductItem::V1_0& representationObject,
+			const sdl::V1_0::imtlic::CProductsListGqlRequest& productsListRequest,
+			sdl::V1_0::imtlic::CProductItem& representationObject,
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -129,7 +130,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 
 	idoc::MetaInfoPtr metaInfo = objectCollectionIterator.GetDataMetaInfo();
 
-	sdl::imtlic::Products::ProductsListRequestInfo requestInfo = productsListRequest.GetRequestInfo();
+	sdl::V1_0::imtlic::ProductsListRequestInfo requestInfo = productsListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.id = QByteArray(objectId);
@@ -165,7 +166,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isLicensesRequested){
-		imtsdl::TElementList<sdl::imtlic::Products::CLicenseData::V1_0> licenseDataList;
+		imtsdl::TElementList<sdl::V1_0::imtlic::CLicenseData> licenseDataList;
 
 		if (m_licenseCollectionCompPtr.IsValid()){
 			imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
@@ -188,7 +189,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 				if (m_licenseCollectionCompPtr->GetObjectData(licenseCollectionId, licenseDataPtr)){
 					const imtlic::CLicenseDefinition* licenseInfoPtr = dynamic_cast<const imtlic::CLicenseDefinition*>(licenseDataPtr.GetPtr());
 					if (licenseInfoPtr != nullptr){
-						sdl::imtlic::Products::CLicenseData::V1_0 licenseData;
+						sdl::V1_0::imtlic::CLicenseData licenseData;
 
 						licenseData.id = QByteArray(licenseCollectionId);
 						licenseData.licenseId = QByteArray(licenseInfoPtr->GetLicenseId());
@@ -223,7 +224,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeableUniquePtr CProductCollectionControllerComp::CreateObjectFromRepresentation(
-			const sdl::imtlic::Products::CProductData::V1_0& productDataRepresentation,
+			const sdl::V1_0::imtlic::CProductData& productDataRepresentation,
 			QByteArray& newObjectId,
 			QString& errorMessage) const
 {
@@ -255,8 +256,8 @@ istd::IChangeableUniquePtr CProductCollectionControllerComp::CreateObjectFromRep
 
 bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 			const istd::IChangeable& data,
-			const sdl::imtlic::Products::CProductItemGqlRequest& productItemRequest,
-			sdl::imtlic::Products::CProductData::V1_0& representationPayload,
+			const sdl::V1_0::imtlic::CProductItemGqlRequest& productItemRequest,
+			sdl::V1_0::imtlic::CProductData& representationPayload,
 			QString& errorMessage) const
 {
 	imtlic::CIdentifiableProductInfo* productInfoPtr = const_cast<imtlic::CIdentifiableProductInfo*>(dynamic_cast<const imtlic::CIdentifiableProductInfo*>(&data));
@@ -267,11 +268,11 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtlic::Products::ProductItemRequestArguments arguments = productItemRequest.GetRequestedArguments();
+	sdl::V1_0::imtlic::ProductItemRequestArguments arguments = productItemRequest.GetRequestedArguments();
 
 	QByteArray id;
-	if (arguments.input.Version_1_0->id){
-		id = *arguments.input.Version_1_0->id;
+	if (arguments.input->id){
+		id = *arguments.input->id;
 	}
 	representationPayload.id = QByteArray(id);
 
@@ -296,7 +297,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 
 bool CProductCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			const imtgql::CGqlRequest& /*rawGqlRequest*/,
-			const sdl::imtlic::Products::CProductUpdateGqlRequest& productUpdateRequest,
+			const sdl::V1_0::imtlic::CProductUpdateGqlRequest& productUpdateRequest,
 			istd::IChangeable& object,
 			QString& errorMessage) const
 {
@@ -308,20 +309,15 @@ bool CProductCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		return false;
 	}
 
-	sdl::imtlic::Products::ProductUpdateRequestArguments arguments = productUpdateRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return false;
-	}
-
+	sdl::V1_0::imtlic::ProductUpdateRequestArguments arguments = productUpdateRequest.GetRequestedArguments();
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->id){
-		objectId = *productUpdateRequest.GetRequestedArguments().input.Version_1_0->id;
+	if (arguments.input->id){
+		objectId = *productUpdateRequest.GetRequestedArguments().input->id;
 	}
 
-	sdl::imtlic::Products::CProductData::V1_0 productData;
-	if (arguments.input.Version_1_0->item){
-		productData = *productUpdateRequest.GetRequestedArguments().input.Version_1_0->item;
+	sdl::V1_0::imtlic::CProductData productData;
+	if (arguments.input->item){
+		productData = *productUpdateRequest.GetRequestedArguments().input->item;
 	}
 
 	productInfoPtr->ResetData();
@@ -370,7 +366,7 @@ QString CProductCollectionControllerComp::GetExportFileName(const QByteArray& ob
 // private methods
 
 bool CProductCollectionControllerComp::FillObjectFromRepresentation(
-			const sdl::imtlic::Products::CProductData::V1_0& productDataRepresentation,
+			const sdl::V1_0::imtlic::CProductData& productDataRepresentation,
 			istd::IChangeable& object,
 			QByteArray& objectId,
 			QString& errorMessage) const

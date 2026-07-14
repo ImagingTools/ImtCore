@@ -30,7 +30,8 @@ iproc::IProcessor::TaskState CQmlCodeCommandIdGeneratorComp::DoProcessing(
 			const iprm::IParamsSet* /*paramsPtr*/,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,
-			ibase::IProgressManager* /*progressManagerPtr*/)
+			ibase::IProgressManager* /*progressManagerPtr*/,
+			istd::IChangeable* /*processingReportPtr*/)
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlRequestListCompPtr.IsValid());
@@ -331,4 +332,3 @@ QString CQmlCodeCommandIdGeneratorComp::GetQmlCommandIdsFilePath() const
 
 
 } // namespace imtsdlgenqml
-

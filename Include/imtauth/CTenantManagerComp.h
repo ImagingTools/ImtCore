@@ -30,10 +30,14 @@ public:
 	// reimplemented (imtauth::ITenantManager)
 	virtual QByteArrayList GetTenantIds() const override;
 	virtual ITenantInfoUniquePtr GetTenant(const QByteArray& tenantId) const override;
+	virtual QByteArrayList GetTenantPermissions(const QByteArray& tenantId) const override;
 	virtual QByteArray CreateTenant(const QString& tenantName, const QString& description = QString(), const QByteArray& ownerId = QByteArray()) override;
 	virtual bool RemoveTenant(const QByteArray& tenantId) override;
 	virtual bool UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId = QByteArray(), bool updateOwner = false) override;
 	virtual bool SetTenantActive(const QByteArray& tenantId, bool isActive) override;
+	virtual bool SetTenantHierarchy(const QByteArray& tenantId, const QByteArray& parentTenantId) override;
+	virtual QByteArray GetSystemTenantId() const override;
+	virtual bool EnsureSystemTenant() override;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);

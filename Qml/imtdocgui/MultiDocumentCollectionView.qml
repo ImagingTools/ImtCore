@@ -22,7 +22,6 @@ Item {
 
 	onCollectionViewChanged: {
 		if (collectionView){
-			collectionView.documentManager = documentManager
 			navigableItem.parentSegment = collectionView.collectionId
 		}
 	}
@@ -208,7 +207,7 @@ Item {
 			}
 		}
 
-		function onDocumentServiceChanged(typeOperation, objectId, documentId, documentName){
+		function onDocumentManagerChanged(typeOperation, objectId, documentId, documentName){
 			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
 				tabView.removeTab(documentId)
 			}
@@ -441,6 +440,16 @@ Item {
 				}
 
 				setCurrentIndex(0)
+
+				// Align overlay state with current document-service state in case
+				// start/stopLoading signals were emitted before this tab was initialized.
+				if (workspaceView.documentManager
+						&& workspaceView.documentManager.documentIsLoading(documentId)){
+					loading.start()
+				}
+				else{
+					loading.stop()
+				}
 			}
 
 			onPageAdded: {

@@ -373,6 +373,34 @@ void CGqlRequestTest::CreateArrayQuery()
 }
 
 
+void CGqlRequestTest::CreateStringEscapesRoundTrip()
+{
+	imtgql::CGqlRequest request(imtgql::IGqlRequest::RT_MUTATION);
+	request.SetCommandId("UpdateServiceSettings");
+
+	imtgql::CGqlParamObject inputObject;
+	inputObject.InsertParam("serviceId", QStringLiteral("service-1"));
+
+	const QString expectedContent = QStringLiteral("Line1\nLine2\r\nLine3\tTab\\Slash\"Quote");
+	inputObject.InsertParam("content", expectedContent);
+	request.AddParam("input", inputObject);
+
+	const QByteArray query = request.GetQuery();
+
+	qsizetype errorPosition = -1;
+	imtgql::CGqlRequest parsedRequest;
+	const bool isParsed = parsedRequest.ParseQuery(query, errorPosition);
+	QVERIFY(isParsed);
+	QVERIFY(errorPosition < 0);
+
+	const imtgql::CGqlParamObject* parsedInput = parsedRequest.GetParamObject("input");
+	QVERIFY(parsedInput != nullptr);
+
+	const QString parsedContent = parsedInput->GetParamArgumentValue("content").toString();
+	QCOMPARE(parsedContent, expectedContent);
+}
+
+
 void CGqlRequestTest::CreateUnionRequest()
 {
 	imtgql::CGqlRequest request;
@@ -510,6 +538,33 @@ void CGqlRequestTest::ParseArrayQuery()
 	QVERIFY(retVal);
 	QVERIFY(errorPosition < 0);
 	QCOMPARE(resultQuery, arrayQueryResult);
+}
+
+
+void CGqlRequestTest::ParseArrayEnumTokens()
+{
+	const char* payload = R"(
+	{
+		"query": "query GetMyTenantInvitations { GetMyTenantInvitations(input: { statuses: [Pending, Accepted] }) { invitations { id } } }"
+	}
+	)";
+
+	qsizetype errorPosition = -1;
+	imtgql::CGqlRequest request;
+	bool retVal = request.ParseQuery(payload, errorPosition);
+
+	QVERIFY(retVal);
+	QVERIFY(errorPosition < 0);
+
+	const imtgql::CGqlParamObject* inputObject = request.GetParamObject("input");
+	QVERIFY(inputObject != nullptr);
+
+	const QVariant statusesValue = inputObject->GetParamArgumentValue("statuses");
+	QVERIFY(statusesValue.isValid());
+	const QVariantList statuses = statusesValue.toList();
+	QCOMPARE(statuses.size(), 2);
+	QCOMPARE(statuses[0].toString(), QStringLiteral("Pending"));
+	QCOMPARE(statuses[1].toString(), QStringLiteral("Accepted"));
 }
 
 

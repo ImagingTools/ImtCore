@@ -333,22 +333,28 @@ void CWebSocketServerComp::HandleNewConnections()
 			SendVerboseMessage("Unsupported subprotocol: " + subprotocol, "CWebSocketServerComp");
 		}
 #endif
-		bool find = false;
-		for (CWebSocketThread* webSocketThreadPtr: m_webSocketThreadList){
-			if (!webSocketThreadPtr->isRunning()){
-				webSocketThreadPtr->SetWebSocket(webSocketPtr);
-				find = true;
+		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
+
+		// bool find = false;
+		CWebSocketThread* webSocketThreadPtr = nullptr;
+		for (CWebSocketThread* webSocketThreadItemPtr: m_webSocketThreadList){
+			if (!webSocketThreadItemPtr->isRunning()){
+				webSocketThreadItemPtr->SetWebSocket(webSocketPtr);
+				webSocketThreadPtr = webSocketThreadItemPtr;
 
 				break;
 			}
 		}
 
-		if (!find){
-			CWebSocketThread* webSocketThreadPtr = new CWebSocketThread(this);
+		if (webSocketThreadPtr == nullptr){
+			webSocketThreadPtr = new CWebSocketThread(this);
 			m_webSocketThreadList.append(webSocketThreadPtr);
 			webSocketThreadPtr->SetWebSocket(webSocketPtr);
 		}
-		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
+
+		connect(webSocketPtr, &QWebSocket::textMessageReceived, webSocketThreadPtr, &CWebSocketThread::TextMessageReceived);
+		connect(webSocketPtr, &QWebSocket::disconnected, webSocketThreadPtr, &CWebSocketThread::SocketDisconnected);
+		connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), webSocketThreadPtr, &CWebSocketThread::SocketError);
 	}
 }
 
@@ -362,15 +368,34 @@ void CWebSocketServerComp::OnSocketDisconnected()
 		m_subscriberEngineCompPtr->UnRegisterSubscriber(socketObjectPtr);
 	}
 
-	for (const QByteArray& key: m_senders.keys()){
-		if (socketObjectPtr == m_senders[key]->GetSocket()){
-			m_senders.remove(key);
-
-			istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));
-			loginChangeSet.SetChangeInfo("ClientId", key);
-			istd::CChangeNotifier notifier(this, &loginChangeSet);
-			m_senderLoginStatusMap.remove(key);
+	// m_senders is read concurrently by worker threads in SendResponse()/SendRequest() (QReadLocker)
+	// and written by RegisterSender() (QWriteLocker). This handler runs on the main thread when a
+	// socket disconnects and previously mutated m_senders / m_senderLoginStatusMap with NO lock, so a
+	// disconnect racing a worker's publish did a concurrent QMap read+write on the same shared map:
+	// that corrupts the map's shared nodes / QByteArray keys / the QSharedPointer<CWebSocketSender>
+	// control block, giving a use-after-free refcount fault (crash reproduced live under workers:10 -
+	// faulting instruction `lock xadd [rax]` with rax = 0xdddddddd..., the MSVC freed-heap fill).
+	// Take the write lock (exclusive against both readers and RegisterSender) while removing the
+	// disconnecting socket's entries, matching how every other m_senders accessor is guarded.
+	QList<QByteArray> removedKeys;
+	{
+		QWriteLocker locker(&m_sendersLock);
+		for (const QByteArray& key: m_senders.keys()){
+			if (socketObjectPtr == m_senders[key]->GetSocket().data()){
+				m_senders.remove(key);
+				m_senderLoginStatusMap.remove(key);
+				removedKeys.append(key);
+			}
 		}
+	}
+
+	// Announce the logout status change AFTER releasing the lock: CChangeNotifier fires observer
+	// callbacks synchronously, and an observer that calls back into SendResponse()/RegisterSender()
+	// would re-enter the (non-recursive) m_sendersLock and deadlock.
+	for (const QByteArray& key: removedKeys){
+		istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));
+		loginChangeSet.SetChangeInfo("ClientId", key);
+		istd::CChangeNotifier notifier(this, &loginChangeSet);
 	}
 
 	socketObjectPtr->deleteLater();
@@ -430,5 +455,4 @@ void CWebSocketServerComp::OnSslErrors(const QList<QSslError>& errors)
 
 
 } // namespace imtrest
-
 

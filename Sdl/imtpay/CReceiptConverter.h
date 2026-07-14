@@ -7,7 +7,7 @@
 // ACF includes
 #include<istd/IPolymorphic.h>
 
-#include <GeneratedFiles/imtpaysdl/SDL/1.0/CPP/ImtPay.h>
+#include <GeneratedFiles/imtpaysdl/SDL/1.0/CPP/ImtPay_fwd.h>
 
 
 namespace iprm
@@ -23,8 +23,8 @@ namespace imtpaysdl
 class CReceiptConverter: public virtual istd::IPolymorphic
 {
 public:
-	static bool CreateSdlFromParams(sdl::imtpay::ImtPay::CReceipt::V1_0& receipt, const iprm::IParamsSet& params);
-	static bool CreateParamsFromSdl(iprm::IParamsSet& params, const sdl::imtpay::ImtPay::CReceipt::V1_0& receipt);
+	static bool CreateSdlFromParams(sdl::V1_0::imtpay::CReceipt& receipt, const iprm::IParamsSet& params);
+	static bool CreateParamsFromSdl(iprm::IParamsSet& params, const sdl::V1_0::imtpay::CReceipt& receipt);
 };
 
 

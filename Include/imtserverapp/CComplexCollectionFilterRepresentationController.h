@@ -14,7 +14,7 @@ namespace imtserverapp
 
 
 class CComplexCollectionFilterRepresentationController:
-			public imtserverapp::TJsonRepresentationControllerWrap<sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0>
+			public imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CComplexCollectionFilter>
 {
 public:
 	enum FilterOperationFlags
@@ -32,39 +32,39 @@ public:
 
 	CComplexCollectionFilterRepresentationController();
 
-	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CParamsSet>)
+	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CParamsSet>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetSdlRepresentationFromDataModel(
-				sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0& sdlRepresentation,
+				sdl::V1_0::imtbase::CComplexCollectionFilter& sdlRepresentation,
 				const istd::IChangeable& dataModel,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual bool GetDataModelFromSdlRepresentation(
 				istd::IChangeable& dataModel,
-				const sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0& sdlRepresentation) const override;
+				const sdl::V1_0::imtbase::CComplexCollectionFilter& sdlRepresentation) const override;
 
 private:
 	QString GetFlagsAsString(int flags) const;
 	bool GetFieldFilterFromSdlRepresentation(
-				const sdl::imtbase::ComplexCollectionFilter::FieldFilterUnion& representation,
+				const sdl::V1_0::imtbase::FieldFilterUnion& representation,
 				imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter) const;
 	bool GetSdlRepresentationFromFieldFilter(
 				const imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter,
-				sdl::imtbase::ComplexCollectionFilter::FieldFilterUnion& representation) const;
+				sdl::V1_0::imtbase::FieldFilterUnion& representation) const;
 	bool GetGroupFilterFromSdlRepresentation(
-				const sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0& representation,
+				const sdl::V1_0::imtbase::CGroupFilter& representation,
 				imtbase::IComplexCollectionFilter::FilterExpression& groupFilter) const;
 	bool GetSdlRepresentationFromGroupFilter(
 				const imtbase::IComplexCollectionFilter::FilterExpression& groupFilter,
-				sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0& representation) const;
+				sdl::V1_0::imtbase::CGroupFilter& representation) const;
 
-	bool GetSdlMetaTypeFromVariantType(const int& typeId, sdl::imtbase::ComplexCollectionFilter::ValueType& sdlType) const;
-	bool GetQVariantFromSdlValue(const QString& sdlValue, const sdl::imtbase::ComplexCollectionFilter::ValueType& valueType, QVariant& value) const;
+	bool GetSdlMetaTypeFromVariantType(const int& typeId, sdl::V1_0::imtbase::ValueType& sdlType) const;
+	bool GetQVariantFromSdlValue(const QString& sdlValue, const sdl::V1_0::imtbase::ValueType& valueType, QVariant& value) const;
 	int ComputeFlagsFromSdlOperations(
-				const imtsdl::TElementList<sdl::imtbase::ComplexCollectionFilter::FilterOperation>& filterOperations) const;
+				const imtsdl::TElementList<sdl::V1_0::imtbase::FilterOperation>& filterOperations) const;
 	void MapFieldOperationToSdlOperations(
 				imtbase::IComplexCollectionFilter::FieldOperation op,
-				imtsdl::TElementList<sdl::imtbase::ComplexCollectionFilter::FilterOperation>& outOperations) const;
+				imtsdl::TElementList<sdl::V1_0::imtbase::FilterOperation>& outOperations) const;
 
 	bool FieldIsExists(const imtbase::IComplexCollectionFilter::Fields& fields, const QByteArray& fieldId) const;
 	bool CreateOrUpdateFieldInfo(

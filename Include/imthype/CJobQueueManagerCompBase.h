@@ -37,6 +37,7 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CJobQueueManagerCompBase);
 		I_REGISTER_INTERFACE(IJobQueueManager);
+		I_REGISTER_INTERFACE(IJobStatusSink);
 		I_ASSIGN(m_jobTicketsCollectionCompPtr, "JobTicketsCollection", "External object collection containing job tickets", true, "JobTicketsCollection");
 	I_END_COMPONENT;
 

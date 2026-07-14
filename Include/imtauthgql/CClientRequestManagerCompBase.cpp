@@ -12,11 +12,11 @@ namespace imtauthgql
 
 QByteArrayList CClientRequestManagerCompBase::GetElementIds(const QByteArray& collectionId) const
 {
-	namespace imtcollection = sdl::imtbase::ImtCollection;
+	namespace imtcollection = sdl::V1_0::imtbase;
 
 	imtcollection::GetElementIdsRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->collectionId = collectionId;
+	arguments.input.emplace();
+	arguments.input->collectionId = collectionId;
 
 	imtcollection::CGetElementIdsPayload payload;
 	bool ok = SendModelRequestInternal<imtcollection::GetElementIdsRequestArguments, imtcollection::CGetElementIdsPayload, imtcollection::CGetElementIdsGqlRequest>(arguments, payload);
@@ -24,23 +24,23 @@ QByteArrayList CClientRequestManagerCompBase::GetElementIds(const QByteArray& co
 		return QByteArrayList();
 	}
 
-	if (!payload.Version_1_0->elementIds.HasValue()){
+	if (!payload.elementIds.HasValue()){
 		return QByteArrayList();
 	}
 
-	return payload.Version_1_0->elementIds->ToList();
+	return payload.elementIds->ToList();
 }
 
 
 bool CClientRequestManagerCompBase::RemoveElements(const QByteArray& collectionId, const QByteArrayList& elementIds) const
 {
-	namespace imtcollection = sdl::imtbase::ImtCollection;
+	namespace imtcollection = sdl::V1_0::imtbase;
 
 	imtcollection::RemoveElementsRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->elementIds.Emplace();
-	arguments.input.Version_1_0->elementIds->FromList(elementIds);
-	arguments.input.Version_1_0->collectionId = collectionId;
+	arguments.input.emplace();
+	arguments.input->elementIds.Emplace();
+	arguments.input->elementIds->FromList(elementIds);
+	arguments.input->collectionId = collectionId;
 
 	imtcollection::CRemoveElementsPayload payload;
 	bool ok = SendModelRequestInternal<imtcollection::RemoveElementsRequestArguments, imtcollection::CRemoveElementsPayload, imtcollection::CRemoveElementsGqlRequest>(arguments, payload);
@@ -48,11 +48,11 @@ bool CClientRequestManagerCompBase::RemoveElements(const QByteArray& collectionI
 		return false;
 	}
 
-	if (!payload.Version_1_0->success.HasValue()){
+	if (!payload.success.HasValue()){
 		return false;
 	}
 
-	return *payload.Version_1_0->success;
+	return *payload.success;
 }
 
 

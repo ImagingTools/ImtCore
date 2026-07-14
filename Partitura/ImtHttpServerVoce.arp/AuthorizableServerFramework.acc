@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6397" Description="ACF"/>
-            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -17,10 +17,13 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PersonalAccessTokenController/PersonalAccessTokenManager"/>
+                        <Data IsEnabled="true" Value="PumaClientEngine/RemotePersonalAccessTokenController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SlaveJwtSessionController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaClientEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine/RemoteTenantController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
@@ -29,55 +32,7 @@
                         <Data IsEnabled="true" Value="PumaClientEngine/CachedUserCollection"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseUserSettings"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="DatabaseEngine" PackageId="ImtCoreVoce" ComponentId="DatabaseEngine">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="BackupOnStart" Type="Boolean" ExportId="BackupOnStart">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="BackupSettings">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="DatabaseAccessSettings">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MaxBackupCount" Type="Integer" ExportId="MaxBackupCount">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MigrationController" Type="Reference" ExportId="MigrationController">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="DatabaseUserSettings" PackageId="ImtCoreVoce" ComponentId="DatabaseUserSettings">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="LanguageConstraints">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true" Value="UserSettingsRepository"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -89,7 +44,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>UserActionController</Value>
-                                <Value>PersonalAccessTokenController</Value>
                                 <Value>DeskController</Value>
                                 <Value>PumaClientEngine</Value>
                                 <Value>PermissionsController</Value>
@@ -111,8 +65,8 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -197,27 +151,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PersonalAccessTokenController" PackageId="ImtAuthVoce" ComponentId="PersonalAccessTokenController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="PumaClientEngine" PackageId="ImtGraphQlVoce" ComponentId="PumaGQLClientEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -287,8 +220,8 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseEngine"/>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -311,6 +244,27 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="UserSettingsRepository" PackageId="ImtCoreVoce" ComponentId="DatabaseUserSettings">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="LanguageConstraints">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="WebSocketServerFramework" PackageId="ImtHttpServerVoce" ComponentId="WebSocketServerFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -328,6 +282,9 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RequestHandler" Type="Factory" ExportId="RequestHandler">
@@ -366,7 +323,6 @@
         <Component ExportedId="CachedRoleCollection" ComponentId="PumaClientEngine/CachedRoleCollection"/>
         <Component ExportedId="CachedUserCollection" ComponentId="PumaClientEngine/CachedUserCollection"/>
         <Component ExportedId="ConnectionSubscriber" ComponentId="PumaClientEngine/ConnectionSubscriber"/>
-        <Component ExportedId="DatabaseEngine" ComponentId="DatabaseEngine"/>
         <Component ExportedId="FeatureContainer" ComponentId="IdentifiableProductInfo"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="PumaClientEngine/GroupRemoteRepository"/>
         <Component ExportedId="HttpServerFramework" ComponentId="HttpServerFramework"/>
@@ -377,7 +333,7 @@
         <Component ExportedId="UserActionSqlRepository" ComponentId="UserActionController/UserActionSqlRepository"/>
         <Component ExportedId="UserRemoteRepository" ComponentId="PumaClientEngine/UserRemoteRepository"/>
         <Component ExportedId="UserSessionRemoteRepository" ComponentId="PumaClientEngine/UserSessionRemoteRepository"/>
-        <Component ExportedId="UserSettingsRepository" ComponentId="DatabaseUserSettings/UserSettingsRepository"/>
+        <Component ExportedId="UserSettingsRepository" ComponentId="UserSettingsRepository/UserSettingsRepository"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>
     </ExportedComponents>
 </Acf>

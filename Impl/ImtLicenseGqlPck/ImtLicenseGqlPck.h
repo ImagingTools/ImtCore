@@ -17,7 +17,6 @@
 #include <imtlicgql/CFeatureCollectionControllerComp.h>
 #include <imtlicgql/CFeatureDependenciesProviderComp.h>
 #include <imtlicgql/CProductInfoProviderComp.h>
-#include <imtlicgql/CPermissionsProviderComp.h>
 #include <imtlicgql/CFeatureMetaInfoDelegateComp.h>
 #include <imtlicgql/CProductMetaInfoDelegateComp.h>
 #include <imtlicgql/CLicenseMetaInfoDelegateComp.h>
@@ -41,7 +40,6 @@ typedef imtlicgql::CFeatureControllerComp FeatureController;
 typedef imtlicgql::CFeatureCollectionControllerComp FeatureCollectionController;
 typedef imtlicgql::CFeatureDependenciesProviderComp FeatureDependenciesProvider;
 typedef imtlicgql::CProductInfoProviderComp ProductInfoProvider;
-typedef imtlicgql::CPermissionsProviderComp PermissionsProvider;
 typedef imtlicgql::CFeatureMetaInfoDelegateComp FeatureMetaInfoDelegate;
 typedef imtlicgql::CProductMetaInfoDelegateComp ProductMetaInfoDelegate;
 typedef imtlicgql::CLicenseMetaInfoDelegateComp LicenseMetaInfoDelegate;

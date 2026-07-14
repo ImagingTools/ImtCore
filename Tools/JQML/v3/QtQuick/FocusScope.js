@@ -2,13 +2,9 @@ const Item = require("./Item")
 
 class FocusScope extends Item {
     SLOT_focusChanged(oldValue, newValue){
-        super.SLOT_focusChanged()
+        super.SLOT_focusChanged(oldValue, newValue)
 
-        if(this.focus){
-            for(let child of this.children){
-                if(child.focus) child.activeFocus = true
-            }
-        } else {
+        if(!newValue){
             for(let child of this.children){
                 child.activeFocus = false
             }

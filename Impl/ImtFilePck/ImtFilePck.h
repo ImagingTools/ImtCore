@@ -3,8 +3,9 @@
 
 
 // ImtCore includes
-#include <imtfile/CFileProviderComp.h>
+#include <imtfile/CDiskFileLoaderComp.h>
 #include <imtfile/CFileFormatConversionComp.h>
+#include <imtfile/CFileSystemStructureProviderComp.h>
 
 
 /**
@@ -14,8 +15,9 @@ namespace ImtFilePck
 {
 
 
-typedef imtfile::CFileProviderComp FileProvider;
+typedef imtfile::CDiskFileLoaderComp FileProvider;
 typedef imtfile::CFileFormatConversionComp FileFormatConversion;
+typedef imtfile::CFileSystemStructureProviderComp FileSystemStructureProvider;
 
 
 } // namespace ImtFilePck

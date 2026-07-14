@@ -2,13 +2,16 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QJsonDocument>
+
 // ImtCore includes
 #include <imtdoc/IDocumentService.h>
 #include <imtdoc/IDocumentServiceEventHandler.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
 
 // ImtCore includes
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/CollectionDocumentService_fwd.h>
 
 
 namespace imtservergql
@@ -51,8 +54,8 @@ protected:
 		imtdoc::IDocumentService::DocumentNotification& notification) const;
 	void FillSdlNotification(
 		const imtdoc::IDocumentService::DocumentNotification& notification,
-		sdl::imtbase::CollectionDocumentService::EDocumentOperation operation,
-		sdl::imtbase::CollectionDocumentService::CDocumentServiceNotification::V1_0& sdlNotification) const;
+		sdl::V1_0::imtbase::EDocumentOperation operation,
+		sdl::V1_0::imtbase::CDocumentServiceNotification& sdlNotification) const;
 	QByteArray ConvertUrlToObjectId(const QUrl& url) const;
 	QByteArray GetCommandId() const;
 

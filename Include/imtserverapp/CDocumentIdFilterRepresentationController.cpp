@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtserverapp/CDocumentIdFilterRepresentationController.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentIdFilter.h>
 
 
 // ImtCore includes
@@ -20,7 +21,7 @@ CDocumentIdFilterRepresentationController::CDocumentIdFilterRepresentationContro
 }
 
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<Filter::CDocumentIdFilter::V1_0>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<Filter::CDocumentIdFilter>)
 
 QByteArray CDocumentIdFilterRepresentationController::GetTypeId() const
 {
@@ -36,10 +37,10 @@ bool CDocumentIdFilterRepresentationController::IsModelSupported(const istd::ICh
 }
 
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<Filter::CDocumentIdFilter::V1_0>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<Filter::CDocumentIdFilter>)
 
 bool CDocumentIdFilterRepresentationController::GetSdlRepresentationFromDataModel(
-			sdl::imtbase::DocumentIdFilter::CDocumentIdFilter::V1_0& sdlRepresentation,
+			sdl::V1_0::imtbase::CDocumentIdFilter& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
@@ -53,13 +54,13 @@ bool CDocumentIdFilterRepresentationController::GetSdlRepresentationFromDataMode
 	imtcol::IDocumentIdFilter::ConditionType conditionType = documentIdFilterPtr->GetConditionType();
 	switch(conditionType){
 	case imtcol::IDocumentIdFilter::CT_NONE:
-		sdlRepresentation.conditionType = sdl::imtbase::DocumentIdFilter::ConditionType::None;
+		sdlRepresentation.conditionType = sdl::V1_0::imtbase::ConditionType::None;
 		break;
 	case imtcol::IDocumentIdFilter::CT_IN:
-		sdlRepresentation.conditionType = sdl::imtbase::DocumentIdFilter::ConditionType::In;
+		sdlRepresentation.conditionType = sdl::V1_0::imtbase::ConditionType::In;
 		break;
 	case imtcol::IDocumentIdFilter::CT_NOT_IN:
-		sdlRepresentation.conditionType = sdl::imtbase::DocumentIdFilter::ConditionType::NotIn;
+		sdlRepresentation.conditionType = sdl::V1_0::imtbase::ConditionType::NotIn;
 		break;
 	}
 
@@ -69,7 +70,7 @@ bool CDocumentIdFilterRepresentationController::GetSdlRepresentationFromDataMode
 
 bool CDocumentIdFilterRepresentationController::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const sdl::imtbase::DocumentIdFilter::CDocumentIdFilter::V1_0& sdlRepresentation) const
+			const sdl::V1_0::imtbase::CDocumentIdFilter& sdlRepresentation) const
 {
 	imtcol::IDocumentIdFilter* documentIdFilterPtr = dynamic_cast<imtcol::IDocumentIdFilter*>(&dataModel);
 	if (documentIdFilterPtr == nullptr){
@@ -83,13 +84,13 @@ bool CDocumentIdFilterRepresentationController::GetDataModelFromSdlRepresentatio
 
 	if (sdlRepresentation.conditionType){
 		switch (*sdlRepresentation.conditionType){
-		case sdl::imtbase::DocumentIdFilter::ConditionType::None:
+		case sdl::V1_0::imtbase::ConditionType::None:
 			documentIdFilterPtr->SetConditionType(imtcol::IDocumentIdFilter::CT_NONE);
 			break;
-		case sdl::imtbase::DocumentIdFilter::ConditionType::In:
+		case sdl::V1_0::imtbase::ConditionType::In:
 			documentIdFilterPtr->SetConditionType(imtcol::IDocumentIdFilter::CT_IN);
 			break;
-		case sdl::imtbase::DocumentIdFilter::ConditionType::NotIn:
+		case sdl::V1_0::imtbase::ConditionType::NotIn:
 			documentIdFilterPtr->SetConditionType(imtcol::IDocumentIdFilter::CT_NOT_IN);
 			break;
 		}

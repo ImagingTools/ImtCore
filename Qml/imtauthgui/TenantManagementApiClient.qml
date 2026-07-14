@@ -42,7 +42,6 @@ QtObject {
 
 	// --- Ownership / membership ---
 	signal ownershipTransferred()
-	signal memberRoleChanged(string userId, string role)
 	signal memberRemoved(string userId)
 
 	// --- Roles ---
@@ -63,22 +62,74 @@ QtObject {
 	signal userUpdated(string userId)
 	signal userDataReceived(var data)
 
+	// --- Cross-org grants ---
+	signal crossOrgGrantsRemoved()
+
+	// --- Cooperation contracts ---
+	signal contractCreated(string contractId)
+	signal contractStatusUpdated(string contractId)
+	signal contractTerminated(string contractId)
+	signal contractsReceived(var contracts)
+
+	// --- Connection Code ---
+	signal connectionCodeReceived(string code, bool allowByCode)
+	signal connectionCodeRegenerated(string newCode)
+	signal allowConnectionsByCodeChanged(bool allow)
+
+	// --- Connection Requests ---
+	signal connectionRequestCreated(string requestId)
+	signal connectionRequestError(string errorMessage)
+	signal connectionRequestApproved(string connectionId)
+	signal connectionRequestRejected()
+	signal connectionRequestCanceled()
+	signal connectionRequestsReceived()
+
+	// --- Connections ---
+	signal connectionsReceived()
+	signal connectionRemoved(string connectionId)
+
+	// --- Tenant Relationships ---
+	signal tenantRelationshipRemoved()
+	signal tenantRelationshipsReceived()
+
+	// --- Relationship Proposals ---
+	signal relationshipProposalCreated()
+	signal relationshipProposalApproved(string relationshipId)
+	signal relationshipProposalRejected()
+	signal relationshipProposalCanceled()
+	signal relationshipProposalsReceived()
+
+	// --- Cross-tenant messages (phase 2) ---
+	signal crossTenantMessageSent(string messageId)
+	signal crossTenantMessageStatusUpdated(string messageId)
+	signal crossTenantMessagesReceived(var messages)
+
+	// --- Order requests (phase 3) ---
+	signal orderRequestConfirmed(string orderRequestId)
+	signal orderRequestRejected(string orderRequestId)
+	signal orderRequestStatusUpdated(string orderRequestId)
+	signal orderRequestsReceived(var orderRequests)
+
 	// --- Generic error ---
 	signal requestFailed(string message)
 
 	// --- Real-time membership subscription notifications ---
-	signal subscriptionInvitationReceived(var notification)
-	signal subscriptionInvitationAccepted(var notification)
-	signal subscriptionInvitationRejected(var notification)
-	signal subscriptionOwnershipTransferred(var notification)
+	signal subscriptionInvitationReceived(string tenantId, string tenantName, string role)
+	signal subscriptionInvitationAccepted(string tenantId, string membershipId)
+	signal subscriptionInvitationRejected(string tenantId, string membershipId)
+	signal subscriptionOwnershipTransferred(string tenantId)
+	signal subscriptionMembershipRoleChanged(string tenantId, string userId, string role)
+	signal subscriptionMembershipRemoved(string tenantId, string userId)
+
+	// --- Real-time connection notifications ---
+	signal subscriptionConnectionNotification(var notification)
 
 	// --- Stub methods (overridden by concrete implementations) ---
-	function createInvitation(tenantId, userId, role) {}
+	function createInvitation(tenantId, userId) {}
 	function revokeInvitation(invitationId) {}
 	function resendInvitation(invitationId) {}
 
 	function transferOwnership(tenantId, newOwnerId) {}
-	function setMemberRole(tenantId, userId, role) {}
 	function removeMember(tenantId, userId) {}
 
 	function createRoleData() {}
@@ -100,6 +151,75 @@ QtObject {
 	function getUserData(userId) {}
 
 	// --- Permissions ---
-	property var permissionsModel: null
-	function fetchPermissions() {}
+	property var permissionsProvider: null
+	function setRolePermissionsTenantId(tenantId) {}
+
+	// All product permissions (unfiltered) — for TenantPermissionsPage
+	property var allPermissions: []
+	signal allPermissionsReceived()
+	function fetchAllPermissions() {}
+
+	// Tenant-scoped permissions (filtered by tenant's tenantPermissions) — for RoleView
+	property var tenantPermissions: []
+	signal tenantPermissionsReceived()
+	function fetchTenantPermissions(tenantId) {}
+
+	// --- Cross-org grants ---
+	property var crossOrgGrantDocumentManager: null
+	property var crossOrgGrantsListDataProvider: null
+	property var tenantsListDataProvider: null
+	property var tenantRelationshipsListDataProvider: null
+	function revokeCrossOrgGrant(grantId) {}
+	function removeCrossOrgGrants(grantIds) {}
+
+	// --- Cooperation contracts ---
+	property var contractsModel: null
+	function fetchContracts(tenantId) {}
+	function createContract(relationshipId, sourceTenantId, targetTenantId, scope, validFrom, validUntil, description, terms) {}
+	function updateContractStatus(contractId, status) {}
+	function terminateContract(contractId) {}
+
+	// --- Connection Code ---
+	function getConnectionCode(tenantId) {}
+	function regenerateConnectionCode(tenantId) {}
+	function setAllowConnectionsByCode(tenantId, allow) {}
+
+	// --- Connection Requests ---
+	property var connectionRequestsModel: null
+	function fetchConnectionRequests(tenantId) {}
+	function createConnectionRequest(sourceTenantId, connectionCode, message) {}
+	function approveConnectionRequest(requestId, tenantId) {}
+	function rejectConnectionRequest(requestId, tenantId) {}
+	function cancelConnectionRequest(requestId, tenantId) {}
+
+	// --- Connections ---
+	property var connectionsModel: null
+	function fetchConnections(tenantId) {}
+	function removeConnection(connectionId, tenantId) {}
+
+	// --- Tenant Relationships ---
+	property var tenantRelationshipsModel: null
+	function fetchTenantRelationships(tenantId) {}
+	function removeTenantRelationship(tenantId, relationshipId) {}
+
+	// --- Relationship Proposals ---
+	property var relationshipProposalsModel: null
+	function fetchRelationshipProposals(tenantId) {}
+	function createRelationshipProposal(connectionId, initiatorTenantId, proposalType, proposedSourceRole, proposedTargetRole, proposedScope, proposedDescription, message) {}
+	function approveRelationshipProposal(proposalId, tenantId) {}
+	function rejectRelationshipProposal(proposalId, tenantId) {}
+	function cancelRelationshipProposal(proposalId, tenantId) {}
+
+	// --- Cross-tenant messages (phase 2) ---
+	property var crossTenantMessagesModel: null
+	function fetchCrossTenantMessages(tenantId, direction) {}
+	function sendCrossTenantMessage(sourceTenantId, targetTenantId, relationshipId, messageType, payload, sourceObjectId, customType, expiresAt) {}
+	function updateCrossTenantMessageStatus(messageId, status, errorMessage) {}
+
+	// --- Order requests (phase 3) ---
+	property var orderRequestsModel: null
+	function fetchOrderRequests(tenantId) {}
+	function confirmOrderRequest(orderRequestId, note) {}
+	function rejectOrderRequest(orderRequestId, reason) {}
+	function updateOrderRequestStatus(orderRequestId, status, note) {}
 }

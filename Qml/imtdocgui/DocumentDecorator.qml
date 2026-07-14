@@ -27,6 +27,12 @@ QtObject {
 			representationController.representationUpdated.connect(onRepresentationUpdated)
 			representationController.startUpdateRepresentation.connect(onStartUpdateRepresentation)
 			representationController.updateRepresentationFailed.connect(onUpdateRepresentationFailed)
+			representationController.updateDocumentFailed.connect(onUpdateDocumentFailed)
+
+			if (documentManager && view.commandsController){
+				let isDirty = documentManager.documentIsDirty(documentId)
+				view.commandsController.setCommandIsEnabled("Save", isDirty)
+			}
 
 			if (updateRepresentation){
 				if (view.visible){
@@ -36,6 +42,12 @@ QtObject {
 					if (!_internal.requestUpdateViews.includes(view)){
 						_internal.requestUpdateViews.push(view)
 					}
+				}
+			}
+
+			if (view.objectName === "DocumentViewBase"){
+				if (view.representationController !== undefined){
+					view.representationController = representationController
 				}
 			}
 		}
@@ -56,6 +68,13 @@ QtObject {
 	property Connections documentManagerConnections: Connections {
 		target: root.documentManager
 
+		function onStartSaveDocument(documentId){
+			if (documentId !== root.documentId){
+				return
+			}
+			root._internal.saveRequested = false
+		}
+
 		function onUndoInfoReceived(documentId, availableUndoSteps, availableRedoSteps, isDirty){
 			if (documentId !== root.documentId){
 				return
@@ -65,6 +84,18 @@ QtObject {
 				if (root.registeredViews[i].commandsController){
 					root.registeredViews[i].commandsController.setCommandIsEnabled("Undo", availableUndoSteps > 0)
 					root.registeredViews[i].commandsController.setCommandIsEnabled("Redo", availableRedoSteps > 0)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty)
+				}
+			}
+		}
+
+		function onDocumentIsDirtyChanged(documentId, isDirty){
+			if (documentId !== root.documentId){
+				return
+			}
+
+			for (let i = 0; i < root.registeredViews.length; ++i){
+				if (root.registeredViews[i].commandsController){
 					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty)
 				}
 			}
@@ -81,7 +112,9 @@ QtObject {
 
 			if (typeOperation === EDocumentOperationEnum.s_documentSaved){
 				for (let i = 0; i < root.registeredViews.length; ++i){
-					root.registeredViews[i].documentSaved()
+					if (root.registeredViews[i] && typeof root.registeredViews[i].documentSaved === "function"){
+						root.registeredViews[i].documentSaved()
+					}
 				}
 			}
 		}
@@ -150,6 +183,14 @@ QtObject {
 		documentManager.updateRepresentationFailed(documentId, message)
 	}
 
+	function onUpdateDocumentFailed(documentId, message){
+		if (root.documentId !== documentId){
+			return
+		}
+
+		documentManager.updateDocumentFailed(documentId, message)
+	}
+
 	function onGuiUpdated(view, model){
 		if (registeredViews.includes(view)){
 			documentManager.documentGuiUpdated(documentId, model)
@@ -173,8 +214,13 @@ QtObject {
 
 	function onModelDataChanged(view, model){
 		if (registeredViews.includes(view)){
-			_internal.initiatingView = view
 			let index = registeredViews.indexOf(view)
+			if (_internal.updateCounters[index] > 0){
+				// Change originates from representation load (updateRepresentationFromDocument),
+				// must not trigger reverse updateDocumentFromRepresentation.
+				return
+			}
+			_internal.initiatingView = view
 			registeredRepresentation[index].updateDocumentFromRepresentation()
 		}
 	}

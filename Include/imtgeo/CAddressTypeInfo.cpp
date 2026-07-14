@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include "CAddressTypeInfo.h"
+#include <imtgeo/CAddressTypeInfo.h>
 
 
 // ACF includes
@@ -12,30 +12,22 @@
 namespace imtgeo
 {
 
+
 // public methods
-
-CAddressTypeInfo::CAddressTypeInfo()
-{
-}
-
-
-CAddressTypeInfo::~CAddressTypeInfo()
-{
-}
 
 // reimplemented (IAddressTypeInfo)
 
 QByteArray CAddressTypeInfo::GetId() const
 {
-    return m_id;
+	return m_id;
 }
 
 
-void CAddressTypeInfo::SetId(QByteArray id)
+void CAddressTypeInfo::SetId(const QByteArray& id)
 {
-    if (m_id != id){
+	if (m_id != id){
 		istd::CChangeNotifier notifier(this);
-        m_id = id;
+		m_id = id;
 	}
 }
 
@@ -46,7 +38,7 @@ QString CAddressTypeInfo::GetName() const
 }
 
 
-void CAddressTypeInfo::SetName(QString name)
+void CAddressTypeInfo::SetName(const QString& name)
 {
 	if (m_name != name){
 		istd::CChangeNotifier notifier(this);
@@ -60,7 +52,7 @@ QString CAddressTypeInfo::GetShortName() const
 }
 
 
-void CAddressTypeInfo::SetShortName(QString sname)
+void CAddressTypeInfo::SetShortName(const QString& sname)
 {
 	if (m_shortName != sname){
 		istd::CChangeNotifier notifier(this);
@@ -71,16 +63,16 @@ void CAddressTypeInfo::SetShortName(QString sname)
 
 QString CAddressTypeInfo::GetDescription() const
 {
-    return m_description;
+	return m_description;
 }
 
 
-void CAddressTypeInfo::SetDescription(QString description)
+void CAddressTypeInfo::SetDescription(const QString& description)
 {
-    if (m_description != description){
-        istd::CChangeNotifier notifier(this);
-        m_description = description;
-    }
+	if (m_description != description){
+		istd::CChangeNotifier notifier(this);
+		m_description = description;
+	}
 }
 
 
@@ -92,25 +84,25 @@ bool CAddressTypeInfo::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-    static iser::CArchiveTag idTag("Id", "Address elemen id", iser::CArchiveTag::TT_LEAF);
-    retVal = archive.BeginTag(idTag);
-    retVal = retVal && archive.Process(m_id);
-    retVal = retVal && archive.EndTag(idTag);
+	static iser::CArchiveTag idTag("Id", "Address elemen id", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(idTag);
+	retVal = retVal && archive.Process(m_id);
+	retVal = retVal && archive.EndTag(idTag);
 
 	static iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
-	retVal = archive.BeginTag(nameTag);
+	retVal = retVal && archive.BeginTag(nameTag);
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(nameTag);
 
 	static iser::CArchiveTag snameTag("ShortName", "Short name", iser::CArchiveTag::TT_LEAF);
-	retVal = archive.BeginTag(snameTag);
+	retVal = retVal && archive.BeginTag(snameTag);
 	retVal = retVal && archive.Process(m_shortName);
 	retVal = retVal && archive.EndTag(snameTag);
 
-    static iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
-    retVal = archive.BeginTag(descriptionTag);
-    retVal = retVal && archive.Process(m_description);
-    retVal = retVal && archive.EndTag(descriptionTag);
+	static iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(descriptionTag);
+	retVal = retVal && archive.Process(m_description);
+	retVal = retVal && archive.EndTag(descriptionTag);
 
 	return retVal;
 }
@@ -120,7 +112,7 @@ bool CAddressTypeInfo::Serialize(iser::IArchive& archive)
 
 int CAddressTypeInfo::GetSupportedOperations() const
 {
-	return SO_CLONE | SO_COPY | SO_RESET;
+	return SO_CLONE | SO_COPY | SO_RESET | SO_COMPARE;
 }
 
 
@@ -128,31 +120,46 @@ bool CAddressTypeInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 {
 	istd::CChangeGroup changeGroup(this);
 
-
 	const CAddressTypeInfo* sourcePtr = dynamic_cast<const CAddressTypeInfo*>(&object);
-	if (sourcePtr != nullptr){
-		istd::CChangeNotifier changeNotifier(this);
-
-        m_id = sourcePtr->m_id;
-        m_name = sourcePtr->m_name;
-		m_shortName = sourcePtr->m_shortName;
-		m_description = sourcePtr->m_description;
-
-		return true;
+	if (sourcePtr == nullptr){
+		return false;
 	}
 
-	return false;
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_id = sourcePtr->m_id;
+	m_name = sourcePtr->m_name;
+	m_shortName = sourcePtr->m_shortName;
+	m_description = sourcePtr->m_description;
+
+	return true;
+}
+
+
+bool CAddressTypeInfo::IsEqual(const IChangeable& object) const
+{
+	const CAddressTypeInfo* sourcePtr = dynamic_cast<const CAddressTypeInfo*>(&object);
+	if (sourcePtr == nullptr){
+		return false;
+	}
+
+	bool retVal = m_id == sourcePtr->m_id;
+	retVal = retVal && m_name == sourcePtr->m_name;
+	retVal = retVal && m_shortName == sourcePtr->m_shortName;
+	retVal = retVal && m_description == sourcePtr->m_description;
+
+	return retVal;
 }
 
 
 istd::IChangeableUniquePtr CAddressTypeInfo::CloneMe(CompatibilityMode mode) const
 {
 	istd::IChangeableUniquePtr clonePtr(new CAddressTypeInfo);
-	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr;
+	if (!clonePtr->CopyFrom(*this, mode)){
+		return nullptr;
 	}
 
-	return nullptr;
+	return clonePtr;
 }
 
 
@@ -160,7 +167,7 @@ bool CAddressTypeInfo::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-    m_id.clear();
+	m_id.clear();
 	m_name.clear();
 	m_shortName.clear();
 	m_description.clear();

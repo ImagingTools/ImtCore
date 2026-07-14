@@ -14,7 +14,7 @@
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantManager.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships_fwd.h>
 
 
 namespace imtauthgql
@@ -81,7 +81,6 @@ private:
 	{
 		QByteArray userId;
 		QByteArray tenantId;
-		QByteArray roleId;
 		bool isActive;
 	};
 
@@ -94,14 +93,13 @@ private:
 	{
 		QByteArray userId;
 		QByteArray tenantId;
-		QByteArray roleId;
 		QByteArray invitedByUserId;
 		imtauth::ITenantInvitation::TenantInvitationStatus status;
 	};
 
 	void PublishNotification(
 		const QByteArray& targetUserId,
-		sdl::imtauth::TenantMemberships::EMembershipNotificationType notificationType,
+		sdl::V1_0::imtauth::EMembershipNotificationType notificationType,
 		const QByteArray& membershipId,
 		const QByteArray& userId,
 		const QByteArray& tenantId,

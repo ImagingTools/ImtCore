@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CProfileControllerComp.h>
+#include <imtauthgql/imtauthgql.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Profile.h>
 
 
 // ACF includes
@@ -18,36 +20,33 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::imtauth::Profile::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CProfileGqlHandlerCompBase)
 
-sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
-			const sdl::imtauth::Profile::CGetProfileGqlRequest& getProfileRequest,
+sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
+			const sdl::V1_0::imtauth::CGetProfileGqlRequest& getProfileRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Profile::CProfileData::V1_0 profileData;
+	sdl::V1_0::imtauth::CProfileData profileData;
 
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CProfileControllerComp");
-		return sdl::imtauth::Profile::CProfileData();
+		return sdl::V1_0::imtauth::CProfileData();
 	}
 
-	sdl::imtauth::Profile::GetProfileRequestArguments arguments = getProfileRequest.GetRequestedArguments();
-
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return sdl::imtauth::Profile::CProfileData();
-	}
+	sdl::V1_0::imtauth::GetProfileRequestArguments arguments = getProfileRequest.GetRequestedArguments();
 
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->id){
-		objectId = *arguments.input.Version_1_0->id;
+	if (arguments.input->id){
+		objectId = *arguments.input->id;
 	}
 
 	QByteArray productId;
-	if (arguments.input.Version_1_0->productId){
-		productId = *arguments.input.Version_1_0->productId;
+	if (arguments.input->productId){
+		productId = *arguments.input->productId;
 	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -58,7 +57,42 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to get a profile info. Error: User with ID '%1' does not exists").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "CProfileControllerComp");
-		return sdl::imtauth::Profile::CProfileData();
+		return sdl::V1_0::imtauth::CProfileData();
+	}
+
+	// Apply tenant-based adaptation to the user data (roles/groups/permissions
+	// + delegated role enrichment). This is the same logic used by
+	// CUserCollectionControllerComp::CreateAdaptedObjectData.
+	// We obtain an (optionally cloned) version whose GetRoles/GetGroups/GetPermissions
+	// already reflect only what is visible for the current tenant (or globals
+	// for No Organization).
+	QByteArray currentTenantId;
+	if (gqlContextPtr != nullptr){
+		currentTenantId = gqlContextPtr->GetTenantId();
+	}
+	QByteArray currentProductId = productId;
+
+	imtauth::ITenantEntityBindingManager* bindingPtr = m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr;
+	imtauth::IDelegatedAccess* delPtr = m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr;
+	imtauth::ITenantMembershipManager* memPtr = m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr;
+	imtauth::IRoleInfoProvider* roleProvPtr = m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr;
+
+	istd::IChangeableUniquePtr adaptedPtr = AdaptUserForTenant(
+				objectId,
+				*userInfoPtr,
+				currentTenantId,
+				currentProductId,
+				bindingPtr,
+				delPtr,
+				memPtr,
+				roleProvPtr);
+
+	const imtauth::IUserInfo* effectiveUserPtr = userInfoPtr;
+	if (adaptedPtr.IsValid()){
+		imtauth::IUserInfo* au = dynamic_cast<imtauth::IUserInfo*>(adaptedPtr.GetPtr());
+		if (au != nullptr){
+			effectiveUserPtr = au;
+		}
 	}
 
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
@@ -74,22 +108,46 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 	profileData.email = QString(userInfoPtr->GetMail());
 	profileData.username = QString(userInfoPtr->GetId());
 
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
 		profileData.currentTenantId = gqlContextPtr->GetTenantId();
 	}
 
-	imtsdl::TElementList<sdl::imtauth::Profile::CRoleInfo::V1_0> roleList;
+	// =========================================================================
+	// TENANT-SCOPED PROFILE DATA (Roles / Permissions / Groups)
+	// =========================================================================
+	//
+	// The goal of the logic below is to make the data returned by GetProfile
+	// depend on the currently selected tenant (including the special "No
+	// Organization" case when tenantId is empty).
+	//
+	// Requirements:
+	//   - When a real tenant is selected → return only Roles, Permissions and
+	//     Groups that are relevant inside that tenant.
+	//   - When "No Organization" is selected (empty tenantId) → return ONLY
+	//     items that are available to the user OUTSIDE of any tenant
+	//     (both direct organizations and delegated/foreign organizations).
+	//
+	// How it works:
+	// The actual work is delegated to the shared AdaptUserForTenant helper
+	// (extracted to imtauthgql.h and also used by CUserCollectionControllerComp).
+	// It performs binding-based filtering for the current tenant (or globals)
+	// plus delegated role enrichment.
+	// =========================================================================
+
+	imtsdl::TElementList<sdl::V1_0::imtauth::CRoleInfo> roleList;
 
 	if (m_roleCollectionCompPtr.IsValid()){
-		const QByteArrayList roles = userInfoPtr->GetRoles(productId);
+		// Use the (possibly tenant-adapted) roles list. The adaptation has
+		// already filtered according to tenant bindings and appended any
+		// delegated roles.
+		const QByteArrayList roles = effectiveUserPtr->GetRoles(currentProductId);
 
 		for (const QByteArray& roleId : std::as_const(roles)){
 			imtbase::IObjectCollection::DataPtr roleDataPtr;
 			if (m_roleCollectionCompPtr->GetObjectData(roleId, roleDataPtr)){
 				const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
 				if (roleInfoPtr != nullptr){
-					sdl::imtauth::Profile::CRoleInfo::V1_0 info;
+					sdl::V1_0::imtauth::CRoleInfo info;
 					info.id = QByteArray(roleInfoPtr->GetRoleId());
 					info.name = QString(roleInfoPtr->GetRoleName());
 					info.description = QString(roleInfoPtr->GetRoleDescription());
@@ -102,17 +160,20 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 
 	profileData.roles = std::move(roleList);
 
-	imtsdl::TElementList<sdl::imtauth::Profile::CGroupInfo::V1_0> groupList;
+	imtsdl::TElementList<sdl::V1_0::imtauth::CGroupInfo> groupList;
 
 	if (m_groupCollectionCompPtr.IsValid()){
-		QByteArrayList groups = userInfoPtr->GetGroups();
+		// Groups from the (tenant-adapted) user. The AdaptUserForTenant
+		// has already applied binding-based filtering for the current tenant
+		// (or globals for No Organization).
+		QByteArrayList groups = effectiveUserPtr->GetGroups();
 
 		for (const QByteArray& groupId : std::as_const(groups)){
 			imtbase::IObjectCollection::DataPtr groupDataPtr;
 			if (m_groupCollectionCompPtr->GetObjectData(groupId, groupDataPtr)){
 				const imtauth::IUserGroupInfo* groupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
 				if (groupInfoPtr != nullptr){
-					sdl::imtauth::Profile::CGroupInfo::V1_0 info;
+					sdl::V1_0::imtauth::CGroupInfo info;
 
 					info.id = QByteArray(groupInfoPtr->GetId());
 					info.name = QString(groupInfoPtr->GetName());
@@ -126,55 +187,54 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 
 	profileData.groups = std::move(groupList);
 
-	imtsdl::TElementList<sdl::imtauth::Profile::CPermissionInfo::V1_0> permissionList;
+	imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionInfo> permissionList;
 
-	QByteArrayList permissions = userInfoPtr->GetPermissions(productId);
+	// Permissions from the adapted user (consistent with the binding-based
+	// tenant adaptation used for user collection views).
+	QByteArrayList permissions = effectiveUserPtr->GetPermissions(currentProductId);
 	for (const QByteArray& permissionId : std::as_const(permissions)){
-		sdl::imtauth::Profile::CPermissionInfo::V1_0 info;
+		sdl::V1_0::imtauth::CPermissionInfo info;
 		info.id = permissionId;
 		permissionList << info;
 	}
 
 	profileData.permissions = std::move(permissionList);
 
-	sdl::imtauth::Profile::CProfileData retVal;
-	retVal.Version_1_0 = std::move(profileData);
-
-	return retVal;
+	return profileData;
 }
 
 
-sdl::imtauth::Profile::CGetUserOrganizationsPayload CProfileControllerComp::OnGetUserOrganizations(
-			const sdl::imtauth::Profile::CGetUserOrganizationsGqlRequest& getUserOrganizationsRequest,
+sdl::V1_0::imtauth::CGetUserOrganizationsPayload CProfileControllerComp::OnGetUserOrganizations(
+			const sdl::V1_0::imtauth::CGetUserOrganizationsGqlRequest& getUserOrganizationsRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Profile::CGetUserOrganizationsPayload response;
-	response.Version_1_0.emplace();
-
-	sdl::imtauth::Profile::GetUserOrganizationsRequestArguments arguments = getUserOrganizationsRequest.GetRequestedArguments();
+	sdl::V1_0::imtauth::CGetUserOrganizationsPayload response;
+	sdl::V1_0::imtauth::GetUserOrganizationsRequestArguments arguments = getUserOrganizationsRequest.GetRequestedArguments();
 
 	QByteArray userId;
-	if (arguments.input.Version_1_0.has_value() && arguments.input.Version_1_0->id){
-		userId = *arguments.input.Version_1_0->id;
+	if (arguments.input->id){
+		userId = *arguments.input->id;
 	}
 
 	if (!userId.isEmpty()){
-		response.Version_1_0->organizations = CreateOrganizationList(userId);
+		response.organizations = CreateOrganizationList(userId);
 	}
 
 	return response;
 }
 
 
-imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> CProfileControllerComp::CreateOrganizationList(
+imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerComp::CreateOrganizationList(
 			const QByteArray& userId) const
 {
-	imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> organizationList;
+	imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> organizationList;
 
 	if (!m_tenantManagerCompPtr.IsValid()){
 		return organizationList;
 	}
+
+	QByteArrayList directTenantIds;
 
 	for (const QByteArray& tenantId : m_tenantManagerCompPtr->GetTenantIds()){
 		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
@@ -193,55 +253,125 @@ imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> CProfileCo
 			continue;
 		}
 
-		sdl::imtauth::Profile::CProfileTenantInfo::V1_0 organizationInfo;
+		directTenantIds.append(tenantId);
+
+		sdl::V1_0::imtauth::CProfileTenantInfo organizationInfo;
 		organizationInfo.id = tenantId;
 		organizationInfo.name = tenantPtr->GetTenantName();
 		organizationInfo.description = tenantPtr->GetTenantDescription();
 		organizationInfo.ownerId = tenantPtr->GetOwnerId();
 		organizationInfo.isOwner = isOwner;
 		organizationInfo.isActive = tenantPtr->IsActive();
+		organizationInfo.isDelegated = false;
 		if (isOwner){
 			organizationInfo.role = QStringLiteral("Owner");
 		}
 		else{
-			organizationInfo.role = TenantMembershipRoleToString(membershipPtr->GetRoleId());
+			organizationInfo.role = QStringLiteral("Member");
 		}
 
 		organizationList << organizationInfo;
+	}
+
+	// Append delegated organizations via cross-org grants
+	if (m_crossOrgGrantCompPtr.IsValid() && m_membershipManagerCompPtr.IsValid()){
+		// Find the user's home tenant(s) and check for grants targeting them
+		const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
+			m_membershipManagerCompPtr->GetMembershipsByUser(userId);
+
+		QByteArrayList homeTenantIds;
+		for (const QByteArray& membershipId : membershipIds){
+			imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+			if (membershipPtr.IsValid()){
+				QByteArray tenantId = membershipPtr->GetTenantId();
+				if (!homeTenantIds.contains(tenantId)){
+					homeTenantIds.append(tenantId);
+				}
+			}
+		}
+
+		for (const QByteArray& homeTenantId : homeTenantIds){
+			const imtauth::CrossOrgGrants grants = m_crossOrgGrantCompPtr->GetGrantsByTargetTenant(homeTenantId);
+			for (const imtauth::CrossOrgGrantInfo& grant : grants){
+				if (!grant.isActive){
+					continue;
+				}
+				QByteArray sourceTenantId = grant.sourceTenantId;
+				if (directTenantIds.contains(sourceTenantId)){
+					continue;
+				}
+
+				// Verify at least one role is effective
+				bool isEffective = false;
+				for (const QByteArray& roleId : grant.roleIds){
+					if (m_crossOrgGrantCompPtr->HasAccess(sourceTenantId, homeTenantId, roleId)){
+						isEffective = true;
+						break;
+					}
+				}
+				if (!isEffective && !grant.roleIds.isEmpty()){
+					continue;
+				}
+
+				// Check if already added from another home tenant
+				bool alreadyAdded = false;
+				for (int i = 0; i < organizationList.size(); ++i){
+					if (organizationList[i]->id.HasValue() && organizationList[i]->id == sourceTenantId){
+						alreadyAdded = true;
+						break;
+					}
+				}
+				if (alreadyAdded){
+					continue;
+				}
+
+				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(sourceTenantId);
+				if (!tenantPtr.IsValid() || !tenantPtr->IsActive()){
+					continue;
+				}
+
+				sdl::V1_0::imtauth::CProfileTenantInfo organizationInfo;
+				organizationInfo.id = sourceTenantId;
+				organizationInfo.name = tenantPtr->GetTenantName();
+				organizationInfo.description = tenantPtr->GetTenantDescription();
+				organizationInfo.ownerId = tenantPtr->GetOwnerId();
+				organizationInfo.isOwner = false;
+				organizationInfo.isActive = tenantPtr->IsActive();
+				organizationInfo.isDelegated = true;
+				organizationInfo.role = QStringLiteral("Delegated Member");
+
+				imtsdl::TElementList<QString> delegatedRolesList;
+				for (const QByteArray& roleId : grant.roleIds){
+					delegatedRolesList << QString::fromUtf8(roleId);
+				}
+				organizationInfo.delegatedRoles = delegatedRolesList;
+
+				organizationList << organizationInfo;
+			}
+		}
 	}
 
 	return organizationList;
 }
 
 
-QString CProfileControllerComp::TenantMembershipRoleToString(const QByteArray& roleId) const
-{
-	return QString::fromUtf8(roleId);
-}
-
-
-sdl::imtauth::Profile::CSetProfileResponse CProfileControllerComp::OnSetProfile(
-			const sdl::imtauth::Profile::CSetProfileGqlRequest& setProfileRequest,
+sdl::V1_0::imtauth::CSetProfileResponse CProfileControllerComp::OnSetProfile(
+			const sdl::V1_0::imtauth::CSetProfileGqlRequest& setProfileRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Profile::CSetProfileResponse::V1_0 response;
+	sdl::V1_0::imtauth::CSetProfileResponse response;
 
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CProfileControllerComp");
 
-		return sdl::imtauth::Profile::CSetProfileResponse();
+		return sdl::V1_0::imtauth::CSetProfileResponse();
 	}
 
-	sdl::imtauth::Profile::SetProfileRequestArguments arguments = setProfileRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return sdl::imtauth::Profile::CSetProfileResponse();
-	}
-
+	sdl::V1_0::imtauth::SetProfileRequestArguments arguments = setProfileRequest.GetRequestedArguments();
 	QByteArray id;
-	if (arguments.input.Version_1_0->id){
-		id = *arguments.input.Version_1_0->id;
+	if (arguments.input->id){
+		id = *arguments.input->id;
 	}
 
 	imtauth::IUserInfo* userInfoPtr = nullptr;
@@ -252,17 +382,17 @@ sdl::imtauth::Profile::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to set a profile info. Error: User with ID '%1' does not exists").arg(qPrintable(id));
-		return sdl::imtauth::Profile::CSetProfileResponse();
+		return sdl::V1_0::imtauth::CSetProfileResponse();
 	}
 
 	QString name;
-	if (arguments.input.Version_1_0->name){
-		name = *arguments.input.Version_1_0->name;
+	if (arguments.input->name){
+		name = *arguments.input->name;
 	}
 
 	QString email;
-	if (arguments.input.Version_1_0->email){
-		email = *arguments.input.Version_1_0->email;
+	if (arguments.input->email){
+		email = *arguments.input->email;
 	}
 
 	userInfoPtr->SetName(name);
@@ -271,15 +401,12 @@ sdl::imtauth::Profile::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 	if (!m_userCollectionCompPtr->SetObjectData(id, *userInfoPtr)){
 		errorMessage = QString("Unable to set a profile info. Error: User collection cannot to update an object with ID '%1'").arg(qPrintable(id));
 
-		return sdl::imtauth::Profile::CSetProfileResponse();
+		return sdl::V1_0::imtauth::CSetProfileResponse();
 	}
 
 	response.status = true;
 
-	sdl::imtauth::Profile::CSetProfileResponse retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 

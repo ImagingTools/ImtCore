@@ -37,7 +37,8 @@ iproc::IProcessor::TaskState CSimpleFileJoinerComp::DoProcessing(
 		const iprm::IParamsSet* paramsPtr,
 		const istd::IPolymorphic* inputPtr,
 		istd::IChangeable* /*outputPtr*/,
-		ibase::IProgressManager* /*progressManagerPtr*/)
+		ibase::IProgressManager* /*progressManagerPtr*/,
+		istd::IChangeable* /*processingReportPtr*/)
 {
 	if (paramsPtr == nullptr){
 		SendErrorMessage(0, QString("Input params is required"));
@@ -164,5 +165,4 @@ iproc::IProcessor::TaskState CSimpleFileJoinerComp::DoProcessing(
 
 
 } // namespace imtsdl
-
 

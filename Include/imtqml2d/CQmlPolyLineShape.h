@@ -17,13 +17,13 @@ namespace imtqml2d
 {
 
 
-class CQmlPolyLineShape: public sdl::imtsdl2d::imt2d::CPolyline2d, public imod::TSingleModelObserverBase<i2d::CPolyline>
+class CQmlPolyLineShape: public sdl::V1_0::imtsdl2d::CPolyline2d, public imod::TSingleModelObserverBase<i2d::CPolyline>
 {
 	Q_OBJECT
 
 public:
 	typedef imod::CSingleModelObserverBase BaseClass;
-	typedef sdl::imtsdl2d::imt2d::CPolyline2d BaseClass2;
+	typedef sdl::V1_0::imtsdl2d::CPolyline2d BaseClass2;
 
 	[[nodiscard]] bool IsValid() const;
 
@@ -34,7 +34,7 @@ public:
 
 	// reimplemented CPolyline2d
 public:
-	virtual void SetPoints(const QList<sdl::imtsdl2d::imt2d::CPoint2d>& newPoints) override;
+	virtual void SetPoints(const QList<sdl::V1_0::imtsdl2d::CPoint2d>& newPoints) override;
 };
 
 

@@ -23,14 +23,18 @@ TenantSimpleCollectionPage {
 	documentManager: apiClient ? apiClient.groupDocumentManager : null
 	objectTypeId: apiClient ? apiClient.groupObjectTypeId : ""
 	dataProvider: apiClient ? apiClient.groupListDataProvider : null
-	function removeItem(id) {
+	managePermissionIds: ["EditOrganizationGroup", "ChangeOrganizationGroup", "RemoveOrganizationGroup", "AddOrganizationGroup"]
+	createPermissionIds: ["AddOrganizationGroup", "EditOrganizationGroup"]
+	editPermissionIds: ["ChangeOrganizationGroup", "EditOrganizationGroup"]
+	deletePermissionIds: ["RemoveOrganizationGroup", "EditOrganizationGroup"]
+	function removeItems(ids) {
 		if (groupsPage.apiClient)
-			groupsPage.apiClient.removeGroup(id)
+			groupsPage.apiClient.removeGroups(ids)
 	}
 
 	Connections {
 		target: groupsPage.apiClient
-		function onGroupRemoved(groupId) {
+		function onGroupsRemoved() {
 			groupsPage.refresh()
 		}
 	}

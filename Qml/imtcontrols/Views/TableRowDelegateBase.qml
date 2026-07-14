@@ -5,7 +5,11 @@ import imtcontrols 1.0
 
 Rectangle {
 	id: tableDelegateContainer;
-	
+
+	// Test instrumentation: makes every collection row addressable by index for GUI tests
+	// (Tests/ProLifeGui). Inert - objectName has no runtime/visual effect.
+	objectName: "TableRow_" + rowIndex;
+
 	width: Style.sizeHintXXXL;
 	height: minHeight;
 	property real minHeight: Style.controlHeightL;
@@ -319,48 +323,38 @@ Rectangle {
 	
 	MouseArea {
 		id: ma;
-		
+		objectName: "MouseArea";
+
 		anchors.fill: parent;
 		hoverEnabled: true;
-		
+
 		acceptedButtons: Qt.AllButtons;
-		
-		Timer{
-			id:timer
-			interval: 300
-			onTriggered: {
-				ma.clickCount = 0;
-			}
-		}
-		
-		property int clickCount: 0;
+
 		onClicked: {
-			clickCount++;
-			
-			if (ma.clickCount == 1){
-				if (mouse.button === Qt.RightButton){
-					tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
-				}
-				tableDelegateContainer.clicked();
-				
-				timer.start();
+			if (mouse.button === Qt.RightButton){
+				tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
 			}
-			
-			if (ma.clickCount == 2){
-				if (mouse.button === Qt.RightButton){
-					return;
-				}
-				
-				tableDelegateContainer.doubleClicked(this.mouseX, this.mouseY);
-				
-				ma.clickCount = 0;
-				timer.stop();
-			}
-			
+			tableDelegateContainer.clicked();
+
 			if (tableDelegateContainer.tableItem.selectable){
 				selectionManager.onMouseEvent(mouse, tableDelegateContainer.rowIndex);
 			}
-			
+
+			tableDelegateContainer.forceActiveFocus();
+			mouse.accepted = false;
+		}
+
+		onDoubleClicked: {
+			if (mouse.button === Qt.RightButton){
+				return;
+			}
+
+			tableDelegateContainer.doubleClicked(this.mouseX, this.mouseY);
+
+			if (tableDelegateContainer.tableItem.selectable){
+				selectionManager.onMouseEvent(mouse, tableDelegateContainer.rowIndex);
+			}
+
 			tableDelegateContainer.forceActiveFocus();
 			mouse.accepted = false;
 		}
@@ -368,10 +362,15 @@ Rectangle {
 	
 	Component{
 		id: checkBox;
-		
+
 		CheckBox {
+			// Test instrumentation: distinguishes this row-level check toggle from the row's own
+			// "MouseArea" (both live under the same "TableRow_<index>" container) so GUI tests can
+			// address it unambiguously via [objectName="TableRow_i"] [objectName="RowCheckBox"]
+			// [objectName="MouseArea"]. Inert - no runtime/visual effect.
+			objectName: "RowCheckBox";
 			z: 1000;
-			
+
 			anchors.verticalCenter: parent.verticalCenter;
 			anchors.left: parent.left;
 			anchors.leftMargin: Style.marginM;

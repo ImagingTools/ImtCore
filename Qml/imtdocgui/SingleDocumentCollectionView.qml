@@ -13,18 +13,20 @@ Item {
 	property bool showStandardLoading: true
 	property CollectionView collectionView: null
 	property DocumentServiceBase documentManager
+	property string reopenAfterCloseDocumentId: ""
+	property string reopenAfterCloseTypeId: ""
+	property string reopenAfterCloseObjectId: ""
 
 	signal startLoading(string documentId)
 	signal stopLoading(string documentId)
 
 	onCollectionViewChanged: {
 		if (collectionView){
-			collectionView.documentManager = documentManager
 			navigableItem.parentSegment = collectionView.collectionId
 		}
 	}
 
-	onDocumentServiceChanged: {
+	onDocumentManagerChanged: {
 		if (documentManager){
 			documentManager.setDocumentServiceActiveView(workspaceView)
 		}
@@ -60,6 +62,42 @@ Item {
 		stackView.addPage(collectionViewComp)
 		headersModel.addHeader(UuidGenerator.generateUUID(), name)
 		stackView.setCurrentIndex(0)
+	}
+
+	function __showSingleDocument(documentId, name){
+		if (headersModel.count > 1){
+			let currentHeader = headersModel.get(headersModel.count - 1)
+			if (currentHeader.headerId === documentId){
+				headersModel.setHeaderName(documentId, name)
+				workspaceView.__closeOtherOpenedDocuments(documentId)
+				if (stackView.count > 1){
+					stackView.setCurrentIndex(stackView.count - 1)
+				}
+				return
+			}
+
+			while (stackView.count > 1){
+				stackView.removePage(stackView.count - 1)
+			}
+			headersModel.removeAllAfterFirst()
+		}
+
+		headersModel.addHeader(documentId, name)
+		stackView.addPage(documentViewComp)
+		stackView.setCurrentIndex(stackView.count - 1)
+		workspaceView.__closeOtherOpenedDocuments(documentId)
+	}
+
+	function __closeOtherOpenedDocuments(activeDocumentId){
+		if (!workspaceView.documentManager)
+			return
+
+		let openedDocumentIds = workspaceView.documentManager.getOpenedDocumentIds()
+		for (let i = 0; i < openedDocumentIds.length; ++i){
+			let openedId = openedDocumentIds[i]
+			if (openedId !== activeDocumentId)
+				workspaceView.documentManager.closeDocument(openedId)
+		}
 	}
 
 	Connections {
@@ -121,14 +159,8 @@ Item {
 			}
 		}
 
-		function onDocumentServiceChanged(typeOperation, objectId, documentId, documentName){
-			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
-				if (stackView.count > 1){
-					stackView.removePage(stackView.count - 1)
-					headersModel.removeAllAfterFirst()
-				}
-			}
-			else if (typeOperation === EDocumentOperationEnum.s_newDocumentCreated ||
+		function onDocumentManagerChanged(typeOperation, objectId, documentId, documentName){
+			if (typeOperation === EDocumentOperationEnum.s_newDocumentCreated ||
 					typeOperation === EDocumentOperationEnum.s_documentOpened){
 				workspaceView.documentManager.setDocumentName(documentId, documentName)
 			}
@@ -161,19 +193,30 @@ Item {
 			if (name === ""){
 				name = workspaceView.documentManager.getDefaultDocumentName()
 			}
-			headersModel.addHeader(documentId, name)
-			stackView.addPage(documentViewComp)
-			stackView.setCurrentIndex(stackView.count - 1)
+			workspaceView.reopenAfterCloseDocumentId = ""
+			workspaceView.reopenAfterCloseTypeId = ""
+			workspaceView.reopenAfterCloseObjectId = ""
+			workspaceView.__showSingleDocument(documentId, name)
 			workspaceView.startLoading(documentId)
 		}
 
 		function onDocumentAlreadyOpened(documentId, typeId){
-			if (stackView.count > 1){
-				stackView.setCurrentIndex(stackView.count - 1)
+			let name = workspaceView.documentManager.getDocumentName(documentId)
+			if (name === ""){
+				name = workspaceView.documentManager.getDefaultDocumentName()
 			}
+			workspaceView.reopenAfterCloseDocumentId = documentId
+			workspaceView.reopenAfterCloseTypeId = typeId
+			workspaceView.reopenAfterCloseObjectId = workspaceView.documentManager.getDocumentObjectId
+				? workspaceView.documentManager.getDocumentObjectId(documentId)
+				: ""
+			workspaceView.__showSingleDocument(documentId, name)
 		}
 
 		function onOpenDocumentFailed(documentId, message){
+			workspaceView.reopenAfterCloseDocumentId = ""
+			workspaceView.reopenAfterCloseTypeId = ""
+			workspaceView.reopenAfterCloseObjectId = ""
 			workspaceView.stopLoading(documentId)
 			ModalDialogManager.showErrorDialog(message)
 		}
@@ -184,11 +227,26 @@ Item {
 		}
 
 		function onDocumentClosed(documentId){
-			if (stackView.count > 1){
-				stackView.removePage(stackView.count - 1)
-				headersModel.removeAllAfterFirst()
+			let shouldReopen = workspaceView.reopenAfterCloseDocumentId === documentId
+			let reopenTypeId = workspaceView.reopenAfterCloseTypeId
+			let reopenObjectId = workspaceView.reopenAfterCloseObjectId
+
+			workspaceView.reopenAfterCloseDocumentId = ""
+			workspaceView.reopenAfterCloseTypeId = ""
+			workspaceView.reopenAfterCloseObjectId = ""
+
+			if (headersModel.count > 1){
+				let currentHeader = headersModel.get(headersModel.count - 1)
+				if (currentHeader.headerId === documentId && stackView.count > 1){
+					stackView.removePage(stackView.count - 1)
+					headersModel.removeAllAfterFirst()
+				}
 			}
 			workspaceView.stopLoading(documentId)
+
+			if (shouldReopen && reopenTypeId !== "" && reopenObjectId !== ""){
+				workspaceView.documentManager.openDocument(reopenTypeId, reopenObjectId)
+			}
 		}
 
 		function onCloseDocumentFailed(documentId, message){
@@ -224,9 +282,10 @@ Item {
 			if (name === ""){
 				name = workspaceView.documentManager.getDefaultDocumentName()
 			}
-			headersModel.addHeader(documentId, name)
-			stackView.addPage(documentViewComp)
-			stackView.setCurrentIndex(stackView.count - 1)
+			workspaceView.reopenAfterCloseDocumentId = ""
+			workspaceView.reopenAfterCloseTypeId = ""
+			workspaceView.reopenAfterCloseObjectId = ""
+			workspaceView.__showSingleDocument(documentId, name)
 			workspaceView.startLoading(documentId)
 		}
 
@@ -309,14 +368,20 @@ Item {
 
 	Rectangle {
 		anchors.fill: parent
-		color: Style.backgroundColor2
+		color: Style.baseColor
 	}
 
 	ListModel {
 		id: headersModel
 
 		function addHeader(id, name){
+			let existingIndex = headersModel.getIndexById(id)
+			if (existingIndex >= 0){
+				headersModel.setProperty(existingIndex, "headerName", name)
+				return false
+			}
 			headersModel.append({headerId: id, headerName: name})
+			return true
 		}
 
 		function getIndexById(id){

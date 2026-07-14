@@ -4,14 +4,12 @@
         <VersionInfos>
             <Version Id="0" Number="6154" Description="ACF"/>
             <Version Id="1" Number="2274" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395778" Description="Qt Framework"/>
+            <Version Id="1023" Number="396033" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CollectionBasedMessageConsumer" X="400" Y="375" Note=""/>
-        <Element ComponentName="LogSqlRepository" X="525" Y="525" Note=""/>
-        <Element ComponentName="QuickApplicationFramework" X="550" Y="200" Note=""/>
-        <Element ComponentName="SqLiteDatabaseEngine" X="775" Y="400" Note=""/>
+        <Element ComponentName="LogDatabase" X="900" Y="525" Note=""/>
+        <Element ComponentName="QuickApplicationFramework" X="325" Y="150" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

@@ -7,7 +7,7 @@
 #include <istd/IChangeable.h>
 
 // ImtCore includes
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users_fwd.h>
 
 
 namespace imtauthgql
@@ -18,7 +18,7 @@ class CUserRepresentationController: public istd::IPolymorphic
 {
 public:
 	virtual bool FillUserInfoFromRepresentation(
-				const sdl::imtauth::Users::CUserData::V1_0& representation,
+				const sdl::V1_0::imtauth::CUserData& representation,
 				istd::IChangeable& userObject,
 				imtbase::IObjectCollection* userCollectionPtr,
 				const QByteArray& userId,

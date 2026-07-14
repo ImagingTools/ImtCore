@@ -4,7 +4,32 @@
 
 // ImtCore includes
 #include <imtauth/CTenantFilterParam.h>
+#include <imtauth/ITenantRelationshipInfo.h>
+#include <imtauth/ITenantRelationshipProposalInfo.h>
+#include <imtauth/ITenantConnectionRequestInfo.h>
+#include <imtauth/ITenantConnectionInfo.h>
+#include <imtauth/ICrossOrgGrant.h>
+#include <imtauth/IContract.h>
+#include <imtauth/ITenantEntityBindingManager.h>
+#include <imtauth/IDelegatedAccess.h>
+#include <imtauth/ITenantMembershipManager.h>
+#include <imtauth/IRoleInfoProvider.h>
+#include <istd/IChangeable.h>
+#include <imtauth/ICrossTenantMessage.h>
+#include <imtauth/IOrderRequest.h>
+#include <imtlic/IProductInfo.h>
+#include <imtlic/CFeatureInfo.h>
+#include <imtsdl/TElementList.h>
+#include <iqt/ITranslationManager.h>
+#include <iqt/iqt.h>
 #include <imtgql/CGqlRequest.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
+
+
+// Qt includes
+#include <QtCore/QSet>
+#include <QtCore/QByteArrayList>
+#include <imtauth/IUserInfo.h>
 
 
 /**
@@ -295,7 +320,7 @@
 	**Register New User:**
 	\code{.cpp}
 	// Prepare registration request
-	sdl::imtauth::Users::CRegisterUserGqlRequest request;
+	sdl::V1_0::imtauth::CRegisterUserGqlRequest request;
 	request.SetEmail("newuser@example.com");
 	request.SetPassword("SecurePassword123!");
 	request.SetName("John Doe");
@@ -319,7 +344,7 @@
 	**Change User Password:**
 	\code{.cpp}
 	// Prepare change password request
-	sdl::imtauth::Users::CChangePasswordGqlRequest request;
+	sdl::V1_0::imtauth::CChangePasswordGqlRequest request;
 	request.SetOldPassword("OldPassword123");
 	request.SetNewPassword("NewSecurePassword456!");
 	
@@ -373,7 +398,7 @@
 	                             clientRequestManager.get());
 	
 	// Generate token
-	sdl::imtauth::Tokens::CGenerateTokenGqlRequest request;
+	sdl::V1_0::imtauth::CGenerateTokenGqlRequest request;
 	request.SetName("API Access Token");
 	request.SetExpiresIn(2592000); // 30 days
 	
@@ -450,7 +475,7 @@
 	        }
 	        
 	        // Prepare GraphQL request
-	        sdl::imtauth::Users::CLoginGqlRequest request;
+	        sdl::V1_0::imtauth::CLoginGqlRequest request;
 	        request.SetEmail(email);
 	        request.SetPassword(password);
 	        
@@ -606,16 +631,269 @@ namespace imtauthgql
 
 
 /**
+	Collect flat permission entries from a feature subtree.
+	When allowedPermissionsPtr is set, returns only entries reachable from selected nodes.
+*/
+template<typename TEntry>
+inline bool CollectPermissionEntries(
+			const imtlic::CFeatureInfo& featureInfo,
+			imtsdl::TElementList<TEntry>& entries,
+			const QByteArray& languageId,
+			const QSet<QByteArray>* allowedPermissionsPtr,
+			const QString& parentPath,
+			const iqt::ITranslationManager* translationManagerPtr,
+			bool parentSelected = false)
+{
+	if (!featureInfo.IsPermission()){
+		return false;
+	}
+
+	QByteArray featureId = featureInfo.GetFeatureId();
+	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
+
+	QString featureName = featureInfo.GetFeatureName();
+	if (translationManagerPtr != nullptr){
+		featureName = iqt::GetTranslation(translationManagerPtr, featureName.toUtf8(), languageId, QByteArrayLiteral("Feature"));
+	}
+
+	QString displayName = parentPath.isEmpty() ? featureName : (parentPath + QStringLiteral(" / ") + featureName);
+
+	if (subFeatures.isEmpty()){
+		if (allowedPermissionsPtr != nullptr && !parentSelected && !allowedPermissionsPtr->contains(featureId)){
+			return false;
+		}
+
+		QString featureDescription = featureInfo.GetFeatureDescription();
+		if (translationManagerPtr != nullptr){
+			featureDescription = iqt::GetTranslation(translationManagerPtr, featureDescription.toUtf8(), languageId, QByteArrayLiteral("Feature"));
+		}
+
+		TEntry entry;
+		entry.permissionId = featureId;
+		entry.displayName = displayName;
+		entry.description = featureDescription;
+		entries.append(entry);
+
+		return true;
+	}
+
+	imtsdl::TElementList<TEntry> childEntries;
+	int childCount = 0;
+	const bool thisNodeSelected = parentSelected || (allowedPermissionsPtr != nullptr && allowedPermissionsPtr->contains(featureId));
+
+	for (int i = 0; i < subFeatures.count(); i++){
+		const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr = subFeatures.at(i);
+		if (!subFeaturePtr.IsValid()){
+			continue;
+		}
+
+		const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(subFeaturePtr.GetPtr());
+		if (subFeatureInfoPtr == nullptr){
+			continue;
+		}
+
+		if (CollectPermissionEntries<TEntry>(
+					*subFeatureInfoPtr,
+					childEntries,
+					languageId,
+					allowedPermissionsPtr,
+					displayName,
+					translationManagerPtr,
+					thisNodeSelected)){
+			childCount++;
+		}
+	}
+
+	if (allowedPermissionsPtr != nullptr && childCount == 0){
+		return false;
+	}
+
+	for (const TEntry& childEntry : childEntries.ToList()){
+		entries.append(childEntry);
+	}
+
+	return childCount > 0;
+}
+
+
+/**
+	Build top-level permission groups with flattened path-based entries.
+	When allowedPermissionsPtr is set, only selected group subtrees are included.
+*/
+template<typename TGroup, typename TEntry>
+inline void BuildPermissionGroups(
+			imtlic::IProductInfo* productInfoPtr,
+			const iqt::ITranslationManager* translationManagerPtr,
+			imtsdl::TElementList<TGroup>& groups,
+			const QByteArray& languageId,
+			const QSet<QByteArray>* allowedPermissionsPtr)
+{
+	if (productInfoPtr == nullptr){
+		return;
+	}
+
+	imtbase::IObjectCollection* featureCollectionPtr = productInfoPtr->GetFeatures();
+	if (featureCollectionPtr == nullptr){
+		return;
+	}
+
+	imtbase::ICollectionInfo::Ids elementIds = featureCollectionPtr->GetElementIds();
+	for (imtbase::ICollectionInfo::Id& elementId : elementIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (!featureCollectionPtr->GetObjectData(elementId, dataPtr)){
+			continue;
+		}
+
+		const imtlic::CFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(dataPtr.GetPtr());
+		if (featureInfoPtr == nullptr || !featureInfoPtr->IsPermission()){
+			continue;
+		}
+
+		QByteArray groupId = featureInfoPtr->GetFeatureId();
+		QString groupName = featureInfoPtr->GetFeatureName();
+		if (translationManagerPtr != nullptr){
+			groupName = iqt::GetTranslation(translationManagerPtr, groupName.toUtf8(), languageId, QByteArrayLiteral("Feature"));
+		}
+
+		TGroup group;
+		group.groupId = groupId;
+		group.groupName = groupName;
+		group.entries.Emplace();
+
+		const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
+		bool hasEntries = false;
+		const bool groupSelected = (allowedPermissionsPtr != nullptr && allowedPermissionsPtr->contains(groupId));
+
+		if (subFeatures.isEmpty()){
+			hasEntries = CollectPermissionEntries<TEntry>(
+					*featureInfoPtr,
+					*group.entries,
+					languageId,
+					allowedPermissionsPtr,
+					QString(),
+					translationManagerPtr,
+					groupSelected);
+		}
+		else{
+			for (int i = 0; i < subFeatures.count(); i++){
+				const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr = subFeatures.at(i);
+				if (!subFeaturePtr.IsValid()){
+					continue;
+				}
+
+				const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(subFeaturePtr.GetPtr());
+				if (subFeatureInfoPtr != nullptr){
+					if (CollectPermissionEntries<TEntry>(
+							*subFeatureInfoPtr,
+							*group.entries,
+							languageId,
+							allowedPermissionsPtr,
+							QString(),
+							translationManagerPtr,
+							groupSelected)){
+						hasEntries = true;
+					}
+				}
+			}
+		}
+
+		if (allowedPermissionsPtr != nullptr && !hasEntries){
+			continue;
+		}
+
+		groups.append(group);
+	}
+}
+
+
+/**
+	Build permission groups from an IFeatureInfoProvider (used for organization-specific permissions).
+	Follows the same flattening logic as BuildPermissionGroups.
+*/
+template<typename TGroup, typename TEntry>
+inline void BuildPermissionGroupsFromProvider(
+			const imtlic::IFeatureInfoProvider* providerPtr,
+			const iqt::ITranslationManager* translationManagerPtr,
+			imtsdl::TElementList<TGroup>& groups,
+			const QByteArray& languageId,
+			const QSet<QByteArray>* allowedPermissionsPtr)
+{
+	if (providerPtr == nullptr){
+		return;
+	}
+
+	const imtbase::ICollectionInfo& coll = providerPtr->GetFeatureList();
+	imtbase::ICollectionInfo::Ids elementIds = coll.GetElementIds();
+	for (const auto& elementId : elementIds){
+		imtlic::IFeatureInfoSharedPtr featPtr = providerPtr->GetFeatureInfo(elementId);
+		if (!featPtr.IsValid()) continue;
+
+		const imtlic::CFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(featPtr.GetPtr());
+		if (featureInfoPtr == nullptr || !featureInfoPtr->IsPermission()){
+			continue;
+		}
+
+		QByteArray groupId = featureInfoPtr->GetFeatureId();
+		QString groupName = featureInfoPtr->GetFeatureName();
+		if (translationManagerPtr != nullptr){
+			groupName = iqt::GetTranslation(translationManagerPtr, groupName.toUtf8(), languageId, QByteArrayLiteral("Feature"));
+		}
+
+		TGroup group;
+		group.groupId = groupId;
+		group.groupName = groupName;
+		group.entries.Emplace();
+
+		const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
+		bool hasEntries = false;
+		const bool groupSelected = (allowedPermissionsPtr != nullptr && allowedPermissionsPtr->contains(groupId));
+
+		if (subFeatures.isEmpty()){
+			hasEntries = CollectPermissionEntries<TEntry>(
+					*featureInfoPtr,
+					*group.entries,
+					languageId,
+					allowedPermissionsPtr,
+					QString(),
+					translationManagerPtr,
+					groupSelected);
+		}
+		else{
+			for (int i = 0; i < subFeatures.count(); i++){
+				const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr = subFeatures.at(i);
+				if (!subFeaturePtr.IsValid()) continue;
+				const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(subFeaturePtr.GetPtr());
+				if (subFeatureInfoPtr != nullptr){
+					if (CollectPermissionEntries<TEntry>(
+							*subFeatureInfoPtr,
+							*group.entries,
+							languageId,
+							allowedPermissionsPtr,
+							QString(),
+							translationManagerPtr,
+							groupSelected)){
+						hasEntries = true;
+					}
+				}
+			}
+		}
+
+		if (allowedPermissionsPtr != nullptr && !hasEntries){
+			continue;
+		}
+
+		groups.append(group);
+	}
+}
+
+
+/**
 	Create an optional tenant filter param from a tenant id.
-	Returns nullptr when no tenant id is available.
+	Empty tenant id is allowed and represents NoOrganization context.
 	The returned pointer is owned by the caller (ParamsSet takes ownership via SetEditableParameter).
 */
 inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const QByteArray& tenantId)
 {
-	if (tenantId.isEmpty()){
-		return nullptr;
-	}
-
 	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
 	tenantFilterPtr->SetTenantId(tenantId);
 
@@ -625,7 +903,9 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const QByteArray& te
 
 /**
 	Create an optional tenant filter param from the GQL request context.
-	Returns nullptr when no tenant context is available.
+	Returns nullptr when no request context is available.
+	When tenant id is empty (NoOrganization), returns an empty-tenant filter so
+	storage delegates can apply no-organization isolation (NOT EXISTS binding).
 	The returned pointer is owned by the caller (ParamsSet takes ownership via SetEditableParameter).
 */
 inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRequest& gqlRequest)
@@ -635,7 +915,519 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRe
 		return nullptr;
 	}
 
-	return CreateTenantFilterParam(gqlContextPtr->GetTenantId());
+	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
+	tenantFilterPtr->SetTenantId(gqlContextPtr->GetTenantId());
+
+	return tenantFilterPtr;
+}
+
+/**
+	Adapts (filters) the roles, groups and permissions of a user according to the
+	current tenant context, and enriches with delegated roles when appropriate.
+
+	This is the shared logic for tenant-aware UserInfo transformation.
+
+	- For empty tenantId (No Organization): keeps only entities that have no
+	  tenant bindings at all (global items).
+	- For non-empty tenantId: keeps only entities explicitly bound to that tenant.
+	- Additionally, if the user does not have direct membership in the current
+	  tenant, adds roles granted via cross-org delegation from the user's home
+	  tenants.
+
+	The function returns a (possibly cloned) adapted object, or the original
+	base adapted if no changes were needed.
+
+	Callers must pass the required manager pointers (can be null for optional
+	behavior).
+*/
+
+/**
+ * Helper function (used internally by AdaptUserForTenant) to determine
+ * whether a given role, group or permission entity should be visible
+ * for the supplied tenant context.
+ *
+ * - If tenantId is empty (No Organization): only entities that have
+ *   absolutely no tenant bindings are kept (i.e. true global items).
+ * - If tenantId is non-empty: only entities that have an explicit
+ *   binding to that tenant are kept.
+ */
+inline bool ShouldKeepEntityForTenant(
+				imtauth::ITenantEntityBindingManager* bindingManager,
+				const QByteArray& tenantId,
+				const QByteArray& entityType,
+				const QByteArray& entityId)
+{
+	if (bindingManager == nullptr || entityId.isEmpty()){
+		return true;
+	}
+	const bool boundToAny = bindingManager->HasAnyTenantBinding(entityType, entityId);
+	if (tenantId.isEmpty()){
+		return !boundToAny;
+	}
+	return bindingManager->HasBinding(tenantId, entityType, entityId);
+}
+
+inline istd::IChangeableUniquePtr AdaptUserForTenant(
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
+				const QByteArray& tenantId,
+				const QByteArray& productId,
+				imtauth::ITenantEntityBindingManager* bindingManager,
+				imtauth::IDelegatedAccess* delegatedAccess,
+				imtauth::ITenantMembershipManager* membershipManager,
+				imtauth::IRoleInfoProvider* roleInfoProvider)
+{
+	// Operate on the original object for reading current assignments.
+	// Explicit cast, no auto.
+	const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(&object);
+	if (userInfoPtr == nullptr){
+		return istd::IChangeableUniquePtr();
+	}
+
+	const QByteArray rolesEntity = QByteArrayLiteral("Roles");
+	// Must match the Groups collection's SQL table name ("UserGroups"), since
+	// CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery stores
+	// TenantEntityBindings.EntityType as GetTableName(), not the collection ID.
+	const QByteArray groupsEntity = QByteArrayLiteral("UserGroups");
+	const QByteArray permsEntity = QByteArrayLiteral("Permissions");
+
+	// Filter roles/groups/permissions according to tenant context.
+	// empty tenantId: keep only entities with no tenant bindings at all (globals).
+	// non-empty tenantId: keep only entities bound to this tenant.
+	bool anyFilterChange = false;
+
+	QByteArrayList filteredRoles;
+	if (!productId.isEmpty()){
+		QByteArrayList userRoles = userInfoPtr->GetRoles(productId);
+		for (int i = 0; i < userRoles.size(); ++i){
+			const QByteArray rid = userRoles.at(i);
+			if (rid.isEmpty()) continue;
+			if (ShouldKeepEntityForTenant(bindingManager, tenantId, rolesEntity, rid)){
+				filteredRoles.append(rid);
+			} else {
+				anyFilterChange = true;
+			}
+		}
+	}
+
+	QByteArrayList filteredGroups;
+	QByteArrayList userGroups = userInfoPtr->GetGroups();
+	for (int i = 0; i < userGroups.size(); ++i){
+		const QByteArray gid = userGroups.at(i);
+		if (gid.isEmpty()) continue;
+		if (ShouldKeepEntityForTenant(bindingManager, tenantId, groupsEntity, gid)){
+			filteredGroups.append(gid);
+		} else {
+			anyFilterChange = true;
+		}
+	}
+
+	QByteArrayList filteredPerms;
+	if (!productId.isEmpty()){
+		QByteArrayList userPerms = userInfoPtr->GetPermissions(productId);
+		for (int i = 0; i < userPerms.size(); ++i){
+			const QByteArray pid = userPerms.at(i);
+			if (pid.isEmpty()) continue;
+			if (ShouldKeepEntityForTenant(bindingManager, tenantId, permsEntity, pid)){
+				filteredPerms.append(pid);
+			} else {
+				anyFilterChange = true;
+			}
+		}
+	}
+
+	// Delegated roles enrichment (only when not direct member in current tenant)
+	QSet<QByteArray> delegatedRoleIdSet;
+	if (!tenantId.isEmpty() && !productId.isEmpty() && delegatedAccess != nullptr && membershipManager != nullptr){
+		bool hasDirectMembership = false;
+		QByteArrayList homeTenantIds;
+		const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
+			membershipManager->GetMembershipsByUser(objectId);
+		for (int i = 0; i < membershipIds.size(); ++i){
+			const QByteArray membershipId = membershipIds.at(i);
+			imtauth::ITenantMembershipUniquePtr membershipPtr = membershipManager->GetMembership(membershipId);
+			if (!membershipPtr.IsValid() || !membershipPtr->IsActive()){
+				continue;
+			}
+			QByteArray tId = membershipPtr->GetTenantId();
+			if (tId == tenantId){
+				hasDirectMembership = true;
+				break;
+			}
+			if (!tId.isEmpty()){
+				homeTenantIds.append(tId);
+			}
+		}
+
+		if (!hasDirectMembership){
+			for (int i = 0; i < homeTenantIds.size(); ++i){
+				const QByteArray homeTenantId = homeTenantIds.at(i);
+				QByteArrayList roleIds = delegatedAccess->GetDelegatedRoles(homeTenantId, tenantId);
+				for (int j = 0; j < roleIds.size(); ++j){
+					const QByteArray roleId = roleIds.at(j);
+					if (!roleId.isEmpty()){
+						// Only keep roles that belong to the current product context (if provider available).
+						if (roleInfoProvider != nullptr){
+							imtauth::IRoleUniquePtr roleInfoPtr = roleInfoProvider->GetRole(roleId);
+							if (!roleInfoPtr.IsValid() || roleInfoPtr->GetProductId() != productId){
+								continue;
+							}
+						}
+						delegatedRoleIdSet.insert(roleId);
+					}
+				}
+			}
+		}
+	}
+
+	bool hasDelegatedChanges = !delegatedRoleIdSet.isEmpty();
+	if (!anyFilterChange && !hasDelegatedChanges){
+		return istd::IChangeableUniquePtr();
+	}
+
+	// Create a clone to modify.
+	istd::IChangeableUniquePtr adaptedObjectPtr = object.CloneMe();
+
+	imtauth::IUserInfo* adaptedUserInfoPtr = dynamic_cast<imtauth::IUserInfo*>(adaptedObjectPtr.GetPtr());
+	if (adaptedUserInfoPtr == nullptr){
+		// Should not happen, but fall back gracefully.
+		return istd::IChangeableUniquePtr();
+	}
+
+	if (anyFilterChange){
+		if (!productId.isEmpty()){
+			adaptedUserInfoPtr->SetRoles(productId, filteredRoles);
+			adaptedUserInfoPtr->SetLocalPermissions(productId, filteredPerms);
+		}
+		// reset groups to filtered list
+		QByteArrayList currGroups = adaptedUserInfoPtr->GetGroups();
+		for (int i = 0; i < currGroups.size(); ++i){
+			const QByteArray g = currGroups.at(i);
+			adaptedUserInfoPtr->RemoveFromGroup(g);
+		}
+		for (int i = 0; i < filteredGroups.size(); ++i){
+			const QByteArray g = filteredGroups.at(i);
+			adaptedUserInfoPtr->AddToGroup(g);
+		}
+	}
+
+	if (hasDelegatedChanges){
+		QByteArrayList currRoles = adaptedUserInfoPtr->GetRoles(productId);
+		QSet<QByteArray>::const_iterator it = delegatedRoleIdSet.constBegin();
+		for (; it != delegatedRoleIdSet.constEnd(); ++it){
+			const QByteArray r = *it;
+			if (!currRoles.contains(r)){
+				currRoles.append(r);
+			}
+		}
+		adaptedUserInfoPtr->SetRoles(productId, currRoles);
+	}
+
+	return adaptedObjectPtr;
+}
+
+
+// --- SDL ↔ C++ Enum Converters ---
+
+// Relationship Role
+
+inline imtauth::ITenantRelationshipInfo::TenantRelationshipRole FromSdlRelationshipRole(sdl::V1_0::imtauth::TenantRelationshipRole role)
+{
+	switch (role){
+	case sdl::V1_0::imtauth::TenantRelationshipRole::Parent:
+		return imtauth::ITenantRelationshipInfo::TRR_PARENT;
+	case sdl::V1_0::imtauth::TenantRelationshipRole::Child:
+		return imtauth::ITenantRelationshipInfo::TRR_CHILD;
+	case sdl::V1_0::imtauth::TenantRelationshipRole::Supplier:
+		return imtauth::ITenantRelationshipInfo::TRR_SUPPLIER;
+	case sdl::V1_0::imtauth::TenantRelationshipRole::Customer:
+		return imtauth::ITenantRelationshipInfo::TRR_CUSTOMER;
+	case sdl::V1_0::imtauth::TenantRelationshipRole::Affiliate:
+		return imtauth::ITenantRelationshipInfo::TRR_AFFILIATE;
+	default:
+		return imtauth::ITenantRelationshipInfo::TRR_PARTNER;
+	}
+}
+
+
+inline sdl::V1_0::imtauth::TenantRelationshipRole ToSdlRelationshipRole(imtauth::ITenantRelationshipInfo::TenantRelationshipRole role)
+{
+	switch (role){
+	case imtauth::ITenantRelationshipInfo::TRR_PARENT:
+		return sdl::V1_0::imtauth::TenantRelationshipRole::Parent;
+	case imtauth::ITenantRelationshipInfo::TRR_CHILD:
+		return sdl::V1_0::imtauth::TenantRelationshipRole::Child;
+	case imtauth::ITenantRelationshipInfo::TRR_SUPPLIER:
+		return sdl::V1_0::imtauth::TenantRelationshipRole::Supplier;
+	case imtauth::ITenantRelationshipInfo::TRR_CUSTOMER:
+		return sdl::V1_0::imtauth::TenantRelationshipRole::Customer;
+	case imtauth::ITenantRelationshipInfo::TRR_AFFILIATE:
+		return sdl::V1_0::imtauth::TenantRelationshipRole::Affiliate;
+	default:
+		return sdl::V1_0::imtauth::TenantRelationshipRole::Partner;
+	}
+}
+
+
+// Relationship Status
+
+inline sdl::V1_0::imtauth::RelationshipStatus ToSdlRelationshipStatus(imtauth::ITenantRelationshipInfo::TenantRelationshipStatus status)
+{
+	switch (status){
+	case imtauth::ITenantRelationshipInfo::TRS_ARCHIVED:
+		return sdl::V1_0::imtauth::RelationshipStatus::Archived;
+	case imtauth::ITenantRelationshipInfo::TRS_PENDING_APPROVED:
+		return sdl::V1_0::imtauth::RelationshipStatus::PendingApproval;
+	default:
+		return sdl::V1_0::imtauth::RelationshipStatus::Active;
+	}
+}
+
+
+// Connection Request Status
+
+inline sdl::V1_0::imtauth::ConnectionRequestStatus ToSdlConnectionRequestStatus(imtauth::ITenantConnectionRequestInfo::ConnectionRequestStatus status)
+{
+	switch (status){
+	case imtauth::ITenantConnectionRequestInfo::CRS_APPROVED:
+		return sdl::V1_0::imtauth::ConnectionRequestStatus::Approved;
+	case imtauth::ITenantConnectionRequestInfo::CRS_REJECTED:
+		return sdl::V1_0::imtauth::ConnectionRequestStatus::Rejected;
+	case imtauth::ITenantConnectionRequestInfo::CRS_CANCELED:
+		return sdl::V1_0::imtauth::ConnectionRequestStatus::Canceled;
+	default:
+		return sdl::V1_0::imtauth::ConnectionRequestStatus::Pending;
+	}
+}
+
+
+// Connection Status
+
+inline sdl::V1_0::imtauth::ConnectionStatus ToSdlConnectionStatus(imtauth::ITenantConnectionInfo::ConnectionStatus status)
+{
+	switch (status){
+	case imtauth::ITenantConnectionInfo::CS_REMOVED:
+		return sdl::V1_0::imtauth::ConnectionStatus::Removed;
+	case imtauth::ITenantConnectionInfo::CS_SUSPENDED:
+		return sdl::V1_0::imtauth::ConnectionStatus::Suspended;
+	default:
+		return sdl::V1_0::imtauth::ConnectionStatus::Active;
+	}
+}
+
+
+// Relationship Proposal Type
+
+inline sdl::V1_0::imtauth::RelationshipProposalType ToSdlProposalType(imtauth::ITenantRelationshipProposalInfo::RelationshipProposalType type)
+{
+	switch (type){
+	case imtauth::ITenantRelationshipProposalInfo::RPT_UPDATE:
+		return sdl::V1_0::imtauth::RelationshipProposalType::Update;
+	case imtauth::ITenantRelationshipProposalInfo::RPT_DELETE:
+		return sdl::V1_0::imtauth::RelationshipProposalType::Delete;
+	default:
+		return sdl::V1_0::imtauth::RelationshipProposalType::Create;
+	}
+}
+
+
+inline imtauth::ITenantRelationshipProposalInfo::RelationshipProposalType FromSdlProposalType(sdl::V1_0::imtauth::RelationshipProposalType type)
+{
+	switch (type){
+	case sdl::V1_0::imtauth::RelationshipProposalType::Update:
+		return imtauth::ITenantRelationshipProposalInfo::RPT_UPDATE;
+	case sdl::V1_0::imtauth::RelationshipProposalType::Delete:
+		return imtauth::ITenantRelationshipProposalInfo::RPT_DELETE;
+	default:
+		return imtauth::ITenantRelationshipProposalInfo::RPT_CREATE;
+	}
+}
+
+
+// Relationship Proposal Status
+
+inline sdl::V1_0::imtauth::RelationshipProposalStatus ToSdlProposalStatus(imtauth::ITenantRelationshipProposalInfo::RelationshipProposalStatus status)
+{
+	switch (status){
+	case imtauth::ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::ApprovedByInitiator;
+	case imtauth::ITenantRelationshipProposalInfo::RPS_APPROVED_BY_COUNTERPARTY:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::ApprovedByCounterparty;
+	case imtauth::ITenantRelationshipProposalInfo::RPS_REJECTED:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::Rejected;
+	case imtauth::ITenantRelationshipProposalInfo::RPS_CANCELED:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::Canceled;
+	case imtauth::ITenantRelationshipProposalInfo::RPS_EXPIRED:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::Expired;
+	case imtauth::ITenantRelationshipProposalInfo::RPS_APPLIED:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::Applied;
+	default:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::Pending;
+	}
+}
+
+
+// Contract Status
+
+inline imtauth::ContractStatus FromSdlContractStatus(sdl::V1_0::imtauth::ContractStatus status)
+{
+	switch (status){
+	case sdl::V1_0::imtauth::ContractStatus::Active:
+		return imtauth::CTS_ACTIVE;
+	case sdl::V1_0::imtauth::ContractStatus::Expired:
+		return imtauth::CTS_EXPIRED;
+	case sdl::V1_0::imtauth::ContractStatus::Terminated:
+		return imtauth::CTS_TERMINATED;
+	case sdl::V1_0::imtauth::ContractStatus::Renewed:
+		return imtauth::CTS_RENEWED;
+	default:
+		return imtauth::CTS_DRAFT;
+	}
+}
+
+
+inline sdl::V1_0::imtauth::ContractStatus ToSdlContractStatus(imtauth::ContractStatus status)
+{
+	switch (status){
+	case imtauth::CTS_ACTIVE:
+		return sdl::V1_0::imtauth::ContractStatus::Active;
+	case imtauth::CTS_EXPIRED:
+		return sdl::V1_0::imtauth::ContractStatus::Expired;
+	case imtauth::CTS_TERMINATED:
+		return sdl::V1_0::imtauth::ContractStatus::Terminated;
+	case imtauth::CTS_RENEWED:
+		return sdl::V1_0::imtauth::ContractStatus::Renewed;
+	default:
+		return sdl::V1_0::imtauth::ContractStatus::Draft;
+	}
+}
+
+
+// Cross-Tenant Message Type
+
+inline sdl::V1_0::imtauth::CrossTenantMessageType ToSdlMessageType(imtauth::CrossTenantMessageType type)
+{
+	switch (type){
+	case imtauth::CTMT_ORDER_REQUEST:
+		return sdl::V1_0::imtauth::CrossTenantMessageType::OrderRequest;
+	case imtauth::CTMT_ORDER_CONFIRMATION:
+		return sdl::V1_0::imtauth::CrossTenantMessageType::OrderConfirmation;
+	case imtauth::CTMT_ORDER_REJECTION:
+		return sdl::V1_0::imtauth::CrossTenantMessageType::OrderRejection;
+	case imtauth::CTMT_ORDER_STATUS_UPDATE:
+		return sdl::V1_0::imtauth::CrossTenantMessageType::OrderStatusUpdate;
+	case imtauth::CTMT_ORDER_CANCELLATION:
+		return sdl::V1_0::imtauth::CrossTenantMessageType::OrderCancellation;
+	case imtauth::CTMT_DOCUMENT_SHARE:
+		return sdl::V1_0::imtauth::CrossTenantMessageType::DocumentShare;
+	default:
+		return sdl::V1_0::imtauth::CrossTenantMessageType::Custom;
+	}
+}
+
+
+inline imtauth::CrossTenantMessageType FromSdlMessageType(sdl::V1_0::imtauth::CrossTenantMessageType type)
+{
+	switch (type){
+	case sdl::V1_0::imtauth::CrossTenantMessageType::OrderRequest:
+		return imtauth::CTMT_ORDER_REQUEST;
+	case sdl::V1_0::imtauth::CrossTenantMessageType::OrderConfirmation:
+		return imtauth::CTMT_ORDER_CONFIRMATION;
+	case sdl::V1_0::imtauth::CrossTenantMessageType::OrderRejection:
+		return imtauth::CTMT_ORDER_REJECTION;
+	case sdl::V1_0::imtauth::CrossTenantMessageType::OrderStatusUpdate:
+		return imtauth::CTMT_ORDER_STATUS_UPDATE;
+	case sdl::V1_0::imtauth::CrossTenantMessageType::OrderCancellation:
+		return imtauth::CTMT_ORDER_CANCELLATION;
+	case sdl::V1_0::imtauth::CrossTenantMessageType::DocumentShare:
+		return imtauth::CTMT_DOCUMENT_SHARE;
+	default:
+		return imtauth::CTMT_CUSTOM;
+	}
+}
+
+
+// Cross-Tenant Message Status
+
+inline sdl::V1_0::imtauth::CrossTenantMessageStatus ToSdlMessageStatus(imtauth::CrossTenantMessageStatus status)
+{
+	switch (status){
+	case imtauth::CTMS_VALIDATED:
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Validated;
+	case imtauth::CTMS_DELIVERED:
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Delivered;
+	case imtauth::CTMS_ACKNOWLEDGED:
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Acknowledged;
+	case imtauth::CTMS_PROCESSED:
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Processed;
+	case imtauth::CTMS_FAILED:
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Failed;
+	case imtauth::CTMS_EXPIRED:
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Expired;
+	default:
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Created;
+	}
+}
+
+
+inline imtauth::CrossTenantMessageStatus FromSdlMessageStatus(sdl::V1_0::imtauth::CrossTenantMessageStatus status)
+{
+	switch (status){
+	case sdl::V1_0::imtauth::CrossTenantMessageStatus::Validated:
+		return imtauth::CTMS_VALIDATED;
+	case sdl::V1_0::imtauth::CrossTenantMessageStatus::Delivered:
+		return imtauth::CTMS_DELIVERED;
+	case sdl::V1_0::imtauth::CrossTenantMessageStatus::Acknowledged:
+		return imtauth::CTMS_ACKNOWLEDGED;
+	case sdl::V1_0::imtauth::CrossTenantMessageStatus::Processed:
+		return imtauth::CTMS_PROCESSED;
+	case sdl::V1_0::imtauth::CrossTenantMessageStatus::Failed:
+		return imtauth::CTMS_FAILED;
+	case sdl::V1_0::imtauth::CrossTenantMessageStatus::Expired:
+		return imtauth::CTMS_EXPIRED;
+	default:
+		return imtauth::CTMS_CREATED;
+	}
+}
+
+
+// Order Request Status
+
+inline sdl::V1_0::imtauth::OrderRequestStatus ToSdlOrderStatus(imtauth::OrderRequestStatus status)
+{
+	switch (status){
+	case imtauth::ORS_CONFIRMED:
+		return sdl::V1_0::imtauth::OrderRequestStatus::Confirmed;
+	case imtauth::ORS_REJECTED:
+		return sdl::V1_0::imtauth::OrderRequestStatus::Rejected;
+	case imtauth::ORS_IN_PROGRESS:
+		return sdl::V1_0::imtauth::OrderRequestStatus::InProgress;
+	case imtauth::ORS_COMPLETED:
+		return sdl::V1_0::imtauth::OrderRequestStatus::Completed;
+	case imtauth::ORS_CANCELLED:
+		return sdl::V1_0::imtauth::OrderRequestStatus::Cancelled;
+	default:
+		return sdl::V1_0::imtauth::OrderRequestStatus::Received;
+	}
+}
+
+
+inline imtauth::OrderRequestStatus FromSdlOrderStatus(sdl::V1_0::imtauth::OrderRequestStatus status)
+{
+	switch (status){
+	case sdl::V1_0::imtauth::OrderRequestStatus::Confirmed:
+		return imtauth::ORS_CONFIRMED;
+	case sdl::V1_0::imtauth::OrderRequestStatus::Rejected:
+		return imtauth::ORS_REJECTED;
+	case sdl::V1_0::imtauth::OrderRequestStatus::InProgress:
+		return imtauth::ORS_IN_PROGRESS;
+	case sdl::V1_0::imtauth::OrderRequestStatus::Completed:
+		return imtauth::ORS_COMPLETED;
+	case sdl::V1_0::imtauth::OrderRequestStatus::Cancelled:
+		return imtauth::ORS_CANCELLED;
+	default:
+		return imtauth::ORS_RECEIVED;
+	}
 }
 
 

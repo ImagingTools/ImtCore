@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtgeo/CAddressTypeDatabaseDelegateComp.h>
 
+
 // ImtCore includes
 #include <imtdb/imtdb.h>
 
@@ -15,17 +16,13 @@ namespace imtgeo
 
 QByteArray CAddressTypeDatabaseDelegateComp::GetObjectTypeId(const QByteArray& /*objectId*/) const
 {
-	return "AddressType";
+	return QByteArrayLiteral("AddressType");
 }
 
 
 istd::IChangeableUniquePtr CAddressTypeDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record, const iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
-	if (!m_databaseEngineCompPtr.IsValid()){
-		return nullptr;
-	}
-
-	if (!m_adrTypeInfoFactCompPtr.IsValid()){
+	if (!m_databaseEngineCompPtr.IsValid() || !m_adrTypeInfoFactCompPtr.IsValid()){
 		return nullptr;
 	}
 
@@ -34,30 +31,27 @@ istd::IChangeableUniquePtr CAddressTypeDatabaseDelegateComp::CreateObjectFromRec
 		return nullptr;
 	}
 
-	if (record.contains("Id")){
-		QByteArray id = imtdb::VariantToByteArray(record.value("Id"));
+	if (record.contains(QStringLiteral("Id"))){
+		QByteArray id = imtdb::VariantToByteArray(record.value(QStringLiteral("Id")));
 		adrTypeInfoPtr->SetId(id);
 	}
 
-	if (record.contains("Name")){
-		QString name = record.value("Name").toString();
+	if (record.contains(QStringLiteral("Name"))){
+		QString name = record.value(QStringLiteral("Name")).toString();
 		adrTypeInfoPtr->SetName(name);
 	}
 
-	if (record.contains("ShortName")){
-		QString sname = record.value("ShortName").toString();
+	if (record.contains(QStringLiteral("ShortName"))){
+		QString sname = record.value(QStringLiteral("ShortName")).toString();
 		adrTypeInfoPtr->SetShortName(sname);
 	}
 
-	if (record.contains("Description")){
-		QString description = record.value("Description").toString();
+	if (record.contains(QStringLiteral("Description"))){
+		QString description = record.value(QStringLiteral("Description")).toString();
 		adrTypeInfoPtr->SetDescription(description);
 	}
 
-	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<IAddressTypeInfo>(adrTypeInfoPtr);
-
-	return retVal;
+	return adrTypeInfoPtr;
 }
 
 
@@ -69,22 +63,34 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressTypeDatabaseDelegateComp:
 			const istd::IChangeable* valuePtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	const IAddressTypeInfo* adrInfoPtr = dynamic_cast<const IAddressTypeInfo*>(valuePtr);
-	if (adrInfoPtr == nullptr){
-		return NewObjectQuery();
+	if (!m_tableNameAttrPtr.IsValid()){
+		Q_ASSERT_X(false, __func__, "Invalid component configuration: Table name is not set");
+
+		return {};
 	}
 
-	QString name = adrInfoPtr->GetName();
-	QString sname = adrInfoPtr->GetShortName();
-	QString description = adrInfoPtr->GetDescription();
+	const IAddressTypeInfo* addressTypeInfoPtr = dynamic_cast<const IAddressTypeInfo*>(valuePtr);
+	if (addressTypeInfoPtr == nullptr){
+		return {};
+	}
+
+	const QString name			= addressTypeInfoPtr->GetName();
+	const QString sname			= addressTypeInfoPtr->GetShortName();
+	const QString description	= addressTypeInfoPtr->GetDescription();
 
 	NewObjectQuery retVal;
-	retVal.query = QString("INSERT INTO \"AddressTypes\"(\"Id\", \"Name\", \"ShortName\", \"Description\")  VALUES('%1', '%2', '%3', '%4');")
-				.arg(qPrintable(proposedObjectId))
-				.arg(imtdb::SqlEncode(name))
-				.arg(imtdb::SqlEncode(sname))
-				.arg(imtdb::SqlEncode(description))
-				.toUtf8();
+	retVal.query = QStringLiteral(R"(
+						INSERT INTO "%5" ("Id", "Name", "ShortName", "Description")
+						VALUES('%1', %2, %3, %4);
+					)")
+						.arg(
+							/*1*/ proposedObjectId,
+							/*2*/ imtdb::SqlValue(name),
+							/*3*/ imtdb::SqlValue(sname),
+							/*4*/ imtdb::SqlValue(description),
+							/*5*/ *m_tableNameAttrPtr
+						).toUtf8();
+
 	retVal.objectName = name;
 
 	return retVal;
@@ -96,20 +102,21 @@ QByteArray CAddressTypeDatabaseDelegateComp::CreateDeleteObjectsQuery(
 			const imtbase::ICollectionInfo::Ids& objectIds,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
+	if (!m_tableNameAttrPtr.IsValid()){
+		Q_ASSERT_X(false, __func__, "Invalid component configuration: Table name is not set");
+
+		return QByteArray();
+	}
+
+
 	if (objectIds.isEmpty()){
 		return QByteArray();
 	}
 
-	QStringList quotedIds;
-	for (const QByteArray& objectId : objectIds){
-		quotedIds << QString("'%1'").arg(qPrintable(objectId));
-	}
+	const QString quotedIds = objectIds.join(u8"','").prepend('\'').append('\'');
 
-	QString query = QString(
-						"DELETE FROM \"AddressTypes\" WHERE \"Id\" IN (%1);")
-						.arg(
-							quotedIds.join(", ")
-							);
+	QString query = QStringLiteral(R"(DELETE FROM "%1" WHERE "Id" IN (%2);)")
+						.arg(*m_tableNameAttrPtr, quotedIds);
 
 	return query.toUtf8();
 }
@@ -131,29 +138,47 @@ QByteArray CAddressTypeDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IOperationContext* /*operationContextPtr*/,
 			bool /*useExternDelegate*/) const
 {
-	const IAddressTypeInfo* adrInfoPtr = dynamic_cast<const IAddressTypeInfo*>(&object);
-	if (adrInfoPtr == nullptr || objectId.isEmpty()){
-		return QByteArray();
-	}
-	QByteArray adrId = adrInfoPtr->GetId();
-	QString name = adrInfoPtr->GetName();
-	QString shortName = adrInfoPtr->GetShortName();
-	QString description = adrInfoPtr->GetDescription();
+	if (!m_tableNameAttrPtr.IsValid()){
+		Q_ASSERT_X(false, __func__, "Invalid component configuration: Table name is not set");
 
-	if (adrId.isEmpty() && !objectId.isEmpty()){
-		adrId = objectId;
-	}
-	if (adrId.isEmpty()){
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE \"AddressTypes\" SET \"Id\" = '%1', \"Name\" = '%2', \"ShortName\" = '%3', \"Description\" = '%4' WHERE \"Id\" ='%5';")
-				.arg(qPrintable(adrId))
-				.arg(imtdb::SqlEncode(name))
-				.arg(imtdb::SqlEncode(shortName))
-				.arg(imtdb::SqlEncode(description))
-				.arg(qPrintable(objectId))
-				.toUtf8();
+
+	const IAddressTypeInfo* addressTypeInfoPtr = dynamic_cast<const IAddressTypeInfo*>(&object);
+	if (addressTypeInfoPtr == nullptr || objectId.isEmpty()){
+		return QByteArray();
+	}
+
+	QByteArray proposedObjectId = addressTypeInfoPtr->GetId();
+	if (proposedObjectId.isEmpty() && !objectId.isEmpty()){
+		proposedObjectId = objectId;
+	}
+
+	if (proposedObjectId.isEmpty()){
+		return QByteArray();
+	}
+
+	const QString name			= addressTypeInfoPtr->GetName();
+	const QString shortName		= addressTypeInfoPtr->GetShortName();
+	const QString description	= addressTypeInfoPtr->GetDescription();
+
+	QByteArray retVal = QStringLiteral(R"(
+							UPDATE "%6"
+							SET "Id" = '%1'
+								, "Name" = %2
+								, "ShortName" = %3
+								, "Description" = %4
+							WHERE "Id" = '%5';
+						)")
+					.arg(
+						/*1*/ proposedObjectId,
+						/*2*/ imtdb::SqlValue(name),
+						/*3*/ imtdb::SqlValue(shortName),
+						/*4*/ imtdb::SqlValue(description),
+						/*5*/ objectId,
+						/*6*/ *m_tableNameAttrPtr
+					).toUtf8();
 
 	return retVal;
 }

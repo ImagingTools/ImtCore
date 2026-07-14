@@ -9,43 +9,64 @@ namespace controlsgallerygql
 {
 
 
-// protected methods
+// public methods
 
-// reimplemented (imtdbgql::TSdlBasedMetaInfoDelegate<sdl::controlsgallery::ContactInfos::CContactInfoItemData::V1_0>)
+// reimplemented (imtdb::IJsonBasedMetaInfoDelegate)
 
-bool CContactInfoMetaInfoDelegateComp::FillRepresentation(
-			sdl::controlsgallery::ContactInfos::CContactInfoItemData::V1_0& metaInfoRepresentation,
+bool CContactInfoMetaInfoDelegateComp::ToJsonRepresentation(
 			const idoc::IDocumentMetaInfo& metaInfo,
+			QByteArray& json,
 			const QByteArray& /*typeId*/) const
 {
+	sdl::V1_0::controlsgallery::CContactInfoItemData representation;
+
 	QString firstName = metaInfo.GetMetaInfo(imtauth::IContactInfo::MIT_FIRST_NAME).toString();
-	metaInfoRepresentation.firstName = firstName;
+	representation.firstName = firstName;
 
 	QString lastName = metaInfo.GetMetaInfo(imtauth::IContactInfo::MIT_LAST_NAME).toString();
-	metaInfoRepresentation.lastName = lastName;
+	representation.lastName = lastName;
 
 	QString mail = metaInfo.GetMetaInfo(imtauth::IContactInfo::MIT_MAIL).toString();
-	metaInfoRepresentation.email = mail;
+	representation.email = mail;
 
-	return true;
+	QJsonObject object;
+	if (representation.WriteToJsonObject(object))
+	{
+		json = QJsonDocument(object).toJson(QJsonDocument::Compact);
+		return !json.isEmpty();
+	}
+
+	return false;
 }
 
 
-bool CContactInfoMetaInfoDelegateComp::FillMetaInfo(
+bool CContactInfoMetaInfoDelegateComp::FromJsonRepresentation(
+			const QByteArray& json,
 			idoc::IDocumentMetaInfo& metaInfo,
-			const sdl::controlsgallery::ContactInfos::CContactInfoItemData::V1_0& metaInfoRepresentation,
 			const QByteArray& /*typeId*/) const
 {
-	if (metaInfoRepresentation.firstName){
-		metaInfo.SetMetaInfo(imtauth::IContactInfo::MIT_FIRST_NAME, *metaInfoRepresentation.firstName);
+	QJsonDocument document = QJsonDocument::fromJson(json);
+	if (!document.isObject()) {
+		return false;
 	}
 
-	if (metaInfoRepresentation.lastName){
-		metaInfo.SetMetaInfo(imtauth::IContactInfo::MIT_LAST_NAME, *metaInfoRepresentation.lastName);
+	sdl::V1_0::controlsgallery::CContactInfoItemData representation;
+	if (!representation.ReadFromJsonObject(document.object())) {
+		return false;
 	}
 
-	if (metaInfoRepresentation.email){
-		metaInfo.SetMetaInfo(imtauth::IContactInfo::MIT_MAIL, *metaInfoRepresentation.email);
+	metaInfo.ResetData();
+
+	if (representation.firstName){
+		metaInfo.SetMetaInfo(imtauth::IContactInfo::MIT_FIRST_NAME, *representation.firstName);
+	}
+
+	if (representation.lastName){
+		metaInfo.SetMetaInfo(imtauth::IContactInfo::MIT_LAST_NAME, *representation.lastName);
+	}
+
+	if (representation.email){
+		metaInfo.SetMetaInfo(imtauth::IContactInfo::MIT_MAIL, *representation.email);
 	}
 
 	return true;

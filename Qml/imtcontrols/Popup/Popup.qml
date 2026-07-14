@@ -322,7 +322,6 @@ FocusScope {
         }
 
         function _open() {
-            console.log("_open")
             popup.aboutToShow();
             targetRoot = resolveRoot();
             if (!targetRoot) {
@@ -336,6 +335,9 @@ FocusScope {
                 return;
             }
             _ensureContentRoot();
+            // Set opening=true BEFORE attach() so that refresh() inside attach()
+            // sees popup.opened=true and correctly shows the modal dim overlay.
+            opening = true;
             OverlayManager.attach(popup, targetRoot);
 
             // Auto-detect parent popup if not explicitly set.
@@ -359,8 +361,6 @@ FocusScope {
                 var c = popup.parent.mapToItem(overlay, popup.parent.width/2, popup.parent.height/2);
                 popup._cursorPos = c;
             }
-
-            opening = true;
             contentRoot.opacity = 0;
             contentRoot.scale = 0.9;
             contentRoot.visible = true;
@@ -454,12 +454,11 @@ FocusScope {
                 y: popup ? popup.topPadding  : 0
                 width: popup ? popup.availableWidth  : 0
                 height: popup ? popup.availableHeight : 0
+                // Clip prevents ListView/tree content from rendering outside popup
+                // bounds and visually covering the modal dim overlay.
+                clip: true
             }
             property alias contentSlot: contentSlot_
-
-            Component.onCompleted: {
-                console.log("contentRootComponent onCompleted")
-            }
 
             // Eat presses so they don't reach the outside-click catcher,
             // and use them as "raise + collapse chain above me" signals.
@@ -518,7 +517,6 @@ FocusScope {
         duration: 120
         easing.type: Easing.OutQuad
         onStopped: {
-            console.log("NumberAnimation onStopped", d.opening, d.contentRoot)
             if (d.opening) {
                 d.opening = false;
                 d.opened = true;

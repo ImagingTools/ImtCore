@@ -37,3 +37,4 @@ inline QString GetUserName(const imtbase::IObjectCollection& userCollection, con
 
 } // namespace imtauth
 
+

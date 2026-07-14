@@ -42,7 +42,7 @@ Item {
 
 	property int gridDelegateMargin: Style.marginM;
 
-	property string gridIndicatorMainColor: Style.color_element;
+	property string gridIndicatorMainColor: ""
 	property alias gridIndicatorCoverColor: gridIndicatorCover.color;
 	property alias gridIndicatorCoverOpacity: gridIndicatorCover.opacity;
 	property bool gridIndicatorVisible: true;
@@ -145,7 +145,7 @@ Item {
 			id: gridDecoratorModel;
 
 			property bool compl: false;
-			property bool complCompl: gridDecoratorModel.compl && loaderTableDecorator.compl && gridInternal.headersCompl;
+			property bool complCompl: gridDecoratorModel.compl && loaderTableDecorator.compl;
 			Component.onCompleted: {
 				gridDecoratorModel.compl = true;
 			}
@@ -153,7 +153,7 @@ Item {
 				if(gridDecoratorModel.complCompl){
 
 					var tableDecorator = loaderTableDecorator.item;
-					var count = gridInternal.columnCount;
+					var count = 0
 
 					if(tableDecorator.getItemsCount()){
 
@@ -463,7 +463,7 @@ Item {
 		onCurrentValueChanged: {
 			console.log("Pagination onCurrentValueChanged", paginationObj.currentValue);
 			gridInternal.selectedIndex = -1;
-			if(this.commandsId){
+			if(collectionViewBaseContainer.commandsId){
 				baseCommands.updateModels();
 			}
 			collectionViewBaseContainer.openST = false;
@@ -473,7 +473,7 @@ Item {
 
 			console.log("PAGINATION::Pagination onCountElementsChanged", paginationObj.countElements);
 			gridInternal.selectedIndex = -1;
-			if(this.commandsId){
+			if(collectionViewBaseContainer.commandsId){
 				baseCommands.updateModels();
 			}
 			collectionViewBaseContainer.openST = false;
@@ -482,8 +482,6 @@ Item {
 
 	CollectionViewBaseGqlModels {
 		id: baseCommands;
-
-		table: collectionViewBaseContainer.table;
 
 		rootItem: collectionViewBaseContainer;
 		commandId: collectionViewBaseContainer.commandsId;

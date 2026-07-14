@@ -42,10 +42,6 @@ Rectangle {
         color: Style.borderColor
         visible: row.isSeparator
     }
-    
-    Component.onCompleted: {
-        console.log("MenuItemDelegate.qml onCompleted", width, height, visible)
-    }
 
     Item {
         anchors.fill: parent
@@ -66,7 +62,8 @@ Rectangle {
             sourceSize.height: height
         }
 
-        // Check mark for checkable items.
+        // Check mark is driven by checked state. This allows manual checked
+        // bindings (without auto-toggle) when checkable is false.
         Image {
             id: check
             anchors.verticalCenter: parent.verticalCenter
@@ -77,7 +74,7 @@ Rectangle {
             source: row.menuItem && row.menuItem.checked
                     ? "qrc:/" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
                     : ""
-            visible: row.menuItem && (row.menuItem.checkable === true) && (row.menuItem.checked === true)
+            visible: row.menuItem && (row.menuItem.checked === true)
             sourceSize.width: width
             sourceSize.height: height
         }

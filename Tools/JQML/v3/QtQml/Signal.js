@@ -1,15 +1,12 @@
 const BaseObject = require("../QtBase/BaseObject")
 
-class Signal extends BaseObject {
-    /**
-     * 
-     * @param {Object} target 
-     * @param {String} name
-     * @returns {Object}
-     */
-    static get(target, name){
-        let f = (...args)=>{
-            if(target.signalsBlocked()) return
+const handler = {
+    apply(proxyTarget, thisValue, args){
+        let target = proxyTarget.meta.parent
+        let name = proxyTarget.meta.name
+
+        if(target.signalsBlocked() || target.__destroyed) return
+            JQApplication.beginUpdate()
 
             let slotName = 'SLOT_' + name
 
@@ -18,7 +15,7 @@ class Signal extends BaseObject {
 
             // Priority connections (cross-item bindings) fire before SLOT_
             if(name in target.__connections){
-                for(let connection of target.__connections[name]){
+                for(let connection of target.__connections[name].slice()){
                     if(!connection.priority) continue
                     try {
                         if(connection.target){
@@ -41,7 +38,7 @@ class Signal extends BaseObject {
             }
 
             if(name in target.__connections){
-                for(let connection of target.__connections[name]){
+                for(let connection of target.__connections[name].slice()){
                     if(connection.priority) continue
                     try {
                         if(connection.target){
@@ -56,9 +53,14 @@ class Signal extends BaseObject {
             }
             global.queueFlag.pop()
             global.signalTargets.pop()
-        }
+            JQApplication.endUpdate()
+    },
+    get(proxyTarget, key) {
+        let target = proxyTarget.meta.parent
+        let name = proxyTarget.meta.name
 
-        f.connect = (...args)=>{
+        if (key === 'meta') return proxyTarget.meta
+        if (key === 'connect') return (...args)=>{
             if(!target.__connections[name]) target.__connections[name] = []
 
             if(args.length === 1){
@@ -76,7 +78,7 @@ class Signal extends BaseObject {
 
                 if(connection.slot.meta && !connection.slot.meta.destruction){
                     let destructionFunc = ()=>{
-                        this.removeConnection(connectionObj)
+                        Signal.removeConnection(connectionObj)
                     }
                     destructionFunc.meta = {
                         name: connection.slot.meta.name,
@@ -103,7 +105,7 @@ class Signal extends BaseObject {
 
                 if(connection.slot.meta && !connection.slot.meta.destruction){
                     let destructionFunc = ()=>{
-                        this.removeConnection(connectionObj)
+                        Signal.removeConnection(connectionObj)
                     }
                     destructionFunc.meta = {
                         name: connection.slot.meta.name,
@@ -116,8 +118,7 @@ class Signal extends BaseObject {
                 return connectionObj
             }
         }
-
-        f.connectBefore = (...args)=>{
+        if (key === 'connectBefore') return (...args)=>{
             if(!target.__connections[name]) target.__connections[name] = []
 
             if(args.length === 1){
@@ -136,7 +137,7 @@ class Signal extends BaseObject {
 
                 if(connection.slot.meta && !connection.slot.meta.destruction){
                     let destructionFunc = ()=>{
-                        this.removeConnection(connectionObj)
+                        Signal.removeConnection(connectionObj)
                     }
                     destructionFunc.meta = {
                         name: connection.slot.meta.name,
@@ -149,8 +150,7 @@ class Signal extends BaseObject {
                 return connectionObj
             }
         }
-
-        f.disconnect = (...args)=>{
+        if (key === 'disconnect') return (...args)=>{
             if(!target.__connections || !target.__connections[name]) return
 
             let i = 0
@@ -162,7 +162,7 @@ class Signal extends BaseObject {
 
                             if(connection.slot.meta && !connection.slot.meta.destruction){
                                 let destructionFunc = ()=>{
-                                    this.removeConnection(connectionObj)
+                                    Signal.removeConnection(connectionObj)
                                 }
                                 destructionFunc.meta = {
                                     name: connection.slot.meta.name,
@@ -181,7 +181,7 @@ class Signal extends BaseObject {
 
                             if(connection.slot.meta && !connection.slot.meta.destruction){
                                 let destructionFunc = ()=>{
-                                    this.removeConnection(connectionObj)
+                                    Signal.removeConnection(connectionObj)
                                 }
                                 destructionFunc.meta = {
                                     name: connection.slot.meta.name,
@@ -204,7 +204,7 @@ class Signal extends BaseObject {
 
                             if(connection.slot.meta && !connection.slot.meta.destruction){
                                 let destructionFunc = ()=>{
-                                    this.removeConnection(connectionObj)
+                                    Signal.removeConnection(connectionObj)
                                 }
                                 destructionFunc.meta = {
                                     name: connection.slot.meta.name,
@@ -222,7 +222,7 @@ class Signal extends BaseObject {
 
                             if(connection.slot.meta && !connection.slot.meta.destruction){
                                 let destructionFunc = ()=>{
-                                    this.removeConnection(connectionObj)
+                                    Signal.removeConnection(connectionObj)
                                 }
                                 destructionFunc.meta = {
                                     name: connection.slot.meta.name,
@@ -239,15 +239,30 @@ class Signal extends BaseObject {
             }
             if(target.__connections[name].length === 0) delete target.__connections[name]
         }
+        if (key === 'extendSlot') return ()=>{}
+    },
+}
 
-        f.extendSlot = ()=>{}
+class Signal extends BaseObject {
+    /**
+     * 
+     * @param {Object} target 
+     * @param {String} name
+     * @returns {Object}
+     */
+    static get(target, name){
+        if(!target[`CACHED_SIGNAL_${name}`]){
+            let f = ()=>{}
+            f.meta = {
+                parent: target,
+                name: name
+            }
 
-        f.meta = {
-            parent: target,
-            name: name
+            target[`CACHED_SIGNAL_${name}`] = new Proxy(f, handler)
         }
 
-        return f
+        return target[`CACHED_SIGNAL_${name}`]
+        
     }
 
     /**

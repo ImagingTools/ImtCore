@@ -84,7 +84,8 @@ iproc::IProcessor::TaskState CGqlSchemaParserComp::DoProcessing(
 			const iprm::IParamsSet* /*paramsPtr*/,
 			const istd::IPolymorphic* inputPtr,
 			istd::IChangeable* outputPtr,
-			ibase::IProgressManager* /*progressManagerPtr*/)
+			ibase::IProgressManager* /*progressManagerPtr*/,
+			istd::IChangeable* /*processingReportPtr*/)
 {
 	/**
 		\param paramsPtr - unused
@@ -195,6 +196,9 @@ iproc::IProcessor::TaskState CGqlSchemaParserComp::DoProcessing(
 
 	static QRegularExpression commentRegex("#.*\n");
 	content.replace(commentRegex, "\n");
+
+	static QRegularExpression multilineCommentRegex("(\"\"\"[\\s\\S]*?\"\"\")");
+	content.replace(multilineCommentRegex, "\n");
 
 	QString outputFileName = m_tempDirPtr->GetPath() + QDir::separator() + "schema.sdl";
 	QFile outputFile(outputFileName);
@@ -392,7 +396,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 			}
 		}
 
-		int processingResult = newSchemaProcessor->DoProcessing(nullptr, &schemaFilePathParam, &outputParams);
+		int processingResult = newSchemaProcessor->DoProcessing(nullptr, &schemaFilePathParam, &outputParams, nullptr, nullptr);
 		if (processingResult != TS_OK){
 			SendErrorMessage(0, QString("Unable to process file '%1'").arg(schemaPath));
 
@@ -765,5 +769,3 @@ bool CGqlSchemaParserComp::ValidateSchema()
 
 
 } // namespace imtsdl
-
-

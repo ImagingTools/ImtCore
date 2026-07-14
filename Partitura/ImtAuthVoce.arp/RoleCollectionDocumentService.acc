@@ -2,14 +2,19 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6397" Description="ACF"/>
-            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="CheckPermissionOr" PackageId="ImtAuthPck" ComponentId="CheckPermissionOr">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="CollectionDocumentService" PackageId="ImtCollectionVoce" ComponentId="CollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -18,6 +23,13 @@
                     </AttributeInfo>
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Roles"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentValidators" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RoleDocumentValidator</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="IsSingleCopyMode" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="false"/>
@@ -71,6 +83,18 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="Permissions" PackageId="" ComponentId="Permissions">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Role" PackageId="ImtAuthPck" ComponentId="Role">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
@@ -95,8 +119,14 @@
                     <AttributeInfo Id="CollectionDocumentService" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CollectionDocumentService"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="CommandPermissions" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Permissions"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CheckPermissionOr"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
@@ -107,8 +137,93 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="RoleDocumentValidator" PackageId="ImtAuthPck" ComponentId="RoleDocumentValidator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
     </ElementsList>
-    <EmbeddedRegistriesList/>
+    <EmbeddedRegistriesList>
+        <EmbeddedRegistry Id="Permissions">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="GetRoleRepresentation" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="GetRoleRepresentation"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>ViewOrganizationRoles</Value>
+                                            <Value>ViewRoles</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="PermissionsJoiner" PackageId="ImtServerAppPck" ComponentId="CommandPermissionsProviderJoiner">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandPermissionsProvider" Type="Reference[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>GetRoleRepresentation</Value>
+                                            <Value>UpdateRoleFromRepresentation</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="UpdateRoleFromRepresentation" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="UpdateRoleFromRepresentation"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>ChangeOrganizationRole</Value>
+                                            <Value>ChangeRole</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces>
+                    <Interface InterfaceId="imtserverapp::ICommandPermissionsProvider" ComponentId="PermissionsJoiner"/>
+                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="PermissionsJoiner"/>
+                </ExportedInterfaces>
+                <ExportedComponents/>
+            </Data>
+        </EmbeddedRegistry>
+    </EmbeddedRegistriesList>
     <ExportedInterfaces>
         <Interface InterfaceId="imod::IModel" ComponentId="CollectionDocumentService"/>
         <Interface InterfaceId="imtdoc::IDocumentService" ComponentId="CollectionDocumentService"/>

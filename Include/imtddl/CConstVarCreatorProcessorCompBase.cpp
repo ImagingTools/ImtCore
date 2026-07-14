@@ -111,7 +111,8 @@ iproc::IProcessor::TaskState CConstVarCreatorProcessorCompBase::DoProcessing(
 			const iprm::IParamsSet* paramsPtr,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,
-			ibase::IProgressManager* /*progressManagerPtr*/)
+			ibase::IProgressManager* /*progressManagerPtr*/,
+			istd::IChangeable* /*processingReportPtr*/)
 {
 	QString moduleName = GetModuleName(paramsPtr);
 
@@ -168,5 +169,4 @@ iproc::IProcessor::TaskState CConstVarCreatorProcessorCompBase::DoProcessing(
 
 
 } // namespace imtddl
-
 

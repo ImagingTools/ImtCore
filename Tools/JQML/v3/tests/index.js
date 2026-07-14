@@ -1,4 +1,4 @@
-const { spawn } = require('child_process')
+const { spawn, spawnSync } = require('child_process')
 const fs = require('fs')
 const { Builder, Capabilities, By, until } = require('selenium-webdriver')
 const chrome = require('selenium-webdriver/chrome')
@@ -51,6 +51,24 @@ function getQmlLog(fullLogs) {
     return matches
 }
 
+function getQmlDiagnostics(fullLogs) {
+    if (!fullLogs) return []
+
+    const rawLines = fullLogs
+        .split(/\r?\n/g)
+        .map(line => line.trim())
+        .filter(Boolean)
+
+    return rawLines.filter(line =>
+        line.includes('QQmlApplicationEngine failed to load component') ||
+        line.includes('Did not load any objects, exiting.') ||
+        line.startsWith('file:///') ||
+        line.includes(' is not installed') ||
+        line.includes(' unavailable') ||
+        line.includes(': error:')
+    )
+}
+
 function getErrorMessage(error) {
     if (!error) return 'Unknown error'
     if (error.message) return error.message
@@ -90,9 +108,150 @@ function ensureDefaultTargetName() {
     }
 }
 
+function runCommandSync(command, args, cwd) {
+    const result = spawnSync(command, args, {
+        cwd,
+        encoding: 'utf-8',
+        windowsHide: true,
+    })
+
+    const stdout = result.stdout ? String(result.stdout) : ''
+    const stderr = result.stderr ? String(result.stderr) : ''
+
+    if (result.error) {
+        return {
+            ok: false,
+            code: -1,
+            output: `${stdout}\n${stderr}\n${result.error.message}`,
+        }
+    }
+
+    return {
+        ok: result.status === 0,
+        code: result.status,
+        output: `${stdout}\n${stderr}`,
+    }
+}
+
+function failAndExit(message) {
+    console.error(`${colors.red}[Error] ${message}${colors.reset}`)
+    process.exitCode = 1
+}
+
+function resolveDesktopHostExecutable() {
+    const executableName = process.platform === 'win32' ? 'JQMLHost.exe' : 'JQMLHost'
+    
+    const candidates = []
+    
+    // Относительные пути от корня workspace (JQML v3)
+    const workspaceRoot = path.resolve(__dirname, '..')
+    candidates.push(
+        path.resolve(workspaceRoot, 'JQMLHost', executableName),
+        path.resolve(workspaceRoot, 'bin', executableName),
+        path.resolve(workspaceRoot, 'build', executableName)
+    )
+
+    // Пути в ImtCore (корень находится на 3 уровня выше текущего скрипта)
+    const imtCoreDir = path.resolve(__dirname, '../../../..')
+    const targetName = (process.env.TARGETNAME || '').trim()
+    candidates.push(
+        path.resolve(imtCoreDir, 'Bin', `Debug_${targetName}`, executableName),
+        path.resolve(imtCoreDir, 'Bin', `Release_${targetName}`, executableName),
+        path.resolve(imtCoreDir, 'Bin', `RelWithDebInfo_${targetName}`, executableName),
+        // Fallback if TARGETNAME not set - try common patterns
+        path.resolve(imtCoreDir, 'Bin', 'Debug_Qt6_VC17_x64', executableName),
+        path.resolve(imtCoreDir, 'Bin', 'Release_Qt6_VC17_x64', executableName),
+        path.resolve(imtCoreDir, 'Bin', 'Debug', executableName),
+        path.resolve(imtCoreDir, 'Bin', 'Release', executableName)
+    )
+
+    for (const p of candidates) {
+        if (fs.existsSync(p)) return p
+    }
+
+    return ''
+}
+
+function setupDesktopHostRunner() {
+    const hostExePath = resolveDesktopHostExecutable()
+    if (!hostExePath) {
+        throw new Error(`JQMLHost executable not found`)
+    }
+
+    process.env.IMT_DESKTOP_RUNNER = hostExePath
+    process.env.IMT_DESKTOP_PRECHECK = '0'
+    if (!process.env.IMT_DESKTOP_RUNNER_ARGS_JSON || !process.env.IMT_DESKTOP_RUNNER_ARGS_JSON.trim()) {
+        process.env.IMT_DESKTOP_RUNNER_ARGS_JSON = '["{QML_FILE}"]'
+    }
+
+    console.log(`${colors.gray}[Desktop host] ${hostExePath}${colors.reset}`)
+}
+
 function getQmlImportPathsFromConfig(testDirPath) {
     const visitedConfigs = new Set()
     const resolvedDirs = new Set()
+
+    function findModuleRootInTree(rootDir, moduleName, maxDepth = 6) {
+        if (!rootDir || !fs.existsSync(rootDir) || !checkIsDirectorySync(rootDir)) return null
+
+        const parts = moduleName.split('.')
+        const queue = [{ dir: rootDir, depth: 0 }]
+        const visited = new Set()
+
+        while (queue.length > 0) {
+            const current = queue.shift()
+            if (visited.has(current.dir)) continue
+            visited.add(current.dir)
+
+            const candidateQmldir = path.resolve(current.dir, ...parts, 'qmldir')
+            if (fs.existsSync(candidateQmldir) && qmldirDeclaresModule(candidateQmldir, moduleName)) {
+                return current.dir
+            }
+
+            if (current.depth >= maxDepth) continue
+
+            let children = []
+            try {
+                children = fs.readdirSync(current.dir)
+            } catch (e) {
+                continue
+            }
+
+            for (const child of children) {
+                const childPath = path.resolve(current.dir, child)
+                if (checkIsDirectorySync(childPath)) {
+                    queue.push({ dir: childPath, depth: current.depth + 1 })
+                }
+            }
+        }
+
+        return null
+    }
+
+    function tryAppendBuiltImtcoreModule(moduleName) {
+        const targetName = (process.env.TARGETNAME || '').trim()
+        const root = process.env.IMTCOREDIR_BUILD || process.env.IMTCOREDIR
+        if (!root) return
+
+        const candidates = [
+            path.resolve(root, 'Bin', `Debug_${targetName}`, 'qml'),
+            path.resolve(root, 'Bin', `Release_${targetName}`, 'qml'),
+            path.resolve(root, 'Bin', `RelWithDebInfo_${targetName}`, 'qml'),
+            path.resolve(root, 'Install', `Debug_${targetName}`, 'qml'),
+            path.resolve(root, 'Install', `Release_${targetName}`, 'qml'),
+            path.resolve(root, 'Install', `RelWithDebInfo_${targetName}`, 'qml'),
+            path.resolve(root, 'Bin'),
+            path.resolve(root, 'Install')
+        ]
+
+        for (const c of candidates) {
+            const moduleRoot = findModuleRootInTree(c, moduleName)
+            if (moduleRoot) {
+                resolvedDirs.add(moduleRoot)
+                return
+            }
+        }
+    }
 
     function collectConfig(configPath) {
         const normalizedConfigPath = path.resolve(configPath)
@@ -132,11 +291,208 @@ function getQmlImportPathsFromConfig(testDirPath) {
 
     collectConfig(path.resolve(testDirPath, 'test.json'))
 
+    tryAppendBuiltImtcoreModule('com.imtcore.imtqml')
+
     return Array.from(resolvedDirs)
+}
+
+function getQmlImportsFromFile(filePath) {
+    if (!fs.existsSync(filePath)) return []
+
+    const content = fs.readFileSync(filePath, 'utf-8')
+    const regex = /^\s*import\s+([^\s;]+)\b/gm
+    const imports = new Set()
+    let match
+
+    while ((match = regex.exec(content)) !== null) {
+        const moduleName = String(match[1] || '').trim().replaceAll('"', '').replaceAll("'", '')
+
+        if (!/^[A-Za-z_][\w\.]*$/.test(moduleName)) continue
+        if (moduleName.toLowerCase().endsWith('.js')) continue
+
+        // Skip built-in Qt modules and relative/local imports
+        if (!moduleName || moduleName.startsWith('Qt')) continue
+        if (moduleName === 'QML') continue
+
+        imports.add(moduleName)
+    }
+
+    return Array.from(imports)
+}
+
+function resolveModuleDirectory(moduleName, qmlImportPaths) {
+    const modulePath = moduleName.split('.')
+    const moduleShortName = modulePath[modulePath.length - 1]
+
+    for (const importPath of qmlImportPaths) {
+        const nestedDir = path.resolve(importPath, ...modulePath)
+        const nestedQmldir = path.resolve(nestedDir, 'qmldir')
+        if (fs.existsSync(nestedQmldir) && qmldirDeclaresModule(nestedQmldir, moduleName)) {
+            return nestedDir
+        }
+
+        const directDir = path.resolve(importPath, moduleShortName)
+        const directQmldir = path.resolve(directDir, 'qmldir')
+        if (fs.existsSync(directQmldir) && qmldirDeclaresModule(directQmldir, moduleName)) {
+            return directDir
+        }
+
+        const currentQmldir = path.resolve(importPath, 'qmldir')
+        if (fs.existsSync(currentQmldir) && qmldirDeclaresModule(currentQmldir, moduleName)) {
+            return importPath
+        }
+    }
+
+    return null
+}
+
+function getQmlFilesRecursively(rootDir, maxFiles = 2000) {
+    if (!rootDir || !fs.existsSync(rootDir) || !checkIsDirectorySync(rootDir)) return []
+
+    const result = []
+    const stack = [rootDir]
+
+    while (stack.length > 0 && result.length < maxFiles) {
+        const currentDir = stack.pop()
+        let entries = []
+
+        try {
+            entries = fs.readdirSync(currentDir)
+        } catch (e) {
+            continue
+        }
+
+        for (const name of entries) {
+            const absolutePath = path.resolve(currentDir, name)
+
+            if (checkIsDirectorySync(absolutePath)) {
+                stack.push(absolutePath)
+                continue
+            }
+
+            if (name.toLowerCase().endsWith('.qml')) {
+                result.push(absolutePath)
+                if (result.length >= maxFiles) break
+            }
+        }
+    }
+
+    return result
+}
+
+function qmldirDeclaresModule(qmldirPath, moduleName) {
+    try {
+        if (!fs.existsSync(qmldirPath)) return false
+
+        const content = fs.readFileSync(qmldirPath, 'utf-8')
+        const moduleRegex = /^\s*module\s+(.+)\s*$/m
+        const match = content.match(moduleRegex)
+
+        if (!match) return false
+
+        return match[1].trim() === moduleName
+    } catch (e) {
+        return false
+    }
+}
+
+function moduleExistsInImportPaths(moduleName, qmlImportPaths) {
+    const modulePath = moduleName.split('.')
+    const moduleShortName = modulePath[modulePath.length - 1]
+
+    for (const importPath of qmlImportPaths) {
+        const nestedQmldir = path.resolve(importPath, ...modulePath, 'qmldir')
+        if (fs.existsSync(nestedQmldir) && qmldirDeclaresModule(nestedQmldir, moduleName)) {
+            return true
+        }
+
+        const directQmldir = path.resolve(importPath, moduleShortName, 'qmldir')
+        if (fs.existsSync(directQmldir) && qmldirDeclaresModule(directQmldir, moduleName)) {
+            return true
+        }
+
+        const currentQmldir = path.resolve(importPath, 'qmldir')
+        if (fs.existsSync(currentQmldir)) {
+            if (qmldirDeclaresModule(currentQmldir, moduleName)) {
+                return true
+            }
+
+            if (path.basename(importPath) === moduleShortName) {
+                return true
+            }
+        }
+    }
+
+    return false
+}
+
+function findMissingQmlModules(entryFilePath, qmlImportPaths) {
+    const modules = getQmlImportsFromFile(entryFilePath)
+    return modules.filter(moduleName => !moduleExistsInImportPaths(moduleName, qmlImportPaths))
+}
+
+function getDesktopRunnerSpec(filePath, qmlImportPaths) {
+    const customRunner = process.env.IMT_DESKTOP_RUNNER || resolveDesktopHostExecutable()
+
+    if (!customRunner) {
+        throw new Error('JQMLHost executable not found and IMT_DESKTOP_RUNNER not set')
+    }
+
+    const pathSeparator = process.platform === 'win32' ? ';' : ':'
+    const placeholders = {
+        '{QML_FILE}': filePath,
+        '{QML_DIR}': path.dirname(filePath),
+        '{IMPORT_PATHS}': qmlImportPaths.join(pathSeparator),
+    }
+
+    let args = []
+    const argsJson = (process.env.IMT_DESKTOP_RUNNER_ARGS_JSON || '').trim()
+    const argsRaw = (process.env.IMT_DESKTOP_RUNNER_ARGS || '').trim()
+
+    if (argsJson) {
+        try {
+            const parsed = JSON.parse(argsJson)
+            if (Array.isArray(parsed)) {
+                args = parsed.map(item => String(item))
+            }
+        } catch (e) {
+            args = []
+        }
+    } else if (argsRaw) {
+        args = argsRaw.split(/\s+/g).filter(Boolean)
+    }
+
+    args = args.map(arg => {
+        let result = arg
+        for (const key of Object.keys(placeholders)) {
+            result = result.replaceAll(key, placeholders[key])
+        }
+        return result
+    })
+
+    if (args.length === 0 || process.env.IMT_DESKTOP_RUNNER_APPEND_QML === '1') {
+        args.push(filePath)
+    }
+
+    return {
+        command: customRunner,
+        args,
+        skipPrecheck: process.env.IMT_DESKTOP_PRECHECK !== '1',
+    }
 }
 
 function runQmlTest(filePath, timeout = 5000, qmlImportPaths = []) {
     return new Promise((resolve, reject) => {
+        const desktopRunner = getDesktopRunnerSpec(filePath, qmlImportPaths)
+
+        if (!desktopRunner.skipPrecheck) {
+            const missingModules = findMissingQmlModules(filePath, qmlImportPaths)
+            if (missingModules.length > 0) {
+                reject(new Error(`Missing QML modules in import paths: ${missingModules.join(', ')}`))
+                return
+            }
+        }
+
         const pathSeparator = process.platform === 'win32' ? ';' : ':'
         const mergedImportPath = qmlImportPaths.join(pathSeparator)
 
@@ -150,13 +506,8 @@ function runQmlTest(filePath, timeout = 5000, qmlImportPaths = []) {
                 : mergedImportPath
         }
 
-        const importArgs = []
-        for (const importPath of qmlImportPaths) {
-            importArgs.push('-I', importPath)
-        }
-
-        // Запуск в headless режиме
-        const child = spawn('qml', ['-platform', 'offscreen', ...importArgs, filePath], {
+        // Запуск desktop-раннера
+        const child = spawn(desktopRunner.command, desktopRunner.args, {
             cwd: path.dirname(filePath),
             env,
         })
@@ -180,24 +531,25 @@ function runQmlTest(filePath, timeout = 5000, qmlImportPaths = []) {
             clearTimeout(timer)
 
             let logs = getQmlLog(rawOutput)
+            const diagnostics = getQmlDiagnostics(rawOutput)
+
+            if (diagnostics.length > 0) {
+                const missingDiagnostics = diagnostics.filter(diag => !logs.some(log => log.includes(diag) || diag.includes(log)))
+
+                if (missingDiagnostics.length > 0) {
+                    console.log(`${colors.gray}[Desktop details] ${missingDiagnostics.join(' ; ')}${colors.reset}`)
+                }
+            }
 
             if (logs.length === 0 && rawOutput) {
-                const rawLines = rawOutput
-                    .split(/\r?\n/g)
-                    .map(line => line.trim())
-                    .filter(Boolean)
-
-                const diagnostics = rawLines.filter(line =>
-                    line.includes('QQmlApplicationEngine failed to load component') ||
-                    line.includes('Did not load any objects, exiting.') ||
-                    line.startsWith('file:///') ||
-                    line.includes(' is not installed') ||
-                    line.includes(': error:')
-                )
-
                 if (diagnostics.length > 0) {
                     logs.push(...diagnostics)
                 } else {
+                    const rawLines = rawOutput
+                        .split(/\r?\n/g)
+                        .map(line => line.trim())
+                        .filter(Boolean)
+
                     logs.push(...rawLines.slice(0, 20))
                 }
             }
@@ -256,6 +608,7 @@ function getTestsToRun(allEntries, selectedTestName) {
 
 async function runTests() {
     ensureDefaultTargetName()
+    setupDesktopHostRunner()
 
     const tests = fs.readdirSync('./tests')
     const options = parseCliOptions()
@@ -353,7 +706,7 @@ async function runWebTest(driver, testDirPath, timeout = 5000) {
     }
 
     try {
-        await driver.get('file://' + path.resolve(testDirPath, './_web/test.html'))
+        await driver.get('file://' + path.resolve(testDirPath, './_web/test.html') + '#jqdebug')
 
         await driver.wait(async () => {
             const readyState = await driver.executeScript('return document.readyState')
@@ -430,4 +783,8 @@ async function closeWebDriver(driver) {
 }
 
 
-runTests()
+runTests().catch(err => {
+    if (!process.exitCode) {
+        failAndExit(getErrorMessage(err))
+    }
+})

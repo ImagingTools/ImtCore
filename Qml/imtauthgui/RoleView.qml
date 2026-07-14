@@ -5,6 +5,7 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtauthRolesSdl 1.0
 import imtdocgui 1.0
+import imtauthgui 1.0
 import imtguigql 1.0
 
 ViewBase {
@@ -13,35 +14,107 @@ ViewBase {
 	anchors.fill: parent;
 	contentColor: Style.baseColor
 	
-	property TreeItemModel permissionsModel: TreeItemModel {};
-	onPermissionsModelChanged: {
-		permissionsGroup.buildPermissionsModel()
-		// After the permissions tree is rebuilt (e.g. fetchPermissions completes
-		// asynchronously after the role has been loaded), re-apply the checked
-		// state from the current roleData; otherwise the tree appears empty and
-		// a subsequent Save would clear all permissions.
-		if (container.roleData){
-			container.doUpdateGui()
+	property string productId: "";
+	property string tenantId: "";
+	property var permissionsProvider: null;
+
+	property bool __permissionsRequested: false
+	property var __receivedPermissions: null
+	property bool __completed: false
+
+	property RoleData roleData: model;
+
+	Component.onCompleted: {
+		container.__completed = true
+		container.__requestPermissionsOnce()
+	}
+
+	onProductIdChanged: {
+		if (!container.__completed)
+			return
+		container.__permissionsRequested = false
+		container.__receivedPermissions = null
+		container.__requestPermissionsOnce()
+	}
+
+	onTenantIdChanged: {
+		if (!container.__completed)
+			return
+		container.__permissionsRequested = false
+		container.__receivedPermissions = null
+		container.__requestPermissionsOnce()
+	}
+
+	onPermissionsProviderChanged: {
+		if (!container.__completed)
+			return
+		container.__permissionsRequested = false
+		container.__receivedPermissions = null
+		container.__requestPermissionsOnce()
+	}
+
+	Connections {
+		target: container.permissionsProvider
+
+		function onPermissionsReceived(permissions, sourceTenantId) {
+			var expectedTenantId = container.tenantId || ""
+			var actualTenantId = sourceTenantId || ""
+			if (expectedTenantId !== actualTenantId)
+				return
+			container.__receivedPermissions = permissions
+			container.__populatePermissionsTree()
 		}
 	}
-	
-	property string productId: "";
-	
-	property RoleData roleData: model;
-	
+
+	Connections {
+		target: permissionsTableElementView
+
+		function onBottomItemChanged() {
+			container.__populatePermissionsTree()
+		}
+	}
+
+	function __requestPermissionsOnce() {
+		if (!container.permissionsProvider)
+			return
+		if (container.productId === "")
+			return
+		if (container.__permissionsRequested)
+			return
+		container.__permissionsRequested = true
+		container.permissionsProvider.productId = container.productId
+		var requestTenantId = container.tenantId || ""
+		container.permissionsProvider.requestPermissions(requestTenantId)
+	}
+
+	function __populatePermissionsTree() {
+		if (!permissionsTableElementView.bottomItem)
+			return
+		var perms = container.__receivedPermissions
+		if (!perms)
+			return
+		permissionsTableElementView.bottomItem.rebuildFromFlatArray(perms)
+		if (container.roleData)
+			container.doUpdateGuiPermissions()
+	}
+
 	function updateGui(){
 		generalGroup.updateGui();
-		permissionsGroup.updateGui()
+		container.doUpdateGuiPermissions()
 	}
 	
 	function updateModel(){
+		if (!container.roleData){
+			return
+		}
+
 		if (container.productId === ""){
 			console.error("Unable to update a role model. Product-ID is empty");
 			return;
 		}
 		
 		generalGroup.updateModel();
-		permissionsGroup.updateModel()
+		container.doUpdateModelPermissions()
 		
 		roleData.m_productId = container.productId;
 	}
@@ -115,11 +188,21 @@ ViewBase {
 				
 				TextInputElementView {
 					id: roleNameInput;
-					
+
+					// Test instrumentation: matches the AccountEditor/DeviceEditor/etc. convention of
+					// an explicit per-field objectName on the ElementView usage site (the shared
+					// TextInputElementView/CustomTextField components only ever carry the generic
+					// "TextField"/"TextInput"). Inert - no runtime/visual effect.
+					objectName: "RoleNameInput";
+
 					name: qsTr("Role Name");
 					placeHolderText: qsTr("Enter the role name");
 					
 					onEditingFinished: {
+						if (!container.roleData){
+							return
+						}
+
 						let oldText = container.roleData.m_name;
 						if (oldText && oldText !== roleNameInput.text || !oldText && roleNameInput.text !== ""){
 							roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
@@ -128,14 +211,17 @@ ViewBase {
 					}
 					
 					KeyNavigation.tab: roleIdInput;
-					KeyNavigation.backtab: permissionsGroup;
+					KeyNavigation.backtab: permissionsGroupElement;
 				}
 				
 				TextInputElementView {
 					id: roleIdInput;
-					
+
+					// Test instrumentation - see roleNameInput's comment above. Inert.
+					objectName: "RoleIdInput";
+
 					readOnly: true;
-					
+
 					name: qsTr("Role-ID");
 					
 					KeyNavigation.tab: descriptionInput;
@@ -144,10 +230,13 @@ ViewBase {
 				
 				TextInputElementView {
 					id: descriptionInput;
-					
+
+					// Test instrumentation - see roleNameInput's comment above. Inert.
+					objectName: "RoleDescriptionInput";
+
 					name: qsTr("Description");
 					placeHolderText: qsTr("Enter the description");
-					
+
 					onEditingFinished: {
 						let oldText = container.roleData.m_description;
 						if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
@@ -159,18 +248,22 @@ ViewBase {
 					KeyNavigation.backtab: roleIdInput;
 				}
 				
-				ItemSelectElementView {
+				GqlBasedItemSelectElementView {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
-						label: qsTr("Parent Roles")
-						addButtonText: qsTr("Add Parent Role")
-						showCount: true
-						onSelectionChanged: {
-							container.doUpdateModel()
-						}
+					label: qsTr("Parent Roles")
+					addButtonText: qsTr("Add Parent Role")
+					showCount: true
+					onSelectionChanged: {
+						container.doUpdateModel()
 					}
+				}
 
 				function updateGui(){
+					if (!container.roleData){
+						return
+					}
+
 					roleIdInput.text = container.roleData.m_roleId;
 					roleNameInput.text = container.roleData.m_name;
 					descriptionInput.text = container.roleData.m_description;
@@ -182,6 +275,10 @@ ViewBase {
 				}
 				
 				function updateModel(){
+					if (!container.roleData){
+						return
+					}
+
 					container.roleData.m_roleId = roleIdInput.text;
 					container.roleData.m_name = roleNameInput.text;
 					container.roleData.m_description = descriptionInput.text;
@@ -194,105 +291,69 @@ ViewBase {
 			
 			GroupHeaderView {
 				width: parent.width;
-				
 				title: qsTr("Permissions");
-				groupView: group;
 			}
 			
 			GroupElementView {
-				id: group;
+				id: permissionsGroupElement
+				width: parent.width
 				
-				width: parent.width;
-				
-				TreeViewElementView {
-					id: permissionsGroup;
-					
-					KeyNavigation.tab: roleNameInput;
-					KeyNavigation.backtab: roleSelectableCollectionEditor;
-					
-					Component.onCompleted: {
-						permissionsGroup.treeView.tristate = true;
-					}
-					
-					function buildPermissionsModel() {
-						if (!container.permissionsModel)
-							return;
-						
-						var nodes = TreeModelBuilder.fromTreeItemModel(
-							container.permissionsModel,
-							function(wrapper, index) {
-								return {
-									key: wrapper.data("FeatureId", ""),
-									text: wrapper.data("FeatureName", ""),
-									checkable: true,
-									expanded: true,
-									data: {
-										FeatureId: wrapper.data("FeatureId", ""),
-										FeatureName: wrapper.data("FeatureName", "")
-									}
-								};
-							},
-							function(wrapper, index) {
-								return wrapper.childModel("ChildModel");
+				ElementView {
+					id: permissionsTableElementView
+					width: parent.width
+					border.width: 0
+					color: "transparent"
+					radius: 0
+					contentMargin: Style.marginL
+					contentSpacing: 0
+					height: contentHeight
+					bottomComp: Component {
+						PermissionsTableView {
+							id: permissionsTableView
+							width: parent.width
+							height: preferredHeight
+							showControlPanel: true
+							treeToScrollbarSpacing: 0
+							controlPanelTopMargin: Style.marginL
+							treeTopMargin: Style.marginL
+							treeBottomMargin: Style.marginL
+		
+							onSelectionChanged: {
+								container.doUpdateModel()
 							}
-						);
-						
-						permissionsGroup.treeView.model = nodes;
-					}
-					
-					function updateGui(){
-						let selectedPermissionsIds = [];
-						let selectedPermissions = container.roleData.m_permissions;
-						if (selectedPermissions !== ""){
-							selectedPermissionsIds = selectedPermissions.split(';');
-						}
-						
-						selectedPermissionsIds.sort();
-						
-						permissionsGroup.treeView.uncheckAll();
-						
-						let allNodesList = permissionsGroup.treeView.allNodes();
-						for (let i = 0; i < allNodesList.length; i++){
-							let nodeIdx = allNodesList[i];
-							let nodeChildren = nodeIdx.item && nodeIdx.item.children ? nodeIdx.item.children : [];
-							if (nodeChildren.length === 0){
-								let nodeData = nodeIdx.data || {};
-								let id = nodeData.FeatureId;
-								
-								if (selectedPermissionsIds.includes(id)){
-									permissionsGroup.treeView.checkItem(nodeIdx.key);
-								}
-							}
-						}
-					}
-					
-					function updateModel(){
-						let selectedPermissionIds = [];
-						let checkedNodes = permissionsGroup.treeView.getCheckedNodes();
-						for (let j = 0; j < checkedNodes.length; j++){
-							let nodeIdx = checkedNodes[j];
-							let nodeChildren = nodeIdx.item && nodeIdx.item.children ? nodeIdx.item.children : [];
-							if (nodeChildren.length === 0){
-								let nodeData = nodeIdx.data || {};
-								let id = nodeData.FeatureId;
-								selectedPermissionIds.push(id);
-							}
-						}
-						
-						selectedPermissionIds.sort();
-						
-						container.roleData.m_permissions = selectedPermissionIds.join(';')
-					}
-					
-					Connections {
-						target: permissionsGroup.treeView;
-						
-						function onCheckedItemsChanged(){
-							container.doUpdateModel();
 						}
 					}
 				}
 			}
+		}
+	}
+	
+	function doUpdateGuiPermissions() {
+		if (!container.roleData){
+			return
+		}
+
+		var selectedPermissionsIds = [];
+		var selectedPermissions = container.roleData.m_permissions;
+		if (selectedPermissions !== ""){
+			selectedPermissionsIds = selectedPermissions.split(';');
+		}
+
+		if (permissionsTableElementView.bottomItem){
+			permissionsTableElementView.bottomItem.applySelection(selectedPermissionsIds)
+		}
+	}
+	
+	function doUpdateModelPermissions() {
+		if (!container.roleData){
+			return
+		}
+
+		if (permissionsTableElementView.bottomItem){
+			// Only leaf permission IDs must be stored (groups/parents are excluded even
+			// when tristate check selected the whole subtree).
+			var selectedPermissionIds = permissionsTableElementView.bottomItem.getCheckedIds()
+			container.roleData.m_permissions = selectedPermissionIds.join(';')
 		}
 	}
 }

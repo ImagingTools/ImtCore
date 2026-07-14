@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtclientgql/CRemoteCommandsControllerComp.h>
 
+// ImtCore includes
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Commands.h>
+
 
 namespace imtclientgql
 {
@@ -8,7 +11,7 @@ namespace imtclientgql
 
 // protected methods
 
-// reimplemented (sdl::imtbase::Commands::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CCommandsGqlHandlerCompBase)
 
 bool CRemoteCommandsControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
@@ -29,15 +32,14 @@ bool CRemoteCommandsControllerComp::IsRequestSupported(const imtgql::CGqlRequest
 }
 
 
-sdl::imtbase::Commands::CGuiElementContainer CRemoteCommandsControllerComp::OnGetCommands(
-			const sdl::imtbase::Commands::CGetCommandsGqlRequest& /*getCommandsRequest*/,
+sdl::V1_0::imtbase::CGuiElementContainer CRemoteCommandsControllerComp::OnGetCommands(
+			const sdl::V1_0::imtbase::CGetCommandsGqlRequest& /*getCommandsRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::Commands::CGuiElementContainer>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CGuiElementContainer>(gqlRequest, errorMessage);
 }
 
 
 } // namespace imtclientgql
-
 

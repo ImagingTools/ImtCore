@@ -33,6 +33,7 @@ RemoteCollectionView {
 	}
 	
 	property string productId;
+	property string tenantId: AuthorizationController.currentTenantId || ""
 	property var documentManager: null;
 	
 	function handleSubscription(dataModel){
@@ -40,25 +41,37 @@ RemoteCollectionView {
 	}
 
 	onProductIdChanged: {
-		permissionsProvider.productId = productId;
-		permissionsProvider.updateModel();
+		roleCollectionViewContainer.__requestPermissions()
 	}
-	
-	property TreeItemModel permissionsModel;
-	
-	GqlBasedPermissionsProvider {
-		id: permissionsProvider;
-		productId: roleCollectionViewContainer.productId;
-		
-		onPermissionsModelChanged: {
-			if (permissionsProvider.permissionsModel != null){
-				roleCollectionViewContainer.permissionsModel = permissionsProvider.permissionsModel;
-			}
+
+	onTenantIdChanged: {
+		roleCollectionViewContainer.__requestPermissions()
+	}
+
+	property GqlBasedPermissionsProvider __permissionsProvider: GqlBasedPermissionsProvider {
+		productId: roleCollectionViewContainer.productId || ""
+
+		onRequestFailed: {
+			if (message && message !== "")
+				ModalDialogManager.showInfoDialog(message)
 		}
-		
-		function getHeaders(){
-			return roleCollectionViewContainer.getHeaders()
-		}
+	}
+
+	function __requestPermissions() {
+		if (!roleCollectionViewContainer.__permissionsProvider)
+			return
+		if (!roleCollectionViewContainer.productId || roleCollectionViewContainer.productId === "")
+			return
+
+		roleCollectionViewContainer.__permissionsProvider.productId = roleCollectionViewContainer.productId
+		if (roleCollectionViewContainer.tenantId && roleCollectionViewContainer.tenantId !== "")
+			roleCollectionViewContainer.__permissionsProvider.requestPermissions(roleCollectionViewContainer.tenantId)
+		else
+			roleCollectionViewContainer.__permissionsProvider.requestAllPermissions()
+	}
+
+	Component.onCompleted: {
+		roleCollectionViewContainer.__requestPermissions()
 	}
 	
 	Component {
@@ -67,8 +80,9 @@ RemoteCollectionView {
 		RoleView {
 			id: roleEditor;
 			
-			permissionsModel: roleCollectionViewContainer.permissionsModel;
 			productId: roleCollectionViewContainer.productId;
+			tenantId: roleCollectionViewContainer.tenantId;
+			permissionsProvider: roleCollectionViewContainer.__permissionsProvider
 			
 			commandsControllerComp: Component {GqlBasedCommandsController {
 					typeId: "Role";

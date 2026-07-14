@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -80,6 +80,9 @@
         <Element Id="TenantInvitationDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="TenantInvitationDatabaseDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value=":/SQL/SQLite/CreateTenantInvitationsTable.sql"/>
                     </AttributeInfo>

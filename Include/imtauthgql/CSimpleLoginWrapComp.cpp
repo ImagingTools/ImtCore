@@ -53,14 +53,14 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 		return false;
 	}
 
-	namespace authsdl = sdl::imtauth::Authorization;
+	namespace authsdl = sdl::V1_0::imtauth;
 
 	QByteArray productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	authsdl::AuthorizationRequestArguments arguments;
-	arguments.input.Version_1_0 = authsdl::CAuthorizationInput::V1_0();
-	arguments.input.Version_1_0->login = QString(userName);
-	arguments.input.Version_1_0->password = QString(password);
-	arguments.input.Version_1_0->productId = QByteArray(productId);
+	arguments.input.emplace();
+	arguments.input->login = QString(userName);
+	arguments.input->password = QString(password);
+	arguments.input->productId = QByteArray(productId);
 
 	imtgql::CGqlRequest gqlRequest;
 	if (authsdl::CAuthorizationGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -72,14 +72,10 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 			return false;
 		}
 
-		if (!response.Version_1_0){
-			return false;
-		}
-
 		m_loggedUserPassword = password.toUtf8();
 
-		if (response.Version_1_0->userId){
-			m_loggedUserId = *response.Version_1_0->userId;
+		if (response.userId){
+			m_loggedUserId = *response.userId;
 		}
 
 		m_userInfoPtr.FromUnique(m_userInfoFactCompPtr.CreateInstance());
@@ -87,23 +83,23 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 			return false;
 		}
 
-		if (response.Version_1_0->username){
-			m_userInfoPtr->SetId(*response.Version_1_0->username);
+		if (response.username){
+			m_userInfoPtr->SetId(*response.username);
 		}
-		if (response.Version_1_0->permissions){
-			QByteArray permissions = *response.Version_1_0->permissions;
+		if (response.permissions){
+			QByteArray permissions = *response.permissions;
 			if (!permissions.isEmpty()){
-				m_userInfoPtr->SetLocalPermissions(productId, response.Version_1_0->permissions->split(';'));
+				m_userInfoPtr->SetLocalPermissions(productId, response.permissions->split(';'));
 			}
 		}
 
 		m_userPermissionIds = m_userInfoPtr->GetLocalPermissions(productId);
 
-		if (response.Version_1_0->token){
-			m_loggedUserToken = *response.Version_1_0->token;
+		if (response.token){
+			m_loggedUserToken = *response.token;
 		}
-		if (response.Version_1_0->refreshToken){
-			m_loggedUserRefreshToken = *response.Version_1_0->refreshToken;
+		if (response.refreshToken){
+			m_loggedUserRefreshToken = *response.refreshToken;
 		}
 		imtqml::CGqlModel::SetGlobalAccessToken(m_loggedUserToken);
 
@@ -114,11 +110,11 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 
 		imtgql::CGqlRequestContextManager::SetContext(m_gqlContextSharedPtr.GetPtr());
 
-		if (response.Version_1_0->username){
+		if (response.username){
 			istd::CChangeNotifier notifier(this);
 			Q_UNUSED(notifier);
 
-			m_loggedUserName = *response.Version_1_0->username;
+			m_loggedUserName = *response.username;
 		}
 
 		return true;
@@ -162,11 +158,11 @@ bool CSimpleLoginWrapComp::LoginWithRefreshToken(const QString& userName, const 
 	}
 
 	// Use Sessions SDL schema to refresh token
-	namespace sessionsdl = sdl::imtauth::Sessions;
+	namespace sessionsdl = sdl::V1_0::imtauth;
 
 	sessionsdl::RefreshTokenRequestArguments arguments;
-	arguments.input.Version_1_0 = sessionsdl::CRefreshTokenInput::V1_0();
-	arguments.input.Version_1_0->refreshToken = refreshToken;
+	arguments.input.emplace();
+	arguments.input->refreshToken = refreshToken;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (sessionsdl::CRefreshTokenGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -178,11 +174,11 @@ bool CSimpleLoginWrapComp::LoginWithRefreshToken(const QString& userName, const 
 			return false;
 		}
 
-		if (!response.Version_1_0 || !response.Version_1_0->ok.has_value() || !*response.Version_1_0->ok){
+		if (!response.ok.has_value() || !*response.ok){
 			return false;
 		}
 
-		if (!response.Version_1_0->userSession.has_value()){
+		if (!response.userSession.has_value()){
 			return false;
 		}
 
@@ -196,8 +192,8 @@ bool CSimpleLoginWrapComp::LoginWithRefreshToken(const QString& userName, const 
 
 		// Extract session data from response
 		QByteArray userId;
-		if (response.Version_1_0->userSession->userId.has_value()){
-			userId = *response.Version_1_0->userSession->userId;
+		if (response.userSession->userId.has_value()){
+			userId = *response.userSession->userId;
 			m_loggedUserName = userId;
 		}
 		else{
@@ -210,11 +206,11 @@ bool CSimpleLoginWrapComp::LoginWithRefreshToken(const QString& userName, const 
 
 		m_userInfoPtr->SetId(m_loggedUserName);
 
-		if (response.Version_1_0->userSession->accessToken.has_value()){
-			m_loggedUserToken = *response.Version_1_0->userSession->accessToken;
+		if (response.userSession->accessToken.has_value()){
+			m_loggedUserToken = *response.userSession->accessToken;
 		}
-		if (response.Version_1_0->userSession->refreshToken.has_value()){
-			m_loggedUserRefreshToken = *response.Version_1_0->userSession->refreshToken;
+		if (response.userSession->refreshToken.has_value()){
+			m_loggedUserRefreshToken = *response.userSession->refreshToken;
 		}
 
 		imtqml::CGqlModel::SetGlobalAccessToken(m_loggedUserToken);

@@ -6,7 +6,7 @@
 #include <imtdoc/IDocumentService.h>
 
 // Generated includes
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/RoleCollectionDocumentService.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/RoleCollectionDocumentService_fwd.h>
 
 
 namespace imtauthgql
@@ -21,23 +21,23 @@ namespace imtauthgql
  * CollectionDocumentManager holds for a given documentId.
  */
 class CRoleCollectionDocumentServiceComp:
-			public sdl::imtauth::RoleCollectionDocumentService::CGraphQlHandlerCompBase
+			public sdl::V1_0::imtauth::CRoleCollectionDocumentServiceGqlHandlerCompBase
 {
 public:
-	typedef sdl::imtauth::RoleCollectionDocumentService::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CRoleCollectionDocumentServiceGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CRoleCollectionDocumentServiceComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", false, "CollectionDocumentService");
 	I_END_COMPONENT
 
 protected:
-	// reimplemented (CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Roles::CRoleData OnGetRoleRepresentation(
-				const sdl::imtauth::RoleCollectionDocumentService::CGetRoleRepresentationGqlRequest& getRoleRepresentationRequest,
+	// reimplemented (CRoleCollectionDocumentServiceGqlHandlerCompBase)
+	virtual sdl::V1_0::imtauth::CRoleData OnGetRoleRepresentation(
+				const sdl::V1_0::imtauth::CGetRoleRepresentationGqlRequest& getRoleRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus OnUpdateRoleFromRepresentation(
-				const sdl::imtauth::RoleCollectionDocumentService::CUpdateRoleFromRepresentationGqlRequest& updateRoleFromRepresentationRequest,
+	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnUpdateRoleFromRepresentation(
+				const sdl::V1_0::imtauth::CUpdateRoleFromRepresentationGqlRequest& updateRoleFromRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

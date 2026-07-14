@@ -58,14 +58,40 @@
 #include <imtauth/CTenantManagerComp.h>
 #include <imtauth/CTenantMembershipComp.h>
 #include <imtauth/CTenantMembershipManagerComp.h>
+#include <imtauth/CTenantEntityBindingComp.h>
+#include <imtauth/CTenantEntityBindingManagerComp.h>
 #include <imtauth/CTenantInvitationComp.h>
 #include <imtauth/CTenantInvitationManagerComp.h>
+#include <imtauth/CCrossOrgGrantComp.h>
+#include <imtauth/CCrossOrgGrantManagerComp.h>
+#include <imtauth/CContractComp.h>
+#include <imtauth/CContractManagerComp.h>
+#include <imtauth/CTenantRelationshipInfoComp.h>
+#include <imtauth/CTenantConnectionRequestComp.h>
+#include <imtauth/CTenantConnectionRequestManagerComp.h>
+#include <imtauth/CTenantConnectionCodeComp.h>
+#include <imtauth/CTenantConnectionComp.h>
+#include <imtauth/CTenantRelationshipProposalComp.h>
+#include <imtauth/CCrossTenantMessageComp.h>
+#include <imtauth/CCrossTenantMessageProjectionComp.h>
+#include <imtauth/CCrossTenantMessageBrokerComp.h>
+#include <imtauth/COrderRequestComp.h>
+#include <imtauth/COrderRequestHandlerComp.h>
 #include <imtauth/CTenantDocumentNameProviderComp.h>
 #include <imtauth/CExternalIdentity.h>
 #include <imtauth/CGoogleOidcProviderComp.h>
 #include <imtauth/CAppleOidcProviderComp.h>
 #include <imtauth/CFacebookOidcProviderComp.h>
 #include <imtauth/CExternalOidcAuthControllerComp.h>
+#include <imtauth/CTenantRelationshipDocumentNameProviderComp.h>
+#include <imtauth/CTenantDocumentValidatorComp.h>
+#include <imtauth/CRelationshipDocumentValidatorComp.h>
+#include <imtauth/CCrossOrgGrantDocumentValidatorComp.h>
+#include <imtauth/CRoleDocumentValidatorComp.h>
+#include <imtauth/CUserDocumentValidatorComp.h>
+#include <imtauth/CUserGroupDocumentValidatorComp.h>
+#include <imtauth/CDelegatedAccessResolverComp.h>
+#include <imtauth/COrganizationsPermissionsProviderComp.h>
 
 
 namespace ImtAuthPck
@@ -114,6 +140,7 @@ typedef imtauth::CRoleCollectionAdapterComp RoleCollectionAdapter;
 typedef imtauth::CUserCollectionAdapterComp UserCollectionAdapter;
 typedef imtauth::CCheckPermissionCompBase CheckPermissions;
 typedef imtauth::CCollectionPermissionsProviderComp CollectionPermissionsProvider;
+typedef imtauth::COrganizationsPermissionsProviderComp OrganizationsPermissionsProvider;
 typedef imtauth::CCheckPermissionOrComp CheckPermissionOr;
 typedef icomp::TModelCompWrap<imtauth::CUserSettingsComp> UserSettings;
 typedef imtauth::CUserGroupInfoProviderComp UserGroupInfoProvider;
@@ -178,8 +205,25 @@ typedef imtauth::CTenantMetaInfoCreatorComp TenantMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CTenantManagerComp> TenantManager;
 typedef icomp::TModelCompWrap<imtauth::CTenantMembershipComp> TenantMembershipInfo;
 typedef icomp::TModelCompWrap<imtauth::CTenantMembershipManagerComp> TenantMembershipManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantEntityBindingComp> TenantEntityBindingInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantEntityBindingManagerComp> TenantEntityBindingManager;
 typedef icomp::TModelCompWrap<imtauth::CTenantInvitationComp> TenantInvitationInfo;
 typedef icomp::TModelCompWrap<imtauth::CTenantInvitationManagerComp> TenantInvitationManager;
+typedef icomp::TModelCompWrap<imtauth::CCrossOrgGrantComp> CrossOrgGrantInfo;
+typedef icomp::TModelCompWrap<imtauth::CCrossOrgGrantManagerComp> CrossOrgGrantManager;
+typedef icomp::TModelCompWrap<imtauth::CContractComp> ContractInfo;
+typedef icomp::TModelCompWrap<imtauth::CContractManagerComp> ContractManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantConnectionRequestComp> TenantConnectionRequestInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantConnectionRequestManagerComp> TenantConnectionRequestManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantConnectionCodeComp> TenantConnectionCodeInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantConnectionComp> TenantConnectionInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantRelationshipProposalComp> TenantRelationshipProposalInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantRelationshipInfoComp> TenantRelationshipInfo;
+typedef icomp::TModelCompWrap<imtauth::CCrossTenantMessageComp> CrossTenantMessageInfo;
+typedef imtauth::CCrossTenantMessageProjectionComp CrossTenantMessageProjection;
+typedef icomp::TModelCompWrap<imtauth::CCrossTenantMessageBrokerComp> CrossTenantMessageBroker;
+typedef icomp::TModelCompWrap<imtauth::COrderRequestComp> OrderRequestInfo;
+typedef icomp::TModelCompWrap<imtauth::COrderRequestHandlerComp> OrderRequestHandler;
 typedef imtauth::CTenantDocumentNameProviderComp TenantDocumentNameProvider;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap <
@@ -191,6 +235,14 @@ typedef imtauth::CGoogleOidcProviderComp GoogleOidcProvider;
 typedef imtauth::CAppleOidcProviderComp AppleOidcProvider;
 typedef imtauth::CFacebookOidcProviderComp FacebookOidcProvider;
 typedef imtauth::CExternalOidcAuthControllerComp ExternalOidcAuthController;
+typedef imtauth::CTenantRelationshipDocumentNameProviderComp TenantRelationshipDocumentNameProvider;
+typedef imtauth::CTenantDocumentValidatorComp TenantDocumentValidator;
+typedef imtauth::CCrossOrgGrantDocumentValidatorComp CrossOrgGrantDocumentValidator;
+typedef imtauth::CRelationshipDocumentValidatorComp RelationshipDocumentValidator;
+typedef imtauth::CRoleDocumentValidatorComp RoleDocumentValidator;
+typedef imtauth::CUserDocumentValidatorComp UserDocumentValidator;
+typedef imtauth::CUserGroupDocumentValidatorComp UserGroupDocumentValidator;
+typedef imtauth::CDelegatedAccessResolverComp DelegatedAccessResolver;
 
 
 } // namespace ImtAuthPck

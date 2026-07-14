@@ -40,8 +40,6 @@ public:
 	virtual const imtbase::IReferenceCollection* GetInput() const override;
 	virtual void SetInput(const imtbase::IReferenceCollection& input) override;
 
-	virtual void SetParamsFactory(const ParamsFactoryFunction& factory) override;
-
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
 
@@ -58,7 +56,6 @@ private:
 	CStandardJobOutput m_results;
 	imtbase::CSimpleReferenceCollection m_input;
 	iprm::IParamsSetSharedPtr m_paramsPtr;
-	ParamsFactoryFunction m_paramsFactory;
 };
 
 typedef imtbase::TIdentifiableWrap<CJobTicket> CIdentifiableJobInfo;

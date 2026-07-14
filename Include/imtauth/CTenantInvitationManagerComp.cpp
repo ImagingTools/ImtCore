@@ -27,6 +27,29 @@ QString CreateInvitationExpirationTime()
 }
 
 
+bool IsValidInvitationId(const QByteArray& invitationId)
+{
+	if (invitationId.isEmpty()){
+		return false;
+	}
+
+	QString idText = QString::fromUtf8(invitationId).trimmed();
+	if (idText.compare(QStringLiteral("null"), Qt::CaseInsensitive) == 0){
+		return false;
+	}
+
+	if (!idText.startsWith('{')){
+		idText.prepend('{');
+	}
+	if (!idText.endsWith('}')){
+		idText.append('}');
+	}
+
+	const QUuid uuid(idText);
+	return !uuid.isNull();
+}
+
+
 } // anonymous namespace
 
 
@@ -77,6 +100,9 @@ ITenantInvitationUniquePtr CTenantInvitationManagerComp::GetInvitation(const QBy
 	if (!m_invitationCollectionCompPtr.IsValid() || !m_invitationFactoryCompPtr.IsValid()){
 		return nullptr;
 	}
+	if (!IsValidInvitationId(invitationId)){
+		return nullptr;
+	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_invitationCollectionCompPtr->GetObjectData(invitationId, dataPtr)){
@@ -112,7 +138,7 @@ ITenantInvitationUniquePtr CTenantInvitationManagerComp::FindPendingInvitation(c
 }
 
 
-QByteArray CTenantInvitationManagerComp::CreateInvitation(const QByteArray& invitedByUserId, const QByteArray& userId, const QByteArray& tenantId, const QByteArray& roleId)
+QByteArray CTenantInvitationManagerComp::CreateInvitation(const QByteArray& invitedByUserId, const QByteArray& userId, const QByteArray& tenantId)
 {
 	if (!m_invitationCollectionCompPtr.IsValid() || !m_invitationFactoryCompPtr.IsValid() || !m_membershipManagerCompPtr.IsValid()){
 		SendErrorMessage(0, "Invitation collection, factory or membership manager not configured", "CTenantInvitationManagerComp");
@@ -147,7 +173,6 @@ QByteArray CTenantInvitationManagerComp::CreateInvitation(const QByteArray& invi
 	invitationPtr->SetInvitationId(invitationId);
 	invitationPtr->SetUserId(userId);
 	invitationPtr->SetTenantId(tenantId);
-	invitationPtr->SetRoleId(roleId);
 	invitationPtr->SetStatus(ITenantInvitation::TIS_PENDING);
 	invitationPtr->SetInvitedByUserId(invitedByUserId);
 	invitationPtr->SetCreatedAt(now);
@@ -165,6 +190,9 @@ QByteArray CTenantInvitationManagerComp::AcceptInvitation(const QByteArray& invi
 	if (!m_invitationCollectionCompPtr.IsValid() || !m_membershipManagerCompPtr.IsValid()){
 		return QByteArray();
 	}
+	if (!IsValidInvitationId(invitationId)){
+		return QByteArray();
+	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_invitationCollectionCompPtr->GetObjectData(invitationId, dataPtr)){
@@ -178,8 +206,7 @@ QByteArray CTenantInvitationManagerComp::AcceptInvitation(const QByteArray& invi
 
 	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(
 		invitationPtr->GetUserId(),
-		invitationPtr->GetTenantId(),
-		invitationPtr->GetRoleId().isEmpty() ? QByteArrayLiteral("Member") : invitationPtr->GetRoleId());
+		invitationPtr->GetTenantId());
 	if (membershipId.isEmpty()){
 		return QByteArray();
 	}
@@ -199,6 +226,9 @@ QByteArray CTenantInvitationManagerComp::AcceptInvitation(const QByteArray& invi
 bool CTenantInvitationManagerComp::RejectInvitation(const QByteArray& invitationId, const QByteArray& userId)
 {
 	if (!m_invitationCollectionCompPtr.IsValid()){
+		return false;
+	}
+	if (!IsValidInvitationId(invitationId)){
 		return false;
 	}
 
@@ -228,6 +258,9 @@ bool CTenantInvitationManagerComp::RevokeInvitation(const QByteArray& invitation
 	if (!m_invitationCollectionCompPtr.IsValid()){
 		return false;
 	}
+	if (!IsValidInvitationId(invitationId)){
+		return false;
+	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_invitationCollectionCompPtr->GetObjectData(invitationId, dataPtr)){
@@ -254,6 +287,9 @@ bool CTenantInvitationManagerComp::RevokeInvitation(const QByteArray& invitation
 bool CTenantInvitationManagerComp::ResendInvitation(const QByteArray& invitationId)
 {
 	if (!m_invitationCollectionCompPtr.IsValid()){
+		return false;
+	}
+	if (!IsValidInvitationId(invitationId)){
 		return false;
 	}
 

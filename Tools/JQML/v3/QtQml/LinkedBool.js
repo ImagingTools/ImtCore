@@ -27,7 +27,7 @@ class LinkedBool extends Property {
             try {
                 target.__self[name].value = value.call(target)
             } catch(error) {
-                if(location.hash === '#jqdebug')console.error(error)
+                if(location.hash === '#jqdebugdetail')console.error(error)
             }
         } else {
             target.__self[name].value = value
@@ -62,7 +62,7 @@ class LinkedBool extends Property {
             try {
                 target.__self[name].value = value.call(target)
             } catch(error) {
-                if(location.hash === '#jqdebug')console.error(error)
+                if(location.hash === '#jqdebugdetail')console.error(error)
             }
         } else {
             target.__self[name].value = value
@@ -109,7 +109,7 @@ class LinkedBool extends Property {
 
             let found = false
             for(let connectionObj of link.target.__depends[link.name]){
-                if(connectionObj.name === name + 'Changed' && connectionObj.target === target){
+                if(connectionObj.name === name + 'Changed' && connectionObj.target.__self === target.__self){
                     found = true
                     break
                 }
@@ -152,7 +152,7 @@ class LinkedBool extends Property {
                 })
                 target.__self[name].value = value.call(target)
             } catch(error) {
-                if(location.hash === '#jqdebug')console.error(error)
+                if(location.hash === '#jqdebugdetail')console.error(error)
             } finally {
                 global.queueFlag.pop()
                 this.queueLink.pop()
