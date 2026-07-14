@@ -145,6 +145,7 @@ Dialog {
 
 				TextInputElementView {
 					id: emailElementView;
+					objectName: "EmailInput"
 					placeHolderText: qsTr("Enter the email");
 					name: qsTr("Email");
 					description: qsTr("Enter the email address that was specified on your account, a code will be sent to it");

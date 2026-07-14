@@ -5,6 +5,12 @@ ListModel {
 	signal finished
 	dynamicRoles: true;
 
+	onOwnerChanged: {
+		for (let i = 0; i < count; ++i){
+			get(i).item.owner = owner
+		}
+	}
+
 	function getProperties(item){
 		let list = []
 		if(Qt.platform.os === 'web'){

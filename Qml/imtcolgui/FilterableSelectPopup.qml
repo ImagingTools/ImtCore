@@ -36,6 +36,10 @@ import imtgui 1.0
 PopupView {
 	id: root
 
+	// Test instrumentation: PopupView has no objectName of its own. Only one of these is ever open at a
+	// time (it's a modal picker), so a generic name is unambiguous. Inert - no runtime/visual effect.
+	objectName: "FilterableSelectPopup"
+
 	width: root.embedded ? (parent ? parent.width : itemWidth) : (itemWidth + 2 * Style.marginL)
 	height: root.embedded ? contentColumn.height : Math.min(contentColumn.height + 2 * Style.marginL, root.__maxPopupHeight)
 
@@ -106,6 +110,13 @@ PopupView {
 			width: root.itemWidth
 
 			height: root.itemHeight
+
+			// Test instrumentation: PopupMenuDelegate.qml hardcodes objectName: "PopupMenuDelegate" on
+			// every instance (identical for every row, not text/index-derived), and this popup has no
+			// separate "OK"/confirm button - a single click on a row toggles its selection immediately.
+			// Without a per-row objectName there was no way to address a SPECIFIC row at all. Inert -
+			// overrides the base's objectName binding, no runtime/visual effect.
+			objectName: "FilterableSelectItem_" + model.index
 
 			isSeparator: false
 

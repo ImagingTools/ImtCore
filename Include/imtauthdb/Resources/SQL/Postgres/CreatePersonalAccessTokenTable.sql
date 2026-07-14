@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS "PersonalAccessTokens"
     "UserId"     uuid        NOT NULL,
     "ProductId"  text,
     "TokenHash"  bytea       NOT NULL,
-    -- Code stores scopes as comma-separated string; keep as text for compatibility
+    -- Code stores scopes as comma-separated string, kept as text for compatibility
     "Scopes"     text        NOT NULL DEFAULT '',
     "CreatedAt"  timestamp without time zone NOT NULL DEFAULT now(),
     "LastUsedAt" timestamp without time zone,
