@@ -91,22 +91,20 @@ imt_declare_library_dependencies(imtoas			Acf::istd)
 
 if(NOT IMT_BUILD_TOOLS_ONLY)
 
-	if(USE_SDL)
-		# ---------------------------------------------------------------------------
-		# SDL (schema-generated) libraries. Their generated C++ pulls in the Acf base
-		# serialization/component headers and the imt domain SDL types; those flow in
-		# transitively through the imtsdl runtime and imtbasesdl base-type libraries.
-		# ---------------------------------------------------------------------------
-		imt_declare_library_dependencies(imtbasesdl			imtsdl imtbase)
-		imt_declare_library_dependencies(imtcolorsdl		imtsdl imtbasesdl imtcol)
-		imt_declare_library_dependencies(imtauthsdl			imtsdl imtbasesdl imtauth)
-		imt_declare_library_dependencies(imt2dsdl			imtsdl imtbasesdl)
-		imt_declare_library_dependencies(imtlicsdl			imtsdl imtbasesdl imtlic)
-		imt_declare_library_dependencies(imtappsdl			imtsdl imtbasesdl imtapp)
-		imt_declare_library_dependencies(imtpaysdl			imtsdl imtbasesdl)
-		imt_declare_library_dependencies(imtchatsdl			imtsdl imtbasesdl imtchat)
-		imt_declare_library_dependencies(imtdesksdl			imtsdl imtbasesdl imtdesk)
-	endif()
+	# ---------------------------------------------------------------------------
+	# SDL (schema-generated) libraries. Their generated C++ pulls in the Acf base
+	# serialization/component headers and the imt domain SDL types; those flow in
+	# transitively through the imtsdl runtime and imtbasesdl base-type libraries.
+	# ---------------------------------------------------------------------------
+	imt_declare_library_dependencies(imtbasesdl			imtsdl imtbase)
+	imt_declare_library_dependencies(imtcolorsdl		imtsdl imtbasesdl imtcol)
+	imt_declare_library_dependencies(imtauthsdl			imtsdl imtbasesdl imtauth)
+	imt_declare_library_dependencies(imt2dsdl			imtsdl imtbasesdl)
+	imt_declare_library_dependencies(imtlicsdl			imtsdl imtbasesdl imtlic)
+	imt_declare_library_dependencies(imtappsdl			imtsdl imtbasesdl imtapp)
+	imt_declare_library_dependencies(imtpaysdl			imtsdl imtbasesdl)
+	imt_declare_library_dependencies(imtchatsdl			imtsdl imtbasesdl imtchat)
+	imt_declare_library_dependencies(imtdesksdl			imtsdl imtbasesdl imtdesk)
 
 	#-------- Libraries --------
 	imt_declare_library_dependencies(imtapp					Acf::ifile)

@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.26)
 
 project(ImtCore)
 
+
 if(NOT DEFINED QT_VERSION_MAJOR)
 	find_package(QT NAMES Qt6 Qt5 COMPONENTS Core)
 	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core Widgets Core Gui Xml Network Svg Sql WebSockets Concurrent PrintSupport REQUIRED)
@@ -25,11 +26,15 @@ if(NOT DEFINED IMTCOREDIR_BUILD)
 	set(IMTCOREDIR_BUILD "${IMTCOREDIR}")
 endif()
 
+
+option(BUILD_TESTING "Configures projects for testing" OFF)
+option(USE_MDBX "Use libmdbx" OFF)
+
 # Enable modern target-based architecture:
 # find_package(IAcf) provides Acf::/AcfSln::/IAcf:: imported targets with transitive
 # include dirs and link deps. Legacy global include_directories()/link_directories() in the
 # Env chain are skipped.
-set(ACF_MODERN_CMAKE ON CACHE BOOL "Enable modern target-based architecture")
+option(ACF_MODERN_CMAKE "Enable modern target-based architecture" ON)
 
 # Collect ImtCore libraries in their own export set so they are published as the
 # ImtCore:: package. Read by StaticConfig.cmake / acf_register_library().
@@ -66,22 +71,15 @@ if(ACF_MODERN_CMAKE AND NOT TARGET Acf::istd)
 	set(IAcf_DIR "${IACFDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}/cmake" CACHE PATH "Path to the IAcf build-tree CMake package")
 	find_package(IAcf REQUIRED GLOBAL)
 endif()
-include(${IMTCOREDIR}/Config/CMake/PartituraUpgrade.cmake)
-if (NOT ANDROID)
-	imt_core_upgrade_partitura("${CMAKE_CURRENT_LIST_DIR}/../..")
-endif()
 
 message(VERBOSE "ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
 
-set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
-set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
-set (QML_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Qml")
-set (SDL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Sdl")
-set (TESTS_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Tests")
-
+set(INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
+set(IMPL_DIR	"${CMAKE_CURRENT_LIST_DIR}/../../Impl")
+set(QML_DIR		"${CMAKE_CURRENT_LIST_DIR}/../../Qml")
+set(SDL_DIR		"${CMAKE_CURRENT_LIST_DIR}/../../Sdl")
+set(TESTS_DIR	"${CMAKE_CURRENT_LIST_DIR}/../../Tests")
 set(AUX_INCLUDE_DIR "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles")
-
-set(BUILD_TESTING OFF CACHE BOOL "Configures projects for testing")
 
 include_directories(${AUX_INCLUDE_DIR}/..)
 include_directories(${AUX_INCLUDE_DIR})
@@ -102,12 +100,12 @@ add_dependencies(ImtDdlPck imtddl)
 
 #------ DesignToken ------
 add_subdirectory("${IMPL_DIR}/DesignTokenCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DesignTokenCreator")
-add_dependencies(DesignTokenCreator imtbase)
+add_dependencies(DesignTokenCreator imtdesign ImtDesignPck)
 imt_chain_windeploy_target(DesignTokenCreator)
 
 #------ DDLCodeCreator ------
 add_subdirectory("${IMPL_DIR}/DdlCodeCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DdlCodeCreator")
-add_dependencies(DdlCodeCreator imtddl)
+add_dependencies(DdlCodeCreator imtddl ImtDdlPck)
 imt_chain_windeploy_target(DdlCodeCreator)
 
 #------ SDL tool ------
@@ -121,16 +119,18 @@ add_dependencies(ImtSdlGenQmlPck imtsdlgenqml imtsdl imtfile imtbase)
 
 add_subdirectory("${INCLUDE_DIR}/imtsdlgencpp/CMake" "${AUX_INCLUDE_DIR}/imtsdlgencpp")
 add_subdirectory("${IMPL_DIR}/ImtSdlGenCppPck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenCppPck")
-add_dependencies(ImtSdlGenCppPck imtsdlgencpp imtsdlgenqml imtsdl imtfile imtbase)
+add_dependencies(ImtSdlGenCppPck imtsdl imtsdlgencpp imtsdlgenqml imtfile imtbase)
 
 add_subdirectory("${IMPL_DIR}/SdlCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/SdlCodeGenerator")
-add_dependencies(SdlCodeGenerator ImtSdlGenCppPck ImtSdlGenQmlPck ImtSdlPck)
+add_dependencies(SdlCodeGenerator ImtCorePck ImtSdlPck ImtSdlGenCppPck ImtSdlGenQmlPck)
 imt_chain_windeploy_target(SdlCodeGenerator)
 
 #------ SDL tool tests ------
 if (NOT DEFINED BUILD_TESTING OR BUILD_TESTING)
 	add_subdirectory("${INCLUDE_DIR}/imtsdlgencpp/Test/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenCppTest")
 	add_subdirectory("${INCLUDE_DIR}/imtsdlgenqml/Test/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenQmlTest")
+	imt_chain_windeploy_target(ImtSdlGenQmlTest)
+	imt_chain_windeploy_target(ImtSdlGenTest)
 endif()
 
 #------ OpenAPI ------
@@ -138,84 +138,95 @@ add_subdirectory("${INCLUDE_DIR}/imtoas/CMake" "${AUX_INCLUDE_DIR}/imtoas")
 add_subdirectory("${IMPL_DIR}/ImtOasPck/CMake" "${AUX_INCLUDE_DIR}/ImtOasPck")
 add_subdirectory("${IMPL_DIR}/OasCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/OasCodeGeneratorExe")
 imt_chain_windeploy_target(OasCodeGeneratorExe)
-imt_chain_windeploy_target(ImtSdlGenTest)
-imt_chain_windeploy_target(ImtSdlGenQmlTest)
 
 if(NOT IMT_BUILD_TOOLS_ONLY)
-	if(NOT DEFINED USE_SDL)
-		set(USE_SDL ON)
-	endif()
+	#-------- SDL generated libraries --------
+	add_subdirectory("${SDL_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbasesdl")
+	add_dependencies(imtbasesdl SdlCodeGenerator)
 
-	#-------- Sdl --------
-	if(USE_SDL)
-		add_subdirectory("${SDL_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbasesdl")
-		add_subdirectory("${SDL_DIR}/imt2d/CMake" "${AUX_INCLUDE_DIR}/imt2dsdl")
-		add_subdirectory("${SDL_DIR}/imtcolor/CMake" "${AUX_INCLUDE_DIR}/imtcolorsdl")
-		add_dependencies(imt2dsdl imtbasesdl imtcolorsdl)
-		add_subdirectory("${SDL_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauthsdl")
-		add_dependencies(imtauthsdl imtbasesdl)
-		add_subdirectory("${SDL_DIR}/imtlic/CMake" "${AUX_INCLUDE_DIR}/imtlicsdl")
-		add_subdirectory("${SDL_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtappsdl")
-		add_subdirectory("${SDL_DIR}/imtpay/CMake" "${AUX_INCLUDE_DIR}/imtpaysdl")
-		add_dependencies(imtpaysdl imtbasesdl)
-		add_subdirectory("${SDL_DIR}/imtchat/CMake" "${AUX_INCLUDE_DIR}/imtchatsdl")
-		add_subdirectory("${SDL_DIR}/imtdesk/CMake" "${AUX_INCLUDE_DIR}/imtdesksdl")
-	endif()
+	add_subdirectory("${SDL_DIR}/imt2d/CMake" "${AUX_INCLUDE_DIR}/imt2dsdl")
+	add_dependencies(imt2dsdl imtcolorsdl)
+
+	add_subdirectory("${SDL_DIR}/imtcolor/CMake" "${AUX_INCLUDE_DIR}/imtcolorsdl")
+	add_dependencies(imtcolorsdl imtbasesdl)
+
+	add_subdirectory("${SDL_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauthsdl")
+	add_dependencies(imtauthsdl imtbasesdl)
+
+	add_subdirectory("${SDL_DIR}/imtlic/CMake" "${AUX_INCLUDE_DIR}/imtlicsdl")
+	add_dependencies(imtlicsdl imtbasesdl)
+
+	add_subdirectory("${SDL_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtappsdl")
+	add_dependencies(imtappsdl imtbasesdl)
+
+	add_subdirectory("${SDL_DIR}/imtpay/CMake" "${AUX_INCLUDE_DIR}/imtpaysdl")
+	add_dependencies(imtpaysdl imtbasesdl)
+
+	add_subdirectory("${SDL_DIR}/imtchat/CMake" "${AUX_INCLUDE_DIR}/imtchatsdl")
+	add_dependencies(imtchatsdl imtbasesdl)
+
+	add_subdirectory("${SDL_DIR}/imtdesk/CMake" "${AUX_INCLUDE_DIR}/imtdesksdl")
+	add_dependencies(imtdesksdl imtbasesdl)
 
 	#-------- Libraries --------
-	add_subdirectory("${INCLUDE_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtapp")
-	add_subdirectory("${INCLUDE_DIR}/imtcrypt/CMake" "${AUX_INCLUDE_DIR}/imtcrypt")
-	add_subdirectory("${INCLUDE_DIR}/imtmail/CMake" "${AUX_INCLUDE_DIR}/imtmail")
-	add_subdirectory("${INCLUDE_DIR}/imtwidgets/CMake" "${AUX_INCLUDE_DIR}/imtwidgets")
-	add_subdirectory("${INCLUDE_DIR}/imtdev/CMake" "${AUX_INCLUDE_DIR}/imtdev")
-	add_subdirectory("${INCLUDE_DIR}/imtdevgui/CMake" "${AUX_INCLUDE_DIR}/imtdevgui")
-	add_dependencies(imtdevgui imtdev)
-	add_subdirectory("${INCLUDE_DIR}/imtdoc/CMake" "${AUX_INCLUDE_DIR}/imtdoc")
-	add_dependencies(imtdoc imtbase)
-	add_subdirectory("${INCLUDE_DIR}/imtrest/CMake" "${AUX_INCLUDE_DIR}/imtrest")
-	add_dependencies(imtrest imtbasesdl)
-	add_subdirectory("${INCLUDE_DIR}/imtstyle/CMake" "${AUX_INCLUDE_DIR}/imtstyle")
-	add_dependencies(imtstyle DesignTokenCreator)
-	add_subdirectory("${INCLUDE_DIR}/imtcol/CMake" "${AUX_INCLUDE_DIR}/imtcol")
-	add_dependencies(imtcol imtbase imtbasesdl)
-	add_subdirectory("${INCLUDE_DIR}/imtgql/CMake" "${AUX_INCLUDE_DIR}/imtgql")
+	add_subdirectory("${INCLUDE_DIR}/imtauth/CMake"			"${AUX_INCLUDE_DIR}/imtauth")
+	add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake"		"${AUX_INCLUDE_DIR}/imtauthdb")
+	add_subdirectory("${INCLUDE_DIR}/imtapp/CMake"			"${AUX_INCLUDE_DIR}/imtapp")
+	add_subdirectory("${INCLUDE_DIR}/imtchat/CMake"			"${AUX_INCLUDE_DIR}/imtchat")
+	add_subdirectory("${INCLUDE_DIR}/imtcom/CMake"			"${AUX_INCLUDE_DIR}/imtcom")
+	add_subdirectory("${INCLUDE_DIR}/imtcrypt/CMake"		"${AUX_INCLUDE_DIR}/imtcrypt")
+	add_subdirectory("${INCLUDE_DIR}/imtdesk/CMake"			"${AUX_INCLUDE_DIR}/imtdesk")
+	add_subdirectory("${INCLUDE_DIR}/imtdev/CMake"			"${AUX_INCLUDE_DIR}/imtdev")
+	add_subdirectory("${INCLUDE_DIR}/imtdevgui/CMake"		"${AUX_INCLUDE_DIR}/imtdevgui")
+	add_subdirectory("${INCLUDE_DIR}/imtdoc/CMake"			"${AUX_INCLUDE_DIR}/imtdoc")
+	add_subdirectory("${INCLUDE_DIR}/imtgql/CMake"			"${AUX_INCLUDE_DIR}/imtgql")
+	add_subdirectory("${INCLUDE_DIR}/imthttp/CMake"			"${AUX_INCLUDE_DIR}/imthttp")
+	add_subdirectory("${INCLUDE_DIR}/imthype/CMake"			"${AUX_INCLUDE_DIR}/imthype")
+	add_subdirectory("${INCLUDE_DIR}/imthypegui/CMake"		"${AUX_INCLUDE_DIR}/imthypegui")
+	add_subdirectory("${INCLUDE_DIR}/imtlic/CMake"			"${AUX_INCLUDE_DIR}/imtlic")
+	add_subdirectory("${INCLUDE_DIR}/imtlog/CMake"			"${AUX_INCLUDE_DIR}/imtlog")
+	add_subdirectory("${INCLUDE_DIR}/imtloggui/CMake"		"${AUX_INCLUDE_DIR}/imtloggui")
+	add_subdirectory("${INCLUDE_DIR}/imtmail/CMake"			"${AUX_INCLUDE_DIR}/imtmail")
+	add_subdirectory("${INCLUDE_DIR}/imtrepo/CMake"			"${AUX_INCLUDE_DIR}/imtrepo")
+	add_subdirectory("${INCLUDE_DIR}/imtreport/CMake"		"${AUX_INCLUDE_DIR}/imtreport")
+	add_subdirectory("${INCLUDE_DIR}/imtreportgui/CMake"	"${AUX_INCLUDE_DIR}/imtreportgui")
+	add_subdirectory("${INCLUDE_DIR}/imtrest/CMake"			"${AUX_INCLUDE_DIR}/imtrest")
+	add_subdirectory("${INCLUDE_DIR}/imtservice/CMake"		"${AUX_INCLUDE_DIR}/imtservice")
+	add_subdirectory("${INCLUDE_DIR}/imtwidgets/CMake"		"${AUX_INCLUDE_DIR}/imtwidgets")
+	add_subdirectory("${INCLUDE_DIR}/imtzip/CMake"			"${AUX_INCLUDE_DIR}/imtzip")
+
 	add_subdirectory("${INCLUDE_DIR}/imtauthgql/CMake" "${AUX_INCLUDE_DIR}/imtauthgql")
 	add_dependencies(imtauthgql imtauthsdl)
+
+	add_subdirectory("${INCLUDE_DIR}/imtclientgql/CMake" "${AUX_INCLUDE_DIR}/imtclientgql")
+	add_dependencies(imtclientgql imtbasesdl)
+
+	add_subdirectory("${INCLUDE_DIR}/imtcol/CMake" "${AUX_INCLUDE_DIR}/imtcol")
+	add_dependencies(imtcol imtbasesdl)
+
+	add_subdirectory("${INCLUDE_DIR}/imtgui/CMake" "${AUX_INCLUDE_DIR}/imtgui")
+	add_dependencies(imtgui DesignTokenCreator)
+
+	add_subdirectory("${INCLUDE_DIR}/imtguigql/CMake" "${AUX_INCLUDE_DIR}/imtguigql")
+	add_dependencies(imtguigql DesignTokenCreator)
+
+	add_subdirectory("${INCLUDE_DIR}/imtlicgui/CMake" "${AUX_INCLUDE_DIR}/imtlicgui")
+	add_dependencies(imtlicgui DesignTokenCreator)
+
+	add_subdirectory("${INCLUDE_DIR}/imtlicgql/CMake" "${AUX_INCLUDE_DIR}/imtlicgql")
+	add_dependencies(imtlicgql imtlicsdl)
+
 	add_subdirectory("${INCLUDE_DIR}/imtservergql/CMake" "${AUX_INCLUDE_DIR}/imtservergql")
 	add_dependencies(imtservergql imtappsdl)
-	add_subdirectory("${INCLUDE_DIR}/imtclientgql/CMake" "${AUX_INCLUDE_DIR}/imtclientgql")
-	add_subdirectory("${INCLUDE_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauth")
-	add_subdirectory("${INCLUDE_DIR}/imtlic/CMake" "${AUX_INCLUDE_DIR}/imtlic")
+
+	add_subdirectory("${INCLUDE_DIR}/imtstyle/CMake" "${AUX_INCLUDE_DIR}/imtstyle")
+	add_dependencies(imtstyle DesignTokenCreator)
+
 	add_subdirectory("${INCLUDE_DIR}/imtserverapp/CMake" "${AUX_INCLUDE_DIR}/imtserverapp")
 	add_dependencies(imtserverapp imtbasesdl)
 
-	add_subdirectory("${INCLUDE_DIR}/imtrepo/CMake" "${AUX_INCLUDE_DIR}/imtrepo")
-	add_subdirectory("${INCLUDE_DIR}/imtreport/CMake" "${AUX_INCLUDE_DIR}/imtreport")
-	add_subdirectory("${INCLUDE_DIR}/imtreportgui/CMake" "${AUX_INCLUDE_DIR}/imtreportgui")
-	add_subdirectory("${INCLUDE_DIR}/imtgui/CMake" "${AUX_INCLUDE_DIR}/imtgui")
-	add_dependencies(imtgui DesignTokenCreator)
-	add_subdirectory("${INCLUDE_DIR}/imtguigql/CMake" "${AUX_INCLUDE_DIR}/imtguigql")
-	add_dependencies(imtguigql imtgql imtservergql)
-	add_subdirectory("${INCLUDE_DIR}/imtloggui/CMake" "${AUX_INCLUDE_DIR}/imtloggui")
-	add_subdirectory("${INCLUDE_DIR}/imtlog/CMake" "${AUX_INCLUDE_DIR}/imtlog")
-	add_subdirectory("${INCLUDE_DIR}/imtzip/CMake" "${AUX_INCLUDE_DIR}/imtzip")
-	add_subdirectory("${INCLUDE_DIR}/imtlicgql/CMake" "${AUX_INCLUDE_DIR}/imtlicgql")
-	add_dependencies(imtlicgql imtgql imtservergql)
-	add_subdirectory("${INCLUDE_DIR}/imtlicgui/CMake" "${AUX_INCLUDE_DIR}/imtlicgui")
-	add_subdirectory("${INCLUDE_DIR}/imtcom/CMake" "${AUX_INCLUDE_DIR}/imtcom")
-	add_subdirectory("${INCLUDE_DIR}/imthttp/CMake" "${AUX_INCLUDE_DIR}/imthttp")
-	add_dependencies(imthttp imtcom)
-	add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake" "${AUX_INCLUDE_DIR}/imtauthdb")
-	add_subdirectory("${INCLUDE_DIR}/imtchat/CMake" "${AUX_INCLUDE_DIR}/imtchat")
-	add_subdirectory("${INCLUDE_DIR}/imtdesk/CMake" "${AUX_INCLUDE_DIR}/imtdesk")
-	add_subdirectory("${INCLUDE_DIR}/imtservice/CMake" "${AUX_INCLUDE_DIR}/imtservice")
-
-	add_subdirectory("${INCLUDE_DIR}/imthype/CMake" "${AUX_INCLUDE_DIR}/imthype")
-	add_subdirectory("${INCLUDE_DIR}/imthypegui/CMake" "${AUX_INCLUDE_DIR}/imthypegui")
-
 	if(NOT DEFINED USE_GEO OR USE_GEO)
 		add_subdirectory("${INCLUDE_DIR}/imtgeo/CMake" "${AUX_INCLUDE_DIR}/imtgeo")
-		add_dependencies(imtgeo imtbasesdl)
 	endif()
 
 	if(DEFINED USE_MONGODB AND USE_MONGODB)
@@ -231,23 +242,26 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 		add_subdirectory("${INCLUDE_DIR}/imt3d/CMake" "${AUX_INCLUDE_DIR}/imt3d")
 		add_subdirectory("${INCLUDE_DIR}/imt3dview/CMake" "${AUX_INCLUDE_DIR}/imt3dview")
+
 		add_subdirectory("${INCLUDE_DIR}/imt3dgui/CMake" "${AUX_INCLUDE_DIR}/imt3dgui")
-		add_subdirectory("${INCLUDE_DIR}/imt3d/Test/CMake" "${AUX_INCLUDE_DIR}/imt3d/Test")
 		add_dependencies(imt3dgui DesignTokenCreator)
+
+		add_subdirectory("${INCLUDE_DIR}/imt3d/Test/CMake" "${AUX_INCLUDE_DIR}/imt3d/Test")
 	endif()
 
 	if(NOT DEFINED USE_QTDB OR USE_QTDB)
-		add_subdirectory("${INCLUDE_DIR}/imtdb/CMake" "${AUX_INCLUDE_DIR}/imtdb")
-		add_dependencies(imtserverapp imtbasesdl)
+		add_subdirectory("${INCLUDE_DIR}/imtchatdb/CMake"	"${AUX_INCLUDE_DIR}/imtchatdb")
+		add_subdirectory("${INCLUDE_DIR}/imtdb/CMake"		"${AUX_INCLUDE_DIR}/imtdb")
+		add_subdirectory("${INCLUDE_DIR}/imtdbgql/CMake"	"${AUX_INCLUDE_DIR}/imtdbgql")
+		add_subdirectory("${INCLUDE_DIR}/imtdeskdb/CMake"	"${AUX_INCLUDE_DIR}/imtdeskdb")
+		add_subdirectory("${INCLUDE_DIR}/imthypedb/CMake"	"${AUX_INCLUDE_DIR}/imthypedb")
+		add_subdirectory("${INCLUDE_DIR}/imtlicdb/CMake"	"${AUX_INCLUDE_DIR}/imtlicdb")
+
 		add_subdirectory("${INCLUDE_DIR}/imtdbgui/CMake" "${AUX_INCLUDE_DIR}/imtdbgui")
-		add_subdirectory("${INCLUDE_DIR}/imtlicdb/CMake" "${AUX_INCLUDE_DIR}/imtlicdb")
-		add_subdirectory("${INCLUDE_DIR}/imtdbgql/CMake" "${AUX_INCLUDE_DIR}/imtdbgql")
-		add_subdirectory("${INCLUDE_DIR}/imthypedb/CMake" "${AUX_INCLUDE_DIR}/imthypedb")
-		add_subdirectory("${INCLUDE_DIR}/imtchatdb/CMake" "${AUX_INCLUDE_DIR}/imtchatdb")
-		add_subdirectory("${INCLUDE_DIR}/imtdeskdb/CMake" "${AUX_INCLUDE_DIR}/imtdeskdb")
+		add_dependencies(imtdbgui DesignTokenCreator)
 	endif()
 
-	if(DEFINED USE_MDBX AND USE_MDBX)
+	if(NOT USE_MDBX)
 		add_subdirectory("${INCLUDE_DIR}/imtmdbx/CMake" "${AUX_INCLUDE_DIR}/imtmdbx")
 	endif()
 
@@ -255,23 +269,32 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 	if(NOT DEFINED USE_QTQML OR USE_QTQML)
 		# TODO return it when new wrappers will be finished
 		# add_subdirectory("${INCLUDE_DIR}/imtqml2d/CMake" "${AUX_INCLUDE_DIR}/imtqml2d")
+
 		add_subdirectory("${INCLUDE_DIR}/imtauthgui/CMake" "${AUX_INCLUDE_DIR}/imtauthgui")
 		add_dependencies(imtauthgui DesignTokenCreator)
+
 		add_subdirectory("${INCLUDE_DIR}/imtchatgql/CMake" "${AUX_INCLUDE_DIR}/imtchatgql")
+		add_dependencies(imtchatgql imtchatsdl)
+
 		add_subdirectory("${INCLUDE_DIR}/imtdeskgql/CMake" "${AUX_INCLUDE_DIR}/imtdeskgql")
-		add_subdirectory("${QML_DIR}/imtdocgui/CMake" "${AUX_INCLUDE_DIR}/imtdocguiqml")
-		add_subdirectory("${QML_DIR}/imtauthgui/CMake" "${AUX_INCLUDE_DIR}/imtauthguiqml")
-		add_subdirectory("${QML_DIR}/imtcolgui/CMake" "${AUX_INCLUDE_DIR}/imtcolguiqml")
-		add_subdirectory("${QML_DIR}/imtgui/CMake" "${AUX_INCLUDE_DIR}/imtguiqml")
-		add_subdirectory("${QML_DIR}/imtguigql/CMake" "${AUX_INCLUDE_DIR}/imtguigqlqml")
-		add_subdirectory("${QML_DIR}/imtlicgui/CMake" "${AUX_INCLUDE_DIR}/imtlicguiqml")
-		add_subdirectory("${QML_DIR}/imtcontrols/CMake" "${AUX_INCLUDE_DIR}/imtcontrolsqml")
+		add_dependencies(imtdeskgql imtdesksdl)
+
 		add_subdirectory("${INCLUDE_DIR}/imtqml/CMake" "${AUX_INCLUDE_DIR}/imtqml")
 		add_dependencies(imtqml imtbasesdl)
+
 		add_subdirectory("${INCLUDE_DIR}/imtstylecontrolsqml/CMake" "${AUX_INCLUDE_DIR}/imtstylecontrolsqml")
-		add_subdirectory("${QML_DIR}/imtgeogui/CMake" "${AUX_INCLUDE_DIR}/imtgeoguiqml")
-		add_subdirectory("${QML_DIR}/imtdeskgui/CMake" "${AUX_INCLUDE_DIR}/imtdeskguiqml")
-		add_subdirectory("${QML_DIR}/imtchatgui/CMake" "${AUX_INCLUDE_DIR}/imtchatguiqml")
+
+		# QML libraries
+		add_subdirectory("${QML_DIR}/imtauthgui/CMake"		"${AUX_INCLUDE_DIR}/imtauthguiqml")
+		add_subdirectory("${QML_DIR}/imtchatgui/CMake"		"${AUX_INCLUDE_DIR}/imtchatguiqml")
+		add_subdirectory("${QML_DIR}/imtcolgui/CMake"		"${AUX_INCLUDE_DIR}/imtcolguiqml")
+		add_subdirectory("${QML_DIR}/imtcontrols/CMake"		"${AUX_INCLUDE_DIR}/imtcontrolsqml")
+		add_subdirectory("${QML_DIR}/imtdeskgui/CMake"		"${AUX_INCLUDE_DIR}/imtdeskguiqml")
+		add_subdirectory("${QML_DIR}/imtdocgui/CMake"		"${AUX_INCLUDE_DIR}/imtdocguiqml")
+		add_subdirectory("${QML_DIR}/imtgeogui/CMake"		"${AUX_INCLUDE_DIR}/imtgeoguiqml")
+		add_subdirectory("${QML_DIR}/imtgui/CMake"			"${AUX_INCLUDE_DIR}/imtguiqml")
+		add_subdirectory("${QML_DIR}/imtguigql/CMake"		"${AUX_INCLUDE_DIR}/imtguigqlqml")
+		add_subdirectory("${QML_DIR}/imtlicgui/CMake"		"${AUX_INCLUDE_DIR}/imtlicguiqml")
 	endif()
 
 	#-------- Packages --------
@@ -526,11 +549,9 @@ endif() # NOT IMT_BUILD_TOOLS_ONLY
 # Declare target-based deps so include paths/link order propagate transitively across ImtCore
 # libraries and onto the underlying Acf::/AcfSln::/IAcf:: libraries. Guarded on the modern
 # packaging machinery (acf_register_library from Acf) so the file no-ops under the legacy shim.
-if(COMMAND acf_register_library)
-	include("${IMTCOREDIR}/Config/CMake/ImtCoreLibraryDependencies.cmake")
+include("${IMTCOREDIR}/Config/CMake/ImtCoreLibraryDependencies.cmake")
 
-	# Export ImtCore libraries as a find_package(ImtCore) package (build + install tree) so
-	# downstream modules consume them via ImtCore::<lib> targets instead of env vars/manual paths.
-	include("${IMTCOREDIR}/Config/CMake/ImtCorePackageExport.cmake")
-endif()
+# Export ImtCore libraries as a find_package(ImtCore) package (build + install tree) so
+# downstream modules consume them via ImtCore::<lib> targets instead of env vars/manual paths.
+include("${IMTCOREDIR}/Config/CMake/ImtCorePackageExport.cmake")
 
