@@ -674,12 +674,10 @@ class ListView extends Flickable {
                     }
                 } else if (role === 'insert') {
                     for (let i = leftTop; i < bottomRight; i++) {
-                        this.__items.splice(i, 0, undefined)
                         let itemInfo = this.__getItemInfo(i)
+                        this.__items.splice(i, 0, undefined) 
                         if (itemInfo.inner) {
-                            if (!itemInfo.exist) {
-                                if (this.__createItem(i, itemInfo)) this.__updateGeometry()
-                            }
+                            if (this.__createItem(i, itemInfo)) this.__updateGeometry()
                         }
                     }
 
@@ -723,14 +721,15 @@ class ListView extends Flickable {
                 this.__realignItems(layoutFrom)
             }
 
-            let firstIndex = 0
-            let lastIndex = 0
+            let firstIndex = -1
+            let lastIndex = -1
 
             for (let i = 0; i < length; i++) {
-                if (this.__items[i] && !this.__items[i - 1] && !firstIndex) firstIndex = i
-                if (this.__items[i] && !this.__items[i + 1] && !lastIndex) lastIndex = i
+                if (this.__items[i] && !this.__items[i - 1] && firstIndex < 0) firstIndex = i
+                if (this.__items[i] && !this.__items[i + 1] && lastIndex < 0) lastIndex = i
             }
 
+            if(firstIndex >= 0)
             for (let i = firstIndex; i < length; i++) {
                 let itemInfo = this.__getItemInfo(i)
                 if (itemInfo.inner) {
@@ -743,6 +742,7 @@ class ListView extends Flickable {
                 }
 
             }
+            if(lastIndex >= 0)
             for (let i = lastIndex; i >= 0; i--) {
                 let itemInfo = this.__getItemInfo(i)
                 if (itemInfo.inner) {
