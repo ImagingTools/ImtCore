@@ -50,6 +50,24 @@ protected:
 				QString& errorMessage) const override;
 
 private:
+	/**
+		Checks whether the caller identified by the request's GraphQL context
+		is allowed to manage (list/create/revoke/delete) personal access
+		tokens belonging to \p targetUserId.
+
+		Access is granted to system administrators (imtauth::IUserInfo::IsAdmin())
+		and to the token owner themselves; anyone else - including
+		unauthenticated callers, for whom the request carries no context or no
+		resolved user - is denied. ValidateToken() is deliberately not gated by
+		this check: presenting the raw token secret is itself the credential.
+
+		\param gqlRequest GraphQL request carrying the caller's context.
+		\param targetUserId Owner of the token(s) being accessed.
+		\return true if the caller may manage tokens owned by targetUserId.
+	*/
+	bool IsCallerAuthorizedForUser(const ::imtgql::CGqlRequest& gqlRequest, const QByteArray& targetUserId) const;
+
+private:
 	I_REF(imtauth::IPersonalAccessTokenManager, m_tokenManagerCompPtr);
 	I_FACT(imtauth::IPersonalAccessToken, m_tokenFactoryCompPtr);
 };

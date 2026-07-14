@@ -909,6 +909,7 @@ DocumentViewBase {
 									
 									CustomTextField {
 										id: editTitleInput
+										objectName: "TitleInput"
 										width: titleColumn.width
 										height: Style.controlHeightM
 										placeHolderText: qsTr("Enter ticket title...")
@@ -1011,6 +1012,12 @@ DocumentViewBase {
 								}
 
 								Rectangle {
+									// Test instrumentation: this bordered box (Flickable+raw TextEdit, not
+									// the standard CustomTextField wrapper) had no objectName pair at all;
+									// the container needs one so gui.fill()'s own container-then-nested-
+									// TextInput lookup can resolve it (see editDescriptionInput's own
+									// "TextInput" objectName below). Inert.
+									objectName: "DescriptionInput"
 									width: parent.width
 									height: Math.min(220, Math.max(50, editDescriptionInput.contentHeight)) + Style.paddingM * 2
 									radius: Style.radiusM
@@ -1044,6 +1051,7 @@ DocumentViewBase {
 										
 										TextEdit {
 											id: editDescriptionInput
+										objectName: "TextInput"
 											width: descriptionFlick.width
 											height: Math.max(50, contentHeight)
 											font.pixelSize: Style.fontSizeM
@@ -1163,6 +1171,7 @@ DocumentViewBase {
 									
 									ComboBox {
 										id: editTypeCB
+										objectName: "TicketTypeCombo"
 										width: parent.width
 										height: Style.buttonHeightM
 										currentIndex: 1
@@ -1186,6 +1195,7 @@ DocumentViewBase {
 									
 									ComboBox {
 										id: editPriorityCB
+										objectName: "TicketPriorityCombo"
 										width: parent.width
 										height: Style.buttonHeightM
 										currentIndex: 1
@@ -1210,6 +1220,7 @@ DocumentViewBase {
 									
 									ComboBox {
 										id: editStatusCB
+										objectName: "TicketStatusCombo"
 										width: parent.width
 										height: Style.buttonHeightM
 										currentIndex: 0
@@ -1267,6 +1278,7 @@ DocumentViewBase {
 									
 									Text {
 										id: addAssigneeBtn
+										objectName: "AddAssigneeButton"
 										anchors.right: parent.right
 										anchors.verticalCenter: parent.verticalCenter
 										visible: root.canEditCoreTicketFields
@@ -1274,8 +1286,9 @@ DocumentViewBase {
 										font.pixelSize: Style.fontSizeM
 										font.bold: true
 										color: editView.accentColor
-										
+
 										MouseArea {
+											objectName: "MouseArea"
 											anchors.fill: parent
 											hoverEnabled: true
 											cursorShape: Qt.PointingHandCursor
@@ -1309,6 +1322,7 @@ DocumentViewBase {
 									Repeater {
 										model: root.pendingAssignees
 										delegate: Rectangle {
+											objectName: "AssigneeChip_" + index
 											width: Math.min(assigneeChipText.contentWidth + assigneeChipRemove.width + Style.paddingS * 3, 200)
 											height: 28
 											radius: 14
@@ -1332,6 +1346,7 @@ DocumentViewBase {
 											
 											ToolButton {
 												id: assigneeChipRemove
+												objectName: "RemoveButton"
 												visible: root.canEditCoreTicketFields
 												anchors.right: parent.right
 												anchors.verticalCenter: parent.verticalCenter
@@ -1460,6 +1475,7 @@ DocumentViewBase {
 									
 									Text {
 										id: addContextBtn
+										objectName: "AddContextButton"
 										anchors.right: parent.right
 										anchors.verticalCenter: parent.verticalCenter
 										visible: root.canEdit
@@ -1467,8 +1483,9 @@ DocumentViewBase {
 										font.pixelSize: Style.fontSizeM
 										font.bold: true
 										color: editView.accentColor
-										
+
 										MouseArea {
+											objectName: "MouseArea"
 											anchors.fill: parent
 											hoverEnabled: true
 											cursorShape: Qt.PointingHandCursor
@@ -1493,6 +1510,7 @@ DocumentViewBase {
 									Repeater {
 										model: root.pendingEntityRefs
 										delegate: Rectangle {
+											objectName: "ContextChip_" + index
 											readonly property real maxRefWidth: 260
 											width: Math.min(refLabelText.contentWidth + refRemoveBtn.width + Style.paddingS * 3, maxRefWidth)
 											height: 28
@@ -1529,6 +1547,7 @@ DocumentViewBase {
 											
 											ToolButton {
 												id: refRemoveBtn
+												objectName: "RemoveButton"
 												visible: root.canEdit
 												anchors.right: parent.right
 												anchors.verticalCenter: parent.verticalCenter
@@ -1634,6 +1653,7 @@ DocumentViewBase {
 
 										ComboBox {
 											id: ctxTypeCB
+											objectName: "ContextEntityTypeCombo"
 											anchors.left: parent.left
 											anchors.right: parent.right
 											anchors.top: parent.top
@@ -1762,6 +1782,7 @@ DocumentViewBase {
 								
 								CheckBox {
 									id: editLockedCB
+									objectName: "LockIssueCheckBox"
 									text: qsTr("Lock issue")
 									enabled: root.canLock
 									onCheckStateChanged: root.doUpdateModel()
@@ -1782,6 +1803,7 @@ DocumentViewBase {
 									
 									CustomTextField {
 										id: editLockReasonInput
+										objectName: "LockReasonInput"
 										width: parent.width
 										height: Style.controlHeightM
 										placeHolderText: qsTr("Reason for locking")
@@ -2669,6 +2691,7 @@ DocumentViewBase {
 							// Comment input with rounded border and inline paperclip icon
 							Rectangle {
 								id: inputFieldRect
+								objectName: "CommentInput"
 								property int maxInputHeight: 120
 								width: parent.width - sendBtnRect.width - Style.spacingS
 								// Extra 4px accounts for the border width change on focus (1→2px on each side)
@@ -2695,6 +2718,7 @@ DocumentViewBase {
 									
 									TextEdit {
 										id: commentInputField
+										objectName: "TextInput"
 										width: commentInputFlick.width
 										height: Math.max(contentHeight, root.minCommentInputHeightPx)
 										y: Math.max(0, (commentInputFlick.height - height) / 2)
@@ -2727,6 +2751,7 @@ DocumentViewBase {
 								
 								ToolButton {
 									id: attachButton
+									objectName: "AttachButton"
 									anchors.right: parent.right
 									anchors.rightMargin: 6
 									anchors.bottom: parent.bottom
@@ -2741,6 +2766,7 @@ DocumentViewBase {
 							
 							Rectangle {
 								id: sendBtnRect
+								objectName: "SendCommentButton"
 								width: sendBtnText.contentWidth + 28
 								height: 40
 								radius: 20
@@ -2768,6 +2794,7 @@ DocumentViewBase {
 								
 								MouseArea {
 									id: sendBtnMa
+									objectName: "MouseArea"
 									anchors.fill: parent
 									hoverEnabled: true
 									cursorShape: commentButton.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor

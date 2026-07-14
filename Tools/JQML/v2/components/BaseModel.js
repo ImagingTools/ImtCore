@@ -5,12 +5,18 @@ const { Qt } = require('../utils/Qt')
 class BaseModel extends ListModel {
 	static defaultProperties = {
 		dynamicRoles: { type: QBool, value: true },
-		owner: { type: QVar, value: null },
+		owner: { type: QVar, value: null, changed: '$ownerChanged' },
 	}
 
 	static defaultSignals = {
 		internalModelChanged: { params: ['name', 'sender'] },
 		finished: { params: [] },
+	}
+
+	$ownerChanged(){
+		for(let i = 0; i < this.count; i++){
+			this.get(i).item.owner = this.owner
+		}
 	}
 
 	getProperties(item){

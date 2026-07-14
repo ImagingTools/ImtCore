@@ -137,7 +137,13 @@ Item {
 	
 	ToolButton {
 		id: loginButton;
-		
+
+		// Test instrumentation: this ToolButton sets no `text` (icon-only), so it would otherwise
+		// resolve to the generic, non-unique "Button" shared by every untexted ToolButton on the page -
+		// and unlike a one-off dialog button, THIS one is present on every single page. Inert - no
+		// runtime/visual effect.
+		objectName: "UserPanelButton";
+
 		anchors.right: parent ? parent.right : undefined;
 		anchors.verticalCenter: userPanel.verticalCenter;
 		

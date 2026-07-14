@@ -391,6 +391,7 @@ Rectangle {
 
 				MouseArea{
 					id: passwordRecoveryMA;
+					objectName: "PasswordRecoveryLink"
 
 					anchors.fill: titlePasswordRecovery;
 					visible: authPageContainer.canRecoveryPassword;
