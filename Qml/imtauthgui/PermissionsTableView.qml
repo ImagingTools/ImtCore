@@ -470,12 +470,18 @@ Item {
 
 			Text {
 				id: checkAllBtn
+				// Test instrumentation: this reusable control's Text+MouseArea "buttons" had no
+				// objectName at all - inner MouseArea named "MouseArea" so click()'s standard nested
+				// lookup finds it (same pattern already used for ItemSelectElementView.qml's add
+				// button). Inert.
+				objectName: "CheckAllButton"
 				anchors.verticalCenter: parent.verticalCenter
 				text: qsTr("Check All")
 				font.pixelSize: Style.fontSizeM
 				color: root.readOnly ? Style.inactiveTextColor : Style.linkColor
 
 				MouseArea {
+					objectName: "MouseArea"
 					anchors.fill: parent
 					hoverEnabled: true
 					cursorShape: root.readOnly ? Qt.ArrowCursor : Qt.PointingHandCursor
@@ -486,12 +492,14 @@ Item {
 
 			Text {
 				id: uncheckAllBtn
+				objectName: "UncheckAllButton"
 				anchors.verticalCenter: parent.verticalCenter
 				text: qsTr("Uncheck All")
 				font.pixelSize: Style.fontSizeM
 				color: root.readOnly ? Style.inactiveTextColor : Style.linkColor
 
 				MouseArea {
+					objectName: "MouseArea"
 					anchors.fill: parent
 					hoverEnabled: true
 					cursorShape: root.readOnly ? Qt.ArrowCursor : Qt.PointingHandCursor
@@ -502,12 +510,14 @@ Item {
 
 			Text {
 				id: expandBtn
+				objectName: "ExpandAllButton"
 				anchors.verticalCenter: parent.verticalCenter
 				text: qsTr("Expand All")
 				font.pixelSize: Style.fontSizeM
 				color: Style.linkColor
 
 				MouseArea {
+					objectName: "MouseArea"
 					anchors.fill: parent
 					hoverEnabled: true
 					cursorShape: Qt.PointingHandCursor
@@ -517,12 +527,14 @@ Item {
 
 			Text {
 				id: collapseBtn
+				objectName: "CollapseAllButton"
 				anchors.verticalCenter: parent.verticalCenter
 				text: qsTr("Collapse All")
 				font.pixelSize: Style.fontSizeM
 				color: Style.linkColor
 
 				MouseArea {
+					objectName: "MouseArea"
 					anchors.fill: parent
 					hoverEnabled: true
 					cursorShape: Qt.PointingHandCursor

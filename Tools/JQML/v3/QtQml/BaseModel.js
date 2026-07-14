@@ -11,6 +11,12 @@ class BaseModel extends ListModel {
 		internalModelChanged: { type:Signal, args: ['name', 'sender'] },
     })
 
+	SLOT_ownerChanged(){
+		for(let i = 0; i < this.count; i++){
+			this.get(i).item.owner = this.owner
+		}
+	}
+
 	escapeSpecialChars(jsonString) {
 		return jsonString.replace(/\\/g, "\\\\")
 		.replace(/\"/g, "\\\"")
