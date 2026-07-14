@@ -6,6 +6,7 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE}
 	imtgui
 	imtloggui
+	imtstyle
 	AcfSln::iproc
 	AcfSln::iedge
 	Acf::iqt2d)

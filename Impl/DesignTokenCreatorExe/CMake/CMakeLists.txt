@@ -20,7 +20,9 @@ include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE} imtbase)
+target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
+	imtdesign
+)
 
 if(WIN32)
 	set(files \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
@@ -28,9 +30,9 @@ if(WIN32)
 endif()
 
 if(APPLE)
-mac_deploy_qt(
-	REMOVE_DEBUGSYM
-	TARGET ${PROJECT_NAME}
-	TARGET_FILE_NAME ${PROJECT_NAME}
-)
+	mac_deploy_qt(
+		REMOVE_DEBUGSYM
+		TARGET ${PROJECT_NAME}
+		TARGET_FILE_NAME ${PROJECT_NAME}
+	)
 endif()
