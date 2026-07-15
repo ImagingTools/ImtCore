@@ -46,7 +46,7 @@ imtauth::IRoleUniquePtr CClientRequestRoleInfoProviderComp::GetRole(const QByteA
 		istd::IChangeableUniquePtr clonedPtr = gqlContextPtr->CloneMe();
 		imtgql::IGqlContextUniquePtr castedPtr;
 		castedPtr.MoveCastedPtr(std::move(clonedPtr));
-		gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(castedPtr));
+		gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(castedPtr)));
 	}
 
 	if (!rolessdl::CRoleItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
