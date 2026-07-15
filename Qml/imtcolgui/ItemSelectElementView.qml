@@ -67,6 +67,14 @@ ElementView {
 	controlComp: Component {
 		Text {
 			id: addBtn
+
+			// Test instrumentation: this reusable control has no objectName of its own (it's a plain
+			// Text with a MouseArea, not a Button-derived control that would auto-derive one from
+			// `text`), and it's used more than once per document (e.g. UserView.qml's "Roles" AND
+			// "Groups" sections) - derive a distinct name from `label` (e.g. "AddRoles"/"AddGroups") so
+			// each usage is addressable. Inert - no runtime/visual effect.
+			objectName: "Add" + itemSelectElementView.label.replace(/[^A-Za-z0-9]/g, "")
+
 			visible: itemSelectElementView.editable
 			text: "+ " + itemSelectElementView.addButtonText
 			font.pixelSize: Style.fontSizeM
@@ -74,6 +82,12 @@ ElementView {
 			color: itemSelectElementView.accentColor
 
 			MouseArea {
+				// Test instrumentation: click()'s mouseAreaOf() helper specifically looks for
+				// [objectName="MouseArea"] inside the target - every other clickable control in this
+				// codebase names its inner MouseArea this way (see TabDelegate.qml etc.); this one had
+				// none. Inert - no runtime/visual effect.
+				objectName: "MouseArea"
+
 				anchors.fill: parent
 				hoverEnabled: true
 				cursorShape: Qt.PointingHandCursor
@@ -112,6 +126,7 @@ ElementView {
 				Repeater {
 					model: itemSelectElementView.items
 					delegate: Rectangle {
+						objectName: "AssignedItem_" + index
 						width: Math.min(chipText.implicitWidth + chipRemove.width + Style.paddingS * 3, 200)
 						height: 28
 						radius: 14
@@ -135,6 +150,7 @@ ElementView {
 
 						ToolButton {
 							id: chipRemove
+							objectName: "RemoveButton"
 							visible: itemSelectElementView.editable && itemSelectElementView.nonRemovableIds.indexOf(modelData.id) < 0
 							anchors.right: parent.right
 							anchors.verticalCenter: parent.verticalCenter

@@ -13,7 +13,7 @@ namespace imtcom
 // public methods
 
 
-thread_local std::unique_ptr<QNetworkAccessManager> CRequestSender::s_networkManagerPtr;
+thread_local QNetworkAccessManager* CRequestSender::s_networkManagerPtr = nullptr;
 
 
 QNetworkReply* CRequestSender::DoSyncGet(const QNetworkRequest& request, int timeout)
@@ -113,7 +113,7 @@ QNetworkReply* CRequestSender::DoSyncCustomRequest(const QNetworkRequest& reques
 void CRequestSender::EnsureNetworkAccessManager()
 {
 	if (s_networkManagerPtr == nullptr){
-		s_networkManagerPtr.reset(new QNetworkAccessManager());
+		s_networkManagerPtr = new QNetworkAccessManager();
 	}
 }
 

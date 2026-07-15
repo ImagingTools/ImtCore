@@ -424,11 +424,13 @@ class BaseClass extends QtObject {
 					} else {
 						if (component) {
 							let obj = BaseModel.create(this)
+							obj.owner = this
 							this[_key] = obj
 						}
 					}
 
 					if (component) {
+						this[_key].owner = this
 						for (let sourceObjectInner of sourceObject[key]) {
 							let sourceTypename
 							if (sourceObjectInner['__typename']){

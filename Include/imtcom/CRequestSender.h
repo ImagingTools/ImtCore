@@ -38,7 +38,13 @@ private:
 		QTimer timer;
 	};
 
-	static thread_local std::unique_ptr<QNetworkAccessManager> s_networkManagerPtr;
+	// Intentionally a raw, never-deleted pointer (not std::unique_ptr): a unique_ptr
+	// here registers a dynamic TLS/atexit destructor that can run after Qt's own
+	// thread/event infrastructure has already been torn down at process exit,
+	// which crashes (c0000409) when ~QNetworkAccessManager touches it. Leaking one
+	// instance per thread that ever sent a request is a harmless, one-time cost
+	// reclaimed by the OS on process exit.
+	static thread_local QNetworkAccessManager* s_networkManagerPtr;
 };
 
 

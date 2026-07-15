@@ -12,6 +12,9 @@
 
 // ImtCore includes
 #include <imtclientgql/IGqlClient.h>
+#include <imtgql/CGqlContext.h>
+#include <imtgql/CGqlRequest.h>
+#include <imtgql/CGqlRequestContextManager.h>
 
 
 namespace imtclientgql
@@ -44,6 +47,24 @@ protected:
 		if (!requestPtr.IsValid()){
 			errorMessage = QStringLiteral("Request is invalid");
 			return SdlClass();
+		}
+
+		// Forwarded requests (e.g. Remote*Controller client wrappers relaying an
+		// incoming request to a backend server) otherwise carry no context, so the
+		// backend sees an anonymous caller and denies any permission-gated command.
+		// Only fills in a missing context - an explicitly attached one (e.g. PAT's
+		// own AttachCurrentContext()) is left untouched.
+		if (requestPtr->GetRequestContext() == nullptr){
+			imtgql::IGqlContext* currentContextPtr = imtgql::CGqlRequestContextManager::GetContext();
+			if (currentContextPtr != nullptr){
+				imtgql::CGqlRequest* concreteRequestPtr = dynamic_cast<imtgql::CGqlRequest*>(requestPtr.GetPtr());
+				if (concreteRequestPtr != nullptr){
+					istd::IChangeableUniquePtr clonedContextPtr = currentContextPtr->CloneMe();
+					imtgql::IGqlContextUniquePtr castedContextPtr;
+					castedContextPtr.MoveCastedPtr(std::move(clonedContextPtr));
+					concreteRequestPtr->SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(castedContextPtr));
+				}
+			}
 		}
 
 		IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);

@@ -214,6 +214,9 @@ ViewBase {
 						TableCellDelegateBase {
 							id: removeColumnDelegateBase
 							ToolButton {
+								// Test instrumentation: icon-only ToolButton (no text) falls back to
+								// the generic, non-unique "Button" objectName otherwise. Inert.
+								objectName: "DeleteTokenButton"
 								anchors.centerIn: parent
 								width: Style.buttonWidthM
 								height: width
@@ -234,6 +237,7 @@ ViewBase {
 							id: revokeColumnDelegateBase
 							ToolButton {
 								id: revokeButton
+								objectName: "RevokeTokenButton"
 								anchors.centerIn: parent
 								width: Style.buttonWidthM
 								height: width
@@ -318,6 +322,7 @@ ViewBase {
 
 						CustomTextField {
 							id: tokenInput
+							objectName: "TokenValueField"
 							width: parent.width
 							readOnly: true
 							text: tokenCreatedDialog.token
@@ -326,6 +331,7 @@ ViewBase {
 
 							property bool copied: false
 							ToolButton {
+								objectName: "CopyTokenButton"
 								z: parent.z + 1
 								anchors.verticalCenter: parent.verticalCenter
 								anchors.right: parent.right
@@ -462,6 +468,7 @@ ViewBase {
 								}
 								CustomTextField {
 									id: nameInputElementView
+									objectName: "TokenNameInput"
 									width: parent.width
 									height: Style.controlHeightM
 									placeHolderText: qsTr("e.g. CI/CD Pipeline, API Client...")
@@ -552,6 +559,7 @@ ViewBase {
 								color: Style.inactiveTextColor
 							}
 							CustomTextField {
+								objectName: "TokenDescriptionInput"
 								width: parent.width
 								height: Style.controlHeightM
 								placeHolderText: qsTr("What will this token be used for?")

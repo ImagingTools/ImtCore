@@ -109,7 +109,7 @@ class LinkedBool extends Property {
 
             let found = false
             for(let connectionObj of link.target.__depends[link.name]){
-                if(connectionObj.name === name + 'Changed' && connectionObj.target === target){
+                if(connectionObj.name === name + 'Changed' && connectionObj.target.__self === target.__self){
                     found = true
                     break
                 }

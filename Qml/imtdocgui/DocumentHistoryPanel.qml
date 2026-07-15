@@ -89,6 +89,12 @@ Rectangle {
 			ToolButton {
 				id: openButton;
 
+				// Test instrumentation: this ToolButton sets no `text` (icon-only), so it would
+				// otherwise resolve to the generic, non-unique "Button" shared by every untexted
+				// ToolButton on the page - and this panel is embedded identically in every document
+				// editor (Devices/Orders/Accounts/Software/...). Inert - no runtime/visual effect.
+				objectName: "HistoryPanelToggle";
+
 				height: Style.buttonHeightS;
 				width: height;
 				iconSource: historyPanel.opened
