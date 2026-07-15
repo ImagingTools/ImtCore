@@ -1,5 +1,6 @@
 project(imt3dgui LANGUAGES CXX)
 
+
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
@@ -9,7 +10,6 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 #                 Qt::Gui directly.  For older versions fall back to GuiPrivate.
 # - OpenGL / OpenGLWidgets : QOpenGLBuffer, QOpenGLShaderProgram, QOpenGLWidget
 #                            (headers moved from QtGui to separate modules in Qt 6)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS OpenGL OpenGLWidgets REQUIRED)
 
 set(QT_VERSION_STR
     "${Qt${QT_VERSION_MAJOR}Core_VERSION_MAJOR}.${Qt${QT_VERSION_MAJOR}Core_VERSION_MINOR}.${Qt${QT_VERSION_MAJOR}Core_VERSION_PATCH}")
