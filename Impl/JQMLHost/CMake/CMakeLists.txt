@@ -11,7 +11,6 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 #------ SDL-generated QML libraries ------
 target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
-	imtbasesdl
 	imtappsdl
 	imtauthsdl
 	imtlicsdl
@@ -36,42 +35,22 @@ target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 
 #------ Core ImtCore libraries ------
 target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
-	imtbase
 	ImtCoreLoc
 	Acf::AcfLoc
 	AcfSln::AcfSlnLoc
-	imtdb
-	imtgui
 	imtguigql
-	imtauth
 	imtauthdb
 	imtauthgui
-	imtlic
 	imtlicgui
 	imtstyle
-	imtqml
-	imtcol
-	imtgql
 	imtchatdb
 	imtdeskdb
-	imtclientgql
-	imtserverapp
-	imtservice
-	imtcom
-	imtlog
-	imtcrypt
-	imtrest
-	imtapp
-	imtchat
-	imtdesk)
+	imtlog)
 
 #------ Qt modules ------
-target_link_libraries(${PROJECT_NAME} ${ACF_QT_MODULE_LINK_SCOPE}
-	Qt${QT_VERSION_MAJOR}::Qml
-	Qt${QT_VERSION_MAJOR}::Quick
+target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	Qt${QT_VERSION_MAJOR}::QuickControls2
-	Qt${QT_VERSION_MAJOR}::QuickWidgets
-	Qt${QT_VERSION_MAJOR}::WebSockets)
+)
 
 if(WIN32)
 	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")

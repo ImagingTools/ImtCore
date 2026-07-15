@@ -9,7 +9,6 @@ include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
 
 target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE}
 	imtej
-	imtbase
 )
 
 include(${IMTCOREDIR}/Config/CMake/EjMiniZipper.cmake)
