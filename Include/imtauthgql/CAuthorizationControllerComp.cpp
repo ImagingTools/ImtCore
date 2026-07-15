@@ -3,6 +3,9 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
+// Qt includes
+#include <QtCore/QMutableListIterator>
+
 // ACF includes
 #include <iprm/CParamsSet.h>
 
@@ -472,12 +475,10 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 		QByteArrayList globalPermissions = CalculateGlobalPermissions(*userInfoPtr, userId, productId);
 		if (isPat){
 			const QSet<QByteArray> scopeSet(tokenScopes.begin(), tokenScopes.end());
-			for (auto iter = globalPermissions.begin(); iter != globalPermissions.end(); ){
-				if (!scopeSet.contains(*iter)){
-					iter = globalPermissions.erase(iter);
-				}
-				else{
-					++iter;
+			QMutableListIterator permissionsIter(globalPermissions);
+			while (permissionsIter.hasNext()){
+				if (!scopeSet.contains(permissionsIter.next())){
+					permissionsIter.remove();
 				}
 			}
 		}
