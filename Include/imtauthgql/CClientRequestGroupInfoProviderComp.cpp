@@ -59,7 +59,7 @@ imtauth::IUserGroupInfoSharedPtr CClientRequestGroupInfoProviderComp::GetUserGro
 		istd::IChangeableUniquePtr clonedPtr = gqlContextPtr->CloneMe();
 		imtgql::IGqlContextUniquePtr castedPtr;
 		castedPtr.MoveCastedPtr(std::move(clonedPtr));
-		gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(castedPtr));
+		gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(castedPtr)));
 	}
 
 	QString errorMessage;
@@ -95,7 +95,7 @@ imtauth::IUserGroupInfoSharedPtr CClientRequestGroupInfoProviderComp::GetUserGro
 		}
 	}
 
-	return imtauth::IUserGroupInfoSharedPtr::CreateFromUnique(userGroupInfoPtr);
+	return imtauth::IUserGroupInfoSharedPtr::CreateFromUnique(std::move(userGroupInfoPtr));
 }
 
 

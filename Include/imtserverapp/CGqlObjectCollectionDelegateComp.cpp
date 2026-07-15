@@ -760,7 +760,7 @@ istd::TUniqueInterfacePtr<imtgql::IGqlRequest> CGqlObjectCollectionDelegateComp:
 		istd::IChangeableUniquePtr clonedPtr = gqlContextPtr->CloneMe();
 		imtgql::IGqlContextUniquePtr castedPtr;
 		castedPtr.MoveCastedPtr(std::move(clonedPtr));
-		requestPtr->SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(castedPtr));
+		requestPtr->SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(castedPtr)));
 	}
 
 	if (!SdlRequest::SetupGqlRequest(*requestPtr, arguments)){
