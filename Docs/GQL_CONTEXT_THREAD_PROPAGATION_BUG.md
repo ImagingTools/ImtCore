@@ -1,6 +1,7 @@
 # GraphQL request context lost across a thread hop in the server request pipeline
 
-Status: **actual root cause found 2026-07-14, fix applied, not yet rebuilt/reverified**
+Status: **FIXED and verified 2026-07-14** - see "Verification of the wiring fix" at the
+bottom. Previous status line kept for history: actual root cause found 2026-07-14, fix applied
 - see "Actual root cause found" section below; everything above it is the original
 2026-07-13 investigation, which chased a thread-hop/propagation theory that turned out
 to be a red herring (kept for the reasoning trail and because the affected components
@@ -571,6 +572,104 @@ to be found before this is usable. Next step: instrument
 `CAuthenticationManagerComp::ResolveUserId()` and whatever `SlaveJwtSessionController`/
 `PersonalAccessTokenManager` do over `PumaClientEngine`, and/or retry the
 `OnPost()` reentrancy instrumentation now that this code path is live.
+
+## Verification of the wiring fix (2026-07-14, later the same day)
+
+Rebuilt `AuthServerSdk.dll` with the `AuthenticationManager` wiring fix and re-ran the
+suite. **Trap that cost the first re-run**: the rebuilt DLL lands in
+`Bin\<config>\Plugins\`, but `pumatest.exe` loads the *stale* copy sitting next to
+itself - always re-copy `Plugins\Auth*Sdk.dll` into `Bin\<config>\` after a rebuild
+(the "Known packaging gap" from the repro recipe applies to every rebuild, not just
+the first setup).
+
+Results (fresh DB, then a second run against the same live server):
+
+```
+Before fix:  CAuthClientSdkTest 3/5 fail,  CAuthServerLifecycleTest 4/0,  CPersonalAccessTokenTest 2/7 fail
+After fix:   CAuthClientSdkTest 7/1 fail,  CAuthServerLifecycleTest 4/0,  CPersonalAccessTokenTest 9/0
+```
+
+The context-loss failure class is gone: `su` creates users/roles/groups, PAT
+create/list/revoke/validate all pass, and `IsCallerAuthorizedForUser()`'s
+admin-or-owner checks now operate on real contexts (the server log shows deliberate
+negative tests being denied with proper reasons instead of everything being denied
+anonymously). The three remaining `Invalid permissions for the user ''` lines in the
+server log are **intentional negative tests** (`CAuthClientSdkTest` lines 114/193/196
+- unauthenticated calls that must be denied).
+
+Remaining, *unrelated* failures/issues found during verification (tracked for
+follow-up, none of them context-propagation):
+
+1. `UserCrudTest` still fails one check: `CreateUser(Test2, ..., "test@example.com")`
+   (duplicate **email**, different login) is *accepted* by the server -
+   **no server-side email-uniqueness validation exists anywhere in ImtCore**
+   (`CUserRepresentationController::FillUserInfoFromRepresentation()` and
+   `CUserDocumentValidatorComp::ValidateDocumentData()` both check only username).
+   The test asserts email uniqueness; the server needs the check added.
+2. `pumatest.exe` still hard-crashes at process exit with `0xC0000409`
+   (FAST_FAIL_FATAL_APP_EXIT). cdb stack: `AuthClientSdk!__dyn_tls_dtor` →
+   `dynamic atexit destructor for imtcom::CRequestSender::s_networkManagerPtr` →
+   `~QNetworkAccessManager` → Qt6Network teardown → qFatal. The
+   `thread_local std::unique_ptr<QNetworkAccessManager>`
+   (`Include/imtcom/CRequestSender.cpp:16`) is destroyed during TLS teardown, after
+   Qt's threading infrastructure for that thread is gone. All 3 registered test
+   classes complete *before* the crash, so it only corrupts the exit code (CI always
+   sees failure) and loses buffered stdout - but it must be fixed in `imtcom`.
+3. QTest output from `pumatest.exe` goes to `OutputDebugString` (GUI-subsystem app,
+   no console) - invisible in redirected files; run under `cdb` to capture, or make
+   pumatest a console app.
+4. Every login triggers `CLdapCredentialControllerComp::CheckCredential()` →
+   Windows `LogonUser()` (fails with 1326 for DB-only test users, 26 times/run) -
+   auth-chain ordering/config noise, cosmetic but noisy and slow.
+
+## All four issues above fixed and verified (2026-07-14, same day)
+
+1. Email uniqueness: added the same duplicate-email check (mirrors the existing
+   duplicate-username check) to both real server-side call sites -
+   `CUserCollectionControllerComp::FillObjectFromRepresentation()` (the actual
+   `UserAdd`/`UserUpdate` path pumatest exercises) and
+   `CUserRepresentationController::FillUserInfoFromRepresentation()`
+   (`OnRegisterUser`'s self-service path). Filters on `Mail` field, same pattern
+   `CUserControllerComp::GetUserIdByEmail()` already used.
+2. Exit crash: `imtcom::CRequestSender::s_networkManagerPtr` changed from
+   `thread_local std::unique_ptr<QNetworkAccessManager>` to a raw, never-deleted
+   `thread_local QNetworkAccessManager*` - avoids registering a TLS/atexit
+   destructor that ran after Qt's thread infrastructure was already torn down.
+3. `pumatest.pro` got `CONFIG += console` so QTest output is visible in redirected
+   runs (not yet exercised - `pumatest.exe` wasn't in the rebuilt set this round,
+   only the SDK DLLs and the server; harmless until it's rebuilt too).
+4. `CHttpGraphQLServletComp::OnPost()`'s silent `else` now logs via
+   `SendCriticalMessage()` when `GqlContextCreator` isn't wired - this is what
+   would have made the original bug visible in minutes instead of a full session.
+5. LDAP noise: root-caused to `CLdapAuthorizationControllerComp::OnAuthorization()`
+   deliberately trying Windows `LogonUser()` before falling back to local DB auth
+   (a real feature, not a bug) - `PumaSettings.acc`'s `LdapEnabled` defaults to
+   `true` product-wide (kept as-is, production may need it), but
+   `PumaServerSlTestSettings.xml` (machine-local, not in git) only ever has
+   DB-only test users, so it was flipped to `false` there, and
+   `Run-AuthSdkTests.ps1` got a `Disable-TestLdapAuth` step so it re-patches on
+   any machine/CI where the settings file gets regenerated with the product
+   default.
+
+**Verified**: `Run-AuthSdkTests.ps1 -ResetDatabase -TestArgs "-v2"` after rebuild -
+exit code 0 ("All tests passed"), 0 occurrences of `LogonUser failed` (was 26),
+`Invalid permissions` count unchanged at 3 (all intentional negative tests), 4
+occurrences of the new `Email already exists`/`Username already exists` (the CRUD
+tests exercising it), and the process exited cleanly instead of the previous
+`0xC0000409` at shutdown.
+
+### Item 1 (email uniqueness) reverted at the user's request (2026-07-15)
+
+The server-side duplicate-email check added to `CUserCollectionControllerComp::
+FillObjectFromRepresentation()` and `CUserRepresentationController::
+FillUserInfoFromRepresentation()`, and the corresponding `UserCrudTest` assertion
+in Puma's `CAuthClientSdkTest.cpp` ("User with this email already exists"), were
+both removed - "давай удалим этот тест пока что, и логику которую ты добавил на
+сервере для этого тоже". Both files are back to their pre-fix state (`git diff`
+empty in ImtCore for these two files). Email is once again **not** validated for
+uniqueness anywhere server-side - if this surfaces again, it's a deliberate,
+temporary rollback, not a missed fix. Items 2-5 (exit crash, console output,
+context-creator diagnostics, LDAP noise) remain in place and verified.
 
 ## Why this matters beyond Puma
 
