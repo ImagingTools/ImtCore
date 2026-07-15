@@ -1,13 +1,13 @@
 project(ImtLogGuiPck LANGUAGES CXX)
 
+
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE}
 	imtloggui
 	imtgui
-	AcfSln::iproc
-	AcfSln::iipr
-	AcfSln::icalib
 	AcfSln::iedge
-	Acf::iqt2d)
+	Acf::iqt2d
+)
+

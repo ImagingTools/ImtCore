@@ -1,5 +1,6 @@
 project(Imt3dDemo LANGUAGES CXX)
 
+
 if(APPLE)
 	set(CMAKE_MACOSX_BUNDLE "off")
 endif()
@@ -7,14 +8,16 @@ endif()
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE} imt3dgui imt3dview imt3d imtbase)
-target_link_libraries(${PROJECT_NAME} ${ACF_QT_MODULE_LINK_SCOPE} Qt${QT_VERSION_MAJOR}::Qml Qt${QT_VERSION_MAJOR}::Quick Qt${QT_VERSION_MAJOR}::QuickControls2)
-
-if(QT_VERSION_MAJOR EQUAL 6)
-	target_link_libraries(${PROJECT_NAME} ${ACF_QT_MODULE_LINK_SCOPE} Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
-endif()
+target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
+	imt3dgui
+	imtbase
+	Qt${QT_VERSION_MAJOR}::Qml
+	Qt${QT_VERSION_MAJOR}::Quick
+	Qt${QT_VERSION_MAJOR}::QuickControls2
+)
 
 if(WIN32)
 	set(files \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
 	windeploy(${PROJECT_NAME} "" "${files}")
 endif()
+

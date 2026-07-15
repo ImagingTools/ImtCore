@@ -20,7 +20,8 @@ include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
 target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	imtsdlgencpp
-	imtsdlgenqml)
+	imtsdlgenqml
+)
 
 if(WIN32)
 	set(files \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
@@ -33,3 +34,4 @@ if(APPLE)
 		TARGET_FILE_NAME ${PROJECT_NAME}
 	)
 endif()
+

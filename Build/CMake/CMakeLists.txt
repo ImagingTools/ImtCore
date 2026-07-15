@@ -139,11 +139,11 @@ add_dependencies(SdlCodeGenerator ImtCorePck ImtSdlPck ImtSdlGenCppPck ImtSdlGen
 imt_chain_windeploy_target(SdlCodeGenerator)
 
 #------ SDL tool tests ------
-if (NOT DEFINED BUILD_TESTING OR BUILD_TESTING)
+if (BUILD_TESTING)
 	add_subdirectory("${INCLUDE_DIR}/imtsdlgencpp/Test/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenCppTest")
+	imt_chain_windeploy_target(ImtSdlGenTest)
 	add_subdirectory("${INCLUDE_DIR}/imtsdlgenqml/Test/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenQmlTest")
 	imt_chain_windeploy_target(ImtSdlGenQmlTest)
-	imt_chain_windeploy_target(ImtSdlGenTest)
 endif()
 
 #------ OpenAPI ------

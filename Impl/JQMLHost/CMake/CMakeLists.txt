@@ -1,5 +1,6 @@
 project(JQMLHost LANGUAGES CXX)
 
+
 if(APPLE)
 	set(CMAKE_MACOSX_BUNDLE "off")
 endif()
@@ -78,3 +79,4 @@ if(WIN32)
 	windeploy(${PROJECT_NAME} "${listOptions}" "${files}")
 	unset(listOptions)
 endif()
+

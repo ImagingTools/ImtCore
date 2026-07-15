@@ -15,7 +15,6 @@ if(APPLE)
 	set(CMAKE_MACOSX_BUNDLE "off")
 endif()
 
-
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
@@ -36,3 +35,4 @@ if(APPLE)
 		TARGET_FILE_NAME ${PROJECT_NAME}
 	)
 endif()
+
