@@ -82,7 +82,7 @@ QLayout* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 					customLayoutWidgetPtr->SetWidget(guiPtr->GetWidget());
 					customLayoutWidgetPtr->SetViewId(viewId);
 
-					m_guiObjects.push_back(iqtgui::IGuiObjectSharedPtr::CreateFromUnique(guiPtr));
+					m_guiObjects.push_back(iqtgui::IGuiObjectSharedPtr::CreateFromUnique(std::move(guiPtr)));
 				}
 			}
 		}
