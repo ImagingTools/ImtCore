@@ -16,6 +16,7 @@ DecoratorBase {
 	property alias segmentedButton: segmentedButton_
 	property alias filtermenu: filtermenu_
 	property CollectionFilter complexFilter: baseElement ? baseElement.complexFilter : null;	
+	property int filterRightMargin: 0
 	
 	Component.onCompleted: {
 		checkWidth();
@@ -24,9 +25,13 @@ DecoratorBase {
 	onWidthChanged: {
 		checkWidth();
 	}
+
+	onFilterRightMarginChanged: {
+		checkWidth();
+	}
 	
 	function checkWidth(){
-		if (width - filtermenu.width <= segmentedButton.width + 2 * segmentedButton.spacing){
+		if (width - filtermenu.width - filterRightMargin <= segmentedButton.width + 2 * segmentedButton.spacing){
 			segmentedButton.visible = false;
 		}
 		else{
@@ -103,6 +108,9 @@ DecoratorBase {
 		anchors.verticalCenter: parent.verticalCenter;
 		
 		height: parent.height
+		firstSegmentDecorator: firstFilterSegmentDecorator
+		middleSegmentDecorator: middleFilterSegmentDecorator
+		lastSegmentdecorator: lastFilterSegmentDecorator
 		
 		Button {
 			id: infoFilter;
@@ -180,11 +188,41 @@ DecoratorBase {
 		}
 		
 	}
+
+	Component {
+		id: firstFilterSegmentDecorator
+		ExternalSegmentDecorator {
+			color: baseElement && baseElement.checked ? Style.selectedColor :
+				(baseElement && baseElement.hovered ? Style.buttonHoverColor : Style.backgroundColor2)
+			textColor: baseElement && baseElement.checked ? Style.textSelectedColor : Style.textColor
+		}
+	}
+
+	Component {
+		id: middleFilterSegmentDecorator
+		ButtonDecorator {
+			radius: 0
+			color: baseElement && baseElement.checked ? Style.selectedColor :
+				(baseElement && baseElement.hovered ? Style.buttonHoverColor : Style.backgroundColor2)
+			textColor: baseElement && baseElement.checked ? Style.textSelectedColor : Style.textColor
+		}
+	}
+
+	Component {
+		id: lastFilterSegmentDecorator
+		ExternalSegmentDecorator {
+			isLast: true
+			color: baseElement && baseElement.checked ? Style.selectedColor :
+				(baseElement && baseElement.hovered ? Style.buttonHoverColor : Style.backgroundColor2)
+			textColor: baseElement && baseElement.checked ? Style.textSelectedColor : Style.textColor
+		}
+	}
 	
 	FilterPanelDecorator {
 		id: filtermenu_
 		anchors.verticalCenter: parent.verticalCenter;
 		anchors.right: parent.right;
+		anchors.rightMargin: mainItem.filterRightMargin
 		
 		baseElement: mainItem.baseElement;
 		complexFilter: mainItem.complexFilter;
