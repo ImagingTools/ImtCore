@@ -116,7 +116,18 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		m_lastRequest.SetGqlContext(std::move(gqlContextPtr));
 	}
 	else{
-		// Q_ASSERT(false);
+		// No GqlContextCreator wired for this servlet's assembly: every request is
+		// processed with no context attached, so any downstream permission check
+		// sees an anonymous caller regardless of the token supplied. This is a
+		// static misconfiguration (a missing "AuthenticationManager"-style
+		// attribute wire-up somewhere in the .acc chain), not a per-request
+		// condition, so log it loudly instead of silently degrading to anonymous
+		// access - see Docs/GQL_CONTEXT_THREAD_PROPAGATION_BUG.md.
+		SendCriticalMessage(
+					0,
+					QStringLiteral("GqlContextCreator is not configured for this servlet - Command-ID: '%1' will be processed with no request context (caller will appear anonymous to every permission check).")
+										.arg(QString(gqlCommand)),
+					QStringLiteral("GraphQL - servlet"));
 	}
 
 	QByteArray responseData;
