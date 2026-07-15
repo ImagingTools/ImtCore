@@ -388,11 +388,6 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 		return response;
 	}
 
-	if (!m_jwtSessionControllerCompPtr.IsValid()){
-		Q_ASSERT_X(false, "Component 'JwtSessionControlle' was not set", "CAuthorizationControllerComp");
-		return response;
-	}
-
 	istd::TNullableValue<sdl::V1_0::imtauth::CTokenInput> arguments = getPermissionsRequest.GetRequestedArguments().input;
 	if (!arguments.HasValue()){
 		SendWarningMessage(0, "GetPermissions called without input arguments", "imtauthgql::CAuthorizationControllerComp");
@@ -409,8 +404,28 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 		token = gqlContextPtr->GetToken();
 	}
 
-	QByteArray userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
-	QByteArray tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(token);
+	QByteArray userId;
+	QByteArray tenantId;
+	QByteArray tokenId;
+	QByteArrayList tokenScopes;
+	bool isPat = false;
+
+	const QByteArray patPrefix = m_patPrefixAttrPtr.IsValid() ? *m_patPrefixAttrPtr : QByteArrayLiteral("imt_pat_");
+	if (!patPrefix.isEmpty() && token.size() > patPrefix.size() && token.startsWith(patPrefix)){
+		isPat = true;
+		if (!m_personalAccessTokenManagerCompPtr.IsValid() ||
+			!m_personalAccessTokenManagerCompPtr->ValidateToken(token, userId, tokenId, tokenScopes)){
+			SendWarningMessage(0, "GetPermissions called with invalid or expired personal access token", "imtauthgql::CAuthorizationControllerComp");
+			return response;
+		}
+
+		m_personalAccessTokenManagerCompPtr->UpdateLastUsedAt(tokenId);
+	}
+	else if (m_jwtSessionControllerCompPtr.IsValid()){
+		userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
+		tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(token);
+	}
+
 	if (userId.isEmpty()){
 		SendWarningMessage(0, "GetPermissions called with invalid or expired token", "imtauthgql::CAuthorizationControllerComp");
 		return response;
@@ -419,6 +434,22 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 	QByteArray productId;
 	if (gqlContextPtr != nullptr){
 		productId = gqlContextPtr->GetProductId();
+	}
+	if (isPat){
+		imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_personalAccessTokenManagerCompPtr->GetToken(tokenId);
+		if (!tokenPtr.IsValid()){
+			SendWarningMessage(0, "GetPermissions cannot resolve personal access token", "imtauthgql::CAuthorizationControllerComp");
+			return response;
+		}
+
+		const QByteArray tokenProductId = tokenPtr->GetProductId();
+		if (!tokenProductId.isEmpty()){
+			if (!productId.isEmpty() && productId != tokenProductId){
+				SendWarningMessage(0, "GetPermissions called with personal access token for a different product", "imtauthgql::CAuthorizationControllerComp");
+				return response;
+			}
+			productId = tokenProductId;
+		}
 	}
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
@@ -439,6 +470,17 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 	// Empty tenantId means global (non-tenant) scope.
 	if (tenantId.isEmpty()){
 		QByteArrayList globalPermissions = CalculateGlobalPermissions(*userInfoPtr, userId, productId);
+		if (isPat){
+			const QSet<QByteArray> scopeSet(tokenScopes.begin(), tokenScopes.end());
+			for (auto iter = globalPermissions.begin(); iter != globalPermissions.end(); ){
+				if (!scopeSet.contains(*iter)){
+					iter = globalPermissions.erase(iter);
+				}
+				else{
+					++iter;
+				}
+			}
+		}
 		response.permissions.Emplace().FromList(globalPermissions);
 		return response;
 	}
@@ -478,5 +520,4 @@ bool CAuthorizationControllerComp::CheckPermissions(const imtgql::CGqlRequest& /
 
 
 } // namespace imtauthgql
-
 
