@@ -13,6 +13,7 @@ RemoteCollectionView {
 	commandsControllerComp: null
 	table.enableAlternating: false
 	additionalFieldIds: ["category", "infoId"]
+	property int filterRightMargin: 0
 
 	onHeadersChanged: {
 		if (log.table.headers.getItemsCount() > 0){
@@ -63,6 +64,7 @@ RemoteCollectionView {
 		
 		MessageCollectionFilterDecorator {
 			complexFilter: log.collectionFilter
+			filterRightMargin: log.filterRightMargin
 		}
 	}
 	

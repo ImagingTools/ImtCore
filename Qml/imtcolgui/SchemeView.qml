@@ -28,6 +28,10 @@ Rectangle {
 	property real originX: 0;
 	
 	property real scaleStep: 0.1;
+	property real maximumObjectWidth: 0;
+	property int objectFontSize: Style.fontSizeXXL
+	property int objectSecondaryFontSize: Style.fontSizeM
+	property bool strokeSecondaryText: true
 	
 	property bool autoFit: true;
 	
@@ -37,6 +41,7 @@ Rectangle {
 	signal renameSignal(int index);
 	signal revertSignal();
 	signal modelDataChanged();
+	signal objectMoveFinished();
 	
 	ApplicationEvents {
 		onDesignSchemeChanged: {
@@ -245,6 +250,9 @@ Rectangle {
 				else {
 					controlArea.cursorShape = Qt.OpenHandCursor
 				}
+				if (canvas.selectedIndex >= 0 && wasMoving){
+					canvasPage.objectMoveFinished()
+				}
 			}
 			
 			onDoubleClicked: {
@@ -435,8 +443,8 @@ Rectangle {
 			property real mainRec_width: 250
 			property real mainRec_height: 60
 			
-			property int fontSize: Style.fontSizeXXL
-			property int fontSizeS: Style.fontSizeM
+			property int fontSize: canvasPage.objectFontSize
+			property int fontSizeS: canvasPage.objectSecondaryFontSize
 			property int radius_: Style.radiusXS
 			property int borderShift: 4
 			property int shadowSize: 6
@@ -611,28 +619,53 @@ Rectangle {
 				
 				let mainText  = item.m_mainText
 				let secondText  = item.m_secondText
-				let width_ = item.m_width ? item.m_width : canvas.mainRec_width;
+				let thirdText = item.m_thirdText
 				
 				ctx.lineWidth = 1;
 				let fontStr_main = String(canvas.fontSize) + "px " + Style.fontFamily
 				ctx.font = fontStr_main;
 
-				let textStr_main = mainText
 				let textWidth_main = ctx.measureText(mainText).width
 				
 				ctx.lineWidth = 0.5;
 				let fontStr_second = String(canvas.fontSizeS) + "px " + Style.fontFamily
 				ctx.font = fontStr_second;
-				let textStr_second = secondText;
 				let textWidth_second = ctx.measureText(secondText).width
+				let textWidth_third = ctx.measureText(thirdText).width
 				
-				let add = 2 * canvas.imageSize + 2 * canvas.imageMargin + 2 * canvas.borderShift + 30 /** scaleCoeff*/;
-				let mainRecWidth = Math.max(textWidth_main + add, textWidth_second + add, width_)
+				let horizontalMargins = 2 * (canvas.borderShift + canvas.textMargin)
+				let iconsWidth = 0
+				if (item.m_icon1 !== ""){
+					iconsWidth += canvas.imageSize + canvas.imageMargin
+				}
+				if (item.m_icon2 !== ""){
+					iconsWidth += canvas.imageSize + canvas.imageMargin
+				}
+				let bottomSpacing = thirdText !== "" ? canvas.textMargin : 0
+				let mainRecWidth = Math.max(textWidth_main + horizontalMargins + iconsWidth,
+					textWidth_second + textWidth_third + horizontalMargins + bottomSpacing,
+					canvas.mainRec_width)
+				if (canvasPage.maximumObjectWidth > 0){
+					mainRecWidth = Math.min(mainRecWidth, canvasPage.maximumObjectWidth)
+				}
 				// canvasPage.objectsModel.setData("width", mainRecWidth /*/ scaleCoeff*/, index);
 				
 				item.m_width = mainRecWidth;
 				
 				return mainRecWidth;
+			}
+
+			function elideText(ctx, text, maximumWidth){
+				if (!text || ctx.measureText(text).width <= maximumWidth){
+					return text
+				}
+
+				let suffix = "..."
+				let elidedText = text
+				while (elidedText.length > 0 && ctx.measureText(elidedText + suffix).width > maximumWidth){
+					elidedText = elidedText.slice(0, -1)
+				}
+				return elidedText + suffix
 			}
 			
 			function drawObject(ctx, index){
@@ -640,7 +673,6 @@ Rectangle {
 				
 				let x_  = item.m_x
 				let y_  = item.m_y
-				let width_ = item.m_width ? item.m_width : canvas.mainRec_width;
 				let mainText  =  item.m_mainText
 				let secondText  = item.m_secondText
 				let thirdText  = item.m_thirdText
@@ -695,13 +727,18 @@ Rectangle {
 				ctx.strokeStyle = canvas.mainTextColor;
 				ctx.fillStyle = canvas.mainTextColor;
 				ctx.lineWidth = 1;
-				ctx.font = fontStr;
-				ctx.font = fontStr; //"20px sans-serif";
-				let textStr = mainText
-				let textWidth = ctx.measureText(mainText).width
-				
+				ctx.font = String(canvas.fontSize) + "px " + Style.fontFamily
 				let text_x = x_ + canvas.borderShift + canvas.textMargin;
 				let text_y = y_ + canvas.borderShift + canvas.textVerticalOffset;
+				let iconsWidth = 0
+				if (iconUrl_1 !== ""){
+					iconsWidth += canvas.imageSize + canvas.imageMargin
+				}
+				if (iconUrl_2 !== ""){
+					iconsWidth += canvas.imageSize + canvas.imageMargin
+				}
+				let mainTextWidth = mainRecWidth - 2 * (canvas.borderShift + canvas.textMargin) - iconsWidth
+				let textStr = elideText(ctx, mainText, mainTextWidth)
 				
 				ctx.beginPath()
 				ctx.fillText(textStr, text_x, text_y);
@@ -713,35 +750,44 @@ Rectangle {
 				ctx.lineWidth = 0.5;
 				let fontStr2 = String(canvas.fontSizeS) + "px " + Style.fontFamily
 				ctx.font = fontStr2;
-				let textStr2 = secondText;
-				let textWidth2 = ctx.measureText(secondText).width
+				let availableBottomWidth = mainRecWidth - 2 * (canvas.borderShift + canvas.textMargin)
+				let thirdTextWidth = Math.min(ctx.measureText(thirdText).width, availableBottomWidth / 2)
+				let textStr3 = elideText(ctx, thirdText, thirdTextWidth)
+				let textWidth3 = ctx.measureText(textStr3).width
+				let secondTextWidth = mainRecWidth - 2 * (canvas.borderShift + canvas.textMargin) - textWidth3
+				if (thirdText !== ""){
+					secondTextWidth -= canvas.textMargin
+				}
+				let textStr2 = elideText(ctx, secondText, secondTextWidth)
 				
 				let text_x2 = x_ + canvas.borderShift + canvas.textMargin;
 				let text_y2 = y_ + canvas.mainRec_height - canvas.borderShift - canvas.textMargin;
 				
 				ctx.beginPath()
 				ctx.fillText(textStr2, text_x2, text_y2);
-				ctx.strokeText(textStr2, text_x2, text_y2);
+				if (canvasPage.strokeSecondaryText){
+					ctx.strokeText(textStr2, text_x2, text_y2);
+				}
 				
 				//Third text
 				ctx.strokeStyle = canvas.secondTextColor;
 				ctx.fillStyle = canvas.secondTextColor;
 				ctx.lineWidth = 0.5;
 				ctx.font = fontStr2;
-				let textStr3 = thirdText;
-				let textWidth3 = ctx.measureText(thirdText).width
 				
 				let text_x3 = x_ + mainRecWidth - textWidth3 - canvas.borderShift - canvas.textMargin ;
 				let text_y3 = y_ + canvas.mainRec_height - canvas.borderShift - canvas.textMargin;
 				
 				ctx.beginPath()
 				ctx.fillText(textStr3, text_x3, text_y3);
-				ctx.strokeText(textStr3, text_x3, text_y3);
+				if (canvasPage.strokeSecondaryText){
+					ctx.strokeText(textStr3, text_x3, text_y3);
+				}
 				
 				//images
 				let image1_x = x_ + mainRecWidth - canvas.borderShift - canvas.imageSize - canvas.imageMargin;
 				let image1_y = text_y - canvas.imageSize + canvas.imageMargin;
-				let image2_x = image1_x - canvas.imageSize - canvas.imageMargin;
+				let image2_x = iconUrl_1 !== "" ? image1_x - canvas.imageSize - canvas.imageMargin : image1_x;
 				let image2_y = text_y - canvas.imageSize + canvas.imageMargin;
 				ctx.beginPath()
 				if (iconUrl_1 !== ""){

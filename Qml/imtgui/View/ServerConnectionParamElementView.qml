@@ -12,6 +12,7 @@ GroupElementView {
 	property int wsPort: -1
 	property bool isSecure: false
 	property bool readOnly: false
+	property int controlWidth: Style.sizeHintM
 
 	property alias hostInput: hostInput_
 	property alias httpPortInput: httpPortInput_
@@ -42,6 +43,7 @@ GroupElementView {
 
 	TextInputElementView {
 		id: hostInput_
+		controlWidth: root.controlWidth
 		name: qsTr("Server Host")
 		readOnly: root.readOnly
 		onEditingFinished: {
@@ -51,6 +53,7 @@ GroupElementView {
 
 	IntegerInputElementView {
 		id: httpPortInput_
+		controlWidth: root.controlWidth
 		name: qsTr("Http Port")
 		readOnly: root.readOnly
 		onEditingFinished: {
@@ -60,6 +63,7 @@ GroupElementView {
 
 	IntegerInputElementView {
 		id: wsPortInput_
+		controlWidth: root.controlWidth
 		name: qsTr("Web Socket Port")
 		readOnly: root.readOnly
 		onEditingFinished: {
@@ -69,6 +73,7 @@ GroupElementView {
 	
 	SwitchElementView {
 		id: switchElementView
+		controlWidth: root.controlWidth
 		name: qsTr("Secure Connection")
 		readOnly: root.readOnly
 		onCheckedChanged: {

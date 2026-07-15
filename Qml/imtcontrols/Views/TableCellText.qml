@@ -24,15 +24,6 @@ Text {
         Qt.openUrlExternally(link)
     }
 
-    onTextChanged: {
-        // Multiline fit in one line
-        if (wrapMode == Text.NoWrap){
-            if (name.text.includes('\n')){
-                let result = name.text.split('\n')
-                name.text = result[0] + "..."
-            }
-        }
-    }
     onHeightChanged: {
         if (!rowDelegate || !rowDelegate.tableItem
                 || !rowDelegate.tableItem.canFitHeight){
