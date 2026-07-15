@@ -11,6 +11,10 @@ if(NOT DEFINED QT_VERSION_MAJOR)
 		find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core5Compat REQUIRED)
 	endif()
 
+	if(BUILD_TESTING)
+		find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Test REQUIRED)
+	endif()
+
 	if(NOT DEFINED USE_GEO OR USE_GEO)
 		find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Positioning REQUIRED)
 
@@ -272,7 +276,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_dependencies(imtdbgui DesignTokenCreator)
 	endif()
 
-	if(NOT USE_MDBX)
+	if(USE_MDBX)
 		add_subdirectory("${INCLUDE_DIR}/imtmdbx/CMake" "${AUX_INCLUDE_DIR}/imtmdbx")
 	endif()
 
@@ -555,7 +559,6 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_dependencies(CollectionDocumentServiceTest imtbase imtdoc)
 
 		file(COPY ${TESTS_DIR}/Migrations DESTINATION ${TESTS_DIR}/../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
-
 	endif() # BUILD_TESTING
 endif() # NOT IMT_BUILD_TOOLS_ONLY
 
