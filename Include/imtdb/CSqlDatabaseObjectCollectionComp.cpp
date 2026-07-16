@@ -381,7 +381,7 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 	}
 
 	istd::IChangeableUniquePtr objectPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(sqlQuery.record(), dataConfigurationPtr);
-	dataPtr.FromUnique(objectPtr);
+	dataPtr.FromUnique(std::move(objectPtr));
 
 	return dataPtr.IsValid();
 }

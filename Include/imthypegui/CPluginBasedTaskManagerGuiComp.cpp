@@ -74,7 +74,7 @@ void CPluginBasedTaskManagerGuiComp::OnGuiCreated()
 
 				if (editorPtr->CreateGui(pageWidgetPtr.GetPtr())){
 					TaskEditorStack->addWidget(pageWidgetPtr.PopPtr());
-					m_editorsMap[editorTypeId].FromUnique(editorPtr);
+					m_editorsMap[editorTypeId].FromUnique(std::move(editorPtr));
 					m_observersMap[editorTypeId] = observerPtr;
 					m_typeToStackIndexMap[editorTypeId] = ++lastTaskEditorIndex;
 				}
