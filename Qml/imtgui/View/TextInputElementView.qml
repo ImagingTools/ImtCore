@@ -80,6 +80,12 @@ ElementView {
 	
 	controlComp: textInputComp;
 	
+	function ensureVisible(pos){
+		if (controlItem){
+			controlItem.ensureVisible((pos))
+		}
+	}
+
 	Component {
 		id: textInputComp;
 		CustomTextField {

@@ -6,6 +6,8 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QMutexLocker>
 #include <QtCore/QSet>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
 // ACF includes
 #include <iprm/TParamsPtr.h>
@@ -73,10 +75,24 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 		gqlContextPtr->SetScopes(scopes);
 	}
 
-	// Resolve tenant ownership flag
+	// Resolve tenant ownership flag. Cached alongside the rest of this token's
+	// resolved claims (see TokenCacheEntry) instead of being looked up live on
+	// every call - CreateGqlContext() runs on every single incoming request AND
+	// every WebSocket subscription (re-)registration, and m_tenantManagerCompPtr
+	// is a remote proxy (CRemoteTenantControllerComp) that hits the tenant
+	// service over the network. Without this cache, a burst of requests (e.g.
+	// the dozens fired right after a tenant switch: subscriptions re-registering,
+	// per-open-document queries, page reload) each re-triggered their own
+	// uncached GetTenant() round-trip - the exact flood seen after SelectTenant.
 	if (m_tenantManagerCompPtr.IsValid() && !tenantId.isEmpty() && !resolvedUserId.isEmpty()){
-		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
-		if (tenantPtr.IsValid() && tenantPtr->GetOwnerId() == resolvedUserId){
+		bool isTenantOwner = false;
+		if (!TryGetCachedTenantOwnership(token, isTenantOwner)){
+			imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+			isTenantOwner = tenantPtr.IsValid() && tenantPtr->GetOwnerId() == resolvedUserId;
+			StoreCachedTenantOwnership(token, isTenantOwner);
+		}
+
+		if (isTenantOwner){
 			gqlContextPtr->SetIsTenantOwner(true);
 		}
 	}
@@ -204,7 +220,7 @@ imtauth::IJwtSessionController::JwtState CAuthenticationManagerComp::ValidateJwt
 	if (state == JwtState::JS_OK){
 		QByteArray resolvedUserId = m_slaveJwtSessionControllerCompPtr->GetUserFromJwt(jwt);
 		QByteArray resolvedTenantId = m_slaveJwtSessionControllerCompPtr->GetTenantFromJwt(jwt);
-		StoreCachedToken(jwt, resolvedUserId, resolvedTenantId, QByteArray(), QByteArrayList(), false);
+		StoreCachedToken(jwt, resolvedUserId, resolvedTenantId, QByteArray(), QByteArrayList(), false, GetJwtExpirationSecs(jwt));
 	}
 
 	return state;
@@ -220,11 +236,10 @@ bool CAuthenticationManagerComp::RefreshToken(
 	}
 
 	bool result = m_slaveJwtSessionControllerCompPtr->RefreshToken(refreshToken, outputData);
-	if (result){
-		// The old JWT is no longer valid — invalidate it from cache.
-		// We cannot easily know the old JWT here, so we don't invalidate.
-		// The new token will be cached on its first use.
-	}
+	// Note: the slave rotates the session's refresh token but keeps the same
+	// session-ID and updates it in place, so a JWT issued before this refresh
+	// remains valid (and correctly cached) until its own 'exp' elapses. There
+	// is nothing to invalidate here; the new token will be cached on first use.
 
 	return result;
 }
@@ -249,7 +264,8 @@ bool CAuthenticationManagerComp::CreateNewSession(
 					outputData.tenantId,
 					QByteArray(),
 					QByteArrayList(),
-					false);
+					false,
+					GetJwtExpirationSecs(outputData.accessToken));
 	}
 
 	return result;
@@ -409,7 +425,7 @@ bool CAuthenticationManagerComp::ResolveUserId(
 		return false;
 	}
 
-	StoreCachedToken(token, userId, tenantId, QByteArray(), QByteArrayList(), false);
+	StoreCachedToken(token, userId, tenantId, QByteArray(), QByteArrayList(), false, GetJwtExpirationSecs(token));
 	return true;
 }
 
@@ -447,7 +463,8 @@ void CAuthenticationManagerComp::StoreCachedToken(
 			const QByteArray& tenantId,
 			const QByteArray& tokenId,
 			const QByteArrayList& scopes,
-			bool isPat) const
+			bool isPat,
+			qint64 jwtExpSecs) const
 {
 	TokenCacheEntry entry;
 	entry.userId = userId;
@@ -459,6 +476,13 @@ void CAuthenticationManagerComp::StoreCachedToken(
 
 	const qint64 tokenCacheTtlMs = m_tokenCacheTtlAttrPtr.IsValid() ? (static_cast<qint64>(*m_tokenCacheTtlAttrPtr) * 1000) : (5 * 60 * 1000);
 	entry.expiresAt = now + tokenCacheTtlMs;
+
+	// Never let the cache consider a JWT valid past its own 'exp' claim -
+	// otherwise an already-expired token could still be accepted for up to
+	// TokenCacheLifetime after it actually expired.
+	if (jwtExpSecs > 0){
+		entry.expiresAt = std::min(entry.expiresAt, jwtExpSecs * 1000);
+	}
 
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	m_tokenCache.insert(token, entry);
@@ -489,6 +513,36 @@ void CAuthenticationManagerComp::InvalidateTokenCache(const QByteArray& token) c
 }
 
 
+bool CAuthenticationManagerComp::TryGetCachedTenantOwnership(const QByteArray& token, bool& isTenantOwner) const
+{
+	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	auto iter = m_tokenCache.find(token);
+	if (iter == m_tokenCache.end() || !iter->tenantOwnershipResolved){
+		return false;
+	}
+
+	isTenantOwner = iter->isTenantOwner;
+	return true;
+}
+
+
+void CAuthenticationManagerComp::StoreCachedTenantOwnership(const QByteArray& token, bool isTenantOwner) const
+{
+	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	auto iter = m_tokenCache.find(token);
+	if (iter == m_tokenCache.end()){
+		// ResolveUserId() always caches the token before this is reached; a
+		// missing entry here means it expired/was invalidated in the tiny
+		// window since then. Nothing to attach the flag to - next call will
+		// simply resolve (and cache) it again from scratch.
+		return;
+	}
+
+	iter->isTenantOwner = isTenantOwner;
+	iter->tenantOwnershipResolved = true;
+}
+
+
 imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContextInstance() const
 {
 	return m_gqlContextFactCompPtr.CreateInstance();
@@ -499,6 +553,25 @@ bool CAuthenticationManagerComp::IsPatToken(const QByteArray& token) const
 {
 	const QByteArray& patPrefix = m_patPrefixAttrPtr.IsValid() ? *m_patPrefixAttrPtr : QByteArrayLiteral("imt_pat_");
 	return !patPrefix.isEmpty() && token.size() > patPrefix.size() && token.startsWith(patPrefix);
+}
+
+
+qint64 CAuthenticationManagerComp::GetJwtExpirationSecs(const QByteArray& jwt) const
+{
+	QByteArrayList parts = jwt.split('.');
+	if (parts.size() != 3){
+		return 0;
+	}
+
+	QByteArray json = QByteArray::fromBase64(
+				parts[1],
+				QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
+	QJsonObject payloadObj = QJsonDocument::fromJson(json).object();
+	if (!payloadObj.contains("exp")){
+		return 0;
+	}
+
+	return static_cast<qint64>(payloadObj["exp"].toDouble());
 }
 
 

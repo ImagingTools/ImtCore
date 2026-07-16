@@ -191,9 +191,14 @@ StyleComponents {
 		}
 	}
 
+	// SegmentedButton defaults: light selected fill + selected text (same look as
+	// MessageCollectionFilterDecorator). Checked -> selectedColor, hover -> buttonHoverColor.
 	Component{
 		id: firstSegmentDecoratorComp
 		ExternalSegmentDecorator{
+			color: baseElement && baseElement.checked ? Style.selectedColor :
+				(baseElement && baseElement.hovered ? Style.buttonHoverColor : Style.backgroundColor2)
+			textColor: baseElement && baseElement.checked ? Style.textSelectedColor : Style.textColor
 		}
 	}
 
@@ -201,6 +206,9 @@ StyleComponents {
 		id: middleSegmentDecoratorComp
 		ButtonDecorator{
 			radius: 0;
+			color: baseElement && baseElement.checked ? Style.selectedColor :
+				(baseElement && baseElement.hovered ? Style.buttonHoverColor : Style.backgroundColor2)
+			textColor: baseElement && baseElement.checked ? Style.textSelectedColor : Style.textColor
 		}
 	}
 
@@ -209,6 +217,9 @@ StyleComponents {
 
 		ExternalSegmentDecorator{
 			isLast: true
+			color: baseElement && baseElement.checked ? Style.selectedColor :
+				(baseElement && baseElement.hovered ? Style.buttonHoverColor : Style.backgroundColor2)
+			textColor: baseElement && baseElement.checked ? Style.textSelectedColor : Style.textColor
 		}
 	}
 

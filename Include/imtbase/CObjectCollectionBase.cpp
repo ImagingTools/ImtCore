@@ -213,12 +213,16 @@ bool CObjectCollectionBase::RemoveElements(const Ids& elementIds, const IOperati
 		return false;
 	}
 
+	// CChangeNotifier copies the ChangeSet in its constructor and EndChanges uses that copy.
+	// Filling MultiElementNotifierInfo after construction therefore never reaches observers —
+	// they always saw CN_ELEMENTS_REMOVED with an empty elementIds list.
+	// Match CCachedObjectCollectionComp / CCollectionInfo: set final ids before the notifier.
 	MultiElementNotifierInfo notifierInfo;
+	notifierInfo.elementIds = elementIds;
 
 	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
 	changeSet.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
-	istd::IChangeable::ChangeInfoMap changeInfoMap;
 
 	QWriteLocker locker(&m_lock);
 
@@ -236,9 +240,7 @@ bool CObjectCollectionBase::RemoveElements(const Ids& elementIds, const IOperati
 					Ids externalObjectIds;
 					externalObjectIds << externalObjectId;
 
-					if (externalStoragePtr->RemoveElements(externalObjectIds)){
-						notifierInfo.elementIds += externalObjectIds;
-					}
+					externalStoragePtr->RemoveElements(externalObjectIds);
 				}
 			}
 
@@ -247,16 +249,12 @@ bool CObjectCollectionBase::RemoveElements(const Ids& elementIds, const IOperati
 				modelPtr->DetachObserver(&m_modelUpdateBridge);
 			}
 
-			notifierInfo.elementIds << iter->id;
 			iter = m_objects.erase(iter);
 		}
 		else{
 			++iter;
 		}
 	}
-
-	changeInfoMap.insert(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
-	changeSet.SetChangeInfoMap(changeInfoMap);
 
 	locker.unlock();
 
@@ -597,8 +595,9 @@ bool CObjectCollectionBase::SetElementName(const Id& elementId, const QString& o
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){
 			if (objectInfo.name != objectName){
+				// CChangeNotifier copies ChangeSet at construction — set final item id before it.
+				// Observers expect CN_ELEMENT_RENAMED to be the element id (not the old name).
 				istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_RENAMED);
-				changeSet.SetChangeInfo(CN_ELEMENT_RENAMED, objectInfo.name);
 				changeSet.SetChangeInfo(CN_ELEMENT_RENAMED, elementId);
 
 				locker.unlock();
@@ -627,8 +626,8 @@ bool CObjectCollectionBase::SetElementDescription(const Id& elementId, const QSt
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){
 			if (objectInfo.description != objectDescription){
+				// CChangeNotifier copies ChangeSet at construction — set final item id before it.
 				istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_DESCRIPTION_CHANGED);
-				changeSet.SetChangeInfo(CN_ELEMENT_DESCRIPTION_CHANGED, objectInfo.description);
 				changeSet.SetChangeInfo(CN_ELEMENT_DESCRIPTION_CHANGED, elementId);
 
 				locker.unlock();
@@ -657,8 +656,8 @@ bool CObjectCollectionBase::SetElementEnabled(const Id& elementId, bool isEnable
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){
 			if (objectInfo.isEnabled != isEnabled){
+				// CChangeNotifier copies ChangeSet at construction — set final item id before it.
 				istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_STATE);
-				changeSet.SetChangeInfo(CN_ELEMENT_STATE, objectInfo.isEnabled);
 				changeSet.SetChangeInfo(CN_ELEMENT_STATE, elementId);
 
 				locker.unlock();
