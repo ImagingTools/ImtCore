@@ -401,7 +401,7 @@ bool CTaskCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr&
 				iinsp::ISupplierUniquePtr newInstancePtr = CreateTaskInstance(task.typeId);
 				if (newInstancePtr.IsValid()){
 					if (newInstancePtr->CopyFrom(*task.taskPtr)){
-						dataPtr.MoveCastedPtr(newInstancePtr);
+						dataPtr.MoveCastedPtr(std::move(newInstancePtr));
 
 						return true;
 					}

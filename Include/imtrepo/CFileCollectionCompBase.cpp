@@ -529,7 +529,7 @@ bool CFileCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr&
 				istd::IChangeableUniquePtr newInstancePtr = CreateDataObject(typeId);
 				if (newInstancePtr.IsValid()){
 					if (newInstancePtr->CopyFrom(*dataObjectPtr, CM_WITH_REFS)){
-						dataPtr.FromUnique(newInstancePtr);
+						dataPtr.FromUnique(std::move(newInstancePtr));
 
 						return true;
 					}

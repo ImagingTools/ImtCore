@@ -45,7 +45,7 @@ QJsonObject CGqlRemoteRepresentationControllerCompBase::CreateInternalResponse(c
 					istd::IChangeableUniquePtr clonedContextPtr = currentContextPtr->CloneMe();
 					imtgql::IGqlContextUniquePtr castedContextPtr;
 					castedContextPtr.MoveCastedPtr(std::move(clonedContextPtr));
-					concreteRequestPtr->SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(castedContextPtr));
+					concreteRequestPtr->SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(castedContextPtr)));
 				}
 			}
 		}

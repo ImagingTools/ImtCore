@@ -9,6 +9,7 @@
 #include <imtauth/ICredentialController.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauth/IJwtSessionController.h>
+#include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization_fwd.h>
@@ -29,6 +30,8 @@ public:
 		I_ASSIGN_MULTI_0(m_credentialControllersCompPtr, "CredentialControllers", "Credential Controllers", true);
 		I_ASSIGN_MULTI_0(m_systemIdsAttrPtr, "SystemIds", "System-IDs", true);
 		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "JWT session controller", false, "JwtSessionController");
+		I_ASSIGN(m_personalAccessTokenManagerCompPtr, "PersonalAccessTokenManager", "Personal access token manager", false, "PersonalAccessTokenManager");
+		I_ASSIGN(m_patPrefixAttrPtr, "PatPrefix", "Personal access token prefix", false, "imt_pat_");
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager", false, "TenantManager");
 		I_ASSIGN(m_tenantMembershipManagerCompPtr, "TenantMembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
 	I_END_COMPONENT;
@@ -70,13 +73,14 @@ protected:
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userConnectionCollectionCompPtr);
 	I_REF(imtauth::IJwtSessionController, m_jwtSessionControllerCompPtr);
+	I_REF(imtauth::IPersonalAccessTokenManager, m_personalAccessTokenManagerCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_tenantMembershipManagerCompPtr);
 	I_MULTIREF(imtauth::ICredentialController, m_credentialControllersCompPtr);
 	I_MULTIATTR(QByteArray, m_systemIdsAttrPtr);
+	I_ATTR(QByteArray, m_patPrefixAttrPtr);
 };
 
 
 } // namespace imtauthgql
-
 
