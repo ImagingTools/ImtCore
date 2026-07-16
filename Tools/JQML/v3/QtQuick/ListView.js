@@ -589,6 +589,7 @@ class ListView extends Flickable {
         this.__items = {}
         for(let child of this.contentItem.__children){
             let index = child.index
+            if(index >= 0 && Number.isFinite(index))
             this.__items[index] = child
         }
     }
@@ -684,6 +685,8 @@ class ListView extends Flickable {
                         }
                     }
                 } else if (role === 'insert') {
+                    this.__normalizeItemsIndex()
+                    
                     for (let i = leftTop; i < bottomRight; i++) {
                         let itemInfo = this.__getItemInfo(i)
                         if (itemInfo.inner) {
@@ -699,19 +702,21 @@ class ListView extends Flickable {
                         layoutFrom = leftTop
                     }
                 } else if (role === 'remove') {
-                    let leftTopGeometry = {
-                        x: this.__items[leftTop].x,
-                        y: this.__items[leftTop].y,
-                    }
+                    let leftTopItem = this.__items[leftTop]
+                    let bottomRightItem = this.__items[bottomRight]
+
                     for(let i = leftTop; i < bottomRight; i++){
                         this.__toCache(this.__items[i])
                         delete this.__items[i]
                     }
 
-                    this.__items[bottomRight].x = leftTopGeometry.x
-                    this.__items[bottomRight].y = leftTopGeometry.y
-
                     this.__normalizeItemsIndex()
+
+                    if(leftTopItem && bottomRightItem){
+                        bottomRightItem.x = leftTopItem.x
+                        bottomRightItem.y = leftTopItem.y
+                    }
+                    
 
                     if (currentIndex >= leftTop && currentIndex < bottomRight) {
                         currentIndex = leftTop
