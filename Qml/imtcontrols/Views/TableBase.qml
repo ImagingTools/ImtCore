@@ -240,7 +240,10 @@ Rectangle {
 	}
 
 	onElementsChanged: {
+		// Clear selection and notify rows. Without checkedItemsChanged the row CheckBox keeps
+		// a stale checkedState while _checkedItems is already empty (breaks undo/redo restore).
 		properties._checkedItems = []
+		properties.checkedItemsChanged()
 
 		tableContainer.setWidth();
 	}

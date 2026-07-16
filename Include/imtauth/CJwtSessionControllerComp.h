@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QMutex>
+
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <ifile/IFileNameParam.h>
@@ -58,6 +61,11 @@ private:
 	I_FACT(imtauth::ISession, m_sessionFactoryCompPtr);
 	I_ATTR(int, m_refreshTokenLifetimeAttrPtr);
 	I_ATTR(int, m_jwtLifetimeAttrPtr);
+
+	// Serializes refresh-token rotation so that two concurrent refresh calls
+	// for the same session cannot race (e.g. read-modify-write the session
+	// record concurrently or both succeed with the same old refresh token).
+	mutable QMutex m_refreshMutex;
 };
 
 

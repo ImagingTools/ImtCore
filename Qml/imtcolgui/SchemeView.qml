@@ -16,7 +16,7 @@ Rectangle {
 	property BaseModel objectsModel: BaseModel {}
 	
 	// property TreeItemModel objectsModel: TreeItemModel{};
-	property alias selectedIndex: canvas.selectedIndex;
+	property int selectedIndex: -1;
 	
 	//for scrollBars
 	property real contentHeight: backgroundRec.height;
@@ -75,6 +75,10 @@ Rectangle {
 		}
 	}
 	
+	onSelectedIndexChanged: {
+		console.log("SchemeView.qml onSelectedIndexChanged", selectedIndex)
+	}
+
 	function designSchemeChanged(scheme){
 		canvas.requestPaint();
 	}
@@ -218,7 +222,9 @@ Rectangle {
 			}
 			
 			onPressed: {
+				console.log("onPressed", canvas.selectedIndex)
 				canvas.selectedIndex = -1;
+				console.log("canvasPage.objectsModel", canvasPage.objectsModel.toJson())
 				for(let i = 0; i < canvasPage.objectsModel.count; i++){
 					let item = canvasPage.objectsModel.get(i).item;
 					let x_ = item.m_x;
@@ -233,7 +239,7 @@ Rectangle {
 					height_ = height_  * canvas.scaleCoeff;
 					
 					let ok = checkInsideMovingItem(x_, y_, width_, height_);
-					
+					console.log("ok", ok, i)
 					if(ok){
 						canvas.selectedIndex = i;
 					}
@@ -476,6 +482,11 @@ Rectangle {
 			property string backgroundColor: Style.baseColor;
 			property string innerFrameColor: "transparent";
 			
+			onSelectedIndexChanged: {
+				canvasPage.selectedIndex = selectedIndex
+				console.log("Canvas.qml onSelectedIndexChanged", selectedIndex)
+			}
+			
 			onWidthChanged: {
 				requestPaint()
 			}
@@ -683,7 +694,7 @@ Rectangle {
 				let iconUrl_2  = icon === "" ? "" : "../../../" + Style.getIconPath(icon, Icon.State.On, Icon.Mode.Normal)
 				// for future multiselect
 				// let selected = item.m_selected ? item.m_selected : false;
-				let selected = index === canvasPage.selectedIndex
+				let selected = index === canvas.selectedIndex
 				
 				let hasError = item.m_hasError
 				let isComposite = item.m_isComposite
