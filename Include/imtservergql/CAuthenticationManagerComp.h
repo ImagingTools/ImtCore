@@ -69,6 +69,14 @@ private:
 		QByteArrayList scopes;
 		bool isPat = false;
 		qint64 expiresAt = 0;
+
+		// Tenant-ownership flag, resolved lazily (see TryGetCachedTenantOwnership /
+		// StoreCachedTenantOwnership) and cached alongside the rest of this token's
+		// claims for the same TTL. 'resolved' distinguishes "not an owner" from
+		// "never looked up yet" so a fresh entry doesn't get misread as a cached
+		// negative result.
+		bool isTenantOwner = false;
+		bool tenantOwnershipResolved = false;
 	};
 
 	bool ResolveUserId(
@@ -91,10 +99,34 @@ private:
 				const QByteArray& tenantId,
 				const QByteArray& tokenId,
 				const QByteArrayList& scopes,
-				bool isPat) const;
+				bool isPat,
+				qint64 jwtExpSecs = 0) const;
 	void InvalidateTokenCache(const QByteArray& token) const;
+
+	/**
+		Reads a previously-resolved tenant-ownership flag for 'token', if any.
+		Returns false (nothing written to isTenantOwner) if the token isn't
+		cached yet or its ownership was never resolved - the caller should then
+		look it up (e.g. via the tenant manager) and store the result via
+		StoreCachedTenantOwnership().
+	*/
+	bool TryGetCachedTenantOwnership(const QByteArray& token, bool& isTenantOwner) const;
+
+	/**
+		Records a resolved tenant-ownership flag for 'token' on its existing
+		cache entry (a no-op if the token has no cache entry - callers only
+		reach this after ResolveUserId() has already cached the token).
+	*/
+	void StoreCachedTenantOwnership(const QByteArray& token, bool isTenantOwner) const;
 	imtgql::IGqlContextUniquePtr CreateContextInstance() const;
 	bool IsPatToken(const QByteArray& token) const;
+
+	/**
+		Extract the 'exp' claim (seconds since epoch) from a JWT without going
+		through the slave session controller. Returns 0 if the token is not a
+		well-formed JWT or has no 'exp' claim.
+	*/
+	qint64 GetJwtExpirationSecs(const QByteArray& jwt) const;
 	void SetError(
 				imtgql::IGqlContextCreator::ContextCreationError& error,
 				imtgql::IGqlContextCreator::ContextCreationStatus status,

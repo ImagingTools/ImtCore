@@ -117,6 +117,29 @@ void CWebSocketThread::run()
 
 void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 {
+	// Queue the message and process it (plus anything queued while we work) in a
+	// single flat drain loop. If we are re-entered while a previous message is
+	// still being processed - which happens because ProcessTextMessage() can
+	// block in a nested QEventLoop during synchronous JWT validation, and that
+	// loop keeps dispatching queued TextMessageReceived events on this thread -
+	// we must not process here: that would recurse per message and overflow the
+	// stack. Instead the already-running drain loop below will pick it up once
+	// the blocking call returns, keeping the call stack depth bounded.
+	m_pendingMessages.append(textMessage);
+	if (m_isProcessingMessage){
+		return;
+	}
+
+	m_isProcessingMessage = true;
+	while (!m_pendingMessages.isEmpty()){
+		ProcessTextMessage(m_pendingMessages.takeFirst());
+	}
+	m_isProcessingMessage = false;
+}
+
+
+void CWebSocketThread::ProcessTextMessage(const QString& textMessage)
+{
 	if (m_requestServerHandlerPtr == nullptr || m_server == nullptr || textMessage.isEmpty()){
 		return;
 	}

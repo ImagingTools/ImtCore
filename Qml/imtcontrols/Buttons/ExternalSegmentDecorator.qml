@@ -14,23 +14,40 @@ ButtonDecorator {
 
     Component {
         id: patch
-        Rectangle {
+        Item {
             id: background
 
             x: commonButtonDecorator.isLast ? 0 : width
 
             height: commonButtonDecorator.height
             width: commonButtonDecorator.width / 2
-            radius: 0
-            color: commonButtonDecorator.backgroundItem.color
 
-            border.width: commonButtonDecorator.backgroundItem.border.width
-            border.color: commonButtonDecorator.backgroundItem.border.color
+            // Opaque fill that squares off the inner half of the segment and
+            // hides the base background's rounded corners on this side.
             Rectangle {
-                anchors.centerIn: parent
-                color: background.color
-                height: background.height - background.border.width * 2
-                width: background.width
+                anchors.fill: parent
+                color: commonButtonDecorator.backgroundItem.color
+            }
+
+            // Only the top and bottom borders are continued across the squared
+            // half - no vertical borders are drawn. The previous implementation
+            // used a fully-bordered rectangle plus an inner cover that was 1px
+            // shorter than the border on top and bottom, leaving the vertical
+            // border corners exposed as small marks overlapping the border at
+            // the middle of each segment and at the seam between two segments.
+            Rectangle {
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: commonButtonDecorator.backgroundItem.border.width
+                color: commonButtonDecorator.backgroundItem.border.color
+            }
+            Rectangle {
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: commonButtonDecorator.backgroundItem.border.width
+                color: commonButtonDecorator.backgroundItem.border.color
             }
         }
     }
