@@ -502,6 +502,9 @@ class ListView extends Flickable {
                 JQApplication.updateLater(this)
             })
             item.indexChanged.connect((oldValue, newValue) => {
+                delete this.__items[oldValue]
+                if(newValue < 0) return
+                
                 let _index = newValue
                 this.__items[_index] = item
                 if (this.orientation === ListView.Horizontal) {
@@ -582,14 +585,11 @@ class ListView extends Flickable {
         }
     }
 
-    __normalizeItemsIndex(startIndex = 0) {
-        for (let i in this.__items) {
-            let item = this.__items[i]
-            if (!item) continue
-
-            if (item.JQAbstractModel && item.JQAbstractModel.index != i) {
-                item.JQAbstractModel.index = i
-            }
+    __normalizeItemsIndex() {
+        this.__items = {}
+        for(let child of this.contentItem.__children){
+            let index = child.index
+            this.__items[index] = child
         }
     }
 
@@ -699,10 +699,19 @@ class ListView extends Flickable {
                         layoutFrom = leftTop
                     }
                 } else if (role === 'remove') {
+                    let leftTopGeometry = {
+                        x: this.__items[leftTop].x,
+                        y: this.__items[leftTop].y,
+                    }
                     for(let i = leftTop; i < bottomRight; i++){
                         this.__toCache(this.__items[i])
                         delete this.__items[i]
                     }
+
+                    this.__items[bottomRight].x = leftTopGeometry.x
+                    this.__items[bottomRight].y = leftTopGeometry.y
+
+                    this.__normalizeItemsIndex()
 
                     if (currentIndex >= leftTop && currentIndex < bottomRight) {
                         currentIndex = leftTop
@@ -726,10 +735,10 @@ class ListView extends Flickable {
                 this.currentIndex = currentIndex
             }
 
-            if (layoutFrom !== undefined) {
-                this.__normalizeItemsIndex(layoutFrom)
-                this.__realignItems(layoutFrom)
-            }
+            // if (layoutFrom !== undefined) {
+            //     this.__normalizeItemsIndex()
+            //     this.__realignItems(layoutFrom)
+            // }
 
             let keys = Object.keys(this.__items)
             let firstIndex = Number(keys[0])
@@ -779,7 +788,7 @@ class ListView extends Flickable {
 
             if(Object.keys(this.__items).length === 0){
                 let index = this.__getItemIndex(this.contentX-this.cacheBuffer, this.contentY-this.cacheBuffer)
-                if(index >= 0)
+                if(!Number.isFinite(index) || index < 0) index = 0
                 for(let i = index; i < length; i++){
                     let itemInfo = this.__getItemInfo(i)
                     if (itemInfo.inner) {
