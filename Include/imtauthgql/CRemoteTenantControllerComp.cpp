@@ -35,7 +35,7 @@ void AttachCurrentContext(imtgql::CGqlRequest& gqlRequest)
 	istd::IChangeableUniquePtr clonedPtr = gqlContextPtr->CloneMe();
 	imtgql::IGqlContextUniquePtr castedPtr;
 	castedPtr.MoveCastedPtr(std::move(clonedPtr));
-	gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(castedPtr));
+	gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(castedPtr)));
 }
 
 

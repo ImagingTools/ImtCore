@@ -220,7 +220,7 @@ imtauth::ISessionSharedPtr CRemoteJwtSessionControllerComp::GetSession(const QBy
 			return nullptr;
 		}
 
-		return imtauth::ISessionSharedPtr::CreateFromUnique(sessionInfoPtr);
+		return imtauth::ISessionSharedPtr::CreateFromUnique(std::move(sessionInfoPtr));
 	}
 
 	return nullptr;

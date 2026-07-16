@@ -325,7 +325,7 @@ bool CObjectCollectionBase::GetObjectData(const Id& objectId, DataPtr& dataPtr, 
 				istd::IChangeableUniquePtr newInstancePtr = CreateDataObject(objectInfo.typeId);
 				if (newInstancePtr.IsValid()){
 					if (newInstancePtr->CopyFrom(*objectInfo.dataPtr, objectInfo.copyMode)){
-						dataPtr.FromUnique(newInstancePtr);
+						dataPtr.FromUnique(std::move(newInstancePtr));
 
 						return true;
 					}

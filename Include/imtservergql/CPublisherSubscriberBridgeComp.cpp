@@ -50,7 +50,7 @@ bool CPublisherSubscriberBridgeComp::RegisterSubscription(
 		if (clonedPtr.IsValid()){
 			imtgql::IGqlContextUniquePtr castedPtr;
 			castedPtr.MoveCastedPtr(std::move(clonedPtr));
-			upstreamRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(castedPtr));
+			upstreamRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(castedPtr)));
 		}
 	}
 
