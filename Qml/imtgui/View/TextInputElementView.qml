@@ -79,10 +79,10 @@ ElementView {
 	}
 	
 	controlComp: textInputComp;
-	
+
 	function ensureVisible(pos){
 		if (controlItem){
-			controlItem.ensureVisible((pos))
+			controlItem.ensureVisible(pos)
 		}
 	}
 

@@ -4,6 +4,7 @@
 
 // ACF includes
 #include <ifile/IDeviceBasedPersistence.h>
+#include <iauth/ILogin.h>
 
 // ImtCore includes
 #include <imtbase/IRevisionController.h>
@@ -27,10 +28,12 @@ public:
 		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
 		I_ASSIGN_MULTI_0(m_documentPersistenceListCompPtr, "DocumentPersistenceList", "List of device-based persistence components for each type of the document", true);
 		I_ASSIGN(m_metaInfoTableDelegateCompPtr, "MetaInfoTableDelegate", "Delegate for the table containing meta-informations for the document type", false, "MetaInfoTableDelegate");
+		I_ASSIGN(m_loginCompPtr, "Login", "Login component used to get user info for revision history", false, "Login");
 		I_ASSIGN(m_documentContentColumnIdAttrPtr, "DocumentContentColumnId", "ID of the column in the table containing document content", true, "Document");
 		I_ASSIGN(m_metaInfoTableNameAttrPtr, "MetaInfoTableName", "Name of the meta-info table", true, "");
 		I_ASSIGN(m_revisionsTableNameAttrPtr, "RevisionsTableName", "Name of the table contained document revisions", true, "");
 		I_ASSIGN(m_maxLengthRevisionCommentAttrPtr, "MaxLengthRevisionComment", "Maximum length of the revision comment when saving document", true, 1000);
+		I_ASSIGN(m_mainSoftwareVersionIdAttrPtr, "MainSoftwareVersionId", "ID of the main software version for revision history", true, 0);
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -100,6 +103,8 @@ protected:
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const;
 	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const;
 	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const;
+	QString GetRevisionUserName(const imtbase::IOperationContext* operationContextPtr) const;
+	QString GetRevisionSoftwareVersion() const;
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual QString GetBaseSelectionQuery() const override;
@@ -131,13 +136,14 @@ protected:
 	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);
 	I_MULTIREF(ifile::IDeviceBasedPersistence, m_documentPersistenceListCompPtr);
 	I_REF(IMetaInfoTableDelegate, m_metaInfoTableDelegateCompPtr);
+	I_REF(iauth::ILogin, m_loginCompPtr);
+
 	I_ATTR(QByteArray, m_documentContentColumnIdAttrPtr);
 	I_ATTR(QByteArray, m_metaInfoTableNameAttrPtr);
 	I_ATTR(QByteArray, m_revisionsTableNameAttrPtr);
 	I_ATTR(int, m_maxLengthRevisionCommentAttrPtr);
+	I_ATTR(int, m_mainSoftwareVersionIdAttrPtr);
 };
 
 
 } // namespace imtdb
-
-

@@ -129,6 +129,7 @@ ViewBase {
 
 					CustomTextField {
 						id: nameInput
+						objectName: "NameInput"
 						width: parent.width
 						height: Style.controlHeightM
 						readOnly: generalPage.readOnly
@@ -153,6 +154,7 @@ ViewBase {
 
 					CustomTextField {
 						id: mailInput
+						objectName: "EmailInput"
 						width: parent.width
 						height: Style.controlHeightM
 						readOnly: generalPage.readOnly
@@ -314,6 +316,7 @@ ViewBase {
 
 							CustomTextField {
 								id: currentPasswordInput
+								objectName: "CurrentPasswordInput"
 								width: parent.width
 								height: Style.controlHeightM
 								echoMode: TextInput.Password
@@ -337,6 +340,7 @@ ViewBase {
 
 								CustomTextField {
 									id: newPasswordInput
+									objectName: "NewPasswordInput"
 									width: parent.width
 									height: Style.controlHeightM
 									echoMode: TextInput.Password
@@ -356,6 +360,7 @@ ViewBase {
 
 								CustomTextField {
 									id: confirmPasswordInput
+									objectName: "ConfirmPasswordInput"
 									width: parent.width
 									height: Style.controlHeightM
 									echoMode: TextInput.Password

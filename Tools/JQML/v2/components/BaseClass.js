@@ -486,6 +486,7 @@ class BaseClass extends QtObject {
 					}
 
 					if (component) {
+						this[_key].owner = this
 						for (let sourceObjectInner of sourceObject[key]) {
 							let sourceTypename
 							if (sourceObjectInner['__typename']){
