@@ -64,11 +64,26 @@ include_directories("${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}")
 # per-target INCLUDE_DIR/IMPL_DIR exposed by acf_register_library, so it stays unconditional.
 include_directories("${IMTCOREDIR}/Sdl")
 
-# Legacy mode: global include/link dirs for repos that haven't migrated to
-# find_package(ImtCore) + target-based deps yet. Skipped when ACF_MODERN_CMAKE is ON.
 if(NOT ACF_MODERN_CMAKE)
+	# Legacy mode: global include/link dirs for repos that haven't migrated to
+	# find_package(ImtCore) + target-based deps yet. Skipped when ACF_MODERN_CMAKE is ON.
 	include_directories("${IMTCOREDIR}/Include")
 	include_directories("${IMTCOREDIR}/Impl")
 
 	link_directories("${IMTCOREDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}")
+else()
+	# Discover the IAcf package published by its build tree. IAcf transitively pulls in the
+	# AcfSln and Acf packages (find_dependency(Acf)/find_dependency(AcfSln) in IAcfConfig.cmake),
+	# so the Acf::/AcfSln::/IAcf:: imported targets referenced by the ImtCore dependency graph resolve.
+	# Acf_DIR/AcfSln_DIR are set as well so those transitive find_dependency() calls locate the sibling build trees.
+	if(NOT DEFINED IACFDIR_BUILD)
+		set(IACFDIR_BUILD "${IACFDIR}")
+	endif()
+
+	set(IAcf_DIR "${IACFDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}/cmake" CACHE PATH "Path to the IAcf build-tree CMake package")
+	find_package(IAcf QUIET GLOBAL)
+
+	if(NOT IAcf_FOUND)
+		message(STATUS "IAcf package not found. Using AcfSln package instead.")
+	endif()
 endif()

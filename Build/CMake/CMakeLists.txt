@@ -66,29 +66,6 @@ if(ACF_MODERN_CMAKE)
 	acf_define_link_scope_var(ACF_APPLICATION_LINK_SCOPE "PRIVATE" "Link scope used by executables linking their dependencies")
 endif()
 
-# Discover the IAcf package published by its build tree. IAcf transitively pulls in the
-# AcfSln and Acf packages (find_dependency(Acf)/find_dependency(AcfSln) in IAcfConfig.cmake),
-# so the Acf::/AcfSln::/IAcf:: imported targets referenced by the ImtCore dependency graph resolve.
-# Acf_DIR/AcfSln_DIR are set as well so those transitive find_dependency() calls locate the sibling build trees.
-if(NOT TARGET Acf::istd)
-	if(NOT DEFINED ACFDIR_BUILD)
-		set(ACFDIR_BUILD "${ACFDIR}")
-	endif()
-
-	if(NOT DEFINED ACFSLNDIR_BUILD)
-		set(ACFSLNDIR_BUILD "${ACFSLNDIR}")
-	endif()
-
-	if(NOT DEFINED IACFDIR_BUILD)
-		set(IACFDIR_BUILD "${IACFDIR}")
-	endif()
-
-	set(Acf_DIR "${ACFDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}/cmake" CACHE PATH "Path to the Acf build-tree CMake package")
-	set(AcfSln_DIR "${ACFSLNDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}/cmake" CACHE PATH "Path to the AcfSln build-tree CMake package")
-	set(IAcf_DIR "${IACFDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}/cmake" CACHE PATH "Path to the IAcf build-tree CMake package")
-	find_package(IAcf REQUIRED GLOBAL)
-endif()
-
 message(VERBOSE "ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
 
 set(INCLUDE_DIR "${IMTCOREDIR}/Include")

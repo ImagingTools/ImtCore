@@ -28,8 +28,12 @@ find_dependency(IAcf)
 set(IMTCORE_QT_VERSION_MAJOR "@IMTCORE_QT_VERSION_MAJOR@")
 
 set(_imtcore_qt_components Core Gui Widgets Xml Network Svg Sql WebSockets Concurrent PrintSupport)
+
+if(IMTCORE_QT_VERSION_MAJOR EQUAL 5)
+	list(APPEND _imtcore_qt_components XmlPatterns)
+endif()
 if(IMTCORE_QT_VERSION_MAJOR EQUAL 6)
-	list(APPEND _imtcore_qt_components Core5Compat)
+	list(APPEND _imtcore_qt_components Core5Compat SvgWidgets OpenGLWidgets)
 endif()
 
 find_dependency(Qt${IMTCORE_QT_VERSION_MAJOR}
