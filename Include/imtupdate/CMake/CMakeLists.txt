@@ -9,16 +9,5 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 if(ANDROID)
 	find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 	find_package(Qt${QT_VERSION_MAJOR} COMPONENTS AndroidExtras REQUIRED)
-	target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::AndroidExtras)
+	target_link_libraries(${PROJECT_NAME} ${ACF_QT_MODULE_LINK_SCOPE} Qt${QT_VERSION_MAJOR}::AndroidExtras)
 endif()
-
-
-target_link_libraries(${PROJECT_NAME}
-	imtbase
-	imod
-	iser
-	ifile
-)
-
-acf_use_qt_graphics_modules()
-

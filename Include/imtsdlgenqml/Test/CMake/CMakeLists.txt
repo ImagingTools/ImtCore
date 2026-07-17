@@ -8,7 +8,6 @@ set (ARX_ENABLE_GENERATE_DEPENDENCIES_LIST OFF)
 
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
@@ -18,8 +17,8 @@ endif()
 
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test)
 
-target_link_libraries(${PROJECT_NAME} imtsdlgenqml imtsdlgencpp imtsdl imtfile imtbase itest)
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE} imtsdlgenqml imtsdlgencpp imtsdl imtfile imtbase Acf::itest)
+target_link_libraries(${PROJECT_NAME} ${ACF_QT_MODULE_LINK_SCOPE} Qt${QT_VERSION_MAJOR}::Test)
 
 if(WIN32)
 	set(listFiles \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
