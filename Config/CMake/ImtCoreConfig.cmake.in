@@ -20,7 +20,14 @@ include(CMakeFindDependencyMacro)
 # their packages so the Acf::<lib> / AcfSln::<lib> / IAcf::<lib> imported targets
 # referenced by the exported ImtCore targets resolve. find_package(IAcf) already
 # pulls in Acf and AcfSln through its own find_dependency() calls.
-find_dependency(IAcf)
+#
+# NOTE: find_package() is used instead of find_dependency() for IAcf because
+# find_dependency propagates REQUIRED from the outer find_package(ImtCore REQUIRED)
+# call, making the lookup fatal even with QUIET.
+find_package(IAcf QUIET)
+if(NOT IAcf_FOUND)
+	find_dependency(AcfSln REQUIRED)
+endif()
 
 # ImtCore was built against a specific Qt major version; pin the very same one so
 # the Qt imported targets referenced by the exported ImtCore targets
