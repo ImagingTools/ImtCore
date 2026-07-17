@@ -42,5 +42,6 @@
 	<file alias="imtguigql/GqlBasedPermissionsProvider.qml">GqlBasedPermissionsProvider.qml</file>
 	<file alias="imtguigql/FileSystemBrowserDialog.qml">FileSystemBrowserDialog.qml</file>
 	<file alias="imtguigql/ServerPathPicker.qml">ServerPathPicker.qml</file>
+	<file alias="imtguigql/ServerPathPickerElementView.qml">ServerPathPickerElementView.qml</file>
     </qresource>
 </RCC>

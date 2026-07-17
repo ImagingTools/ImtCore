@@ -175,25 +175,55 @@ bool CServerConnectionInterfaceParam::Serialize(iser::IArchive& archive)
 		return iser::CPrimitiveTypesSerializer::SerializeEnum<ProtocolType, IServerConnectionInterface::ToString, IServerConnectionInterface::FromString>(archive, protocolType);
 	};
 
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeAssociativeContainer<InterfaceMap, ProtocolType>(
-				archive,
-				m_interfaceMap,
-				keySerializer,
-				"Interfaces",
-				"Interface",
-				"Protocol",
-				"Port",
-				"List of interfaces");
+	// When storing, serialize snapshots. Agent reconnect can re-enter AutoPersistence
+	// (StoreObject) from nested GQL event loops while another SyncServiceInMirror is
+	// still filling connection maps — concurrent QMap mutation during
+	// SerializeAssociativeContainer iteration crashes in MSVC tree iterators.
+	if (archive.IsStoring()){
+		InterfaceMap interfacesCopy = m_interfaceMap;
+		PathMap pathsCopy = m_pathMap;
 
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeAssociativeContainer<PathMap, ProtocolType>(
-				archive,
-				m_pathMap,
-				keySerializer,
-				"Paths",
-				"Path",
-				"Protocol",
-				"Value",
-				"List of URL paths per protocol");
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeAssociativeContainer<InterfaceMap, ProtocolType>(
+					archive,
+					interfacesCopy,
+					keySerializer,
+					"Interfaces",
+					"Interface",
+					"Protocol",
+					"Port",
+					"List of interfaces");
+
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeAssociativeContainer<PathMap, ProtocolType>(
+					archive,
+					pathsCopy,
+					keySerializer,
+					"Paths",
+					"Path",
+					"Protocol",
+					"Value",
+					"List of URL paths per protocol");
+	}
+	else{
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeAssociativeContainer<InterfaceMap, ProtocolType>(
+					archive,
+					m_interfaceMap,
+					keySerializer,
+					"Interfaces",
+					"Interface",
+					"Protocol",
+					"Port",
+					"List of interfaces");
+
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeAssociativeContainer<PathMap, ProtocolType>(
+					archive,
+					m_pathMap,
+					keySerializer,
+					"Paths",
+					"Path",
+					"Protocol",
+					"Value",
+					"List of URL paths per protocol");
+	}
 
 	return retVal;
 }
