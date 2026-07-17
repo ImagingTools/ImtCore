@@ -11,7 +11,6 @@
 #include <imtgeo/CAddressElementInfo.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <iprm/CParamsSet.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
 namespace imtgeo

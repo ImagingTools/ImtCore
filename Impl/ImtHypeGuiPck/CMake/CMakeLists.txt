@@ -1,17 +1,12 @@
 project(ImtHypeGuiPck LANGUAGES CXX)
 
+
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
+include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE}
 	imthypegui
-	imtwidgets
-	imtgui
-	imtstyle
-	imtbase)
-
-include(${ACFDIR}/Config/CMake/AcfQt.cmake)
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
-include(${ACFDIR}/Config/CMake/AcfStd.cmake)
+)
 
 ADD_DEFINITIONS(-DUNICODE)
 ADD_DEFINITIONS(-D_UNICODE)

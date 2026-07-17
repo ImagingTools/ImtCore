@@ -202,7 +202,7 @@ GraphicsView{
 		point: Qt.point(0,0)
 	}
 
-	ImageShape{
+	ImageShape2d{
 		id: imageShape;
 
 		imageSource: "/Images/testImage";
