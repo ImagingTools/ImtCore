@@ -1,4 +1,4 @@
-project(imtgeoguiqml LANGUAGES CXX)
+project(imtdeskguiqml LANGUAGES CXX)
 
 
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
