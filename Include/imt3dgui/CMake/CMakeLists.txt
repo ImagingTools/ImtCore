@@ -1,5 +1,6 @@
 project(imt3dgui LANGUAGES CXX)
 
+
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
@@ -9,7 +10,6 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 #                 Qt::Gui directly.  For older versions fall back to GuiPrivate.
 # - OpenGL / OpenGLWidgets : QOpenGLBuffer, QOpenGLShaderProgram, QOpenGLWidget
 #                            (headers moved from QtGui to separate modules in Qt 6)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS OpenGL OpenGLWidgets REQUIRED)
 
 set(QT_VERSION_STR
     "${Qt${QT_VERSION_MAJOR}Core_VERSION_MAJOR}.${Qt${QT_VERSION_MAJOR}Core_VERSION_MINOR}.${Qt${QT_VERSION_MAJOR}Core_VERSION_PATCH}")
@@ -70,11 +70,6 @@ else()
         endforeach()
     endif()
 endif()
-
-target_link_libraries(${PROJECT_NAME}
-    Qt${QT_VERSION_MAJOR}::OpenGL
-    Qt${QT_VERSION_MAJOR}::OpenGLWidgets
-)
 
 set(DESIGN_TOKEN_CREATOR_COMMAND_PARAM_IMAGES_INPUT_DIR "${PROJECT_SOURCE_DIR}/../Resources/Icons/Template")
 set(DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR "${AUX_INCLUDE_DIR}/${PROJECT_NAME}")
