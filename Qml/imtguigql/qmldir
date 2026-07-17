@@ -42,3 +42,4 @@ FilterableSelectGqlDataProvider 1.0 FilterableSelectGqlDataProvider.qml
 GqlBasedItemSelectElementView 1.0 GqlBasedItemSelectElementView.qml
 FileSystemBrowserDialog 1.0 FileSystemBrowserDialog.qml
 ServerPathPicker 1.0 ServerPathPicker.qml
+ServerPathPickerElementView 1.0 ServerPathPickerElementView.qml

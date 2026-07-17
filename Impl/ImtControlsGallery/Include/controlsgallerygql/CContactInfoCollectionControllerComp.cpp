@@ -4,6 +4,10 @@
 // ImtCore includes
 #include <imtauth/CContactInfo.h>
 
+// ControlsGallery includes
+#include <GeneratedFiles/controlsgallerysdl/SDL/1.0/CPP/ContactInfos.h>
+
+
 
 namespace controlsgallerygql
 {
@@ -28,8 +32,8 @@ sdl::V1_0::imtbase::CVisualStatus CContactInfoCollectionControllerComp::OnGetObj
 	sdl::V1_0::imtbase::GetObjectVisualStatusRequestArguments arguments = getObjectVisualStatusRequest.GetRequestedArguments();
 
 	QByteArray objectId;
-	if (arguments.input.objectId.has_value()){
-		objectId = *arguments.input.objectId;
+	if (arguments.input->objectId.has_value()){
+		objectId = *arguments.input->objectId;
 	}
 
 	response.objectId = objectId;
@@ -134,8 +138,8 @@ bool CContactInfoCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::V1_0::controlsgallery::GetContactInfoRequestArguments arguments = getContactInfoRequest.GetRequestedArguments();
 
 	QByteArray id;
-	if (arguments.input.id){
-		id = *arguments.input.id;
+	if (arguments.input->id){
+		id = *arguments.input->id;
 	}
 
 	representationPayload.id = id;
@@ -216,7 +220,7 @@ bool CContactInfoCollectionControllerComp::UpdateObjectFromRepresentationRequest
 	}
 
 	sdl::V1_0::controlsgallery::UpdateContactInfoRequestArguments inputArguments = updateContactInfoRequest.GetRequestedArguments();
-	if (!inputArguments.input.item){
+	if (!inputArguments.input->item){
 		I_CRITICAL();
 		return false;
 	}
@@ -224,7 +228,7 @@ bool CContactInfoCollectionControllerComp::UpdateObjectFromRepresentationRequest
 	imtauth::CContactInfo* contactInfoPtr = dynamic_cast<imtauth::CContactInfo*>(&object);
 	Q_ASSERT(contactInfoPtr != nullptr);
 
-	sdl::V1_0::controlsgallery::CContactInfoData contactInfoData = *inputArguments.input.item;
+	sdl::V1_0::controlsgallery::CContactInfoData contactInfoData = *inputArguments.input->item;
 
 	QByteArray objectId;
 	if (!FillObjectFromRepresentation(contactInfoData, *contactInfoPtr, objectId, errorMessage)){
