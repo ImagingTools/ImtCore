@@ -8,6 +8,9 @@
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtauth/IContactInfo.h>
 
+// ControlsGallery includes
+#include <controlsgallerysdl/SDL/1.0/CPP/ContactInfoCollectionDocumentService.h>
+
 
 namespace controlsgallerygql
 {
@@ -25,8 +28,8 @@ sdl::V1_0::controlsgallery::CContactInfoData CContactInfoCollectionDocumentServi
 	sdl::V1_0::controlsgallery::GetContactInfoRepresentationRequestArguments arguments = getContactInfoRepresentationRequest.GetRequestedArguments();
 	QByteArray objectId;
 	istd::IChangeableSharedPtr documentPtr;
-	if (arguments.input.id){
-		objectId = *arguments.input.id;
+	if (arguments.input->id){
+		objectId = *arguments.input->id;
 
 		m_documentManagerCompPtr->GetDocumentData("", objectId, documentPtr);
 	}
@@ -60,13 +63,13 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CContactInfoCollectionDocumentServi
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.documentId){
-		documentId = *arguments.input.documentId;
+	if (arguments.input->documentId){
+		documentId = *arguments.input->documentId;
 	}
 
 	sdl::V1_0::controlsgallery::CContactInfoData contactInfo;
-	if (arguments.input.contactInfo){
-		contactInfo = *arguments.input.contactInfo;
+	if (arguments.input->contactInfo){
+		contactInfo = *arguments.input->contactInfo;
 	}
 
 	istd::IChangeableSharedPtr documentPtr;
@@ -113,8 +116,8 @@ sdl::V1_0::controlsgallery::CEmailData CContactInfoCollectionDocumentServiceComp
 	sdl::V1_0::controlsgallery::GetContactInfoEmailRepresentationRequestArguments arguments = getContactInfoEmailRepresentationRequest.GetRequestedArguments();
 	QByteArray objectId;
 	istd::IChangeableSharedPtr documentPtr;
-	if (arguments.input.id){
-		objectId = *arguments.input.id;
+	if (arguments.input && arguments.input->id){
+		objectId = *arguments.input->id;
 		m_documentManagerCompPtr->GetDocumentData("", objectId, documentPtr);
 	}
 
@@ -143,13 +146,13 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CContactInfoCollectionDocumentServi
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.documentId){
-		documentId = *arguments.input.documentId;
+	if (arguments.input->documentId){
+		documentId = *arguments.input->documentId;
 	}
 
 	sdl::V1_0::controlsgallery::CEmailData emailInfo;
-	if (arguments.input.email){
-		emailInfo = *arguments.input.email;
+	if (arguments.input->email){
+		emailInfo = *arguments.input->email;
 	}
 
 	istd::IChangeableSharedPtr documentPtr;
