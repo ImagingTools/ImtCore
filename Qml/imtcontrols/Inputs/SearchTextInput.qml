@@ -14,9 +14,15 @@ CustomTextField {
 	height: Style.controlHeightM;
 	
 	signal searchChanged()
-	
-	onTextChanged: {
-		timer.restart();
+
+	// A directly-declared onTextChanged here would shadow CustomTextField's own
+	// internal onTextChanged (which pushes the text property into the visible
+	// TextInput) - Connections attaches independently so both keep working.
+	Connections {
+		target: tfc
+		function onTextChanged(){
+			timer.restart();
+		}
 	}
 
 	Timer {
