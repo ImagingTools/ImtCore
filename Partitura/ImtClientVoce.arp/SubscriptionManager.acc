@@ -49,6 +49,24 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="GqlClientSyncAdapter" PackageId="ImtClientGqlPck" ComponentId="GqlClientSyncAdapter">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AsyncClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SubscriptionManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Timeout" Type="Real" ExportId="">
+                        <Data IsEnabled="true" Value="100"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="WebSocketClient" PackageId="ImtClientGqlPck" ComponentId="WebSocketClient">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -109,7 +127,8 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtclientgql::IGqlClient" ComponentId="SubscriptionManager"/>
+        <Interface InterfaceId="imtclientgql::IGqlClient" ComponentId="GqlClientSyncAdapter"/>
+        <Interface InterfaceId="imtclientgql::IAsyncGqlClient" ComponentId="SubscriptionManager"/>
         <Interface InterfaceId="imtclientgql::IGqlSubscriptionManager" ComponentId="SubscriptionManager"/>
         <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="SubscriptionManager"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="WebSocketClient"/>

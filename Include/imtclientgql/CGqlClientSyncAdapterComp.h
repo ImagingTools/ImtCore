@@ -15,22 +15,16 @@ namespace imtclientgql
 
 
 /**
-	Adapter that exposes the synchronous \c IGqlClient interface on top of
-	an asynchronous \c IAsyncGqlClient.
+	Adapter: synchronous \c IGqlClient on top of \c IAsyncGqlClient.
 
-	Lets existing high-level components written against \c IGqlClient
-	(e.g. \c TClientRequestManagerCompWrap, \c CGqlObjectCollectionComp,
-	\c CGqlHierarchicalStructureComp, \c CGqlRemoteRepresentationControllerCompBase,
-	\c CRemoteGqlCollectionController) keep their synchronous semantics
-	while the underlying transport runs asynchronously — the "Path A"
-	integration option of the async communication plan.
+	Keeps \c CSubscriptionManagerComp / \c CAsyncApiClientComp free of sync
+	Wait logic. Wire this when a consumer needs \c IGqlClient (e.g.
+	\c TClientRequestManagerCompWrap \c ApiClient) while the transport is async
+	(\c WebSocketServerFramework exports this as \c IGqlClient).
 
-	On each \c SendRequest call the adapter forwards the request to the
-	configured \c AsyncClient, installs an internal response handler and
-	blocks until the response arrives or the configured \c Timeout
-	elapses. On timeout the in-flight request is cancelled before
-	returning to ensure the handler has been invoked exactly once and
-	no waiter is left dangling.
+	Each \c SendRequest forwards to \c AsyncClient and blocks until completion
+	or \c Timeout (then cancels). Prefer \c IAsyncGqlClient / \c TAsyncClientRequestManagerCompWrap
+	on WebSocket worker threads to avoid nested event loops.
 */
 class CGqlClientSyncAdapterComp:
 			public ilog::CLoggerComponentBase,

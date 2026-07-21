@@ -34,7 +34,10 @@ void CFileBasedTranslationManagerComp::LoadTranslations()
 
 			QString translatorFile = translationsPath + QString("/") + translationFilePrefix + QString("_") + languageId + QString(".qm");
 
-			istd::TDelPtr<QTranslator> qtTranslatorPtr(new QTranslator(qApp));
+			// No qApp parent: LoadTranslations can theoretically run off the app
+			// thread (factory/servlet create). Parentless QTranslator is fine —
+			// lifetime is owned by m_translatorsList.
+			istd::TDelPtr<QTranslator> qtTranslatorPtr(new QTranslator());
 
 			if (!qtTranslatorPtr->load(translatorFile)){
 				SendVerboseMessage(QString("Cannot load translator for: %1").arg(translatorFile), "TranslationManager");

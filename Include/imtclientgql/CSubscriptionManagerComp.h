@@ -3,9 +3,10 @@
 
 
 // Qt includes
-#include <QtCore/QTimer>
+#include <QtCore/QHash>
 #include <QtCore/QMutex>
-#include <QReadWriteLock>
+#include <QtCore/QReadWriteLock>
+#include <QtCore/QTimer>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -19,35 +20,47 @@
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtgql/CGqlRequest.h>
-#include <imtclientgql/IGqlClient.h>
+#include <imtclientgql/IAsyncGqlClient.h>
 #include <imtclientgql/IGqlSubscriptionManager.h>
+#include <imtclientgql/CAsyncGqlRequestToken.h>
 
 
 namespace imtclientgql
 {
 
 
+/**
+	Subscription manager and **asynchronous** outbound GQL client over WebSocket.
+
+	Implements \c IAsyncGqlClient only (no nested event loop).
+	For synchronous \c IGqlClient semantics, wire \c CGqlClientSyncAdapterComp
+	on top of this component (see WebSocketServerFramework).
+*/
 class CSubscriptionManagerComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
 			public imod::CSingleModelObserverBase,
 			virtual public IGqlSubscriptionManager,
 			virtual public imtrest::IRequestServlet,
-			virtual public IGqlClient
+			virtual public IAsyncGqlClient
 {
 	Q_OBJECT
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
+	typedef IAsyncGqlClient::GqlRequestPtr GqlRequestPtr;
+	typedef IAsyncGqlClient::GqlResponsePtr GqlResponsePtr;
+
 	I_BEGIN_COMPONENT(CSubscriptionManagerComp);
 		I_REGISTER_INTERFACE(IGqlSubscriptionManager);
-		I_REGISTER_INTERFACE(IGqlClient);
+		I_REGISTER_INTERFACE(IAsyncGqlClient);
 		I_REGISTER_INTERFACE(imtrest::IRequestServlet);
 		I_ASSIGN(m_subscriptionSenderCompPtr, "SubscriptionSender", "Subscription sender", false, "SubscriptionSender");
 		I_ASSIGN(m_requestManagerCompPtr, "RequestManager", "Response dispatcher for sending a request", false, "RequestManager");
 		I_ASSIGN(m_engineCompPtr, "ProtocolEngine", "Protocol engine for subscription", true, "ProtocolEngine");
 		I_ASSIGN(m_connectionStatusProviderCompPtr, "WebLoginStatus", "Web login status", false, "WebLoginStatus");
 		I_ASSIGN_TO(m_connectionStatusProviderModelCompPtr, m_connectionStatusProviderCompPtr, true);
+		I_ASSIGN(m_requestTimeoutMsAttrPtr, "RequestTimeoutMs", "Async request timeout (ms)", false, 100000);
 	I_END_COMPONENT;
 
 	// reimplemented (imtclientgql::IGqlSubscriptionManager)
@@ -61,8 +74,11 @@ public:
 	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
 	virtual imtrest::ConstResponsePtr ProcessRequest(const imtrest::IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
-	// reimplemented (IGqlClient)
-	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
+	// reimplemented (IAsyncGqlClient)
+	virtual IAsyncGqlRequestTokenPtr SendRequest(
+				GqlRequestPtr requestPtr,
+				IAsyncGqlResponseHandler* handlerPtr,
+				imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
 protected:
 	virtual void SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const;
@@ -77,12 +93,24 @@ Q_SIGNALS:
 private:
 	virtual imtrest::ConstResponsePtr CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const;
 
+	struct PendingAsync
+	{
+		IAsyncGqlRequestTokenPtr tokenPtr;
+		CAsyncGqlRequestToken* tokenImplPtr = nullptr;
+		IAsyncGqlResponseHandler* handlerPtr = nullptr;
+		GqlRequestPtr requestPtr;
+	};
+
+	void CompletePending(const QString& key, const QByteArray& body, bool isError) const;
+	void FailPending(const QString& key, IAsyncGqlResponseHandler::ErrorCategory category, const QString& message) const;
+
 private:
 	I_REF(imtrest::ITransport, m_subscriptionSenderCompPtr);
 	I_REF(imtrest::IResponseDispatcher, m_requestManagerCompPtr);
 	I_REF(imtcom::IConnectionStatusProvider, m_connectionStatusProviderCompPtr);
 	I_REF(imod::IModel, m_connectionStatusProviderModelCompPtr);
 	I_REF(imtrest::IProtocolEngine, m_engineCompPtr);
+	I_ATTR(int, m_requestTimeoutMsAttrPtr);
 
 	class SubscriptionHelper
 	{
@@ -93,25 +121,13 @@ private:
 		QList<IGqlSubscriptionClient*> m_clients;
 	};
 
-	class NetworkOperation
-	{
-	public:
-		NetworkOperation() = delete;
-		NetworkOperation(int timeout, const CSubscriptionManagerComp* parent);
-		~NetworkOperation();
-
-		QEventLoop connectionLoop;
-		bool timerFlag;
-		QTimer timer;
-	};
-
 	mutable QMap <QByteArray, SubscriptionHelper> m_registeredClients;
-	mutable QMap<QString, QByteArray> m_queryDataMap;
 	mutable QMutex m_registeredClientsMutex;
-	mutable QReadWriteLock m_queryDataMapLock;
+
+	mutable QHash<QString, PendingAsync> m_pendingAsync;
+	mutable QMutex m_pendingAsyncMutex;
+	int m_requestTimeoutMs = 100000;
 };
 
 
 } // namespace imtclientgql
-
-

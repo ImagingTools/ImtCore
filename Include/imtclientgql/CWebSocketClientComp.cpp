@@ -74,7 +74,12 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr reque
 
 	GqlResponsePtr retVal;
 
-	for (int i = 0; i < 100; i++){
+	// 300 * 100ms = 30s. The server may legitimately take a few seconds to answer a
+	// request that arrives while it is mid-processing another exchange on the same
+	// connection (e.g. a deferred server->client sync push queued right after this
+	// client's own request) — 10s used to be tight enough to time out under that kind
+	// of transient, non-error latency.
+	for (int i = 0; i < 300; i++){
 		networkOperation.timer.start();
 		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 		QCoreApplication::processEvents();
@@ -341,8 +346,23 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 			){
 	}
 	else if (methodType == imtrest::CWebSocketRequest::MT_QUERY_DATA){
+		// Envelope is {"type":"query_data","id":"...","payload":{...GQL JSON...}}.
+		// Callers of SendRequest expect the GraphQL body only.
+		QByteArray gqlBody = webSocketRequest->GetBody();
+		{
+			const QJsonDocument envelope = QJsonDocument::fromJson(gqlBody);
+			if (envelope.isObject()){
+				const QJsonValue payloadVal = envelope.object().value(QStringLiteral("payload"));
+				if (payloadVal.isObject()){
+					gqlBody = QJsonDocument(payloadVal.toObject()).toJson(QJsonDocument::Compact);
+				}
+				else if (payloadVal.isString()){
+					gqlBody = payloadVal.toString().toUtf8();
+				}
+			}
+		}
 		QWriteLocker writeLock(&m_queryDataMapLock);
-		m_queryDataMap.insert(webSocketRequest->GetRequestId(), webSocketRequest->GetBody());
+		m_queryDataMap.insert(webSocketRequest->GetRequestId(), gqlBody);
 		writeLock.unlock();
 
 		emit EmitQueryDataReceived(1);
@@ -382,7 +402,19 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 
 	if (responsePtr.IsValid()){
 		QByteArray data = responsePtr->GetData();
-
+		// Server CSubscriptionManagerComp sends type=query with a correlation id and waits
+		// for type=query_data. Reply with the same envelope (same as SendResponse path).
+		if (methodType == imtrest::CWebSocketRequest::MT_QUERY){
+			const QByteArray queryRequestId = webSocketRequest->GetRequestId();
+			if (!queryRequestId.isEmpty()){
+				const QByteArray payload = data.isEmpty() ? QByteArrayLiteral("{}") : data;
+				data = QByteArrayLiteral("{\"type\":\"query_data\",\"id\":\"")
+							+ queryRequestId
+							+ QByteArrayLiteral("\",\"payload\":")
+							+ payload
+							+ QByteArrayLiteral("}");
+			}
+		}
 		webSocketPtr->sendTextMessage(data);
 	}
 }

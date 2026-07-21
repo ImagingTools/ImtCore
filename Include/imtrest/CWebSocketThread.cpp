@@ -204,8 +204,9 @@ void CWebSocketThread::ProcessTextMessage(const QString& textMessage)
 					imtrest::IRequestUniquePtr requestPtr = m_httpEnginePtr->CreateRequest(*m_requestServerHandlerPtr);
 					CHttpRequest* newHttpRequestPtr = dynamic_cast<CHttpRequest*>(requestPtr.GetPtr());
 					if (newHttpRequestPtr != nullptr){
-						if (!clientId.isEmpty() && !webSocketPtr.isNull()){
-							m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr.data());
+						const QByteArray queryRequestId = webSocketRequest->GetRequestId();
+						if (!queryRequestId.isEmpty() && !webSocketPtr.isNull()){
+							m_server->RegisterSender(queryRequestId, webSocketPtr.data());
 						}
 	
 						QJsonDocument document = QJsonDocument::fromJson(textMessage.toUtf8());
@@ -215,6 +216,11 @@ void CWebSocketThread::ProcessTextMessage(const QString& textMessage)
 						QJsonObject headers = object.value("headers").toObject();
 						for (QString& key: headers.keys()){
 							newHttpRequestPtr->SetHeader(key.toUtf8().toLower(), headers.value(key).toString().toUtf8());
+						}
+						// Correlate the HTTP response with the WS query id (agent CWebSocketClientComp
+						// waits for type=query_data with this id).
+						if (!queryRequestId.isEmpty()){
+							newHttpRequestPtr->SetHeader(QByteArrayLiteral("id"), queryRequestId);
 						}
 						newHttpRequestPtr->SetBody(body);
 						newHttpRequestPtr->SetMethodType(CHttpRequest::MT_POST);
@@ -231,6 +237,21 @@ void CWebSocketThread::ProcessTextMessage(const QString& textMessage)
 
 		if (responsePtr.IsValid()){
 			QByteArray data = responsePtr->GetData();
+			// Agent/server sync clients (CWebSocketClientComp::SendRequest) send type=query with
+			// a correlation id and wait for type=query_data with the same id. Emitting the raw
+			// GraphQL HTTP body leaves the client spinning until timeout
+			// ("Live service sync notify failed … no response from server").
+			if (methodType == CWebSocketRequest::MT_QUERY){
+				const QByteArray queryRequestId = webSocketRequest->GetRequestId();
+				if (!queryRequestId.isEmpty()){
+					const QByteArray payload = data.isEmpty() ? QByteArrayLiteral("{}") : data;
+					data = QByteArrayLiteral("{\"type\":\"query_data\",\"id\":\"")
+								+ queryRequestId
+								+ QByteArrayLiteral("\",\"payload\":")
+								+ payload
+								+ QByteArrayLiteral("}");
+				}
+			}
 			emit SendTextMessage(data);
 		}
 
