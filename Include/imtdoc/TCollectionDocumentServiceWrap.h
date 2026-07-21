@@ -5,7 +5,7 @@
 // Qt includes
 #include <QtCore/QCoreApplication>
 #include <QtCore/QMap>
-#include <QtCore/QTimer>
+#include <QtCore/QMetaObject>
 #include <QtCore/QUuid>
 #include <QtCore/QThread>
 
@@ -236,16 +236,22 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 			if (!sharedIsLoading){
 				// Defer the notification to ensure the mutation response is sent
 				// to the client before the subscription notification arrives.
+				// Use invokeMethod (not QTimer::singleShot(..., qApp, ...)): singleShot
+				// creates a QObject parented to qApp; from a worker thread that logs
+				// "Cannot create children for a parent that is in a different thread".
 				QByteArray deferredUserId = userId;
 				QByteArray deferredDocumentId = documentId;
 				std::weak_ptr<std::atomic<bool>> deferredAliveGuard(this->m_isAlive);
-				QTimer::singleShot(0, QCoreApplication::instance(), [this, deferredAliveGuard, deferredUserId, deferredDocumentId](){
-					auto isAlive = deferredAliveGuard.lock();
-					if (!isAlive || !isAlive->load()){
-						return;
-					}
-					this->OnDocumentDataLoaded(deferredUserId, deferredDocumentId);
-				});
+				QMetaObject::invokeMethod(
+							QCoreApplication::instance(),
+							[this, deferredAliveGuard, deferredUserId, deferredDocumentId]() {
+								auto isAlive = deferredAliveGuard.lock();
+								if (!isAlive || !isAlive->load()){
+									return;
+								}
+								this->OnDocumentDataLoaded(deferredUserId, deferredDocumentId);
+							},
+							Qt::QueuedConnection);
 			}
 
 			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_OK, documentId, QString()});

@@ -3,14 +3,12 @@
 
 
 // Qt includes
-#include <QtCore/QCoreApplication>
-#include <QtCore/QEventLoop>
-#include <QtCore/QList>
 #include <QtCore/QMetaObject>
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 #include <QtCore/QTimer>
 #include <QtCore/QUuid>
+#include <QtCore/QWaitCondition>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
@@ -80,44 +78,16 @@ public:
 
 	virtual bool Wait(int timeoutMs = -1) override
 	{
-		QEventLoop loop;
-		{
-			QMutexLocker lock(&m_mutex);
-			if (m_state != RS_PENDING){
-				return true;
-			}
-			m_waiters.append(&loop);
+		// QWaitCondition — no QEventLoop/QTimer on worker threads (affinity warnings).
+		QMutexLocker lock(&m_mutex);
+		if (m_state != RS_PENDING){
+			return true;
 		}
-
-		bool timedOut = false;
-		QTimer timer;
-		if (timeoutMs >= 0){
-			timer.setSingleShot(true);
-			QObject::connect(&timer, &QTimer::timeout, &loop, [&loop, &timedOut]() {
-				timedOut = true;
-				loop.quit();
-			});
-			timer.start(timeoutMs);
+		if (timeoutMs < 0){
+			m_waitCondition.wait(&m_mutex);
+			return true;
 		}
-
-		// If the application is shutting down, release the waiter as well.
-		QMetaObject::Connection appConn;
-		if (QCoreApplication::instance() != nullptr){
-			appConn = QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &loop, &QEventLoop::quit);
-		}
-
-		loop.exec(QEventLoop::ExcludeUserInputEvents);
-
-		if (appConn){
-			QObject::disconnect(appConn);
-		}
-
-		{
-			QMutexLocker lock(&m_mutex);
-			m_waiters.removeOne(&loop);
-		}
-
-		return !timedOut;
+		return m_waitCondition.wait(&m_mutex, static_cast<unsigned long>(timeoutMs));
 	}
 
 	// internal API used by CAsyncApiClientComp
@@ -146,26 +116,19 @@ public:
 private:
 	void MarkTerminal(RequestState newState)
 	{
-		QList<QEventLoop*> waitersSnapshot;
-		{
-			QMutexLocker lock(&m_mutex);
-			if (m_state != RS_PENDING){
-				return;
-			}
-			m_state = newState;
-			waitersSnapshot = m_waiters;
-			m_cancelCb = nullptr;
+		QMutexLocker lock(&m_mutex);
+		if (m_state != RS_PENDING){
+			return;
 		}
-
-		for (QEventLoop* loopPtr : waitersSnapshot){
-			QMetaObject::invokeMethod(loopPtr, "quit", Qt::QueuedConnection);
-		}
+		m_state = newState;
+		m_cancelCb = nullptr;
+		m_waitCondition.wakeAll();
 	}
 
 	mutable QMutex m_mutex;
+	QWaitCondition m_waitCondition;
 	RequestState m_state;
 	std::function<void()> m_cancelCb;
-	QList<QEventLoop*> m_waiters;
 };
 
 
