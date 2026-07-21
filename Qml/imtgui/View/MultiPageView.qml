@@ -33,7 +33,8 @@ Item {
             expanded: false,
             loaded: false,
             submenuVisited: false,
-            lastSubpageId: ""
+            lastSubpageId: "",
+            badge: ""
         })
     }
 
@@ -62,8 +63,19 @@ Item {
             expanded: false,
             loaded: false,
             submenuVisited: false,
-            lastSubpageId: ""
+            lastSubpageId: "",
+            badge: ""
         })
+    }
+
+    // Small text badge next to a page's nav label (e.g. "3", or "•" as an "unread" dot) -
+    // badgeText: "" clears it. No built-in caller; consumers (e.g. AgentEditor's Services/Log
+    // pages) call this whenever the count/marker they want shown changes.
+    function setPageBadge(pageId, badgeText){
+        var idx = getIndexById(pageId)
+        if (idx >= 0) {
+            pagesModel.setProperty(idx, "badge", badgeText)
+        }
     }
 
     function removePage(pageId){
@@ -306,6 +318,20 @@ Item {
                                 color: navDelegate.__isSelected ? Style.textSelectedColor : Style.textColor
                                 elide: Text.ElideRight
                                 width: parent.width - ((!navDelegate.__isSubpage && model.icon) ? Style.iconSizeS + parent.spacing : 0)
+                                    - (navBadge.visible ? navBadge.width + parent.spacing : 0)
+                            }
+
+                            // Small text badge next to the label (a count like "3", or a short
+                            // marker like "•") - see setPageBadge(). Empty/unset by default, so
+                            // pages that never call it look exactly as before.
+                            Text {
+                                id: navBadge
+                                visible: model.badge !== undefined && model.badge !== ""
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: model.badge !== undefined ? model.badge : ""
+                                font.family: Style.fontFamily
+                                font.pixelSize: Style.fontSizeS
+                                color: navDelegate.__isSelected ? Style.textSelectedColor : Style.subtitleColor
                             }
                         }
 

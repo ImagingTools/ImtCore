@@ -8,7 +8,7 @@ import imtcontrols 1.0
 Rectangle {
 	id: root;
 
-	color: Style.backgroundColor2;
+	color: Style.baseColor;
 
 	property string titleSeparation: "/";
 	property bool initialItemTitleVisible: false;
