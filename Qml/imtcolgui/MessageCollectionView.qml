@@ -6,10 +6,13 @@ import imtguigql 1.0
 
 RemoteCollectionView {
 	id: log;
-	
+
 	width: parent.width
 	height: Style.sizeHintXXS;
-	
+
+	// ViewBase's default contentColor (backgroundColor2) showed through the filter panel area.
+	contentColor: Style.baseColor;
+
 	commandsControllerComp: null
 	table.enableAlternating: false
 	additionalFieldIds: ["category", "infoId"]

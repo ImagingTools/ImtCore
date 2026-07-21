@@ -22,9 +22,6 @@ class CWorker: public QObject
 public:
 	CWorker(imtrest::IRequestServletPtr&& requestServletPtr, CWorkerThread* workerThread);
 
-Q_SIGNALS:
-	void FinishProcess(const IRequest* request, const QByteArray& subCommandId);
-
 public Q_SLOTS:
 	void ProcessRequest(const IRequest* request, const QByteArray& subCommandId);
 
