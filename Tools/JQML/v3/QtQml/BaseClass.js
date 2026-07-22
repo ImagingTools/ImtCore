@@ -153,7 +153,7 @@ class BaseClass extends QtObject {
 	connectProperties() {}
 
 	createMe() {
-		return BaseClass.create()
+		return this.constructor.create()
 	}
 
 	isEqualWithModel(model) {
@@ -210,18 +210,100 @@ class BaseClass extends QtObject {
 
 	copyMe() {
 		let obj = this.createMe()
-		obj.fromJSON(this.toJson())
+		obj.copyFrom(this)
 
 		return obj
 	}
 
 	copyFrom(item) {
-		this.fromJSON(item.toJson())
+		let sourceObject = item
+		for(let objKey of this.getProperties()){
+			if (!(this.getJSONKeyForProperty(objKey) in sourceObject)){
+				if(this[objKey] && typeof this[objKey] === "object"){
+					if (this[objKey].clear){
+						this[objKey].clear()
+					}
+					if (this[objKey].destroy){
+						this[objKey].destroy()
+					}
+					this[objKey] = null
+				}
+			}
+		}
+
+		for (let key of item.getProperties()) {
+			if (key === '__typename' || (sourceObject[key] == null && sourceObject._internal.containceInRemoved(key))){
+				continue
+			}
+
+			this._internal.removeAt(key)
+
+			if (sourceObject[key] === null){
+				this[key] = null
+			}
+			else if (typeof sourceObject[key] === "object") {
+				if (Array.isArray(sourceObject[key])) {
+					let component = this.createComponent(key)
+
+					if (this[key]) {
+						if (this[key].clear) {
+							this[key].clear()
+						}
+					} else {
+						if (component) {
+							let obj = BaseModel.create(this)
+							obj.owner = this
+							this[key] = obj
+						}
+					}
+
+					if (component) {
+						this[key].owner = this
+						for (let sourceObjectInner of sourceObject[key]) {
+							let sourceTypename
+							if (sourceObjectInner['__typename']){
+								sourceTypename = sourceObjectInner['__typename']
+							}
+							let obj = this.createElement(key, sourceTypename).createObject(this)
+							obj.copyFrom(sourceObjectInner)
+							this[key].append({ item: obj })
+							obj.owner = this
+						}
+					}
+					else {
+						this[key] = sourceObject[key]
+					}
+				} else {
+					let obj
+					if (!this[key]) {
+						let sourceData = sourceObject[key]
+						let sourceTypename
+						if (sourceData['__typename']){
+							sourceTypename = sourceData['__typename']
+						}	
+						obj = this.createComponent(key, sourceTypename).createObject(this)
+					}
+					else {
+						obj = this[key]
+					}
+
+					obj.copyFrom(sourceObject[key])
+					this[key] = obj
+
+					obj.owner = this
+				}
+			} else {
+				this[key] = sourceObject[key]
+			}
+		}
+
+		this.finished()
+		
 		return true
 	}
 
 	copyTo(item) {
-		item.fromJSON(this.toJson())
+		item.copyFrom(this)
 		return true
 	}
 
@@ -238,19 +320,6 @@ class BaseClass extends QtObject {
 
 	getProperties() {
 		return this.__self.constructor.cachedPoperties
-	}
-
-	getProperties2() {
-		let meta = this.__self.constructor.meta
-		let list = []
-
-		for (let key in meta) {
-			if ((meta[key].type !== Signal && key[0] === 'm' && key[1] === '_') || (key === '__typename')) {
-				list.push(key)
-			}
-		}
-
-		return list
 	}
 
 	createFromJson(json) {

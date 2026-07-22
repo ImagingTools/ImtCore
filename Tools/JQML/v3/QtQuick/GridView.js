@@ -3,6 +3,7 @@ const Var = require("../QtQml/Var")
 const Real = require("../QtQml/Real")
 const Signal = require("../QtQml/Signal")
 const Variant = require("../QtQml/Variant")
+const Geometry = require("../QtQml/Geometry")
 const Component = require("../QtQml/Component")
 
 class GridView extends Flickable {
@@ -143,20 +144,24 @@ class GridView extends Flickable {
             if(r) r.destroy()
         }
 
-
         this.originX = 0
         this.originY = 0
-        
+
         this.contentX = 0
         this.contentY = 0
+
+        this.contentItem.x = 0
+        this.contentItem.y = 0
 
         this.blockSignals(false)
 
         this.count = 0
+        this.currentItem = undefined
     }
 
     __createItem(index){
         if(JQApplication.isQuitting) return null
+        if(this.__items[index]) return this.__items[index]
         let properties = {}
 
         if (Array.isArray(this.model)) {
@@ -169,6 +174,13 @@ class GridView extends Flickable {
         }
 
         let item = this.delegate.createObject(this.contentItem, properties)
+
+        let cell = document.createElement('div')
+        this.contentItem.__getDOM().appendChild(cell)
+        cell.appendChild(item.__getDOM())
+        item.JQDestruction.connect(()=>{
+            cell.remove()
+        })
 
         this.__items[index] = item
 
@@ -299,35 +311,14 @@ class GridView extends Flickable {
             return
         }
 
-        // if(length === 0) return
-
-        let columns = Math.trunc(this.width / this.cellWidth)
+        let columns = Math.floor(this.width / this.cellWidth)
         if(columns <= 0) columns = 1
-        // let rows = Math.trunc(length / columns)
-        // if(rows <= 0) rows = 1
+        let rows = Math.ceil(length/columns)
 
-        let index = 0
-        let rowIndex = 0
-        let columnIndex = 0
-
-        while(index < length){
-            if(!this.__items[index]) {
-                index++
-                continue
-            }
-
-            this.__items[index].x = this.cellWidth*columnIndex
-            this.__items[index].y = this.cellHeight*rowIndex
-
-            columnIndex++
-            if(columnIndex >= columns){
-                columnIndex = 0
-                rowIndex++
-            }
-
-            index++
-        }
-
+        this.contentItem.__setDOMStyle({
+            gridTemplateColumns: `repeat(${columns}, ${this.cellWidth}px)`,
+            gridTemplateRows: `repeat(${rows}, ${this.cellHeight}px)`
+        })
     }
 
     SLOT_widthChanged(oldValue, newValue){
@@ -361,7 +352,6 @@ class GridView extends Flickable {
     __updateGeometry(){
         this.contentWidth = this.contentItem.__DOM.scrollWidth
         this.contentHeight = this.contentItem.__DOM.scrollHeight
-      
     }
 
     __endUpdate(){
