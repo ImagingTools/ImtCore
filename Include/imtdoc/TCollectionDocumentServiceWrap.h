@@ -323,7 +323,21 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 
 		imtbase::IObjectCollection* collPtr = GetCollection();
 		if (collPtr == nullptr){
-			this->CloseDocumentInternal(userId, documentId);
+			UserDocumentPairList docsToClose;
+			{
+				QMutexLocker locker(&this->m_mutex);
+				if (singleCopyMode && this->m_sharedDocuments.contains(objectId)){
+					this->m_sharedDocuments[objectId].isLoading = false;
+					docsToClose = this->FindDocumentsByObjectId(objectId);
+				}
+				else{
+					docsToClose.append(qMakePair(userId, documentId));
+				}
+			}
+
+			for (const UserDocumentPair& pair : docsToClose){
+				this->CloseDocumentInternal(pair.first, pair.second);
+			}
 			worker->deleteLater();
 			return;
 		}

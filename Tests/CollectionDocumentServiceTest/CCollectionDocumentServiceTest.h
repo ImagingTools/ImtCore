@@ -676,6 +676,7 @@ private slots:
 	void OpenDocumentEventFiredTest();
 	void OpenDocumentIsLoadingTest();
 	void OpenDocumentCompletesBeforeDataLoadedTest();
+	void OpenDocumentDataLoadFailClosesDocumentTest();
 	void OpenDocumentWithHostTest();
 	void OpenDocumentMultiplePathSegmentsTest();
 

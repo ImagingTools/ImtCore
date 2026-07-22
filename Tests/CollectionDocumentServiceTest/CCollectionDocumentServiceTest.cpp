@@ -483,6 +483,28 @@ void CCollectionDocumentServiceTest::OpenDocumentCompletesBeforeDataLoadedTest()
 }
 
 
+void CCollectionDocumentServiceTest::OpenDocumentDataLoadFailClosesDocumentTest()
+{
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject()));
+	m_managerPtr->GetMockCollection().SetGetObjectDataShouldFail(true);
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QVERIFY2(!result.documentId.isEmpty(),
+		"OpenDocument should complete before an asynchronous data-load failure");
+
+	QTRY_VERIFY_WITH_TIMEOUT(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID).isEmpty(), 1000);
+	QVERIFY2(m_managerPtr->GetMockEventHandler().CountEventsOfType("DocumentClosedEvent") > 0,
+		"Data-load failure should notify clients that the document was closed");
+}
+
+
 void CCollectionDocumentServiceTest::OpenDocumentWithHostTest()
 {
 	imtdoc::IDocumentService::TaskParams params;
