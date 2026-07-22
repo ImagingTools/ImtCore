@@ -332,7 +332,6 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		bool success = collPtr->GetObjectData(objectId, dataPtr);
 		isAlive = aliveGuard.lock();
 		if (!isAlive || !isAlive->load()){
-		if (!isAlive || !isAlive->load()){
 			worker->deleteLater();
 			return;
 		}

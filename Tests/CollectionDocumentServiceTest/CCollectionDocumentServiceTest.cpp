@@ -54,18 +54,6 @@ QByteArray CCollectionDocumentServiceTest::CreateDocumentAndWaitForLoad(
 	}
 
 	auto result = manager.WaitForTaskFinished(taskId);
-	QElapsedTimer timer;
-	timer.start();
-	while (!result.documentId.isEmpty() && timer.elapsed() < 5000) {
-		auto documents = manager.GetOpenedDocumentList(userId);
-		for (const auto& document : documents) {
-			if (document.documentId == result.documentId && !document.isLoading) {
-				return result.documentId;
-			}
-		}
-		QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
-	}
-
 	return result.documentId;
 }
 
@@ -85,6 +73,18 @@ QByteArray CCollectionDocumentServiceTest::OpenDocumentAndWaitForLoad(
 	}
 
 	auto result = manager.WaitForTaskFinished(taskId);
+	QElapsedTimer timer;
+	timer.start();
+	while (!result.documentId.isEmpty() && timer.elapsed() < 5000) {
+		auto documents = manager.GetOpenedDocumentList(userId);
+		for (const auto& document : documents) {
+			if (document.documentId == result.documentId && !document.isLoading) {
+				return result.documentId;
+			}
+		}
+		QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+	}
+
 	return result.documentId;
 }
 
@@ -468,15 +468,18 @@ void CCollectionDocumentServiceTest::OpenDocumentCompletesBeforeDataLoadedTest()
 		"Document data loading should have started");
 
 	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+	m_managerPtr->GetMockCollection().ContinueGetObjectData();
+
 	QVERIFY2(!result.documentId.isEmpty(),
 		"OpenDocument should complete while document data is still loading");
-
-	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	QCOMPARE(list.size(), 1);
 	QVERIFY2(list[0].isLoading, "Document should remain in loading state");
 
-	m_managerPtr->GetMockCollection().ContinueGetObjectData();
-	QTRY_VERIFY_WITH_TIMEOUT(!m_managerPtr->GetOpenedDocumentList(TEST_USER_ID)[0].isLoading, 1000);
+	QTRY_VERIFY_WITH_TIMEOUT([this]() {
+		auto documents = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+		return documents.size() == 1 && !documents[0].isLoading;
+	}(), 1000);
 }
 
 
