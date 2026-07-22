@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QCoreApplication>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QUuid>
 
 
@@ -53,6 +54,18 @@ QByteArray CCollectionDocumentServiceTest::CreateDocumentAndWaitForLoad(
 	}
 
 	auto result = manager.WaitForTaskFinished(taskId);
+	QElapsedTimer timer;
+	timer.start();
+	while (!result.documentId.isEmpty() && timer.elapsed() < 5000) {
+		auto documents = manager.GetOpenedDocumentList(userId);
+		for (const auto& document : documents) {
+			if (document.documentId == result.documentId && !document.isLoading) {
+				return result.documentId;
+			}
+		}
+		QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+	}
+
 	return result.documentId;
 }
 
