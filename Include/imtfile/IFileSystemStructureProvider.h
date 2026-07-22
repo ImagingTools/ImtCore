@@ -58,11 +58,15 @@ public:
 		QString path;
 		int offset = 0;
 		int limit = 0; // 0 = no limit
-		// Case-insensitive substring on entry name; empty = no name filter.
+		// Case-insensitive name filter; empty = no name filter.
+		// Default: shell-style glob (* = any chars, ? = one char; other
+		// characters are literal — so "*.exe" works). Full PCRE regex when
+		// wrapped as /pattern/. Invalid patterns fall back to substring match.
 		// Applied before sort and pagination (totalCount/hasMore reflect it).
 		QString nameFilter;
 		// Case-insensitive whitelist of file extensions (without the dot, e.g.
-		// "exe"); empty = all files. Applies to files only - containers (dir /
+		// "exe"); empty = all files. Token "*" or "none" also allows extensionless
+		// names (Linux binaries). Applies to files only - containers (dir /
 		// symlink / drive) always pass so navigation is never blocked. Applied
 		// before sort and pagination (totalCount/hasMore reflect it).
 		QStringList extensions;

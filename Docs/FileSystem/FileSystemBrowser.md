@@ -118,8 +118,8 @@ uses the same order.
 
 | Input field | Meaning |
 |-------------|--------|
-| `nameFilter` | Case-insensitive substring on entry display name (optional) |
-| `extensionFilter` | `;`-separated file extensions to include (no dot, e.g. `exe;dll`); empty = all. Files only — folders always listed so navigation is never blocked. Case-insensitive |
+| `nameFilter` | Case-insensitive name filter on entry display name (optional). Default is shell-style glob (`*` / `?`; other characters literal — e.g. `*.exe`). Full PCRE regex when wrapped as `/pattern/`. Invalid patterns fall back to literal substring match. |
+| `extensionFilter` | `;`-separated file extensions to include (no dot, e.g. `exe;dll`); empty = all. Token `*` (or `none`) also allows extensionless names (Linux binaries). Files only — folders always listed so navigation is never blocked. Case-insensitive |
 | `sortBy` | `Name` (default) \| `Date` \| `Size` (`FileSystemSortBy`) |
 | `sortAscending` | Default `true` (A→Z / oldest / smallest) |
 

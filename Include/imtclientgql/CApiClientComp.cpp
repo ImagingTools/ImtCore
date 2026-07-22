@@ -89,6 +89,12 @@ IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr,
 }
 
 
+bool CApiClientComp::SendRequestNoWait(GqlRequestPtr /*requestPtr*/, imtbase::IUrlParam* /*urlParamPtr*/) const
+{
+	return false;
+}
+
+
 // protected methods
 
 // reimplemented (icomp::CComponentBase)

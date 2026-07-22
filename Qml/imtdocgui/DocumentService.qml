@@ -282,7 +282,15 @@ QtObject {
 		documentData.isNew = false;
 
 		let onResult = function(){
-			addDocumentToModel(documentId, name, documentTypeId, documentData);
+			// Prefer the name passed by the opener (Topology / collection row). If it was
+			// empty, use the loaded document model name so tabs do not stay "<no name>".
+			let resolvedName = name
+			if ((resolvedName === undefined || resolvedName === null || resolvedName === "")
+					&& documentData.documentDataController
+					&& documentData.documentDataController.documentName){
+				resolvedName = documentData.documentDataController.documentName
+			}
+			addDocumentToModel(documentId, resolvedName, documentTypeId, documentData);
 
 			documentData.documentDataController.modelChanged.disconnect(onResult);
 		}
@@ -363,6 +371,19 @@ QtObject {
 			if (documentData && documentData.isNew){
 				documentData.isNew = false
 				documentsModel.setProperty(documentIndex, "isNew", false);
+			}
+
+			// documentsModel's "name" role is a static snapshot taken when the tab was
+			// created (e.g. the "New service" placeholder passed to insertNewDocument()) -
+			// nothing else ever refreshes it. Pull the confirmed name from the data
+			// controller (its documentName is live-bound to the saved model, e.g.
+			// serviceData.m_name) now that the save completed, so a freshly named/created
+			// document doesn't keep showing its placeholder name forever.
+			if (documentData && documentData.documentDataController){
+				let confirmedName = documentData.documentDataController.getDocumentName();
+				if (confirmedName !== undefined && confirmedName !== "" && confirmedName !== documentsModel.get(documentIndex).name){
+					documentsModel.setProperty(documentIndex, "name", confirmedName);
+				}
 			}
 		}
 

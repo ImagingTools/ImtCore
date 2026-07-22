@@ -725,6 +725,19 @@ QString CDatabaseEngineComp::GetPassword() const
 
 int CDatabaseEngineComp::GetDatabaseVersion() const
 {
+	// A missing "Revisions" table is the expected state before the schema has been created
+	// (first run against a fresh/reset database) - EnsureDatabaseConsistency() already treats
+	// a negative version as "create it" and self-heals right after this call. Check existence
+	// first instead of letting the SELECT fail: ExecSqlQuery() unconditionally logs every
+	// failed statement as an error, so the normal first-run path was showing a scary
+	// "Database query failed: no such table: Revisions" even though nothing was actually wrong.
+	if (!EnsureDatabaseConnected()){
+		return -1;
+	}
+	if (!QSqlDatabase::database(GetConnectionName()).tables().contains(QStringLiteral("Revisions"), Qt::CaseInsensitive)){
+		return -1;
+	}
+
 	QSqlError sqlError;
 	QSqlQuery queryGetRevision = ExecSqlQueryFromFile(GetSqlResourcePath(GetDatabaseDriverId(), QStringLiteral("GetRevision.sql")), &sqlError);
 	if (sqlError.type() != QSqlError::NoError){

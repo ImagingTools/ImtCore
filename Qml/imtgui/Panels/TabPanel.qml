@@ -21,6 +21,9 @@ Rectangle {
 	
 	property alias model: list.model;
 	property alias tabDelegate: list.delegate
+	// Expose the horizontal tab ListView so custom tabDelegate instances can set
+	// TabDelegate.listView (dividers, lastElement, scroll helpers).
+	property alias tabsList: list
 	property Component tabDelegateDecorator: Style.tabPanelDecorator;
 	
 	signal closeItem(int index);
@@ -84,53 +87,112 @@ Rectangle {
 		}
 	}
 	
-	Rectangle {
+	// Compact overflow navigation — flat chevrons that match modern tab chrome
+	// (not a solid block that steals half the strip height).
+	Item {
 		id: externButtons;
-		
+
+		readonly property int navButtonSize: Style.controlHeightM;
+		readonly property int navContentWidth: navButtonSize * 2 + Style.spacingXS + Style.marginS;
+
 		anchors.right: parent.right;
-		
-		width: visible ? height : 0;
+		anchors.verticalCenter: parent.verticalCenter;
+
+		width: visible ? navContentWidth : 0;
 		height: parent.height;
-		
-		color: Style.backgroundColor;
-		
-		visible:  list.contentWidth > tabPanelContainer.maxWidth - height;
-		
-		Button {
-			id: leftButton;
-			
-			anchors.left: externButtons.left;
-			anchors.verticalCenter: externButtons.verticalCenter;
-			
-			width: externButtons.width / 2;
-			height: externButtons.height;
-			
-			enabled: tabPanelContainer.selectedIndex > 0;
-			
-			iconSource: enabled ? "../../../" +  Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal)
-								: "../../../" +  Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled);
-			
-			onClicked: {
-				tabPanelContainer.leftClicked();
+
+		// Reserve space when tabs overflow the available strip width.
+		visible: list.contentWidth > (tabPanelContainer.maxWidth - navContentWidth);
+
+		// Soft fade so scrolling tabs do not hard-cut under the nav cluster.
+		Rectangle {
+			anchors.right: parent.left;
+			anchors.verticalCenter: parent.verticalCenter;
+			width: Style.marginL;
+			height: parent.height;
+			visible: externButtons.visible;
+			// Keep the strip surface; only a light edge cue, not a heavy panel.
+			gradient: Gradient {
+				orientation: Gradient.Horizontal;
+				GradientStop {
+					position: 0.0;
+					color: "transparent";
+				}
+				GradientStop {
+					position: 1.0;
+					color: tabPanelContainer.color;
+				}
 			}
 		}
-		
-		Button {
-			id: rightButton;
-			
-			anchors.right: externButtons.right;
-			anchors.verticalCenter: externButtons.verticalCenter;
-			
-			width: externButtons.width / 2;
-			height: externButtons.height;
-			
-			enabled: tabPanelContainer.selectedIndex < list.count - 1;
-			
-			iconSource: enabled ? "../../../" +  Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal)
-								: "../../../" +  Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled);
-			
-			onClicked: {
-				tabPanelContainer.rightClicked();
+
+		// Thin separator between the last visible tab and the chevrons.
+		Rectangle {
+			anchors.left: parent.left;
+			anchors.verticalCenter: parent.verticalCenter;
+			width: 1;
+			height: parent.height * 0.4;
+			color: Style.borderColor;
+			opacity: 0.5;
+		}
+
+		Row {
+			id: navRow;
+
+			anchors.right: parent.right;
+			anchors.verticalCenter: parent.verticalCenter;
+			anchors.rightMargin: Style.spacingXXS;
+			spacing: Style.spacingXXS;
+
+			Button {
+				id: leftButton;
+
+				width: externButtons.navButtonSize;
+				height: externButtons.navButtonSize;
+				enabled: tabPanelContainer.selectedIndex > 0;
+				opacity: enabled ? 1.0 : 0.4;
+				tooltipText: qsTr("Previous tab");
+				iconSource: enabled
+						? ("../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal))
+						: ("../../../" + Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled));
+				decorator: Component {
+					ButtonDecorator {
+						color: parent.enabled && parent.hovered ? Style.alternateBaseColor : "transparent";
+						radius: Style.radiusM;
+						border.width: 0;
+						icon.width: Style.iconSizeS;
+						icon.height: Style.iconSizeS;
+					}
+				}
+
+				onClicked: {
+					tabPanelContainer.leftClicked();
+				}
+			}
+
+			Button {
+				id: rightButton;
+
+				width: externButtons.navButtonSize;
+				height: externButtons.navButtonSize;
+				enabled: tabPanelContainer.selectedIndex < list.count - 1;
+				opacity: enabled ? 1.0 : 0.4;
+				tooltipText: qsTr("Next tab");
+				iconSource: enabled
+						? ("../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal))
+						: ("../../../" + Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled));
+				decorator: Component {
+					ButtonDecorator {
+						color: parent.enabled && parent.hovered ? Style.alternateBaseColor : "transparent";
+						radius: Style.radiusM;
+						border.width: 0;
+						icon.width: Style.iconSizeS;
+						icon.height: Style.iconSizeS;
+					}
+				}
+
+				onClicked: {
+					tabPanelContainer.rightClicked();
+				}
 			}
 		}
 	}

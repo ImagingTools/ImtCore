@@ -576,7 +576,14 @@ Item {
 		}
 
 		function onCloseTab(index){
+			// Pinned Fixed collection tab must not be closable.
+			if (index >= 0 && index < tabModel.count && tabModel.get(index).pinned){
+				return
+			}
 			let tabId = getTabIdByIndex(index)
+			if (tabId === workspaceView.collectionTabId){
+				return
+			}
 			workspaceView.documentManager.closeDocument(tabId)
 		}
 	}

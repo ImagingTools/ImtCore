@@ -932,6 +932,29 @@ bool CObjectCollectionBase::InsertObjectIntoCollection(ObjectInfo info)
 
 	QWriteLocker locker(&m_lock);
 
+	// Atomic duplicate-id guard. InsertNewObject picks info.id after a *separate* read-locked
+	// GetObjectInfo() check, so two concurrent inserts of the same not-yet-present id can both
+	// pass that check and reach here, appending two elements with identical ids. That is pure
+	// corruption: GetObjectData / SetObjectData / RemoveElements all key by id and then act on
+	// an arbitrary one of the copies (observed live: an agent's service mirror ended up with a
+	// service duplicated, which in turn broke that service's status updates). The id-existence
+	// test must therefore be re-done here, under the same write lock that performs the append,
+	// so the loser of the race is rejected instead of duplicated. Empty ids are left untouched
+	// (that path is unrelated and preserves existing behaviour).
+	if (!info.id.isEmpty()){
+		for (int i = 0; i < m_objects.count(); ++i){
+			if (m_objects[i].id == info.id){
+				locker.unlock();
+
+				if (modelPtr != nullptr){
+					modelPtr->DetachObserver(&m_modelUpdateBridge);
+				}
+
+				return false;
+			}
+		}
+	}
+
 	m_objects.push_back(info);
 
 	return true;

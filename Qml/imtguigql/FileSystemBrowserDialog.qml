@@ -44,9 +44,10 @@ Dialog {
 	property string clientIdHeader: ""
 	property string serviceIdHeader: ""
 	// Semicolon-separated file extensions to show (without dot, e.g. "exe;dll").
-	// Empty = all files. Files-only; folders always listed for navigation. Sent
-	// verbatim to the server, which filters before sort/pagination.
+	// Empty = all files. Token "*" / "none" = extensionless names. Files-only;
+	// folders always listed for navigation. Sent verbatim to the server.
 	property string extensionFilter: ""
+	readonly property bool hasExtensionFilter: root.extensionFilter !== ""
 
 	property string currentPath: ""
 	// Whether a parent exists, kept apart from parentPath: an EMPTY parentPath is
@@ -70,7 +71,8 @@ Dialog {
 	// it is a cheap Int already computed server-side for hasMore.
 	property int totalCount: 0
 
-	// Server-side name filter (substring, case-insensitive). Cleared on navigation.
+	// Server-side name filter (case-insensitive). Default: shell glob (* / ?);
+	// full regex via /pattern/. Cleared on navigation.
 	// Sent as GetFileSystemEntriesInput.nameFilter; totalCount/hasMore reflect it.
 	property string filterText: ""
 	// "name" | "date" | "size" → SDL FileSystemSortBy Name/Date/Size.
@@ -843,6 +845,35 @@ Dialog {
 		return n === 1 ? qsTr("1 selected") : qsTr("%1 selected").arg(n)
 	}
 
+	// Human-readable whitelist for the UI, e.g. "*.exe, *.com, (no extension)".
+	// "*" / "none" mean extensionless file names (Linux binaries).
+	function extensionFilterLabel(){
+		if (!root.hasExtensionFilter)
+			return ""
+		var parts = String(root.extensionFilter).split(";")
+		var labels = []
+		for (var i = 0; i < parts.length; i++){
+			var p = parts[i].trim()
+			if (p === "")
+				continue
+			var lower = p.toLowerCase()
+			if (lower.charAt(0) === ".")
+				lower = lower.substring(1)
+			if (lower === "*" || lower === "none"){
+				labels.push(qsTr("(no extension)"))
+				continue
+			}
+			labels.push("*." + lower)
+		}
+		return labels.join(", ")
+	}
+
+	function extensionFilterHint(){
+		if (!root.hasExtensionFilter)
+			return ""
+		return qsTr("Allowed file types: %1").arg(root.extensionFilterLabel())
+	}
+
 	function statusLabel(){
 		if (root.errorText !== "")
 			return root.errorText
@@ -850,12 +881,16 @@ Dialog {
 			return qsTr("Loading…")
 		if (root.filterText !== "" && entriesModel.count === 0)
 			return qsTr("No items match \"%1\"").arg(root.filterText)
+		if (root.hasExtensionFilter && entriesModel.count === 0 && root.filterText === "")
+			return root.extensionFilterHint()
 		if (root.selectedPaths.length > 0 && !root.selectionIsValid())
 			return root.selectionKindHint()
 		if (root.multiSelect && root.selectedPaths.length > 1)
 			return qsTr("%1 items selected").arg(root.selectedPaths.length)
 		if (root.selectedPath !== "")
 			return root.selectedPath
+		if (root.hasExtensionFilter)
+			return root.extensionFilterHint()
 		return qsTr("Nothing selected")
 	}
 
@@ -1112,6 +1147,40 @@ Dialog {
 				}
 			}
 
+			// Allowed formats strip — explains why non-matching files are hidden.
+			Item {
+				id: extensionHintBar
+
+				anchors.top: toolbar.bottom
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.leftMargin: Style.marginL
+				anchors.rightMargin: Style.marginL
+				anchors.topMargin: root.hasExtensionFilter ? Style.marginS : 0
+				height: root.hasExtensionFilter ? Style.controlHeightS : 0
+				visible: root.hasExtensionFilter
+				clip: true
+
+				Rectangle {
+					anchors.fill: parent
+					radius: Style.radiusS
+					color: Style.alternateBaseColor
+					opacity: 0.65
+				}
+
+				Text {
+					anchors.fill: parent
+					anchors.leftMargin: Style.marginM
+					anchors.rightMargin: Style.marginM
+					verticalAlignment: Text.AlignVCenter
+					elide: Text.ElideRight
+					text: root.extensionFilterHint()
+					color: Style.subtitleColor
+					font.pixelSize: Style.fontSizeS
+					font.italic: true
+				}
+			}
+
 			// Sync filter field when navigation clears filterText.
 			Connections {
 				target: root
@@ -1125,7 +1194,7 @@ Dialog {
 			Item {
 				id: headerRow
 
-				anchors.top: toolbar.bottom
+				anchors.top: extensionHintBar.bottom
 				anchors.topMargin: Style.marginL
 				anchors.left: parent.left
 				anchors.leftMargin: Style.marginL + Style.marginXS
@@ -1462,8 +1531,15 @@ Dialog {
 					id: emptyState
 
 					readonly property bool loadFailed: root.currentPath === "" && root.errorText !== ""
-					readonly property bool filterEmpty: !emptyState.loadFailed
+					readonly property bool nameFilterEmpty: !emptyState.loadFailed
 						&& entriesModel.count === 0 && root.filterText !== "" && root.errorText === ""
+					// Folder has no allowed files (and no navigable dirs to show) under extensionFilter.
+					readonly property bool extensionEmpty: !emptyState.loadFailed
+						&& !emptyState.nameFilterEmpty
+						&& entriesModel.count === 0
+						&& root.hasExtensionFilter
+						&& root.errorText === ""
+					readonly property bool filterEmpty: emptyState.nameFilterEmpty
 
 					anchors.centerIn: parent
 					width: Math.min(parent.width - 2 * Style.marginXL, Style.sizeHintM)
@@ -1474,7 +1550,9 @@ Dialog {
 						width: parent.width
 						horizontalAlignment: Text.AlignHCenter
 						text: emptyState.loadFailed ? qsTr("Can't load this location")
-							: (emptyState.filterEmpty ? qsTr("No matching items") : qsTr("This folder is empty"))
+							: (emptyState.nameFilterEmpty ? qsTr("No matching items")
+								: (emptyState.extensionEmpty ? qsTr("No files of the allowed types")
+									: qsTr("This folder is empty")))
 						color: Style.textColor
 						font.pixelSize: Style.fontSizeL
 						opacity: 0.8
@@ -1487,9 +1565,11 @@ Dialog {
 						wrapMode: Text.WordWrap
 						text: emptyState.loadFailed
 							? root.errorText
-							: (emptyState.filterEmpty
+							: (emptyState.nameFilterEmpty
 								? qsTr("Try a different filter, or clear it to see all items")
-								: ((root.hasParent && !root.atDrivesRoot) ? qsTr("Go up or pick another location") : qsTr("Pick another location")))
+								: (emptyState.extensionEmpty
+									? root.extensionFilterHint()
+									: ((root.hasParent && !root.atDrivesRoot) ? qsTr("Go up or pick another location") : qsTr("Pick another location"))))
 						color: Style.textColor
 						font.pixelSize: Style.fontSizeS
 						opacity: 0.5

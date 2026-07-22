@@ -16,6 +16,13 @@ Item {
 
 	property int mainMargin: Style.marginM;
 	property bool tabVisible: true
+	// Page body behind tab content. Optional override for host surfaces that use
+	// Style.baseColor (defaults keep the global MultiDoc look unchanged).
+	property color contentColor: Style.backgroundColor2
+	// Tab strip surface. Default = Style.tabPanelBackgroundColor (global theme).
+	property color tabPanelColor: Style.tabPanelBackgroundColor
+	// Optional per-instance tab chrome; default is the global Style.tabPanelDecorator.
+	property alias tabDelegateDecorator: tabPanel.tabDelegateDecorator
 
 	signal tabLoaded(int index, string tabId, var tabItem);
 	signal tabClicked(var mouse, var tabItem, int index);
@@ -143,6 +150,7 @@ Item {
 		isCloseEnable: false
 		clip: true;
 		visible: root.tabVisible
+		color: root.tabPanelColor
 		onRightClicked: {
 			if (tabPanel.selectedIndex < root.tabModel.count - 1){
 				tabPanel.selectedIndex++;
@@ -171,7 +179,7 @@ Item {
 		anchors.top: tabPanel.bottom;
 		anchors.bottom: parent.bottom;
 		anchors.right: parent.right;
-		color: Style.backgroundColor2;
+		color: root.contentColor;
 
 		Repeater {
 			id: bodyRepeater;

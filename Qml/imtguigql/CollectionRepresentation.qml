@@ -331,7 +331,12 @@ Item {
 		sdlObjectComp: Component {
 			RemoveElementsPayload {
 				onFinished: {
-					root.elementsRemoved(removeGqlSender.elementIds)
+					// Only notify UI on success — otherwise Topology would clear selection /
+					// reload as if the service were gone while it still exists on the agent.
+					if (m_success){
+						root.elementsRemoved(removeGqlSender.elementIds)
+						root.removed()
+					}
 				}
 			}
 		}
@@ -386,7 +391,8 @@ Item {
 		}
 		
 		function onError(message, type){
-			root.visualStatusReceiveFailed(message)
+			// Match ObjectVisualStatusProvider contract: (objectId, errorMessage).
+			root.visualStatusReceiveFailed(objectVisualStatusInput.m_objectId, message)
 		}
 		
 		function getHeaders(){

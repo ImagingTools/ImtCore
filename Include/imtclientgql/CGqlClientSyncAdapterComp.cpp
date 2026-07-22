@@ -117,6 +117,13 @@ IGqlClient::GqlResponsePtr CGqlClientSyncAdapterComp::SendRequest(GqlRequestPtr 
 }
 
 
+bool CGqlClientSyncAdapterComp::SendRequestNoWait(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr) const
+{
+	IGqlClient::GqlResponsePtr responsePtr = SendRequest(requestPtr, urlParamPtr);
+	return responsePtr.IsValid();
+}
+
+
 // protected methods
 
 // reimplemented (icomp::CComponentBase)
