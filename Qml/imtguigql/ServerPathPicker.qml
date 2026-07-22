@@ -25,7 +25,8 @@ Item {
 	property bool readOnlyPath: false
 	property string placeHolderText: ""
 	// Optional file-extension whitelist (without dots, e.g. ["exe", "dll"]).
-	// Empty = all files shown. Files only; folders are always navigable.
+	// Empty = all files shown. Use "*" to also allow extensionless names
+	// (Linux binaries). Files only; folders are always navigable.
 	property var extensions: []
 
 	signal pathEdited()

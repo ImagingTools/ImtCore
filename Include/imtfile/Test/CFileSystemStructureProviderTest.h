@@ -97,6 +97,11 @@ private slots:
 	// Server-side nameFilter / sortBy (applied before pagination).
 	void NameFilterMatchesSubstringTest();
 	void NameFilterAffectsTotalCountTest();
+	void NameFilterMatchesGlobStarTest();
+	void NameFilterMatchesDelimitedRegexTest();
+	void NameFilterGlobTreatsMetacharactersLiterallyTest();
+	void ExtensionFilterMatchesSuffixTest();
+	void ExtensionFilterStarAllowsExtensionlessTest();
 	void SortByNameDescendingTest();
 	void SortBySizeFilesAfterDirsTest();
 

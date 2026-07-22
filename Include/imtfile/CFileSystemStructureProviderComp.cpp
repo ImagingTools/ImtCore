@@ -5,6 +5,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QCollator>
 #include <QtCore/QFileInfo>
+#include <QtCore/QRegularExpression>
 #include <QtCore/QStorageInfo>
 #include <algorithm>
 
@@ -13,6 +14,67 @@ namespace imtfile
 {
 namespace
 {
+
+
+// Shell-style glob → regex: * = any run of chars, ? = one char; all other
+// regex metacharacters are escaped so "file.txt" and "*.exe" behave as users
+// expect in a file browser (not as raw PCRE, where leading * is invalid).
+QString GlobToRegexPattern(const QString& glob)
+{
+	QString pattern;
+	pattern.reserve(glob.size() * 2);
+	for (const QChar ch : glob){
+		switch (ch.unicode()){
+		case L'*':
+			pattern += QStringLiteral(".*");
+			break;
+		case L'?':
+			pattern += QLatin1Char('.');
+			break;
+		case L'.':
+		case L'(':
+		case L')':
+		case L'[':
+		case L']':
+		case L'{':
+		case L'}':
+		case L'+':
+		case L'|':
+		case L'^':
+		case L'$':
+		case L'\\':
+			pattern += QLatin1Char('\\');
+			pattern += ch;
+			break;
+		default:
+			pattern += ch;
+			break;
+		}
+	}
+	return pattern;
+}
+
+
+// Explicit full regex: /pattern/ (optional trailing junk after the closing slash
+// is ignored). Returns false when the filter is not delimited that way or the
+// inner pattern does not compile.
+bool TryParseDelimitedRegex(const QString& nameFilter, QRegularExpression& outRegex)
+{
+	if (nameFilter.size() < 2 || !nameFilter.startsWith(QLatin1Char('/'))){
+		return false;
+	}
+
+	const int lastSlash = nameFilter.lastIndexOf(QLatin1Char('/'));
+	if (lastSlash <= 0){
+		return false;
+	}
+
+	outRegex.setPattern(nameFilter.mid(1, lastSlash - 1));
+	outRegex.setPatternOptions(
+				QRegularExpression::CaseInsensitiveOption
+				| QRegularExpression::UseUnicodePropertiesOption);
+	return outRegex.isValid();
+}
 
 
 // Lexical containment check that is correct for drive roots. For a normal root
@@ -189,10 +251,31 @@ void CFileSystemStructureProviderComp::ApplyNameFilter(
 		return;
 	}
 
+	// Matching rules (case-insensitive):
+	// 1) /pattern/  → full regular expression (PCRE via QRegularExpression)
+	// 2) otherwise  → shell-style glob: * and ? wildcards; other metacharacters
+	//    are literal (so "*.exe" and "file.txt" work as in Explorer).
+	// 3) if neither compiles, fall back to plain substring contains.
+	//
+	// QString::contains(QRegularExpression) searches anywhere in the name, so
+	// plain text without wildcards still behaves as a substring filter.
+	QRegularExpression regex;
+	bool useRegex = TryParseDelimitedRegex(nameFilter, regex);
+	if (!useRegex){
+		regex.setPattern(GlobToRegexPattern(nameFilter));
+		regex.setPatternOptions(
+					QRegularExpression::CaseInsensitiveOption
+					| QRegularExpression::UseUnicodePropertiesOption);
+		useRegex = regex.isValid();
+	}
+
 	QList<FileSystemEntry> filtered;
 	filtered.reserve(entries.size());
 	for (const FileSystemEntry& entry : entries){
-		if (entry.name.contains(nameFilter, Qt::CaseInsensitive)){
+		const bool matches = useRegex
+				? entry.name.contains(regex)
+				: entry.name.contains(nameFilter, Qt::CaseInsensitive);
+		if (matches){
 			filtered.append(entry);
 		}
 	}
@@ -208,19 +291,27 @@ void CFileSystemStructureProviderComp::ApplyExtensionFilter(
 		return;
 	}
 
-	// Normalize the whitelist once: trim, strip a leading dot, lowercase, drop empties.
+	// Normalize the whitelist once: trim, strip a leading dot, lowercase.
+	// Special token "*" (or "none") allows extensionless file names — needed for
+	// Linux/Unix executables that have no suffix (e.g. "myservice").
 	QStringList allowed;
 	allowed.reserve(extensions.size());
+	bool allowExtensionless = false;
 	for (const QString& ext : extensions){
 		QString normalized = ext.trimmed().toLower();
 		if (normalized.startsWith(QLatin1Char('.'))){
 			normalized = normalized.mid(1);
 		}
-		if (!normalized.isEmpty()){
-			allowed.append(normalized);
+		if (normalized.isEmpty()){
+			continue;
 		}
+		if (normalized == QLatin1String("*") || normalized == QLatin1String("none")){
+			allowExtensionless = true;
+			continue;
+		}
+		allowed.append(normalized);
 	}
-	if (allowed.isEmpty()){
+	if (allowed.isEmpty() && !allowExtensionless){
 		return;
 	}
 
@@ -233,7 +324,14 @@ void CFileSystemStructureProviderComp::ApplyExtensionFilter(
 
 			continue;
 		}
-		if (allowed.contains(QFileInfo(entry.name).suffix().toLower())){
+		const QString suffix = QFileInfo(entry.name).suffix().toLower();
+		if (suffix.isEmpty()){
+			if (allowExtensionless){
+				filtered.append(entry);
+			}
+			continue;
+		}
+		if (allowed.contains(suffix)){
 			filtered.append(entry);
 		}
 	}

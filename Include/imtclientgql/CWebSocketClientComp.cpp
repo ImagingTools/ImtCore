@@ -39,9 +39,9 @@ CWebSocketClientComp::CWebSocketClientComp()
 
 // reimplemented (imtclientgql::IGqlClient)
 
-IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* /*urlParamPtr*/) const
+QByteArray CWebSocketClientComp::BuildRequestEnvelope(const GqlRequestPtr& requestPtr, QString& key) const
 {
-	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
+	key = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
 	QJsonObject dataObject;
 	dataObject["type"] = "query";
@@ -67,7 +67,14 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr reque
 		dataObject["clientid"] = clientId;
 	}
 
-	QByteArray data = QJsonDocument(dataObject).toJson(QJsonDocument::Compact);
+	return QJsonDocument(dataObject).toJson(QJsonDocument::Compact);
+}
+
+
+IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* /*urlParamPtr*/) const
+{
+	QString key;
+	QByteArray data = BuildRequestEnvelope(requestPtr, key);
 
 	m_webSocket.sendTextMessage(data);
 	NetworkOperation networkOperation(100, this);
@@ -96,6 +103,20 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr reque
 	}
 
 	return retVal;
+}
+
+
+bool CWebSocketClientComp::SendRequestNoWait(GqlRequestPtr requestPtr, imtbase::IUrlParam* /*urlParamPtr*/) const
+{
+	QString key;
+	const QByteArray data = BuildRequestEnvelope(requestPtr, key);
+
+	// No NetworkOperation / wait loop: the caller does not need a response, only that the
+	// message was handed to the socket - avoids blocking this component's thread for up to
+	// SendRequest()'s 30s budget for requests whose result is never actually consumed.
+	m_webSocket.sendTextMessage(data);
+
+	return true;
 }
 
 
