@@ -203,6 +203,15 @@ class BaseModel extends ListModel {
 		return retVal
 	}
 
+	copyFrom(sourceObject) {
+		for(let i = 0; i < sourceObject.count; i++){
+			let item = sourceObject.get(i).item
+			this.addElement(item.copyMe())
+		}
+
+		return true
+	}
+
 	createFromJson(json){
 		return this.fromJSON(json);
 	}
