@@ -435,6 +435,38 @@ void CCollectionDocumentServiceTest::OpenDocumentIsLoadingTest()
 }
 
 
+void CCollectionDocumentServiceTest::OpenDocumentCompletesBeforeDataLoadedTest()
+{
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject()));
+	m_managerPtr->GetMockCollection().SetBlockGetObjectData(true);
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	bool loadingStarted = m_managerPtr->GetMockCollection().WaitForGetObjectData(1000);
+	if (!loadingStarted){
+		m_managerPtr->GetMockCollection().ContinueGetObjectData();
+	}
+	QVERIFY2(loadingStarted,
+		"Document data loading should have started");
+
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QVERIFY2(!result.documentId.isEmpty(),
+		"OpenDocument should complete while document data is still loading");
+
+	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+	QCOMPARE(list.size(), 1);
+	QVERIFY2(list[0].isLoading, "Document should remain in loading state");
+
+	m_managerPtr->GetMockCollection().ContinueGetObjectData();
+	QTRY_VERIFY_WITH_TIMEOUT(!m_managerPtr->GetOpenedDocumentList(TEST_USER_ID)[0].isLoading, 1000);
+}
+
+
 void CCollectionDocumentServiceTest::OpenDocumentWithHostTest()
 {
 	imtdoc::IDocumentService::TaskParams params;
