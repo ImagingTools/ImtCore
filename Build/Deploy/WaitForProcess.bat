@@ -48,6 +48,9 @@ if !ELAPSED! GEQ %TIMEOUT_SEC% (
     exit /b 1
 )
 
-timeout /t 2 /nobreak >nul
+REM `timeout` requires an interactive console and fails immediately
+REM ("Input redirection is not supported") on a non-interactive
+REM TeamCity build agent, so use the classic ping-based sleep instead.
+ping -n 3 127.0.0.1 >nul
 set /a ELAPSED+=2
 goto :poll_loop
