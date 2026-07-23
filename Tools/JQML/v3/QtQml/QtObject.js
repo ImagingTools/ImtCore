@@ -36,6 +36,8 @@ class QtObject extends QObject {
     static create(parent = null, properties = {}){
         let obj = super.create(parent, properties)
 
+        if(obj instanceof JQModules.QtQml.BaseClass || obj instanceof JQModules.QtQml.BaseModel) return obj
+
         let isModelChanged = properties.model || properties.modelData
 
         if(properties.model){
@@ -65,16 +67,6 @@ class QtObject extends QObject {
             PropertyAuto.setAuto(obj.__self, 'JQAbstractModel', obj.parent.JQAbstractModel, obj.constructor.meta.JQAbstractModel)
             PropertyAuto.setAuto(obj.__self, 'JQAbstractModelData', obj.parent.JQAbstractModelData, obj.constructor.meta.JQAbstractModelData)
         }
-
-        if(this.meta.modelData.auto){
-            // obj.modelData = ()=>{return obj.JQAbstractModelData}
-        }
-        
-        if(this.meta.model.auto){
-            // obj.model = ()=>{return obj.JQAbstractModel}
-        }
-
-        // obj.index = ()=>{return obj.JQAbstractModel ? obj.JQAbstractModel.index : -1}
 
         return obj
     }

@@ -89,32 +89,95 @@ class BaseClass extends QtObject {
 		propertiesIsConnected: { type: Bool, value: false },
 		owner: { type: Var, value: null },
 		_internal: { type: Var, value: null },
+		isTransaction: { type: Bool, value: false },
+		countChanges: { type: Int, value: 0 },
+		changeList: { type: Var, value: null },
+		removed: { type: Var, value: null },
+		__typename: { type: String, value: '' },
 
 		enableNotificationsChanged: {type:Signal, args:[]},
 		propertiesIsConnectedChanged: {type:Signal, args:[]},
 		ownerChanged: {type:Signal, args:[]},
 		_internalChanged: {type:Signal, args:[]},
+		isTransactionChanged: {type:Signal, args:[]},
+		countChangesChanged: {type:Signal, args:[]},
+		changeListChanged: {type:Signal, args:[]},
+		removedChanged: {type:Signal, args:[]},
+		__typenameChanged: {type:Signal, args:[]},
 
+		internalModelChanged: { type:Signal, args: ['name', 'sender'] },
 		modelChanged: { type:Signal, args: ['changeSet'] },
 		finished: { type:Signal, args: [] },
     })
+	
+	static cachedPoperties = new Set(['__typename'])
 
-	static create(parent = null, properties = {}){
-		let proxy = super.create(parent, properties)
 
-		proxy._internal = Internal.create()
-		proxy._internal.__base = proxy
-
-		return proxy
+	SLOT_internalModelChanged(name, sender){
+		if (this.isTransaction){
+			let changeObj = {"name":name,"sender":sender}
+				this.changeList.push(changeObj)
+				this.countChanges++
+				return
+			}
+		this.modelChanged([{"name":name,"sender":sender}])
 	}
 
-	static cachedPoperties = new Set(['__typename'])
+	startTransaction(){
+		if (this.isTransaction){
+			console.error("Unable to start transaction. Error: transaction already started.")
+
+			return
+		}
+
+		this.changeList = []
+		this.isTransaction = true
+	}
+
+	stopTransaction(){
+		if (!this.isTransaction){
+			console.error("Unable to stop transaction. Error: there is no active transaction.")
+
+			return
+		}
+
+		if (this.countChanges > 0){
+			this.modelChanged(this.changeList)
+
+			this.countChanges = 0
+		}
+
+		this.isTransaction = false
+		delete this.changeList
+	}
+
+	removeAt(key){
+	// get index if value found otherwise -1
+		let index = this.removed ? this.removed.indexOf(key) : -1
+		if (index > -1) { //if found
+			this.removed.splice(index, 1)
+			if(this.removed.length === 0) delete this.removed
+		}
+	}
+
+	containceInRemoved(key){
+		let index = this.removed ? this.removed.indexOf(key) : -1
+		if (index > -1) {
+			return true
+		}
+
+		return false
+	}
+
+	get _internal(){
+		return this.__proxy
+	}
 
 	SLOT_modelChanged(changeSet){
 		if (this.owner && this.owner.enableNotifications && this.owner.modelChanged) {
-			if (this.owner._internal.isTransaction){
-				this.owner._internal.changeList.concat(changeSet)
-				this.owner._internal.countChanges++
+			if (this.owner.isTransaction){
+				this.owner.changeList.concat(changeSet)
+				this.owner.countChanges++
 			}
 			else{
 				this.owner.modelChanged(changeSet)
@@ -129,11 +192,11 @@ class BaseClass extends QtObject {
 	// }
 
 	beginChanges() {
-		this._internal.startTransaction()
+		this.startTransaction()
 	}
 
 	endChanges() {
-		this._internal.stopTransaction()
+		this.stopTransaction()
 	}
 
 	removeKey(key){
@@ -146,8 +209,8 @@ class BaseClass extends QtObject {
 			this[key] = null
 		}
 
-		if(!this._internal.removed) this._internal.removed = []
-		this._internal.removed.push(key)
+		if(!this.removed) this.removed = []
+		this.removed.push(key)
 	}
 
 	connectProperties() {}
@@ -447,7 +510,13 @@ class BaseClass extends QtObject {
 			return false
 		}
 
-		return this.fromObject(obj)
+
+		// for(let key in obj){
+		// 	this[key] = obj[key]
+		// }
+		// return true
+		
+		this.fromObject(obj)
 	}
 
 	escapeSpecialChars(jsonString) {
@@ -459,47 +528,66 @@ class BaseClass extends QtObject {
 		.replace(/\f/g, "\\f")
 	}
 
-	fromObject(sourceObject) {
-		for(let objKey of this.getProperties()){
-			if (!(this.getJSONKeyForProperty(objKey) in sourceObject)){
-				if(this[objKey] && typeof this[objKey] === "object"){
-					if (this[objKey].clear){
-						this[objKey].clear()
+	reviver(key,value){
+		if(!key) return value
+
+		if(value){
+			if(typeof value === 'object'){
+				if(Array.isArray(value)) {
+					let model = BaseModel.create()
+					for(let item of value){
+						model.append({item: item})
 					}
-					if (this[objKey].destroy){
-						this[objKey].destroy()
+					
+					return model
+				} else {
+					let obj = BaseClass.create()
+					for(let key in value){
+						obj[key] = value[key]
 					}
-					this[objKey] = null
+					return obj
 				}
 			}
+
+			return value
 		}
 
-		for (let key in sourceObject) {
-			let _key = "m_" + key[0].toLowerCase() + key.slice(1, key.length)
+		return value
+	}
 
-			this._internal.removeAt(_key)
+	fromObject(sourceObject) {
+		let self = this.__self 
+		for(let _key of this.getProperties()){
+			let key = _key.replace('m_', '')
+			if (!(key in sourceObject)){
+				if(self[_key] && typeof self[_key] === "object"){
+					if (self[_key].clear){
+						self[_key].clear()
+					}
+					if (self[_key].destroy){
+						self[_key].destroy()
+					}
+					self[_key] = null
+				}
+			}
+
+			this.removeAt(_key)
 
 			if (sourceObject[key] === null){
-				this[_key] = null
+				self[_key] = null
 			}
 			else if (typeof sourceObject[key] === "object") {
 				if (Array.isArray(sourceObject[key])) {
 					let component = this.createComponent(_key)
 
-					if (this[_key]) {
-						if (this[_key].clear) {
-							this[_key].clear()
-						}
-					} else {
-						if (component) {
+					if (component) {
+						if(!self[_key]){
 							let obj = BaseModel.create(this)
 							obj.owner = this
-							this[_key] = obj
+							self[_key] = obj
 						}
-					}
 
-					if (component) {
-						this[_key].owner = this
+						self[_key].owner = this
 						for (let sourceObjectInner of sourceObject[key]) {
 							let sourceTypename
 							if (sourceObjectInner['__typename']){
@@ -507,16 +595,16 @@ class BaseClass extends QtObject {
 							}
 							let obj = this.createElement(_key, sourceTypename).createObject(this)
 							obj.fromObject(sourceObjectInner)
-							this[_key].append({ item: obj })
+							self[_key].append({ item: obj })
 							obj.owner = this
 						}
 					}
 					else {
-						this[_key] = sourceObject[key]
+						self[_key] = sourceObject[key]
 					}
 				} else {
 					let obj
-					if (!this[_key]) {
+					if (!self[_key]) {
 						let sourceData = sourceObject[key]
 						let sourceTypename
 						if (sourceData['__typename']){
@@ -525,27 +613,22 @@ class BaseClass extends QtObject {
 						obj = this.createComponent(_key, sourceTypename).createObject(this)
 					}
 					else {
-						obj = this[_key]
+						obj = self[_key]
 					}
 
 					obj.fromObject(sourceObject[key])
-					this[_key] = obj
+					self[_key] = obj
 
 					obj.owner = this
 				}
 			} else {
-				this[_key] = sourceObject[key]
+				self[_key] = sourceObject[key]
 			}
 		}
 
 		this.finished()
 		
 		return true
-	}
-
-	destroy(){
-		if(this._internal) this._internal.destroy()
-		super.destroy()
 	}
 }
 
