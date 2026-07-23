@@ -100,10 +100,12 @@ Item {
 		anchors.top: alertPanel.bottom;
 		anchors.left: parent.left;
 		anchors.right: parent.right;
-		height: visible ? viewBase.commandsPanelHeight : 0;
+		height: visibleState ? viewBase.commandsPanelHeight : 0;
+		visible: visibleState
+
 		objectName: "ViewBase";
-		visible: !viewBase.commandsPanelVisible ? false : headerViewLoader.item && viewBase.commandsController != null;
-		
+		property bool visibleState: !viewBase.commandsPanelVisible ? false : headerViewLoader.item && viewBase.commandsController != null;
+
 		Loader {
 			id: headerViewLoader;
 			anchors.verticalCenter: parent.verticalCenter;
@@ -121,9 +123,11 @@ Item {
 		id: separator;
 		anchors.top: headerViewItem.bottom;
 		width: parent.width;
-		height: visible ? 1 : 0;
+		height: visibleState ? 1 : 0;
 		color: Style.borderColor;
-		visible: !viewBase.commandsPanelVisible ? false : headerViewLoader.item && viewBase.commandsController != null && viewBase.commandsSeparatorVisible
+		visible: visibleState
+		property bool visibleState: !viewBase.commandsPanelVisible ? false : headerViewLoader.item && viewBase.commandsController != null;
+
 		objectName: "ViewBase";
 	}
 	
