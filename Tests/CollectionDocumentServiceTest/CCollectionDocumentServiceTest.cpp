@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QCoreApplication>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QUuid>
 
 
@@ -72,6 +73,18 @@ QByteArray CCollectionDocumentServiceTest::OpenDocumentAndWaitForLoad(
 	}
 
 	auto result = manager.WaitForTaskFinished(taskId);
+	QElapsedTimer timer;
+	timer.start();
+	while (!result.documentId.isEmpty() && timer.elapsed() < 5000) {
+		auto documents = manager.GetOpenedDocumentList(userId);
+		for (const auto& document : documents) {
+			if (document.documentId == result.documentId && !document.isLoading) {
+				return result.documentId;
+			}
+		}
+		QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+	}
+
 	return result.documentId;
 }
 
@@ -432,6 +445,63 @@ void CCollectionDocumentServiceTest::OpenDocumentIsLoadingTest()
 	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	QCOMPARE(list.size(), 1);
 	QVERIFY2(list[0].isLoading, "Opened document should be in loading state initially");
+}
+
+
+void CCollectionDocumentServiceTest::OpenDocumentCompletesBeforeDataLoadedTest()
+{
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject()));
+	m_managerPtr->GetMockCollection().SetBlockGetObjectData(true);
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	bool loadingStarted = m_managerPtr->GetMockCollection().WaitForGetObjectData(1000);
+	if (!loadingStarted){
+		m_managerPtr->GetMockCollection().ContinueGetObjectData();
+	}
+	QVERIFY2(loadingStarted,
+		"Document data loading should have started");
+
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+	m_managerPtr->GetMockCollection().ContinueGetObjectData();
+
+	QVERIFY2(!result.documentId.isEmpty(),
+		"OpenDocument should complete while document data is still loading");
+	QCOMPARE(list.size(), 1);
+	QVERIFY2(list[0].isLoading, "Document should remain in loading state");
+
+	QTRY_VERIFY_WITH_TIMEOUT([this]() {
+		auto documents = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+		return documents.size() == 1 && !documents[0].isLoading;
+	}(), 1000);
+}
+
+
+void CCollectionDocumentServiceTest::OpenDocumentDataLoadFailClosesDocumentTest()
+{
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject()));
+	m_managerPtr->GetMockCollection().SetGetObjectDataShouldFail(true);
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QVERIFY2(!result.documentId.isEmpty(),
+		"OpenDocument should complete before an asynchronous data-load failure");
+
+	QTRY_VERIFY_WITH_TIMEOUT(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID).isEmpty(), 1000);
+	QVERIFY2(m_managerPtr->GetMockEventHandler().CountEventsOfType("DocumentClosedEvent") > 0,
+		"Data-load failure should notify clients that the document was closed");
 }
 
 

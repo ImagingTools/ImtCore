@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QObject>
+#include <QtCore/QSemaphore>
 #include <QtTest/QtTest>
 
 // ACF includes
@@ -174,6 +175,7 @@ public:
 		, m_setObjectDataShouldFail(false)
 		, m_getObjectDataShouldFail(false)
 		, m_setElementNameShouldFail(false)
+		, m_blockGetObjectData(false)
 	{
 	}
 
@@ -182,6 +184,9 @@ public:
 	void SetSetObjectDataShouldFail(bool fail) { m_setObjectDataShouldFail = fail; }
 	void SetGetObjectDataShouldFail(bool fail) { m_getObjectDataShouldFail = fail; }
 	void SetSetElementNameShouldFail(bool fail) { m_setElementNameShouldFail = fail; }
+	void SetBlockGetObjectData(bool block) { m_blockGetObjectData = block; }
+	bool WaitForGetObjectData(int timeout) { return m_getObjectDataStarted.tryAcquire(1, timeout); }
+	void ContinueGetObjectData() { m_continueGetObjectData.release(); }
 
 	void AddObject(const QByteArray& objectId, const QByteArray& typeId, const QString& name,
 		istd::IChangeableSharedPtr dataPtr = istd::IChangeableSharedPtr())
@@ -370,6 +375,11 @@ public:
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr,
 		const iprm::IParamsSet* /*dataConfigurationPtr*/ = nullptr) const override
 	{
+		if (m_blockGetObjectData) {
+			m_getObjectDataStarted.release();
+			m_continueGetObjectData.acquire();
+		}
+
 		if (m_getObjectDataShouldFail) {
 			return false;
 		}
@@ -421,6 +431,9 @@ private:
 	bool m_setObjectDataShouldFail;
 	bool m_getObjectDataShouldFail;
 	bool m_setElementNameShouldFail;
+	bool m_blockGetObjectData;
+	mutable QSemaphore m_getObjectDataStarted;
+	mutable QSemaphore m_continueGetObjectData;
 };
 
 
@@ -662,6 +675,8 @@ private slots:
 	void OpenDocumentUndoManagerFailTest();
 	void OpenDocumentEventFiredTest();
 	void OpenDocumentIsLoadingTest();
+	void OpenDocumentCompletesBeforeDataLoadedTest();
+	void OpenDocumentDataLoadFailClosesDocumentTest();
 	void OpenDocumentWithHostTest();
 	void OpenDocumentMultiplePathSegmentsTest();
 
