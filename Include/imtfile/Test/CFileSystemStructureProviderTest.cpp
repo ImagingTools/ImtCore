@@ -376,6 +376,118 @@ void CFileSystemStructureProviderTest::NameFilterAffectsTotalCountTest()
 }
 
 
+void CFileSystemStructureProviderTest::NameFilterMatchesGlobStarTest()
+{
+	// Explorer-style "*.txt" must match fixture "other.txt" (and not require
+	// users to write a PCRE pattern like .*\.txt$).
+	imtfile::IFileSystemStructureProvider::FileSystemQuery query;
+	query.nameFilter = QStringLiteral("*.txt");
+
+	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
+	QString error;
+	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+
+	QVERIFY2(listing.totalCount >= 1, "Expected at least other.txt from the fixture");
+	bool foundOther = false;
+	for (const auto& entry : listing.entries){
+		QVERIFY2(entry.name.endsWith(QStringLiteral(".txt"), Qt::CaseInsensitive),
+				qPrintable(entry.name));
+		if (entry.name == QStringLiteral("other.txt")){
+			foundOther = true;
+		}
+	}
+	QVERIFY(foundOther);
+}
+
+
+void CFileSystemStructureProviderTest::NameFilterMatchesDelimitedRegexTest()
+{
+	// Full regex is opt-in via /pattern/ so globs stay the default UX.
+	// Anchored: only the fixture file "other.txt".
+	imtfile::IFileSystemStructureProvider::FileSystemQuery query;
+	query.nameFilter = QStringLiteral(R"(/^other\.txt$/)");
+
+	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
+	QString error;
+	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+
+	QCOMPARE(listing.totalCount, 1);
+	QCOMPARE(listing.entries.size(), 1);
+	QCOMPARE(listing.entries.first().name, QStringLiteral("other.txt"));
+	QVERIFY(!listing.hasMore);
+}
+
+
+void CFileSystemStructureProviderTest::NameFilterGlobTreatsMetacharactersLiterallyTest()
+{
+	// In glob mode '[' is literal (escaped), not a character-class opener.
+	CreateFile(QStringLiteral("file[a.txt"));
+
+	imtfile::IFileSystemStructureProvider::FileSystemQuery query;
+	query.nameFilter = QStringLiteral("file[a");
+
+	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
+	QString error;
+	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+
+	QCOMPARE(listing.totalCount, 1);
+	QCOMPARE(listing.entries.size(), 1);
+	QCOMPARE(listing.entries.first().name, QStringLiteral("file[a.txt"));
+}
+
+
+void CFileSystemStructureProviderTest::ExtensionFilterMatchesSuffixTest()
+{
+	CreateFile(QStringLiteral("tool.exe"));
+	CreateFile(QStringLiteral("readme.md"));
+
+	imtfile::IFileSystemStructureProvider::FileSystemQuery query;
+	query.extensions = QStringList{QStringLiteral("exe")};
+
+	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
+	QString error;
+	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+
+	bool foundExe = false;
+	for (const auto& entry : listing.entries){
+		if (entry.type == imtfile::IFileSystemStructureProvider::FileSystemEntry::Type::File){
+			QVERIFY2(entry.name.endsWith(QStringLiteral(".exe"), Qt::CaseInsensitive),
+					qPrintable(entry.name));
+			if (entry.name == QStringLiteral("tool.exe")){
+				foundExe = true;
+			}
+		}
+	}
+	QVERIFY(foundExe);
+}
+
+
+void CFileSystemStructureProviderTest::ExtensionFilterStarAllowsExtensionlessTest()
+{
+	CreateFile(QStringLiteral("myservice"));
+	CreateFile(QStringLiteral("notes.txt"));
+
+	imtfile::IFileSystemStructureProvider::FileSystemQuery query;
+	// "*" = extensionless only for this assertion (no other suffixes).
+	query.extensions = QStringList{QStringLiteral("*")};
+
+	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
+	QString error;
+	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+
+	bool foundBinary = false;
+	for (const auto& entry : listing.entries){
+		if (entry.type == imtfile::IFileSystemStructureProvider::FileSystemEntry::Type::File){
+			QVERIFY2(QFileInfo(entry.name).suffix().isEmpty(), qPrintable(entry.name));
+			if (entry.name == QStringLiteral("myservice")){
+				foundBinary = true;
+			}
+		}
+	}
+	QVERIFY(foundBinary);
+}
+
+
 void CFileSystemStructureProviderTest::SortByNameDescendingTest()
 {
 	imtfile::IFileSystemStructureProvider::FileSystemQuery query;

@@ -921,6 +921,7 @@ class ListView extends Flickable {
         let visibleContentHeight = 0
 
         for (let i in this.__items) {
+            let index = Number(i)
             if (this.__items[i]) {
                 if (isNaN(this.__items[i].width) || this.__items[i].width === Infinity || this.__items[i].width === -Infinity ||
                     isNaN(this.__items[i].height) || this.__items[i].height === Infinity || this.__items[i].height === -Infinity) continue
@@ -935,8 +936,8 @@ class ListView extends Flickable {
                 if (x < minX) minX = x
                 if (y < minY) minY = y
 
-                if (i < firstIndex) firstIndex = i
-                if (i > lastIndex) lastIndex = i
+                if (index < firstIndex) firstIndex = index
+                if (index > lastIndex) lastIndex = index
             }
         }
 

@@ -26,12 +26,16 @@ input GetFileSystemEntriesInput
 	path: String
 	offset: Int
 	limit: Int
-	# Case-insensitive substring filter on the entry display name.
+	# Case-insensitive name filter on the entry display name.
+	# Default: shell-style glob (* = any chars, ? = one char; other characters
+	# are literal — so "*.exe" works). Full PCRE regex when wrapped as /pattern/.
+	# Invalid patterns fall back to literal substring match.
 	# Applied before sort and pagination; totalCount/hasMore reflect the filter.
 	nameFilter: String
 	# Semicolon-separated list of file extensions to include (without the dot,
-	# e.g. "exe;dll"). Case-insensitive; empty/absent = all files. Applies to
-	# files only - folders are always listed so navigation is never blocked.
+	# e.g. "exe;dll"). Case-insensitive; empty/absent = all files. Token "*"
+	# (or "none") allows extensionless file names (Linux executables). Applies
+	# to files only - folders are always listed so navigation is never blocked.
 	# Applied before sort and pagination (totalCount/hasMore reflect it).
 	extensionFilter: String
 	sortBy: FileSystemSortBy
