@@ -235,13 +235,13 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-270" />
         <source>ImagingTools</source>
-        <translation>Strumenti di imaging</translation>
+        <translation>ImagingTools</translation>
     </message>
     <message>
         <location line="+6" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4" />
         <source>. ImagingTools</source>
-        <translation>. Strumenti di imaging</translation>
+        <translation>. ImagingTools</translation>
     </message>
     <message>
         <location line="-2" />
@@ -446,7 +446,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-112" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-120" />
         <source>DocumentInfo</source>
-        <translation type="unfinished" />
+        <translation>Informazioni documento</translation>
     </message>
     <message>
         <location line="+2" />
@@ -500,7 +500,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-98" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-92" />
         <source>^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$</source>
-        <translation type="unfinished" />
+        <translation>^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$</translation>
     </message>
     <message>
         <location line="+12" />
@@ -825,7 +825,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-314" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-270" />
         <source>AddressElements</source>
-        <translation type="unfinished" />
+        <translation>Elementi indirizzo</translation>
     </message>
     <message>
         <location line="-118" />
@@ -843,7 +843,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+30" />
         <location line="+12" />
         <source>NO_USER_MANAGEMENT</source>
-        <translation type="unfinished" />
+        <translation>Nessuna gestione utenti</translation>
     </message>
     <message>
         <location line="-10" />
@@ -861,7 +861,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-10" />
         <location line="+12" />
         <source>OPTIONAL_USER_MANAGEMENT</source>
-        <translation type="unfinished" />
+        <translation>Gestione utenti opzionale</translation>
     </message>
     <message>
         <location line="-10" />
@@ -879,7 +879,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-10" />
         <location line="+12" />
         <source>STRONG_USER_MANAGEMENT</source>
-        <translation type="unfinished" />
+        <translation>Gestione utenti rigorosa</translation>
     </message>
     <message>
         <location line="-434" />
@@ -948,7 +948,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2" />
         <source>Z</source>
-        <translation type="unfinished" />
+        <translation>Z</translation>
     </message>
     <message>
         <location line="+2" />
@@ -959,7 +959,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4" />
         <source>X</source>
-        <translation type="unfinished" />
+        <translation>X</translation>
     </message>
     <message>
         <location line="+2" />
@@ -970,7 +970,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2" />
         <source>Y</source>
-        <translation type="unfinished" />
+        <translation>Y</translation>
     </message>
     <message>
         <location line="+2" />
@@ -1101,7 +1101,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+154" />
         <location line="+62" />
         <source>commodity</source>
-        <translation type="unfinished" />
+        <translation>merce</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1119,7 +1119,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>excise</source>
-        <translation type="unfinished" />
+        <translation>accisa</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1137,7 +1137,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>job</source>
-        <translation type="unfinished" />
+        <translation>lavoro</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1155,7 +1155,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>service</source>
-        <translation type="unfinished" />
+        <translation>servizio</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1173,7 +1173,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>gamblingBet</source>
-        <translation type="unfinished" />
+        <translation>scommessa</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1191,7 +1191,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>gamblingPrize</source>
-        <translation type="unfinished" />
+        <translation>vincita di gioco</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1209,7 +1209,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>lottery</source>
-        <translation type="unfinished" />
+        <translation>lotteria</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1227,7 +1227,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>lotteryPrize</source>
-        <translation type="unfinished" />
+        <translation>vincita di lotteria</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1245,7 +1245,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>intellectualActivity</source>
-        <translation type="unfinished" />
+        <translation>attività intellettuale</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1263,7 +1263,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>payment</source>
-        <translation type="unfinished" />
+        <translation>pagamento</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1281,7 +1281,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>agentCommission</source>
-        <translation type="unfinished" />
+        <translation>commissione agente</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1299,7 +1299,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>pay</source>
-        <translation type="unfinished" />
+        <translation>erogazione</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1317,7 +1317,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>another</source>
-        <translation type="unfinished" />
+        <translation>altro</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1335,7 +1335,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>proprietaryLaw</source>
-        <translation type="unfinished" />
+        <translation>diritto patrimoniale</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1353,7 +1353,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>nonOperatingIncome</source>
-        <translation type="unfinished" />
+        <translation>reddito non operativo</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1371,7 +1371,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>otherContributions</source>
-        <translation type="unfinished" />
+        <translation>altri contributi</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1389,7 +1389,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>merchantTax</source>
-        <translation type="unfinished" />
+        <translation>imposta commerciale</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1407,7 +1407,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>resortFee</source>
-        <translation type="unfinished" />
+        <translation>tassa di soggiorno</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1425,7 +1425,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>deposit</source>
-        <translation type="unfinished" />
+        <translation>deposito</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1443,7 +1443,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>consumption</source>
-        <translation type="unfinished" />
+        <translation>consumo</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1461,7 +1461,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>soleProprietorCPIContributions</source>
-        <translation type="unfinished" />
+        <translation>contributi previdenziali obbligatori del titolare</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1479,7 +1479,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>cpiContributions</source>
-        <translation type="unfinished" />
+        <translation>contributi previdenziali obbligatori</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1497,7 +1497,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>soleProprietorCMIContributions</source>
-        <translation type="unfinished" />
+        <translation>contributi sanitari obbligatori del titolare</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1515,7 +1515,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>cmiContributions</source>
-        <translation type="unfinished" />
+        <translation>contributi sanitari obbligatori</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1533,7 +1533,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>csiContributions</source>
-        <translation type="unfinished" />
+        <translation>contributi sociali obbligatori</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1551,7 +1551,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>casinoPayment</source>
-        <translation type="unfinished" />
+        <translation>pagamento casinò</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1569,7 +1569,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>fundsIssuance</source>
-        <translation type="unfinished" />
+        <translation>erogazione fondi</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1587,7 +1587,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>exciseWithoutMarking</source>
-        <translation type="unfinished" />
+        <translation>prodotto soggetto ad accisa senza marcatura</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1605,7 +1605,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>exciseWithMarking</source>
-        <translation type="unfinished" />
+        <translation>prodotto soggetto ad accisa con marcatura</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1623,7 +1623,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>commodityWithoutMarking</source>
-        <translation type="unfinished" />
+        <translation>merce senza marcatura</translation>
     </message>
     <message>
         <location line="-60" />
@@ -1641,7 +1641,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60" />
         <location line="+62" />
         <source>commodityWithMarking</source>
-        <translation type="unfinished" />
+        <translation>merce con marcatura</translation>
     </message>
     <message>
         <location line="+2" />
@@ -1659,7 +1659,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-150" />
         <location line="+14" />
         <source>fullPrepayment</source>
-        <translation type="unfinished" />
+        <translation>prepagamento totale</translation>
     </message>
     <message>
         <location line="-12" />
@@ -1677,7 +1677,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12" />
         <location line="+14" />
         <source>prepayment</source>
-        <translation type="unfinished" />
+        <translation>prepagamento</translation>
     </message>
     <message>
         <location line="-12" />
@@ -1695,7 +1695,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12" />
         <location line="+14" />
         <source>advance</source>
-        <translation type="unfinished" />
+        <translation>anticipo</translation>
     </message>
     <message>
         <location line="-12" />
@@ -1713,7 +1713,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12" />
         <location line="+14" />
         <source>fullPayment</source>
-        <translation type="unfinished" />
+        <translation>pagamento completo</translation>
     </message>
     <message>
         <location line="-12" />
@@ -1731,7 +1731,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12" />
         <location line="+14" />
         <source>partialPayment</source>
-        <translation type="unfinished" />
+        <translation>pagamento parziale</translation>
     </message>
     <message>
         <location line="-12" />
@@ -1763,7 +1763,7 @@
         <location line="+134" />
         <location line="+10" />
         <source>credit</source>
-        <translation type="unfinished" />
+        <translation>credito</translation>
     </message>
     <message>
         <location line="-128" />
@@ -1781,7 +1781,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-156" />
         <location line="+14" />
         <source>creditPayment</source>
-        <translation type="unfinished" />
+        <translation>pagamento del credito</translation>
     </message>
     <message>
         <location line="+2" />
@@ -1799,7 +1799,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-122" />
         <location line="+48" />
         <source>piece</source>
-        <translation type="unfinished" />
+        <translation>pezzo</translation>
     </message>
     <message>
         <location line="-46" />
@@ -1817,7 +1817,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>gram</source>
-        <translation type="unfinished" />
+        <translation>grammo</translation>
     </message>
     <message>
         <location line="-46" />
@@ -1835,7 +1835,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>kilogram</source>
-        <translation type="unfinished" />
+        <translation>chilogrammo</translation>
     </message>
     <message>
         <location line="-46" />
@@ -1853,7 +1853,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>ton</source>
-        <translation type="unfinished" />
+        <translation>tonnellata</translation>
     </message>
     <message>
         <location line="-46" />
@@ -1871,7 +1871,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>centimeter</source>
-        <translation type="unfinished" />
+        <translation>centimetro</translation>
     </message>
     <message>
         <location line="-46" />
@@ -1889,7 +1889,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>decimeter</source>
-        <translation type="unfinished" />
+        <translation>decimetro</translation>
     </message>
     <message>
         <location line="-46" />
@@ -1907,7 +1907,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>meter</source>
-        <translation type="unfinished" />
+        <translation>metro</translation>
     </message>
     <message>
         <location line="-46" />
@@ -1925,7 +1925,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>squareCentimeter</source>
-        <translation type="unfinished" />
+        <translation>centimetro quadrato</translation>
     </message>
     <message>
         <location line="-46" />
@@ -1943,7 +1943,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>squareDecimeter</source>
-        <translation type="unfinished" />
+        <translation>decimetro quadrato</translation>
     </message>
     <message>
         <location line="-46" />
@@ -1961,7 +1961,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>squareMeter</source>
-        <translation type="unfinished" />
+        <translation>metro quadrato</translation>
     </message>
     <message>
         <location line="-46" />
@@ -1979,7 +1979,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>milliliter</source>
-        <translation type="unfinished" />
+        <translation>millilitro</translation>
     </message>
     <message>
         <location line="-46" />
@@ -1997,7 +1997,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>liter</source>
-        <translation type="unfinished" />
+        <translation>litro</translation>
     </message>
     <message>
         <location line="-46" />
@@ -2015,7 +2015,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>cubicMeter</source>
-        <translation type="unfinished" />
+        <translation>metro cubo</translation>
     </message>
     <message>
         <location line="-46" />
@@ -2033,7 +2033,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>kilowattHour</source>
-        <translation type="unfinished" />
+        <translation>chilowattora</translation>
     </message>
     <message>
         <location line="-46" />
@@ -2051,7 +2051,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>gkal</source>
-        <translation type="unfinished" />
+        <translation>Gcal</translation>
     </message>
     <message>
         <location line="-46" />
@@ -2069,7 +2069,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>day</source>
-        <translation type="unfinished" />
+        <translation>giorno</translation>
     </message>
     <message>
         <location line="-46" />
@@ -2087,7 +2087,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>hour</source>
-        <translation type="unfinished" />
+        <translation>ora</translation>
     </message>
     <message>
         <location line="-46" />
@@ -2105,7 +2105,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>minute</source>
-        <translation type="unfinished" />
+        <translation>minuto</translation>
     </message>
     <message>
         <location line="-46" />
@@ -2123,7 +2123,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>second</source>
-        <translation type="unfinished" />
+        <translation>secondo</translation>
     </message>
     <message>
         <location line="-46" />
@@ -2141,7 +2141,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>kilobyte</source>
-        <translation type="unfinished" />
+        <translation>kilobyte</translation>
     </message>
     <message>
         <location line="-46" />
@@ -2159,7 +2159,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>megabyte</source>
-        <translation type="unfinished" />
+        <translation>megabyte</translation>
     </message>
     <message>
         <location line="-46" />
@@ -2177,7 +2177,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>gigabyte</source>
-        <translation type="unfinished" />
+        <translation>gigabyte</translation>
     </message>
     <message>
         <location line="-46" />
@@ -2195,7 +2195,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>terabyte</source>
-        <translation type="unfinished" />
+        <translation>terabyte</translation>
     </message>
     <message>
         <location line="-46" />
@@ -2213,7 +2213,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46" />
         <location line="+48" />
         <source>otherUnits</source>
-        <translation type="unfinished" />
+        <translation>altre unità</translation>
     </message>
     <message>
         <location line="+2" />
@@ -2231,7 +2231,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+154" />
         <location line="+10" />
         <source>cash</source>
-        <translation type="unfinished" />
+        <translation>contanti</translation>
     </message>
     <message>
         <location line="-8" />
@@ -2249,7 +2249,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8" />
         <location line="+10" />
         <source>electronically</source>
-        <translation type="unfinished" />
+        <translation>elettronicamente</translation>
     </message>
     <message>
         <location line="-8" />
@@ -2267,7 +2267,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8" />
         <location line="+10" />
         <source>prepaid</source>
-        <translation type="unfinished" />
+        <translation>prepagato</translation>
     </message>
     <message>
         <location line="-6" />
@@ -2285,7 +2285,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6" />
         <location line="+10" />
         <source>other</source>
-        <translation type="unfinished" />
+        <translation>altro</translation>
     </message>
     <message>
         <location line="+2" />
@@ -2303,7 +2303,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2" />
         <location line="+8" />
         <source>Sell</source>
-        <translation type="unfinished" />
+        <translation>Vendita</translation>
     </message>
     <message>
         <location line="-6" />
@@ -2321,7 +2321,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6" />
         <location line="+8" />
         <source>Buy</source>
-        <translation type="unfinished" />
+        <translation>Acquisto</translation>
     </message>
     <message>
         <location line="-6" />
@@ -2339,7 +2339,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6" />
         <location line="+8" />
         <source>SellReturn</source>
-        <translation type="unfinished" />
+        <translation>Reso vendita</translation>
     </message>
     <message>
         <location line="-6" />
@@ -2357,7 +2357,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6" />
         <location line="+8" />
         <source>BuyReturn</source>
-        <translation type="unfinished" />
+        <translation>Reso acquisto</translation>
     </message>
     <message>
         <location line="+2" />
@@ -2375,7 +2375,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2" />
         <location line="+2" />
         <source>Receipt</source>
-        <translation type="unfinished" />
+        <translation>Ricevuta</translation>
     </message>
     <message>
         <location line="+6" />
@@ -2393,7 +2393,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-640" />
         <location line="+158" />
         <source>Alias</source>
-        <translation type="unfinished" />
+        <translation>Alias</translation>
     </message>
     <message>
         <location line="-286" />
@@ -2404,7 +2404,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+184" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+184" />
         <source>. xxxx &lt;my company&gt;</source>
-        <translation type="unfinished" />
+        <translation>. xxxx &lt;la mia azienda&gt;</translation>
     </message>
     <message>
         <location line="+4" />
@@ -2443,7 +2443,7 @@
         <location line="+126" />
         <location line="+4" />
         <source>ImagingTools</source>
-        <translation type="unfinished" />
+        <translation>ImagingTools</translation>
     </message>
     <message>
         <location line="-106" />
@@ -2454,7 +2454,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-190" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-190" />
         <source>(C) 2020 ImagingTools GmbH. All rights reserved.</source>
-        <translation type="unfinished" />
+        <translation>(C) 2020 ImagingTools GmbH. Tutti i diritti riservati.</translation>
     </message>
     <message>
         <location line="+6" />
@@ -2505,7 +2505,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-494" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4" />
         <source>PageViewParam</source>
-        <translation type="unfinished" />
+        <translation>Parametro visualizzazione pagina</translation>
     </message>
     <message>
         <location line="+2" />
@@ -2560,7 +2560,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6" />
         <source>qrc:/qml/imtdocgui/MultiDocWorkspacePageView.qml</source>
-        <translation type="unfinished" />
+        <translation>qrc:/qml/imtdocgui/MultiDocWorkspacePageView.qml</translation>
     </message>
     <message>
         <location line="+2" />
@@ -2571,7 +2571,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2" />
         <source>../../imtdocgui/MultiDocWorkspacePageView.qml</source>
-        <translation type="unfinished" />
+        <translation>../../imtdocgui/MultiDocWorkspacePageView.qml</translation>
     </message>
     <message>
         <location line="+8" />
@@ -2582,7 +2582,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+436" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-100" />
         <source>LDAP</source>
-        <translation type="unfinished" />
+        <translation>LDAP</translation>
     </message>
     <message>
         <location line="+2" />
@@ -2777,7 +2777,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-454" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+92" />
         <source>:/qml/imtgui/Settings/DatabaseInput.qml</source>
-        <translation type="unfinished" />
+        <translation>:/qml/imtgui/Settings/DatabaseInput.qml</translation>
     </message>
     <message>
         <location line="+4" />
@@ -2788,7 +2788,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4" />
         <source>:/qml/imtgui/Settings/SettingsTextInput.qml</source>
-        <translation type="unfinished" />
+        <translation>:/qml/imtgui/Settings/SettingsTextInput.qml</translation>
     </message>
     <message>
         <location line="+4" />
@@ -2799,7 +2799,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6" />
         <source>qrc:/qml/imtdocgui/SingleDocumentWorkspacePageView.qml</source>
-        <translation type="unfinished" />
+        <translation>qrc:/qml/imtdocgui/SingleDocumentWorkspacePageView.qml</translation>
     </message>
     <message>
         <location line="+4" />
@@ -2854,7 +2854,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+24" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+36" />
         <source>Icons/Redo</source>
-        <translation type="unfinished" />
+        <translation>Icons/Redo</translation>
     </message>
     <message>
         <location line="+4" />
@@ -2865,7 +2865,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+12" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4" />
         <source>Icons/Undo</source>
-        <translation type="unfinished" />
+        <translation>Icons/Undo</translation>
     </message>
     <message>
         <location line="+2" />
@@ -2887,7 +2887,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2" />
         <source>Icons/History</source>
-        <translation type="unfinished" />
+        <translation>Icons/History</translation>
     </message>
     <message>
         <location line="+4" />
@@ -2898,7 +2898,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8" />
         <source>Icons/Close</source>
-        <translation type="unfinished" />
+        <translation>Icons/Close</translation>
     </message>
     <message>
         <location line="+4" />
@@ -2916,7 +2916,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4" />
         <location line="+8" />
         <source>Icons/Save</source>
-        <translation type="unfinished" />
+        <translation>Icons/Save</translation>
     </message>
     <message>
         <location line="+2" />
@@ -3159,7 +3159,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2" />
         <source>SMTP</source>
-        <translation type="unfinished" />
+        <translation>SMTP</translation>
     </message>
     <message>
         <location line="+2" />
@@ -3170,7 +3170,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+14" />
         <source>465</source>
-        <translation type="unfinished" />
+        <translation>465</translation>
     </message>
     <message>
         <location line="+2" />
@@ -3181,7 +3181,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2" />
         <source>qqmbxszuzxnylorx</source>
-        <translation type="unfinished" />
+        <translation>qqmbxszuzxnylorx</translation>
     </message>
     <message>
         <location line="+2" />
@@ -3192,7 +3192,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4" />
         <source>smtp.gmail.com</source>
-        <translation type="unfinished" />
+        <translation>smtp.gmail.com</translation>
     </message>
     <message>
         <location line="+2" />
@@ -3203,7 +3203,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2" />
         <source>kucherenkord@gmail.com</source>
-        <translation type="unfinished" />
+        <translation>kucherenkord@gmail.com</translation>
     </message>
     <message>
         <location line="+4" />
@@ -3302,7 +3302,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+18" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+8" />
         <source>http://localhost:7778</source>
-        <translation type="unfinished" />
+        <translation>http://localhost:7778</translation>
     </message>
     <message>
         <location line="+8" />
@@ -3345,7 +3345,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-76" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+8" />
         <source>qrc:/qml/imtcolgui/CollectionWorkspacePageView.qml</source>
-        <translation type="unfinished" />
+        <translation>qrc:/qml/imtcolgui/CollectionWorkspacePageView.qml</translation>
     </message>
     <message>
         <location line="+4" />
@@ -3356,7 +3356,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+122" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-72" />
         <source>/// \file $(FilePath)</source>
-        <translation type="unfinished" />
+        <translation>/// \file $(FilePath)</translation>
     </message>
     <message>
         <location line="+16" />
@@ -3440,7 +3440,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4" />
         <source>qrc:/qml/imtguigql/GqlCollectionDocManagerPageView.qml</source>
-        <translation type="unfinished" />
+        <translation>qrc:/qml/imtguigql/GqlCollectionDocManagerPageView.qml</translation>
     </message>
     <message>
         <location line="+2" />
@@ -3462,7 +3462,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2" />
         <source>Icons/Search</source>
-        <translation type="unfinished" />
+        <translation>Icons/Search</translation>
     </message>
     <message>
         <location line="+2" />
@@ -3473,7 +3473,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6" />
         <source>qrc:/qml/imtgui/View/SearchPage.qml</source>
-        <translation type="unfinished" />
+        <translation>qrc:/qml/imtgui/View/SearchPage.qml</translation>
     </message>
     <message>
         <location line="+2" />
@@ -3484,7 +3484,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2" />
         <source>qrc:/qml/imtdocgui/SearchPageSingleDocumentView.qml</source>
-        <translation type="unfinished" />
+        <translation>qrc:/qml/imtdocgui/SearchPageSingleDocumentView.qml</translation>
     </message>
     <message>
         <location line="+2" />
@@ -3495,7 +3495,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6" />
         <source>qrc:/qml/imtauthgui/AdministrationView.qml</source>
-        <translation type="unfinished" />
+        <translation>qrc:/qml/imtauthgui/AdministrationView.qml</translation>
     </message>
     <message>
         <location line="+2" />
@@ -3517,7 +3517,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2" />
         <source>Icons/AdminPanel</source>
-        <translation type="unfinished" />
+        <translation>Icons/AdminPanel</translation>
     </message>
     <message>
         <location line="+2" />
@@ -3528,7 +3528,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+12" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-18" />
         <source>qrc:/qml/imtauthgui/UserActionCollectionView.qml</source>
-        <translation type="unfinished" />
+        <translation>qrc:/qml/imtauthgui/UserActionCollectionView.qml</translation>
     </message>
     <message>
         <location line="+2" />
@@ -3550,7 +3550,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2" />
         <source>Icons/Dashboard</source>
-        <translation type="unfinished" />
+        <translation>Icons/Dashboard</translation>
     </message>
     <message>
         <source>ImagingTools GmbH</source>
@@ -3592,7 +3592,7 @@
         <location line="+6" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-96" />
         <source>? ImagingTools</source>
-        <translation>? Strumenti di imaging</translation>
+        <translation>? ImagingTools</translation>
     </message>
     <message>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8" />
@@ -4027,7 +4027,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+2" />
         <location line="+6" />
         <source>16777215</source>
-        <translation />
+        <translation>16777215</translation>
     </message>
     <message>
         <location line="-81" />
@@ -4237,7 +4237,7 @@
         <location filename="../../../Include/imtloggui/CEventStatisticsViewComp.ui" line="+14" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtloggui/ui_CEventStatisticsViewComp.h" line="+55" />
         <source>ScrollArea</source>
-        <translation />
+        <translation>Area di scorrimento</translation>
     </message>
 </context>
 <context>
@@ -4538,7 +4538,7 @@
         <location line="+43" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1" />
         <source>TextLabel</source>
-        <translation />
+        <translation>Etichetta di testo</translation>
     </message>
 </context>
 <context>
@@ -5424,7 +5424,7 @@
         <location line="+19" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4" />
         <source>Dashboard</source>
-        <translation />
+        <translation>Cruscotto</translation>
     </message>
     <message>
         <location line="+90" />
@@ -6880,7 +6880,7 @@
         <location filename="../../../Include/imtwidgets/CToolButton.ui" line="+14" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtwidgets/ui_CToolButton.h" line="+88" />
         <source>Tool Button</source>
-        <translation />
+        <translation>Pulsante strumento</translation>
     </message>
     <message>
         <location line="+33" />
@@ -7364,7 +7364,7 @@
         <location line="+25" />
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiStatusProviderGuiComp.h" line="+1" />
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;StatusIcon&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation />
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;StatusIcon&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -8685,18 +8685,18 @@ Errori: 0</translation>
         <location line="+4" />
         <location line="+1" />
         <source>RGB</source>
-        <translation type="unfinished" />
+        <translation>RGB</translation>
     </message>
     <message>
         <location line="+3" />
         <location line="+1" />
         <source>RGBA</source>
-        <translation type="unfinished" />
+        <translation>RGBA</translation>
     </message>
     <message>
         <location line="+5" />
         <source>Float</source>
-        <translation type="unfinished" />
+        <translation>Virgola mobile</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CUserInfoMetaInfo.cpp" line="+17" />
@@ -9378,7 +9378,7 @@ ID input: </translation>
     <message>
         <location line="+1" />
         <source>LDAP</source>
-        <translation type="unfinished" />
+        <translation>LDAP</translation>
     </message>
     <message>
         <location line="+67" />
@@ -10602,7 +10602,7 @@ ID input: </translation>
     <message>
         <location line="+0" />
         <source>EditMode</source>
-        <translation />
+        <translation>Modalità modifica</translation>
     </message>
     <message>
         <location line="+1" />
