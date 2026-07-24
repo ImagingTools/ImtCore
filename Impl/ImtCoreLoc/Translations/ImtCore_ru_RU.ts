@@ -196,7 +196,7 @@
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
         <source>. ImagingTools</source>
-        <translation>. Средства обработки изображений</translation>
+        <translation>. ImagingTools</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -213,7 +213,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>ImagingTools</source>
-        <translation>Инструменты для изображений</translation>
+        <translation>ImagingTools</translation>
     </message>
     <message>
         <location line="+826"/>
@@ -3313,7 +3313,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-360"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>? ImagingTools</source>
-        <translation>? Средства обработки изображений</translation>
+        <translation>? ImagingTools</translation>
     </message>
     <message>
         <location line="-6"/>

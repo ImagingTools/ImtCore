@@ -141,7 +141,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+41"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+33"/>
         <source>ImagingTools</source>
-        <translation>أدوات التصوير</translation>
+        <translation>ImagingTools</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -175,7 +175,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
         <source>. ImagingTools</source>
-        <translation>. أدوات التصوير</translation>
+        <translation>. ImagingTools</translation>
     </message>
     <message>
         <location line="+2"/>
