@@ -29,7 +29,11 @@ if "%TARGET_STATE%"=="" (
     exit /b 1
 )
 
-set "STATE_FILE=%TEMP%\_waitforservicestate_%RANDOM%.txt"
+REM Deliberately not %TEMP%-based: on some agents %TEMP% resolves to a
+REM path that isn't writable/valid in this execution context ("The
+REM system cannot find the path specified"). The current directory is
+REM always the build checkout dir here, which is guaranteed to exist.
+set "STATE_FILE=_waitforservicestate_%RANDOM%.txt"
 set /a ELAPSED=0
 
 :poll_loop
