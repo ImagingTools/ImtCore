@@ -31,10 +31,15 @@ class CSubstrateSpecificationDocumentObject;
 class CSubstrateSpecificationDocumentObjectList;
 
 // request forward declarations
+struct GetSubstrateSpecificationListRequestInfo;
 class CGetSubstrateSpecificationListGqlRequest;
+struct GetSubstrateSpecificationRequestInfo;
 class CGetSubstrateSpecificationGqlRequest;
+struct GetOptionsListRequestInfo;
 class CGetOptionsListGqlRequest;
+struct InsertSubstrateSpecificationRequestInfo;
 class CInsertSubstrateSpecificationGqlRequest;
+struct UpdateSubstrateSpecificationRequestInfo;
 class CUpdateSubstrateSpecificationGqlRequest;
 
 class CSubstrateSpecificationCollectionControllerCompBase: public ::imtservergql::CObjectCollectionControllerCompBase

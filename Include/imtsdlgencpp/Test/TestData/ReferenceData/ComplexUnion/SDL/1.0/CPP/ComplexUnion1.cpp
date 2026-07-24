@@ -1,5 +1,4 @@
 #include "ComplexUnion1.h"
-#include "ComplexUnion1_fwd.h"
 
 
 namespace sdl::V1_0::complextest
