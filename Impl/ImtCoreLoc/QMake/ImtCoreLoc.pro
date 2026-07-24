@@ -4,10 +4,9 @@ include($(ACFCONFIGDIR)/QMake/StaticConfig.pri)
 
 HEADERS =
 SOURCES =
-RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
-
 TRANSLATIONS += $$files($$_PRO_FILE_PWD_/../Translations/*.ts, false)
-CONFIG += lrelease
+CONFIG += lrelease embed_translations
+QM_FILES_RESOURCE_PREFIX = Translations
 
 # Set configuration of custom builds:
 # ARX Compiler:

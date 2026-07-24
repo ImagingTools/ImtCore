@@ -10,7 +10,6 @@
       <file alias="ImtCore_pt_PT">Translations/ImtCore_pt_PT.qm</file>
       <file alias="ImtCore_kk_KZ">Translations/ImtCore_kk_KZ.qm</file>
       <file alias="ImtCore_ru_RU">Translations/ImtCore_ru_RU.qm</file>
-      <file alias="ImtCore_sv_SE">Translations/ImtCore_sv_SE.qm</file>
       <file alias="ImtCore_zh_ZH">Translations/ImtCore_zh_ZH.qm</file>
     </qresource>
 </RCC>
