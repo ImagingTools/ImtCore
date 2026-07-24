@@ -1,5 +1,4 @@
 #include "ComplexCollectionFilter.h"
-#include "ComplexCollectionFilter_fwd.h"
 
 
 namespace sdl::V1_0::imtbase
