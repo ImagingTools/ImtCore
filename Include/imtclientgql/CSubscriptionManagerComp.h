@@ -91,6 +91,7 @@ Q_SIGNALS:
 	void OnQueryDataReceived(int resultCode = 1) const;
 
 private:
+	void UpdateCustomerSubscriptionStatuses(const QByteArray& subscriptionId, const QString& message = QString()) const;
 	virtual imtrest::ConstResponsePtr CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const;
 
 	struct PendingAsync

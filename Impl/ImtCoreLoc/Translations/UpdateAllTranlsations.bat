@@ -9,3 +9,4 @@ call Update_fr_FR.bat
 call Update_zh_ZH.bat
 call Update_jp_JP.bat
 call Update_it_IT.bat
+call Update_sv_SE.bat

@@ -583,7 +583,7 @@ CWebSocketClientComp::ConnectionStatusProvider::ConnectionStatusProvider()
 void CWebSocketClientComp::ConnectionStatusProvider::SetConnectionStatus(ConnectionStatus status)
 {
 	if (m_connectionStatus != status){
-		istd::IChangeable::ChangeSet changeSet(status);
+		istd::IChangeable::ChangeSet changeSet(status == CS_CONNECTED ? CF_CONNECTED : CF_DISCONNECTED);
 		istd::CChangeNotifier notifier(this, &changeSet);
 
 		m_connectionStatus = status;

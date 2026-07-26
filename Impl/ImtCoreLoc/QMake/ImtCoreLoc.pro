@@ -7,6 +7,7 @@ SOURCES =
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
 TRANSLATIONS += $$files($$_PRO_FILE_PWD_/../Translations/*.ts, false)
+CONFIG += lrelease
 
 # Set configuration of custom builds:
 # ARX Compiler:

@@ -154,7 +154,7 @@
     <message>
         <location line="+22"/>
         <source>Click to open →</source>
-        <translation type="unfinished"></translation>
+        <translation>Ашу үшін басыңыз →</translation>
     </message>
     <message>
         <location line="+153"/>
@@ -195,8 +195,8 @@
     <message>
         <location line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <source>. Imaging tools</source>
-        <translation>. Imaging tools</translation>
+        <source>. ImagingTools</source>
+        <translation>. ImagingTools</translation>
     </message>
     <message>
         <location line="-6"/>
@@ -212,8 +212,8 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
-        <source>Imaging tools</source>
-        <translation>Imaging tools</translation>
+        <source>ImagingTools</source>
+        <translation>ImagingTools</translation>
     </message>
     <message>
         <location line="+640"/>
@@ -260,7 +260,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-548"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+88"/>
         <source>AddressElements</source>
-        <translation type="unfinished"></translation>
+        <translation>AddressElements</translation>
     </message>
     <message>
         <location line="+622"/>
@@ -269,7 +269,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-234"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-102"/>
         <source>. xxxx &lt;my company&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>. xxxx &lt;менің компаниям&gt;</translation>
     </message>
     <message>
         <location line="+38"/>
@@ -391,7 +391,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-562"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+64"/>
         <source>http://localhost:7778</source>
-        <translation type="unfinished"></translation>
+        <translation>http://localhost:7778</translation>
     </message>
     <message>
         <location line="+588"/>
@@ -456,7 +456,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$</source>
-        <translation type="unfinished"></translation>
+        <translation>^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -483,7 +483,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+58"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+64"/>
         <source>ImtCore</source>
-        <translation type="unfinished"></translation>
+        <translation>ImtCore</translation>
     </message>
     <message>
         <location line="-550"/>
@@ -525,7 +525,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-128"/>
         <source>qrc:/qml/imtcolgui/CollectionWorkspacePageView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtcolgui/CollectionWorkspacePageView.qml</translation>
     </message>
     <message>
         <location line="+34"/>
@@ -570,7 +570,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-182"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+392"/>
         <source>qrc:/qml/imtguigql/GqlCollectionDocManagerPageView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtguigql/GqlCollectionDocManagerPageView.qml</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -579,7 +579,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+26"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+20"/>
         <source>qrc:/qml/imtgui/View/SearchPage.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtgui/View/SearchPage.qml</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -588,7 +588,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>Icons/Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/Search</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -597,7 +597,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>qrc:/qml/imtdocgui/SearchPageSingleDocumentView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtdocgui/SearchPageSingleDocumentView.qml</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -615,7 +615,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
         <source>qrc:/qml/imtauthgui/AdministrationView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtauthgui/AdministrationView.qml</translation>
     </message>
     <message>
         <location line="-4"/>
@@ -647,7 +647,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>/// \file $(FilePath)</source>
-        <translation type="unfinished"></translation>
+        <translation>/// \file $(FilePath)</translation>
     </message>
     <message>
         <location line="-90"/>
@@ -883,7 +883,7 @@
         <location line="+84"/>
         <location line="+4"/>
         <source>ImagingTools</source>
-        <translation type="unfinished"></translation>
+        <translation>ImagingTools</translation>
     </message>
     <message>
         <location line="-84"/>
@@ -901,7 +901,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+20"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>PageViewParam</source>
-        <translation type="unfinished"></translation>
+        <translation>PageViewParam</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -910,7 +910,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-818"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+26"/>
         <source>qrc:/qml/imtdocgui/MultiDocWorkspacePageView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtdocgui/MultiDocWorkspacePageView.qml</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -919,7 +919,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>../../imtdocgui/MultiDocWorkspacePageView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>../../imtdocgui/MultiDocWorkspacePageView.qml</translation>
     </message>
     <message>
         <location line="+68"/>
@@ -928,7 +928,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+714"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+26"/>
         <source>qrc:/qml/imtdocgui/SingleDocumentWorkspacePageView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtdocgui/SingleDocumentWorkspacePageView.qml</translation>
     </message>
     <message>
         <location line="+34"/>
@@ -937,7 +937,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+42"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+42"/>
         <source>Icons/History</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/History</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -1077,7 +1077,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>465</source>
-        <translation type="unfinished"></translation>
+        <translation>465</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1308,7 +1308,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+42"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-244"/>
         <source>#</source>
-        <translation type="unfinished"></translation>
+        <translation>#</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1372,7 +1372,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-740"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+182"/>
         <source>Icons/Conversation</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/Conversation</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -1390,7 +1390,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>Icons/Ticket</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/Ticket</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -1451,7 +1451,7 @@
         <location line="+322"/>
         <location line="+2"/>
         <source>TenantInvitation</source>
-        <translation type="unfinished"></translation>
+        <translation>TenantInvitation</translation>
     </message>
     <message>
         <location line="-34"/>
@@ -1475,7 +1475,7 @@
         <location line="+322"/>
         <location line="+2"/>
         <source>TenantMembership</source>
-        <translation type="unfinished"></translation>
+        <translation>TenantMembership</translation>
     </message>
     <message>
         <location line="-34"/>
@@ -1591,7 +1591,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-140"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+432"/>
         <source>Icons/SupportDesk</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/SupportDesk</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1600,7 +1600,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
         <source>qrc:/qml/imtdeskgui/TicketCollectionView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtdeskgui/TicketCollectionView.qml</translation>
     </message>
     <message>
         <location line="-4"/>
@@ -1637,7 +1637,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <location line="+2"/>
         <source>ChatMessage</source>
-        <translation type="unfinished"></translation>
+        <translation>ChatMessage</translation>
     </message>
     <message>
         <location line="+284"/>
@@ -2507,7 +2507,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-412"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+556"/>
         <source>Icons/AdminPanel</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/AdminPanel</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -2516,7 +2516,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-16"/>
         <source>qrc:/qml/imtauthgui/UserActionCollectionView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtauthgui/UserActionCollectionView.qml</translation>
     </message>
     <message>
         <location line="-4"/>
@@ -2534,7 +2534,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Icons/Dashboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/Dashboard</translation>
     </message>
     <message>
         <location line="+172"/>
@@ -2854,7 +2854,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+364"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-118"/>
         <source>:/qml/imtgui/Settings/SettingsTextInput.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>:/qml/imtgui/Settings/SettingsTextInput.qml</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2863,7 +2863,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
         <source>:/qml/imtgui/Settings/DatabaseInput.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>:/qml/imtgui/Settings/DatabaseInput.qml</translation>
     </message>
     <message>
         <location line="-646"/>
@@ -3046,7 +3046,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-142"/>
         <source>Icons/Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/Redo</translation>
     </message>
     <message>
         <location line="-4"/>
@@ -3060,7 +3060,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
         <location line="+12"/>
         <source>Icons/Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/Save</translation>
     </message>
     <message>
         <location line="-4"/>
@@ -3069,7 +3069,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-16"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
         <source>Icons/Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/Close</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CRoleChangeGeneratorComp.cpp" line="+59"/>
@@ -3097,7 +3097,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+522"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+186"/>
         <source>Icons/Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/Undo</translation>
     </message>
     <message>
         <location line="-596"/>
@@ -3285,8 +3285,8 @@
     <message>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-340"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <source>? Imaging tools</source>
-        <translation>? Imaging tools</translation>
+        <source>? ImagingTools</source>
+        <translation>? ImagingTools</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -3510,7 +3510,7 @@
         <location filename="../../../Include/imtgui/CButtonBasedSelectionGuiComp.ui" line="+20"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CButtonBasedSelectionGuiComp.h" line="+55"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
 </context>
 <context>
@@ -3703,7 +3703,7 @@
         <location line="+34"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+2"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -3725,7 +3725,7 @@
         <location line="+3"/>
         <location line="+3"/>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation>0</translation>
     </message>
     <message>
         <location line="-301"/>
@@ -3739,7 +3739,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+2"/>
         <location line="+6"/>
         <source>16777215</source>
-        <translation type="unfinished"></translation>
+        <translation>16777215</translation>
     </message>
     <message>
         <location line="-81"/>
@@ -3790,7 +3790,7 @@
         <location filename="../../../Include/imtgui/CCustomLayoutWidgetForm.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="+280"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
     <message>
         <location line="+97"/>
@@ -3812,7 +3812,7 @@
         <location line="+1"/>
         <location line="+3"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
         <location line="-7"/>
@@ -3835,7 +3835,7 @@
         <location filename="../../../Include/imtdbgui/CDatabaseLoginSettingsEditorComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+148"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -3927,7 +3927,7 @@
         <location filename="../../../Include/imtdevgui/CDeviceSelectionGuiComp.ui" line="+26"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdevgui/ui_CDeviceSelectionGuiComp.h" line="+73"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
 </context>
 <context>
@@ -3945,7 +3945,7 @@
         <location filename="../../../Include/imtloggui/CEventViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtloggui/ui_CEventViewComp.h" line="+41"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
 </context>
 <context>
@@ -4036,7 +4036,7 @@
         <location filename="../../../Include/imtwidgets/CMenuPanel.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtwidgets/ui_CMenuPanel.h" line="+104"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
 </context>
 <context>
@@ -4045,7 +4045,7 @@
         <location filename="../../../Include/imtgui/CMultiParamsSetGuiComp.ui" line="+32"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiParamsSetGuiComp.h" line="+62"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
 </context>
 <context>
@@ -4054,7 +4054,7 @@
         <location filename="../../../Include/imtgui/CMultiSelectionEditorComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiSelectionEditorComp.h" line="+103"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
     <message>
         <location line="+44"/>
@@ -4110,7 +4110,7 @@
         <location filename="../../../Include/imtgui/CObjectCollectionMetaInfoViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionMetaInfoViewComp.h" line="+77"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
 </context>
 <context>
@@ -4158,13 +4158,13 @@
         <location filename="../../../Include/imtgui/CObjectCollectionViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+264"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
     <message>
         <location line="+37"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+2"/>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation>1</translation>
     </message>
     <message>
         <location line="+105"/>
@@ -4188,7 +4188,7 @@
         <location line="+43"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation>Мәтіндік жапсырма</translation>
     </message>
 </context>
 <context>
@@ -4197,7 +4197,7 @@
         <location filename="../../../Include/imtgui/CPageDecoratorComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPageDecoratorComp.h" line="+145"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
 </context>
 <context>
@@ -4206,31 +4206,31 @@
         <location filename="../../../Include/imtgui/CPaginationGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+123"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
     <message>
         <location line="+85"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+1"/>
         <source>&lt;&lt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;&lt;</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+1"/>
         <source>&lt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;</translation>
     </message>
     <message>
         <location line="+40"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+1"/>
         <source>&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+1"/>
         <source>&gt;&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt;</translation>
     </message>
 </context>
 <context>
@@ -4290,7 +4290,7 @@
         <location filename="../../../Include/imtgui/CPluginStatusViewerComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+62"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
     <message>
         <location line="+25"/>
@@ -4329,7 +4329,7 @@
         <location filename="../../../Include/imtgui/CPopupTestGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+389"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -4415,25 +4415,25 @@
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>5s</source>
-        <translation type="unfinished"></translation>
+        <translation>5s</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>10s</source>
-        <translation type="unfinished"></translation>
+        <translation>10s</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>15s</source>
-        <translation type="unfinished"></translation>
+        <translation>15s</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>20s</source>
-        <translation type="unfinished"></translation>
+        <translation>20s</translation>
     </message>
     <message>
         <location line="+53"/>
@@ -4582,7 +4582,7 @@
         <location filename="../../../Include/imtgui/CProgressDialog.ui" line="+20"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CProgressDialog.h" line="+83"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
     <message>
         <location line="+68"/>
@@ -4597,7 +4597,7 @@
         <location filename="../../../Include/imtauthgui/CRemoteStandardLoginGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+390"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
     <message>
         <location line="+89"/>
@@ -4710,7 +4710,7 @@
         <location filename="../../../Include/imtgui/CSimpleAttributeManagerViewComp.ui" line="+20"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CSimpleAttributeManagerViewComp.h" line="+55"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
 </context>
 <context>
@@ -4719,7 +4719,7 @@
         <location filename="../../../Include/imtauthgui/CStandardAccountMenuComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardAccountMenuComp.h" line="+158"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
     <message>
         <location line="+96"/>
@@ -4781,7 +4781,7 @@
         <location filename="../../../Include/imtauthgui/CStandardLoginGuiComp.ui" line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+326"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
     <message>
         <location line="+156"/>
@@ -5051,7 +5051,7 @@
         <location line="+1"/>
         <location line="+1"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
         <location line="+35"/>
@@ -5096,7 +5096,7 @@
         <location filename="../../../Include/imtgui/CTimeFilterParamEditorComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+95"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -6324,7 +6324,7 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentService.qml" line="+9"/>
         <source>&lt;no name&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;атауы жоқ&gt;</translation>
     </message>
     <message>
         <location line="+286"/>
@@ -6344,7 +6344,7 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentServiceBase.qml" line="+117"/>
         <source>&lt;no name&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;атауы жоқ&gt;</translation>
     </message>
 </context>
 <context>
@@ -6689,7 +6689,7 @@
         <location line="+33"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtwidgets/ui_CToolButton.h" line="+1"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
         <location line="+35"/>
@@ -7008,7 +7008,7 @@
     <message>
         <location line="+13"/>
         <source>Only the symbols &lt;a-f&gt; and &lt;0 - 9&gt; may be included</source>
-        <translation type="unfinished"></translation>
+        <translation>Тек &lt;a-f&gt; және &lt;0 - 9&gt; таңбаларын қолдануға болады</translation>
     </message>
 </context>
 <context>
@@ -7170,13 +7170,13 @@
         <location filename="../../../Include/imtgui/CMultiStatusProviderGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiStatusProviderGuiComp.h" line="+92"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
     <message>
         <location line="+25"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiStatusProviderGuiComp.h" line="+1"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;StatusIcon&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Күй белгішесі&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -7855,7 +7855,7 @@
     <message>
         <location line="+7"/>
         <source>%1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1</translation>
     </message>
     <message>
         <location filename="../../../Include/imtgeo/CAddressControllerComp.cpp" line="-129"/>
@@ -8026,7 +8026,7 @@
     <message>
         <location filename="../../../Include/imtimg/CBitmapMetaInfoCreatorComp.cpp" line="-28"/>
         <source> bits</source>
-        <translation type="unfinished"></translation>
+        <translation> бит</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -8042,18 +8042,18 @@
         <location line="+4"/>
         <location line="+1"/>
         <source>RGB</source>
-        <translation type="unfinished"></translation>
+        <translation>RGB</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+1"/>
         <source>RGBA</source>
-        <translation type="unfinished"></translation>
+        <translation>RGBA</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Float</source>
-        <translation type="unfinished"></translation>
+        <translation>Жылжымалы нүкте</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlic/CProductInstanceMetaInfo.cpp" line="+18"/>
@@ -8170,7 +8170,7 @@
     <message>
         <location filename="../../../Include/imtloggui/CEventItemBase.cpp" line="+66"/>
         <source>UNKNOWN</source>
-        <translation type="unfinished"></translation>
+        <translation>БЕЛГІСІЗ</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -8180,17 +8180,17 @@
     <message>
         <location line="+2"/>
         <source>WARNING</source>
-        <translation type="unfinished"></translation>
+        <translation>ЕСКЕРТУ</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>ERROR</source>
-        <translation type="unfinished"></translation>
+        <translation>ҚАТЕ</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>CRITICAL</source>
-        <translation type="unfinished"></translation>
+        <translation>СЫНИ</translation>
     </message>
     <message>
         <location line="+30"/>
@@ -8238,7 +8238,10 @@
 Warnings: %2
 Noks: %3
 Errors: %4</source>
-        <translation type="unfinished"></translation>
+        <translation>Сәтті: %1
+Ескертулер: %2
+Қателер: %3
+Сыни қателер: %4</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -8246,12 +8249,15 @@ Errors: %4</source>
 Warnings: 0
 Noks: 0
 Errors: 0</source>
-        <translation type="unfinished"></translation>
+        <translation>Сәтті: 0
+Ескертулер: 0
+Қателер: 0
+Сыни қателер: 0</translation>
     </message>
     <message>
         <location line="+367"/>
         <source>Oks</source>
-        <translation type="unfinished"></translation>
+        <translation>Сәтті</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -8261,7 +8267,7 @@ Errors: 0</source>
     <message>
         <location line="+1"/>
         <source>Noks</source>
-        <translation type="unfinished"></translation>
+        <translation>Қателер</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -8507,7 +8513,10 @@ Errors: 0</source>
 	| Table could not be created
 	| Error: %1
 	| Query: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>
+	| Кестені жасау мүмкін болмады
+	| Қате: %1
+	| Сұраныс: %2</translation>
     </message>
     <message>
         <location filename="../../../Include/imthypegui/CTaskSettingsGuiComp.cpp" line="+264"/>
@@ -8800,7 +8809,7 @@ Errors: 0</source>
         <location filename="../../../Include/imtgui/CSingleStatusProviderGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CSingleStatusProviderGuiComp.h" line="+59"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Пішін</translation>
     </message>
 </context>
 <context>
@@ -8952,7 +8961,8 @@ Errors: 0</source>
         <location line="+1"/>
         <source>Do you want to save your changes made in document
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Құжатта жасалған өзгерістерді сақтағыңыз келе ме
+%1</translation>
     </message>
     <message>
         <location line="+125"/>
@@ -8981,13 +8991,15 @@ Errors: 0</source>
         <location line="+1"/>
         <source>
 User-ID: </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Пайдаланушы ID: </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>
 Input-ID: </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Кіріс ID: </translation>
     </message>
 </context>
 <context>
@@ -11250,7 +11262,10 @@ Input-ID: </source>
 	| Table could not be created
 	| Error: %1
 	| Query: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>
+	| Кестені жасау мүмкін болмады
+	| Қате: %1
+	| Сұраныс: %2</translation>
     </message>
 </context>
 <context>
@@ -11508,12 +11523,12 @@ Input-ID: </source>
         <location filename="../../../Include/imtgui/CMultiDocumentWorkspaceGuiCompBase.cpp" line="+130"/>
         <location line="+534"/>
         <source>&lt;no name&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;атауы жоқ&gt;</translation>
     </message>
     <message>
         <location line="-525"/>
         <source>%1 &lt;%2&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 &lt;%2&gt;</translation>
     </message>
     <message>
         <location line="+230"/>
@@ -11887,7 +11902,7 @@ Input-ID: </source>
         <location line="+416"/>
         <location line="+154"/>
         <source>&lt;unnamed&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;атаусыз&gt;</translation>
     </message>
 </context>
 <context>
@@ -12321,7 +12336,7 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtlicgui/CProductInstanceInfoEditorComp.cpp" line="+162"/>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete"></translation>
     </message>
     <message>
         <location line="+4"/>
@@ -12569,7 +12584,7 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtqml/CDocumentServiceController.cpp" line="+370"/>
         <source>&lt;no name&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;атауы жоқ&gt;</translation>
     </message>
     <message>
         <location line="+301"/>

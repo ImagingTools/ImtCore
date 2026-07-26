@@ -36,7 +36,7 @@
     <message>
         <location filename="../../../Qml/imtauthgui/AdministrationUi.qml" line="+12"/>
         <source>Administration</source>
-        <translation type="unfinished"></translation>
+        <translation>管理</translation>
     </message>
 </context>
 <context>
@@ -45,19 +45,19 @@
         <location filename="../../../Qml/imtauthgui/AdministrationView.qml" line="+44"/>
         <location line="+99"/>
         <source>Roles</source>
-        <translation type="unfinished"></translation>
+        <translation>ロール</translation>
     </message>
     <message>
         <location line="-94"/>
         <location line="+102"/>
         <source>Users</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー</translation>
     </message>
     <message>
         <location line="-97"/>
         <location line="+105"/>
         <source>Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>グループ</translation>
     </message>
 </context>
 <context>
@@ -65,42 +65,42 @@
     <message>
         <location filename="../../../Qml/imtgui/Application/ApplicationMain.qml" line="+84"/>
         <source>Try connecting to authorization server ...</source>
-        <translation type="unfinished"></translation>
+        <translation>認可サーバーに接続を試みています ...</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Authorization server connection error</source>
-        <translation type="unfinished"></translation>
+        <translation>認可サーバー接続エラー</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Try connecting to </source>
-        <translation type="unfinished"></translation>
+        <translation>接続を試みています: </translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Server connection error</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー接続エラー</translation>
     </message>
     <message>
         <location line="+229"/>
         <source>Network</source>
-        <translation type="unfinished"></translation>
+        <translation>ネットワーク</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>一般</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>製品について</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>PAT Tokens</source>
-        <translation type="unfinished"></translation>
+        <translation>PATトークン</translation>
     </message>
 </context>
 <context>
@@ -227,21 +227,21 @@
         <location line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-222"/>
         <source>Design token generator</source>
-        <translation type="unfinished"></translation>
+        <translation>デザイントークンジェネレーター</translation>
     </message>
     <message>
         <location line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-270"/>
-        <source>Imaging tools</source>
-        <translation type="unfinished"></translation>
+        <source>ImagingTools</source>
+        <translation>ImagingTools</translation>
     </message>
     <message>
         <location line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
-        <source>. Imaging tools</source>
-        <translation type="unfinished"></translation>
+        <source>. ImagingTools</source>
+        <translation>. ImagingTools</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -249,7 +249,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
         <source>Client (CommandLine)</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアント (CommandLine)</translation>
     </message>
     <message>
         <location line="+376"/>
@@ -281,7 +281,7 @@
         <location line="+8"/>
         <location line="+122"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー</translation>
     </message>
     <message>
         <location line="-126"/>
@@ -306,7 +306,7 @@
         <location line="+152"/>
         <location line="+136"/>
         <source>Settings</source>
-        <translation type="unfinished">設定</translation>
+        <translation>設定</translation>
     </message>
     <message>
         <location line="-592"/>
@@ -338,7 +338,7 @@
         <location line="+12"/>
         <location line="+86"/>
         <source>Preference File</source>
-        <translation type="unfinished"></translation>
+        <translation>設定ファイル</translation>
     </message>
     <message>
         <location line="-90"/>
@@ -356,7 +356,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-260"/>
         <location line="+140"/>
         <source>Light</source>
-        <translation type="unfinished">明るい</translation>
+        <translation>ライト</translation>
     </message>
     <message>
         <location line="-224"/>
@@ -374,7 +374,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-138"/>
         <location line="+140"/>
         <source>Dark</source>
-        <translation type="unfinished">暗い</translation>
+        <translation>ダーク</translation>
     </message>
     <message>
         <location line="-584"/>
@@ -399,7 +399,7 @@
         <location line="+46"/>
         <location line="+124"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>言語</translation>
     </message>
     <message>
         <location line="-58"/>
@@ -417,7 +417,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-168"/>
         <location line="+46"/>
         <source>Design Schema</source>
-        <translation type="unfinished"></translation>
+        <translation>デザインスキーマ</translation>
     </message>
     <message>
         <location line="-430"/>
@@ -435,7 +435,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <location line="+122"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>一般</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -446,7 +446,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-112"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-120"/>
         <source>DocumentInfo</source>
-        <translation type="unfinished"></translation>
+        <translation>DocumentInfo</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -457,7 +457,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>Network</source>
-        <translation type="unfinished"></translation>
+        <translation>ネットワーク</translation>
     </message>
     <message>
         <location line="-372"/>
@@ -489,7 +489,7 @@
         <location line="+96"/>
         <location line="+2"/>
         <source>Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>環境設定</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -500,7 +500,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-98"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-92"/>
         <source>^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$</source>
-        <translation type="unfinished"></translation>
+        <translation>^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -511,7 +511,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+12"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>Instance Mask</source>
-        <translation type="unfinished"></translation>
+        <translation>インスタンスマスク</translation>
     </message>
     <message>
         <location line="-4"/>
@@ -522,7 +522,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>Database Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>データベース設定</translation>
     </message>
     <message>
         <location line="+160"/>
@@ -533,7 +533,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-166"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-322"/>
         <source>Users</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -551,7 +551,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <location line="+36"/>
         <source>Roles</source>
-        <translation type="unfinished"></translation>
+        <translation>ロール</translation>
     </message>
     <message>
         <location line="-32"/>
@@ -562,7 +562,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-32"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-32"/>
         <source>Role Name</source>
-        <translation type="unfinished"></translation>
+        <translation>ロール名</translation>
     </message>
     <message>
         <location line="-126"/>
@@ -573,7 +573,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+202"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+340"/>
         <source>Close</source>
-        <translation type="unfinished">閉じる</translation>
+        <translation>閉じる</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -591,7 +591,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-188"/>
         <location line="+204"/>
         <source>Redo</source>
-        <translation type="unfinished">やり直し</translation>
+        <translation>やり直し</translation>
     </message>
     <message>
         <location line="-104"/>
@@ -616,7 +616,7 @@
         <location line="+194"/>
         <location line="+8"/>
         <source>Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location line="-120"/>
@@ -634,7 +634,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-198"/>
         <location line="+206"/>
         <source>Undo</source>
-        <translation type="unfinished">取り消し</translation>
+        <translation>取り消し</translation>
     </message>
     <message>
         <location line="-636"/>
@@ -659,7 +659,7 @@
         <location line="+72"/>
         <location line="+186"/>
         <source>New</source>
-        <translation type="unfinished">新規</translation>
+        <translation>新規</translation>
     </message>
     <message>
         <source>Add</source>
@@ -695,7 +695,7 @@
         <location line="+104"/>
         <location line="+78"/>
         <source>Remove</source>
-        <translation type="unfinished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -710,7 +710,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-166"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-308"/>
         <source>Group Name</source>
-        <translation type="unfinished"></translation>
+        <translation>グループ名</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CRoleChangeGeneratorComp.cpp" line="+59"/>
@@ -722,7 +722,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-14"/>
         <source>Role-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ロールID</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -750,7 +750,7 @@
         <location line="+14"/>
         <location line="+190"/>
         <source>Description</source>
-        <translation type="unfinished">説明</translation>
+        <translation>説明</translation>
     </message>
     <message>
         <location line="-7"/>
@@ -763,7 +763,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-568"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-182"/>
         <source>Name</source>
-        <translation type="unfinished">名前</translation>
+        <translation>名前</translation>
     </message>
     <message>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="+2"/>
@@ -774,7 +774,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Email</source>
-        <translation type="unfinished"></translation>
+        <translation>メール</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -785,7 +785,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>System Name</source>
-        <translation type="unfinished"></translation>
+        <translation>システム名</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -796,7 +796,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>グループ</translation>
     </message>
     <message>
         <location line="-332"/>
@@ -814,7 +814,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+386"/>
         <location line="+8"/>
         <source>Client</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアント</translation>
     </message>
     <message>
         <source>Product</source>
@@ -829,7 +829,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-314"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-270"/>
         <source>AddressElements</source>
-        <translation type="unfinished"></translation>
+        <translation>AddressElements</translation>
     </message>
     <message>
         <location line="-118"/>
@@ -847,7 +847,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+30"/>
         <location line="+12"/>
         <source>NO_USER_MANAGEMENT</source>
-        <translation type="unfinished"></translation>
+        <translation>NO_USER_MANAGEMENT</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -865,7 +865,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-10"/>
         <location line="+12"/>
         <source>OPTIONAL_USER_MANAGEMENT</source>
-        <translation type="unfinished"></translation>
+        <translation>OPTIONAL_USER_MANAGEMENT</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -883,7 +883,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-10"/>
         <location line="+12"/>
         <source>STRONG_USER_MANAGEMENT</source>
-        <translation type="unfinished"></translation>
+        <translation>STRONG_USER_MANAGEMENT</translation>
     </message>
     <message>
         <location line="-434"/>
@@ -912,7 +912,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-290"/>
         <location line="+252"/>
         <source>Import</source>
-        <translation type="unfinished">インポート</translation>
+        <translation>インポート</translation>
     </message>
     <message>
         <location line="-506"/>
@@ -930,7 +930,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-250"/>
         <location line="+260"/>
         <source>Export</source>
-        <translation type="unfinished">エクスポート</translation>
+        <translation>エクスポート</translation>
     </message>
     <message>
         <location line="-500"/>
@@ -952,7 +952,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Z</source>
-        <translation type="unfinished"></translation>
+        <translation>Z</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -963,7 +963,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation>X</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -974,7 +974,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>Y</source>
-        <translation type="unfinished"></translation>
+        <translation>Y</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1076,7 +1076,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+8"/>
         <source>Design</source>
-        <translation type="unfinished"></translation>
+        <translation>デザイン</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1087,7 +1087,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>Text file</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストファイル</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1105,7 +1105,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+154"/>
         <location line="+62"/>
         <source>commodity</source>
-        <translation type="unfinished"></translation>
+        <translation>商品</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1123,7 +1123,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>excise</source>
-        <translation type="unfinished"></translation>
+        <translation>物品税品</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1141,7 +1141,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>job</source>
-        <translation type="unfinished"></translation>
+        <translation>作業</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1159,7 +1159,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>service</source>
-        <translation type="unfinished"></translation>
+        <translation>サービス</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1177,7 +1177,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>gamblingBet</source>
-        <translation type="unfinished"></translation>
+        <translation>賭博の賭け金</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1195,7 +1195,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>gamblingPrize</source>
-        <translation type="unfinished"></translation>
+        <translation>賭博の賞金</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1213,7 +1213,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>lottery</source>
-        <translation type="unfinished"></translation>
+        <translation>宝くじ</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1231,7 +1231,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>lotteryPrize</source>
-        <translation type="unfinished"></translation>
+        <translation>宝くじの賞金</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1249,7 +1249,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>intellectualActivity</source>
-        <translation type="unfinished"></translation>
+        <translation>知的活動成果</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1267,7 +1267,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>payment</source>
-        <translation type="unfinished"></translation>
+        <translation>支払い</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1285,7 +1285,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>agentCommission</source>
-        <translation type="unfinished"></translation>
+        <translation>代理店手数料</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1303,7 +1303,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>pay</source>
-        <translation type="unfinished"></translation>
+        <translation>支払</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1321,7 +1321,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>another</source>
-        <translation type="unfinished"></translation>
+        <translation>その他</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1339,7 +1339,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>proprietaryLaw</source>
-        <translation type="unfinished"></translation>
+        <translation>財産権</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1357,7 +1357,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>nonOperatingIncome</source>
-        <translation type="unfinished"></translation>
+        <translation>営業外収益</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1375,7 +1375,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>otherContributions</source>
-        <translation type="unfinished"></translation>
+        <translation>その他の拠出金</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1393,7 +1393,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>merchantTax</source>
-        <translation type="unfinished"></translation>
+        <translation>商業税</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1411,7 +1411,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>resortFee</source>
-        <translation type="unfinished"></translation>
+        <translation>リゾート料金</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1429,7 +1429,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>deposit</source>
-        <translation type="unfinished"></translation>
+        <translation>預り金</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1447,7 +1447,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>consumption</source>
-        <translation type="unfinished"></translation>
+        <translation>消費</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1465,7 +1465,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>soleProprietorCPIContributions</source>
-        <translation type="unfinished"></translation>
+        <translation>個人事業主の年金保険拠出金</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1483,7 +1483,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>cpiContributions</source>
-        <translation type="unfinished"></translation>
+        <translation>年金保険拠出金</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1501,7 +1501,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>soleProprietorCMIContributions</source>
-        <translation type="unfinished"></translation>
+        <translation>個人事業主の医療保険拠出金</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1519,7 +1519,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>cmiContributions</source>
-        <translation type="unfinished"></translation>
+        <translation>医療保険拠出金</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1537,7 +1537,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>csiContributions</source>
-        <translation type="unfinished"></translation>
+        <translation>社会保険拠出金</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1555,7 +1555,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>casinoPayment</source>
-        <translation type="unfinished"></translation>
+        <translation>カジノ支払い</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1573,7 +1573,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>fundsIssuance</source>
-        <translation type="unfinished"></translation>
+        <translation>資金の払い出し</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1591,7 +1591,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>exciseWithoutMarking</source>
-        <translation type="unfinished"></translation>
+        <translation>マーキングなし物品税品</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1609,7 +1609,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>exciseWithMarking</source>
-        <translation type="unfinished"></translation>
+        <translation>マーキングあり物品税品</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1627,7 +1627,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>commodityWithoutMarking</source>
-        <translation type="unfinished"></translation>
+        <translation>マーキングなし商品</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1645,7 +1645,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>commodityWithMarking</source>
-        <translation type="unfinished"></translation>
+        <translation>マーキングあり商品</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1663,7 +1663,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-150"/>
         <location line="+14"/>
         <source>fullPrepayment</source>
-        <translation type="unfinished"></translation>
+        <translation>全額前払い</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1681,7 +1681,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
         <location line="+14"/>
         <source>prepayment</source>
-        <translation type="unfinished"></translation>
+        <translation>前払い</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1699,7 +1699,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
         <location line="+14"/>
         <source>advance</source>
-        <translation type="unfinished"></translation>
+        <translation>前受金</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1717,7 +1717,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
         <location line="+14"/>
         <source>fullPayment</source>
-        <translation type="unfinished"></translation>
+        <translation>全額決済</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1735,7 +1735,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
         <location line="+14"/>
         <source>partialPayment</source>
-        <translation type="unfinished"></translation>
+        <translation>一部決済</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1767,7 +1767,7 @@
         <location line="+134"/>
         <location line="+10"/>
         <source>credit</source>
-        <translation type="unfinished"></translation>
+        <translation>信用取引</translation>
     </message>
     <message>
         <location line="-128"/>
@@ -1785,7 +1785,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-156"/>
         <location line="+14"/>
         <source>creditPayment</source>
-        <translation type="unfinished"></translation>
+        <translation>信用取引の支払い</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1803,7 +1803,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-122"/>
         <location line="+48"/>
         <source>piece</source>
-        <translation type="unfinished"></translation>
+        <translation>個</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -1821,7 +1821,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>gram</source>
-        <translation type="unfinished"></translation>
+        <translation>グラム</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -1839,7 +1839,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>kilogram</source>
-        <translation type="unfinished"></translation>
+        <translation>キログラム</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -1857,7 +1857,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>ton</source>
-        <translation type="unfinished"></translation>
+        <translation>トン</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -1875,7 +1875,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>centimeter</source>
-        <translation type="unfinished"></translation>
+        <translation>センチメートル</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -1893,7 +1893,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>decimeter</source>
-        <translation type="unfinished"></translation>
+        <translation>デシメートル</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -1911,7 +1911,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>meter</source>
-        <translation type="unfinished"></translation>
+        <translation>メートル</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -1929,7 +1929,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>squareCentimeter</source>
-        <translation type="unfinished"></translation>
+        <translation>平方センチメートル</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -1947,7 +1947,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>squareDecimeter</source>
-        <translation type="unfinished"></translation>
+        <translation>平方デシメートル</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -1965,7 +1965,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>squareMeter</source>
-        <translation type="unfinished"></translation>
+        <translation>平方メートル</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -1983,7 +1983,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>milliliter</source>
-        <translation type="unfinished"></translation>
+        <translation>ミリリットル</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2001,7 +2001,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>liter</source>
-        <translation type="unfinished"></translation>
+        <translation>リットル</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2019,7 +2019,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>cubicMeter</source>
-        <translation type="unfinished"></translation>
+        <translation>立方メートル</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2037,7 +2037,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>kilowattHour</source>
-        <translation type="unfinished"></translation>
+        <translation>キロワット時</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2055,7 +2055,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>gkal</source>
-        <translation type="unfinished"></translation>
+        <translation>ギガカロリー</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2073,7 +2073,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>day</source>
-        <translation type="unfinished"></translation>
+        <translation>日</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2091,7 +2091,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>hour</source>
-        <translation type="unfinished"></translation>
+        <translation>時間</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2109,7 +2109,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>minute</source>
-        <translation type="unfinished"></translation>
+        <translation>分</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2127,7 +2127,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>second</source>
-        <translation type="unfinished"></translation>
+        <translation>秒</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2145,7 +2145,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>kilobyte</source>
-        <translation type="unfinished"></translation>
+        <translation>キロバイト</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2163,7 +2163,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>megabyte</source>
-        <translation type="unfinished"></translation>
+        <translation>メガバイト</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2181,7 +2181,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>gigabyte</source>
-        <translation type="unfinished"></translation>
+        <translation>ギガバイト</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2199,7 +2199,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>terabyte</source>
-        <translation type="unfinished"></translation>
+        <translation>テラバイト</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2217,7 +2217,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>otherUnits</source>
-        <translation type="unfinished"></translation>
+        <translation>その他の単位</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2235,7 +2235,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+154"/>
         <location line="+10"/>
         <source>cash</source>
-        <translation type="unfinished"></translation>
+        <translation>現金</translation>
     </message>
     <message>
         <location line="-8"/>
@@ -2253,7 +2253,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
         <location line="+10"/>
         <source>electronically</source>
-        <translation type="unfinished"></translation>
+        <translation>電子決済</translation>
     </message>
     <message>
         <location line="-8"/>
@@ -2271,7 +2271,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
         <location line="+10"/>
         <source>prepaid</source>
-        <translation type="unfinished"></translation>
+        <translation>前払い</translation>
     </message>
     <message>
         <location line="-6"/>
@@ -2289,7 +2289,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
         <location line="+10"/>
         <source>other</source>
-        <translation type="unfinished"></translation>
+        <translation>その他</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2307,7 +2307,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <location line="+8"/>
         <source>Sell</source>
-        <translation type="unfinished"></translation>
+        <translation>販売</translation>
     </message>
     <message>
         <location line="-6"/>
@@ -2325,7 +2325,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
         <location line="+8"/>
         <source>Buy</source>
-        <translation type="unfinished"></translation>
+        <translation>購入</translation>
     </message>
     <message>
         <location line="-6"/>
@@ -2343,7 +2343,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
         <location line="+8"/>
         <source>SellReturn</source>
-        <translation type="unfinished"></translation>
+        <translation>販売返品</translation>
     </message>
     <message>
         <location line="-6"/>
@@ -2361,7 +2361,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
         <location line="+8"/>
         <source>BuyReturn</source>
-        <translation type="unfinished"></translation>
+        <translation>購入返品</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2379,7 +2379,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <location line="+2"/>
         <source>Receipt</source>
-        <translation type="unfinished"></translation>
+        <translation>レシート</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -2397,7 +2397,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-640"/>
         <location line="+158"/>
         <source>Alias</source>
-        <translation type="unfinished"></translation>
+        <translation>エイリアス</translation>
     </message>
     <message>
         <location line="-286"/>
@@ -2408,7 +2408,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+184"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+184"/>
         <source>. xxxx &lt;my company&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>. xxxx &lt;自社&gt;</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2447,7 +2447,7 @@
         <location line="+126"/>
         <location line="+4"/>
         <source>ImagingTools</source>
-        <translation type="unfinished"></translation>
+        <translation>ImagingTools</translation>
     </message>
     <message>
         <location line="-106"/>
@@ -2458,7 +2458,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-190"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-190"/>
         <source>(C) 2020 ImagingTools GmbH. All rights reserved.</source>
-        <translation type="unfinished"></translation>
+        <translation>(C) 2020 ImagingTools GmbH. All rights reserved.</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -2469,7 +2469,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>New sensor</source>
-        <translation type="unfinished"></translation>
+        <translation>新規センサー</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -2480,7 +2480,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
         <source>Full Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>全画面</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -2498,7 +2498,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-30"/>
         <location line="+32"/>
         <source>User Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー設定</translation>
     </message>
     <message>
         <location line="-68"/>
@@ -2509,7 +2509,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-494"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>PageViewParam</source>
-        <translation type="unfinished"></translation>
+        <translation>PageViewParam</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2520,7 +2520,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>English</source>
-        <translation type="unfinished"></translation>
+        <translation>英語</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2531,7 +2531,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>German</source>
-        <translation type="unfinished"></translation>
+        <translation>ドイツ語</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2542,7 +2542,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Russian</source>
-        <translation type="unfinished"></translation>
+        <translation>ロシア語</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2553,7 +2553,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+18"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+14"/>
         <source>Server Connection Interface</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー接続インターフェース</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2564,7 +2564,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>qrc:/qml/imtdocgui/MultiDocWorkspacePageView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtdocgui/MultiDocWorkspacePageView.qml</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2575,7 +2575,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>../../imtdocgui/MultiDocWorkspacePageView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>../../imtdocgui/MultiDocWorkspacePageView.qml</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -2586,7 +2586,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+436"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-100"/>
         <source>LDAP</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAP</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2604,7 +2604,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <location line="+2"/>
         <source>Personal Access Token</source>
-        <translation type="unfinished"></translation>
+        <translation>パーソナルアクセストークン</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -2615,7 +2615,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+8"/>
         <source>Action</source>
-        <translation type="unfinished">アクション</translation>
+        <translation>アクション</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2647,7 +2647,7 @@
         <location line="+144"/>
         <location line="+14"/>
         <source>User</source>
-        <translation type="unfinished">ユーザー</translation>
+        <translation>ユーザー</translation>
     </message>
     <message>
         <location line="-276"/>
@@ -2665,7 +2665,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-42"/>
         <location line="+30"/>
         <source>Type</source>
-        <translation type="unfinished">タイプ</translation>
+        <translation>タイプ</translation>
     </message>
     <message>
         <location line="-116"/>
@@ -2676,7 +2676,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Target</source>
-        <translation type="unfinished"></translation>
+        <translation>ターゲット</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2687,7 +2687,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Timestamp</source>
-        <translation type="unfinished">タイムスタンプ</translation>
+        <translation>タイムスタンプ</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2698,7 +2698,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>Open</source>
-        <translation type="unfinished">開く</translation>
+        <translation>開く</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2709,7 +2709,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>New Customer</source>
-        <translation type="unfinished"></translation>
+        <translation>新規顧客</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2720,7 +2720,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>User Action</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーアクション</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2745,7 +2745,7 @@
         <location line="+70"/>
         <location line="+160"/>
         <source>Role</source>
-        <translation type="unfinished"></translation>
+        <translation>ロール</translation>
     </message>
     <message>
         <location line="-254"/>
@@ -2770,7 +2770,7 @@
         <location line="+56"/>
         <location line="+156"/>
         <source>Group</source>
-        <translation type="unfinished"></translation>
+        <translation>グループ</translation>
     </message>
     <message>
         <location line="-232"/>
@@ -2781,7 +2781,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-454"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+92"/>
         <source>:/qml/imtgui/Settings/DatabaseInput.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>:/qml/imtgui/Settings/DatabaseInput.qml</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2792,7 +2792,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
         <source>:/qml/imtgui/Settings/SettingsTextInput.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>:/qml/imtgui/Settings/SettingsTextInput.qml</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2803,7 +2803,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>qrc:/qml/imtdocgui/SingleDocumentWorkspacePageView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtdocgui/SingleDocumentWorkspacePageView.qml</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2814,7 +2814,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+16"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>Remove All</source>
-        <translation type="unfinished"></translation>
+        <translation>すべて削除</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2825,7 +2825,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+10"/>
         <source>Restore All</source>
-        <translation type="unfinished"></translation>
+        <translation>すべて復元</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2836,7 +2836,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
         <source>Duplicate</source>
-        <translation type="unfinished">コピー</translation>
+        <translation>コピー</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -2847,7 +2847,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-16"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-10"/>
         <source>Restore</source>
-        <translation type="unfinished">復元</translation>
+        <translation>復元</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2858,7 +2858,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+24"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+36"/>
         <source>Icons/Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/Redo</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2869,7 +2869,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+12"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>Icons/Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/Undo</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2880,7 +2880,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-14"/>
         <source>History</source>
-        <translation type="unfinished"></translation>
+        <translation>履歴</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2891,7 +2891,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Icons/History</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/History</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2902,7 +2902,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
         <source>Icons/Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/Close</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2920,7 +2920,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <location line="+8"/>
         <source>Icons/Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/Save</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2942,7 +2942,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-248"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-204"/>
         <source>Message Info</source>
-        <translation type="unfinished"></translation>
+        <translation>メッセージ情報</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2953,7 +2953,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Certificate Files</source>
-        <translation type="unfinished"></translation>
+        <translation>証明書ファイル</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2971,7 +2971,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-50"/>
         <location line="+52"/>
         <source>Enable SSL</source>
-        <translation type="unfinished"></translation>
+        <translation>SSLを有効にする</translation>
     </message>
     <message>
         <location line="-40"/>
@@ -2982,7 +2982,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Local Certificate</source>
-        <translation type="unfinished"></translation>
+        <translation>ローカル証明書</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2993,7 +2993,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>CA Certificate</source>
-        <translation type="unfinished"></translation>
+        <translation>CA証明書</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3011,7 +3011,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>Private Key</source>
-        <translation type="unfinished"></translation>
+        <translation>秘密鍵</translation>
     </message>
     <message>
         <location line="-52"/>
@@ -3022,7 +3022,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Verification Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>検証モード</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3033,7 +3033,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Protocol</source>
-        <translation type="unfinished"></translation>
+        <translation>プロトコル</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3044,7 +3044,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Key Files</source>
-        <translation type="unfinished"></translation>
+        <translation>鍵ファイル</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3062,7 +3062,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-48"/>
         <location line="+50"/>
         <source>Algorithm</source>
-        <translation type="unfinished"></translation>
+        <translation>アルゴリズム</translation>
     </message>
     <message>
         <location line="-42"/>
@@ -3087,7 +3087,7 @@
         <location line="+10"/>
         <location line="+50"/>
         <source>Encoding Format</source>
-        <translation type="unfinished"></translation>
+        <translation>エンコード形式</translation>
     </message>
     <message>
         <location line="-48"/>
@@ -3105,7 +3105,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-86"/>
         <location line="+90"/>
         <source>Password</source>
-        <translation type="unfinished">パスワード</translation>
+        <translation>パスワード</translation>
     </message>
     <message>
         <location line="-4"/>
@@ -3130,7 +3130,7 @@
         <location line="+8"/>
         <location line="+60"/>
         <source>File Path</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルパス</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -3141,7 +3141,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-92"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-94"/>
         <source>Server Address</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーアドレス</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -3152,7 +3152,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>ポート</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -3163,7 +3163,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>SMTP</source>
-        <translation type="unfinished"></translation>
+        <translation>SMTP</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3174,7 +3174,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+14"/>
         <source>465</source>
-        <translation type="unfinished"></translation>
+        <translation>465</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3185,7 +3185,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>qqmbxszuzxnylorx</source>
-        <translation type="unfinished"></translation>
+        <translation>qqmbxszuzxnylorx</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3196,7 +3196,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
         <source>smtp.gmail.com</source>
-        <translation type="unfinished"></translation>
+        <translation>smtp.gmail.com</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3207,7 +3207,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>kucherenkord@gmail.com</source>
-        <translation type="unfinished"></translation>
+        <translation>kucherenkord@gmail.com</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -3218,7 +3218,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
         <source>Activate it if you want your server to work using SSL</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーをSSLで動作させたい場合に有効にします</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3229,7 +3229,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>Local Cert</source>
-        <translation type="unfinished"></translation>
+        <translation>ローカル証明書</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3240,7 +3240,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
         <source>Verify Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>検証モード</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3251,7 +3251,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>SSL Protocol</source>
-        <translation type="unfinished"></translation>
+        <translation>SSLプロトコル</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3262,7 +3262,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
         <source>SSL Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>SSL構成</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3273,7 +3273,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
         <source>Ca Cert</source>
-        <translation type="unfinished"></translation>
+        <translation>CA証明書</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -3284,7 +3284,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+22"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+8"/>
         <source>Select the file with your private key</source>
-        <translation type="unfinished"></translation>
+        <translation>秘密鍵が含まれるファイルを選択してください</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3295,7 +3295,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+8"/>
         <source>Key Type</source>
-        <translation type="unfinished"></translation>
+        <translation>鍵タイプ</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -3306,7 +3306,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+18"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+8"/>
         <source>http://localhost:7778</source>
-        <translation type="unfinished"></translation>
+        <translation>http://localhost:7778</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -3338,7 +3338,7 @@
         <location line="+18"/>
         <location line="+108"/>
         <source>Revision</source>
-        <translation type="unfinished">改訂</translation>
+        <translation>改訂</translation>
     </message>
     <message>
         <location line="-50"/>
@@ -3349,7 +3349,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-76"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+8"/>
         <source>qrc:/qml/imtcolgui/CollectionWorkspacePageView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtcolgui/CollectionWorkspacePageView.qml</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -3360,7 +3360,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+122"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-72"/>
         <source>/// \file $(FilePath)</source>
-        <translation type="unfinished"></translation>
+        <translation>/// \file $(FilePath)</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -3371,7 +3371,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-76"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-78"/>
         <source>New Role</source>
-        <translation type="unfinished"></translation>
+        <translation>新規ロール</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3389,7 +3389,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <location line="+54"/>
         <source>Session</source>
-        <translation type="unfinished"></translation>
+        <translation>セッション</translation>
     </message>
     <message>
         <location line="-56"/>
@@ -3400,7 +3400,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-52"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-52"/>
         <source>User Connection</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー接続</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -3411,7 +3411,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+8"/>
         <source>New Group</source>
-        <translation type="unfinished"></translation>
+        <translation>新規グループ</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -3422,7 +3422,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+16"/>
         <source>Last Connection</source>
-        <translation type="unfinished"></translation>
+        <translation>最終接続</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -3433,7 +3433,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>New User</source>
-        <translation type="unfinished"></translation>
+        <translation>新規ユーザー</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3444,7 +3444,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>qrc:/qml/imtguigql/GqlCollectionDocManagerPageView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtguigql/GqlCollectionDocManagerPageView.qml</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3455,7 +3455,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>検索</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3466,7 +3466,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Icons/Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/Search</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3477,7 +3477,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
         <source>qrc:/qml/imtgui/View/SearchPage.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtgui/View/SearchPage.qml</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3488,7 +3488,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>qrc:/qml/imtdocgui/SearchPageSingleDocumentView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtdocgui/SearchPageSingleDocumentView.qml</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3499,7 +3499,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>qrc:/qml/imtauthgui/AdministrationView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtauthgui/AdministrationView.qml</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3510,7 +3510,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Admin</source>
-        <translation type="unfinished"></translation>
+        <translation>管理者</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3521,7 +3521,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Icons/AdminPanel</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/AdminPanel</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3532,7 +3532,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+12"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-18"/>
         <source>qrc:/qml/imtauthgui/UserActionCollectionView.qml</source>
-        <translation type="unfinished"></translation>
+        <translation>qrc:/qml/imtauthgui/UserActionCollectionView.qml</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3543,7 +3543,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Workspace</source>
-        <translation type="unfinished"></translation>
+        <translation>ワークスペース</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -3554,7 +3554,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Icons/Dashboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Icons/Dashboard</translation>
     </message>
     <message>
         <source>ImagingTools GmbH</source>
@@ -3563,7 +3563,7 @@
     <message>
         <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="-14"/>
         <source>User-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーID</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -3575,43 +3575,43 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-166"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+38"/>
         <source>Username</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー名</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Mail</source>
-        <translation type="unfinished"></translation>
+        <translation>メール</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="-7"/>
         <source>Group-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>グループID</translation>
     </message>
     <message>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-12"/>
         <source>OAS Code generator</source>
-        <translation type="unfinished"></translation>
+        <translation>OAS コードジェネレーター</translation>
     </message>
     <message>
         <location line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-96"/>
-        <source>? Imaging tools</source>
-        <translation type="unfinished"></translation>
+        <source>? ImagingTools</source>
+        <translation>? ImagingTools</translation>
     </message>
     <message>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
         <source>SDL Code generator</source>
-        <translation type="unfinished"></translation>
+        <translation>SDL コードジェネレーター</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>SDL code generator</source>
-        <translation type="unfinished"></translation>
+        <translation>SDL コードジェネレーター</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>SDL Generator version</source>
-        <translation type="unfinished"></translation>
+        <translation>SDL ジェネレーターのバージョン</translation>
     </message>
 </context>
 <context>
@@ -3619,12 +3619,12 @@
     <message>
         <location filename="../../../Qml/imtauthgui/AuthorizationController.qml" line="+323"/>
         <source>The user has been successfully registered</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーが正常に登録されました</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Password changed successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードが正常に変更されました</translation>
     </message>
 </context>
 <context>
@@ -3632,60 +3632,60 @@
     <message>
         <location filename="../../../Qml/imtauthgui/AuthorizationPage.qml" line="+152"/>
         <source>Welcome</source>
-        <translation type="unfinished">ようこそ</translation>
+        <translation>ようこそ</translation>
     </message>
     <message>
         <location line="-105"/>
         <location line="+147"/>
         <location line="+260"/>
         <source>Login</source>
-        <translation type="unfinished">ログイン</translation>
+        <translation>ログイン</translation>
     </message>
     <message>
         <location line="-302"/>
         <source>Welcome to</source>
-        <translation type="unfinished"></translation>
+        <translation>ようこそ</translation>
     </message>
     <message>
         <location line="+60"/>
         <source>Enter the login</source>
-        <translation type="unfinished"></translation>
+        <translation>ログイン名を入力してください</translation>
     </message>
     <message>
         <location line="+35"/>
         <source>Password</source>
-        <translation type="unfinished">パスワード</translation>
+        <translation>パスワード</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Enter the password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードを入力してください</translation>
     </message>
     <message>
         <location line="+71"/>
         <source>Password recovery</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードの回復</translation>
     </message>
     <message>
         <location line="+35"/>
         <source>Remember me</source>
-        <translation type="unfinished">ログイン状態を保存する</translation>
+        <translation>ログイン状態を保存する</translation>
     </message>
     <message>
         <location line="+20"/>
         <location line="+93"/>
         <source>Register</source>
-        <translation type="unfinished"></translation>
+        <translation>登録</translation>
     </message>
     <message>
         <location line="-9"/>
         <source>User Registration</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー登録</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Close</source>
-        <translation type="unfinished">閉じる</translation>
+        <translation>閉じる</translation>
     </message>
 </context>
 <context>
@@ -3802,7 +3802,7 @@
         <location filename="../../../Include/imtgui/CButtonBasedSelectionGuiComp.ui" line="+20"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CButtonBasedSelectionGuiComp.h" line="+55"/>
         <source>Form</source>
-        <translation type="unfinished">元</translation>
+        <translation>元</translation>
     </message>
 </context>
 <context>
@@ -3810,43 +3810,43 @@
     <message>
         <location filename="../../../Include/imtservergql/CCollectionImportControllerComp.cpp" line="+74"/>
         <source>Unable to initialize progress manager</source>
-        <translation type="unfinished"></translation>
+        <translation>進行状況マネージャーを初期化できません</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Unable to create temporary fileInfo for upload</source>
-        <translation type="unfinished"></translation>
+        <translation>アップロード用の一時fileInfoを作成できません</translation>
     </message>
     <message>
         <location line="+22"/>
         <location line="+216"/>
         <source>Collection import cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>コレクションのインポートがキャンセルされました</translation>
     </message>
     <message>
         <location line="-212"/>
         <source>Collection import session not found</source>
-        <translation type="unfinished"></translation>
+        <translation>コレクションのインポートセッションが見つかりません</translation>
     </message>
     <message>
         <location line="+92"/>
         <source>Import files to the collection</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルをコレクションにインポート</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Uploading files to the server</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルをサーバーにアップロードしています</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Processing files on the server</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーでファイルを処理しています</translation>
     </message>
     <message>
         <location line="+122"/>
         <source>An error occurred during collection import</source>
-        <translation type="unfinished"></translation>
+        <translation>コレクションのインポート中にエラーが発生しました</translation>
     </message>
 </context>
 <context>
@@ -4127,49 +4127,49 @@
         <location filename="../../../Include/imtdbgui/CDatabaseLoginSettingsEditorComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+148"/>
         <source>Form</source>
-        <translation type="unfinished">元</translation>
+        <translation>元</translation>
     </message>
     <message>
         <location line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation>ホスト</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>ポート</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Database Name</source>
-        <translation type="unfinished"></translation>
+        <translation>データベース名</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>User</source>
-        <translation type="unfinished">ユーザー</translation>
+        <translation>ユーザー</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Password</source>
-        <translation type="unfinished">パスワード</translation>
+        <translation>パスワード</translation>
     </message>
     <message>
         <location line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Use SSL</source>
-        <translation type="unfinished"></translation>
+        <translation>SSLを使用する</translation>
     </message>
     <message>
         <location line="+36"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Test Connection</source>
-        <translation type="unfinished"></translation>
+        <translation>接続をテスト</translation>
     </message>
 </context>
 <context>
@@ -4185,17 +4185,17 @@
         <location line="+9"/>
         <location line="+8"/>
         <source>Palette file parsing error</source>
-        <translation type="unfinished">パレットファイル構文解析エラー</translation>
+        <translation>パレットファイルの解析エラー</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Light</source>
-        <translation type="unfinished">明るい</translation>
+        <translation>ライト</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Dark</source>
-        <translation type="unfinished">暗い</translation>
+        <translation>ダーク</translation>
     </message>
 </context>
 <context>
@@ -4203,27 +4203,27 @@
     <message>
         <location filename="../../../Include/imtdev/CDeviceDataFilePersistenceComp.cpp" line="+48"/>
         <source>Wrong data object type</source>
-        <translation type="unfinished"></translation>
+        <translation>データオブジェクトのタイプが不正です</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Wrong data object type. Serialization is not supported</source>
-        <translation type="unfinished"></translation>
+        <translation>データオブジェクトのタイプが不正です。シリアライズはサポートされていません</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Reading of the device data failed</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイスデータの読み取りに失敗しました</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Reading of the device data during deserialization failed</source>
-        <translation type="unfinished"></translation>
+        <translation>デシリアライズ中のデバイスデータの読み取りに失敗しました</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Reading of the device meta-data failed</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイスのメタデータの読み取りに失敗しました</translation>
     </message>
 </context>
 <context>
@@ -4232,7 +4232,7 @@
         <location filename="../../../Include/imtdevgui/CDeviceSelectionGuiComp.ui" line="+26"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdevgui/ui_CDeviceSelectionGuiComp.h" line="+73"/>
         <source>Form</source>
-        <translation type="unfinished">元</translation>
+        <translation>元</translation>
     </message>
 </context>
 <context>
@@ -4324,18 +4324,18 @@
     <message>
         <location filename="../../../Include/imtrepo/CFileRepositoryComp.cpp" line="+209"/>
         <source>File could not be inserted into the repository</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルをリポジトリに挿入できませんでした</translation>
     </message>
     <message>
         <location line="+109"/>
         <source>Initial value could not be set</source>
-        <translation type="unfinished"></translation>
+        <translation>初期値を設定できませんでした</translation>
     </message>
     <message>
         <location line="+10"/>
         <location line="+183"/>
         <source>Temp folder could not be created</source>
-        <translation type="unfinished"></translation>
+        <translation>一時フォルダを作成できませんでした</translation>
     </message>
 </context>
 <context>
@@ -4344,19 +4344,19 @@
         <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.cpp" line="+22"/>
         <location line="+28"/>
         <source>Collection import controller unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>コレクションインポートコントローラーが利用できません</translation>
     </message>
     <message>
         <location line="+15"/>
         <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.h" line="+91"/>
         <location line="+4"/>
         <source>Invalid import request</source>
-        <translation type="unfinished"></translation>
+        <translation>インポート要求が無効です</translation>
     </message>
     <message>
         <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.h" line="-13"/>
         <source>Invalid file info in the request</source>
-        <translation type="unfinished"></translation>
+        <translation>要求内のファイル情報が無効です</translation>
     </message>
 </context>
 <context>
@@ -4399,7 +4399,7 @@
         <location filename="../../../Include/imtgui/CMultiParamsSetGuiComp.ui" line="+32"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiParamsSetGuiComp.h" line="+62"/>
         <source>Form</source>
-        <translation type="unfinished">元</translation>
+        <translation>元</translation>
     </message>
 </context>
 <context>
@@ -4408,31 +4408,31 @@
         <location filename="../../../Include/imtgui/CMultiSelectionEditorComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiSelectionEditorComp.h" line="+103"/>
         <source>Form</source>
-        <translation type="unfinished">元</translation>
+        <translation>元</translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiSelectionEditorComp.h" line="+1"/>
         <source>Deselect All</source>
-        <translation type="unfinished"></translation>
+        <translation>すべて選択解除</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiSelectionEditorComp.h" line="+1"/>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>すべて選択</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiSelectionEditorComp.h" line="+1"/>
         <source>Invert</source>
-        <translation type="unfinished">反転</translation>
+        <translation>反転</translation>
     </message>
     <message>
         <location line="+20"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiSelectionEditorComp.h" line="+1"/>
         <source>Exclusive</source>
-        <translation type="unfinished"></translation>
+        <translation>排他</translation>
     </message>
 </context>
 <context>
@@ -4440,22 +4440,22 @@
     <message>
         <location filename="../../../Include/imtbase/CObjectCollectionMetaInfo.cpp" line="+33"/>
         <source>Added</source>
-        <translation type="unfinished">追加</translation>
+        <translation>追加</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Revision</source>
-        <translation type="unfinished">改訂</translation>
+        <translation>改訂</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Time when the object was added to the collection</source>
-        <translation type="unfinished"></translation>
+        <translation>オブジェクトがコレクションに追加された時刻</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Item revision</source>
-        <translation type="unfinished"></translation>
+        <translation>項目の改訂</translation>
     </message>
 </context>
 <context>
@@ -4497,7 +4497,7 @@
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionRevisionDialog.h" line="+2"/>
         <source>SW Version</source>
-        <translation type="unfinished"></translation>
+        <translation>SW バージョン</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -4536,7 +4536,7 @@
         <location line="+157"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>Info</source>
-        <translation type="unfinished"></translation>
+        <translation>情報</translation>
     </message>
     <message>
         <location line="+43"/>
@@ -4551,7 +4551,7 @@
         <location filename="../../../Include/imtgui/CPageDecoratorComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPageDecoratorComp.h" line="+145"/>
         <source>Form</source>
-        <translation type="unfinished">元</translation>
+        <translation>元</translation>
     </message>
 </context>
 <context>
@@ -4560,31 +4560,31 @@
         <location filename="../../../Include/imtgui/CPaginationGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+123"/>
         <source>Form</source>
-        <translation type="unfinished">元</translation>
+        <translation>元</translation>
     </message>
     <message>
         <location line="+85"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+1"/>
         <source>&lt;&lt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;&lt;</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+1"/>
         <source>&lt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;</translation>
     </message>
     <message>
         <location line="+40"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+1"/>
         <source>&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+1"/>
         <source>&gt;&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;&gt;</translation>
     </message>
 </context>
 <context>
@@ -4593,49 +4593,49 @@
         <location filename="../../../Include/imtauthgui/CPersonalAccessTokenManagerGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+135"/>
         <source>Personal Access Token Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>パーソナルアクセストークンマネージャー</translation>
     </message>
     <message>
         <location line="+21"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>User: &lt;not set&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー: &lt;未設定&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Personal Access Tokens</source>
-        <translation type="unfinished"></translation>
+        <translation>パーソナルアクセストークン</translation>
     </message>
     <message>
         <location line="+19"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Create</source>
-        <translation type="unfinished"></translation>
+        <translation>作成</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Revoke</source>
-        <translation type="unfinished"></translation>
+        <translation>失効</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Delete</source>
-        <translation type="unfinished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>更新</translation>
     </message>
     <message>
         <location line="+25"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Token Details</source>
-        <translation type="unfinished"></translation>
+        <translation>トークンの詳細</translation>
     </message>
 </context>
 <context>
@@ -4683,7 +4683,7 @@
         <location filename="../../../Include/imtgui/CPopupTestGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+389"/>
         <source>Form</source>
-        <translation type="unfinished">元</translation>
+        <translation>元</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -4695,13 +4695,13 @@
         <location line="+24"/>
         <location line="+1"/>
         <source>Anchor</source>
-        <translation type="unfinished"></translation>
+        <translation>アンカー</translation>
     </message>
     <message>
         <location line="-449"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="-24"/>
         <source>Standart popup</source>
-        <translation type="unfinished"></translation>
+        <translation>標準ポップアップ</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -4709,7 +4709,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <location line="+7"/>
         <source>Info</source>
-        <translation type="unfinished"></translation>
+        <translation>情報</translation>
     </message>
     <message>
         <location line="-111"/>
@@ -4717,7 +4717,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="-6"/>
         <location line="+7"/>
         <source>Warning</source>
-        <translation type="unfinished">警告</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <location line="-108"/>
@@ -4725,7 +4725,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="-6"/>
         <location line="+7"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location line="-102"/>
@@ -4733,91 +4733,91 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="-6"/>
         <location line="+7"/>
         <source>Critical</source>
-        <translation type="unfinished"></translation>
+        <translation>重大</translation>
     </message>
     <message>
         <location line="-78"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="-6"/>
         <source>Extended popup</source>
-        <translation type="unfinished"></translation>
+        <translation>拡張ポップアップ</translation>
     </message>
     <message>
         <location line="+38"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>カテゴリ</translation>
     </message>
     <message>
         <location line="+9"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>なし</translation>
     </message>
     <message>
         <location line="+47"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+5"/>
         <source>Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムアウト</translation>
     </message>
     <message>
         <location line="+9"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Require user action</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー操作が必要</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>5s</source>
-        <translation type="unfinished">5s</translation>
+        <translation>5s</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>10s</source>
-        <translation type="unfinished">10s</translation>
+        <translation>10s</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>15s</source>
-        <translation type="unfinished">15s</translation>
+        <translation>15s</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>20s</source>
-        <translation type="unfinished">20s</translation>
+        <translation>20s</translation>
     </message>
     <message>
         <location line="+53"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Message</source>
-        <translation type="unfinished">メッセージ</translation>
+        <translation>メッセージ</translation>
     </message>
     <message>
         <location line="+13"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Widget without close control</source>
-        <translation type="unfinished"></translation>
+        <translation>閉じるコントロールなしのウィジェット</translation>
     </message>
     <message>
         <location line="+13"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Widget with close control</source>
-        <translation type="unfinished"></translation>
+        <translation>閉じるコントロール付きのウィジェット</translation>
     </message>
     <message>
         <location line="+39"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Allow closing on mouse click</source>
-        <translation type="unfinished"></translation>
+        <translation>マウスクリックで閉じることを許可</translation>
     </message>
     <message>
         <location line="+55"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Use area provider</source>
-        <translation type="unfinished"></translation>
+        <translation>エリアプロバイダーを使用</translation>
     </message>
 </context>
 <context>
@@ -4877,13 +4877,13 @@
         <location line="+41"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+2"/>
         <source>Create Transaction Code...</source>
-        <translation type="unfinished"></translation>
+        <translation>トランザクションコードを作成...</translation>
     </message>
     <message>
         <location line="+24"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+2"/>
         <source>Load License...</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスを読み込み...</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -4943,13 +4943,13 @@
         <location filename="../../../Include/imtgui/CProgressDialog.ui" line="+20"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CProgressDialog.h" line="+83"/>
         <source>Form</source>
-        <translation type="unfinished">元</translation>
+        <translation>元</translation>
     </message>
     <message>
         <location line="+68"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CProgressDialog.h" line="+2"/>
         <source>Some work in progress...</source>
-        <translation type="unfinished"></translation>
+        <translation>作業を実行中...</translation>
     </message>
 </context>
 <context>
@@ -4958,7 +4958,7 @@
         <location filename="../../../Include/imtauthgui/CRemoteStandardLoginGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+390"/>
         <source>Form</source>
-        <translation type="unfinished">元</translation>
+        <translation>元</translation>
     </message>
     <message>
         <location line="+89"/>
@@ -4966,61 +4966,61 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <location line="+9"/>
         <source>Password</source>
-        <translation type="unfinished">パスワード</translation>
+        <translation>パスワード</translation>
     </message>
     <message>
         <location line="-339"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="-8"/>
         <source>User</source>
-        <translation type="unfinished">ユーザー</translation>
+        <translation>ユーザー</translation>
     </message>
     <message>
         <location line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>Remember me</source>
-        <translation type="unfinished">ログイン状態を保存する</translation>
+        <translation>ログイン状態を保存する</translation>
     </message>
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+2"/>
         <source>Login</source>
-        <translation type="unfinished">ログイン</translation>
+        <translation>ログイン</translation>
     </message>
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>Please enter your credentials to log in.</source>
-        <translation type="unfinished"></translation>
+        <translation>ログインするには認証情報を入力してください。</translation>
     </message>
     <message>
         <location line="+163"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+2"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+74"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>Please, enter the password for system administrator</source>
-        <translation type="unfinished"></translation>
+        <translation>システム管理者のパスワードを入力してください</translation>
     </message>
     <message>
         <location line="+50"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+2"/>
         <source>Confirm Password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードの確認</translation>
     </message>
     <message>
         <location line="+55"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>No connection to the server</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーに接続されていません</translation>
     </message>
     <message>
         <location line="+38"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>更新</translation>
     </message>
 </context>
 <context>
@@ -5038,31 +5038,31 @@
         <location filename="../../../Include/imtauthgui/CServerConnectionEditorComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CServerConnectionEditorComp.h" line="+114"/>
         <source>Edit Addresses</source>
-        <translation type="unfinished">住所を編集</translation>
+        <translation>住所を編集</translation>
     </message>
     <message>
         <location line="+27"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CServerConnectionEditorComp.h" line="+1"/>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation>ホスト</translation>
     </message>
     <message>
         <location line="+18"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CServerConnectionEditorComp.h" line="+1"/>
         <source>HTTP Port</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTPポート</translation>
     </message>
     <message>
         <location line="+22"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CServerConnectionEditorComp.h" line="+1"/>
         <source>Websocket Port</source>
-        <translation type="unfinished"></translation>
+        <translation>WebSocketポート</translation>
     </message>
     <message>
         <location line="+18"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CServerConnectionEditorComp.h" line="+1"/>
         <source>gRPC Port</source>
-        <translation type="unfinished"></translation>
+        <translation>gRPCポート</translation>
     </message>
 </context>
 <context>
@@ -5071,7 +5071,7 @@
         <location filename="../../../Include/imtgui/CSimpleAttributeManagerViewComp.ui" line="+20"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CSimpleAttributeManagerViewComp.h" line="+55"/>
         <source>Form</source>
-        <translation type="unfinished">元</translation>
+        <translation>元</translation>
     </message>
 </context>
 <context>
@@ -5086,7 +5086,7 @@
         <location line="+96"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardAccountMenuComp.h" line="+3"/>
         <source>Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>環境設定</translation>
     </message>
     <message>
         <location line="+39"/>
@@ -5174,31 +5174,31 @@
         <location line="-65"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="-3"/>
         <source>Please enter your credentials to log in.</source>
-        <translation type="unfinished"></translation>
+        <translation>ログインするには認証情報を入力してください。</translation>
     </message>
     <message>
         <location line="+153"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+5"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+74"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
         <source>Please, enter the password for system administrator</source>
-        <translation type="unfinished"></translation>
+        <translation>システム管理者のパスワードを入力してください</translation>
     </message>
     <message>
         <location line="+50"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+2"/>
         <source>Confirm Password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードの確認</translation>
     </message>
     <message>
         <location line="+42"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
         <source>No connection to the server</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーに接続されていません</translation>
     </message>
 </context>
 <context>
@@ -5207,73 +5207,73 @@
         <location filename="../../../Include/imthypegui/CTaskManagerGuiComp.ui" line="+103"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+242"/>
         <source>Add</source>
-        <translation type="unfinished">追加</translation>
+        <translation>追加</translation>
     </message>
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Duplicate current inspection</source>
-        <translation type="unfinished"></translation>
+        <translation>現在の点検をコピー</translation>
     </message>
     <message>
         <location line="+3"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Duplicate</source>
-        <translation type="unfinished">コピー</translation>
+        <translation>コピー</translation>
     </message>
     <message>
         <location line="+26"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Remove current inspection</source>
-        <translation type="unfinished"></translation>
+        <translation>現在の点検を削除</translation>
     </message>
     <message>
         <location line="+3"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Remove</source>
-        <translation type="unfinished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location line="+20"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+1"/>
         <source>Inputs...</source>
-        <translation type="unfinished"></translation>
+        <translation>入力...</translation>
     </message>
     <message>
         <location line="+35"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Hide inspections list</source>
-        <translation type="unfinished"></translation>
+        <translation>点検リストを非表示</translation>
     </message>
     <message>
         <location line="+3"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Hide</source>
-        <translation type="unfinished"></translation>
+        <translation>非表示</translation>
     </message>
     <message>
         <location line="+26"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Run all inspections</source>
-        <translation type="unfinished"></translation>
+        <translation>すべての点検を実行</translation>
     </message>
     <message>
         <location line="+3"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Test Product</source>
-        <translation type="unfinished"></translation>
+        <translation>テスト製品</translation>
     </message>
     <message>
         <location line="+96"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Show inspections list</source>
-        <translation type="unfinished"></translation>
+        <translation>点検リストを表示</translation>
     </message>
     <message>
         <location line="+3"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation>表示</translation>
     </message>
 </context>
 <context>
@@ -5282,43 +5282,43 @@
         <location filename="../../../Include/imthypegui/CTaskSettingsDialog.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+159"/>
         <source>Task Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>タスク設定</translation>
     </message>
     <message>
         <location line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>Active</source>
-        <translation type="unfinished"></translation>
+        <translation>有効</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>Task Name</source>
-        <translation type="unfinished"></translation>
+        <translation>タスク名</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>User-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーID</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>Input-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>入力ID</translation>
     </message>
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>Edit</source>
-        <translation type="unfinished">編集</translation>
+        <translation>編集</translation>
     </message>
     <message>
         <location line="+34"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>Description</source>
-        <translation type="unfinished">説明</translation>
+        <translation>説明</translation>
     </message>
 </context>
 <context>
@@ -5327,43 +5327,43 @@
         <location filename="../../../Include/imthypegui/CTaskSettingsGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="+159"/>
         <source>Task Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>タスク設定</translation>
     </message>
     <message>
         <location line="+18"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="+1"/>
         <source>Active</source>
-        <translation type="unfinished"></translation>
+        <translation>有効</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="+1"/>
         <source>Task Name</source>
-        <translation type="unfinished"></translation>
+        <translation>タスク名</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="+1"/>
         <source>User-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーID</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="+1"/>
         <source>Input-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>入力ID</translation>
     </message>
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="+1"/>
         <source>Edit</source>
-        <translation type="unfinished">編集</translation>
+        <translation>編集</translation>
     </message>
     <message>
         <location line="+34"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="+1"/>
         <source>Description</source>
-        <translation type="unfinished">説明</translation>
+        <translation>説明</translation>
     </message>
 </context>
 <context>
@@ -5400,7 +5400,7 @@
         <location line="+339"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+11"/>
         <source>Close</source>
-        <translation type="unfinished">閉じる</translation>
+        <translation>閉じる</translation>
     </message>
     <message>
         <source>Remember me</source>
@@ -5455,79 +5455,79 @@
         <location filename="../../../Include/imtgui/CTimeFilterParamEditorComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+95"/>
         <source>Form</source>
-        <translation type="unfinished">元</translation>
+        <translation>元</translation>
     </message>
     <message>
         <location line="+13"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Total Period</source>
-        <translation type="unfinished"></translation>
+        <translation>全期間</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Hour</source>
-        <translation type="unfinished"></translation>
+        <translation>直近1時間</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last 4 Hours</source>
-        <translation type="unfinished"></translation>
+        <translation>直近4時間</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last 8 Hours</source>
-        <translation type="unfinished"></translation>
+        <translation>直近8時間</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Day</source>
-        <translation type="unfinished"></translation>
+        <translation>直近1日</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Week</source>
-        <translation type="unfinished"></translation>
+        <translation>直近1週間</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Month</source>
-        <translation type="unfinished"></translation>
+        <translation>直近1か月</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Quarter</source>
-        <translation type="unfinished"></translation>
+        <translation>直近四半期</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Year</source>
-        <translation type="unfinished"></translation>
+        <translation>直近1年</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>User-Defined</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー定義</translation>
     </message>
     <message>
         <location line="+41"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+2"/>
         <source>From</source>
-        <translation type="unfinished"></translation>
+        <translation>開始</translation>
     </message>
     <message>
         <location line="+16"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>To</source>
-        <translation type="unfinished"></translation>
+        <translation>終了</translation>
     </message>
 </context>
 <context>
@@ -5535,207 +5535,207 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/Calendar.qml" line="+70"/>
         <source>January</source>
-        <translation type="unfinished"></translation>
+        <translation>1月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>February</source>
-        <translation type="unfinished"></translation>
+        <translation>2月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>March</source>
-        <translation type="unfinished"></translation>
+        <translation>3月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>April</source>
-        <translation type="unfinished"></translation>
+        <translation>4月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>May</source>
-        <translation type="unfinished"></translation>
+        <translation>5月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>June</source>
-        <translation type="unfinished"></translation>
+        <translation>6月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>July</source>
-        <translation type="unfinished"></translation>
+        <translation>7月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>August</source>
-        <translation type="unfinished"></translation>
+        <translation>8月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>September</source>
-        <translation type="unfinished"></translation>
+        <translation>9月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>October</source>
-        <translation type="unfinished"></translation>
+        <translation>10月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>November</source>
-        <translation type="unfinished"></translation>
+        <translation>11月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>December</source>
-        <translation type="unfinished"></translation>
+        <translation>12月</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Январь</source>
-        <translation type="unfinished"></translation>
+        <translation>1月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Февраль</source>
-        <translation type="unfinished"></translation>
+        <translation>2月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Март</source>
-        <translation type="unfinished"></translation>
+        <translation>3月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Апрель</source>
-        <translation type="unfinished"></translation>
+        <translation>4月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Май</source>
-        <translation type="unfinished"></translation>
+        <translation>5月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Июнь</source>
-        <translation type="unfinished"></translation>
+        <translation>6月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Июль</source>
-        <translation type="unfinished"></translation>
+        <translation>7月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Август</source>
-        <translation type="unfinished"></translation>
+        <translation>8月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Сентябрь</source>
-        <translation type="unfinished"></translation>
+        <translation>9月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Октябрь</source>
-        <translation type="unfinished"></translation>
+        <translation>10月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Ноябрь</source>
-        <translation type="unfinished"></translation>
+        <translation>11月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Декабрь</source>
-        <translation type="unfinished"></translation>
+        <translation>12月</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Пн</source>
-        <translation type="unfinished"></translation>
+        <translation>月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Вт</source>
-        <translation type="unfinished"></translation>
+        <translation>火</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Ср</source>
-        <translation type="unfinished"></translation>
+        <translation>水</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Чт</source>
-        <translation type="unfinished"></translation>
+        <translation>木</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Пт</source>
-        <translation type="unfinished"></translation>
+        <translation>金</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Сб</source>
-        <translation type="unfinished"></translation>
+        <translation>土</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Вс</source>
-        <translation type="unfinished"></translation>
+        <translation>日</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Mo</source>
-        <translation type="unfinished"></translation>
+        <translation>月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Tu</source>
-        <translation type="unfinished"></translation>
+        <translation>火</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>We</source>
-        <translation type="unfinished"></translation>
+        <translation>水</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Th</source>
-        <translation type="unfinished"></translation>
+        <translation>木</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Fr</source>
-        <translation type="unfinished"></translation>
+        <translation>金</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Sa</source>
-        <translation type="unfinished"></translation>
+        <translation>土</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Su</source>
-        <translation type="unfinished"></translation>
+        <translation>日</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Today</source>
-        <translation type="unfinished"></translation>
+        <translation>今日</translation>
     </message>
 </context>
 <context>
@@ -5743,62 +5743,62 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/CalendarFunctions.qml" line="+10"/>
         <source>January</source>
-        <translation type="unfinished"></translation>
+        <translation>1月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>February</source>
-        <translation type="unfinished"></translation>
+        <translation>2月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>March</source>
-        <translation type="unfinished"></translation>
+        <translation>3月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>April</source>
-        <translation type="unfinished"></translation>
+        <translation>4月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>May</source>
-        <translation type="unfinished"></translation>
+        <translation>5月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>June</source>
-        <translation type="unfinished"></translation>
+        <translation>6月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>July</source>
-        <translation type="unfinished"></translation>
+        <translation>7月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>August</source>
-        <translation type="unfinished"></translation>
+        <translation>8月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>September</source>
-        <translation type="unfinished"></translation>
+        <translation>9月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>October</source>
-        <translation type="unfinished"></translation>
+        <translation>10月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>November</source>
-        <translation type="unfinished"></translation>
+        <translation>11月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>December</source>
-        <translation type="unfinished"></translation>
+        <translation>12月</translation>
     </message>
 </context>
 <context>
@@ -5806,37 +5806,37 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/CalendarView.qml" line="+40"/>
         <source>Mo</source>
-        <translation type="unfinished"></translation>
+        <translation>月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Tu</source>
-        <translation type="unfinished"></translation>
+        <translation>火</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>We</source>
-        <translation type="unfinished"></translation>
+        <translation>水</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Th</source>
-        <translation type="unfinished"></translation>
+        <translation>木</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Fr</source>
-        <translation type="unfinished"></translation>
+        <translation>金</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Sa</source>
-        <translation type="unfinished"></translation>
+        <translation>土</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Su</source>
-        <translation type="unfinished"></translation>
+        <translation>日</translation>
     </message>
 </context>
 <context>
@@ -5848,12 +5848,12 @@
     <message>
         <location filename="../../../Qml/imtauthgui/ChangePasswordDialog.qml" line="+15"/>
         <source>Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -5861,7 +5861,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/CheckBoxMenu.qml" line="+285"/>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>すべて</translation>
     </message>
 </context>
 <context>
@@ -5869,7 +5869,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/ClearableComboBoxElementView.qml" line="+75"/>
         <source>Clear</source>
-        <translation type="unfinished">クリア</translation>
+        <translation>クリア</translation>
     </message>
 </context>
 <context>
@@ -5877,32 +5877,32 @@
     <message>
         <location filename="../../../Qml/imtcolgui/CollectionStructure.qml" line="+190"/>
         <source>Edit</source>
-        <translation type="unfinished">編集</translation>
+        <translation>編集</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Remove</source>
-        <translation type="unfinished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>名前を変更</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Set Description</source>
-        <translation type="unfinished"></translation>
+        <translation>説明を設定</translation>
     </message>
     <message>
         <location line="+333"/>
         <source>This table has been modified from another computer</source>
-        <translation type="unfinished"></translation>
+        <translation>このテーブルは別のコンピューターから変更されました</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>更新</translation>
     </message>
 </context>
 <context>
@@ -5910,42 +5910,42 @@
     <message>
         <location filename="../../../Qml/imtcolgui/CollectionStructureCommandsDelegateBase.qml" line="+47"/>
         <source>Deleting a selected element</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した要素を削除しています</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Remove selected item from the collection ?</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した項目をコレクションから削除しますか？</translation>
     </message>
     <message>
         <location line="+134"/>
         <source>Please enter the name of the new node</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいノードの名前を入力してください</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Please enter the name of the document:</source>
-        <translation type="unfinished">ドキュメント名を入力してください:</translation>
+        <translation>ドキュメント名を入力してください:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Please enter the description of the document:</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントの説明を入力してください:</translation>
     </message>
     <message>
         <location line="+75"/>
         <source>Rename document</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントの名前を変更</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>New node</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいノード</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Set description</source>
-        <translation type="unfinished"></translation>
+        <translation>説明を設定</translation>
     </message>
 </context>
 <context>
@@ -5953,7 +5953,7 @@
     <message>
         <location filename="../../../Qml/imtcolgui/CollectionStructureCommandsObserver.qml" line="+27"/>
         <source>Open</source>
-        <translation type="unfinished">開く</translation>
+        <translation>開く</translation>
     </message>
 </context>
 <context>
@@ -5969,7 +5969,7 @@
     <message>
         <location filename="../../../Qml/imtcolgui/CollectionView.qml" line="+529"/>
         <source>Please select an item for showing additional informations</source>
-        <translation type="unfinished"></translation>
+        <translation>追加情報を表示する項目を選択してください</translation>
     </message>
 </context>
 <context>
@@ -5977,132 +5977,132 @@
     <message>
         <location filename="../../../Qml/imtcolgui/CollectionViewCommandsDelegateBase.qml" line="+19"/>
         <source>Deleting a selected element</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した要素を削除しています</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Remove selected item from the collection ?</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した項目をコレクションから削除しますか？</translation>
     </message>
     <message>
         <location line="+103"/>
         <source>The object has been successfully imported</source>
-        <translation type="unfinished"></translation>
+        <translation>オブジェクトが正常にインポートされました</translation>
     </message>
     <message>
         <location line="+107"/>
         <source>Duplicate</source>
-        <translation type="unfinished">コピー</translation>
+        <translation>コピー</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Edit</source>
-        <translation type="unfinished">編集</translation>
+        <translation>編集</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Remove</source>
-        <translation type="unfinished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>名前を変更</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set Description</source>
-        <translation type="unfinished"></translation>
+        <translation>説明を設定</translation>
     </message>
     <message>
         <location line="+71"/>
         <source>Restore all items with the current filter ?</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のフィルターですべての項目を復元しますか？</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Restore all data from this collection ?</source>
-        <translation type="unfinished"></translation>
+        <translation>このコレクションからすべてのデータを復元しますか？</translation>
     </message>
     <message>
         <location line="+51"/>
         <source>Import file</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルをインポート</translation>
     </message>
     <message>
         <location line="+104"/>
         <source>Save file</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルを保存</translation>
     </message>
     <message>
         <location line="+65"/>
         <source>Delete all items with the current filter ?</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のフィルターですべての項目を削除しますか？</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Delete all data from this collection ?</source>
-        <translation type="unfinished"></translation>
+        <translation>このコレクションからすべてのデータを削除しますか？</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Please enter the name of the document:</source>
-        <translation type="unfinished">ドキュメント名を入力してください:</translation>
+        <translation>ドキュメント名を入力してください:</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Please enter the description of the document:</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントの説明を入力してください:</translation>
     </message>
     <message>
         <location line="+73"/>
         <source>Restoring an objects</source>
-        <translation type="unfinished"></translation>
+        <translation>オブジェクトを復元しています</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Restore the selected objects ?</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したオブジェクトを復元しますか？</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Enter the description</source>
-        <translation type="unfinished"></translation>
+        <translation>説明を入力してください</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Duplicate Name</source>
-        <translation type="unfinished"></translation>
+        <translation>名前を複製</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the duplicate name</source>
-        <translation type="unfinished"></translation>
+        <translation>複製する名前を入力してください</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Rename document</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントの名前を変更</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the name</source>
-        <translation type="unfinished"></translation>
+        <translation>名前を入力してください</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Deleting elements</source>
-        <translation type="unfinished"></translation>
+        <translation>要素を削除しています</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Restoring elements</source>
-        <translation type="unfinished"></translation>
+        <translation>要素を復元しています</translation>
     </message>
     <message>
         <location line="-114"/>
         <source>Set description</source>
-        <translation type="unfinished"></translation>
+        <translation>説明を設定</translation>
     </message>
 </context>
 <context>
@@ -6117,12 +6117,12 @@
     <message>
         <location filename="../../../Qml/imtgui/View/ComboBoxAddressElementView.qml" line="+13"/>
         <source>Please select an item</source>
-        <translation type="unfinished"></translation>
+        <translation>項目を選択してください</translation>
     </message>
     <message>
         <location line="+68"/>
         <source>Address</source>
-        <translation type="unfinished"></translation>
+        <translation>住所</translation>
     </message>
 </context>
 <context>
@@ -6130,7 +6130,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/ComboBoxElementView.qml" line="+12"/>
         <source>Please select an item</source>
-        <translation type="unfinished"></translation>
+        <translation>項目を選択してください</translation>
     </message>
 </context>
 <context>
@@ -6138,7 +6138,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/ComboBoxGqlElementView.qml" line="+13"/>
         <source>Please select an item</source>
-        <translation type="unfinished"></translation>
+        <translation>項目を選択してください</translation>
     </message>
 </context>
 <context>
@@ -6146,7 +6146,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/ComboBoxGqlLegacyElementView.qml" line="+13"/>
         <source>Please select an item</source>
-        <translation type="unfinished"></translation>
+        <translation>項目を選択してください</translation>
     </message>
 </context>
 <context>
@@ -6154,22 +6154,22 @@
     <message>
         <location filename="../../../Qml/imtgui/Application/Configurator.qml" line="+88"/>
         <source>Apply</source>
-        <translation type="unfinished"></translation>
+        <translation>適用</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Close</source>
-        <translation type="unfinished">閉じる</translation>
+        <translation>閉じる</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Save all changes ?</source>
-        <translation type="unfinished"></translation>
+        <translation>すべての変更を保存しますか？</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -6224,7 +6224,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/CriticalErrorDialog.qml" line="+11"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
 </context>
 <context>
@@ -6232,102 +6232,102 @@
     <message>
         <location filename="../../../Qml/imtgui/Params/DatabaseAccessSettingsEditor.qml" line="+22"/>
         <source>Database restore was successful</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースの復元に成功しました</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error when trying to restore the database</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースの復元中にエラーが発生しました</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error when trying to create a database backup</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースのバックアップ作成中にエラーが発生しました</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Select backup file</source>
-        <translation type="unfinished"></translation>
+        <translation>バックアップファイルを選択</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Save file</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルを保存</translation>
     </message>
     <message>
         <location line="+39"/>
         <source>Database name</source>
-        <translation type="unfinished"></translation>
+        <translation>データベース名</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation>ホスト</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Password</source>
-        <translation type="unfinished">パスワード</translation>
+        <translation>パスワード</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>ポート</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Username</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー名</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Test database connection</source>
-        <translation type="unfinished"></translation>
+        <translation>データベース接続をテスト</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation>テスト</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>There is no connection to the database</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースに接続されていません</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Test connection successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>接続テストに成功しました</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Backup Information</source>
-        <translation type="unfinished"></translation>
+        <translation>バックアップ情報</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Backup data</source>
-        <translation type="unfinished"></translation>
+        <translation>バックアップデータ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Before performing the operation, check the connection to the server</source>
-        <translation type="unfinished"></translation>
+        <translation>操作を実行する前に、サーバーへの接続を確認してください</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>バックアップ</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Restore data from backup</source>
-        <translation type="unfinished">バックアップからデータを復元します</translation>
+        <translation>バックアップからデータを復元します</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Restore</source>
-        <translation type="unfinished">復元</translation>
+        <translation>復元</translation>
     </message>
 </context>
 <context>
@@ -6335,62 +6335,62 @@
     <message>
         <location filename="../../../Qml/imtgui/Application/DatabaseBackupController.qml" line="+22"/>
         <source>Backup Information</source>
-        <translation type="unfinished"></translation>
+        <translation>バックアップ情報</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Backup data</source>
-        <translation type="unfinished"></translation>
+        <translation>バックアップデータ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Before performing the operation, check the connection to the server</source>
-        <translation type="unfinished"></translation>
+        <translation>操作を実行する前に、サーバーへの接続を確認してください</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>バックアップ</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Restore data from backup</source>
-        <translation type="unfinished">バックアップからデータを復元します</translation>
+        <translation>バックアップからデータを復元します</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Restore</source>
-        <translation type="unfinished">復元</translation>
+        <translation>復元</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Restore successful</source>
-        <translation type="unfinished"></translation>
+        <translation>復元に成功しました</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Database restore was successful</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースの復元に成功しました</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error when trying to restore the database</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースの復元中にエラーが発生しました</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error when trying to create a database backup</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースのバックアップ作成中にエラーが発生しました</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Select backup file</source>
-        <translation type="unfinished"></translation>
+        <translation>バックアップファイルを選択</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Save file</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルを保存</translation>
     </message>
 </context>
 <context>
@@ -6398,22 +6398,22 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/DateInput.qml" line="+35"/>
         <source>Wrong date format!</source>
-        <translation type="unfinished"></translation>
+        <translation>日付の形式が不正です！</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Invalid month value!</source>
-        <translation type="unfinished"></translation>
+        <translation>月の値が無効です！</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Invalid day value!</source>
-        <translation type="unfinished"></translation>
+        <translation>日の値が無効です！</translation>
     </message>
     <message>
         <location line="+230"/>
         <source>Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>日付:</translation>
     </message>
 </context>
 <context>
@@ -6421,62 +6421,62 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/DatePicker.qml" line="+28"/>
         <source>January</source>
-        <translation type="unfinished"></translation>
+        <translation>1月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>February</source>
-        <translation type="unfinished"></translation>
+        <translation>2月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>March</source>
-        <translation type="unfinished"></translation>
+        <translation>3月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>April</source>
-        <translation type="unfinished"></translation>
+        <translation>4月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>May</source>
-        <translation type="unfinished"></translation>
+        <translation>5月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>June</source>
-        <translation type="unfinished"></translation>
+        <translation>6月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>July</source>
-        <translation type="unfinished"></translation>
+        <translation>7月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>August</source>
-        <translation type="unfinished"></translation>
+        <translation>8月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>September</source>
-        <translation type="unfinished"></translation>
+        <translation>9月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>October</source>
-        <translation type="unfinished"></translation>
+        <translation>10月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>November</source>
-        <translation type="unfinished"></translation>
+        <translation>11月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>December</source>
-        <translation type="unfinished"></translation>
+        <translation>12月</translation>
     </message>
 </context>
 <context>
@@ -6484,13 +6484,13 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Base/Decorators.qml" line="+1306"/>
         <source>Progress:</source>
-        <translation type="unfinished"></translation>
+        <translation>進行状況:</translation>
     </message>
     <message>
         <location line="+80"/>
         <location line="+1"/>
         <source>Completed</source>
-        <translation type="unfinished"></translation>
+        <translation>完了</translation>
     </message>
 </context>
 <context>
@@ -6498,22 +6498,22 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocCollectionViewDelegate.qml" line="+179"/>
         <source>Select Document Type</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントタイプを選択</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location line="+53"/>
         <source>Please select a document type</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントタイプを選択してください</translation>
     </message>
 </context>
 <context>
@@ -6521,67 +6521,67 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentCollectionViewDelegate.qml" line="+197"/>
         <source>User</source>
-        <translation type="unfinished">ユーザー</translation>
+        <translation>ユーザー</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Revision</source>
-        <translation type="unfinished">改訂</translation>
+        <translation>改訂</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Active</source>
-        <translation type="unfinished"></translation>
+        <translation>有効</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation>時刻</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Revision Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>改訂マネージャー</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Set this revision</source>
-        <translation type="unfinished"></translation>
+        <translation>この改訂を設定</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Delete revision</source>
-        <translation type="unfinished"></translation>
+        <translation>改訂を削除</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Close</source>
-        <translation type="unfinished">閉じる</translation>
+        <translation>閉じる</translation>
     </message>
     <message>
         <location line="+60"/>
         <source>The document revision has been successfully delete</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントの改訂が正常に削除されました</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>The document revision has been successfully set</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントの改訂が正常に設定されました</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Remove revision</source>
-        <translation type="unfinished"></translation>
+        <translation>改訂を削除</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete the selected revision ?</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した改訂を削除しますか？</translation>
     </message>
     <message>
         <location line="+123"/>
         <source>Description</source>
-        <translation type="unfinished">説明</translation>
+        <translation>説明</translation>
     </message>
 </context>
 <context>
@@ -6589,7 +6589,7 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentHistoryDialog.qml" line="+12"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -6597,7 +6597,7 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentHistoryPanel.qml" line="+79"/>
         <source>History</source>
-        <translation type="unfinished"></translation>
+        <translation>履歴</translation>
     </message>
 </context>
 <context>
@@ -6605,17 +6605,17 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentHistoryView.qml" line="+123"/>
         <source>Revision</source>
-        <translation type="unfinished">改訂</translation>
+        <translation>改訂</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Active</source>
-        <translation type="unfinished"></translation>
+        <translation>有効</translation>
     </message>
     <message>
         <location line="+51"/>
         <source>There is no history for this document</source>
-        <translation type="unfinished"></translation>
+        <translation>このドキュメントには履歴がありません</translation>
     </message>
 </context>
 <context>
@@ -6623,18 +6623,18 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentService.qml" line="+9"/>
         <source>&lt;no name&gt;</source>
-        <translation type="unfinished">&lt;名前なし&gt;</translation>
+        <translation>&lt;名前なし&gt;</translation>
     </message>
     <message>
         <location line="+286"/>
         <source>Unable to get a model for document. Error: Document data controller is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントのモデルを取得できません。エラー: ドキュメントデータコントローラーが無効です</translation>
     </message>
     <message>
         <location line="+363"/>
         <location line="+54"/>
         <source>Internal error</source>
-        <translation type="unfinished"></translation>
+        <translation>内部エラー</translation>
     </message>
 </context>
 <context>
@@ -6642,7 +6642,7 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentServiceBase.qml" line="+100"/>
         <source>&lt;no name&gt;</source>
-        <translation type="unfinished">&lt;名前なし&gt;</translation>
+        <translation>&lt;名前なし&gt;</translation>
     </message>
 </context>
 <context>
@@ -6658,7 +6658,7 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentWorkspaceCommandsDelegate.qml" line="+12"/>
         <source>Document history</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメント履歴</translation>
     </message>
 </context>
 <context>
@@ -6666,22 +6666,22 @@
     <message>
         <location filename="../../../Qml/imtgui/View/DoubleInputElementView.qml" line="+27"/>
         <source>Please enter a value ranging from</source>
-        <translation type="unfinished"></translation>
+        <translation>次の範囲内の値を入力してください:</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>to</source>
-        <translation type="unfinished"></translation>
+        <translation>～</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Please enter a value less than or equal to</source>
-        <translation type="unfinished"></translation>
+        <translation>以下の値を入力してください:</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Please enter a value greater than or equal to</source>
-        <translation type="unfinished"></translation>
+        <translation>以上の値を入力してください:</translation>
     </message>
 </context>
 <context>
@@ -6711,13 +6711,13 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/ErrorDialog.qml" line="+11"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location line="+8"/>
         <location line="+10"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -6725,7 +6725,7 @@
     <message>
         <location filename="../../../Qml/imtlicgui/FeatureCollectionView.qml" line="+77"/>
         <source>Feature Name</source>
-        <translation type="unfinished">フィーチャー名</translation>
+        <translation>フィーチャー名</translation>
     </message>
 </context>
 <context>
@@ -6734,59 +6734,59 @@
         <location filename="../../../Qml/imtlicgui/FeatureEditor.qml" line="+166"/>
         <location line="+376"/>
         <source>Feature Name</source>
-        <translation type="unfinished">フィーチャー名</translation>
+        <translation>フィーチャー名</translation>
     </message>
     <message>
         <location line="-368"/>
         <source>Enter the feature name</source>
-        <translation type="unfinished"></translation>
+        <translation>フィーチャー名を入力してください</translation>
     </message>
     <message>
         <location line="+16"/>
         <location line="+356"/>
         <source>Feature-ID</source>
-        <translation type="unfinished">フィーチャーID</translation>
+        <translation>フィーチャーID</translation>
     </message>
     <message>
         <location line="-348"/>
         <source>Enter the feature ID</source>
-        <translation type="unfinished"></translation>
+        <translation>フィーチャーIDを入力してください</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Description</source>
-        <translation type="unfinished">説明</translation>
+        <translation>説明</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Enter the description</source>
-        <translation type="unfinished"></translation>
+        <translation>説明を入力してください</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Is Optional</source>
-        <translation type="unfinished"></translation>
+        <translation>オプション</translation>
     </message>
     <message>
         <location line="+15"/>
         <location line="+316"/>
         <source>Is Permission</source>
-        <translation type="unfinished"></translation>
+        <translation>権限</translation>
     </message>
     <message>
         <location line="-138"/>
         <source>Dependencies</source>
-        <translation type="unfinished"></translation>
+        <translation>依存関係</translation>
     </message>
     <message>
         <location line="+130"/>
         <source>Feature Description</source>
-        <translation type="unfinished"></translation>
+        <translation>フィーチャーの説明</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Optional</source>
-        <translation type="unfinished"></translation>
+        <translation>オプション</translation>
     </message>
 </context>
 <context>
@@ -6794,22 +6794,22 @@
     <message>
         <location filename="../../../Qml/imtlicgui/FeaturesDialog.qml" line="+11"/>
         <source>Select features</source>
-        <translation type="unfinished"></translation>
+        <translation>フィーチャーを選択</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Add</source>
-        <translation type="unfinished">追加</translation>
+        <translation>追加</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location line="+53"/>
         <source>Feature Name</source>
-        <translation type="unfinished">フィーチャー名</translation>
+        <translation>フィーチャー名</translation>
     </message>
 </context>
 <context>
@@ -6817,7 +6817,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/FileImportDialog.qml" line="+10"/>
         <source>Import file</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルをインポート</translation>
     </message>
 </context>
 <context>
@@ -6825,17 +6825,17 @@
     <message>
         <location filename="../../../Qml/imtgui/View/FilePickerElementView.qml" line="+12"/>
         <source>Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>参照...</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Select a file</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルを選択</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Nothing is selected</source>
-        <translation type="unfinished"></translation>
+        <translation>何も選択されていません</translation>
     </message>
 </context>
 <context>
@@ -6847,27 +6847,27 @@
     <message>
         <location filename="../../../Qml/imtgui/Panels/FilterPanelDecorator.qml" line="+217"/>
         <source>Document State</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントの状態</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Active</source>
-        <translation type="unfinished"></translation>
+        <translation>有効</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>無効</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Creation Date</source>
-        <translation type="unfinished"></translation>
+        <translation>作成日</translation>
     </message>
     <message>
         <location line="+48"/>
         <source>Reset all filters</source>
-        <translation type="unfinished"></translation>
+        <translation>すべてのフィルターをリセット</translation>
     </message>
 </context>
 <context>
@@ -6875,7 +6875,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/FilterableComboBoxElementView.qml" line="+86"/>
         <source>Clear</source>
-        <translation type="unfinished">クリア</translation>
+        <translation>クリア</translation>
     </message>
 </context>
 <context>
@@ -6904,27 +6904,27 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Views/Gallery.qml" line="+86"/>
         <source>Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>ギャラリー</translation>
     </message>
     <message>
         <location line="+293"/>
         <source>Delete photo</source>
-        <translation type="unfinished"></translation>
+        <translation>写真を削除</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Are you sure you want to delete the photo?</source>
-        <translation type="unfinished"></translation>
+        <translation>写真を削除してもよろしいですか？</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -6935,7 +6935,7 @@
         <location line="+34"/>
         <location line="+37"/>
         <source>Invalid user-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーIDが無効です</translation>
     </message>
     <message>
         <location line="-101"/>
@@ -6943,33 +6943,33 @@
         <location line="+34"/>
         <location line="+37"/>
         <source>Invalid document-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントIDが無効です</translation>
     </message>
     <message>
         <location line="-101"/>
         <source>Save document failed</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントの保存に失敗しました</translation>
     </message>
     <message>
         <location line="+33"/>
         <source>Close document failed</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントを閉じるのに失敗しました</translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Undo failed</source>
-        <translation type="unfinished"></translation>
+        <translation>取り消しに失敗しました</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+37"/>
         <source>Invalid step count</source>
-        <translation type="unfinished"></translation>
+        <translation>ステップ数が無効です</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>Redo failed</source>
-        <translation type="unfinished"></translation>
+        <translation>やり直しに失敗しました</translation>
     </message>
 </context>
 <context>
@@ -6977,7 +6977,7 @@
     <message>
         <location filename="../../../Qml/imtguigql/GqlBasedDataModelController.qml" line="+104"/>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation>ネットワークエラー</translation>
     </message>
 </context>
 <context>
@@ -6985,7 +6985,7 @@
     <message>
         <location filename="../../../Qml/imtguigql/GqlBasedDataModelProvider.qml" line="+105"/>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation>ネットワークエラー</translation>
     </message>
 </context>
 <context>
@@ -6993,7 +6993,7 @@
     <message>
         <location filename="../../../Qml/imtguigql/GqlSdlRequestSender.qml" line="+156"/>
         <source>Network error</source>
-        <translation type="unfinished"></translation>
+        <translation>ネットワークエラー</translation>
     </message>
 </context>
 <context>
@@ -7001,47 +7001,47 @@
     <message>
         <location filename="../../../Qml/imtcontrols/GraphicsView/GraphicsView.qml" line="+1310"/>
         <source>Selection mode</source>
-        <translation type="unfinished"></translation>
+        <translation>選択モード</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Edit mode</source>
-        <translation type="unfinished"></translation>
+        <translation>編集モード</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Edit points mode</source>
-        <translation type="unfinished"></translation>
+        <translation>点編集モード</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Add points mode</source>
-        <translation type="unfinished"></translation>
+        <translation>点追加モード</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Delete points mode</source>
-        <translation type="unfinished"></translation>
+        <translation>点削除モード</translation>
     </message>
     <message>
         <location line="+111"/>
         <source>Zoom in</source>
-        <translation type="unfinished">ズームイン</translation>
+        <translation>ズームイン</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Zoom out</source>
-        <translation type="unfinished">ズームアウト</translation>
+        <translation>ズームアウト</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Reset view</source>
-        <translation type="unfinished"></translation>
+        <translation>ビューをリセット</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Fit to view</source>
-        <translation type="unfinished"></translation>
+        <translation>ビューに合わせる</translation>
     </message>
 </context>
 <context>
@@ -7056,27 +7056,27 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/InputActions.qml" line="+37"/>
         <source>Cut</source>
-        <translation type="unfinished"></translation>
+        <translation>切り取り</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>コピー</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Paste</source>
-        <translation type="unfinished"></translation>
+        <translation>貼り付け</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Remove</source>
-        <translation type="unfinished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Select All</source>
-        <translation type="unfinished"></translation>
+        <translation>すべて選択</translation>
     </message>
 </context>
 <context>
@@ -7085,13 +7085,13 @@
         <location filename="../../../Qml/imtcontrols/Dialogs/InputDialog.qml" line="+20"/>
         <location line="+17"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="-16"/>
         <location line="+17"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -7119,53 +7119,53 @@
         <location filename="../../../Qml/imtlicgui/LicenseEditor.qml" line="+237"/>
         <location line="+226"/>
         <source>License Name</source>
-        <translation type="unfinished">ライセンス名</translation>
+        <translation>ライセンス名</translation>
     </message>
     <message>
         <location line="-217"/>
         <source>Enter the license name</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンス名を入力してください</translation>
     </message>
     <message>
         <location line="+21"/>
         <location line="+201"/>
         <source>License-ID</source>
-        <translation type="unfinished">ライセンスID</translation>
+        <translation>ライセンスID</translation>
     </message>
     <message>
         <location line="-192"/>
         <source>Enter the license ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスIDを入力してください</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Description</source>
-        <translation type="unfinished">説明</translation>
+        <translation>説明</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Enter the license description</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスの説明を入力してください</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Product</source>
-        <translation type="unfinished">製品</translation>
+        <translation>製品</translation>
     </message>
     <message>
         <location line="+44"/>
         <source>Features</source>
-        <translation type="unfinished">フィーチャー</translation>
+        <translation>フィーチャー</translation>
     </message>
     <message>
         <location line="+48"/>
         <source>Dependencies</source>
-        <translation type="unfinished"></translation>
+        <translation>依存関係</translation>
     </message>
     <message>
         <location line="+67"/>
         <source>Feature Name</source>
-        <translation type="unfinished">フィーチャー名</translation>
+        <translation>フィーチャー名</translation>
     </message>
 </context>
 <context>
@@ -7180,7 +7180,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/LogView.qml" line="+31"/>
         <source>Log</source>
-        <translation type="unfinished">ログ</translation>
+        <translation>ログ</translation>
     </message>
 </context>
 <context>
@@ -7199,22 +7199,22 @@
     <message>
         <location filename="../../../Qml/imtgui/View/MacAddressElementView.qml" line="+10"/>
         <source>MAC-Address</source>
-        <translation type="unfinished"></translation>
+        <translation>MACアドレス</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter MAC-Address</source>
-        <translation type="unfinished"></translation>
+        <translation>MACアドレスを入力してください</translation>
     </message>
     <message>
         <location line="+54"/>
         <source>MAC Address must be in the format XX:XX:XX:XX:XX:XX</source>
-        <translation type="unfinished"></translation>
+        <translation>MACアドレスは XX:XX:XX:XX:XX:XX の形式である必要があります</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Only the symbols &lt;a-f&gt; and &lt;0 - 9&gt; may be included</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;a-f&gt; と &lt;0 - 9&gt; の記号のみ使用できます</translation>
     </message>
 </context>
 <context>
@@ -7222,27 +7222,27 @@
     <message>
         <location filename="../../../Qml/imtcolgui/MessageCollectionFilterDecorator.qml" line="+106"/>
         <source>Info</source>
-        <translation type="unfinished"></translation>
+        <translation>情報</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Warning</source>
-        <translation type="unfinished">警告</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Critical</source>
-        <translation type="unfinished"></translation>
+        <translation>重大</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Verbose</source>
-        <translation type="unfinished"></translation>
+        <translation>詳細</translation>
     </message>
 </context>
 <context>
@@ -7250,7 +7250,7 @@
     <message>
         <location filename="../../../Qml/imtcolgui/MessageCollectionView.qml" line="+118"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -7258,19 +7258,19 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/MessageDialog.qml" line="+11"/>
         <source>Message</source>
-        <translation type="unfinished">メッセージ</translation>
+        <translation>メッセージ</translation>
     </message>
     <message>
         <location line="+8"/>
         <location line="+11"/>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>はい</translation>
     </message>
     <message>
         <location line="-10"/>
         <location line="+11"/>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>いいえ</translation>
     </message>
 </context>
 <context>
@@ -7278,7 +7278,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/MessagePopup.qml" line="+9"/>
         <source>Message</source>
-        <translation type="unfinished">メッセージ</translation>
+        <translation>メッセージ</translation>
     </message>
 </context>
 <context>
@@ -7286,22 +7286,22 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/ModalDialogManager.qml" line="+132"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>情報</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Warning</source>
-        <translation type="unfinished">警告</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Critical</source>
-        <translation type="unfinished"></translation>
+        <translation>重大</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -7313,22 +7313,22 @@
     <message>
         <location filename="../../../Qml/imtdocgui/MultiDocWorkspaceView.qml" line="+172"/>
         <source>Save document</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントを保存</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Save all changes ?</source>
-        <translation type="unfinished"></translation>
+        <translation>すべての変更を保存しますか？</translation>
     </message>
     <message>
         <location line="+81"/>
         <source>Close document</source>
-        <translation type="unfinished">ドキュメントを閉じる</translation>
+        <translation>ドキュメントを閉じる</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Close all documents</source>
-        <translation type="unfinished"></translation>
+        <translation>すべてのドキュメントを閉じる</translation>
     </message>
 </context>
 <context>
@@ -7336,32 +7336,32 @@
     <message>
         <location filename="../../../Qml/imtdocgui/MultiDocumentCollectionView.qml" line="+123"/>
         <source>Document Name</source>
-        <translation type="unfinished">ドキュメント名</translation>
+        <translation>ドキュメント名</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the document name</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメント名を入力してください</translation>
     </message>
     <message>
         <location line="+204"/>
         <source>Save document</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントを保存</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Save all changes ?</source>
-        <translation type="unfinished"></translation>
+        <translation>すべての変更を保存しますか？</translation>
     </message>
     <message>
         <location line="+52"/>
         <source>Close document</source>
-        <translation type="unfinished">ドキュメントを閉じる</translation>
+        <translation>ドキュメントを閉じる</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Close all documents</source>
-        <translation type="unfinished"></translation>
+        <translation>すべてのドキュメントを閉じる</translation>
     </message>
 </context>
 <context>
@@ -7384,12 +7384,12 @@
     <message>
         <location filename="../../../Qml/imtlicgui/PackageCollectionViewCommandsDelegate.qml" line="+10"/>
         <source>Deleting a feature</source>
-        <translation type="unfinished"></translation>
+        <translation>フィーチャーを削除しています</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete the selected feature ?</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したフィーチャーを削除しますか？</translation>
     </message>
 </context>
 <context>
@@ -7412,12 +7412,12 @@
     <message>
         <location filename="../../../Qml/imtlicgui/PackageViewItemDelegate.qml" line="+152"/>
         <source>Feature-ID already exists (In this or another package)</source>
-        <translation type="unfinished"></translation>
+        <translation>フィーチャーIDは既に存在します（このパッケージまたは別のパッケージ内）</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>It is impossible to rename the feature, please remove all dependencies</source>
-        <translation type="unfinished"></translation>
+        <translation>フィーチャーの名前を変更できません。すべての依存関係を削除してください</translation>
     </message>
 </context>
 <context>
@@ -7425,12 +7425,12 @@
     <message>
         <location filename="../../../Qml/imtgui/Settings/PageAboutProvider.qml" line="+36"/>
         <source>Server Version</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーバージョン</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーログ</translation>
     </message>
 </context>
 <context>
@@ -7438,7 +7438,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/Pagination.qml" line="+193"/>
         <source>Per page: </source>
-        <translation type="unfinished"></translation>
+        <translation>ページあたり: </translation>
     </message>
 </context>
 <context>
@@ -7446,27 +7446,27 @@
     <message>
         <location filename="../../../Qml/imtauthgui/PasswordInput.qml" line="+43"/>
         <source>Passwords don&apos;t match</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードが一致しません</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Current password</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のパスワード</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Enter the current password</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のパスワードを入力してください</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>New password</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいパスワード</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Enter the new password</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいパスワードを入力してください</translation>
     </message>
     <message>
         <source>Password</source>
@@ -7476,7 +7476,7 @@
         <location line="+11"/>
         <location line="+2"/>
         <source>Confirm password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードの確認</translation>
     </message>
 </context>
 <context>
@@ -7484,103 +7484,103 @@
     <message>
         <location filename="../../../Qml/imtauthgui/PasswordRecoveryDialog.qml" line="+15"/>
         <source>Password Recovery</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードの回復</translation>
     </message>
     <message>
         <location line="+27"/>
         <location line="+40"/>
         <source>Check the email</source>
-        <translation type="unfinished"></translation>
+        <translation>メールを確認</translation>
     </message>
     <message>
         <location line="-35"/>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>はい</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Check the code</source>
-        <translation type="unfinished"></translation>
+        <translation>コードを確認</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Change password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードを変更</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Check the email you entered</source>
-        <translation type="unfinished"></translation>
+        <translation>入力したメールを確認してください</translation>
     </message>
     <message>
         <location line="+41"/>
         <source>Enter the email</source>
-        <translation type="unfinished"></translation>
+        <translation>メールを入力してください</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Email</source>
-        <translation type="unfinished"></translation>
+        <translation>メール</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the email address that was specified on your account, a code will be sent to it</source>
-        <translation type="unfinished"></translation>
+        <translation>アカウントに指定されたメールアドレスを入力してください。そこにコードが送信されます</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Please enter the valid email</source>
-        <translation type="unfinished"></translation>
+        <translation>有効なメールを入力してください</translation>
     </message>
     <message>
         <location line="+37"/>
         <source>Enter the code</source>
-        <translation type="unfinished"></translation>
+        <translation>コードを入力してください</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Code</source>
-        <translation type="unfinished"></translation>
+        <translation>コード</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Please enter the code sent to your email</source>
-        <translation type="unfinished"></translation>
+        <translation>メールに送信されたコードを入力してください</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Send the code again</source>
-        <translation type="unfinished"></translation>
+        <translation>コードを再送信</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Send</source>
-        <translation type="unfinished"></translation>
+        <translation>送信</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>The new code can be obtained via</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいコードは次で取得できます</translation>
     </message>
     <message>
         <location line="+47"/>
         <source>Username</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー名</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>For this email this account has been found, is that you?</source>
-        <translation type="unfinished"></translation>
+        <translation>このメールでこのアカウントが見つかりました。ご本人ですか？</translation>
     </message>
     <message>
         <location line="+142"/>
         <source>Password changed successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードが正常に変更されました</translation>
     </message>
 </context>
 <context>
@@ -7588,112 +7588,112 @@
     <message>
         <location filename="../../../Qml/imtgui/Params/PatTokenParamEditor.qml" line="+138"/>
         <source>Token Created Successfully</source>
-        <translation type="unfinished"></translation>
+        <translation>トークンが正常に作成されました</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Please copy and save the token:</source>
-        <translation type="unfinished"></translation>
+        <translation>トークンをコピーして保存してください:</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>The token is copied</source>
-        <translation type="unfinished"></translation>
+        <translation>トークンがコピーされました</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Copy the token</source>
-        <translation type="unfinished"></translation>
+        <translation>トークンをコピー</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>New Token</source>
-        <translation type="unfinished"></translation>
+        <translation>新規トークン</translation>
     </message>
     <message>
         <location line="+62"/>
         <source>No Expiration</source>
-        <translation type="unfinished"></translation>
+        <translation>有効期限なし</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Delete Token</source>
-        <translation type="unfinished"></translation>
+        <translation>トークンを削除</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Revoke Token</source>
-        <translation type="unfinished"></translation>
+        <translation>トークンを失効</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Revoked</source>
-        <translation type="unfinished"></translation>
+        <translation>失効済み</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Are you sure you want to delete this token?</source>
-        <translation type="unfinished"></translation>
+        <translation>このトークンを削除してもよろしいですか？</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Any applications or scripts using this token will no longer be able to access the API. You cannot undo this action.</source>
-        <translation type="unfinished"></translation>
+        <translation>このトークンを使用するアプリケーションやスクリプトはAPIにアクセスできなくなります。この操作は元に戻せません。</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Add PAT Token</source>
-        <translation type="unfinished"></translation>
+        <translation>PATトークンを追加</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Add</source>
-        <translation type="unfinished">追加</translation>
+        <translation>追加</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Token Name</source>
-        <translation type="unfinished"></translation>
+        <translation>トークン名</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>A descriptive name for this token</source>
-        <translation type="unfinished"></translation>
+        <translation>このトークンの分かりやすい名前</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Please enter the token name</source>
-        <translation type="unfinished"></translation>
+        <translation>トークン名を入力してください</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Description</source>
-        <translation type="unfinished">説明</translation>
+        <translation>説明</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Optional description for this token</source>
-        <translation type="unfinished"></translation>
+        <translation>このトークンの説明（任意）</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Expiration</source>
-        <translation type="unfinished">有効期限切れ</translation>
+        <translation>有効期限切れ</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>The token will expire on the selected date</source>
-        <translation type="unfinished"></translation>
+        <translation>トークンは選択した日付に失効します</translation>
     </message>
 </context>
 <context>
@@ -7701,12 +7701,12 @@
     <message>
         <location filename="../../../Qml/imtgui/Settings/PatTokenSettingsController.qml" line="+14"/>
         <source>PAT Tokens</source>
-        <translation type="unfinished"></translation>
+        <translation>PATトークン</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Personal Access Tokens for API authentication</source>
-        <translation type="unfinished"></translation>
+        <translation>API認証用のパーソナルアクセストークン</translation>
     </message>
 </context>
 <context>
@@ -7714,7 +7714,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/PopupDecoratorGql.qml" line="+310"/>
         <source>No data</source>
-        <translation type="unfinished"></translation>
+        <translation>データがありません</translation>
     </message>
 </context>
 <context>
@@ -7722,23 +7722,23 @@
     <message>
         <location filename="../../../Qml/imtgui/Settings/PreferenceDialog.qml" line="+12"/>
         <source>Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>環境設定</translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Apply</source>
-        <translation type="unfinished"></translation>
+        <translation>適用</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+6"/>
         <source>Close</source>
-        <translation type="unfinished">閉じる</translation>
+        <translation>閉じる</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -7753,32 +7753,32 @@
     <message>
         <location filename="../../../Qml/imtlicgui/ProductCollectionViewCommandsDelegate.qml" line="+15"/>
         <source>Deleting a product</source>
-        <translation type="unfinished"></translation>
+        <translation>製品を削除しています</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete the selected product ?</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した製品を削除しますか？</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Select product</source>
-        <translation type="unfinished"></translation>
+        <translation>製品を選択</translation>
     </message>
     <message>
         <location line="+46"/>
         <source>Feature overwriting</source>
-        <translation type="unfinished"></translation>
+        <translation>フィーチャーの上書き</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Overwrite features ?</source>
-        <translation type="unfinished"></translation>
+        <translation>フィーチャーを上書きしますか？</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Please enter the name of the document:</source>
-        <translation type="unfinished">ドキュメント名を入力してください:</translation>
+        <translation>ドキュメント名を入力してください:</translation>
     </message>
 </context>
 <context>
@@ -7794,32 +7794,32 @@
     <message>
         <location filename="../../../Qml/imtlicgui/ProductView.qml" line="+50"/>
         <source>Feature Name</source>
-        <translation type="unfinished">フィーチャー名</translation>
+        <translation>フィーチャー名</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Feature-ID</source>
-        <translation type="unfinished">フィーチャーID</translation>
+        <translation>フィーチャーID</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Description</source>
-        <translation type="unfinished">説明</translation>
+        <translation>説明</translation>
     </message>
     <message>
         <location line="+147"/>
         <source>Product Name</source>
-        <translation type="unfinished"></translation>
+        <translation>製品名</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Enter the product name</source>
-        <translation type="unfinished"></translation>
+        <translation>製品名を入力してください</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>カテゴリ</translation>
     </message>
 </context>
 <context>
@@ -7827,73 +7827,73 @@
     <message>
         <location filename="../../../Qml/imtauthgui/ProfileView.qml" line="+122"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>一般</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Username</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー名</translation>
     </message>
     <message>
         <location line="+10"/>
         <location line="+137"/>
         <source>Name</source>
-        <translation type="unfinished">名前</translation>
+        <translation>名前</translation>
     </message>
     <message>
         <location line="-136"/>
         <source>Enter the name</source>
-        <translation type="unfinished"></translation>
+        <translation>名前を入力してください</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Email Address</source>
-        <translation type="unfinished"></translation>
+        <translation>メールアドレス</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enter the email</source>
-        <translation type="unfinished"></translation>
+        <translation>メールを入力してください</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Save</source>
-        <translation type="unfinished">保存</translation>
+        <translation>保存</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Change password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードを変更</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Change</source>
-        <translation type="unfinished"></translation>
+        <translation>変更</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Change Password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードを変更</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Roles</source>
-        <translation type="unfinished"></translation>
+        <translation>ロール</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>グループ</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Permissions</source>
-        <translation type="unfinished"></translation>
+        <translation>権限</translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Description</source>
-        <translation type="unfinished">説明</translation>
+        <translation>説明</translation>
     </message>
 </context>
 <context>
@@ -7901,7 +7901,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Views/ProgressBar.qml" line="+22"/>
         <source>Progress:</source>
-        <translation type="unfinished"></translation>
+        <translation>進行状況:</translation>
     </message>
 </context>
 <context>
@@ -7909,34 +7909,34 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/ProgressDialogManager.qml" line="+11"/>
         <source>Progress manager</source>
-        <translation type="unfinished"></translation>
+        <translation>進行状況マネージャー</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Total progress</source>
-        <translation type="unfinished"></translation>
+        <translation>全体の進行状況</translation>
     </message>
     <message>
         <location line="+45"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+32"/>
         <location line="+4"/>
         <location line="+116"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location line="-47"/>
         <source>Subtasks</source>
-        <translation type="unfinished"></translation>
+        <translation>サブタスク</translation>
     </message>
     <message>
         <location line="+82"/>
         <source>Cancelling</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセルしています</translation>
     </message>
 </context>
 <context>
@@ -7944,14 +7944,14 @@
     <message>
         <location filename="../../../Include/imtgui/TDocumentWorkspaceGuiCompBase.h" line="+318"/>
         <source>Close document</source>
-        <translation type="unfinished">ドキュメントを閉じる</translation>
+        <translation>ドキュメントを閉じる</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Do you want to save your changes made in document
 %1</source>
-        <translation type="unfinished">ドキュメントの変更を保存しますか
-%1</translation>
+        <translation>ドキュメント
+%1 で行った変更を保存しますか？</translation>
     </message>
 </context>
 <context>
@@ -8229,7 +8229,7 @@ NOK: 0
     <message>
         <location filename="../../../Include/imtauth/CAccountInfoMetaInfoCreatorComp.cpp" line="+43"/>
         <source>Private</source>
-        <translation type="unfinished"></translation>
+        <translation>プライベート</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -8242,7 +8242,7 @@ NOK: 0
         <location line="+3"/>
         <location line="+1"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>不明</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CAccountInfoMetaInfo.cpp" line="+2"/>
@@ -8307,7 +8307,7 @@ NOK: 0
     <message>
         <location line="+7"/>
         <source>%1</source>
-        <translation></translation>
+        <translation>%1</translation>
     </message>
     <message>
         <location filename="../../../Include/imtgui/TStandardDocumentViewDecorator.h" line="+366"/>
@@ -8422,13 +8422,13 @@ NOK: 0
     <message>
         <location line="+2"/>
         <source>Instance-ID</source>
-        <translation type="unfinished">MACアドレス</translation>
+        <translation>MACアドレス</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtlic/CProductLicensingMetaInfo.cpp" line="+19"/>
         <source>Category-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>カテゴリID</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlic/CProductInstanceMetaInfoCreatorComp.cpp" line="+51"/>
@@ -8458,27 +8458,27 @@ NOK: 0
     <message>
         <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+300"/>
         <source>Task Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>タスクマネージャー</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Task could not be created!</source>
-        <translation type="unfinished"></translation>
+        <translation>タスクを作成できませんでした！</translation>
     </message>
     <message>
         <location line="+87"/>
         <source>Task Error</source>
-        <translation type="unfinished"></translation>
+        <translation>タスクエラー</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Task could not be duplicated!</source>
-        <translation type="unfinished"></translation>
+        <translation>タスクをコピーできませんでした！</translation>
     </message>
     <message>
         <location line="+130"/>
         <source>Enter new task name</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいタスク名を入力してください</translation>
     </message>
     <message>
         <location line="+40"/>
@@ -8490,17 +8490,17 @@ NOK: 0
     <message>
         <location line="+1"/>
         <source>Task name already exist</source>
-        <translation type="unfinished"></translation>
+        <translation>タスク名は既に存在します</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Wrong task name</source>
-        <translation type="unfinished"></translation>
+        <translation>タスク名が不正です</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Empty task name cannot be used</source>
-        <translation type="unfinished"></translation>
+        <translation>空のタスク名は使用できません</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlicgui/CFeatureDependencyEditorBase.cpp" line="-26"/>
@@ -8588,225 +8588,225 @@ NOK: 0
         <location filename="../../../Include/imtlicgql/CLicenseControllerComp.cpp" line="+159"/>
         <location filename="../../../Include/imtservergql/CObjectMetaInfoCollectionControllerComp.cpp" line="+29"/>
         <source>Internal error</source>
-        <translation type="unfinished"></translation>
+        <translation>内部エラー</translation>
     </message>
     <message>
         <location filename="../../../Include/imtgeo/CAddressControllerComp.cpp" line="-131"/>
         <source>Can not insert object: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>オブジェクトを挿入できません: %1</translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Can not create Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>住所を作成できません: %1</translation>
     </message>
     <message>
         <location line="+71"/>
         <source>Can not create address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>住所を作成できません: %1</translation>
     </message>
     <message>
         <location line="+47"/>
         <source>Can not update object: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>オブジェクトを更新できません: %1</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Can not create object for update: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>更新用のオブジェクトを作成できません: %1</translation>
     </message>
     <message>
         <location filename="../../../Include/imtimg/CBitmapMetaInfo.cpp" line="+17"/>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation>幅</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Height</source>
-        <translation type="unfinished"></translation>
+        <translation>高さ</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Depth</source>
-        <translation type="unfinished"></translation>
+        <translation>深さ</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Format</source>
-        <translation type="unfinished"></translation>
+        <translation>形式</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Color Space</source>
-        <translation type="unfinished"></translation>
+        <translation>色空間</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Color Space Type</source>
-        <translation type="unfinished"></translation>
+        <translation>色空間タイプ</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Pixel Depth</source>
-        <translation type="unfinished"></translation>
+        <translation>ピクセル深度</translation>
     </message>
     <message>
         <location filename="../../../Include/imtimg/CBitmapMetaInfoCreatorComp.cpp" line="-28"/>
         <source> bits</source>
-        <translation type="unfinished"></translation>
+        <translation> ビット</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Grayscale</source>
-        <translation type="unfinished"></translation>
+        <translation>グレースケール</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Monochromatic</source>
-        <translation type="unfinished"></translation>
+        <translation>モノクロ</translation>
     </message>
     <message>
         <location line="+4"/>
         <location line="+1"/>
         <source>RGB</source>
-        <translation type="unfinished"></translation>
+        <translation>RGB</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+1"/>
         <source>RGBA</source>
-        <translation type="unfinished"></translation>
+        <translation>RGBA</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Float</source>
-        <translation type="unfinished"></translation>
+        <translation>浮動小数点</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CUserInfoMetaInfo.cpp" line="+17"/>
         <source>Email</source>
-        <translation type="unfinished"></translation>
+        <translation>メール</translation>
     </message>
     <message>
         <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="-45"/>
         <source>Name</source>
-        <translation type="unfinished">名前</translation>
+        <translation>名前</translation>
     </message>
     <message>
         <location filename="../../../Include/imtbase/CCollectionDataControllerComp.cpp" line="+74"/>
         <source>Import from %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1からインポート</translation>
     </message>
     <message>
         <location filename="../../../Include/imtdb/CSqlDatabaseDocumentDelegateLegacyComp.cpp" line="+156"/>
         <source>Initial revision</source>
-        <translation type="unfinished"></translation>
+        <translation>最初の改訂</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlic/CProductLicensingMetaInfo.cpp" line="-2"/>
         <source>Product</source>
-        <translation type="unfinished">製品</translation>
+        <translation>製品</translation>
     </message>
     <message>
         <location filename="../../../Include/imttest/CTestMetaInfo.cpp" line="+19"/>
         <source>Test Id</source>
-        <translation type="unfinished"></translation>
+        <translation>テストID</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Test Name</source>
-        <translation type="unfinished"></translation>
+        <translation>テスト名</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CSessionMetaInfoCreatorComp.cpp" line="+53"/>
         <source>Token</source>
-        <translation type="unfinished"></translation>
+        <translation>トークン</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>User-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーID</translation>
     </message>
     <message>
         <location filename="../../../Include/imtserverapp/CSystemStatusComp.cpp" line="+185"/>
         <source>The %1 server cannot be connected at %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 サーバーに %2 で接続できません。</translation>
     </message>
     <message>
         <location filename="../../../Include/imtcol/imtcol.h" line="+190"/>
         <source>Invalid document</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントが無効です</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Version 1.0 of the GQL request arguments is missing</source>
-        <translation type="unfinished"></translation>
+        <translation>GQL要求引数のバージョン1.0がありません</translation>
     </message>
     <message>
         <location filename="../../../Include/imthypegui/CTaskItemDelegate.cpp" line="+178"/>
         <source>Not active</source>
-        <translation type="unfinished"></translation>
+        <translation>無効</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlic/CFeatureMetaInfoCreatorComp.cpp" line="+56"/>
         <source>Feature-ID</source>
-        <translation type="unfinished">フィーチャーID</translation>
+        <translation>フィーチャーID</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Feature Name</source>
-        <translation type="unfinished">フィーチャー名</translation>
+        <translation>フィーチャー名</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Feature Description</source>
-        <translation type="unfinished"></translation>
+        <translation>フィーチャーの説明</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Is Optional</source>
-        <translation type="unfinished"></translation>
+        <translation>オプション</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Is Permission</source>
-        <translation type="unfinished"></translation>
+        <translation>権限</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlic/CLicenseMetaInfoCreatorComp.cpp" line="+55"/>
         <source>License-ID</source>
-        <translation type="unfinished">ライセンスID</translation>
+        <translation>ライセンスID</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>License Name</source>
-        <translation type="unfinished">ライセンス名</translation>
+        <translation>ライセンス名</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>License Description</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスの説明</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtlic/CProductMetaInfoCreatorComp.cpp" line="-4"/>
         <source>Product-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>製品ID</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlic/CProductMetaInfoCreatorComp.cpp" line="-2"/>
         <source>Product Name</source>
-        <translation type="unfinished"></translation>
+        <translation>製品名</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>カテゴリ</translation>
     </message>
 </context>
 <context>
@@ -8851,12 +8851,12 @@ NOK: 0
     <message>
         <location filename="../../../Qml/imtguigql/RemoteCollectionView.qml" line="+157"/>
         <source>This table has been modified from another computer</source>
-        <translation type="unfinished"></translation>
+        <translation>このテーブルは別のコンピューターから変更されました</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>更新</translation>
     </message>
 </context>
 <context>
@@ -8864,12 +8864,12 @@ NOK: 0
     <message>
         <location filename="../../../Qml/imtauthgui/RoleCollectionViewCommandsDelegate.qml" line="+12"/>
         <source>Deleting a role</source>
-        <translation type="unfinished"></translation>
+        <translation>ロールを削除しています</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete the selected role ?</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したロールを削除しますか？</translation>
     </message>
 </context>
 <context>
@@ -8884,52 +8884,52 @@ NOK: 0
     <message>
         <location filename="../../../Qml/imtauthgui/RoleView.qml" line="+99"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>一般</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Role Name</source>
-        <translation type="unfinished"></translation>
+        <translation>ロール名</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the role name</source>
-        <translation type="unfinished"></translation>
+        <translation>ロール名を入力してください</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Role-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ロールID</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Description</source>
-        <translation type="unfinished">説明</translation>
+        <translation>説明</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the description</source>
-        <translation type="unfinished"></translation>
+        <translation>説明を入力してください</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Parent Roles</source>
-        <translation type="unfinished"></translation>
+        <translation>親ロール</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Adding Parent Role</source>
-        <translation type="unfinished"></translation>
+        <translation>親ロールを追加</translation>
     </message>
     <message>
         <location line="+47"/>
         <source>Permissions</source>
-        <translation type="unfinished"></translation>
+        <translation>権限</translation>
     </message>
     <message>
         <location line="+80"/>
         <source>Permission</source>
-        <translation type="unfinished"></translation>
+        <translation>権限</translation>
     </message>
 </context>
 <context>
@@ -8937,27 +8937,27 @@ NOK: 0
     <message>
         <location filename="../../../Qml/imtgui/Params/SchedulerParamEditor.qml" line="+34"/>
         <source>Start Time</source>
-        <translation type="unfinished"></translation>
+        <translation>開始時刻</translation>
     </message>
     <message>
         <location line="+37"/>
         <source>Backup Interval</source>
-        <translation type="unfinished"></translation>
+        <translation>バックアップ間隔</translation>
     </message>
     <message>
         <location line="+54"/>
         <source>Day</source>
-        <translation type="unfinished"></translation>
+        <translation>日</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Week</source>
-        <translation type="unfinished"></translation>
+        <translation>週</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Month</source>
-        <translation type="unfinished"></translation>
+        <translation>月</translation>
     </message>
 </context>
 <context>
@@ -8965,7 +8965,7 @@ NOK: 0
     <message>
         <location filename="../../../Qml/imtgui/View/SearchAddressComp.qml" line="+21"/>
         <source>Address</source>
-        <translation type="unfinished"></translation>
+        <translation>住所</translation>
     </message>
 </context>
 <context>
@@ -8973,7 +8973,7 @@ NOK: 0
     <message>
         <location filename="../../../Qml/imtgui/View/SearchCompLegacy.qml" line="+731"/>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>検索</translation>
     </message>
 </context>
 <context>
@@ -8981,12 +8981,12 @@ NOK: 0
     <message>
         <location filename="../../../Qml/imtgui/View/SearchResultsView.qml" line="+67"/>
         <source>No results</source>
-        <translation type="unfinished"></translation>
+        <translation>結果がありません</translation>
     </message>
     <message>
         <location line="+122"/>
         <source>Go to the content</source>
-        <translation type="unfinished"></translation>
+        <translation>コンテンツへ移動</translation>
     </message>
 </context>
 <context>
@@ -8994,7 +8994,7 @@ NOK: 0
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/SearchTextInput.qml" line="+12"/>
         <source>Enter text for search</source>
-        <translation type="unfinished"></translation>
+        <translation>検索するテキストを入力してください</translation>
     </message>
 </context>
 <context>
@@ -9002,33 +9002,33 @@ NOK: 0
     <message>
         <location filename="../../../Qml/imtguigql/SelectableCollectionEditor.qml" line="+71"/>
         <source>New</source>
-        <translation type="unfinished">新規</translation>
+        <translation>新規</translation>
     </message>
     <message>
         <location line="+15"/>
         <location line="+151"/>
         <source>Add</source>
-        <translation type="unfinished">追加</translation>
+        <translation>追加</translation>
     </message>
     <message>
         <location line="-132"/>
         <source>Remove</source>
-        <translation type="unfinished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location line="+39"/>
         <source>Selected Elements</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した要素</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>New Elements</source>
-        <translation type="unfinished"></translation>
+        <translation>新しい要素</translation>
     </message>
     <message>
         <location line="+93"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
@@ -9036,22 +9036,22 @@ NOK: 0
     <message>
         <location filename="../../../Qml/imtgui/View/ServerConnectionParamElementView.qml" line="+45"/>
         <source>Server Host</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーホスト</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Http Port</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTPポート</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Web Socket Port</source>
-        <translation type="unfinished"></translation>
+        <translation>WebSocketポート</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Secure Connection</source>
-        <translation type="unfinished"></translation>
+        <translation>セキュア接続</translation>
     </message>
 </context>
 <context>
@@ -9059,17 +9059,17 @@ NOK: 0
     <message>
         <location filename="../../../Qml/imtgui/Settings/ServerLogProvider.qml" line="+18"/>
         <source>Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーログ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Download</source>
-        <translation type="unfinished"></translation>
+        <translation>ダウンロード</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Save file</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルを保存</translation>
     </message>
 </context>
 <context>
@@ -9077,12 +9077,12 @@ NOK: 0
     <message>
         <location filename="../../../Qml/imtdocgui/SingleDocumentWorkspaceView.qml" line="+134"/>
         <source>Save document</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントを保存</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Save all changes ?</source>
-        <translation type="unfinished"></translation>
+        <translation>すべての変更を保存しますか？</translation>
     </message>
 </context>
 <context>
@@ -9103,12 +9103,12 @@ NOK: 0
     <message>
         <location filename="../../../Qml/imtauthgui/SuperuserPasswordPage.qml" line="+67"/>
         <source>Please fill in the information for the system administrator</source>
-        <translation type="unfinished"></translation>
+        <translation>システム管理者の情報を入力してください</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -9134,34 +9134,36 @@ NOK: 0
     <message>
         <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+12"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>The task name contains some not allowed characters</source>
-        <translation type="unfinished"></translation>
+        <translation>タスク名に許可されていない文字が含まれています</translation>
     </message>
     <message>
         <location line="+58"/>
         <source>Task Input Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>タスク入力マネージャー</translation>
     </message>
     <message>
         <location line="+332"/>
         <source>Task name: </source>
-        <translation type="unfinished"></translation>
+        <translation>タスク名: </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>
 User-ID: </source>
-        <translation type="unfinished"></translation>
+        <translation>
+ユーザーID: </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>
 Input-ID: </source>
-        <translation type="unfinished"></translation>
+        <translation>
+入力ID: </translation>
     </message>
 </context>
 <context>
@@ -9169,37 +9171,37 @@ Input-ID: </source>
     <message>
         <location filename="../../../Qml/imtcontrols/Views/TableHeaderParamComp.qml" line="+12"/>
         <source>Table configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>テーブル構成</translation>
     </message>
     <message>
         <location line="+95"/>
         <source>Select at least one column</source>
-        <translation type="unfinished"></translation>
+        <translation>少なくとも1つの列を選択してください</translation>
     </message>
     <message>
         <location line="+120"/>
         <source>Available Columns</source>
-        <translation type="unfinished"></translation>
+        <translation>利用可能な列</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Apply</source>
-        <translation type="unfinished"></translation>
+        <translation>適用</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Confirm reset headers</source>
-        <translation type="unfinished"></translation>
+        <translation>ヘッダーのリセットを確認</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Reset header settings to default ?</source>
-        <translation type="unfinished"></translation>
+        <translation>ヘッダー設定を既定値にリセットしますか？</translation>
     </message>
 </context>
 <context>
@@ -9214,7 +9216,7 @@ Input-ID: </source>
     <message>
         <location filename="../../../Qml/imtgui/View/TextInputElementView.qml" line="+22"/>
         <source>Enter the correct value</source>
-        <translation type="unfinished"></translation>
+        <translation>正しい値を入力してください</translation>
     </message>
 </context>
 <context>
@@ -9222,37 +9224,37 @@ Input-ID: </source>
     <message>
         <location filename="../../../Qml/imtgui/Panels/TimeFilterDelegate.qml" line="+9"/>
         <source>Date</source>
-        <translation type="unfinished"></translation>
+        <translation>日付</translation>
     </message>
     <message>
         <location line="+105"/>
         <source>Last 7 Days</source>
-        <translation type="unfinished"></translation>
+        <translation>直近7日間</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>This Month</source>
-        <translation type="unfinished"></translation>
+        <translation>今月</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Last Month</source>
-        <translation type="unfinished"></translation>
+        <translation>直近1か月</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>This Year</source>
-        <translation type="unfinished"></translation>
+        <translation>今年</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Last Year</source>
-        <translation type="unfinished"></translation>
+        <translation>直近1年</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation>カスタム</translation>
     </message>
 </context>
 <context>
@@ -9260,52 +9262,52 @@ Input-ID: </source>
     <message>
         <location filename="../../../Qml/imtgui/View/TimeFilterParamView.qml" line="+119"/>
         <source>Last 7 Days</source>
-        <translation type="unfinished"></translation>
+        <translation>直近7日間</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>This Month</source>
-        <translation type="unfinished"></translation>
+        <translation>今月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Last Month</source>
-        <translation type="unfinished"></translation>
+        <translation>直近1か月</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>This Year</source>
-        <translation type="unfinished"></translation>
+        <translation>今年</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Last Year</source>
-        <translation type="unfinished"></translation>
+        <translation>直近1年</translation>
     </message>
     <message>
         <location line="+76"/>
         <source>From</source>
-        <translation type="unfinished"></translation>
+        <translation>開始</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Select a date</source>
-        <translation type="unfinished"></translation>
+        <translation>日付を選択</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>To</source>
-        <translation type="unfinished"></translation>
+        <translation>終了</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Apply</source>
-        <translation type="unfinished"></translation>
+        <translation>適用</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Clear</source>
-        <translation type="unfinished">クリア</translation>
+        <translation>クリア</translation>
     </message>
 </context>
 <context>
@@ -9313,12 +9315,12 @@ Input-ID: </source>
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/TimeInput.qml" line="+154"/>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>時刻:</translation>
     </message>
     <message>
         <location line="+87"/>
         <source>Wrong time format!</source>
-        <translation type="unfinished"></translation>
+        <translation>時刻の形式が不正です！</translation>
     </message>
 </context>
 <context>
@@ -9326,17 +9328,17 @@ Input-ID: </source>
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/TimeIntervalPicker.qml" line="+127"/>
         <source>Days</source>
-        <translation type="unfinished"></translation>
+        <translation>日</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Hours</source>
-        <translation type="unfinished"></translation>
+        <translation>時間</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>分</translation>
     </message>
 </context>
 <context>
@@ -9344,12 +9346,12 @@ Input-ID: </source>
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/TimePicker.qml" line="+97"/>
         <source>Hours</source>
-        <translation type="unfinished"></translation>
+        <translation>時間</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>分</translation>
     </message>
 </context>
 <context>
@@ -9357,27 +9359,27 @@ Input-ID: </source>
     <message>
         <location filename="../../../Qml/imtauthgui/UserActionCollectionView.qml" line="+37"/>
         <source>Action</source>
-        <translation type="unfinished">アクション</translation>
+        <translation>アクション</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Create</source>
-        <translation type="unfinished"></translation>
+        <translation>作成</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>更新</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete</source>
-        <translation type="unfinished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Users</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー</translation>
     </message>
 </context>
 <context>
@@ -9393,57 +9395,57 @@ Input-ID: </source>
     <message>
         <location filename="../../../Qml/imtauthgui/UserCollectionView.qml" line="+60"/>
         <source>System Info</source>
-        <translation type="unfinished"></translation>
+        <translation>システム情報</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Internal</source>
-        <translation type="unfinished"></translation>
+        <translation>内部</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>LDAP</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAP</translation>
     </message>
     <message>
         <location line="+67"/>
         <source>View roles</source>
-        <translation type="unfinished"></translation>
+        <translation>ロールを表示</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>has been assigned</source>
-        <translation type="unfinished"></translation>
+        <translation>に割り当てられています</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>roles:</source>
-        <translation type="unfinished"></translation>
+        <translation>ロール:</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>No roles</source>
-        <translation type="unfinished"></translation>
+        <translation>ロールがありません</translation>
     </message>
     <message>
         <location line="+54"/>
         <source>View groups</source>
-        <translation type="unfinished"></translation>
+        <translation>グループを表示</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>is included into</source>
-        <translation type="unfinished"></translation>
+        <translation>に含まれています</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>groups</source>
-        <translation type="unfinished"></translation>
+        <translation>グループ</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>No groups</source>
-        <translation type="unfinished"></translation>
+        <translation>グループがありません</translation>
     </message>
 </context>
 <context>
@@ -9462,89 +9464,89 @@ Input-ID: </source>
     <message>
         <location filename="../../../Qml/imtauthgui/UserGeneralEditor.qml" line="+50"/>
         <source>Username</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー名</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the username</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー名を入力してください</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Please enter the username</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー名を入力してください</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Name</source>
-        <translation type="unfinished">名前</translation>
+        <translation>名前</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the name</source>
-        <translation type="unfinished"></translation>
+        <translation>名前を入力してください</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Please enter the name</source>
-        <translation type="unfinished"></translation>
+        <translation>名前を入力してください</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Email Address</source>
-        <translation type="unfinished"></translation>
+        <translation>メールアドレス</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enter the email</source>
-        <translation type="unfinished"></translation>
+        <translation>メールを入力してください</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Please enter the email</source>
-        <translation type="unfinished"></translation>
+        <translation>メールを入力してください</translation>
     </message>
     <message>
         <location line="+18"/>
         <location line="+11"/>
         <source>Passwords don&apos;t match</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードが一致しません</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Password</source>
-        <translation type="unfinished">パスワード</translation>
+        <translation>パスワード</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードを入力してください</translation>
     </message>
     <message>
         <location line="+14"/>
         <location line="+2"/>
         <source>Confirm password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードの確認</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Please enter the password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードを入力してください</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Change password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードを変更</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Change</source>
-        <translation type="unfinished"></translation>
+        <translation>変更</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Change Password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードを変更</translation>
     </message>
 </context>
 <context>
@@ -9563,57 +9565,57 @@ Input-ID: </source>
     <message>
         <location filename="../../../Qml/imtauthgui/UserGroupView.qml" line="+106"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>一般</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Group Name</source>
-        <translation type="unfinished"></translation>
+        <translation>グループ名</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the name</source>
-        <translation type="unfinished"></translation>
+        <translation>名前を入力してください</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Description</source>
-        <translation type="unfinished">説明</translation>
+        <translation>説明</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the description</source>
-        <translation type="unfinished"></translation>
+        <translation>説明を入力してください</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Parent Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>親グループ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Adding Parent Group</source>
-        <translation type="unfinished"></translation>
+        <translation>親グループを追加</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Users</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Adding Users</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーを追加</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Roles</source>
-        <translation type="unfinished"></translation>
+        <translation>ロール</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Adding Roles</source>
-        <translation type="unfinished"></translation>
+        <translation>ロールを追加</translation>
     </message>
 </context>
 <context>
@@ -9622,12 +9624,12 @@ Input-ID: </source>
         <location filename="../../../Qml/imtauthgui/UserPanel.qml" line="+121"/>
         <location line="+13"/>
         <source>Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>プロフィール</translation>
     </message>
     <message>
         <location line="-11"/>
         <source>Logout</source>
-        <translation type="unfinished">ログアウト</translation>
+        <translation>ログアウト</translation>
     </message>
 </context>
 <context>
@@ -9635,39 +9637,39 @@ Input-ID: </source>
     <message>
         <location filename="../../../Qml/imtauthgui/UserView.qml" line="+184"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>一般</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>System Information</source>
-        <translation type="unfinished"></translation>
+        <translation>システム情報</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>System Name</source>
-        <translation type="unfinished"></translation>
+        <translation>システム名</translation>
     </message>
     <message>
         <location line="+80"/>
         <location line="+12"/>
         <source>Roles</source>
-        <translation type="unfinished"></translation>
+        <translation>ロール</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Adding Role</source>
-        <translation type="unfinished"></translation>
+        <translation>ロールを追加</translation>
     </message>
     <message>
         <location line="+18"/>
         <location line="+12"/>
         <source>Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>グループ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Adding Group</source>
-        <translation type="unfinished"></translation>
+        <translation>グループを追加</translation>
     </message>
 </context>
 <context>
@@ -9935,32 +9937,32 @@ Input-ID: </source>
     <message>
         <location line="+2"/>
         <source>Orthogonal View Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>正投影ビューモード</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Orthogonal</source>
-        <translation type="unfinished"></translation>
+        <translation>正投影</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Select orthogonal view mode</source>
-        <translation type="unfinished"></translation>
+        <translation>正投影ビューモードを選択</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Perspective View Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>透視投影ビューモード</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Perspective</source>
-        <translation type="unfinished"></translation>
+        <translation>透視投影</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Select perspective view mode</source>
-        <translation type="unfinished"></translation>
+        <translation>透視投影ビューモードを選択</translation>
     </message>
 </context>
 <context>
@@ -9968,22 +9970,22 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtauth/CRoleChangeGeneratorComp.cpp" line="+55"/>
         <source>Added parent role &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>親ロール '%1' を追加しました</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed parent role &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>親ロール '%1' を削除しました</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added permission &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>権限 '%1' を追加しました</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed permission &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>権限 '%1' を削除しました</translation>
     </message>
 </context>
 <context>
@@ -9991,37 +9993,37 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="+75"/>
         <source>Added to group &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>グループ '%1' に追加しました</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed from group &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>グループ '%1' から削除しました</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added role &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>ロール '%1' を追加しました</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed role &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>ロール '%1' を削除しました</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added to product &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>製品 '%1' に追加しました</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed from product &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>製品 '%1' から削除しました</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Password changed</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードが変更されました</translation>
     </message>
 </context>
 <context>
@@ -10029,42 +10031,42 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="+106"/>
         <source>Added parent group &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>親グループ '%1' を追加しました</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed parent group &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>親グループ '%1' を削除しました</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed user &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー '%1' を削除しました</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added user &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー '%1' を追加しました</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added role &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>ロール '%1' を追加しました</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed role &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>ロール '%1' を削除しました</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added to product &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>製品 '%1' に追加しました</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed from product &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>製品 '%1' から削除しました</translation>
     </message>
 </context>
 <context>
@@ -10072,12 +10074,12 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtauthgql/CRoleCollectionControllerComp.cpp" line="+168"/>
         <source>Roles</source>
-        <translation type="unfinished"></translation>
+        <translation>ロール</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Unable to get a role info</source>
-        <translation type="unfinished"></translation>
+        <translation>ロール情報を取得できません</translation>
     </message>
 </context>
 <context>
@@ -10085,27 +10087,27 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtauthgql/CUserCollectionControllerComp.cpp" line="+46"/>
         <source>Username can&apos;t be empty!</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー名は空にできません！</translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Username already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー名は既に存在します</translation>
     </message>
     <message>
         <location line="+89"/>
         <source>Email already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>メールは既に存在します</translation>
     </message>
     <message>
         <location line="+76"/>
         <source>Users</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー</translation>
     </message>
     <message>
         <location line="+191"/>
         <source>Internal</source>
-        <translation type="unfinished"></translation>
+        <translation>内部</translation>
     </message>
 </context>
 <context>
@@ -10113,7 +10115,7 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtauthgql/CUserGroupCollectionControllerComp.cpp" line="+136"/>
         <source>Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>グループ</translation>
     </message>
 </context>
 <context>
@@ -10121,12 +10123,12 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtauthgql/CUserRepresentationController.cpp" line="+43"/>
         <source>Username can&apos;t be empty!</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー名は空にできません！</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Username already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー名は既に存在します</translation>
     </message>
 </context>
 <context>
@@ -10187,7 +10189,7 @@ Input-ID: </source>
     <message>
         <location line="+3"/>
         <source>Account Description</source>
-        <translation type="unfinished">アカウントの説明</translation>
+        <translation>アカウントの説明</translation>
     </message>
     <message>
         <source>Account Desciption</source>
@@ -10245,37 +10247,37 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtauthgui/CRemoteStandardLoginGuiComp.cpp" line="+225"/>
         <source>Login failed</source>
-        <translation type="unfinished">ログイン失敗</translation>
+        <translation>ログイン失敗</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Please enter a non-empty password</source>
-        <translation type="unfinished"></translation>
+        <translation>空でないパスワードを入力してください</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>User Management</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー管理</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Password for the super user could not be set</source>
-        <translation type="unfinished"></translation>
+        <translation>スーパーユーザーのパスワードを設定できませんでした</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>No connection to the server</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーに接続されていません</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>No connection to the authorization server</source>
-        <translation type="unfinished"></translation>
+        <translation>認可サーバーに接続されていません</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Password doesn&apos;t match</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードが一致しません</translation>
     </message>
 </context>
 <context>
@@ -10288,22 +10290,22 @@ Input-ID: </source>
     <message>
         <location line="+35"/>
         <source>Please enter a non-empty password</source>
-        <translation type="unfinished"></translation>
+        <translation>空でないパスワードを入力してください</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>User Management</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー管理</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Password for the super user could not be set</source>
-        <translation type="unfinished"></translation>
+        <translation>スーパーユーザーのパスワードを設定できませんでした</translation>
     </message>
     <message>
         <location line="+62"/>
         <source>Password doesn&apos;t match</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードが一致しません</translation>
     </message>
 </context>
 <context>
@@ -10318,22 +10320,22 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtbase/CDocumentChangeGeneratorCompBase.cpp" line="+121"/>
         <source>Created the document</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントを作成しました</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>&apos;%1&apos; changed from &apos;%2&apos; to &apos;%3&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>'%1' が '%2' から '%3' に変更されました</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&apos;%1&apos; was set to &apos;%2&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>'%1' が '%2' に設定されました</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&apos;%1&apos; was cleared</source>
-        <translation type="unfinished"></translation>
+        <translation>'%1' がクリアされました</translation>
     </message>
 </context>
 <context>
@@ -10342,7 +10344,7 @@ Input-ID: </source>
         <location filename="../../../Include/imtserverapp/CSystemStatusComp.cpp" line="-140"/>
         <location line="+64"/>
         <source>Try connect to: &apos;%1&apos; ...</source>
-        <translation type="unfinished"></translation>
+        <translation>接続を試みています: '%1' ...</translation>
     </message>
 </context>
 <context>
@@ -10351,12 +10353,12 @@ Input-ID: </source>
         <location filename="../../../Include/imtdb/CDatabaseEngineComp.cpp" line="+263"/>
         <location line="+242"/>
         <source>Maintenance database name was not set</source>
-        <translation type="unfinished"></translation>
+        <translation>メンテナンスデータベース名が設定されていません</translation>
     </message>
     <message>
         <location line="+111"/>
         <source>Database file path incorrect</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースファイルのパスが正しくありません</translation>
     </message>
 </context>
 <context>
@@ -10364,7 +10366,7 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtdbgui/CDatabaseLoginSettingsEditorComp.cpp" line="+144"/>
         <source>Database connection test was successful</source>
-        <translation type="unfinished"></translation>
+        <translation>データベース接続テストに成功しました</translation>
     </message>
 </context>
 <context>
@@ -10372,27 +10374,27 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtddl/CConstVarCreatorProcessorCompBase.cpp" line="+59"/>
         <source>Template directory path is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>テンプレートディレクトリのパスが無効です</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Cpp directory path is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>Cppディレクトリのパスが無効です</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Qml directory path is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>Qmlディレクトリのパスが無効です</translation>
     </message>
     <message>
         <location line="+32"/>
         <source>The module name is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>モジュール名が無効です</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>The template dir path is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>テンプレートディレクトリのパスが無効です</translation>
     </message>
 </context>
 <context>
@@ -10400,12 +10402,12 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtgeo/CAddressControllerComp.cpp" line="-251"/>
         <source>Unable to get an address info</source>
-        <translation type="unfinished"></translation>
+        <translation>住所情報を取得できません</translation>
     </message>
     <message>
         <location line="+143"/>
         <source>Unable to get an address info!</source>
-        <translation type="unfinished"></translation>
+        <translation>住所情報を取得できません！</translation>
     </message>
 </context>
 <context>
@@ -10485,22 +10487,22 @@ Input-ID: </source>
     <message>
         <location line="-208"/>
         <source>File &quot;%1&quot; could not be exported</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル "%1" をエクスポートできませんでした</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Remove selected item(s) from the database</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した項目をデータベースから削除</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Item &quot;%1&quot; is currently being edited and cannot be deleted</source>
-        <translation type="unfinished"></translation>
+        <translation>項目 "%1" は現在編集中のため削除できません</translation>
     </message>
     <message>
         <location line="+125"/>
         <source>Loading document...</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントを読み込んでいます...</translation>
     </message>
     <message>
         <location line="+43"/>
@@ -10511,7 +10513,7 @@ Input-ID: </source>
         <location line="+175"/>
         <location line="+17"/>
         <source>Item &quot;%1&quot; could not be opened</source>
-        <translation type="unfinished"></translation>
+        <translation>項目 "%1" を開けませんでした</translation>
     </message>
 </context>
 <context>
@@ -10875,17 +10877,17 @@ Input-ID: </source>
     <message>
         <location line="-505"/>
         <source>Remove selected item(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した項目を削除</translation>
     </message>
     <message>
         <location line="+35"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>名前を変更</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Enter new name</source>
-        <translation type="unfinished"></translation>
+        <translation>新しい名前を入力してください</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -10905,7 +10907,7 @@ Input-ID: </source>
     <message>
         <location line="-450"/>
         <source>Edit</source>
-        <translation type="unfinished">編集</translation>
+        <translation>編集</translation>
     </message>
     <message>
         <source>Enter new object name</source>
@@ -10918,7 +10920,7 @@ Input-ID: </source>
     <message>
         <location line="+383"/>
         <source>Rename...</source>
-        <translation type="unfinished">名前変更...</translation>
+        <translation>名前を変更...</translation>
     </message>
     <message>
         <location line="+70"/>
@@ -10945,7 +10947,7 @@ Input-ID: </source>
         <location line="+191"/>
         <location line="+31"/>
         <source>Compressed item folder (*.zip)</source>
-        <translation type="unfinished"></translation>
+        <translation>圧縮された項目フォルダ (*.zip)</translation>
     </message>
     <message>
         <location line="-26"/>
@@ -10970,7 +10972,7 @@ Input-ID: </source>
     <message>
         <location line="+1"/>
         <source>Remove selected item(s) from the collection</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した項目をコレクションから削除</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -11034,12 +11036,12 @@ Input-ID: </source>
     <message>
         <location line="+6"/>
         <source>Select Targetn Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>ターゲットフォルダを選択</translation>
     </message>
     <message>
         <location line="+128"/>
         <source>Enter object description</source>
-        <translation type="unfinished">オブジェクトの説明を入力</translation>
+        <translation>オブジェクトの説明を入力してください</translation>
     </message>
     <message>
         <source>Remove selected document from the collection</source>
@@ -11059,22 +11061,22 @@ Input-ID: </source>
     <message>
         <location line="-450"/>
         <source>The name could not be set</source>
-        <translation type="unfinished"></translation>
+        <translation>名前を設定できませんでした</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>The name contains some not allowed characters</source>
-        <translation type="unfinished"></translation>
+        <translation>名前に許可されていない文字が含まれています</translation>
     </message>
     <message>
         <location line="+120"/>
         <source>Edit Description...</source>
-        <translation type="unfinished"></translation>
+        <translation>説明を編集...</translation>
     </message>
     <message>
         <location line="+330"/>
         <source>Export data from the collection to file(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>コレクションのデータをファイルにエクスポート</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -11117,7 +11119,7 @@ Input-ID: </source>
     <message>
         <location line="+5"/>
         <source>Loaded at</source>
-        <translation type="unfinished"></translation>
+        <translation>読み込み日時</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -11218,32 +11220,32 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imthypegui/CTaskInputCollectionViewDelegateComp.cpp" line="+107"/>
         <source>Acquisition-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>取得ID</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Description</source>
-        <translation type="unfinished">説明</translation>
+        <translation>説明</translation>
     </message>
     <message>
         <location line="+74"/>
         <source>Enter new object name</source>
-        <translation type="unfinished">新規オブジェクト名を入力</translation>
+        <translation>新しいオブジェクト名を入力してください</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Name</source>
-        <translation type="unfinished">名前</translation>
+        <translation>名前</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Incorrect object name. Object name must be a number between 0 and 255</source>
-        <translation type="unfinished"></translation>
+        <translation>オブジェクト名が正しくありません。オブジェクト名は0から255の数値である必要があります</translation>
     </message>
 </context>
 <context>
@@ -11251,123 +11253,123 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imthypegui/CTaskManagerGuiComp.cpp" line="+141"/>
         <source>Disable</source>
-        <translation type="unfinished"></translation>
+        <translation>無効化</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Enable</source>
-        <translation type="unfinished"></translation>
+        <translation>有効化</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>名前を変更</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+186"/>
         <source>Duplicate</source>
-        <translation type="unfinished">コピー</translation>
+        <translation>コピー</translation>
     </message>
     <message>
         <location line="-185"/>
         <source>Delete</source>
-        <translation type="unfinished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Show Input Manager...</source>
-        <translation type="unfinished"></translation>
+        <translation>入力マネージャーを表示...</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Settings</source>
-        <translation type="unfinished">設定</translation>
+        <translation>設定</translation>
     </message>
     <message>
         <location line="+172"/>
         <source>&amp;Show Task List</source>
-        <translation type="unfinished"></translation>
+        <translation>タスクリストを表示 (S)</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Show Tasks</source>
-        <translation type="unfinished"></translation>
+        <translation>タスクを表示</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Show task list</source>
-        <translation type="unfinished"></translation>
+        <translation>タスクリストを表示</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Execute All Tasks</source>
-        <translation type="unfinished"></translation>
+        <translation>すべてのタスクを実行 (E)</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Execute</source>
-        <translation type="unfinished"></translation>
+        <translation>実行</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Execute all tasks</source>
-        <translation type="unfinished"></translation>
+        <translation>すべてのタスクを実行</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Add Task</source>
-        <translation type="unfinished"></translation>
+        <translation>タスクを追加 (A)</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Add</source>
-        <translation type="unfinished">追加</translation>
+        <translation>追加</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Add a new task</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいタスクを追加</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Remove Task</source>
-        <translation type="unfinished"></translation>
+        <translation>タスクを削除 (R)</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Remove</source>
-        <translation type="unfinished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Remove current task</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のタスクを削除</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Duplicate Task</source>
-        <translation type="unfinished"></translation>
+        <translation>タスクをコピー (D)</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Duplicate current task</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のタスクをコピー</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Show Input Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>入力マネージャーを表示 (S)</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Show Input Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>入力マネージャーを表示</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Show editor of the task inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>タスク入力のエディターを表示</translation>
     </message>
 </context>
 <context>
@@ -11375,17 +11377,17 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imthypegui/CTaskSettingsGuiComp.cpp" line="+144"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>The task name contains some not allowed characters</source>
-        <translation type="unfinished"></translation>
+        <translation>タスク名に許可されていない文字が含まれています</translation>
     </message>
     <message>
         <location line="+91"/>
         <source>Task Input Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>タスク入力マネージャー</translation>
     </message>
 </context>
 <context>
@@ -11393,75 +11395,75 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtlic/CLicenseControllerComp.cpp" line="+404"/>
         <source>License key was changed. Checking license fingerprint</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスキーが変更されました。ライセンスフィンガープリントを確認しています</translation>
     </message>
     <message>
         <location line="-204"/>
         <location line="+204"/>
         <source>License Controller</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスコントローラー</translation>
     </message>
     <message>
         <location line="-352"/>
         <source>Backup of the existing license failed. Import canceled</source>
-        <translation type="unfinished"></translation>
+        <translation>既存のライセンスのバックアップに失敗しました。インポートがキャンセルされました</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>License file could not be imported</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスファイルをインポートできませんでした</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Restore of the last license failed</source>
-        <translation type="unfinished"></translation>
+        <translation>最後のライセンスの復元に失敗しました</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>License file could not be copied to the target location</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスファイルをターゲットの場所にコピーできませんでした</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>No license path component was set. Please check component configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスパスコンポーネントが設定されていません。コンポーネント構成を確認してください</translation>
     </message>
     <message>
         <location line="+6"/>
         <location line="+39"/>
         <source>No product instance persistence component was set. Please check component configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>製品インスタンス永続化コンポーネントが設定されていません。コンポーネント構成を確認してください</translation>
     </message>
     <message>
         <location line="-33"/>
         <location line="+39"/>
         <source>No encrypted instance persistence component was set. Please check component configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>暗号化インスタンス永続化コンポーネントが設定されていません。コンポーネント構成を確認してください</translation>
     </message>
     <message>
         <location line="-32"/>
         <source>License file path is empty. Please check component configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスファイルのパスが空です。コンポーネント構成を確認してください</translation>
     </message>
     <message>
         <location line="+38"/>
         <source>License file path is empty, nothing to check</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスファイルのパスが空です。確認するものがありません</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Checking license fingerprint</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスフィンガープリントを確認しています</translation>
     </message>
     <message>
         <location line="+114"/>
         <source>License fingerprint could not be updated</source>
-        <translation type="unfinished">ライセンスフィンガープリントを更新できませんでした</translation>
+        <translation>ライセンスフィンガープリントを更新できませんでした</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>License was successfully loaded</source>
-        <translation type="unfinished">ライセンスが正常に読み込まれました</translation>
+        <translation>ライセンスが正常に読み込まれました</translation>
     </message>
 </context>
 <context>
@@ -11480,17 +11482,17 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtlicgql/CAccountControllerComp.cpp" line="+114"/>
         <source>Unable to get an account info!</source>
-        <translation type="unfinished"></translation>
+        <translation>アカウント情報を取得できません！</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Account name can&apos;t be empty</source>
-        <translation type="unfinished"></translation>
+        <translation>アカウント名は空にできません</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Account Name already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>アカウント名は既に存在します</translation>
     </message>
 </context>
 <context>
@@ -11498,22 +11500,22 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtlicgql/CFeatureControllerComp.cpp" line="+27"/>
         <source>Internal error.</source>
-        <translation type="unfinished"></translation>
+        <translation>内部エラー。</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Unable to create object. GQL input params is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>オブジェクトを作成できません。GQL入力パラメーターが無効です。</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Unable to create object from empty json.</source>
-        <translation type="unfinished"></translation>
+        <translation>空のjsonからオブジェクトを作成できません。</translation>
     </message>
     <message>
         <location line="+52"/>
         <source>Unable to get object. GQL input params is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>オブジェクトを取得できません。GQL入力パラメーターが無効です。</translation>
     </message>
 </context>
 <context>
@@ -11539,27 +11541,27 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtlicgql/CLicenseControllerComp.cpp" line="-136"/>
         <source>Internal error.</source>
-        <translation type="unfinished"></translation>
+        <translation>内部エラー。</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Unable to create object. GQL input params is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>オブジェクトを作成できません。GQL入力パラメーターが無効です。</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Unable to create object from empty json.</source>
-        <translation type="unfinished"></translation>
+        <translation>空のjsonからオブジェクトを作成できません。</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Unable to create license with an empty License-ID.</source>
-        <translation type="unfinished"></translation>
+        <translation>空のライセンスIDでライセンスを作成できません。</translation>
     </message>
     <message>
         <location line="+98"/>
         <source>Unable to get object. GQL input params is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>オブジェクトを取得できません。GQL入力パラメーターが無効です。</translation>
     </message>
 </context>
 <context>
@@ -11567,12 +11569,12 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtlicgql/CProductCollectionControllerComp.cpp" line="+403"/>
         <source>Product Name cannot be empty</source>
-        <translation type="unfinished"></translation>
+        <translation>製品名は空にできません</translation>
     </message>
     <message>
         <location line="+38"/>
         <source>Product Name is empty</source>
-        <translation type="unfinished"></translation>
+        <translation>製品名が空です</translation>
     </message>
 </context>
 <context>
@@ -11580,7 +11582,7 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtlicgui/CFeatureCollectionViewDelegateComp.cpp" line="+48"/>
         <source>Wrong object type</source>
-        <translation type="unfinished"></translation>
+        <translation>オブジェクトのタイプが不正です</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -11633,7 +11635,7 @@ Input-ID: </source>
     <message>
         <location line="+3"/>
         <source>Description</source>
-        <translation type="unfinished">説明</translation>
+        <translation>説明</translation>
     </message>
 </context>
 <context>
@@ -11666,44 +11668,44 @@ Input-ID: </source>
     <message>
         <location line="+9"/>
         <source>Create Transaction Code</source>
-        <translation type="unfinished"></translation>
+        <translation>トランザクションコードを作成</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>License Request Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンス要求マネージャー</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>License request file could not be saved</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンス要求ファイルを保存できませんでした</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Select license file to be imported</source>
-        <translation type="unfinished"></translation>
+        <translation>インポートするライセンスファイルを選択</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>License files (*.lic)</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスファイル (*.lic)</translation>
     </message>
     <message>
         <location line="+4"/>
         <location line="+6"/>
         <location line="+3"/>
         <source>License Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスマネージャー</translation>
     </message>
     <message>
         <location line="-9"/>
         <source>License file successfully imported</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスファイルが正常にインポートされました</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>License could not be imported</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスをインポートできませんでした</translation>
     </message>
 </context>
 <context>
@@ -11712,22 +11714,22 @@ Input-ID: </source>
         <location filename="../../../Include/imtlicgui/CProductInstanceInfoViewDelegateComp.cpp" line="+21"/>
         <location line="+97"/>
         <source>Create License File</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスファイルを作成</translation>
     </message>
     <message>
         <location line="-30"/>
         <source>Instance-ID</source>
-        <translation type="unfinished">MACアドレス</translation>
+        <translation>MACアドレス</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Customer</source>
-        <translation type="unfinished">顧客</translation>
+        <translation>顧客</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Export existing product installation license to file</source>
-        <translation type="unfinished"></translation>
+        <translation>既存の製品インストールライセンスをファイルにエクスポート</translation>
     </message>
 </context>
 <context>
@@ -11803,12 +11805,12 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtlog/CMessagesReader.cpp" line="+226"/>
         <source>No compressor component. Load history container failed</source>
-        <translation type="unfinished">圧縮コンポーネントがありません。履歴コンテナの読み込みに失敗しました</translation>
+        <translation>コンプレッサーコンポーネントがありません。履歴コンテナの読み込みに失敗しました</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Cannot create temporary folder. Load history container failed</source>
-        <translation type="unfinished">一時フォルダを作成できません。履歴コンテナの読み込みに失敗しました</translation>
+        <translation>一時フォルダを作成できません。履歴コンテナの読み込みに失敗しました</translation>
     </message>
 </context>
 <context>
@@ -11929,7 +11931,7 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="+704"/>
         <source>File could not be inserted into the repository</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルをリポジトリに挿入できませんでした</translation>
     </message>
     <message>
         <source>Unable read item file &apos;%1&apos;</source>
@@ -11950,7 +11952,7 @@ Input-ID: </source>
     <message>
         <location line="+326"/>
         <source>Revision number updated to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>改訂番号が %1 に更新されました</translation>
     </message>
 </context>
 <context>
@@ -11958,13 +11960,13 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtrepo/CFileCollectionCompBase.cpp" line="+260"/>
         <source>File could not be inserted into the repository</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルをリポジトリに挿入できませんでした</translation>
     </message>
     <message>
         <location line="+191"/>
         <location line="+145"/>
         <source>Temp folder could not be created</source>
-        <translation type="unfinished"></translation>
+        <translation>一時フォルダを作成できませんでした</translation>
     </message>
 </context>
 <context>
@@ -12235,7 +12237,7 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtrest/CSdlJsonServletBaseComp.h" line="+79"/>
         <source>The request does not match the scheme</source>
-        <translation type="unfinished"></translation>
+        <translation>要求がスキーマと一致しません</translation>
     </message>
 </context>
 <context>
@@ -12243,7 +12245,7 @@ Input-ID: </source>
     <message>
         <location line="-16"/>
         <source>The request is not a valid json object</source>
-        <translation type="unfinished"></translation>
+        <translation>要求が有効なjsonオブジェクトではありません</translation>
     </message>
 </context>
 <context>
@@ -12251,7 +12253,7 @@ Input-ID: </source>
     <message>
         <location line="+43"/>
         <source>Unable to convert reply to json</source>
-        <translation type="unfinished"></translation>
+        <translation>応答をjsonに変換できません</translation>
     </message>
 </context>
 <context>
@@ -12259,7 +12261,7 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtservergql/CGqlSearchControllerComp.cpp" line="+62"/>
         <source>Unnamed result</source>
-        <translation type="unfinished"></translation>
+        <translation>名前のない結果</translation>
     </message>
 </context>
 <context>
@@ -12267,13 +12269,13 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtservergql/CLegacyObjectCollectionControllerCompBase.cpp" line="+334"/>
         <source>Internal error</source>
-        <translation type="unfinished"></translation>
+        <translation>内部エラー</translation>
     </message>
     <message>
         <location line="+663"/>
         <location line="+120"/>
         <source>Unable to import the object. GQL input params is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>オブジェクトをインポートできません。GQL入力パラメーターが無効です。</translation>
     </message>
 </context>
 <context>
@@ -12281,14 +12283,14 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtservergql/CObjectCollectionControllerCompBase.cpp" line="+1715"/>
         <source>Internal error</source>
-        <translation type="unfinished"></translation>
+        <translation>内部エラー</translation>
     </message>
     <message>
         <location line="+455"/>
         <location line="+25"/>
         <location line="+123"/>
         <source>Unable to import the object. GQL input params is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>オブジェクトをインポートできません。GQL入力パラメーターが無効です。</translation>
     </message>
 </context>
 <context>
@@ -12296,7 +12298,7 @@ Input-ID: </source>
     <message>
         <location filename="../../../Include/imtservergql/CStructureControllerCompBase.cpp" line="+294"/>
         <source>Internal error</source>
-        <translation type="unfinished"></translation>
+        <translation>内部エラー</translation>
     </message>
 </context>
 <context>

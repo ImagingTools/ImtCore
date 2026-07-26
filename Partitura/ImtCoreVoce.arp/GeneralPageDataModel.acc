@@ -92,6 +92,7 @@
                                 <Value>en_US</Value>
                                 <Value>de_DE</Value>
                                 <Value>ru_RU</Value>
+                                <Value>sv_SE</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -101,6 +102,7 @@
                                 <Value>English</Value>
                                 <Value>German</Value>
                                 <Value>Russian</Value>
+                                <Value>Swedish</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
