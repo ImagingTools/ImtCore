@@ -14,6 +14,7 @@ Item {
 	
 	property Component commandsControllerComp: null;
 	property CommandsController commandsController: null;
+	property bool commandsRequested: false;
 	
 	property Component commandsDelegateComp: Component {
 		ViewCommandsDelegateBase {
@@ -153,6 +154,8 @@ Item {
 		
 		if (commandsControllerComp){
 			commandsController = commandsControllerComp.createObject(viewBase);
+			commandsController.view = viewBase;
+			requestCommands()
 		}
 		
 		if (commandsDelegateComp){
@@ -171,15 +174,17 @@ Item {
 	}
 	
 	onVisibleChanged: {
-		if (commandsController && visible && viewBase.internal__.localizationChanged){
-			commandsController.getCommands()
-		}
+		requestCommands()
 
 		guiVisibleChanged(viewBase, visible)
 	}
 	
 	Connections {
 		target: viewBase.commandsController;
+		function onTypeIdChanged(){
+			viewBase.requestCommands()
+		}
+
 		function onCommandsReceived(typeId, commands){
 			viewBase.commandsView.commandsModel = commands
 			
@@ -188,6 +193,15 @@ Item {
 				viewBase.internal__.localizationChanged = false
 			}
 		}
+	}
+
+	function requestCommands(){
+		if (!commandsController || !visible || commandsRequested || commandsController.typeId === ""){
+			return
+		}
+
+		commandsRequested = true;
+		commandsController.getCommands()
 	}
 	
 	ApplicationEvents {

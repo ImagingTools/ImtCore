@@ -81,7 +81,7 @@ public:
 				imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
 protected:
-	virtual void SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const;
+	virtual bool SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const;
 	virtual bool SendRequestInternal(const imtgql::IGqlRequest& request, imtrest::ConstRequestPtr& requestPtr) const;
 
 	// reimplemented (icomp::CComponentBase)

@@ -15,6 +15,7 @@
 #include <QtCore/QUrl>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtrest/CWebSocketRequest.h>
 #include <imtgql/CGqlResponse.h>
 
@@ -69,7 +70,12 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 
 	locker.unlock();
 
-	SubscriptionRegister(*requestImplPtr, subscriptionId.toLocal8Bit());
+	if (!SubscriptionRegister(*requestImplPtr, subscriptionId.toLocal8Bit())){
+		QMutexLocker failedRegistrationLocker(&m_registeredClientsMutex);
+		m_registeredClients.remove(subscriptionId.toLocal8Bit());
+
+		return QByteArray();
+	}
 
 	return subscriptionId.toLocal8Bit();
 }
@@ -306,7 +312,7 @@ IAsyncGqlRequestTokenPtr CSubscriptionManagerComp::SendRequest(
 	if (contextPtr != nullptr){
 		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
 		for (const QByteArray& headerId: headers.keys()){
-			if (headerId != "accept-encoding" && headerId != "x-authentication-token"){
+			if (headerId != "accept-encoding" && headerId != imtbase::s_authenticationTokenHeaderId){
 				headersObject[headerId] = QString(headers.value(headerId));
 			}
 		}
@@ -474,12 +480,12 @@ void CSubscriptionManagerComp::FailPending(
 
 // protected methods
 
-void CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const
+bool CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const
 {
 	if (!m_engineCompPtr.IsValid()){
 		Q_ASSERT(0);
 
-		return;
+		return false;
 	}
 
 	QString authToken;
@@ -520,7 +526,7 @@ void CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& s
 
 	imtrest::ConstRequestPtr requestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, "").PopInterfacePtr());
 
-	SendRequestInternal(subscriptionRequest, requestPtr);
+	return SendRequestInternal(subscriptionRequest, requestPtr);
 }
 
 

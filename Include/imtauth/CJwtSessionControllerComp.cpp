@@ -75,10 +75,15 @@ imtauth::IJwtSessionController::JwtState CJwtSessionControllerComp::ValidateJwt(
 	// token that is expired by time must be reported as JS_EXPIRED regardless
 	// of whether its session record still exists, so the client is told to
 	// refresh rather than told the token is permanently invalid.
-	qint64 exp = payloadObj["exp"].toInt();
-	if (exp < QDateTime::currentSecsSinceEpoch()){
-		SendWarningMessage(0, QString("JWT rejected: token expired by time, exp = %1 for session-ID '%2'")
-								.arg(exp).arg(qPrintable(sessionId)), "CJwtSessionControllerComp");
+	// Use toDouble (not toInt): toInt() truncates and returns 0 outside 32-bit.
+	const qint64 exp = static_cast<qint64>(payloadObj.value(QStringLiteral("exp")).toDouble());
+	const qint64 nowSecs = QDateTime::currentSecsSinceEpoch();
+	if (exp < nowSecs){
+		SendWarningMessage(0, QString("JWT rejected: token expired by time, exp = %1 (now = %2, age = %3s) for session-ID '%4'")
+								.arg(exp)
+								.arg(nowSecs)
+								.arg(nowSecs - exp)
+								.arg(qPrintable(sessionId)), "CJwtSessionControllerComp");
 		return imtauth::IJwtSessionController::JS_EXPIRED;
 	}
 

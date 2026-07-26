@@ -153,7 +153,19 @@ GqlRequest {
 
 	onStateChanged: {
 		if (state === "Error"){
-			root.onError(qsTr("Network error"), "Critical");
+			// Transport-level failure (server unreachable, 5xx, empty body). Passing
+			// no type deliberately opens no modal: this state is now reached by every
+			// failed request, including startup polling and background refreshes, and
+			// a critical dialog per attempt would bury the UI. Senders that care
+			// override onError(); everyone else still gets finished(-1).
+			console.warn("GraphQL request failed:", root.gqlCommandId);
+			root.onError(qsTr("Network error"), "");
+		}
+		else if (state === "Unauthorized" || state === "Forbidden"){
+			// Auth recovery is owned by XmlHttpRequestProxy / AuthorizationController
+			// (refresh + retry). Do not open a modal for every 401/403, but complete
+			// the request so callers waiting on finished() are not stuck forever.
+			root.finished(-1);
 		}
 		else if (state === "Ready"){
 			let responseObj = null

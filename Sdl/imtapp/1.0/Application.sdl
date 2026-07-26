@@ -4,6 +4,17 @@ schema {
 	version: 1.0
 }
 
+import {
+	"../../imtbase/1.0/ImtBaseTypes.sdl"
+	"../../imtauth/1.0/Users.sdl"
+}
+
+enum UserManagementMode {
+	NO_USER_MANAGEMENT
+	OPTIONAL_USER_MANAGEMENT
+	STRONG_USER_MANAGEMENT
+}
+
 type ApplicationInfo {
 	version: String
 	companyName: String
@@ -12,6 +23,9 @@ type ApplicationInfo {
 	applicationName: String
 	applicationType: String
 	logoIconName: String
+	webSocketUrl: UrlParam
+	userMode: UserManagementMode
+	superuser: CheckSuperuserPayload
 }
 
 input GetApplicationInfoInput {

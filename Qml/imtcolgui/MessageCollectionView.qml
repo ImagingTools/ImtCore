@@ -17,6 +17,10 @@ RemoteCollectionView {
 	table.enableAlternating: false
 	additionalFieldIds: ["category", "infoId"]
 	property int filterRightMargin: 0
+	property bool clearLogEnabled: true
+	property string clearLogCommandId: ""
+	property Component clearLogInputComp: null
+	property Component clearLogPayloadComp: null
 
 	onHeadersChanged: {
 		if (log.table.headers.getItemsCount() > 0){
@@ -33,18 +37,49 @@ RemoteCollectionView {
 	function getHeaders(){
 		return {};
 	}
+
+	function requestClearLog(){
+		ModalDialogManager.showConfirmationDialog(
+			qsTr("Clear log"),
+			qsTr("Are you sure you want to clear the entire log? This action cannot be undone."),
+			function(result){
+				if (result === Enums.yes){
+					clearLogRequest.send()
+				}
+			})
+	}
+
+	GqlSdlRequestSender {
+		id: clearLogRequest
+		requestType: 1
+		gqlCommandId: log.clearLogCommandId
+		inputObjectComp: log.clearLogInputComp
+		sdlObjectComp: log.clearLogPayloadComp
+
+		onFinished:{
+			if (status === 1){
+				log.doUpdateGui()
+			}
+		}
+
+		function getHeaders(){
+			return log.getHeaders()
+		}
+	}
 	
 	dataControllerComp: Component { CollectionRepresentation {
 			collectionId: log.collectionId
 			gqlGetListCommandId: log.gqlGetListCommandId
 			additionalFieldIds: log.additionalFieldIds
 
+			onElementSetRemoved: log.doUpdateGui()
+			onElementSetRemoveFailed: ModalDialogManager.showErrorDialog(message)
+
 			function getHeaders(){
 				return log.getHeaders()
 			}
 		} }
-	
-	
+
 	TreeItemModel {
 		id: logTableDecoratorModel;
 		
@@ -68,6 +103,8 @@ RemoteCollectionView {
 		MessageCollectionFilterDecorator {
 			complexFilter: log.collectionFilter
 			filterRightMargin: log.filterRightMargin
+			clearLogVisible: log.clearLogEnabled && log.clearLogCommandId !== ""
+			onClearLogRequested: log.requestClearLog()
 		}
 	}
 	

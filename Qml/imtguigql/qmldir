@@ -17,7 +17,6 @@ ClientStyle 1.0 ClientStyle.qml
 CollectionRepresentation 1.0 CollectionRepresentation.qml
 RemoteCollectionView 1.0 RemoteCollectionView.qml
 MetaInfoProvider 1.0 MetaInfoProvider.qml
-WebSocketPortProvider 1.0 WebSocketPortProvider.qml
 ComboBoxGqlSimpleElementView 1.0 ComboBoxGqlSimpleElementView.qml
 GqlRequestDocumentDataController 1.0 GqlRequestDocumentDataController.qml
 TableViewParamController 1.0 TableViewParamController.qml

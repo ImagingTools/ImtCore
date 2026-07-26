@@ -6,6 +6,9 @@
 #include <QtQml/QQmlEngine>
 #include <QtNetwork/QNetworkAccessManager>
 
+// ImtCore includes
+#include <imtbase/imtbase.h>
+
 
 namespace imtqml
 {
@@ -55,7 +58,7 @@ bool CGqlModel::SetGqlQuery(QString query, QVariantMap headers)
 		}
 
 		if (!s_accessToken.isEmpty()){
-			networkRequest.setRawHeader("x-authentication-token", s_accessToken.toUtf8());
+			networkRequest.setRawHeader(imtbase::s_authenticationTokenHeaderId, s_accessToken.toUtf8());
 		}
 
 		QString message = QString("Post to url '%1' query '%2'").arg(requestUrl.toString()).arg(query);

@@ -48,6 +48,7 @@ Item {
 	property bool commandsPanelVisible: true
 	property bool loadingDataAfterHeadersReceived: true
 	property bool backgroundUpdatesEnabled: false
+	property int loadingIndicatorDelay: 0
 
 	property alias canResetFilters: container.canResetFilters;
 	property int metaInfoWidth: Style.sizeHintXXS;
@@ -293,10 +294,16 @@ Item {
 			target: container.dataController;
 			
 			function onBeginUpdate(){
-				container.loading.start();
+				if (root.loadingIndicatorDelay > 0){
+					loadingIndicatorDelayTimer.restart()
+				}
+				else{
+					container.loading.start()
+				}
 			}
 			
 			function onEndUpdate(){
+				loadingIndicatorDelayTimer.stop()
 				container.loading.stop();
 
 				if(root.visibleMetaInfo ){
@@ -370,6 +377,16 @@ Item {
 					let pagesCount = notificationModel.getData("pagesCount")
 					container.pagination.pagesSize = pagesCount;
 				}
+			}
+		}
+
+		Timer {
+			id: loadingIndicatorDelayTimer
+			interval: root.loadingIndicatorDelay
+			repeat: false
+
+			onTriggered: {
+				container.loading.start()
 			}
 		}
 		

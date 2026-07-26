@@ -337,6 +337,18 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SuperuserProvider" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestRemoteSuperuserProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SuperuserId" Type="Id" ExportId="SuperuserId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="SubscriberDemultiplexer" PackageId="ImtServerGqlPck" ComponentId="SlaveSubscriberController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -731,6 +743,7 @@
         <Component ExportedId="RemotePersonalAccessTokenController" ComponentId="RemotePersonalAccessTokenController"/>
         <Component ExportedId="RemoteTenantController" ComponentId="RemoteTenantController/RemoteTenantController"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="RemoteRepositories/RoleRemoteRepository"/>
+        <Component ExportedId="SuperuserProvider" ComponentId="SuperuserProvider"/>
         <Component ExportedId="UserGroupInfoProvider" ComponentId="RemoteRepositories/UserGroupInfoProvider"/>
         <Component ExportedId="UserRemoteRepository" ComponentId="RemoteRepositories/UserRemoteRepository"/>
         <Component ExportedId="UserSessionRemoteRepository" ComponentId="RemoteRepositories/UserSessionRemoteRepository"/>
