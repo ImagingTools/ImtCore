@@ -7,6 +7,7 @@
 #include <QtNetwork/QNetworkAccessManager>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtqml/CGqlModel.h>
 #include <imtqml/CNetworkEventInterceptor.h>
 
@@ -54,7 +55,7 @@ bool CGqlRequest::SetGqlQuery(QString query, QVariantMap headers)
 		}
 
 		if (!CGqlModel::s_accessToken.isEmpty()){
-			networkRequest.setRawHeader("x-authentication-token", CGqlModel::s_accessToken.toUtf8());
+			networkRequest.setRawHeader(imtbase::s_authenticationTokenHeaderId, CGqlModel::s_accessToken.toUtf8());
 		}
 
 		QString message = QString("Post to url '%1' query '%2'").arg(requestUrl.toString()).arg(query);
@@ -100,6 +101,16 @@ void CGqlRequest::replyFinished()
 				SetState("Ready");
 			}
 		}
+		else{
+			// Every outcome has to leave "Loading". Previously anything that was not
+			// 200/401/403 - a 5xx, a 404, or a transport failure with no HTTP status
+			// at all - left the request in "Loading" forever, so callers waiting on
+			// the state (and single-flight guards keyed on it) never completed.
+			qDebug() << "CGqlRequest: request failed, HTTP status" << statusCode
+					 << "error" << reply->errorString();
+
+			SetState("Error");
+		}
 
 		reply->deleteLater();
 	}
@@ -110,9 +121,11 @@ void CGqlRequest::errorOccurred(QNetworkReply::NetworkError /*code*/)
 {
 	QNetworkReply* networkReplyPtr = dynamic_cast<QNetworkReply*>(sender());
 	if (networkReplyPtr != nullptr){
+		// Deliberately no deleteLater() here: QNetworkReply always emits finished()
+		// after errorOccurred(), and replyFinished() owns both the terminal state and
+		// the reply's lifetime. Deleting in two places left the failure path setting
+		// no state at all.
 		qDebug() << networkReplyPtr->errorString();
-
-		networkReplyPtr->deleteLater();
 	}
 }
 

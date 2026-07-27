@@ -283,6 +283,19 @@ StyleComponents {
 	property string selectedLinkFromColor: "#1974d2";
 	property string selectedLinkToColor: "#51AC2A";
 
+		//popup / toast (PopupManager → PopupContainer)
+	property string popupErrorBackgroundColor: "#FFF5F3";
+	property string popupWarningBackgroundColor: "#FFFBF2";
+	property string popupSuccessBackgroundColor: "#F3FBF6";
+	property string popupInfoBackgroundColor: "#F3F8FD";
+	property string popupErrorAccentColor: errorTextColor;
+	property string popupWarningAccentColor: secondColor;
+	property string popupSuccessAccentColor: selectedLinkToColor;
+	property string popupInfoAccentColor: linkColor;
+	property string popupCloseHoverColor: "#1A000000";
+	property string popupCloseIdleColor: "#00000000";
+	property real popupIconChipOpacity: 0.14;
+
 		//border
 	property string borderColor: "#d0d0d2";
 	property string borderColor2: "#a4a4a6";

@@ -329,6 +329,7 @@
         <Component ExportedId="PersonalAccessTokenManager" ComponentId="PersonalAccessTokenController/PersonalAccessTokenManager"/>
         <Component ExportedId="PumaGQLClientEngine" ComponentId="PumaClientEngine"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="PumaClientEngine/RoleRemoteRepository"/>
+        <Component ExportedId="SuperuserProvider" ComponentId="PumaClientEngine/SuperuserProvider"/>
         <Component ExportedId="UserActionManager" ComponentId="UserActionController/UserActionManager"/>
         <Component ExportedId="UserActionSqlRepository" ComponentId="UserActionController/UserActionSqlRepository"/>
         <Component ExportedId="UserRemoteRepository" ComponentId="PumaClientEngine/UserRemoteRepository"/>

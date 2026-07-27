@@ -13,6 +13,7 @@ CollectionView {
 	property bool hasRemoteChanges: false;
 	property bool tableViewParamsStoredServer: true;
 	property bool showRemoteChangesAlert: true
+	loadingIndicatorDelay: 300
 
 	property string gqlGetListCommandId: root.collectionId + "List";
 

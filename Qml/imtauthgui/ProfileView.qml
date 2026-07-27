@@ -36,6 +36,12 @@ ViewBase {
 	// independently subscribes to the same apiClient signal for its own data.
 	property var __headerProfile: null
 
+	// Guards the open-time fetch: Component.onCompleted and onApiClientChanged
+	// both fire when apiClient is injected via binding (UserPanel -> Dialog ->
+	// ProfileView). Without this flag each open issued GetProfile /
+	// GetUserOrganizations twice.
+	property bool __initialLoadDone: false
+
 	readonly property string __displayName: container.__headerProfile
 		? (container.__headerProfile.m_name || container.__headerProfile.m_username || "")
 		: ""
@@ -50,26 +56,35 @@ ViewBase {
 	}
 
 	Component.onCompleted: {
-		if (container.apiClient)
-			container.__headerProfile = container.apiClient.lastProfile
-		container.__reload()
+		container.__ensureInitialLoad()
 	}
 
 	// apiClient is injected via a property binding (UserPanel -> Dialog.contentComp
 	// -> ProfileView), several Loader layers deep. If that binding hasn't settled
-	// by the time Component.onCompleted runs, __reload() below silently no-ops
-	// (guarded) and the initial fetch would never happen — so also react the
-	// moment apiClient actually becomes available.
+	// by the time Component.onCompleted runs, the initial fetch would never
+	// happen — so also react the moment apiClient actually becomes available.
+	// __ensureInitialLoad() is idempotent so the onCompleted + changed race
+	// only issues one pair of requests.
 	onApiClientChanged: {
-		console.log("onApiClientChanged", apiClient)
-		if (container.apiClient) {
-			container.__headerProfile = container.apiClient.lastProfile
-			container.__reload()
+		if (!container.apiClient) {
+			container.__initialLoadDone = false
+			container.__headerProfile = null
+			return
 		}
+		container.__ensureInitialLoad()
+	}
+
+	function __ensureInitialLoad() {
+		if (!container.apiClient)
+			return
+		if (container.__initialLoadDone)
+			return
+		container.__initialLoadDone = true
+		container.__headerProfile = container.apiClient.lastProfile
+		container.__reload()
 	}
 
 	function __reload() {
-		console.log("__reload", container.apiClient)
 		if (!container.apiClient)
 			return
 		container.apiClient.getProfile()

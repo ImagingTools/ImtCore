@@ -7,7 +7,7 @@ import imtcontrols 1.0
 Rectangle {
 	id: container;
 	
-	color: Style.backgroundColor;
+	color: Style.backgroundColor2;
 	
 	property alias text: textNoConnection.text;
 	property alias loadingVisible: loading.visible;
@@ -52,6 +52,7 @@ Rectangle {
 			width: Style.sizeHintBXS;
 			height: width;
 			visible: false;
+			background.color: Style.backgroundColor2
 		}
 	}
 	

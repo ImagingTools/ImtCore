@@ -15,6 +15,7 @@
 #include <QtCore/QUrl>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtrest/CWebSocketRequest.h>
 #include <imtgql/CGqlResponse.h>
 
@@ -69,7 +70,12 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 
 	locker.unlock();
 
-	SubscriptionRegister(*requestImplPtr, subscriptionId);
+	if (!SubscriptionRegister(*requestImplPtr, subscriptionId)){
+		QMutexLocker failedRegistrationLocker(&m_registeredClientsMutex);
+		m_registeredClients.remove(subscriptionId);
+
+		return QByteArray();
+	}
 
 	return subscriptionId;
 }
@@ -307,7 +313,7 @@ IAsyncGqlRequestTokenPtr CSubscriptionManagerComp::SendRequest(
 	if (contextPtr != nullptr){
 		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
 		for (const QByteArray& headerId: headers.keys()){
-			if (headerId != "accept-encoding" && headerId != "x-authentication-token"){
+			if (headerId != "accept-encoding" && headerId != imtbase::s_authenticationTokenHeaderId){
 				headersObject[headerId] = QString(headers.value(headerId));
 			}
 		}
@@ -371,12 +377,12 @@ IAsyncGqlRequestTokenPtr CSubscriptionManagerComp::SendRequest(
 
 // protected methods
 
-void CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const
+bool CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const
 {
 	if (!m_engineCompPtr.IsValid()){
 		Q_ASSERT(0);
 
-		return;
+		return false;
 	}
 
 	QString authToken;
@@ -417,7 +423,7 @@ void CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& s
 
 	imtrest::ConstRequestPtr requestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, "").PopInterfacePtr());
 
-	SendRequestInternal(subscriptionRequest, requestPtr);
+	return SendRequestInternal(subscriptionRequest, requestPtr);
 }
 
 
@@ -436,11 +442,9 @@ bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& re
 	}
 	else if (m_requestManagerCompPtr.IsValid()){
 		if (clientId.isEmpty()){
-			// Server→agent queries must target a registered agent socket (clientid header).
-			// Empty id leaves ServicesList/GetService undelivered and the mirror empty.
 			SendErrorMessage(
 				0,
-				QStringLiteral("Outbound WebSocket request has empty clientid — cannot route to agent"),
+				QStringLiteral("Outbound WebSocket request has empty clientid — cannot route to recipient"),
 				"SubscriptionManager");
 			return false;
 		}
@@ -448,7 +452,7 @@ bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& re
 		if (!retVal){
 			SendErrorMessage(
 				0,
-				QStringLiteral("No WebSocket sender registered for clientid '%1' (agent offline or id mismatch)")
+				QStringLiteral("No WebSocket sender registered for clientid '%1' (client offline or id mismatch)")
 				.arg(QString::fromUtf8(clientId)),
 				"SubscriptionManager");
 		}
@@ -538,7 +542,7 @@ void CSubscriptionManagerComp::CompletePending(const QString& key, const QByteAr
 	// query_data is delivered on the WebSocket socket thread (CWebSocketThread).
 	// Handlers must NOT run there: a nested SendRequest/Wait (or any blocking
 	// GQL) re-enters the same socket while m_isProcessingMessage is true, so the
-	// reply is only queued and never drained — full agent-request hang after
+	// reply is only queued and never drained — full request hang after
 	// reconnect/reconcile. Always hop to this component's thread first.
 	// Order: OnResponseReceived (fill capturers) then MarkCompleted (wake Wait).
 	CSubscriptionManagerComp* self = const_cast<CSubscriptionManagerComp*>(this);
@@ -619,5 +623,4 @@ void CSubscriptionManagerComp::FailPending(
 
 
 } // namespace imtclientgql
-
 

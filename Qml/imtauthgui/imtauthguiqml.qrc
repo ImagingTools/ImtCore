@@ -9,7 +9,6 @@
         <file alias="imtauthgui/UserCollectionView.qml">UserCollectionView.qml</file>
         <file alias="imtauthgui/UserGroupCollectionView.qml">UserGroupCollectionView.qml</file>
         <file alias="imtauthgui/UserView.qml">UserView.qml</file>
-        <file alias="imtauthgui/UserManagementProvider.qml">UserManagementProvider.qml</file>
         <file alias="imtauthgui/UserPanel.qml">UserPanel.qml</file>
         <file alias="imtauthgui/UserTokenProvider.qml">UserTokenProvider.qml</file>
         <file alias="imtauthgui/RoleCollectionViewCommandsDelegate.qml">RoleCollectionViewCommandsDelegate.qml</file>
@@ -20,7 +19,6 @@
         <file alias="imtauthgui/PermissionsTableView.qml">PermissionsTableView.qml</file>
         <file alias="imtauthgui/PermissionsController.qml">PermissionsController.qml</file>
         <file alias="imtauthgui/SuperuserPasswordPage.qml">SuperuserPasswordPage.qml</file>
-        <file alias="imtauthgui/SuperuserProvider.qml">SuperuserProvider.qml</file>
         <file alias="imtauthgui/ChangePasswordDialog.qml">ChangePasswordDialog.qml</file>
         <file alias="imtauthgui/PasswordInput.qml">PasswordInput.qml</file>
         <file alias="imtauthgui/CachedAccountCollection.qml">CachedAccountCollection.qml</file>
