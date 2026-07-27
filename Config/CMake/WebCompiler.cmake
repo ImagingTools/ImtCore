@@ -483,9 +483,6 @@ macro(getImtAuthQmlWebDirs webdirs buildwebdir)
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthSessionsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthSessionsSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAuthorizationOptionsSdl)
-	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthAuthorizationOptionsSdl)
-
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthPersonalAccessTokensSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthPersonalAccessTokensSdl)
 
