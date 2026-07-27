@@ -6,13 +6,28 @@ schema {
 
 import {
 	"../../imtbase/1.0/ImtBaseTypes.sdl"
-	"../../imtauth/1.0/Users.sdl"
 }
 
 enum UserManagementMode {
 	NO_USER_MANAGEMENT
 	OPTIONAL_USER_MANAGEMENT
 	STRONG_USER_MANAGEMENT
+}
+
+# Local copy of imtauth's ExistsStatus/CheckSuperuserPayload shape. Deliberately
+# not imported from imtauth/1.0/Users.sdl - imtapp is a lower layer that imtauth
+# itself depends on (via imtservergql), and importing back from imtauth closes a
+# cyclic SDL/library dependency that CMake's strong imtservergql->imtappsdl
+# add_dependencies (AUTOMOC autogen target) cannot tolerate.
+enum SuperuserExistsStatus {
+	EXISTS
+	NOT_EXISTS
+	UNKNOWN
+}
+
+type SuperuserCheckResult {
+	status: SuperuserExistsStatus
+	message: String
 }
 
 type ApplicationInfo {
@@ -25,7 +40,7 @@ type ApplicationInfo {
 	logoIconName: String
 	webSocketUrl: UrlParam
 	userMode: UserManagementMode
-	superuser: CheckSuperuserPayload
+	superuser: SuperuserCheckResult
 }
 
 input GetApplicationInfoInput {

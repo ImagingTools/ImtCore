@@ -157,12 +157,12 @@ void CApplicationInfoControllerComp::FillSuperuserStatus(ApplicationInfo& applic
 		return;
 	}
 
-	sdl::V1_0::imtauth::CCheckSuperuserPayload superuser;
+	sdl::V1_0::imtapp::CSuperuserCheckResult superuser;
 
 	if (m_databaseConnectionCheckerCompPtr.IsValid()){
 		QString connectionMessage;
 		if (!m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(connectionMessage)){
-			superuser.status = sdl::V1_0::imtauth::ExistsStatus::UNKNOWN;
+			superuser.status = sdl::V1_0::imtapp::SuperuserExistsStatus::UNKNOWN;
 			superuser.message = connectionMessage;
 
 			applicationInfo.superuser = std::move(superuser);
@@ -174,14 +174,14 @@ void CApplicationInfoControllerComp::FillSuperuserStatus(ApplicationInfo& applic
 	QString errorMessage;
 	imtauth::ISuperuserProvider::ExistsStatus status = m_superuserProviderCompPtr->SuperuserExists(errorMessage);
 
-	sdl::V1_0::imtauth::ExistsStatus sdlStatus = sdl::V1_0::imtauth::ExistsStatus::UNKNOWN;
+	sdl::V1_0::imtapp::SuperuserExistsStatus sdlStatus = sdl::V1_0::imtapp::SuperuserExistsStatus::UNKNOWN;
 	switch (status){
 	case imtauth::ISuperuserProvider::ES_EXISTS:
-		sdlStatus = sdl::V1_0::imtauth::ExistsStatus::EXISTS;
+		sdlStatus = sdl::V1_0::imtapp::SuperuserExistsStatus::EXISTS;
 		break;
 
 	case imtauth::ISuperuserProvider::ES_NOT_EXISTS:
-		sdlStatus = sdl::V1_0::imtauth::ExistsStatus::NOT_EXISTS;
+		sdlStatus = sdl::V1_0::imtapp::SuperuserExistsStatus::NOT_EXISTS;
 		break;
 
 	default:
