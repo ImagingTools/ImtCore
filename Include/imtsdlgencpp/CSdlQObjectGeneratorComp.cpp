@@ -73,6 +73,9 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, const
 	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("Q_OBJECT");
 	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)");
+	FeedStream(stream, 1, false);
 
 	bool isArray = false;
 	bool isCustom = false;
@@ -115,6 +118,7 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, const
 	FeedStream(stream, 2, false);
 
 	// class Getters and Setters
+	bool isTypenameGetterAdded = false;
 	for (const imtsdl::CSdlField& field: fieldList){
 		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
 
@@ -122,6 +126,13 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, const
 		stream << QStringLiteral("QVariant");
 		stream << QStringLiteral(" Get") << GetCapitalizedValue(field.GetId()) << QStringLiteral("();");
 		FeedStream(stream, 1, false);
+
+		if (!isTypenameGetterAdded){
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("QString Get__Typename() {return QStringLiteral(\"") << sdlEntry.GetName() << QStringLiteral("\");}");
+			FeedStream(stream, 1, false);
+			isTypenameGetterAdded = true;
+		}
 
 		FeedStreamHorizontally(stream);
 		stream << QStringLiteral("void Set") << GetCapitalizedValue(field.GetId());
@@ -147,6 +158,12 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, const
 			stream << QStringLiteral("Q_INVOKABLE QVariant create") << GetCapitalizedValue(field.GetId()) << QStringLiteral("ArrayElement(const QVariant& v);");
 			FeedStream(stream, 1, false);
 		}
+	}
+
+	if (!isTypenameGetterAdded){
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("QString Get__Typename() {return QStringLiteral(\"") << sdlEntry.GetName() << QStringLiteral("\");}");
+		FeedStream(stream, 1, false);
 	}
 
 	// CItemModelBase implemented
