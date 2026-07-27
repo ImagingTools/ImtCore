@@ -130,6 +130,7 @@ class CDigitalPrinterSpecificationObjectList;
 class CDigitalPrinterSpecificationObject: public ::imtbase::CItemModelBase, public CDigitalPrinterSpecification
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_base READ GetBase WRITE SetBase NOTIFY baseChanged)
 	Q_PROPERTY(QVariant m_printingTechnology READ GetPrintingTechnology WRITE SetPrintingTechnology NOTIFY printingTechnologyChanged)
 
@@ -139,6 +140,7 @@ public:
 	CDigitalPrinterSpecificationObject(QObject* parent = nullptr);
 
 	QVariant GetBase();
+	QString Get__Typename() {return QStringLiteral("DigitalPrinterSpecification");}
 	void SetBase(const QVariant& v);
 	Q_INVOKABLE bool hasBase();
 	Q_INVOKABLE void emplaceBase();
@@ -201,6 +203,7 @@ class CDigitalPrinterObjectList;
 class CDigitalPrinterObject: public ::imtbase::CItemModelBase, public CDigitalPrinter
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_base READ GetBase WRITE SetBase NOTIFY baseChanged)
 	Q_PROPERTY(QVariant m_printingTechnology READ GetPrintingTechnology WRITE SetPrintingTechnology NOTIFY printingTechnologyChanged)
 
@@ -210,6 +213,7 @@ public:
 	CDigitalPrinterObject(QObject* parent = nullptr);
 
 	QVariant GetBase();
+	QString Get__Typename() {return QStringLiteral("DigitalPrinter");}
 	void SetBase(const QVariant& v);
 	Q_INVOKABLE bool hasBase();
 	Q_INVOKABLE void emplaceBase();

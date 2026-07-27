@@ -189,6 +189,7 @@ class CCoordsObjectList;
 class CCoordsObject: public ::imtbase::CItemModelBase, public CCoords
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_x READ GetX WRITE SetX NOTIFY xChanged)
 	Q_PROPERTY(QVariant m_y READ GetY WRITE SetY NOTIFY yChanged)
 
@@ -198,6 +199,7 @@ public:
 	CCoordsObject(QObject* parent = nullptr);
 
 	QVariant GetX();
+	QString Get__Typename() {return QStringLiteral("Coords");}
 	void SetX(const QVariant& v);
 	Q_INVOKABLE bool hasX();
 	QVariant GetY();
@@ -257,6 +259,7 @@ class CPrinterSpecificationBaseObjectList;
 class CPrinterSpecificationBaseObject: public ::imtbase::CItemModelBase, public CPrinterSpecificationBase
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_name READ GetName WRITE SetName NOTIFY nameChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
@@ -265,6 +268,7 @@ public:
 	CPrinterSpecificationBaseObject(QObject* parent = nullptr);
 
 	QVariant GetName();
+	QString Get__Typename() {return QStringLiteral("PrinterSpecificationBase");}
 	void SetName(const QVariant& v);
 	Q_INVOKABLE bool hasName();
 	// CItemModelBase implemented
@@ -320,6 +324,7 @@ class CLinkObjectList;
 class CLinkObject: public ::imtbase::CItemModelBase, public CLink
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_link READ GetLink WRITE SetLink NOTIFY linkChanged)
 	Q_PROPERTY(QVariant m_status READ GetStatus WRITE SetStatus NOTIFY statusChanged)
 	Q_PROPERTY(QVariant m_statusList READ GetStatusList WRITE SetStatusList NOTIFY statusListChanged)
@@ -330,6 +335,7 @@ public:
 	CLinkObject(QObject* parent = nullptr);
 
 	QVariant GetLink();
+	QString Get__Typename() {return QStringLiteral("Link");}
 	void SetLink(const QVariant& v);
 	Q_INVOKABLE bool hasLink();
 	QVariant GetStatus();
@@ -393,6 +399,7 @@ class CPrinterBaseObjectList;
 class CPrinterBaseObject: public ::imtbase::CItemModelBase, public CPrinterBase
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_name READ GetName WRITE SetName NOTIFY nameChanged)
 	Q_PROPERTY(QVariant m_linkList READ GetLinkList WRITE SetLinkList NOTIFY linkListChanged)
 	Q_PROPERTY(QVariant m_specification READ GetSpecification WRITE SetSpecification NOTIFY specificationChanged)
@@ -404,6 +411,7 @@ public:
 	CPrinterBaseObject(QObject* parent = nullptr);
 
 	QVariant GetName();
+	QString Get__Typename() {return QStringLiteral("PrinterBase");}
 	void SetName(const QVariant& v);
 	Q_INVOKABLE bool hasName();
 	QVariant GetLinkList();
