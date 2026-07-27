@@ -21,8 +21,8 @@ type Pen {
 }
 
 type Painter {
-	stroke: Pen!
-	fill: Brush!
+	stroke: Pen
+	fill: Brush
 }
 
 ## Supported image formats for ImageShape
