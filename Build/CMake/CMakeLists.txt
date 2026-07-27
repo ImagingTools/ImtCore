@@ -151,7 +151,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 	add_dependencies(imtlicsdl imtbasesdl)
 
 	add_subdirectory("${SDL_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtappsdl")
-	add_dependencies(imtappsdl imtbasesdl imtauthsdl)
+	add_dependencies(imtappsdl imtbasesdl)
 
 	add_subdirectory("${SDL_DIR}/imtpay/CMake" "${AUX_INCLUDE_DIR}/imtpaysdl")
 	add_dependencies(imtpaysdl imtbasesdl)
