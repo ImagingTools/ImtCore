@@ -19,8 +19,8 @@
                     <AttributeInfo Id="DatabaseConnectionChecker" Type="Reference" ExportId="DatabaseConnectionChecker">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="0"/>
+                    <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="AuthOptionIndex">
+                        <Data IsEnabled="true" Value="2"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
