@@ -216,6 +216,11 @@ class BaseClass extends QtObject {
 	}
 
 	copyFrom(item) {
+		this.fromJSON(item.toJson())
+		return true
+	}
+
+	copyFrom2(item) {
 		let sourceObject = item
 		for(let objKey of this.getProperties()){
 			if (!(this.getJSONKeyForProperty(objKey) in sourceObject)){
