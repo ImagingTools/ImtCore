@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 
+#include "imtbase/imtbase.h"
 #include <imt2d/CPaintConverters.h>
 
 // STL includes
@@ -626,8 +627,8 @@ bool CPaintConverters::ToQtPen(const sdl::V1_0::imt2d::CPen& sdlPen, QPen& pen)
 	}
 	if (sdlPen.dashPattern) {
 		QVector<qreal> pattern;
-		for (const double value : *sdlPen.dashPattern) {
-			pattern.append(static_cast<qreal>(value));
+		for (const auto& value : *sdlPen.dashPattern) {
+			pattern.append(imtbase::narrow_cast<qreal>(*value));
 		}
 		if (!pattern.isEmpty()) {
 			pen.setDashPattern(pattern);
