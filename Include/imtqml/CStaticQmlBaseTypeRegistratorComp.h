@@ -24,14 +24,25 @@ class CStaticQmlBaseTypeRegistratorComp: public icomp::CComponentBase
 {
 
 public:
-	typedef icomp::CComponentBase BaseClass;
+	using BaseClass = icomp::CComponentBase;
 
 	I_BEGIN_COMPONENT(CStaticQmlBaseTypeRegistratorComp)
+		I_ASSIGN(m_initTreeModelAttrPtr, "initTreeModel", "Initialize Tree Model", true, true)
+		I_ASSIGN(m_initWebSocketAttrPtr, "initWebSocket", "Initialize WebSocket", true, true)
+		I_ASSIGN(m_initSdlObjectAttrPtr, "initSdlObject", "Initialize SDL Object", true, false)
+		I_ASSIGN(m_initSdlListModelAttrPtr, "initSdlListModel", "Initialize SDL List Model", true, false)
 	I_END_COMPONENT
 
 protected:
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
+	void OnComponentCreated() override;
+
+private:
+	I_ATTR(bool, m_initTreeModelAttrPtr);
+	I_ATTR(bool, m_initWebSocketAttrPtr);
+	I_ATTR(bool, m_initSdlObjectAttrPtr);
+	I_ATTR(bool, m_initSdlListModelAttrPtr);
+
 
 private:
 	static bool s_isInitialized;

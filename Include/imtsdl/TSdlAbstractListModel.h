@@ -9,6 +9,7 @@
 
 // ImtCore includes
 #include <imtsdl/TElementList.h>
+#include <imtsdl/CSdandardSdlListModelBase.h>
 
 
 namespace imtsdl
@@ -16,24 +17,28 @@ namespace imtsdl
 
 
 template <class ModelDataType, class ModelObjectDataType>
-class TSdlAbstractListModel: public QAbstractListModel
+class TSdlAbstractListModel: public CSdandardSdlListModelBase
 {
+
+
 public:
-	TSdlAbstractListModel(QObject* parent = nullptr);
+	using BaseClass = CSdandardSdlListModelBase;
 
-	void ClearCache();
-	virtual QVariant GetOrCreateCachedObject(int index) const = 0;
-	virtual QVariantMap  get(int row) const;
-	virtual void remove(int index);
-	virtual void clear();
-	virtual QVariant getData(const QString& nameId, int index);
+	explicit TSdlAbstractListModel(QObject* parent = nullptr);
 
-protected:
+	// reimplemented (CSdandardSdlListModelBase)
+	void ClearCache() override;
+	QVariant GetOrCreateCachedObject(int index) const override = 0;
+	QVariantMap get(int row) const override;
+	void remove(int index) override;
+	void clear() override;
+	QVariant getData(const QString& nameId, int index) const override;
+
 	// reimplemented (QAbstractListModel)
-	virtual int rowCount(const QModelIndex&  parent = QModelIndex()) const override;
-	virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-	virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
-	virtual QHash<int, QByteArray> roleNames() const override;
+	int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+	bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
+	QHash<int, QByteArray> roleNames() const override;
 
 public:
 	// available version members
@@ -46,7 +51,7 @@ public:
 
 template <class ModelDataType, class ModelObjectDataType>
 TSdlAbstractListModel<ModelDataType, ModelObjectDataType>::
-	TSdlAbstractListModel(QObject *parent): QAbstractListModel(parent)
+	TSdlAbstractListModel(QObject *parent): BaseClass(parent)
 {
 	Version_1_0.emplace();
 }
@@ -106,7 +111,7 @@ void TSdlAbstractListModel<ModelDataType, ModelObjectDataType>::clear()
 
 
 template <class ModelDataType, class ModelObjectDataType>
-QVariant TSdlAbstractListModel<ModelDataType, ModelObjectDataType>::getData(const QString& nameId, int index)
+QVariant TSdlAbstractListModel<ModelDataType, ModelObjectDataType>::getData(const QString& nameId, int index) const
 {
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		QVariant retVal = GetOrCreateCachedObject(index);
