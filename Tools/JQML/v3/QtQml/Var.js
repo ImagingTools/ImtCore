@@ -89,7 +89,7 @@ class Var extends Property {
         
         let oldValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
 
-        if(typeof value === 'function'){
+        if(typeof value === 'function' && value.isSubscription){
             try {
                 global.queueFlag.push(true)
                 this.queueLink.push({

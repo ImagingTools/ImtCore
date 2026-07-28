@@ -63,6 +63,10 @@ class GroupProperty extends QBaseObject {
             if(!target) return
         }
 
+        if(typeof value === 'function'){
+            value.isSubscription = true
+        }
+
         target[path[path.length - 1]] = value
     }
   
