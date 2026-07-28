@@ -15,7 +15,7 @@ type Painter {
 
 ## Union of all shape types that can be drawn on a canvas.
 ## The client must implement a rendering procedure for every member of this union.
-union GraphicsShape = Point2dShape | TextLabelShape | ImageShape | Rectangle2dShape | Polygon2dShape | Polyline2dShape | Line2dShape | CircleShape | AnnulusShape | ShapeGroup
+union GraphicsShape = Point2dShape | TextLabelShape | ImageShape | Rectangle2dShape | Polygon2dShape | Polyline2dShape | Line2dShape | CircleShape | AnnulusShape | AnnulusSegmentShape | ShapeGroup
 
 type ShapeGroup{
 	origin: Point2d!
