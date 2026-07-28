@@ -116,7 +116,7 @@ class BaseClass extends QtObject {
 			
 							if (component) {
 								target[key] = node.typeTarget.create(target.__proxy)
-								target[key].owner = target
+								target[key].owner = target.__proxy
 
 								for (let _pureData of pureData) {
 									let sourceTypename
@@ -126,7 +126,7 @@ class BaseClass extends QtObject {
 									let obj = target.__proxy.createElement(key, sourceTypename).createObject(target.__proxy)
 									
 									target[key].append({ item: obj })
-									obj.owner = target
+									obj.owner = target.__proxy
 
 									obj.fromObject(_pureData)
 								}
