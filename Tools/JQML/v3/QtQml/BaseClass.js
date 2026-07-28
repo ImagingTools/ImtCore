@@ -104,7 +104,7 @@ class BaseClass extends QtObject {
         get(target, key){
 			if(key !== '__typename' && target.constructor.cachedPoperties.has(key)){
 				let node = target.constructor.meta[key]
-				if(node.typeTarget && !(target[key] instanceof node.typeTarget)){
+				if(typeof target[key] === "object" && !(target[key] instanceof QtObject)){
 					let pureData = target[key]
 
 					if(pureData === null){
