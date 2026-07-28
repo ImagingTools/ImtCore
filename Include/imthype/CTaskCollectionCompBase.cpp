@@ -202,26 +202,38 @@ const imtbase::IObjectCollection* CTaskCollectionCompBase::GetTaskInputs() const
 }
 
 
-QString CTaskCollectionCompBase::GenerateUniqueObjectName(const QString& newName, const QString& oldName) const
+QString CTaskCollectionCompBase::GenerateUniqueObjectName(const QString& newName, const QString& /*oldName*/) const
 {
 	imtbase::ICollectionInfo::Ids ids = GetElementIds();
 
-	QVector<QString> names;
+	QSet<QString> names;
 	for (const QByteArray& id : ids){
-		names.append(GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString());
+		names.insert(GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString());
 	}
 
-	QString uniqueName = newName;
-	int counterName = 1;
-	while (names.contains(uniqueName)){
-		if (uniqueName == oldName){
-			break;
+	QString baseName = newName + " - ";
+	int nameCounter = 1;
+
+	int suffixStart = newName.length();
+	while (suffixStart > 0 && newName[suffixStart - 1].isDigit()){
+		--suffixStart;
+	}
+
+	if (suffixStart < newName.length()){
+		bool isOk = false;
+		const int parsedNumber = newName.mid(suffixStart).toInt(&isOk);
+		if (isOk){
+			nameCounter = parsedNumber + 1;
+			baseName = newName.left(suffixStart);
 		}
-
-		uniqueName = newName + QString(" - %1").arg(counterName++);
 	}
 
-	return uniqueName;
+	QString workingName = newName;
+	while (names.contains(workingName)){
+		workingName = baseName + QString::number(nameCounter++);
+	}
+
+	return workingName;
 }
 
 
@@ -293,28 +305,18 @@ QByteArray CTaskCollectionCompBase::InsertNewObject(
 
 		QString newName = name.isEmpty() ? GetTaskTypeName(typeId) : name;
 
-		imtbase::ICollectionInfo::Ids ids = GetElementIds();
-		QVector<QString> names;
-
-		for(const QByteArray& elementId : ids){
-			names.append(GetElementInfo(elementId, imtbase::ICollectionInfo::EIT_NAME).toString());
-		}
-
-		QString workingName = newName;
-		int nameCounter = 1;
-		while (names.contains(workingName)){
-			workingName = newName + QString(" - %1").arg(nameCounter++);
-		}
+		QString workingName = GenerateUniqueObjectName(newName, "");
 
 		newTask.taskPtr.TakeOver(newTaskPtr);
 		newTask.typeId = typeId;
 		newTask.name = workingName;
 		newTask.description = description;
 
+		imtbase::ICollectionInfo::Ids ids = GetElementIds();
 		if (!proposedObjectId.isEmpty() && !ids.contains(proposedObjectId)){
 			newTask.uuid = proposedObjectId;
 		}
-
+		
 		istd::IChangeable::ChangeSet changeSet(CF_ADDED);
 		changeSet.SetChangeInfo(imtbase::IObjectCollection::CN_ELEMENT_INSERTED, newTask.uuid);
 		istd::CChangeNotifier changeNotifier(this, &changeSet);
