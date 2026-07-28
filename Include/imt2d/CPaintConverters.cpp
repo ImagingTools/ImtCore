@@ -624,6 +624,15 @@ bool CPaintConverters::ToQtPen(const sdl::V1_0::imt2d::CPen& sdlPen, QPen& pen)
 	if (sdlPen.dashOffset) {
 		pen.setDashOffset(*sdlPen.dashOffset);
 	}
+	if (sdlPen.dashPattern) {
+		QVector<qreal> pattern;
+		for (const double value : *sdlPen.dashPattern) {
+			pattern.append(static_cast<qreal>(value));
+		}
+		if (!pattern.isEmpty()) {
+			pen.setDashPattern(pattern);
+		}
+	}
 	if (sdlPen.cosmetic) {
 		pen.setCosmetic(*sdlPen.cosmetic);
 	}
