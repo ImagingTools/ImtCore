@@ -21,7 +21,11 @@ void CPaintConvertersTest::testPenRoundTrip()
 	QPen input;
 	input.setColor(QColor(10, 20, 30, 140));
 	input.setWidthF(2.5);
-	input.setStyle(Qt::DashDotLine);
+
+	const QVector<qreal> dashPattern = {1.0, 2.0, 3.0};
+	input.setStyle(Qt::CustomDashLine);
+	input.setDashPattern(dashPattern);
+	input.setDashOffset(0.5);
 	input.setCapStyle(Qt::RoundCap);
 	input.setJoinStyle(Qt::BevelJoin);
 	input.setMiterLimit(4.0);
