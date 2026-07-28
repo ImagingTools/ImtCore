@@ -134,7 +134,7 @@ class BaseClass extends QtObject {
 								target[key].finished()
 							}
 							else {
-								target[key] = pureData[key]
+								target[key] = pureData
 							}
 						} else {
 							let sourceTypename
