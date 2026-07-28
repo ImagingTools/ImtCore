@@ -27,17 +27,31 @@ ViewBase {
 	// PersonalAccessTokenList model (opaque), used as the table's elements source.
 	property var tokenList: null
 
+	// Same onCompleted + onApiClientChanged race as ProfileView — load once.
+	property bool __tokenListLoadDone: false
+
 	Component.onCompleted: {
-		if (tokensPage.apiClient)
-			tokensPage.apiClient.getTokenList()
+		tokensPage.__ensureTokenListLoad()
 	}
 
 	// See ProfileView's onApiClientChanged for why this is needed: apiClient is
 	// injected through several Loader layers and may not be settled yet when
 	// Component.onCompleted above runs.
 	onApiClientChanged: {
-		if (tokensPage.apiClient)
-			tokensPage.apiClient.getTokenList()
+		if (!tokensPage.apiClient) {
+			tokensPage.__tokenListLoadDone = false
+			return
+		}
+		tokensPage.__ensureTokenListLoad()
+	}
+
+	function __ensureTokenListLoad() {
+		if (!tokensPage.apiClient)
+			return
+		if (tokensPage.__tokenListLoadDone)
+			return
+		tokensPage.__tokenListLoadDone = true
+		tokensPage.apiClient.getTokenList()
 	}
 
 	Connections {

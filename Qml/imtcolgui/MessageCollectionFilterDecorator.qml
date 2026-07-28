@@ -17,6 +17,8 @@ DecoratorBase {
 	property alias filtermenu: filtermenu_
 	property CollectionFilter complexFilter: baseElement ? baseElement.complexFilter : null;	
 	property int filterRightMargin: 0
+	property bool clearLogVisible: false
+	signal clearLogRequested()
 	
 	Component.onCompleted: {
 		checkWidth();
@@ -31,7 +33,8 @@ DecoratorBase {
 	}
 	
 	function checkWidth(){
-		if (width - filtermenu.width - filterRightMargin <= segmentedButton.width + 2 * segmentedButton.spacing){
+		let clearLogWidth = clearLogButton.visible ? clearLogButton.width + Style.marginM : 0
+		if (width - filtermenu.width - filterRightMargin - clearLogWidth <= segmentedButton.width + 2 * segmentedButton.spacing){
 			segmentedButton.visible = false;
 		}
 		else{
@@ -185,6 +188,33 @@ DecoratorBase {
 			}
 		}
 		
+	}
+
+	ToolButton {
+		id: clearLogButton
+
+		anchors.left: segmentedButton_.right
+		anchors.leftMargin: Style.marginM
+		anchors.verticalCenter: parent.verticalCenter
+
+		width: Style.controlHeightM
+		height: width
+
+		visible: mainItem.clearLogVisible
+		iconSource: "qrc:/" + Style.getIconPath("Icons/Delete", Icon.State.On, Icon.Mode.Normal)
+		tooltipText: qsTr("Clear log")
+
+		onClicked: mainItem.clearLogRequested()
+
+		decorator: Component {
+			ToolButtonDecorator {
+				color: clearLogButton.hovered ? Style.errorTextColor : Style.negativeAccentColor
+				border.width: 1
+				border.color: clearLogButton.hovered ? Style.errorTextColor : Style.negativeAccentColor
+				radius: width / 2
+				icon.width: Style.iconSizeM
+			}
+		}
 	}
 	
 	FilterPanelDecorator {

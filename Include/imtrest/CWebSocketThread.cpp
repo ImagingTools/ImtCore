@@ -237,10 +237,6 @@ void CWebSocketThread::ProcessTextMessage(const QString& textMessage)
 
 		if (responsePtr.IsValid()){
 			QByteArray data = responsePtr->GetData();
-			// Agent/server sync clients (CWebSocketClientComp::SendRequest) send type=query with
-			// a correlation id and wait for type=query_data with the same id. Emitting the raw
-			// GraphQL HTTP body leaves the client spinning until timeout
-			// ("Live service sync notify failed … no response from server").
 			if (methodType == CWebSocketRequest::MT_QUERY){
 				const QByteArray queryRequestId = webSocketRequest->GetRequestId();
 				if (!queryRequestId.isEmpty()){

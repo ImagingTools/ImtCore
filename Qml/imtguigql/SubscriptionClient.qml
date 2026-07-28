@@ -44,17 +44,24 @@ GqlModel {
 		}
 	}
 
-	onStateChanged: {
-		if (container.state === "Ready"){
-			if (container.containsKey("data")){
-				let dataModelLocal = container.getData("data")
-				
-				if (dataModelLocal.containsKey(gqlCommandId)){
-					dataModelLocal = dataModelLocal.getData(gqlCommandId)
-				}
+	// Delivery is driven synchronously by SubscriptionManager (which calls deliverReady()
+	// right after copying each payload) rather than from this deferred onStateChanged. The
+	// state signal is delivered asynchronously, so when several subscription messages arrive
+	// back-to-back the next message overwrote this model before the previous message's
+	// deferred handler ran - only the last message of a burst was ever surfaced (observed
+	// live: after an agent reconnect only one of two open services' status updates reached
+	// the GUI). Synchronous delivery per message fixes that; onStateChanged no longer emits.
 
-				container.messageReceived(dataModelLocal);
+	// Fire messageReceived for the data currently held by this subscription.
+	function deliverReady(){
+		if (container.containsKey("data")){
+			let dataModelLocal = container.getData("data")
+
+			if (dataModelLocal.containsKey(gqlCommandId)){
+				dataModelLocal = dataModelLocal.getData(gqlCommandId)
 			}
+
+			container.messageReceived(dataModelLocal);
 		}
 	}
 

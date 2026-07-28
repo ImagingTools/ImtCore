@@ -576,7 +576,10 @@ sdl::V1_0::imtbase::CRemoveElementSetPayload CObjectCollectionControllerCompBase
 		return sdl::V1_0::imtbase::CRemoveElementSetPayload();
 	}
 
-	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(elementIds[0]);
+	QByteArray typeId;
+	if (!elementIds.isEmpty()){
+		typeId = m_objectCollectionCompPtr->GetObjectTypeId(elementIds[0]);
+	}
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 	if (m_operationContextControllerCompPtr.IsValid()){
@@ -585,7 +588,9 @@ sdl::V1_0::imtbase::CRemoveElementSetPayload CObjectCollectionControllerCompBase
 
 	bool ok = m_objectCollectionCompPtr->RemoveElementSet(&filterParams, operationContextPtr.GetPtr());
 	if (ok){
-		CreateUserActionLog(elementIds[0], typeId, "Delete", gqlRequest);
+		if (!elementIds.isEmpty()){
+			CreateUserActionLog(elementIds[0], typeId, "Delete", gqlRequest);
+		}
 		OnAfterRemoveElements(elementIds, gqlRequest);
 	}
 

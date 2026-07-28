@@ -113,7 +113,6 @@ QtObject {
 	}
 
 	function getProfile() {
-		console.log("getProfile")
 		root.loading = true
 		getProfileRequest.send()
 	}

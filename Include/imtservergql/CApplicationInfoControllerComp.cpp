@@ -3,6 +3,9 @@
 #include <GeneratedFiles/imtappsdl/SDL/1.0/CPP/Application.h>
 
 
+// Qt includes
+#include <QtCore/QUrl>
+
 // ACF includes
 #include <iprm/TParamsPtr.h>
 #include <iprm/ITextParam.h>
@@ -79,7 +82,118 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 		applicationInfo.logoIconName = logoIconNameParamPtr->GetText();
 	}
 
+	FillWebSocketUrl(applicationInfo);
+	FillUserMode(applicationInfo);
+	FillSuperuserStatus(applicationInfo);
+
 	return applicationInfo;
+}
+
+
+// private methods
+
+void CApplicationInfoControllerComp::FillWebSocketUrl(ApplicationInfo& applicationInfo) const
+{
+	if (!m_webSocketUrlProviderCompPtr.IsValid()){
+		return;
+	}
+
+	QUrl url;
+	if (!m_webSocketUrlProviderCompPtr->GetUrl(imtcom::IServerConnectionInterface::PT_WEBSOCKET, url)){
+		return;
+	}
+
+	sdl::V1_0::imtbase::CUrlParam webSocketUrl;
+	webSocketUrl.host = url.host();
+	webSocketUrl.port = url.port();
+	webSocketUrl.scheme = url.scheme();
+
+	applicationInfo.webSocketUrl = std::move(webSocketUrl);
+}
+
+
+void CApplicationInfoControllerComp::FillUserMode(ApplicationInfo& applicationInfo) const
+{
+	if (!m_userModeSelectionParamCompPtr.IsValid()){
+		return;
+	}
+
+	// Index order matches Sdl/imtapp/1.0/Application.sdl's UserManagementMode enum and
+	// the UserModeOptions SelectionConstraints in Partitura/ImtAuthVoce.arp/AuthorizationOptions.acc.
+	enum UserModeIndex
+	{
+		UMI_NO_USER_MANAGEMENT,
+		UMI_OPTIONAL_USER_MANAGEMENT,
+		UMI_STRONG_USER_MANAGEMENT
+	};
+
+	int index = m_userModeSelectionParamCompPtr->GetSelectedOptionIndex();
+
+	sdl::V1_0::imtapp::UserManagementMode userMode = sdl::V1_0::imtapp::UserManagementMode::STRONG_USER_MANAGEMENT;
+	switch (index){
+	case UMI_NO_USER_MANAGEMENT:
+		userMode = sdl::V1_0::imtapp::UserManagementMode::NO_USER_MANAGEMENT;
+		break;
+
+	case UMI_OPTIONAL_USER_MANAGEMENT:
+		userMode = sdl::V1_0::imtapp::UserManagementMode::OPTIONAL_USER_MANAGEMENT;
+		break;
+
+	case UMI_STRONG_USER_MANAGEMENT:
+		userMode = sdl::V1_0::imtapp::UserManagementMode::STRONG_USER_MANAGEMENT;
+		break;
+
+	default:
+		break;
+	}
+
+	applicationInfo.userMode = userMode;
+}
+
+
+void CApplicationInfoControllerComp::FillSuperuserStatus(ApplicationInfo& applicationInfo) const
+{
+	if (!m_superuserProviderCompPtr.IsValid()){
+		return;
+	}
+
+	sdl::V1_0::imtapp::CSuperuserCheckResult superuser;
+
+	if (m_databaseConnectionCheckerCompPtr.IsValid()){
+		QString connectionMessage;
+		if (!m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(connectionMessage)){
+			superuser.status = sdl::V1_0::imtapp::SuperuserExistsStatus::UNKNOWN;
+			superuser.message = connectionMessage;
+
+			applicationInfo.superuser = std::move(superuser);
+
+			return;
+		}
+	}
+
+	QString errorMessage;
+	imtauth::ISuperuserProvider::ExistsStatus status = m_superuserProviderCompPtr->SuperuserExists(errorMessage);
+
+	sdl::V1_0::imtapp::SuperuserExistsStatus sdlStatus = sdl::V1_0::imtapp::SuperuserExistsStatus::UNKNOWN;
+	switch (status){
+	case imtauth::ISuperuserProvider::ES_EXISTS:
+		sdlStatus = sdl::V1_0::imtapp::SuperuserExistsStatus::EXISTS;
+		break;
+
+	case imtauth::ISuperuserProvider::ES_NOT_EXISTS:
+		sdlStatus = sdl::V1_0::imtapp::SuperuserExistsStatus::NOT_EXISTS;
+		break;
+
+	default:
+		break;
+	}
+
+	superuser.status = sdlStatus;
+	if (!errorMessage.isEmpty()){
+		superuser.message = errorMessage;
+	}
+
+	applicationInfo.superuser = std::move(superuser);
 }
 
 

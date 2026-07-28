@@ -16,8 +16,7 @@ CREATE TABLE IF NOT EXISTS "CrossTenantMessages" (
 "ExpiresAt" TIMESTAMP,
 CONSTRAINT "FK_CrossTenantMessages_SourceTenantId" FOREIGN KEY ("SourceTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE,
 CONSTRAINT "FK_CrossTenantMessages_TargetTenantId" FOREIGN KEY ("TargetTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE,
-CONSTRAINT "FK_CrossTenantMessages_RelationshipId" FOREIGN KEY ("RelationshipId") REFERENCES "TenantRelationships" ("Id") ON DELETE CASCADE,
-CONSTRAINT "FK_CrossTenantMessages_ContractId" FOREIGN KEY ("ContractId") REFERENCES "Contracts" ("Id") ON DELETE SET NULL
+CONSTRAINT "FK_CrossTenantMessages_RelationshipId" FOREIGN KEY ("RelationshipId") REFERENCES "TenantRelationships" ("Id") ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS "IdxCrossTenantMessagesSourceTenantId" ON "CrossTenantMessages" ("SourceTenantId");

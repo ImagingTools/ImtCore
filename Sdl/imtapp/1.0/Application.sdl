@@ -4,6 +4,27 @@ schema {
 	version: 1.0
 }
 
+import {
+	"../../imtbase/1.0/ImtBaseTypes.sdl"
+}
+
+enum UserManagementMode {
+	NO_USER_MANAGEMENT
+	OPTIONAL_USER_MANAGEMENT
+	STRONG_USER_MANAGEMENT
+}
+
+enum SuperuserExistsStatus {
+	EXISTS
+	NOT_EXISTS
+	UNKNOWN
+}
+
+type SuperuserCheckResult {
+	status: SuperuserExistsStatus
+	message: String
+}
+
 type ApplicationInfo {
 	version: String
 	companyName: String
@@ -12,6 +33,9 @@ type ApplicationInfo {
 	applicationName: String
 	applicationType: String
 	logoIconName: String
+	webSocketUrl: UrlParam
+	userMode: UserManagementMode
+	superuser: SuperuserCheckResult
 }
 
 input GetApplicationInfoInput {

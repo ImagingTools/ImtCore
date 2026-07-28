@@ -57,7 +57,6 @@ public:
 		Q_INIT_RESOURCE(imtauthUsersSdl);
 		Q_INIT_RESOURCE(imtauthProfileSdl);
 		Q_INIT_RESOURCE(imtauthSessionsSdl);
-		Q_INIT_RESOURCE(imtauthAuthorizationOptionsSdl);
 		Q_INIT_RESOURCE(imtauthAuthorizationSdl);
 		Q_INIT_RESOURCE(imtauthPermissionsSdl);
 		Q_INIT_RESOURCE(imtappApplicationSdl);
@@ -69,6 +68,7 @@ public:
 		Q_INIT_RESOURCE(imtbaseProgressManagerSdl);
 		Q_INIT_RESOURCE(imtbaseCollectionImportSdl);
 		Q_INIT_RESOURCE(imt2dGeometrySdl);
+		Q_INIT_RESOURCE(imt2dPaintPrimitivesSdl);
 		Q_INIT_RESOURCE(imt2dPaintSystemSdl);
 		Q_INIT_RESOURCE(imtauthPersonalAccessTokensSdl);
 		Q_INIT_RESOURCE(imtbaseFilterableSelectSdl);

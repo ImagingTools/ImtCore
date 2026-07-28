@@ -81,7 +81,7 @@ public:
 				imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
 protected:
-	virtual void SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const;
+	virtual bool SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const;
 	virtual bool SendRequestInternal(const imtgql::IGqlRequest& request, imtrest::ConstRequestPtr& requestPtr) const;
 
 	// reimplemented (icomp::CComponentBase)
@@ -91,6 +91,7 @@ Q_SIGNALS:
 	void OnQueryDataReceived(int resultCode = 1) const;
 
 private:
+	void UpdateCustomerSubscriptionStatuses(const QByteArray& subscriptionId, const QString& message = QString()) const;
 	virtual imtrest::ConstResponsePtr CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const;
 
 	struct PendingAsync

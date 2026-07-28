@@ -15,6 +15,7 @@
 #include <QtCore/QUrl>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtrest/CWebSocketRequest.h>
 #include <imtgql/CGqlResponse.h>
 
@@ -58,20 +59,25 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 		}
 	}
 
-	QString subscriptionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+	QByteArray subscriptionId = QUuid::createUuid().toString(QUuid::WithoutBraces).toLocal8Bit();
 
 	SubscriptionHelper subscriptionHelper;
 	subscriptionHelper.m_request = *requestImplPtr;
 	subscriptionHelper.m_clientId = clientId;
 	subscriptionHelper.m_status = IGqlSubscriptionClient::SS_IN_REGISTRATION;
 	subscriptionHelper.m_clients.append(subscriptionClient);
-	m_registeredClients.insert(subscriptionId.toLocal8Bit(), subscriptionHelper);
+	m_registeredClients.insert(subscriptionId, subscriptionHelper);
 
 	locker.unlock();
 
-	SubscriptionRegister(*requestImplPtr, subscriptionId.toLocal8Bit());
+	if (!SubscriptionRegister(*requestImplPtr, subscriptionId)){
+		QMutexLocker failedRegistrationLocker(&m_registeredClientsMutex);
+		m_registeredClients.remove(subscriptionId);
 
-	return subscriptionId.toLocal8Bit();
+		return QByteArray();
+	}
+
+	return subscriptionId;
 }
 
 
@@ -89,6 +95,8 @@ bool CSubscriptionManagerComp::UnregisterSubscription(const QByteArray& subscrip
 }
 
 
+// reimplemented (imod::CSingleModelObserverBase)
+
 void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
 	if (!m_connectionStatusProviderCompPtr.IsValid()){
@@ -100,16 +108,19 @@ void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& chan
 	QByteArray clientId = changeSet.GetChangeInfo("ClientId").toByteArray();
 
 	for (const QByteArray& subscriptionId : m_registeredClients.keys()){
-		if (!changeSet.Contains(imtcom::IConnectionStatusProvider::CS_CONNECTED)){
+		if (changeSet.Contains(imtcom::IConnectionStatusProvider::CF_CONNECTED)){
 			if (m_registeredClients[subscriptionId].m_clientId == clientId){
-				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_IN_REGISTRATION;
+				SubscriptionRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
+				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_REGISTERED;
 			}
 		}
 		else{
 			if (m_registeredClients[subscriptionId].m_clientId == clientId){
-				SubscriptionRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
+				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_IN_REGISTRATION;
 			}
 		}
+
+		UpdateCustomerSubscriptionStatuses(subscriptionId);
 	}
 }
 
@@ -165,11 +176,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 			if (m_registeredClients.contains(subscriptionId)){
 				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_REGISTERED;
 
-				for (IGqlSubscriptionClient* subscriptionClientPtr : m_registeredClients[subscriptionId].m_clients){
-					if (subscriptionClientPtr != nullptr){
-						subscriptionClientPtr->OnSubscriptionStatusChanged(subscriptionId, m_registeredClients[subscriptionId].m_status, message);
-					}
-				}
+				UpdateCustomerSubscriptionStatuses(subscriptionId, message);
 			}
 		}
 		break;
@@ -306,7 +313,7 @@ IAsyncGqlRequestTokenPtr CSubscriptionManagerComp::SendRequest(
 	if (contextPtr != nullptr){
 		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
 		for (const QByteArray& headerId: headers.keys()){
-			if (headerId != "accept-encoding" && headerId != "x-authentication-token"){
+			if (headerId != "accept-encoding" && headerId != imtbase::s_authenticationTokenHeaderId){
 				headersObject[headerId] = QString(headers.value(headerId));
 			}
 		}
@@ -368,6 +375,149 @@ IAsyncGqlRequestTokenPtr CSubscriptionManagerComp::SendRequest(
 }
 
 
+// protected methods
+
+bool CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const
+{
+	if (!m_engineCompPtr.IsValid()){
+		Q_ASSERT(0);
+
+		return false;
+	}
+
+	QString authToken;
+
+	QByteArray endpoint;
+	QUrl url(endpoint);
+	QString host = url.host();
+
+	QJsonObject authorization;
+	authorization["Authorization"] = authToken;
+	authorization["host"] = host;
+
+	QJsonObject extensions;
+	extensions["authorization"] = authorization;
+
+	QJsonObject payload;
+	payload["data"] = QString(subscriptionRequest.GetQuery());
+	payload["extensions"] = extensions;
+
+	QJsonObject registerSubscription;
+	registerSubscription["id"] = QString(subscriptionId);
+	registerSubscription["type"] = "start";
+	registerSubscription["payload"] = payload;
+
+	QJsonObject headersObject;
+	const imtgql::IGqlContext* contextPtr = subscriptionRequest.GetRequestContext();
+	if (contextPtr != nullptr){
+		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
+		for (const QByteArray& headerId : headers.keys()){
+			if (headerId != "accept-encoding"){
+				headersObject[headerId] = QString(headers.value(headerId));
+			}
+		}
+	}
+	registerSubscription["headers"] = headersObject;
+
+	QByteArray queryData = QJsonDocument(registerSubscription).toJson(QJsonDocument::Compact);
+
+	imtrest::ConstRequestPtr requestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, "").PopInterfacePtr());
+
+	return SendRequestInternal(subscriptionRequest, requestPtr);
+}
+
+
+bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& request, imtrest::ConstRequestPtr& requestPtr) const
+{
+	bool retVal = false;
+	QByteArray clientId;
+
+	auto requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&request);
+	if (requestImplPtr != nullptr){
+		clientId = requestImplPtr->GetHeader("clientid");
+	}
+
+	if (m_subscriptionSenderCompPtr.IsValid()){
+		retVal = m_subscriptionSenderCompPtr->SendRequest(requestPtr);
+	}
+	else if (m_requestManagerCompPtr.IsValid()){
+		if (clientId.isEmpty()){
+			SendErrorMessage(
+				0,
+				QStringLiteral("Outbound WebSocket request has empty clientid — cannot route to recipient"),
+				"SubscriptionManager");
+			return false;
+		}
+		retVal = m_requestManagerCompPtr->SendRequest(clientId, requestPtr);
+		if (!retVal){
+			SendErrorMessage(
+				0,
+				QStringLiteral("No WebSocket sender registered for clientid '%1' (client offline or id mismatch)")
+				.arg(QString::fromUtf8(clientId)),
+				"SubscriptionManager");
+		}
+	}
+
+	return retVal;
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CSubscriptionManagerComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	if (m_requestTimeoutMsAttrPtr.IsValid() && *m_requestTimeoutMsAttrPtr > 0){
+		m_requestTimeoutMs = *m_requestTimeoutMsAttrPtr;
+	}
+
+	if (m_connectionStatusProviderModelCompPtr.IsValid()){
+		m_connectionStatusProviderModelCompPtr->AttachObserver(this);
+	}
+}
+
+
+// private methods
+
+void CSubscriptionManagerComp::UpdateCustomerSubscriptionStatuses(const QByteArray& subscriptionId, const QString& message) const
+{
+	if (m_registeredClients.contains(subscriptionId)){
+		for (IGqlSubscriptionClient* subscriptionClientPtr : m_registeredClients[subscriptionId].m_clients){
+			if (subscriptionClientPtr != nullptr){
+				subscriptionClientPtr->OnSubscriptionStatusChanged(subscriptionId, m_registeredClients[subscriptionId].m_status, message);
+			}
+		}
+	}
+}
+
+
+imtrest::ConstResponsePtr CSubscriptionManagerComp::CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const
+{
+	QByteArray requestBody = request.GetBody();
+	QJsonDocument document = QJsonDocument::fromJson(requestBody);
+	QJsonObject object = document.object();
+
+	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
+
+	QString body = QString(R"({"id": "%1","type": "error","payload": [ {"message": "%2", "extensions": { "type": "Warning" }} ]})")
+		.arg(object["id"].toString())
+		.arg(errorMessage);
+
+	QByteArray responseTypeId("text/html; charset=utf-8");
+	imtrest::ConstResponsePtr responsePtr(
+		engine.CreateResponse(
+			request,
+			imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
+			body.toUtf8(),
+			responseTypeId).PopInterfacePtr());
+
+	SendErrorMessage(0, QString(errorMessage));
+
+	return responsePtr;
+}
+
+
 void CSubscriptionManagerComp::CompletePending(const QString& key, const QByteArray& body, bool isError) const
 {
 	PendingAsync pending;
@@ -392,7 +542,7 @@ void CSubscriptionManagerComp::CompletePending(const QString& key, const QByteAr
 	// query_data is delivered on the WebSocket socket thread (CWebSocketThread).
 	// Handlers must NOT run there: a nested SendRequest/Wait (or any blocking
 	// GQL) re-enters the same socket while m_isProcessingMessage is true, so the
-	// reply is only queued and never drained — full agent-request hang after
+	// reply is only queued and never drained — full request hang after
 	// reconnect/reconcile. Always hop to this component's thread first.
 	// Order: OnResponseReceived (fill capturers) then MarkCompleted (wake Wait).
 	CSubscriptionManagerComp* self = const_cast<CSubscriptionManagerComp*>(this);
@@ -472,137 +622,5 @@ void CSubscriptionManagerComp::FailPending(
 }
 
 
-// protected methods
-
-void CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const
-{
-	if (!m_engineCompPtr.IsValid()){
-		Q_ASSERT(0);
-
-		return;
-	}
-
-	QString authToken;
-
-	QByteArray endpoint;
-	QUrl url(endpoint);
-	QString host = url.host();
-
-	QJsonObject authorization;
-	authorization["Authorization"] = authToken;
-	authorization["host"] = host;
-
-	QJsonObject extensions;
-	extensions["authorization"] = authorization;
-
-	QJsonObject payload;
-	payload["data"] = QString(subscriptionRequest.GetQuery());
-	payload["extensions"] = extensions;
-
-	QJsonObject registerSubscription;
-	registerSubscription["id"] = QString(subscriptionId);
-	registerSubscription["type"] = "start";
-	registerSubscription["payload"] = payload;
-
-	QJsonObject headersObject;
-	const imtgql::IGqlContext* contextPtr = subscriptionRequest.GetRequestContext();
-	if (contextPtr != nullptr){
-		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
-		for (const QByteArray& headerId: headers.keys()){
-			if (headerId != "accept-encoding"){
-				headersObject[headerId] = QString(headers.value(headerId));
-			}
-		}
-	}
-	registerSubscription["headers"] = headersObject;
-
-	QByteArray queryData = QJsonDocument(registerSubscription).toJson(QJsonDocument::Compact);
-
-	imtrest::ConstRequestPtr requestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, "").PopInterfacePtr());
-
-	SendRequestInternal(subscriptionRequest, requestPtr);
-}
-
-
-bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& request, imtrest::ConstRequestPtr& requestPtr) const
-{
-	bool retVal = false;
-	QByteArray clientId;
-
-	auto requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&request);
-	if (requestImplPtr != nullptr){
-		clientId = requestImplPtr->GetHeader("clientid");
-	}
-
-	if (m_subscriptionSenderCompPtr.IsValid()){
-		retVal = m_subscriptionSenderCompPtr->SendRequest(requestPtr);
-	}
-	else if (m_requestManagerCompPtr.IsValid()){
-		if (clientId.isEmpty()){
-			// Server→agent queries must target a registered agent socket (clientid header).
-			// Empty id leaves ServicesList/GetService undelivered and the mirror empty.
-			SendErrorMessage(
-						0,
-						QStringLiteral("Outbound WebSocket request has empty clientid — cannot route to agent"),
-						"SubscriptionManager");
-			return false;
-		}
-		retVal = m_requestManagerCompPtr->SendRequest(clientId, requestPtr);
-		if (!retVal){
-			SendErrorMessage(
-						0,
-						QStringLiteral("No WebSocket sender registered for clientid '%1' (agent offline or id mismatch)")
-									.arg(QString::fromUtf8(clientId)),
-						"SubscriptionManager");
-		}
-	}
-
-	return retVal;
-}
-
-
-// reimplemented (icomp::CComponentBase)
-
-void CSubscriptionManagerComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-
-	if (m_requestTimeoutMsAttrPtr.IsValid() && *m_requestTimeoutMsAttrPtr > 0){
-		m_requestTimeoutMs = *m_requestTimeoutMsAttrPtr;
-	}
-
-	if (m_connectionStatusProviderModelCompPtr.IsValid()){
-		m_connectionStatusProviderModelCompPtr->AttachObserver(this);
-	}
-}
-
-
-imtrest::ConstResponsePtr CSubscriptionManagerComp::CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const
-{
-	QByteArray requestBody = request.GetBody();
-	QJsonDocument document = QJsonDocument::fromJson(requestBody);
-	QJsonObject object = document.object();
-
-	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
-
-	QString body = QString(R"({"id": "%1","type": "error","payload": [ {"message": "%2", "extensions": { "type": "Warning" }} ]})")
-					   .arg(object["id"].toString())
-					   .arg(errorMessage);
-
-	QByteArray responseTypeId("text/html; charset=utf-8");
-	imtrest::ConstResponsePtr responsePtr(
-				engine.CreateResponse(
-							request,
-							imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
-							body.toUtf8(),
-							responseTypeId).PopInterfacePtr());
-
-	SendErrorMessage(0, QString(errorMessage));
-
-	return responsePtr;
-}
-
-
 } // namespace imtclientgql
-
 

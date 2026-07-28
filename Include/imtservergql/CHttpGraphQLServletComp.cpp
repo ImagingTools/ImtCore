@@ -98,17 +98,29 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		imtgql::IGqlContextCreator::ContextCreationError contextError;
 		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(headers, contextError);
 		if (!gqlContextPtr.IsValid()){
+			const QString maskedToken = MaskToken(headers.value(imtbase::s_authenticationTokenHeaderId));
 			if (contextError.status == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED){
+				// Client should refresh the access token; log detail for diagnostics.
+				SendWarningMessage(
+							0,
+							QStringLiteral("HTTP GraphQL auth rejected (401 Unauthorized) for Command-ID '%1', token %2: %3")
+									.arg(QString(gqlCommand), maskedToken, contextError.message),
+							QStringLiteral("GraphQL - servlet"));
 				return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
 			}
 			if (contextError.status == imtgql::IGqlContextCreator::CCS_FORBIDDEN){
+				SendWarningMessage(
+							0,
+							QStringLiteral("HTTP GraphQL auth rejected (403 Forbidden) for Command-ID '%1', token %2: %3")
+									.arg(QString(gqlCommand), maskedToken, contextError.message),
+							QStringLiteral("GraphQL - servlet"));
 				return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
 			}
 
 			SendCriticalMessage(
 						0,
 						QStringLiteral("Unable to create a GraphQL context for the access token '%1' for Command-ID: '%2'. Error: '%3'")
-											.arg(MaskToken(headers.value(imtbase::s_authenticationTokenHeaderId)), QString(gqlCommand), contextError.message),
+											.arg(maskedToken, QString(gqlCommand), contextError.message),
 						QStringLiteral("GraphQL - servlet"));
 			return GenerateError(StatusCode::SC_INTERNAL_SERVER_ERROR, QStringLiteral("Request context is invalid"), request);
 		}
@@ -167,6 +179,17 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		}
 
 		if (isError) {
+			// Permission handler reports unauthenticated callers as type Unauthorized.
+			// Map to HTTP 401 so clients run the same reactive refresh path as expired JWT.
+			if (errorType.compare(QStringLiteral("Unauthorized"), Qt::CaseInsensitive) == 0){
+				SendWarningMessage(
+							0,
+							QStringLiteral("HTTP GraphQL auth rejected (401 Unauthorized) for Command-ID '%1': %2")
+									.arg(QString(gqlCommand), errorMessage),
+							QStringLiteral("GraphQL - servlet"));
+				return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
+			}
+
 			responseData = BuildGqlErrorJson(gqlCommand, errorMessage, errorType);
 			isSuccessful = !responseData.isEmpty();
 		}

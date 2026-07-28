@@ -650,9 +650,11 @@ bool CSqlDatabaseObjectDelegateCompBase::TableExists(const QString& tableName) c
 	QString tableExistsQuery;
 
 	if (driverId == "QPSQL"){
+		const QByteArray tableScheme = GetTableScheme();
+		const QString schemaName = tableScheme.isEmpty() ? QStringLiteral("public") : QString::fromUtf8(tableScheme);
 		tableExistsQuery = QString(
-								"SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '%1');"
-								).arg(tableName);
+								"SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = '%1' AND table_name = '%2');"
+								).arg(schemaName, tableName);
 	}
 	else if (driverId == "QSQLITE"){
 		tableExistsQuery = QString(
