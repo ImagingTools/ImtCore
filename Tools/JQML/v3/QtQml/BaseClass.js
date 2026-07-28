@@ -104,6 +104,7 @@ class BaseClass extends QtObject {
         get(target, key){
 			if(key !== '__typename' && target.constructor.cachedPoperties.has(key)){
 				let node = target.constructor.meta[key]
+				if(target.__destroying || target.__destroyed) return node.type.get(target, key, node)
 				if(typeof target[key] === "object" && !(target[key] instanceof QtObject)){
 					let pureData = target[key]
 
@@ -111,7 +112,7 @@ class BaseClass extends QtObject {
 						target[key] = null
 					} else if(typeof pureData === "object") {
 						if(Array.isArray(pureData)){
-							let component = target.createComponent(key)
+							let component = target.__proxy.createComponent(key)
 			
 							if (component) {
 								target[key] = node.typeTarget.create(target.__proxy)
@@ -122,7 +123,7 @@ class BaseClass extends QtObject {
 									if (_pureData['__typename']){
 										sourceTypename = _pureData['__typename']
 									}
-									let obj = target.createElement(key, sourceTypename).createObject(target.__proxy)
+									let obj = target.__proxy.createElement(key, sourceTypename).createObject(target.__proxy)
 									
 									target[key].append({ item: obj })
 									obj.owner = target
@@ -140,7 +141,7 @@ class BaseClass extends QtObject {
 							if (target[key]['__typename']){
 								sourceTypename = target[key]['__typename']
 							}	
-							let obj = target.createComponent(key, sourceTypename).createObject(target.__proxy)
+							let obj = target.__proxy.createComponent(key, sourceTypename).createObject(target.__proxy)
 
 							target[key] = obj
 							obj.owner = target.__proxy
