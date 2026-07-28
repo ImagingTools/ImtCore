@@ -233,7 +233,7 @@ class BaseModel extends ListModel {
 				continue
 			}
 			let obj = QtFunctions.createComponent(sourceTypename + ".qml").createObject(this)
-			obj.fromObject(arr[i])
+			obj.fromObject(sourceObject[i])
 			this.addElement(obj)
 		}
 
