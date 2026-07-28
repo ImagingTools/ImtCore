@@ -1,4 +1,5 @@
 const QtObject = require("./QtObject")
+const Property = require("./Property")
 const Bool = require("./Bool")
 const Int = require("./Int")
 const Var = require("./Var")
@@ -98,6 +99,86 @@ class BaseClass extends QtObject {
 		modelChanged: { type:Signal, args: ['changeSet'] },
 		finished: { type:Signal, args: [] },
     })
+
+	static handle = {
+        get(target, key){
+			if(key !== '__typename' && target.constructor.cachedPoperties.has(key)){
+				let node = target.constructor.meta[key]
+				if(target.__destroying || target.__destroyed) return node.type.get(target, key, node)
+				if(typeof target[key] === "object" && !(target[key] instanceof QtObject)){
+					let pureData = target[key]
+
+					if(pureData === null){
+						target[key] = null
+					} else if(typeof pureData === "object") {
+						if(Array.isArray(pureData)){
+							let component = target.__proxy.createComponent(key)
+			
+							if (component) {
+								target[key] = node.typeTarget.create(target.__proxy)
+								target[key].owner = target
+
+								for (let _pureData of pureData) {
+									let sourceTypename
+									if (_pureData['__typename']){
+										sourceTypename = _pureData['__typename']
+									}
+									let obj = target.__proxy.createElement(key, sourceTypename).createObject(target.__proxy)
+									
+									target[key].append({ item: obj })
+									obj.owner = target
+
+									obj.fromObject(_pureData)
+								}
+
+								target[key].finished()
+							}
+							else {
+								target[key] = pureData
+							}
+						} else {
+							let sourceTypename
+							if (target[key]['__typename']){
+								sourceTypename = target[key]['__typename']
+							}	
+							let obj = target.__proxy.createComponent(key, sourceTypename).createObject(target.__proxy)
+
+							target[key] = obj
+							obj.owner = target.__proxy
+
+							obj.fromObject(pureData)
+						}
+					} else {
+						target[key] = pureData
+					}
+
+					
+				}
+                return node.type.get(target, key, node)
+			} else if(target.constructor.meta.hasOwnProperty(key)){
+                let node = target.constructor.meta[key]
+                return node.type.get(target, key, node)
+            } else {
+                return target[key]
+            }
+        },
+
+        set(target, key, value){
+            if(target.constructor.meta.hasOwnProperty(key)){
+                let node = target.constructor.meta[key]
+
+                if(node.type.isAssignableFrom(Property)){
+                    return node.type.reset(target, key, value, node)
+                } else {
+                    return node.type.set(target, key, value, node)
+                }
+            } else {
+                target[key] = value
+
+                return true
+            }
+        },
+    }
 
 	static create(parent = null, properties = {}){
 		let proxy = super.create(parent, properties)
@@ -486,58 +567,6 @@ class BaseClass extends QtObject {
 
 			if (sourceObject[key] === null){
 				this[_key] = null
-			}
-			else if (typeof sourceObject[key] === "object") {
-				if (Array.isArray(sourceObject[key])) {
-					let component = this.createComponent(_key)
-
-					if (this[_key]) {
-						if (this[_key].clear) {
-							this[_key].clear()
-						}
-					} else {
-						if (component) {
-							let obj = BaseModel.create(this)
-							obj.owner = this
-							this[_key] = obj
-						}
-					}
-
-					if (component) {
-						this[_key].owner = this
-						for (let sourceObjectInner of sourceObject[key]) {
-							let sourceTypename
-							if (sourceObjectInner['__typename']){
-								sourceTypename = sourceObjectInner['__typename']
-							}
-							let obj = this.createElement(_key, sourceTypename).createObject(this)
-							obj.fromObject(sourceObjectInner)
-							this[_key].append({ item: obj })
-							obj.owner = this
-						}
-					}
-					else {
-						this[_key] = sourceObject[key]
-					}
-				} else {
-					let obj
-					if (!this[_key]) {
-						let sourceData = sourceObject[key]
-						let sourceTypename
-						if (sourceData['__typename']){
-							sourceTypename = sourceData['__typename']
-						}	
-						obj = this.createComponent(_key, sourceTypename).createObject(this)
-					}
-					else {
-						obj = this[_key]
-					}
-
-					obj.fromObject(sourceObject[key])
-					this[_key] = obj
-
-					obj.owner = this
-				}
 			} else {
 				this[_key] = sourceObject[key]
 			}
