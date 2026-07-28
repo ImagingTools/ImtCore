@@ -252,10 +252,18 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		if(NOT DEFINED USE_GEO OR USE_GEO)
 			add_subdirectory("${INCLUDE_DIR}/imtgeo/CMake" "${AUX_INCLUDE_DIR}/imtgeo")
 		endif()
+
 	endif()
+
+	add_subdirectory("${INCLUDE_DIR}/imt2d/CMake" "${AUX_INCLUDE_DIR}/imt2d")
+	add_dependencies(imt2d imt2dsdl)
 
 	if(USE_MDBX)
 		add_subdirectory("${INCLUDE_DIR}/imtmdbx/CMake" "${AUX_INCLUDE_DIR}/imtmdbx")
+	endif()
+
+	if(BUILD_TESTING)
+		add_subdirectory("${INCLUDE_DIR}/imt2d/Test/CMake" "${AUX_INCLUDE_DIR}/imt2d/Test")
 	endif()
 
 	#-------- Qml --------
