@@ -67,7 +67,12 @@ void CObjectCollectionChangeNotifierComp::OnUpdate(const istd::IChangeable::Chan
 		return;
 	}
 
-	if (m_commandIdsAttrPtr.GetCount() <= 0){
+	QByteArray collectionChangedCommandId;
+	if (m_collectionIdAttrPtr.IsValid() && !(*m_collectionIdAttrPtr).isEmpty()){
+		collectionChangedCommandId = QByteArrayLiteral("On") + *m_collectionIdAttrPtr + QByteArrayLiteral("CollectionChanged");
+	}
+
+	if (collectionChangedCommandId.isEmpty() && m_commandIdsAttrPtr.GetCount() <= 0){
 		return;
 	}
 
@@ -160,11 +165,15 @@ void CObjectCollectionChangeNotifierComp::OnUpdate(const istd::IChangeable::Chan
 	jsonDocument.setObject(dataObject);
 	const QByteArray data = jsonDocument.toJson(QJsonDocument::Compact);
 
-	// Same pattern as ServiceSubscriberController: publish by configured CommandIds so the
-	// payload key is always the subscription command (e.g. OnAgentServicesCollectionChanged),
-	// not a stale/empty networkRequest->GetCommandId().
+	if (!collectionChangedCommandId.isEmpty()){
+		PublishData(collectionChangedCommandId, data);
+	}
+
 	for (int index = 0; index < m_commandIdsAttrPtr.GetCount(); ++index){
-		PublishData(m_commandIdsAttrPtr[index], data);
+		const QByteArray& commandId = m_commandIdsAttrPtr[index];
+		if (commandId != collectionChangedCommandId){
+			PublishData(commandId, data);
+		}
 	}
 }
 
