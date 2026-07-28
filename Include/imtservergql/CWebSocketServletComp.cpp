@@ -202,15 +202,9 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(gqlHeaders, contextError);
 	if (!gqlContextPtr.IsValid()){
 		QByteArray errorMessage;
-		if (contextError.status == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED){
-			errorMessage = QByteArrayLiteral("Unauthorized");
-		}
-		else if (contextError.status == imtgql::IGqlContextCreator::CCS_FORBIDDEN){
-			errorMessage = QByteArrayLiteral("Forbidden");
-		}
-		else{
-			errorMessage = QByteArrayLiteral("Unable to create GraphQL context: ") + contextError.message.toUtf8();
-		}
+
+		errorMessage = QByteArrayLiteral("Unable to create GraphQL context: ") + contextError.message.toUtf8();
+
 		return CreateErrorResponse(errorMessage, request);
 	}
 
