@@ -107,7 +107,9 @@ class BaseClass extends QtObject {
 				if(node.typeTarget && !(target[key] instanceof node.typeTarget)){
 					let pureData = target[key]
 
-					if(pureData){
+					if(pureData === null){
+						target[key] = null
+					} else if(typeof pureData === "object") {
 						if(Array.isArray(pureData)){
 							let component = target.createComponent(key)
 			
@@ -146,8 +148,7 @@ class BaseClass extends QtObject {
 							obj.fromObject(pureData)
 						}
 					} else {
-						target[key] = node.typeTarget.create(target.__proxy)
-						target[key].owner = target.__proxy
+						target[key] = pureData
 					}
 
 					
