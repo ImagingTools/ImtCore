@@ -868,7 +868,7 @@ void sdl::V1_0::modsdl::CDigitalPrinterSpecificationObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::modsdl::CDigitalPrinterSpecificationObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::modsdl::CDigitalPrinterSpecificationObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::modsdl::CDigitalPrinterSpecificationObject*>();
@@ -1129,7 +1129,7 @@ void sdl::V1_0::modsdl::CDigitalPrinterObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::modsdl::CDigitalPrinterObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::modsdl::CDigitalPrinterObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::modsdl::CDigitalPrinterObject*>();

@@ -280,11 +280,11 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassListFile(QTextStream& stream, c
 	FeedStream(stream, 2, false);
 
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;");
+	stream << QStringLiteral("Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE int getItemsCount() const;");
+	stream << QStringLiteral("Q_INVOKABLE int getItemsCount() const override;");
 	FeedStream(stream, 1, false);
 
 
@@ -323,7 +323,7 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassListFile(QTextStream& stream, c
 
 	// removeElement method
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE void removeElement(int index);");
+	stream << QStringLiteral("Q_INVOKABLE void removeElement(int index) override;");
 	FeedStream(stream, 1, false);
 
 	// isEqualWithModel method
@@ -348,7 +348,7 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassListFile(QTextStream& stream, c
 
 
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;");
+	stream << QStringLiteral("Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;");
 	FeedStream(stream, 2, false);
 
 	stream << QStringLiteral("signals:");
@@ -1310,7 +1310,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 	FeedStream(stream, 3, false);
 	// clear method end
 
-	stream << QStringLiteral("QVariant ") + objectListClassNameWithNamespace + QStringLiteral("::getData(const QString& nameId, int index)");
+	stream << QStringLiteral("QVariant ") + objectListClassNameWithNamespace + QStringLiteral("::getData(const QString& nameId, int index) const");
 	FeedStream(stream, 1, false);
 	stream << '{';
 	FeedStream(stream, 1, false);

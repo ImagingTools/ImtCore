@@ -1196,7 +1196,7 @@ void sdl::V1_0::complextest::CPointObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CPointObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CPointObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CPointObject*>();
@@ -1606,7 +1606,7 @@ void sdl::V1_0::complextest::CGeometryObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CGeometryObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CGeometryObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CGeometryObject*>();

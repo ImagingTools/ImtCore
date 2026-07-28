@@ -177,20 +177,20 @@ public:
 
 	explicit CDigitalPrinterSpecificationObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::modsdl::CDigitalPrinterSpecificationObject* item);
 	Q_INVOKABLE sdl::V1_0::modsdl::CDigitalPrinterSpecificationObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::modsdl::CDigitalPrinterSpecificationObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::modsdl::CDigitalPrinterSpecificationObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::modsdl::CDigitalPrinterSpecificationObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -250,20 +250,20 @@ public:
 
 	explicit CDigitalPrinterObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::modsdl::CDigitalPrinterObject* item);
 	Q_INVOKABLE sdl::V1_0::modsdl::CDigitalPrinterObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::modsdl::CDigitalPrinterObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::modsdl::CDigitalPrinterObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::modsdl::CDigitalPrinterObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();

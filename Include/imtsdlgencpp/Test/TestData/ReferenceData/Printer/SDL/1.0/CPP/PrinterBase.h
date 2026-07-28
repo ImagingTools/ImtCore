@@ -204,20 +204,20 @@ public:
 
 	explicit CPrinterSpecificationBaseObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::modsdl::CPrinterSpecificationBaseObject* item);
 	Q_INVOKABLE sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::modsdl::CPrinterSpecificationBaseObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::modsdl::CPrinterSpecificationBaseObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -269,20 +269,20 @@ public:
 
 	explicit CLinkObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::modsdl::CLinkObject* item);
 	Q_INVOKABLE sdl::V1_0::modsdl::CLinkObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::modsdl::CLinkObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::modsdl::CLinkObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::modsdl::CLinkObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -358,20 +358,20 @@ public:
 
 	explicit CPrinterBaseObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::modsdl::CPrinterBaseObject* item);
 	Q_INVOKABLE sdl::V1_0::modsdl::CPrinterBaseObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::modsdl::CPrinterBaseObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::modsdl::CPrinterBaseObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::modsdl::CPrinterBaseObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -427,20 +427,20 @@ public:
 
 	explicit CPrinterListObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::modsdl::CPrinterListObject* item);
 	Q_INVOKABLE sdl::V1_0::modsdl::CPrinterListObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::modsdl::CPrinterListObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::modsdl::CPrinterListObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::modsdl::CPrinterListObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -518,12 +518,12 @@ public:
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(QVariant item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::modsdl::CPrinterSpecificationObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, QVariant item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 signals:
 	void countChanged();
 };
@@ -549,12 +549,12 @@ public:
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(QVariant item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::modsdl::CSimpleUnionObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, QVariant item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 signals:
 	void countChanged();
 };
@@ -580,12 +580,12 @@ public:
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(QVariant item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::modsdl::CMixedUnionObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, QVariant item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 signals:
 	void countChanged();
 };

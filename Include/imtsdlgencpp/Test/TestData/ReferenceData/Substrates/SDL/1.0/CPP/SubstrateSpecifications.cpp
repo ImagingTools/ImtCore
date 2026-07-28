@@ -2746,7 +2746,7 @@ void sdl::V1_0::substrate::CInputIdObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::substrate::CInputIdObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CInputIdObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::substrate::CInputIdObject*>();
@@ -2954,7 +2954,7 @@ void sdl::V1_0::substrate::CCollectionViewParamsTestObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::substrate::CCollectionViewParamsTestObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CCollectionViewParamsTestObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::substrate::CCollectionViewParamsTestObject*>();
@@ -3188,7 +3188,7 @@ void sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList::cle
 }
 
 
-QVariant sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObject*>();
@@ -3417,7 +3417,7 @@ void sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::substrate::CSubstrateSpecificationListInputObject*>();
@@ -3763,7 +3763,7 @@ void sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::substrate::CSubstrateSpecificationListItemObject*>();
@@ -4009,7 +4009,7 @@ void sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList::clear(
 }
 
 
-QVariant sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::substrate::CSubstrateSpecificationListResponseObject*>();
@@ -4217,7 +4217,7 @@ void sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::substrate::CCardboardSubstrateSpecificationObject*>();
@@ -4451,7 +4451,7 @@ void sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::substrate::CPaperSubstrateSpecificationObject*>();
@@ -4688,7 +4688,7 @@ void sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::substrate::CFilmSubstrateSpecificationObject*>();
@@ -5028,7 +5028,7 @@ void sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::substrate::CSubstrateSpecificationInputObject*>();
@@ -5248,7 +5248,7 @@ void sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList::cl
 }
 
 
-QVariant sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObject*>();
@@ -5515,7 +5515,7 @@ void CSubstrateSpecificationDocumentObjectList::clear()
 }
 
 
-QVariant CSubstrateSpecificationDocumentObjectList::getData(const QString& nameId, int index)
+QVariant CSubstrateSpecificationDocumentObjectList::getData(const QString& nameId, int index) const
 {
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		QVariant retVal = GetOrCreateCachedObject(index);

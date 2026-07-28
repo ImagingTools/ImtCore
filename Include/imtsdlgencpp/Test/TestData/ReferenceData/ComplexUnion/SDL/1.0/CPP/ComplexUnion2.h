@@ -677,20 +677,20 @@ public:
 
 	explicit CResultObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CResultObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CResultObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CResultObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CResultObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CResultObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -769,20 +769,20 @@ public:
 
 	explicit CAreaObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CAreaObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CAreaObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CAreaObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CAreaObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CAreaObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -848,20 +848,20 @@ public:
 
 	explicit CAnalyzerObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CAnalyzerObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CAnalyzerObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CAnalyzerObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CAnalyzerObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CAnalyzerObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -937,20 +937,20 @@ public:
 
 	explicit CInspectionObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CInspectionObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CInspectionObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CInspectionObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CInspectionObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CInspectionObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -1036,20 +1036,20 @@ public:
 
 	explicit CProductOverviewObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CProductOverviewObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CProductOverviewObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CProductOverviewObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CProductOverviewObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CProductOverviewObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -1106,20 +1106,20 @@ public:
 
 	explicit CLocalizedTextObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CLocalizedTextObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CLocalizedTextObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CLocalizedTextObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CLocalizedTextObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CLocalizedTextObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -1181,20 +1181,20 @@ public:
 
 	explicit CCoordinatesObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CCoordinatesObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CCoordinatesObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CCoordinatesObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CCoordinatesObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CCoordinatesObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -1254,20 +1254,20 @@ public:
 
 	explicit CExtendedMetaDataObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CExtendedMetaDataObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CExtendedMetaDataObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CExtendedMetaDataObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CExtendedMetaDataObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CExtendedMetaDataObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -1361,20 +1361,20 @@ public:
 
 	explicit CResultMetaDataObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CResultMetaDataObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CResultMetaDataObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CResultMetaDataObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CResultMetaDataObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CResultMetaDataObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -1446,20 +1446,20 @@ public:
 
 	explicit COverallResultValuesObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::COverallResultValuesObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::COverallResultValuesObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::COverallResultValuesObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::COverallResultValuesObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::COverallResultValuesObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -1530,20 +1530,20 @@ public:
 
 	explicit CUnionTestingTypeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CUnionTestingTypeObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CUnionTestingTypeObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CUnionTestingTypeObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CUnionTestingTypeObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CUnionTestingTypeObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -1625,20 +1625,20 @@ public:
 
 	explicit CCDMResultVarRecursiveObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CCDMResultVarRecursiveObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CCDMResultVarRecursiveObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CCDMResultVarRecursiveObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -1717,20 +1717,20 @@ public:
 
 	explicit CCDMResultVarStringObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CCDMResultVarStringObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CCDMResultVarStringObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CCDMResultVarStringObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CCDMResultVarStringObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CCDMResultVarStringObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -1812,20 +1812,20 @@ public:
 
 	explicit CCDMResultObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CCDMResultObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CCDMResultObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CCDMResultObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CCDMResultObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CCDMResultObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -1877,20 +1877,20 @@ public:
 
 	explicit CPointsInCoordinateFormatObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CPointsInCoordinateFormatObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CPointsInCoordinateFormatObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CPointsInCoordinateFormatObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -1955,20 +1955,20 @@ public:
 
 	explicit CCollectionViewParamsTestObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CCollectionViewParamsTestObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CCollectionViewParamsTestObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CCollectionViewParamsTestObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CCollectionViewParamsTestObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CCollectionViewParamsTestObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -2055,12 +2055,12 @@ public:
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(QVariant item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CExtendedMetaDataUnionTypeObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, QVariant item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 signals:
 	void countChanged();
 };
@@ -2086,12 +2086,12 @@ public:
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(QVariant item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CExtendedMetaDataUnionSimpleTypeObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, QVariant item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 signals:
 	void countChanged();
 };
@@ -2117,12 +2117,12 @@ public:
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(QVariant item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CCDMResultUnionTypeObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, QVariant item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 signals:
 	void countChanged();
 };

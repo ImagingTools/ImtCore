@@ -12070,7 +12070,7 @@ void sdl::V1_0::complextest::CResultObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CResultObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CResultObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CResultObject*>();
@@ -12478,7 +12478,7 @@ void sdl::V1_0::complextest::CAreaObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CAreaObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CAreaObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CAreaObject*>();
@@ -12771,7 +12771,7 @@ void sdl::V1_0::complextest::CAnalyzerObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CAnalyzerObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CAnalyzerObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CAnalyzerObject*>();
@@ -13104,7 +13104,7 @@ void sdl::V1_0::complextest::CInspectionObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CInspectionObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CInspectionObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CInspectionObject*>();
@@ -13489,7 +13489,7 @@ void sdl::V1_0::complextest::CProductOverviewObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CProductOverviewObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CProductOverviewObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CProductOverviewObject*>();
@@ -13715,7 +13715,7 @@ void sdl::V1_0::complextest::CLocalizedTextObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CLocalizedTextObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CLocalizedTextObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CLocalizedTextObject*>();
@@ -13949,7 +13949,7 @@ void sdl::V1_0::complextest::CCoordinatesObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CCoordinatesObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CCoordinatesObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CCoordinatesObject*>();
@@ -14217,7 +14217,7 @@ void sdl::V1_0::complextest::CExtendedMetaDataObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CExtendedMetaDataObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CExtendedMetaDataObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CExtendedMetaDataObject*>();
@@ -14644,7 +14644,7 @@ void sdl::V1_0::complextest::CResultMetaDataObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CResultMetaDataObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CResultMetaDataObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
@@ -14942,7 +14942,7 @@ void sdl::V1_0::complextest::COverallResultValuesObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::COverallResultValuesObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::COverallResultValuesObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::COverallResultValuesObject*>();
@@ -15333,7 +15333,7 @@ void sdl::V1_0::complextest::CUnionTestingTypeObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CUnionTestingTypeObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CUnionTestingTypeObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CUnionTestingTypeObject*>();
@@ -15733,7 +15733,7 @@ void sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CCDMResultVarRecursiveObject*>();
@@ -16123,7 +16123,7 @@ void sdl::V1_0::complextest::CCDMResultVarStringObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CCDMResultVarStringObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CCDMResultVarStringObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CCDMResultVarStringObject*>();
@@ -16529,7 +16529,7 @@ void sdl::V1_0::complextest::CCDMResultObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CCDMResultObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CCDMResultObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CCDMResultObject*>();
@@ -16726,7 +16726,7 @@ void sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CPointsInCoordinateFormatObject*>();
@@ -16997,7 +16997,7 @@ void sdl::V1_0::complextest::CCollectionViewParamsTestObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::complextest::CCollectionViewParamsTestObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CCollectionViewParamsTestObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::complextest::CCollectionViewParamsTestObject*>();
@@ -17288,7 +17288,7 @@ void CExtendedMetaDataUnionTypeObjectList::clear()
 }
 
 
-QVariant CExtendedMetaDataUnionTypeObjectList::getData(const QString& nameId, int index)
+QVariant CExtendedMetaDataUnionTypeObjectList::getData(const QString& nameId, int index) const
 {
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		QVariant retVal = GetOrCreateCachedObject(index);
@@ -17532,7 +17532,7 @@ void CExtendedMetaDataUnionSimpleTypeObjectList::clear()
 }
 
 
-QVariant CExtendedMetaDataUnionSimpleTypeObjectList::getData(const QString& nameId, int index)
+QVariant CExtendedMetaDataUnionSimpleTypeObjectList::getData(const QString& nameId, int index) const
 {
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		QVariant retVal = GetOrCreateCachedObject(index);
@@ -17755,7 +17755,7 @@ void CCDMResultUnionTypeObjectList::clear()
 }
 
 
-QVariant CCDMResultUnionTypeObjectList::getData(const QString& nameId, int index)
+QVariant CCDMResultUnionTypeObjectList::getData(const QString& nameId, int index) const
 {
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		QVariant retVal = GetOrCreateCachedObject(index);

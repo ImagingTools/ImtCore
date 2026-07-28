@@ -4717,7 +4717,7 @@ void sdl::V1_0::imtbase::CTimeRangeObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CTimeRangeObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CTimeRangeObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CTimeRangeObject*>();
@@ -4928,7 +4928,7 @@ void sdl::V1_0::imtbase::CSdlSizeObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CSdlSizeObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CSdlSizeObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CSdlSizeObject*>();
@@ -5139,7 +5139,7 @@ void sdl::V1_0::imtbase::CSdlPointObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CSdlPointObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CSdlPointObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CSdlPointObject*>();
@@ -5626,7 +5626,7 @@ void sdl::V1_0::imtbase::CParamTypeIdsObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CParamTypeIdsObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CParamTypeIdsObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CParamTypeIdsObject*>();
@@ -5919,7 +5919,7 @@ void sdl::V1_0::imtbase::CUrlParamObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CUrlParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CUrlParamObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CUrlParamObject*>();
@@ -6113,7 +6113,7 @@ void sdl::V1_0::imtbase::CIdParamObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CIdParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CIdParamObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CIdParamObject*>();
@@ -6298,7 +6298,7 @@ void sdl::V1_0::imtbase::CTextParamObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CTextParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CTextParamObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CTextParamObject*>();
@@ -6483,7 +6483,7 @@ void sdl::V1_0::imtbase::CEnableableParamObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CEnableableParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CEnableableParamObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CEnableableParamObject*>();
@@ -6668,7 +6668,7 @@ void sdl::V1_0::imtbase::CIntegerParamObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CIntegerParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CIntegerParamObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CIntegerParamObject*>();
@@ -6853,7 +6853,7 @@ void sdl::V1_0::imtbase::CDoubleParamObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CDoubleParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CDoubleParamObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CDoubleParamObject*>();
@@ -7107,7 +7107,7 @@ void sdl::V1_0::imtbase::COptionObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::COptionObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::COptionObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::COptionObject*>();
@@ -7387,7 +7387,7 @@ void sdl::V1_0::imtbase::COptionsListObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::COptionsListObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::COptionsListObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::COptionsListObject*>();
@@ -7640,7 +7640,7 @@ void sdl::V1_0::imtbase::CSelectionParamObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CSelectionParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CSelectionParamObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CSelectionParamObject*>();
@@ -7851,7 +7851,7 @@ void sdl::V1_0::imtbase::CSchedulerParamObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CSchedulerParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CSchedulerParamObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CSchedulerParamObject*>();
@@ -8100,7 +8100,7 @@ void sdl::V1_0::imtbase::CBackupSettingsObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CBackupSettingsObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CBackupSettingsObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CBackupSettingsObject*>();
@@ -8403,7 +8403,7 @@ void sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CDatabaseAccessSettingsObject*>();
@@ -8626,7 +8626,7 @@ void sdl::V1_0::imtbase::CFileNameParamObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CFileNameParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CFileNameParamObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CFileNameParamObject*>();
@@ -8991,7 +8991,7 @@ void sdl::V1_0::imtbase::CParamsSetObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CParamsSetObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CParamsSetObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CParamsSetObject*>();
@@ -9314,7 +9314,7 @@ void sdl::V1_0::imtbase::CMimeTypeObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CMimeTypeObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CMimeTypeObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CMimeTypeObject*>();

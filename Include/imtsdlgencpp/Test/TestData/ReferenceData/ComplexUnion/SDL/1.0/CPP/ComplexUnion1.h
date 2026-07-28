@@ -529,20 +529,20 @@ public:
 
 	explicit CPointObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CPointObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CPointObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CPointObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CPointObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CPointObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();
@@ -626,20 +626,20 @@ public:
 
 	explicit CGeometryObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
-	Q_INVOKABLE int getItemsCount() const;
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const override;
+	Q_INVOKABLE int getItemsCount() const override;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::V1_0::complextest::CGeometryObject* item);
 	Q_INVOKABLE sdl::V1_0::complextest::CGeometryObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CGeometryObject* item);
-	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE void removeElement(int index) override;
 	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CGeometryObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CGeometryObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;
 
 signals:
 	void countChanged();

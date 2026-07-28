@@ -2494,7 +2494,7 @@ void sdl::V1_0::imtbase::CTimeFilterObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CTimeFilterObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CTimeFilterObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CTimeFilterObject*>();
@@ -2711,7 +2711,7 @@ void sdl::V1_0::imtbase::CFieldSortingInfoObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CFieldSortingInfoObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CFieldSortingInfoObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CFieldSortingInfoObject*>();
@@ -2979,7 +2979,7 @@ void sdl::V1_0::imtbase::CFieldFilterObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CFieldFilterObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CFieldFilterObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CFieldFilterObject*>();
@@ -3309,7 +3309,7 @@ void sdl::V1_0::imtbase::CGroupFilterObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CGroupFilterObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CGroupFilterObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CGroupFilterObject*>();
@@ -3705,7 +3705,7 @@ void sdl::V1_0::imtbase::CComplexCollectionFilterObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::imtbase::CComplexCollectionFilterObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CComplexCollectionFilterObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::imtbase::CComplexCollectionFilterObject*>();

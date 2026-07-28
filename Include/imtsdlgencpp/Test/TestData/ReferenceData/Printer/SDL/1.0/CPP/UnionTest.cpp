@@ -1886,7 +1886,7 @@ void sdl::V1_0::modsdl::CCoordsObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::modsdl::CCoordsObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::modsdl::CCoordsObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::modsdl::CCoordsObject*>();
@@ -2074,7 +2074,7 @@ void sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::modsdl::CPrinterSpecificationBaseObject*>();
@@ -2316,7 +2316,7 @@ void sdl::V1_0::modsdl::CLinkObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::modsdl::CLinkObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::modsdl::CLinkObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::modsdl::CLinkObject*>();
@@ -2706,7 +2706,7 @@ void sdl::V1_0::modsdl::CPrinterBaseObjectList::clear()
 }
 
 
-QVariant sdl::V1_0::modsdl::CPrinterBaseObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::modsdl::CPrinterBaseObjectList::getData(const QString& nameId, int index) const
 {
 	QVariant item = GetOrCreateCachedObject(index);
 	auto* itemPtr = item.value<sdl::V1_0::modsdl::CPrinterBaseObject*>();
@@ -3004,7 +3004,7 @@ void CPrinterSpecificationObjectList::clear()
 }
 
 
-QVariant CPrinterSpecificationObjectList::getData(const QString& nameId, int index)
+QVariant CPrinterSpecificationObjectList::getData(const QString& nameId, int index) const
 {
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		QVariant retVal = GetOrCreateCachedObject(index);

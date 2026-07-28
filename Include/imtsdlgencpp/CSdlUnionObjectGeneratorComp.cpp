@@ -198,7 +198,7 @@ bool CSdlUnionObjectGeneratorComp::ProcessHeaderClassListFile(QTextStream& strea
 
 	// removeElement method begin
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE void removeElement(int index);");
+	stream << QStringLiteral("Q_INVOKABLE void removeElement(int index) override;");
 	FeedStream(stream, 1, false);
 
 	// isEqualWithModel method begin
@@ -231,7 +231,7 @@ bool CSdlUnionObjectGeneratorComp::ProcessHeaderClassListFile(QTextStream& strea
 	// clear method end
 
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;");
+	stream << QStringLiteral("Q_INVOKABLE QVariant getData(const QString& nameId, int index) const override;");
 	FeedStream(stream, 1, false);
 
 	stream << QStringLiteral("signals:");
@@ -663,7 +663,7 @@ bool CSdlUnionObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& strea
 	FeedStream(stream, 3, false);
 	// clear method end
 
-	stream << QStringLiteral("QVariant ") + objectListClassName + QStringLiteral("::getData(const QString& nameId, int index)");
+	stream << QStringLiteral("QVariant ") + objectListClassName + QStringLiteral("::getData(const QString& nameId, int index) const");
 	FeedStream(stream, 1, false);
 	stream << '{';
 	FeedStream(stream, 1, false);
