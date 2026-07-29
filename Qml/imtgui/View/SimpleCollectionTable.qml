@@ -104,11 +104,26 @@ Item {
 	signal itemClicked(string id)
 
 	// Reads one item out of `model`, hiding the difference between a JS array
-	// (indexed) and a ListModel (get()).
+	// (indexed), a ListModel (get()) and a QAbstractItemModel (data/roleNames).
 	function itemAt(index) {
 		if (!root.model)
 			return null
-		return root.model.get ? root.model.get(index) : root.model[index]
+		// ListModel path
+		if (root.model.get)
+			return root.model.get(index)
+		// JS array path
+		if (typeof root.model[index] !== "undefined")
+			return root.model[index]
+		// QAbstractItemModel path - build a role-keyed object from roleNames()
+		if (root.model.roleNames && root.model.data && root.model.index) {
+			var modelIndex = root.model.index(index, 0)
+			var roles = root.model.roleNames()
+			var item = {}
+			for (var role in roles)
+				item[roles[role]] = root.model.data(modelIndex, parseInt(role))
+			return item
+		}
+		return null
 	}
 
 	function clearSelection() {
