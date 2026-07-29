@@ -44,12 +44,5 @@ DecoratorBase {
 		width: Style.sizeHintBXS;
         height: topPanelDecorator.height;
     }
-
-    Rectangle {
-        anchors.bottom: parent.bottom;
-        width: parent.width;
-        height: 1;
-        color: Style.borderColor;
-    }
 }
 

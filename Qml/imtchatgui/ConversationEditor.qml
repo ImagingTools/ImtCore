@@ -4,9 +4,6 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 import imtgui 1.0
-import imtguigql 1.0
-import imtdocgui 1.0
-import imtcolgui 1.0
 import imtchatImtChatSdl 1.0
 import imtchatConversationCollectionDocumentServiceSdl 1.0
 import imtbaseCollectionDocumentServiceSdl 1.0

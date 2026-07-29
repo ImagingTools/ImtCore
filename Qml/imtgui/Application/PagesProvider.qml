@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
+import imtgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 
@@ -50,7 +51,7 @@ QtObject {
                 }
             }
             else if (this.state === "Error"){
-                ModalDialogManager.showWarningDialog("Request failed")
+                PopupManager.addWarningMessage(qsTr("Failed to load application pages. Please try again."), true)
             }
         }
     }
