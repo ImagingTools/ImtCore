@@ -109,7 +109,7 @@ ComboBox {
 				let str = filterText.replace(comboBoxContainerGql.excludeFilterPart, "");
 				comboBoxContainerGql.setTextFilter(str)
 
-				pause.restart();
+				comboBoxContainerGql.updateModel(0);
 			}
 
 			function close(){}
@@ -226,6 +226,10 @@ ComboBox {
 				comboBoxContainerGql.model = dataProvider.collectionModel
 				comboBoxContainerGql.endListStatus = false;
 				comboBoxContainerGql.currentIndex = -1;
+
+				if(comboBoxContainerGql.popup && comboBoxContainerGql.popup.decorator_){
+					comboBoxContainerGql.popup.decorator_.contentY = 0;
+				}
 
 				if(comboBoxContainerGql.popup && closeImmediately){
 					comboBoxContainerGql.popup.finished('', -1)
