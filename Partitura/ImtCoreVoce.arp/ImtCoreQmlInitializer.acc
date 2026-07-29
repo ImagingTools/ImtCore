@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5349" Description="ACF"/>
-            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5349" Description="ACF" />
+            <Version Id="1" Number="2236" Description="ACF-Solutions" />
+            <Version Id="1023" Number="395264" Description="Qt Framework" />
         </VersionInfos>
     </AcfHeader>
     <Description>This component registrates all types of the ImtCore modules for QQmlEngine.</Description>
@@ -12,44 +12,48 @@
     <ElementsList>
         <Element Id="StaticQmlBaseTypeRegistrator" PackageId="ImtQmlPck" ComponentId="StaticQmlBaseTypeRegistrator">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
+                <AttributeInfoMap>
+                    <AttributeInfo Id="initSdlListModel" Type="Boolean" ExportId="RegisterCStandardSdlListModelBase">
+                        <Data IsEnabled="true" Value="true" />
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="StaticQmlModuleRegistrator" PackageId="ImtQmlPck" ComponentId="StaticQmlModuleRegistrator">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
+                <AttributeInfoMap />
             </Data>
         </Element>
         <Element Id="StaticQmlTypeRegistrator" PackageId="ImtQmlPck" ComponentId="StaticQmlTypeRegistrator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="RegisterCGqlModel" Type="Boolean" ExportId="RegisterCGqlModel">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                     <AttributeInfo Id="RegisterCGqlRequest" Type="Boolean" ExportId="RegisterCGqlRequest">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                     <AttributeInfo Id="RegisterCNetworkEventInterceptor" Type="Boolean" ExportId="RegisterCNetworkEventInterceptor">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                     <AttributeInfo Id="RegisterCQmlProcess" Type="Boolean" ExportId="RegisterCQmlProcess">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                     <AttributeInfo Id="RegisterCRemoteFileController" Type="Boolean" ExportId="RegisterCRemoteFileController">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                     <AttributeInfo Id="RegisterFileIO" Type="Boolean" ExportId="RegisterFileIO">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
     </ElementsList>
-    <EmbeddedRegistriesList/>
-    <ExportedInterfaces/>
+    <EmbeddedRegistriesList />
+    <ExportedInterfaces />
     <ExportedComponents>
-        <Component ExportedId="StaticQmlBaseTypeRegistrator" ComponentId="StaticQmlBaseTypeRegistrator"/>
-        <Component ExportedId="StaticQmlModuleRegistrator" ComponentId="StaticQmlModuleRegistrator"/>
-        <Component ExportedId="StaticQmlTypeRegistrator" ComponentId="StaticQmlTypeRegistrator"/>
+        <Component ExportedId="StaticQmlBaseTypeRegistrator" ComponentId="StaticQmlBaseTypeRegistrator" />
+        <Component ExportedId="StaticQmlModuleRegistrator" ComponentId="StaticQmlModuleRegistrator" />
+        <Component ExportedId="StaticQmlTypeRegistrator" ComponentId="StaticQmlTypeRegistrator" />
     </ExportedComponents>
 </Acf>

@@ -1,9 +1,9 @@
 import QtQuick 2.12
 import Acf 1.0
-import com.imtcore.imtqml 1.0
 import Qt5Compat.GraphicalEffects 6.0
 
 import imtcontrols 1.0
+import com.imtcore.imtqml 1.0
 
 
 Rectangle {
@@ -20,7 +20,7 @@ Rectangle {
 			graphicsView.sdlShapesCreated();
 		}
 	}
-	property var sdlShapeModel: null
+	property BaseModel sdlShapeModel: null
 
 
 	property alias selectedIndex: canvas.selectedIndex;
