@@ -1,0 +1,169 @@
+# Структура QML-модулей ImtCore — руководство по размещению
+
+Этот документ отвечает на вопрос: **«я создаю новый QML-компонент — куда его положить?»**
+Сначала выбирается **модуль**, затем **подпапка** внутри модуля. См. также
+[README.md](README.md) (прикладные модули) и [README-base.md](README-base.md) (базовые модули).
+
+---
+
+## Шаг 1. Выбрать модуль
+
+| Модуль | Что сюда кладём |
+|---|---|
+| **`imtqmlutils`** | Невизуальные утилиты общего назначения: математика/геометрия, валидаторы, генераторы (UUID), модельные помощники (сортировка/фильтрация, конечный автомат), общие функции, дизайн-схема, шина событий. |
+| **`imtcontrols`** | Базовые переиспользуемые контролы и примитивы: кнопки, поля ввода, диалоги, таблицы/деревья, меню, всплывающие окна, индикаторы, а также базовые классы и стили. |
+| **`imtgraphics2d`** | 2D-графика на HTML5 Canvas: контейнер сцены, слои, фигуры и их параметры, графики (Graph2d/MultiGraph2d), матрицы. |
+| **`imtgui`** | Каркас прикладного интерфейса поверх imtcontrols: оболочка приложения, панели, редакторы параметров (Params), настройки, представления-элементы форм (ElementView). |
+| **`imtguigql`** | Инфраструктура поверх GraphQL/SDL: запросы, подписки, WebSocket, GraphQL-версии контроллеров/провайдеров/сервисов, удалённые коллекции, выбор серверных путей. |
+| **`imtauthgui`** | Аутентификация, пользователи, роли, группы, права, организации (tenant), профиль. |
+| **`imtcolgui`** | Обобщённые коллекции и представления коллекций, фильтры, метаданные. |
+| **`imtdocgui`** | Документо-ориентированные рабочие области, история/ревизии, undo/redo. |
+| **`imtdeskgui`** | Служба поддержки (тикеты). |
+| **`imtchatgui`** | Чат и обмен сообщениями. |
+| **`imtlicgui`** | Лицензирование (продукты, функции, лицензии). |
+| **`imtgeogui`** | Адреса и географические структуры. |
+| **`imt3dgui`** | 3D-сцены — обёртки над Qt Quick 3D. |
+
+**Правило доменности:** если компонент относится к конкретной предметной области
+(пользователи, документы, лицензии, чат…) — он идёт в соответствующий доменный
+модуль. Если он **общего назначения** и не привязан к домену — в базовый
+(`imtcontrols` / `imtqmlutils` / `imtgraphics2d` / `imtgui`).
+
+---
+
+## Шаг 2. Выбрать подпапку (по роли)
+
+Раскладка по подпапкам единообразна во всех модулях. Ориентируйтесь на **роль**
+компонента (обычно видна по суффиксу имени):
+
+| Папка | Что сюда | Типичные имена / суффиксы |
+|---|---|---|
+| `Pages/` | Экранные страницы верхнего уровня и контейнеры-страницы. | `*Page`, `*PageView` |
+| `Views/` (в `imtgui` — `View/`) | Визуальные представления данных, панели-виджеты, бейджи, карточки, баннеры. | `*View`, `*ViewBase`, `*Badge`, `*Card`, `*Banner` |
+| `Panels/` | Панели (боковые/списочные/нижние области). | `*Panel` |
+| `Dialogs/` | Модальные диалоги и всплывающие окна. | `*Dialog`, `*Popup` |
+| `Editors/` | Формы создания/редактирования сущностей. | `*Editor`, `*EditorShell` |
+| `Inputs/` | Элементы ввода. | `*Input`, `ComboBox*`, `*Picker`, `*Field`, `*Bar` (поиск) |
+| `Delegates/` | Делегаты элементов списков/таблиц. | `*Delegate`, `*DelegateBase` |
+| `Controllers/` | Невизуальная координация и логика. | `*Controller`, `*Manager`, `*StateManager`, `*Observer` |
+| `Providers/` | Поставщики данных. | `*Provider`, `*DataProvider` |
+| `Services/` | Сервисы над сущностью/жизненным циклом. | `*Service`, `*ServiceBase` |
+| `Api/` | Сетевой слой: запросы, клиенты, сокеты, подписки, прокси. | `*ApiClient`, `*Client`, `*Sender`, `*Proxy`, `*Request`, `*Listener`, `*Checker`, `*Subscription*` |
+| `Models/` | Модели, кэши, фильтры, валидаторы, структуры, регистраторы. | `Cached*`, `*Model`, `*Filter`, `*Validator`, `*Registrar`, `*Structure` |
+| `Base/` | Базовые классы для наследования, перечисления, JS-хелперы типов. | `*Base`, `ControlBase`, `DecoratorBase`, `Enums`, `Icon.js` |
+| `Styles/` | Оформление: стили, наборы свойств шрифта/иконок. | `Style*`, `*Properties` |
+| `Params/` | Редакторы/просмотр параметров (в `imtgui`). | `*ParamEditor`, `*ParamView`, `*ParamController` |
+| `Settings/` | Настройки приложения (в `imtgui`). | `Settings*`, `Preference*` |
+| `Actions/`, `Buttons/`, `Menu/`, `Popup/` | Специализированные группы контролов в `imtcontrols`. | действия/жесты, кнопки, меню, всплывашки |
+
+### 2D-графика (`imtgraphics2d`)
+| Папка | Что сюда |
+|---|---|
+| `Core/` | Контейнер сцены (`GraphicsView`), слои, фабрики и базовые классы фигур, матрицы, `BoundingBox`. |
+| `Graphs/` | Графики: `Graph2d`, `MultiGraph2d`. |
+| `Shapes/` | Конкретные фигуры (`*Shape`). |
+| `Params/` | Параметры фигур (`*Params`). |
+
+### Утилиты (`imtqmlutils`)
+| Папка | Что сюда |
+|---|---|
+| `Math/` | Геометрия и линейная алгебра. |
+| `Validators/` | Валидаторы ввода (`*Validator`). |
+| `Models/` | Модельные помощники (сортировка/фильтрация, конечный автомат, построитель деревьев, `jsonpath.js`). |
+| `Core/` | Общие функции, дизайн-схема, события (`Functions`, `DesignScheme`, `Events`, `EventManager`). |
+| `Web/` | JS-реализации для веб-сборки (JQML): `GraphQLRequest.js`, `FileUploader.js` и т. п. |
+
+### 3D (`imt3dgui`)
+Предметная группировка по Qt Quick 3D: `Scene/`, `Cameras/`, `Lights/`,
+`Materials/`, `Textures/`, `Environment/`, `Geometry/`, `Instancing/`,
+`Skeleton/`, `Particles/`, `Effects/`, `Helpers/`.
+
+---
+
+## Быстрый выбор по суффиксу имени
+
+| Имя оканчивается на… | Папка |
+|---|---|
+| `Page`, `PageView` | `Pages/` |
+| `Dialog`, `Popup` | `Dialogs/` |
+| `Editor` | `Editors/` |
+| `Delegate` | `Delegates/` |
+| `Controller`, `Manager`, `Observer` | `Controllers/` |
+| `Provider` | `Providers/` |
+| `Service` | `Services/` |
+| `ApiClient`, `Client`, `Sender`, `Proxy`, `Request`, `Listener`, `Checker` | `Api/` |
+| `Model`, `Filter`, `Validator`, `Structure`, `Registrar`, `Cached…` | `Models/` |
+| `Panel` | `Panels/` |
+| `Input`, `Picker`, `ComboBox…`, `Field` | `Inputs/` |
+| `Style…`, `…Properties` | `Styles/` |
+| `Base` (базовый класс) | `Base/` |
+| `View`, `ViewBase`, `Badge`, `Card`, `Banner` | `Views/` (`View/` в imtgui) |
+| `Shape` | `Shapes/` (imtgraphics2d) |
+| `Params` | `Params/` (imtgraphics2d) |
+
+> Если подходят несколько ролей — выбирайте по **основному назначению**
+> компонента, а не по второстепенному. Пример: `UserCollectionView` — это
+> представление (`Views/`), а не модель, хотя и работает с коллекцией.
+
+---
+
+## Инвентарь папок по модулям (актуальный)
+
+| Модуль | Подпапки |
+|---|---|
+| `imtcontrols` | Actions, Base (+`Base/web`), Buttons, Dialogs, Inputs, Menu, Models, Popup, Styles, Views |
+| `imtqmlutils` | Core, Math, Models, Validators, Web |
+| `imtgraphics2d` | Core, Graphs, Params, Shapes |
+| `imtgui` | Application, Panels, Params, Settings, View |
+| `imtauthgui` | Api, Controllers, Delegates, Dialogs, Editors, Models, Pages, Providers, Views |
+| `imtcolgui` | Controllers, Delegates, Dialogs, Models, Pages, Providers, Views |
+| `imtdocgui` | Controllers, Delegates, Dialogs, Models, Pages, Panels, Providers, Services, Views |
+| `imtdeskgui` | Dialogs, Editors, Pages, Panels, Views |
+| `imtchatgui` | Dialogs, Editors, Inputs, Panels, Views |
+| `imtlicgui` | Delegates, Dialogs, Editors, Models, Providers, Views |
+| `imtgeogui` | Editors, Views |
+| `imtguigql` | Api, Base, Controllers, Dialogs, Editors, Inputs, Pages, Providers, Services, Views |
+| `imt3dgui` | Cameras, Effects, Environment, Geometry, Helpers, Instancing, Lights, Materials, Particles, Scene, Skeleton, Textures |
+
+Нужной папки нет? Создайте её, придерживаясь ролевого словаря выше (папки с
+одинаковой ролью называются одинаково во всех модулях).
+
+---
+
+## Особые случаи
+
+- **Синглтоны** (`pragma Singleton`) размещаются по своей роли (например,
+  singleton-провайдер — в `Providers/`) и помечаются словом `singleton` в `qmldir`.
+- **`imtcontrols/Base/web/`** — веб-специфичные оверрайды контролов для JQML-сборки
+  (`RoundButton`, `ScrollBar`, `Switch`, `ToolTip`, `Window`). Это намеренная
+  инфраструктура веб-сборки — **не трогайте её при обычной разработке**; новые
+  desktop-контролы кладите в обычные папки (`Buttons/`, `Inputs/` и т. д.).
+- **`imtqmlutils/Web/`** — общие JS-реализации, используемые веб-сборкой; на них
+  ссылаются из `qmldir` относительными путями.
+- **Утилита или контрол?** Если компонент **невизуальный** и общего назначения
+  (математика, валидатор, модель-помощник, событие) — это `imtqmlutils`, а не
+  `imtcontrols`.
+
+---
+
+## Чек-лист добавления компонента
+
+1. **Модуль** — по таблице «Шаг 1».
+2. **Подпапка** — по роли/суффиксу («Шаг 2»).
+3. Создать файл `<Модуль>/<Папка>/<Имя>.qml`.
+4. Зарегистрировать тип в `<Модуль>/qmldir`:
+   `[singleton] <Имя> 1.0 <Папка>/<Имя>.qml`
+5. Добавить в ресурс `<Модуль>/<модуль>qml.qrc`:
+   `<file alias="<модуль>/<Папка>/<Имя>.qml"><Папка>/<Имя>.qml</file>`
+6. Если используете типы **другого** модуля — добавить `import <модуль> 1.0`
+   (внутри своего модуля типы видны по имени без импорта).
+7. Проверить сборку ресурса: `rcc <модуль>qml.qrc -o /dev/null` (все пути должны
+   резолвиться).
+
+### Если создаёте новый модуль
+Дополнительно: `CMake/CMakeLists.txt` и `QMake/<модуль>qml.pro` по образцу
+соседнего модуля; регистрация в
+`3rdParty/ImtCore/Build/CMake/CMakeLists.txt`
+(`add_subdirectory("${QML_DIR}/<модуль>/CMake" …)`); при необходимости — добавить
+модуль в веб-манифест `Qml/web/imtcore.json` и в `-qmldir` деплой-конфигураций
+продуктов.

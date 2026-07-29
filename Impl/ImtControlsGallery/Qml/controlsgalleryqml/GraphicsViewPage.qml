@@ -5,6 +5,7 @@ import com.imtcore.imtqml 1.0
 
 import imtcontrols 1.0
 import imtcolgui 1.0
+import imtgraphics2d 1.0
 
 
 

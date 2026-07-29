@@ -6,6 +6,7 @@ import imtcolgui 1.0
 import imtcontrols 1.0 as ImtControls
 import imtcontrols 1.0
 import Qt.labs.platform 1.1
+import imtqmlutils 1.0
 
 ViewCommandsDelegateBase {
 	id: collectionViewCommandsDelegate;

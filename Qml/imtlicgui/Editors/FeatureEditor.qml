@@ -5,6 +5,7 @@ import imtauthgui 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtlicFeaturesSdl 1.0
+import imtqmlutils 1.0
 
 ViewBase {
 	id: featureEditor;

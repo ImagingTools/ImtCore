@@ -6,6 +6,7 @@ import imtcontrols 1.0
 import imtgui 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
+import imtgraphics2d 1.0
 
 Rectangle {
 	id: testPage;

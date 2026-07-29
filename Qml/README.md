@@ -19,6 +19,10 @@
 
 ## Соглашения и структура
 
+Правила выбора модуля и подпапки для нового компонента (чтобы не было сомнений,
+куда его положить) — в [STRUCTURE.md](STRUCTURE.md). Базовые модули (`imtcontrols`,
+`imtqmlutils`, `imtgraphics2d`, `imtgui`) описаны в [README-base.md](README-base.md).
+
 Файлы внутри модуля разложены по подпапкам согласно роли компонента (стиль,
 близкий к организации модулей Qt):
 
@@ -5351,7 +5355,7 @@
 Стиль/оформление: набор визуальных констант и правил.
 
 - **Файл:** [Base/ClientStyle.qml](imtguigql/Base/ClientStyle.qml)
-- **Базовый тип:** [`StyleBase`](imtcontrols/Base/StyleBase.qml)
+- **Базовый тип:** [`StyleBase`](imtcontrols/Styles/StyleBase.qml)
 
 **Функции**
 
