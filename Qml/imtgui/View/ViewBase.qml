@@ -2,7 +2,6 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
-import imtdocgui 1.0
 import imtcontrols 1.0
 
 Item {
@@ -29,7 +28,7 @@ Item {
 	
 	property bool readOnly: false;
 
-	property string contentColor: Style.backgroundColor2
+	property string contentColor: Style.baseColor
 
 	property bool commandsPanelVisible: true
 	property bool commandsSeparatorVisible: true
@@ -126,6 +125,7 @@ Item {
 		width: parent.width;
 		height: visibleState ? 1 : 0;
 		color: Style.borderColor;
+		opacity: 0.5
 		visible: visibleState
 		property bool visibleState: !viewBase.commandsPanelVisible ? false : headerViewLoader.item && viewBase.commandsController != null;
 

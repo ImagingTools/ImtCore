@@ -2,7 +2,6 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
-import imtguigql 1.0
 import imtcontrols 1.0
 import imtdocgui 1.0
 
@@ -16,26 +15,29 @@ Item {
     signal multiPageUpdated();
 
 	property string productId: AuthorizationController.productId
-    property var documentManager: MainDocumentService.getDocumentService("Administration");
+    property GqlBasedTenantManagementApiClient apiClient: GqlBasedTenantManagementApiClient {
+        productId: administrationContainer.productId
+    }
 
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
+        apiClient.setRolePermissionsTenantId(apiClient.tenantId);
+        apiClient.fetchTenantPermissions(apiClient.tenantId);
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
     }
-    
-    onDocumentManagerChanged: {
-        if (documentManager){
-            if (documentManager.activeView){
-                documentManager.activeView.visualStatusProvider = visualStatusProvider
-            }
+
+    function closeAllDocumentsForManager(manager){
+        if (!manager){
+            return;
         }
-    }
-    
-    GqlBasedObjectVisualStatusProvider {
-        id: visualStatusProvider
+
+        let ids = manager.getOpenedDocumentIds();
+        for (let i = 0; i < ids.length; ++i){
+            manager.closeDocument(ids[i]);
+        }
     }
 
     function onLocalizationChanged(language){
@@ -57,33 +59,69 @@ Item {
 
     Rectangle {
         anchors.fill: parent;
-        color: Style.backgroundColor2;
+        color: Style.baseColor;
     }
 
     Component {
         id: roleCollectionComp;
-        
+
+        MultiDocumentCollectionView {
+            documentManager: administrationContainer.apiClient.roleDocumentManager;
+            contentColor: Style.baseColor;
+
+            Component.onCompleted: setCollectionViewComp(qsTr("Roles"), roleListComp)
+        }
+    }
+
+    Component {
+        id: roleListComp;
+
         RoleCollectionView {
             productId: administrationContainer.productId;
-            documentManager: administrationContainer.documentManager;
+            documentManager: administrationContainer.apiClient.roleDocumentManager;
+            contentColor: Style.baseColor;
         }
     }
 
     Component {
         id: userCollectionComp;
 
+        MultiDocumentCollectionView {
+            documentManager: administrationContainer.apiClient.userDocumentManager;
+            contentColor: Style.baseColor;
+
+            Component.onCompleted: setCollectionViewComp(qsTr("Users"), userListComp)
+        }
+    }
+
+    Component {
+        id: userListComp;
+
         UserCollectionView {
             productId: administrationContainer.productId;
-            documentManager: administrationContainer.documentManager;
+            documentManager: administrationContainer.apiClient.userDocumentManager;
+            contentColor: Style.baseColor;
         }
     }
 
     Component {
         id: userGroupCollectionComp;
 
+        MultiDocumentCollectionView {
+            documentManager: administrationContainer.apiClient.groupDocumentManager;
+            contentColor: Style.baseColor;
+
+            Component.onCompleted: setCollectionViewComp(qsTr("Groups"), userGroupListComp)
+        }
+    }
+
+    Component {
+        id: userGroupListComp;
+
         UserGroupCollectionView {
             productId: administrationContainer.productId;
-            documentManager: administrationContainer.documentManager;
+            documentManager: administrationContainer.apiClient.groupDocumentManager;
+            contentColor: Style.baseColor;
         }
     }
 
@@ -102,14 +140,23 @@ Item {
                 let index = paths.indexOf(matchedPath)
                 multiPageView.block = true
                 multiPageView.currentIndex = index
-                if (administrationContainer.documentManager){
-                    administrationContainer.documentManager.closeAllDocuments()
-                }
+
+                administrationContainer.closeAllDocumentsForManager(administrationContainer.apiClient.roleDocumentManager)
+                administrationContainer.closeAllDocumentsForManager(administrationContainer.apiClient.userDocumentManager)
+                administrationContainer.closeAllDocumentsForManager(administrationContainer.apiClient.groupDocumentManager)
 
                 if (restPath.length >= 2){
                     let documentTypeId = restPath[0]
                     let documentId = restPath[1]
-                    administrationContainer.documentManager.openDocument(documentId, documentTypeId)
+
+                    let manager = null
+                    if (matchedPath === "Roles") manager = administrationContainer.apiClient.roleDocumentManager
+                    else if (matchedPath === "Users") manager = administrationContainer.apiClient.userDocumentManager
+                    else if (matchedPath === "Groups") manager = administrationContainer.apiClient.groupDocumentManager
+
+                    if (manager){
+                        manager.openDocument(documentTypeId, documentId)
+                    }
                 }
 
                 multiPageView.block = false
@@ -117,10 +164,6 @@ Item {
         }
 
         Component.onCompleted: {
-            MainDocumentService.registerDocumentService("Administration/Roles", administrationContainer.documentManager)
-            MainDocumentService.registerDocumentService("Administration/Users", administrationContainer.documentManager)
-            MainDocumentService.registerDocumentService("Administration/Groups", administrationContainer.documentManager)
-            
             updateModel();
         }
 
@@ -128,7 +171,6 @@ Item {
         onCurrentIndexChanged: {
             if (currentIndex >= 0 && multiPageView.pagesModel.count > currentIndex){
                 let pageId = multiPageView.pagesModel.get(currentIndex).id
-                visualStatusProvider.collectionId = pageId
                 if (!block){
                     NavigationController.push("Administration/" + pageId)
                 }

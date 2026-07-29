@@ -117,7 +117,7 @@ QtObject {
 
 		function onRequestFailed(message, tenantId) {
 			if (message && message !== "") {
-				ModalDialogManager.showInfoDialog(message)
+				PopupManager.addErrorMessage(message, true)
 				root.requestFailed(message)
 			}
 		}
@@ -235,7 +235,7 @@ QtObject {
 			CreateTenantInvitationPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.invitationCreated()
@@ -266,7 +266,7 @@ QtObject {
 			TransferTenantOwnershipPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.ownershipTransferred()
@@ -309,7 +309,7 @@ QtObject {
 			AddMembershipPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					}
 					root.userCreated()
@@ -407,7 +407,7 @@ QtObject {
 			FindMembershipPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else if (m_membership && m_membership.m_id) {
 						root.__removeMembershipInput.m_membershipId = m_membership.m_id
@@ -426,7 +426,7 @@ QtObject {
 			FindMembershipPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else if (root.__pendingOrgPermsUserId && root.__pendingOrgPermsList !== null && m_membership && m_membership.m_id) {
 						root.setMemberOrganizationPermissions(m_membership.m_id, root.__pendingOrgPermsList)
@@ -448,7 +448,7 @@ QtObject {
 			UpdateMembershipPermissionsPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 					} else {
 						root.memberPermissionsUpdated()
 					}
@@ -467,7 +467,7 @@ QtObject {
 			RemoveMembershipPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.memberRemoved(root.__findMembershipForRemoveInput.m_userId)
@@ -583,7 +583,7 @@ QtObject {
 			RevokeCrossOrgGrantPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.crossOrgGrantsRemoved()
@@ -602,7 +602,7 @@ QtObject {
 			RemoveCrossOrgGrantsPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.crossOrgGrantsRemoved()
@@ -644,7 +644,7 @@ QtObject {
 			CreateContractPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.contractCreated(m_contractId || "")
@@ -664,7 +664,7 @@ QtObject {
 			UpdateContractStatusPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.contractStatusUpdated(root.__pendingUpdateContractId)
@@ -684,7 +684,7 @@ QtObject {
 			TerminateContractPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.contractTerminated(root.__pendingTerminateContractId)
@@ -702,7 +702,7 @@ QtObject {
 			GetContractsPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.__populateContractsModel(m_contracts)
@@ -1323,7 +1323,7 @@ QtObject {
 			SendCrossTenantMessagePayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.crossTenantMessageSent(m_messageId || "")
@@ -1343,7 +1343,7 @@ QtObject {
 			UpdateCrossTenantMessageStatusPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.crossTenantMessageStatusUpdated(root.__pendingUpdateMessageId)
@@ -1363,7 +1363,7 @@ QtObject {
 			GetCrossTenantMessagesPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.__populateCrossTenantMessagesModel(m_messages)
@@ -1446,7 +1446,7 @@ QtObject {
 			ConfirmOrderRequestPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.orderRequestConfirmed(root.__pendingConfirmOrderRequestId)
@@ -1466,7 +1466,7 @@ QtObject {
 			RejectOrderRequestPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.orderRequestRejected(root.__pendingRejectOrderRequestId)
@@ -1486,7 +1486,7 @@ QtObject {
 			UpdateOrderRequestStatusPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.orderRequestStatusUpdated(root.__pendingUpdateOrderRequestId)
@@ -1504,7 +1504,7 @@ QtObject {
 			GetOrderRequestsPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.__populateOrderRequestsModel(m_orderRequests)
@@ -1661,17 +1661,6 @@ QtObject {
 				root.__refreshDataProvider(root.tenantRelationshipsListDataProvider)
 		}
 	}
-
-	// =========================================================================
-	// Document services (Roles / Groups / Users)
-	//
-	// These three services drive the SingleDocumentWorkspaceShellView in the
-	// Roles / Groups / Members pages. The pages themselves do NOT instantiate
-	// any GqlBasedCollectionDocumentService / SingleDocumentTypeRegistrar /
-	// DocumentRepresentationController — they only consume the abstract
-	// `roleDocumentManager` / `groupDocumentManager` / `userDocumentManager`
-	// properties.
-	// =========================================================================
 
 	property GqlBasedCollectionDocumentService __roleDocumentService: GqlBasedCollectionDocumentService {
 		collectionId: "Roles"
@@ -1931,6 +1920,13 @@ QtObject {
 				getUserInput.m_id = documentId
 				getUserInput.m_collectionId = "Users"
 				getUserRequest.send(getUserInput)
+			}
+
+			property MailRegExpValidator mailRegExp: MailRegExpValidator {}
+
+			function __failValidation(message){
+				PopupManager.addErrorMessage(message, true)
+				updateDocumentFailed(documentId, message)
 			}
 
 			function updateDocumentFromRepresentation(){

@@ -57,17 +57,12 @@
 	<file alias="imtauthgui/TenantConnectOrganizationPage.qml">TenantConnectOrganizationPage.qml</file>
 	<file alias="imtauthgui/TenantMyConnectionsPage.qml">TenantMyConnectionsPage.qml</file>
 	<file alias="imtauthgui/TenantMessagesPage.qml">TenantMessagesPage.qml</file>
-	<file alias="imtauthgui/TenantSimpleCollectionPage.qml">TenantSimpleCollectionPage.qml</file>
-	<file alias="imtauthgui/TenantDocumentEditorShell.qml">TenantDocumentEditorShell.qml</file>
 	<file alias="imtauthgui/CrossOrgGrantView.qml">CrossOrgGrantView.qml</file>
 	<file alias="imtauthgui/ContractView.qml">ContractView.qml</file>
 	<file alias="imtauthgui/RelationshipView.qml">RelationshipView.qml</file>
 	<file alias="imtauthgui/MessageView.qml">MessageView.qml</file>
 	<file alias="imtauthgui/StatusBadge.qml">StatusBadge.qml</file>
-	<file alias="imtauthgui/TenantCollectionItemDelegateBase.qml">TenantCollectionItemDelegateBase.qml</file>
 	<file alias="imtauthgui/TenantCollectionListView.qml">TenantCollectionListView.qml</file>
-	<file alias="imtauthgui/TenantTableContainer.qml">TenantTableContainer.qml</file>
-	<file alias="imtauthgui/TenantTableHeader.qml">TenantTableHeader.qml</file>
         <file alias="imtauthgui/qmldir">qmldir</file>
     </qresource>
     <qresource prefix="/"/>

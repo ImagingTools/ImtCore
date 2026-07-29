@@ -6,7 +6,6 @@ import imtauthgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
-import imtdocgui 1.0
 import imtauthUsersSdl 1.0
 import imtbaseComplexCollectionFilterSdl 1.0
 import imtbaseImtCollectionSdl 1.0

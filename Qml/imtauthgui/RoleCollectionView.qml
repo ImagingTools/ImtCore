@@ -1,10 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
 import imtauthgui 1.0
-import imtcolgui 1.0
-import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
 import imtauthRolesSdl 1.0
@@ -18,116 +15,31 @@ RemoteCollectionView {
 
 	additionalFieldIds: [RoleItemDataTypeMetaInfo.s_productId, RoleItemDataTypeMetaInfo.s_parentRoles]
 	
-	commandsDelegateComp: Component {RoleCollectionViewCommandsDelegate {
+	commandsDelegateComp: Component {DocCollectionViewDelegate {
 			collectionView: roleCollectionViewContainer;
-			documentManagerId: "Administration/Roles"
-			documentTypeIds: ["Role"]
-			documentViewsComp: [roleDocumentComp];
-			documentDataControllersComp: [dataControllerComp];
-			isSingleDocumentMode: true
+			documentManager: roleCollectionViewContainer.documentManager;
 
-			function getHeaders(){
-				return roleCollectionViewContainer.getHeaders()
+			removeDialogTitle: qsTr("Deleting a role");
+			removeMessage: qsTr("Delete the selected role ?");
+
+			Component.onCompleted: registerDocumentType("Role", qsTr("Role"))
+
+			function updateStateBaseCommands(selection, commandsController, elementsModel){
+				let isEnabled = selection.length > 0;
+				if(commandsController){
+					commandsController.setCommandIsEnabled("Remove", isEnabled);
+					commandsController.setCommandIsEnabled("Edit", selection.length === 1);
+					commandsController.setCommandIsEnabled("Export", selection.length === 1);
+					commandsController.setCommandIsEnabled("Revision", selection.length === 1);
+				}
 			}
 		}
 	}
 	
 	property string productId;
-	property string tenantId: AuthorizationController.currentTenantId || ""
 	property var documentManager: null;
 	
 	function handleSubscription(dataModel){
 		roleCollectionViewContainer.doUpdateGui();
-	}
-
-	onProductIdChanged: {
-		roleCollectionViewContainer.__requestPermissions()
-	}
-
-	onTenantIdChanged: {
-		roleCollectionViewContainer.__requestPermissions()
-	}
-
-	property GqlBasedPermissionsProvider __permissionsProvider: GqlBasedPermissionsProvider {
-		productId: roleCollectionViewContainer.productId || ""
-
-		onRequestFailed: {
-			if (message && message !== "")
-				ModalDialogManager.showInfoDialog(message)
-		}
-	}
-
-	function __requestPermissions() {
-		if (!roleCollectionViewContainer.__permissionsProvider)
-			return
-		if (!roleCollectionViewContainer.productId || roleCollectionViewContainer.productId === "")
-			return
-
-		roleCollectionViewContainer.__permissionsProvider.productId = roleCollectionViewContainer.productId
-		if (roleCollectionViewContainer.tenantId && roleCollectionViewContainer.tenantId !== "")
-			roleCollectionViewContainer.__permissionsProvider.requestPermissions(roleCollectionViewContainer.tenantId)
-		else
-			roleCollectionViewContainer.__permissionsProvider.requestAllPermissions()
-	}
-
-	Component.onCompleted: {
-		roleCollectionViewContainer.__requestPermissions()
-	}
-	
-	Component {
-		id: roleDocumentComp;
-		
-		RoleView {
-			id: roleEditor;
-			
-			productId: roleCollectionViewContainer.productId;
-			tenantId: roleCollectionViewContainer.tenantId;
-			permissionsProvider: roleCollectionViewContainer.__permissionsProvider
-			
-			commandsControllerComp: Component {GqlBasedCommandsController {
-					typeId: "Role";
-				}
-			}
-			
-			function getHeaders(){
-				return roleCollectionViewContainer.getHeaders()
-			}
-		}
-	}
-	Component {
-		id: dataControllerComp;
-		
-		GqlRequestDocumentDataController {
-			id: requestDocumentDataController
-			
-			property RoleData roleData: documentModel;
-			
-			typeId: "Role";
-			documentName: roleData ? roleData.m_name: "";
-			documentDescription: roleData ? roleData.m_description: "";
-			
-			gqlGetCommandId: ImtauthRolesSdlCommandIds.s_roleItem;
-			gqlUpdateCommandId: ImtauthRolesSdlCommandIds.s_roleUpdate;
-			gqlAddCommandId: ImtauthRolesSdlCommandIds.s_roleAdd;
-			
-			Component.onCompleted: {
-				if (roleCollectionViewContainer.productId === ""){
-					console.error("Unable to create an additional GraphQL input parameters. Product-ID is empty:", gqlGetCommandId);
-					return null;
-				}
-				
-				getRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
-				addRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
-				updateRequestInputParam.InsertField(RoleItemInputTypeMetaInfo.s_productId, roleCollectionViewContainer.productId);
-			}
-			
-			documentModelComp: Component {
-				RoleData {}
-			}
-			
-			function getHeaders(){
-				return roleCollectionViewContainer.getHeaders()
-			}
-		}
 	}
 }
