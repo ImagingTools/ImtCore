@@ -18,13 +18,13 @@ namespace
 
 
 template <class T>
-bool IsEnabled(icomp::TAttributeMember<T>& attr)
+bool IsEnabled(T& attr)
 {
 	return attr.IsValid() && *attr;
 }
 
-
 }
+
 
 namespace imtqml
 {

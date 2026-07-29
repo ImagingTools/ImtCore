@@ -81,10 +81,10 @@ public:
 	Q_INVOKABLE [[nodiscard]] 
 	virtual QObject* copyMe() const;
 
-	[[nodiscard]] QObject* getOwner() const;
-	void setOwner(QObject* owner);
+	[[nodiscard]] virtual QObject* getOwner() const;
+	virtual void setOwner(QObject* owner);
 
-	[[nodiscard]] int count() const;
+	[[nodiscard]] virtual int count() const;
 
 	virtual void ClearCache();
 	[[nodiscard]] virtual QVariant GetOrCreateCachedObject(int index) const;
