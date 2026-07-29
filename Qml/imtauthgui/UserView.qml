@@ -27,15 +27,15 @@ DocumentViewBase {
 		: ""
 	
 	function updateGui(){
-		var generalPage = multiPageView.getPageByIndex(0)
-		if (generalPage)
-			generalPage.updateGui()
-		var rolesPage = multiPageView.getPageById("Roles")
-		if (rolesPage)
-			rolesPage.updateGui()
-		var groupsPage = multiPageView.getPageById("Groups")
-		if (groupsPage)
-			groupsPage.updateGui()
+		var generalPageInstance = multiPageView.getPageByIndex(0)
+		if (generalPageInstance)
+			generalPageInstance.updateGui()
+		var rolesPageInstance = multiPageView.getPageById("Roles")
+		if (rolesPageInstance)
+			rolesPageInstance.updateGui()
+		var groupsPageInstance = multiPageView.getPageById("Groups")
+		if (groupsPageInstance)
+			groupsPageInstance.updateGui()
 	}
 	
 	function updateModel(){
@@ -43,15 +43,15 @@ DocumentViewBase {
 			return
 		}
 
-		var generalPage = multiPageView.getPageByIndex(0)
-		if (generalPage)
-			generalPage.updateModel()
-		var rolesPage = multiPageView.getPageById("Roles")
-		if (rolesPage)
-			rolesPage.updateModel()
-		var groupsPage = multiPageView.getPageById("Groups")
-		if (groupsPage)
-			groupsPage.updateModel()
+		var generalPageInstance = multiPageView.getPageByIndex(0)
+		if (generalPageInstance)
+			generalPageInstance.updateModel()
+		var rolesPageInstance = multiPageView.getPageById("Roles")
+		if (rolesPageInstance)
+			rolesPageInstance.updateModel()
+		var groupsPageInstance = multiPageView.getPageById("Groups")
+		if (groupsPageInstance)
+			groupsPageInstance.updateModel()
 		userData.m_productId = container.productId;
 	}
 	
@@ -68,21 +68,21 @@ DocumentViewBase {
 			return;
 		}
 
-		var generalPage = multiPageView.getPageByIndex(0)
-		if (generalPage)
-			generalPage.handleUserDataChanged()
+		var generalPageInstance = multiPageView.getPageByIndex(0)
+		if (generalPageInstance)
+			generalPageInstance.handleUserDataChanged()
 	}
 	
 	function checkChangePasswordLogic(){
-		var generalPage = multiPageView.getPageByIndex(0)
-		if (generalPage)
-			generalPage.checkChangePasswordLogic()
+		var generalPageInstance = multiPageView.getPageByIndex(0)
+		if (generalPageInstance)
+			generalPageInstance.checkChangePasswordLogic()
 	}
 	
 	function checkSystemId(){
-		var generalPage = multiPageView.getPageByIndex(0)
-		if (generalPage)
-			generalPage.checkSystemId()
+		var generalPageInstance = multiPageView.getPageByIndex(0)
+		if (generalPageInstance)
+			generalPageInstance.checkSystemId()
 	}
 
 	MultiPageView {

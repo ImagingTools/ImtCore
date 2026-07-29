@@ -80,24 +80,24 @@ ViewBase {
 	}
 
 	function __populatePermissionsTree() {
-		var permissionPage = multiPageView.getPageById("Permission")
-		if (!permissionPage || !permissionPage.bottomItem)
+		var permissionPageInstance = multiPageView.getPageById("Permission")
+		if (!permissionPageInstance || !permissionPageInstance.bottomItem)
 			return
 		var perms = container.__receivedPermissions
 		if (!perms)
 			return
-		permissionPage.bottomItem.rebuildFromFlatArray(perms)
+		permissionPageInstance.bottomItem.rebuildFromFlatArray(perms)
 		if (container.roleData)
 			container.doUpdateGuiPermissions()
 	}
 
 	function updateGui(){
-		var generalPage = multiPageView.getPageByIndex(0)
-		if (generalPage)
-			generalPage.updateGui()
-		var parentRolesPage = multiPageView.getPageById("ParentRoles")
-		if (parentRolesPage)
-			parentRolesPage.updateGui()
+		var generalPageInstance = multiPageView.getPageByIndex(0)
+		if (generalPageInstance)
+			generalPageInstance.updateGui()
+		var parentRolesPageInstance = multiPageView.getPageById("ParentRoles")
+		if (parentRolesPageInstance)
+			parentRolesPageInstance.updateGui()
 		container.doUpdateGuiPermissions()
 	}
 	
@@ -111,12 +111,12 @@ ViewBase {
 			return;
 		}
 		
-		var generalPage = multiPageView.getPageByIndex(0)
-		if (generalPage)
-			generalPage.updateModel()
-		var parentRolesPage = multiPageView.getPageById("ParentRoles")
-		if (parentRolesPage)
-			parentRolesPage.updateModel()
+		var generalPageInstance = multiPageView.getPageByIndex(0)
+		if (generalPageInstance)
+			generalPageInstance.updateModel()
+		var parentRolesPageInstance = multiPageView.getPageById("ParentRoles")
+		if (parentRolesPageInstance)
+			parentRolesPageInstance.updateModel()
 		container.doUpdateModelPermissions()
 		
 		roleData.m_productId = container.productId;
@@ -137,9 +137,9 @@ ViewBase {
 			selectedPermissionsIds = selectedPermissions.split(';');
 		}
 
-		var permissionPage = multiPageView.getPageById("Permission")
-		if (permissionPage && permissionPage.bottomItem){
-			permissionPage.bottomItem.applySelection(selectedPermissionsIds)
+		var permissionPageInstance = multiPageView.getPageById("Permission")
+		if (permissionPageInstance && permissionPageInstance.bottomItem){
+			permissionPageInstance.bottomItem.applySelection(selectedPermissionsIds)
 		}
 	}
 	
@@ -148,11 +148,11 @@ ViewBase {
 			return
 		}
 
-		var permissionPage = multiPageView.getPageById("Permission")
-		if (permissionPage && permissionPage.bottomItem){
+		var permissionPageInstance = multiPageView.getPageById("Permission")
+		if (permissionPageInstance && permissionPageInstance.bottomItem){
 			// Only leaf permission IDs must be stored (groups/parents are excluded even
 			// when tristate check selected the whole subtree).
-			var selectedPermissionIds = permissionPage.bottomItem.getCheckedIds()
+			var selectedPermissionIds = permissionPageInstance.bottomItem.getCheckedIds()
 			container.roleData.m_permissions = selectedPermissionIds.join(';')
 		}
 	}

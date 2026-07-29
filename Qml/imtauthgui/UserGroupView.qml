@@ -15,18 +15,18 @@ ViewBase {
 	property string productId;
 
 	function updateGui(){
-		var generalPage = multiPageView.getPageByIndex(0)
-		if (generalPage)
-			generalPage.updateGui()
-		var parentGroupsPage = multiPageView.getPageById("ParentGroups")
-		if (parentGroupsPage)
-			parentGroupsPage.updateGui()
-		var usersPage = multiPageView.getPageById("Users")
-		if (usersPage)
-			usersPage.updateGui()
-		var rolesPage = multiPageView.getPageById("Roles")
-		if (rolesPage)
-			rolesPage.updateGui()
+		var generalPageInstance = multiPageView.getPageByIndex(0)
+		if (generalPageInstance)
+			generalPageInstance.updateGui()
+		var parentGroupsPageInstance = multiPageView.getPageById("ParentGroups")
+		if (parentGroupsPageInstance)
+			parentGroupsPageInstance.updateGui()
+		var usersPageInstance = multiPageView.getPageById("Users")
+		if (usersPageInstance)
+			usersPageInstance.updateGui()
+		var rolesPageInstance = multiPageView.getPageById("Roles")
+		if (rolesPageInstance)
+			rolesPageInstance.updateGui()
 	}
 	
 	function updateModel(){
@@ -34,18 +34,18 @@ ViewBase {
 			return
 		}
 
-		var generalPage = multiPageView.getPageByIndex(0)
-		if (generalPage)
-			generalPage.updateModel()
-		var parentGroupsPage = multiPageView.getPageById("ParentGroups")
-		if (parentGroupsPage)
-			parentGroupsPage.updateModel()
-		var usersPage = multiPageView.getPageById("Users")
-		if (usersPage)
-			usersPage.updateModel()
-		var rolesPage = multiPageView.getPageById("Roles")
-		if (rolesPage)
-			rolesPage.updateModel()
+		var generalPageInstance = multiPageView.getPageByIndex(0)
+		if (generalPageInstance)
+			generalPageInstance.updateModel()
+		var parentGroupsPageInstance = multiPageView.getPageById("ParentGroups")
+		if (parentGroupsPageInstance)
+			parentGroupsPageInstance.updateModel()
+		var usersPageInstance = multiPageView.getPageById("Users")
+		if (usersPageInstance)
+			usersPageInstance.updateModel()
+		var rolesPageInstance = multiPageView.getPageById("Roles")
+		if (rolesPageInstance)
+			rolesPageInstance.updateModel()
 		
 		groupData.m_productId = productId;
 	}
