@@ -8,7 +8,7 @@
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtbase/CItemModelBase.h>
-#include <imtsdl/CSdandardSdlListModelBase.h>
+#include <imtsdl/CStandardSdlListModelBase.h>
 #include <imtsdl/TSdlAbstractListModel.h>
 #include <imtqml/CQmlWebSocket.h>
 
@@ -65,7 +65,7 @@ void CStaticQmlBaseTypeRegistratorComp::OnComponentCreated()
 
 	if (IsEnabled(m_initSdlListModelAttrPtr)) {
 		/// \todo rename to SdlListModel
-		qmlRegisterType<imtsdl::CSdandardSdlListModelBase>("com.imtcore.imtqml", 1, 0, "BaseModel");
+		qmlRegisterType<imtsdl::CStandardSdlListModelBase>("com.imtcore.imtqml", 1, 0, "BaseModel");
 	}
 
 }

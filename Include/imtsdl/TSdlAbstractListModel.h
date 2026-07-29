@@ -9,7 +9,7 @@
 
 // ImtCore includes
 #include <imtsdl/TElementList.h>
-#include <imtsdl/CSdandardSdlListModelBase.h>
+#include <imtsdl/CStandardSdlListModelBase.h>
 
 
 namespace imtsdl
@@ -17,16 +17,16 @@ namespace imtsdl
 
 
 template <class ModelDataType, class ModelObjectDataType>
-class TSdlAbstractListModel: public CSdandardSdlListModelBase
+class TSdlAbstractListModel: public CStandardSdlListModelBase
 {
 
 
 public:
-	using BaseClass = CSdandardSdlListModelBase;
+	using BaseClass = CStandardSdlListModelBase;
 
 	explicit TSdlAbstractListModel(QObject* parent = nullptr);
 
-	// reimplemented (CSdandardSdlListModelBase)
+	// reimplemented (CStandardSdlListModelBase)
 	void ClearCache() override;
 	QVariantMap get(int row) const override;
 	void remove(int index) override;

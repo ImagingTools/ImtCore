@@ -21,14 +21,14 @@ namespace imtsdl
 	\warning DO NOT instantiate this class directly!!! -- use ONLY concrete SDL list model types.
 	\warning ALL METHODS DO NOTHING IN THIS BASE CLASS (ASSERTS ONLY)!!!
 */
-class CSdandardSdlListModelBase : public QAbstractListModel
+class CStandardSdlListModelBase : public QAbstractListModel
 {
 	Q_OBJECT
 	Q_PROPERTY(QObject* owner READ getOwner WRITE setOwner NOTIFY ownerChanged)
 	Q_PROPERTY(int count READ count NOTIFY countChanged)
 
 public:
-	explicit CSdandardSdlListModelBase(QObject* parent = nullptr);
+	explicit CStandardSdlListModelBase(QObject* parent = nullptr);
 
 	Q_INVOKABLE [[nodiscard]] 
 	virtual QVariantMap get(int row) const;
@@ -76,7 +76,7 @@ public:
 	virtual void createFromJson(const QString& json);
 	
 	Q_INVOKABLE 
-	virtual bool isEqualWithModel(imtsdl::CSdandardSdlListModelBase* model) const;
+	virtual bool isEqualWithModel(imtsdl::CStandardSdlListModelBase* model) const;
 	
 	Q_INVOKABLE [[nodiscard]] 
 	virtual QObject* copyMe() const;
