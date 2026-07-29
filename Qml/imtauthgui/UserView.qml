@@ -5,6 +5,7 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtauthUsersSdl 1.0
 import imtdocgui 1.0
+import imtauthgui 1.0
 import imtguigql 1.0
 
 DocumentViewBase {
@@ -16,8 +17,8 @@ DocumentViewBase {
 	property UserData userData: model;
 	property string productId;
 	
-	property alias passwordInput: userGeneralEditor.passwordInput;
-	property alias passwordInputConfirm: userGeneralEditor.confirmPasswordInput;
+	property var passwordInput: multiPageView.getPageByIndex(0) ? multiPageView.getPageByIndex(0).passwordInput : null;
+	property var passwordInputConfirm: multiPageView.getPageByIndex(0) ? multiPageView.getPageByIndex(0).passwordInputConfirm : null;
 	
 	property bool isNew: true
 	readonly property bool hasValidUserId: container.userData && container.userData.m_id && container.userData.m_id !== ""
@@ -26,10 +27,15 @@ DocumentViewBase {
 		: ""
 	
 	function updateGui(){
-		userGeneralEditor.updateGui();
-		rolesGroup.updateGui();
-		groupsBlock.updateGui();
-		systemInfoGroup.updateGui();
+		var generalPage = multiPageView.getPageByIndex(0)
+		if (generalPage)
+			generalPage.updateGui()
+		var rolesPage = multiPageView.getPageById("Roles")
+		if (rolesPage)
+			rolesPage.updateGui()
+		var groupsPage = multiPageView.getPageById("Groups")
+		if (groupsPage)
+			groupsPage.updateGui()
 	}
 	
 	function updateModel(){
@@ -37,10 +43,15 @@ DocumentViewBase {
 			return
 		}
 
-		userGeneralEditor.updateModel();
-		rolesGroup.updateModel();
-		groupsBlock.updateModel();
-		systemInfoGroup.updateModel();
+		var generalPage = multiPageView.getPageByIndex(0)
+		if (generalPage)
+			generalPage.updateModel()
+		var rolesPage = multiPageView.getPageById("Roles")
+		if (rolesPage)
+			rolesPage.updateModel()
+		var groupsPage = multiPageView.getPageById("Groups")
+		if (groupsPage)
+			groupsPage.updateModel()
 		userData.m_productId = container.productId;
 	}
 	
@@ -56,353 +67,538 @@ DocumentViewBase {
 		if (!userData){
 			return;
 		}
-		
-		setBlockingUpdateModel(true);
-		
-		let ok = false
-		if (systemInfoTable.table && userData.hasSystemInfos()){
-			let systemInfosModel = userData.m_systemInfos;
-			systemInfoTable.table.elements = systemInfosModel;
-			ok = systemInfoTable.table.elementsCount > 1
-		}
-		
-		if (!ok){
-			headerSystemInfoGroup.visible = false;
-			systemInfoGroup.visible = false;
-		}
-		
-		checkChangePasswordLogic();
-		
-		checkSystemId();
-		
-		setBlockingUpdateModel(false);
+
+		var generalPage = multiPageView.getPageByIndex(0)
+		if (generalPage)
+			generalPage.handleUserDataChanged()
 	}
 	
 	function checkChangePasswordLogic(){
-		if (!userData){
-			return;
-		}
-
-		userGeneralEditor.passwordInput.visible = isNew;
-		userGeneralEditor.changePasswordButton.visible = !isNew;
+		var generalPage = multiPageView.getPageByIndex(0)
+		if (generalPage)
+			generalPage.checkChangePasswordLogic()
 	}
 	
 	function checkSystemId(){
-		if (!userData){
-			console.error("Unable to check system ID for the user. Error: UserData is invalid");
-			return;
-		}
-		
-		if (!userData.hasSystemInfos()){
-			return;
-		}
-		
-		userGeneralEditor.usernameInput.readOnly = false;
-		userGeneralEditor.passwordInput.readOnly = false;
+		var generalPage = multiPageView.getPageByIndex(0)
+		if (generalPage)
+			generalPage.checkSystemId()
+	}
 
-		for (let i = 0; i < userData.m_systemInfos.count; i++){
-			let systemId = userData.m_systemInfos.get(i).item.m_id;
-			if (systemId !== ""){
-				userGeneralEditor.changePasswordButton.visible = false;
-				userGeneralEditor.usernameInput.readOnly = true;
+	MultiPageView {
+		id: multiPageView
+		anchors.fill: parent
+		panelWidth: Style.sizeHintXXS
+
+		function updatePages() {
+			multiPageView.clear()
+			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
+			multiPageView.addPage("Roles", qsTr("Roles"), rolesPageComp, "Icons/Role")
+			multiPageView.addPage("Groups", qsTr("Groups"), groupsPageComp, "Icons/Organization")
+			if (PermissionsController.checkPermission("ViewRevisions")){
+				multiPageView.addPage("History", qsTr("History"), historyPageComp, "Icons/History")
 			}
-			
-			let enabled = userData.m_systemInfos.get(i).item.m_enabled;
-			if (enabled && systemId !== ""){
-				userGeneralEditor.usernameInput.readOnly = true;
-				userGeneralEditor.passwordInput.readOnly = true;
-				userGeneralEditor.changePasswordButton.visible = false;
+			multiPageView.currentIndex = 0
+		}
+
+		Component.onCompleted: {
+			multiPageView.updatePages()
+		}
+	}
+
+	Component {
+		id: generalPageComp
+
+		Item {
+			id: generalPage
+			anchors.fill: parent
+
+			property alias passwordInput: userGeneralEditor.passwordInput;
+			property alias passwordInputConfirm: userGeneralEditor.confirmPasswordInput;
+
+			function updateGui(){
+				userGeneralEditor.updateGui();
+				systemInfoGroup.updateGui();
 			}
-			else if (enabled && systemId === ""){
+
+			function updateModel(){
+				userGeneralEditor.updateModel();
+				systemInfoGroup.updateModel();
+			}
+
+			function handleUserDataChanged(){
+				container.setBlockingUpdateModel(true);
+
+				let ok = false
+				if (systemInfoTable.table && container.userData.hasSystemInfos()){
+					let systemInfosModel = container.userData.m_systemInfos;
+					systemInfoTable.table.elements = systemInfosModel;
+					ok = systemInfoTable.table.elementsCount > 1
+				}
+
+				if (!ok){
+					headerSystemInfoGroup.visible = false;
+					systemInfoGroup.visible = false;
+				}
+
+				generalPage.checkChangePasswordLogic();
+
+				generalPage.checkSystemId();
+
+				container.setBlockingUpdateModel(false);
+			}
+
+			function checkChangePasswordLogic(){
+				if (!container.userData){
+					return;
+				}
+
+				userGeneralEditor.passwordInput.visible = container.isNew;
+				userGeneralEditor.changePasswordButton.visible = !container.isNew;
+			}
+
+			function checkSystemId(){
+				if (!container.userData){
+					console.error("Unable to check system ID for the user. Error: UserData is invalid");
+					return;
+				}
+
+				if (!container.userData.hasSystemInfos()){
+					return;
+				}
+
+				userGeneralEditor.usernameInput.readOnly = false;
 				userGeneralEditor.passwordInput.readOnly = false;
-			}
-		}
-	}
-	
-	DocumentHistoryPanel {
-		id: historyPanel;
-		documentId: container.userData ? container.userData.m_id : "";
-		collectionId: "Users";
-		editorFlickable: flickable;
-		
-		function getHeaders(){
-			return container.getHeaders()
-		}
-	}
-	
-	CustomScrollbar {
-		id: scrollbar;
-		
-		z: parent.z + 1;
-		
-		anchors.right: parent.right;
-		anchors.top: flickable.top;
-		anchors.bottom: flickable.bottom;
-		
-		secondSize: 10;
-		targetItem: flickable;
-	}
-	
-	CustomScrollbar{
-		id: scrollHoriz;
-		
-		z: parent.z + 1;
-		
-		anchors.left: flickable.left;
-		anchors.right: flickable.right;
-		anchors.bottom: flickable.bottom;
-		
-		secondSize: 10;
-		
-		vertical: false;
-		targetItem: flickable;
-	}
-	
-	Flickable {
-		id: flickable;
-		
-		anchors.top: parent.top;
-		anchors.topMargin: Style.marginXL;
-		
-		anchors.bottom: parent.bottom;
-		anchors.bottomMargin: Style.marginXL;
-		
-		anchors.left: parent.left;
-		anchors.leftMargin: Style.marginXL;
-		
-		anchors.right: scrollbar.left;
-		anchors.rightMargin: Style.marginXL;
-		
-		contentWidth: bodyColumn.width;
-		contentHeight: Math.max(bodyColumn.height + 2 * Style.marginXL, historyPanel.contentHeight + 2 * Style.marginXL);
-		
-		boundsBehavior: Flickable.StopAtBounds;
-		
-		clip: true;
-		
-		Column {
-			id: bodyColumn;
-			
-			width: Style.sizeHintXXL;
-			
-			spacing: Style.marginXL;
-			
-			GroupHeaderView {
-				id: headerGeneralGroup;
-				width: parent.width;
-				title: qsTr("General");
+
+				for (let i = 0; i < container.userData.m_systemInfos.count; i++){
+					let systemId = container.userData.m_systemInfos.get(i).item.m_id;
+					if (systemId !== ""){
+						userGeneralEditor.changePasswordButton.visible = false;
+						userGeneralEditor.usernameInput.readOnly = true;
+					}
+					
+					let enabled = container.userData.m_systemInfos.get(i).item.m_enabled;
+					if (enabled && systemId !== ""){
+						userGeneralEditor.usernameInput.readOnly = true;
+						userGeneralEditor.passwordInput.readOnly = true;
+						userGeneralEditor.changePasswordButton.visible = false;
+					}
+					else if (enabled && systemId === ""){
+						userGeneralEditor.passwordInput.readOnly = false;
+					}
+				}
 			}
 
-			UserGeneralEditor {
-				id: userGeneralEditor;
-				width: parent.width;
-				userData: container.userData;
+			CustomScrollbar {
+				id: scrollbar;
 				
-				onEmitUpdateModel: {
-					container.doUpdateModel();
-				}
+				z: parent.z + 1;
 				
-				onEmitUpdateGui: {
-					container.doUpdateGui();
-				}
+				anchors.right: parent.right;
+				anchors.top: flickable.top;
+				anchors.bottom: flickable.bottom;
+				
+				secondSize: 10;
+				targetItem: flickable;
 			}
 			
-			GroupHeaderView {
-				id: headerSystemInfoGroup;
-				width: parent.width;
+			Flickable {
+				id: flickable;
 				
-				title: qsTr("System Information");
-				groupView: systemInfoGroup;
-			}
-			
-			GroupElementView {
-				id: systemInfoGroup;
-				width: parent.width;
+				anchors.top: parent.top;
+				anchors.topMargin: Style.marginXL;
 				
-				TableElementView {
-					id: systemInfoTable;
-					TreeItemModel {
-						id: headersModel2;
+				anchors.bottom: parent.bottom;
+				anchors.bottomMargin: Style.marginXL;
+				
+				anchors.left: parent.left;
+				anchors.leftMargin: Style.marginXL;
+				
+				anchors.right: scrollbar.left;
+				anchors.rightMargin: Style.marginXL;
+				
+				contentHeight: bodyColumn.height + 2 * Style.marginXL;
+				
+				boundsBehavior: Flickable.StopAtBounds;
+				
+				clip: true;
+				
+				Column {
+					id: bodyColumn;
+					
+					anchors.horizontalCenter: parent.horizontalCenter;
+					width: Math.min(parent.width, Style.sizeHintXXL);
+					
+					spacing: Style.marginXL;
+					
+					GroupHeaderView {
+						id: headerGeneralGroup;
+						width: parent.width;
+						title: qsTr("General");
+					}
+
+					UserGeneralEditor {
+						id: userGeneralEditor;
+						width: parent.width;
+						userData: container.userData;
 						
-						Component.onCompleted: {
-							updateModel();
+						onEmitUpdateModel: {
+							container.doUpdateModel();
+						}
+						
+						onEmitUpdateGui: {
+							container.doUpdateGui();
+						}
+					}
+					
+					GroupHeaderView {
+						id: headerSystemInfoGroup;
+						width: parent.width;
+						
+						title: qsTr("System Information");
+						groupView: systemInfoGroup;
+					}
+					
+					GroupElementView {
+						id: systemInfoGroup;
+						width: parent.width;
+						
+						TableElementView {
+							id: systemInfoTable;
+							TreeItemModel {
+								id: headersModel2;
+								
+								Component.onCompleted: {
+									updateModel();
+								}
+								
+								function updateModel(){
+									headersModel2.clear();
+									
+									let index = headersModel2.insertNewItem();
+									headersModel2.setData("id", "name", index)
+									headersModel2.setData("name", qsTr("System Name"), index)
+									
+									if (systemInfoTable.table){
+										systemInfoTable.table.headers = headersModel2;
+									}
+								}
+							}
+							
+							onTableChanged: {
+								if (table){
+									table.checkable = true;
+									table.isMultiCheckable = false;
+								}
+							}
+							
+							Connections {
+								id: systemInfoTableConn;
+								target: systemInfoTable.table;
+								
+								function onCheckedItemsChanged(){
+									if (systemInfoGroup.block){
+										return;
+									}
+									
+									let indexes = systemInfoTable.table.getCheckedItems();
+									if (indexes.length === 0){
+										systemInfoGroup.block = true;
+										systemInfoTable.table.checkItem(0);
+										systemInfoGroup.block = false;
+									}
+									
+									container.doUpdateModel();
+									container.checkSystemId();
+								}
+							}
+						}
+						
+						property bool block: false;
+						
+						function updateGui(){
+							if (!container.userData){
+								return;
+							}
+							
+							if (!container.userData.hasSystemInfos()){
+								return;
+							}
+							
+							if (systemInfoTable.table){
+								systemInfoTable.table.uncheckAll();
+								let systemInfosModel = container.userData.m_systemInfos;
+								if (systemInfosModel){
+									for (let i = 0; i < systemInfosModel.count; i++){
+										let enabled = systemInfosModel.get(i).item.m_enabled;
+										if (enabled){
+											systemInfoTable.table.checkItem(i);
+										}
+									}
+								}
+							}
 						}
 						
 						function updateModel(){
-							headersModel2.clear();
-							
-							let index = headersModel2.insertNewItem();
-							headersModel2.setData("id", "name", index)
-							headersModel2.setData("name", qsTr("System Name"), index)
-							
-							if (systemInfoTable.table){
-								systemInfoTable.table.headers = headersModel2;
-							}
-						}
-					}
-					
-					onTableChanged: {
-						if (table){
-							table.checkable = true;
-							table.isMultiCheckable = false;
-						}
-					}
-					
-					Connections {
-						id: systemInfoTableConn;
-						target: systemInfoTable.table;
-						
-						function onCheckedItemsChanged(){
-							if (systemInfoGroup.block){
+							if (!container.userData){
 								return;
 							}
 							
 							let indexes = systemInfoTable.table.getCheckedItems();
-							if (indexes.length === 0){
-								systemInfoGroup.block = true;
-								systemInfoTable.table.checkItem(0);
-								systemInfoGroup.block = false;
-							}
 							
-							container.doUpdateModel();
-							container.checkSystemId();
-						}
-					}
-				}
-				
-				property bool block: false;
-				
-				function updateGui(){
-					if (!container.userData){
-						return;
-					}
-					
-					if (!container.userData.hasSystemInfos()){
-						return;
-					}
-					
-					if (systemInfoTable.table){
-						systemInfoTable.table.uncheckAll();
-						let systemInfosModel = container.userData.m_systemInfos;
-						if (systemInfosModel){
-							for (let i = 0; i < systemInfosModel.count; i++){
-								let enabled = systemInfosModel.get(i).item.m_enabled;
-								if (enabled){
-									systemInfoTable.table.checkItem(i);
+							if (container.userData.m_systemInfos){
+								for (let i = 0; i < container.userData.m_systemInfos.count; i++){
+									container.userData.m_systemInfos.get(i).item.m_enabled = indexes.includes(i)
 								}
 							}
 						}
 					}
 				}
-				
-				function updateModel(){
-					if (!container.userData){
-						return;
+			}
+		}
+	}
+
+	Component {
+		id: rolesPageComp
+
+		Item {
+			id: rolesPage
+			anchors.fill: parent
+
+			function updateGui(){
+				rolesGroup.updateGui();
+			}
+
+			function updateModel(){
+				rolesGroup.updateModel();
+			}
+
+			Component.onCompleted: {
+				rolesPage.updateGui();
+			}
+
+			CustomScrollbar {
+				id: scrollbar;
+				z: parent.z + 1;
+				anchors.right: parent.right;
+				anchors.top: flickable.top;
+				anchors.bottom: flickable.bottom;
+				secondSize: 10;
+				targetItem: flickable;
+			}
+
+			Flickable {
+				id: flickable;
+				anchors.top: parent.top;
+				anchors.topMargin: Style.marginXL;
+				anchors.bottom: parent.bottom;
+				anchors.bottomMargin: Style.marginXL;
+				anchors.left: parent.left;
+				anchors.leftMargin: Style.marginXL;
+				anchors.right: scrollbar.left;
+				anchors.rightMargin: Style.marginXL;
+				contentHeight: bodyColumn.height + 2 * Style.marginXL;
+
+				boundsBehavior: Flickable.StopAtBounds;
+				clip: true;
+
+				Column {
+					id: bodyColumn;
+					anchors.horizontalCenter: parent.horizontalCenter;
+					width: Math.min(parent.width, Style.sizeHintXXL);
+					spacing: Style.marginXL;
+
+					GroupHeaderView {
+						width: parent.width;
+						title: qsTr("Roles");
+						groupView: rolesGroup;
+					}
+
+					GroupElementView {
+						id: rolesGroup;
+
+						width: parent.width;
+
+						GqlBasedItemSelectElementView {
+							id: roleSelectableCollectionEditor
+							collectionId: "Roles"
+								label: qsTr("Roles")
+								addButtonText: qsTr("Add Role")
+								showCount: true
+								onSelectionChanged: {
+									container.doUpdateModel()
+								}
+							}
+
+						function updateGui(){
+							if (!container.userData){
+								return
+							}
+
+							var ids = container.userData.m_roles ? container.userData.m_roles.slice() : []
+							var arr = []
+							for (var i = 0; i < ids.length; i++)
+								arr.push({id: ids[i], name: ids[i]})
+							roleSelectableCollectionEditor.items = arr
+						}
+						
+						function updateModel(){
+							if (!container.userData){
+								return
+							}
+
+							var arr = []
+							for (var i = 0; i < roleSelectableCollectionEditor.items.length; i++)
+								arr.push(roleSelectableCollectionEditor.items[i].id)
+							container.userData.m_roles = arr
+						}
+					}
+				}
+			}
+		}
+	}
+
+	Component {
+		id: groupsPageComp
+
+		Item {
+			id: groupsPage
+			anchors.fill: parent
+
+			function updateGui(){
+				groupsBlock.updateGui();
+			}
+
+			function updateModel(){
+				groupsBlock.updateModel();
+			}
+
+			Component.onCompleted: {
+				groupsPage.updateGui();
+			}
+
+			CustomScrollbar {
+				id: scrollbar;
+				z: parent.z + 1;
+				anchors.right: parent.right;
+				anchors.top: flickable.top;
+				anchors.bottom: flickable.bottom;
+				secondSize: 10;
+				targetItem: flickable;
+			}
+
+			Flickable {
+				id: flickable;
+				anchors.top: parent.top;
+				anchors.topMargin: Style.marginXL;
+				anchors.bottom: parent.bottom;
+				anchors.bottomMargin: Style.marginXL;
+				anchors.left: parent.left;
+				anchors.leftMargin: Style.marginXL;
+				anchors.right: scrollbar.left;
+				anchors.rightMargin: Style.marginXL;
+				contentHeight: bodyColumn.height + 2 * Style.marginXL;
+
+				boundsBehavior: Flickable.StopAtBounds;
+				clip: true;
+
+				Column {
+					id: bodyColumn;
+					anchors.horizontalCenter: parent.horizontalCenter;
+					width: Math.min(parent.width, Style.sizeHintXXL);
+					spacing: Style.marginXL;
+
+					GroupHeaderView {
+						width: parent.width;
+						
+						title: qsTr("Groups");
+						groupView: groupsBlock;
 					}
 					
-					let indexes = systemInfoTable.table.getCheckedItems();
-					
-					if (container.userData.m_systemInfos){
-						for (let i = 0; i < container.userData.m_systemInfos.count; i++){
-							container.userData.m_systemInfos.get(i).item.m_enabled = indexes.includes(i)
+					GroupElementView {
+						id: groupsBlock;
+						
+						width: parent.width;
+
+						GqlBasedItemSelectElementView {
+							id: groupSelectableCollectionEditor
+							collectionId: "Groups"
+								label: qsTr("Groups")
+								addButtonText: qsTr("Add Group")
+								showCount: true
+								onSelectionChanged: {
+									container.doUpdateModel()
+								}
+							}
+
+						function updateGui(){
+							if (!container.userData){
+								return
+							}
+
+							var ids = container.userData.m_groups ? container.userData.m_groups.slice() : []
+							var arr = []
+							for (var i = 0; i < ids.length; i++)
+								arr.push({id: ids[i], name: ids[i]})
+							groupSelectableCollectionEditor.items = arr
+						}
+						
+						function updateModel(){
+							if (!container.userData){
+								return
+							}
+
+							var arr = []
+							for (var i = 0; i < groupSelectableCollectionEditor.items.length; i++)
+								arr.push(groupSelectableCollectionEditor.items[i].id)
+							container.userData.m_groups = arr
 						}
 					}
 				}
 			}
-			
+		}
+	}
+
+	Component {
+		id: historyPageComp
+
+		Item {
+			id: historyPage
+			anchors.fill: parent
+
+			Item {
+				id: centeredContainer
+				anchors.top: parent.top
+				anchors.bottom: parent.bottom
+				anchors.horizontalCenter: parent.horizontalCenter
+				width: Math.min(parent.width - Style.marginXL * 2, Style.sizeHintXXL)
+			}
+
 			GroupHeaderView {
-				width: parent.width;
-				
-				title: qsTr("Roles");
-				groupView: rolesGroup;
+				id: historyHeader
+				anchors.left: centeredContainer.left
+				anchors.top: parent.top
+				anchors.topMargin: Style.marginXL
+				anchors.right: centeredContainer.right
+				title: qsTr("History") + " (" + historyView.revisionsCount + ")"
 			}
-			
-			GroupElementView {
-				id: rolesGroup;
-				
-				width: parent.width;
 
-				GqlBasedItemSelectElementView {
-					id: roleSelectableCollectionEditor
-					collectionId: "Roles"
-						label: qsTr("Roles")
-						addButtonText: qsTr("Add Role")
-						showCount: true
-						onSelectionChanged: {
-							container.doUpdateModel()
-						}
-					}
+			DocumentHistoryView {
+				id: historyView
+				anchors.left: centeredContainer.left
+				anchors.top: historyHeader.bottom
+				anchors.topMargin: Style.marginM
+				anchors.right: centeredContainer.right
+				anchors.bottom: parent.bottom
+				anchors.bottomMargin: Style.marginXL
+				documentId: container.userData ? container.userData.m_id : "";
+				collectionId: "Users";
 
-				function updateGui(){
-					if (!container.userData){
-						return
-					}
-
-					var ids = container.userData.m_roles ? container.userData.m_roles.slice() : []
-					var arr = []
-					for (var i = 0; i < ids.length; i++)
-						arr.push({id: ids[i], name: ids[i]})
-					roleSelectableCollectionEditor.items = arr
-				}
-				
-				function updateModel(){
-					if (!container.userData){
-						return
-					}
-
-					var arr = []
-					for (var i = 0; i < roleSelectableCollectionEditor.items.length; i++)
-						arr.push(roleSelectableCollectionEditor.items[i].id)
-					container.userData.m_roles = arr
-				}
-			}
-			
-			GroupHeaderView {
-				width: parent.width;
-				
-				title: qsTr("Groups");
-				groupView: groupsBlock;
-			}
-			
-			GroupElementView {
-				id: groupsBlock;
-				
-				width: parent.width;
-
-				GqlBasedItemSelectElementView {
-					id: groupSelectableCollectionEditor
-					collectionId: "Groups"
-						label: qsTr("Groups")
-						addButtonText: qsTr("Add Group")
-						showCount: true
-						onSelectionChanged: {
-							container.doUpdateModel()
-						}
-					}
-
-				function updateGui(){
-					if (!container.userData){
-						return
-					}
-
-					var ids = container.userData.m_groups ? container.userData.m_groups.slice() : []
-					var arr = []
-					for (var i = 0; i < ids.length; i++)
-						arr.push({id: ids[i], name: ids[i]})
-					groupSelectableCollectionEditor.items = arr
-				}
-				
-				function updateModel(){
-					if (!container.userData){
-						return
-					}
-
-					var arr = []
-					for (var i = 0; i < groupSelectableCollectionEditor.items.length; i++)
-						arr.push(groupSelectableCollectionEditor.items[i].id)
-					container.userData.m_groups = arr
+				function getHeaders(){
+					return container.getHeaders()
 				}
 			}
 		}
 	}
 }
+
