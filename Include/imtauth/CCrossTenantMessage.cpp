@@ -111,6 +111,13 @@ bool CCrossTenantMessage::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_info.errorMessage);
 	retVal = retVal && archive.EndTag(errorTag);
 
+	iser::CArchiveTag accessModeTag("AccessMode", "Access mode", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(accessModeTag);
+	int accessMode = static_cast<int>(m_info.accessMode);
+	retVal = retVal && archive.Process(accessMode);
+	m_info.accessMode = static_cast<DocumentShareAccessMode>(accessMode);
+	retVal = retVal && archive.EndTag(accessModeTag);
+
 	iser::CArchiveTag createdAtTag("CreatedAt", "Created at", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(createdAtTag);
 	retVal = retVal && archive.Process(m_info.createdAt);

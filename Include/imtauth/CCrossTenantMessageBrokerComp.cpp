@@ -123,7 +123,8 @@ QByteArray CCrossTenantMessageBrokerComp::SendMessage(
 		const QByteArray& sourceObjectId,
 		const QString& customType,
 		const QString& expiresAt,
-		const QByteArray& contractId)
+		const QByteArray& contractId,
+		DocumentShareAccessMode accessMode)
 {
 	if (!m_messageCollectionCompPtr.IsValid() || !m_messageFactoryCompPtr.IsValid()){
 		SendErrorMessage(0, "Message collection or factory not configured", "CCrossTenantMessageBrokerComp");
@@ -176,6 +177,7 @@ QByteArray CCrossTenantMessageBrokerComp::SendMessage(
 	info.customType = customType;
 	info.payload = projectedPayload;
 	info.status = CTMS_VALIDATED;
+	info.accessMode = accessMode;
 	info.createdAt = now;
 	info.updatedAt = now;
 	info.expiresAt = expiresAt;

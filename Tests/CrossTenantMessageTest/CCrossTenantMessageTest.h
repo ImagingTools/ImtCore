@@ -124,7 +124,8 @@ public:
 				CrossTenantMessageType messageType,
 				const QByteArray& payload,
 				const QByteArray& sourceObjectId = QByteArray(),
-				const QString& customType = QString())
+				const QString& customType = QString(),
+				DocumentShareAccessMode accessMode = DSAM_READ_ONLY)
 	{
 		if (sourceTenantId.isEmpty() || targetTenantId.isEmpty() || relationshipId.isEmpty()){
 			return QByteArray();
@@ -155,6 +156,7 @@ public:
 		info.customType = customType;
 		info.payload = projectedPayload;
 		info.status = CTMS_VALIDATED;
+		info.accessMode = accessMode;
 		info.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 		info.updatedAt = info.createdAt;
 

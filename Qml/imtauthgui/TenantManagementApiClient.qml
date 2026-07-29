@@ -213,7 +213,7 @@ QtObject {
 	// --- Cross-tenant messages (phase 2) ---
 	property var crossTenantMessagesModel: null
 	function fetchCrossTenantMessages(tenantId, direction) {}
-	function sendCrossTenantMessage(sourceTenantId, targetTenantId, relationshipId, messageType, payload, sourceObjectId, customType, expiresAt) {}
+	function sendCrossTenantMessage(sourceTenantId, targetTenantId, relationshipId, messageType, payload, sourceObjectId, customType, expiresAt, accessMode) {}
 	function updateCrossTenantMessageStatus(messageId, status, errorMessage) {}
 
 	// --- Order requests (phase 3) ---

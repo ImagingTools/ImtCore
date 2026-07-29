@@ -1410,7 +1410,7 @@ QtObject {
 		root.__getMessagesSender.send(root.__getMessagesInput)
 	}
 
-	function sendCrossTenantMessage(sourceTenantId, targetTenantId, relationshipId, messageType, payload, sourceObjectId, customType, expiresAt) {
+	function sendCrossTenantMessage(sourceTenantId, targetTenantId, relationshipId, messageType, payload, sourceObjectId, customType, expiresAt, accessMode) {
 		root.__sendMessageInput.m_sourceTenantId = sourceTenantId || root.tenantId || ""
 		root.__sendMessageInput.m_targetTenantId = targetTenantId || ""
 		root.__sendMessageInput.m_relationshipId = relationshipId || ""
@@ -1419,6 +1419,7 @@ QtObject {
 		root.__sendMessageInput.m_sourceObjectId = sourceObjectId || ""
 		root.__sendMessageInput.m_customType = customType || ""
 		root.__sendMessageInput.m_expiresAt = expiresAt || ""
+		root.__sendMessageInput.m_accessMode = accessMode || DocumentShareAccessModeEnum.s_readOnly
 		root.__sendMessageSender.send(root.__sendMessageInput)
 	}
 
