@@ -31,7 +31,7 @@ void CSdandardSdlListModelBase::setOwner(QObject*)
 
 int CSdandardSdlListModelBase::count() const
 {
-	return rowCount();
+	ASSERT_NOT_BASE_INSTANCE();
 }
 
 

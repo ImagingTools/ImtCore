@@ -28,7 +28,6 @@ public:
 
 	// reimplemented (CSdandardSdlListModelBase)
 	void ClearCache() override;
-	QVariant GetOrCreateCachedObject(int index) const override = 0;
 	QVariantMap get(int row) const override;
 	void remove(int index) override;
 	void clear() override;
@@ -60,13 +59,6 @@ TSdlAbstractListModel<ModelDataType, ModelObjectDataType>::
 template <class ModelDataType, class ModelObjectDataType>
 void TSdlAbstractListModel<ModelDataType, ModelObjectDataType>::ClearCache()
 {
-	// for (auto it = m_objectDataTypeMap.begin(); it != m_objectDataTypeMap.end(); ++it){
-	// 	QObject* itemPtr = dynamic_cast<QObject*>(it.value());
-	// 	if (itemPtr){
-	// 		itemPtr->deleteLater();
-	// 	}
-	// }
-
 	m_objectDataTypeMap.clear();
 }
 
@@ -117,7 +109,7 @@ QVariant TSdlAbstractListModel<ModelDataType, ModelObjectDataType>::getData(cons
 		QVariant retVal = GetOrCreateCachedObject(index);
 		return retVal;
 	}
-	return QVariant();
+	return {};
 }
 
 
@@ -143,7 +135,7 @@ QVariant TSdlAbstractListModel<ModelDataType, ModelObjectDataType>::
 
 	int row = index.row();
 	if (!Version_1_0.has_value() || row < 0 || row > Version_1_0->count() - 1){
-		return QVariant();
+		return {};
 	}
 
 	QVariant retVal = GetOrCreateCachedObject(row);
