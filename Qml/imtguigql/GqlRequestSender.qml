@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
+import imtgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 
@@ -47,16 +48,16 @@ GqlModel {
 
     function onError(message, type){
         if (type == "Critical"){
-            ModalDialogManager.showCriticalDialog(message);
+            PopupManager.addErrorMessage(message, true);
         }
         else if (type == "Warning"){
-            ModalDialogManager.showWarningDialog(message);
+            PopupManager.addWarningMessage(message, true);
         }
         else if (type == "Info"){
-            ModalDialogManager.showInfoDialog(message);
+            PopupManager.addInfoMessage(message, true);
         }
         else if (type == "Error"){
-            ModalDialogManager.showErrorDialog(message);
+            PopupManager.addErrorMessage(message, true);
         }
     }
 
@@ -95,7 +96,13 @@ GqlModel {
     function createQueryParams(query, params){}
 
     onStateChanged: {
-        if (state === "Error"){
+        if (state === "Unauthorized" || state === "Forbidden"){
+            // Auth recovery is owned by XmlHttpRequestProxy / AuthorizationController
+            // (refresh + retry). Do not surface a generic network error here - the
+            // request is transparently replayed once the token has been refreshed.
+            return;
+        }
+        else if (state === "Error"){
             root.onError("Network error", "Critical");
         }
         else if (state === "Ready"){

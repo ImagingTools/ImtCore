@@ -11,6 +11,8 @@
 
 // ImtCore includes
 #include <imtauth/ISession.h>
+#include <imtgql/CGqlContext.h>
+#include <imtgql/CGqlRequestContextManager.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
 
 
@@ -133,6 +135,13 @@ bool CRemoteJwtSessionControllerComp::RefreshToken(
 	if (!sessionsdl::CRefreshTokenGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
+
+	imtgql::IGqlContextSharedPtr refreshContextPtr = new imtgql::CGqlContext;
+	imtgql::IGqlContext* currentContextPtr = imtgql::CGqlRequestContextManager::GetContext();
+	if (currentContextPtr != nullptr){
+		refreshContextPtr->SetProductId(currentContextPtr->GetProductId());
+	}
+	gqlRequest.SetGqlContext(refreshContextPtr);
 
 	typedef sdl::V1_0::imtauth::CRefreshTokenPayload Response;
 

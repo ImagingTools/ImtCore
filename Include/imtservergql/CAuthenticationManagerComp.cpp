@@ -211,16 +211,16 @@ imtauth::IJwtSessionController::JwtState CAuthenticationManagerComp::ValidateJwt
 		return imtauth::IJwtSessionController::JS_INVALID;
 	}
 
-	// Check the cache first — avoid calling the slave controller if we already know the result.
 	QByteArray userId;
 	QByteArray tenantId;
 	QByteArrayList scopes;
 	bool isPat = false;
-	if (TryGetCachedToken(jwt, userId, tenantId, scopes, isPat)){
-		return imtauth::IJwtSessionController::JS_OK;
+	JwtState cachedState = JwtState::JS_NONE;
+	if (TryAwaitOrClaimTokenResolution(jwt, userId, tenantId, scopes, isPat, cachedState)){
+		return cachedState;
 	}
 
-	// Cache miss — delegate to the slave and populate the cache.
+	auto claimGuard = qScopeGuard([this, jwt](){ ReleaseTokenResolutionClaim(jwt); });
 	JwtState state = m_slaveJwtSessionControllerCompPtr->ValidateJwt(jwt);
 
 	if (state == JwtState::JS_OK){
@@ -237,6 +237,9 @@ imtauth::IJwtSessionController::JwtState CAuthenticationManagerComp::ValidateJwt
 			expSecs = GetJwtExpirationSecs(jwt);
 		}
 		StoreCachedToken(jwt, resolvedUserId, resolvedTenantId, QByteArray(), QByteArrayList(), false, expSecs);
+	}
+	else if (state == JwtState::JS_EXPIRED){
+		StoreExpiredToken(jwt);
 	}
 	else{
 		SendWarningMessage(
@@ -436,7 +439,13 @@ bool CAuthenticationManagerComp::ResolveUserId(
 			QString& errorMessage,
 			imtgql::IGqlContextCreator::ContextCreationStatus& status) const
 {
-	if (TryAwaitOrClaimTokenResolution(token, userId, tenantId, scopes, isPat)){
+	JwtState cachedState = JwtState::JS_NONE;
+	if (TryAwaitOrClaimTokenResolution(token, userId, tenantId, scopes, isPat, cachedState)){
+		if (cachedState == JwtState::JS_EXPIRED){
+			errorMessage = QStringLiteral("JWT token expired.");
+			status = imtgql::IGqlContextCreator::CCS_UNAUTHORIZED;
+			return false;
+		}
 		status = imtgql::IGqlContextCreator::CCS_OK;
 		return true;
 	}
@@ -514,6 +523,7 @@ bool CAuthenticationManagerComp::ResolveUserId(
 	}
 
 	if (state == JwtState::JS_EXPIRED){
+		StoreExpiredToken(token);
 		errorMessage = QStringLiteral("JWT token expired.");
 		status = imtgql::IGqlContextCreator::CCS_UNAUTHORIZED;
 		SendWarningMessage(
@@ -619,17 +629,30 @@ bool CAuthenticationManagerComp::TryAwaitOrClaimTokenResolution(
 			QByteArray& userId,
 			QByteArray& tenantId,
 			QByteArrayList& scopes,
-			bool& isPat) const
+			bool& isPat,
+			JwtState& state) const
 {
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 
 	while (true){
 		if (TryReadCachedTokenLocked(token, userId, tenantId, scopes, isPat)){
+			state = JwtState::JS_OK;
 			return true;
+		}
+
+		const qint64 now = QDateTime::currentMSecsSinceEpoch();
+		auto expiredIter = m_expiredTokenCache.find(token);
+		if (expiredIter != m_expiredTokenCache.end()){
+			if (*expiredIter > now){
+				state = JwtState::JS_EXPIRED;
+				return true;
+			}
+			m_expiredTokenCache.erase(expiredIter);
 		}
 
 		if (!m_tokensBeingResolved.contains(token)){
 			m_tokensBeingResolved.insert(token);
+			state = JwtState::JS_NONE;
 			return false;
 		}
 
@@ -697,6 +720,7 @@ void CAuthenticationManagerComp::StoreCachedToken(
 				QStringLiteral("CAuthenticationManagerComp"));
 
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	m_expiredTokenCache.remove(token);
 	m_tokenCache.insert(token, entry);
 	const int maxTokenCacheSize = m_maxTokenCacheSizeAttrPtr.IsValid() ? *m_maxTokenCacheSizeAttrPtr : 10000;
 	if (m_tokenCache.size() <= maxTokenCacheSize){
@@ -725,10 +749,38 @@ void CAuthenticationManagerComp::StoreCachedToken(
 }
 
 
+void CAuthenticationManagerComp::StoreExpiredToken(const QByteArray& token) const
+{
+	const qint64 now = QDateTime::currentMSecsSinceEpoch();
+	const qint64 expiresAt = now + 10 * 1000;
+	QMutexLocker cacheLocker(&m_tokenCacheMutex);
+	m_tokenCache.remove(token);
+	for (auto iter = m_expiredTokenCache.begin(); iter != m_expiredTokenCache.end(); ){
+		if (*iter <= now){
+			iter = m_expiredTokenCache.erase(iter);
+		}
+		else{
+			++iter;
+		}
+	}
+	m_expiredTokenCache.insert(token, expiresAt);
+
+	const int maxTokenCacheSize = m_maxTokenCacheSizeAttrPtr.IsValid() ? *m_maxTokenCacheSizeAttrPtr : 10000;
+	while (m_expiredTokenCache.size() > maxTokenCacheSize){
+		auto victim = m_expiredTokenCache.begin();
+		if (victim == m_expiredTokenCache.end()){
+			break;
+		}
+		m_expiredTokenCache.erase(victim);
+	}
+}
+
+
 void CAuthenticationManagerComp::InvalidateTokenCache(const QByteArray& token) const
 {
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	m_tokenCache.remove(token);
+	m_expiredTokenCache.remove(token);
 }
 
 
