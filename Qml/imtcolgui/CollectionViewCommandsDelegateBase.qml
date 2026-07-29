@@ -46,6 +46,7 @@ ViewCommandsDelegateBase {
 	signal removed(string id);
 	signal selectionChanged(var selectedIds, var selectedIndexes)
 	signal beginImport(string fileName, string filePath, int fileSize);
+	signal exportFinished()
 
 	Component.onDestruction: {
 		if (collectionViewCommandsDelegate.collectionView){
@@ -130,6 +131,8 @@ ViewCommandsDelegateBase {
 
 			let encodedStr = Qt.atob(data);
 			exportFileIO.write(encodedStr);
+
+			collectionViewCommandsDelegate.exportFinished()
 		}
 	}
 

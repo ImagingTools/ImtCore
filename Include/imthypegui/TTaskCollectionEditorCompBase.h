@@ -390,7 +390,13 @@ void TTaskCollectionEditorCompBase<UI>::DuplicateTask()
 		istd::CChangeGroup changeGroup(objectPtr);
 		Q_UNUSED(changeGroup);
 
-		QByteArray newTaskId = objectPtr->InsertNewObject(taskTypeId, QString("Copy of %1").arg(sourceTaskName), "", objectPtr->GetObjectPtr(taskId));
+		QByteArray newTaskId = objectPtr->InsertNewObject(
+			taskTypeId, 
+			sourceTaskName, 
+			tr("Copy of") + " " + sourceTaskName, 
+			objectPtr->GetObjectPtr(taskId)
+		);
+
 		if (newTaskId.isEmpty()){
 			QMessageBox::critical(BaseClass::GetWidget(), QObject::tr("Task Error"), QObject::tr("Task could not be duplicated!"));
 			return;
