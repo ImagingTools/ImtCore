@@ -1,7 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
-import imtcolgui 1.0
 
 Item {
 	id: filterDelegateBase
@@ -51,8 +50,8 @@ Item {
 				ButtonDecorator {
 					id: buttonDecorator
 					radius: Style.radiusM
-					color: filterDelegateBase.isActive ? Style.buttonAccentColor : Style.baseColor
-					textColor: filterDelegateBase.isActive ? Style.baseColor : Style.textColor
+					color: filterDelegateBase.isActive ? Style.buttonAccentColor : Style.buttonColor
+					textColor: filterDelegateBase.isActive ? Style.highlightedTextColor : Style.textColor
 					border.width: filterDelegateBase.isActive ? 0 : 1
 					opacity: mainButton_.hovered ? 0.85 : 1
 					maxTextWidth: Style.sizeHintXS
@@ -101,7 +100,7 @@ Item {
 				ButtonDecorator {
 					id: buttonDecorator
 					radius: Style.radiusM
-					color: filterDelegateBase.isActive ? Style.buttonAccentColor : Style.baseColor
+					color: filterDelegateBase.isActive ? Style.buttonAccentColor : Style.buttonColor
 					border.width: filterDelegateBase.isActive ? 0 : 1
 					opacity: clearButton_.hovered ? 0.85 : 1
 					Rectangle {

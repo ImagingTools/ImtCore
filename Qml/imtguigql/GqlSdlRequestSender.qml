@@ -1,7 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtcontrols 1.0
+import imtgui 1.0
 import imtguigql 1.0
 
 
@@ -75,16 +75,16 @@ GqlRequest {
 	
 	function onError(message, type){
 		if (type == "Critical"){
-			ModalDialogManager.showCriticalDialog(message);
+			PopupManager.addErrorMessage(message, true);
 		}
 		else if (type == "Warning"){
-			ModalDialogManager.showWarningDialog(message);
+			PopupManager.addWarningMessage(message, true);
 		}
 		else if (type == "Info"){
-			ModalDialogManager.showInfoDialog(message);
+			PopupManager.addInfoMessage(message, true);
 		}
 		else if (type == "Error"){
-			ModalDialogManager.showErrorDialog(message);
+			PopupManager.addErrorMessage(message, true);
 		}
 		
 		root.finished(-1);

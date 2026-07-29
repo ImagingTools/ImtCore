@@ -29,6 +29,14 @@ Item {
         Events.unSubscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
     }
 
+    Connections {
+        target: administrationContainer.apiClient
+        function onTenantIdChanged() {
+            administrationContainer.apiClient.setRolePermissionsTenantId(administrationContainer.apiClient.tenantId);
+            administrationContainer.apiClient.fetchTenantPermissions(administrationContainer.apiClient.tenantId);
+        }
+    }
+
     function closeAllDocumentsForManager(manager){
         if (!manager){
             return;

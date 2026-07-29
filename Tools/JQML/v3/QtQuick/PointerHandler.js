@@ -20,8 +20,8 @@ class PointerHandler extends QtObject {
     static ApprovesTakeOverByAnything = 9
 
     static meta = Object.assign({}, QtObject.meta, {
-        active: { type: Bool, value: true},
-        cursorShape: { type: String, value: QtEnums.ArrowCursor},
+        active: { type: Bool, value: false},
+        cursorShape: { type: String, value: ''},
         enabled: { type: Bool, value: true},
         grabPermissions: { type: Int, value: PointerHandler.CanTakeOverFromItems | PointerHandler.CanTakeOverFromHandlersOfDifferentType | PointerHandler.ApprovesTakeOverByAnything },
         margin: { type: Real, value: 0},
@@ -37,6 +37,16 @@ class PointerHandler extends QtObject {
         canceled: { type:Signal, args:['point'] },
         grabChanged: { type:Signal, args:['transition', 'point'] },
     })
+
+    __isHandlerEnabled(){
+        return !!this.enabled && !this.__destroyed
+    }
+
+    __getEffectiveTarget(){
+        if(this.target) return this.target
+        if(this.parent && this.parent instanceof JQModules.QtQuick.Item) return this.parent
+        return null
+    }
 }
 
 

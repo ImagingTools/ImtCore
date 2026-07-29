@@ -1930,6 +1930,55 @@ QtObject {
 			}
 
 			function updateDocumentFromRepresentation(){
+				var userData = representationModel
+				if (!userData) {
+					__failValidation(qsTr("No user data available."))
+					return
+				}
+
+				if (userData.m_name === "") {
+					__failValidation(qsTr("Name is required."))
+					return
+				}
+
+				if (userData.m_username === "") {
+					__failValidation(qsTr("Username is required."))
+					return
+				}
+
+				var regExp = new RegExp(mailRegExp.regularExpression)
+				if (!regExp.test(userData.m_email)) {
+					__failValidation(qsTr("A valid email address is required."))
+					return
+				}
+
+				var emptyPasswordIsOk = false
+				if (userData.hasSystemInfos && userData.hasSystemInfos()) {
+					for (var i = 0; i < userData.m_systemInfos.count; i++) {
+						var systemId = userData.m_systemInfos.get(i).item.m_id
+						if (systemId !== "") {
+							emptyPasswordIsOk = true
+							break
+						}
+					}
+				}
+
+				if (userData.m_password === "" && !emptyPasswordIsOk) {
+					__failValidation(qsTr("Password is required."))
+					return
+				}
+
+				if (view && root.__userDocumentService.documentIsNew(documentId)) {
+					if (view.passwordInput && view.passwordInputConfirm) {
+						var pw1 = view.passwordInput.text
+						var pw2 = view.passwordInputConfirm.text
+						if (pw1 !== pw2) {
+							__failValidation(qsTr("Passwords do not match."))
+							return
+						}
+					}
+				}
+
 				startUpdateDocument(documentId)
 
 				updateUserInput.m_documentId = documentId

@@ -12,7 +12,7 @@ Rectangle {
 	clip: true;
 
 	color: Style.backgroundColor;
-	radius: Style.menuPanelRadius;
+	radius: 0;
 
 	property string textColor: Style.textColor;
 	property string fontName: Style.fontFamily;
@@ -40,7 +40,6 @@ Rectangle {
 	property bool centered: Style.menuPanelCentered !== undefined ? Style.menuPanelCentered : false;
 	property bool collapsed: false
 	property real menuDefaultWidth: 0
-
 
 	Component.onCompleted: {
 		Events.subscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
@@ -344,6 +343,18 @@ Rectangle {
 				delegate: menuPanel.delegate
 			}
 		}
+	}
+
+	CustomScrollbar {
+		id: allPagesScrollbar;
+		z: allPagesFlick.z + 1;
+		anchors.right: allPagesFlick.right;
+		anchors.top: allPagesFlick.top;
+		anchors.bottom: allPagesFlick.bottom;
+		secondSize: Style.spacingS;
+		targetItem: allPagesFlick;
+		alwaysVisible: false;
+		visible: allPagesFlick.visible;
 	}
 
 	Column{

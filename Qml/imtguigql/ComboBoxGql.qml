@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
+import imtgui 1.0
 import imtcontrols 1.0
 import imtcolgui 1.0
 
@@ -109,7 +110,7 @@ ComboBox {
 				let str = filterText.replace(comboBoxContainerGql.excludeFilterPart, "");
 				comboBoxContainerGql.setTextFilter(str)
 
-				pause.restart();
+				comboBoxContainerGql.updateModel(0);
 			}
 
 			function close(){}
@@ -213,7 +214,7 @@ ComboBox {
 		}
 
 		onFailed: {
-			ModalDialogManager.showErrorDialog(message)
+			PopupManager.addErrorMessage(message, true)
 		}
 
 		onModelUpdated: {
@@ -226,6 +227,10 @@ ComboBox {
 				comboBoxContainerGql.model = dataProvider.collectionModel
 				comboBoxContainerGql.endListStatus = false;
 				comboBoxContainerGql.currentIndex = -1;
+
+				if(comboBoxContainerGql.popup && comboBoxContainerGql.popup.decorator_){
+					comboBoxContainerGql.popup.decorator_.contentY = 0;
+				}
 
 				if(comboBoxContainerGql.popup && closeImmediately){
 					comboBoxContainerGql.popup.finished('', -1)

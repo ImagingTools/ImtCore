@@ -234,8 +234,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 								 maskedToken,
 								 detail),
 					QStringLiteral("CWebSocketServletComp"));
-		// CreateErrorResponse logs the same wire message once for non-auth paths;
-		// auth path already logged above — pass the informative message to the client.
+
 		return CreateErrorResponse(wireMessage.toUtf8(), request, /*logMessage*/ false);
 	}
 
@@ -270,6 +269,10 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		if (subscriberControllerPtr->RegisterSubscription(subscriptionId, gqlRequest, request, errorMessage)){
 			return imtrest::ConstResponsePtr();
 		}
+
+		return CreateErrorResponse(errorMessage.isEmpty()
+					? QByteArrayLiteral("Failed to register subscription")
+					: errorMessage.toUtf8(), request);
 	}
 	else{
 		QByteArray errorMessage = QString("The requested command could not be executed. No servlet was found for the given command: '%1")

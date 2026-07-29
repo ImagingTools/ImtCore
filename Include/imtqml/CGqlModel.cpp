@@ -8,6 +8,7 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
+#include <imtqml/CNetworkEventInterceptor.h>
 
 
 namespace imtqml
@@ -58,7 +59,9 @@ bool CGqlModel::SetGqlQuery(QString query, QVariantMap headers)
 		}
 
 		if (!s_accessToken.isEmpty()){
-			networkRequest.setRawHeader(imtbase::s_authenticationTokenHeaderId, s_accessToken.toUtf8());
+			if (!networkRequest.hasRawHeader(imtbase::s_authenticationTokenHeaderId)){
+				networkRequest.setRawHeader(imtbase::s_authenticationTokenHeaderId, s_accessToken.toUtf8());
+			}
 		}
 
 		QString message = QString("Post to url '%1' query '%2'").arg(requestUrl.toString()).arg(query);
@@ -67,10 +70,11 @@ bool CGqlModel::SetGqlQuery(QString query, QVariantMap headers)
 		QNetworkReply* replyPtr = accessManager->post(networkRequest, query.toUtf8());
 		if (replyPtr != nullptr){
 			replyPtr->setProperty("requestBody", query.toUtf8());
-			
+
 			replyPtr->ignoreSslErrors();
 			connect(replyPtr, &QNetworkReply::finished, this, &CGqlModel::replyFinished);
 			connect(replyPtr, &QNetworkReply::errorOccurred, this, &CGqlModel::errorOccurred);
+			CNetworkEventInterceptor::Instance()->InterceptRequest(replyPtr, this);
 		}
 
 		return true;
@@ -84,17 +88,26 @@ void CGqlModel::replyFinished()
 {
 	QNetworkReply* reply = dynamic_cast<QNetworkReply*>(sender());
 	if(reply){
-		QByteArray representationData = reply->readAll();
-		bool result = CreateFromJson(representationData);
-		if (result){
-			if (State() == "Ready"){
-				SetState("Loading");
-			}
-
-			SetState("Ready");
+		int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+		if (statusCode == 401){
+			SetState("Unauthorized");
+		}
+		else if (statusCode == 403){
+			SetState("Forbidden");
 		}
 		else{
-			SetState("Error");
+			QByteArray representationData = reply->readAll();
+			bool result = CreateFromJson(representationData);
+			if (result){
+				if (State() == "Ready"){
+					SetState("Loading");
+				}
+
+				SetState("Ready");
+			}
+			else{
+				SetState("Error");
+			}
 		}
 		reply->deleteLater();
 	}

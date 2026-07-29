@@ -125,7 +125,8 @@ private:
 				QByteArray& userId,
 				QByteArray& tenantId,
 				QByteArrayList& scopes,
-				bool& isPat) const;
+				bool& isPat,
+				JwtState& state) const;
 
 	/**
 		Releases a claim taken by TryAwaitOrClaimTokenResolution() and wakes any
@@ -142,6 +143,7 @@ private:
 				const QByteArrayList& scopes,
 				bool isPat,
 				qint64 jwtExpSecs = 0) const;
+	void StoreExpiredToken(const QByteArray& token) const;
 	void InvalidateTokenCache(const QByteArray& token) const;
 
 	/**
@@ -202,6 +204,7 @@ private:
 
 	mutable QMutex m_tokenCacheMutex;
 	mutable QHash<QByteArray, TokenCacheEntry> m_tokenCache;
+	mutable QHash<QByteArray, qint64> m_expiredTokenCache;
 
 	// Tokens currently being resolved by some thread via ResolveUserId(), so
 	// concurrent callers for the same token can wait for that result instead

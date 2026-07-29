@@ -132,19 +132,6 @@ WebSocket {
 					subscription.state = "Error"
 			}
 		}
-
-		// Server prefixes auth failures: "Unauthorized: <detail>" / "Forbidden: <detail>"
-		// (detail comes from CAuthenticationManagerComp contextError.message).
-		let isAuthFailure = false
-		if (rawMessage && rawMessage.indexOf("Unauthorized") >= 0)
-			isAuthFailure = true
-		if (rawMessage && rawMessage.indexOf("Forbidden") >= 0)
-			isAuthFailure = true
-
-		if (isAuthFailure){
-			console.warn("SubscriptionManager: auth failure on subscription — requesting token refresh:", rawMessage)
-			Events.sendEvent("AccessTokenUnauthorized", {})
-		}
 	}
 
 	function onAccessTokenRefreshed(parameters) {

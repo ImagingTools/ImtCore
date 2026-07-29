@@ -267,17 +267,19 @@ void CTaskManagerGuiComp::OnDuplicateTask()
 
 		for (const QByteArray& taskId : selectedIds){
 			const QByteArray taskTypeId = objectPtr->GetObjectTypeId(taskId);
+			
 			const QString sourceTaskName = objectPtr->GetElementInfo(
 				taskId,
 				imtbase::ICollectionInfo::EIT_NAME).toString();
+				
 			const bool sourceEnabled = objectPtr->GetElementInfo(
 				taskId,
 				imtbase::ICollectionInfo::EIT_ENABLED).toBool();
 
 			QByteArray newTaskId = objectPtr->InsertNewObject(
 				taskTypeId,
-				QString("Copy of %1").arg(sourceTaskName),
-				QString(),
+				sourceTaskName, 
+				tr("Copy of") + " " + sourceTaskName,
 				objectPtr->GetObjectPtr(taskId));
 
 			if (newTaskId.isEmpty()){
