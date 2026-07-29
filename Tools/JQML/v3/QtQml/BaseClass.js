@@ -415,53 +415,38 @@ class BaseClass extends QtObject {
 	toJson() {
 		let json = '{'
 		let isFirst = true
-		for (let key of this.getProperties()) {
-			if(key === '__typename' && this[key] === '') continue
+		let self = this.__self
 
-			if (this[key] == null && this._internal.containceInRemoved(key)){
+		for (let key of this.getProperties()) {
+			let meta = self.constructor.meta[key]
+			let thisValue = key in self ? self[key] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
+
+			if(key === '__typename' && thisValue === '') continue
+
+			if (thisValue == null && this._internal.containceInRemoved(key)){
 				continue
 			}
 			if (!isFirst) json += ','
 			isFirst = false
-			if (typeof this[key] === 'object') {
-				if (Array.isArray(this[key])) {
-
-					json += '"' + this.getJSONKeyForProperty(key) + '":'
-
-					json += "["
-
-					for (let j = 0; j < this[key].length; j++) {
-						let value = this[key][j]
-						if (j != 0) {
-							json += ", "
-						}
-
-						if (typeof value === "string") {
-							value = JSON.stringify(value)
-						}
-						
-						json += value
-					}
-
-					json += "]"
-				}
-				else if (this[key] !== null) {
-					json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].toJson()
-				}
-				else{
+			if (typeof thisValue === 'object') {
+				if(thisValue instanceof QtObject) {
+					json += '"' + this.getJSONKeyForProperty(key) + '":' + thisValue.toJson()
+				} else if(thisValue !== null){
+					json += '"' + this.getJSONKeyForProperty(key) + '":' + JSON.stringify(thisValue)
+				} else {
 					json += '"' + this.getJSONKeyForProperty(key) + '": null'
 				}
 			} else {
-				let value = this[key]
+				let value = thisValue
 				if (value === undefined) {
 					value = null
 				}
-				let safeValue = this[key]
+				let safeValue = thisValue
 				if (typeof safeValue === 'string') {
 					safeValue = this.escapeSpecialChars(safeValue)
 				}
 
-				json += '"' + this.getJSONKeyForProperty(key) + '":' + (typeof this[key] === 'string' ? '"' + safeValue + '"' : value)
+				json += '"' + this.getJSONKeyForProperty(key) + '":' + (typeof thisValue === 'string' ? '"' + safeValue + '"' : value)
 			}
 		}
 		json += '}'
@@ -471,45 +456,34 @@ class BaseClass extends QtObject {
 	toGraphQL() {
 		let graphQL = '{'
 		let isFirst = true
+		let self = this.__self
+
 		for (let key of this.getProperties()) {
-			if (this[key] == null && this._internal.containceInRemoved(key)){
+			let meta = self.constructor.meta[key]
+			let thisValue = key in self ? self[key] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
+
+			if (thisValue == null && this._internal.containceInRemoved(key)){
 				continue
 			}
 			if (!isFirst) graphQL += ','
 			isFirst = false
-			if (typeof this[key] === 'object') {
-				if (Array.isArray(this[key])) {
-					graphQL += this.getJSONKeyForProperty(key) + ':'
-
-					graphQL += "["
-
-					for (let j = 0; j < this[key].length; j++) {
-						if (j != 0) {
-							graphQL += ", "
-						}
-
-						if (typeof this[key][j] === "string") {
-							graphQL += "\"" + this.escapeSpecialChars(this[key][j]) + "\""
-						}
-						else {
-							graphQL += this[key][j]
-						}
-					}
-
-					graphQL += "]"
-				}
-				else {
-					graphQL += this.getJSONKeyForProperty(key) + ':' + ((this[key] !== null) ? this[key].toGraphQL() : "null")
+			if (typeof thisValue === 'object') {
+				if(thisValue instanceof QtObject) {
+					graphQL += '"' + this.getJSONKeyForProperty(key) + '":' + thisValue.toGraphQL()
+				} else if(thisValue !== null){
+					graphQL += '"' + this.getJSONKeyForProperty(key) + '":' + JSON.stringify(thisValue)
+				} else {
+					graphQL += '"' + this.getJSONKeyForProperty(key) + '": null'
 				}
 			} else {
-				let value = this[key]
+				let value = thisValue
 				if (value === undefined) {
 					value = null
 				}
 
 				graphQL += this.getJSONKeyForProperty(key) + ':';
-				if (typeof this[key] === 'string') {
-					let data = this[key];
+				if (typeof thisValue === 'string') {
+					let data = thisValue;
 					
 					graphQL += '"'
 					graphQL += this.escapeSpecialChars(data)

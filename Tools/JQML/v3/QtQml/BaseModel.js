@@ -1,3 +1,4 @@
+const QtObject = require('./QtObject')
 const ListModel = require('./Models/ListModel')
 const Bool = require('./Bool')
 const Var = require('./Var')
@@ -37,48 +38,33 @@ class BaseModel extends ListModel {
 		for(let i = 0; i < this.count; i++){
 			let item = this.get(i).item
 			let list = this.getProperties(item)
+			let itemSelf = item.__self
 
 			json += '{'
 			let j = 0
 			for(let key of list){
-				if (item[key] == null){
-					json += '"' + item.getJSONKeyForProperty(key) + '": null'
-				}
-				else if(typeof item[key] === 'object'){
-					if (Array.isArray(item[key])){
-						json += '"' + item.getJSONKeyForProperty(key) + '":'
+				let meta = itemSelf.constructor.meta[key]
+				let itemValue = key in itemSelf ? itemSelf[key] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
 
-						json += "["
-
-						for (let k = 0; k < item[key].length; k++){
-							if (k != 0){
-								json += ", "
-							}
-
-							if (typeof item[key][k] === "string"){
-								json += "\"" + this.escapeSpecialChars(item[key][k]) + "\""
-							}
-							else{
-								json += item[key][k]
-							}
-						}
-
-						json += "]"
-					}
-					else if (typeof item[key].toJson === "function"){
-						json += '"' + item.getJSONKeyForProperty(key) + '":' + item[key].toJson()
+				if(typeof itemValue === 'object'){
+					if(itemValue instanceof QtObject) {
+						json += '"' + item.getJSONKeyForProperty(key) + '":' + itemValue.toJson()
+					} else if(itemValue !== null){
+						json += '"' + item.getJSONKeyForProperty(key) + '":' + JSON.stringify(itemValue)
+					} else {
+						json += '"' + item.getJSONKeyForProperty(key) + '": null'
 					}
 				} else {
-					let value = item[key]
+					let value = itemValue
 					if (value === undefined){
 						value = null
 					}
-					let safeValue = item[key]
+					let safeValue = itemValue
 					if (typeof safeValue === 'string'){
 						safeValue = this.escapeSpecialChars(safeValue)
 					}
 
-					json += '"' + item.getJSONKeyForProperty(key) + '":' + (typeof item[key] === 'string' ? '"' + safeValue + '"' : value)
+					json += '"' + item.getJSONKeyForProperty(key) + '":' + (typeof itemValue === 'string' ? '"' + safeValue + '"' : value)
 				}
 				if(j < list.size - 1) json += ','
 				j++
@@ -96,44 +82,29 @@ class BaseModel extends ListModel {
 		for(let i = 0; i < this.count; i++){
 			let item = this.get(i).item
 			let list = this.getProperties(item)
+			let itemSelf = item.__self
 
 			graphQL += '{'
 			let j = 0
 			for(let key of list){
-				if (item[key] == null){
-					graphQL += item.getJSONKeyForProperty(key) + ':null'
-				}
-				else if(typeof item[key] === 'object'){
-					if (Array.isArray(item[key])){
-						graphQL +=  item.getJSONKeyForProperty(key) + ':'
-
-						graphQL += "["
-
-						for (let k = 0; k < item[key].length; k++){
-							if (k != 0){
-								graphQL += ", "
-							}
-
-							if (typeof item[key][k] === "string"){
-								graphQL += "\"" + this.escapeSpecialChars(item[key][k]) + "\""
-							}
-							else{
-								graphQL += item[key][k]
-							}
-						}
-
-						graphQL += "]"
-					}
-					else{
-						graphQL += item.getJSONKeyForProperty(key) + ':' + item[key].toGraphQL()
+				let meta = itemSelf.constructor.meta[key]
+				let itemValue = key in itemSelf ? itemSelf[key] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
+				
+				if(typeof itemValue === 'object'){
+					if(itemValue instanceof QtObject) {
+						graphQL += '"' + item.getJSONKeyForProperty(key) + '":' + itemValue.toGraphQL()
+					} else if(itemValue !== null){
+						graphQL += '"' + item.getJSONKeyForProperty(key) + '":' + JSON.stringify(itemValue)
+					} else {
+						graphQL += '"' + item.getJSONKeyForProperty(key) + '": null'
 					}
 				} else {
-					let value = item[key]
+					let value = itemValue
 					if (value === undefined){
 						value = null
 					}
 
-					graphQL += item.getJSONKeyForProperty(key) + ':' + (typeof item[key] === 'string' ? '"' + this.escapeSpecialChars(item[key]) + '"' : value)
+					graphQL += item.getJSONKeyForProperty(key) + ':' + (typeof itemValue === 'string' ? '"' + this.escapeSpecialChars(itemValue) + '"' : value)
 				}
 				if(j < list.size - 1) graphQL += ','
 				j++
