@@ -41,7 +41,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PageQmlItem" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtdocgui/MultiDocWorkspacePageView.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtdocgui/Pages/MultiDocWorkspacePageView.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="StartQmlItem" Type="Text" ExportId="FixedItemQmlPath">
                         <Data IsEnabled="false"/>
