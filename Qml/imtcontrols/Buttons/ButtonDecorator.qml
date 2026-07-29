@@ -115,13 +115,15 @@ DecoratorBase {
 		anchors.fill: parent
 		radius: Style.buttonRadius
 		color: !commonButtonDecorator.baseElement ? "transparent" :
-													commonButtonDecorator.baseElement.down || commonButtonDecorator.baseElement.checked ?
-														Style.baseColor : commonButtonDecorator.baseElement.hovered ?
-															Style.baseColor : Style.backgroundColor2
+													!commonButtonDecorator.baseElement.enabled ?
+														Style.buttonInactiveColor : commonButtonDecorator.baseElement.down || commonButtonDecorator.baseElement.checked ?
+															Style.buttonPressedColor : commonButtonDecorator.baseElement.hovered ?
+																Style.buttonHoverColor : Style.buttonColor
 		border.width: Style.buttonBorderWidth
 		border.color: !commonButtonDecorator.baseElement ? "transparent" :
+														   !commonButtonDecorator.baseElement.enabled ? Style.buttonBorderInactiveColor :
 														   commonButtonDecorator.baseElement.focus ? Style.buttonBorderFocusColor :
-																									 Style.borderColor
+																									 Style.buttonBorderColor
 	}
 
 	Item {
@@ -186,7 +188,7 @@ DecoratorBase {
 
 				width: parent.width;
 
-				color: !commonButtonDecorator.baseElement ? "transparent" : (commonButtonDecorator.baseElement.font && commonButtonDecorator.baseElement.font.color !== "") ? commonButtonDecorator.baseElement.font.color : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactiveTextColor
+				color: !commonButtonDecorator.baseElement ? "transparent" : (commonButtonDecorator.baseElement.font && commonButtonDecorator.baseElement.font.color !== "") ? commonButtonDecorator.baseElement.font.color : commonButtonDecorator.baseElement.enabled ? Style.buttonTextColor : Style.buttonInactiveTextColor
 
 				font.pixelSize: commonButtonDecorator.fontSize;
 				font.family: commonButtonDecorator.fontFamily;

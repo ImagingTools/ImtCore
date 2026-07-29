@@ -7,7 +7,7 @@ Dialog {
 	id: messageDialog;
 	
 	width: Style.sizeHintL;
-	
+	backgroundColor: Style.baseColor
 	title: qsTr("Message");
 	
 	property string message;

@@ -2,7 +2,6 @@
 import QtQuick 2.0
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
 import imtguigql 1.0
 import imtauthPermissionsSdl 1.0
 import imtauthTenantMembershipsSdl 1.0

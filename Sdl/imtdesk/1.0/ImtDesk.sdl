@@ -161,6 +161,7 @@ input EntityContextTicketsInput {
 type EntityContextTicketsPayload {
 	items: [TicketItemData]
 	notification: NotificationItem
+	totalCount: Integer
 }
 
 input CreateEntityContextTicketInput {

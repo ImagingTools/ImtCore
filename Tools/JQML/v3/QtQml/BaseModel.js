@@ -217,19 +217,23 @@ class BaseModel extends ListModel {
 	}
 
 	fromJSON(json){
+		let arr = JSON.parse(json)
+		return this.fromObject(arr)
+	}
+
+	fromObject(sourceObject){
 		this.clear()
 
-		let arr = JSON.parse(json)
-		for(let i = 0; i < arr.length; i++){
+		for(let i = 0; i < sourceObject.length; i++){
 			let sourceTypename
-			if (arr[i]['__typename']){
-				sourceTypename = arr[i]['__typename']
+			if (sourceObject[i]['__typename']){
+				sourceTypename = sourceObject[i]['__typename']
 			}
 			else {
 				continue
 			}
 			let obj = QtFunctions.createComponent(sourceTypename + ".qml").createObject(this)
-			obj.fromObject(arr[i])
+			obj.fromObject(sourceObject[i])
 			this.addElement(obj)
 		}
 

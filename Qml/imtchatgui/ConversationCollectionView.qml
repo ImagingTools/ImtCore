@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.12
 import Acf 1.0
-import imtgui 1.0
-import imtcolgui 1.0
-import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
 import imtchatImtChatSdl 1.0

@@ -17,7 +17,7 @@ import imtauthgui 1.0
  * Action requests are surfaced as signals so the parent (TenantMembersPage)
  * can pop the appropriate menu and call the api client.
  */
-TenantCollectionItemDelegateBase {
+SimpleCollectionItemDelegateBase {
 	id: row
 
 	// --- Inputs ---

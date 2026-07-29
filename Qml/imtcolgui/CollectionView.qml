@@ -512,16 +512,31 @@ Item {
 		}
 	}
 	
+	Rectangle {
+		id: metaInfoSeparator;
+
+		anchors.right: collectionMetaInfo.left;
+		anchors.top: parent.top;
+		anchors.topMargin: container.viewContentY
+		anchors.bottom: parent.bottom;
+
+		width: 1;
+		color: Style.borderColor;
+		opacity: 0.5;
+
+		visible: root.visibleMetaInfo;
+	}
+
 	MetaInfo {
 		id: collectionMetaInfo;
-		
+
 		anchors.top: parent.top;
 		anchors.topMargin: container.viewContentY
 		anchors.right: parent.right;
-		
+
 		width: visible ? root.metaInfoWidth : 0;
 		height: parent.height;
-		
+
 		visible: root.visibleMetaInfo;
 	}
 	
@@ -549,8 +564,6 @@ Item {
 			text: qsTr("Please select an item for showing additional informations");
 		}
 	}
-
-
 }
 
 

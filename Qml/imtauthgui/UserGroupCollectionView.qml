@@ -1,12 +1,8 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
-import imtcolgui 1.0
-import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
-import imtauthGroupsSdl 1.0
 
 RemoteCollectionView {
 	id: userGroupCollectionViewContainer;
@@ -18,14 +14,12 @@ RemoteCollectionView {
 	property string productId;
 	property var documentManager: null;
 	
-	commandsDelegateComp: Component {DocumentCollectionViewDelegate {
+	commandsDelegateComp: Component {DocCollectionViewDelegate {
 			collectionView: userGroupCollectionViewContainer;
-			documentManagerId: "Administration/Groups"
-			documentTypeIds: ["Group"]
-			documentDataControllersComp: [documentDataControllerComp]
-			documentViewsComp: [userGroupDocumentComp]
-			isSingleDocumentMode: true
-	
+			documentManager: userGroupCollectionViewContainer.documentManager;
+
+			Component.onCompleted: registerDocumentType("Group", qsTr("Group"))
+
 			function updateStateBaseCommands(selection, commandsController, elementsModel){
 				let isEnabled = selection.length > 0;
 				if(commandsController){
@@ -35,65 +29,10 @@ RemoteCollectionView {
 					commandsController.setCommandIsEnabled("Revision", selection.length === 1);
 				}
 			}
-			
-			function getHeaders(){
-				return userGroupCollectionViewContainer.getHeaders()
-			}
 		}
 	}
 
 	function handleSubscription(dataModel){
 		userGroupCollectionViewContainer.doUpdateGui();
-	}
-
-	Component {
-		id: userGroupDocumentComp;
-		
-		UserGroupView {
-			id: groupEditor;
-
-			productId: userGroupCollectionViewContainer.productId;
-			
-			commandsControllerComp: Component {GqlBasedCommandsController {
-					typeId: "Group";
-				}
-			}
-			
-			function getHeaders(){
-				return userGroupCollectionViewContainer.getHeaders()
-			}
-		}
-	}
-	
-	Component {
-		id: documentDataControllerComp;
-		
-		GqlRequestDocumentDataController {
-			id: requestDocumentDataController
-			
-			property GroupData groupData: documentModel;
-
-			typeId: "Group";
-			documentName: groupData && groupData.m_name ? groupData.m_name: "";
-			documentDescription: groupData && groupData.m_description ? groupData.m_description: "";
-			
-			gqlGetCommandId: ImtauthGroupsSdlCommandIds.s_groupItem;
-			gqlUpdateCommandId: ImtauthGroupsSdlCommandIds.s_groupUpdate;
-			gqlAddCommandId: ImtauthGroupsSdlCommandIds.s_groupAdd;
-			
-			Component.onCompleted: {
-				getRequestInputParam.InsertField(GroupItemInputTypeMetaInfo.s_productId, userGroupCollectionViewContainer.productId);
-				addRequestInputParam.InsertField(GroupItemInputTypeMetaInfo.s_productId, userGroupCollectionViewContainer.productId);
-				updateRequestInputParam.InsertField(GroupItemInputTypeMetaInfo.s_productId, userGroupCollectionViewContainer.productId);
-			}
-			
-			documentModelComp: Component {
-				GroupData {}
-			}
-			
-			function getHeaders(){
-				return userGroupCollectionViewContainer.getHeaders();
-			}
-		}
 	}
 }

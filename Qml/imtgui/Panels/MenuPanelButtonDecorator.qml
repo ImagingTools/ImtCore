@@ -33,7 +33,8 @@ DecoratorBase {
         anchors.fill: leftPanelElement;
 		anchors.margins: Style.marginS;
         radius: Style.buttonRadius;
-        color: leftPanelElement.baseElement.selected || leftPanelElement.baseElement.highlighted ? Style.backgroundColor2 : "transparent";
+        color: leftPanelElement.baseElement.selected ? Style.selectedColor :
+											 leftPanelElement.baseElement.highlighted ? Style.backgroundColor2 : "transparent";
         border.width: 1;
         border.color: leftPanelElement.baseElement.selected ? Style.iconColorOnSelected : "transparent";
     }

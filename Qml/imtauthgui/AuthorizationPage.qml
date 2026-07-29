@@ -14,7 +14,7 @@ Rectangle {
 	property string state:"";
 
 	property int mainRadius: Style.radiusL;
-	property string mainColor: Style.backgroundColor2
+	property string mainColor: Style.baseColor
 
 	property bool canRecoveryPassword: true;
 	property bool canRegisterUser: true;

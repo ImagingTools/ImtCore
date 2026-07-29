@@ -3,7 +3,6 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtauthgui 1.0
 import imtlicgui 1.0
-import imtcolgui 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtlicLicensesSdl 1.0
