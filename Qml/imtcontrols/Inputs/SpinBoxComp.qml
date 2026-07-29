@@ -46,9 +46,10 @@ Item {
     
     Rectangle{
         id: mainRec;
-        
+
         anchors.fill: parent;
-        
+
+        color: Style.baseColor;
         radius: Style.radiusM;
         border.width: 1;
         border.color: Style.borderColor;
@@ -124,11 +125,12 @@ Item {
         
         Rectangle{
             id: buttonsBlock;
-            
+
             anchors.verticalCenter: parent.verticalCenter;
             anchors.right: parent.right;
             anchors.rightMargin: 2*mainRec.border.width;
-            
+
+            color: "transparent";
             width: Style.buttonWidthS;
             height: parent.height - 2*mainRec.border.width;
             

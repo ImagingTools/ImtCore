@@ -11,7 +11,7 @@ Rectangle {
 	width: list.width + externButtons.width;
 	height: visible ? Style.controlHeightL : 0;
 	
-	color: Style.tabPanelBackgroundColor;
+	color: Style.baseColor;
 
 	property int selectedIndex: 0;
 	property int count: 0;

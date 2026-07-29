@@ -1090,7 +1090,7 @@ Dialog {
 					anchors.verticalCenter: parent.verticalCenter
 					height: parent.height
 					radius: height / 2
-					color: Style.backgroundColor2
+					color: Style.baseColor
 
 					Text {
 						anchors.fill: parent
@@ -1113,7 +1113,7 @@ Dialog {
 					width: root.filterFieldWidth
 					height: parent.height
 					radius: height / 2
-					color: Style.backgroundColor2
+					color: Style.baseColor
 					borderWidth: filterField.textInputActiveFocus ? 1 : 0
 					placeHolderText: qsTr("Search %1").arg(root.currentFolderName())
 
