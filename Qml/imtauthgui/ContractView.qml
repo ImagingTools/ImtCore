@@ -39,7 +39,7 @@ ViewBase {
 
 	function submitContract() {
 		if (!container.__selectedRelationshipId || !container.__selectedTargetTenantId) {
-			ModalDialogManager.showInfoDialog(qsTr("Relationship and counterparty tenant are required."))
+			PopupManager.addWarningMessage(qsTr("Relationship and counterparty tenant are required."), true)
 			return
 		}
 		if (container.apiClient) {

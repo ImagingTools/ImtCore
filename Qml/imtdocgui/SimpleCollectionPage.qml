@@ -4,26 +4,36 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-import imtdocgui 1.0
-import imtauthgui 1.0
 
 /**
- * TenantSimpleCollectionPage
+ * SimpleCollectionPage
  *
- * Generic CRUD page for TenantEditor tabs that need a flat list with
- * checkbox-multiselect, search filter, Create/Edit/Remove header buttons
- * and create/edit sub-pages driven by a CollectionDocumentManager.
+ * Generic CRUD page for a flat list: checkbox multiselect, search filter,
+ * Create/Edit/Remove header buttons and create/edit sub-pages driven by a
+ * CollectionDocumentManager.
  *
- * Consumed by TenantRolesPage, TenantGroupsPage; the Members tab has its
- * own delegate and does not use this component.
+ * A subclass supplies the entity-specific wiring and nothing else - see
+ * TenantRolesPage / TenantGroupsPage for the minimal shape, TenantMembersPage
+ * for one that also replaces the delegate and the header buttons.
+ *
+ * Rows come from exactly one of:
+ *   - `dataProvider` - a FilterableSelectDataProvider; this page drives
+ *     fetch/fetchMore/retry and reflects its loading and error state.
+ *   - `listModel` - a model the subclass builds and refreshes itself. Note
+ *     that `refresh()` does nothing in this mode; the subclass owns reloading.
+ *
+ * It also implements the `actionHandler` interface expected by
+ * SimpleCollectionItemDelegateBase (canManage/canEdit/canDelete, openEdit,
+ * confirmRemoveItems).
  */
 ViewBase {
 	id: root
 
 	commandsPanelVisible: false
 	contentColor: Style.baseColor
-	readonly property var tenantData: root.model
 	property var stateManager: null
+	// Not used by this page; declared here because the whole page family is
+	// wired the same way by its host and every subclass reads it.
 	property var apiClient: null
 
 	// --- entity-specific configuration ---
@@ -49,11 +59,35 @@ ViewBase {
 	property var createPermissionIds: []
 	property var editPermissionIds: []
 	property var deletePermissionIds: []
-	function removeItems(ids) {}
+
+	// Width of the centered content column; the table matches it.
+	readonly property int contentWidth: Math.min(root.width - Style.marginXL * 2, Style.contentWidthMax)
+	readonly property int contentLeftMargin: Math.max((root.width - root.contentWidth) / 2, Style.marginXL)
+
+	function removeItems(ids) {
+		console.warn("SimpleCollectionPage.removeItems() is not implemented; override it in the consumer.")
+	}
+
+	function confirmRemoveItems(ids, itemTitle) {
+		var singleItem = ids.length === 1 && itemTitle && itemTitle !== ""
+		var title = singleItem ? root.__deleteSingleTitle : root.__deleteMultipleTitle
+		var message = singleItem
+			? qsTr("Are you sure you want to delete \"%1\"? This action cannot be undone.").arg(itemTitle)
+			: qsTr("Are you sure you want to delete %1 selected item(s)? This action cannot be undone.").arg(ids.length)
+		ModalDialogManager.showConfirmationDialog(title, message, function(result) {
+			if (result === Enums.yes) {
+				root.removeItems(ids)
+				if (root.selectionManager)
+					root.selectionManager.clear()
+			}
+		})
+	}
 
 	function updateGui() {}
 	function updateModel() {}
 
+	// Reloads through `dataProvider`. A `listModel`-driven subclass reloads
+	// itself and can leave this alone.
 	function refresh() {
 		if (!root.visible) {
 			root.__refreshPending = true
@@ -88,7 +122,8 @@ ViewBase {
 	property bool __isCreating: false
 	property var __activeShellView: null
 
-	readonly property bool __canManage: stateManager
+	// Public - read by actionHandler consumers such as SimpleCollectionItemDelegateBase.
+	readonly property bool canManage: stateManager
 		? (managePermissionIds.length > 0
 			? stateManager.hasAnyPermission(managePermissionIds)
 			: stateManager.canManageMembers)
@@ -102,9 +137,9 @@ ViewBase {
 		return fallbackValue
 	}
 
-	readonly property bool __canCreate: __resolveCommandPermission(createPermissionIds, __canManage)
-	readonly property bool __canEdit: __resolveCommandPermission(editPermissionIds, __canManage)
-	readonly property bool __canDelete: __resolveCommandPermission(deletePermissionIds, __canManage)
+	readonly property bool canCreate: __resolveCommandPermission(createPermissionIds, canManage)
+	readonly property bool canEdit: __resolveCommandPermission(editPermissionIds, canManage)
+	readonly property bool canDelete: __resolveCommandPermission(deletePermissionIds, canManage)
 
 	readonly property int __selectedCount: selectionManager ? selectionManager.selectedIds.length : 0
 	readonly property bool __onListPage: collectionStackView.currentIndex === 0
@@ -115,8 +150,31 @@ ViewBase {
 	property var __listItems: []
 	property bool __refreshPending: false
 
+	// Exactly one of listModel/dataProvider should be set; listModel wins if both are (see __warnIfMisconfigured).
+	readonly property var effectiveModel: root.listModel ? root.listModel : root.__listItems
+
+	function __findItemById(id) {
+		var items = root.effectiveModel
+		if (!items)
+			return null
+		var count = items.count !== undefined ? items.count : items.length
+		for (var i = 0; i < count; i++) {
+			var item = items.get ? items.get(i) : items[i]
+			if (item && item.id === id)
+				return item
+		}
+		return null
+	}
+
+	function __warnIfMisconfigured() {
+		if (root.listModel && root.dataProvider)
+			console.warn("SimpleCollectionPage: both listModel and dataProvider are set - listModel wins and dataProvider results are ignored.")
+	}
+
 	property var dataProvider: null
+	onListModelChanged: __warnIfMisconfigured()
 	onDataProviderChanged: {
+		__warnIfMisconfigured()
 		if (dataProvider && root.visible)
 			dataProvider.fetch(__lastFilterText)
 		else if (dataProvider)
@@ -161,16 +219,19 @@ ViewBase {
 			collectionStackView.removePage(collectionStackView.count - 1)
 	}
 
+	function __pushEditorPage() {
+		if (root.documentManager)
+			collectionStackView.addPage(editorViewComponent)
+		else if (root.customEditorComponent)
+			collectionStackView.addPage(root.customEditorComponent)
+		collectionStackView.next()
+	}
+
 	function openCreate() {
 		__clearExtraPages()
 		root.__isCreating = true
 		stackViewHeader.addHeader("create", qsTr("Create New %1").arg(root.entityName))
-		if (root.documentManager) {
-			collectionStackView.addPage(editorViewComponent)
-		} else if (root.customEditorComponent) {
-			collectionStackView.addPage(root.customEditorComponent)
-		}
-		collectionStackView.next()
+		__pushEditorPage()
 	}
 
 	function openEdit(itemId, itemName, itemDescription) {
@@ -182,12 +243,7 @@ ViewBase {
 		root.__isCreating = false
 		__clearExtraPages()
 		stackViewHeader.addHeader("edit", itemName || qsTr("Edit %1").arg(root.entityName))
-		if (root.documentManager) {
-			collectionStackView.addPage(editorViewComponent)
-		} else if (root.customEditorComponent) {
-			collectionStackView.addPage(root.customEditorComponent)
-		}
-		collectionStackView.next()
+		__pushEditorPage()
 	}
 
 	Connections {
@@ -206,8 +262,8 @@ ViewBase {
 		id: stackViewHeader
 		anchors.top: parent.top
 		anchors.left: parent.left
-		anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
-		width: Math.min(parent.width - Style.marginXL * 2, 1000)
+		anchors.leftMargin: root.contentLeftMargin
+		width: root.contentWidth
 		height: Style.controlHeightL
 		initialItemTitleVisible: true
 
@@ -242,7 +298,7 @@ ViewBase {
 
 	Text {
 		id: createBtn
-		visible: root.showCreateButton && root.__canCreate && root.__onListPage && root.__useDefaultButtons
+		visible: root.showCreateButton && root.canCreate && root.__onListPage && root.__useDefaultButtons
 		anchors.right: stackViewHeader.right
 		anchors.verticalCenter: stackViewHeader.verticalCenter
 		text: root.__createBtnText
@@ -255,7 +311,7 @@ ViewBase {
 			hoverEnabled: true
 			cursorShape: Qt.PointingHandCursor
 			onClicked: {
-				if (root.__canCreate)
+				if (root.canCreate)
 					root.openCreate()
 			}
 		}
@@ -263,7 +319,7 @@ ViewBase {
 
 	Text {
 		id: editBtn
-		visible: root.__canEdit && root.__onListPage && root.__useDefaultButtons
+		visible: root.canEdit && root.__onListPage && root.__useDefaultButtons
 		anchors.right: createBtn.left
 		anchors.rightMargin: Style.marginL
 		anchors.verticalCenter: stackViewHeader.verticalCenter
@@ -276,27 +332,23 @@ ViewBase {
 		MouseArea {
 			anchors.fill: parent
 			hoverEnabled: true
-			cursorShape: root.__selectedCount === 1 && root.__canEdit ? Qt.PointingHandCursor : Qt.ArrowCursor
-			enabled: root.__selectedCount === 1 && root.__canEdit
+			cursorShape: root.__selectedCount === 1 && root.canEdit ? Qt.PointingHandCursor : Qt.ArrowCursor
+			enabled: root.__selectedCount === 1 && root.canEdit
 			onClicked: {
-				if (!root.__canEdit)
+				if (!root.canEdit)
 					return
 
 				var selId = root.selectionManager.selectedIds[0]
-				var items = root.__listItems
-				for (var i = 0; i < items.length; i++) {
-					if (items[i] && items[i].id === selId) {
-						root.__openEdit(selId, items[i].title || items[i].id || "", items[i].description || "")
-						break
-					}
-				}
+				var item = root.__findItemById(selId)
+				if (item)
+					root.__openEdit(selId, item.title || item.id || "", item.description || "")
 			}
 		}
 	}
 
 	Text {
 		id: removeBtn
-		visible: root.__canDelete && root.__onListPage && root.__useDefaultButtons
+		visible: root.canDelete && root.__onListPage && root.__useDefaultButtons
 		anchors.right: editBtn.left
 		anchors.rightMargin: Style.marginL
 		anchors.verticalCenter: stackViewHeader.verticalCenter
@@ -309,30 +361,20 @@ ViewBase {
 		MouseArea {
 			anchors.fill: parent
 			hoverEnabled: true
-			cursorShape: root.__selectedCount > 0 && root.__canDelete ? Qt.PointingHandCursor : Qt.ArrowCursor
-			enabled: root.__selectedCount > 0 && root.__canDelete
+			cursorShape: root.__selectedCount > 0 && root.canDelete ? Qt.PointingHandCursor : Qt.ArrowCursor
+			enabled: root.__selectedCount > 0 && root.canDelete
 			onClicked: {
-				if (!root.__canDelete)
+				if (!root.canDelete)
 					return
 
-				ModalDialogManager.showConfirmationDialog(
-							root.__deleteMultipleTitle,
-							qsTr("Are you sure you want to delete %1 selected item(s)? This action cannot be undone.").arg(root.__selectedCount),
-							function(result) {
-								if (result === Enums.yes) {
-									var ids = root.selectionManager.selectedIds.slice()
-									root.removeItems(ids)
-									root.selectionManager.clear()
-								}
-							}
-							)
+				root.confirmRemoveItems(root.selectionManager.selectedIds.slice(), "")
 			}
 		}
 	}
 
 	Loader {
 		id: customHeaderButtonsLoader
-		visible: root.headerButtonsComponent && root.__onListPage
+		visible: !!root.headerButtonsComponent && root.__onListPage
 		anchors.right: stackViewHeader.right
 		anchors.verticalCenter: stackViewHeader.verticalCenter
 		sourceComponent: root.headerButtonsComponent
@@ -344,7 +386,7 @@ ViewBase {
 		anchors.top: stackViewHeader.bottom
 		anchors.topMargin: Style.marginS
 		anchors.horizontalCenter: parent.horizontalCenter
-		width: Math.min(parent.width - Style.marginXL * 2, 1000)
+		width: root.contentWidth
 		visible: root.__onListPage && root.descriptionText.length > 0
 		text: root.descriptionText
 		font.pixelSize: Style.fontSizeM
@@ -367,144 +409,37 @@ ViewBase {
 	Component {
 		id: listView
 
-		Item {
-			id: listViewItem
-			readonly property var effectiveModel: root.listModel ? root.listModel : root.__listItems
-			readonly property int effectiveCount: effectiveModel ? (effectiveModel.count || effectiveModel.length || 0) : 0
+		SimpleCollectionTable {
+			id: collectionTable
+			model: root.effectiveModel
+			delegateComponent: root.delegateComponent
+			actionHandler: root
+			emptyText: root.__emptyText
+			filterPlaceholder: root.__filterPlaceholder
+			initialLoading: root.dataProvider ? root.dataProvider.isInitialLoading : false
+			loadingMore: root.dataProvider ? root.dataProvider.isPageLoading : false
+			errorMessage: root.dataProvider && root.dataProvider.error
+				? (root.dataProvider.error.message || qsTr("Error loading items"))
+				: ""
 
-			SearchTextInput {
-				id: filterInput
-				anchors.top: parent.top
-				anchors.topMargin: Style.marginM
-				anchors.horizontalCenter: parent.horizontalCenter
-				width: Math.min(parent.width - Style.marginXL * 2, 1000)
-				placeHolderText: root.__filterPlaceholder
-				onTextChanged: {
-					selectionManager_.clear()
-					root.__lastFilterText = text
-					filterDebounce.restart()
-				}
+			onFilterChanged: root.__lastFilterText = text
+			onFilterRequested: {
+				if (root.dataProvider)
+					root.dataProvider.fetch(text)
+			}
+			onLoadMoreRequested: {
+				if (root.dataProvider)
+					root.dataProvider.fetchMore()
+			}
+			onRetryRequested: {
+				if (root.dataProvider)
+					root.dataProvider.retry()
 			}
 
-			Timer {
-				id: filterDebounce
-				interval: 300
-				repeat: false
-				onTriggered: {
-					if (root.dataProvider)
-						root.dataProvider.fetch(filterInput.text)
-				}
-			}
-
-			TenantTableContainer {
-				anchors.top: filterInput.bottom
-				anchors.topMargin: Style.marginM
-				height: Math.min(tableHeader.height + emptyState.height + itemListView.contentHeight + 2,
-								 parent.height - filterInput.height - filterInput.anchors.topMargin - Style.marginM - Style.marginL)
-
-				IdSelectionManager {
-					id: selectionManager_
-					multiSelect: true
-					Component.onCompleted: {
-						root.selectionManager = selectionManager_
-					}
-					Component.onDestruction: {
-						if (root)
-							root.selectionManager = null
-					}
-				}
-
-				TenantTableHeader {
-					id: tableHeader
-					anchors.top: parent.top
-					anchors.left: parent.left
-					anchors.right: parent.right
-					selectedCount: selectionManager_.selectedIds.length
-					totalCount: itemListView.count
-					checkState: selectionManager_.selectedIds.length === 0
-								? Qt.Unchecked
-								: (selectionManager_.selectedIds.length === itemListView.count
-								   ? Qt.Checked : Qt.PartiallyChecked)
-
-					onSelectAllToggled: {
-						if (checkState === Qt.Checked) {
-							selectionManager_.clear()
-						} else {
-							var allIds = []
-							var items = listViewItem.effectiveModel
-							var itemCount = itemListView.count
-							for (var i = 0; i < itemCount; i++) {
-								var item = items && items.get ? items.get(i) : items[i]
-								if (item && item.id)
-									allIds.push(item.id)
-							}
-							selectionManager_.selectMultiple(allIds)
-						}
-					}
-				}
-
-				Item {
-					id: emptyState
-					visible: listViewItem.effectiveCount === 0
-					anchors.top: tableHeader.bottom
-					anchors.left: parent.left
-					anchors.right: parent.right
-					height: visible ? Style.controlHeightL + Style.marginL : 0
-
-					BaseText {
-						anchors.centerIn: parent
-						text: root.__emptyText
-						font.pixelSize: Style.fontSizeM
-						color: Style.inactiveTextColor
-					}
-				}
-
-				ListView {
-					id: itemListView
-					anchors.top: emptyState.visible ? emptyState.bottom : tableHeader.bottom
-					anchors.left: parent.left
-					anchors.right: parent.right
-					anchors.bottom: parent.bottom
-					clip: true
-					boundsBehavior: Flickable.StopAtBounds
-					model: listViewItem.effectiveModel
-
-					delegate: root.delegateComponent ? root.delegateComponent : defaultDelegateComp
-				}
-
-				Component {
-					id: defaultDelegateComp
-
-					TenantCollectionItemDelegateBase {
-						id: defaultDelegate
-						selectionManager: selectionManager_
-						collectionPage: root
-
-						BaseText {
-							text: defaultDelegate.itemTitle
-							font.pixelSize: Style.fontSizeL
-							font.bold: true
-							color: Style.textColor
-						}
-
-						BaseText {
-							visible: defaultDelegate.itemDescription !== ""
-							text: defaultDelegate.itemDescription
-							font.pixelSize: Style.fontSizeM
-							color: Style.inactiveTextColor
-							elide: Text.ElideRight
-							width: parent.width
-						}
-					}
-				}
-
-				CustomScrollbar {
-					anchors.right: parent.right
-					anchors.top: tableHeader.bottom
-					anchors.bottom: parent.bottom
-					targetItem: itemListView
-					secondSize: 8
-				}
+			Component.onCompleted: root.selectionManager = collectionTable.selectionManager
+			Component.onDestruction: {
+				if (root)
+					root.selectionManager = null
 			}
 		}
 	}
@@ -512,7 +447,7 @@ ViewBase {
 	Component {
 		id: editorViewComponent
 
-		TenantDocumentEditorShell {
+		SimpleDocumentEditorShell {
 			documentManager: root.documentManager
 			objectTypeId: root.objectTypeId
 			objectId: root.__isCreating ? "" : root.__editItemId

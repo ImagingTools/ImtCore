@@ -52,6 +52,11 @@ SettingsController 1.0 Settings/SettingsController.qml
 MultiPageView 1.0 View/MultiPageView.qml
 TabView 1.0 View/TabView.qml
 Pagination 1.0 View/Pagination.qml
+SimpleCollectionTable 1.0 View/SimpleCollectionTable.qml
+SimpleCollectionTableFrame 1.0 View/SimpleCollectionTableFrame.qml
+SimpleCollectionTableHeader 1.0 View/SimpleCollectionTableHeader.qml
+SimpleCollectionStateOverlay 1.0 View/SimpleCollectionStateOverlay.qml
+SimpleCollectionItemDelegateBase 1.0 View/SimpleCollectionItemDelegateBase.qml
 ServerNoConnectionView 1.0 View/ServerNoConnectionView.qml
 SimpleCommandsDecorator 1.0 View/SimpleCommandsDecorator.qml
 SearchComp 1.0 View/SearchComp.qml
