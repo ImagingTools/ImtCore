@@ -5,6 +5,7 @@ import imtcontrols 1.0
 import imtguigql 1.0
 import imtauthgui 1.0
 import imtcolgui 1.0
+import imtqmlutils 1.0
 
 CollectionView {
 	id: root;

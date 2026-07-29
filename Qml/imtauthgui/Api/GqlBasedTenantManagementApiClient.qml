@@ -13,6 +13,7 @@ import imtbaseCollectionDocumentServiceSdl 1.0
 import imtauthRelationshipCollectionDocumentServiceSdl 1.0
 import imtauthCrossOrgGrantCollectionDocumentServiceSdl 1.0
 import imtauthgui 1.0
+import imtqmlutils 1.0
 
 /**
  * GqlBasedTenantManagementApiClient

@@ -12,6 +12,7 @@ import imtauthAuthorizationSdl 1.0
 import imtauthSessionsSdl 1.0
 import imtauthTenantMembershipsSdl 1.0
 import Qt.labs.settings 1.0
+import imtqmlutils 1.0
 
 QtObject {
 	id: root;
