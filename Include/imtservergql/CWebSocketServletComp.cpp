@@ -234,8 +234,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 								 maskedToken,
 								 detail),
 					QStringLiteral("CWebSocketServletComp"));
-		// CreateErrorResponse logs the same wire message once for non-auth paths;
-		// auth path already logged above — pass the informative message to the client.
+
 		return CreateErrorResponse(wireMessage.toUtf8(), request, /*logMessage*/ false);
 	}
 

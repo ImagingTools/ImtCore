@@ -55,7 +55,9 @@ bool CGqlRequest::SetGqlQuery(QString query, QVariantMap headers)
 		}
 
 		if (!CGqlModel::s_accessToken.isEmpty()){
-			networkRequest.setRawHeader(imtbase::s_authenticationTokenHeaderId, CGqlModel::s_accessToken.toUtf8());
+			if (!networkRequest.hasRawHeader(imtbase::s_authenticationTokenHeaderId)){
+				networkRequest.setRawHeader(imtbase::s_authenticationTokenHeaderId, CGqlModel::s_accessToken.toUtf8());
+			}
 		}
 
 		QString message = QString("Post to url '%1' query '%2'").arg(requestUrl.toString()).arg(query);
