@@ -2,18 +2,17 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
-import imtcontrols 1.0
+import imtdocgui 1.0
 import imtauthgui 1.0
 
 /**
  * TenantRolesPage
  *
  * Roles tab — list / create / edit / delete tenant roles via the abstract apiClient.
- * Thin wrapper around `TenantSimpleCollectionPage` that wires up the role-specific
+ * Thin wrapper around `SimpleCollectionPage` that wires up the role-specific
  * apiClient bindings and i18n strings.
  */
-TenantSimpleCollectionPage {
+SimpleCollectionPage {
 	id: rolesPage
 
 	entityName: qsTr("Role")
@@ -35,8 +34,8 @@ TenantSimpleCollectionPage {
 	}
 
 	function __resolvedTenantId() {
-		if (rolesPage.tenantData && rolesPage.tenantData.m_id)
-			return rolesPage.tenantData.m_id
+		if (rolesPage.model && rolesPage.model.m_id)
+			return rolesPage.model.m_id
 		return ""
 	}
 
@@ -105,7 +104,7 @@ TenantSimpleCollectionPage {
 	}
 
 	Connections {
-		target: rolesPage.tenantData
+		target: rolesPage.model
 		function onM_idChanged() {
 			rolesPage.__lastPermissionsTenantId = ""
 			rolesPage.__scheduleTenantPermissionsRequest(true)

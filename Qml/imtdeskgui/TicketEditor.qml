@@ -12,11 +12,10 @@ import imtdocgui 1.0
 import imtcolgui 1.0
 import imtdeskImtDeskSdl 1.0
 import imtdeskTicketCollectionDocumentServiceSdl 1.0
-import imtchatgui 1.0
 import Qt.labs.platform 1.1 as QLP
 
 DocumentViewBase {
-	id: root
+	id: ticketEditor
 	
 	anchors.fill: parent
 	contentColor: Style.baseColor
@@ -35,7 +34,7 @@ DocumentViewBase {
 	// CommentOnly: same-group viewer — can view and comment only
 	// ViewOnly: pure read-only
 	readonly property string accessLevel: {
-		if (root._removedFromAssignees) return "ViewOnly"
+		if (ticketEditor._removedFromAssignees) return "ViewOnly"
 		return isNewIssue ? "FullAccess" : (ticketData ? (ticketData.m_accessLevel || "ViewOnly") : "ViewOnly")
 	}
 	readonly property bool canEdit: accessLevel === "FullAccess" || accessLevel === "LimitedAccess"
@@ -54,7 +53,7 @@ DocumentViewBase {
 	// Track whether entity refs changed to avoid unnecessary emplace calls
 	property bool _entityRefsChanged: false
 	// Title inline edit mode (display vs edit)
-	property bool _titleEditing: root.isNewIssue
+	property bool _titleEditing: ticketEditor.isNewIssue
 	// Guard flag: set briefly when entering title edit so the activeFocus blur
 	// handler does not immediately cancel edit mode while the focus is being
 	// transferred to the input.
@@ -70,6 +69,18 @@ DocumentViewBase {
 	property string _highlightedMessageId: ""
 	// ID of message currently being edited inline ("" = none)
 	property string _editingMessageId: ""
+	// Attachment ids marked for removal while editing a comment, but not yet
+	// committed - applied on Save, discarded on Cancel so a stray click on
+	// the "x" icon does not permanently delete the attachment.
+	property var _editPendingRemovedAttachmentIds: []
+	// Guards the programmatic checkState flips used to show a confirmation
+	// dialog before locking a ticket (see editLockedCB.onCheckStateChanged),
+	// so those flips don't re-enter the same handler.
+	property bool __lockCheckboxSuppressHandler: false
+	// Transient "Saved" feedback next to the Properties header - field
+	// changes there (type/priority/status/assignees/lock) push instantly
+	// with no other feedback, so users can't tell if a click registered.
+	property string _propsSavedHint: ""
 	// Chat feedback
 	property string _chatActionHint: ""
 	property bool _exportChatCopiedState: false
@@ -151,7 +162,7 @@ DocumentViewBase {
 		clipboardProxy.selectAll()
 		clipboardProxy.copy()
 		clipboardProxy.select(0, 0)
-		root._chatActionHint = successHint || qsTr("Copied to clipboard")
+		ticketEditor._chatActionHint = successHint || qsTr("Copied to clipboard")
 		chatHintTimer.restart()
 	}
 
@@ -191,7 +202,7 @@ DocumentViewBase {
 			if (!item) continue
 
 			var linePrefix = String(i + 1) + "."
-			lines.push(linePrefix + tabSep + root.formatTimestamp(item.m_timestamp) + tabSep + (item.m_userName || qsTr("Unknown")))
+			lines.push(linePrefix + tabSep + ticketEditor.formatTimestamp(item.m_timestamp) + tabSep + (item.m_userName || qsTr("Unknown")))
 			var contentText = String(item.m_content || "")
 			var contentLines = contentText.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n")
 			var isContentEmpty = contentLines.length === 0 || (contentLines.length === 1 && contentLines[0].length === 0)
@@ -209,9 +220,9 @@ DocumentViewBase {
 			}
 
 			var attachments = item.m_attachments || []
-			var attachmentCount = root.getCollectionCount(attachments)
+			var attachmentCount = ticketEditor.getCollectionCount(attachments)
 			for (var a = 0; a < attachmentCount; a++) {
-				var att = root.getCollectionItem(attachments, a)
+				var att = ticketEditor.getCollectionItem(attachments, a)
 				if (!att) continue
 				lines.push(tabSep + qsTr("Attachment") + tabSep + (att.m_fileName || qsTr("file")) + tabSep + (att.m_preview || ""))
 			}
@@ -219,6 +230,20 @@ DocumentViewBase {
 		}
 
 		return lines.join("\n")
+	}
+
+	// commentsThread.count reflects the raw m_comments model, which still
+	// contains soft-deleted items (deleteComment() only sets m_deleted, it
+	// never removes the element) - the header badge/label and the "no
+	// comments" placeholder need the count of comments actually shown.
+	function visibleCommentsCount() {
+		if (!ticketData || !ticketData.m_comments) return 0
+		var n = 0
+		for (var i = 0; i < ticketData.m_comments.count; i++) {
+			var item = ticketData.m_comments.get(i).item
+			if (item && !item.m_deleted) n++
+		}
+		return n
 	}
 
 	function chatParticipants() {
@@ -263,10 +288,10 @@ DocumentViewBase {
 		newItem.m_content = commentText || ""
 		newItem.m_reactions = []
 		// Set replyToId if replying to a message
-		if (root._replyToMessage && root._replyToMessage.id) {
-			newItem.m_replyToId = String(root._replyToMessage.id)
-			newItem.m_replyToContent = String(root._replyToMessage.content || "")
-			newItem.m_replyToUserName = String(root._replyToMessage.userName || "")
+		if (ticketEditor._replyToMessage && ticketEditor._replyToMessage.id) {
+			newItem.m_replyToId = String(ticketEditor._replyToMessage.id)
+			newItem.m_replyToContent = String(ticketEditor._replyToMessage.content || "")
+			newItem.m_replyToUserName = String(ticketEditor._replyToMessage.userName || "")
 		}
 		if (attachmentsList && attachmentsList.length > 0) {
 			newItem.emplaceAttachments()
@@ -282,14 +307,14 @@ DocumentViewBase {
 		ticketData.m_comments.addElement(newItem)
 		
 		setBlockingUpdateModel(false)
-		ticketData.modelChanged()
-		
+		ticketData.modelChanged([])
+
 		// Assign a temporary local ID to the newly-added comment so that
 		// subsequent doUpdateModel() calls (e.g. assignee change) do not
 		// re-send it as a new message. The server skips comments that
 		// already have an ID set.
 		newItem.m_id = "local-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8)
-		root.commentSubmitted(commentText)
+		ticketEditor.commentSubmitted(commentText)
 	}
 
 	// Edit an existing comment in-place. The comment is located by its
@@ -309,7 +334,7 @@ DocumentViewBase {
 			}
 		}
 		setBlockingUpdateModel(false)
-		ticketData.modelChanged()
+		ticketData.modelChanged([])
 	}
 
 	// Mark an existing comment as deleted. The deleted flag is propagated to
@@ -328,22 +353,32 @@ DocumentViewBase {
 			}
 		}
 		setBlockingUpdateModel(false)
-		ticketData.modelChanged()
+		ticketData.modelChanged([])
 	}
 
-	// Remove an attachment from an existing comment by index. The change
-	// is local-only; the server update happens when the user clicks Save
-	// in the inline editor, which calls editComment() → modelChanged().
-	function removeCommentAttachment(messageId, attachmentIndex) {
-		if (!messageId || !ticketData || !ticketData.m_comments) return
+	// Remove an attachment from an existing comment by attachment id. The
+	// change is local-only; the server update happens when the user clicks
+	// Save in the inline editor, which calls editComment() → modelChanged().
+	// Called once per pending removal when the user confirms Save (see the
+	// inline comment editor below) - never directly from the "x" icon,
+	// so that Cancel can discard pending removals without having touched
+	// the actual model.
+	function removeCommentAttachment(messageId, attachmentId) {
+		if (!messageId || !attachmentId || !ticketData || !ticketData.m_comments) return
 		setBlockingUpdateModel(true)
 		for (var i = 0; i < ticketData.m_comments.count; i++) {
 			var item = ticketData.m_comments.get(i).item
 			if (!item) continue
 			if (String(item.m_id || "") === String(messageId)) {
-				if (item.m_attachments && attachmentIndex >= 0 && attachmentIndex < item.m_attachments.count) {
-					item.m_attachments.removeElement(attachmentIndex)
-					item.m_edited = true
+				if (item.m_attachments) {
+					for (var j = 0; j < item.m_attachments.count; j++) {
+						var att = item.m_attachments.get(j).item
+						if (att && String(att.m_id || "") === String(attachmentId)) {
+							item.m_attachments.removeElement(j)
+							item.m_edited = true
+							break
+						}
+					}
 				}
 				break
 			}
@@ -354,7 +389,7 @@ DocumentViewBase {
 	// Upload attachment file to the server via HTTP POST.
 	// On success, adds {id, preview} to pendingAttachments.
 	function uploadAttachment(fileObj, fileName, localPreview) {
-		root.uploadsInProgress++
+		ticketEditor.uploadsInProgress++
 		
 		if (Qt.platform.os === "web") {
 			// Web: read binary data with FileReader and POST to /files/<name>
@@ -365,22 +400,24 @@ DocumentViewBase {
 				xhr.open("POST", "../../files/" + encodeURIComponent(fileName))
 				xhr.onreadystatechange = function() {
 					if (xhr.readyState === XMLHttpRequest.DONE) {
-						root.uploadsInProgress--
+						ticketEditor.uploadsInProgress--
 						if (xhr.status === 200) {
 							var attachmentId = xhr.responseText.trim()
-							var arr = root.pendingAttachments.slice()
+							var arr = ticketEditor.pendingAttachments.slice()
 							arr.push({id: attachmentId, fileName: fileName, preview: "../../files/" + attachmentId})
-							root.pendingAttachments = arr
+							ticketEditor.pendingAttachments = arr
 						} else {
 							console.error("Attachment upload failed: " + xhr.status + " " + xhr.responseText)
+							PopupManager.addErrorMessage(qsTr("Failed to upload attachment: %1").arg(fileName), true)
 						}
 					}
 				}
 				xhr.send(reader.result)
 			}
 			reader.onerror = function() {
-				root.uploadsInProgress--
+				ticketEditor.uploadsInProgress--
 				console.error("Failed to read attachment file: " + fileName)
+				PopupManager.addErrorMessage(qsTr("Failed to read attachment: %1").arg(fileName), true)
 			}
 		} else {
 			// Native: read file with FileIO and POST binary data
@@ -390,14 +427,15 @@ DocumentViewBase {
 			xhr.open("POST", "../../files/" + encodeURIComponent(fileName))
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState === XMLHttpRequest.DONE) {
-					root.uploadsInProgress--
+					ticketEditor.uploadsInProgress--
 					if (xhr.status === 200) {
 						var attachmentId = xhr.responseText.trim()
-						var arr = root.pendingAttachments.slice()
+						var arr = ticketEditor.pendingAttachments.slice()
 						arr.push({id: attachmentId, fileName: fileName, preview: "../../files/" + attachmentId})
-						root.pendingAttachments = arr
+						ticketEditor.pendingAttachments = arr
 					} else {
 						console.error("Attachment upload failed: " + xhr.status + " " + xhr.responseText)
+						PopupManager.addErrorMessage(qsTr("Failed to upload attachment: %1").arg(fileName), true)
 					}
 				}
 			}
@@ -419,7 +457,7 @@ DocumentViewBase {
 	
 	function updateGui() {
 		// Stop updating GUI if user was removed from assignees (readOnly, no new data)
-		if (root._removedFromAssignees) return
+		if (ticketEditor._removedFromAssignees) return
 		
 		editTitleInput.text = ticketData.m_title || ""
 		editDescriptionInput.text = ticketData.m_description || ""
@@ -466,15 +504,15 @@ DocumentViewBase {
 				}
 			}
 		}
-		root.pendingEntityRefs = refs
-		root._entityRefsChanged = true
+		ticketEditor.pendingEntityRefs = refs
+		ticketEditor._entityRefsChanged = true
 		
 		// Load assignees as array for multi-select
 		// First, check if current user was previously an assignee (for removal detection)
 		var wasAssignee = false
-		if (!root.isNewIssue) {
-			for (var prev = 0; prev < root.pendingAssignees.length; prev++) {
-				if (root.isSameUserId(root.pendingAssignees[prev].id, root.currentUserId)) {
+		if (!ticketEditor.isNewIssue) {
+			for (var prev = 0; prev < ticketEditor.pendingAssignees.length; prev++) {
+				if (ticketEditor.isSameUserId(ticketEditor.pendingAssignees[prev].id, ticketEditor.currentUserId)) {
 					wasAssignee = true
 					break
 				}
@@ -487,12 +525,12 @@ DocumentViewBase {
 		var hasUnresolved = false
 		for (var a = 0; a < aIds.length; a++) {
 			var aId = aIds[a]
-			var cachedName = root.__userNameCache[aId]
+			var cachedName = ticketEditor.__userNameCache[aId]
 			assigns.push({id: aId, name: cachedName || aId})
 			if (!cachedName) hasUnresolved = true
 		}
-		root.pendingAssignees = assigns
-		root._assigneesChanged = false
+		ticketEditor.pendingAssignees = assigns
+		ticketEditor._assigneesChanged = false
 		
 		// Trigger user name resolution for uncached IDs
 		if (hasUnresolved && aIds.length > 0) {
@@ -503,13 +541,13 @@ DocumentViewBase {
 		if (wasAssignee) {
 			var stillAssignee = false
 			for (var sa = 0; sa < assigns.length; sa++) {
-				if (root.isSameUserId(assigns[sa].id, root.currentUserId)) {
+				if (ticketEditor.isSameUserId(assigns[sa].id, ticketEditor.currentUserId)) {
 					stillAssignee = true
 					break
 				}
 			}
 			if (!stillAssignee) {
-				root._removedFromAssignees = true
+				ticketEditor._removedFromAssignees = true
 				PopupManager.addWarningMessage(
 					qsTr("You have been removed from the assignees of this ticket. The view is now read-only."),
 					true
@@ -524,9 +562,9 @@ DocumentViewBase {
 		ticketData.m_locked = editLockedCB.checkState === Qt.Checked
 		ticketData.m_lockReason = editLockReasonInput.text
 		
-		ticketData.m_assigneeIds = root.pendingAssignees.map(function(a) { return a.id })
+		ticketData.m_assigneeIds = ticketEditor.pendingAssignees.map(function(a) { return a.id })
 		
-		if (root.isNewIssue) {
+		if (ticketEditor.isNewIssue) {
 			ticketData.m_reporterId = AuthorizationController.getUserId()
 		}
 		
@@ -544,11 +582,11 @@ DocumentViewBase {
 		}
 
 		// Save entity references to ticket data only when they actually changed
-		if (root._entityRefsChanged) {
-			root._entityRefsChanged = false
+		if (ticketEditor._entityRefsChanged) {
+			ticketEditor._entityRefsChanged = false
 			ticketData.emplaceEntityReferences()
-			for (var r = 0; r < root.pendingEntityRefs.length; r++) {
-				var ref = root.pendingEntityRefs[r]
+			for (var r = 0; r < ticketEditor.pendingEntityRefs.length; r++) {
+				var ref = ticketEditor.pendingEntityRefs[r]
 				var refItem = ticketData.createEntityReferencesArrayElement()
 				refItem.m_entityType = String(ref.entityType || "")
 				refItem.m_entityId = String(ref.entityId || "")
@@ -564,6 +602,14 @@ DocumentViewBase {
 				ticketData.m_entityReferences.addElement(refItem)
 			}
 		}
+
+		// New tickets are not persisted until explicitly saved (see
+		// OnUpdateTicketFromRepresentation on the server), so "Saved" would
+		// be misleading here - only show it once the ticket actually exists.
+		if (!ticketEditor.isNewIssue) {
+			ticketEditor._propsSavedHint = qsTr("Saved")
+			propsSavedHintTimer.restart()
+		}
 	}
 	
 	// --- Shared data providers and models ---
@@ -578,16 +624,23 @@ DocumentViewBase {
 
 	Timer {
 		id: chatHintTimer
-		interval: root.chatHintDurationMs
+		interval: ticketEditor.chatHintDurationMs
 		repeat: false
-		onTriggered: root._chatActionHint = ""
+		onTriggered: ticketEditor._chatActionHint = ""
+	}
+
+	Timer {
+		id: propsSavedHintTimer
+		interval: ticketEditor.chatHintDurationMs
+		repeat: false
+		onTriggered: ticketEditor._propsSavedHint = ""
 	}
 
 	Timer {
 		id: exportChatBtnStateTimer
 		interval: 2000
 		repeat: false
-		onTriggered: root._exportChatCopiedState = false
+		onTriggered: ticketEditor._exportChatCopiedState = false
 	}
 	
 	// Standalone user name resolver — fetches Users collection to resolve assignee IDs to display names
@@ -598,7 +651,7 @@ DocumentViewBase {
 		pageSize: 100
 		
 		onDataChanged: {
-			root.__resolveAssigneeNamesFromResolver()
+			ticketEditor.__resolveAssigneeNamesFromResolver()
 		}
 	}
 	
@@ -610,7 +663,7 @@ DocumentViewBase {
 		for (var i = 0; i < resolverItems.length; i++) {
 			var item = resolverItems[i]
 			if (item.id && item.title && item.title !== "") {
-				root.__userNameCache[item.id] = item.title
+				ticketEditor.__userNameCache[item.id] = item.title
 				cacheUpdated = true
 			}
 		}
@@ -619,15 +672,15 @@ DocumentViewBase {
 		
 		// Re-build pendingAssignees with resolved names
 		var assigns = []
-		for (var j = 0; j < root.pendingAssignees.length; j++) {
-			var a = root.pendingAssignees[j]
-			var cachedName = root.__userNameCache[a.id]
+		for (var j = 0; j < ticketEditor.pendingAssignees.length; j++) {
+			var a = ticketEditor.pendingAssignees[j]
+			var cachedName = ticketEditor.__userNameCache[a.id]
 			assigns.push({
 				id: a.id,
 				name: cachedName || a.name || a.id
 			})
 		}
-		root.pendingAssignees = assigns
+		ticketEditor.pendingAssignees = assigns
 	}
 	
 	TreeItemModel {
@@ -727,21 +780,21 @@ DocumentViewBase {
 		readonly property string cardBorderColor: Style.borderColor
 		// Pre-faded variant of cardBorderColor used by inputs to render a subtle
 		// (~40% opacity, alpha 0x66) border in their unfocused state.
-		readonly property string cardBorderColorFaded: "#d0d0d266"
+		readonly property string cardBorderColorFaded: Style.borderColor + "66"
 		readonly property string pageBgColor: Style.backgroundColor2
-		readonly property string accentColor: "#5b8fd6"
+		readonly property string accentColor: Style.imaginToolsAccentColor
 		readonly property string labelColor: Style.textColor
 		readonly property real avatarSize: 36
 		readonly property real accentDividerHeight: 2
 		readonly property real badgeHeight: 22
-		readonly property string accentBgLight: "#DFECF9"
-		readonly property string accentBorderLight: "#B4D3F2"
-		readonly property string accentBadgeBg: "#E5F0FB"
+		readonly property string accentBgLight: Style.selectedColor
+		readonly property string accentBorderLight: Style.borderColor
+		readonly property string accentBadgeBg: Style.selectedColor
 		readonly property string chatBgColor: Style.baseColor
-		readonly property string bubbleColor: "#DFECF9"
-		readonly property string otherBubbleColor: "#F1F3F7"
-		readonly property string myBubbleColor: "#EAF3FF"
-		readonly property string sectionLabelColor: "#8C95A6"
+		readonly property string bubbleColor: Style.selectedColor
+		readonly property string otherBubbleColor: Style.alternateBaseColor
+		readonly property string myBubbleColor: Style.selectedColor
+		readonly property string sectionLabelColor: Style.subtitleColor
 		readonly property string timestampColor: Style.inactiveTextColor
 		readonly property real columnGap: Style.spacingL
 		readonly property real avatarOverlap: -8
@@ -752,9 +805,9 @@ DocumentViewBase {
 		readonly property real imageAttachmentHeight: 96
 		readonly property real fileAttachmentMaxWidth: 240
 		readonly property real fileAttachmentHeight: 44
-		readonly property string focusedAttachmentBgColor: "#ECF3FF"
-		readonly property string imageAttachmentBgColor: "#EEF2F8"
-		readonly property string fileAttachmentBgColor: "#F6F8FC"
+		readonly property string focusedAttachmentBgColor: Style.selectedColor
+		readonly property string imageAttachmentBgColor: Style.alternateBaseColor
+		readonly property string fileAttachmentBgColor: Style.alternateBaseColor
 		readonly property string chatHintBgColor: editView.cardColor
 		// Fixed widths for top groups (left = Title/Desc/Context and Messages, right = Properties)
 		readonly property real detailsWidth: 700
@@ -780,7 +833,7 @@ DocumentViewBase {
 				anchors.right: parent.right
 				// Height = only detailsCard (Title/Desc). Properties is independent and may extend below.
 				// For new tickets: stack properties below details (single left-aligned group), so include both heights.
-				height: root.isNewIssue ? (detailsCard.height + editView.columnGap + propertiesCard.height) : detailsCard.height
+				height: ticketEditor.isNewIssue ? (detailsCard.height + editView.columnGap + propertiesCard.height) : detailsCard.height
 				
 				// LEFT: Title + Description (Context moved to Properties card)
 				Item {
@@ -788,7 +841,7 @@ DocumentViewBase {
 					anchors.left: parent.left
 					anchors.top: parent.top
 					readonly property real _propW: Math.min(editView.propertiesWidth, Math.max(220, parent.width * 0.4))
-					width: root.isNewIssue
+					width: ticketEditor.isNewIssue
 						? Math.min(editView.detailsWidth, Math.max(280, parent.width))
 						: Math.min(editView.detailsWidth, Math.max(280, parent.width - _propW - editView.columnGap))
 					height: detailsCard.height
@@ -812,12 +865,12 @@ DocumentViewBase {
 							// Title display/edit row — H1, page anchor
 							Row {
 								id: titleDisplayRow
-								visible: !root._titleEditing
+								visible: !ticketEditor._titleEditing
 								width: parent.width
 								spacing: Style.spacingS
 								
 								Text {
-									text: root.isNewIssue ? qsTr("New Ticket") : "#" + (root.ticketData ? root.ticketData.m_number : "") + "  " + editTitleInput.text
+									text: ticketEditor.isNewIssue ? qsTr("New Ticket") : "#" + (ticketEditor.ticketData ? ticketEditor.ticketData.m_number : "") + "  " + editTitleInput.text
 									font.pixelSize: Style.fontSizeXXL
 									font.bold: true
 									color: Style.textColor
@@ -832,13 +885,13 @@ DocumentViewBase {
 									anchors.verticalCenter: parent.verticalCenter
 									
 									TicketBadge {
-										visible: !root.isNewIssue
+										visible: !ticketEditor.isNewIssue
 										badgeType: "status"
 										value: editStatusCB.currentIndex
 									}
 									
 									TicketBadge {
-										visible: !root.isNewIssue && editStateReasonCB.currentIndex > 0
+										visible: !ticketEditor.isNewIssue && editStateReasonCB.currentIndex > 0
 										badgeType: "stateReason"
 										value: editStateReasonCB.currentIndex
 									}
@@ -846,18 +899,18 @@ DocumentViewBase {
 								
 								Rectangle {
 									id: titleEditBtn
-									visible: root.canEditCoreTicketFields
+									visible: ticketEditor.canEditCoreTicketFields
 									width: visible ? 28 : 0
 									height: width
 									radius: width / 2
-									color: titleEditBtnMa.containsMouse ? "#F0F2F5" : "transparent"
+									color: titleEditBtnMa.containsMouse ? Style.alternateBaseColor : "transparent"
 									anchors.verticalCenter: parent.verticalCenter
 									
 									Image {
 										anchors.centerIn: parent
 										width: Style.iconSizeS
 										height: width
-										source: Style.getIconPath("Icons/Edit", Icon.State.On, Icon.Mode.Normal)
+										source: "qrc:/" +Style.getIconPath("Icons/Edit", Icon.State.On, Icon.Mode.Normal)
 										sourceSize.width: width
 										sourceSize.height: height
 									}
@@ -869,8 +922,8 @@ DocumentViewBase {
 										cursorShape: Qt.PointingHandCursor
 										onClicked: {
 											editTitleInput.oldText = editTitleInput.text
-											root.__titleEditOpening = true
-											root._titleEditing = true
+											ticketEditor.__titleEditOpening = true
+											ticketEditor._titleEditing = true
 											titleEditFocusTimer.start()
 										}
 									}
@@ -881,7 +934,7 @@ DocumentViewBase {
 										repeat: false
 										onTriggered: {
 											editTitleInput.forceActiveFocus()
-											root.__titleEditOpening = false
+											ticketEditor.__titleEditOpening = false
 										}
 									}
 								}
@@ -890,13 +943,13 @@ DocumentViewBase {
 							// Title edit row
 							Row {
 								id: titleEditRow
-								visible: root._titleEditing
+								visible: ticketEditor._titleEditing
 								width: parent.width
 								spacing: Style.spacingS
 								
 								Column {
 									id: titleColumn
-									width: root.isNewIssue ? parent.width : parent.width - titleConfirmBtn.width - titleCloseBtn.width - 2*Style.spacingS
+									width: ticketEditor.isNewIssue ? parent.width : parent.width - titleConfirmBtn.width - titleCloseBtn.width - 2*Style.spacingS
 									spacing: 4
 
 									Text {
@@ -904,7 +957,7 @@ DocumentViewBase {
 										font.pixelSize: Style.fontSizeM
 										font.bold: true
 										color: editView.sectionLabelColor
-										visible: root.isNewIssue
+										visible: ticketEditor.isNewIssue
 									}
 									
 									CustomTextField {
@@ -913,24 +966,27 @@ DocumentViewBase {
 										width: titleColumn.width
 										height: Style.controlHeightM
 										placeHolderText: qsTr("Enter ticket title...")
-										readOnly: !root.canEditCoreTicketFields
+										readOnly: !ticketEditor.canEditCoreTicketFields
 										onActiveFocusChanged: {
-											if (!activeFocus && root._titleEditing && !root.isNewIssue && !root.__titleEditOpening) {
-												editTitleInput.text = root.ticketData ? root.ticketData.m_title : editTitleInput.oldText
-												root._titleEditing = false
+											// Only auto-close on blur if nothing was typed - never silently
+											// discard an in-progress edit; that requires the explicit
+											// Close (x) or Confirm (✓) button below.
+											if (!activeFocus && ticketEditor._titleEditing && !ticketEditor.isNewIssue && !ticketEditor.__titleEditOpening
+													&& editTitleInput.text === editTitleInput.oldText) {
+												ticketEditor._titleEditing = false
 											}
 										}
 										KeyNavigation.tab: editDescriptionInput
 										onAccepted: {
-											root._titleEditing = false
-											root.doUpdateModel()
+											ticketEditor._titleEditing = false
+											ticketEditor.doUpdateModel()
 										}
 										onCancelled: {
-											root._titleEditing = false
+											ticketEditor._titleEditing = false
 										}
 										onEditingFinished: {
-											if (root.isNewIssue){
-												root.doUpdateModel()
+											if (ticketEditor.isNewIssue){
+												ticketEditor.doUpdateModel()
 											}
 										}
 
@@ -940,18 +996,18 @@ DocumentViewBase {
 
 								Rectangle {
 									id: titleCloseBtn
-									visible: !root.isNewIssue
+									visible: !ticketEditor.isNewIssue
 									width: visible ? 28 : 0
 									height: width
 									radius: width/2
-									color: titleCloseBtnMa.containsMouse ? "#E6F4EA" : "#F0F2F5"
+									color: titleCloseBtnMa.containsMouse ? Style.selectedColor : Style.alternateBaseColor
 									anchors.verticalCenter: parent.verticalCenter
 									
 									Image {
 										anchors.centerIn: parent
 										width: Style.iconSizeS
 										height: width
-										source: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+										source: "qrc:/" +Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 										sourceSize.width: width
 										sourceSize.height: height
 									}
@@ -962,7 +1018,7 @@ DocumentViewBase {
 										hoverEnabled: true
 										cursorShape: Qt.PointingHandCursor
 										onClicked: {
-											editTitleInput.text = root.ticketData ? root.ticketData.m_title : editTitleInput.oldText
+											editTitleInput.text = ticketEditor.ticketData ? ticketEditor.ticketData.m_title : editTitleInput.oldText
 											editTitleInput.oldText = ""
 											editTitleInput.cancelled()
 										}
@@ -971,18 +1027,18 @@ DocumentViewBase {
 
 								Rectangle {
 									id: titleConfirmBtn
-									visible: !root.isNewIssue
+									visible: !ticketEditor.isNewIssue
 									width: visible ? 28 : 0
 									height: width
 									radius: width/2
-									color: titleConfirmBtnMa.containsMouse ? "#E6F4EA" : "#F0F2F5"
+									color: titleConfirmBtnMa.containsMouse ? Style.selectedColor : Style.alternateBaseColor
 									anchors.verticalCenter: parent.verticalCenter
 									
 									Image {
 										anchors.centerIn: parent
 										width: Style.iconSizeS
 										height: width
-										source: Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
+										source: "qrc:/" +Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
 										sourceSize.width: width
 										sourceSize.height: height
 									}
@@ -1023,7 +1079,7 @@ DocumentViewBase {
 									radius: Style.radiusM
 									border.color: editDescriptionInput.activeFocus ? editView.accentColor : editView.cardBorderColorFaded
 									border.width: editDescriptionInput.activeFocus ? 2 : 1
-									color: root.canEditCoreTicketFields ? "white" : Style.alternateBaseColor
+									color: ticketEditor.canEditCoreTicketFields ? Style.baseColor : Style.alternateBaseColor
 
 									Image {
 										z: 2
@@ -1033,10 +1089,10 @@ DocumentViewBase {
 										anchors.rightMargin: Style.paddingS
 										width: Style.iconSizeS
 										height: width
-										source: Style.getIconPath("Icons/Lock", Icon.State.On, Icon.Mode.Normal)
+										source: "qrc:/" +Style.getIconPath("Icons/Lock", Icon.State.On, Icon.Mode.Normal)
 										sourceSize.width: width
 										sourceSize.height: height
-										visible: !root.canEditCoreTicketFields
+										visible: !ticketEditor.canEditCoreTicketFields
 									}
 									
 									Flickable {
@@ -1058,13 +1114,13 @@ DocumentViewBase {
 											color: Style.textColor
 											wrapMode: TextEdit.Wrap
 											textFormat: TextEdit.PlainText
-											readOnly: !root.canEditCoreTicketFields
-											onEditingFinished: root.doUpdateModel()
+											readOnly: !ticketEditor.canEditCoreTicketFields
+											onEditingFinished: ticketEditor.doUpdateModel()
 											KeyNavigation.tab: editTypeCB
 											KeyNavigation.backtab: editTitleInput
 
 											onTextChanged: {
-												if (!root.guiIsBlocked() && text !== root.ticketData.m_description) {
+												if (!ticketEditor.guiIsBlocked() && text !== ticketEditor.ticketData.m_description) {
 													descriptionAutoSaveTimer.restart()
 												}
 											}
@@ -1074,7 +1130,7 @@ DocumentViewBase {
 												interval: 1000
 												repeat: false
 												onTriggered: {
-													root.doUpdateModel()
+													ticketEditor.doUpdateModel()
 												}
 											}
 
@@ -1122,11 +1178,11 @@ DocumentViewBase {
 				// For new tickets: stacked below leftTopWrapper at same width, left-aligned (single group).
 				Item {
 					id: rightTopWrapper
-					anchors.left: root.isNewIssue ? parent.left : leftTopWrapper.right
-					anchors.leftMargin: root.isNewIssue ? 0 : editView.columnGap
-					anchors.top: root.isNewIssue ? leftTopWrapper.bottom : parent.top
-					anchors.topMargin: root.isNewIssue ? editView.columnGap : 0
-					width: root.isNewIssue
+					anchors.left: ticketEditor.isNewIssue ? parent.left : leftTopWrapper.right
+					anchors.leftMargin: ticketEditor.isNewIssue ? 0 : editView.columnGap
+					anchors.top: ticketEditor.isNewIssue ? leftTopWrapper.bottom : parent.top
+					anchors.topMargin: ticketEditor.isNewIssue ? editView.columnGap : 0
+					width: ticketEditor.isNewIssue
 						? leftTopWrapper.width
 						: Math.min(editView.propertiesWidth, Math.max(220, parent.width - leftTopWrapper.width - editView.columnGap))
 					height: propertiesCard.height
@@ -1147,13 +1203,26 @@ DocumentViewBase {
 							width: parent.width - editView.cardPadding * 2
 							spacing: Style.spacingL
 							
-							Text {
-								text: qsTr("Properties")
-								font.pixelSize: Style.fontSizeL
-								font.bold: true
-								color: Style.textColor
+							Row {
+								width: parent.width
+								spacing: Style.spacingS
+
+								Text {
+									text: qsTr("Properties")
+									font.pixelSize: Style.fontSizeL
+									font.bold: true
+									color: Style.textColor
+								}
+
+								Text {
+									visible: ticketEditor._propsSavedHint.length > 0
+									anchors.verticalCenter: parent.verticalCenter
+									text: ticketEditor._propsSavedHint
+									font.pixelSize: Style.fontSizeS
+									color: Style.inactiveTextColor
+								}
 							}
-							
+
 							// Row 1: Type then Priority (stacked vertically in narrow Properties card)
 							Column {
 								width: parent.width
@@ -1176,8 +1245,8 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 1
 										model: ticketTypeModel
-										changeable: root.canEditCoreTicketFields
-										onCurrentIndexChanged: root.doUpdateModel()
+										changeable: ticketEditor.canEditCoreTicketFields
+										onCurrentIndexChanged: ticketEditor.doUpdateModel()
 										KeyNavigation.tab: editPriorityCB
 										KeyNavigation.backtab: editDescriptionInput
 									}
@@ -1200,15 +1269,15 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 1
 										model: priorityModel
-										changeable: root.canEditCoreTicketFields
-										onCurrentIndexChanged: root.doUpdateModel()
+										changeable: ticketEditor.canEditCoreTicketFields
+										onCurrentIndexChanged: ticketEditor.doUpdateModel()
 										KeyNavigation.tab: editStatusCB
 										KeyNavigation.backtab: editTypeCB
 									}
 								}
 
 								Column {
-									visible: !root.isNewIssue
+									visible: !ticketEditor.isNewIssue
 									width: parent.width
 									spacing: 4
 									
@@ -1225,8 +1294,8 @@ DocumentViewBase {
 										height: Style.buttonHeightM
 										currentIndex: 0
 										model: statusModel
-										changeable: root.canEdit
-										onCurrentIndexChanged: root.doUpdateModel()
+										changeable: ticketEditor.canEdit
+										onCurrentIndexChanged: ticketEditor.doUpdateModel()
 										KeyNavigation.tab: editLockedCB
 										KeyNavigation.backtab: editPriorityCB
 									}
@@ -1258,7 +1327,7 @@ DocumentViewBase {
 										}
 										
 										Rectangle {
-											visible: root.pendingAssignees.length > 0
+											visible: ticketEditor.pendingAssignees.length > 0
 											width: assigneeCountLabel.contentWidth + Style.paddingS * 2
 											height: editView.badgeHeight - 2
 											radius: (editView.badgeHeight - 2) / 2
@@ -1268,7 +1337,7 @@ DocumentViewBase {
 											Text {
 												id: assigneeCountLabel
 												anchors.centerIn: parent
-												text: root.pendingAssignees.length
+												text: ticketEditor.pendingAssignees.length
 												font.pixelSize: Style.fontSizeM - 1
 												font.bold: true
 												color: Style.baseColor
@@ -1281,7 +1350,7 @@ DocumentViewBase {
 										objectName: "AddAssigneeButton"
 										anchors.right: parent.right
 										anchors.verticalCenter: parent.verticalCenter
-										visible: root.canEditCoreTicketFields
+										visible: ticketEditor.canEditCoreTicketFields
 										text: "+ " + qsTr("Add assignee")
 										font.pixelSize: Style.fontSizeM
 										font.bold: true
@@ -1294,13 +1363,13 @@ DocumentViewBase {
 											cursorShape: Qt.PointingHandCursor
 											onClicked: {
 												var known = []
-												for (var j = 0; j < root.pendingAssignees.length; j++) {
-													var assignee = root.pendingAssignees[j]
+												for (var j = 0; j < ticketEditor.pendingAssignees.length; j++) {
+													var assignee = ticketEditor.pendingAssignees[j]
 													known.push({ id: assignee.id, title: assignee.name || assignee.id })
 												}
 												var ids = []
-												for (var i = 0; i < root.pendingAssignees.length; i++)
-													ids.push(root.pendingAssignees[i].id)
+												for (var i = 0; i < ticketEditor.pendingAssignees.length; i++)
+													ids.push(ticketEditor.pendingAssignees[i].id)
 												var point = addAssigneeBtn.mapToItem(null, 0, addAssigneeBtn.height)
 												ModalDialogManager.openDialog(assigneeSelectComp, {
 													"x": point.x,
@@ -1317,10 +1386,10 @@ DocumentViewBase {
 									width: parent.width
 									clip: true
 									spacing: Style.spacingXS
-									visible: root.pendingAssignees.length > 0
+									visible: ticketEditor.pendingAssignees.length > 0
 									
 									Repeater {
-										model: root.pendingAssignees
+										model: ticketEditor.pendingAssignees
 										delegate: Rectangle {
 											objectName: "AssigneeChip_" + index
 											width: Math.min(assigneeChipText.contentWidth + assigneeChipRemove.width + Style.paddingS * 3, 200)
@@ -1347,10 +1416,10 @@ DocumentViewBase {
 											ToolButton {
 												id: assigneeChipRemove
 												objectName: "RemoveButton"
-												visible: root.canEditCoreTicketFields
+												visible: ticketEditor.canEditCoreTicketFields
 												anchors.right: parent.right
 												anchors.verticalCenter: parent.verticalCenter
-												iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+												iconSource: "qrc:/" +Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 												decorator: Component {
 													ToolButtonDecorator {
 														color: "transparent"
@@ -1358,11 +1427,31 @@ DocumentViewBase {
 													}
 												}
 												onClicked: {
-													var arr = root.pendingAssignees.slice()
-													arr.splice(index, 1)
-													root.pendingAssignees = arr
-													root._assigneesChanged = true
-													root.doUpdateModel()
+													ModalDialogManager.openDialog(confirmRemoveAssigneeDialogComp, {
+														"assigneeIndex": index,
+														"assigneeName": modelData.name || modelData.id
+													})
+												}
+											}
+										}
+									}
+
+									Component {
+										id: confirmRemoveAssigneeDialogComp
+										MessageDialog {
+											title: qsTr("Remove assignee?")
+											message: qsTr("%1 will be unassigned from this ticket.").arg(assigneeName)
+
+											property int assigneeIndex: -1
+											property string assigneeName: ""
+
+											onFinished: {
+												if (buttonId === Enums.yes && assigneeIndex >= 0 && assigneeIndex < ticketEditor.pendingAssignees.length) {
+													var arr = ticketEditor.pendingAssignees.slice()
+													arr.splice(assigneeIndex, 1)
+													ticketEditor.pendingAssignees = arr
+													ticketEditor._assigneesChanged = true
+													ticketEditor.doUpdateModel()
 												}
 											}
 										}
@@ -1370,7 +1459,7 @@ DocumentViewBase {
 								}
 								
 								Text {
-									visible: root.pendingAssignees.length === 0
+									visible: ticketEditor.pendingAssignees.length === 0
 									width: parent.width
 									text: qsTr("No assignees")
 									font.pixelSize: Style.fontSizeM
@@ -1401,16 +1490,16 @@ DocumentViewBase {
 												if (!selName)
 													selName = selId
 												// Cache resolved name
-												if (selName !== selId) root.__userNameCache[selId] = selName
+												if (selName !== selId) ticketEditor.__userNameCache[selId] = selName
 												arr.push({id: selId, name: selName})
 											}
-											root.pendingAssignees = arr
-											root._assigneesChanged = true
+											ticketEditor.pendingAssignees = arr
+											ticketEditor._assigneesChanged = true
 										}
 										
 										Component.onDestruction: {
-											if (root._assigneesChanged) {
-												root.doUpdateModel()
+											if (ticketEditor._assigneesChanged) {
+												ticketEditor.doUpdateModel()
 											}
 										}
 									}
@@ -1425,7 +1514,7 @@ DocumentViewBase {
 								height: 0
 								currentIndex: 0
 								model: stateReasonModel
-								onCurrentIndexChanged: root.doUpdateModel()
+								onCurrentIndexChanged: ticketEditor.doUpdateModel()
 							}
 							
 							// ---------- Context / Entity References (in properties card) ----------
@@ -1455,7 +1544,7 @@ DocumentViewBase {
 										}
 										
 										Rectangle {
-											visible: root.pendingEntityRefs.length > 0
+											visible: ticketEditor.pendingEntityRefs.length > 0
 											width: refCountLabel.contentWidth + Style.paddingS * 2
 											height: editView.badgeHeight - 2
 											radius: (editView.badgeHeight - 2) / 2
@@ -1465,7 +1554,7 @@ DocumentViewBase {
 											Text {
 												id: refCountLabel
 												anchors.centerIn: parent
-												text: root.pendingEntityRefs.length
+												text: ticketEditor.pendingEntityRefs.length
 												font.pixelSize: Style.fontSizeM - 1
 												font.bold: true
 												color: Style.baseColor
@@ -1478,7 +1567,7 @@ DocumentViewBase {
 										objectName: "AddContextButton"
 										anchors.right: parent.right
 										anchors.verticalCenter: parent.verticalCenter
-										visible: root.canEdit
+										visible: ticketEditor.canEdit
 										text: "+ " + qsTr("Add context")
 										font.pixelSize: Style.fontSizeM
 										font.bold: true
@@ -1505,10 +1594,10 @@ DocumentViewBase {
 									width: parent.width
 									clip: true
 									spacing: Style.spacingXS
-									visible: root.pendingEntityRefs.length > 0
+									visible: ticketEditor.pendingEntityRefs.length > 0
 									
 									Repeater {
-										model: root.pendingEntityRefs
+										model: ticketEditor.pendingEntityRefs
 										delegate: Rectangle {
 											objectName: "ContextChip_" + index
 											readonly property real maxRefWidth: 260
@@ -1548,10 +1637,10 @@ DocumentViewBase {
 											ToolButton {
 												id: refRemoveBtn
 												objectName: "RemoveButton"
-												visible: root.canEdit
+												visible: ticketEditor.canEdit
 												anchors.right: parent.right
 												anchors.verticalCenter: parent.verticalCenter
-												iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+												iconSource: "qrc:/" +Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 												decorator: Component {
 													ToolButtonDecorator {
 														color: "transparent"
@@ -1559,11 +1648,31 @@ DocumentViewBase {
 													}
 												}
 												onClicked: {
-													var arr = root.pendingEntityRefs.slice()
-													arr.splice(index, 1)
-													root.pendingEntityRefs = arr
-													root._entityRefsChanged = true
-													root.doUpdateModel()
+													ModalDialogManager.openDialog(confirmRemoveContextRefDialogComp, {
+														"refIndex": index,
+														"refName": modelData.displayName || modelData.entityId || ""
+													})
+												}
+											}
+										}
+									}
+
+									Component {
+										id: confirmRemoveContextRefDialogComp
+										MessageDialog {
+											title: qsTr("Remove linked entity?")
+											message: qsTr("%1 will be unlinked from this ticket.").arg(refName)
+
+											property int refIndex: -1
+											property string refName: ""
+
+											onFinished: {
+												if (buttonId === Enums.yes && refIndex >= 0 && refIndex < ticketEditor.pendingEntityRefs.length) {
+													var arr = ticketEditor.pendingEntityRefs.slice()
+													arr.splice(refIndex, 1)
+													ticketEditor.pendingEntityRefs = arr
+													ticketEditor._entityRefsChanged = true
+													ticketEditor.doUpdateModel()
 												}
 											}
 										}
@@ -1572,7 +1681,7 @@ DocumentViewBase {
 
 								// Empty context placeholder
 								Text {
-									visible: root.pendingEntityRefs.length === 0
+									visible: ticketEditor.pendingEntityRefs.length === 0
 									width: parent.width
 									text: qsTr("No linked entities")
 									font.pixelSize: Style.fontSizeM
@@ -1594,6 +1703,11 @@ DocumentViewBase {
 
 										width: __popupWidth + 2 * Style.marginL
 										height: Math.min(Style.marginL + ctxTypeCB.height + ctxPopupItem.height + 2*Style.marginL, __maxHeight)
+										// Content can be taller than __maxHeight once the combo box and
+										// margins are subtracted; clip here (the common parent of ctxBg
+										// and ctxPopupItem) so any overflow is cut at the rounded card's
+										// edge instead of spilling past it.
+										clip: true
 
 										function started() {
 											ctxWrapper.__ctxReady = false
@@ -1696,9 +1810,9 @@ DocumentViewBase {
 
 												onSelectionChanged: {
 													var otherRefs = []
-													for (var j = 0; j < root.pendingEntityRefs.length; j++) {
-														if (root.pendingEntityRefs[j].entityType !== ctxWrapper.selectedEntityTypeId) {
-															otherRefs.push(root.pendingEntityRefs[j])
+													for (var j = 0; j < ticketEditor.pendingEntityRefs.length; j++) {
+														if (ticketEditor.pendingEntityRefs[j].entityType !== ctxWrapper.selectedEntityTypeId) {
+															otherRefs.push(ticketEditor.pendingEntityRefs[j])
 														}
 													}
 													for (var i = 0; i < selectedIds.length; i++) {
@@ -1718,9 +1832,9 @@ DocumentViewBase {
 															typeId: selTypeId
 														})
 													}
-													root.pendingEntityRefs = otherRefs
-													root._entityRefsChanged = true
-													root.doUpdateModel()
+													ticketEditor.pendingEntityRefs = otherRefs
+													ticketEditor._entityRefsChanged = true
+													ticketEditor.doUpdateModel()
 												}
 											}
 										}
@@ -1740,8 +1854,8 @@ DocumentViewBase {
 												onLoaded: {
 													var preIds = []
 													var knownItms = []
-													for (var i = 0; i < root.pendingEntityRefs.length; i++) {
-														var ref = root.pendingEntityRefs[i]
+													for (var i = 0; i < ticketEditor.pendingEntityRefs.length; i++) {
+														var ref = ticketEditor.pendingEntityRefs[i]
 														if (ref.entityType === ctxWrapper.selectedEntityTypeId) {
 															preIds.push(ref.entityId)
 															knownItms.push({
@@ -1774,7 +1888,7 @@ DocumentViewBase {
 							}
 							// Lock section (existing tickets only, reporter/admin only)
 							Column {
-								visible: !root.isNewIssue && root.canLock
+								visible: !ticketEditor.isNewIssue && ticketEditor.canLock
 								width: parent.width
 								spacing: Style.spacingS
 								
@@ -1784,10 +1898,39 @@ DocumentViewBase {
 									id: editLockedCB
 									objectName: "LockIssueCheckBox"
 									text: qsTr("Lock issue")
-									enabled: root.canLock
-									onCheckStateChanged: root.doUpdateModel()
+									enabled: ticketEditor.canLock
+									onCheckStateChanged: {
+										if (ticketEditor.__lockCheckboxSuppressHandler || ticketEditor.guiIsBlocked()) return
+										if (checkState === Qt.Checked) {
+											// Ask for confirmation before locking: revert the visual
+											// state now, re-apply it if the user confirms.
+											ticketEditor.__lockCheckboxSuppressHandler = true
+											checkState = Qt.Unchecked
+											ticketEditor.__lockCheckboxSuppressHandler = false
+											ModalDialogManager.openDialog(confirmLockTicketDialogComp, {})
+											return
+										}
+										ticketEditor.doUpdateModel()
+									}
 									KeyNavigation.tab: editLockedCB.checkState === Qt.Checked ? editLockReasonInput : commentInputField
 									KeyNavigation.backtab: editStateReasonCB
+								}
+
+								Component {
+									id: confirmLockTicketDialogComp
+									MessageDialog {
+										title: qsTr("Lock this ticket?")
+										message: qsTr("Locked tickets can no longer receive new comments. You can unlock it again later.")
+
+										onFinished: {
+											if (buttonId === Enums.yes) {
+												ticketEditor.__lockCheckboxSuppressHandler = true
+												editLockedCB.checkState = Qt.Checked
+												ticketEditor.__lockCheckboxSuppressHandler = false
+												ticketEditor.doUpdateModel()
+											}
+										}
+									}
 								}
 								
 								Column {
@@ -1807,8 +1950,8 @@ DocumentViewBase {
 										width: parent.width
 										height: Style.controlHeightM
 										placeHolderText: qsTr("Reason for locking")
-										readOnly: !root.canLock
-										onEditingFinished: root.doUpdateModel()
+										readOnly: !ticketEditor.canLock
+										onEditingFinished: ticketEditor.doUpdateModel()
 										KeyNavigation.tab: commentInputField
 										KeyNavigation.backtab: editLockedCB
 									}
@@ -1833,7 +1976,7 @@ DocumentViewBase {
 			// ==================== BOTTOM: Chat (same width as Title/Desc, below topRow) ====================
 			Rectangle {
 				id: commentsPanel
-				visible: !root.isNewIssue
+				visible: !ticketEditor.isNewIssue
 				anchors.top: topRow.bottom
 				anchors.topMargin: editView.columnGap
 				anchors.bottom: parent.bottom
@@ -1882,7 +2025,7 @@ DocumentViewBase {
 						}
 						
 						Rectangle {
-							visible: commentsThread.count > 0
+							visible: ticketEditor.visibleCommentsCount() > 0
 							width: chatCountLabel.contentWidth + Style.paddingS * 2
 							height: editView.badgeHeight
 							radius: editView.badgeHeight / 2
@@ -1892,7 +2035,7 @@ DocumentViewBase {
 							Text {
 								id: chatCountLabel
 								anchors.centerIn: parent
-								text: commentsThread.count
+								text: ticketEditor.visibleCommentsCount()
 								font.pixelSize: Style.fontSizeM
 								font.bold: true
 								color: Style.baseColor
@@ -1912,21 +2055,21 @@ DocumentViewBase {
 							spacing: editView.avatarOverlap
 							
 							Repeater {
-								model: root.chatParticipants().slice(0, editView.maxVisibleParticipants)
+								model: ticketEditor.chatParticipants().slice(0, editView.maxVisibleParticipants)
 								delegate: Rectangle {
 									width: 26
 									height: 26
 									radius: 13
 									border.width: 2
 									border.color: editView.cardColor
-									color: modelData.id === root.currentUserId ? editView.accentColor : "#9AA5B8"
+									color: modelData.id === ticketEditor.currentUserId ? editView.accentColor : Style.inactiveTextColor
 									
 									Text {
 										anchors.centerIn: parent
 										text: modelData.name ? modelData.name.charAt(0).toUpperCase() : "?"
 										font.pixelSize: Style.fontSizeM - 1
 										font.bold: true
-										color: Style.baseColor
+										color: Style.highlightedTextColor
 									}
 								}
 							}
@@ -1935,10 +2078,10 @@ DocumentViewBase {
 						ToolButton {
 							id: exportChatBtn
 							anchors.verticalCenter: parent.verticalCenter
-							enabled: !root._exportChatCopiedState
-							iconSource: root._exportChatCopiedState
-										? Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
-										: Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
+							enabled: !ticketEditor._exportChatCopiedState
+							iconSource: ticketEditor._exportChatCopiedState
+										? "qrc:/" +Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
+										: "qrc:/" +Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
 							decorator: Component {
 								ToolButtonDecorator {
 									color: "transparent"
@@ -1946,8 +2089,8 @@ DocumentViewBase {
 								}
 							}
 							onClicked: {
-								root.copyTextToClipboard(root.formatChatExportText(), qsTr("Chat export copied"))
-								root._exportChatCopiedState = true
+								ticketEditor.copyTextToClipboard(ticketEditor.formatChatExportText(), qsTr("Chat export copied"))
+								ticketEditor._exportChatCopiedState = true
 								exportChatBtnStateTimer.restart()
 							}
 						}
@@ -1967,12 +2110,12 @@ DocumentViewBase {
 				}
 
 				Rectangle {
-					visible: root._chatActionHint.length > 0
+					visible: ticketEditor._chatActionHint.length > 0
 					anchors.top: chatHeader.bottom
 					anchors.topMargin: Style.spacingS
 					anchors.horizontalCenter: parent.horizontalCenter
 					radius: Style.radiusL
-					height: root.chatHintHeightPx
+					height: ticketEditor.chatHintHeightPx
 					width: chatHintText.contentWidth + Style.paddingM * 2
 					color: editView.chatHintBgColor
 					border.color: editView.cardBorderColor
@@ -1983,7 +2126,7 @@ DocumentViewBase {
 					Text {
 						id: chatHintText
 						anchors.centerIn: parent
-						text: root._chatActionHint
+						text: ticketEditor._chatActionHint
 						font.pixelSize: Style.fontSizeM - 1
 						color: Style.textColor
 					}
@@ -2036,7 +2179,7 @@ DocumentViewBase {
 								var targetY = pos.y
 								var maxY = Math.max(0, contentHeight - height)
 								contentY = Math.min(Math.max(0, targetY - 20), maxY)
-								root._highlightedMessageId = msgId
+								ticketEditor._highlightedMessageId = msgId
 								highlightClearTimer.restart()
 								return
 							}
@@ -2046,7 +2189,7 @@ DocumentViewBase {
 					Timer {
 						id: highlightClearTimer
 						interval: 1500
-						onTriggered: root._highlightedMessageId = ""
+						onTriggered: ticketEditor._highlightedMessageId = ""
 					}
 
 					onContentHeightChanged: {
@@ -2065,7 +2208,7 @@ DocumentViewBase {
 							
 							Repeater {
 								id: commentsThread
-								model: root.ticketData ? root.ticketData.m_comments : 0
+								model: ticketEditor.ticketData ? ticketEditor.ticketData.m_comments : 0
 								
 								delegate: Item {
 									id: commentDelegate
@@ -2073,19 +2216,19 @@ DocumentViewBase {
 									height: visible ? (commentBubbleCol.height + topGap) : 0
 									visible: !(model.item.m_deleted === true)
 									
-									readonly property bool isMe: root.isSameUserId(model.item.m_userId, root.currentUserId)
+									readonly property bool isMe: ticketEditor.isSameUserId(model.item.m_userId, ticketEditor.currentUserId)
 									readonly property var dataModel: model.item
 									readonly property string _prevUserId: index > 0 && commentsThread.itemAt(index - 1) ? commentsThread.itemAt(index - 1).dataModel.m_userId : ""
 									readonly property bool isGroupedWithPrev: index > 0
 																			  && _prevUserId.length > 0
-																			  && root.isSameUserId(_prevUserId, model.item.m_userId)
+																			  && ticketEditor.isSameUserId(_prevUserId, model.item.m_userId)
 									readonly property int topGap: index === 0 ? 0 : (isGroupedWithPrev ? 2 : Style.spacingS)
-									readonly property bool isEditingThis: root._editingMessageId.length > 0
-																		  && String(model.item.m_id || "") === root._editingMessageId
+									readonly property bool isEditingThis: ticketEditor._editingMessageId.length > 0
+																		  && String(model.item.m_id || "") === ticketEditor._editingMessageId
 									readonly property bool canEditOrDelete: isMe
-																			&& root.canComment
+																			&& ticketEditor.canComment
 																			&& String(model.item.m_id || "").length > 0
-																			&& !(root.ticketData && root.ticketData.m_locked)
+																			&& !(ticketEditor.ticketData && ticketEditor.ticketData.m_locked)
 									
 									Column {
 										id: commentBubbleCol
@@ -2097,7 +2240,7 @@ DocumentViewBase {
 										Rectangle {
 											id: chatBubbleRect
 											readonly property real maxBubbleWidth: Math.min(parent.width * editView.bubbleWidthRatio, editView.bubbleMaxWidth)
-											readonly property bool isHighlighted: root._highlightedMessageId.length > 0 && commentDelegate.dataModel.m_id === root._highlightedMessageId
+											readonly property bool isHighlighted: ticketEditor._highlightedMessageId.length > 0 && commentDelegate.dataModel.m_id === ticketEditor._highlightedMessageId
 											width: maxBubbleWidth
 											anchors.right: commentDelegate.isMe ? parent.right : undefined
 											anchors.left: commentDelegate.isMe ? undefined : parent.left
@@ -2132,14 +2275,14 @@ DocumentViewBase {
 														width: editView.avatarSize
 														height: editView.avatarSize
 														radius: editView.avatarSize / 2
-														color: commentDelegate.isMe ? editView.accentColor : "#9AA5B8"
+														color: commentDelegate.isMe ? editView.accentColor : Style.inactiveTextColor
 														
 														Text {
 															anchors.centerIn: parent
 															text: model.item.m_userName ? model.item.m_userName.charAt(0).toUpperCase() : "?"
 															font.pixelSize: Style.fontSizeM
 															font.bold: true
-															color: Style.baseColor
+															color: Style.highlightedTextColor
 															font.family: Style.fontFamily
 														}
 													}
@@ -2163,7 +2306,7 @@ DocumentViewBase {
 														Row {
 															spacing: Style.spacingXS
 															Text {
-																text: root.formatTimestamp(model.item.m_timestamp)
+																text: ticketEditor.formatTimestamp(model.item.m_timestamp)
 																font.pixelSize: Style.fontSizeM - 1
 																color: editView.timestampColor
 															}
@@ -2185,8 +2328,7 @@ DocumentViewBase {
 													width: parent.width
 													height: replyBubbleCol.height + Style.paddingS
 													radius: Style.radiusM
-													color: replyIndicatorMA.containsMouse ? "#C7D2E6" : "#D7DFEE"
-													
+															color: replyIndicatorMA.containsMouse ? Style.selectedColor : Style.backgroundColor2
 													MouseArea {
 														id: replyIndicatorMA
 														anchors.fill: parent
@@ -2240,7 +2382,7 @@ DocumentViewBase {
 													id: commentBodyText
 													width: parent.width
 													textFormat: Text.StyledText
-													text: root.formatCommentHtml(model.item.m_content)
+													text: ticketEditor.formatCommentHtml(model.item.m_content)
 													font.pixelSize: Style.fontSizeM
 													color: Style.textColor
 													wrapMode: Text.Wrap
@@ -2258,8 +2400,7 @@ DocumentViewBase {
 														width: parent.width
 														height: Math.max(40, editMessageInput.contentHeight + Style.paddingS * 2)
 														radius: Style.radiusM
-														color: "white"
-														border.color: editView.accentColor
+												color: Style.baseColor
 														border.width: 1
 
 														TextEdit {
@@ -2270,10 +2411,10 @@ DocumentViewBase {
 															color: Style.textColor
 															wrapMode: TextEdit.Wrap
 															textFormat: TextEdit.PlainText
-															text: root.__unescapeNewlines(model.item.m_content)
+															text: ticketEditor.__unescapeNewlines(model.item.m_content)
 															onVisibleChanged: {
 																if (visible) {
-																	text = root.__unescapeNewlines(model.item.m_content)
+																	text = ticketEditor.__unescapeNewlines(model.item.m_content)
 																	editMessageFocusTimer.start()
 																}
 															}
@@ -2297,8 +2438,9 @@ DocumentViewBase {
 																interval: 50
 																repeat: false
 																onTriggered: {
-																	if (root._editingMessageId.length > 0) {
-																		root._editingMessageId = ""
+																	if (ticketEditor._editingMessageId.length > 0) {
+																		ticketEditor._editingMessageId = ""
+																		ticketEditor._editPendingRemovedAttachmentIds = []
 																	}
 																}
 															}
@@ -2318,9 +2460,14 @@ DocumentViewBase {
 																cursorShape: Qt.PointingHandCursor
 																onClicked: {
 																	editCancelOnBlurTimer.stop()
-																	var newText = root.__escapeNewlines(editMessageInput.text)
-																	root._editingMessageId = ""
-																	root.editComment(model.item.m_id, newText)
+																	var newText = ticketEditor.__escapeNewlines(editMessageInput.text)
+																	var msgId = model.item.m_id
+																	for (var i = 0; i < ticketEditor._editPendingRemovedAttachmentIds.length; i++) {
+																		ticketEditor.removeCommentAttachment(msgId, ticketEditor._editPendingRemovedAttachmentIds[i])
+																	}
+																	ticketEditor._editPendingRemovedAttachmentIds = []
+																	ticketEditor._editingMessageId = ""
+																	ticketEditor.editComment(msgId, newText)
 																}
 															}
 														}
@@ -2334,7 +2481,8 @@ DocumentViewBase {
 																cursorShape: Qt.PointingHandCursor
 																onClicked: {
 																	editCancelOnBlurTimer.stop()
-																	root._editingMessageId = ""
+																	ticketEditor._editingMessageId = ""
+																	ticketEditor._editPendingRemovedAttachmentIds = []
 																}
 															}
 														}
@@ -2344,7 +2492,7 @@ DocumentViewBase {
 												Flow {
 													width: parent.width
 													spacing: Style.spacingS
-													visible: commentDelegate.dataModel.m_attachments.count > 0
+													visible: (commentDelegate.dataModel.m_attachments && commentDelegate.dataModel.m_attachments.count > 0)
 
 													Repeater {
 														model: commentDelegate.dataModel.m_attachments || []
@@ -2352,6 +2500,9 @@ DocumentViewBase {
 															id: attachmentDelegate
 															spacing: Style.spacingS
 															readonly property string attachmentUrl: model.item.m_preview || ""
+															// Hide attachments marked for removal in the current edit draft;
+															// the actual removal only happens on Save (see ticketEditor._editPendingRemovedAttachmentIds).
+															visible: ticketEditor._editPendingRemovedAttachmentIds.indexOf(String(model.item.m_id || "")) < 0
 
 															Text {
 																font.pixelSize: Style.fontSizeM
@@ -2379,7 +2530,14 @@ DocumentViewBase {
 																	anchors.fill: parent
 																	hoverEnabled: true
 																	cursorShape: Qt.PointingHandCursor
-																	onClicked: root.removeCommentAttachment(commentDelegate.dataModel.m_id, index)
+																	onClicked: {
+																		var attId = String(model.item.m_id || "")
+																		if (attId && ticketEditor._editPendingRemovedAttachmentIds.indexOf(attId) < 0) {
+																			var arr = ticketEditor._editPendingRemovedAttachmentIds.slice()
+																			arr.push(attId)
+																			ticketEditor._editPendingRemovedAttachmentIds = arr
+																		}
+																	}
 																}
 															}
 														}
@@ -2391,7 +2549,7 @@ DocumentViewBase {
 													visible: !commentDelegate.isEditingThis
 
 													Text {
-														visible: root.canComment
+														visible: ticketEditor.canComment
 														text: qsTr("Reply")
 														font.pixelSize: Style.fontSizeM
 														color: Style.inactiveTextColor
@@ -2401,7 +2559,7 @@ DocumentViewBase {
 															hoverEnabled: true
 															cursorShape: Qt.PointingHandCursor
 															onClicked: {
-																root._replyToMessage = {
+																ticketEditor._replyToMessage = {
 																	id: model.item.m_id || "",
 																	userName: model.item.m_userName || qsTr("Unknown"),
 																	content: model.item.m_content || ""
@@ -2420,7 +2578,7 @@ DocumentViewBase {
 															anchors.fill: parent
 															hoverEnabled: true
 															cursorShape: Qt.PointingHandCursor
-															onClicked: root.copyTextToClipboard(model.item.m_content || "", qsTr("Message copied"))
+															onClicked: ticketEditor.copyTextToClipboard(model.item.m_content || "", qsTr("Message copied"))
 														}
 													}
 
@@ -2434,7 +2592,10 @@ DocumentViewBase {
 															anchors.fill: parent
 															hoverEnabled: true
 															cursorShape: Qt.PointingHandCursor
-															onClicked: root._editingMessageId = String(model.item.m_id || "")
+															onClicked: {
+																ticketEditor._editPendingRemovedAttachmentIds = []
+																ticketEditor._editingMessageId = String(model.item.m_id || "")
+															}
 														}
 													}
 
@@ -2442,13 +2603,13 @@ DocumentViewBase {
 														visible: commentDelegate.canEditOrDelete
 														text: qsTr("Delete")
 														font.pixelSize: Style.fontSizeM
-														color: Style.inactiveTextColor
+														color: Style.errorColor
 
 														MouseArea {
 															anchors.fill: parent
 															hoverEnabled: true
 															cursorShape: Qt.PointingHandCursor
-															onClicked: root.deleteComment(model.item.m_id)
+															onClicked: ModalDialogManager.openDialog(confirmDeleteCommentDialogComp, {"messageId": String(model.item.m_id || "")})
 														}
 													}
 												}
@@ -2457,10 +2618,25 @@ DocumentViewBase {
 									}
 								}
 							}
-							
+
+							Component {
+								id: confirmDeleteCommentDialogComp
+								MessageDialog {
+									title: qsTr("Delete comment?")
+									message: qsTr("This comment will be permanently deleted. You cannot undo this action.")
+
+									property string messageId
+
+									onFinished: {
+										if (buttonId === Enums.yes && messageId !== "")
+											ticketEditor.deleteComment(messageId)
+									}
+								}
+							}
+
 							// Empty comments placeholder
 							Item {
-								visible: commentsThread.count === 0
+								visible: ticketEditor.visibleCommentsCount() === 0
 								width: parent.width
 								height: commentsFlick.height - Style.spacingL * 2
 								
@@ -2492,7 +2668,7 @@ DocumentViewBase {
 				// ---- Fixed bottom: Add comment input ----
 				Rectangle {
 					id: addCommentSection
-					visible: root.canComment && (!root.ticketData || !root.ticketData.m_locked)
+					visible: ticketEditor.canComment && (!ticketEditor.ticketData || !ticketEditor.ticketData.m_locked)
 					anchors.bottom: parent.bottom
 					anchors.bottomMargin: 1
 					anchors.left: parent.left
@@ -2536,7 +2712,7 @@ DocumentViewBase {
 						
 						// Reply-to indicator
 						Rectangle {
-							visible: root._replyToMessage !== null
+							visible: ticketEditor._replyToMessage !== null
 							width: parent.width
 							height: replyRow.height + Style.paddingS * 2
 							radius: Style.radiusM
@@ -2564,7 +2740,7 @@ DocumentViewBase {
 									spacing: 1
 									
 									Text {
-										text: root._replyToMessage ? root._replyToMessage.userName : ""
+										text: ticketEditor._replyToMessage ? ticketEditor._replyToMessage.userName : ""
 										font.pixelSize: Style.fontSizeM
 										font.bold: true
 										color: editView.accentColor
@@ -2573,7 +2749,7 @@ DocumentViewBase {
 									}
 									
 									Text {
-										text: root._replyToMessage ? root._replyToMessage.content : ""
+										text: ticketEditor._replyToMessage ? ticketEditor._replyToMessage.content : ""
 										font.pixelSize: Style.fontSizeM
 										color: Style.inactiveTextColor
 										elide: Text.ElideRight
@@ -2587,14 +2763,14 @@ DocumentViewBase {
 								id: replyCloseBtn
 								anchors.right: parent.right
 								anchors.verticalCenter: parent.verticalCenter
-								iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+								iconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 								decorator: Component {
 									ToolButtonDecorator {
 										color: "transparent"
 										icon.width: Style.iconSizeXS
 									}
 								}
-								onClicked: root._replyToMessage = null
+								onClicked: ticketEditor._replyToMessage = null
 							}
 						}
 						
@@ -2602,10 +2778,10 @@ DocumentViewBase {
 						Flow {
 							width: parent.width
 							spacing: Style.spacingS
-							visible: root.pendingAttachments.length > 0 || root.uploadsInProgress > 0
+							visible: ticketEditor.pendingAttachments.length > 0 || ticketEditor.uploadsInProgress > 0
 							
 							Repeater {
-								model: root.pendingAttachments
+								model: ticketEditor.pendingAttachments
 								delegate: Row {
 									spacing: Style.spacingXS
 									
@@ -2613,7 +2789,7 @@ DocumentViewBase {
 										anchors.verticalCenter: parent.verticalCenter
 										width: Style.iconSizeS
 										height: width
-										source: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
+										source: "qrc:/" + Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
 										sourceSize.width: width
 										sourceSize.height: height
 									}
@@ -2644,16 +2820,17 @@ DocumentViewBase {
 											}
 										}
 										onClicked: {
-											var removed = root.pendingAttachments[index]
-											var arr = root.pendingAttachments.slice()
+											var removed = ticketEditor.pendingAttachments[index]
+											var arr = ticketEditor.pendingAttachments.slice()
 											arr.splice(index, 1)
-											root.pendingAttachments = arr
+											ticketEditor.pendingAttachments = arr
 											if (removed && removed.id) {
 												var xhr = new XMLHttpRequest()
 												xhr.open("DELETE", "../../files/" + encodeURIComponent(removed.id))
 												xhr.onreadystatechange = function() {
 													if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
 														console.warn("Failed to delete attachment from server:", xhr.status, xhr.responseText)
+														PopupManager.addErrorMessage(qsTr("Failed to remove attachment from server: %1").arg(removed.fileName || removed.id), true)
 													}
 												}
 												xhr.send()
@@ -2671,7 +2848,7 @@ DocumentViewBase {
 								border.color: editView.cardBorderColor
 								border.width: 1
 								color: editView.pageBgColor
-								visible: root.uploadsInProgress > 0
+								visible: ticketEditor.uploadsInProgress > 0
 								
 								Text {
 									id: uploadingLabel
@@ -2720,7 +2897,7 @@ DocumentViewBase {
 										id: commentInputField
 										objectName: "TextInput"
 										width: commentInputFlick.width
-										height: Math.max(contentHeight, root.minCommentInputHeightPx)
+										height: Math.max(contentHeight, ticketEditor.minCommentInputHeightPx)
 										y: Math.max(0, (commentInputFlick.height - height) / 2)
 										font.pixelSize: Style.fontSizeM
 										color: Style.textColor
@@ -2756,7 +2933,7 @@ DocumentViewBase {
 									anchors.rightMargin: 6
 									anchors.bottom: parent.bottom
 									anchors.bottomMargin: Math.max(0, (40 - height) / 2)
-									iconSource: Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
+									iconSource: "qrc:/" + Style.getIconPath("Icons/Attachment", Icon.State.On, Icon.Mode.Normal)
 									decorator: Component {
 										ToolButtonDecorator { color: "transparent" }
 									}
@@ -2775,21 +2952,20 @@ DocumentViewBase {
 									   ? (sendBtnMa.pressed ? Qt.darker(editView.accentColor, 1.15)
 															: sendBtnMa.containsMouse ? Qt.lighter(editView.accentColor, 1.1)
 																					  : editView.accentColor)
-									   : "#D0D5DD"
+									   : Style.buttonInactiveColor
 								
-								Text {
-									id: sendBtnText
-									anchors.centerIn: parent
-									text: root.uploadsInProgress > 0 ? qsTr("Uploading...") : qsTr("Send")
-									font.pixelSize: Style.fontSizeM
-									color: commentButton.enabled ? Style.baseColor : "#98A2B3"
-								}
-								
+									Text {
+										id: sendBtnText
+										anchors.centerIn: parent
+										text: ticketEditor.uploadsInProgress > 0 ? qsTr("Uploading...") : qsTr("Send")
+										font.pixelSize: Style.fontSizeM
+										color: commentButton.enabled ? Style.highlightedTextColor : Style.buttonInactiveTextColor
+									}
 								// Hidden functional Button for enabled state
 								Button {
 									id: commentButton
 									visible: false
-									enabled: commentInputField.text.trim().length > 0 && root.uploadsInProgress === 0
+									enabled: commentInputField.text.trim().length > 0 && ticketEditor.uploadsInProgress === 0
 								}
 								
 								MouseArea {
@@ -2800,10 +2976,10 @@ DocumentViewBase {
 									cursorShape: commentButton.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
 									onClicked: {
 										if (!commentButton.enabled) return
-										root.addComment(commentInputField.text.trim(), root.pendingAttachments.slice())
+										ticketEditor.addComment(commentInputField.text.trim(), ticketEditor.pendingAttachments.slice())
 										commentInputField.text = ""
-										root.pendingAttachments = []
-										root._replyToMessage = null
+										ticketEditor.pendingAttachments = []
+										ticketEditor._replyToMessage = null
 									}
 								}
 							}
@@ -2824,17 +3000,17 @@ DocumentViewBase {
 								var previewReader = new FileReader()
 								previewReader.readAsDataURL(fileObj)
 								previewReader.onload = function() {
-									root.uploadAttachment(fileObj, fileName, previewReader.result)
+									ticketEditor.uploadAttachment(fileObj, fileName, previewReader.result)
 								}
 								previewReader.onerror = function() {
 									console.warn("Failed to generate preview for: " + fileName)
-									root.uploadAttachment(fileObj, fileName, "")
+									ticketEditor.uploadAttachment(fileObj, fileName, "")
 								}
 							} else {
 								var filePath = String(attachImageDialog.file)
 								var parts = filePath.replace("file:///", "").split("/")
 								var nativeFileName = parts.length > 0 ? parts[parts.length - 1] : "attachment"
-								root.uploadAttachment(null, nativeFileName, filePath)
+								ticketEditor.uploadAttachment(null, nativeFileName, filePath)
 							}
 						}
 					}
@@ -2847,7 +3023,7 @@ DocumentViewBase {
 				// Lock notice / read-only notice
 				Row {
 					id: lockNoticeRow
-					visible: (root.ticketData && root.ticketData.m_locked) || (!root.isNewIssue && !root.canComment)
+					visible: (ticketEditor.ticketData && ticketEditor.ticketData.m_locked) || (!ticketEditor.isNewIssue && !ticketEditor.canComment)
 					anchors.bottom: parent.bottom
 					anchors.bottomMargin: Style.paddingM
 					anchors.left: parent.left
@@ -2859,13 +3035,13 @@ DocumentViewBase {
 						anchors.verticalCenter: parent.verticalCenter
 						width: Style.iconSizeS
 						height: width
-						source: Style.getIconPath("Icons/Lock", Icon.State.On, Icon.Mode.Normal)
+						source: "qrc:/" +Style.getIconPath("Icons/Lock", Icon.State.On, Icon.Mode.Normal)
 						sourceSize.width: width
 						sourceSize.height: height
 					}
 					
 					Text {
-						text: root.canComment
+						text: ticketEditor.canComment
 							  ? qsTr("This conversation has been locked. Only collaborators can comment.")
 							  : qsTr("You have read-only access to this ticket. Only the reporter, assignees, and administrators can edit.")
 						font.pixelSize: Style.fontSizeM

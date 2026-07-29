@@ -230,8 +230,8 @@ QtObject {
 
 				let stroke = shapeItemArg.m_painter.m_stroke
 				lineObj.color = stroke.m_color && stroke.m_color.m_color ? stroke.m_color.m_color : 'black'
-				lineObj.penAlpha = stroke.m_alpha ?stroke.m_alpha/255:0
-				lineObj.lineWidht = stroke.m_width ? stroke.m_width : 1
+				lineObj.penAlpha = stroke.m_alpha ? stroke.m_alpha/255 : 1
+				lineObj.lineWidth = stroke.m_width ? stroke.m_width : 1
 				layerArg.addShape(lineObj)
 			}
 		}
@@ -252,7 +252,7 @@ QtObject {
 
 				lineObj.color = shapeItemArg.m_painter.m_fill.m_color.m_color
 				lineObj.penAlpha = shapeItemArg.m_painter.m_stroke.m_alpha/255
-				lineObj.lineWidht = shapeItemArg.m_painter.m_stroke.m_width
+				lineObj.lineWidth = shapeItemArg.m_painter.m_stroke.m_width
 				layerArg.addShape(lineObj)
 			}
 		}

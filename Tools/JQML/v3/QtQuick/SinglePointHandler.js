@@ -9,6 +9,17 @@ class SinglePointHandler extends PointerDeviceHandler {
 
         pointChanged: { type:Signal, args:[] },
     })
+
+    __updatePointFromMouse(mouse){
+        this.point = {
+            x: mouse.x,
+            y: mouse.y,
+            sceneX: mouse.originX,
+            sceneY: mouse.originY,
+            pressedButtons: mouse.buttons,
+            modifiers: mouse.modifiers,
+        }
+    }
 }
 
 

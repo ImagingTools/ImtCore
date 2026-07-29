@@ -1,0 +1,159 @@
+schema {
+	namespace: imt2d
+	version: 1.0
+}
+
+import {
+	"Geometry.sdl"
+	"../../imtcolor/1.0/RgbColorHex.sdl"
+}
+
+## Qt6-compatible paint primitives used by PaintSystem.
+## Detailed mapping and defaults are documented in README.md in this folder.
+
+## Supported image formats for ImageShape and BrushTexture payloads.
+enum ImageFormat {
+	PNG
+	JPEG
+	SVG
+}
+
+## Qt::PenStyle
+enum PenStyle {
+	NO_PEN
+	SOLID_LINE
+	DASH_LINE
+	DOT_LINE
+	DASH_DOT_LINE
+	DASH_DOT_DOT_LINE
+	CUSTOM_DASH_LINE
+}
+
+## Qt::PenCapStyle
+enum PenCapStyle {
+	FLAT_CAP
+	SQUARE_CAP
+	ROUND_CAP
+}
+
+## Qt::PenJoinStyle
+enum PenJoinStyle {
+	MITER_JOIN
+	BEVEL_JOIN
+	ROUND_JOIN
+	SVG_MITER_JOIN
+}
+
+## Qt::BrushStyle
+enum BrushStyle {
+	NO_BRUSH
+	SOLID_PATTERN
+	DENSE1_PATTERN
+	DENSE2_PATTERN
+	DENSE3_PATTERN
+	DENSE4_PATTERN
+	DENSE5_PATTERN
+	DENSE6_PATTERN
+	DENSE7_PATTERN
+	HOR_PATTERN
+	VER_PATTERN
+	CROSS_PATTERN
+	BDIAG_PATTERN
+	FDIAG_PATTERN
+	DIAG_CROSS_PATTERN
+	LINEAR_GRADIENT_PATTERN
+	RADIAL_GRADIENT_PATTERN
+	CONICAL_GRADIENT_PATTERN
+	TEXTURE_PATTERN
+}
+
+## QGradient::Spread
+enum GradientSpread {
+	PAD_SPREAD
+	REFLECT_SPREAD
+	REPEAT_SPREAD
+}
+
+## QGradient::CoordinateMode
+enum GradientCoordinateMode {
+	LOGICAL_MODE
+	STRETCH_TO_DEVICE_MODE
+	OBJECT_BOUNDING_MODE
+	OBJECT_MODE
+}
+
+type GradientStop {
+	position: Double!   ## [0.0 .. 1.0]
+	color: RgbColorHex!
+	alpha: Integer      ## 0-255
+}
+
+type LinearGradient {
+	start: Point2d!
+	end: Point2d!
+	spread: GradientSpread
+	coordinateMode: GradientCoordinateMode
+	stops: [GradientStop]!
+}
+
+type RadialGradient {
+	center: Point2d!
+	radius: Double!
+	focalPoint: Point2d
+	centerRadius: Double
+	focalRadius: Double
+	spread: GradientSpread
+	coordinateMode: GradientCoordinateMode
+	stops: [GradientStop]!
+}
+
+type ConicalGradient {
+	center: Point2d!
+	angle: Double!
+	coordinateMode: GradientCoordinateMode
+	stops: [GradientStop]!
+}
+
+union BrushGradient = LinearGradient | RadialGradient | ConicalGradient
+
+## 3x3 affine matrix compatible with QTransform.
+type Transform2d {
+	m11: Double!
+	m12: Double!
+	m13: Double!
+	m21: Double!
+	m22: Double!
+	m23: Double!
+	m31: Double!
+	m32: Double!
+	m33: Double!
+}
+
+type BrushTexture {
+	imageFormat: ImageFormat!
+	imageData: String!  ## Base64-encoded texture image
+}
+
+type Brush {
+	alpha: Integer # 0-255
+	color: RgbColorHex!
+	style: BrushStyle
+	gradient: BrushGradient
+	texture: BrushTexture
+	transform: Transform2d
+}
+
+type Pen {
+	alpha: Integer # 0-255
+	color: RgbColorHex!
+	width: Int
+	widthF: Double
+	style: PenStyle
+	capStyle: PenCapStyle
+	joinStyle: PenJoinStyle
+	miterLimit: Double
+	dashPattern: [Double]
+	dashOffset: Double
+	cosmetic: Bool
+	brush: Brush
+}
