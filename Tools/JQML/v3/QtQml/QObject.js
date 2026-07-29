@@ -133,6 +133,10 @@ class QObject extends QBaseObject {
             value.__completeProperties()
         }
 
+        if(typeof value === 'function'){
+            value.isSubscription = true
+        }
+
         if(path.length === 2){
             this.__proxy[path[0]][path[1]] = value
         } else {

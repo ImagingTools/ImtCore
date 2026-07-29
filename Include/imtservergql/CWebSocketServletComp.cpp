@@ -270,6 +270,10 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		if (subscriberControllerPtr->RegisterSubscription(subscriptionId, gqlRequest, request, errorMessage)){
 			return imtrest::ConstResponsePtr();
 		}
+
+		return CreateErrorResponse(errorMessage.isEmpty()
+					? QByteArrayLiteral("Failed to register subscription")
+					: errorMessage.toUtf8(), request);
 	}
 	else{
 		QByteArray errorMessage = QString("The requested command could not be executed. No servlet was found for the given command: '%1")
