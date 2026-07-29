@@ -5,6 +5,7 @@ TicketBadge 1.0 TicketBadge.qml
 TicketCollectionView 1.0 TicketCollectionView.qml
 TicketCreateDialog 1.0 TicketCreateDialog.qml
 TicketEditor 1.0 TicketEditor.qml
-EntityContextTicketsDialog 1.0 EntityContextTicketsDialog.qml
+EntityContextTicketsPanel 1.0 EntityContextTicketsPanel.qml
+EntityContextTicketsDataProvider 1.0 EntityContextTicketsDataProvider.qml
 TicketListPanel 1.0 TicketListPanel.qml
 TicketView 1.0 TicketView.qml
