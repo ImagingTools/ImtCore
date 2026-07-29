@@ -26,6 +26,7 @@ Item {
 	signal removed()
 	signal elementsRemoved(var elementIds)
 	signal elementSetRemoved()
+	signal elementSetRemoveFailed(string message)
 	
 	signal renamed(string objectId, string newName);
 	signal imported(string objectId);
@@ -315,6 +316,13 @@ Item {
 					if (m_success){
 						root.elementSetRemoved()
 					}
+					else{
+						let message = m_errorMessage
+						if (!message || message === ""){
+							message = qsTr("Unable to remove elements")
+						}
+						root.elementSetRemoveFailed(message)
+					}
 				}
 			}
 		}
@@ -331,7 +339,12 @@ Item {
 		sdlObjectComp: Component {
 			RemoveElementsPayload {
 				onFinished: {
-					root.elementsRemoved(removeGqlSender.elementIds)
+					// Only notify UI on success — otherwise Topology would clear selection /
+					// reload as if the service were gone while it still exists on the agent.
+					if (m_success){
+						root.elementsRemoved(removeGqlSender.elementIds)
+						root.removed()
+					}
 				}
 			}
 		}
@@ -386,7 +399,8 @@ Item {
 		}
 		
 		function onError(message, type){
-			root.visualStatusReceiveFailed(message)
+			// Match ObjectVisualStatusProvider contract: (objectId, errorMessage).
+			root.visualStatusReceiveFailed(objectVisualStatusInput.m_objectId, message)
 		}
 		
 		function getHeaders(){

@@ -5,10 +5,8 @@ AuthorizationPage 1.0 AuthorizationPage.qml
 singleton AuthorizationController 1.0 AuthorizationController.qml
 
 SuperuserPasswordPage 1.0 SuperuserPasswordPage.qml
-SuperuserProvider 1.0 SuperuserProvider.qml
 
 UserPanel 1.0 UserPanel.qml
-UserManagementProvider 1.0 UserManagementProvider.qml
 UserTokenProvider 1.0 UserTokenProvider.qml
 
 singleton PermissionsController 1.0 PermissionsController.qml
@@ -29,6 +27,13 @@ RoleCollectionDataProvider 1.0 RoleCollectionDataProvider.qml
 GroupCollectionDataProvider 1.0 GroupCollectionDataProvider.qml
 UserCollectionDataProvider 1.0 UserCollectionDataProvider.qml
 ProfileView 1.0 ProfileView.qml
+ProfileApiClient 1.0 ProfileApiClient.qml
+GqlBasedProfileApiClient 1.0 GqlBasedProfileApiClient.qml
+ProfileGeneralPage 1.0 ProfileGeneralPage.qml
+ProfileOrganizationsPage 1.0 ProfileOrganizationsPage.qml
+ProfileTokensPage 1.0 ProfileTokensPage.qml
+ProfileAccessPage 1.0 ProfileAccessPage.qml
+ProfileNoticeBanner 1.0 ProfileNoticeBanner.qml
 RoleCollectionView 1.0 RoleCollectionView.qml
 UserCollectionView 1.0 UserCollectionView.qml
 UserGroupCollectionView 1.0 UserGroupCollectionView.qml
@@ -55,15 +60,10 @@ TenantConnectionCodePage 1.0 TenantConnectionCodePage.qml
 TenantConnectOrganizationPage 1.0 TenantConnectOrganizationPage.qml
 TenantMyConnectionsPage 1.0 TenantMyConnectionsPage.qml
 TenantMessagesPage 1.0 TenantMessagesPage.qml
-TenantSimpleCollectionPage 1.0 TenantSimpleCollectionPage.qml
-TenantDocumentEditorShell 1.0 TenantDocumentEditorShell.qml
 CrossOrgGrantView 1.0 CrossOrgGrantView.qml
 ContractView 1.0 ContractView.qml
 RelationshipView 1.0 RelationshipView.qml
 MessageView 1.0 MessageView.qml
 StatusBadge 1.0 StatusBadge.qml
-TenantCollectionItemDelegateBase 1.0 TenantCollectionItemDelegateBase.qml
 TenantCollectionListView 1.0 TenantCollectionListView.qml
-TenantTableContainer 1.0 TenantTableContainer.qml
-TenantTableHeader 1.0 TenantTableHeader.qml
 

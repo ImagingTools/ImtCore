@@ -1,5 +1,4 @@
 #include "DigitalPrinter.h"
-#include "DigitalPrinter_fwd.h"
 
 
 namespace sdl::V1_0::modsdl

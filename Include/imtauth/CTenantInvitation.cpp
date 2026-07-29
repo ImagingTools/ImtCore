@@ -39,21 +39,6 @@ IMT_TENANT_INVITATION_GET_SET(QString, LastSentAt, m_lastSentAt)
 #undef IMT_TENANT_INVITATION_GET_SET
 
 
-QByteArray CTenantInvitation::GetRoleId() const
-{
-	return m_roleId;
-}
-
-
-void CTenantInvitation::SetRoleId(const QByteArray& roleId)
-{
-	if (m_roleId != roleId){
-		istd::CChangeNotifier notifier(this);
-		m_roleId = roleId;
-	}
-}
-
-
 ITenantInvitation::TenantInvitationStatus CTenantInvitation::GetStatus() const
 {
 	return m_status;
@@ -89,11 +74,6 @@ bool CTenantInvitation::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(tenantIdTag);
 	retVal = retVal && archive.Process(m_tenantId);
 	retVal = retVal && archive.EndTag(tenantIdTag);
-
-	iser::CArchiveTag roleTag("Role", "Role", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(roleTag);
-	retVal = retVal && archive.Process(m_roleId);
-	retVal = retVal && archive.EndTag(roleTag);
 
 	iser::CArchiveTag statusTag("Status", "Status", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(statusTag);
@@ -161,7 +141,6 @@ bool CTenantInvitation::CopyFrom(const IChangeable& object, CompatibilityMode /*
 	m_invitationId = sourcePtr->m_invitationId;
 	m_userId = sourcePtr->m_userId;
 	m_tenantId = sourcePtr->m_tenantId;
-	m_roleId = sourcePtr->m_roleId;
 	m_status = sourcePtr->m_status;
 	m_invitedByUserId = sourcePtr->m_invitedByUserId;
 	m_createdAt = sourcePtr->m_createdAt;
@@ -195,7 +174,6 @@ bool CTenantInvitation::ResetData(CompatibilityMode /*mode*/)
 	m_invitationId.clear();
 	m_userId.clear();
 	m_tenantId.clear();
-	m_roleId.clear();
 	m_status = TIS_PENDING;
 	m_invitedByUserId.clear();
 	m_createdAt.clear();

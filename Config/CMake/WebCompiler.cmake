@@ -425,6 +425,9 @@ macro(getImtBaseQmlWebDirs webdirs buildwebdir useImtControlsStyle)
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseFilterableSelectSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseFilterableSelectSdl)
 
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseFileSystemSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseFileSystemSdl)
+
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseProgressManagerSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseProgressManagerSdl)
 
@@ -479,9 +482,6 @@ macro(getImtAuthQmlWebDirs webdirs buildwebdir)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthSessionsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthSessionsSdl)
-
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAuthorizationOptionsSdl)
-	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthAuthorizationOptionsSdl)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthPersonalAccessTokensSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthPersonalAccessTokensSdl)

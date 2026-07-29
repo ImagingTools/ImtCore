@@ -40,16 +40,10 @@ input TenantMemberEntryInput {
 	name: String
 }
 
-type TenantMemberRoleEntry {
-	userId: ID!
-	role: String!
-}
-
 type TenantInvitationEntry {
 	id: ID!
 	userId: ID!
 	userName: String
-	role: String!
 	status: String!
 	invitedByUserId: ID
 	invitedByName: String
@@ -67,8 +61,8 @@ type TenantData {
 	createdAt: String
 	updatedAt: String
 	currentUserId: ID
+	currentUserOrganizationPermissions: [ID]
 	members: [TenantMemberEntry]
-	memberRoles: [TenantMemberRoleEntry]
 	pendingInvitations: [TenantInvitationEntry]
 	tenantPermissions: [ID]
 	parentTenantId: ID
@@ -126,18 +120,12 @@ type RemoveTenantPayload {
 	errorMessage: String
 }
 
-input MemberRoleEntryInput {
-	userId: ID!
-	role: String!
-}
-
 input UpdateTenantInput {
 	tenantId: ID!
 	name: String!
 	description: String
 	ownerId: ID
 	members: [TenantMemberEntryInput]
-	memberRoles: [MemberRoleEntryInput]
 	tenantPermissions: [ID]
 }
 
@@ -159,15 +147,6 @@ type SetTenantActivePayload {
 type GetTenantIdsPayload {
 	tenantIds: [ID]
 	errorMessage: String
-}
-
-# --- Tenant Environment Roles ---
-
-enum TenantEnvironmentRole {
-	Creator
-	Owner
-	Admin
-	Member
 }
 
 # --- Connection Code ---

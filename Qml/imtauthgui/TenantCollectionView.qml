@@ -144,14 +144,14 @@ RemoteCollectionView {
 						// Fan out so any TenantEditor open on this tenant reloads.
 						AuthorizationController.tenantInvitationAccepted(container.__pendingAcceptTenantId, "")
 					} else if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 					}
 				}
 			}
 		}
 
 		function onError(message, type) {
-			ModalDialogManager.showInfoDialog(message)
+			PopupManager.addErrorMessage(message, true)
 		}
 	}
 
@@ -166,14 +166,14 @@ RemoteCollectionView {
 						container.doUpdateGui()
 						AuthorizationController.tenantInvitationRejected(container.__pendingRejectTenantId, "")
 					} else if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 					}
 				}
 			}
 		}
 
 		function onError(message, type) {
-			ModalDialogManager.showInfoDialog(message)
+			PopupManager.addErrorMessage(message, true)
 		}
 	}
 
@@ -271,14 +271,14 @@ RemoteCollectionView {
 							width: acceptBtnLabel.contentWidth + 2 * Style.marginL
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: Style.successColor
+							color: "#3FB950"
 
 							Text {
 								id: acceptBtnLabel
 								anchors.centerIn: parent
 								text: qsTr("Accept")
 								font.pixelSize: Style.fontSizeS
-								color: Style.baseColor
+								color: "#FFFFFF"
 							}
 
 							MouseArea {
@@ -297,14 +297,14 @@ RemoteCollectionView {
 							width: rejectBtnLabel.contentWidth + 2 * Style.marginL
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: Style.dangerColor
+							color: "#DA3633"
 
 							Text {
 								id: rejectBtnLabel
 								anchors.centerIn: parent
 								text: qsTr("Reject")
 								font.pixelSize: Style.fontSizeS
-								color: Style.baseColor
+								color: "#FFFFFF"
 							}
 
 							MouseArea {
@@ -387,7 +387,7 @@ RemoteCollectionView {
 			onReused: {
 				var val = isActiveDelegate.getValue()
 				isActiveLabel.text = val ? qsTr("Active") : qsTr("Inactive")
-				isActiveIndicator.color = val ? Style.indicatorActiveColor : Style.indicatorInactiveColor
+				isActiveIndicator.color = val ? "#3FB950" : "#8C95A6"
 			}
 
 			Row {
@@ -402,7 +402,7 @@ RemoteCollectionView {
 					width: 10
 					height: 10
 					radius: width / 2
-					color: Style.indicatorInactiveColor
+					color: "#8C95A6"
 				}
 
 				Text {
@@ -484,10 +484,6 @@ RemoteCollectionView {
 		AuthorizationController.selectTenant(tenantId || "")
 	}
 
-	property string __pendingOpenTenantAfterSwitchId: ""
-	property bool __pendingCreateNewTenantDocumentAfterSwitch: false
-	property bool __skipCloseOnSwitch: false
-
 	function openTenantDocument(tenantId) {
 		if (!tenantId) return
 
@@ -510,8 +506,9 @@ RemoteCollectionView {
 	function requestOpenTenantDocument(tenantId, tenantName) {
 		if (!tenantId) return
 		if (tenantId !== AuthorizationController.currentTenantId) {
-			ModalDialogManager.openDialog(switchOnDoubleClickDialogComp,
-				{"tenantId": tenantId, "tenantName": tenantName || tenantId})
+			PopupManager.addInfoMessage(
+				qsTr("To edit \"%1\", first switch to that organization using the Switch command.").arg(tenantName || tenantId),
+				true)
 		} else {
 			openTenantDocument(tenantId)
 		}
@@ -546,98 +543,11 @@ RemoteCollectionView {
 		}
 	}
 
-	Component {
-		id: switchOnDoubleClickDialogComp
-		MessageDialog {
-			property string tenantId: ""
-			property string tenantName: ""
-			width: Style.sizeHintM
-			title: qsTr("Switch organization")
-			message: qsTr("Do you want to switch to \"%1\"?").arg(tenantName)
-			onFinished: {
-				if (buttonId == Enums.yes) {
-					if (tenantId && tenantId !== AuthorizationController.currentTenantId) {
-						container.__pendingOpenTenantAfterSwitchId = tenantId
-						container.switchToTenant(tenantId)
-					} else {
-						container.openTenantDocument(tenantId)
-					}
-				}
-			}
-		}
-	}
-
 	Connections {
 		target: AuthorizationController
 
 		function onTenantSelected(tenantId){
-			if (!container.__skipCloseOnSwitch) {
-				container.closeTenantEditorsForSwitch(tenantId || "")
-			}
-			container.__skipCloseOnSwitch = false
-
-			if (container.__pendingCreateNewTenantDocumentAfterSwitch && tenantId === "") {
-				container.__pendingCreateNewTenantDocumentAfterSwitch = false
-				if (container.commandsDelegate) {
-					container.commandsDelegate.createNewTenantDocument()
-				}
-				return
-			}
-
-			if (container.__pendingOpenTenantAfterSwitchId !== ""
-					&& tenantId === container.__pendingOpenTenantAfterSwitchId) {
-				var pendingTenantId = container.__pendingOpenTenantAfterSwitchId
-				container.__pendingOpenTenantAfterSwitchId = ""
-				container.openTenantDocument(pendingTenantId)
-			}
-		}
-
-		function onTenantSelectionFailed(errorMessage) {
-			if (container.__pendingCreateNewTenantDocumentAfterSwitch) {
-				container.__pendingCreateNewTenantDocumentAfterSwitch = false
-				if (errorMessage && errorMessage !== "") {
-					ModalDialogManager.showInfoDialog(errorMessage)
-				}
-				return
-			}
-
-			if (container.__pendingOpenTenantAfterSwitchId !== "") {
-				container.__pendingOpenTenantAfterSwitchId = ""
-				if (errorMessage && errorMessage !== "") {
-					ModalDialogManager.showInfoDialog(errorMessage)
-				}
-			}
-		}
-	}
-
-	Component {
-		id: switchToNewTenantDialogComp
-		MessageDialog {
-			property string tenantId: ""
-			property string tenantName: ""
-			width: Style.sizeHintM
-			title: qsTr("Switch to new organization")
-			message: qsTr("Organization \"%1\" has been created. Do you want to switch to it?").arg(tenantName)
-			onFinished: {
-				if (buttonId == Enums.yes) {
-					container.switchToTenant(tenantId)
-				}
-			}
-		}
-	}
-
-	Component {
-		id: leaveCurrentTenantForNewDialogComp
-		MessageDialog {
-			width: Style.sizeHintM
-			title: qsTr("Switch current organization")
-			message: qsTr("To create a new organization, switch from the current organization?")
-			onFinished: {
-				if (buttonId == Enums.yes) {
-					container.__pendingCreateNewTenantDocumentAfterSwitch = true
-					container.switchToTenant("")
-				}
-			}
+			container.closeTenantEditorsForSwitch(tenantId || "")
 		}
 	}
 
@@ -663,14 +573,14 @@ RemoteCollectionView {
 						container.__removeMembershipForLeaveInput.m_membershipId = m_membership.m_id
 						container.__removeMembershipForLeaveSender.send(container.__removeMembershipForLeaveInput)
 					} else if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 					}
 				}
 			}
 		}
 
 		function onError(message, type) {
-			ModalDialogManager.showInfoDialog(message)
+			PopupManager.addErrorMessage(message, true)
 		}
 	}
 
@@ -686,17 +596,18 @@ RemoteCollectionView {
 						// If we left the currently selected tenant, deselect it
 						if (container.__leaveTenantId === AuthorizationController.currentTenantId) {
 							AuthorizationController.selectTenant("")
+						} else {
+							container.doUpdateGui()
 						}
-						container.doUpdateGui()
 					} else if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 					}
 				}
 			}
 		}
 
 		function onError(message, type) {
-			ModalDialogManager.showInfoDialog(message)
+			PopupManager.addErrorMessage(message, true)
 		}
 	}
 
@@ -716,7 +627,9 @@ RemoteCollectionView {
 
 			function onNew(){
 				if (AuthorizationController.currentTenantId && AuthorizationController.currentTenantId !== "") {
-					ModalDialogManager.openDialog(leaveCurrentTenantForNewDialogComp)
+					PopupManager.addInfoMessage(
+						qsTr("To create a new organization, first switch to No Organization using the organization switcher."),
+						true)
 					return
 				}
 
@@ -744,6 +657,27 @@ RemoteCollectionView {
 				for (let i = 0; i < indexes.length; ++i){
 					let index = indexes[i]
 					if (!elementsModel.containsKey("id", index)){
+						continue
+					}
+
+					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, index)
+					if (scope === "Invited") {
+						continue
+					}
+
+					let tenantId = elementsModel.getData("id", index)
+					if (tenantId && tenantId !== AuthorizationController.currentTenantId){
+						let tenantName = elementsModel.containsKey("name", index)
+								? elementsModel.getData("name", index)
+								: tenantId
+						container.requestOpenTenantDocument(tenantId, tenantName)
+						return
+					}
+				}
+
+				for (let i = 0; i < indexes.length; ++i){
+					let index = indexes[i]
+					if (!elementsModel.containsKey("id", index)){
 						console.error("Unable to edit element. Field: 'id' does not exists in the table model")
 						return
 					}
@@ -758,15 +692,7 @@ RemoteCollectionView {
 
 					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, index)
 					if (scope === "Invited") {
-						return
-					}
-
-					if (tenantId && tenantId !== AuthorizationController.currentTenantId){
-						let tenantName = elementsModel.containsKey("name", index)
-								? elementsModel.getData("name", index)
-								: tenantId
-						container.requestOpenTenantDocument(tenantId, tenantName)
-						return
+						continue
 					}
 
 					documentManager.openDocument(typeId, tenantId)
@@ -811,15 +737,6 @@ RemoteCollectionView {
 						if (isNewTenant){
 							if (tenantEditor.representationController){
 								tenantEditor.representationController.updateRepresentationFromDocument()
-							}
-						}
-					}
-					onIsNewTenantChanged: {
-						if (!isNewTenant){
-							var tenantId = tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
-							if (tenantId && tenantId !== AuthorizationController.currentTenantId){
-								container.__skipCloseOnSwitch = true
-								container.switchToTenant(tenantId)
 							}
 						}
 					}

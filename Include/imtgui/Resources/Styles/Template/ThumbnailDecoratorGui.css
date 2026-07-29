@@ -40,7 +40,7 @@ QTreeWidget#SubPages::item:first:selected
 
 
 QWidget#CurrentPageLabel {
-	font-family: "Roboto";
+	font-family: "Verdana";
 	font-size: 20pt;
 }
 

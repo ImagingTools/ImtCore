@@ -20,7 +20,7 @@ Rectangle {
 			graphicsView.sdlShapesCreated();
 		}
 	}
-	property BaseModel sdlShapeModel: null
+	property var sdlShapeModel: null
 
 
 	property alias selectedIndex: canvas.selectedIndex;

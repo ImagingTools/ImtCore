@@ -1,0 +1,51 @@
+@PACKAGE_INIT@
+
+# ---------------------------------------------------------------------------
+# CMake package configuration for the ImtCore module.
+#
+# Usage in a consuming project:
+#
+#     find_package(ImtCore REQUIRED)
+#     target_link_libraries(myTarget PUBLIC ImtCore::imtbase ImtCore::imtgui)
+#
+# All ImtCore libraries are exposed as imported targets under the "ImtCore::"
+# namespace and carry their include directories and inter-library dependencies
+# (including the dependencies onto the underlying Acf::, AcfSln:: and IAcf::
+# libraries) as transitive usage requirements.
+# ---------------------------------------------------------------------------
+
+include(CMakeFindDependencyMacro)
+
+# ImtCore is built on top of the ACF, ACF-Solutions and IAcf foundations; pull in
+# their packages so the Acf::<lib> / AcfSln::<lib> / IAcf::<lib> imported targets
+# referenced by the exported ImtCore targets resolve. find_package(IAcf) already
+# pulls in Acf and AcfSln through its own find_dependency() calls.
+#
+# NOTE: find_package() is used instead of find_dependency() for IAcf because
+# find_dependency propagates REQUIRED from the outer find_package(ImtCore REQUIRED)
+# call, making the lookup fatal even with QUIET.
+find_package(IAcf QUIET)
+if(NOT IAcf_FOUND)
+	find_dependency(AcfSln REQUIRED)
+endif()
+
+# ImtCore was built against a specific Qt major version; pin the very same one so
+# the Qt imported targets referenced by the exported ImtCore targets
+# (Qt@IMTCORE_QT_VERSION_MAJOR@::*) resolve to a compatible Qt installation.
+set(IMTCORE_QT_VERSION_MAJOR "@IMTCORE_QT_VERSION_MAJOR@")
+
+set(_imtcore_qt_components Core Gui Widgets Xml Network Svg Sql WebSockets Concurrent PrintSupport)
+
+if(IMTCORE_QT_VERSION_MAJOR EQUAL 5)
+	list(APPEND _imtcore_qt_components XmlPatterns)
+endif()
+if(IMTCORE_QT_VERSION_MAJOR EQUAL 6)
+	list(APPEND _imtcore_qt_components Core5Compat SvgWidgets OpenGLWidgets)
+endif()
+
+find_dependency(Qt${IMTCORE_QT_VERSION_MAJOR}
+	COMPONENTS ${_imtcore_qt_components})
+
+include("${CMAKE_CURRENT_LIST_DIR}/ImtCoreTargets.cmake")
+
+check_required_components(ImtCore)

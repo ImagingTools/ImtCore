@@ -5,7 +5,6 @@
 // Qt includes
 #include <QtCore/QTextStream>
 #include <QtCore/QDir>
-#include <QtGui/QFontDatabase>
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
 #include <QtWidgets/QApplication>

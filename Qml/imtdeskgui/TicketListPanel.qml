@@ -2,8 +2,6 @@
 import QtQuick 2.15
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
-import imtcontrols 1.0
 
 Rectangle {
 	id: ticketListPanelRoot
@@ -145,7 +143,7 @@ Rectangle {
 							width: 10
 							height: 10
 							radius: 5
-							color: (model.status || 0) === 0 ? Style.statusOpenColor : Style.statusClosedColor
+							color: (model.status || 0) === 0 ? "#1a7f37" : "#8957e5"
 							anchors.verticalCenter: parent.verticalCenter
 						}
 

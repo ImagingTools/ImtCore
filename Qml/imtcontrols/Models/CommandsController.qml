@@ -8,6 +8,7 @@ QtObject {
 	id: root;
 
 	property string typeId;
+	property Item view: null;
 	property GuiElementContainer commands: GuiElementContainer {}
 
 	property var pendingChanges: ({}) // { commandId: { m_enabled: true, m_visible: false, ... } }

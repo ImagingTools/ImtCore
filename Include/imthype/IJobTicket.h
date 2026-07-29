@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
-// Qt includes
-#include <functional>
-
 // ImtCore includes
 #include <imtbase/IReferenceCollection.h>
 
@@ -28,8 +25,6 @@ public:
 		MIT_PROCESSING_STATUS
 	};
 
-	typedef std::function<iprm::IParamsSetSharedPtr(const QByteArray& contextId, const QByteArray& typeId)> ParamsFactoryFunction;
-
 	virtual QByteArray GetTypeId() const = 0;
 	virtual void SetTypeId(const QByteArray& typeId) = 0;
 
@@ -43,12 +38,22 @@ public:
 	virtual void SetContextId(const QByteArray& contextId) = 0;
 
 	virtual iprm::IParamsSetSharedPtr GetParams() const = 0;
+
+	/**
+		Create an empty processing parameters instance matching this ticket.
+		Pure data tickets return an empty pointer; concrete components that know
+		the parameter type (e.g. via a component factory) override this to provide
+		a properly typed, empty parameters object used for deserialization.
+	*/
 	virtual iprm::IParamsSetSharedPtr CreateParams() const = 0;
 	virtual void SetParams(const iprm::IParamsSetSharedPtr& paramsPtr) = 0;
 
 	virtual IJobQueueManager::ProcessingStatus GetProcessingStatus() const = 0;
 	virtual void SetProcessingStatus(IJobQueueManager::ProcessingStatus status) = 0;
 
+	/**
+		Get/set the job progress in the normalized range [0.0 ... 1.0].
+	*/
 	virtual double GetProgress() const = 0;
 	virtual void SetProgress(double progress) = 0;
 
@@ -57,9 +62,6 @@ public:
 
 	virtual const imtbase::IReferenceCollection* GetInput() const = 0;
 	virtual void SetInput(const imtbase::IReferenceCollection& input) = 0;
-	// JobStatus - Progress, ProcassingStatus, MessageContainer log
-
-	virtual void SetParamsFactory(const ParamsFactoryFunction& factory) = 0;
 };
 
 

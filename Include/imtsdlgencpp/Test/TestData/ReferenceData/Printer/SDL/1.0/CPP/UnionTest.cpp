@@ -1,5 +1,4 @@
 #include "UnionTest.h"
-#include "UnionTest_fwd.h"
 
 
 namespace sdl::V1_0::modsdl

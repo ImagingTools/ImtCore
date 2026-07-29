@@ -3,7 +3,13 @@
 
 
 // Qt includes
+#include <QtCore/QMetaObject>
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
+#include <QtCore/QThread>
 #include <QtNetwork/QNetworkReply>
+#include <QtNetwork/QSslConfiguration>
+#include <QtNetwork/QSslSocket>
 
 
 namespace imtcom
@@ -13,7 +19,9 @@ namespace imtcom
 // public methods
 
 
-thread_local std::unique_ptr<QNetworkAccessManager> CRequestSender::s_networkManagerPtr;
+thread_local QNetworkAccessManager* CRequestSender::s_networkManagerPtr = nullptr;
+static QNetworkAccessManager* s_mainThreadNetworkProbePtr = nullptr;
+static QMutex s_networkBackendMutex;
 
 
 QNetworkReply* CRequestSender::DoSyncGet(const QNetworkRequest& request, int timeout)
@@ -29,7 +37,6 @@ QNetworkReply* CRequestSender::DoSyncGet(const QNetworkRequest& request, int tim
 		replyPtr->ignoreSslErrors();
 
 		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
-		networkOperation.timer.stop();
 
 		if (replyPtr->isRunning()){
 			replyPtr->abort();
@@ -51,7 +58,6 @@ QNetworkReply* CRequestSender::DoSyncPut(const QNetworkRequest& request, const Q
 		QObject::connect(replyPtr, &QNetworkReply::finished, &networkOperation.connectionLoop, &QEventLoop::quit);
 
 		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
-		networkOperation.timer.stop();
 
 		if (replyPtr->isRunning()){
 			replyPtr->abort();
@@ -75,7 +81,6 @@ QNetworkReply* CRequestSender::DoSyncPost(const QNetworkRequest& request, const 
 		replyPtr->ignoreSslErrors();
 
 		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
-		networkOperation.timer.stop();
 
 		if (replyPtr->isRunning()){
 			replyPtr->abort();
@@ -97,7 +102,6 @@ QNetworkReply* CRequestSender::DoSyncCustomRequest(const QNetworkRequest& reques
 		QObject::connect(replyPtr, &QNetworkReply::finished, &networkOperation.connectionLoop, &QEventLoop::quit);
 
 		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
-		networkOperation.timer.stop();
 
 		if (replyPtr->isRunning()){
 			replyPtr->abort();
@@ -110,10 +114,59 @@ QNetworkReply* CRequestSender::DoSyncCustomRequest(const QNetworkRequest& reques
 
 // private methods
 
+void CRequestSender::InitializeNetworkBackend()
+{
+	EnsureNetworkBackendInitialized();
+}
+
+
+void CRequestSender::EnsureNetworkBackendInitialized()
+{
+	// Fast path without lock once primed.
+	if (s_mainThreadNetworkProbePtr != nullptr){
+		return;
+	}
+
+	QCoreApplication* appPtr = QCoreApplication::instance();
+	if (appPtr == nullptr){
+		return;
+	}
+
+	auto primeBackendOnAppThread = [appPtr]() {
+		QMutexLocker lock(&s_networkBackendMutex);
+		if (s_mainThreadNetworkProbePtr != nullptr){
+			return;
+		}
+
+		// Keep one QNAM for process lifetime, parented to qApp on the app thread.
+		// Destroying a temporary QNAM is not always enough — Qt may lazy-init more
+		// globals on the first real use; a long-lived main-thread QNAM covers that.
+		s_mainThreadNetworkProbePtr = new QNetworkAccessManager(appPtr);
+
+		// SSL backend load (OpenSSL etc.) also creates process-wide QObjects;
+		// do it here so a worker's first HTTPS/WSS never owns that init.
+		Q_UNUSED(QSslSocket::supportsSsl());
+		Q_UNUSED(QSslConfiguration::defaultConfiguration());
+	};
+
+	if (QThread::currentThread() == appPtr->thread()){
+		primeBackendOnAppThread();
+		return;
+	}
+
+	// Worker (or other secondary) path: hop to the app thread. Main is in exec()
+	// while workers serve requests, so BlockingQueuedConnection is safe.
+	QMetaObject::invokeMethod(appPtr, primeBackendOnAppThread, Qt::BlockingQueuedConnection);
+}
+
+
 void CRequestSender::EnsureNetworkAccessManager()
 {
+	EnsureNetworkBackendInitialized();
+
 	if (s_networkManagerPtr == nullptr){
-		s_networkManagerPtr.reset(new QNetworkAccessManager());
+		// Per-thread QNAM (no parent): each worker that does sync HTTP gets its own.
+		s_networkManagerPtr = new QNetworkAccessManager();
 	}
 }
 
@@ -125,26 +178,18 @@ CRequestSender::NetworkOperation::NetworkOperation(int timeout)
 	// If the application will be finished, the internal event loop will be also finished:
 	QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit);
 
-	// If a timeout for the request was defined, start the timer:
+	// Timeout: singleShot parented to the loop (same thread) — not a free QTimer
+	// and not qApp, so no cross-thread child-of-QCoreApplication warning.
 	if (timeout > 0){
-		timer.setSingleShot(true);
-
-		// If the timer is running out, the internal event loop will be finished:
-		QObject::connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit);
-
-		timer.start(timeout);
+		QTimer::singleShot(timeout, &connectionLoop, &QEventLoop::quit);
 	}
 }
 
 
 CRequestSender::NetworkOperation::~NetworkOperation()
 {
-	timer.stop();
-
-	QObject::disconnect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit);
 	QObject::disconnect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit);
 
-	Q_ASSERT(!timer.isActive());
 	Q_ASSERT(!connectionLoop.isRunning());
 }
 

@@ -39,6 +39,7 @@ public:
 
 	I_BEGIN_COMPONENT(CPersonalAccessTokenManagerGuiComp);
 		I_ASSIGN(m_loginInfoProviderCompPtr, "LoginInfoProvider", "Login info provider", true, "LoginInfoProvider");
+		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product-ID", false, "");
 	I_END_COMPONENT;
 
 	CPersonalAccessTokenManagerGuiComp();
@@ -73,11 +74,11 @@ private Q_SLOTS:
 
 private:
 	I_REF(imtauth::ILoginInfoProvider, m_loginInfoProviderCompPtr);
+	I_ATTR(QByteArray, m_productIdAttrPtr);
 
 	QByteArray m_currentUserId;
 };
 
 
 } // namespace imtauthgui
-
 

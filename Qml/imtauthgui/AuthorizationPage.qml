@@ -14,7 +14,7 @@ Rectangle {
 	property string state:"";
 
 	property int mainRadius: Style.radiusL;
-	property string mainColor: Style.backgroundColor2
+	property string mainColor: Style.baseColor
 
 	property bool canRecoveryPassword: true;
 	property bool canRegisterUser: true;
@@ -37,6 +37,20 @@ Rectangle {
 
 	Component.onCompleted: {
 		decoratorPause.start();
+
+		authPageContainer.state = "unauthorized";
+		authPageContainer.isAuthenticating = false;
+
+		passwordTextInput.text = "";
+		
+		// Restore username from AuthorizationController if "Remember me" is checked
+		if (authPageContainer.rememberMe && AuthorizationController.lastUser !== "") {
+			loginTextInput.text = AuthorizationController.lastUser;
+		}
+		else {
+			loginTextInput.text = "";
+		}
+		loginTextInput.forceActiveFocus();
 	}
 
 	LocalizationEvent {
@@ -51,18 +65,6 @@ Rectangle {
 
 	onVisibleChanged: {
 		if (authPageContainer.visible){
-			authPageContainer.state = "unauthorized";
-			authPageContainer.isAuthenticating = false;
-
-			passwordTextInput.text = "";
-			
-			// Restore username from AuthorizationController if "Remember me" is checked
-			if (authPageContainer.rememberMe && AuthorizationController.lastUser !== "") {
-				loginTextInput.text = AuthorizationController.lastUser;
-			}
-			else {
-				loginTextInput.text = "";
-			}
 			loginTextInput.forceActiveFocus();
 		}
 	}
@@ -74,7 +76,8 @@ Rectangle {
 			authPageContainer.isAuthenticating = false;
 			// Clear password on error (common good UX: don't leave bad credentials; username stays)
 			passwordTextInput.text = "";
-			errorMessage.text = (message && message !== "") ? message : qsTr("Username or password is incorrect");
+			var errorText = (message && message !== "") ? message : qsTr("Username or password is incorrect");
+			PopupManager.addErrorMessage(errorText, true);
 			passwordTextInput.forceActiveFocus();
 		}
 
@@ -112,6 +115,7 @@ Rectangle {
 
 		onFinished: {
 			authPageContainer.setDecorators();
+			loginTextInput.forceActiveFocus();
 		}
 	}
 
@@ -152,7 +156,7 @@ Rectangle {
 				id: headerRec;
 
 				width: loginContainer.width;
-				height: 80;
+				height: Math.max(80, welcomeText.implicitHeight + 56);
 
 				color: loginContainer.color;
 				radius: loginContainer.radius;
@@ -162,11 +166,19 @@ Rectangle {
 
 					anchors.top: parent.top;
 					anchors.topMargin: 30;
-					anchors.horizontalCenter: parent.horizontalCenter;
+					anchors.left: parent.left;
+					anchors.right: parent.right;
+					anchors.leftMargin: Style.marginXL;
+					anchors.rightMargin: Style.marginXL;
 
 					color: Style.textColor;
 					font.family: Style.fontFamily;
 					font.pixelSize: Style.fontSizeXXL;
+
+					horizontalAlignment: Text.AlignHCenter;
+					wrapMode: Text.Wrap;
+					maximumLineCount: 2;
+					elide: Text.ElideRight;
 
 					text: authPageContainer.appName !== "" ? qsTr("Welcome to") + " " + authPageContainer.appName : qsTr("Welcome");
 				}
@@ -177,7 +189,7 @@ Rectangle {
 			id: headerItem;
 
 			width: parent.width;
-			height: 70;
+			height: headerLoader.item ? headerLoader.item.height : 70;
 
 			Loader{
 				id: headerLoader;
@@ -187,9 +199,7 @@ Rectangle {
 				sourceComponent: Style.authorizationHeaderDecorator !== undefined ? Style.authorizationHeaderDecorator: headerDefaultComp;
 
 				onLoaded:{
-					headerItem.height = headerLoader.item.height;
 					headerLoader.width = headerLoader.item.width;
-					headerLoader.height = headerLoader.item.height;
 				}
 			}
 		}
@@ -233,12 +243,6 @@ Rectangle {
 				placeHolderText: qsTr("Enter your username");
 				KeyNavigation.tab: passwordTextInput;
 				KeyNavigation.backtab: passwordTextInput;
-
-				onTextChanged: {
-					if (errorMessage.text != ""){
-						errorMessage.text = "";
-					}
-				}
 
 				onAccepted: {
 					if (!authPageContainer.isAuthenticating && passwordTextInput.text != "" && loginTextInput.text != ""){
@@ -289,12 +293,6 @@ Rectangle {
 
 				KeyNavigation.tab: loginTextInput;
 				KeyNavigation.backtab: loginTextInput;
-
-				onTextChanged: {
-					if (errorMessage.text != ""){
-						errorMessage.text = "";
-					}
-				}
 
 				onAccepted: {
 					if (!authPageContainer.isAuthenticating && passwordTextInput.text != "" && loginTextInput.text != ""){
@@ -382,6 +380,7 @@ Rectangle {
 
 				MouseArea{
 					id: passwordRecoveryMA;
+					objectName: "PasswordRecoveryLink"
 
 					anchors.fill: titlePasswordRecovery;
 					visible: authPageContainer.canRecoveryPassword;
@@ -420,7 +419,6 @@ Rectangle {
 						text: qsTr("Sign in");
 
 						onClicked: {
-							errorMessage.text = "";
 							authPageContainer.isAuthenticating = true;
 							authPageContainer.login(loginTextInput.text, passwordTextInput.text)
 						}
@@ -438,31 +436,6 @@ Rectangle {
 							background.color: "transparent";
 							indicatorSize: 14;
 							z: 20;
-						}
-					}
-
-					// Fixed-height container for error placed right under the Sign in button.
-					// The reserved space ensures the login card height never jumps when an error is shown/hidden.
-					Item {
-						id: errorContainer;
-						width: parent.width;
-						height: Style.controlHeightS + Style.marginS;
-
-						Text {
-							id: errorMessage;
-
-							anchors.top: parent.top;
-							anchors.topMargin: 2;
-							anchors.horizontalCenter: parent.horizontalCenter;
-							width: parent.width;
-
-							color: Style.errorTextColor;
-							font.family: Style.fontFamily;
-							font.pixelSize: Style.fontSizeM;
-
-							visible: text !== "";
-							horizontalAlignment: Text.AlignHCenter;
-							wrapMode: Text.Wrap;
 						}
 					}
 				}

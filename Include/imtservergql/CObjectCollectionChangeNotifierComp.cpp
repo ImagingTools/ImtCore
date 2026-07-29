@@ -2,6 +2,11 @@
 #include <imtservergql/CObjectCollectionChangeNotifierComp.h>
 
 
+// Qt includes
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+
 // ACF includes
 #include <iser/CJsonMemWriteArchive.h>
 
@@ -62,99 +67,116 @@ void CObjectCollectionChangeNotifierComp::OnUpdate(const istd::IChangeable::Chan
 		return;
 	}
 
-	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
-		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
-			const imtrest::IRequest* networkRequest = requestNetworks.networkRequests[id];
-			QByteArray data;
-			QByteArray itemId;
-			QJsonObject dataObject;
-			
-			bool isRemoved = false;
+	QByteArray collectionChangedCommandId;
+	if (m_collectionIdAttrPtr.IsValid() && !(*m_collectionIdAttrPtr).isEmpty()){
+		collectionChangedCommandId = QByteArrayLiteral("On") + *m_collectionIdAttrPtr + QByteArrayLiteral("CollectionChanged");
+	}
 
-			if (changeSet.Contains(imtbase::ICollectionInfo::CF_ADDED)){
-				itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED).toByteArray();
-				dataObject.insert("typeOperation", "inserted");
+	if (collectionChangedCommandId.isEmpty() && m_commandIdsAttrPtr.GetCount() <= 0){
+		return;
+	}
+
+	QByteArray itemId;
+	QJsonObject dataObject;
+	bool isRemoved = false;
+	bool recognized = false;
+
+	if (changeSet.Contains(imtbase::ICollectionInfo::CF_ADDED)){
+		itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED).toByteArray();
+		dataObject.insert("typeOperation", "inserted");
+		recognized = true;
+	}
+	else if (changeSet.Contains(imtbase::ICollectionInfo::CF_REMOVED)){
+		QVariant changeInfo = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENTS_REMOVED);
+		if (changeInfo.isValid()){
+			imtbase::ICollectionInfo::MultiElementNotifierInfo info = changeInfo.value<imtbase::ICollectionInfo::MultiElementNotifierInfo>();
+
+			QJsonArray removedItemsArray;
+			for (const QByteArray& elementId: info.elementIds){
+				removedItemsArray.append(QJsonValue(QString(elementId)));
 			}
-			else if (changeSet.Contains(imtbase::ICollectionInfo::CF_REMOVED)){
-				QVariant changeInfo = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENTS_REMOVED);
-				if (changeInfo.isValid()){
-					imtbase::ICollectionInfo::MultiElementNotifierInfo info = changeInfo.value<imtbase::ICollectionInfo::MultiElementNotifierInfo>();
 
-					QJsonArray removedItemsArray;
-					for (const QByteArray& elementId: info.elementIds){
-						removedItemsArray.append(QJsonValue(QString(elementId)));
-					}
-					
-					dataObject.insert("itemIds", removedItemsArray);
+			dataObject.insert("itemIds", removedItemsArray);
+		}
+		dataObject.insert("typeOperation", "removed");
+		isRemoved = true;
+		recognized = true;
+	}
+	else if (changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_DESCRIPTION_CHANGED)){
+		itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_DESCRIPTION_CHANGED).toByteArray();
+		dataObject.insert("typeOperation", "updated");
+		recognized = true;
+	}
+	else if (changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_RENAMED)){
+		itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_RENAMED).toByteArray();
+		dataObject.insert("typeOperation", "updated");
+		recognized = true;
+	}
+	else if (changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_STATE)){
+		itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_STATE).toByteArray();
+		dataObject.insert("typeOperation", "updated");
+		recognized = true;
+	}
+	else if (changeSet.Contains(imtbase::IObjectCollection::CF_OBJECT_DATA_CHANGED)){
+		itemId = changeSet.GetChangeInfo(imtbase::IObjectCollection::CN_OBJECT_DATA_CHANGED).toByteArray();
+		dataObject.insert("typeOperation", "updated");
+		recognized = true;
+	}
+
+	if (!recognized){
+		return;
+	}
+
+	QVariant operationContext = changeSet.GetChangeInfo(imtbase::IOperationContext::OPERATION_CONTEXT_INFO);
+	if (operationContext.isValid()){
+		QJsonObject operationContextObject;
+
+		imtbase::IOperationContext::OperationContextInfo info = operationContext.value<imtbase::IOperationContext::OperationContextInfo>();
+		operationContextObject.insert("ownerId", QString(info.id));
+		operationContextObject.insert("ownerName", info.name);
+
+		dataObject.insert("operationContext", operationContextObject);
+	}
+
+	if (!isRemoved){
+		dataObject.insert("itemId", QString(itemId));
+
+		// Send serialized item payload only when itemId is valid.
+		if (!itemId.isEmpty() && m_isSendItemSource.IsValid() && m_objectCollectionCompPtr.IsValid() && *m_isSendItemSource){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			m_objectCollectionCompPtr->GetObjectData(itemId, dataPtr);
+			QByteArray representationData;
+			iser::ISerializable* objectPtr = dynamic_cast<iser::ISerializable*>(dataPtr.GetPtr());
+			if (objectPtr != nullptr){
+				iser::CJsonMemWriteArchive archive;
+
+				if (objectPtr->Serialize(archive)){
+					representationData = archive.GetData();
 				}
-				dataObject.insert("typeOperation", "removed");
-				
-				isRemoved = true;
-			}
-			else if (changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_DESCRIPTION_CHANGED)){
-				itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_DESCRIPTION_CHANGED).toByteArray();
-
-				dataObject.insert("typeOperation", "updated");
-			}
-			else if (changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_RENAMED)){
-				itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_RENAMED).toByteArray();
-
-				dataObject.insert("typeOperation", "updated");
-			}
-			else if (changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_STATE)){
-				itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_STATE).toByteArray();
-
-				dataObject.insert("typeOperation", "updated");
-			}
-			else if (changeSet.Contains(imtbase::IObjectCollection::CF_OBJECT_DATA_CHANGED)){
-				itemId = changeSet.GetChangeInfo(imtbase::IObjectCollection::CN_OBJECT_DATA_CHANGED).toByteArray();
-
-				dataObject.insert("typeOperation", "updated");
-			}
-			
-			QVariant operationContext = changeSet.GetChangeInfo(imtbase::IOperationContext::OPERATION_CONTEXT_INFO);
-			if (operationContext.isValid()){
-				QJsonObject operationContextObject;
-				
-				imtbase::IOperationContext::OperationContextInfo info = operationContext.value<imtbase::IOperationContext::OperationContextInfo>();
-				operationContextObject.insert("ownerId", QString(info.id));
-				operationContextObject.insert("ownerName", info.name);
-
-				dataObject.insert("operationContext", operationContextObject);
-			}
-			
-			if (!isRemoved){
-				dataObject.insert("itemId", QString(itemId));
-				
-				if (itemId.isEmpty() && m_isSendItemSource.IsValid() && m_objectCollectionCompPtr.IsValid() && *m_isSendItemSource){
-					imtbase::IObjectCollection::DataPtr dataPtr;
-					m_objectCollectionCompPtr->GetObjectData(itemId, dataPtr);
-					QByteArray representationData;
-					iser::ISerializable* objectPtr = dynamic_cast<iser::ISerializable*>(dataPtr.GetPtr());
-					if (objectPtr != nullptr){
-						iser::CJsonMemWriteArchive archive;
-						
-						if (objectPtr->Serialize(archive)){
-							representationData = archive.GetData();
-						}
-						else{
-							Q_ASSERT(false);
-						}
-					}
-					dataObject.insert("item", QString(representationData));
+				else{
+					Q_ASSERT(false);
 				}
 			}
+			dataObject.insert("item", QString(representationData));
+		}
+	}
 
-			QJsonDocument jsonDocument;
-			jsonDocument.setObject(dataObject);
-			data = jsonDocument.toJson(QJsonDocument::Compact);
+	QJsonDocument jsonDocument;
+	jsonDocument.setObject(dataObject);
+	const QByteArray data = jsonDocument.toJson(QJsonDocument::Compact);
 
-			PushDataToSubscriber(id, networkRequest->GetCommandId(), data, *networkRequest);
+	if (!collectionChangedCommandId.isEmpty()){
+		PublishData(collectionChangedCommandId, data);
+	}
+
+	for (int index = 0; index < m_commandIdsAttrPtr.GetCount(); ++index){
+		const QByteArray& commandId = m_commandIdsAttrPtr[index];
+		if (commandId != collectionChangedCommandId){
+			PublishData(commandId, data);
 		}
 	}
 }
 
 
 } // namespace imtservergql
-
 

@@ -365,9 +365,12 @@ bool CFileRepositoryComp::RemoveElements(const Ids& elementIds, const imtbase::I
 		return false;
 	}
 
+	// CChangeNotifier copies ChangeSet at construction — set removed ids before creating it.
+	// Filling notifierInfo after construction never reaches observers.
 	MultiElementNotifierInfo notifierInfo;
+	notifierInfo.elementIds = elementIds;
 
-	static ChangeSet changes(imtbase::ICollectionInfo::CF_REMOVED);
+	ChangeSet changes(imtbase::ICollectionInfo::CF_REMOVED);
 	changes.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
 	istd::CChangeNotifier changeNotifier(this, &changes);
 
@@ -384,9 +387,6 @@ bool CFileRepositoryComp::RemoveElements(const Ids& elementIds, const imtbase::I
 		if (GetFileInfo(elementId, fileItemInfo)){
 			bool indexUpdated = m_documentInfoCollectionCompPtr->RemoveElements(elementIds);
 			if (!indexUpdated){
-				notifierInfo.elementIds = elementIds;
-			}
-			else{
 				QString targetFilePath = fileItemInfo.GetFilePath();
 				SendErrorMessage(0, QT_TR_NOOP(QString("File '%1' could not be removed").arg(targetFilePath)));
 			}

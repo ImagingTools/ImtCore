@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QDataStream>
 #include <QtCore/QRegularExpression>
+#include <QtCore/QUuid>
 
 
 namespace imtdb
@@ -185,26 +186,42 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(
 
 bool CDatabaseEngineComp::CheckDatabaseConnection(QString& errorMessage) const
 {
-	QSqlDatabase::removeDatabase(*m_maintenanceDatabaseNameAttrPtr);
+	// This is invoked off CSystemStatusComp's periodic health-check timer via QtConcurrent::run(), so
+	// overlapping calls from different worker-pool threads are expected (more likely to actually overlap
+	// under load, when a check takes long enough that the next timer tick fires before it finishes).
+	// Using the fixed, shared *m_maintenanceDatabaseNameAttrPtr as the QSqlDatabase connection name (as
+	// before) meant one thread's removeDatabase() could fire while another thread's connection of the
+	// same name was still open - Qt then prints "connection 'X' is still in use, all queries will cease
+	// to work" and every further query on that connection name breaks, cascading into failures across
+	// the whole server. A unique name per call sidesteps this entirely; this connection is only ever
+	// opened, closed and torn down within this single call, so there's no need to share or reuse it.
+	const QString connectionName = QStringLiteral("%1-check-%2")
+		.arg(QString(*m_maintenanceDatabaseNameAttrPtr), QUuid::createUuid().toString(QUuid::WithoutBraces));
 
-	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
+	bool isConnected = false;
+	{
+		QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, connectionName);
 
-	maintainanceDb.setConnectOptions(GetConnectionOptionsString(*m_dbTypeAttrPtr));
+		maintainanceDb.setConnectOptions(GetConnectionOptionsString(*m_dbTypeAttrPtr));
 
-	maintainanceDb.setHostName(GetHostName());
-	maintainanceDb.setUserName(GetUserName());
-	maintainanceDb.setPassword(GetPassword());
-	maintainanceDb.setDatabaseName(*m_maintenanceDatabaseNameAttrPtr);
-	maintainanceDb.setPort(GetPort());
-	
-	bool isConnected = maintainanceDb.open();
+		maintainanceDb.setHostName(GetHostName());
+		maintainanceDb.setUserName(GetUserName());
+		maintainanceDb.setPassword(GetPassword());
+		maintainanceDb.setDatabaseName(*m_maintenanceDatabaseNameAttrPtr);
+		maintainanceDb.setPort(GetPort());
 
-	maintainanceDb.close();
+		isConnected = maintainanceDb.open();
 
-	if (!isConnected){
-		QSqlError sqlError = maintainanceDb.lastError();
-		errorMessage = sqlError.text();
+		if (!isConnected){
+			QSqlError sqlError = maintainanceDb.lastError();
+			errorMessage = sqlError.text();
+		}
+
+		maintainanceDb.close();
 	}
+	// maintainanceDb must be out of scope (no live QSqlDatabase handle referencing connectionName) before
+	// removeDatabase, otherwise Qt warns "connection still in use" even though we just closed it ourselves.
+	QSqlDatabase::removeDatabase(connectionName);
 
 	return isConnected;
 }
@@ -708,6 +725,19 @@ QString CDatabaseEngineComp::GetPassword() const
 
 int CDatabaseEngineComp::GetDatabaseVersion() const
 {
+	// A missing "Revisions" table is the expected state before the schema has been created
+	// (first run against a fresh/reset database) - EnsureDatabaseConsistency() already treats
+	// a negative version as "create it" and self-heals right after this call. Check existence
+	// first instead of letting the SELECT fail: ExecSqlQuery() unconditionally logs every
+	// failed statement as an error, so the normal first-run path was showing a scary
+	// "Database query failed: no such table: Revisions" even though nothing was actually wrong.
+	if (!EnsureDatabaseConnected()){
+		return -1;
+	}
+	if (!QSqlDatabase::database(GetConnectionName()).tables().contains(QStringLiteral("Revisions"), Qt::CaseInsensitive)){
+		return -1;
+	}
+
 	QSqlError sqlError;
 	QSqlQuery queryGetRevision = ExecSqlQueryFromFile(GetSqlResourcePath(GetDatabaseDriverId(), QStringLiteral("GetRevision.sql")), &sqlError);
 	if (sqlError.type() != QSqlError::NoError){

@@ -23,7 +23,7 @@ Item{
 	property bool isOpen: hiddenItem.addToMargin > 0;
 
 	property int edgeSize: 12;
-	property string controlColor: Style.secondColor;
+	property string controlColor: "#ffe4c4";
 
 	property int itemWidth: !loader.item ? 0 : loader.item.width;
 	property int itemHeight: !loader.item ? 0 : loader.item.height;

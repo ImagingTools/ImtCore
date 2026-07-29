@@ -9,7 +9,6 @@
         <file alias="imtauthgui/UserCollectionView.qml">UserCollectionView.qml</file>
         <file alias="imtauthgui/UserGroupCollectionView.qml">UserGroupCollectionView.qml</file>
         <file alias="imtauthgui/UserView.qml">UserView.qml</file>
-        <file alias="imtauthgui/UserManagementProvider.qml">UserManagementProvider.qml</file>
         <file alias="imtauthgui/UserPanel.qml">UserPanel.qml</file>
         <file alias="imtauthgui/UserTokenProvider.qml">UserTokenProvider.qml</file>
         <file alias="imtauthgui/RoleCollectionViewCommandsDelegate.qml">RoleCollectionViewCommandsDelegate.qml</file>
@@ -20,7 +19,6 @@
         <file alias="imtauthgui/PermissionsTableView.qml">PermissionsTableView.qml</file>
         <file alias="imtauthgui/PermissionsController.qml">PermissionsController.qml</file>
         <file alias="imtauthgui/SuperuserPasswordPage.qml">SuperuserPasswordPage.qml</file>
-        <file alias="imtauthgui/SuperuserProvider.qml">SuperuserProvider.qml</file>
         <file alias="imtauthgui/ChangePasswordDialog.qml">ChangePasswordDialog.qml</file>
         <file alias="imtauthgui/PasswordInput.qml">PasswordInput.qml</file>
         <file alias="imtauthgui/CachedAccountCollection.qml">CachedAccountCollection.qml</file>
@@ -31,6 +29,13 @@
         <file alias="imtauthgui/UserCollectionDataProvider.qml">UserCollectionDataProvider.qml</file>
         <file alias="imtauthgui/GroupCollectionDataProvider.qml">GroupCollectionDataProvider.qml</file>
         <file alias="imtauthgui/ProfileView.qml">ProfileView.qml</file>
+        <file alias="imtauthgui/ProfileApiClient.qml">ProfileApiClient.qml</file>
+        <file alias="imtauthgui/GqlBasedProfileApiClient.qml">GqlBasedProfileApiClient.qml</file>
+        <file alias="imtauthgui/ProfileGeneralPage.qml">ProfileGeneralPage.qml</file>
+        <file alias="imtauthgui/ProfileOrganizationsPage.qml">ProfileOrganizationsPage.qml</file>
+        <file alias="imtauthgui/ProfileTokensPage.qml">ProfileTokensPage.qml</file>
+        <file alias="imtauthgui/ProfileAccessPage.qml">ProfileAccessPage.qml</file>
+        <file alias="imtauthgui/ProfileNoticeBanner.qml">ProfileNoticeBanner.qml</file>
         <file alias="imtauthgui/UserGeneralEditor.qml">UserGeneralEditor.qml</file>
         <file alias="imtauthgui/PasswordRecoveryDialog.qml">PasswordRecoveryDialog.qml</file>
 	<file alias="imtauthgui/UserSettingsController.qml">UserSettingsController.qml</file>
@@ -52,17 +57,12 @@
 	<file alias="imtauthgui/TenantConnectOrganizationPage.qml">TenantConnectOrganizationPage.qml</file>
 	<file alias="imtauthgui/TenantMyConnectionsPage.qml">TenantMyConnectionsPage.qml</file>
 	<file alias="imtauthgui/TenantMessagesPage.qml">TenantMessagesPage.qml</file>
-	<file alias="imtauthgui/TenantSimpleCollectionPage.qml">TenantSimpleCollectionPage.qml</file>
-	<file alias="imtauthgui/TenantDocumentEditorShell.qml">TenantDocumentEditorShell.qml</file>
 	<file alias="imtauthgui/CrossOrgGrantView.qml">CrossOrgGrantView.qml</file>
 	<file alias="imtauthgui/ContractView.qml">ContractView.qml</file>
 	<file alias="imtauthgui/RelationshipView.qml">RelationshipView.qml</file>
 	<file alias="imtauthgui/MessageView.qml">MessageView.qml</file>
 	<file alias="imtauthgui/StatusBadge.qml">StatusBadge.qml</file>
-	<file alias="imtauthgui/TenantCollectionItemDelegateBase.qml">TenantCollectionItemDelegateBase.qml</file>
 	<file alias="imtauthgui/TenantCollectionListView.qml">TenantCollectionListView.qml</file>
-	<file alias="imtauthgui/TenantTableContainer.qml">TenantTableContainer.qml</file>
-	<file alias="imtauthgui/TenantTableHeader.qml">TenantTableHeader.qml</file>
         <file alias="imtauthgui/qmldir">qmldir</file>
     </qresource>
     <qresource prefix="/"/>

@@ -11,6 +11,16 @@ DecoratorBase {
 
 	property bool textIsCropped: textHelper.text != "" && textHelper.width > text.width;
 
+	property bool isSelected: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected : false;
+	property bool isHovered: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.mouseArea
+			? tabPanelDecorator.baseElement.mouseArea.containsMouse : false;
+	// Slot is always reserved for closable tabs so hover does not resize the tab.
+	property bool canClose: tabPanelDecorator.baseElement
+			&& !tabPanelDecorator.baseElement.pinned
+			&& tabPanelDecorator.baseElement.isCloseEnable;
+	property bool showClose: tabPanelDecorator.canClose && (tabPanelDecorator.isSelected || tabPanelDecorator.isHovered);
+	property int closeSlotSize: Style.iconSizeS;
+
 	Connections {
 		target: tabPanelDecorator.baseElement;
 
@@ -23,10 +33,17 @@ DecoratorBase {
 		}
 	}
 
+	// Light gray hover wash, inset from the tab edges - not on the selected tab,
+	// whose own bottom accent bar already marks it.
 	Rectangle {
-		id: bg;
 		anchors.fill: tabPanelDecorator;
-		color: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected ? Style.alternateBaseColor: "transparent": "transparent";
+		anchors.topMargin: Style.marginXS;
+		anchors.bottomMargin: Style.marginXS;
+		anchors.leftMargin: 2;
+		anchors.rightMargin: 2;
+		radius: Style.marginS;
+		color: Style.alternateBaseColor;
+		visible: tabPanelDecorator.isHovered && !tabPanelDecorator.isSelected;
 	}
 
 	Rectangle {
@@ -42,7 +59,8 @@ DecoratorBase {
 				   (tabPanelDecorator.baseElement.index + 1) !== tabPanelDecorator.baseElement.selectedIndex
 				 : false;
 
-		color: Style.borderColor2;
+		color: Style.borderColor;
+		opacity: 0.55;
 	}
 
 	Rectangle {
@@ -52,10 +70,9 @@ DecoratorBase {
 		anchors.left: tabPanelDecorator.left;
 		anchors.right: tabPanelDecorator.right;
 
-		height: 2;
+		height: tabPanelDecorator.isSelected ? 2 : 0;
 
-		color: Style.tabSelectedColor;
-		visible: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected: false;
+		color: Style.textSelectedColor;
 	}
 
 	Row {
@@ -81,6 +98,7 @@ DecoratorBase {
 				sourceSize.width: width;
 				sourceSize.height: height;
 				fillMode: Image.PreserveAspectFit;
+				opacity: tabPanelDecorator.isSelected || tabPanelDecorator.isHovered ? 1.0 : Style.opacityHigh;
 			}
 		}
 
@@ -102,8 +120,8 @@ DecoratorBase {
 				visible: false;
 
 				text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
-				font.family: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned ? Style.fontFamilyBold : Style.fontFamily;
-				font.bold: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned;
+				font.family: tabPanelDecorator.isSelected || (tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned) ? Style.fontFamilyBold : Style.fontFamily;
+				font.bold: tabPanelDecorator.isSelected || (tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned);
 				font.pixelSize: Style.fontSizeM;
 			}
 
@@ -116,9 +134,9 @@ DecoratorBase {
 
 				width: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned ? textHelper.width : parent.width;
 
-				color: Style.textColor;
-				font.family: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned ? Style.fontFamilyBold : Style.fontFamily;
-				font.bold: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned;
+				color: tabPanelDecorator.isSelected ? Style.titleColor : (tabPanelDecorator.isHovered ? Style.textColor : Style.subtitleColor);
+				font.family: tabPanelDecorator.isSelected || (tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned) ? Style.fontFamilyBold : Style.fontFamily;
+				font.bold: tabPanelDecorator.isSelected || (tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned);
 				font.pixelSize: Style.fontSizeM;
 				text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
 
@@ -126,33 +144,54 @@ DecoratorBase {
 			}
 		}
 
-		ToolButton {
-			id: closeButton;
-			objectName: "CloseButton"
-			anchors.verticalCenter: parent.verticalCenter;
-			width: Style.iconSizeS;
-			height: width;
-			visible: tabPanelDecorator.baseElement && !tabPanelDecorator.baseElement.pinned && tabPanelDecorator.baseElement.isCloseEnable;
-			iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
-			decorator: Component {
-				ToolButtonDecorator {
-					color: "transparent";
-					icon.width: 16;
-				}
-			}
+		// Fixed-width close slot: width never collapses, only the glyph fades in/out,
+		// so hovering a tab does not resize it.
+		Item {
+			id: closeSlot;
 
-			onClicked: {
-				tabPanelDecorator.baseElement.closeSignal();
+			anchors.verticalCenter: parent.verticalCenter;
+			width: tabPanelDecorator.canClose ? tabPanelDecorator.closeSlotSize : 0;
+			height: tabPanelDecorator.closeSlotSize;
+			visible: tabPanelDecorator.canClose;
+
+			ToolButton {
+				id: closeButton;
+				objectName: "CloseButton"
+				anchors.centerIn: parent;
+				width: tabPanelDecorator.closeSlotSize;
+				height: tabPanelDecorator.closeSlotSize;
+				opacity: tabPanelDecorator.showClose ? 1 : 0;
+				enabled: tabPanelDecorator.showClose;
+				iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
+				decorator: Component {
+					ToolButtonDecorator {
+						color: "transparent";
+						icon.width: 10;
+					}
+				}
+
+				onClicked: {
+					tabPanelDecorator.baseElement.closeSignal();
+				}
 			}
 		}
 	}
 
+	// Spinner only over the label (not the whole tab / close slot), so a stuck
+	// waitName load cannot block closing the tab.
 	Loading {
 		id: loading;
-		anchors.fill: bg;
-		indicatorSize: Style.controlHeightS;
-		background.color: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.selected ? Style.alternateBaseColor: "transparent";
+		// texttabDelegate is a grandchild (inside the `content` Row), not a
+		// parent or sibling of this item, so it cannot be an anchor target.
+		// Center over it by reading its geometry into a plain binding instead.
+		anchors.verticalCenter: tabPanelDecorator.verticalCenter;
+		x: content.x + texttabDelegate.x + (texttabDelegate.width - width) / 2;
+		width: Style.controlHeightS;
+		height: Style.controlHeightS;
+		indicatorSize: Style.iconSizeS;
+		background.color: "transparent";
 		visible: false;
+		z: 5;
 	}
 }
 

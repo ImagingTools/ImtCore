@@ -29,6 +29,7 @@ class CPrinterSpecificationObject;
 class CPrinterSpecificationObjectList;
 
 // request forward declarations
+struct GetSpecificationsRequestInfo;
 class CGetSpecificationsGqlRequest;
 
 class CPrinterCollectionControllerCompBase: public ::imtservergql::CObjectCollectionControllerCompBase

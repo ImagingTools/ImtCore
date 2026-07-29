@@ -63,12 +63,12 @@ sdl::V1_0::controlsgallery::CSetParamsSetResult CParamsSetTestControllerComp::On
 	auto paramsSet = setParamsSetRequest.GetRequestedArguments().input;
 
 
-	if (paramsSet.parameters){
+	if (paramsSet->parameters){
 		errorMessage = "ParamsSet: parameters is null";
 		return retVal;
 	}
 
-	auto parameters = *paramsSet.parameters;
+	auto parameters = *paramsSet->parameters;
 	if (parameters.count() == 1){
 		errorMessage = "ParamsSet: invalid parameters count";
 		return retVal;

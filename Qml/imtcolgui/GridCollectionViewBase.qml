@@ -427,7 +427,7 @@ Item {
 		id: extendingInfoCompDefault;
 
 		Rectangle{
-			color: Style.baseColor;
+			color: "#ffffff";
 			border.color: "gray";
 			border.width: 2;
 

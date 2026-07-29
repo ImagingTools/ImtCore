@@ -134,6 +134,17 @@ ICollectionInfo::Id CObjectCollectionBase::InsertNewObject(
 {
 	ObjectInfo info;
 
+	// Check the proposed ID for a collision as early as possible, before the backing storage
+	// insert and the data object creation below, so no orphaned storage object or wasted copy
+	// is produced when the ID is already taken.
+	if (!proposedElementId.isEmpty()){
+		if (GetObjectInfo(proposedElementId) != nullptr){
+			return QByteArray();
+		}
+
+		info.id = proposedElementId;
+	}
+
 	QByteArray storageId;
 	IObjectCollection* storagePtr = GetObjectStorage(typeId, defaultValuePtr);
 	if (storagePtr != nullptr){
@@ -148,12 +159,6 @@ ICollectionInfo::Id CObjectCollectionBase::InsertNewObject(
 			operationContextPtr);
 		if (storageId.isEmpty()){
 			return QByteArray();
-		}
-	}
-
-	if (!proposedElementId.isEmpty()){
-		if (GetObjectInfo(proposedElementId) == nullptr){
-			info.id = proposedElementId;
 		}
 	}
 
@@ -213,12 +218,16 @@ bool CObjectCollectionBase::RemoveElements(const Ids& elementIds, const IOperati
 		return false;
 	}
 
+	// CChangeNotifier copies the ChangeSet in its constructor and EndChanges uses that copy.
+	// Filling MultiElementNotifierInfo after construction therefore never reaches observers —
+	// they always saw CN_ELEMENTS_REMOVED with an empty elementIds list.
+	// Match CCachedObjectCollectionComp / CCollectionInfo: set final ids before the notifier.
 	MultiElementNotifierInfo notifierInfo;
+	notifierInfo.elementIds = elementIds;
 
 	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
 	changeSet.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
-	istd::IChangeable::ChangeInfoMap changeInfoMap;
 
 	QWriteLocker locker(&m_lock);
 
@@ -236,9 +245,7 @@ bool CObjectCollectionBase::RemoveElements(const Ids& elementIds, const IOperati
 					Ids externalObjectIds;
 					externalObjectIds << externalObjectId;
 
-					if (externalStoragePtr->RemoveElements(externalObjectIds)){
-						notifierInfo.elementIds += externalObjectIds;
-					}
+					externalStoragePtr->RemoveElements(externalObjectIds);
 				}
 			}
 
@@ -247,16 +254,12 @@ bool CObjectCollectionBase::RemoveElements(const Ids& elementIds, const IOperati
 				modelPtr->DetachObserver(&m_modelUpdateBridge);
 			}
 
-			notifierInfo.elementIds << iter->id;
 			iter = m_objects.erase(iter);
 		}
 		else{
 			++iter;
 		}
 	}
-
-	changeInfoMap.insert(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
-	changeSet.SetChangeInfoMap(changeInfoMap);
 
 	locker.unlock();
 
@@ -327,7 +330,7 @@ bool CObjectCollectionBase::GetObjectData(const Id& objectId, DataPtr& dataPtr, 
 				istd::IChangeableUniquePtr newInstancePtr = CreateDataObject(objectInfo.typeId);
 				if (newInstancePtr.IsValid()){
 					if (newInstancePtr->CopyFrom(*objectInfo.dataPtr, objectInfo.copyMode)){
-						dataPtr.FromUnique(newInstancePtr);
+						dataPtr.FromUnique(std::move(newInstancePtr));
 
 						return true;
 					}
@@ -597,8 +600,9 @@ bool CObjectCollectionBase::SetElementName(const Id& elementId, const QString& o
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){
 			if (objectInfo.name != objectName){
+				// CChangeNotifier copies ChangeSet at construction — set final item id before it.
+				// Observers expect CN_ELEMENT_RENAMED to be the element id (not the old name).
 				istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_RENAMED);
-				changeSet.SetChangeInfo(CN_ELEMENT_RENAMED, objectInfo.name);
 				changeSet.SetChangeInfo(CN_ELEMENT_RENAMED, elementId);
 
 				locker.unlock();
@@ -627,8 +631,8 @@ bool CObjectCollectionBase::SetElementDescription(const Id& elementId, const QSt
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){
 			if (objectInfo.description != objectDescription){
+				// CChangeNotifier copies ChangeSet at construction — set final item id before it.
 				istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_DESCRIPTION_CHANGED);
-				changeSet.SetChangeInfo(CN_ELEMENT_DESCRIPTION_CHANGED, objectInfo.description);
 				changeSet.SetChangeInfo(CN_ELEMENT_DESCRIPTION_CHANGED, elementId);
 
 				locker.unlock();
@@ -657,8 +661,8 @@ bool CObjectCollectionBase::SetElementEnabled(const Id& elementId, bool isEnable
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){
 			if (objectInfo.isEnabled != isEnabled){
+				// CChangeNotifier copies ChangeSet at construction — set final item id before it.
 				istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_STATE);
-				changeSet.SetChangeInfo(CN_ELEMENT_STATE, objectInfo.isEnabled);
 				changeSet.SetChangeInfo(CN_ELEMENT_STATE, elementId);
 
 				locker.unlock();
@@ -765,7 +769,9 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.EndTag(objectDataTag);
 
 		if (retVal && !archive.IsStoring()){
-			InsertObjectIntoCollection(elementInfo);
+			if (!InsertObjectIntoCollection(elementInfo)){
+				qWarning("CObjectCollectionBase::Serialize: Element '%s' was skipped (duplicate ID or observer attach failure)", elementInfo.id.constData());
+			}
 		}
 
 		retVal = retVal && archive.EndTag(objectTag);
@@ -920,20 +926,44 @@ IObjectCollection* CObjectCollectionBase::CreateSubCollectionInstance() const
 
 bool CObjectCollectionBase::InsertObjectIntoCollection(ObjectInfo info)
 {
+	Q_ASSERT(info.dataPtr.IsValid());
+
+	QWriteLocker locker(&m_lock);
+
+	// Atomic duplicate-ID guard: InsertNewObject checks the proposed ID under a separate read
+	// lock, so two concurrent inserts of the same ID could both pass that check. The check must
+	// be re-done under the same write lock that performs the append, so the loser of the race
+	// is rejected instead of appending a corrupting duplicate.
+	if (!info.id.isEmpty()){
+		for (int i = 0; i < m_objects.count(); ++i){
+			if (m_objects[i].id == info.id){
+				return false;
+			}
+		}
+	}
+
+	m_objects.push_back(info);
+
+	locker.unlock();
+
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(info.dataPtr.GetPtr());
 	if (modelPtr != nullptr){
 		if (!modelPtr->AttachObserver(&m_modelUpdateBridge)){
 			qDebug("CObjectCollectionBase::InsertObjectIntoCollection: Attaching object's model to the internal observer failed");
 
+			QWriteLocker removeLocker(&m_lock);
+
+			for (int i = m_objects.count() - 1; i >= 0; --i){
+				if (m_objects[i].dataPtr.GetPtr() == info.dataPtr.GetPtr()){
+					m_objects.remove(i);
+
+					break;
+				}
+			}
+
 			return false;
 		}
 	}
-
-	Q_ASSERT(info.dataPtr.IsValid());
-
-	QWriteLocker locker(&m_lock);
-
-	m_objects.push_back(info);
 
 	return true;
 }

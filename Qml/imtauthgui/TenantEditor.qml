@@ -3,8 +3,6 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
-import imtcontrols 1.0
-import imtcolgui 1.0
 import imtdocgui 1.0
 import imtauthgui 1.0
 import imtauthTenantsSdl 1.0
@@ -120,7 +118,7 @@ DocumentViewBase {
 		}
 	}
 
-	// Re-build pages when role / ownership state flips.
+	// Re-build pages whenever anything controlling page visibility changes.
 	Connections {
 		target: stateManager_
 		function onIsNewTenantChanged() {
@@ -130,13 +128,7 @@ DocumentViewBase {
 				stateManager_.loadInvitationsFromModel()
 			}
 		}
-		function onIsOwnerChanged() {
-			if (!stateManager_.isNewTenant) multiPageView.updatePages()
-		}
-		function onIsCreatorChanged() {
-			if (!stateManager_.isNewTenant) multiPageView.updatePages()
-		}
-		function onCanManageMembersChanged() {
+		function onPagesConfigKeyChanged() {
 			if (!stateManager_.isNewTenant) multiPageView.updatePages()
 		}
 	}

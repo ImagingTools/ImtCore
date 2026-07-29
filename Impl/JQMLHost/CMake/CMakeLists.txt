@@ -1,19 +1,16 @@
 project(JQMLHost LANGUAGES CXX)
 
+
 if(APPLE)
 	set(CMAKE_MACOSX_BUNDLE "off")
 endif()
 
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
-include(${ACFDIR}/Config/CMake/AcfQt.cmake)
-include(${ACFDIR}/Config/CMake/AcfStd.cmake)
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 #------ SDL-generated QML libraries ------
-target_link_libraries(${PROJECT_NAME}
-	imtbasesdl
+target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	imtappsdl
 	imtauthsdl
 	imtlicsdl
@@ -24,7 +21,7 @@ target_link_libraries(${PROJECT_NAME}
 	imtpaysdl)
 
 #------ QML modules (from ImtCore/Qml) ------
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	imtcontrolsqml
 	imtstylecontrolsqml
 	imtguiqml
@@ -37,41 +34,23 @@ target_link_libraries(${PROJECT_NAME}
 	imtdeskguiqml)
 
 #------ Core ImtCore libraries ------
-target_link_libraries(${PROJECT_NAME}
-	imtbase
+target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	ImtCoreLoc
-	AcfLoc
-	AcfSlnLoc
-	imtdb
-	imtgui
+	Acf::AcfLoc
+	AcfSln::AcfSlnLoc
 	imtguigql
-	imtauth
 	imtauthdb
 	imtauthgui
-	imtlic
 	imtlicgui
 	imtstyle
-	imtqml
-	imtcol
-	imtgql
-	imtclientgql
-	imtserverapp
-	imtservice
-	imtcom
-	imtlog
-	imtcrypt
-	imtrest
-	imtapp
-	imtchat
-	imtdesk)
+	imtchatdb
+	imtdeskdb
+	imtlog)
 
 #------ Qt modules ------
-target_link_libraries(${PROJECT_NAME}
-	Qt${QT_VERSION_MAJOR}::Qml
-	Qt${QT_VERSION_MAJOR}::Quick
+target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	Qt${QT_VERSION_MAJOR}::QuickControls2
-	Qt${QT_VERSION_MAJOR}::QuickWidgets
-	Qt${QT_VERSION_MAJOR}::WebSockets)
+)
 
 if(WIN32)
 	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")
@@ -79,3 +58,4 @@ if(WIN32)
 	windeploy(${PROJECT_NAME} "${listOptions}" "${files}")
 	unset(listOptions)
 endif()
+

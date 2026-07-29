@@ -9,11 +9,8 @@ import imtauthgui 1.0
 /**
  * TenantPermissionsPage
  *
- * Permissions tab of the TenantEditor — displays ALL product permissions as a
- * flat table with path-style names using PermissionsTableView.
- *
- * Permissions are fetched via apiClient.fetchAllPermissions() (no tenant filter).
- * The tenant's selected permission IDs are stored in tenantData.m_tenantPermissions.
+ * Permissions page for TenantEditor — displays product permissions tree.
+ * (Organization-specific permissions are assigned per-member via memberships, not here.)
  */
 ViewBase {
 	id: permissionsPage
@@ -23,37 +20,37 @@ ViewBase {
 	readonly property var tenantData: model
 	property var stateManager: null
 	property var apiClient: null
-	property bool __allPermissionsRequested: false
+	property bool __permissionsRequested: false
 	readonly property bool __canEditPermissions: stateManager ? stateManager.canViewOrganizationPermissions : false
 
-	function __requestAllPermissionsOnce() {
+	function __requestPermissionsOnce() {
 		if (!permissionsPage.apiClient)
 			return
-		if (permissionsPage.__allPermissionsRequested)
+		if (permissionsPage.__permissionsRequested)
 			return
-		permissionsPage.__allPermissionsRequested = true
+		permissionsPage.__permissionsRequested = true
 		permissionsPage.apiClient.fetchAllPermissions()
 	}
 
-	// Fetch all permissions when the page is first shown
+	// Fetch permissions tree when the page is first shown
 	Component.onCompleted: {
-		permissionsPage.__requestAllPermissionsOnce()
+		permissionsPage.__requestPermissionsOnce()
 	}
 
 	onApiClientChanged: {
-		permissionsPage.__allPermissionsRequested = false
-		permissionsPage.__requestAllPermissionsOnce()
+		permissionsPage.__permissionsRequested = false
+		permissionsPage.__requestPermissionsOnce()
 	}
 
 	Connections {
 		target: permissionsPage.apiClient
 
 		function onAllPermissionsReceived() {
-			permissionsPage.__onAllPermissionsReceived()
+			permissionsPage.__onPermissionsReceived()
 		}
 	}
 
-	function __onAllPermissionsReceived() {
+	function __onPermissionsReceived() {
 		if (!permissionsPage.apiClient)
 			return
 		permissionsTableView.rebuildFromFlatArray(permissionsPage.apiClient.allPermissions)
@@ -64,12 +61,9 @@ ViewBase {
 		if (!permissionsPage.tenantData)
 			return
 		var selectedPermissionsIds = []
-		var permissionsArray = permissionsPage.tenantData.m_tenantPermissions
-		if (permissionsArray) {
-			var permCount = permissionsArray.length || 0
-			for (var i = 0; i < permCount; i++)
-				selectedPermissionsIds.push(permissionsArray[i])
-		}
+		var permissionsArray = permissionsPage.tenantData.m_tenantPermissions || []
+		for (var i = 0; i < permissionsArray.length; i++)
+			selectedPermissionsIds.push(permissionsArray[i])
 		permissionsTableView.applySelection(selectedPermissionsIds)
 	}
 
@@ -77,7 +71,6 @@ ViewBase {
 		if (!permissionsPage.tenantData)
 			return
 
-		// If permissions are already loaded, just re-apply selection
 		if (permissionsPage.apiClient && permissionsPage.apiClient.allPermissions
 				&& permissionsPage.apiClient.allPermissions.length > 0) {
 			permissionsTableView.rebuildFromFlatArray(permissionsPage.apiClient.allPermissions)

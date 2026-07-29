@@ -22,8 +22,6 @@ public:
 	virtual void SetUserId(const QByteArray& userId) override;
 	virtual QByteArray GetTenantId() const override;
 	virtual void SetTenantId(const QByteArray& tenantId) override;
-	virtual QByteArray GetRoleId() const override;
-	virtual void SetRoleId(const QByteArray& roleId) override;
 	virtual TenantInvitationStatus GetStatus() const override;
 	virtual void SetStatus(TenantInvitationStatus status) override;
 	virtual QByteArray GetInvitedByUserId() const override;
@@ -54,7 +52,6 @@ protected:
 	QByteArray m_invitationId;
 	QByteArray m_userId;
 	QByteArray m_tenantId;
-	QByteArray m_roleId;
 	TenantInvitationStatus m_status;
 	QByteArray m_invitedByUserId;
 	QString m_createdAt;

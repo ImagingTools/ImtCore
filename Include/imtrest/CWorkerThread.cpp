@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QDebug>
+#include <QtCore/QMetaObject>
 
 // ImtCore includes
 #include <imtrest/CWorkerManagerComp.h>
@@ -15,11 +16,18 @@ namespace imtrest
 
 CWorkerThread::CWorkerThread(const CWorkerManagerComp* workerManager, const QByteArray& subCommandId)
 	: m_status(ST_PROCESS),
+	  m_workerManager(nullptr),
 	  m_workerPtr(nullptr),
 	  m_requestPtr(nullptr),
 	  m_subCommandId(subCommandId)
 {
 	m_workerManager = const_cast<CWorkerManagerComp*>(workerManager);
+}
+
+
+void CWorkerThread::SetServlet(IRequestServletPtr&& servletPtr)
+{
+	m_servletPtr = std::move(servletPtr);
 }
 
 
@@ -59,36 +67,73 @@ bool CWorkerThread::SendResponse(const QByteArray& requestId, ConstResponsePtr& 
 
 void CWorkerThread::run()
 {
-	imtrest::IRequestServletPtr requestServletPtr = m_workerManager->CreateServlet();
-	if (!requestServletPtr.IsValid()){
+	// Servlet must already be created on the manager thread (SetServlet). Creating it
+	// here ran factory OnComponentCreated() on the worker and could parent QObjects to
+	// qApp → one-shot "Cannot create children... Parent is QCoreApplication".
+
+	if (!m_servletPtr.IsValid()){
+		// Fallback only if a caller forgot SetServlet (should not happen).
+		if (m_workerManager != nullptr){
+			m_servletPtr = m_workerManager->CreateServlet();
+		}
+	}
+
+	if (!m_servletPtr.IsValid()){
 		Q_ASSERT(false);
 
 		return;
 	}
 
-	m_workerPtr.SetPtr(new CWorker(std::move(requestServletPtr), this));
+	// CWorker is a QObject bound to THIS worker thread. ProcessRequest is posted so it
+	// runs only after exec() pumps the event loop (timers / nested loops need a dispatcher).
+	m_workerPtr.SetPtr(new CWorker(std::move(m_servletPtr), this));
+	m_workerPtr->moveToThread(this);
 
-	connect(this, &CWorkerThread::StartProcess, m_workerPtr.GetPtr(), &CWorker::ProcessRequest); //, Qt::QueuedConnection
-	connect(m_workerPtr.GetPtr(), &CWorker::FinishProcess, this, &CWorkerThread::OnFinishProcess, Qt::DirectConnection); //, Qt::QueuedConnection
-
-	m_workerPtr->ProcessRequest(m_requestPtr, m_subCommandId);
+	if (m_requestPtr != nullptr){
+		PostRequest(m_requestPtr, m_subCommandId);
+	}
 
 	exec();
 }
 
 
-void CWorkerThread::OnStarted()
+void CWorkerThread::PostRequest(const IRequest* requestPtr, const QByteArray& subCommandId)
 {
-	Q_EMIT StartProcess(m_requestPtr, m_subCommandId);
+	CWorker* workerPtr = m_workerPtr.GetPtr();
+	if (workerPtr == nullptr){
+		return;
+	}
+
+	// Deliver to the worker on its own thread via a captured-argument lambda. This is
+	// the fix for the hang: the previous queued StartProcess signal carried a raw
+	// 'const IRequest*', which is not a registered queued metatype, so Qt dropped the
+	// call and ProcessRequest never ran (worker stuck idle in exec()). A lambda captures
+	// the pointer directly and needs no metatype.
+	QMetaObject::invokeMethod(
+				workerPtr,
+				[workerPtr, requestPtr, subCommandId]() {
+					workerPtr->ProcessRequest(requestPtr, subCommandId);
+				},
+				Qt::QueuedConnection);
 }
 
 
-void CWorkerThread::OnFinishProcess(const IRequest* request, const QByteArray& subCommandId)
+void CWorkerThread::NotifyFinished(const IRequest* requestPtr, const QByteArray& subCommandId)
 {
-	Q_EMIT FinishProcess(request,subCommandId);
+	CWorkerManagerComp* workerManager = m_workerManager;
+	if (workerManager == nullptr){
+		return;
+	}
+
+	// Hop to the manager's own thread (same lambda rationale as PostRequest); the
+	// manager's OnFinish frees the request and dispatches the next queued one.
+	QMetaObject::invokeMethod(
+				workerManager,
+				[workerManager, requestPtr, subCommandId]() {
+					workerManager->OnFinish(requestPtr, subCommandId);
+				},
+				Qt::QueuedConnection);
 }
 
 
 } // namespace imtrest
-
-

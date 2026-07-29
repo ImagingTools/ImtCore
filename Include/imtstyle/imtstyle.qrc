@@ -6,10 +6,4 @@
         <file alias="dark.theme">dark.theme</file>
         <file alias="light.theme">light.theme</file>
     </qresource>
-    <qresource prefix="/Fonts">
-        <file alias="Roboto-Light.ttf">Resources/Fonts/Roboto-Light.ttf</file>
-        <file alias="Roboto-Regular.ttf">Resources/Fonts/Roboto-Regular.ttf</file>
-        <file alias="Roboto-Medium.ttf">Resources/Fonts/Roboto-Medium.ttf</file>
-        <file alias="Roboto-Bold.ttf">Resources/Fonts/Roboto-Bold.ttf</file>
-    </qresource>
 </RCC>

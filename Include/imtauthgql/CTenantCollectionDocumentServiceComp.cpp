@@ -94,12 +94,14 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 	sdl::V1_0::imtauth::CTenantData response;
 	QByteArray tenantId = tenantPtr->GetTenantId();
 
+	QByteArray userObjectId;
 	// Server-side access control: user can only open TenantEditor if
 	// they have switched to this tenant (current tenant in JWT must match)
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	QByteArray contextTenantId;
 	if (gqlContextPtr != nullptr){
 		contextTenantId = gqlContextPtr->GetTenantId();
+		userObjectId = gqlContextPtr->GetUserId();
 	}
 
 	response.id = tenantId;
@@ -117,11 +119,11 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 		}
 	}
 
-	const bool isCreator = (!tenantId.isEmpty() && tenantPtr->GetCreatorId() == userId);
-	const bool isOwner = (!tenantId.isEmpty() && tenantPtr->GetOwnerId() == userId);
+	const bool isCreator = (!tenantId.isEmpty() && tenantPtr->GetCreatorId() == userObjectId);
+	const bool isOwner = (!tenantId.isEmpty() && tenantPtr->GetOwnerId() == userObjectId);
 	bool isMember = false;
 	if (!tenantId.isEmpty() && m_membershipManagerCompPtr.IsValid()){
-		isMember = m_membershipManagerCompPtr->IsMember(userId, tenantId);
+		isMember = m_membershipManagerCompPtr->IsMember(userObjectId, tenantId);
 	}
 
 	// Prevent invited users (and any non-members) from reading tenant details
@@ -143,10 +145,22 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 	if (gqlContextPtr != nullptr){
 		response.currentUserId = gqlContextPtr->GetUserId();
 	}
+
+	// Populate the organization permissions available to the *current user* within this tenant
+	// (used by TenantEditor to know what org features the user can manage)
+	if (m_membershipManagerCompPtr.IsValid() && gqlContextPtr != nullptr){
+		QByteArray currentUid = gqlContextPtr->GetUserId();
+		if (!currentUid.isEmpty()){
+			imtauth::ITenantMembershipUniquePtr myMs = m_membershipManagerCompPtr->FindMembership(currentUid, tenantId);
+			if (myMs.IsValid()){
+				response.currentUserOrganizationPermissions.Emplace().FromList(myMs->GetOrganizationPermissions());
+			}
+		}
+	}
+
 	if (m_membershipManagerCompPtr.IsValid()){
 		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 		response.members.Emplace();
-		response.memberRoles.Emplace();
 
 		QByteArray ownerId = tenantPtr->GetOwnerId();
 		QByteArray creatorId = tenantPtr->GetCreatorId();
@@ -172,16 +186,9 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 
 				response.members->push_back(memberEntry);
 
-				// Assign environment role: Owner > stored role (Admin/Member)
-				sdl::V1_0::imtauth::CTenantMemberRoleEntry roleEntry;
-				roleEntry.userId = userId;
 				if (!ownerId.isEmpty() && userId == ownerId){
-					roleEntry.role = TenantEnvironmentRoleToString(imtauth::TER_OWNER);
 					ownerFound = true;
-				} else {
-					roleEntry.role = TenantEnvironmentRoleToString(membershipPtr->GetEnvironmentRole());
 				}
-				response.memberRoles->push_back(roleEntry);
 			}
 		}
 
@@ -193,11 +200,6 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 				ownerEntry.name = imtauth::GetUserName(*m_userCollectionCompPtr, ownerId);
 			}
 			response.members->push_back(ownerEntry);
-
-			sdl::V1_0::imtauth::CTenantMemberRoleEntry ownerRoleEntry;
-			ownerRoleEntry.userId = ownerId;
-			ownerRoleEntry.role = TenantEnvironmentRoleToString(imtauth::TER_OWNER);
-			response.memberRoles->push_back(ownerRoleEntry);
 		}
 	}
 
@@ -237,7 +239,6 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 				sdl::V1_0::imtauth::CTenantInvitationEntry invitationEntry;
 				invitationEntry.id = invitationPtr->GetInvitationId();
 				invitationEntry.userId = invitationPtr->GetUserId();
-				invitationEntry.role = QString::fromUtf8(invitationPtr->GetRoleId());
 				invitationEntry.status = TenantInvitationStatusToString(m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr));
 				invitationEntry.invitedByUserId = invitationPtr->GetInvitedByUserId();
 				invitationEntry.createdAt = invitationPtr->GetCreatedAt();
@@ -341,6 +342,19 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		effectiveUserPermissions = scopedPermissions;
 	}
 
+	// Additionally grant organization-specific permissions from the user's membership in this tenant.
+	// These control org-internal operations (member mgmt, roles, groups, etc.) and are not part of tenant's product permissions.
+	if (!isSystemAdmin && !tenantId.isEmpty() && m_membershipManagerCompPtr.IsValid()){
+		imtauth::ITenantMembershipUniquePtr msPtr = m_membershipManagerCompPtr->FindMembership(contextUserId, tenantId);
+		if (msPtr.IsValid() && msPtr->IsActive()){
+			for (const QByteArray& p : msPtr->GetOrganizationPermissions()){
+				if (!p.isEmpty() && !effectiveUserPermissions.contains(p)){
+					effectiveUserPermissions.push_back(p);
+				}
+			}
+		}
+	}
+
 	if (!tenantId.isEmpty() && !contextTenantId.isEmpty() && contextTenantId != tenantId){
 		errorMessage = QStringLiteral("Access denied: tenant context mismatch");
 		return response;
@@ -356,17 +370,19 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->FindMembership(contextUserId, tenantId);
 		if (membershipPtr.IsValid() && membershipPtr->IsActive()){
 			isMember = true;
-			isAdmin = isOwner || isCreator || (membershipPtr->GetEnvironmentRole() == imtauth::TER_ADMIN);
+			// isAdmin now based on having key org permission (replacing env role)
+		QByteArrayList orgP = membershipPtr->GetOrganizationPermissions();
+		isAdmin = isOwner || isCreator || orgP.contains("EditOrganizationMember") || orgP.contains("InviteOrganizationMember");
 		}
 	}
 	bool isNewTenant = tenantId.isEmpty();
 
 	const bool canChangeOrganizationName = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
-		QByteArrayList() << QByteArrayLiteral("ChangeOrganizationName") << QByteArrayLiteral("ChangeOrganization") << QByteArrayLiteral("EditOrganization"));
+		QByteArrayList() << QByteArrayLiteral("ChangeOrganizationName") << QByteArrayLiteral("EditOrganization"));
 	const bool canChangeOrganizationDescription = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
-		QByteArrayList() << QByteArrayLiteral("ChangeOrganizationDescription") << QByteArrayLiteral("ChangeOrganization") << QByteArrayLiteral("EditOrganization"));
+		QByteArrayList() << QByteArrayLiteral("ChangeOrganizationDescription") << QByteArrayLiteral("EditOrganization"));
 	const bool canChangeOrganizationState = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
-		QByteArrayList() << QByteArrayLiteral("ChangeOrganization") << QByteArrayLiteral("EditOrganization"));
+		QByteArrayList() << QByteArrayLiteral("EditOrganization"));
 	const bool canInviteOrganizationMember = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
 		QByteArrayList() << QByteArrayLiteral("InviteOrganizationMember") << QByteArrayLiteral("EditOrganizationMember"));
 	const bool canExcludeOrganizationMember = isSystemAdmin || HasAnyPermission(effectiveUserPermissions,
@@ -510,48 +526,13 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 			for (const QByteArray& addUserId : newUserIds){
 				if (!currentUserIds.contains(addUserId)){
 					if (m_invitationManagerCompPtr.IsValid()){
-						m_invitationManagerCompPtr->CreateInvitation(contextUserId, addUserId, tenantId, QByteArray());
+						m_invitationManagerCompPtr->CreateInvitation(contextUserId, addUserId, tenantId);
 					}
 				}
 			}
 		} else if (isSelfLeaving){
 			// Non-admin member can only remove themselves
 			m_membershipManagerCompPtr->RemoveMembership(userIdToMembershipId.value(contextUserId));
-		}
-
-		// Apply role updates from memberRoles (only Creator/Owner/Admin can change roles)
-		if (tenantData.memberRoles && !isCreator && !isOwner && !isAdmin && !canChangeOrganizationMemberRole){
-			errorMessage = QStringLiteral("Permission denied: ChangeOrganizationMemberRole");
-			return response;
-		}
-
-		if ((isCreator || isOwner || isAdmin || canChangeOrganizationMemberRole) && tenantData.memberRoles){
-			// Rebuild userIdToMembershipId after additions
-			QMap<QByteArray, QByteArray> updatedUserIdToMembershipId;
-			QByteArrayList updatedMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
-			for (const QByteArray& membershipId : updatedMembershipIds){
-				imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-				if (membershipPtr.IsValid()){
-					updatedUserIdToMembershipId[membershipPtr->GetUserId()] = membershipId;
-				}
-			}
-
-			QByteArray ownerId = tenantPtr->GetOwnerId();
-			QByteArray creatorId = tenantPtr->GetCreatorId();
-			for (const auto& roleEntry : *tenantData.memberRoles){
-				if (roleEntry->userId && roleEntry->role){
-					QByteArray userId = *roleEntry->userId;
-					// Creator and Owner roles are immutable — skip any attempt to change them
-					if (userId == creatorId || userId == ownerId){
-						continue;
-					}
-					QString roleStr = *roleEntry->role;
-					if (updatedUserIdToMembershipId.contains(userId)){
-						QByteArray newRoleId = roleStr.toUtf8();
-						m_membershipManagerCompPtr->UpdateMembershipRole(updatedUserIdToMembershipId.value(userId), newRoleId);
-					}
-				}
-			}
 		}
 
 		// Apply tenant permissions (only Creator can change permissions)
@@ -610,7 +591,7 @@ bool CTenantCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* even
 				// Auto-create OWNER membership for the tenant creator
 				QByteArray ownerId = documentTicketPtr->GetOwnerId();
 				if (m_membershipManagerCompPtr.IsValid() && !ownerId.isEmpty()){
-					m_membershipManagerCompPtr->AddMembership(ownerId, objectId, QByteArray());
+					m_membershipManagerCompPtr->AddMembership(ownerId, objectId);
 				}
 			}
 		}

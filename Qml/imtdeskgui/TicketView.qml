@@ -2,8 +2,6 @@
 import QtQuick 2.15
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
-import imtcontrols 1.0
 
 Rectangle {
 	id: ticketViewRoot
@@ -256,7 +254,7 @@ Rectangle {
 					width: Style.buttonWidthM
 					height: Style.buttonHeightM
 					radius: Style.radiusS
-					color: Style.statusClosedColor
+					color: "#8957e5"
 
 					Text {
 						anchors.centerIn: parent
@@ -304,7 +302,7 @@ Rectangle {
 					width: Style.buttonWidthM
 					height: Style.buttonHeightM
 					radius: Style.radiusS
-					color: Style.statusOpenColor
+					color: "#1a7f37"
 
 					Text {
 						anchors.centerIn: parent

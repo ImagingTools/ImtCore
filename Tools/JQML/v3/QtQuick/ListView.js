@@ -65,7 +65,7 @@ class ListView extends Flickable {
         keyNavigationEnabledChanged: { type: Signal, args: [] },
     })
 
-    __items = []
+    __items = {}
     __cache = []
     __changeSet = []
     __keyNavigationEnabledExplicit = false
@@ -112,13 +112,13 @@ class ListView extends Flickable {
     }
 
     itemAtIndex(index) {
-        return index >= 0 && index < this.__items.length ? this.__items[index] : undefined
+        return this.__items[index]
     }
     positionViewAtBeginning() {
         this.positionViewAtIndex(0, ListView.Beginning)
     }
     positionViewAtEnd() {
-        this.positionViewAtIndex(this.__items.length - 1, ListView.Beginning)
+        this.positionViewAtIndex(Object.keys(this.__items).pop(), ListView.Beginning)
 
 
     }
@@ -250,7 +250,7 @@ class ListView extends Flickable {
         this.__changeSet = []
 
         let removed = this.__items
-        this.__items = []
+        this.__items = {}
 
         for (let c of this.__cache) {
             if (c) c.destroy()
@@ -258,8 +258,8 @@ class ListView extends Flickable {
 
         this.__cache = []
 
-        for (let r of removed) {
-            if (r) r.destroy()
+        for (let r in removed) {
+            if (removed[r]) removed[r].destroy()
         }
 
         // this.__middleWidth = 0
@@ -293,6 +293,14 @@ class ListView extends Flickable {
 
         if (index !== this.currentIndex) {
             this.currentIndex = index
+        }
+    }
+
+    __getItemIndex(x, y){
+        if (this.orientation === ListView.Horizontal) {
+            return Math.ceil((x - this.originX) / (this.__middleWidth + this.spacing))
+        } else {
+            return Math.ceil((y - this.originY) / (this.__middleHeight + this.spacing))
         }
     }
 
@@ -493,8 +501,12 @@ class ListView extends Flickable {
             item.visibleChanged.connect(() => {
                 JQApplication.updateLater(this)
             })
-            item.indexChanged.connect(() => {
-                let _index = item.JQAbstractModel.index
+            item.indexChanged.connect((oldValue, newValue) => {
+                delete this.__items[oldValue]
+                if(newValue < 0) return
+                
+                let _index = newValue
+                this.__items[_index] = item
                 if (this.orientation === ListView.Horizontal) {
                     if(_index > 0){
                         item.x = this.__items[_index - 1].x + this.__items[_index - 1].width + this.spacing
@@ -555,6 +567,8 @@ class ListView extends Flickable {
                     if (!itemInfo.exist) {
                         if (this.__createItem(i, itemInfo)) this.__updateGeometry()
                     }
+                } else {
+                    break
                 }
             }
 
@@ -571,14 +585,12 @@ class ListView extends Flickable {
         }
     }
 
-    __normalizeItemsIndex(startIndex = 0) {
-        for (let i = startIndex; i < this.__items.length; i++) {
-            let item = this.__items[i]
-            if (!item) continue
-
-            if (item.JQAbstractModel && item.JQAbstractModel.index !== i) {
-                item.JQAbstractModel.index = i
-            }
+    __normalizeItemsIndex() {
+        this.__items = {}
+        for(let child of this.contentItem.__children){
+            let index = child.index
+            if(index >= 0 && Number.isFinite(index))
+            this.__items[index] = child
         }
     }
 
@@ -594,7 +606,7 @@ class ListView extends Flickable {
             }
         }
 
-        for (let i = startIndex; i < this.__items.length; i++) {
+        for (let i = startIndex; i < Number(Object.keys(this.__items).pop()); i++) {
             let item = this.__items[i]
             if (!item) continue
 
@@ -628,7 +640,7 @@ class ListView extends Flickable {
                 return
             }
 
-            if (length === 0 && this.__items.length === 0) return
+            if (length === 0 && Object.keys(this.__items).length === 0) return
 
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)
@@ -673,13 +685,12 @@ class ListView extends Flickable {
                         }
                     }
                 } else if (role === 'insert') {
+                    this.__normalizeItemsIndex()
+                    
                     for (let i = leftTop; i < bottomRight; i++) {
-                        this.__items.splice(i, 0, undefined)
                         let itemInfo = this.__getItemInfo(i)
                         if (itemInfo.inner) {
-                            if (!itemInfo.exist) {
-                                if (this.__createItem(i, itemInfo)) this.__updateGeometry()
-                            }
+                            if (this.__createItem(i, itemInfo)) this.__updateGeometry()
                         }
                     }
 
@@ -691,10 +702,21 @@ class ListView extends Flickable {
                         layoutFrom = leftTop
                     }
                 } else if (role === 'remove') {
-                    let removed = this.__items.splice(leftTop, bottomRight - leftTop)
-                    for (let r of removed) {
-                        if (r) this.__toCache(r)
+                    let leftTopItem = this.__items[leftTop]
+                    let bottomRightItem = this.__items[bottomRight]
+
+                    for(let i = leftTop; i < bottomRight; i++){
+                        this.__toCache(this.__items[i])
+                        delete this.__items[i]
                     }
+
+                    this.__normalizeItemsIndex()
+
+                    if(leftTopItem && bottomRightItem){
+                        bottomRightItem.x = leftTopItem.x
+                        bottomRightItem.y = leftTopItem.y
+                    }
+                    
 
                     if (currentIndex >= leftTop && currentIndex < bottomRight) {
                         currentIndex = leftTop
@@ -718,20 +740,17 @@ class ListView extends Flickable {
                 this.currentIndex = currentIndex
             }
 
-            if (layoutFrom !== undefined) {
-                this.__normalizeItemsIndex(layoutFrom)
-                this.__realignItems(layoutFrom)
-            }
+            // if (layoutFrom !== undefined) {
+            //     this.__normalizeItemsIndex()
+            //     this.__realignItems(layoutFrom)
+            // }
 
-            let firstIndex = 0
-            let lastIndex = 0
+            let keys = Object.keys(this.__items)
+            let firstIndex = Number(keys[0])
+            let lastIndex = Number(keys[keys.length-1])
 
-            for (let i = 0; i < length; i++) {
-                if (this.__items[i] && !this.__items[i - 1] && !firstIndex) firstIndex = i
-                if (this.__items[i] && !this.__items[i + 1] && !lastIndex) lastIndex = i
-            }
-
-            for (let i = firstIndex; i < length; i++) {
+            if(firstIndex)
+            for(let i = firstIndex - 1; i >= 0 ; i--) {
                 let itemInfo = this.__getItemInfo(i)
                 if (itemInfo.inner) {
                     if (!itemInfo.exist) {
@@ -739,11 +758,14 @@ class ListView extends Flickable {
                     }
                 } else if (itemInfo.exist) {
                     this.__toCache(this.__items[i])
-                    this.__items[i] = undefined
+                    delete this.__items[i]
+                } else {
+                    break
                 }
-
             }
-            for (let i = lastIndex; i >= 0; i--) {
+
+            if(lastIndex)
+            for(let i = lastIndex + 1; i < length ; i++) {
                 let itemInfo = this.__getItemInfo(i)
                 if (itemInfo.inner) {
                     if (!itemInfo.exist) {
@@ -751,7 +773,39 @@ class ListView extends Flickable {
                     }
                 } else if (itemInfo.exist) {
                     this.__toCache(this.__items[i])
-                    this.__items[i] = undefined
+                    delete this.__items[i]
+                } else {
+                    break
+                }
+            }
+
+            for(let i of keys){
+                let itemInfo = this.__getItemInfo(i)
+                if (itemInfo.inner) {
+                    if (!itemInfo.exist) {
+                        if (this.__items[i] = this.__createItem(i, itemInfo)) this.__updateGeometry()
+                    }
+                } else if (itemInfo.exist) {
+                    this.__toCache(this.__items[i])
+                    delete this.__items[i]
+                }
+            }
+
+            if(Object.keys(this.__items).length === 0){
+                let index = this.__getItemIndex(this.contentX-this.cacheBuffer, this.contentY-this.cacheBuffer)
+                if(!Number.isFinite(index) || index < 0) index = 0
+                for(let i = index; i < length; i++){
+                    let itemInfo = this.__getItemInfo(i)
+                    if (itemInfo.inner) {
+                        if (!itemInfo.exist) {
+                            if (this.__items[i] = this.__createItem(i, itemInfo)) this.__updateGeometry()
+                        }
+                    } else if (itemInfo.exist) {
+                        this.__toCache(this.__items[i])
+                        delete this.__items[i]
+                    } else {
+                        break
+                    }
                 }
             }
 
@@ -821,7 +875,7 @@ class ListView extends Flickable {
     }
 
     SLOT_orientationChanged(oldValue, newValue) {
-        for (let i = 0; i < this.__items.length; i++) {
+        for (let i in this.__items) {
             let itemInfo = this.__getItemInfo(i)
 
             if (itemInfo.exist) {
@@ -840,7 +894,7 @@ class ListView extends Flickable {
     }
 
     __updateGeometry() {
-        if (!this.__items.length) {
+        if (!Object.keys(this.__items).length) {
             Geometry.setAuto(this.__self, 'contentWidth', 0, this.__self.constructor.meta.contentWidth)
             Geometry.setAuto(this.__self, 'contentHeight', 0, this.__self.constructor.meta.contentHeight)
             return
@@ -858,7 +912,7 @@ class ListView extends Flickable {
         }
 
         let lastIndex = 0
-        let firstIndex = this.__items.length - 1
+        let firstIndex = length - 1
         let minX = Infinity
         let minY = Infinity
 
@@ -866,7 +920,8 @@ class ListView extends Flickable {
         let visibleContentWidth = 0
         let visibleContentHeight = 0
 
-        for (let i = 0; i < this.__items.length; i++) {
+        for (let i in this.__items) {
+            let index = Number(i)
             if (this.__items[i]) {
                 if (isNaN(this.__items[i].width) || this.__items[i].width === Infinity || this.__items[i].width === -Infinity ||
                     isNaN(this.__items[i].height) || this.__items[i].height === Infinity || this.__items[i].height === -Infinity) continue
@@ -881,8 +936,8 @@ class ListView extends Flickable {
                 if (x < minX) minX = x
                 if (y < minY) minY = y
 
-                if (i < firstIndex) firstIndex = i
-                if (i > lastIndex) lastIndex = i
+                if (index < firstIndex) firstIndex = index
+                if (index > lastIndex) lastIndex = index
             }
         }
 

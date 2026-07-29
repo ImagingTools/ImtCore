@@ -57,10 +57,11 @@ FocusScope{
     property bool hasAllSelection : true;
 
 	property int menuHeight: Style.sizeHintM;
-    property int delegateHeight: 60;
+    property int delegateHeight: Style.controlHeightL;
 
 	property Component menuItemContent: Component{
 		BaseText{
+            elide: Text.ElideRight
 		}
 	}
 
@@ -146,7 +147,10 @@ FocusScope{
             id: popupMenuContainer;
 
 			width: checkBoxMenu.width;
-			height: Math.min(checkBoxMenu.menuHeight, listView.y + listView.contentHeight + Style.marginM);
+            property real headerHeight: checkBoxMenu.hasSearch ? searchBlock.y + searchBlock.height :
+                checkBoxMenu.hasAllSelection ? checkBoxAll.y + checkBoxAll.height : 0
+            height: Math.min(checkBoxMenu.menuHeight,
+                headerHeight + Style.marginXS + listView.contentHeight + Style.marginXS);
 
             property Item rootItem: null;
             property TreeItemModel dataModel: TreeItemModel{};
@@ -281,6 +285,7 @@ FocusScope{
 
                     secondSize: 10;
                     targetItem: listView;
+					allowableGapVert: 1;
 
                 }
 
@@ -348,8 +353,8 @@ FocusScope{
 						width: parent.width - Style.marginM;
                         height: parent.height - 2*parent.border.width;
                         radius: parent.radius;
-                        color: Style.baseColor;
-                        fontColor: Style.baseColorInverted;
+                        color: "#ffffff";
+                        fontColor: "#000000";
                         textSize: Style.fontSizeM;
                         borderColorConst: "transparent";
                         placeHolderText: "Поиск";
@@ -361,14 +366,14 @@ FocusScope{
                 ListView{
                     id: listView;
 
-                    anchors.top: checkBoxMenu.hasAllSelection ? checkBoxAll.bottom : parent.top;
-                    anchors.bottom: parent.bottom;
+                    anchors.top: checkBoxMenu.hasSearch ? searchBlock.bottom :
+						checkBoxMenu.hasAllSelection ? checkBoxAll.bottom : parent.top;
                     anchors.left: parent.left;
                     anchors.right: parent.right;
                     anchors.topMargin: Style.marginXS;
-                    anchors.bottomMargin: Style.marginXS;
                     anchors.leftMargin: Style.marginM;
                     anchors.rightMargin: Style.marginM;
+					height: Math.min(contentHeight, popupMenuContainer.height - y - Style.marginXS);
 
                     boundsBehavior: Flickable.StopAtBounds;
                     clip: true;
@@ -387,6 +392,8 @@ FocusScope{
 
 							item_.anchors.left = checkBox.right
 							item_.anchors.leftMargin = checkBox.mainMargin
+                            item_.anchors.right = item.right
+                            item_.anchors.rightMargin = Style.marginXS
 							item_.anchors.verticalCenter = checkBox.verticalCenter
 						}
 

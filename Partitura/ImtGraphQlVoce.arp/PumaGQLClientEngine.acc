@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6397" Description="ACF"/>
-            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -93,6 +93,7 @@
                                 <Value>RemoteTenantController</Value>
                                 <Value>RemoteProfileController</Value>
                                 <Value>JwtSessionControllerProxy</Value>
+                                <Value>RemotePersonalAccessTokenController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -237,6 +238,24 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="RemotePersonalAccessTokenController" PackageId="ImtAuthClientVoce" ComponentId="RemotePersonalAccessTokenController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="RemoteProfileController" PackageId="ImtAuthGqlPck" ComponentId="RemoteProfileController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -303,9 +322,6 @@
                     <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ProductInfo" Type="Reference" ExportId="ProductInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -316,6 +332,18 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SuperuserProvider" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestRemoteSuperuserProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SuperuserId" Type="Id" ExportId="SuperuserId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -712,8 +740,10 @@
         <Component ExportedId="CachedUserCollection" ComponentId="RemoteRepositories/CachedUserCollection"/>
         <Component ExportedId="ConnectionSubscriber" ComponentId="ConnectionSubscriber"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="RemoteRepositories/GroupRemoteRepository"/>
+        <Component ExportedId="RemotePersonalAccessTokenController" ComponentId="RemotePersonalAccessTokenController"/>
         <Component ExportedId="RemoteTenantController" ComponentId="RemoteTenantController/RemoteTenantController"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="RemoteRepositories/RoleRemoteRepository"/>
+        <Component ExportedId="SuperuserProvider" ComponentId="SuperuserProvider"/>
         <Component ExportedId="UserGroupInfoProvider" ComponentId="RemoteRepositories/UserGroupInfoProvider"/>
         <Component ExportedId="UserRemoteRepository" ComponentId="RemoteRepositories/UserRemoteRepository"/>
         <Component ExportedId="UserSessionRemoteRepository" ComponentId="RemoteRepositories/UserSessionRemoteRepository"/>

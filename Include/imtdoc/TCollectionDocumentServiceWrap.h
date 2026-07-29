@@ -5,7 +5,7 @@
 // Qt includes
 #include <QtCore/QCoreApplication>
 #include <QtCore/QMap>
-#include <QtCore/QTimer>
+#include <QtCore/QMetaObject>
 #include <QtCore/QUuid>
 #include <QtCore/QThread>
 
@@ -236,16 +236,22 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 			if (!sharedIsLoading){
 				// Defer the notification to ensure the mutation response is sent
 				// to the client before the subscription notification arrives.
+				// Use invokeMethod (not QTimer::singleShot(..., qApp, ...)): singleShot
+				// creates a QObject parented to qApp; from a worker thread that logs
+				// "Cannot create children for a parent that is in a different thread".
 				QByteArray deferredUserId = userId;
 				QByteArray deferredDocumentId = documentId;
 				std::weak_ptr<std::atomic<bool>> deferredAliveGuard(this->m_isAlive);
-				QTimer::singleShot(0, QCoreApplication::instance(), [this, deferredAliveGuard, deferredUserId, deferredDocumentId](){
-					auto isAlive = deferredAliveGuard.lock();
-					if (!isAlive || !isAlive->load()){
-						return;
-					}
-					this->OnDocumentDataLoaded(deferredUserId, deferredDocumentId);
-				});
+				QMetaObject::invokeMethod(
+							QCoreApplication::instance(),
+							[this, deferredAliveGuard, deferredUserId, deferredDocumentId]() {
+								auto isAlive = deferredAliveGuard.lock();
+								if (!isAlive || !isAlive->load()){
+									return;
+								}
+								this->OnDocumentDataLoaded(deferredUserId, deferredDocumentId);
+							},
+							Qt::QueuedConnection);
 			}
 
 			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_OK, documentId, QString()});
@@ -297,6 +303,10 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		}
 	}
 
+	// Opening is complete once the document is registered.  Loading continues
+	// asynchronously and is reported through CDocumentDataLoadedEvent.
+	this->CompleteTask(taskId, TaskResult{IDocumentService::OS_OK, documentId, QString()});
+
 	// Load document data asynchronously in a separate thread
 	QThread* thread = new QThread();
 	QObject* worker = new QObject();
@@ -304,32 +314,42 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 
 	bool singleCopyMode = this->IsSingleCopyMode();
 	std::weak_ptr<std::atomic<bool>> aliveGuard(this->m_isAlive);
-	QObject::connect(thread, &QThread::started, worker, [this, aliveGuard, singleCopyMode, objectId, userId, documentId, taskId, worker](){
+	QObject::connect(thread, &QThread::started, worker, [this, aliveGuard, singleCopyMode, objectId, userId, documentId, worker](){
 		auto isAlive = aliveGuard.lock();
 		if (!isAlive || !isAlive->load()){
-			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")});
 			worker->deleteLater();
 			return;
 		}
 
 		imtbase::IObjectCollection* collPtr = GetCollection();
 		if (collPtr == nullptr){
-			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("No collection available")});
+			UserDocumentPairList docsToClose;
+			{
+				QMutexLocker locker(&this->m_mutex);
+				if (singleCopyMode && this->m_sharedDocuments.contains(objectId)){
+					this->m_sharedDocuments[objectId].isLoading = false;
+					docsToClose = this->FindDocumentsByObjectId(objectId);
+				}
+				else{
+					docsToClose.append(qMakePair(userId, documentId));
+				}
+			}
+
+			for (const UserDocumentPair& pair : docsToClose){
+				this->CloseDocumentInternal(pair.first, pair.second);
+			}
 			worker->deleteLater();
 			return;
 		}
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		bool success = collPtr->GetObjectData(objectId, dataPtr);
-
 		isAlive = aliveGuard.lock();
 		if (!isAlive || !isAlive->load()){
-			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")});
 			worker->deleteLater();
 			return;
 		}
 
-		bool loadSuccess = false;
 		{
 			QMutexLocker locker(&this->m_mutex);
 
@@ -346,7 +366,6 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 							dp->objectPtr = dataPtr;
 						}
 					}
-					loadSuccess = true;
 				}
 				else {
 					if (this->m_sharedDocuments.contains(objectId)){
@@ -368,7 +387,6 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 
 				if (docPtr != nullptr && success && dataPtr.IsValid()){
 					docPtr->objectPtr = dataPtr;
-					loadSuccess = true;
 				}
 				else if (docPtr != nullptr){
 					docPtr->isLoading = false;
@@ -377,23 +395,17 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 			}
 		}
 
-		if (!loadSuccess){
-			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Failed to load document data")});
-		}
-
 		worker->deleteLater();
 	});
 
 	// Initialize observers and fire events in the main thread after background work completes
-	QObject::connect(thread, &QThread::finished, QCoreApplication::instance(), [this, aliveGuard, singleCopyMode, objectId, userId, documentId, taskId](){
+	QObject::connect(thread, &QThread::finished, QCoreApplication::instance(), [this, aliveGuard, singleCopyMode, objectId, userId, documentId](){
 		auto isAlive = aliveGuard.lock();
 		if (!isAlive || !isAlive->load()){
 			return;
 		}
 
 		UserDocumentPairList docsToNotify;
-		TaskResult taskResult{IDocumentService::OS_FAILED, documentId, QString()};
-		bool taskSucceeded = false;
 
 		{
 			QMutexLocker locker(&this->m_mutex);
@@ -419,7 +431,6 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 							}
 						}
 
-						taskSucceeded = true;
 					}
 				}
 			}
@@ -429,21 +440,14 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 				if (docPtr != nullptr && docPtr->objectPtr.IsValid() && docPtr->isLoading){
 					this->InitializeDocumentObservers(*docPtr, userId);
 					docsToNotify.append(qMakePair(userId, documentId));
-					taskSucceeded = true;
 				}
 			}
 		}
 
-		if (taskSucceeded){
-			// OnDocumentDataLoaded sets isLoading=false
-			for (const UserDocumentPair& pair : docsToNotify){
-				this->OnDocumentDataLoaded(pair.first, pair.second);
-			}
-
-			taskResult = TaskResult{IDocumentService::OS_OK, documentId, QString()};
+		// OnDocumentDataLoaded sets isLoading=false
+		for (const UserDocumentPair& pair : docsToNotify){
+			this->OnDocumentDataLoaded(pair.first, pair.second);
 		}
-
-		this->CompleteTask(taskId, taskResult);
 	});
 
 	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit, Qt::DirectConnection);

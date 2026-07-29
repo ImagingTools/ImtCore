@@ -101,6 +101,11 @@ I_EXPORT_COMPONENT(
 			"Remote Commands Controller");
 
 I_EXPORT_COMPONENT(
+			RemoteFileSystemStructureProvider,
+			"Remote file system structure provider forwarding browse requests through IGqlClient",
+			"Remote File System Structure Provider Folder Browser");
+
+I_EXPORT_COMPONENT(
 			RemoteFilterableSelectController,
 			"Remote filterable select controller",
 			"Remote Filterable Select Controller");

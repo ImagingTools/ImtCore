@@ -85,6 +85,15 @@ sdl::V1_0::imtauth::CGetMyTenantInvitationsPayload CRemoteTenantMembershipManage
 }
 
 
+sdl::V1_0::imtauth::CGetOrganizationPermissionsPayload CRemoteTenantMembershipManagerControllerComp::OnGetOrganizationPermissions(
+			const sdl::V1_0::imtauth::CGetOrganizationPermissionsGqlRequest& /*request*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CGetOrganizationPermissionsPayload>(gqlRequest, errorMessage);
+}
+
+
 sdl::V1_0::imtauth::CAddMembershipPayload CRemoteTenantMembershipManagerControllerComp::OnAddMembership(
 			const sdl::V1_0::imtauth::CAddMembershipGqlRequest& /*request*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
@@ -148,12 +157,12 @@ sdl::V1_0::imtauth::CRemoveMembershipPayload CRemoteTenantMembershipManagerContr
 }
 
 
-sdl::V1_0::imtauth::CUpdateMembershipRolePayload CRemoteTenantMembershipManagerControllerComp::OnUpdateMembershipRole(
-			const sdl::V1_0::imtauth::CUpdateMembershipRoleGqlRequest& /*request*/,
+sdl::V1_0::imtauth::CUpdateMembershipPermissionsPayload CRemoteTenantMembershipManagerControllerComp::OnUpdateMembershipPermissions(
+			const sdl::V1_0::imtauth::CUpdateMembershipPermissionsGqlRequest& /*request*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::V1_0::imtauth::CUpdateMembershipRolePayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CUpdateMembershipPermissionsPayload>(gqlRequest, errorMessage);
 }
 
 

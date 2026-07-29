@@ -7,7 +7,7 @@ import imtcontrols 1.0
 Dialog {
 	id: dialog;
 
-	width: Style.sizeHintXS;
+	width: Style.sizeHintS;
 
 	title: qsTr("Table configuration");
 	property TableViewParams tableViewParamsCopied: TableViewParams {};
@@ -17,6 +17,8 @@ Dialog {
 			id: item;
 
 			width: dialog.width;
+			topPadding: Style.marginL;
+			bottomPadding: Style.marginL;
 
 			property var checkedIndexes: [];
 			property bool block: true;
@@ -36,6 +38,9 @@ Dialog {
 					}
 				}
 				item.block = false;
+
+				item.checkedIndexes = leftTable.getCheckedItems();
+				errorText.visible = item.checkedIndexes.length < 1;
 			}
 
 			function updateModel(){
@@ -53,15 +58,29 @@ Dialog {
 				}
 			}
 
+			BaseText {
+				id: introText;
+				anchors.left: parent.left;
+				anchors.leftMargin: Style.marginL;
+				anchors.right: parent.right;
+				anchors.rightMargin: Style.marginL;
+				color: Style.subtitleColor;
+				text: qsTr("Choose which columns to show, and drag their order with the arrows below.");
+				wrapMode: Text.WordWrap;
+			}
+
 			Table {
 				id: leftTable;
 
 				anchors.left: parent.left;
+				anchors.leftMargin: Style.marginL;
+				anchors.right: parent.right;
+				anchors.rightMargin: Style.marginL;
 
-				width: parent.width;
-				height: Math.min(ModalDialogManager.activeView.height - 200, itemHeight * elementsCount + headerHeight);
+				height: Math.max(0, Math.min(ModalDialogManager.activeView.height - 200,
+										 itemHeight * elementsCount + headerHeight));
 
-				itemHeight: 35;
+				itemHeight: Style.tableRowHeight;
 				checkable: true;
 				onCheckedItemsChanged: {
 					item.checkedIndexes = getCheckedItems();
@@ -103,32 +122,52 @@ Dialog {
 
 			BaseText {
 				id: errorText;
-				anchors.horizontalCenter: parent.horizontalCenter;
+				anchors.left: parent.left;
+				anchors.leftMargin: Style.marginL;
+				anchors.right: parent.right;
+				anchors.rightMargin: Style.marginL;
 				color: Style.errorTextColor;
 				text: qsTr("Select at least one column");
 				visible: false;
 			}
 
-			Item{
-				height: 25;
-				width: parent.width;
+			Rectangle {
+				id: toolbar;
+
+				anchors.left: parent.left;
+				anchors.leftMargin: Style.marginL;
+				anchors.right: parent.right;
+				anchors.rightMargin: Style.marginL;
+
+				height: Style.buttonHeightM + 2 * Style.spacingXS;
+				radius: Style.radiusM;
+				color: Style.baseColor;
+				border.width: Style.buttonBorderWidth;
+				border.color: Style.borderColor;
+				visible: buttonRow.visible || fitToWidthButton.visible;
 
 				Row {
 					id: buttonRow;
 
 					anchors.left: parent.left;
-					anchors.leftMargin: Style.marginM;
+					anchors.leftMargin: Style.spacingS;
+					anchors.verticalCenter: parent.verticalCenter;
 
-					height: 25;
-					spacing: Style.marginXS
+					height: Style.buttonHeightM;
+					spacing: Style.spacingXS
 
 					visible: !dialog.tableItem ? false : dialog.tableItem.canSwapColumns;
 
 					ToolButton {
 						id: upButton;
+						// These 4 ToolButtons are icon-only (text: ""), so Button.qml's default
+						// objectName ("" + "Button") would make them indistinguishable from each
+						// other - name them explicitly for GUI test/automation addressability.
+						objectName: "MoveColumnUpButton";
 						enabled: false;
 						width: buttonRow.height;
 						height: width;
+						tooltipText: qsTr("Move column up");
 						iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Normal):
 											  "../../../" + Style.getIconPath("Icons/Up", Icon.State.Off, Icon.Mode.Disabled)
 
@@ -153,9 +192,11 @@ Dialog {
 
 					ToolButton {
 						id: downButton;
+						objectName: "MoveColumnDownButton";
 						enabled: false;
 						width: buttonRow.height;
 						height: width;
+						tooltipText: qsTr("Move column down");
 						iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal):
 											  "../../../" + Style.getIconPath("Icons/Down", Icon.State.Off, Icon.Mode.Disabled)
 						onClicked: {
@@ -180,9 +221,11 @@ Dialog {
 
 					ToolButton {
 						id: resetButton;
+						objectName: "ResetColumnsButton";
 						enabled: true;
 						width: buttonRow.height;
 						height: width;
+						tooltipText: qsTr("Reset to default columns");
 						iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Restore", Icon.State.On, Icon.Mode.Normal):
 											  "../../../" + Style.getIconPath("Icons/Restore", Icon.State.Off, Icon.Mode.Disabled)
 						onClicked: {
@@ -195,6 +238,7 @@ Dialog {
 
 				ToolButton {
 					id: fitToWidthButton;
+					objectName: "FitToWidthButton";
 
 					anchors.verticalCenter: buttonRow.verticalCenter;
 					anchors.right: buttonRow.visible ? parent.right : undefined;
@@ -206,6 +250,7 @@ Dialog {
 					enabled: visible;
 					width: buttonRow.height;
 					height: width;
+					tooltipText: qsTr("Fit columns to available width");
 
 					iconSource: enabled ? "../../../" + Style.getIconPath("Icons/FitToWidth", Icon.State.On, Icon.Mode.Normal):
 										  "../../../" + Style.getIconPath("Icons/FitToWidth", Icon.State.Off, Icon.Mode.Disabled)

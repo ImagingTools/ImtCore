@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtgql/CGqlResponse.h>
+#include <imtgql/CGqlRequestContextManager.h>
 
 
 namespace imtclientgql
@@ -32,6 +33,23 @@ QJsonObject CGqlRemoteRepresentationControllerCompBase::CreateInternalResponse(c
 	imtclientgql::IGqlClient::GqlRequestPtr requestPtr;
 	requestPtr.MoveCastedPtr(gqlRequest.CloneMe());
 	if (requestPtr.IsValid()){
+		// Forwarded requests otherwise carry no context if the incoming gqlRequest
+		// lost its attachment upstream, so the backend sees an anonymous caller and
+		// denies any permission-gated command. Only fills in a missing context - an
+		// already-attached one is left untouched.
+		if (requestPtr->GetRequestContext() == nullptr){
+			imtgql::IGqlContext* currentContextPtr = imtgql::CGqlRequestContextManager::GetContext();
+			if (currentContextPtr != nullptr){
+				imtgql::CGqlRequest* concreteRequestPtr = dynamic_cast<imtgql::CGqlRequest*>(requestPtr.GetPtr());
+				if (concreteRequestPtr != nullptr){
+					istd::IChangeableUniquePtr clonedContextPtr = currentContextPtr->CloneMe();
+					imtgql::IGqlContextUniquePtr castedContextPtr;
+					castedContextPtr.MoveCastedPtr(std::move(clonedContextPtr));
+					concreteRequestPtr->SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(castedContextPtr)));
+				}
+			}
+		}
+
 		imtclientgql::IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
 		if (responsePtr.IsValid()){
 			return CreateJsonObjectFromResponse(gqlRequest.GetCommandId(), *responsePtr);

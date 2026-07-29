@@ -109,6 +109,17 @@ QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QSt
 	tenantPtr->SetCreatedAt(now);
 	tenantPtr->SetUpdatedAt(now);
 
+	// Grant the tenant a default set of permissions that its roles are allowed to
+	// use. Roles created within a tenant context may only reference permissions
+	// present in this set (see CRoleDocumentValidatorComp); without a default set
+	// a fresh tenant could not grant its roles any RBAC permission at all.
+	static const QByteArrayList defaultTenantPermissions = {
+		QByteArrayLiteral("ViewUsers"), QByteArrayLiteral("AddUser"), QByteArrayLiteral("UserUpdate"), QByteArrayLiteral("RemoveUser"), QByteArrayLiteral("UserItem"),
+		QByteArrayLiteral("ViewRoles"), QByteArrayLiteral("AddRole"), QByteArrayLiteral("RoleUpdate"), QByteArrayLiteral("RemoveRole"), QByteArrayLiteral("RoleItem"),
+		QByteArrayLiteral("ViewGroups"), QByteArrayLiteral("AddGroup"), QByteArrayLiteral("GroupUpdate"), QByteArrayLiteral("RemoveGroup"), QByteArrayLiteral("GroupItem")
+	};
+	tenantPtr->SetTenantPermissions(defaultTenantPermissions);
+
 	QByteArray retVal = m_tenantCollectionCompPtr->InsertNewObject("Tenant", tenantName, description, tenantPtr.GetPtr(), tenantId);
 	if (retVal.isEmpty()){
 		SendErrorMessage(0, "Failed to store tenant in collection", "CTenantManagerComp");

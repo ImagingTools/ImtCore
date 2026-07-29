@@ -398,7 +398,8 @@ ViewBase {
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.bottom: paginationObj.bottom
-		background.color: Style.backgroundColor2
+		// baseColor is the Loading default and matches Agents/Services/Messages tables.
+		background.color: Style.baseColor
 		visible: false;
 	}
 }

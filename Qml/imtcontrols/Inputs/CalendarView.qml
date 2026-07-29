@@ -2,7 +2,6 @@ import QtQuick 2.12
 
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
 import imtcontrols 1.0
 
 ListView{
@@ -27,9 +26,9 @@ ListView{
 
 	property ListModel dayOfWeekModel: ListModel{};
 
-	property string color: Style.baseColor;
-	property string cellColor: Style.baseColor;
-	property string fontColor_cell: Style.baseColorInverted;
+	property string color: "#ffffff";
+	property string cellColor: "#ffffff";
+	property string fontColor_cell: "#000000";
 	property int fontSize_cell: 12;
 
 	property int gridCellWidth: Math.trunc(width/7);

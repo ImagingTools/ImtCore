@@ -48,11 +48,11 @@ public:
 	virtual ITenantMembershipUniquePtr FindMembership(const QByteArray& userId, const QByteArray& tenantId) const = 0;
 
 	/**
-		Add a user to a tenant with the specified role ID.
+		Add a user to a tenant.
 		Creates a new membership entity.
 		\return The ID of the newly created membership, or empty on failure.
 	*/
-	virtual QByteArray AddMembership(const QByteArray& userId, const QByteArray& tenantId, const QByteArray& roleId) = 0;
+	virtual QByteArray AddMembership(const QByteArray& userId, const QByteArray& tenantId) = 0;
 
 	/**
 		Remove a membership (remove user from tenant).
@@ -61,21 +61,17 @@ public:
 	virtual bool RemoveMembership(const QByteArray& membershipId) = 0;
 
 	/**
-		Update the role of an existing membership.
+		Update the organization-specific permissions of an existing membership.
+		These are the special permissions (from OrganizationsPermissionsProvider) granted to the member inside the org.
 		\return true if updated successfully.
 	*/
-	virtual bool UpdateMembershipRole(const QByteArray& membershipId, const QByteArray& newRoleId) = 0;
+	virtual bool UpdateMembershipOrganizationPermissions(const QByteArray& membershipId, const QByteArrayList& permissions) = 0;
 
 	/**
 		Check if a user is a member of a specific tenant.
 	*/
 	virtual bool IsMember(const QByteArray& userId, const QByteArray& tenantId) const = 0;
 
-	/**
-		Check if a user has at least the specified role in a tenant.
-		Owner is identified via ITenantInfo::GetOwnerId(), not via role comparison.
-	*/
-	virtual bool HasMinimumRole(const QByteArray& userId, const QByteArray& tenantId, const QByteArray& minimumRoleId) const = 0;
 };
 
 

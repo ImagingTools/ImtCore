@@ -9,6 +9,9 @@ ObjectVisualStatusProvider {
 	id: root
 
 	property string collectionId
+	// Last requested object id — onError only gets a message string, but MultiDoc
+	// (and other listeners) expect visualStatusReceiveFailed(objectId, message).
+	property string __pendingObjectId: ""
 	property ObjectVisualStatusInput objectVisualStatusInput: ObjectVisualStatusInput {
 		m_collectionId: root.collectionId
 	}
@@ -19,6 +22,7 @@ ObjectVisualStatusProvider {
 			return
 		}
 
+		root.__pendingObjectId = id
 		objectVisualStatusInput.m_objectId = id
 		objectVisualStatusInput.m_typeId = typeId
 		getVisualStatusInfoRequest.send(objectVisualStatusInput)
@@ -39,7 +43,7 @@ ObjectVisualStatusProvider {
 		}
 
 		function onError(message, type){
-			root.visualStatusReceiveFailed(message)
+			root.visualStatusReceiveFailed(root.__pendingObjectId, message)
 		}
 
 		function getHeaders(){

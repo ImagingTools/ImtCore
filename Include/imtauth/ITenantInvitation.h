@@ -43,8 +43,6 @@ public:
 	virtual void SetUserId(const QByteArray& userId) = 0;
 	virtual QByteArray GetTenantId() const = 0;
 	virtual void SetTenantId(const QByteArray& tenantId) = 0;
-	virtual QByteArray GetRoleId() const = 0;
-	virtual void SetRoleId(const QByteArray& roleId) = 0;
 	virtual TenantInvitationStatus GetStatus() const = 0;
 	virtual void SetStatus(TenantInvitationStatus status) = 0;
 	virtual QByteArray GetInvitedByUserId() const = 0;

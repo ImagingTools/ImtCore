@@ -24,6 +24,16 @@ public:
 		Send a request to the server.
 	*/
 	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const = 0;
+
+	/**
+		Send a request without waiting for the response (fire-and-forget).
+
+		For callers that only care whether the request was handed to the transport, not
+		what the server answered - avoids the SendRequest() nested-event-loop wait entirely.
+		Default implementation reports "unsupported"; transports capable of a non-blocking
+		send should reimplement this instead of falling back to SendRequest().
+	*/
+	virtual bool SendRequestNoWait(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const = 0;
 };
 
 

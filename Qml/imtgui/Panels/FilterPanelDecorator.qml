@@ -88,19 +88,25 @@ DecoratorBase {
 		width: visible ? height : 0
 		height: visible ? Style.controlHeightM : 0
 		anchors.left: customFiltersFlickable.left
-		
+
 		visible: customFiltersFlickable.visible && customFiltersFlickable.contentWidth > customFiltersFlickable.width
 		enabled: customFiltersFlickable.contentX > 0
-		
-		icon.source: enabled ? "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal)
-							 : "../../../" + Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled)
-		
+		opacity: enabled ? 1.0 : 0.4
+		tooltipText: qsTr("Scroll filters left")
+
+		icon.source: enabled ? "qrc:/" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal)
+							 : "qrc:/" + Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled)
+
 		onClicked: {
 			customFiltersFlickable.contentX = Math.max(0, customFiltersFlickable.contentX - 100)
 		}
 		decorator: Component {
 			ButtonDecorator {
-				radius: width
+				color: parent.enabled && parent.hovered ? Style.alternateBaseColor : "transparent";
+				radius: Style.radiusM;
+				border.width: 0;
+				icon.width: Style.iconSizeS;
+				icon.height: Style.iconSizeS;
 			}
 		}
 	}
@@ -195,18 +201,24 @@ DecoratorBase {
 
 		visible: customFiltersFlickable.visible && customFiltersFlickable.contentWidth > customFiltersFlickable.width
 		enabled: customFiltersFlickable.contentX < (customFiltersFlickable.contentWidth - customFiltersFlickable.width)
+		opacity: enabled ? 1.0 : 0.4
+		tooltipText: qsTr("Scroll filters right")
 
-		icon.source: enabled ? "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal)
-							 : "../../../" + Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled)
+		icon.source: enabled ? "qrc:/" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal)
+							 : "qrc:/" + Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled)
 
 		onClicked: {
 			let maxScroll = customFiltersFlickable.contentWidth - customFiltersFlickable.width
 			customFiltersFlickable.contentX = Math.min(maxScroll, customFiltersFlickable.contentX + 100)
 		}
-		
+
 		decorator: Component {
 			ButtonDecorator {
-				radius: width
+				color: parent.enabled && parent.hovered ? Style.alternateBaseColor : "transparent";
+				radius: Style.radiusM;
+				border.width: 0;
+				icon.width: Style.iconSizeS;
+				icon.height: Style.iconSizeS;
 			}
 		}
 	}
@@ -295,7 +307,7 @@ DecoratorBase {
 		objectName: "ClearAllFilters"
 		anchors.right: parent.right
 		icon.source: enabled ? "qrc:/" + Style.getIconPath("Icons/FilterRemove", Icon.State.On, Icon.Mode.Normal)
-							 : "qrc:/" + Style.getIconPath("Icons/FilterRemove", Icon.State.Off, Icon.Mode.Disabled)
+								 : "qrc:/" + Style.getIconPath("Icons/FilterRemove", Icon.State.Off, Icon.Mode.Disabled)
 		width: visible ? Style.buttonWidthL : 0
 		height: width
 		enabled: false

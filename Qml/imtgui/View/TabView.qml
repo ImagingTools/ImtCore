@@ -1,7 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtcontrols 1.0
 import imtgui 1.0
 
 Item {
@@ -16,6 +15,13 @@ Item {
 
 	property int mainMargin: Style.marginM;
 	property bool tabVisible: true
+	// Page body behind tab content. Optional override for host surfaces that use
+	// Style.baseColor (defaults keep the global MultiDoc look unchanged).
+	property color contentColor: Style.baseColor
+	// Tab strip surface. Default = Style.tabPanelBackgroundColor (global theme).
+	property color tabPanelColor: Style.baseColor
+	// Optional per-instance tab chrome; default is the global Style.tabPanelDecorator.
+	property alias tabDelegateDecorator: tabPanel.tabDelegateDecorator
 
 	signal tabLoaded(int index, string tabId, var tabItem);
 	signal tabClicked(var mouse, var tabItem, int index);
@@ -143,6 +149,7 @@ Item {
 		isCloseEnable: false
 		clip: true;
 		visible: root.tabVisible
+		color: root.tabPanelColor
 		onRightClicked: {
 			if (tabPanel.selectedIndex < root.tabModel.count - 1){
 				tabPanel.selectedIndex++;
@@ -165,13 +172,24 @@ Item {
 	}
 
 	Rectangle {
+		id: separator;
+		z: 6;
+		anchors.top: tabPanel.bottom;
+		width: parent.width;
+		height: 1;
+		color: Style.borderColor;
+		opacity: 0.5;
+		visible: root.tabVisible;
+	}
+
+	Rectangle {
 		id: bodyTab;
 		z: 5;
 		anchors.left: parent.left;
 		anchors.top: tabPanel.bottom;
 		anchors.bottom: parent.bottom;
 		anchors.right: parent.right;
-		color: Style.backgroundColor2;
+		color: root.contentColor;
 
 		Repeater {
 			id: bodyRepeater;

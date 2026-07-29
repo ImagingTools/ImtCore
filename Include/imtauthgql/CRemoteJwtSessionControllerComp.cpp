@@ -2,6 +2,10 @@
 #include <imtauthgql/CRemoteJwtSessionControllerComp.h>
 
 
+// Qt includes
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+
 // ACF includes
 #include <iser/CMemoryReadArchive.h>
 
@@ -51,12 +55,23 @@ imtauth::IJwtSessionController::JwtState CRemoteJwtSessionControllerComp::Valida
 {
 	namespace sessionsdl = sdl::V1_0::imtauth;
 
+	const QString maskedToken = token.isEmpty()
+				? QStringLiteral("<empty>")
+				: (QStringLiteral("***") + QString::fromUtf8(token.right(4)));
+
 	sessionsdl::ValidateJwtRequestArguments arguments;
 	arguments.input.Emplace();
 	arguments.input->jwt = token;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!sessionsdl::CValidateJwtGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		SendErrorMessage(
+					0,
+					QStringLiteral("Remote ValidateJwt: failed to build GQL request for token %1")
+							.arg(maskedToken),
+					QStringLiteral("CRemoteJwtSessionControllerComp"));
+		// JS_NONE = validation could not be completed (transport / setup), not a
+		// permanent credential rejection. Callers must map this to 5xx, not 403.
 		return imtauth::IJwtSessionController::JS_NONE;
 	}
 
@@ -65,6 +80,11 @@ imtauth::IJwtSessionController::JwtState CRemoteJwtSessionControllerComp::Valida
 	QString errorMessage;
 	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
 	if (!errorMessage.isEmpty()){
+		SendErrorMessage(
+					0,
+					QStringLiteral("Remote ValidateJwt: request failed for token %1: %2")
+							.arg(maskedToken, errorMessage),
+					QStringLiteral("CRemoteJwtSessionControllerComp"));
 		return imtauth::IJwtSessionController::JS_NONE;
 	}
 
@@ -80,6 +100,19 @@ imtauth::IJwtSessionController::JwtState CRemoteJwtSessionControllerComp::Valida
 		if (state == sessionsdl::JwtState::OK){
 			return imtauth::IJwtSessionController::JS_OK;
 		}
+
+		SendWarningMessage(
+					0,
+					QStringLiteral("Remote ValidateJwt: unexpected JwtState enum value for token %1")
+							.arg(maskedToken),
+					QStringLiteral("CRemoteJwtSessionControllerComp"));
+	}
+	else{
+		SendErrorMessage(
+					0,
+					QStringLiteral("Remote ValidateJwt: response missing 'state' for token %1")
+							.arg(maskedToken),
+					QStringLiteral("CRemoteJwtSessionControllerComp"));
 	}
 
 	return imtauth::IJwtSessionController::JS_NONE;
@@ -220,7 +253,7 @@ imtauth::ISessionSharedPtr CRemoteJwtSessionControllerComp::GetSession(const QBy
 			return nullptr;
 		}
 
-		return imtauth::ISessionSharedPtr::CreateFromUnique(sessionInfoPtr);
+		return imtauth::ISessionSharedPtr::CreateFromUnique(std::move(sessionInfoPtr));
 	}
 
 	return nullptr;
@@ -256,8 +289,34 @@ bool CRemoteJwtSessionControllerComp::RemoveSession(const QByteArray& sessionId)
 }
 
 
+namespace
+{
+
+QJsonObject ParseJwtPayloadObject(const QByteArray& jwt)
+{
+	const QByteArrayList parts = jwt.split('.');
+	if (parts.size() != 3){
+		return {};
+	}
+
+	const QByteArray json = QByteArray::fromBase64(
+				parts[1],
+				QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
+	return QJsonDocument::fromJson(json).object();
+}
+
+} // namespace
+
+
 QByteArray CRemoteJwtSessionControllerComp::GetUserFromJwt(const QByteArray& jwt) const
 {
+	// Claims are embedded in the JWT payload; decode locally to avoid a remote
+	// round-trip on every cache miss (was 3 remote calls per ValidateJwt path).
+	const QJsonObject payloadObj = ParseJwtPayloadObject(jwt);
+	if (payloadObj.contains(QStringLiteral("userId"))){
+		return payloadObj.value(QStringLiteral("userId")).toString().toUtf8();
+	}
+
 	namespace sessionsdl = sdl::V1_0::imtauth;
 
 	sessionsdl::GetUserFromJwtRequestArguments arguments;
@@ -274,6 +333,10 @@ QByteArray CRemoteJwtSessionControllerComp::GetUserFromJwt(const QByteArray& jwt
 	QString errorMessage;
 	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
 	if (!errorMessage.isEmpty()){
+		SendWarningMessage(
+					0,
+					QStringLiteral("Remote GetUserFromJwt failed: %1").arg(errorMessage),
+					QStringLiteral("CRemoteJwtSessionControllerComp"));
 		return QByteArray();
 	}
 
@@ -285,14 +348,24 @@ QByteArray CRemoteJwtSessionControllerComp::GetUserFromJwt(const QByteArray& jwt
 }
 
 
-QByteArray CRemoteJwtSessionControllerComp::GetSessionFromJwt(const QByteArray& /*jwt*/) const
+QByteArray CRemoteJwtSessionControllerComp::GetSessionFromJwt(const QByteArray& jwt) const
 {
+	const QJsonObject payloadObj = ParseJwtPayloadObject(jwt);
+	if (payloadObj.contains(QStringLiteral("sessionId"))){
+		return payloadObj.value(QStringLiteral("sessionId")).toString().toUtf8();
+	}
+
 	return QByteArray();
 }
 
 
 QByteArray CRemoteJwtSessionControllerComp::GetTenantFromJwt(const QByteArray& jwt) const
 {
+	const QJsonObject payloadObj = ParseJwtPayloadObject(jwt);
+	if (payloadObj.contains(QStringLiteral("tenantId"))){
+		return payloadObj.value(QStringLiteral("tenantId")).toString().toUtf8();
+	}
+
 	namespace sessionsdl = sdl::V1_0::imtauth;
 
 	sessionsdl::GetTenantFromJwtRequestArguments arguments;
@@ -309,6 +382,10 @@ QByteArray CRemoteJwtSessionControllerComp::GetTenantFromJwt(const QByteArray& j
 	QString errorMessage;
 	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
 	if (!errorMessage.isEmpty()){
+		SendWarningMessage(
+					0,
+					QStringLiteral("Remote GetTenantFromJwt failed: %1").arg(errorMessage),
+					QStringLiteral("CRemoteJwtSessionControllerComp"));
 		return QByteArray();
 	}
 

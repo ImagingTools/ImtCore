@@ -7,6 +7,7 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QFileInfo>
+#include <QtCore/QMutexLocker>
 
 // ACF includes
 #include <iprm/CParamsSet.h>
@@ -43,6 +44,8 @@ imtauth::IJwtSessionController::JwtState CJwtSessionControllerComp::ValidateJwt(
 {
 	QByteArrayList parts = token.split('.');
 	if (parts.size() != 3){
+		SendWarningMessage(0, QString("JWT rejected: malformed token, expected 3 dot-separated parts, got %1")
+								.arg(parts.size()), "CJwtSessionControllerComp");
 		return imtauth::IJwtSessionController::JS_INVALID;
 	}
 
@@ -54,27 +57,60 @@ imtauth::IJwtSessionController::JwtState CJwtSessionControllerComp::ValidateJwt(
 	QByteArray expectedSignature = CreateSignature(headerBase64, payloadBase64);
 
 	if (signatureBase64 != expectedSignature){
-		qWarning() << "Invalid JWT signature!";
+		SendWarningMessage(0, "JWT rejected: signature mismatch (forged/tampered token or secret-key rotation)", "CJwtSessionControllerComp");
 		return imtauth::IJwtSessionController::JS_INVALID;
 	}
 
 	QJsonObject payloadObj = JsonObjectFromBase64(payloadBase64);
 	if (!payloadObj.contains("exp") || !payloadObj.contains("sessionId")){
+		SendWarningMessage(0, QString("JWT rejected: payload is missing required claim(s), has 'exp': %1, has 'sessionId': %2")
+								.arg(payloadObj.contains("exp") ? "yes" : "no")
+								.arg(payloadObj.contains("sessionId") ? "yes" : "no"), "CJwtSessionControllerComp");
 		return imtauth::IJwtSessionController::JS_INVALID;
 	}
 
 	QByteArray sessionId = payloadObj["sessionId"].toString().toUtf8();
-	if (!ValidateSession(sessionId)){
-		if (!RemoveSession(sessionId)){
-			SendWarningMessage(0, QString("Unable to remove session '%1' after JWT validation").arg(qPrintable(sessionId)), "CJwtSessionControllerComp");
-		}
 
-		return imtauth::IJwtSessionController::JS_INVALID;
+	// Check the token's own expiration before touching the session store. A
+	// token that is expired by time must be reported as JS_EXPIRED regardless
+	// of whether its session record still exists, so the client is told to
+	// refresh rather than told the token is permanently invalid.
+	// Use toDouble (not toInt): toInt() truncates and returns 0 outside 32-bit.
+	const qint64 exp = static_cast<qint64>(payloadObj.value(QStringLiteral("exp")).toDouble());
+	const qint64 nowSecs = QDateTime::currentSecsSinceEpoch();
+	if (exp < nowSecs){
+		SendWarningMessage(0, QString("JWT rejected: token expired by time, exp = %1 (now = %2, age = %3s) for session-ID '%4'")
+								.arg(exp)
+								.arg(nowSecs)
+								.arg(nowSecs - exp)
+								.arg(qPrintable(sessionId)), "CJwtSessionControllerComp");
+		return imtauth::IJwtSessionController::JS_EXPIRED;
 	}
 
-	qint64 exp = payloadObj["exp"].toInt();
-	if (exp < QDateTime::currentSecsSinceEpoch()){
-		qWarning() << "JWT token has expired!";
+	// Read-only check: a missing or expired session is reported as JS_EXPIRED
+	// (prompting the client to refresh) rather than removed here. Deleting the
+	// session as a side-effect of validation would destroy the refresh token
+	// along with it, making it impossible for the client to recover; session
+	// cleanup belongs to RefreshToken()/a maintenance task, not to validation.
+	//
+	// GetSession() is called directly (instead of ValidateSession()) so the two
+	// distinct failure reasons - no session record at all vs. an existing but
+	// expired session - can be logged and diagnosed separately.
+	ISessionSharedPtr sessionInfoPtr = GetSession(sessionId);
+	if (!sessionInfoPtr.IsValid()){
+		SendWarningMessage(0, QString("JWT rejected: no session record found for session-ID '%1' "
+								"(already removed by cleanup, or the JWT references a session that never existed)")
+								.arg(qPrintable(sessionId)), "CJwtSessionControllerComp");
+		return imtauth::IJwtSessionController::JS_EXPIRED;
+	}
+
+	QDateTime currentDate = QDateTime::currentDateTimeUtc();
+	QDateTime sessionExpirationDate = sessionInfoPtr->GetExpirationDate();
+	if (currentDate >= sessionExpirationDate){
+		SendWarningMessage(0, QString("JWT rejected: session '%1' expired at %2 (current time %3) - "
+								"the client was idle longer than RefreshTokenLifetime")
+								.arg(qPrintable(sessionId), sessionExpirationDate.toString(Qt::ISODate), currentDate.toString(Qt::ISODate)),
+								"CJwtSessionControllerComp");
 		return imtauth::IJwtSessionController::JS_EXPIRED;
 	}
 
@@ -91,38 +127,68 @@ bool CJwtSessionControllerComp::RefreshToken(
 		return false;
 	}
 
+	// Serialize rotation: two concurrent refresh calls for the same session
+	// (e.g. several requests failing with an expired token at once) must not
+	// race on the same session record.
+	QMutexLocker refreshLocker(&m_refreshMutex);
+
 	QByteArray sessionId = GetSessionIdByRefreshToken(refreshToken);
+	if (sessionId.isEmpty()){
+		SendWarningMessage(0, "Refresh rejected: no session found for the given refresh token (unknown, already rotated, or already used once)",
+								"CJwtSessionControllerComp");
+		return false;
+	}
+
 	ISessionSharedPtr sessionInfoPtr = GetSession(sessionId);
 	if (!sessionInfoPtr.IsValid()){
+		SendWarningMessage(0, QString("Refresh rejected: session-ID '%1' resolved from the refresh token but the session record is gone (race with cleanup?)")
+								.arg(qPrintable(sessionId)), "CJwtSessionControllerComp");
+		return false;
+	}
+
+	QDateTime currentDate = QDateTime::currentDateTimeUtc();
+	if (currentDate >= sessionInfoPtr->GetExpirationDate()){
+		// The session itself has expired (the user has been away longer than
+		// RefreshTokenLifetime) - refuse to rotate it and clean it up.
+		SendWarningMessage(0, QString("Refresh rejected: session '%1' expired at %2 - the user was away longer than "
+								"RefreshTokenLifetime; removing the dead session")
+								.arg(qPrintable(sessionId), sessionInfoPtr->GetExpirationDate().toString(Qt::ISODate)),
+								"CJwtSessionControllerComp");
+		if (!RemoveSession(sessionId)){
+			SendWarningMessage(0, QString("Unable to remove expired session '%1'").arg(qPrintable(sessionId)), "CJwtSessionControllerComp");
+		}
+
 		return false;
 	}
 
 	istd::TUniqueInterfacePtr<imtauth::ISession> clonedSessionInfo;
 	clonedSessionInfo.MoveCastedPtr(sessionInfoPtr->CloneMe());
 	if (!clonedSessionInfo.IsValid()){
-		return false;
-	}
-
-	if (!RemoveSession(sessionId)){
-		SendErrorMessage(0, QString("Unable to remove old session '%1' from collection")
-							 .arg(qPrintable(refreshToken)), "CJwtSessionControllerComp");
+		SendErrorMessage(0, QString("Unable to clone session '%1' for rotation").arg(qPrintable(sessionId)), "CJwtSessionControllerComp");
 		return false;
 	}
 
 	QByteArray newRefreshToken = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-
 	clonedSessionInfo->SetToken(newRefreshToken);
 
-	QByteArray newSessionId = InsertNewSession(*clonedSessionInfo.GetPtr());
-	if (newSessionId.isEmpty()){
-		SendErrorMessage(0, QString("Unable to insert session '%1' to collection")
-								.arg(qPrintable(newRefreshToken)), "CJwtSessionControllerComp");
+	// Sliding expiration: an actively-used session keeps getting extended
+	// instead of dying exactly RefreshTokenLifetime after the original login.
+	clonedSessionInfo->SetExpirationDate(currentDate.addSecs(*m_refreshTokenLifetimeAttrPtr));
+
+	// Update the session record in place (same session-ID) instead of
+	// remove-then-insert. This means any JWT already issued for this session -
+	// including ones still in flight from concurrent requests, or the JWT the
+	// client is about to discard - keeps validating for the remainder of its
+	// own lifetime, instead of being invalidated the instant a refresh happens.
+	if (!m_sessionCollectionCompPtr->SetObjectData(sessionId, *clonedSessionInfo.GetPtr())){
+		SendErrorMessage(0, QString("Unable to update session '%1' in collection")
+								.arg(qPrintable(refreshToken)), "CJwtSessionControllerComp");
 		return false;
 	}
 
 	QByteArray userId = sessionInfoPtr->GetUserId();
 
-	QByteArray jwt = GenerateJwt(newSessionId, userId, sessionInfoPtr->GetTenantId());
+	QByteArray jwt = GenerateJwt(sessionId, userId, sessionInfoPtr->GetTenantId());
 	if (jwt.isEmpty()){
 		SendErrorMessage(0, QString("Unable to refresh session for user '%1'. Error: JWT is invalid").arg(qPrintable(userId)), "CJwtSessionControllerComp");
 		return false;

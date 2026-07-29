@@ -2,7 +2,6 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
-import imtdocgui 1.0
 import imtcontrols 1.0
 
 Item {
@@ -14,6 +13,7 @@ Item {
 	
 	property Component commandsControllerComp: null;
 	property CommandsController commandsController: null;
+	property bool commandsRequested: false;
 	
 	property Component commandsDelegateComp: Component {
 		ViewCommandsDelegateBase {
@@ -28,11 +28,14 @@ Item {
 	
 	property bool readOnly: false;
 
-	property string contentColor: Style.backgroundColor2
+	property string contentColor: Style.baseColor
 
 	property bool commandsPanelVisible: true
 	property bool commandsSeparatorVisible: true
 	property int commandsPanelHeight: Style.controlHeightM + 2 * Style.marginM
+
+	property real viewContentY: viewContent.y
+	property real viewContentRightMargin: 0
 
 	signal commandsModelChanged(var commandsModel)
 	signal commandActivated(string commandId)
@@ -97,10 +100,12 @@ Item {
 		anchors.top: alertPanel.bottom;
 		anchors.left: parent.left;
 		anchors.right: parent.right;
-		height: visible ? viewBase.commandsPanelHeight : 0;
+		height: visibleState ? viewBase.commandsPanelHeight : 0;
+		visible: visibleState
+
 		objectName: "ViewBase";
-		visible: !viewBase.commandsPanelVisible ? false : headerViewLoader.item && viewBase.commandsController != null;
-		
+		property bool visibleState: !viewBase.commandsPanelVisible ? false : headerViewLoader.item && viewBase.commandsController != null;
+
 		Loader {
 			id: headerViewLoader;
 			anchors.verticalCenter: parent.verticalCenter;
@@ -118,9 +123,12 @@ Item {
 		id: separator;
 		anchors.top: headerViewItem.bottom;
 		width: parent.width;
-		height: visible ? 1 : 0;
+		height: visibleState ? 1 : 0;
 		color: Style.borderColor;
-		visible: !viewBase.commandsPanelVisible ? false : headerViewLoader.item && viewBase.commandsController != null && viewBase.commandsSeparatorVisible
+		opacity: 0.5
+		visible: visibleState
+		property bool visibleState: !viewBase.commandsPanelVisible ? false : headerViewLoader.item && viewBase.commandsController != null;
+
 		objectName: "ViewBase";
 	}
 	
@@ -129,6 +137,7 @@ Item {
 		anchors.top: separator.bottom;
 		anchors.left: parent.left;
 		anchors.right: parent.right;
+		anchors.rightMargin: viewBase.viewContentRightMargin
 		anchors.bottom: parent.bottom;
 		objectName: "ViewBase";
 		color: viewBase.contentColor;
@@ -145,6 +154,8 @@ Item {
 		
 		if (commandsControllerComp){
 			commandsController = commandsControllerComp.createObject(viewBase);
+			commandsController.view = viewBase;
+			requestCommands()
 		}
 		
 		if (commandsDelegateComp){
@@ -163,15 +174,17 @@ Item {
 	}
 	
 	onVisibleChanged: {
-		if (commandsController && visible && viewBase.internal__.localizationChanged){
-			commandsController.getCommands()
-		}
+		requestCommands()
 
 		guiVisibleChanged(viewBase, visible)
 	}
 	
 	Connections {
 		target: viewBase.commandsController;
+		function onTypeIdChanged(){
+			viewBase.requestCommands()
+		}
+
 		function onCommandsReceived(typeId, commands){
 			viewBase.commandsView.commandsModel = commands
 			
@@ -180,6 +193,15 @@ Item {
 				viewBase.internal__.localizationChanged = false
 			}
 		}
+	}
+
+	function requestCommands(){
+		if (!commandsController || !visible || commandsRequested || commandsController.typeId === ""){
+			return
+		}
+
+		commandsRequested = true;
+		commandsController.getCommands()
 	}
 	
 	ApplicationEvents {

@@ -5,68 +5,95 @@ import imtcontrols 1.0
 
 Rectangle {
 	id: tableDelegateContainer;
-	
+
+	// Test instrumentation: makes every collection row addressable by index for GUI tests
+	// (Tests/ProLifeGui). Inert - objectName has no runtime/visual effect.
+	objectName: "TableRow_" + rowIndex;
+
 	width: Style.sizeHintXXXL;
 	height: minHeight;
 	property real minHeight: Style.controlHeightL;
 	property real contentHeight: height;
-	
-	color: tableDelegateContainer.selected ? Style.selectedColor : "transparent";
-	
+
+	// Row chrome is painted by backgroundRect with solid colors (no opacity
+	// overlays). Root stays transparent so child cell content is never faded.
+	color: "transparent";
+
 	visible: true
-	
+
 	property int textTopMargin: Style.marginS;
 	property int columnCount: tableItem ? tableItem.columnCount : 0;
-	
+
 	property bool selected: false;
 	property int checkedState: Qt.Unchecked;
-	
+
 	property TableBase tableItem: null;
-	
+
 	property var dataModel: model;
-	
+
 	property int rowIndex: model.index;
-	
+
 	property TreeItemModel cellDecorator : tableItem.cellDecorator
-	
+
 	property alias mouseArea: ma;
-	
+
 	property bool readOnly: false;
-	
+
 	property bool enabled: true;
-	
+
+	// Kept for API compatibility with older call sites / themes; painting no
+	// longer multiplies background color by these values.
 	property real selectedOpacity: ((Style.selectedOpacity !== undefined && Style.selectedOpacity !== null) ?  Style.selectedOpacity :  0.5);
 	property real hoverOpacity:((Style.hoverOpacity !== undefined && Style.hoverOpacity !== null) ?  Style.hoverOpacity :  selectedOpacity/2);
-	
+
 	//
 	property string borderColorHorizontal: "transparent";
 	property string borderColorVertical: "transparent";
 	property int horizontalBorderSize: 0;
 	property int verticalBorderSize: 0;
-	
+
 	property bool visibleLeftBorderFirst: true;
 	property bool visibleRightBorderLast: false;
 	property bool visibleTopBorderFirst: false;
 	property bool visibleBottomBorderLast: true;
-	
+
 	property bool canSetBorderParams: tableItem ? tableItem.canSetBorderParams : false;
 	property int wrapMode: tableItem ? tableItem.wrapMode_deleg : Text.NoWrap;
 	property int elideMode: Text.ElideRight;
 	property bool isRightBorder: false;
 	//
-	
+
 	property string maxLengthText: '';
-	
+
 	property string cellColor: "transparent";
-	
+
 	property int textMarginHor: Style.marginS;
 	property int textLeftMargin: Style.marginS;
 	property int textRightMargin: Style.marginS;
 	property int textMarginVer: textTopMargin;
-	
+
 	property bool compl: false;
-	
+
 	property string selectedColor: Style.selectedColor;
+	// Solid hover fill (replaces selectedColor * hoverOpacity).
+	property string hoverColor: Style.hover;
+
+	readonly property bool isHovered: tableDelegateContainer.tableItem
+			&& tableDelegateContainer.tableItem.hoverEnabled
+			&& ma.containsMouse
+
+	// Priority: selected > hover > zebra stripe > transparent.
+	function rowBackgroundColor(){
+		if (tableDelegateContainer.selected)
+			return tableDelegateContainer.selectedColor
+		if (tableDelegateContainer.isHovered)
+			return tableDelegateContainer.hoverColor
+		if (tableDelegateContainer.tableItem
+				&& tableDelegateContainer.tableItem.enableAlternating
+				&& (tableDelegateContainer.rowIndex % 2 === 0))
+			return tableDelegateContainer.tableItem.alternatingColor
+		return "transparent"
+	}
 	
 	property  Component cellDelegate: tableItem ? tableItem.cellDelegate : cellDelegateDefault;
 	property  Component cellDelegateDefault: TableCellDelegate {};
@@ -289,23 +316,15 @@ Rectangle {
 	ListModel{
 		id: heightModel;
 	}
-	
-	Rectangle{
-		id: alternatingRect;
-		
-		anchors.fill: parent;
-		
-		property bool containsMouse: tableDelegateContainer.tableItem.hoverEnabled && ma.containsMouse;
-		
-		color: containsMouse ? Style.selectedColor :
-							   tableDelegateContainer.tableItem.enableAlternating ? tableDelegateContainer.tableItem.alternatingColor : 'transparent';
-		
-		opacity: tableDelegateContainer.selected ? tableDelegateContainer.selectedOpacity :
-												   containsMouse ? tableDelegateContainer.hoverOpacity :
-																   tableDelegateContainer.tableItem.enableAlternating && model.index % 2 === 0 ? tableDelegateContainer.tableItem.alternatingOpacity: 0;
-		
-		visible: !tableDelegateContainer.selected && (tableDelegateContainer.tableItem.enableAlternating || tableDelegateContainer.tableItem.selectable);
-		z: 10;
+
+	// Solid row background behind cells (z below content). Never uses opacity —
+	// semi-transparent overlays used to sit above the row and wash out text.
+	Rectangle {
+		id: backgroundRect
+
+		anchors.fill: parent
+		z: -1
+		color: tableDelegateContainer.rowBackgroundColor()
 	}
 	
 	TableSelectionManager {
@@ -319,10 +338,11 @@ Rectangle {
 	
 	MouseArea {
 		id: ma;
-		
+		objectName: "MouseArea";
+
 		anchors.fill: parent;
 		hoverEnabled: true;
-		
+
 		acceptedButtons: Qt.AllButtons;
 
 		onClicked: {
@@ -357,10 +377,15 @@ Rectangle {
 	
 	Component{
 		id: checkBox;
-		
+
 		CheckBox {
+			// Test instrumentation: distinguishes this row-level check toggle from the row's own
+			// "MouseArea" (both live under the same "TableRow_<index>" container) so GUI tests can
+			// address it unambiguously via [objectName="TableRow_i"] [objectName="RowCheckBox"]
+			// [objectName="MouseArea"]. Inert - no runtime/visual effect.
+			objectName: "RowCheckBox";
 			z: 1000;
-			
+
 			anchors.verticalCenter: parent.verticalCenter;
 			anchors.left: parent.left;
 			anchors.leftMargin: Style.marginM;

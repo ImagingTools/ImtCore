@@ -5,10 +5,12 @@
 // Qt includes
 #include <QtCore/QThread>
 #include <QtCore/QMutex>
+#include <QtCore/QStringList>
 
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/ITransport.h>
+#include <imtrest/CWebSocketRequest.h>
 
 // Qt includes
 #include <QtWebSockets/QWebSocket>
@@ -20,21 +22,6 @@ namespace imtrest
 
 
 class CWebSocketServerComp;
-class CWebSocketThread;
-
-
-class CWebSocket: public QObject
-{
-	Q_OBJECT
-public:
-	CWebSocket(CWebSocketThread *parent);
-
-public Q_SLOTS:
-	void OnWebSocketTextMessage(const QString& textMessage);
-
-private:
-	CWebSocketThread* m_parent;
-};
 
 
 class CWebSocketThread:
@@ -65,9 +52,9 @@ public:
 
 public Q_SLOTS:
 	void OnWebSocketTextMessage(const QString& textMessage);
+	void OnSocketDisconnected();
 
 private Q_SLOTS:
-	void OnSocketDisconnected();
 	void OnWebSocketBinaryMessage(const QByteArray& dataMessage);
 	void OnError(QAbstractSocket::SocketError error);
 	void OnTimeout();
@@ -76,9 +63,17 @@ private Q_SLOTS:
 	void OnSendTextMessage(const QByteArray& data) const;
 Q_SIGNALS:
 	void SendTextMessage(const QByteArray& data) const;
+	void TextMessageReceived(const QString& msg);
+	void SocketDisconnected();
+	void SocketError(QAbstractSocket::SocketError error);
 
 private:
 	QPointer<QWebSocket> GetValidWebSocket() const;
+
+	// Processes a single received text message. Must only be called from the
+	// drain loop in OnWebSocketTextMessage() so that nested event loops
+	// (e.g. synchronous auth I/O) cannot recurse back into message processing.
+	void ProcessTextMessage(const QString& textMessage);
 
 	CWebSocketServerComp* m_server;
 	imtrest::IProtocolEngine* m_enginePtr;
@@ -87,6 +82,7 @@ private:
 	Status m_status;
 	QPointer<QWebSocket> m_socket;
 	bool m_isSecureConnection;
+	QList<CWebSocketRequest*> m_requestList;
 
 	imtrest::IProtocolEngine* m_httpEnginePtr;
 	imtrest::IRequestServlet* m_requestServerHandlerPtr;
@@ -94,6 +90,16 @@ private:
 	QByteArray m_productId;
 
 	QByteArray m_requestId;
+	QObject m_receiver;
+
+	// Re-entrancy guard for OnWebSocketTextMessage(). A message handler may
+	// block in a nested QEventLoop (synchronous JWT validation via DoSyncPost),
+	// during which further queued TextMessageReceived events would otherwise
+	// recurse back into OnWebSocketTextMessage and eventually overflow the
+	// stack. While a message is being processed, incoming messages are queued
+	// here and drained sequentially by the active handler instead.
+	bool m_isProcessingMessage = false;
+	QStringList m_pendingMessages;
 };
 
 

@@ -326,6 +326,11 @@ module.exports = {
                 pointer-events: all;
             }
 
+            .Window {
+                width: 100vw;
+                height: 100vh;
+            }
+
             .Item {
                 position: absolute;
                 display: flex;
@@ -388,8 +393,16 @@ module.exports = {
                 display: none;
             }
 
-            .Map > *{
-                pointer-events: all;
+            .GridView > div {
+                display: grid;
+            }
+
+            .GridView > div > * {
+                overflow: unset;
+            }
+
+            .GridView > div > *[no-view] {
+                display: none;
             }
 
             *[invisible] {

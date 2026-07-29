@@ -8,12 +8,6 @@ import imtbaseCommandsSdl 1.0
 CommandsController {
 	id: root;
 	
-	onTypeIdChanged: {
-		if (typeId !== ""){
-			getCommands()
-		}
-	}
-	
 	function getCommands(){
 		commandsRequest.send()
 	}

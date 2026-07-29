@@ -12,6 +12,7 @@ StyleComponents {
 	subMenuPanelButtonDecorator: subMenuPanelButtonDecoratorComp
 	menuPanelDecorator: Component{Item{}}
 	filterPanelDecorator: filterPanelDecoratorComp
+	metaInfoPanelDecorator: Component{Item{}}
 	// bottomPanelDecorator: bottomPanelDecoratorComp
 	topButtonDecorator: topButtonDecoratorComp
 	topPanelDecorator: topPanelDecoratorComp
@@ -190,9 +191,14 @@ StyleComponents {
 		}
 	}
 
+	// SegmentedButton defaults: light selected fill + selected text (same look as
+	// MessageCollectionFilterDecorator). Checked -> selectedColor, hover -> buttonHoverColor.
 	Component{
 		id: firstSegmentDecoratorComp
 		ExternalSegmentDecorator{
+			color: baseElement && baseElement.checked ? Style.selectedColor :
+				(baseElement && baseElement.hovered ? Style.buttonHoverColor : Style.backgroundColor2)
+			textColor: baseElement && baseElement.checked ? Style.textSelectedColor : Style.textColor
 		}
 	}
 
@@ -200,6 +206,9 @@ StyleComponents {
 		id: middleSegmentDecoratorComp
 		ButtonDecorator{
 			radius: 0;
+			color: baseElement && baseElement.checked ? Style.selectedColor :
+				(baseElement && baseElement.hovered ? Style.buttonHoverColor : Style.backgroundColor2)
+			textColor: baseElement && baseElement.checked ? Style.textSelectedColor : Style.textColor
 		}
 	}
 
@@ -208,6 +217,9 @@ StyleComponents {
 
 		ExternalSegmentDecorator{
 			isLast: true
+			color: baseElement && baseElement.checked ? Style.selectedColor :
+				(baseElement && baseElement.hovered ? Style.buttonHoverColor : Style.backgroundColor2)
+			textColor: baseElement && baseElement.checked ? Style.textSelectedColor : Style.textColor
 		}
 	}
 
@@ -484,11 +496,11 @@ StyleComponents {
 				id: checkRect;
 
 				anchors.left: checkBoxItem ? checkBoxItem.left : undefined;
-				anchors.leftMargin: !checkBoxItem.baseElement ? 0 : !checkBoxItem.baseElement.isLeftText ? 0 : checkBoxText.width + checkBoxItem.baseElement.mainMargin;
+				anchors.leftMargin: !checkBoxItem || !checkBoxItem.baseElement ? 0 : !checkBoxItem.baseElement.isLeftText ? 0 : checkBoxText.width + checkBoxItem.baseElement.mainMargin;
 				anchors.verticalCenter: checkBoxItem ? checkBoxItem.verticalCenter : undefined;
 
 				width: height;
-				height: checkBoxItem.height;
+				height: checkBoxItem ? checkBoxItem.height : 0;
 
 				color: Style.baseColor;
 
@@ -502,7 +514,7 @@ StyleComponents {
 
 					anchors.centerIn: checkRect;
 
-					height: checkRect.height - 1;
+					height: checkRect ? checkRect.height - 1 : 0;
 					width: height;
 
 					sourceSize.width: width;
@@ -519,10 +531,10 @@ StyleComponents {
 
 				anchors.centerIn: checkRect;
 
-				height: checkRect.height - 4;
+				height: checkRect ? checkRect.height - 4 : 0;
 				width: height;
 
-				radius: checkRect.radius;
+				radius: checkRect ? checkRect.radius : 0;
 
 				color: Style.textColor;
 
@@ -533,16 +545,16 @@ StyleComponents {
 				id: checkBoxText;
 
 				anchors.left: checkBoxItem ? checkBoxItem.left : undefined;
-				anchors.leftMargin: !checkBoxItem.baseElement ? 0 : checkBoxItem.baseElement.isLeftText ? 0 : checkRect.width + checkBoxItem.baseElement.mainMargin;
+				anchors.leftMargin: !checkBoxItem || !checkBoxItem.baseElement ? 0 : checkBoxItem.baseElement.isLeftText ? 0 : checkRect.width + checkBoxItem.baseElement.mainMargin;
 				anchors.verticalCenter: checkBoxItem ? checkBoxItem.verticalCenter : undefined;
 
-				color: !checkBoxItem.baseElement ? "transparent" :  checkBoxItem.baseElement.enabled ? Style.buttonTextColor : Style.buttonInactiveTextColor;
+				color: !checkBoxItem || !checkBoxItem.baseElement ? "transparent" :  checkBoxItem.baseElement.enabled ? Style.buttonTextColor : Style.buttonInactiveTextColor;
 
-				font.pixelSize: checkBoxItem.fontPixelSize;
+				font.pixelSize: checkBoxItem ? checkBoxItem.fontPixelSize : 10;
 				font.family: Style.fontFamily;
-				font.bold: checkBoxItem.fontBold;
+				font.bold: checkBoxItem ? checkBoxItem.fontBold : false;
 
-				text: checkBoxItem.text;
+				text: checkBoxItem ? checkBoxItem.text : "";
 			}
 
 		}

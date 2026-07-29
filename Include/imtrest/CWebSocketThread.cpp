@@ -16,19 +16,6 @@ namespace imtrest
 {
 
 
-CWebSocket::CWebSocket(CWebSocketThread *parent)
-{
-	Q_ASSERT(parent);
-
-	m_parent = parent;
-}
-
-
-void CWebSocket::OnWebSocketTextMessage(const QString& textMessage)
-{
-	m_parent->OnWebSocketTextMessage(textMessage);
-}
-
 
 CWebSocketThread::CWebSocketThread(CWebSocketServerComp* parent)
 	:QThread(parent),
@@ -44,6 +31,24 @@ CWebSocketThread::CWebSocketThread(CWebSocketServerComp* parent)
 	m_requestServerHandlerPtr = m_server->GetRequestServerServlet();
 	m_requestClientHandlerPtr = m_server->GetRequestClientServlet();
 	m_productId = m_server->GetProductId();
+
+	m_receiver.moveToThread(this);
+
+	connect(this, &CWebSocketThread::TextMessageReceived,
+			&m_receiver, [this](const QString& msg) {
+				OnWebSocketTextMessage(msg); // worker-thread
+			}, Qt::QueuedConnection);
+
+	connect(this, &CWebSocketThread::SocketDisconnected,
+			&m_receiver, [this]() {
+				OnSocketDisconnected(); // worker-thread
+			}, Qt::QueuedConnection);
+
+	connect(this, &CWebSocketThread::SocketError,
+			&m_receiver, [this](QAbstractSocket::SocketError error) {
+				OnError(error); // worker-thread
+			}, Qt::QueuedConnection);
+
 	connect(this, &CWebSocketThread::SendTextMessage, this, &CWebSocketThread::OnSendTextMessage);
 }
 
@@ -51,10 +56,6 @@ CWebSocketThread::CWebSocketThread(CWebSocketServerComp* parent)
 void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 {
 	m_socket = webSocketPtr;
-
-	if (webSocketPtr != nullptr){
-		connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CWebSocketThread::OnWebSocketTextMessage);
-	}
 
 	start();
 }
@@ -105,13 +106,8 @@ void CWebSocketThread::run()
 		return;
 	}
 
-	connect(webSocketPtr.data(), &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage);
-	connect(webSocketPtr.data(), &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected);
-#if (QT_VERSION >= 0x060500)
-	connect(webSocketPtr.data(), QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError);
-#else
-//	connect(webSocketPtr.data(), QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &CWebSocketThread::OnError);
-#endif
+	// connect(webSocketPtr.data(), &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage);
+	// connect(webSocketPtr.data(), &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected);
 
 	exec();
 }
@@ -120,6 +116,29 @@ void CWebSocketThread::run()
 // public slots
 
 void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
+{
+	// Queue the message and process it (plus anything queued while we work) in a
+	// single flat drain loop. If we are re-entered while a previous message is
+	// still being processed - which happens because ProcessTextMessage() can
+	// block in a nested QEventLoop during synchronous JWT validation, and that
+	// loop keeps dispatching queued TextMessageReceived events on this thread -
+	// we must not process here: that would recurse per message and overflow the
+	// stack. Instead the already-running drain loop below will pick it up once
+	// the blocking call returns, keeping the call stack depth bounded.
+	m_pendingMessages.append(textMessage);
+	if (m_isProcessingMessage){
+		return;
+	}
+
+	m_isProcessingMessage = true;
+	while (!m_pendingMessages.isEmpty()){
+		ProcessTextMessage(m_pendingMessages.takeFirst());
+	}
+	m_isProcessingMessage = false;
+}
+
+
+void CWebSocketThread::ProcessTextMessage(const QString& textMessage)
 {
 	if (m_requestServerHandlerPtr == nullptr || m_server == nullptr || textMessage.isEmpty()){
 		return;
@@ -135,6 +154,7 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 
 	imtrest::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*m_requestServerHandlerPtr);
 	if (newRequestPtr.IsValid()){
+		bool isRequestSaved = false;
 		CWebSocketRequest* webSocketRequest = dynamic_cast<CWebSocketRequest*>(newRequestPtr.GetPtr());
 		if (webSocketRequest == nullptr){
 			return;
@@ -145,12 +165,7 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 		imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
 		if (methodType == CWebSocketRequest::MT_START || methodType == CWebSocketRequest::MT_SUBSCRIBE){
 			newRequestPtr.PopPtr();
-			// Parent to CWebSocketThread instead of QWebSocket to avoid cascade-deletion.
-			// When auth validation (ValidateJwt, ValidateToken) triggers Qt event processing,
-			// pending deleteLater() for old QWebSockets fires, cascade-deleting children.
-			// By parenting to the thread, CWebSocketRequests survive socket destruction.
-			// Cleanup happens explicitly in OnSocketDisconnected.
-			webSocketRequest->setParent(this);
+			isRequestSaved = true;
 			if (m_server != nullptr && !webSocketPtr.isNull()){
 				m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr.data());
 			}
@@ -189,8 +204,9 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 					imtrest::IRequestUniquePtr requestPtr = m_httpEnginePtr->CreateRequest(*m_requestServerHandlerPtr);
 					CHttpRequest* newHttpRequestPtr = dynamic_cast<CHttpRequest*>(requestPtr.GetPtr());
 					if (newHttpRequestPtr != nullptr){
-						if (!clientId.isEmpty() && !webSocketPtr.isNull()){
-							m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr.data());
+						const QByteArray queryRequestId = webSocketRequest->GetRequestId();
+						if (!queryRequestId.isEmpty() && !webSocketPtr.isNull()){
+							m_server->RegisterSender(queryRequestId, webSocketPtr.data());
 						}
 	
 						QJsonDocument document = QJsonDocument::fromJson(textMessage.toUtf8());
@@ -200,6 +216,11 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 						QJsonObject headers = object.value("headers").toObject();
 						for (QString& key: headers.keys()){
 							newHttpRequestPtr->SetHeader(key.toUtf8().toLower(), headers.value(key).toString().toUtf8());
+						}
+						// Correlate the HTTP response with the WS query id (agent CWebSocketClientComp
+						// waits for type=query_data with this id).
+						if (!queryRequestId.isEmpty()){
+							newHttpRequestPtr->SetHeader(QByteArrayLiteral("id"), queryRequestId);
 						}
 						newHttpRequestPtr->SetBody(body);
 						newHttpRequestPtr->SetMethodType(CHttpRequest::MT_POST);
@@ -216,7 +237,22 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 
 		if (responsePtr.IsValid()){
 			QByteArray data = responsePtr->GetData();
+			if (methodType == CWebSocketRequest::MT_QUERY){
+				const QByteArray queryRequestId = webSocketRequest->GetRequestId();
+				if (!queryRequestId.isEmpty()){
+					const QByteArray payload = data.isEmpty() ? QByteArrayLiteral("{}") : data;
+					data = QByteArrayLiteral("{\"type\":\"query_data\",\"id\":\"")
+								+ queryRequestId
+								+ QByteArrayLiteral("\",\"payload\":")
+								+ payload
+								+ QByteArrayLiteral("}");
+				}
+			}
 			emit SendTextMessage(data);
+		}
+
+		if (isRequestSaved){
+			m_requestList.append(webSocketRequest);
 		}
 	}
 }
@@ -229,8 +265,8 @@ void CWebSocketThread::OnSocketDisconnected()
 	// Explicitly clean up subscription requests parented to this thread.
 	// Their destructors call OnRequestDestroyed on publishers, cleanly
 	// unregistering subscriptions before the QWebSocket is destroyed.
-	QList<CWebSocketRequest*> requests = findChildren<CWebSocketRequest*>(QString(), Qt::FindDirectChildrenOnly);
-	qDeleteAll(requests);
+	qDeleteAll(m_requestList);
+	m_requestList.clear();
 
 	m_socket = nullptr;
 	exit();

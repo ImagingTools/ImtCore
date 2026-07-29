@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.12
-import QtQuick.Controls
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
 import imtdocgui 1.0
@@ -13,11 +11,11 @@ import imtauthgui 1.0
  * TenantMembersPage
  *
  * Members tab — list / create / edit / exclude tenant members.
- * Extends TenantSimpleCollectionPage with custom header buttons,
+ * Extends SimpleCollectionPage with custom header buttons,
  * a custom delegate (TenantMemberDelegate), and member-specific
  * commands (invite, exclude, role management).
  */
-TenantSimpleCollectionPage {
+SimpleCollectionPage {
 	id: membersPage
 
 	entityName: qsTr("User")
@@ -74,6 +72,261 @@ TenantSimpleCollectionPage {
 		)
 	}
 
+	function showMemberOrgPermissionsPopup(memberData) {
+		orgPermsPopup.currentMember = memberData
+		orgPermsPopup.__checkedCount = 0
+		permsLoading.start()
+		orgPermsPopup.open()
+		var tid = membersPage.model ? membersPage.model.m_id : ""
+		var uid = memberData ? (memberData.id || "") : ""
+		if (membersPage.apiClient && tid) {
+			membersPage.apiClient.fetchOrganizationPermissions(tid, uid)
+		}
+	}
+
+	Popup {
+		id: orgPermsPopup
+		parent: ModalDialogManager.activeView
+		modal: true
+		dim: true
+		width: Math.min(Style.sizeHintXXXL, Math.round(parent.width * 0.8))
+		height: Math.min(Style.sizeHintXXXL, Math.round(parent.height * 0.8))
+		x: Math.round((parent.width - width) / 2)
+		y: Math.round((parent.height - height) / 2)
+		padding: 0
+		closePolicy: Enums.popupCloseOnEscape | Enums.popupCloseOnPressOutside
+
+		property var currentMember: null
+		property int __checkedCount: 0
+
+		background: Rectangle {
+			color: Style.baseColor
+			border.color: Style.borderColor
+			border.width: 1
+			radius: Style.radiusM
+		}
+
+		Item {
+			anchors.fill: parent
+			anchors.margins: 1
+
+			// ─── Header ─────────────────────────────────────────────
+			Rectangle {
+				id: permsHeader
+				anchors.top: parent.top
+				anchors.left: parent.left
+				anchors.right: parent.right
+				height: 62
+				color: Style.alternateBaseColor
+				radius: Style.radiusM
+
+				// Square off bottom corners so the color fills edge-to-edge
+				Rectangle {
+					anchors.bottom: parent.bottom
+					anchors.left: parent.left
+					anchors.right: parent.right
+					height: Style.radiusM
+					color: parent.color
+				}
+
+				Row {
+					anchors.verticalCenter: parent.verticalCenter
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.leftMargin: Style.marginM
+					anchors.rightMargin: Style.marginM
+					spacing: Style.marginM
+
+					Rectangle {
+						width: 36
+						height: 36
+						radius: 18
+						color: Style.selectedColor
+						anchors.verticalCenter: parent.verticalCenter
+
+						BaseText {
+							anchors.centerIn: parent
+							text: orgPermsPopup.currentMember
+								? ((orgPermsPopup.currentMember.name || orgPermsPopup.currentMember.id || "").charAt(0).toUpperCase() || "?")
+								: "?"
+							font.bold: true
+							font.pixelSize: Style.fontSizeM
+							color: Style.textColor
+						}
+					}
+
+					Column {
+						anchors.verticalCenter: parent.verticalCenter
+						spacing: 2
+
+						BaseText {
+							text: qsTr("Organization Permissions")
+							font.pixelSize: Style.fontSizeL
+							font.bold: true
+							color: Style.textColor
+						}
+
+						BaseText {
+							text: orgPermsPopup.currentMember
+								? (orgPermsPopup.currentMember.name || orgPermsPopup.currentMember.id || "")
+								: ""
+							font.pixelSize: Style.fontSizeS
+							color: Style.inactiveTextColor
+						}
+					}
+				}
+			}
+
+			// ─── Permissions tree ────────────────────────────────────
+			// Always visible — delegates build while Loading covers the area,
+			// so when Loading stops the tree is already fully rendered.
+			PermissionsTableView {
+				id: orgPermsTable
+				anchors.top: permsHeader.bottom
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.bottom: permsFooter.top
+				anchors.leftMargin: Style.marginM
+				anchors.rightMargin: Style.marginM
+				showControlPanel: true
+				controlPanelTopMargin: Style.marginM
+				treeTopMargin: Style.marginS
+				treeBottomMargin: Style.marginXS
+
+				onSelectionChanged: {
+					orgPermsPopup.__checkedCount = getCheckedIds().length
+				}
+			}
+
+			// ─── Loading overlay ─────────────────────────────────────
+			Loading {
+				id: permsLoading
+				anchors.top: permsHeader.bottom
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.bottom: permsFooter.top
+				visible: false
+				background.color: Style.baseColor
+			}
+
+			// ─── Footer ──────────────────────────────────────────────
+			Rectangle {
+				id: permsFooter
+				anchors.bottom: parent.bottom
+				anchors.left: parent.left
+				anchors.right: parent.right
+				height: 54
+				color: Style.alternateBaseColor
+				radius: Style.radiusM
+
+				// Square off top corners
+				Rectangle {
+					anchors.top: parent.top
+					anchors.left: parent.left
+					anchors.right: parent.right
+					height: Style.radiusM
+					color: parent.color
+				}
+
+				BaseText {
+					anchors.left: parent.left
+					anchors.leftMargin: Style.marginM
+					anchors.verticalCenter: parent.verticalCenter
+					text: orgPermsPopup.__checkedCount > 0
+						? qsTr("%1 permission(s) selected").arg(orgPermsPopup.__checkedCount)
+						: qsTr("No permissions selected")
+					font.pixelSize: Style.fontSizeS
+					color: Style.inactiveTextColor
+				}
+
+				Row {
+					anchors.right: parent.right
+					anchors.rightMargin: Style.marginM
+					anchors.verticalCenter: parent.verticalCenter
+					spacing: Style.marginL
+
+					Text {
+						id: cancelBtn
+						text: qsTr("Cancel")
+						font.pixelSize: Style.fontSizeM
+						color: Style.linkColor
+						opacity: cancelMouse.containsMouse ? 0.65 : 1.0
+						anchors.verticalCenter: parent.verticalCenter
+
+						Behavior on opacity { NumberAnimation { duration: 100 } }
+
+						MouseArea {
+							id: cancelMouse
+							anchors.fill: parent
+							anchors.margins: -4
+							hoverEnabled: true
+							cursorShape: Qt.PointingHandCursor
+							onClicked: orgPermsPopup.close()
+						}
+					}
+
+					Rectangle {
+						id: applyBtnRect
+						width: applyBtnLabel.implicitWidth + Style.marginXL
+						height: 32
+						radius: 4
+						color: Style.linkColor
+						anchors.verticalCenter: parent.verticalCenter
+						opacity: applyBtnMouse.containsMouse ? 0.75 : 1.0
+
+						Behavior on opacity { NumberAnimation { duration: 100 } }
+
+						BaseText {
+							id: applyBtnLabel
+							anchors.centerIn: parent
+							text: qsTr("Apply")
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: Style.baseColor
+						}
+
+						MouseArea {
+							id: applyBtnMouse
+							anchors.fill: parent
+							hoverEnabled: true
+							cursorShape: Qt.PointingHandCursor
+							onClicked: {
+								var selected = orgPermsTable.getCheckedIds ? orgPermsTable.getCheckedIds() : []
+								var tid = membersPage.model ? membersPage.model.m_id : ""
+								var uid = orgPermsPopup.currentMember ? orgPermsPopup.currentMember.id : ""
+								if (uid && tid && membersPage.apiClient) {
+									membersPage.apiClient.setMemberOrganizationPermissionsByUser(tid, uid, selected)
+								}
+								orgPermsPopup.close()
+								if (membersPage.stateManager) {
+									membersPage.stateManager.loadMembersFromModel()
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	Connections {
+		target: membersPage.apiClient
+		function onOrganizationPermissionsReceived() {
+			if (orgPermsPopup.opened && orgPermsPopup.currentMember && orgPermsTable) {
+				var tree = membersPage.apiClient ? membersPage.apiClient.organizationPermissions : []
+				orgPermsTable.rebuildFromFlatArray(tree)
+				// Prefer server-fresh member permissions from response; fall back to locally cached
+				var serverPerms = membersPage.apiClient ? membersPage.apiClient.memberOrganizationPermissions : []
+				var cur = (serverPerms && serverPerms.length > 0)
+					? serverPerms
+					: (orgPermsPopup.currentMember.organizationPermissions || [])
+				orgPermsTable.applySelection(cur)
+				orgPermsPopup.__checkedCount = orgPermsTable.getCheckedIds().length
+				permsLoading.stop()
+			}
+		}
+	}
+
 	// --- Combined model: invitations + active members ---
 	property var __combinedModel: []
 
@@ -112,7 +365,6 @@ TenantSimpleCollectionPage {
 			result.push({
 				id: members[i].id,
 				title: memName,
-				description: members[i].role || "Member",
 				totalCount: invitations.length + members.length,
 				kind: "member",
 				sourceData: members[i]
@@ -132,6 +384,10 @@ TenantSimpleCollectionPage {
 
 	Component.onCompleted: {
 		__rebuildCombinedModel()
+		if (membersPage.apiClient && membersPage.model) {
+			var tid = membersPage.model.m_id
+			membersPage.apiClient.fetchOrganizationPermissions(tid)
+		}
 	}
 
 	Connections {
@@ -151,10 +407,6 @@ TenantSimpleCollectionPage {
 		function onInvitationRevoked(invitationId) {
 			if (membersPage.stateManager)
 				membersPage.stateManager.removePendingInvitation(invitationId)
-		}
-		function onMemberRoleChanged(userId, role) {
-			if (membersPage.stateManager)
-				membersPage.stateManager.setUserRole(userId, role)
 		}
 	}
 
@@ -312,7 +564,7 @@ TenantSimpleCollectionPage {
 			memberData: modelData.sourceData || modelData
 			tenantData: membersPage.model
 			stateManager: membersPage.stateManager
-			collectionPage: membersPage
+			actionHandler: membersPage
 			isOwner: membersPage.stateManager ? membersPage.stateManager.isOwner : false
 			selectionManager: membersPage.selectionManager
 			showCheckBox: true
@@ -320,14 +572,12 @@ TenantSimpleCollectionPage {
 			onMemberActionsRequested: {
 				memberActionMenu.targetUserId = userId
 				memberActionMenu.targetUserName = userName
-				memberActionMenu.targetCurrentRole = membersPage.stateManager
-					? membersPage.stateManager.getUserRole(userId) : "Member"
-				memberActionMenu.showChangeRole = false
+				memberActionMenu.showManagePermissions = false
 				memberActionMenu.showExclude = false
 				memberActionMenu.showTransfer = false
 				memberActionMenu.showLeave = false
 				for (var i = 0; i < menuItems.length; i++) {
-					if (menuItems[i].action === "changeRole") memberActionMenu.showChangeRole = true
+					if (menuItems[i].action === "managePermissions") memberActionMenu.showManagePermissions = true
 					else if (menuItems[i].action === "remove") memberActionMenu.showExclude = true
 					else if (menuItems[i].action === "transfer") memberActionMenu.showTransfer = true
 					else if (menuItems[i].action === "leave") memberActionMenu.showLeave = true
@@ -365,9 +615,8 @@ TenantSimpleCollectionPage {
 		function fillModel(){
 			memberActionContextModel.clear()
 
-			if (memberActionMenu.showChangeRole) {
-				memberActionContextModel.append({"id": "ChangeRole:Member", "name": qsTr("Member"), "icon": "", "isEnabled": memberActionMenu.targetCurrentRole !== "Member"})
-				memberActionContextModel.append({"id": "ChangeRole:Admin", "name": qsTr("Admin"), "icon": "", "isEnabled": memberActionMenu.targetCurrentRole !== "Admin"})
+			if (memberActionMenu.showManagePermissions) {
+				memberActionContextModel.append({"id": "ManagePermissions", "name": qsTr("Manage Organization Permissions..."), "icon": "", "isEnabled": true})
 			}
 
 			if (memberActionMenu.showExclude || memberActionMenu.showTransfer || memberActionMenu.showLeave) {
@@ -390,11 +639,14 @@ TenantSimpleCollectionPage {
 		PopupMenuDialog {
 			id: memberActionPopupDialog
 			onFinished: {
-				if (commandId === "ChangeRole:Member" || commandId === "ChangeRole:Admin") {
-					if (membersPage.apiClient && membersPage.stateManager && membersPage.stateManager.canChangeOrganizationMemberRole) {
-						var tenantId = membersPage.model ? membersPage.model.m_id : ""
-						var role = commandId === "ChangeRole:Admin" ? "Admin" : "Member"
-						membersPage.apiClient.setMemberRole(tenantId, memberActionMenu.targetUserId, role)
+				if (commandId === "ManagePermissions") {
+					var uid = memberActionMenu.targetUserId
+					var items = membersPage.__combinedModel
+					for (var i = 0; i < items.length; i++) {
+						if (items[i].id === uid) {
+							membersPage.showMemberOrgPermissionsPopup(items[i].sourceData || items[i])
+							break
+						}
 					}
 				}
 				else if (commandId === "Exclude") {
@@ -459,41 +711,12 @@ TenantSimpleCollectionPage {
 		id: memberActionMenu
 		property string targetUserId: ""
 		property string targetUserName: ""
-		property string targetCurrentRole: ""
-		property bool showChangeRole: false
+		property bool showManagePermissions: false
 		property bool showExclude: false
 		property bool showTransfer: false
 		property bool showLeave: false
 
 		closePolicy: Enums.popupCloseOnEscape | Enums.popupCloseOnPressOutside
-
-		Menu {
-			id: changeRoleSubmenu
-			title: qsTr("Change Role")
-			visible: memberActionMenu.showChangeRole
-			height: visible ? implicitHeight : 0
-
-			MenuItem {
-				text: qsTr("Member")
-				checked: memberActionMenu.targetCurrentRole === "Member"
-				onTriggered: {
-					if (membersPage.apiClient) {
-						var tenantId = membersPage.model ? membersPage.model.m_id : ""
-						membersPage.apiClient.setMemberRole(tenantId, memberActionMenu.targetUserId, "Member")
-					}
-				}
-			}
-			MenuItem {
-				text: qsTr("Admin")
-				checked: memberActionMenu.targetCurrentRole === "Admin"
-				onTriggered: {
-					if (membersPage.apiClient) {
-						var tenantId = membersPage.model ? membersPage.model.m_id : ""
-						membersPage.apiClient.setMemberRole(tenantId, memberActionMenu.targetUserId, "Admin")
-					}
-				}
-			}
-		}
 
 		MenuItem {
 			text: qsTr("Exclude from Tenant")

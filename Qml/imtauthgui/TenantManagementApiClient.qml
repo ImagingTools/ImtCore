@@ -42,7 +42,6 @@ QtObject {
 
 	// --- Ownership / membership ---
 	signal ownershipTransferred()
-	signal memberRoleChanged(string userId, string role)
 	signal memberRemoved(string userId)
 
 	// --- Roles ---
@@ -126,12 +125,11 @@ QtObject {
 	signal subscriptionConnectionNotification(var notification)
 
 	// --- Stub methods (overridden by concrete implementations) ---
-	function createInvitation(tenantId, userId, role) {}
+	function createInvitation(tenantId, userId) {}
 	function revokeInvitation(invitationId) {}
 	function resendInvitation(invitationId) {}
 
 	function transferOwnership(tenantId, newOwnerId) {}
-	function setMemberRole(tenantId, userId, role) {}
 	function removeMember(tenantId, userId) {}
 
 	function createRoleData() {}

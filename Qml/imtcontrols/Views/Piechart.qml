@@ -77,11 +77,11 @@ Item{
 
 				ctx.beginPath()
 				ctx.arc(cx, cy, r, 0, 2 * Math.PI)
-				ctx.strokeStyle = Style.chartAxisColor
+				ctx.strokeStyle = "#999"
 				ctx.lineWidth = 1
 				ctx.stroke()
 
-				ctx.fillStyle = Style.chartAxisColor
+				ctx.fillStyle = "#999"
 				ctx.font = "14px " + Style.fontFamily
 				ctx.textAlign = "center"
 				ctx.textBaseline = "middle"
@@ -110,7 +110,7 @@ Item{
 
 				ctx.fillStyle = isHovered
 						? Functions.darkenColor(seg.color, 1.4)
-						: seg.color || Style.chartFallbackColor
+						: seg.color || "#ccc"
 
 				ctx.fill()
 				angle = nextAngle
@@ -148,7 +148,7 @@ Item{
 					width: Style.fontSizeXS
 					height: width
 					radius: Style.radiusS
-					color: modelData.color || Style.chartFallbackColor
+					color: modelData.color || "#ccc"
 				}
 
 				Text{
@@ -160,7 +160,7 @@ Item{
 					anchors.verticalCenter: parent.verticalCenter
 					verticalAlignment: Text.AlignVCenter
 					text: modelData.label
-					color: pieChart.legendClickable ? Style.linkColor : Style.textColor
+					color: pieChart.legendClickable ? "#0b5ed7": Style.textColor
 					font.pixelSize: Style.fontSizeS
 					elide: Text.ElideRight
 

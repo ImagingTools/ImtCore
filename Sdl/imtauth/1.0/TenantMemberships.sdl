@@ -9,6 +9,7 @@ schema {
 import {
 	"../../imtbase/1.0/ImtCollection.sdl"
 	"../../imtbase/1.0/ImtBaseTypes.sdl"
+	"Permissions.sdl"
 }
 
 # --- TenantMembership ---
@@ -26,7 +27,6 @@ type TenantMembershipItemData {
 	typeId: ID!
 	userId: ID!
 	tenantId: ID!
-	role: ID!
 	isActive: Boolean
 	joinedAt: String
 	updatedAt: String
@@ -36,10 +36,10 @@ type TenantMembershipData {
 	id: ID
 	userId: ID
 	tenantId: ID
-	role: ID
 	isActive: Boolean
 	joinedAt: String
 	updatedAt: String
+	organizationPermissions: [ID]
 }
 
 type TenantInvitationData {
@@ -47,7 +47,6 @@ type TenantInvitationData {
 	userId: ID
 	tenantId: ID
 	tenantName: String
-	role: ID
 	status: TenantInvitationStatus
 	invitedByUserId: ID
 	createdAt: String
@@ -120,6 +119,17 @@ type HasMinimumRolePayload {
 	errorMessage: String
 }
 
+input GetOrganizationPermissionsInput {
+	tenantId: ID
+	userId: ID
+}
+
+type GetOrganizationPermissionsPayload {
+	groups: [PermissionGroup]
+	memberPermissions: [ID]
+	errorMessage: String
+}
+
 input GetTenantInvitationsInput {
 	tenantId: ID!
 	statuses: [TenantInvitationStatus]
@@ -144,7 +154,6 @@ type GetMyTenantInvitationsPayload {
 input AddMembershipInput {
 	userId: ID!
 	tenantId: ID!
-	role: ID!
 }
 
 type AddMembershipPayload {
@@ -155,7 +164,6 @@ type AddMembershipPayload {
 input CreateTenantInvitationInput {
 	userId: ID!
 	tenantId: ID!
-	role: ID
 }
 
 type CreateTenantInvitationPayload {
@@ -209,12 +217,12 @@ type RemoveMembershipPayload {
 	errorMessage: String
 }
 
-input UpdateMembershipRoleInput {
+input UpdateMembershipPermissionsInput {
 	membershipId: ID!
-	role: ID!
+	permissions: [ID]
 }
 
-type UpdateMembershipRolePayload {
+type UpdateMembershipPermissionsPayload {
 	success: Boolean
 	errorMessage: String
 }
@@ -238,6 +246,7 @@ type Query {
 	HasMinimumRole (input: HasMinimumRoleInput): HasMinimumRolePayload!
 	GetTenantInvitations (input: GetTenantInvitationsInput): GetTenantInvitationsPayload!
 	GetMyTenantInvitations (input: GetMyTenantInvitationsInput): GetMyTenantInvitationsPayload!
+	GetOrganizationPermissions (input: GetOrganizationPermissionsInput): GetOrganizationPermissionsPayload!
 }
 
 type Mutation {
@@ -248,7 +257,7 @@ type Mutation {
 	RevokeTenantInvitation (input: RevokeTenantInvitationInput): RevokeTenantInvitationPayload!
 	ResendTenantInvitation (input: ResendTenantInvitationInput): ResendTenantInvitationPayload!
 	RemoveMembership (input: RemoveMembershipInput): RemoveMembershipPayload!
-	UpdateMembershipRole (input: UpdateMembershipRoleInput): UpdateMembershipRolePayload!
+	UpdateMembershipPermissions (input: UpdateMembershipPermissionsInput): UpdateMembershipPermissionsPayload!
 	TransferTenantOwnership (input: TransferTenantOwnershipInput): TransferTenantOwnershipPayload!
 }
 

@@ -25,7 +25,7 @@ Rectangle {
 	property bool showHeaders: true;
 
 	property bool enableAlternating: (Style.enableAlternating !== undefined && Style.enableAlternating !== null) ? Style.enableAlternating : false;
-	property color alternatingColor: Style.alternatingColor ? Style.alternatingColor : Style.baseColorInverted;
+	property color alternatingColor: Style.alternateBaseColor ? Style.alternateBaseColor : Style.baseColorInverted;
 	property color alternatingCellColor: 'transparent';
 	property real alternatingOpacity: Style.alternatingOpacity ? Style.alternatingOpacity : 0.05;
 	property bool hoverEnabled: (Style.enableHoverEffect !== undefined && Style.enableHoverEffect !== null) ? Style.enableHoverEffect : true;
@@ -240,7 +240,10 @@ Rectangle {
 	}
 
 	onElementsChanged: {
+		// Clear selection and notify rows. Without checkedItemsChanged the row CheckBox keeps
+		// a stale checkedState while _checkedItems is already empty (breaks undo/redo restore).
 		properties._checkedItems = []
+		properties.checkedItemsChanged()
 
 		tableContainer.setWidth();
 	}

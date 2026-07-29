@@ -29,6 +29,8 @@
 	<file alias="imtdocgui/SingleDocumentTypeRegistrar.qml">SingleDocumentTypeRegistrar.qml</file>
 	<file alias="imtdocgui/SingleDocumentWorkspaceContentView.qml">SingleDocumentWorkspaceContentView.qml</file>
 	<file alias="imtdocgui/SingleDocumentWorkspaceShellView.qml">SingleDocumentWorkspaceShellView.qml</file>
+	<file alias="imtdocgui/SimpleDocumentEditorShell.qml">SimpleDocumentEditorShell.qml</file>
+	<file alias="imtdocgui/SimpleCollectionPage.qml">SimpleCollectionPage.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

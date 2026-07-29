@@ -24,6 +24,7 @@
 #include <imtclientgql/CObjectCollectionSubscriberComp.h>
 #include <imtclientgql/CRemoteCollectionDocumentServiceControllerComp.h>
 #include <imtclientgql/CRemoteCommandsControllerComp.h>
+#include <imtclientgql/CRemoteFileSystemStructureProviderComp.h>
 #include <imtclientgql/CRemoteFilterableSelectControllerComp.h>
 
 
@@ -51,6 +52,7 @@ typedef imtclientgql::CRemoteObjectCollectionControllerComp RemoteObjectCollecti
 typedef imtclientgql::CRemoteCollectionDocumentServiceControllerComp RemoteCollectionDocumentServiceController;
 typedef imtclientgql::CObjectCollectionSubscriberComp ObjectCollectionSubscriber;
 typedef imtclientgql::CRemoteCommandsControllerComp RemoteCommandsController;
+typedef imtclientgql::CRemoteFileSystemStructureProviderComp RemoteFileSystemStructureProvider;
 typedef imtclientgql::CRemoteFilterableSelectControllerComp RemoteFilterableSelectController;
 
 

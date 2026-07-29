@@ -17,7 +17,7 @@ import imtauthgui 1.0
  * Action requests are surfaced as signals so the parent (TenantMembersPage)
  * can pop the appropriate menu and call the api client.
  */
-TenantCollectionItemDelegateBase {
+SimpleCollectionItemDelegateBase {
 	id: row
 
 	// --- Inputs ---
@@ -45,10 +45,6 @@ TenantCollectionItemDelegateBase {
 	readonly property bool isCurrentUser: row.isMember && row.tenantData
 		&& row.tenantData.m_currentUserId
 		&& row.memberData.id === row.tenantData.m_currentUserId
-	readonly property string memberRole: row.isMemberOwner
-		? "Owner"
-		: (row.stateManager ? row.stateManager.getUserRole(row.memberData.id) : "Member")
-
 	readonly property bool isExpired: !row.isMember && row.stateManager
 		? row.stateManager.isInvitationExpired(row.memberData.expiresAt)
 		: false
@@ -59,6 +55,7 @@ TenantCollectionItemDelegateBase {
 		: row.isRevoked ? "Revoked" : "Pending"
 	readonly property bool canEditMember: row.stateManager ? row.stateManager.canChangeOrganizationMember : false
 	readonly property bool canChangeMemberRole: row.stateManager ? row.stateManager.canChangeOrganizationMemberRole : false
+	readonly property bool canManageOrganizationMembers: row.stateManager ? row.stateManager.canManageOrganizationMembers : false
 	readonly property bool canRemoveMember: row.stateManager ? row.stateManager.canExcludeOrganizationMember : false
 	readonly property bool canInviteMember: row.stateManager ? row.stateManager.canInviteOrganizationMember : false
 
@@ -192,11 +189,11 @@ TenantCollectionItemDelegateBase {
 				spacing: Style.marginXS
 
 				StatusBadge {
-					visible: row.isMember
-					text: row.memberRole
-					badgeColor: (row.isMemberOwner || row.isMemberCreator) ? Style.selectedColor : Style.baseColor
-					badgeBorderColor: (row.isMemberOwner || row.isMemberCreator) ? Style.secondColor : Style.borderColor
-					textColor: (row.isMemberOwner || row.isMemberCreator) ? Style.secondColor : Style.textColor
+					visible: row.isMember && (row.isMemberOwner || row.isMemberCreator)
+					text: row.isMemberOwner ? qsTr("Owner") : qsTr("Creator")
+					badgeColor: Style.selectedColor
+					badgeBorderColor: Style.secondColor
+					textColor: Style.secondColor
 				}
 
 				StatusBadge {
@@ -205,6 +202,21 @@ TenantCollectionItemDelegateBase {
 					badgeColor: Style.selectedColor
 					badgeBorderWidth: 0
 					textColor: Style.textColor
+				}
+
+				StatusBadge {
+					readonly property int __permCount: row.isMember
+						&& row.memberData
+						&& Array.isArray(row.memberData.organizationPermissions)
+						? row.memberData.organizationPermissions.length : 0
+					visible: row.isMember && __permCount > 0
+					text: qsTr("%1 perm%2").arg(__permCount).arg(__permCount === 1 ? "" : "s")
+					badgeColor: Style.baseColor
+					badgeBorderColor: Style.borderColor
+					textColor: Style.inactiveTextColor
+					horizontalPadding: Style.marginS
+					verticalPadding: Style.marginXS
+					fontPixelSize: Style.fontSizeXS
 				}
 
 				StatusBadge {
@@ -255,8 +267,8 @@ TenantCollectionItemDelegateBase {
 						var menuItems = []
 						if (!row.isCurrentUser) {
 							if (!row.isMemberOwner && !row.isMemberCreator) {
-								if (row.canChangeMemberRole)
-									menuItems.push({ text: qsTr("Change Environment Role"), action: "changeRole" })
+								if (row.canChangeMemberRole || row.canManageOrganizationMembers)
+									menuItems.push({ text: qsTr("Manage Organization Permissions"), action: "managePermissions" })
 								if (row.canRemoveMember)
 									menuItems.push({ text: qsTr("Exclude from Tenant"), action: "remove" })
 							}

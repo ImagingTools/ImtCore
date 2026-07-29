@@ -5,6 +5,7 @@ Item {
 	property Component menuPanelButtonDecorator
 	property Component subMenuPanelButtonDecorator
 	property Component menuPanelDecorator
+	property Component metaInfoPanelDecorator
 	property Component filterPanelDecorator
 	property Component bottomPanelDecorator
 	property Component topButtonDecorator

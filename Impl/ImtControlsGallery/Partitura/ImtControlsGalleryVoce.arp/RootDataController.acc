@@ -16,7 +16,6 @@
                     <AttributeInfo Id="GqlRequestHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>AuthorizationOptions</Value>
                                 <Value>Pages</Value>
                                 <Value>SettingsController</Value>
                                 <Value>ContactInfoController</Value>

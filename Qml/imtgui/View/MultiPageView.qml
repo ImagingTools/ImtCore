@@ -33,7 +33,8 @@ Item {
             expanded: false,
             loaded: false,
             submenuVisited: false,
-            lastSubpageId: ""
+            lastSubpageId: "",
+            badge: ""
         })
     }
 
@@ -62,8 +63,19 @@ Item {
             expanded: false,
             loaded: false,
             submenuVisited: false,
-            lastSubpageId: ""
+            lastSubpageId: "",
+            badge: ""
         })
+    }
+
+    // Small text badge next to a page's nav label (e.g. "3", or "•" as an "unread" dot) -
+    // badgeText: "" clears it. No built-in caller; consumers (e.g. AgentEditor's Services/Log
+    // pages) call this whenever the count/marker they want shown changes.
+    function setPageBadge(pageId, badgeText){
+        var idx = getIndexById(pageId)
+        if (idx >= 0) {
+            pagesModel.setProperty(idx, "badge", badgeText)
+        }
     }
 
     function removePage(pageId){
@@ -250,6 +262,13 @@ Item {
                 delegate: Item {
                     id: navDelegate
 
+                    // Test instrumentation: every MultiPageView consumer (e.g. Administration's
+                    // Roles/Users/Groups) gets a per-nav-item selector keyed by the same pageId passed
+                    // to addPage()/addSubPage() - previously this delegate had no objectName at all, so
+                    // subpage navigation was only clickable by visible text. Inert - no runtime/visual
+                    // effect.
+                    objectName: "Page_" + model.id;
+
                     readonly property bool __isParentWithSubs: root.hasSubPages(model.id)
                     readonly property bool __isSubpage: model.isSubpage
                     readonly property string __parentId: model.parentId || ""
@@ -299,6 +318,20 @@ Item {
                                 color: navDelegate.__isSelected ? Style.textSelectedColor : Style.textColor
                                 elide: Text.ElideRight
                                 width: parent.width - ((!navDelegate.__isSubpage && model.icon) ? Style.iconSizeS + parent.spacing : 0)
+                                    - (navBadge.visible ? navBadge.width + parent.spacing : 0)
+                            }
+
+                            // Small text badge next to the label (a count like "3", or a short
+                            // marker like "•") - see setPageBadge(). Empty/unset by default, so
+                            // pages that never call it look exactly as before.
+                            Text {
+                                id: navBadge
+                                visible: model.badge !== undefined && model.badge !== ""
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: model.badge !== undefined ? model.badge : ""
+                                font.family: Style.fontFamily
+                                font.pixelSize: Style.fontSizeS
+                                color: navDelegate.__isSelected ? Style.textSelectedColor : Style.subtitleColor
                             }
                         }
 
@@ -318,6 +351,10 @@ Item {
 
                         MouseArea {
                             id: navMouseArea
+
+                            // Test instrumentation: matches the "[objectName=Page_x] [objectName=MouseArea]"
+                            // click convention used everywhere else in this codebase. Inert.
+                            objectName: "MouseArea";
 
                             anchors.fill: parent
                             hoverEnabled: true

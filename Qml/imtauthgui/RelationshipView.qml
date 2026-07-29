@@ -13,7 +13,7 @@ import imtauthgui 1.0
  * ViewBase-inherited editor for creating or editing tenant relationships.
  * Follows the RoleView / UserGroupView pattern.
  *
- * Used inside the document service flow (TenantDocumentEditorShell).
+ * Used inside the document service flow (SimpleDocumentEditorShell).
  * The document framework calls updateGui() to populate the form from
  * the representationModel and updateModel() to write form values back.
  * Saving is handled by the shell's Save button which triggers the
@@ -249,11 +249,11 @@ ViewBase {
 
 			onItemSelected: {
 				if (container.__isExistingRelationship) {
-					ModalDialogManager.showInfoDialog(qsTr("Partner organization cannot be changed after relationship creation."))
+					PopupManager.addWarningMessage(qsTr("Partner organization cannot be changed after relationship creation."), true)
 					return
 				}
 				if (itemId === container.__currentTenantId) {
-					ModalDialogManager.showInfoDialog(qsTr("Choose another organization. Current and partner organizations must be different."))
+					PopupManager.addWarningMessage(qsTr("Choose another organization. Current and partner organizations must be different."), true)
 					return
 				}
 				container.__selectedPartnerTenantId = itemId

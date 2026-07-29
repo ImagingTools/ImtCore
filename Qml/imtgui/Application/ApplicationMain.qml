@@ -30,7 +30,6 @@ Item {
 	
 	property alias loadPageByClick: thumbnailDecorator.loadPageByClick;
 	property alias canRecoveryPassword: thumbnailDecorator.canRecoveryPassword;
-	property alias webSocketPortProvider: webSocketPortProvider
 
 	property alias authConnectionState: connectionState.authConnectionState
 	property alias pageAboutProvider: pageAboutProvider
@@ -50,7 +49,25 @@ Item {
 		})
 		
 		// 0 - WebSocket.Connecting, 1 - WebSocket.Open, 2 - WebSocket.Closing, 3 - WebSocket.Closed, 4 - WebSocket.Error
-		property int appConnectionState: application.useWebSocketSubscription ? subscriptionManager_.status : 1
+		//
+		// Until the WebSocket has been given a URL it still reports its initial
+		// Closed state - and the port it needs only arrives with the first
+		// GetApplicationInfo response. Reporting that as APP_SERVER_CONNECTION_ERROR
+		// meant every cold start emitted ServerConnectionError at t=0 and, whenever
+		// the first response took longer than statusTimer's second, showed
+		// "Server connection error" instead of "Try connecting...". Report
+		// "connecting" for the whole window in which the port is still unknown.
+		property int appConnectionState: {
+			if (!application.useWebSocketSubscription){
+				return 1;
+			}
+
+			if (application.webSocketPort < 0){
+				return 0;
+			}
+
+			return subscriptionManager_.status;
+		}
 		property int authConnectionState: 1 // -1 - Unknown, 0 - Connecting, 1 - Connected, 2 - Disconnected
 
 		onAppConnectionStateChanged: {
@@ -152,63 +169,118 @@ Item {
 		timer.onTriggeredFunc();
 	}
 	
-	onWidthChanged: {
-		Events.sendEvent("AppSizeChanged", {"Width": width, "Height": height})
-		Events.sendEvent("AppWidthChanged", width)
+	// Dragging a window edge changes width and height on nearly every frame, and each
+	// change used to dispatch two global Events immediately - so a resize walked every
+	// subscriber list of three event keys, allocating a fresh parameters object each
+	// time. Coalesce into one dispatch per event-loop turn instead, and only for the
+	// dimension that actually changed.
+	onWidthChanged: sizeEventTimer.restart()
+	onHeightChanged: sizeEventTimer.restart()
+
+	QtObject {
+		id: lastSentSize
+
+		property int width: -1
+		property int height: -1
 	}
-	
-	onHeightChanged: {
-		Events.sendEvent("AppSizeChanged", {"Width": width, "Height": height})
-		Events.sendEvent("AppHeightChanged", height)
-	}
-	
-	onServerConnectedChanged: {
-		if (serverConnected){
-			applicationInfoProvider.updateModel();
+
+	Timer {
+		id: sizeEventTimer
+
+		interval: 0
+		repeat: false
+
+		onTriggered: {
+			let newWidth = application.width;
+			let newHeight = application.height;
+
+			if (newWidth === lastSentSize.width && newHeight === lastSentSize.height){
+				return;
+			}
+
+			let widthChanged = newWidth !== lastSentSize.width;
+			let heightChanged = newHeight !== lastSentSize.height;
+
+			lastSentSize.width = newWidth;
+			lastSentSize.height = newHeight;
+
+			Events.sendEvent("AppSizeChanged", {"Width": newWidth, "Height": newHeight})
+
+			if (widthChanged){
+				Events.sendEvent("AppWidthChanged", newWidth)
+			}
+
+			if (heightChanged){
+				Events.sendEvent("AppHeightChanged", newHeight)
+			}
 		}
 	}
 	
+	// WebSocket port, resolved from the merged GetApplicationInfo response (see
+	// ApplicationInfoProvider / CApplicationInfoControllerComp). -1 means "not known
+	// yet"; the retry Timer below re-fetches until it is.
+	property int webSocketPort: -1;
+
+	onWebSocketPortChanged: {
+		application.connectToWebSocketServer();
+	}
+
 	Decorators {
 		id: decorators_
 	}
-	
+
+	// Exposed like `decorators` so applications that offer a Qt-style theme switch
+	// (e.g. ControlsGallery) reuse this instance instead of creating a second full
+	// DecoratorsQt tree of their own.
+	property DecoratorsQt decoratorsQt: decoratorsQt_
+
 	DecoratorsQt {
-		id: decoratorsQt;
+		id: decoratorsQt_;
 	}
-	
+
 	function setDecorators(){
 		Style.setDecorators(decorators)
 	}
-	
+
 	function getServerUrl(){
 		return clientSettingsController.getServerUrl()
 	}
-	
+
 	function reconnect(){
-		webSocketPortProvider.port = -1;
+		application.webSocketPort = -1;
 	}
-	
+
 	function getHeaders(){
 		return {"productId": AuthorizationController.productId};
 	}
-	
+
 	property alias thumbnailDecoratorGui: thumbnailDecorator;
-	
-	property ApplicationInfoProvider applicationInfoProvider : ApplicationInfoProvider
-	{
-		onUpdated: {
+
+	// Startup bootstrap data (app metadata, logo, version, WebSocket port) arrives via
+	// the shared ApplicationInfoProvider singleton - a single GetApplicationInfo
+	// request that also folds in what used to be separate GetWebSocketUrl / GetUserMode /
+	// CheckSuperuserExists queries (see CApplicationInfoControllerComp on the server).
+	Connections {
+		target: ApplicationInfoProvider;
+
+		function onUpdated(){
+			let serverApplicationInfo = ApplicationInfoProvider.serverApplicationInfo;
 			if (serverApplicationInfo){
 				context.appId = serverApplicationInfo.m_applicationId;
 				context.appName = serverApplicationInfo.m_applicationName;
 				Style.logoIconName = serverApplicationInfo.m_logoIconName;
 
 				pageAboutProvider.serverVersion = serverApplicationInfo.m_version
-				
+
 				AuthorizationController.productId = serverApplicationInfo.m_applicationId
+			}
+
+			if (ApplicationInfoProvider.webSocketPort >= 0){
+				application.webSocketPort = ApplicationInfoProvider.webSocketPort;
 			}
 		}
 	}
-	
+
 	property DesignSchemaProvider designProvider : DesignSchemaProvider
 	{
 	}
@@ -246,10 +318,6 @@ Item {
 				application.designProvider.selectionParam.createFromJson(designParamter.m_data)
 			}
 		}
-	}
-	
-	PatTokenSettingsController {
-		id: patTokenSettingsController
 	}
 	
 	PageAboutProvider {
@@ -294,8 +362,8 @@ Item {
 			width: parent ? parent.width : Style.sizeHintXS
 			height: contentColumn.height + 2 * Style.marginL
 			radius: Style.radiusM
-			border.color: Style.borderColor
-			color: ticketPopupRoot.notificationType === "assignee" ? Style.notificationAssigneeBgColor : Style.notificationDefaultBgColor
+			border.color: "#bbbbbb"
+			color: ticketPopupRoot.notificationType === "assignee" ? "#d4edda" : "#d6eaf8"
 
 			MouseArea {
 				anchors.fill: parent
@@ -308,7 +376,7 @@ Item {
 						ticketPopupRoot.popupContainer.removeMessageById(ticketPopupRoot.messageId)
 				}
 				onEntered: ticketPopupRoot.border.color = Style.highlightColor
-				onExited: ticketPopupRoot.border.color = Style.borderColor
+				onExited: ticketPopupRoot.border.color = "#bbbbbb"
 			}
 
 			Column {
@@ -353,7 +421,7 @@ Item {
 				BaseText {
 					width: parent.width
 					text: ticketPopupRoot.preview.split("\n").join(" ")
-					color: Style.subtitleColor
+					color: "#666666"
 					elide: Text.ElideRight
 					maximumLineCount: 1
 					visible: ticketPopupRoot.preview !== ""
@@ -362,7 +430,7 @@ Item {
 				// Hint
 				BaseText {
 					text: qsTr("Click to open →")
-					color: Style.inactiveTextColor
+					color: "#999999"
 				}
 			}
 
@@ -461,14 +529,6 @@ Item {
 		}
 	}
 	
-	WebSocketPortProvider {
-		id: webSocketPortProvider;
-		
-		onPortChanged: {
-			application.connectToWebSocketServer();
-		}
-	}
-	
 	function getWebSocketUrl(serverUrl){
 		try {
 			let url = new URL(serverUrl);
@@ -480,8 +540,8 @@ Item {
 
 			url.protocol = protocol
 
-			if (webSocketPortProvider.port >= 0){
-				url.port = webSocketPortProvider.port;
+			if (application.webSocketPort >= 0){
+				url.port = application.webSocketPort;
 			}
 			else{
 				console.error("WebSocket port provider has invalid port!");
@@ -520,9 +580,6 @@ Item {
 			if (application.serverConnected){
 				settingsController.registerParamsSetController("General", qsTr("General"), userSettingsController)
 				settingsController.registerParamsSetController("About", qsTr("About"), pageAboutProvider)
-
-				// Register PAT tokens settings (always available)
-				settingsController.registerParamsSetController("PatTokens", qsTr("PAT Tokens"), patTokenSettingsController)
 			}
 		}
 	}
@@ -536,27 +593,50 @@ Item {
 		application.updateAllModels();
 	}
 	
-	function onStrongUserManagement(){
-		let loggedUserId = AuthorizationController.getLoggedUserId();
-		if (loggedUserId === ""){
+	// After forced logout (session/refresh expired) open the login UI immediately
+	// instead of leaving the user on a connection-status overlay.
+	function enterLoggedOutUi(){
+		statusTimer.stop();
+		Events.sendEvent("SearchVisible", false);
+		Events.sendEvent("SetUserPanelEnabled", false);
+
+		if (AuthorizationController.isStrongUserManagement()){
+			// Show login right away; superuser probe may still switch to setup page.
+			thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp);
 			AuthorizationController.updateSuperuserModel();
+			return;
 		}
+
+		if (AuthorizationController.isSimpleUserManagement()){
+			application.onSimpleUserManagement();
+			return;
+		}
+
+		// User mode unknown — re-detect (async). Still show login so the UI is not blank.
+		thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp);
+		AuthorizationController.updateUserManagementModel();
 	}
 	
 	function firstModelsInit(force){
 		if (!force){
 			force = false
 		}
-		
+
 		if (!force && firstModelsIsInit){
 			return
 		}
-		
+
+		// No explicit updateUserManagementModel() call here: by the time this runs
+		// (WS reaches CONNECTION_SUCCESSFUL, which itself requires a WebSocket port
+		// obtained from the very first ApplicationInfoProvider fetch at startup),
+		// userMode/superuser status have already arrived from that same merged
+		// GetApplicationInfo response - just apply the routing decision now that
+		// the connection overlay machinery has settled (see routeUserManagementUi).
 		let loggedUserId = AuthorizationController.getLoggedUserId();
 		if (loggedUserId === ""){
-			AuthorizationController.updateUserManagementModel();
+			application.routeUserManagementUi();
 		}
-		
+
 		firstModelsIsInit = true;
 	}
 	
@@ -572,31 +652,77 @@ Item {
 		subscriptionManager_.active = true;
 	}
 	
+	// Applies the login / superuser-setup / simple-dashboard routing decision from
+	// the latest known userMode + superuser status (both arrive together in the
+	// merged ApplicationInfoProvider response - see CApplicationInfoControllerComp).
+	//
+	// Guarded on CONNECTION_SUCCESFUL: the connection-status overlay machinery
+	// (statusTimer / onTotalStatusChanged) clears thumbnailDecorator.stackView
+	// whenever it is not yet in the "connected" state, and again exactly once when
+	// it *reaches* that state. Routing before that point means the login page gets
+	// shown and then immediately wiped by that clear() - login page flashes, then
+	// a blank/gray screen. So this only acts once the overlay machinery has
+	// settled; firstModelsInit() (called from the CONNECTION_SUCCESFUL branch)
+	// re-applies it at that point using the already-cached data (no extra fetch).
+	function routeUserManagementUi(){
+		if (connectionState.totalStatus !== connectionState.status.CONNECTION_SUCCESFUL){
+			return;
+		}
+
+		if (AuthorizationController.isSimpleUserManagement()){
+			application.onSimpleUserManagement();
+			return;
+		}
+
+		if (!AuthorizationController.isStrongUserManagement()){
+			return;
+		}
+
+		let status = ApplicationInfoProvider.superuserStatus;
+		let message = ApplicationInfoProvider.superuserMessage;
+
+		if (AuthorizationController.getLoggedUserId() !== ""){
+			// Already logged in - a background refresh (e.g. on WebSocket reconnect)
+			// must not disturb the current session/page.
+			if (status === "UNKNOWN" && message){
+				console.warn("Superuser check failed:", message)
+				PopupManager.addWarningMessage(message, true)
+			}
+			return;
+		}
+
+		if (status === "EXISTS"){
+			thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp)
+		}
+		else if (status === "NOT_EXISTS"){
+			thumbnailDecorator.showPage(thumbnailDecorator.superuserPasswordPageComp)
+		}
+		else{
+			// UNKNOWN / network error (e.g. database unreachable - see
+			// CApplicationInfoControllerComp::FillSuperuserStatus): prefer the login
+			// page over a sticky "Try connecting..." message after session expiry,
+			// but surface *why* to the user instead of only logging it - a login
+			// attempt here is likely to fail too, and a silent redirect would look
+			// like the click just did nothing.
+			thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp)
+			if (message){
+				console.warn("Superuser check failed:", message)
+				PopupManager.addErrorMessage(message, true)
+			}
+		}
+	}
+
 	Connections {
 		target: AuthorizationController;
-		
+
 		function onUserModeChanged(userMode){
-			if (AuthorizationController.isStrongUserManagement()){
-				application.onStrongUserManagement();
-			}
-			else if (AuthorizationController.isSimpleUserManagement()){
-				application.onSimpleUserManagement();
-			}
+			application.routeUserManagementUi();
 		}
-		
+
 		function onSuperuserExistResult(status, message){
-			if (status === "EXISTS"){
-				thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp)
-			}
-			else if (status === "NOT_EXISTS"){
-				thumbnailDecorator.showPage(thumbnailDecorator.superuserPasswordPageComp)
-			}
-			else{
-				// UNKNOWN
-				application.showMessagePage(message);
-			}
+			application.routeUserManagementUi();
 		}
-		
+
 		function onLoggedIn(){
 			thumbnailDecorator.drawingContainer.content = Style.drawingContainerDecorator;
 			thumbnailDecorator.showPage(undefined)
@@ -620,27 +746,45 @@ Item {
 			ticketAssigneeSubscription.unRegisterSubscription();
 
 			thumbnailDecorator.stopLoading();
-			application.firstModelsInit(true);
 			NavigationController.clear();
 			subscriptionManager_.clear();
+			// Force login UI after session/refresh death (do not wait on connection state).
+			application.enterLoggedOutUi();
+			application.firstModelsIsInit = false;
 		}
 	}
 	
+	// Retries the bootstrap fetch until a WebSocket port is known. The first retry is
+	// deliberately quick (a cold start that just lost a race with the server should
+	// not cost three seconds), then backs off so an unreachable server is not polled
+	// at a fixed 3s forever. ApplicationInfoProvider is single-flight, so a slow
+	// response never stacks duplicate requests.
 	property Timer timer: Timer{
-		interval: 3000;
+		readonly property int minInterval: 1000;
+		readonly property int maxInterval: 15000;
+
+		interval: minInterval;
 		repeat: true;
-		running: application.useWebSocketSubscription && webSocketPortProvider.port == -1;
+		running: application.useWebSocketSubscription && application.webSocketPort == -1;
 		onTriggered: {
+			interval = Math.min(interval * 2, maxInterval);
+
 			onTriggeredFunc();
 		}
-		
+
+		onRunningChanged: {
+			if (running){
+				interval = minInterval;
+			}
+		}
+
 		function onTriggeredFunc(){
 			if (!application.useWebSocketSubscription){
 				return;
 			}
-			
-			if (webSocketPortProvider.port == -1){
-				webSocketPortProvider.updateModel();
+
+			if (application.webSocketPort == -1){
+				ApplicationInfoProvider.updateModel();
 			}
 		}
 	}

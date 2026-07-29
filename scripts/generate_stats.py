@@ -102,6 +102,7 @@ class RepositoryStats:
                 'dependency_inversion': {
                     'abstract_dependencies': 0,
                     'concrete_dependencies': 0,
+                    'low_abstraction_files': [],
                 },
             },
         }
@@ -1175,13 +1176,28 @@ class RepositoryStats:
         # Note: This heuristic assumes ACF naming convention where interfaces
         # start with 'I' followed by uppercase letter (e.g., IComponent, ISerializable)
         for file_path, includes in self.stats['code_structure']['include_dependencies'].items():
+            file_abstract = 0
+            file_concrete = 0
             for include in includes:
                 # Check if it's an interface (starts with 'I' and has uppercase second letter)
                 include_name = include.split('/')[-1].replace('.h', '')
                 if len(include_name) > 1 and include_name[0] == 'I' and include_name[1].isupper():
                     self.stats['solid_metrics']['dependency_inversion']['abstract_dependencies'] += 1
+                    file_abstract += 1
                 else:
                     self.stats['solid_metrics']['dependency_inversion']['concrete_dependencies'] += 1
+                    file_concrete += 1
+            # Track files with many concrete dependencies and low abstraction ratio
+            total_file_deps = file_abstract + file_concrete
+            if total_file_deps >= 5 and file_concrete > 0:
+                ratio = file_abstract / total_file_deps
+                if ratio < 0.3:
+                    self.stats['solid_metrics']['dependency_inversion']['low_abstraction_files'].append({
+                        'file': file_path,
+                        'abstract': file_abstract,
+                        'concrete': file_concrete,
+                        'ratio': round(ratio, 2)
+                    })
         
         # Calculate SOLID compliance score
         self.stats['summary']['solid_compliance_score'] = self.calculate_solid_score()

@@ -1,0 +1,71 @@
+schema {
+	namespace: imtbase
+	version: 1.0
+	query: Query
+}
+
+enum FileSystemEntryType {
+	File
+	Dir
+	Symlink
+	Drive
+}
+
+# Client-requested column sort for GetFileSystemEntries.
+# Name is the default (dirs-first, case-insensitive).
+# Date maps to lastModified for files/folders and freeBytes for drives.
+# Size maps to size for files and totalBytes for drives (folders sort as 0).
+enum FileSystemSortBy {
+	Name
+	Date
+	Size
+}
+
+input GetFileSystemEntriesInput
+{
+	path: String
+	offset: Int
+	limit: Int
+	# Case-insensitive name filter on the entry display name.
+	# Default: shell-style glob (* = any chars, ? = one char; other characters
+	# are literal — so "*.exe" works). Full PCRE regex when wrapped as /pattern/.
+	# Invalid patterns fall back to literal substring match.
+	# Applied before sort and pagination; totalCount/hasMore reflect the filter.
+	nameFilter: String
+	# Semicolon-separated list of file extensions to include (without the dot,
+	# e.g. "exe;dll"). Case-insensitive; empty/absent = all files. Token "*"
+	# (or "none") allows extensionless file names (Linux executables). Applies
+	# to files only - folders are always listed so navigation is never blocked.
+	# Applied before sort and pagination (totalCount/hasMore reflect it).
+	extensionFilter: String
+	sortBy: FileSystemSortBy
+	# Default true (A→Z / oldest / smallest). false = reverse.
+	sortAscending: Boolean
+}
+
+type FileSystemEntry
+{
+	name: String!
+	path: String!
+	entryType: FileSystemEntryType!
+	size: Int
+	lastModified: String
+	# Volume capacity, sent for Drive entries only. Double (not Int) because a
+	# byte count of a drive overflows 32 bits; Double holds exact integers well
+	# past any real volume size.
+	totalBytes: Double
+	freeBytes: Double
+}
+
+type GetFileSystemEntriesPayload
+{
+	path: String!
+	parentPath: String
+	entries: [FileSystemEntry!]
+	totalCount: Int!
+	hasMore: Boolean!
+}
+
+type Query {
+	GetFileSystemEntries(input: GetFileSystemEntriesInput): GetFileSystemEntriesPayload!
+}

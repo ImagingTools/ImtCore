@@ -2,8 +2,6 @@
 import QtQuick 2.15
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
-import imtcontrols 1.0
 
 Rectangle {
 	id: ticketBadgeRoot
@@ -19,9 +17,9 @@ Rectangle {
 	property string labelName: ""
 
 	readonly property var _colorMap: ({
-		"status":      [Style.statusOpenColor, Style.statusClosedColor],
-		"priority":    [Style.priorityLowColor, Style.priorityMediumColor, Style.priorityHighColor, Style.priorityCriticalColor],
-		"stateReason": [Style.indicatorInactiveColor, Style.statusClosedColor, Style.indicatorInactiveColor, Style.linkColor]
+		"status":      ["#1a7f37", "#8957e5"],
+		"priority":    ["#4CAF50", "#FF9800", "#F44336", "#9C27B0"],
+		"stateReason": ["#9E9E9E", "#8957e5", "#9E9E9E", "#2196F3"]
 	})
 
 	readonly property var _labelMap: ({

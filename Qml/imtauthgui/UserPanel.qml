@@ -2,12 +2,11 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
-import imtgui 1.0
 import imtguigql 1.0
 import imtauthProfileSdl 1.0
 
 Item {
-	id: root;
+	id: userPanel;
 	
 	width: 50;
 	height: Style.controlHeightM;
@@ -16,47 +15,51 @@ Item {
 	
 	property alias iconSource: loginButton.iconSource;
 	property bool isExitButton: false;
-	
+
+	// Concrete transport injected into the Profile dialog (mirrors how
+	// TenantCollectionView owns tenantManagementApiClient for the TenantEditor).
+	property GqlBasedProfileApiClient profileApiClient: GqlBasedProfileApiClient {}
+
 	Component.onCompleted: {
-		Events.subscribeEvent("SetUserPanelEnabled", root.setUserPanelEnabled);
-		root.__loadOrganizations();
+		Events.subscribeEvent("SetUserPanelEnabled", userPanel.setUserPanelEnabled);
+		userPanel.__loadOrganizations();
 	}
 	
 	Component.onDestruction: {
-		Events.unSubscribeEvent("SetUserPanelEnabled", root.setUserPanelEnabled);
+		Events.unSubscribeEvent("SetUserPanelEnabled", userPanel.setUserPanelEnabled);
 	}
 
 	Connections {
 		target: AuthorizationController;
 		
 		function onLoggedIn(){
-			root.enabled = true;
-			root.__loadOrganizations();
+			userPanel.enabled = true;
+			userPanel.__loadOrganizations();
 		}
 		
 		function onLoggedOut(){
-			root.enabled = false;
+			userPanel.enabled = false;
 		}
 
 		function onTenantSelected(tenantId){
-			root.__loadOrganizations();
+			userPanel.__loadOrganizations();
 		}
 
 		function onTenantInvitationAccepted(tenantId, membershipId){
-			root.__loadOrganizations();
+			userPanel.__loadOrganizations();
 		}
 
 		function onTenantInvitationRejected(tenantId, membershipId){
-			root.__loadOrganizations();
+			userPanel.__loadOrganizations();
 		}
 	}
 	
 	function setUserPanelEnabled(enabled){
-		root.enabled = enabled;
+		userPanel.enabled = enabled;
 	}
 	
 	function setVisible(visible){
-		root.visible = visible;
+		userPanel.visible = visible;
 	}
 
 	// --- Organizations list for context menu ---
@@ -96,7 +99,7 @@ Item {
 							}
 						}
 					}
-					root.__organizationsList = list
+					userPanel.__organizationsList = list
 					contextMenuModel.fillModel()
 				}
 			}
@@ -110,7 +113,7 @@ Item {
 
 	Text {
 		id: tenantText;
-		anchors.verticalCenter: root.verticalCenter;
+		anchors.verticalCenter: userPanel.verticalCenter;
 		anchors.right: usernameText.left;
 		anchors.rightMargin: Style.marginM;
 		color: Style.inactiveTextColor;
@@ -122,7 +125,7 @@ Item {
 
 	Text {
 		id: usernameText;
-		anchors.verticalCenter: root.verticalCenter;
+		anchors.verticalCenter: userPanel.verticalCenter;
 		anchors.right: loginButton.left;
 		anchors.rightMargin: Style.marginXS;
 		color: Style.textColor;
@@ -133,19 +136,25 @@ Item {
 	
 	ToolButton {
 		id: loginButton;
-		
+
+		// Test instrumentation: this ToolButton sets no `text` (icon-only), so it would otherwise
+		// resolve to the generic, non-unique "Button" shared by every untexted ToolButton on the page -
+		// and unlike a one-off dialog button, THIS one is present on every single page. Inert - no
+		// runtime/visual effect.
+		objectName: "UserPanelButton";
+
 		anchors.right: parent ? parent.right : undefined;
-		anchors.verticalCenter: root.verticalCenter;
+		anchors.verticalCenter: userPanel.verticalCenter;
 		
 		width: Style.buttonWidthM;
 		height: width;
 		
 		iconSource: "../../../" + Style.getIconPath("Icons/Account", Icon.State.On, Icon.Mode.Normal);
 		
-		enabled: root.enabled;
+		enabled: userPanel.enabled;
 		
 		onClicked: {
-			if(root.isExitButton){
+			if(userPanel.isExitButton){
 				AuthorizationController.logout();
 			}
 			else{
@@ -187,8 +196,8 @@ Item {
 			contextMenuModel.append({"id": "Profile", "name": profileName, "icon": "Icons/Account", "isEnabled": true});
 			contextMenuModel.append({"id": "", "name": "", "Icon": ""});
 
-			for (var i = 0; i < root.__organizationsList.length; i++) {
-				var orgData = root.__organizationsList[i];
+			for (var i = 0; i < userPanel.__organizationsList.length; i++) {
+				var orgData = userPanel.__organizationsList[i];
 				if (!orgData || !orgData.id)
 					continue;
 
@@ -257,10 +266,10 @@ Item {
 			id: organizationsSubmenu
 			title: qsTr("Organization")
 			Instantiator {
-				model: root.__organizationsList.length
+				model: userPanel.__organizationsList.length
 
 				delegate: MenuItem {
-					property var orgData: root.__organizationsList[index]
+					property var orgData: userPanel.__organizationsList[index]
 					text: orgData ? orgData.name : ""
 					checked: orgData && orgData.id === AuthorizationController.currentTenantId
 					onTriggered: {
@@ -275,7 +284,7 @@ Item {
 			}
 
 			MenuSeparator {
-				visible: root.__organizationsList.length > 0
+				visible: userPanel.__organizationsList.length > 0
 			}
 
 			MenuItem {
@@ -299,7 +308,7 @@ Item {
 		}
 
 		onAboutToShow: {
-			root.__loadOrganizations()
+			userPanel.__loadOrganizations()
 		}
 	}
 
@@ -308,14 +317,16 @@ Item {
 		
 		Dialog {
 			id: dialog;
-			width: 760;
+			width: Math.max(Style.sizeHintXXL, Math.min(ModalDialogManager.activeView.width - 160, 1120));
 			height: ModalDialogManager.activeView.height - 100;
 			title: qsTr("Profile");
 			canMove: false;
+			backgroundColor: Style.baseColor;
 			contentComp: Component {
 				ProfileView {
 					width: dialog.width;
 					height: dialog.height - 40;
+					apiClient: userPanel.profileApiClient;
 				}
 			}
 		}

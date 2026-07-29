@@ -3,7 +3,7 @@ module imtgui
 ApplicationMain 1.0 ./Application/ApplicationMain.qml
 Configurator 1.0 ./Application/Configurator.qml
 AlertMessage 1.0 ./Application/AlertMessage.qml
-ApplicationInfoProvider 1.0 ./Application/ApplicationInfoProvider.qml
+singleton ApplicationInfoProvider 1.0 ./Application/ApplicationInfoProvider.qml
 DatabaseBackupController 1.0 ./Application/DatabaseBackupController.qml
 DesignSchemaProvider 1.0 ./Application/DesignSchemaProvider.qml
 LanguageProvider 1.0 ./Application/LanguageProvider.qml
@@ -48,11 +48,15 @@ ServerLogProvider 1.0 Settings/ServerLogProvider.qml
 SettingsObserver 1.0 Settings/SettingsObserver.qml
 SettingsProvider 1.0 Settings/SettingsProvider.qml
 SettingsController 1.0 Settings/SettingsController.qml
-PatTokenSettingsController 1.0 Settings/PatTokenSettingsController.qml
 
 MultiPageView 1.0 View/MultiPageView.qml
 TabView 1.0 View/TabView.qml
 Pagination 1.0 View/Pagination.qml
+SimpleCollectionTable 1.0 View/SimpleCollectionTable.qml
+SimpleCollectionTableFrame 1.0 View/SimpleCollectionTableFrame.qml
+SimpleCollectionTableHeader 1.0 View/SimpleCollectionTableHeader.qml
+SimpleCollectionStateOverlay 1.0 View/SimpleCollectionStateOverlay.qml
+SimpleCollectionItemDelegateBase 1.0 View/SimpleCollectionItemDelegateBase.qml
 ServerNoConnectionView 1.0 View/ServerNoConnectionView.qml
 SimpleCommandsDecorator 1.0 View/SimpleCommandsDecorator.qml
 SearchComp 1.0 View/SearchComp.qml
@@ -114,7 +118,5 @@ ConstrainedDoubleParamEditor 1.0 Params/ConstrainedDoubleParamEditor.qml
 IntegerParamEditor 1.0 Params/IntegerParamEditor.qml
 EnableableParamEditor 1.0 Params/EnableableParamEditor.qml
 ServerConnectionParamEditor 1.0 Params/ServerConnectionParamEditor.qml
-PatTokenListParam 1.0 Params/PatTokenListParam.qml
-PatTokenParamEditor 1.0 Params/PatTokenParamEditor.qml
 
 

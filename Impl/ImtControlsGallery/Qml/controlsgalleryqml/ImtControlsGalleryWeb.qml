@@ -2,10 +2,11 @@ import QtQuick 2.0
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 
-Item {
+Window {
     id: window;
 
-    anchors.fill: parent;
+    // anchors.fill: parent;
+    title: qsTr("Gallery")
 
     ImtControlsGalleryMain {
         id: application;

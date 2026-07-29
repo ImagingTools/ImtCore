@@ -78,6 +78,7 @@ class QmlWheelEvent {
     path = []
 
     accepted = false
+    modifiers = QtEnums.NoModifier
     angleDelta = {
         x: 0,
         y: 0,
@@ -114,6 +115,7 @@ class QmlWheelEvent {
 module.exports = {
     objects: new Set(),
     dropAreas: new Set(),
+    activePointerHandlers: new Set(),
 
     buttons: {
         0: {
@@ -159,6 +161,65 @@ module.exports = {
             while(index >= 0){
                 this.event.path.splice(index, 1)
                 index = this.event.path.indexOf(obj)
+            }
+        }
+    },
+
+    __isPointerHandler: function(obj){
+        if(!obj || obj.__destroyed) return false
+        return obj instanceof JQModules.QtQuick.PointerHandler
+    },
+
+    __collectHandlersFromOwner: function(owner, result){
+        if(!owner || owner.__destroyed || !owner.resources || !Array.isArray(owner.resources)) return
+
+        for(let resource of owner.resources){
+            if(this.__isPointerHandler(resource)){
+                result.add(resource)
+            }
+        }
+    },
+
+    __collectPointerHandlersForPath: function(path){
+        let handlers = new Set()
+        if(!Array.isArray(path)) return handlers
+
+        for(let obj of path){
+            let parent = obj
+            while(parent){
+                this.__collectHandlersFromOwner(parent, handlers)
+                parent = parent.parent
+            }
+        }
+
+        return handlers
+    },
+
+    __pruneActivePointerHandlers: function(){
+        for(let handler of this.activePointerHandlers){
+            if(!handler || handler.__destroyed || !handler.enabled || !handler.active){
+                this.activePointerHandlers.delete(handler)
+            }
+        }
+    },
+
+    __dispatchPointerHandlers: function(handlers, methodName, event){
+        if(!handlers || handlers.size === 0) return
+
+        for(let handler of handlers){
+            if(!handler || handler.__destroyed || typeof handler[methodName] !== 'function') continue
+
+            let target = typeof handler.__getEffectiveTarget === 'function' ? handler.__getEffectiveTarget() : null
+            if(target && target.__DOM && typeof event.relative === 'function'){
+                event.relative(target)
+            }
+
+            handler[methodName](event)
+
+            if(handler.active){
+                this.activePointerHandlers.add(handler)
+            } else {
+                this.activePointerHandlers.delete(handler)
             }
         }
     },
@@ -404,6 +465,18 @@ module.exports = {
 
                 i++
             }
+
+            let pathHandlers = this.__collectPointerHandlersForPath(event.path)
+            this.__dispatchPointerHandlers(pathHandlers, '__onMouseMove', event)
+            this.__pruneActivePointerHandlers()
+            let activeHandlers = new Set()
+            for(let handler of this.activePointerHandlers){
+                if(!pathHandlers.has(handler)){
+                    activeHandlers.add(handler)
+                }
+            }
+            this.__dispatchPointerHandlers(activeHandlers, '__onMouseMove', event)
+            this.__pruneActivePointerHandlers()
         })
 
         window.addEventListener('click', (e)=>{
@@ -434,12 +507,16 @@ module.exports = {
             this.event.startX = e.pageX
             this.event.startY = e.pageY
             this.event.path = this.getObjectsFromPoint(e.pageX, e.pageY)
+            let handlers = this.__collectPointerHandlersForPath(this.event.path)
 
             for(let obj of this.event.path){
                 this.event.accepted = true
                 this.event.relative(obj)
                 obj.__onMouseDown(this.event) 
-            }  
+            }
+
+            this.__dispatchPointerHandlers(handlers, '__onMouseDown', this.event)
+            this.__pruneActivePointerHandlers()
         })
         window.addEventListener('mouseup', (e)=>{
             if(this.event){
@@ -459,12 +536,17 @@ module.exports = {
                 this.event.fillButton(e)
                 this.event.originX = e.pageX
                 this.event.originY = e.pageY
+
+                this.__dispatchPointerHandlers(this.activePointerHandlers, '__onMouseUp', this.event)
+                this.__pruneActivePointerHandlers()
                 
                 if(this.event.target) {
                     this.event.relative(this.event.target)
                     this.event.target.__onMouseUp(this.event)
                     this.__finishMouseAreaDrag(this.event.target)
                 }
+
+                this.activePointerHandlers.clear()
             }
         })
         window.addEventListener('contextmenu', (e)=>{
@@ -495,11 +577,27 @@ module.exports = {
         // })
         window.addEventListener('wheel', (e)=>{
             this.event = new QmlWheelEvent()
+
+            let modifiers = QtEnums.NoModifier
+            if(e.shiftKey) {
+                modifiers |= QtEnums.ShiftModifier
+            }
+            if(e.altKey) {
+                modifiers |= QtEnums.AltModifier
+            }
+            if(e.ctrlKey) {
+                modifiers |= QtEnums.ControlModifier
+            }
+
+            this.event.modifiers = modifiers
             this.event.originX = e.pageX
             this.event.originY = e.pageY
             this.event.angleDelta.x = e.deltaX / 8
             this.event.angleDelta.y = e.deltaY / 8
             this.event.path = this.getObjectsFromPoint(e.pageX, e.pageY)
+            let handlers = this.__collectPointerHandlersForPath(this.event.path)
+
+            this.__dispatchPointerHandlers(handlers, '__onWheel', this.event)
 
             for(let obj of this.event.path){
                 if(!this.event.accepted || !this.event.target){

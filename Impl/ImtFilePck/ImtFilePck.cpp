@@ -25,6 +25,11 @@ I_EXPORT_COMPONENT(
 			"File format conversion",
 			"File Format Conversion");
 
+I_EXPORT_COMPONENT(
+			FileSystemStructureProvider,
+			"File system structure provider",
+			"File System Structure Provider Folder");
+
 
 } // namespace ImtFilePck
 

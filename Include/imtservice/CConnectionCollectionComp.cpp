@@ -10,6 +10,35 @@ namespace imtservice
 {
 
 
+namespace
+{
+
+
+/**
+	Copy host/ports/path/flags through the IServerConnectionInterface accessors.
+
+	Unlike IChangeable::CopyFrom(), which most implementations (e.g. CUrlConnectionParam)
+	restrict to their own exact concrete type, every implementation of
+	IServerConnectionInterface supports these setters directly, so this works between
+	unrelated concrete classes (e.g. copying a CServerConnectionInterfaceParam built by a
+	caller into a CUrlConnectionParam held by this collection).
+*/
+void CopyServerConnectionInterface(imtcom::IServerConnectionInterface& target, const imtcom::IServerConnectionInterface& source)
+{
+	target.SetHost(source.GetHost());
+	target.SetConnectionFlags(source.GetConnectionFlags());
+
+	const imtcom::IServerConnectionInterface::ProtocolTypes protocols = source.GetSupportedProtocols();
+	for (imtcom::IServerConnectionInterface::ProtocolType protocol : protocols){
+		target.SetPort(protocol, source.GetPort(protocol));
+		target.SetPath(protocol, source.GetPath(protocol));
+	}
+}
+
+
+} // namespace
+
+
 // public methods
 
 // reimplemented (imtservice::IConnectionCollection)
@@ -79,22 +108,21 @@ bool CConnectionCollectionComp::SetServerConnectionInterface(const QByteArray& c
 
 	imtcom::IServerConnectionInterface* urlConnectionParam =  dynamic_cast<imtcom::IServerConnectionInterface*>(notConstObjectPtr);
 	if (urlConnectionParam != nullptr){
-		bool retVal = true;
 		imtbase::ICollectionInfo::Ids elementIds = m_collection.GetElementIds();
 		for (int index = 0; index < elementIds.size(); index++){
 			const imtbase::ICollectionInfo::Id& elementId = elementIds[index];
 			if (elementId == connectionId){
 				if (index < m_serverInterfaceListCompPtr.GetCount()){
-					retVal = retVal && m_serverInterfaceListCompPtr[index]->CopyFrom(connectionInterface);
+					// Not CopyFrom(): it requires an exact concrete-type match (e.g.
+					// CUrlConnectionParam::CopyFrom rejects a CServerConnectionInterfaceParam
+					// source), which a caller updating just host/port never has.
+					CopyServerConnectionInterface(*m_serverInterfaceListCompPtr[index], connectionInterface);
+					CopyServerConnectionInterface(*urlConnectionParam, connectionInterface);
 
-					retVal = retVal && urlConnectionParam->CopyFrom(connectionInterface);
-
-					break;
+					return true;
 				}
 			}
 		}
-
-		return retVal;
 	}
 
 	return false;
