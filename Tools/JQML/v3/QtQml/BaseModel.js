@@ -92,11 +92,11 @@ class BaseModel extends ListModel {
 				
 				if(typeof itemValue === 'object'){
 					if(itemValue instanceof QtObject) {
-						graphQL += '"' + item.getJSONKeyForProperty(key) + '":' + itemValue.toGraphQL()
+						graphQL += item.getJSONKeyForProperty(key) + ':' + itemValue.toGraphQL()
 					} else if(itemValue !== null){
-						graphQL += '"' + item.getJSONKeyForProperty(key) + '":' + JSON.stringify(itemValue)
+						graphQL += item.getJSONKeyForProperty(key) + ':' + JSON.stringify(itemValue)
 					} else {
-						graphQL += '"' + item.getJSONKeyForProperty(key) + '": null'
+						graphQL += item.getJSONKeyForProperty(key) + ': null'
 					}
 				} else {
 					let value = itemValue

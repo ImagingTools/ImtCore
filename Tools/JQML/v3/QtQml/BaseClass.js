@@ -469,11 +469,11 @@ class BaseClass extends QtObject {
 			isFirst = false
 			if (typeof thisValue === 'object') {
 				if(thisValue instanceof QtObject) {
-					graphQL += '"' + this.getJSONKeyForProperty(key) + '":' + thisValue.toGraphQL()
+					graphQL += this.getJSONKeyForProperty(key) + ':' + thisValue.toGraphQL()
 				} else if(thisValue !== null){
-					graphQL += '"' + this.getJSONKeyForProperty(key) + '":' + JSON.stringify(thisValue)
+					graphQL += this.getJSONKeyForProperty(key) + ':' + JSON.stringify(thisValue)
 				} else {
-					graphQL += '"' + this.getJSONKeyForProperty(key) + '": null'
+					graphQL += this.getJSONKeyForProperty(key) + ': null'
 				}
 			} else {
 				let value = thisValue
