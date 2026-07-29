@@ -25,7 +25,7 @@ class PointerHandler extends QtObject {
         enabled: { type: Bool, value: true},
         grabPermissions: { type: Int, value: PointerHandler.CanTakeOverFromItems | PointerHandler.CanTakeOverFromHandlersOfDifferentType | PointerHandler.ApprovesTakeOverByAnything },
         margin: { type: Real, value: 0},
-        target: { type: Var, value: null},
+        target: { type: Var, value: undefined},
 
         activeChanged: { type:Signal, args:[] },
         cursorShapeChanged: { type:Signal, args:[] },
@@ -43,9 +43,77 @@ class PointerHandler extends QtObject {
     }
 
     __getEffectiveTarget(){
-        if(this.target) return this.target
+        if(this.target !== undefined) return this.target
         if(this.parent && this.parent instanceof JQModules.QtQuick.Item) return this.parent
         return null
+    }
+
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
+
+        let dom = obj.__getDOM()
+        dom.classList.add('PointerHandler')
+        dom.qml = obj
+
+        JQApplication.MouseController.add(obj)
+        obj.__connectDOM(parent)
+
+        return obj
+    }
+
+    __getDOM(){
+        let dom = this.__DOM
+        if(dom) {
+            return dom
+        }
+
+        dom = document.createElement('div')
+        dom.style.position = 'absolute'
+        dom.style.left = '0px'
+        dom.style.top = '0px'
+        dom.style.right = '0px'
+        dom.style.bottom = '0px'
+        dom.style.width = '100%'
+        dom.style.height = '100%'
+        dom.style.pointerEvents = 'auto'
+        dom.style.opacity = '0'
+        this.__DOM = dom
+        return dom
+    }
+
+    __setDOMStyle(style){
+        let dom = this.__DOM
+
+        if(dom) {
+            for(let name in style){
+                dom.style[name] = style[name]
+            }
+        }
+    }
+
+    __connectDOM(target){
+        let dom = this.__getDOM()
+        if(target && dom){
+            if(typeof target.__getDOM === 'function'){
+                let parentDOM = target.__getDOM()
+                if(parentDOM) parentDOM.appendChild(dom)
+            } else if(target instanceof Node){
+                target.appendChild(dom)
+            }
+        }
+    }
+
+    SLOT_parentChanged(oldValue, newValue){
+        super.SLOT_parentChanged(oldValue, newValue)
+        this.__connectDOM(newValue)
+    }
+
+    __destroy(){
+        JQApplication.MouseController.remove(this)
+        if(this.__DOM && this.__DOM.parentNode){
+            this.__DOM.parentNode.removeChild(this.__DOM)
+        }
+        super.__destroy()
     }
 }
 
