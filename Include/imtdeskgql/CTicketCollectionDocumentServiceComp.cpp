@@ -9,6 +9,7 @@
 
 // Qt includes
 #include <QtCore/QFileInfo>
+#include <QtCore/QUuid>
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
@@ -476,6 +477,10 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTicketCollectionDocumentServiceCom
 				// Existing messages (with id) may be edited or deleted.
 				if (sdlItem->id && !sdlItem->id->isEmpty()){
 					QByteArray messageId = *sdlItem->id;
+
+					if (QUuid::fromString(QString::fromUtf8(messageId)).isNull()){
+						continue;
+					}
 
 					// Delete request (explicit `deleted: true` flag from client).
 					if (sdlItem->deleted && *sdlItem->deleted){

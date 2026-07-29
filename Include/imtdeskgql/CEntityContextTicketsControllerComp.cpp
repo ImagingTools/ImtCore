@@ -2,6 +2,7 @@
 #include <imtdeskgql/CEntityContextTicketsControllerComp.h>
 
 // Qt includes
+#include <QtCore/QMetaEnum>
 #include <QtCore/QUuid>
 #include <QtCore/QtGlobal>
 
@@ -51,6 +52,50 @@ bool TicketHasEntityContext(
 }
 
 
+/**
+ * Renders a Q_ENUM_NS value as its key ("Open", "Closed", ...), which is both
+ * what the wire format carries and what the user sees on the ticket badge.
+ */
+template <typename EnumType>
+QString EnumKeyString(EnumType value)
+{
+	const char* keyPtr = QMetaEnum::fromType<EnumType>().valueToKey(static_cast<int>(value));
+
+	return (keyPtr != nullptr) ? QString::fromLatin1(keyPtr) : QString();
+}
+
+
+/**
+ * Case-insensitive "contains" over the fields a ticket row actually shows, so
+ * what the user types matches what the user sees. An empty filter matches
+ * everything.
+ */
+bool MatchesTicketFilter(const sdl::V1_0::imtdesk::CTicketItemData& itemData, const QString& filterText)
+{
+	if (filterText.isEmpty()){
+		return true;
+	}
+
+	if (itemData.title && itemData.title->contains(filterText, Qt::CaseInsensitive)){
+		return true;
+	}
+	if (itemData.assignee && itemData.assignee->contains(filterText, Qt::CaseInsensitive)){
+		return true;
+	}
+	if (itemData.number && QString::number(*itemData.number).contains(filterText)){
+		return true;
+	}
+	if (itemData.status && EnumKeyString(*itemData.status).contains(filterText, Qt::CaseInsensitive)){
+		return true;
+	}
+	if (itemData.priority && EnumKeyString(*itemData.priority).contains(filterText, Qt::CaseInsensitive)){
+		return true;
+	}
+
+	return false;
+}
+
+
 } // namespace
 
 
@@ -88,12 +133,20 @@ sdl::V1_0::imtdesk::CEntityContextTicketsPayload CEntityContextTicketsController
 
 	int offset = 0;
 	int count = 250;
+	QString filterText;
 	if (arguments.input->viewParams){
-		if (arguments.input->viewParams->offset){
-			offset = qMax(0, *arguments.input->viewParams->offset);
+		const auto& viewParams = *arguments.input->viewParams;
+		if (viewParams.offset){
+			offset = qMax(0, *viewParams.offset);
 		}
-		if (arguments.input->viewParams->count){
-			count = qMax(1, *arguments.input->viewParams->count);
+		if (viewParams.count){
+			count = qMax(1, *viewParams.count);
+		}
+		if (viewParams.filterModel){
+			const auto& filterModel = *viewParams.filterModel;
+			if (filterModel.textFilter && filterModel.textFilter->text){
+				filterText = *filterModel.textFilter->text;
+			}
 		}
 	}
 
@@ -126,15 +179,6 @@ sdl::V1_0::imtdesk::CEntityContextTicketsPayload CEntityContextTicketsController
 			continue;
 		}
 
-		if (matchedCount < offset){
-			++matchedCount;
-			continue;
-		}
-
-		if (count >= 0 && itemList.size() >= count){
-			break;
-		}
-
 		sdl::V1_0::imtdesk::CTicketItemData itemData;
 		itemData.id = ticketPtr->GetId();
 		itemData.typeId = iteratorPtr->GetObjectTypeId();
@@ -150,9 +194,26 @@ sdl::V1_0::imtdesk::CEntityContextTicketsPayload CEntityContextTicketsController
 		}
 		itemData.assignee = assigneeNames.join(';');
 
-		itemList << itemData;
+		if (!MatchesTicketFilter(itemData, filterText)){
+			continue;
+		}
+
+		// Keep counting past the end of the requested page: totalCount has to
+		// describe the whole match set, not the slice being returned.
+		const int matchIndex = matchedCount;
 		++matchedCount;
+
+		if (matchIndex < offset){
+			continue;
+		}
+		if (count >= 0 && itemList.size() >= count){
+			continue;
+		}
+
+		itemList << itemData;
 	}
+
+	response.totalCount = matchedCount;
 
 	if (!itemList.isEmpty()){
 		response.items.Emplace().FromList(itemList);
