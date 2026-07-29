@@ -1,134 +1,69 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtcontrols 1.0
 import imtgui 1.0
 import imtauthgui 1.0
 
 Rectangle {
-	id: historyPanel;
-	z: parent.z + 1;
-	anchors.top: parent.top;
-	anchors.right: parent.right;
-	anchors.bottom: parent.bottom;
+	id: historyPanel
 
-	width: contentWidth;
-	color: Style.baseColor;
+	z: parent.z + 1
+	anchors.top: parent.top
+	anchors.right: parent.right
+	anchors.bottom: parent.bottom
 
-	property bool opened: false;
-	property int contentWidth: Style.sizeHintL;
-	property int collapsedWidth: Style.buttonHeightS + 2 * Style.marginXL;
-	property alias contentHeight: historyView.contentHeight;
-	property string documentId: "";
-	property alias collectionId: historyView.collectionId;
-	property Flickable editorFlickable;
+	width: contentWidth
+	color: Style.baseColor
+
+	property int contentWidth: Style.sizeHintL
+	property string documentId: ""
+	property alias collectionId: historyView.collectionId
+	property alias contentHeight: historyView.contentHeight
 
 	Component.onCompleted: {
-		historyPanel.visible = PermissionsController.checkPermission("ViewRevisions");
-		if (!historyPanel.opened){
-			historyPanel.width = historyPanel.collapsedWidth;
-		}
-	}
-
-	Connections {
-		target: historyPanel.editorFlickable;
-
-		function onContentXChanged(){
-			historyView.flickable.contentX = historyPanel.editorFlickable.contentX;
-		}
-
-		function onContentYChanged(){
-			historyView.flickable.contentY = historyPanel.editorFlickable.contentY;
-		}
-	}
-
-	NumberAnimation {
-		id: animation;
-		property: "width";
-		duration: 200;
-		target: historyPanel;
-	}
-
-	onOpenedChanged: {
-		if (opened){
-			animation.from = historyPanel.collapsedWidth;
-			animation.to = contentWidth;
-		}
-		else{
-			animation.from = contentWidth;
-			animation.to = historyPanel.collapsedWidth;
-		}
-
-		animation.start();
+		historyPanel.visible = PermissionsController.checkPermission("ViewRevisions")
 	}
 
 	Rectangle {
-		id: separator;
-		anchors.top: parent.top;
-		anchors.left: parent.left;
-		width: 1;
-		height: parent.height;
-		color: Style.borderColor;
-		visible: historyPanel.opened;
+		id: separator
+		anchors.top: parent.top
+		anchors.left: parent.left
+		width: 1
+		height: parent.height
+		color: Style.borderColor
 	}
 
 	GroupHeaderView {
-		id: historyHeader;
-		anchors.left: parent.left;
-		anchors.leftMargin: Style.marginXL;
-		anchors.top: parent.top;
-		anchors.topMargin: Style.marginXL;
-		anchors.right: parent.right;
-		anchors.rightMargin: Style.marginXL;
-		title: qsTr("History");
-		titleText.visible: historyPanel.width == historyPanel.contentWidth;
-		
-		controlComp: Component {
-			id: baseControlComp;
-
-			ToolButton {
-				id: openButton;
-
-				// Test instrumentation: this ToolButton sets no `text` (icon-only), so it would
-				// otherwise resolve to the generic, non-unique "Button" shared by every untexted
-				// ToolButton on the page - and this panel is embedded identically in every document
-				// editor (Devices/Orders/Accounts/Software/...). Inert - no runtime/visual effect.
-				objectName: "HistoryPanelToggle";
-
-				height: Style.buttonHeightS;
-				width: height;
-				iconSource: historyPanel.opened
-							? "../../../" + Style.getIconPath("Icons/History", Icon.State.On, Icon.Mode.Normal)
-							: "../../../" + Style.getIconPath("Icons/History", Icon.State.On, Icon.Mode.Normal);
-				visible: true;
-				checkable: true;
-				checked: historyPanel.opened;
-				onClicked: {
-					historyPanel.opened = !historyPanel.opened;
-				}
-			}
-		}
+		id: historyHeader
+		anchors.left: parent.left
+		anchors.leftMargin: Style.marginXL
+		anchors.top: parent.top
+		anchors.topMargin: Style.marginXL
+		anchors.right: parent.right
+		anchors.rightMargin: Style.marginXL
+		height: titleText.height
+		title: qsTr("History") + " (" + historyView.revisionsCount + ")"
 	}
 
 	DocumentHistoryView {
-		id: historyView;
-		anchors.left: parent.left;
-		anchors.leftMargin: Style.marginXL;
-		anchors.top: historyHeader.bottom;
-		anchors.bottom: parent.bottom;
-		anchors.right: parent.right;
-		anchors.rightMargin: Style.marginXL;
-		// visible: historyPanel.width !== 0;
-		visible: historyPanel.width == historyPanel.contentWidth;
-		documentId: historyPanel.documentId;
-		
+		id: historyView
+		anchors.left: parent.left
+		anchors.leftMargin: Style.marginXL
+		anchors.top: historyHeader.bottom
+		anchors.topMargin: Style.marginM
+		anchors.right: parent.right
+		anchors.rightMargin: Style.marginXL
+		anchors.bottom: parent.bottom
+		anchors.bottomMargin: Style.marginXL
+		documentId: historyPanel.documentId
+
 		function getHeaders(){
-			return historyPanel.getHeaders();
+			return historyPanel.getHeaders()
 		}
 	}
-	
+
 	function getHeaders(){
-		return {};
+		return {}
 	}
 }
-

@@ -1,191 +1,233 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtcontrols 1.0
-import imtguigql 1.0
 import imtgui 1.0
+import imtguigql 1.0
 import imtauthgui 1.0
-import imtbaseDocumentRevisionSdl 1.0
+import imtcontrols 1.0
 
+/**
+ * DocumentHistoryView
+ *
+ * A document's revision history, rendered as a SimpleCollectionTable: search,
+ * server-side paging and empty/loading/error states come from the table
+ * itself. The columns (revision/user/date/description) are a custom
+ * `columnHeaderComponent` + `delegateComponent` pair defined here -
+ * DocumentRevisionsDataProvider just supplies the raw per-revision fields.
+ *
+ * Revisions are read-only, so the table's select-all bar and row checkboxes
+ * are switched off. Give this item a bounded height - the table pages as the
+ * list is scrolled, which needs a viewport smaller than its content.
+ */
 Rectangle {
-	id: container;
+	id: container
 
-	color: Style.baseColor;
+	color: Style.baseColor
+	clip: true
 
-	property int elementWidth: 450;
-	property alias contentHeight: column.height;
-	property alias flickable: flickable_;
-	property string documentId: "";
-	property int activeRevision: 0;
+	property string documentId: ""
+	property string collectionId: ""
 
-	property string collectionId: "";
+	//! Revisions matching the current filter, across all pages.
+	readonly property int revisionsCount: revisionsProvider.totalCount
+	//! Revision currently in effect, even when it is not on the loaded page.
+	readonly property int activeRevision: revisionsProvider.activeRevision
+	readonly property alias contentHeight: historyTable.contentHeight
 
-	property bool ok: collectionId !== "" && documentId !== "";
+	readonly property bool __canViewRevisions: PermissionsController.checkPermission("ViewRevisions")
 
-	onOkChanged: {
-		if (ok){
-			sendRequest();
-		}
-	}
-
-	clip: true;
-
-	onCollectionIdChanged: {
-		if (collectionId !== ""){
-			subscriptionClient.gqlCommandId = "On" + container.collectionId + "CollectionChanged";
-		}
-	}
-
-	SubscriptionClient {
-		id: subscriptionClient;
-		onMessageReceived: {
-			container.sendRequest();
-		}
+	function getHeaders(){
+		return {}
 	}
 
 	function sendRequest(){
-		if (PermissionsController.checkPermission("ViewRevisions")){
-			request.send();
+		if (container.__canViewRevisions){
+			revisionsProvider.refresh()
 		}
 	}
-	
-	function getHeaders(){
-		return {};
+
+	DocumentRevisionsDataProvider {
+		id: revisionsProvider
+		documentId: container.documentId
+		collectionId: container.collectionId
+
+		function getHeaders(){
+			return container.getHeaders()
+		}
+
+		onDataChanged: historyTable.model = revisionsProvider.items
 	}
 
-	GqlSdlRequestSender {
-		id: request;
-		gqlCommandId: ImtbaseDocumentRevisionSdlCommandIds.s_getRevisionInfoList;
-		inputObjectComp: Component {
-			GetRevisionInfoListInput {
-				m_documentId: container.documentId;
-				m_collectionId: container.collectionId;
+	onDocumentIdChanged: container.sendRequest()
+	onCollectionIdChanged: {
+		if (container.collectionId !== ""){
+			subscriptionClient.gqlCommandId = "On" + container.collectionId + "CollectionChanged"
+		}
+		container.sendRequest()
+	}
+
+	SubscriptionClient {
+		id: subscriptionClient
+		onMessageReceived: container.sendRequest()
+	}
+
+	Component {
+		id: revisionColumnHeaderComp
+
+		Item {
+			height: Style.controlHeightL + Style.marginM
+
+			Rectangle {
+				anchors.fill: parent
+				color: Style.backgroundColor2
 			}
-		}
 
-		sdlObjectComp: Component { RevisionInfoList {
-				onFinished: {
-					container.activeRevision = m_activeRevision;
-					repeaterColumn.model = m_revisions;
+			Row {
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.leftMargin: Style.marginL
+				anchors.rightMargin: Style.marginL
+				anchors.verticalCenter: parent.verticalCenter
+				spacing: Style.marginL
+
+				BaseText {
+					width: parent.width * 0.14
+					text: qsTr("Revision")
+					font.bold: true
+					font.pixelSize: Style.fontSizeS
+					color: Style.inactiveTextColor
+				}
+				BaseText {
+					width: parent.width * 0.20
+					text: qsTr("User")
+					font.bold: true
+					font.pixelSize: Style.fontSizeS
+					color: Style.inactiveTextColor
+				}
+				BaseText {
+					width: parent.width * 0.22
+					text: qsTr("Date")
+					font.bold: true
+					font.pixelSize: Style.fontSizeS
+					color: Style.inactiveTextColor
+				}
+				BaseText {
+					width: parent.width * 0.40
+					text: qsTr("Description")
+					font.bold: true
+					font.pixelSize: Style.fontSizeS
+					color: Style.inactiveTextColor
 				}
 			}
-		}
 
-		onStateChanged: {
-			loading.visible = (state === "Loading");
-		}
-		
-		function getHeaders(){
-			return container.getHeaders();
+			Rectangle {
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.bottom: parent.bottom
+				height: 1
+				color: Style.borderColor
+			}
 		}
 	}
 
 	Component {
-		id: delegateComp;
+		id: revisionRowDelegateComp
 
-		Column {
-			width: column.width;
-			visible: model.item.m_description !== "" && model.item.m_user !== "";
+		SimpleCollectionItemDelegateBase {
+			id: revisionDelegate
+			showCheckBox: false
+			showDefaultActionsMenu: false
+			enableDefaultDoubleClickEdit: false
 
-			Item {
-				width: parent.width;
-				height: elementView.height + 2*Style.marginM;
+			readonly property var revisionItem: revisionDelegate.modelItem
 
-				ElementView {
-					id: elementView;
-					anchors.verticalCenter: parent.verticalCenter;
-					width: parent.width;
-					name: model.item.m_user + ", " + model.item.m_timestamp;
+			Row {
+				width: parent.width
+				spacing: Style.marginL
 
-					clip: false;
-					bottomComp: Component {
+				Row {
+					anchors.verticalCenter: parent.verticalCenter
+					width: parent.width * 0.14
+					spacing: Style.spacingS
+
+					Text {
+						anchors.verticalCenter: parent.verticalCenter
+						text: revisionDelegate.revisionItem ? "#" + revisionDelegate.revisionItem.revision : ""
+						font.pixelSize: Style.fontSizeL
+						font.bold: true
+						color: Style.textColor
+					}
+
+					Rectangle {
+						anchors.verticalCenter: parent.verticalCenter
+						visible: revisionDelegate.revisionItem ? revisionDelegate.revisionItem.isActive : false
+						width: currentLabel.width + Style.marginM
+						height: Style.controlHeightM
+						radius: height / 2
+						color: Style.imaginToolsAccentColor
+
 						Text {
-							width: parent.width;
-							font.family: Style.fontFamily;
-							font.pixelSize: Style.fontSizeM;
-							color: Style.textColor;
-							wrapMode: Text.WrapAnywhere;
-							text: model.item.m_description;
+							id: currentLabel
+							anchors.centerIn: parent
+							text: qsTr("Current")
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: "white"
 						}
 					}
+				}
 
-					Row {
-						id: row;
-						z: 999;
-						anchors.verticalCenter: parent.top;
-						anchors.left: parent.left;
-						anchors.leftMargin: Style.marginM;
-						spacing: Style.marginM;
+				Text {
+					anchors.verticalCenter: parent.verticalCenter
+					width: parent.width * 0.20
+					text: revisionDelegate.revisionItem ? revisionDelegate.revisionItem.user : ""
+					font.pixelSize: Style.fontSizeM
+					color: Style.inactiveTextColor
+					elide: Text.ElideRight
+				}
 
-						StickerView {
-							anchors.verticalCenter: parent.verticalCenter;
-							color: Style.iconColorOnSelected;
-							text: qsTr("Revision") + ": " + model.item.m_revision;
-						}
+				Text {
+					anchors.verticalCenter: parent.verticalCenter
+					width: parent.width * 0.22
+					text: revisionDelegate.revisionItem ? revisionDelegate.revisionItem.timestamp : ""
+					font.pixelSize: Style.fontSizeM
+					color: Style.inactiveTextColor
+					elide: Text.ElideRight
+				}
 
-						StickerView {
-							anchors.verticalCenter: parent.verticalCenter;
-							color: Style.errorColor;
-							text: qsTr("Active");
-							visible: model.item.m_revision == container.activeRevision;
-						}
-					}
+				Text {
+					anchors.verticalCenter: parent.verticalCenter
+					width: parent.width * 0.40
+					text: revisionDelegate.revisionItem ? revisionDelegate.revisionItem.description : ""
+					font.pixelSize: Style.fontSizeM
+					color: Style.textColor
+					elide: Text.ElideRight
 				}
 			}
 		}
 	}
 
-	Flickable {
-		id: flickable_;
-		anchors.left: parent.left;
-		anchors.right: parent.right;
-		anchors.top: parent.top;
-		anchors.topMargin: Style.marginM;
-		anchors.bottom: parent.bottom;
-		anchors.bottomMargin: Style.marginM;
+	SimpleCollectionTable {
+		id: historyTable
+		anchors.fill: parent
+		selectionEnabled: false
+		// The panel around this view already applies its own margins.
+		maximumWidth: container.width
+		horizontalMargin: 0
+		emptyText: qsTr("No document history yet")
+		filterPlaceholder: qsTr("Filter revisions...")
+		columnHeaderComponent: revisionColumnHeaderComp
+		delegateComponent: revisionRowDelegateComp
 
-		contentWidth: width;
-		contentHeight: column.height;
+		initialLoading: revisionsProvider.isInitialLoading
+		loadingMore: revisionsProvider.isPageLoading
+		errorMessage: revisionsProvider.error
+			? (revisionsProvider.error.message || qsTr("Error loading document history"))
+			: ""
 
-		boundsBehavior: Flickable.StopAtBounds;
-		interactive: false;
-
-		clip: true;
-
-		Column {
-			id: column;
-
-			anchors.left: parent.left;
-			anchors.leftMargin: Style.marginM;
-			anchors.right: parent.right;
-			anchors.rightMargin: Style.marginM;
-
-			spacing: Style.marginM;
-
-			Repeater {
-				id: repeaterColumn;
-
-				delegate: delegateComp;
-			}
-		}//Column main
-	}
-
-	Text {
-		anchors.centerIn: parent;
-		font.pixelSize: Style.fontSizeM;
-		font.family: Style.fontFamilyBold;
-		font.bold: true;
-		color: Style.textColor;
-		wrapMode: Text.WrapAnywhere;
-		text: qsTr("There is no history for this document");
-		visible: repeaterColumn.count === 0;
-	}
-
-	Loading {
-		id: loading;
-		anchors.fill: parent;
-		visible: false;
-		background.color: Style.baseColor;
+		onFilterRequested: revisionsProvider.fetch(text)
+		onLoadMoreRequested: revisionsProvider.fetchMore()
+		onRetryRequested: revisionsProvider.retry()
 	}
 }
-

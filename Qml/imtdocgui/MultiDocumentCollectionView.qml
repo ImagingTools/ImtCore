@@ -14,6 +14,7 @@ Item {
 	property CollectionView collectionView: null
 	property DocumentServiceBase documentManager
 	property string collectionTabId: ""
+	property color contentColor: Style.baseColor
 
 	property bool tabVisible: true
 
@@ -45,7 +46,6 @@ Item {
 	NavigableItem {
 		id: navigableItem
 		onActivated: {
-			console.log("navigableItem onActivated", paths)
 			if (workspaceView.documentManager){
 				if (restPath.length >= 1){
 					let documentTypeId = matchedPath
@@ -176,7 +176,7 @@ Item {
 		function onOpenedDocumentListReceiveFailed(message){
 			globalLoading.stop()
 			if(message !==""){
-				ModalDialogManager.showErrorDialog(message)
+				PopupManager.addErrorMessage(message, true)
 			}
 		}
 
@@ -200,7 +200,7 @@ Item {
 
 		function onUpdateRepresentationFailed(documentId, message){
 			if(message !==""){
-				ModalDialogManager.showErrorDialog(message)
+				PopupManager.addErrorMessage(message, true)
 			}
 			if (!workspaceView.documentManager.documentIsLoading(documentId)){
 				workspaceView.stopLoading(documentId)
@@ -215,12 +215,6 @@ Item {
 					typeOperation === EDocumentOperationEnum.s_documentOpened){
 				workspaceView.documentManager.setDocumentName(documentId, documentName)
 			}
-			// Note: For s_documentSaved we intentionally do NOT update the
-			// document name from the subscription payload — the SDL save
-			// response already delivers the authoritative documentName via
-			// setDocumentName() and using the subscription value would cause
-			// a redundant overwrite (which has been observed to corrupt
-			// non-ASCII characters such as German umlauts in the tab title).
 		}
 
 		function onDocumentNameChanged(documentId, oldName, newName){
@@ -253,7 +247,7 @@ Item {
 		function onOpenDocumentFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
 			if(message !==""){
-				ModalDialogManager.showErrorDialog(message)
+				PopupManager.addErrorMessage(message, true)
 			}
 		}
 
@@ -270,7 +264,7 @@ Item {
 		function onCloseDocumentFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
 			if(message !==""){
-				ModalDialogManager.showErrorDialog(message)
+				PopupManager.addErrorMessage(message, true)
 			}
 			onDocumentClosed(documentId)
 		}
@@ -287,7 +281,7 @@ Item {
 		function onSaveDocumentFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
 			if(message !==""){
-				ModalDialogManager.showErrorDialog(message)
+				PopupManager.addErrorMessage(message, true)
 			}
 		}
 
@@ -297,7 +291,7 @@ Item {
 
 		function onCreateDocumentFailed(documentTypeId, message){
 			if(message !==""){
-				ModalDialogManager.showErrorDialog(message)
+				PopupManager.addErrorMessage(message, true)
 			}
 		}
 
@@ -321,7 +315,7 @@ Item {
 		function onUndoInfoReceiveFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
 			if(message !==""){
-				ModalDialogManager.showErrorDialog(message)
+				PopupManager.addErrorMessage(message, true)
 			}
 		}
 
@@ -337,7 +331,7 @@ Item {
 		function onUndoFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
 			if(message !==""){
-				ModalDialogManager.showErrorDialog(message)
+				PopupManager.addErrorMessage(message, true)
 			}
 		}
 
@@ -353,7 +347,7 @@ Item {
 		function onRedoFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
 			if(message !==""){
-				ModalDialogManager.showErrorDialog(message)
+				PopupManager.addErrorMessage(message, true)
 			}
 		}
 
@@ -371,7 +365,7 @@ Item {
 
 	Rectangle {
 		anchors.fill: parent
-		color: Style.backgroundColor2
+		color: workspaceView.contentColor
 	}
 
 	Component {
@@ -553,6 +547,7 @@ Item {
 		anchors.fill: parent
 		closable: true
 		tabVisible: workspaceView.tabVisible
+		contentColor: workspaceView.contentColor
 
 		onTabLoaded: {
 			if (tabId === workspaceView.collectionTabId){
