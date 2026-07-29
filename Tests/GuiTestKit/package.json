@@ -1,0 +1,10 @@
+{
+  "name": "imtcore-gui-testkit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reusable Playwright GUI-test framework for Imt-based apps: objectName-driven locators/actions, CollectionPage+Editor page-object base classes, generic ImtCore page objects (Administration/Search/Organizations), and factories for the fixtures/global-setup/playwright-config boilerplate every app needs.",
+  "main": "index.js",
+  "peerDependencies": {
+    "@playwright/test": "^1.52.0"
+  }
+}
