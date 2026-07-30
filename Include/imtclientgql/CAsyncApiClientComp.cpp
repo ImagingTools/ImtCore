@@ -140,6 +140,20 @@ QFuture<IAsyncGqlClient::GqlResponsePtr> CAsyncApiClientComp::SendRequest(
 			timeoutTimerPtr->stop();
 		}
 
+		// QFuture::cancel marks the shared state canceled before the queued
+		// abort() reaches the reply; if the reply finished in that window the
+		// error code may be NoError (or a non-cancellation error). The future
+		// state is the authoritative terminal decision: a canceled future must
+		// produce exactly one EC_CANCELLED callback, never a response.
+		if (futureInterface.isCanceled()){
+			if (handlerPtr != nullptr){
+				handlerPtr->OnError(IAsyncGqlResponseHandler::EC_CANCELLED, "Request cancelled");
+			}
+			futureInterface.reportFinished();
+			replyPtr->deleteLater();
+			return;
+		}
+
 		const QNetworkReply::NetworkError error = replyPtr->error();
 
 		if (error == QNetworkReply::NoError){

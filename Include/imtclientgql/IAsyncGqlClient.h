@@ -51,7 +51,7 @@ public:
 		\param requestPtr	The GraphQL request to send.
 		\param handlerPtr	Callback sink invoked when the response (or an error)
 		                    is available. May be \c nullptr for fire-and-forget
-		                    call sites that only inspect the returned token.
+		                    call sites that only inspect the returned future.
 		\param urlParamPtr	Optional URL parameters passed to the protocol engine.
 		\return A future tracking the in-flight request. On synchronous
 		        validation failure the future is returned already finished

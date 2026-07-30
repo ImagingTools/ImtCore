@@ -24,7 +24,7 @@ namespace imtclientgql
 	including a cancellation triggered via \c QFuture::cancel).
 
 	By default the handler is invoked on the network/event-loop thread of the
-	client component that produced the token. Adapters that need to dispatch
+	client component that returned the future. Adapters that need to dispatch
 	to another thread are responsible for marshalling.
 */
 class IAsyncGqlResponseHandler: virtual public istd::IPolymorphic

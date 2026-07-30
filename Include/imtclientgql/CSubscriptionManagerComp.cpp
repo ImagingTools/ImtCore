@@ -547,7 +547,7 @@ void CSubscriptionManagerComp::CompletePending(const QString& key, const QByteAr
 		pending = m_pendingAsync.take(key);
 	}
 
-	if (pending.futureInterface.isFinished() || pending.futureInterface.isCanceled()){
+	if (pending.futureInterface.isFinished()){
 		return;
 	}
 
@@ -562,27 +562,38 @@ void CSubscriptionManagerComp::CompletePending(const QString& key, const QByteAr
 	// true, so the reply is only queued and never drained — full request hang
 	// after reconnect/reconcile. Always hop to this component's thread first.
 	// Order: OnResponseReceived (fill capturers) then reportFinished (wake waiters).
-	CSubscriptionManagerComp* self = const_cast<CSubscriptionManagerComp*>(this);
-	const bool queued = QMetaObject::invokeMethod(
-				self,
-				[pending, responsePtr, isError]() mutable {
-					if (pending.handlerPtr != nullptr){
-						// isError: still deliver body (may contain GraphQL errors).
-						Q_UNUSED(isError);
-						pending.handlerPtr->OnResponseReceived(responsePtr);
-					}
-					pending.futureInterface.reportResult(responsePtr);
-					pending.futureInterface.reportFinished();
-				},
-				Qt::QueuedConnection);
-
-	if (!queued){
+	//
+	// Taking the map entry above is the single atomic terminalization point:
+	// a racing FailPending (cancel watcher / timeout) finds no entry and does
+	// nothing, so this path must always finish the future. Cancellation may
+	// also occur after take() but before this lambda runs, so it re-checks the
+	// canceled flag and converts to the EC_CANCELLED terminal state — otherwise
+	// cancel(); waitForFinished() callers would block forever.
+	auto deliver = [pending, responsePtr, isError]() mutable {
+		if (pending.futureInterface.isFinished()){
+			return;
+		}
+		if (pending.futureInterface.isCanceled()){
+			if (pending.handlerPtr != nullptr){
+				pending.handlerPtr->OnError(IAsyncGqlResponseHandler::EC_CANCELLED, "Cancelled");
+			}
+			pending.futureInterface.reportFinished();
+			return;
+		}
 		if (pending.handlerPtr != nullptr){
+			// isError: still deliver body (may contain GraphQL errors).
 			Q_UNUSED(isError);
 			pending.handlerPtr->OnResponseReceived(responsePtr);
 		}
 		pending.futureInterface.reportResult(responsePtr);
 		pending.futureInterface.reportFinished();
+	};
+
+	CSubscriptionManagerComp* self = const_cast<CSubscriptionManagerComp*>(this);
+	const bool queued = QMetaObject::invokeMethod(self, deliver, Qt::QueuedConnection);
+
+	if (!queued){
+		deliver();
 	}
 }
 
@@ -605,34 +616,38 @@ void CSubscriptionManagerComp::FailPending(
 		return;
 	}
 
-	CSubscriptionManagerComp* self = const_cast<CSubscriptionManagerComp*>(this);
-	const bool queued = QMetaObject::invokeMethod(
-				self,
-				[pending, category, message]() mutable {
-					if (pending.handlerPtr != nullptr){
-						pending.handlerPtr->OnError(category, message);
-					}
-					if (category == IAsyncGqlResponseHandler::EC_CANCELLED){
-						pending.futureInterface.reportCanceled();
-					}
-					else{
-						pending.futureInterface.reportResult(IAsyncGqlClient::GqlResponsePtr());
-					}
-					pending.futureInterface.reportFinished();
-				},
-				Qt::QueuedConnection);
-
-	if (!queued){
-		if (pending.handlerPtr != nullptr){
-			pending.handlerPtr->OnError(category, message);
+	// Same atomic terminalization as CompletePending: the entry was taken above,
+	// so this path must finish the future. Re-check cancellation in the queued
+	// lambda so a cancel racing with e.g. a timeout still yields EC_CANCELLED.
+	auto deliver = [pending, category, message]() mutable {
+		if (pending.futureInterface.isFinished()){
+			return;
 		}
-		if (category == IAsyncGqlResponseHandler::EC_CANCELLED){
+		const bool cancelled =
+					(category == IAsyncGqlResponseHandler::EC_CANCELLED) ||
+					pending.futureInterface.isCanceled();
+		if (pending.handlerPtr != nullptr){
+			if (cancelled){
+				pending.handlerPtr->OnError(IAsyncGqlResponseHandler::EC_CANCELLED, "Cancelled");
+			}
+			else{
+				pending.handlerPtr->OnError(category, message);
+			}
+		}
+		if (cancelled){
 			pending.futureInterface.reportCanceled();
 		}
 		else{
 			pending.futureInterface.reportResult(IAsyncGqlClient::GqlResponsePtr());
 		}
 		pending.futureInterface.reportFinished();
+	};
+
+	CSubscriptionManagerComp* self = const_cast<CSubscriptionManagerComp*>(this);
+	const bool queued = QMetaObject::invokeMethod(self, deliver, Qt::QueuedConnection);
+
+	if (!queued){
+		deliver();
 	}
 }
 
