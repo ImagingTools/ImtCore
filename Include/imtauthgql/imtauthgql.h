@@ -1391,30 +1391,6 @@ inline imtauth::CrossTenantMessageStatus FromSdlMessageStatus(sdl::V1_0::imtauth
 }
 
 
-// Document Share Access Mode
-
-inline sdl::V1_0::imtauth::DocumentShareAccessMode ToSdlAccessMode(imtauth::DocumentShareAccessMode mode)
-{
-	switch (mode){
-	case imtauth::DSAM_FULL_ACCESS:
-		return sdl::V1_0::imtauth::DocumentShareAccessMode::FullAccess;
-	default:
-		return sdl::V1_0::imtauth::DocumentShareAccessMode::ReadOnly;
-	}
-}
-
-
-inline imtauth::DocumentShareAccessMode FromSdlAccessMode(sdl::V1_0::imtauth::DocumentShareAccessMode mode)
-{
-	switch (mode){
-	case sdl::V1_0::imtauth::DocumentShareAccessMode::FullAccess:
-		return imtauth::DSAM_FULL_ACCESS;
-	default:
-		return imtauth::DSAM_READ_ONLY;
-	}
-}
-
-
 // Order Request Status
 
 inline sdl::V1_0::imtauth::OrderRequestStatus ToSdlOrderStatus(imtauth::OrderRequestStatus status)

@@ -23,7 +23,6 @@ imtauth::CrossTenantMessageInfo MakeSampleInfo()
 	info.payload = "{\"articleNumber\":\"A-1\"}";
 	info.status = imtauth::CTMS_PROCESSED;
 	info.errorMessage = QString();
-	info.accessMode = imtauth::DSAM_READ_ONLY;
 	info.createdAt = "2026-01-01T00:00:00.000Z";
 	info.updatedAt = "2026-01-01T00:01:00.000Z";
 	info.expiresAt = "2030-01-01T00:00:00.000Z";

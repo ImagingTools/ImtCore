@@ -2118,7 +2118,6 @@ sdl::V1_0::imtauth::CCrossTenantMessage MessageInfoToData(const imtauth::CrossTe
 	data.payload = QString::fromUtf8(info.payload);
 	data.status = imtauthgql::ToSdlMessageStatus(info.status);
 	data.errorMessage = info.errorMessage;
-	data.accessMode = imtauthgql::ToSdlAccessMode(info.accessMode);
 	data.createdAt = info.createdAt;
 	data.updatedAt = info.updatedAt;
 	data.expiresAt = info.expiresAt;
@@ -2301,11 +2300,6 @@ sdl::V1_0::imtauth::CSendCrossTenantMessagePayload CTenantManagerControllerComp:
 		expiresAt = *arguments.input->expiresAt;
 	}
 	
-	imtauth::DocumentShareAccessMode accessMode = imtauth::DSAM_READ_ONLY;
-	if (arguments.input->accessMode){
-		accessMode = FromSdlAccessMode(*arguments.input->accessMode);
-	}
-	
 	QByteArray messageId = m_messageBrokerCompPtr->SendMessage(
 							   sourceTenantId,
 							   targetTenantId,
@@ -2315,8 +2309,7 @@ sdl::V1_0::imtauth::CSendCrossTenantMessagePayload CTenantManagerControllerComp:
 							   sourceObjectId,
 							   customType,
 							   expiresAt,
-							   contractId,
-							   accessMode);
+							   contractId);
 	
 	if (messageId.isEmpty()){
 		response.errorMessage = QStringLiteral("Failed to send cross-tenant message");

@@ -34,18 +34,6 @@ enum CrossTenantMessageType
 
 
 /**
-	Access mode for document sharing.
-	Determines whether the recipient has read-only or full (edit) access
-	to the shared document.
-*/
-enum DocumentShareAccessMode
-{
-	DSAM_READ_ONLY = 0,
-	DSAM_FULL_ACCESS
-};
-
-
-/**
 	Lifecycle status of a cross-tenant message.
 */
 enum CrossTenantMessageStatus
@@ -85,7 +73,6 @@ struct CrossTenantMessageInfo
 	QByteArray payload;
 	CrossTenantMessageStatus status = CTMS_CREATED;
 	QString errorMessage;
-	DocumentShareAccessMode accessMode = DSAM_READ_ONLY;
 	QString createdAt;
 	QString updatedAt;
 	QString expiresAt;
@@ -104,7 +91,6 @@ struct CrossTenantMessageInfo
 			&& payload == other.payload
 			&& status == other.status
 			&& errorMessage == other.errorMessage
-			&& accessMode == other.accessMode
 			&& createdAt == other.createdAt
 			&& updatedAt == other.updatedAt
 			&& expiresAt == other.expiresAt;
@@ -154,7 +140,6 @@ public:
 		\param customType Concrete type name when \a messageType is CTMT_CUSTOM.
 		\param expiresAt Optional expiry timestamp (empty for no expiry).
 		\param contractId Optional contract that authorizes this exchange (empty for ad-hoc messages).
-		\param accessMode Access mode for document sharing (read-only or full access).
 		\return Message ID if successful, empty if validation or storage failed.
 	*/
 	virtual QByteArray SendMessage(
@@ -166,8 +151,7 @@ public:
 				const QByteArray& sourceObjectId = QByteArray(),
 				const QString& customType = QString(),
 				const QString& expiresAt = QString(),
-				const QByteArray& contractId = QByteArray(),
-				DocumentShareAccessMode accessMode = DSAM_READ_ONLY) = 0;
+				const QByteArray& contractId = QByteArray()) = 0;
 
 	/**
 		Get a specific message by its ID.

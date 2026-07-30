@@ -97,9 +97,6 @@ istd::IChangeableUniquePtr CCrossTenantMessageDbDelegateComp::CreateObjectFromRe
 	if (record.contains("ErrorMessage")){
 		info.errorMessage = record.value("ErrorMessage").toString();
 	}
-	if (record.contains("AccessMode")){
-		info.accessMode = static_cast<imtauth::DocumentShareAccessMode>(record.value("AccessMode").toInt());
-	}
 	info.createdAt = RecordDateTimeToString(record, "CreatedAt");
 	info.updatedAt = RecordDateTimeToString(record, "UpdatedAt");
 	info.expiresAt = RecordDateTimeToString(record, "ExpiresAt");
@@ -139,14 +136,13 @@ CCrossTenantMessageDbDelegateComp::NewObjectQuery CCrossTenantMessageDbDelegateC
 	QString payload = NullableSqlText(QString::fromUtf8(info.payload));
 	int status = static_cast<int>(info.status);
 	QString errorMessage = NullableSqlText(info.errorMessage);
-	int accessMode = static_cast<int>(info.accessMode);
 	QString createdAt = !info.createdAt.isEmpty() ? imtdb::EscapeSql(info.createdAt) : imtdb::UtcNow();
 	QString updatedAt = !info.updatedAt.isEmpty() ? imtdb::EscapeSql(info.updatedAt) : imtdb::UtcNow();
 	QString expiresAt = NullableSqlDateTime(info.expiresAt);
 
 	result.query = QString(
-		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"RelationshipId\", \"ContractId\", \"SourceObjectId\", \"TargetObjectId\", \"MessageType\", \"CustomType\", \"Payload\", \"Status\", \"ErrorMessage\", \"AccessMode\", \"CreatedAt\", \"UpdatedAt\", \"ExpiresAt\") "
-		"VALUES ('%2', '%3', '%4', '%5', %6, %7, %8, %9, %10, %11, %12, %13, %14, '%15', '%16', %17);")
+		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"RelationshipId\", \"ContractId\", \"SourceObjectId\", \"TargetObjectId\", \"MessageType\", \"CustomType\", \"Payload\", \"Status\", \"ErrorMessage\", \"CreatedAt\", \"UpdatedAt\", \"ExpiresAt\") "
+		"VALUES ('%2', '%3', '%4', '%5', %6, %7, %8, %9, %10, %11, %12, %13, '%14', '%15', %16);")
 		.arg(*m_tableNameAttrPtr)
 		.arg(id)
 		.arg(sourceTenantId)
@@ -160,7 +156,6 @@ CCrossTenantMessageDbDelegateComp::NewObjectQuery CCrossTenantMessageDbDelegateC
 		.arg(payload)
 		.arg(QString::number(status))
 		.arg(errorMessage)
-		.arg(QString::number(accessMode))
 		.arg(createdAt)
 		.arg(updatedAt)
 		.arg(expiresAt).toUtf8();

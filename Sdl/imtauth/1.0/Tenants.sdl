@@ -589,11 +589,6 @@ enum CrossTenantMessageType {
 	DocumentShare
 }
 
-enum DocumentShareAccessMode {
-	ReadOnly
-	FullAccess
-}
-
 enum CrossTenantMessageStatus {
 	Created
 	Validated
@@ -622,7 +617,6 @@ type CrossTenantMessage {
 	payload: String
 	status: CrossTenantMessageStatus!
 	errorMessage: String
-	accessMode: DocumentShareAccessMode
 	createdAt: String
 	updatedAt: String
 	expiresAt: String
@@ -638,7 +632,6 @@ input SendCrossTenantMessageInput {
 	sourceObjectId: ID
 	customType: String
 	expiresAt: String
-	accessMode: DocumentShareAccessMode
 }
 
 type SendCrossTenantMessagePayload {

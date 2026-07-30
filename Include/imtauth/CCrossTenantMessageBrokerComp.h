@@ -63,8 +63,7 @@ public:
 				const QByteArray& sourceObjectId = QByteArray(),
 				const QString& customType = QString(),
 				const QString& expiresAt = QString(),
-				const QByteArray& contractId = QByteArray(),
-				DocumentShareAccessMode accessMode = DSAM_READ_ONLY) override;
+				const QByteArray& contractId = QByteArray()) override;
 	virtual CrossTenantMessageInfo GetMessage(const QByteArray& messageId) const override;
 	virtual CrossTenantMessages GetIncomingMessages(const QByteArray& targetTenantId) const override;
 	virtual CrossTenantMessages GetOutgoingMessages(const QByteArray& sourceTenantId) const override;
