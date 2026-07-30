@@ -7,6 +7,7 @@
 
 // Qt includes
 #include <QtCore/QByteArray>
+#include <QtCore/QString>
 
 
 namespace iprm { class IParamsSet; }
@@ -38,6 +39,8 @@ public:
 		\brief Initialize a data object before change-tracking begins.
 
 		\param typeId       Registered type-ID of the object.
+		\param errorString  Out-parameter for a human-readable error description
+		                    when the method returns \c false.
 		\param initParams   Optional initialization parameters provided by the
 		                    caller (may be \c nullptr when no parameters were
 		                    supplied).
@@ -51,6 +54,7 @@ public:
 	virtual bool InitializeDocument(
 		const QByteArray& typeId,
 		istd::IChangeable& document,
+		QString& errorString,
 		const iprm::IParamsSet* initParams = nullptr) = 0;
 };
 

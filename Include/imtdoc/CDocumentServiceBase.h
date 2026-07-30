@@ -188,20 +188,19 @@ protected:
 		\brief Called after a new document is created from the factory but before
 		the undo manager is attached.
 
-		The default implementation does nothing and returns \c true.
-		Subclasses override to perform initialization that should not
+		Subclasses must implement to perform initialization that should not
 		generate undo history.
 
 		\param typeId       Registered object type-ID of the document.
 		\param initParams   Optional initialization parameters (may be \c nullptr).
 		\param document     Mutable reference to the document data object.
-		\param errorMessage Optional out-parameter for a human-readable error
+		\param errorMessage Out-parameter for a human-readable error
 		                    description when the method returns \c false.
 		\return             \c true on success; \c false if initialization failed
 		                    (e.g.\ init params provided but no delegate registered,
 		                    or the delegate rejected the parameters).
 	*/
-	virtual bool OnDocumentCreatedFromFactory(const QByteArray& typeId, const iprm::IParamsSet* initParams, istd::IChangeable& document, QString* errorMessage = nullptr);
+	virtual bool OnDocumentCreated(const QByteArray& typeId, const iprm::IParamsSet* initParams, istd::IChangeable& document, QString& errorMessage) = 0;
 
 	static QString GetInvalidDocumentMessage();
 

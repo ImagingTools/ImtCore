@@ -155,23 +155,18 @@ const imtdoc::IDocumentValidator* CDocumentServiceCompBase::GetDocumentValidator
 }
 
 
-bool CDocumentServiceCompBase::OnDocumentCreatedFromFactory(const QByteArray& typeId, const iprm::IParamsSet* initParams, istd::IChangeable& document, QString* errorMessage)
+bool CDocumentServiceCompBase::OnDocumentCreated(const QByteArray& typeId, const iprm::IParamsSet* initParams, istd::IChangeable& document, QString& errorMessage)
 {
 	imtdoc::IDocumentInitDelegate* delegatePtr = GetDocumentInitDelegate(typeId);
 	if (delegatePtr != nullptr){
-		if (!delegatePtr->InitializeDocument(typeId, document, initParams)){
-			if (errorMessage != nullptr){
-				*errorMessage = QStringLiteral("Document initialization failed: init delegate rejected the parameters");
-			}
+		if (!delegatePtr->InitializeDocument(typeId, document, errorMessage, initParams)){
 			return false;
 		}
 		return true;
 	}
 
 	if (initParams != nullptr){
-		if (errorMessage != nullptr){
-			*errorMessage = QStringLiteral("Document initialization failed: init parameters provided but no init delegate registered");
-		}
+		errorMessage = QStringLiteral("Document initialization failed: init parameters provided but no init delegate registered");
 		return false;
 	}
 

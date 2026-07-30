@@ -74,7 +74,7 @@ protected:
 	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentServiceEventHandlers() const override;
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const override;
 	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override;
-	virtual bool OnDocumentCreatedFromFactory(const QByteArray& typeId, const iprm::IParamsSet* initParams, istd::IChangeable& document, QString* errorMessage = nullptr) override;
+	virtual bool OnDocumentCreated(const QByteArray& typeId, const iprm::IParamsSet* initParams, istd::IChangeable& document, QString& errorMessage) override;
 
 private:
 	// Reserve 170000000-170000099 for imtdoc validation warnings to avoid collisions with other message IDs.

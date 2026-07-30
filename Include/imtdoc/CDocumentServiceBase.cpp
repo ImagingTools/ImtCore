@@ -296,7 +296,7 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 			}
 
 			QString errorMessage;
-			if (!OnDocumentCreatedFromFactory(docPtr->typeId, initParamsPtr, *docPtr->objectPtr, &errorMessage)){
+			if (!OnDocumentCreated(docPtr->typeId, initParamsPtr, *docPtr->objectPtr, errorMessage)){
 				docPtr->isLoading = false;
 				CloseDocumentInternal(userId, documentId);
 				if (errorMessage.isEmpty()){
@@ -689,12 +689,6 @@ int CDocumentServiceBase::GetUndoManagerNextModelId(const QByteArray& /*userId*/
 }
 
 
-bool CDocumentServiceBase::OnDocumentCreatedFromFactory(const QByteArray& /*typeId*/, const iprm::IParamsSet* /*initParams*/, istd::IChangeable& /*document*/, QString* /*errorMessage*/)
-{
-	// Default implementation does nothing.
-	// Subclasses override to perform initialization before undo manager attachment.
-	return true;
-}
 
 
 void CDocumentServiceBase::InitializeDocumentObservers(
