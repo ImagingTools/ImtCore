@@ -142,6 +142,11 @@ I_EXPORT_COMPONENT(
 			"Cross Tenant Message Database Delegate");
 
 I_EXPORT_COMPONENT(
+			DocumentShareDatabaseDelegate,
+			"SQL delegate for document shares (hydration, INSERT/UPDATE/DELETE)",
+			"Document Share Database Delegate");
+
+I_EXPORT_COMPONENT(
 			OrderRequestDatabaseDelegate,
 			"SQL delegate for order requests (hydration, INSERT/UPDATE/DELETE)",
 			"Order Request Database Delegate");

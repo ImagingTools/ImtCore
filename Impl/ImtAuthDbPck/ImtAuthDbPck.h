@@ -24,6 +24,7 @@
 #include <imtauthdb/CTenantRelationshipProposalDbDelegateComp.h>
 #include <imtauthdb/CTenantRelationshipDbDelegateComp.h>
 #include <imtauthdb/CCrossTenantMessageDbDelegateComp.h>
+#include <imtauthdb/CDocumentShareDbDelegateComp.h>
 #include <imtauthdb/COrderRequestDbDelegateComp.h>
 
 /**
@@ -58,6 +59,7 @@ typedef imtauthdb::CTenantConnectionDbDelegateComp TenantConnectionDatabaseDeleg
 typedef imtauthdb::CTenantRelationshipProposalDbDelegateComp TenantRelationshipProposalDatabaseDelegate;
 typedef imtauthdb::CTenantRelationshipDbDelegateComp TenantRelationshipDatabaseDelegate;
 typedef imtauthdb::CCrossTenantMessageDbDelegateComp CrossTenantMessageDatabaseDelegate;
+typedef imtauthdb::CDocumentShareDbDelegateComp DocumentShareDatabaseDelegate;
 typedef imtauthdb::COrderRequestDbDelegateComp OrderRequestDatabaseDelegate;
 
 

@@ -342,6 +342,16 @@ I_EXPORT_COMPONENT(
 			"Cross Tenant Message Broker");
 
 I_EXPORT_COMPONENT(
+			DocumentShareInfo,
+			"Entity representing a document shared by one tenant with another tenant",
+			"Document Share Info");
+
+I_EXPORT_COMPONENT(
+			DocumentShareManager,
+			"Manager creating, updating, revoking and resolving document shares",
+			"Document Share Manager");
+
+I_EXPORT_COMPONENT(
 			OrderRequestInfo,
 			"Entity representing an order request materialized inside the target tenant (Order -> OrderRequest)",
 			"Order Request Info");

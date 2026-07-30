@@ -1,0 +1,123 @@
+schema {
+	query: Query
+	mutation: Mutation
+	namespace: imtauth
+	version: 1.0
+}
+
+# --- Document Shares ---
+#
+# A document share is an independent, revocable grant issued by the owning
+# (source) tenant to another (target) tenant for exactly one document. It is not
+# part of the cross-tenant messaging pipeline.
+
+enum DocumentShareAccessMode {
+	ReadOnly
+	FullAccess
+}
+
+enum DocumentShareStatus {
+	Active
+	Revoked
+	Expired
+}
+
+enum DocumentShareDirection {
+	Incoming
+	Outgoing
+}
+
+type DocumentShare {
+	id: ID!
+	sourceTenantId: ID!
+	targetTenantId: ID!
+	relationshipId: ID
+	documentId: ID!
+	documentType: String
+	documentName: String
+	accessMode: DocumentShareAccessMode!
+	status: DocumentShareStatus!
+	sharedByUserId: ID
+	createdAt: String
+	updatedAt: String
+	expiresAt: String
+	revokedAt: String
+}
+
+input ShareDocumentInput {
+	sourceTenantId: ID!
+	targetTenantId: ID!
+	relationshipId: ID
+	documentId: ID!
+	documentType: String
+	documentName: String
+	accessMode: DocumentShareAccessMode
+	expiresAt: String
+}
+
+type ShareDocumentPayload {
+	shareId: ID
+	errorMessage: String
+}
+
+input GetDocumentShareInput {
+	shareId: ID!
+}
+
+type GetDocumentSharePayload {
+	share: DocumentShare
+	errorMessage: String
+}
+
+input GetDocumentSharesInput {
+	tenantId: ID!
+	direction: DocumentShareDirection
+	documentId: ID
+}
+
+type GetDocumentSharesPayload {
+	shares: [DocumentShare]
+	errorMessage: String
+}
+
+input SetDocumentShareAccessModeInput {
+	shareId: ID!
+	accessMode: DocumentShareAccessMode!
+}
+
+type SetDocumentShareAccessModePayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input RevokeDocumentShareInput {
+	shareId: ID!
+}
+
+type RevokeDocumentSharePayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input GetDocumentAccessInput {
+	tenantId: ID!
+	documentId: ID!
+}
+
+type GetDocumentAccessPayload {
+	hasAccess: Boolean
+	accessMode: DocumentShareAccessMode
+	errorMessage: String
+}
+
+type Query {
+	GetDocumentShare (input: GetDocumentShareInput): GetDocumentSharePayload!
+	GetDocumentShares (input: GetDocumentSharesInput): GetDocumentSharesPayload!
+	GetDocumentAccess (input: GetDocumentAccessInput): GetDocumentAccessPayload!
+}
+
+type Mutation {
+	ShareDocument (input: ShareDocumentInput): ShareDocumentPayload!
+	SetDocumentShareAccessMode (input: SetDocumentShareAccessModeInput): SetDocumentShareAccessModePayload!
+	RevokeDocumentShare (input: RevokeDocumentShareInput): RevokeDocumentSharePayload!
+}

@@ -241,6 +241,11 @@ I_EXPORT_COMPONENT(
 			"JWT Session Controller Proxy");
 
 I_EXPORT_COMPONENT(
+			DocumentShareController,
+			"GraphQL handler for document share queries and mutations",
+			"Document Share Controller");
+
+I_EXPORT_COMPONENT(
 			TenantManagerController,
 			"Tenant manager controller",
 			"Tenant Manager Controller");
