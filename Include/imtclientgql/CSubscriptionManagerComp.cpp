@@ -280,16 +280,16 @@ QFuture<CSubscriptionManagerComp::GqlResponsePtr> CSubscriptionManagerComp::Send
 			IAsyncGqlResponseHandler* handlerPtr,
 			imtbase::IUrlParam* /*urlParamPtr*/) const
 {
-	QFutureInterface<GqlResponsePtr> futureInterface;
-	futureInterface.reportStarted();
-	QFuture<GqlResponsePtr> future = futureInterface.future();
+	auto promisePtr = std::make_shared<QPromise<GqlResponsePtr>>();
+	promisePtr->start();
+	QFuture<GqlResponsePtr> future = promisePtr->future();
 
-	auto FailFast = [&futureInterface, handlerPtr](IAsyncGqlResponseHandler::ErrorCategory category, const QString& message) {
+	auto FailFast = [promisePtr, handlerPtr](IAsyncGqlResponseHandler::ErrorCategory category, const QString& message) {
 		if (handlerPtr != nullptr){
 			handlerPtr->OnError(category, message);
 		}
-		futureInterface.reportResult(GqlResponsePtr());
-		futureInterface.reportFinished();
+		promisePtr->addResult(GqlResponsePtr());
+		promisePtr->finish();
 	};
 
 	if (!requestPtr.IsValid()){
@@ -329,7 +329,7 @@ QFuture<CSubscriptionManagerComp::GqlResponsePtr> CSubscriptionManagerComp::Send
 	{
 		QMutexLocker lock(&m_pendingAsyncMutex);
 		PendingAsync pending;
-		pending.futureInterface = futureInterface;
+		pending.promisePtr = promisePtr;
 		pending.handlerPtr = handlerPtr;
 		pending.requestPtr = requestPtr;
 		m_pendingAsync.insert(key, pending);
@@ -547,7 +547,7 @@ void CSubscriptionManagerComp::CompletePending(const QString& key, const QByteAr
 		pending = m_pendingAsync.take(key);
 	}
 
-	if (pending.futureInterface.isFinished()){
+	if (pending.promisePtr->future().isFinished()){
 		return;
 	}
 
@@ -561,7 +561,7 @@ void CSubscriptionManagerComp::CompletePending(const QString& key, const QByteAr
 	// blocking GQL) re-enters the same socket while m_isProcessingMessage is
 	// true, so the reply is only queued and never drained — full request hang
 	// after reconnect/reconcile. Always hop to this component's thread first.
-	// Order: OnResponseReceived (fill capturers) then reportFinished (wake waiters).
+	// Order: OnResponseReceived (fill capturers) then finish (wake waiters).
 	//
 	// Taking the map entry above is the single atomic terminalization point:
 	// a racing FailPending (cancel watcher / timeout) finds no entry and does
@@ -570,14 +570,14 @@ void CSubscriptionManagerComp::CompletePending(const QString& key, const QByteAr
 	// canceled flag and converts to the EC_CANCELLED terminal state — otherwise
 	// cancel(); waitForFinished() callers would block forever.
 	auto deliver = [pending, responsePtr, isError]() mutable {
-		if (pending.futureInterface.isFinished()){
+		if (pending.promisePtr->future().isFinished()){
 			return;
 		}
-		if (pending.futureInterface.isCanceled()){
+		if (pending.promisePtr->isCanceled()){
 			if (pending.handlerPtr != nullptr){
 				pending.handlerPtr->OnError(IAsyncGqlResponseHandler::EC_CANCELLED, "Cancelled");
 			}
-			pending.futureInterface.reportFinished();
+			pending.promisePtr->finish();
 			return;
 		}
 		if (pending.handlerPtr != nullptr){
@@ -585,8 +585,8 @@ void CSubscriptionManagerComp::CompletePending(const QString& key, const QByteAr
 			Q_UNUSED(isError);
 			pending.handlerPtr->OnResponseReceived(responsePtr);
 		}
-		pending.futureInterface.reportResult(responsePtr);
-		pending.futureInterface.reportFinished();
+		pending.promisePtr->addResult(responsePtr);
+		pending.promisePtr->finish();
 	};
 
 	CSubscriptionManagerComp* self = const_cast<CSubscriptionManagerComp*>(this);
@@ -612,7 +612,7 @@ void CSubscriptionManagerComp::FailPending(
 		pending = m_pendingAsync.take(key);
 	}
 
-	if (pending.futureInterface.isFinished()){
+	if (pending.promisePtr->future().isFinished()){
 		return;
 	}
 
@@ -620,12 +620,12 @@ void CSubscriptionManagerComp::FailPending(
 	// so this path must finish the future. Re-check cancellation in the queued
 	// lambda so a cancel racing with e.g. a timeout still yields EC_CANCELLED.
 	auto deliver = [pending, category, message]() mutable {
-		if (pending.futureInterface.isFinished()){
+		if (pending.promisePtr->future().isFinished()){
 			return;
 		}
 		const bool cancelled =
 					(category == IAsyncGqlResponseHandler::EC_CANCELLED) ||
-					pending.futureInterface.isCanceled();
+					pending.promisePtr->isCanceled();
 		if (pending.handlerPtr != nullptr){
 			if (cancelled){
 				pending.handlerPtr->OnError(IAsyncGqlResponseHandler::EC_CANCELLED, "Cancelled");
@@ -634,13 +634,10 @@ void CSubscriptionManagerComp::FailPending(
 				pending.handlerPtr->OnError(category, message);
 			}
 		}
-		if (cancelled){
-			pending.futureInterface.reportCanceled();
+		if (!cancelled){
+			pending.promisePtr->addResult(IAsyncGqlClient::GqlResponsePtr());
 		}
-		else{
-			pending.futureInterface.reportResult(IAsyncGqlClient::GqlResponsePtr());
-		}
-		pending.futureInterface.reportFinished();
+		pending.promisePtr->finish();
 	};
 
 	CSubscriptionManagerComp* self = const_cast<CSubscriptionManagerComp*>(this);
@@ -653,4 +650,3 @@ void CSubscriptionManagerComp::FailPending(
 
 
 } // namespace imtclientgql
-

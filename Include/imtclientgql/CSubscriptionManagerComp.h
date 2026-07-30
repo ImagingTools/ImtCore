@@ -4,11 +4,14 @@
 
 // Qt includes
 #include <QtCore/QFuture>
-#include <QtCore/QFutureInterface>
 #include <QtCore/QHash>
 #include <QtCore/QMutex>
+#include <QtCore/QPromise>
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QTimer>
+
+// stdlib
+#include <memory>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -97,7 +100,7 @@ private:
 
 	struct PendingAsync
 	{
-		QFutureInterface<GqlResponsePtr> futureInterface;
+		std::shared_ptr<QPromise<GqlResponsePtr>> promisePtr;
 		IAsyncGqlResponseHandler* handlerPtr = nullptr;
 		GqlRequestPtr requestPtr;
 	};

@@ -4,7 +4,7 @@
 
 // Qt includes
 #include <QtCore/QFuture>
-#include <QtCore/QFutureInterface>
+#include <QtCore/QPromise>
 
 // stdlib
 #include <functional>
@@ -148,11 +148,11 @@ protected:
 private:
 	static QFuture<IAsyncGqlClient::GqlResponsePtr> CreateFailedFuture()
 	{
-		QFutureInterface<IAsyncGqlClient::GqlResponsePtr> futureInterface;
-		futureInterface.reportStarted();
-		futureInterface.reportResult(IAsyncGqlClient::GqlResponsePtr());
-		futureInterface.reportFinished();
-		return futureInterface.future();
+		QPromise<IAsyncGqlClient::GqlResponsePtr> promise;
+		promise.start();
+		promise.addResult(IAsyncGqlClient::GqlResponsePtr());
+		promise.finish();
+		return promise.future();
 	}
 
 protected:

@@ -3,9 +3,9 @@
 
 
 // Qt includes
-#include <QtCore/QFutureInterface>
 #include <QtCore/QFutureWatcher>
 #include <QtCore/QMetaObject>
+#include <QtCore/QPromise>
 #include <QtCore/QTimer>
 #include <QtCore/QUuid>
 #include <QtNetwork/QNetworkAccessManager>
@@ -46,17 +46,16 @@ QFuture<IAsyncGqlClient::GqlResponsePtr> CAsyncApiClientComp::SendRequest(
 			IAsyncGqlResponseHandler* handlerPtr,
 			imtbase::IUrlParam* urlParamPtr) const
 {
-	// QFutureInterface copies share the same state; it drives the returned future.
-	QFutureInterface<GqlResponsePtr> futureInterface;
-	futureInterface.reportStarted();
-	QFuture<GqlResponsePtr> future = futureInterface.future();
+	auto promisePtr = std::make_shared<QPromise<GqlResponsePtr>>();
+	promisePtr->start();
+	QFuture<GqlResponsePtr> future = promisePtr->future();
 
-	auto FailFast = [&futureInterface, handlerPtr](IAsyncGqlResponseHandler::ErrorCategory category, const QString& message) {
+	auto FailFast = [promisePtr, handlerPtr](IAsyncGqlResponseHandler::ErrorCategory category, const QString& message) {
 		if (handlerPtr != nullptr){
 			handlerPtr->OnError(category, message);
 		}
-		futureInterface.reportResult(GqlResponsePtr());
-		futureInterface.reportFinished();
+		promisePtr->addResult(GqlResponsePtr());
+		promisePtr->finish();
 	};
 
 	if (!requestPtr.IsValid()){
@@ -129,8 +128,8 @@ QFuture<IAsyncGqlClient::GqlResponsePtr> CAsyncApiClientComp::SendRequest(
 	// finished signal arrives.
 	auto timedOutFlagPtr = std::make_shared<bool>(false);
 
-	auto Finalize = [this, replyPtr, requestPtr, handlerPtr, futureInterface, timeoutTimerPtr, timedOutFlagPtr, uuid]() mutable {
-		if (futureInterface.isFinished()){
+	auto Finalize = [this, replyPtr, requestPtr, handlerPtr, promisePtr, timeoutTimerPtr, timedOutFlagPtr, uuid]() mutable {
+		if (promisePtr->future().isFinished()){
 			// Already finalized (defensive: should not happen, finished fires once).
 			replyPtr->deleteLater();
 			return;
@@ -145,11 +144,11 @@ QFuture<IAsyncGqlClient::GqlResponsePtr> CAsyncApiClientComp::SendRequest(
 		// error code may be NoError (or a non-cancellation error). The future
 		// state is the authoritative terminal decision: a canceled future must
 		// produce exactly one EC_CANCELLED callback, never a response.
-		if (futureInterface.isCanceled()){
+		if (promisePtr->isCanceled()){
 			if (handlerPtr != nullptr){
 				handlerPtr->OnError(IAsyncGqlResponseHandler::EC_CANCELLED, "Request cancelled");
 			}
-			futureInterface.reportFinished();
+			promisePtr->finish();
 			replyPtr->deleteLater();
 			return;
 		}
@@ -168,8 +167,8 @@ QFuture<IAsyncGqlClient::GqlResponsePtr> CAsyncApiClientComp::SendRequest(
 			if (handlerPtr != nullptr){
 				handlerPtr->OnResponseReceived(responsePtr);
 			}
-			futureInterface.reportResult(responsePtr);
-			futureInterface.reportFinished();
+			promisePtr->addResult(responsePtr);
+			promisePtr->finish();
 		}
 		else if (error == QNetworkReply::OperationCanceledError){
 			if (*timedOutFlagPtr){
@@ -178,15 +177,14 @@ QFuture<IAsyncGqlClient::GqlResponsePtr> CAsyncApiClientComp::SendRequest(
 				if (handlerPtr != nullptr){
 					handlerPtr->OnError(IAsyncGqlResponseHandler::EC_TIMEOUT, message);
 				}
-				futureInterface.reportResult(GqlResponsePtr());
-				futureInterface.reportFinished();
+				promisePtr->addResult(GqlResponsePtr());
+				promisePtr->finish();
 			}
 			else{
 				if (handlerPtr != nullptr){
 					handlerPtr->OnError(IAsyncGqlResponseHandler::EC_CANCELLED, "Request cancelled");
 				}
-				futureInterface.reportCanceled();
-				futureInterface.reportFinished();
+				promisePtr->finish();
 			}
 		}
 		else{
@@ -195,8 +193,8 @@ QFuture<IAsyncGqlClient::GqlResponsePtr> CAsyncApiClientComp::SendRequest(
 			if (handlerPtr != nullptr){
 				handlerPtr->OnError(IAsyncGqlResponseHandler::EC_NETWORK, replyPtr->errorString());
 			}
-			futureInterface.reportResult(GqlResponsePtr());
-			futureInterface.reportFinished();
+			promisePtr->addResult(GqlResponsePtr());
+			promisePtr->finish();
 		}
 
 		replyPtr->deleteLater();
@@ -235,4 +233,3 @@ void CAsyncApiClientComp::OnComponentCreated()
 
 
 } // namespace imtclientgql
-
