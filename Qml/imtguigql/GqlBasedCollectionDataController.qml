@@ -141,7 +141,7 @@ CollectionDataController {
 						if (!message || message === ""){
 							message = qsTr("Unable to remove selected element(s)")
 						}
-						ModalDialogManager.showErrorDialog(message)
+						PopupManager.addErrorMessage(message, true)
 					}
 				}
 			}
@@ -174,7 +174,7 @@ CollectionDataController {
 						if (!message || message === ""){
 							message = qsTr("Unable to remove selected element(s)")
 						}
-						ModalDialogManager.showErrorDialog(message)
+						PopupManager.addErrorMessage(message, true)
 					}
 				}
 			}

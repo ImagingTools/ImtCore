@@ -60,15 +60,10 @@ TenantConnectionCodePage 1.0 TenantConnectionCodePage.qml
 TenantConnectOrganizationPage 1.0 TenantConnectOrganizationPage.qml
 TenantMyConnectionsPage 1.0 TenantMyConnectionsPage.qml
 TenantMessagesPage 1.0 TenantMessagesPage.qml
-TenantSimpleCollectionPage 1.0 TenantSimpleCollectionPage.qml
-TenantDocumentEditorShell 1.0 TenantDocumentEditorShell.qml
 CrossOrgGrantView 1.0 CrossOrgGrantView.qml
 ContractView 1.0 ContractView.qml
 RelationshipView 1.0 RelationshipView.qml
 MessageView 1.0 MessageView.qml
 StatusBadge 1.0 StatusBadge.qml
-TenantCollectionItemDelegateBase 1.0 TenantCollectionItemDelegateBase.qml
 TenantCollectionListView 1.0 TenantCollectionListView.qml
-TenantTableContainer 1.0 TenantTableContainer.qml
-TenantTableHeader 1.0 TenantTableHeader.qml
 

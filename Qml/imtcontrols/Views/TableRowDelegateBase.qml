@@ -76,7 +76,7 @@ Rectangle {
 
 	property string selectedColor: Style.selectedColor;
 	// Solid hover fill (replaces selectedColor * hoverOpacity).
-	property string hoverColor: Style.alternateBaseColor;
+	property string hoverColor: Style.hover;
 
 	readonly property bool isHovered: tableDelegateContainer.tableItem
 			&& tableDelegateContainer.tableItem.hoverEnabled

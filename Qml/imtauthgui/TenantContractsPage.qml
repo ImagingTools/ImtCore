@@ -4,7 +4,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-import imtcolgui 1.0
+import imtdocgui 1.0
 import imtguigql 1.0
 import imtauthgui 1.0
 
@@ -13,11 +13,11 @@ import imtauthgui 1.0
  *
  * Cooperation Contracts tab of the TenantEditor.
  *
- * Displays contracts via TenantSimpleCollectionPage. Create opens a separate
+ * Displays contracts via SimpleCollectionPage. Create opens a separate
  * ContractView editor (ViewBase) with GqlBasedCommandsController.
  * Status changes (Activate / Terminate) are per-item in the list delegate.
  */
-TenantSimpleCollectionPage {
+SimpleCollectionPage {
 id: contractsPage
 
 entityName: qsTr("Contract")
@@ -35,20 +35,20 @@ readonly property bool __canManageContracts: contractsPage.stateManager
 	: false
 
 function updateGui() {
-if (contractsPage.apiClient && contractsPage.tenantData && contractsPage.tenantData.m_id) {
-contractsPage.apiClient.fetchContracts(contractsPage.tenantData.m_id)
+if (contractsPage.apiClient && contractsPage.model && contractsPage.model.m_id) {
+contractsPage.apiClient.fetchContracts(contractsPage.model.m_id)
 }
 }
 
 Component.onCompleted: {
-if (contractsPage.apiClient && contractsPage.tenantData && contractsPage.tenantData.m_id) {
-contractsPage.apiClient.fetchContracts(contractsPage.tenantData.m_id)
+if (contractsPage.apiClient && contractsPage.model && contractsPage.model.m_id) {
+contractsPage.apiClient.fetchContracts(contractsPage.model.m_id)
 }
 }
 
 onVisibleChanged: {
-if (contractsPage.visible && contractsPage.apiClient && contractsPage.tenantData && contractsPage.tenantData.m_id) {
-contractsPage.apiClient.fetchContracts(contractsPage.tenantData.m_id)
+if (contractsPage.visible && contractsPage.apiClient && contractsPage.model && contractsPage.model.m_id) {
+contractsPage.apiClient.fetchContracts(contractsPage.model.m_id)
 }
 }
 
@@ -58,22 +58,22 @@ target: contractsPage.apiClient
 function onContractCreated(contractId) {
 PopupManager.addSuccessMessage(qsTr("Contract created successfully"), true)
 contractsPage.popEditor()
-if (contractsPage.apiClient && contractsPage.tenantData && contractsPage.tenantData.m_id) {
-contractsPage.apiClient.fetchContracts(contractsPage.tenantData.m_id)
+if (contractsPage.apiClient && contractsPage.model && contractsPage.model.m_id) {
+contractsPage.apiClient.fetchContracts(contractsPage.model.m_id)
 }
 }
 
 function onContractStatusUpdated(contractId) {
 PopupManager.addSuccessMessage(qsTr("Contract status updated"), true)
-if (contractsPage.apiClient && contractsPage.tenantData && contractsPage.tenantData.m_id) {
-contractsPage.apiClient.fetchContracts(contractsPage.tenantData.m_id)
+if (contractsPage.apiClient && contractsPage.model && contractsPage.model.m_id) {
+contractsPage.apiClient.fetchContracts(contractsPage.model.m_id)
 }
 }
 
 function onContractTerminated(contractId) {
 PopupManager.addSuccessMessage(qsTr("Contract terminated"), true)
-if (contractsPage.apiClient && contractsPage.tenantData && contractsPage.tenantData.m_id) {
-contractsPage.apiClient.fetchContracts(contractsPage.tenantData.m_id)
+if (contractsPage.apiClient && contractsPage.model && contractsPage.model.m_id) {
+contractsPage.apiClient.fetchContracts(contractsPage.model.m_id)
 }
 }
 }
@@ -111,7 +111,9 @@ radius: Style.radiusS
 border.color: Style.borderColor
 border.width: 1
 
-readonly property var __contract: modelData
+// contractsModel is a role-based ListModel, so rows arrive as `model` and
+// `modelData` is undefined - resolve both, as the shared delegate base does.
+readonly property var __contract: (typeof modelData !== "undefined" && modelData !== null) ? modelData : model
 readonly property bool __canManage: contractsPage.stateManager
 	&& contractsPage.__canManageContracts
 
@@ -197,7 +199,7 @@ id: createContractComp
 
 ContractView {
 apiClient: contractsPage.apiClient
-tenantData: contractsPage.tenantData
+tenantData: contractsPage.model
 commandsControllerComp: Component {
 GqlBasedCommandsController {
 typeId: contractsPage.apiClient ? contractsPage.apiClient.contractObjectTypeId : ""

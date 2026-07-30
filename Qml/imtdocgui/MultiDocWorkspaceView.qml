@@ -12,8 +12,8 @@ Item {
 	property int popupWidth: Style.sizeHintXXS
 	property ObjectVisualStatusProvider visualStatusProvider: null
 	// Optional surface overrides (defaults keep the global MultiDoc look).
-	property color contentColor: Style.backgroundColor2
-	property color tabPanelColor: Style.tabPanelBackgroundColor
+	property color contentColor: Style.baseColor
+	property color tabPanelColor: Style.baseColor
 	// Optional per-instance tab chrome; default is the global Style.tabPanelDecorator.
 	property alias tabDelegateDecorator: tabView.tabDelegateDecorator
 	// Fallback icon for document tabs when visual-status does not supply one.
@@ -231,7 +231,7 @@ Item {
 	}
 
 	function openErrorDialog(message){
-		ModalDialogManager.showErrorDialog(message)
+		PopupManager.addErrorMessage(message, true)
 	}
 	
 	function setDocumentName(documentId, name){

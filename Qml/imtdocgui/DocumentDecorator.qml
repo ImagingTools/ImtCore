@@ -1,5 +1,4 @@
 import QtQuick 2.12
-import imtgui 1.0
 import imtbaseCollectionDocumentServiceSdl 1.0
 
 QtObject {

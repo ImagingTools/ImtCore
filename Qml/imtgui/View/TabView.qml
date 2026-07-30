@@ -1,7 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtcontrols 1.0
 import imtgui 1.0
 
 Item {
@@ -18,9 +17,9 @@ Item {
 	property bool tabVisible: true
 	// Page body behind tab content. Optional override for host surfaces that use
 	// Style.baseColor (defaults keep the global MultiDoc look unchanged).
-	property color contentColor: Style.backgroundColor2
+	property color contentColor: Style.baseColor
 	// Tab strip surface. Default = Style.tabPanelBackgroundColor (global theme).
-	property color tabPanelColor: Style.tabPanelBackgroundColor
+	property color tabPanelColor: Style.baseColor
 	// Optional per-instance tab chrome; default is the global Style.tabPanelDecorator.
 	property alias tabDelegateDecorator: tabPanel.tabDelegateDecorator
 
@@ -170,6 +169,17 @@ Item {
 		onCloseItem: {
 			root.onCloseTab(index);
 		}
+	}
+
+	Rectangle {
+		id: separator;
+		z: 6;
+		anchors.top: tabPanel.bottom;
+		width: parent.width;
+		height: 1;
+		color: Style.borderColor;
+		opacity: 0.5;
+		visible: root.tabVisible;
 	}
 
 	Rectangle {

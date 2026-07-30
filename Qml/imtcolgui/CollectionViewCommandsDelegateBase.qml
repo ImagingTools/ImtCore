@@ -2,7 +2,6 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
-import imtdocgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0 as ImtControls
 import imtcontrols 1.0
@@ -121,7 +120,7 @@ ViewCommandsDelegateBase {
 		target: null
 
 		function onImported(objectId){
-			ModalDialogManager.showInfoDialog(qsTr("The object has been successfully imported"));
+			PopupManager.addSuccessMessage(qsTr("The object has been successfully imported"), true);
 		}
 
 		function onExported(name, data){

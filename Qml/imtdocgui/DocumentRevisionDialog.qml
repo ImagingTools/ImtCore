@@ -1,16 +1,17 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
+import imtgui 1.0
 import imtauthgui 1.0
 import imtbaseDocumentRevisionSdl 1.0
 
 Dialog {
 	id: documentRevisionDialog;
-	title: qsTr("Revision Manager");
+	title: qsTr("Revisions (%1)").arg(revisionsModel ? revisionsModel.count : 0);
 	canMove: false;
+	backgroundColor: Style.baseColor;
 
 	notClosingButtons: Enums.no | Enums.save;
 
@@ -93,7 +94,7 @@ Dialog {
 		sdlObjectComp: Component { DeleteRevisionResponse {
 				onFinished: {
 					documentRevisionDialog.getRevisionList()
-					ModalDialogManager.showInfoDialog(qsTr("The document revision has been successfully delete"));
+					PopupManager.addSuccessMessage(qsTr("The document revision has been successfully delete"));
 				}
 			}
 		}
@@ -118,7 +119,7 @@ Dialog {
 		sdlObjectComp: Component { RestoreRevisionResponse {
 				onFinished: {
 					documentRevisionDialog.getRevisionList()
-					ModalDialogManager.showInfoDialog(qsTr("The document revision has been successfully set"));
+					PopupManager.addSuccessMessage(qsTr("The document revision has been successfully set"))
 				}
 			}
 		}
@@ -145,8 +146,23 @@ Dialog {
 	contentComp: Component {
 		Item {
 			id: contentItem;
-			width: Style.sizeHintXXL;
-			height: Style.sizeHintXL;
+			width: Style.sizeHintXXXL;
+			height: Style.sizeHintXXL;
+
+			property int visualSelectedRevision: -1;
+
+			function selectRevision(revision){
+				documentRevisionDialog.buttons.setButtonState(Enums.save, false);
+				documentRevisionDialog.buttons.setButtonState(Enums.no, false);
+
+				contentItem.visualSelectedRevision = revision;
+
+				if (revision !== documentRevisionDialog.currentRevision){
+					documentRevisionDialog.selectedRevision = revision;
+					documentRevisionDialog.buttons.setButtonState(Enums.save, true);
+					documentRevisionDialog.buttons.setButtonState(Enums.no, true);
+				}
+			}
 
 			Connections {
 				target: documentRevisionDialog;
@@ -165,174 +181,114 @@ Dialog {
 
 				function onRevisionModelReceived(){
 					loading.stop()
+
+					contentItem.visualSelectedRevision = -1;
+					documentRevisionDialog.buttons.setButtonState(Enums.save, false);
+					documentRevisionDialog.buttons.setButtonState(Enums.no, false);
 				}
+			}
+
+			Rectangle {
+				anchors.fill: parent;
+				color: Style.baseColor;
 			}
 
 			Component {
-				id: isActiveColumnDelegateComp;
-				TableCellDelegateBase {
-					id: cellDelegate
+				id: revisionCardComp;
 
-					Image {
-						id: image;
-						anchors.verticalCenter: parent.verticalCenter;
-						anchors.left: parent.left;
-						anchors.leftMargin: Style.marginM;
-						width: Style.iconSizeM;
-						height: width;
-						source: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal);
-						sourceSize.width: width;
-						sourceSize.height: height;
-					}
+				RevisionCard {
+					width: revisionColumn.width;
+					revision: model.item.m_revision;
+					userName: model.item.m_user;
+					timestamp: model.item.m_timestamp;
+					description: model.item.m_description;
+					isActive: model.item.m_isActive;
+					selectable: true;
+					selected: contentItem.visualSelectedRevision === model.item.m_revision;
 
-					onReused: {
-						if (!rowDelegate){
-							return
-						}
+					onClicked: contentItem.selectRevision(model.item.m_revision);
+				}
+			}
 
-						if (rowIndex >= 0){
-							let isActive = table.elements.get(rowIndex).item.m_isActive;
-							image.visible = isActive;
-						}
+			Flickable {
+				id: flickable;
+				anchors.top: parent.top;
+				anchors.topMargin: Style.marginL;
+				anchors.left: parent.left;
+				anchors.leftMargin: Style.marginL;
+				anchors.right: parent.right;
+				anchors.bottom: parent.bottom;
+				anchors.bottomMargin: Style.marginL;
+
+				contentWidth: width;
+				contentHeight: revisionColumn.height;
+
+				boundsBehavior: Flickable.StopAtBounds;
+				clip: true;
+
+				Column {
+					id: revisionColumn;
+					anchors.left: parent.left;
+					anchors.right: parent.right;
+					anchors.rightMargin: revisionScrollbar.secondSize + Style.spacingS;
+					spacing: Style.marginM;
+
+					Repeater {
+						id: repeaterColumn;
+						model: documentRevisionDialog.revisionsModel;
+						delegate: revisionCardComp;
 					}
 				}
 			}
 
-			Item {
-				id: splitView;
-				anchors.fill: parent
-				anchors.margins: Style.marginM
+			CustomScrollbar {
+				id: revisionScrollbar;
+				z: flickable.z + 1;
+				anchors.right: flickable.right;
+				anchors.top: flickable.top;
+				anchors.bottom: flickable.bottom;
+				secondSize: Style.marginM;
+				targetItem: flickable;
+				alwaysVisible: false;
+			}
 
-				Table {
-					id: table;
-					anchors.top: parent.top
-					width: parent.width;
-					height: Style.sizeHintM;
-					elements: documentRevisionDialog.revisionsModel
+			Column {
+				anchors.centerIn: flickable;
+				spacing: Style.marginM;
+				visible: repeaterColumn.count === 0 && !loading.visible;
 
-					onElementsChanged: {
-						table.resetSelection();
-					}
-
-					onHeadersChanged: {
-						setColumnContentById("isActive", isActiveColumnDelegateComp);
-					}
-
-					onSelectionChanged: {
-						documentRevisionDialog.buttons.setButtonState(Enums.save, false);
-						documentRevisionDialog.buttons.setButtonState(Enums.no, false);
-
-						let isEnabled = selection.length === 1;
-						if (isEnabled){
-							if (selection.length > 0){
-								let index = selection[0]
-								let selectedRevision = table.elements.get(index).item.m_revision;
-								if (selectedRevision !== documentRevisionDialog.currentRevision){
-									documentRevisionDialog.selectedRevision = selectedRevision;
-									documentRevisionDialog.buttons.setButtonState(Enums.save, true);
-									documentRevisionDialog.buttons.setButtonState(Enums.no, true);
-								}
-
-								descriptionTextField.text = table.elements.get(index).item.m_description;
-							}
-						}
-					}
-
-					TreeItemModel {
-						id: revisionHeadersModel
-						Component.onCompleted: {
-							updateHeaders()
-							table.headers = revisionHeadersModel
-						}
-				
-						function updateHeaders(){
-							revisionHeadersModel.clear()
-				
-							let index = revisionHeadersModel.insertNewItem();
-							revisionHeadersModel.setData("id", "user", index)
-							revisionHeadersModel.setData("name", qsTr("User"), index)
-				
-							index = revisionHeadersModel.insertNewItem();
-							revisionHeadersModel.setData("id", "revision", index)
-							revisionHeadersModel.setData("name", qsTr("Revision"), index)
-				
-							index = revisionHeadersModel.insertNewItem();
-							revisionHeadersModel.setData("id", "isActive", index)
-							revisionHeadersModel.setData("name", qsTr("Active"), index)
-				
-							index = revisionHeadersModel.insertNewItem();
-							revisionHeadersModel.setData("id", "timestamp", index)
-							revisionHeadersModel.setData("name", qsTr("Time"), index)
-						}
-					}
+				Image {
+					anchors.horizontalCenter: parent.horizontalCenter;
+					width: Style.iconSizeXL;
+					height: width;
+					source: "qrc:/" + Style.getIconPath("Icons/History", Icon.State.On, Icon.Mode.Normal);
+					sourceSize.width: width;
+					sourceSize.height: height;
+					opacity: Style.opacityLow;
 				}
 
-				Rectangle {
-					id: descriptionItem;
-					anchors.top: table.bottom
-					width: parent.width;
-					height: Style.sizeHintXXS;
-					clip: true
-					color: Style.backgroundColor2
+				Text {
+					anchors.horizontalCenter: parent.horizontalCenter;
+					font.pixelSize: Style.fontSizeL;
+					font.family: Style.fontFamilyBold;
+					color: Style.textColor;
+					text: qsTr("No revisions yet");
+				}
 
-					Text {
-						id: descriptionTitle;
-						anchors.top: parent.top;
-						anchors.topMargin: Style.marginM;
-						color: Style.buttonTextColor;
-						font.family: Style.fontFamilyBold;
-						font.pixelSize: Style.fontSizeM;
-						font.bold: true;
-						text: qsTr("Description");
-					}
-
-					Rectangle {
-						id: background;
-						anchors.top: descriptionTitle.bottom;
-						anchors.topMargin: Style.marginM;
-						anchors.bottom: parent.bottom;
-						width: parent.width;
-						border.width: 1;
-						border.color: Style.borderColor2;
-						radius: 3;
-					}
-
-					CustomScrollbar {
-						id: scrollbar;
-						z: parent.z + 1;
-						anchors.right: parent.right;
-						anchors.top: parent.top;
-						anchors.bottom: parent.bottom;
-						secondSize: Style.marginXS;
-						targetItem: flickable;
-					}
-
-					Flickable {
-						id: flickable;
-						anchors.centerIn: background;
-						width: background.width - 2 * Style.marginM;
-						height: background.height - 2 * Style.marginM;
-						contentHeight: descriptionTextField.height;
-						clip: true;
-						boundsBehavior: Flickable.StopAtBounds;
-
-						Text {
-							id: descriptionTextField;
-							width: parent.width;
-							font.family: Style.fontFamily;
-							font.pixelSize: Style.fontSizeM;
-							color: Style.textColor;
-							wrapMode: Text.WordWrap;
-						}
-					}
+				Text {
+					anchors.horizontalCenter: parent.horizontalCenter;
+					font.pixelSize: Style.fontSizeM;
+					font.family: Style.fontFamily;
+					color: Style.inactiveTextColor;
+					text: qsTr("Saved revisions of this document will appear here");
 				}
 			}
 
 			Loading {
 				id: loading;
 				anchors.fill: parent;
-				visible: false
-				background.color: Style.backgroundColor2
+				visible: false;
+				background.color: Style.baseColor;
 			}
 		}
 	}

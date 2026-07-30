@@ -2,19 +2,16 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
 import imtcontrols 1.0
-import imtdocgui 1.0
 
 /**
- * TenantDocumentEditorShell
+ * SimpleDocumentEditorShell
  *
  * Shared wrapper around `SingleDocumentWorkspaceShellView` used by the
- * Role / Group / User create+edit screens inside the TenantEditor sub-pages
- * (TenantRolesPage / TenantGroupsPage / TenantMembersPage).
+ * create+edit screens of a `SimpleCollectionPage`.
  *
  * Encapsulates the common configuration of those shells:
- *   - centered max-1000px layout matching the surrounding list pages
+ *   - centered layout matching the width of the surrounding list pages
  *   - hidden internal header (`headerVisible: false`) and disabled
  *     document-name dialog (`documentNameInputEnabled: false`)
  *   - optional UUID pre-allocation via `generateNewId` for the create flow
@@ -50,6 +47,11 @@ Item {
 
 	readonly property alias shellView: shell
 
+	// Same centered content column as SimpleCollectionPage, so the editor
+	// lines up with the list it was opened from.
+	readonly property int contentWidth: Math.min(root.width - Style.marginXL * 2, Style.contentWidthMax)
+	readonly property int contentLeftMargin: Math.max((root.width - root.contentWidth) / 2, Style.marginXL)
+
 	signal closed()
 
 	SingleDocumentWorkspaceShellView {
@@ -57,8 +59,8 @@ Item {
 		anchors.top: parent.top
 		anchors.bottom: parent.bottom
 		anchors.left: parent.left
-		anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
-		width: Math.min(parent.width - Style.marginXL * 2, 1000)
+		anchors.leftMargin: root.contentLeftMargin
+		width: root.contentWidth
 
 		documentManager: root.documentManager
 		objectTypeId: root.objectTypeId

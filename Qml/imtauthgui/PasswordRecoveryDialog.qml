@@ -104,7 +104,7 @@ Dialog {
 			currentIndex = -1;
 		}
 		else if (buttonId === Enums.no){
-			ModalDialogManager.showInfoDialog(qsTr("Check the email you entered"));
+			PopupManager.addWarningMessage(qsTr("Check the email you entered"), true);
 
 			currentIndex = 0;
 			finished(Enums.cancel);
@@ -304,7 +304,7 @@ Dialog {
 					}
 					else{
 						if (m_message !== ""){
-							ModalDialogManager.showErrorDialog(m_message);
+							PopupManager.addErrorMessage(m_message, true);
 						}
 					}
 
@@ -363,7 +363,7 @@ Dialog {
 					}
 					else{
 						if (m_message !== ""){
-							ModalDialogManager.showErrorDialog(m_message);
+							PopupManager.addErrorMessage(m_message, true);
 						}
 					}
 				}
@@ -397,7 +397,7 @@ Dialog {
 				passwordRecoveryDialog.currentIndex = 2;
 			}
 			else{
-				ModalDialogManager.showInfoDialog(qsTr("Password changed successfully"));
+				PopupManager.addSuccessMessage(qsTr("Password changed successfully"), true);
 			}
 		}
 	}

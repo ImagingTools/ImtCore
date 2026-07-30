@@ -2,18 +2,17 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
-import imtcontrols 1.0
+import imtdocgui 1.0
 import imtauthgui 1.0
 
 /**
  * TenantGroupsPage
  *
  * Groups tab — list / create / edit / delete tenant groups via the abstract apiClient.
- * Thin wrapper around `TenantSimpleCollectionPage` that wires up the group-specific
+ * Thin wrapper around `SimpleCollectionPage` that wires up the group-specific
  * apiClient bindings and i18n strings.
  */
-TenantSimpleCollectionPage {
+SimpleCollectionPage {
 	id: groupsPage
 
 	entityName: qsTr("Group")
