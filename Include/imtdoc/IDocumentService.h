@@ -17,6 +17,7 @@
 #include <imtdoc/IDocumentServiceEventHandler.h>
 
 
+namespace iprm { class IParamsSet; }
 namespace imtbase { class IOperationContext; }
 
 
@@ -104,6 +105,7 @@ public:
 		| userId                     |   X    |    X    |    X    |    X     |
 		| documentTypeId             |   X    |         |         |          |
 		| proposedSourceDocumentId   |  (opt) |         |         |          |
+		| initParamsPtr              |  (opt) |         |         |          |
 		| url                        |        |    X    |         |          |
 		| documentId                 |        |         |    X    |    X     |
 		| documentName               |        |         |  (opt)  |          |
@@ -118,6 +120,7 @@ public:
 		QString documentName;
 		const imtbase::IOperationContext* operationContextPtr = nullptr; ///< Optional operation context for tenant/owner propagation during save.
 		const istd::IChangeable* defaultDataPtr = nullptr;
+		const iprm::IParamsSet* initParamsPtr = nullptr; ///< Optional initialization parameters passed to the init delegate (TT_NEW only).
 	};
 
 	/**
