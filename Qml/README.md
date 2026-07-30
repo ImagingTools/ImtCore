@@ -5355,7 +5355,7 @@
 Стиль/оформление: набор визуальных констант и правил.
 
 - **Файл:** [Base/ClientStyle.qml](imtguigql/Base/ClientStyle.qml)
-- **Базовый тип:** [`StyleBase`](imtcontrols/Styles/StyleBase.qml)
+- **Базовый тип:** [`StyleBase`](imtstyle/StyleBase.qml)
 
 **Функции**
 

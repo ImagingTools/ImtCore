@@ -11,12 +11,8 @@ ControlBase 1.0 ./Base/ControlBase.qml
 DecoratorBase 1.0 ./Base/DecoratorBase.qml
 Decorators 1.0 ./Base/Decorators.qml
 DecoratorsQt 1.0 ./Base/DecoratorsQt.qml
-StyleBase 1.0 ./Styles/StyleBase.qml
-StyleComponents 1.0 ./Styles/StyleComponents.qml
 MainWindow 1.0 ./Base/MainWindow.qml
 WrapItem 1.0 ./Base/WrapItem.qml
-IconProperties 1.0 ./Styles/IconProperties.qml
-FontProperties 1.0 ./Styles/FontProperties.qml
 StateManager 1.0 ./Base/StateManager.qml
 
 Action 1.0 ./Actions/Action.qml

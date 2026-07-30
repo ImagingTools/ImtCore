@@ -3,8 +3,6 @@
                 <file alias="imtcontrols/qmldir">qmldir</file>
                 <file alias="imtcontrols/Base/BaseClass.qml">Base/BaseClass.qml</file>
                 <file alias="imtcontrols/Base/BaseModel.qml">Base/BaseModel.qml</file>
-                <file alias="imtcontrols/Styles/StyleBase.qml">Styles/StyleBase.qml</file>
-                <file alias="imtcontrols/Styles/StyleComponents.qml">Styles/StyleComponents.qml</file>
                 <file alias="imtcontrols/Base/ControlBase.qml">Base/ControlBase.qml</file>
                 <file alias="imtcontrols/Base/DecoratorBase.qml">Base/DecoratorBase.qml</file>
                 <file alias="imtcontrols/Base/DecoratorsQt.qml">Base/DecoratorsQt.qml</file>
@@ -12,8 +10,6 @@
                 <file alias="imtcontrols/Base/Enums.qml">Base/Enums.qml</file>
                 <file alias="imtcontrols/Base/ButtonType.js">Base/ButtonType.js</file>
                 <file alias="imtcontrols/Base/IconTest.qml">Base/IconTest.qml</file>
-                <file alias="imtcontrols/Styles/IconProperties.qml">Styles/IconProperties.qml</file>
-                <file alias="imtcontrols/Styles/FontProperties.qml">Styles/FontProperties.qml</file>
                 <file alias="imtcontrols/Base/StateManager.qml">Base/StateManager.qml</file>
                 <file alias="imtcontrols/Base/Icon.js">Base/Icon.js</file>
                 <file alias="MainWindow.qml">Base/MainWindow.qml</file>
