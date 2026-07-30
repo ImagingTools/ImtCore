@@ -22,7 +22,7 @@ Rectangle {
 	property bool hasIcon: true;
 	property bool canClose: true;
 	property string iconSource: "../../../../" + Style.getIconPath("Icons/AppIcon", Icon.State.On, Icon.Mode.Normal);
-	property string closeButtonIconSource: "../../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
+	property string closeButtonIconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
 	signal closeButtonClicked(int buttonId);
 

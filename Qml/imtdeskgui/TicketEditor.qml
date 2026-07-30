@@ -2812,7 +2812,7 @@ DocumentViewBase {
 									
 									ToolButton {
 										anchors.verticalCenter: parent.verticalCenter
-										iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+										iconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 										decorator: Component {
 											ToolButtonDecorator {
 												color: "transparent"

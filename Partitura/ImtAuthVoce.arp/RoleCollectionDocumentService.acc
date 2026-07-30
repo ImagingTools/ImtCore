@@ -24,6 +24,13 @@
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Roles"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DocumentNameProviders" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RoleDocumentNameProvider</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="DocumentValidators" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -135,6 +142,11 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RoleDocumentNameProvider" PackageId="ImtAuthPck" ComponentId="RoleDocumentNameProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="RoleDocumentValidator" PackageId="ImtAuthPck" ComponentId="RoleDocumentValidator">

@@ -40,7 +40,7 @@ CustomTextField {
 		anchors.verticalCenter: parent.verticalCenter
 		width: Style.buttonWidthXS;
 		height: width;
-		source: "../../../" + Style.getIconPath("Icons/Search", Icon.State.On, Icon.Mode.Normal);
+		source: "qrc:/" + Style.getIconPath("Icons/Search", Icon.State.On, Icon.Mode.Normal);
 		sourceSize.width: width
 		sourceSize.height: height
 	}
@@ -64,7 +64,7 @@ CustomTextField {
 		
 		visible: tfc.text != "";
 		
-		iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
+		iconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 		decorator: Component {
 			ToolButtonDecorator {
 				color: "transparent";

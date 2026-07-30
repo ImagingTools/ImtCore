@@ -798,7 +798,10 @@ Item {
             __autoLeaveEdit()
     }
 
-    onModelChanged: rebuildTree()
+    onModelChanged: {
+        rebuildTree()
+    }
+
     onColumnsChanged: {
         __hasUserColumnWidths = false
         __recomputeColumnWidths()
@@ -946,7 +949,6 @@ Item {
             for (var c = childCount - 1; c >= 0; --c)
                 stack.push({ item: __itemAt(children, c), row: c, parentKey: keyValue, level: entry.level + 1, path: entry.path + "/" + c })
         }
-
         __pruneExpandedState()
         cleanupSelection()
         buildVisibleTree()

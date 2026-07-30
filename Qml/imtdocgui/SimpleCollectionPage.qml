@@ -436,7 +436,9 @@ ViewBase {
 					root.dataProvider.retry()
 			}
 
-			Component.onCompleted: root.selectionManager = collectionTable.selectionManager
+			Component.onCompleted: {
+				root.selectionManager = collectionTable.selectionManager
+			}
 			Component.onDestruction: {
 				if (root)
 					root.selectionManager = null

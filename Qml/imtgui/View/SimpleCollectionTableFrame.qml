@@ -49,7 +49,9 @@ Item {
 	}
 
 	onChildrenChanged: root.__relocateExternalChildren()
-	Component.onCompleted: root.__relocateExternalChildren()
+	Component.onCompleted: {
+		root.__relocateExternalChildren()
+	}
 
 	Rectangle {
 		id: frame

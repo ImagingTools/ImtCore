@@ -22,7 +22,9 @@ RemoteCollectionView {
 			removeDialogTitle: qsTr("Deleting a role");
 			removeMessage: qsTr("Delete the selected role ?");
 
-			Component.onCompleted: registerDocumentType("Role", qsTr("Role"))
+			Component.onCompleted: {
+				registerDocumentType("Role", qsTr("Role"))
+			}
 
 			function updateStateBaseCommands(selection, commandsController, elementsModel){
 				let isEnabled = selection.length > 0;
