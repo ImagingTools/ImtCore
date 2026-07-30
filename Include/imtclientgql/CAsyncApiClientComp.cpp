@@ -124,11 +124,7 @@ QFuture<IAsyncGqlClient::GqlResult> CAsyncApiClientComp::SendRequest(
 	auto timedOutFlagPtr = std::make_shared<bool>(false);
 
 	auto Finalize = [this, replyPtr, requestPtr, promisePtr, timeoutTimerPtr, timedOutFlagPtr, uuid]() mutable {
-		if (promisePtr->future().isFinished()){
-			// Already finalized (defensive: should not happen, finished fires once).
-			replyPtr->deleteLater();
-			return;
-		}
+		Q_ASSERT(!promisePtr->future().isFinished());
 
 		if (timeoutTimerPtr != nullptr){
 			timeoutTimerPtr->stop();
