@@ -53,6 +53,11 @@ DocumentServiceBase {
 		if (collectionId !== ""){
 			documentManagerSubscription.gqlCommandId = "On" + root.collectionId + "DocumentChanged"
 			undoManagerSubscription.gqlCommandId = "On" + root.collectionId + "UndoChanged"
+		}
+	}
+
+	onDocumentServiceActivated: {
+		if (root.collectionId !== ""){
 			getOpenedDocumentList()
 		}
 	}

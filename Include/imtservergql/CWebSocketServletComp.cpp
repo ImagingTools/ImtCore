@@ -226,15 +226,6 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 			wireMessage = detail;
 		}
 
-		SendErrorMessage(
-					0,
-					QStringLiteral("WebSocket subscription auth failed (%1) for command '%2', token %3: %4")
-							.arg(statusLabel,
-								 QString::fromUtf8(gqlRequest.GetCommandId()),
-								 maskedToken,
-								 detail),
-					QStringLiteral("CWebSocketServletComp"));
-
 		return CreateErrorResponse(wireMessage.toUtf8(), request, /*logMessage*/ false);
 	}
 

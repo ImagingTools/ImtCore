@@ -42,12 +42,7 @@ public:
 	typedef Base BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(TAsyncClientRequestManagerCompWrap);
-		I_ASSIGN(
-					m_asyncApiClientCompPtr,
-					"AsyncApiClient",
-					"Asynchronous API Client (IAsyncGqlClient)",
-					true,
-					"AsyncApiClient");
+		I_ASSIGN(m_asyncApiClientCompPtr, "AsyncApiClient", "Asynchronous API Client (IAsyncGqlClient)", true, "AsyncApiClient");
 	I_END_COMPONENT;
 
 protected:
@@ -79,9 +74,9 @@ protected:
 		class CHandler: virtual public IAsyncGqlResponseHandler
 		{
 		public:
-			CHandler(std::function<void(SdlClass, QString)> cb, QByteArray cmdId):
+			CHandler(std::function<void(SdlClass, QString)> cb, const QByteArray& commandId):
 				m_callback(std::move(cb)),
-				m_commandId(std::move(cmdId))
+				m_commandId(commandId)
 			{
 			}
 

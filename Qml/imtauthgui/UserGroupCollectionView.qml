@@ -18,7 +18,9 @@ RemoteCollectionView {
 			collectionView: userGroupCollectionViewContainer;
 			documentManager: userGroupCollectionViewContainer.documentManager;
 
-			Component.onCompleted: registerDocumentType("Group", qsTr("Group"))
+			Component.onCompleted: {
+				registerDocumentType("Group", qsTr("Group"))
+			}
 
 			function updateStateBaseCommands(selection, commandsController, elementsModel){
 				let isEnabled = selection.length > 0;

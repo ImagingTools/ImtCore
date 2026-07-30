@@ -15,14 +15,13 @@ Item {
     signal multiPageUpdated();
 
 	property string productId: AuthorizationController.productId
-    property GqlBasedTenantManagementApiClient apiClient: GqlBasedTenantManagementApiClient {
+    property GqlBasedUserAdministrationApiClient apiClient: GqlBasedUserAdministrationApiClient {
         productId: administrationContainer.productId
     }
 
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
         apiClient.setRolePermissionsTenantId(apiClient.tenantId);
-        apiClient.fetchTenantPermissions(apiClient.tenantId);
     }
 
     Component.onDestruction: {
@@ -33,7 +32,6 @@ Item {
         target: administrationContainer.apiClient
         function onTenantIdChanged() {
             administrationContainer.apiClient.setRolePermissionsTenantId(administrationContainer.apiClient.tenantId);
-            administrationContainer.apiClient.fetchTenantPermissions(administrationContainer.apiClient.tenantId);
         }
     }
 
@@ -77,7 +75,9 @@ Item {
             documentManager: administrationContainer.apiClient.roleDocumentManager;
             contentColor: Style.baseColor;
 
-            Component.onCompleted: setCollectionViewComp(qsTr("Roles"), roleListComp)
+            Component.onCompleted: {
+                setCollectionViewComp(qsTr("Roles"), roleListComp)
+            }
         }
     }
 
@@ -98,7 +98,9 @@ Item {
             documentManager: administrationContainer.apiClient.userDocumentManager;
             contentColor: Style.baseColor;
 
-            Component.onCompleted: setCollectionViewComp(qsTr("Users"), userListComp)
+            Component.onCompleted: {
+                setCollectionViewComp(qsTr("Users"), userListComp)
+            }
         }
     }
 
@@ -119,7 +121,9 @@ Item {
             documentManager: administrationContainer.apiClient.groupDocumentManager;
             contentColor: Style.baseColor;
 
-            Component.onCompleted: setCollectionViewComp(qsTr("Groups"), userGroupListComp)
+            Component.onCompleted: {
+                setCollectionViewComp(qsTr("Groups"), userGroupListComp)
+            }
         }
     }
 
