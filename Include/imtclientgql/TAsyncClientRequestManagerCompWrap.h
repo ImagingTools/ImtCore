@@ -6,10 +6,6 @@
 #include <QtCore/QFuture>
 #include <QtCore/QPromise>
 
-// stdlib
-#include <functional>
-#include <memory>
-
 // ACF includes
 #include <icomp/CComponentBase.h>
 
@@ -27,7 +23,7 @@ namespace imtclientgql
 /**
 	Asynchronous GQL model requests via \c IAsyncGqlClient (\c AsyncApiClient).
 
-	No blocking Wait — callers supply a completion callback.
+	No blocking Wait — callers handle completion through the returned future.
 	Does not expose sync \c SendModelRequest; stack with
 	\c TClientRequestManagerCompWrap when both paths are needed:
 
@@ -48,22 +44,17 @@ public:
 protected:
 	/**
 		Non-blocking model request.
-		\param callback invoked once with (parsedSdl, errorMessage).
 		Returns an already finished future if the async client is missing or the request is invalid.
 	*/
-	template<class SdlClass>
-	QFuture<IAsyncGqlClient::GqlResult> SendModelRequestAsync(
-				const imtgql::IGqlRequest& request,
-				std::function<void(SdlClass, QString)> callback) const
+	QFuture<IAsyncGqlClient::GqlResult> SendModelRequestAsync(const imtgql::IGqlRequest& request) const
 	{
-		if (!m_asyncApiClientCompPtr.IsValid() || !callback){
+		if (!m_asyncApiClientCompPtr.IsValid()){
 			return CreateFailedFuture();
 		}
 
 		IGqlClient::GqlRequestPtr requestPtr;
 		requestPtr.MoveCastedPtr(request.CloneMe());
 		if (!requestPtr.IsValid()){
-			callback(SdlClass(), QStringLiteral("Request is invalid"));
 			return CreateFailedFuture(
 						IAsyncGqlClient::EC_INVALID_REQUEST,
 						QStringLiteral("Request is invalid"));
@@ -71,35 +62,7 @@ protected:
 
 		CClientRequestModelHelpers::AttachMissingContext(requestPtr);
 
-		const QByteArray commandId = request.GetCommandId();
-
-		auto callbackPtr = std::make_shared<std::function<void(SdlClass, QString)>>(std::move(callback));
-		QFuture<IAsyncGqlClient::GqlResult> future = m_asyncApiClientCompPtr->SendRequest(requestPtr);
-		future.then([callbackPtr, commandId](IAsyncGqlClient::GqlResult result) {
-			if (result.errorCategory != IAsyncGqlClient::EC_NONE){
-				(*callbackPtr)(
-							SdlClass(),
-							result.errorMessage.isEmpty() ? QStringLiteral("Request failed") : result.errorMessage);
-				return;
-			}
-
-			QString error;
-			SdlClass payload;
-			if (result.responsePtr.IsValid()){
-				payload = CClientRequestModelHelpers::ParseModelResponse<SdlClass>(
-							result.responsePtr->GetResponseData(),
-							commandId,
-							error);
-			}
-			else{
-				error = QStringLiteral("Response is invalid");
-			}
-			(*callbackPtr)(payload, error);
-		}).onCanceled([callbackPtr]() {
-			(*callbackPtr)(SdlClass(), QStringLiteral("Request cancelled"));
-		});
-
-		return future;
+		return m_asyncApiClientCompPtr->SendRequest(requestPtr);
 	}
 
 	bool HasAsyncApiClient() const
