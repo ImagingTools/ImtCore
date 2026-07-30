@@ -98,6 +98,18 @@ class Map extends Item {
         item.destroy()
     }
 
+    pan(dx, dy){
+        let view = this.__map.getView()
+        let currentCenter = view.getCenter()
+
+        let updatedCenter = [
+            currentCenter[0] + dx*view.getResolution(), 
+            currentCenter[1] + -dy*view.getResolution()
+        ]
+
+        view.setCenter(updatedCenter); 
+    }
+
     SLOT_mapReadyChanged(oldValue, newValue){
         if(newValue){
             for(let f of this.__queue){

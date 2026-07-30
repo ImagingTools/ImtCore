@@ -44,7 +44,7 @@ class WheelHandler extends SinglePointHandler {
         let delta = this.orientation === QtEnums.Horizontal ? wheelEvent.angleDelta.x : wheelEvent.angleDelta.y
         if(!Number.isFinite(delta) || delta === 0) return
 
-        let signedDelta = this.invertible ? delta : -delta
+        let signedDelta = this.invertible ? -delta : delta
         let rotationStep = signedDelta * Number(this.rotationScale || 1)
         this.rotation += rotationStep
 
