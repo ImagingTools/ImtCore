@@ -683,19 +683,16 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 
 			// Prepare notification with expected new state
 			QByteArray savedTypeId = workingDocumentPtr->typeId;
+	
+			workingDocumentPtr = this->FindDocument(userId, documentId);
+			if (workingDocumentPtr != nullptr){
+				workingDocumentPtr->objectId = newObjectId;
+				workingDocumentPtr->name = resultDocumentName;
+				workingDocumentPtr->isDirty = false;
+				workingDocumentPtr->undoManagerPtr->StoreDocumentState();
+			}
 
 			locker.unlock();
-
-			{
-				QMutexLocker locker(&this->m_mutex);
-				workingDocumentPtr = this->FindDocument(userId, documentId);
-				if (workingDocumentPtr != nullptr){
-					workingDocumentPtr->objectId = newObjectId;
-					workingDocumentPtr->name = resultDocumentName;
-					workingDocumentPtr->isDirty = false;
-					workingDocumentPtr->undoManagerPtr->StoreDocumentState();
-				}
-			}
 
 			for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
 				if (handlerPtr != nullptr){
@@ -835,17 +832,14 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 		QByteArray savedTypeId = workingDocumentPtr->typeId;
 		QByteArray savedObjectId = workingDocumentPtr->objectId;
 
-		locker.unlock();
-
-		{
-			QMutexLocker locker(&this->m_mutex);
-			workingDocumentPtr = this->FindDocument(userId, documentId);
-			if (workingDocumentPtr != nullptr){
-				workingDocumentPtr->name = resultDocumentName;
-				workingDocumentPtr->isDirty = false;
-				workingDocumentPtr->undoManagerPtr->StoreDocumentState();
-			}
+		workingDocumentPtr = this->FindDocument(userId, documentId);
+		if (workingDocumentPtr != nullptr){
+			workingDocumentPtr->name = resultDocumentName;
+			workingDocumentPtr->isDirty = false;
+			workingDocumentPtr->undoManagerPtr->StoreDocumentState();
 		}
+
+		locker.unlock();
 
 		for (IDocumentServiceEventHandler* handlerPtr : this->GetDocumentServiceEventHandlers()){
 			if (handlerPtr != nullptr){
@@ -896,9 +890,9 @@ inline void TCollectionDocumentServiceWrap<Base>::DoCloseDocument(
 }
 
 
-/// \brief Backward-compatibility alias: \c CCollectionDocumentServiceBase is now
-///        a typedef for \c TCollectionDocumentServiceWrap<CDocumentServiceBase>.
 typedef TCollectionDocumentServiceWrap<CDocumentServiceBase> CCollectionDocumentServiceBase;
 
 
 } // namespace imtdoc
+
+
