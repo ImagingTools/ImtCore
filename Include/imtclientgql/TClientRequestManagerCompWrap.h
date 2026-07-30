@@ -112,9 +112,6 @@ public:
 
 /**
 	Synchronous GQL model requests via \c IGqlClient (\c ApiClient).
-
-	Does not know about async clients — use \c TAsyncClientRequestManagerCompWrap
-	when non-blocking dispatch is required.
 */
 template <class Base>
 class TClientRequestManagerCompWrap: public Base
