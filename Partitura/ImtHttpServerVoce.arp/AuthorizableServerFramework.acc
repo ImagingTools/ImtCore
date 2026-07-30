@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6435" Description="ACF"/>
-            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="6306" Description="ACF"/>
+            <Version Id="1" Number="2256" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395267" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -326,7 +326,6 @@
         <Component ExportedId="FeatureContainer" ComponentId="IdentifiableProductInfo"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="PumaClientEngine/GroupRemoteRepository"/>
         <Component ExportedId="HttpServerFramework" ComponentId="HttpServerFramework"/>
-        <Component ExportedId="PersonalAccessTokenManager" ComponentId="PersonalAccessTokenController/PersonalAccessTokenManager"/>
         <Component ExportedId="PumaGQLClientEngine" ComponentId="PumaClientEngine"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="PumaClientEngine/RoleRemoteRepository"/>
         <Component ExportedId="SuperuserProvider" ComponentId="PumaClientEngine/SuperuserProvider"/>
