@@ -168,7 +168,7 @@ ImtCore. Сначала выбирается **модуль**, затем **по
 
 ### Если создаёте новый модуль
 Дополнительно: `CMake/CMakeLists.txt` и `QMake/<модуль>qml.pro` по образцу
-соседнего модуля; регистрация в `3rdParty/ImtCore/Build/CMake/CMakeLists.txt`
+соседнего модуля; регистрация в `ImtCore/Build/CMake/CMakeLists.txt`
 (`add_subdirectory("${QML_DIR}/<модуль>/CMake" …)`); при необходимости — добавить
 модуль в веб-манифест `Qml/web/imtcore.json` и в `-qmldir` конфигураций
 развёртывания продуктов.
