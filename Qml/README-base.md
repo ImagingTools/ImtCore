@@ -3,6 +3,7 @@
 Документация по фундаментальным QML-модулям ImtCore, на которых строятся прикладные модули (см. [README.md](README.md)). Правила размещения новых компонентов — в [STRUCTURE.md](STRUCTURE.md).
 
 - **`imtcontrols`** — библиотека UI-контролов и базовых классов;
+- **`imtstyle`** — стили и оформление (отдельный модуль, не подпапка);
 - **`imtqmlutils`** — невизуальные утилиты (математика, валидаторы, модели, события);
 - **`imtgraphics2d`** — 2D-графика на Canvas;
 - **`imtgui`** — каркас приложения и представлений.
@@ -13,7 +14,8 @@
 
 | Модуль | Назначение | Компонентов |
 |---|---|---|
-| [`imtcontrols`](#imtcontrols) | Библиотека UI-контролов | 212 |
+| [`imtcontrols`](#imtcontrols) | Библиотека UI-контролов | 208 |
+| [`imtstyle`](#imtstyle) | Стили и оформление | 4 |
 | [`imtqmlutils`](#imtqmlutils) | Утилиты (математика, валидаторы, модели, события) | 17 |
 | [`imtgraphics2d`](#imtgraphics2d) | 2D-графика на Canvas (фигуры, графики, матрицы) | 35 |
 | [`imtgui`](#imtgui) | Каркас приложения и представлений | 110 |
@@ -24,9 +26,9 @@
 <a id="imtcontrols"></a>
 ## `imtcontrols` — Библиотека UI-контролов
 
-Фундаментальная библиотека переиспользуемых контролов и визуальных примитивов: кнопки, поля ввода, диалоги и всплывающие окна, таблицы и деревья, меню, диаграммы и индикаторы, а также базовые классы (ControlBase, DecoratorBase) и оформление (Styles). На неё опираются почти все остальные QML-модули.
+Фундаментальная библиотека переиспользуемых контролов и визуальных примитивов: кнопки, поля ввода, диалоги и всплывающие окна, таблицы и деревья, меню, диаграммы и индикаторы, а также базовые классы (ControlBase, DecoratorBase). Оформление вынесено в отдельный модуль imtstyle. На неё опираются почти все остальные QML-модули.
 
-**Импорт:** `import imtcontrols 1.0` · **Компонентов:** 212
+**Импорт:** `import imtcontrols 1.0` · **Компонентов:** 208
 
 ### Base/ — Базовые классы
 
@@ -156,7 +158,7 @@
 Вспомогательный компонент.
 
 - **Файл:** [Base/Decorators.qml](imtcontrols/Base/Decorators.qml)
-- **Базовый тип:** [`StyleComponents`](#b-imtcontrols-StyleComponents)
+- **Базовый тип:** [`StyleComponents`](#b-imtstyle-StyleComponents)
 
 **Свойства**
 
@@ -258,351 +260,6 @@
 
 - **Файл:** [Base/WrapItem.qml](imtcontrols/Base/WrapItem.qml)
 - **Базовый тип:** `?`
-
-### Styles/ — Стили и оформление
-
-<a id="b-imtcontrols-FontProperties"></a>
-#### `FontProperties`
-
-Набор свойств оформления.
-
-- **Файл:** [Styles/FontProperties.qml](imtcontrols/Styles/FontProperties.qml)
-- **Базовый тип:** [`QtObject`](https://doc.qt.io/qt-6/qml-qtqml-qtobject.html)
-
-**Свойства**
-
-- `family: string`
-- `pixelSize: int`
-- `bold: bool`
-- `color: string`
-
-<a id="b-imtcontrols-IconProperties"></a>
-#### `IconProperties`
-
-Набор свойств оформления.
-
-- **Файл:** [Styles/IconProperties.qml](imtcontrols/Styles/IconProperties.qml)
-- **Базовый тип:** [`QtObject`](https://doc.qt.io/qt-6/qml-qtqml-qtobject.html)
-
-**Свойства**
-
-- `source: string`
-- `width: int`
-- `height: int`
-
-<a id="b-imtcontrols-StyleBase"></a>
-#### `StyleBase`
-
-Базовый компонент (для наследования).
-
-- **Файл:** [Styles/StyleBase.qml](imtcontrols/Styles/StyleBase.qml)
-- **Базовый тип:** [`StyleComponents`](#b-imtcontrols-StyleComponents)
-
-**Свойства**
-
-- `styleId: string`
-- `mobile: bool`
-- `mainWidth: real`
-- `mainHeight: real`
-- `mainSize: real`
-- `theme: string`
-- `logoIconName: string`
-- `language: string`
-- `mainFontSource: string`
-- `boldFontSource: string`
-- `fontFamily: string`
-- `fontFamilyBold: string`
-- `mainFontLoader: alias`
-- `boldFontLoader: alias`
-- `startWindowWidth: int`
-- `startWindowHeight: int`
-- `fontSizeXHuge: int`
-- `fontSizeHuge: int`
-- `fontSizeXXXXLarge: int`
-- `fontSizeXXXLarge: int`
-- `fontSizeXXLarge: int`
-- `fontSizeXLarge: int`
-- `fontSizeLarge: int`
-- `fontSizeNormal: int`
-- `fontSizeSmall: int`
-- `fontSizeXSmall: int`
-- `fontSizeXXSmall: int`
-- `fontSizeTiny: int`
-- `buttonWidthLarge: int`
-- `buttonWidthMedium: int`
-- `buttonWidthSmall: int`
-- `buttonWidthXSmall: int`
-- `buttonWidthTiny: int`
-- `buttonHeight: int`
-- `iconSizeXLarge: int`
-- `iconSizeLarge: int`
-- `iconSizeMedium: int`
-- `iconSizeSmall: int`
-- `iconSizeXSmall: int`
-- `itemSizeHuge: int`
-- `itemSizeXLarge: int`
-- `itemSizeLarge: int`
-- `itemSizeMedium: int`
-- `itemSizeSmall: int`
-- `itemSizeXSmall: int`
-- `paddingHuge: int`
-- `paddingLarge: int`
-- `paddingMedium: int`
-- `paddingSmall: int`
-- `sizeLargeMargin: int`
-- `sizeMainMargin: int`
-- `sizeSmallMargin: int`
-- `fontSizeBXXXL: int`
-- `fontSizeBXXL: int`
-- `fontSizeBXL: int`
-- `fontSizeXXXL: int`
-- `fontSizeXXL: int`
-- `fontSizeXL: int`
-- `fontSizeL: int`
-- `fontSizeM: int`
-- `fontSizeS: int`
-- `fontSizeXS: int`
-- `fontSizeXXS: int`
-- `fontSizeXXXS: int`
-- `marginXXXL: int`
-- `marginXXL: int`
-- `marginXL: int`
-- `marginL: int`
-- `marginM: int`
-- `marginS: int`
-- `marginXS: int`
-- `sizeHintXXXL: int`
-- `sizeHintXXL: int`
-- `sizeHintXL: int`
-- `sizeHintL: int`
-- `sizeHintM: int`
-- `sizeHintS: int`
-- `sizeHintXS: int`
-- `sizeHintXXS: int`
-- `sizeHintXXXS: int`
-- `sizeHintBXS: int`
-- `controlHeightL: int`
-- `controlHeightM: int`
-- `controlHeightS: int`
-- `radiusXXL: int`
-- `radiusXL: int`
-- `radiusL: int`
-- `radiusM: int`
-- `radiusS: int`
-- `radiusXS: int`
-- `spacingXXXL: int`
-- `spacingXXL: int`
-- `spacingXL: int`
-- `spacingL: int`
-- `spacingM: int`
-- `spacingS: int`
-- `spacingXS: int`
-- `spacingXXS: int`
-- `iconSizeXXXL: int`
-- `iconSizeXXL: int`
-- `iconSizeXL: int`
-- `iconSizeL: int`
-- `iconSizeM: int`
-- `iconSizeS: int`
-- `iconSizeXS: int`
-- `iconSizeXXS: int`
-- `iconSizeXXXS: int`
-- `buttonWidthXXXL: int`
-- `buttonWidthXXL: int`
-- `buttonWidthXL: int`
-- `buttonWidthL: int`
-- `buttonWidthM: int`
-- `buttonWidthS: int`
-- `buttonWidthXS: int`
-- `buttonWidthXXS: int`
-- `buttonWidthXXXS: int`
-- `buttonHeightM: int`
-- `buttonHeightS: int`
-- `buttonHeightXS: int`
-- `buttonHeightXXS: int`
-- `buttonHeightXXXS: int`
-- `buttonRadius: int`
-- `buttonBorderWidth: int`
-- `itemSizeXXL: int`
-- `itemSizeXL: int`
-- `itemSizeL: int`
-- `itemSizeM: int`
-- `itemSizeS: int`
-- `itemSizeXS: int`
-- `paddingXL: int`
-- `paddingL: int`
-- `paddingM: int`
-- `paddingS: int`
-- `menuRowHeight: int`
-- `menuMinWidth: int`
-- `tableRowHeight: int`
-- `tableHeaderHeight: int`
-- `gridCellSize: int`
-- `treeBranchOffset: int`
-- `mainWindowMargin: int`
-- `pageMargin: int`
-- `textFieldRadius: int`
-- `comboBoxRadius: int`
-- `menuPanelRadius: int`
-- `sizePanelsHeight: int`
-- `headerHeight: int`
-- `menuPanelMinWidth: int`
-- `opacityFaint: real`
-- `opacityHigh: real`
-- `opacityLow: real`
-- `opacityOverlay: real`
-- `selectedOpacity: real`
-- `hoverOpacity: real`
-- `highlightBackgroundOpacity: real`
-- `enableAlternating: bool`
-- `alternatingOpacity: real`
-- `imagingToolsGradient0: string`
-- `imagingToolsGradient1: string`
-- `imagingToolsGradient2: string`
-- `imagingToolsGradient3: string`
-- `imagingToolsGradient4: string`
-- `baseColor: string`
-- `baseColorInverted: string`
-- `mainColor: string`
-- `firstColor: string`
-- `secondColor: string`
-- `firstColorHighlight: string`
-- `colorMenuPanel: string`
-- `errorColor: string`
-- `errorTextColor: string`
-- `imaginToolsAccentColor: string`
-- `positiveAccentColor: string`
-- `negativeAccentColor: string`
-- `middleAccentColor: string`
-- `textColor: string`
-- `titleColor: string`
-- `subtitleColor: string`
-- `textSelectedColor: string`
-- `inactiveTextColor: string`
-- `placeHolderTextColor: string`
-- `linkColor: string`
-- `selectedLinkFromColor: string`
-- `selectedLinkToColor: string`
-- `popupErrorBackgroundColor: string`
-- `popupWarningBackgroundColor: string`
-- `popupSuccessBackgroundColor: string`
-- `popupInfoBackgroundColor: string`
-- `popupErrorAccentColor: string`
-- `popupWarningAccentColor: string`
-- `popupSuccessAccentColor: string`
-- `popupInfoAccentColor: string`
-- `popupCloseHoverColor: string`
-- `popupCloseIdleColor: string`
-- `popupIconChipOpacity: real`
-- `borderColor: string`
-- `borderColor2: string`
-- `backgroundColor: string`
-- `backgroundColor2: string`
-- `menuPanelBackgroundColor: string`
-- `dialogBackgroundColor: string`
-- `overlayBackgroundColor: string`
-- `tabPanelBackgroundColor: string`
-- `highlightBackgroundColor: string`
-- `highlightColor: string`
-- `highlightDimmerColor: string`
-- `secondaryHighlightColor: string`
-- `selectedColor: string`
-- `tabSelectedColor: string`
-- `iconColorOnSelected: string`
-- `buttonColor: string`
-- `buttonBorderColor: string`
-- `buttonHoverColor: string`
-- `buttonPressedColor: string`
-- `buttonAccentColor: string`
-- `buttonInactiveColor: string`
-- `buttonBorderFocusColor: string`
-- `buttonTextColor: string`
-- `buttonInactiveTextColor: string`
-- `tableHeaderColor: string`
-- `tableCellColor: string`
-- `tableHeaderBorederColor: string`
-- `tableCellBorderColor: string`
-- `tableHeaderFontColor: string`
-- `tableCellFontColor: string`
-- `scrollBackgroundColor: string`
-- `scrollIndicatorColor: string`
-- `scrollHighlightColor: string`
-- `shadowColor: string`
-- `hover: string`
-- `alternatingColor: color`
-- `alternateBaseColor: string`
-- `grayColor: string`
-- `greenColor: string`
-- `lightBlueColor: string`
-- `maximumFlickVelocity: real`
-- `enableHoverEffect: bool`
-- `enableMenuPanelCollapse: bool`
-
-**Функции**
-
-- `getIconPath(iconName, state, mode, extention )`
-- `getThemeColor(colorType, colorKey, themeType)`
-- `setDecorators(sourceDecorators)`
-- `parseStyleTheme(themeType)`
-
-<a id="b-imtcontrols-StyleComponents"></a>
-#### `StyleComponents`
-
-Визуальный компонент.
-
-- **Файл:** [Styles/StyleComponents.qml](imtcontrols/Styles/StyleComponents.qml)
-- **Базовый тип:** [`Item`](https://doc.qt.io/qt-6/qml-qtquick-item.html)
-- **Наследники:** [`Decorators`](#b-imtcontrols-Decorators), [`StyleBase`](#b-imtcontrols-StyleBase)
-
-**Свойства**
-
-- `menuPanelButtonDecorator: Component`
-- `subMenuPanelButtonDecorator: Component`
-- `menuPanelDecorator: Component`
-- `metaInfoPanelDecorator: Component`
-- `filterPanelDecorator: Component`
-- `bottomPanelDecorator: Component`
-- `topButtonDecorator: Component`
-- `topPanelDecorator: Component`
-- `topCenterPanelDecorator: Component`
-- `topLeftPanelDecorator: Component`
-- `topRightPanelDecorator: Component`
-- `tabPanelDecorator: Component`
-- `buttonDecorator: Component`
-- `firstSegmentDecorator: Component`
-- `middleSegmentDecorator: Component`
-- `lastSegmentDecorator: Component`
-- `toolButtonDecorator: Component`
-- `roundButtonDecorator: Component`
-- `textFieldDecorator: Component`
-- `textEditDecorator: Component`
-- `comboBoxDecorator: Component`
-- `checkBoxDecorator: Component`
-- `switchDecorator: Component`
-- `sliderDecorator: Component`
-- `rangeSliderDecorator: Component`
-- `radioButtonDecorator: Component`
-- `textAreaDecorator: Component`
-- `spinBoxDecorator: Component`
-- `dialogDecorator: Component`
-- `progressBarDecorator: Component`
-- `busyIndicatorDecorator: Component`
-- `tooltipDecorator: Component`
-- `scrollBarDecorator: Component`
-- `backGroundDecorator: Component`
-- `messageDecorator: Component`
-- `titleDecorator: Component`
-- `inputTitleDecorator: Component`
-- `frame: Component`
-- `commonButtonDecorator: Component`
-- `topPanelDialogDecorator: Component`
-- `itemDelegateDecorator: Component`
-- `popupDecorator: Component`
-- `popupDecoratorGql: Component`
-- `popupItemDelegateDecorator: Component`
-- `detailedPopupItemDelegateDecorator: Component`
-- `collectionTableDecorator: Component`
-- `drawingContainerDecorator: Component`
 
 ### Models/ — Модели и данные
 
@@ -6079,6 +5736,361 @@
 - **Файл:** [Base/web/Window.qml](imtcontrols/Base/web/Window.qml)
 - **Базовый тип:** [`Item`](https://doc.qt.io/qt-6/qml-qtquick-item.html)
 - **Наследники:** [`MainWindow`](#b-imtcontrols-MainWindow)
+
+
+---
+
+<a id="imtstyle"></a>
+## `imtstyle` — Стили и оформление
+
+Модуль оформления, вынесенный из imtcontrols в отдельный модуль: базовые стили (StyleBase, StyleComponents) и наборы свойств шрифта/иконок (FontProperties, IconProperties). Оформление всегда живёт здесь, а не в подпапке Styles/ какого-либо модуля. Подключается строкой `import imtstyle 1.0`.
+
+**Импорт:** `import imtstyle 1.0` · **Компонентов:** 4
+
+### ./ — Компоненты модуля
+
+<a id="b-imtstyle-FontProperties"></a>
+#### `FontProperties`
+
+Набор свойств оформления.
+
+- **Файл:** [FontProperties.qml](imtstyle/FontProperties.qml)
+- **Базовый тип:** [`QtObject`](https://doc.qt.io/qt-6/qml-qtqml-qtobject.html)
+
+**Свойства**
+
+- `family: string`
+- `pixelSize: int`
+- `bold: bool`
+- `color: string`
+
+<a id="b-imtstyle-IconProperties"></a>
+#### `IconProperties`
+
+Набор свойств оформления.
+
+- **Файл:** [IconProperties.qml](imtstyle/IconProperties.qml)
+- **Базовый тип:** [`QtObject`](https://doc.qt.io/qt-6/qml-qtqml-qtobject.html)
+
+**Свойства**
+
+- `source: string`
+- `width: int`
+- `height: int`
+
+<a id="b-imtstyle-StyleBase"></a>
+#### `StyleBase`
+
+Базовый стиль (для наследования).
+
+- **Файл:** [StyleBase.qml](imtstyle/StyleBase.qml)
+- **Базовый тип:** [`StyleComponents`](#b-imtstyle-StyleComponents)
+
+**Свойства**
+
+- `styleId: string`
+- `mobile: bool`
+- `mainWidth: real`
+- `mainHeight: real`
+- `mainSize: real`
+- `theme: string`
+- `logoIconName: string`
+- `language: string`
+- `mainFontSource: string`
+- `boldFontSource: string`
+- `fontFamily: string`
+- `fontFamilyBold: string`
+- `mainFontLoader: alias`
+- `boldFontLoader: alias`
+- `startWindowWidth: int`
+- `startWindowHeight: int`
+- `fontSizeXHuge: int`
+- `fontSizeHuge: int`
+- `fontSizeXXXXLarge: int`
+- `fontSizeXXXLarge: int`
+- `fontSizeXXLarge: int`
+- `fontSizeXLarge: int`
+- `fontSizeLarge: int`
+- `fontSizeNormal: int`
+- `fontSizeSmall: int`
+- `fontSizeXSmall: int`
+- `fontSizeXXSmall: int`
+- `fontSizeTiny: int`
+- `buttonWidthLarge: int`
+- `buttonWidthMedium: int`
+- `buttonWidthSmall: int`
+- `buttonWidthXSmall: int`
+- `buttonWidthTiny: int`
+- `buttonHeight: int`
+- `iconSizeXLarge: int`
+- `iconSizeLarge: int`
+- `iconSizeMedium: int`
+- `iconSizeSmall: int`
+- `iconSizeXSmall: int`
+- `itemSizeHuge: int`
+- `itemSizeXLarge: int`
+- `itemSizeLarge: int`
+- `itemSizeMedium: int`
+- `itemSizeSmall: int`
+- `itemSizeXSmall: int`
+- `paddingHuge: int`
+- `paddingLarge: int`
+- `paddingMedium: int`
+- `paddingSmall: int`
+- `sizeLargeMargin: int`
+- `sizeMainMargin: int`
+- `sizeSmallMargin: int`
+- `fontSizeBXXXL: int`
+- `fontSizeBXXL: int`
+- `fontSizeBXL: int`
+- `fontSizeXXXL: int`
+- `fontSizeXXL: int`
+- `fontSizeXL: int`
+- `fontSizeL: int`
+- `fontSizeM: int`
+- `fontSizeS: int`
+- `fontSizeXS: int`
+- `fontSizeXXS: int`
+- `fontSizeXXXS: int`
+- `marginXXXL: int`
+- `marginXXL: int`
+- `marginXL: int`
+- `marginL: int`
+- `marginM: int`
+- `marginS: int`
+- `marginXS: int`
+- `sizeHintXXXL: int`
+- `sizeHintXXL: int`
+- `sizeHintXL: int`
+- `sizeHintL: int`
+- `sizeHintM: int`
+- `sizeHintS: int`
+- `sizeHintXS: int`
+- `sizeHintXXS: int`
+- `sizeHintXXXS: int`
+- `sizeHintBXS: int`
+- `controlHeightL: int`
+- `controlHeightM: int`
+- `controlHeightS: int`
+- `radiusXXL: int`
+- `radiusXL: int`
+- `radiusL: int`
+- `radiusM: int`
+- `radiusS: int`
+- `radiusXS: int`
+- `spacingXXXL: int`
+- `spacingXXL: int`
+- `spacingXL: int`
+- `spacingL: int`
+- `spacingM: int`
+- `spacingS: int`
+- `spacingXS: int`
+- `spacingXXS: int`
+- `iconSizeXXXL: int`
+- `iconSizeXXL: int`
+- `iconSizeXL: int`
+- `iconSizeL: int`
+- `iconSizeM: int`
+- `iconSizeS: int`
+- `iconSizeXS: int`
+- `iconSizeXXS: int`
+- `iconSizeXXXS: int`
+- `buttonWidthXXXL: int`
+- `buttonWidthXXL: int`
+- `buttonWidthXL: int`
+- `buttonWidthL: int`
+- `buttonWidthM: int`
+- `buttonWidthS: int`
+- `buttonWidthXS: int`
+- `buttonWidthXXS: int`
+- `buttonWidthXXXS: int`
+- `buttonHeightM: int`
+- `buttonHeightS: int`
+- `buttonHeightXS: int`
+- `buttonHeightXXS: int`
+- `buttonHeightXXXS: int`
+- `buttonRadius: int`
+- `buttonBorderWidth: int`
+- `itemSizeXXL: int`
+- `itemSizeXL: int`
+- `itemSizeL: int`
+- `itemSizeM: int`
+- `itemSizeS: int`
+- `itemSizeXS: int`
+- `paddingXL: int`
+- `paddingL: int`
+- `paddingM: int`
+- `paddingS: int`
+- `menuRowHeight: int`
+- `menuMinWidth: int`
+- `tableRowHeight: int`
+- `tableHeaderHeight: int`
+- `gridCellSize: int`
+- `treeBranchOffset: int`
+- `mainWindowMargin: int`
+- `pageMargin: int`
+- `textFieldRadius: int`
+- `comboBoxRadius: int`
+- `menuPanelRadius: int`
+- `sizePanelsHeight: int`
+- `headerHeight: int`
+- `menuPanelMinWidth: int`
+- `opacityFaint: real`
+- `opacityHigh: real`
+- `opacityLow: real`
+- `opacityOverlay: real`
+- `selectedOpacity: real`
+- `hoverOpacity: real`
+- `highlightBackgroundOpacity: real`
+- `enableAlternating: bool`
+- `alternatingOpacity: real`
+- `imagingToolsGradient0: string`
+- `imagingToolsGradient1: string`
+- `imagingToolsGradient2: string`
+- `imagingToolsGradient3: string`
+- `imagingToolsGradient4: string`
+- `baseColor: string`
+- `baseColorInverted: string`
+- `mainColor: string`
+- `firstColor: string`
+- `secondColor: string`
+- `firstColorHighlight: string`
+- `colorMenuPanel: string`
+- `errorColor: string`
+- `errorTextColor: string`
+- `imaginToolsAccentColor: string`
+- `positiveAccentColor: string`
+- `negativeAccentColor: string`
+- `middleAccentColor: string`
+- `textColor: string`
+- `titleColor: string`
+- `subtitleColor: string`
+- `textSelectedColor: string`
+- `inactiveTextColor: string`
+- `placeHolderTextColor: string`
+- `linkColor: string`
+- `selectedLinkFromColor: string`
+- `selectedLinkToColor: string`
+- `popupErrorBackgroundColor: string`
+- `popupWarningBackgroundColor: string`
+- `popupSuccessBackgroundColor: string`
+- `popupInfoBackgroundColor: string`
+- `popupErrorAccentColor: string`
+- `popupWarningAccentColor: string`
+- `popupSuccessAccentColor: string`
+- `popupInfoAccentColor: string`
+- `popupCloseHoverColor: string`
+- `popupCloseIdleColor: string`
+- `popupIconChipOpacity: real`
+- `borderColor: string`
+- `borderColor2: string`
+- `backgroundColor: string`
+- `backgroundColor2: string`
+- `menuPanelBackgroundColor: string`
+- `dialogBackgroundColor: string`
+- `overlayBackgroundColor: string`
+- `tabPanelBackgroundColor: string`
+- `highlightBackgroundColor: string`
+- `highlightColor: string`
+- `highlightDimmerColor: string`
+- `secondaryHighlightColor: string`
+- `selectedColor: string`
+- `tabSelectedColor: string`
+- `iconColorOnSelected: string`
+- `buttonColor: string`
+- `buttonBorderColor: string`
+- `buttonHoverColor: string`
+- `buttonPressedColor: string`
+- `buttonAccentColor: string`
+- `buttonInactiveColor: string`
+- `buttonBorderFocusColor: string`
+- `buttonTextColor: string`
+- `buttonInactiveTextColor: string`
+- `tableHeaderColor: string`
+- `tableCellColor: string`
+- `tableHeaderBorederColor: string`
+- `tableCellBorderColor: string`
+- `tableHeaderFontColor: string`
+- `tableCellFontColor: string`
+- `scrollBackgroundColor: string`
+- `scrollIndicatorColor: string`
+- `scrollHighlightColor: string`
+- `shadowColor: string`
+- `hover: string`
+- `alternatingColor: color`
+- `alternateBaseColor: string`
+- `grayColor: string`
+- `greenColor: string`
+- `lightBlueColor: string`
+- `maximumFlickVelocity: real`
+- `enableHoverEffect: bool`
+- `enableMenuPanelCollapse: bool`
+
+**Функции**
+
+- `getIconPath(iconName, state, mode, extention )`
+- `getThemeColor(colorType, colorKey, themeType)`
+- `setDecorators(sourceDecorators)`
+- `parseStyleTheme(themeType)`
+
+<a id="b-imtstyle-StyleComponents"></a>
+#### `StyleComponents`
+
+Набор компонентов стиля.
+
+- **Файл:** [StyleComponents.qml](imtstyle/StyleComponents.qml)
+- **Базовый тип:** [`Item`](https://doc.qt.io/qt-6/qml-qtquick-item.html)
+- **Наследники:** [`Decorators`](#b-imtcontrols-Decorators), [`StyleBase`](#b-imtstyle-StyleBase)
+
+**Свойства**
+
+- `menuPanelButtonDecorator: Component`
+- `subMenuPanelButtonDecorator: Component`
+- `menuPanelDecorator: Component`
+- `metaInfoPanelDecorator: Component`
+- `filterPanelDecorator: Component`
+- `bottomPanelDecorator: Component`
+- `topButtonDecorator: Component`
+- `topPanelDecorator: Component`
+- `topCenterPanelDecorator: Component`
+- `topLeftPanelDecorator: Component`
+- `topRightPanelDecorator: Component`
+- `tabPanelDecorator: Component`
+- `buttonDecorator: Component`
+- `firstSegmentDecorator: Component`
+- `middleSegmentDecorator: Component`
+- `lastSegmentDecorator: Component`
+- `toolButtonDecorator: Component`
+- `roundButtonDecorator: Component`
+- `textFieldDecorator: Component`
+- `textEditDecorator: Component`
+- `comboBoxDecorator: Component`
+- `checkBoxDecorator: Component`
+- `switchDecorator: Component`
+- `sliderDecorator: Component`
+- `rangeSliderDecorator: Component`
+- `radioButtonDecorator: Component`
+- `textAreaDecorator: Component`
+- `spinBoxDecorator: Component`
+- `dialogDecorator: Component`
+- `progressBarDecorator: Component`
+- `busyIndicatorDecorator: Component`
+- `tooltipDecorator: Component`
+- `scrollBarDecorator: Component`
+- `backGroundDecorator: Component`
+- `messageDecorator: Component`
+- `titleDecorator: Component`
+- `inputTitleDecorator: Component`
+- `frame: Component`
+- `commonButtonDecorator: Component`
+- `topPanelDialogDecorator: Component`
+- `itemDelegateDecorator: Component`
+- `popupDecorator: Component`
+- `popupDecoratorGql: Component`
+- `popupItemDelegateDecorator: Component`
+- `detailedPopupItemDelegateDecorator: Component`
+- `collectionTableDecorator: Component`
+- `drawingContainerDecorator: Component`
 
 
 ---

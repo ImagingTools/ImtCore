@@ -4,6 +4,7 @@ import com.imtcore.imtqml 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
 import imtbaseSettingsSdl 1.0
+import imtstyle 1.0
 
 StyleBase {
 	id: styleContainer;

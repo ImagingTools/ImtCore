@@ -15,6 +15,7 @@
         "${IMTCOREDIR}/Qml/imtcolgui",
         "${IMTCOREDIR}/Qml/imtcontrols",
         "${IMTCOREDIR}/Qml/imtqmlutils",
+        "${IMTCOREDIR}/Qml/imtstyle",
         "${IMTCOREDIR}/Qml/imtgraphics2d",
 	"${IMTCOREDIR}/Qml/imtcontrols/Popup/Internal",
 	"${IMTCOREDIR}/Qml/imtcontrols/Menu/Internal",

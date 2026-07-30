@@ -12,7 +12,8 @@ ImtCore. Сначала выбирается **модуль**, затем **по
 | Модуль | Назначение |
 |---|---|
 | **`imtqmlutils`** | Невизуальные утилиты общего назначения: математика и геометрия, валидаторы, генераторы (UUID), модельные помощники (сортировка и фильтрация, конечный автомат), общие функции, дизайн-схема, шина событий. |
-| **`imtcontrols`** | Базовые переиспользуемые контролы и примитивы: кнопки, поля ввода, диалоги, таблицы и деревья, меню, всплывающие окна, индикаторы, а также базовые классы и стили. |
+| **`imtstyle`** | Стили и оформление: базовые стили и наборы свойств шрифта/иконок (`StyleBase`, `StyleComponents`, `FontProperties`, `IconProperties`). |
+| **`imtcontrols`** | Базовые переиспользуемые контролы и примитивы: кнопки, поля ввода, диалоги, таблицы/деревья, меню, всплывающие окна, индикаторы, а также базовые классы. |
 | **`imtgraphics2d`** | 2D-графика на HTML5 Canvas: контейнер сцены, слои, фигуры и их параметры, графики (Graph2d/MultiGraph2d), матрицы. |
 | **`imtgui`** | Каркас прикладного интерфейса поверх imtcontrols: оболочка приложения, панели, редакторы параметров (Params), настройки, представления и элементы форм (ElementView). |
 | **`imtguigql`** | Инфраструктура поверх GraphQL/SDL: запросы, подписки, WebSocket, GraphQL-версии контроллеров, провайдеров и сервисов, удалённые коллекции, выбор серверных путей. |
@@ -54,10 +55,11 @@ ImtCore. Сначала выбирается **модуль**, затем **по
 | `Api/` | Сетевой слой: запросы, клиенты, сокеты, подписки, прокси. | `*ApiClient`, `*Client`, `*Sender`, `*Proxy`, `*Request`, `*Listener`, `*Checker`, `*Subscription*` |
 | `Models/` | Модели, кэши, фильтры, валидаторы, структуры, регистраторы. | `Cached*`, `*Model`, `*Filter`, `*Validator`, `*Registrar`, `*Structure` |
 | `Base/` | Базовые классы для наследования, перечисления, JS-хелперы типов. | `*Base`, `ControlBase`, `DecoratorBase`, `Enums`, `Icon.js` |
-| `Styles/` | Оформление: стили, наборы свойств шрифта и иконок. | `Style*`, `*Properties` |
 | `Params/` | Редакторы/просмотр параметров (в `imtgui`). | `*ParamEditor`, `*ParamView`, `*ParamController` |
 | `Settings/` | Настройки приложения (в `imtgui`). | `Settings*`, `Preference*` |
 | `Actions/`, `Buttons/`, `Menu/`, `Popup/` | Специализированные группы контролов в `imtcontrols`. | действия и жесты, кнопки, меню, всплывающие элементы |
+
+> **Оформление (стили) — НЕ подпапка, а отдельный модуль [`imtstyle`](README-base.md#imtstyle).** Подпапка `Style/` или `Styles/` внутри любого модуля **запрещена**.
 
 ### 2D-графика (`imtgraphics2d`)
 | Папка | Назначение |
@@ -98,7 +100,7 @@ ImtCore. Сначала выбирается **модуль**, затем **по
 | `Model`, `Filter`, `Validator`, `Structure`, `Registrar`, `Cached…` | `Models/` |
 | `Panel` | `Panels/` |
 | `Input`, `Picker`, `ComboBox…`, `Field` | `Inputs/` |
-| `Style…`, `…Properties` | `Styles/` |
+| `Style…`, `…Properties` | модуль **`imtstyle`** (не подпапка!) |
 | `Base` (базовый класс) | `Base/` |
 | `View`, `ViewBase`, `Badge`, `Card`, `Banner` | `Views/` (`View/` в imtgui) |
 | `Shape` | `Shapes/` (imtgraphics2d) |
@@ -115,7 +117,8 @@ ImtCore. Сначала выбирается **модуль**, затем **по
 
 | Модуль | Подпапки |
 |---|---|
-| `imtcontrols` | Actions, Base (+`Base/web`), Buttons, Dialogs, Inputs, Menu, Models, Popup, Styles, Views |
+| `imtcontrols` | Actions, Base (+`Base/web`), Buttons, Dialogs, Inputs, Menu, Models, Popup, Views |
+| `imtstyle` | *(плоский модуль)* StyleBase, StyleComponents, FontProperties, IconProperties |
 | `imtqmlutils` | Core, Math, Models, Validators, Web |
 | `imtgraphics2d` | Core, Graphs, Params, Shapes |
 | `imtgui` | Application, Panels, Params, Settings, View |
@@ -137,6 +140,9 @@ ImtCore. Сначала выбирается **модуль**, затем **по
 
 ## Особые случаи
 
+- **Стили — отдельный модуль, а НЕ подпапка.** Любой компонент оформления
+  (стили, наборы свойств шрифта/иконок) размещается в модуле **`imtstyle`**.
+  Подпапка `Style/` или `Styles/` внутри любого модуля **запрещена**.
 - **Синглтоны** (`pragma Singleton`) размещаются по своей роли (например,
    singleton-провайдер — в `Providers/`) и помечаются словом `singleton` в `qmldir`.
 - **`imtcontrols/Base/web/`** — веб-специфичные переопределения контролов для
