@@ -23,8 +23,8 @@ namespace imtclientgql
 	(\c WebSocketServerFramework exports this as \c IGqlClient).
 
 	Each \c SendRequest forwards to \c AsyncClient and blocks until completion
-	or \c Timeout (then cancels). Prefer \c IAsyncGqlClient / \c TAsyncClientRequestManagerCompWrap
-	on WebSocket worker threads to avoid nested event loops.
+	or \c Timeout (then cancels). Prefer \c IAsyncGqlClient on WebSocket worker
+	threads to avoid nested event loops.
 */
 class CGqlClientSyncAdapterComp:
 			public ilog::CLoggerComponentBase,
