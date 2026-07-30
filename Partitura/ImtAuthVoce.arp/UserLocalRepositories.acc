@@ -82,6 +82,24 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SQLiteDocumentShareRepository" PackageId="ImtUserAdministrationVoce" ComponentId="SQLiteDocumentShareRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="SQLiteOrderRequestRepository" PackageId="ImtUserAdministrationVoce" ComponentId="SQLiteOrderRequestRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -381,6 +399,7 @@
         <Component ExportedId="SQLiteContractRepository" ComponentId="SQLiteContractRepository"/>
         <Component ExportedId="SQLiteCrossOrgGrantRepository" ComponentId="SQLiteCrossOrgGrantRepository"/>
         <Component ExportedId="SQLiteCrossTenantMessageRepository" ComponentId="SQLiteCrossTenantMessageRepository"/>
+        <Component ExportedId="SQLiteDocumentShareRepository" ComponentId="SQLiteDocumentShareRepository"/>
         <Component ExportedId="SQLiteOrderRequestRepository" ComponentId="SQLiteOrderRequestRepository"/>
         <Component ExportedId="SQLiteTenantConnectionCodeRepository" ComponentId="SQLiteTenantConnectionCodeRepository"/>
         <Component ExportedId="SQLiteTenantConnectionRepository" ComponentId="SQLiteTenantConnectionRepository"/>

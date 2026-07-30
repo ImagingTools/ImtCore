@@ -316,6 +316,24 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="DocumentShareSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="DocumentShareSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="OrderRequestSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="OrderRequestSqlRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -349,6 +367,7 @@
         <Component ExportedId="TenantRelationshipProposalRepository" ComponentId="TenantRelationshipProposalSqlRepository/TenantRelationshipProposalRepository"/>
         <Component ExportedId="TenantRelationshipRepository" ComponentId="TenantRelationshipSqlRepository/TenantRelationshipRepository"/>
         <Component ExportedId="CrossTenantMessageRepository" ComponentId="CrossTenantMessageSqlRepository/CrossTenantMessageRepository"/>
+        <Component ExportedId="DocumentShareRepository" ComponentId="DocumentShareSqlRepository/DocumentShareRepository"/>
         <Component ExportedId="OrderRequestRepository" ComponentId="OrderRequestSqlRepository/OrderRequestRepository"/>
         <Component ExportedId="RoleRepository" ComponentId="RoleDocumentSqlRepository"/>
         <Component ExportedId="TenantInvitationRepository" ComponentId="TenantInvitationSqlRepository/TenantInvitationRepository"/>

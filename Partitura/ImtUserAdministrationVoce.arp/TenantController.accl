@@ -10,6 +10,7 @@
     <PositionMap>
         <Element ComponentName="DelegatedAccessResolver" X="225" Y="225" Note=""/>
         <Element ComponentName="Demultiplexer" X="600" Y="75" Note=""/>
+        <Element ComponentName="DocumentShareManager" X="250" Y="800" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="650" Y="750" Note=""/>
         <Element ComponentName="TenantCollectionController" X="200" Y="75" Note=""/>
         <Element ComponentName="TenantCollectionDocumentService" X="200" Y="425" Note=""/>
