@@ -3,18 +3,16 @@
 
 
 // Qt includes
+#include <QtCore/QFutureWatcher>
 #include <QtCore/QMetaObject>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <QtCore/QPromise>
 #include <QtCore/QTimer>
 #include <QtCore/QUuid>
-#include <QtCore/QWaitCondition>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
 // stdlib
-#include <functional>
 #include <memory>
 
 // ImtCore includes
@@ -23,116 +21,6 @@
 
 namespace imtclientgql
 {
-
-
-namespace
-{
-
-
-/**
-	Internal token implementation backing each in-flight request of
-	\c CAsyncApiClientComp. The token is reference-counted via
-	\c istd::TSharedInterfacePtr and shared between the caller and the
-	internal completion lambda, which keeps it alive until the request
-	reaches a terminal state.
-*/
-class CAsyncGqlRequestTokenImpl: virtual public IAsyncGqlRequestToken
-{
-public:
-	CAsyncGqlRequestTokenImpl():
-		m_state(RS_PENDING)
-	{
-	}
-
-	// reimplemented (IAsyncGqlRequestToken)
-
-	virtual RequestState GetState() const override
-	{
-		QMutexLocker lock(&m_mutex);
-		return m_state;
-	}
-
-	virtual void Cancel() override
-	{
-		std::function<void()> cancelCb;
-		{
-			QMutexLocker lock(&m_mutex);
-			if (m_state != RS_PENDING){
-				return;
-			}
-			cancelCb = m_cancelCb;
-		}
-
-		if (cancelCb){
-			// The cancel callback aborts the network reply; the resulting
-			// "finished" signal will drive the final transition to RS_CANCELLED.
-			cancelCb();
-		}
-		else{
-			// No callback wired (e.g. synchronous validation failure before
-			// the network request was issued): finalize directly so waiters
-			// are released and the contract is honoured.
-			MarkTerminal(RS_CANCELLED);
-		}
-	}
-
-	virtual bool Wait(int timeoutMs = -1) override
-	{
-		// QWaitCondition — no QEventLoop/QTimer on worker threads (affinity warnings).
-		QMutexLocker lock(&m_mutex);
-		if (m_state != RS_PENDING){
-			return true;
-		}
-		if (timeoutMs < 0){
-			m_waitCondition.wait(&m_mutex);
-			return true;
-		}
-		return m_waitCondition.wait(&m_mutex, static_cast<unsigned long>(timeoutMs));
-	}
-
-	// internal API used by CAsyncApiClientComp
-
-	void SetCancelCallback(std::function<void()> cancelCb)
-	{
-		QMutexLocker lock(&m_mutex);
-		m_cancelCb = std::move(cancelCb);
-	}
-
-	void MarkCompleted()
-	{
-		MarkTerminal(RS_COMPLETED);
-	}
-
-	void MarkCancelled()
-	{
-		MarkTerminal(RS_CANCELLED);
-	}
-
-	void MarkFailed()
-	{
-		MarkTerminal(RS_FAILED);
-	}
-
-private:
-	void MarkTerminal(RequestState newState)
-	{
-		QMutexLocker lock(&m_mutex);
-		if (m_state != RS_PENDING){
-			return;
-		}
-		m_state = newState;
-		m_cancelCb = nullptr;
-		m_waitCondition.wakeAll();
-	}
-
-	mutable QMutex m_mutex;
-	QWaitCondition m_waitCondition;
-	RequestState m_state;
-	std::function<void()> m_cancelCb;
-};
-
-
-} // anonymous namespace
 
 
 // public methods
@@ -153,51 +41,48 @@ CAsyncApiClientComp::~CAsyncApiClientComp()
 
 // reimplemented (IAsyncGqlClient)
 
-IAsyncGqlRequestTokenPtr CAsyncApiClientComp::SendRequest(
+QFuture<IAsyncGqlClient::GqlResult> CAsyncApiClientComp::SendRequest(
 			GqlRequestPtr requestPtr,
-			IAsyncGqlResponseHandler* handlerPtr,
 			imtbase::IUrlParam* urlParamPtr) const
 {
-	auto* tokenImplPtr = new CAsyncGqlRequestTokenImpl();
-	IAsyncGqlRequestTokenPtr tokenPtr;
-	tokenPtr.SetPtr(tokenImplPtr);
+	auto promisePtr = std::make_shared<QPromise<GqlResult>>();
+	promisePtr->start();
+	QFuture<GqlResult> future = promisePtr->future();
 
-	auto FailFast = [tokenImplPtr, handlerPtr](IAsyncGqlResponseHandler::ErrorCategory category, const QString& message) {
-		if (handlerPtr != nullptr){
-			handlerPtr->OnError(category, message);
-		}
-		tokenImplPtr->MarkFailed();
+	auto FailFast = [promisePtr](ErrorCategory category, const QString& message) {
+		promisePtr->addResult(GqlResult{GqlResponsePtr(), category, message});
+		promisePtr->finish();
 	};
 
 	if (!requestPtr.IsValid()){
-		FailFast(IAsyncGqlResponseHandler::EC_INVALID_REQUEST, "Invalid request");
-		return tokenPtr;
+		FailFast(EC_INVALID_REQUEST, "Invalid request");
+		return future;
 	}
 
 	if (!m_protocolEngineCompPtr.IsValid()){
 		SendErrorMessage(0, "Protocol engine is not available", "Async API Client");
-		FailFast(IAsyncGqlResponseHandler::EC_INTERNAL, "Protocol engine is not available");
-		return tokenPtr;
+		FailFast(EC_INTERNAL, "Protocol engine is not available");
+		return future;
 	}
 
 	if (m_networkManagerPtr == nullptr){
 		SendErrorMessage(0, "Network access manager is not initialized", "Async API Client");
-		FailFast(IAsyncGqlResponseHandler::EC_INTERNAL, "Network access manager is not initialized");
-		return tokenPtr;
+		FailFast(EC_INTERNAL, "Network access manager is not initialized");
+		return future;
 	}
 
 	imtgql::IGqlRequest::RequestType requestType = requestPtr->GetRequestType();
 	if ((requestType != imtgql::IGqlRequest::RT_QUERY) && (requestType != imtgql::IGqlRequest::RT_MUTATION)){
 		SendErrorMessage(0, "Invalid request type", "Async API Client");
-		FailFast(IAsyncGqlResponseHandler::EC_INVALID_REQUEST, "Invalid request type");
-		return tokenPtr;
+		FailFast(EC_INVALID_REQUEST, "Invalid request type");
+		return future;
 	}
 
 	QNetworkRequest* networkRequestPtr = m_protocolEngineCompPtr->CreateNetworkRequest(*requestPtr, urlParamPtr);
 	if (networkRequestPtr == nullptr){
 		SendErrorMessage(0, "Failed to create network request", "Async API Client");
-		FailFast(IAsyncGqlResponseHandler::EC_INTERNAL, "Failed to create network request");
-		return tokenPtr;
+		FailFast(EC_INTERNAL, "Failed to create network request");
+		return future;
 	}
 
 	const QByteArray uuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
@@ -208,20 +93,22 @@ IAsyncGqlRequestTokenPtr CAsyncApiClientComp::SendRequest(
 
 	if (replyPtr == nullptr){
 		SendErrorMessage(0, QString("Null reply for request-ID ") + uuid, "Async API Client");
-		FailFast(IAsyncGqlResponseHandler::EC_NETWORK, "Failed to start network request");
-		return tokenPtr;
+		FailFast(EC_NETWORK, "Failed to start network request");
+		return future;
 	}
 
 	replyPtr->ignoreSslErrors();
 
-	// Wire cancellation: aborting the reply triggers QNetworkReply::finished
-	// with OperationCanceledError, which the finalizer maps to EC_CANCELLED.
-	QPointer<QNetworkReply> replyGuard(replyPtr);
-	tokenImplPtr->SetCancelCallback([replyGuard]() {
-		if (!replyGuard.isNull() && replyGuard->isRunning()){
-			replyGuard->abort();
+	// Wire cancellation: QFuture::cancel aborts the reply, which triggers
+	// QNetworkReply::finished with OperationCanceledError. The watcher is
+	// parented to the reply so it is destroyed along with it.
+	auto* cancelWatcherPtr = new QFutureWatcher<GqlResult>(replyPtr);
+	QObject::connect(cancelWatcherPtr, &QFutureWatcherBase::canceled, replyPtr, [replyPtr]() {
+		if (replyPtr->isRunning()){
+			replyPtr->abort();
 		}
 	});
+	cancelWatcherPtr->setFuture(future);
 
 	// Optional timeout timer (single-shot, parented to the reply so it is
 	// destroyed along with it).
@@ -236,18 +123,21 @@ IAsyncGqlRequestTokenPtr CAsyncApiClientComp::SendRequest(
 	// finished signal arrives.
 	auto timedOutFlagPtr = std::make_shared<bool>(false);
 
-	// Keep the token alive until the finalizer runs, regardless of the caller.
-	auto tokenKeepAlive = tokenPtr;
-
-	auto Finalize = [this, replyPtr, requestPtr, handlerPtr, tokenKeepAlive, tokenImplPtr, timeoutTimerPtr, timedOutFlagPtr, uuid]() {
-		if (tokenImplPtr->GetState() != IAsyncGqlRequestToken::RS_PENDING){
-			// Already finalized (defensive: should not happen, finished fires once).
-			replyPtr->deleteLater();
-			return;
-		}
+	auto Finalize = [this, replyPtr, requestPtr, promisePtr, timeoutTimerPtr, timedOutFlagPtr, uuid]() mutable {
+		Q_ASSERT(!promisePtr->future().isFinished());
 
 		if (timeoutTimerPtr != nullptr){
 			timeoutTimerPtr->stop();
+		}
+
+		// QFuture::cancel marks the shared state canceled before the queued
+		// abort() reaches the reply; if the reply finished in that window the
+		// error code may be NoError (or a non-cancellation error). The future
+		// state is the authoritative terminal decision.
+		if (promisePtr->isCanceled()){
+			promisePtr->finish();
+			replyPtr->deleteLater();
+			return;
 		}
 
 		const QNetworkReply::NetworkError error = replyPtr->error();
@@ -261,34 +151,25 @@ IAsyncGqlRequestTokenPtr CAsyncApiClientComp::SendRequest(
 			IAsyncGqlClient::GqlResponsePtr responsePtr;
 			responsePtr.SetPtr(gqlResponsePtr);
 
-			tokenImplPtr->MarkCompleted();
-			if (handlerPtr != nullptr){
-				handlerPtr->OnResponseReceived(responsePtr);
-			}
+			promisePtr->addResult(GqlResult{responsePtr, EC_NONE, QString()});
+			promisePtr->finish();
 		}
 		else if (error == QNetworkReply::OperationCanceledError){
 			if (*timedOutFlagPtr){
 				const QString message = QString("Request ") + uuid + " timed out";
 				SendErrorMessage(0, message, "Async API Client");
-				tokenImplPtr->MarkFailed();
-				if (handlerPtr != nullptr){
-					handlerPtr->OnError(IAsyncGqlResponseHandler::EC_TIMEOUT, message);
-				}
+				promisePtr->addResult(GqlResult{GqlResponsePtr(), EC_TIMEOUT, message});
+				promisePtr->finish();
 			}
 			else{
-				tokenImplPtr->MarkCancelled();
-				if (handlerPtr != nullptr){
-					handlerPtr->OnError(IAsyncGqlResponseHandler::EC_CANCELLED, "Request cancelled");
-				}
+				promisePtr->finish();
 			}
 		}
 		else{
 			const QString message = QString("Response for request-ID ") + uuid + "\n" + replyPtr->errorString();
 			SendErrorMessage(0, message, "Async API Client");
-			tokenImplPtr->MarkFailed();
-			if (handlerPtr != nullptr){
-				handlerPtr->OnError(IAsyncGqlResponseHandler::EC_NETWORK, replyPtr->errorString());
-			}
+			promisePtr->addResult(GqlResult{GqlResponsePtr(), EC_NETWORK, replyPtr->errorString()});
+			promisePtr->finish();
 		}
 
 		replyPtr->deleteLater();
@@ -306,7 +187,7 @@ IAsyncGqlRequestTokenPtr CAsyncApiClientComp::SendRequest(
 		timeoutTimerPtr->start(m_timeout);
 	}
 
-	return tokenPtr;
+	return future;
 }
 
 
@@ -327,4 +208,3 @@ void CAsyncApiClientComp::OnComponentCreated()
 
 
 } // namespace imtclientgql
-
