@@ -605,7 +605,7 @@ void CSubscriptionManagerComp::FailPending(
 
 	// Same atomic terminalization as CompletePending: the entry was taken above,
 	// so this path must finish the future. Re-check cancellation in the queued
-	// lambda so a cancel racing with e.g. a timeout still yields EC_CANCELLED.
+	// lambda so a cancel racing with e.g. a timeout still finishes without a result.
 	auto deliver = [pending, category, message]() mutable {
 		if (pending.promisePtr->future().isFinished()){
 			return;
