@@ -165,65 +165,6 @@ module.exports = {
         }
     },
 
-    __isPointerHandler: function(obj){
-        if(!obj || obj.__destroyed) return false
-        return obj instanceof JQModules.QtQuick.PointerHandler
-    },
-
-    __collectHandlersFromOwner: function(owner, result){
-        if(!owner || owner.__destroyed || !owner.resources || !Array.isArray(owner.resources)) return
-
-        for(let resource of owner.resources){
-            if(this.__isPointerHandler(resource)){
-                result.add(resource)
-            }
-        }
-    },
-
-    __collectPointerHandlersForPath: function(path){
-        let handlers = new Set()
-        if(!Array.isArray(path)) return handlers
-
-        for(let obj of path){
-            let parent = obj
-            while(parent){
-                this.__collectHandlersFromOwner(parent, handlers)
-                parent = parent.parent
-            }
-        }
-
-        return handlers
-    },
-
-    __pruneActivePointerHandlers: function(){
-        for(let handler of this.activePointerHandlers){
-            if(!handler || handler.__destroyed || !handler.enabled || !handler.active){
-                this.activePointerHandlers.delete(handler)
-            }
-        }
-    },
-
-    __dispatchPointerHandlers: function(handlers, methodName, event){
-        if(!handlers || handlers.size === 0) return
-
-        for(let handler of handlers){
-            if(!handler || handler.__destroyed || typeof handler[methodName] !== 'function') continue
-
-            let target = typeof handler.__getEffectiveTarget === 'function' ? handler.__getEffectiveTarget() : null
-            if(target && target.__DOM && typeof event.relative === 'function'){
-                event.relative(target)
-            }
-
-            handler[methodName](event)
-
-            if(handler.active){
-                this.activePointerHandlers.add(handler)
-            } else {
-                this.activePointerHandlers.delete(handler)
-            }
-        }
-    },
-
     getObjectsFromPoint: function(x, y){
         let result = []
 
@@ -440,7 +381,7 @@ module.exports = {
 
                 event.relative(this.entered[i])
                 if(event.x < 0 || event.y < 0 || event.x >= this.entered[i].width || event.y >= this.entered[i].height) {
-                    this.entered[i].__onMouseLeave(event)
+                    if(typeof this.entered[i].__onMouseLeave === 'function') this.entered[i].__onMouseLeave(event)
                     this.entered.splice(i, 1)
                 } else {
                     i++
@@ -458,25 +399,29 @@ module.exports = {
                 if(event.x >= 0 && event.y >= 0 && event.x < event.path[i].width && event.y < event.path[i].height){
                     if(this.entered.indexOf(event.path[i]) < 0) {
                         this.entered.push(event.path[i])
-                        event.path[i].__onMouseEnter(event)
+                        if(typeof event.path[i].__onMouseEnter === 'function') event.path[i].__onMouseEnter(event)
                     }
                 } 
-                event.path[i].__onMouseMove(event)
+                if(typeof event.path[i].__onMouseMove === 'function') event.path[i].__onMouseMove(event)
 
                 i++
             }
 
-            let pathHandlers = this.__collectPointerHandlersForPath(event.path)
-            this.__dispatchPointerHandlers(pathHandlers, '__onMouseMove', event)
-            this.__pruneActivePointerHandlers()
-            let activeHandlers = new Set()
+            let activeHandlers = []
             for(let handler of this.activePointerHandlers){
-                if(!pathHandlers.has(handler)){
-                    activeHandlers.add(handler)
+                if(!handler || handler.__destroyed || !handler.active){
+                    this.activePointerHandlers.delete(handler)
+                    continue
+                }
+                if(event.path.indexOf(handler) < 0){
+                    activeHandlers.push(handler)
                 }
             }
-            this.__dispatchPointerHandlers(activeHandlers, '__onMouseMove', event)
-            this.__pruneActivePointerHandlers()
+
+            for(let handler of activeHandlers){
+                if(typeof handler.__onMouseMove === 'function') handler.__onMouseMove(event)
+            }
+
         })
 
         window.addEventListener('click', (e)=>{
@@ -507,16 +452,16 @@ module.exports = {
             this.event.startX = e.pageX
             this.event.startY = e.pageY
             this.event.path = this.getObjectsFromPoint(e.pageX, e.pageY)
-            let handlers = this.__collectPointerHandlersForPath(this.event.path)
 
             for(let obj of this.event.path){
                 this.event.accepted = true
                 this.event.relative(obj)
-                obj.__onMouseDown(this.event) 
+                if(typeof obj.__onMouseDown === 'function') obj.__onMouseDown(this.event)
+                if(obj.active && this.activePointerHandlers.indexOf && false){}
+                if(obj.active && this.activePointerHandlers.add){
+                    this.activePointerHandlers.add(obj)
+                }
             }
-
-            this.__dispatchPointerHandlers(handlers, '__onMouseDown', this.event)
-            this.__pruneActivePointerHandlers()
         })
         window.addEventListener('mouseup', (e)=>{
             if(this.event){
@@ -537,12 +482,14 @@ module.exports = {
                 this.event.originX = e.pageX
                 this.event.originY = e.pageY
 
-                this.__dispatchPointerHandlers(this.activePointerHandlers, '__onMouseUp', this.event)
-                this.__pruneActivePointerHandlers()
+                for(let handler of this.activePointerHandlers){
+                    if(!handler || handler.__destroyed) continue
+                    if(typeof handler.__onMouseUp === 'function') handler.__onMouseUp(this.event)
+                }
                 
                 if(this.event.target) {
                     this.event.relative(this.event.target)
-                    this.event.target.__onMouseUp(this.event)
+                    if(typeof this.event.target.__onMouseUp === 'function') this.event.target.__onMouseUp(this.event)
                     this.__finishMouseAreaDrag(this.event.target)
                 }
 
@@ -595,14 +542,11 @@ module.exports = {
             this.event.angleDelta.x = e.deltaX / 8
             this.event.angleDelta.y = e.deltaY / 8
             this.event.path = this.getObjectsFromPoint(e.pageX, e.pageY)
-            let handlers = this.__collectPointerHandlersForPath(this.event.path)
-
-            this.__dispatchPointerHandlers(handlers, '__onWheel', this.event)
 
             for(let obj of this.event.path){
                 if(!this.event.accepted || !this.event.target){
                     this.event.relative(obj)
-                    obj.__onWheel(this.event)
+                    if(typeof obj.__onWheel === 'function') obj.__onWheel(this.event)
                 }
             }
 

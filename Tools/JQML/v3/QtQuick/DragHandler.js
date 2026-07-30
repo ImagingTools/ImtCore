@@ -13,12 +13,14 @@ class DragHandler extends MultiPointHandler {
 
     static meta = Object.assign({}, MultiPointHandler.meta, {
         snapMode: { type: Int, value:DragHandler.SnapAuto},
+        translation: { type: Var, value: { x: 0, y: 0 }},
         activeTranslation: { type: Var, value: { x: 0, y: 0 }},
         persistentTranslation: { type: Var, value: { x: 0, y: 0 }},
         xAxis: { type: Axis },
         yAxis: { type: Axis },
 
         snapModeChanged: { type:Signal, args:[] },
+        translationChanged: { type:Signal, args:['delta'] },
         activeTranslationChanged: { type:Signal, args:[] },
         persistentTranslationChanged: { type:Signal, args:[] },
         xAxisChanged: { type:Signal, args:[] },
@@ -30,6 +32,10 @@ class DragHandler extends MultiPointHandler {
     __targetStartX = 0
     __targetStartY = 0
     __dragging = false
+
+    SLOT_activeTranslationChanged(oldValue, newValue){
+        this.translation = newValue
+    }
 
     __canStart(mouse){
         if(!this.__isHandlerEnabled()) return false
@@ -57,18 +63,13 @@ class DragHandler extends MultiPointHandler {
         if(mouse.target && mouse.target !== this.__getEffectiveTarget()) return
 
         let target = this.__getEffectiveTarget()
-        if(!target) return
 
         this.__dragging = true
         this.active = true
-        this.__dragStartX = mouse.originX
-        this.__dragStartY = mouse.originY
-        this.__targetStartX = Number(target.x) || 0
-        this.__targetStartY = Number(target.y) || 0
         this.activeTranslation = { x: 0, y: 0 }
 
-        if(this.xAxis) this.xAxis.activeValue = this.__targetStartX
-        if(this.yAxis) this.yAxis.activeValue = this.__targetStartY
+        if(this.xAxis) this.xAxis.activeValue = 0
+        if(this.yAxis) this.yAxis.activeValue = 0
 
         mouse.target = target
     }
@@ -77,35 +78,23 @@ class DragHandler extends MultiPointHandler {
         if(!this.__dragging || !this.active) return
 
         let target = this.__getEffectiveTarget()
-        if(!target || target.__destroyed) return
+        if(target && target.__destroyed) return
 
-        let deltaX = mouse.originX - this.__dragStartX
-        let deltaY = mouse.originY - this.__dragStartY
+        let deltaX = this.__clampAxis(-mouse.moveX, this.xAxis)
+        let deltaY = this.__clampAxis(-mouse.moveY, this.yAxis)
 
-        let activeX = deltaX
-        let activeY = deltaY
-
-        let nextX = this.__clampAxis(this.__targetStartX + deltaX, this.xAxis)
-        let nextY = this.__clampAxis(this.__targetStartY + deltaY, this.yAxis)
-
-        if(nextX !== null){
-            target.x = nextX
-            if(this.xAxis) this.xAxis.activeValue = nextX
-            activeX = nextX - this.__targetStartX
-        } else {
-            activeX = 0
+        if(deltaX !== null){
+            if(target) target.x += deltaX
+            if(this.xAxis) this.xAxis.activeValue = deltaX
         }
 
-        if(nextY !== null){
-            target.y = nextY
-            if(this.yAxis) this.yAxis.activeValue = nextY
-            activeY = nextY - this.__targetStartY
-        } else {
-            activeY = 0
+        if(deltaY !== null){
+            if(target) target.y += deltaY
+            if(this.yAxis) this.yAxis.activeValue = deltaY
         }
 
         this.__updateCentroidFromMouse(mouse)
-        this.activeTranslation = { x: activeX, y: activeY }
+        this.activeTranslation = { x: deltaX || 0, y: deltaY || 0 }
         this.persistentTranslation = {
             x: (this.persistentTranslation && Number(this.persistentTranslation.x) || 0) + (mouse.moveX * -1),
             y: (this.persistentTranslation && Number(this.persistentTranslation.y) || 0) + (mouse.moveY * -1),
