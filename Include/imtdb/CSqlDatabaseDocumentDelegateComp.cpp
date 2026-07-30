@@ -1392,11 +1392,10 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 				root1."%6" as "%7" %5
 			FROM %2"%3" as root
 			LEFT JOIN (
-				SELECT DISTINCT ON ("%8")
+				SELECT
 					"%8", "%6", "%9"
 				FROM %2"%3"
 				WHERE %1 = 1
-				ORDER BY "%8", "%6" DESC
 			) AS root1 ON root1."%8" = root."%8"
 			%4
 		)")
@@ -2144,11 +2143,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 			SELECT root.*, root1."TimeStamp" as "Added"
 			FROM %1 "%2" as root
 			LEFT JOIN (
-				SELECT DISTINCT ON ("%4")
+				SELECT
 					"%4", "%5"
 				FROM %1 "%2"
 				WHERE %7 = 1
-				ORDER BY "%4", "%5" DESC
 			) AS root1 ON root1."%4" = root."%4"
 			WHERE (%3) AND root."%4" = '%6' ORDER BY %8 DESC)")
 			.arg(
