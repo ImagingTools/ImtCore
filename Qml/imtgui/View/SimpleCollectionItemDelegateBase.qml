@@ -58,7 +58,9 @@ Rectangle {
 	readonly property bool isSelected: selectionManager ? selectionManager.isSelected(itemId) : false
 	readonly property bool isHovered: itemMouseArea.containsMouse
 	readonly property int checkBoxSize: Style.itemSizeS + Style.marginXS
-	readonly property bool isLastItem: ListView.view ? index === ListView.view.count - 1 : false
+	// ListView.view isn't usable from JQML; divider is drawn above each row
+	// and hidden on the first one instead of below and hidden on the last.
+	readonly property bool isFirstItem: index === 0
 
 	// --- default-content plumbing --------------------------------------- //
 	// TODO: replace all of this with
@@ -79,7 +81,7 @@ Rectangle {
 			|| child === contentRow
 			|| child === trailingActions
 			|| child === moreButton
-			|| child === bottomDivider
+			|| child === topDivider
 	}
 
 	property bool __isRelocatingExternalChildren: false
@@ -106,7 +108,9 @@ Rectangle {
 	}
 
 	onChildrenChanged: root.__relocateExternalChildren()
-	Component.onCompleted: root.__relocateExternalChildren()
+	Component.onCompleted: {
+		root.__relocateExternalChildren()
+	}
 
 	width: parent ? parent.width : 0
 	height: contentRow.implicitHeight + Style.marginXL
@@ -236,13 +240,13 @@ Rectangle {
 	}
 
 	Rectangle {
-		id: bottomDivider
-		anchors.bottom: parent.bottom
+		id: topDivider
+		anchors.top: parent.top
 		anchors.left: parent.left
 		anchors.right: parent.right
 		height: 1
 		color: Style.borderColor
 		opacity: 0.5
-		visible: !root.isLastItem
+		visible: !root.isFirstItem
 	}
 }

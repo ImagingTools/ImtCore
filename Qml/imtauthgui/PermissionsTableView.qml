@@ -175,10 +175,12 @@ Item {
 	 * Each entry becomes a checkable leaf with permissionId as the key.
 	 */
 	function rebuildFromFlatArray(groups) {
+		loading.start()
 		__beginSelectionUpdate()
 		if (!groups || groups.length === 0) {
 			permissionsTreeView.model = []
 			__endSelectionUpdate()
+			__buildSettleTimer.restart()
 			return
 		}
 
@@ -226,6 +228,7 @@ Item {
 
 		permissionsTreeView.model = result
 		__endSelectionUpdate()
+		__buildSettleTimer.restart()
 	}
 
 	function __beginSelectionUpdate() {
@@ -573,5 +576,21 @@ Item {
 			if (!root.readOnly && root.__selectionUpdateDepth === 0)
 				root.selectionChanged()
 		}
+	}
+
+	// Rebuilding + settling the tree's layout (see GroupElementView's own
+	// deferred relayout) spans a few frames; cover it so the user sees a
+	// spinner instead of the tree reflowing mid-render.
+	Timer {
+		id: __buildSettleTimer
+		interval: 80
+		repeat: false
+		onTriggered: loading.stop()
+	}
+
+	Loading {
+		id: loading
+		anchors.fill: parent
+		visible: false
 	}
 }

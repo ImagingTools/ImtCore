@@ -45,7 +45,6 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 		{
 			QMutexLocker lock(&m_publisherMapMutex);
 			if (m_publisherMap.contains(subscriptionId)){
-				qWarning("Subscription already registered");
 				return true;
 			}
 		}

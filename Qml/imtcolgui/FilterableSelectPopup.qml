@@ -460,7 +460,7 @@ PopupView {
 					z: filterField.z + 1
 
 					decorator: Component { IconButtonDecorator {} }
-					iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+					iconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 
 					visible: filterField.text !== ""
 					enabled: visible
@@ -599,7 +599,7 @@ PopupView {
 								height: Style.iconSizeXS
 
 								decorator: Component { IconButtonDecorator {} }
-								iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+								iconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 
 								onClicked: {
 									var si = parent.__selItem

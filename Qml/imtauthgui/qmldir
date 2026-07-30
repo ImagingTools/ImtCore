@@ -48,6 +48,7 @@ TenantEditor 1.0 TenantEditor.qml
 TenantEditorStateManager 1.0 TenantEditorStateManager.qml
 TenantManagementApiClient 1.0 TenantManagementApiClient.qml
 GqlBasedTenantManagementApiClient 1.0 GqlBasedTenantManagementApiClient.qml
+GqlBasedUserAdministrationApiClient 1.0 GqlBasedUserAdministrationApiClient.qml
 TenantGeneralPage 1.0 TenantGeneralPage.qml
 TenantMembersPage 1.0 TenantMembersPage.qml
 TenantMemberDelegate 1.0 TenantMemberDelegate.qml

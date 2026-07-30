@@ -166,7 +166,7 @@ ViewBase {
 			multiPageView.clear()
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
 			multiPageView.addPage("ParentRoles", qsTr("Parent Roles"), parentRolesPageComp, "Icons/Role")
-			multiPageView.addPage("Permission", qsTr("Permission"), permissionPageComp, "Icons/Key")
+			multiPageView.addPage("Permission", qsTr("Permissions"), permissionPageComp, "Icons/Key")
 			if (PermissionsController.checkPermission("ViewRevisions")){
 				multiPageView.addPage("History", qsTr("History"), historyPageComp, "Icons/History")
 			}
@@ -221,7 +221,7 @@ ViewBase {
 				Column {
 					id: bodyColumn;
 					anchors.horizontalCenter: parent.horizontalCenter;
-					width: Math.min(parent.width, Style.sizeHintXXL);
+					width: Math.min(parent.width, Style.contentWidthMax);
 					spacing: Style.marginXL;
 					
 					GroupHeaderView {
@@ -366,7 +366,7 @@ ViewBase {
 				Column {
 					id: bodyColumn;
 					anchors.horizontalCenter: parent.horizontalCenter;
-					width: Math.min(parent.width, Style.sizeHintXXL);
+					width: Math.min(parent.width, Style.contentWidthMax);
 					spacing: Style.marginXL;
 
 					GroupHeaderView {
@@ -427,16 +427,25 @@ ViewBase {
 
 			property alias bottomItem: permissionsTableElementView.bottomItem
 
+			// Deferred: multiPageView.getPageById() needs the Loader to have
+			// published itemAt().item, which isn't true yet during this page's own completion.
+			Timer {
+				id: populatePermissionsTimer
+				interval: 0
+				repeat: false
+				onTriggered: container.__populatePermissionsTree()
+			}
+
 			Connections {
 				target: permissionsTableElementView
 
 				function onBottomItemChanged() {
-					container.__populatePermissionsTree()
+					populatePermissionsTimer.restart()
 				}
 			}
 
 			Component.onCompleted: {
-				container.__populatePermissionsTree();
+				populatePermissionsTimer.restart();
 			}
 
 			CustomScrollbar {
@@ -467,12 +476,13 @@ ViewBase {
 				Column {
 					id: bodyColumn;
 					anchors.horizontalCenter: parent.horizontalCenter;
-					width: Math.min(parent.width, Style.sizeHintXXL);
+					width: Math.min(parent.width, Style.contentWidthMax);
 					spacing: Style.marginXL;
 
 					GroupHeaderView {
 						width: parent.width;
-						title: qsTr("Permission");
+						title: qsTr("Permissions");
+						groupView: permissionsGroupElement;
 					}
 
 					GroupElementView {
@@ -523,7 +533,7 @@ ViewBase {
 				anchors.top: parent.top
 				anchors.bottom: parent.bottom
 				anchors.horizontalCenter: parent.horizontalCenter
-				width: Math.min(parent.width - Style.marginXL * 2, Style.sizeHintXXL)
+				width: Math.min(parent.width - Style.marginXL * 2, Style.contentWidthMax)
 			}
 
 			GroupHeaderView {

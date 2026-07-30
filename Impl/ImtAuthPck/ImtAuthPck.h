@@ -75,6 +75,9 @@
 #include <imtauth/COrderRequestHandlerComp.h>
 #include <imtauth/CTenantDocumentNameProviderComp.h>
 #include <imtauth/CTenantRelationshipDocumentNameProviderComp.h>
+#include <imtauth/CRoleDocumentNameProviderComp.h>
+#include <imtauth/CUserDocumentNameProviderComp.h>
+#include <imtauth/CUserGroupDocumentNameProviderComp.h>
 #include <imtauth/CTenantDocumentValidatorComp.h>
 #include <imtauth/CRelationshipDocumentValidatorComp.h>
 #include <imtauth/CCrossOrgGrantDocumentValidatorComp.h>
@@ -198,6 +201,9 @@ typedef icomp::TModelCompWrap<imtauth::COrderRequestComp> OrderRequestInfo;
 typedef icomp::TModelCompWrap<imtauth::COrderRequestHandlerComp> OrderRequestHandler;
 typedef imtauth::CTenantDocumentNameProviderComp TenantDocumentNameProvider;
 typedef imtauth::CTenantRelationshipDocumentNameProviderComp TenantRelationshipDocumentNameProvider;
+typedef imtauth::CRoleDocumentNameProviderComp RoleDocumentNameProvider;
+typedef imtauth::CUserDocumentNameProviderComp UserDocumentNameProvider;
+typedef imtauth::CUserGroupDocumentNameProviderComp UserGroupDocumentNameProvider;
 typedef imtauth::CTenantDocumentValidatorComp TenantDocumentValidator;
 typedef imtauth::CCrossOrgGrantDocumentValidatorComp CrossOrgGrantDocumentValidator;
 typedef imtauth::CRelationshipDocumentValidatorComp RelationshipDocumentValidator;
