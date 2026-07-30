@@ -2,11 +2,13 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QFuture>
+
 // ImtCore includes
 #include <imtgql/IGqlResponse.h>
 #include <imtbase/IUrlParam.h>
 #include <imtclientgql/IAsyncGqlResponseHandler.h>
-#include <imtclientgql/IAsyncGqlRequestToken.h>
 
 
 namespace imtclientgql
@@ -20,14 +22,22 @@ namespace imtclientgql
 	without blocking the calling thread and the result is delivered later
 	via the supplied \c IAsyncGqlResponseHandler.
 
-	The returned \c IAsyncGqlRequestTokenPtr can be used to query the state
-	of the request, to cancel it, or — for "wait-for-response" adapters
-	feeding synchronous high-level interfaces (e.g. \c IObjectCollection) —
-	to block until the response arrives.
+	The returned \c QFuture can be used to query the state of the request
+	(\c QFuture::isFinished / \c QFuture::isCanceled), to cancel it
+	(\c QFuture::cancel), or — for "wait-for-response" adapters feeding
+	synchronous high-level interfaces (e.g. \c IObjectCollection) —
+	to block until the response arrives (\c QFuture::waitForFinished).
 
-	The handler is owned by the caller. It must remain alive until the token
-	leaves the \c IAsyncGqlRequestToken::RS_PENDING state (see the
-	"Threading & cancellation contract" notes on \c IAsyncGqlRequestToken).
+	Threading / cancellation contract:
+	- \c QFuture::cancel is safe to call from any thread; it triggers exactly
+	  one final call to the related \c IAsyncGqlResponseHandler::OnError with
+	  \c EC_CANCELLED before the future is finished.
+	- A finished, non-cancelled future always carries exactly one result:
+	  the received response on success, or an invalid (null) response on
+	  failure (network error, timeout, internal error, ...).
+
+	The handler is owned by the caller. It must remain alive until the
+	returned future is finished.
 */
 class IAsyncGqlClient: virtual public istd::IPolymorphic
 {
@@ -43,12 +53,12 @@ public:
 		                    is available. May be \c nullptr for fire-and-forget
 		                    call sites that only inspect the returned token.
 		\param urlParamPtr	Optional URL parameters passed to the protocol engine.
-		\return A token tracking the in-flight request. The token is always
-		        valid; on synchronous validation failure it is returned in a
-		        terminal state (\c RS_FAILED) and the handler — if any —
+		\return A future tracking the in-flight request. On synchronous
+		        validation failure the future is returned already finished
+		        with an invalid (null) response and the handler — if any —
 		        is invoked synchronously before \c SendRequest returns.
 	*/
-	virtual IAsyncGqlRequestTokenPtr SendRequest(
+	virtual QFuture<GqlResponsePtr> SendRequest(
 				GqlRequestPtr requestPtr,
 				IAsyncGqlResponseHandler* handlerPtr,
 				imtbase::IUrlParam* urlParamPtr = nullptr) const = 0;

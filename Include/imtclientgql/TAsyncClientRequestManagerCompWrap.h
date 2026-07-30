@@ -2,6 +2,10 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QFuture>
+#include <QtCore/QFutureInterface>
+
 // stdlib
 #include <functional>
 
@@ -50,22 +54,22 @@ protected:
 	/**
 		Non-blocking model request.
 		\param callback invoked once with (parsedSdl, errorMessage).
-		Returns empty token if the async client is missing or the request is invalid.
+		Returns an already finished future if the async client is missing or the request is invalid.
 	*/
 	template<class SdlClass>
-	IAsyncGqlRequestTokenPtr SendModelRequestAsync(
+	QFuture<IAsyncGqlClient::GqlResponsePtr> SendModelRequestAsync(
 				const imtgql::IGqlRequest& request,
 				std::function<void(SdlClass, QString)> callback) const
 	{
 		if (!m_asyncApiClientCompPtr.IsValid() || !callback){
-			return IAsyncGqlRequestTokenPtr(nullptr);
+			return CreateFailedFuture();
 		}
 
 		IGqlClient::GqlRequestPtr requestPtr;
 		requestPtr.MoveCastedPtr(request.CloneMe());
 		if (!requestPtr.IsValid()){
 			callback(SdlClass(), QStringLiteral("Request is invalid"));
-			return IAsyncGqlRequestTokenPtr(nullptr);
+			return CreateFailedFuture();
 		}
 
 		CClientRequestModelHelpers::AttachMissingContext(requestPtr);
@@ -139,6 +143,16 @@ protected:
 	bool HasAsyncApiClient() const
 	{
 		return m_asyncApiClientCompPtr.IsValid();
+	}
+
+private:
+	static QFuture<IAsyncGqlClient::GqlResponsePtr> CreateFailedFuture()
+	{
+		QFutureInterface<IAsyncGqlClient::GqlResponsePtr> futureInterface;
+		futureInterface.reportStarted();
+		futureInterface.reportResult(IAsyncGqlClient::GqlResponsePtr());
+		futureInterface.reportFinished();
+		return futureInterface.future();
 	}
 
 protected:

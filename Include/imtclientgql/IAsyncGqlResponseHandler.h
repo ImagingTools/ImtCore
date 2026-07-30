@@ -17,11 +17,11 @@ namespace imtclientgql
 	Callback sink for the async GraphQL client (\c IAsyncGqlClient).
 
 	Instances are owned by the caller and must remain alive at least until the
-	related \c IAsyncGqlRequestToken transitions out of the \c RS_PENDING state.
+	related \c QFuture returned by \c IAsyncGqlClient::SendRequest is finished.
 
 	The handler is invoked exactly once per request — either through
 	\c OnResponseReceived (success) or through \c OnError (any failure,
-	including a cancellation triggered via \c IAsyncGqlRequestToken::Cancel).
+	including a cancellation triggered via \c QFuture::cancel).
 
 	By default the handler is invoked on the network/event-loop thread of the
 	client component that produced the token. Adapters that need to dispatch
@@ -53,7 +53,7 @@ public:
 		EC_TIMEOUT,
 
 		/**
-			Request was cancelled via \c IAsyncGqlRequestToken::Cancel.
+			Request was cancelled via \c QFuture::cancel.
 		*/
 		EC_CANCELLED,
 

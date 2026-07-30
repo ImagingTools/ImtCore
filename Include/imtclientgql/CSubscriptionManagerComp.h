@@ -3,6 +3,8 @@
 
 
 // Qt includes
+#include <QtCore/QFuture>
+#include <QtCore/QFutureInterface>
 #include <QtCore/QHash>
 #include <QtCore/QMutex>
 #include <QtCore/QReadWriteLock>
@@ -22,7 +24,6 @@
 #include <imtgql/CGqlRequest.h>
 #include <imtclientgql/IAsyncGqlClient.h>
 #include <imtclientgql/IGqlSubscriptionManager.h>
-#include <imtclientgql/CAsyncGqlRequestToken.h>
 
 
 namespace imtclientgql
@@ -75,7 +76,7 @@ public:
 	virtual imtrest::ConstResponsePtr ProcessRequest(const imtrest::IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
 	// reimplemented (IAsyncGqlClient)
-	virtual IAsyncGqlRequestTokenPtr SendRequest(
+	virtual QFuture<GqlResponsePtr> SendRequest(
 				GqlRequestPtr requestPtr,
 				IAsyncGqlResponseHandler* handlerPtr,
 				imtbase::IUrlParam* urlParamPtr = nullptr) const override;
@@ -96,8 +97,7 @@ private:
 
 	struct PendingAsync
 	{
-		IAsyncGqlRequestTokenPtr tokenPtr;
-		CAsyncGqlRequestToken* tokenImplPtr = nullptr;
+		QFutureInterface<GqlResponsePtr> futureInterface;
 		IAsyncGqlResponseHandler* handlerPtr = nullptr;
 		GqlRequestPtr requestPtr;
 	};

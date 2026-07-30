@@ -4,7 +4,6 @@
 
 // Qt includes
 #include <QtCore/QObject>
-#include <QtCore/QPointer>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -56,7 +55,7 @@ public:
 	virtual ~CAsyncApiClientComp();
 
 	// reimplemented (IAsyncGqlClient)
-	virtual IAsyncGqlRequestTokenPtr SendRequest(
+	virtual QFuture<GqlResponsePtr> SendRequest(
 				GqlRequestPtr requestPtr,
 				IAsyncGqlResponseHandler* handlerPtr,
 				imtbase::IUrlParam* urlParamPtr = nullptr) const override;
