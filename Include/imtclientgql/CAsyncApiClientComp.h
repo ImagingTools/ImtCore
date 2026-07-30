@@ -33,8 +33,8 @@ namespace imtclientgql
 	is a drop-in replacement in partitura files when the async transport
 	is desired.
 
-	The response handler is invoked on this component's QObject thread
-	(the thread of the owned \c QNetworkAccessManager).
+	The future is completed on this component's QObject thread (the thread
+	of the owned \c QNetworkAccessManager).
 */
 class CAsyncApiClientComp:
 			public QObject,
@@ -55,9 +55,8 @@ public:
 	virtual ~CAsyncApiClientComp();
 
 	// reimplemented (IAsyncGqlClient)
-	virtual QFuture<GqlResponsePtr> SendRequest(
+	virtual QFuture<GqlResult> SendRequest(
 				GqlRequestPtr requestPtr,
-				IAsyncGqlResponseHandler* handlerPtr,
 				imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
 protected:
@@ -74,4 +73,3 @@ private:
 
 
 } // namespace imtclientgql
-

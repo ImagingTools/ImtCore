@@ -11,9 +11,6 @@
 #include <QtCore/QWaitCondition>
 
 // ImtCore includes
-#include <imtclientgql/IAsyncGqlResponseHandler.h>
-
-
 namespace imtclientgql
 {
 
@@ -22,42 +19,26 @@ namespace
 {
 
 
-/**
-	Internal handler used by \c CGqlClientSyncAdapterComp::SendRequest to
-	capture the asynchronous result on the calling thread. Stored on the
-	stack of the caller and guaranteed to outlive the in-flight request
-	thanks to the explicit cancellation + final \c waitForFinished performed below.
-*/
-class CCapturingHandler: virtual public IAsyncGqlResponseHandler
+class CCompletionState
 {
 public:
-	CCapturingHandler():
-		m_errorCategory(EC_NONE),
+	CCompletionState():
 		m_isCompleted(false)
 	{
 	}
 
-	virtual void OnResponseReceived(GqlResponsePtr responsePtr) override
+	void Complete(IAsyncGqlClient::GqlResult result)
 	{
 		QMutexLocker locker(&m_mutex);
-		m_responsePtr = responsePtr;
-		m_isCompleted = true;
-		m_waitCondition.wakeAll();
-	}
-
-	virtual void OnError(ErrorCategory category, const QString& message) override
-	{
-		QMutexLocker locker(&m_mutex);
-		m_errorCategory = category;
-		m_errorMessage = message;
+		m_result = result;
 		m_isCompleted = true;
 		m_waitCondition.wakeAll();
 	}
 
 	/**
-		Block the calling thread until the handler was invoked or the timeout
+		Block the calling thread until the future continuation runs or the timeout
 		elapsed. A non-positive \a timeoutMs waits without a time limit.
-		\return \c true if the handler was invoked, \c false on timeout.
+		\return \c true if the continuation ran, \c false on timeout.
 	*/
 	bool WaitForCompletion(int timeoutMs)
 	{
@@ -73,25 +54,13 @@ public:
 		return true;
 	}
 
-	IAsyncGqlClient::GqlResponsePtr ResponsePtr() const
+	IAsyncGqlClient::GqlResult Result() const
 	{
-		return m_responsePtr;
-	}
-
-	ErrorCategory Error() const
-	{
-		return m_errorCategory;
-	}
-
-	const QString& ErrorMessage() const
-	{
-		return m_errorMessage;
+		return m_result;
 	}
 
 private:
-	IAsyncGqlClient::GqlResponsePtr m_responsePtr;
-	ErrorCategory m_errorCategory;
-	QString m_errorMessage;
+	IAsyncGqlClient::GqlResult m_result;
 	QMutex m_mutex;
 	QWaitCondition m_waitCondition;
 	bool m_isCompleted;
@@ -122,33 +91,32 @@ IGqlClient::GqlResponsePtr CGqlClientSyncAdapterComp::SendRequest(GqlRequestPtr 
 		return GqlResponsePtr(nullptr);
 	}
 
-	CCapturingHandler handler;
+	CCompletionState completionState;
 
-	QFuture<IAsyncGqlClient::GqlResponsePtr> future = m_asyncClientCompPtr->SendRequest(requestPtr, &handler, urlParamPtr);
+	QFuture<IAsyncGqlClient::GqlResult> future = m_asyncClientCompPtr->SendRequest(requestPtr, urlParamPtr);
+	QFuture<void> completionFuture = future.then([&completionState](IAsyncGqlClient::GqlResult result) {
+		completionState.Complete(result);
+	});
 
-	// QFuture offers no timed wait; block on the handler's wait condition
-	// (the producer invokes the handler before reportFinished), avoiding both
-	// a polling loop and a nested event loop.
-	if (!handler.WaitForCompletion(m_timeout)){
-		// Timeout: cancel the in-flight request and wait for the resulting
-		// terminal callback so the captured handler is no longer referenced
-		// by the async client once it goes out of scope below.
+	// QFuture offers no timed wait; a continuation signals the wait condition,
+	// avoiding both a polling loop and a nested event loop.
+	if (!completionState.WaitForCompletion(m_timeout)){
 		future.cancel();
 		future.waitForFinished();
+		completionFuture.waitForFinished();
 		SendErrorMessage(0, "Request timed out", "Sync Adapter");
 		return GqlResponsePtr(nullptr);
 	}
 
-	// The handler was invoked; wait for the immediately following
-	// reportFinished so the async client no longer references the handler.
-	future.waitForFinished();
+	completionFuture.waitForFinished();
+	const IAsyncGqlClient::GqlResult result = completionState.Result();
 
-	if (handler.Error() != IAsyncGqlResponseHandler::EC_NONE){
-		SendErrorMessage(0, handler.ErrorMessage(), "Sync Adapter");
+	if (result.errorCategory != IAsyncGqlClient::EC_NONE){
+		SendErrorMessage(0, result.errorMessage, "Sync Adapter");
 		return GqlResponsePtr(nullptr);
 	}
 
-	return handler.ResponsePtr();
+	return result.responsePtr;
 }
 
 
@@ -172,4 +140,3 @@ void CGqlClientSyncAdapterComp::OnComponentCreated()
 
 
 } // namespace imtclientgql
-

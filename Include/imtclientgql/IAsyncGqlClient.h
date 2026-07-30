@@ -4,11 +4,11 @@
 
 // Qt includes
 #include <QtCore/QFuture>
+#include <QtCore/QString>
 
 // ImtCore includes
 #include <imtgql/IGqlResponse.h>
 #include <imtbase/IUrlParam.h>
-#include <imtclientgql/IAsyncGqlResponseHandler.h>
 
 
 namespace imtclientgql
@@ -19,8 +19,8 @@ namespace imtclientgql
 	Common interface for an asynchronous GraphQL client.
 
 	Asynchronous counterpart of \c IGqlClient. The request is dispatched
-	without blocking the calling thread and the result is delivered later
-	via the supplied \c IAsyncGqlResponseHandler.
+	without blocking the calling thread and the result is delivered through
+	the returned \c QFuture.
 
 	The returned \c QFuture can be used to query the state of the request
 	(\c QFuture::isFinished / \c QFuture::isCanceled), to cancel it
@@ -29,15 +29,9 @@ namespace imtclientgql
 	to block until the response arrives (\c QFuture::waitForFinished).
 
 	Threading / cancellation contract:
-	- \c QFuture::cancel is safe to call from any thread; it triggers exactly
-	  one final call to the related \c IAsyncGqlResponseHandler::OnError with
-	  \c EC_CANCELLED before the future is finished.
+	- \c QFuture::cancel is safe to call from any thread.
 	- A finished, non-cancelled future always carries exactly one result:
-	  the received response on success, or an invalid (null) response on
-	  failure (network error, timeout, internal error, ...).
-
-	The handler is owned by the caller. It must remain alive until the
-	returned future is finished.
+	  the received response on success, or error details on failure.
 */
 class IAsyncGqlClient: virtual public istd::IPolymorphic
 {
@@ -45,25 +39,35 @@ public:
 	typedef istd::TSharedInterfacePtr<imtgql::IGqlRequest> GqlRequestPtr;
 	typedef istd::TSharedInterfacePtr<imtgql::IGqlResponse> GqlResponsePtr;
 
+	enum ErrorCategory
+	{
+		EC_NONE = 0,
+		EC_NETWORK,
+		EC_TIMEOUT,
+		EC_INVALID_REQUEST,
+		EC_INTERNAL
+	};
+
+	struct GqlResult
+	{
+		GqlResponsePtr responsePtr;
+		ErrorCategory errorCategory = EC_NONE;
+		QString errorMessage;
+	};
+
 	/**
 		Dispatch a request to the server asynchronously.
 
 		\param requestPtr	The GraphQL request to send.
-		\param handlerPtr	Callback sink invoked when the response (or an error)
-		                    is available. May be \c nullptr for fire-and-forget
-		                    call sites that only inspect the returned future.
 		\param urlParamPtr	Optional URL parameters passed to the protocol engine.
 		\return A future tracking the in-flight request. On synchronous
 		        validation failure the future is returned already finished
-		        with an invalid (null) response and the handler — if any —
-		        is invoked synchronously before \c SendRequest returns.
+		        with the corresponding error result.
 	*/
-	virtual QFuture<GqlResponsePtr> SendRequest(
+	virtual QFuture<GqlResult> SendRequest(
 				GqlRequestPtr requestPtr,
-				IAsyncGqlResponseHandler* handlerPtr,
 				imtbase::IUrlParam* urlParamPtr = nullptr) const = 0;
 };
 
 
 } // namespace imtclientgql
-

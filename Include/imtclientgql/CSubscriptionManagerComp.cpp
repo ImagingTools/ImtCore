@@ -249,7 +249,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 				}
 			}
 			locker.unlock();
-			// Deliver body to async handler so callers can parse GraphQL errors.
+			// Deliver the body so async callers can parse GraphQL errors.
 			CompletePending(key, body, true);
 		}
 			break;
@@ -275,30 +275,26 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 
 // reimplemented (IAsyncGqlClient)
 
-QFuture<CSubscriptionManagerComp::GqlResponsePtr> CSubscriptionManagerComp::SendRequest(
+QFuture<CSubscriptionManagerComp::GqlResult> CSubscriptionManagerComp::SendRequest(
 			GqlRequestPtr requestPtr,
-			IAsyncGqlResponseHandler* handlerPtr,
 			imtbase::IUrlParam* /*urlParamPtr*/) const
 {
-	auto promisePtr = std::make_shared<QPromise<GqlResponsePtr>>();
+	auto promisePtr = std::make_shared<QPromise<GqlResult>>();
 	promisePtr->start();
-	QFuture<GqlResponsePtr> future = promisePtr->future();
+	QFuture<GqlResult> future = promisePtr->future();
 
-	auto FailFast = [promisePtr, handlerPtr](IAsyncGqlResponseHandler::ErrorCategory category, const QString& message) {
-		if (handlerPtr != nullptr){
-			handlerPtr->OnError(category, message);
-		}
-		promisePtr->addResult(GqlResponsePtr());
+	auto FailFast = [promisePtr](ErrorCategory category, const QString& message) {
+		promisePtr->addResult(GqlResult{GqlResponsePtr(), category, message});
 		promisePtr->finish();
 	};
 
 	if (!requestPtr.IsValid()){
-		FailFast(IAsyncGqlResponseHandler::EC_INVALID_REQUEST, "Invalid request");
+		FailFast(EC_INVALID_REQUEST, "Invalid request");
 		return future;
 	}
 
 	if (!m_engineCompPtr.IsValid()){
-		FailFast(IAsyncGqlResponseHandler::EC_INTERNAL, "Protocol engine is not available");
+		FailFast(EC_INTERNAL, "Protocol engine is not available");
 		return future;
 	}
 
@@ -330,7 +326,6 @@ QFuture<CSubscriptionManagerComp::GqlResponsePtr> CSubscriptionManagerComp::Send
 		QMutexLocker lock(&m_pendingAsyncMutex);
 		PendingAsync pending;
 		pending.promisePtr = promisePtr;
-		pending.handlerPtr = handlerPtr;
 		pending.requestPtr = requestPtr;
 		m_pendingAsync.insert(key, pending);
 	}
@@ -342,9 +337,9 @@ QFuture<CSubscriptionManagerComp::GqlResponsePtr> CSubscriptionManagerComp::Send
 	{
 		auto* self = const_cast<CSubscriptionManagerComp*>(this);
 		const auto armCancelWatcher = [self, key, future]() {
-			auto* watcherPtr = new QFutureWatcher<GqlResponsePtr>(self);
+			auto* watcherPtr = new QFutureWatcher<GqlResult>(self);
 			QObject::connect(watcherPtr, &QFutureWatcherBase::canceled, self, [self, key]() {
-				self->FailPending(key, IAsyncGqlResponseHandler::EC_CANCELLED, "Cancelled");
+				self->FailPending(key, EC_NONE, QString());
 			});
 			QObject::connect(watcherPtr, &QFutureWatcherBase::finished, watcherPtr, &QObject::deleteLater);
 			watcherPtr->setFuture(future);
@@ -358,7 +353,7 @@ QFuture<CSubscriptionManagerComp::GqlResponsePtr> CSubscriptionManagerComp::Send
 	}
 
 	if (!SendRequestInternal(*requestPtr, constRequestPtr)){
-		FailPending(key, IAsyncGqlResponseHandler::EC_NETWORK,
+		FailPending(key, EC_NETWORK,
 					QString("Request could not be sent: '%1'").arg(QString(requestPtr->GetCommandId())));
 		return future;
 	}
@@ -378,7 +373,7 @@ QFuture<CSubscriptionManagerComp::GqlResponsePtr> CSubscriptionManagerComp::Send
 					return;
 				}
 				lock.unlock();
-				self->FailPending(key, IAsyncGqlResponseHandler::EC_TIMEOUT, "Request timed out");
+				self->FailPending(key, EC_TIMEOUT, "Request timed out");
 			});
 		};
 		if (QThread::currentThread() == self->thread()){
@@ -557,35 +552,27 @@ void CSubscriptionManagerComp::CompletePending(const QString& key, const QByteAr
 	responsePtr.SetPtr(responseRawPtr);
 
 	// query_data is delivered on the WebSocket socket thread (CWebSocketThread).
-	// Handlers must NOT run there: a nested SendRequest/waitForFinished (or any
-	// blocking GQL) re-enters the same socket while m_isProcessingMessage is
-	// true, so the reply is only queued and never drained — full request hang
-	// after reconnect/reconcile. Always hop to this component's thread first.
-	// Order: OnResponseReceived (fill capturers) then finish (wake waiters).
+	// Completing the promise there could run continuations which re-enter the
+	// same socket while m_isProcessingMessage is true. Always hop to this
+	// component's thread first.
 	//
 	// Taking the map entry above is the single atomic terminalization point:
 	// a racing FailPending (cancel watcher / timeout) finds no entry and does
 	// nothing, so this path must always finish the future. Cancellation may
 	// also occur after take() but before this lambda runs, so it re-checks the
-	// canceled flag and converts to the EC_CANCELLED terminal state — otherwise
+	// canceled flag and finishes without a result — otherwise
 	// cancel(); waitForFinished() callers would block forever.
 	auto deliver = [pending, responsePtr, isError]() mutable {
 		if (pending.promisePtr->future().isFinished()){
 			return;
 		}
 		if (pending.promisePtr->isCanceled()){
-			if (pending.handlerPtr != nullptr){
-				pending.handlerPtr->OnError(IAsyncGqlResponseHandler::EC_CANCELLED, "Cancelled");
-			}
 			pending.promisePtr->finish();
 			return;
 		}
-		if (pending.handlerPtr != nullptr){
-			// isError: still deliver body (may contain GraphQL errors).
-			Q_UNUSED(isError);
-			pending.handlerPtr->OnResponseReceived(responsePtr);
-		}
-		pending.promisePtr->addResult(responsePtr);
+		// isError: still deliver body (may contain GraphQL errors).
+		Q_UNUSED(isError);
+		pending.promisePtr->addResult(GqlResult{responsePtr, EC_NONE, QString()});
 		pending.promisePtr->finish();
 	};
 
@@ -600,7 +587,7 @@ void CSubscriptionManagerComp::CompletePending(const QString& key, const QByteAr
 
 void CSubscriptionManagerComp::FailPending(
 			const QString& key,
-			IAsyncGqlResponseHandler::ErrorCategory category,
+			ErrorCategory category,
 			const QString& message) const
 {
 	PendingAsync pending;
@@ -623,19 +610,9 @@ void CSubscriptionManagerComp::FailPending(
 		if (pending.promisePtr->future().isFinished()){
 			return;
 		}
-		const bool cancelled =
-					(category == IAsyncGqlResponseHandler::EC_CANCELLED) ||
-					pending.promisePtr->isCanceled();
-		if (pending.handlerPtr != nullptr){
-			if (cancelled){
-				pending.handlerPtr->OnError(IAsyncGqlResponseHandler::EC_CANCELLED, "Cancelled");
-			}
-			else{
-				pending.handlerPtr->OnError(category, message);
-			}
-		}
+		const bool cancelled = pending.promisePtr->isCanceled();
 		if (!cancelled){
-			pending.promisePtr->addResult(IAsyncGqlClient::GqlResponsePtr());
+			pending.promisePtr->addResult(GqlResult{GqlResponsePtr(), category, message});
 		}
 		pending.promisePtr->finish();
 	};

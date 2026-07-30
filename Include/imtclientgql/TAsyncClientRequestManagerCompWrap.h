@@ -8,13 +8,13 @@
 
 // stdlib
 #include <functional>
+#include <memory>
 
 // ACF includes
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
 #include <imtclientgql/IAsyncGqlClient.h>
-#include <imtclientgql/IAsyncGqlResponseHandler.h>
 #include <imtclientgql/IGqlClient.h>
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
 #include <imtgql/CGqlRequest.h>
@@ -52,7 +52,7 @@ protected:
 		Returns an already finished future if the async client is missing or the request is invalid.
 	*/
 	template<class SdlClass>
-	QFuture<IAsyncGqlClient::GqlResponsePtr> SendModelRequestAsync(
+	QFuture<IAsyncGqlClient::GqlResult> SendModelRequestAsync(
 				const imtgql::IGqlRequest& request,
 				std::function<void(SdlClass, QString)> callback) const
 	{
@@ -64,75 +64,42 @@ protected:
 		requestPtr.MoveCastedPtr(request.CloneMe());
 		if (!requestPtr.IsValid()){
 			callback(SdlClass(), QStringLiteral("Request is invalid"));
-			return CreateFailedFuture();
+			return CreateFailedFuture(
+						IAsyncGqlClient::EC_INVALID_REQUEST,
+						QStringLiteral("Request is invalid"));
 		}
 
 		CClientRequestModelHelpers::AttachMissingContext(requestPtr);
 
 		const QByteArray commandId = request.GetCommandId();
 
-		class CHandler: virtual public IAsyncGqlResponseHandler
-		{
-		public:
-			CHandler(std::function<void(SdlClass, QString)> cb, const QByteArray& commandId):
-				m_callback(std::move(cb)),
-				m_commandId(commandId)
-			{
+		auto callbackPtr = std::make_shared<std::function<void(SdlClass, QString)>>(std::move(callback));
+		QFuture<IAsyncGqlClient::GqlResult> future = m_asyncApiClientCompPtr->SendRequest(requestPtr);
+		future.then([callbackPtr, commandId](IAsyncGqlClient::GqlResult result) {
+			if (result.errorCategory != IAsyncGqlClient::EC_NONE){
+				(*callbackPtr)(
+							SdlClass(),
+							result.errorMessage.isEmpty() ? QStringLiteral("Request failed") : result.errorMessage);
+				return;
 			}
 
-			virtual void OnResponseReceived(GqlResponsePtr responsePtr) override
-			{
-				QString error;
-				SdlClass payload;
-				if (responsePtr.IsValid()){
-					payload = CClientRequestModelHelpers::ParseModelResponse<SdlClass>(
-								responsePtr->GetResponseData(),
-								m_commandId,
-								error);
-				}
-				else{
-					error = QStringLiteral("Response is invalid");
-				}
-				m_callback(payload, error);
+			QString error;
+			SdlClass payload;
+			if (result.responsePtr.IsValid()){
+				payload = CClientRequestModelHelpers::ParseModelResponse<SdlClass>(
+							result.responsePtr->GetResponseData(),
+							commandId,
+							error);
 			}
+			else{
+				error = QStringLiteral("Response is invalid");
+			}
+			(*callbackPtr)(payload, error);
+		}).onCanceled([callbackPtr]() {
+			(*callbackPtr)(SdlClass(), QStringLiteral("Request cancelled"));
+		});
 
-			virtual void OnError(ErrorCategory /*category*/, const QString& message) override
-			{
-				m_callback(SdlClass(), message.isEmpty() ? QStringLiteral("Request failed") : message);
-			}
-
-		private:
-			std::function<void(SdlClass, QString)> m_callback;
-			QByteArray m_commandId;
-		};
-
-		// Self-deleting owner so fire-and-forget callers need not keep the handler alive.
-		struct HandlerOwner: virtual public IAsyncGqlResponseHandler
-		{
-			explicit HandlerOwner(CHandler* h):
-				m_handler(h)
-			{
-			}
-			~HandlerOwner()
-			{
-				delete m_handler;
-			}
-			virtual void OnResponseReceived(GqlResponsePtr r) override
-			{
-				m_handler->OnResponseReceived(r);
-				delete this;
-			}
-			virtual void OnError(ErrorCategory c, const QString& m) override
-			{
-				m_handler->OnError(c, m);
-				delete this;
-			}
-			CHandler* m_handler = nullptr;
-		};
-
-		auto* handlerPtr = new CHandler(std::move(callback), commandId);
-		auto* ownerPtr = new HandlerOwner(handlerPtr);
-		return m_asyncApiClientCompPtr->SendRequest(requestPtr, ownerPtr, nullptr);
+		return future;
 	}
 
 	bool HasAsyncApiClient() const
@@ -141,11 +108,16 @@ protected:
 	}
 
 private:
-	static QFuture<IAsyncGqlClient::GqlResponsePtr> CreateFailedFuture()
+	static QFuture<IAsyncGqlClient::GqlResult> CreateFailedFuture(
+				IAsyncGqlClient::ErrorCategory category = IAsyncGqlClient::EC_INTERNAL,
+				const QString& message = QStringLiteral("Async client is not available"))
 	{
-		QPromise<IAsyncGqlClient::GqlResponsePtr> promise;
+		QPromise<IAsyncGqlClient::GqlResult> promise;
 		promise.start();
-		promise.addResult(IAsyncGqlClient::GqlResponsePtr());
+		promise.addResult(IAsyncGqlClient::GqlResult{
+					IAsyncGqlClient::GqlResponsePtr(),
+					category,
+					message});
 		promise.finish();
 		return promise.future();
 	}

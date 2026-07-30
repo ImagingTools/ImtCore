@@ -41,51 +41,47 @@ CAsyncApiClientComp::~CAsyncApiClientComp()
 
 // reimplemented (IAsyncGqlClient)
 
-QFuture<IAsyncGqlClient::GqlResponsePtr> CAsyncApiClientComp::SendRequest(
+QFuture<IAsyncGqlClient::GqlResult> CAsyncApiClientComp::SendRequest(
 			GqlRequestPtr requestPtr,
-			IAsyncGqlResponseHandler* handlerPtr,
 			imtbase::IUrlParam* urlParamPtr) const
 {
-	auto promisePtr = std::make_shared<QPromise<GqlResponsePtr>>();
+	auto promisePtr = std::make_shared<QPromise<GqlResult>>();
 	promisePtr->start();
-	QFuture<GqlResponsePtr> future = promisePtr->future();
+	QFuture<GqlResult> future = promisePtr->future();
 
-	auto FailFast = [promisePtr, handlerPtr](IAsyncGqlResponseHandler::ErrorCategory category, const QString& message) {
-		if (handlerPtr != nullptr){
-			handlerPtr->OnError(category, message);
-		}
-		promisePtr->addResult(GqlResponsePtr());
+	auto FailFast = [promisePtr](ErrorCategory category, const QString& message) {
+		promisePtr->addResult(GqlResult{GqlResponsePtr(), category, message});
 		promisePtr->finish();
 	};
 
 	if (!requestPtr.IsValid()){
-		FailFast(IAsyncGqlResponseHandler::EC_INVALID_REQUEST, "Invalid request");
+		FailFast(EC_INVALID_REQUEST, "Invalid request");
 		return future;
 	}
 
 	if (!m_protocolEngineCompPtr.IsValid()){
 		SendErrorMessage(0, "Protocol engine is not available", "Async API Client");
-		FailFast(IAsyncGqlResponseHandler::EC_INTERNAL, "Protocol engine is not available");
+		FailFast(EC_INTERNAL, "Protocol engine is not available");
 		return future;
 	}
 
 	if (m_networkManagerPtr == nullptr){
 		SendErrorMessage(0, "Network access manager is not initialized", "Async API Client");
-		FailFast(IAsyncGqlResponseHandler::EC_INTERNAL, "Network access manager is not initialized");
+		FailFast(EC_INTERNAL, "Network access manager is not initialized");
 		return future;
 	}
 
 	imtgql::IGqlRequest::RequestType requestType = requestPtr->GetRequestType();
 	if ((requestType != imtgql::IGqlRequest::RT_QUERY) && (requestType != imtgql::IGqlRequest::RT_MUTATION)){
 		SendErrorMessage(0, "Invalid request type", "Async API Client");
-		FailFast(IAsyncGqlResponseHandler::EC_INVALID_REQUEST, "Invalid request type");
+		FailFast(EC_INVALID_REQUEST, "Invalid request type");
 		return future;
 	}
 
 	QNetworkRequest* networkRequestPtr = m_protocolEngineCompPtr->CreateNetworkRequest(*requestPtr, urlParamPtr);
 	if (networkRequestPtr == nullptr){
 		SendErrorMessage(0, "Failed to create network request", "Async API Client");
-		FailFast(IAsyncGqlResponseHandler::EC_INTERNAL, "Failed to create network request");
+		FailFast(EC_INTERNAL, "Failed to create network request");
 		return future;
 	}
 
@@ -97,17 +93,16 @@ QFuture<IAsyncGqlClient::GqlResponsePtr> CAsyncApiClientComp::SendRequest(
 
 	if (replyPtr == nullptr){
 		SendErrorMessage(0, QString("Null reply for request-ID ") + uuid, "Async API Client");
-		FailFast(IAsyncGqlResponseHandler::EC_NETWORK, "Failed to start network request");
+		FailFast(EC_NETWORK, "Failed to start network request");
 		return future;
 	}
 
 	replyPtr->ignoreSslErrors();
 
 	// Wire cancellation: QFuture::cancel aborts the reply, which triggers
-	// QNetworkReply::finished with OperationCanceledError; the finalizer
-	// maps it to EC_CANCELLED. The watcher is parented to the reply so it
-	// is destroyed along with it.
-	auto* cancelWatcherPtr = new QFutureWatcher<GqlResponsePtr>(replyPtr);
+	// QNetworkReply::finished with OperationCanceledError. The watcher is
+	// parented to the reply so it is destroyed along with it.
+	auto* cancelWatcherPtr = new QFutureWatcher<GqlResult>(replyPtr);
 	QObject::connect(cancelWatcherPtr, &QFutureWatcherBase::canceled, replyPtr, [replyPtr]() {
 		if (replyPtr->isRunning()){
 			replyPtr->abort();
@@ -128,7 +123,7 @@ QFuture<IAsyncGqlClient::GqlResponsePtr> CAsyncApiClientComp::SendRequest(
 	// finished signal arrives.
 	auto timedOutFlagPtr = std::make_shared<bool>(false);
 
-	auto Finalize = [this, replyPtr, requestPtr, handlerPtr, promisePtr, timeoutTimerPtr, timedOutFlagPtr, uuid]() mutable {
+	auto Finalize = [this, replyPtr, requestPtr, promisePtr, timeoutTimerPtr, timedOutFlagPtr, uuid]() mutable {
 		if (promisePtr->future().isFinished()){
 			// Already finalized (defensive: should not happen, finished fires once).
 			replyPtr->deleteLater();
@@ -142,12 +137,8 @@ QFuture<IAsyncGqlClient::GqlResponsePtr> CAsyncApiClientComp::SendRequest(
 		// QFuture::cancel marks the shared state canceled before the queued
 		// abort() reaches the reply; if the reply finished in that window the
 		// error code may be NoError (or a non-cancellation error). The future
-		// state is the authoritative terminal decision: a canceled future must
-		// produce exactly one EC_CANCELLED callback, never a response.
+		// state is the authoritative terminal decision.
 		if (promisePtr->isCanceled()){
-			if (handlerPtr != nullptr){
-				handlerPtr->OnError(IAsyncGqlResponseHandler::EC_CANCELLED, "Request cancelled");
-			}
 			promisePtr->finish();
 			replyPtr->deleteLater();
 			return;
@@ -164,36 +155,24 @@ QFuture<IAsyncGqlClient::GqlResponsePtr> CAsyncApiClientComp::SendRequest(
 			IAsyncGqlClient::GqlResponsePtr responsePtr;
 			responsePtr.SetPtr(gqlResponsePtr);
 
-			if (handlerPtr != nullptr){
-				handlerPtr->OnResponseReceived(responsePtr);
-			}
-			promisePtr->addResult(responsePtr);
+			promisePtr->addResult(GqlResult{responsePtr, EC_NONE, QString()});
 			promisePtr->finish();
 		}
 		else if (error == QNetworkReply::OperationCanceledError){
 			if (*timedOutFlagPtr){
 				const QString message = QString("Request ") + uuid + " timed out";
 				SendErrorMessage(0, message, "Async API Client");
-				if (handlerPtr != nullptr){
-					handlerPtr->OnError(IAsyncGqlResponseHandler::EC_TIMEOUT, message);
-				}
-				promisePtr->addResult(GqlResponsePtr());
+				promisePtr->addResult(GqlResult{GqlResponsePtr(), EC_TIMEOUT, message});
 				promisePtr->finish();
 			}
 			else{
-				if (handlerPtr != nullptr){
-					handlerPtr->OnError(IAsyncGqlResponseHandler::EC_CANCELLED, "Request cancelled");
-				}
 				promisePtr->finish();
 			}
 		}
 		else{
 			const QString message = QString("Response for request-ID ") + uuid + "\n" + replyPtr->errorString();
 			SendErrorMessage(0, message, "Async API Client");
-			if (handlerPtr != nullptr){
-				handlerPtr->OnError(IAsyncGqlResponseHandler::EC_NETWORK, replyPtr->errorString());
-			}
-			promisePtr->addResult(GqlResponsePtr());
+			promisePtr->addResult(GqlResult{GqlResponsePtr(), EC_NETWORK, replyPtr->errorString()});
 			promisePtr->finish();
 		}
 

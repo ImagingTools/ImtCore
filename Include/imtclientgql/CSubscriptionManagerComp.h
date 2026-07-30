@@ -54,6 +54,7 @@ public:
 
 	typedef IAsyncGqlClient::GqlRequestPtr GqlRequestPtr;
 	typedef IAsyncGqlClient::GqlResponsePtr GqlResponsePtr;
+	typedef IAsyncGqlClient::GqlResult GqlResult;
 
 	I_BEGIN_COMPONENT(CSubscriptionManagerComp);
 		I_REGISTER_INTERFACE(IGqlSubscriptionManager);
@@ -79,9 +80,8 @@ public:
 	virtual imtrest::ConstResponsePtr ProcessRequest(const imtrest::IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
 	// reimplemented (IAsyncGqlClient)
-	virtual QFuture<GqlResponsePtr> SendRequest(
+	virtual QFuture<GqlResult> SendRequest(
 				GqlRequestPtr requestPtr,
-				IAsyncGqlResponseHandler* handlerPtr,
 				imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
 protected:
@@ -100,13 +100,12 @@ private:
 
 	struct PendingAsync
 	{
-		std::shared_ptr<QPromise<GqlResponsePtr>> promisePtr;
-		IAsyncGqlResponseHandler* handlerPtr = nullptr;
+		std::shared_ptr<QPromise<GqlResult>> promisePtr;
 		GqlRequestPtr requestPtr;
 	};
 
 	void CompletePending(const QString& key, const QByteArray& body, bool isError) const;
-	void FailPending(const QString& key, IAsyncGqlResponseHandler::ErrorCategory category, const QString& message) const;
+	void FailPending(const QString& key, ErrorCategory category, const QString& message) const;
 
 private:
 	I_REF(imtrest::ITransport, m_subscriptionSenderCompPtr);
