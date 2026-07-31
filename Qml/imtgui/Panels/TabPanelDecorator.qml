@@ -162,7 +162,7 @@ DecoratorBase {
 				height: tabPanelDecorator.closeSlotSize;
 				opacity: tabPanelDecorator.showClose ? 1 : 0;
 				enabled: tabPanelDecorator.showClose;
-				iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
+				iconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 				decorator: Component {
 					ToolButtonDecorator {
 						color: "transparent";

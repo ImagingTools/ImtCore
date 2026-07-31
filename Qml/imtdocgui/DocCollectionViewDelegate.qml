@@ -68,7 +68,13 @@ CollectionViewCommandsDelegateBase{
 
 	onDocumentManagerIdChanged:{
 		if (documentManagerId !== ""){
-			documentManager = MainDocumentService.getDocumentService(documentManagerId)
+			let docManager = MainDocumentService.getDocumentService(documentManagerId)
+			if (docManager){
+				documentManager = docManager
+			}
+			else{
+				console.error(qsTr("Document manager with ID: '%1' does not exist").arg(documentManagerId))
+			}
 		}
 	}
 

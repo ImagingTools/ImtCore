@@ -656,14 +656,6 @@ bool CAuthenticationManagerComp::TryAwaitOrClaimTokenResolution(
 			return false;
 		}
 
-		// Another thread (e.g. a concurrent GraphQL request bearing the same
-		// freshly-issued token) is already resolving this exact token - wait
-		// for it instead of each independently hitting the slave JWT/PAT
-		// controller and re-storing the same cache entry (this was the burst
-		// of duplicate "Token cache store" log lines seen when several
-		// requests race in right after login). Once woken, loop back: the
-		// resolution may have failed (no cache entry to reuse), in which case
-		// we either wait again for a new claimant or claim it ourselves.
 		m_tokenResolutionWaitCondition.wait(&m_tokenCacheMutex);
 	}
 }
@@ -697,9 +689,6 @@ void CAuthenticationManagerComp::StoreCachedToken(
 	const qint64 tokenCacheTtlMs = m_tokenCacheTtlAttrPtr.IsValid() ? (static_cast<qint64>(*m_tokenCacheTtlAttrPtr) * 1000) : (30 * 1000);
 	entry.expiresAt = now + tokenCacheTtlMs;
 
-	// Never let the cache consider a JWT valid past its own 'exp' claim -
-	// otherwise an already-expired token could still be accepted for up to
-	// TokenCacheLifetime after it actually expired.
 	if (jwtExpSecs > 0){
 		const qint64 jwtExpMs = jwtExpSecs * 1000;
 		if (jwtExpMs < entry.expiresAt){
@@ -708,16 +697,6 @@ void CAuthenticationManagerComp::StoreCachedToken(
 	}
 
 	const qint64 cacheTtlSecs = (entry.expiresAt - now) / 1000;
-	SendWarningMessage(
-				0,
-				QStringLiteral("Token cache store: token %1 user=%2 tenant=%3 isPat=%4 cacheTtlSecs=%5 jwtExpSecs=%6")
-						.arg(MaskToken(token),
-							 QString::fromUtf8(userId),
-							 QString::fromUtf8(tenantId),
-							 isPat ? QStringLiteral("true") : QStringLiteral("false"),
-							 QString::number(cacheTtlSecs),
-							 QString::number(jwtExpSecs)),
-				QStringLiteral("CAuthenticationManagerComp"));
 
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	m_expiredTokenCache.remove(token);

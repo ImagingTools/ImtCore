@@ -29,6 +29,12 @@ Rectangle {
 	property string documentId: ""
 	property string collectionId: ""
 
+	// Opt-in row selection (used by DocumentRevisionDialog to pick a revision
+	// to restore/delete); plain history tabs leave this off.
+	property bool selectable: false
+	property int selectedRevision: -1
+	signal revisionSelected(int revision)
+
 	//! Revisions matching the current filter, across all pages.
 	readonly property int revisionsCount: revisionsProvider.totalCount
 	//! Revision currently in effect, even when it is not on the loaded page.
@@ -36,6 +42,12 @@ Rectangle {
 	readonly property alias contentHeight: historyTable.contentHeight
 
 	readonly property bool __canViewRevisions: PermissionsController.checkPermission("ViewRevisions")
+
+	property QtObject __selectionManager: QtObject {
+		function isSelected(id){
+			return container.selectable && id === String(container.selectedRevision)
+		}
+	}
 
 	function getHeaders(){
 		return {}
@@ -57,6 +69,13 @@ Rectangle {
 		}
 
 		onDataChanged: historyTable.model = revisionsProvider.items
+	}
+
+	Component.onCompleted: {
+		if (container.collectionId !== ""){
+			subscriptionClient.gqlCommandId = "On" + container.collectionId + "CollectionChanged"
+		}
+		container.sendRequest()
 	}
 
 	onDocumentIdChanged: container.sendRequest()
@@ -139,8 +158,14 @@ Rectangle {
 			showCheckBox: false
 			showDefaultActionsMenu: false
 			enableDefaultDoubleClickEdit: false
+			selectionManager: container.selectable ? container.__selectionManager : null
 
 			readonly property var revisionItem: revisionDelegate.modelItem
+
+			onItemClicked: {
+				if (container.selectable && revisionDelegate.revisionItem)
+					container.revisionSelected(revisionDelegate.revisionItem.revision)
+			}
 
 			Row {
 				width: parent.width
@@ -178,13 +203,38 @@ Rectangle {
 					}
 				}
 
-				Text {
+				Row {
 					anchors.verticalCenter: parent.verticalCenter
 					width: parent.width * 0.20
-					text: revisionDelegate.revisionItem ? revisionDelegate.revisionItem.user : ""
-					font.pixelSize: Style.fontSizeM
-					color: Style.inactiveTextColor
-					elide: Text.ElideRight
+					spacing: Style.spacingS
+
+					Rectangle {
+						anchors.verticalCenter: parent.verticalCenter
+						visible: revisionDelegate.revisionItem && revisionDelegate.revisionItem.user !== ""
+						width: Style.iconSizeS
+						height: width
+						radius: width / 2
+						color: Style.imaginToolsAccentColor
+
+						BaseText {
+							anchors.centerIn: parent
+							text: revisionDelegate.revisionItem && revisionDelegate.revisionItem.user
+								? revisionDelegate.revisionItem.user.charAt(0).toUpperCase()
+								: ""
+							font.pixelSize: Style.fontSizeS
+							font.bold: true
+							color: "white"
+						}
+					}
+
+					Text {
+						anchors.verticalCenter: parent.verticalCenter
+						width: parent.width - (parent.spacing + Style.iconSizeS)
+						text: revisionDelegate.revisionItem ? revisionDelegate.revisionItem.user : ""
+						font.pixelSize: Style.fontSizeM
+						color: Style.inactiveTextColor
+						elide: Text.ElideRight
+					}
 				}
 
 				Text {

@@ -20,6 +20,9 @@ QtObject {
 	signal openedDocumentListReceived(var documentListInfo)
 	signal openedDocumentListReceiveFailed(string message)
 
+	// Emitted once, the first time this service is bound to a real view.
+	signal documentServiceActivated()
+
 	signal startOpenDocument(string documentId, string typeId)
 	signal documentOpened(string documentId, string typeId)
 	signal openDocumentFailed(string documentId, string message)
@@ -523,7 +526,11 @@ QtObject {
 	}
 
 	function setDocumentServiceActiveView(view){
+		let wasActive = __internal.documentManagerActiveView !== null
 		__internal.documentManagerActiveView = view
+		if (!wasActive && view !== null){
+			root.documentServiceActivated()
+		}
 	}
 
 	function setAutoNamedTypeId(typeId, hasProvider){

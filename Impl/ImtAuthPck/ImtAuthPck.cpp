@@ -362,6 +362,21 @@ I_EXPORT_COMPONENT(
 			"Tenant Relationship Document Name Provider");
 
 I_EXPORT_COMPONENT(
+			RoleDocumentNameProvider,
+			"Provides default document name from role name",
+			"Role Document Name Provider");
+
+I_EXPORT_COMPONENT(
+			UserDocumentNameProvider,
+			"Provides default document name from user name",
+			"User Document Name Provider");
+
+I_EXPORT_COMPONENT(
+			UserGroupDocumentNameProvider,
+			"Provides default document name from user group name",
+			"User Group Document Name Provider");
+
+I_EXPORT_COMPONENT(
 			TenantDocumentValidator,
 			"Tenant document validator",
 			"Tenant Document Validator");

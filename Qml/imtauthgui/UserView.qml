@@ -227,7 +227,7 @@ DocumentViewBase {
 					id: bodyColumn;
 					
 					anchors.horizontalCenter: parent.horizontalCenter;
-					width: Math.min(parent.width, Style.sizeHintXXL);
+					width: Math.min(parent.width, Style.contentWidthMax);
 					
 					spacing: Style.marginXL;
 					
@@ -405,7 +405,7 @@ DocumentViewBase {
 				Column {
 					id: bodyColumn;
 					anchors.horizontalCenter: parent.horizontalCenter;
-					width: Math.min(parent.width, Style.sizeHintXXL);
+					width: Math.min(parent.width, Style.contentWidthMax);
 					spacing: Style.marginXL;
 
 					GroupHeaderView {
@@ -505,7 +505,7 @@ DocumentViewBase {
 				Column {
 					id: bodyColumn;
 					anchors.horizontalCenter: parent.horizontalCenter;
-					width: Math.min(parent.width, Style.sizeHintXXL);
+					width: Math.min(parent.width, Style.contentWidthMax);
 					spacing: Style.marginXL;
 
 					GroupHeaderView {
@@ -571,7 +571,7 @@ DocumentViewBase {
 				anchors.top: parent.top
 				anchors.bottom: parent.bottom
 				anchors.horizontalCenter: parent.horizontalCenter
-				width: Math.min(parent.width - Style.marginXL * 2, Style.sizeHintXXL)
+				width: Math.min(parent.width - Style.marginXL * 2, Style.contentWidthMax)
 			}
 
 			GroupHeaderView {
