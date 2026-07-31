@@ -82,6 +82,43 @@ bool CPersonalAccessTokenControllerComp::IsCallerAuthorizedForUser(
 }
 
 
+bool CPersonalAccessTokenControllerComp::AreRequestedScopesAllowed(
+			const ::imtgql::CGqlRequest& gqlRequest,
+			const QByteArrayList& scopes,
+			const QByteArray& productId) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return false;
+	}
+
+	// Without resolvable user info the caller's permissions cannot be
+	// determined, so no scope may be granted (fail closed).
+	const imtauth::IUserInfo* callerInfoPtr = gqlContextPtr->GetUserInfo();
+	if (callerInfoPtr == nullptr){
+		return false;
+	}
+
+	// Administrators may grant any scope, mirroring OnGetUserPermissions()
+	// which presents them the full permission tree.
+	if (callerInfoPtr->IsAdmin()){
+		return true;
+	}
+
+	// A caller authenticated with a PAT gets user info already restricted to
+	// the token's scopes (see CAuthenticationManagerComp), so this check also
+	// prevents a scoped token from minting a broader one.
+	const imtauth::IUserInfo::FeatureIds callerPermissions = callerInfoPtr->GetPermissions(productId);
+	for (const QByteArray& scope : scopes){
+		if (!callerPermissions.contains(scope)){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
 // protected methods
 
 // reimplemented (sdl::V1_0::imtauth::CPersonalAccessTokensGqlHandlerCompBase)
@@ -328,6 +365,15 @@ sdl::V1_0::imtauth::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCr
 
 	if (!IsCallerAuthorizedForUser(gqlRequest, userId)){
 		errorMessage = "Not authorized to create a personal access token for this user";
+		response.message = errorMessage;
+		return response;
+	}
+
+	// A token must never carry permissions its creator does not have
+	// themselves; otherwise a user could escalate privileges via a
+	// hand-crafted createToken request bypassing the UI's filtered scope tree.
+	if (!AreRequestedScopesAllowed(gqlRequest, scopes, productId)){
+		errorMessage = "Not authorized to grant one or more of the requested permission scopes";
 		response.message = errorMessage;
 		return response;
 	}
