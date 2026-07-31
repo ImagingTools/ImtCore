@@ -1,13 +1,6 @@
 module imtcontrols
 
-singleton Events 1.0 ./Base/Events.qml
-singleton EventManager 1.0 ./Base/EventManager.qml
 singleton Enums 1.0 ./Base/Enums.qml
-singleton Functions 1.0 ./Base/Functions.qml
-singleton AnalyticGeometry 1.0 ./Base/AnalyticGeometry.qml
-singleton LinearAlgebra 1.0 ./Base/LinearAlgebra.qml
-singleton RelativePosition 1.0 ./Base/RelativePosition.qml
-singleton DesignScheme 1.0 ./Base/DesignScheme.qml
 
 Icon 1.0 ./Base/Icon.js
 ButtonType 1.0 ./Base/ButtonType.js
@@ -18,12 +11,8 @@ ControlBase 1.0 ./Base/ControlBase.qml
 DecoratorBase 1.0 ./Base/DecoratorBase.qml
 Decorators 1.0 ./Base/Decorators.qml
 DecoratorsQt 1.0 ./Base/DecoratorsQt.qml
-StyleBase 1.0 ./Base/StyleBase.qml
-StyleComponents 1.0 ./Base/StyleComponents.qml
 MainWindow 1.0 ./Base/MainWindow.qml
 WrapItem 1.0 ./Base/WrapItem.qml
-IconProperties 1.0 ./Base/IconProperties.qml
-FontProperties 1.0 ./Base/FontProperties.qml
 StateManager 1.0 ./Base/StateManager.qml
 
 Action 1.0 ./Actions/Action.qml
@@ -106,19 +95,13 @@ BarControl 1.0 ./Inputs/BarControl.qml
 DateTimePicker 1.0 ./Inputs/DateTimePicker.qml
 SearchTextInput 1.0 ./Inputs/SearchTextInput.qml
 
-singleton UuidGenerator 1.0 Models/UuidGenerator.qml
 singleton NavigationController 1.0 Models/NavigationController.qml
-singleton TreeModelBuilder 1.0 ./Models/TreeModelBuilder.qml
 ModelIndex 1.0 Models/ModelIndex.qml
 SortController 1.0 Models/SortController.qml
-StateMachine 1.0 Models/StateMachine.qml
 TreeItemModelConverter 1.0 ./Models/TreeItemModelConverter.qml
 TreeItemModelObserver 1.0 ./Models/TreeItemModelObserver.qml
 CommandsController 1.0 Models/CommandsController.qml
-MacAddressValidator 1.0 Models/MacAddressValidator.qml
 PopupMenuModel 1.0 Models/PopupMenuModel.qml
-MailRegExpValidator 1.0 Models/MailRegExpValidator.qml
-SortFilterProxyModel 1.0 Models/SortFilterProxyModel.qml
 DataModelController 1.0 Models/DataModelController.qml
 DataModelProvider 1.0 Models/DataModelProvider.qml
 OptionManager 1.0 Models/OptionManager.qml
@@ -210,45 +193,10 @@ BarChartSimple 1.0 ./Views/BarChartSimple.qml
 ReorderableListDelegate 1.0 ./Views/ReorderableListDelegate.qml
 ReorderListQmlManager 1.0 ./Views/ReorderListQmlManager.qml
 
-GraphicsView 1.0 ./GraphicsView/GraphicsView.qml
-GraphicsLayer 1.0 ./GraphicsView/GraphicsLayer.qml
-GraphicsShapeBase 1.0 ./GraphicsView/GraphicsShapeBase.qml
-CanvasMatrix 1.0 ./GraphicsView/CanvasMatrix.qml
-Matrix3x3 1.0 ./GraphicsView/Matrix3x3.qml
-Graph2d 1.0 ./GraphicsView/Graph2d.qml
-MultiGraph2d 1.0 ./GraphicsView/MultiGraph2d.qml
 
-GraphicsShapeFactoryManager 1.0 ./GraphicsView/GraphicsShapeFactoryManager.qml
-GraphicsShapeFactoryBase 1.0 ./GraphicsView/GraphicsShapeFactoryBase.qml
 
-PolygonShape 1.0 ./GraphicsView/PolygonShape.qml
-RectangleShape 1.0 ./GraphicsView/RectangleShape.qml
-CircleShape 1.0 ./GraphicsView/CircleShape.qml
-PolyLineShape 1.0 ./GraphicsView/PolyLineShape.qml
-GradientPolyLineShape 1.0 ./GraphicsView/GradientPolyLineShape.qml
-ArcShape 1.0 ./GraphicsView/ArcShape.qml
-BezierCurveShape 1.0 ./GraphicsView/BezierCurveShape.qml
-QuadraticCurveShape 1.0 ./GraphicsView/QuadraticCurveShape.qml
-TextShape 1.0 ./GraphicsView/TextShape.qml
-ImageShape2d 1.0 ./GraphicsView/ImageShape2d.qml
-CoordinateGridShape 1.0 ./GraphicsView/CoordinateGridShape.qml
-SegmentShape 1.0 ./GraphicsView/SegmentShape.qml
-DiskSegmentShape 1.0 ./GraphicsView/DiskSegmentShape.qml
-SegmentBaseShape 1.0 ./GraphicsView/SegmentBaseShape.qml
 
-PolygonParams 1.0 ./GraphicsView/PolygonParams.qml
-RectangleParams 1.0 ./GraphicsView/RectangleParams.qml
-CircleParams 1.0 ./GraphicsView/CircleParams.qml
-LineParams 1.0 ./GraphicsView/LineParams.qml
-ArcParams 1.0 ./GraphicsView/ArcParams.qml
-BezierCurveParams 1.0 ./GraphicsView/BezierCurveParams.qml
-QuadraticCurveParams 1.0 ./GraphicsView/QuadraticCurveParams.qml
-TextParams 1.0 ./GraphicsView/TextParams.qml
-ImageParams 1.0 ./GraphicsView/ImageParams.qml
 
-ComplexShape 1.0 ./GraphicsView/ComplexShape.qml
-SelectionShape 1.0 ./GraphicsView/SelectionShape.qml
-BoundingBox 1.0 ./GraphicsView/BoundingBox.qml
 
 
 # -------------------------------------------------------------------------

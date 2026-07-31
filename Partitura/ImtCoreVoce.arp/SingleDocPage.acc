@@ -41,7 +41,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PageQmlItem" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtdocgui/SingleDocumentWorkspacePageView.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtdocgui/Pages/SingleDocumentWorkspacePageView.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="Priority">
                         <Data IsEnabled="false"/>

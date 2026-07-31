@@ -40,7 +40,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PageQmlItem" Type="Text" ExportId="PageQmlItem">
-                        <Data IsEnabled="true" Value="../../imtdocgui/MultiDocWorkspacePageView.qml"/>
+                        <Data IsEnabled="true" Value="../../imtdocgui/Pages/MultiDocWorkspacePageView.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="Priority">
                         <Data IsEnabled="false"/>

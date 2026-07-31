@@ -1,0 +1,40 @@
+<RCC>
+    <qresource prefix="/qml">
+        <file alias="imtgraphics2d/qmldir">qmldir</file>
+        <file alias="imtgraphics2d/Core/GraphicsView.qml">Core/GraphicsView.qml</file>
+        <file alias="imtgraphics2d/Core/GraphicsLayer.qml">Core/GraphicsLayer.qml</file>
+        <file alias="imtgraphics2d/Core/GraphicsShapeBase.qml">Core/GraphicsShapeBase.qml</file>
+        <file alias="imtgraphics2d/Shapes/PolygonShape.qml">Shapes/PolygonShape.qml</file>
+        <file alias="imtgraphics2d/Shapes/RectangleShape.qml">Shapes/RectangleShape.qml</file>
+        <file alias="imtgraphics2d/Shapes/CircleShape.qml">Shapes/CircleShape.qml</file>
+        <file alias="imtgraphics2d/Shapes/PolyLineShape.qml">Shapes/PolyLineShape.qml</file>
+        <file alias="imtgraphics2d/Shapes/GradientPolyLineShape.qml">Shapes/GradientPolyLineShape.qml</file>
+        <file alias="imtgraphics2d/Shapes/ArcShape.qml">Shapes/ArcShape.qml</file>
+        <file alias="imtgraphics2d/Shapes/BezierCurveShape.qml">Shapes/BezierCurveShape.qml</file>
+        <file alias="imtgraphics2d/Shapes/QuadraticCurveShape.qml">Shapes/QuadraticCurveShape.qml</file>
+        <file alias="imtgraphics2d/Shapes/TextShape.qml">Shapes/TextShape.qml</file>
+        <file alias="imtgraphics2d/Shapes/ImageShape2d.qml">Shapes/ImageShape2d.qml</file>
+        <file alias="imtgraphics2d/Shapes/CoordinateGridShape.qml">Shapes/CoordinateGridShape.qml</file>
+        <file alias="imtgraphics2d/Params/PolygonParams.qml">Params/PolygonParams.qml</file>
+        <file alias="imtgraphics2d/Params/RectangleParams.qml">Params/RectangleParams.qml</file>
+        <file alias="imtgraphics2d/Params/CircleParams.qml">Params/CircleParams.qml</file>
+        <file alias="imtgraphics2d/Params/LineParams.qml">Params/LineParams.qml</file>
+        <file alias="imtgraphics2d/Params/ArcParams.qml">Params/ArcParams.qml</file>
+        <file alias="imtgraphics2d/Params/BezierCurveParams.qml">Params/BezierCurveParams.qml</file>
+        <file alias="imtgraphics2d/Params/QuadraticCurveParams.qml">Params/QuadraticCurveParams.qml</file>
+        <file alias="imtgraphics2d/Params/TextParams.qml">Params/TextParams.qml</file>
+        <file alias="imtgraphics2d/Params/ImageParams.qml">Params/ImageParams.qml</file>
+        <file alias="imtgraphics2d/Shapes/ComplexShape.qml">Shapes/ComplexShape.qml</file>
+        <file alias="imtgraphics2d/Shapes/SelectionShape.qml">Shapes/SelectionShape.qml</file>
+        <file alias="imtgraphics2d/Shapes/SegmentShape.qml">Shapes/SegmentShape.qml</file>
+        <file alias="imtgraphics2d/Shapes/DiskSegmentShape.qml">Shapes/DiskSegmentShape.qml</file>
+        <file alias="imtgraphics2d/Shapes/SegmentBaseShape.qml">Shapes/SegmentBaseShape.qml</file>
+        <file alias="imtgraphics2d/Core/BoundingBox.qml">Core/BoundingBox.qml</file>
+        <file alias="imtgraphics2d/Core/CanvasMatrix.qml">Core/CanvasMatrix.qml</file>
+        <file alias="imtgraphics2d/Core/Matrix3x3.qml">Core/Matrix3x3.qml</file>
+        <file alias="imtgraphics2d/Graphs/Graph2d.qml">Graphs/Graph2d.qml</file>
+        <file alias="imtgraphics2d/Graphs/MultiGraph2d.qml">Graphs/MultiGraph2d.qml</file>
+        <file alias="imtgraphics2d/Core/GraphicsShapeFactoryManager.qml">Core/GraphicsShapeFactoryManager.qml</file>
+        <file alias="imtgraphics2d/Core/GraphicsShapeFactoryBase.qml">Core/GraphicsShapeFactoryBase.qml</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,37 @@
+module imtgraphics2d
+
+GraphicsView 1.0 Core/GraphicsView.qml
+GraphicsLayer 1.0 Core/GraphicsLayer.qml
+GraphicsShapeBase 1.0 Core/GraphicsShapeBase.qml
+CanvasMatrix 1.0 Core/CanvasMatrix.qml
+Matrix3x3 1.0 Core/Matrix3x3.qml
+Graph2d 1.0 Graphs/Graph2d.qml
+MultiGraph2d 1.0 Graphs/MultiGraph2d.qml
+GraphicsShapeFactoryManager 1.0 Core/GraphicsShapeFactoryManager.qml
+GraphicsShapeFactoryBase 1.0 Core/GraphicsShapeFactoryBase.qml
+PolygonShape 1.0 Shapes/PolygonShape.qml
+RectangleShape 1.0 Shapes/RectangleShape.qml
+CircleShape 1.0 Shapes/CircleShape.qml
+PolyLineShape 1.0 Shapes/PolyLineShape.qml
+GradientPolyLineShape 1.0 Shapes/GradientPolyLineShape.qml
+ArcShape 1.0 Shapes/ArcShape.qml
+BezierCurveShape 1.0 Shapes/BezierCurveShape.qml
+QuadraticCurveShape 1.0 Shapes/QuadraticCurveShape.qml
+TextShape 1.0 Shapes/TextShape.qml
+ImageShape2d 1.0 Shapes/ImageShape2d.qml
+CoordinateGridShape 1.0 Shapes/CoordinateGridShape.qml
+SegmentShape 1.0 Shapes/SegmentShape.qml
+DiskSegmentShape 1.0 Shapes/DiskSegmentShape.qml
+SegmentBaseShape 1.0 Shapes/SegmentBaseShape.qml
+PolygonParams 1.0 Params/PolygonParams.qml
+RectangleParams 1.0 Params/RectangleParams.qml
+CircleParams 1.0 Params/CircleParams.qml
+LineParams 1.0 Params/LineParams.qml
+ArcParams 1.0 Params/ArcParams.qml
+BezierCurveParams 1.0 Params/BezierCurveParams.qml
+QuadraticCurveParams 1.0 Params/QuadraticCurveParams.qml
+TextParams 1.0 Params/TextParams.qml
+ImageParams 1.0 Params/ImageParams.qml
+ComplexShape 1.0 Shapes/ComplexShape.qml
+SelectionShape 1.0 Shapes/SelectionShape.qml
+BoundingBox 1.0 Core/BoundingBox.qml

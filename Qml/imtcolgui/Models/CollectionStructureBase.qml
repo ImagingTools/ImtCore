@@ -1,0 +1,271 @@
+import QtQuick 2.12
+import Acf 1.0
+import com.imtcore.imtqml 1.0
+import imtgui 1.0
+import imtcontrols 1.0
+import imtqmlutils 1.0
+
+Item {
+    id: collectionStructureBaseContainer;
+
+    property alias commands: gqlModels;
+
+    property string commandId;
+
+    property alias tableElementsDelegate: treeViewInternal.delegate;
+    // property alias tableHeadersDelegate: treeViewInternal.headerDelegate;
+    // property alias elementsList: treeViewInternal.elementsList;
+
+    // property alias tableMinWidth: treeViewInternal.minWidth;
+    // property alias tableHeaderHeight: treeViewInternal.headerHeight;
+    // property alias tableItemHeight: treeViewInternal.itemHeight;
+    // property alias tableDecoratorPath: loaderTableDecorator.source;
+    // property alias tableDecoratorComp: loaderTableDecorator.sourceComponent;
+    // property alias tableCellDecorator: treeViewInternal.cellDecorator;
+    // property alias tableWidthDecorator: treeViewInternal.widthDecorator;
+    // property alias tableWidth: treeViewInternal.width;
+    // property alias tableHeaders: treeViewInternal.headers;
+
+    property var treeView: treeViewInternal;
+    property bool hasFilter: true;
+
+    // property bool hasSort: true;
+    // property alias isMultiCheckable: treeViewInternal.isMultiCheckable;
+
+    property alias filterMenu: filterMenuLocal.sourceComponent;
+    property alias filterMenuItem: filterMenuLocal.item;
+    property alias filterMenuVisible: filterMenuLocal.visible;
+    property alias modelFilter: modelFilterObj;
+
+    signal selectedItem(string id, string name);
+    signal selectedIndexChanged(int index);
+
+    signal elementsChanged();
+
+    signal selectionChanged(var selection);
+    signal filterDecoratorLoaded();
+
+    Component.onCompleted: {
+        treeViewInternal.focus = true;
+
+        Events.subscribeEvent("OnLocalizationChanged", collectionStructureBaseContainer.onLocalizationChanged);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", collectionStructureBaseContainer.onLocalizationChanged);
+    }
+
+
+    onCommandIdChanged: {
+        gqlModels.commandId = commandId;
+
+        gqlModels.updateModels();
+        // gqlModels.updateItemsModel()
+    }
+
+    Loader {
+        id: filterMenuLocal;
+
+        anchors.top: collectionStructureBaseContainer.top;
+		anchors.topMargin: Style.marginM;
+
+        width: parent.width;
+
+        visible: treeViewInternal ? false : false;//for web, do not remove!!!
+
+        onVisibleChanged: {
+            if (!filterMenuLocal.visible){
+                treeViewInternal.forceActiveFocus();
+            }
+        }
+
+        sourceComponent: Component {
+            FilterMenu {
+                decoratorSource: Style.filterPanelDecoratorPath;
+            }
+        }
+
+        onLoaded: {
+            filterMenuLocal.item.textFilterChanged.connect(collectionStructureBaseContainer.onTextFilterChanged);
+            filterMenuLocal.item.closed.connect(collectionStructureBaseContainer.onFilterClosed);
+        }
+    }
+
+    function onLocalizationChanged(language){
+        console.log("CollectionViewBase onLocalizationChanged", commandId);
+        gqlModels.updateModels();
+    }
+
+    function onFilterClosed(){
+        filterMenuLocal.visible = false;
+    }
+
+    function onTextFilterChanged(index, text){
+        console.log("onTextFilterChanged", text);
+        modelFilterObj.setData("TextFilter", text);
+        gqlModels.updateModels();
+    }
+
+    function updateModels(){
+        gqlModels.updateModels();
+    }
+
+    function updateBranch(nodeId){
+        let index = treeViewInternal.findIndexById(nodeId)
+        // if (index > -1){
+            treeViewInternal.deleteBranch(index)
+            treeViewInternal.model.setData("IsOpen", true, index);
+            gqlModels.updateItemsModel(nodeId)
+        // }
+    }
+
+    Rectangle {
+        id: backgroundTreeView;
+
+        anchors.top: filterMenuLocal.visible ? filterMenuLocal.bottom: parent.top;
+		anchors.topMargin: filterMenuLocal.visible ? Style.marginM : 0;
+        anchors.left: parent.left;
+
+        width: parent.width
+
+        anchors.bottom: parent.bottom;
+
+        color: Style.baseColor;
+
+        radius: Style.size_mainCornerRadius !== undefined ? Style.size_mainCornerRadius: 0;
+
+        Loader{
+            id: loaderTableDecorator;
+
+            property bool compl: false;
+            onLoaded: {
+                if(loaderTableDecorator.item){
+                    loaderTableDecorator.compl = true;
+                }
+            }
+        }
+
+
+
+        Item {
+            id: rightPanel;
+
+            anchors.top: parent.top;
+            anchors.right: parent.right;
+			anchors.rightMargin: Style.marginXS;
+            anchors.bottom: parent.bottom;
+
+            width: collectionStructureBaseContainer.hasFilter ? 35 : 10;
+
+            visible: treeViewInternal.width > 0;
+
+            Item {
+                id: filterItem;
+
+                anchors.top: parent.top;
+
+                width: parent.width;
+                height: treeViewInternal.headerHeight;
+
+                Button {
+                    id: iconFilter;
+
+                    anchors.centerIn: parent;
+
+                    width: Style.buttonWidthM;
+                    height: width;
+
+                    visible: collectionStructureBaseContainer.hasFilter;
+
+                    iconSource: "../../../" + Style.getIconPath("Icons/Filter", Icon.State.On, Icon.Mode.Normal);
+
+                    onClicked: {
+                        filterMenuLocal.visible = !filterMenuLocal.visible;
+                    }
+                }
+            }
+        }
+
+        TreeViewSelection {
+            id: visualControl
+        }
+
+        TreeViewGql{
+            id: treeViewInternal
+            anchors.left: parent.left;
+            anchors.right: rightPanel.left;
+            anchors.top: parent.top;
+            anchors.bottom: parent.bottom;
+            hasSelection: true
+            onRequestSignal: {
+                let nodeId = treeViewInternal.getData("id", index)
+                if (nodeId === -1){
+                    nodeId = ""
+                }
+                gqlModels.updateItemsModel(nodeId)
+            }
+            onOpenBranch: {
+                let nodeId = treeViewInternal.getData("id", index)
+                visualControl.select(nodeId)
+            }
+            onCloseBranch: {
+                let nodeId = treeViewInternal.getData("id", index)
+                visualControl.deselect(nodeId)
+                treeViewInternal.deleteBranch(index)
+            }
+        }
+
+
+        TreeItemModel {
+            id: modelFilterObj;
+
+            Component.onCompleted: {
+                modelFilterObj.setUpdateEnabled(true)
+                modelFilterObj.addTreeModel("FilterIds");
+                console.log("modelFilterObj onCompleted", modelFilterObj.toJson())
+            }
+        }
+
+        Loading {
+            id: ldng;
+
+            anchors.fill: treeViewInternal;
+            anchors.topMargin: treeViewInternal.headerElementHeight;
+
+            visible: false;
+        }
+    }
+
+
+
+    CollectionStructureBaseGqlModels {
+        id: gqlModels;
+
+        commandId: collectionStructureBaseContainer.commandId;
+        rootItem: collectionStructureBaseContainer;
+
+        onItemsReceived: {
+            let index = treeViewInternal.findIndexById(selectIndex)
+            console.log("onItemsReceived", selectIndex, index)
+            treeViewInternal.insertTree(index, items)
+            treeViewInternal.model.setData("IsOpen", true, index);
+            for (let i = 0; i < items.getItemsCount(); i++){
+                let nodeId = items.getData("id", i)
+                if (visualControl.contains(nodeId)){
+                    gqlModels.updateItemsModel(nodeId)
+                }
+            }
+
+        }
+
+        onItemsInfoGqlStateChanged: {
+            if (state === "Loading"){
+                ldng.visible = true;
+            }
+            else{
+                ldng.visible = false;
+            }
+        }
+
+    }
+}

@@ -1,14 +1,14 @@
 <RCC>
     <qresource prefix="/qml">
 	    <file alias="imtdeskgui/qmldir">qmldir</file>
-		<file alias="imtdeskgui/DeskPage.qml">DeskPage.qml</file>
-		<file alias="imtdeskgui/TicketBadge.qml">TicketBadge.qml</file>
-		<file alias="imtdeskgui/TicketCollectionView.qml">TicketCollectionView.qml</file>
-		<file alias="imtdeskgui/TicketCreateDialog.qml">TicketCreateDialog.qml</file>
-		<file alias="imtdeskgui/TicketEditor.qml">TicketEditor.qml</file>
-		<file alias="imtdeskgui/EntityContextTicketsPanel.qml">EntityContextTicketsPanel.qml</file>
-		<file alias="imtdeskgui/EntityContextTicketsDataProvider.qml">EntityContextTicketsDataProvider.qml</file>
-		<file alias="imtdeskgui/TicketListPanel.qml">TicketListPanel.qml</file>
-		<file alias="imtdeskgui/TicketView.qml">TicketView.qml</file>
+		<file alias="imtdeskgui/Pages/DeskPage.qml">Pages/DeskPage.qml</file>
+		<file alias="imtdeskgui/Views/TicketBadge.qml">Views/TicketBadge.qml</file>
+		<file alias="imtdeskgui/Views/TicketCollectionView.qml">Views/TicketCollectionView.qml</file>
+		<file alias="imtdeskgui/Dialogs/TicketCreateDialog.qml">Dialogs/TicketCreateDialog.qml</file>
+		<file alias="imtdeskgui/Editors/TicketEditor.qml">Editors/TicketEditor.qml</file>
+		<file alias="imtdeskgui/Panels/TicketListPanel.qml">Panels/TicketListPanel.qml</file>
+		<file alias="imtdeskgui/Views/TicketView.qml">Views/TicketView.qml</file>
+        <file alias="imtdeskgui/Panels/EntityContextTicketsPanel.qml">Panels/EntityContextTicketsPanel.qml</file>
+        <file alias="imtdeskgui/Providers/EntityContextTicketsDataProvider.qml">Providers/EntityContextTicketsDataProvider.qml</file>
     </qresource>
 </RCC>

@@ -1,41 +1,41 @@
 module imtcolgui
 
-CollectionDataProvider 1.0 CollectionDataProvider.qml
-CollectionStructure 1.0 CollectionStructure.qml
-CollectionStructureBase 1.0 CollectionStructureBase.qml
-CollectionStructureBaseGqlModels 1.0 CollectionStructureBaseGqlModels.qml
-CollectionStructureCommandsDelegateBase 1.0 CollectionStructureCommandsDelegateBase.qml
-CollectionStructureCommandsObserver 1.0 CollectionStructureCommandsObserver.qml
-CollectionStructureDataProvider 1.0 CollectionStructureDataProvider.qml
-CollectionView 1.0 CollectionView.qml
-CollectionViewBase 1.0 CollectionViewBase.qml
-CollectionViewBaseGqlModels 1.0 CollectionViewBaseGqlModels.qml
-CollectionViewCommandsDelegateBase 1.0 CollectionViewCommandsDelegateBase.qml
+CollectionDataProvider 1.0 Providers/CollectionDataProvider.qml
+CollectionStructure 1.0 Models/CollectionStructure.qml
+CollectionStructureBase 1.0 Models/CollectionStructureBase.qml
+CollectionStructureBaseGqlModels 1.0 Models/CollectionStructureBaseGqlModels.qml
+CollectionStructureCommandsDelegateBase 1.0 Delegates/CollectionStructureCommandsDelegateBase.qml
+CollectionStructureCommandsObserver 1.0 Controllers/CollectionStructureCommandsObserver.qml
+CollectionStructureDataProvider 1.0 Providers/CollectionStructureDataProvider.qml
+CollectionView 1.0 Views/CollectionView.qml
+CollectionViewBase 1.0 Views/CollectionViewBase.qml
+CollectionViewBaseGqlModels 1.0 Models/CollectionViewBaseGqlModels.qml
+CollectionViewCommandsDelegateBase 1.0 Delegates/CollectionViewCommandsDelegateBase.qml
 
-GridCollectionView 1.0 GridCollectionView.qml
-GridCollectionViewBase 1.0 GridCollectionViewBase.qml
-GridExtendingBaseDelegate 1.0 GridExtendingBaseDelegate.qml
+GridCollectionView 1.0 Views/GridCollectionView.qml
+GridCollectionViewBase 1.0 Views/GridCollectionViewBase.qml
+GridExtendingBaseDelegate 1.0 Delegates/GridExtendingBaseDelegate.qml
 
-CollectionFilter 1.0 CollectionFilter.qml
-CollectionCommandsController 1.0 CollectionCommandsController.qml
-CollectionViewDelegate 1.0 CollectionViewDelegate.qml
+CollectionFilter 1.0 Models/CollectionFilter.qml
+CollectionCommandsController 1.0 Controllers/CollectionCommandsController.qml
+CollectionViewDelegate 1.0 Delegates/CollectionViewDelegate.qml
 
-MessageCollectionFilterDecorator 1.0 MessageCollectionFilterDecorator.qml
-MessageCollectionFilter 1.0 MessageCollectionFilter.qml
-MessageFilterItem 1.0 MessageFilterItem.qml
-MessageCollectionView 1.0 MessageCollectionView.qml
+MessageCollectionFilterDecorator 1.0 Models/MessageCollectionFilterDecorator.qml
+MessageCollectionFilter 1.0 Models/MessageCollectionFilter.qml
+MessageFilterItem 1.0 Models/MessageFilterItem.qml
+MessageCollectionView 1.0 Views/MessageCollectionView.qml
 
-SchemeView 1.0 SchemeView.qml
-MetaInfo 1.0 MetaInfo.qml
+SchemeView 1.0 Views/SchemeView.qml
+MetaInfo 1.0 Models/MetaInfo.qml
 
-MetaInfoViewDelegateBase 1.0 MetaInfoViewDelegateBase.qml
-MetaInfoTextDelegate 1.0 MetaInfoTextDelegate.qml
-MetaInfoDateDelegate 1.0 MetaInfoDateDelegate.qml
-MetaInfoStringListDelegate 1.0 MetaInfoStringListDelegate.qml
+MetaInfoViewDelegateBase 1.0 Delegates/MetaInfoViewDelegateBase.qml
+MetaInfoTextDelegate 1.0 Delegates/MetaInfoTextDelegate.qml
+MetaInfoDateDelegate 1.0 Delegates/MetaInfoDateDelegate.qml
+MetaInfoStringListDelegate 1.0 Delegates/MetaInfoStringListDelegate.qml
 
-CollectionDataController 1.0 CollectionDataController.qml
-FilterableSelectDataProvider 1.0 FilterableSelectDataProvider.qml
-FilterableSelectPopup 1.0 FilterableSelectPopup.qml
-DocCollectionFilter 1.0 DocCollectionFilter.qml
-CollectionWorkspacePageView 1.0 CollectionWorkspacePageView.qml
-ItemSelectElementView 1.0 ItemSelectElementView.qml
+CollectionDataController 1.0 Controllers/CollectionDataController.qml
+FilterableSelectDataProvider 1.0 Providers/FilterableSelectDataProvider.qml
+FilterableSelectPopup 1.0 Dialogs/FilterableSelectPopup.qml
+DocCollectionFilter 1.0 Models/DocCollectionFilter.qml
+CollectionWorkspacePageView 1.0 Pages/CollectionWorkspacePageView.qml
+ItemSelectElementView 1.0 Views/ItemSelectElementView.qml

@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/qml">
+        <file alias="imtstyle/qmldir">qmldir</file>
+        <file alias="imtstyle/StyleBase.qml">StyleBase.qml</file>
+        <file alias="imtstyle/StyleComponents.qml">StyleComponents.qml</file>
+        <file alias="imtstyle/IconProperties.qml">IconProperties.qml</file>
+        <file alias="imtstyle/FontProperties.qml">FontProperties.qml</file>
+    </qresource>
+</RCC>
