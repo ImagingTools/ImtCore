@@ -52,10 +52,10 @@ public:
 		        (e.g. required parameters were not provided via \a initParams).
 	*/
 	virtual bool InitializeDocument(
-		const QByteArray& typeId,
-		istd::IChangeable& document,
-		QString& errorString,
-		const iprm::IParamsSet* initParams = nullptr) = 0;
+			const QByteArray& typeId,
+			istd::IChangeable& document,
+			QString& errorString,
+			const iprm::IParamsSet* initParams = nullptr) = 0;
 };
 
 
