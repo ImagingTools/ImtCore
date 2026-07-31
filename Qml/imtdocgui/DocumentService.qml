@@ -771,12 +771,6 @@ QtObject {
 					if (view.commandsController){
 						view.commandsController.setCommandIsEnabled("Save", isDirty);
 					}
-
-					if (view.commandsView){
-						if (view.commandsView.setPositiveAccentCommandIds !== undefined){
-							view.commandsView.setPositiveAccentCommandIds(["Save"]);
-						}
-					}
 				}
 
 				documentManager.documentIsDirtyChanged(documentId, isDirty);
