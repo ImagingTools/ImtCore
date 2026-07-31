@@ -18,7 +18,7 @@ namespace imtservergql
 
 // protected methods
 
-QJsonObject CSdlCollectionControllerCompBase::ListObjects(
+QJsonObject CSdlCollectionControllerCompBase::GetObjectListFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -97,7 +97,7 @@ QJsonObject CSdlCollectionControllerCompBase::ListObjects(
 }
 
 
-QJsonObject CSdlCollectionControllerCompBase::GetObject(
+QJsonObject CSdlCollectionControllerCompBase::GetObjectFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {

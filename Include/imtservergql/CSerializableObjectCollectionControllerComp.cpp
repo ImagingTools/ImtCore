@@ -198,7 +198,7 @@ QJsonObject CSerializableObjectCollectionControllerComp::GetDataMetaInfo(
 }
 
 
-QJsonObject CSerializableObjectCollectionControllerComp::GetObject(
+QJsonObject CSerializableObjectCollectionControllerComp::GetObjectFromRequest(
 	const imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
@@ -339,7 +339,7 @@ bool CSerializableObjectCollectionControllerComp::UpdateObjectFromRequest(
 }
 
 
-QJsonObject CSerializableObjectCollectionControllerComp::ListObjects(
+QJsonObject CSerializableObjectCollectionControllerComp::GetObjectListFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {

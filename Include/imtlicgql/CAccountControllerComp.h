@@ -25,7 +25,7 @@ public:
 
 protected:
 	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
-	virtual QJsonObject GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromInputParams(const QList<imtgql::CGqlParamObject>& inputParams, QByteArray &objectId, QString& errorMessage) const override;
 
 private:
