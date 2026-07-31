@@ -59,7 +59,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="QmlFilePath" Type="String" ExportId="AdministrationQmlPath">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtauthgui/Views/AdministrationUi.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtauthgui/AdministrationUi.qml"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

@@ -7,7 +7,6 @@ import imtdocgui 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtbaseImtBaseTypesSdl 1.0
-import imtqmlutils 1.0
 
 Rectangle {
 	id: thumbnailDecoratorContainer;

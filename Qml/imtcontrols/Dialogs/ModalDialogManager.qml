@@ -5,7 +5,6 @@ import Acf 1.0
 // import imtcontrols 1.0
 import com.imtcore.imtqml 1.0
 import QtQuick.Window 2.2
-import imtqmlutils 1.0
 
 Item {
 	id: container;

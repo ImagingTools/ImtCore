@@ -1,0 +1,528 @@
+import QtQuick 2.12
+import Acf 1.0
+import com.imtcore.imtqml 1.0
+import imtgui 1.0
+import imtdocgui 1.0
+import imtcontrols 1.0
+import imtguigql 1.0
+
+Item {
+    id: collectionStructureContainer;
+
+    property string uuid;
+    property DocumentService documentManagerPtr: null;
+    property string documentName;
+
+    property int contentMargins: 0;
+
+    property alias baseCollectionView: collectionStructureBase;
+
+    property bool isUsedDocumentService: true;
+    property bool visibleMetaInfo: true;
+    property bool hasFilter: true;
+
+    property string commandId;
+    property string documentTypeId;
+
+    property string commandsDelegatePath: "CollectionStructureCommandsDelegateBase.qml";
+    property alias commandsDelegate: commandsDelegateLoader.item;
+
+    property alias treeView: collectionStructureBase.treeView;
+
+    property alias filterMenu: collectionStructureBase.filterMenu;
+    property alias filterMenuVisible: collectionStructureBase.filterMenuVisible;
+    property alias modelFilter: collectionStructureBase.modelFilter;
+    // property alias defaultSortHeaderIndex: collectionStructureBase.defaultSortHeaderIndex;
+    // property alias defaultOrderType: collectionStructureBase.defaultOrderType;
+
+    property TreeItemModel notificationModel: collectionStructureBase.commands.notificationModel;
+
+    property ListModel contextMenuModel: ListModel {}
+
+    property alias commandsProvider: commandsProviderLocal;
+
+    property bool hasRemoteChanges: false;
+    property bool localizationChanged: false;
+
+    signal elementsChanged();
+    signal headersChanged();
+
+    signal filterDecoratorLoaded();
+
+    Component.onCompleted: {
+        Events.subscribeEvent("FilterActivated", collectionStructureContainer.filterMenuActivate);
+        Events.subscribeEvent("OnLocalizationChanged", collectionStructureContainer.onLocalizationChanged);
+        Events.subscribeEvent("UpdateAllModels", collectionStructureContainer.receiveRemoteChanges);
+    }
+
+    Component.onDestruction: {
+        console.log("CollectionView onDestruction", commandId)
+
+        Events.unSubscribeEvent("OnLocalizationChanged", collectionStructureContainer.onLocalizationChanged);
+        Events.unSubscribeEvent("FilterActivated", collectionStructureContainer.filterMenuActivate);
+        Events.unSubscribeEvent("UpdateAllModels", collectionStructureContainer.receiveRemoteChanges);
+    }
+
+    onHasRemoteChangesChanged: {
+        console.log("onHasRemoteChangesChanged", hasRemoteChanges)
+
+        if (visible && hasRemoteChanges){
+            setAlertPanel(alertPanelComp)
+        }
+
+        if (hasRemoteChanges){
+            Events.sendEvent("HasRemoteChanges");
+        }
+    }
+
+    onNotificationModelChanged: {
+        if (documentManagerPtr){
+            let index = documentManagerPtr.getDocumentIndexByUuid(uuid);
+            if (index >= 0){
+                documentManagerPtr.updateDocumentTitle(index);
+            }
+        }
+    }
+
+    onDocumentServicePtrChanged: {
+        if (commandsDelegateLoader.item){
+            if (commandsDelegateLoader.item.documentManagerPtr !== undefined){
+                commandsDelegateLoader.item.documentManagerPtr = collectionStructureContainer.documentManagerPtr;
+            }
+        }
+    }
+
+    Keys.onPressed: {
+        if (event.key === Qt.Key_Delete){
+            commandsDelegateLoader.item.commandHandle("Remove");
+        }
+    }
+
+    onVisibleChanged: {
+        console.log("CollectionView onVisibleChanged", visible);
+        if (collectionStructureContainer.visible){
+
+            if (localizationChanged){
+                commandsProviderLocal.updateModel();
+
+                localizationChanged = false;
+            }
+
+            if (hasRemoteChanges){
+                setAlertPanel(alertPanelComp);
+            }
+
+            Events.subscribeEvent("FilterActivated", collectionStructureContainer.filterMenuActivate);
+        }
+        else{
+            if (hasRemoteChanges){
+                setAlertPanel(undefined);
+            }
+
+            Events.unSubscribeEvent("FilterActivated", collectionStructureContainer.filterMenuActivate);
+        }
+    }
+
+    onCommandIdChanged: {
+        console.log("CollectionStructure onCommandsIdChanged", collectionStructureContainer.commandId);
+
+        commandsProviderLocal.additionInputParams = collectionStructureContainer.getHeaders();
+        commandsProviderLocal.commandId = collectionStructureContainer.commandId;
+        commandsProviderLocal.uuid = collectionStructureContainer.commandId;
+
+        collectionStructureBase.commands.additionInputParams = getHeaders()
+
+//        collectionStructureBase.commandId = collectionViewContainer.commandId;
+
+        collectionMetaInfo.getMetaInfoGqlCommand = collectionStructureContainer.commandId + "MetaInfo";
+
+        if (commandsDelegateLoader.item){
+            commandsDelegateLoader.item.commandId = collectionStructureContainer.commandId;
+        }
+    }
+
+    function onLocalizationChanged(language){
+        console.log("CommandsDecorator onLocalizationChanged", commandId, visible);
+
+        if (visible){
+            commandsProviderLocal.updateModel();
+        }
+        else{
+            localizationChanged = true;
+        }
+
+        fillContextMenuModel();
+    }
+
+    function getDocumentName(){
+        let documentName = collectionStructureContainer.documentName;
+
+        if (notificationModel != null){
+            if (notificationModel.containsKey("TotalCount")){
+                let totalCount = notificationModel.getData("TotalCount");
+
+                documentName += " (" + totalCount + ")";
+            }
+        }
+
+        return documentName;
+    }
+
+    function receiveRemoteChanges(){
+        if (hasRemoteChanges){
+            updateGui();
+            hasRemoteChanges = false;
+
+            setAlertPanel(undefined);
+        }
+    }
+
+    function filterMenuActivate(){
+        if (collectionStructureContainer.hasFilter){
+            collectionStructureContainer.filterMenuVisible = !collectionStructureContainer.filterMenuVisible;
+        }
+    }
+
+    function fillContextMenuModel(){
+        contextMenuModel.clear();
+
+        contextMenuModel.append({"id": "Edit", "name": qsTr("Edit"), "IconSource": "../../../../" + Style.getIconPath("Icons/Edit", "On", "Normal")});
+        contextMenuModel.append({"id": "Remove", "name": qsTr("Remove"), "IconSource": "../../../../" + Style.getIconPath("Icons/Remove", "On", "Normal")});
+        contextMenuModel.append({"id": "Rename", "name": qsTr("Rename"), "IconSource": ""});
+        contextMenuModel.append({"id": "SetDescription", "name": qsTr("Set Description"), "IconSource": ""});
+    }
+
+    function getHeaders(){
+        let additionalInputParams = {}
+        let nodeId = treeView.getData("id", treeView.selectedIndex)
+        additionalInputParams["nodeId"] = ""
+        if (nodeId !== undefined){
+            additionalInputParams["nodeId"] = nodeId
+        }
+        // console.log("nodeId", additionalInputParams["nodeId"])
+
+        return additionalInputParams
+    }
+
+    function updateGui(){
+        collectionStructureBase.updateModels();
+    }
+
+    function updateModel(){
+
+    }
+
+
+    function selectItem(id, name){
+        console.log("CollectionView selectItem", id, name);
+
+        let editorPath = collectionStructureContainer.getEditorPath();
+        let documentTypeId = collectionStructureContainer.getEditorCommandId();
+
+        if (documentTypeId === ""){
+            console.error("Unable to select item documentTypeId is invalid");
+            return;
+        }
+
+        if (!name){
+            name = "";
+        }
+
+        if (collectionStructureContainer.isUsedDocumentService){
+            if (id === ""){
+                documentManagerPtr.insertNewDocument(documentTypeId);
+            }
+            else{
+                documentManagerPtr.openDocument(id, documentTypeId);
+            }
+        }
+        else{
+            ModalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentCommandsId": documentTypeId,"contentSource": editorPath});
+        }
+    }
+
+    function getEditorPath(){
+        return collectionStructureBase.commands.objectViewEditorPath;
+    }
+
+    function getEditorCommandId(){
+        return collectionStructureBase.commands.objectViewEditorCommandsId;
+    }
+
+    // function getSelectedIds(){
+    //     return collectionStructureBase.treeView.getSelectedIds();
+    // }
+
+    // function getSelectedIndexes(){
+    //     return collectionStructureBase.table.getSelectedIndexes();
+    // }
+
+    // function getSelectedNames(){
+    //     return collectionStructureBase.table.getSelectedNames();
+    // }
+
+    Component {
+        id: contentDialog;
+        Item {
+            id: content;
+            property Item root: null;
+            property Item rootItem:collectionStructureContainer;
+            property bool centered: true;
+            property string contentId;
+            property string contentName;
+            property string contentSource;
+            property string contentCommandsId;
+            width: contentLoader.width;
+            height: contentLoader.height;
+
+            onRootChanged: {
+                if(contentLoader.item){
+                    contentLoader.item.root = content.root;
+                }
+            }
+            onRootItemChanged: {
+                if(contentLoader.item){
+                    contentLoader.item.rootItem = content.rootItem;
+                }
+            }
+
+            Loader {
+                id: contentLoader;
+                anchors.centerIn: parent;
+                source: content.contentSource;
+                onLoaded: {
+                    console.log("contentLoader onLoaded");
+
+                    contentLoader.item.root = content.root;
+                    contentLoader.item.rootItem = content.rootItem;
+                    contentLoader.width = item.width;
+                    contentLoader.height = item.height;
+                    contentLoader.item.itemId = content.contentId;
+                    contentLoader.item.itemName = content.contentName;
+                    contentLoader.item.commandsId = content.contentCommandsId;
+                }
+            }
+        }
+
+    }
+
+    Loader {
+        id: commandsDelegateLoader;
+
+        Component.onCompleted: {
+            console.log("commandsDelegateLoader.source", parent.commandsDelegatePath);
+            commandsDelegateLoader.source = parent.commandsDelegatePath;
+        }
+
+        onLoaded: {
+            commandsDelegateLoader.item.commandId = collectionStructureContainer.commandId;
+
+            commandsDelegateLoader.item.treeView = collectionStructureBase.treeView;
+
+            commandsDelegateLoader.item.collectionStructureBase = collectionStructureContainer;
+            commandsDelegateLoader.item.commandsProvider = commandsProviderLocal;
+            commandsDelegateLoader.item.documentManagerPtr = collectionStructureContainer.documentManagerPtr;
+
+            commandsDelegateLoader.item.contextMenuModel = collectionStructureContainer.contextMenuModel;
+        }
+
+        onStatusChanged: {
+            if (status == Loader.Error){
+                console.error("Commands delegate is not loaded!");
+            }
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent;
+
+        color: Style.baseColor;
+    }
+
+    CollectionStructureBase {
+        id: collectionStructureBase;
+
+        anchors.right: collectionMetaInfo.left;
+        anchors.left: parent.left;
+        anchors.top: parent.top;
+        anchors.bottom: parent.bottom;
+        anchors.margins: parent.contentMargins;
+
+        hasFilter: collectionStructureContainer.hasFilter;
+
+        property bool ok: collectionStructureContainer.visible && collectionStructureContainer.commandId !== "";
+        onOkChanged: {
+            console.log("collectionStructureBase onOkChanged", ok);
+            if (ok){
+                collectionStructureBase.commandId = collectionStructureContainer.commandId;
+//                collectionViewContainer.updateGui();
+            }
+        }
+
+        onFilterDecoratorLoaded: {
+            collectionStructureContainer.filterDecoratorLoaded();
+        }
+
+        onSelectedItem: {
+            console.log("collectionStructureBase onItemSelected", commandsDelegateLoader, commandsDelegateLoader.item);
+
+            if (id == ""){
+                commandsDelegateLoader.item.commandHandle("New");
+            }
+            else{
+                commandsDelegateLoader.item.commandHandle("Edit");
+            }
+        }
+
+        onElementsChanged: {
+            collectionStructureContainer.elementsChanged();
+        }
+
+    }
+
+    CommandsProvider {
+        id: commandsProviderLocal;
+
+        property bool ok: collectionStructureContainer.visible && commandId !== "";
+        onOkChanged: {
+            if (commandsModel == null){
+                commandsProviderLocal.updateModel();
+
+                return;
+            }
+
+            if (ok){
+                commandsProviderLocal.updateGui()
+            }
+            else{
+                commandsProviderLocal.clearGui();
+            }
+        }
+
+        onCommandsModelChanged: {
+            if (ok){
+                commandsProviderLocal.updateGui()
+            }
+
+            collectionStructureContainer.fillContextMenuModel();
+
+            collectionStructureContainer.onCommandsModelChanged();
+        }
+    }
+
+    function onCommandsModelChanged(){}
+
+    MetaInfo {
+        id: collectionMetaInfo;
+
+        anchors.right: parent.right;
+
+		width: visible ? Style.sizeHintXXS : 1;
+        height: parent.height;
+
+        visible: collectionStructureContainer.visibleMetaInfo;
+    }
+
+    SubscriptionClient {
+        id: subscriptionClient;
+
+        property string ok: collectionStructureContainer.commandId !== "" && subscriptionClient.subscriptionId !== "";
+        onOkChanged: {
+            if (collectionStructureContainer.commandId !== ""){
+                let subscriptionRequestId = "On" + collectionStructureContainer.commandId + "BranchChanged"
+                var query = Gql.GqlRequest("subscription", subscriptionRequestId);
+                var queryFields = Gql.GqlObject("notification");
+                queryFields.InsertField("id");
+                query.AddField(queryFields);
+
+                console.log("registerSubscription", subscriptionRequestId, subscriptionId)
+                Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
+            }
+        }
+
+        onStateChanged: {
+            console.log("SubscriptionClient onStateChanged", state);
+
+            if (state === "Ready"){
+                console.log("subscriptionClient Ready");
+
+                if (subscriptionClient.containsKey("data")){
+                    let dataModelLocal = subscriptionClient.getData("data")
+                    if (dataModelLocal.containsKey("NodeId")){
+                        let nodeId = dataModelLocal.getData("NodeId");
+                            collectionStructureBase.updateBranch(nodeId)
+                    }
+                }
+            }
+        }
+    }
+
+    function setAlertPanel(alertPanelComp){
+        if (collectionStructureContainer.documentManagerPtr != null){
+            collectionStructureContainer.documentManagerPtr.setAlertPanel(alertPanelComp);
+        }
+    }
+
+    Component {
+        id: alertPanelComp;
+
+        Rectangle {
+            anchors.fill: parent;
+
+            color: Style.selectedColor;
+
+            Component.onCompleted: {
+                Events.subscribeEvent("UpdateAllModels", updateButton.clicked);
+            }
+
+            Component.onDestruction: {
+                Events.unSubscribeEvent("UpdateAllModels", updateButton.clicked);
+            }
+
+            Image {
+                id: icon;
+
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: parent.left;
+				anchors.leftMargin: Style.marginM;
+
+				width: Style.iconSizeM;
+				height: width;
+
+                sourceSize.height: height;
+                sourceSize.width: width;
+
+                source: "../../../" + Style.getIconPath("Icons/Lamp", Icon.State.On, Icon.Mode.Normal);
+            }
+
+            BaseText {
+                id: message;
+
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: icon.right;
+				anchors.leftMargin: Style.marginM;
+                anchors.right: updateButton.left;
+
+                text: qsTr("This table has been modified from another computer");
+            }
+
+            Button {
+                id: updateButton;
+
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.right: parent.right;
+				anchors.rightMargin: Style.marginM;
+
+				width: Style.buttonWidthXL;
+				height: Style.conntrolHeightM;
+
+                text: qsTr("Update");
+
+                onClicked: {
+                    Events.sendEvent("UpdateAllModels");
+                }
+            }
+        }
+    }
+}
+

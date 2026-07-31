@@ -1,0 +1,251 @@
+import QtQuick 2.12
+import Acf 1.0
+import com.imtcore.imtqml 1.0
+import imtcontrols 1.0
+
+Item {
+	id: gridCollectionViewContainer;
+
+	clip: true;
+
+	property string uuid;
+	property var documentManagerPtr: null;
+	property string documentName;
+
+	property int contentMargins: 0;
+
+	property alias baseGridCollectionView: gridCollectionViewBase;
+
+	property string itemName;
+	property bool isUsedDocumentService: true;
+	property bool visibleMetaInfo: true;
+	property bool hasMetaInfo: true;
+
+	property string editorPath;
+	property string commandsDelegatePath: "CollectionViewCommandsDelegateBase.qml";
+	property string commandUpdateGui;
+	property alias commandsDelegate: commandsLoader.item;
+
+	property alias commandsId: gridCollectionViewBase.commandsId;
+	property alias commands: gridCollectionViewBase.commands;
+	property alias gridCellWidth: gridCollectionViewBase.gridCellWidth;
+	property alias gridCellHeight: gridCollectionViewBase.gridCellHeightMin;
+	property alias gridContentHeight: gridCollectionViewBase.gridContentHeight;
+	property alias gridContentY: gridCollectionViewBase.gridContentY;
+	property alias gridBottomMargin: gridCollectionViewBase.gridBottomMargin;
+
+	property alias hasExtention: gridCollectionViewBase.hasExtention;
+	property alias openST: gridCollectionViewBase.openST;
+
+	property alias grid: gridCollectionViewBase.grid;
+	property alias gridCount: gridCollectionViewBase.gridCount;
+	property alias gridCountInLine: gridCollectionViewBase.gridCountInLine;
+	property alias gridRowCount : gridCollectionViewBase.gridRowCount;
+	property alias gridSelectedRow: gridCollectionViewBase.gridSelectedRow;
+	property alias gridIsLastRow: gridCollectionViewBase.gridIsLastRow;
+	property alias gridAddHeight: gridCollectionViewBase.gridAddHeight;
+	property alias gridCellHeightMin: gridCollectionViewBase.gridCellHeightMin;
+	property alias gridCellHeightMax: gridCollectionViewBase.gridCellHeightMax;
+	property alias gridCacheBuffer: gridCollectionViewBase.gridCacheBuffer;
+
+	property alias extendingInfoComp: gridCollectionViewBase.extendingInfoComp;
+	property alias gridDelegateMargin: gridCollectionViewBase.gridDelegateMargin;
+
+	property alias gridIndicatorMainColor: gridCollectionViewBase.gridIndicatorMainColor;
+	property alias gridIndicatorCoverColor: gridCollectionViewBase.gridIndicatorCoverColor;
+	property alias gridIndicatorCoverOpacity: gridCollectionViewBase.gridIndicatorCoverOpacity;
+	property alias gridIndicatorVisible: gridCollectionViewBase.gridIndicatorVisible;
+
+	property alias gridElementsDelegate: gridCollectionViewBase.gridElementsDelegate;
+	property alias gridElementsModel: gridCollectionViewBase.gridElementsModel;
+	// property alias selectedIndex: gridCollectionViewBase.grid.selectedIndex;
+	property int selectedIndex: gridCollectionViewBase.selectedIndex;
+	// property alias elementsList: gridCollectionViewBase.elementsList;
+	// property alias gridMinWidth: gridCollectionViewBase.gridMinWidth;
+	property alias gridDecoratorPath: gridCollectionViewBase.gridDecoratorPath;
+
+	// property alias tableItemHeight: gridCollectionViewBase.gridItemHeight;
+	property alias metaInfo: collectionMetaInfo;
+	property int paginationCurrentIndex: gridCollectionViewBase.paginationCurrentIndex;
+	property alias paginationPageSize: gridCollectionViewBase.paginationPageSize;
+	property alias paginationCountAllElements: gridCollectionViewBase.paginationCountAllElements;
+	property int paginationCountElements: gridCollectionViewBase.paginationCountElements;
+	property alias hasPagination: gridCollectionViewBase.hasPagination;
+
+	property string backgroundColor: Style.baseColor;
+
+	// Component.onCompleted: {
+	// 	itemId = documentsData.getData("id", model.index);
+	// 	itemName = documentsData.getData("Title", model.index);
+	// }
+
+	Component.onDestruction: {
+		Events.unSubscribeEvent(commandUpdateGui, updateGui);
+	}
+
+	onCommandUpdateGuiChanged: {
+		Events.subscribeEvent(commandUpdateGui, updateGui);
+	}
+
+	onCommandsIdChanged: {
+		gridCollectionViewBase.commandsId = commandsId;
+
+		if (commandsLoader.item){
+			commandsLoader.item.commandId = commandsId;
+		}
+	}
+
+	onPaginationCurrentIndexChanged: {
+		gridCollectionViewBase.paginationCurrentIndex = paginationCurrentIndex;
+	}
+	onPaginationCountElementsChanged: {
+		gridCollectionViewBase.paginationCountElements = paginationCountElements;
+	}
+	onSelectedIndexChanged: {
+		gridCollectionViewBase.selectedIndex = selectedIndex;
+	}
+
+	function updateGui(){
+		gridCollectionViewBase.commands.updateModels();
+	}
+
+	function selectItem(id, name){
+		let editorPath = gridCollectionViewBase.commands.objectViewEditorPath;
+		let commandsId = gridCollectionViewBase.commands.objectViewEditorCommandsId;
+
+		if (gridCollectionViewContainer.isUsedDocumentService){
+			documentManagerPtr.insertNewDocument(commandsId);
+		}
+		else{
+			ModalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentSource": editorPath, "contentCommandsId": commandsId});
+		}
+	}
+
+	function findIndexById(id, nameId){
+		if(nameId == undefined){
+			nameId = "id";
+		}
+		let foundIndex = -1;
+		for(let i = 0; i < gridCollectionViewContainer.gridElementsModel.getItemsCount(); i++){
+			let id_curr = gridCollectionViewContainer.gridElementsModel.isValidData(nameId, i) ? gridCollectionViewContainer.gridElementsModel.getData(nameId, i) : "";
+			if(id_curr == id){
+				foundIndex = i;
+				break;
+			}
+		}
+		return foundIndex;
+	}
+
+	Component {
+		id: contentDialog;
+
+		Item {
+			id: content;
+
+			width: contentLoader.width;
+			height: contentLoader.height;
+
+			property Item root;
+			property bool centered: true;
+			property string contentId;
+			property string contentName;
+			property string contentSource;
+			property string contentCommandsId;
+
+			onRootChanged: {
+				contentLoader.item.root = content.root;
+			}
+
+			Loader {
+				id: contentLoader;
+
+				anchors.centerIn: parent;
+
+				source: content.contentSource;
+				onLoaded: {
+					contentLoader.item.root = content.root;
+					contentLoader.width = item.width;
+					contentLoader.height = item.height;
+					contentLoader.item.itemId = content.contentId;
+					contentLoader.item.itemName = content.contentName;
+					contentLoader.item.commandsId = content.contentCommandsId;
+				}
+			}
+		}
+
+	}
+
+	Loader {
+		id: commandsLoader;
+
+		Component.onCompleted: {
+			console.log("commandsLoader.source", parent.commandsDelegatePath);
+			commandsLoader.source = parent.commandsDelegatePath;
+		}
+
+		onLoaded: {
+			// commandsLoader.item.commandId = gridCollectionViewBase.commandsId;
+			// commandsLoader.item.tableData = gridCollectionViewBase.grid;
+			// commandsLoader.item.documentManagerPtr = gridCollectionViewBase.documentManagerPtr;
+		}
+	}
+
+	TreeItemModel {
+		id: collectionViewModel;
+	}
+
+	Rectangle {
+		anchors.fill: parent;
+
+		color: gridCollectionViewContainer.backgroundColor;
+	}
+
+	GridCollectionViewBase {
+		id: gridCollectionViewBase;
+
+		anchors.fill: parent;
+
+		anchors.margins: parent.contentMargins;
+
+		commandsId: parent.commandsId;
+		backgroundColor: gridCollectionViewContainer.backgroundColor;
+
+		onSelectedIndexChangedSignal: {
+			console.log("gridCollectionViewBase onSelectedIndexChanged");
+			if(gridCollectionViewContainer.hasMetaInfo){
+				//collectionMetaInfo.getMetaInfo(); // в collectionMetaInfo нет getMetaInfo
+			}
+		}
+
+		onSelectedIndexChanged: {
+			gridCollectionViewContainer.selectedIndex = selectedIndex;
+		}
+
+		onSelectedItem: {
+			console.log("gridCollectionViewBase onItemSelected");
+			gridCollectionViewContainer.selectItem(id, name);
+		}
+
+		onPaginationCurrentIndexChanged: {
+			gridCollectionViewContainer.paginationCurrentIndex = paginationCurrentIndex;
+		}
+		onPaginationCountElementsChanged: {
+			gridCollectionViewContainer.paginationCountElements = paginationCountElements;
+		}
+	}
+
+	MetaInfo {
+		id: collectionMetaInfo;
+
+		anchors.right: parent.right;
+
+		width: visible ? Style.sizeHintXXS : 1;
+		height: parent.height;
+
+		visible: gridCollectionViewContainer.visibleMetaInfo;
+
+		// tableData: gridCollectionViewBase.grid;
+		// contentVisible: gridCollectionViewBase.grid.selectedIndex != -1;
+	}
+}
+
