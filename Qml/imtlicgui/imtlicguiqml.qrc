@@ -1,22 +1,22 @@
 <RCC>
     <qresource prefix="/qml">
         <file alias="imtlicgui/qmldir">qmldir</file>
-        <file alias="imtlicgui/Dialogs/FeaturesDialog.qml">Dialogs/FeaturesDialog.qml</file>
-        <file alias="imtlicgui/Editors/FeatureEditor.qml">Editors/FeatureEditor.qml</file>
-        <file alias="imtlicgui/Views/FeatureCollectionView.qml">Views/FeatureCollectionView.qml</file>
-        <file alias="imtlicgui/Providers/FeaturesDependenciesProvider.qml">Providers/FeaturesDependenciesProvider.qml</file>
-        <file alias="imtlicgui/Delegates/PackageCollectionViewCommandsDelegate.qml">Delegates/PackageCollectionViewCommandsDelegate.qml</file>
-        <file alias="imtlicgui/Delegates/PackageViewItemDelegate.qml">Delegates/PackageViewItemDelegate.qml</file>
-        <file alias="imtlicgui/Delegates/ProductViewCommandsDelegate.qml">Delegates/ProductViewCommandsDelegate.qml</file>
-        <file alias="imtlicgui/Views/ProductView.qml">Views/ProductView.qml</file>
-        <file alias="imtlicgui/Views/ProductCollectionView.qml">Views/ProductCollectionView.qml</file>
-        <file alias="imtlicgui/Delegates/ProductCollectionViewCommandsDelegate.qml">Delegates/ProductCollectionViewCommandsDelegate.qml</file>
-        <file alias="imtlicgui/Editors/LicenseEditor.qml">Editors/LicenseEditor.qml</file>
-        <file alias="imtlicgui/Views/LicenseCollectionView.qml">Views/LicenseCollectionView.qml</file>
-        <file alias="imtlicgui/Providers/LicensesProvider.qml">Providers/LicensesProvider.qml</file>
-        <file alias="imtlicgui/Delegates/FeatureEditorCommandsDelegate.qml">Delegates/FeatureEditorCommandsDelegate.qml</file>
-        <file alias="imtlicgui/Models/CachedFeatureCollection.qml">Models/CachedFeatureCollection.qml</file>
-        <file alias="imtlicgui/Models/CachedProductCollection.qml">Models/CachedProductCollection.qml</file>
-        <file alias="imtlicgui/Models/CachedLicenseCollection.qml">Models/CachedLicenseCollection.qml</file>
+        <file alias="imtlicgui/FeaturesDialog.qml">FeaturesDialog.qml</file>
+        <file alias="imtlicgui/FeatureEditor.qml">FeatureEditor.qml</file>
+        <file alias="imtlicgui/FeatureCollectionView.qml">FeatureCollectionView.qml</file>
+        <file alias="imtlicgui/FeaturesDependenciesProvider.qml">FeaturesDependenciesProvider.qml</file>
+        <file alias="imtlicgui/PackageCollectionViewCommandsDelegate.qml">PackageCollectionViewCommandsDelegate.qml</file>
+        <file alias="imtlicgui/PackageViewItemDelegate.qml">PackageViewItemDelegate.qml</file>
+        <file alias="imtlicgui/ProductViewCommandsDelegate.qml">ProductViewCommandsDelegate.qml</file>
+        <file alias="imtlicgui/ProductView.qml">ProductView.qml</file>
+        <file alias="imtlicgui/ProductCollectionView.qml">ProductCollectionView.qml</file>
+        <file alias="imtlicgui/ProductCollectionViewCommandsDelegate.qml">ProductCollectionViewCommandsDelegate.qml</file>
+        <file alias="imtlicgui/LicenseEditor.qml">LicenseEditor.qml</file>
+        <file alias="imtlicgui/LicenseCollectionView.qml">LicenseCollectionView.qml</file>
+        <file alias="imtlicgui/LicensesProvider.qml">LicensesProvider.qml</file>
+        <file alias="imtlicgui/FeatureEditorCommandsDelegate.qml">FeatureEditorCommandsDelegate.qml</file>
+        <file alias="imtlicgui/CachedFeatureCollection.qml">CachedFeatureCollection.qml</file>
+        <file alias="imtlicgui/CachedProductCollection.qml">CachedProductCollection.qml</file>
+        <file alias="imtlicgui/CachedLicenseCollection.qml">CachedLicenseCollection.qml</file>
     </qresource>
 </RCC>

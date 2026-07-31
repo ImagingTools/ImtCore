@@ -1,69 +1,70 @@
 module imtauthgui
 
-AdministrationView 1.0 Views/AdministrationView.qml
-AuthorizationPage 1.0 Pages/AuthorizationPage.qml
-singleton AuthorizationController 1.0 Controllers/AuthorizationController.qml
+AdministrationView 1.0 AdministrationView.qml
+AuthorizationPage 1.0 AuthorizationPage.qml
+singleton AuthorizationController 1.0 AuthorizationController.qml
 
-SuperuserPasswordPage 1.0 Pages/SuperuserPasswordPage.qml
+SuperuserPasswordPage 1.0 SuperuserPasswordPage.qml
 
-UserPanel 1.0 Views/UserPanel.qml
-UserTokenProvider 1.0 Providers/UserTokenProvider.qml
+UserPanel 1.0 UserPanel.qml
+UserTokenProvider 1.0 UserTokenProvider.qml
 
-singleton PermissionsController 1.0 Controllers/PermissionsController.qml
-singleton CachedAccountCollection 1.0 Models/CachedAccountCollection.qml
-singleton CachedRoleCollection 1.0 Models/CachedRoleCollection.qml
-singleton CachedUserCollection 1.0 Models/CachedUserCollection.qml
-singleton CachedGroupCollection 1.0 Models/CachedGroupCollection.qml
+singleton PermissionsController 1.0 PermissionsController.qml
+singleton CachedAccountCollection 1.0 CachedAccountCollection.qml
+singleton CachedRoleCollection 1.0 CachedRoleCollection.qml
+singleton CachedUserCollection 1.0 CachedUserCollection.qml
+singleton CachedGroupCollection 1.0 CachedGroupCollection.qml
 
-PermissionsProvider 1.0 Providers/PermissionsProvider.qml
-PermissionsTableView 1.0 Views/PermissionsTableView.qml
+PermissionsProvider 1.0 PermissionsProvider.qml
+PermissionsTableView 1.0 PermissionsTableView.qml
 
-RoleView 1.0 Views/RoleView.qml
-UserView 1.0 Views/UserView.qml
-UserGroupView 1.0 Views/UserGroupView.qml
+RoleView 1.0 RoleView.qml
+UserView 1.0 UserView.qml
+UserGroupView 1.0 UserGroupView.qml
 
-RoleCollectionViewCommandsDelegate 1.0 Delegates/RoleCollectionViewCommandsDelegate.qml
-RoleCollectionDataProvider 1.0 Providers/RoleCollectionDataProvider.qml
-GroupCollectionDataProvider 1.0 Providers/GroupCollectionDataProvider.qml
-UserCollectionDataProvider 1.0 Providers/UserCollectionDataProvider.qml
-ProfileView 1.0 Views/ProfileView.qml
-ProfileApiClient 1.0 Api/ProfileApiClient.qml
-GqlBasedProfileApiClient 1.0 Api/GqlBasedProfileApiClient.qml
-ProfileGeneralPage 1.0 Pages/ProfileGeneralPage.qml
-ProfileOrganizationsPage 1.0 Pages/ProfileOrganizationsPage.qml
-ProfileTokensPage 1.0 Pages/ProfileTokensPage.qml
-ProfileAccessPage 1.0 Pages/ProfileAccessPage.qml
-ProfileNoticeBanner 1.0 Views/ProfileNoticeBanner.qml
-RoleCollectionView 1.0 Views/RoleCollectionView.qml
-UserCollectionView 1.0 Views/UserCollectionView.qml
-UserGroupCollectionView 1.0 Views/UserGroupCollectionView.qml
-ChangePasswordDialog 1.0 Dialogs/ChangePasswordDialog.qml
-PasswordInput 1.0 Views/PasswordInput.qml
-UserGeneralEditor 1.0 Editors/UserGeneralEditor.qml
-PasswordRecoveryDialog 1.0 Dialogs/PasswordRecoveryDialog.qml
-UserSettingsController 1.0 Controllers/UserSettingsController.qml
-UserActionCollectionView 1.0 Views/UserActionCollectionView.qml
-TenantCollectionView 1.0 Views/TenantCollectionView.qml
-TenantEditor 1.0 Editors/TenantEditor.qml
-TenantEditorStateManager 1.0 Controllers/TenantEditorStateManager.qml
-TenantManagementApiClient 1.0 Api/TenantManagementApiClient.qml
-GqlBasedTenantManagementApiClient 1.0 Api/GqlBasedTenantManagementApiClient.qml
-TenantGeneralPage 1.0 Pages/TenantGeneralPage.qml
-TenantMembersPage 1.0 Pages/TenantMembersPage.qml
-TenantMemberDelegate 1.0 Delegates/TenantMemberDelegate.qml
-TenantRolesPage 1.0 Pages/TenantRolesPage.qml
-TenantGroupsPage 1.0 Pages/TenantGroupsPage.qml
-TenantPermissionsPage 1.0 Pages/TenantPermissionsPage.qml
-TenantCrossOrgGrantsPage 1.0 Pages/TenantCrossOrgGrantsPage.qml
-TenantContractsPage 1.0 Pages/TenantContractsPage.qml
-TenantConnectionCodePage 1.0 Pages/TenantConnectionCodePage.qml
-TenantConnectOrganizationPage 1.0 Pages/TenantConnectOrganizationPage.qml
-TenantMyConnectionsPage 1.0 Pages/TenantMyConnectionsPage.qml
-TenantMessagesPage 1.0 Pages/TenantMessagesPage.qml
-CrossOrgGrantView 1.0 Views/CrossOrgGrantView.qml
-ContractView 1.0 Views/ContractView.qml
-RelationshipView 1.0 Views/RelationshipView.qml
-MessageView 1.0 Views/MessageView.qml
-StatusBadge 1.0 Views/StatusBadge.qml
-TenantCollectionListView 1.0 Views/TenantCollectionListView.qml
-GqlBasedUserAdministrationApiClient 1.0 Api/GqlBasedUserAdministrationApiClient.qml
+RoleCollectionViewCommandsDelegate 1.0 RoleCollectionViewCommandsDelegate.qml
+RoleCollectionDataProvider 1.0 RoleCollectionDataProvider.qml
+GroupCollectionDataProvider 1.0 GroupCollectionDataProvider.qml
+UserCollectionDataProvider 1.0 UserCollectionDataProvider.qml
+ProfileView 1.0 ProfileView.qml
+ProfileApiClient 1.0 ProfileApiClient.qml
+GqlBasedProfileApiClient 1.0 GqlBasedProfileApiClient.qml
+ProfileGeneralPage 1.0 ProfileGeneralPage.qml
+ProfileOrganizationsPage 1.0 ProfileOrganizationsPage.qml
+ProfileTokensPage 1.0 ProfileTokensPage.qml
+ProfileAccessPage 1.0 ProfileAccessPage.qml
+ProfileNoticeBanner 1.0 ProfileNoticeBanner.qml
+RoleCollectionView 1.0 RoleCollectionView.qml
+UserCollectionView 1.0 UserCollectionView.qml
+UserGroupCollectionView 1.0 UserGroupCollectionView.qml
+ChangePasswordDialog 1.0 ChangePasswordDialog.qml
+PasswordInput 1.0 PasswordInput.qml
+UserGeneralEditor 1.0 UserGeneralEditor.qml
+PasswordRecoveryDialog 1.0 PasswordRecoveryDialog.qml
+UserSettingsController 1.0 UserSettingsController.qml
+UserActionCollectionView 1.0 UserActionCollectionView.qml
+TenantCollectionView 1.0 TenantCollectionView.qml
+TenantEditor 1.0 TenantEditor.qml
+TenantEditorStateManager 1.0 TenantEditorStateManager.qml
+TenantManagementApiClient 1.0 TenantManagementApiClient.qml
+GqlBasedTenantManagementApiClient 1.0 GqlBasedTenantManagementApiClient.qml
+GqlBasedUserAdministrationApiClient 1.0 GqlBasedUserAdministrationApiClient.qml
+TenantGeneralPage 1.0 TenantGeneralPage.qml
+TenantMembersPage 1.0 TenantMembersPage.qml
+TenantMemberDelegate 1.0 TenantMemberDelegate.qml
+TenantRolesPage 1.0 TenantRolesPage.qml
+TenantGroupsPage 1.0 TenantGroupsPage.qml
+TenantPermissionsPage 1.0 TenantPermissionsPage.qml
+TenantCrossOrgGrantsPage 1.0 TenantCrossOrgGrantsPage.qml
+TenantContractsPage 1.0 TenantContractsPage.qml
+TenantConnectionCodePage 1.0 TenantConnectionCodePage.qml
+TenantConnectOrganizationPage 1.0 TenantConnectOrganizationPage.qml
+TenantMyConnectionsPage 1.0 TenantMyConnectionsPage.qml
+TenantMessagesPage 1.0 TenantMessagesPage.qml
+CrossOrgGrantView 1.0 CrossOrgGrantView.qml
+ContractView 1.0 ContractView.qml
+RelationshipView 1.0 RelationshipView.qml
+MessageView 1.0 MessageView.qml
+StatusBadge 1.0 StatusBadge.qml
+TenantCollectionListView 1.0 TenantCollectionListView.qml
+

@@ -1,17 +1,17 @@
 <RCC>
     <qresource prefix="/qml">
 	    <file alias="imtchatgui/qmldir">qmldir</file>
-		<file alias="imtchatgui/Views/ChatNotificationBanner.qml">Views/ChatNotificationBanner.qml</file>
-		<file alias="imtchatgui/Panels/ChatPanel.qml">Panels/ChatPanel.qml</file>
-		<file alias="imtchatgui/Inputs/ChatSearchBar.qml">Inputs/ChatSearchBar.qml</file>
-		<file alias="imtchatgui/Views/ChatView.qml">Views/ChatView.qml</file>
-		<file alias="imtchatgui/Views/ConversationCollectionView.qml">Views/ConversationCollectionView.qml</file>
-		<file alias="imtchatgui/Dialogs/ConversationCreateDialog.qml">Dialogs/ConversationCreateDialog.qml</file>
-		<file alias="imtchatgui/Editors/ConversationEditor.qml">Editors/ConversationEditor.qml</file>
-		<file alias="imtchatgui/Views/EntityReferenceCard.qml">Views/EntityReferenceCard.qml</file>
-		<file alias="imtchatgui/Dialogs/EntitySearchPopup.qml">Dialogs/EntitySearchPopup.qml</file>
-		<file alias="imtchatgui/Views/MessageBubble.qml">Views/MessageBubble.qml</file>
-		<file alias="imtchatgui/Inputs/MessageInput.qml">Inputs/MessageInput.qml</file>
-		<file alias="imtchatgui/Views/TypingIndicator.qml">Views/TypingIndicator.qml</file>
+		<file alias="imtchatgui/ChatNotificationBanner.qml">ChatNotificationBanner.qml</file>
+		<file alias="imtchatgui/ChatPanel.qml">ChatPanel.qml</file>
+		<file alias="imtchatgui/ChatSearchBar.qml">ChatSearchBar.qml</file>
+		<file alias="imtchatgui/ChatView.qml">ChatView.qml</file>
+		<file alias="imtchatgui/ConversationCollectionView.qml">ConversationCollectionView.qml</file>
+		<file alias="imtchatgui/ConversationCreateDialog.qml">ConversationCreateDialog.qml</file>
+		<file alias="imtchatgui/ConversationEditor.qml">ConversationEditor.qml</file>
+		<file alias="imtchatgui/EntityReferenceCard.qml">EntityReferenceCard.qml</file>
+		<file alias="imtchatgui/EntitySearchPopup.qml">EntitySearchPopup.qml</file>
+		<file alias="imtchatgui/MessageBubble.qml">MessageBubble.qml</file>
+		<file alias="imtchatgui/MessageInput.qml">MessageInput.qml</file>
+		<file alias="imtchatgui/TypingIndicator.qml">TypingIndicator.qml</file>
     </qresource>
 </RCC>

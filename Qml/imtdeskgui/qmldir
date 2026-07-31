@@ -1,11 +1,11 @@
 module imtdeskgui
 
-DeskPage 1.0 Pages/DeskPage.qml
-TicketBadge 1.0 Views/TicketBadge.qml
-TicketCollectionView 1.0 Views/TicketCollectionView.qml
-TicketCreateDialog 1.0 Dialogs/TicketCreateDialog.qml
-TicketEditor 1.0 Editors/TicketEditor.qml
-TicketListPanel 1.0 Panels/TicketListPanel.qml
-TicketView 1.0 Views/TicketView.qml
-EntityContextTicketsPanel 1.0 Panels/EntityContextTicketsPanel.qml
-EntityContextTicketsDataProvider 1.0 Providers/EntityContextTicketsDataProvider.qml
+DeskPage 1.0 DeskPage.qml
+TicketBadge 1.0 TicketBadge.qml
+TicketCollectionView 1.0 TicketCollectionView.qml
+TicketCreateDialog 1.0 TicketCreateDialog.qml
+TicketEditor 1.0 TicketEditor.qml
+EntityContextTicketsPanel 1.0 EntityContextTicketsPanel.qml
+EntityContextTicketsDataProvider 1.0 EntityContextTicketsDataProvider.qml
+TicketListPanel 1.0 TicketListPanel.qml
+TicketView 1.0 TicketView.qml

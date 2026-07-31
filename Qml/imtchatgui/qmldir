@@ -1,14 +1,14 @@
 module imtchatgui
 
-ChatNotificationBanner 1.0 Views/ChatNotificationBanner.qml
-ChatPanel 1.0 Panels/ChatPanel.qml
-ChatSearchBar 1.0 Inputs/ChatSearchBar.qml
-ChatView 1.0 Views/ChatView.qml
-ConversationCollectionView 1.0 Views/ConversationCollectionView.qml
-ConversationCreateDialog 1.0 Dialogs/ConversationCreateDialog.qml
-ConversationEditor 1.0 Editors/ConversationEditor.qml
-EntityReferenceCard 1.0 Views/EntityReferenceCard.qml
-EntitySearchPopup 1.0 Dialogs/EntitySearchPopup.qml
-MessageBubble 1.0 Views/MessageBubble.qml
-MessageInput 1.0 Inputs/MessageInput.qml
-TypingIndicator 1.0 Views/TypingIndicator.qml
+ChatNotificationBanner 1.0 ChatNotificationBanner.qml
+ChatPanel 1.0 ChatPanel.qml
+ChatSearchBar 1.0 ChatSearchBar.qml
+ChatView 1.0 ChatView.qml
+ConversationCollectionView 1.0 ConversationCollectionView.qml
+ConversationCreateDialog 1.0 ConversationCreateDialog.qml
+ConversationEditor 1.0 ConversationEditor.qml
+EntityReferenceCard 1.0 EntityReferenceCard.qml
+EntitySearchPopup 1.0 EntitySearchPopup.qml
+MessageBubble 1.0 MessageBubble.qml
+MessageInput 1.0 MessageInput.qml
+TypingIndicator 1.0 TypingIndicator.qml

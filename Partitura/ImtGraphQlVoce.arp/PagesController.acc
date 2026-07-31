@@ -17,7 +17,7 @@
                         <Data IsEnabled="true" Value="64"/>
                     </AttributeInfo>
                     <AttributeInfo Id="FixedItemQmlPath" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtauthgui/Views/AdministrationView.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtauthgui/AdministrationView.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Icons/AdminPanel"/>
@@ -98,7 +98,7 @@
                         <Data IsEnabled="true" Value="64"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CollectionViewQmlPath" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtdeskgui/Views/TicketCollectionView.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtdeskgui/TicketCollectionView.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Icons/SupportDesk"/>
@@ -227,7 +227,7 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="PageQmlItem" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtdocgui/Views/SearchPageSingleDocumentView.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtdocgui/SearchPageSingleDocumentView.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="StartQmlItem" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="qrc:/qml/imtgui/View/SearchPage.qml"/>
@@ -245,7 +245,7 @@
                         <Data IsEnabled="true" Value="32"/>
                     </AttributeInfo>
                     <AttributeInfo Id="FixedItemQmlPath" Type="Text" ExportId="WorkspacePageQmlPath">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtauthgui/Views/UserActionCollectionView.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtauthgui/UserActionCollectionView.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Icons/Dashboard"/>

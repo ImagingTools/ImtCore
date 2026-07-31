@@ -1,6 +1,0 @@
-module imtstyle
-
-StyleBase 1.0 StyleBase.qml
-StyleComponents 1.0 StyleComponents.qml
-IconProperties 1.0 IconProperties.qml
-FontProperties 1.0 FontProperties.qml

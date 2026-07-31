@@ -1,8 +1,8 @@
 <RCC>
     <qresource prefix="/qml">
-        <file alias="imtgeogui/Views/AddressTreeView.qml">Views/AddressTreeView.qml</file>
-        <file alias="imtgeogui/Views/StructureAddressView.qml">Views/StructureAddressView.qml</file>
-        <file alias="imtgeogui/Editors/AddressEditor.qml">Editors/AddressEditor.qml</file>
+        <file alias="imtgeogui/AddressTreeView.qml">AddressTreeView.qml</file>
+        <file alias="imtgeogui/StructureAddressView.qml">StructureAddressView.qml</file>
+        <file alias="imtgeogui/AddressEditor.qml">AddressEditor.qml</file>
         <file alias="imtgeogui/qmldir">qmldir</file>
     </qresource>
     <qresource prefix="/"/>
