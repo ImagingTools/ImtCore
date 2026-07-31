@@ -22,16 +22,7 @@ Item {
 	
 	// Reference on the all elements in order of priority to this view
 	property var priorityElements: []
-	
-	// Commands with negative accent
-	property var negativeAccentCommandIds: []
-	
-	// Commands with positive accent
-	property var positiveAccentCommandIds: []
-	
-	property string positiveAccentColor: Style.imaginToolsAccentColor;
-	property string negativeAccentColor: Style.errorTextColor;
-	
+
 	property alias commandsCount: repeater.count;
 
 	// params["x"] = X coord click
@@ -196,24 +187,14 @@ Item {
 						TopButtonDecorator {
 							property string baseColor: !baseElement ? "transparent" : baseElement.checked ? Style.selectedColor : baseElement.mouseArea.containsMouse ? Style.alternateBaseColor : Style.baseColor
 							property string baseTextColor: !baseElement ? "transparent" : baseElement.enabled ? Style.textColor : Style.inactiveTextColor;
-							color: button.isPositiveAccent ? commandsItem.positiveAccentColor :
-															 button.isNegativeAccent ? commandsItem.negativeAccentColor : baseColor;
-							textColor: button.isPositiveAccent || button.isNegativeAccent ? "white" : baseTextColor;
-							icon.source: button.isPositiveAccent || button.isNegativeAccent ?
-											 "../../../../" + Style.getIconPath(button.element.m_elementItemPath, Icon.State.Off, Icon.Mode.Disabled)
-										   : baseElement.iconSource;
-
-							arrowIconAlias.source: button.isPositiveAccent || button.isNegativeAccent ?
-													"../../../../" + Style.getIconPath("Icons/Down", Icon.State.Off, Icon.Mode.Disabled)
-												  : "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
-
-							border.width: button.isPositiveAccent || button.isNegativeAccent ? 0 : baseElement.mouseArea.containsMouse;
-							opacity: button.hovered && (button.isPositiveAccent || button.isNegativeAccent) ? 0.85 : 1;
+							color: baseColor;
+							textColor: baseTextColor;
+							icon.source: baseElement.iconSource;
+							arrowIconAlias.source: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
+							border.width: baseElement.mouseArea.containsMouse;
 						}
 					}
-					
-					property bool isNegativeAccent: element && element.m_enabled ? commandsItem.negativeAccentCommandIds.includes(element.m_elementId) : false;
-					property bool isPositiveAccent: element && element.m_enabled ? commandsItem.positiveAccentCommandIds.includes(element.m_elementId) : false;
+
 					property int priority: element ? element.m_priority : 0;
 					property int maxWidth: -1;
 					
