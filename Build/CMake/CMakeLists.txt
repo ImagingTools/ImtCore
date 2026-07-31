@@ -115,6 +115,9 @@ add_subdirectory("${INCLUDE_DIR}/imtsdlgencpp/CMake" "${AUX_INCLUDE_DIR}/imtsdlg
 add_subdirectory("${IMPL_DIR}/ImtSdlGenCppPck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenCppPck")
 add_dependencies(ImtSdlGenCppPck imtsdl imtsdlgencpp imtsdlgenqml imtfile imtbase)
 
+add_subdirectory("${IMPL_DIR}/ImtCorePck/CMake" "${AUX_INCLUDE_DIR}/ImtCorePck")
+add_dependencies(ImtCorePck imtbase imtfile)
+
 add_subdirectory("${IMPL_DIR}/SdlCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/SdlCodeGenerator")
 add_dependencies(SdlCodeGenerator ImtCorePck ImtSdlPck ImtSdlGenCppPck ImtSdlGenQmlPck)
 imt_chain_windeploy_target(SdlCodeGenerator)
@@ -305,8 +308,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 	#-------- Packages --------
 	if(NOT ANDROID)
-		add_subdirectory("${IMPL_DIR}/ImtCorePck/CMake" "${AUX_INCLUDE_DIR}/ImtCorePck")
-		add_dependencies(ImtCorePck imtbase imtfile)
+
 
 		add_subdirectory("${IMPL_DIR}/ImtAppPck/CMake" "${AUX_INCLUDE_DIR}/ImtAppPck")
 		add_dependencies(ImtAppPck imtapp)
