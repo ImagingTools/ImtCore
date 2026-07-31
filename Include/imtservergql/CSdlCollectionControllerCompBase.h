@@ -10,6 +10,9 @@
 #include <imtbase/ITreeModelWrittable.h>
 
 
+#undef GetObject
+
+
 namespace imtservergql
 {
 
