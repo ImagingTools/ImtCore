@@ -5,6 +5,7 @@
 
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
+#include <imtauthgql/imtauthgql.h>
 #include <imtgql/IGqlContext.h>
 
 
@@ -107,8 +108,19 @@ bool CPersonalAccessTokenControllerComp::AreRequestedScopesAllowed(
 
 	// A caller authenticated with a PAT gets user info already restricted to
 	// the token's scopes (see CAuthenticationManagerComp), so this check also
-	// prevents a scoped token from minting a broader one.
-	const imtauth::IUserInfo::FeatureIds callerPermissions = callerInfoPtr->GetPermissions(productId);
+	// prevents a scoped token from minting a broader one. The permission set
+	// is tenant-adapted (same adaptation as GetProfile and
+	// OnGetUserPermissions), so only scopes the caller actually possesses in
+	// the current tenant context can be granted.
+	const imtauth::IUserInfo::FeatureIds callerPermissions = GetEffectiveUserPermissions(
+				gqlContextPtr->GetUserId(),
+				*callerInfoPtr,
+				gqlContextPtr->GetTenantId(),
+				productId,
+				m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr,
+				m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr,
+				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
+				m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr);
 	for (const QByteArray& scope : scopes){
 		if (!callerPermissions.contains(scope)){
 			return false;
