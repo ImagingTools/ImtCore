@@ -813,7 +813,11 @@ sdl::V1_0::imtbase::CExportObjectPayload CObjectCollectionControllerCompBase::On
 		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
 
-	if (!ConvertObject(*dataPtr.GetPtr(), *objectPersistenceInstancePtr.GetPtr())){
+	if (!ConvertObject(*dataPtr.GetPtr(), *objectPersistenceInstancePtr.GetPtr(), errorMessage)){
+		if (errorMessage.isEmpty()){
+			errorMessage = QString("Unable to export the object with ID: '%1'. Error: Object conversion failed").arg(qPrintable(objectId));
+		}
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
 
@@ -964,7 +968,11 @@ sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::On
 		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
-	if (!ConvertObject(*objectPersistenceInstancePtr.GetPtr(), *collectionObjectInstancePtr.GetPtr())){
+	if (!ConvertObject(*objectPersistenceInstancePtr.GetPtr(), *collectionObjectInstancePtr.GetPtr(), errorMessage)){
+		if (errorMessage.isEmpty()){
+			errorMessage = QString("Unable to import object to the collection. Error: Object conversion failed");
+		}
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
@@ -2321,7 +2329,12 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 		return QJsonObject();
 	}
 
-	if (!ConvertObject(*objectPersistenceInstancePtr.GetPtr(), *collectionObjectInstancePtr.GetPtr())){
+	if (!ConvertObject(*objectPersistenceInstancePtr.GetPtr(), *collectionObjectInstancePtr.GetPtr(), errorMessage)){
+		if (errorMessage.isEmpty()){
+			errorMessage = QString("Unable to import object to the collection. Error: Object conversion failed");
+		}
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
 		return QJsonObject();
 	}
 
@@ -2411,7 +2424,12 @@ QJsonObject CObjectCollectionControllerCompBase::ExportObject(const imtgql::CGql
 		return QJsonObject();
 	}
 
-	if (!ConvertObject(*dataPtr.GetPtr(), *objectPersistenceInstancePtr.GetPtr())){
+	if (!ConvertObject(*dataPtr.GetPtr(), *objectPersistenceInstancePtr.GetPtr(), errorMessage)){
+		if (errorMessage.isEmpty()){
+			errorMessage = QString("Unable to export the object with ID: '%1'. Error: Object conversion failed").arg(qPrintable(objectId));
+		}
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
 		return QJsonObject();
 	}
 
@@ -2443,8 +2461,9 @@ QJsonObject CObjectCollectionControllerCompBase::ExportObject(const imtgql::CGql
 }
 
 
-bool CObjectCollectionControllerCompBase::ConvertObject(const istd::IChangeable& source, istd::IChangeable& target) const
+bool CObjectCollectionControllerCompBase::ConvertObject(const istd::IChangeable& source, istd::IChangeable& target, QString& errorMessage) const
 {
+	Q_UNUSED(errorMessage);
 	return target.CopyFrom(source);
 }
 
