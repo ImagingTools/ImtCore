@@ -107,7 +107,7 @@ protected:
 	virtual QJsonObject ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual QJsonObject ExportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
-	virtual bool ConvertObject(const istd::IChangeable& source, istd::IChangeable& target, QString& errorMessage) const;
+	virtual bool ConvertObject(const istd::IChangeable& source, istd::IChangeable& target) const;
 	virtual int GetObjectTypeIdIndex(const QByteArray& typeId) const;
 	virtual int GetMimeTypeIndex(const QString& mimeType) const;
 

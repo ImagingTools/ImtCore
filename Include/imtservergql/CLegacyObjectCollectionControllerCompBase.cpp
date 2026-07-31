@@ -1094,12 +1094,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ImportObject(const imtgql
 		return QJsonObject();
 	}
 
-	if (!ConvertObject(*objectPersistenceInstancePtr.GetPtr(), *collectionObjectInstancePtr.GetPtr(), errorMessage)){
-		if (errorMessage.isEmpty()){
-			errorMessage = QString("Unable to import object to the collection. Error: Object conversion failed");
-		}
-		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
-
+	if (!ConvertObject(*objectPersistenceInstancePtr.GetPtr(), *collectionObjectInstancePtr.GetPtr())){
 		return QJsonObject();
 	}
 
@@ -1187,12 +1182,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ExportObject(const imtgql
 		return QJsonObject();
 	}
 
-	if (!ConvertObject(*dataPtr.GetPtr(), *objectPersistenceInstancePtr.GetPtr(), errorMessage)){
-		if (errorMessage.isEmpty()){
-			errorMessage = QString("Unable to export the object with ID: '%1'. Error: Object conversion failed").arg(qPrintable(objectId));
-		}
-		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
-
+	if (!ConvertObject(*dataPtr.GetPtr(), *objectPersistenceInstancePtr.GetPtr())){
 		return QJsonObject();
 	}
 
@@ -1224,9 +1214,8 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ExportObject(const imtgql
 }
 
 
-bool CLegacyObjectCollectionControllerCompBase::ConvertObject(const istd::IChangeable& source, istd::IChangeable& target, QString& errorMessage) const
+bool CLegacyObjectCollectionControllerCompBase::ConvertObject(const istd::IChangeable& source, istd::IChangeable& target) const
 {
-	Q_UNUSED(errorMessage);
 	return target.CopyFrom(source);
 }
 

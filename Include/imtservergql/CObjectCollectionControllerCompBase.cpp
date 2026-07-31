@@ -818,6 +818,7 @@ sdl::V1_0::imtbase::CExportObjectPayload CObjectCollectionControllerCompBase::On
 			errorMessage = QString("Unable to export the object with ID: '%1'. Error: Object conversion failed").arg(qPrintable(objectId));
 		}
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
 		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
 
@@ -973,6 +974,7 @@ sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::On
 			errorMessage = QString("Unable to import object to the collection. Error: Object conversion failed");
 		}
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+
 		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
