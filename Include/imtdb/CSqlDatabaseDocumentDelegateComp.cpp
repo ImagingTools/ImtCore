@@ -1396,6 +1396,7 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 					"%8", "%6", "%9"
 				FROM %2"%3"
 				WHERE %1 = 1
+				LIMIT 1
 			) AS root1 ON root1."%8" = root."%8"
 			%4
 		)")
@@ -2147,6 +2148,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 					"%4", "%5"
 				FROM %1 "%2"
 				WHERE %7 = 1
+				LIMIT 1
 			) AS root1 ON root1."%4" = root."%4"
 			WHERE (%3) AND root."%4" = '%6' ORDER BY %8 DESC)")
 			.arg(
