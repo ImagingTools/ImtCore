@@ -155,4 +155,34 @@ const imtdoc::IDocumentValidator* CDocumentServiceCompBase::GetDocumentValidator
 }
 
 
+bool CDocumentServiceCompBase::OnDocumentCreated(const QByteArray& typeId, const iprm::IParamsSet* initParams, istd::IChangeable& document, QString& errorMessage)
+{
+	imtdoc::IDocumentInitDelegate* delegatePtr = GetDocumentInitDelegate(typeId);
+	if (delegatePtr != nullptr){
+		if (!delegatePtr->InitializeDocument(typeId, document, errorMessage, initParams)){
+			return false;
+		}
+		return true;
+	}
+
+	if (initParams != nullptr){
+		errorMessage = QStringLiteral("Document initialization failed: init parameters provided but no init delegate registered");
+		return false;
+	}
+
+	return true;
+}
+
+
+imtdoc::IDocumentInitDelegate* CDocumentServiceCompBase::GetDocumentInitDelegate(const QByteArray& typeId) const
+{
+	int index = GetObjectFactoryIndex(typeId);
+	if ((index >= 0) && (index < m_documentInitDelegateCompPtr.GetCount())){
+		return m_documentInitDelegateCompPtr[index];
+	}
+
+	return nullptr;
+}
+
+
 } // namespace imtdoc
