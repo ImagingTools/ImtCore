@@ -7,6 +7,10 @@
 
 // ImtCore includes
 #include <imtauth/ITenantManager.h>
+#include <imtauth/ITenantEntityBindingManager.h>
+#include <imtauth/IDelegatedAccess.h>
+#include <imtauth/ITenantMembershipManager.h>
+#include <imtauth/IRoleInfoProvider.h>
 #include <imtlic/IProductInfo.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions_fwd.h>
 
@@ -23,6 +27,10 @@ public:
 	I_BEGIN_COMPONENT(CPermissionsProviderComp)
 		I_ASSIGN(m_productInfoCompPtr, "FeatureContainer", "Feature container", true, "FeatureContainer");
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for filtering permissions by tenant scope", false, "TenantManager");
+		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for tenant-scoped adaptation of user roles/groups/permissions", false, "TenantEntityBindingManager");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
+		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
+		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider (used for delegated role product validation)", false, "RoleInfoProvider");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT
 
@@ -40,6 +48,10 @@ protected:
 protected:
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
+	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
+	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
+	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
+	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
 	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 };
 

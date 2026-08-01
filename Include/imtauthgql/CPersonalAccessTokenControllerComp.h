@@ -4,6 +4,10 @@
 
 // ImtCore includes
 #include <imtauth/IPersonalAccessTokenManager.h>
+#include <imtauth/ITenantEntityBindingManager.h>
+#include <imtauth/IDelegatedAccess.h>
+#include <imtauth/ITenantMembershipManager.h>
+#include <imtauth/IRoleInfoProvider.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/PersonalAccessTokens_fwd.h>
 
 
@@ -20,6 +24,10 @@ public:
 	I_BEGIN_COMPONENT(CPersonalAccessTokenControllerComp);
 		I_ASSIGN(m_tokenManagerCompPtr, "PersonalAccessTokenManager", "Personal access token manager", true, "PersonalAccessTokenManager");
 		I_ASSIGN(m_tokenFactoryCompPtr, "TokenFactory", "Factory for creating token instances", true, "PersonalAccessTokenFactory");
+		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for tenant-scoped adaptation of user roles/groups/permissions", false, "TenantEntityBindingManager");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
+		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
+		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider (used for delegated role product validation)", false, "RoleInfoProvider");
 	I_END_COMPONENT;
 
 protected:
@@ -67,9 +75,39 @@ private:
 	*/
 	bool IsCallerAuthorizedForUser(const ::imtgql::CGqlRequest& gqlRequest, const QByteArray& targetUserId) const;
 
+	/**
+		Checks whether the caller identified by the request's GraphQL context
+		is allowed to grant all of the requested permission \p scopes to a
+		personal access token.
+
+		Administrators (imtauth::IUserInfo::IsAdmin()) may grant any scope,
+		mirroring OnGetUserPermissions() which shows them the full permission
+		tree. Any other caller may only grant scopes that are contained in
+		their own effective permissions for \p productId - this prevents a
+		user from minting a token with permissions they do not have
+		themselves (privilege escalation). The effective permission set is
+		tenant-adapted (imtauthgql::GetEffectiveUserPermissions), matching
+		the scope tree shown by OnGetUserPermissions. Callers whose user
+		info cannot be resolved are denied (fail closed).
+
+		\param gqlRequest GraphQL request carrying the caller's context.
+		\param scopes Requested permission scopes for the new token.
+		\param productId Product the token is created for; passed through to
+			the effective permission lookup.
+		\return true if the caller may grant all requested scopes.
+	*/
+	bool AreRequestedScopesAllowed(
+				const ::imtgql::CGqlRequest& gqlRequest,
+				const QByteArrayList& scopes,
+				const QByteArray& productId) const;
+
 private:
 	I_REF(imtauth::IPersonalAccessTokenManager, m_tokenManagerCompPtr);
 	I_FACT(imtauth::IPersonalAccessToken, m_tokenFactoryCompPtr);
+	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
+	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
+	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
+	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
 };
 
 
