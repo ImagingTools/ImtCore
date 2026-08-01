@@ -1127,6 +1127,49 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 }
 
 
+/**
+	Get the effective permission set of a user for the given tenant and
+	product context.
+
+	This applies the same tenant-based adaptation as GetProfile
+	(AdaptUserForTenant): only roles/groups/permissions visible in the
+	current tenant - or true globals for "No Organization" - plus delegated
+	role enrichment are considered. Use this instead of a raw
+	IUserBaseInfo::GetPermissions() call whenever the result must reflect
+	what the user actually possesses in the caller's current context (e.g.
+	for building the personal-access-token scope tree or for validating
+	requested token scopes).
+*/
+inline imtauth::IUserBaseInfo::FeatureIds GetEffectiveUserPermissions(
+				const QByteArray& userId,
+				const imtauth::IUserInfo& userInfo,
+				const QByteArray& tenantId,
+				const QByteArray& productId,
+				imtauth::ITenantEntityBindingManager* bindingManager,
+				imtauth::IDelegatedAccess* delegatedAccess,
+				imtauth::ITenantMembershipManager* membershipManager,
+				imtauth::IRoleInfoProvider* roleInfoProvider)
+{
+	istd::IChangeableUniquePtr adaptedPtr = AdaptUserForTenant(
+				userId,
+				userInfo,
+				tenantId,
+				productId,
+				bindingManager,
+				delegatedAccess,
+				membershipManager,
+				roleInfoProvider);
+	if (adaptedPtr.IsValid()){
+		const imtauth::IUserInfo* adaptedUserPtr = dynamic_cast<const imtauth::IUserInfo*>(adaptedPtr.GetPtr());
+		if (adaptedUserPtr != nullptr){
+			return adaptedUserPtr->GetPermissions(productId);
+		}
+	}
+
+	return userInfo.GetPermissions(productId);
+}
+
+
 // --- SDL ↔ C++ Enum Converters ---
 
 // Relationship Role
