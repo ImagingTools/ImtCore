@@ -68,6 +68,19 @@ Item {
         }
     }
 
+    // Between signing in and the page list coming back there was nothing here at
+    // all - the window sat on its own background colour, which reads as the
+    // application having stopped rather than as it still working.
+    Loading {
+        id: pagesLoading;
+
+        anchors.fill: parent;
+
+        // Keyed on the repeater, not on getItemsCount(): that is a plain call and
+        // a binding on it would never hear the model fill up.
+        visible: pagesData.count === 0 && container.modelState !== "Error";
+    }
+
     Repeater {
         id: pagesData;
         anchors.fill: parent;

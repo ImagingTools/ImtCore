@@ -45,7 +45,7 @@ FilterDelegateBase {
 	}
 
 	onOpenFilter:{
-		var point = mapToItem(null, x, y + height);
+		var point = timeDelegateFilter.popupPoint();
 		ModalDialogManager.openDialog(timeFilterParamComp,{"x": point.x, "y": point.y, "timeFilter": timeFilter});
 	}
 

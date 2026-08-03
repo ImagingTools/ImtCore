@@ -8,26 +8,23 @@ ViewCommandsDelegateBase {
     id: container;
 
     onViewChanged: {
-        if (view){
-            tableConnections.target = view.tableView;
-        }
+		viewConnections.target = view;
+		container.updateCommandStates();
     }
 
+	function updateCommandStates(){
+		if (!container.view || !container.view.commandsController)
+			return;
+		container.view.commandsController.setCommandIsEnabled("Remove",
+			container.view.selectedRootFeatureId() !== "");
+	}
+
     Connections {
-        id: tableConnections;
+        id: viewConnections;
 
-        function onSelectionChanged(){
-            let idx = container.view.tableView.currentIndex;
-
-            let isEnabled = false;
-            if (idx != null){
-                if (idx.level === 0){
-                    isEnabled = true;
-                }
-            }
-
-            container.view.commandsController.setCommandIsEnabled("Remove", isEnabled);
-        }
+		function onSelectedNodeChanged(){
+			container.updateCommandStates();
+		}
     }
 
     onCommandActivated: {
@@ -36,41 +33,10 @@ ViewCommandsDelegateBase {
         }
 
         if (commandId === "New"){
-            let features = container.view.model.m_features;
-
-            let featureIds = []
-            if (features !== ""){
-                featureIds = features.split(';');
-            }
-
-            ModalDialogManager.openDialog(featuresDialogComp, {"excludeFeatureIds": featureIds, "featuresModel": container.view.allFeaturesModel});
+			container.view.openFeaturesDialog();
         }
         else if (commandId === "Remove"){
-            let selectedIndex = container.view.tableView.currentIndex;
-            if (selectedIndex !== null && selectedIndex.data){
-                let featureId = selectedIndex.data["id"] || "";
-                if (featureId !== "") {
-                    container.view.removeFeature(featureId);
-                    container.view.updateFeaturesGui();
-                }
-            }
-        }
-    }
-
-    property Component featuresDialogComp: Component {
-        FeaturesDialog {
-            onFinished: {
-                if (selectedIndexes.length > 0){
-                    container.view.productData.beginChanges();
-                    for (let i = 0; i < selectedIndexes.length; i++){
-                        let featureId = tableModel.getData("id", selectedIndexes[i]);
-                        container.view.addFeature(featureId);
-                    }
-                    container.view.productData.endChanges();
-
-                    container.view.updateFeaturesGui();
-                }
-            }
+			container.view.removeSelectedRootFeature();
         }
     }
 }

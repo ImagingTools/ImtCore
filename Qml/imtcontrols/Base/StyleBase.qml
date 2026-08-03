@@ -207,7 +207,7 @@ StyleComponents {
 	property int menuMinWidth: 200
 
 	//table sizes
-	property int tableRowHeight: 35
+	property int tableRowHeight: controlHeightL + marginXS
 	property int tableHeaderHeight: 35
 
 	//grid cell size
@@ -229,7 +229,10 @@ StyleComponents {
 	//Other sizes
 	property int sizePanelsHeight: 50;
 	property int headerHeight: 50;
-	property int menuPanelMinWidth: 26;
+	property int menuPanelIconSize: iconSizeM;
+
+	property int menuPanelMinWidth: 2 * marginL + menuPanelIconSize;
+	property int menuPanelWidth: sizeHintXXS;
 	//Upper bound for centered, readability-limited page content (lists, forms).
 	property int contentWidthMax: 1000;
 
@@ -262,7 +265,7 @@ StyleComponents {
 	property string firstColor: "#4682B4";
 	property string secondColor: "#F18C16";
 	property string firstColorHighlight: "#B0C4DE";
-	property string colorMenuPanel: imagingToolsGradient1;
+	property string colorMenuPanel: baseColor;
 
 		//error
 	property string errorColor: errorTextColor
@@ -347,9 +350,9 @@ StyleComponents {
 	property string tableCellFontColor: "#686671";
 
 		//scroll
-	property string scrollBackgroundColor: styleContainer.imagingToolsGradient0;
-	property string scrollIndicatorColor: styleContainer.imagingToolsGradient3;
-	property string scrollHighlightColor: styleContainer.imagingToolsGradient0;
+	property string scrollBackgroundColor: styleContainer.backgroundColor2;
+	property string scrollIndicatorColor: styleContainer.borderColor2;
+	property string scrollHighlightColor: styleContainer.backgroundColor;
 
 		//shadow, hover
 	property string shadowColor: "#ececec";
@@ -367,7 +370,7 @@ StyleComponents {
 	//other parameters
 	property real maximumFlickVelocity: 75
 	property bool enableHoverEffect: true
-	property bool enableMenuPanelCollapse: false
+	property bool enableMenuPanelCollapse: true
 
 
 	function getIconPath(iconName, state, mode, extention /* = '.svg'*/){
@@ -401,6 +404,11 @@ StyleComponents {
 		}
 
 		return iconPath;
+	}
+
+	function getLogoIconPath(state, mode, extention){
+		let iconName = styleContainer.logoIconName !== "" ? styleContainer.logoIconName : "Icons/AppIcon";
+		return styleContainer.getIconPath(iconName, state, mode, extention);
 	}
 
 	function getThemeColor(colorType, colorKey, themeType){

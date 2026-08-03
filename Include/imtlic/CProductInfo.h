@@ -28,6 +28,8 @@ public:
 	virtual imtbase::IObjectCollection* GetFeatures() override;
 	virtual bool AddFeature(const QByteArray& featureId, const IFeatureInfo& featureInfo) override;
 	virtual bool RemoveFeature(const QByteArray& featureId) override;
+	virtual OptionalFeatureInfos GetOptionalFeatures() const override;
+	virtual void SetOptionalFeatures(const OptionalFeatureInfos& optionalFeatures) override;
 
 	// reimplemented (iprm::INameParam)
 	virtual const QString& GetName() const override;
@@ -49,6 +51,7 @@ protected:
 	QByteArray m_categoryId;
 
 	imtbase::CObjectCollection m_featureCollection;
+	OptionalFeatureInfos m_optionalFeatures;
 	const imtlic::IFeatureInfoProvider* m_featureInfoProviderPtr;
 };
 

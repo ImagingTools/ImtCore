@@ -6,12 +6,13 @@ import imtcontrols 1.0
 Rectangle {
 	id: menuPanel;
 
-	width: buttonWidth;
 	objectName: "MenuPanel"
 
-	clip: true;
+	// The rows are clipped by contentArea instead, which leaves the hint card
+	// free to stand outside the rail.
+	clip: false;
 
-	color: Style.backgroundColor;
+	color: Style.baseColor;
 	radius: 0;
 
 	property string textColor: Style.textColor;
@@ -41,7 +42,23 @@ Rectangle {
 	property bool collapsed: false
 	property real menuDefaultWidth: 0
 
+	property int iconSize: Style.menuPanelIconSize;
+	property int rowHeight: Style.controlHeightL;
+	property int expandedWidth: Style.menuPanelWidth !== undefined ? Style.menuPanelWidth : Style.sizeHintXXS;
+	// Exactly wide enough to hold an icon at its usual distance from the edge,
+	// which is what keeps the icons still while the panel moves.
+	property int collapsedWidth: Style.menuPanelMinWidth;
+
+	// What the hint card is naming, and where along the rail it points.
+	property string hintText: "";
+	property real hintY: 0;
+
+	width: menuPanel.collapsedWidth;
+
 	Component.onCompleted: {
+		menuPanel.width = menuPanel.collapsed ? menuPanel.collapsedWidth : menuPanel.expandedWidth;
+		menuPanel.menuDefaultWidth = menuPanel.expandedWidth;
+
 		Events.subscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
 		Events.subscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
 		Events.subscribeEvent("ChangePage", menuPanel.setActivePage);
@@ -61,13 +78,15 @@ Rectangle {
 	onActivePageIdChanged: {
 		if(activePageId !== ""){
 			Events.sendEvent("ActivePageIdChanged", activePageId);
-			
+
 			NavigationController.push(activePageId)
 		}
 	}
 
 	onWidthChanged: {
-		Events.sendEvent("MenuWidthChanged", width)
+		if (!widthAnimation.running){
+			Events.sendEvent("MenuWidthChanged", width)
+		}
 	}
 
 	Keys.onPressed: {
@@ -138,18 +157,51 @@ Rectangle {
 		collapsed = stateArg;
 	}
 
+	// A row asks for the card by name, and gives it back by name: two rows can
+	// trade the pointer between them without one clearing the other's card.
+	function showHint(text, y){
+		menuPanel.hintText = text;
+		menuPanel.hintY = y;
+	}
+
+	function hideHint(text){
+		if (menuPanel.hintText === text){
+			menuPanel.hintText = "";
+		}
+	}
+
 	onModelChanged: {
 		Events.sendEvent("MenuModelChanged", menuPanel.model);
 		updateGui();
 	}
 
 	onCollapsedChanged: {
-		if(collapsed){
-			menuDefaultWidth = menuPanel.width
-			menuPanel.width = Style.menuPanelMinWidth
+		menuPanel.hintText = "";
+
+		if(!menuPanel.collapsed){
+			menuPanel.menuDefaultWidth = menuPanel.expandedWidth;
 		}
-		else {
-			menuPanel.width = menuDefaultWidth
+
+		// Both ends spelled out: from wherever the edge stands right now to the
+		// other width. Left to work its start out for itself the animation can
+		// pick up a width the panel has not settled on yet and run from there.
+		widthAnimation.from = menuPanel.width;
+		widthAnimation.to = menuPanel.collapsed ? menuPanel.collapsedWidth : menuPanel.menuDefaultWidth;
+		widthAnimation.restart();
+	}
+
+	// Eased at both ends. A curve that leaves at full speed shows every frame it
+	// misses; one that builds up and settles reads as motion rather than a jump.
+	NumberAnimation {
+		id: widthAnimation;
+
+		target: menuPanel;
+		property: "width";
+		duration: 220;
+		easing.type: Easing.InOutQuad;
+
+		onFinished: {
+			Events.sendEvent("MenuWidthChanged", menuPanel.width)
 		}
 	}
 
@@ -216,6 +268,12 @@ Rectangle {
 	property Component delegate: Component {
 		MenuPanelButton {
 			objectName: model["id"] + "Button"
+
+			// Kept at the open width and clipped, rather than resized with the
+			// panel: a width that moves re-elides every label on every frame.
+			width: menuPanel.expandedWidth;
+			height: menuPanel.rowHeight;
+
 			Component.onCompleted: {
 				if (model.index === 0 && menuPanel.activePageIndex === -1){
 					this.clicked();
@@ -258,165 +316,318 @@ Rectangle {
 		sourceComponent: Style.menuPanelDecorator//backgroundComp
 	}
 
+	Item {
+		id: contentArea;
 
-	Button{
-		id: menuButton
+		anchors.fill: parent;
 
-		anchors.top: parent.top
-		anchors.left: parent.left
-		anchors.topMargin: Style.marginS
-		anchors.leftMargin: (Style.menuPanelMinWidth - height)/2
-
-		visible: Style.enableMenuPanelCollapse
-
-		height: Style.controlHeightS
-
-		decorator: Component{
-			DecoratorBase{
-				id: dec;
-
-				height: menuButton.height
-				width: menuButtonText.text ? image.width + menuButtonText.width + menuButtonText.anchors.leftMargin : image.width
-
-				Image{
-					id: image;
-
-					width: height;
-					height: menuButton.height;
-
-					sourceSize.width: width;
-					sourceSize.height: height;
-
-					source: menuButton.iconSource;
-				}
-
-				BaseText{
-					id: menuButtonText
-
-					anchors.left: image.right
-					anchors.leftMargin: Style.marginM
-					anchors.verticalCenter: parent.verticalCenter
-
-					text: menuButton.collapsed ? "" : qsTr("Collapse Menu")
-					color: Style.inactiveTextColor
-				}
-			}
-		}
-
-		text: collapsed ? "" : qsTr("Collapse Menu")
-
-		iconSource: "../../../../" + Style.getIconPath("Icons/Menu", Icon.State.Off, Icon.Mode.Disabled);
-
-		property bool collapsed: false
-
-		onClicked: {
-			if(!collapsed){
-				Events.sendEvent("CollapseMenu", true)
-			}
-			else {
-				Events.sendEvent("ExpandMenu", false)
-			}
-			collapsed = !collapsed
-		}
-	}
-
-	Flickable{
-		id: allPagesFlick;
-
-		anchors.top: menuButton.visible ? menuButton.bottom : menuPanel.top;
-		anchors.topMargin: menuButton.visible ? Style.marginL: 0
-		anchors.left: menuPanel.left;
-		anchors.right: menuPanel.right;
-		anchors.bottom: menuPanel.bottom;
-
-		boundsBehavior: Flickable.StopAtBounds;
 		clip: true;
-		contentWidth: allPagesColumn.width;
-		contentHeight:  allPagesColumn.height;
 
-		visible: topAlignmentColumn.y + topAlignmentColumn.height > bottomAlignmentColumn.y;
+		Flickable{
+			id: allPagesFlick;
+
+			anchors.top: parent.top;
+			anchors.topMargin: Style.marginS;
+			anchors.left: parent.left;
+			anchors.right: parent.right;
+			anchors.bottom: collapseRow.visible ? collapseRow.top : parent.bottom;
+
+			boundsBehavior: Flickable.StopAtBounds;
+			// The rows stay at the open width, so without this the closed rail
+			// would let itself be dragged sideways over them.
+			flickableDirection: Flickable.VerticalFlick;
+			clip: true;
+			contentWidth: allPagesFlick.width;
+			contentHeight:  allPagesColumn.height;
+
+			visible: topAlignmentColumn.y + topAlignmentColumn.height > bottomAlignmentColumn.y;
+
+			Column{
+				id: allPagesColumn;
+				Repeater{
+					id: allPages;
+					delegate: menuPanel.delegate
+				}
+			}
+		}
+
+		CustomScrollbar {
+			id: allPagesScrollbar;
+			z: allPagesFlick.z + 1;
+			anchors.right: allPagesFlick.right;
+			anchors.top: allPagesFlick.top;
+			anchors.bottom: allPagesFlick.bottom;
+			secondSize: Style.spacingS;
+			targetItem: allPagesFlick;
+			alwaysVisible: false;
+			visible: allPagesFlick.visible;
+		}
 
 		Column{
-			id: allPagesColumn;
+			id: topAlignmentColumn;
+
+			anchors.top: parent.top;
+			anchors.left: parent.left;
+
+			width: menuPanel.expandedWidth;
+
+			anchors.topMargin: Style.menuPanelTopMargin !==undefined ? Style.menuPanelTopMargin :
+																	   !menuPanel.centered ? Style.marginS :
+																							 parent.height - bottomAlignmentColumn.height -  height > 0 ? (parent.height - bottomAlignmentColumn.height - height)/2 : 0
+
+			visible: !allPagesFlick.visible;
+
 			Repeater{
-				id: allPages;
-				delegate: menuPanel.delegate
+				id: topAlignmentPages;
+
+				delegate: Component {
+					MenuPanelButton {
+						objectName: model["id"] + "Button"
+
+						width: menuPanel.expandedWidth;
+						height: menuPanel.rowHeight;
+
+						text:  model["name"];
+						textColor: Style.textColor;
+						menuPanelRef: menuPanel;
+						iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
+																"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
+						selected: menuPanel.activePageIndex <= topAlignmentPages.count - 1 ? model.index === menuPanel.activePageIndex : false;
+						onClicked: {
+							menuPanel.setActivePage(model.id)
+						}
+					}
+				}
 			}
 		}
-	}
 
-	CustomScrollbar {
-		id: allPagesScrollbar;
-		z: allPagesFlick.z + 1;
-		anchors.right: allPagesFlick.right;
-		anchors.top: allPagesFlick.top;
-		anchors.bottom: allPagesFlick.bottom;
-		secondSize: Style.spacingS;
-		targetItem: allPagesFlick;
-		alwaysVisible: false;
-		visible: allPagesFlick.visible;
-	}
+		Column{
+			id: bottomAlignmentColumn;
 
-	Column{
-		id: topAlignmentColumn;
+			anchors.left: parent.left;
+			anchors.bottom: collapseRow.visible ? collapseRow.top : parent.bottom;
 
-		anchors.top: menuButton.visible ? menuButton.bottom: menuPanel.top;
-		anchors.left: menuPanel.left;
-		anchors.right: menuPanel.right;
+			width: menuPanel.expandedWidth;
 
-		anchors.topMargin: Style.menuPanelTopMargin !==undefined ? Style.menuPanelTopMargin :
-																   menuButton.visible ? Style.marginL :
-																						!menuPanel.centered ? 0 :
-																											  parent.height - bottomAlignmentColumn.height -  height > 0 ? (parent.height - bottomAlignmentColumn.height - height)/2 : 0
+			visible: !allPagesFlick.visible;
 
-		visible: !allPagesFlick.visible;
+			Repeater{
+				id: bottomAlignmentPages;
 
-		Repeater{
-			id: topAlignmentPages;
+				delegate: Component {
+					MenuPanelButton {
+						objectName: model["id"] + "Button"
 
-			delegate: Component {
-				MenuPanelButton {
-					objectName: model["id"] + "Button"
-					text:  model["name"];
-					textColor: Style.textColor;
-					menuPanelRef: menuPanel;
-					iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
-															"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
-					selected: menuPanel.activePageIndex <= topAlignmentPages.count - 1 ? model.index === menuPanel.activePageIndex : false;
-					onClicked: {
-						menuPanel.setActivePage(model.id)
+						width: menuPanel.expandedWidth;
+						height: menuPanel.rowHeight;
+
+						text:  model["name"];
+						textColor: Style.textColor;
+						menuPanelRef: menuPanel;
+						iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
+																"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
+						selected: menuPanel.activePageIndex > topAlignmentPages.count - 1 ? menuPanel.activePageIndex - topAlignmentPages.count === model.index : false;
+						onClicked: {
+							menuPanel.setActivePage(model.id)
+						}
+					}
+				}
+			}
+		}
+
+		Item{
+			id: collapseRow
+
+			anchors.bottom: parent.bottom
+			anchors.left: parent.left
+
+			width: menuPanel.expandedWidth;
+			height: visible ? menuPanel.rowHeight : 0
+
+			visible: Style.enableMenuPanelCollapse
+
+
+			Rectangle {
+				id: collapseMarker
+
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginS
+				anchors.top: parent.top
+				anchors.bottom: parent.bottom
+
+				width: (!menuPanel ? parent.width : menuPanel.width) - 2 * Style.marginS
+
+				radius: Style.buttonRadius
+				color: menuButtonArea.containsMouse ? Style.backgroundColor2 : "transparent"
+			}
+
+			Image{
+				id: collapseIcon
+
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginL
+				anchors.verticalCenter: parent.verticalCenter
+
+				width: menuPanel.iconSize
+				height: width
+
+				sourceSize.width: width
+				sourceSize.height: height
+
+				source: menuPanel.collapsed ? "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Disabled)
+											: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Disabled)
+			}
+
+			BaseText {
+				anchors.left: collapseIcon.right
+				anchors.leftMargin: Style.marginM
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginL
+				anchors.verticalCenter: parent.verticalCenter
+
+				visible: !menuPanel.collapsed
+				text: qsTr("Collapse")
+				font.pixelSize: Style.fontSizeM
+				color: Style.inactiveTextColor
+				elide: Text.ElideRight
+			}
+
+			MouseArea {
+				id: menuButtonArea;
+
+				anchors.fill: collapseMarker;
+
+				hoverEnabled: true;
+				cursorShape: Qt.PointingHandCursor;
+
+				onClicked: {
+					if(!menuPanel.collapsed){
+						Events.sendEvent("CollapseMenu", true)
+					}
+					else {
+						Events.sendEvent("ExpandMenu", false)
+					}
+				}
+
+				onContainsMouseChanged: {
+					if (menuButtonArea.containsMouse && menuPanel.collapsed){
+						menuPanel.showHint(qsTr("Expand menu"),
+							collapseIcon.mapToItem(menuPanel, 0, collapseIcon.height / 2).y);
+					}
+					else{
+						menuPanel.hideHint(qsTr("Expand menu"));
 					}
 				}
 			}
 		}
 	}
 
-	Column{
-		id: bottomAlignmentColumn;
+	// Parts the rail from the page beside it without drawing a hard edge.
+	Rectangle {
+		anchors.right: parent.right;
+		anchors.top: parent.top;
+		anchors.bottom: parent.bottom;
 
-		anchors.left: menuPanel.left;
-		anchors.right: menuPanel.right;
-		anchors.bottom: menuPanel.bottom;
+		width: 1;
+		opacity: 0.5;
+		color: Style.borderColor;
+	}
 
-		visible: !allPagesFlick.visible;
+	// The name of the page under the pointer while the rail is closed. It stands
+	// outside the rail, so it lives here rather than inside contentArea, and it
+	// carries a tip back towards the icon it belongs to.
+	Item {
+		id: hint;
 
-		Repeater{
-			id: bottomAlignmentPages;
+		x: menuPanel.width + hint.slide;
+		y: menuPanel.hintY - height / 2;
+		z: 100;
 
-			delegate: Component {
-				MenuPanelButton {
-					objectName: model["id"] + "Button"
-					text:  model["name"];
-					textColor: Style.textColor;
-					menuPanelRef: menuPanel;
-					iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
-															"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
-					selected: menuPanel.activePageIndex > topAlignmentPages.count - 1 ? menuPanel.activePageIndex - topAlignmentPages.count === model.index : false;
-					onClicked: {
-						menuPanel.setActivePage(model.id)
-					}
-				}
+		width: hintBody.width + Style.spacingS;
+		height: Style.controlHeightM;
+
+		visible: hint.opacity > 0;
+		opacity: 0;
+
+		property real slide: 0;
+
+		Rectangle {
+			id: arrowTip;
+
+			x: Style.spacingS - width / 2;
+			z: -1;
+
+			anchors.verticalCenter: parent.verticalCenter;
+
+			width: Style.marginM;
+			height: width;
+			rotation: 45;
+			color: hintBody.color;
+		}
+
+		Rectangle {
+			id: hintBody;
+
+			anchors.left: parent.left;
+			anchors.leftMargin: Style.spacingS;
+			anchors.verticalCenter: parent.verticalCenter;
+
+			width: hintLabel.width + 2 * Style.marginM;
+			height: parent.height;
+			radius: Style.radiusM;
+			color: Style.titleColor;
+
+			BaseText {
+				id: hintLabel;
+
+				anchors.centerIn: parent;
+
+				text: menuPanel.hintText;
+				font.pixelSize: Style.fontSizeM;
+				color: Style.baseColor;
 			}
+		}
+
+		ParallelAnimation {
+			id: hintIn;
+
+			NumberAnimation {
+				target: hint;
+				property: "opacity";
+				to: 1;
+				duration: 120;
+				easing.type: Easing.OutQuad;
+			}
+
+			NumberAnimation {
+				target: hint;
+				property: "slide";
+				to: Style.spacingXS;
+				duration: 120;
+				easing.type: Easing.OutCubic;
+			}
+		}
+
+		NumberAnimation {
+			id: hintOut;
+
+			target: hint;
+			property: "opacity";
+			to: 0;
+			duration: 90;
+			easing.type: Easing.InQuad;
+		}
+	}
+
+	onHintTextChanged: {
+		if (menuPanel.hintText === ""){
+			hintIn.stop();
+			hintOut.restart();
+		}
+		else if (hint.opacity < 1){
+			hintOut.stop();
+			hint.slide = 0;
+			hintIn.restart();
 		}
 	}
 }

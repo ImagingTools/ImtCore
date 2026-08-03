@@ -8,7 +8,11 @@ Rectangle {
 	id: tabPanelContainer;
 	objectName: "TabPanel"
 	
-	width: list.width + externButtons.width;
+	// Shrink-wrap only where nothing else sizes the panel. As a plain width binding it
+	// fought the left/right anchors of a host like TabView and, through maxWidth, fed
+	// its own result back into list.width - once the strip measured nothing it stayed
+	// at nothing until a resize re-applied the anchors.
+	implicitWidth: list.width + externButtons.width;
 	height: visible ? Style.controlHeightL : 0;
 	
 	color: Style.baseColor;
@@ -57,7 +61,7 @@ Rectangle {
 		id: list;
 		
 		anchors.left: parent.left;
-		width: contentWidth > (tabPanelContainer.maxWidth - externButtons.width) ? tabPanelContainer.maxWidth - externButtons.width : contentWidth
+		width: Math.max(0, Math.min(contentWidth, tabPanelContainer.maxWidth - externButtons.width))
 		
 		height: parent.height;
 		

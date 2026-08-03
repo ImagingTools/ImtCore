@@ -62,11 +62,9 @@ QtObject {
 
 	function getDocumentTypeId(documentId)
 	{
-		for (let documentIndex = 0; documentIndex < documentsModel.count; ++documentIndex){
-			let id = documentsModel.get(documentIndex).id;
-			if (id === documentId){
-				return documentsModel.get(documentIndex).typeId;
-			}
+		let index = getDocumentIndexByDocumentId(documentId);
+		if (index >= 0){
+			return documentsModel.get(index).typeId;
 		}
 
 		return String();
@@ -77,12 +75,11 @@ QtObject {
 	}
 
 	function getDocumentName(documentId){
-		for (let documentIndex = 0; documentIndex < documentsModel.count; ++documentIndex){
-			let id = documentsModel.get(documentIndex).id;
-			if (id === documentId){
-				return documentsModel.get(documentIndex).name;
-			}
+		let index = getDocumentIndexByDocumentId(documentId);
+		if (index >= 0){
+			return documentsModel.get(index).name;
 		}
+
 		return ""
 	}
 
@@ -149,12 +146,9 @@ QtObject {
 
 	function getDocumentViewCompByDocumentId(documentId)
 	{
-		for (let i = 0; i < documentsModel.count; i++){
-			let documentData = documentsModel.get(i).documentData;
-			if (documentData && documentData.documentId === documentId){
-				return documentData.viewComp;
-			}
-		}
+		let documentData = getDocumentDataById(documentId);
+
+		return documentData ? documentData.viewComp : undefined;
 	}
 
 
@@ -220,11 +214,9 @@ QtObject {
 	}
 
 	function getDocumentDataById(documentId){
-		for (let i = 0; i < documentsModel.count; i++){
-			let documentData = documentsModel.get(i).documentData;
-			if (documentData && documentData.documentId === documentId){
-				return documentData;
-			}
+		let index = getDocumentIndexByDocumentId(documentId);
+		if (index >= 0){
+			return documentsModel.get(index).documentData;
 		}
 
 		return null;
@@ -391,15 +383,53 @@ QtObject {
 	}
 
 
-	function getDocumentIndexByDocumentId(documentId){
+	// Looked up, not searched for.
+	//
+	// Every one of these used to walk the whole model calling get(i), which
+	// builds a JavaScript wrapper for the row each time round. One open call
+	// makes three such walks and closing them all makes one per document, so the
+	// cost went up with the square of the number of tabs.
+	//
+	// The map is rebuilt whenever the row set changes rather than maintained by
+	// hand at each call site - rows are appended, removed and reordered from
+	// several places, and one that forgot to keep the map honest would be a far
+	// worse problem than the scan ever was.
+	property var documentIndexById: ({})
+
+	function rebuildDocumentIndex(){
+		let map = ({})
 		for (let i = 0; i < documentsModel.count; i++){
 			let documentData = documentsModel.get(i).documentData;
-			if (documentData && documentData.documentId === documentId){
-				return i;
+			if (documentData && documentData.documentId !== undefined){
+				map[documentData.documentId] = i;
 			}
 		}
 
-		return -1;
+		documentIndexById = map;
+	}
+
+	onDocumentsCountChanged: rebuildDocumentIndex()
+
+	function getDocumentIndexByDocumentId(documentId){
+		let index = documentIndexById[documentId];
+		if (index === undefined){
+			return -1;
+		}
+
+		// The map can only be stale in one direction - a row that moved - so the
+		// hit is confirmed before it is trusted, and a miss falls back to a scan.
+		if (index < documentsModel.count){
+			let documentData = documentsModel.get(index).documentData;
+			if (documentData && documentData.documentId === documentId){
+				return index;
+			}
+		}
+
+		rebuildDocumentIndex();
+
+		index = documentIndexById[documentId];
+
+		return index === undefined ? -1 : index;
 	}
 
 
@@ -797,13 +827,23 @@ QtObject {
 				}
 			}
 
+			// Asked of the undo manager, which already keeps the saved state as
+			// JSON. It used to hold a deep copy of the model instead and compare
+			// the two by walking both trees property by property - on every
+			// change, on top of the serialisation the undo history was doing at
+			// the same moment.
 			function checkDocumentModel(){
-				let currentStateModel = undoManager.getStandardModel();
-				if (currentStateModel){
-					let documentModel = singleDocumentData.documentDataController.documentModel
-					let isEqual = currentStateModel.isEqualWithModel(documentModel);
-					isDirty = !isEqual && documentManager.documentIsValid(singleDocumentData);
+				if (!undoManager){
+					return
 				}
+
+				let documentModel = singleDocumentData.documentDataController.documentModel
+				if (!documentModel){
+					return
+				}
+
+				isDirty = undoManager.isModifiedFrom(documentModel)
+						&& documentManager.documentIsValid(singleDocumentData);
 			}
 		}
 	}

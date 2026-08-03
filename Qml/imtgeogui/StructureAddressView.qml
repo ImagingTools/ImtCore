@@ -129,8 +129,8 @@ Item {
 
 		Dialog{
 			id: editAddressDialog
-			width: 1000;
-			height: 700;
+			width: Math.max(Style.sizeHintXXL, Math.min(ModalDialogManager.activeView.width - 100, 1000));
+			height: Math.max(Style.sizeHintXL, Math.min(ModalDialogManager.activeView.height - 100, 700));
 			radius:8;
 
 			canMove: false;

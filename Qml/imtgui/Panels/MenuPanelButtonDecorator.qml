@@ -2,111 +2,165 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
-import Qt5Compat.GraphicalEffects
-import QtGraphicalEffects 1.0
 
+// One entry of the navigation rail: icon on the left, label beside it.
+//
+// It used to be a tile with the label centred under the icon, which left the
+// text about eighty pixels to live in - anything longer than a single short
+// word was cut to an ellipsis. Laid out along the row instead, a name has the
+// whole width of the panel, and the panel can be pulled in to the icons without
+// any of them moving: the icon sits a fixed margin from the left edge in both
+// states, and only the label goes.
 DecoratorBase {
-    id: leftPanelElement;
+	id: leftPanelElement;
 
-    width: 87;
-    height: 80;
+	width: Style.sizeHintXXS;
+	height: Style.controlHeightL;
 
-    signal accepted(string text);
-    signal clicked();
+	signal accepted(string text);
+	signal clicked();
 
-    property bool textIsCropped: helperText.width > description.width;
+	readonly property Item panel: !leftPanelElement.baseElement ? null : leftPanelElement.baseElement.menuPanelRef;
+	readonly property bool collapsed: !leftPanelElement.panel ? false : leftPanelElement.panel.collapsed;
+	readonly property bool isSelected: !leftPanelElement.baseElement ? false : leftPanelElement.baseElement.selected;
+	readonly property bool isHighlighted: !leftPanelElement.baseElement ? false : leftPanelElement.baseElement.highlighted;
+	readonly property string title: !leftPanelElement.baseElement ? "" : leftPanelElement.baseElement.text;
+	readonly property int iconSize: !leftPanelElement.panel ? Style.menuPanelIconSize : leftPanelElement.panel.iconSize;
 
-    onWidthChanged: {
-        if(leftPanelElement.baseElement){
-            leftPanelElement.baseElement.contentWidth = width;
-        }
-    }
+	property bool textIsCropped: helperText.width > description.width;
 
-    onHeightChanged: {
-        if(leftPanelElement.baseElement){
-            leftPanelElement.baseElement.contentHeight = height;
-        }
-    }
+	onWidthChanged: {
+		if(leftPanelElement.baseElement){
+			leftPanelElement.baseElement.contentWidth = width;
+		}
+	}
 
-    Rectangle {
-        id: marker;
-        anchors.fill: leftPanelElement;
-		anchors.margins: Style.marginS;
-        radius: Style.buttonRadius;
-        color: leftPanelElement.baseElement.selected ? Style.selectedColor :
-											 leftPanelElement.baseElement.highlighted ? Style.backgroundColor2 : "transparent";
-        border.width: 1;
-        border.color: leftPanelElement.baseElement.selected ? Style.iconColorOnSelected : "transparent";
-    }
+	onHeightChanged: {
+		if(leftPanelElement.baseElement){
+			leftPanelElement.baseElement.contentHeight = height;
+		}
+	}
 
-    Rectangle {
-        id: itemBody;
+	onCollapsedChanged: leftPanelElement.updateHint();
+	onIsHighlightedChanged: leftPanelElement.updateHint();
 
-        anchors.verticalCenter: leftPanelElement.verticalCenter;
-        anchors.left: leftPanelElement.left;
-        anchors.right: leftPanelElement.right;
-        height: image.height + description.height + description.anchors.topMargin;
+	// Named to the panel, which owns the one card the whole rail shares: a card
+	// per row would mean as many idle items as there are pages.
+	function updateHint(){
+		if (!leftPanelElement.panel){
+			return;
+		}
 
-        color: "transparent";
+		if (leftPanelElement.collapsed && leftPanelElement.isHighlighted){
+			leftPanelElement.panel.showHint(leftPanelElement.title,
+				leftPanelElement.mapToItem(leftPanelElement.panel, 0, leftPanelElement.height / 2).y);
+		}
+		else{
+			leftPanelElement.panel.hideHint(leftPanelElement.title);
+		}
+	}
 
-        Image {
-            id: image;
-            anchors.horizontalCenter: itemBody.horizontalCenter;
-            anchors.top: itemBody.top;
-			width: Style.iconSizeL;
-            height: width;
-            fillMode: Image.PreserveAspectFit;
-            source: leftPanelElement.baseElement && leftPanelElement.baseElement.iconSource ? leftPanelElement.baseElement.iconSource : ""
-            sourceSize.height: height;
-            sourceSize.width: width;
-        }
+	// Marks the page you are on down the edge of the rail, where it stays
+	// legible after the panel is pulled in to the icons.
+	Rectangle {
+		id: activeBar;
 
-        Text {
-            id: description;
-            anchors.top: image.bottom;
-            anchors.topMargin: Style.marginM;
-            anchors.left: itemBody.left;
-            anchors.leftMargin: Style.marginM;
-            anchors.right: itemBody.right;
-            anchors.rightMargin: Style.marginM;
-            color: leftPanelElement.baseElement.selected || leftPanelElement.baseElement.highlighted ? Style.iconColorOnSelected : Style.textColor;
-            font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSizeS;
-            text: leftPanelElement.baseElement.text;
-            horizontalAlignment: Text.AlignHCenter;
-            elide: Text.ElideRight;
-        }
+		anchors.left: parent.left;
+		anchors.verticalCenter: parent.verticalCenter;
 
-        Text {
-            id: helperText;
-            font.family: Style.fontFamily;
-            font.pixelSize: description.font.pixelSize;
-            text: !leftPanelElement.baseElement ? "" : leftPanelElement.baseElement.text;
-            wrapMode: Text.NoWrap;
-            elide: Text.ElideRight;
-            horizontalAlignment: Text.AlignHCenter;
-            visible: false;
-        }
-    }
+		width: Style.spacingXS;
+		height: parent.height - 2 * Style.spacingXS;
+		radius: width / 2;
+		visible: leftPanelElement.isSelected;
+		color: Style.iconColorOnSelected;
+	}
 
-    DropShadow {
-        id: dropShadow;
-        anchors.fill: marker;
-        z: marker.z-1
-        horizontalOffset:ok ? 3 : 0;
-        verticalOffset: ok ? 3 : 0;
-        radius: ok ? 8 : 0;
-        spread: 0;
-        color: ok ? Style.shadowColor : "transparent";
-        source: marker;
-        visible: ok;
+	// Hover the way the tab strip does it: a light wash that never lands on the
+	// row you are already on - that one carries its own
+	// mark and does not need a second one laid over it.
+	//
+	// The row keeps the open width and is clipped, so this has to be told where
+	// the rail's edge is: it is the one part that follows the slide, and a
+	// rectangle is cheap to resize where re-eliding a label is not.
+	Rectangle {
+		id: marker;
 
-		property bool ok: leftPanelElement.baseElement && (leftPanelElement.baseElement.selected || leftPanelElement.baseElement.highlighted) ? true : false;
+		anchors.left: parent.left;
+		anchors.leftMargin: Style.marginS;
+		anchors.top: parent.top;
+		// Full height on purpose: the pages are meant to sit flush against one
+		// another, so nothing is taken off the top and bottom here.
+		anchors.topMargin: 0;
+		anchors.bottom: parent.bottom;
+		anchors.bottomMargin: 0;
 
-        Component.onCompleted: {
-            if (Qt.platform.os === "web"){
-                dropShadow.samples = 15;
-            }
-        }
-    }
+		width: (!leftPanelElement.panel ? parent.width : leftPanelElement.panel.width) - 2 * Style.marginS;
+
+		radius: Style.marginS;
+		color: leftPanelElement.isSelected ? Style.selectedColor
+			: leftPanelElement.isHighlighted ? Style.alternateBaseColor : "transparent";
+	}
+
+	Image {
+		id: image;
+
+		anchors.left: parent.left;
+		// The same distance from the edge whether the panel is open or shut, so
+		// collapsing reads as the labels leaving rather than everything moving.
+		anchors.leftMargin: Style.marginL;
+		anchors.verticalCenter: parent.verticalCenter;
+
+		width: leftPanelElement.iconSize;
+		height: width;
+		fillMode: Image.PreserveAspectFit;
+		sourceSize.width: width;
+		sourceSize.height: height;
+		source: leftPanelElement.baseElement && leftPanelElement.baseElement.iconSource ? leftPanelElement.baseElement.iconSource : "";
+		// Full strength where the pointer is or where you already are, held back
+		// everywhere else - the same weighting the tabs use.
+		opacity: leftPanelElement.isSelected || leftPanelElement.isHighlighted ? 1.0 : Style.opacityHigh;
+	}
+
+	Text {
+		id: description;
+
+		anchors.left: image.right;
+		anchors.leftMargin: Style.marginM;
+		anchors.right: parent.right;
+		anchors.rightMargin: Style.marginL;
+		anchors.verticalCenter: parent.verticalCenter;
+
+		// Switched, not faded: a fade on every row is work on every frame of the
+		// slide, and the label has nowhere useful to be halfway through one.
+		visible: !leftPanelElement.collapsed;
+		// Selection recolours the label; hover only lifts the row behind it. The
+		// two used to share a colour, so passing the pointer over a row made it
+		// look picked.
+		color: leftPanelElement.isSelected ? Style.titleColor : Style.textColor;
+		// The page you are on carries the weight, so the rail says where you are
+		// without relying on the tint alone.
+		font.family: leftPanelElement.isSelected ? Style.fontFamilyBold : Style.fontFamily;
+		font.pixelSize: Style.fontSizeM;
+		text: leftPanelElement.title;
+		verticalAlignment: Text.AlignVCenter;
+		elide: Text.ElideRight;
+	}
+
+	Text {
+		id: helperText;
+
+		font.family: description.font.family;
+		font.pixelSize: description.font.pixelSize;
+		text: description.text;
+		wrapMode: Text.NoWrap;
+		visible: false;
+	}
+
+	// Open, a name that had to be cut is still worth reading in full.
+	TooltipArea {
+		anchors.fill: parent;
+
+		mouseArea: !leftPanelElement.baseElement ? null : leftPanelElement.baseElement.mouseArea;
+		text: !leftPanelElement.collapsed && leftPanelElement.textIsCropped ? leftPanelElement.title : "";
+	}
 }

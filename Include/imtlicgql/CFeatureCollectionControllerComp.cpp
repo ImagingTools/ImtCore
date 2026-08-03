@@ -116,9 +116,9 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 	QByteArray featureId = featureInfo.GetFeatureId();
 	featureRepresentationData.featureId = std::move(featureId);
 
-	QString featureName = featureInfo.GetFeatureName();
-	featureRepresentationData.featureName = std::move(featureName);
-	featureRepresentationData.name = std::move(featureName);
+	const QString featureName = featureInfo.GetFeatureName();
+	featureRepresentationData.featureName = featureName;
+	featureRepresentationData.name = featureName;
 
 	QByteArrayList dependencyList = featureInfo.GetDependencies();
 	QByteArray dependencies = dependencyList.join(';');

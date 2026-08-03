@@ -51,9 +51,12 @@ ViewBase {
 	signal doubleClicked(string id, int index);
 
 	property bool activeFilter: false
-	property int contentHeight: filterMenu_.height + 2 * filterMenu_.anchors.topMargin + (tableInternal.headerHeight + tableInternal.contentHeight) + paginationObj.height
+	property int activeFilterCount: 0
+	property int contentHeight: filterArea.height + (tableInternal.headerHeight + tableInternal.contentHeight) + paginationObj.height
 	
 	Component.onCompleted: {
+		filterArea.height = collectionViewBaseContainer.filterMenuVisible ? filterArea.expandedHeight : 0;
+
 		tableInternal.focus = true;
 	}
 
@@ -61,6 +64,14 @@ ViewBase {
 		id: internal
 		function checkActiveFilter(){
 			collectionViewBaseContainer.activeFilter = collectionViewBaseContainer.hasActiveFilter() || collectionViewBaseContainer.filterMenu.hasActiveFilter()
+
+			let count = collectionViewBaseContainer.filterMenu.activeFilterCount()
+			let collectionFilter = collectionViewBaseContainer.collectionFilter
+			if (collectionFilter && collectionFilter.getTextFilter() !== ""){
+				count = count + 1
+			}
+
+			collectionViewBaseContainer.activeFilterCount = count
 		}
 	}
 	
@@ -86,6 +97,24 @@ ViewBase {
 		filterMenu_.setFilterDependency(filterId, dependsOnFilterId)
 	}
 
+	Item {
+		id: filterArea;
+
+		anchors.top: parent.top;
+		anchors.left: parent.left;
+		anchors.right: parent.right;
+
+		height: 0;
+		clip: true;
+
+		readonly property int expandedHeight: filterMenu_.height + 2 * Style.marginM;
+
+		onExpandedHeightChanged: {
+			if (collectionViewBaseContainer.filterMenuVisible && !filterAreaAnimation.running){
+				filterArea.height = filterArea.expandedHeight;
+			}
+		}
+
 	FilterMenu {
 		id: filterMenu_;
 		anchors.top: parent.top;
@@ -95,7 +124,6 @@ ViewBase {
 		canResetFilters: collectionViewBaseContainer.canResetFilters
 		complexFilter: collectionViewBaseContainer.collectionFilter;
 		documentFilter: collectionViewBaseContainer.documentCollectionFilter;
-		visible: collectionViewBaseContainer.filterMenuVisible
 		onClose: {
 			collectionViewBaseContainer.filterMenuVisible = false;
 		}
@@ -125,6 +153,22 @@ ViewBase {
 			tableInternal.clearSortingInfo(beQuiet)
 		}
 	}
+	}
+
+	NumberAnimation {
+		id: filterAreaAnimation;
+
+		target: filterArea;
+		property: "height";
+		duration: 160;
+		easing.type: Easing.OutCubic;
+	}
+
+	onFilterMenuVisibleChanged: {
+		filterAreaAnimation.from = filterArea.height;
+		filterAreaAnimation.to = collectionViewBaseContainer.filterMenuVisible ? filterArea.expandedHeight : 0;
+		filterAreaAnimation.restart();
+	}
 
 	onHeadersChanged: {
 		table.tableViewParams.clear();
@@ -141,9 +185,9 @@ ViewBase {
 	
 	Rectangle {
 		id: backgroundTable;
-		anchors.top: filterMenu_.visible ? filterMenu_.bottom: parent.top;
+		anchors.top: filterArea.bottom;
 		anchors.left: parent.left;
-		anchors.topMargin: filterMenu_.visible ? Style.marginM : 0;
+		anchors.topMargin: 0;
 		anchors.bottom: paginationObj.top;
 		width: tableInternal.minWidth * tableInternal.columnCount < parent.width ? tableInternal.minWidth * tableInternal.columnCount : parent.width;
 		color: Style.baseColor;
@@ -314,6 +358,74 @@ ViewBase {
 			}
 		}
 		
+
+		// Nothing in the list, said plainly. An empty table used to be a header
+		// with blank space under it, which reads the same whether the collection
+		// has nothing in it or the filters have hidden everything - and those two
+		// want completely different things from the reader.
+		Column {
+			id: emptyState;
+
+			anchors.left: parent.left;
+			anchors.right: tableRightPanel.left;
+			anchors.verticalCenter: parent.verticalCenter;
+			anchors.verticalCenterOffset: tableInternal.headerHeight / 2;
+
+			spacing: Style.marginM;
+
+			visible: tableInternal.elementsCount === 0 && !loading_.visible;
+
+			readonly property bool filtered: collectionViewBaseContainer.activeFilterCount > 0;
+
+			Image {
+				anchors.horizontalCenter: parent.horizontalCenter;
+
+				width: Style.iconSizeL;
+				height: width;
+				sourceSize.width: width;
+				sourceSize.height: height;
+				source: "qrc:/" + Style.getIconPath(emptyState.filtered ? "Icons/Filter" : "Icons/Table",
+					Icon.State.On, Icon.Mode.Disabled);
+			}
+
+			BaseText {
+				anchors.horizontalCenter: parent.horizontalCenter;
+
+				width: Math.min(parent.width - 2 * Style.marginXL, Style.sizeHintM);
+				horizontalAlignment: Text.AlignHCenter;
+				text: emptyState.filtered ? qsTr("Nothing matches the filters") : qsTr("Nothing here yet");
+				font.pixelSize: Style.fontSizeL;
+				color: Style.textColor;
+				wrapMode: Text.WordWrap;
+			}
+
+			BaseText {
+				anchors.horizontalCenter: parent.horizontalCenter;
+
+				width: Math.min(parent.width - 2 * Style.marginXL, Style.sizeHintM);
+				horizontalAlignment: Text.AlignHCenter;
+				text: emptyState.filtered
+					? qsTr("%1 filters are narrowing this list down.").arg(collectionViewBaseContainer.activeFilterCount)
+					: qsTr("Items added to this collection will show up here.");
+				color: Style.subtitleColor;
+				wrapMode: Text.WordWrap;
+			}
+
+			// Offered only when the filters are what emptied the list - the way
+			// back out, without hunting for the panel first.
+			ToolbarButton {
+				anchors.horizontalCenter: parent.horizontalCenter;
+
+				visible: emptyState.filtered;
+				text: qsTr("Clear all filters");
+				iconSource: "qrc:/" + Style.getIconPath("Icons/FilterReset", Icon.State.On, Icon.Mode.Normal);
+
+				onClicked: {
+					collectionViewBaseContainer.filterMenu.clearAllFilters(true);
+					collectionViewBaseContainer.filterMenu.filterChanged();
+				}
+			}
+		}
 		Item {
 			id: tableRightPanel;
 			anchors.top: parent.top;
@@ -328,6 +440,11 @@ ViewBase {
 				width: parent.width;
 				height: tableInternal.headerHeight;
 
+				// Open or shut, and how many filters are on: two different things,
+				// which the button used to conflate into one icon that changed
+				// shade. The panel being open is the tinted disc; the filters that
+				// are on are the number on the badge - the only thing left saying
+				// so once the panel is shut.
 				ToolButton {
 					id: iconFilter;
 					objectName: "FilterVisible"
@@ -335,17 +452,177 @@ ViewBase {
 					width: Style.buttonWidthL;
 					height: width;
 					visible: collectionViewBaseContainer.hasFilter;
-					icon.source: collectionViewBaseContainer.activeFilter ? "qrc:/" + Style.getIconPath("Icons/FilterActive", Icon.State.On, Icon.Mode.Selected)
-										 : "qrc:/" + Style.getIconPath("Icons/FilterEdit", Icon.State.On, Icon.Mode.Normal)
+					// Named by the card below rather than by the stock tooltip: this
+					// button lives against the right edge, and a tooltip that opens
+					// rightwards has nowhere to go.
+					// A plain funnel, in both states. It used to be a funnel with a
+					// pencil when shut - which reads as "edit a filter" - and a funnel
+					// with a tick when something was on, a job the count badge now does
+					// properly. The funnel says "filters"; the disc behind it says the
+					// panel is open; the badge says how many are working.
+					icon.source: "qrc:/" + Style.getIconPath("Icons/Filter", Icon.State.On,
+						collectionViewBaseContainer.activeFilter ? Icon.Mode.Selected : Icon.Mode.Normal)
 					onClicked: {
 						collectionViewBaseContainer.filterMenuVisible = !collectionViewBaseContainer.filterMenuVisible;
 					}
 					decorator: Component {
 						ToolButtonDecorator {
-							icon.width: 26
+							// Matched to the reset button in the panel: same button size,
+							// same glyph size, so the pair reads as one control.
+							icon.width: Style.iconSizeM + Style.spacingXS
+							radius: height / 2
+							color: collectionViewBaseContainer.filterMenuVisible ? Style.selectedColor
+								: baseElement && baseElement.hovered ? Style.hover : "transparent"
+							// A ring while anything is filtering, so the button carries
+							// the state even at a glance and even without the badge.
+							border.width: collectionViewBaseContainer.activeFilterCount > 0 ? 1 : 0
+							border.color: Style.titleColor
+						}
+					}
+
+					// Above the decorator, which is built after this and would
+					// otherwise be painted over it.
+					Rectangle {
+						anchors.right: parent.right;
+						anchors.top: parent.top;
+
+						z: 1;
+
+						width: Math.max(Style.iconSizeXS + Style.spacingXS, badgeText.implicitWidth + Style.spacingXS);
+						height: Style.iconSizeXS + Style.spacingXS;
+						radius: height / 2;
+						visible: collectionViewBaseContainer.activeFilterCount > 0;
+						color: Style.titleColor;
+
+						// Filled to the badge and aligned in both directions. Centred
+						// by anchor alone the glyph sat off to one side of a circle
+						// barely wider than itself.
+						BaseText {
+							id: badgeText;
+
+							anchors.fill: parent;
+
+							horizontalAlignment: Text.AlignHCenter;
+							verticalAlignment: Text.AlignVCenter;
+							text: "" + collectionViewBaseContainer.activeFilterCount;
+							font.family: Style.fontFamilyBold;
+							font.pixelSize: Style.fontSizeXS;
+							color: Style.baseColor;
 						}
 					}
 				}
+
+			// Names the button, in the same card the navigation rail uses, but
+			// pointing the other way: this button sits against the right edge, so
+			// the card comes out to its left with the tip on its own right side.
+			Item {
+				id: filterHint;
+
+				anchors.right: filterItem.left;
+				anchors.rightMargin: filterHint.slide;
+				anchors.verticalCenter: filterItem.verticalCenter;
+
+				z: 200;
+
+				width: hintBody.width + Style.spacingS;
+				height: Style.controlHeightM;
+
+				visible: filterHint.opacity > 0;
+				opacity: 0;
+
+				property real slide: 0;
+
+				Rectangle {
+					id: hintArrow;
+
+					// Centred on the body's edge, so the body covers the inner half
+					// and only a triangle shows. Centred on the item's edge instead,
+					// nothing covered it and the whole square stood there as a lozenge.
+					x: hintBody.width - width / 2;
+					z: -1;
+
+					anchors.verticalCenter: parent.verticalCenter;
+
+					width: Style.marginM;
+					height: width;
+					rotation: 45;
+					color: hintBody.color;
+				}
+
+				Rectangle {
+					id: hintBody;
+
+					anchors.left: parent.left;
+					anchors.verticalCenter: parent.verticalCenter;
+
+					width: hintLabel.width + 2 * Style.marginM;
+					height: parent.height;
+					radius: Style.radiusM;
+					color: Style.titleColor;
+
+					BaseText {
+						id: hintLabel;
+
+						anchors.centerIn: parent;
+
+						text: collectionViewBaseContainer.filterMenuVisible ? qsTr("Hide filters")
+							: collectionViewBaseContainer.activeFilterCount > 0
+								? qsTr("Show filters - %1 active").arg(collectionViewBaseContainer.activeFilterCount)
+								: qsTr("Show filters");
+						font.pixelSize: Style.fontSizeM;
+						color: Style.baseColor;
+					}
+				}
+
+				ParallelAnimation {
+					id: filterHintIn;
+
+					NumberAnimation {
+						target: filterHint;
+						property: "opacity";
+						to: 1;
+						duration: 120;
+						easing.type: Easing.OutQuad;
+					}
+
+					NumberAnimation {
+						target: filterHint;
+						property: "slide";
+						to: Style.spacingXS;
+						duration: 120;
+						easing.type: Easing.OutCubic;
+					}
+				}
+
+				NumberAnimation {
+					id: filterHintOut;
+
+					target: filterHint;
+					property: "opacity";
+					to: 0;
+					duration: 90;
+					easing.type: Easing.InQuad;
+				}
+
+				// Bound, not listened for: a mouse area that switches off never
+				// reports the pointer leaving, and a card driven by that signal
+				// alone would stay on screen. Read as a condition it goes as soon
+				// as the button stops being usable.
+				readonly property bool wanted: iconFilter.enabled && iconFilter.visible
+					&& iconFilter.mouseArea && iconFilter.mouseArea.containsMouse;
+
+				onWantedChanged: {
+					if (filterHint.wanted){
+						filterHintOut.stop();
+						filterHint.slide = 0;
+						filterHintIn.restart();
+					}
+					else{
+						filterHintIn.stop();
+						filterHintOut.restart();
+					}
+				}
+			}
 			}
 		}
 	}
@@ -394,7 +671,7 @@ ViewBase {
 
 	Loading {
 		id: loading_;
-		anchors.top: filterMenu_.top
+		anchors.top: filterArea.top
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.bottom: paginationObj.bottom

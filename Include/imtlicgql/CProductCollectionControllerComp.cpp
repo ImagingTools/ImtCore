@@ -165,6 +165,10 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.features = QByteArray(productInfoPtr->GetFeatures()->GetElementIds().toList().join(';'));
 	}
 
+	if (requestInfo.items.isOptionalFeaturesRequested){
+		representationObject.optionalFeatures = CreateOptionalFeaturesRepresentation(*productInfoPtr);
+	}
+
 	if (requestInfo.items.isLicensesRequested){
 		imtsdl::TElementList<sdl::V1_0::imtlic::CLicenseData> licenseDataList;
 
@@ -290,6 +294,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	representationPayload.categoryId = QByteArray((categoryId));
 
 	representationPayload.features = QByteArray((productInfoPtr->GetFeatures()->GetElementIds().toList().join(';')));
+	representationPayload.optionalFeatures = CreateOptionalFeaturesRepresentation(*productInfoPtr);
 
 	return true;
 }
@@ -477,8 +482,10 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 	if (productDataRepresentation.features){
 		features = *productDataRepresentation.features;
 	}
+
+	QByteArrayList featureIds;
 	if (!features.isEmpty()){
-		QByteArrayList featureIds = features.split(';');
+		featureIds = features.split(';');
 
 		for (const QByteArray& featureId : featureIds){
 			imtbase::IObjectCollection::DataPtr dataPtr;
@@ -491,7 +498,60 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 		}
 	}
 
+	// Kept out of the loop above on purpose. Every id in "features" is a feature
+	// document id and is looked up as one; the ids below are nodes inside such a
+	// document and are never resolved against the collection. featureId is only
+	// matched against what the product actually has, to drop stale entries.
+	imtlic::IProductInfo::OptionalFeatureInfos optionalFeatures;
+	if (productDataRepresentation.optionalFeatures){
+		for (const sdl::V1_0::imtlic::CProductOptionalFeature& optionalFeature : productDataRepresentation.optionalFeatures->ToList()){
+			if (!optionalFeature.featureId){
+				continue;
+			}
+
+			const QByteArray featureId = *optionalFeature.featureId;
+			if (featureId.isEmpty() || !featureIds.contains(featureId)){
+				continue;
+			}
+
+			imtlic::IProductInfo::OptionalFeatureInfo optionalFeatureInfo;
+			optionalFeatureInfo.featureId = featureId;
+
+			if (optionalFeature.subFeatureIds){
+				optionalFeatureInfo.subFeatureIds = optionalFeature.subFeatureIds->ToList();
+				optionalFeatureInfo.subFeatureIds.removeAll(QByteArray());
+			}
+
+			if (!optionalFeatureInfo.subFeatureIds.isEmpty()){
+				optionalFeatures << optionalFeatureInfo;
+			}
+		}
+	}
+
+	productInfoPtr->SetOptionalFeatures(optionalFeatures);
+
 	return true;
+}
+
+
+// private methods
+
+imtsdl::TElementList<sdl::V1_0::imtlic::CProductOptionalFeature> CProductCollectionControllerComp::CreateOptionalFeaturesRepresentation(
+			const imtlic::IProductInfo& productInfo)
+{
+	imtsdl::TElementList<sdl::V1_0::imtlic::CProductOptionalFeature> retVal;
+
+	const imtlic::IProductInfo::OptionalFeatureInfos optionalFeatures = productInfo.GetOptionalFeatures();
+	for (const imtlic::IProductInfo::OptionalFeatureInfo& optionalFeature : optionalFeatures){
+		sdl::V1_0::imtlic::CProductOptionalFeature representation;
+		representation.featureId = optionalFeature.featureId;
+		representation.subFeatureIds.Emplace();
+		representation.subFeatureIds->FromList(optionalFeature.subFeatureIds);
+
+		retVal << representation;
+	}
+
+	return retVal;
 }
 
 

@@ -27,6 +27,42 @@ program.parse(process.argv)
 const options = program.opts()
 
 
+// A property initializer may only be folded into a static default value when it
+// is a genuine compile-time constant. Deciding this by eval()-ing the source is
+// unsafe: "typeof foo" never throws, so an expression such as
+// "typeof modelData !== 'undefined' ? modelData : null" silently folds to null
+// and the property never gets a binding at all.
+function isConstantExpression(stat){
+    if(!stat)
+        return false
+
+    switch(stat[0]){
+        case 'stat':
+            return isConstantExpression(stat[1])
+        case 'num':
+        case 'string':
+        case 'regexp':
+        case 'atom': // true / false / null / undefined
+            return true
+        case 'array':
+            return stat[1].every(item => isConstantExpression(item))
+        case 'object':
+            // [name, value] pairs; getters/setters carry a third element
+            return stat[1].every(pair => pair.length < 3 && isConstantExpression(pair[1]))
+        case 'unary-prefix':
+        case 'unary-postfix':
+            return isConstantExpression(stat[2])
+        case 'binary':
+            return isConstantExpression(stat[2]) && isConstantExpression(stat[3])
+        case 'conditional':
+            return isConstantExpression(stat[1]) && isConstantExpression(stat[2]) && isConstantExpression(stat[3])
+        case 'seq':
+            return isConstantExpression(stat[1]) && isConstantExpression(stat[2])
+        default:
+            return false
+    }
+}
+
 function compile(options){
     if(options.mode === 'html'){
         console.time('JQML3: compile html')
@@ -231,7 +267,8 @@ function compile(options){
 
             }
 
-            if (meta[4] && meta[4][1][0] === 'qmlelem') {
+            // meta[4][1] is null for anonymous functions ("property var f: function(a) { ... }")
+            if (meta[4] && meta[4][1] && meta[4][1][0] === 'qmlelem') {
                 this.defineSignals.push({
                     name: meta[2] + 'Changed',
                     slotName: 'on' + meta[2][0].toUpperCase() + meta[2].slice(1) + 'Changed',
@@ -256,16 +293,21 @@ function compile(options){
                 let defaultValue = type.getDefaultValue()
 
                 if (meta[5]) {
-                    try {
-                        defaultValue = eval(meta[5])
-                        if (defaultValue && typeof defaultValue === 'object') {
-                            this.assignProperties.push({
-                                name: meta[2],
-                                value: meta[4],
-                                fromDefinition: true,
-                            })
+                    let folded = false
+
+                    if (isConstantExpression(meta[4])) {
+                        try {
+                            defaultValue = eval(meta[5])
+                            folded = true
+                        } catch {
+
                         }
-                    } catch {
+                    }
+
+                    // Array/object literals must still be built per instance, and
+                    // everything that is not a compile-time constant has to stay a
+                    // binding so it is re-evaluated whenever its dependencies change.
+                    if (!folded || (defaultValue && typeof defaultValue === 'object')) {
                         this.assignProperties.push({
                             name: meta[2],
                             value: meta[4],
@@ -342,7 +384,8 @@ function compile(options){
                         this.id = meta[2][1][1]
                         this.qmlFile.context[this.id] = this
                     } else {
-                        if (meta[2][1][0] === 'qmlelem') {
+                        // meta[2][1] is null for anonymous functions ("prop: function(a) { ... }")
+                        if (meta[2][1] && meta[2][1][0] === 'qmlelem') {
                             //console.log('=====', name)
                             this.assignProperties.push({
                                 name: name,//.join('.'),
@@ -515,6 +558,7 @@ function compile(options){
                 switch (tree[0]) {
                     case 'return': {
                         stat.isCompute = true
+                        stat.hasReturn = true
                         stat.value.add('return ')
                         this.prepare(tree[1], stat)
                         stat.value.add(';')
@@ -891,7 +935,12 @@ function compile(options){
                             if (i < tree[2].length - 1) stat.value.add(',')
                         }
                         stat.value.add(`){`)
+                        // The body belongs to the nested function, not to the enclosing binding
+                        let outerCompute = stat.isCompute
+                        let outerReturn = stat.hasReturn
                         this.prepare(tree[3], stat)
+                        stat.isCompute = outerCompute
+                        stat.hasReturn = outerReturn
                         stat.value.add(`}`)
 
                         let index = stat.local.indexOf(local)
@@ -1094,7 +1143,12 @@ function compile(options){
                         stat.value.add(`(`)
                         stat.value.add(tree[1].join(','))
                         stat.value.add(`)=>{`)
+                        // The body belongs to the nested function, not to the enclosing binding
+                        let outerCompute = stat.isCompute
+                        let outerReturn = stat.hasReturn
                         this.prepare(tree[2], stat)
+                        stat.isCompute = outerCompute
+                        stat.hasReturn = outerReturn
                         stat.value.add(`}`)
                         let index = stat.local.indexOf(local)
                         if (index >= 0) stat.local.splice(index, 1)
@@ -1497,7 +1551,7 @@ function compile(options){
                             aliasCode.add('\n')
                         } else {
                             // lazyCode.add(`'${assignProperty.name}': function(){return ${stat.value}},`)
-                            let isReturn = stat.value.toString().indexOf('return ') >= 0
+                            let isReturn = stat.hasReturn === true
                             if(names.length > 1){
                                 if(names.length === 2){
                                     lazyCode.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=function(){${isReturn ? '' : 'return '}${stat.value}}`)

@@ -117,11 +117,20 @@ class LinkedBool extends Property {
 
             if(!found){
                 let connectionObj = Signal.get(target, name + 'Changed').connect(()=>{
-                    if(!link.target[link.name+'__updating']){
-                        link.target[link.name+'__updating'] = true
-                        link.meta.type.set(link.target, link.name, link.func, link.meta)
-                        delete link.target[link.name+'__updating']
+                    if(link.target[link.name+'__updating']){
+                        link.target[link.name+'__pending'] = true
+                        return
                     }
+
+                    link.target[link.name+'__updating'] = true
+                    let passes = 0
+                    do {
+                        delete link.target[link.name+'__pending']
+                        link.meta.type.set(link.target, link.name, link.func, link.meta)
+                        passes++
+                    } while(link.target[link.name+'__pending'] && passes < 16)
+                    delete link.target[link.name+'__pending']
+                    delete link.target[link.name+'__updating']
                 })
 
                 link.target.__depends[link.name].push(connectionObj)

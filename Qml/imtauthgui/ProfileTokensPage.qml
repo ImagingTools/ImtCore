@@ -379,8 +379,8 @@ ViewBase {
 		Dialog {
 			id: addDialog
 			title: qsTr("New Personal Access Token")
-			width: 780
-			height: 720
+			width: Math.max(Style.sizeHintXXL, Math.min(ModalDialogManager.activeView.width - 100, 780))
+			height: Math.max(Style.sizeHintL, Math.min(ModalDialogManager.activeView.height - 100, 720))
 			backgroundColor: Style.baseColor
 
 			property string tokenName: ""
@@ -411,7 +411,7 @@ ViewBase {
 				Item {
 					id: contentItem
 					width: addDialog.width
-					height: 600
+					height: addDialog.height - 120
 
 					function checkAddButtonEnabled() {
 						var hasName = nameInputElementView.text !== ""
