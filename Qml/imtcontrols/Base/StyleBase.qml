@@ -406,6 +406,11 @@ StyleComponents {
 		return iconPath;
 	}
 
+	function getLogoIconPath(state, mode, extention){
+		let iconName = styleContainer.logoIconName !== "" ? styleContainer.logoIconName : "Icons/AppIcon";
+		return styleContainer.getIconPath(iconName, state, mode, extention);
+	}
+
 	function getThemeColor(colorType, colorKey, themeType){
 		if (themeType.containsKey("Style")){
 			let styleModel = themeType.getData("Style");

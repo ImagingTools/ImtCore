@@ -515,27 +515,6 @@ class ListView extends Flickable {
             item.visibleChanged.connect(() => {
                 JQApplication.updateLater(this)
             })
-            item.indexChanged.connect((oldValue, newValue) => {
-                delete this.__items[oldValue]
-                if(newValue < 0) return
-                
-                let _index = newValue
-                this.__items[_index] = item
-                if (this.orientation === ListView.Horizontal) {
-                    if(_index > 0){
-                        item.x = this.__items[_index - 1].x + this.__items[_index - 1].width + this.spacing
-                    } else {
-                        item.x = this.originX
-                    }
-                } else {
-                    if(_index > 0){
-                        item.y = this.__items[_index - 1].y + this.__items[_index - 1].height + this.spacing
-                    } else {
-                        item.y = this.originY
-                    }
-                }
-                JQApplication.updateLater(this)
-            })
 
             item.x = itemInfo.x
             item.y = itemInfo.y
@@ -594,13 +573,25 @@ class ListView extends Flickable {
         }
     }
 
-    __normalizeItemsIndex() {
-        this.__items = {}
-        for(let child of this.contentItem.__children){
-            let index = child.index
-            if(index >= 0 && Number.isFinite(index))
-            this.__items[index] = child
+    // Rebuilding the map from contentItem.__children used to pick up items that were
+    // already handed to __toCache - destroy() only detaches them at endUpdate - and it
+    // trusted child.index, which a delegate declaring its own "property int index"
+    // shadows with a value nothing refreshes. Both left the map pointing at delegates
+    // that no longer belong to any row. The shift is arithmetic instead.
+    __shiftItemsIndex(from, delta) {
+        if(!delta) return
+
+        let shifted = {}
+
+        for(let key of Object.keys(this.__items)){
+            let item = this.__items[key]
+            if(!item) continue
+
+            let index = Number(key)
+            shifted[index >= from ? index + delta : index] = item
         }
+
+        this.__items = shifted
     }
 
     __realignItems(startIndex = 0) {
@@ -693,8 +684,8 @@ class ListView extends Flickable {
                         }
                     }
                 } else if (role === 'insert') {
-                    this.__normalizeItemsIndex()
-                    
+                    this.__shiftItemsIndex(leftTop, bottomRight - leftTop)
+
                     for (let i = leftTop; i < bottomRight; i++) {
                         let itemInfo = this.__getItemInfo(i)
                         if (itemInfo.inner) {
@@ -718,7 +709,7 @@ class ListView extends Flickable {
                         delete this.__items[i]
                     }
 
-                    this.__normalizeItemsIndex()
+                    this.__shiftItemsIndex(bottomRight, leftTop - bottomRight)
 
                     if(leftTopItem && bottomRightItem){
                         bottomRightItem.x = leftTopItem.x
@@ -748,16 +739,13 @@ class ListView extends Flickable {
                 this.currentIndex = currentIndex
             }
 
-            // if (layoutFrom !== undefined) {
-            //     this.__normalizeItemsIndex()
-            //     this.__realignItems(layoutFrom)
-            // }
-
             let keys = Object.keys(this.__items)
             let firstIndex = Number(keys[0])
             let lastIndex = Number(keys[keys.length-1])
 
-            if(firstIndex)
+            // Guards are about "is there anything materialised", not about the index
+            // being non-zero: a list holding only row 0 never filled rows 1..n.
+            if(Number.isFinite(firstIndex))
             for(let i = firstIndex - 1; i >= 0 ; i--) {
                 let itemInfo = this.__getItemInfo(i)
                 if (itemInfo.inner) {
@@ -772,7 +760,7 @@ class ListView extends Flickable {
                 }
             }
 
-            if(lastIndex)
+            if(Number.isFinite(lastIndex))
             for(let i = lastIndex + 1; i < length ; i++) {
                 let itemInfo = this.__getItemInfo(i)
                 if (itemInfo.inner) {

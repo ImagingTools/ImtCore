@@ -11,6 +11,7 @@ Willkommen zur QML- und JQML-Dokumentation des ImtCore SDK. Diese Dokumentation 
 | **[JQML Guide](QML_JQML_Guide.md)** | JQML-Versionen, Web-Kompilierung, Cross-Platform-Entwicklung | Web-Deployment |
 | **[JQML v3 Fixes (RU)](JQML_V3_Fixes.ru.md)** | Begründung der Compiler- und Runtime-Korrekturen in JQML v3 | Wartung |
 | **[Komponenten-Tutorials](QML_Component_Tutorials.md)** | Praktische Tutorials für häufige UI-Muster | Praxis-Beispiele |
+| **[Document Service Client (RU)](DocumentService_Client_Architecture.ru.md)** | Клиентские Document Service: локальный и клиент серверного сервиса | Dokumenten-Workflows |
 
 ---
 

@@ -181,6 +181,14 @@ FocusScope {
 		checkedNodes = nodes
 	}
 
+	function selectOnly(node) {
+		if (!editable || !node)
+			return
+		if (checkedNodes.length === 1 && checkedNodes[0] === node)
+			return
+		checkedNodes = [node]
+	}
+
 	function checkAll(value) {
 		if (!multiSelectEnabled || !editable)
 			return
@@ -1068,10 +1076,10 @@ FocusScope {
 						cursorShape: Qt.PointingHandCursor
 						onClicked: {
 							root.forceActiveFocus()
-							// Not while the row is open: unticking it would take the
-							// editor's subject away from under it.
+							// Not while the row is open: changing the selection would
+							// take the editor's subject away from under it.
 							if (!entryRow.rowEditing)
-								root.toggleChecked(entryRow.treeNode)
+								root.selectOnly(entryRow.treeNode)
 						}
 						onDoubleClicked: root.navigateInto(entryRow.treeNode)
 					}
@@ -1097,10 +1105,10 @@ FocusScope {
 						color: Style.titleColor
 					}
 
-					// Ticking a row is the only way to select it. The hit area is a
-					// sibling rather than a child of the box: a ControlBase builds
-					// its visuals from a decorator, and parenting anything into it
-					// left the tick no longer following checkState.
+					// The box is what builds a selection of more than one row. Its hit
+					// area is a sibling rather than a child of the box: a ControlBase
+					// builds its visuals from a decorator, and parenting anything into
+					// it left the tick no longer following checkState.
 					CheckBox {
 						id: rowCheck
 						anchors.left: parent.left
@@ -1110,6 +1118,25 @@ FocusScope {
 						isActive: root.editable
 						checkState: entryRow.rowChecked ? Qt.Checked : Qt.Unchecked
 						mouseArea.enabled: false
+					}
+
+					MouseArea {
+						id: rowCheckHit
+
+						anchors.left: parent.left
+						anchors.top: parent.top
+						anchors.bottom: parent.bottom
+
+						width: rowCheck.visible ? Style.marginL + rowCheck.width + Style.marginS : 0
+						z: 1
+						visible: rowCheck.visible
+						cursorShape: Qt.PointingHandCursor
+
+						onClicked: {
+							root.forceActiveFocus()
+							if (!entryRow.rowEditing)
+								root.toggleChecked(entryRow.treeNode)
+						}
 					}
 
 

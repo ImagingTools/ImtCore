@@ -22,6 +22,8 @@ Rectangle {
 	
 	property alias name: textName.text
 	property alias description: textDescription.text
+	// So a row can say its note is a warning rather than a footnote.
+	property alias descriptionColor: textDescription.color
 	
 	property alias controlComp: controlLoader.sourceComponent
 	property alias controlItem: controlLoader.item

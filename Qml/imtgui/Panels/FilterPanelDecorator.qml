@@ -10,7 +10,8 @@ import imtbaseImtBaseTypesSdl 1.0
 DecoratorBase {
 	id: filterPanelDecorator;
 	objectName: "FilterPanel"
-	height: visible ? Style.controlHeightM : 0
+	// Tall enough for a reset button the size of the show/hide one it pairs with.
+	height: visible ? Style.buttonWidthL : 0
 
 	property alias contentWidth: content.width;
 	// Kept up to date from filterChanged, which is the one place that already
@@ -308,7 +309,7 @@ DecoratorBase {
 		anchors.leftMargin: Style.marginM
 		anchors.right: mainFilters.left
 		anchors.rightMargin: Style.marginM
-		anchors.top: parent.top
+		anchors.verticalCenter: parent.verticalCenter
 
 		height: Style.controlHeightM
 
@@ -743,7 +744,7 @@ DecoratorBase {
 		id: mainFilters
 		anchors.right: clearAllButton.left
 		anchors.rightMargin: Style.marginM
-		anchors.top: parent.top
+		anchors.verticalCenter: parent.verticalCenter
 		height: Style.controlHeightM
 		spacing: Style.marginM
 
@@ -768,13 +769,20 @@ DecoratorBase {
 		id: clearAllButton
 		objectName: "ClearAllFilters"
 		anchors.right: parent.right
-		anchors.top: parent.top
-		icon.source: enabled ? "qrc:/" + Style.getIconPath("Icons/FilterRemove", Icon.State.On, Icon.Mode.Normal)
-								 : "qrc:/" + Style.getIconPath("Icons/FilterRemove", Icon.State.Off, Icon.Mode.Disabled)
-		width: visible ? Style.controlHeightM : 0
+		anchors.verticalCenter: parent.verticalCenter
+		// The same funnel as the show/hide button beside it, with a cross added.
+		// FilterRemove is a different drawing from a different set, so the two
+		// buttons never looked like a pair.
+
+
+		icon.source: enabled ? "qrc:/" + Style.getIconPath("Icons/FilterReset", Icon.State.On, Icon.Mode.Normal)
+								 : "qrc:/" + Style.getIconPath("Icons/FilterReset", Icon.State.Off, Icon.Mode.Disabled)
+		width: visible ? Style.buttonWidthL : 0
 		height: width
 		enabled: false
-		tooltipText: qsTr("Reset all filters")
+		// Named by the card below, not by the stock tooltip: this button sits
+		// against the right edge and a tooltip opening rightwards has nowhere
+		// to go.
 		visible: filterPanelDecorator.canResetFilters
 		onClicked: {
 			filterPanelDecorator.baseElement.clearAllFilters(true)
@@ -782,7 +790,10 @@ DecoratorBase {
 		}
 		decorator: Component {
 			ToolButtonDecorator {
-				icon.width: Style.iconSizeM
+				// Bigger inside a bigger button: the cross on this icon is a
+				// fraction of the drawing, and at twenty pixels that fraction
+				// came to about three.
+				icon.width: Style.iconSizeM + Style.spacingXS
 				radius: height / 2
 			}
 		}
@@ -797,18 +808,131 @@ DecoratorBase {
 			// otherwise be painted over it.
 			z: 1
 
-			width: Style.iconSizeXS + Style.spacingXXS
+			width: Style.iconSizeXS + Style.spacingXS
 			height: width
 			radius: width / 2
 			visible: filterPanelDecorator.activeFilterCount > 1
 			color: Style.titleColor
 
 			BaseText {
-				anchors.centerIn: parent
+				anchors.fill: parent
 
+				horizontalAlignment: Text.AlignHCenter
+				verticalAlignment: Text.AlignVCenter
 				text: "" + filterPanelDecorator.activeFilterCount
+				font.family: Style.fontFamilyBold
 				font.pixelSize: Style.fontSizeXS
 				color: Style.baseColor
+			}
+		}
+
+		// Names the command in the same card the navigation rail uses, opening to
+		// its left: the button stands against the right edge of the row.
+		Item {
+			id: resetHint
+
+			anchors.right: parent.left
+			anchors.rightMargin: resetHint.slide
+			anchors.verticalCenter: parent.verticalCenter
+
+			z: 200
+
+			width: resetHintBody.width + Style.spacingS
+			height: Style.controlHeightM
+
+			visible: resetHint.opacity > 0
+			opacity: 0
+
+			property real slide: 0
+
+			Rectangle {
+				x: resetHintBody.width - width / 2
+				z: -1
+
+				anchors.verticalCenter: parent.verticalCenter
+
+				width: Style.marginM
+				height: width
+				rotation: 45
+				color: resetHintBody.color
+			}
+
+			Rectangle {
+				id: resetHintBody
+
+				anchors.left: parent.left
+				anchors.verticalCenter: parent.verticalCenter
+
+				width: resetHintLabel.width + 2 * Style.marginM
+				height: parent.height
+				radius: Style.radiusM
+				color: Style.titleColor
+
+				BaseText {
+					id: resetHintLabel
+
+					anchors.centerIn: parent
+
+					text: filterPanelDecorator.activeFilterCount > 0
+						? qsTr("Reset all filters - %1 active").arg(filterPanelDecorator.activeFilterCount)
+						: qsTr("Reset all filters")
+					font.pixelSize: Style.fontSizeM
+					color: Style.baseColor
+				}
+			}
+
+			ParallelAnimation {
+				id: resetHintIn
+
+				NumberAnimation {
+					target: resetHint
+					property: "opacity"
+					to: 1
+					duration: 120
+					easing.type: Easing.OutQuad
+				}
+
+				NumberAnimation {
+					target: resetHint
+					property: "slide"
+					to: Style.spacingXS
+					duration: 120
+					easing.type: Easing.OutCubic
+				}
+			}
+
+			NumberAnimation {
+				id: resetHintOut
+
+				target: resetHint
+				property: "opacity"
+				to: 0
+				duration: 90
+				easing.type: Easing.InQuad
+			}
+
+			// Bound, not listened for.
+			//
+			// Clearing the filters is the last thing this button is allowed to do
+			// - it disables itself the moment they are gone - and Button switches
+			// its mouse area off with it. A disabled area never reports the
+			// pointer leaving, so a card driven by that signal alone was never
+			// told to go, and sat there for good. Read as a condition, the card
+			// leaves the moment the button stops being usable, whether the
+			// pointer moved or not.
+			readonly property bool wanted: clearAllButton.enabled && clearAllButton.visible
+				&& clearAllButton.mouseArea && clearAllButton.mouseArea.containsMouse
+
+			onWantedChanged: {
+				if (resetHint.wanted){
+					resetHintOut.stop()
+					resetHint.slide = 0
+					resetHintIn.restart()
+				}
+				else{
+					resetHintIn.stop()
+					resetHintOut.restart()
+				}
 			}
 		}
 	}

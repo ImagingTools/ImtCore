@@ -642,7 +642,13 @@ ViewBase {
 
 						TextInputElementView {
 							id: featureNameInput
-							name: qsTr("Feature Name")
+							// Both of these must be filled in before the feature can be
+							// given sub-features, so the page says so where they are
+							// rather than leaving the reader to infer it from a command
+							// that never lights up.
+							name: qsTr("Feature Name") + " *"
+							description: featureNameInput.text === "" ? qsTr("Required. A feature needs a name before it can have sub-features.") : ""
+							descriptionColor: Style.errorTextColor
 							placeHolderText: qsTr("Enter the feature name")
 							readOnly: !featureEditor.canEdit
 							onEditingFinished: {
@@ -655,7 +661,9 @@ ViewBase {
 
 						TextInputElementView {
 							id: featureIdInput
-							name: qsTr("Feature ID")
+							name: qsTr("Feature ID") + " *"
+							description: featureIdInput.text === "" ? qsTr("Required. Filled in from the name if you leave it empty.") : ""
+							descriptionColor: Style.errorTextColor
 							placeHolderText: qsTr("Enter the feature ID")
 							readOnly: !featureEditor.canEdit
 							onEditingFinished: featureEditor.doUpdateModel()
@@ -1330,7 +1338,11 @@ ViewBase {
 				levelStatusText: featureEditor.incompleteCount(treeExplorer.currentEntries) > 0
 					? qsTr("%1 incomplete").arg(featureEditor.incompleteCount(treeExplorer.currentEntries)) : ""
 				levelStatusDetails: featureEditor.incompleteDetails(treeExplorer.currentEntries)
-				idleHintText: qsTr("Select a sub-feature, or press New sub-feature to add one")
+				// Says what is in the way while it is, rather than only greying the
+				// command out and leaving the reader to guess which page to visit.
+				idleHintText: featureEditor.levelAcceptsChildren(treeExplorer.navigationStack)
+					? qsTr("Select a sub-feature, or press New sub-feature to add one")
+					: qsTr("Fill in Feature Name and Feature ID on the General page to add sub-features here")
 				selectedHintText: featureEditor.isLeafNode(treeExplorer.selectedNode)
 					? qsTr("Edit or F2 changes this row; the Sub-features chip opens the level below")
 					: qsTr("This feature groups others - Optional, Permission and dependencies are set on the sub-features inside it")

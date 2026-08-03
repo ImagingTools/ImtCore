@@ -159,7 +159,6 @@ Item {
 				tabIndex = tabView.tabModel.count - 1
 			}
 
-			console.log("onDocumentAdded", tabIndex)
 			
 			tabView.currentIndex = tabIndex
 		}
@@ -169,30 +168,30 @@ Item {
 			tabView.removeTab(documentId)
 		}
 
+		// The marker is stripped before it is applied, so a title never collects
+		// more than one. The dirty branch used to prepend without looking, and a
+		// document reported dirty twice ended up titled "* * name".
 		function onDocumentIsDirtyChanged(documentId, isDirty){
 			let tabIndex = tabView.getIndexById(documentId)
-			if (tabIndex >= 0){
-				let tabName = tabView.getTabName(documentId)
-				if (tabName === ""){
-					tabName = workspaceView.documentManager.defaultDocumentName
-				}
-
-				let dirtyPrefix = "* "
-
-				if (isDirty){
-					tabView.setTabName(documentId, dirtyPrefix + tabName)
-				}
-				else{
-					if (tabName.startsWith(dirtyPrefix)){
-						tabName = tabName.slice(dirtyPrefix.length)
-						tabView.setTabName(documentId, tabName)
-					}
-				}
+			if (tabIndex < 0){
+				return
 			}
+
+			let dirtyPrefix = "* "
+
+			let tabName = tabView.getTabName(documentId)
+			while (tabName.startsWith(dirtyPrefix)){
+				tabName = tabName.slice(dirtyPrefix.length)
+			}
+
+			if (tabName === ""){
+				tabName = workspaceView.documentManager.defaultDocumentName
+			}
+
+			tabView.setTabName(documentId, isDirty ? dirtyPrefix + tabName : tabName)
 		}
 		
 		function onDocumentOpened(documentId){
-			console.log("onDocumentOpened", documentId)
 			workspaceView.stopLocalLoading()
 		}
 		

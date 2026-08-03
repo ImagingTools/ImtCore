@@ -84,20 +84,35 @@ Item {
 		}
 	}
 
+	onActiveChanged: {
+		if (!control.active)
+			tooltip.hide()
+	}
+
+	onVisibleChanged: {
+		if (!control.visible)
+			tooltip.hide()
+	}
+
 	MouseArea {
 		id: commandArea
 		anchors.fill: parent
-		hoverEnabled: control.active
-		enabled: control.active
-		cursorShape: Qt.PointingHandCursor
-		onClicked: control.clicked()
+		hoverEnabled: true
+		cursorShape: control.active ? Qt.PointingHandCursor : Qt.ArrowCursor
+		onClicked: {
+			if (control.active)
+				control.clicked()
+		}
 		onPositionChanged: {
-			if (control.tooltipText !== "")
+			if (control.tooltipText !== "" && control.active)
 				tooltip.show(mouseX, mouseY)
 		}
 		onExited: {
-			if (control.tooltipText !== "")
-				tooltip.hide()
+			tooltip.hide()
+		}
+		// The grab can be taken away without the pointer ever leaving.
+		onCanceled: {
+			tooltip.hide()
 		}
 	}
 
