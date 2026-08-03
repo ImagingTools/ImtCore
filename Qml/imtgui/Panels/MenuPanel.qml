@@ -435,9 +435,6 @@ Rectangle {
 			}
 		}
 
-		// Chrome rather than a page, so it sits apart from them at the foot of
-		// the rail and is a bare disc on the icon column - another labelled row
-		// would only compete with the pages above it.
 		Item{
 			id: collapseRow
 
@@ -449,39 +446,56 @@ Rectangle {
 
 			visible: Style.enableMenuPanelCollapse
 
+
 			Rectangle {
-				id: menuButtonDisc;
+				id: collapseMarker
 
-				anchors.left: parent.left;
-				anchors.leftMargin: Style.marginL - Style.spacingXS;
-				anchors.verticalCenter: parent.verticalCenter;
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginS
+				anchors.top: parent.top
+				anchors.bottom: parent.bottom
 
-				width: menuPanel.iconSize + 2 * Style.spacingXS;
-				height: width;
-				radius: width / 2;
+				width: (!menuPanel ? parent.width : menuPanel.width) - 2 * Style.marginS
 
-				color: menuButtonArea.containsMouse ? Style.backgroundColor2 : "transparent";
-				border.width: 1;
-				border.color: menuButtonArea.containsMouse ? Style.borderColor : "transparent";
+				radius: Style.buttonRadius
+				color: menuButtonArea.containsMouse ? Style.backgroundColor2 : "transparent"
+			}
 
-				Image{
-					anchors.centerIn: parent;
+			Image{
+				id: collapseIcon
 
-					width: Style.iconSizeS;
-					height: width;
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginL
+				anchors.verticalCenter: parent.verticalCenter
 
-					sourceSize.width: width;
-					sourceSize.height: height;
+				width: menuPanel.iconSize
+				height: width
 
-					source: menuPanel.collapsed ? "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Disabled)
-												: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Disabled);
-				}
+				sourceSize.width: width
+				sourceSize.height: height
+
+				source: menuPanel.collapsed ? "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Disabled)
+											: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Disabled)
+			}
+
+			BaseText {
+				anchors.left: collapseIcon.right
+				anchors.leftMargin: Style.marginM
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginL
+				anchors.verticalCenter: parent.verticalCenter
+
+				visible: !menuPanel.collapsed
+				text: qsTr("Collapse")
+				font.pixelSize: Style.fontSizeM
+				color: Style.inactiveTextColor
+				elide: Text.ElideRight
 			}
 
 			MouseArea {
 				id: menuButtonArea;
 
-				anchors.fill: menuButtonDisc;
+				anchors.fill: collapseMarker;
 
 				hoverEnabled: true;
 				cursorShape: Qt.PointingHandCursor;
@@ -498,7 +512,7 @@ Rectangle {
 				onContainsMouseChanged: {
 					if (menuButtonArea.containsMouse && menuPanel.collapsed){
 						menuPanel.showHint(qsTr("Expand menu"),
-							menuButtonDisc.mapToItem(menuPanel, 0, menuButtonDisc.height / 2).y);
+							collapseIcon.mapToItem(menuPanel, 0, collapseIcon.height / 2).y);
 					}
 					else{
 						menuPanel.hideHint(qsTr("Expand menu"));
@@ -605,8 +619,6 @@ Rectangle {
 		}
 	}
 
-	// Only the first arrival animates: moving the pointer down a column of icons
-	// should slide the card along, not blink it once per row.
 	onHintTextChanged: {
 		if (menuPanel.hintText === ""){
 			hintIn.stop();

@@ -172,14 +172,23 @@ Item{
 															headerDelegate.tableItem.headerDecorator.isValidData("CellRadius", headerDelegate.columnIndex) ?
 																headerDelegate.tableItem.headerDecorator.getData("CellRadius", headerDelegate.columnIndex) :0;
 
-		// Tells the reader the title is a control before they click it. Under the
-		// corner patches, so a decorated header keeps the corners it asked for.
+		// Tells the reader the title is a control before they click it, in the
+		// tab strip's manner: a light wash inset from the cell's edges, and not
+		// on the column the rows are already ordered by - that one has its own
+		// accent along the bottom and does not want a second mark over it.
+		//
+		// Under the corner patches, so a decorated header keeps the corners it
+		// asked for.
 		Rectangle {
 			anchors.fill: parent;
+			anchors.topMargin: Style.marginXS;
+			anchors.bottomMargin: Style.marginXS;
+			anchors.leftMargin: 2;
+			anchors.rightMargin: 2;
 
-			visible: headerDelegate.sortable && headerMa.containsMouse;
-			color: Style.hover;
-			radius: parent.radius;
+			visible: headerDelegate.sortable && headerMa.containsMouse && !headerDelegate.activeSort;
+			color: Style.alternateBaseColor;
+			radius: Style.marginS;
 		}
 
 		// The press itself. A wash that deepens under the finger and drains away
@@ -188,11 +197,17 @@ Item{
 		Rectangle {
 			id: pressWash;
 
+			// Same shape as the hover wash above, so pressing deepens what the
+			// pointer already lit rather than painting a second, wider patch.
 			anchors.fill: parent;
+			anchors.topMargin: Style.marginXS;
+			anchors.bottomMargin: Style.marginXS;
+			anchors.leftMargin: 2;
+			anchors.rightMargin: 2;
 
 			color: Style.selectedColor;
 			opacity: 0;
-			radius: parent.radius;
+			radius: Style.marginS;
 
 			// Quick to arrive, slower to leave: snapping straight back reads as a
 			// glitch, while a short drain reads as a release.
@@ -398,6 +413,10 @@ Item{
 		hoverEnabled: true;
 		visible: headerDelegate.tableItem.hasSort || headerDelegate.textIsCropped || headerDelegate.tableItem.editableHeaderParams;
 		acceptedButtons: Qt.LeftButton | Qt.RightButton;
+		// A hand over a column that would reorder the rows, and nothing over one
+		// that would not - the wash alone left it to be found by clicking. The
+		// resize handles sit above this at either edge and keep their own cursor.
+		cursorShape: headerDelegate.sortable ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
 
 		// Only a column that would actually reorder anything presses in.

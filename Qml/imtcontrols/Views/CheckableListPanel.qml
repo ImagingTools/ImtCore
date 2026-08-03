@@ -411,6 +411,8 @@ FocusScope {
 				width: Style.iconSizeL
 				height: width
 				source: "qrc:/" + Style.getIconPath(root.iconSource, Icon.State.On, Icon.Mode.Disabled)
+				sourceSize.width: width
+				sourceSize.height: height
 			}
 			BaseText {
 				width: parent.width

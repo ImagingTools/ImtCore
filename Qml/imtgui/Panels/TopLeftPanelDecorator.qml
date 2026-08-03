@@ -24,7 +24,7 @@ DecoratorBase {
 			anchors.verticalCenter: content.verticalCenter;
 			anchors.left: parent.left
 			anchors.leftMargin: Style.marginL
-			height: Math.min(Style.iconSizeL, parent.height - Style.marginM)
+			height: Math.min(Style.fontSizeXXXL, parent.height - Style.marginM)
 			width: visible ? height : 0
 			visible: source !== ''
 			source: context && context.appIcon && context.appIcon !== '' ? context.appIcon

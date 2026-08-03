@@ -735,10 +735,7 @@ Rectangle {
 
 			color: Style.borderColor;
 			opacity: 0.5;
-			// The edge a header needs to look finished. It used to disappear as
-			// soon as a table brought any decorator of its own along, which is
-			// most of them; separatorVisible is still there to turn it off.
-			visible: true;
+			visible: false;
 		}
 	}//headers
 

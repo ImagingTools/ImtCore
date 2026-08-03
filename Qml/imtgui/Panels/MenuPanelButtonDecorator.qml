@@ -75,24 +75,30 @@ DecoratorBase {
 		color: Style.iconColorOnSelected;
 	}
 
-	// The row keeps the open width and is clipped, so the pill has to be told
-	// where the rail's edge is - it is the one part that follows the slide, and
-	// a rectangle is cheap to resize where re-eliding a label is not.
+	// Hover the way the tab strip does it: a light wash that never lands on the
+	// row you are already on - that one carries its own
+	// mark and does not need a second one laid over it.
+	//
+	// The row keeps the open width and is clipped, so this has to be told where
+	// the rail's edge is: it is the one part that follows the slide, and a
+	// rectangle is cheap to resize where re-eliding a label is not.
 	Rectangle {
 		id: marker;
 
 		anchors.left: parent.left;
 		anchors.leftMargin: Style.marginS;
 		anchors.top: parent.top;
+		// Full height on purpose: the pages are meant to sit flush against one
+		// another, so nothing is taken off the top and bottom here.
 		anchors.topMargin: 0;
 		anchors.bottom: parent.bottom;
 		anchors.bottomMargin: 0;
 
 		width: (!leftPanelElement.panel ? parent.width : leftPanelElement.panel.width) - 2 * Style.marginS;
 
-		radius: Style.buttonRadius;
+		radius: Style.marginS;
 		color: leftPanelElement.isSelected ? Style.selectedColor
-			: leftPanelElement.isHighlighted ? Style.backgroundColor2 : "transparent";
+			: leftPanelElement.isHighlighted ? Style.alternateBaseColor : "transparent";
 	}
 
 	Image {
@@ -110,6 +116,9 @@ DecoratorBase {
 		sourceSize.width: width;
 		sourceSize.height: height;
 		source: leftPanelElement.baseElement && leftPanelElement.baseElement.iconSource ? leftPanelElement.baseElement.iconSource : "";
+		// Full strength where the pointer is or where you already are, held back
+		// everywhere else - the same weighting the tabs use.
+		opacity: leftPanelElement.isSelected || leftPanelElement.isHighlighted ? 1.0 : Style.opacityHigh;
 	}
 
 	Text {
@@ -124,7 +133,10 @@ DecoratorBase {
 		// Switched, not faded: a fade on every row is work on every frame of the
 		// slide, and the label has nowhere useful to be halfway through one.
 		visible: !leftPanelElement.collapsed;
-		color: leftPanelElement.isSelected || leftPanelElement.isHighlighted ? Style.iconColorOnSelected : Style.textColor;
+		// Selection recolours the label; hover only lifts the row behind it. The
+		// two used to share a colour, so passing the pointer over a row made it
+		// look picked.
+		color: leftPanelElement.isSelected ? Style.titleColor : Style.textColor;
 		// The page you are on carries the weight, so the rail says where you are
 		// without relying on the tint alone.
 		font.family: leftPanelElement.isSelected ? Style.fontFamilyBold : Style.fontFamily;
