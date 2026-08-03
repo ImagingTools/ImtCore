@@ -15,9 +15,13 @@ GqlModel {
 	// should only be registered after an external trigger (e.g. login).
 	property bool autoSubscribe: true
 
+	property bool ok: subscriptionId !== "" && gqlCommandId !== "";
+
+	property BaseClass sdlInputObject: null
+	property Component sdlInputObjectComp: null;
+
 	signal messageReceived(var data);
 
-	property bool ok: subscriptionId !== "" && gqlCommandId !== "";
 	onOkChanged: {
 		if (ok && autoSubscribe){
 			registerSubscription();
@@ -68,12 +72,29 @@ GqlModel {
 	function getGqlQuery(){
 		var query = Gql.GqlRequest("subscription", gqlCommandId);
 		var inputParams = Gql.GqlObject("input");
-		query.AddParam(inputParams);
+		if (sdlInputObject != null){
+			inputParams.fromObject(sdlInputObject)
+			query.AddParam(inputParams);
+		}
+		else if (sdlInputObjectComp != null){
+			let inputObject = sdlInputObjectComp.createObject(container);
+			inputParams.fromObject(inputObject)
+			query.AddParam(inputParams);
+
+			inputObject.destroy()
+		}
+		else {
+			createQueryParams(query, inputParams)
+		}
 		var queryFields = Gql.GqlObject("notification");
 		queryFields.InsertField("id");
 		query.AddField(queryFields);
 
 		return query;
+	}
+
+	function createQueryParams(query, inputParams){
+		query.AddParam(inputParams);
 	}
 
 	function registerSubscription(){
