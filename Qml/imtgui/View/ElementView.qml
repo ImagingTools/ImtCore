@@ -117,26 +117,54 @@ Rectangle {
 		Item {
 			id: mainPart
 			width: parent.width
-			height: textName.text === "" && !controlLoader.item ? 0 : Math.max(Style.controlHeightM, textName.height)
+			height: textName.text === "" && !controlLoader.item ? 0
+					: mainPart.stacked ? textName.height + Style.marginS + controlHolder.height
+					: Math.max(Style.controlHeightM, textName.height)
 			visible: textName.text !== "" || controlLoader.item
-			
+
+			// Squeezed far enough that the name would have no room left beside its
+			// control, the two stop sharing a line and stack instead - the only
+			// way neither ends up drawn over the other. Guarded on a real width,
+			// or a row would stack while it was still being built and had none.
+			property bool stacked: mainPart.width > 0 && controlHolder.width > 0 && textName.text !== ""
+					&& (mainPart.width - controlHolder.width - rootElement.nameMargin) < Style.sizeHintXXXS
+
+			// Placed by y rather than by swapping anchors between verticalCenter
+			// and top: bound through a ternary each of those is set independently,
+			// and the moment both hold a value Qt drops the pair and leaves the
+			// item wherever the conflict left it - which is what sent the control
+			// down the row and kept it there.
 			Text {
 				id: textName
-				anchors.verticalCenter: parent.verticalCenter
+				y: mainPart.stacked ? 0 : Math.round((mainPart.height - height) / 2)
 				anchors.left: parent.left
-				anchors.right: controlLoader.left
-				anchors.rightMargin: rootElement.nameMargin
+				anchors.right: mainPart.stacked ? parent.right : controlHolder.left
+				anchors.rightMargin: mainPart.stacked ? 0 : rootElement.nameMargin
 				color: Style.textColor
 				font.family: Style.fontFamilyBold
 				font.pixelSize: rootElement.titleFontSize
 				elide: Text.ElideRight
 				wrapMode: Text.NoWrap
 			}
-			
-			Loader {
-				id: controlLoader
-				anchors.verticalCenter: parent.verticalCenter
+
+			// Measures the control instead of being measured by it. The Loader
+			// carried no size, so until whatever it holds reported an implicit
+			// one the name was told the control started at the right-hand edge -
+			// and controls that set a plain width never report one at all. That
+			// is why a row only came out right after the page had been resized.
+			Item {
+				id: controlHolder
+
+				y: mainPart.stacked ? textName.height + Style.marginS
+					: Math.round((mainPart.height - height) / 2)
 				anchors.right: parent.right
+
+				width: controlLoader.item ? controlLoader.item.width : 0
+				height: controlLoader.item ? controlLoader.item.height : 0
+
+				Loader {
+					id: controlLoader
+				}
 			}
 		}
 		
@@ -161,22 +189,18 @@ Rectangle {
 		Item {
 			id: bottomItemPart
 			width: parent.width
+			// Left standing even with nothing in it: every element in the code
+			// base is laid out around the row of column spacing this reserves.
 			visible: bottomLoader.item !== undefined
+			// Bound rather than assigned from a pair of handlers, which left the
+			// height at whatever the last signal happened to report - and never
+			// followed a bottom item that changed size afterwards.
+			height: bottomLoader.item ? bottomLoader.item.height : 0
 			clip: true
 
 			Loader {
 				id: bottomLoader
 				width: parent.width
-				onItemChanged: {
-					bottomItemconnections.target = item
-					bottomItemPart.height = item ? item.height : 0
-				}
-			}
-			Connections {
-				id: bottomItemconnections
-				function onHeightChanged(){
-					bottomItemPart.height = bottomLoader.item.height
-				}
 			}
 		}
 

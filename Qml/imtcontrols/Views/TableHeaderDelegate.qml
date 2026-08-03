@@ -18,10 +18,33 @@ Item{
 
 	property bool textIsCropped: helperText.width > name.width;
 
+	// Whether a click on this one would do anything, and whether it is the
+	// column the rows are ordered by.
+	readonly property bool sortable: headerDelegate.tableItem
+			&& headerDelegate.tableItem.hasSort
+			&& !headerDelegate.tableItem.nonSortableColumns.includes(headerDelegate.headerId);
+	readonly property bool activeSort: headerDelegate.tableItem
+			&& headerDelegate.tableItem.hasSort
+			&& headerDelegate.tableItem.currentHeaderId === headerDelegate.headerId;
+
 	property var rightMA: null;
 
 	Component.onCompleted: {
 		headerDelegate.compl = true;
+		// Seeded, not bound: the underline is driven by the animations below, and
+		// a delegate can be built for a column that is already the sorted one.
+		sortUnderline.opacity = headerDelegate.activeSort ? 1 : 0;
+	}
+
+	onActiveSortChanged: {
+		if (headerDelegate.activeSort){
+			underlineOut.stop();
+			underlineIn.restart();
+		}
+		else{
+			underlineIn.stop();
+			underlineOut.restart();
+		}
 	}
 
 	Component.onDestruction: {
@@ -52,6 +75,11 @@ Item{
 		}
 	}
 
+	// Whether anything is drawn to the left of this one. Recomputed rather than
+	// bound: hiding a column leaves the indexes alone, so the second column
+	// became the first on screen while still drawing a divider against nothing.
+	property bool firstVisibleColumn: true;
+
 	function setCellWidth(){
 		if (!headerDelegate || headerDelegate.columnCount === 0){
 			return
@@ -73,6 +101,8 @@ Item{
 		}
 
 		visible = width > 0;
+
+		headerDelegate.firstVisibleColumn = headerDelegate.getPrevHeaderIndex() < 0;
 
 		createRightMA();
 	}
@@ -101,8 +131,8 @@ Item{
 		z: -1;
 		anchors.verticalCenter: parent.verticalCenter;
 		anchors.left: parent.left;
-		width: headerDelegate.tableItem.isRightBorder ? headerDelegate.tableItem.verticalBorderSize * headerDelegate.tableItem.visibleLeftBorderFirst * (headerDelegate.columnIndex == 0)
-													  : headerDelegate.tableItem.visibleLeftBorderFirst ? headerDelegate.tableItem.verticalBorderSize : headerDelegate.columnIndex > 0 ? headerDelegate.tableItem.verticalBorderSize : 0;
+		width: headerDelegate.tableItem.isRightBorder ? headerDelegate.tableItem.verticalBorderSize * headerDelegate.tableItem.visibleLeftBorderFirst * headerDelegate.firstVisibleColumn
+													  : headerDelegate.tableItem.visibleLeftBorderFirst ? headerDelegate.tableItem.verticalBorderSize : !headerDelegate.firstVisibleColumn ? headerDelegate.tableItem.verticalBorderSize : 0;
 		height: headerDelegate.tableItem.verticalBorderHeight >= 0 ? headerDelegate.tableItem.verticalBorderHeight :parent.height;
 		color:  headerDelegate.tableItem.borderColorVertical;
 	}
@@ -141,6 +171,51 @@ Item{
 		radius: headerDelegate.tableItem.emptyDecorHeader ? 0 :
 															headerDelegate.tableItem.headerDecorator.isValidData("CellRadius", headerDelegate.columnIndex) ?
 																headerDelegate.tableItem.headerDecorator.getData("CellRadius", headerDelegate.columnIndex) :0;
+
+		// Tells the reader the title is a control before they click it. Under the
+		// corner patches, so a decorated header keeps the corners it asked for.
+		Rectangle {
+			anchors.fill: parent;
+
+			visible: headerDelegate.sortable && headerMa.containsMouse;
+			color: Style.hover;
+			radius: parent.radius;
+		}
+
+		// The press itself. A wash that deepens under the finger and drains away
+		// after it, rather than the whole cell twitching 1.5% smaller: scaling the
+		// delegate dragged its borders and its resize handles along with it.
+		Rectangle {
+			id: pressWash;
+
+			anchors.fill: parent;
+
+			color: Style.selectedColor;
+			opacity: 0;
+			radius: parent.radius;
+
+			// Quick to arrive, slower to leave: snapping straight back reads as a
+			// glitch, while a short drain reads as a release.
+			NumberAnimation {
+				id: pressIn;
+
+				target: pressWash;
+				property: "opacity";
+				to: 1;
+				duration: 90;
+				easing.type: Easing.OutQuad;
+			}
+
+			NumberAnimation {
+				id: pressOut;
+
+				target: pressWash;
+				property: "opacity";
+				to: 0;
+				duration: 220;
+				easing.type: Easing.InQuad;
+			}
+		}
 
 		//cornerPatches
 		Rectangle{
@@ -191,6 +266,41 @@ Item{
 																	 !headerDelegate.tableItem.headerDecorator.getData("RightBottomRound", headerDelegate.columnIndex) :true;
 		}
 		//cornerPatches
+
+		// The column the rows are ordered by, marked along its whole width: a
+		// small arrow alone is easy to miss in a wide table. Faded in rather than
+		// switched on, so it reads as the answer to the click that just landed.
+		Rectangle {
+			id: sortUnderline;
+
+			anchors.left: parent.left;
+			anchors.right: parent.right;
+			anchors.bottom: parent.bottom;
+
+			height: 2;
+			opacity: 0;
+			color: Style.titleColor;
+
+			NumberAnimation {
+				id: underlineIn;
+
+				target: sortUnderline;
+				property: "opacity";
+				to: 1;
+				duration: 160;
+				easing.type: Easing.OutQuad;
+			}
+
+			NumberAnimation {
+				id: underlineOut;
+
+				target: sortUnderline;
+				property: "opacity";
+				to: 0;
+				duration: 120;
+				easing.type: Easing.InQuad;
+			}
+		}
 	}//mainRec
 
 	Text {
@@ -209,10 +319,13 @@ Item{
 																			 Text.AlignLeft;
 
 
-		font.pixelSize: headerDelegate.tableItem.emptyDecorHeader ? Style.fontSizeM * headerDelegate.scale :
+		// A title, not another row of data: smaller and quieter than the cells
+		// below it, so the eye lands on the content first. The delegate itself
+		// carries the press scale - multiplying it in here applied it twice.
+		font.pixelSize: headerDelegate.tableItem.emptyDecorHeader ? Style.fontSizeS :
 																	headerDelegate.tableItem.headerDecorator.isValidData("FontSize", headerDelegate.columnIndex) ?
 																		headerDelegate.tableItem.headerDecorator.getData("FontSize", headerDelegate.columnIndex) :
-																		Style.fontSizeM * headerDelegate.scale;
+																		Style.fontSizeS;
 
 
 		font.family: headerDelegate.tableItem.emptyDecorHeader ? Style.fontFamilyBold :
@@ -226,10 +339,10 @@ Item{
 																   true;
 
 
-		color: headerDelegate.tableItem.emptyDecorHeader ? Style.textColor :
+		color: headerDelegate.tableItem.emptyDecorHeader ? (headerDelegate.activeSort ? Style.titleColor : Style.subtitleColor) :
 														   headerDelegate.tableItem.headerDecorator.isValidData("FontColor", headerDelegate.columnIndex) ?
 															   headerDelegate.tableItem.headerDecorator.getData("FontColor", headerDelegate.columnIndex) :
-															   Style.textColor;
+															   headerDelegate.activeSort ? Style.titleColor : Style.subtitleColor;
 		elide: headerDelegate.tableItem.elideMode;
 
 		wrapMode: headerDelegate.tableItem.wrapMode;
@@ -260,11 +373,14 @@ Item{
 		anchors.right: mainRec.right;
 		anchors.rightMargin: headerDelegate.columnIndex == headerDelegate.columnCount - 1 ? 3 * Style.marginM : Style.marginM;
 
-		width: visible ? 12 : 0;
+		width: visible ? Style.iconSizeXS : 0;
 		height: width;
 
-		visible: headerDelegate.tableItem.currentHeaderId === headerDelegate.headerId && headerDelegate.tableItem.hasSort;
-		rotation: headerDelegate.tableItem.currentSortOrder == "ASC" ? 180 : 0
+		// Shown faintly under the pointer as well, so a column advertises that
+		// it can be sorted before anyone tries.
+		visible: headerDelegate.activeSort || (headerDelegate.sortable && headerMa.containsMouse);
+		opacity: headerDelegate.activeSort ? 1 : 0.4;
+		rotation: headerDelegate.activeSort && headerDelegate.tableItem.currentSortOrder == "ASC" ? 180 : 0
 
 		sourceSize.width: width;
 		sourceSize.height: height;
@@ -284,16 +400,24 @@ Item{
 		acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
 
-		onReleased: {
-			if(headerDelegate.tableItem.hasSort){
-				headerDelegate.scale = 1;
+		// Only a column that would actually reorder anything presses in.
+		onPressed: {
+			if(headerDelegate.sortable){
+				pressOut.stop();
+				pressIn.restart();
 			}
 		}
 
-		onPressed: {
-			if(headerDelegate.tableItem.hasSort){
-				headerDelegate.scale = 0.985;
-			}
+		onReleased: {
+			pressIn.stop();
+			pressOut.restart();
+		}
+
+		// The grab can be taken away without a release - the pointer leaving the
+		// window, or the view scrolling out from under it.
+		onCanceled: {
+			pressIn.stop();
+			pressOut.restart();
 		}
 
 		onClicked: {
@@ -374,28 +498,45 @@ Item{
 		anchors.left: parent.left;
 
 		height: parent.height;
-		width: 15;
+		// The grab zone and the zone that says so are now the same width: two
+		// thirds of the old area showed an arrow while still dragging.
+		width: Style.marginS;
 
-		visible: headerDelegate.tableItem.canMoveColumns && headerDelegate.columnIndex > 0 && headerDelegate.visible;
+		visible: headerDelegate.tableItem.canMoveColumns && !headerDelegate.firstVisibleColumn && headerDelegate.visible;
 		enabled: visible;
 
 		hoverEnabled: true;
-		cursorShape: pressed ?  Qt.SplitHCursor : isWithinBorder ? Qt.SplitHCursor : Qt.ArrowCursor;
-		property bool isWithinBorder:  mouseX <= splitterWidth;
-		property int splitterWidth: 6;
-		property var coord: mapToItem(moving,0,0);
+		cursorShape: Qt.SplitHCursor;
+		property real lastX: 0;
 		property bool  blocked: false;
 
+		Rectangle {
+			anchors.left: parent.left;
+			anchors.top: parent.top;
+			anchors.bottom: parent.bottom;
+
+			width: 2;
+			visible: moving.containsMouse || moving.pressed;
+			color: Style.titleColor;
+		}
+
 		onPressed: {
-			moving.coord = mapToItem(moving,mouse.x,mouse.y)
+			moving.lastX = moving.mapToItem(headerDelegate.tableItem, moving.mouseX, 0).x;
 		}
 
 		onPositionChanged: {
 			if(pressed){
 				let isFlickableTable = headerDelegate.tableItem.isFlickable;
 
-				let newCoords = mapToItem(moving,mouse.x,mouse.y);
-				let deltaX = Math.trunc(newCoords.x - moving.coord.x);
+				// Measured against the table rather than against this handle: the
+				// handle travels with the edge it drags, so a delta taken here
+				// would cancel itself out. Taken since the previous move, not
+				// since the press, so the widths do not compound.
+				let currentX = moving.mapToItem(headerDelegate.tableItem, moving.mouseX, 0).x;
+				let deltaX = Math.trunc(currentX - moving.lastX);
+				if (deltaX === 0){
+					return;
+				}
 
 				let width_ = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", headerDelegate.columnIndex);
 				let width_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex) : headerDelegate.tableItem.minCellWidth;
@@ -444,17 +585,26 @@ Item{
 						headerDelegate.tableItem.tableViewParams.setHeaderSize(prevHeaderId, prevPercent)
 					}
 
+					// Only a delta that was actually applied is consumed: at the
+					// minimum width the pointer can be walked back without first
+					// having to make up the distance it ran on.
+					moving.lastX = currentX;
+
+					moving.blocked = true;
+					blockmovingPause.restart();
 				}
 			}
-
-			blocked = true;
-			blockmovingPause.restart();
 		}
 
 		onReleased: {
-			headerDelegate.tableItem.saveWidth();
+			if (moving.blocked){
+				headerDelegate.tableItem.saveWidth();
+			}
 		}
 
+		// Swallowed only after a real resize. This used to be set from any
+		// pointer move, hover included, so a plain click near a column edge
+		// was eaten and the column never sorted.
 		onClicked: {
 			if(blocked){
 				mouse.accepted = true;
@@ -483,20 +633,31 @@ Item{
 			anchors.right: parent.right;
 
 			height: parent.height;
-			width: 15;
+			width: Style.marginS;
 
-			visible: headerDelegate.tableItem.canMoveColumns && headerDelegate.columnIndex > 0 && headerDelegate.visible;
+			// The last column has no neighbour to give width back to, so this is
+			// the only edge it can be dragged by - including when it is also the
+			// first one, which the old index test ruled out.
+			visible: headerDelegate.tableItem.canMoveColumns && headerDelegate.visible;
 			enabled: visible;
 
 			hoverEnabled: true;
-			cursorShape: pressed ?  Qt.SplitHCursor : isWithinBorder ? Qt.SplitHCursor : Qt.ArrowCursor;
-			property bool isWithinBorder:  mouseX >=  width - splitterWidth;
-			property int splitterWidth: 6;
-			property var coord: mapToItem(movingRight,0,0);
+			cursorShape: Qt.SplitHCursor;
+			property real lastX: 0;
 			property bool  blocked: moving.blocked;
 
+			Rectangle {
+				anchors.right: parent.right;
+				anchors.top: parent.top;
+				anchors.bottom: parent.bottom;
+
+				width: 2;
+				visible: movingRight.containsMouse || movingRight.pressed;
+				color: Style.titleColor;
+			}
+
 			onPressed: {
-				movingRight.coord = mapToItem(movingRight,mouse.x,mouse.y)
+				movingRight.lastX = movingRight.mapToItem(headerDelegate.tableItem, movingRight.mouseX, 0).x;
 			}
 
 			onPositionChanged: {
@@ -505,8 +666,14 @@ Item{
 					if(!isFlickableTable){
 						return;
 					}
-					let newCoords = mapToItem(movingRight,mouse.x,mouse.y);
-					let deltaX = Math.trunc(newCoords.x - movingRight.coord.x);
+
+					// See the left handle: measured against the table, and since
+					// the previous move rather than since the press.
+					let currentX = movingRight.mapToItem(headerDelegate.tableItem, movingRight.mouseX, 0).x;
+					let deltaX = Math.trunc(currentX - movingRight.lastX);
+					if (deltaX === 0){
+						return;
+					}
 
 					let width_ = headerDelegate.tableItem.widthDecoratorDynamic.getData("Width", headerDelegate.columnIndex);
 					let width_min = headerDelegate.tableItem.widthDecoratorDynamic.isValidData("MinWidth", headerDelegate.columnIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.getData("MinWidth", headerDelegate.columnIndex) : headerDelegate.tableItem.minCellWidth;
@@ -527,15 +694,19 @@ Item{
 						headerDelegate.tableItem.setWidth();
 
 						headerDelegate.tableItem.tableViewParams.setHeaderSize(headerDelegate.headerId, currentPercent)
+
+						movingRight.lastX = currentX;
+
+						moving.blocked = true;
+						blockmovingPause.restart();
 					}
 				}
-
-				moving.blocked = true;
-				blockmovingPause.restart();
 			}
 
 			onReleased: {
-				headerDelegate.tableItem.saveWidth();
+				if (movingRight.blocked){
+					headerDelegate.tableItem.saveWidth();
+				}
 			}
 
 			onClicked: {

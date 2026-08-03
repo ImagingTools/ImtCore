@@ -58,59 +58,10 @@ Rectangle {
 	readonly property bool isSelected: selectionManager ? selectionManager.isSelected(itemId) : false
 	readonly property bool isHovered: itemMouseArea.containsMouse
 	readonly property int checkBoxSize: Style.itemSizeS + Style.marginXS
-	// ListView.view isn't usable from JQML; divider is drawn above each row
-	// and hidden on the first one instead of below and hidden on the last.
+
 	readonly property bool isFirstItem: index === 0
 
-	// --- default-content plumbing --------------------------------------- //
-	// TODO: replace all of this with
-	//     default property alias content: contentColumn.data
-	// once the web (JQML) runtime honours default property aliases. Native Qt
-	// redirects declared children into the alias target, but JQML parents them
-	// straight onto this root instead (see Menu.qml::_ingestDeclaredChildren),
-	// so we move them into the content column ourselves and stay correct on
-	// both runtimes.
-	//
-	// Everything this file declares itself is listed here; anything else found
-	// among our children came from a subclass and belongs in the column. This
-	// is a function rather than a cached list property on purpose: children
-	// can change while the delegate is still being built, and ids are not
-	// binding dependencies, so a list property could cache an incomplete set.
-	function __isOwnItem(child) {
-		return child === itemMouseArea
-			|| child === contentRow
-			|| child === trailingActions
-			|| child === moreButton
-			|| child === topDivider
-	}
-
-	property bool __isRelocatingExternalChildren: false
-
-	function __relocateExternalChildren() {
-		if (root.__isRelocatingExternalChildren)
-			return
-
-		root.__isRelocatingExternalChildren = true
-		// `children` is a QQmlListProperty, not a JS array - it has length and
-		// indexed access but no Array methods, so copy it by hand. Reparenting
-		// below mutates the live list, hence the snapshot.
-		var children = []
-		for (var i = 0; i < root.children.length; i++)
-			children.push(root.children[i])
-
-		for (i = 0; i < children.length; i++) {
-			var child = children[i]
-			if (!child || root.__isOwnItem(child))
-				continue
-			child.parent = contentColumn
-		}
-		root.__isRelocatingExternalChildren = false
-	}
-
-	onChildrenChanged: root.__relocateExternalChildren()
-	Component.onCompleted: {
-		root.__relocateExternalChildren()
-	}
+	default property alias content: contentColumn.data
 
 	width: parent ? parent.width : 0
 	height: contentRow.implicitHeight + Style.marginXL
@@ -183,7 +134,7 @@ Rectangle {
 			id: customActionsLoader
 			anchors.centerIn: parent
 			sourceComponent: root.customActionsComponent
-			visible: !!sourceComponent
+			visible: root.customActionsComponent !== null
 		}
 	}
 

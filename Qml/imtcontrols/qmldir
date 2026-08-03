@@ -166,6 +166,10 @@ TreeViewSelection 1.0 ./Views/TreeViewSelection.qml
 BarChart 1.0 ./Views/BarChart.qml
 BasicTableView 1.0 ./Views/BasicTableView.qml
 BasicTreeView 1.0 ./Views/BasicTreeView.qml
+TreeExplorerView 1.0 ./Views/TreeExplorerView.qml
+CheckableListPanel 1.0 ./Views/CheckableListPanel.qml
+EditableTableCell 1.0 ./Views/EditableTableCell.qml
+ToolbarButton 1.0 ./Views/ToolbarButton.qml
 ChangeItemSize 1.0 ./Views/ChangeItemSize.qml
 CustomScrollbar 1.0 ./Views/CustomScrollbar.qml
 ScrollIndicator 1.0 ./Views/ScrollIndicator.qml

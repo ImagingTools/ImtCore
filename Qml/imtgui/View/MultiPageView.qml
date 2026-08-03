@@ -395,24 +395,18 @@ Item {
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
         anchors.left: sidebarPanel.right;
-        anchors.topMargin: root.mainMargin;
-        anchors.bottomMargin: root.mainMargin;
         anchors.leftMargin: root.mainMargin;
 
         width: 1;
         color: Style.borderColor;
+        opacity: 0.5
     }
 
     Item {
-        id: bodyAdministration;
-
         anchors.left: separator.right;
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
         anchors.right: parent.right;
-        anchors.topMargin: root.mainMargin;
-        anchors.leftMargin: root.mainMargin;
-        anchors.rightMargin: root.mainMargin;
 
         Repeater {
             id: bodyRepeater;

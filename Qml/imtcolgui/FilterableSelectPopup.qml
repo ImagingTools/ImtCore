@@ -85,6 +85,23 @@ PopupView {
 	// --- Private: max popup height (screen height minus margins) ---
 	property int __maxPopupHeight: 600
 
+	// --- Private: fixed height of the list stage ---
+	// Loading / empty / error / results all reserve this SAME height regardless of
+	// how many rows actually load - so the popup never resizes once opened. An
+	// animated transition was tried first, but the popup opening at one size and
+	// then visibly resizing shortly after (open then shrink/grow) reads as an
+	// unstable window even when the resize itself is eased - a fixed stage removes
+	// the resize entirely instead of smoothing it. When there are fewer results than
+	// maxVisibleItems the list simply leaves blank space below, the same tradeoff
+	// any fixed-height dropdown/autocomplete makes.
+	readonly property int __listStageHeight: root.maxVisibleItems > 0
+		? root.maxVisibleItems * root.itemHeight
+		: 200
+
+	// --- Private: floor so loading/empty/error still show something in embedded
+	// "-1" mode when there are (as yet) zero rows to size against ---
+	readonly property int __placeholderMinHeight: 100
+
 	// --- Private: suppress selectionChanged during initialization ---
 	property bool __initializing: false
 	// --- Private: tracks whether started() has been called (popup is open) ---
@@ -434,7 +451,6 @@ PopupView {
 				radius: Style.radiusL
 
 				onTextChanged: {
-					console.log("filterField", text)
 					root.__internal.focusedIndex = -1
 					debounce.stop()
 					debounce.start()
@@ -645,22 +661,23 @@ PopupView {
 			}
 
 			// --- List Body ---
+			// Fixed to __listStageHeight (uncapped in the maxVisibleItems === -1
+			// "embedded, show everything" mode, where the surrounding page already
+			// scrolls) so switching between loading/empty/error/results never
+			// resizes the popup - see __listStageHeight above for why.
 			Item {
 				id: itemBody
 
 				width: parent.width
-				height: loadingOverlay.visible ? loadingOverlay.height
-						: errorItem.visible ? errorItem.height
-						: noDataItem.visible ? noDataItem.height
-						: popupListView.height
+				height: root.maxVisibleItems === -1
+					? Math.max(popupListView.height, root.__placeholderMinHeight)
+					: root.__listStageHeight
 
 				Item {
 					id: noDataItem
 
 					width: parent.width
-					// Match loadingOverlay reserved height so the popup does not visibly
-					// shrink when the initial fetch completes with no results.
-					height: root.maxVisibleItems > 0 ? root.maxVisibleItems * root.itemHeight : 100
+					height: parent.height
 					visible: root.dataProvider
 							&& !root.dataProvider.isInitialLoading
 							&& !root.dataProvider.error
@@ -678,9 +695,7 @@ PopupView {
 					id: errorItem
 
 					width: parent.width
-					// Match loadingOverlay reserved height so the popup does not visibly
-					// shrink when the initial fetch completes with an error.
-					height: root.maxVisibleItems > 0 ? root.maxVisibleItems * root.itemHeight : 100
+					height: parent.height
 					visible: root.dataProvider
 							&& root.dataProvider.error !== null
 							&& !root.dataProvider.isInitialLoading
@@ -709,7 +724,7 @@ PopupView {
 					id: loadingOverlay
 
 					width: parent.width
-					height: root.maxVisibleItems > 0 ? root.maxVisibleItems * root.itemHeight : 100
+					height: parent.height
 					visible: false
 					indicatorSize: 30
 					background.color: "transparent"
@@ -735,8 +750,12 @@ PopupView {
 					property int itemCount: 0
 
 					width: parent.width
-					height: itemCount === 0 ? 0
-							: (root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)) * root.itemHeight
+					// Fixed to the reserved stage height (see __listStageHeight) instead of
+					// shrinking to fit the actual item count - fewer results just leave
+					// blank space below rather than resizing the popup. Uncapped in
+					// embedded "-1" mode, where the surrounding page already scrolls.
+					height: root.maxVisibleItems === -1 ? itemCount * root.itemHeight : parent.height
+					visible: itemCount > 0
 
 					boundsBehavior: Flickable.StopAtBounds
 					clip: true

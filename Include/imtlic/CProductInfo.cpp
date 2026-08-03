@@ -10,6 +10,7 @@
 #include <iser/CPrimitiveTypesSerializer.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtcore/Version.h>
 #include <imtlic/CFeatureInfo.h>
 
@@ -103,7 +104,29 @@ bool CProductInfo::RemoveFeature(const QByteArray& featureId)
 	imtbase::ICollectionInfo::Ids elementIds;
 	elementIds << featureId;
 
+	// The optional parts taken from this feature go with it: an entry naming a
+	// feature the product no longer has is a grant of nothing.
+	for (qsizetype index = m_optionalFeatures.size() - 1; index >= 0; --index){
+		if (m_optionalFeatures[index].featureId == featureId){
+			m_optionalFeatures.remove(index);
+		}
+	}
+
 	return m_featureCollection.RemoveElements(elementIds);
+}
+
+
+IProductInfo::OptionalFeatureInfos CProductInfo::GetOptionalFeatures() const
+{
+	return m_optionalFeatures;
+}
+
+
+void CProductInfo::SetOptionalFeatures(const OptionalFeatureInfos& optionalFeatures)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_optionalFeatures = optionalFeatures;
 }
 
 
@@ -187,6 +210,45 @@ bool CProductInfo::Serialize(iser::IArchive& archive)
 		}
 	}
 
+	// Products written before this field existed carry no such tag; the version
+	// number stored in their archive header is what keeps us from looking for one.
+	if (imtCoreVersion >= 22921){
+		if (!archive.IsStoring()){
+			m_optionalFeatures.clear();
+		}
+
+		iser::CArchiveTag optionalFeaturesTag("OptionalFeatures", "Optional sub-features taken by this product", iser::CArchiveTag::TT_MULTIPLE);
+		iser::CArchiveTag optionalFeatureTag("OptionalFeature", "Optional sub-features of one feature", iser::CArchiveTag::TT_GROUP);
+
+		int optionalFeaturesCount = imtbase::narrow_cast<int>(m_optionalFeatures.count());
+		retVal = retVal && archive.BeginMultiTag(optionalFeaturesTag, optionalFeatureTag, optionalFeaturesCount);
+
+		if (retVal && !archive.IsStoring()){
+			m_optionalFeatures.resize(optionalFeaturesCount);
+		}
+
+		for (int i = 0; i < optionalFeaturesCount; ++i){
+			retVal = retVal && archive.BeginTag(optionalFeatureTag);
+
+			iser::CArchiveTag featureIdTag("FeatureId", "ID of the feature these parts belong to", iser::CArchiveTag::TT_LEAF, &optionalFeatureTag);
+			retVal = retVal && archive.BeginTag(featureIdTag);
+			retVal = retVal && archive.Process(m_optionalFeatures[i].featureId);
+			retVal = retVal && archive.EndTag(featureIdTag);
+
+			retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(
+						archive, m_optionalFeatures[i].subFeatureIds, "SubFeatures", "SubFeature");
+
+			retVal = retVal && archive.EndTag(optionalFeatureTag);
+		}
+
+		retVal = retVal && archive.EndTag(optionalFeaturesTag);
+	}
+	else{
+		if (!archive.IsStoring()){
+			m_optionalFeatures.clear();
+		}
+	}
+
 	return retVal;
 }
 
@@ -204,6 +266,7 @@ bool CProductInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 		m_productDescription = sourcePtr->m_productDescription;
 		m_categoryId = sourcePtr->m_categoryId;
 		m_featureCollection.CopyFrom(sourcePtr->m_featureCollection);
+		m_optionalFeatures = sourcePtr->m_optionalFeatures;
 
 		return true;
 	}
@@ -220,7 +283,8 @@ bool CProductInfo::IsEqual(const IChangeable& object) const
 				m_productName == sourcePtr->m_productName &&
 				m_productDescription == sourcePtr->m_productDescription &&
 				m_categoryId == sourcePtr->m_categoryId &&
-				m_featureCollection.IsEqual(sourcePtr->m_featureCollection);
+				m_featureCollection.IsEqual(sourcePtr->m_featureCollection) &&
+				m_optionalFeatures == sourcePtr->m_optionalFeatures;
 	}
 
 	return false;
@@ -234,6 +298,7 @@ bool CProductInfo::ResetData(CompatibilityMode mode)
 	m_productDescription.clear();
 	m_categoryId.clear();
 	m_featureCollection.ResetData(mode);
+	m_optionalFeatures.clear();
 
 	return true;
 }

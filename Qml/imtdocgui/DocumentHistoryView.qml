@@ -103,6 +103,7 @@ Rectangle {
 			}
 
 			Row {
+				id: headerRow
 				anchors.left: parent.left
 				anchors.right: parent.right
 				anchors.leftMargin: Style.marginL
@@ -110,29 +111,32 @@ Rectangle {
 				anchors.verticalCenter: parent.verticalCenter
 				spacing: Style.marginL
 
+				readonly property int columnCount: 4
+				readonly property real columnsWidth: width - spacing * (columnCount - 1)
+
 				BaseText {
-					width: parent.width * 0.14
+					width: headerRow.columnsWidth * 0.14
 					text: qsTr("Revision")
 					font.bold: true
 					font.pixelSize: Style.fontSizeS
 					color: Style.inactiveTextColor
 				}
 				BaseText {
-					width: parent.width * 0.20
+					width: headerRow.columnsWidth * 0.20
 					text: qsTr("User")
 					font.bold: true
 					font.pixelSize: Style.fontSizeS
 					color: Style.inactiveTextColor
 				}
 				BaseText {
-					width: parent.width * 0.22
+					width: headerRow.columnsWidth * 0.22
 					text: qsTr("Date")
 					font.bold: true
 					font.pixelSize: Style.fontSizeS
 					color: Style.inactiveTextColor
 				}
 				BaseText {
-					width: parent.width * 0.40
+					width: headerRow.columnsWidth * 0.40
 					text: qsTr("Description")
 					font.bold: true
 					font.pixelSize: Style.fontSizeS
@@ -168,13 +172,18 @@ Rectangle {
 			}
 
 			Row {
+				id: dataRow
 				width: parent.width
 				spacing: Style.marginL
 
+				readonly property int columnCount: 4
+				readonly property real columnsWidth: width - spacing * (columnCount - 1)
+
 				Row {
 					anchors.verticalCenter: parent.verticalCenter
-					width: parent.width * 0.14
+					width: dataRow.columnsWidth * 0.14
 					spacing: Style.spacingS
+					clip: true
 
 					Text {
 						anchors.verticalCenter: parent.verticalCenter
@@ -187,8 +196,8 @@ Rectangle {
 					Rectangle {
 						anchors.verticalCenter: parent.verticalCenter
 						visible: revisionDelegate.revisionItem ? revisionDelegate.revisionItem.isActive : false
-						width: currentLabel.width + Style.marginM
-						height: Style.controlHeightM
+						width: currentLabel.width + Style.marginL
+						height: Style.buttonHeightS
 						radius: height / 2
 						color: Style.imaginToolsAccentColor
 
@@ -205,7 +214,7 @@ Rectangle {
 
 				Row {
 					anchors.verticalCenter: parent.verticalCenter
-					width: parent.width * 0.20
+					width: dataRow.columnsWidth * 0.20
 					spacing: Style.spacingS
 
 					Rectangle {
@@ -239,7 +248,7 @@ Rectangle {
 
 				Text {
 					anchors.verticalCenter: parent.verticalCenter
-					width: parent.width * 0.22
+					width: dataRow.columnsWidth * 0.22
 					text: revisionDelegate.revisionItem ? revisionDelegate.revisionItem.timestamp : ""
 					font.pixelSize: Style.fontSizeM
 					color: Style.inactiveTextColor
@@ -248,7 +257,7 @@ Rectangle {
 
 				Text {
 					anchors.verticalCenter: parent.verticalCenter
-					width: parent.width * 0.40
+					width: dataRow.columnsWidth * 0.40
 					text: revisionDelegate.revisionItem ? revisionDelegate.revisionItem.description : ""
 					font.pixelSize: Style.fontSizeM
 					color: Style.textColor

@@ -25,7 +25,7 @@ Rectangle {
 	property bool showHeaders: true;
 
 	property bool enableAlternating: (Style.enableAlternating !== undefined && Style.enableAlternating !== null) ? Style.enableAlternating : false;
-	property color alternatingColor: Style.alternateBaseColor ? Style.alternateBaseColor : Style.baseColorInverted;
+	property color alternatingColor: Style.backgroundColor2;
 	property color alternatingCellColor: 'transparent';
 	property real alternatingOpacity: Style.alternatingOpacity ? Style.alternatingOpacity : 0.05;
 	property bool hoverEnabled: (Style.enableHoverEffect !== undefined && Style.enableHoverEffect !== null) ? Style.enableHoverEffect : true;
@@ -734,7 +734,11 @@ Rectangle {
 			height: 1;
 
 			color: Style.borderColor;
-			visible: tableContainer.emptyDecor;
+			opacity: 0.5;
+			// The edge a header needs to look finished. It used to disappear as
+			// soon as a table brought any decorator of its own along, which is
+			// most of them; separatorVisible is still there to turn it off.
+			visible: true;
 		}
 	}//headers
 

@@ -409,7 +409,7 @@ class Item extends QtObject {
             width: newValue > 0 ? newValue + 'px' : '0px',
             minWidth: newValue > 0 ? newValue + 'px' : '0px',
         })
-        this.implicitWidth = newValue
+        Geometry.setAuto(this.__self, 'implicitWidth', newValue, this.__self.constructor.meta.implicitWidth)
         JQApplication.updateLater(this.parent)
         Geometry.setAuto(this.__self, 'AWidth', newValue, this.__self.constructor.meta.AWidth)
         this.__updateSiblingAnchors()
@@ -421,10 +421,18 @@ class Item extends QtObject {
             height: newValue > 0 ? newValue + 'px' : '0px',
             minHeight: newValue > 0 ? newValue + 'px' : '0px',
         })
-        this.implicitHeight = newValue
+        Geometry.setAuto(this.__self, 'implicitHeight', newValue, this.__self.constructor.meta.implicitHeight)
         JQApplication.updateLater(this.parent)
         Geometry.setAuto(this.__self, 'AHeight', newValue, this.__self.constructor.meta.AHeight)
         this.__updateSiblingAnchors()
+    }
+
+    SLOT_implicitWidthChanged(oldValue, newValue){
+        Geometry.setAuto(this.__self, 'width', newValue, this.__self.constructor.meta.width)
+    }
+
+    SLOT_implicitHeightChanged(oldValue, newValue){
+        Geometry.setAuto(this.__self, 'height', newValue, this.__self.constructor.meta.height)
     }
 
     __updateSiblingAnchors(){

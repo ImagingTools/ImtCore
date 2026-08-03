@@ -188,6 +188,7 @@ Item {
 			}
 
 			Row {
+				id: ticketHeaderRow
 				anchors.left: parent.left
 				anchors.right: parent.right
 				anchors.leftMargin: Style.marginL
@@ -195,36 +196,39 @@ Item {
 				anchors.verticalCenter: parent.verticalCenter
 				spacing: Style.marginL
 
+				readonly property int columnCount: 5
+				readonly property real columnsWidth: width - spacing * (columnCount - 1)
+
 				BaseText {
-					width: parent.width * 0.34
+					width: ticketHeaderRow.columnsWidth * 0.34
 					text: qsTr("Ticket")
 					font.bold: true
 					font.pixelSize: Style.fontSizeS
 					color: Style.inactiveTextColor
 				}
 				BaseText {
-					width: parent.width * 0.14
+					width: ticketHeaderRow.columnsWidth * 0.14
 					text: qsTr("Status")
 					font.bold: true
 					font.pixelSize: Style.fontSizeS
 					color: Style.inactiveTextColor
 				}
 				BaseText {
-					width: parent.width * 0.14
+					width: ticketHeaderRow.columnsWidth * 0.14
 					text: qsTr("Priority")
 					font.bold: true
 					font.pixelSize: Style.fontSizeS
 					color: Style.inactiveTextColor
 				}
 				BaseText {
-					width: parent.width * 0.18
+					width: ticketHeaderRow.columnsWidth * 0.18
 					text: qsTr("Assignee")
 					font.bold: true
 					font.pixelSize: Style.fontSizeS
 					color: Style.inactiveTextColor
 				}
 				BaseText {
-					width: parent.width * 0.14
+					width: ticketHeaderRow.columnsWidth * 0.14
 					text: qsTr("Created")
 					font.bold: true
 					font.pixelSize: Style.fontSizeS
@@ -267,12 +271,16 @@ Item {
 			onItemClicked: root.openTicket(ticketDelegate.itemId)
 
 			Row {
+				id: ticketDataRow
 				width: parent.width
 				spacing: Style.marginL
 
+				readonly property int columnCount: 5
+				readonly property real columnsWidth: width - spacing * (columnCount - 1)
+
 				Text {
 					anchors.verticalCenter: parent.verticalCenter
-					width: parent.width * 0.34
+					width: ticketDataRow.columnsWidth * 0.34
 					text: (ticketDelegate.ticket && ticketDelegate.ticket.number
 						? "#" + ticketDelegate.ticket.number + "  " : "")
 						+ (ticketDelegate.ticket ? ticketDelegate.ticket.title : "")
@@ -284,14 +292,14 @@ Item {
 
 				Item {
 					anchors.verticalCenter: parent.verticalCenter
-					width: parent.width * 0.14
+					width: ticketDataRow.columnsWidth * 0.14
 					height: Style.controlHeightM
 
 					Rectangle {
 						anchors.left: parent.left
 						anchors.verticalCenter: parent.verticalCenter
-						width: statusLabel.implicitWidth + Style.marginM
-						height: Style.controlHeightM
+						width: statusLabel.implicitWidth + Style.marginL
+						height: Style.buttonHeightS
 						radius: height / 2
 						color: ticketDelegate.ticket
 							? (ticketDelegate.statusColors[ticketDelegate.ticket.status] || Style.buttonInactiveTextColor)
@@ -311,14 +319,14 @@ Item {
 
 				Item {
 					anchors.verticalCenter: parent.verticalCenter
-					width: parent.width * 0.14
+					width: ticketDataRow.columnsWidth * 0.14
 					height: Style.controlHeightM
 
 					Rectangle {
 						anchors.left: parent.left
 						anchors.verticalCenter: parent.verticalCenter
-						width: priorityLabel.implicitWidth + Style.marginM
-						height: Style.controlHeightM
+						width: priorityLabel.implicitWidth + Style.marginL
+						height: Style.buttonHeightS
 						radius: height / 2
 						color: ticketDelegate.ticket
 							? (ticketDelegate.priorityColors[ticketDelegate.ticket.priority] || Style.buttonInactiveTextColor)
@@ -338,7 +346,7 @@ Item {
 
 				Text {
 					anchors.verticalCenter: parent.verticalCenter
-					width: parent.width * 0.18
+					width: ticketDataRow.columnsWidth * 0.18
 					text: ticketDelegate.ticket ? ticketDelegate.ticket.assignee : ""
 					font.pixelSize: Style.fontSizeM
 					color: Style.inactiveTextColor
@@ -347,7 +355,7 @@ Item {
 
 				Text {
 					anchors.verticalCenter: parent.verticalCenter
-					width: parent.width * 0.14
+					width: ticketDataRow.columnsWidth * 0.14
 					text: ticketDelegate.ticket ? ticketDelegate.formatTimestamp(ticketDelegate.ticket.createdAt) : ""
 					font.pixelSize: Style.fontSizeM
 					color: Style.inactiveTextColor

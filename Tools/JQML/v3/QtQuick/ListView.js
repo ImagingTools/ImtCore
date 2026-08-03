@@ -118,41 +118,55 @@ class ListView extends Flickable {
         this.positionViewAtIndex(0, ListView.Beginning)
     }
     positionViewAtEnd() {
-        this.positionViewAtIndex(Object.keys(this.__items).pop(), ListView.Beginning)
-
-
+        this.positionViewAtIndex(this.count - 1, ListView.End)
     }
     positionViewAtIndex(index, mode) {
-        let pos = 'start'
-        switch(mode){
-            case ListView.Beginning: pos = 'start'; break;
-            case ListView.Center: pos = 'center'; break;
-            case ListView.End: pos = 'end'; break;
-            case ListView.Visible: break;
+        index = Number(index)
+        if (!Number.isFinite(index) || index < 0 || index >= this.count) return
+
+        let horizontal = this.orientation === ListView.Horizontal
+        let viewSize = horizontal ? this.width : this.height
+        let contentSize = horizontal ? this.contentWidth : this.contentHeight
+        if (contentSize <= viewSize) return
+
+        let item = this.__items[index]
+        let origin = horizontal ? this.originX : this.originY
+        let itemSize = item
+            ? (horizontal ? item.width : item.height)
+            : (horizontal ? this.__middleWidth : this.__middleHeight)
+        // An index outside the materialised window has no item yet, so its place
+        // is estimated from the average item size, exactly as __getItemInfo does.
+        let itemPos = item
+            ? (horizontal ? item.x : item.y)
+            : origin + (itemSize + this.spacing) * index
+        let contentPos = horizontal ? this.contentX : this.contentY
+        let target = contentPos
+
+        switch (mode) {
+            case ListView.Beginning: target = itemPos; break
+            case ListView.Center: target = itemPos + itemSize / 2 - viewSize / 2; break
+            case ListView.End: target = itemPos + itemSize - viewSize; break
+            case ListView.Visible:
             case ListView.Contain: {
-                if(this.__items[index]){
-                    if(this.orientation === ListView.Horizontal){
-                        if(this.contentWidth <= this.width) return
-
-                        if(this.__items[index].x <= this.contentX){
-                            this.contentX = this.__items[index].x
-                        } else if(this.__items[index].x + this.__items[index].width >= this.contentX + this.width){
-                            this.contentX = this.__items[index].x + this.__items[index].width - this.width
-                        }
-                    } else {
-                        if(this.contentHeight <= this.height) return
-
-                        if(this.__items[index].y <= this.contentY){
-                            this.contentY = this.__items[index].y
-                        } else if(this.__items[index].y + this.__items[index].height >= this.contentY + this.height){
-                            this.contentY = this.__items[index].y + this.__items[index].height - this.height
-                        }
-                    }
+                if (itemPos < contentPos) {
+                    target = itemPos
+                } else if (itemPos + itemSize > contentPos + viewSize) {
+                    target = itemPos + itemSize - viewSize
                 }
-                break;
+                break
             }
+            default: return
         }
 
+        let maxPos = origin + contentSize - viewSize
+        if (target > maxPos) target = maxPos
+        if (target < origin) target = origin
+
+        if (horizontal) {
+            this.contentX = target
+        } else {
+            this.contentY = target
+        }
     }
 
     __moveCurrentIndex(direction){
@@ -549,13 +563,10 @@ class ListView extends Flickable {
 
             if (length === 0) return
 
-            let countChanged = false
-
-            if (this.count !== length) {
-                countChanged = true
-            }
-
-            this.__self.count = length
+            // Through the property setter, not __self: a raw write skips the change
+            // notification, and the countChanged() emitted by hand later in the same
+            // update batch is dropped, so bindings on count keep the stale value.
+            this.count = length
             this.__normalizeCurrentIndex(length)
 
             JQApplication.beginUpdate()
@@ -571,8 +582,6 @@ class ListView extends Flickable {
                     break
                 }
             }
-
-            if (countChanged) this.countChanged()
 
             JQApplication.endUpdate()
         }
@@ -628,7 +637,6 @@ class ListView extends Flickable {
 
     __updateView() {
         if (this.delegate && this.model && this.__completed) {
-            this.__updating = true
             let length = 0
             if (Array.isArray(this.model)) {
                 length = this.model.length
@@ -642,16 +650,16 @@ class ListView extends Flickable {
 
             if (length === 0 && Object.keys(this.__items).length === 0) return
 
+            // Set only past the early exits: a leftover flag stops __endUpdate from
+            // ever calling this again, which freezes the view at its first batch.
+            this.__updating = true
+
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)
 
-            let countChanged = false
-
-            if (this.count !== length) {
-                countChanged = true
-            }
-
-            this.__self.count = length
+            // See __initView: count has to go through the property setter, or the
+            // bindings that depend on it are never re-evaluated.
+            this.count = length
 
             let changeSet = this.__changeSet
             this.__changeSet = []
@@ -809,8 +817,6 @@ class ListView extends Flickable {
                 }
             }
 
-            if (countChanged) this.countChanged()
-
             JQApplication.endUpdate()
             delete this.__updating
         }
@@ -901,6 +907,7 @@ class ListView extends Flickable {
         }
 
         let model = this.model
+        let length = 0
         if (Array.isArray(model)) {
             length = model.length
         } else if (typeof model === 'object') {

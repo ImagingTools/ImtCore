@@ -107,7 +107,7 @@ ControlBase {
 	}
 
 	Connections {
-		target: comboBoxContainer.model
+		target: comboBoxContainer.model || null
 		function onModelChanged(){
 			comboBoxContainer.updateText()
 		}

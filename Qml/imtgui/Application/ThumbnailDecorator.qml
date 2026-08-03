@@ -104,7 +104,10 @@ Rectangle {
 		
 		model: pagesManager.pageModel;
 		
-		color: !pagesManager.pageModel.getItemsCount() ? "transparent" : Style.colorMenuPanel !==undefined ? Style.colorMenuPanel : Style.imagingToolsGradient1;
+		// The rail keeps its own colour even before the page list arrives. Left
+		// transparent while empty it showed the window's darker backdrop through
+		// itself, so the panel came up grey and turned white once data landed.
+		color: Style.colorMenuPanel !== undefined ? Style.colorMenuPanel : Style.baseColor;
 		
 		Component.onCompleted: {
 			MainDocumentService.documentOpened.connect(onDocumentOpened);

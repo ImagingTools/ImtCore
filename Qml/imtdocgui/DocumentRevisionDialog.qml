@@ -13,6 +13,12 @@ Dialog {
 	canMove: false;
 	backgroundColor: Style.baseColor;
 
+	// Set on the dialog itself (not on the content item) and mirrored by the
+	// content below - matching ProfileTokensPage's addDialog, which is what
+	// actually keeps this reactive to live window resizes.
+	width: Math.max(Style.sizeHintXXL, Math.min(ModalDialogManager.activeView.width - 100, Style.sizeHintXXXL));
+	height: Math.max(Style.sizeHintXL, Math.min(ModalDialogManager.activeView.height - 100, Style.sizeHintXXL));
+
 	notClosingButtons: Enums.no | Enums.save;
 
 	property string collectionId;
@@ -126,8 +132,13 @@ Dialog {
 	contentComp: Component {
 		Item {
 			id: contentItem;
-			width: Style.sizeHintXXXL;
-			height: Style.sizeHintXXL;
+			width: documentRevisionDialog.width;
+			// The dialog's own height above is the TOTAL popup size; the title bar
+			// and button row are stacked above/below this content (~120px), so the
+			// content must be shorter than the dialog by that much - otherwise the
+			// whole popup grows past what was computed as "fits the screen" and
+			// the button row is pushed off it.
+			height: documentRevisionDialog.height - 120;
 
 			property alias revisionsCount: historyView.revisionsCount;
 

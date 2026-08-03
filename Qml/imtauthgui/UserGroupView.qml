@@ -62,9 +62,12 @@ ViewBase {
 		function updatePages() {
 			multiPageView.clear()
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
+			// Labelled by what they are *for this group*, so they don't read as the
+			// identically-named top-level Users/Roles collections in
+			// AdministrationView. Page ids stay untouched, they are the API.
 			multiPageView.addPage("ParentGroups", qsTr("Parent Groups"), parentGroupsPageComp, "Icons/Organization")
-			multiPageView.addPage("Users", qsTr("Users"), usersPageComp, "Icons/MultipleUser")
-			multiPageView.addPage("Roles", qsTr("Roles"), rolesPageComp, "Icons/Role")
+			multiPageView.addPage("Users", qsTr("Members"), usersPageComp, "Icons/MultipleUser")
+			multiPageView.addPage("Roles", qsTr("Assigned Roles"), rolesPageComp, "Icons/Role")
 			if (PermissionsController.checkPermission("ViewRevisions")){
 				multiPageView.addPage("History", qsTr("History"), historyPageComp, "Icons/History")
 			}
@@ -347,7 +350,7 @@ ViewBase {
 
 					GroupHeaderView {
 						width: parent.width;
-						title: qsTr("Users");
+						title: qsTr("Members");
 						groupView: usersGroup;
 					}
 
@@ -445,7 +448,7 @@ ViewBase {
 
 					GroupHeaderView {
 						width: parent.width;
-						title: qsTr("Roles");
+						title: qsTr("Assigned Roles");
 						groupView: rolesGroup;
 					}
 

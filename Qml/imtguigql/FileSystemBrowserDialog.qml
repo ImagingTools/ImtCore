@@ -22,14 +22,9 @@ import imtbaseFileSystemSdl 1.0
 Dialog {
 	id: root
 
-	// A binding (not a one-shot assignment in Component.onCompleted) because the
-	// dialog manager applies ModalDialogManager params - including pathKind and
-	// titleText - only in Loader.onLoaded, which fires AFTER this item's own
-	// Component.onCompleted already ran. A one-shot assignment would always see
-	// the property defaults; this recomputes whenever pathKind/titleText change.
 	title: root.computeTitle()
-	width: 1000
-	height: 800
+	width: Math.max(Style.sizeHintXXL, Math.min(ModalDialogManager.activeView.width - 100, 1000))
+	height: Math.max(Style.sizeHintXL, Math.min(ModalDialogManager.activeView.height - 100, 800))
 	modal: true
 	centered: true
 	backgroundColor: Style.baseColor

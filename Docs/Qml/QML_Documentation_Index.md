@@ -9,6 +9,7 @@ Willkommen zur QML- und JQML-Dokumentation des ImtCore SDK. Diese Dokumentation 
 | **[Getting Started](QML_Getting_Started.md)** | Einstieg in die QML-Entwicklung mit ImtCore | ⭐ START HIER |
 | **[Modul-Referenz](QML_Module_Reference.md)** | Detaillierte Referenz aller QML-Module und Komponenten | Nachschlagewerk |
 | **[JQML Guide](QML_JQML_Guide.md)** | JQML-Versionen, Web-Kompilierung, Cross-Platform-Entwicklung | Web-Deployment |
+| **[JQML v3 Fixes (RU)](JQML_V3_Fixes.ru.md)** | Begründung der Compiler- und Runtime-Korrekturen in JQML v3 | Wartung |
 | **[Komponenten-Tutorials](QML_Component_Tutorials.md)** | Praktische Tutorials für häufige UI-Muster | Praxis-Beispiele |
 
 ---

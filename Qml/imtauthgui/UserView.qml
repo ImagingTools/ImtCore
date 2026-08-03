@@ -93,8 +93,11 @@ DocumentViewBase {
 		function updatePages() {
 			multiPageView.clear()
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
-			multiPageView.addPage("Roles", qsTr("Roles"), rolesPageComp, "Icons/Role")
-			multiPageView.addPage("Groups", qsTr("Groups"), groupsPageComp, "Icons/Organization")
+			// Labelled by what they are *for this user*, so they don't read as the
+			// identically-named top-level Roles/Groups collections in
+			// AdministrationView. Page ids stay untouched, they are the API.
+			multiPageView.addPage("Roles", qsTr("Assigned Roles"), rolesPageComp, "Icons/Role")
+			multiPageView.addPage("Groups", qsTr("Group Membership"), groupsPageComp, "Icons/Organization")
 			if (PermissionsController.checkPermission("ViewRevisions")){
 				multiPageView.addPage("History", qsTr("History"), historyPageComp, "Icons/History")
 			}
@@ -410,7 +413,7 @@ DocumentViewBase {
 
 					GroupHeaderView {
 						width: parent.width;
-						title: qsTr("Roles");
+						title: qsTr("Assigned Roles");
 						groupView: rolesGroup;
 					}
 
@@ -511,7 +514,7 @@ DocumentViewBase {
 					GroupHeaderView {
 						width: parent.width;
 						
-						title: qsTr("Groups");
+						title: qsTr("Group Membership");
 						groupView: groupsBlock;
 					}
 					
