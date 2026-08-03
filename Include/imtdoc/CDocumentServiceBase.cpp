@@ -223,6 +223,7 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 	QByteArray userId = params.userId;
 	QByteArray documentTypeId = params.documentTypeId;
 	const istd::IChangeable* defaultDataPtr = params.defaultDataPtr;
+	const iprm::IParamsSet* initParamsPtr = params.initParamsPtr;
 	QThread* thread = new QThread();
 	QObject* worker = new QObject();
 	worker->moveToThread(thread);
@@ -280,7 +281,7 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 	});
 
 	// Initialize observers and fire events in the main thread after background work completes
-	QObject::connect(thread, &QThread::finished, QCoreApplication::instance(), [this, aliveGuard, userId, documentId, taskId](){
+	QObject::connect(thread, &QThread::finished, QCoreApplication::instance(), [this, aliveGuard, userId, documentId, taskId, initParamsPtr](){
 		auto isAlive = aliveGuard.lock();
 		if (!isAlive || !isAlive->load()){
 			return;
@@ -291,6 +292,17 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 			WorkingDocument* docPtr = FindDocument(userId, documentId);
 
 			if (docPtr == nullptr || !docPtr->objectPtr.IsValid() || !docPtr->isLoading){
+				return;
+			}
+
+			QString errorMessage;
+			if (!OnDocumentCreated(docPtr->typeId, initParamsPtr, *docPtr->objectPtr, errorMessage)){
+				docPtr->isLoading = false;
+				CloseDocumentInternal(userId, documentId);
+				if (errorMessage.isEmpty()){
+					errorMessage = QStringLiteral("Document initialization failed");
+				}
+				CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), errorMessage});
 				return;
 			}
 
@@ -675,6 +687,8 @@ int CDocumentServiceBase::GetUndoManagerNextModelId(const QByteArray& /*userId*/
 		retVal++;
 	}
 }
+
+
 
 
 void CDocumentServiceBase::InitializeDocumentObservers(

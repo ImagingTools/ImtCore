@@ -9,6 +9,7 @@
 
 // ImtCore includes
 #include <imtdoc/CDocumentServiceBase.h>
+#include <imtdoc/IDocumentInitDelegate.h>
 #include <imtdoc/IDocumentNameProvider.h>
 #include <imtdoc/IDocumentValidator.h>
 
@@ -58,6 +59,7 @@ public:
 		I_ASSIGN_MULTI_0(m_documentNameProviderCompPtr, "DocumentNameProviders", "List of document name providers related to registered type-IDs ('ObjectTypeIdList')", false);
 		I_ASSIGN_MULTI_0(m_objectFactListCompPtr, "ObjectFactories", "List of object factories related to registered type-IDs ('ObjectTypeIdList')", true);
 		I_ASSIGN_MULTI_0(m_documentValidatorCompPtr, "DocumentValidators", "List of document data validators related to registered type-IDs ('ObjectTypeIdList')", false);
+		I_ASSIGN_MULTI_0(m_documentInitDelegateCompPtr, "DocumentInitDelegates", "List of document initialization delegates related to registered type-IDs ('ObjectTypeIdList')", false);
 	I_END_COMPONENT
 
 protected:
@@ -72,6 +74,7 @@ protected:
 	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentServiceEventHandlers() const override;
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const override;
 	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override;
+	virtual bool OnDocumentCreated(const QByteArray& typeId, const iprm::IParamsSet* initParams, istd::IChangeable& document, QString& errorMessage) override;
 
 private:
 	// Reserve 170000000-170000099 for imtdoc validation warnings to avoid collisions with other message IDs.
@@ -81,6 +84,7 @@ private:
 	int GetObjectFactoryIndex(const QByteArray& typeId) const;
 	const imtdoc::IDocumentNameProvider* GetDocumentNameProvider(const QByteArray& typeId) const;
 	const imtdoc::IDocumentValidator* GetDocumentValidator(const QByteArray& typeId) const;
+	imtdoc::IDocumentInitDelegate* GetDocumentInitDelegate(const QByteArray& typeId) const;
 
 protected:
 	I_MULTIREF(imtdoc::IDocumentServiceEventHandler, m_handlerCompPtr);
@@ -89,6 +93,7 @@ protected:
 	I_MULTIREF(imtdoc::IDocumentNameProvider, m_documentNameProviderCompPtr);
 	I_MULTIFACT(istd::IChangeable, m_objectFactListCompPtr);
 	I_MULTIREF(imtdoc::IDocumentValidator, m_documentValidatorCompPtr);
+	I_MULTIREF(imtdoc::IDocumentInitDelegate, m_documentInitDelegateCompPtr);
 };
 
 

@@ -12,18 +12,6 @@ Item {
 	signal commandsReady();
 	signal commandActivated(string commandId, var params);
 	
-	function setNegativeAccentCommandIds(commandIds){
-		leftCommands.negativeAccentCommandIds = commandIds;
-		centerCommands.negativeAccentCommandIds = commandIds;
-		rightCommands.negativeAccentCommandIds = commandIds;
-	}
-	
-	function setPositiveAccentCommandIds(commandIds){
-		leftCommands.positiveAccentCommandIds = commandIds;
-		centerCommands.positiveAccentCommandIds = commandIds;
-		rightCommands.positiveAccentCommandIds = commandIds;
-	}
-	
 	property GuiElementContainer commandsModel: GuiElementContainer {};
 	onCommandsModelChanged: {
 		updateGui()

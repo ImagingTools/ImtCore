@@ -184,6 +184,24 @@ protected:
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const = 0;
 	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const = 0;
 
+	/**
+		\brief Called after a new document is created from the factory but before
+		the undo manager is attached.
+
+		Subclasses must implement to perform initialization that should not
+		generate undo history.
+
+		\param typeId       Registered object type-ID of the document.
+		\param initParams   Optional initialization parameters (may be \c nullptr).
+		\param document     Mutable reference to the document data object.
+		\param errorMessage Out-parameter for a human-readable error
+		                    description when the method returns \c false.
+		\return             \c true on success; \c false if initialization failed
+		                    (e.g.\ init params provided but no delegate registered,
+		                    or the delegate rejected the parameters).
+	*/
+	virtual bool OnDocumentCreated(const QByteArray& typeId, const iprm::IParamsSet* initParams, istd::IChangeable& document, QString& errorMessage) = 0;
+
 	static QString GetInvalidDocumentMessage();
 
 	// reimplemented (imod::CMultiModelObserverBase)

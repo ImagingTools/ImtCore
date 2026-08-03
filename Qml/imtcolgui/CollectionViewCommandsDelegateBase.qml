@@ -62,8 +62,6 @@ ViewCommandsDelegateBase {
 			if (collectionView.dataController){
 				controllerConnections.target = collectionView.dataController;
 			}
-
-			updateBaseCommandsAccent()
 		}
 	}
 
@@ -94,7 +92,6 @@ ViewCommandsDelegateBase {
 		target: null
 
 		function onSelectionChanged(selectedIds, selectedIndexes){
-			collectionViewCommandsDelegate.updateBaseCommandsAccent();
 			collectionViewCommandsDelegate.updateItemSelection(selectedIndexes);
 
 			collectionViewCommandsDelegate.selectionChanged(selectedIds, selectedIndexes);
@@ -157,32 +154,6 @@ ViewCommandsDelegateBase {
 	function getContextMenuModel(){
 		return collectionViewCommandsDelegate.contextMenuModel;
 	}
-
-	function updateBaseCommandsAccent(){
-		let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
-		let isEnabled = indexes.length > 0;
-
-		let commandsView = collectionViewCommandsDelegate.collectionView.commandsView;
-		if (commandsView){
-			if (commandsView.setPositiveAccentCommandIds !== undefined){
-				commandsView.setPositiveAccentCommandIds(["New"]);
-			}
-
-			if (isEnabled){
-				if (commandsView.setNegativeAccentCommandIds !== undefined){
-					commandsView.setNegativeAccentCommandIds(["Remove"]);
-				}
-
-				if (commandsView.setPositiveAccentCommandIds !== undefined){
-					commandsView.setPositiveAccentCommandIds(["Edit"]);
-				}
-			}
-		}
-
-		collectionViewCommandsDelegate.updateCustomCommandsAccent();
-	}
-
-	function updateCustomCommandsAccent(){}
 
 	function updateItemSelection(selectedItems){
 		if (collectionViewCommandsDelegate.collectionView && collectionViewCommandsDelegate.collectionView.commandsController){

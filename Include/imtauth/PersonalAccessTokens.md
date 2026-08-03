@@ -200,6 +200,12 @@ tokenManager->DeleteToken(tokenId);
 - Revoked tokens are immediately invalidated
 - Token validation is constant-time to prevent timing attacks
 - All datetime comparisons use UTC to ensure consistency
+- Requested scopes are validated on creation: a non-admin caller can only
+  grant scopes contained in their own effective permissions (tenant-adapted,
+  i.e. what the user actually possesses in the current organization context),
+  so a token can never carry permissions its creator does not have themselves.
+  The scope tree offered by the UI (`GetUserPermissions`) is filtered to the
+  same effective permission set.
 
 ## Database Schema
 

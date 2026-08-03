@@ -129,7 +129,19 @@ sdl::V1_0::imtauth::CGetProductPermissionsPayload CPermissionsProviderComp::OnGe
 	QSet<QByteArray> allowedPermissions;
 	const QSet<QByteArray>* allowedPermissionsPtr = nullptr;
 	if (!userInfoPtr->IsAdmin()){
-		const imtauth::IUserInfo::FeatureIds userPermissions = userInfoPtr->GetPermissions(productId);
+		// Use the tenant-adapted effective permission set (same adaptation as
+		// GetProfile): only permissions the user actually possesses in the
+		// current tenant context - or true globals for "No Organization" -
+		// may be offered, e.g. as personal access token scopes.
+		const imtauth::IUserInfo::FeatureIds userPermissions = GetEffectiveUserPermissions(
+					gqlContextPtr->GetUserId(),
+					*userInfoPtr,
+					gqlContextPtr->GetTenantId(),
+					productId,
+					m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr,
+					m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr,
+					m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
+					m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr);
 		for (const QByteArray& permissionId : userPermissions){
 			QByteArray normalizedPermissionId = permissionId.trimmed();
 			if (!normalizedPermissionId.isEmpty()){
