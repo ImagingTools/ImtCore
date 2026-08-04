@@ -915,11 +915,17 @@ class ListView extends Flickable {
         let visibleContentWidth = 0
         let visibleContentHeight = 0
 
+        let maxWidth = 0
+        let maxHeight = 0
+
         for (let i in this.__items) {
             let index = Number(i)
             if (this.__items[i]) {
                 if (isNaN(this.__items[i].width) || this.__items[i].width === Infinity || this.__items[i].width === -Infinity ||
                     isNaN(this.__items[i].height) || this.__items[i].height === Infinity || this.__items[i].height === -Infinity) continue
+
+                if (this.__items[i].width > maxWidth) maxWidth = this.__items[i].width
+                if (this.__items[i].height > maxHeight) maxHeight = this.__items[i].height
 
                 visibleCount++
                 visibleContentWidth += this.__items[i].width
@@ -946,7 +952,7 @@ class ListView extends Flickable {
             let originX = (minX - firstIndex * (Math.round(middleWidth + this.spacing)))
             if (originX !== Infinity && originX !== -Infinity) this.originX = originX
 
-            Geometry.setAuto(this.__self, 'contentHeight', this.height, this.__self.constructor.meta.contentHeight)
+            Geometry.setAuto(this.__self, 'contentHeight', Math.max(this.height, maxHeight), this.__self.constructor.meta.contentHeight)
             // this.__getDataQml('contentHeight').__setAuto(this.height)
         } else {
             this.contentHeight = visibleContentHeight + Math.round(middleHeight) * (length - visibleCount) + this.spacing * (length - 1)
@@ -954,7 +960,7 @@ class ListView extends Flickable {
             if (originY !== Infinity && originY !== -Infinity) this.originY = originY
 
             // this.__getDataQml('contentWidth').__setAuto(this.width)
-            Geometry.setAuto(this.__self, 'contentWidth', this.width, this.__self.constructor.meta.contentWidth)
+            Geometry.setAuto(this.__self, 'contentWidth', Math.max(this.width, maxWidth), this.__self.constructor.meta.contentWidth)
         }
     }
 

@@ -24,131 +24,200 @@ class MapItemView extends QtObject {
     })
 
 
-    __items = []
+    __items = {}
+    __changeSet = []
 
     __complete(){
         this.__initView(true)
         super.__complete()
     }
 
-    SLOT_modelChanged(oldValue, newValue){
+    SLOT_modelChanged(oldValue, newValue) {
         this.__clear()
-        
-        if(oldValue && typeof oldValue === 'object' && !oldValue.__destroyed){
+
+        if (oldValue && typeof oldValue === 'object' && !Array.isArray(oldValue) && !oldValue.__destroyed) {
             oldValue.__removeViewListener(this)
         }
 
-        if(newValue && typeof newValue === 'object'){
+        if (newValue && typeof newValue === 'object' && !Array.isArray(newValue)) {
             newValue.__addViewListener(this)
         }
 
-        this.__initView(this.__completed)
+        this.__initView(true)
     }
 
-    SLOT_delegateChanged(oldValue, newValue){
+    SLOT_delegateChanged() {
         this.__clear()
         this.__initView(this.__completed)
     }
 
-    __clear(){
-        let removed = this.__items
-        this.__items = []
+    __clear() {
+        this.blockSignals(true)
+        this.__changeSet = []
 
-        for(let r of removed){
-            if(r) r.destroy()
+        let removed = this.__items
+        this.__items = {}
+
+        for (let r in removed) {
+            if (removed[r]) removed[r].destroy()
         }
+
+        this.blockSignals(false)
 
         this.count = 0
     }
 
-    __createItem(model){
-        let item = this.delegate.createObject(this.parent, {model:model}, true)
+    __createItem(index) {
+        let properties = {}
+
+        if (Array.isArray(this.model)) {
+            properties.modelData = this.model[index]
+            properties.model = { index: index }
+        } else if (typeof this.model === 'object') {
+            properties.model = this.model.data[index]
+        } else {
+            properties.model = { index: index }
+        }
+
+        let item = null
+        item = this.delegate.createObject(this.parent, properties, true)
+
+        this.__items[index] = item
         item.__updateFeature(true)
 
         return item
     }
 
-    __initView(isCompleted){
-        if(this.delegate && this.model && isCompleted){
-            JQApplication.beginUpdate()
-            JQApplication.updateLater(this)
+    __updateChangedSet(changeSet) {
+        this.__changeSet.push(changeSet)
+        if (this.model && typeof this.model === 'object') {
+            this.count = this.model.count
+        }
+    }
+
+    __normalizeItemsIndex() {
+        let temp = this.__items
+        this.__items = {}
+        for(let i in temp){
+            let index = temp[i].index
+            if(index >= 0 && Number.isFinite(index))
+            this.__items[index] = temp[i]
+        }
+    }
+
+    __initView(isCompleted) {
+        if (this.delegate && this.model && isCompleted) {
+            let length = 0
+            if (Array.isArray(this.model)) {
+                length = this.model.length
+            } else if (typeof this.model === 'object') {
+                length = this.model.count
+            } else if (typeof this.model === 'number') {
+                length = this.model
+            } else {
+                return
+            }
+
+            if (length === 0) return
 
             let countChanged = false
 
-            if(typeof this.model === 'number'){
-                if(this.count !== this.model){
-                    countChanged = true
-                    this.__self.count = this.model
-                    this.count = this.model
-                }
-
-                for(let i = 0; i < this.model; i++){
-                    let item = this.__createItem({index: i})
-                    this.__items.push(item)
-                }
-            } else {
-                if(this.count !== this.model.data.length){
-                    countChanged = true
-                    this.__self.count = this.model.data.length
-                    this.count = this.model.data.length
-                }
-
-                for(let i = 0; i < this.model.data.length; i++){
-                    let item = this.__createItem(this.model.data[i])
-                    this.__items.push(item)
-                }
+            if (this.count !== length) {
+                countChanged = true
             }
 
-            if(countChanged) this.__proxy.countChanged()
+            this.__self.count = length
+
+            JQApplication.beginUpdate()
+            JQApplication.updateLater(this)
+
+            for (let i = 0; i < length; i++) {
+                this.__createItem(i)
+            }
+
+            if (countChanged) this.countChanged()
 
             JQApplication.endUpdate()
         }
     }
 
-    __updateView(changeSet){
-        if(this.delegate && this.model && this.__completed){
-            JQApplication.beginUpdate()
-            JQApplication.updateLater(this.parent)
-
-            if(this.model.data.length === this.__items.length) {
-                for(let i = 0; i < this.model.data.length; i++){
-                    this.__items[i].JQAbstractModel = this.model.data[i]
-                }
+    __updateView() {
+        if (this.delegate && this.model && this.__completed) {
+            this.__updating = true
+            let length = 0
+            if (Array.isArray(this.model)) {
+                length = this.model.length
+            } else if (typeof this.model === 'object') {
+                length = this.model.count
+            } else if (typeof this.model === 'number') {
+                length = this.model
             } else {
-                let countChanged = false
-
-                if(this.count !== this.model.data.length){
-                    countChanged = true
-                    this.__self.count = this.model.data.length
-                }
-
-                for(let change of changeSet){
-                    let leftTop = change[0]
-                    let bottomRight = change[1]
-                    let role = change[2]
-
-                    if(role === 'append'){
-                        for(let i = leftTop; i < bottomRight; i++){
-                            let item = this.__createItem(this.model.data[i])
-                            this.__items[i] = item
-                        }
-                    } else if(role === 'insert'){
-                        for(let i = leftTop; i < bottomRight; i++){
-                            let item = this.__createItem(this.model.data[i])
-                            this.__items.splice(i, 0, item)
-                        }
-                    } else if(role === 'remove'){
-                        let removed = this.__items.splice(leftTop, bottomRight - leftTop)
-                        for(let r of removed){
-                            if(r) r.destroy()
-                        }
-                    }
-                }
-
-                if(countChanged) this.__proxy.countChanged()
+                return
             }
 
+            if (length === 0 && Object.keys(this.__items).length === 0) return
+
+            JQApplication.beginUpdate()
+            JQApplication.updateLater(this)
+
+            let countChanged = false
+
+            if (this.count !== length) {
+                countChanged = true
+            }
+
+            this.__self.count = length
+
+            let changeSet = this.__changeSet
+            this.__changeSet = []
+
+            if(changeSet.length > 0){
+                let i = 0
+                while(i < changeSet.length - 1){
+                    if(changeSet[i][0] === changeSet[i+1][0] && changeSet[i][1] === changeSet[i+1][1] && 
+                        (changeSet[i][2] === 'append' || changeSet[i][2] === 'insert') && changeSet[i+1][2] === 'remove'){
+                            changeSet.splice(i, 2)
+                    } else {
+                        i++
+                    }
+                }
+            }
+
+            for (let change of changeSet) {
+                let leftTop = change[0]
+                let bottomRight = change[1]
+                let role = change[2]
+
+                if (role === 'append') {
+                    for (let i = leftTop; i < bottomRight; i++) {
+                        this.__createItem(i)
+                    }
+                } else if (role === 'insert') {
+                    this.__normalizeItemsIndex()
+                    
+                    for (let i = leftTop; i < bottomRight; i++) {
+                        this.__createItem(i)
+                    }
+                } else if (role === 'remove') {
+                    let leftTopItem = this.__items[leftTop]
+                    let bottomRightItem = this.__items[bottomRight]
+
+                    for(let i = leftTop; i < bottomRight; i++){
+                        if(this.__items[i]){
+                           this.__items[i].destroy()
+                            delete this.__items[i] 
+                        }
+                        
+                    }
+
+                    this.__normalizeItemsIndex()
+                }
+            }
+
+            if (countChanged) this.countChanged()
+
             JQApplication.endUpdate()
+            delete this.__updating
         }
     }
 
