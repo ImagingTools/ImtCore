@@ -610,6 +610,16 @@ protected:
 		return true;
 	}
 
+	// reimplemented (CDocumentServiceBase)
+	virtual bool OnDocumentCreated(
+		const QByteArray& /*typeId*/,
+		const iprm::IParamsSet* /*initParams*/,
+		istd::IChangeable& /*document*/,
+		QString& /*errorMessage*/) override
+	{
+		return true;
+	}
+
 private:
 	CMockObjectCollection m_mockCollection;
 	CMockEventHandler m_mockEventHandler;
