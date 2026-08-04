@@ -140,6 +140,7 @@ class Property extends BaseObject {
         // }
 
         let oldValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
+        let middleValue = oldValue
 
         if(typeof value === 'function'){
             try {
@@ -150,7 +151,7 @@ class Property extends BaseObject {
                     meta: meta,
                     func: value,
                 })
-                target[name] = this.typeCasting(value.call(target))
+                middleValue = this.typeCasting(value.call(target))
             } catch(error) {
                 if(location.hash === '#jqdebugdetail')console.error(error)
             } finally {
@@ -159,7 +160,7 @@ class Property extends BaseObject {
             }
         } else {
             try {
-                target[name] = this.typeCasting(value)
+                middleValue = this.typeCasting(value)
             } catch (error) {
                 if(location.hash === '#jqdebugdetail')console.error(error)
             }
@@ -167,8 +168,9 @@ class Property extends BaseObject {
 
         let currentValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
 
-        if(oldValue !== currentValue){
-            target.constructor.meta[name + 'Changed'].type.get(target, name + 'Changed')(oldValue, currentValue)
+        if(oldValue !== middleValue && oldValue === currentValue){
+            target[name] = middleValue
+            target.constructor.meta[name + 'Changed'].type.get(target, name + 'Changed')(oldValue, middleValue)
         }
 
         return true

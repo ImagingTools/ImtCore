@@ -268,6 +268,9 @@ class BaseModel extends ListModel {
 	}
 
 	containsKey(key, index){
+		if (index < 0 || index >= this.count){
+			return false
+		}
 		return this.get(index).item[key] != undefined
 	}
 
