@@ -223,9 +223,8 @@ function(jqml_compile_web2)
 endfunction(jqml_compile_web2)
 
 function(jq_compile_web)
-	# set(QRC_WEB_FILE ${buildwebdir}/Resources/${PROJECT_NAME}JsWeb.qrc)
 	set(QRC_WEB_FILE ${buildwebdir}/Resources/qmlJsWeb.qrc)
-	set(QRC_CPP_WEB_FILE ${buildwebdir}/Resources/qrc_${PROJECT_NAME}Web.cpp)
+	set(QRC_CPP_WEB_FILE ${buildwebdir}/Resources/qrc_${resname}Web.cpp)
 
 	if(NOT PYTHONEXE)
 		set(PYTHONEXE "$ENV{PYTHONEXE}")
@@ -319,7 +318,7 @@ function(jq_compile_web)
 		COMMAND
 		Qt${QT_VERSION_MAJOR}::rcc
 		ARGS
-		-name ${PROJECT_NAME}Web
+		-name ${resname}Web
 		${QRC_WEB_FILE}
 		-o ${QRC_CPP_WEB_FILE}
 		DEPENDS
@@ -330,11 +329,11 @@ function(jq_compile_web)
 	)
 
 	add_custom_target(
-		WebCompiler${PROJECT_NAME} ALL
+		WebCompiler${resname} ALL
 		DEPENDS ${QRC_CPP_WEB_FILE}
 	)
 
-	add_dependencies(WebCompiler${PROJECT_NAME} ${PROJECT_NAME})
+add_dependencies(WebCompiler${resname} ${PROJECT_NAME})
 
 	set(QRC_QRC_FILES)
 
