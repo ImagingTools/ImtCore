@@ -3,7 +3,6 @@
 
 
 // ImtCore includes
-#include <iqt/iqt.h>
 #include <imtauth/CRole.h>
 
 
@@ -29,7 +28,7 @@ QString CRoleChangeGeneratorComp::GetRoleName(const QByteArray& roleId) const
 		}
 	}
 
-	return QString();
+	return roleId;
 }
 
 
@@ -53,58 +52,41 @@ bool CRoleChangeGeneratorComp::CompareDocuments(
 		return false;
 	}
 
-	QByteArray oldRoleId = oldRoleInfoPtr->GetRoleId();
-	QByteArray newRoleId = newRoleInfoPtr->GetRoleId();
-	if (oldRoleId != newRoleId){
-		QString keyName = QT_TRANSLATE_NOOP("Attribute", "Role-ID");
-		InsertOperationDescription(documentChangeCollection, "", "RoleId", keyName, oldRoleId, newRoleId);
-	}
+	InsertChange(documentChangeCollection, "RoleId", QT_TRANSLATE_NOOP("Attribute", "Role-ID"), oldRoleInfoPtr->GetRoleId(), newRoleInfoPtr->GetRoleId());
+	InsertTextChange(documentChangeCollection, "Name", QT_TRANSLATE_NOOP("Attribute", "Name"), oldRoleInfoPtr->GetRoleName(), newRoleInfoPtr->GetRoleName());
+	InsertTextChange(documentChangeCollection, "Description", QT_TRANSLATE_NOOP("Attribute", "Description"), oldRoleInfoPtr->GetRoleDescription(), newRoleInfoPtr->GetRoleDescription());
+	InsertChange(documentChangeCollection, "ProductId", QT_TRANSLATE_NOOP("Attribute", "Product-ID"), oldRoleInfoPtr->GetProductId(), newRoleInfoPtr->GetProductId());
+	InsertFlagChange(documentChangeCollection, "Default", QT_TRANSLATE_NOOP("Attribute", "Default Role"), oldRoleInfoPtr->IsDefault(), newRoleInfoPtr->IsDefault());
+	InsertFlagChange(documentChangeCollection, "Guest", QT_TRANSLATE_NOOP("Attribute", "Guest Role"), oldRoleInfoPtr->IsGuest(), newRoleInfoPtr->IsGuest());
 
-	QString oldRoleName = oldRoleInfoPtr->GetRoleName();
-	QString newRoleName = newRoleInfoPtr->GetRoleName();
-	if (oldRoleName != newRoleName){
-		QString keyName = QT_TRANSLATE_NOOP("Attribute", "Name");
-		InsertOperationDescription(documentChangeCollection, "", "Name", keyName, oldRoleName.toUtf8(), newRoleName.toUtf8());
-	}
+	InsertListChanges(
+				documentChangeCollection,
+				"AddParentRole",
+				"RemoveParentRole",
+				"ParentRoleId",
+				QT_TRANSLATE_NOOP("Attribute", "Parent Role"),
+				oldRoleInfoPtr->GetIncludedRoles(),
+				newRoleInfoPtr->GetIncludedRoles());
 
-	QString oldDescription = oldRoleInfoPtr->GetRoleDescription();
-	QString newDescription = newRoleInfoPtr->GetRoleDescription();
-	if (oldDescription != newDescription){
-		QString keyName = QT_TRANSLATE_NOOP("Attribute", "Description");
-		InsertOperationDescription(documentChangeCollection, "", "Description", keyName, oldDescription.toUtf8(), newDescription.toUtf8());
-	}
+	// Only the local permissions are an attribute of this role, the resulting ones also
+	// change whenever a parent role is edited and would report changes nobody made here.
+	InsertListChanges(
+				documentChangeCollection,
+				"AddPermission",
+				"RemovePermission",
+				"Permission",
+				QT_TRANSLATE_NOOP("Attribute", "Permission"),
+				oldRoleInfoPtr->GetLocalPermissions(),
+				newRoleInfoPtr->GetLocalPermissions());
 
-	QByteArrayList oldParentRoles = oldRoleInfoPtr->GetIncludedRoles();
-	QByteArrayList newParentRoles = newRoleInfoPtr->GetIncludedRoles();
-
-	QByteArrayList addedParentRoles;
-	QByteArrayList removedParentRoles;
-	GenerateChanges(oldParentRoles, newParentRoles, addedParentRoles, removedParentRoles);
-
-	for (const QByteArray& parentRoleId : addedParentRoles){
-		QString name = GetRoleName(parentRoleId);
-		InsertOperationDescription(documentChangeCollection, "AddParentRole", "ParentRoleId", name, parentRoleId, parentRoleId);
-	}
-
-	for (const QByteArray& parentRoleId : removedParentRoles){
-		QString name = GetRoleName(parentRoleId);
-		InsertOperationDescription(documentChangeCollection, "RemoveParentRole", "ParentRoleId", name, parentRoleId, parentRoleId);
-	}
-
-	QByteArrayList oldPermissions = oldRoleInfoPtr->GetPermissions();
-	QByteArrayList newPermissions = newRoleInfoPtr->GetPermissions();
-
-	QByteArrayList addedPermissions;
-	QByteArrayList removedPermissions;
-	GenerateChanges(oldPermissions, newPermissions, addedPermissions, removedPermissions);
-
-	for (const QByteArray& permissionId : addedPermissions){
-		InsertOperationDescription(documentChangeCollection, "AddPermission", "Permission", "Permission", permissionId, permissionId);
-	}
-
-	for (const QByteArray& permissionId : removedPermissions){
-		InsertOperationDescription(documentChangeCollection, "RemovePermission", "Permission", "Permission", permissionId, permissionId);
-	}
+	InsertListChanges(
+				documentChangeCollection,
+				"AddProhibition",
+				"RemoveProhibition",
+				"Prohibition",
+				QT_TRANSLATE_NOOP("Attribute", "Prohibition"),
+				oldRoleInfoPtr->GetProhibitions(),
+				newRoleInfoPtr->GetProhibitions());
 
 	return true;
 }
@@ -112,36 +94,39 @@ bool CRoleChangeGeneratorComp::CompareDocuments(
 
 QString CRoleChangeGeneratorComp::CreateCustomOperationDescription(const imtbase::COperationDescription& operationDescription, const QByteArray& languageId) const
 {
-	QString retVal;
+	static const QByteArray translationContext = QByteArrayLiteral("imtauth::CRoleChangeGeneratorComp");
 
-	QByteArray typeId = operationDescription.GetOperationTypeId();
-	QByteArray newValue = operationDescription.GetNewValue();
+	const QByteArray typeId = operationDescription.GetOperationTypeId();
+	const QByteArray oldValue = operationDescription.GetOldValue();
+	const QByteArray newValue = operationDescription.GetNewValue();
 
 	if (typeId == "AddParentRole"){
-		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added parent role '%1'"), languageId, "imtauth::CRoleChangeGeneratorComp");
-		change = change.arg(GetRoleName(newValue));
-		retVal += change;
-	}
-	else if (typeId == "RemoveParentRole"){
-		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed parent role '%1'"), languageId, "imtauth::CRoleChangeGeneratorComp");
-		change = change.arg(GetRoleName(newValue));
-		retVal += change;
-	}
-	else if (typeId == "AddPermission"){
-		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added permission '%1'"), languageId, "imtauth::CRoleChangeGeneratorComp");
-		change = change.arg(qPrintable(newValue));
-		retVal += change;
-	}
-	else if (typeId == "RemovePermission"){
-		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed permission '%1'"), languageId, "imtauth::CRoleChangeGeneratorComp");
-		change = change.arg(qPrintable(newValue));
-		retVal += change;
+		return Translate(QT_TR_NOOP("Added parent role '%1'"), languageId, translationContext).arg(GetRoleName(newValue).toHtmlEscaped());
 	}
 
-	return retVal;
+	if (typeId == "RemoveParentRole"){
+		return Translate(QT_TR_NOOP("Removed parent role '%1'"), languageId, translationContext).arg(GetRoleName(oldValue).toHtmlEscaped());
+	}
+
+	if (typeId == "AddPermission"){
+		return Translate(QT_TR_NOOP("Added permission '%1'"), languageId, translationContext).arg(QString::fromUtf8(newValue).toHtmlEscaped());
+	}
+
+	if (typeId == "RemovePermission"){
+		return Translate(QT_TR_NOOP("Removed permission '%1'"), languageId, translationContext).arg(QString::fromUtf8(oldValue).toHtmlEscaped());
+	}
+
+	if (typeId == "AddProhibition"){
+		return Translate(QT_TR_NOOP("Added prohibition '%1'"), languageId, translationContext).arg(QString::fromUtf8(newValue).toHtmlEscaped());
+	}
+
+	if (typeId == "RemoveProhibition"){
+		return Translate(QT_TR_NOOP("Removed prohibition '%1'"), languageId, translationContext).arg(QString::fromUtf8(oldValue).toHtmlEscaped());
+	}
+
+	return QString();
 }
 
 
 } // namespace imtauth
-
 

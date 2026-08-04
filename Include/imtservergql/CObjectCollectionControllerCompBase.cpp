@@ -686,6 +686,8 @@ sdl::V1_0::imtbase::CSetObjectNamePayload CObjectCollectionControllerCompBase::O
 		return sdl::V1_0::imtbase::CSetObjectNamePayload();
 	}
 
+	CreateElementAttributeHistoryEntry(objectId, "Rename", "Name", QT_TRANSLATE_NOOP("Attribute", "Name"), oldName, newName);
+
 	OnAfterSetObjectName(objectId, oldName, newName, gqlRequest);
 
 	sdl::V1_0::imtbase::CSetObjectNamePayload retVal;
@@ -722,12 +724,18 @@ sdl::V1_0::imtbase::CSetObjectDescriptionPayload CObjectCollectionControllerComp
 		return sdl::V1_0::imtbase::CSetObjectDescriptionPayload();
 	}
 
+	const QString oldDescription = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+
 	istd::CChangeGroup changeGroup(m_objectCollectionCompPtr.GetPtr());
 	if (!m_objectCollectionCompPtr->SetElementDescription(objectId, description)){
 		changeGroup.Reset();
 
 		errorMessage = QString("Unable to set description '%1' for element with ID: '%2'").arg(description, QString::fromUtf8(objectId));
 		return sdl::V1_0::imtbase::CSetObjectDescriptionPayload();
+	}
+
+	if (!IsDescriptionStoredInDocument()){
+		CreateElementAttributeHistoryEntry(objectId, "", "Description", QT_TRANSLATE_NOOP("Attribute", "Description"), oldDescription, description);
 	}
 
 	OnAfterSetObjectDescription(objectId, description, gqlRequest);
@@ -1193,6 +1201,11 @@ sdl::V1_0::imtbase::CInsertNewObjectPayload CObjectCollectionControllerCompBase:
 	istd::IChangeableUniquePtr objectPtr = nullptr;
 	if (!objectData.isEmpty()){
 		objectPtr = CreateObject(typeId);
+		if (!objectPtr.IsValid()){
+			errorMessage = QString("Unable to insert new object to collection '%1'. Error: Object of type '%2' could not be created").arg(QString::fromUtf8(*m_collectionIdAttrPtr), QString::fromUtf8(typeId));
+			return sdl::V1_0::imtbase::CInsertNewObjectPayload();
+		}
+
 		if (!DeSerializeObject(*objectPtr.GetPtr(), objectData)){
 			errorMessage = QString("Unable to insert new object to collection '%1'. Error: Object serialization failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
 			return sdl::V1_0::imtbase::CInsertNewObjectPayload();
@@ -1242,13 +1255,20 @@ sdl::V1_0::imtbase::CSetObjectDataPayload CObjectCollectionControllerCompBase::O
 
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
 
-	istd::IChangeableUniquePtr objectPtr = nullptr;
-	if (!objectData.isEmpty()){
-		objectPtr = CreateObject(typeId);
-		if (!DeSerializeObject(*objectPtr.GetPtr(), objectData)){
-			errorMessage = QString("Unable to set object data to collection '%1'. Error: Object serialization failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
-			return sdl::V1_0::imtbase::CSetObjectDataPayload();
-		}
+	if (objectData.isEmpty()){
+		errorMessage = QString("Unable to set object data to collection '%1'. Error: Object data not provided").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+		return sdl::V1_0::imtbase::CSetObjectDataPayload();
+	}
+
+	istd::IChangeableUniquePtr objectPtr = CreateObject(typeId);
+	if (!objectPtr.IsValid()){
+		errorMessage = QString("Unable to set object data to collection '%1'. Error: Object of type '%2' could not be created").arg(QString::fromUtf8(*m_collectionIdAttrPtr), QString::fromUtf8(typeId));
+		return sdl::V1_0::imtbase::CSetObjectDataPayload();
+	}
+
+	if (!DeSerializeObject(*objectPtr.GetPtr(), objectData)){
+		errorMessage = QString("Unable to set object data to collection '%1'. Error: Object serialization failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+		return sdl::V1_0::imtbase::CSetObjectDataPayload();
 	}
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
@@ -1890,13 +1910,17 @@ QJsonObject CObjectCollectionControllerCompBase::UpdateObject(
 	if (name.length() > 0){
 		QString currentName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 		if (currentName != name){
-			m_objectCollectionCompPtr->SetElementName(objectId, name);
+			if (m_objectCollectionCompPtr->SetElementName(objectId, name)){
+				CreateElementAttributeHistoryEntry(objectId, "Rename", "Name", QT_TRANSLATE_NOOP("Attribute", "Name"), currentName, name);
+			}
 		}
 	}
 
 	QString currentDescription = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 	if (currentDescription != description){
-		m_objectCollectionCompPtr->SetElementDescription(objectId, description);
+		if (m_objectCollectionCompPtr->SetElementDescription(objectId, description) && !IsDescriptionStoredInDocument()){
+			CreateElementAttributeHistoryEntry(objectId, "", "Description", QT_TRANSLATE_NOOP("Attribute", "Description"), currentDescription, description);
+		}
 	}
 
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
@@ -1940,12 +1964,16 @@ QJsonObject CObjectCollectionControllerCompBase::RenameObject(
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
 	QString newName = inputParamPtr->GetParamArgumentValue("newName").toString();
 
+	const QString oldName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+
 	if (!m_objectCollectionCompPtr->SetElementName(objectId, newName)){
 		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(newName, qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
 	}
+
+	CreateElementAttributeHistoryEntry(objectId, "Rename", "Name", QT_TRANSLATE_NOOP("Attribute", "Name"), oldName, newName);
 
 	QJsonObject rootObj;
 	QJsonObject dataObj;
@@ -1980,11 +2008,17 @@ QJsonObject CObjectCollectionControllerCompBase::SetObjectDescription(
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
 	QString description = inputParamPtr->GetParamArgumentValue("description").toString();
 
+	const QString oldDescription = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+
 	if (!m_objectCollectionCompPtr->SetElementDescription(objectId, description)){
 		errorMessage = QString("Unable to set description '%1' for element with ID: '%2'").arg(description, qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
+	}
+
+	if (!IsDescriptionStoredInDocument()){
+		CreateElementAttributeHistoryEntry(objectId, "", "Description", QT_TRANSLATE_NOOP("Attribute", "Description"), oldDescription, description);
 	}
 
 	QJsonObject rootObj;
@@ -3095,12 +3129,82 @@ void CObjectCollectionControllerCompBase::OnAfterSetObjectDescription(
 }
 
 
+bool CObjectCollectionControllerCompBase::IsDescriptionStoredInDocument() const
+{
+	return false;
+}
+
+
 istd::IChangeableUniquePtr CObjectCollectionControllerCompBase::CreateAdaptedObjectData(
 			const QByteArray& /*objectId*/,
 			const istd::IChangeable& /*object*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
 	return istd::IChangeableUniquePtr();
+}
+
+
+bool CObjectCollectionControllerCompBase::CreateElementAttributeHistoryEntry(
+			const QByteArray& objectId,
+			const QByteArray& operationTypeId,
+			const QByteArray& key,
+			const QString& keyName,
+			const QString& oldValue,
+			const QString& newValue) const
+{
+	if (!m_operationContextControllerCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
+		return false;
+	}
+
+	if (oldValue == newValue){
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr) || !dataPtr.IsValid()){
+		SendWarningMessage(
+			0,
+			QString("Unable to write history entry for object '%1'. Error: Object data is not available").arg(QString::fromUtf8(objectId)),
+			"CObjectCollectionControllerCompBase");
+
+		return false;
+	}
+
+	iprm::CParamsSet changeParams;
+
+	iprm::CTextParam keyParam;
+	keyParam.SetText(QString::fromUtf8(key));
+	changeParams.SetEditableParameter("Key", &keyParam);
+
+	iprm::CTextParam keyNameParam;
+	keyNameParam.SetText(keyName);
+	changeParams.SetEditableParameter("KeyName", &keyNameParam);
+
+	iprm::CTextParam oldValueParam;
+	oldValueParam.SetText(oldValue);
+	changeParams.SetEditableParameter("OldValue", &oldValueParam);
+
+	iprm::CTextParam newValueParam;
+	newValueParam.SetText(newValue);
+	changeParams.SetEditableParameter("NewValue", &newValueParam);
+
+	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(
+				operationTypeId, objectId, dataPtr.GetPtr(), &changeParams);
+	if (!operationContextPtr.IsValid()){
+		return false;
+	}
+
+	// Storing the unchanged document body creates the revision that carries the history entry.
+	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *dataPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
+		SendWarningMessage(
+			0,
+			QString("Unable to write history entry for object '%1'. Error: Storing the document revision failed").arg(QString::fromUtf8(objectId)),
+			"CObjectCollectionControllerCompBase");
+
+		return false;
+	}
+
+	return true;
 }
 
 

@@ -489,14 +489,16 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
 	if (m_tableSchemaAttrPtr.IsValid()){
 		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
 	}
-	QByteArray retVal = QString("UPDATE %0 \"%1\" SET \"%2\" = '%3' WHERE \"%4\" = '%5';")
+	// Only the current revision is renamed, older revisions keep the name they were stored with.
+	QByteArray retVal = QString("UPDATE %0 \"%1\" SET \"%2\" = '%3' WHERE \"%4\" = '%5' AND \"%6\" <> 'InActive';")
 						.arg(
 							schemaPrefix,
 							qPrintable(*m_tableNameAttrPtr),
 							qPrintable(s_nameColumn),
 							SqlEncode(newObjectName),
 							qPrintable(s_documentIdColumn),
-							qPrintable(objectId)
+							qPrintable(objectId),
+							qPrintable(s_stateColumn)
 							).toUtf8();
 
 	return retVal;
@@ -513,14 +515,16 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
 	if (m_tableSchemaAttrPtr.IsValid()){
 		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
 	}
-	QByteArray retVal = QString("UPDATE %0 \"%1\" SET \"%2\" = '%3' WHERE \"%4\" = '%5';")
+	// Only the current revision is changed, older revisions keep the description they were stored with.
+	QByteArray retVal = QString("UPDATE %0 \"%1\" SET \"%2\" = '%3' WHERE \"%4\" = '%5' AND \"%6\" <> 'InActive';")
 						.arg(
 							schemaPrefix,
 							qPrintable(*m_tableNameAttrPtr),
 							qPrintable(s_descriptionColumn),
 							SqlEncode(description),
 							qPrintable(s_documentIdColumn),
-							qPrintable(objectId)
+							qPrintable(objectId),
+							qPrintable(s_stateColumn)
 							).toUtf8();
 
 	return retVal;

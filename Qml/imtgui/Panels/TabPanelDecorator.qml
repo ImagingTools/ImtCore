@@ -14,7 +14,6 @@ DecoratorBase {
 	property bool isSelected: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected : false;
 	property bool isHovered: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.mouseArea
 			? tabPanelDecorator.baseElement.mouseArea.containsMouse : false;
-	// Slot is always reserved for closable tabs so hover does not resize the tab.
 	property bool canClose: tabPanelDecorator.baseElement
 			&& !tabPanelDecorator.baseElement.pinned
 			&& tabPanelDecorator.baseElement.isCloseEnable;
@@ -33,8 +32,6 @@ DecoratorBase {
 		}
 	}
 
-	// Light gray hover wash, inset from the tab edges - not on the selected tab,
-	// whose own bottom accent bar already marks it.
 	Rectangle {
 		anchors.fill: tabPanelDecorator;
 		anchors.topMargin: Style.marginXS;
@@ -144,8 +141,6 @@ DecoratorBase {
 			}
 		}
 
-		// Fixed-width close slot: width never collapses, only the glyph fades in/out,
-		// so hovering a tab does not resize it.
 		Item {
 			id: closeSlot;
 
@@ -177,13 +172,8 @@ DecoratorBase {
 		}
 	}
 
-	// Spinner only over the label (not the whole tab / close slot), so a stuck
-	// waitName load cannot block closing the tab.
 	Loading {
 		id: loading;
-		// texttabDelegate is a grandchild (inside the `content` Row), not a
-		// parent or sibling of this item, so it cannot be an anchor target.
-		// Center over it by reading its geometry into a plain binding instead.
 		anchors.verticalCenter: tabPanelDecorator.verticalCenter;
 		x: content.x + texttabDelegate.x + (texttabDelegate.width - width) / 2;
 		width: Style.controlHeightS;
