@@ -679,10 +679,10 @@ Rectangle {
 
 					requestPaintPause.restart()
 
-					if(!found){
-						controlArea.cursorShape = Qt.ClosedHandCursor;
-					}
 
+				}
+				if(!found){
+					controlArea.cursorShape = Qt.OpenHandCursor;
 				}
 			}
 
