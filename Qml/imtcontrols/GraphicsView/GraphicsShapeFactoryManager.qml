@@ -113,6 +113,19 @@ QtObject {
 				let point1 = Qt.point(topLeft.m_x , topLeft.m_y )
 				let point2 = Qt.point(bottomRight.m_x , bottomRight.m_y)
 
+				if(fontFamily == undefined){
+					 fontFamily = Style.fontFamily
+				}
+				if(fontSize == undefined){
+					fontSize = Style.fontSizeM
+				}
+				if(fillStyle == undefined){
+					fillStyle = Style.textColor
+				}
+				if(strokeStyle == undefined){
+					strokeStyle = Style.textColor
+				}
+
 				textObj.points = [point1, point2]
 				textObj.fontFamily = fontFamily
 				textObj.fontSize = fontSize
