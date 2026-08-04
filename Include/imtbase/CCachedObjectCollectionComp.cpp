@@ -201,20 +201,30 @@ bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dat
 		QReadLocker locker(&m_lock);
 
 		CacheItemMap::const_iterator it = m_cacheItems.constFind(objectId);
-		if (it != m_cacheItems.constEnd()){
-			dataPtr = it.value().dataPtr;
+		if (it != m_cacheItems.constEnd() && it.value().dataPtr.IsValid()){
+			// Callers modify the returned object in place, so the cached instance is never handed out.
+			istd::IChangeableUniquePtr clonePtr = it.value().dataPtr->CloneMe();
+			if (clonePtr.IsValid()){
+				dataPtr.FromUnique(std::move(clonePtr));
 
-			return true;
+				return true;
+			}
 		}
 	}
 
 	bool retVal = m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr);
-	if (retVal){
-		QWriteLocker locker(&m_lock);
-		if (m_cacheItems.size() >= *m_objectCacheLimitAttrPtr){
-			RemoveOldestObjectFromCache();
+	if (retVal && dataPtr.IsValid()){
+		istd::IChangeableUniquePtr cachedCopyPtr = dataPtr->CloneMe();
+		if (cachedCopyPtr.IsValid()){
+			DataPtr cachedDataPtr;
+			cachedDataPtr.FromUnique(std::move(cachedCopyPtr));
+
+			QWriteLocker locker(&m_lock);
+			if (m_cacheItems.size() >= *m_objectCacheLimitAttrPtr){
+				RemoveOldestObjectFromCache();
+			}
+			m_cacheItems.insert(objectId, {cachedDataPtr, QDateTime::currentMSecsSinceEpoch()});
 		}
-		m_cacheItems.insert(objectId, {dataPtr, QDateTime::currentMSecsSinceEpoch()});
 	}
 
 	return retVal;

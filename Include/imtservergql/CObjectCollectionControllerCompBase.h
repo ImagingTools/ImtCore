@@ -343,6 +343,13 @@ protected:
 				const imtgql::CGqlRequest& gqlRequest) const;
 
 	/**
+		Tell whether the derived controller mirrors the element description into the document body and
+		therefore writes its own history revision in \ref OnAfterSetObjectDescription. If it returns true,
+		no separate history entry is created for the description, so the history stays free of duplicates.
+	*/
+	virtual bool IsDescriptionStoredInDocument() const;
+
+	/**
 		Create an optionally adapted copy of the collection object before it is serialized
 		as payload of the \c GetObjectData request.
 		The default implementation returns an invalid pointer, meaning the original
@@ -352,6 +359,22 @@ protected:
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
 				const imtgql::CGqlRequest& gqlRequest) const;
+
+	/**
+		Write a change history entry for a collection element attribute that is stored outside of
+		the document body (name, description). Such attributes are not covered by the document
+		comparison, so the entry is created explicitly and stored as a new document revision.
+		Does nothing when no operation context controller is configured.
+		\param operationTypeId	Operation type of the entry, e.g. \c Rename.
+		\return True if the history entry was written.
+	*/
+	bool CreateElementAttributeHistoryEntry(
+				const QByteArray& objectId,
+				const QByteArray& operationTypeId,
+				const QByteArray& key,
+				const QString& keyName,
+				const QString& oldValue,
+				const QString& newValue) const;
 
 	QByteArray ExtractObjectIdFromGetObjectTypeIdGqlRequest(const imtgql::CGqlRequest& gqlRequest) const;
 	QByteArray ExtractObjectIdFromGetObjectDataGqlRequest(const imtgql::CGqlRequest& gqlRequest) const;

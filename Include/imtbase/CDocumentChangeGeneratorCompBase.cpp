@@ -2,12 +2,21 @@
 #include <imtbase/CDocumentChangeGeneratorCompBase.h>
 
 
+// Qt includes
+#include <QtCore/QUuid>
+
 // ACF includes
+#include <iprm/ITextParam.h>
+#include <iprm/TParamsPtr.h>
 #include <iqt/iqt.h>
 
 
 namespace imtbase
 {
+
+
+const QByteArray CDocumentChangeGeneratorCompBase::VALUE_YES = QByteArrayLiteral(QT_TRANSLATE_NOOP("Attribute", "Yes"));
+const QByteArray CDocumentChangeGeneratorCompBase::VALUE_NO = QByteArrayLiteral(QT_TRANSLATE_NOOP("Attribute", "No"));
 
 
 // protected methods
@@ -65,6 +74,142 @@ bool CDocumentChangeGeneratorCompBase::IsUuid(const QByteArray& data) const
 }
 
 
+QString CDocumentChangeGeneratorCompBase::GetTextParamValue(const iprm::IParamsSet* paramsPtr, const QByteArray& paramId)
+{
+	iprm::TParamsPtr<iprm::ITextParam> textParamPtr(paramsPtr, paramId, false);
+	if (textParamPtr.IsValid()){
+		return textParamPtr->GetText();
+	}
+
+	return QString();
+}
+
+
+bool CDocumentChangeGeneratorCompBase::InsertChange(
+	imtbase::CObjectCollection& documentChangeCollection,
+	const QByteArray& key,
+	const QString& keyName,
+	const QByteArray& oldValue,
+	const QByteArray& newValue) const
+{
+	if (oldValue == newValue){
+		return false;
+	}
+
+	return !InsertOperationDescription(documentChangeCollection, "", key, keyName, oldValue, newValue).isEmpty();
+}
+
+
+bool CDocumentChangeGeneratorCompBase::InsertTextChange(
+	imtbase::CObjectCollection& documentChangeCollection,
+	const QByteArray& key,
+	const QString& keyName,
+	const QString& oldValue,
+	const QString& newValue) const
+{
+	if (oldValue == newValue){
+		return false;
+	}
+
+	return InsertChange(documentChangeCollection, key, keyName, oldValue.toUtf8(), newValue.toUtf8());
+}
+
+
+bool CDocumentChangeGeneratorCompBase::InsertFlagChange(
+	imtbase::CObjectCollection& documentChangeCollection,
+	const QByteArray& key,
+	const QString& keyName,
+	bool oldValue,
+	bool newValue) const
+{
+	if (oldValue == newValue){
+		return false;
+	}
+
+	return InsertChange(documentChangeCollection, key, keyName, oldValue ? VALUE_YES : VALUE_NO, newValue ? VALUE_YES : VALUE_NO);
+}
+
+
+bool CDocumentChangeGeneratorCompBase::InsertNumberChange(
+	imtbase::CObjectCollection& documentChangeCollection,
+	const QByteArray& key,
+	const QString& keyName,
+	qint64 oldValue,
+	qint64 newValue) const
+{
+	if (oldValue == newValue){
+		return false;
+	}
+
+	return InsertChange(documentChangeCollection, key, keyName, QByteArray::number(oldValue), QByteArray::number(newValue));
+}
+
+
+bool CDocumentChangeGeneratorCompBase::InsertDateTimeChange(
+	imtbase::CObjectCollection& documentChangeCollection,
+	const QByteArray& key,
+	const QString& keyName,
+	const QDateTime& oldValue,
+	const QDateTime& newValue) const
+{
+	if (oldValue == newValue){
+		return false;
+	}
+
+	static const QString dateTimeFormat = QStringLiteral("yyyy-MM-dd");
+
+	return InsertChange(
+				documentChangeCollection,
+				key,
+				keyName,
+				oldValue.isValid() ? oldValue.toString(dateTimeFormat).toUtf8() : QByteArray(),
+				newValue.isValid() ? newValue.toString(dateTimeFormat).toUtf8() : QByteArray());
+}
+
+
+bool CDocumentChangeGeneratorCompBase::InsertEnumChange(
+	imtbase::CObjectCollection& documentChangeCollection,
+	const QByteArray& key,
+	const QString& keyName,
+	int oldValue,
+	int newValue,
+	const QStringList& enumNames) const
+{
+	if (oldValue == newValue){
+		return false;
+	}
+
+	// Out-of-range enumeration values must not abort the whole comparison, the raw value is still informative.
+	const QByteArray oldName = (oldValue >= 0 && oldValue < enumNames.size()) ? enumNames[oldValue].toUtf8() : QByteArray::number(oldValue);
+	const QByteArray newName = (newValue >= 0 && newValue < enumNames.size()) ? enumNames[newValue].toUtf8() : QByteArray::number(newValue);
+
+	return InsertChange(documentChangeCollection, key, keyName, oldName, newName);
+}
+
+
+void CDocumentChangeGeneratorCompBase::InsertListChanges(
+	imtbase::CObjectCollection& documentChangeCollection,
+	const QByteArray& addOperationTypeId,
+	const QByteArray& removeOperationTypeId,
+	const QByteArray& key,
+	const QString& keyName,
+	const QByteArrayList& oldValueList,
+	const QByteArrayList& newValueList) const
+{
+	QByteArrayList addedValueList;
+	QByteArrayList removedValueList;
+	GenerateChanges(oldValueList, newValueList, addedValueList, removedValueList);
+
+	for (const QByteArray& value : std::as_const(addedValueList)){
+		InsertOperationDescription(documentChangeCollection, addOperationTypeId, key, keyName, QByteArray(), value);
+	}
+
+	for (const QByteArray& value : std::as_const(removedValueList)){
+		InsertOperationDescription(documentChangeCollection, removeOperationTypeId, key, keyName, value, QByteArray());
+	}
+}
+
+
 // reimplemented (imtbase::IDocumentChangeGenerator)
 
 bool CDocumentChangeGeneratorCompBase::GenerateDocumentChanges(
@@ -73,7 +218,7 @@ bool CDocumentChangeGeneratorCompBase::GenerateDocumentChanges(
 			const istd::IChangeable* documentPtr,
 			CObjectCollection& documentChangeCollection,
 			QString& errorMessage,
-			const iprm::IParamsSet* /*paramsPtr*/)
+			const iprm::IParamsSet* paramsPtr)
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Component 'm_objectCollectionCompPtr' was not set", "CDocumentChangeGeneratorCompBase");
@@ -81,16 +226,23 @@ bool CDocumentChangeGeneratorCompBase::GenerateDocumentChanges(
 	}
 
 	if (operationTypeId == QByteArray("Update")){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(documentId, dataPtr)){
-			if (dataPtr.IsValid()){
-				return CompareDocuments(*dataPtr, *documentPtr, documentChangeCollection, errorMessage);
-			}
-		}
+		return AppendDocumentComparison(documentId, documentPtr, documentChangeCollection, errorMessage);
+	}
+
+	// Attributes stored outside of the document body describe themselves through the optional
+	// 'Key', 'KeyName', 'OldValue' and 'NewValue' parameters. Without them a bare marker entry is written.
+	const QByteArray key = GetTextParamValue(paramsPtr, "Key").toUtf8();
+	if (key.isEmpty()){
+		InsertOperationDescription(documentChangeCollection, operationTypeId, "", "", "", "");
 	}
 	else{
-		istd::TDelPtr<imtbase::COperationDescription> operationDescriptionPtr = CreateOperationDescription(operationTypeId, "", "", "", "");
-		documentChangeCollection.InsertNewObject("OperationInfo", "", "", operationDescriptionPtr.GetPtr());
+		InsertOperationDescription(
+					documentChangeCollection,
+					operationTypeId,
+					key,
+					GetTextParamValue(paramsPtr, "KeyName"),
+					GetTextParamValue(paramsPtr, "OldValue").toUtf8(),
+					GetTextParamValue(paramsPtr, "NewValue").toUtf8());
 	}
 
 	return true;
@@ -105,61 +257,18 @@ QString CDocumentChangeGeneratorCompBase::GetOperationDescription(CObjectCollect
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (documentChangeCollection.GetObjectData(elementId, dataPtr)){
 			const imtbase::COperationDescription* operationDescriptionPtr = dynamic_cast<const imtbase::COperationDescription*>(dataPtr.GetPtr());
-			if (operationDescriptionPtr != nullptr){
-				QByteArray typeId = operationDescriptionPtr->GetOperationTypeId();
-				QByteArray key = operationDescriptionPtr->GetKey();
+			if (operationDescriptionPtr == nullptr){
+				continue;
+			}
 
-				QByteArray oldValue = operationDescriptionPtr->GetOldValue();
-				QByteArray newValue = operationDescriptionPtr->GetNewValue();
-				oldValue = GetKeyNameForOperation(key, oldValue).toUtf8();
-				newValue = GetKeyNameForOperation(key, newValue).toUtf8();
+			// Derived generators may render any operation type, the standard rendering is the fallback.
+			QString change = CreateCustomOperationDescription(*operationDescriptionPtr, languageId);
+			if (change.isEmpty()){
+				change = CreateStandardOperationDescription(*operationDescriptionPtr, languageId);
+			}
 
-				QString keyName = operationDescriptionPtr->GetKeyName();
-				keyName = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), keyName.toUtf8(), languageId, "Attribute");
-
-				if (typeId == "Create"){
-					QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Created the document"), languageId, "imtbase::CDocumentChangeGeneratorCompBase");
-					retVal += change + "\n";
-				}
-				else if (typeId == "Change"){
-					QString change = iqt::GetTranslation(
-						m_translationManagerCompPtr.GetPtr(),
-						QString(QT_TR_NOOP("'%1' changed from '%2' to '%3'")).toUtf8(),
-						languageId,
-						"imtbase::CDocumentChangeGeneratorCompBase");
-
-					change = change.arg("<b>" + keyName + "</b>").arg(qPrintable(oldValue)).arg(qPrintable(newValue));
-
-					retVal += "<p>" + change + "</p>";
-				}
-				else if (typeId == "Set"){
-					QString change = iqt::GetTranslation(
-						m_translationManagerCompPtr.GetPtr(),
-						QString(QT_TR_NOOP("'%1' was set to '%2'")).toUtf8(),
-						languageId,
-						"imtbase::CDocumentChangeGeneratorCompBase");
-
-					change = change.arg("<b>" + keyName + "</b>").arg(qPrintable(newValue));
-
-					retVal += "<p>" + change + "</p>";
-				}
-				else if (typeId == "Clear"){
-					QString change = iqt::GetTranslation(
-						m_translationManagerCompPtr.GetPtr(),
-						QString(QT_TR_NOOP("'%1' was cleared")).toUtf8(),
-						languageId,
-						"imtbase::CDocumentChangeGeneratorCompBase");
-
-					change = change.arg("<b>" + keyName + "</b>");
-
-					retVal += "<p>" + change + "</p>";
-				}
-				else{
-					QString change = CreateCustomOperationDescription(*operationDescriptionPtr);
-					if (!change.isEmpty()){
-						retVal += "<p>" + change + "</p>";
-					}
-				}
+			if (!change.isEmpty()){
+				retVal += "<p>" + change + "</p>";
 			}
 		}
 	}
@@ -180,7 +289,99 @@ QString CDocumentChangeGeneratorCompBase::CreateCustomOperationDescription(const
 }
 
 
+QString CDocumentChangeGeneratorCompBase::Translate(const QByteArray& phrase, const QByteArray& languageId, const QByteArray& context) const
+{
+	return QString::fromUtf8(iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), phrase, languageId, context));
+}
+
+
+bool CDocumentChangeGeneratorCompBase::AppendDocumentComparison(
+	const QByteArray& documentId,
+	const istd::IChangeable* documentPtr,
+	CObjectCollection& documentChangeCollection,
+	QString& errorMessage)
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Component 'm_objectCollectionCompPtr' was not set", "CDocumentChangeGeneratorCompBase");
+
+		return false;
+	}
+
+	if (documentPtr == nullptr){
+		errorMessage = QString("Unable to generate changes for document '%1'. Error: New document is not available").arg(QString::fromUtf8(documentId));
+
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!m_objectCollectionCompPtr->GetObjectData(documentId, dataPtr) || !dataPtr.IsValid()){
+		errorMessage = QString("Unable to generate changes for document '%1'. Error: Stored document is not available").arg(QString::fromUtf8(documentId));
+
+		return false;
+	}
+
+	// The stored instance must not alias the new one, otherwise the comparison would always be empty.
+	if (dataPtr.GetPtr() == documentPtr){
+		errorMessage = QString("Unable to generate changes for document '%1'. Error: Modified document aliases the stored one").arg(QString::fromUtf8(documentId));
+
+		return false;
+	}
+
+	return CompareDocuments(*dataPtr, *documentPtr, documentChangeCollection, errorMessage);
+}
+
+
 // private methods
+
+QString CDocumentChangeGeneratorCompBase::CreateStandardOperationDescription(
+	const imtbase::COperationDescription& operationDescription,
+	const QByteArray& languageId) const
+{
+	static const QByteArray translationContext = QByteArrayLiteral("imtbase::CDocumentChangeGeneratorCompBase");
+
+	const QByteArray typeId = operationDescription.GetOperationTypeId();
+	const QByteArray key = operationDescription.GetKey();
+
+	// The raw values are resolved to display names first and then escaped, because they end up in HTML markup.
+	const QString oldValue = Translate(GetKeyNameForOperation(key, operationDescription.GetOldValue()).toUtf8(), languageId, "Attribute").toHtmlEscaped();
+	const QString newValue = Translate(GetKeyNameForOperation(key, operationDescription.GetNewValue()).toUtf8(), languageId, "Attribute").toHtmlEscaped();
+	const QString keyName = "<b>" + Translate(operationDescription.GetKeyName().toUtf8(), languageId, "Attribute").toHtmlEscaped() + "</b>";
+
+	if (typeId == "Create"){
+		return Translate(QT_TR_NOOP("Created the document"), languageId, translationContext);
+	}
+
+	if (typeId == "Remove"){
+		return Translate(QT_TR_NOOP("Deleted the document"), languageId, translationContext);
+	}
+
+	if (typeId == "Restore"){
+		return Translate(QT_TR_NOOP("Restored the document"), languageId, translationContext);
+	}
+
+	if (typeId == "Import"){
+		return Translate(QT_TR_NOOP("Imported the document"), languageId, translationContext);
+	}
+
+	if (typeId == "Rename"){
+		return Translate(QT_TR_NOOP("Renamed from '%1' to '%2'"), languageId, translationContext).arg(oldValue, newValue);
+	}
+
+	if (typeId == "Change"){
+		return Translate(QT_TR_NOOP("'%1' changed from '%2' to '%3'"), languageId, translationContext).arg(keyName, oldValue, newValue);
+	}
+
+	if (typeId == "Set"){
+		return Translate(QT_TR_NOOP("'%1' was set to '%2'"), languageId, translationContext).arg(keyName, newValue);
+	}
+
+	if (typeId == "Clear"){
+		return Translate(QT_TR_NOOP("'%1' was cleared"), languageId, translationContext).arg(keyName);
+	}
+
+	return QString();
+}
+
 
 imtbase::COperationDescription* CDocumentChangeGeneratorCompBase::CreateOperationDescription(
 	const QByteArray& operationTypeId,
@@ -214,6 +415,6 @@ imtbase::COperationDescription* CDocumentChangeGeneratorCompBase::CreateOperatio
 }
 
 
-} // namespace imtlic
+} // namespace imtbase
 
 

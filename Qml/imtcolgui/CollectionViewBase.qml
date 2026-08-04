@@ -22,7 +22,7 @@ ViewBase {
 	
 	property alias filterMenu: filterMenu_;
 	property alias loading: loading_;
-	property bool filterMenuVisible: true
+	property bool filterMenuVisible: collectionViewBaseContainer.hasFilter;
 	property alias pagination: pagination_;
 	property alias elementsCount: tableInternal.elementsCount;
 	property alias tableRowDelegate: tableInternal.rowDelegate
@@ -55,8 +55,6 @@ ViewBase {
 	property int contentHeight: filterArea.height + (tableInternal.headerHeight + tableInternal.contentHeight) + paginationObj.height
 	
 	Component.onCompleted: {
-		filterArea.height = collectionViewBaseContainer.filterMenuVisible ? filterArea.expandedHeight : 0;
-
 		tableInternal.focus = true;
 	}
 
@@ -104,15 +102,17 @@ ViewBase {
 		anchors.left: parent.left;
 		anchors.right: parent.right;
 
-		height: 0;
 		clip: true;
 
-		readonly property int expandedHeight: filterMenu_.height + 2 * Style.marginM;
+		readonly property int targetHeight: collectionViewBaseContainer.filterMenuVisible ? (filterMenu_.height + 2 * Style.marginM) : 0;
 
-		onExpandedHeightChanged: {
-			if (collectionViewBaseContainer.filterMenuVisible && !filterAreaAnimation.running){
-				filterArea.height = filterArea.expandedHeight;
-			}
+		height: filterArea.targetHeight;
+
+		onTargetHeightChanged: {
+			filterAreaAnimation.stop();
+			filterAreaAnimation.from = filterArea.height;
+			filterAreaAnimation.to = filterArea.targetHeight;
+			filterAreaAnimation.start();
 		}
 
 	FilterMenu {
@@ -162,12 +162,6 @@ ViewBase {
 		property: "height";
 		duration: 160;
 		easing.type: Easing.OutCubic;
-	}
-
-	onFilterMenuVisibleChanged: {
-		filterAreaAnimation.from = filterArea.height;
-		filterAreaAnimation.to = collectionViewBaseContainer.filterMenuVisible ? filterArea.expandedHeight : 0;
-		filterAreaAnimation.restart();
 	}
 
 	onHeadersChanged: {

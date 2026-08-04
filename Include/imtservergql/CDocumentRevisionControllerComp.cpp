@@ -122,7 +122,10 @@ sdl::V1_0::imtbase::CRevisionInfoList CDocumentRevisionControllerComp::OnGetRevi
 	}
 
 	const imtbase::IObjectCollection* objectCollectionPtr = FindObjectCollection(collectionId);
-	Q_ASSERT(objectCollectionPtr != nullptr);
+	if (objectCollectionPtr == nullptr){
+		errorMessage = QString("Unable to get revision list. Error: No collection configured for '%1'").arg(QString::fromUtf8(collectionId));
+		return sdl::V1_0::imtbase::CRevisionInfoList();
+	}
 
 	response.documentId = (documentId);
 
@@ -258,7 +261,11 @@ sdl::V1_0::imtbase::CRestoreRevisionResponse CDocumentRevisionControllerComp::On
 	}
 
 	imtbase::IObjectCollection* objectCollectionPtr = FindObjectCollection(collectionId);
-	Q_ASSERT(objectCollectionPtr != nullptr);
+	if (objectCollectionPtr == nullptr){
+		errorMessage = QString("Unable to set revision '%1' for document '%2'. Error: No collection configured for '%3'")
+					.arg(revisionNumber).arg(qPrintable(documentId), QString::fromUtf8(collectionId));
+		return sdl::V1_0::imtbase::CRestoreRevisionResponse();
+	}
 
 	const imtbase::IRevisionController* revisionControllerPtr = objectCollectionPtr->GetRevisionController();
 	if (revisionControllerPtr == nullptr){
@@ -333,7 +340,11 @@ sdl::V1_0::imtbase::CDeleteRevisionResponse CDocumentRevisionControllerComp::OnD
 	}
 
 	imtbase::IObjectCollection* objectCollectionPtr = FindObjectCollection(collectionId);
-	Q_ASSERT(objectCollectionPtr != nullptr);
+	if (objectCollectionPtr == nullptr){
+		errorMessage = QString("Unable to delete revision '%1' for document '%2'. Error: No collection configured for '%3'")
+					.arg(revisionNumber).arg(qPrintable(documentId), QString::fromUtf8(collectionId));
+		return sdl::V1_0::imtbase::CDeleteRevisionResponse();
+	}
 
 	const imtbase::IRevisionController* revisionControllerPtr = objectCollectionPtr->GetRevisionController();
 	if (revisionControllerPtr == nullptr){

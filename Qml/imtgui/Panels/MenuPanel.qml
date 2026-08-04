@@ -8,8 +8,6 @@ Rectangle {
 
 	objectName: "MenuPanel"
 
-	// The rows are clipped by contentArea instead, which leaves the hint card
-	// free to stand outside the rail.
 	clip: false;
 
 	color: Style.baseColor;
@@ -45,19 +43,20 @@ Rectangle {
 	property int iconSize: Style.menuPanelIconSize;
 	property int rowHeight: Style.controlHeightL;
 	property int expandedWidth: Style.menuPanelWidth !== undefined ? Style.menuPanelWidth : Style.sizeHintXXS;
-	// Exactly wide enough to hold an icon at its usual distance from the edge,
-	// which is what keeps the icons still while the panel moves.
 	property int collapsedWidth: Style.menuPanelMinWidth;
 
-	// What the hint card is naming, and where along the rail it points.
+	readonly property int rowWidth: Style.enableMenuPanelCollapse ? menuPanel.expandedWidth : menuPanel.buttonWidth;
+
 	property string hintText: "";
 	property real hintY: 0;
 
-	width: menuPanel.collapsedWidth;
+	width: Style.enableMenuPanelCollapse ? menuPanel.collapsedWidth : menuPanel.rowWidth;
 
 	Component.onCompleted: {
-		menuPanel.width = menuPanel.collapsed ? menuPanel.collapsedWidth : menuPanel.expandedWidth;
-		menuPanel.menuDefaultWidth = menuPanel.expandedWidth;
+		if (Style.enableMenuPanelCollapse){
+			menuPanel.width = menuPanel.collapsed ? menuPanel.collapsedWidth : menuPanel.expandedWidth;
+			menuPanel.menuDefaultWidth = menuPanel.expandedWidth;
+		}
 
 		Events.subscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
 		Events.subscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
@@ -157,8 +156,6 @@ Rectangle {
 		collapsed = stateArg;
 	}
 
-	// A row asks for the card by name, and gives it back by name: two rows can
-	// trade the pointer between them without one clearing the other's card.
 	function showHint(text, y){
 		menuPanel.hintText = text;
 		menuPanel.hintY = y;
@@ -182,16 +179,11 @@ Rectangle {
 			menuPanel.menuDefaultWidth = menuPanel.expandedWidth;
 		}
 
-		// Both ends spelled out: from wherever the edge stands right now to the
-		// other width. Left to work its start out for itself the animation can
-		// pick up a width the panel has not settled on yet and run from there.
 		widthAnimation.from = menuPanel.width;
 		widthAnimation.to = menuPanel.collapsed ? menuPanel.collapsedWidth : menuPanel.menuDefaultWidth;
 		widthAnimation.restart();
 	}
 
-	// Eased at both ends. A curve that leaves at full speed shows every frame it
-	// misses; one that builds up and settles reads as motion rather than a jump.
 	NumberAnimation {
 		id: widthAnimation;
 
@@ -269,10 +261,8 @@ Rectangle {
 		MenuPanelButton {
 			objectName: model["id"] + "Button"
 
-			// Kept at the open width and clipped, rather than resized with the
-			// panel: a width that moves re-elides every label on every frame.
-			width: menuPanel.expandedWidth;
-			height: menuPanel.rowHeight;
+			width: Style.enableMenuPanelCollapse ? menuPanel.expandedWidth : (decorator_ ? decorator_.width : 0);
+			height: Style.enableMenuPanelCollapse ? menuPanel.rowHeight : (decorator_ ? decorator_.height : 0);
 
 			Component.onCompleted: {
 				if (model.index === 0 && menuPanel.activePageIndex === -1){
@@ -333,8 +323,6 @@ Rectangle {
 			anchors.bottom: collapseRow.visible ? collapseRow.top : parent.bottom;
 
 			boundsBehavior: Flickable.StopAtBounds;
-			// The rows stay at the open width, so without this the closed rail
-			// would let itself be dragged sideways over them.
 			flickableDirection: Flickable.VerticalFlick;
 			clip: true;
 			contentWidth: allPagesFlick.width;
@@ -369,7 +357,7 @@ Rectangle {
 			anchors.top: parent.top;
 			anchors.left: parent.left;
 
-			width: menuPanel.expandedWidth;
+			width: menuPanel.rowWidth;
 
 			anchors.topMargin: Style.menuPanelTopMargin !==undefined ? Style.menuPanelTopMargin :
 																	   !menuPanel.centered ? Style.marginS :
@@ -384,8 +372,8 @@ Rectangle {
 					MenuPanelButton {
 						objectName: model["id"] + "Button"
 
-						width: menuPanel.expandedWidth;
-						height: menuPanel.rowHeight;
+						width: Style.enableMenuPanelCollapse ? menuPanel.expandedWidth : (decorator_ ? decorator_.width : 0);
+						height: Style.enableMenuPanelCollapse ? menuPanel.rowHeight : (decorator_ ? decorator_.height : 0);
 
 						text:  model["name"];
 						textColor: Style.textColor;
@@ -407,7 +395,7 @@ Rectangle {
 			anchors.left: parent.left;
 			anchors.bottom: collapseRow.visible ? collapseRow.top : parent.bottom;
 
-			width: menuPanel.expandedWidth;
+			width: menuPanel.rowWidth;
 
 			visible: !allPagesFlick.visible;
 
@@ -418,8 +406,8 @@ Rectangle {
 					MenuPanelButton {
 						objectName: model["id"] + "Button"
 
-						width: menuPanel.expandedWidth;
-						height: menuPanel.rowHeight;
+						width: Style.enableMenuPanelCollapse ? menuPanel.expandedWidth : (decorator_ ? decorator_.width : 0);
+						height: Style.enableMenuPanelCollapse ? menuPanel.rowHeight : (decorator_ ? decorator_.height : 0);
 
 						text:  model["name"];
 						textColor: Style.textColor;
@@ -441,7 +429,7 @@ Rectangle {
 			anchors.bottom: parent.bottom
 			anchors.left: parent.left
 
-			width: menuPanel.expandedWidth;
+			width: menuPanel.rowWidth;
 			height: visible ? menuPanel.rowHeight : 0
 
 			visible: Style.enableMenuPanelCollapse
@@ -522,8 +510,9 @@ Rectangle {
 		}
 	}
 
-	// Parts the rail from the page beside it without drawing a hard edge.
 	Rectangle {
+		visible: Style.enableMenuPanelCollapse;
+
 		anchors.right: parent.right;
 		anchors.top: parent.top;
 		anchors.bottom: parent.bottom;
@@ -533,9 +522,6 @@ Rectangle {
 		color: Style.borderColor;
 	}
 
-	// The name of the page under the pointer while the rail is closed. It stands
-	// outside the rail, so it lives here rather than inside contentArea, and it
-	// carries a tip back towards the icon it belongs to.
 	Item {
 		id: hint;
 
