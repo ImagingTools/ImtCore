@@ -10,26 +10,28 @@ if(NOT DEFINED QT_VERSION_MAJOR)
 	if(QT_VERSION_MAJOR EQUAL 6)
 		find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core5Compat REQUIRED)
 	endif()
+endif()
 
-	if(BUILD_TESTING)
-		find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Test REQUIRED)
+
+if(NOT DEFINED USE_GEO OR USE_GEO)
+	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Positioning REQUIRED)
+
+	if(QT_VERSION_MAJOR EQUAL 5)
+		find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Location REQUIRED)
 	endif()
+endif()
 
-	if(NOT DEFINED USE_GEO OR USE_GEO)
-		find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Positioning REQUIRED)
+if(NOT DEFINED USE_QTQML OR USE_QTQML)
+	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Qml QuickControls2 QuickWidgets REQUIRED)
+endif()
 
-		if(QT_VERSION_MAJOR EQUAL 5)
-			find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Location REQUIRED)
-		endif()
-	endif()
+if(NOT DEFINED USE_QT3D OR USE_QT3D)
+	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS OpenGL OpenGLWidgets REQUIRED)
+endif()
 
-	if(NOT DEFINED USE_QTQML OR USE_QTQML)
-		find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Qml QuickControls2 QuickWidgets REQUIRED)
-	endif()
 
-	if(NOT DEFINED USE_QT3D OR USE_QT3D)
-		find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS OpenGL OpenGLWidgets REQUIRED)
-	endif()
+if(BUILD_TESTING)
+	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Test REQUIRED)
 endif()
 
 if(UNIX AND NOT APPLE)
