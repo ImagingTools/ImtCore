@@ -228,7 +228,7 @@ class BaseClass extends QtObject {
 		}
 
 		if(!this._internal.removed) this._internal.removed = []
-		this._internal.removed.push(key)
+		if(this._internal.removed.indexOf(key) === -1) this._internal.removed.push(key)
 	}
 
 	connectProperties() {}

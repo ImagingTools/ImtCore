@@ -66,6 +66,13 @@ class Map extends Item {
 			}),
 		})
 
+        this.__map.getView().on('change:center', (e) => {
+            let center = this.__map.getView().getCenter()
+
+            let point = OpenLayers.transform(center, 'EPSG:3857', 'EPSG:4326')
+            this.center = { longitude: point[0], latitude: point[1] }
+        })
+
         super.__complete()
 
         this.mapReady = true
@@ -121,7 +128,13 @@ class Map extends Item {
 
     SLOT_centerChanged(oldValue, newValue){
         if(this.__map){
-            this.__map.getView().setCenter(OpenLayers.transform([newValue.longitude, newValue.latitude], 'EPSG:4326','EPSG:3857'))
+            this.__map.getView().setCenter(OpenLayers.transform([this.center.longitude, this.center.latitude], 'EPSG:4326','EPSG:3857'))
+        }
+    }
+
+    SLOT_bearingChanged(oldValue, newValue){
+        if(this.__map){
+            this.__map.getView().setRotation(-newValue*Math.PI/180)
         }
     }
 
