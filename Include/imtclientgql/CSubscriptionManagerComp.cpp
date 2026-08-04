@@ -31,13 +31,9 @@ namespace imtclientgql
 
 QByteArray CSubscriptionManagerComp::RegisterSubscription(
 			const imtgql::IGqlRequest& subscriptionRequest,
-			IGqlSubscriptionClient* subscriptionClient)
+			IGqlSubscriptionClient& subscriptionClient)
 {
 	if (!m_connectionStatusProviderCompPtr.IsValid()){
-		return QByteArray();
-	}
-
-	if (!subscriptionClient){
 		return QByteArray();
 	}
 
@@ -54,7 +50,7 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 
 	for (QByteArray subscriptionId : m_registeredClients.keys()){
 		if (m_registeredClients[subscriptionId].m_request.IsEqual(subscriptionRequest) && m_registeredClients[subscriptionId].m_clientId == clientId){
-			m_registeredClients[subscriptionId].m_clients.append(subscriptionClient);
+			m_registeredClients[subscriptionId].m_clients.append(&subscriptionClient);
 
 			return subscriptionId;
 		}
@@ -66,7 +62,7 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 	subscriptionHelper.m_request = *requestImplPtr;
 	subscriptionHelper.m_clientId = clientId;
 	subscriptionHelper.m_status = IGqlSubscriptionClient::SS_IN_REGISTRATION;
-	subscriptionHelper.m_clients.append(subscriptionClient);
+	subscriptionHelper.m_clients.append(&subscriptionClient);
 	m_registeredClients.insert(subscriptionId, subscriptionHelper);
 
 	locker.unlock();
@@ -82,12 +78,17 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 }
 
 
-bool CSubscriptionManagerComp::UnregisterSubscription(const QByteArray& subscriptionId)
+bool CSubscriptionManagerComp::UnregisterSubscription(
+			const QByteArray& subscriptionId,
+			const imtclientgql::IGqlSubscriptionClient& subscriptionClient)
 {
 	QMutexLocker locker(&m_registeredClientsMutex);
 
 	if (m_registeredClients.contains(subscriptionId)){
-		m_registeredClients.remove(subscriptionId);
+		m_registeredClients[subscriptionId].m_clients.removeAll(&subscriptionClient);
+		if (m_registeredClients[subscriptionId].m_clients.isEmpty()){
+			m_registeredClients.remove(subscriptionId);
+		}
 
 		return true;
 	}
