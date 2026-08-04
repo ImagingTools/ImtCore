@@ -7,6 +7,7 @@
 #include <QtCore/QMetaObject>
 #include <QtCore/QPromise>
 #include <QtCore/QTimer>
+#include <QtCore/QThread>
 #include <QtCore/QUuid>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
@@ -25,17 +26,13 @@ namespace imtclientgql
 
 // public methods
 
-CAsyncApiClientComp::CAsyncApiClientComp():
-	m_timeout(30000),
-	m_networkManagerPtr(nullptr)
+CAsyncApiClientComp::CAsyncApiClientComp()
 {
 }
 
 
 CAsyncApiClientComp::~CAsyncApiClientComp()
 {
-	// m_networkManagerPtr is parented to this QObject and destroyed
-	// automatically when this instance is destroyed.
 }
 
 
@@ -45,56 +42,62 @@ QFuture<IAsyncGqlClient::GqlResult> CAsyncApiClientComp::SendRequest(
 			GqlRequestPtr requestPtr,
 			imtbase::IUrlParam* urlParamPtr) const
 {
-	auto promisePtr = std::make_shared<QPromise<GqlResult>>();
-	promisePtr->start();
-	QFuture<GqlResult> future = promisePtr->future();
-
-	auto FailFast = [promisePtr](ErrorCategory category, const QString& message) {
-		promisePtr->addResult(GqlResult{GqlResponsePtr(), category, message});
-		promisePtr->finish();
+	auto FailFast = [this](ErrorCategory category, const QString& message) {
+		SendErrorMessage(0, message);
+		return QtFuture::makeReadyValueFuture(GqlResult{GqlResponsePtr(), category, message});
 	};
 
-	if (!requestPtr.IsValid()){
-		FailFast(EC_INVALID_REQUEST, "Invalid request");
-		return future;
+	if (requestPtr == nullptr){
+		return FailFast(EC_INVALID_REQUEST, "Invalid request");
 	}
 
 	if (!m_protocolEngineCompPtr.IsValid()){
-		SendErrorMessage(0, "Protocol engine is not available", "Async API Client");
-		FailFast(EC_INTERNAL, "Protocol engine is not available");
-		return future;
-	}
-
-	if (m_networkManagerPtr == nullptr){
-		SendErrorMessage(0, "Network access manager is not initialized", "Async API Client");
-		FailFast(EC_INTERNAL, "Network access manager is not initialized");
-		return future;
+		return FailFast(EC_INTERNAL, "Protocol engine is not available");
 	}
 
 	imtgql::IGqlRequest::RequestType requestType = requestPtr->GetRequestType();
 	if ((requestType != imtgql::IGqlRequest::RT_QUERY) && (requestType != imtgql::IGqlRequest::RT_MUTATION)){
-		SendErrorMessage(0, "Invalid request type", "Async API Client");
-		FailFast(EC_INVALID_REQUEST, "Invalid request type");
-		return future;
+		return FailFast(EC_INVALID_REQUEST, "Invalid request type");
 	}
 
-	QNetworkRequest* networkRequestPtr = m_protocolEngineCompPtr->CreateNetworkRequest(*requestPtr, urlParamPtr);
+	std::unique_ptr<QNetworkRequest> networkRequestPtr(m_protocolEngineCompPtr->CreateNetworkRequest(*requestPtr, urlParamPtr));
 	if (networkRequestPtr == nullptr){
-		SendErrorMessage(0, "Failed to create network request", "Async API Client");
-		FailFast(EC_INTERNAL, "Failed to create network request");
-		return future;
+		return FailFast(EC_INTERNAL, "Failed to create network request");
 	}
 
-	const QByteArray uuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	SendVerboseMessage(QString("Send async request with ID ") + uuid + "\n" + requestPtr->GetQuery(), "Async API client");
+	auto promise = std::make_shared<QPromise<GqlResult>>();
+	auto future = promise->future();
 
-	QNetworkReply* replyPtr = m_networkManagerPtr->post(*networkRequestPtr, requestPtr->GetQuery());
-	delete networkRequestPtr;
+	QMetaObject::invokeMethod(
+		m_networkManager, [this, promise, requestPtr, networkRequest = *networkRequestPtr]() mutable {
+			SendRequestInternal(promise, requestPtr, networkRequest);
+		},
+		Qt::QueuedConnection);
 
+	return future;
+}
+
+
+// private methods
+
+void CAsyncApiClientComp::SendRequestInternal(
+			std::shared_ptr<QPromise<GqlResult>> promisePtr,
+			GqlRequestPtr requestPtr,
+			const QNetworkRequest& networkRequest) const
+{
+	Q_ASSERT(QThread::currentThread() == m_networkManager->thread());
+
+	promisePtr->start();
+
+	const auto uuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	SendVerboseMessage(QString("Send async request with ID ") + uuid + "\n" + requestPtr->GetQuery());
+
+	auto replyPtr = m_networkManager->post(networkRequest, requestPtr->GetQuery());
 	if (replyPtr == nullptr){
-		SendErrorMessage(0, QString("Null reply for request-ID ") + uuid, "Async API Client");
-		FailFast(EC_NETWORK, "Failed to start network request");
-		return future;
+		SendErrorMessage(0, QString("Null reply for request-ID ") + uuid);
+		promisePtr->addResult(GqlResult{GqlResponsePtr(), EC_NETWORK, "Failed to start network request"});
+		promisePtr->finish();
+		return;
 	}
 
 	replyPtr->ignoreSslErrors();
@@ -108,7 +111,7 @@ QFuture<IAsyncGqlClient::GqlResult> CAsyncApiClientComp::SendRequest(
 			replyPtr->abort();
 		}
 	});
-	cancelWatcherPtr->setFuture(future);
+	cancelWatcherPtr->setFuture(promisePtr->future());
 
 	// Optional timeout timer (single-shot, parented to the reply so it is
 	// destroyed along with it).
@@ -145,7 +148,7 @@ QFuture<IAsyncGqlClient::GqlResult> CAsyncApiClientComp::SendRequest(
 		if (error == QNetworkReply::NoError){
 			const QByteArray payload = replyPtr->readAll();
 
-			imtgql::CGqlResponse* gqlResponsePtr = new imtgql::CGqlResponse(requestPtr);
+			auto* gqlResponsePtr = new imtgql::CGqlResponse(requestPtr);
 			gqlResponsePtr->SetResponseData(payload);
 
 			IAsyncGqlClient::GqlResponsePtr responsePtr;
@@ -157,7 +160,7 @@ QFuture<IAsyncGqlClient::GqlResult> CAsyncApiClientComp::SendRequest(
 		else if (error == QNetworkReply::OperationCanceledError){
 			if (*timedOutFlagPtr){
 				const QString message = QString("Request ") + uuid + " timed out";
-				SendErrorMessage(0, message, "Async API Client");
+				SendErrorMessage(0, message);
 				promisePtr->addResult(GqlResult{GqlResponsePtr(), EC_TIMEOUT, message});
 				promisePtr->finish();
 			}
@@ -167,7 +170,7 @@ QFuture<IAsyncGqlClient::GqlResult> CAsyncApiClientComp::SendRequest(
 		}
 		else{
 			const QString message = QString("Response for request-ID ") + uuid + "\n" + replyPtr->errorString();
-			SendErrorMessage(0, message, "Async API Client");
+			SendErrorMessage(0, message);
 			promisePtr->addResult(GqlResult{GqlResponsePtr(), EC_NETWORK, replyPtr->errorString()});
 			promisePtr->finish();
 		}
@@ -175,7 +178,7 @@ QFuture<IAsyncGqlClient::GqlResult> CAsyncApiClientComp::SendRequest(
 		replyPtr->deleteLater();
 	};
 
-	QObject::connect(replyPtr, &QNetworkReply::finished, this, Finalize);
+	QObject::connect(replyPtr, &QNetworkReply::finished, replyPtr, Finalize);
 
 	if (timeoutTimerPtr != nullptr){
 		QObject::connect(timeoutTimerPtr, &QTimer::timeout, replyPtr, [replyPtr, timedOutFlagPtr]() {
@@ -186,8 +189,6 @@ QFuture<IAsyncGqlClient::GqlResult> CAsyncApiClientComp::SendRequest(
 		});
 		timeoutTimerPtr->start(m_timeout);
 	}
-
-	return future;
 }
 
 
@@ -197,13 +198,37 @@ QFuture<IAsyncGqlClient::GqlResult> CAsyncApiClientComp::SendRequest(
 
 void CAsyncApiClientComp::OnComponentCreated()
 {
+	// Assume that OnComponentCreated() is called only once and guarded by mutex by the acf runtime
+	// No other calls to this component should be made until OnComponentCreated() returns
+
 	BaseClass::OnComponentCreated();
 
-	m_timeout = static_cast<int>(*m_timeoutAttrPtr * 1000);
+	Q_ASSERT(m_thread == nullptr);
 
-	if (m_networkManagerPtr == nullptr){
-		m_networkManagerPtr = new QNetworkAccessManager(this);
-	}
+	m_thread = new QThread();
+	m_thread->setObjectName(QStringLiteral("AsyncApiClientNetworkThread"));
+
+	auto* networkManagerPtr = new QNetworkAccessManager();
+	networkManagerPtr->moveToThread(m_thread);
+	QObject::connect(m_thread, &QThread::finished, networkManagerPtr, &QObject::deleteLater);
+
+	m_networkManager = networkManagerPtr;
+	m_thread->start();
+}
+
+
+void CAsyncApiClientComp::OnComponentDestroyed()
+{
+	// Assume that OnComponentDestroyed() is called only once and guarded by mutex by the acf runtime
+	// No other calls to this component should be made after OnComponentDestroyed() is called
+
+	Q_ASSERT(m_thread != nullptr);
+
+	m_thread->quit();
+	m_thread->wait();
+	delete m_thread;
+
+	BaseClass::OnComponentDestroyed();
 }
 
 
