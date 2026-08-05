@@ -51,7 +51,7 @@ class Var extends Property {
                     parent: currentValue
                 }
                 currentValue.__addLink()
-                if(oldValue instanceof JQModules.QtQml.QtObject){
+                if(currentValue instanceof JQModules.QtQml.QtObject){
                     currentValue['Component.destruction'].connect(destructionFunc)
                 }
             }

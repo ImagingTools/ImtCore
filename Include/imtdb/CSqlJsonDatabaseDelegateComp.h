@@ -60,6 +60,15 @@ public:
 	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& timeFieldId = QStringLiteral("root1.\"TimeStamp\"")) const override;
 	virtual QByteArray GetObjectSelectionQuery(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
+	// reimplemented (imtbase::IRevisionController)
+	/**
+		This schema keeps owner and operation description in dedicated columns and marks the current
+		revision with \c IsActive, so the revision list cannot be read by the base implementation.
+	*/
+	virtual imtbase::IRevisionController::RevisionInfoList GetRevisionInfoList(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId) const override;
+
 protected:
 	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const override;
 	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const override;

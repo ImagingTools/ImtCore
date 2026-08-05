@@ -499,7 +499,7 @@ Rectangle {
 		id: registerDialogComp;
 		Dialog {
 			id: registerDialog;
-			width: Style.sizeHintXXL;
+			width: Math.max(Style.sizeHintL, Math.min(ModalDialogManager.activeView.width - 100, Style.sizeHintXXL));
 			height: ModalDialogManager.activeView.height - 100;
 			title: qsTr("Sign up");
 			canMove: false;

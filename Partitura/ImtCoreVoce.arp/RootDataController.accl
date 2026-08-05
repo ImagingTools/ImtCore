@@ -8,6 +8,8 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="AppIconName" X="200" Y="700" Note=""/>
+        <Element ComponentName="AppPreferences" X="200" Y="550" Note=""/>
         <Element ComponentName="ApplicationInfoController" X="225" Y="400" Note=""/>
         <Element ComponentName="Demultiplexer" X="600" Y="75" Note=""/>
         <Element ComponentName="PagesController" X="825" Y="450" Note=""/>

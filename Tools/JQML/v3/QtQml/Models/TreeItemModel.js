@@ -235,6 +235,8 @@ class TreeItemModel extends JSONListModel {
         if(externTreeModel){
             this.clear()
 
+            this.setIsArray(externTreeModel.isArray)
+
             let retVal = true
 
             for(let index = 0; index < externTreeModel.getItemsCount(); index++){
@@ -580,7 +582,7 @@ class TreeItemModel extends JSONListModel {
 
                     modelObject[keys[index]] = retModel
 
-                    if(Object.keys(retVal).length) {
+                    if(Object.keys(retVal).length || Array.isArray(retVal)) {
                         if (Array.isArray(retVal)){
                             retModel.setIsArray(true)
                         }

@@ -63,23 +63,46 @@ Item {
 	
 	Timer {
 		id: timer;
-		interval: 50
+		interval: 0
 		onTriggered: {
 			if (commandsItem.visible){
-				commandsItem.checkCommandsWidth();
-				commandsItem.checkButtonVisible();
+				commandsItem.layoutCommands();
 			}
 		}
 	}
 
-	function checkCommandsWidth(){
+	function layoutCommands(){
+		if (!button || !leftCommands || !centerCommands || !rightCommands){
+			return;
+		}
+
+		commandsItem.checkCommandsWidth(0);
+
+		let needsButton = leftCommands.hasHiddenCommands() ||
+				centerCommands.hasHiddenCommands() ||
+				rightCommands.hasHiddenCommands();
+
+		if (needsButton){
+			commandsItem.checkCommandsWidth(Style.controlHeightM + Style.marginM);
+
+			needsButton = leftCommands.hasHiddenCommands() ||
+					centerCommands.hasHiddenCommands() ||
+					rightCommands.hasHiddenCommands();
+		}
+
+		button.visible = needsButton;
+	}
+
+	function checkCommandsWidth(reserved){
+		let available = Math.max(0, commandsItem.width - 2 * Style.marginM - reserved);
+
 		let checkWidthFunc = function (commands, type){
 			commands.maximumWidth = commandsItem.computeMaxWidth(
 						type,
 						leftCommands.calcVisibleCommandsCount(),
 						centerCommands.calcVisibleCommandsCount(),
 						rightCommands.calcVisibleCommandsCount(),
-						commandsItem.width
+						available
 					)
 			commands.checkWidth()
 		}
@@ -88,39 +111,29 @@ Item {
 		checkWidthFunc(centerCommands, "center")
 		checkWidthFunc(rightCommands, "right")
 	}
-	
-	function checkButtonVisible(){
-		if (!button || !leftCommands || !centerCommands || !rightCommands){
-			return;
-		}
-
-		button.visible = leftCommands.hasHiddenCommands() ||
-				centerCommands.hasHiddenCommands() ||
-				rightCommands.hasHiddenCommands();
-	}
 
 	function computeMaxWidth(role, left, center, right, full) {
 		let hasLeft = left > 0;
 		let hasCenter = center > 0;
 		let hasRight = right > 0;
 		let visible = (hasLeft ? 1 : 0) + (hasCenter ? 1 : 0) + (hasRight ? 1 : 0);
-	
+
 		// Left || Center || Right
 		if (visible === 1)
 			return full;
-	
+
 		// Left && Center && Right
 		if (visible === 3) {
 			if (role === "center") return full * 0.4;
 			return full * 0.3;
 		}
-	
+
 		// Center && (Left || Right)
 		if (hasCenter) {
 			if (role === "center") return full * 0.4
 			return full * 0.3
 		}
-	
+
 		// (Left && Right)
 		return full * 0.5;
 	}
@@ -130,7 +143,6 @@ Item {
 		anchors.left: parent.left;
 		anchors.leftMargin: Style.marginM;
 
-		visible: !timer.running
 		onCommandActivated: {
 			commandsItem.commandActivated(commandId, params);
 		}
@@ -144,7 +156,6 @@ Item {
 		id: centerCommands;
 		anchors.horizontalCenter: parent.horizontalCenter;
 
-		visible: !timer.running
 		onCommandActivated: {
 			commandsItem.commandActivated(commandId, params);
 		}
@@ -159,7 +170,6 @@ Item {
 		anchors.right: button.left;
 		anchors.rightMargin: Style.marginM;
 
-		visible: !timer.running
 		onCommandActivated: {
 			commandsItem.commandActivated(commandId, params);
 		}
@@ -175,11 +185,12 @@ Item {
 		anchors.right: parent.right;
 		width: visible ? Style.controlHeightM : 0;
 		height: width;
-		iconSource: "../../../" + Style.getIconPath("Icons/More", Icon.Mode.On, Icon.State.Active);
+		iconSource: "../../../" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal);
 		visible: false;
 		decorator: Component {
 			ToolButtonDecorator {
-				color: baseElement && baseElement.hovered  ? Style.baseColor : "transparent";
+				color: baseElement && baseElement.hovered  ? Style.hover : "transparent";
+				radius: height / 2;
 			}
 		}
 		
@@ -216,7 +227,7 @@ Item {
 				contextMenuModel.addModel(rightCommands.allElements);
 			}
 			
-			ModalDialogManager.openDialog(popupMenu, {"x": point.x - 200, "y": point.y, "model": contextMenuModel});
+			ModalDialogManager.openDialog(popupMenu, {"x": point.x - Style.sizeHintXXS, "y": point.y, "model": contextMenuModel});
 		}
 	}
 	
@@ -226,12 +237,13 @@ Item {
 		function addModel(elements){
 			let result = false;
 			for (let i = 0; i < elements.length; i++){
-				if (elements[i].hidden && elements[i].element && elements[i].element.m_visible){
+				let element = elements[i].element;
+				if (elements[i].hidden && element && element.m_visible){
 					insertNewItem({
-									  "id": elements[i].modelData.m_elementId,
-									  "name": elements[i].modelData.m_elementName,
-									  "icon": elements[i].modelData.m_elementItemPath,
-									  "isEnabled": elements[i].modelData.m_enabled
+									  "id": element.m_elementId,
+									  "name": element.m_elementName,
+									  "icon": element.m_elementItemPath,
+									  "isEnabled": element.m_enabled
 								  }
 								  );
 					result = true;

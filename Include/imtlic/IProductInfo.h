@@ -211,6 +211,53 @@ public:
 		\return true if the feature was successfully removed, false otherwise
 	*/
 	virtual bool RemoveFeature(const QByteArray& featureId) = 0;
+
+	/**
+		The optional parts of one feature that a product takes.
+
+		A sub-feature id is only unique inside its own feature, so it is kept
+		next to the feature it belongs to rather than being glued onto it. Every
+		id here is what it says it is: featureId is a feature document id,
+		subFeatureIds are ids of nodes inside that document.
+	*/
+	struct OptionalFeatureInfo
+	{
+		QByteArray featureId;
+		QByteArrayList subFeatureIds;
+
+		bool operator==(const OptionalFeatureInfo& other) const
+		{
+			return (featureId == other.featureId) && (subFeatureIds == other.subFeatureIds);
+		}
+
+		bool operator!=(const OptionalFeatureInfo& other) const
+		{
+			return !operator==(other);
+		}
+	};
+
+	typedef QVector<OptionalFeatureInfo> OptionalFeatureInfos;
+
+	/**
+		Get the optional sub-features this product takes.
+
+		A feature may declare parts of itself optional (\see IFeatureInfo). The
+		feature as a whole belongs to the product through GetFeatures(); which of
+		its optional parts the product actually takes is recorded here.
+
+		This is kept apart from the feature collection because the ids in that
+		collection are feature document ids and are resolved as such, while a
+		sub-feature is a node inside a feature document and has none of its own.
+
+		\return One entry per feature that has optional parts taken.
+	*/
+	virtual OptionalFeatureInfos GetOptionalFeatures() const = 0;
+
+	/**
+		Set the optional sub-features this product takes.
+		\param optionalFeatures One entry per feature that has optional parts taken.
+	*/
+	virtual void SetOptionalFeatures(const OptionalFeatureInfos& optionalFeatures) = 0;
 };
 
 

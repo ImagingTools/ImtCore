@@ -99,11 +99,20 @@ class Property extends BaseObject {
                 const isCrossItem = link.target !== target
                 const connectFn = isCrossItem && signalFunc.connectBefore ? signalFunc.connectBefore : signalFunc.connect
                 let connectionObj = connectFn(()=>{
-                    if(!link.target[link.name+'__updating']){
-                        link.target[link.name+'__updating'] = true
-                        link.meta.type.set(link.target, link.name, link.func, link.meta)
-                        delete link.target[link.name+'__updating']
+                    if(link.target[link.name+'__updating']){
+                        link.target[link.name+'__pending'] = true
+                        return
                     }
+
+                    link.target[link.name+'__updating'] = true
+                    let passes = 0
+                    do {
+                        delete link.target[link.name+'__pending']
+                        link.meta.type.set(link.target, link.name, link.func, link.meta)
+                        passes++
+                    } while(link.target[link.name+'__pending'] && passes < 16)
+                    delete link.target[link.name+'__pending']
+                    delete link.target[link.name+'__updating']
                 })
     
                 link.target.__depends[link.name].push(connectionObj)
@@ -131,6 +140,7 @@ class Property extends BaseObject {
         // }
 
         let oldValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
+        let middleValue = oldValue
 
         if(typeof value === 'function'){
             try {
@@ -141,7 +151,7 @@ class Property extends BaseObject {
                     meta: meta,
                     func: value,
                 })
-                target[name] = this.typeCasting(value.call(target))
+                middleValue = this.typeCasting(value.call(target))
             } catch(error) {
                 if(location.hash === '#jqdebugdetail')console.error(error)
             } finally {
@@ -150,7 +160,7 @@ class Property extends BaseObject {
             }
         } else {
             try {
-                target[name] = this.typeCasting(value)
+                middleValue = this.typeCasting(value)
             } catch (error) {
                 if(location.hash === '#jqdebugdetail')console.error(error)
             }
@@ -158,8 +168,9 @@ class Property extends BaseObject {
 
         let currentValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
 
-        if(oldValue !== currentValue){
-            target.constructor.meta[name + 'Changed'].type.get(target, name + 'Changed')(oldValue, currentValue)
+        if(oldValue !== middleValue && oldValue === currentValue){
+            target[name] = middleValue
+            target.constructor.meta[name + 'Changed'].type.get(target, name + 'Changed')(oldValue, middleValue)
         }
 
         return true

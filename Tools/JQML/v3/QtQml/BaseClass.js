@@ -194,7 +194,7 @@ class BaseClass extends QtObject {
 	SLOT_modelChanged(changeSet){
 		if (this.owner && this.owner.enableNotifications && this.owner.modelChanged) {
 			if (this.owner._internal.isTransaction){
-				this.owner._internal.changeList.concat(changeSet)
+				this.owner._internal.changeList = this.owner._internal.changeList.concat(changeSet)
 				this.owner._internal.countChanges++
 			}
 			else{
@@ -228,7 +228,7 @@ class BaseClass extends QtObject {
 		}
 
 		if(!this._internal.removed) this._internal.removed = []
-		this._internal.removed.push(key)
+		if(this._internal.removed.indexOf(key) === -1) this._internal.removed.push(key)
 	}
 
 	connectProperties() {}

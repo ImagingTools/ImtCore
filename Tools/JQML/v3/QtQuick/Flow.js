@@ -62,6 +62,16 @@ class Flow extends Item {
         JQApplication.updateLater(this)
     }
 
+    SLOT_widthChanged(oldValue, newValue){
+        super.SLOT_widthChanged(oldValue, newValue)
+        JQApplication.updateLater(this)
+    }
+
+    SLOT_heightChanged(oldValue, newValue){
+        super.SLOT_heightChanged(oldValue, newValue)
+        JQApplication.updateLater(this)
+    }
+
     SLOT_flowChanged(oldValue, newValue){
         this.__updateFlow()
     }
@@ -91,29 +101,34 @@ class Flow extends Item {
     }
 
     __updateGeometry(){
-        let children = this.children
-
-        let width = 0
-        let height = 0
-        let count = 0
-
-        for(let i = 0; i < children.length; i++){
-            if(!(children[i] instanceof Repeater) && children[i].visible && children[i].width > 0 && children[i].height > 0){
-                if(children[i].__destroying) continue
-                
-                width = Math.max(width, children[i].width)
-                height += children[i].height
-                count += 1
-            }
-        }
-
-        if(count > 0) height += (count-1) * this.spacing
+        let width = this.width__prevent ? this.width - (this.leftPadding + this.rightPadding) : 0
+        let height = this.height__prevent ? this.height - (this.topPadding + this.bottomPadding) : 0
 
         this.__setDOMStyle({
-            paddingLeft: this.leftPadding+'px',
-            paddingTop: this.topPadding+'px',
-            paddingRight: this.rightPadding+'px',
-            paddingBottom: this.bottomPadding+'px',
+            minWidth: width + 'px',
+            minHeight: height + 'px',
+            width: width + 'px',
+            height: height + 'px',
+
+            paddingLeft: this.leftPadding + 'px',
+            paddingTop: this.topPadding + 'px',
+            paddingRight: this.rightPadding + 'px',
+            paddingBottom: this.bottomPadding + 'px',
+        })
+
+        width = this.__DOM.scrollWidth - (this.leftPadding + this.rightPadding)
+        height = this.__DOM.scrollHeight - (this.topPadding + this.bottomPadding)
+
+        this.__setDOMStyle({
+            minWidth: width + 'px',
+            minHeight: height + 'px',
+            width: width + 'px',
+            height: height + 'px',
+
+            paddingLeft: this.leftPadding + 'px',
+            paddingTop: this.topPadding + 'px',
+            paddingRight: this.rightPadding + 'px',
+            paddingBottom: this.bottomPadding + 'px',
         })
 
         Geometry.setAuto(this.__self, 'width', width + this.leftPadding + this.rightPadding, this.__self.constructor.meta.width)

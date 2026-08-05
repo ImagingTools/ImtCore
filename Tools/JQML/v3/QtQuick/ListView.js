@@ -118,41 +118,55 @@ class ListView extends Flickable {
         this.positionViewAtIndex(0, ListView.Beginning)
     }
     positionViewAtEnd() {
-        this.positionViewAtIndex(Object.keys(this.__items).pop(), ListView.Beginning)
-
-
+        this.positionViewAtIndex(this.count - 1, ListView.End)
     }
     positionViewAtIndex(index, mode) {
-        let pos = 'start'
-        switch(mode){
-            case ListView.Beginning: pos = 'start'; break;
-            case ListView.Center: pos = 'center'; break;
-            case ListView.End: pos = 'end'; break;
-            case ListView.Visible: break;
+        index = Number(index)
+        if (!Number.isFinite(index) || index < 0 || index >= this.count) return
+
+        let horizontal = this.orientation === ListView.Horizontal
+        let viewSize = horizontal ? this.width : this.height
+        let contentSize = horizontal ? this.contentWidth : this.contentHeight
+        if (contentSize <= viewSize) return
+
+        let item = this.__items[index]
+        let origin = horizontal ? this.originX : this.originY
+        let itemSize = item
+            ? (horizontal ? item.width : item.height)
+            : (horizontal ? this.__middleWidth : this.__middleHeight)
+        // An index outside the materialised window has no item yet, so its place
+        // is estimated from the average item size, exactly as __getItemInfo does.
+        let itemPos = item
+            ? (horizontal ? item.x : item.y)
+            : origin + (itemSize + this.spacing) * index
+        let contentPos = horizontal ? this.contentX : this.contentY
+        let target = contentPos
+
+        switch (mode) {
+            case ListView.Beginning: target = itemPos; break
+            case ListView.Center: target = itemPos + itemSize / 2 - viewSize / 2; break
+            case ListView.End: target = itemPos + itemSize - viewSize; break
+            case ListView.Visible:
             case ListView.Contain: {
-                if(this.__items[index]){
-                    if(this.orientation === ListView.Horizontal){
-                        if(this.contentWidth <= this.width) return
-
-                        if(this.__items[index].x <= this.contentX){
-                            this.contentX = this.__items[index].x
-                        } else if(this.__items[index].x + this.__items[index].width >= this.contentX + this.width){
-                            this.contentX = this.__items[index].x + this.__items[index].width - this.width
-                        }
-                    } else {
-                        if(this.contentHeight <= this.height) return
-
-                        if(this.__items[index].y <= this.contentY){
-                            this.contentY = this.__items[index].y
-                        } else if(this.__items[index].y + this.__items[index].height >= this.contentY + this.height){
-                            this.contentY = this.__items[index].y + this.__items[index].height - this.height
-                        }
-                    }
+                if (itemPos < contentPos) {
+                    target = itemPos
+                } else if (itemPos + itemSize > contentPos + viewSize) {
+                    target = itemPos + itemSize - viewSize
                 }
-                break;
+                break
             }
+            default: return
         }
 
+        let maxPos = origin + contentSize - viewSize
+        if (target > maxPos) target = maxPos
+        if (target < origin) target = origin
+
+        if (horizontal) {
+            this.contentX = target
+        } else {
+            this.contentY = target
+        }
     }
 
     __moveCurrentIndex(direction){
@@ -501,27 +515,6 @@ class ListView extends Flickable {
             item.visibleChanged.connect(() => {
                 JQApplication.updateLater(this)
             })
-            item.indexChanged.connect((oldValue, newValue) => {
-                delete this.__items[oldValue]
-                if(newValue < 0) return
-                
-                let _index = newValue
-                this.__items[_index] = item
-                if (this.orientation === ListView.Horizontal) {
-                    if(_index > 0){
-                        item.x = this.__items[_index - 1].x + this.__items[_index - 1].width + this.spacing
-                    } else {
-                        item.x = this.originX
-                    }
-                } else {
-                    if(_index > 0){
-                        item.y = this.__items[_index - 1].y + this.__items[_index - 1].height + this.spacing
-                    } else {
-                        item.y = this.originY
-                    }
-                }
-                JQApplication.updateLater(this)
-            })
 
             item.x = itemInfo.x
             item.y = itemInfo.y
@@ -549,13 +542,10 @@ class ListView extends Flickable {
 
             if (length === 0) return
 
-            let countChanged = false
-
-            if (this.count !== length) {
-                countChanged = true
-            }
-
-            this.__self.count = length
+            // Through the property setter, not __self: a raw write skips the change
+            // notification, and the countChanged() emitted by hand later in the same
+            // update batch is dropped, so bindings on count keep the stale value.
+            this.count = length
             this.__normalizeCurrentIndex(length)
 
             JQApplication.beginUpdate()
@@ -572,8 +562,6 @@ class ListView extends Flickable {
                 }
             }
 
-            if (countChanged) this.countChanged()
-
             JQApplication.endUpdate()
         }
     }
@@ -585,13 +573,25 @@ class ListView extends Flickable {
         }
     }
 
-    __normalizeItemsIndex() {
-        this.__items = {}
-        for(let child of this.contentItem.__children){
-            let index = child.index
-            if(index >= 0 && Number.isFinite(index))
-            this.__items[index] = child
+    // Rebuilding the map from contentItem.__children used to pick up items that were
+    // already handed to __toCache - destroy() only detaches them at endUpdate - and it
+    // trusted child.index, which a delegate declaring its own "property int index"
+    // shadows with a value nothing refreshes. Both left the map pointing at delegates
+    // that no longer belong to any row. The shift is arithmetic instead.
+    __shiftItemsIndex(from, delta) {
+        if(!delta) return
+
+        let shifted = {}
+
+        for(let key of Object.keys(this.__items)){
+            let item = this.__items[key]
+            if(!item) continue
+
+            let index = Number(key)
+            shifted[index >= from ? index + delta : index] = item
         }
+
+        this.__items = shifted
     }
 
     __realignItems(startIndex = 0) {
@@ -628,7 +628,6 @@ class ListView extends Flickable {
 
     __updateView() {
         if (this.delegate && this.model && this.__completed) {
-            this.__updating = true
             let length = 0
             if (Array.isArray(this.model)) {
                 length = this.model.length
@@ -642,16 +641,16 @@ class ListView extends Flickable {
 
             if (length === 0 && Object.keys(this.__items).length === 0) return
 
+            // Set only past the early exits: a leftover flag stops __endUpdate from
+            // ever calling this again, which freezes the view at its first batch.
+            this.__updating = true
+
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)
 
-            let countChanged = false
-
-            if (this.count !== length) {
-                countChanged = true
-            }
-
-            this.__self.count = length
+            // See __initView: count has to go through the property setter, or the
+            // bindings that depend on it are never re-evaluated.
+            this.count = length
 
             let changeSet = this.__changeSet
             this.__changeSet = []
@@ -685,8 +684,8 @@ class ListView extends Flickable {
                         }
                     }
                 } else if (role === 'insert') {
-                    this.__normalizeItemsIndex()
-                    
+                    this.__shiftItemsIndex(leftTop, bottomRight - leftTop)
+
                     for (let i = leftTop; i < bottomRight; i++) {
                         let itemInfo = this.__getItemInfo(i)
                         if (itemInfo.inner) {
@@ -710,7 +709,7 @@ class ListView extends Flickable {
                         delete this.__items[i]
                     }
 
-                    this.__normalizeItemsIndex()
+                    this.__shiftItemsIndex(bottomRight, leftTop - bottomRight)
 
                     if(leftTopItem && bottomRightItem){
                         bottomRightItem.x = leftTopItem.x
@@ -740,16 +739,13 @@ class ListView extends Flickable {
                 this.currentIndex = currentIndex
             }
 
-            // if (layoutFrom !== undefined) {
-            //     this.__normalizeItemsIndex()
-            //     this.__realignItems(layoutFrom)
-            // }
-
             let keys = Object.keys(this.__items)
             let firstIndex = Number(keys[0])
             let lastIndex = Number(keys[keys.length-1])
 
-            if(firstIndex)
+            // Guards are about "is there anything materialised", not about the index
+            // being non-zero: a list holding only row 0 never filled rows 1..n.
+            if(Number.isFinite(firstIndex))
             for(let i = firstIndex - 1; i >= 0 ; i--) {
                 let itemInfo = this.__getItemInfo(i)
                 if (itemInfo.inner) {
@@ -764,7 +760,7 @@ class ListView extends Flickable {
                 }
             }
 
-            if(lastIndex)
+            if(Number.isFinite(lastIndex))
             for(let i = lastIndex + 1; i < length ; i++) {
                 let itemInfo = this.__getItemInfo(i)
                 if (itemInfo.inner) {
@@ -808,8 +804,6 @@ class ListView extends Flickable {
                     }
                 }
             }
-
-            if (countChanged) this.countChanged()
 
             JQApplication.endUpdate()
             delete this.__updating
@@ -901,6 +895,7 @@ class ListView extends Flickable {
         }
 
         let model = this.model
+        let length = 0
         if (Array.isArray(model)) {
             length = model.length
         } else if (typeof model === 'object') {
@@ -920,11 +915,17 @@ class ListView extends Flickable {
         let visibleContentWidth = 0
         let visibleContentHeight = 0
 
+        let maxWidth = 0
+        let maxHeight = 0
+
         for (let i in this.__items) {
             let index = Number(i)
             if (this.__items[i]) {
                 if (isNaN(this.__items[i].width) || this.__items[i].width === Infinity || this.__items[i].width === -Infinity ||
                     isNaN(this.__items[i].height) || this.__items[i].height === Infinity || this.__items[i].height === -Infinity) continue
+
+                if (this.__items[i].width > maxWidth) maxWidth = this.__items[i].width
+                if (this.__items[i].height > maxHeight) maxHeight = this.__items[i].height
 
                 visibleCount++
                 visibleContentWidth += this.__items[i].width
@@ -951,7 +952,7 @@ class ListView extends Flickable {
             let originX = (minX - firstIndex * (Math.round(middleWidth + this.spacing)))
             if (originX !== Infinity && originX !== -Infinity) this.originX = originX
 
-            Geometry.setAuto(this.__self, 'contentHeight', this.height, this.__self.constructor.meta.contentHeight)
+            Geometry.setAuto(this.__self, 'contentHeight', Math.max(this.height, maxHeight), this.__self.constructor.meta.contentHeight)
             // this.__getDataQml('contentHeight').__setAuto(this.height)
         } else {
             this.contentHeight = visibleContentHeight + Math.round(middleHeight) * (length - visibleCount) + this.spacing * (length - 1)
@@ -959,7 +960,7 @@ class ListView extends Flickable {
             if (originY !== Infinity && originY !== -Infinity) this.originY = originY
 
             // this.__getDataQml('contentWidth').__setAuto(this.width)
-            Geometry.setAuto(this.__self, 'contentWidth', this.width, this.__self.constructor.meta.contentWidth)
+            Geometry.setAuto(this.__self, 'contentWidth', Math.max(this.width, maxWidth), this.__self.constructor.meta.contentWidth)
         }
     }
 

@@ -311,6 +311,10 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 		istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
 		operationContextPtr.SetPtr(CreateOperationContextFromGqlRequest(gqlRequest));
 
+		if (operationContextPtr.IsValid()){
+			GenerateDocumentChanges(userId, *saveDocumentInput->documentId, *operationContextPtr);
+		}
+
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
 		taskParams.documentId = *saveDocumentInput->documentId;
@@ -706,6 +710,56 @@ imtbase::IOperationContext* CCollectionDocumentServiceControllerComp::CreateOper
 	operationContextPtr->SetTenantId(tenantId);
 
 	return operationContextPtr.PopPtr();
+}
+
+
+QByteArray CCollectionDocumentServiceControllerComp::GetCollectionObjectId(const QByteArray& userId, const QByteArray& documentId) const
+{
+	if (!m_documentManagerCompPtr.IsValid()){
+		return QByteArray();
+	}
+
+	const imtdoc::IDocumentService::DocumentList documentList = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+	for (const imtdoc::IDocumentService::DocumentListItem& documentItem : documentList){
+		if (documentItem.documentId == documentId){
+			// Documents bound to a collection element carry a 'collection:///<objectId>' source URL.
+			return documentItem.url.path().mid(1).toUtf8();
+		}
+	}
+
+	return QByteArray();
+}
+
+
+void CCollectionDocumentServiceControllerComp::GenerateDocumentChanges(
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			imtbase::IOperationContext& operationContext) const
+{
+	if (!m_documentChangeGeneratorCompPtr.IsValid() || !m_documentManagerCompPtr.IsValid()){
+		return;
+	}
+
+	imtbase::CObjectCollection* changesCollectionPtr = dynamic_cast<imtbase::CObjectCollection*>(operationContext.GetChangesCollection());
+	if (changesCollectionPtr == nullptr){
+		return;
+	}
+
+	const istd::IChangeable* documentDataPtr = m_documentManagerCompPtr->GetDocumentPtr(userId, documentId);
+	if (documentDataPtr == nullptr){
+		return;
+	}
+
+	// An empty object-ID means the document was never stored, so saving it creates a new element.
+	const QByteArray objectId = GetCollectionObjectId(userId, documentId);
+	const QByteArray operationTypeId = objectId.isEmpty() ? QByteArray("Create") : QByteArray("Update");
+
+	QString errorMessage;
+	if (!m_documentChangeGeneratorCompPtr->GenerateDocumentChanges(
+				operationTypeId, objectId, documentDataPtr, *changesCollectionPtr, errorMessage, nullptr)){
+		SendWarningMessage(0, QString("Unable to generate document changes for '%1'. Error: %2")
+					.arg(QString::fromUtf8(objectId), errorMessage));
+	}
 }
 
 

@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IOperationContext.h>
+#include <imtbase/IDocumentChangeGenerator.h>
 #include <imtdoc/IDocumentService.h>
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService_fwd.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager_fwd.h>
@@ -27,6 +28,7 @@ public:
 
 	I_BEGIN_COMPONENT(CCollectionDocumentServiceControllerComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection-related document manager", true, "CollectionDocumentService");
+		I_ASSIGN(m_documentChangeGeneratorCompPtr, "DocumentChangeGenerator", "Change generator producing the document history entries on save", false, "DocumentChangeGenerator");
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "ID of the underlaying document collection", true, "");
 	I_END_COMPONENT
 
@@ -83,9 +85,23 @@ private:
 	int GetObjectFactoryIndex(const QByteArray& typeId) const;
 	QByteArray GetUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
 	imtbase::IOperationContext* CreateOperationContextFromGqlRequest(const ::imtgql::CGqlRequest& gqlRequest) const;
+	/**
+		Get the ID of the collection element an open document instance is bound to.
+		Returns an empty ID for documents which were never saved before.
+	*/
+	QByteArray GetCollectionObjectId(const QByteArray& userId, const QByteArray& documentId) const;
+	/**
+		Fill the changes collection of \a operationContext with the differences produced by saving
+		the given document instance, so that the collection can store them as history.
+	*/
+	void GenerateDocumentChanges(
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				imtbase::IOperationContext& operationContext) const;
 
 private:
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
+	I_REF(imtbase::IDocumentChangeGenerator, m_documentChangeGeneratorCompPtr);
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 };
 

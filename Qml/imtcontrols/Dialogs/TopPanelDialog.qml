@@ -21,7 +21,10 @@ Rectangle {
 
 	property bool hasIcon: true;
 	property bool canClose: true;
-	property string iconSource: "../../../../" + Style.getIconPath("Icons/AppIcon", Icon.State.On, Icon.Mode.Normal);
+	// The installation's own logo, falling back to the generic mark. It used to
+	// ask for the generic one outright, so a deployment that had named a logo
+	// never saw it here.
+	property string iconSource: "qrc:/" + Style.getLogoIconPath(Icon.State.On, Icon.Mode.Normal);
 	property string closeButtonIconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
 	signal closeButtonClicked(int buttonId);

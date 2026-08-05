@@ -3,7 +3,6 @@
 
 
 // ImtCore includes
-#include <iqt/iqt.h>
 #include <imtauth/CRole.h>
 #include <imtauth/CUserInfo.h>
 
@@ -30,7 +29,8 @@ QString CUserChangeGeneratorComp::GetRoleName(const QByteArray& roleId) const
 		}
 	}
 
-	return QString();
+	// Falling back to the raw ID keeps a deleted role traceable in the history.
+	return roleId;
 }
 
 
@@ -50,7 +50,7 @@ QString CUserChangeGeneratorComp::GetGroupName(const QByteArray& groupId) const
 		}
 	}
 
-	return QString();
+	return groupId;
 }
 
 
@@ -74,143 +74,149 @@ bool CUserChangeGeneratorComp::CompareDocuments(
 		return false;
 	}
 
-	QByteArray oldUserId = oldUserInfoPtr->GetId();
-	QByteArray newUserId = newUserInfoPtr->GetId();
-	if (oldUserId != newUserId){
-		QString keyName = QT_TRANSLATE_NOOP("Attribute", "User-ID");
-		InsertOperationDescription(documentChangeCollection, "", "UserId", keyName, oldUserId, newUserId);
+	InsertChange(documentChangeCollection, "UserId", QT_TRANSLATE_NOOP("Attribute", "User-ID"), oldUserInfoPtr->GetId(), newUserInfoPtr->GetId());
+	InsertTextChange(documentChangeCollection, "Username", QT_TRANSLATE_NOOP("Attribute", "Username"), oldUserInfoPtr->GetName(), newUserInfoPtr->GetName());
+	InsertTextChange(documentChangeCollection, "Description", QT_TRANSLATE_NOOP("Attribute", "Description"), oldUserInfoPtr->GetDescription(), newUserInfoPtr->GetDescription());
+	InsertTextChange(documentChangeCollection, "Mail", QT_TRANSLATE_NOOP("Attribute", "Mail"), oldUserInfoPtr->GetMail(), newUserInfoPtr->GetMail());
+	InsertChange(documentChangeCollection, "Sid", QT_TRANSLATE_NOOP("Attribute", "Security-ID"), oldUserInfoPtr->GetSid(), newUserInfoPtr->GetSid());
+	InsertFlagChange(documentChangeCollection, "Admin", QT_TRANSLATE_NOOP("Attribute", "Administrator"), oldUserInfoPtr->IsAdmin(), newUserInfoPtr->IsAdmin());
+
+	// The hash itself must never reach the history, only the fact that it was replaced.
+	if (oldUserInfoPtr->GetPasswordHash() != newUserInfoPtr->GetPasswordHash()){
+		InsertOperationDescription(documentChangeCollection, "ChangePassword", "Password", QT_TRANSLATE_NOOP("Attribute", "Password"));
 	}
 
-	QString oldUserName = oldUserInfoPtr->GetName();
-	QString newUserName = newUserInfoPtr->GetName();
-	if (oldUserName != newUserName){
-		QString keyName = QT_TRANSLATE_NOOP("Attribute", "Username");
-		InsertOperationDescription(documentChangeCollection, "", "Username", keyName, oldUserName.toUtf8(), newUserName.toUtf8());
-	}
+	InsertListChanges(
+				documentChangeCollection,
+				"AddGroup",
+				"RemoveGroup",
+				"GroupId",
+				QT_TRANSLATE_NOOP("Attribute", "Group"),
+				oldUserInfoPtr->GetGroups(),
+				newUserInfoPtr->GetGroups());
 
-	QString oldDescription = oldUserInfoPtr->GetDescription();
-	QString newDescription = newUserInfoPtr->GetDescription();
-	if (oldDescription != newDescription){
-		QString keyName = QT_TRANSLATE_NOOP("Attribute", "Description");
-		InsertOperationDescription(documentChangeCollection, "", "Description", keyName, oldDescription.toUtf8(), newDescription.toUtf8());
-	}
-
-	QString oldMail = oldUserInfoPtr->GetMail();
-	QString newMail = newUserInfoPtr->GetMail();
-	if (oldMail != newMail){
-		QString keyName = QT_TRANSLATE_NOOP("Attribute", "Mail");
-		InsertOperationDescription(documentChangeCollection, "", "Mail", keyName, oldMail.toUtf8(), newMail.toUtf8());
-	}
-
-	QByteArrayList oldProducts = oldUserInfoPtr->GetProducts();
-	QByteArrayList newProducts = newUserInfoPtr->GetProducts();
-
-	QByteArrayList addedProducts;
-	QByteArrayList removedProducts;
-	GenerateChanges(oldProducts, newProducts, addedProducts, removedProducts);
-
-	for (const QByteArray& productId : addedProducts){
-		InsertOperationDescription(documentChangeCollection, "AddProduct", "Product", "Product", productId, productId);
-
-		QByteArrayList newRoles = newUserInfoPtr->GetRoles(productId);
-		for (const QByteArray& roleId : newRoles){
-			InsertOperationDescription(documentChangeCollection, "AddRole", "Role", "Role", roleId, roleId);
-		}
-	}
-
-	for (const QByteArray& productId : removedProducts){
-		InsertOperationDescription(documentChangeCollection, "RemoveProduct", "Product", "Product", productId, productId);
-
-		QByteArrayList oldRoles = oldUserInfoPtr->GetRoles(productId);
-		for (const QByteArray& roleId : oldRoles){
-			InsertOperationDescription(documentChangeCollection, "RemoveRole", "Role", "Role", roleId, roleId);
-		}
-	}
-
-	if (oldProducts == newProducts){
-		for (const QByteArray& productId : newProducts){
-			QByteArrayList newRoles = newUserInfoPtr->GetRoles(productId);
-			QByteArrayList oldRoles = oldUserInfoPtr->GetRoles(productId);
-
-			QByteArrayList addedRoles;
-			QByteArrayList removedRoles;
-			GenerateChanges(oldRoles, newRoles, addedRoles, removedRoles);
-
-			for (const QByteArray& roleId : addedRoles){
-				InsertOperationDescription(documentChangeCollection, "AddRole", "Role", "Role", roleId, roleId);
-			}
-
-			for (const QByteArray& roleId : removedRoles){
-				InsertOperationDescription(documentChangeCollection, "RemoveRole", "Role", "Role", roleId, roleId);
-			}
-		}
-	}
-
-	QByteArrayList oldGroups = oldUserInfoPtr->GetGroups();
-	QByteArrayList newGroups = newUserInfoPtr->GetGroups();
-
-	QByteArrayList addedGroups;
-	QByteArrayList removedGroups;
-	GenerateChanges(oldGroups, newGroups, addedGroups, removedGroups);
-
-	for (const QByteArray& groupId : addedGroups){
-		InsertOperationDescription(documentChangeCollection, "AddGroup", "Group", "Group", groupId, groupId);
-	}
-
-	for (const QByteArray& groupId : removedGroups){
-		InsertOperationDescription(documentChangeCollection, "RemoveGroup", "Group", "Group", groupId, groupId);
-	}
+	CompareProductRoles(*oldUserInfoPtr, *newUserInfoPtr, documentChangeCollection);
 
 	return true;
 }
 
 
+void CUserChangeGeneratorComp::CompareProductRoles(
+			const imtauth::IUserInfo& oldUserInfo,
+			const imtauth::IUserInfo& newUserInfo,
+			imtbase::CObjectCollection& documentChangeCollection)
+{
+	const QByteArrayList oldProducts = oldUserInfo.GetProducts();
+	const QByteArrayList newProducts = newUserInfo.GetProducts();
+
+	InsertListChanges(
+				documentChangeCollection,
+				"AddProduct",
+				"RemoveProduct",
+				"ProductId",
+				QT_TRANSLATE_NOOP("Attribute", "Product"),
+				oldProducts,
+				newProducts);
+
+	// Roles are assigned per product, so every product has to be diffed on its own. Products that
+	// only exist on one side contribute all of their roles as added resp. removed.
+	QByteArrayList allProducts = oldProducts;
+	for (const QByteArray& productId : newProducts){
+		if (!allProducts.contains(productId)){
+			allProducts << productId;
+		}
+	}
+
+	for (const QByteArray& productId : std::as_const(allProducts)){
+		const bool inOld = oldProducts.contains(productId);
+		const bool inNew = newProducts.contains(productId);
+
+		InsertListChanges(
+					documentChangeCollection,
+					"AddRole",
+					"RemoveRole",
+					"RoleId",
+					QT_TRANSLATE_NOOP("Attribute", "Role"),
+					inOld ? oldUserInfo.GetRoles(productId) : QByteArrayList(),
+					inNew ? newUserInfo.GetRoles(productId) : QByteArrayList());
+
+		// Permissions granted directly to the user, independently of the roles.
+		InsertListChanges(
+					documentChangeCollection,
+					"AddPermission",
+					"RemovePermission",
+					"Permission",
+					QT_TRANSLATE_NOOP("Attribute", "Permission"),
+					inOld ? oldUserInfo.GetLocalPermissions(productId) : QByteArrayList(),
+					inNew ? newUserInfo.GetLocalPermissions(productId) : QByteArrayList());
+	}
+
+	InsertListChanges(
+				documentChangeCollection,
+				"AddProhibition",
+				"RemoveProhibition",
+				"Prohibition",
+				QT_TRANSLATE_NOOP("Attribute", "Prohibition"),
+				oldUserInfo.GetProhibitions(),
+				newUserInfo.GetProhibitions());
+}
+
+
 QString CUserChangeGeneratorComp::CreateCustomOperationDescription(const imtbase::COperationDescription& operationDescription, const QByteArray& languageId) const
 {
-	QString retVal;
+	static const QByteArray translationContext = QByteArrayLiteral("imtauth::CUserChangeGeneratorComp");
 
-	QByteArray typeId = operationDescription.GetOperationTypeId();
-	QByteArray newValue = operationDescription.GetNewValue();
+	const QByteArray typeId = operationDescription.GetOperationTypeId();
+	const QByteArray oldValue = operationDescription.GetOldValue();
+	const QByteArray newValue = operationDescription.GetNewValue();
 
 	if (typeId == "AddGroup"){
-		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added to group '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
-		change = change.arg(GetGroupName(newValue));
-		retVal += change;
-	}
-	else if (typeId == "RemoveGroup"){
-		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed from group '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
-		change = change.arg(GetGroupName(newValue));
-		retVal += change;
-	}
-	else if (typeId == "AddRole"){
-		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added role '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
-		change = change.arg(GetRoleName(newValue));
-		retVal += change;
-	}
-	else if (typeId == "RemoveRole"){
-		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed role '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
-		change = change.arg(GetRoleName(newValue));
-		retVal += change;
-	}
-	else if (typeId == "AddProduct"){
-		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Added to product '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
-		change = change.arg(qPrintable(newValue));
-		retVal += change;
-	}
-	else if (typeId == "RemoveProduct"){
-		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Removed from product '%1'"), languageId, "imtauth::CUserChangeGeneratorComp");
-		change = change.arg(qPrintable(newValue));
-		retVal += change;
-	}
-	else if (typeId == "ChangePassword"){
-		QString change = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Password changed"), languageId, "imtauth::CUserChangeGeneratorComp");
-		retVal += change;
+		return Translate(QT_TR_NOOP("Added to group '%1'"), languageId, translationContext).arg(GetGroupName(newValue).toHtmlEscaped());
 	}
 
-	return retVal;
+	if (typeId == "RemoveGroup"){
+		return Translate(QT_TR_NOOP("Removed from group '%1'"), languageId, translationContext).arg(GetGroupName(oldValue).toHtmlEscaped());
+	}
+
+	if (typeId == "AddRole"){
+		return Translate(QT_TR_NOOP("Added role '%1'"), languageId, translationContext).arg(GetRoleName(newValue).toHtmlEscaped());
+	}
+
+	if (typeId == "RemoveRole"){
+		return Translate(QT_TR_NOOP("Removed role '%1'"), languageId, translationContext).arg(GetRoleName(oldValue).toHtmlEscaped());
+	}
+
+	if (typeId == "AddProduct"){
+		return Translate(QT_TR_NOOP("Added to product '%1'"), languageId, translationContext).arg(QString::fromUtf8(newValue).toHtmlEscaped());
+	}
+
+	if (typeId == "RemoveProduct"){
+		return Translate(QT_TR_NOOP("Removed from product '%1'"), languageId, translationContext).arg(QString::fromUtf8(oldValue).toHtmlEscaped());
+	}
+
+	if (typeId == "AddPermission"){
+		return Translate(QT_TR_NOOP("Added permission '%1'"), languageId, translationContext).arg(QString::fromUtf8(newValue).toHtmlEscaped());
+	}
+
+	if (typeId == "RemovePermission"){
+		return Translate(QT_TR_NOOP("Removed permission '%1'"), languageId, translationContext).arg(QString::fromUtf8(oldValue).toHtmlEscaped());
+	}
+
+	if (typeId == "AddProhibition"){
+		return Translate(QT_TR_NOOP("Added prohibition '%1'"), languageId, translationContext).arg(QString::fromUtf8(newValue).toHtmlEscaped());
+	}
+
+	if (typeId == "RemoveProhibition"){
+		return Translate(QT_TR_NOOP("Removed prohibition '%1'"), languageId, translationContext).arg(QString::fromUtf8(oldValue).toHtmlEscaped());
+	}
+
+	if (typeId == "ChangePassword"){
+		return Translate(QT_TR_NOOP("Password changed"), languageId, translationContext);
+	}
+
+	return QString();
 }
 
 
 } // namespace imtauth
-
 

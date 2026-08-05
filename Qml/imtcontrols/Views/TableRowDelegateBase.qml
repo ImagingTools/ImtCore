@@ -90,7 +90,7 @@ Rectangle {
 			return tableDelegateContainer.hoverColor
 		if (tableDelegateContainer.tableItem
 				&& tableDelegateContainer.tableItem.enableAlternating
-				&& (tableDelegateContainer.rowIndex % 2 === 0))
+				&& (tableDelegateContainer.rowIndex % 2 === 1))
 			return tableDelegateContainer.tableItem.alternatingColor
 		return "transparent"
 	}

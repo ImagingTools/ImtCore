@@ -585,40 +585,99 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteArra
 }
 
 
+// reimplemented (imtbase::IRevisionController)
+
+imtbase::IRevisionController::RevisionInfoList CSqlJsonDatabaseDelegateComp::GetRevisionInfoList(
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& objectId) const
+{
+	imtbase::IRevisionController::RevisionInfoList revisionInfoList;
+
+	if (!m_databaseEngineCompPtr.IsValid() || objectId.isEmpty()){
+		return revisionInfoList;
+	}
+
+	QString schemaPrefix;
+	if (m_tableSchemaAttrPtr.IsValid()){
+		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
+	}
+
+	const QByteArray query = QString(R"(SELECT * FROM %0"%1" WHERE "DocumentId" = '%2' ORDER BY "RevisionNumber" DESC;)")
+				.arg(schemaPrefix)
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(objectId))
+				.toUtf8();
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		SendErrorMessage(0, sqlError.text(), "CSqlJsonDatabaseDelegateComp");
+
+		return revisionInfoList;
+	}
+
+	while (sqlQuery.next()){
+		const QSqlRecord record = sqlQuery.record();
+		imtbase::IRevisionController::RevisionInfo revisionInfo;
+
+		if (record.contains("RevisionNumber")){
+			revisionInfo.revision = record.value("RevisionNumber").toInt();
+		}
+
+		if (record.contains("OwnerName")){
+			revisionInfo.user = record.value("OwnerName").toString();
+		}
+
+		if (record.contains("OperationDescription")){
+			revisionInfo.comment = record.value("OperationDescription").toString();
+		}
+
+		if (record.contains("LastModified")){
+			revisionInfo.timestamp = record.value("LastModified").toDateTime();
+		}
+
+		if (record.contains("IsActive")){
+			revisionInfo.isRevisionAvailable = record.value("IsActive").toBool();
+		}
+
+		revisionInfoList.push_back(revisionInfo);
+	}
+
+	return revisionInfoList;
+}
+
+
 QByteArray CSqlJsonDatabaseDelegateComp::CreateOperationDescriptionQuery(
 	const QByteArray& objectId,
 	const imtbase::IOperationContext* operationContextPtr) const
 {
-	if (operationContextPtr != nullptr){
-		auto operationPtr = const_cast<imtbase::IOperationContext*>(operationContextPtr);
-		if (operationPtr != nullptr){
-			auto changeCollectionPtr = dynamic_cast<imtbase::CObjectCollection*>(operationPtr->GetChangesCollection());
+	if (operationContextPtr == nullptr){
+		return QByteArray();
+	}
 
-			QByteArray json;
-			{
-				iser::CJsonMemWriteArchive archive(m_versionInfoCompPtr.GetPtr());
-				if (!changeCollectionPtr->Serialize(archive)){
-					qDebug() << QString("Unable to serialize a change object collection");
-				}
-				else{
-					json = archive.GetData();
-				}
-			}
+	imtbase::IOperationContext* operationPtr = const_cast<imtbase::IOperationContext*>(operationContextPtr);
 
-			QString operationDescription = json;
-
-			imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationPtr->GetOperationOwnerId();
-			return QString(R"(UPDATE "%1" SET "OwnerId" = '%2', "OwnerName" = '%3', "OperationDescription" = '%4' WHERE "IsActive" = true AND "DocumentId" = '%5';)")
-				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(qPrintable(objectInfo.id))
-				.arg(SqlEncode(objectInfo.name))
-				.arg(SqlEncode(operationDescription))
-				.arg(qPrintable(objectId))
-				.toUtf8();
+	QByteArray json;
+	iser::ISerializable* changeCollectionPtr = dynamic_cast<iser::ISerializable*>(operationPtr->GetChangesCollection());
+	if (changeCollectionPtr != nullptr){
+		iser::CJsonMemWriteArchive archive(m_versionInfoCompPtr.GetPtr());
+		if (!changeCollectionPtr->Serialize(archive)){
+			SendWarningMessage(0, "Unable to serialize a change object collection", "CSqlJsonDatabaseDelegateComp");
+		}
+		else{
+			json = archive.GetData();
 		}
 	}
 
-	return QByteArray();
+	imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationPtr->GetOperationOwnerId();
+
+	return QString(R"(UPDATE "%1" SET "OwnerId" = '%2', "OwnerName" = '%3', "OperationDescription" = '%4' WHERE "IsActive" = true AND "DocumentId" = '%5';)")
+		.arg(qPrintable(*m_tableNameAttrPtr))
+		.arg(qPrintable(objectInfo.id))
+		.arg(SqlEncode(objectInfo.name))
+		.arg(SqlEncode(QString::fromUtf8(json)))
+		.arg(qPrintable(objectId))
+		.toUtf8();
 }
 
 

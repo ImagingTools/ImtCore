@@ -6,8 +6,8 @@ import imtcontrols 1.0
 Dialog {
 	id: rootDialog;
 	
-	width: Style.sizeHintXXL;
-	
+	width: Math.max(Style.sizeHintL, Math.min(ModalDialogManager.activeView.width - 100, Style.sizeHintXXL));
+
 	property bool currentPasswordInputVisible: true;
 	
 	Component.onCompleted: {

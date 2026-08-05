@@ -9,8 +9,8 @@ import imtguigql 1.0
 Dialog {
 	id: passwordRecoveryDialog;
 
-	width: Style.sizeHintXXL;
-	height: Style.sizeHintL;
+	width: Math.max(Style.sizeHintL, Math.min(ModalDialogManager.activeView.width - 100, Style.sizeHintXXL));
+	height: Math.max(Style.sizeHintM, Math.min(ModalDialogManager.activeView.height - 100, Style.sizeHintL));
 
 	title: qsTr("Password Recovery");
 	canMove: false;

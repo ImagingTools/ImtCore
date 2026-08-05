@@ -205,19 +205,12 @@ class GridView extends Flickable {
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)
 
-            let countChanged = false
 
-            if(this.count !== length){
-                countChanged = true 
-            }
-
-            this.__self.count = length
+            this.count = length
 
             for(let i = 0; i < length; i++){
                 this.__createItem(i)
             }
-
-            if(countChanged) this.countChanged()
 
             JQApplication.endUpdate()
         }
@@ -226,7 +219,7 @@ class GridView extends Flickable {
     __updateChangedSet(changeSet) {
         this.__changeSet.push(changeSet)
         if (this.model && typeof this.model === 'object') {
-            this.__self.count = this.model.count
+            this.count = this.model.count
         }
     }
 
@@ -248,13 +241,9 @@ class GridView extends Flickable {
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)
 
-            let countChanged = false
-
-            if(this.count !== length){
-                countChanged = true 
-            }
-
-            this.__self.count = length
+            // See __initView: count has to go through the property setter, or the
+            // bindings that depend on it are never re-evaluated.
+            this.count = length
 
             let changeSet = this.__changeSet
             this.__changeSet = []
@@ -292,8 +281,6 @@ class GridView extends Flickable {
                     }
                 }
             }
-
-            if(countChanged) this.countChanged()
 
             JQApplication.endUpdate()
         }
