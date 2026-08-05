@@ -84,12 +84,15 @@ class Var extends Property {
      */
     static set(target, name, value, meta){
         if(target.constructor.meta[name].modifiers && target.constructor.meta[name].modifiers.readonly){
-            target[`__${name}__init`] = true
+            target["__" + name + "__init"] = true
         }
-        
-        let oldValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
 
-        if(typeof value === 'function' && value.isSubscription){
+        let oldValue = name in target ? target[name] : ("value" in meta ? meta.value : meta.type.getDefaultValue())
+        let currentValue = oldValue
+
+        if(typeof value === "function" && value.isSubscription){
+            let middleValue = oldValue
+
             try {
                 global.queueFlag.push(true)
                 this.queueLink.push({
@@ -98,18 +101,26 @@ class Var extends Property {
                     meta: meta,
                     func: value,
                 })
-                target[name] = value.call(target)
+                middleValue = value.call(target)
             } catch(error) {
-                if(location.hash === '#jqdebugdetail')console.error(error)
+                if(location.hash === "#jqdebugdetail")console.error(error)
             } finally {
                 global.queueFlag.pop()
                 this.queueLink.pop()
             }
+
+            currentValue = name in target ? target[name] : ("value" in meta ? meta.value : meta.type.getDefaultValue())
+
+            if(oldValue !== middleValue && oldValue === currentValue){
+                target[name] = middleValue
+                currentValue = name in target ? target[name] : ("value" in meta ? meta.value : meta.type.getDefaultValue())
+            } else {
+                return true
+            }
         } else {
             target[name] = value
-        }  
-
-        let currentValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
+            currentValue = name in target ? target[name] : ("value" in meta ? meta.value : meta.type.getDefaultValue())
+        }
 
         if(oldValue !== currentValue){
             if(currentValue instanceof JQModules.QtQml.QObject){
@@ -117,14 +128,14 @@ class Var extends Property {
                     target[name] = null
                 }
                 destructionFunc.meta = {
-                    name: name+'__destruction',
+                    name: name + "__destruction",
                     destruction: true,
                     parent: currentValue
                 }
                 currentValue.__addLink()
-                if(oldValue instanceof JQModules.QtQml.QtObject){
+                if(currentValue instanceof JQModules.QtQml.QtObject){
                     destructionFunc.meta.parent = currentValue
-                    currentValue['Component.destruction'].connect(destructionFunc)
+                    currentValue["Component.destruction"].connect(destructionFunc)
                 }
             }
             if(oldValue instanceof JQModules.QtQml.QObject){
@@ -132,18 +143,18 @@ class Var extends Property {
                     target[name] = null
                 }
                 destructionFunc.meta = {
-                    name: name+'__destruction',
+                    name: name + "__destruction",
                     destruction: true,
                     parent: oldValue
                 }
                 if(oldValue instanceof JQModules.QtQml.QtObject){
                     destructionFunc.meta.parent = oldValue
-                    oldValue['Component.destruction'].disconnect(destructionFunc)
+                    oldValue["Component.destruction"].disconnect(destructionFunc)
                 }
                 oldValue.__removeLink()
             }
 
-            Signal.get(target, name + 'Changed')(oldValue, currentValue)
+            Signal.get(target, name + "Changed")(oldValue, currentValue)
         }
 
         return true

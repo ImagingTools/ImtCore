@@ -117,20 +117,11 @@ class LinkedBool extends Property {
 
             if(!found){
                 let connectionObj = Signal.get(target, name + 'Changed').connect(()=>{
-                    if(link.target[link.name+'__updating']){
-                        link.target[link.name+'__pending'] = true
-                        return
-                    }
-
-                    link.target[link.name+'__updating'] = true
-                    let passes = 0
-                    do {
-                        delete link.target[link.name+'__pending']
+                    if(!link.target[link.name+'__updating']){
+                        link.target[link.name+'__updating'] = true
                         link.meta.type.set(link.target, link.name, link.func, link.meta)
-                        passes++
-                    } while(link.target[link.name+'__pending'] && passes < 16)
-                    delete link.target[link.name+'__pending']
-                    delete link.target[link.name+'__updating']
+                        delete link.target[link.name+'__updating']
+                    }
                 })
 
                 link.target.__depends[link.name].push(connectionObj)
@@ -148,7 +139,8 @@ class LinkedBool extends Property {
      * @param {Object} meta
      */
     static set(target, name, value, meta){
-        let oldValue = target.__self[name].value && target.__self[name].parentValue
+        let oldRawValue = target.__self[name].value
+        let middleRawValue = oldRawValue
 
         if(typeof value === 'function'){
             try {
@@ -159,7 +151,7 @@ class LinkedBool extends Property {
                     meta: meta,
                     func: value,
                 })
-                target.__self[name].value = value.call(target)
+                middleRawValue = value.call(target)
             } catch(error) {
                 if(location.hash === '#jqdebugdetail')console.error(error)
             } finally {
@@ -167,13 +159,22 @@ class LinkedBool extends Property {
                 this.queueLink.pop()
             }
         } else {
-            target.__self[name].value = value
-        }  
+            middleRawValue = value
+        }
 
-        let currentValue = target.__self[name].value && target.__self[name].parentValue
+        // Состояние сразу перед возможным коммитом (после реэнтрантных эффектов)
+        let beforeCommitValue = target.__self[name].value && target.__self[name].parentValue
 
-        if(oldValue !== currentValue){
-            Signal.get(target, name + 'Changed')(oldValue, currentValue)
+        // Не перетираем, если raw уже был изменен реэнтрантно в процессе вычисления
+        let rawWasNotReentered = target.__self[name].value === oldRawValue
+        if(rawWasNotReentered){
+            target.__self[name].value = middleRawValue
+        }
+
+        let afterCommitValue = target.__self[name].value && target.__self[name].parentValue
+
+        if(beforeCommitValue !== afterCommitValue){
+            Signal.get(target, name + 'Changed')(beforeCommitValue, afterCommitValue)
         }
 
         return true
