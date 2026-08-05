@@ -199,12 +199,12 @@ protected:
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const;
 	virtual QByteArray GetObjectIdFromInputParams(const imtgql::CGqlParamObject &inputParams) const;
 	virtual QByteArray GetObjectIdFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
-	virtual QJsonObject GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual QJsonObject InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual QJsonObject UpdateObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual QJsonObject RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual QJsonObject SetObjectDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual QJsonObject ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetObjectListFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual QJsonObject GetElementsCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual QJsonObject DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	/// \todo rename to GetElementMetaInfo

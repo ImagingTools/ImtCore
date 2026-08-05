@@ -18,7 +18,7 @@ namespace imtlicgql
 
 // reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 
-QJsonObject CAccountControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CAccountControllerComp::GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QString("Internal error");

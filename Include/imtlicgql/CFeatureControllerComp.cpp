@@ -92,7 +92,7 @@ istd::IChangeableUniquePtr CFeatureControllerComp::CreateObjectFromRequest(
 }
 
 
-QJsonObject CFeatureControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CFeatureControllerComp::GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QString("Internal error.").toUtf8();

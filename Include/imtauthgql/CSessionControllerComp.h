@@ -23,7 +23,7 @@ public:
 
 protected:
 	// reimplemented (CObjectCollectionControllerCompBase)
-	virtual QJsonObject GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 };
 
 
