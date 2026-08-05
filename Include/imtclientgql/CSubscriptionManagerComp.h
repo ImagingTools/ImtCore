@@ -69,8 +69,12 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtclientgql::IGqlSubscriptionManager)
-	virtual QByteArray RegisterSubscription(const imtgql::IGqlRequest& subscriptionRequest, imtclientgql::IGqlSubscriptionClient * subscriptionClientPtr) override;
-	virtual bool UnregisterSubscription(const QByteArray& subscriptionId) override;
+	virtual QByteArray RegisterSubscription(
+			const imtgql::IGqlRequest& subscriptionRequest,
+			imtclientgql::IGqlSubscriptionClient& subscriptionClient) override;
+	virtual bool UnregisterSubscription(
+			const QByteArray& subscriptionId,
+			imtclientgql::IGqlSubscriptionClient& subscriptionClient) override;
 
 	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;

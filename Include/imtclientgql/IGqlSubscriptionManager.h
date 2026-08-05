@@ -11,16 +11,18 @@ namespace imtclientgql
 {
 
 
-class IGqlSubscriptionManager: virtual public istd::IChangeable
+	class IGqlSubscriptionManager: virtual public istd::IChangeable
 {
 public:
 	virtual QByteArray RegisterSubscription(
-				const imtgql::IGqlRequest& subscriptionRequest,
-				IGqlSubscriptionClient* subscriptionClientPtr) = 0;
-	virtual bool UnregisterSubscription(const QByteArray& subscriptionId) = 0;
+			const imtgql::IGqlRequest& subscriptionRequest,
+			imtclientgql::IGqlSubscriptionClient& subscriptionClient) = 0;
+	virtual bool UnregisterSubscription(
+			const QByteArray& subscriptionId,
+			imtclientgql::IGqlSubscriptionClient& subscriptionClient) = 0;
 };
 
 
-} // namespace imtgql
+} // namespace imtclientgql
 
 

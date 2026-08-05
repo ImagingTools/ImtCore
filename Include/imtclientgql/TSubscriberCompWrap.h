@@ -61,7 +61,7 @@ void TSubscriberCompWrap<Base>::RegisterSubscription()
 		// subscriptionField.InsertParam("id", "");
 		// gqlRequest.AddField("data", subscriptionField);
 
-		m_subscriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
+		m_subscriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, *this);
 	}
 }
 
