@@ -203,6 +203,7 @@ void CAsyncApiClientComp::OnComponentCreated()
 
 	BaseClass::OnComponentCreated();
 
+	m_timeout = static_cast<int>(*m_timeoutAttrPtr * 1000);
 	Q_ASSERT(m_thread == nullptr);
 
 	m_thread = new QThread();
