@@ -41,7 +41,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PageQmlItem" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtguigql/GqlSingleDocCollectionPageView.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtguigql/Pages/GqlSingleDocCollectionPageView.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="StartQmlItem" Type="Text" ExportId="CollectionViewQmlPath">
                         <Data IsEnabled="false"/>
