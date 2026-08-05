@@ -74,7 +74,7 @@ public:
 			imtclientgql::IGqlSubscriptionClient& subscriptionClient) override;
 	virtual bool UnregisterSubscription(
 			const QByteArray& subscriptionId,
-			const imtclientgql::IGqlSubscriptionClient& subscriptionClient) override;
+			imtclientgql::IGqlSubscriptionClient& subscriptionClient) override;
 
 	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
