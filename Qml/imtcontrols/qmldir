@@ -35,6 +35,7 @@ RadioButton 1.0 ./Buttons/RadioButton.qml
 TextButtonDecorator 1.0 ./Buttons/TextButtonDecorator.qml
 ToolButton 1.0 ./Buttons/ToolButton.qml
 ToolButtonDecorator 1.0 ./Buttons/ToolButtonDecorator.qml
+ToolbarButton 1.0 ./Buttons/ToolbarButton.qml
 TopButtonDecorator 1.0 ./Buttons/TopButtonDecorator.qml
 IconButtonDecorator 1.0 ./Buttons/IconButtonDecorator.qml
 RadioButtonDecorator 1.0 ./Buttons/RadioButtonDecorator.qml
@@ -152,7 +153,6 @@ BasicTreeView 1.0 ./Views/BasicTreeView.qml
 TreeExplorerView 1.0 ./Views/TreeExplorerView.qml
 CheckableListPanel 1.0 ./Views/CheckableListPanel.qml
 EditableTableCell 1.0 ./Views/EditableTableCell.qml
-ToolbarButton 1.0 ./Views/ToolbarButton.qml
 ChangeItemSize 1.0 ./Views/ChangeItemSize.qml
 CustomScrollbar 1.0 ./Views/CustomScrollbar.qml
 ScrollIndicator 1.0 ./Views/ScrollIndicator.qml

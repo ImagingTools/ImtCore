@@ -14,7 +14,7 @@
 
 | Модуль | Назначение | Компонентов |
 |---|---|---|
-| [`imtcontrols`](#imtcontrols) | Библиотека UI-контролов | 208 |
+| [`imtcontrols`](#imtcontrols) | Библиотека UI-контролов | 212 |
 | [`imtstyle`](#imtstyle) | Стили и оформление | 4 |
 | [`imtqmlutils`](#imtqmlutils) | Утилиты (математика, валидаторы, модели, события) | 17 |
 | [`imtgraphics2d`](#imtgraphics2d) | 2D-графика на Canvas (фигуры, графики, матрицы) | 35 |
@@ -28,7 +28,7 @@
 
 Фундаментальная библиотека переиспользуемых контролов и визуальных примитивов: кнопки, поля ввода, диалоги и всплывающие окна, таблицы и деревья, меню, диаграммы и индикаторы, а также базовые классы (ControlBase, DecoratorBase). Оформление вынесено в отдельный модуль imtstyle. На неё опираются почти все остальные QML-модули.
 
-**Импорт:** `import imtcontrols 1.0` · **Компонентов:** 208
+**Импорт:** `import imtcontrols 1.0` · **Компонентов:** 212
 
 ### Base/ — Базовые классы
 
@@ -1253,6 +1253,29 @@
 
 - **Файл:** [Buttons/ToolButtonDecorator.qml](imtcontrols/Buttons/ToolButtonDecorator.qml)
 - **Базовый тип:** [`ButtonDecorator`](#b-imtcontrols-ButtonDecorator)
+
+<a id="b-imtcontrols-ToolbarButton"></a>
+#### `ToolbarButton`
+
+Кнопка: плоская команда для тулбаров [`TreeExplorerView`](#b-imtcontrols-TreeExplorerView) и [`CheckableListPanel`](#b-imtcontrols-CheckableListPanel); второстепенные команды подсвечиваются только при наведении, основная — залитая акцентная «пилюля».
+
+- **Файл:** [Buttons/ToolbarButton.qml](imtcontrols/Buttons/ToolbarButton.qml)
+- **Базовый тип:** [`Item`](https://doc.qt.io/qt-6/qml-qtquick-item.html)
+
+**Свойства**
+
+- `text: string`
+- `iconSource: string`
+- `primary: bool`
+- `plusGlyph: bool`
+- `active: bool`
+- `leftAligned: bool`
+- `tooltipText: string`
+- `contentColor: color`
+
+**Сигналы**
+
+- `clicked()`
 
 <a id="b-imtcontrols-TopButtonDecorator"></a>
 #### `TopButtonDecorator`
@@ -3614,6 +3637,62 @@
 - `rootItem: Item`
 - `coord: var`
 
+<a id="b-imtcontrols-CheckableListPanel"></a>
+#### `CheckableListPanel`
+
+Панель-список отмечаемых записей с поиском и древовидным отступом; размечена так, чтобы стоять рядом с [`TreeExplorerView`](#b-imtcontrols-TreeExplorerView) как его боковая панель.
+
+- **Файл:** [Views/CheckableListPanel.qml](imtcontrols/Views/CheckableListPanel.qml)
+- **Базовый тип:** [`FocusScope`](https://doc.qt.io/qt-6/qml-qtquick-focusscope.html)
+
+**Свойства**
+
+- `currentRow: int`
+- `model: var`
+- `title: string`
+- `subtitle: string`
+- `searchPlaceholder: string`
+- `nameColumnTitle: string`
+- `emptyText: string`
+- `emptyDescription: string`
+- `filteredEmptyText: string`
+- `iconSource: string`
+- `contentActive: bool`
+- `placeholderText: string`
+- `placeholderDescription: string`
+- `actionText: string`
+- `actionEnabled: bool`
+- `footerText: string`
+- `entryTitleProvider: var`
+- `entrySubtitleProvider: var`
+- `entryBadgeProvider: var`
+- `entrySearchableTextProvider: var`
+- `entryCheckStateProvider: var`
+- `entryCheckEnabledProvider: var`
+- `filterText: string`
+- `visibleEntries: var`
+- `rowHeight: real`
+- `revealKey: string`
+
+**Сигналы**
+
+- `toggleRequested(var entry)`
+- `actionRequested()`
+
+**Функции**
+
+- `moveCurrent(step)`
+- `toggleCurrent()`
+- `pageStep()`
+- `revealFirstChecked()`
+- `entryTitle(entry)`
+- `entrySubtitle(entry)`
+- `entryBadge(entry)`
+- `entrySearchableText(entry)`
+- `entryCheckState(entry)`
+- `entryCheckEnabled(entry)`
+- `rebuildVisibleEntries()`
+
 <a id="b-imtcontrols-CollapsibleRectangle"></a>
 #### `CollapsibleRectangle`
 
@@ -3857,6 +3936,41 @@
 - `setVisible(visible_)`
 - `addStep(step)`
 - `setSizes()`
+
+<a id="b-imtcontrols-EditableTableCell"></a>
+#### `EditableTableCell`
+
+Ячейка строки таблицы с инлайн-редактированием: отображает текст, а в режиме редактирования строки держит черновик значения; модель не изменяет — строка сама забирает черновики через `pendingValue()`.
+
+- **Файл:** [Views/EditableTableCell.qml](imtcontrols/Views/EditableTableCell.qml)
+- **Базовый тип:** [`Item`](https://doc.qt.io/qt-6/qml-qtquick-item.html)
+
+**Свойства**
+
+- `value: string`
+- `placeHolderText: string`
+- `emptyText: string`
+- `readOnly: bool`
+- `bold: bool`
+- `editing: bool`
+- `required: bool`
+- `missing: bool`
+- `draft: string`
+- `textInset: real`
+- `editorItem: alias`
+- `nextEditor: Item`
+- `previousEditor: Item`
+
+**Сигналы**
+
+- `editingEndRequested()`
+- `editingCancelRequested()`
+
+**Функции**
+
+- `focusEditor()`
+- `pendingValue()`
+- `setDraft(newValue)`
 
 <a id="b-imtcontrols-ExpandingContainer"></a>
 #### `ExpandingContainer`
@@ -5338,6 +5452,130 @@
 - `tooltip: alias`
 - `containsMouse: bool`
 - `interval: alias`
+
+<a id="b-imtcontrols-TreeExplorerView"></a>
+#### `TreeExplorerView`
+
+Проводник-редактор для нормализованных узлов `TreeModelBuilder`: панель навигации с «хлебными крошками», строка команд с поиском, безрамочная таблица уровня и опциональная боковая панель за перетаскиваемым разделителем; изменения модели запрашиваются через сигналы.
+
+- **Файл:** [Views/TreeExplorerView.qml](imtcontrols/Views/TreeExplorerView.qml)
+- **Базовый тип:** [`FocusScope`](https://doc.qt.io/qt-6/qml-qtquick-focusscope.html)
+
+**Свойства**
+
+- `model: var`
+- `navigationStack: var`
+- `currentEntries: var`
+- `selectedNode: var`
+- `editingNode: var`
+- `editColumn: int`
+- `commitRequest: int`
+- `movingNode: var`
+- `renamingNode: var`
+- `filterText: string`
+- `rootTitle: string`
+- `nameColumnTitle: string`
+- `secondaryColumnTitle: string`
+- `createButtonText: string`
+- `searchPlaceholder: string`
+- `emptyText: string`
+- `filteredEmptyText: string`
+- `emptyDescription: string`
+- `levelStatusText: string`
+- `levelStatusDetails: var`
+- `idleHintText: string`
+- `selectedHintText: string`
+- `editable: bool`
+- `navigationEnabled: bool`
+- `createVisible: bool`
+- `createEnabled: bool`
+- `removeVisible: bool`
+- `renameVisible: bool`
+- `moveVisible: bool`
+- `editVisible: bool`
+- `multiSelectEnabled: bool`
+- `checkedNodes: var`
+- `rowIconVisible: bool`
+- `listView: alias`
+- `textProvider: var`
+- `descriptionProvider: var`
+- `secondaryTextProvider: var`
+- `iconProvider: var`
+- `containerProvider: var`
+- `searchableTextProvider: var`
+- `defaultIconSource: string`
+- `componentReady: bool`
+- `headerContentComponent: Component`
+- `rowContentComponent: Component`
+- `sidePanelComponent: Component`
+- `sidePanelVisible: bool`
+- `sidePanelWidth: real`
+- `sidePanelMinWidth: real`
+- `mainPaneMinWidth: real`
+- `sidePanelShown: bool`
+- `sidePanelActualWidth: real`
+- `rowHeight: real`
+- `rowEditingEnabled: bool`
+- `rowLeftInset: real`
+- `rowRightInset: real`
+- `committingRow: bool`
+
+**Сигналы**
+
+- `createRequested(var parentNode)`
+- `removeNodesRequested(var nodes, var parentNode)`
+- `renameRequested(var node, string newName)`
+- `moveRequested(var node, var oldParentNode, var newParentNode)`
+- `nodeActivated(var node)`
+
+**Функции**
+
+- `nodeText(node)`
+- `nodeDescription(node)`
+- `nodeSecondaryText(node)`
+- `nodeIcon(node)`
+- `isContainer(node)`
+- `nodeSearchableText(node)`
+- `isChecked(node)`
+- `toggleChecked(node)`
+- `selectOnly(node)`
+- `checkAll(value)`
+- `allChecked()`
+- `commandTargets()`
+- `singleTargetOnly()`
+- `currentParentNode()`
+- `currentSourceEntries()`
+- `currentLevelTitle()`
+- `pathSegmentText(index)`
+- `rebuildCurrentEntries()`
+- `synchronizeModel()`
+- `findNodeByKey(nodes, key)`
+- `findParent(node, nodes, parentNode)`
+- `containsNode(parentNode, candidateNode)`
+- `selectNode(node)`
+- `clearSelection()`
+- `clearFilter()`
+- `navigateInto(node)`
+- `navigateUp()`
+- `navigateToDepth(depth)`
+- `beginEditRow(node, column)`
+- `commitEditRow()`
+- `cancelEditRow()`
+- `endEditRow()`
+- `toggleEditRow(node)`
+- `moveEditRow(node, direction, column)`
+- `beginRename()`
+- `finishRename(node, text)`
+- `beginMove()`
+- `canMoveHere()`
+- `finishMove()`
+- `cancelMove()`
+- `selectRelative(direction)`
+- `selectAt(index)`
+- `pageStep()`
+- `openSelected()`
+- `canOpenSelected()`
+- `removeSelection()`
 
 <a id="b-imtcontrols-TreeItemDelegate"></a>
 #### `TreeItemDelegate`
