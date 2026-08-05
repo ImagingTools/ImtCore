@@ -361,6 +361,10 @@ macro(getImtBaseQmlWebDirs webdirs buildwebdir useImtControlsStyle)
 	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/web)
 	list(APPEND ${webdirs} ${buildwebdir}/Resources)
 
+	# Web JS entrypoints (GraphQLRequest.js, Icon.js, ...) live under imtqmlutils/Web and must sit at the Resources root (referenced by index.html and *JsWeb.qrc).
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtqmlutils/Web)
+	list(APPEND ${webdirs} ${buildwebdir}/Resources)
+
 	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtgui)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtgui)
 
@@ -375,6 +379,18 @@ macro(getImtBaseQmlWebDirs webdirs buildwebdir useImtControlsStyle)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtcontrols)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtcontrols)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtqmlutils)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtqmlutils)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtstyle)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtstyle)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtgraphics2d)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtgraphics2d)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imt3dgui)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imt3dgui)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR}/Impl/ImtCoreLoc/Translations)
 	list(APPEND ${webdirs} ${buildwebdir}/Resources/Translations)
