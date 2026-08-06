@@ -245,15 +245,6 @@ Item {
 			delegate: root.delegateComponent ? root.delegateComponent : defaultDelegateComponent
 
 			onModelChanged: {
-				// Restored synchronously, in the same tick as the model swap below -
-				// a Timer (even interval: 0) defers to the next event-loop turn, which
-				// is one turn too late: Qt Quick has already composited a frame with
-				// contentY reset to 0 by then, so the fix itself became a visible
-				// jump-to-top-then-to-middle instead of a silent one. Setting it here
-				// happens before this tick's frame is ever painted, so only the final,
-				// correct position reaches the screen. No clamping needed either - the
-				// old position was valid for the smaller pre-append content, so it is
-				// still valid now that content only grew.
 				if (root.__restorePagingScroll) {
 					root.__restorePagingScroll = false
 					itemListView.contentY = root.__pagingContentY

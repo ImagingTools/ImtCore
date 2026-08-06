@@ -45,6 +45,9 @@ Rectangle {
 	property int expandedWidth: Style.menuPanelWidth !== undefined ? Style.menuPanelWidth : Style.sizeHintXXS;
 	property int collapsedWidth: Style.menuPanelMinWidth;
 
+	property int autoCollapseWidth: Style.menuPanelAutoCollapseWidth !== undefined ? Style.menuPanelAutoCollapseWidth : 0;
+	property bool autoCollapsed: false;
+
 	readonly property int rowWidth: Style.enableMenuPanelCollapse ? menuPanel.expandedWidth : menuPanel.buttonWidth;
 
 	property string hintText: "";
@@ -63,6 +66,16 @@ Rectangle {
 		Events.subscribeEvent("ChangePage", menuPanel.setActivePage);
 		Events.subscribeEvent("CollapseMenu", menuPanel.setCollapsed);
 		Events.subscribeEvent("ExpandMenu", menuPanel.setCollapsed);
+
+		menuPanel.updateAutoCollapse();
+	}
+
+	Connections {
+		target: menuPanel.parent;
+
+		function onWidthChanged(){
+			menuPanel.updateAutoCollapse();
+		}
 	}
 
 	Component.onDestruction: {
@@ -156,6 +169,26 @@ Rectangle {
 		collapsed = stateArg;
 	}
 
+	function updateAutoCollapse(){
+		if (!Style.enableMenuPanelCollapse || menuPanel.autoCollapseWidth <= 0 || !menuPanel.parent){
+			return;
+		}
+
+		if (menuPanel.parent.width <= 0){
+			return;
+		}
+
+		let isNarrow = menuPanel.parent.width < menuPanel.autoCollapseWidth;
+
+		if (isNarrow && !menuPanel.collapsed){
+			menuPanel.autoCollapsed = true;
+			Events.sendEvent("CollapseMenu", true);
+		}
+		else if (!isNarrow && menuPanel.autoCollapsed){
+			Events.sendEvent("ExpandMenu", false);
+		}
+	}
+
 	function showHint(text, y){
 		menuPanel.hintText = text;
 		menuPanel.hintY = y;
@@ -177,6 +210,7 @@ Rectangle {
 
 		if(!menuPanel.collapsed){
 			menuPanel.menuDefaultWidth = menuPanel.expandedWidth;
+			menuPanel.autoCollapsed = false;
 		}
 
 		widthAnimation.from = menuPanel.width;

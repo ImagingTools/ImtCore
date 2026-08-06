@@ -233,6 +233,7 @@ StyleComponents {
 
 	property int menuPanelMinWidth: 2 * marginL + menuPanelIconSize;
 	property int menuPanelWidth: sizeHintXXS;
+	property int menuPanelAutoCollapseWidth: sizeHintXXL;
 	//Upper bound for centered, readability-limited page content (lists, forms).
 	property int contentWidthMax: 1000;
 
