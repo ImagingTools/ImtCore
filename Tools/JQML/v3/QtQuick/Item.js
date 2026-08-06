@@ -248,10 +248,10 @@ class Item extends QtObject {
     }
 
     __checkVisibility(){
-        if(this.__getPropertyValue('visible')){
+        if(this.visible){
             this.__proxy.__DOM.setAttribute('visible', '') // temp
             this.__proxy.__DOM.removeAttribute('invisible')
-            if(this.__getPropertyValue('width') > 0 && this.__getPropertyValue('height') > 0){
+            if(this.width > 0 && this.height > 0){
                 this.__proxy.__DOM.removeAttribute('no-view')
             } else {
                 this.__proxy.__DOM.setAttribute('no-view', '')
