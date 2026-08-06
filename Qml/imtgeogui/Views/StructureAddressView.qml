@@ -8,6 +8,7 @@ import imtguigql 1.0
 // SDL imports
 import imtbaseImtCollectionSdl 1.0
 import imtbaseComplexCollectionFilterSdl 1.0
+import imtgeogui 1.0
 
 
 Item {

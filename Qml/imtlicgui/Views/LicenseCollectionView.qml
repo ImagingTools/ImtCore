@@ -8,6 +8,7 @@ import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
 import imtlicLicensesSdl 1.0
+import imtlicgui 1.0
 
 RemoteCollectionView {
 	id: root;

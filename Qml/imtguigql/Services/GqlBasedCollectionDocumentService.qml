@@ -3,6 +3,7 @@ import Acf 1.0
 import imtdocgui 1.0
 import imtbaseCollectionDocumentServiceSdl 1.0
 import imtbaseUndoManagerSdl 1.0
+import imtguigql 1.0
 
 DocumentServiceBase {
 	id: root

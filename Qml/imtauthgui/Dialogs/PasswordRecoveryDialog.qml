@@ -6,6 +6,7 @@ import imtcontrols 1.0
 import imtauthUsersSdl 1.0
 import imtguigql 1.0
 import imtqmlutils 1.0
+import imtauthgui 1.0
 
 Dialog {
 	id: passwordRecoveryDialog;

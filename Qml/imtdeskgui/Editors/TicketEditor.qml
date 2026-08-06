@@ -13,6 +13,7 @@ import imtcolgui 1.0
 import imtdeskImtDeskSdl 1.0
 import imtdeskTicketCollectionDocumentServiceSdl 1.0
 import Qt.labs.platform 1.1 as QLP
+import imtdeskgui 1.0
 
 DocumentViewBase {
 	id: ticketEditor

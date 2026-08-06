@@ -3,6 +3,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 import imtbaseImtCollectionSdl 1.0
+import imtcolgui 1.0
 
 Rectangle {
 	id: container;

@@ -7,6 +7,7 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 import imtdeskImtDeskSdl 1.0
+import imtdeskgui 1.0
 
 /**
  * EntityContextTicketsPanel

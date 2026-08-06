@@ -6,6 +6,7 @@ import imtguigql 1.0
 import imtgui 1.0
 import imtauthgui 1.0
 import imtbaseDocumentRevisionSdl 1.0
+import imtdocgui 1.0
 
 Dialog {
 	id: documentRevisionDialog;

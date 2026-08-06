@@ -7,6 +7,7 @@ import imtchatImtChatSdl 1.0
 import imtchatConversationCollectionDocumentServiceSdl 1.0
 import imtbaseCollectionDocumentServiceSdl 1.0
 import imtbaseUndoManagerSdl 1.0
+import imtchatgui 1.0
 
 RemoteCollectionView {
 	id: container

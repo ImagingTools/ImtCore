@@ -3,6 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtqmlutils 1.0
+import imtdocgui 1.0
 
 QtObject {
 	id: documentManager

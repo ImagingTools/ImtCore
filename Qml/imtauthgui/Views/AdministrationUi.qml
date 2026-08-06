@@ -4,6 +4,7 @@ import imtdocgui 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
 import imtqmlutils 1.0
+import imtauthgui 1.0
 
 SingleDocumentWorkspacePageView {
     id: container;

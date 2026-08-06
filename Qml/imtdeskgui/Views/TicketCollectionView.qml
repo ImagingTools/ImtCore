@@ -12,6 +12,7 @@ import imtdeskTicketCollectionDocumentServiceSdl 1.0
 import imtbaseCollectionDocumentServiceSdl 1.0
 import imtbaseUndoManagerSdl 1.0
 import imtbaseComplexCollectionFilterSdl 1.0
+import imtdeskgui 1.0
 
 RemoteCollectionView {
 	id: container

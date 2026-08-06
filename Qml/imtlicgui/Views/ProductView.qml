@@ -7,6 +7,7 @@ import imtcontrols 1.0
 import imtlicProductsSdl 1.0
 import imtlicFeaturesSdl 1.0
 import imtqmlutils 1.0
+import imtlicgui 1.0
 
 ViewBase {
 	id: productViewContainer

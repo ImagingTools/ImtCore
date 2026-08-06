@@ -5,6 +5,7 @@ import imtcontrols 1.0
 import imtguigql 1.0
 import imtauthProfileSdl 1.0
 import imtqmlutils 1.0
+import imtauthgui 1.0
 
 Item {
 	id: userPanel;

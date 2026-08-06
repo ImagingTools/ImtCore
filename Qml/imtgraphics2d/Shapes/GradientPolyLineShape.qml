@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import imtgraphics2d 1.0
 
 
 /**

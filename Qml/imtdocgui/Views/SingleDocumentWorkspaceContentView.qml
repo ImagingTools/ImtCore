@@ -5,6 +5,7 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtbaseImtCollectionSdl 1.0
 import imtbaseCollectionDocumentServiceSdl 1.0
+import imtdocgui 1.0
 
 // Universal one-document content host built on top of DocumentServiceBase.
 //

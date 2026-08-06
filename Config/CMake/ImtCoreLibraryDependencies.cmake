@@ -169,6 +169,11 @@ imt_declare_library_dependencies(imtguiqml				imtqml imtgui)
 imt_declare_library_dependencies(imtlicguiqml			imtqml imtlicgui)
 imt_declare_library_dependencies(imtstylecontrolsqml	imtqml imtgui imtstyle)
 
+imt_declare_library_dependencies(imtstyleqml			imtqml imtgui)
+imt_declare_library_dependencies(imtqmlutilsqml			imtqml imtgui)
+imt_declare_library_dependencies(imtgraphics2dqml		imtqml imtgui imtqmlutilsqml)
+imt_declare_library_dependencies(imtcontrolsqml			imtstyleqml imtqmlutilsqml imtgraphics2dqml)
+
 # --- Arxc-generated static libraries ----------------------------------------
 imt_declare_library_dependencies(ImtCoreLoc	Acf::icomp)
 

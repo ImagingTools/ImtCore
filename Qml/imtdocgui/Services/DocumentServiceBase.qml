@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import imtdocgui 1.0
 
 QtObject {
 	id: root

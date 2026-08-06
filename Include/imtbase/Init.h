@@ -84,6 +84,9 @@ public:
 
 	static void InitQml()
 	{
+		Q_INIT_RESOURCE(imtstyleqml);
+		Q_INIT_RESOURCE(imtqmlutilsqml);
+		Q_INIT_RESOURCE(imtgraphics2dqml);
 		Q_INIT_RESOURCE(imtcontrolsqml);
 		Q_INIT_RESOURCE(imtguiqml);
 		Q_INIT_RESOURCE(imtcolguiqml);

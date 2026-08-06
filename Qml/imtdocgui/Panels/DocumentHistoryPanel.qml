@@ -4,6 +4,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtauthgui 1.0
+import imtdocgui 1.0
 
 Rectangle {
 	id: historyPanel

@@ -9,6 +9,7 @@ import imtguigql 1.0
 import imtdocgui 1.0
 import imtlicFeaturesSdl 1.0
 import Qt.labs.platform 1.0
+import imtlicgui 1.0
 
 RemoteCollectionView {
 	id: featureCollectionViewContainer;

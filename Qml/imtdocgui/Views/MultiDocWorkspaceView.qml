@@ -5,6 +5,7 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtbaseImtCollectionSdl 1.0
 import imtqmlutils 1.0
+import imtdocgui 1.0
 
 Item {
 	id: workspaceView
