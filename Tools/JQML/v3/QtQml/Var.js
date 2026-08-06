@@ -109,14 +109,15 @@ class Var extends Property {
                 this.queueLink.pop()
             }
 
-            currentValue = name in target ? target[name] : ("value" in meta ? meta.value : meta.type.getDefaultValue())
+            let beforeCommitValue = name in target ? target[name] : ("value" in meta ? meta.value : meta.type.getDefaultValue())
 
-            if(oldValue !== middleValue && oldValue === currentValue){
+            // Важно: если свойство уже изменилось реэнтрантно, не перезаписываем,
+            // но и не выходим раньше времени — side effects ниже должны выполниться.
+            if(oldValue === beforeCommitValue){
                 target[name] = middleValue
-                currentValue = name in target ? target[name] : ("value" in meta ? meta.value : meta.type.getDefaultValue())
-            } else {
-                return true
             }
+
+            currentValue = name in target ? target[name] : ("value" in meta ? meta.value : meta.type.getDefaultValue())
         } else {
             target[name] = value
             currentValue = name in target ? target[name] : ("value" in meta ? meta.value : meta.type.getDefaultValue())
