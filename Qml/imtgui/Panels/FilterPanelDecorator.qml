@@ -10,22 +10,12 @@ import imtbaseImtBaseTypesSdl 1.0
 DecoratorBase {
 	id: filterPanelDecorator;
 	objectName: "FilterPanel"
-	// Tall enough for a reset button the size of the show/hide one it pairs with.
 	height: visible ? Style.buttonWidthL : 0
 
 	property alias contentWidth: content.width;
-	// Kept up to date from filterChanged, which is the one place that already
-	// knows a filter went on or off.
 	property int activeFilterCount: 0;
-	// How many chips are folded into the overflow button, and how many of those
-	// are switched on.
 	property int hiddenFilterCount: 0;
 	property int hiddenActiveCount: 0;
-	// A constant, and the overflow button's actual width. Taken from the button
-	// itself the reserve grew with the number printed on it, so the run that
-	// folded nine chips away and the run that folded ten reserved different
-	// amounts - each undoing the other's answer, which is what set the row
-	// twitching while the window was being dragged.
 	readonly property int overflowReserve: Style.controlHeightM + Style.marginXL;
 	
 	property CollectionFilter complexFilter: baseElement ? baseElement.complexFilter : null;
@@ -96,10 +86,6 @@ DecoratorBase {
 		}
 	}
 
-	// Chips that do not fit fold into the button at the end of the row and are
-	// reached from there. They used to sit in a Flickable between two arrow
-	// buttons that scrolled it a hundred pixels at a time - which told nobody
-	// how many filters were off-screen.
 	property bool relayoutRunning: false;
 
 	function scheduleRelayout(){
@@ -110,33 +96,8 @@ DecoratorBase {
 		relayoutTimer.restart()
 	}
 
-	// Gather, decide, then apply in one go.
-	//
-	// It used to decide in two passes - once without room for the overflow
-	// button, again with it if anything had folded away - and write each chip's
-	// visibility as it went. Two answers, and the row could be handed either of
-	// them: whether the button was there decided how much width the chips had,
-	// and how much width the chips had decided whether the button was there. On
-	// a window being dragged the two took turns, which is what set the chips
-	// swapping back and forth.
-	//
-	// Now whether the button is needed is read off the natural width of the
-	// whole row - an input, not an outcome - so there is one answer and it
-	// cannot contradict itself.
-	// Everything the answer is allowed to depend on, written down. Nothing here
-	// is touched by the answer itself: the strip's width, and for each chip the
-	// width it asks for and whether its filter is on.
 	property string layoutSignature: "";
 
-	// Last width each chip reported while it was on the row, by filter id.
-	//
-	// A hidden item is never laid out, and text that has never been laid out
-	// measures nothing - so a folded chip reported the width of its name alone,
-	// with the value part counting for zero. That is what set an active chip
-	// blinking: folded it measured short and fitted, so the row took it back;
-	// laid out it measured its real width and no longer fitted, so the row
-	// folded it again. It settled only once the row had shrunk past the name as
-	// well, which is exactly where the blinking was seen to stop.
 	property var chipWidthCache: ({});
 
 	function updateOverflow(){
@@ -537,14 +498,13 @@ DecoratorBase {
 				anchors.centerIn: parent
 
 				width: Math.min(hintMetrics.width, Style.sizeHintM)
+				elide: Text.ElideNone
 				text: valueHint.hintText
 				color: Style.baseColor
 				wrapMode: Text.WordWrap
 			}
 		}
 
-		// Plain Text with eliding off: BaseText elides by default, and a Text
-		// that elides without a width of its own measures the elided line.
 		Text {
 			id: hintMetrics
 

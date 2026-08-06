@@ -10,9 +10,6 @@ ControlBase {
     
     decorator: Style.filterPanelDecorator
 
-    // Above the table it sits over: the chips hang a card below themselves when
-    // a value had to be cut short, and a collection view paints its table after
-    // this panel.
     z: 1
 
     heightFromDecorator: true

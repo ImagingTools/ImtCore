@@ -102,7 +102,9 @@ ViewBase {
 		anchors.left: parent.left;
 		anchors.right: parent.right;
 
-		clip: true;
+		z: 1;
+
+		clip: filterAreaAnimation.running || !collectionViewBaseContainer.filterMenuVisible;
 
 		readonly property int targetHeight: collectionViewBaseContainer.filterMenuVisible ? (filterMenu_.height + 2 * Style.marginM) : 0;
 
@@ -410,7 +412,7 @@ ViewBase {
 			ToolbarButton {
 				anchors.horizontalCenter: parent.horizontalCenter;
 
-				visible: emptyState.filtered;
+				visible: emptyState.filtered && collectionViewBaseContainer.canResetFilters;
 				text: qsTr("Clear all filters");
 				iconSource: "qrc:/" + Style.getIconPath("Icons/FilterReset", Icon.State.On, Icon.Mode.Normal);
 
