@@ -333,7 +333,7 @@ const imtbase::ISearchResults* CObjectCollectionControllerCompBase::Search(
 	items.InsertField("description");
 	gqlRequest.AddField("items", items);
 
-	QJsonObject resultObj = ListObjects(gqlRequest, errorMessage);
+	QJsonObject resultObj = GetObjectListFromRequest(gqlRequest, errorMessage);
 	if (resultObj.isEmpty()){
 		return nullptr;
 	}
@@ -1554,11 +1554,11 @@ QJsonObject CObjectCollectionControllerCompBase::CreateInternalResponse(
 	case OT_NEW:
 		return InsertObject(gqlRequest, errorMessage);
 	case OT_GET:
-		return GetObject(gqlRequest, errorMessage);
+		return GetObjectFromRequest(gqlRequest, errorMessage);
 	case OT_UPDATE:
 		return UpdateObject(gqlRequest, errorMessage);
 	case OT_LIST:
-		return ListObjects(gqlRequest, errorMessage);
+		return GetObjectListFromRequest(gqlRequest, errorMessage);
 	}
 
 	return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
@@ -1716,7 +1716,7 @@ QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromRequest(const imt
 }
 
 
-QJsonObject CObjectCollectionControllerCompBase::GetObject(
+QJsonObject CObjectCollectionControllerCompBase::GetObjectFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -2032,7 +2032,7 @@ QJsonObject CObjectCollectionControllerCompBase::SetObjectDescription(
 }
 
 
-QJsonObject CObjectCollectionControllerCompBase::ListObjects(
+QJsonObject CObjectCollectionControllerCompBase::GetObjectListFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {

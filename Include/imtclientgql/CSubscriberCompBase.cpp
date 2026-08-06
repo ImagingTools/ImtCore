@@ -58,7 +58,7 @@ void CSubscriberCompBase::OnComponentCreated()
 			subscriptionField.InsertField("id");
 			gqlRequest.AddField("data", subscriptionField);
 
-			m_subscriptionIds << m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
+			m_subscriptionIds << m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, *this);
 		}
 	}
 }

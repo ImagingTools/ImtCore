@@ -157,7 +157,7 @@ istd::IChangeableUniquePtr CLicenseControllerComp::CreateObjectFromRequest(
 }
 
 
-QJsonObject CLicenseControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CLicenseControllerComp::GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();

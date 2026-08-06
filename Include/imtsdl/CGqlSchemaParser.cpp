@@ -572,7 +572,7 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 		QByteArray requestName;
 		QByteArray expectedDelimiters = "(";
 		// Queries might not have arguments
-		if (type == CSdlRequest::T_QUERY){
+		if (type == CSdlRequest::T_QUERY || type == CSdlRequest::T_SUBSCRIPTION){
 			expectedDelimiters.append(':');
 		}
 		retVal = retVal && ReadToDelimeter(expectedDelimiters, requestName, &foundDelimiter) && MoveToNextReadableSymbol();
@@ -601,7 +601,7 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 			}
 			request.SetInputArguments(inputArguments);
 		}
-		else if (type != CSdlRequest::T_QUERY){
+		else if (type != CSdlRequest::T_QUERY && type != CSdlRequest::T_SUBSCRIPTION){
 			QString errorString = QString("Schema error! Request '%1' is not a Query and has not arguments at line %2")
 			.arg(request.GetName(),
 				 QString::number(m_lastReadLine + 1));
