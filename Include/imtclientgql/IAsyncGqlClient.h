@@ -64,9 +64,10 @@ public:
 	struct GqlModelResult
 	{
 		SdlClass model;
-		ErrorCategory errorCategory = EC_NONE;
+		ErrorCategory errorCategory = EC_INTERNAL;
 		QString errorMessage;
 
+		explicit operator bool() const {
 			return errorCategory == EC_NONE && errorMessage.isEmpty();
 		}
 	};
