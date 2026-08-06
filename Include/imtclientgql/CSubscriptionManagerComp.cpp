@@ -80,12 +80,12 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 
 bool CSubscriptionManagerComp::UnregisterSubscription(
 			const QByteArray& subscriptionId,
-			imtclientgql::IGqlSubscriptionClient& subscriptionClient)
+			const imtclientgql::IGqlSubscriptionClient& subscriptionClient)
 {
 	QMutexLocker locker(&m_registeredClientsMutex);
 
 	if (m_registeredClients.contains(subscriptionId)){
-		m_registeredClients[subscriptionId].m_clients.removeAll(&subscriptionClient);
+		m_registeredClients[subscriptionId].m_clients.removeAll(const_cast<imtclientgql::IGqlSubscriptionClient*>(&subscriptionClient));
 		if (m_registeredClients[subscriptionId].m_clients.isEmpty()){
 			m_registeredClients.remove(subscriptionId);
 		}

@@ -19,10 +19,9 @@ public:
 			imtclientgql::IGqlSubscriptionClient& subscriptionClient) = 0;
 	virtual bool UnregisterSubscription(
 			const QByteArray& subscriptionId,
-			imtclientgql::IGqlSubscriptionClient& subscriptionClient) = 0;
+			const imtclientgql::IGqlSubscriptionClient& subscriptionClient) = 0;
 };
 
 
 } // namespace imtclientgql
-
 

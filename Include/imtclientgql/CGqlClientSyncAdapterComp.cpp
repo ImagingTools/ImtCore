@@ -136,6 +136,7 @@ void CGqlClientSyncAdapterComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	m_timeout = static_cast<int>(*m_timeoutAttrPtr * 1000);
+	m_asyncClientCompPtr.EnsureInitialized();
 }
 
 
