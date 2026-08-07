@@ -40,3 +40,4 @@ FilterableSelectPopup 1.0 FilterableSelectPopup.qml
 DocCollectionFilter 1.0 DocCollectionFilter.qml
 CollectionWorkspacePageView 1.0 CollectionWorkspacePageView.qml
 ItemSelectElementView 1.0 ItemSelectElementView.qml
+CollectionItemSelectElementView 1.0 CollectionItemSelectElementView.qml

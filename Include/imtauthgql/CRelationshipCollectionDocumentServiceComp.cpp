@@ -54,7 +54,8 @@ sdl::V1_0::imtauth::CTenantRelationship CRelationshipCollectionDocumentServiceCo
 			QByteArray targetTenantId = relPtr->GetTargetTenantId();
 
 			sdl::V1_0::imtauth::CTenantRelationship response;
-			response.id = relPtr->GetRelationshipId();
+
+			response.id = objectId;
 			response.targetTenantId = targetTenantId;
 			response.sourceTenantId = sourceTenantId;
 			response.connectionId = relPtr->GetConnectionId();

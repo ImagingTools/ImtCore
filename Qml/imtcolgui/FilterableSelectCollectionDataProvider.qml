@@ -41,11 +41,18 @@ FilterableSelectDataProvider {
 	//! Host-supplied GroupFilter objects, re-applied to every request.
 	property var groupFilters: []
 
+	//! Rows that must never be offered - e.g. a role may not become its own parent.
+	property var excludeIds: []
+
 	property string sortByField
 	property string orderType: "ASC"
 
 	function getHeaders(){
 		return {}
+	}
+
+	//! Override to add fields to the request input, e.g. a product scope.
+	function setCustomInputParams(inputParams){
 	}
 
 	property QtObject __state: QtObject {
@@ -62,6 +69,10 @@ FilterableSelectDataProvider {
 
 		function getHeaders(){
 			return root.getHeaders()
+		}
+
+		function setCustomInputParams(inputParams){
+			root.setCustomInputParams(inputParams)
 		}
 
 		onModelUpdated: {
@@ -149,7 +160,7 @@ FilterableSelectDataProvider {
 			}
 
 			var id = String(values[root.idField] || "")
-			if (id === ""){
+			if (id === "" || (root.excludeIds && root.excludeIds.indexOf(id) >= 0)){
 				continue
 			}
 
