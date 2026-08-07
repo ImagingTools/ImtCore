@@ -64,11 +64,11 @@ public:
 	struct GqlModelResult
 	{
 		SdlClass model;
-		ErrorCategory errorCategory = EC_NONE;
+		ErrorCategory errorCategory = EC_INTERNAL;
 		QString errorMessage;
 
 		explicit operator bool() const {
-			return errorCategory == EC_NONE;
+			return errorCategory == EC_NONE && errorMessage.isEmpty();
 		}
 	};
 
@@ -91,7 +91,7 @@ public:
 		IAsyncGqlClient::GqlRequestPtr requestPtr;
 		requestPtr.MoveCastedPtr(request.CloneMe());
 		if (!requestPtr.IsValid()) {
-			return QtFuture::makeReadyValueFuture(GqlModelResult<SdlClass>());
+			return QtFuture::makeReadyValueFuture(GqlModelResult<SdlClass>{{}, EC_INVALID_REQUEST, QStringLiteral("Invalid request")});
 		}
 
 		CClientRequestModelHelpers::AttachMissingContext(requestPtr);

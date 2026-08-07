@@ -37,11 +37,9 @@ namespace imtclientgql
 	of the owned \c QNetworkAccessManager).
 */
 class CAsyncApiClientComp:
-			public QObject,
 			public ilog::CLoggerComponentBase,
 			virtual public IAsyncGqlClient
 {
-	Q_OBJECT
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
@@ -62,13 +60,20 @@ public:
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 private:
+	void SendRequestInternal(
+			std::shared_ptr<QPromise<GqlResult>> promisePtr,
+			GqlRequestPtr requestPtr,
+			const QNetworkRequest& networkRequest) const;
+
 	I_REF(imtclientgql::IClientProtocolEngine, m_protocolEngineCompPtr);
 	I_ATTR(double, m_timeoutAttrPtr);
 
-	int m_timeout;
-	mutable QNetworkAccessManager* m_networkManagerPtr;
+	int m_timeout = 30000; // milliseconds
+	QThread* m_thread = nullptr;
+	QNetworkAccessManager* m_networkManager = nullptr;
 };
 
 

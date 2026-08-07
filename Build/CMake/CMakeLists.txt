@@ -486,6 +486,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 			add_subdirectory("${IMPL_DIR}/Imt3dGuiPck/CMake" "${AUX_INCLUDE_DIR}/Imt3dGuiPck")
 			add_dependencies(Imt3dGuiPck imt3d imt3dview imt3dgui)
+			imt_chain_windeploy_target(Imt3dGuiPck)
 
 			add_subdirectory("${IMPL_DIR}/Imt3dDemo/CMake" "${AUX_INCLUDE_DIR}/Imt3dDemo")
 			add_dependencies(Imt3dDemo imt3dgui imt3dview imt3d)
