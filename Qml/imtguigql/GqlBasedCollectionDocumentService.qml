@@ -20,6 +20,10 @@ DocumentServiceBase {
 			let documentName = data.getData("documentName")
 			let operation = data.getData("documentOperation")
 
+			if (objectId !== undefined && objectId !== ""){
+				root.setDocumentObjectId(documentId, objectId)
+			}
+
 			if (operation === "DocumentDataLoaded"){
 				root.setDocumentIsLoading(documentId, false)
 			}

@@ -6,7 +6,7 @@ import com.imtcore.imtqml 1.0
 Rectangle {
 	id: messageInputRoot
 	objectName: "MessageInput"
-	color: Style.surfaceColor
+	color: Style.baseColor
 	height: inputRow.height + Style.paddingS * 2
 
 	property string conversationId: ""
@@ -54,7 +54,7 @@ Rectangle {
 			TextInput {
 				id: textField
 				width: parent.width - sendButton.width - Style.paddingS
-				height: Style.inputHeightM
+				height: Style.buttonHeight
 				verticalAlignment: TextInput.AlignVCenter
 				font.pixelSize: Style.fontSizeS
 				color: Style.imaginToolsAccentColor
@@ -68,7 +68,7 @@ Rectangle {
 					anchors.fill: parent
 					anchors.leftMargin: Style.paddingS
 					text: qsTr("Write a message... (@ to mention, # for reference)")
-					color: Style.textPlaceholderColor
+					color: Style.placeHolderTextColor
 					font.pixelSize: Style.fontSizeS
 					verticalAlignment: Text.AlignVCenter
 					visible: textField.text.length === 0
@@ -126,7 +126,7 @@ Rectangle {
 				id: sendButton
 				width: Style.buttonHeightM
 				radius: Style.radiusS
-				color: textField.text.trim().length > 0 ? Style.imaginToolsAccentColor : Style.disabledColor
+				color: textField.text.trim().length > 0 ? Style.imaginToolsAccentColor : Style.inactiveTextColor
 
 				Text {
 					anchors.centerIn: parent

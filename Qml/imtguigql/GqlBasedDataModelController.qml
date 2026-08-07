@@ -57,7 +57,7 @@ DataModelController {
 					responseObj = JSON.parse(json)
 				}
 				catch(e){
-					root.dataModelLoadFailed("Json convertation failed")
+					root.dataModelSaveFailed("Json convertation failed")
 					return
 				}
 
@@ -73,7 +73,7 @@ DataModelController {
 					}
 
 					if (!responseModel){
-						root.dataModelLoadFailed("Unable to create data model from json. Error: Result model is invalid")
+						root.dataModelSaveFailed("Unable to create data model from json. Error: Result model is invalid")
 						return
 					}
 

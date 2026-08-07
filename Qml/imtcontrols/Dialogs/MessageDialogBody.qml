@@ -5,8 +5,8 @@ import com.imtcore.imtqml 1.0
 Rectangle {
     id: inputDialogBodyContainer;
 
-	height: Style.size_minMessageHeight == undefined ? columnBody.height + 2*Style.marginL :
-													  Math.max(Style.size_minMessageHeight, columnBody.height + 2*Style.marginL);
+	height: Style.buttonHeight == undefined ? columnBody.height + 2*Style.marginL :
+													  Math.max(Style.buttonHeight, columnBody.height + 2*Style.marginL);
     color: "transparent";
 
     property string message;

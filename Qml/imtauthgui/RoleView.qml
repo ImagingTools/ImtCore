@@ -384,6 +384,11 @@ ViewBase {
 							collectionId: "Roles"
 							label: qsTr("Parent Roles")
 							addButtonText: qsTr("Add Parent Role")
+							// A role cannot be its own parent, so it is not offered at all.
+							// Deeper cycles are rejected by the server on save.
+							excludeIds: container.roleData && container.roleData.m_id
+								? [container.roleData.m_id]
+								: []
 							showCount: true
 							onSelectionChanged: {
 								container.doUpdateModel()

@@ -80,7 +80,6 @@ Item {
 
         sourceComponent: Component {
             FilterMenu {
-                decoratorSource: Style.filterPanelDecoratorPath;
             }
         }
 
@@ -131,8 +130,6 @@ Item {
 
         color: Style.baseColor;
 
-        radius: Style.size_mainCornerRadius !== undefined ? Style.size_mainCornerRadius: 0;
-
         Loader{
             id: loaderTableDecorator;
 
@@ -164,7 +161,6 @@ Item {
                 anchors.top: parent.top;
 
                 width: parent.width;
-                height: treeViewInternal.headerHeight;
 
                 Button {
                     id: iconFilter;
@@ -229,7 +225,6 @@ Item {
             id: ldng;
 
             anchors.fill: treeViewInternal;
-            anchors.topMargin: treeViewInternal.headerElementHeight;
 
             visible: false;
         }

@@ -490,14 +490,16 @@ Rectangle {
 				anchors.leftMargin: Style.marginL
 				anchors.verticalCenter: parent.verticalCenter
 
-				width: menuPanel.iconSize
+				width: Style.iconSizeS
 				height: width
 
 				sourceSize.width: width
 				sourceSize.height: height
 
-				source: menuPanel.collapsed ? "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Disabled)
-											: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Disabled)
+				source: menuPanel.collapsed ? "qrc:/" + Style.getIconPath("Icons/SidebarExpand", Icon.State.Off, Icon.Mode.Disabled)
+											: "qrc:/" + Style.getIconPath("Icons/SidebarCollapse", Icon.State.Off, Icon.Mode.Disabled)
+
+				opacity: menuButtonArea.containsMouse ? 1.0 : Style.opacityHigh
 			}
 
 			BaseText {

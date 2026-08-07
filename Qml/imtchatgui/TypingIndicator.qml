@@ -6,7 +6,7 @@ import com.imtcore.imtqml 1.0
 Item {
 	id: typingIndicatorRoot
 	objectName: "TypingIndicator"
-	height: visible ? Style.typingIndicatorHeight : 0
+	height: visible ? Style.buttonHeight : 0
 	visible: false
 
 	property string userName: ""

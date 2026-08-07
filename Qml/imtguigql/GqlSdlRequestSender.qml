@@ -52,11 +52,16 @@ GqlRequest {
 	}
 	
 	function onResult(data){
+		// A resolver that failed server-side (dead DB connection, unhandled exception)
+		// answers 200 with `data: { <command>: null }`. Routing that through onError()
+		// rather than returning silently is what keeps callers - which clear their
+		// `loading` flag in onError()/finished() - from waiting forever.
 		if (!data){
-			console.error("Unable to parse response. Response data is invalid");
+			console.warn("GraphQL request returned no data:", root.gqlCommandId);
+			root.onError(qsTr("The server returned no data. Please try again."), "");
 			return;
 		}
-		
+
 		if (sdlObjectComp){
 			sdlObject = sdlObjectComp.createObject(root)
 		}
@@ -211,9 +216,13 @@ GqlRequest {
 			
 			if ("data" in responseObj){
 				let dataObject = responseObj["data"];
-				let itemObject = dataObject[root.gqlCommandId];
-				
+				let itemObject = dataObject ? dataObject[root.gqlCommandId] : null;
+
 				root.onResult(itemObject);
+			}
+			else{
+				// 200 with neither "data" nor "errors" is still a terminal outcome.
+				root.onResult(null);
 			}
 		}
 	}

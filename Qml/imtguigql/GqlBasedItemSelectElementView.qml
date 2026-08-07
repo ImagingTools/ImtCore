@@ -29,6 +29,10 @@ ItemSelectElementView {
 	// CollectionId for the GQL data provider
 	property string collectionId: ""
 
+	// Ids the popup must never offer, beyond the already selected ones - e.g. the edited role
+	// itself, which may not become its own parent.
+	property var excludeIds: []
+
 	// Internal GQL data provider for the select popup
 	dataProvider: __gqlDataProvider
 
@@ -49,6 +53,7 @@ ItemSelectElementView {
 	FilterableSelectGqlDataProvider {
 		id: __gqlDataProvider
 		collectionId: gqlItemSelectView.collectionId
+		extraExcludeIds: gqlItemSelectView.excludeIds
 		multiSelect: true
 	}
 
