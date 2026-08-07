@@ -82,6 +82,7 @@ include_directories(${AUX_INCLUDE_DIR})
 
 
 #------ Required libs ------
+add_subdirectory("${INCLUDE_DIR}/imtcore/CMake" "${AUX_INCLUDE_DIR}/imtcore")
 add_subdirectory("${INCLUDE_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbase")
 
 add_subdirectory("${INCLUDE_DIR}/imtdesign/CMake" "${AUX_INCLUDE_DIR}/imtdesign")
