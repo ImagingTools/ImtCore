@@ -1374,8 +1374,6 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 				FROM %1"%2" AS root1
 				WHERE root1."RevisionInfo" IS NOT NULL
 				  AND CAST(json_extract(root1."RevisionInfo", '$.RevisionNumber') AS INTEGER) = 1
-				ORDER BY root1."TimeStamp" DESC
-				LIMIT 1
 			) AS root1
 			ON root1."DocumentId" = root."DocumentId"
 			%3
@@ -1395,12 +1393,13 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 				root.*,
 				root1."%6" as "%7" %5
 			FROM %2"%3" as root
+			-- No LIMIT on the derived table: revision 1 is already one row per document, and
+			-- limiting it to a single row left every other document with a NULL "Added".
 			LEFT JOIN (
 				SELECT
 					"%8", "%6", "%9"
 				FROM %2"%3"
 				WHERE %1 = 1
-				LIMIT 1
 			) AS root1 ON root1."%8" = root."%8"
 			%4
 		)")
@@ -2152,7 +2151,6 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 					"%4", "%5"
 				FROM %1 "%2"
 				WHERE %7 = 1
-				LIMIT 1
 			) AS root1 ON root1."%4" = root."%4"
 			WHERE (%3) AND root."%4" = '%6' ORDER BY %8 DESC)")
 			.arg(

@@ -58,7 +58,7 @@ Rectangle {
 
 		delegate: Rectangle {
 			width: resultsListView.width
-			height: Style.listItemHeightS
+			height: Style.buttonHeightS
 			color: "transparent"
 			radius: Style.radiusXS
 

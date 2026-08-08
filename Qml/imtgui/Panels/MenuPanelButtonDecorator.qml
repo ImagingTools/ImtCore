@@ -3,14 +3,6 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 
-// One entry of the navigation rail: icon on the left, label beside it.
-//
-// It used to be a tile with the label centred under the icon, which left the
-// text about eighty pixels to live in - anything longer than a single short
-// word was cut to an ellipsis. Laid out along the row instead, a name has the
-// whole width of the panel, and the panel can be pulled in to the icons without
-// any of them moving: the icon sits a fixed margin from the left edge in both
-// states, and only the label goes.
 DecoratorBase {
 	id: leftPanelElement;
 
@@ -44,8 +36,6 @@ DecoratorBase {
 	onCollapsedChanged: leftPanelElement.updateHint();
 	onIsHighlightedChanged: leftPanelElement.updateHint();
 
-	// Named to the panel, which owns the one card the whole rail shares: a card
-	// per row would mean as many idle items as there are pages.
 	function updateHint(){
 		if (!leftPanelElement.panel){
 			return;
@@ -60,8 +50,6 @@ DecoratorBase {
 		}
 	}
 
-	// Marks the page you are on down the edge of the rail, where it stays
-	// legible after the panel is pulled in to the icons.
 	Rectangle {
 		id: activeBar;
 
@@ -75,21 +63,12 @@ DecoratorBase {
 		color: Style.iconColorOnSelected;
 	}
 
-	// Hover the way the tab strip does it: a light wash that never lands on the
-	// row you are already on - that one carries its own
-	// mark and does not need a second one laid over it.
-	//
-	// The row keeps the open width and is clipped, so this has to be told where
-	// the rail's edge is: it is the one part that follows the slide, and a
-	// rectangle is cheap to resize where re-eliding a label is not.
 	Rectangle {
 		id: marker;
 
 		anchors.left: parent.left;
 		anchors.leftMargin: Style.marginS;
 		anchors.top: parent.top;
-		// Full height on purpose: the pages are meant to sit flush against one
-		// another, so nothing is taken off the top and bottom here.
 		anchors.topMargin: 0;
 		anchors.bottom: parent.bottom;
 		anchors.bottomMargin: 0;
@@ -105,8 +84,6 @@ DecoratorBase {
 		id: image;
 
 		anchors.left: parent.left;
-		// The same distance from the edge whether the panel is open or shut, so
-		// collapsing reads as the labels leaving rather than everything moving.
 		anchors.leftMargin: Style.marginL;
 		anchors.verticalCenter: parent.verticalCenter;
 

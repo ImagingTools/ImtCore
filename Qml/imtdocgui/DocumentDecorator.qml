@@ -16,6 +16,14 @@ QtObject {
 
 	onViewRegistered: {
 		if (view){
+			if (view.objectName === "DocumentViewBase"){
+				if (view.documentManager !== undefined){
+					view.documentId = documentId
+					view.documentTypeId = documentTypeId
+					view.documentManager = documentManager
+				}
+			}
+
 			view.setBlockingUpdateModel(true)
 			view.model = representationController.representationModel
 			view.commandActivated.connect(onCommandActivated)

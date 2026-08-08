@@ -184,6 +184,16 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		return ShouldKeepEntityForTenant(bindingPtr, tenantId, entityType, entityId);
 	};
 
+	auto shouldKeepPermissionForTenant = [&](const QByteArray& permissionId) -> bool {
+		if (tenantId.isEmpty() || bindingPtr == nullptr || permissionId.isEmpty()){
+			return true;
+		}
+		if (!bindingPtr->HasAnyTenantBinding(permsEntity, permissionId)){
+			return true;
+		}
+		return ShouldKeepEntityForTenant(bindingPtr, tenantId, permsEntity, permissionId);
+	};
+
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
@@ -344,7 +354,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		for (const auto& permissionIdPtr : *userData.permissions){
 			if (permissionIdPtr){
 				QByteArray pid = *permissionIdPtr;
-				if (shouldKeepForTenant(permsEntity, pid)){
+				if (shouldKeepPermissionForTenant(pid)){
 					incomingPerms.append(pid);
 				}
 			}
@@ -353,7 +363,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		imtauth::IUserBaseInfo::FeatureIds currentPerms = userPtr->GetLocalPermissions(productId);
 		imtauth::IUserBaseInfo::FeatureIds finalPerms;
 		for (const QByteArray& cp : currentPerms){
-			if (!shouldKeepForTenant(permsEntity, cp) || incomingPerms.contains(cp)){
+			if (!shouldKeepPermissionForTenant(cp) || incomingPerms.contains(cp)){
 				finalPerms.append(cp);
 			}
 		}

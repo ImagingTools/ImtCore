@@ -77,8 +77,6 @@ Rectangle{
 	}
 
 	function clearSearchFunc(){
-		console.log("clearSearchFunc")
-
 		searchContainer.propertiesModel.clear();
 		setPropertiesModel(searchContainer.propertyId, "");
 

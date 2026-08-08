@@ -92,10 +92,10 @@ Item {
 		componentHeight: Style.controlHeightM;
 		fontPixelSize:  Style.fontSizeM;
 
-		color: Style.color_buttonText;
+		color: Style.textColor;
 		fontColor: "#ffffff";
 
-		borderColor: Style.color_elementBorder;
+		borderColor: Style.borderColor;
 		property string shownValPos: Math.trunc((barChart.positiveValue + barChart.addToValue)*1000)/1000;
 		property string shownVal:  shownValPos;
 

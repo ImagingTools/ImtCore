@@ -54,6 +54,67 @@ ElementView {
 	signal selectionChanged(var selectedItems)
 	signal popupClosed()
 
+	// --- Name resolution ------------------------------------------------------------
+	// Items are usually assigned as bare ids, so a derived view feeds the rows of a
+	// second provider through here to turn them into readable names. Guarded against
+	// re-entering itemsChanged while the resolved list is written back.
+	property bool __resolvingNames: false
+
+	/*!
+		Returns whether any item still shows its id instead of a name - a derived view
+		uses it to decide if a resolving request is worth sending.
+	*/
+	function hasUnresolvedItems(){
+		if (!itemSelectElementView.items || itemSelectElementView.items.length === 0){
+			return false
+		}
+		for (var i = 0; i < itemSelectElementView.items.length; i++){
+			var item = itemSelectElementView.items[i]
+			if (!item.name || item.name === item.id){
+				return true
+			}
+		}
+		return false
+	}
+
+	/*!
+		Fills in the names of the current items from normalized provider rows.
+		\param providerItems Array of { id, title } as delivered by a data provider.
+	*/
+	function resolveItemNames(providerItems){
+		if (!providerItems || providerItems.length === 0){
+			return
+		}
+
+		var nameMap = ({})
+		for (var i = 0; i < providerItems.length; i++){
+			var providerItem = providerItems[i]
+			if (providerItem.id && providerItem.title && providerItem.title !== ""){
+				nameMap[providerItem.id] = providerItem.title
+			}
+		}
+
+		var updated = false
+		var newItems = []
+		for (var j = 0; j < itemSelectElementView.items.length; j++){
+			var current = itemSelectElementView.items[j]
+			var resolved = nameMap[current.id]
+			if (resolved && current.name !== resolved){
+				newItems.push({ id: current.id, name: resolved })
+				updated = true
+			}
+			else {
+				newItems.push(current)
+			}
+		}
+
+		if (updated){
+			itemSelectElementView.__resolvingNames = true
+			itemSelectElementView.items = newItems
+			itemSelectElementView.__resolvingNames = false
+		}
+	}
+
 	function __applyRemoval(newItems, removedIndex, removedData) {
 		itemSelectElementView.items = newItems
 		itemSelectElementView.itemRemoved(removedIndex, removedData)

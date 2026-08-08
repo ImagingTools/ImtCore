@@ -4,6 +4,7 @@ import com.imtcore.imtqml 1.0
 import imtcolgui 1.0
 import imtguigql 1.0
 import imtbaseFilterableSelectSdl 1.0
+import imtbaseImtBaseTypesSdl 1.0
 
 /*!
 	\qmltype FilterableSelectGqlDataProvider
@@ -28,8 +29,20 @@ FilterableSelectDataProvider {
 		return {}
 	}
 
+	/**
+	 * Ids that must never be offered, on top of the already selected ones.
+	 */
+	property var extraExcludeIds: []
+
+	/**
+	 * Host-supplied GroupFilter objects sent in viewParams.filterModel with every
+	 * request, so a picker can be scoped the same way as the collection behind it.
+	 */
+	property var groupFilters: []
+
 	property QtObject __gql: QtObject {
 		property int pendingRequestId: 0
+		property var appliedGroupFilters: []
 	}
 
 	// --- Shared normalization helper ---
@@ -62,6 +75,10 @@ FilterableSelectDataProvider {
 	}
 
 	// --- Normalize parameters from SDL ParamsSet to plain JS array ---
+	// Parameter.data carries the parameter serialized as a JSON archive, so the
+	// readable value has to be decoded with the matching SDL type.
+	property TextParam __textParamDecoder: TextParam {}
+
 	function __normalizeParameters(paramsSet){
 		var result = []
 		if (!paramsSet)
@@ -77,14 +94,26 @@ FilterableSelectDataProvider {
 				id: paramId || "",
 				name: paramName || "",
 				description: paramDesc || "",
-				data: paramData || ""
+				data: paramData || "",
+				value: root.__decodeParameterValue(paramsList.getData("m_typeId", i), paramData)
 			})
 		}
 		return result
 	}
 
+	function __decodeParameterValue(typeId, data){
+		if (!data || String(typeId) !== "TextParam"){
+			return ""
+		}
+		root.__textParamDecoder.m_text = ""
+		root.__textParamDecoder.createFromJson(String(data))
+		return String(root.__textParamDecoder.m_text || "")
+	}
+
 	// --- Main list request ---
 	property GetSelectableItemsInput getSelectableItemsInput: GetSelectableItemsInput {}
+	// The server matches the text only against the field ids it is told about, so
+	// without them the filter silently matches nothing.
 	property CollectionFilter __filter: CollectionFilter {
 		Component.onCompleted: {
 			setFilteringInfoIds(["Name", "Description"])
@@ -124,10 +153,18 @@ FilterableSelectDataProvider {
 
 		getSelectableItemsInput.m_collectionId = root.collectionId
 
-		// Pass selected IDs as excludeIds for server-side filtering
-		var selectedIds = root.getSelectedIds()
-		if (selectedIds.length > 0){
-			getSelectableItemsInput.m_excludeIds = selectedIds
+		// Pass selected IDs as excludeIds for server-side filtering, plus anything the host
+		// declared unselectable (a role must not be offered as its own parent).
+		var excludeIds = root.getSelectedIds().slice()
+		for (var i = 0; i < root.extraExcludeIds.length; i++){
+			var extraId = root.extraExcludeIds[i]
+			if (extraId && excludeIds.indexOf(extraId) < 0){
+				excludeIds.push(extraId)
+			}
+		}
+
+		if (excludeIds.length > 0){
+			getSelectableItemsInput.m_excludeIds = excludeIds
 		}
 		else {
 			getSelectableItemsInput.m_excludeIds = null
@@ -141,16 +178,32 @@ FilterableSelectDataProvider {
 		viewParams.m_offset = offset || 0
 		viewParams.m_count = count || 20
 
-		__filter.clearAllFilters(true)
-		if (filter && filter !== ""){
-			__filter.setTextFilter(filter)
-			viewParams.m_filterModel = __filter
-		}
-		else {
-			viewParams.m_filterModel = null
-		}
+		__filter.setTextFilter(filter || "")
+
+		var groupCount = root.__applyGroupFilters()
+		viewParams.m_filterModel = ((filter && filter !== "") || groupCount > 0) ? __filter : null
 
 		getSelectableItemsRequest.send(getSelectableItemsInput)
+	}
+
+	// Re-attached per request: the host rebuilds its groups as its own state changes.
+	function __applyGroupFilters(){
+		var previous = root.__gql.appliedGroupFilters
+		for (var i = 0; i < previous.length; i++){
+			root.__filter.removeGroupFilter(previous[i])
+		}
+
+		var groups = root.groupFilters || []
+		var applied = []
+		for (var j = 0; j < groups.length; j++){
+			if (groups[j]){
+				root.__filter.addGroupFilter(groups[j])
+				applied.push(groups[j])
+			}
+		}
+
+		root.__gql.appliedGroupFilters = applied
+		return applied.length
 	}
 
 	function executeFetchByIds(requestId, ids){
