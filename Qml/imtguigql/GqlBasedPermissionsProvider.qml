@@ -26,8 +26,20 @@ PermissionsProvider {
     property string __pendingTenantId: ""
     property string __pendingOrgTenantId: ""
 
+    function __onRequestFailed(status, tenantId) {
+        if (status === 1) {
+            return
+        }
+
+        root.loading = false
+        root.lastError = qsTr("Unable to load permissions")
+        root.requestFailed(root.lastError, tenantId)
+    }
+
     property GqlSdlRequestSender __requestSender: GqlSdlRequestSender {
         gqlCommandId: ImtauthPermissionsSdlCommandIds.s_getProductPermissions
+
+        onFinished: root.__onRequestFailed(status, root.__pendingTenantId)
 
         sdlObjectComp: Component {
             GetProductPermissionsPayload {
@@ -67,6 +79,8 @@ PermissionsProvider {
     property GqlSdlRequestSender __userRequestSender: GqlSdlRequestSender {
         gqlCommandId: ImtauthPermissionsSdlCommandIds.s_getUserPermissions
 
+        onFinished: root.__onRequestFailed(status, "")
+
         sdlObjectComp: Component {
             GetProductPermissionsPayload {
                 onFinished: {
@@ -99,6 +113,8 @@ PermissionsProvider {
 
     property GqlSdlRequestSender __orgRequestSender: GqlSdlRequestSender {
         gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_getOrganizationPermissions
+
+        onFinished: root.__onRequestFailed(status, root.__pendingOrgTenantId)
 
         sdlObjectComp: Component {
             GetOrganizationPermissionsPayload {

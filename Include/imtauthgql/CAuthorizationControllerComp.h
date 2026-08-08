@@ -12,6 +12,9 @@
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
+#include <imtauth/ITenantEntityBindingManager.h>
+#include <imtauth/IDelegatedAccess.h>
+#include <imtauth/IRoleInfoProvider.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization_fwd.h>
 
 
@@ -34,6 +37,9 @@ public:
 		I_ASSIGN(m_patPrefixAttrPtr, "PatPrefix", "Personal access token prefix", false, "imt_pat_");
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager", false, "TenantManager");
 		I_ASSIGN(m_tenantMembershipManagerCompPtr, "TenantMembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
+		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for tenant-scoped adaptation of user roles/groups/permissions", false, "TenantEntityBindingManager");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
+		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider (used for delegated role product validation)", false, "RoleInfoProvider");
 	I_END_COMPONENT;
 
 protected:
@@ -76,6 +82,9 @@ protected:
 	I_REF(imtauth::IPersonalAccessTokenManager, m_personalAccessTokenManagerCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_tenantMembershipManagerCompPtr);
+	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
+	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
+	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
 	I_MULTIREF(imtauth::ICredentialController, m_credentialControllersCompPtr);
 	I_MULTIATTR(QByteArray, m_systemIdsAttrPtr);
 	I_ATTR(QByteArray, m_patPrefixAttrPtr);

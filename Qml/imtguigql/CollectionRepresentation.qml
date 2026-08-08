@@ -317,10 +317,7 @@ Item {
 						root.elementSetRemoved()
 					}
 					else{
-						let message = m_errorMessage
-						if (!message || message === ""){
-							message = qsTr("Unable to remove elements")
-						}
+						let message = qsTr("Unable to remove elements")
 						root.elementSetRemoveFailed(message)
 					}
 				}

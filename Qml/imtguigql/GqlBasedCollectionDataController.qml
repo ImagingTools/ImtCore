@@ -137,10 +137,7 @@ CollectionDataController {
 						root.objectsRemoved()
 					}
 					else{
-						let message = m_errorMessage
-						if (!message || message === ""){
-							message = qsTr("Unable to remove selected element(s)")
-						}
+						let message = qsTr("Unable to remove selected element(s)")
 						PopupManager.addErrorMessage(message, true)
 					}
 				}
@@ -170,10 +167,7 @@ CollectionDataController {
 						root.objectsRemoved()
 					}
 					else{
-						let message = m_errorMessage
-						if (!message || message === ""){
-							message = qsTr("Unable to remove selected element(s)")
-						}
+						let message = qsTr("Unable to remove selected element(s)")
 						PopupManager.addErrorMessage(message, true)
 					}
 				}
