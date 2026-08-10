@@ -1,6 +1,6 @@
 # Application Initializers
 
-This section documents the new modular application initialization model for ImtCore.
+This section documents the static function based initialization model for ImtCore.
 
 ## Language Versions
 
@@ -9,18 +9,14 @@ This section documents the new modular application initialization model for ImtC
 
 ## What Is Covered
 
-- Why legacy static initialization was replaced with composable initializers
-- Initialization architecture and responsibilities
-- Detailed layer model: atomic, technical, domain, and full default
-- Layer composition details: what each layer includes
-- Inclusion guidance: when to enable each layer in your applications
-- Aggregating and domain-specific initializer classes
+- Static initialization entry points and responsibilities
+- Macro profiles for common app types: server-auth, server-lic, server-auth-lic, client
+- Domain-level resource initialization functions
 - Usage patterns in applications
-- Extension rules for adding new initializers
 
 ## Quick Start
 
-Use `imtcore::CDefaultImtCoreQmlInitializer` when you need full default startup behavior.
-Use domain aggregators (for example `imtcore::CImtCoreAuthInitializer`) when only a subsystem should be initialized.
+Use `imtcore::InitializeDefaultImtCoreQml()` when you need full default startup behavior.
+Use domain functions (for example `imtcore::InitializeImtCoreAuth()`) when only a subsystem should be initialized.
 
 See full details in the language-specific documents above.

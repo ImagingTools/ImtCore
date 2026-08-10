@@ -1,295 +1,134 @@
-# Инициализаторы приложения ImtCore
+# Инициализаторы приложений ImtCore
 
 ## 1. Назначение
 
-Документ описывает модульную архитектуру инициализации в ImtCore, введенную взамен устаревшей монолитной статической инициализации.
+Документ описывает упрощенную макро-модель инициализации приложений ImtCore.
 
-Новый подход основан на:
+Модель ориентирована на команды прикладной разработки: вместо большого количества микро-инициализаторов используются готовые крупные профили запуска.
 
-- `imtcore::IApplicationInitializer` как общем контракте
-- небольших инициализаторах с одной ответственностью
-- композиции через `imtcore::CCascadedApplicationInitializer`
+## 2. Базовый API
 
-Это улучшает поддерживаемость, тестопригодность и повторное использование логики старта.
+- Статические функции инициализации в пространстве имен `imtcore`
+- `imtcore::CApplicationRunner::Run(..., autoInit)` для запуска приложения
 
-## 2. Цель
+## 3. Макро-профили
 
-Старая статическая инициализация смешивала в одном месте:
+### 3.1 Сервер с авторизацией
 
-- локализацию
-- UI-ресурсы
-- ресурсы тем
-- QML-ресурсы
-- SDL-схемы/ресурсы
-- настройку стиля
+Функция:
+- `imtcore::InitializeImtCoreServerAuth()`
 
-Новая структура разделяет эти зоны ответственности и позволяет настраивать точные профили запуска.
+Включает:
+- Локализацию
+- Базовый server/core слой
+- Auth-домен
 
-## 3. Базовые контракты
+Когда использовать:
+- Сервис требует auth-доменную логику
+- Лицензионный домен не обязателен по умолчанию
 
-### 3.1 Базовый интерфейс
+### 3.2 Сервер с лицензиями
 
-- `imtcore::IApplicationInitializer`
-  - Метод: `void Initialize()`
+Функция:
+- `imtcore::InitializeImtCoreServerLic()`
 
-### 3.2 Композиция
+Включает:
+- Локализацию
+- Базовый server/core слой
+- Lic-домен
 
-- `imtcore::CCascadedApplicationInitializer`
-  - Хранит и выполняет упорядоченную цепочку инициализаторов
-  - Владеет переданными инициализаторами (ownership transfer)
+Когда использовать:
+- Сервис ориентирован на лицензионные сценарии
+- Авторизация опциональна или вынесена наружу
 
-### 3.3 Интеграция с runner
+### 3.3 Сервер с авторизацией и лицензиями
 
-- `imtcore::CApplicationRunner::Run(..., IApplicationInitializer& initializer)`
-  - Вызывает `initializer.Initialize()` перед запуском приложения
+Функция:
+- `imtcore::InitializeImtCoreServerAuthLic()`
 
-## 4. Слои инициализации
+Включает:
+- Локализацию
+- Базовый server/core слой
+- Auth-домен
+- Lic-домен
 
-### 4.1 Атомарные инициализаторы (одна ответственность)
+Когда использовать:
+- И авторизация, и лицензирование являются ключевыми требованиями сервиса
 
-Что это:
-Минимальные инициализаторы, каждый из которых выполняет одну техническую операцию или инициализирует один узкий набор ресурсов.
+### 3.4 Профиль клиентского приложения
 
-Что включает:
-- Ровно одну зону ответственности: локализация, конкретный набор ресурсов, конкретный QML-набор, отдельная тема, отдельная группа SDL, отдельный шаг стиля.
+Функция:
+- `imtcore::InitializeImtCoreClientApp()`
 
-Когда включать в приложениях:
-- Когда нужен очень точный и минимальный профиль запуска.
-- Когда вы строите собственный специализированный pipeline инициализации.
-- Когда важно строго управлять порядком инициализации зависимых подсистем.
+Включает:
+- Локализацию
+- Настройку стиля/UI
+- Base-домен
+- Auth-домен
+- Desk-домен
+- Lic-домен
 
-Примеры:
+Когда использовать:
+- Desktop/QML клиентские приложения
+- Полнофункциональные UI-приложения
 
-- Локализация:
-  - `CAcfLocInitializer`
-  - `CImtCoreLocalizationInitializer`
-- Ресурсы:
-  - `CImtCoreAuthResourcesInitializer`
-  - `CImtCoreLicResourcesInitializer`
-  - `CImtCoreChatDbResourcesInitializer`
-  - `CImtCoreDeskDbResourcesInitializer`
-  - `CImtCoreCommonDbResourcesInitializer`
-  - `CImtCoreGuiResourcesInitializer`
-  - `CImtCoreGuiLightResourcesInitializer`
-  - `CImtCoreGuiDarkResourcesInitializer`
-  - `CImtCoreDeskResourcesInitializer` (композиционный над desk resource атомарными инициализаторами)
-  - `CImtCoreBaseResourcesInitializer`
-  - `CImtCoreStyleResourcesInitializer`
-- QML:
-  - `CImtCoreBaseQmlInitializer`
-  - `CImtCoreGuiQmlInitializer`
-  - `CImtCoreColGuiQmlInitializer`
-  - `CImtCoreDocGuiQmlInitializer`
-  - `CImtCoreGuiGqlQmlInitializer`
-  - `CImtCoreDeskQmlInitializer` (композиционный над desk QML атомарными инициализаторами)
-  - `CImtCoreAuthQmlInitializer`
-  - `CImtCoreLicQmlInitializer`
-  - `CImtCoreGeoQmlInitializer`
-- Темы:
-  - `CImtCoreGuiThemeInitializer`
-  - `CImtCoreAuthThemeInitializer`
-- SDL:
-  - `CImtCoreBaseSdlInitializer`
-  - `CImtCoreAuthSdlInitializer`
-  - `CImtCoreDomainSdlInitializer`
-- Настройка стиля:
-  - `CImtCoreStyleTypeInitializer`
-  - `CImtCoreFusionBaseStyleInitializer`
-  - `CImtCoreLightThemePropertyInitializer`
+### 3.5 Обратносуместимый профиль по умолчанию
 
-#### 4.1.1 Подробно по атомарным инициализаторам
+Функция:
+- `imtcore::InitializeDefaultImtCoreQml()`
 
-Ниже приведен практический каталог атомарных инициализаторов: что делает каждый класс и когда его стоит подключать напрямую.
+Поведение:
+- Делегирует в `InitializeImtCoreClientApp()`
 
-| Класс | Что инициализирует | Когда подключать |
-| --- | --- | --- |
-| `CAcfLocInitializer` | Локализацию ACF (`AcfLoc`, `AcfSlnLoc`) | Когда приложению нужны базовые переводы ACF, даже без остальных модулей ImtCore |
-| `CImtCoreLocalizationInitializer` | Локализацию ImtCore + базовую локализацию ACF | Когда нужен полный базовый слой локализации для ImtCore-UI |
-| `CImtCoreAuthResourcesInitializer` | Auth ресурсы и auth UI resource-паки | Для auth-экранов/сценариев без подключения всего приложения |
-| `CImtCoreLicResourcesInitializer` | Lic resource-паки | Для лицензирования и экранов лицензий |
-| `CImtCoreChatDbResourcesInitializer` | Ресурс chat DB (`imtchatdb`) | Когда нужны ресурсы чатов/чатовых данных |
-| `CImtCoreDeskDbResourcesInitializer` | Ресурс desk DB (`imtdeskdb`) | Когда нужны desk-специфичные данные |
-| `CImtCoreCommonDbResourcesInitializer` | Общий DB-ресурс (`imtdb`) | Когда нужен общий DB payload |
-| `CImtCoreGuiResourcesInitializer` | Основной GUI resource-пак (`imtgui`) | Когда нужен базовый набор GUI-ресурсов |
-| `CImtCoreGuiLightResourcesInitializer` | Light GUI resource-пак (`imtguilight`) | Когда нужны ресурсы светлой темы GUI |
-| `CImtCoreGuiDarkResourcesInitializer` | Dark GUI resource-пак (`imtguidark`) | Когда нужны ресурсы темной темы GUI |
-| `CImtCoreDeskResourcesInitializer` | Композиционный desk resource-инициализатор над шестью desk resource атомарными инициализаторами выше | Когда нужен полный desk-набор ресурсов без ручной сборки |
-| `CImtCoreBaseResourcesInitializer` | Базовые core-ресурсы (`imtbase`) | Для инфраструктурных сценариев и базовых сервисов |
-| `CImtCoreStyleResourcesInitializer` | Ресурсы стиля (style + style variants) | Когда нужно оформление без полного доменного старта |
-| `CImtCoreBaseQmlInitializer` | Базовый QML модуль (`imtcontrolsqml`) | Для минимального QML-фундамента |
-| `CImtCoreGuiQmlInitializer` | Базовый desk GUI QML-модуль (`imtguiqml`) | Для базового GUI-слоя рабочего пространства |
-| `CImtCoreColGuiQmlInitializer` | QML-модуль коллекций (`imtcolguiqml`) | Для UI-функциональности, связанной с коллекциями |
-| `CImtCoreDocGuiQmlInitializer` | QML-модуль документов (`imtdocguiqml`) | Для UI-сценариев, ориентированных на документы |
-| `CImtCoreGuiGqlQmlInitializer` | GUI GQL QML-модуль (`imtguigqlqml`) | Для интеграции GUI с GraphQL/QML-слоем |
-| `CImtCoreDeskQmlInitializer` | Композиционный desk QML-инициализатор над четырьмя desk атомарными QML-инициализаторами выше | Когда нужен полный desk QML-слой без ручной сборки |
-| `CImtCoreAuthQmlInitializer` | Auth QML модуль (`imtauthguiqml`) | Для auth UI |
-| `CImtCoreLicQmlInitializer` | Lic QML модуль (`imtlicguiqml`) | Для экранов лицензирования |
-| `CImtCoreGeoQmlInitializer` | Geo QML модуль (`imtgeoguiqml`) | Для гео-функциональности, подключаемой отдельно |
-| `CImtCoreGuiThemeInitializer` | GUI theme ресурсы (`imtguiTheme`) | Когда desktop/UI темы нужны отдельно от auth темы |
-| `CImtCoreAuthThemeInitializer` | Auth theme ресурсы (`imtauthguiTheme`) | Когда нужны только auth темы |
-| `CImtCoreBaseSdlInitializer` | Базовые SDL-схемы (`imtbase*`) | Для core-сервисов, базовых фильтров, коллекций и операций |
-| `CImtCoreAuthSdlInitializer` | Auth SDL-схемы (`imtauth*`) | Для auth-domain API и сервисов |
-| `CImtCoreDomainSdlInitializer` | Domain SDL (`imtapp*`, `imtcolor*`, `imt2d*`) | Для предметных доменов приложения (app/color/2d) |
-| `CImtCoreStyleTypeInitializer` | Тип стиля ImtStyle (`ST_IMAGINGTOOLS`) | Когда нужно установить policy стиля без применения базовой Qt-темы |
-| `CImtCoreFusionBaseStyleInitializer` | Базовый Qt-стиль `fusion` + подключение `CImtStyle` к `QApplication` | Когда нужно применить базовый визуальный стиль |
-| `CImtCoreLightThemePropertyInitializer` | Свойство приложения `ThemeId=Light` | Когда нужно явно зафиксировать light theme на старте |
+Когда использовать:
+- Нужна стандартная точка входа полного QML-профиля
 
-Практическое правило:
-если вы не уверены, что выбираете правильный набор атомарных классов, используйте доменный агрегатор. К атомарному уровню переходите только когда действительно нужен узкий профиль запуска.
+## 4. Примеры использования
 
-### 4.2 Агрегаторы среднего уровня
-
-Что это:
-Технические агрегаторы, которые собирают атомарные инициализаторы внутри одной технической области.
-
-Что включает:
-- `CImtCoreResourcesInitializer`: атомарные инициализаторы ресурсов.
-- `CImtCoreQmlInitializer`: атомарные инициализаторы QML.
-- `CImtCoreThemeInitializer`: атомарные инициализаторы тем.
-- `CImtCoreSdlInitializer`: атомарные инициализаторы SDL.
-- `CImtCoreStyleInitializer`: атомарные шаги настройки стиля.
-
-Когда включать в приложениях:
-- Когда приложение нуждается в полной технической области, но не во всех доменах.
-- Когда миграция со старого монолита идет поэтапно: сначала техническими слоями, затем доменными.
-- Когда нужно стандартизировать инициализацию конкретной технологии между несколькими приложениями.
-
-- `CImtCoreResourcesInitializer`
-- `CImtCoreQmlInitializer`
-- `CImtCoreThemeInitializer`
-- `CImtCoreSdlInitializer`
-- `CImtCoreStyleInitializer`
-
-Эти классы агрегируют атомарные инициализаторы внутри одной технической области.
-
-### 4.3 Доменные агрегаторы
-
-Что это:
-Бизнес/предметные агрегаторы, которые объединяют ресурсы, QML, темы и SDL в рамках одного домена.
-
-Что включает:
-- `CImtCoreAuthInitializer`: auth-ресурсы, auth-theme, auth-QML, auth-SDL.
-- `CImtCoreBaseInitializer`: base-ресурсы, style-ресурсы, base-QML, base-SDL.
-- `CImtCoreDeskInitializer`: desk-ресурсы, gui-theme, desk-QML, domain-SDL.
-- `CImtCoreLicInitializer`: lic-ресурсы, lic-QML.
-
-Когда включать в приложениях:
-- Когда приложение функционально сосредоточено на конкретном домене.
-- Когда нужно быстро подключить "все необходимое" для домена без ручной сборки цепочки.
-- Когда важна переиспользуемость профиля между сервисами и UI-приложениями одного домена.
-
-- `CImtCoreAuthInitializer`
-- `CImtCoreBaseInitializer`
-- `CImtCoreDeskInitializer`
-- `CImtCoreLicInitializer`
-
-Эти классы объединяют ресурсы, QML, темы и SDL в рамках предметной области.
-
-### 4.4 Полный агрегатор по умолчанию
-
-Что это:
-Верхнеуровневый агрегатор, который собирает стандартный профиль инициализации приложения.
-
-Что включает:
-- Общие шаги (локализация и стиль) и доменные агрегаторы (`Base`, `Auth`, `Desk`, `Lic`) в фиксированном порядке.
-
-Когда включать в приложениях:
-- Для большинства полнофункциональных desktop/QML приложений.
-- Когда нужна максимальная совместимость со стандартным startup-профилем ImtCore.
-- Когда нет явного требования минимизировать startup до конкретных подсистем.
-
-- `CDefaultImtCoreQmlInitializer`
-
-Используется, когда нужно полное стандартное поведение запуска.
-
-### 4.5 Практическая матрица выбора слоя
-
-| Сценарий приложения | Рекомендуемый слой | Почему |
-| --- | --- | --- |
-| Полнофункциональное приложение ImtCore | `CDefaultImtCoreQmlInitializer` | Готовый стандартный профиль без ручной сборки |
-| Приложение одного домена (например, только Auth) | Доменные агрегаторы (`CImtCoreAuthInitializer`) | Подключает полный набор зависимостей домена |
-| Приложение без части UI-функций, но с нужной технологией | Агрегаторы среднего уровня | Можно включить только нужную техническую область |
-| Узкоспециализированный startup (ограниченный footprint) | Атомарные инициализаторы | Максимально точный контроль состава и порядка |
-| Поэтапная миграция legacy-кода | Сначала агрегаторы среднего уровня, затем доменные | Упрощает безопасный переход без большого одномоментного изменения |
-
-### 4.6 Минимальный чек-лист подключения
-
-1. Определите: вам нужен full-profile, домен или точечная инициализация.
-2. Выберите самый высокий подходящий слой (по умолчанию: full, иначе доменный).
-3. Если выбираете низкий слой, явно проверьте зависимости по теме, QML и SDL.
-4. Зафиксируйте порядок инициализаторов и не меняйте его без проверки поведения.
-5. Для новых приложений предпочитайте доменные агрегаторы вместо ручного набора атомарных классов.
-
-## 5. Рекомендуемые сценарии использования
-
-### 5.1 Полный запуск приложения по умолчанию
+### 4.1 Сервер с авторизацией
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
-#include <imtcore/CDefaultImtCoreQmlInitializer.h>
+#include <imtcore/CImtCoreServerAuthInitializer.h>
 
-imtcore::CDefaultImtCoreQmlInitializer initializer;
-return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true, initializer);
+imtcore::InitializeImtCoreServerAuth();
+return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.2 Запуск только нужного домена (пример: Auth)
+### 4.2 Сервер с лицензиями
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
-#include <imtcore/CImtCoreAuthInitializer.h>
+#include <imtcore/CImtCoreServerLicInitializer.h>
 
-imtcore::CImtCoreAuthInitializer initializer;
-return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true, initializer);
+imtcore::InitializeImtCoreServerLic();
+return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.3 Кастомная композиция под специализированное приложение
+### 4.3 Сервер с авторизацией и лицензиями
 
 ```cpp
-#include <imtcore/CCascadedApplicationInitializer.h>
-#include <imtcore/CImtCoreLocalizationInitializer.h>
-#include <imtcore/CImtCoreDeskInitializer.h>
-#include <imtcore/CImtCoreStyleInitializer.h>
+#include <imtcore/CApplicationRunner.h>
+#include <imtcore/CImtCoreServerAuthLicInitializer.h>
 
-imtcore::CCascadedApplicationInitializer initializer;
-initializer.AddInitializer(new imtcore::CImtCoreLocalizationInitializer());
-initializer.AddInitializer(new imtcore::CImtCoreDeskInitializer());
-initializer.AddInitializer(new imtcore::CImtCoreStyleInitializer());
-
-return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true, initializer);
+imtcore::InitializeImtCoreServerAuthLic();
+return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-## 6. Правила порядка инициализации
+### 4.4 Клиентское приложение
 
-Порядок влияет на поведение во время выполнения. Практические правила:
+```cpp
+#include <imtcore/CApplicationRunner.h>
+#include <imtcore/CImtCoreClientAppInitializer.h>
 
-1. Сначала локализация
-2. Затем базовые/доменные ресурсы
-3. Настройка стиля до отображения UI
-4. Темы до QML, зависящего от theme-свойств
-5. SDL/QML домена до фактического использования
+imtcore::InitializeImtCoreClientApp();
+return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
+```
 
-Если собираете цепочку вручную, порядок должен быть явным и детерминированным.
+## 5. Как выбрать профиль
 
-## 7. Рекомендации по миграции
-
-При переходе со старой статической инициализации:
-
-1. Определите необходимые подсистемы
-2. Предпочитайте готовые доменные агрегаторы
-3. Если агрегатор не подходит, соберите локальную цепочку из атомарных инициализаторов
-4. Держите цепочку минимальной под профиль приложения
-
-## 8. Правила расширения
-
-При добавлении нового инициализатора:
-
-1. Реализуйте `IApplicationInitializer`
-2. Соблюдайте одну ответственность
-3. Используйте понятное доменное имя класса
-4. Подключайте его в ближайший подходящий агрегатор
-5. Проверяйте влияние порядка на зависимые подсистемы
-
-## 9. Примечания
-
-- Legacy-файл `Include/imtbase/Init.h` оставлен без изменений по договоренности.
-- В новом коде рекомендуется использовать инициализаторы из `imtcore` и запуск через `CApplicationRunner`.
+- `InitializeImtCoreServerAuth()` для auth-ориентированных серверов.
+- `InitializeImtCoreServerLic()` для lic-ориентированных серверов.
+- `InitializeImtCoreServerAuthLic()`, когда нужны оба домена.
+- `InitializeImtCoreClientApp()` для клиентских/UI приложений.
+- `InitializeDefaultImtCoreQml()` как стандартная точка входа полного профиля.

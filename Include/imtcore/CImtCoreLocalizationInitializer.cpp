@@ -19,7 +19,7 @@ namespace imtcore
 {
 
 
-void CImtCoreLocalizationInitializer::Initialize()
+void InitializeImtCoreLocalization()
 {
 	DoInitImtCoreLocalizationResources();
 }

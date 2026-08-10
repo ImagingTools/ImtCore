@@ -1,25 +1,33 @@
 #include <imtcore/CImtCoreStyleInitializer.h>
 
+// Qt includes
+#include <QtCore/QCoreApplication>
+#include <QtCore/QVariant>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStyleFactory>
+
 // ImtCore includes
-#include <imtcore/CCascadedApplicationInitializer.h>
-#include <imtcore/CImtCoreStyleTypeInitializer.h>
-#include <imtcore/CImtCoreFusionBaseStyleInitializer.h>
-#include <imtcore/CImtCoreLightThemePropertyInitializer.h>
+#include <imtstyle/CImtStyle.h>
 
 
 namespace imtcore
 {
 
 
-void CImtCoreStyleInitializer::Initialize()
+void InitializeImtCoreStyle()
 {
-	CCascadedApplicationInitializer cascadedInitializer;
+	auto* imtStylePtr = imtstyle::CImtStyle::GetInstance();
+	Q_ASSERT(imtStylePtr != nullptr);
+	imtStylePtr->SetStyleType(imtstyle::CImtStyle::ST_IMAGINGTOOLS);
 
-	cascadedInitializer.AddInitializer(new CImtCoreStyleTypeInitializer());
-	cascadedInitializer.AddInitializer(new CImtCoreFusionBaseStyleInitializer());
-	cascadedInitializer.AddInitializer(new CImtCoreLightThemePropertyInitializer());
+	imtStylePtr->setBaseStyle(QStyleFactory::create("fusion"));
+	QApplication::setStyle(imtStylePtr);
 
-	cascadedInitializer.Initialize();
+	auto* appPtr = QCoreApplication::instance();
+	if (appPtr != nullptr)
+	{
+		appPtr->setProperty("ThemeId", QVariant("Light"));
+	}
 }
 
 

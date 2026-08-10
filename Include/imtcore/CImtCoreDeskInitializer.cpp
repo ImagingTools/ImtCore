@@ -1,27 +1,36 @@
 #include <imtcore/CImtCoreDeskInitializer.h>
 
-// ImtCore includes
-#include <imtcore/CCascadedApplicationInitializer.h>
-#include <imtcore/CImtCoreDeskResourcesInitializer.h>
-#include <imtcore/CImtCoreGuiThemeInitializer.h>
-#include <imtcore/CImtCoreDeskQmlInitializer.h>
-#include <imtcore/CImtCoreDomainSdlInitializer.h>
+// Qt includes
+#include <QtCore/qglobal.h>
 
 
 namespace imtcore
 {
 
 
-void CImtCoreDeskInitializer::Initialize()
+void InitializeImtCoreDesk()
 {
-	CCascadedApplicationInitializer cascadedInitializer;
+	Q_INIT_RESOURCE(imtchatdb);
+	Q_INIT_RESOURCE(imtdeskdb);
+	Q_INIT_RESOURCE(imtdb);
 
-	cascadedInitializer.AddInitializer(new CImtCoreDeskResourcesInitializer());
-	cascadedInitializer.AddInitializer(new CImtCoreGuiThemeInitializer());
-	cascadedInitializer.AddInitializer(new CImtCoreDeskQmlInitializer());
-	cascadedInitializer.AddInitializer(new CImtCoreDomainSdlInitializer());
+	Q_INIT_RESOURCE(imtgui);
+	Q_INIT_RESOURCE(imtguilight);
+	Q_INIT_RESOURCE(imtguidark);
 
-	cascadedInitializer.Initialize();
+	Q_INIT_RESOURCE(imtguiTheme);
+
+	Q_INIT_RESOURCE(imtguiqml);
+	Q_INIT_RESOURCE(imtcolguiqml);
+	Q_INIT_RESOURCE(imtdocguiqml);
+	Q_INIT_RESOURCE(imtguigqlqml);
+
+	Q_INIT_RESOURCE(imtappApplicationSdl);
+	Q_INIT_RESOURCE(imtcolorLabSdl);
+	Q_INIT_RESOURCE(imtcolorRgbColorHexSdl);
+	Q_INIT_RESOURCE(imt2dGeometrySdl);
+	Q_INIT_RESOURCE(imt2dPaintPrimitivesSdl);
+	Q_INIT_RESOURCE(imt2dPaintSystemSdl);
 }
 
 

@@ -1,23 +1,19 @@
 #include <imtcore/CImtCoreLicInitializer.h>
 
-// ImtCore includes
-#include <imtcore/CCascadedApplicationInitializer.h>
-#include <imtcore/CImtCoreLicResourcesInitializer.h>
-#include <imtcore/CImtCoreLicQmlInitializer.h>
+// Qt includes
+#include <QtCore/qglobal.h>
 
 
 namespace imtcore
 {
 
 
-void CImtCoreLicInitializer::Initialize()
+void InitializeImtCoreLic()
 {
-	CCascadedApplicationInitializer cascadedInitializer;
+	Q_INIT_RESOURCE(imtlicguilight);
+	Q_INIT_RESOURCE(imtlicguidark);
 
-	cascadedInitializer.AddInitializer(new CImtCoreLicResourcesInitializer());
-	cascadedInitializer.AddInitializer(new CImtCoreLicQmlInitializer());
-
-	cascadedInitializer.Initialize();
+	Q_INIT_RESOURCE(imtlicguiqml);
 }
 
 

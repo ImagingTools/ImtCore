@@ -4,7 +4,7 @@ namespace imtcore
 {
 
 
-void InitializeImtCoreDesk();
+void InitializeImtCoreServerAuthLic();
 
 
 } // namespace imtcore
