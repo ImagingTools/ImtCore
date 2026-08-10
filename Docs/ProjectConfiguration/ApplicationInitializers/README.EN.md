@@ -71,7 +71,11 @@ Examples:
   - `CImtCoreStyleResourcesInitializer`
 - QML:
   - `CImtCoreBaseQmlInitializer`
-  - `CImtCoreDeskQmlInitializer`
+  - `CImtCoreGuiQmlInitializer`
+  - `CImtCoreColGuiQmlInitializer`
+  - `CImtCoreDocGuiQmlInitializer`
+  - `CImtCoreGuiGqlQmlInitializer`
+  - `CImtCoreDeskQmlInitializer` (composite over desk QML atomic initializers)
   - `CImtCoreAuthQmlInitializer`
   - `CImtCoreLicQmlInitializer`
   - `CImtCoreGeoQmlInitializer`
@@ -101,7 +105,11 @@ The table below provides a practical reference for each atomic initializer: what
 | `CImtCoreBaseResourcesInitializer` | Base core resources (`imtbase`) | For infrastructure services and minimal core scenarios |
 | `CImtCoreStyleResourcesInitializer` | Style resources (style + style variants) | When visual styling is needed without full domain startup |
 | `CImtCoreBaseQmlInitializer` | Base QML module (`imtcontrolsqml`) | For minimal QML foundation |
-| `CImtCoreDeskQmlInitializer` | Desk-oriented QML modules (`imtguiqml`, `imtcolguiqml`, `imtdocguiqml`, `imtguigqlqml`) | For workspace UI features without auth/lic parts |
+| `CImtCoreGuiQmlInitializer` | Core desk GUI QML module (`imtguiqml`) | For base workspace GUI layer |
+| `CImtCoreColGuiQmlInitializer` | Collection GUI QML module (`imtcolguiqml`) | For collection-centric GUI functionality |
+| `CImtCoreDocGuiQmlInitializer` | Document GUI QML module (`imtdocguiqml`) | For document-oriented GUI workflows |
+| `CImtCoreGuiGqlQmlInitializer` | GUI GQL QML module (`imtguigqlqml`) | For GUI GraphQL-related QML integration |
+| `CImtCoreDeskQmlInitializer` | Composite desk QML initializer over the four desk atomic QML initializers above | When you need full desk QML scope without manual assembly |
 | `CImtCoreAuthQmlInitializer` | Auth QML module (`imtauthguiqml`) | For auth UI |
 | `CImtCoreLicQmlInitializer` | Licensing QML module (`imtlicguiqml`) | For licensing screens |
 | `CImtCoreGeoQmlInitializer` | Geo QML module (`imtgeoguiqml`) | For optional geo functionality |

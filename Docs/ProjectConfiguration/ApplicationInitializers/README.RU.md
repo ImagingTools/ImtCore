@@ -71,7 +71,11 @@
   - `CImtCoreStyleResourcesInitializer`
 - QML:
   - `CImtCoreBaseQmlInitializer`
-  - `CImtCoreDeskQmlInitializer`
+  - `CImtCoreGuiQmlInitializer`
+  - `CImtCoreColGuiQmlInitializer`
+  - `CImtCoreDocGuiQmlInitializer`
+  - `CImtCoreGuiGqlQmlInitializer`
+  - `CImtCoreDeskQmlInitializer` (композиционный над desk QML атомарными инициализаторами)
   - `CImtCoreAuthQmlInitializer`
   - `CImtCoreLicQmlInitializer`
   - `CImtCoreGeoQmlInitializer`
@@ -101,7 +105,11 @@
 | `CImtCoreBaseResourcesInitializer` | Базовые core-ресурсы (`imtbase`) | Для инфраструктурных сценариев и базовых сервисов |
 | `CImtCoreStyleResourcesInitializer` | Ресурсы стиля (style + style variants) | Когда нужно оформление без полного доменного старта |
 | `CImtCoreBaseQmlInitializer` | Базовый QML модуль (`imtcontrolsqml`) | Для минимального QML-фундамента |
-| `CImtCoreDeskQmlInitializer` | Desk-ориентированные QML-модули (`imtguiqml`, `imtcolguiqml`, `imtdocguiqml`, `imtguigqlqml`) | Для рабочих UI-фич без auth/lic частей |
+| `CImtCoreGuiQmlInitializer` | Базовый desk GUI QML-модуль (`imtguiqml`) | Для базового GUI-слоя рабочего пространства |
+| `CImtCoreColGuiQmlInitializer` | QML-модуль коллекций (`imtcolguiqml`) | Для UI-функциональности, связанной с коллекциями |
+| `CImtCoreDocGuiQmlInitializer` | QML-модуль документов (`imtdocguiqml`) | Для UI-сценариев, ориентированных на документы |
+| `CImtCoreGuiGqlQmlInitializer` | GUI GQL QML-модуль (`imtguigqlqml`) | Для интеграции GUI с GraphQL/QML-слоем |
+| `CImtCoreDeskQmlInitializer` | Композиционный desk QML-инициализатор над четырьмя desk атомарными QML-инициализаторами выше | Когда нужен полный desk QML-слой без ручной сборки |
 | `CImtCoreAuthQmlInitializer` | Auth QML модуль (`imtauthguiqml`) | Для auth UI |
 | `CImtCoreLicQmlInitializer` | Lic QML модуль (`imtlicguiqml`) | Для экранов лицензирования |
 | `CImtCoreGeoQmlInitializer` | Geo QML модуль (`imtgeoguiqml`) | Для гео-функциональности, подключаемой отдельно |
