@@ -11,6 +11,9 @@ This section documents the new modular application initialization model for ImtC
 
 - Why legacy static initialization was replaced with composable initializers
 - Initialization architecture and responsibilities
+- Detailed layer model: atomic, technical, domain, and full default
+- Layer composition details: what each layer includes
+- Inclusion guidance: when to enable each layer in your applications
 - Aggregating and domain-specific initializer classes
 - Usage patterns in applications
 - Extension rules for adding new initializers

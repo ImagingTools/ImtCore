@@ -47,6 +47,17 @@ The new structure separates these concerns into domain modules and allows precis
 
 ### 4.1 Atomic initializers (single concern)
 
+What this layer is:
+The smallest initialization units. Each class performs one narrow initialization task.
+
+What it includes:
+- One precise responsibility only: localization, one resource group, one QML set, one theme group, one SDL group, or one style setup step.
+
+When to include in applications:
+- You need a strict minimal startup profile.
+- You are building a custom specialized initialization pipeline.
+- You need explicit low-level control over initialization ordering.
+
 Examples:
 
 - Localization:
@@ -76,7 +87,52 @@ Examples:
   - `CImtCoreFusionBaseStyleInitializer`
   - `CImtCoreLightThemePropertyInitializer`
 
+#### 4.1.1 Atomic initializer reference
+
+The table below provides a practical reference for each atomic initializer: what it initializes and when to include it directly.
+
+| Class | What it initializes | When to include |
+| --- | --- | --- |
+| `CAcfLocInitializer` | ACF localization resources (`AcfLoc`, `AcfSlnLoc`) | When the app needs baseline ACF translations, even without full ImtCore startup |
+| `CImtCoreLocalizationInitializer` | ImtCore localization plus baseline ACF localization | When full localization baseline is required for ImtCore UI |
+| `CImtCoreAuthResourcesInitializer` | Auth resources and auth UI resource packs | For auth screens/workflows without full app startup |
+| `CImtCoreLicResourcesInitializer` | Licensing resource packs | For licensing flows and license-related screens |
+| `CImtCoreDeskResourcesInitializer` | Desk/chat/db resources and main GUI resources | For desktop-oriented functionality and workspace UI |
+| `CImtCoreBaseResourcesInitializer` | Base core resources (`imtbase`) | For infrastructure services and minimal core scenarios |
+| `CImtCoreStyleResourcesInitializer` | Style resources (style + style variants) | When visual styling is needed without full domain startup |
+| `CImtCoreBaseQmlInitializer` | Base QML module (`imtcontrolsqml`) | For minimal QML foundation |
+| `CImtCoreDeskQmlInitializer` | Desk-oriented QML modules (`imtguiqml`, `imtcolguiqml`, `imtdocguiqml`, `imtguigqlqml`) | For workspace UI features without auth/lic parts |
+| `CImtCoreAuthQmlInitializer` | Auth QML module (`imtauthguiqml`) | For auth UI |
+| `CImtCoreLicQmlInitializer` | Licensing QML module (`imtlicguiqml`) | For licensing screens |
+| `CImtCoreGeoQmlInitializer` | Geo QML module (`imtgeoguiqml`) | For optional geo functionality |
+| `CImtCoreGuiThemeInitializer` | GUI theme resources (`imtguiTheme`) | When desktop themes are needed separately from auth themes |
+| `CImtCoreAuthThemeInitializer` | Auth theme resources (`imtauthguiTheme`) | When only auth theme assets are required |
+| `CImtCoreBaseSdlInitializer` | Base SDL schemas (`imtbase*`) | For core services, base filters, collections, and operations |
+| `CImtCoreAuthSdlInitializer` | Auth SDL schemas (`imtauth*`) | For auth domain API/services |
+| `CImtCoreDomainSdlInitializer` | Domain SDL (`imtapp*`, `imtcolor*`, `imt2d*`) | For application domains like app/color/2d |
+| `CImtCoreStyleTypeInitializer` | ImtStyle type policy (`ST_IMAGINGTOOLS`) | When style policy must be set before visual base style application |
+| `CImtCoreFusionBaseStyleInitializer` | Qt `fusion` base style and `CImtStyle` attachment to `QApplication` | When base visual style must be applied |
+| `CImtCoreLightThemePropertyInitializer` | App property `ThemeId=Light` | When startup must explicitly lock light theme |
+
+Practical rule:
+if you are not fully sure about selecting atomic classes manually, prefer domain aggregators. Move to atomic composition only when a narrow startup footprint is a real requirement.
+
 ### 4.2 Mid-level aggregators
+
+What this layer is:
+Technical aggregators that compose atomic initializers by technical area.
+
+What it includes:
+- `CImtCoreResourcesInitializer`: resource atomic initializers.
+- `CImtCoreQmlInitializer`: QML atomic initializers.
+- `CImtCoreThemeInitializer`: theme atomic initializers.
+- `CImtCoreSdlInitializer`: SDL atomic initializers.
+- `CImtCoreStyleInitializer`: style setup atomic initializers.
+
+When to include in applications:
+- The app needs one complete technical area, but not all domains.
+- Migration from legacy startup is done incrementally.
+- Multiple apps should share standardized initialization of the same technology stack.
 
 - `CImtCoreResourcesInitializer`
 - `CImtCoreQmlInitializer`
@@ -88,6 +144,20 @@ These aggregators compose atomic initializers of one technical area.
 
 ### 4.3 Domain aggregators
 
+What this layer is:
+Business/domain-oriented aggregators that combine resources, QML, themes, and SDL for one domain.
+
+What it includes:
+- `CImtCoreAuthInitializer`: auth resources, auth theme, auth QML, auth SDL.
+- `CImtCoreBaseInitializer`: base resources, style resources, base QML, base SDL.
+- `CImtCoreDeskInitializer`: desk resources, gui theme, desk QML, domain SDL.
+- `CImtCoreLicInitializer`: lic resources, lic QML.
+
+When to include in applications:
+- The app is focused on one functional domain.
+- You want the full domain package without manual chain assembly.
+- You want reusable startup profiles across apps within the same domain.
+
 - `CImtCoreAuthInitializer`
 - `CImtCoreBaseInitializer`
 - `CImtCoreDeskInitializer`
@@ -97,9 +167,38 @@ These aggregators combine resources, QML, themes, and SDL per business/domain ar
 
 ### 4.4 Full default aggregator
 
+What this layer is:
+Top-level aggregator that defines the standard default startup profile.
+
+What it includes:
+- Shared steps (localization and style) plus domain aggregators (`Base`, `Auth`, `Desk`, `Lic`) in fixed order.
+
+When to include in applications:
+- Most full-featured desktop/QML applications.
+- You need maximum compatibility with the standard ImtCore startup profile.
+- There is no strict requirement to minimize startup to selected subsystems only.
+
 - `CDefaultImtCoreQmlInitializer`
 
 Use this when full default startup behavior is required.
+
+### 4.5 Practical layer selection matrix
+
+| Application scenario | Recommended layer | Why |
+| --- | --- | --- |
+| Full-featured ImtCore application | `CDefaultImtCoreQmlInitializer` | Ready standard profile, no manual composition |
+| Single-domain app (for example Auth only) | Domain aggregators (`CImtCoreAuthInitializer`) | Brings complete domain dependencies |
+| App with partial UI needs but specific technology requirements | Mid-level aggregators | Enables one technical area without unrelated domains |
+| Specialized low-footprint startup | Atomic initializers | Maximum precision over scope and ordering |
+| Incremental legacy migration | Mid-level first, then domain aggregators | Safer transition with smaller behavioral steps |
+
+### 4.6 Minimal inclusion checklist
+
+1. Decide if you need full profile, domain profile, or narrow selective initialization.
+2. Choose the highest suitable layer (default: full, otherwise domain).
+3. If you choose a lower layer, verify dependencies for theme, QML, and SDL explicitly.
+4. Keep initializer order deterministic and avoid changing order without runtime checks.
+5. For new applications, prefer domain aggregators over manual assembly of atomic classes.
 
 ## 5. Recommended Usage Patterns
 
