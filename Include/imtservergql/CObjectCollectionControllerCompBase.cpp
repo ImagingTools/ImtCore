@@ -1515,7 +1515,7 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompB
 			if (requestInfo.items.isMetaInfoRequested){
 				QByteArray elementMetaInfoData;
 				idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(id);
-				if (SerializeObject(*metaInfo.GetPtr(), elementMetaInfoData)){
+				if (metaInfo.IsValid() && SerializeObject(*metaInfo.GetPtr(), elementMetaInfoData)){
 					collectionItem.metaInfo = elementMetaInfoData;
 				}
 			}
@@ -1523,7 +1523,7 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompB
 			if (requestInfo.items.isDataMetaInfoRequested){
 				QByteArray dataMetaInfo;
 				idoc::MetaInfoPtr dataMetaInfoPtr = m_objectCollectionCompPtr->GetDataMetaInfo(id);
-				if (SerializeObject(*dataMetaInfoPtr.GetPtr(), dataMetaInfo)){
+				if (dataMetaInfoPtr.IsValid() && SerializeObject(*dataMetaInfoPtr.GetPtr(), dataMetaInfo)){
 					collectionItem.dataMetaInfo = dataMetaInfo;
 				}
 			}
