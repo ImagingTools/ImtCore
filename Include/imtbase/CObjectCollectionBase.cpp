@@ -399,20 +399,31 @@ IObjectCollectionUniquePtr CObjectCollectionBase::CreateSubCollection(
 			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	imtbase::IObjectCollection* collectionPtr = CreateSubCollectionInstance();
-	if (collectionPtr != nullptr){
-		Q_ASSERT(offset >= 0);
-
-		QWriteLocker locker(&m_lock);
-		qsizetype objectsCount = count >= 0 ? qMin(count, m_objects.size()) : m_objects.size();
-
-		for (qsizetype i = offset; i < objectsCount; i++){
-			collectionPtr->InsertNewObject(m_objects[i].typeId, m_objects[i].name, m_objects[i].description, m_objects[i].dataPtr.GetPtr(), m_objects[i].id);
-		}
-
-		return collectionPtr;
+	if (collectionPtr == nullptr){
+		return nullptr;
 	}
 
-	return nullptr;
+	Q_ASSERT(offset >= 0);
+	if(offset < 0){
+		offset = 0;
+	}
+
+	QWriteLocker locker(&m_lock);
+	qsizetype objectsCount = count >= 0 ? qMin(count, m_objects.size()) : m_objects.size();
+
+	for (qsizetype i = offset; i < objectsCount; i++){
+		collectionPtr->InsertNewObject(
+			m_objects[i].typeId,
+			m_objects[i].name,
+			m_objects[i].description,
+			m_objects[i].dataPtr.GetPtr(),
+			m_objects[i].id,
+			m_objects[i].contentsMetaInfoPtr.GetPtr(),
+			&m_objects[i].collectionItemMetaInfo
+		);
+	}
+
+	return collectionPtr;
 }
 
 
