@@ -1,17 +1,23 @@
 #pragma once
 
-#include <imtcore/IApplicationInitializer.h>
+// Qt includes
+#include <QtCore/qglobal.h>
 
+
+Q_ALWAYS_INLINE static void ImtCoreInitAcfLocalizationResourcesGlobal()
+{
+	Q_INIT_RESOURCE(AcfLoc);
+	Q_INIT_RESOURCE(AcfSlnLoc);
+}
 
 namespace imtcore
 {
 
 
-class CAcfLocInitializer : public IApplicationInitializer
+inline void InitializeAcfLocalization()
 {
-public:
-	virtual void Initialize() override;
-};
+	ImtCoreInitAcfLocalizationResourcesGlobal();
+}
 
 
 } // namespace imtcore

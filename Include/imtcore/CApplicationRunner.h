@@ -8,9 +8,6 @@
 #include <ibase/IApplication.h>
 #include <icomp/CCompositeComponent.h>
 
-// ImtCore includes
-#include <imtcore/IApplicationInitializer.h>
-
 
 namespace imtcore
 {
@@ -22,8 +19,6 @@ public:
 	CApplicationRunner() = delete;
 	template <class T>
 	[[nodiscard]] static int Run(int argc, char** argv, T& applicationComponent, bool autoInit = false);
-	template <class T>
-	[[nodiscard]] static int Run(int argc, char** argv, T& applicationComponent, bool autoInit, IApplicationInitializer& initializer);
 };
 
 
@@ -73,20 +68,5 @@ int CApplicationRunner::Run(int argc, char** argv, T& applicationComponent, bool
 
 	return -1;
 }
-
-
-template <class T>
-int CApplicationRunner::Run(
-			int argc, 
-			char** argv, 
-			T& applicationComponent, 
-			bool autoInit,
-			IApplicationInitializer& initializer)
-{
-	initializer.Initialize();
-
-	return Run(argc, argv, applicationComponent, autoInit);
-}
-
 
 } // namespace imtcore

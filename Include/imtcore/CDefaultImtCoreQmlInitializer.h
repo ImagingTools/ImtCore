@@ -1,10 +1,16 @@
 #pragma once
 
+// ImtCore includes
+#include <imtcore/CImtCoreClientAppInitializer.h>
+
 namespace imtcore
 {
 
 
-void InitializeDefaultImtCoreQml();
+inline void InitializeDefaultImtCoreQml()
+{
+	InitializeImtCoreClientApp();
+}
 
 
 } // namespace imtcore
