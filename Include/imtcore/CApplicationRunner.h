@@ -61,6 +61,7 @@ int CApplicationRunner::Run(int argc, char** argv, T& applicationComponent, bool
 		if (!applicationComponent.EnsureAutoInitComponentsCreated())
 		{
 			qCritical() << "[App Runner] Auto-initialize components failed.";
+			return -1;
 		}
 	}
 
