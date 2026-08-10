@@ -66,7 +66,13 @@
 - Ресурсы:
   - `CImtCoreAuthResourcesInitializer`
   - `CImtCoreLicResourcesInitializer`
-  - `CImtCoreDeskResourcesInitializer`
+  - `CImtCoreChatDbResourcesInitializer`
+  - `CImtCoreDeskDbResourcesInitializer`
+  - `CImtCoreCommonDbResourcesInitializer`
+  - `CImtCoreGuiResourcesInitializer`
+  - `CImtCoreGuiLightResourcesInitializer`
+  - `CImtCoreGuiDarkResourcesInitializer`
+  - `CImtCoreDeskResourcesInitializer` (композиционный над desk resource атомарными инициализаторами)
   - `CImtCoreBaseResourcesInitializer`
   - `CImtCoreStyleResourcesInitializer`
 - QML:
@@ -101,7 +107,13 @@
 | `CImtCoreLocalizationInitializer` | Локализацию ImtCore + базовую локализацию ACF | Когда нужен полный базовый слой локализации для ImtCore-UI |
 | `CImtCoreAuthResourcesInitializer` | Auth ресурсы и auth UI resource-паки | Для auth-экранов/сценариев без подключения всего приложения |
 | `CImtCoreLicResourcesInitializer` | Lic resource-паки | Для лицензирования и экранов лицензий |
-| `CImtCoreDeskResourcesInitializer` | Desk/chat/db ресурсы и основные GUI ресурсы | Для desktop-функциональности и рабочих экранов |
+| `CImtCoreChatDbResourcesInitializer` | Ресурс chat DB (`imtchatdb`) | Когда нужны ресурсы чатов/чатовых данных |
+| `CImtCoreDeskDbResourcesInitializer` | Ресурс desk DB (`imtdeskdb`) | Когда нужны desk-специфичные данные |
+| `CImtCoreCommonDbResourcesInitializer` | Общий DB-ресурс (`imtdb`) | Когда нужен общий DB payload |
+| `CImtCoreGuiResourcesInitializer` | Основной GUI resource-пак (`imtgui`) | Когда нужен базовый набор GUI-ресурсов |
+| `CImtCoreGuiLightResourcesInitializer` | Light GUI resource-пак (`imtguilight`) | Когда нужны ресурсы светлой темы GUI |
+| `CImtCoreGuiDarkResourcesInitializer` | Dark GUI resource-пак (`imtguidark`) | Когда нужны ресурсы темной темы GUI |
+| `CImtCoreDeskResourcesInitializer` | Композиционный desk resource-инициализатор над шестью desk resource атомарными инициализаторами выше | Когда нужен полный desk-набор ресурсов без ручной сборки |
 | `CImtCoreBaseResourcesInitializer` | Базовые core-ресурсы (`imtbase`) | Для инфраструктурных сценариев и базовых сервисов |
 | `CImtCoreStyleResourcesInitializer` | Ресурсы стиля (style + style variants) | Когда нужно оформление без полного доменного старта |
 | `CImtCoreBaseQmlInitializer` | Базовый QML модуль (`imtcontrolsqml`) | Для минимального QML-фундамента |

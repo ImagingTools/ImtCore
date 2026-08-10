@@ -66,7 +66,13 @@ Examples:
 - Resources:
   - `CImtCoreAuthResourcesInitializer`
   - `CImtCoreLicResourcesInitializer`
-  - `CImtCoreDeskResourcesInitializer`
+  - `CImtCoreChatDbResourcesInitializer`
+  - `CImtCoreDeskDbResourcesInitializer`
+  - `CImtCoreCommonDbResourcesInitializer`
+  - `CImtCoreGuiResourcesInitializer`
+  - `CImtCoreGuiLightResourcesInitializer`
+  - `CImtCoreGuiDarkResourcesInitializer`
+  - `CImtCoreDeskResourcesInitializer` (composite over desk resource atomic initializers)
   - `CImtCoreBaseResourcesInitializer`
   - `CImtCoreStyleResourcesInitializer`
 - QML:
@@ -101,7 +107,13 @@ The table below provides a practical reference for each atomic initializer: what
 | `CImtCoreLocalizationInitializer` | ImtCore localization plus baseline ACF localization | When full localization baseline is required for ImtCore UI |
 | `CImtCoreAuthResourcesInitializer` | Auth resources and auth UI resource packs | For auth screens/workflows without full app startup |
 | `CImtCoreLicResourcesInitializer` | Licensing resource packs | For licensing flows and license-related screens |
-| `CImtCoreDeskResourcesInitializer` | Desk/chat/db resources and main GUI resources | For desktop-oriented functionality and workspace UI |
+| `CImtCoreChatDbResourcesInitializer` | Chat DB resource (`imtchatdb`) | When chat data resources are required |
+| `CImtCoreDeskDbResourcesInitializer` | Desk DB resource (`imtdeskdb`) | When desk-specific data resources are required |
+| `CImtCoreCommonDbResourcesInitializer` | Common DB resource (`imtdb`) | When shared DB resource payload is required |
+| `CImtCoreGuiResourcesInitializer` | Main GUI resource package (`imtgui`) | When base GUI resources are required |
+| `CImtCoreGuiLightResourcesInitializer` | Light GUI resource package (`imtguilight`) | When light GUI resources are required |
+| `CImtCoreGuiDarkResourcesInitializer` | Dark GUI resource package (`imtguidark`) | When dark GUI resources are required |
+| `CImtCoreDeskResourcesInitializer` | Composite desk resource initializer over the six desk resource atomic initializers above | When full desk resource scope is needed without manual assembly |
 | `CImtCoreBaseResourcesInitializer` | Base core resources (`imtbase`) | For infrastructure services and minimal core scenarios |
 | `CImtCoreStyleResourcesInitializer` | Style resources (style + style variants) | When visual styling is needed without full domain startup |
 | `CImtCoreBaseQmlInitializer` | Base QML module (`imtcontrolsqml`) | For minimal QML foundation |
