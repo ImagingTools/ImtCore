@@ -5,7 +5,7 @@ SUBDIRS += imtbase
 imtbase.file = ../../Include/imtbase/QMake/imtbase.pro
 
 SUBDIRS += imtcore
-imtbase.file = ../../Include/imtcore/QMake/imtcore.pro
+imtcore.file = ../../Include/imtcore/QMake/imtcore.pro
 
 SUBDIRS += imtdesign
 imtdesign.file = ../../Include/imtdesign/QMake/imtdesign.pro

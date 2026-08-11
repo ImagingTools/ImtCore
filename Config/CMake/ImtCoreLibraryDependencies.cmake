@@ -62,7 +62,6 @@ endfunction()
 # ---------------------------------------------------------------------------
 
 #------ Required libs ------
-imt_declare_library_dependencies(imtcore			Acf::icomp)
 imt_declare_library_dependencies(imtbase			AcfSln::iauth AcfSln::icomm AcfSln::imeas imtfile)
 imt_declare_library_dependencies(imtdesign			imtbase Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg)
 imt_declare_library_dependencies(imtfile			AcfSln::ifileproc)
