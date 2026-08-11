@@ -17,9 +17,13 @@ inline void InitializeImtCoreClientApp()
 	InitializeImtCoreLocalization();
 	InitializeImtCoreStyle();
 	InitializeImtCoreBase();
+	InitializeImtCoreBaseUi();
 	InitializeImtCoreAuth();
+	InitializeImtCoreAuthUi();
 	InitializeImtCoreDesk();
+	InitializeImtCoreDeskUi();
 	InitializeImtCoreLic();
+	InitializeImtCoreLicUi();
 }
 
 

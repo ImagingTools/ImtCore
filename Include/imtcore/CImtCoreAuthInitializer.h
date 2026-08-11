@@ -1,5 +1,6 @@
 #pragma once
 
+
 // Qt includes
 #include <QtCore/qglobal.h>
 
@@ -7,11 +8,6 @@
 Q_ALWAYS_INLINE static void ImtCoreInitAuthResourcesGlobal()
 {
 	Q_INIT_RESOURCE(imtauthdb);
-	Q_INIT_RESOURCE(imtauthguilight);
-	Q_INIT_RESOURCE(imtauthguidark);
-
-	Q_INIT_RESOURCE(imtauthguiTheme);
-	Q_INIT_RESOURCE(imtauthguiqml);
 
 	Q_INIT_RESOURCE(imtauthGroupsSdl);
 	Q_INIT_RESOURCE(imtauthRolesSdl);
@@ -31,6 +27,16 @@ Q_ALWAYS_INLINE static void ImtCoreInitAuthResourcesGlobal()
 	Q_INIT_RESOURCE(imtauthCrossOrgGrantCollectionDocumentServiceSdl);
 }
 
+
+Q_ALWAYS_INLINE static void ImtCoreInitAuthUiResourcesGlobal()
+{
+	Q_INIT_RESOURCE(imtauthguilight);
+	Q_INIT_RESOURCE(imtauthguidark);
+
+	Q_INIT_RESOURCE(imtauthguiTheme);
+	Q_INIT_RESOURCE(imtauthguiqml);
+}
+
 namespace imtcore
 {
 
@@ -38,6 +44,12 @@ namespace imtcore
 inline void InitializeImtCoreAuth()
 {
 	ImtCoreInitAuthResourcesGlobal();
+}
+
+
+inline void InitializeImtCoreAuthUi()
+{
+	ImtCoreInitAuthUiResourcesGlobal();
 }
 
 

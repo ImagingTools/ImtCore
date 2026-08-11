@@ -7,13 +7,6 @@
 Q_ALWAYS_INLINE static void ImtCoreInitBaseResourcesGlobal()
 {
 	Q_INIT_RESOURCE(imtbase);
-	Q_INIT_RESOURCE(imtstylecontrolsqml);
-
-	Q_INIT_RESOURCE(imtstyle);
-	Q_INIT_RESOURCE(imtstylelight);
-	Q_INIT_RESOURCE(imtstyledark);
-
-	Q_INIT_RESOURCE(imtcontrolsqml);
 
 	Q_INIT_RESOURCE(imtbaseSearchSdl);
 	Q_INIT_RESOURCE(imtbaseCommandsSdl);
@@ -32,6 +25,17 @@ Q_ALWAYS_INLINE static void ImtCoreInitBaseResourcesGlobal()
 	Q_INIT_RESOURCE(imtbaseFilterableSelectSdl);
 }
 
+Q_ALWAYS_INLINE static void ImtCoreInitBaseUiResourcesGlobal()
+{
+	Q_INIT_RESOURCE(imtstylecontrolsqml);
+
+	Q_INIT_RESOURCE(imtstyle);
+	Q_INIT_RESOURCE(imtstylelight);
+	Q_INIT_RESOURCE(imtstyledark);
+
+	Q_INIT_RESOURCE(imtcontrolsqml);
+}
+
 namespace imtcore
 {
 
@@ -39,6 +43,11 @@ namespace imtcore
 inline void InitializeImtCoreBase()
 {
 	ImtCoreInitBaseResourcesGlobal();
+}
+
+inline void InitializeImtCoreBaseUi()
+{
+	ImtCoreInitBaseUiResourcesGlobal();
 }
 
 
