@@ -1,16 +1,17 @@
 #pragma once
 
+
 // Qt includes
 #include <QtCore/qglobal.h>
 
-// ImtCore includes
-#include <imtcore/CAcfLocInitializer.h>
 
-
-Q_ALWAYS_INLINE static void ImtCoreInitLocalizationResourcesGlobal()
+Q_ALWAYS_INLINE static void ImtCoreInitializeLocalizationResources()
 {
+	Q_INIT_RESOURCE(AcfLoc);
+	Q_INIT_RESOURCE(AcfSlnLoc);
 	Q_INIT_RESOURCE(ImtCoreLoc);
 }
+
 
 namespace imtcore
 {
@@ -18,8 +19,7 @@ namespace imtcore
 
 inline void InitializeImtCoreLocalization()
 {
-	InitializeAcfLocalization();
-	ImtCoreInitLocalizationResourcesGlobal();
+	ImtCoreInitializeLocalizationResources();
 }
 
 

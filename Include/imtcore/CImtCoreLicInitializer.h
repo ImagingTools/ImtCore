@@ -1,5 +1,6 @@
 #pragma once
 
+
 // Qt includes
 #include <QtCore/qglobal.h>
 
@@ -11,6 +12,7 @@ Q_ALWAYS_INLINE static void ImtCoreInitLicResourcesGlobal()
 
 	Q_INIT_RESOURCE(imtlicguiqml);
 }
+
 
 namespace imtcore
 {
