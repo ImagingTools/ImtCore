@@ -23,8 +23,7 @@ inline void InitializeImtCoreStyle()
 	QApplication::setStyle(imtStylePtr);
 
 	auto* appPtr = QCoreApplication::instance();
-	if (appPtr != nullptr)
-	{
+	if (appPtr != nullptr) {
 		appPtr->setProperty("ThemeId", QVariant("Light"));
 	}
 }

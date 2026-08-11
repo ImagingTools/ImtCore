@@ -22,47 +22,39 @@ public:
 };
 
 
-
-
 template <class T>
 int CApplicationRunner::Run(int argc, char** argv, T& applicationComponent, bool autoInit)
 {
 	QDirIterator dirIter(":/Style");
-	while (dirIter.hasNext())
-	{
+	while (dirIter.hasNext()) {
 		qDebug() << dirIter.filePath();
 
 		dirIter.next();
 	}
 
 	QDirIterator dirIter3(":/Icons");
-	while (dirIter3.hasNext())
-	{
+	while (dirIter3.hasNext()) {
 		qDebug() << dirIter3.filePath();
 
 		dirIter3.next();
 	}
 
 	QDirIterator dirIter2(":/Styles");
-	while (dirIter2.hasNext())
-	{
+	while (dirIter2.hasNext()) {
 		qDebug() << dirIter2.filePath();
 
 		dirIter2.next();
 	}
 
-	if (autoInit)
-	{
-		if (!applicationComponent.EnsureAutoInitComponentsCreated())
-		{
+	if (autoInit) {
+		if (!applicationComponent.EnsureAutoInitComponentsCreated()) {
 			qCritical() << "[App Runner] Auto-initialize components failed.";
 			return -1;
 		}
 	}
 
 	auto* applicationPtr = applicationComponent.template GetInterface<ibase::IApplication>();
-	if (applicationPtr != nullptr)
-	{
+	if (applicationPtr != nullptr) {
 		return applicationPtr->Execute(argc, argv);
 	}
 

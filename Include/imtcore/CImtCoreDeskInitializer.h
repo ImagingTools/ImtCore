@@ -6,7 +6,7 @@
 
 Q_ALWAYS_INLINE static void ImtCoreInitDeskResourcesGlobal()
 {
-    /// \todo duscuss about split it (or not:))
+	/// \todo duscuss about split it (or not:))
 	Q_INIT_RESOURCE(imtchatdb);
 	Q_INIT_RESOURCE(imtdeskdb);
 	Q_INIT_RESOURCE(imtdb);
@@ -22,7 +22,6 @@ Q_ALWAYS_INLINE static void ImtCoreInitDeskResourcesGlobal()
 
 Q_ALWAYS_INLINE static void ImtCoreInitDeskUiResourcesGlobal()
 {
-
 	Q_INIT_RESOURCE(imtgui);
 	Q_INIT_RESOURCE(imtguilight);
 	Q_INIT_RESOURCE(imtguidark);
