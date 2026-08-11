@@ -25,27 +25,6 @@ public:
 template <class T>
 int CApplicationRunner::Run(int argc, char** argv, T& applicationComponent, bool autoInit)
 {
-	QDirIterator dirIter(":/Style");
-	while (dirIter.hasNext()) {
-		qDebug() << dirIter.filePath();
-
-		dirIter.next();
-	}
-
-	QDirIterator dirIter3(":/Icons");
-	while (dirIter3.hasNext()) {
-		qDebug() << dirIter3.filePath();
-
-		dirIter3.next();
-	}
-
-	QDirIterator dirIter2(":/Styles");
-	while (dirIter2.hasNext()) {
-		qDebug() << dirIter2.filePath();
-
-		dirIter2.next();
-	}
-
 	if (autoInit) {
 		if (!applicationComponent.EnsureAutoInitComponentsCreated()) {
 			qCritical() << "[App Runner] Auto-initialize components failed.";
@@ -60,5 +39,6 @@ int CApplicationRunner::Run(int argc, char** argv, T& applicationComponent, bool
 
 	return -1;
 }
+
 
 } // namespace imtcore

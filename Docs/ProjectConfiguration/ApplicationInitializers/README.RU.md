@@ -10,26 +10,25 @@
 
 ## 2. Базовый API
 
-- Глобальные статические функции инициализации (без namespace-оберток в initializer headers).
-- `imtcore::CApplicationRunner::Run(..., autoInit)` для запуска приложения.
+- Глобальные статические функции инициализации определяются без namespace-оберток в initializer headers.
+- `imtcore::CApplicationRunner::Run(..., autoInit)` используется как точка запуска приложения.
 
 ## 3. Разделение доменов (Core и UI)
 
 - Core/non-UI функции:
-  - `InitializeImtCoreBase()`
-  - Core-ресурсы auth: `ImtCoreInitAuthResources()`
-  - `InitializeImtCoreDesk()`
-  - `InitializeImtCoreLic()`
+  - `ImtCoreInitBaseResources()`
+  - `ImtCoreInitAuthResources()`
+  - `ImtCoreInitDeskResources()`
 - UI функции:
-  - `InitializeImtCoreBaseUi()`
-  - UI-ресурсы auth: `ImtCoreInitAuthUiResources()`
-  - Tenant UI-ресурсы auth: `ImtCoreInitAuthTenantUiResources()`
-  - `InitializeImtCoreDeskUi()`
-  - `InitializeImtCoreLicUi()`
+  - `ImtCoreInitBaseUiResources()`
+  - `ImtCoreInitAuthUiResources()`
+  - `ImtCoreInitAuthTenantUiResources()`
+  - `ImtCoreInitDeskUiResources()`
+  - `ImtCoreInitLicUiResources()`
 
 Правила:
 - SDL-ресурсы инициализируются в UI-функциях.
-- Tenant-часть подключается только явно через tenant-функции.
+- Tenant-часть подключается только явно через tenant UI-ресурсы.
 
 ## 4. Макро-профили
 
@@ -43,22 +42,17 @@
 Функция:
 - `InitializeImtCoreServerAuthTenant()`
 
-### 4.3 Сервер с лицензиями
-
-Функция:
-- `InitializeImtCoreServerLic()`
-
-### 4.4 Клиент с авторизацией
+### 4.3 Клиент с авторизацией
 
 Функция:
 - `InitializeImtCoreClientAuth()`
 
-### 4.5 Клиент с лицензиями
+### 4.4 Клиент с лицензиями
 
 Функция:
 - `InitializeImtCoreClientLic()`
 
-### 4.6 Полный профиль клиентского приложения
+### 4.5 Полный профиль клиентского приложения
 
 Функция:
 - `InitializeImtCoreClientApp()`
@@ -85,17 +79,7 @@ InitializeImtCoreServerAuthTenant();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.3 Сервер с лицензиями
-
-```cpp
-#include <imtcore/CApplicationRunner.h>
-#include <imtcore/CImtCoreServerLicInitializer.h>
-
-InitializeImtCoreServerLic();
-return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
-```
-
-### 5.4 Клиент с авторизацией
+### 5.3 Клиент с авторизацией
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -105,7 +89,7 @@ InitializeImtCoreClientAuth();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.5 Клиент с лицензиями
+### 5.4 Клиент с лицензиями
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -115,7 +99,7 @@ InitializeImtCoreClientLic();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.6 Полный клиентский профиль
+### 5.5 Полный клиентский профиль
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -129,11 +113,10 @@ return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 
 - `InitializeImtCoreServerAuth()` для auth-ориентированных серверов.
 - `InitializeImtCoreServerAuthTenant()` для auth-серверов с tenant-частью.
-- `InitializeImtCoreServerLic()` для lic-ориентированных серверов.
 - `InitializeImtCoreClientAuth()` для UI-клиентов с auth.
 - `InitializeImtCoreClientLic()` для UI-клиентов с lic.
 - `InitializeImtCoreClientApp()` для полного клиентского/UI запуска.
 
 Для продуктового приложения:
 - Создайте собственный инициализатор приложения и явно вызовите только нужные доменные инициализаторы/ресурсы.
-- Для auth используйте `ImtCoreInitAuthResources()`, `ImtCoreInitAuthUiResources()` и (при необходимости) `ImtCoreInitAuthTenantUiResources()`.
+- Для auth используйте `ImtCoreInitAuthResources()`, `ImtCoreInitAuthUiResources()` и `ImtCoreInitAuthTenantUiResources()` при необходимости.

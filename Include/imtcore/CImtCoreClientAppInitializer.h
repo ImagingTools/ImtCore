@@ -10,14 +10,13 @@
 
 inline void InitializeImtCoreClientApp()
 {
-	InitializeImtCoreLocalization();
+	ImtCoreInitLocalizationResources();
 	InitializeImtCoreStyle();
-	InitializeImtCoreBase();
-	InitializeImtCoreBaseUi();
+	ImtCoreInitBaseResources();
+	ImtCoreInitBaseResources();
 	ImtCoreInitAuthResources();
 	ImtCoreInitAuthUiResources();
-	InitializeImtCoreDesk();
-	InitializeImtCoreDeskUi();
-	InitializeImtCoreLic();
-	InitializeImtCoreLicUi();
+	ImtCoreInitDeskResources();
+	ImtCoreInitDeskUiResources();
+	ImtCoreInitLicUiResources();
 }

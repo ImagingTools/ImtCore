@@ -5,9 +5,10 @@
 #include "CImtCoreBaseInitializer.h"
 #include "CImtCoreAuthInitializer.h"
 
+
 inline void InitializeImtCoreServerAuthTenant()
 {
-	InitializeImtCoreLocalization();
-	InitializeImtCoreBase();
+	ImtCoreInitLocalizationResources();
+	ImtCoreInitBaseResources();
 	ImtCoreInitAuthResources();
 }

@@ -10,26 +10,25 @@ Important:
 
 ## 2. Core API
 
-- Global static initialization functions (no `imtcore` namespace wrappers in initializer headers).
-- `imtcore::CApplicationRunner::Run(..., autoInit)` for app execution.
+- Global static initialization functions are defined without namespace wrappers in the initializer headers.
+- `imtcore::CApplicationRunner::Run(..., autoInit)` is the application entry point.
 
 ## 3. Domain Split (Core vs UI)
 
 - Core/non-UI functions:
-	- `InitializeImtCoreBase()`
-	- Auth core resources: `ImtCoreInitAuthResources()`
-	- `InitializeImtCoreDesk()`
-	- `InitializeImtCoreLic()`
+  - `ImtCoreInitBaseResources()`
+  - `ImtCoreInitAuthResources()`
+  - `ImtCoreInitDeskResources()`
 - UI functions:
-	- `InitializeImtCoreBaseUi()`
-	- Auth UI resources: `ImtCoreInitAuthUiResources()`
-	- Auth tenant UI resources: `ImtCoreInitAuthTenantUiResources()`
-	- `InitializeImtCoreDeskUi()`
-	- `InitializeImtCoreLicUi()`
+  - `ImtCoreInitBaseUiResources()`
+  - `ImtCoreInitAuthUiResources()`
+  - `ImtCoreInitAuthTenantUiResources()`
+  - `ImtCoreInitDeskUiResources()`
+  - `ImtCoreInitLicUiResources()`
 
 Rule:
 - SDL resources are initialized in UI functions.
-- Tenant resources are opt-in and explicitly marked via tenant functions.
+- Tenant resources are opt-in and explicitly marked via tenant UI resources.
 
 ## 4. Macro Profiles
 
@@ -43,22 +42,17 @@ Function:
 Function:
 - `InitializeImtCoreServerAuthTenant()`
 
-### 4.3 Server with licensing
-
-Function:
-- `InitializeImtCoreServerLic()`
-
-### 4.4 Client with authorization
+### 4.3 Client with authorization
 
 Function:
 - `InitializeImtCoreClientAuth()`
 
-### 4.5 Client with licensing
+### 4.4 Client with licensing
 
 Function:
 - `InitializeImtCoreClientLic()`
 
-### 4.6 Full client application profile
+### 4.5 Full client application profile
 
 Function:
 - `InitializeImtCoreClientApp()`
@@ -85,17 +79,7 @@ InitializeImtCoreServerAuthTenant();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.3 Server with licensing
-
-```cpp
-#include <imtcore/CApplicationRunner.h>
-#include <imtcore/CImtCoreServerLicInitializer.h>
-
-InitializeImtCoreServerLic();
-return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
-```
-
-### 5.4 Client with authorization
+### 5.3 Client with authorization
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -105,7 +89,7 @@ InitializeImtCoreClientAuth();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.5 Client with licensing
+### 5.4 Client with licensing
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -115,7 +99,7 @@ InitializeImtCoreClientLic();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.6 Full client application
+### 5.5 Full client application
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -129,11 +113,10 @@ return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 
 - Choose `InitializeImtCoreServerAuth()` for auth-centric servers.
 - Choose `InitializeImtCoreServerAuthTenant()` when server auth must include tenant resources.
-- Choose `InitializeImtCoreServerLic()` for licensing-centric servers.
 - Choose `InitializeImtCoreClientAuth()` for UI clients with auth.
 - Choose `InitializeImtCoreClientLic()` for UI clients with licensing.
 - Choose `InitializeImtCoreClientApp()` for full client/UI startup.
 
 For product applications:
 - Define a dedicated product initializer and call only the required domain initializers/resources.
-- For auth, use `ImtCoreInitAuthResources()`, `ImtCoreInitAuthUiResources()`, and (if needed) `ImtCoreInitAuthTenantUiResources()`.
+- For auth, use `ImtCoreInitAuthResources()`, `ImtCoreInitAuthUiResources()`, and `ImtCoreInitAuthTenantUiResources()` when needed.

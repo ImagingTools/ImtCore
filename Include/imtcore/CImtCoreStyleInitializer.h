@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtstyle/CImtStyle.h>
 
+
 inline void InitializeImtCoreStyle()
 {
 	auto* imtStylePtr = imtstyle::CImtStyle::GetInstance();

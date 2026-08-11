@@ -7,7 +7,7 @@
 
 inline void InitializeImtCoreServerAuth()
 {
-	InitializeImtCoreLocalization();
-	InitializeImtCoreBase();
+	ImtCoreInitLocalizationResources();
+	ImtCoreInitBaseResources();
 	ImtCoreInitAuthResources();
 }

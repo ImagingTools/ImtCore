@@ -33,7 +33,7 @@ Q_ALWAYS_INLINE static void ImtCoreInitAuthUiResources()
 	Q_INIT_RESOURCE(imtauthguiqml);
 }
 
-Q_ALWAYS_INLINE static void ImtCoreInitAuthTenantUiResources()
+Q_ALWAYS_INLINE static void ImtCoreInitTenantUiResources()
 {
 	Q_INIT_RESOURCE(imtauthTenantsSdl);
 	Q_INIT_RESOURCE(imtauthTenantMembershipsSdl);

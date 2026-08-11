@@ -8,10 +8,9 @@
 
 inline void InitializeImtCoreClientLic()
 {
-	InitializeImtCoreLocalization();
+	ImtCoreInitLocalizationResources();
 	InitializeImtCoreStyle();
-	InitializeImtCoreBase();
-	InitializeImtCoreBaseUi();
-	InitializeImtCoreLic();
-	InitializeImtCoreLicUi();
+	ImtCoreInitBaseResources();
+	ImtCoreInitBaseResources();
+	ImtCoreInitLicUiResources();
 }

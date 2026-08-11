@@ -8,10 +8,10 @@
 
 inline void InitializeImtCoreClientAuth()
 {
-	InitializeImtCoreLocalization();
+	ImtCoreInitLocalizationResources();
 	InitializeImtCoreStyle();
-	InitializeImtCoreBase();
-	InitializeImtCoreBaseUi();
+	ImtCoreInitBaseResources();
+	ImtCoreInitBaseResources();
 	ImtCoreInitAuthResources();
 	ImtCoreInitAuthUiResources();
 }

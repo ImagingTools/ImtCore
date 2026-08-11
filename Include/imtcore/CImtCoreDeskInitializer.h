@@ -6,11 +6,8 @@
 
 Q_ALWAYS_INLINE static void ImtCoreInitDeskResources()
 {
-	/// 	odo discuss about split it (or not:))
 	Q_INIT_RESOURCE(imtchatdb);
 	Q_INIT_RESOURCE(imtdeskdb);
-
-	// Desk core keeps only non-UI resources.
 }
 
 
@@ -33,15 +30,4 @@ Q_ALWAYS_INLINE static void ImtCoreInitDeskUiResources()
 	Q_INIT_RESOURCE(imtcolguiqml);
 	Q_INIT_RESOURCE(imtdocguiqml);
 	Q_INIT_RESOURCE(imtguigqlqml);
-}
-
-
-inline void InitializeImtCoreDesk()
-{
-	ImtCoreInitDeskResources();
-}
-
-inline void InitializeImtCoreDeskUi()
-{
-	ImtCoreInitDeskUiResources();
 }

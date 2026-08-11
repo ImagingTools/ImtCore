@@ -8,9 +8,8 @@ Q_ALWAYS_INLINE static void ImtCoreInitBaseResources()
 {
 	Q_INIT_RESOURCE(imtbase);
 	Q_INIT_RESOURCE(imtdb);
-
-	// Base core keeps only non-UI resources.
 }
+
 
 Q_ALWAYS_INLINE static void ImtCoreInitBaseUiResources()
 {
@@ -37,15 +36,4 @@ Q_ALWAYS_INLINE static void ImtCoreInitBaseUiResources()
 	Q_INIT_RESOURCE(imtstyledark);
 
 	Q_INIT_RESOURCE(imtcontrolsqml);
-}
-
-
-inline void InitializeImtCoreBase()
-{
-	ImtCoreInitBaseResources();
-}
-
-inline void InitializeImtCoreBaseUi()
-{
-	ImtCoreInitBaseUiResources();
 }
