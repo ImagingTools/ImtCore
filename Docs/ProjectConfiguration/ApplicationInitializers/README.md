@@ -11,12 +11,14 @@ This section documents the static function based initialization model for ImtCor
 
 - Static initialization entry points and responsibilities
 - Macro profiles for common app types: server-auth, server-lic, server-auth-lic, client
-- Domain-level resource initialization functions
+- Domain split into core and UI functions: Base/Auth/Desk/Lic
+- Dedicated client standard initializers in separate `*UiInitializer.h` files
 - Usage patterns in applications
 
 ## Quick Start
 
-Use `imtcore::InitializeDefaultImtCoreQml()` when you need full default startup behavior.
-Use domain functions (for example `imtcore::InitializeImtCoreAuth()`) when only a subsystem should be initialized.
+Use `imtcore::InitializeImtCoreClientApp()` when you need full default startup behavior.
+Use server profiles (`InitializeImtCoreServerAuth`, `InitializeImtCoreServerLic`, `InitializeImtCoreServerAuthLic`) for headless startup.
+Use client profile (`InitializeImtCoreClientApp`) for UI startup.
 
 See full details in the language-specific documents above.

@@ -11,51 +11,73 @@ The model is designed for application teams that need clear startup profiles ins
 - Static initialization functions in `imtcore` namespace
 - `imtcore::CApplicationRunner::Run(..., autoInit)` for app execution
 
-## 3. Macro Profiles
+## 3. Domain Split (Core vs UI)
 
-### 3.1 Server with authorization
+Each domain is split into two functions:
+
+- Core/non-UI:
+	- `InitializeImtCoreBase()`
+	- `InitializeImtCoreAuth()`
+	- `InitializeImtCoreDesk()`
+	- `InitializeImtCoreLic()`
+- UI:
+	- `InitializeImtCoreBaseUi()`
+	- `InitializeImtCoreAuthUi()`
+	- `InitializeImtCoreDeskUi()`
+	- `InitializeImtCoreLicUi()`
+
+Client standard wrappers are implemented in separate files:
+
+- `CImtCoreBaseUiInitializer.h` -> `InitializeImtCoreBaseUiInit()`
+- `CImtCoreAuthUiInitializer.h` -> `InitializeImtCoreAuthUiInit()`
+- `CImtCoreDeskUiInitializer.h` -> `InitializeImtCoreDeskUiInit()`
+- `CImtCoreLicUiInitializer.h` -> `InitializeImtCoreLicUiInit()`
+
+## 4. Macro Profiles
+
+### 4.1 Server with authorization
 
 Function:
 - `imtcore::InitializeImtCoreServerAuth()`
 
 Includes:
 - Localization
-- Base server/core layer
-- Authorization domain
+- Base core layer (non-UI)
+- Authorization core domain (non-UI)
 
 Use when:
 - Backend service requires auth-related domain logic
 - Licensing domain is not required by default
 
-### 3.2 Server with licensing
+### 4.2 Server with licensing
 
 Function:
 - `imtcore::InitializeImtCoreServerLic()`
 
 Includes:
 - Localization
-- Base server/core layer
-- Licensing domain
+- Base core layer (non-UI)
+- Licensing core domain (non-UI)
 
 Use when:
 - Backend service focuses on licensing workflows
 - Auth domain is optional or externalized
 
-### 3.3 Server with authorization and licensing
+### 4.3 Server with authorization and licensing
 
 Function:
 - `imtcore::InitializeImtCoreServerAuthLic()`
 
 Includes:
 - Localization
-- Base server/core layer
-- Authorization domain
-- Licensing domain
+- Base core layer (non-UI)
+- Authorization core domain (non-UI)
+- Licensing core domain (non-UI)
 
 Use when:
 - Both auth and licensing are core service responsibilities
 
-### 3.4 Client application profile
+### 4.4 Client application profile
 
 Function:
 - `imtcore::InitializeImtCoreClientApp()`
@@ -63,29 +85,18 @@ Function:
 Includes:
 - Localization
 - Style/UI setup
-- Base domain
-- Auth domain
-- Desk domain
-- Lic domain
+- Base (core + UI)
+- Auth (core + UI)
+- Desk (core + UI)
+- Lic (core + UI)
 
 Use when:
 - Desktop/QML client applications
 - Full-featured UI applications
 
-### 3.5 Backward-compatible default profile
+## 5. Usage Examples
 
-Function:
-- `imtcore::InitializeDefaultImtCoreQml()`
-
-Behavior:
-- Delegates to `InitializeImtCoreClientApp()`
-
-Use when:
-- You need a default full QML startup profile entry point
-
-## 4. Usage Examples
-
-### 4.1 Server with authorization
+### 5.1 Server with authorization
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -95,7 +106,7 @@ imtcore::InitializeImtCoreServerAuth();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 4.2 Server with licensing
+### 5.2 Server with licensing
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -105,7 +116,7 @@ imtcore::InitializeImtCoreServerLic();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 4.3 Server with authorization and licensing
+### 5.3 Server with authorization and licensing
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -115,7 +126,7 @@ imtcore::InitializeImtCoreServerAuthLic();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 4.4 Client application
+### 5.4 Client application
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -125,10 +136,13 @@ imtcore::InitializeImtCoreClientApp();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-## 5. Selection Guide
+## 6. Selection Guide
 
 - Choose `InitializeImtCoreServerAuth()` for auth-centric servers.
 - Choose `InitializeImtCoreServerLic()` for licensing-centric servers.
 - Choose `InitializeImtCoreServerAuthLic()` when both domains are required.
 - Choose `InitializeImtCoreClientApp()` for client/UI apps.
-- Use `InitializeDefaultImtCoreQml()` as a full default profile entry point.
+
+Rule of thumb:
+- Server profiles initialize only non-UI domain parts.
+- Client profile initializes both non-UI and UI parts through dedicated `*UiInitializer` wrappers.
