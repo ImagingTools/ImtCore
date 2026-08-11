@@ -19,7 +19,7 @@ This section documents the static function based initialization model for ImtCor
 
 - Use `imtcore::InitializeImtCoreClientApp()` when you need full default startup behavior.
 - Use server profiles (`InitializeImtCoreServerAuth`, `InitializeImtCoreServerLic`, `InitializeImtCoreServerAuthLic`) for headless startup.
-- Use split client profiles (`InitializeImtCoreClientAuth`, `InitializeImtCoreClientLic`, `InitializeImtCoreClientAuthLic`) for partial UI startup.
+- Use split client profiles (`InitializeImtCoreClientAuth`, `InitializeImtCoreClientLic`) for partial UI startup.
 - Use full client profile (`InitializeImtCoreClientApp`) for full UI startup including Desk.
 
 See full details in the language-specific documents above.

@@ -6,6 +6,10 @@ This document describes a simplified, macro-level initialization model for ImtCo
 
 The model is designed for application teams that need clear startup profiles instead of many low-level initializer building blocks.
 
+Important:
+- The initializer set in this document is a baseline for ImtCore, not an exhaustive final setup.
+- Each final product/application should define its own initializer with the exact domain/resource set it needs.
+
 ## 2. Core API
 
 - Static initialization functions in `imtcore` namespace
@@ -106,23 +110,7 @@ Use when:
 - UI clients focus on licensing workflows
 - Auth and desk domains are not required
 
-### 4.6 Client with authorization and licensing
-
-Function:
-- `imtcore::InitializeImtCoreClientAuthLic()`
-
-Includes:
-- Localization
-- Style/UI setup
-- Base (core + UI)
-- Auth (core + UI)
-- Lic (core + UI)
-
-Use when:
-- UI clients require both auth and licensing domains
-- Desk domain is not required
-
-### 4.7 Client application profile
+### 4.6 Client application profile
 
 Function:
 - `imtcore::InitializeImtCoreClientApp()`
@@ -191,17 +179,7 @@ imtcore::InitializeImtCoreClientLic();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.6 Client with authorization and licensing
-
-```cpp
-#include <imtcore/CApplicationRunner.h>
-#include <imtcore/CImtCoreClientAuthLicInitializer.h>
-
-imtcore::InitializeImtCoreClientAuthLic();
-return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
-```
-
-### 5.7 Client application
+### 5.6 Client application
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -218,8 +196,10 @@ return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 - Choose `InitializeImtCoreServerAuthLic()` when both domains are required.
 - Choose `InitializeImtCoreClientAuth()` for UI clients with the auth domain.
 - Choose `InitializeImtCoreClientLic()` for UI clients with the licensing domain.
-- Choose `InitializeImtCoreClientAuthLic()` for UI clients with auth and licensing domains.
 - Choose `InitializeImtCoreClientApp()` for client/UI apps.
+
+For product applications:
+- Define a dedicated product initializer and explicitly call only the required `InitializeImtCore<Domain>()` and `InitializeImtCore<Domain>Ui()` functions.
 
 Rule of thumb:
 - Server profiles initialize only non-UI domain parts.

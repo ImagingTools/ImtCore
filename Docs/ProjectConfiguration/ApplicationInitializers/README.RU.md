@@ -6,6 +6,10 @@
 
 Модель ориентирована на команды прикладной разработки: вместо большого количества микро-инициализаторов используются готовые крупные профили запуска.
 
+Важно:
+- Набор инициализаторов в этом документе является базовым для ImtCore, а не исчерпывающим.
+- Для каждого конечного продукта/приложения нужно создавать собственный инициализатор с необходимым набором доменов и ресурсов.
+
 ## 2. Базовый API
 
 - Статические функции инициализации в пространстве имен `imtcore`
@@ -134,23 +138,7 @@
 - UI-клиентам, ориентированным на lic-сценарии
 - Auth и desk-домены не требуются
 
-### 4.6 Клиент с авторизацией и лицензиями
-
-Функция:
-- `imtcore::InitializeImtCoreClientAuthLic()`
-
-Включает:
-- Локализацию
-- Настройку стиля/UI
-- Base (core + UI)
-- Auth (core + UI)
-- Lic (core + UI)
-
-Когда использовать:
-- UI-клиентам, где одновременно нужны auth и lic-домены
-- Desk-домен не требуется
-
-### 4.7 Профиль клиентского приложения
+### 4.6 Профиль клиентского приложения
 
 Функция:
 - `imtcore::InitializeImtCoreClientApp()`
@@ -219,17 +207,7 @@ imtcore::InitializeImtCoreClientLic();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.6 Клиент с авторизацией и лицензиями
-
-```cpp
-#include <imtcore/CApplicationRunner.h>
-#include <imtcore/CImtCoreClientAuthLicInitializer.h>
-
-imtcore::InitializeImtCoreClientAuthLic();
-return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
-```
-
-### 5.7 Клиентское приложение
+### 5.6 Клиентское приложение
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -246,8 +224,10 @@ return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 - `InitializeImtCoreServerAuthLic()`, когда нужны оба домена.
 - `InitializeImtCoreClientAuth()` для UI-клиентов с auth-доменом.
 - `InitializeImtCoreClientLic()` для UI-клиентов с lic-доменом.
-- `InitializeImtCoreClientAuthLic()` для UI-клиентов с auth+lic доменами.
 - `InitializeImtCoreClientApp()` для клиентских/UI приложений.
+
+Для продуктового приложения:
+- Создайте собственный инициализатор приложения и явно вызовите только нужные `InitializeImtCore<Domain>()` и `InitializeImtCore<Domain>Ui()`.
 
 Практическое правило:
 - Серверные профили инициализируют только non-UI части доменов.
