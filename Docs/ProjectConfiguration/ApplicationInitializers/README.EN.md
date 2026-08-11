@@ -26,12 +26,11 @@ Each domain is split into two functions:
 	- `InitializeImtCoreDeskUi()`
 	- `InitializeImtCoreLicUi()`
 
-Client standard wrappers are implemented in separate files:
+Client profiles do not use intermediate `*UiInit()` wrappers.
 
-- `CImtCoreBaseUiInitializer.h` -> `InitializeImtCoreBaseUiInit()`
-- `CImtCoreAuthUiInitializer.h` -> `InitializeImtCoreAuthUiInit()`
-- `CImtCoreDeskUiInitializer.h` -> `InitializeImtCoreDeskUiInit()`
-- `CImtCoreLicUiInitializer.h` -> `InitializeImtCoreLicUiInit()`
+For each domain, the profile code explicitly calls:
+1. `InitializeImtCore<Domain>()`
+2. `InitializeImtCore<Domain>Ui()`
 
 ## 4. Macro Profiles
 
@@ -224,4 +223,4 @@ return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 
 Rule of thumb:
 - Server profiles initialize only non-UI domain parts.
-- Client profile initializes both non-UI and UI parts through dedicated `*UiInitializer` wrappers.
+- Client profiles initialize both non-UI and UI parts through explicit domain function calls.

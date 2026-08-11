@@ -3,8 +3,8 @@
 // ImtCore includes
 #include <imtcore/CImtCoreLocalizationInitializer.h>
 #include <imtcore/CImtCoreStyleInitializer.h>
-#include <imtcore/CImtCoreBaseUiInitializer.h>
-#include <imtcore/CImtCoreLicUiInitializer.h>
+#include <imtcore/CImtCoreBaseInitializer.h>
+#include <imtcore/CImtCoreLicInitializer.h>
 
 namespace imtcore
 {
@@ -14,8 +14,10 @@ inline void InitializeImtCoreClientLic()
 {
 	InitializeImtCoreLocalization();
 	InitializeImtCoreStyle();
-	InitializeImtCoreBaseUiInit();
-	InitializeImtCoreLicUiInit();
+	InitializeImtCoreBase();
+	InitializeImtCoreBaseUi();
+	InitializeImtCoreLic();
+	InitializeImtCoreLicUi();
 }
 
 

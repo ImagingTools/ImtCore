@@ -42,23 +42,20 @@
 - Core: `InitializeImtCoreLic()`
 - UI: `InitializeImtCoreLicUi()`
 
-### 3.2 Стандартные клиентские инициализаторы (в отдельных файлах)
+### 3.2 Явный вызов Core и UI в клиентских профилях
 
-- `CImtCoreBaseUiInitializer.h` -> `InitializeImtCoreBaseUiInit()`
-- `CImtCoreAuthUiInitializer.h` -> `InitializeImtCoreAuthUiInit()`
-- `CImtCoreDeskUiInitializer.h` -> `InitializeImtCoreDeskUiInit()`
-- `CImtCoreLicUiInitializer.h` -> `InitializeImtCoreLicUiInit()`
+В клиентских макро-профилях нет промежуточных `*UiInit()` оберток.
 
-Каждый `*UiInit()` вызывает пару функций одного домена в правильной последовательности:
-1. Core-функция домена
-2. UI-функция домена
+Для каждого домена вызовы выполняются явно в коде профиля:
+1. `InitializeImtCore<Domain>()`
+2. `InitializeImtCore<Domain>Ui()`
 
-Это гарантирует, что UI-слой поднимается только после non-UI ресурсов домена.
+Это гарантирует раздельную инициализацию non-UI и UI и явный порядок вызовов.
 
 ### 3.3 Практическое правило использования
 
 - Серверные профили используют только Core-функции доменов.
-- Клиентский профиль использует `*UiInit()` обертки из отдельных файлов.
+- Клиентские профили явно вызывают пары Core/UI функций доменов.
 - Если приложению нужен смешанный профиль, выбирайте минимально необходимый набор:
   - Core-only для headless сценариев
   - Core + UI только для реально используемых доменов
@@ -254,4 +251,4 @@ return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 
 Практическое правило:
 - Серверные профили инициализируют только non-UI части доменов.
-- Клиентский профиль инициализирует и core, и UI части через отдельные `*UiInitializer` обертки.
+- Клиентский профиль инициализирует и core, и UI части явными вызовами доменных функций.

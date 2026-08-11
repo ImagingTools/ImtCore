@@ -12,7 +12,7 @@ This section documents the static function based initialization model for ImtCor
 - Static initialization entry points and responsibilities
 - Macro profiles for common app types: server-auth, server-lic, server-auth-lic, client-auth, client-lic, client-auth-lic, full-client
 - Domain split into core and UI functions: Base/Auth/Desk/Lic
-- Dedicated client standard initializers in separate `*UiInitializer.h` files
+- Explicit Core/UI calls in client profiles (without intermediate `*UiInit()` wrappers)
 - Usage patterns in applications
 
 ## Quick Start
