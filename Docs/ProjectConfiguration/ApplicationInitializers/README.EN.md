@@ -22,6 +22,7 @@ Each domain is split into two functions:
 - Core/non-UI:
 	- `InitializeImtCoreBase()`
 	- `InitializeImtCoreAuth()`
+	- `InitializeImtCoreAuthTenant()`
 	- `InitializeImtCoreDesk()`
 	- `InitializeImtCoreLic()`
 - UI:
@@ -36,6 +37,8 @@ For each domain, the profile code explicitly calls:
 1. `InitializeImtCore<Domain>()`
 2. `InitializeImtCore<Domain>Ui()`
 
+Tenant resources are opt-in and must be explicitly initialized.
+
 ## 4. Macro Profiles
 
 ### 4.1 Server with authorization
@@ -46,13 +49,26 @@ Function:
 Includes:
 - Localization
 - Base core layer (non-UI)
-- Authorization core domain (non-UI)
+- Authorization core domain (no tenant)
 
 Use when:
-- Backend service requires auth-related domain logic
-- Licensing domain is not required by default
+- Backend service requires auth logic without tenant resources
 
-### 4.2 Server with licensing
+### 4.2 Server with authorization and tenant
+
+Function:
+- `imtcore::InitializeImtCoreServerAuthTenant()`
+
+Includes:
+- Localization
+- Base core layer (non-UI)
+- Auth core
+- Tenant extension of auth
+
+Use when:
+- Backend service requires tenant auth resources
+
+### 4.3 Server with licensing
 
 Function:
 - `imtcore::InitializeImtCoreServerLic()`
@@ -66,7 +82,7 @@ Use when:
 - Backend service focuses on licensing workflows
 - Auth domain is optional or externalized
 
-### 4.3 Server with authorization and licensing
+### 4.4 Server with authorization and licensing
 
 Function:
 - `imtcore::InitializeImtCoreServerAuthLic()`
@@ -74,13 +90,13 @@ Function:
 Includes:
 - Localization
 - Base core layer (non-UI)
-- Authorization core domain (non-UI)
+- Authorization core domain (no tenant)
 - Licensing core domain (non-UI)
 
 Use when:
 - Both auth and licensing are core service responsibilities
 
-### 4.4 Client with authorization
+### 4.5 Client with authorization
 
 Function:
 - `imtcore::InitializeImtCoreClientAuth()`
@@ -92,10 +108,9 @@ Includes:
 - Auth (core + UI)
 
 Use when:
-- UI clients need only the auth domain
-- Licensing and desk domains are not required
+- UI clients need auth without tenant resources
 
-### 4.5 Client with licensing
+### 4.6 Client with licensing
 
 Function:
 - `imtcore::InitializeImtCoreClientLic()`
@@ -110,7 +125,22 @@ Use when:
 - UI clients focus on licensing workflows
 - Auth and desk domains are not required
 
-### 4.6 Client application profile
+### 4.7 Client with authorization and licensing
+
+Function:
+- `imtcore::InitializeImtCoreClientAuthLic()`
+
+Includes:
+- Localization
+- Style/UI setup
+- Base (core + UI)
+- Auth (core + UI)
+- Lic (core + UI)
+
+Use when:
+- UI clients require auth and licensing without tenant resources
+
+### 4.8 Client application profile
 
 Function:
 - `imtcore::InitializeImtCoreClientApp()`
@@ -139,7 +169,17 @@ imtcore::InitializeImtCoreServerAuth();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.2 Server with licensing
+### 5.2 Server with authorization and tenant
+
+```cpp
+#include <imtcore/CApplicationRunner.h>
+#include <imtcore/CImtCoreServerAuthTenantInitializer.h>
+
+imtcore::InitializeImtCoreServerAuthTenant();
+return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
+```
+
+### 5.3 Server with licensing
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -149,7 +189,7 @@ imtcore::InitializeImtCoreServerLic();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.3 Server with authorization and licensing
+### 5.4 Server with authorization and licensing
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -159,7 +199,7 @@ imtcore::InitializeImtCoreServerAuthLic();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.4 Client with authorization
+### 5.5 Client with authorization
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -169,7 +209,7 @@ imtcore::InitializeImtCoreClientAuth();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.5 Client with licensing
+### 5.6 Client with licensing
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -179,7 +219,17 @@ imtcore::InitializeImtCoreClientLic();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.6 Client application
+### 5.7 Client with authorization and licensing
+
+```cpp
+#include <imtcore/CApplicationRunner.h>
+#include <imtcore/CImtCoreClientAuthLicInitializer.h>
+
+imtcore::InitializeImtCoreClientAuthLic();
+return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
+```
+
+### 5.8 Client application
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -192,14 +242,17 @@ return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ## 6. Selection Guide
 
 - Choose `InitializeImtCoreServerAuth()` for auth-centric servers.
+- Choose `InitializeImtCoreServerAuthTenant()` when server auth must include tenant resources.
 - Choose `InitializeImtCoreServerLic()` for licensing-centric servers.
 - Choose `InitializeImtCoreServerAuthLic()` when both domains are required.
 - Choose `InitializeImtCoreClientAuth()` for UI clients with the auth domain.
 - Choose `InitializeImtCoreClientLic()` for UI clients with the licensing domain.
+- Choose `InitializeImtCoreClientAuthLic()` for UI clients with auth and licensing domains.
 - Choose `InitializeImtCoreClientApp()` for client/UI apps.
 
 For product applications:
 - Define a dedicated product initializer and explicitly call only the required `InitializeImtCore<Domain>()` and `InitializeImtCore<Domain>Ui()` functions.
+- If you need `auth+tenant+lic` (or any other specific blend), compose it only in product initializer code, not as a generic ImtCore combination profile.
 
 Rule of thumb:
 - Server profiles initialize only non-UI domain parts.

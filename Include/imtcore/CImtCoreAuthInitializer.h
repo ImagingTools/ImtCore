@@ -17,6 +17,11 @@ Q_ALWAYS_INLINE static void ImtCoreInitAuthResourcesGlobal()
 	Q_INIT_RESOURCE(imtauthAuthorizationSdl);
 	Q_INIT_RESOURCE(imtauthPermissionsSdl);
 	Q_INIT_RESOURCE(imtauthPersonalAccessTokensSdl);
+}
+
+
+Q_ALWAYS_INLINE static void ImtCoreInitAuthTenantResourcesGlobal()
+{
 	Q_INIT_RESOURCE(imtauthTenantsSdl);
 	Q_INIT_RESOURCE(imtauthTenantMembershipsSdl);
 	Q_INIT_RESOURCE(imtauthTenantCollectionDocumentServiceSdl);
@@ -44,6 +49,12 @@ namespace imtcore
 inline void InitializeImtCoreAuth()
 {
 	ImtCoreInitAuthResourcesGlobal();
+}
+
+
+inline void InitializeImtCoreAuthTenant()
+{
+	ImtCoreInitAuthTenantResourcesGlobal();
 }
 
 

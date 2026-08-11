@@ -36,6 +36,7 @@
 
 `Auth`:
 - Core: `InitializeImtCoreAuth()`
+- Core (tenant-дополнение): `InitializeImtCoreAuthTenant()`
 - UI: `InitializeImtCoreAuthUi()`
 
 `Desk`:
@@ -60,6 +61,7 @@
 
 - Серверные профили используют только Core-функции доменов.
 - Клиентские профили явно вызывают пары Core/UI функций доменов.
+- Tenant-часть auth подключается только там, где это явно нужно.
 - Если приложению нужен смешанный профиль, выбирайте минимально необходимый набор:
   - Core-only для headless сценариев
   - Core + UI только для реально используемых доменов
@@ -74,13 +76,26 @@
 Включает:
 - Локализацию
 - Базовый core слой (без UI)
-- Auth-домен core (без UI)
+- Auth core (без tenant)
 
 Когда использовать:
-- Сервис требует auth-доменную логику
-- Лицензионный домен не обязателен по умолчанию
+- Сервис требует auth-доменную логику без tenant-ресурсов
 
-### 4.2 Сервер с лицензиями
+### 4.2 Сервер с авторизацией и tenant
+
+Функция:
+- `imtcore::InitializeImtCoreServerAuthTenant()`
+
+Включает:
+- Локализацию
+- Базовый core слой (без UI)
+- Auth core
+- Tenant-дополнение auth
+
+Когда использовать:
+- Сервису нужны tenant-ресурсы auth
+
+### 4.3 Сервер с лицензиями
 
 Функция:
 - `imtcore::InitializeImtCoreServerLic()`
@@ -94,7 +109,7 @@
 - Сервис ориентирован на лицензионные сценарии
 - Авторизация опциональна или вынесена наружу
 
-### 4.3 Сервер с авторизацией и лицензиями
+### 4.4 Сервер с авторизацией и лицензиями
 
 Функция:
 - `imtcore::InitializeImtCoreServerAuthLic()`
@@ -102,13 +117,13 @@
 Включает:
 - Локализацию
 - Базовый core слой (без UI)
-- Auth-домен core (без UI)
+- Auth core (без tenant)
 - Lic-домен core (без UI)
 
 Когда использовать:
 - И авторизация, и лицензирование являются ключевыми требованиями сервиса
 
-### 4.4 Клиент с авторизацией
+### 4.5 Клиент с авторизацией
 
 Функция:
 - `imtcore::InitializeImtCoreClientAuth()`
@@ -120,10 +135,9 @@
 - Auth (core + UI)
 
 Когда использовать:
-- UI-клиентам, которым нужен только auth-домен
-- Лицензионный и desk-домены не требуются
+- UI-клиентам, которым нужен auth без tenant
 
-### 4.5 Клиент с лицензиями
+### 4.6 Клиент с лицензиями
 
 Функция:
 - `imtcore::InitializeImtCoreClientLic()`
@@ -138,7 +152,22 @@
 - UI-клиентам, ориентированным на lic-сценарии
 - Auth и desk-домены не требуются
 
-### 4.6 Профиль клиентского приложения
+### 4.7 Клиент с авторизацией и лицензиями
+
+Функция:
+- `imtcore::InitializeImtCoreClientAuthLic()`
+
+Включает:
+- Локализацию
+- Настройку стиля/UI
+- Base (core + UI)
+- Auth (core + UI)
+- Lic (core + UI)
+
+Когда использовать:
+- UI-клиентам, где нужны auth и lic без tenant
+
+### 4.8 Профиль клиентского приложения
 
 Функция:
 - `imtcore::InitializeImtCoreClientApp()`
@@ -167,7 +196,17 @@ imtcore::InitializeImtCoreServerAuth();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.2 Сервер с лицензиями
+### 5.2 Сервер с авторизацией и tenant
+
+```cpp
+#include <imtcore/CApplicationRunner.h>
+#include <imtcore/CImtCoreServerAuthTenantInitializer.h>
+
+imtcore::InitializeImtCoreServerAuthTenant();
+return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
+```
+
+### 5.3 Сервер с лицензиями
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -177,7 +216,7 @@ imtcore::InitializeImtCoreServerLic();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.3 Сервер с авторизацией и лицензиями
+### 5.4 Сервер с авторизацией и лицензиями
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -187,7 +226,7 @@ imtcore::InitializeImtCoreServerAuthLic();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.4 Клиент с авторизацией
+### 5.5 Клиент с авторизацией
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -197,7 +236,7 @@ imtcore::InitializeImtCoreClientAuth();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.5 Клиент с лицензиями
+### 5.6 Клиент с лицензиями
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -207,7 +246,17 @@ imtcore::InitializeImtCoreClientLic();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.6 Клиентское приложение
+### 5.7 Клиент с авторизацией и лицензиями
+
+```cpp
+#include <imtcore/CApplicationRunner.h>
+#include <imtcore/CImtCoreClientAuthLicInitializer.h>
+
+imtcore::InitializeImtCoreClientAuthLic();
+return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
+```
+
+### 5.8 Клиентское приложение
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -220,14 +269,17 @@ return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ## 6. Как выбрать профиль
 
 - `InitializeImtCoreServerAuth()` для auth-ориентированных серверов.
+- `InitializeImtCoreServerAuthTenant()` для auth-серверов с tenant-частью.
 - `InitializeImtCoreServerLic()` для lic-ориентированных серверов.
 - `InitializeImtCoreServerAuthLic()`, когда нужны оба домена.
 - `InitializeImtCoreClientAuth()` для UI-клиентов с auth-доменом.
 - `InitializeImtCoreClientLic()` для UI-клиентов с lic-доменом.
+- `InitializeImtCoreClientAuthLic()` для UI-клиентов с auth+lic.
 - `InitializeImtCoreClientApp()` для клиентских/UI приложений.
 
 Для продуктового приложения:
 - Создайте собственный инициализатор приложения и явно вызовите только нужные `InitializeImtCore<Domain>()` и `InitializeImtCore<Domain>Ui()`.
+- Если нужен набор `auth+tenant+lic` или другой специфический профиль, собирайте его только в продуктовом инициализаторе, а не в ImtCore.
 
 Практическое правило:
 - Серверные профили инициализируют только non-UI части доменов.
