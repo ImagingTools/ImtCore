@@ -9,10 +9,6 @@
 // ImtCore includes
 #include <imtstyle/CImtStyle.h>
 
-namespace imtcore
-{
-
-
 inline void InitializeImtCoreStyle()
 {
 	auto* imtStylePtr = imtstyle::CImtStyle::GetInstance();
@@ -27,6 +23,3 @@ inline void InitializeImtCoreStyle()
 		appPtr->setProperty("ThemeId", QVariant("Light"));
 	}
 }
-
-
-} // namespace imtcore

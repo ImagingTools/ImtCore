@@ -1,21 +1,13 @@
 #pragma once
 
 // ImtCore includes
-#include <imtcore/CImtCoreLocalizationInitializer.h>
-#include <imtcore/CImtCoreBaseInitializer.h>
-#include <imtcore/CImtCoreAuthInitializer.h>
-
-namespace imtcore
-{
-
+#include "CImtCoreLocalizationInitializer.h"
+#include "CImtCoreBaseInitializer.h"
+#include "CImtCoreAuthInitializer.h"
 
 inline void InitializeImtCoreServerAuthTenant()
 {
 	InitializeImtCoreLocalization();
 	InitializeImtCoreBase();
-	InitializeImtCoreAuth();
-	InitializeImtCoreAuthTenant();
+	ImtCoreInitAuthResources();
 }
-
-
-} // namespace imtcore

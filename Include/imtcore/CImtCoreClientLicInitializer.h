@@ -1,14 +1,10 @@
 #pragma once
 
 // ImtCore includes
-#include <imtcore/CImtCoreLocalizationInitializer.h>
-#include <imtcore/CImtCoreStyleInitializer.h>
-#include <imtcore/CImtCoreBaseInitializer.h>
-#include <imtcore/CImtCoreLicInitializer.h>
-
-namespace imtcore
-{
-
+#include "CImtCoreLocalizationInitializer.h"
+#include "CImtCoreStyleInitializer.h"
+#include "CImtCoreBaseInitializer.h"
+#include "CImtCoreLicInitializer.h"
 
 inline void InitializeImtCoreClientLic()
 {
@@ -19,6 +15,3 @@ inline void InitializeImtCoreClientLic()
 	InitializeImtCoreLic();
 	InitializeImtCoreLicUi();
 }
-
-
-} // namespace imtcore

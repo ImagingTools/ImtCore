@@ -4,24 +4,25 @@
 #include <QtCore/qglobal.h>
 
 
-Q_ALWAYS_INLINE static void ImtCoreInitDeskResourcesGlobal()
+Q_ALWAYS_INLINE static void ImtCoreInitDeskResources()
 {
-	/// \todo duscuss about split it (or not:))
+	/// 	odo discuss about split it (or not:))
 	Q_INIT_RESOURCE(imtchatdb);
 	Q_INIT_RESOURCE(imtdeskdb);
-	Q_INIT_RESOURCE(imtdb);
 
+	// Desk core keeps only non-UI resources.
+}
+
+
+Q_ALWAYS_INLINE static void ImtCoreInitDeskUiResources()
+{
 	Q_INIT_RESOURCE(imtappApplicationSdl);
 	Q_INIT_RESOURCE(imtcolorLabSdl);
 	Q_INIT_RESOURCE(imtcolorRgbColorHexSdl);
 	Q_INIT_RESOURCE(imt2dGeometrySdl);
 	Q_INIT_RESOURCE(imt2dPaintPrimitivesSdl);
 	Q_INIT_RESOURCE(imt2dPaintSystemSdl);
-}
 
-
-Q_ALWAYS_INLINE static void ImtCoreInitDeskUiResourcesGlobal()
-{
 	Q_INIT_RESOURCE(imtgui);
 	Q_INIT_RESOURCE(imtguilight);
 	Q_INIT_RESOURCE(imtguidark);
@@ -35,19 +36,12 @@ Q_ALWAYS_INLINE static void ImtCoreInitDeskUiResourcesGlobal()
 }
 
 
-namespace imtcore
-{
-
-
 inline void InitializeImtCoreDesk()
 {
-	ImtCoreInitDeskResourcesGlobal();
+	ImtCoreInitDeskResources();
 }
 
 inline void InitializeImtCoreDeskUi()
 {
-	ImtCoreInitDeskUiResourcesGlobal();
+	ImtCoreInitDeskUiResources();
 }
-
-
-} // namespace imtcore

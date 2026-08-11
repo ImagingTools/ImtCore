@@ -10,16 +10,21 @@ This section documents the static function based initialization model for ImtCor
 ## What Is Covered
 
 - Static initialization entry points and responsibilities
-- Macro profiles for common app types: server-auth, server-auth-tenant, server-lic, server-auth-lic, client-auth, client-lic, client-auth-lic, full-client
+- Macro profiles for common app types:
+	- server-auth
+	- server-auth-tenant
+	- server-lic
+	- client-auth
+	- client-lic
+	- full-client
 - Domain split into core and UI functions: Base/Auth/Desk/Lic
-- Explicit Core/UI calls in client profiles (without intermediate `*UiInit()` wrappers)
-- Usage patterns in applications
+- Explicit Core/UI calls in client profiles (without intermediate wrappers)
+- Tenant extension rules
 
 ## Quick Start
 
-- Use `imtcore::InitializeImtCoreClientApp()` when you need full default startup behavior.
-- Use server profiles (`InitializeImtCoreServerAuth`, `InitializeImtCoreServerAuthTenant`, `InitializeImtCoreServerLic`, `InitializeImtCoreServerAuthLic`) for headless startup.
-- Use split client profiles (`InitializeImtCoreClientAuth`, `InitializeImtCoreClientLic`, `InitializeImtCoreClientAuthLic`) for partial UI startup.
-- Use full client profile (`InitializeImtCoreClientApp`) for full UI startup including Desk.
+- Use `InitializeImtCoreClientApp()` when you need full default startup behavior.
+- Use server profiles (`InitializeImtCoreServerAuth`, `InitializeImtCoreServerAuthTenant`, `InitializeImtCoreServerLic`) for headless startup.
+- Use split client profiles (`InitializeImtCoreClientAuth`, `InitializeImtCoreClientLic`) for partial UI startup.
 
 See full details in the language-specific documents above.

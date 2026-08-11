@@ -1,16 +1,12 @@
 #pragma once
 
 // ImtCore includes
-#include <imtcore/CImtCoreLocalizationInitializer.h>
-#include <imtcore/CImtCoreStyleInitializer.h>
-#include <imtcore/CImtCoreBaseInitializer.h>
-#include <imtcore/CImtCoreAuthInitializer.h>
-#include <imtcore/CImtCoreDeskInitializer.h>
-#include <imtcore/CImtCoreLicInitializer.h>
-
-namespace imtcore
-{
-
+#include "CImtCoreLocalizationInitializer.h"
+#include "CImtCoreStyleInitializer.h"
+#include "CImtCoreBaseInitializer.h"
+#include "CImtCoreAuthInitializer.h"
+#include "CImtCoreDeskInitializer.h"
+#include "CImtCoreLicInitializer.h"
 
 inline void InitializeImtCoreClientApp()
 {
@@ -18,13 +14,10 @@ inline void InitializeImtCoreClientApp()
 	InitializeImtCoreStyle();
 	InitializeImtCoreBase();
 	InitializeImtCoreBaseUi();
-	InitializeImtCoreAuth();
-	InitializeImtCoreAuthUi();
+	ImtCoreInitAuthResources();
+	ImtCoreInitAuthUiResources();
 	InitializeImtCoreDesk();
 	InitializeImtCoreDeskUi();
 	InitializeImtCoreLic();
 	InitializeImtCoreLicUi();
 }
-
-
-} // namespace imtcore

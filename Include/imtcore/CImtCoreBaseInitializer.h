@@ -4,10 +4,16 @@
 #include <QtCore/qglobal.h>
 
 
-Q_ALWAYS_INLINE static void ImtCoreInitBaseResourcesGlobal()
+Q_ALWAYS_INLINE static void ImtCoreInitBaseResources()
 {
 	Q_INIT_RESOURCE(imtbase);
+	Q_INIT_RESOURCE(imtdb);
 
+	// Base core keeps only non-UI resources.
+}
+
+Q_ALWAYS_INLINE static void ImtCoreInitBaseUiResources()
+{
 	Q_INIT_RESOURCE(imtbaseSearchSdl);
 	Q_INIT_RESOURCE(imtbaseCommandsSdl);
 	Q_INIT_RESOURCE(imtbaseSettingsSdl);
@@ -23,10 +29,7 @@ Q_ALWAYS_INLINE static void ImtCoreInitBaseResourcesGlobal()
 	Q_INIT_RESOURCE(imtbaseProgressManagerSdl);
 	Q_INIT_RESOURCE(imtbaseCollectionImportSdl);
 	Q_INIT_RESOURCE(imtbaseFilterableSelectSdl);
-}
 
-Q_ALWAYS_INLINE static void ImtCoreInitBaseUiResourcesGlobal()
-{
 	Q_INIT_RESOURCE(imtstylecontrolsqml);
 
 	Q_INIT_RESOURCE(imtstyle);
@@ -36,19 +39,13 @@ Q_ALWAYS_INLINE static void ImtCoreInitBaseUiResourcesGlobal()
 	Q_INIT_RESOURCE(imtcontrolsqml);
 }
 
-namespace imtcore
-{
-
 
 inline void InitializeImtCoreBase()
 {
-	ImtCoreInitBaseResourcesGlobal();
+	ImtCoreInitBaseResources();
 }
 
 inline void InitializeImtCoreBaseUi()
 {
-	ImtCoreInitBaseUiResourcesGlobal();
+	ImtCoreInitBaseUiResources();
 }
-
-
-} // namespace imtcore

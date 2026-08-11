@@ -5,10 +5,14 @@
 #include <QtCore/qglobal.h>
 
 
-Q_ALWAYS_INLINE static void ImtCoreInitAuthResourcesGlobal()
+Q_ALWAYS_INLINE static void ImtCoreInitAuthResources()
 {
 	Q_INIT_RESOURCE(imtauthdb);
+}
 
+
+Q_ALWAYS_INLINE static void ImtCoreInitAuthUiResources()
+{
 	Q_INIT_RESOURCE(imtauthGroupsSdl);
 	Q_INIT_RESOURCE(imtauthRolesSdl);
 	Q_INIT_RESOURCE(imtauthUsersSdl);
@@ -17,24 +21,11 @@ Q_ALWAYS_INLINE static void ImtCoreInitAuthResourcesGlobal()
 	Q_INIT_RESOURCE(imtauthAuthorizationSdl);
 	Q_INIT_RESOURCE(imtauthPermissionsSdl);
 	Q_INIT_RESOURCE(imtauthPersonalAccessTokensSdl);
-}
 
-
-Q_ALWAYS_INLINE static void ImtCoreInitAuthTenantResourcesGlobal()
-{
-	Q_INIT_RESOURCE(imtauthTenantsSdl);
-	Q_INIT_RESOURCE(imtauthTenantMembershipsSdl);
-	Q_INIT_RESOURCE(imtauthTenantCollectionDocumentServiceSdl);
 	Q_INIT_RESOURCE(imtauthRoleCollectionDocumentServiceSdl);
-	Q_INIT_RESOURCE(imtauthRelationshipCollectionDocumentServiceSdl);
 	Q_INIT_RESOURCE(imtauthGroupCollectionDocumentServiceSdl);
 	Q_INIT_RESOURCE(imtauthUserCollectionDocumentServiceSdl);
-	Q_INIT_RESOURCE(imtauthCrossOrgGrantCollectionDocumentServiceSdl);
-}
 
-
-Q_ALWAYS_INLINE static void ImtCoreInitAuthUiResourcesGlobal()
-{
 	Q_INIT_RESOURCE(imtauthguilight);
 	Q_INIT_RESOURCE(imtauthguidark);
 
@@ -42,26 +33,11 @@ Q_ALWAYS_INLINE static void ImtCoreInitAuthUiResourcesGlobal()
 	Q_INIT_RESOURCE(imtauthguiqml);
 }
 
-namespace imtcore
+Q_ALWAYS_INLINE static void ImtCoreInitAuthTenantUiResources()
 {
-
-
-inline void InitializeImtCoreAuth()
-{
-	ImtCoreInitAuthResourcesGlobal();
+	Q_INIT_RESOURCE(imtauthTenantsSdl);
+	Q_INIT_RESOURCE(imtauthTenantMembershipsSdl);
+	Q_INIT_RESOURCE(imtauthTenantCollectionDocumentServiceSdl);
+	Q_INIT_RESOURCE(imtauthRelationshipCollectionDocumentServiceSdl);
+	Q_INIT_RESOURCE(imtauthCrossOrgGrantCollectionDocumentServiceSdl);
 }
-
-
-inline void InitializeImtCoreAuthTenant()
-{
-	ImtCoreInitAuthTenantResourcesGlobal();
-}
-
-
-inline void InitializeImtCoreAuthUi()
-{
-	ImtCoreInitAuthUiResourcesGlobal();
-}
-
-
-} // namespace imtcore
