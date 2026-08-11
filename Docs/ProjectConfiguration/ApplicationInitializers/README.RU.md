@@ -107,7 +107,53 @@
 Когда использовать:
 - И авторизация, и лицензирование являются ключевыми требованиями сервиса
 
-### 4.4 Профиль клиентского приложения
+### 4.4 Клиент с авторизацией
+
+Функция:
+- `imtcore::InitializeImtCoreClientAuth()`
+
+Включает:
+- Локализацию
+- Настройку стиля/UI
+- Base (core + UI)
+- Auth (core + UI)
+
+Когда использовать:
+- UI-клиентам, которым нужен только auth-домен
+- Лицензионный и desk-домены не требуются
+
+### 4.5 Клиент с лицензиями
+
+Функция:
+- `imtcore::InitializeImtCoreClientLic()`
+
+Включает:
+- Локализацию
+- Настройку стиля/UI
+- Base (core + UI)
+- Lic (core + UI)
+
+Когда использовать:
+- UI-клиентам, ориентированным на lic-сценарии
+- Auth и desk-домены не требуются
+
+### 4.6 Клиент с авторизацией и лицензиями
+
+Функция:
+- `imtcore::InitializeImtCoreClientAuthLic()`
+
+Включает:
+- Локализацию
+- Настройку стиля/UI
+- Base (core + UI)
+- Auth (core + UI)
+- Lic (core + UI)
+
+Когда использовать:
+- UI-клиентам, где одновременно нужны auth и lic-домены
+- Desk-домен не требуется
+
+### 4.7 Профиль клиентского приложения
 
 Функция:
 - `imtcore::InitializeImtCoreClientApp()`
@@ -156,7 +202,37 @@ imtcore::InitializeImtCoreServerAuthLic();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.4 Клиентское приложение
+### 5.4 Клиент с авторизацией
+
+```cpp
+#include <imtcore/CApplicationRunner.h>
+#include <imtcore/CImtCoreClientAuthInitializer.h>
+
+imtcore::InitializeImtCoreClientAuth();
+return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
+```
+
+### 5.5 Клиент с лицензиями
+
+```cpp
+#include <imtcore/CApplicationRunner.h>
+#include <imtcore/CImtCoreClientLicInitializer.h>
+
+imtcore::InitializeImtCoreClientLic();
+return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
+```
+
+### 5.6 Клиент с авторизацией и лицензиями
+
+```cpp
+#include <imtcore/CApplicationRunner.h>
+#include <imtcore/CImtCoreClientAuthLicInitializer.h>
+
+imtcore::InitializeImtCoreClientAuthLic();
+return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
+```
+
+### 5.7 Клиентское приложение
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -171,6 +247,9 @@ return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 - `InitializeImtCoreServerAuth()` для auth-ориентированных серверов.
 - `InitializeImtCoreServerLic()` для lic-ориентированных серверов.
 - `InitializeImtCoreServerAuthLic()`, когда нужны оба домена.
+- `InitializeImtCoreClientAuth()` для UI-клиентов с auth-доменом.
+- `InitializeImtCoreClientLic()` для UI-клиентов с lic-доменом.
+- `InitializeImtCoreClientAuthLic()` для UI-клиентов с auth+lic доменами.
 - `InitializeImtCoreClientApp()` для клиентских/UI приложений.
 
 Практическое правило:

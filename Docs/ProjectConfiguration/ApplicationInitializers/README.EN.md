@@ -77,7 +77,53 @@ Includes:
 Use when:
 - Both auth and licensing are core service responsibilities
 
-### 4.4 Client application profile
+### 4.4 Client with authorization
+
+Function:
+- `imtcore::InitializeImtCoreClientAuth()`
+
+Includes:
+- Localization
+- Style/UI setup
+- Base (core + UI)
+- Auth (core + UI)
+
+Use when:
+- UI clients need only the auth domain
+- Licensing and desk domains are not required
+
+### 4.5 Client with licensing
+
+Function:
+- `imtcore::InitializeImtCoreClientLic()`
+
+Includes:
+- Localization
+- Style/UI setup
+- Base (core + UI)
+- Lic (core + UI)
+
+Use when:
+- UI clients focus on licensing workflows
+- Auth and desk domains are not required
+
+### 4.6 Client with authorization and licensing
+
+Function:
+- `imtcore::InitializeImtCoreClientAuthLic()`
+
+Includes:
+- Localization
+- Style/UI setup
+- Base (core + UI)
+- Auth (core + UI)
+- Lic (core + UI)
+
+Use when:
+- UI clients require both auth and licensing domains
+- Desk domain is not required
+
+### 4.7 Client application profile
 
 Function:
 - `imtcore::InitializeImtCoreClientApp()`
@@ -126,7 +172,37 @@ imtcore::InitializeImtCoreServerAuthLic();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.4 Client application
+### 5.4 Client with authorization
+
+```cpp
+#include <imtcore/CApplicationRunner.h>
+#include <imtcore/CImtCoreClientAuthInitializer.h>
+
+imtcore::InitializeImtCoreClientAuth();
+return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
+```
+
+### 5.5 Client with licensing
+
+```cpp
+#include <imtcore/CApplicationRunner.h>
+#include <imtcore/CImtCoreClientLicInitializer.h>
+
+imtcore::InitializeImtCoreClientLic();
+return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
+```
+
+### 5.6 Client with authorization and licensing
+
+```cpp
+#include <imtcore/CApplicationRunner.h>
+#include <imtcore/CImtCoreClientAuthLicInitializer.h>
+
+imtcore::InitializeImtCoreClientAuthLic();
+return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
+```
+
+### 5.7 Client application
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
@@ -141,6 +217,9 @@ return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 - Choose `InitializeImtCoreServerAuth()` for auth-centric servers.
 - Choose `InitializeImtCoreServerLic()` for licensing-centric servers.
 - Choose `InitializeImtCoreServerAuthLic()` when both domains are required.
+- Choose `InitializeImtCoreClientAuth()` for UI clients with the auth domain.
+- Choose `InitializeImtCoreClientLic()` for UI clients with the licensing domain.
+- Choose `InitializeImtCoreClientAuthLic()` for UI clients with auth and licensing domains.
 - Choose `InitializeImtCoreClientApp()` for client/UI apps.
 
 Rule of thumb:
