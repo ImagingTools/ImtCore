@@ -409,7 +409,7 @@ IObjectCollectionUniquePtr CObjectCollectionBase::CreateSubCollection(
 	}
 
 	QWriteLocker locker(&m_lock);
-	qsizetype objectsCount = count >= 0 ? qMin(count, m_objects.size()) : m_objects.size();
+	qsizetype objectsCount = count >= 0 ? qMin(static_cast<qsizetype>(offset) + count, m_objects.size()) : m_objects.size();
 
 	for (qsizetype i = offset; i < objectsCount; i++){
 		collectionPtr->InsertNewObject(
