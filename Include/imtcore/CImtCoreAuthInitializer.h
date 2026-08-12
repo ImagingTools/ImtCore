@@ -43,6 +43,13 @@ Q_ALWAYS_INLINE static void ImtCoreInitAuthQmlUiResources()
 }
 
 
+Q_ALWAYS_INLINE static void ImtCoreInitAuthQmlUiSdlResources()
+{
+	ImtCoreInitAuthQmlSdlResources();
+	ImtCoreInitAuthQmlUiResources();
+}
+
+
 Q_ALWAYS_INLINE static void ImtCoreInitTenantQmlSdlResources()
 {
 	Q_INIT_RESOURCE(imtauthTenantsSdl);
