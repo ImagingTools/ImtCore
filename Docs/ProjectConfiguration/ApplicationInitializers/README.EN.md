@@ -37,11 +37,6 @@ Rule:
 Function:
 - `InitializeImtCoreServerAuth()`
 
-### 4.2 Server with authorization and tenant
-
-Function:
-- `InitializeImtCoreServerAuthTenant()`
-
 ## 5. Usage Examples
 
 ### 5.1 Server with authorization
@@ -54,22 +49,11 @@ InitializeImtCoreServerAuth();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.2 Server with authorization and tenant
-
-```cpp
-#include <imtcore/CApplicationRunner.h>
-#include <imtcore/CImtCoreServerAuthTenantInitializer.h>
-
-InitializeImtCoreServerAuthTenant();
-return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
-```
-
 For client applications, compose startup in a product initializer by calling only the required domain helpers.
 
 ## 6. Selection Guide
 
 - Choose `InitializeImtCoreServerAuth()` for auth-centric servers.
-- Choose `InitializeImtCoreServerAuthTenant()` when server auth must include tenant resources.
 
 For product applications:
 - Define a dedicated product initializer and call only the required domain initializers/resources.

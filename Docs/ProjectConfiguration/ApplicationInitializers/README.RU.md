@@ -37,11 +37,6 @@
 Функция:
 - `InitializeImtCoreServerAuth()`
 
-### 4.2 Сервер с авторизацией и tenant
-
-Функция:
-- `InitializeImtCoreServerAuthTenant()`
-
 ## 5. Примеры использования
 
 ### 5.1 Сервер с авторизацией
@@ -54,22 +49,11 @@ InitializeImtCoreServerAuth();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.2 Сервер с авторизацией и tenant
-
-```cpp
-#include <imtcore/CApplicationRunner.h>
-#include <imtcore/CImtCoreServerAuthTenantInitializer.h>
-
-InitializeImtCoreServerAuthTenant();
-return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
-```
-
 Для клиентских приложений собирайте запуск в продуктовом инициализаторе, вызывая только нужные доменные helper-функции.
 
 ## 6. Как выбрать профиль
 
 - `InitializeImtCoreServerAuth()` для auth-ориентированных серверов.
-- `InitializeImtCoreServerAuthTenant()` для auth-серверов с tenant-частью.
 
 Для продуктового приложения:
 - Создайте собственный инициализатор приложения и явно вызовите только нужные доменные инициализаторы/ресурсы.
