@@ -13,21 +13,28 @@
 - Глобальные статические функции инициализации определяются без namespace-оберток в initializer headers.
 - `imtcore::CApplicationRunner::Run(..., autoInit)` используется как точка запуска приложения.
 
-## 3. Разделение доменов (Core и UI)
+## 3. Разделение доменов (Core, UI и QML-UI)
 
 - Core/non-UI функции:
   - `ImtCoreInitBaseResources()`
   - `ImtCoreInitAuthResources()`
   - `ImtCoreInitDeskResources()`
-- UI функции:
+- UI функции (не-QML):
   - `ImtCoreInitBaseUiResources()`
   - `ImtCoreInitAuthUiResources()`
-  - `ImtCoreInitTenantUiResources()`
   - `ImtCoreInitLicUiResources()`
+- QML-UI функции:
+  - `ImtCoreInitBaseQmlSdlResources()`
+  - `ImtCoreInitBaseQmlUiResources()`
+  - `ImtCoreInitAuthQmlSdlResources()`
+  - `ImtCoreInitAuthQmlUiResources()`
+  - `ImtCoreInitTenantQmlSdlResources()`
+  - `ImtCoreInitLicQmlUiResources()`
 
 Правила:
-- SDL-ресурсы инициализируются в UI-функциях.
-- Tenant-часть подключается только явно через tenant UI-ресурсы.
+- UI-функции не должны инициализировать SDL или QML ресурсы.
+- SDL-ресурсы инициализируются только QML-UI функции.
+- QML-ресурсы инициализируются только QML-UI функции.
 
 ## 4. Макро-профили
 
@@ -56,5 +63,5 @@ return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 
 Для продуктового приложения:
 - Создайте собственный инициализатор приложения и явно вызовите только нужные доменные инициализаторы/ресурсы.
-- Для auth используйте `ImtCoreInitAuthResources()`, `ImtCoreInitAuthUiResources()` и `ImtCoreInitTenantUiResources()` при необходимости.
-- Для client UI запуска явно комбинируйте base/auth/desk/lic helper-функции под нужды продукта.
+- Для auth используйте `ImtCoreInitAuthResources()`, `ImtCoreInitAuthUiResources()`, `ImtCoreInitAuthQmlSdlResources()`, `ImtCoreInitAuthQmlUiResources()` и `ImtCoreInitTenantQmlSdlResources()` при необходимости.
+- Для client UI запуска явно комбинируйте base/auth/desk/lic helper-функции, включая QML-UI helper-функции там, где нужен QML.

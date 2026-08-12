@@ -13,21 +13,28 @@ Important:
 - Global static initialization functions are defined without namespace wrappers in the initializer headers.
 - `imtcore::CApplicationRunner::Run(..., autoInit)` is the application entry point.
 
-## 3. Domain Split (Core vs UI)
+## 3. Domain Split (Core vs UI and QML-UI)
 
 - Core/non-UI functions:
   - `ImtCoreInitBaseResources()`
   - `ImtCoreInitAuthResources()`
   - `ImtCoreInitDeskResources()`
-- UI functions:
+- UI functions (non-QML):
   - `ImtCoreInitBaseUiResources()`
   - `ImtCoreInitAuthUiResources()`
-  - `ImtCoreInitTenantUiResources()`
   - `ImtCoreInitLicUiResources()`
+- QML-UI functions:
+  - `ImtCoreInitBaseQmlSdlResources()`
+  - `ImtCoreInitBaseQmlUiResources()`
+  - `ImtCoreInitAuthQmlSdlResources()`
+  - `ImtCoreInitAuthQmlUiResources()`
+  - `ImtCoreInitTenantQmlSdlResources()`
+  - `ImtCoreInitLicQmlUiResources()`
 
 Rule:
-- SDL resources are initialized in UI functions.
-- Tenant resources are opt-in and explicitly marked via tenant UI resources.
+- UI functions must not initialize SDL or QML resources.
+- SDL resources are initialized in QML-UI functions.
+- QML resources are initialized in QML-UI functions.
 
 ## 4. Macro Profiles
 
@@ -56,5 +63,5 @@ For client applications, compose startup in a product initializer by calling onl
 
 For product applications:
 - Define a dedicated product initializer and call only the required domain initializers/resources.
-- For auth, use `ImtCoreInitAuthResources()`, `ImtCoreInitAuthUiResources()`, and `ImtCoreInitTenantUiResources()` when needed.
-- For client UI startup, combine base/auth/desk/lic helpers explicitly as required by the product.
+- For auth, use `ImtCoreInitAuthResources()`, `ImtCoreInitAuthUiResources()`, `ImtCoreInitAuthQmlSdlResources()`, `ImtCoreInitAuthQmlUiResources()`, and `ImtCoreInitTenantQmlSdlResources()` when needed.
+- For client UI startup, combine base/auth/desk/lic helpers explicitly, including QML-UI helpers where QML is required.

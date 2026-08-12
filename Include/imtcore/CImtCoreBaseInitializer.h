@@ -11,7 +11,7 @@ Q_ALWAYS_INLINE static void ImtCoreInitBaseResources()
 }
 
 
-Q_ALWAYS_INLINE static void ImtCoreInitBaseUiResources()
+Q_ALWAYS_INLINE static void ImtCoreInitBaseQmlSdlResources()
 {
 	Q_INIT_RESOURCE(imtappApplicationSdl);
 	Q_INIT_RESOURCE(imtbaseSearchSdl);
@@ -35,12 +35,24 @@ Q_ALWAYS_INLINE static void ImtCoreInitBaseUiResources()
 	Q_INIT_RESOURCE(imt2dGeometrySdl);
 	Q_INIT_RESOURCE(imt2dPaintPrimitivesSdl);
 	Q_INIT_RESOURCE(imt2dPaintSystemSdl);
-
+}
+Q_ALWAYS_INLINE static void ImtCoreInitBaseUiResources()
+{
 	Q_INIT_RESOURCE(imtgui);
 	Q_INIT_RESOURCE(imtguilight);
 	Q_INIT_RESOURCE(imtguidark);
 
 	Q_INIT_RESOURCE(imtguiTheme);
+
+	Q_INIT_RESOURCE(imtstyle);
+	Q_INIT_RESOURCE(imtstylelight);
+	Q_INIT_RESOURCE(imtstyledark);
+}
+
+
+Q_ALWAYS_INLINE static void ImtCoreInitBaseQmlUiResources()
+{
+	ImtCoreInitBaseQmlSdlResources();
 
 	Q_INIT_RESOURCE(imtguiqml);
 	Q_INIT_RESOURCE(imtcolguiqml);
@@ -48,10 +60,6 @@ Q_ALWAYS_INLINE static void ImtCoreInitBaseUiResources()
 	Q_INIT_RESOURCE(imtguigqlqml);
 
 	Q_INIT_RESOURCE(imtstylecontrolsqml);
-
-	Q_INIT_RESOURCE(imtstyle);
-	Q_INIT_RESOURCE(imtstylelight);
-	Q_INIT_RESOURCE(imtstyledark);
 
 	Q_INIT_RESOURCE(imtcontrolsqml);
 }
