@@ -11,14 +11,14 @@ This section documents the static function based initialization model for ImtCor
 
 - Static initialization entry points and responsibilities
 - Macro profiles for common app types:
-	- server-auth
+	- authorizable-server
 - Domain split into core and UI functions: Base/Auth/Desk/Lic
-- Explicit Core/UI calls in client profiles (without intermediate wrappers)
+- Product-level composition from domain helper functions
 - Tenant extension rules
 
 ## Quick Start
 
-- Use server profile (`InitializeImtCoreServerAuth`) for headless startup.
+- Use server profile (`InitializeImtCoreAuthorizableServer`) for headless startup.
 - For client apps, create a product initializer and compose the required domain helper calls explicitly.
 
 See full details in the language-specific documents above.

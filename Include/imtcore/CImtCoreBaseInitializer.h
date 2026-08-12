@@ -13,6 +13,7 @@ Q_ALWAYS_INLINE static void ImtCoreInitBaseResources()
 
 Q_ALWAYS_INLINE static void ImtCoreInitBaseUiResources()
 {
+	Q_INIT_RESOURCE(imtappApplicationSdl);
 	Q_INIT_RESOURCE(imtbaseSearchSdl);
 	Q_INIT_RESOURCE(imtbaseCommandsSdl);
 	Q_INIT_RESOURCE(imtbaseSettingsSdl);
@@ -28,6 +29,23 @@ Q_ALWAYS_INLINE static void ImtCoreInitBaseUiResources()
 	Q_INIT_RESOURCE(imtbaseProgressManagerSdl);
 	Q_INIT_RESOURCE(imtbaseCollectionImportSdl);
 	Q_INIT_RESOURCE(imtbaseFilterableSelectSdl);
+
+	Q_INIT_RESOURCE(imtcolorLabSdl);
+	Q_INIT_RESOURCE(imtcolorRgbColorHexSdl);
+	Q_INIT_RESOURCE(imt2dGeometrySdl);
+	Q_INIT_RESOURCE(imt2dPaintPrimitivesSdl);
+	Q_INIT_RESOURCE(imt2dPaintSystemSdl);
+
+	Q_INIT_RESOURCE(imtgui);
+	Q_INIT_RESOURCE(imtguilight);
+	Q_INIT_RESOURCE(imtguidark);
+
+	Q_INIT_RESOURCE(imtguiTheme);
+
+	Q_INIT_RESOURCE(imtguiqml);
+	Q_INIT_RESOURCE(imtcolguiqml);
+	Q_INIT_RESOURCE(imtdocguiqml);
+	Q_INIT_RESOURCE(imtguigqlqml);
 
 	Q_INIT_RESOURCE(imtstylecontrolsqml);
 

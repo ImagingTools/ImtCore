@@ -22,8 +22,7 @@
 - UI функции:
   - `ImtCoreInitBaseUiResources()`
   - `ImtCoreInitAuthUiResources()`
-  - `ImtCoreInitAuthTenantUiResources()`
-  - `ImtCoreInitDeskUiResources()`
+  - `ImtCoreInitTenantUiResources()`
   - `ImtCoreInitLicUiResources()`
 
 Правила:
@@ -32,20 +31,20 @@
 
 ## 4. Макро-профили
 
-### 4.1 Сервер с авторизацией
+### 4.1 Авторизуемый сервер
 
 Функция:
-- `InitializeImtCoreServerAuth()`
+- `InitializeImtCoreAuthorizableServer()`
 
 ## 5. Примеры использования
 
-### 5.1 Сервер с авторизацией
+### 5.1 Авторизуемый сервер
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
-#include <imtcore/CImtCoreServerAuthInitializer.h>
+#include <imtcore/CImtCoreAuthorizableServerInitializer.h>
 
-InitializeImtCoreServerAuth();
+InitializeImtCoreAuthorizableServer();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
@@ -53,9 +52,9 @@ return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 
 ## 6. Как выбрать профиль
 
-- `InitializeImtCoreServerAuth()` для auth-ориентированных серверов.
+- `InitializeImtCoreAuthorizableServer()` для auth-ориентированных серверов.
 
 Для продуктового приложения:
 - Создайте собственный инициализатор приложения и явно вызовите только нужные доменные инициализаторы/ресурсы.
-- Для auth используйте `ImtCoreInitAuthResources()`, `ImtCoreInitAuthUiResources()` и `ImtCoreInitAuthTenantUiResources()` при необходимости.
+- Для auth используйте `ImtCoreInitAuthResources()`, `ImtCoreInitAuthUiResources()` и `ImtCoreInitTenantUiResources()` при необходимости.
 - Для client UI запуска явно комбинируйте base/auth/desk/lic helper-функции под нужды продукта.

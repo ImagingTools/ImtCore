@@ -22,8 +22,7 @@ Important:
 - UI functions:
   - `ImtCoreInitBaseUiResources()`
   - `ImtCoreInitAuthUiResources()`
-  - `ImtCoreInitAuthTenantUiResources()`
-  - `ImtCoreInitDeskUiResources()`
+  - `ImtCoreInitTenantUiResources()`
   - `ImtCoreInitLicUiResources()`
 
 Rule:
@@ -32,20 +31,20 @@ Rule:
 
 ## 4. Macro Profiles
 
-### 4.1 Server with authorization
+### 4.1 Authorizable server
 
 Function:
-- `InitializeImtCoreServerAuth()`
+- `InitializeImtCoreAuthorizableServer()`
 
 ## 5. Usage Examples
 
-### 5.1 Server with authorization
+### 5.1 Authorizable server
 
 ```cpp
 #include <imtcore/CApplicationRunner.h>
-#include <imtcore/CImtCoreServerAuthInitializer.h>
+#include <imtcore/CImtCoreAuthorizableServerInitializer.h>
 
-InitializeImtCoreServerAuth();
+InitializeImtCoreAuthorizableServer();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
@@ -53,9 +52,9 @@ For client applications, compose startup in a product initializer by calling onl
 
 ## 6. Selection Guide
 
-- Choose `InitializeImtCoreServerAuth()` for auth-centric servers.
+- Choose `InitializeImtCoreAuthorizableServer()` for auth-centric servers.
 
 For product applications:
 - Define a dedicated product initializer and call only the required domain initializers/resources.
-- For auth, use `ImtCoreInitAuthResources()`, `ImtCoreInitAuthUiResources()`, and `ImtCoreInitAuthTenantUiResources()` when needed.
+- For auth, use `ImtCoreInitAuthResources()`, `ImtCoreInitAuthUiResources()`, and `ImtCoreInitTenantUiResources()` when needed.
 - For client UI startup, combine base/auth/desk/lic helpers explicitly as required by the product.

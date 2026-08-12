@@ -6,7 +6,7 @@
 #include "CImtCoreAuthInitializer.h"
 
 
-inline void InitializeImtCoreServerAuth()
+inline void InitializeImtCoreAuthorizableServer()
 {
 	ImtCoreInitLocalizationResources();
 	ImtCoreInitBaseResources();
