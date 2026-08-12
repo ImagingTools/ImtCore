@@ -14,7 +14,7 @@ Item {
     property alias multiPageView: multiPageView;
     signal multiPageUpdated();
 
-	property string productId: AuthorizationController.productId
+    property string productId: AuthorizationController.productId
     property GqlBasedUserAdministrationApiClient apiClient: GqlBasedUserAdministrationApiClient {
         productId: administrationContainer.productId
     }
@@ -46,21 +46,23 @@ Item {
         }
     }
 
-    function onLocalizationChanged(language){
-        let rolesIndex = multiPageView.getIndexById("Roles");
-        if (rolesIndex >= 0){
-            multiPageView.pagesModel.setProperty(rolesIndex, "name", qsTr("Roles"))
+    function updatePageName(pageId, displayName) {
+        let index = multiPageView.getIndexById(pageId);
+        if (index >= 0) {
+            multiPageView.pagesModel.setProperty(index, "name", displayName);
         }
+    }
 
-        let usersIndex = multiPageView.getIndexById("Users");
-        if (usersIndex >= 0){
-            multiPageView.pagesModel.setProperty(usersIndex, "name", qsTr("Users"))
-        }
+    function onLocalizationChanged(language) {
+        updatePageName("Roles", qsTr("Roles"));
+        updatePageName("Users", qsTr("Users"));
+        updatePageName("Groups", qsTr("Groups"));
 
-        let groupsIndex = multiPageView.getIndexById("Groups");
-        if (groupsIndex >= 0){
-            multiPageView.pagesModel.setProperty(groupsIndex, "name", qsTr("Groups"))
-        }
+        onCustomPagesLocalizationChanged();
+    }
+
+    function onCustomPagesLocalizationChanged(){
+        // Override this function to update custom page names on localization change
     }
 
     Rectangle {
@@ -144,7 +146,7 @@ Item {
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.bottom: parent.bottom;
-        
+
         NavigableItem {
             parentSegment: "Administration"
             paths: ["Roles", "Users", "Groups"]
@@ -189,32 +191,28 @@ Item {
             }
         }
 
+        function addSubPage(pageId, pageName, pageComp, pageIcon){
+            let index = multiPageView.getIndexById(pageId);
+            if (index >= 0){
+                return
+            }
+
+            let accessGranted = PermissionsController.checkPermission("View" + pageId)
+            if (!accessGranted){
+                console.warn("Subpage '" + pageId + "' cannot be displayed. Error: Access denied (check permissions)")
+
+                return
+            }
+
+            multiPageView.addPage(pageId, pageName, pageComp, pageIcon);
+        }
+
         function updateModel(){
             multiPageView.clear();
 
-            let ok = PermissionsController.checkPermission("ViewRoles");
-            if (ok){
-                multiPageView.addPage("Roles", qsTr("Roles"), roleCollectionComp, "Icons/Role");
-            }
-            else{
-                console.warn("Role collection cannot be displayed. Error: Permission denied");
-            }
-
-            ok = PermissionsController.checkPermission("ViewUsers");
-            if (ok){
-                multiPageView.addPage("Users", qsTr("Users"), userCollectionComp, "Icons/Account");
-            }
-            else{
-                console.warn("User collection cannot be displayed. Error: Permission denied");
-            }
-
-            ok = PermissionsController.checkPermission("ViewGroups");
-            if (ok){
-                multiPageView.addPage("Groups", qsTr("Groups"), userGroupCollectionComp, "Icons/MultipleUser");
-            }
-            else{
-                console.warn("Group collection cannot be displayed. Error: Permission denied");
-            }
+            addSubPage("Roles", qsTr("Roles"), roleCollectionComp, "Icons/Role")
+            addSubPage("Users", qsTr("Users"), userCollectionComp, "Icons/Account")
+            addSubPage("Groups", qsTr("Groups"), userGroupCollectionComp, "Icons/MultipleUser")
 
             multiPageView.currentIndex = 0;
             administrationContainer.multiPageUpdated();
