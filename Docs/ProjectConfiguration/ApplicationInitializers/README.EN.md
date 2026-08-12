@@ -42,21 +42,6 @@ Function:
 Function:
 - `InitializeImtCoreServerAuthTenant()`
 
-### 4.3 Client with authorization
-
-Function:
-- `InitializeImtCoreClientAuth()`
-
-### 4.4 Client with licensing
-
-Function:
-- `InitializeImtCoreClientLic()`
-
-### 4.5 Full client application profile
-
-Function:
-- `InitializeImtCoreClientApp()`
-
 ## 5. Usage Examples
 
 ### 5.1 Server with authorization
@@ -79,44 +64,14 @@ InitializeImtCoreServerAuthTenant();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.3 Client with authorization
-
-```cpp
-#include <imtcore/CApplicationRunner.h>
-#include <imtcore/CImtCoreClientAuthInitializer.h>
-
-InitializeImtCoreClientAuth();
-return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
-```
-
-### 5.4 Client with licensing
-
-```cpp
-#include <imtcore/CApplicationRunner.h>
-#include <imtcore/CImtCoreClientLicInitializer.h>
-
-InitializeImtCoreClientLic();
-return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
-```
-
-### 5.5 Full client application
-
-```cpp
-#include <imtcore/CApplicationRunner.h>
-#include <imtcore/CImtCoreClientAppInitializer.h>
-
-InitializeImtCoreClientApp();
-return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
-```
+For client applications, compose startup in a product initializer by calling only the required domain helpers.
 
 ## 6. Selection Guide
 
 - Choose `InitializeImtCoreServerAuth()` for auth-centric servers.
 - Choose `InitializeImtCoreServerAuthTenant()` when server auth must include tenant resources.
-- Choose `InitializeImtCoreClientAuth()` for UI clients with auth.
-- Choose `InitializeImtCoreClientLic()` for UI clients with licensing.
-- Choose `InitializeImtCoreClientApp()` for full client/UI startup.
 
 For product applications:
 - Define a dedicated product initializer and call only the required domain initializers/resources.
 - For auth, use `ImtCoreInitAuthResources()`, `ImtCoreInitAuthUiResources()`, and `ImtCoreInitAuthTenantUiResources()` when needed.
+- For client UI startup, combine base/auth/desk/lic helpers explicitly as required by the product.

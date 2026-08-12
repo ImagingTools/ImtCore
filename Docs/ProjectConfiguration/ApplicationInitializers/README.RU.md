@@ -42,21 +42,6 @@
 Функция:
 - `InitializeImtCoreServerAuthTenant()`
 
-### 4.3 Клиент с авторизацией
-
-Функция:
-- `InitializeImtCoreClientAuth()`
-
-### 4.4 Клиент с лицензиями
-
-Функция:
-- `InitializeImtCoreClientLic()`
-
-### 4.5 Полный профиль клиентского приложения
-
-Функция:
-- `InitializeImtCoreClientApp()`
-
 ## 5. Примеры использования
 
 ### 5.1 Сервер с авторизацией
@@ -79,44 +64,14 @@ InitializeImtCoreServerAuthTenant();
 return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 ```
 
-### 5.3 Клиент с авторизацией
-
-```cpp
-#include <imtcore/CApplicationRunner.h>
-#include <imtcore/CImtCoreClientAuthInitializer.h>
-
-InitializeImtCoreClientAuth();
-return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
-```
-
-### 5.4 Клиент с лицензиями
-
-```cpp
-#include <imtcore/CApplicationRunner.h>
-#include <imtcore/CImtCoreClientLicInitializer.h>
-
-InitializeImtCoreClientLic();
-return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
-```
-
-### 5.5 Полный клиентский профиль
-
-```cpp
-#include <imtcore/CApplicationRunner.h>
-#include <imtcore/CImtCoreClientAppInitializer.h>
-
-InitializeImtCoreClientApp();
-return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
-```
+Для клиентских приложений собирайте запуск в продуктовом инициализаторе, вызывая только нужные доменные helper-функции.
 
 ## 6. Как выбрать профиль
 
 - `InitializeImtCoreServerAuth()` для auth-ориентированных серверов.
 - `InitializeImtCoreServerAuthTenant()` для auth-серверов с tenant-частью.
-- `InitializeImtCoreClientAuth()` для UI-клиентов с auth.
-- `InitializeImtCoreClientLic()` для UI-клиентов с lic.
-- `InitializeImtCoreClientApp()` для полного клиентского/UI запуска.
 
 Для продуктового приложения:
 - Создайте собственный инициализатор приложения и явно вызовите только нужные доменные инициализаторы/ресурсы.
 - Для auth используйте `ImtCoreInitAuthResources()`, `ImtCoreInitAuthUiResources()` и `ImtCoreInitAuthTenantUiResources()` при необходимости.
+- Для client UI запуска явно комбинируйте base/auth/desk/lic helper-функции под нужды продукта.
