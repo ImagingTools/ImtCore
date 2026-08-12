@@ -11,5 +11,5 @@ inline void InitializeImtCoreAuthorizableServer()
 {
 	ImtCoreInitLocalizationResources();
 	ImtCoreInitBaseResources();
-	ImtCoreInitAuthResources();
+	ImtCoreInitAuthSqlResources();
 }

@@ -36,7 +36,9 @@ Q_ALWAYS_INLINE static void ImtCoreInitBaseQmlSdlResources()
 	Q_INIT_RESOURCE(imt2dPaintPrimitivesSdl);
 	Q_INIT_RESOURCE(imt2dPaintSystemSdl);
 }
-Q_ALWAYS_INLINE static void ImtCoreInitBaseUiResources()
+
+
+Q_ALWAYS_INLINE static void ImtCoreInitStyleResources()
 {
 	Q_INIT_RESOURCE(imtgui);
 	Q_INIT_RESOURCE(imtguilight);
@@ -50,7 +52,7 @@ Q_ALWAYS_INLINE static void ImtCoreInitBaseUiResources()
 }
 
 
-Q_ALWAYS_INLINE static void ImtCoreInitBaseQmlUiResources()
+Q_ALWAYS_INLINE static void ImtCoreInitQmlResources()
 {
 	ImtCoreInitBaseQmlSdlResources();
 

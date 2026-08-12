@@ -5,13 +5,13 @@
 #include <QtCore/qglobal.h>
 
 
-Q_ALWAYS_INLINE static void ImtCoreInitAuthResources()
+Q_ALWAYS_INLINE static void ImtCoreInitAuthSqlResources()
 {
 	Q_INIT_RESOURCE(imtauthdb);
 }
 
 
-Q_ALWAYS_INLINE static void ImtCoreInitAuthUiResources()
+Q_ALWAYS_INLINE static void ImtCoreInitAuthStyleResources()
 {
 	Q_INIT_RESOURCE(imtauthguilight);
 	Q_INIT_RESOURCE(imtauthguidark);
@@ -37,7 +37,7 @@ Q_ALWAYS_INLINE static void ImtCoreInitAuthQmlSdlResources()
 }
 
 
-Q_ALWAYS_INLINE static void ImtCoreInitAuthQmlUiResources()
+Q_ALWAYS_INLINE static void ImtCoreInitAuthQmlResources()
 {
 	Q_INIT_RESOURCE(imtauthguiqml);
 }
@@ -46,7 +46,7 @@ Q_ALWAYS_INLINE static void ImtCoreInitAuthQmlUiResources()
 Q_ALWAYS_INLINE static void ImtCoreInitAuthQmlUiSdlResources()
 {
 	ImtCoreInitAuthQmlSdlResources();
-	ImtCoreInitAuthQmlUiResources();
+	ImtCoreInitAuthQmlResources();
 }
 
 

@@ -17,19 +17,19 @@
 
 - Core/non-UI функции:
   - `ImtCoreInitBaseResources()`
-  - `ImtCoreInitAuthResources()`
+  - `ImtCoreInitAuthSqlResources()`
   - `ImtCoreInitDeskResources()`
 - UI функции (не-QML):
-  - `ImtCoreInitBaseUiResources()`
-  - `ImtCoreInitAuthUiResources()`
-  - `ImtCoreInitLicUiResources()`
+  - `ImtCoreInitStyleResources()`
+  - `ImtCoreInitAuthStyleResources()`
+  - `ImtCoreInitLicStyleResources()`
 - QML-UI функции:
   - `ImtCoreInitBaseQmlSdlResources()`
-  - `ImtCoreInitBaseQmlUiResources()`
+  - `ImtCoreInitQmlResources()`
   - `ImtCoreInitAuthQmlSdlResources()`
-  - `ImtCoreInitAuthQmlUiResources()`
+  - `ImtCoreInitAuthQmlResources()`
   - `ImtCoreInitTenantQmlSdlResources()`
-  - `ImtCoreInitLicQmlUiResources()`
+  - `ImtCoreInitLicQmlResources()`
 
 Правила:
 - UI-функции не должны инициализировать SDL или QML ресурсы.
@@ -63,5 +63,5 @@ return imtcore::CApplicationRunner::Run(argc, argv, appComponent, true);
 
 Для продуктового приложения:
 - Создайте собственный инициализатор приложения и явно вызовите только нужные доменные инициализаторы/ресурсы.
-- Для auth используйте `ImtCoreInitAuthResources()`, `ImtCoreInitAuthUiResources()`, `ImtCoreInitAuthQmlSdlResources()`, `ImtCoreInitAuthQmlUiResources()` и `ImtCoreInitTenantQmlSdlResources()` при необходимости.
+- Для auth используйте `ImtCoreInitAuthSqlResources()`, `ImtCoreInitAuthStyleResources()`, `ImtCoreInitAuthQmlSdlResources()`, `ImtCoreInitAuthQmlResources()` и `ImtCoreInitTenantQmlSdlResources()` при необходимости.
 - Для client UI запуска явно комбинируйте base/auth/desk/lic helper-функции, включая QML-UI helper-функции там, где нужен QML.
