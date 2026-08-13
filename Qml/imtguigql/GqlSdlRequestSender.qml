@@ -31,6 +31,7 @@ GqlRequest {
 	
 	property string gqlCommandId;
 	property int requestType: 0; // 0 - Query, 1 - Mutation, 2 - Subscription
+	property string context
 	
 	/**
 		SDL object created from sdlObjectComp
@@ -145,7 +146,11 @@ GqlRequest {
 			query.AddField(requestedFields);
 		}
 		
-		root.setGqlQuery(query.GetQuery(), root.getHeaders());
+		let headers = root.getHeaders()
+		if (headers && root.context && root.context != "")
+			headers["context"] = root.context
+
+		root.setGqlQuery(query.GetQuery(), headers)
 	}
 	
 	function createQueryParams(query){
