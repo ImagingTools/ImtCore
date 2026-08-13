@@ -65,10 +65,15 @@ CollectionView {
 		}
 	}
 
+	function fillContext(headers){
+		if (headers && root.context && root.context != "")
+			headers["context"] = root.context
+	}
+
 	function getHeaders(){
 		let headers = {}
-		if (root.context && root.context != "")
-			headers["context"] = root.context
+		fillContext(headers)
+
 		return headers
 	}
 
