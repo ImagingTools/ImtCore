@@ -40,6 +40,8 @@ Q_ALWAYS_INLINE static void ImtCoreInitQmlApplicationCoreResources()
 
 Q_ALWAYS_INLINE static void ImtCoreInitQmlCollectionResources()
 {
+	Q_INIT_RESOURCE(imtcolguiqml);
+
 	Q_INIT_RESOURCE(imtbaseComplexCollectionFilterSdl);
 	Q_INIT_RESOURCE(imtbaseCollectionDocumentServiceSdl);
 	Q_INIT_RESOURCE(imtbaseCollectionImportSdl);
@@ -50,6 +52,8 @@ Q_ALWAYS_INLINE static void ImtCoreInitQmlCollectionResources()
 Q_ALWAYS_INLINE static void ImtCoreInitQmlDocumentManagementResources()
 {
 	ImtCoreInitQmlCollectionResources();
+
+	Q_INIT_RESOURCE(imtdocguiqml);
 
 	Q_INIT_RESOURCE(imtbaseDocumentRevisionSdl);
 	Q_INIT_RESOURCE(imtbaseDocumentIdFilterSdl);
@@ -74,9 +78,6 @@ Q_ALWAYS_INLINE static void ImtCoreInitQmlCoreControlsResources()
 	Q_INIT_RESOURCE(imtguiqml);
 	Q_INIT_RESOURCE(imtstylecontrolsqml);
 	Q_INIT_RESOURCE(imtcontrolsqml);
-
-	Q_INIT_RESOURCE(imtcolguiqml);
-	Q_INIT_RESOURCE(imtdocguiqml);
 
 	Q_INIT_RESOURCE(imtguigqlqml);
 }
