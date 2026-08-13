@@ -74,6 +74,14 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 		return QByteArray();
 	}
 
+	{
+		QMutexLocker registeredLocker(&m_registeredClientsMutex);
+		if (m_registeredClients.contains(subscriptionId)){
+			m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_REGISTERED;
+			UpdateCustomerSubscriptionStatuses(subscriptionId);
+		}
+	}
+
 	return subscriptionId;
 }
 
