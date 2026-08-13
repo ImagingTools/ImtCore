@@ -20,8 +20,16 @@ Q_ALWAYS_INLINE static void ImtCoreInitAuthStyleResources()
 }
 
 
+Q_ALWAYS_INLINE static void ImtCoreInitAuthQmlResources()
+{
+	Q_INIT_RESOURCE(imtauthguiqml);
+}
+
+
 Q_ALWAYS_INLINE static void ImtCoreInitAuthQmlSdlResources()
 {
+	ImtCoreInitAuthQmlResources();
+
 	Q_INIT_RESOURCE(imtauthGroupsSdl);
 	Q_INIT_RESOURCE(imtauthRolesSdl);
 	Q_INIT_RESOURCE(imtauthUsersSdl);
@@ -34,19 +42,6 @@ Q_ALWAYS_INLINE static void ImtCoreInitAuthQmlSdlResources()
 	Q_INIT_RESOURCE(imtauthRoleCollectionDocumentServiceSdl);
 	Q_INIT_RESOURCE(imtauthGroupCollectionDocumentServiceSdl);
 	Q_INIT_RESOURCE(imtauthUserCollectionDocumentServiceSdl);
-}
-
-
-Q_ALWAYS_INLINE static void ImtCoreInitAuthQmlResources()
-{
-	Q_INIT_RESOURCE(imtauthguiqml);
-}
-
-
-Q_ALWAYS_INLINE static void ImtCoreInitAuthQmlUiSdlResources()
-{
-	ImtCoreInitAuthQmlSdlResources();
-	ImtCoreInitAuthQmlResources();
 }
 
 
