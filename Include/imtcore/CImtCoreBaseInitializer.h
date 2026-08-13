@@ -58,18 +58,14 @@ Q_ALWAYS_INLINE static void ImtCoreInitQmlDocumentManagementResources()
 }
 
 
-Q_ALWAYS_INLINE static void ImtCoreInitQmlColorResources()
-{
-	Q_INIT_RESOURCE(imtcolorLabSdl);
-	Q_INIT_RESOURCE(imtcolorRgbColorHexSdl);
-}
-
-
-Q_ALWAYS_INLINE static void ImtCoreInitQml2dResources()
+Q_ALWAYS_INLINE static void ImtCoreInitQmlPaintResources()
 {
 	Q_INIT_RESOURCE(imt2dGeometrySdl);
 	Q_INIT_RESOURCE(imt2dPaintPrimitivesSdl);
 	Q_INIT_RESOURCE(imt2dPaintSystemSdl);
+
+	Q_INIT_RESOURCE(imtcolorLabSdl);
+	Q_INIT_RESOURCE(imtcolorRgbColorHexSdl);
 }
 
 
@@ -83,14 +79,4 @@ Q_ALWAYS_INLINE static void ImtCoreInitQmlCoreControlsResources()
 	Q_INIT_RESOURCE(imtdocguiqml);
 
 	Q_INIT_RESOURCE(imtguigqlqml);
-}
-
-
-Q_ALWAYS_INLINE static void ImtCoreInitQmlResources()
-{
-	ImtCoreInitQmlApplicationCoreResources();
-	ImtCoreInitQmlDocumentManagementResources();
-	ImtCoreInitQmlColorResources();
-	ImtCoreInitQml2dResources();
-	ImtCoreInitQmlCoreControlsResources();
 }

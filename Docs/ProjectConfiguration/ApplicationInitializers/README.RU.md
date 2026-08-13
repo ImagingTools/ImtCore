@@ -30,7 +30,6 @@
   - `ImtCoreInitQmlColorResources()`
   - `ImtCoreInitQml2dResources()`
   - `ImtCoreInitQmlCoreControlsResources()`
-  - `ImtCoreInitQmlResources()`
   - `ImtCoreInitAuthQmlResources()`
   - `ImtCoreInitTenantQmlResources()`
   - `ImtCoreInitLicQmlResources()`
@@ -39,7 +38,6 @@
 - UI-функции не должны инициализировать SDL или QML ресурсы.
 - SDL-ресурсы инициализируются только QML функциями.
 - QML-ресурсы инициализируются только QML функциями.
-- `ImtCoreInitQmlResources()` является агрегатором групп base QML (application core, collection, document management, color, 2d и core controls).
 - `ImtCoreInitAuthQmlResources()` инициализирует auth QML-ресурсы и транзитивно включает tenant QML-ресурсы.
 
 ## 4. Макро-профили
