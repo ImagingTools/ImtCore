@@ -24,11 +24,9 @@ Important:
   - `ImtCoreInitAuthStyleResources()`
   - `ImtCoreInitLicStyleResources()`
 - QML functions:
-  - `ImtCoreInitBaseQmlSdlResources()`
   - `ImtCoreInitQmlResources()`
-  - `ImtCoreInitAuthQmlSdlResources()`
   - `ImtCoreInitAuthQmlResources()`
-  - `ImtCoreInitTenantQmlSdlResources()`
+  - `ImtCoreInitTenantQmlResources()`
   - `ImtCoreInitLicQmlResources()`
 
 Rule:
@@ -63,5 +61,5 @@ For client applications, compose startup in a product initializer by calling onl
 
 For product applications:
 - Define a dedicated product initializer and call only the required domain initializers/resources.
-- For auth, use `ImtCoreInitAuthSqlResources()`, `ImtCoreInitAuthStyleResources()`, `ImtCoreInitAuthQmlSdlResources()`, `ImtCoreInitAuthQmlResources()`, and `ImtCoreInitTenantQmlSdlResources()` when needed.
+- For auth, use `ImtCoreInitAuthSqlResources()`, `ImtCoreInitAuthStyleResources()`, `ImtCoreInitAuthQmlResources()`, and `ImtCoreInitTenantQmlResources()` when needed.
 - For client UI startup, combine base/auth/desk/lic helpers explicitly, including QML helpers where QML is required.
