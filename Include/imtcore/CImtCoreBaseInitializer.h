@@ -25,18 +25,6 @@ Q_ALWAYS_INLINE static void ImtCoreInitStyleResources()
 }
 
 
-Q_ALWAYS_INLINE static void ImtCoreInitQmlApplicationCoreResources()
-{
-	Q_INIT_RESOURCE(imtappApplicationSdl);
-	Q_INIT_RESOURCE(imtbaseCommandsSdl);
-	Q_INIT_RESOURCE(imtbaseImtBaseTypesSdl);
-	Q_INIT_RESOURCE(imtbaseFileSystemSdl);
-	Q_INIT_RESOURCE(imtbaseProgressManagerSdl);
-	Q_INIT_RESOURCE(imtbaseSearchSdl);
-	Q_INIT_RESOURCE(imtbaseSettingsSdl);
-}
-
-
 Q_ALWAYS_INLINE static void ImtCoreInitQmlCollectionResources()
 {
 	Q_INIT_RESOURCE(imtcolguiqml);
@@ -73,8 +61,16 @@ Q_ALWAYS_INLINE static void ImtCoreInitQmlPaintResources()
 }
 
 
-Q_ALWAYS_INLINE static void ImtCoreInitQmlCoreControlsResources()
+Q_ALWAYS_INLINE static void ImtCoreInitQmlApplicationCoreResources()
 {
+	Q_INIT_RESOURCE(imtappApplicationSdl);
+	Q_INIT_RESOURCE(imtbaseCommandsSdl);
+	Q_INIT_RESOURCE(imtbaseImtBaseTypesSdl);
+	Q_INIT_RESOURCE(imtbaseFileSystemSdl);
+	Q_INIT_RESOURCE(imtbaseProgressManagerSdl);
+	Q_INIT_RESOURCE(imtbaseSearchSdl);
+	Q_INIT_RESOURCE(imtbaseSettingsSdl);
+
 	Q_INIT_RESOURCE(imtguiqml);
 	Q_INIT_RESOURCE(imtstylecontrolsqml);
 	Q_INIT_RESOURCE(imtcontrolsqml);

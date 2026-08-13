@@ -27,9 +27,8 @@ Important:
   - `ImtCoreInitQmlApplicationCoreResources()`
   - `ImtCoreInitQmlCollectionResources()`
   - `ImtCoreInitQmlDocumentManagementResources()`
-  - `ImtCoreInitQmlColorResources()`
-  - `ImtCoreInitQml2dResources()`
-  - `ImtCoreInitQmlCoreControlsResources()`
+  - `ImtCoreInitQmlPaintResources()`
+  - `ImtCoreInitQmlResources()`
   - `ImtCoreInitAuthQmlResources()`
   - `ImtCoreInitTenantQmlResources()`
   - `ImtCoreInitLicQmlResources()`
@@ -38,6 +37,7 @@ Rule:
 - UI functions must not initialize SDL or QML resources.
 - SDL resources are initialized in QML functions.
 - QML resources are initialized in QML functions.
+- `ImtCoreInitQmlResources()` aggregates base QML resources transitively.
 - `ImtCoreInitAuthQmlResources()` initializes auth QML resources and includes tenant QML resources transitively.
 
 ## 4. Macro Profiles
