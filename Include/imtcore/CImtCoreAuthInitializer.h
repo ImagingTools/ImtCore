@@ -46,5 +46,6 @@ Q_ALWAYS_INLINE static void ImtCoreInitAuthQmlResources()
 	Q_INIT_RESOURCE(imtauthRoleCollectionDocumentServiceSdl);
 	Q_INIT_RESOURCE(imtauthGroupCollectionDocumentServiceSdl);
 	Q_INIT_RESOURCE(imtauthUserCollectionDocumentServiceSdl);
+
 	ImtCoreInitTenantQmlResources();
 }
