@@ -20,6 +20,9 @@ CollectionView {
 	property var additionalFieldIds: ["id", "name"]
 	property var requestedFields: []
 
+	// Context for requests, placed in the headers  
+	property string context: ""
+
 	property alias subscriptionCommandId: collectionChangeListener.gqlCommandId
 
 	signal removed(string objectId)
@@ -63,7 +66,10 @@ CollectionView {
 	}
 
 	function getHeaders(){
-		return {}
+		let headers = {}
+		if (root.context && root.context != "")
+			headers["context"] = root.context
+		return headers
 	}
 
 	dataControllerComp: Component {
