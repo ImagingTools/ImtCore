@@ -194,10 +194,8 @@ Rectangle {
 		menuPanel.hintY = y;
 	}
 
-	function hideHint(text){
-		if (menuPanel.hintText === text){
-			menuPanel.hintText = "";
-		}
+	function hideHint(){
+		menuPanel.hintText = "";
 	}
 
 	onModelChanged: {
@@ -351,10 +349,10 @@ Rectangle {
 			id: allPagesFlick;
 
 			anchors.top: parent.top;
-			anchors.topMargin: Style.marginS;
+			anchors.topMargin: Style.marginM;
 			anchors.left: parent.left;
 			anchors.right: parent.right;
-			anchors.bottom: collapseRow.visible ? collapseRow.top : parent.bottom;
+			anchors.bottom: parent.bottom;
 
 			boundsBehavior: Flickable.StopAtBounds;
 			flickableDirection: Flickable.VerticalFlick;
@@ -394,7 +392,7 @@ Rectangle {
 			width: menuPanel.rowWidth;
 
 			anchors.topMargin: Style.menuPanelTopMargin !==undefined ? Style.menuPanelTopMargin :
-																	   !menuPanel.centered ? Style.marginS :
+																	   !menuPanel.centered ? Style.marginM :
 																							 parent.height - bottomAlignmentColumn.height -  height > 0 ? (parent.height - bottomAlignmentColumn.height - height)/2 : 0
 
 			visible: !allPagesFlick.visible;
@@ -427,7 +425,7 @@ Rectangle {
 			id: bottomAlignmentColumn;
 
 			anchors.left: parent.left;
-			anchors.bottom: collapseRow.visible ? collapseRow.top : parent.bottom;
+			anchors.bottom: parent.bottom;
 
 			width: menuPanel.rowWidth;
 
@@ -460,60 +458,37 @@ Rectangle {
 		Item{
 			id: collapseRow
 
-			anchors.bottom: parent.bottom
-			anchors.left: parent.left
+			anchors.top: parent.top
+			anchors.right: parent.right
 
-			width: menuPanel.rowWidth;
-			height: visible ? menuPanel.rowHeight : 0
+			width: collapseMarker.width
+			height: collapseMarker.height
 
 			visible: Style.enableMenuPanelCollapse
-
 
 			Rectangle {
 				id: collapseMarker
 
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginS
-				anchors.top: parent.top
-				anchors.bottom: parent.bottom
+				width: Style.buttonWidthS - Style.marginXXXS
+				height: width
 
-				width: (!menuPanel ? parent.width : menuPanel.width) - 2 * Style.marginS
-
-				radius: Style.buttonRadius
-				color: menuButtonArea.containsMouse ? Style.backgroundColor2 : "transparent"
+				radius: 1
+				color:"transparent"
 			}
 
 			Image{
 				id: collapseIcon
 
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginL
-				anchors.verticalCenter: parent.verticalCenter
-
-				width: Style.iconSizeS
+				width: collapseMarker.width
 				height: width
 
 				sourceSize.width: width
 				sourceSize.height: height
 
-				source: menuPanel.collapsed ? "qrc:/" + Style.getIconPath("Icons/SidebarExpand", Icon.State.Off, Icon.Mode.Disabled)
-											: "qrc:/" + Style.getIconPath("Icons/SidebarCollapse", Icon.State.Off, Icon.Mode.Disabled)
+				source: menuPanel.collapsed ? "qrc:/" + Style.getIconPath("Icons/Expand", Icon.State.Off, Icon.Mode.Disabled)
+											: "qrc:/" + Style.getIconPath("Icons/Collapse", Icon.State.Off, Icon.Mode.Disabled)
 
 				opacity: menuButtonArea.containsMouse ? 1.0 : Style.opacityHigh
-			}
-
-			BaseText {
-				anchors.left: collapseIcon.right
-				anchors.leftMargin: Style.marginM
-				anchors.right: parent.right
-				anchors.rightMargin: Style.marginL
-				anchors.verticalCenter: parent.verticalCenter
-
-				visible: !menuPanel.collapsed
-				text: qsTr("Collapse")
-				font.pixelSize: Style.fontSizeM
-				color: Style.inactiveTextColor
-				elide: Text.ElideRight
 			}
 
 			MouseArea {
@@ -534,12 +509,16 @@ Rectangle {
 				}
 
 				onContainsMouseChanged: {
-					if (menuButtonArea.containsMouse && menuPanel.collapsed){
+					if(!menuButtonArea.containsMouse){
+						menuPanel.hideHint();
+					}
+					else if (menuPanel.collapsed){
 						menuPanel.showHint(qsTr("Expand menu"),
 							collapseIcon.mapToItem(menuPanel, 0, collapseIcon.height / 2).y);
 					}
-					else{
-						menuPanel.hideHint(qsTr("Expand menu"));
+					else if(!menuPanel.collapsed){
+						menuPanel.showHint(qsTr("Collapss menu"),
+							collapseIcon.mapToItem(menuPanel, 0, collapseIcon.height / 2).y)
 					}
 				}
 			}
@@ -562,11 +541,11 @@ Rectangle {
 		id: hint;
 
 		x: menuPanel.width + hint.slide;
-		y: menuPanel.hintY - height / 2;
+		y: menuPanel.hintY - height / 2 + Style.marginXXXS;
 		z: 100;
 
 		width: hintBody.width + Style.spacingS;
-		height: Style.controlHeightM;
+		height: Style.controlHeightS + Style.marginXXS;
 
 		visible: hint.opacity > 0;
 		opacity: 0;
@@ -581,7 +560,7 @@ Rectangle {
 
 			anchors.verticalCenter: parent.verticalCenter;
 
-			width: Style.marginM;
+			width: Style.marginS;
 			height: width;
 			rotation: 45;
 			color: hintBody.color;
