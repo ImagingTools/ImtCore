@@ -9,6 +9,7 @@ DataModelProvider {
 	property string getCommandId
 	property var responseModel
 	property var inputModel
+	property string context
 	
 	function requestDataModel(paramsObj){
 		root.requestStarted(paramsObj)
@@ -35,7 +36,11 @@ DataModelProvider {
 		
 		query.AddParam(inputObject)
 		
-		gqlRequest.setGqlQuery(query.GetQuery(), root.getHeaders())
+		let headers = root.getHeaders()
+		if (headers && root.context && root.context != "")
+			headers["context"] = root.context
+
+		gqlRequest.setGqlQuery(query.GetQuery(), headers)
 	}
 
 	function prepareInputModel(paramsObj){

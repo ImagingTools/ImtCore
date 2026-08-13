@@ -43,6 +43,7 @@ GqlModel {
 
     property string gqlCommandId;
     property int requestType: 0; // 0 - Query, 1 - Mutation, 2 - Subscription
+    property string context
 
     function onResult(data){}
 
@@ -90,7 +91,11 @@ GqlModel {
         var query = Gql.GqlRequest(type, root.gqlCommandId);
         createQueryParams(query, params);
 
-        root.setGqlQuery(query.GetQuery(), root.getHeaders());
+        let headers = root.getHeaders()
+		if (headers && root.context && root.context != "")
+			headers["context"] = root.context
+
+		root.setGqlQuery(query.GetQuery(), headers)
     }
 
     function createQueryParams(query, params){}

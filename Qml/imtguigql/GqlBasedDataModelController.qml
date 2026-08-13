@@ -9,6 +9,7 @@ DataModelController {
 	property string gqlCommandId
 	property var responseModel
 	property var inputModel
+	property string context
 
 	function saveDataModel(params, documentId, documentName, documentDescription, documentTypeId){
 		root.requestStarted(params)
@@ -34,7 +35,11 @@ DataModelController {
 
 		query.AddParam(inputObject)
 
-		gqlRequest.setGqlQuery(query.GetQuery(), root.getHeaders())
+		let headers = root.getHeaders()
+		if (headers && root.context && root.context != "")
+			headers["context"] = root.context
+
+		gqlRequest.setGqlQuery(query.GetQuery(), headers)
 	}
 
 	function prepareInputModel(params, documentId, documentName, documentDescription){

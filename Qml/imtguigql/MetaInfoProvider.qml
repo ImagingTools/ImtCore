@@ -9,6 +9,7 @@ Item {
     id: container;
 
     property string getMetaInfoGqlCommand;
+    property string context;
 
     property TreeItemModel metaInfoModel: TreeItemModel {}
 
@@ -42,7 +43,11 @@ Item {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            this.setGqlQuery(gqlData, container.getHeaders());
+            let headers = container.getHeaders()
+			if (headers && container.context && container.context != "")
+				headers["context"] = container.context
+
+            this.setGqlQuery(gqlData, headers);
         }
 
         onStateChanged: {

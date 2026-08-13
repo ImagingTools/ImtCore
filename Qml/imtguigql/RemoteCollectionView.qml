@@ -65,14 +65,8 @@ CollectionView {
 		}
 	}
 
-	function fillContext(headers){
-		if (headers && root.context && root.context != "")
-			headers["context"] = root.context
-	}
-
 	function getHeaders(){
 		let headers = {}
-		fillContext(headers)
 
 		return headers
 	}
@@ -82,6 +76,7 @@ CollectionView {
 			collectionId: root.collectionId;
 			gqlGetListCommandId: root.gqlGetListCommandId
 			requestedFields: root.requestedFields
+			context: root.context
 
 			additionalFieldIds: root.additionalFieldIds;
 
