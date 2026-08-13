@@ -74,7 +74,7 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 		return QByteArray();
 	}
 
-	{
+	if (m_connectionStatusProviderCompPtr->GetConnectionStatus() == imtcom::IConnectionStatusProvider::CS_CONNECTED){
 		QMutexLocker registeredLocker(&m_registeredClientsMutex);
 		if (m_registeredClients.contains(subscriptionId)){
 			m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_REGISTERED;
