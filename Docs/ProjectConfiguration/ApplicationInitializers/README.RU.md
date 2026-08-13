@@ -18,7 +18,7 @@
 - Core/non-UI функции:
   - `ImtCoreInitBaseResources()`
   - `ImtCoreInitAuthSqlResources()`
-  - `ImtCoreInitDeskResources()`
+  - `ImtCoreInitDeskSqlResources()`
 - UI функции (не-QML):
   - `ImtCoreInitStyleResources()`
   - `ImtCoreInitAuthStyleResources()`
