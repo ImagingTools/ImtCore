@@ -13,5 +13,3 @@ enum VersionId
 
 
 } // namespace imtcore
-
-
