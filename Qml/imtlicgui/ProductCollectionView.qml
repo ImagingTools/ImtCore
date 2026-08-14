@@ -12,6 +12,7 @@ import imtlicProductsSdl 1.0
 RemoteCollectionView {
 	id: productCollectionViewContainer;
 	
+	property string context: ""
 	visibleMetaInfo: false;
 	
 	collectionId: "Products";
@@ -53,6 +54,7 @@ RemoteCollectionView {
 		id: dataControllerComp;
 		
 		GqlRequestDocumentDataController {
+			context: productCollectionViewContainer.context
 			id: requestDocumentDataController
 			
 			property ProductData productData: documentModel

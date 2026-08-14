@@ -26,6 +26,7 @@ import imtdeskImtDeskSdl 1.0
 FilterableSelectDataProvider {
 	id: root
 
+	property string context: ""
 	property string entityType: ""
 	property string entityId: ""
 	readonly property bool hasEntityContext: root.entityType !== "" && root.entityId !== ""
@@ -57,6 +58,7 @@ FilterableSelectDataProvider {
 	property EntityContextTicketsInput __input: EntityContextTicketsInput {}
 
 	property GqlSdlRequestSender __request: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtdeskImtDeskSdlCommandIds.s_entityContextTickets
 
 		sdlObjectComp: Component {
