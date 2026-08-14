@@ -17,6 +17,7 @@ import imtappApplicationSdl 1.0
 QtObject {
 	id: root;
 
+	property string context: ""
 	property ApplicationInfo serverApplicationInfo: null;
 	property int webSocketPort: -1;
 	property string userMode: "";
@@ -52,6 +53,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender request : GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtappApplicationSdlCommandIds.s_getApplicationInfo;
 		sdlObjectComp: Component { ApplicationInfo {
 			} }

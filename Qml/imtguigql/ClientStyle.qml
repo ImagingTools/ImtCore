@@ -8,6 +8,7 @@ import imtbaseSettingsSdl 1.0
 StyleBase {
 	id: styleContainer;
 	
+	property string context: ""
 	function getDesignScheme(theme){
 		getStyleDataInput.m_schemeId = theme
 		getStyleRequest.send(getStyleDataInput)
@@ -22,6 +23,7 @@ StyleBase {
 	}
 	
 	GqlSdlRequestSender {
+		context: styleContainer.context
 		id: getStyleRequest
 		gqlCommandId: ImtbaseSettingsSdlCommandIds.s_getStyleData
 		

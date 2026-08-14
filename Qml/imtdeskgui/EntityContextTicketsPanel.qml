@@ -25,6 +25,7 @@ import imtdeskImtDeskSdl 1.0
 Item {
 	id: root
 
+	property string context: ""
 	property string entityType: ""
 	property string entityId: ""
 	property string entityDisplayName: ""
@@ -568,6 +569,7 @@ Item {
 	}
 
 	GqlSdlRequestSender {
+		context: root.context
 		id: createTicketRequest
 		gqlCommandId: ImtdeskImtDeskSdlCommandIds.s_createEntityContextTicket
 		requestType: 1

@@ -25,6 +25,7 @@ import imtbaseImtBaseTypesSdl 1.0
 FilterableSelectDataProvider {
 	id: root
 
+	property string context: ""
 	function getHeaders(){
 		return {}
 	}
@@ -121,6 +122,7 @@ FilterableSelectDataProvider {
 	}
 
 	property GqlSdlRequestSender getSelectableItemsRequest: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtbaseFilterableSelectSdlCommandIds.s_getSelectableItems
 		sdlObjectComp: Component {
 			GetSelectableItemsPayload {

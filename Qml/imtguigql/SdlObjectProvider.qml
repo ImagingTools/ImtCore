@@ -4,7 +4,12 @@ import com.imtcore.imtqml 1.0
 import imtguigql 1.0
 
 QtObject {
+    id: root
+
+    property string context: ""
+
     GqlSdlRequestSender {
+        context: root.context
     }
 }
 

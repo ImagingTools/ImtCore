@@ -9,6 +9,7 @@ import imtbaseSearchSdl 1.0
 Item {
 	id: root;
 
+	property string context: ""
 	property string currentText: ""
 	property int pageSize: 30
 	property var categories: null   // groups metadata from discovery (id, name, totalCount). items empty except possibly first group.
@@ -242,6 +243,7 @@ Item {
 	}
 	
 	GqlSdlRequestSender {
+		context: root.context
 		id: searchRequestSender;
 		gqlCommandId: ImtbaseSearchSdlCommandIds.s_search;
 		
