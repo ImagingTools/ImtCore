@@ -271,6 +271,10 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${INCLUDE_DIR}/imt2d/Test/CMake" "${AUX_INCLUDE_DIR}/imt2d/Test")
 	endif()
 
+	if(NOT DEFINED USE_QTDB OR USE_QTDB)
+		add_subdirectory("${INCLUDE_DIR}/imtservice/CMake" "${AUX_INCLUDE_DIR}/imtservice")
+	endif()
+
 	#-------- Qml --------
 	if(NOT DEFINED USE_QTQML OR USE_QTQML)
 		# TODO return it when new wrappers will be finished
@@ -305,7 +309,6 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${QML_DIR}/imtgui/CMake"			"${AUX_INCLUDE_DIR}/imtguiqml")
 		add_subdirectory("${QML_DIR}/imtguigql/CMake"		"${AUX_INCLUDE_DIR}/imtguigqlqml")
 		add_subdirectory("${QML_DIR}/imtlicgui/CMake"		"${AUX_INCLUDE_DIR}/imtlicguiqml")
-		add_subdirectory("${INCLUDE_DIR}/imtservice/CMake"	"${AUX_INCLUDE_DIR}/imtservice")
 	endif()
 
 	#-------- Packages --------
