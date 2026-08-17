@@ -349,7 +349,7 @@ Rectangle {
 			id: allPagesFlick;
 
 			anchors.top: parent.top;
-			anchors.topMargin: Style.marginM;
+			anchors.topMargin: Style.marginXL + Style.marginXXXS;
 			anchors.left: parent.left;
 			anchors.right: parent.right;
 			anchors.bottom: parent.bottom;
@@ -392,7 +392,7 @@ Rectangle {
 			width: menuPanel.rowWidth;
 
 			anchors.topMargin: Style.menuPanelTopMargin !==undefined ? Style.menuPanelTopMargin :
-																	   !menuPanel.centered ? Style.marginM :
+																	   !menuPanel.centered ? Style.marginXL + Style.marginXXXS:
 																							 parent.height - bottomAlignmentColumn.height -  height > 0 ? (parent.height - bottomAlignmentColumn.height - height)/2 : 0
 
 			visible: !allPagesFlick.visible;
@@ -456,73 +456,94 @@ Rectangle {
 		}
 
 		Item{
-			id: collapseRow
-
-			anchors.top: parent.top
-			anchors.right: parent.right
-
-			width: collapseMarker.width
-			height: collapseMarker.height
-
-			visible: Style.enableMenuPanelCollapse
-
-			Rectangle {
-				id: collapseMarker
-
-				width: Style.buttonWidthS - Style.marginXXXS
-				height: width
-
-				radius: 1
-				color:"transparent"
+			id: controlPanel
+			width: parent.width
+			height: Style.controlHeightS
+			Rectangle{
+				anchors.fill: parent
+				color: Style.backgroundColor2
+				opacity: 0.7
 			}
 
-			Image{
-				id: collapseIcon
+			Rectangle{
+				anchors.bottom: parent.bottom
+				width: parent.width
+				height: 1
+
+				color: Style.backgroundColor
+
+			}
+			Item{
+				id: collapseRow
+
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginXXXS
 
 				width: collapseMarker.width
-				height: width
+				height: collapseMarker.height
 
-				sourceSize.width: width
-				sourceSize.height: height
+				visible: Style.enableMenuPanelCollapse
 
-				source: menuPanel.collapsed ? "qrc:/" + Style.getIconPath("Icons/Expand", Icon.State.Off, Icon.Mode.Disabled)
-											: "qrc:/" + Style.getIconPath("Icons/Collapse", Icon.State.Off, Icon.Mode.Disabled)
+				Rectangle {
+					id: collapseMarker
 
-				opacity: menuButtonArea.containsMouse ? 1.0 : Style.opacityHigh
-			}
+					width: Style.buttonWidthS - Style.marginXXS
+					height: width
 
-			MouseArea {
-				id: menuButtonArea;
-
-				anchors.fill: collapseMarker;
-
-				hoverEnabled: true;
-				cursorShape: Qt.PointingHandCursor;
-
-				onClicked: {
-					if(!menuPanel.collapsed){
-						Events.sendEvent("CollapseMenu", true)
-					}
-					else {
-						Events.sendEvent("ExpandMenu", false)
-					}
+					radius: 1
+					color:"transparent"
 				}
 
-				onContainsMouseChanged: {
-					if(!menuButtonArea.containsMouse){
-						menuPanel.hideHint();
+				Image{
+					id: collapseIcon
+
+					width: collapseMarker.width
+					height: width
+
+					sourceSize.width: width
+					sourceSize.height: height
+
+					source: menuPanel.collapsed ? "qrc:/" + Style.getIconPath("Icons/Expand", Icon.State.Off, Icon.Mode.Disabled)
+												: "qrc:/" + Style.getIconPath("Icons/Collapse", Icon.State.Off, Icon.Mode.Disabled)
+
+					opacity: menuButtonArea.containsMouse ? 1.0 : Style.opacityHigh
+				}
+
+				MouseArea {
+					id: menuButtonArea;
+
+					anchors.fill: collapseMarker;
+
+					hoverEnabled: true;
+					cursorShape: Qt.PointingHandCursor;
+
+					onClicked: {
+						if(!menuPanel.collapsed){
+							Events.sendEvent("CollapseMenu", true)
+						}
+						else {
+							Events.sendEvent("ExpandMenu", false)
+						}
 					}
-					else if (menuPanel.collapsed){
-						menuPanel.showHint(qsTr("Expand menu"),
-							collapseIcon.mapToItem(menuPanel, 0, collapseIcon.height / 2).y);
-					}
-					else if(!menuPanel.collapsed){
-						menuPanel.showHint(qsTr("Collapss menu"),
-							collapseIcon.mapToItem(menuPanel, 0, collapseIcon.height / 2).y)
+
+					onContainsMouseChanged: {
+						if(!menuButtonArea.containsMouse){
+							menuPanel.hideHint();
+						}
+						else if (menuPanel.collapsed){
+							menuPanel.showHint(qsTr("Expand menu"),
+								collapseIcon.mapToItem(menuPanel, 0, collapseIcon.height / 2).y);
+						}
+						else if(!menuPanel.collapsed){
+							menuPanel.showHint(qsTr("Collapse menu"),
+								collapseIcon.mapToItem(menuPanel, 0, collapseIcon.height / 2).y)
+						}
 					}
 				}
 			}
 		}
+
 	}
 
 	Rectangle {
@@ -541,7 +562,7 @@ Rectangle {
 		id: hint;
 
 		x: menuPanel.width + hint.slide;
-		y: menuPanel.hintY - height / 2 + Style.marginXXXS;
+		y: menuPanel.hintY - height / 2 + Style.marginXXS;
 		z: 100;
 
 		width: hintBody.width + Style.spacingS;
