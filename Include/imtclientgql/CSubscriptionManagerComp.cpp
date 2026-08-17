@@ -75,11 +75,14 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 	}
 
 	if (m_connectionStatusProviderCompPtr->GetConnectionStatus() == imtcom::IConnectionStatusProvider::CS_CONNECTED){
-		QMutexLocker registeredLocker(&m_registeredClientsMutex);
-		if (m_registeredClients.contains(subscriptionId)){
-			m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_REGISTERED;
-			UpdateCustomerSubscriptionStatuses(subscriptionId);
+		{
+			QMutexLocker registeredLocker(&m_registeredClientsMutex);
+			if (m_registeredClients.contains(subscriptionId)){
+				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_REGISTERED;
+			}
 		}
+
+		UpdateCustomerSubscriptionStatuses(subscriptionId);
 	}
 
 	return subscriptionId;
@@ -116,8 +119,9 @@ void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& chan
 	QMutexLocker locker(&m_registeredClientsMutex);
 
 	QByteArray clientId = changeSet.GetChangeInfo("ClientId").toByteArray();
+	QByteArrayList subscriptionIds = m_registeredClients.keys();
 
-	for (const QByteArray& subscriptionId : m_registeredClients.keys()){
+	for (const QByteArray& subscriptionId : subscriptionIds){
 		if (changeSet.Contains(imtcom::IConnectionStatusProvider::CF_CONNECTED)){
 			if (m_registeredClients[subscriptionId].m_clientId == clientId){
 				SubscriptionRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
@@ -129,7 +133,11 @@ void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& chan
 				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_IN_REGISTRATION;
 			}
 		}
+	}
 
+	locker.unlock();
+
+	for (const QByteArray& subscriptionId : subscriptionIds){
 		UpdateCustomerSubscriptionStatuses(subscriptionId);
 	}
 }
@@ -504,11 +512,18 @@ void CSubscriptionManagerComp::OnComponentCreated()
 
 void CSubscriptionManagerComp::UpdateCustomerSubscriptionStatuses(const QByteArray& subscriptionId, const QString& message) const
 {
-	if (m_registeredClients.contains(subscriptionId)){
-		for (IGqlSubscriptionClient* subscriptionClientPtr : m_registeredClients[subscriptionId].m_clients){
-			if (subscriptionClientPtr != nullptr){
-				subscriptionClientPtr->OnSubscriptionStatusChanged(subscriptionId, m_registeredClients[subscriptionId].m_status, message);
-			}
+	QList<IGqlSubscriptionClient*> clients;
+
+	{
+		QMutexLocker lock(&m_pendingAsyncMutex);
+		if (m_registeredClients.contains(subscriptionId)){
+			clients = m_registeredClients[subscriptionId].m_clients;
+		}
+	}
+
+	for (IGqlSubscriptionClient* subscriptionClientPtr : clients){
+		if (subscriptionClientPtr != nullptr){
+			subscriptionClientPtr->OnSubscriptionStatusChanged(subscriptionId, m_registeredClients[subscriptionId].m_status, message);
 		}
 	}
 }
