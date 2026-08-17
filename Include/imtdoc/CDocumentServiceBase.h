@@ -164,7 +164,7 @@ protected:
 
 	bool ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const;
 	int GetUndoManagerNextModelId(const QByteArray& userId);
-	void InitializeDocumentObservers(WorkingDocument& document, const QByteArray& userId);
+	void InitializeDocumentObservers(WorkingDocument& document, const QByteArray& userId, const QByteArray& documentId);
 	WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId);
 	const WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId) const;
 	bool FindDocument(int undoManagerModelId, QByteArray& outUserId, QByteArray& outDocumentId);
@@ -223,6 +223,7 @@ protected:
 		idoc::IUndoManagerSharedPtr undoManagerPtr;///< Associated undo/redo manager.
 		bool isDirty;                              ///< \c true when there are unsaved changes.
 		bool isLoading = false;                    ///< \c true while the background load is in progress.
+		bool singleDocumentInstance = false;       ///< \c true when the document was opened with \c TaskParams::singleDocumentInstance.
 		int undoManagerModelId = -1;               ///< Model registration ID in \c UndoManagerObserver.
 	};
 
@@ -300,5 +301,3 @@ protected:
 
 
 } // namespace imtdoc
-
-

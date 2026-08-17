@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6500" Description="ACF"/>
-            <Version Id="1" Number="2438" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="6560" Description="ACF"/>
+            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="396033" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -284,6 +284,27 @@
         <EmbeddedRegistry Id="ContactInfoDocCollectionManager">
             <Data Description="" Keywords="">
                 <ElementsList>
+                    <Element Id="AutoPersistence" PackageId="FilePck" ComponentId="AutoPersistence">
+                        <Data IsEnabled="true" Flags="1">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="FileLoader" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="JsonFileSerializer"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="FilePath" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="FileNameParam"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Object" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="CollectionDocumentService"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="StoreOnChange" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="StoreOnEnd" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
                     <Element Id="CollectionDocumentService" PackageId="ImtDocPck" ComponentId="CollectionDocumentService">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
@@ -318,7 +339,7 @@
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="UndoManager" Type="Factory" ExportId="">
-                                    <Data IsEnabled="true" Value="SerializedUndoManager"/>
+                                    <Data IsEnabled="true" Value="FileBasedUndoManager"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -361,9 +382,62 @@
                             <AttributeInfoMap/>
                         </Data>
                     </Element>
-                    <Element Id="SerializedUndoManager" PackageId="BasePck" ComponentId="SerializedUndoManager">
+                    <Element Id="FileBasedUndoManager" PackageId="ImtServerVoce" ComponentId="FileBasedUndoManager">
                         <Data IsEnabled="true" Flags="2">
-                            <AttributeInfoMap/>
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RootFolder" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="FileNameParam_2"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="FileNameParam" PackageId="FilePck" ComponentId="FileNameParam">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
+                                    <Data IsEnabled="true" Value="w:\CollectionDM.json"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="PathType" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="1"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="FileNameParam_2" PackageId="FilePck" ComponentId="FileNameParam">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
+                                    <Data IsEnabled="true" Value="w:\_UndoManagers"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="PathType" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="2"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="JsonFileSerializer" PackageId="FilePck" ComponentId="JsonFileSerializer">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="AutoCreatePath" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="FileExtensions" Type="String[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>json</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
                         </Data>
                     </Element>
                 </ElementsList>
@@ -373,7 +447,9 @@
                     <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="CollectionDocumentServiceController"/>
                     <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="CollectionDocumentServicePublisher"/>
                 </ExportedInterfaces>
-                <ExportedComponents/>
+                <ExportedComponents>
+                    <Component ExportedId="AutoPersistence" ComponentId="AutoPersistence"/>
+                </ExportedComponents>
             </Data>
         </EmbeddedRegistry>
         <EmbeddedRegistry Id="Migrations">
@@ -518,6 +594,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="HttpServerFramework"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="AutoPersistence" ComponentId="ContactInfoDocCollectionManager/AutoPersistence"/>
         <Component ExportedId="DatabaseEngine" ComponentId="DatabaseEngine"/>
         <Component ExportedId="HttpServerFramework" ComponentId="HttpServerFramework"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>

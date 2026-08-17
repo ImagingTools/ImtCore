@@ -12,7 +12,7 @@ import controlsgalleryContactInfoCollectionDocumentServiceSdl 1.0
 import imtbaseCollectionDocumentServiceSdl 1.0
 import imtbaseUndoManagerSdl 1.0
 
-ViewBase {
+DocumentViewBase {
 	id: root
 	
 	anchors.fill: parent

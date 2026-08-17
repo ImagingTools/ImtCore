@@ -4,6 +4,9 @@
 
 // Qt includes
 #include <QtCore/QJsonDocument>
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
+#include <QtCore/QTimer>
 
 // ImtCore includes
 #include <imtdoc/IDocumentService.h>
@@ -28,7 +31,13 @@ public:
 	I_BEGIN_COMPONENT(CCollectionDocumentServicePublisherComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler)
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID", true, "DummyCollection");
+		I_ASSIGN(m_documentServiceCompPtr, "DocumentService", "Document service used to close documents without active subscribers", false, "DocumentService");
+		I_ASSIGN(m_closeDocumentTimeoutAttrPtr, "CloseDocumentTimeout", "Time (in ms) an open document may stay without an active OnSingleDocumentChanged subscriber before it is closed", true, 30000);
 	I_END_COMPONENT;
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 protected:
 	// reimplemented (imtgql::IGqlSubscriberController)
@@ -57,7 +66,26 @@ protected:
 		sdl::V1_0::imtbase::EDocumentOperation operation,
 		sdl::V1_0::imtbase::CDocumentServiceNotification& sdlNotification) const;
 	QByteArray ConvertUrlToObjectId(const QUrl& url) const;
-	QByteArray GetCommandId() const;
+
+	/**
+		Start tracking an open document instance so that it can be closed when it
+		has no active OnSingleDocumentChanged subscriber for CloseDocumentTimeout.
+	*/
+	void TrackDocument(const QByteArray& userId, const QByteArray& documentId) const;
+	/**
+		Stop tracking a document instance (e.g.\ once it has been closed).
+	*/
+	void UntrackDocument(const QByteArray& documentId) const;
+	/**
+		Return \c true when at least one registered subscriber listens to the
+		OnSingleDocumentChanged command of this collection for the given \a documentId.
+	*/
+	bool HasActiveSingleDocumentChangedSubscriber(const QByteArray& documentId) const;
+	/**
+		Close every tracked document whose grace period without an active
+		OnSingleDocumentChanged subscriber has elapsed.
+	*/
+	void CloseIdleDocuments();
 
 	template<class Representation>
 	void PublishRepresentation(
@@ -66,7 +94,20 @@ protected:
 		const Representation& representation) const;
 
 private:
+	I_REF(imtdoc::IDocumentService, m_documentServiceCompPtr);
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
+	I_ATTR(int, m_closeDocumentTimeoutAttrPtr);
+
+private:
+	struct TrackedDocument
+	{
+		QByteArray userId;
+		qint64 lastSubscriberSeenMs = 0; ///< Monotonic timestamp of the last moment an active subscriber was observed.
+	};
+
+	mutable QMutex m_trackedDocumentsMutex;
+	mutable QMap<QByteArray, TrackedDocument> m_trackedDocuments; // documentId -> tracking info
+	QTimer m_closeIdleDocumentsTimer; ///< Periodically closes tracked documents without active subscribers.
 };
 
 
@@ -111,5 +152,4 @@ void CCollectionDocumentServicePublisherComp::PublishRepresentation(
 
 
 } // namespace imtservergql
-
 

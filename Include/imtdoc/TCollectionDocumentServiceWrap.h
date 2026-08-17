@@ -11,6 +11,7 @@
 
 // ACF includes
 #include <istd/CChangeGroup.h>
+#include <istd/CChangeNotifier.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
@@ -114,6 +115,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoCreateNewDocument(
 			const QByteArray& taskId,
 			const TaskParams& params)
 {
+	istd::CChangeNotifier notifier(this);
 	QMutexLocker locker(&this->m_mutex);
 
 	// Delegate to base class which handles UUID generation, events, and
@@ -145,6 +147,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 			const QByteArray& taskId,
 			const TaskParams& params)
 {
+	istd::CChangeNotifier notifier(this);
+
 	const QUrl& url = params.url;
 	const QByteArray& userId = params.userId;
 
@@ -162,6 +166,35 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	}
 
 	QByteArray objectId = parts.first().toUtf8();
+
+	// Single-instance constraints (per user/object):
+	// - opening in single-instance mode is forbidden when the object is already open;
+	// - opening without single-instance mode is forbidden when the object is already
+	//   open in single-instance mode.
+	{
+		QMutexLocker locker(&this->m_mutex);
+		auto userDocsIt = this->m_userDocuments.constFind(userId);
+		if (userDocsIt != this->m_userDocuments.constEnd()){
+			const WorkingDocumentList& userDocuments = userDocsIt.value();
+			for (auto it = userDocuments.constBegin(); it != userDocuments.constEnd(); ++it){
+				if (it.value().objectId != objectId){
+					continue;
+				}
+
+				if (params.singleDocumentInstance){
+					locker.unlock();
+					this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Document is already open")});
+					return;
+				}
+
+				if (it.value().singleDocumentInstance){
+					locker.unlock();
+					this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Document is already open in single-instance mode")});
+					return;
+				}
+			}
+		}
+	}
 
 	imtbase::IObjectCollection* collectionPtr = GetCollection();
 	if (collectionPtr == nullptr){
@@ -216,6 +249,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 					doc.undoManagerPtr = shared.undoManagerPtr;
 					doc.isDirty = docIsDirty;
 					doc.isLoading = shared.isLoading;
+					doc.singleDocumentInstance = params.singleDocumentInstance;
 					doc.undoManagerModelId = -1;
 				}
 			}
@@ -259,7 +293,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		}
 	}
 
-	idoc::IUndoManagerSharedPtr undoManagerPtr = this->CreateUndoManager();
+	idoc::IUndoManagerSharedPtr undoManagerPtr;
+	undoManagerPtr.FromUnique(std::move(this->CreateUndoManager()));
 	if (!undoManagerPtr.IsValid()){
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Failed to create undo manager")});
 		return;
@@ -279,6 +314,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		doc.undoManagerPtr = undoManagerPtr;
 		doc.isDirty = false;
 		doc.isLoading = true;
+		doc.singleDocumentInstance = params.singleDocumentInstance;
 
 		if (this->IsSingleCopyMode()){
 			SharedDocumentData& shared = this->m_sharedDocuments[objectId];
@@ -325,6 +361,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		if (collPtr == nullptr){
 			UserDocumentPairList docsToClose;
 			{
+				istd::CChangeNotifier notifier(this);
 				QMutexLocker locker(&this->m_mutex);
 				if (singleCopyMode && this->m_sharedDocuments.contains(objectId)){
 					this->m_sharedDocuments[objectId].isLoading = false;
@@ -351,6 +388,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		}
 
 		{
+			istd::CChangeNotifier notifier(this);
 			QMutexLocker locker(&this->m_mutex);
 
 			if (singleCopyMode){
@@ -408,6 +446,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		UserDocumentPairList docsToNotify;
 
 		{
+			istd::CChangeNotifier notifier(this);
 			QMutexLocker locker(&this->m_mutex);
 
 			if (singleCopyMode){
@@ -422,7 +461,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 							WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
 							if (dp != nullptr && dp->isLoading){
 								if (!observersInitialized){
-									this->InitializeDocumentObservers(*dp, pair.first);
+									this->InitializeDocumentObservers(*dp, pair.first, pair.second);
 									shared.undoManagerModelId = dp->undoManagerModelId;
 									observersInitialized = true;
 								}
@@ -438,7 +477,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 				WorkingDocument* docPtr = this->FindDocument(userId, documentId);
 
 				if (docPtr != nullptr && docPtr->objectPtr.IsValid() && docPtr->isLoading){
-					this->InitializeDocumentObservers(*docPtr, userId);
+					this->InitializeDocumentObservers(*docPtr, userId, documentId);
 					docsToNotify.append(qMakePair(userId, documentId));
 				}
 			}
@@ -497,6 +536,8 @@ TCollectionDocumentServiceWrap<Base>::SetDocumentName(
 			return IDocumentService::OS_FAILED;
 		}
 	}
+
+	istd::CChangeNotifier notifier(this);
 
 	// Shared docs: rename and notify each user sharing this object
 	if (this->IsSingleCopyMode() && !objectId.isEmpty()){
@@ -673,12 +714,13 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 				if (newObjectPtr.IsValid()){
 					newObjectPtr->CopyFrom(*documentSnapshotPtr);
 				}
-				idoc::IUndoManagerSharedPtr newUndoManagerPtr = this->CreateUndoManager();
+				idoc::IUndoManagerSharedPtr newUndoManagerPtr;
+				newUndoManagerPtr.FromUnique(std::move(this->CreateUndoManager()));
 
 				workingDocumentPtr->objectPtr = newObjectPtr;
 				workingDocumentPtr->undoManagerPtr = newUndoManagerPtr;
 
-				this->InitializeDocumentObservers(*workingDocumentPtr, userId);
+				this->InitializeDocumentObservers(*workingDocumentPtr, userId, documentId);
 			}
 
 			// Prepare notification with expected new state
@@ -686,6 +728,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 	
 			workingDocumentPtr = this->FindDocument(userId, documentId);
 			if (workingDocumentPtr != nullptr){
+				istd::CChangeNotifier notifier(this);
+
 				workingDocumentPtr->objectId = newObjectId;
 				workingDocumentPtr->name = resultDocumentName;
 				workingDocumentPtr->isDirty = false;
@@ -722,6 +766,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 			}
 
 			workingDocumentPtr->undoManagerPtr->StoreDocumentState();
+
+			istd::CChangeNotifier notifier(this);
 
 			if (this->IsSingleCopyMode() && !workingDocumentPtr->objectId.isEmpty()){
 				// Update all users sharing this document
@@ -834,6 +880,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 
 		workingDocumentPtr = this->FindDocument(userId, documentId);
 		if (workingDocumentPtr != nullptr){
+			istd::CChangeNotifier notifier(this);
+
 			workingDocumentPtr->name = resultDocumentName;
 			workingDocumentPtr->isDirty = false;
 			workingDocumentPtr->undoManagerPtr->StoreDocumentState();
@@ -894,5 +942,3 @@ typedef TCollectionDocumentServiceWrap<CDocumentServiceBase> CCollectionDocument
 
 
 } // namespace imtdoc
-
-

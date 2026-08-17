@@ -43,6 +43,7 @@ type CollectionId {
 type ObjectId {
 	collectionId: ID
 	id: ID!
+	singleInstanceMode: Bool
 }
 
 type DocumentId {
@@ -68,6 +69,7 @@ type DocumentTypeId {
 	collectionId: ID
 	typeId: ID!
 	proposedSourceDocumentId: ID
+	singleDocumentInstance: Bool
 }
 
 type DocumentServiceNotification {
@@ -114,5 +116,7 @@ type Mutation {
 }
 
 type Subscription {
-	OnDocumentChanged(input: CollectionId): DocumentServiceNotification!
+	OnDocumentManagerChanged(input: CollectionId): DocumentServiceNotification!
+	OnDocumentChanged(input: DocumentId): DocumentServiceNotification!
+	OnUndoRedoChanged(input: CollectionId): UndoInfo!
 }

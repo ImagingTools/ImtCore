@@ -10,6 +10,8 @@
 // ACF includes
 #include <imod/IModel.h>
 #include <imod/IObserver.h>
+#include <istd/CChangeNotifier.h>
+#include <ifile/CAutoPersistenceComp.h>
 
 // ImtCore includes
 #include <imtdoc/CDocumentChangedEvent.h>
@@ -21,6 +23,7 @@
 #include <imtdoc/CDocumentSavedAsEvent.h>
 #include <imtdoc/CDocumentSavedEvent.h>
 #include <imtdoc/CDocumentUndoRedoChangedEvent.h>
+#include <imtdoc/IPersistentUndoManager.h>
 
 
 namespace imtdoc
@@ -173,6 +176,7 @@ IDocumentService::DocumentList CDocumentServiceBase::GetOpenedDocumentList(const
 			info.isDirty = workingDocument.isDirty;
 			info.hasNameProvider = HasDocumentNameProvider(workingDocument.typeId);
 			info.isLoading = workingDocument.isLoading;
+			info.singleDocumentInstance = workingDocument.singleDocumentInstance;
 
 			list.append(info);
 		}
@@ -186,13 +190,16 @@ IDocumentService::DocumentList CDocumentServiceBase::GetOpenedDocumentList(const
 
 void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const TaskParams& params)
 {
-	idoc::IUndoManagerSharedPtr undoManagerPtr = CreateUndoManager();
+	idoc::IUndoManagerSharedPtr undoManagerPtr;
+	undoManagerPtr.FromUnique(std::move(CreateUndoManager()));
 	if (!undoManagerPtr.IsValid()){
 		CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Failed to create undo manager")});
 		return;
 	}
 
 	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+
+	istd::CChangeNotifier notifier(this);
 
 	QString documentName;
 	{
@@ -203,6 +210,7 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 		doc.isDirty = true;
 		doc.name = params.documentName;
 		doc.isLoading = true;
+		doc.singleDocumentInstance = params.singleDocumentInstance;
 		documentName = doc.name;
 	}
 
@@ -306,7 +314,7 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 				return;
 			}
 
-			InitializeDocumentObservers(*docPtr, userId);
+			InitializeDocumentObservers(*docPtr, userId, documentId);
 		}
 
 		OnDocumentDataLoaded(userId, documentId);
@@ -362,25 +370,21 @@ IDocumentService::OperationStatus CDocumentServiceBase::CloseDocumentInternal(
 	QByteArray objectId;
 	QString name;
 	bool isDirty = false;
-	WorkingDocument* workingDocumentPtr = nullptr;
 
 	{
 		QMutexLocker locker(&m_mutex);
+
 		OperationStatus validationStatus;
 		if (!ValidateInputParams(userId, documentId, validationStatus)){
 			return validationStatus;
 		}
-	}
 
-	{
-		QMutexLocker locker(&m_mutex);
-		if (!m_userDocuments.contains(userId) || !m_userDocuments[userId].contains(documentId)){
-			return OS_INVALID_DOCUMENT_ID;
-		}
+		istd::CChangeNotifier notifier(this);
 
-		workingDocumentPtr = &m_userDocuments[userId][documentId];
+		WorkingDocument* workingDocumentPtr = &m_userDocuments[userId][documentId];
 
 		bool isLastSharedUser = true;
+		bool isUndoObserverUnregistered = false;
 		if (IsSingleCopyMode() && !workingDocumentPtr->objectId.isEmpty()
 			&& m_sharedDocuments.contains(workingDocumentPtr->objectId)){
 			SharedDocumentData& shared = m_sharedDocuments[workingDocumentPtr->objectId];
@@ -390,12 +394,18 @@ IDocumentService::OperationStatus CDocumentServiceBase::CloseDocumentInternal(
 				imod::IModel* undoModelPtr = dynamic_cast<imod::IModel*>(shared.undoManagerPtr.GetPtr());
 				if (undoModelPtr != nullptr && shared.undoManagerModelId >= 0){
 					m_undoManagerObserver.UnregisterModel(shared.undoManagerModelId);
+					isUndoObserverUnregistered = true;
 				}
 				m_sharedDocuments.remove(workingDocumentPtr->objectId);
 			}
 		}
 
 		if (isLastSharedUser){
+			if (!isUndoObserverUnregistered && workingDocumentPtr->undoManagerModelId >= 0){
+				m_undoManagerObserver.UnregisterModel(workingDocumentPtr->undoManagerModelId);
+				workingDocumentPtr->undoManagerModelId = -1;
+			}
+
 			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(workingDocumentPtr->undoManagerPtr.GetPtr());
 			if (modelPtr != nullptr){
 				modelPtr->DetachAllObservers();
@@ -689,11 +699,10 @@ int CDocumentServiceBase::GetUndoManagerNextModelId(const QByteArray& /*userId*/
 }
 
 
-
-
 void CDocumentServiceBase::InitializeDocumentObservers(
 			WorkingDocument& document,
-			const QByteArray& userId)
+			const QByteArray& userId,
+			const QByteArray& documentId)
 {
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(document.objectPtr.GetPtr());
 	imod::IModel* undoModelPtr = dynamic_cast<imod::IModel*>(document.undoManagerPtr.GetPtr());
@@ -705,6 +714,11 @@ void CDocumentServiceBase::InitializeDocumentObservers(
 		}
 
 		modelPtr->AttachObserver(this);
+	}
+
+	imtdoc::IPersistentUndoManager* persistentUndoManagerPtr = dynamic_cast<imtdoc::IPersistentUndoManager*>(document.undoManagerPtr.GetPtr());
+	if (persistentUndoManagerPtr != nullptr){
+		persistentUndoManagerPtr->Initialize(documentId, document.typeId);
 	}
 
 	document.undoManagerPtr->StoreDocumentState();

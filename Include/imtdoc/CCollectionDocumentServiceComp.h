@@ -38,9 +38,13 @@ public:
 
 	I_BEGIN_COMPONENT(CCollectionDocumentServiceComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentService)
+		I_REGISTER_INTERFACE(iser::ISerializable)
 		I_ASSIGN(m_collectionCompPtr, "Collection", "Document collection containing related documents", true, "Collection");
 		I_ASSIGN(m_isSingleCopyModeAttrPtr, "IsSingleCopyMode", "When enabled, all users share a single copy of each document", false, false);
 	I_END_COMPONENT
+
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 protected:
 	// reimplemented (imtdoc::TCollectionDocumentServiceWrap)
@@ -56,5 +60,4 @@ private:
 
 
 } // namespace imtdoc
-
 

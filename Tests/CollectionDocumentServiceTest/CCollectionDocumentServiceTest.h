@@ -19,6 +19,7 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtdoc/CCollectionDocumentServiceBase.h>
 #include <imtdoc/IDocumentServiceEventHandler.h>
+#include <imtdoc/IPersistentUndoManager.h>
 
 
 /**
@@ -114,7 +115,7 @@ private:
 */
 class CMockUndoManager:
 	public imod::IModel,
-	virtual public idoc::IUndoManager
+	virtual public imtdoc::IPersistentUndoManager
 {
 public:
 	CMockUndoManager()
@@ -140,6 +141,9 @@ public:
 	virtual QString GetUndoLevelDescription(int stepIndex) const override { return QString(); }
 	virtual QString GetRedoLevelDescription(int stepIndex) const override { return QString(); }
 	virtual void ResetUndo() override {}
+
+	// reimplemented (imtdoc::IPersistentUndoManager)
+	virtual void Initialize(const QByteArray& /*documentId*/, const QByteArray& /*documentTypeId*/) override {}
 
 	// reimplemented (idoc::IDocumentStateComparator)
 	virtual bool HasStoredDocumentState() const override { return true; }
@@ -689,6 +693,7 @@ private slots:
 	void OpenDocumentDataLoadFailClosesDocumentTest();
 	void OpenDocumentWithHostTest();
 	void OpenDocumentMultiplePathSegmentsTest();
+	void OpenDocumentWithoutSingleInstanceModeFailsWhenSingleInstanceAlreadyOpenedTest();
 
 	// GetDocumentName tests
 	void GetDocumentNameSuccessTest();

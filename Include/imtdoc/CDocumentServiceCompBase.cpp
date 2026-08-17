@@ -109,14 +109,20 @@ istd::IChangeableUniquePtr CDocumentServiceCompBase::CreateObject(const QByteArr
 
 idoc::IUndoManagerUniquePtr CDocumentServiceCompBase::CreateUndoManager() const
 {
-	if (m_undoManagerFactPtr.IsValid()){
-		return m_undoManagerFactPtr.CreateInstance();
+	idoc::IUndoManagerUniquePtr retVal;
+
+	if (m_persistUndoManagerFactPtr.IsValid()){
+		retVal = m_persistUndoManagerFactPtr.CreateInstance();
+	}
+	
+	if (!retVal.IsValid() && m_undoManagerFactPtr.IsValid()){
+		retVal = m_undoManagerFactPtr.CreateInstance();
 	}
 
 	const QByteArray errorMessage = QStringLiteral("Factory not found").toUtf8();
 	Q_ASSERT_X(false, "CDocumentServiceCompBase::CreateUndoManager", errorMessage.constData());
 
-	return nullptr;
+	return retVal;
 }
 
 
