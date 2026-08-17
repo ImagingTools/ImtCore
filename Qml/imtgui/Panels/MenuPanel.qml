@@ -349,7 +349,7 @@ Rectangle {
 			id: allPagesFlick;
 
 			anchors.top: parent.top;
-			anchors.topMargin: Style.marginXL + Style.marginXXXS;
+			anchors.topMargin: Style.enableMenuPanelCollapse ? Style.marginXL + Style.marginXXXS : Style.marginM;
 			anchors.left: parent.left;
 			anchors.right: parent.right;
 			anchors.bottom: parent.bottom;
@@ -392,7 +392,7 @@ Rectangle {
 			width: menuPanel.rowWidth;
 
 			anchors.topMargin: Style.menuPanelTopMargin !==undefined ? Style.menuPanelTopMargin :
-																	   !menuPanel.centered ? Style.marginXL + Style.marginXXXS:
+																	   !menuPanel.centered ? (Style.enableMenuPanelCollapse ? Style.marginXL + Style.marginXXXS : Style.marginM):
 																							 parent.height - bottomAlignmentColumn.height -  height > 0 ? (parent.height - bottomAlignmentColumn.height - height)/2 : 0
 
 			visible: !allPagesFlick.visible;
@@ -459,6 +459,7 @@ Rectangle {
 			id: controlPanel
 			width: parent.width
 			height: Style.controlHeightS
+			visible: Style.enableMenuPanelCollapse
 			Rectangle{
 				anchors.fill: parent
 				color: Style.backgroundColor2
