@@ -79,7 +79,7 @@ imt_declare_library_dependencies(imtoas				Acf::istd)
 
 #-------- SDL generated libraries --------
 imt_declare_library_dependencies(imtbasesdl			imtsdl)
-imt_declare_library_dependencies(imt2dsdl			imtbasesdl)
+imt_declare_library_dependencies(imt2dsdl			imtbasesdl imtcolorsdl)
 imt_declare_library_dependencies(imtauthsdl			imtbasesdl imtauth)
 imt_declare_library_dependencies(imtappsdl			imtbasesdl imtapp)
 imt_declare_library_dependencies(imtchatsdl			imtbasesdl imtchat)
@@ -89,6 +89,7 @@ imt_declare_library_dependencies(imtlicsdl			imtbasesdl imtlic)
 imt_declare_library_dependencies(imtpaysdl			imtbasesdl)
 
 #-------- Libraries --------
+imt_declare_library_dependencies(imt2d				imt2dsdl imtcolorsdl Acf::istd Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui)
 imt_declare_library_dependencies(imt3d				Acf::i3d AcfSln::icalib Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg)
 imt_declare_library_dependencies(imt3dgui			Acf::iqtgui imt3dview Qt${QT_VERSION_MAJOR}::OpenGL Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
 imt_declare_library_dependencies(imt3dview			imt3d imt3dgui)
@@ -101,7 +102,7 @@ imt_declare_library_dependencies(imtchat			imtdb Qt${QT_VERSION_MAJOR}::Sql)
 imt_declare_library_dependencies(imtchatdb			imtchat Qt${QT_VERSION_MAJOR}::Sql)
 imt_declare_library_dependencies(imtchatgql			imtchatsdl imtservergql)
 imt_declare_library_dependencies(imtclientgql		imtbasesdl imtservergql Qt${QT_VERSION_MAJOR}::WebSockets)
-imt_declare_library_dependencies(imtcol				imtbase)
+imt_declare_library_dependencies(imtcol				imtbasesdl)
 imt_declare_library_dependencies(imtcom				imtrest)
 imt_declare_library_dependencies(imtcrypt			Acf::ifile)
 imt_declare_library_dependencies(imtdb				imtapp imtauth imtcol Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg Qt${QT_VERSION_MAJOR}::Sql)
@@ -170,7 +171,7 @@ imt_declare_library_dependencies(imtlicguiqml			imtqml imtlicgui)
 imt_declare_library_dependencies(imtstylecontrolsqml	imtqml imtgui imtstyle)
 
 # --- Arxc-generated static libraries ----------------------------------------
-imt_declare_library_dependencies(ImtCoreLoc	Acf::icomp)
+imt_declare_library_dependencies(ImtCoreLoc	Acf::icomp AcfSln::AcfSlnLoc Acf::AcfLoc)
 
 
 
