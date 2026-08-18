@@ -1449,16 +1449,16 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompB
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::V1_0::imtbase::CCreateSubCollectionPayload response;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return sdl::V1_0::imtbase::CCreateSubCollectionPayload();
+
+		return {};
 	}
 
-	sdl::V1_0::imtbase::CreateSubCollectionRequestInfo requestInfo = createSubCollectionRequest.GetRequestInfo();
+	const sdl::V1_0::imtbase::CreateSubCollectionRequestInfo& requestInfo	 = createSubCollectionRequest.GetRequestInfo();
+	const sdl::V1_0::imtbase::CreateSubCollectionRequestArguments& arguments = createSubCollectionRequest.GetRequestedArguments();
 
-	sdl::V1_0::imtbase::CreateSubCollectionRequestArguments arguments = createSubCollectionRequest.GetRequestedArguments();
 	int offset = 0;
 	if (arguments.input->offset){
 		offset = *arguments.input->offset;
@@ -1470,68 +1470,101 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompB
 	}
 
 	iprm::CParamsSet filterParams;
-	if (arguments.input->selectionParams){
-		if (filterParams.CopyFrom(m_selectionParams)){
-			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
-			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
-				errorMessage = QString("Unable to create sub collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
-				return sdl::V1_0::imtbase::CCreateSubCollectionPayload();
-			}
+	if (arguments.input->selectionParams && filterParams.CopyFrom(m_selectionParams)){
+		sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
+		if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
+			errorMessage = QStringLiteral("Unable to create sub collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+
+			return {};
 		}
 	}
 
-	if (requestInfo.isItemsRequested){
-		imtsdl::TElementList<sdl::V1_0::imtbase::CSubCollectionItem> collectionItems;
-		imtbase::ICollectionInfo::Ids ids = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
-		for (const imtbase::ICollectionInfo::Id& id: ids){
-			sdl::V1_0::imtbase::CSubCollectionItem collectionItem;
+	if (!requestInfo.isItemsRequested){
+		return {};
+	}
 
-			if (requestInfo.items.isItemInfoRequested){
-				sdl::V1_0::imtbase::CParameter parameterInfo;
+	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> objectCollectionIterator = m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams);
+	if(!objectCollectionIterator.IsValid()){
+		errorMessage = QStringLiteral("Unable to create sub-collection '%1'. Error: failed to create an iterator on collection.").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
 
-				if (requestInfo.items.itemInfo.isIdRequested){
-					parameterInfo.id = id;
-				}
+		return {};
+	}
 
-				if (requestInfo.items.itemInfo.isTypeIdRequested){
-					parameterInfo.typeId = m_objectCollectionCompPtr->GetObjectTypeId(id);
-				}
+	sdl::V1_0::imtbase::CCreateSubCollectionPayload response;
+	imtsdl::TElementList<sdl::V1_0::imtbase::CSubCollectionItem>& collectionItems = response.items.emplace();
 
-				if (requestInfo.items.itemInfo.isNameRequested){
-					parameterInfo.name = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
-				}
+	while(objectCollectionIterator->Next()){
+		const QByteArray objectId = objectCollectionIterator->GetObjectId();
 
-				if (requestInfo.items.itemInfo.isEnabledRequested){
-					parameterInfo.enabled = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_ENABLED).toBool();
-				}
+		sdl::V1_0::imtbase::CSubCollectionItem collectionItem;
 
-				if (requestInfo.items.itemInfo.isDescriptionRequested){
-					parameterInfo.description = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
-				}
+		if (requestInfo.items.isItemInfoRequested){
+			sdl::V1_0::imtbase::CParameter parameterInfo;
 
-				collectionItem.itemInfo = parameterInfo;
+			if (requestInfo.items.itemInfo.isIdRequested){
+				parameterInfo.id = objectId;
 			}
 
-			if (requestInfo.items.isMetaInfoRequested){
-				QByteArray elementMetaInfoData;
-				idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(id);
-				if (metaInfo.IsValid() && SerializeObject(*metaInfo.GetPtr(), elementMetaInfoData)){
-					collectionItem.metaInfo = elementMetaInfoData;
+			if (requestInfo.items.itemInfo.isTypeIdRequested){
+				QByteArray typeId = objectCollectionIterator->GetObjectTypeId();
+				if (typeId.isEmpty()){
+					typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
 				}
+				parameterInfo.typeId = typeId;
 			}
 
-			if (requestInfo.items.isDataMetaInfoRequested){
-				QByteArray dataMetaInfo;
-				idoc::MetaInfoPtr dataMetaInfoPtr = m_objectCollectionCompPtr->GetDataMetaInfo(id);
-				if (dataMetaInfoPtr.IsValid() && SerializeObject(*dataMetaInfoPtr.GetPtr(), dataMetaInfo)){
-					collectionItem.dataMetaInfo = dataMetaInfo;
+			if (requestInfo.items.itemInfo.isNameRequested){
+				QVariant nameVal = objectCollectionIterator->GetElementInfo(imtbase::ICollectionInfo::EIT_NAME);
+				if (!nameVal.isValid() || nameVal.isNull()){
+					nameVal = objectCollectionIterator->GetElementInfo(QByteArrayLiteral("Name"));
 				}
+				parameterInfo.name = nameVal.toString();
 			}
 
-			collectionItems << collectionItem;
+			if (requestInfo.items.itemInfo.isEnabledRequested){
+				parameterInfo.enabled = objectCollectionIterator->GetElementInfo(imtbase::ICollectionInfo::EIT_ENABLED).toBool();
+			}
+
+			if (requestInfo.items.itemInfo.isDescriptionRequested){
+				QVariant descVal = objectCollectionIterator->GetElementInfo(imtbase::ICollectionInfo::EIT_DESCRIPTION);
+				if (!descVal.isValid() || descVal.isNull()){
+					descVal = objectCollectionIterator->GetElementInfo(QByteArrayLiteral("Description"));
+				}
+				parameterInfo.description = descVal.toString();
+			}
+
+			collectionItem.itemInfo = parameterInfo;
 		}
 
-		response.items = collectionItems;
+		if (requestInfo.items.isItemDataRequested){
+			QByteArray itemDataInfo;
+
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (!objectCollectionIterator->GetObjectData(dataPtr)){
+				SendErrorMessage(0, QStringLiteral("Failed to serialize object with id '%1' while creating sub-collection '%2'").arg(objectId, *m_collectionIdAttrPtr), __func__);
+			}
+			else if (SerializeObject(*dataPtr.GetPtr(), itemDataInfo)){
+				collectionItem.itemData = itemDataInfo;
+			}
+		}
+
+		if (requestInfo.items.isMetaInfoRequested){
+			QByteArray elementMetaInfoData;
+			idoc::MetaInfoPtr metaInfo = objectCollectionIterator->GetCollectionMetaInfo();
+			if (metaInfo.IsValid() && SerializeObject(*metaInfo.GetPtr(), elementMetaInfoData)){
+				collectionItem.metaInfo = elementMetaInfoData;
+			}
+		}
+
+		if (requestInfo.items.isDataMetaInfoRequested){
+			QByteArray dataMetaInfo;
+			idoc::MetaInfoPtr dataMetaInfoPtr = objectCollectionIterator->GetDataMetaInfo();
+			if (dataMetaInfoPtr.IsValid() && SerializeObject(*dataMetaInfoPtr.GetPtr(), dataMetaInfo)){
+				collectionItem.dataMetaInfo = dataMetaInfo;
+			}
+		}
+
+		collectionItems << collectionItem;
 	}
 
 	return response;
