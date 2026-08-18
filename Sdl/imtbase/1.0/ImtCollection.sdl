@@ -294,6 +294,7 @@ input CreateSubCollectionInput {
 
 type SubCollectionItem {
 	itemInfo: Parameter
+	itemData: String
 	metaInfo: String
 	dataMetaInfo: String
 	operationContext: String
