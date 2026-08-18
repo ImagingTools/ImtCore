@@ -37,6 +37,8 @@ public:
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", false, "");
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", false, "ObjectCollection");
+		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "List of type-ID corresponding to the registered factories", false);
+		I_ASSIGN_MULTI_0(m_objectFactoriesCompPtr, "ObjectFactories", "Factory list for creating object instances by type-ID", false);
 	I_END_COMPONENT;
 
 	virtual imtgql::IGqlRequest* CreateGetObjectTypeIdRequest(const QByteArray& objectId) const override;
@@ -121,6 +123,7 @@ private:
 	bool SerializeObject(const istd::IPolymorphic* object, QByteArray& objectData) const;
 	bool DeSerializeObject(istd::IPolymorphic* object, const QByteArray& objectData) const;
 	bool GetParamsSetRepresentation(const iprm::IParamsSet& paramsSet, sdl::V1_0::imtbase::CParamsSet& representation) const;
+	istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const;
 
 	template<class Arguments,class SdlRequest>
 	istd::TUniqueInterfacePtr<imtgql::IGqlRequest> CreateGqlRequest(Arguments arguments) const;
@@ -135,6 +138,8 @@ private:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
+	I_MULTIATTR(QByteArray, m_typeIdsAttrPtr);
+	I_MULTIFACT(istd::IChangeable, m_objectFactoriesCompPtr);
 };
 
 
