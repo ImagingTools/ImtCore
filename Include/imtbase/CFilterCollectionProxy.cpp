@@ -85,6 +85,10 @@ ICollectionInfo::Id CFilterCollectionProxy::InsertNewObject(
 		info.id = proposedElementId;
 	}
 
+	if (defaultValuePtr != nullptr){
+		info.dataPtr.TakeOver(defaultValuePtr->CloneMe());
+	}
+
 	if (elementMetaInfoPtr != nullptr){
 		info.collectionItemMetaInfo.CopyFrom(*elementMetaInfoPtr);
 	}
