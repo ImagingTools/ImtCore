@@ -552,82 +552,90 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 
 	sdl::V1_0::imtbase::CCreateSubCollectionPayload createSubCollectionPayload;
 	ResponseData responseData = GetResponseData(response);
-	if (createSubCollectionPayload.ReadFromJsonObject(responseData.data)){
-		if (createSubCollectionPayload.items){
-			imtsdl::TElementList<sdl::V1_0::imtbase::CSubCollectionItem> subCollectionItems = *createSubCollectionPayload.items;
-			for (const istd::TNullableValue<sdl::V1_0::imtbase::CSubCollectionItem>& subCollectionItem : subCollectionItems){
-				QByteArray objectId = *subCollectionItem->itemInfo->id;
-				QByteArray objectTypeId = *subCollectionItem->itemInfo->typeId;
-				QString name = *subCollectionItem->itemInfo->name;
-				QString description = *subCollectionItem->itemInfo->description;
+	if (!createSubCollectionPayload.ReadFromJsonObject(responseData.data)){
+		return subCollectionPtr.PopPtr();
+	}
 
-				idoc::MetaInfoPtr dataMetainfoPtr;
-				auto CreateMetaInfo = [&objectId, this](const QByteArray& typeId,
-										 QList<imtbase::IMetaInfoCreator*> metaInfoCreatorList){
-					idoc::MetaInfoPtr metaInfoPtr;
-					for (int i = 0; i < metaInfoCreatorList.count(); i++){
-						imtbase::IMetaInfoCreator* metaInfoCreatorPtr = metaInfoCreatorList[i];
-						if (metaInfoCreatorPtr != nullptr){
-							QByteArrayList typeIds = metaInfoCreatorPtr->GetSupportedTypeIds();
-							if (typeIds.contains(typeId)){
-								imtbase::IObjectCollection::DataPtr dataPtr;
-								if (m_objectCollectionCompPtr.IsValid()){
-									// TODO: Read full object ?
-									m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr);
-								}
+	if (!createSubCollectionPayload.items){
+		return subCollectionPtr.PopPtr();
+	}
 
-								metaInfoCreatorPtr->CreateMetaInfo(dataPtr.GetPtr(), typeId, metaInfoPtr);
-							}
-						}
-					}
+	const imtsdl::TElementList<sdl::V1_0::imtbase::CSubCollectionItem>& subCollectionItems = *createSubCollectionPayload.items;
+	for (const istd::TNullableValue<sdl::V1_0::imtbase::CSubCollectionItem>& subCollectionItem : subCollectionItems){
+		const QByteArray objectId		= *subCollectionItem->itemInfo->id;
+		const QByteArray objectTypeId	= *subCollectionItem->itemInfo->typeId;
+		const QString name				= *subCollectionItem->itemInfo->name;
+		const QString description		= *subCollectionItem->itemInfo->description;
 
-					if (!metaInfoPtr.IsValid()){
-						metaInfoPtr.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
-					}
-
-					Q_ASSERT(metaInfoPtr.IsValid());
-
-					return metaInfoPtr;
-				};
-
-				dataMetainfoPtr = CreateMetaInfo(objectTypeId, metaInfoCreatorList);
-
-				idoc::CStandardDocumentMetaInfo metainfo;
-				if (subCollectionItem->metaInfo){
-					QByteArray metaInfoData = (*subCollectionItem->metaInfo).toUtf8();
-					bool retVal = DeSerializeObject(&metainfo, metaInfoData);
-					if (!retVal){
-						qDebug() << "Deserialization of the meta.information was failed!";
-					}
+		// Deserialize item data if available
+		imtbase::IObjectCollection::DataPtr objectPtr;
+		if (subCollectionItem->itemData){
+			QByteArray itemDataInfo = (*subCollectionItem->itemData).toUtf8();
+			objectPtr = CreateObject(objectTypeId);
+			if (objectPtr.IsValid()){
+				if (!DeSerializeObject(objectPtr.GetPtr(), itemDataInfo)){
+					objectPtr.SetPtr(nullptr);
 				}
-
-				if (subCollectionItem->dataMetaInfo){
-					QByteArray dataMetaInfo = (*subCollectionItem->dataMetaInfo).toUtf8();
-					bool retVal = DeSerializeObject(dataMetainfoPtr.GetPtr(), dataMetaInfo);
-					if (!retVal){
-						qDebug() << "Deserialization of the object was failed!";
-					}
-				}
-
-				imtbase::COperationContext operationContext;
-				if (subCollectionItem->operationContext){
-					QByteArray operationContextData = (*subCollectionItem->operationContext).toUtf8();
-					DeSerializeObject(&operationContext, operationContextData);
-				}
-
-				subCollectionPtr->InsertNewObject(
-							objectTypeId,
-							name,
-							description,
-							nullptr,
-							objectId,
-							dataMetainfoPtr.GetPtr(),
-							&metainfo,
-							&operationContext);
-
-				dataMetainfoPtr.SetPtr(nullptr);
 			}
 		}
+
+		// Use meta info creator only when object data is available
+		idoc::MetaInfoPtr dataMetainfoPtr;
+		if (objectPtr.IsValid()){
+			for (int i = 0; i < metaInfoCreatorList.count(); i++){
+				imtbase::IMetaInfoCreator* metaInfoCreatorPtr = metaInfoCreatorList[i];
+				if (metaInfoCreatorPtr == nullptr){
+					continue;
+				}
+
+				const QByteArrayList typeIds = metaInfoCreatorPtr->GetSupportedTypeIds();
+				if (!typeIds.contains(objectTypeId)){
+					continue;
+				}
+
+				metaInfoCreatorPtr->CreateMetaInfo(objectPtr.GetPtr(), objectTypeId, dataMetainfoPtr);
+				break;
+			}
+		}
+
+		if (!dataMetainfoPtr.IsValid()){
+			dataMetainfoPtr.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
+		}
+
+		// Deserialize collection item meta info
+		idoc::CStandardDocumentMetaInfo metainfo;
+		if (subCollectionItem->metaInfo){
+			QByteArray metaInfoData = (*subCollectionItem->metaInfo).toUtf8();
+			if (!DeSerializeObject(&metainfo, metaInfoData)){
+				qDebug() << "Deserialization of the meta information failed!";
+			}
+		}
+
+		// Deserialize data meta info from response
+		if (subCollectionItem->dataMetaInfo){
+			QByteArray dataMetaInfo = (*subCollectionItem->dataMetaInfo).toUtf8();
+			if (!DeSerializeObject(dataMetainfoPtr.GetPtr(), dataMetaInfo)){
+				qDebug() << "Deserialization of the data meta info failed!";
+			}
+		}
+
+		imtbase::COperationContext operationContext;
+		if (subCollectionItem->operationContext){
+			QByteArray operationContextData = (*subCollectionItem->operationContext).toUtf8();
+			DeSerializeObject(&operationContext, operationContextData);
+		}
+
+		subCollectionPtr->InsertNewObject(
+			objectTypeId,
+			name,
+			description,
+			objectPtr.GetPtr(),
+			objectId,
+			dataMetainfoPtr.GetPtr(),
+			&metainfo,
+			&operationContext);
+
+		dataMetainfoPtr.SetPtr(nullptr);
 	}
 
 	return subCollectionPtr.PopPtr();
@@ -646,6 +654,26 @@ void CGqlObjectCollectionDelegateComp::OnComponentCreated()
 
 
 // private methods
+
+istd::IChangeableUniquePtr CGqlObjectCollectionDelegateComp::CreateObject(const QByteArray& typeId) const
+{
+	if (!m_objectFactoriesCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	for (int i = 0; i < m_typeIdsAttrPtr.GetCount(); ++i){
+		if (i >= m_objectFactoriesCompPtr.GetCount()){
+			break;
+		}
+
+		if (typeId == m_typeIdsAttrPtr[i]){
+			return m_objectFactoriesCompPtr.CreateInstance(i);
+		}
+	}
+
+	return nullptr;
+}
+
 
 CGqlObjectCollectionDelegateComp::ResponseData CGqlObjectCollectionDelegateComp::GetResponseData(const imtgql::IGqlResponse& response) const
 {
