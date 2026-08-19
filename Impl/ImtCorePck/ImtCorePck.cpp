@@ -156,6 +156,11 @@ I_EXPORT_COMPONENT(
 			"Undo Manager Transaction");
 
 I_EXPORT_COMPONENT(
+			FileSerializedUndoManager,
+			"Undo manager that stores each serialized document step in a separate file",
+			"Undo Manager File Serialized Persistence");
+
+I_EXPORT_COMPONENT(
 			Selection,
 			"Ids based selection",
 			"Selection Id");

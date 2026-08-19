@@ -33,6 +33,7 @@
 #include <imtbase/CLoginBasedEnablerComp.h>
 #include <imtbase/CCommandLineParamsAdapterComp.h>
 #include <imtbase/CTransactionableUndoManagerComp.h>
+#include <imtbase/CFileSerializedUndoManagerComp.h>
 #include <imtbase/CSelectionComp.h>
 #include <imtbase/CSelectionAdapterComp.h>
 #include <imtbase/CSelectionParamAdapterComp.h>
@@ -97,6 +98,7 @@ typedef imtbase::CMessageFilterComp MessageFilter;
 typedef icomp::TModelCompWrap<imtbase::CLoginBasedEnablerComp> LoginBasedEnabler;
 typedef icomp::TModelCompWrap<imtbase::CCommandLineParamsAdapterComp> CommandLineParamsAdapter;
 typedef ibase::TModelObserverCompWrap<icomp::TModelCompWrap<imtbase::CTransactionableUndoManagerComp>> TransactionableUndoManager;
+typedef ibase::TModelObserverCompWrap<icomp::TModelCompWrap<imtbase::CFileSerializedUndoManagerComp>> FileSerializedUndoManager;
 typedef icomp::TModelCompWrap<imtbase::CSelectionComp> Selection;
 typedef icomp::TModelCompWrap<imtbase::CSelectionAdapterComp> SelectionAdapter;
 typedef icomp::TModelCompWrap<imtbase::CSelectionParamAdapterComp> SelectionParamAdapter;
