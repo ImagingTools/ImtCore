@@ -50,7 +50,7 @@
 
 ```cmake
 # Пример из ImtCore — imtauth нуждается в imtdoc, imtlic, imtmail (только прямые зависимости)
-imt_declare_library_dependencies(imtauth  imtdoc imtlic imtmail
+acf_declare_target_dependencies(imtauth  imtdoc imtlic imtmail
     Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg)
 ```
 
