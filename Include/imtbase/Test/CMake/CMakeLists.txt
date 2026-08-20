@@ -6,7 +6,7 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
 
-target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
+target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtbase
 	Acf::itest
 	Qt${QT_VERSION_MAJOR}::Test

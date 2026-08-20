@@ -10,7 +10,7 @@ include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 #------ SDL-generated QML libraries ------
-target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
+target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtappsdl
 	imtauthsdl
 	imtlicsdl
@@ -21,7 +21,7 @@ target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	imtpaysdl)
 
 #------ QML modules (from ImtCore/Qml) ------
-target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
+target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtcontrolsqml
 	imtstylecontrolsqml
 	imtguiqml
@@ -34,7 +34,7 @@ target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	imtdeskguiqml)
 
 #------ Core ImtCore libraries ------
-target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
+target_link_libraries(${PROJECT_NAME} PRIVATE
 	ImtCoreLoc
 	Acf::AcfLoc
 	AcfSln::AcfSlnLoc
@@ -48,7 +48,7 @@ target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	imtlog)
 
 #------ Qt modules ------
-target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
+target_link_libraries(${PROJECT_NAME} PRIVATE
 	Qt${QT_VERSION_MAJOR}::QuickControls2
 )
 

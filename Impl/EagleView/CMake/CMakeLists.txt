@@ -16,7 +16,7 @@ include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
+target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtgui
 	imtstyle
 	imt3dgui
@@ -24,7 +24,7 @@ target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 )
 
 if(QT_VERSION_MAJOR GREATER 4)
-	target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
+	target_link_libraries(${PROJECT_NAME} PRIVATE
 		Qt${QT_VERSION_MAJOR}::PrintSupport)
 endif()
 
