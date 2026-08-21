@@ -10,7 +10,7 @@ Rectangle{
 	clip: true;
 
 	color: Style.baseColor
-	opacity: enabled ? 1: 0.5
+	opacity: enabled ? 1 : 0.5
 
 	border.color: Style.borderColor
 	radius: Style.radiusXL
