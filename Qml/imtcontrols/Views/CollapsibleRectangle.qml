@@ -10,6 +10,7 @@ Rectangle{
 	clip: true;
 
 	color: Style.baseColor
+	opacity: enabled ? 1: 0.5
 
 	border.color: Style.borderColor
 	radius: Style.radiusXL
@@ -19,6 +20,7 @@ Rectangle{
 	property int buttonMargin: Style.marginL
 
 	property alias iconSource: expandButton.iconSource
+	property alias expanded: expandButton.expanded
 
 	ToolButton{
 		id: expandButton
@@ -33,6 +35,8 @@ Rectangle{
 		iconSource: "../../../" + Style.getIconPath(expanded ? "Icons/Up" : "Icons/Down", Icon.State.On, Icon.Mode.Normal);
 
 		tooltipText: expanded ? qsTr("Collapse") : qsTr("Expand");
+
+		enabled: parent.enabled
 
 		property bool expanded: true
 
