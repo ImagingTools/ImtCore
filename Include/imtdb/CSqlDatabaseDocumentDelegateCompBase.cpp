@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtdb/CSqlDatabaseDocumentDelegateComp.h>
+﻿// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtdb/CSqlDatabaseDocumentDelegateCompBase.h>
 
 
 // Qt includes
@@ -35,25 +35,25 @@
 namespace imtdb
 {
 
-const QByteArray CSqlDatabaseDocumentDelegateComp::s_idColumn = QByteArrayLiteral("Id");
-const QByteArray CSqlDatabaseDocumentDelegateComp::s_typeIdColumn = QByteArrayLiteral("TypeId");
-const QByteArray CSqlDatabaseDocumentDelegateComp::s_documentIdColumn = QByteArrayLiteral("DocumentId");
-const QByteArray CSqlDatabaseDocumentDelegateComp::s_nameColumn = QByteArrayLiteral("Name");
-const QByteArray CSqlDatabaseDocumentDelegateComp::s_descriptionColumn = QByteArrayLiteral("Description");
-const QByteArray CSqlDatabaseDocumentDelegateComp::s_documentColumn = QByteArrayLiteral("Document");
-const QByteArray CSqlDatabaseDocumentDelegateComp::s_dataMetaInfoColumn = QByteArrayLiteral("DataMetaInfo");
-const QByteArray CSqlDatabaseDocumentDelegateComp::s_addedColumn = QByteArrayLiteral("Added");
-const QByteArray CSqlDatabaseDocumentDelegateComp::s_lastModifiedColumn = QByteArrayLiteral("TimeStamp");
-const QByteArray CSqlDatabaseDocumentDelegateComp::s_stateColumn = QByteArrayLiteral("State");
-const QByteArray CSqlDatabaseDocumentDelegateComp::s_revisionInfoColumn = QByteArrayLiteral("RevisionInfo");
+const QByteArray CSqlDatabaseDocumentDelegateCompBase::s_idColumn = QByteArrayLiteral("Id");
+const QByteArray CSqlDatabaseDocumentDelegateCompBase::s_typeIdColumn = QByteArrayLiteral("TypeId");
+const QByteArray CSqlDatabaseDocumentDelegateCompBase::s_documentIdColumn = QByteArrayLiteral("DocumentId");
+const QByteArray CSqlDatabaseDocumentDelegateCompBase::s_nameColumn = QByteArrayLiteral("Name");
+const QByteArray CSqlDatabaseDocumentDelegateCompBase::s_descriptionColumn = QByteArrayLiteral("Description");
+const QByteArray CSqlDatabaseDocumentDelegateCompBase::s_documentColumn = QByteArrayLiteral("Document");
+const QByteArray CSqlDatabaseDocumentDelegateCompBase::s_dataMetaInfoColumn = QByteArrayLiteral("DataMetaInfo");
+const QByteArray CSqlDatabaseDocumentDelegateCompBase::s_addedColumn = QByteArrayLiteral("Added");
+const QByteArray CSqlDatabaseDocumentDelegateCompBase::s_lastModifiedColumn = QByteArrayLiteral("TimeStamp");
+const QByteArray CSqlDatabaseDocumentDelegateCompBase::s_stateColumn = QByteArrayLiteral("State");
+const QByteArray CSqlDatabaseDocumentDelegateCompBase::s_revisionInfoColumn = QByteArrayLiteral("RevisionInfo");
 
-const QByteArray CSqlDatabaseDocumentDelegateComp::s_ownerIdKey = QByteArrayLiteral("OwnerId");
-const QByteArray CSqlDatabaseDocumentDelegateComp::s_ownerNameKey = QByteArrayLiteral("OwnerName");
-const QByteArray CSqlDatabaseDocumentDelegateComp::s_operationDescriptionKey = QByteArrayLiteral("OperationDescription");
-const QByteArray CSqlDatabaseDocumentDelegateComp::s_revisionNumberKey = QByteArrayLiteral("RevisionNumber");
-const QByteArray CSqlDatabaseDocumentDelegateComp::s_checksumKey = QByteArrayLiteral("Checksum");
+const QByteArray CSqlDatabaseDocumentDelegateCompBase::s_ownerIdKey = QByteArrayLiteral("OwnerId");
+const QByteArray CSqlDatabaseDocumentDelegateCompBase::s_ownerNameKey = QByteArrayLiteral("OwnerName");
+const QByteArray CSqlDatabaseDocumentDelegateCompBase::s_operationDescriptionKey = QByteArrayLiteral("OperationDescription");
+const QByteArray CSqlDatabaseDocumentDelegateCompBase::s_revisionNumberKey = QByteArrayLiteral("RevisionNumber");
+const QByteArray CSqlDatabaseDocumentDelegateCompBase::s_checksumKey = QByteArrayLiteral("Checksum");
 
-QSet<QString> CSqlDatabaseDocumentDelegateComp::s_filterableColumns ={
+QSet<QString> CSqlDatabaseDocumentDelegateCompBase::s_filterableColumns ={
 	s_typeIdColumn,
 	s_documentIdColumn,
 	s_nameColumn,
@@ -68,7 +68,7 @@ QSet<QString> CSqlDatabaseDocumentDelegateComp::s_filterableColumns ={
 
 // reimplemented (icomp::CComponentBase)
 
-void CSqlDatabaseDocumentDelegateComp::OnComponentCreated()
+void CSqlDatabaseDocumentDelegateCompBase::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
@@ -80,7 +80,7 @@ void CSqlDatabaseDocumentDelegateComp::OnComponentCreated()
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-QByteArray CSqlDatabaseDocumentDelegateComp::GetCountQuery(const iprm::IParamsSet* paramsPtr) const
+QByteArray CSqlDatabaseDocumentDelegateCompBase::GetCountQuery(const iprm::IParamsSet* paramsPtr) const
 {
 	QString baseQuery = GetSelectionQuery(QByteArray(), 0, -1, paramsPtr);
 
@@ -88,7 +88,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetCountQuery(const iprm::IParamsSe
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectIdFromRecord(const QSqlRecord& record) const
+QByteArray CSqlDatabaseDocumentDelegateCompBase::GetObjectIdFromRecord(const QSqlRecord& record) const
 {
 	const QString columnId = QString::fromUtf8(*m_objectIdColumnAttrPtr);
 	if (!record.contains(columnId)){
@@ -104,7 +104,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectIdFromRecord(const QSqlRec
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
+QByteArray CSqlDatabaseDocumentDelegateCompBase::GetSelectionQuery(
 			const QByteArray& objectId,
 			int offset,
 			int count,
@@ -181,18 +181,18 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 }
 
 
-istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(
+istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateCompBase::CreateObjectFromRecord(
 			const QSqlRecord& record,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
-		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord", "No database engine was registered");
+		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateCompBase::CreateObjectFromRecord", "No database engine was registered");
 
 		return nullptr;
 	}
 
 	if (!m_documentFactoriesCompPtr.IsValid()){
-		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord", "No document factories were registered");
+		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateCompBase::CreateObjectFromRecord", "No document factories were registered");
 
 		return nullptr;
 	}
@@ -201,7 +201,7 @@ istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateComp::CreateObjectFromRec
 
 	istd::IChangeableUniquePtr documentPtr = CreateObject(typeId);
 	if (!documentPtr.IsValid()){
-		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord", qPrintable(QString("Document instance could not be created for the type: '%1'").arg(qPrintable(typeId))));
+		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateCompBase::CreateObjectFromRecord", qPrintable(QString("Document instance could not be created for the type: '%1'").arg(qPrintable(typeId))));
 
 		return nullptr;
 	}
@@ -217,7 +217,7 @@ istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateComp::CreateObjectFromRec
 }
 
 
-imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp::CreateNewObjectQuery(
+imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateCompBase::CreateNewObjectQuery(
 			const QByteArray& typeId,
 			const QByteArray& proposedObjectId,
 			const QString& objectName,
@@ -264,7 +264,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectsQuery(
+QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDeleteObjectsQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const imtbase::ICollectionInfo::Ids& objectIds,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
@@ -297,7 +297,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectsQuery(
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectSetQuery(
+QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDeleteObjectSetQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const iprm::IParamsSet* paramsPtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
@@ -361,7 +361,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectSetQuery(
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateRestoreObjectsQuery(
+QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateRestoreObjectsQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const imtbase::ICollectionInfo::Ids& objectIds,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
@@ -392,7 +392,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRestoreObjectsQuery(
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateRestoreObjectSetQuery(
+QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateRestoreObjectSetQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const iprm::IParamsSet* paramsPtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
@@ -440,7 +440,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRestoreObjectSetQuery(
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
+QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
@@ -479,7 +479,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
+QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateRenameObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId,
 			const QString& newObjectName,
@@ -505,7 +505,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
+QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDescriptionObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId,
 			const QString& description,
@@ -531,7 +531,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionByMetaInfoQuery(
+QByteArray CSqlDatabaseDocumentDelegateCompBase::GetSelectionByMetaInfoQuery(
 			const QByteArray& metaInfoId,
 			const QVariant& metaInfoValue) const
 {
@@ -550,7 +550,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionByMetaInfoQuery(
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateMetaInfoQuery(const QSqlRecord& record) const
+QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateUpdateMetaInfoQuery(const QSqlRecord& record) const
 {
 	istd::IChangeableUniquePtr objectPtr = CreateObjectFromRecord(record);
 	if (!objectPtr.IsValid()){
@@ -598,7 +598,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateMetaInfoQuery(const QSq
 
 // reimplemented (imtbase::IRevisionController)
 
-imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp::GetRevisionInfoList(
+imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateCompBase::GetRevisionInfoList(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId) const
 {
@@ -665,7 +665,7 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp:
 }
 
 
-int CSqlDatabaseDocumentDelegateComp::BackupRevision(
+int CSqlDatabaseDocumentDelegateCompBase::BackupRevision(
 			const imtbase::IObjectCollection& /*collection*/,
 			const imtbase::ICollectionInfo::Id& /*objectId*/,
 			const QString& /*userComment*/) const
@@ -674,7 +674,7 @@ int CSqlDatabaseDocumentDelegateComp::BackupRevision(
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::RestoreRevision(
+bool CSqlDatabaseDocumentDelegateCompBase::RestoreRevision(
 			imtbase::IObjectCollection& collection,
 			const imtbase::ICollectionInfo::Id& objectId,
 			int revision) const
@@ -723,7 +723,7 @@ bool CSqlDatabaseDocumentDelegateComp::RestoreRevision(
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::ExportRevision(
+bool CSqlDatabaseDocumentDelegateCompBase::ExportRevision(
 			const imtbase::IObjectCollection& /*collection*/,
 			const imtbase::ICollectionInfo::Id& /*objectId*/,
 			int /*revision*/,
@@ -733,7 +733,7 @@ bool CSqlDatabaseDocumentDelegateComp::ExportRevision(
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
+bool CSqlDatabaseDocumentDelegateCompBase::DeleteRevision(
 			imtbase::IObjectCollection& collection,
 			const imtbase::ICollectionInfo::Id& objectId,
 			int revision) const
@@ -806,7 +806,7 @@ bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
 
 // reimplemented (imtdb::IDependentMetaInfoController)
 
-bool CSqlDatabaseDocumentDelegateComp::UpdateDependentMetaInfo(const DependentMetaInfo& metaInfo) const
+bool CSqlDatabaseDocumentDelegateCompBase::UpdateDependentMetaInfo(const DependentMetaInfo& metaInfo) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		Q_ASSERT(false);
@@ -846,7 +846,7 @@ bool CSqlDatabaseDocumentDelegateComp::UpdateDependentMetaInfo(const DependentMe
 	return true;
 }
 
-bool CSqlDatabaseDocumentDelegateComp::ClearDependentMetaInfo(const MetaFieldCleanupPlan& metaInfo) const
+bool CSqlDatabaseDocumentDelegateCompBase::ClearDependentMetaInfo(const MetaFieldCleanupPlan& metaInfo) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		Q_ASSERT(false);
@@ -906,7 +906,7 @@ bool CSqlDatabaseDocumentDelegateComp::ClearDependentMetaInfo(const MetaFieldCle
 
 // protected methods
 
-QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
+QByteArray CSqlDatabaseDocumentDelegateCompBase::PrepareInsertNewObjectQuery(
 			const QByteArray& typeId,
 			const QByteArray& objectId,
 			const QString& objectName,
@@ -1010,7 +1010,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 }
 
 
-istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateComp::CreateObject(const QByteArray& typeId) const
+istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateCompBase::CreateObject(const QByteArray& typeId) const
 {
 	if (!m_typesCompPtr.IsValid()){
 		return nullptr;
@@ -1030,7 +1030,7 @@ istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateComp::CreateObject(const 
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const QByteArray& /*typeId*/, const istd::IChangeable& object, QByteArray& data) const
+bool CSqlDatabaseDocumentDelegateCompBase::WriteDataToMemory(const QByteArray& /*typeId*/, const istd::IChangeable& object, QByteArray& data) const
 {
 	iser::ISerializable* serializableObjectPtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(&object));
 	if (serializableObjectPtr == nullptr){
@@ -1050,7 +1050,7 @@ bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const QByteArray& /*typ
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& /*typeId*/, const QByteArray& data, istd::IChangeable& object) const
+bool CSqlDatabaseDocumentDelegateCompBase::ReadDataFromMemory(const QByteArray& /*typeId*/, const QByteArray& data, istd::IChangeable& object) const
 {
 	iser::ISerializable* serializableObjectPtr = dynamic_cast<iser::ISerializable*>(&object);
 	if (serializableObjectPtr == nullptr){
@@ -1069,7 +1069,7 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& /*ty
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateRevisionInfoQuery(
+QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateRevisionInfoQuery(
 			const imtbase::IOperationContext* operationContextPtr,
 			const QVariant& revisionArgument,
 			quint32 checksum) const
@@ -1108,7 +1108,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRevisionInfoQuery(
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const QVariantMap& paramMap) const
+QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateJsonBuildObjectQuery(const QVariantMap& paramMap) const
 {
 	const bool isSqlite = IsSQLite();
 	QString revisionInfo = isSqlite
@@ -1151,7 +1151,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const QV
 }
 
 
-QString CSqlDatabaseDocumentDelegateComp::CreateJsonExtractSql(
+QString CSqlDatabaseDocumentDelegateCompBase::CreateJsonExtractSql(
 			const QString& jsonName,
 			const QString& key,
 			QMetaType::Type metaType,
@@ -1165,7 +1165,7 @@ QString CSqlDatabaseDocumentDelegateComp::CreateJsonExtractSql(
 }
 
 
-QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingTableName() const
+QString CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingTableName() const
 {
 	if (m_tableSchemaAttrPtr.IsValid() && !(*m_tableSchemaAttrPtr).isEmpty()){
 		return QString("%1.\"TenantEntityBindings\"").arg(qPrintable(*m_tableSchemaAttrPtr));
@@ -1175,7 +1175,7 @@ QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingTableName() const
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingTableInitializationQuery() const
+QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingTableInitializationQuery() const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return QByteArray();
@@ -1204,7 +1204,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingTableInitializat
 }
 
 
-void CSqlDatabaseDocumentDelegateComp::EnsureTenantBindingTableExists() const
+void CSqlDatabaseDocumentDelegateCompBase::EnsureTenantBindingTableExists() const
 {
 	if (m_tenantBindingTableInitialized){
 		return;
@@ -1233,7 +1233,7 @@ void CSqlDatabaseDocumentDelegateComp::EnsureTenantBindingTableExists() const
 }
 
 
-QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode) const
+QString CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode) const
 {
 	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
 	if (!useTenantBindings){
@@ -1278,7 +1278,7 @@ QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const Q
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery(
+QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingInsertQuery(
 			const QByteArray& tenantId,
 			const QByteArray& entityId,
 			const imtbase::IOperationContext* operationContextPtr) const
@@ -1322,7 +1322,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery(
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingDeleteQuery(const QByteArrayList& entityIds) const
+QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingDeleteQuery(const QByteArrayList& entityIds) const
 {
 	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
 	if (!useTenantBindings || entityIds.isEmpty()){
@@ -1346,7 +1346,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingDeleteQuery(cons
 
 // reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 
-QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
+QString CSqlDatabaseDocumentDelegateCompBase::GetBaseSelectionQuery() const
 {
 	QString schema;
 	if (m_tableSchemaAttrPtr.IsValid()){
@@ -1419,7 +1419,7 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 }
 
 
-idoc::MetaInfoPtr CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
+idoc::MetaInfoPtr CSqlDatabaseDocumentDelegateCompBase::CreateObjectMetaInfo(const QByteArray& typeId) const
 {
 	if (m_metaInfoCreatorCompPtr.IsValid()){
 		QByteArrayList supportedTypeIds = m_metaInfoCreatorCompPtr->GetSupportedTypeIds();
@@ -1445,7 +1445,7 @@ idoc::MetaInfoPtr CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const Q
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(
+bool CSqlDatabaseDocumentDelegateCompBase::SetObjectMetaInfoFromRecord(
 			const QSqlRecord& record,
 			idoc::IDocumentMetaInfo& metaInfo) const
 {
@@ -1472,7 +1472,7 @@ bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::CreatePaginationQuery(int offset, int count, QByteArray& paginationQuery) const
+bool CSqlDatabaseDocumentDelegateCompBase::CreatePaginationQuery(int offset, int count, QByteArray& paginationQuery) const
 {
 	paginationQuery.clear();
 
@@ -1489,7 +1489,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreatePaginationQuery(int offset, int cou
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
+bool CSqlDatabaseDocumentDelegateCompBase::CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
 {
 	filterQuery.clear();
 
@@ -1508,7 +1508,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const iprm::IPara
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const
+bool CSqlDatabaseDocumentDelegateCompBase::CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const
 {
 	QByteArray columnId;
 	QByteArray sortOrder;
@@ -1541,7 +1541,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::ICollectio
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const
+bool CSqlDatabaseDocumentDelegateCompBase::CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const
 {
 	bool retVal = BaseClass::CreateSortQuery(collectionFilter, sortQuery);
 
@@ -1553,7 +1553,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::IComplexCo
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
+bool CSqlDatabaseDocumentDelegateCompBase::CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
 {
 	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
 
@@ -1687,13 +1687,13 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 }
 
 
-QString CSqlDatabaseDocumentDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
+QString CSqlDatabaseDocumentDelegateCompBase::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
 {
 	return QString();
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(
+bool CSqlDatabaseDocumentDelegateCompBase::CreateTextFilterQuery(
 		const imtbase::ICollectionFilter& collectionFilter,
 		QString& textFilterQuery) const
 {
@@ -1756,7 +1756,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& timeFieldId) const
+bool CSqlDatabaseDocumentDelegateCompBase::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& timeFieldId) const
 {
 	if (IsSQLite()){
 		QString addedStrQuery = QString(R"((SELECT "TimeStamp" FROM "%1" as temp WHERE %2 = 1 AND root."DocumentId" = temp."DocumentId" LIMIT 1))")
@@ -1930,7 +1930,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITim
 
 // protected methods
 
-bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const
+bool CSqlDatabaseDocumentDelegateCompBase::CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const
 {
 	if (IsSQLite()){
 		filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter);
@@ -1949,7 +1949,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const imtbase::IC
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(
+bool CSqlDatabaseDocumentDelegateCompBase::CreateTextFilterQuery(
 			const imtbase::IComplexCollectionFilter& collectionFilter,
 			QString& textFilterQuery) const
 {
@@ -2038,7 +2038,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(
 }
 
 
-void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query, bool /*castToStr*/) const
+void CSqlDatabaseDocumentDelegateCompBase::SubstituteFieldIds(QString& query, bool /*castToStr*/) const
 {
 	Q_ASSERT(!query.isEmpty());
 
@@ -2089,7 +2089,7 @@ void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query, bool /
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr) const
+QByteArray CSqlDatabaseDocumentDelegateCompBase::GetObjectSelectionQuery(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr) const
 {
 	QString documentFilterQuery;
 	if (paramsPtr != nullptr){
@@ -2166,19 +2166,19 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateJoinTablesQuery() const
+QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateJoinTablesQuery() const
 {
 	return QByteArray();
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::GetCustomColumnsQuery() const
+QByteArray CSqlDatabaseDocumentDelegateCompBase::GetCustomColumnsQuery() const
 {
 	return QByteArray();
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::CreateDocumentCollectionFilterQuery(
+bool CSqlDatabaseDocumentDelegateCompBase::CreateDocumentCollectionFilterQuery(
 			const imtcol::IDocumentCollectionFilter& documentCollectionFilter,
 			QString& documentFilterQuery) const
 {
@@ -2220,7 +2220,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateDocumentCollectionFilterQuery(
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::CreateDocumentIdFilterQuery(
+bool CSqlDatabaseDocumentDelegateCompBase::CreateDocumentIdFilterQuery(
 			const imtcol::IDocumentIdFilter& documentIdFilter,
 			QString& documentIdFilterQuery) const
 {
@@ -2260,7 +2260,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateDocumentIdFilterQuery(
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::IsArrayOperation(
+bool CSqlDatabaseDocumentDelegateCompBase::IsArrayOperation(
 			const QString& query,
 			const QString& field) const
 {
@@ -2286,7 +2286,7 @@ bool CSqlDatabaseDocumentDelegateComp::IsArrayOperation(
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::IsSQLite() const
+bool CSqlDatabaseDocumentDelegateCompBase::IsSQLite() const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return false;
@@ -2298,3 +2298,4 @@ bool CSqlDatabaseDocumentDelegateComp::IsSQLite() const
 
 
 } // namespace imtdb
+
