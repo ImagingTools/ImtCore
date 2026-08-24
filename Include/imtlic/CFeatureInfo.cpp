@@ -167,6 +167,10 @@ bool CFeatureInfo::InsertSubFeature(FeatureInfoPtr subFeatureInfo)
 		istd::CChangeNotifier notifier(this);
 
 		m_subFeatures.push_back(subFeatureInfo);
+		CFeatureInfo* cfeatureInfoPtr = subFeatureInfo.GetPtr<CFeatureInfo>();
+		if (cfeatureInfoPtr != nullptr){
+			cfeatureInfoPtr->SetParentFeature(this);
+		}
 
 		retVal = true;
 	}
@@ -269,6 +273,13 @@ bool CFeatureInfo::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.BeginTag(subfeatureTag);
 		retVal = retVal && featureInfoPtr->Serialize(archive);
 		retVal = retVal && archive.EndTag(subfeatureTag);
+		if (!archive.IsStoring()){
+			CFeatureInfo* cfeatureInfoPtr = featureInfoPtr.GetPtr<CFeatureInfo>();
+			if (cfeatureInfoPtr != nullptr){
+				cfeatureInfoPtr->SetParentFeature(this);
+			}
+
+		}
 	}
 
 	retVal = retVal && archive.EndTag(subFeaturesTag);
@@ -313,9 +324,12 @@ bool CFeatureInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 			if (!result){
 				return false;
 			}
+			CFeatureInfo* cfeatureInfoPtr = featureInfoPtr.GetPtr<CFeatureInfo>();
+			if (cfeatureInfoPtr != nullptr){
+				cfeatureInfoPtr->SetParentFeature(this);
+			}
 		}
 
-		m_parentFeaturePtr = sourcePtr->GetParentFeature();
 
 		return true;
 	}
@@ -427,6 +441,22 @@ IFeatureInfo::FeatureInfoPtr CFeatureInfo::GetSubFeatureRecursive(const FeatureI
 
 	return nullptr;
 }
+
+
+QByteArray CalculateFeaturePath(const IFeatureInfo& featureInfo)
+{
+	QByteArray featurePath = featureInfo.GetFeatureId();
+	featurePath.prepend('/');
+	const imtlic::IFeatureInfo* parentFeature = featureInfo.GetParentFeature();
+	while (parentFeature != nullptr) {
+		featurePath.prepend(parentFeature->GetFeatureId());
+		parentFeature = parentFeature->GetParentFeature();
+		featurePath.prepend('/');
+	}
+
+	return featurePath;
+}
+
 
 
 } // namespace imtlic

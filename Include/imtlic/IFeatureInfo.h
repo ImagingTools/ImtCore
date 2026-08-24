@@ -284,6 +284,8 @@ public:
 typedef istd::TUniqueInterfacePtr<IFeatureInfo> IFeatureInfoUniquePtr;
 typedef istd::TSharedInterfacePtr<IFeatureInfo> IFeatureInfoSharedPtr;
 
+QByteArray CalculateFeaturePath(const IFeatureInfo& featureInfo);
+
 
 } // namespace imtlic
 

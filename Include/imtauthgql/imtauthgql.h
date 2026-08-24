@@ -648,7 +648,7 @@ inline bool CollectPermissionEntries(
 		return false;
 	}
 
-	QByteArray featureId = featureInfo.GetFeatureId();
+	QByteArray featureId = imtlic::CalculateFeaturePath(featureInfo);
 	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
 
 	QString featureName = featureInfo.GetFeatureName();
