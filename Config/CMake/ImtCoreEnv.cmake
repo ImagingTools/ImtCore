@@ -48,6 +48,29 @@ if(NOT DEFINED ZLIBDIR)
 	endif()
 endif()
 
+# Unified modern link-scope defaults for repositories that opt into
+# target-based CMake (set ACF_MODERN_CMAKE ON before including ImtCoreEnv.cmake).
+if(ACF_MODERN_CMAKE)
+	acf_define_link_scope_var(ACF_QT_MODULE_LINK_SCOPE "PRIVATE" "Link scope used for Qt module dependencies")
+	acf_define_link_scope_var(ACF_LIBRARY_LINK_SCOPE "PUBLIC" "Link scope used by inter-library dependencies")
+	acf_define_link_scope_var(ACF_PACKAGE_LINK_SCOPE "PRIVATE" "Link scope used by package (Pck) libraries linking their dependencies")
+	acf_define_link_scope_var(ACF_APPLICATION_LINK_SCOPE "PRIVATE" "Link scope used by executables linking their dependencies")
+
+	# Normalize stale empty-cache values from old CMake caches.
+	if("${ACF_QT_MODULE_LINK_SCOPE}" STREQUAL "")
+		set(ACF_QT_MODULE_LINK_SCOPE "PRIVATE" CACHE STRING "Link scope used for Qt module dependencies" FORCE)
+	endif()
+	if("${ACF_LIBRARY_LINK_SCOPE}" STREQUAL "")
+		set(ACF_LIBRARY_LINK_SCOPE "PUBLIC" CACHE STRING "Link scope used by inter-library dependencies" FORCE)
+	endif()
+	if("${ACF_PACKAGE_LINK_SCOPE}" STREQUAL "")
+		set(ACF_PACKAGE_LINK_SCOPE "PRIVATE" CACHE STRING "Link scope used by package (Pck) libraries linking their dependencies" FORCE)
+	endif()
+	if("${ACF_APPLICATION_LINK_SCOPE}" STREQUAL "")
+		set(ACF_APPLICATION_LINK_SCOPE "PRIVATE" CACHE STRING "Link scope used by executables linking their dependencies" FORCE)
+	endif()
+endif()
+
 function(imt_chain_windeploy_target target)
 	if(TARGET ${target})
 		if(DEFINED IMT_PREV_WINDEPLOY_TARGET AND TARGET ${IMT_PREV_WINDEPLOY_TARGET})
