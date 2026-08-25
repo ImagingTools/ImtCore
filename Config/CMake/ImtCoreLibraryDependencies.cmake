@@ -13,7 +13,7 @@
 # use find_package(ImtCore) and link a single ImtCore::<lib> target.
 #
 # Link scopes are explicit in this file (PUBLIC/PRIVATE/INTERFACE) and applied
-# by the shared acf_declare_target_dependencies() helper from
+# by the shared declare_target_dependencies() helper from
 # ACF/Acf/Config/CMake/ProjectRoot.cmake.
 # The helper uses target properties and therefore avoids plain-vs-keyword
 # target_link_libraries() signature conflicts in mixed environments.
