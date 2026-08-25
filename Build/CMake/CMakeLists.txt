@@ -504,6 +504,10 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 				add_subdirectory("${IMPL_DIR}/ImtDeskGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtDeskGqlPck")
 				add_dependencies(ImtDeskGqlPck imtdb imtdesk imtdesksdl imtservergql imtdoc imtdeskgql)
+				if (IMT_BUILD_CONTROLS_GALLERY)
+					add_subdirectory("${IMPL_DIR}/ImtControlsGallery/Build/CMake" "${AUX_INCLUDE_DIR}/ImtControlsGallery")
+					add_dependencies(ControlsGallery imtgui imtauthsdl imtlicsdl)
+				endif() # IMT_BUILD_CONTROLS_GALLERY
 			endif()
 		endif()
 	endif()

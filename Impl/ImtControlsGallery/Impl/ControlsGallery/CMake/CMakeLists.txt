@@ -18,28 +18,30 @@ endif()
 
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
-include(${ACFDIR}/Config/CMake/AcfQt.cmake)
-include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
 if(DEFINED WEB_COMPILE AND WEB_COMPILE)
 	add_compile_definitions(WEB_COMPILE)
 endif()
 
-target_link_libraries(${PROJECT_NAME} ImtCoreLoc AcfLoc AcfSlnLoc)
-target_link_libraries(${PROJECT_NAME} controlsgallerysdl controlsgallerygql controlsgalleryqml)
-target_link_libraries(${PROJECT_NAME} imtappsdl imtauthsdl imtlicsdl imtcolorsdl imt2dsdl)
-target_link_libraries(${PROJECT_NAME} imtmail imtgui imtauth imtauthgui imtlicdb imtlic imtlicgui imtwidgets imtzip imt3dgui imtrepo imtstyle imtqml imtdb imtfile)
-target_link_libraries(${PROJECT_NAME} imtlicgql imtguigql imtclientgql imtgql imtauthgql imtauthdb imtcom imtservice imtlog imtservergql imtcol)
-target_link_libraries(${PROJECT_NAME} imtcontrolsqml imtstylecontrolsqml imtguiqml imtcolguiqml imtdocguiqml imtguigqlqml imtauthguiqml imtlicguiqml)
-target_link_libraries(${PROJECT_NAME} imtbase imtbasesdl imtserverapp imtapp imtrest imtcrypt imtchatdb imtdeskdb)
-target_link_libraries(${PROJECT_NAME} imtchat)
-target_link_libraries(${PROJECT_NAME} iauth iservice imtdoc)
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::QuickWidgets Qt${QT_VERSION_MAJOR}::WebSockets)
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Sql)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+	ImtCoreLoc
+	controlsgallerygql
+	controlsgalleryqml
+	imt2dsdl
+	imtauthdb
+	imtchatdb
+	imtdeskdb
+	imtcontrolsqml
+	imtstylecontrolsqml
+	imtguiqml
+	imtcolguiqml
+	imtdocguiqml
+	imtguigqlqml
+	imtauthguiqml
+	imtlicguiqml
+)
 
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
-include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 
 if(WIN32)
 	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")
