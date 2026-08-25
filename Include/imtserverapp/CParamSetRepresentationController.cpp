@@ -57,20 +57,14 @@ bool CParamSetRepresentationController::GetSdlRepresentationFromDataModel(
 			continue;
 		}
 
-		// IsModelSupported?
-
 		const iser::ISerializable* parameterPtr = paramsSetPtr->GetParameter(parameterId);
 		if (parameterPtr == nullptr){
 			continue;
 		}
 
-		if (!m_representationControllersMap.contains(parameterId)){
-			continue;
-		}
-
-		const IJsonRepresentationController* subControllerPtr = m_representationControllersMap[parameterId];
+		const IJsonRepresentationController* subControllerPtr = GetRepresentationController(*parameterPtr);
 		if (subControllerPtr == nullptr){
-			return false;
+			continue;
 		}
 
 		QJsonObject parameterRepresentation;
@@ -147,11 +141,7 @@ bool CParamSetRepresentationController::GetDataModelFromSdlRepresentation(
 			return false;
 		}
 
-		if (!m_representationControllersMap.contains(parameterId)){
-			return false;
-		}
-
-		const IJsonRepresentationController* subControllerPtr = m_representationControllersMap[parameterId];
+		const IJsonRepresentationController* subControllerPtr = GetRepresentationController(*parameterPtr);
 		if (subControllerPtr == nullptr){
 			return false;
 		}
@@ -167,14 +157,25 @@ bool CParamSetRepresentationController::GetDataModelFromSdlRepresentation(
 
 // private methods
 
+const IJsonRepresentationController* CParamSetRepresentationController::GetRepresentationController(
+			const istd::IChangeable& dataModel) const
+{
+	for (const IJsonRepresentationController* controllerPtr : m_representationControllers){
+		if (controllerPtr != nullptr && controllerPtr->IsModelSupported(dataModel)){
+			return controllerPtr;
+		}
+	}
+
+	return nullptr;
+}
+
 bool CParamSetRepresentationController::RegisterSubController(const imtserverapp::IJsonRepresentationController& controller) const
 {
-	imtserverapp::IJsonRepresentationController::RepresentationInfo representationInfo = controller.GetRepresentationInfo();
-	if (m_representationControllersMap.contains(representationInfo.modelId)){
+	if (m_representationControllers.contains(&controller)){
 		return false;
 	}
 
-	m_representationControllersMap[representationInfo.modelId] = &controller;
+	m_representationControllers << &controller;
 
 	return true;
 }

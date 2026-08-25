@@ -28,7 +28,10 @@ public:
 	bool RegisterSubController(const imtserverapp::IJsonRepresentationController& controller) const;
 
 private:
-	mutable QMap<QByteArray, const imtserverapp::IJsonRepresentationController*> m_representationControllersMap;
+	const IJsonRepresentationController* GetRepresentationController(const istd::IChangeable& dataModel) const;
+
+private:
+	mutable QList<const IJsonRepresentationController*> m_representationControllers;
 };
 
 

@@ -22,6 +22,7 @@ public:
 	I_BEGIN_COMPONENT(CParamSetRepresentationControllerComp)
 		I_REGISTER_INTERFACE(IJsonRepresentationController);
 		I_ASSIGN_MULTI_0(m_paramRepresentationControllersCompPtr, "ParamRepresentationControllers", "Sub parameters representation controllers", false);
+		I_ASSIGN_MULTI_0(m_customParamRepresentationControllersCompPtr, "CustomParamRepresentationControllers", "Additional application specific sub parameters representation controllers", false);
 	I_END_COMPONENT;
 
 protected:
@@ -40,7 +41,11 @@ protected:
 	virtual void OnComponentCreated() override;
 
 protected:
+	void RegisterSubControllers(const icomp::TMultiReferenceMember<IJsonRepresentationController>& controllers);
+
+protected:
 	I_MULTIREF(IJsonRepresentationController, m_paramRepresentationControllersCompPtr);
+	I_MULTIREF(IJsonRepresentationController, m_customParamRepresentationControllersCompPtr);
 
 private:
 	CParamSetRepresentationController m_representationController;

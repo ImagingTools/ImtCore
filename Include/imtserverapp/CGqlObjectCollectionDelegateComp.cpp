@@ -642,17 +642,6 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 }
 
 
-// reimplemented (icomp::CComponentBase)
-
-void CGqlObjectCollectionDelegateComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-	m_paramSetRepresentationController.RegisterSubController(m_complexCollectionFilterRepresentationController);
-	m_paramSetRepresentationController.RegisterSubController(m_documentIdFilterRepresentationController);
-	m_paramSetRepresentationController.RegisterSubController(m_documentFilterRepresentationController);
-}
-
-
 // private methods
 
 istd::IChangeableUniquePtr CGqlObjectCollectionDelegateComp::CreateObject(const QByteArray& typeId) const
@@ -769,7 +758,7 @@ bool CGqlObjectCollectionDelegateComp::GetParamsSetRepresentation(
 			sdl::V1_0::imtbase::CParamsSet& representation) const
 {
 	QJsonObject jsonObject;
-	if (m_paramSetRepresentationController.GetRepresentationFromDataModel(paramsSet, jsonObject)){
+	if (m_paramSetRepresentationControllerCompPtr.IsValid() && m_paramSetRepresentationControllerCompPtr->GetRepresentationFromDataModel(paramsSet, jsonObject)){
 		if (representation.ReadFromJsonObject(jsonObject)){
 			return true;
 		}
