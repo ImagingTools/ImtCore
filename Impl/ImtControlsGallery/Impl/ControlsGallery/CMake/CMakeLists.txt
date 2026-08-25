@@ -13,10 +13,6 @@ if(WIN32)
 	set(RC_FILE "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/ControlsGallery.rc")
 endif()
 
-if(APPLE)
-	set(CMAKE_MACOSX_BUNDLE "on")
-endif()
-
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
@@ -30,19 +26,12 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	ImtCoreLoc
-	controlsgallerysdl
 	controlsgallerygql
 	controlsgalleryqml
-	imtappsdl
-	imtauthsdl
-	imtlicsdl
-	imtcolorsdl
 	imt2dsdl
-	imtgui
-	imtlicdb
-	imtlicgui
-	imtstyle
-	imtdb
+	imtauthdb
+	imtchatdb
+	imtdeskdb
 	imtcontrolsqml
 	imtstylecontrolsqml
 	imtguiqml
@@ -51,9 +40,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtguigqlqml
 	imtauthguiqml
 	imtlicguiqml
-	imtbase
-	imtchatdb
-	imtdeskdb
 )
 
 set(DEPLOY_QT_QML_DIRS"${IMTCOREDIR}/Qml")
