@@ -47,6 +47,12 @@ public:
 	virtual const iprm::IOptionsList* GetObjectTypeInfos() const override;
 	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
 	virtual QByteArray GetCountQuery(const iprm::IParamsSet* paramsPtr = nullptr) const override;
+	virtual NewObjectQuery CreateUpdateObjectQueryWithBindings(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
+				const imtbase::IOperationContext* operationContextPtr,
+				bool useExternDelegate = true) const override;
 	virtual QByteArray GetSelectionQuery(
 				const QByteArray& objectId = QByteArray(),
 				int offset = 0,
@@ -115,5 +121,4 @@ protected:
 
 
 } // namespace imtdb
-
 

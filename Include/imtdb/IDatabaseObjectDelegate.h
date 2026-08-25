@@ -393,12 +393,7 @@ public:
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
 				const imtbase::IOperationContext* operationContextPtr,
-				bool useExternDelegate = true) const
-	{
-		NewObjectQuery result;
-		result.query = CreateUpdateObjectQuery(collection, objectId, object, operationContextPtr, useExternDelegate);
-		return result;
-	}
+				bool useExternDelegate = true) const = 0;
 
 	/**
 	 * @brief Creates SQL query for renaming an object
