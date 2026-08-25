@@ -8,7 +8,6 @@ include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtdesk
 	imtdeskgql
-	imtauth
 	Acf::itest
 	Qt${QT_VERSION_MAJOR}::Test
 )

@@ -37,8 +37,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtchatdb
 	imtdeskdb
 	imtlog
-	AcfSln::AcfSlnLoc
-	Acf::AcfLoc
 	Qt${QT_VERSION_MAJOR}::QuickControls2
 )
 

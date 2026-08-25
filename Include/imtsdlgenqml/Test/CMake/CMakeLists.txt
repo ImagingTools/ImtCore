@@ -18,9 +18,6 @@ include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtsdlgenqml
 	imtsdlgencpp
-	imtsdl
-	imtfile
-	imtbase
 	Acf::itest
 	Qt${QT_VERSION_MAJOR}::Test
 )
