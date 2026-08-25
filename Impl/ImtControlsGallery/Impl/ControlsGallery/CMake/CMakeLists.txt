@@ -13,6 +13,10 @@ if(WIN32)
 	set(RC_FILE "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/ControlsGallery.rc")
 endif()
 
+if(APPLE)
+	set(CMAKE_MACOSX_BUNDLE "on")
+endif()
+
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
@@ -60,4 +64,3 @@ if(WIN32)
 	file(COPY ${IMTCOREDIR}/3rdParty/openssl/1.1/lib/x64/libcrypto-1_1-x64.dll DESTINATION ${IMTCOREDIR}/Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 	file(COPY ${IMTCOREDIR}/3rdParty/openssl/1.1/lib/x64/libssl-1_1-x64.dll DESTINATION ${IMTCOREDIR}/Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 endif()
-
