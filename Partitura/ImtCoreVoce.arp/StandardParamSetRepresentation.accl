@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6556" Description="ACF"/>
+            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="396034" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ComplexFilterRepresentation" X="225" Y="150" Note=""/>
+        <Element ComponentName="DocumentFilterRepresentation" X="775" Y="225" Note=""/>
+        <Element ComponentName="DocumentIdFilterRepresentation" X="975" Y="150" Note=""/>
+        <Element ComponentName="DoubleParamRepresentationController" X="175" Y="500" Note=""/>
+        <Element ComponentName="EnableableParamRepresentationController" X="300" Y="650" Note=""/>
+        <Element ComponentName="IdParamRepresentationController" X="475" Y="775" Note=""/>
+        <Element ComponentName="IntegerParamRepresentationController" X="1000" Y="500" Note=""/>
+        <Element ComponentName="ParamSetRepresentation" X="575" Y="325" Note=""/>
+        <Element ComponentName="TextParamRepresentationController" X="850" Y="725" Note=""/>
+        <Element ComponentName="TimeFilterRepresentation" X="600" Y="150" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
