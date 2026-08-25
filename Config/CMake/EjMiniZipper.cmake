@@ -2,6 +2,6 @@ include_directories(${IMTCOREDIR}/3rdParty/EJ/EjExport/mini_zipper/)
 
 
 if(WIN32)
-	target_link_libraries(${PROJECT_NAME} ${ACF_LIBRARY_LINK_SCOPE} "${IMTCOREDIR}/3rdParty/EJ/libs/${CMAKE_BUILD_TYPE}_${TARGETNAME}/mini_zipper.lib")
+	target_link_libraries(${PROJECT_NAME} PUBLIC "${IMTCOREDIR}/3rdParty/EJ/libs/${CMAKE_BUILD_TYPE}_${TARGETNAME}/mini_zipper.lib")
 endif()
 
