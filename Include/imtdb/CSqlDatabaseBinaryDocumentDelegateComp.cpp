@@ -57,7 +57,7 @@ IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseBinaryDocumentDelegateComp::
 }
 
 
-IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseBinaryDocumentDelegateComp::CreateUpdateObjectQueryWithBindings(
+IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseBinaryDocumentDelegateComp::CreateUpdateObjectQueryWithParameters(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,

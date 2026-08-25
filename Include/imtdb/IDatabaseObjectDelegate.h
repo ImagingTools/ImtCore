@@ -373,7 +373,7 @@ public:
 	 *
 	 * @code{.cpp}
 	 * user->SetEmail("newemail@example.com");
-	 * auto updateQuery = delegate->CreateUpdateObjectQueryWithBindings(
+	 * auto updateQuery = delegate->CreateUpdateObjectQueryWithParameters(
 	 *     collection,
 	 *     userId,
 	 *     *user,
@@ -388,7 +388,7 @@ public:
 	 *
 	 * @see CreateUpdateObjectQuery(), CreateNewObjectQuery()
 	 */
-	virtual NewObjectQuery CreateUpdateObjectQueryWithBindings(
+	virtual NewObjectQuery CreateUpdateObjectQueryWithParameters(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,

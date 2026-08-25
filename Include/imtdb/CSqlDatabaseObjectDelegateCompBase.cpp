@@ -43,7 +43,7 @@ const iprm::IOptionsList* CSqlDatabaseObjectDelegateCompBase::GetObjectTypeInfos
 }
 
 
-IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseObjectDelegateCompBase::CreateUpdateObjectQueryWithBindings(
+IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseObjectDelegateCompBase::CreateUpdateObjectQueryWithParameters(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
@@ -803,4 +803,3 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTableIfNeeded()
 
 
 } // namespace imtdb
-

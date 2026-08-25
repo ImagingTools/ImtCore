@@ -32,7 +32,7 @@ public:
 				const istd::IChangeable& object,
 				const imtbase::IOperationContext* operationContextPtr,
 				bool useExternDelegate = true) const override;
-	virtual NewObjectQuery CreateUpdateObjectQueryWithBindings(
+	virtual NewObjectQuery CreateUpdateObjectQueryWithParameters(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,

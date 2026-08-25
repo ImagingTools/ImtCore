@@ -47,7 +47,7 @@ public:
 	virtual const iprm::IOptionsList* GetObjectTypeInfos() const override;
 	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
 	virtual QByteArray GetCountQuery(const iprm::IParamsSet* paramsPtr = nullptr) const override;
-	virtual NewObjectQuery CreateUpdateObjectQueryWithBindings(
+	virtual NewObjectQuery CreateUpdateObjectQueryWithParameters(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
@@ -121,4 +121,3 @@ protected:
 
 
 } // namespace imtdb
-

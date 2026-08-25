@@ -397,7 +397,7 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 		return false;
 	}
 
-	auto objectQuery = m_objectDelegateCompPtr->CreateUpdateObjectQueryWithBindings(*this, objectId, object, operationContextPtr);
+	auto objectQuery = m_objectDelegateCompPtr->CreateUpdateObjectQueryWithParameters(*this, objectId, object, operationContextPtr);
 	if (objectQuery.query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
