@@ -6,21 +6,24 @@ set(ARXC_FILES "${PROJECT_SOURCE_DIR}/../${PROJECT_NAME}.acc")
 set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
 set (ARX_ENABLE_GENERATE_DEPENDENCIES_LIST OFF)
 
-include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
-include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
-include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
-include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
-
 if(APPLE)
 	set(CMAKE_MACOSX_BUNDLE "off")
 endif()
 
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test)
+include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
+include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
+include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
+include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE imtsdlgenqml imtsdlgencpp imtsdl imtfile imtbase Acf::itest)
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+	imtsdlgenqml
+	imtsdlgencpp
+	imtsdl
+	imtfile
+	imtbase
+	Acf::itest
+	Qt${QT_VERSION_MAJOR}::Test
+)
 
-if(WIN32)
-	set(listFiles \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
-	windeploy(${PROJECT_NAME} "" "${listFiles}")
-endif()
+deploy_qt(TARGET ${PROJECT_NAME})
+

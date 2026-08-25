@@ -29,7 +29,7 @@ if(NOT DEFINED USE_QT3D OR USE_QT3D)
 	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS OpenGL OpenGLWidgets REQUIRED)
 endif()
 
-
+option(BUILD_TESTING "Configures projects for testing" OFF)
 if(BUILD_TESTING)
 	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Test REQUIRED)
 endif()
@@ -46,8 +46,6 @@ if(NOT DEFINED IMTCOREDIR_BUILD)
 	set(IMTCOREDIR_BUILD "${IMTCOREDIR}")
 endif()
 
-
-option(BUILD_TESTING "Configures projects for testing" OFF)
 option(USE_MDBX "Use 3rdParty/libmdbx" OFF)
 
 # Enable modern target-based architecture:
@@ -216,7 +214,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${INCLUDE_DIR}/imt3dgui/CMake" "${AUX_INCLUDE_DIR}/imt3dgui")
 		add_dependencies(imt3dgui DesignTokenCreator)
 
-		add_subdirectory("${INCLUDE_DIR}/imt3d/Test/CMake" "${AUX_INCLUDE_DIR}/imt3d/Test")
+		if(BUILD_TESTING)
+			add_subdirectory("${INCLUDE_DIR}/imt3d/Test/CMake" "${AUX_INCLUDE_DIR}/imt3d/Test")
+		endif()
 	endif()
 
 	if(NOT DEFINED USE_QTDB OR USE_QTDB)
