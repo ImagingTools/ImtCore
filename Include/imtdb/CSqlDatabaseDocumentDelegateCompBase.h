@@ -53,7 +53,7 @@ public:
 	static const QByteArray s_checksumKey;
 	static QSet<QString> s_filterableColumns;
 
-	I_BEGIN_COMPONENT(CSqlDatabaseDocumentDelegateCompBase)
+	I_BEGIN_BASE_COMPONENT(CSqlDatabaseDocumentDelegateCompBase)
 		I_REGISTER_INTERFACE(imtbase::IRevisionController);
 		I_REGISTER_INTERFACE(imtdb::IDependentMetaInfoController);
 		I_ASSIGN(m_useDataMetaInfoAttrPtr, "UseDataMetaInfo", "If true - documents will be searched and sorted by the 'DataMetaInfo' column,\n else - otherwise according to the contents of the 'Document' column", true, false);
@@ -156,8 +156,8 @@ protected:
 				const imtbase::IOperationContext* operationContextPtr,
 				const QVariant& revisionArgument) const;
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const;
-	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const;
-	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const;
+	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const = 0;
+	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const = 0;
 	virtual QByteArray CreateRevisionInfoQuery(const imtbase::IOperationContext* operationContextPtr, const QVariant& revisionArgument, quint32 checksum) const;
 	virtual QByteArray CreateJsonBuildObjectQuery(const QVariantMap& paramMap) const;
 	virtual QString CreateJsonExtractSql(const QString& jsonName, const QString& key, QMetaType::Type metaType = QMetaType::QString, const QString& tableAlias = QString()) const;

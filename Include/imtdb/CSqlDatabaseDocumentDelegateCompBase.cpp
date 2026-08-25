@@ -15,7 +15,6 @@
 #include <istd/CCrcCalculator.h>
 #include <imod/TModelWrap.h>
 #include <iser/CJsonMemWriteArchive.h>
-#include <iser/CJsonMemReadArchive.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/CIdParam.h>
 #include <iprm/TParamsPtr.h>
@@ -837,7 +836,7 @@ bool CSqlDatabaseDocumentDelegateCompBase::UpdateDependentMetaInfo(const Depende
 	QSqlError sqlError;
 	m_databaseEngineCompPtr->ExecSqlQuery(query.toUtf8(), &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
-		SendErrorMessage(0, sqlError.text(), "CSqlDatabaseDocumentDelegateComp");
+		SendErrorMessage(0, sqlError.text(), "CSqlDatabaseDocumentDelegateCompBase");
 		qDebug() << "SQL-error" << sqlError.text();
 
 		return false;
@@ -895,7 +894,7 @@ bool CSqlDatabaseDocumentDelegateCompBase::ClearDependentMetaInfo(const MetaFiel
 	m_databaseEngineCompPtr->ExecSqlQuery(fullQuery.toUtf8(), &sqlError);
 
 	if (sqlError.type() != QSqlError::NoError){
-		SendErrorMessage(0, sqlError.text(), "CSqlDatabaseDocumentDelegateComp");
+		SendErrorMessage(0, sqlError.text(), "CSqlDatabaseDocumentDelegateCompBase");
 		qDebug() << "SQL-error:" << sqlError.text();
 		return false;
 	}
@@ -1027,45 +1026,6 @@ istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateCompBase::CreateObject(co
 	}
 
 	return nullptr;
-}
-
-
-bool CSqlDatabaseDocumentDelegateCompBase::WriteDataToMemory(const QByteArray& /*typeId*/, const istd::IChangeable& object, QByteArray& data) const
-{
-	iser::ISerializable* serializableObjectPtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(&object));
-	if (serializableObjectPtr == nullptr){
-		Q_ASSERT(0);
-		return false;
-	}
-
-	iser::CJsonMemWriteArchive archive(m_versionInfoCompPtr.GetPtr());
-	if (!serializableObjectPtr->Serialize(archive)){
-		SendErrorMessage(0, "Unable to write data to memory. Error: Serialization failed", "CSqlJsonDatabaseDelegateComp");
-		return false;
-	}
-
-	data = archive.GetData();
-
-	return true;
-}
-
-
-bool CSqlDatabaseDocumentDelegateCompBase::ReadDataFromMemory(const QByteArray& /*typeId*/, const QByteArray& data, istd::IChangeable& object) const
-{
-	iser::ISerializable* serializableObjectPtr = dynamic_cast<iser::ISerializable*>(&object);
-	if (serializableObjectPtr == nullptr){
-		Q_ASSERT(0);
-		return false;
-	}
-
-	iser::CJsonMemReadArchive archive(data);
-
-	if (!serializableObjectPtr->Serialize(archive)){
-		SendErrorMessage(0, "Unable to read data from memory. Error: Serialization failed", "CSqlJsonDatabaseDelegateComp");
-		return false;
-	}
-
-	return true;
 }
 
 
@@ -2298,4 +2258,3 @@ bool CSqlDatabaseDocumentDelegateCompBase::IsSQLite() const
 
 
 } // namespace imtdb
-

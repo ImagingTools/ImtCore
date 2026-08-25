@@ -12,7 +12,7 @@
 #include <imtdb/CDatabaseAccessSettingsComp.h>
 #include <imtdb/CSqlDatabaseDocumentDelegateLegacyComp.h>
 #include <imtdb/CSqlDatabaseDocumentDelegateCompBase.h>
-#include <imtdb/CSqlDatabaseJsonDocumentDelegateComp.h>
+#include <imtdb/CSqlDatabaseDocumentDelegateComp.h>
 #include <imtdb/CSqlDatabaseBinaryDocumentDelegateComp.h>
 #include <imtdb/CSqlJsonDatabaseDelegateComp.h>
 #include <imtdb/CStandardSqlMetaInfoTableDelegateComp.h>
@@ -43,7 +43,7 @@ typedef imtdb::CDatabaseEngineComp SqlDatabaseEngine;
 typedef icomp::TModelCompWrap<imtdb::CSqlDatabaseObjectCollectionComp> SqlDatabaseCollection;
 typedef icomp::TModelCompWrap<imtdb::CDatabaseAccessSettingsComp> DatabaseAccessSettings;
 typedef imtdb::CSqlDatabaseDocumentDelegateLegacyComp SqlDatabaseDocumentDelegateLegacy;
-typedef imtdb::CSqlDatabaseJsonDocumentDelegateComp SqlDatabaseDocumentDelegate;
+typedef imtdb::CSqlDatabaseDocumentDelegateComp SqlDatabaseDocumentDelegate;
 typedef imtdb::CSqlDatabaseBinaryDocumentDelegateComp SqlDatabaseBinaryDocumentDelegate;
 typedef imtdb::CSqlJsonDatabaseDelegateComp SqlDatabaseJsonDelegate;
 typedef imtdb::CStandardSqlMetaInfoTableDelegateComp StandardMetaInfoTableDelegate;
@@ -51,13 +51,13 @@ typedef imtdb::CDatabaseAutomaticBackupComp DatabaseAutomaticBackup;
 typedef imtdb::CRestoringDatabaseControllerComp RestoringDatabaseController;
 typedef imtdb::CSqlStructureDelegateComp SqlStructureDelegate;
 typedef imtdb::CSqliteJsonDatabaseDelegateComp SqliteJsonDatabaseDelegate;
-typedef imtdb::TMessageDatabaseDelegateComp<imtdb::CSqlDatabaseJsonDocumentDelegateComp> SqliteJsonMessageDatabaseDelegate;
+typedef imtdb::TMessageDatabaseDelegateComp<imtdb::CSqlDatabaseDocumentDelegateComp> SqliteJsonMessageDatabaseDelegate;
 typedef imtdb::CMigrationControllerComp MigrationController;
 typedef imtdb::CCompositeMigrationControllerComp CompositeMigrationController;
 typedef imtdb::CObjectCollectionMigrationControllerComp ObjectCollectionMigrationController;
 typedef imtdb::CDatabaseConnectorComp DatabaseConnector;
 typedef imtdb::CDependentTableMetaInfoControllerComp DependentTableMetaInfoController;
-typedef imtdb::CSqlDatabaseJsonDocumentDelegateComp SQLiteDatabaseDocumentDelegate;
+typedef imtdb::CSqlDatabaseDocumentDelegateComp SQLiteDatabaseDocumentDelegate;
 typedef imtdb::CPostgresXPathExtractorComp PostgresXPathExtractor;
 typedef imtdb::CSqliteXPathExtractorComp SqliteXPathExtractor;
 typedef imtdb::CSqlDatabaseTransactionManagerComp SqlDatabaseTransactionManager;

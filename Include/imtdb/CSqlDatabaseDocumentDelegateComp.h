@@ -3,14 +3,25 @@
 
 
 // ImtCore includes
-#include <imtdb/CSqlDatabaseJsonDocumentDelegateComp.h>
+#include <imtdb/CSqlDatabaseDocumentDelegateCompBase.h>
 
 
 namespace imtdb
 {
 
 
-using CSqlDatabaseDocumentDelegateComp = CSqlDatabaseJsonDocumentDelegateComp;
+class CSqlDatabaseDocumentDelegateComp: public imtdb::CSqlDatabaseDocumentDelegateCompBase
+{
+public:
+	typedef imtdb::CSqlDatabaseDocumentDelegateCompBase BaseClass;
+
+	I_BEGIN_COMPONENT(CSqlDatabaseDocumentDelegateComp)
+	I_END_COMPONENT
+
+protected:
+	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const override;
+	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const override;
+};
 
 
 } // namespace imtdb
