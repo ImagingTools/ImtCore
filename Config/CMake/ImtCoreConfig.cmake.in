@@ -46,11 +46,13 @@ endif()
 find_dependency(Qt${IMTCORE_QT_VERSION_MAJOR}
 	COMPONENTS ${_imtcore_qt_components})
 
-# The exported ImtCore targets reference third-party imported targets in their link
-# interface: OpenSSL::Crypto (imtcrypt) and QuaZip::QuaZip (imtrest). Resolve their
-# packages here so those targets exist before ImtCoreTargets.cmake is included.
-find_dependency(OpenSSL)
-find_dependency(QuaZip)
+if(USE_FIND_PACKAGE)
+	# The exported ImtCore targets reference third-party imported targets in their link
+	# interface: OpenSSL::Crypto (imtcrypt) and QuaZip::QuaZip (imtrest). Resolve their
+	# packages here so those targets exist before ImtCoreTargets.cmake is included.
+	find_dependency(OpenSSL)
+	find_dependency(QuaZip)
+endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/ImtCoreTargets.cmake")
 
