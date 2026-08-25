@@ -13,7 +13,7 @@ namespace imtserverapp
 
 // public methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CSchedulerParam>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CSchedulerParam>)
 
 QByteArray CDatabaseAccessSettingsRepresentationControllerComp::GetTypeId() const
 {

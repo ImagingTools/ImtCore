@@ -16,7 +16,7 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CSchedulerParam>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CSchedulerParam>)
 
 IJsonRepresentationController::RepresentationInfo CParamsRepresentationControllerComp::GetRepresentationInfo() const
 {
