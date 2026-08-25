@@ -18,9 +18,40 @@ public:
 	I_BEGIN_COMPONENT(CSqlDatabaseBinaryDocumentDelegateComp)
 	I_END_COMPONENT
 
+	// reimplemented (imtdb::IDatabaseObjectDelegate)
+	virtual NewObjectQuery CreateNewObjectQuery(
+				const QByteArray& typeId,
+				const QByteArray& proposedObjectId,
+				const QString& objectName,
+				const QString& objectDescription,
+				const istd::IChangeable* valuePtr,
+				const imtbase::IOperationContext* operationContextPtr) const override;
+	virtual QByteArray CreateUpdateObjectQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
+				const imtbase::IOperationContext* operationContextPtr,
+				bool useExternDelegate = true) const override;
+	virtual NewObjectQuery CreateUpdateObjectQueryWithBindings(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
+				const imtbase::IOperationContext* operationContextPtr,
+				bool useExternDelegate = true) const override;
+
 protected:
 	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const override;
 	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const override;
+
+private:
+	NewObjectQuery CreatePreparedInsertQuery(
+				const QByteArray& typeId,
+				const QByteArray& objectId,
+				const QString& objectName,
+				const QString& objectDescription,
+				const istd::IChangeable& object,
+				const imtbase::IOperationContext* operationContextPtr,
+				const QVariant& revisionArgument) const;
 };
 
 
