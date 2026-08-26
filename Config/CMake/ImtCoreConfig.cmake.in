@@ -49,8 +49,20 @@ find_dependency(Qt${IMTCORE_QT_VERSION_MAJOR}
 # The exported ImtCore targets reference third-party imported targets in their link
 # interface: OpenSSL::Crypto (imtcrypt) and QuaZip::QuaZip (imtrest). Resolve their
 # packages here so those targets exist before ImtCoreTargets.cmake is included.
+#
+# Promote the OpenSSL/QuaZip imported targets to global scope. Consumers pull ImtCore
+# in with find_package(ImtCore GLOBAL), which promotes the ImtCore:: targets to global
+# but does NOT propagate GLOBAL into these nested find_dependency() calls. Without the
+# promotion the global ImtCore::imtcrypt / ImtCore::imtrest targets would reference
+# directory-scoped OpenSSL::Crypto / QuaZip::QuaZip targets, so consumers had to
+# pre-find OpenSSL/QuaZip with GLOBAL themselves. Doing it centrally here removes that
+# need. Requires CMake >= 3.24 (project mandates >= 3.26).
+set(_imtcore_prev_targets_global "${CMAKE_FIND_PACKAGE_TARGETS_GLOBAL}")
+set(CMAKE_FIND_PACKAGE_TARGETS_GLOBAL TRUE)
 find_dependency(OpenSSL)
 find_dependency(QuaZip)
+set(CMAKE_FIND_PACKAGE_TARGETS_GLOBAL "${_imtcore_prev_targets_global}")
+unset(_imtcore_prev_targets_global)
 
 include("${CMAKE_CURRENT_LIST_DIR}/ImtCoreTargets.cmake")
 
