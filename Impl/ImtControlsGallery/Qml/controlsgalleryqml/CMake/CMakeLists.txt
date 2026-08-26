@@ -55,4 +55,3 @@ else()
 		jqml_compile_web2("${webdirs}" "${buildwebdir}" "${resname}")
 	endif()
 endif()
-

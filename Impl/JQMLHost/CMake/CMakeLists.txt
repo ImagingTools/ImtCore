@@ -6,10 +6,9 @@ if(APPLE)
 endif()
 
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
-include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
+include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-#------ SDL-generated QML libraries ------
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtappsdl
 	imtauthsdl
@@ -18,10 +17,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	imt2dsdl
 	imtchatsdl
 	imtdesksdl
-	imtpaysdl)
-
-#------ QML modules (from ImtCore/Qml) ------
-target_link_libraries(${PROJECT_NAME} PRIVATE
+	imtpaysdl
 	imtcontrolsqml
 	imtstylecontrolsqml
 	imtguiqml
@@ -31,13 +27,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtauthguiqml
 	imtlicguiqml
 	imtchatguiqml
-	imtdeskguiqml)
-
-#------ Core ImtCore libraries ------
-target_link_libraries(${PROJECT_NAME} PRIVATE
+	imtdeskguiqml
 	ImtCoreLoc
-	Acf::AcfLoc
-	AcfSln::AcfSlnLoc
 	imtguigql
 	imtauthdb
 	imtauthgui
@@ -45,17 +36,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtstyle
 	imtchatdb
 	imtdeskdb
-	imtlog)
-
-#------ Qt modules ------
-target_link_libraries(${PROJECT_NAME} PRIVATE
+	imtlog
 	Qt${QT_VERSION_MAJOR}::QuickControls2
 )
 
-if(WIN32)
-	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")
-	set(files \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
-	windeploy(${PROJECT_NAME} "${listOptions}" "${files}")
-	unset(listOptions)
-endif()
+set(DEPLOY_QT_QML_DIRS "${IMTCOREDIR}/Qml")
+deploy_qt(TARGET ${PROJECT_NAME})
 

@@ -13,23 +13,20 @@ endif()
 
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
-include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
+include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
+
+if(QT_VERSION_MAJOR GREATER 4)
+	set(EAGLE_VIEW_QT_LIBRARIES Qt${QT_VERSION_MAJOR}::PrintSupport)
+endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtgui
 	imtstyle
 	imt3dgui
 	Qt${QT_VERSION_MAJOR}::Xml
+	${EAGLE_VIEW_QT_LIBRARIES}
 )
 
-if(QT_VERSION_MAJOR GREATER 4)
-	target_link_libraries(${PROJECT_NAME} PRIVATE
-		Qt${QT_VERSION_MAJOR}::PrintSupport)
-endif()
-
-if(WIN32)
-	set(listFiles \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
-	windeploy(${PROJECT_NAME} "" "${listFiles}")
-endif()
+deploy_qt(TARGET ${PROJECT_NAME})
 

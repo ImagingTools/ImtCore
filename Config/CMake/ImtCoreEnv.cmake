@@ -80,7 +80,9 @@ else()
 		set(IACFDIR_BUILD "${IACFDIR}")
 	endif()
 
-	set(IAcf_DIR "${IACFDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}/cmake" CACHE PATH "Path to the IAcf build-tree CMake package")
+	set(IAcf_DIR "${IACFDIR_BUILD}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}/cmake")
+	message(VERBOSE "ImtCoreEnv find_package(IAcf) from ${IAcf_DIR}")
+
 	find_package(IAcf QUIET GLOBAL)
 
 	if(NOT IAcf_FOUND)
