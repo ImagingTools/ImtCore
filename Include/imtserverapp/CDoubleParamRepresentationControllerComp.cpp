@@ -4,7 +4,7 @@
 
 
 // ACF includes
-#include <iprm/ITextParam.h>
+#include <imeas/INumericValue.h>
 
 
 namespace imtserverapp
@@ -23,9 +23,9 @@ QByteArray CDoubleParamRepresentationControllerComp::GetTypeId() const
 
 bool CDoubleParamRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
-	const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(&dataModel);
+	const imeas::INumericValue* numericValuePtr = dynamic_cast<const imeas::INumericValue*>(&dataModel);
 
-	return textParamPtr != nullptr;
+	return numericValuePtr != nullptr && numericValuePtr->GetValues().GetElementsCount() == 1;
 }
 
 
@@ -34,18 +34,21 @@ bool CDoubleParamRepresentationControllerComp::GetSdlRepresentationFromDataModel
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
-	const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(&dataModel);
-	Q_ASSERT(textParamPtr != nullptr);
-	if (textParamPtr == nullptr){
+	const imeas::INumericValue* numericValuePtr = dynamic_cast<const imeas::INumericValue*>(&dataModel);
+	Q_ASSERT(numericValuePtr != nullptr);
+	if (numericValuePtr == nullptr){
 		return false;
 	}
 
-	bool ok = false;
-	QString text = textParamPtr->GetText();
+	imath::CVarVector values = numericValuePtr->GetValues();
+	Q_ASSERT(values.GetElementsCount() == 1);
+	if (values.GetElementsCount() != 1){
+		return false;
+	}
 
-	sdlRepresentation.value = text.toDouble(&ok);
+	sdlRepresentation.value = values[0];
 
-	return ok;
+	return true;
 }
 
 
@@ -53,9 +56,9 @@ bool CDoubleParamRepresentationControllerComp::GetDataModelFromSdlRepresentation
 			istd::IChangeable& dataModel,
 			const sdl::V1_0::imtbase::CDoubleParam& sdlRepresentation) const
 {
-	iprm::ITextParam* textParamPtr = dynamic_cast<iprm::ITextParam*>(&dataModel);
-	Q_ASSERT(textParamPtr != nullptr);
-	if (textParamPtr == nullptr){
+	imeas::INumericValue* numericValuePtr = dynamic_cast<imeas::INumericValue*>(&dataModel);
+	Q_ASSERT(numericValuePtr != nullptr);
+	if (numericValuePtr == nullptr){
 		return false;
 	}
 
@@ -63,8 +66,14 @@ bool CDoubleParamRepresentationControllerComp::GetDataModelFromSdlRepresentation
 		return false;
 	}
 
-	QString text = QString::number(*sdlRepresentation.value);
-	textParamPtr->SetText(text);
+	imath::CVarVector values = numericValuePtr->GetValues();
+	Q_ASSERT(values.GetElementsCount() == 1);
+	if (values.GetElementsCount() != 1){
+		return false;
+	}
+
+	values[0] = *sdlRepresentation.value;
+	numericValuePtr->SetValues(values);
 
 	return true;
 }

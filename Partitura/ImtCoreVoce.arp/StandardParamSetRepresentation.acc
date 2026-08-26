@@ -90,9 +90,9 @@
                                 <Value>DocumentIdFilterRepresentation</Value>
                                 <Value>TimeFilterRepresentation</Value>
                                 <Value>DoubleParamRepresentationController</Value>
+                                <Value>IntegerParamRepresentationController</Value>
                                 <Value>EnableableParamRepresentationController</Value>
                                 <Value>IdParamRepresentationController</Value>
-                                <Value>IntegerParamRepresentationController</Value>
                                 <Value>TextParamRepresentationController</Value>
                             </Values>
                         </Data>
