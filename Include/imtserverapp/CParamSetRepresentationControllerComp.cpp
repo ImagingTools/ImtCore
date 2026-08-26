@@ -41,7 +41,10 @@ void CParamSetRepresentationControllerComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	RegisterSubControllers(m_paramRepresentationControllersCompPtr);
-	RegisterSubControllers(m_customParamRepresentationControllersCompPtr);
+
+	if (m_customParamRepresentationControllerCompPtr.IsValid()){
+		m_representationController.RegisterSubController(*m_customParamRepresentationControllerCompPtr);
+	}
 }
 
 

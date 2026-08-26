@@ -22,7 +22,7 @@ public:
 	I_BEGIN_COMPONENT(CParamSetRepresentationControllerComp)
 		I_REGISTER_INTERFACE(IJsonRepresentationController);
 		I_ASSIGN_MULTI_0(m_paramRepresentationControllersCompPtr, "ParamRepresentationControllers", "Sub parameters representation controllers", false);
-		I_ASSIGN_MULTI_0(m_customParamRepresentationControllersCompPtr, "CustomParamRepresentationControllers", "Additional application specific sub parameters representation controllers", false);
+		I_ASSIGN(m_customParamRepresentationControllerCompPtr, "CustomParamRepresentationController", "Additional application-specific sub parameter representation controller", false, "");
 	I_END_COMPONENT;
 
 protected:
@@ -45,7 +45,7 @@ protected:
 
 protected:
 	I_MULTIREF(IJsonRepresentationController, m_paramRepresentationControllersCompPtr);
-	I_MULTIREF(IJsonRepresentationController, m_customParamRepresentationControllersCompPtr);
+	I_REF(IJsonRepresentationController, m_customParamRepresentationControllerCompPtr);
 
 private:
 	CParamSetRepresentationController m_representationController;
