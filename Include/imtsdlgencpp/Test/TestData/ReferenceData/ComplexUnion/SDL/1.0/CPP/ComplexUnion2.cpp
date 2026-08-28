@@ -18076,7 +18076,7 @@ QJsonObject CComplexUnion2GqlHandlerCompBase::CreateInternalResponse(const ::imt
 	if (commandId == CGetLastProductionResultsGqlRequest::GetCommandId()){
 		CGetLastProductionResultsGqlRequest getLastProductionResultsGqlRequest(gqlRequest, false);
 		if (!getLastProductionResultsGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -18091,7 +18091,7 @@ QJsonObject CComplexUnion2GqlHandlerCompBase::CreateInternalResponse(const ::imt
 
 		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
-			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
 			SendCriticalMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -18104,7 +18104,7 @@ QJsonObject CComplexUnion2GqlHandlerCompBase::CreateInternalResponse(const ::imt
 	if (commandId == CGetLastProductionResultsCDMGqlRequest::GetCommandId()){
 		CGetLastProductionResultsCDMGqlRequest getLastProductionResultsCDMGqlRequest(gqlRequest, false);
 		if (!getLastProductionResultsCDMGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -18119,7 +18119,7 @@ QJsonObject CComplexUnion2GqlHandlerCompBase::CreateInternalResponse(const ::imt
 
 		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
-			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
 			SendCriticalMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -18128,7 +18128,7 @@ QJsonObject CComplexUnion2GqlHandlerCompBase::CreateInternalResponse(const ::imt
 		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
-	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
 	SendErrorMessage(0, errorMessage);
 
 	return QJsonObject();

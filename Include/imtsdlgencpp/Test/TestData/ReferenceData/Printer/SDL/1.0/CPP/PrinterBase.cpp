@@ -2848,7 +2848,7 @@ QJsonObject CPrinterBaseGqlHandlerCompBase::CreateInternalResponse(const ::imtgq
 	if (commandId == CGetPrintersGqlRequest::GetCommandId()){
 		CGetPrintersGqlRequest getPrintersGqlRequest(gqlRequest, false);
 		if (!getPrintersGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -2863,7 +2863,7 @@ QJsonObject CPrinterBaseGqlHandlerCompBase::CreateInternalResponse(const ::imtgq
 
 		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
-			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
 			SendCriticalMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -2872,7 +2872,7 @@ QJsonObject CPrinterBaseGqlHandlerCompBase::CreateInternalResponse(const ::imtgq
 		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
-	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
 	SendErrorMessage(0, errorMessage);
 
 	return QJsonObject();

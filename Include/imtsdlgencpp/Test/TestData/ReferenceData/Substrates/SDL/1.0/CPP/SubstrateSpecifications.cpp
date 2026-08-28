@@ -6075,7 +6075,7 @@ bool CSubstrateSpecificationCollectionControllerCompBase::CreateRepresentationFr
 		return true;
 	}
 
-	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
 
 	SendErrorMessage(0, errorMessage);
 
@@ -6091,7 +6091,7 @@ istd::IChangeableUniquePtr CSubstrateSpecificationCollectionControllerCompBase::
 	if (commandId == CInsertSubstrateSpecificationGqlRequest::GetCommandId()){
 		CInsertSubstrateSpecificationGqlRequest insertSubstrateSpecificationGqlRequest(gqlRequest, false);
 		if (!insertSubstrateSpecificationGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
 			SendErrorMessage(0, errorMessage);
 
 			return nullptr;
@@ -6100,7 +6100,7 @@ istd::IChangeableUniquePtr CSubstrateSpecificationCollectionControllerCompBase::
 		return CreateObjectFromRepresentation(*insertSubstrateSpecificationGqlRequest.GetRequestedArguments().input->item, newObjectId, errorMessage);
 	}
 
-	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
 	SendErrorMessage(0, errorMessage);
 
 	return nullptr;
@@ -6117,7 +6117,7 @@ bool CSubstrateSpecificationCollectionControllerCompBase::UpdateObjectFromReques
 		return UpdateObjectFromRepresentationRequest(gqlRequest, updateSubstrateSpecificationGqlRequest, object, errorMessage);
 	}
 
-	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
 	SendErrorMessage(0, errorMessage);
 
 	return false;
@@ -6129,7 +6129,7 @@ bool CSubstrateSpecificationCollectionControllerCompBase::UpdateObjectFromReques
 	const QByteArray commandId = gqlRequest.GetCommandId();
 	auto setupContext = std::make_shared<CGetSubstrateSpecificationListGqlRequest>(gqlRequest, false);
 	if (!setupContext->IsValid()){
-		errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+		errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
 		SendErrorMessage(0, errorMessage);
 
 		return {};
@@ -6151,7 +6151,7 @@ I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create object it
 
 	const auto typedSetupContext = std::static_pointer_cast<const CGetSubstrateSpecificationListGqlRequest>(setupContext);
 	if (!typedSetupContext){
-		errorMessage = QStringLiteral("Internal error. Invalid request setup context for command-ID: '%1'").arg(qPrintable(CGetSubstrateSpecificationListGqlRequest::GetCommandId()));
+		errorMessage = QStringLiteral("Internal error. Invalid request setup context for command-ID: '%1'").arg(CGetSubstrateSpecificationListGqlRequest::GetCommandId());
 		SendErrorMessage(0, errorMessage);
 
 		return false;
@@ -6188,7 +6188,7 @@ QJsonObject CSubstrateSpecificationCollectionControllerCompBase::CreateInternalR
 	if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
 		CGetOptionsListGqlRequest getOptionsListGqlRequest(gqlRequest, false);
 		if (!getOptionsListGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6203,7 +6203,7 @@ QJsonObject CSubstrateSpecificationCollectionControllerCompBase::CreateInternalR
 
 		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
-			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
 			SendCriticalMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6249,7 +6249,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 	if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
 		CGetSubstrateSpecificationListGqlRequest getSubstrateSpecificationListGqlRequest(gqlRequest, false);
 		if (!getSubstrateSpecificationListGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6264,7 +6264,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 
 		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
-			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
 			SendCriticalMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6277,7 +6277,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 	if (commandId == CGetSubstrateSpecificationGqlRequest::GetCommandId()){
 		CGetSubstrateSpecificationGqlRequest getSubstrateSpecificationGqlRequest(gqlRequest, false);
 		if (!getSubstrateSpecificationGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6318,7 +6318,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 	if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
 		CGetOptionsListGqlRequest getOptionsListGqlRequest(gqlRequest, false);
 		if (!getOptionsListGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6333,7 +6333,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 
 		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
-			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
 			SendCriticalMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6346,7 +6346,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 	if (commandId == CInsertSubstrateSpecificationGqlRequest::GetCommandId()){
 		CInsertSubstrateSpecificationGqlRequest insertSubstrateSpecificationGqlRequest(gqlRequest, false);
 		if (!insertSubstrateSpecificationGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6361,7 +6361,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 
 		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
-			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
 			SendCriticalMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6374,7 +6374,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 	if (commandId == CUpdateSubstrateSpecificationGqlRequest::GetCommandId()){
 		CUpdateSubstrateSpecificationGqlRequest updateSubstrateSpecificationGqlRequest(gqlRequest, false);
 		if (!updateSubstrateSpecificationGqlRequest.IsValid()){
-			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(commandId);
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6389,7 +6389,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 
 		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
-			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(commandId);
 			SendCriticalMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6398,7 +6398,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
-	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(commandId);
 	SendErrorMessage(0, errorMessage);
 
 	return QJsonObject();

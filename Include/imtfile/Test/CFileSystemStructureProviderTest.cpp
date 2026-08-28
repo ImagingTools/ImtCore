@@ -47,7 +47,7 @@ void CFileSystemStructureProviderTest::PathTraversalOutsideRootDeniedTest()
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
 
-	const bool ok = m_provider.GetEntries(query, listing, error.toUtf8().constData());
+	const bool ok = m_provider.GetEntries(query, listing, error);
 	if (QDir(parentOfRoot).canonicalPath() != QDir(m_tempDir.path()).canonicalPath()){
 		QVERIFY2(!ok, "Path traversal outside root must be denied");
 		QVERIFY(!error.isEmpty());
@@ -247,8 +247,8 @@ void CFileSystemStructureProviderTest::WholeFsDrivesHaveNamesTest()
 		if (entry.path.size() >= 2 && entry.path.at(1) == QLatin1Char(':')){
 			const QString rootKey = entry.path.left(2).toUpper();
 			QVERIFY2(entry.name.contains(rootKey, Qt::CaseInsensitive),
-					 QStringLiteral("Drive name '%1' lacks root key '%2'")
-								.arg(entry.name, rootKey));
+					 qPrintable(QStringLiteral("Drive name '%1' lacks root key '%2'")
+									.arg(entry.name, rootKey)));
 		}
 	}
 
@@ -391,7 +391,7 @@ void CFileSystemStructureProviderTest::NameFilterMatchesGlobStarTest()
 	bool foundOther = false;
 	for (const auto& entry : listing.entries){
 		QVERIFY2(entry.name.endsWith(QStringLiteral(".txt"), Qt::CaseInsensitive),
-				entry.name);
+				qPrintable(entry.name));
 		if (entry.name == QStringLiteral("other.txt")){
 			foundOther = true;
 		}
@@ -452,7 +452,7 @@ void CFileSystemStructureProviderTest::ExtensionFilterMatchesSuffixTest()
 	for (const auto& entry : listing.entries){
 		if (entry.type == imtfile::IFileSystemStructureProvider::FileSystemEntry::Type::File){
 			QVERIFY2(entry.name.endsWith(QStringLiteral(".exe"), Qt::CaseInsensitive),
-					entry.name);
+					qPrintable(entry.name));
 			if (entry.name == QStringLiteral("tool.exe")){
 				foundExe = true;
 			}

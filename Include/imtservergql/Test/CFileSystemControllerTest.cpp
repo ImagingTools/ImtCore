@@ -14,7 +14,8 @@ imtgql::CGqlRequest MakeGetFileSystemEntriesRequest(const QString& path = QStrin
 	if (!path.isEmpty()){
 		arguments.input->path = path;
 	}
-	sdl::V1_0::imtbase::CGetFileSystemEntriesGqlRequest::SetupGqlRequest(request, arguments);
+
+	[[maybe_unused]] auto unused = sdl::V1_0::imtbase::CGetFileSystemEntriesGqlRequest::SetupGqlRequest(request, arguments);
 	request.AddSimpleField(QByteArrayLiteral("path"));
 	request.AddSimpleField(QByteArrayLiteral("parentPath"));
 	request.AddSimpleField(QByteArrayLiteral("totalCount"));
@@ -54,7 +55,7 @@ void CFileSystemControllerTest::ProviderErrorIsPropagatedTest()
 	const imtgql::CGqlRequest request = MakeGetFileSystemEntriesRequest(QStringLiteral("/tmp"));
 	sdl::V1_0::imtbase::CGetFileSystemEntriesGqlRequest typedRequest(request, true);
 	QString error;
-	const auto payload = controller.OnGetFileSystemEntries(typedRequest, request, error.toUtf8().constData());
+	const auto payload = controller.OnGetFileSystemEntries(typedRequest, request, error);
 
 	QCOMPARE(error, QStringLiteral("access denied by provider"));
 	QVERIFY(!payload.path.has_value());
@@ -83,7 +84,7 @@ void CFileSystemControllerTest::HappyPathMapsPayloadTest()
 	const imtgql::CGqlRequest request = MakeGetFileSystemEntriesRequest(QStringLiteral("/root/sub"));
 	sdl::V1_0::imtbase::CGetFileSystemEntriesGqlRequest typedRequest(request, true);
 	QString error;
-	const auto payload = controller.OnGetFileSystemEntries(typedRequest, request, error.toUtf8().constData());
+	const auto payload = controller.OnGetFileSystemEntries(typedRequest, request, error);
 
 	QVERIFY2(error.isEmpty(), error.toUtf8().constData());
 	QVERIFY(payload.path.has_value());
@@ -121,7 +122,7 @@ void CFileSystemControllerTest::PermissionDeniedCreateResponseTest()
 	// Our test subclass overrides CheckPermissions; CreateResponse must refuse.
 	const imtgql::CGqlRequest request = MakeGetFileSystemEntriesRequest();
 	QString error;
-	const QJsonObject response = controller.CreateResponse(request, error.toUtf8().constData());
+	const QJsonObject response = controller.CreateResponse(request, error);
 
 	QVERIFY(response.isEmpty());
 	QVERIFY(!error.isEmpty());
