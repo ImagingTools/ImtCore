@@ -146,7 +146,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::GetSelectionQuery(
 		retVal += ' ';
 		retVal += sortQuery;
 		retVal += ' ';
-		retVal += qPrintable(paginationQuery);
+		retVal += QString::fromUtf8(paginationQuery);
 
 		return retVal.toUtf8();
 	}
@@ -203,13 +203,14 @@ istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateCompBase::CreateObjectFro
 
 	istd::IChangeableUniquePtr documentPtr = CreateObject(typeId);
 	if (!documentPtr.IsValid()){
-		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateCompBase::CreateObjectFromRecord", qPrintable(QStringLiteral("Document instance could not be created for the type: '%1'").arg(typeId)));
+		const QByteArray errorMessage = QStringLiteral("Document instance could not be created for the type: '%1'").arg(typeId).toUtf8();
+		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateCompBase::CreateObjectFromRecord", errorMessage.constData());
 
 		return nullptr;
 	}
 
 	if (record.contains(s_documentColumn)){
-		QByteArray documentContent = record.value(qPrintable(s_documentColumn)).toByteArray();
+		QByteArray documentContent = record.value(QString::fromUtf8(s_documentColumn)).toByteArray();
 		if (ReadDataFromMemory(typeId, documentContent, *documentPtr)){
 			return documentPtr;
 		}
@@ -565,8 +566,8 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateUpdateMetaInfoQuery(const
 		return QByteArray();
 	}
 
-	QByteArray objectId = imtdb::VariantToByteArray(record.value(qPrintable(s_documentIdColumn)));
-	QByteArray typeId = imtdb::VariantToByteArray(record.value(qPrintable(s_typeIdColumn)));
+	QByteArray objectId = imtdb::VariantToByteArray(record.value(QString::fromUtf8(s_documentIdColumn)));
+	QByteArray typeId = imtdb::VariantToByteArray(record.value(QString::fromUtf8(s_typeIdColumn)));
 
 	QByteArray metaInfoRepresentation = QByteArrayLiteral("{}");
 
@@ -641,7 +642,7 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateCompB
 		RevisionInfo revisionInfo;
 
 		if (revisionRecord.contains(s_revisionInfoColumn)){
-			QByteArray revisionValueJson = revisionRecord.value(qPrintable(s_revisionInfoColumn)).toByteArray();
+			QByteArray revisionValueJson = revisionRecord.value(QString::fromUtf8(s_revisionInfoColumn)).toByteArray();
 			QJsonObject infoData = QJsonDocument::fromJson(revisionValueJson).object();
 			revisionInfo.revision = infoData.value(s_revisionNumberKey).toInt();
 			revisionInfo.user = infoData.value(s_ownerNameKey).toString();
@@ -658,11 +659,11 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateCompB
 		}
 
 		if (revisionRecord.contains(s_lastModifiedColumn)){
-			revisionInfo.timestamp = revisionRecord.value(qPrintable(s_lastModifiedColumn)).toDateTime();
+			revisionInfo.timestamp = revisionRecord.value(QString::fromUtf8(s_lastModifiedColumn)).toDateTime();
 		}
 
 		if (revisionRecord.contains(s_stateColumn)){
-			revisionInfo.isRevisionAvailable = (revisionRecord.value(qPrintable(s_stateColumn)).toString() == "Active" || revisionRecord.value(qPrintable(s_stateColumn)).toString() == "Disabled");
+			revisionInfo.isRevisionAvailable = (revisionRecord.value(QString::fromUtf8(s_stateColumn)).toString() == QStringLiteral("Active") || revisionRecord.value(QString::fromUtf8(s_stateColumn)).toString() == QStringLiteral("Disabled"));
 		}
 
 		revisionInfoList.push_back(revisionInfo);
@@ -774,7 +775,7 @@ bool CSqlDatabaseDocumentDelegateCompBase::DeleteRevision(
 	int currentRevision = -1;
 
 	if (revisionRecord.contains(s_revisionInfoColumn)){
-		QByteArray revisionValueJson = revisionRecord.value(qPrintable(s_revisionInfoColumn)).toByteArray();
+		QByteArray revisionValueJson = revisionRecord.value(QString::fromUtf8(s_revisionInfoColumn)).toByteArray();
 		QJsonObject infoData = QJsonDocument::fromJson(revisionValueJson).object();
 		currentRevision = infoData.value(s_revisionNumberKey).toInt();
 	}
@@ -1419,12 +1420,12 @@ bool CSqlDatabaseDocumentDelegateCompBase::SetObjectMetaInfoFromRecord(
 		return true;
 	}
 
-	const QByteArray metaInfoRepresentation = record.value(qPrintable(s_dataMetaInfoColumn)).toByteArray();
+	const QByteArray metaInfoRepresentation = record.value(QString::fromUtf8(s_dataMetaInfoColumn)).toByteArray();
 	if (metaInfoRepresentation.isEmpty()){
 		return true;
 	}
 
-	const QByteArray typeId = imtdb::VariantToByteArray(record.value(qPrintable(s_typeIdColumn)));
+	const QByteArray typeId = imtdb::VariantToByteArray(record.value(QString::fromUtf8(s_typeIdColumn)));
 
 	return m_jsonBasedMetaInfoDelegateCompPtr->FromJsonRepresentation(
 				metaInfoRepresentation,
