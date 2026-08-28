@@ -43,7 +43,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::GetSelectionQuery(
 		QString baseQuery = GetBaseSelectionQuery();
 
 		return QString(
-			baseQuery + QStringLiteral(" AND \"%1\".\"Id\" = '%2'").arg(*m_tableNameAttrPtr).arg(objectId)).toUtf8();
+			baseQuery + QStringLiteral(" AND \"%1\".\"Id\" = '%2'").arg(*m_tableNameAttrPtr, objectId)).toUtf8();
 	}
 
 	return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
@@ -682,7 +682,7 @@ QString CSqlDatabaseDocumentDelegateLegacyComp::GetBaseSelectionQuery() const
 	if (m_metaInfoTableDelegateCompPtr.IsValid()){
 		QByteArrayList columnIds = m_metaInfoTableDelegateCompPtr->GetColumnIds();
 		for (int i = 0; i < columnIds.count(); ++i){
-			metaInfoValuesQuery += QStringLiteral(", \"%1\".%2").arg(*m_metaInfoTableNameAttrPtr).arg(columnIds[i]);
+			metaInfoValuesQuery += QStringLiteral(", \"%1\".%2").arg(*m_metaInfoTableNameAttrPtr, columnIds[i]);
 		}
 
 		joinMetaInfoQuery = QStringLiteral("JOIN \"%1\" ON \"%2\".\"LastRevisionId\" = \"%1\".\"RevisionId\"")

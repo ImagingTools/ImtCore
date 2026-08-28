@@ -433,13 +433,13 @@ bool CFileCollectionComp::RemoveElements(
 			QString dataFilePath = GetDataItemFilePath(itemToRemove);
 			QFile dataFile(dataFilePath);
 			if (!dataFile.remove()){
-				SendErrorMessage(0, QT_TR_NOOP(QStringLiteral("File '%1' could not be removed. Error status: %2").arg(dataFilePath).arg(dataFile.errorString())));
+				SendErrorMessage(0, QT_TR_NOOP(QStringLiteral("File '%1' could not be removed. Error status: %2").arg(dataFilePath, dataFile.errorString())));
 			}
 
 			QString metaDataFilePath = GetMetaInfoFilePath(itemToRemove);
 			QFile metaDataFile(metaDataFilePath);
 			if (!metaDataFile.remove()){
-				SendErrorMessage(0, QT_TR_NOOP(QStringLiteral("File '%1' could not be removed. Error status: %2").arg(metaDataFilePath).arg(metaDataFile.errorString())));
+				SendErrorMessage(0, QT_TR_NOOP(QStringLiteral("File '%1' could not be removed. Error status: %2").arg(metaDataFilePath, metaDataFile.errorString())));
 			}
 
 			QString parentDirectory = fileInfo.absolutePath();
@@ -950,7 +950,7 @@ QString CFileCollectionComp::CalculateFolderPathInRepository(
 	}
 
 	if (newDirPath != targetDirPath){
-		QString warning = QT_TR_NOOP(QStringLiteral("Input file name %1 renamed to %2").arg(QDir(targetDirPath).dirName()).arg(QDir(newDirPath).dirName()));
+		QString warning = QT_TR_NOOP(QStringLiteral("Input file name %1 renamed to %2").arg(QDir(targetDirPath).dirName(), QDir(newDirPath).dirName()));
 
 		SendWarningMessage(0, warning);
 

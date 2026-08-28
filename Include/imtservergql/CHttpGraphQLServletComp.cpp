@@ -283,7 +283,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
 									   request,
 									   errorCode,
 									   responseJson,
-									   QByteArray("application/json;charset=utf-8")).PopInterfacePtr());
+									   QByteArrayLiteral("application/json;charset=utf-8")).PopInterfacePtr());
 }
 
 

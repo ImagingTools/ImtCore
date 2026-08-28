@@ -132,7 +132,7 @@ bool CGqlPublisherCompBase::PushDataToSubscriber(
 			.arg(commandId)
 			.arg(data).toUtf8();
 
-	QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
+	QByteArray reponseTypeId = QByteArrayLiteral("application/json; charset=utf-8");
 	const imtrest::IProtocolEngine& engine = networkRequest.GetProtocolEngine();
 
 	imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(networkRequest, imtrest::IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());

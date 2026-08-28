@@ -209,7 +209,7 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 QByteArray CUsersSessionsDatabaseDelegateComp::GetObjectTypeId(const QByteArray& /*objectId*/) const
 {
-	return QByteArray("Session");
+	return QByteArrayLiteral("Session");
 }
 
 

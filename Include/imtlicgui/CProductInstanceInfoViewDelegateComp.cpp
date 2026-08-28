@@ -44,7 +44,7 @@ bool CProductInstanceInfoViewDelegateComp::GetSummaryInformation(
 		SummaryInformation summaryInformation;
 		summaryInformation.infoId = informationId;
 		
-		if (informationId == QByteArray("InstanceId")){
+		if (informationId == QByteArrayLiteral("InstanceId")){
 			Q_ASSERT(metaInfoPtr.IsValid());
 
 			imtgui::ICollectionViewDelegate::SummaryInformation retVal;
@@ -53,7 +53,7 @@ bool CProductInstanceInfoViewDelegateComp::GetSummaryInformation(
 			retVal.sortValue = retVal.text;
 			objectMetaInfo.append(summaryInformation);
 		}
-		else if (informationId == QByteArray("Customer")){
+		else if (informationId == QByteArrayLiteral("Customer")){
 			imtgui::ICollectionViewDelegate::SummaryInformation retVal;
 
 			retVal.text = metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_CUSTOMER_NAME).toString();

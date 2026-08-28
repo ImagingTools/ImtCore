@@ -774,7 +774,7 @@ bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
 	}
 
 	if (currentRevision == revision){
-		SendErrorMessage(0, QStringLiteral("Unable to delete revision '%1' for document '%2'. Error: Revision '%1' is active").arg(revision).arg(objectId), "Database collection");
+		SendErrorMessage(0, QStringLiteral("Unable to delete revision '%1' for document '%2'. Error: Revision '%1' is active").arg(revision, objectId), "Database collection");
 		return false;
 	}
 
@@ -1139,10 +1139,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const QV
 			revisionInfo += QStringLiteral("'%1', '%2'").arg(key, SqlEncode(value.toString()));
 		}
 		else if (typeId == QMetaType::Int){
-			revisionInfo += QStringLiteral("'%1', %2").arg(key).arg(value.toInt());
+			revisionInfo += QStringLiteral("'%1', %2").arg(key, QString::number(value.toInt()));
 		}
 		else if (typeId == QMetaType::Bool){
-			revisionInfo += QStringLiteral("'%1', %2").arg(key).arg(value.toBool());
+			revisionInfo += QStringLiteral("'%1', %2").arg(key, QString::number(value.toBool()));
 		}
 	}
 

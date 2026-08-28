@@ -58,7 +58,7 @@ QByteArray CSqlStructureDelegateComp::CreateSetNodeNameQuery(
 	const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	QString query = QStringLiteral("UPDATE  public.\"Nodes\" SET \"Name\" = '%1' WHERE \"NodeId\" = '%2';")
-		.arg(SqlEncode(name)).arg(nodeId);
+		.arg(SqlEncode(name), nodeId);
 
 	return query.toUtf8();
 }
@@ -70,7 +70,7 @@ QByteArray CSqlStructureDelegateComp::CreateSetNodeDescriptionQuery(
 	const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	QString query = QStringLiteral("UPDATE  public.\"Nodes\" SET \"Description\" = '%1' WHERE \"NodeId\" = '%2';")
-						.arg(SqlEncode(description)).arg(nodeId);
+						.arg(SqlEncode(description), nodeId);
 
 	return query.toUtf8();
 }
@@ -86,7 +86,7 @@ QByteArray CSqlStructureDelegateComp::CreateSetNodeMetaInfoQuery(
 	document.setArray(metaInfos);
 	QByteArray documentContent = document.toJson(QJsonDocument::Compact);
 	QString query = QStringLiteral("UPDATE  public.\"Nodes\" SET \"NodeInfo\"=jsonb_set(\"NodeInfo\"::jsonb, '{metainfo}', '%1') WHERE \"NodeId\" = '%2';")
-						.arg(SqlEncode(documentContent)).arg(nodeId);
+						.arg(SqlEncode(documentContent), nodeId);
 
 	return query.toUtf8();
 }
@@ -98,7 +98,7 @@ QByteArray CSqlStructureDelegateComp::CreateMoveNodeQuery(
 	const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	QString query = QStringLiteral("UPDATE  public.\"Nodes\" SET \"ParentId\"='%1' WHERE \"NodeId\" = '%2';")
-						.arg(parentNodeId).arg(nodeId);
+						.arg(parentNodeId, nodeId);
 
 	return query.toUtf8();
 }
@@ -174,7 +174,7 @@ QByteArray CSqlStructureDelegateComp::CreateMoveObjectQuery(
 					"WHERE \"DocumentId\"='%1' "
 					"AND \"NodeId\" = '%2' "
 					"AND  subquery.count = 1;"
-					).arg(objectId).arg(sourceNodeId).arg(targetNodeId);
+					).arg(objectId, sourceNodeId, targetNodeId);
 	}
 	else{
 		query = QString(
@@ -183,7 +183,7 @@ QByteArray CSqlStructureDelegateComp::CreateMoveObjectQuery(
 					"WHERE \"DocumentId\"='%1' "
 					"AND \"NodeId\" = '%2' "
 					"AND  subquery.count = 1;"
-					).arg(objectId).arg(sourceNodeId).arg(targetNodeId);
+					).arg(objectId, sourceNodeId, targetNodeId);
 	}
 
 
@@ -197,7 +197,7 @@ QByteArray CSqlStructureDelegateComp::CreateRemoveObjectQuery(
 	const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	QString query = QStringLiteral("DELETE FROM public.\"NodeDocuments\" WHERE \"DocumentId\"='%1' AND \"NodeId\" = '%2';")
-						.arg(objectId).arg(nodeId);
+						.arg(objectId, nodeId);
 
 	return query.toUtf8();
 }
@@ -429,7 +429,7 @@ bool CSqlStructureDelegateComp::CreateObjectFilterQuery(
 
 			QString value = textParamPtr->GetText();
 
-			filterQuery = QStringLiteral("%1 = '%2'").arg(key).arg(SqlEncode(value));
+			filterQuery = QStringLiteral("%1 = '%2'").arg(key, SqlEncode(value));
 		}
 	}
 

@@ -120,7 +120,7 @@ bool CSqliteJsonDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParam
 			}
 
 			QString value = textParamPtr->GetText();
-			filterQuery += QStringLiteral("json_extract(\"Document\",'$.%1') = '%2'").arg(key).arg(SqlEncode(value));
+			filterQuery += QStringLiteral("json_extract(\"Document\",'$.%1') = '%2'").arg(key, SqlEncode(value));
 		}
 	}
 
@@ -213,5 +213,4 @@ QByteArray CSqliteJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteA
 
 
 } // namespace imtdb
-
 

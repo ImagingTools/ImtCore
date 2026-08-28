@@ -422,7 +422,7 @@ bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
 			}
 
 			QString value = textParamPtr->GetText();
-			filterQuery += QStringLiteral("lower(\"Document\"->>'%1') = lower('%2')").arg(key).arg(SqlEncode(value));
+			filterQuery += QStringLiteral("lower(\"Document\"->>'%1') = lower('%2')").arg(key, SqlEncode(value));
 		}
 	}
 
@@ -762,5 +762,4 @@ bool CSqlJsonDatabaseDelegateComp::TableExists(const QString& tableName) const
 
 
 } // namespace imtdb
-
 

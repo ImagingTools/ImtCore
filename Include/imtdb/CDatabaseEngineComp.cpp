@@ -84,7 +84,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 			*sqlErrorPtr = queryError;
 		}
 
-		SendErrorMessage(0, QStringLiteral("Database query failed: '%1', SQL-statement: '%2'").arg(queryError.text()).arg(queryString), __FILE__);
+		SendErrorMessage(0, QStringLiteral("Database query failed: '%1', SQL-statement: '%2'").arg(queryError.text(), queryString), __FILE__);
 
 		return QSqlQuery();
 	}

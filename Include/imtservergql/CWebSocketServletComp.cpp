@@ -171,7 +171,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	qsizetype errorPosition;
 	if (!gqlRequest.ParseQuery(body, errorPosition)){
 		QString errorMessage = QStringLiteral("Error when parsing request: '%1'; Error position: '%2'")
-								.arg(body).arg(errorPosition);
+								.arg(body, errorPosition);
 		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
 
@@ -295,7 +295,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 		}
 	}
 
-	QByteArray errorMessage = QByteArray("Unable to unregister subscription'. Error: Subscription is unregistered");
+	QByteArray errorMessage = QByteArrayLiteral("Unable to unregister subscription'. Error: Subscription is unregistered");
 	return CreateErrorResponse(errorMessage, request);
 }
 
@@ -304,7 +304,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateDataResponse(const QByteA
 {
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
-	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
+	QByteArray reponseTypeId = QByteArrayLiteral("text/html; charset=utf-8");
 	QByteArray commandId = request.GetCommandId();
 
 	imtrest::ConstResponsePtr responsePtr(

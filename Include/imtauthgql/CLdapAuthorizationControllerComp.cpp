@@ -104,7 +104,7 @@ QByteArray CLdapAuthorizationControllerComp::InsertNewIdentifiableRoleInfo(
 	roleInfoPtr->SetProductId(productId);
 
 	QByteArray result = m_roleCollectionCompPtr->InsertNewObject(
-		QByteArray("Role"),
+		QByteArrayLiteral("Role"),
 		roleInfoPtr->GetRoleName(),
 		roleInfoPtr->GetRoleDescription(),
 		roleInfoPtr.GetPtr(),

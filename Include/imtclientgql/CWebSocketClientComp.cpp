@@ -130,7 +130,7 @@ bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) con
 		QByteArray body = data;
 		imtrest::IResponse::Headers headers = response->GetHeaders();
 		data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
-				   .arg(headers.value("id")).arg(body).toUtf8();
+				   .arg(headers.value("id"), body).toUtf8();
 	}
 
 	EmitSendTextMessage(data);
@@ -519,7 +519,7 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 		}
 	}
 
-	SendInfoMessage(0, QStringLiteral("Try connect to the WebSocket-server: Host: %1; Port: %2, Protocol: %3").arg(url.host()).arg(url.port()).arg(url.scheme()));
+	SendInfoMessage(0, QStringLiteral("Try connect to the WebSocket-server: Host: %1; Port: %2, Protocol: %3").arg(url.host(), QString::number(url.port()), url.scheme()));
 
 #if QT_VERSION >= QT_VERSION_CHECK(6,4,0)
 	QWebSocketHandshakeOptions handshakeOptions;
@@ -600,4 +600,3 @@ imtcom::IConnectionStatusProvider::ConnectionStatus CWebSocketClientComp::Connec
 
 
 } // namespace imtclientgql
-

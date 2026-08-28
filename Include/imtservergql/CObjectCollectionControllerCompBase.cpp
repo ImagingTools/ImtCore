@@ -2673,23 +2673,23 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 	for (const QByteArray& informationId : informationIds){
 		QVariant elementInformation;
 
-		if(informationId == QByteArray("id")){
+		if(informationId == QByteArrayLiteral("id")){
 			elementInformation = QString(collectionId);
 		}
-		else if(informationId == QByteArray("name")){
+		else if(informationId == QByteArrayLiteral("name")){
 			elementInformation = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_NAME);
 		}
-		else if(informationId == QByteArray("description")){
+		else if(informationId == QByteArrayLiteral("description")){
 			elementInformation = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION);
 		}
 		else{
 			idoc::MetaInfoPtr elementMetaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(collectionId);
 			if (elementMetaInfo.IsValid()){
-				if (informationId == QByteArray("added")){
+				if (informationId == QByteArrayLiteral("added")){
 					elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
 					.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
-				else if (informationId == QByteArray("lastModified")){
+				else if (informationId == QByteArrayLiteral("lastModified")){
 					elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
 					.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
@@ -2735,22 +2735,22 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 	for (const QByteArray& informationId : informationIds){
 		QVariant elementInformation;
 
-		if(informationId == QByteArray("id")){
+		if(informationId == QByteArrayLiteral("id")){
 			elementInformation = QString(collectionId);
 		}
-		else if(informationId == QByteArray("name")){
+		else if(informationId == QByteArrayLiteral("name")){
 			elementInformation = objectCollectionIterator->GetElementInfo("Name");
 		}
-		else if(informationId == QByteArray("description")){
+		else if(informationId == QByteArrayLiteral("description")){
 			elementInformation = objectCollectionIterator->GetElementInfo("Description");
 		}
 		else{
 			if (elementMetaInfo.IsValid()){
-				if (informationId == QByteArray("added")){
+				if (informationId == QByteArrayLiteral("added")){
 					elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
 					.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
-				else if (informationId == QByteArray("lastModified")){
+				else if (informationId == QByteArrayLiteral("lastModified")){
 					elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
 					.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
