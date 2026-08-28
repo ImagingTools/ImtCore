@@ -179,7 +179,7 @@ void CFeatureDependencyEditorBase::UpdateFeatureTree()
 		packageItemPtr->setForeground(0, QBrush(Qt::red));
 
 		for (const QByteArray& featureId : m_missingDependencies){
-			QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({QObject::tr("ID: %1").arg(QString(featureId))});
+			QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({QObject::tr("ID: %1").arg(featureId)});
 			packageItemPtr->addChild(featureItemPtr);
 			featureItemPtr->setData(0, DR_ITEM_ID, featureId);
 			featureItemPtr->setData(0, DR_ITEM_TYPE, IT_FEATURE);
@@ -338,8 +338,8 @@ void CFeatureDependencyEditorBase::on_FeatureTree_itemChanged(QTreeWidgetItem *i
 									m_treeWidgetPtr,
 									QObject::tr("Warning"),
 									QObject::tr("Feature with ID '%1' depends on feature with ID '%2'")
-												.arg(QString(featureId))
-												.arg(QString(m_selectedFeatureId)));
+												.arg(featureId)
+												.arg(m_selectedFeatureId));
 
 						break;
 					}
@@ -365,8 +365,8 @@ void CFeatureDependencyEditorBase::on_FeatureTree_itemChanged(QTreeWidgetItem *i
 								m_treeWidgetPtr,
 								QObject::tr("Warning"),
 								QObject::tr("Feature with ID '%1' depends on feature with ID '%2'")
-											.arg(QString(featureId))
-											.arg(QString(m_selectedFeatureId)));
+											.arg(featureId)
+											.arg(m_selectedFeatureId));
 				}
 			}
 		}

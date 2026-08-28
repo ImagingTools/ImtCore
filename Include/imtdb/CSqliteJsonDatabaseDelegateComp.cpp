@@ -200,15 +200,15 @@ QByteArray CSqliteJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteA
 
 	QString schemaPrefix;
 	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(QString(*m_tableSchemaAttrPtr));
+		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 
 	return QStringLiteral("SELECT * FROM %0\"%1\" WHERE (%2) AND \"%3\" = '%4' ORDER BY \"RevisionNumber\" DESC;")
 		.arg(schemaPrefix)
-		.arg(QString(*m_tableNameAttrPtr))
+		.arg(*m_tableNameAttrPtr)
 		.arg(stateDocumentFilter)
-		.arg(QString(*m_objectIdColumnAttrPtr))
-		.arg(QString(objectId)).toUtf8();
+		.arg(*m_objectIdColumnAttrPtr)
+		.arg(objectId).toUtf8();
 }
 
 

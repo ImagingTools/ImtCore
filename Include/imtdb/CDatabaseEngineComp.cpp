@@ -196,7 +196,7 @@ bool CDatabaseEngineComp::CheckDatabaseConnection(QString& errorMessage) const
 	// the whole server. A unique name per call sidesteps this entirely; this connection is only ever
 	// opened, closed and torn down within this single call, so there's no need to share or reuse it.
 	const QString connectionName = QStringLiteral("%1-check-%2")
-		.arg(QString(*m_maintenanceDatabaseNameAttrPtr), QUuid::createUuid().toString(QUuid::WithoutBraces));
+		.arg(*m_maintenanceDatabaseNameAttrPtr, QUuid::createUuid().toString(QUuid::WithoutBraces));
 
 	bool isConnected = false;
 	{

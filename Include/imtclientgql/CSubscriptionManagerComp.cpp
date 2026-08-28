@@ -371,7 +371,7 @@ QFuture<CSubscriptionManagerComp::GqlResult> CSubscriptionManagerComp::SendReque
 
 	if (!SendRequestInternal(*requestPtr, constRequestPtr)){
 		FailPending(key, EC_NETWORK,
-					QStringLiteral("Request could not be sent: '%1'").arg(QString(requestPtr->GetCommandId())));
+					QStringLiteral("Request could not be sent: '%1'").arg(requestPtr->GetCommandId()));
 		return future;
 	}
 

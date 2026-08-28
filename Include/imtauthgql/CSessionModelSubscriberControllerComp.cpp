@@ -56,9 +56,9 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequest = requestNetworks.networkRequests[id];
 			QByteArray body = QString(R"({"type": "data", "id": "%1","payload":{"data": {"token": "%2", "changeSet": %3}}})")
-								.arg(QString(id))
-								.arg(QString(sessionId))
-								.arg(QString(changeSetDocument.toJson(QJsonDocument::Compact))).toUtf8();
+								.arg(id)
+								.arg(sessionId)
+								.arg(changeSetDocument.toJson(QJsonDocument::Compact)).toUtf8();
 			QByteArray responseTypeId("application/json; charset=utf-8");
 			const imtrest::IProtocolEngine& engine = networkRequest->GetProtocolEngine();
 

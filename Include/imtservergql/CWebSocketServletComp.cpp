@@ -171,7 +171,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	qsizetype errorPosition;
 	if (!gqlRequest.ParseQuery(body, errorPosition)){
 		QString errorMessage = QStringLiteral("Error when parsing request: '%1'; Error position: '%2'")
-								.arg(QString(body)).arg(errorPosition);
+								.arg(body).arg(errorPosition);
 		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
 
@@ -267,7 +267,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	}
 	else{
 		QByteArray errorMessage = QStringLiteral("The requested command could not be executed. No servlet was found for the given command: '%1")
-		.arg(QString(commandId)).toUtf8();
+		.arg(commandId).toUtf8();
 		return CreateErrorResponse(errorMessage, request);
 	}
 
@@ -289,7 +289,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 		if (controllerPtr != nullptr){
 			QByteArray subscriptionId = webSocketRequest->GetRequestId();
 			if (controllerPtr->UnregisterSubscription(subscriptionId)){
-				QByteArray data = QString(R"({"type": "complete","id": "%1"})").arg(QString(subscriptionId)).toUtf8();
+				QByteArray data = QString(R"({"type": "complete","id": "%1"})").arg(subscriptionId).toUtf8();
 				return CreateDataResponse(data, request);
 			}
 		}

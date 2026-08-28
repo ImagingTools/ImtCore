@@ -813,7 +813,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::DeleteObject(
 	elementIds << objectId;
 
 	if (!m_objectCollectionCompPtr->RemoveElements(elementIds, operationContextPtr.GetPtr())){
-		errorMessage = QStringLiteral("Can't remove object with ID: '%1'").arg(QString(objectId));
+		errorMessage = QStringLiteral("Can't remove object with ID: '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();

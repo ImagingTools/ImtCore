@@ -523,7 +523,7 @@ sdl::V1_0::imtbase::CRemoveElementsPayload CObjectCollectionControllerCompBase::
 	imtbase::ICollectionInfo::Ids allElementIds = m_objectCollectionCompPtr->GetElementIds();
 	for (const QByteArray& elementId : elementIds){
 		if (!allElementIds.contains(elementId)){
-			errorMessage = QStringLiteral("Unable to delete object. Object with ID '%1' does not exists").arg(QString(elementId));
+			errorMessage = QStringLiteral("Unable to delete object. Object with ID '%1' does not exists").arg(elementId);
 			SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 			return sdl::V1_0::imtbase::CRemoveElementsPayload();
 		}
@@ -2212,7 +2212,7 @@ QJsonObject CObjectCollectionControllerCompBase::DeleteObject(
 	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
 	for (const QByteArray& objectId : objectIds){
 		if (!elementIds.contains(objectId)){
-			errorMessage = QStringLiteral("Unable to delete object. Object with ID '%1' does not exists").arg(QString(objectId));
+			errorMessage = QStringLiteral("Unable to delete object. Object with ID '%1' does not exists").arg(objectId);
 			SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 			return QJsonObject();
 		}
@@ -2224,7 +2224,7 @@ QJsonObject CObjectCollectionControllerCompBase::DeleteObject(
 	}
 
 	if (!m_objectCollectionCompPtr->RemoveElements(objectIds, operationContextPtr.GetPtr())){
-		errorMessage = QStringLiteral("Can't remove object with ID: '%1'").arg(QString(objectIds.toList().join(';')));
+		errorMessage = QStringLiteral("Can't remove object with ID: '%1'").arg(objectIds.toList().join(';'));
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return QJsonObject();

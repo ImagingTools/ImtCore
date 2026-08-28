@@ -43,7 +43,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::GetSelectionQuery(
 		QString baseQuery = GetBaseSelectionQuery();
 
 		return QString(
-			baseQuery + QStringLiteral(" AND \"%1\".\"Id\" = '%2'").arg(QString(*m_tableNameAttrPtr)).arg(QString(objectId))).toUtf8();
+			baseQuery + QStringLiteral(" AND \"%1\".\"Id\" = '%2'").arg(*m_tableNameAttrPtr).arg(objectId)).toUtf8();
 	}
 
 	return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
@@ -105,7 +105,7 @@ istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateLegacyComp::CreateObjectF
 
 	istd::IChangeableUniquePtr documentPtr = CreateObject(typeId);
 	if (!documentPtr.IsValid()){
-		const QByteArray errorMessage = QStringLiteral("Document instance could not be created for the type: '%1'").arg(QString(typeId)).toUtf8();
+		const QByteArray errorMessage = QStringLiteral("Document instance could not be created for the type: '%1'").arg(typeId).toUtf8();
 		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateLegacyComp::CreateObjectFromRecord", errorMessage.constData());
 
 		return nullptr;
@@ -174,24 +174,24 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateLegac
 
 	// Insert new entry into the document list table:
 	retVal.query = QStringLiteral("INSERT INTO \"%1\"(\"Id\", \"%2\", \"Name\", \"Description\", \"Added\", \"LastRevisionId\") VALUES('%3', '%4', '%5', '%6', '%7', '%8');")
-				.arg(QString(*m_tableNameAttrPtr))
-				.arg(QString(*m_objectTypeIdColumnAttrPtr))
-				.arg(QString(objectId))
-				.arg(QString(typeId))
+				.arg(*m_tableNameAttrPtr)
+				.arg(*m_objectTypeIdColumnAttrPtr)
+				.arg(objectId)
+				.arg(typeId)
 				.arg(SqlEncode(objectName))
 				.arg(SqlEncode(objectDescription))
 				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-				.arg(QString(revisionUuid))
+				.arg(revisionUuid)
 				.toUtf8();
 
 	// Insert new entry into the document data revision table:
 	QString revisionColumns = QStringLiteral("\"Id\", \"%1\", \"%2\", \"RevisionNumber\", \"Comment\", \"LastModified\", \"Checksum\"")
 				.arg(s_documentIdColumn)
-				.arg(QString(*m_documentContentColumnIdAttrPtr));
+				.arg(*m_documentContentColumnIdAttrPtr);
 	QString revisionValues = QStringLiteral("'%1', '%2', '%3', '%4', '%5', '%6', %7")
-				.arg(QString(revisionUuid))
-				.arg(QString(objectId))
-				.arg(QString(documentContent.toBase64()))
+				.arg(revisionUuid)
+				.arg(objectId)
+				.arg(documentContent.toBase64())
 				.arg(1)
 				.arg(SqlEncode(QObject::tr("Initial revision")))
 				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
@@ -201,7 +201,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateLegac
 	revisionColumns += QStringLiteral(", \"%1\"").arg(s_softwareVersionColumn);
 	revisionValues += QStringLiteral(", '%1'").arg(SqlEncode(GetRevisionSoftwareVersion()));
 	retVal.query += QStringLiteral("INSERT INTO \"%1\"(%2) VALUES(%3);")
-				.arg(QString(*m_revisionsTableNameAttrPtr))
+				.arg(*m_revisionsTableNameAttrPtr)
 				.arg(revisionColumns)
 				.arg(revisionValues)
 				.toUtf8();
@@ -228,7 +228,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateLegac
 
 			// Insert new entry into the document' meta info table:
 			retVal.query += QStringLiteral("INSERT INTO \"%1\"(%2) VALUES(%3);")
-						.arg(QString(*m_metaInfoTableNameAttrPtr))
+						.arg(*m_metaInfoTableNameAttrPtr)
 						.arg(columnIds.join(", "))
 						.arg(tableValues.join(", "))
 						.toUtf8();
@@ -257,7 +257,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateDeleteObjectsQuery(
 
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
-		quotedIds << QStringLiteral("'%1'").arg(QString(objectId));
+		quotedIds << QStringLiteral("'%1'").arg(objectId);
 	}
 
 	QString query = QString(
@@ -290,9 +290,9 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateUpdateObjectQuery(
 {
 	// Get number of the revisions of the document in the database:
 	QByteArray countRevisionsQuery = QStringLiteral("SELECT COUNT(*) FROM \"%1\" WHERE \"%2\" = '%3';")
-				.arg(QString(*m_revisionsTableNameAttrPtr))
+				.arg(*m_revisionsTableNameAttrPtr)
 				.arg(s_documentIdColumn)
-				.arg(QString(objectId))
+				.arg(objectId)
 				.toUtf8();
 
 	QSqlError error;
@@ -320,20 +320,20 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateUpdateObjectQuery(
 		QByteArray revisionUuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 		retVal = QStringLiteral("UPDATE \"%1\" SET \"LastRevisionId\" = '%2' WHERE \"%3\" = '%4';")
-					.arg(QString(*m_tableNameAttrPtr))
-					.arg(QString(revisionUuid))
+					.arg(*m_tableNameAttrPtr)
+					.arg(revisionUuid)
 					.arg(s_idColumn)
-					.arg(QString(objectId))
+					.arg(objectId)
 					.toUtf8();
 
 		QString operationComment = operationContextPtr != nullptr ? operationContextPtr->GetOperationDescription() : QString();
 		QString revisionColumns = QStringLiteral("\"Id\", \"%1\", \"%2\", \"RevisionNumber\", \"Comment\", \"LastModified\", \"Checksum\"")
 					.arg(s_documentIdColumn)
-					.arg(QString(*m_documentContentColumnIdAttrPtr));
+					.arg(*m_documentContentColumnIdAttrPtr);
 		QString revisionValues = QStringLiteral("'%1', '%2', '%3', '%4', '%5', '%6', %7")
-					.arg(QString(revisionUuid))
-					.arg(QString(objectId))
-					.arg(QString(documentContent.toBase64()))
+					.arg(revisionUuid)
+					.arg(objectId)
+					.arg(documentContent.toBase64())
 					.arg(revisionsCount + 1)
 					.arg(SqlEncode(operationComment))
 					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
@@ -343,7 +343,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateUpdateObjectQuery(
 		revisionColumns += QStringLiteral(", \"%1\"").arg(s_softwareVersionColumn);
 		revisionValues += QStringLiteral(", '%1'").arg(SqlEncode(GetRevisionSoftwareVersion()));
 		retVal += QStringLiteral("INSERT INTO \"%1\"(%2) VALUES(%3);")
-					.arg(QString(*m_revisionsTableNameAttrPtr))
+					.arg(*m_revisionsTableNameAttrPtr)
 					.arg(revisionColumns)
 					.arg(revisionValues)
 					.toUtf8();
@@ -369,7 +369,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateUpdateObjectQuery(
 				}
 
 				retVal += QStringLiteral("INSERT INTO \"%1\"(%2) VALUES(%3);")
-							.arg(QString(*m_metaInfoTableNameAttrPtr))
+							.arg(*m_metaInfoTableNameAttrPtr)
 							.arg(columnIds.join(", "))
 							.arg(tableValues.join(", "))
 							.toUtf8();
@@ -388,10 +388,10 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateRenameObjectQuery(
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QByteArray retVal = QStringLiteral("UPDATE \"%1\" SET \"Name\" = '%2' WHERE \"%3\" = '%4';")
-				.arg(QString(*m_tableNameAttrPtr))
+				.arg(*m_tableNameAttrPtr)
 				.arg(SqlEncode(newObjectName))
 				.arg(s_idColumn)
-				.arg(QString(objectId))
+				.arg(objectId)
 				.toUtf8();
 
 	return retVal;
@@ -427,9 +427,9 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateLegac
 	QString revisionListQuery = QStringLiteral("SELECT \"RevisionNumber\", \"LastModified\", \"Comment\", \"%1\", \"%2\" from \"%3\" WHERE \"%4\" = '%5' ORDER BY \"RevisionNumber\" DESC")
 			.arg(s_ownerNameColumn)
 				.arg(s_softwareVersionColumn)
-				.arg(QString(*m_revisionsTableNameAttrPtr))
+				.arg(*m_revisionsTableNameAttrPtr)
 				.arg(s_documentIdColumn)
-				.arg(QString(objectId));
+				.arg(objectId);
 
 	QSqlError sqlError;
 	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(revisionListQuery.toUtf8(), &sqlError);
@@ -488,16 +488,16 @@ int CSqlDatabaseDocumentDelegateLegacyComp::BackupRevision(
 
 	QByteArray lastRevisionQuery = QStringLiteral("SELECT \"%1\" from \"%2\" WHERE \"%1\" in (SELECT \"LastRevisionId\" from \"%3\" WHERE \"%1\" = '%4')")
 				.arg(s_idColumn)
-				.arg(QString(*m_revisionsTableNameAttrPtr))
-				.arg(QString(*m_tableNameAttrPtr))
-				.arg(QString(objectId))
+				.arg(*m_revisionsTableNameAttrPtr)
+				.arg(*m_tableNameAttrPtr)
+				.arg(objectId)
 				.toUtf8();
 
 	QByteArray lastRevisionNumberQuery = QStringLiteral("SELECT \"RevisionNumber\" from \"%2\" WHERE \"%1\" in (SELECT \"LastRevisionId\" from \"%3\" WHERE \"%1\" = '%4')")
 				.arg(s_idColumn)
-				.arg(QString(*m_revisionsTableNameAttrPtr))
-				.arg(QString(*m_tableNameAttrPtr))
-				.arg(QString(objectId))
+				.arg(*m_revisionsTableNameAttrPtr)
+				.arg(*m_tableNameAttrPtr)
+				.arg(objectId)
 				.toUtf8();
 
 	QString escapedComment = SqlEncode(userComment);
@@ -509,7 +509,7 @@ int CSqlDatabaseDocumentDelegateLegacyComp::BackupRevision(
 		}
 	}
 	QByteArray updateCommentQuery = QStringLiteral("UPDATE \"%1\" SET \"Comment\" = '%2' WHERE \"%3\" in (%4)")
-				.arg(QString(*m_revisionsTableNameAttrPtr))
+				.arg(*m_revisionsTableNameAttrPtr)
 				.arg(escapedComment)
 				.arg(s_idColumn)
 				.arg(lastRevisionQuery)
@@ -543,9 +543,9 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::RestoreRevision(
 	}
 
 	QString revisionIdQuery  = QStringLiteral("SELECT \"%5\" from \"%1\" WHERE \"%2\" = '%3' AND \"RevisionNumber\" = %4")
-				.arg(QString(*m_revisionsTableNameAttrPtr))
+				.arg(*m_revisionsTableNameAttrPtr)
 				.arg(s_documentIdColumn)
-				.arg(QString(objectId))
+				.arg(objectId)
 				.arg(revision)
 				.arg(s_idColumn);
 
@@ -563,10 +563,10 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::RestoreRevision(
 	}
 
 	QString setActiveRevisionQuery = QStringLiteral("UPDATE \"%1\" SET \"LastRevisionId\" = '%2' WHERE \"%3\" = '%4';")
-				.arg(QString(*m_tableNameAttrPtr))
-				.arg(QString(revisionUuid))
+				.arg(*m_tableNameAttrPtr)
+				.arg(revisionUuid)
 				.arg(s_idColumn)
-				.arg(QString(objectId))
+				.arg(objectId)
 				.toUtf8();
 
 	istd::CChangeNotifier changeNotifier(&collection);
@@ -622,7 +622,7 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::WriteDataToMemory(const QByteArray&
 {
 	const ifile::IDeviceBasedPersistence* documentPersistencePtr = FindDocumentPersistence(typeId);
 	if (documentPersistencePtr == nullptr){
-		SendErrorMessage(0, QStringLiteral("Document data could not be written due no persistence was found for the type: %1").arg(QString(typeId)));
+		SendErrorMessage(0, QStringLiteral("Document data could not be written due no persistence was found for the type: %1").arg(typeId));
 
 		return false;
 	}
@@ -648,7 +648,7 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::ReadDataFromMemory(const QByteArray
 {
 	const ifile::IDeviceBasedPersistence* documentPersistencePtr = FindDocumentPersistence(typeId);
 	if (documentPersistencePtr == nullptr){
-		SendErrorMessage(0, QStringLiteral("Document data could not be read due no persistence was found for the type: %1").arg(QString(typeId)));
+		SendErrorMessage(0, QStringLiteral("Document data could not be read due no persistence was found for the type: %1").arg(typeId));
 
 		return false;
 	}
@@ -682,17 +682,17 @@ QString CSqlDatabaseDocumentDelegateLegacyComp::GetBaseSelectionQuery() const
 	if (m_metaInfoTableDelegateCompPtr.IsValid()){
 		QByteArrayList columnIds = m_metaInfoTableDelegateCompPtr->GetColumnIds();
 		for (int i = 0; i < columnIds.count(); ++i){
-			metaInfoValuesQuery += QStringLiteral(", \"%1\".%2").arg(QString(*m_metaInfoTableNameAttrPtr)).arg(columnIds[i]);
+			metaInfoValuesQuery += QStringLiteral(", \"%1\".%2").arg(*m_metaInfoTableNameAttrPtr).arg(columnIds[i]);
 		}
 
 		joinMetaInfoQuery = QStringLiteral("JOIN \"%1\" ON \"%2\".\"LastRevisionId\" = \"%1\".\"RevisionId\"")
-				.arg(QString(*m_metaInfoTableNameAttrPtr))
-				.arg(QString(*m_tableNameAttrPtr));
+				.arg(*m_metaInfoTableNameAttrPtr)
+				.arg(*m_tableNameAttrPtr);
 	}
 
 	return QStringLiteral("SELECT \"%1\".*, \"%2\".\"Document\", \"%2\".\"LastModified\", \"%2\".\"Checksum\", \"%2\".\"RevisionNumber\", \"%2\".\"Comment\" %3 FROM \"%1\" JOIN \"%2\" ON \"%1\".\"LastRevisionId\" = \"%2\".\"Id\" %4")
-		.arg(QString(*m_tableNameAttrPtr))
-		.arg(QString(*m_revisionsTableNameAttrPtr))
+		.arg(*m_tableNameAttrPtr)
+		.arg(*m_revisionsTableNameAttrPtr)
 		.arg(metaInfoValuesQuery)
 		.arg(joinMetaInfoQuery);
 }
@@ -707,7 +707,7 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::CreateObjectFilterQuery(const iprm:
 	if (collectionFilterParamPtr.IsValid()){
 		QByteArray typeId = collectionFilterParamPtr->GetObjectTypeId();
 
-		filterQuery = QStringLiteral("\"TypeId\" = '%1'").arg(QString(typeId)).toUtf8();
+		filterQuery = QStringLiteral("\"TypeId\" = '%1'").arg(typeId).toUtf8();
 	}
 
 	return true;
@@ -727,9 +727,9 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::CreateObjectInfoFromRecord(
 	QByteArray objectId = imtdb::VariantToByteArray(record.value(s_idColumn));
 
 	QByteArray sqlMetaInfoQuery = QStringLiteral("SELECT * FROM \"%1\" WHERE \"RevisionId\" = (SELECT \"LastRevisionId\" FROM \"%3\" WHERE \"Id\" = '%2')")
-				.arg(QString(*m_metaInfoTableNameAttrPtr))
-				.arg(QString(objectId))
-				.arg(QString(*m_tableNameAttrPtr))
+				.arg(*m_metaInfoTableNameAttrPtr)
+				.arg(objectId)
+				.arg(*m_tableNameAttrPtr)
 				.toUtf8();
 
 	QSqlQuery metaInfoQuery = m_databaseEngineCompPtr->ExecSqlQuery(sqlMetaInfoQuery);
@@ -820,11 +820,11 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateOperationDescriptionQue
 
 			imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationPtr->GetOperationOwnerId();
 			return QString(R"(UPDATE "%1" SET "OwnerId" = '%2', "OwnerName" = '%3', "OperationDescription" = '%4' WHERE "IsActive" = true AND "DocumentId" = '%5')")
-				.arg(QString(*m_tableNameAttrPtr))
+				.arg(*m_tableNameAttrPtr)
 				.arg(objectInfo.id)
 				.arg(SqlEncode(objectInfo.name))
 				.arg(SqlEncode(operationDescription))
-				.arg(QString(objectId))
+				.arg(objectId)
 				.toUtf8();
 		}
 	}

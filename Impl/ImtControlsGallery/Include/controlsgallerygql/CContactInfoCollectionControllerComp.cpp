@@ -75,7 +75,7 @@ bool CContactInfoCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (contactInfoPtr == nullptr){
-		errorMessage = QStringLiteral("Unable to create representation from object '%1'").arg(QString(objectId));
+		errorMessage = QStringLiteral("Unable to create representation from object '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, QStringLiteral("CContactInfoCollectionControllerComp"));
 
 		return false;

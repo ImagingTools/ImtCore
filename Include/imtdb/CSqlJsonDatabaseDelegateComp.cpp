@@ -110,15 +110,15 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 			QString queryStr;
 			if (*m_isMultiTypeAttrPtr){
 				queryStr = QStringLiteral("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\", \"TypeId\") VALUES('%2', '%3', '%4', '%5', '%6', true, '%0');")
-				.arg(QString(typeId));
+				.arg(typeId);
 			}
 			else{
 				queryStr = QStringLiteral("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\") VALUES('%2', '%3', '%4', '%5', '%6', true);");
 			}
 
 			retVal.query = queryStr
-						.arg(QString(*m_tableNameAttrPtr))
-						.arg(QString(objectId))
+						.arg(*m_tableNameAttrPtr)
+						.arg(objectId)
 						.arg(SqlEncode(documentContent))
 						.arg(revisionVersion)
 						.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
@@ -143,7 +143,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDeleteObjectsQuery(
 
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
-		quotedIds << QStringLiteral("'%1'").arg(QString(objectId));
+		quotedIds << QStringLiteral("'%1'").arg(objectId);
 	}
 
 	QString query = QString(
@@ -181,8 +181,8 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 			queryStr = QStringLiteral("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT MAX(\"RevisionNumber\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );");
 		}
 		retVal = queryStr
-				.arg(QString(*m_tableNameAttrPtr))
-				.arg(QString(objectId))
+				.arg(*m_tableNameAttrPtr)
+				.arg(objectId)
 				.arg(SqlEncode(documentContent))
 				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
 				.arg(checksum).toUtf8();
@@ -201,11 +201,11 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDescriptionObjectQuery(
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QByteArray retVal = QStringLiteral("UPDATE \"%1\" SET \"Document\" = jsonb_set(\"Document\", '{Description}', '\"%2\"', true), \"LastModified\" = '%3' WHERE \"%4\" ='%5' AND \"IsActive\" = true;")
-				.arg(QString(*m_tableNameAttrPtr))
+				.arg(*m_tableNameAttrPtr)
 				.arg(SqlEncode(description))
 				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
-				.arg(QString(*m_objectIdColumnAttrPtr))
-				.arg(QString(objectId)).toUtf8();
+				.arg(*m_objectIdColumnAttrPtr)
+				.arg(objectId).toUtf8();
 
 	return retVal;
 }
@@ -227,15 +227,15 @@ QString CSqlJsonDatabaseDelegateComp::GetBaseSelectionQuery() const
 		return QStringLiteral("SELECT root.*,"
 					   "(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND root.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
 					   " as root WHERE \"IsActive\" = true")
-				.arg(QString(*m_objectIdColumnAttrPtr))
-				.arg(QString(*m_tableNameAttrPtr));
+				.arg(*m_objectIdColumnAttrPtr)
+				.arg(*m_tableNameAttrPtr);
 	}
 
 	return QStringLiteral("SELECT \"Id\", \"%1\", \"Document\", \"RevisionNumber\", \"LastModified\","
 					"(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND root.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
 					" as root WHERE \"IsActive\" = true")
-			.arg(QString(*m_objectIdColumnAttrPtr))
-			.arg(QString(*m_tableNameAttrPtr));
+			.arg(*m_objectIdColumnAttrPtr)
+			.arg(*m_tableNameAttrPtr);
 }
 
 
@@ -248,9 +248,9 @@ bool CSqlJsonDatabaseDelegateComp::SetCollectionItemMetaInfoFromRecord(const QSq
 
 	if (!objectId.isEmpty()){
 		QByteArray query = QStringLiteral("SELECT * FROM \"%1\" WHERE \"%2\" = '%3' AND \"RevisionNumber\" = 1;")
-				.arg(QString(*m_tableNameAttrPtr))
-				.arg(QString(*m_objectIdColumnAttrPtr))
-				.arg(QString(objectId)).toUtf8();
+				.arg(*m_tableNameAttrPtr)
+				.arg(*m_objectIdColumnAttrPtr)
+				.arg(objectId).toUtf8();
 
 		QSqlError error;
 		QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &error);
@@ -457,7 +457,7 @@ bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
 
 bool CSqlJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& /*timeFieldId*/) const
 {
-	QString addedStrQuery = QString(R"((SELECT "LastModified" FROM "%1" as temp WHERE "RevisionNumber" = 1 AND root."DocumentId" = temp."DocumentId" LIMIT 1))").arg(QString(*m_tableNameAttrPtr));
+	QString addedStrQuery = QString(R"((SELECT "LastModified" FROM "%1" as temp WHERE "RevisionNumber" = 1 AND root."DocumentId" = temp."DocumentId" LIMIT 1))").arg(*m_tableNameAttrPtr);
 	switch (timeFilter.GetTimeUnit()){
 	case imtbase::ITimeFilterParam::TU_CUSTOM:
 		break;
@@ -574,14 +574,14 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteArra
 
 	QString schemaPrefix;
 	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(QString(*m_tableSchemaAttrPtr));
+		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 
 	return QStringLiteral("(SELECT * FROM %0\"%1\" WHERE (%2) AND \"DocumentId\" = '%3') ORDER BY \"RevisionNumber\" DESC;")
 		.arg(schemaPrefix)
-		.arg(QString(*m_tableNameAttrPtr))
+		.arg(*m_tableNameAttrPtr)
 		.arg(stateDocumentFilter)
-		.arg(QString(objectId)).toUtf8();
+		.arg(objectId).toUtf8();
 }
 
 
@@ -599,13 +599,13 @@ imtbase::IRevisionController::RevisionInfoList CSqlJsonDatabaseDelegateComp::Get
 
 	QString schemaPrefix;
 	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(QString(*m_tableSchemaAttrPtr));
+		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 
 	const QByteArray query = QString(R"(SELECT * FROM %0"%1" WHERE "DocumentId" = '%2' ORDER BY "RevisionNumber" DESC;)")
 				.arg(schemaPrefix)
-				.arg(QString(*m_tableNameAttrPtr))
-				.arg(QString(objectId))
+				.arg(*m_tableNameAttrPtr)
+				.arg(objectId)
 				.toUtf8();
 
 	QSqlError sqlError;
@@ -672,11 +672,11 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateOperationDescriptionQuery(
 	imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationPtr->GetOperationOwnerId();
 
 	return QString(R"(UPDATE "%1" SET "OwnerId" = '%2', "OwnerName" = '%3', "OperationDescription" = '%4' WHERE "IsActive" = true AND "DocumentId" = '%5';)")
-		.arg(QString(*m_tableNameAttrPtr))
+		.arg(*m_tableNameAttrPtr)
 		.arg(objectInfo.id)
 		.arg(SqlEncode(objectInfo.name))
 		.arg(SqlEncode(QString::fromUtf8(json)))
-		.arg(QString(objectId))
+		.arg(objectId)
 		.toUtf8();
 }
 

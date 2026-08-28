@@ -130,7 +130,7 @@ bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) con
 		QByteArray body = data;
 		imtrest::IResponse::Headers headers = response->GetHeaders();
 		data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
-				   .arg(QString(headers.value("id"))).arg(QString(body)).toUtf8();
+				   .arg(headers.value("id")).arg(body).toUtf8();
 	}
 
 	EmitSendTextMessage(data);

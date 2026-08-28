@@ -211,7 +211,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 		return companyInfoPtr;
 	}
 
-	errorMessage = QStringLiteral("Can not create account: %1").arg(QString(objectId));
+	errorMessage = QStringLiteral("Can not create account: %1").arg(objectId);
 	SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 	return nullptr;

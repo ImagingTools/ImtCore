@@ -71,7 +71,7 @@ ConstResponsePtr CHttpFileControllerServletComp::OnPost(
 
 	if(fileExists){
 		QString errorString = QString("<p>File already exists</p><p>%1</p>");
-		errorString = errorString.arg(QString(commandIdFileName));
+		errorString = errorString.arg(commandIdFileName);
 		return generateErrorResponsePtr(errorString.toUtf8(), IProtocolEngine::SC_CONFLICT);
 	}
 	else if(!loadRes){
