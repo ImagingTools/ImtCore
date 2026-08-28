@@ -80,7 +80,7 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 
 		dependentMetaInfo.metaInfoIds << metaInfoName;
 		QString selectValue =
-			QString(R"((SELECT "%0"->>'%1' FROM "%2" WHERE "State" = 'Active' AND "DocumentId" = '%3' LIMIT 1)
+			QStringLiteral(R"((SELECT "%0"->>'%1' FROM "%2" WHERE "State" = 'Active' AND "DocumentId" = '%3' LIMIT 1)
 					)").arg(isDocumentSource ? "Document" : "DataMetaInfo",
 							dependentMetaInfoName,
 							*m_dependentTableNameAttrPtr,

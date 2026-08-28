@@ -130,7 +130,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 	}
 
 	const QByteArray replyToId = msgPtr->GetReplyToId();
-	const QString replyToIdSql = replyToId.isEmpty() ? "NULL" : QString("'%1'").arg(QString::fromUtf8(replyToId));
+	const QString replyToIdSql = replyToId.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(replyToId);
 
 	const QString nowUtc = utcNow();
 
@@ -141,9 +141,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 		"INSERT INTO \"Messages\" "
 		"(\"Id\", \"ConversationId\", \"SenderId\", \"Content\", \"Status\", \"ReplyToId\", \"CreatedAt\", \"UpdatedAt\") "
 		"VALUES('%1', '%2', '%3', '%4', %5, %6, '%7', '%8');")
-		.arg(QString::fromUtf8(msgId))
-		.arg(QString::fromUtf8(msgPtr->GetConversationId()))
-		.arg(QString::fromUtf8(msgPtr->GetSenderId()))
+		.arg(msgId)
+		.arg(msgPtr->GetConversationId())
+		.arg(msgPtr->GetSenderId())
 		.arg(imtdb::SqlEncode(msgPtr->GetContent()))
 		.arg(msgPtr->GetStatus())
 		.arg(replyToIdSql)
@@ -162,7 +162,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CMessageDbDelegateComp::CreateNew
 			"\nINSERT INTO \"MessageAttachments\" "
 			"(\"MessageId\", \"AttachmentId\", \"CreatedAt\") "
 			"VALUES('%1', '%2', '%3');")
-			.arg(QString::fromUtf8(msgId))
+			.arg(msgId)
 			.arg(escapedAttachId)
 			.arg(nowUtc);
 	}
@@ -241,11 +241,11 @@ QByteArray CMessageDbDelegateComp::CreateDeleteObjectsQuery(
 	QString idsStr;
 	for (int i = 0; i < objectIds.size(); ++i){
 		if (i > 0) idsStr += ", ";
-		idsStr += QString("'%1'").arg(QString::fromUtf8(objectIds[i]));
+		idsStr += QStringLiteral("'%1'").arg(objectIds[i]);
 	}
 
 	// Delete junction records first, then the messages
-	return QString("DELETE FROM \"MessageAttachments\" WHERE \"MessageId\" IN (%1);\n"
+	return QStringLiteral("DELETE FROM \"MessageAttachments\" WHERE \"MessageId\" IN (%1);\n"
 		"DELETE FROM \"Messages\" WHERE \"Id\" IN (%1);")
 		.arg(idsStr)
 		.toUtf8();
@@ -293,7 +293,7 @@ void CMessageDbDelegateComp::OnComponentCreated()
 	if (!TableExists("MessageAttachments")){
 		QFile junctionScriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateMessageAttachmentsTable.sql")));
 		if (!junctionScriptFile.open(QFile::ReadOnly)){
-			SendErrorMessage(0, QString("MessageAttachments table creation script '%1' could not be loaded").arg(junctionScriptFile.fileName()));
+			SendErrorMessage(0, QStringLiteral("MessageAttachments table creation script '%1' could not be loaded").arg(junctionScriptFile.fileName()));
 			return;
 		}
 
@@ -309,7 +309,7 @@ void CMessageDbDelegateComp::OnComponentCreated()
 						<< "\n\t| MessageAttachments table could not be created"
 						<< "\n\t| Error:" << junctionError
 						<< "\n\t| Query:" << junctionQuery;
-			SendErrorMessage(0, QString("MessageAttachments table could not be created: %1").arg(junctionError.text()));
+			SendErrorMessage(0, QStringLiteral("MessageAttachments table could not be created: %1").arg(junctionError.text()));
 		}
 	}
 
@@ -327,7 +327,7 @@ QString CMessageDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParams
 			if (!conversationId.isEmpty()){
 				QString escaped = QString::fromUtf8(conversationId);
 				escaped.replace('\'', "''");
-				return QString("\"ConversationId\"='%1'").arg(escaped);
+				return QStringLiteral(R"("ConversationId"='%1')").arg(escaped);
 			}
 		}
 	}

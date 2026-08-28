@@ -144,7 +144,7 @@ void CMdbxTest::test_delete_append()
 					str = str.prepend("0");
 				}
 				QString key = str;
-				QString doc = QString("Doc_") + str;
+				QString doc = QStringLiteral("Doc_") + str;
 				if(j > 0){
 					QString add = "_" + QString::number(j);
 					doc = doc.append(add);
@@ -175,12 +175,12 @@ void CMdbxTest::test_delete_append()
 				for(int j = 0; j < maxLength - length; j++){
 					str = str.prepend("0");
 				}
-				QString doc = QString("Doc_") + str;
+				QString doc = QStringLiteral("Doc_") + str;
 				if(multiCoeff > 1){//for multi value
 					doc = doc.append("_1");
 				}
 
-				QString new_key = QString("_") + str;
+				QString new_key = QStringLiteral("_") + str;
 
 				testTable->MoveToValue(doc.toLocal8Bit());
 				testTable->RemoveDocument();
@@ -221,7 +221,7 @@ void CMdbxTest::test_delete_append()
 				for(int j = 0; j < maxLength - length; j++){
 					str = str.prepend("0");
 				}
-				QString doc = QString("Doc_") + str;
+				QString doc = QStringLiteral("Doc_") + str;
 				if(multiCoeff > 1){//for multi value
 					doc = doc.append("_1");
 				}
@@ -249,7 +249,7 @@ void CMdbxTest::test_delete_append()
 				for(int j = 0; j < maxLength - length; j++){
 					str = str.prepend("0");
 				}
-				QString doc = QString("Doc_") + str;
+				QString doc = QStringLiteral("Doc_") + str;
 				if(multiCoeff > 1){//for multi value
 					doc = doc.append("_1");
 				}
@@ -462,7 +462,7 @@ void CMdbxTest::test_mdbxcursor()
 	cursor.upsert(keySlice, valueSlice);
 	// key = 3;
 	// keySlice = mdbx::slice(&key, 8);
-	name = QString("Сергей");
+	name = QStringLiteral("Сергей");
 	data.resize(1);
 	data += name.toUtf8();
 	keySlice = mdbx::slice(data.data(), data.size());
@@ -473,7 +473,7 @@ void CMdbxTest::test_mdbxcursor()
 	cursor.upsert(keySlice, valueSlice);
 	// key = 1;
 	// keySlice = mdbx::slice(&key, 8);
-	name = QString("Петр");
+	name = QStringLiteral("Петр");
 	data.resize(1);
 	data += name.toUtf8();
 	keySlice = mdbx::slice(data.data(), data.size());
@@ -481,7 +481,7 @@ void CMdbxTest::test_mdbxcursor()
 	valueSlice = mdbx::slice(value.data());
 	cursor.upsert(keySlice, valueSlice);
 
-	name = QString("Антон");
+	name = QStringLiteral("Антон");
 	data.resize(1);
 	data += name.toUtf8();
 	keySlice = mdbx::slice(data.data(), data.size());

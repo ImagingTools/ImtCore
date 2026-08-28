@@ -225,7 +225,7 @@ bool CDocumentChangeGeneratorCompBase::GenerateDocumentChanges(
 		return false;
 	}
 
-	if (operationTypeId == QByteArray("Update")){
+	if (operationTypeId == QByteArrayLiteral("Update")){
 		return AppendDocumentComparison(documentId, documentPtr, documentChangeCollection, errorMessage);
 	}
 
@@ -308,21 +308,21 @@ bool CDocumentChangeGeneratorCompBase::AppendDocumentComparison(
 	}
 
 	if (documentPtr == nullptr){
-		errorMessage = QString("Unable to generate changes for document '%1'. Error: New document is not available").arg(QString::fromUtf8(documentId));
+		errorMessage = QStringLiteral("Unable to generate changes for document '%1'. Error: New document is not available").arg(documentId);
 
 		return false;
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(documentId, dataPtr) || !dataPtr.IsValid()){
-		errorMessage = QString("Unable to generate changes for document '%1'. Error: Stored document is not available").arg(QString::fromUtf8(documentId));
+		errorMessage = QStringLiteral("Unable to generate changes for document '%1'. Error: Stored document is not available").arg(documentId);
 
 		return false;
 	}
 
 	// The stored instance must not alias the new one, otherwise the comparison would always be empty.
 	if (dataPtr.GetPtr() == documentPtr){
-		errorMessage = QString("Unable to generate changes for document '%1'. Error: Modified document aliases the stored one").arg(QString::fromUtf8(documentId));
+		errorMessage = QStringLiteral("Unable to generate changes for document '%1'. Error: Modified document aliases the stored one").arg(documentId);
 
 		return false;
 	}

@@ -85,7 +85,7 @@ CTenantEntityBindingDbDelegateComp::NewObjectQuery CTenantEntityBindingDbDelegat
 
 	QString createdByLiteral = createdByUserId.isEmpty()
 			? QStringLiteral("NULL")
-			: QString("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(createdByUserId)));
+			: QStringLiteral("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(createdByUserId)));
 
 	const bool isSqlite = m_databaseEngineCompPtr.IsValid() &&
 			m_databaseEngineCompPtr->GetDatabaseDriverId() == "QSQLITE";
@@ -94,7 +94,7 @@ CTenantEntityBindingDbDelegateComp::NewObjectQuery CTenantEntityBindingDbDelegat
 			: QStringLiteral("INSERT INTO");
 	const QString onConflictSuffix = isSqlite
 			? QString()
-			: QStringLiteral(" ON CONFLICT (\"TenantId\", \"EntityType\", \"EntityId\") DO NOTHING");
+			: QStringLiteral(R"( ON CONFLICT ("TenantId", "EntityType", "EntityId") DO NOTHING)");
 
 	result.query = QString(
 		"%1 \"%2\" (\"Id\", \"TenantId\", \"EntityType\", \"EntityId\", \"CreatedAt\", \"CreatedByUserId\") "
@@ -136,10 +136,10 @@ QByteArray CTenantEntityBindingDbDelegateComp::CreateDeleteObjectsQuery(
 
 	QStringList escapedIds;
 	for (const QByteArray& id : objectIds){
-		escapedIds << QString("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
+		escapedIds << QStringLiteral("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
 	}
 
-	return QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
+	return QStringLiteral(R"(DELETE FROM "%1" WHERE "Id" IN (%2);)")
 			.arg(*m_tableNameAttrPtr, escapedIds.join(", ")).toUtf8();
 }
 
@@ -151,7 +151,7 @@ QByteArray CTenantEntityBindingDbDelegateComp::CreateDeleteObjectSetQuery(
 {
 	if (paramsPtr == nullptr){
 		// No filter means delete all — return a simple delete
-		return QString("DELETE FROM \"%1\";").arg(*m_tableNameAttrPtr).toUtf8();
+		return QStringLiteral(R"(DELETE FROM "%1";)").arg(*m_tableNameAttrPtr).toUtf8();
 	}
 
 	iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
@@ -165,7 +165,7 @@ QByteArray CTenantEntityBindingDbDelegateComp::CreateDeleteObjectSetQuery(
 		return QByteArray();
 	}
 
-	return QString("DELETE FROM \"%1\" WHERE %2;")
+	return QStringLiteral(R"(DELETE FROM "%1" WHERE %2;)")
 			.arg(*m_tableNameAttrPtr, filterQuery).toUtf8();
 }
 

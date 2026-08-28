@@ -483,7 +483,7 @@ bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& re
 			SendErrorMessage(
 				0,
 				QStringLiteral("No WebSocket sender registered for clientid '%1' (client offline or id mismatch)")
-				.arg(QString::fromUtf8(clientId)),
+				.arg(clientId),
 				"SubscriptionManager");
 		}
 	}
@@ -537,7 +537,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::CreateErrorResponse(const QB
 
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
-	QString body = QString(R"({"id": "%1","type": "error","payload": [ {"message": "%2", "extensions": { "type": "Warning" }} ]})")
+	QString body = QStringLiteral(R"({"id": "%1","type": "error","payload": [ {"message": "%2", "extensions": { "type": "Warning" }} ]})")
 		.arg(object["id"].toString())
 		.arg(errorMessage);
 

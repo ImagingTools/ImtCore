@@ -33,7 +33,7 @@ static QString NullableSqlText(const QString& value)
 		return QStringLiteral("NULL");
 	}
 
-	return QString("'%1'").arg(imtdb::EscapeSql(value));
+	return QStringLiteral("'%1'").arg(imtdb::EscapeSql(value));
 }
 
 
@@ -43,7 +43,7 @@ static QString NullableSqlDateTime(const QString& value)
 		return QStringLiteral("NULL");
 	}
 
-	return QString("'%1'").arg(imtdb::EscapeSql(value));
+	return QStringLiteral("'%1'").arg(imtdb::EscapeSql(value));
 }
 
 
@@ -207,10 +207,10 @@ QByteArray CCrossTenantMessageDbDelegateComp::CreateDeleteObjectsQuery(
 
 	QStringList escapedIds;
 	for (const QByteArray& id : objectIds){
-		escapedIds << QString("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
+		escapedIds << QStringLiteral("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
 	}
 
-	return QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
+	return QStringLiteral(R"(DELETE FROM "%1" WHERE "Id" IN (%2);)")
 			.arg(*m_tableNameAttrPtr, escapedIds.join(", ")).toUtf8();
 }
 

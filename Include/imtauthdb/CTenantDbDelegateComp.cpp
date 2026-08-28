@@ -264,7 +264,7 @@ QByteArray CTenantDbDelegateComp::CreateDeleteObjectsQuery(
 		result += CreateRelationshipIdsDeleteQuery(id);
 	}
 
-	result += QStringLiteral("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
+	result += QStringLiteral(R"(DELETE FROM "%1" WHERE "Id" IN (%2);)")
 				.arg(*m_tableNameAttrPtr, idsJoined).toUtf8();
 
 	return result;
@@ -286,7 +286,7 @@ QByteArray CTenantDbDelegateComp::CreateRenameObjectQuery(
 		const QString& newObjectName,
 		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	return QStringLiteral("UPDATE \"%1\" SET \"Name\"='%2', \"UpdatedAt\"='%3' WHERE \"Id\"='%4';")
+	return QStringLiteral(R"(UPDATE "%1" SET "Name"='%2', "UpdatedAt"='%3' WHERE "Id"='%4';)")
 			.arg(*m_tableNameAttrPtr,
 				 imtdb::EscapeSql(newObjectName),
 				 imtdb::UtcNow(),
@@ -300,7 +300,7 @@ QByteArray CTenantDbDelegateComp::CreateDescriptionObjectQuery(
 		const QString& description,
 		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	return QStringLiteral("UPDATE \"%1\" SET \"Description\"='%2', \"UpdatedAt\"='%3' WHERE \"Id\"='%4';")
+	return QStringLiteral(R"(UPDATE "%1" SET "Description"='%2', "UpdatedAt"='%3' WHERE "Id"='%4';)")
 			.arg(*m_tableNameAttrPtr,
 				 imtdb::EscapeSql(description),
 				 imtdb::UtcNow(),
@@ -369,7 +369,7 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 {
 	QString tableName = *m_tableNameAttrPtr;
 	if (userId.isEmpty()){
-		return QStringLiteral("SELECT *, NULL AS \"TenantRelationScope\" FROM \"%1\"").arg(tableName);
+		return QStringLiteral(R"(SELECT *, NULL AS "TenantRelationScope" FROM "%1")").arg(tableName);
 	}
 
 	QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(userId));
@@ -380,8 +380,8 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 	const bool hasCrossOrgGrantsTable = !grantsTableName.isEmpty() && TableExists(grantsTableName);
 
 	QStringList relationCaseItems;
-	relationCaseItems << QStringLiteral("WHEN \"CreatorId\"='%1' THEN 'Creator'").arg(escapedUserId);
-	relationCaseItems << QStringLiteral("WHEN \"OwnerId\"='%1' THEN 'Owner'").arg(escapedUserId);
+	relationCaseItems << QStringLiteral(R"(WHEN "CreatorId"='%1' THEN 'Creator')").arg(escapedUserId);
+	relationCaseItems << QStringLiteral(R"(WHEN "OwnerId"='%1' THEN 'Owner')").arg(escapedUserId);
 
 	if (hasMembershipsTable){
 		relationCaseItems << QString(
@@ -521,7 +521,7 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 	if (!userId.isEmpty()){
 		// With TenantRelationScope as a computed column in the subquery,
 		// only show tenants where the user has a relationship (Owner, Member, Invited, or Delegated)
-		additionalFilters << QStringLiteral("\"TenantRelationScope\" IS NOT NULL");
+		additionalFilters << QStringLiteral(R"("TenantRelationScope" IS NOT NULL)");
 	}
 
 	if (filterParamIds.contains("TenantName")){
@@ -529,7 +529,7 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 		if (tenantNameParamPtr.IsValid()){
 			const QString tenantName = tenantNameParamPtr->GetText().trimmed();
 			if (!tenantName.isEmpty()){
-				additionalFilters << QStringLiteral("\"Name\"='%1'").arg(imtdb::EscapeSql(tenantName));
+				additionalFilters << QStringLiteral(R"("Name"='%1')").arg(imtdb::EscapeSql(tenantName));
 			}
 		}
 	}
@@ -539,7 +539,7 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 		if (excludedTenantIdParamPtr.IsValid()){
 			const QByteArray excludedTenantId = excludedTenantIdParamPtr->GetId();
 			if (!excludedTenantId.isEmpty()){
-				additionalFilters << QStringLiteral("\"Id\"<>'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(excludedTenantId)));
+				additionalFilters << QStringLiteral(R"("Id"<>'%1')").arg(imtdb::EscapeSql(QString::fromUtf8(excludedTenantId)));
 			}
 		}
 	}
@@ -650,10 +650,10 @@ QByteArrayList CTenantDbDelegateComp::LoadTenantPermissions(const QByteArray& te
 	QString queryStr;
 	QByteArray productId = GetProductId();
 	if (!productId.isEmpty()){
-		queryStr = QStringLiteral("SELECT \"PermissionId\" FROM \"%1\" WHERE \"TenantId\"='%2' AND \"ProductId\"='%3';")
+		queryStr = QStringLiteral(R"(SELECT "PermissionId" FROM "%1" WHERE "TenantId"='%2' AND "ProductId"='%3';)")
 				.arg(permissionsTableName, escapedTenantId, imtdb::EscapeSql(QString::fromUtf8(productId)));
 	} else {
-		queryStr = QStringLiteral("SELECT \"PermissionId\" FROM \"%1\" WHERE \"TenantId\"='%2';")
+		queryStr = QStringLiteral(R"(SELECT "PermissionId" FROM "%1" WHERE "TenantId"='%2';)")
 				.arg(permissionsTableName, escapedTenantId);
 	}
 
@@ -685,7 +685,7 @@ QByteArray CTenantDbDelegateComp::CreatePermissionsInsertQuery(const QByteArray&
 		valueRows << QStringLiteral("('%1', '%2', '%3')").arg(escapedTenantId, escapedProductId, imtdb::EscapeSql(QString::fromUtf8(permissionId)));
 	}
 
-	return QStringLiteral("INSERT INTO \"%1\" (\"TenantId\", \"ProductId\", \"PermissionId\") VALUES %2;")
+	return QStringLiteral(R"(INSERT INTO "%1" ("TenantId", "ProductId", "PermissionId") VALUES %2;)")
 			.arg(permissionsTableName, valueRows.join(", ")).toUtf8();
 }
 
@@ -697,11 +697,11 @@ QByteArray CTenantDbDelegateComp::CreatePermissionsDeleteQuery(const QByteArray&
 
 	QByteArray productId = GetProductId();
 	if (!productId.isEmpty()){
-		return QStringLiteral("DELETE FROM \"%1\" WHERE \"TenantId\"='%2' AND \"ProductId\"='%3';")
+		return QStringLiteral(R"(DELETE FROM "%1" WHERE "TenantId"='%2' AND "ProductId"='%3';)")
 				.arg(permissionsTableName, escapedTenantId, imtdb::EscapeSql(QString::fromUtf8(productId))).toUtf8();
 	}
 
-	return QStringLiteral("DELETE FROM \"%1\" WHERE \"TenantId\"='%2';")
+	return QStringLiteral(R"(DELETE FROM "%1" WHERE "TenantId"='%2';)")
 			.arg(permissionsTableName, escapedTenantId).toUtf8();
 }
 
@@ -717,7 +717,7 @@ QByteArrayList CTenantDbDelegateComp::LoadTenantRelationshipIds(const QByteArray
 			? QString::fromUtf8(*m_relationshipsTableNameAttrPtr) : QStringLiteral("TenantRelationships");
 	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
 
-	QString queryStr = QStringLiteral("SELECT \"Id\" FROM \"%1\" WHERE \"SourceTenantId\"='%2' OR \"TargetTenantId\"='%2';")
+	QString queryStr = QStringLiteral(R"(SELECT "Id" FROM "%1" WHERE "SourceTenantId"='%2' OR "TargetTenantId"='%2';)")
 			.arg(relationshipsTableName, escapedTenantId);
 
 	QSqlError sqlError;

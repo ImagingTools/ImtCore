@@ -62,7 +62,7 @@ bool CDocumentServiceCompBase::ValidateDocumentData(
 			*errorMessage = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;
 		}
 		QString warningMessage = QStringLiteral("Document validation failed for type '%1'")
-			.arg(QString::fromUtf8(document.typeId));
+			.arg(document.typeId);
 		if (!validationMessage.isEmpty()){
 			warningMessage = QStringLiteral("%1: %2").arg(warningMessage, validationMessage);
 			SendWarningMessage(kValidationFailureWarningId, warningMessage);

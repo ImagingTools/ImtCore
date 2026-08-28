@@ -301,7 +301,7 @@ void CMessagesController::Writer::run()
 
 				if (!containerPtr->Serialize(xmlArchive)){
 					m_parent.SendErrorMessage(
-								0, QT_TR_NOOP(QString("Unable to serialize message history container \"%1\". Event container skipped")
+								0, QT_TR_NOOP(QStringLiteral("Unable to serialize message history container \"%1\". Event container skipped")
 								.arg(containerPath)));
 
 					break;
@@ -315,7 +315,7 @@ void CMessagesController::Writer::run()
 				if (m_compressorPtr != nullptr){
 					if (!m_compressorPtr->CompressFile(containerPath, archivePath)){
 						m_parent.SendErrorMessage(
-									0, QT_TR_NOOP(QString("Unable to compress message history container \"%1\". Event container skipped")
+									0, QT_TR_NOOP(QStringLiteral("Unable to compress message history container \"%1\". Event container skipped")
 									.arg(archivePath)));
 
 						break;
@@ -328,7 +328,7 @@ void CMessagesController::Writer::run()
 
 				if (!istd::CSystem::FileCopy(archivePath, outPath, true)){
 					m_parent.SendErrorMessage(
-								0, QT_TR_NOOP(QString("Unable to copy history archive to repository. Event container skipped")
+								0, QT_TR_NOOP(QStringLiteral("Unable to copy history archive to repository. Event container skipped")
 								.arg(archivePath)));
 
 					break;

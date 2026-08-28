@@ -213,7 +213,7 @@ void CAxisShape::DrawOverlay(QPainter& painter)
 	painter.drawText(windowCoordinate, xLabel);
 
 	if (m_axisConfigs[AT_X].axisRange.GetMinValue() < 0.0){
-		QString negXLabel = QString("-") + xLabel;
+		QString negXLabel = QStringLiteral("-") + xLabel;
 		windowCoordinate = ModelToWindow(QVector3D(m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMinValue(), 0.0, 0.0));
 		textRect = fontMetrics.boundingRect(negXLabel);
 		windowCoordinate.setX(windowCoordinate.x() - textRect.width() - textOffset);
@@ -237,7 +237,7 @@ void CAxisShape::DrawOverlay(QPainter& painter)
 	painter.drawText(windowCoordinate, yLabel);
 
 	if (m_axisConfigs[AT_Y].axisRange.GetMinValue() < 0.0){
-		QString negYLabel = QString("-") + yLabel;
+		QString negYLabel = QStringLiteral("-") + yLabel;
 		windowCoordinate = ModelToWindow(QVector3D(0.0, m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMinValue(), 0.0));
 		textRect = fontMetrics.boundingRect(negYLabel);
 		windowCoordinate.setX(windowCoordinate.x() - textRect.width() - textOffset);
@@ -261,7 +261,7 @@ void CAxisShape::DrawOverlay(QPainter& painter)
 	painter.drawText(windowCoordinate, zLabel);
 
 	if (m_axisConfigs[AT_Z].axisRange.GetMinValue() < 0.0){
-		QString negZLabel = QString("-") + zLabel;
+		QString negZLabel = QStringLiteral("-") + zLabel;
 		windowCoordinate = ModelToWindow(QVector3D(0.0, 0.0, m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMinValue()));
 		textRect = fontMetrics.boundingRect(negZLabel);
 		windowCoordinate.setX(windowCoordinate.x() - textRect.width() - textOffset);

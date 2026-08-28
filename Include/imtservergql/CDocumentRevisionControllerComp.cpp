@@ -123,7 +123,7 @@ sdl::V1_0::imtbase::CRevisionInfoList CDocumentRevisionControllerComp::OnGetRevi
 
 	const imtbase::IObjectCollection* objectCollectionPtr = FindObjectCollection(collectionId);
 	if (objectCollectionPtr == nullptr){
-		errorMessage = QStringLiteral("Unable to get revision list. Error: No collection configured for '%1'").arg(QString::fromUtf8(collectionId));
+		errorMessage = QStringLiteral("Unable to get revision list. Error: No collection configured for '%1'").arg(collectionId);
 		return sdl::V1_0::imtbase::CRevisionInfoList();
 	}
 

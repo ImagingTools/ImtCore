@@ -17,7 +17,7 @@ namespace imtserverapp
 
 QByteArray CFileNameParamRepresentationControllerComp::GetTypeId() const
 {
-	return QByteArray("FileNameParam");
+	return QByteArrayLiteral("FileNameParam");
 }
 
 

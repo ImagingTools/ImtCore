@@ -186,9 +186,9 @@ void CMeshShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chang
 void CMeshShape::DrawOverlay(QPainter& painter)
 {
 	if (m_isInfoBoxEnabled && m_pointsDataPtr != nullptr){
-		QString text = QString("<b><p>Total vertices: %1</p>").arg(m_pointsDataPtr->GetPointsCount());
-		text += QString("<p>Total faces: %1</p>").arg(m_indices.size() / 3);
-		text += QString("<p>Selected faces: %1</p></b>").arg(static_cast<int>(m_selectedIndicies.size() / 3));
+		QString text = QStringLiteral("<b><p>Total vertices: %1</p>").arg(m_pointsDataPtr->GetPointsCount());
+		text += QStringLiteral("<p>Total faces: %1</p>").arg(m_indices.size() / 3);
+		text += QStringLiteral("<p>Selected faces: %1</p></b>").arg(static_cast<int>(m_selectedIndicies.size() / 3));
 
 		painter.save();
 

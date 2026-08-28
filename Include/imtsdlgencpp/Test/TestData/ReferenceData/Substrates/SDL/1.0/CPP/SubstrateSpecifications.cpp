@@ -23,7 +23,7 @@ bool V1_0::substrate::CInputId::WriteToModel(::imtbase::CTreeItemModel& model, i
 	model.SetData("__typename", "InputId", modelIndex);
 
 	if (!id){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -38,7 +38,7 @@ bool V1_0::substrate::CInputId::ReadFromModel(const ::imtbase::CTreeItemModel& m
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (idData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -62,7 +62,7 @@ bool V1_0::substrate::CInputId::OptReadFromModel(const ::imtbase::CTreeItemModel
 bool V1_0::substrate::CInputId::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!id){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -77,7 +77,7 @@ bool V1_0::substrate::CInputId::WriteToGraphQlObject(::imtgql::CGqlParamObject& 
 bool V1_0::substrate::CInputId::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("id") || (gqlObject["id"].userType() != QMetaType::QString && gqlObject["id"].userType() != QMetaType::QByteArray)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -100,7 +100,7 @@ bool V1_0::substrate::CInputId::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 bool V1_0::substrate::CInputId::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!id){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -115,7 +115,7 @@ bool V1_0::substrate::CInputId::WriteToJsonObject(QJsonObject& jsonObject) const
 bool V1_0::substrate::CInputId::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("id") || ! jsonObject["id"].isString()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -504,7 +504,7 @@ bool V1_0::substrate::CSubstrateSpecificationListInput::WriteToModel(::imtbase::
 		::imtbase::CTreeItemModel* viewParamsNewModelPtr = model.AddTreeModel("viewParams", modelIndex);
 		const bool isViewParamsAdded = viewParams->WriteToModel(*viewParamsNewModelPtr, 0);
 		if (!isViewParamsAdded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -522,7 +522,7 @@ bool V1_0::substrate::CSubstrateSpecificationListInput::ReadFromModel(const ::im
 		viewParams = V1_0::substrate::CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->ReadFromModel(*viewParamsDataModelPtr, modelIndex);
 		if (!isViewParamsRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -539,7 +539,7 @@ bool V1_0::substrate::CSubstrateSpecificationListInput::OptReadFromModel(const :
 		viewParams = V1_0::substrate::CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->ReadFromModel(*viewParamsDataModelPtr, modelIndex);
 		if (!isViewParamsRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -555,7 +555,7 @@ bool V1_0::substrate::CSubstrateSpecificationListInput::WriteToGraphQlObject(::i
 		::imtgql::CGqlParamObject viewParamsGqlObject;
 		const bool isViewParamsAdded = viewParams->WriteToGraphQlObject(viewParamsGqlObject);
 		if (!isViewParamsAdded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -574,7 +574,7 @@ bool V1_0::substrate::CSubstrateSpecificationListInput::ReadFromGraphQlObject(co
 		viewParams = V1_0::substrate::CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("viewParams"));
 		if (!isViewParamsRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -590,7 +590,7 @@ bool V1_0::substrate::CSubstrateSpecificationListInput::OptReadFromGraphQlObject
 		viewParams = V1_0::substrate::CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("viewParams"));
 		if (!isViewParamsRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -606,7 +606,7 @@ bool V1_0::substrate::CSubstrateSpecificationListInput::WriteToJsonObject(QJsonO
 		QJsonObject viewParamsJsonObject;
 		const bool isViewParamsAdded = viewParams->WriteToJsonObject(viewParamsJsonObject);
 		if (!isViewParamsAdded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -625,7 +625,7 @@ bool V1_0::substrate::CSubstrateSpecificationListInput::ReadFromJsonObject(const
 		viewParams = V1_0::substrate::CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->ReadFromJsonObject(jsonObject["viewParams"].toObject());
 		if (!isViewParamsRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -641,7 +641,7 @@ bool V1_0::substrate::CSubstrateSpecificationListInput::OptReadFromJsonObject(co
 		viewParams = V1_0::substrate::CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->OptReadFromJsonObject(jsonObject["viewParams"].toObject());
 		if (!isViewParamsRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -678,21 +678,21 @@ bool V1_0::substrate::CSubstrateSpecificationListItem::WriteToModel(::imtbase::C
 	model.SetData("__typename", "SubstrateSpecificationListItem", modelIndex);
 
 	if (!id){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
 	model.SetData("id", *id, modelIndex);
 
 	if (!typeId){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
 
 		return false;
 	}
 	model.SetData("typeId", *typeId, modelIndex);
 
 	if (!name){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "name").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "name").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -727,7 +727,7 @@ bool V1_0::substrate::CSubstrateSpecificationListItem::ReadFromModel(const ::imt
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (idData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -735,7 +735,7 @@ bool V1_0::substrate::CSubstrateSpecificationListItem::ReadFromModel(const ::imt
 
 	QVariant typeIdData = model.GetData("typeId", modelIndex);
 	if (typeIdData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -743,7 +743,7 @@ bool V1_0::substrate::CSubstrateSpecificationListItem::ReadFromModel(const ::imt
 
 	QVariant nameData = model.GetData("name", modelIndex);
 	if (nameData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "name").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "name").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -827,21 +827,21 @@ bool V1_0::substrate::CSubstrateSpecificationListItem::OptReadFromModel(const ::
 bool V1_0::substrate::CSubstrateSpecificationListItem::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!id){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
 	gqlObject.InsertParam("id", QVariant(*id));
 
 	if (!typeId){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
 
 		return false;
 	}
 	gqlObject.InsertParam("typeId", QVariant(*typeId));
 
 	if (!name){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "name").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "name").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -876,21 +876,21 @@ bool V1_0::substrate::CSubstrateSpecificationListItem::WriteToGraphQlObject(::im
 bool V1_0::substrate::CSubstrateSpecificationListItem::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("id") || (gqlObject["id"].userType() != QMetaType::QString && gqlObject["id"].userType() != QMetaType::QByteArray)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
 	id = gqlObject["id"].toByteArray();
 
 	if (!gqlObject.ContainsParam("typeId") || (gqlObject["typeId"].userType() != QMetaType::QString && gqlObject["typeId"].userType() != QMetaType::QByteArray)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
 
 		return false;
 	}
 	typeId = gqlObject["typeId"].toByteArray();
 
 	if (!gqlObject.ContainsParam("name") || (gqlObject["name"].userType() != QMetaType::QString && gqlObject["name"].userType() != QMetaType::QByteArray)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "name").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "name").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -961,21 +961,21 @@ bool V1_0::substrate::CSubstrateSpecificationListItem::OptReadFromGraphQlObject(
 bool V1_0::substrate::CSubstrateSpecificationListItem::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!id){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
 	jsonObject["id"] = QString::fromUtf8(*id);
 
 	if (!typeId){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
 
 		return false;
 	}
 	jsonObject["typeId"] = QString::fromUtf8(*typeId);
 
 	if (!name){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "name").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "name").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -1010,21 +1010,21 @@ bool V1_0::substrate::CSubstrateSpecificationListItem::WriteToJsonObject(QJsonOb
 bool V1_0::substrate::CSubstrateSpecificationListItem::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("id") || ! jsonObject["id"].isString()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
 	id = jsonObject["id"].toString().toUtf8();
 
 	if (!jsonObject.contains("typeId") || ! jsonObject["typeId"].isString()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
 
 		return false;
 	}
 	typeId = jsonObject["typeId"].toString().toUtf8();
 
 	if (!jsonObject.contains("name") || ! jsonObject["name"].isString()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "name").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "name").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -1117,7 +1117,7 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::WriteToModel(::imtbas
 		for (qsizetype itemsIndex = 0; itemsIndex < items->size(); ++itemsIndex){
 			newItemsModelPtr->InsertNewItem();
 			if (!(items->at(itemsIndex)->WriteToModel(*newItemsModelPtr, itemsIndex))){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
+				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1137,7 +1137,7 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::ReadFromModel(const :
 		for (int itemsIndex = 0; itemsIndex < itemsCount; ++itemsIndex){
 			V1_0::substrate::CSubstrateSpecificationListItem t_items;
 			if (!t_items.ReadFromModel(*itemsModel, itemsIndex)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
+				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1160,7 +1160,7 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::OptReadFromModel(cons
 		for (int itemsIndex = 0; itemsIndex < itemsCount; ++itemsIndex){
 			V1_0::substrate::CSubstrateSpecificationListItem t_items;
 			if (!t_items.OptReadFromModel(*itemsModel, itemsIndex)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
+				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1181,7 +1181,7 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::WriteToGraphQlObject(
 		for (qsizetype itemsIndex = 0; itemsIndex < items->size(); ++itemsIndex){
 			::imtgql::CGqlParamObject newItemsGqlObject;
 			if (!items->at(itemsIndex)->WriteToGraphQlObject(newItemsGqlObject)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
+				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1212,7 +1212,7 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::ReadFromGraphQlObject
 			}
 			V1_0::substrate::CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.ReadFromGraphQlObject(*itemsDataObjectPtr)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
+				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1240,7 +1240,7 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::OptReadFromGraphQlObj
 			}
 			V1_0::substrate::CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.OptReadFromGraphQlObject(*itemsDataObjectPtr)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
+				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1259,7 +1259,7 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::WriteToJsonObject(QJs
 		for (qsizetype itemsIndex = 0; itemsIndex < items->size(); ++itemsIndex){
 			QJsonObject newItemsJsonObject;
 			if (!items->at(itemsIndex)->WriteToJsonObject(newItemsJsonObject)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
+				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1283,7 +1283,7 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::ReadFromJsonObject(co
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsArrayCount; ++itemsIndex){
 			V1_0::substrate::CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.ReadFromJsonObject(itemsJsonArray[itemsIndex].toObject())){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
+				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1304,7 +1304,7 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::OptReadFromJsonObject
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsArrayCount; ++itemsIndex){
 			V1_0::substrate::CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.OptReadFromJsonObject(itemsJsonArray[itemsIndex].toObject())){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
+				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1883,7 +1883,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::WriteToModel(::imtbase::CTre
 	model.SetData("__typename", "SubstrateSpecificationInput", modelIndex);
 
 	if (!id){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -1898,7 +1898,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::WriteToModel(::imtbase::CTre
 	}
 
 	if (!item){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -1930,7 +1930,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::WriteToModel(::imtbase::CTre
 
 
 	if (!typeId){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -1945,7 +1945,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::ReadFromModel(const ::imtbas
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (idData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -1963,7 +1963,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::ReadFromModel(const ::imtbas
 
 	QVariant itemData = model.GetData("item", modelIndex);
 	if (itemData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -1995,7 +1995,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::ReadFromModel(const ::imtbas
 
 	QVariant typeIdData = model.GetData("typeId", modelIndex);
 	if (typeIdData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -2063,7 +2063,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::OptReadFromModel(const ::imt
 bool V1_0::substrate::CSubstrateSpecificationInput::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!id){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -2078,7 +2078,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::WriteToGraphQlObject(::imtgq
 	}
 
 	if (!item){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -2104,7 +2104,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::WriteToGraphQlObject(::imtgq
 	gqlObject.InsertParam("item", itemDataObject);
 
 	if (!typeId){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -2119,7 +2119,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::WriteToGraphQlObject(::imtgq
 bool V1_0::substrate::CSubstrateSpecificationInput::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("id") || (gqlObject["id"].userType() != QMetaType::QString && gqlObject["id"].userType() != QMetaType::QByteArray)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -2134,13 +2134,13 @@ bool V1_0::substrate::CSubstrateSpecificationInput::ReadFromGraphQlObject(const 
 	}
 
 	if (!gqlObject.ContainsParam("item")){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
 
 		return false;
 	}
 	const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("item");
 	if (!itemDataObjectPtr->ContainsParam("__typename")){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -2171,7 +2171,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::ReadFromGraphQlObject(const 
 	}
 
 	if (!gqlObject.ContainsParam("typeId") || (gqlObject["typeId"].userType() != QMetaType::QString && gqlObject["typeId"].userType() != QMetaType::QByteArray)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -2198,7 +2198,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::OptReadFromGraphQlObject(con
 	if (gqlObject.ContainsParam("item")){
 		const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("item");
 		if (!itemDataObjectPtr->ContainsParam("__typename")){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -2240,7 +2240,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::OptReadFromGraphQlObject(con
 bool V1_0::substrate::CSubstrateSpecificationInput::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!id){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -2255,7 +2255,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::WriteToJsonObject(QJsonObjec
 	}
 
 	if (!item){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -2289,7 +2289,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::WriteToJsonObject(QJsonObjec
 
 
 	if (!typeId){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -2304,7 +2304,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::WriteToJsonObject(QJsonObjec
 bool V1_0::substrate::CSubstrateSpecificationInput::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("id") || ! jsonObject["id"].isString()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -2319,13 +2319,13 @@ bool V1_0::substrate::CSubstrateSpecificationInput::ReadFromJsonObject(const QJs
 	}
 
 	if (!jsonObject.contains("item")){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
 
 		return false;
 	}
 	const QJsonObject itemObject = jsonObject.value("item").toObject();
 	if (!jsonObject.value("item").isObject() || !itemObject.contains("__typename")){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -2356,7 +2356,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::ReadFromJsonObject(const QJs
 	}
 
 	if (!jsonObject.contains("typeId") || ! jsonObject["typeId"].isString()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "typeId").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -2383,7 +2383,7 @@ bool V1_0::substrate::CSubstrateSpecificationInput::OptReadFromJsonObject(const 
 	if (jsonObject.contains("item")){
 		const QJsonObject itemObject = jsonObject.value("item").toObject();
 		if (!jsonObject.value("item").isObject() || !itemObject.contains("__typename")){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "item").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -2655,7 +2655,7 @@ QVariant CInputIdObject::CreateObject(const QString& key)
 
 QString CInputIdObject::getJSONKeyForProperty(const QString& propertyName) const
 {
-	if (propertyName == (QString("m_") + "id")){
+	if (propertyName == (QStringLiteral("m_") + "id")){
 		return "id";
 	}
 
@@ -2860,10 +2860,10 @@ QVariant CCollectionViewParamsTestObject::CreateObject(const QString& key)
 
 QString CCollectionViewParamsTestObject::getJSONKeyForProperty(const QString& propertyName) const
 {
-	if (propertyName == (QString("m_") + "count")){
+	if (propertyName == (QStringLiteral("m_") + "count")){
 		return "count";
 	}
-	if (propertyName == (QString("m_") + "offset")){
+	if (propertyName == (QStringLiteral("m_") + "offset")){
 		return "offset";
 	}
 
@@ -3091,13 +3091,13 @@ QVariant CSubstrateSpecificationDocumentTypeIdsObject::CreateObject(const QStrin
 
 QString CSubstrateSpecificationDocumentTypeIdsObject::getJSONKeyForProperty(const QString& propertyName) const
 {
-	if (propertyName == (QString("m_") + "paperID")){
+	if (propertyName == (QStringLiteral("m_") + "paperID")){
 		return "PaperID";
 	}
-	if (propertyName == (QString("m_") + "cardboardID")){
+	if (propertyName == (QStringLiteral("m_") + "cardboardID")){
 		return "CardboardID";
 	}
-	if (propertyName == (QString("m_") + "filmID")){
+	if (propertyName == (QStringLiteral("m_") + "filmID")){
 		return "FilmID";
 	}
 
@@ -3326,7 +3326,7 @@ QVariant CSubstrateSpecificationListInputObject::CreateObject(const QString& key
 
 QString CSubstrateSpecificationListInputObject::getJSONKeyForProperty(const QString& propertyName) const
 {
-	if (propertyName == (QString("m_") + "viewParams")){
+	if (propertyName == (QStringLiteral("m_") + "viewParams")){
 		return "viewParams";
 	}
 
@@ -3651,28 +3651,28 @@ QVariant CSubstrateSpecificationListItemObject::CreateObject(const QString& key)
 
 QString CSubstrateSpecificationListItemObject::getJSONKeyForProperty(const QString& propertyName) const
 {
-	if (propertyName == (QString("m_") + "id")){
+	if (propertyName == (QStringLiteral("m_") + "id")){
 		return "id";
 	}
-	if (propertyName == (QString("m_") + "typeId")){
+	if (propertyName == (QStringLiteral("m_") + "typeId")){
 		return "typeId";
 	}
-	if (propertyName == (QString("m_") + "name")){
+	if (propertyName == (QStringLiteral("m_") + "name")){
 		return "name";
 	}
-	if (propertyName == (QString("m_") + "materialId")){
+	if (propertyName == (QStringLiteral("m_") + "materialId")){
 		return "materialId";
 	}
-	if (propertyName == (QString("m_") + "materialName")){
+	if (propertyName == (QStringLiteral("m_") + "materialName")){
 		return "materialName";
 	}
-	if (propertyName == (QString("m_") + "added")){
+	if (propertyName == (QStringLiteral("m_") + "added")){
 		return "added";
 	}
-	if (propertyName == (QString("m_") + "timeStamp")){
+	if (propertyName == (QStringLiteral("m_") + "timeStamp")){
 		return "timeStamp";
 	}
-	if (propertyName == (QString("m_") + "colorPreview")){
+	if (propertyName == (QStringLiteral("m_") + "colorPreview")){
 		return "colorPreview";
 	}
 
@@ -3918,7 +3918,7 @@ QVariant CSubstrateSpecificationListResponseObject::CreateObject(const QString& 
 
 QString CSubstrateSpecificationListResponseObject::getJSONKeyForProperty(const QString& propertyName) const
 {
-	if (propertyName == (QString("m_") + "items")){
+	if (propertyName == (QStringLiteral("m_") + "items")){
 		return "items";
 	}
 
@@ -4123,10 +4123,10 @@ QVariant CCardboardSubstrateSpecificationObject::CreateObject(const QString& key
 
 QString CCardboardSubstrateSpecificationObject::getJSONKeyForProperty(const QString& propertyName) const
 {
-	if (propertyName == (QString("m_") + "color")){
+	if (propertyName == (QStringLiteral("m_") + "color")){
 		return "color";
 	}
-	if (propertyName == (QString("m_") + "grammage")){
+	if (propertyName == (QStringLiteral("m_") + "grammage")){
 		return "grammage";
 	}
 
@@ -4354,13 +4354,13 @@ QVariant CPaperSubstrateSpecificationObject::CreateObject(const QString& key)
 
 QString CPaperSubstrateSpecificationObject::getJSONKeyForProperty(const QString& propertyName) const
 {
-	if (propertyName == (QString("m_") + "grammage")){
+	if (propertyName == (QStringLiteral("m_") + "grammage")){
 		return "grammage";
 	}
-	if (propertyName == (QString("m_") + "color")){
+	if (propertyName == (QStringLiteral("m_") + "color")){
 		return "color";
 	}
-	if (propertyName == (QString("m_") + "coatType")){
+	if (propertyName == (QStringLiteral("m_") + "coatType")){
 		return "coatType";
 	}
 
@@ -4591,13 +4591,13 @@ QVariant CFilmSubstrateSpecificationObject::CreateObject(const QString& key)
 
 QString CFilmSubstrateSpecificationObject::getJSONKeyForProperty(const QString& propertyName) const
 {
-	if (propertyName == (QString("m_") + "transparency")){
+	if (propertyName == (QStringLiteral("m_") + "transparency")){
 		return "transparency";
 	}
-	if (propertyName == (QString("m_") + "color")){
+	if (propertyName == (QStringLiteral("m_") + "color")){
 		return "color";
 	}
-	if (propertyName == (QString("m_") + "material")){
+	if (propertyName == (QStringLiteral("m_") + "material")){
 		return "material";
 	}
 
@@ -4925,19 +4925,19 @@ QVariant CSubstrateSpecificationInputObject::CreateObject(const QString& key)
 
 QString CSubstrateSpecificationInputObject::getJSONKeyForProperty(const QString& propertyName) const
 {
-	if (propertyName == (QString("m_") + "id")){
+	if (propertyName == (QStringLiteral("m_") + "id")){
 		return "id";
 	}
-	if (propertyName == (QString("m_") + "name")){
+	if (propertyName == (QStringLiteral("m_") + "name")){
 		return "name";
 	}
-	if (propertyName == (QString("m_") + "description")){
+	if (propertyName == (QStringLiteral("m_") + "description")){
 		return "description";
 	}
-	if (propertyName == (QString("m_") + "item")){
+	if (propertyName == (QStringLiteral("m_") + "item")){
 		return "item";
 	}
-	if (propertyName == (QString("m_") + "typeId")){
+	if (propertyName == (QStringLiteral("m_") + "typeId")){
 		return "typeId";
 	}
 
@@ -5154,10 +5154,10 @@ QVariant CSubstrateSpecificationDocumentMetaInfoObject::CreateObject(const QStri
 
 QString CSubstrateSpecificationDocumentMetaInfoObject::getJSONKeyForProperty(const QString& propertyName) const
 {
-	if (propertyName == (QString("m_") + "materialId")){
+	if (propertyName == (QStringLiteral("m_") + "materialId")){
 		return "materialId";
 	}
-	if (propertyName == (QString("m_") + "lab")){
+	if (propertyName == (QStringLiteral("m_") + "lab")){
 		return "lab";
 	}
 
@@ -5538,7 +5538,7 @@ bool CGetSubstrateSpecificationListGqlRequest::SetupGqlRequest(::imtgql::CGqlReq
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
 	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -5635,7 +5635,7 @@ bool CGetSubstrateSpecificationGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
 	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -5715,7 +5715,7 @@ bool CGetOptionsListGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlReques
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
 	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -5810,7 +5810,7 @@ bool CInsertSubstrateSpecificationGqlRequest::SetupGqlRequest(::imtgql::CGqlRequ
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
 	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -5893,7 +5893,7 @@ bool CUpdateSubstrateSpecificationGqlRequest::SetupGqlRequest(::imtgql::CGqlRequ
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
 	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -6045,7 +6045,7 @@ bool CSubstrateSpecificationCollectionControllerCompBase::CreateRepresentationFr
 		V1_0::substrate::SubstrateSpecificationDocument representationObject;
 		const bool isRepresentationCreated = CreateRepresentationFromObject(data, getSubstrateSpecificationGqlRequest, representationObject, errorMessage);
 		if (!isRepresentationCreated){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6075,7 +6075,7 @@ bool CSubstrateSpecificationCollectionControllerCompBase::CreateRepresentationFr
 		return true;
 	}
 
-	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
 
 	SendErrorMessage(0, errorMessage);
 
@@ -6091,7 +6091,7 @@ istd::IChangeableUniquePtr CSubstrateSpecificationCollectionControllerCompBase::
 	if (commandId == CInsertSubstrateSpecificationGqlRequest::GetCommandId()){
 		CInsertSubstrateSpecificationGqlRequest insertSubstrateSpecificationGqlRequest(gqlRequest, false);
 		if (!insertSubstrateSpecificationGqlRequest.IsValid()){
-			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
 			return nullptr;
@@ -6100,7 +6100,7 @@ istd::IChangeableUniquePtr CSubstrateSpecificationCollectionControllerCompBase::
 		return CreateObjectFromRepresentation(*insertSubstrateSpecificationGqlRequest.GetRequestedArguments().input->item, newObjectId, errorMessage);
 	}
 
-	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
 	SendErrorMessage(0, errorMessage);
 
 	return nullptr;
@@ -6117,7 +6117,7 @@ bool CSubstrateSpecificationCollectionControllerCompBase::UpdateObjectFromReques
 		return UpdateObjectFromRepresentationRequest(gqlRequest, updateSubstrateSpecificationGqlRequest, object, errorMessage);
 	}
 
-	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
 	SendErrorMessage(0, errorMessage);
 
 	return false;
@@ -6129,7 +6129,7 @@ bool CSubstrateSpecificationCollectionControllerCompBase::UpdateObjectFromReques
 	const QByteArray commandId = gqlRequest.GetCommandId();
 	auto setupContext = std::make_shared<CGetSubstrateSpecificationListGqlRequest>(gqlRequest, false);
 	if (!setupContext->IsValid()){
-		errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+		errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 		SendErrorMessage(0, errorMessage);
 
 		return {};
@@ -6144,14 +6144,14 @@ bool CSubstrateSpecificationCollectionControllerCompBase::SetupGqlItemWithContex
 	Q_UNUSED(gqlRequest);
 
 	if (objectCollectionIterator == nullptr){
-I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create object iterator.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create object iterator.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
 	}
 
 	const auto typedSetupContext = std::static_pointer_cast<const CGetSubstrateSpecificationListGqlRequest>(setupContext);
 	if (!typedSetupContext){
-		errorMessage = QString("Internal error. Invalid request setup context for command-ID: '%1'").arg(qPrintable(CGetSubstrateSpecificationListGqlRequest::GetCommandId()));
+		errorMessage = QStringLiteral("Internal error. Invalid request setup context for command-ID: '%1'").arg(qPrintable(CGetSubstrateSpecificationListGqlRequest::GetCommandId()));
 		SendErrorMessage(0, errorMessage);
 
 		return false;
@@ -6161,14 +6161,14 @@ I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create object iterator.
 	V1_0::substrate::CSubstrateSpecificationListItem representationObject;
 	const bool isRepresentationCreated = CreateRepresentationFromObject(*objectCollectionIterator, *typedSetupContext, representationObject, errorMessage);
 	if (!isRepresentationCreated){
-	I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+	I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
 	}
 
 	const bool isRepresentationWritten = representationObject.WriteToJsonObject(itemObj);
 	if (!isRepresentationWritten){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to Write TreeModel").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to Write TreeModel").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -6188,7 +6188,7 @@ QJsonObject CSubstrateSpecificationCollectionControllerCompBase::CreateInternalR
 	if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
 		CGetOptionsListGqlRequest getOptionsListGqlRequest(gqlRequest, false);
 		if (!getOptionsListGqlRequest.IsValid()){
-			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6196,14 +6196,14 @@ QJsonObject CSubstrateSpecificationCollectionControllerCompBase::CreateInternalR
 
 		V1_0::imtbase::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
-			SendErrorMessage(0, QString("The derived call [OnGetOptionsList] returned an error: %1").arg(errorMessage));
+			SendErrorMessage(0, QStringLiteral("The derived call [OnGetOptionsList] returned an error: %1").arg(errorMessage));
 
 			return QJsonObject();
 		}
 
 		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
-			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
 			SendCriticalMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6249,7 +6249,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 	if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
 		CGetSubstrateSpecificationListGqlRequest getSubstrateSpecificationListGqlRequest(gqlRequest, false);
 		if (!getSubstrateSpecificationListGqlRequest.IsValid()){
-			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6257,14 +6257,14 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 
 		V1_0::substrate::CSubstrateSpecificationListResponse replyPayload = OnGetSubstrateSpecificationList(getSubstrateSpecificationListGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
-			SendErrorMessage(0, QString("The derived call [OnGetSubstrateSpecificationList] returned an error: %1").arg(errorMessage));
+			SendErrorMessage(0, QStringLiteral("The derived call [OnGetSubstrateSpecificationList] returned an error: %1").arg(errorMessage));
 
 			return QJsonObject();
 		}
 
 		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
-			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
 			SendCriticalMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6277,7 +6277,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 	if (commandId == CGetSubstrateSpecificationGqlRequest::GetCommandId()){
 		CGetSubstrateSpecificationGqlRequest getSubstrateSpecificationGqlRequest(gqlRequest, false);
 		if (!getSubstrateSpecificationGqlRequest.IsValid()){
-			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6285,7 +6285,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 
 		V1_0::substrate::SubstrateSpecificationDocument replyPayload = OnGetSubstrateSpecification(getSubstrateSpecificationGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
-			SendErrorMessage(0, QString("The derived call [OnGetSubstrateSpecification] returned an error: %1").arg(errorMessage));
+			SendErrorMessage(0, QStringLiteral("The derived call [OnGetSubstrateSpecification] returned an error: %1").arg(errorMessage));
 
 			return QJsonObject();
 		}
@@ -6318,7 +6318,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 	if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
 		CGetOptionsListGqlRequest getOptionsListGqlRequest(gqlRequest, false);
 		if (!getOptionsListGqlRequest.IsValid()){
-			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6326,14 +6326,14 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 
 		V1_0::imtbase::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
-			SendErrorMessage(0, QString("The derived call [OnGetOptionsList] returned an error: %1").arg(errorMessage));
+			SendErrorMessage(0, QStringLiteral("The derived call [OnGetOptionsList] returned an error: %1").arg(errorMessage));
 
 			return QJsonObject();
 		}
 
 		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
-			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
 			SendCriticalMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6346,7 +6346,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 	if (commandId == CInsertSubstrateSpecificationGqlRequest::GetCommandId()){
 		CInsertSubstrateSpecificationGqlRequest insertSubstrateSpecificationGqlRequest(gqlRequest, false);
 		if (!insertSubstrateSpecificationGqlRequest.IsValid()){
-			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6354,14 +6354,14 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 
 		V1_0::substrate::CInputId replyPayload = OnInsertSubstrateSpecification(insertSubstrateSpecificationGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
-			SendErrorMessage(0, QString("The derived call [OnInsertSubstrateSpecification] returned an error: %1").arg(errorMessage));
+			SendErrorMessage(0, QStringLiteral("The derived call [OnInsertSubstrateSpecification] returned an error: %1").arg(errorMessage));
 
 			return QJsonObject();
 		}
 
 		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
-			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
 			SendCriticalMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6374,7 +6374,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 	if (commandId == CUpdateSubstrateSpecificationGqlRequest::GetCommandId()){
 		CUpdateSubstrateSpecificationGqlRequest updateSubstrateSpecificationGqlRequest(gqlRequest, false);
 		if (!updateSubstrateSpecificationGqlRequest.IsValid()){
-			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6382,14 +6382,14 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 
 		V1_0::substrate::CInputId replyPayload = OnUpdateSubstrateSpecification(updateSubstrateSpecificationGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
-			SendErrorMessage(0, QString("The derived call [OnUpdateSubstrateSpecification] returned an error: %1").arg(errorMessage));
+			SendErrorMessage(0, QStringLiteral("The derived call [OnUpdateSubstrateSpecification] returned an error: %1").arg(errorMessage));
 
 			return QJsonObject();
 		}
 
 		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
-			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
+			errorMessage = QStringLiteral("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
 			SendCriticalMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -6398,7 +6398,7 @@ QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(c
 		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
-	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
+	errorMessage = QStringLiteral("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
 	SendErrorMessage(0, errorMessage);
 
 	return QJsonObject();

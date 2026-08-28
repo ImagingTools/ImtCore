@@ -36,7 +36,7 @@ bool CGqlQueryBasedPublisherCompBase::Publish(bool useAwsStyle)
 		QString errorMessage;
 		QJsonObject resultObj = m_requestHandlerCompPtr->CreateResponse(clonedRequest, errorMessage);
 		if (resultObj.isEmpty()){
-			errorMessage = QString("Unable to send response to the subscribers result model is invalid");
+			errorMessage = QStringLiteral("Unable to send response to the subscribers result model is invalid");
 			SendErrorMessage(0, errorMessage, "CGqlQueryBasedPublisherCompBase");
 
 			return false;
@@ -44,7 +44,7 @@ bool CGqlQueryBasedPublisherCompBase::Publish(bool useAwsStyle)
 
 		QJsonObject dataObj = resultObj.value(QStringLiteral("data")).toObject();
 		if (dataObj.isEmpty()){
-			errorMessage = QString("Unable to send response to the subscribers result model is invalid");
+			errorMessage = QStringLiteral("Unable to send response to the subscribers result model is invalid");
 			SendErrorMessage(0, errorMessage, "CGqlQueryBasedPublisherCompBase");
 
 			return false;

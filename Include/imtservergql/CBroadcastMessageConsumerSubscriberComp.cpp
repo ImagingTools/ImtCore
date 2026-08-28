@@ -28,7 +28,7 @@ void CBroadcastMessageConsumerSubscriberComp::AddMessage(const MessagePtr& messa
 	QString source = messagePtr->GetInformationSource();
 	QString message = messagePtr->GetInformationDescription();
 
-	QString data = QString("{\"source\": \"%1\", \"message\": \"%2\"}").arg(source).arg(message);
+	QString data = QStringLiteral(R"({"source": "%1", "message": "%2"})").arg(source, message);
 
 	PublishData(m_commandIdsAttrPtr[0], data.toUtf8());
 }

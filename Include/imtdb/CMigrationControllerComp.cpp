@@ -66,11 +66,11 @@ bool CMigrationControllerComp::DoMigration(int& resultRevision, const istd::CInt
 	folder.setNameFilters(nameFilter);
 
 	for (int i = startIndex; i <= endIndex; i++){
-		QString migrationFilePath = folder.filePath("migration_" + QString::number(i) + ".sql");
+		QString migrationFilePath = folder.filePath(QStringLiteral("migration_") + QString::number(i) + QStringLiteral(".sql"));
 
 		QFileInfo fileInfo(migrationFilePath);
 		if (!fileInfo.exists()){
-			SendErrorMessage(0, QString("Unable to do migration number '%1'. Error: File '%2' was not found").arg(i).arg(migrationFilePath), "CMigrationControllerComp");
+			SendErrorMessage(0, QStringLiteral("Unable to do migration number '%1'. Error: File '%2' was not found").arg(QString::number(i), migrationFilePath), QStringLiteral("CMigrationControllerComp"));
 
 			continue;
 		}
@@ -79,14 +79,14 @@ bool CMigrationControllerComp::DoMigration(int& resultRevision, const istd::CInt
 		m_databaseEngineCompPtr->ExecSqlQueryFromFile(migrationFilePath.toUtf8(), &sqlError);
 
 		if (sqlError.type() != QSqlError::NoError){
-			SendErrorMessage(0, QString("Unable to execute migration file '%1'. Error: '%2'").arg(migrationFilePath, sqlError.text()), "CMigrationControllerComp");
+			SendErrorMessage(0, QStringLiteral("Unable to execute migration file '%1'. Error: '%2'").arg(migrationFilePath, sqlError.text()), QStringLiteral("CMigrationControllerComp"));
 
 			return false;
 		}
 
 		resultRevision = endIndex;
 
-		SendInfoMessage(0, QString("Migration '%1' succesfully migrated").arg(i), "CMigrationControllerComp");
+		SendInfoMessage(0, QStringLiteral("Migration '%1' succesfully migrated").arg(QString::number(i)), QStringLiteral("CMigrationControllerComp"));
 	}
 
 	return true;
@@ -145,7 +145,7 @@ int CMigrationControllerComp::GetLastMigration(const QString& migrationFolder, Q
 		return avaliableMigration;
 	}
 
-	errorMessage = QString("Directory containing SQL-migration files doesn't exist: '%1'").arg(migrationFolder);
+	errorMessage = QStringLiteral("Directory containing SQL-migration files doesn't exist: '%1'").arg(migrationFolder);
 
 	return -1;
 }

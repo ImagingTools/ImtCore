@@ -56,7 +56,7 @@ bool CLicenseDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSe
 
 			QByteArray value = idParamPtr->GetId();
 
-			filterQuery = QString(R"((lower("Document"->>'%1') = lower('%2')))").arg(key, value);
+			filterQuery = QStringLiteral(R"((lower("Document"->>'%1') = lower('%2')))").arg(key, value);
 		}
 	}
 
@@ -83,7 +83,7 @@ bool CLicenseDatabaseDelegateComp::CreateTextFilterQuery(const imtbase::ICollect
 				textFilterQuery += QStringLiteral("%1 ILIKE '%%2%'").arg(R"((SELECT "Document"->>'ProductId' FROM "Products" as pr WHERE pr."DocumentId" = root."Document"->>'ProductId' AND pr."IsActive" = true))", encodedFilter);
 			}
 			else{
-				textFilterQuery += QStringLiteral("\"Document\"->>'%1' ILIKE '%%2%'").arg(filteringColumnIds[i], encodedFilter);
+				textFilterQuery += QStringLiteral(R"("Document"->>'%1' ILIKE '%%2%')").arg(filteringColumnIds[i], encodedFilter);
 			}
 		}
 	}

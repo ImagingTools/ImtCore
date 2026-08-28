@@ -516,7 +516,7 @@ sdl::V1_0::imtbase::CRemoveElementsPayload CObjectCollectionControllerCompBase::
 	}
 
 	if (elementIds.isEmpty()){
-		errorMessage = QStringLiteral("Unable to remove elements for collection: '%1'. Error: Element-IDs not provided").arg(QString::fromUtf8(collectionId));
+		errorMessage = QStringLiteral("Unable to remove elements for collection: '%1'. Error: Element-IDs not provided").arg(collectionId);
 		return sdl::V1_0::imtbase::CRemoveElementsPayload();
 	}
 
@@ -565,7 +565,7 @@ sdl::V1_0::imtbase::CRemoveElementSetPayload CObjectCollectionControllerCompBase
 		if (filterParams.CopyFrom(m_selectionParams)){
 			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
-				errorMessage = QStringLiteral("Unable to remove element set for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+				errorMessage = QStringLiteral("Unable to remove element set for collection '%1'. Error: Selection Params parsing failed").arg(*m_collectionIdAttrPtr);
 				return sdl::V1_0::imtbase::CRemoveElementSetPayload();
 			}
 		}
@@ -637,7 +637,7 @@ sdl::V1_0::imtbase::CRestoreObjectSetPayload CObjectCollectionControllerCompBase
 		if (filterParams.CopyFrom(m_selectionParams)){
 			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
-				errorMessage = QStringLiteral("Unable to restore object set for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+				errorMessage = QStringLiteral("Unable to restore object set for collection '%1'. Error: Selection Params parsing failed").arg(*m_collectionIdAttrPtr);
 				return sdl::V1_0::imtbase::CRestoreObjectSetPayload();
 			}
 		}
@@ -1106,7 +1106,7 @@ sdl::V1_0::imtbase::CGetElementsCountPayload CObjectCollectionControllerCompBase
 		if (filterParams.CopyFrom(m_selectionParams)){
 			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
-				errorMessage = QStringLiteral("Unable to get elements count for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+				errorMessage = QStringLiteral("Unable to get elements count for collection '%1'. Error: Selection Params parsing failed").arg(*m_collectionIdAttrPtr);
 				return sdl::V1_0::imtbase::CGetElementsCountPayload();
 			}
 		}
@@ -1146,7 +1146,7 @@ sdl::V1_0::imtbase::CGetElementIdsPayload CObjectCollectionControllerCompBase::O
 		if (filterParams.CopyFrom(m_selectionParams)){
 			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
-				errorMessage = QStringLiteral("Unable to get element IDs for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+				errorMessage = QStringLiteral("Unable to get element IDs for collection '%1'. Error: Selection Params parsing failed").arg(*m_collectionIdAttrPtr);
 				return sdl::V1_0::imtbase::CGetElementIdsPayload();
 			}
 		}
@@ -1207,7 +1207,7 @@ sdl::V1_0::imtbase::CInsertNewObjectPayload CObjectCollectionControllerCompBase:
 		}
 
 		if (!DeSerializeObject(*objectPtr.GetPtr(), objectData)){
-			errorMessage = QStringLiteral("Unable to insert new object to collection '%1'. Error: Object serialization failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+			errorMessage = QStringLiteral("Unable to insert new object to collection '%1'. Error: Object serialization failed").arg(*m_collectionIdAttrPtr);
 			return sdl::V1_0::imtbase::CInsertNewObjectPayload();
 		}
 	}
@@ -1219,7 +1219,7 @@ sdl::V1_0::imtbase::CInsertNewObjectPayload CObjectCollectionControllerCompBase:
 
 	QByteArray result = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, objectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
 	if (result.isEmpty()){
-		errorMessage = QStringLiteral("Unable to insert new object to collection '%1'").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+		errorMessage = QStringLiteral("Unable to insert new object to collection '%1'").arg(*m_collectionIdAttrPtr);
 		return sdl::V1_0::imtbase::CInsertNewObjectPayload();
 	}
 
@@ -1256,7 +1256,7 @@ sdl::V1_0::imtbase::CSetObjectDataPayload CObjectCollectionControllerCompBase::O
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
 
 	if (objectData.isEmpty()){
-		errorMessage = QStringLiteral("Unable to set object data to collection '%1'. Error: Object data not provided").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+		errorMessage = QStringLiteral("Unable to set object data to collection '%1'. Error: Object data not provided").arg(*m_collectionIdAttrPtr);
 		return sdl::V1_0::imtbase::CSetObjectDataPayload();
 	}
 
@@ -1267,7 +1267,7 @@ sdl::V1_0::imtbase::CSetObjectDataPayload CObjectCollectionControllerCompBase::O
 	}
 
 	if (!DeSerializeObject(*objectPtr.GetPtr(), objectData)){
-		errorMessage = QStringLiteral("Unable to set object data to collection '%1'. Error: Object serialization failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+		errorMessage = QStringLiteral("Unable to set object data to collection '%1'. Error: Object serialization failed").arg(*m_collectionIdAttrPtr);
 		return sdl::V1_0::imtbase::CSetObjectDataPayload();
 	}
 
@@ -1307,7 +1307,7 @@ sdl::V1_0::imtbase::CGetObjectDataPayload CObjectCollectionControllerCompBase::O
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QStringLiteral("Unable to get object data '%1'. Error: Object does not exists").arg(QString::fromUtf8(objectId));
+		errorMessage = QStringLiteral("Unable to get object data '%1'. Error: Object does not exists").arg(objectId);
 		return sdl::V1_0::imtbase::CGetObjectDataPayload();
 	}
 
@@ -1316,7 +1316,7 @@ sdl::V1_0::imtbase::CGetObjectDataPayload CObjectCollectionControllerCompBase::O
 
 	QByteArray objectData;
 	if (!SerializeObject(*objectToSerializePtr, objectData)){
-		errorMessage = QStringLiteral("Unable to get object data '%1'. Error: Object serializaion failed").arg(QString::fromUtf8(objectId));
+		errorMessage = QStringLiteral("Unable to get object data '%1'. Error: Object serializaion failed").arg(objectId);
 		return sdl::V1_0::imtbase::CGetObjectDataPayload();
 	}
 
@@ -1347,7 +1347,7 @@ sdl::V1_0::imtbase::CGetDataMetaInfoPayload CObjectCollectionControllerCompBase:
 	QByteArray metaInfoData;
 	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
 	if (!SerializeObject(*metaInfo.GetPtr(), metaInfoData)){
-		errorMessage = QStringLiteral("Unable to get data meta info for object '%1'. Error: Meta Info serializaion failed").arg(QString::fromUtf8(objectId));
+		errorMessage = QStringLiteral("Unable to get data meta info for object '%1'. Error: Meta Info serializaion failed").arg(objectId);
 		return sdl::V1_0::imtbase::CGetDataMetaInfoPayload();
 	}
 
@@ -1416,7 +1416,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CObjectCollectionControllerCompBa
 
 	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
 	if (!metaInfo.IsValid()){
-		errorMessage = QStringLiteral("Unable to get element meta info for object '%1'. Error: Meta Info is invalid").arg(QString::fromUtf8(objectId));
+		errorMessage = QStringLiteral("Unable to get element meta info for object '%1'. Error: Meta Info is invalid").arg(objectId);
 		return sdl::V1_0::imtbase::CGetElementMetaInfoPayload();
 	}
 
@@ -1473,7 +1473,7 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompB
 	if (arguments.input->selectionParams && filterParams.CopyFrom(m_selectionParams)){
 		sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
 		if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
-			errorMessage = QStringLiteral("Unable to create sub collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+			errorMessage = QStringLiteral("Unable to create sub collection '%1'. Error: Selection Params parsing failed").arg(*m_collectionIdAttrPtr);
 
 			return {};
 		}
@@ -1485,7 +1485,7 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompB
 
 	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> objectCollectionIterator = m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams);
 	if(!objectCollectionIterator.IsValid()){
-		errorMessage = QStringLiteral("Unable to create sub-collection '%1'. Error: failed to create an iterator on collection.").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+		errorMessage = QStringLiteral("Unable to create sub-collection '%1'. Error: failed to create an iterator on collection.").arg(*m_collectionIdAttrPtr);
 
 		return {};
 	}
@@ -2876,7 +2876,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 			}
 		}
 		if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
-			SendErrorMessage(0, QStringLiteral("Unable to read filter params set for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr)));
+			SendErrorMessage(0, QStringLiteral("Unable to read filter params set for collection '%1'. Error: Selection Params parsing failed").arg(*m_collectionIdAttrPtr));
 		}
 	}
 
@@ -3197,7 +3197,7 @@ bool CObjectCollectionControllerCompBase::CreateElementAttributeHistoryEntry(
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr) || !dataPtr.IsValid()){
 		SendWarningMessage(
 			0,
-			QStringLiteral("Unable to write history entry for object '%1'. Error: Object data is not available").arg(QString::fromUtf8(objectId)),
+			QStringLiteral("Unable to write history entry for object '%1'. Error: Object data is not available").arg(objectId),
 			"CObjectCollectionControllerCompBase");
 
 		return false;
@@ -3231,7 +3231,7 @@ bool CObjectCollectionControllerCompBase::CreateElementAttributeHistoryEntry(
 	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *dataPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
 		SendWarningMessage(
 			0,
-			QStringLiteral("Unable to write history entry for object '%1'. Error: Storing the document revision failed").arg(QString::fromUtf8(objectId)),
+			QStringLiteral("Unable to write history entry for object '%1'. Error: Storing the document revision failed").arg(objectId),
 			"CObjectCollectionControllerCompBase");
 
 		return false;

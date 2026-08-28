@@ -307,7 +307,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectSetQuery(
 	if (m_tableSchemaAttrPtr.IsValid()){
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
-	QByteArray retVal = QStringLiteral("UPDATE %0 \"%1\" as root SET \"%2\" = 'Disabled' WHERE \"%2\" = 'Active'").arg(schemaPrefix, QString::fromUtf8(*m_tableNameAttrPtr), QString::fromUtf8(s_stateColumn)).toUtf8();
+	QByteArray retVal = QStringLiteral(R"(UPDATE %0 "%1" as root SET "%2" = 'Disabled' WHERE "%2" = 'Active')").arg(schemaPrefix, *m_tableNameAttrPtr, s_stateColumn).toUtf8();
 
 	QByteArrayList conditionList;
 	if (paramsPtr != nullptr){
@@ -344,15 +344,12 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectSetQuery(
 	if (useTenantBindings){
 		const QString bindingsTableName = CreateTenantBindingTableName();
 		const QString escapedEntityType = SqlEncode(QString::fromUtf8(GetTableName()));
-		QString bindingsDelete = QStringLiteral("DELETE FROM %1 WHERE \"EntityType\" = '%2';")
+		QString bindingsDelete = QStringLiteral(R"(DELETE FROM %1 WHERE "EntityType" = '%2';)")
 				.arg(bindingsTableName, escapedEntityType);
 		if (!conditionList.isEmpty()){
-			const QString tableName = QString::fromUtf8(*m_tableNameAttrPtr);
-			const QString idCol = QString::fromUtf8(s_documentIdColumn);
-			const QString stateCol = QString::fromUtf8(s_stateColumn);
-			QString idSelect = QStringLiteral("SELECT \"%1\" FROM %2\"%3\" as root WHERE \"%4\" = 'Active' AND (%5)")
-					.arg(idCol, schemaPrefix, tableName, stateCol, QString::fromUtf8(conditionList.join(" AND ")));
-			bindingsDelete = QStringLiteral("DELETE FROM %1 WHERE \"EntityType\" = '%2' AND \"EntityId\" IN (%3);")
+			QString idSelect = QStringLiteral(R"(SELECT "%1" FROM %2"%3" as root WHERE "%4" = 'Active' AND (%5))")
+					.arg(s_documentIdColumn, schemaPrefix, *m_tableNameAttrPtr, s_stateColumn, conditionList.join(QByteArrayLiteral(" AND ")));
+			bindingsDelete = QStringLiteral(R"(DELETE FROM %1 WHERE "EntityType" = '%2' AND "EntityId" IN (%3);)")
 					.arg(bindingsTableName, escapedEntityType, idSelect);
 		}
 		retVal += QByteArrayLiteral(";") + bindingsDelete.toUtf8();
@@ -378,7 +375,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRestoreObjectsQuery(
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 
-	return QString(R"(
+	return QStringLiteral(R"(
 				UPDATE %0 "%1"
 				SET "%2" = 'Active'
 				WHERE "%3" IN (%4)
@@ -403,8 +400,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRestoreObjectSetQuery(
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 	QByteArray retVal = 
-				QStringLiteral("UPDATE %0 \"%1\" as root SET \"%2\" = 'Active' WHERE \"%2\" = 'Disabled'")
-							.arg(schemaPrefix, QString::fromUtf8(*m_tableNameAttrPtr), QString::fromUtf8(s_stateColumn)).toUtf8();
+				QStringLiteral(R"(UPDATE %0 "%1" as root SET "%2" = 'Active' WHERE "%2" = 'Disabled')")
+							.arg(schemaPrefix, *m_tableNameAttrPtr, s_stateColumn).toUtf8();
 
 	if (paramsPtr != nullptr){
 		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
@@ -454,10 +451,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 	QByteArray countRevisionsQuery = 
-				QStringLiteral("(SELECT MAX(%0) + 1 FROM %1 \"%2\" as root WHERE \"%3\" = '%4')").arg(
+				QStringLiteral(R"((SELECT MAX(%0) + 1 FROM %1 "%2" as root WHERE "%3" = '%4'))").arg(
 							CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
 										schemaPrefix,
-										QString(*m_tableNameAttrPtr),
+										*m_tableNameAttrPtr,
 										s_documentIdColumn,
 										objectId).toUtf8();
 
@@ -491,10 +488,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 	// Only the current revision is renamed, older revisions keep the name they were stored with.
-	QByteArray retVal = QStringLiteral("UPDATE %0 \"%1\" SET \"%2\" = '%3' WHERE \"%4\" = '%5' AND \"%6\" <> 'InActive';")
+	QByteArray retVal = QStringLiteral(R"(UPDATE %0 "%1" SET "%2" = '%3' WHERE "%4" = '%5' AND "%6" <> 'InActive';)")
 						.arg(
 							schemaPrefix,
-							QString(*m_tableNameAttrPtr),
+							*m_tableNameAttrPtr,
 							s_nameColumn,
 							SqlEncode(newObjectName),
 							s_documentIdColumn,
@@ -517,10 +514,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 	// Only the current revision is changed, older revisions keep the description they were stored with.
-	QByteArray retVal = QStringLiteral("UPDATE %0 \"%1\" SET \"%2\" = '%3' WHERE \"%4\" = '%5' AND \"%6\" <> 'InActive';")
+	QByteArray retVal = QStringLiteral(R"(UPDATE %0 "%1" SET "%2" = '%3' WHERE "%4" = '%5' AND "%6" <> 'InActive';)")
 						.arg(
 							schemaPrefix,
-							QString(*m_tableNameAttrPtr),
+							*m_tableNameAttrPtr,
 							s_descriptionColumn,
 							SqlEncode(description),
 							s_documentIdColumn,
@@ -540,13 +537,13 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionByMetaInfoQuery(
 	if (m_tableSchemaAttrPtr.IsValid()){
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
-	return QString(R"(SELECT * FROM %0 "%1" WHERE ("%2" = 'Active') AND %3 = '%4';)")
+	return QStringLiteral(R"(SELECT * FROM %0 "%1" WHERE ("%2" = 'Active') AND %3 = '%4';)")
 			.arg(
 				schemaPrefix,
-				QString(*m_tableNameAttrPtr),
+				*m_tableNameAttrPtr,
 				s_stateColumn,
 				CreateJsonExtractSql(s_dataMetaInfoColumn, metaInfoId),
-				QString(metaInfoValue.toByteArray())
+				metaInfoValue.toByteArray()
 				).toUtf8();
 }
 
@@ -581,10 +578,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateMetaInfoQuery(const QSq
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 
-	QByteArray query = QString(R"(UPDATE %0 "%1" SET "%2" = '%3' WHERE "%4" = 'Active' AND "%5" = '%6';)")
+	QByteArray query = QStringLiteral(R"(UPDATE %0 "%1" SET "%2" = '%3' WHERE "%4" = 'Active' AND "%5" = '%6';)")
 						.arg(
 							schemaPrefix,
-							QString(*m_tableNameAttrPtr),
+							*m_tableNameAttrPtr,
 							s_dataMetaInfoColumn,
 							SqlEncode(metaInfoRepresentation),
 							s_stateColumn,
@@ -694,7 +691,7 @@ bool CSqlDatabaseDocumentDelegateComp::RestoreRevision(
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 
-	QByteArray query = QStringLiteral("UPDATE %0 \"%1\" SET \"%2\" = 'InActive' WHERE \"%3\" = '%4';")
+	QByteArray query = QStringLiteral(R"(UPDATE %0 "%1" SET "%2" = 'InActive' WHERE "%3" = '%4';)")
 			.arg(
 						schemaPrefix,
 						QString(*m_tableNameAttrPtr),
@@ -702,15 +699,15 @@ bool CSqlDatabaseDocumentDelegateComp::RestoreRevision(
 						s_documentIdColumn,
 						objectId).toUtf8();
 
-	query += QString(R"(UPDATE %0 "%1" SET "%2" = 'Active' WHERE "%3" = '%4' AND %5 = %6;)")
+	query += QStringLiteral(R"(UPDATE %0 "%1" SET "%2" = 'Active' WHERE "%3" = '%4' AND %5 = %6;)")
 				.arg(
 							schemaPrefix,
-							QString(*m_tableNameAttrPtr),
+							*m_tableNameAttrPtr,
 							s_stateColumn,
 							s_documentIdColumn,
 							objectId,
-							CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int))
-			.arg(revision).toUtf8();
+							CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
+							QString::number(revision)).toUtf8();
 
 	QSqlError sqlError;
 	m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
@@ -743,10 +740,10 @@ bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
 	if (m_tableSchemaAttrPtr.IsValid()){
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
-	QByteArray checkCurrentRevisionQuery = QStringLiteral("SELECT * FROM %0 \"%1\" WHERE \"%2\" = '%3' AND \"%4\" = 'Active';")
+	QByteArray checkCurrentRevisionQuery = QStringLiteral(R"(SELECT * FROM %0 "%1" WHERE "%2" = '%3' AND "%4" = 'Active';)")
 				.arg(
 							schemaPrefix,
-							QString(*m_tableNameAttrPtr),
+							*m_tableNameAttrPtr,
 							s_documentIdColumn,
 							objectId,
 							s_stateColumn).toUtf8();
@@ -778,15 +775,15 @@ bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
 		return false;
 	}
 
-	QByteArray query = QStringLiteral("DELETE FROM %0 \"%1\" WHERE \"%2\" = '%3' AND %4 = %5;")
+	QByteArray query = QStringLiteral(R"(DELETE FROM %0 "%1" WHERE "%2" = '%3' AND %4 = %5;)")
 						.arg(
 							schemaPrefix,
-							QString(*m_tableNameAttrPtr),
+							*m_tableNameAttrPtr,
 							s_documentIdColumn,
 							objectId,
-							CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int)
+							CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
+							QString::number(revision)
 						)
-						.arg(revision)
 						.toUtf8();
 	
 	sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
@@ -825,9 +822,9 @@ bool CSqlDatabaseDocumentDelegateComp::UpdateDependentMetaInfo(const DependentMe
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 
-	QString query = QStringLiteral("UPDATE %0 \"%1\" SET \"%2\" = ").arg(schemaPrefix, tableName, s_dataMetaInfoColumn);
+	QString query = QStringLiteral(R"(UPDATE %0 "%1" SET "%2" = )").arg(schemaPrefix, tableName, s_dataMetaInfoColumn);
 
-	QString jsonbUpdate = QStringLiteral("\"%1\"").arg(s_dataMetaInfoColumn);
+	QString jsonbUpdate = QStringLiteral(R"("%1")").arg(s_dataMetaInfoColumn);
 
 	for (int i = 0; i < metaInfo.metaInfoIds.size(); i++){
 		jsonbUpdate = QStringLiteral("jsonb_set(%1, '{%2}', to_jsonb(%3))").arg(jsonbUpdate, metaInfo.metaInfoIds[i], metaInfo.metaInfoValues[i]);
@@ -860,7 +857,7 @@ bool CSqlDatabaseDocumentDelegateComp::ClearDependentMetaInfo(const MetaFieldCle
 
 	QString tableName = GetTableName();
 
-	QString jsonbExpr = QStringLiteral("\"%1\"").arg(s_dataMetaInfoColumn);
+	QString jsonbExpr = QStringLiteral(R"("%1")").arg(s_dataMetaInfoColumn);
 
 	for (const QString& metaInfoId : metaInfo.metaInfoIds){
 		jsonbExpr = QStringLiteral("jsonb_set(%1, '{%2}', to_jsonb(''::text))")
@@ -884,7 +881,7 @@ bool CSqlDatabaseDocumentDelegateComp::ClearDependentMetaInfo(const MetaFieldCle
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 
-	QString fullQuery = QStringLiteral("UPDATE %0 \"%1\" SET \"%2\" = %3 WHERE %4;")
+	QString fullQuery = QStringLiteral(R"(UPDATE %0 "%1" SET "%2" = %3 WHERE %4;)")
 		.arg(
 				schemaPrefix,
 				tableName,
@@ -933,7 +930,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 	}
 
 	// Insert new entry into the document list table:
-	QString query = QStringLiteral("UPDATE %0 \"%1\" SET \"%2\" = 'InActive' WHERE \"%3\" = '%4';")
+	QString query = QStringLiteral(R"(UPDATE %0 "%1" SET "%2" = 'InActive' WHERE "%3" = '%4';)")
 					.arg(
 						schemaPrefix,
 						QString(*m_tableNameAttrPtr),
@@ -964,7 +961,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 		tenantId = operationContextPtr->GetTenantId();
 	}
 
-	QString columnsClause = QStringLiteral("\"%0\", \"%1\", \"%2\", \"%3\", \"%4\", \"%5\", \"%6\", \"%7\", \"%8\", \"%9\"")
+	QString columnsClause = QStringLiteral(R"("%0", "%1", "%2", "%3", "%4", "%5", "%6", "%7", "%8", "%9")")
 				.arg(
 						s_idColumn,
 						s_typeIdColumn,
@@ -992,7 +989,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 						QStringLiteral("Active")
 					);
 
-	query += QStringLiteral("INSERT INTO %0 \"%1\"(%2) VALUES(%3);")
+	query += QStringLiteral(R"(INSERT INTO %0 "%1"(%2) VALUES(%3);)")
 				.arg(
 						schemaPrefix,
 						QString(*m_tableNameAttrPtr),
@@ -1169,10 +1166,10 @@ QString CSqlDatabaseDocumentDelegateComp::CreateJsonExtractSql(
 QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingTableName() const
 {
 	if (m_tableSchemaAttrPtr.IsValid() && !(QString(*m_tableSchemaAttrPtr)).isEmpty()){
-		return QStringLiteral("%1.\"TenantEntityBindings\"").arg(*m_tableSchemaAttrPtr);
+		return QStringLiteral(R"(%1."TenantEntityBindings")").arg(*m_tableSchemaAttrPtr);
 	}
 
-	return QStringLiteral("\"TenantEntityBindings\"");
+	return QStringLiteral(R"("TenantEntityBindings")");
 }
 
 
@@ -1248,8 +1245,8 @@ QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const Q
 	const QByteArray databaseDriverId = m_databaseEngineCompPtr.IsValid() ? m_databaseEngineCompPtr->GetDatabaseDriverId() : QByteArray();
 	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
 	const QString entityIdExpression = isSqlite
-			? QStringLiteral("root.\"%1\"").arg(s_documentIdColumn)
-			: QStringLiteral("root.\"%1\"::text").arg(s_documentIdColumn);
+			? QStringLiteral(R"(root."%1")").arg(s_documentIdColumn)
+			: QStringLiteral(R"(root."%1"::text)").arg(s_documentIdColumn);
 
 	QString bindingsLookup = QString(
 				"SELECT 1 FROM %1 tenantBindings "
@@ -1261,7 +1258,7 @@ QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const Q
 					entityIdExpression);
 
 	if (!tenantId.isEmpty()){
-		bindingsLookup += QStringLiteral(" AND tenantBindings.\"TenantId\" = '%1'")
+		bindingsLookup += QStringLiteral(R"( AND tenantBindings."TenantId" = '%1')")
 				.arg(SqlEncode(QString::fromUtf8(tenantId)));
 
 		if (filterMode == imtauth::TFM_EXCLUDE){
@@ -1274,7 +1271,7 @@ QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const Q
 	// NoOrganization mode: empty TenantId binding and missing binding are equivalent.
 	// Keep only records that have no non-empty tenant binding.
 	QString nonEmptyTenantBindingsLookup = bindingsLookup
-			+ QStringLiteral(" AND COALESCE(tenantBindings.\"TenantId\", '') <> ''");
+			+ QStringLiteral(R"( AND COALESCE(tenantBindings."TenantId", '') <> '')");
 	return QStringLiteral("NOT EXISTS (%1)").arg(nonEmptyTenantBindingsLookup);
 }
 
@@ -1301,7 +1298,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery(
 			: QStringLiteral("INSERT INTO");
 	const QString onConflictClause = isSqlite
 			? QString()
-			: QStringLiteral(" ON CONFLICT (\"TenantId\", \"EntityType\", \"EntityId\") DO NOTHING");
+			: QStringLiteral(R"( ON CONFLICT ("TenantId", "EntityType", "EntityId") DO NOTHING)");
 
 	const QString query = QString(
 				"%1 %2 (\"Id\", \"TenantId\", \"EntityType\", \"EntityId\", \"CreatedAt\", \"CreatedByUserId\") "
@@ -1335,7 +1332,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingDeleteQuery(cons
 		quotedIds.append(QStringLiteral("'%1'").arg(SqlEncode(QString::fromUtf8(id))));
 	}
 
-	const QString query = QStringLiteral("DELETE FROM %1 WHERE \"EntityType\" = '%2' AND \"EntityId\" IN (%3);")
+	const QString query = QStringLiteral(R"(DELETE FROM %1 WHERE "EntityType" = '%2' AND "EntityId" IN (%3);)")
 			.arg(
 					CreateTenantBindingTableName(),
 					SqlEncode(QString::fromUtf8(GetTableName())),
@@ -1365,7 +1362,7 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 	}
 
 	if (IsSQLite()){
-		QString query = QString(R"(
+		QString query = QStringLiteral(R"(
 			SELECT
 				root.*,
 				root1."TimeStamp" AS "Added" %4
@@ -1382,7 +1379,7 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 				.arg(
 					schema,
 					tableName,
-					joinTablesQuery.isEmpty() ? "" : QString::fromUtf8(joinTablesQuery),
+					joinTablesQuery,
 					customColumns
 					);
 
@@ -1408,12 +1405,12 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 						/*1*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
 						/*2*/ schema,
 						/*3*/ tableName,
-						/*4*/ joinTablesQuery.isEmpty() ? QString() : QString::fromUtf8(joinTablesQuery),
+						/*4*/ joinTablesQuery,
 						/*5*/ customColumns,
-						/*6*/ QString::fromUtf8(s_lastModifiedColumn),
-						/*7*/ QString::fromUtf8(s_addedColumn),
-						/*8*/ QString::fromUtf8(s_documentIdColumn),
-						/*9*/ QString::fromUtf8(s_revisionInfoColumn)
+						/*6*/ s_lastModifiedColumn,
+						/*7*/ s_addedColumn,
+						/*8*/ s_documentIdColumn,
+						/*9*/ s_revisionInfoColumn
 					);
 
 	return query;
@@ -1500,7 +1497,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const iprm::IPara
 		if (collectionFilterParamPtr.IsValid()){
 			QByteArray typeId = collectionFilterParamPtr->GetObjectTypeId();
 			if (!typeId.isEmpty()){
-				filterQuery = QStringLiteral("\"%0\" = '%1'").arg(s_typeIdColumn, SqlEncode(QString::fromUtf8(typeId))).toUtf8();
+				filterQuery = QStringLiteral(R"("%0" = '%1')").arg(s_typeIdColumn, SqlEncode(QString::fromUtf8(typeId))).toUtf8();
 			}
 		}
 	}
@@ -1531,7 +1528,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::ICollectio
 
 	if (!columnId.isEmpty() && !sortOrder.isEmpty()){
 		if (columnId == s_lastModifiedColumn || columnId == s_addedColumn || columnId == s_nameColumn || columnId == s_descriptionColumn || columnId == s_typeIdColumn){
-			sortQuery = QStringLiteral("ORDER BY root.\"%1\" %2").arg(columnId, sortOrder);
+			sortQuery = QStringLiteral(R"(ORDER BY root."%1" %2)").arg(columnId, sortOrder);
 		}
 		else{
 			sortQuery = QStringLiteral("ORDER BY %1 %2").arg(CreateJsonExtractSql(QStringLiteral(R"(root."%1")").arg(s_dataMetaInfoColumn), columnId), sortOrder);
@@ -1568,7 +1565,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 		if (objectTypeIdFilterPtr.IsValid()){
 			QByteArray objectTypeId = objectTypeIdFilterPtr->GetObjectTypeId();
 			if (!objectTypeId.isEmpty()){
-				objectTypeIdQuery = QStringLiteral("\"%0\" = '%1'").arg(s_typeIdColumn, SqlEncode(QString::fromUtf8(objectTypeId))).toUtf8();
+				objectTypeIdQuery = QStringLiteral(R"("%0" = '%1')").arg(s_typeIdColumn, SqlEncode(QString::fromUtf8(objectTypeId))).toUtf8();
 			}
 		}
 	}
@@ -1599,7 +1596,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 	}
 
 	if (documentFilterQuery.isEmpty()){
-		documentFilterQuery = QStringLiteral("root.\"%0\" = 'Active'").arg(QString::fromUtf8(s_stateColumn));
+		documentFilterQuery = QStringLiteral(R"(root."%0" = 'Active')").arg(s_stateColumn);
 	}
 
 	QString tenantFilterQuery;
@@ -1732,24 +1729,24 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(
 	};
 
 	if (filteringColumnIds.contains(s_typeIdColumn)){
-		appendTextCondition(QStringLiteral("\"%1\"").arg(QString::fromUtf8(s_typeIdColumn)));
+		appendTextCondition(QStringLiteral(R"("%1")").arg(s_typeIdColumn));
 		filteringColumnIds.removeOne(s_typeIdColumn);
 	}
 
 	if (filteringColumnIds.contains(s_nameColumn)){
-		appendTextCondition(QStringLiteral("\"%1\"").arg(QString::fromUtf8(s_nameColumn)));
+		appendTextCondition(QStringLiteral(R"("%1")").arg(s_nameColumn));
 		filteringColumnIds.removeOne(s_nameColumn);
 	}
 
 	if (filteringColumnIds.contains(s_descriptionColumn)){
-		appendTextCondition(QStringLiteral("\"%1\"").arg(QString::fromUtf8(s_descriptionColumn)));
+		appendTextCondition(QStringLiteral(R"("%1")").arg(s_descriptionColumn));
 		filteringColumnIds.removeOne(s_descriptionColumn);
 	}
 
 	for (int i = 0; i < filteringColumnIds.count(); ++i){
 		appendTextCondition(
 			CreateJsonExtractSql(
-				QString(R"(root."%1")").arg(QString::fromUtf8(s_dataMetaInfoColumn)),
+				QStringLiteral(R"(root."%1")").arg(s_dataMetaInfoColumn),
 				filteringColumnIds[i]));
 	}
 
@@ -1760,7 +1757,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(
 bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& timeFieldId) const
 {
 	if (IsSQLite()){
-		QString addedStrQuery = QString(R"((SELECT "TimeStamp" FROM "%1" as temp WHERE %2 = 1 AND root."DocumentId" = temp."DocumentId" LIMIT 1))")
+		QString addedStrQuery = QStringLiteral(R"((SELECT "TimeStamp" FROM "%1" as temp WHERE %2 = 1 AND root."DocumentId" = temp."DocumentId" LIMIT 1))")
 		.arg(
 			QString(*m_tableNameAttrPtr),
 			CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int)
@@ -1772,65 +1769,65 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITim
 		case imtbase::ITimeFilterParam::TU_HOUR:
 			switch (timeFilter.GetInterpretationMode()){
 			case imtbase::ITimeFilterParam::IM_CURRENT:
-				timeFilterQuery += QString(R"((strftime('%Y-%m-%d %H', %1) = strftime('%Y-%m-%d %H', 'now')))").arg(addedStrQuery);
+				timeFilterQuery += QStringLiteral(R"((strftime('%Y-%m-%d %H', %1) = strftime('%Y-%m-%d %H', 'now')))").arg(addedStrQuery);
 				break;
 			case imtbase::ITimeFilterParam::IM_LAST:
-				timeFilterQuery += QString(R"((strftime('%Y-%m-%d %H', %1) = strftime('%Y-%m-%d %H', datetime('now', '-1 hour'))))").arg(addedStrQuery);
+				timeFilterQuery += QStringLiteral(R"((strftime('%Y-%m-%d %H', %1) = strftime('%Y-%m-%d %H', datetime('now', '-1 hour'))))").arg(addedStrQuery);
 				break;
 			case imtbase::ITimeFilterParam::IM_FOR:
-				timeFilterQuery += QString(R"((%1 >= datetime('now', '-1 hour') AND %1 <= datetime('now')))").arg(addedStrQuery);
+				timeFilterQuery += QStringLiteral(R"((%1 >= datetime('now', '-1 hour') AND %1 <= datetime('now')))").arg(addedStrQuery);
 				break;
 			}
 			break;
 		case imtbase::ITimeFilterParam::TU_DAY:
 			switch (timeFilter.GetInterpretationMode()){
 			case imtbase::ITimeFilterParam::IM_CURRENT:
-				timeFilterQuery += QString(R"((date(%1) = date('now')))").arg(addedStrQuery);
+				timeFilterQuery += QStringLiteral(R"((date(%1) = date('now')))").arg(addedStrQuery);
 				break;
 			case imtbase::ITimeFilterParam::IM_LAST:
-				timeFilterQuery += QString(R"((date(%1) = date('now', '-1 day')))").arg(addedStrQuery);
+				timeFilterQuery += QStringLiteral(R"((date(%1) = date('now', '-1 day')))").arg(addedStrQuery);
 				break;
 			case imtbase::ITimeFilterParam::IM_FOR:
-				timeFilterQuery += QString(R"((%1 >= datetime('now', '-1 day') AND %1 <= datetime('now')))").arg(addedStrQuery);
+				timeFilterQuery += QStringLiteral(R"((%1 >= datetime('now', '-1 day') AND %1 <= datetime('now')))").arg(addedStrQuery);
 				break;
 			}
 			break;
 		case imtbase::ITimeFilterParam::TU_WEEK:
 			switch (timeFilter.GetInterpretationMode()){
 			case imtbase::ITimeFilterParam::IM_CURRENT:
-				timeFilterQuery += QString(R"(strftime('%Y-%W', %1) = strftime('%Y-%W', 'now'))").arg(addedStrQuery);
+				timeFilterQuery += QStringLiteral(R"(strftime('%Y-%W', %1) = strftime('%Y-%W', 'now'))").arg(addedStrQuery);
 				break;
 			case imtbase::ITimeFilterParam::IM_LAST:
-				timeFilterQuery += QString(R"(strftime('%Y-%W', %1) = strftime('%Y-%W', datetime('now', '-7 days')))").arg(addedStrQuery);
+				timeFilterQuery += QStringLiteral(R"(strftime('%Y-%W', %1) = strftime('%Y-%W', datetime('now', '-7 days')))").arg(addedStrQuery);
 				break;
 			case imtbase::ITimeFilterParam::IM_FOR:
-				timeFilterQuery += QString(R"((%1 >= datetime('now', '-7 days') AND %1 <= datetime('now')))").arg(addedStrQuery);
+				timeFilterQuery += QStringLiteral(R"((%1 >= datetime('now', '-7 days') AND %1 <= datetime('now')))").arg(addedStrQuery);
 				break;
 			}
 			break;
 		case imtbase::ITimeFilterParam::TU_MONTH:
 			switch (timeFilter.GetInterpretationMode()){
 			case imtbase::ITimeFilterParam::IM_CURRENT:
-				timeFilterQuery += QString(R"(strftime('%Y-%m', %1) = strftime('%Y-%m', 'now'))").arg(addedStrQuery);
+				timeFilterQuery += QStringLiteral(R"(strftime('%Y-%m', %1) = strftime('%Y-%m', 'now'))").arg(addedStrQuery);
 				break;
 			case imtbase::ITimeFilterParam::IM_LAST:
-				timeFilterQuery += QString(R"(strftime('%Y-%m', %1) = strftime('%Y-%m', datetime('now', '-1 month')))").arg(addedStrQuery);
+				timeFilterQuery += QStringLiteral(R"(strftime('%Y-%m', %1) = strftime('%Y-%m', datetime('now', '-1 month')))").arg(addedStrQuery);
 				break;
 			case imtbase::ITimeFilterParam::IM_FOR:
-				timeFilterQuery += QString(R"((%1 >= datetime('now', '-1 month') AND %1 <= datetime('now')))").arg(addedStrQuery);
+				timeFilterQuery += QStringLiteral(R"((%1 >= datetime('now', '-1 month') AND %1 <= datetime('now')))").arg(addedStrQuery);
 				break;
 			}
 			break;
 		case imtbase::ITimeFilterParam::TU_YEAR:
 			switch (timeFilter.GetInterpretationMode()){
 			case imtbase::ITimeFilterParam::IM_CURRENT:
-				timeFilterQuery += QString(R"(strftime('%Y', %1) = strftime('%Y', 'now'))").arg(addedStrQuery);
+				timeFilterQuery += QStringLiteral(R"(strftime('%Y', %1) = strftime('%Y', 'now'))").arg(addedStrQuery);
 				break;
 			case imtbase::ITimeFilterParam::IM_LAST:
-				timeFilterQuery += QString(R"(strftime('%Y', %1) = strftime('%Y', datetime('now', '-1 year')))").arg(addedStrQuery);
+				timeFilterQuery += QStringLiteral(R"(strftime('%Y', %1) = strftime('%Y', datetime('now', '-1 year')))").arg(addedStrQuery);
 				break;
 			case imtbase::ITimeFilterParam::IM_FOR:
-				timeFilterQuery += QString(R"((%1 >= datetime('now', '-1 year') AND %1 <= datetime('now')))").arg(addedStrQuery);
+				timeFilterQuery += QStringLiteral(R"((%1 >= datetime('now', '-1 year') AND %1 <= datetime('now')))").arg(addedStrQuery);
 				break;
 			}
 			break;
@@ -1839,7 +1836,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITim
 		if (timeFilterQuery.isEmpty()){
 			imtbase::CTimeRange timeRange = timeFilter.GetTimeRange();
 			if (!timeRange.IsNull()){
-				timeFilterQuery += QString(R"(date(%0) >= date('%1') AND date(%0) <= date('%2'))")
+				timeFilterQuery += QStringLiteral(R"(date(%0) >= date('%1') AND date(%0) <= date('%2'))")
 				.arg(addedStrQuery, timeRange.GetBeginTime().toString(Qt::ISODate), timeRange.GetEndTime().toString(Qt::ISODate));
 			}
 		}
@@ -1853,65 +1850,65 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITim
 	case imtbase::ITimeFilterParam::TU_HOUR:
 		switch(timeFilter.GetInterpretationMode()){
 		case imtbase::ITimeFilterParam::IM_CURRENT:
-			timeFilterQuery += QString(R"((date_trunc('hour', %1) = date_trunc('hour', current_timestamp at time zone 'utc')))").arg(timeFieldId);
+			timeFilterQuery += QStringLiteral(R"((date_trunc('hour', %1) = date_trunc('hour', current_timestamp at time zone 'utc')))").arg(timeFieldId);
 			break;
 		case imtbase::ITimeFilterParam::IM_LAST:
-			timeFilterQuery += QString(R"((date_trunc('hour', %1) = date_trunc('hour', current_timestamp at time zone 'utc') - interval '1 hour'))").arg(timeFieldId);
+			timeFilterQuery += QStringLiteral(R"((date_trunc('hour', %1) = date_trunc('hour', current_timestamp at time zone 'utc') - interval '1 hour'))").arg(timeFieldId);
 			break;
 		case imtbase::ITimeFilterParam::IM_FOR:
-			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 hour' and %1 <= current_timestamp at time zone 'utc'))").arg(timeFieldId);
+			timeFilterQuery += QStringLiteral(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 hour' and %1 <= current_timestamp at time zone 'utc'))").arg(timeFieldId);
 			break;
 		}
 		break;
 	case imtbase::ITimeFilterParam::TU_DAY:
 		switch(timeFilter.GetInterpretationMode()){
 		case imtbase::ITimeFilterParam::IM_CURRENT:
-			timeFilterQuery += QString(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp at time zone 'utc')))").arg(timeFieldId);
+			timeFilterQuery += QStringLiteral(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp at time zone 'utc')))").arg(timeFieldId);
 			break;
 		case imtbase::ITimeFilterParam::IM_LAST:
-			timeFilterQuery += QString(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp at time zone 'utc') - interval '1 day'))").arg(timeFieldId);
+			timeFilterQuery += QStringLiteral(R"((date_trunc('day', %1) = date_trunc('day', current_timestamp at time zone 'utc') - interval '1 day'))").arg(timeFieldId);
 			break;
 		case imtbase::ITimeFilterParam::IM_FOR:
-			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 day' and %1 <= current_timestamp at time zone 'utc'))").arg(timeFieldId);
+			timeFilterQuery += QStringLiteral(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 day' and %1 <= current_timestamp at time zone 'utc'))").arg(timeFieldId);
 			break;
 		}
 		break;
 	case imtbase::ITimeFilterParam::TU_WEEK:
 		switch(timeFilter.GetInterpretationMode()){
 		case imtbase::ITimeFilterParam::IM_CURRENT:
-			timeFilterQuery += QString(R"((date_trunc('week', %1) = date_trunc('week', current_timestamp at time zone 'utc')))").arg(timeFieldId);
+			timeFilterQuery += QStringLiteral(R"((date_trunc('week', %1) = date_trunc('week', current_timestamp at time zone 'utc')))").arg(timeFieldId);
 			break;
 		case imtbase::ITimeFilterParam::IM_LAST:
-			timeFilterQuery += QString(R"((date_trunc('week', %1) = date_trunc('week', current_timestamp at time zone 'utc') - interval '1 week'))").arg(timeFieldId);
+			timeFilterQuery += QStringLiteral(R"((date_trunc('week', %1) = date_trunc('week', current_timestamp at time zone 'utc') - interval '1 week'))").arg(timeFieldId);
 			break;
 		case imtbase::ITimeFilterParam::IM_FOR:
-				timeFilterQuery += QString(R"((date(%1) >= current_date - interval '6 days' AND date(%1) <= current_date))").arg(timeFieldId);
+				timeFilterQuery += QStringLiteral(R"((date(%1) >= current_date - interval '6 days' AND date(%1) <= current_date))").arg(timeFieldId);
 				break;
 			}
 		break;
 	case imtbase::ITimeFilterParam::TU_MONTH:
 		switch(timeFilter.GetInterpretationMode()){
 		case imtbase::ITimeFilterParam::IM_CURRENT:
-			timeFilterQuery += QString(R"((date_trunc('month', %1) = date_trunc('month', current_timestamp at time zone 'utc')))").arg(timeFieldId);
+			timeFilterQuery += QStringLiteral(R"((date_trunc('month', %1) = date_trunc('month', current_timestamp at time zone 'utc')))").arg(timeFieldId);
 			break;
 		case imtbase::ITimeFilterParam::IM_LAST:
-			timeFilterQuery += QString(R"((date_trunc('month', %1) = date_trunc('month', current_timestamp at time zone 'utc') - interval '1 month'))").arg(timeFieldId);
+			timeFilterQuery += QStringLiteral(R"((date_trunc('month', %1) = date_trunc('month', current_timestamp at time zone 'utc') - interval '1 month'))").arg(timeFieldId);
 			break;
 		case imtbase::ITimeFilterParam::IM_FOR:
-			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 month' and %1 <= current_timestamp at time zone 'utc'))").arg(timeFieldId);
+			timeFilterQuery += QStringLiteral(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 month' and %1 <= current_timestamp at time zone 'utc'))").arg(timeFieldId);
 			break;
 		}
 		break;
 	case imtbase::ITimeFilterParam::TU_YEAR:
 		switch(timeFilter.GetInterpretationMode()){
 		case imtbase::ITimeFilterParam::IM_CURRENT:
-			timeFilterQuery += QString(R"((date_trunc('year', %1) = date_trunc('year', current_timestamp at time zone 'utc')))").arg(timeFieldId);
+			timeFilterQuery += QStringLiteral(R"((date_trunc('year', %1) = date_trunc('year', current_timestamp at time zone 'utc')))").arg(timeFieldId);
 			break;
 		case imtbase::ITimeFilterParam::IM_LAST:
-			timeFilterQuery += QString(R"((date_trunc('year', %1) = date_trunc('year', current_timestamp at time zone 'utc') - interval '1 year'))").arg(timeFieldId);
+			timeFilterQuery += QStringLiteral(R"((date_trunc('year', %1) = date_trunc('year', current_timestamp at time zone 'utc') - interval '1 year'))").arg(timeFieldId);
 			break;
 		case imtbase::ITimeFilterParam::IM_FOR:
-			timeFilterQuery += QString(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 year' and %1 <= current_timestamp at time zone 'utc'))").arg(timeFieldId);
+			timeFilterQuery += QStringLiteral(R"((%1 >= current_timestamp at time zone 'utc' - interval '1 year' and %1 <= current_timestamp at time zone 'utc'))").arg(timeFieldId);
 			break;
 		}
 		break;
@@ -1920,7 +1917,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITim
 	if (timeFilterQuery.isEmpty()){
 		imtbase::CTimeRange timeRange = timeFilter.GetTimeRange();
 		if (!timeRange.IsNull()){
-			timeFilterQuery += QString(R"(date(%0) >= date('%1') AND date(%0) <= date('%2'))")
+			timeFilterQuery += QStringLiteral(R"(date(%0) >= date('%1') AND date(%0) <= date('%2'))")
 								.arg(timeFieldId, timeRange.GetBeginTime().toString(Qt::ISODateWithMs), timeRange.GetEndTime().toString(Qt::ISODateWithMs));
 		}
 	}
@@ -1993,7 +1990,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(
 		if (info.metaInfo.type == imtbase::IComplexCollectionFilter::FT_SCALAR){
 			if (s_filterableColumns.contains(info.id)){
 				textFilterQuery += makeLikeCondition(
-					QStringLiteral(R"(root."%1")").arg(QString::fromUtf8(info.id)));
+					QStringLiteral(R"(root."%1")").arg(info.id));
 			}
 			else{
 				textFilterQuery += makeLikeCondition(
@@ -2104,7 +2101,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 	}
 
 	if (documentFilterQuery.isEmpty()){
-		documentFilterQuery = QStringLiteral(R"(root."%1" = 'Active')").arg(QString::fromUtf8(s_stateColumn));
+		documentFilterQuery = QStringLiteral(R"(root."%1" = 'Active')").arg(s_stateColumn);
 	}
 
 	QString schemaPrefix;
@@ -2113,7 +2110,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 	}
 
 	if (IsSQLite()){
-		return QString(R"(
+		return QStringLiteral(R"(
 		SELECT
 			root.*,
 			root1."TimeStamp" AS "Added"
@@ -2188,7 +2185,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateDocumentCollectionFilterQuery(
 	// DocumentId
 	QByteArray documentId = documentCollectionFilter.GetDocumentId();
 	if (!documentId.isEmpty()){
-		conditions << QStringLiteral("root.\"%1\" = '%2'").arg(QString::fromUtf8(s_documentIdColumn), SqlEncode(QString::fromUtf8(documentId)));
+		conditions << QStringLiteral(R"(root."%1" = '%2')").arg(s_documentIdColumn, SqlEncode(QString::fromUtf8(documentId)));
 	}
 
 	// Document States
@@ -2196,15 +2193,15 @@ bool CSqlDatabaseDocumentDelegateComp::CreateDocumentCollectionFilterQuery(
 	imtcol::IDocumentCollectionFilter::DocumentStates states = documentCollectionFilter.GetDocumentStates();
 
 	if (states.contains(imtcol::IDocumentCollectionFilter::DS_ACTIVE)){
-		stateConditions << QStringLiteral("root.\"%1\" = 'Active'").arg(QString::fromUtf8(s_stateColumn));
+		stateConditions << QStringLiteral(R"(root."%1" = 'Active')").arg(s_stateColumn);
 	}
 
 	if (states.contains(imtcol::IDocumentCollectionFilter::DS_INACTIVE)){
-		stateConditions << QStringLiteral("root.\"%1\" = 'InActive'").arg(QString::fromUtf8(s_stateColumn));
+		stateConditions << QStringLiteral(R"(root."%1" = 'InActive')").arg(s_stateColumn);
 	}
 
 	if (states.contains(imtcol::IDocumentCollectionFilter::DS_DISABLED)){
-		stateConditions << QStringLiteral("root.\"%1\" = 'Disabled'").arg(QString::fromUtf8(s_stateColumn));
+		stateConditions << QStringLiteral(R"(root."%1" = 'Disabled')").arg(s_stateColumn);
 	}
 
 	if (!stateConditions.isEmpty()){
@@ -2255,7 +2252,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateDocumentIdFilterQuery(
 		break;
 	}
 	
-	documentIdFilterQuery = QString(R"(root."DocumentId" %0 (%1))").arg(conditionStr, idStrings.join(", "));
+	documentIdFilterQuery = QStringLiteral(R"(root."DocumentId" %0 (%1))").arg(conditionStr, idStrings.join(", "));
 
 	return true;
 }

@@ -121,7 +121,7 @@
 	        // Create request with authentication
 	        QNetworkRequest request(url);
 	        request.setRawHeader("Authorization", 
-	            QString("Bearer %1").arg(authToken).toUtf8());
+	            QStringLiteral("Bearer %1").arg(authToken).toUtf8());
 	        request.setHeader(QNetworkRequest::ContentTypeHeader,
 	            "application/octet-stream");
 	        
@@ -238,10 +238,10 @@
 	        QString fileName = fileInfo.fileName();
 	        QString timestamp = QDateTime::currentDateTime()
 	            .toString("yyyyMMdd_hhmmss");
-	        QString remoteFileName = QString("%1_%2").arg(timestamp).arg(fileName);
+	        QString remoteFileName = QStringLiteral("%1_%2").arg(timestamp, fileName);
 	        
 	        // Build upload URL
-	        QUrl uploadUrl = QUrl(QString("%1/backup/%2")
+	        QUrl uploadUrl = QUrl(QStringLiteral("%1/backup/%2")
 	            .arg(m_backupServerUrl)
 	            .arg(remoteFileName));
 	        
@@ -258,7 +258,7 @@
 	    bool RestoreFile(const QString& remoteFileName, 
 	                    const QString& localFile)
 	    {
-	        QUrl downloadUrl = QUrl(QString("%1/backup/%2")
+	        QUrl downloadUrl = QUrl(QStringLiteral("%1/backup/%2")
 	            .arg(m_backupServerUrl)
 	            .arg(remoteFileName));
 	        

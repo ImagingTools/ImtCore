@@ -63,7 +63,7 @@ void CUsersSessionsDatabaseDelegateComp::OnComponentCreated()
 	}
 
 	if (sqlQuery.next() && !sqlQuery.value(0).toBool()){
-		QString alterQuery = QStringLiteral("ALTER TABLE \"%1\" ADD COLUMN \"TenantId\" VARCHAR(1000);").arg(tableName);
+		QString alterQuery = QStringLiteral(R"(ALTER TABLE "%1" ADD COLUMN "TenantId" VARCHAR(1000);)").arg(tableName);
 		m_databaseEngineCompPtr->ExecSqlQuery(alterQuery.toUtf8(), &sqlError);
 	}
 }
@@ -78,7 +78,7 @@ QByteArray CUsersSessionsDatabaseDelegateComp::GetSelectionQuery(
 			const iprm::IParamsSet* paramsPtr) const
 {
 	if (!objectId.isEmpty()){
-		return QStringLiteral("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
+		return QStringLiteral(R"(SELECT * FROM "%1" WHERE "%2" = '%3')")
 			.arg(*m_tableNameAttrPtr, *m_objectIdColumnAttrPtr, SqlEncode(QString::fromUtf8(objectId))).toUtf8();
 	}
 
@@ -87,7 +87,7 @@ QByteArray CUsersSessionsDatabaseDelegateComp::GetSelectionQuery(
 		CreateFilterQuery(*paramsPtr, filterQuery);
 	}
 
-	return QStringLiteral("SELECT * FROM \"%1\" %2;")
+	return QStringLiteral(R"(SELECT * FROM "%1" %2;)")
 		.arg(*m_tableNameAttrPtr, filterQuery).toUtf8();
 }
 
@@ -248,7 +248,7 @@ bool CUsersSessionsDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSe
 			return false;
 		}
 
-		filterQuery += QString(R"( WHERE "RefreshToken" = '%1')").arg(SqlEncode(textParamPtr->GetText()));
+		filterQuery += QStringLiteral(R"( WHERE "RefreshToken" = '%1')").arg(SqlEncode(textParamPtr->GetText()));
 
 		return true;
 	}

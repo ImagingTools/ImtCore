@@ -229,8 +229,8 @@ void CPointCloudShape::DrawOverlay(QPainter& painter)
 	}
 
 	if (m_isInfoBoxEnabled){
-		QString text = QString("<b><p>Total vertices: %1</p>").arg(pointCloudPtr->GetPointsCount());
-		text += QString("<p>Selected vertices: %1</p></b>").arg(static_cast<int>(m_selectedVerticesIndicies.size()));
+		QString text = QStringLiteral("<b><p>Total vertices: %1</p>").arg(pointCloudPtr->GetPointsCount());
+		text += QStringLiteral("<p>Selected vertices: %1</p></b>").arg(static_cast<int>(m_selectedVerticesIndicies.size()));
 
 		painter.save();
 

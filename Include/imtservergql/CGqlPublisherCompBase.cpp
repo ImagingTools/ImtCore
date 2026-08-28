@@ -126,7 +126,7 @@ bool CGqlPublisherCompBase::PushDataToSubscriber(
 		typeId = "next";
 	}
 
-	QByteArray body = QString(R"({"type": "%1","id": "%2","payload": {"data": {"%3": %4}}})")
+	QByteArray body = QStringLiteral(R"({"type": "%1","id": "%2","payload": {"data": {"%3": %4}}})")
 			.arg(typeId)
 			.arg(subscriptionId)
 			.arg(commandId)

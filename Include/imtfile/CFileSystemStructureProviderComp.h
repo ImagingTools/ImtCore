@@ -34,7 +34,7 @@ public:
 
 	I_BEGIN_COMPONENT(CFileSystemStructureProviderComp);
 		I_REGISTER_INTERFACE(IFileSystemStructureProvider);
-		I_ASSIGN(m_rootPathAttrPtr, "RootPath", "Browsable root. Tokens: '${DriveRoot}' (OS drive root, default), '${ApplicationDir}' (process directory). Absolute paths are used as-is. Ignored when 'AllowWholeFileSystem' is 'true'.", true, QString("${DriveRoot}"));
+		I_ASSIGN(m_rootPathAttrPtr, "RootPath", "Browsable root. Tokens: '${DriveRoot}' (OS drive root, default), '${ApplicationDir}' (process directory). Absolute paths are used as-is. Ignored when 'AllowWholeFileSystem' is 'true'.", true, QStringLiteral("${DriveRoot}"));
 		I_ASSIGN(m_allowWholeFileSystemAttrPtr, "AllowWholeFileSystem", "SECURITY: if 'true' the whole machine becomes browsable - 'RootPath' is ignored, no containment check is applied and an empty path lists the storage volumes. Only entry metadata (names/sizes/dates) is exposed; file contents are never read.", true, false);
 		I_ASSIGN(m_showFilesAttrPtr, "ShowFiles", "If 'true' files will be listed in addition to folders", true, true);
 		I_ASSIGN(m_showHiddenAttrPtr, "ShowHidden", "If 'true' hidden entries will be listed", true, false);

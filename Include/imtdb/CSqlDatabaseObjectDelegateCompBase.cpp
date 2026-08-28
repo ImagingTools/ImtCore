@@ -92,7 +92,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetCountQuery(const iprm::IParams
 		return QStringLiteral(R"(SELECT COUNT(*) FROM "%1" %2)").arg(*m_tableNameAttrPtr, filterQuery).toUtf8();
 	}
 
-	return QStringLiteral("SELECT COUNT(*) FROM %0.\"%1\" %2")
+	return QStringLiteral(R"(SELECT COUNT(*) FROM %0."%1" %2)")
 					.arg(
 						*m_tableSchemaAttrPtr,
 						*m_tableNameAttrPtr,

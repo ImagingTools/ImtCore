@@ -351,7 +351,7 @@ bool CClientRequestUserManagerComp::SetUserDataSdl(const QByteArray& userId, con
 	userssdl::UserUpdateRequestArguments arguments;
 	arguments.input.emplace();
 	arguments.input->id = userId;
-	arguments.input->typeId = QByteArray("User");
+	arguments.input->typeId = QByteArrayLiteral("User");
 
 	if (m_applicationInfoCompPtr.IsValid()){
 		arguments.input->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();

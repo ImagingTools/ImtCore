@@ -47,7 +47,7 @@ void CModelChangeNotifierComp::OnUpdate(const istd::IChangeable::ChangeSet& /*ch
 				continue;
 			}
 
-			QByteArray body = QString(R"({"type": "data","id": "%1","payload": {"data": {"%2": {}}}})")
+			QByteArray body = QStringLiteral(R"({"type": "data","id": "%1","payload": {"data": {"%2": {}}}})")
 				.arg(id)
 				.arg(networkRequest->GetCommandId())
 				.toUtf8();

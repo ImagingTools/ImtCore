@@ -306,7 +306,7 @@ void CWebSocketThread::OnTimeout()
 	if (webSocketPtr.isNull()){
 		return;
 	}
-	webSocketPtr->sendTextMessage(QString(R"({"type": "ka"})"));
+	webSocketPtr->sendTextMessage(QStringLiteral(R"({"type": "ka"})"));
 }
 
 

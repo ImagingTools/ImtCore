@@ -54,7 +54,7 @@ void CUserConnectionInfo::SetLastConnection(const QDateTime& lastConnection)
 
 QByteArray CUserConnectionInfo::GetFactoryId() const
 {
-	return QByteArray("UserConnection");
+	return QByteArrayLiteral("UserConnection");
 }
 
 

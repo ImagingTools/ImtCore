@@ -47,7 +47,7 @@ void CStructureSubscriberControllerComp::OnUpdate(const istd::IChangeable::Chang
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequest = requestNetworks.networkRequests[id];
-			QByteArray body = QString(R"({"type": "data","id": "%1","payload": {"data": %2}})")
+			QByteArray body = QStringLiteral(R"({"type": "data","id": "%1","payload": {"data": %2}})")
 								  .arg(id)
 								  .arg(data).toUtf8();
 			QByteArray reponseTypeId = QByteArrayLiteral("application/json; charset=utf-8");

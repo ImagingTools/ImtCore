@@ -258,7 +258,7 @@ imtauth::ISessionSharedPtr CRemoteJwtSessionControllerComp::GetSession(const QBy
 
 		iser::CMemoryReadArchive archive(sessionData.data(), sessionData.length());
 		if (!sessionInfoPtr->Serialize(archive)){
-			SendErrorMessage(0, QString("Unable to deserialize session info. Error: Deserialization failed"));
+			SendErrorMessage(0, QStringLiteral("Unable to deserialize session info. Error: Deserialization failed"));
 			return nullptr;
 		}
 

@@ -66,12 +66,12 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 			folder.mkdir(backupFolderPath);
 		}
 
-		QString fmt = "yyyyMMddhhmmss";
-		QString fileName = dbName + "_" + QDateTime::currentDateTime().toString(fmt);
+		QString fmt = QStringLiteral("yyyyMMddhhmmss");
+		QString fileName = dbName + QStringLiteral("_") + QDateTime::currentDateTime().toString(fmt);
 
-		QString fullPath = backupFolderPath + "/" + fileName;
+		QString fullPath = backupFolderPath + QStringLiteral("/") + fileName;
 
-		QString pgDumpCommand = QStringLiteral("pg_dump -h %1 -U %2 -p %3 -b -v -f \"%4\" \"%5\"")
+		QString pgDumpCommand = QStringLiteral(R"(pg_dump -h %1 -U %2 -p %3 -b -v -f "%4" "%5")")
 									.arg(host, userName, QString::number(port), fullPath, dbName);
 
 		if (!ExecuteCommand(process, pgDumpCommand)){
@@ -81,7 +81,7 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 		}
 	}
 
-	QString dropCommand = QStringLiteral("psql -h %1 -U %2 -p %3 -c \"%4\"")
+	QString dropCommand = QStringLiteral(R"(psql -h %1 -U %2 -p %3 -c "%4")")
 							  .arg(host, userName, QString::number(port), QStringLiteral(R"(DROP DATABASE "%1" WITH (FORCE))").arg(dbName));
 
 	if (!ExecuteCommand(process, dropCommand)){
@@ -90,7 +90,7 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 		return false;
 	}
 
-	QString createCommand = QStringLiteral("psql -h %1 -U %2 -p %3 -c \"%4\"")
+	QString createCommand = QStringLiteral(R"(psql -h %1 -U %2 -p %3 -c "%4")")
 								.arg(host, userName, QString::number(port), QStringLiteral(R"(CREATE DATABASE "%1")").arg(dbName));
 
 	if (!ExecuteCommand(process, createCommand)){
@@ -99,7 +99,7 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 		return false;
 	}
 
-	QString pgRestoreCommand = QStringLiteral("pg_restore -h %1 -U %2 -p %3 -d %4 \"%5\"")
+	QString pgRestoreCommand = QStringLiteral(R"(pg_restore -h %1 -U %2 -p %3 -d %4 "%5")")
 								   .arg(host, userName, QString::number(port), dbName, filePathTmp);
 
 
@@ -169,7 +169,7 @@ bool CRestoringDatabaseControllerComp::GetData(
 	QTemporaryDir tempDir;
 	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".backup";
 
-	QString pgDumpCommand = QStringLiteral("pg_dump -h %1 -U %2 -p %3 -b -v -f \"%4\" \"%5\"")
+	QString pgDumpCommand = QStringLiteral(R"(pg_dump -h %1 -U %2 -p %3 -b -v -f "%4" "%5")")
 								.arg(host, userName, QString::number(port), filePathTmp, dbName);
 
 	if (!ExecuteCommand(process, pgDumpCommand)){

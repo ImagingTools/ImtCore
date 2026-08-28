@@ -86,10 +86,10 @@ bool CSqliteJsonDatabaseDelegateComp::CreateSortQuery(const imtbase::ICollection
 
 	if (!columnId.isEmpty() && !sortOrder.isEmpty()){
 		if (columnId == "LastModified" || columnId == "Added"){
-			sortQuery = QStringLiteral("ORDER BY \"%1\" %2").arg(columnId, sortOrder);
+			sortQuery = QStringLiteral(R"(ORDER BY "%1" %2)").arg(columnId, sortOrder);
 		}
 		else{
-			sortQuery = QStringLiteral("ORDER BY json_extract(\"Document\",'$.%1') %2").arg(columnId, sortOrder);
+			sortQuery = QStringLiteral(R"(ORDER BY json_extract("Document",'$.%1') %2)").arg(columnId, sortOrder);
 		}
 	}
 
@@ -120,7 +120,7 @@ bool CSqliteJsonDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParam
 			}
 
 			QString value = textParamPtr->GetText();
-			filterQuery += QStringLiteral("json_extract(\"Document\",'$.%1') = '%2'").arg(key, SqlEncode(value));
+			filterQuery += QStringLiteral(R"(json_extract("Document",'$.%1') = '%2')").arg(key, SqlEncode(value));
 		}
 	}
 
@@ -143,7 +143,7 @@ bool CSqliteJsonDatabaseDelegateComp::CreateTextFilterQuery(const imtbase::IColl
 		for (int i = 1; i < filteringColumnIds.count(); ++i){
 			textFilterQuery += " OR ";
 
-			textFilterQuery += QStringLiteral("json_extract(\"Document\",'$.%1') LIKE '%%2%'").arg(filteringColumnIds[i], encodedFilter);
+			textFilterQuery += QStringLiteral(R"(json_extract("Document",'$.%1') LIKE '%%2%')").arg(filteringColumnIds[i], encodedFilter);
 		}
 	}
 
@@ -180,7 +180,7 @@ QByteArray CSqliteJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteA
 				imtcol::IDocumentCollectionFilter::DocumentStates states = documentFilterParamPtr->GetDocumentStates();
 
 				if (states.contains(imtcol::IDocumentCollectionFilter::DS_ACTIVE)){
-					stateDocumentFilter += QStringLiteral("\"IsActive\" = true");
+					stateDocumentFilter += QStringLiteral(R"("IsActive" = true)");
 				}
 
 				if (states.contains(imtcol::IDocumentCollectionFilter::DS_INACTIVE)){
@@ -188,14 +188,14 @@ QByteArray CSqliteJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteA
 						stateDocumentFilter += QStringLiteral(" OR ");
 					}
 
-					stateDocumentFilter += QStringLiteral("\"IsActive\" = false");
+					stateDocumentFilter += QStringLiteral(R"("IsActive" = false)");
 				}
 			}
 		}
 	}
 
 	if (stateDocumentFilter.isEmpty()){
-		stateDocumentFilter = QStringLiteral("\"IsActive\" = true");
+		stateDocumentFilter = QStringLiteral(R"("IsActive" = true)");
 	}
 
 	QString schemaPrefix;
@@ -203,7 +203,7 @@ QByteArray CSqliteJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteA
 		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 
-	return QStringLiteral("SELECT * FROM %0\"%1\" WHERE (%2) AND \"%3\" = '%4' ORDER BY \"RevisionNumber\" DESC;")
+	return QStringLiteral(R"(SELECT * FROM %0"%1" WHERE (%2) AND "%3" = '%4' ORDER BY "RevisionNumber" DESC;)")
 		.arg(schemaPrefix)
 		.arg(*m_tableNameAttrPtr)
 		.arg(stateDocumentFilter)

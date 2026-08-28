@@ -99,7 +99,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::InitConnection(const imtrest::I
 {
 	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 	if (webSocketRequest != nullptr){
-		QByteArray data = QString(R"({"type": "connection_ack","payload": {"connectionTimeoutMs": 300000}})").toUtf8();
+		QByteArray data = QStringLiteral(R"({"type": "connection_ack","payload": {"connectionTimeoutMs": 300000}})").toUtf8();
 
 		return CreateDataResponse(data, request);
 	}
@@ -116,7 +116,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::KeepAliveAcknowledge(const imtr
 		return imtrest::ConstResponsePtr();
 	}
 
-	QByteArray data = QString(R"({"type": "pong"})").toUtf8();
+	QByteArray data = QStringLiteral(R"({"type": "pong"})").toUtf8();
 
 	return CreateDataResponse(data, request);
 }
@@ -289,7 +289,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 		if (controllerPtr != nullptr){
 			QByteArray subscriptionId = webSocketRequest->GetRequestId();
 			if (controllerPtr->UnregisterSubscription(subscriptionId)){
-				QByteArray data = QString(R"({"type": "complete","id": "%1"})").arg(subscriptionId).toUtf8();
+				QByteArray data = QStringLiteral(R"({"type": "complete","id": "%1"})").arg(subscriptionId).toUtf8();
 				return CreateDataResponse(data, request);
 			}
 		}

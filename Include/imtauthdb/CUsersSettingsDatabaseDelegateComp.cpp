@@ -30,7 +30,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::GetSelectionQuery(
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!objectId.isEmpty()){
-		return QStringLiteral("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
+		return QStringLiteral(R"(SELECT * FROM "%1" WHERE "%2" = '%3')")
 					.arg(*m_tableNameAttrPtr)
 					.arg(*m_objectIdColumnAttrPtr)
 					.arg(SqlEncode(QString::fromUtf8(objectId)))
@@ -186,7 +186,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
 		data = archive.GetString();
 	}
 
-	QByteArray retVal = QStringLiteral("UPDATE \"UserSettings\" SET \"UserId\" ='%1', \"Settings\" = '%2' WHERE \"UserId\" ='%3';")
+	QByteArray retVal = QStringLiteral(R"(UPDATE "UserSettings" SET "UserId" ='%1', "Settings" = '%2' WHERE "UserId" ='%3';)")
 			.arg(SqlEncode(QString::fromUtf8(userId)))
 			.arg(SqlEncode(QString::fromUtf8(data)))
 			.arg(SqlEncode(QString::fromUtf8(objectId)))

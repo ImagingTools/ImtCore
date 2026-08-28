@@ -129,7 +129,7 @@ bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) con
 	if (httpResponsePtr != nullptr && !data.isEmpty()){
 		QByteArray body = data;
 		imtrest::IResponse::Headers headers = response->GetHeaders();
-		data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
+		data = QStringLiteral(R"({"type": "query_data","id": "%1","payload": %2})")
 				   .arg(headers.value("id"), body).toUtf8();
 	}
 
