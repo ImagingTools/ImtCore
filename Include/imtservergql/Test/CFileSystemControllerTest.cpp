@@ -35,7 +35,7 @@ void CFileSystemControllerTest::MissingProviderFailsTest()
 	const imtgql::CGqlRequest request = MakeGetFileSystemEntriesRequest();
 	sdl::V1_0::imtbase::CGetFileSystemEntriesGqlRequest typedRequest(request, true);
 	QString error;
-	const auto payload = controller.OnGetFileSystemEntries(typedRequest, request, error.toUtf8().constData());
+	const auto payload = controller.OnGetFileSystemEntries(typedRequest, request, error);
 
 	QVERIFY(!error.isEmpty());
 	QVERIFY(!payload.path.has_value());
