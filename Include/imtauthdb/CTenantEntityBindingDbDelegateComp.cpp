@@ -84,7 +84,7 @@ CTenantEntityBindingDbDelegateComp::NewObjectQuery CTenantEntityBindingDbDelegat
 	QByteArray createdByUserId = bindingPtr->GetCreatedByUserId();
 
 	QString createdByLiteral = createdByUserId.isEmpty()
-			? QStringLiteral("NULL")
+			? imtdb::NULL_DATA_LITERAL
 			: QStringLiteral("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(createdByUserId)));
 
 	const bool isSqlite = m_databaseEngineCompPtr.IsValid() &&

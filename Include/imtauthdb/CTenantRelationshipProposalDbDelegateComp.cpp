@@ -18,7 +18,7 @@ namespace imtauthdb
 static QString NullableSqlText(const QString& value)
 {
 	if (value.isEmpty()){
-		return QStringLiteral("NULL");
+		return imtdb::NULL_DATA_LITERAL;
 	}
 
 	return QStringLiteral("'%1'").arg(imtdb::EscapeSql(value));
@@ -28,7 +28,7 @@ static QString NullableSqlText(const QString& value)
 static QString NullableSqlDateTime(const QString& value)
 {
 	if (value.isEmpty()){
-		return QStringLiteral("NULL");
+		return imtdb::NULL_DATA_LITERAL;
 	}
 
 	return QStringLiteral("'%1'").arg(imtdb::EscapeSql(value));
