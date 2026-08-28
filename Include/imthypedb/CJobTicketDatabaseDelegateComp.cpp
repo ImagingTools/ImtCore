@@ -192,10 +192,10 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CJobTicketDatabaseDelegateComp::C
 
 	NewObjectQuery retVal;
 	retVal.query = QString("INSERT INTO \"JobTickets\"(\"Id\", \"TypeId\", \"Name\", \"ContextId\", \"Progress\", \"ProcessingStatus\", \"Params\", \"Results\", \"Input\", \"Added\") VALUES('%1', '%2', '%3', '%4', %5, %6, '%7', '%8', '%9', '%10');")
-				.arg(qPrintable(proposedObjectId))
-				.arg(qPrintable(typeId))
+				.arg(proposedObjectId)
+				.arg(typeId)
 				.arg(imtdb::SqlEncode(name))
-				.arg(qPrintable(contextId))
+				.arg(contextId)
 				.arg(progress)
 				.arg(static_cast<int>(processingStatus))
 				.arg(imtdb::SqlEncode(QString::fromUtf8(paramsData)))
@@ -220,7 +220,7 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateDeleteObjectsQuery(
 
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
-		quotedIds << QString("'%1'").arg(qPrintable(objectId));
+		quotedIds << QString("'%1'").arg(objectId);
 	}
 
 	QString query = QString(
@@ -297,10 +297,10 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateUpdateObjectQuery(
 	}
 
 	QByteArray retVal = QString("UPDATE \"JobTickets\" SET \"TypeId\" = '%1', \"Name\" = '%3', \"ContextId\" = '%4', \"Progress\" = %5, \"ProcessingStatus\" = %6, \"Params\" = '%7', \"Results\" = '%8', \"Input\" = '%9', \"TimeStamp\" = '%10' WHERE \"Id\" ='%2';")
-				.arg(qPrintable(typeId))
-				.arg(qPrintable(objectId))
+				.arg(typeId)
+				.arg(objectId)
 				.arg(imtdb::SqlEncode(name))
-				.arg(qPrintable(contextId))
+				.arg(contextId)
 				.arg(progress)
 				.arg(static_cast<int>(processingStatus))
 				.arg(imtdb::SqlEncode(QString::fromUtf8(paramsData)))
@@ -335,7 +335,7 @@ QByteArray CJobTicketDatabaseDelegateComp::CreateRenameObjectQuery(
 
 	QByteArray retVal = QString("UPDATE \"JobTickets\" SET \"Name\" = '%1', \"TimeStamp\" = '%3' WHERE \"Id\" = '%2';")
 			.arg(imtdb::SqlEncode(newObjectName))
-			.arg(qPrintable(objectId))
+			.arg(objectId)
 			.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs)).toLocal8Bit();
 
 	return retVal;

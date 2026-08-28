@@ -79,7 +79,7 @@ QByteArray CUsersSessionsDatabaseDelegateComp::GetSelectionQuery(
 {
 	if (!objectId.isEmpty()){
 		return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
-			.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(*m_objectIdColumnAttrPtr), SqlEncode(QString::fromUtf8(objectId))).toUtf8();
+			.arg(*m_tableNameAttrPtr, *m_objectIdColumnAttrPtr, SqlEncode(QString::fromUtf8(objectId))).toUtf8();
 	}
 
 	QString filterQuery;
@@ -88,7 +88,7 @@ QByteArray CUsersSessionsDatabaseDelegateComp::GetSelectionQuery(
 	}
 
 	return QString("SELECT * FROM \"%1\" %2;")
-		.arg(qPrintable(*m_tableNameAttrPtr), filterQuery).toUtf8();
+		.arg(*m_tableNameAttrPtr, filterQuery).toUtf8();
 }
 
 
@@ -195,12 +195,12 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	retVal += QString("\nUPDATE \"%0\" SET \"RefreshToken\" = '%1', \"TenantId\" = '%2', \"CreationDate\" = '%3', \"ExpirationDate\" = '%4' WHERE \"%5\" = '%6'")
 				  .arg(
-					  qPrintable(*m_tableNameAttrPtr),
+					  *m_tableNameAttrPtr,
 					  SqlEncode(QString::fromUtf8(token)),
 					  SqlEncode(QString::fromUtf8(tenantId)),
 					creationDate.toString(Qt::ISODate),
 					expirationDate.toString(Qt::ISODate),
-					qPrintable(*m_objectIdColumnAttrPtr),
+					*m_objectIdColumnAttrPtr,
 					SqlEncode(QString::fromUtf8(objectId))).toUtf8();
 
 	return retVal;
@@ -230,7 +230,7 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateDeleteObjectsQuery(
 	QString query = QString(
 						"DELETE FROM \"%1\" WHERE \"%2\" IN (%3);")
 						.arg(
-							QString::fromUtf8(qPrintable(*m_tableNameAttrPtr)),
+							QString::fromUtf8(*m_tableNameAttrPtr),
 							QString::fromUtf8(*m_objectIdColumnAttrPtr),
 							quotedIds.join(", ")
 							);

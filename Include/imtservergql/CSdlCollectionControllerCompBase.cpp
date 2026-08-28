@@ -147,7 +147,7 @@ QJsonObject CSdlCollectionControllerCompBase::GetObjectFromRequest(
 		return rootObj;
 	}
 
-	errorMessage = QT_TR_NOOP(QString("Unable to get an object with ID: '%1'.").arg(qPrintable(objectId)));
+	errorMessage = QT_TR_NOOP(QString("Unable to get an object with ID: '%1'.").arg(objectId));
 
 	SendErrorMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 

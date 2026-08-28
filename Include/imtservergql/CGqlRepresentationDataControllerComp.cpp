@@ -41,7 +41,7 @@ QJsonObject CGqlRepresentationDataControllerComp::CreateRepresentationFromReques
 		return rootObj;
 	}
 
-	errorMessage = QString("Unable to get representation from the data model. Command-ID: '%1'").arg(qPrintable(gqlRequest.GetCommandId()));
+	errorMessage = QString("Unable to get representation from the data model. Command-ID: '%1'").arg(gqlRequest.GetCommandId());
 
 	SendErrorMessage(0, errorMessage);
 
@@ -61,7 +61,7 @@ bool CGqlRepresentationDataControllerComp::UpdateModelFromRepresentation(
 
 	bool retVal = m_representationControllerCompPtr->GetDataModelFromRepresentation(representation, *m_dataModelCompPtr);
 	if (!retVal){
-		SendErrorMessage(0, QString("Unable to get data model from representation. Command: %1.").arg(qPrintable(request.GetCommandId())));
+		SendErrorMessage(0, QString("Unable to get data model from representation. Command: %1.").arg(request.GetCommandId()));
 	}
 
 	return retVal;
@@ -97,7 +97,7 @@ QJsonObject CGqlRepresentationDataControllerComp::CreateInternalResponse(const i
 		}
 	}
 
-	errorMessage = QString("Unable to create internal response for command '%1'").arg(qPrintable(commandId));
+	errorMessage = QString("Unable to create internal response for command '%1'").arg(commandId);
 
 	SendErrorMessage(0, errorMessage);
 

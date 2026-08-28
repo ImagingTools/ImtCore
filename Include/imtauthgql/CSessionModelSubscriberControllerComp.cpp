@@ -58,7 +58,7 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 			QByteArray body = QString(R"({"type": "data", "id": "%1","payload":{"data": {"token": "%2", "changeSet": %3}}})")
 								.arg(QString(id))
 								.arg(QString(sessionId))
-								.arg(qPrintable(changeSetDocument.toJson(QJsonDocument::Compact))).toUtf8();
+								.arg(QString(changeSetDocument.toJson(QJsonDocument::Compact))).toUtf8();
 			QByteArray responseTypeId("application/json; charset=utf-8");
 			const imtrest::IProtocolEngine& engine = networkRequest->GetProtocolEngine();
 
@@ -72,5 +72,4 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 
 
 } // namespace imtauthgql
-
 

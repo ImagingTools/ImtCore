@@ -306,7 +306,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::GetObject(
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QString("Unable to get data with ID: '%1'. The object does not exist.").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to get data with ID: '%1'. The object does not exist.").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -317,7 +317,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::GetObject(
 
 	if (!CreateRepresentationFromObject(*dataPtr, objectTypeId, gqlRequest, dataObj, errorMessage)){
 		if (errorMessage.isEmpty()){
-			errorMessage = QString("Unable create object representation for the object with ID: '%1'.").arg(qPrintable(objectId));
+			errorMessage = QString("Unable create object representation for the object with ID: '%1'.").arg(objectId);
 		}
 
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
@@ -367,7 +367,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::InsertObject(
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QString("Object with ID: '%1' already exists").arg(qPrintable(objectId));
+		errorMessage = QString("Object with ID: '%1' already exists").arg(objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -380,7 +380,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::InsertObject(
 
 	QByteArray newObjectId = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, newObjectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
 	if (newObjectId.isEmpty()){
-		errorMessage = QString("Error when creating a new object. Object-ID: '%1'.").arg(qPrintable(objectId));
+		errorMessage = QString("Error when creating a new object. Object-ID: '%1'.").arg(objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -426,7 +426,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::UpdateObject(
 	istd::IChangeableUniquePtr savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
 	if (!savedObjectPtr.IsValid()){
 		if (errorMessage.isEmpty()){
-			errorMessage = QString("Can not create object for update: '%1'").arg(qPrintable(objectId));
+			errorMessage = QString("Can not create object for update: '%1'").arg(objectId);
 		}
 
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -440,7 +440,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::UpdateObject(
 	}
 
 	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObjectPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
-		errorMessage = QString("Can not update object: '%1'").arg(qPrintable(objectId));
+		errorMessage = QString("Can not update object: '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -489,7 +489,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::UpdateCollection(
 
 	imtbase::CTreeItemModel objectIdsModel;
 	if (!objectIdsModel.CreateFromJson(objectIdsJson)){
-		errorMessage = QString("Unable to create model from json: '%1'").arg(qPrintable(objectIdsJson));
+		errorMessage = QString("Unable to create model from json: '%1'").arg(objectIdsJson);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -504,7 +504,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::UpdateCollection(
 			istd::IChangeableUniquePtr savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
 			if (savedObjectPtr.IsValid()){
 				if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObjectPtr)){
-					errorMessage += QString("Could not update object: '%1'; ").arg(qPrintable(objectId));
+					errorMessage += QString("Could not update object: '%1'; ").arg(objectId);
 					objectIdsModel.SetData("Failed", true, i);
 				}
 			}
@@ -559,7 +559,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::RenameObject(
 	QString newName = inputParamPtr->GetParamArgumentValue("NewName").toString();
 
 	if (!m_objectCollectionCompPtr->SetElementName(objectId, newName)){
-		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(qPrintable(newName)).arg(qPrintable(objectId));
+		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(newName).arg(objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -599,7 +599,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::SetObjectDescription(
 	QString description = inputParamPtr->GetParamArgumentValue("Description").toString();
 
 	if (!m_objectCollectionCompPtr->SetElementDescription(objectId, description)){
-		errorMessage = QString("Unable to set description '%1' for element with ID: '%2'").arg(description).arg(qPrintable(objectId));
+		errorMessage = QString("Unable to set description '%1' for element with ID: '%2'").arg(description).arg(objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -957,7 +957,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::GetObjectHistory(const im
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
 					m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &filterParams));
 	if (objectCollectionIterator == nullptr){
-		errorMessage = QString("Unable to get history for an object with ID: '%1'. Error when trying to create collection iterator.").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to get history for an object with ID: '%1'. Error when trying to create collection iterator.").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -1076,7 +1076,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ImportObject(const imtgql
 	}
 
 	if (m_objectCollectionCompPtr->GetElementIds().contains(objectUuid)){
-		errorMessage = QString("Unable to import object with ID: '%1' to the collection. Error: The object already exists inside the collection").arg(qPrintable(objectUuid));
+		errorMessage = QString("Unable to import object with ID: '%1' to the collection. Error: The object already exists inside the collection").arg(objectUuid);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
@@ -1100,7 +1100,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ImportObject(const imtgql
 
 	QByteArray retVal = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, collectionObjectInstancePtr.GetPtr(), objectUuid);
 	if (retVal.isEmpty()){
-		errorMessage = QString("Unable to import object with ID: '%1' to the collection. Error: The object could not be inserted into the collection").arg(qPrintable(objectUuid));
+		errorMessage = QString("Unable to import object with ID: '%1' to the collection. Error: The object could not be inserted into the collection").arg(objectUuid);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
@@ -1140,7 +1140,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ExportObject(const imtgql
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Object does not exists").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Object does not exists").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -1187,7 +1187,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ExportObject(const imtgql
 	}
 
 	if (m_filePersistenceCompPtr[index]->SaveToFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
-		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Saving data to the file '%1' failed").arg(qPrintable(objectId)).arg(filePathTmp);
+		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Saving data to the file '%1' failed").arg(objectId).arg(filePathTmp);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -1195,7 +1195,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ExportObject(const imtgql
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::ReadOnly)){
-		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Unable to open file with name '%1'").arg(qPrintable(objectId)).arg(filePathTmp);
+		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Unable to open file with name '%1'").arg(objectId).arg(filePathTmp);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 

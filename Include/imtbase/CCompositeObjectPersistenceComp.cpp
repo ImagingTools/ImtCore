@@ -101,7 +101,7 @@ ifile::IFilePersistence::OperationState CCompositeObjectPersistenceComp::LoadFro
 	for (const BundleElementInfo& elementInfo : contentMetaInfo){
 		const ifile::IFilePersistence* persistencePtr = GetFilePersistenceForTypeId(elementInfo.typeId);
 		if (persistencePtr == nullptr){
-			SendErrorMessage(0, QString("No data loader was registered for: '%1'").arg(qPrintable(elementInfo.typeId)));
+			SendErrorMessage(0, QString("No data loader was registered for: '%1'").arg(elementInfo.typeId));
 
 			tempPath.removeRecursively();
 
@@ -195,7 +195,7 @@ ifile::IFilePersistence::OperationState CCompositeObjectPersistenceComp::SaveToF
 	for (const imtbase::ICollectionInfo::Id& objectId: ids){
 		const istd::IChangeable *objectPtr = documentPtr->GetObjectPtr(objectId);
 		if (objectPtr == nullptr){
-			SendErrorMessage(0, QString("No object with the ID: '%1' was found").arg(qPrintable(objectId)));
+			SendErrorMessage(0, QString("No object with the ID: '%1' was found").arg(objectId));
 
 			tempPath.removeRecursively();
 
@@ -205,7 +205,7 @@ ifile::IFilePersistence::OperationState CCompositeObjectPersistenceComp::SaveToF
 		QByteArray typeId = documentPtr->GetObjectTypeId(objectId);
 		const ifile::IFilePersistence* persistencePtr = GetFilePersistenceForTypeId(typeId);
 		if (persistencePtr == nullptr){
-			SendErrorMessage(0, QString("No persistence was registered for type-ID: '%1'").arg(qPrintable(typeId)));
+			SendErrorMessage(0, QString("No persistence was registered for type-ID: '%1'").arg(typeId));
 
 			tempPath.removeRecursively();
 

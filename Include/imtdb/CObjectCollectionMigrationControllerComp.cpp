@@ -92,7 +92,7 @@ bool CObjectCollectionMigrationControllerComp::DoMigration(int& resultRevision, 
 			SendErrorMessage(0, QObject::tr("\n\t| Table could not be created"
 													"\n\t| Error: %1"
 													"\n\t| Query: %2")
-												.arg(sqlError.text(), qPrintable(query)));
+												.arg(sqlError.text(), query));
 
 			return false;
 		}

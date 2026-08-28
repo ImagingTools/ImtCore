@@ -279,7 +279,7 @@ void CWebSocketThread::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
 		return;
 	}
 
-	QString message = QString("Web socket binary message received: '%1'").arg(qPrintable(dataMessage));
+	QString message = QString("Web socket binary message received: '%1'").arg(QString(dataMessage));
 	m_server->SendInfoMessage(0, message, "CWebSocketServerComp");
 }
 

@@ -171,7 +171,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	qsizetype errorPosition;
 	if (!gqlRequest.ParseQuery(body, errorPosition)){
 		QString errorMessage = QString("Error when parsing request: '%1'; Error position: '%2'")
-								.arg(qPrintable(body)).arg(errorPosition);
+								.arg(QString(body)).arg(errorPosition);
 		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
 

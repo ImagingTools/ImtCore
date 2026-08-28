@@ -31,7 +31,7 @@ void CFileSystemStructureProviderTest::EmptyPathResolvesToRootTest()
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
 
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 	QCOMPARE(QDir(listing.resolvedPath).canonicalPath(), QDir(m_tempDir.path()).canonicalPath());
 	QVERIFY(listing.parentPath.isEmpty());
 	QVERIFY(listing.totalCount >= 2);
@@ -47,7 +47,7 @@ void CFileSystemStructureProviderTest::PathTraversalOutsideRootDeniedTest()
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
 
-	const bool ok = m_provider.GetEntries(query, listing, error);
+	const bool ok = m_provider.GetEntries(query, listing, error.toUtf8().constData());
 	if (QDir(parentOfRoot).canonicalPath() != QDir(m_tempDir.path()).canonicalPath()){
 		QVERIFY2(!ok, "Path traversal outside root must be denied");
 		QVERIFY(!error.isEmpty());
@@ -80,7 +80,7 @@ void CFileSystemStructureProviderTest::ExistingSubfolderListingTest()
 
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 
 	QVERIFY(listing.totalCount >= 2);
 
@@ -128,7 +128,7 @@ void CFileSystemStructureProviderTest::PaginationTest()
 
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 	QCOMPARE(listing.entries.size(), 3);
 	QVERIFY(listing.totalCount >= 10);
 	QVERIFY(listing.hasMore);
@@ -136,7 +136,7 @@ void CFileSystemStructureProviderTest::PaginationTest()
 	query.offset = listing.totalCount - 1;
 	query.limit = 5;
 	imtfile::IFileSystemStructureProvider::FileSystemListing lastPage;
-	QVERIFY2(m_provider.GetEntries(query, lastPage, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, lastPage, error), error.toUtf8().constData());
 	QCOMPARE(lastPage.entries.size(), 1);
 	QVERIFY(!lastPage.hasMore);
 }
@@ -147,7 +147,7 @@ void CFileSystemStructureProviderTest::StatExistingFileTest()
 	imtfile::IFileSystemStructureProvider::FileSystemEntry entry;
 	QString error;
 	const QString filePath = m_tempDir.path() + QStringLiteral("/sub/file.txt");
-	QVERIFY2(m_provider.Stat(filePath, entry, error), qPrintable(error));
+	QVERIFY2(m_provider.Stat(filePath, entry, error), error.toUtf8().constData());
 	QCOMPARE(entry.name, QStringLiteral("file.txt"));
 	QCOMPARE(entry.type, imtfile::IFileSystemStructureProvider::FileSystemEntry::Type::File);
 	QVERIFY(entry.size > 0);
@@ -198,7 +198,7 @@ void CFileSystemStructureProviderTest::WholeFsSandboxRootHasNoParentTest()
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
 
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 	QVERIFY(!listing.hasParent);
 	QVERIFY(listing.parentPath.isEmpty());
 }
@@ -212,7 +212,7 @@ void CFileSystemStructureProviderTest::WholeFsEmptyPathListsDrivesTest()
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
 
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 
 	// The virtual drives root: no real path, nothing above it, drives only.
 	QVERIFY(listing.resolvedPath.isEmpty());
@@ -234,7 +234,7 @@ void CFileSystemStructureProviderTest::WholeFsDrivesHaveNamesTest()
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
 
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 	QVERIFY(!listing.entries.isEmpty());
 
 	// QFileInfo::fileName() is empty for a volume root, so drives must be named
@@ -247,8 +247,8 @@ void CFileSystemStructureProviderTest::WholeFsDrivesHaveNamesTest()
 		if (entry.path.size() >= 2 && entry.path.at(1) == QLatin1Char(':')){
 			const QString rootKey = entry.path.left(2).toUpper();
 			QVERIFY2(entry.name.contains(rootKey, Qt::CaseInsensitive),
-					 qPrintable(QStringLiteral("Drive name '%1' lacks root key '%2'")
-								.arg(entry.name, rootKey)));
+					 QStringLiteral("Drive name '%1' lacks root key '%2'")
+								.arg(entry.name, rootKey));
 		}
 	}
 
@@ -268,7 +268,7 @@ void CFileSystemStructureProviderTest::WholeFsDriveRootParentIsDrivesRootTest()
 
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 
 	// A volume root has a parent - the virtual drives root - and it is addressed
 	// by an EMPTY path. That pairing is exactly why hasParent exists.
@@ -295,7 +295,7 @@ void CFileSystemStructureProviderTest::WholeFsOutsideRootIsAllowedTest()
 
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 	QCOMPARE(QDir(listing.resolvedPath).canonicalPath(), QDir(outside).canonicalPath());
 
 	ConfigureProvider(m_tempDir.path(), true, false);
@@ -331,7 +331,7 @@ void CFileSystemStructureProviderTest::WholeFsDrivesPaginationTest()
 
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 
 	QCOMPARE(listing.entries.size(), 1);
 	QCOMPARE(listing.totalCount, driveCount);
@@ -348,7 +348,7 @@ void CFileSystemStructureProviderTest::NameFilterMatchesSubstringTest()
 
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 
 	QCOMPARE(listing.totalCount, 1);
 	QCOMPARE(listing.entries.size(), 1);
@@ -363,13 +363,13 @@ void CFileSystemStructureProviderTest::NameFilterAffectsTotalCountTest()
 	imtfile::IFileSystemStructureProvider::FileSystemQuery allQuery;
 	imtfile::IFileSystemStructureProvider::FileSystemListing allListing;
 	QString error;
-	QVERIFY2(m_provider.GetEntries(allQuery, allListing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(allQuery, allListing, error), error.toUtf8().constData());
 	QVERIFY(allListing.totalCount >= 2);
 
 	imtfile::IFileSystemStructureProvider::FileSystemQuery filteredQuery;
 	filteredQuery.nameFilter = QStringLiteral("no-such-entry-xyz");
 	imtfile::IFileSystemStructureProvider::FileSystemListing filteredListing;
-	QVERIFY2(m_provider.GetEntries(filteredQuery, filteredListing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(filteredQuery, filteredListing, error), error.toUtf8().constData());
 	QCOMPARE(filteredListing.totalCount, 0);
 	QVERIFY(filteredListing.entries.isEmpty());
 	QVERIFY(!filteredListing.hasMore);
@@ -385,13 +385,13 @@ void CFileSystemStructureProviderTest::NameFilterMatchesGlobStarTest()
 
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 
 	QVERIFY2(listing.totalCount >= 1, "Expected at least other.txt from the fixture");
 	bool foundOther = false;
 	for (const auto& entry : listing.entries){
 		QVERIFY2(entry.name.endsWith(QStringLiteral(".txt"), Qt::CaseInsensitive),
-				qPrintable(entry.name));
+				entry.name);
 		if (entry.name == QStringLiteral("other.txt")){
 			foundOther = true;
 		}
@@ -409,7 +409,7 @@ void CFileSystemStructureProviderTest::NameFilterMatchesDelimitedRegexTest()
 
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 
 	QCOMPARE(listing.totalCount, 1);
 	QCOMPARE(listing.entries.size(), 1);
@@ -428,7 +428,7 @@ void CFileSystemStructureProviderTest::NameFilterGlobTreatsMetacharactersLiteral
 
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 
 	QCOMPARE(listing.totalCount, 1);
 	QCOMPARE(listing.entries.size(), 1);
@@ -446,13 +446,13 @@ void CFileSystemStructureProviderTest::ExtensionFilterMatchesSuffixTest()
 
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 
 	bool foundExe = false;
 	for (const auto& entry : listing.entries){
 		if (entry.type == imtfile::IFileSystemStructureProvider::FileSystemEntry::Type::File){
 			QVERIFY2(entry.name.endsWith(QStringLiteral(".exe"), Qt::CaseInsensitive),
-					qPrintable(entry.name));
+					entry.name);
 			if (entry.name == QStringLiteral("tool.exe")){
 				foundExe = true;
 			}
@@ -473,12 +473,13 @@ void CFileSystemStructureProviderTest::ExtensionFilterStarAllowsExtensionlessTes
 
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 
 	bool foundBinary = false;
 	for (const auto& entry : listing.entries){
 		if (entry.type == imtfile::IFileSystemStructureProvider::FileSystemEntry::Type::File){
-			QVERIFY2(QFileInfo(entry.name).suffix().isEmpty(), qPrintable(entry.name));
+			const QByteArray entryName = entry.name.toUtf8();
+			QVERIFY2(QFileInfo(entry.name).suffix().isEmpty(), entryName.constData());
 			if (entry.name == QStringLiteral("myservice")){
 				foundBinary = true;
 			}
@@ -496,7 +497,7 @@ void CFileSystemStructureProviderTest::SortByNameDescendingTest()
 
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 	QVERIFY(listing.entries.size() >= 2);
 
 	// Dirs first regardless of direction; file names within the file group Z→A.
@@ -533,7 +534,7 @@ void CFileSystemStructureProviderTest::SortBySizeFilesAfterDirsTest()
 
 	imtfile::IFileSystemStructureProvider::FileSystemListing listing;
 	QString error;
-	QVERIFY2(m_provider.GetEntries(query, listing, error), qPrintable(error));
+	QVERIFY2(m_provider.GetEntries(query, listing, error), error.toUtf8().constData());
 
 	// First non-container entries should be ordered by size ascending.
 	QList<qint64> fileSizes;

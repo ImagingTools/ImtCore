@@ -60,7 +60,7 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 					QByteArray currentProductId = currentRoleInfoPtr->GetProductId();
 
 					if (currentRoleId == roleId && currentProductId == productId){
-						errorMessage = QString("Role with ID: '%1' already exists").arg(qPrintable(currentRoleId));
+						errorMessage = QString("Role with ID: '%1' already exists").arg(currentRoleId);
 						return false;
 					}
 				}
@@ -92,7 +92,7 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 		for (const QByteArray& parentRoleId : parentRoles){
 			if (parentRoleId == objectId || !roleInfoPtr->IncludeRole(parentRoleId)){
 				errorMessage = QT_TR_NOOP(QString("Unable include role '%1' to the role '%2'. Check the dependencies between them.")
-											.arg(qPrintable(parentRoleId), qPrintable(roleId)));
+											.arg(parentRoleId, roleId));
 
 				return false;
 			}
@@ -266,7 +266,7 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (roleInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to create representation from object '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CRoleCollectionControllerComp");
 
 		return false;

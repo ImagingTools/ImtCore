@@ -72,9 +72,9 @@ bsoncxx::document::view_or_value CMongoDatabaseObjectDelegateCompBase::GetSelect
 {
 //	if (!objectId.isEmpty()){
 //		return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
-//					.arg(qPrintable(*m_tableNameAttrPtr))
-//					.arg(qPrintable(*m_objectIdColumnAttrPtr))
-//					.arg(qPrintable(objectId))
+//					.arg(*m_tableNameAttrPtr)
+//					.arg(*m_objectIdColumnAttrPtr)
+//					.arg(objectId)
 //					.toLocal8Bit();
 //	}
 //	else{
@@ -106,7 +106,7 @@ bsoncxx::document::view_or_value CMongoDatabaseObjectDelegateCompBase::GetSelect
 //		// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
 //		QString retVal = "(" + baseSelelectionQuery;
 //		retVal += QString(" ") + filterQuery;
-//		retVal += QString(" ") + qPrintable(paginationQuery) + ")";
+//		retVal += QString(" ") + paginationQuery + ")";
 //		retVal += QString(" ") + sortQuery;
 
 //		return retVal.toLocal8Bit();
@@ -209,12 +209,12 @@ bool CMongoDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
 
 //	QString textFilter = collectionFilter.GetTextFilter();
 //	if (!textFilter.isEmpty()){
-//        textFilterQuery = QString("\"%1\" ILIKE '%%2%'").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
+//        textFilterQuery = QString("\"%1\" ILIKE '%%2%'").arg(filteringColumnIds.first()).arg(textFilter);
 
 //		for (int i = 1; i < filteringColumnIds.count(); ++i){
 //			textFilterQuery += " OR ";
 
-//            textFilterQuery += QString("\"%1\" ILIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+//            textFilterQuery += QString("\"%1\" ILIKE '%%2%'").arg(filteringColumnIds[i]).arg(textFilter);
 //		}
 //	}
 

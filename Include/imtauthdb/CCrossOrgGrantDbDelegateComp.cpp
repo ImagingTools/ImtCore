@@ -251,7 +251,7 @@ QString CCrossOrgGrantDbDelegateComp::GetBaseSelectionQuery() const
 {
 	// The "Name" column is stored directly on the grant (auto-generated from the
 	// target tenant and roles when not set explicitly), so no join is required.
-	return QString("SELECT * FROM \"%1\"").arg(qPrintable(*m_tableNameAttrPtr));
+	return QString("SELECT * FROM \"%1\"").arg(*m_tableNameAttrPtr);
 }
 
 

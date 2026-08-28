@@ -113,7 +113,7 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 	QByteArray output = process.readAllStandardOutput();
 
 	if (!error.isEmpty()){
-		SendErrorMessage(0, QString("Unable to restore database: %1").arg(qPrintable(error)), "CRestoringDatabaseControllerComp");
+		SendErrorMessage(0, QString("Unable to restore database: %1").arg(error), "CRestoringDatabaseControllerComp");
 
 		return false;
 	}
@@ -149,7 +149,7 @@ bool CRestoringDatabaseControllerComp::GetData(
 	}
 
 	if (*m_commandIdAttrPtr != dataId){
-		SendWarningMessage(0, QString("Unable to get data with command-ID %1").arg(qPrintable(dataId)), "CRestoringDatabaseControllerComp");
+		SendWarningMessage(0, QString("Unable to get data with command-ID %1").arg(dataId), "CRestoringDatabaseControllerComp");
 
 		return false;
 	}

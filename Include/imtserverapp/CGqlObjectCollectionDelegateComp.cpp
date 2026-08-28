@@ -129,7 +129,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 		if (!SerializeObject(objectPtr, objectData)){
 			SendErrorMessage(0,
 						QString("Unable to create insert request for object with id '%1', typeId '%2'. Error: Serialization object failed")
-							.arg(qPrintable(proposedObjectId), qPrintable(typeId)),
+							.arg(proposedObjectId, typeId),
 							"CGqlObjectCollectionDelegateComp");
 
 			return nullptr;

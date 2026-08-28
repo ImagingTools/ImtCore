@@ -52,7 +52,7 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 	if (!collectionIds.isEmpty()){
 		QByteArray id = collectionIds[0];
 		if (rootFeatureId != id){
-			errorMessage = QT_TR_NOOP(QString("Feature-ID: '%1' already exists")).arg(qPrintable(featureId));
+			errorMessage = QT_TR_NOOP(QString("Feature-ID: '%1' already exists")).arg(featureId);
 			return false;
 		}
 	}
@@ -195,7 +195,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (featureInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to create representation from object '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
 
 		return false;

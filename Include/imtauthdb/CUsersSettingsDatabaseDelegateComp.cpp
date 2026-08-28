@@ -31,8 +31,8 @@ QByteArray CUsersSettingsDatabaseDelegateComp::GetSelectionQuery(
 {
 	if (!objectId.isEmpty()){
 		return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
-					.arg(qPrintable(*m_tableNameAttrPtr))
-					.arg(qPrintable(*m_objectIdColumnAttrPtr))
+					.arg(*m_tableNameAttrPtr)
+					.arg(*m_objectIdColumnAttrPtr)
 					.arg(SqlEncode(QString::fromUtf8(objectId)))
 					.toUtf8();
 	}

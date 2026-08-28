@@ -43,12 +43,12 @@ void CStructureSubscriberControllerComp::OnUpdate(const istd::IChangeable::Chang
 	}
 
 	imtbase::IHierarchicalStructure::NodeInsertInfo info = changeSet.GetChangeInfo("InsertInfo").value<imtbase::IHierarchicalStructure::NodeInsertInfo>();
-	QString data = QString("{\"NodeId\": \"%1\"}").arg(qPrintable(info.parentNodeId));
+	QString data = QString("{\"NodeId\": \"%1\"}").arg(info.parentNodeId);
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequest = requestNetworks.networkRequests[id];
 			QByteArray body = QString(R"({"type": "data","id": "%1","payload": {"data": %2}})")
-								  .arg(qPrintable(id))
+								  .arg(id)
 								  .arg(data).toUtf8();
 			QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
 			const imtrest::IProtocolEngine& engine = networkRequest->GetProtocolEngine();

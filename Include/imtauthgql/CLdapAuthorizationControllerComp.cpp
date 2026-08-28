@@ -326,7 +326,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 								if (!m_userCollectionCompPtr->SetObjectData(userObjectId, *userInfoPtr.GetPtr())){
 									SendWarningMessage(
 										0,
-										QString("Unable to update user data for user '%1'").arg(qPrintable(userObjectId)),
+										QString("Unable to update user data for user '%1'").arg(userObjectId),
 										"CLdapAuthorizationControllerComp");
 								}
 							}

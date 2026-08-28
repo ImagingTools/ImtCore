@@ -67,7 +67,7 @@ bool CreateDirectivesFromEntryList(const QList<T>& entryList, QList<imtsdl::Incl
 		if (entry.IsExternal()){
 			const QString typeIncludePath = '<' + entry.GetTargetHeaderFilePath() + '>';
 			if (typeIncludePath.isEmpty()){
-				qCritical() << qPrintable(QString("Header path is empty %1 of %2").arg(entry.GetName(), entry.GetSchemaFilePath()));
+				qCritical() << QString("Header path is empty %1 of %2").arg(entry.GetName(), entry.GetSchemaFilePath());
 				I_CRITICAL();
 
 				return false;

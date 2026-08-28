@@ -71,7 +71,7 @@ QJsonObject CCollectionObjectProviderComp::CreateInternalResponse(
 		return rootObj;
 	}
 	else{
-		errorMessage = QString("Object with the ID '%1' doesn't exist").arg(qPrintable(objectId)).toUtf8();
+		errorMessage = QString("Object with the ID '%1' doesn't exist").arg(objectId).toUtf8();
 		SendErrorMessage(0, errorMessage);
 
 		return QJsonObject();

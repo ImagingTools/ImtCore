@@ -65,12 +65,12 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 	}
 
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to change password for user '%1'. Error: The user does not exist").arg(qPrintable(login));
+		errorMessage = QString("Unable to change password for user '%1'. Error: The user does not exist").arg(login);
 		return sdl::V1_0::imtauth::CChangePasswordPayload();
 	}
 
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to change password for user '%1'. Error: The user does not exist").arg(qPrintable(login));
+		errorMessage = QString("Unable to change password for user '%1'. Error: The user does not exist").arg(login);
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
 		return sdl::V1_0::imtauth::CChangePasswordPayload();
@@ -79,7 +79,7 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
 		if (systemInfo.enabled && !systemInfo.systemId.isEmpty()){
-			errorMessage = QString("Unable to change password for user '%1'. Error: A user from an external system").arg(qPrintable(login));
+			errorMessage = QString("Unable to change password for user '%1'. Error: A user from an external system").arg(login);
 			SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
 			return sdl::V1_0::imtauth::CChangePasswordPayload();
@@ -108,7 +108,7 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 	}
 
 	if (!ok){
-		errorMessage = QString("Unable to change password for user '%1'. Error: Invalid login or password.").arg(qPrintable(login));
+		errorMessage = QString("Unable to change password for user '%1'. Error: Invalid login or password.").arg(login);
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
 		return sdl::V1_0::imtauth::CChangePasswordPayload();
@@ -123,7 +123,7 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 	}
 
 	if (!m_userCollectionCompPtr->SetObjectData(userId, *userInfoPtr, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
-		errorMessage = QString("Unable to change password for user '%1'").arg(qPrintable(login));
+		errorMessage = QString("Unable to change password for user '%1'").arg(login);
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
 		return sdl::V1_0::imtauth::CChangePasswordPayload();

@@ -72,7 +72,8 @@ bool CAuthorizationControllerComp::CheckCredential(
 			const QByteArray& password) const
 {
 	int index = m_systemIdsAttrPtr.FindValue(systemId);
-	Q_ASSERT_X(index >= 0, "CAuthorizationControllerComp::CreateInternalResponse", QString("System-ID '%1' cannot found").arg(qPrintable(systemId)).toUtf8());
+	const QByteArray errorMessage = QString("System-ID '%1' cannot found").arg(systemId).toUtf8();
+	Q_ASSERT_X(index >= 0, "CAuthorizationControllerComp::CreateInternalResponse", errorMessage.constData());
 
 	const imtauth::ICredentialController* credentialControllerPtr = m_credentialControllersCompPtr[index];
 	Q_ASSERT_X(credentialControllerPtr != nullptr, "CAuthorizationControllerComp::CreateInternalResponse", "Invalid credential controller");
@@ -129,7 +130,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateIn
 			const QByteArray& login,
 			QString& errorMessage) const
 {
-	errorMessage = QT_TR_NOOP(QString("Invalid login or password. Login: '%1'").arg(qPrintable(login)));
+	errorMessage = QT_TR_NOOP(QString("Invalid login or password. Login: '%1'").arg(login));
 	SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
 
 	return sdl::V1_0::imtauth::CAuthorizationPayload();
@@ -148,7 +149,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAu
 	QByteArray objectId = GetUserObjectId(login);
 	Q_ASSERT(!objectId.isEmpty());
 	if (objectId.isEmpty()){
-		errorMessage = QString("Unable to create authorization request. Error: User with login '%1' does not exists").arg(qPrintable(login));
+		errorMessage = QString("Unable to create authorization request. Error: User with login '%1' does not exists").arg(login);
 		return payload;
 	}
 
@@ -530,4 +531,3 @@ bool CAuthorizationControllerComp::CheckPermissions(const imtgql::CGqlRequest& /
 
 
 } // namespace imtauthgql
-

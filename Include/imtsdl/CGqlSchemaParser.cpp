@@ -432,7 +432,7 @@ bool CGqlSchemaParser::ProcessEnum()
 		}
 		QString convertedEnumValue = ConvertEnumValueToStringEquivalent(enumValue);
 
-		currentEnum.AddValue(QPair<QString,QString>(QString(qPrintable(enumValue)), convertedEnumValue));
+		currentEnum.AddValue(QPair<QString,QString>(QString(enumValue), convertedEnumValue));
 		currentEnum.SetSchemaFilePath(m_originalSchemaFile);
 		currentEnum.SetSchemaParamsPtr(m_schemaParamsPtr);
 

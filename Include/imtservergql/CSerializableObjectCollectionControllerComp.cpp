@@ -77,7 +77,7 @@ bool CSerializableObjectCollectionControllerComp::DeSerializeObject(
 	const int bufferSize = imtbase::narrow_cast<int>(objectData.length());
 	iser::CMemoryReadArchive archive(objectData.data(), bufferSize);
 	if (!serializableObject->Serialize(archive)){
-		QByteArray errorMessage = QString("Unable to deserialize object '%1'").arg(qPrintable(objectData)).toUtf8();
+		QByteArray errorMessage = QString("Unable to deserialize object '%1'").arg(objectData).toUtf8();
 		SendErrorMessage(0, errorMessage);
 
 		return false;
@@ -113,7 +113,7 @@ QJsonObject CSerializableObjectCollectionControllerComp::GetMetaInfo(
 	QByteArray data;
 
 	if (!SerializeObject(metaInfo.GetPtr(), data)){
-		errorMessage = QString("Unable to get meta info for object with ID '%1'. Error: Serialization failed").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to get meta info for object with ID '%1'. Error: Serialization failed").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CSerializableObjectCollectionControllerComp");
 
 		return QJsonObject();
@@ -186,7 +186,7 @@ QJsonObject CSerializableObjectCollectionControllerComp::GetDataMetaInfo(
 	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
 
 	if (!SerializeObject(metaInfo.GetPtr(), data)){
-		errorMessage = QString("Unable to get a data meta info for object with ID '%1'. Error: Serialization failed").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to get a data meta info for object with ID '%1'. Error: Serialization failed").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CSerializableObjectCollectionControllerComp");
 		return QJsonObject();
 	}
@@ -219,8 +219,8 @@ QJsonObject CSerializableObjectCollectionControllerComp::GetObjectFromRequest(
 		iser::ISerializable* object = dynamic_cast<iser::ISerializable*>(dataPtr.GetPtr());
 		if (object == nullptr){
 			errorMessage =  QString("Unable to get object for command-ID '%1'. Error: Object with ID '%2' is invalid")
-						.arg(qPrintable(gqlRequest.GetCommandId()))
-						.arg(qPrintable(objectId)).toUtf8();
+						.arg(gqlRequest.GetCommandId())
+						.arg(objectId).toUtf8();
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -239,8 +239,8 @@ QJsonObject CSerializableObjectCollectionControllerComp::GetObjectFromRequest(
 		if (archivePtr.IsValid()){
 			if (!object->Serialize(*archivePtr.GetPtr())){
 				errorMessage = QString("Unable to get object for command-ID '%1'. Error: Object with ID '%2' cannot be serialized")
-							.arg(qPrintable(gqlRequest.GetCommandId()))
-							.arg(qPrintable(objectId)).toUtf8();
+							.arg(gqlRequest.GetCommandId())
+							.arg(objectId).toUtf8();
 				SendErrorMessage(0, errorMessage);
 
 				return QJsonObject();
@@ -252,8 +252,8 @@ QJsonObject CSerializableObjectCollectionControllerComp::GetObjectFromRequest(
 	}
 	else{
 		errorMessage = QString("Unable to get object for command-ID '%1'. Error: Object with ID '%2' not found")
-				.arg(qPrintable(gqlRequest.GetCommandId()))
-				.arg(qPrintable(objectId)).toUtf8();
+				.arg(gqlRequest.GetCommandId())
+				.arg(objectId).toUtf8();
 
 		return QJsonObject();
 	}
@@ -405,7 +405,7 @@ QJsonObject CSerializableObjectCollectionControllerComp::GetObjectListFromReques
 			itemObj.insert(QStringLiteral("metaInfo"), QJsonValue::fromVariant(serializedMetaIndoData.toBase64()));
 		}
 		else{
-			SendWarningMessage(0, QString("Unable to set meta info for element '%1'. Error: Meta info serialization failed").arg(qPrintable(id)), "CSerializableObjectCollectionControllerComp");
+			SendWarningMessage(0, QString("Unable to set meta info for element '%1'. Error: Meta info serialization failed").arg(id), "CSerializableObjectCollectionControllerComp");
 		}
 
 		serializedMetaIndoData.clear();
@@ -415,7 +415,7 @@ QJsonObject CSerializableObjectCollectionControllerComp::GetObjectListFromReques
 			itemObj.insert(QStringLiteral("dataMetaInfo"), QJsonValue::fromVariant(serializedMetaIndoData.toBase64()));
 		}
 		else{
-			SendWarningMessage(0, QString("Unable to set data meta info for element '%1'. Error: Data meta info serialization failed").arg(qPrintable(id)), "CSerializableObjectCollectionControllerComp");
+			SendWarningMessage(0, QString("Unable to set data meta info for element '%1'. Error: Data meta info serialization failed").arg(id), "CSerializableObjectCollectionControllerComp");
 		}
 
 		itemsArray.append(itemObj);

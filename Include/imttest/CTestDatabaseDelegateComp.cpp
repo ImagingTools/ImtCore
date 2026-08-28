@@ -96,7 +96,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CTestDatabaseDelegateComp::Create
 	NewObjectQuery retVal;
 
 	retVal.query = QString("INSERT INTO \"Tests\"(\"Id\", \"Name\", \"Description\") VALUES('%1', '%2', '%3');")
-			.arg(qPrintable(testId))
+			.arg(testId)
 			.arg(imtdb::SqlEncode(testName))
 			.arg(imtdb::SqlEncode(testDescription))
 			.toLocal8Bit();
@@ -169,9 +169,9 @@ QByteArray CTestDatabaseDelegateComp::CreateUpdateObjectQuery(
 	}
 	QByteArray testId = testInfoPtr->GetTestId();
 	QByteArray retVal = QString("UPDATE \"Tests\" SET \"Id\" = '%1', \"Name\" = '%2' WHERE \"Id\" ='%3';")
-							.arg(qPrintable(testId))
+							.arg(testId)
 							.arg(imtdb::SqlEncode(testName))
-							.arg(qPrintable(objectId))
+							.arg(objectId)
 							.toLocal8Bit();
 
 	return retVal;
@@ -200,7 +200,7 @@ QByteArray CTestDatabaseDelegateComp::CreateRenameObjectQuery(
 
 	QByteArray retVal = QString("UPDATE \"Tests\" SET \"Name\" = '%1' WHERE \"Id\" = '%2';")
 			.arg(imtdb::SqlEncode(newObjectName))
-			.arg(qPrintable(objectId)).toLocal8Bit();
+			.arg(objectId).toLocal8Bit();
 
 	return retVal;
 }
@@ -229,7 +229,7 @@ QByteArray CTestDatabaseDelegateComp::CreateDescriptionObjectQuery(
 
 	QByteArray retVal = QString("UPDATE \"Tests\" SET \"Description\" = '%1' WHERE \"Id\" ='%2';")
 			.arg(imtdb::SqlEncode(description))
-			.arg(qPrintable(testId)).toLocal8Bit();
+			.arg(testId).toLocal8Bit();
 
 	return retVal;
 }
@@ -280,7 +280,7 @@ QByteArray CTestDatabaseDelegateComp::CreateDataMetaInfoQuery(const imtbase::IOb
 								.arg(imtdb::SqlEncode(description))
 								.arg(str_Added)
 								.arg(str_lastModificationTime)
-								.arg(qPrintable(objectId)).toLocal8Bit();
+								.arg(objectId).toLocal8Bit();
 
 		return retVal;
 	}
@@ -301,7 +301,7 @@ QByteArray CTestDatabaseDelegateComp::CreateCollectionItemMetaInfoQuery(const im
 								.arg(imtdb::SqlEncode(description))
 								.arg(str_Added)
 								.arg(str_lastModificationTime)
-								.arg(qPrintable(objectId)).toLocal8Bit();
+								.arg(objectId).toLocal8Bit();
 
 		return retVal;
 	}

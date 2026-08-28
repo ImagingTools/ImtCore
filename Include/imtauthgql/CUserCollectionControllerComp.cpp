@@ -324,7 +324,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (contextUserInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'. Error: GraphQL context is invalid").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to create representation from object '%1'. Error: GraphQL context is invalid").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
@@ -344,14 +344,14 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to create representation from object '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
 	}
 
 	if (!contextUserInfoPtr->IsAdmin() && userInfoPtr->IsAdmin()){
-		errorMessage = QString("Unable to create representation from object 'su'. Error: User '%1' permission denied").arg(qPrintable(contextUserInfoPtr->GetId()));
+		errorMessage = QString("Unable to create representation from object 'su'. Error: User '%1' permission denied").arg(contextUserInfoPtr->GetId());
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;

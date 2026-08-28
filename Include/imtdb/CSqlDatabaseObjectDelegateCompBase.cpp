@@ -52,7 +52,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectTypeId(const QByteArray&
 			QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError);
 			if (sqlError.type() == QSqlError::NoError){
 				if (sqlQuery.last()){
-					QString columnId = qPrintable(*m_objectTypeIdColumnAttrPtr);
+					QString columnId = QString(*m_objectTypeIdColumnAttrPtr);
 
 					QSqlRecord record = sqlQuery.record();
 					if (record.contains(columnId)){
@@ -84,12 +84,12 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetCountQuery(const iprm::IParams
 	}
 
 	if (!m_tableSchemaAttrPtr.IsValid()){
-		return QString("SELECT COUNT(*) FROM \"%1\" %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toUtf8();
+		return QString("SELECT COUNT(*) FROM \"%1\" %2").arg(QString(*m_tableNameAttrPtr)).arg(filterQuery).toUtf8();
 	}
 
 	return QString("SELECT COUNT(*) FROM %0.\"%1\" %2")
-			.arg(qPrintable(*m_tableSchemaAttrPtr))
-			.arg(qPrintable(*m_tableNameAttrPtr))
+			.arg(QString(*m_tableSchemaAttrPtr))
+			.arg(QString(*m_tableNameAttrPtr))
 			.arg(filterQuery)
 			.toUtf8();
 }
@@ -104,17 +104,17 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 	if (!objectId.isEmpty()){
 		if (m_tableSchemaAttrPtr.IsValid()){
 			return QString("SELECT * FROM %0.\"%1\" WHERE \"%2\" = '%3'")
-				.arg(qPrintable(*m_tableSchemaAttrPtr))
-				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(qPrintable(*m_objectIdColumnAttrPtr))
-				.arg(qPrintable(objectId))
+				.arg(QString(*m_tableSchemaAttrPtr))
+				.arg(QString(*m_tableNameAttrPtr))
+				.arg(QString(*m_objectIdColumnAttrPtr))
+				.arg(QString(objectId))
 				.toUtf8();
 		}
 
 		return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
-				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(qPrintable(*m_objectIdColumnAttrPtr))
-				.arg(qPrintable(objectId))
+				.arg(QString(*m_tableNameAttrPtr))
+				.arg(QString(*m_objectIdColumnAttrPtr))
+				.arg(QString(objectId))
 				.toUtf8();
 	}
 
@@ -169,13 +169,13 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 		retVal = baseSelelectionQuery;
 		retVal += QString(" ") + filterQuery;
 		retVal += QString(" ") + sortQuery;
-		retVal += QString(" ") + qPrintable(paginationQuery);
+		retVal += QString(" ") + QString(paginationQuery);
 	}
 	else{
 		// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
 		retVal = "(" + baseSelelectionQuery;
 		retVal += QString(" ") + filterQuery;
-		retVal += QString(" ") + qPrintable(paginationQuery) + ")";
+		retVal += QString(" ") + QString(paginationQuery) + ")";
 		retVal += QString(" ") + sortQuery;
 	}
 
@@ -185,7 +185,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectIdFromRecord(const QSqlRecord& record) const
 {
-	QString columnId = qPrintable(*m_objectIdColumnAttrPtr);
+	QString columnId = QString(*m_objectIdColumnAttrPtr);
 
 	if (record.contains(columnId)){
 		return imtdb::VariantToByteArray(record.value(columnId));
@@ -197,7 +197,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectIdFromRecord(const QSqlR
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectTypeIdFromRecord(const QSqlRecord& record) const
 {
-	QString columnId = qPrintable(*m_objectTypeIdColumnAttrPtr);
+	QString columnId = QString(*m_objectTypeIdColumnAttrPtr);
 
 	if (record.contains(columnId)){
 		return imtdb::VariantToByteArray(record.value(columnId));
@@ -249,12 +249,12 @@ QVariant CSqlDatabaseObjectDelegateCompBase::GetElementInfoFromRecord(const QSql
 QByteArray CSqlDatabaseObjectDelegateCompBase::CreateResetQuery(const imtbase::IObjectCollection& /*collection*/) const
 {
 	if (!m_tableSchemaAttrPtr.IsValid()){
-		return QString("DELETE FROM \"%1\";").arg(qPrintable(*m_tableNameAttrPtr)).toUtf8();
+		return QString("DELETE FROM \"%1\";").arg(QString(*m_tableNameAttrPtr)).toUtf8();
 	}
 
 	return QString("DELETE FROM %0.\"%1\";")
-			.arg(qPrintable(*m_tableSchemaAttrPtr))
-			.arg(qPrintable(*m_tableNameAttrPtr))
+			.arg(QString(*m_tableSchemaAttrPtr))
+			.arg(QString(*m_tableNameAttrPtr))
 			.toUtf8();
 }
 
@@ -297,14 +297,14 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::CreateUpdateMetaInfoQuery(const Q
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::GetTableName() const
 {
-	return *m_tableNameAttrPtr;
+	return QString(*m_tableNameAttrPtr);
 }
 
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::GetTableScheme() const
 {
 	if (m_tableSchemaAttrPtr.IsValid()){
-		return *m_tableSchemaAttrPtr;
+		return QString(*m_tableSchemaAttrPtr);
 	}
 
 	return QByteArray();
@@ -334,12 +334,12 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::CreateRestoreObjectSetQuery(
 QString CSqlDatabaseObjectDelegateCompBase::GetBaseSelectionQuery() const
 {
 	if (!m_tableSchemaAttrPtr.IsValid()){
-		return QString("SELECT * FROM \"%1\"").arg(qPrintable(*m_tableNameAttrPtr));
+		return QString("SELECT * FROM \"%1\"").arg(QString(*m_tableNameAttrPtr));
 	}
 
 	return QString("SELECT * FROM %0.\"%1\"")
-				.arg(qPrintable(*m_tableSchemaAttrPtr))
-				.arg(qPrintable(*m_tableNameAttrPtr));
+				.arg(QString(*m_tableSchemaAttrPtr))
+				.arg(QString(*m_tableNameAttrPtr));
 }
 
 
@@ -519,7 +519,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
 
 			QString value = textParamPtr->GetText();
 
-			filterQuery = QStringLiteral(R"("%1" = '%2')").arg(qPrintable(key)).arg(SqlEncode(value));
+			filterQuery = QStringLiteral(R"("%1" = '%2')").arg(key).arg(SqlEncode(value));
 		}
 	}
 
@@ -552,12 +552,12 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
 		QString encodedFilter = SqlEncode(textFilter);
-		textFilterQuery = QStringLiteral(R"("%1" ILIKE '%%2%')").arg(qPrintable(filteringColumnIds.first())).arg(encodedFilter);
+		textFilterQuery = QStringLiteral(R"("%1" ILIKE '%%2%')").arg(filteringColumnIds.first()).arg(encodedFilter);
 
 		for (int i = 1; i < filteringColumnIds.count(); ++i){
 			textFilterQuery += QStringLiteral(" OR ");
 
-			textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(qPrintable(filteringColumnIds[i])).arg(encodedFilter);
+			textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(filteringColumnIds[i]).arg(encodedFilter);
 		}
 	}
 
@@ -781,7 +781,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTableIfNeeded()
 		SendErrorMessage(0, QString::fromUtf8(QT_TR_NOOP("\n\t| Table could not be created"
 														"\n\t| Error: %1"
 														"\n\t| Query: %2"))
-								.arg(sqlError.text(), qPrintable(executedQuery)));
+								.arg(sqlError.text(), executedQuery));
 		return false;
 	}
 

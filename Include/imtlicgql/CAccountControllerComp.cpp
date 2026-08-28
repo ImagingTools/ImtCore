@@ -78,7 +78,7 @@ QJsonObject CAccountControllerComp::GetObjectFromRequest(const imtgql::CGqlReque
 		}
 	}
 
-	errorMessage = QT_TR_NOOP(QString("Unable to get an account with ID: '%1'.").arg(qPrintable(accountId)));
+	errorMessage = QT_TR_NOOP(QString("Unable to get an account with ID: '%1'.").arg(accountId));
 	SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 	return QJsonObject();

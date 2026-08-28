@@ -58,7 +58,7 @@ istd::IChangeableUniquePtr TMessageDatabaseDelegateComp<BaseDelegate>::CreateObj
 	}
 
 	if (record.contains("Document")){
-		QByteArray documentContent = record.value(qPrintable("Document")).toByteArray();
+		QByteArray documentContent = record.value("Document").toByteArray();
 
 		if (BaseDelegate::ReadDataFromMemory("MessageInfo", documentContent, *documentPtr)){
 			return documentPtr;
@@ -148,7 +148,7 @@ bool TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFilterQuery(const i
 					if (!filterQuery.isEmpty()){
 						filterQuery += " AND ";
 					}
-					filterQuery += QString("json_extract(\"Document\",'$.Source') != '%1'").arg(qPrintable(key));
+					filterQuery += QString("json_extract(\"Document\",'$.Source') != '%1'").arg(key);
 				}
 			}
 		}

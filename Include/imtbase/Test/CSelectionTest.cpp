@@ -19,7 +19,7 @@ void CSelectionTest::SetSelectedIdsInMultiSelectTest()
 {
 	imtbase::CSelection multiSelection(imtbase::ISelection::SelectionMode::SM_MULTI);
 	bool checkMultiSelectData = multiSelection.SetSelectedIds(m_testMultiSelectedIds);
-	QVERIFY2(checkMultiSelectData, qPrintable(QString("Function CSelection::SetSelectedIds is failed in multi-select")));
+	QVERIFY2(checkMultiSelectData, "Function CSelection::SetSelectedIds is failed in multi-select");
 	QCOMPARE(multiSelection.GetSelectedIds(), m_testMultiSelectedIds);
 }
 
@@ -28,7 +28,7 @@ void CSelectionTest::SetSelectedIdsInSingleSelectTest()
 {
 	imtbase::CSelection singleSelection(imtbase::ISelection::SelectionMode::SM_SINGLE);
 	bool checkSingleSelectData = singleSelection.SetSelectedIds(m_testSingleSelectedIds);
-	QVERIFY2(checkSingleSelectData, qPrintable(QString("Function CSelection::SetSelectedIds is failed in single-select")));
+	QVERIFY2(checkSingleSelectData, "Function CSelection::SetSelectedIds is failed in single-select");
 	QCOMPARE(singleSelection.GetSelectedIds(), m_testSingleSelectedIds);
 }
 
@@ -37,7 +37,7 @@ void CSelectionTest::SetSelectedEmptyIdsInMultiSelectTest()
 {
 	imtbase::CSelection multiSelection(imtbase::ISelection::SelectionMode::SM_MULTI);
 	bool checkMultiSelectWithEmptyData = multiSelection.SetSelectedIds(m_testSelectedWithEmptyKeysIds);
-	QVERIFY2(!checkMultiSelectWithEmptyData, qPrintable(QString("Function CSelection::SetSelectedIds is failed in multi-select with empty Ids list")));
+	QVERIFY2(!checkMultiSelectWithEmptyData, "Function CSelection::SetSelectedIds is failed in multi-select with empty Ids list");
 }
 
 
@@ -45,7 +45,7 @@ void CSelectionTest::SetSelectedEmptyIdsInSingleSelectTest()
 {
 	imtbase::CSelection singleSelection(imtbase::ISelection::SelectionMode::SM_SINGLE);
 	bool checkSingleSelectWithEmptyData = singleSelection.SetSelectedIds(m_testSelectedWithEmptyKeysIds);
-	QVERIFY2(!checkSingleSelectWithEmptyData, qPrintable(QString("Function CSelection::SetSelectedIds is failed in multi-select with empty Ids list")));
+	QVERIFY2(!checkSingleSelectWithEmptyData, "Function CSelection::SetSelectedIds is failed in multi-select with empty Ids list");
 }
 
 
@@ -54,7 +54,7 @@ void CSelectionTest::SetSelectedManyIdsInSingleSelectTest()
 	imtbase::CSelection multiSelection(imtbase::ISelection::SelectionMode::SM_MULTI);
 	imtbase::CSelection singleSelection(imtbase::ISelection::SelectionMode::SM_SINGLE);
 	bool checkSingleSelectWithManyData = singleSelection.SetSelectedIds(m_testMultiSelectedIds);
-	QVERIFY2(!checkSingleSelectWithManyData, qPrintable(QString("Function CSelection::SetSelectedIds is failed in single-select with many select keys")));
+	QVERIFY2(!checkSingleSelectWithManyData, "Function CSelection::SetSelectedIds is failed in single-select with many select keys");
 }
 
 
@@ -64,7 +64,7 @@ void CSelectionTest::IsEqualMultiSelectTest()
 	imtbase::CSelection multiSelection2(imtbase::ISelection::SelectionMode::SM_MULTI);
 	multiSelection.SetSelectedIds(m_testMultiSelectedIds);
 	multiSelection2.SetSelectedIds(m_testMultiSelectedIds);
-	QVERIFY2((multiSelection.IsEqual(multiSelection2)), qPrintable(QString("Function CSelection::IsEqual is failed with compare multi-selects")));
+	QVERIFY2((multiSelection.IsEqual(multiSelection2)), "Function CSelection::IsEqual is failed with compare multi-selects");
 }
 
 
@@ -73,7 +73,7 @@ void CSelectionTest::IsNonEqualMultiSelectTest()
 	imtbase::CSelection multiSelection(imtbase::ISelection::SelectionMode::SM_MULTI);
 	imtbase::CSelection multiSelection2(imtbase::ISelection::SelectionMode::SM_MULTI);
 	multiSelection.SetSelectedIds(m_testMultiSelectedIds);
-	QVERIFY2(!(multiSelection.IsEqual(multiSelection2)), qPrintable(QString("Function CSelection::IsEqual is failed with compare multi-selects (null vs non-null)")));
+	QVERIFY2(!(multiSelection.IsEqual(multiSelection2)), "Function CSelection::IsEqual is failed with compare multi-selects (null vs non-null)");
 }
 
 
@@ -83,7 +83,7 @@ void CSelectionTest::IsNonEqualMultiSelectAndSingleSelectTest()
 	imtbase::CSelection singleSelection(imtbase::ISelection::SelectionMode::SM_SINGLE);
 	multiSelection.SetSelectedIds(m_testMultiSelectedIds);
 	singleSelection.SetSelectedIds(m_testSingleSelectedIds);
-	QVERIFY2(!(multiSelection.IsEqual(singleSelection)), qPrintable(QString("Function CSelection::IsEqual is failed with compare single-select and multi-select")));
+	QVERIFY2(!(multiSelection.IsEqual(singleSelection)), "Function CSelection::IsEqual is failed with compare single-select and multi-select");
 }
 
 
@@ -93,7 +93,7 @@ void CSelectionTest::IsEqualSingleSelectTest()
 	imtbase::CSelection singleSelection2(imtbase::ISelection::SelectionMode::SM_SINGLE);
 	singleSelection.SetSelectedIds(m_testSingleSelectedIds);
 	singleSelection2.SetSelectedIds(m_testSingleSelectedIds);
-	QVERIFY2((singleSelection.IsEqual(singleSelection2)), qPrintable(QString("Function CSelection::IsEqual is failed with compare single-selects")));
+	QVERIFY2((singleSelection.IsEqual(singleSelection2)), "Function CSelection::IsEqual is failed with compare single-selects");
 }
 
 
@@ -102,7 +102,7 @@ void CSelectionTest::IsNonEqualSingleSelectTest()
 	imtbase::CSelection singleSelection(imtbase::ISelection::SelectionMode::SM_SINGLE);
 	imtbase::CSelection singleSelection2(imtbase::ISelection::SelectionMode::SM_SINGLE);
 	singleSelection.SetSelectedIds(m_testSingleSelectedIds);
-	QVERIFY2(!(singleSelection.IsEqual(singleSelection2)), qPrintable(QString("Function CSelection::IsEqual is failed with compare single-selects (null vs non-null)")));
+	QVERIFY2(!(singleSelection.IsEqual(singleSelection2)), "Function CSelection::IsEqual is failed with compare single-selects (null vs non-null)");
 }
 
 
@@ -110,7 +110,7 @@ void CSelectionTest::IsNonEqualEmptiesSingleSelectAndMultiSelectTest()
 {
 	imtbase::CSelection multiSelection(imtbase::ISelection::SelectionMode::SM_MULTI);
 	imtbase::CSelection singleSelection(imtbase::ISelection::SelectionMode::SM_SINGLE);
-	QVERIFY2(!(singleSelection.IsEqual(multiSelection)), qPrintable(QString("Function CSelection::IsEqual is failed with compare single-select and multi-select (null vs null)")));
+	QVERIFY2(!(singleSelection.IsEqual(multiSelection)), "Function CSelection::IsEqual is failed with compare single-select and multi-select (null vs null)");
 }
 
 
@@ -155,7 +155,7 @@ void CSelectionTest::CloneMeSingleSelectTest()
 	imtbase::CSelection singleSelection(imtbase::ISelection::SelectionMode::SM_SINGLE);
 	singleSelection.SetSelectedIds(m_testSingleSelectedIds);
 	auto singleSelectionPtr = singleSelection.CloneMe();
-	QVERIFY2(singleSelection.IsEqual(*singleSelectionPtr), qPrintable(QString("Function CSelection::CloneMe is failed with clone single-select")));
+	QVERIFY2(singleSelection.IsEqual(*singleSelectionPtr), "Function CSelection::CloneMe is failed with clone single-select");
 }
 
 
@@ -164,7 +164,7 @@ void CSelectionTest::CloneMeMultiSelectTest()
 	imtbase::CSelection multiSelection(imtbase::ISelection::SelectionMode::SM_MULTI);
 	multiSelection.SetSelectedIds(m_testMultiSelectedIds);
 	auto multiSelectionPtr = multiSelection.CloneMe();
-	QVERIFY2(multiSelection.IsEqual(*multiSelectionPtr), qPrintable(QString("Function CSelection::CloneMe is failed with clone multi-select")));
+	QVERIFY2(multiSelection.IsEqual(*multiSelectionPtr), "Function CSelection::CloneMe is failed with clone multi-select");
 }
 
 
@@ -174,7 +174,7 @@ void CSelectionTest::CheckSerializeMemoryTest()
 	multiSelection.SetSelectedIds(m_testMultiSelectedIds);
 	iser::CMemoryWriteArchive memoryWritedArchive;
 	bool checkSerializeMemory = multiSelection.Serialize(memoryWritedArchive);
-	QVERIFY2(checkSerializeMemory, qPrintable(QString("Function CSelection::Serialize is failed")));
+	QVERIFY2(checkSerializeMemory, "Function CSelection::Serialize is failed");
 }
 
 
@@ -213,7 +213,7 @@ void CSelectionTest::CheckSerializeXmlTest()
 	multiSelection.SetSelectedIds(m_testMultiSelectedIds);
 	iser::CXmlStringWriteArchive xmlWritedArchive;
 	bool checkSerializeXml = multiSelection.Serialize(xmlWritedArchive);
-	QVERIFY2(checkSerializeXml, qPrintable(QString("Function CSelection::Serialize is failed")));
+	QVERIFY2(checkSerializeXml, "Function CSelection::Serialize is failed");
 }
 
 
@@ -252,7 +252,7 @@ void CSelectionTest::ResetDataTest()
 	multiSelection.SetSelectedIds(m_testMultiSelectedIds);
 	multiSelection.ResetData();
 	imtbase::ISelection::Ids multiSelectionIds = multiSelection.GetSelectedIds();
-	QVERIFY2(multiSelectionIds.isEmpty(), qPrintable(QString("Function CSelection::ResetData is failed")));
+	QVERIFY2(multiSelectionIds.isEmpty(), "Function CSelection::ResetData is failed");
 }
 
 

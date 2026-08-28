@@ -61,7 +61,7 @@ void CDdlCodeCreatorProcessorsControllerComp::OnComponentCreated()
 		}
 
 	}
-	SendInfoMessage(0, ::qPrintable(beginInfoString));
+	SendInfoMessage(0, ::beginInfoString);
 	for (int i = 0; i < m_ddlProcessors.GetCount(); ++i){
 		if(m_ddlProcessors[i]->DoProcessing(&ddlParams, nullptr, nullptr, nullptr, nullptr) != iproc::IProcessor::TS_OK){
 			::exit(-1);

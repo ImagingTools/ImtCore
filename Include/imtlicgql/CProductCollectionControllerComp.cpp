@@ -51,12 +51,12 @@ sdl::V1_0::imtbase::CImportObjectPayload CProductCollectionControllerComp::OnImp
 									if (!featureIds.contains(productFeatureId)){
 										QByteArray result = m_featureCollectionCompPtr->InsertNewObject(QByteArrayLiteral("Feature"), "", "", featureInfoPtr, productFeatureId);
 										if (result.isEmpty()){
-											SendWarningMessage(0, QString("Unable to insert new feature with ID '%1' from product serialization").arg(qPrintable(productFeatureId)), "CProductControllerComp");
+											SendWarningMessage(0, QString("Unable to insert new feature with ID '%1' from product serialization").arg(productFeatureId), "CProductControllerComp");
 										}
 									}
 									else{
 										if (!m_featureCollectionCompPtr->SetObjectData(productFeatureId, *featureInfoPtr)){
-											SendWarningMessage(0, QString("Unable to update feature with ID '%1' from product serialization").arg(qPrintable(productFeatureId)), "CProductControllerComp");
+											SendWarningMessage(0, QString("Unable to update feature with ID '%1' from product serialization").arg(productFeatureId), "CProductControllerComp");
 										}
 									}
 								}
@@ -122,7 +122,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (productInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to create representation from object '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
 
 		return false;
@@ -421,7 +421,7 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 	if (!collectionIds.isEmpty()){
 		QByteArray id = collectionIds[0];
 		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QString("Product '%1' already exists")).arg(qPrintable(productId));
+			errorMessage = QT_TR_NOOP(QString("Product '%1' already exists")).arg(productId);
 
 			return false;
 		}
@@ -459,7 +459,7 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 	if (!collectionIds2.isEmpty()){
 		QByteArray id = collectionIds2[0];
 		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QString("Product name '%1' already exists, please rename")).arg(qPrintable(name));
+			errorMessage = QT_TR_NOOP(QString("Product name '%1' already exists, please rename")).arg(name);
 
 			return false;
 		}

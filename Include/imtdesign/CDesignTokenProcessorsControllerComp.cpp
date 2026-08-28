@@ -58,7 +58,7 @@ void CDesignTokenProcessorsControllerComp::OnComponentCreated()
 			beginInfoString += "\n\t| Qml Generate";
 		}
 	}
-	SendInfoMessage(0, ::qPrintable(beginInfoString));
+	SendInfoMessage(0, ::beginInfoString);
 
 	QString lockFileName = m_argumentParserCompPtr->GetOutputDirectoryPath() + "/DesignToken.lock";
 	QLockFile lockFile(lockFileName);

@@ -51,7 +51,7 @@ bool CRoleDocumentValidatorComp::ValidateDocumentData(
 			const imtauth::IRole* currentRoleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
 			if (currentRoleInfoPtr != nullptr){
 				if (currentRoleInfoPtr->GetRoleId() == roleId && currentRoleInfoPtr->GetProductId() == productId){
-					errorMessage = QString("Role with ID: '%1' already exists").arg(qPrintable(roleId));
+					errorMessage = QString("Role with ID: '%1' already exists").arg(roleId);
 					return false;
 				}
 			}

@@ -452,7 +452,7 @@ bool CFileCollectionComp::RemoveElements(
 			m_files.removeAt(fileIndex);
 		}
 		else{
-			SendInfoMessage(0, QT_TR_NOOP(QString("Resource '%1' doesn't exist").arg(qPrintable(elementId))));
+			SendInfoMessage(0, QT_TR_NOOP(QString("Resource '%1' doesn't exist").arg(elementId)));
 		}
 	}
 

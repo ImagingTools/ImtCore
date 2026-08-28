@@ -92,7 +92,7 @@ QSsl::EncodingFormat CSslConfigurationManagerComp::GetEncodingFormatFromParams(c
 		}
 	}
 	else{
-		SendWarningMessage(0, QString("No selection param for SSL EncodingFormat is set. PEM will be setted. Set '%1' param to fix it.").arg(qPrintable(ParamKeys::s_encodingFormatParamKey)));
+		SendWarningMessage(0, QString("No selection param for SSL EncodingFormat is set. PEM will be setted. Set '%1' param to fix it.").arg(ParamKeys::s_encodingFormatParamKey));
 	}
 
 	switch (sslEncodingFormat){

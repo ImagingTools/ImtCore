@@ -367,7 +367,7 @@ QByteArray CTenantDbDelegateComp::ExtractUserId(const iprm::IParamsSet* paramsPt
 
 QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& userId) const
 {
-	QString tableName = qPrintable(*m_tableNameAttrPtr);
+	QString tableName = *m_tableNameAttrPtr;
 	if (userId.isEmpty()){
 		return QString("SELECT *, NULL AS \"TenantRelationScope\" FROM \"%1\"").arg(tableName);
 	}
@@ -480,13 +480,13 @@ QByteArray CTenantDbDelegateComp::GetSelectionQuery(
 		retVal = baseQuery;
 		retVal += QString(" ") + filterQuery;
 		retVal += QString(" ") + sortQuery;
-		retVal += QString(" ") + qPrintable(paginationQuery);
+		retVal += QString(" ") + QString(paginationQuery);
 	}
 	else{
 		// PostgreSQL: wrap in parens as workaround for Qt bug with '%<NUMBER>%' pattern
 		retVal = "(" + baseQuery;
 		retVal += QString(" ") + filterQuery;
-		retVal += QString(" ") + qPrintable(paginationQuery) + ")";
+		retVal += QString(" ") + QString(paginationQuery) + ")";
 		retVal += QString(" ") + sortQuery;
 	}
 

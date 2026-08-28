@@ -194,7 +194,7 @@ ifile::IFilePersistence::OperationState CQmldirFilePersistenceComp::SaveToFile(
 	// module name
 	iprm::TParamsPtr<iprm::INameParam> moduleNameParam(paramsSetPtr, QmldirModelParamIds::ModuleName);
 	if (!moduleNameParam.IsValid()){
-		SendErrorMessage(0, QString("Name param '%1' is missing").arg(qPrintable(QmldirModelParamIds::ModuleName)));
+		SendErrorMessage(0, QString("Name param '%1' is missing").arg(QmldirModelParamIds::ModuleName));
 		I_CRITICAL();
 
 		return OS_FAILED;

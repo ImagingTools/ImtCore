@@ -55,7 +55,7 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 	}
 
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to get a profile info. Error: User with ID '%1' does not exists").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to get a profile info. Error: User with ID '%1' does not exists").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CProfileControllerComp");
 		return sdl::V1_0::imtauth::CProfileData();
 	}
@@ -381,7 +381,7 @@ sdl::V1_0::imtauth::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 	}
 
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to set a profile info. Error: User with ID '%1' does not exists").arg(qPrintable(id));
+		errorMessage = QString("Unable to set a profile info. Error: User with ID '%1' does not exists").arg(id);
 		return sdl::V1_0::imtauth::CSetProfileResponse();
 	}
 
@@ -399,7 +399,7 @@ sdl::V1_0::imtauth::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 	userInfoPtr->SetMail(email);
 
 	if (!m_userCollectionCompPtr->SetObjectData(id, *userInfoPtr)){
-		errorMessage = QString("Unable to set a profile info. Error: User collection cannot to update an object with ID '%1'").arg(qPrintable(id));
+		errorMessage = QString("Unable to set a profile info. Error: User collection cannot to update an object with ID '%1'").arg(id);
 
 		return sdl::V1_0::imtauth::CSetProfileResponse();
 	}

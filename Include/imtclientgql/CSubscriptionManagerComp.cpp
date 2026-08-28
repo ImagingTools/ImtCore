@@ -164,7 +164,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		QJsonParseError jsonError;
 		QJsonDocument jsonDocument = QJsonDocument::fromJson(message, &jsonError);
 		if (jsonDocument.isNull()){
-			QByteArray errorMessage = QString("Unable to convert message to JSON: '%1'").arg(qPrintable(jsonError.errorString())).toUtf8();
+			QByteArray errorMessage = QString("Unable to convert message to JSON: '%1'").arg(jsonError.errorString()).toUtf8();
 			qDebug() << errorMessage;
 
 			locker.unlock();

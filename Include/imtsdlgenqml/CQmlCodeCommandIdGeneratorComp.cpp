@@ -176,7 +176,7 @@ iproc::IProcessor::TaskState CQmlCodeCommandIdGeneratorComp::DoProcessing(
 
 	iprm::IParamsManager* objectsManagerPtr = dynamic_cast<iprm::IParamsManager*>(qmlPrefixParams->GetEditableParameter(imtsdl::QtResourceModelParamIds::QrcObjects));
 	if (objectsManagerPtr == nullptr){
-		SendCriticalMessage(0, QString("Params manager  '%1' is not valid!").arg(qPrintable(imtsdl::QtResourceModelParamIds::QrcObjects)));
+		SendCriticalMessage(0, QString("Params manager  '%1' is not valid!").arg(imtsdl::QtResourceModelParamIds::QrcObjects));
 		I_CRITICAL();
 
 		return TS_INVALID;
@@ -188,7 +188,7 @@ iproc::IProcessor::TaskState CQmlCodeCommandIdGeneratorComp::DoProcessing(
 
 	iprm::INameParam* fileNameParam = dynamic_cast<iprm::INameParam*>(fileParamsSet->GetEditableParameter(imtsdl::QtResourceModelParamIds::QrcFileName));
 	if (fileNameParam == nullptr){
-		SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(qPrintable(imtsdl::QtResourceModelParamIds::QrcFileName)));
+		SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(imtsdl::QtResourceModelParamIds::QrcFileName));
 		I_CRITICAL();
 
 		return TS_INVALID;
@@ -197,7 +197,7 @@ iproc::IProcessor::TaskState CQmlCodeCommandIdGeneratorComp::DoProcessing(
 
 	iprm::INameParam* aliasNameParam = dynamic_cast<iprm::INameParam*>(fileParamsSet->GetEditableParameter(imtsdl::QtResourceModelParamIds::QrcAlias));
 	if (aliasNameParam == nullptr){
-		SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(qPrintable(imtsdl::QtResourceModelParamIds::QrcAlias)));
+		SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(imtsdl::QtResourceModelParamIds::QrcAlias));
 		I_CRITICAL();
 
 		return TS_INVALID;

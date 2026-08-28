@@ -182,7 +182,7 @@ void CSystemStatusComp::CheckStatus()
 	if (m_connectionStatusProviderCompPtr.IsValid()){
 		imtcom::IConnectionStatusProvider::ConnectionStatus serverConnectionStatus = m_connectionStatusProviderCompPtr->GetConnectionStatus();
 		if (serverConnectionStatus != imtcom::IConnectionStatusProvider::ConnectionStatus::CS_CONNECTED){
-			m_statusMessage = QObject::tr("The %1 server cannot be connected at %2.").arg(qPrintable(*m_serverNameAttrPtr)).arg(m_workingUrl.toString());
+			m_statusMessage = QObject::tr("The %1 server cannot be connected at %2.").arg(*m_serverNameAttrPtr).arg(m_workingUrl.toString());
 			m_futureResultStatus = ISystemStatus::SS_SERVER_CONNECTION_ERROR;
 
 			return;
@@ -194,7 +194,7 @@ void CSystemStatusComp::CheckStatus()
 			QString error;
 			bool isConnected = m_dbServerConnectionCheckerCompPtr->CheckDatabaseConnection(error);
 			if (!isConnected){
-				error = QString("%1 %2").arg(qPrintable(*m_serverNameAttrPtr)).arg(error);
+				error = QString("%1 %2").arg(*m_serverNameAttrPtr).arg(error);
 
 				m_statusMessage = error;
 				m_futureResultStatus = ISystemStatus::SS_DATABASE_CONNECTION_ERROR;

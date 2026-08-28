@@ -42,7 +42,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (licenseInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to create representation from object '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
 
 		return false;
@@ -295,7 +295,7 @@ bool CLicenseCollectionControllerComp::FillObjectFromRepresentation(
 	if (!collectionIds.isEmpty()){
 		QByteArray id = collectionIds[0];
 		if (newObjectId != id){
-			errorMessage = QT_TR_NOOP(QString("License-ID: '%1' already exists.")).arg(qPrintable(licenseId));
+			errorMessage = QT_TR_NOOP(QString("License-ID: '%1' already exists.")).arg(licenseId);
 
 			return false;
 		}

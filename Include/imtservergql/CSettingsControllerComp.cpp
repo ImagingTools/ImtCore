@@ -67,19 +67,19 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 	QJsonParseError error;
 	QJsonDocument representationDoc = QJsonDocument::fromJson(settings.toUtf8(), &error);
 	if (error.error != QJsonParseError::NoError){
-		errorMessage = QString("Unable to set settings for user '%1'. Error: Settings json invalid").arg(qPrintable(userId));
+		errorMessage = QString("Unable to set settings for user '%1'. Error: Settings json invalid").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
 	
 	if (!m_userSettingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(representationDoc.object(), *paramSetPtr)){
-		errorMessage = QString("Unable to set settings for user '%1'. Error: Get data model from representation failed").arg(qPrintable(userId));
+		errorMessage = QString("Unable to set settings for user '%1'. Error: Get data model from representation failed").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
 	
 	if (!SetUserSettings(userId, *userSettingsPtr)){
-		errorMessage = QString("Unable to set settings for user '%1'").arg(qPrintable(userId));
+		errorMessage = QString("Unable to set settings for user '%1'").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
@@ -142,7 +142,7 @@ sdl::V1_0::imtbase::CParamsSet CSettingsControllerComp::OnGetSettings(
 	
 	imtauth::IUserSettingsSharedPtr userSettingsPtr = GetOrCreateUserSettings(userId);
 	if (!userSettingsPtr.IsValid()){
-		errorMessage = QString("Unable to get settings for user '%1'. Error: User settings is invalid").arg(qPrintable(userId));
+		errorMessage = QString("Unable to get settings for user '%1'. Error: User settings is invalid").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
@@ -157,13 +157,13 @@ sdl::V1_0::imtbase::CParamsSet CSettingsControllerComp::OnGetSettings(
 	
 	QJsonObject representationObject;
 	if (!m_userSettingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*paramSetPtr, representationObject, &paramsSet)){
-		errorMessage = QString("Unable to get settings for user '%1'. Error: Get representation failed").arg(qPrintable(userId));
+		errorMessage = QString("Unable to get settings for user '%1'. Error: Get representation failed").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
 	
 	if (!response.ReadFromJsonObject(representationObject)){
-		errorMessage = QString("Unable to get settings for user '%1'. Error: Read from Json object failed").arg(qPrintable(userId));
+		errorMessage = QString("Unable to get settings for user '%1'. Error: Read from Json object failed").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}

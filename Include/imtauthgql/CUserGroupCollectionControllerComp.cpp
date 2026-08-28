@@ -263,7 +263,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (userGroupInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to create representation from object '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
 
 		return false;

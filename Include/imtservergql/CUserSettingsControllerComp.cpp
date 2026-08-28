@@ -163,7 +163,7 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 	iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
 	Q_ASSERT(paramSetPtr != nullptr);
 	if (paramSetPtr == nullptr){
-		SendErrorMessage(0, QString("Unable to get setting from user: '%1'.").arg(qPrintable(userId)));
+		SendErrorMessage(0, QString("Unable to get setting from user: '%1'.").arg(userId));
 
 		return false;
 	}

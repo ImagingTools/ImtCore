@@ -113,7 +113,7 @@ void CProductInstanceInfoViewComp::UpdateProductName()
 	Q_ASSERT(productInstanceInfoPtr != nullptr);
 
 	QString selectedProductId = productInstanceInfoPtr->GetProductId();
-	ProductNameEdit->setText(qPrintable(selectedProductId));
+	ProductNameEdit->setText(selectedProductId);
 
 	const imtbase::IObjectCollection* productsCollectionPtr = productInstanceInfoPtr->GetProductDatabase();
 	if (productsCollectionPtr != nullptr){

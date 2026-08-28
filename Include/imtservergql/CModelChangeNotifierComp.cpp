@@ -48,8 +48,8 @@ void CModelChangeNotifierComp::OnUpdate(const istd::IChangeable::ChangeSet& /*ch
 			}
 
 			QByteArray body = QString(R"({"type": "data","id": "%1","payload": {"data": {"%2": {}}}})")
-				.arg(qPrintable(id))
-				.arg(qPrintable(networkRequest->GetCommandId()))
+				.arg(id)
+				.arg(networkRequest->GetCommandId())
 				.toUtf8();
 			QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
 			const imtrest::IProtocolEngine& engine = networkRequest->GetProtocolEngine();

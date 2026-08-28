@@ -345,8 +345,8 @@ QJsonObject CStructureControllerCompBase::InsertNewObject(
 
 	QByteArray newObjectId =  collectionStructureController->InsertNewObjectIntoCollection(m_objectCollectionCompPtr.GetPtr(), nodeId, typeId, name, description, newObjectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
 	if (newObjectId.isEmpty()){
-		errorMessage = QT_TR_NOOP(QString("Can not insert object: %1").arg(qPrintable(objectId)));
-		SendErrorMessage(0, QString("Can not insert object: %1").arg(qPrintable(objectId)), "Object collection controller");
+		errorMessage = QT_TR_NOOP(QString("Can not insert object: %1").arg(objectId));
+		SendErrorMessage(0, QString("Can not insert object: %1").arg(objectId), "Object collection controller");
 
 		return QJsonObject();
 	}

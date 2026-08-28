@@ -100,7 +100,8 @@ istd::IChangeableUniquePtr CDocumentServiceCompBase::CreateObject(const QByteArr
 		return m_objectFactListCompPtr.CreateInstance(index);
 	}
 
-	Q_ASSERT_X(false, "CDocumentServiceCompBase::CreateObject", qPrintable(QString("Factory not found for the type: '%1'").arg(qPrintable(typeId))));
+	const QByteArray errorMessage = QString("Factory not found for the type: '%1'").arg(typeId).toUtf8();
+	Q_ASSERT_X(false, "CDocumentServiceCompBase::CreateObject", errorMessage.constData());
 
 	return nullptr;
 }
@@ -112,7 +113,8 @@ idoc::IUndoManagerUniquePtr CDocumentServiceCompBase::CreateUndoManager() const
 		return m_undoManagerFactPtr.CreateInstance();
 	}
 
-	Q_ASSERT_X(false, "CDocumentServiceCompBase::CreateUndoManager", qPrintable(QString("Factory not found")));
+	const QByteArray errorMessage = QString("Factory not found").toUtf8();
+	Q_ASSERT_X(false, "CDocumentServiceCompBase::CreateUndoManager", errorMessage.constData());
 
 	return nullptr;
 }

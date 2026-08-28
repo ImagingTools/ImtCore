@@ -29,7 +29,7 @@ void CQtResourceLoaderComp::OnComponentCreated()
 			iser::CCompactXmlMemReadArchive archive(data);
 
 			if (!m_targetObjectCompPtr->Serialize(archive)){
-				SendErrorMessage(0, QString("Unable to load resource '%1'. Error: Serialization failed").arg(qPrintable(path)), QString("CQtResourceLoaderComp"));
+				SendErrorMessage(0, QString("Unable to load resource '%1'. Error: Serialization failed").arg(path), QString("CQtResourceLoaderComp"));
 			}
 		}
 	}

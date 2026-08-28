@@ -131,7 +131,7 @@ sdl::V1_0::imtbase::CRevisionInfoList CDocumentRevisionControllerComp::OnGetRevi
 
 	const imtbase::IRevisionController* revisionControllerPtr = objectCollectionPtr->GetRevisionController();
 	if (revisionControllerPtr == nullptr){
-		errorMessage = QString("Unable to get revision list for document '%1'. Error: revision controller is invalid").arg(qPrintable(documentId));
+		errorMessage = QString("Unable to get revision list for document '%1'. Error: revision controller is invalid").arg(documentId);
 		return sdl::V1_0::imtbase::CRevisionInfoList();
 	}
 
@@ -263,19 +263,19 @@ sdl::V1_0::imtbase::CRestoreRevisionResponse CDocumentRevisionControllerComp::On
 	imtbase::IObjectCollection* objectCollectionPtr = FindObjectCollection(collectionId);
 	if (objectCollectionPtr == nullptr){
 		errorMessage = QString("Unable to set revision '%1' for document '%2'. Error: No collection configured for '%3'")
-					.arg(revisionNumber).arg(qPrintable(documentId), QString::fromUtf8(collectionId));
+					.arg(revisionNumber).arg(documentId, QString::fromUtf8(collectionId));
 		return sdl::V1_0::imtbase::CRestoreRevisionResponse();
 	}
 
 	const imtbase::IRevisionController* revisionControllerPtr = objectCollectionPtr->GetRevisionController();
 	if (revisionControllerPtr == nullptr){
-		errorMessage = QString("Unable to set revision '%1' for document '%2'. Error: revision controller is invalid").arg(revisionNumber).arg(qPrintable(documentId));
+		errorMessage = QString("Unable to set revision '%1' for document '%2'. Error: revision controller is invalid").arg(revisionNumber).arg(documentId);
 		return sdl::V1_0::imtbase::CRestoreRevisionResponse();
 	}
 
 	bool ok = revisionControllerPtr->RestoreRevision(*objectCollectionPtr, documentId, revisionNumber);
 	if (!ok){
-		errorMessage = QString("Unable to set revision '%1' for document '%2'. Error: Restoring object failed").arg(revisionNumber).arg(qPrintable(documentId));
+		errorMessage = QString("Unable to set revision '%1' for document '%2'. Error: Restoring object failed").arg(revisionNumber).arg(documentId);
 		return sdl::V1_0::imtbase::CRestoreRevisionResponse();
 	}
 
@@ -342,13 +342,13 @@ sdl::V1_0::imtbase::CDeleteRevisionResponse CDocumentRevisionControllerComp::OnD
 	imtbase::IObjectCollection* objectCollectionPtr = FindObjectCollection(collectionId);
 	if (objectCollectionPtr == nullptr){
 		errorMessage = QString("Unable to delete revision '%1' for document '%2'. Error: No collection configured for '%3'")
-					.arg(revisionNumber).arg(qPrintable(documentId), QString::fromUtf8(collectionId));
+					.arg(revisionNumber).arg(documentId, QString::fromUtf8(collectionId));
 		return sdl::V1_0::imtbase::CDeleteRevisionResponse();
 	}
 
 	const imtbase::IRevisionController* revisionControllerPtr = objectCollectionPtr->GetRevisionController();
 	if (revisionControllerPtr == nullptr){
-		errorMessage = QString("Unable to delete revision '%1' for document '%2'. Error: revision controller is invalid").arg(revisionNumber).arg(qPrintable(documentId));
+		errorMessage = QString("Unable to delete revision '%1' for document '%2'. Error: revision controller is invalid").arg(revisionNumber).arg(documentId);
 		return sdl::V1_0::imtbase::CDeleteRevisionResponse();
 	}
 

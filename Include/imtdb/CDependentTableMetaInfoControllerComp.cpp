@@ -84,7 +84,7 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 					)").arg(isDocumentSource ? "Document" : "DataMetaInfo",
 							dependentMetaInfoName,
 							*m_dependentTableNameAttrPtr,
-							qPrintable(elementId));
+							elementId);
 
 		dependentMetaInfo.metaInfoValues << selectValue;
 	}

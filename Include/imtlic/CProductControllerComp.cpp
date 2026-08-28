@@ -44,7 +44,7 @@ bool CProductControllerComp::GetData(
 	}
 
 	if (productInfoPtr == nullptr){
-		SendErrorMessage(0, QString("Unable to get product with ID %1.").arg(qPrintable(dataId)), "CProductControllerComp");
+		SendErrorMessage(0, QString("Unable to get product with ID %1.").arg(dataId), "CProductControllerComp");
 		return false;
 	}
 
@@ -52,7 +52,7 @@ bool CProductControllerComp::GetData(
 	{
 		ifile::CCompactXmlFileWriteArchive writeArchive(filePathTmp, m_versionInfoCompPtr.GetPtr());
 		if (!productInfoPtr->Serialize(writeArchive)){
-			SendErrorMessage(0, QString("Error when trying to serialize a feature container. Product-ID: %1.").arg(qPrintable(dataId)), "CProductControllerComp");
+			SendErrorMessage(0, QString("Error when trying to serialize a feature container. Product-ID: %1.").arg(dataId), "CProductControllerComp");
 
 			return false;
 		}
@@ -64,12 +64,12 @@ bool CProductControllerComp::GetData(
 		file.close();
 		QFile::remove(filePathTmp);
 
-		SendInfoMessage(0, QString("The product features have been successfully exported. Product-ID: %1.").arg(qPrintable(dataId)), "CProductControllerComp");
+		SendInfoMessage(0, QString("The product features have been successfully exported. Product-ID: %1.").arg(dataId), "CProductControllerComp");
 
 		return true;
 	}
 
-	SendErrorMessage(0, QString("Error when trying to export product features. Product-ID: %1.").arg(qPrintable(dataId)), "CProductControllerComp");
+	SendErrorMessage(0, QString("Error when trying to export product features. Product-ID: %1.").arg(dataId), "CProductControllerComp");
 
 	return false;
 }
@@ -105,7 +105,7 @@ bool CProductControllerComp::SetData(const QByteArray& data, QByteArray& dataId)
 
 	ifile::CCompactXmlFileReadArchive archive(filePathTmp);
 	if (!productInfo.Serialize(archive)){
-		SendErrorMessage(0, QString("Error when trying to serialize a feature container. Product-ID: %1.").arg(qPrintable(dataId)), "CProductControllerComp");
+		SendErrorMessage(0, QString("Error when trying to serialize a feature container. Product-ID: %1.").arg(dataId), "CProductControllerComp");
 
 		return false;
 	}
@@ -133,7 +133,7 @@ bool CProductControllerComp::SetData(const QByteArray& data, QByteArray& dataId)
 					if (featureInfoPtr != nullptr){
 						QByteArray result = m_featureCollectionCompPtr->InsertNewObject("", "", "", featureInfoPtr, productFeatureId);
 						if (result.isEmpty()){
-							SendWarningMessage(0, QString("Unable to insert new feature with ID '%1' from product serialization").arg(qPrintable(productFeatureId)), "CProductControllerComp");
+							SendWarningMessage(0, QString("Unable to insert new feature with ID '%1' from product serialization").arg(productFeatureId), "CProductControllerComp");
 						}
 					}
 				}

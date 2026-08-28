@@ -361,9 +361,9 @@ void CSdlGenQmlTest::TestGenerationResultJsonFormat()
 	QJsonParseError actualParseError;
 	QJsonDocument actualDoc = QJsonDocument::fromJson(actualJson, &actualParseError);
 	QVERIFY2(actualParseError.error == QJsonParseError::NoError, 
-			qPrintable(QString("Failed to parse actual JSON: %1 at offset %2")
+			QString("Failed to parse actual JSON: %1 at offset %2")
 					.arg(actualParseError.errorString())
-					.arg(actualParseError.offset)));
+					.arg(actualParseError.offset));
 	QByteArray actualJsonIndented = actualDoc.toJson(QJsonDocument::Indented);
 
 	// Write actual JSON to file in temp output directory
