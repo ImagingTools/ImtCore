@@ -85,7 +85,7 @@ ifile::IFilePersistence::OperationState CQtResourceFilePersistenceComp::LoadFrom
 	int errorSymbol = -1;
 	if (!qrcDocument.setContent(&loadFile, &errorString, &errorLine, &errorSymbol)){
 		SendErrorMessage(0, QStringLiteral("XML error on line %1, col %2: %3")
-								.arg(errorLine, errorSymbol, errorString));
+								.arg(QString::number(errorLine), QString::number(errorSymbol), errorString));
 
 		return OS_FAILED;
 	}

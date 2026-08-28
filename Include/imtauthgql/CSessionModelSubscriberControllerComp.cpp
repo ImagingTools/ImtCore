@@ -33,7 +33,7 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 	QJsonArray idsArray;
 	for (int id : ids){
 		QJsonObject obj;
-		obj["id"] = QJsonValue(QString::number(id));
+		obj[QStringLiteral("id")] = QJsonValue(QString::number(id));
 		idsArray.append(obj);
 	}
 
@@ -45,9 +45,9 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 	}
 
 	QJsonObject rootObject;
-	rootObject["ids"] = idsArray;
-	rootObject["infoMap"] = changeObj;
-	rootObject["description"] = changeSet.GetDescription();
+	rootObject[QStringLiteral("ids")] = idsArray;
+	rootObject[QStringLiteral("infoMap")] = changeObj;
+	rootObject[QStringLiteral("description")] = changeSet.GetDescription();
 
 	QJsonDocument changeSetDocument;
 	changeSetDocument.setObject(rootObject);
@@ -55,11 +55,10 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequest = requestNetworks.networkRequests[id];
-			QByteArray body = QString(R"({"type": "data", "id": "%1","payload":{"data": {"token": "%2", "changeSet": %3}}})")
-								.arg(id)
-								.arg(sessionId)
-								.arg(changeSetDocument.toJson(QJsonDocument::Compact)).toUtf8();
-			QByteArray responseTypeId("application/json; charset=utf-8");
+			QByteArray body = QStringLiteral(R"({"type": "data", "id": "%1","payload":{"data": {"token": "%2", "changeSet": %3}}})")
+								.arg(id, sessionId, changeSetDocument.toJson(QJsonDocument::Compact)).toUtf8();
+
+			QByteArray responseTypeId(QByteArrayLiteral("application/json; charset=utf-8"));
 			const imtrest::IProtocolEngine& engine = networkRequest->GetProtocolEngine();
 
 			imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OK, body, responseTypeId).PopInterfacePtr());
