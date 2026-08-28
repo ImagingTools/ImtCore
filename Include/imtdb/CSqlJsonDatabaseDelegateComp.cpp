@@ -442,7 +442,7 @@ bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
 		QString encodedFilter = SqlEncode(textFilter);
-		textFilterQuery = QStringLiteral("\"Document\"->>'%1' ILIKE '%%2%'").arg(filteringColumnIds.first()).arg(encodedFilter);
+		textFilterQuery = QStringLiteral(R"("Document"->>'%1' ILIKE '%%2%')").arg(filteringColumnIds.first(), encodedFilter);
 
 		for (int i = 1; i < filteringColumnIds.count(); ++i){
 			textFilterQuery += " OR ";
@@ -762,4 +762,3 @@ bool CSqlJsonDatabaseDelegateComp::TableExists(const QString& tableName) const
 
 
 } // namespace imtdb
-

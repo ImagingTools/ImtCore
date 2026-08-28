@@ -82,7 +82,7 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 	}
 
 	QString dropCommand = QStringLiteral("psql -h %1 -U %2 -p %3 -c \"%4\"")
-							  .arg(host, userName, QString::number(port), QStringLiteral("DROP DATABASE \"%1\" WITH (FORCE)").arg(dbName));
+							  .arg(host, userName, QString::number(port), QStringLiteral(R"(DROP DATABASE "%1" WITH (FORCE))").arg(dbName));
 
 	if (!ExecuteCommand(process, dropCommand)){
 		SendErrorMessage(0, QStringLiteral("Unable to execute command %1").arg(dropCommand), "CRestoringDatabaseControllerComp");
@@ -91,7 +91,7 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 	}
 
 	QString createCommand = QStringLiteral("psql -h %1 -U %2 -p %3 -c \"%4\"")
-								.arg(host, userName, QString::number(port), QStringLiteral("CREATE DATABASE \"%1\"").arg(dbName));
+								.arg(host, userName, QString::number(port), QStringLiteral(R"(CREATE DATABASE "%1")").arg(dbName));
 
 	if (!ExecuteCommand(process, createCommand)){
 		SendErrorMessage(0, QStringLiteral("Unable to execute command %1").arg(createCommand), "CRestoringDatabaseControllerComp");
@@ -208,5 +208,4 @@ bool CRestoringDatabaseControllerComp::ExecuteCommand(QProcess& process, const Q
 
 
 } // namespace imtdb
-
 

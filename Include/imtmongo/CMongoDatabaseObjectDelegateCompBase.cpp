@@ -209,7 +209,7 @@ bool CMongoDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
 
 //	QString textFilter = collectionFilter.GetTextFilter();
 //	if (!textFilter.isEmpty()){
-//        textFilterQuery = QStringLiteral("\"%1\" ILIKE '%%2%'").arg(filteringColumnIds.first()).arg(textFilter);
+//        textFilterQuery = QStringLiteral(R"("%1" ILIKE '%%2%')").arg(filteringColumnIds.first(), textFilter);
 
 //		for (int i = 1; i < filteringColumnIds.count(); ++i){
 //			textFilterQuery += " OR ";
@@ -306,5 +306,4 @@ QString CMongoDatabaseObjectDelegateCompBase::GetTableName() const
 }
 
 } // namespace imtmongo
-
 

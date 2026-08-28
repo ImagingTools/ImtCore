@@ -449,7 +449,7 @@ bool CSqlStructureDelegateComp::CreateTextFilterQuery(
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
 		QString encodedFilter = SqlEncode(textFilter);
-		textFilterQuery = QStringLiteral("\"%1\" ILIKE '%%2%'").arg(filteringColumnIds.first()).arg(encodedFilter);
+		textFilterQuery = QStringLiteral(R"("%1" ILIKE '%%2%')").arg(filteringColumnIds.first(), encodedFilter);
 
 		for (int i = 1; i < filteringColumnIds.count(); ++i){
 			textFilterQuery += " OR ";
@@ -497,5 +497,4 @@ bool CSqlStructureDelegateComp::CreateSortQuery(
 
 
 } // namespace imtdb
-
 

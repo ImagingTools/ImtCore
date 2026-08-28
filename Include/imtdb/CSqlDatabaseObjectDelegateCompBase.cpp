@@ -554,7 +554,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
 	}
 
 	QString encodedFilter = SqlEncode(textFilter);
-	textFilterQuery = QStringLiteral(R"("%1" ILIKE '%%2%')").arg(filteringColumnIds.first()).arg(encodedFilter);
+	textFilterQuery = QStringLiteral(R"("%1" ILIKE '%%2%')").arg(filteringColumnIds.first(), encodedFilter);
 
 	for (int i = 1; i < filteringColumnIds.count(); ++i){
 		textFilterQuery += QStringLiteral(" OR ");
@@ -796,4 +796,3 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTableIfNeeded()
 
 
 } // namespace imtdb
-

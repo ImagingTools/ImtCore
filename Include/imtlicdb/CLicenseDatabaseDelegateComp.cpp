@@ -80,7 +80,7 @@ bool CLicenseDatabaseDelegateComp::CreateTextFilterQuery(const imtbase::ICollect
 			}
 
 			if (filteringColumnIds[i] == "ProductId"){
-				textFilterQuery += QStringLiteral("%1 ILIKE '%%2%'").arg(R"((SELECT "Document"->>'ProductId' FROM "Products" as pr WHERE pr."DocumentId" = root."Document"->>'ProductId' AND pr."IsActive" = true))").arg(encodedFilter);
+				textFilterQuery += QStringLiteral("%1 ILIKE '%%2%'").arg(R"((SELECT "Document"->>'ProductId' FROM "Products" as pr WHERE pr."DocumentId" = root."Document"->>'ProductId' AND pr."IsActive" = true))", encodedFilter);
 			}
 			else{
 				textFilterQuery += QStringLiteral("\"Document\"->>'%1' ILIKE '%%2%'").arg(filteringColumnIds[i], encodedFilter);
@@ -137,5 +137,4 @@ bool CLicenseDatabaseDelegateComp::SetCollectionItemMetaInfoFromRecord(const QSq
 
 
 } // namespace imtlicdb
-
 

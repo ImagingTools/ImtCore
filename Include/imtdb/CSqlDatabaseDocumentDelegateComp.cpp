@@ -1534,7 +1534,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::ICollectio
 			sortQuery = QStringLiteral("ORDER BY root.\"%1\" %2").arg(columnId, sortOrder);
 		}
 		else{
-			sortQuery = QStringLiteral("ORDER BY %1 %2").arg(CreateJsonExtractSql(QString(R"(root."%1")").arg(s_dataMetaInfoColumn), columnId), sortOrder);
+			sortQuery = QStringLiteral("ORDER BY %1 %2").arg(CreateJsonExtractSql(QStringLiteral(R"(root."%1")").arg(s_dataMetaInfoColumn), columnId), sortOrder);
 		}
 	}
 

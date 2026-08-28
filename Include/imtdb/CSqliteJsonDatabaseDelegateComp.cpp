@@ -138,7 +138,7 @@ bool CSqliteJsonDatabaseDelegateComp::CreateTextFilterQuery(const imtbase::IColl
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
 		QString encodedFilter = SqlEncode(textFilter);
-		textFilterQuery = QStringLiteral("json_extract(\"Document\",'$.%1') LIKE '%%2%'").arg(filteringColumnIds.first()).arg(encodedFilter);
+		textFilterQuery = QStringLiteral(R"(json_extract("Document",'$.%1') LIKE '%%2%')").arg(filteringColumnIds.first(), encodedFilter);
 
 		for (int i = 1; i < filteringColumnIds.count(); ++i){
 			textFilterQuery += " OR ";
@@ -213,4 +213,3 @@ QByteArray CSqliteJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteA
 
 
 } // namespace imtdb
-
