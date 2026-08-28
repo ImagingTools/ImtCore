@@ -263,7 +263,7 @@ sdl::V1_0::imtbase::CRestoreRevisionResponse CDocumentRevisionControllerComp::On
 	imtbase::IObjectCollection* objectCollectionPtr = FindObjectCollection(collectionId);
 	if (objectCollectionPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to set revision '%1' for document '%2'. Error: No collection configured for '%3'")
-					.arg(revisionNumber).arg(documentId, collectionId);
+					.arg(QString::number(revisionNumber), documentId, collectionId);
 		return {};
 	}
 
@@ -342,7 +342,7 @@ sdl::V1_0::imtbase::CDeleteRevisionResponse CDocumentRevisionControllerComp::OnD
 	imtbase::IObjectCollection* objectCollectionPtr = FindObjectCollection(collectionId);
 	if (objectCollectionPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to delete revision '%1' for document '%2'. Error: No collection configured for '%3'")
-					.arg(revisionNumber).arg(documentId, collectionId);
+					.arg(QString::number(revisionNumber), documentId, collectionId);
 		return {};
 	}
 
