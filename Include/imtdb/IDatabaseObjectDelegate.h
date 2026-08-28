@@ -357,6 +357,45 @@ public:
 				bool useExternDelegate = true) const = 0;
 
 	/**
+	 * @brief Creates a parameterized SQL query for updating an existing object
+	 *
+	 * Generates an UPDATE query together with the values for its named placeholders.
+	 * Parameter binding keeps values separate from SQL text, which is required when
+	 * object data contains arbitrary binary bytes.
+	 *
+	 * @param collection The collection containing the object
+	 * @param objectId ID of the object to update
+	 * @param object New object data to serialize
+	 * @param operationContextPtr Context for audit trail
+	 * @param useExternDelegate Whether to use external delegate for serialization (advanced)
+	 * @return NewObjectQuery struct containing SQL and parameter bindings.
+	 *         The objectName field is unused for updates.
+	 *
+	 * @code{.cpp}
+	 * user->SetEmail("newemail@example.com");
+	 * auto updateQuery = delegate->CreateUpdateObjectQueryWithParameters(
+	 *     collection,
+	 *     userId,
+	 *     *user,
+	 *     operationContext
+	 * );
+	 *
+	 * engine->ExecSqlQuery(updateQuery.query, updateQuery.bindValues);
+	 * @endcode
+	 *
+	 * The default implementation preserves the legacy query-only behavior.
+	 * Delegates that need parameter binding should override this method.
+	 *
+	 * @see CreateUpdateObjectQuery(), CreateNewObjectQuery()
+	 */
+	virtual NewObjectQuery CreateUpdateObjectQueryWithParameters(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
+				const imtbase::IOperationContext* operationContextPtr,
+				bool useExternDelegate = true) const = 0;
+
+	/**
 	 * @brief Creates SQL query for renaming an object
 	 * 
 	 * Generates UPDATE query to change only the Name field of an object,
@@ -466,5 +505,3 @@ public:
 
 
 } // namespace imtdb
-
-
