@@ -500,7 +500,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
 							s_documentIdColumn,
 							objectId,
 							s_stateColumn
-							).toUtf8();
+						).toUtf8();
 
 	return retVal;
 }
@@ -774,18 +774,18 @@ bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
 	}
 
 	if (currentRevision == revision){
-		SendErrorMessage(0, QStringLiteral("Unable to delete revision '%1' for document '%2'. Error: Revision '%1' is active").arg(revision, objectId), "Database collection");
+		SendErrorMessage(0, QStringLiteral("Unable to delete revision '%1' for document '%2'. Error: Revision '%1' is active").arg(QString::number(revision), objectId), "Database collection");
 		return false;
 	}
 
-	QByteArray query = QStringLiteral("DELETE  FROM %0 \"%1\" WHERE \"%2\" = '%3' AND %4 = %5;")
+	QByteArray query = QStringLiteral("DELETE FROM %0 \"%1\" WHERE \"%2\" = '%3' AND %4 = %5;")
 						.arg(
 							schemaPrefix,
 							QString(*m_tableNameAttrPtr),
 							s_documentIdColumn,
 							objectId,
 							CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int)
-							)
+						)
 						.arg(revision)
 						.toUtf8();
 	
