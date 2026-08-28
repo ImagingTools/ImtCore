@@ -65,7 +65,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 			return imtrest::ConstResponsePtr();
 
 		default:{
-			QByteArray errorMessage = QString("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
+			QByteArray errorMessage = QStringLiteral("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
 			return CreateErrorResponse(errorMessage, request);
 		}
 		break;
@@ -146,7 +146,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	QByteArray body = request.GetBody();
 	const QJsonDocument document = QJsonDocument::fromJson(body);
 	if (document.isNull() || !document.isObject()) {
-		QString errorMessage = QString("Error when parsing JSON request for command Id: '%1'").arg(request.GetCommandId());
+		QString errorMessage = QStringLiteral("Error when parsing JSON request for command Id: '%1'").arg(request.GetCommandId());
 		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
 
@@ -170,7 +170,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	imtgql::CGqlRequest gqlRequest;
 	qsizetype errorPosition;
 	if (!gqlRequest.ParseQuery(body, errorPosition)){
-		QString errorMessage = QString("Error when parsing request: '%1'; Error position: '%2'")
+		QString errorMessage = QStringLiteral("Error when parsing request: '%1'; Error position: '%2'")
 								.arg(QString(body)).arg(errorPosition);
 		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
@@ -266,7 +266,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 					: errorMessage.toUtf8(), request);
 	}
 	else{
-		QByteArray errorMessage = QString("The requested command could not be executed. No servlet was found for the given command: '%1")
+		QByteArray errorMessage = QStringLiteral("The requested command could not be executed. No servlet was found for the given command: '%1")
 		.arg(QString(commandId)).toUtf8();
 		return CreateErrorResponse(errorMessage, request);
 	}

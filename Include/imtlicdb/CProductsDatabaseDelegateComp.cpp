@@ -41,7 +41,7 @@ bool CProductsDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsS
 
 			QByteArray value = idParamPtr->GetId();
 
-			filterQuery += QString(R"(("Document"->>'%1' = '%2'))").arg(key).arg(value);
+			filterQuery += QString(R"(("Document"->>'%1' = '%2'))").arg(key, value);
 		}
 	}
 

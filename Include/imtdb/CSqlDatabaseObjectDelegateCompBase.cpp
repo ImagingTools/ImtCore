@@ -415,10 +415,10 @@ bool CSqlDatabaseObjectDelegateCompBase::CreatePaginationQuery(int offset, int c
 
 	if (offset >= 0 && count > 0){
 		if (IsSqliteDriver()){
-			paginationQuery = QStringLiteral("LIMIT %1 OFFSET %2").arg(count).arg(offset).toUtf8();
+			paginationQuery = QStringLiteral("LIMIT %1 OFFSET %2").arg(count, offset).toUtf8();
 		}
 		else{
-			paginationQuery = QStringLiteral("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count).toUtf8();
+			paginationQuery = QStringLiteral("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset, count).toUtf8();
 		}
 	}
 
@@ -558,7 +558,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
 
 	for (int i = 1; i < filteringColumnIds.count(); ++i){
 		textFilterQuery += QStringLiteral(" OR ");
-		textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(filteringColumnIds[i]).arg(encodedFilter);
+		textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(filteringColumnIds[i], encodedFilter);
 	}
 
 	return true;

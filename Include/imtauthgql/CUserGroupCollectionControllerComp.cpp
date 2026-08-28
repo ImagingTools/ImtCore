@@ -25,7 +25,7 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 {
 	auto userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(&object);
 	if (userGroupInfoPtr == nullptr){
-		errorMessage = QString("Unable to cast user group instance to identifable object. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to cast user group instance to identifable object. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
 		return false;
 	}
@@ -42,7 +42,7 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 		name = *groupDataRepresentation.name;
 	}
 	if (name.isEmpty()){
-		errorMessage = QString("Group name cannot be empty");
+		errorMessage = QStringLiteral("Group name cannot be empty");
 		return false;
 	}
 
@@ -55,7 +55,7 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 				if (collectionId != newObjectId){
 					QString currentUserGroupName = currentUserGroupInfoPtr->GetName();
 					if (currentUserGroupName == name){
-						errorMessage = QT_TR_NOOP(QString("Group Name '%1' already exists").arg(currentUserGroupName));
+						errorMessage = QT_TR_NOOP(QStringLiteral("Group Name '%1' already exists").arg(currentUserGroupName));
 						return false;
 					}
 				}
@@ -263,7 +263,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (userGroupInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'").arg(objectId);
+		errorMessage = QStringLiteral("Unable to create representation from object '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
 
 		return false;
@@ -321,7 +321,7 @@ istd::IChangeableUniquePtr CUserGroupCollectionControllerComp::CreateObjectFromR
 			QString& errorMessage) const
 {
 	if (!m_userGroupInfoFactCompPtr.IsValid()){
-		errorMessage = QString("Unable to create object from representation. Error: Attribute 'm_userGroupInfoFactCompPtr' was not set");
+		errorMessage = QStringLiteral("Unable to create object from representation. Error: Attribute 'm_userGroupInfoFactCompPtr' was not set");
 		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
 
 		return nullptr;
@@ -329,7 +329,7 @@ istd::IChangeableUniquePtr CUserGroupCollectionControllerComp::CreateObjectFromR
 
 	imtauth::IUserGroupInfoUniquePtr userGroupInstancePtr = m_userGroupInfoFactCompPtr.CreateInstance();
 	if (!userGroupInstancePtr.IsValid()){
-		errorMessage = QString("Unable to create group instance. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to create group instance. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
 
 		return nullptr;
@@ -337,7 +337,7 @@ istd::IChangeableUniquePtr CUserGroupCollectionControllerComp::CreateObjectFromR
 
 	auto userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(userGroupInstancePtr.GetPtr());
 	if (userGroupInfoPtr == nullptr){
-		errorMessage = QString("Unable to cast user group instance to identifable object. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to cast user group instance to identifable object. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
 
 		return nullptr;
@@ -367,7 +367,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 {
 	auto userGroupInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserGroupInfo*>(&data);
 	if (userGroupInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		errorMessage = QStringLiteral("Unable to create representation from object. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
 
 		return false;
@@ -413,7 +413,7 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 	imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(&object);
 	if (userGroupInfoPtr == nullptr){
-		errorMessage = QString("Unable to cast user group instance to identifable object. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to cast user group instance to identifable object. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
 
 		return false;

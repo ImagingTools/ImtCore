@@ -65,7 +65,7 @@ iproc::IProcessor::TaskState CQmlEnumGeneratorComp::DoProcessing(
 	}
 
 	if (!istd::CSystem::EnsurePathExists(outputDirectoryPath)){
-		SendErrorMessage(0, QString("Unable to create path '%1'").arg(outputDirectoryPath));
+		SendErrorMessage(0, QStringLiteral("Unable to create path '%1'").arg(outputDirectoryPath));
 		I_CRITICAL();
 
 		return TS_INVALID;
@@ -76,7 +76,7 @@ iproc::IProcessor::TaskState CQmlEnumGeneratorComp::DoProcessing(
 	iprm::CParamsSet qmldirDataParams;
 	int loadStatus = m_qmldirFilePersistanceCompPtr->LoadFromFile(qmldirDataParams, outputDirectoryPath + "/qmldir");
 	if (loadStatus != ifile::IFilePersistence::OS_OK){
-		SendErrorMessage(0, QString("Unable to load qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir"));
+		SendErrorMessage(0, QStringLiteral("Unable to load qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir"));
 
 		return TS_INVALID;
 	}
@@ -88,7 +88,7 @@ iproc::IProcessor::TaskState CQmlEnumGeneratorComp::DoProcessing(
 	const QString qmlModuleName = GetQmlModuleNameFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	const int qrcLoadStatus = m_qrcFilePersistanceCompPtr->LoadFromFile(*qrcParamsPtr, outputDirectoryPath + '/' + qmlModuleName + QStringLiteral(".qrc"));
 	if (qrcLoadStatus != ifile::IFilePersistence::OS_OK){
-		SendErrorMessage(0, QString("Unable to load QRC file data from '%1'").arg(outputDirectoryPath + '/' + qmlModuleName + QStringLiteral(".qrc")));
+		SendErrorMessage(0, QStringLiteral("Unable to load QRC file data from '%1'").arg(outputDirectoryPath + '/' + qmlModuleName + QStringLiteral(".qrc")));
 
 		return TS_INVALID;
 	}
@@ -100,7 +100,7 @@ iproc::IProcessor::TaskState CQmlEnumGeneratorComp::DoProcessing(
 		ok = ok && AddQmldirEntry(sdlEnum, *qrcParamsPtr);
 		ok = ok && ProcessQmlFile(sdlEnum);
 		if (!ok){
-			SendErrorMessage(0, QString("Unable to process files"));
+			SendErrorMessage(0, QStringLiteral("Unable to process files"));
 
 			return TS_INVALID;
 		}
@@ -108,14 +108,14 @@ iproc::IProcessor::TaskState CQmlEnumGeneratorComp::DoProcessing(
 
 	int saveStatus = m_qmldirFilePersistanceCompPtr->SaveToFile(qmldirDataParams, outputDirectoryPath + "/qmldir");
 	if (saveStatus != ifile::IFilePersistence::OS_OK){
-		SendErrorMessage(0, QString("Unable to save qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir"));
+		SendErrorMessage(0, QStringLiteral("Unable to save qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir"));
 
 		return TS_INVALID;
 	}
 
 	const int qrcSaveStatus = m_qrcFilePersistanceCompPtr->SaveToFile(*qrcParamsPtr, outputDirectoryPath + '/' + qmlModuleName + QStringLiteral(".qrc"));
 	if (qrcSaveStatus != ifile::IFilePersistence::OS_OK){
-		SendErrorMessage(0, QString("Unable to save QRC file data to '%1'").arg(outputDirectoryPath + '/' + qmlModuleName + QStringLiteral(".qrc")));
+		SendErrorMessage(0, QStringLiteral("Unable to save QRC file data to '%1'").arg(outputDirectoryPath + '/' + qmlModuleName + QStringLiteral(".qrc")));
 
 		return TS_INVALID;
 	}
@@ -131,7 +131,7 @@ bool CQmlEnumGeneratorComp::ReOpenFiles()
 {
 	if (!m_qmlFilePtr->open(QIODevice::WriteOnly | QIODevice::Append)){
 		SendCriticalMessage(0,
-							QString("Unable to open file: '%1'. Error: %2")
+							QStringLiteral("Unable to open file: '%1'. Error: %2")
 								.arg(m_qmlFilePtr->fileName(), m_qmlFilePtr->errorString()));
 
 		AbortCurrentProcessing();
@@ -158,7 +158,7 @@ bool CQmlEnumGeneratorComp::ProcessQmlFile(const imtsdl::CSdlEnum& sdlEnum)
 {
 	if (!m_qmlFilePtr->open(QIODevice::WriteOnly)){
 		SendCriticalMessage(0,
-							QString("Unable to open file: '%1'. Error: %2")
+							QStringLiteral("Unable to open file: '%1'. Error: %2")
 								.arg(m_qmlFilePtr->fileName(), m_qmlFilePtr->errorString()));
 		I_CRITICAL();
 
@@ -314,7 +314,7 @@ bool CQmlEnumGeneratorComp::AddQmldirEntry(const imtsdl::CSdlEnum& sdlEnum, iprm
 
 	iprm::IParamsManager* objectsManagerPtr = dynamic_cast<iprm::IParamsManager*>(qmlPrefixParams->GetEditableParameter(imtsdl::QtResourceModelParamIds::QrcObjects));
 	if (objectsManagerPtr == nullptr){
-		SendCriticalMessage(0, QString("Params manager  '%1' is not valid!").arg(imtsdl::QtResourceModelParamIds::QrcObjects));
+		SendCriticalMessage(0, QStringLiteral("Params manager  '%1' is not valid!").arg(imtsdl::QtResourceModelParamIds::QrcObjects));
 		I_CRITICAL();
 
 		return false;
@@ -326,7 +326,7 @@ bool CQmlEnumGeneratorComp::AddQmldirEntry(const imtsdl::CSdlEnum& sdlEnum, iprm
 
 	iprm::INameParam* fileNameParam = dynamic_cast<iprm::INameParam*>(fileParamsSet->GetEditableParameter(imtsdl::QtResourceModelParamIds::QrcFileName));
 	if (fileNameParam == nullptr){
-		SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(imtsdl::QtResourceModelParamIds::QrcFileName));
+		SendCriticalMessage(0, QStringLiteral("Name param '%1' is not valid!").arg(imtsdl::QtResourceModelParamIds::QrcFileName));
 		I_CRITICAL();
 
 		return false;
@@ -335,7 +335,7 @@ bool CQmlEnumGeneratorComp::AddQmldirEntry(const imtsdl::CSdlEnum& sdlEnum, iprm
 
 	iprm::INameParam* aliasNameParam = dynamic_cast<iprm::INameParam*>(fileParamsSet->GetEditableParameter(imtsdl::QtResourceModelParamIds::QrcAlias));
 	if (aliasNameParam == nullptr){
-		SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(imtsdl::QtResourceModelParamIds::QrcAlias));
+		SendCriticalMessage(0, QStringLiteral("Name param '%1' is not valid!").arg(imtsdl::QtResourceModelParamIds::QrcAlias));
 		I_CRITICAL();
 
 		return false;

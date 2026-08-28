@@ -78,7 +78,7 @@ sdl::V1_0::imtbase::CGuiElementContainer CCommandsControllerComp::OnGetCommands(
 	}
 
 	if (!GetRepresentationFromGuiElementContainer(*m_guiElementContainerCompPtr, response, languageId, userInfoPtr)){
-		errorMessage = QString("Unable to get commands for type-ID '%1'. Error: Get representation failed").arg(typeId);
+		errorMessage = QStringLiteral("Unable to get commands for type-ID '%1'. Error: Get representation failed").arg(typeId);
 		SendErrorMessage(0, errorMessage, "CCommandsControllerComp");
 		return sdl::V1_0::imtbase::CGuiElementContainer();
 	}

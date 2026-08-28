@@ -70,7 +70,7 @@ QJsonObject CUserSettingsControllerComp::CreateRepresentationFromRequest(
 
 	if (!userSettingsPtr.IsValid()){
 		if (userId.isEmpty()){
-			errorMessage = QString("Unable to create representation for user settings. Error: User-ID is empty.");
+			errorMessage = QStringLiteral("Unable to create representation for user settings. Error: User-ID is empty.");
 			SendErrorMessage(0, errorMessage, "CUserSettingsControllerComp");
 
 			return QJsonObject();
@@ -79,7 +79,7 @@ QJsonObject CUserSettingsControllerComp::CreateRepresentationFromRequest(
 		userSettingsPtr.FromUnique(m_userSettingsInfoFactCompPtr.CreateInstance());
 		Q_ASSERT(userSettingsPtr.IsValid());
 		if (!userSettingsPtr.IsValid()){
-			errorMessage = QString("Unable to create representation for user settings. Error: User settings is invalid.");
+			errorMessage = QStringLiteral("Unable to create representation for user settings. Error: User settings is invalid.");
 			SendErrorMessage(0, errorMessage, "CUserSettingsControllerComp");
 
 			return QJsonObject();
@@ -91,7 +91,7 @@ QJsonObject CUserSettingsControllerComp::CreateRepresentationFromRequest(
 	iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
 	Q_ASSERT(paramSetPtr != nullptr);
 	if (paramSetPtr == nullptr){
-		errorMessage = QString("Unable to create representation for user settings. Error: Params set from user settings is invalid.");
+		errorMessage = QStringLiteral("Unable to create representation for user settings. Error: Params set from user settings is invalid.");
 		SendErrorMessage(0, errorMessage, "CUserSettingsControllerComp");
 
 		return QJsonObject();
@@ -100,7 +100,7 @@ QJsonObject CUserSettingsControllerComp::CreateRepresentationFromRequest(
 	QJsonObject dataModel;
 	bool result = m_userSettingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*paramSetPtr, dataModel, paramsPtr.GetPtr());
 	if (!result){
-		errorMessage = QString("Unable to create representation for user settings.");
+		errorMessage = QStringLiteral("Unable to create representation for user settings.");
 		SendErrorMessage(0, errorMessage, "CUserSettingsControllerComp");
 
 		return QJsonObject();
@@ -143,7 +143,7 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 	}
 
 	if (userId.isEmpty()){
-		SendErrorMessage(0, QString("Unable to update model from representation. User-ID is empty!"));
+		SendErrorMessage(0, QStringLiteral("Unable to update model from representation. User-ID is empty!"));
 
 		return false;
 	}
@@ -163,7 +163,7 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 	iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
 	Q_ASSERT(paramSetPtr != nullptr);
 	if (paramSetPtr == nullptr){
-		SendErrorMessage(0, QString("Unable to get setting from user: '%1'.").arg(userId));
+		SendErrorMessage(0, QStringLiteral("Unable to get setting from user: '%1'.").arg(userId));
 
 		return false;
 	}

@@ -124,7 +124,7 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 	}
 
 	if (!IsObjectTypeSupported(typeId)){
-		SendErrorMessage(0, QString("Object type ID \"%1\" not supported").arg(typeId));
+		SendErrorMessage(0, QStringLiteral("Object type ID \"%1\" not supported").arg(typeId));
 
 		return QByteArray();
 	}

@@ -95,7 +95,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CTestDatabaseDelegateComp::Create
 
 	NewObjectQuery retVal;
 
-	retVal.query = QString("INSERT INTO \"Tests\"(\"Id\", \"Name\", \"Description\") VALUES('%1', '%2', '%3');")
+	retVal.query = QStringLiteral("INSERT INTO \"Tests\"(\"Id\", \"Name\", \"Description\") VALUES('%1', '%2', '%3');")
 			.arg(testId)
 			.arg(imtdb::SqlEncode(testName))
 			.arg(imtdb::SqlEncode(testDescription))
@@ -126,7 +126,7 @@ QByteArray CTestDatabaseDelegateComp::CreateDeleteObjectsQuery(
 
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
-		quotedIds << QString("'%1'").arg(objectId);
+		quotedIds << QStringLiteral("'%1'").arg(objectId);
 	}
 
 	QString query = QString(
@@ -168,7 +168,7 @@ QByteArray CTestDatabaseDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 	QByteArray testId = testInfoPtr->GetTestId();
-	QByteArray retVal = QString("UPDATE \"Tests\" SET \"Id\" = '%1', \"Name\" = '%2' WHERE \"Id\" ='%3';")
+	QByteArray retVal = QStringLiteral("UPDATE \"Tests\" SET \"Id\" = '%1', \"Name\" = '%2' WHERE \"Id\" ='%3';")
 							.arg(testId)
 							.arg(imtdb::SqlEncode(testName))
 							.arg(objectId)
@@ -198,7 +198,7 @@ QByteArray CTestDatabaseDelegateComp::CreateRenameObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE \"Tests\" SET \"Name\" = '%1' WHERE \"Id\" = '%2';")
+	QByteArray retVal = QStringLiteral("UPDATE \"Tests\" SET \"Name\" = '%1' WHERE \"Id\" = '%2';")
 			.arg(imtdb::SqlEncode(newObjectName))
 			.arg(objectId).toLocal8Bit();
 
@@ -227,7 +227,7 @@ QByteArray CTestDatabaseDelegateComp::CreateDescriptionObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE \"Tests\" SET \"Description\" = '%1' WHERE \"Id\" ='%2';")
+	QByteArray retVal = QStringLiteral("UPDATE \"Tests\" SET \"Description\" = '%1' WHERE \"Id\" ='%2';")
 			.arg(imtdb::SqlEncode(description))
 			.arg(testId).toLocal8Bit();
 
@@ -275,7 +275,7 @@ QByteArray CTestDatabaseDelegateComp::CreateDataMetaInfoQuery(const imtbase::IOb
 		QString str_Added = added.isValid() ? added.toString("yyyy-MM-dd hh:mm:ss") : "null";
 		QDateTime lastModificationTime = dataMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME).toDateTime();
 		QString str_lastModificationTime = lastModificationTime.isValid() ? lastModificationTime.toString("yyyy-MM-dd hh:mm:ss") : "null";
-		QByteArray retVal = QString("UPDATE \"Tests\" SET \"Name\" = '%1', \"Description\" = '%2', \"Added\" = %3, \"LastModified\" = %4 WHERE \"Id\" ='%5';")
+		QByteArray retVal = QStringLiteral("UPDATE \"Tests\" SET \"Name\" = '%1', \"Description\" = '%2', \"Added\" = %3, \"LastModified\" = %4 WHERE \"Id\" ='%5';")
 								.arg(imtdb::SqlEncode(name))
 								.arg(imtdb::SqlEncode(description))
 								.arg(str_Added)
@@ -296,7 +296,7 @@ QByteArray CTestDatabaseDelegateComp::CreateCollectionItemMetaInfoQuery(const im
 		QString str_Added = added.isValid() ? added.toString("yyyy-MM-dd hh:mm:ss") : "null";
 		QDateTime lastModificationTime = collectionItemMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME).toDateTime();
 		QString str_lastModificationTime = lastModificationTime.isValid() ? lastModificationTime.toString("yyyy-MM-dd hh:mm:ss") : "null";
-		QByteArray retVal = QString("UPDATE \"Tests\" SET \"Name\" = '%1', \"Description\" = '%2', \"Added\" = %3, \"LastModified\" = %4 WHERE \"Id\" ='%5';")
+		QByteArray retVal = QStringLiteral("UPDATE \"Tests\" SET \"Name\" = '%1', \"Description\" = '%2', \"Added\" = %3, \"LastModified\" = %4 WHERE \"Id\" ='%5';")
 								.arg(imtdb::SqlEncode(name))
 								.arg(imtdb::SqlEncode(description))
 								.arg(str_Added)

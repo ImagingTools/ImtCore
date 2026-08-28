@@ -194,7 +194,7 @@ void CSystemStatusComp::CheckStatus()
 			QString error;
 			bool isConnected = m_dbServerConnectionCheckerCompPtr->CheckDatabaseConnection(error);
 			if (!isConnected){
-				error = QString("%1 %2").arg(*m_serverNameAttrPtr).arg(error);
+				error = QStringLiteral("%1 %2").arg(*m_serverNameAttrPtr, error);
 
 				m_statusMessage = error;
 				m_futureResultStatus = ISystemStatus::SS_DATABASE_CONNECTION_ERROR;

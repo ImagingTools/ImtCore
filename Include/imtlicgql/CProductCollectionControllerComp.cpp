@@ -51,12 +51,12 @@ sdl::V1_0::imtbase::CImportObjectPayload CProductCollectionControllerComp::OnImp
 									if (!featureIds.contains(productFeatureId)){
 										QByteArray result = m_featureCollectionCompPtr->InsertNewObject(QByteArrayLiteral("Feature"), "", "", featureInfoPtr, productFeatureId);
 										if (result.isEmpty()){
-											SendWarningMessage(0, QString("Unable to insert new feature with ID '%1' from product serialization").arg(productFeatureId), "CProductControllerComp");
+											SendWarningMessage(0, QStringLiteral("Unable to insert new feature with ID '%1' from product serialization").arg(productFeatureId), "CProductControllerComp");
 										}
 									}
 									else{
 										if (!m_featureCollectionCompPtr->SetObjectData(productFeatureId, *featureInfoPtr)){
-											SendWarningMessage(0, QString("Unable to update feature with ID '%1' from product serialization").arg(productFeatureId), "CProductControllerComp");
+											SendWarningMessage(0, QStringLiteral("Unable to update feature with ID '%1' from product serialization").arg(productFeatureId), "CProductControllerComp");
 										}
 									}
 								}
@@ -107,7 +107,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to create representation from object. Error: Attribute 'm_objectCollectionCompPtr' was not set");
+		errorMessage = QStringLiteral("Unable to create representation from object. Error: Attribute 'm_objectCollectionCompPtr' was not set");
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
 
 		return false;
@@ -122,7 +122,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (productInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'").arg(objectId);
+		errorMessage = QStringLiteral("Unable to create representation from object '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
 
 		return false;
@@ -233,7 +233,7 @@ istd::IChangeableUniquePtr CProductCollectionControllerComp::CreateObjectFromRep
 			QString& errorMessage) const
 {
 	if (!m_productInfoFactCompPtr.IsValid()){
-		errorMessage = QString("Unable to create object from representation. Error: Attribute 'm_productInfoFactCompPtr' was not set");
+		errorMessage = QStringLiteral("Unable to create object from representation. Error: Attribute 'm_productInfoFactCompPtr' was not set");
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
 
 		return nullptr;
@@ -241,14 +241,14 @@ istd::IChangeableUniquePtr CProductCollectionControllerComp::CreateObjectFromRep
 
 	imtlic::IProductInfoUniquePtr productInstancePtr = m_productInfoFactCompPtr.CreateInstance();
 	if (!productInstancePtr.IsValid()){
-		errorMessage = QString("Unable to create product instance. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to create product instance. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
 
 		return nullptr;
 	}
 
 	if (!FillObjectFromRepresentation(productDataRepresentation, *productInstancePtr, newObjectId, errorMessage)){
-		errorMessage = QString("Unable to create product instance from representation. Error: '%1'");
+		errorMessage = QStringLiteral("Unable to create product instance from representation. Error: '%1'");
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
 
 		return nullptr;
@@ -266,7 +266,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 {
 	imtlic::CIdentifiableProductInfo* productInfoPtr = const_cast<imtlic::CIdentifiableProductInfo*>(dynamic_cast<const imtlic::CIdentifiableProductInfo*>(&data));
 	if (productInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		errorMessage = QStringLiteral("Unable to create representation from object. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
 
 		return false;
@@ -308,7 +308,7 @@ bool CProductCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 {
 	imtlic::CIdentifiableProductInfo* productInfoPtr = dynamic_cast<imtlic::CIdentifiableProductInfo*>(&object);
 	if (productInfoPtr == nullptr){
-		errorMessage = QString("Unable to update object from representation. Error: Object is invalid");
+		errorMessage = QStringLiteral("Unable to update object from representation. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
 
 		return false;
@@ -330,7 +330,7 @@ bool CProductCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	productInfoPtr->SetObjectUuid(objectId);
 
 	if (!FillObjectFromRepresentation(productData, *productInfoPtr, objectId, errorMessage)){
-		errorMessage = QString("Unable to update product from representation. Error: '%1'").arg(errorMessage);
+		errorMessage = QStringLiteral("Unable to update product from representation. Error: '%1'").arg(errorMessage);
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
 
 		return false;
@@ -378,7 +378,7 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 {
 	imtlic::CIdentifiableProductInfo* productInfoPtr = dynamic_cast<imtlic::CIdentifiableProductInfo*>(&object);
 	if (productInfoPtr == nullptr){
-		errorMessage = QString("Unable to cast product instance to identifable object. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to cast product instance to identifable object. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
 
 		return false;
@@ -421,7 +421,7 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 	if (!collectionIds.isEmpty()){
 		QByteArray id = collectionIds[0];
 		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QString("Product '%1' already exists")).arg(productId);
+			errorMessage = QT_TR_NOOP(QStringLiteral("Product '%1' already exists")).arg(productId);
 
 			return false;
 		}
@@ -459,7 +459,7 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 	if (!collectionIds2.isEmpty()){
 		QByteArray id = collectionIds2[0];
 		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QString("Product name '%1' already exists, please rename")).arg(name);
+			errorMessage = QT_TR_NOOP(QStringLiteral("Product name '%1' already exists, please rename")).arg(name);
 
 			return false;
 		}

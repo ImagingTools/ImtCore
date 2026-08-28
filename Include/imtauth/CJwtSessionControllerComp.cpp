@@ -44,7 +44,7 @@ imtauth::IJwtSessionController::JwtState CJwtSessionControllerComp::ValidateJwt(
 {
 	QByteArrayList parts = token.split('.');
 	if (parts.size() != 3){
-		SendWarningMessage(0, QString("JWT rejected: malformed token, expected 3 dot-separated parts, got %1")
+		SendWarningMessage(0, QStringLiteral("JWT rejected: malformed token, expected 3 dot-separated parts, got %1")
 								.arg(parts.size()), "CJwtSessionControllerComp");
 		return imtauth::IJwtSessionController::JS_INVALID;
 	}
@@ -63,7 +63,7 @@ imtauth::IJwtSessionController::JwtState CJwtSessionControllerComp::ValidateJwt(
 
 	QJsonObject payloadObj = JsonObjectFromBase64(payloadBase64);
 	if (!payloadObj.contains("exp") || !payloadObj.contains("sessionId")){
-		SendWarningMessage(0, QString("JWT rejected: payload is missing required claim(s), has 'exp': %1, has 'sessionId': %2")
+		SendWarningMessage(0, QStringLiteral("JWT rejected: payload is missing required claim(s), has 'exp': %1, has 'sessionId': %2")
 								.arg(payloadObj.contains("exp") ? "yes" : "no")
 								.arg(payloadObj.contains("sessionId") ? "yes" : "no"), "CJwtSessionControllerComp");
 		return imtauth::IJwtSessionController::JS_INVALID;
@@ -79,7 +79,7 @@ imtauth::IJwtSessionController::JwtState CJwtSessionControllerComp::ValidateJwt(
 	const qint64 exp = static_cast<qint64>(payloadObj.value(QStringLiteral("exp")).toDouble());
 	const qint64 nowSecs = QDateTime::currentSecsSinceEpoch();
 	if (exp < nowSecs){
-		SendWarningMessage(0, QString("JWT rejected: token expired by time, exp = %1 (now = %2, age = %3s) for session-ID '%4'")
+		SendWarningMessage(0, QStringLiteral("JWT rejected: token expired by time, exp = %1 (now = %2, age = %3s) for session-ID '%4'")
 								.arg(exp)
 								.arg(nowSecs)
 								.arg(nowSecs - exp)
@@ -98,7 +98,7 @@ imtauth::IJwtSessionController::JwtState CJwtSessionControllerComp::ValidateJwt(
 	// expired session - can be logged and diagnosed separately.
 	ISessionSharedPtr sessionInfoPtr = GetSession(sessionId);
 	if (!sessionInfoPtr.IsValid()){
-		SendWarningMessage(0, QString("JWT rejected: no session record found for session-ID '%1' "
+		SendWarningMessage(0, QStringLiteral("JWT rejected: no session record found for session-ID '%1' "
 								"(already removed by cleanup, or the JWT references a session that never existed)")
 								.arg(sessionId), "CJwtSessionControllerComp");
 		return imtauth::IJwtSessionController::JS_EXPIRED;
@@ -107,7 +107,7 @@ imtauth::IJwtSessionController::JwtState CJwtSessionControllerComp::ValidateJwt(
 	QDateTime currentDate = QDateTime::currentDateTimeUtc();
 	QDateTime sessionExpirationDate = sessionInfoPtr->GetExpirationDate();
 	if (currentDate >= sessionExpirationDate){
-		SendWarningMessage(0, QString("JWT rejected: session '%1' expired at %2 (current time %3) - "
+		SendWarningMessage(0, QStringLiteral("JWT rejected: session '%1' expired at %2 (current time %3) - "
 								"the client was idle longer than RefreshTokenLifetime")
 								.arg(sessionId, sessionExpirationDate.toString(Qt::ISODate), currentDate.toString(Qt::ISODate)),
 								"CJwtSessionControllerComp");
@@ -141,7 +141,7 @@ bool CJwtSessionControllerComp::RefreshToken(
 
 	ISessionSharedPtr sessionInfoPtr = GetSession(sessionId);
 	if (!sessionInfoPtr.IsValid()){
-		SendWarningMessage(0, QString("Refresh rejected: session-ID '%1' resolved from the refresh token but the session record is gone (race with cleanup?)")
+		SendWarningMessage(0, QStringLiteral("Refresh rejected: session-ID '%1' resolved from the refresh token but the session record is gone (race with cleanup?)")
 								.arg(sessionId), "CJwtSessionControllerComp");
 		return false;
 	}
@@ -150,12 +150,12 @@ bool CJwtSessionControllerComp::RefreshToken(
 	if (currentDate >= sessionInfoPtr->GetExpirationDate()){
 		// The session itself has expired (the user has been away longer than
 		// RefreshTokenLifetime) - refuse to rotate it and clean it up.
-		SendWarningMessage(0, QString("Refresh rejected: session '%1' expired at %2 - the user was away longer than "
+		SendWarningMessage(0, QStringLiteral("Refresh rejected: session '%1' expired at %2 - the user was away longer than "
 								"RefreshTokenLifetime; removing the dead session")
 								.arg(sessionId, sessionInfoPtr->GetExpirationDate().toString(Qt::ISODate)),
 								"CJwtSessionControllerComp");
 		if (!RemoveSession(sessionId)){
-			SendWarningMessage(0, QString("Unable to remove expired session '%1'").arg(sessionId), "CJwtSessionControllerComp");
+			SendWarningMessage(0, QStringLiteral("Unable to remove expired session '%1'").arg(sessionId), "CJwtSessionControllerComp");
 		}
 
 		return false;
@@ -164,7 +164,7 @@ bool CJwtSessionControllerComp::RefreshToken(
 	istd::TUniqueInterfacePtr<imtauth::ISession> clonedSessionInfo;
 	clonedSessionInfo.MoveCastedPtr(sessionInfoPtr->CloneMe());
 	if (!clonedSessionInfo.IsValid()){
-		SendErrorMessage(0, QString("Unable to clone session '%1' for rotation").arg(sessionId), "CJwtSessionControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to clone session '%1' for rotation").arg(sessionId), "CJwtSessionControllerComp");
 		return false;
 	}
 
@@ -181,7 +181,7 @@ bool CJwtSessionControllerComp::RefreshToken(
 	// client is about to discard - keeps validating for the remainder of its
 	// own lifetime, instead of being invalidated the instant a refresh happens.
 	if (!m_sessionCollectionCompPtr->SetObjectData(sessionId, *clonedSessionInfo.GetPtr())){
-		SendErrorMessage(0, QString("Unable to update session '%1' in collection")
+		SendErrorMessage(0, QStringLiteral("Unable to update session '%1' in collection")
 								.arg(refreshToken), "CJwtSessionControllerComp");
 		return false;
 	}
@@ -190,7 +190,7 @@ bool CJwtSessionControllerComp::RefreshToken(
 
 	QByteArray jwt = GenerateJwt(sessionId, userId, sessionInfoPtr->GetTenantId());
 	if (jwt.isEmpty()){
-		SendErrorMessage(0, QString("Unable to refresh session for user '%1'. Error: JWT is invalid").arg(userId), "CJwtSessionControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to refresh session for user '%1'. Error: JWT is invalid").arg(userId), "CJwtSessionControllerComp");
 		return false;
 	}
 
@@ -229,7 +229,7 @@ bool CJwtSessionControllerComp::CreateNewSession(
 
 	QByteArray sessionId = InsertNewSession(*sessionInfoPtr.GetPtr());
 	if (sessionId.isEmpty()){
-		SendErrorMessage(0, QString("Unable to insert session '%1' to collection").arg(refreshToken), "CJwtSessionControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to insert session '%1' to collection").arg(refreshToken), "CJwtSessionControllerComp");
 		return false;
 	}
 
@@ -238,7 +238,7 @@ bool CJwtSessionControllerComp::CreateNewSession(
 
 	QByteArray jwt = GenerateJwt(sessionId, userId, tenantId);
 	if (jwt.isEmpty()){
-		SendErrorMessage(0, QString("Unable to create a new session for user '%1'. Error: JWT is invalid").arg(userId), "CJwtSessionControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to create a new session for user '%1'. Error: JWT is invalid").arg(userId), "CJwtSessionControllerComp");
 		return false;
 	}
 

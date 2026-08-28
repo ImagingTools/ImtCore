@@ -122,7 +122,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::CreateInternalResponse(
 		return GetDependencies(gqlRequest, errorMessage);
 	}
 
-	errorMessage = QString("Unable to create internal response. Operation is not supported");
+	errorMessage = QStringLiteral("Unable to create internal response. Operation is not supported");
 	SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 	return QJsonObject();
@@ -250,7 +250,7 @@ bool CLegacyObjectCollectionControllerCompBase::GetOperationFromRequest(
 		}
 	}
 
-	errorMessage = QString("Unable to get the operation type from the request");
+	errorMessage = QStringLiteral("Unable to get the operation type from the request");
 
 	SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
@@ -287,7 +287,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::GetObject(
 		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to get data object. Error: Attribute 'm_objectCollectionCompPtr' was not set").toUtf8();
+		errorMessage = QStringLiteral("Unable to get data object. Error: Attribute 'm_objectCollectionCompPtr' was not set").toUtf8();
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -295,7 +295,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::GetObject(
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QString("Unable to get data object. Error: GraphQL input params is invalid.").toUtf8();
+		errorMessage = QStringLiteral("Unable to get data object. Error: GraphQL input params is invalid.").toUtf8();
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -306,7 +306,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::GetObject(
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QString("Unable to get data with ID: '%1'. The object does not exist.").arg(objectId);
+		errorMessage = QStringLiteral("Unable to get data with ID: '%1'. The object does not exist.").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -317,7 +317,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::GetObject(
 
 	if (!CreateRepresentationFromObject(*dataPtr, objectTypeId, gqlRequest, dataObj, errorMessage)){
 		if (errorMessage.isEmpty()){
-			errorMessage = QString("Unable create object representation for the object with ID: '%1'.").arg(objectId);
+			errorMessage = QStringLiteral("Unable create object representation for the object with ID: '%1'.").arg(objectId);
 		}
 
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
@@ -343,7 +343,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::InsertObject(
 
 	const imtgql::CGqlParamObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
-		errorMessage = QString("Unable to insert an object. GraphQL input params is invalid.");
+		errorMessage = QStringLiteral("Unable to insert an object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -367,7 +367,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::InsertObject(
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QString("Object with ID: '%1' already exists").arg(objectId);
+		errorMessage = QStringLiteral("Object with ID: '%1' already exists").arg(objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -380,7 +380,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::InsertObject(
 
 	QByteArray newObjectId = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, newObjectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
 	if (newObjectId.isEmpty()){
-		errorMessage = QString("Error when creating a new object. Object-ID: '%1'.").arg(objectId);
+		errorMessage = QStringLiteral("Error when creating a new object. Object-ID: '%1'.").arg(objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -405,7 +405,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::UpdateObject(
 		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to update an object. Internal error.");
+		errorMessage = QStringLiteral("Unable to update an object. Internal error.");
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -413,7 +413,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::UpdateObject(
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QString("Unable to update an object. GraphQL input params is invalid.");
+		errorMessage = QStringLiteral("Unable to update an object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -426,7 +426,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::UpdateObject(
 	istd::IChangeableUniquePtr savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
 	if (!savedObjectPtr.IsValid()){
 		if (errorMessage.isEmpty()){
-			errorMessage = QString("Can not create object for update: '%1'").arg(objectId);
+			errorMessage = QStringLiteral("Can not create object for update: '%1'").arg(objectId);
 		}
 
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -440,7 +440,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::UpdateObject(
 	}
 
 	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObjectPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
-		errorMessage = QString("Can not update object: '%1'").arg(objectId);
+		errorMessage = QStringLiteral("Can not update object: '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -463,7 +463,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::UpdateCollection(
 		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to update collection. Component reference 'ObjectCollection' was not set");
+		errorMessage = QStringLiteral("Unable to update collection. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -473,7 +473,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::UpdateCollection(
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QString("Unable to update collection. GraphQL input params is invalid.");
+		errorMessage = QStringLiteral("Unable to update collection. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -481,7 +481,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::UpdateCollection(
 
 	QByteArray objectIdsJson = inputParamPtr->GetParamArgumentValue("Ids").toByteArray();
 	if (objectIdsJson.isEmpty()){
-		errorMessage = QString("Unable to update collection. Ids from input params is empty.");
+		errorMessage = QStringLiteral("Unable to update collection. Ids from input params is empty.");
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -489,7 +489,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::UpdateCollection(
 
 	imtbase::CTreeItemModel objectIdsModel;
 	if (!objectIdsModel.CreateFromJson(objectIdsJson)){
-		errorMessage = QString("Unable to create model from json: '%1'").arg(objectIdsJson);
+		errorMessage = QStringLiteral("Unable to create model from json: '%1'").arg(objectIdsJson);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -504,7 +504,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::UpdateCollection(
 			istd::IChangeableUniquePtr savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
 			if (savedObjectPtr.IsValid()){
 				if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObjectPtr)){
-					errorMessage += QString("Could not update object: '%1'; ").arg(objectId);
+					errorMessage += QStringLiteral("Could not update object: '%1'; ").arg(objectId);
 					objectIdsModel.SetData("Failed", true, i);
 				}
 			}
@@ -541,7 +541,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::RenameObject(
 		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to rename object. Component reference 'ObjectCollection' was not set");
+		errorMessage = QStringLiteral("Unable to rename object. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
 		return QJsonObject();
@@ -549,7 +549,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::RenameObject(
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QString("Unable to rename object. GraphQL input params is invalid.");
+		errorMessage = QStringLiteral("Unable to rename object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -559,7 +559,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::RenameObject(
 	QString newName = inputParamPtr->GetParamArgumentValue("NewName").toString();
 
 	if (!m_objectCollectionCompPtr->SetElementName(objectId, newName)){
-		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(newName).arg(objectId);
+		errorMessage = QStringLiteral("Unable to set name '%1' for element with ID: '%2'").arg(newName, objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -581,7 +581,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::SetObjectDescription(
 		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to set the object description. Component reference 'ObjectCollection' was not set");
+		errorMessage = QStringLiteral("Unable to set the object description. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
 		return QJsonObject();
@@ -589,7 +589,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::SetObjectDescription(
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QString("Unable to set description for object. GraphQL input params is invalid.");
+		errorMessage = QStringLiteral("Unable to set description for object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -599,7 +599,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::SetObjectDescription(
 	QString description = inputParamPtr->GetParamArgumentValue("Description").toString();
 
 	if (!m_objectCollectionCompPtr->SetElementDescription(objectId, description)){
-		errorMessage = QString("Unable to set description '%1' for element with ID: '%2'").arg(description).arg(objectId);
+		errorMessage = QStringLiteral("Unable to set description '%1' for element with ID: '%2'").arg(description, objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -621,7 +621,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ListObjects(
 		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to list objects. Component reference 'ObjectCollection' was not set");
+		errorMessage = QStringLiteral("Unable to list objects. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
 		return QJsonObject();
@@ -655,7 +655,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ListObjects(
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
 				m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
 	if (objectCollectionIterator == nullptr){
-		errorMessage = QString("Object collection iterator creation failed");
+		errorMessage = QStringLiteral("Object collection iterator creation failed");
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -679,7 +679,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ListObjects(
 	while (objectCollectionIterator->Next()){
 		QJsonObject itemObj;
 		if (!SetupGqlItem(gqlRequest, itemObj, objectCollectionIterator.GetPtr(), errorMessage)){
-			errorMessage = QString("Unable to get object data from object collection iterator.");
+			errorMessage = QStringLiteral("Unable to get object data from object collection iterator.");
 			SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 			return QJsonObject();
@@ -697,7 +697,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ListObjects(
 QJsonObject CLegacyObjectCollectionControllerCompBase::GetElementsCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to get the element count. Component reference 'ObjectCollection' was not set");
+		errorMessage = QStringLiteral("Unable to get the element count. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
 		return QJsonObject();
@@ -705,7 +705,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::GetElementsCount(const im
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QString("Unable to rename object. GraphQL input params is invalid.");
+		errorMessage = QStringLiteral("Unable to rename object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -731,7 +731,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::GetElementsCount(const im
 QJsonObject CLegacyObjectCollectionControllerCompBase::GetElementIds(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to get the element IDs. Component reference 'ObjectCollection' was not set");
+		errorMessage = QStringLiteral("Unable to get the element IDs. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
 		return QJsonObject();
@@ -739,7 +739,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::GetElementIds(const imtgq
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QString("Unable to rename object. GraphQL input params is invalid.");
+		errorMessage = QStringLiteral("Unable to rename object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -780,7 +780,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::DeleteObject(
 		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to remove the object from the collection. Component reference 'ObjectCollection' was not set");
+		errorMessage = QStringLiteral("Unable to remove the object from the collection. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
 		return QJsonObject();
@@ -788,7 +788,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::DeleteObject(
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QString("Unable to delete object. GraphQL input params is invalid.");
+		errorMessage = QStringLiteral("Unable to delete object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -796,7 +796,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::DeleteObject(
 
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("Id").toByteArray();
 	if (objectId.isEmpty()){
-		errorMessage = QString("No object-ID could not be extracted from the request");
+		errorMessage = QStringLiteral("No object-ID could not be extracted from the request");
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 		return QJsonObject();
 	}
@@ -813,7 +813,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::DeleteObject(
 	elementIds << objectId;
 
 	if (!m_objectCollectionCompPtr->RemoveElements(elementIds, operationContextPtr.GetPtr())){
-		errorMessage = QString("Can't remove object with ID: '%1'").arg(QString(objectId));
+		errorMessage = QStringLiteral("Can't remove object with ID: '%1'").arg(QString(objectId));
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -835,7 +835,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::GetHeaders(
 		QString& errorMessage) const
 {
 	if (!m_headersProviderCompPtr.IsValid()){
-		errorMessage = QString("Unable to get headers. Component reference 'HeadersProvider' was not set");
+		errorMessage = QStringLiteral("Unable to get headers. Component reference 'HeadersProvider' was not set");
 		SendCriticalMessage(0, errorMessage);
 
 		return QJsonObject();
@@ -906,7 +906,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::GetDataMetaInfo(
 QJsonObject CLegacyObjectCollectionControllerCompBase::GetObjectHistory(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to get the object history. Component reference 'ObjectCollection' was not set");
+		errorMessage = QStringLiteral("Unable to get the object history. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
 		return QJsonObject();
@@ -919,7 +919,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::GetObjectHistory(const im
 
 	const imtgql::CGqlParamObject* gqlInputParamsPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamsPtr == nullptr){
-		errorMessage = QString("Unable to get object history: GraphQL-parameters not set");
+		errorMessage = QStringLiteral("Unable to get object history: GraphQL-parameters not set");
 		SendErrorMessage(0, errorMessage);
 
 		return QJsonObject();
@@ -927,7 +927,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::GetObjectHistory(const im
 
 	QByteArray objectId = gqlInputParamsPtr->GetParamArgumentValue("Id").toByteArray();
 	if (objectId.isEmpty()){
-		errorMessage = QString("Unable to get history for an object with empty ID");
+		errorMessage = QStringLiteral("Unable to get history for an object with empty ID");
 		SendErrorMessage(0, errorMessage);
 
 		return QJsonObject();
@@ -957,7 +957,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::GetObjectHistory(const im
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
 					m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &filterParams));
 	if (objectCollectionIterator == nullptr){
-		errorMessage = QString("Unable to get history for an object with ID: '%1'. Error when trying to create collection iterator.").arg(objectId);
+		errorMessage = QStringLiteral("Unable to get history for an object with ID: '%1'. Error when trying to create collection iterator.").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -1033,7 +1033,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ImportObject(const imtgql
 
 	istd::IChangeableUniquePtr objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
 	if (!objectPersistenceInstancePtr.IsValid()){
-		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
+		errorMessage = QStringLiteral("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -1041,7 +1041,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ImportObject(const imtgql
 
 	imtbase::CMimeType mime;
 	if (!mime.FromString(mimeType)){
-		errorMessage = QString("Unable to parse mime type");
+		errorMessage = QStringLiteral("Unable to parse mime type");
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -1054,7 +1054,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ImportObject(const imtgql
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
-		SendErrorMessage(0, QString("Unable to open file with name '%1'").arg(filePathTmp), "CLegacyObjectCollectionControllerCompBase");
+		SendErrorMessage(0, QStringLiteral("Unable to open file with name '%1'").arg(filePathTmp), "CLegacyObjectCollectionControllerCompBase");
 		return QJsonObject();
 	}
 
@@ -1062,7 +1062,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ImportObject(const imtgql
 	file.close();
 
 	if (m_filePersistenceCompPtr[index]->LoadFromFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
-		errorMessage = QString("Unable to import object to the collection");
+		errorMessage = QStringLiteral("Unable to import object to the collection");
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
@@ -1076,7 +1076,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ImportObject(const imtgql
 	}
 
 	if (m_objectCollectionCompPtr->GetElementIds().contains(objectUuid)){
-		errorMessage = QString("Unable to import object with ID: '%1' to the collection. Error: The object already exists inside the collection").arg(objectUuid);
+		errorMessage = QStringLiteral("Unable to import object with ID: '%1' to the collection. Error: The object already exists inside the collection").arg(objectUuid);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
@@ -1088,7 +1088,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ImportObject(const imtgql
 
 	istd::IChangeableUniquePtr collectionObjectInstancePtr = m_objectFactCompPtr.CreateInstance(typeIdIndex);
 	if (!collectionObjectInstancePtr.IsValid()){
-		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
+		errorMessage = QStringLiteral("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -1100,7 +1100,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ImportObject(const imtgql
 
 	QByteArray retVal = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, collectionObjectInstancePtr.GetPtr(), objectUuid);
 	if (retVal.isEmpty()){
-		errorMessage = QString("Unable to import object with ID: '%1' to the collection. Error: The object could not be inserted into the collection").arg(objectUuid);
+		errorMessage = QStringLiteral("Unable to import object with ID: '%1' to the collection. Error: The object could not be inserted into the collection").arg(objectUuid);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
@@ -1140,7 +1140,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ExportObject(const imtgql
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Object does not exists").arg(objectId);
+		errorMessage = QStringLiteral("Unable to export the object with ID: '%1'. Error: Object does not exists").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -1162,7 +1162,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ExportObject(const imtgql
 
 	imtbase::CMimeType mime;
 	if (!mime.FromString(mimeType)){
-		errorMessage = QString("Unable to parse mime type");
+		errorMessage = QStringLiteral("Unable to parse mime type");
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -1176,7 +1176,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ExportObject(const imtgql
 
 	istd::IChangeableUniquePtr objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
 	if (!objectPersistenceInstancePtr.IsValid()){
-		errorMessage = QString("Unable to import object to the collection. Error: Object persistence instance is invalid");
+		errorMessage = QStringLiteral("Unable to import object to the collection. Error: Object persistence instance is invalid");
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -1187,7 +1187,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ExportObject(const imtgql
 	}
 
 	if (m_filePersistenceCompPtr[index]->SaveToFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
-		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Saving data to the file '%1' failed").arg(objectId).arg(filePathTmp);
+		errorMessage = QStringLiteral("Unable to export the object with ID: '%1'. Error: Saving data to the file '%1' failed").arg(objectId, filePathTmp);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -1195,7 +1195,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ExportObject(const imtgql
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::ReadOnly)){
-		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Unable to open file with name '%1'").arg(objectId).arg(filePathTmp);
+		errorMessage = QStringLiteral("Unable to export the object with ID: '%1'. Error: Unable to open file with name '%1'").arg(objectId, filePathTmp);
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 

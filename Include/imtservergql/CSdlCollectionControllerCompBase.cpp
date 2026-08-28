@@ -23,7 +23,7 @@ QJsonObject CSdlCollectionControllerCompBase::GetObjectListFromRequest(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to list objects. Component reference 'ObjectCollection' was not set");
+		errorMessage = QStringLiteral("Unable to list objects. Component reference 'ObjectCollection' was not set");
 
 		SendCriticalMessage(0, errorMessage);
 
@@ -50,7 +50,7 @@ QJsonObject CSdlCollectionControllerCompBase::GetObjectListFromRequest(
 
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
 	if (!objectCollectionIterator.IsValid()){
-		errorMessage = QString("Object collection iterator could not be created");
+		errorMessage = QStringLiteral("Object collection iterator could not be created");
 
 		SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 
@@ -79,7 +79,7 @@ QJsonObject CSdlCollectionControllerCompBase::GetObjectListFromRequest(
 	if (listPayloadWrittablePtr.IsValid()){
 		imtbase::CTreeItemModel tempModel;
 		if (!listPayloadWrittablePtr->WriteToModel(tempModel)){
-			errorMessage = QString("Unable to setup GraphQL-item. Unable to write the list model");
+			errorMessage = QStringLiteral("Unable to setup GraphQL-item. Unable to write the list model");
 
 			SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 
@@ -102,7 +102,7 @@ QJsonObject CSdlCollectionControllerCompBase::GetObjectFromRequest(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Internal error: Object collection component was not set or resolved");
+		errorMessage = QStringLiteral("Internal error: Object collection component was not set or resolved");
 
 		SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 
@@ -134,7 +134,7 @@ QJsonObject CSdlCollectionControllerCompBase::GetObjectFromRequest(
 
 		imtbase::CTreeItemModel tempModel;
 		if(!substrateWrittablePtr->WriteToModel(tempModel)){
-			errorMessage = QString("Unable to setup GraphQL-item. Unable to write model");
+			errorMessage = QStringLiteral("Unable to setup GraphQL-item. Unable to write model");
 			SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 			Q_ASSERT(0);
 			return QJsonObject();
@@ -147,7 +147,7 @@ QJsonObject CSdlCollectionControllerCompBase::GetObjectFromRequest(
 		return rootObj;
 	}
 
-	errorMessage = QT_TR_NOOP(QString("Unable to get an object with ID: '%1'.").arg(objectId));
+	errorMessage = QT_TR_NOOP(QStringLiteral("Unable to get an object with ID: '%1'.").arg(objectId));
 
 	SendErrorMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 

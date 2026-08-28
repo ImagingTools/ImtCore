@@ -96,7 +96,7 @@ bool CGqlSchemaParser::ParseGqlSchema()
 		SendLogMessage(
 					istd::IInformationProvider::InformationCategory::IC_ERROR,
 					0,
-					QString("Unexpected derictive '%1' at %2 line").arg(keyword, QString::number(m_lastReadLine + 1)),
+					QStringLiteral("Unexpected derictive '%1' at %2 line").arg(keyword, QString::number(m_lastReadLine + 1)),
 					"CGqlSchemaParser");
 
 		return false;
@@ -164,7 +164,7 @@ SdlFieldList CGqlSchemaParser::GetFields(const QString typeName) const
 	SendLogMessage(
 				istd::IInformationProvider::InformationCategory::IC_ERROR,
 				0,
-				QString("Unable to find type name '%1'").arg(typeName),
+				QStringLiteral("Unable to find type name '%1'").arg(typeName),
 				"CGqlSchemaParser");
 
 	return {CSdlField()};
@@ -273,7 +273,7 @@ bool CGqlSchemaParser::ProcessSchema()
 			SendLogMessage(
 						istd::IInformationProvider::InformationCategory::IC_ERROR,
 						0,
-						QString("Unknown derictive '%1' at line %2. ").arg(key, QString::number(m_lastReadLine + 1)),
+						QStringLiteral("Unknown derictive '%1' at line %2. ").arg(key, QString::number(m_lastReadLine + 1)),
 						"CGqlSchemaParser");
 
 			return false;
@@ -321,7 +321,7 @@ bool CGqlSchemaParser::ProcessType()
 			SendLogMessage(
 				istd::IInformationProvider::InformationCategory::IC_ERROR,
 				0,
-				QString("Redifinition of '%1' at %2").arg(sdlType.GetName(), QString::number(m_lastReadLine)),
+				QStringLiteral("Redifinition of '%1' at %2").arg(sdlType.GetName(), QString::number(m_lastReadLine)),
 				"CGqlSchemaParser");
 
 			return false;
@@ -353,7 +353,7 @@ bool CGqlSchemaParser::ProcessInterface()
 	SendLogMessage(
 				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
 				0,
-				QString("Process interface is not implemented yet"),
+				QStringLiteral("Process interface is not implemented yet"),
 				"CGqlSchemaParser");
 	Q_ASSERT(retVal);
 
@@ -402,7 +402,7 @@ bool CGqlSchemaParser::ProcessScalar()
 		SendLogMessage(
 				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
 				0,
-				QString("Process scalar is not implemented yet"),
+				QStringLiteral("Process scalar is not implemented yet"),
 				"CGqlSchemaParser");
 	Q_ASSERT(retVal);
 
@@ -457,7 +457,7 @@ bool CGqlSchemaParser::ProcessExtend()
 		SendLogMessage(
 				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
 				0,
-				QString("Process extend is not implemented yet"),
+				QStringLiteral("Process extend is not implemented yet"),
 				"CGqlSchemaParser");
 	Q_ASSERT(retVal);
 
@@ -471,7 +471,7 @@ bool CGqlSchemaParser::ProcessDirective()
 		SendLogMessage(
 				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
 				0,
-				QString("Process directive is not implemented yet"),
+				QStringLiteral("Process directive is not implemented yet"),
 				"CGqlSchemaParser");
 	Q_ASSERT(retVal);
 
@@ -583,7 +583,7 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 				SendLogMessage(
 					istd::IInformationProvider::InformationCategory::IC_ERROR,
 					0,
-					QString("Redifinition of '%1' at %2").arg(request.GetName(), QString::number(m_lastReadLine)),
+					QStringLiteral("Redifinition of '%1' at %2").arg(request.GetName(), QString::number(m_lastReadLine)),
 					"CGqlSchemaParser");
 
 				return false;
@@ -602,7 +602,7 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 			request.SetInputArguments(inputArguments);
 		}
 		else if (type != CSdlRequest::T_QUERY && type != CSdlRequest::T_SUBSCRIPTION){
-			QString errorString = QString("Schema error! Request '%1' is not a Query and has not arguments at line %2")
+			QString errorString = QStringLiteral("Schema error! Request '%1' is not a Query and has not arguments at line %2")
 			.arg(request.GetName(),
 				 QString::number(m_lastReadLine + 1));
 
@@ -642,7 +642,7 @@ bool CGqlSchemaParser::ProcessRequests(CSdlRequest::Type type)
 			bool isCustom = false;
 			CSdlTools::ConvertType(argument, &isCustom);
 			if (isCustom && !CSdlTools::EnsureFieldHasValidType(argument, m_sdlTypes, m_enums, m_unions)){
-				QString errorString = QString("Schema error! Request '%1' has field '%2' with unknown type '%3' at line %4")
+				QString errorString = QStringLiteral("Schema error! Request '%1' has field '%2' with unknown type '%3' at line %4")
 				.arg(request.GetName(),
 					 argument.GetId(),
 					 argument.GetType(),
@@ -676,7 +676,7 @@ bool CGqlSchemaParser::ProcessCustomSchemaValue(const QString& /*key*/, const QS
 
 bool CGqlSchemaParser::ProcessCustomSection(const QString& sectionName)
 {
-	QString errorString = QString("Schema error! Unsupported type '%1' at %2")
+	QString errorString = QStringLiteral("Schema error! Unsupported type '%1' at %2")
 							  .arg(sectionName, QString::number(m_lastReadLine + 1));
 
 	SendLogMessage(
@@ -696,7 +696,7 @@ bool CGqlSchemaParser::ValidateSchema()
 			bool isCustom = false;
 			CSdlTools::ConvertType(sdlField, &isCustom);
 			if (isCustom && !CSdlTools::EnsureFieldHasValidType(sdlField, m_sdlTypes, m_enums, m_unions)){
-				QString errorString = QString("Schema error! Type '%1' has field '%2' with unknown type '%3'")
+				QString errorString = QStringLiteral("Schema error! Type '%1' has field '%2' with unknown type '%3'")
 							.arg(sdlType.GetName(),
 							sdlField.GetId(),
 							sdlField.GetType());
@@ -717,7 +717,7 @@ bool CGqlSchemaParser::ValidateSchema()
 			bool isCustom = false;
 			CSdlTools::ConvertType(unionName, &isCustom);
 			if (isCustom && !CSdlTools::FindEntryByName(unionName, m_sdlTypes, m_enums, m_unions)){
-				QString errorString = QString("Schema error! Union '%1' has variant '%2' with option type")
+				QString errorString = QStringLiteral("Schema error! Union '%1' has variant '%2' with option type")
 							.arg(sdlUnion.GetName(), unionName);
 
 				SendLogMessage(

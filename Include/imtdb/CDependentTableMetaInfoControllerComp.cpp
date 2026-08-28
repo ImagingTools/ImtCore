@@ -39,7 +39,7 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 			}
 
 			if (!m_dependentMetaInfoControllerCompPtr->ClearDependentMetaInfo(metaFieldCleanupPlan)){
-				SendErrorMessage(0, QString("Unable to clear dependent meta info"), "CDependentTableMetaInfoControllerComp");
+				SendErrorMessage(0, QStringLiteral("Unable to clear dependent meta info"), "CDependentTableMetaInfoControllerComp");
 			}
 
 			return;
@@ -90,7 +90,7 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 	}
 
 	if (!m_dependentMetaInfoControllerCompPtr->UpdateDependentMetaInfo(dependentMetaInfo)){
-		SendErrorMessage(0, QString("Unable to update dependent meta info"), "CDependentTableMetaInfoControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to update dependent meta info"), "CDependentTableMetaInfoControllerComp");
 	}
 }
 

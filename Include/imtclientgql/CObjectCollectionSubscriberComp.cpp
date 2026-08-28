@@ -19,7 +19,7 @@ namespace imtclientgql
 void CObjectCollectionSubscriberComp::OnResponseReceived(const QByteArray& subscriptionId, const QByteArray& subscriptionData)
 {
 	if (!m_subscriptionIds.contains(subscriptionId)){
-		SendErrorMessage(0, QString("Unable to response received for subscription ID '%1'").arg(subscriptionId), "CObjectCollectionSubscriberComp");
+		SendErrorMessage(0, QStringLiteral("Unable to response received for subscription ID '%1'").arg(subscriptionId), "CObjectCollectionSubscriberComp");
 		return;
 	}
 

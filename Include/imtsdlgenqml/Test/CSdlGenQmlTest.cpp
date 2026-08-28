@@ -154,7 +154,7 @@ void ExecuteTest(
 	const QString tempOutputDirPath = tempOutputDir.path();
 	bool isOutputDirExists = istd::CSystem::EnsurePathExists(tempOutputDirPath);
 	if (!isOutputDirExists){
-		qCritical() <<  QString("Unable to create temp dir at '%1'").arg(tempOutputDirPath);
+		qCritical() <<  QStringLiteral("Unable to create temp dir at '%1'").arg(tempOutputDirPath);
 	}
 	QVERIFY(isOutputDirExists);
 
@@ -361,7 +361,7 @@ void CSdlGenQmlTest::TestGenerationResultJsonFormat()
 	QJsonParseError actualParseError;
 	QJsonDocument actualDoc = QJsonDocument::fromJson(actualJson, &actualParseError);
 	QVERIFY2(actualParseError.error == QJsonParseError::NoError, 
-			QString("Failed to parse actual JSON: %1 at offset %2")
+			QStringLiteral("Failed to parse actual JSON: %1 at offset %2")
 					.arg(actualParseError.errorString())
 					.arg(actualParseError.offset));
 	QByteArray actualJsonIndented = actualDoc.toJson(QJsonDocument::Indented);

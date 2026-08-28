@@ -609,7 +609,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 	}
 
 	else {
-		SendCriticalMessage(0, QString("Unexpected request method: %1").arg(imtsdl::CSdlDocumentType::ToString(operationType)));
+		SendCriticalMessage(0, QStringLiteral("Unexpected request method: %1").arg(imtsdl::CSdlDocumentType::ToString(operationType)));
 		I_CRITICAL();
 	}
 }
@@ -1132,7 +1132,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		return true;
 		break;
 	default:
-		SendCriticalMessage(0, QString("Unexpected type: %1").arg(QString::number(operationType)));
+		SendCriticalMessage(0, QStringLiteral("Unexpected type: %1").arg(QString::number(operationType)));
 		I_CRITICAL();
 		break;
 	}
@@ -1154,7 +1154,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		stream << QStringLiteral("UpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QString& errorMessage) const");
 		break;
 	default:
-		SendCriticalMessage(0, QString("Unexpected type: %1").arg(QString::number(operationType)));
+		SendCriticalMessage(0, QStringLiteral("Unexpected type: %1").arg(QString::number(operationType)));
 		I_CRITICAL();
 		break;
 	}
@@ -1404,7 +1404,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		}
 	}
 	if (!referenceType){
-		SendErrorMessage(0, QString("Unable to get collection reference for document %1").arg(sdlDocumentType.GetName()));
+		SendErrorMessage(0, QStringLiteral("Unable to get collection reference for document %1").arg(sdlDocumentType.GetName()));
 
 		return false;
 	}
@@ -1671,7 +1671,7 @@ QString CGqlCollectionControllerBaseClassGeneratorComp::GetInputExtractionString
 		*okPtr = false;
 	}
 
-	SendErrorMessage(0, QString("'collectionSchema' section processing error: Unable to find reference name '%1' in input arguments for '%2'").arg(sdlRequest.GetName(), typeName));
+	SendErrorMessage(0, QStringLiteral("'collectionSchema' section processing error: Unable to find reference name '%1' in input arguments for '%2'").arg(sdlRequest.GetName(), typeName));
 
 	return {};
 }

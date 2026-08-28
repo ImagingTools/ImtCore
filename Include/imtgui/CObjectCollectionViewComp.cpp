@@ -132,8 +132,8 @@ ICollectionViewDelegate* CObjectCollectionViewComp::GetViewDelegatePtr(const QBy
 	}
 
 	QByteArray componentId = GetComponentId(GetComponentContext().get());
-	const QByteArray componentName = QString("%1").arg(__LINE__).toUtf8();
-	const QByteArray errorMessage = QString("Type-ID of the view delegate: '%1' not found, %2").arg(typeId).arg(componentId).toUtf8();
+	const QByteArray componentName = QStringLiteral("%1").arg(__LINE__).toUtf8();
+	const QByteArray errorMessage = QStringLiteral("Type-ID of the view delegate: '%1' not found, %2").arg(typeId, componentId).toUtf8();
 	Q_ASSERT_X(false, componentName.constData(), errorMessage.constData());
 
 	return nullptr;

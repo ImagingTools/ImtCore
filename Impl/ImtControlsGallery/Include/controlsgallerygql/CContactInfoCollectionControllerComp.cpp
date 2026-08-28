@@ -185,13 +185,13 @@ istd::IChangeableUniquePtr CContactInfoCollectionControllerComp::CreateObjectFro
 	
 	istd::TUniqueInterfacePtr<istd::IChangeable> contactInstanceInfoPtr = m_objectFactCompPtr.CreateInstance(typeIdIndex);
 	if (!contactInstanceInfoPtr.IsValid()){
-		errorMessage = QString("Unable to create contact info instance. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to create contact info instance. Error: Invalid object");
 		return nullptr;
 	}
 
 	imtauth::CContactInfo* contactInfoPtr = dynamic_cast<imtauth::CContactInfo*>(contactInstanceInfoPtr.GetPtr());
 	if (contactInfoPtr == nullptr){
-		errorMessage = QString("Unable to cast object to contact info. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to cast object to contact info. Error: Invalid object");
 		return nullptr;
 	}
 

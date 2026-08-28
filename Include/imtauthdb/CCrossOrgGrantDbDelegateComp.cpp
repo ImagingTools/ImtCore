@@ -35,7 +35,7 @@ static QString NullableSqlText(const QString& value)
 		return QStringLiteral("NULL");
 	}
 
-	return QString("'%1'").arg(imtdb::EscapeSql(value));
+	return QStringLiteral("'%1'").arg(imtdb::EscapeSql(value));
 }
 
 
@@ -45,7 +45,7 @@ static QString NullableSqlDateTime(const QString& value)
 		return QStringLiteral("NULL");
 	}
 
-	return QString("'%1'").arg(imtdb::EscapeSql(value));
+	return QStringLiteral("'%1'").arg(imtdb::EscapeSql(value));
 }
 
 
@@ -185,10 +185,10 @@ QByteArray CCrossOrgGrantDbDelegateComp::CreateDeleteObjectsQuery(
 
 	QStringList escapedIds;
 	for (const QByteArray& id : objectIds){
-		escapedIds << QString("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
+		escapedIds << QStringLiteral("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
 	}
 
-	return QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
+	return QStringLiteral("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
 			.arg(*m_tableNameAttrPtr, escapedIds.join(", ")).toUtf8();
 }
 
@@ -212,7 +212,7 @@ QByteArray CCrossOrgGrantDbDelegateComp::CreateRenameObjectQuery(
 		return QByteArray();
 	}
 
-	return QString("UPDATE \"%1\" SET \"Name\"=%2 WHERE \"Id\"='%3';")
+	return QStringLiteral("UPDATE \"%1\" SET \"Name\"=%2 WHERE \"Id\"='%3';")
 			.arg(*m_tableNameAttrPtr)
 			.arg(NullableSqlText(newObjectName))
 			.arg(imtdb::EscapeSql(QString::fromUtf8(objectId))).toUtf8();
@@ -264,7 +264,7 @@ QString CCrossOrgGrantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::I
 		QByteArray tenantId = tenantFilterPtr->GetTenantId();
 		if (!tenantId.isEmpty()){
 			QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
-			return QString("(\"SourceTenantId\"='%1' OR \"TargetTenantId\"='%1')")
+			return QStringLiteral("(\"SourceTenantId\"='%1' OR \"TargetTenantId\"='%1')")
 					.arg(escapedTenantId);
 		}
 	}

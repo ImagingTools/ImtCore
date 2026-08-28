@@ -164,7 +164,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		QJsonParseError jsonError;
 		QJsonDocument jsonDocument = QJsonDocument::fromJson(message, &jsonError);
 		if (jsonDocument.isNull()){
-			QByteArray errorMessage = QString("Unable to convert message to JSON: '%1'").arg(jsonError.errorString()).toUtf8();
+			QByteArray errorMessage = QStringLiteral("Unable to convert message to JSON: '%1'").arg(jsonError.errorString()).toUtf8();
 			qDebug() << errorMessage;
 
 			locker.unlock();
@@ -273,7 +273,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 
 		default:
 			{
-				QByteArray errorMessage = QString("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
+				QByteArray errorMessage = QStringLiteral("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
 
 				return CreateErrorResponse(errorMessage, request);
 			}
@@ -371,7 +371,7 @@ QFuture<CSubscriptionManagerComp::GqlResult> CSubscriptionManagerComp::SendReque
 
 	if (!SendRequestInternal(*requestPtr, constRequestPtr)){
 		FailPending(key, EC_NETWORK,
-					QString("Request could not be sent: '%1'").arg(QString(requestPtr->GetCommandId())));
+					QStringLiteral("Request could not be sent: '%1'").arg(QString(requestPtr->GetCommandId())));
 		return future;
 	}
 

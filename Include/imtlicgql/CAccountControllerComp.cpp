@@ -21,7 +21,7 @@ namespace imtlicgql
 QJsonObject CAccountControllerComp::GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Internal error");
+		errorMessage = QStringLiteral("Internal error");
 		SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 		return QJsonObject();
@@ -78,7 +78,7 @@ QJsonObject CAccountControllerComp::GetObjectFromRequest(const imtgql::CGqlReque
 		}
 	}
 
-	errorMessage = QT_TR_NOOP(QString("Unable to get an account with ID: '%1'.").arg(accountId));
+	errorMessage = QT_TR_NOOP(QStringLiteral("Unable to get an account with ID: '%1'.").arg(accountId));
 	SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 	return QJsonObject();
@@ -91,7 +91,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 			QString& errorMessage) const
 {
 	if (!m_accountInfoFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Internal error");
+		errorMessage = QStringLiteral("Internal error");
 		SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 		return nullptr;
@@ -108,7 +108,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 	if (!itemData.isEmpty()){
 		istd::TUniqueInterfacePtr<imtauth::ICompanyInfo> companyInstancePtr = m_accountInfoFactCompPtr.CreateInstance();
 		if (!companyInstancePtr.IsValid()){
-			errorMessage = QString("Unable to create an instance of the company object.");
+			errorMessage = QStringLiteral("Unable to create an instance of the company object.");
 			SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 			return nullptr;
@@ -211,7 +211,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 		return companyInfoPtr;
 	}
 
-	errorMessage = QString("Can not create account: %1").arg(QString(objectId));
+	errorMessage = QStringLiteral("Can not create account: %1").arg(QString(objectId));
 	SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 	return nullptr;

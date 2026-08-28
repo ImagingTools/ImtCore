@@ -127,7 +127,7 @@ bool CDesignManagerComp::ApplyDesignScheme(const QByteArray& themeId)
 
 	QByteArray componentId = GetComponentId(GetComponentContext().get());
 
-	qDebug() << QString("%1: Start applying color scheme-ID: %2").arg(componentId).arg(themeId);
+	qDebug() << QStringLiteral("%1: Start applying color scheme-ID: %2").arg(componentId, themeId);
 
 	CImtStyle* imtStylePtr = CImtStyle::GetInstance();
 	Q_ASSERT(imtStylePtr != nullptr);
@@ -147,7 +147,7 @@ bool CDesignManagerComp::ApplyDesignScheme(const QByteArray& themeId)
 	appPtr->setProperty("ThemeId", themeId);
 	QCoreApplication::postEvent(QCoreApplication::instance(), new iqt::CDesignThemeEvent(themeId));
 
-	qDebug() << (QString("%1: Finished applying color scheme-ID: %2").arg(componentId).arg(themeId));
+	qDebug() << (QStringLiteral("%1: Finished applying color scheme-ID: %2").arg(componentId, themeId));
 
 	return retVal;
 }
@@ -181,7 +181,7 @@ void CDesignManagerComp::DesignList::UpdateDesignList()
 			designInfo.name = themeList.GetElementInfo(themeId, imtbase::ICollectionInfo::EIT_NAME).toString();
 			designInfo.description = themeList.GetElementInfo(themeId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
-			qDebug() << (QString("Color scheme added: %1").arg(designInfo.name));
+			qDebug() << (QStringLiteral("Color scheme added: %1").arg(designInfo.name));
 
 			m_designList.append(designInfo);
 		}

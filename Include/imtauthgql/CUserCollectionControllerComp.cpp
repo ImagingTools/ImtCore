@@ -37,7 +37,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 {
 	auto userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&object);
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		errorMessage = QStringLiteral("Unable to create representation from object. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
@@ -101,7 +101,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	if (name.isEmpty()){
-		errorMessage = QString("Name cannot be empty");
+		errorMessage = QStringLiteral("Name cannot be empty");
 		return false;
 	}
 
@@ -236,7 +236,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserCollectionControllerComp::On
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QString("Unable to get element meta info for user '%1'. Error: User does not exists").arg(objectId);
+		errorMessage = QStringLiteral("Unable to get element meta info for user '%1'. Error: User does not exists").arg(objectId);
 		return response;
 	}
 
@@ -324,7 +324,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (contextUserInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'. Error: GraphQL context is invalid").arg(objectId);
+		errorMessage = QStringLiteral("Unable to create representation from object '%1'. Error: GraphQL context is invalid").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
@@ -344,14 +344,14 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'").arg(objectId);
+		errorMessage = QStringLiteral("Unable to create representation from object '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
 	}
 
 	if (!contextUserInfoPtr->IsAdmin() && userInfoPtr->IsAdmin()){
-		errorMessage = QString("Unable to create representation from object 'su'. Error: User '%1' permission denied").arg(contextUserInfoPtr->GetId());
+		errorMessage = QStringLiteral("Unable to create representation from object 'su'. Error: User '%1' permission denied").arg(contextUserInfoPtr->GetId());
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
@@ -494,7 +494,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRepres
 
 	imtauth::IUserInfoUniquePtr userInstancePtr = m_userInfoFactCompPtr.CreateInstance();
 	if (!userInstancePtr.IsValid()){
-		errorMessage = QString("Unable to create user instance. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to create user instance. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return nullptr;
@@ -502,7 +502,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRepres
 
 	auto userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(userInstancePtr.GetPtr());
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to cast user instance to identifable object. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to cast user instance to identifable object. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return nullptr;
@@ -528,7 +528,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRepres
 			}
 
 			if (password.isEmpty()){
-				errorMessage = QString("Password cannot be empty");
+				errorMessage = QStringLiteral("Password cannot be empty");
 				return nullptr;
 			}
 
@@ -552,7 +552,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 {
 	auto userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(&data);
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		errorMessage = QStringLiteral("Unable to create representation from object. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
@@ -601,7 +601,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		info.id = QByteArray(systemInfo.systemId);
 
 		if (systemInfo.systemId.isEmpty()){
-			info.name = QString("Internal");
+			info.name = QStringLiteral("Internal");
 		}
 		else{
 			info.name = QString(systemInfo.systemName);
@@ -633,7 +633,7 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 	auto userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&object);
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to cast user instance to identifable object. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to cast user instance to identifable object. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
@@ -785,7 +785,7 @@ QJsonObject CUserCollectionControllerComp::InsertObject(
 
 	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(newUserId, tenantId);
 	if (membershipId.isEmpty()){
-		SendWarningMessage(0, QString("Auto-membership creation failed for user '%1' in tenant '%2'").arg(QString::fromUtf8(newUserId), QString::fromUtf8(tenantId)), "CUserCollectionControllerComp");
+		SendWarningMessage(0, QStringLiteral("Auto-membership creation failed for user '%1' in tenant '%2'").arg(QString::fromUtf8(newUserId), QString::fromUtf8(tenantId)), "CUserCollectionControllerComp");
 	}
 
 	return result;
@@ -801,7 +801,7 @@ bool CUserCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList&
 			for (const QByteArray& tenantId : tenantIds){
 				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
 				if (tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId){
-					errorMessage = QString("Cannot delete user '%1' who owns tenant '%2'. Transfer ownership first.")
+					errorMessage = QStringLiteral("Cannot delete user '%1' who owns tenant '%2'. Transfer ownership first.")
 						.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId));
 					return false;
 				}

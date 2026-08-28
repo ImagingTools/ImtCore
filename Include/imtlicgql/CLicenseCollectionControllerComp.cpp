@@ -27,7 +27,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to create representation from object. Error: Attribute 'm_objectCollectionCompPtr' was not set");
+		errorMessage = QStringLiteral("Unable to create representation from object. Error: Attribute 'm_objectCollectionCompPtr' was not set");
 		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
 
 		return false;
@@ -42,7 +42,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (licenseInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'").arg(objectId);
+		errorMessage = QStringLiteral("Unable to create representation from object '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
 
 		return false;
@@ -130,7 +130,7 @@ istd::IChangeableUniquePtr CLicenseCollectionControllerComp::CreateObjectFromRep
 			QString& errorMessage) const
 {
 	if (!m_licenseInfoFactCompPtr.IsValid()){
-		errorMessage = QString("Unable to create object from representation. Error: Attribute 'm_licenseInfoFactCompPtr' was not set");
+		errorMessage = QStringLiteral("Unable to create object from representation. Error: Attribute 'm_licenseInfoFactCompPtr' was not set");
 		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
 
 		return nullptr;
@@ -138,14 +138,14 @@ istd::IChangeableUniquePtr CLicenseCollectionControllerComp::CreateObjectFromRep
 
 	imtlic::ILicenseDefinitionUniquePtr licenseInstancePtr = m_licenseInfoFactCompPtr.CreateInstance();
 	if (!licenseInstancePtr.IsValid()){
-		errorMessage = QString("Unable to create license instance. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to create license instance. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
 
 		return nullptr;
 	}
 
 	if (!FillObjectFromRepresentation(licenseDataRepresentation, *licenseInstancePtr, newObjectId, errorMessage)){
-		errorMessage = QString("Unable to create object from representation. Error: '%1'").arg(errorMessage);
+		errorMessage = QStringLiteral("Unable to create object from representation. Error: '%1'").arg(errorMessage);
 		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
 
 		return nullptr;
@@ -163,7 +163,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 {
 	const imtlic::CIdentifiableLicenseDefinition* licenseInfoPtr = dynamic_cast<const imtlic::CIdentifiableLicenseDefinition*>(&data);
 	if (licenseInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		errorMessage = QStringLiteral("Unable to create representation from object. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
 
 		return false;
@@ -206,7 +206,7 @@ bool CLicenseCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 {
 	imtlic::CIdentifiableLicenseDefinition* licenseInfoPtr = dynamic_cast<imtlic::CIdentifiableLicenseDefinition*>(&object);
 	if (licenseInfoPtr == nullptr){
-		errorMessage = QString("Unable to update representation from object. Error: Object is invalid");
+		errorMessage = QStringLiteral("Unable to update representation from object. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
 
 		return false;
@@ -231,7 +231,7 @@ bool CLicenseCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	sdl::V1_0::imtlic::CLicenseDefinitionData licenseData = *arguments.input->item;
 
 	if (!FillObjectFromRepresentation(licenseData, *licenseInfoPtr, objectId, errorMessage)){
-		errorMessage = QString("Unable to update object from representation. Error: '%1'").arg(errorMessage);
+		errorMessage = QStringLiteral("Unable to update object from representation. Error: '%1'").arg(errorMessage);
 		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
 
 		return false;
@@ -251,7 +251,7 @@ bool CLicenseCollectionControllerComp::FillObjectFromRepresentation(
 {
 	imtlic::CIdentifiableLicenseDefinition* licenseInfoPtr = dynamic_cast<imtlic::CIdentifiableLicenseDefinition*>(&object);
 	if (licenseInfoPtr == nullptr){
-		errorMessage = QString("Object is invalid");
+		errorMessage = QStringLiteral("Object is invalid");
 		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
 
 		return false;
@@ -272,7 +272,7 @@ bool CLicenseCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	if (licenseId.isEmpty()){
-		errorMessage = QString("Empty License-ID");
+		errorMessage = QStringLiteral("Empty License-ID");
 		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
 
 		return false;
@@ -295,7 +295,7 @@ bool CLicenseCollectionControllerComp::FillObjectFromRepresentation(
 	if (!collectionIds.isEmpty()){
 		QByteArray id = collectionIds[0];
 		if (newObjectId != id){
-			errorMessage = QT_TR_NOOP(QString("License-ID: '%1' already exists.")).arg(licenseId);
+			errorMessage = QT_TR_NOOP(QStringLiteral("License-ID: '%1' already exists.")).arg(licenseId);
 
 			return false;
 		}

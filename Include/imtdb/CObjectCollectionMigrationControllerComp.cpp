@@ -100,7 +100,7 @@ bool CObjectCollectionMigrationControllerComp::DoMigration(int& resultRevision, 
 
 	resultRevision = endIndex;
 
-	SendInfoMessage(0, QString("Migration '%1' succesfully migrated").arg(resultRevision), "CObjectCollectionMigrationControllerComp");
+	SendInfoMessage(0, QStringLiteral("Migration '%1' succesfully migrated").arg(resultRevision), "CObjectCollectionMigrationControllerComp");
 
 	return true;
 }

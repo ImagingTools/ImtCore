@@ -109,11 +109,11 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 			int revisionVersion = 1;
 			QString queryStr;
 			if (*m_isMultiTypeAttrPtr){
-				queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\", \"TypeId\") VALUES('%2', '%3', '%4', '%5', '%6', true, '%0');")
+				queryStr = QStringLiteral("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\", \"TypeId\") VALUES('%2', '%3', '%4', '%5', '%6', true, '%0');")
 				.arg(QString(typeId));
 			}
 			else{
-				queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\") VALUES('%2', '%3', '%4', '%5', '%6', true);");
+				queryStr = QStringLiteral("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\") VALUES('%2', '%3', '%4', '%5', '%6', true);");
 			}
 
 			retVal.query = queryStr
@@ -143,7 +143,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDeleteObjectsQuery(
 
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
-		quotedIds << QString("'%1'").arg(QString(objectId));
+		quotedIds << QStringLiteral("'%1'").arg(QString(objectId));
 	}
 
 	QString query = QString(
@@ -173,12 +173,12 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 		QString queryStr;
 		if (*m_isMultiTypeAttrPtr){
-			queryStr =  QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\", \"TypeId\") VALUES('%2', '%3', '%4', '%5', true, "
+			queryStr =  QStringLiteral("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\", \"TypeId\") VALUES('%2', '%3', '%4', '%5', true, "
 								" (SELECT MAX(\"RevisionNumber\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1,"
 								" (SELECT \"TypeId\" FROM \"%1\" WHERE \"DocumentId\" = '%2' LIMIT 1) );" );
 		}
 		else{
-			queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT MAX(\"RevisionNumber\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );");
+			queryStr = QStringLiteral("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT MAX(\"RevisionNumber\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );");
 		}
 		retVal = queryStr
 				.arg(QString(*m_tableNameAttrPtr))
@@ -200,7 +200,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDescriptionObjectQuery(
 			const QString& description,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	QByteArray retVal = QString("UPDATE \"%1\" SET \"Document\" = jsonb_set(\"Document\", '{Description}', '\"%2\"', true), \"LastModified\" = '%3' WHERE \"%4\" ='%5' AND \"IsActive\" = true;")
+	QByteArray retVal = QStringLiteral("UPDATE \"%1\" SET \"Document\" = jsonb_set(\"Document\", '{Description}', '\"%2\"', true), \"LastModified\" = '%3' WHERE \"%4\" ='%5' AND \"IsActive\" = true;")
 				.arg(QString(*m_tableNameAttrPtr))
 				.arg(SqlEncode(description))
 				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs))
@@ -215,7 +215,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetCountQuery(const iprm::IParamsSet* p
 {
 	QString baseQuery = GetSelectionQuery(QByteArray(), 0, -1, paramsPtr);
 
-	return QString("SELECT COUNT(*) FROM (%1) as t").arg(baseQuery).toUtf8();
+	return QStringLiteral("SELECT COUNT(*) FROM (%1) as t").arg(baseQuery).toUtf8();
 }
 
 
@@ -224,14 +224,14 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetCountQuery(const iprm::IParamsSet* p
 QString CSqlJsonDatabaseDelegateComp::GetBaseSelectionQuery() const
 {
 	if (*m_isMultiTypeAttrPtr){
-		return QString("SELECT root.*,"
+		return QStringLiteral("SELECT root.*,"
 					   "(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND root.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
 					   " as root WHERE \"IsActive\" = true")
 				.arg(QString(*m_objectIdColumnAttrPtr))
 				.arg(QString(*m_tableNameAttrPtr));
 	}
 
-	return QString("SELECT \"Id\", \"%1\", \"Document\", \"RevisionNumber\", \"LastModified\","
+	return QStringLiteral("SELECT \"Id\", \"%1\", \"Document\", \"RevisionNumber\", \"LastModified\","
 					"(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND root.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
 					" as root WHERE \"IsActive\" = true")
 			.arg(QString(*m_objectIdColumnAttrPtr))
@@ -247,7 +247,7 @@ bool CSqlJsonDatabaseDelegateComp::SetCollectionItemMetaInfoFromRecord(const QSq
 	}
 
 	if (!objectId.isEmpty()){
-		QByteArray query = QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3' AND \"RevisionNumber\" = 1;")
+		QByteArray query = QStringLiteral("SELECT * FROM \"%1\" WHERE \"%2\" = '%3' AND \"RevisionNumber\" = 1;")
 				.arg(QString(*m_tableNameAttrPtr))
 				.arg(QString(*m_objectIdColumnAttrPtr))
 				.arg(QString(objectId)).toUtf8();
@@ -325,10 +325,10 @@ bool CSqlJsonDatabaseDelegateComp::CreateSortQuery(const imtbase::ICollectionFil
 
 	if (!columnId.isEmpty() && !sortOrder.isEmpty()){
 		if (columnId == "LastModified" || columnId == "Added"){
-			sortQuery = QString("ORDER BY \"%1\" %2").arg(columnId).arg(sortOrder);
+			sortQuery = QStringLiteral("ORDER BY \"%1\" %2").arg(columnId, sortOrder);
 		}
 		else{
-			sortQuery = QString("ORDER BY \"Document\"->>'%1' %2").arg(columnId).arg(sortOrder);
+			sortQuery = QStringLiteral("ORDER BY \"Document\"->>'%1' %2").arg(columnId, sortOrder);
 		}
 	}
 
@@ -422,7 +422,7 @@ bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
 			}
 
 			QString value = textParamPtr->GetText();
-			filterQuery += QString("lower(\"Document\"->>'%1') = lower('%2')").arg(key).arg(SqlEncode(value));
+			filterQuery += QStringLiteral("lower(\"Document\"->>'%1') = lower('%2')").arg(key).arg(SqlEncode(value));
 		}
 	}
 
@@ -442,12 +442,12 @@ bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
 		QString encodedFilter = SqlEncode(textFilter);
-		textFilterQuery = QString("\"Document\"->>'%1' ILIKE '%%2%'").arg(filteringColumnIds.first()).arg(encodedFilter);
+		textFilterQuery = QStringLiteral("\"Document\"->>'%1' ILIKE '%%2%'").arg(filteringColumnIds.first()).arg(encodedFilter);
 
 		for (int i = 1; i < filteringColumnIds.count(); ++i){
 			textFilterQuery += " OR ";
 
-			textFilterQuery += QString("\"Document\"->>'%1' ILIKE '%%2%'").arg(filteringColumnIds[i]).arg(encodedFilter);
+			textFilterQuery += QStringLiteral("\"Document\"->>'%1' ILIKE '%%2%'").arg(filteringColumnIds[i], encodedFilter);
 		}
 	}
 
@@ -554,30 +554,30 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteArra
 				imtcol::IDocumentCollectionFilter::DocumentStates states = documentFilterParamPtr->GetDocumentStates();
 
 				if (states.contains(imtcol::IDocumentCollectionFilter::DS_ACTIVE)){
-					stateDocumentFilter += QString("\"IsActive\" = true");
+					stateDocumentFilter += QStringLiteral("\"IsActive\" = true");
 				}
 
 				if (states.contains(imtcol::IDocumentCollectionFilter::DS_INACTIVE)){
 					if (!stateDocumentFilter.isEmpty()){
-						stateDocumentFilter += QString(" OR ");
+						stateDocumentFilter += QStringLiteral(" OR ");
 					}
 
-					stateDocumentFilter += QString("\"IsActive\" = false");
+					stateDocumentFilter += QStringLiteral("\"IsActive\" = false");
 				}
 			}
 		}
 	}
 
 	if (stateDocumentFilter.isEmpty()){
-		stateDocumentFilter = QString("\"IsActive\" = true");
+		stateDocumentFilter = QStringLiteral("\"IsActive\" = true");
 	}
 
 	QString schemaPrefix;
 	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QString("%1.").arg(QString(*m_tableSchemaAttrPtr));
+		schemaPrefix = QStringLiteral("%1.").arg(QString(*m_tableSchemaAttrPtr));
 	}
 
-	return QString("(SELECT * FROM %0\"%1\" WHERE (%2) AND \"DocumentId\" = '%3') ORDER BY \"RevisionNumber\" DESC;")
+	return QStringLiteral("(SELECT * FROM %0\"%1\" WHERE (%2) AND \"DocumentId\" = '%3') ORDER BY \"RevisionNumber\" DESC;")
 		.arg(schemaPrefix)
 		.arg(QString(*m_tableNameAttrPtr))
 		.arg(stateDocumentFilter)
@@ -599,7 +599,7 @@ imtbase::IRevisionController::RevisionInfoList CSqlJsonDatabaseDelegateComp::Get
 
 	QString schemaPrefix;
 	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QString("%1.").arg(QString(*m_tableSchemaAttrPtr));
+		schemaPrefix = QStringLiteral("%1.").arg(QString(*m_tableSchemaAttrPtr));
 	}
 
 	const QByteArray query = QString(R"(SELECT * FROM %0"%1" WHERE "DocumentId" = '%2' ORDER BY "RevisionNumber" DESC;)")

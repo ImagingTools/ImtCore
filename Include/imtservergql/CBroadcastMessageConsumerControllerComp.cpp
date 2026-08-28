@@ -21,13 +21,13 @@ QJsonObject CBroadcastMessageConsumerControllerComp::CreateInternalResponse(cons
 	Q_ASSERT(IsRequestSupported(gqlRequest));
 
 	if (!IsRequestSupported(gqlRequest)){
-		SendErrorMessage(0, QString("GQL handler is not supported GQL Request with command '%1'").arg(gqlRequest.GetCommandId()));
+		SendErrorMessage(0, QStringLiteral("GQL handler is not supported GQL Request with command '%1'").arg(gqlRequest.GetCommandId()));
 
 		return QJsonObject();
 	}
 
 	if (!m_messageConsumerCompPtr.IsValid()){
-		errorMessage = QString("Unable to send broadcast message. Component reference 'MessageConsumer' was not set");
+		errorMessage = QStringLiteral("Unable to send broadcast message. Component reference 'MessageConsumer' was not set");
 		SendCriticalMessage(0, errorMessage);
 
 		return QJsonObject();
@@ -35,7 +35,7 @@ QJsonObject CBroadcastMessageConsumerControllerComp::CreateInternalResponse(cons
 
 	const imtgql::CGqlParamObject* inputObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputObjectPtr == nullptr){
-		errorMessage = QString("Unable to send broadcast message. GraphQL input params is invalid");
+		errorMessage = QStringLiteral("Unable to send broadcast message. GraphQL input params is invalid");
 		SendErrorMessage(0, errorMessage);
 
 		return QJsonObject();

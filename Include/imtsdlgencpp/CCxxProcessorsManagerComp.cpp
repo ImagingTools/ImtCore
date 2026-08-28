@@ -67,7 +67,7 @@ bool CreateDirectivesFromEntryList(const QList<T>& entryList, QList<imtsdl::Incl
 		if (entry.IsExternal()){
 			const QString typeIncludePath = '<' + entry.GetTargetHeaderFilePath() + '>';
 			if (typeIncludePath.isEmpty()){
-				qCritical() << QString("Header path is empty %1 of %2").arg(entry.GetName(), entry.GetSchemaFilePath());
+				qCritical() << QStringLiteral("Header path is empty %1 of %2").arg(entry.GetName(), entry.GetSchemaFilePath());
 				I_CRITICAL();
 
 				return false;
@@ -152,7 +152,7 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		}
 
 		if (!BeginHeaderFile(*m_schemaParamsCompPtr, *filePtr, paramsPtr)){
-			SendErrorMessage(0, QString("Unable to begin process file '%1'").arg(filePtr->fileName()));
+			SendErrorMessage(0, QStringLiteral("Unable to begin process file '%1'").arg(filePtr->fileName()));
 
 			return TS_INVALID;
 		}
@@ -166,7 +166,7 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		}
 
 		if (!BeginSourceFile(*m_schemaParamsCompPtr, *filePtr, paramsPtr)){
-			SendErrorMessage(0, QString("Unable to begin process file '%1'").arg(filePtr->fileName()));
+			SendErrorMessage(0, QStringLiteral("Unable to begin process file '%1'").arg(filePtr->fileName()));
 
 			return TS_INVALID;
 		}
@@ -242,7 +242,7 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		}
 
 		if (!EndHeaderFile(*m_schemaParamsCompPtr, *filePtr, paramsPtr)){
-			SendErrorMessage(0, QString("Unable to end process file '%1'").arg(filePtr->fileName()));
+			SendErrorMessage(0, QStringLiteral("Unable to end process file '%1'").arg(filePtr->fileName()));
 
 			return TS_INVALID;
 		}
@@ -256,7 +256,7 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		}
 
 		if (!EndSourceFile(*m_schemaParamsCompPtr, *filePtr, paramsPtr)){
-			SendErrorMessage(0, QString("Unable to end process file '%1'").arg(filePtr->fileName()));
+			SendErrorMessage(0, QStringLiteral("Unable to end process file '%1'").arg(filePtr->fileName()));
 
 			return TS_INVALID;
 		}
@@ -511,7 +511,7 @@ bool CCxxProcessorsManagerComp::ProcessEnums(
 				Q_ASSERT(headerFilePtr);
 				const bool ok = enumProcessorPtr->ProcessEntry(sdlEnum, headerFilePtr.get(), nullptr, paramsPtr);
 				if (!ok){
-					SendErrorMessage(0, QString("Unable to process enum '%1'").arg(sdlEnum.GetName()));
+					SendErrorMessage(0, QStringLiteral("Unable to process enum '%1'").arg(sdlEnum.GetName()));
 
 					return false;
 				}
@@ -577,7 +577,7 @@ bool CCxxProcessorsManagerComp::ProcessTypes(
 			FilePtr sourceFilePtr = GetFilePtrForEntry(sdlType, sourceFiles);
 			const bool ok = typeProcessorPtr->ProcessEntry(sdlType, headerFilePtr.get(), sourceFilePtr.get(), paramsPtr);
 			if (!ok){
-				SendErrorMessage(0, QString("Unable to process type '%1'").arg(sdlType.GetName()));
+				SendErrorMessage(0, QStringLiteral("Unable to process type '%1'").arg(sdlType.GetName()));
 
 				return false;
 			}
@@ -615,7 +615,7 @@ bool CCxxProcessorsManagerComp::ProcessUnions(
 			Q_ASSERT(headerFilePtr || sourceFilePtr);
 			const bool ok = unionProcessorPtr->ProcessEntry(sdlUinion, headerFilePtr.get(), sourceFilePtr.get(), paramsPtr);
 			if (!ok){
-				SendErrorMessage(0, QString("Unable to process union '%1'").arg(sdlUinion.GetName()));
+				SendErrorMessage(0, QStringLiteral("Unable to process union '%1'").arg(sdlUinion.GetName()));
 
 				return false;
 			}
@@ -652,7 +652,7 @@ bool CCxxProcessorsManagerComp::ProcessDocumentTypes(const EntryFileMap& headerF
 			Q_ASSERT(sourceFilePtr);
 			const bool ok = processorPtr->ProcessEntry(documentType, nullptr, sourceFilePtr.get(), paramsPtr);
 			if (!ok){
-				SendErrorMessage(0, QString("Unable to process document type '%1'").arg(documentType.GetName()));
+				SendErrorMessage(0, QStringLiteral("Unable to process document type '%1'").arg(documentType.GetName()));
 			}
 		}
 	}
@@ -688,7 +688,7 @@ bool CCxxProcessorsManagerComp::ProcessRequests(const EntryFileMap& headerFiles,
 
 			const bool ok = requestProcessorPtr->ProcessEntry(request, headerFilePtr.get(), sourceFilePtr.get(), paramsPtr);
 			if (!ok){
-				SendErrorMessage(0, QString("Unable to process request '%1'").arg(request.GetName()));
+				SendErrorMessage(0, QStringLiteral("Unable to process request '%1'").arg(request.GetName()));
 
 				return false;
 			}
@@ -992,7 +992,7 @@ CCxxProcessorsManagerComp::FilePtr CCxxProcessorsManagerComp::CreateFile(const Q
 
 	const bool isPathExists = istd::CSystem::EnsurePathExists(QDir(filePath + "/..").absolutePath());
 	if (!isPathExists){
-		SendErrorMessage(0, QString("Unable to create output dir: '%1'").arg(filePath));
+		SendErrorMessage(0, QStringLiteral("Unable to create output dir: '%1'").arg(filePath));
 
 		return nullPtr;
 	}
@@ -1000,7 +1000,7 @@ CCxxProcessorsManagerComp::FilePtr CCxxProcessorsManagerComp::CreateFile(const Q
 	FilePtr outputFilePtr(new QFile(filePath));
 	const bool isOpen = outputFilePtr->open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate);
 	if (!isOpen){
-		SendErrorMessage(0, QString("Unable to open file: '%1'. Error: %2").arg(filePath, outputFilePtr->errorString()));
+		SendErrorMessage(0, QStringLiteral("Unable to open file: '%1'. Error: %2").arg(filePath, outputFilePtr->errorString()));
 
 		return nullPtr;
 	}

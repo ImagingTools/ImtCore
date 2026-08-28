@@ -96,7 +96,7 @@ bool CFeaturePackageRepresentationControllerComp::CreateRepresentationModelFromF
 		for (int i = 0; i < subFeatures.count(); i++){
 			imtlic::IFeatureInfoSharedPtr featureInfoPtr = subFeatures.at(i);
 			if (!featureInfoPtr.IsValid()){
-				errorMessage = QString("Unable to create representation model for invalid subfeature. Parent feature id: %1.").arg(featureId);
+				errorMessage = QStringLiteral("Unable to create representation model for invalid subfeature. Parent feature id: %1.").arg(featureId);
 				return false;
 			}
 

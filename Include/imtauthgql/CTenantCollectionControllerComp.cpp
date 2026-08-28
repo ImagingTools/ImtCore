@@ -35,7 +35,7 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (tenantInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'").arg(objectId);
+		errorMessage = QStringLiteral("Unable to create representation from object '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CTenantCollectionControllerComp");
 
 		return false;
