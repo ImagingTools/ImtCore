@@ -40,6 +40,19 @@ const iprm::IOptionsList* CSqlDatabaseObjectDelegateCompBase::GetObjectTypeInfos
 }
 
 
+IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseObjectDelegateCompBase::CreateUpdateObjectQueryWithParameters(
+			const imtbase::IObjectCollection& collection,
+			const QByteArray& objectId,
+			const istd::IChangeable& object,
+			const imtbase::IOperationContext* operationContextPtr,
+			bool useExternDelegate) const
+{
+	NewObjectQuery result;
+	result.query = CreateUpdateObjectQuery(collection, objectId, object, operationContextPtr, useExternDelegate);
+	return result;
+}
+
+
 QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectTypeId(const QByteArray& objectId) const
 {
 	if (objectId.isEmpty()){

@@ -397,8 +397,8 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 		return false;
 	}
 
-	QByteArray query = m_objectDelegateCompPtr->CreateUpdateObjectQuery(*this, objectId, object, operationContextPtr);
-	if (query.isEmpty()){
+	auto objectQuery = m_objectDelegateCompPtr->CreateUpdateObjectQueryWithParameters(*this, objectId, object, operationContextPtr);
+	if (objectQuery.query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
 		return false;
@@ -413,7 +413,10 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-	if (ExecuteTransaction(query)){
+	const bool transactionSuccess = objectQuery.bindValues.isEmpty()
+										? ExecuteTransaction(objectQuery.query)
+										: ExecuteTransaction(objectQuery.query, objectQuery.bindValues);
+	if (transactionSuccess){
 		return true;
 	}
 
