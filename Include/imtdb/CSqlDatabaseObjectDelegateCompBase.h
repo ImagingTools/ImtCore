@@ -39,7 +39,7 @@ public:
 	I_END_COMPONENT
 
 	virtual QString SqlEncode(const QString& sqlQuery) const;
-
+	
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
@@ -82,6 +82,7 @@ public:
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 
 protected:
+	virtual bool IsSqliteDriver() const;
 	virtual QString GetBaseSelectionQuery() const;
 	virtual idoc::IDocumentMetaInfo* CreateCollectionItemMetaInfo(const QByteArray& typeId) const;
 	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const;
