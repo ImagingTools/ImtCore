@@ -89,7 +89,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::GetCountQuery(const iprm::IPara
 
 QByteArray CSqlDatabaseDocumentDelegateCompBase::GetObjectIdFromRecord(const QSqlRecord& record) const
 {
-	const QString columnId = QString::fromUtf8(*m_objectIdColumnAttrPtr);
+	const QString columnId = *m_objectIdColumnAttrPtr;
 	if (!record.contains(columnId)){
 		return QByteArray();
 	}
@@ -146,7 +146,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::GetSelectionQuery(
 		retVal += ' ';
 		retVal += sortQuery;
 		retVal += ' ';
-		retVal += QString::fromUtf8(paginationQuery);
+		retVal += paginationQuery;
 
 		return retVal.toUtf8();
 	}
@@ -210,7 +210,7 @@ istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateCompBase::CreateObjectFro
 	}
 
 	if (record.contains(s_documentColumn)){
-		QByteArray documentContent = record.value(QString::fromUtf8(s_documentColumn)).toByteArray();
+		QByteArray documentContent = record.value(s_documentColumn).toByteArray();
 		if (ReadDataFromMemory(typeId, documentContent, *documentPtr)){
 			return documentPtr;
 		}
@@ -293,7 +293,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDeleteObjectsQuery(
 
 	QByteArray bindingDeleteQuery = CreateTenantBindingDeleteQuery(objectIds);
 	if (!bindingDeleteQuery.isEmpty()){
-		query += QString::fromUtf8(bindingDeleteQuery);
+		query += bindingDeleteQuery;
 	}
 
 	return query.toUtf8();
@@ -345,20 +345,20 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDeleteObjectSetQuery(
 	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
 	if (useTenantBindings){
 		const QString bindingsTableName = CreateTenantBindingTableName();
-		const QString escapedEntityType = SqlEncode(QString::fromUtf8(GetTableName()));
+		const QString escapedEntityType = SqlEncode(GetTableName());
 		QString bindingsDelete = QStringLiteral(R"(DELETE FROM %1 WHERE "EntityType" = '%2';)")
 				.arg(bindingsTableName, escapedEntityType);
 		if (!conditionList.isEmpty()){
-			const QString tableName = QString::fromUtf8(*m_tableNameAttrPtr);
-			const QString idCol = QString::fromUtf8(s_documentIdColumn);
-			const QString stateCol = QString::fromUtf8(s_stateColumn);
+			const QString tableName = *m_tableNameAttrPtr;
+			const QString idCol = s_documentIdColumn;
+			const QString stateCol = s_stateColumn;
 			QString idSelect = QStringLiteral(R"(SELECT "%1" FROM %2"%3" as root WHERE "%4" = 'Active' AND (%5))")
 					.arg(
 						/*1*/ idCol,
 						/*2*/ schemaPrefix,
 						/*3*/ tableName,
 						/*4*/ stateCol,
-						/*5*/ QString::fromUtf8(conditionList.join(QByteArrayLiteral(" AND "))));
+						/*5*/ conditionList.join(QByteArrayLiteral(" AND ")));
 			bindingsDelete = QStringLiteral(R"(DELETE FROM %1 WHERE "EntityType" = '%2' AND "EntityId" IN (%3);)")
 					.arg(bindingsTableName, escapedEntityType, idSelect);
 		}
@@ -566,8 +566,8 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateUpdateMetaInfoQuery(const
 		return QByteArray();
 	}
 
-	QByteArray objectId = imtdb::VariantToByteArray(record.value(QString::fromUtf8(s_documentIdColumn)));
-	QByteArray typeId = imtdb::VariantToByteArray(record.value(QString::fromUtf8(s_typeIdColumn)));
+	QByteArray objectId = imtdb::VariantToByteArray(record.value(s_documentIdColumn));
+	QByteArray typeId = imtdb::VariantToByteArray(record.value(s_typeIdColumn));
 
 	QByteArray metaInfoRepresentation = QByteArrayLiteral("{}");
 
@@ -642,7 +642,7 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateCompB
 		RevisionInfo revisionInfo;
 
 		if (revisionRecord.contains(s_revisionInfoColumn)){
-			QByteArray revisionValueJson = revisionRecord.value(QString::fromUtf8(s_revisionInfoColumn)).toByteArray();
+			QByteArray revisionValueJson = revisionRecord.value(s_revisionInfoColumn).toByteArray();
 			QJsonObject infoData = QJsonDocument::fromJson(revisionValueJson).object();
 			revisionInfo.revision = infoData.value(s_revisionNumberKey).toInt();
 			revisionInfo.user = infoData.value(s_ownerNameKey).toString();
@@ -659,11 +659,11 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateCompB
 		}
 
 		if (revisionRecord.contains(s_lastModifiedColumn)){
-			revisionInfo.timestamp = revisionRecord.value(QString::fromUtf8(s_lastModifiedColumn)).toDateTime();
+			revisionInfo.timestamp = revisionRecord.value(s_lastModifiedColumn).toDateTime();
 		}
 
 		if (revisionRecord.contains(s_stateColumn)){
-			revisionInfo.isRevisionAvailable = (revisionRecord.value(QString::fromUtf8(s_stateColumn)).toString() == QStringLiteral("Active") || revisionRecord.value(QString::fromUtf8(s_stateColumn)).toString() == QStringLiteral("Disabled"));
+			revisionInfo.isRevisionAvailable = (revisionRecord.value(s_stateColumn).toString() == QStringLiteral("Active") || revisionRecord.value(s_stateColumn).toString() == QStringLiteral("Disabled"));
 		}
 
 		revisionInfoList.push_back(revisionInfo);
@@ -716,8 +716,8 @@ bool CSqlDatabaseDocumentDelegateCompBase::RestoreRevision(
 							/*3*/ s_stateColumn,
 							/*4*/ s_documentIdColumn,
 							/*5*/ objectId,
-							/*6*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int))
-			.arg(QString::number(revision)).toUtf8();
+							/*6*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
+							/*7*/ QString::number(revision)).toUtf8();
 
 	QSqlError sqlError;
 	m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
@@ -775,7 +775,7 @@ bool CSqlDatabaseDocumentDelegateCompBase::DeleteRevision(
 	int currentRevision = -1;
 
 	if (revisionRecord.contains(s_revisionInfoColumn)){
-		QByteArray revisionValueJson = revisionRecord.value(QString::fromUtf8(s_revisionInfoColumn)).toByteArray();
+		QByteArray revisionValueJson = revisionRecord.value(s_revisionInfoColumn).toByteArray();
 		QJsonObject infoData = QJsonDocument::fromJson(revisionValueJson).object();
 		currentRevision = infoData.value(s_revisionNumberKey).toInt();
 	}
@@ -791,9 +791,8 @@ bool CSqlDatabaseDocumentDelegateCompBase::DeleteRevision(
 							/*2*/ *m_tableNameAttrPtr,
 							/*3*/ s_documentIdColumn,
 							/*4*/ objectId,
-							/*5*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int)
-							)
-						.arg(QString::number(revision))
+							/*5*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
+							/*6*/ QString::number(revision))
 						.toUtf8();
 	
 	sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
@@ -1212,7 +1211,7 @@ QString CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingFilterQuery(con
 	}
 
 	const QString bindingsTableName = CreateTenantBindingTableName();
-	const QString escapedEntityType = SqlEncode(QString::fromUtf8(GetTableName()));
+	const QString escapedEntityType = SqlEncode(GetTableName());
 	const QByteArray databaseDriverId = m_databaseEngineCompPtr.IsValid() ? m_databaseEngineCompPtr->GetDatabaseDriverId() : QByteArray();
 	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
 	const QString entityIdExpression = isSqlite
@@ -1227,7 +1226,7 @@ QString CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingFilterQuery(con
 
 	if (!tenantId.isEmpty()){
 		bindingsLookup += QStringLiteral(R"( AND tenantBindings."TenantId" = '%1')")
-				.arg(SqlEncode(QString::fromUtf8(tenantId)));
+				.arg(SqlEncode(tenantId));
 
 		if (filterMode == imtauth::TFM_EXCLUDE){
 			return QStringLiteral("NOT EXISTS (%1)").arg(bindingsLookup);
@@ -1273,11 +1272,11 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingInsertQuery(
 									/*1*/ conflictClause,
 									/*2*/ CreateTenantBindingTableName(),
 									/*3*/ QUuid::createUuid().toString(QUuid::WithoutBraces),
-									/*4*/ SqlEncode(QString::fromUtf8(tenantId)),
-									/*5*/ SqlEncode(QString::fromUtf8(GetTableName())),
-									/*6*/ SqlEncode(QString::fromUtf8(entityId)),
+									/*4*/ SqlEncode(tenantId),
+									/*5*/ SqlEncode(GetTableName()),
+									/*6*/ SqlEncode(entityId),
 									/*7*/ QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
-									/*8*/ ownerId.isEmpty() ? QStringLiteral("NULL") : QStringLiteral("'%1'").arg(SqlEncode(QString::fromUtf8(ownerId))),
+									/*8*/ ownerId.isEmpty() ? QStringLiteral("NULL") : QStringLiteral("'%1'").arg(SqlEncode(ownerId)),
 									/*9*/ onConflictClause
 								);
 
@@ -1296,13 +1295,13 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingDeleteQuery(
 
 	QStringList quotedIds;
 	for (const QByteArray& id : entityIds){
-		quotedIds.append(QStringLiteral("'%1'").arg(SqlEncode(QString::fromUtf8(id))));
+		quotedIds.append(QStringLiteral("'%1'").arg(SqlEncode(id)));
 	}
 
 	const QString query = QStringLiteral(R"(DELETE FROM %1 WHERE "EntityType" = '%2' AND "EntityId" IN (%3);)")
 			.arg(
 					CreateTenantBindingTableName(),
-					SqlEncode(QString::fromUtf8(GetTableName())),
+					SqlEncode(GetTableName()),
 					quotedIds.join(','));
 
 	return query.toUtf8();
@@ -1345,7 +1344,7 @@ QString CSqlDatabaseDocumentDelegateCompBase::GetBaseSelectionQuery() const
 						.arg(
 							/*1*/ schema,
 							/*2*/ tableName,
-								/*3*/ joinTablesQuery.isEmpty() ? QString() : QString::fromUtf8(joinTablesQuery),
+								/*3*/ joinTablesQuery.isEmpty() ? QString() : joinTablesQuery,
 							/*4*/ customColumns
 						);
 
@@ -1370,12 +1369,12 @@ QString CSqlDatabaseDocumentDelegateCompBase::GetBaseSelectionQuery() const
 						/*1*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
 						/*2*/ schema,
 						/*3*/ tableName,
-						/*4*/ joinTablesQuery.isEmpty() ? QString() : QString::fromUtf8(joinTablesQuery),
+						/*4*/ joinTablesQuery.isEmpty() ? QString() : joinTablesQuery,
 						/*5*/ customColumns,
-						/*6*/ QString::fromUtf8(s_lastModifiedColumn),
-						/*7*/ QString::fromUtf8(s_addedColumn),
-						/*8*/ QString::fromUtf8(s_documentIdColumn),
-						/*9*/ QString::fromUtf8(s_revisionInfoColumn)
+						/*6*/ s_lastModifiedColumn,
+						/*7*/ s_addedColumn,
+						/*8*/ s_documentIdColumn,
+						/*9*/ s_revisionInfoColumn
 					);
 
 	return query;
@@ -1420,12 +1419,12 @@ bool CSqlDatabaseDocumentDelegateCompBase::SetObjectMetaInfoFromRecord(
 		return true;
 	}
 
-	const QByteArray metaInfoRepresentation = record.value(QString::fromUtf8(s_dataMetaInfoColumn)).toByteArray();
+	const QByteArray metaInfoRepresentation = record.value(s_dataMetaInfoColumn).toByteArray();
 	if (metaInfoRepresentation.isEmpty()){
 		return true;
 	}
 
-	const QByteArray typeId = imtdb::VariantToByteArray(record.value(QString::fromUtf8(s_typeIdColumn)));
+	const QByteArray typeId = imtdb::VariantToByteArray(record.value(s_typeIdColumn));
 
 	return m_jsonBasedMetaInfoDelegateCompPtr->FromJsonRepresentation(
 				metaInfoRepresentation,
@@ -1462,7 +1461,7 @@ bool CSqlDatabaseDocumentDelegateCompBase::CreateObjectFilterQuery(const iprm::I
 		if (collectionFilterParamPtr.IsValid()){
 			QByteArray typeId = collectionFilterParamPtr->GetObjectTypeId();
 			if (!typeId.isEmpty()){
-				filterQuery = QStringLiteral(R"("%1" = '%2')").arg(s_typeIdColumn, SqlEncode(QString::fromUtf8(typeId))).toUtf8();
+				filterQuery = QStringLiteral(R"("%1" = '%2')").arg(s_typeIdColumn, SqlEncode(typeId)).toUtf8();
 			}
 		}
 	}
@@ -1530,7 +1529,7 @@ bool CSqlDatabaseDocumentDelegateCompBase::CreateFilterQuery(const iprm::IParams
 		if (objectTypeIdFilterPtr.IsValid()){
 			QByteArray objectTypeId = objectTypeIdFilterPtr->GetObjectTypeId();
 			if (!objectTypeId.isEmpty()){
-				objectTypeIdQuery = QStringLiteral(R"("%1" = '%2')").arg(s_typeIdColumn, SqlEncode(QString::fromUtf8(objectTypeId))).toUtf8();
+				objectTypeIdQuery = QStringLiteral(R"("%1" = '%2')").arg(s_typeIdColumn, SqlEncode(objectTypeId)).toUtf8();
 			}
 		}
 	}
@@ -1919,7 +1918,7 @@ bool CSqlDatabaseDocumentDelegateCompBase::CreateTextFilterQuery(
 	textFilterQuery.clear();
 
 	const bool useDataMeta = m_useDataMetaInfoAttrPtr.IsValid() ? *m_useDataMetaInfoAttrPtr : false;
-	const QString jsonKey = useDataMeta ? QString::fromUtf8(s_dataMetaInfoColumn) : QString::fromUtf8(s_documentColumn);
+	const QString jsonKey = useDataMeta ? s_dataMetaInfoColumn : s_documentColumn;
 
 	const QByteArray driverId = m_databaseEngineCompPtr->GetDatabaseDriverId().toUpper();
 	const bool isSQLite = (driverId == "QSQLITE");
@@ -2089,10 +2088,10 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::GetObjectSelectionQuery(const Q
 	)")
 				.arg(
 					/*1*/ schemaPrefix,
-					/*2*/ QString::fromUtf8(*m_tableNameAttrPtr),
+					/*2*/ *m_tableNameAttrPtr,
 					/*3*/ documentFilterQuery,
-					/*4*/ QString::fromUtf8(s_documentIdColumn),
-					/*5*/ QString::fromUtf8(objectId),
+					/*4*/ s_documentIdColumn,
+					/*5*/ objectId,
 					/*6*/ CreateJsonExtractSql(
 						s_revisionInfoColumn,
 						s_revisionNumberKey,
@@ -2118,11 +2117,11 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::GetObjectSelectionQuery(const Q
 			WHERE (%3) AND root."%4" = '%6' ORDER BY %8 DESC)")
 			.arg(
 				/*1*/ schemaPrefix,
-				/*2*/ QString::fromUtf8(*m_tableNameAttrPtr),
+				/*2*/ *m_tableNameAttrPtr,
 				/*3*/ documentFilterQuery,
-				/*4*/ QString::fromUtf8(s_documentIdColumn),
-				/*5*/ QString::fromUtf8(s_lastModifiedColumn),
-				/*6*/ QString::fromUtf8(objectId),
+				/*4*/ s_documentIdColumn,
+				/*5*/ s_lastModifiedColumn,
+				/*6*/ objectId,
 				/*7*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
 				/*8*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int, QStringLiteral("root"))
 			).toUtf8();
@@ -2150,7 +2149,7 @@ bool CSqlDatabaseDocumentDelegateCompBase::CreateDocumentCollectionFilterQuery(
 	// DocumentId
 	QByteArray documentId = documentCollectionFilter.GetDocumentId();
 	if (!documentId.isEmpty()){
-		conditions << QStringLiteral(R"(root."%1" = '%2')").arg(s_documentIdColumn, SqlEncode(QString::fromUtf8(documentId)));
+		conditions << QStringLiteral(R"(root."%1" = '%2')").arg(s_documentIdColumn, SqlEncode(documentId));
 	}
 
 	// Document States
@@ -2202,7 +2201,7 @@ bool CSqlDatabaseDocumentDelegateCompBase::CreateDocumentIdFilterQuery(
 	idStrings.reserve(documentIds.size());
 
 	for (const QByteArray& id : documentIds){
-		idStrings << QStringLiteral("'%1'").arg(SqlEncode(QString::fromUtf8(id)));
+		idStrings << QStringLiteral("'%1'").arg(SqlEncode(id));
 	}
 
 	QString conditionStr;
