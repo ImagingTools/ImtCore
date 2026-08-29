@@ -789,7 +789,45 @@ std::shared_ptr<CSdlEntryBase> CSdlTools::FindEntryByName(
 }
 
 
-QString CSdlTools::GetNamespaceAcceptableString(const QString& originalText)
+QStringList CSdlTools::CollectListElementTypeNames(
+			const SdlTypeList& localTypes,
+			const SdlTypeList& allTypes,
+			const SdlUnionList& unionList)
+{
+	QStringList retVal;
+
+	for (const CSdlType& sdlType: localTypes){
+		const SdlFieldList fieldList = sdlType.GetFields();
+		for (const CSdlField& sdlField: fieldList){
+			if (!sdlField.IsArray()){
+				continue;
+			}
+
+			bool isCustom = false;
+			const QString elementName = QmlConvertType(sdlField.GetType(), &isCustom);
+			if (!isCustom){
+				// scalar element type, no list model required
+				continue;
+			}
+
+			if (retVal.contains(elementName)){
+				continue;
+			}
+
+			// only user-defined types and unions get a typed list model (enums are skipped)
+			const bool isType =
+				std::find_if(allTypes.cbegin(), allTypes.cend(), CreateFindByNamePredicate(elementName)) != allTypes.cend();
+			const bool isUnion =
+				std::find_if(unionList.cbegin(), unionList.cend(), CreateFindByNamePredicate(elementName)) != unionList.cend();
+
+			if (isType || isUnion){
+				retVal << elementName;
+			}
+		}
+	}
+
+	return retVal;
+}
 {
 	QString retVal = originalText;
 

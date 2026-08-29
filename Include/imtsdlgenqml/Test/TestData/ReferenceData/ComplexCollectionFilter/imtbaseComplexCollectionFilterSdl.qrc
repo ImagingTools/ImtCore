@@ -15,6 +15,9 @@
         <file alias="imtbaseComplexCollectionFilterSdl/TextFilterTypeMetaInfo.qml">TextFilterTypeMetaInfo.qml</file>
         <file alias="imtbaseComplexCollectionFilterSdl/ComplexCollectionFilter.qml">ComplexCollectionFilter.qml</file>
         <file alias="imtbaseComplexCollectionFilterSdl/ComplexCollectionFilterTypeMetaInfo.qml">ComplexCollectionFilterTypeMetaInfo.qml</file>
+        <file alias="imtbaseComplexCollectionFilterSdl/FieldFilterUnionList.qml">FieldFilterUnionList.qml</file>
+        <file alias="imtbaseComplexCollectionFilterSdl/GroupFilterList.qml">GroupFilterList.qml</file>
+        <file alias="imtbaseComplexCollectionFilterSdl/FieldSortingInfoList.qml">FieldSortingInfoList.qml</file>
         <file alias="imtbaseComplexCollectionFilterSdl/qmldir">qmldir</file>
         <file alias="imtbaseComplexCollectionFilterSdl/ImtbaseComplexCollectionFilterSdlCommandIds.qml">ImtbaseComplexCollectionFilterSdlCommandIds.qml</file>
         <file alias="imtbaseComplexCollectionFilterSdl/ValueTypeEnum.qml">ValueTypeEnum.qml</file>

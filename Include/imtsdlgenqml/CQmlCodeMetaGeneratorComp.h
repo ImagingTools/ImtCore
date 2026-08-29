@@ -40,6 +40,7 @@ public:
 		I_ASSIGN(m_sdlDocumentListCompPtr, "SdlDocumentListProvider", "SDL documents used to create a GraphQL wrap code", true, "SdlDocumentListProvider")
 		I_ASSIGN(m_qmldirFilePersistanceCompPtr, "QmldirFilePersistance", "Qmldir file persistance, used to update qmldir file with new modules", true, "QmldirFilePersistance")
 		I_ASSIGN(m_customSchemaParamsCompPtr, "CustomSchemaParams", "Custom schema parameters, that contains additional options", false, "CustomSchemaParams")
+		I_ASSIGN(m_sdlUnionListCompPtr, "SdlUnionListProvider", "SDL unions, used to register typed list models for union array elements", false, "SdlUnionListProvider")
 	I_END_COMPONENT
 
 	//reimplemented(iproc::IProcessor)
@@ -81,6 +82,9 @@ private:
 	I_REF(imtsdl::ISdlDocumentTypeListProvider, m_sdlDocumentListCompPtr);
 	I_REF(ifile::IFilePersistence, m_qmldirFilePersistanceCompPtr);
 	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
+
+	/// Optional: used to recognize union array element types so a typed list model gets registered for them.
+	I_REF(imtsdl::ISdlUnionListProvider, m_sdlUnionListCompPtr);
 
 	istd::TDelPtr<QFile> m_qmlKeysFilePtr;
 };

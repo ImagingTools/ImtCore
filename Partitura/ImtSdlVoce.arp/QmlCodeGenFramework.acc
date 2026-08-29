@@ -260,6 +260,9 @@
                                 <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="SdlUnionListProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
