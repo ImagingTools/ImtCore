@@ -81,6 +81,22 @@ I_EXPORT_COMPONENT(
 			"Job Ticket Meta Info Creator");
 
 
+I_EXPORT_COMPONENT(
+			ProcessingAgentRegistry,
+			"Registry of processing agents",
+			"Job Distributed Agent Registry Pool Processing");
+
+I_EXPORT_COMPONENT(
+			LocalProcessingAgent,
+			"In-process job processing agent",
+			"Job Distributed Agent Worker Processor Local Processing");
+
+I_EXPORT_COMPONENT(
+			DistributedJobExecutionController,
+			"Controller forwarding job execution to processing agents",
+			"Job Distributed Execution Controller Agent Processing");
+
+
 } // namespace ImtHypePck
 
 
