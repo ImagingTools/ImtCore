@@ -45,7 +45,7 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 	// version kind (e.g. "Beta Version") is selected via build pipeline, see ibase::IApplicationInfo::VersionKind
 	QString versionKindText = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_VERSION_KIND);
 	if (!versionKindText.isEmpty()){
-		applicationInfo.versionKind = std::move(versionKindText);
+		applicationInfo.versionKind = versionKindText;
 	}
 
 	using AppAttribute = ibase::IApplicationInfo::ApplicationAttribute;
