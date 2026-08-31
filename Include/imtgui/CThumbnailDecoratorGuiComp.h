@@ -223,6 +223,7 @@ private Q_SLOTS:
 	void on_CommandsMenuButton_clicked();
 	void OnAutoLogoutTimer();
 	void OnCheckIsFullScreenTimer();
+	void OnVersionKindBlinkTimer();
 	void on_BackPageButton_clicked();
 	void on_NextPageButton_clicked();
 	void on_DashboardButton_clicked();
@@ -415,6 +416,7 @@ private:
 	QToolBar* m_fullscreenCommandToolBar;
 	QTimer m_autoLogoutTimer;
 	QTimer m_checkIsFullScreenTimer;
+	QTimer m_versionKindBlinkTimer;
 
 	QMenu m_commandsMenu;
 

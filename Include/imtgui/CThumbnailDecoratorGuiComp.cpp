@@ -344,6 +344,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 	connect(&m_autoLogoutTimer, SIGNAL(timeout()), this, SLOT(OnAutoLogoutTimer()));
 	connect(&m_checkIsFullScreenTimer, SIGNAL(timeout()), this, SLOT(OnCheckIsFullScreenTimer()));
+	connect(&m_versionKindBlinkTimer, SIGNAL(timeout()), this, SLOT(OnVersionKindBlinkTimer()));
 
 	m_checkIsFullScreenTimer.start(500);
 
@@ -400,6 +401,7 @@ void CThumbnailDecoratorGuiComp::OnGuiDestroyed()
 
 	m_autoLogoutTimer.stop();
 	m_checkIsFullScreenTimer.stop();
+	m_versionKindBlinkTimer.stop();
 
 	if (m_loginGuiCompPtr.IsValid() && m_loginGuiCompPtr->IsGuiCreated()){
 		m_loginGuiCompPtr->DestroyGui();
@@ -682,6 +684,16 @@ void CThumbnailDecoratorGuiComp::OnCheckIsFullScreenTimer()
 	else{
 		ExitButton->setVisible(false);
 	}
+}
+
+
+void CThumbnailDecoratorGuiComp::OnVersionKindBlinkTimer()
+{
+	// let the version kind text blink by toggling the text color between red and transparent
+	bool isTransparent = VersionKindLabel->property("BlinkTransparent").toBool();
+
+	VersionKindLabel->setStyleSheet(isTransparent? QStringLiteral("color: red;"): QStringLiteral("color: transparent;"));
+	VersionKindLabel->setProperty("BlinkTransparent", !isTransparent);
 }
 
 
@@ -1245,6 +1257,15 @@ void CThumbnailDecoratorGuiComp::UpdateVersionKindLabel()
 
 	VersionKindLabel->setText(versionKindText);
 	VersionKindLabel->setVisible(!versionKindText.isEmpty());
+
+	if (!versionKindText.isEmpty()){
+		if (!m_versionKindBlinkTimer.isActive()){
+			m_versionKindBlinkTimer.start(500);
+		}
+	}
+	else{
+		m_versionKindBlinkTimer.stop();
+	}
 }
 
 
