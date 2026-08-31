@@ -1688,7 +1688,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 }
 
 
-QString CSqlDatabaseDocumentDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
+QString CSqlDatabaseDocumentDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& /*filterParams*/) const
 {
 	return QString();
 }
