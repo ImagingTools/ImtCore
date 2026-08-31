@@ -4,6 +4,7 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtauthRolesSdl 1.0
+import imtcolgui 1.0
 import imtdocgui 1.0
 import imtauthgui 1.0
 import imtguigql 1.0
@@ -379,12 +380,35 @@ ViewBase {
 						id: parentRolesGroup;
 						width: parent.width;
 
-						GqlBasedItemSelectElementView {
+						CollectionItemSelectElementView {
 							id: roleSelectableCollectionEditor
-							collectionId: "Roles"
+							commandId: ImtauthRolesSdlCommandIds.s_rolesList
+							fields: [RoleItemDataTypeMetaInfo.s_id, RoleItemDataTypeMetaInfo.s_roleName]
+							titleField: RoleItemDataTypeMetaInfo.s_roleName
+							textFilterFieldIds: [RoleItemDataTypeMetaInfo.s_roleName]
+							sortByField: RoleItemDataTypeMetaInfo.s_roleName
 							label: qsTr("Parent Roles")
 							addButtonText: qsTr("Add Parent Role")
+							// A role cannot be its own parent, so it is not offered at all.
+							// Deeper cycles are rejected by the server on save.
+							excludeIds: container.roleData && container.roleData.m_id
+								? [container.roleData.m_id]
+								: []
 							showCount: true
+
+							// The role list is scoped by product, as a header and as an input field.
+							function getHeaders(){
+								let headers = {}
+								headers["productId"] = container.productId
+								return headers
+							}
+
+							function setCustomInputParams(inputParams){
+								if (container.productId){
+									inputParams.InsertField(RoleItemInputTypeMetaInfo.s_productId, container.productId)
+								}
+							}
+
 							onSelectionChanged: {
 								container.doUpdateModel()
 							}

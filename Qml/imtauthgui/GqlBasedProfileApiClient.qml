@@ -28,6 +28,7 @@ import imtbaseImtCollectionSdl 1.0
 QtObject {
 	id: root
 
+	property string context: ""
 	readonly property string __userId: AuthorizationController.userTokenProvider.userId
 	readonly property string __productId: AuthorizationController.productId
 
@@ -72,6 +73,7 @@ QtObject {
 	// =========================================================================
 
 	property GqlSdlRequestSender getProfileRequest: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthProfileSdlCommandIds.s_getProfile
 		sdlObjectComp: Component {
 			ProfileData {
@@ -96,6 +98,7 @@ QtObject {
 
 	property SetProfileInput __setProfileInput: SetProfileInput {}
 	property GqlSdlRequestSender setProfileRequest: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthProfileSdlCommandIds.s_setProfile
 		sdlObjectComp: Component {
 			SetProfileResponse {
@@ -134,6 +137,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender __organizationsRequest: GqlSdlRequestSender {
+		context: root.context
 		requestType: 0
 		gqlCommandId: ImtauthProfileSdlCommandIds.s_getUserOrganizations
 		sdlObjectComp: Component {
@@ -185,6 +189,7 @@ QtObject {
 
 	property AcceptTenantInvitationInput __acceptInvitationInput: AcceptTenantInvitationInput {}
 	property GqlSdlRequestSender __acceptInvitationSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_acceptTenantInvitation
 		sdlObjectComp: Component {
@@ -206,6 +211,7 @@ QtObject {
 
 	property RejectTenantInvitationInput __rejectInvitationInput: RejectTenantInvitationInput {}
 	property GqlSdlRequestSender __rejectInvitationSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_rejectTenantInvitation
 		sdlObjectComp: Component {
@@ -243,6 +249,7 @@ QtObject {
 
 	property FindMembershipInput __findMembershipForLeaveInput: FindMembershipInput {}
 	property GqlSdlRequestSender __findMembershipForLeaveSender: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_findMembership
 		sdlObjectComp: Component {
 			FindMembershipPayload {
@@ -263,6 +270,7 @@ QtObject {
 
 	property RemoveMembershipInput __removeMembershipForLeaveInput: RemoveMembershipInput {}
 	property GqlSdlRequestSender __removeMembershipForLeaveSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_removeMembership
 		sdlObjectComp: Component {
@@ -302,6 +310,7 @@ QtObject {
 	property UserIdInput __userIdInput: UserIdInput {}
 
 	property GqlSdlRequestSender __getTokenListRequest: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_getTokenList
 		sdlObjectComp: Component {
 			PersonalAccessTokenList {
@@ -313,6 +322,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender __createTokenRequest: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_createToken
 		requestType: 1
 		sdlObjectComp: Component {
@@ -330,6 +340,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender __deleteTokenRequest: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_deleteToken
 		requestType: 1
 		sdlObjectComp: Component {
@@ -347,6 +358,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender __revokeTokenRequest: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_revokeToken
 		requestType: 1
 		sdlObjectComp: Component {

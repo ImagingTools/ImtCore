@@ -22,6 +22,7 @@ Item {
 	
 	property var additionalFieldIds: []
 	property var requestedFields: []
+	property string context
 
 	signal removed()
 	signal elementsRemoved(var elementIds)
@@ -246,6 +247,8 @@ Item {
 	GqlSdlRequestSender {
 		id: duplicateElementsRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_duplicateElements
+		context: root.context
+
 		sdlObjectComp: Component {
 			DuplicateElementsPayload {
 				onFinished: {
@@ -267,6 +270,8 @@ Item {
 	GqlSdlRequestSender {
 		id: getElementMetaInfoRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getElementMetaInfo
+		context: root.context
+
 		sdlObjectComp: Component {
 			GetElementMetaInfoPayload {
 				onFinished: {
@@ -283,6 +288,8 @@ Item {
 	GqlSdlRequestSender {
 		id: restoreObjectsRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_restoreObjects
+		context: root.context
+
 		requestType: 1
 		sdlObjectComp: Component {
 			RestoreObjectsPayload {}
@@ -296,6 +303,8 @@ Item {
 	GqlSdlRequestSender {
 		id: restoreObjectSetRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_restoreObjectSet
+		context: root.context
+
 		requestType: 1
 		sdlObjectComp: Component {
 			RestoreObjectSetPayload {}
@@ -309,6 +318,8 @@ Item {
 	GqlSdlRequestSender {
 		id: removeElementSetSender
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElementSet
+		context: root.context
+
 		requestType: 1
 		sdlObjectComp: Component {
 			RemoveElementSetPayload {
@@ -317,10 +328,7 @@ Item {
 						root.elementSetRemoved()
 					}
 					else{
-						let message = m_errorMessage
-						if (!message || message === ""){
-							message = qsTr("Unable to remove elements")
-						}
+						let message = qsTr("Unable to remove elements")
 						root.elementSetRemoveFailed(message)
 					}
 				}
@@ -335,6 +343,8 @@ Item {
 	GqlSdlRequestSender {
 		id: removeGqlSender
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
+		context: root.context
+
 		requestType: 1
 		sdlObjectComp: Component {
 			RemoveElementsPayload {
@@ -363,6 +373,8 @@ Item {
 	GqlSdlRequestSender {
 		id: setObjectNameRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_setObjectName
+		context: root.context
+
 		requestType: 1
 		sdlObjectComp: Component {
 			SetObjectNamePayload {
@@ -390,6 +402,8 @@ Item {
 	GqlSdlRequestSender {
 		id: getObjectVisualStatusRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectVisualStatus
+		context: root.context
+
 		sdlObjectComp: Component {
 			VisualStatus {
 				onFinished: {
@@ -411,6 +425,8 @@ Item {
 	GqlSdlRequestSender {
 		id: setObjectDescriptionRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_setObjectDescription
+		context: root.context
+
 		requestType: 1
 		sdlObjectComp: Component {
 			SetObjectDescriptionPayload {
@@ -432,6 +448,8 @@ Item {
 	GqlSdlRequestSender {
 		id: getCollectionHeadersRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getCollectionHeaders
+		context: root.context
+
 		sdlObjectComp: Component {
 			GetCollectionHeadersPayload {
 				onFinished: {
@@ -475,6 +493,7 @@ Item {
 	GqlRequestSender {
 		id: elementsGqlModel;
 		gqlCommandId: root.gqlGetListCommandId;
+		context: root.context
 		
 		function createQueryParams(query, params){
 			var viewParams = Gql.GqlObject("viewParams");
@@ -525,6 +544,8 @@ Item {
 	GqlSdlRequestSender {
 		id: importObjectRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_importObject
+		context: root.context
+
 		requestType: 1
 		sdlObjectComp: Component {
 			ImportObjectPayload {
@@ -543,6 +564,8 @@ Item {
 	GqlSdlRequestSender {
 		id: exportObjectRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_exportObject
+		context: root.context
+		
 		sdlObjectComp: Component {
 			ExportObjectPayload {
 				onFinished: {

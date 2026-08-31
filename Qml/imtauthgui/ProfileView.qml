@@ -223,7 +223,7 @@ ViewBase {
 
 		Component.onCompleted: {
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
-			multiPageView.addPage("Organizations", qsTr("Organizations"), organizationsPageComp, "Icons/Organization")
+			multiPageView.addPage("Organizations", qsTr("Organizations"), organizationsPageComp, "Icons/Organizations")
 			multiPageView.addPage("AccessTokens", qsTr("Access Tokens"), tokensPageComp, "Icons/Key")
 			multiPageView.addPage("Access", qsTr("Roles & Permissions"), accessPageComp, "Icons/Role")
 			multiPageView.currentIndex = 0

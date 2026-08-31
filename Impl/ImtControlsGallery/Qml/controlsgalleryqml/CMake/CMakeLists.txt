@@ -4,16 +4,16 @@ include(${IMTCOREDIR}/Config/CMake/WebCompiler.cmake)
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 
 if(QT_VERSION_MAJOR EQUAL 6)
-	target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Core5Compat)
+	target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core5Compat)
 endif()
 
 set(buildwebdir ${BUILDDIR}/ImtControlsGallery/Bin/web)
 
-# copy prolife qml from to
-list(APPEND webdirs ${BUILDDIR}/ImtControlsGallery/Qml/controlsgalleryqml)
+# copy local qml sources from source tree to web build dir
+list(APPEND webdirs ${PROJECT_SOURCE_DIR}/..)
 list(APPEND webdirs ${buildwebdir}/src)
 
-list(APPEND webdirs ${BUILDDIR}/ImtControlsGallery/Qml/controlsgalleryqml/Resources/html)
+list(APPEND webdirs ${PROJECT_SOURCE_DIR}/../Resources/html)
 list(APPEND webdirs ${buildwebdir}/Resources)
 
 # copy base qml sources from to
@@ -55,4 +55,3 @@ else()
 		jqml_compile_web2("${webdirs}" "${buildwebdir}" "${resname}")
 	endif()
 endif()
-

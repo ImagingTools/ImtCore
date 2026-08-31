@@ -119,6 +119,8 @@ StyleComponents {
 	property int marginM: 10;
 	property int marginS: 8;
 	property int marginXS: 6;
+	property int marginXXS: 4;
+	property int marginXXXS: 2;
 
 	//SizeHint
 	property int sizeHintXXXL: 1000

@@ -49,7 +49,7 @@ automatically** — both for the in-tree build and for downstream consumers that
 
 ```cmake
 # ImtCore example — imtauth needs imtdoc, imtlic, imtmail (its direct deps only)
-imt_declare_library_dependencies(imtauth  imtdoc imtlic imtmail
+declare_target_dependencies(imtauth  imtdoc imtlic imtmail
     Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Svg)
 ```
 

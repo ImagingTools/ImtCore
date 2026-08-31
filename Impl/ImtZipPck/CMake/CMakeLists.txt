@@ -4,14 +4,11 @@ project(ImtZipPck LANGUAGES CXX)
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
-include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
+include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME} ${ACF_PACKAGE_LINK_SCOPE}
+target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtzip
 )
 
-if(WIN32)
-	set(files \"${IMTCOREDIR_BUILD}/Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.arp\")
-	windeploy(${PROJECT_NAME} "" "${files}")
-endif()
+deploy_qt(TARGET ${PROJECT_NAME})
 

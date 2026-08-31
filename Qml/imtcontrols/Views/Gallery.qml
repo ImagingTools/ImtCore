@@ -403,7 +403,7 @@ Rectangle {
                 anchors.bottomMargin: Style.marginXS;
 
                 width: (parent.width - 3 * Style.marginXS)/2;
-                height: Style.size_ButtonHeight;
+                height: Style.buttonHeight;
 
 				text: qsTr("Ok");
 
@@ -422,7 +422,7 @@ Rectangle {
                 anchors.bottomMargin: Style.marginXS;
 
                 width: (parent.width - 3 * Style.marginXS)/2;
-                height: Style.size_ButtonHeight;
+                height: Style.buttonHeight;
 
 				text: qsTr("Cancel");
 

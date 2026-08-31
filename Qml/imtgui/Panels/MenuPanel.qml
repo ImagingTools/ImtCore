@@ -194,10 +194,8 @@ Rectangle {
 		menuPanel.hintY = y;
 	}
 
-	function hideHint(text){
-		if (menuPanel.hintText === text){
-			menuPanel.hintText = "";
-		}
+	function hideHint(){
+		menuPanel.hintText = "";
 	}
 
 	onModelChanged: {
@@ -351,10 +349,10 @@ Rectangle {
 			id: allPagesFlick;
 
 			anchors.top: parent.top;
-			anchors.topMargin: Style.marginS;
+			anchors.topMargin: Style.enableMenuPanelCollapse ? Style.marginXL + Style.marginXXXS : Style.marginM;
 			anchors.left: parent.left;
 			anchors.right: parent.right;
-			anchors.bottom: collapseRow.visible ? collapseRow.top : parent.bottom;
+			anchors.bottom: parent.bottom;
 
 			boundsBehavior: Flickable.StopAtBounds;
 			flickableDirection: Flickable.VerticalFlick;
@@ -394,7 +392,7 @@ Rectangle {
 			width: menuPanel.rowWidth;
 
 			anchors.topMargin: Style.menuPanelTopMargin !==undefined ? Style.menuPanelTopMargin :
-																	   !menuPanel.centered ? Style.marginS :
+																	   !menuPanel.centered ? (Style.enableMenuPanelCollapse ? Style.marginXL + Style.marginXXXS : Style.marginM):
 																							 parent.height - bottomAlignmentColumn.height -  height > 0 ? (parent.height - bottomAlignmentColumn.height - height)/2 : 0
 
 			visible: !allPagesFlick.visible;
@@ -427,7 +425,7 @@ Rectangle {
 			id: bottomAlignmentColumn;
 
 			anchors.left: parent.left;
-			anchors.bottom: collapseRow.visible ? collapseRow.top : parent.bottom;
+			anchors.bottom: parent.bottom;
 
 			width: menuPanel.rowWidth;
 
@@ -458,90 +456,95 @@ Rectangle {
 		}
 
 		Item{
-			id: collapseRow
-
-			anchors.bottom: parent.bottom
-			anchors.left: parent.left
-
-			width: menuPanel.rowWidth;
-			height: visible ? menuPanel.rowHeight : 0
-
+			id: controlPanel
+			width: parent.width
+			height: Style.controlHeightS
 			visible: Style.enableMenuPanelCollapse
+			Rectangle{
+				anchors.fill: parent
+				color: Style.backgroundColor2
+				opacity: 0.7
+			}
 
-
-			Rectangle {
-				id: collapseMarker
-
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginS
-				anchors.top: parent.top
+			Rectangle{
 				anchors.bottom: parent.bottom
+				width: parent.width
+				height: 1
 
-				width: (!menuPanel ? parent.width : menuPanel.width) - 2 * Style.marginS
+				color: Style.backgroundColor
 
-				radius: Style.buttonRadius
-				color: menuButtonArea.containsMouse ? Style.backgroundColor2 : "transparent"
 			}
+			Item{
+				id: collapseRow
 
-			Image{
-				id: collapseIcon
-
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginL
 				anchors.verticalCenter: parent.verticalCenter
-
-				width: menuPanel.iconSize
-				height: width
-
-				sourceSize.width: width
-				sourceSize.height: height
-
-				source: menuPanel.collapsed ? "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Disabled)
-											: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Disabled)
-			}
-
-			BaseText {
-				anchors.left: collapseIcon.right
-				anchors.leftMargin: Style.marginM
 				anchors.right: parent.right
-				anchors.rightMargin: Style.marginL
-				anchors.verticalCenter: parent.verticalCenter
+				anchors.rightMargin: Style.marginXXXS
 
-				visible: !menuPanel.collapsed
-				text: qsTr("Collapse")
-				font.pixelSize: Style.fontSizeM
-				color: Style.inactiveTextColor
-				elide: Text.ElideRight
-			}
+				width: collapseMarker.width
+				height: collapseMarker.height
 
-			MouseArea {
-				id: menuButtonArea;
+				visible: Style.enableMenuPanelCollapse
 
-				anchors.fill: collapseMarker;
+				Rectangle {
+					id: collapseMarker
 
-				hoverEnabled: true;
-				cursorShape: Qt.PointingHandCursor;
+					width: Style.buttonWidthS - Style.marginXXS
+					height: width
 
-				onClicked: {
-					if(!menuPanel.collapsed){
-						Events.sendEvent("CollapseMenu", true)
-					}
-					else {
-						Events.sendEvent("ExpandMenu", false)
-					}
+					radius: 1
+					color:"transparent"
 				}
 
-				onContainsMouseChanged: {
-					if (menuButtonArea.containsMouse && menuPanel.collapsed){
-						menuPanel.showHint(qsTr("Expand menu"),
-							collapseIcon.mapToItem(menuPanel, 0, collapseIcon.height / 2).y);
+				Image{
+					id: collapseIcon
+
+					width: collapseMarker.width
+					height: width
+
+					sourceSize.width: width
+					sourceSize.height: height
+
+					source: menuPanel.collapsed ? "qrc:/" + Style.getIconPath("Icons/Expand", Icon.State.Off, Icon.Mode.Disabled)
+												: "qrc:/" + Style.getIconPath("Icons/Collapse", Icon.State.Off, Icon.Mode.Disabled)
+
+					opacity: menuButtonArea.containsMouse ? 1.0 : Style.opacityHigh
+				}
+
+				MouseArea {
+					id: menuButtonArea;
+
+					anchors.fill: collapseMarker;
+
+					hoverEnabled: true;
+					cursorShape: Qt.PointingHandCursor;
+
+					onClicked: {
+						if(!menuPanel.collapsed){
+							Events.sendEvent("CollapseMenu", true)
+						}
+						else {
+							Events.sendEvent("ExpandMenu", false)
+						}
 					}
-					else{
-						menuPanel.hideHint(qsTr("Expand menu"));
+
+					onContainsMouseChanged: {
+						if(!menuButtonArea.containsMouse){
+							menuPanel.hideHint();
+						}
+						else if (menuPanel.collapsed){
+							menuPanel.showHint(qsTr("Expand menu"),
+								collapseIcon.mapToItem(menuPanel, 0, collapseIcon.height / 2).y);
+						}
+						else if(!menuPanel.collapsed){
+							menuPanel.showHint(qsTr("Collapse menu"),
+								collapseIcon.mapToItem(menuPanel, 0, collapseIcon.height / 2).y)
+						}
 					}
 				}
 			}
 		}
+
 	}
 
 	Rectangle {
@@ -560,11 +563,11 @@ Rectangle {
 		id: hint;
 
 		x: menuPanel.width + hint.slide;
-		y: menuPanel.hintY - height / 2;
+		y: menuPanel.hintY - height / 2 + Style.marginXXS;
 		z: 100;
 
 		width: hintBody.width + Style.spacingS;
-		height: Style.controlHeightM;
+		height: Style.controlHeightS + Style.marginXXS;
 
 		visible: hint.opacity > 0;
 		opacity: 0;
@@ -579,7 +582,7 @@ Rectangle {
 
 			anchors.verticalCenter: parent.verticalCenter;
 
-			width: Style.marginM;
+			width: Style.marginS;
 			height: width;
 			rotation: 45;
 			color: hintBody.color;

@@ -131,11 +131,6 @@ Item {
         commandsProviderLocal.uuid = collectionStructureContainer.commandId;
 
         collectionStructureBase.commands.additionInputParams = getHeaders()
-
-//        collectionStructureBase.commandId = collectionViewContainer.commandId;
-
-        collectionMetaInfo.getMetaInfoGqlCommand = collectionStructureContainer.commandId + "MetaInfo";
-
         if (commandsDelegateLoader.item){
             commandsDelegateLoader.item.commandId = collectionStructureContainer.commandId;
         }
@@ -514,7 +509,6 @@ Item {
 				anchors.rightMargin: Style.marginM;
 
 				width: Style.buttonWidthXL;
-				height: Style.conntrolHeightM;
 
                 text: qsTr("Update");
 

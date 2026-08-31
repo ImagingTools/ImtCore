@@ -5,6 +5,9 @@ import imtgui 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
 import imtauthGroupsSdl 1.0
+import imtauthUsersSdl 1.0
+import imtauthRolesSdl 1.0
+import imtcolgui 1.0
 import imtdocgui 1.0
 import imtauthgui 1.0
 
@@ -261,16 +264,25 @@ ViewBase {
 						id: parentGroupsGroup;
 						width: parent.width;
 
-						GqlBasedItemSelectElementView {
+						CollectionItemSelectElementView {
 							id: groupSelectableCollectionEditor
-							collectionId: "Groups"
-								label: qsTr("Parent Groups")
-								addButtonText: qsTr("Add Parent Group")
-								showCount: true
-								onSelectionChanged: {
-									container.doUpdateModel()
-								}
+							commandId: ImtauthGroupsSdlCommandIds.s_groupsList
+							fields: [GroupItemDataTypeMetaInfo.s_id, GroupItemDataTypeMetaInfo.s_name]
+							titleField: GroupItemDataTypeMetaInfo.s_name
+							textFilterFieldIds: [GroupItemDataTypeMetaInfo.s_name]
+							sortByField: GroupItemDataTypeMetaInfo.s_name
+							label: qsTr("Parent Groups")
+							addButtonText: qsTr("Add Parent Group")
+							// A group cannot be its own parent.
+							excludeIds: container.groupData && container.groupData.m_id
+								? [container.groupData.m_id]
+								: []
+							showCount: true
+
+							onSelectionChanged: {
+								container.doUpdateModel()
 							}
+						}
 
 						function updateGui(){
 							if (!container.groupData){
@@ -359,16 +371,21 @@ ViewBase {
 						
 						width: parent.width;
 						
-						GqlBasedItemSelectElementView {
+						CollectionItemSelectElementView {
 							id: userSelectableCollectionEditor
-							collectionId: "Users"
-								label: qsTr("Users")
-								addButtonText: qsTr("Add User")
-								showCount: true
-								onSelectionChanged: {
-									container.doUpdateModel()
-								}
+							commandId: ImtauthUsersSdlCommandIds.s_usersList
+							fields: [UserItemDataTypeMetaInfo.s_id, UserItemDataTypeMetaInfo.s_name]
+							titleField: UserItemDataTypeMetaInfo.s_name
+							textFilterFieldIds: [UserItemDataTypeMetaInfo.s_name]
+							sortByField: UserItemDataTypeMetaInfo.s_name
+							label: qsTr("Users")
+							addButtonText: qsTr("Add User")
+							showCount: true
+
+							onSelectionChanged: {
+								container.doUpdateModel()
 							}
+						}
 						
 						function updateGui(){
 							if (!container.groupData){
@@ -457,16 +474,34 @@ ViewBase {
 						
 						width: parent.width;
 						
-						GqlBasedItemSelectElementView {
+						CollectionItemSelectElementView {
 							id: roleSelectableCollectionEditor
-							collectionId: "Roles"
-								label: qsTr("Roles")
-								addButtonText: qsTr("Add Role")
-								showCount: true
-								onSelectionChanged: {
-									container.doUpdateModel()
+							commandId: ImtauthRolesSdlCommandIds.s_rolesList
+							fields: [RoleItemDataTypeMetaInfo.s_id, RoleItemDataTypeMetaInfo.s_roleName]
+							titleField: RoleItemDataTypeMetaInfo.s_roleName
+							textFilterFieldIds: [RoleItemDataTypeMetaInfo.s_roleName]
+							sortByField: RoleItemDataTypeMetaInfo.s_roleName
+							label: qsTr("Roles")
+							addButtonText: qsTr("Add Role")
+							showCount: true
+
+							// The role list is scoped by product, as a header and as an input field.
+							function getHeaders(){
+								let headers = {}
+								headers["productId"] = container.productId
+								return headers
+							}
+
+							function setCustomInputParams(inputParams){
+								if (container.productId){
+									inputParams.InsertField(RoleItemInputTypeMetaInfo.s_productId, container.productId)
 								}
 							}
+
+							onSelectionChanged: {
+								container.doUpdateModel()
+							}
+						}
 
 						function updateGui(){
 							if (!container.groupData){

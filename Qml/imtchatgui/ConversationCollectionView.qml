@@ -11,6 +11,7 @@ import imtbaseUndoManagerSdl 1.0
 RemoteCollectionView {
 	id: container
 
+	property string context: ""
 	collectionId: "Conversations"
 	gqlGetListCommandId: ImtchatImtChatSdlCommandIds.s_conversationsList
 
@@ -67,6 +68,7 @@ RemoteCollectionView {
 
 					property DocumentId documentIdInput: DocumentId {}
 					property GqlSdlRequestSender getConversationRequest: GqlSdlRequestSender {
+						context: container.context
 						gqlCommandId: ImtchatConversationCollectionDocumentServiceSdlCommandIds.s_getConversationRepresentation
 						sdlObjectComp: Component {
 							ConversationData {
@@ -84,6 +86,7 @@ RemoteCollectionView {
 
 					property UpdateConversationInput updateConversationInput: UpdateConversationInput {}
 					property GqlSdlRequestSender updateConversationRequest: GqlSdlRequestSender {
+						context: container.context
 						gqlCommandId: ImtchatConversationCollectionDocumentServiceSdlCommandIds.s_updateConversationFromRepresentation
 						requestType: 1
 						sdlObjectComp: Component {

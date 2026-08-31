@@ -9,6 +9,7 @@ import imtdocgui 1.0
 DocumentDataController {
     id: container;
 
+    property string context: ""
     property string gqlGetCommandId;
     property string gqlAddCommandId;
     property string gqlUpdateCommandId;
@@ -88,6 +89,7 @@ DocumentDataController {
     }
 
     property GqlRequestSender gqlUpdateModel: GqlRequestSender {
+        context: container.context
         requestType: 1; // Mutation
         gqlCommandId: container.gqlUpdateCommandId;
 
@@ -131,6 +133,7 @@ DocumentDataController {
     }
 
     property GqlRequestSender gqlGetModel: GqlRequestSender {
+        context: container.context
         requestType: 0; // Query
         gqlCommandId: container.gqlGetCommandId;
 
@@ -172,6 +175,7 @@ DocumentDataController {
     }
 
     property GqlRequestSender gqlAddModel: GqlRequestSender {
+        context: container.context
         requestType: 1; // Mutation
         gqlCommandId: container.gqlAddCommandId;
 

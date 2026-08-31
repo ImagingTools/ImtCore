@@ -2,10 +2,10 @@ project(ImtCoreFileCollectionTest)
 
 
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
-include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
+include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
+target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtauth
 	imtrepo
 	Acf::ipackage
@@ -13,8 +13,5 @@ target_link_libraries(${PROJECT_NAME} ${ACF_APPLICATION_LINK_SCOPE}
 	Qt${QT_VERSION_MAJOR}::Test
 )
 
-if(WIN32)
-	set(listFiles \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
-	windeploy(${PROJECT_NAME} "" "${listFiles}")
-endif()
+deploy_qt(TARGET ${PROJECT_NAME})
 

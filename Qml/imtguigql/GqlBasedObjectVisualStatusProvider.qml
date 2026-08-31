@@ -8,6 +8,7 @@ import imtbaseImtCollectionSdl 1.0
 ObjectVisualStatusProvider {
 	id: root
 
+	property string context: ""
 	property string collectionId
 	// Last requested object id — onError only gets a message string, but MultiDoc
 	// (and other listeners) expect visualStatusReceiveFailed(objectId, message).
@@ -33,6 +34,7 @@ ObjectVisualStatusProvider {
 	}
 	
 	property GqlSdlRequestSender getVisualStatusInfoRequest: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectVisualStatus
 		sdlObjectComp: Component {
 			VisualStatus {

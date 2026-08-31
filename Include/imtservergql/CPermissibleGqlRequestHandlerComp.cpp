@@ -24,7 +24,7 @@ QJsonObject CPermissibleGqlRequestHandlerComp::CreateResponse(const imtgql::CGql
 	}
 
 	errorMessage = QString("Invalid permissions for the user '%1'").arg(userName);
-	SendErrorMessage(0, errorMessage);
+	SendWarningMessage(0, QString("%1 (command '%2')").arg(errorMessage, QString::fromUtf8(gqlRequest.GetCommandId())));
 
 	return QJsonObject();
 }

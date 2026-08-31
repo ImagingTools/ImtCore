@@ -27,6 +27,7 @@ import imtauthgui 1.0
 QtObject {
 	id: root
 
+	property string context: ""
 	property string productId: AuthorizationController.productId
 	property string tenantId: AuthorizationController.currentTenantId
 	property string rolePermissionsTenantId: ""
@@ -119,6 +120,7 @@ QtObject {
 
 	property RemoveElementsInput __removeRoleInput: RemoveElementsInput {}
 	property GqlSdlRequestSender __removeRoleSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
 
@@ -131,6 +133,7 @@ QtObject {
 
 	property RemoveElementsInput __removeGroupInput: RemoveElementsInput {}
 	property GqlSdlRequestSender __removeGroupSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
 
@@ -261,6 +264,7 @@ QtObject {
 			property UpdateRoleFromRepresentationInput updateRoleInput: UpdateRoleFromRepresentationInput {}
 
 			property GqlSdlRequestSender getRoleRequest: GqlSdlRequestSender {
+				context: root.context
 				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_getRoleRepresentation
 				sdlObjectComp: Component {
 					RoleData {
@@ -279,6 +283,7 @@ QtObject {
 			}
 
 			property GqlSdlRequestSender updateRoleRequest: GqlSdlRequestSender {
+				context: root.context
 				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_updateRoleFromRepresentation
 				requestType: 1
 				sdlObjectComp: Component {
@@ -346,6 +351,7 @@ QtObject {
 			property UpdateGroupFromRepresentationInput updateGroupInput: UpdateGroupFromRepresentationInput {}
 
 			property GqlSdlRequestSender getGroupRequest: GqlSdlRequestSender {
+				context: root.context
 				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_getGroupRepresentation
 				sdlObjectComp: Component {
 					GroupData {
@@ -364,6 +370,7 @@ QtObject {
 			}
 
 			property GqlSdlRequestSender updateGroupRequest: GqlSdlRequestSender {
+				context: root.context
 				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_updateGroupFromRepresentation
 				requestType: 1
 				sdlObjectComp: Component {
@@ -451,6 +458,7 @@ QtObject {
 			property UpdateUserFromRepresentationInput updateUserInput: UpdateUserFromRepresentationInput {}
 
 			property GqlSdlRequestSender getUserRequest: GqlSdlRequestSender {
+				context: root.context
 				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_getUserRepresentation
 				sdlObjectComp: Component {
 					UserData {
@@ -469,6 +477,7 @@ QtObject {
 			}
 
 			property GqlSdlRequestSender updateUserRequest: GqlSdlRequestSender {
+				context: root.context
 				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_updateUserFromRepresentation
 				requestType: 1
 				sdlObjectComp: Component {

@@ -34,8 +34,8 @@ Item {
 
 	property string backgroundColor: "transparent";
 	property string axeColor: "transparent";
-	property string titleColor: Style.color_text_subtitles;
-	property string valueColor: Style.color_text_common;
+	property string titleColor: Style.titleColor;
+	property string valueColor: Style.textColor
 
 	property bool hasMiddleLine: false;
 	property bool hasBarFillingChange: false;

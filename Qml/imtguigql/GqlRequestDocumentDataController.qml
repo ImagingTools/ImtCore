@@ -22,6 +22,7 @@ QtObject {
 	property string gqlUpdateCommandId: "";
 
 	property string subscriptionCommandId;
+	property string context;
 
 	property var getRequestInputParam: Gql.GqlObject("input");
 	property var addRequestInputParam: Gql.GqlObject("input");
@@ -185,6 +186,8 @@ QtObject {
 
 			var gqlData = query.GetQuery();
 			let headers = container.getHeaders()
+			if (headers && container.context && container.context != "")
+				headers["context"] = container.context
 
 			this.setGqlQuery(gqlData, headers);
 		}
@@ -244,6 +247,8 @@ QtObject {
 
 			var gqlData = query.GetQuery();
 			let headers = container.getHeaders()
+			if (headers && container.context && container.context != "")
+				headers["context"] = container.context
 
 			this.setGqlQuery(gqlData, headers);
 		}
@@ -291,6 +296,8 @@ QtObject {
 
 			var gqlData = query.GetQuery();
 			let headers = container.getHeaders()
+			if (headers && container.context && container.context != "")
+				headers["context"] = container.context
 
 			this.setGqlQuery(gqlData, headers);
 		}

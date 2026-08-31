@@ -29,7 +29,7 @@ if(NOT DEFINED USE_QT3D OR USE_QT3D)
 	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS OpenGL OpenGLWidgets REQUIRED)
 endif()
 
-
+option(BUILD_TESTING "Configures projects for testing" OFF)
 if(BUILD_TESTING)
 	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Test REQUIRED)
 endif()
@@ -46,8 +46,6 @@ if(NOT DEFINED IMTCOREDIR_BUILD)
 	set(IMTCOREDIR_BUILD "${IMTCOREDIR}")
 endif()
 
-
-option(BUILD_TESTING "Configures projects for testing" OFF)
 option(USE_MDBX "Use 3rdParty/libmdbx" OFF)
 
 # Enable modern target-based architecture:
@@ -60,13 +58,6 @@ option(ACF_MODERN_CMAKE "Enable modern target-based architecture" ON)
 set(ACF_PACKAGE_NAME "ImtCore")
 
 include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
-
-if(ACF_MODERN_CMAKE)
-	acf_define_link_scope_var(ACF_QT_MODULE_LINK_SCOPE "PRIVATE" "Link scope used for Qt module dependencies")
-	acf_define_link_scope_var(ACF_LIBRARY_LINK_SCOPE "PUBLIC" "Link scope used by ImtCore inter-library dependencies")
-	acf_define_link_scope_var(ACF_PACKAGE_LINK_SCOPE "PRIVATE" "Link scope used by package (Pck) libraries linking their dependencies")
-	acf_define_link_scope_var(ACF_APPLICATION_LINK_SCOPE "PRIVATE" "Link scope used by executables linking their dependencies")
-endif()
 
 message(VERBOSE "ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
 
@@ -82,6 +73,7 @@ include_directories(${AUX_INCLUDE_DIR})
 
 
 #------ Required libs ------
+add_subdirectory("${INCLUDE_DIR}/imtcore/CMake" "${AUX_INCLUDE_DIR}/imtcore")
 add_subdirectory("${INCLUDE_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbase")
 
 add_subdirectory("${INCLUDE_DIR}/imtdesign/CMake" "${AUX_INCLUDE_DIR}/imtdesign")
@@ -222,7 +214,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${INCLUDE_DIR}/imt3dgui/CMake" "${AUX_INCLUDE_DIR}/imt3dgui")
 		add_dependencies(imt3dgui DesignTokenCreator)
 
-		add_subdirectory("${INCLUDE_DIR}/imt3d/Test/CMake" "${AUX_INCLUDE_DIR}/imt3d/Test")
+		if(BUILD_TESTING)
+			add_subdirectory("${INCLUDE_DIR}/imt3d/Test/CMake" "${AUX_INCLUDE_DIR}/imt3d/Test")
+		endif()
 	endif()
 
 	if(NOT DEFINED USE_QTDB OR USE_QTDB)
@@ -271,6 +265,10 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${INCLUDE_DIR}/imt2d/Test/CMake" "${AUX_INCLUDE_DIR}/imt2d/Test")
 	endif()
 
+	if(NOT DEFINED USE_QTDB OR USE_QTDB)
+		add_subdirectory("${INCLUDE_DIR}/imtservice/CMake" "${AUX_INCLUDE_DIR}/imtservice")
+	endif()
+
 	#-------- Qml --------
 	if(NOT DEFINED USE_QTQML OR USE_QTQML)
 		# TODO return it when new wrappers will be finished
@@ -305,7 +303,6 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${QML_DIR}/imtgui/CMake"			"${AUX_INCLUDE_DIR}/imtguiqml")
 		add_subdirectory("${QML_DIR}/imtguigql/CMake"		"${AUX_INCLUDE_DIR}/imtguigqlqml")
 		add_subdirectory("${QML_DIR}/imtlicgui/CMake"		"${AUX_INCLUDE_DIR}/imtlicguiqml")
-		add_subdirectory("${INCLUDE_DIR}/imtservice/CMake"	"${AUX_INCLUDE_DIR}/imtservice")
 	endif()
 
 	#-------- Packages --------
@@ -507,6 +504,10 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 				add_subdirectory("${IMPL_DIR}/ImtDeskGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtDeskGqlPck")
 				add_dependencies(ImtDeskGqlPck imtdb imtdesk imtdesksdl imtservergql imtdoc imtdeskgql)
+				if (IMT_BUILD_CONTROLS_GALLERY)
+					add_subdirectory("${IMPL_DIR}/ImtControlsGallery/Build/CMake" "${AUX_INCLUDE_DIR}/ImtControlsGallery")
+					add_dependencies(ControlsGallery imtgui imtauthsdl imtlicsdl)
+				endif() # IMT_BUILD_CONTROLS_GALLERY
 			endif()
 		endif()
 	endif()

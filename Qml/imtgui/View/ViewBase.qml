@@ -37,14 +37,32 @@ Item {
 	property real viewContentY: viewContent.y
 	property real viewContentRightMargin: 0
 
+	property bool hasButtonPanel: false
+	property BaseModel buttonPanelModel: null
+
 	signal commandsModelChanged(var commandsModel)
 	signal commandActivated(string commandId)
+	signal commandActivatedWithParams(string commandId, var params)
 	signal modelDataChanged(var view, var model)
 	signal guiUpdated(var view, var model)
 	signal guiVisibleChanged(var view, bool visible)
 
 	onModelChanged: {
 		doUpdateGui()
+	}
+
+onCommandsModelChanged: {
+		viewBase.buttonPanelModel = null
+		if (!hasButtonPanel || !commandsModel){
+			return
+		}
+		for (let i = 0; i < commandsModel.m_elements.count; i++){
+			let elementGroup = commandsModel.m_elements.get(i).item
+			if (elementGroup.m_alignment === -1){
+				viewBase.buttonPanelModel = elementGroup.m_subElements
+				break
+			}
+		}
 	}
 
 	Connections {
@@ -132,10 +150,94 @@ Item {
 		objectName: "ViewBase";
 	}
 	
+	Rectangle{
+		id: buttonPanel
+		anchors.left: parent.left
+		anchors.top: separator.bottom
+		anchors.bottom: parent.bottom
+		width: viewBase.hasButtonPanel ? 0.5 * Style.sizeHintBXS : 0
+		clip: true
+
+		objectName: "ViewBase";
+
+
+		Rectangle{
+
+			anchors.top: parent.top
+			anchors.bottom: parent.bottom
+			anchors.right: parent.right
+
+			width: 1
+
+			color: Style.borderColor;
+			opacity: 0.5
+		}
+
+		ListView{
+			id: buttonsList
+
+			anchors.horizontalCenter: parent.horizontalCenter
+			anchors.verticalCenter: parent.verticalCenter
+
+			width: parent.width - Style.marginM
+			height: Math.min(parent.height - 2*Style.marginM, contentHeight)
+
+			boundsBehavior: Flickable.StopAtBounds
+
+			model: viewBase.buttonPanelModel
+
+			delegate: Item{
+				anchors.horizontalCenter: parent.horizontalCenter
+				width: buttonsList.width
+				height: visible ? width: 0
+
+				visible: model.item.m_visible
+
+				Item {
+					anchors.horizontalCenter: parent.horizontalCenter
+					width: parent.width - Style.marginM
+					height: width
+
+					Image {
+						id: imageName
+
+						width: parent.width
+						height: parent.height
+						sourceSize.width: width
+						sourceSize.height: height
+						source: "../../../../" + Style.getIconPath(model.item.m_elementItemPath, Icon.State.On, Icon.Mode.Normal);
+					}
+
+					MouseArea{
+						id: ma
+						anchors.fill: parent
+
+						hoverEnabled: true
+						cursorShape: Qt.PointingHandCursor
+						onClicked: {
+							let params = ({})
+							params.target = this
+							params.x = mouse.x
+							params.y = mouse.y
+							viewBase.commandActivated(model.item.m_elementId)
+							viewBase.commandActivatedWithParams(model.item.m_elementId, params)
+						}
+					}
+					TooltipArea {
+						anchors.fill: parent;
+
+						mouseArea: ma;
+						text: model.item.m_elementName
+					}
+				}
+			}
+		}
+	}
+
 	Rectangle {
 		id: viewContent;
 		anchors.top: separator.bottom;
-		anchors.left: parent.left;
+		anchors.left: buttonPanel.right;
 		anchors.right: parent.right;
 		anchors.rightMargin: viewBase.viewContentRightMargin
 		anchors.bottom: parent.bottom;

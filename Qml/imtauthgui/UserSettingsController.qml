@@ -9,6 +9,7 @@ import imtbaseImtBaseTypesSdl 1.0
 ParamsSetController {
 	id: root
 
+	property string context: ""
 	signal settingsReceived()
 	signal settingsReceiveFailed()
 	signal settingsSaved()
@@ -23,6 +24,7 @@ ParamsSetController {
 	}
 
 	property GqlSdlRequestSender getSettingsQuery: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtbaseSettingsSdlCommandIds.s_getSettings
 		inputObjectComp: Component {
 			GetSettingsInput {
@@ -41,6 +43,7 @@ ParamsSetController {
 	}
 	
 	property GqlSdlRequestSender setSettingsQuery: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtbaseSettingsSdlCommandIds.s_setSettings
 		inputObjectComp: Component {
