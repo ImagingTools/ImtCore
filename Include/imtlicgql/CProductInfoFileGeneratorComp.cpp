@@ -19,10 +19,10 @@ const QString s_productContext = QStringLiteral("Product");
 // reimplemented (ifile::IFilePersistence)
 
 bool CProductInfoFileGeneratorComp::IsOperationSupported(
-			const istd::IChangeable* dataObjectPtr,
-			const QString* /*filePathPtr*/,
-			int /*flags*/,
-			bool /*beQuiet*/) const
+	const istd::IChangeable* dataObjectPtr,
+	const QString* /*filePathPtr*/,
+	int /*flags*/,
+	bool /*beQuiet*/) const
 {
 	const imtlic::IProductInfo* productInfoPtr = dynamic_cast<const imtlic::IProductInfo*>(dataObjectPtr);
 	return productInfoPtr != nullptr;
@@ -30,18 +30,18 @@ bool CProductInfoFileGeneratorComp::IsOperationSupported(
 
 
 ifile::IFilePersistence::OperationState CProductInfoFileGeneratorComp::LoadFromFile(
-			istd::IChangeable& /*data*/,
-			const QString& /*filePath*/,
-			ibase::IProgressManager* /*progressManagerPtr*/) const
+	istd::IChangeable& /*data*/,
+	const QString& /*filePath*/,
+	ibase::IProgressManager* /*progressManagerPtr*/) const
 {
 	return ifile::IFilePersistence::OS_FAILED;
 }
 
 
 ifile::IFilePersistence::OperationState CProductInfoFileGeneratorComp::SaveToFile(
-			const istd::IChangeable& data,
-			const QString& filePath,
-			ibase::IProgressManager* /*progressManagerPtr*/) const
+	const istd::IChangeable& data,
+	const QString& filePath,
+	ibase::IProgressManager* /*progressManagerPtr*/) const
 {
 	istd::IChangeable* notConstDataPtr = const_cast<istd::IChangeable*>(&data);
 	imtlic::IProductInfo* productInfoPtr = dynamic_cast<imtlic::IProductInfo*>(notConstDataPtr);
@@ -76,17 +76,17 @@ ifile::IFilePersistence::OperationState CProductInfoFileGeneratorComp::SaveToFil
 // reimplemented (ifile::IFileTypeInfo)
 
 bool CProductInfoFileGeneratorComp::GetFileExtensions(
-			QStringList& /*result*/,
-			const istd::IChangeable* /*dataObjectPtr*/,
-			int /*flags*/,
-			bool /*doAppend*/) const
+	QStringList& /*result*/,
+	const istd::IChangeable* /*dataObjectPtr*/,
+	int /*flags*/,
+	bool /*doAppend*/) const
 {
 	return false;
 }
 
 
 QString CProductInfoFileGeneratorComp::GetTypeDescription(
-			const QString* /*extensionPtr*/) const
+	const QString* /*extensionPtr*/) const
 {
 	return QString();
 }
@@ -163,7 +163,7 @@ void CProductInfoFileGeneratorComp::WriteFunction(QTextStream& textStream, imtli
 			if (featureCollectionPtr->GetObjectData(featureElementId, dataPtr)) {
 				const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
 				if (featureInfoPtr != nullptr) {
-					WriteFeatureInfo(textStream, *featureInfoPtr, featureElementId);
+					WriteFeatureInfo(textStream, *featureInfoPtr, productInfo, featureElementId);
 					WriteNewLine(textStream, 1);
 
 					const QByteArray featureId = featureInfoPtr->GetFeatureId();
@@ -183,16 +183,17 @@ void CProductInfoFileGeneratorComp::WriteFunction(QTextStream& textStream, imtli
 
 
 void CProductInfoFileGeneratorComp::WriteFeatureInfo(
-			QTextStream& textStream,
-			const imtlic::IFeatureInfo& featureInfo,
-			const QByteArray& objectUuid) const
+	QTextStream& textStream,
+	const imtlic::IFeatureInfo& featureInfo,
+	imtlic::IProductInfo &productInfo,
+	const QByteArray& objectUuid) const
 {
 	const QByteArray featureId = featureInfo.GetFeatureId();
 	const QString featureName = featureInfo.GetFeatureName();
 	const QString featureDescription = featureInfo.GetFeatureDescription();
 	const bool isOptional = featureInfo.IsOptional();
 	const bool isPermission = featureInfo.IsPermission();
-	QByteArrayList dependencyList = featureInfo.GetDependencies();
+	QByteArrayList dependencyList = featureInfo.GetRequirements();
 
 	const QString featureVarName = CreateFeatureVarName(featureId);
 
@@ -218,49 +219,71 @@ void CProductInfoFileGeneratorComp::WriteFeatureInfo(
 	}
 
 	WriteTab(textStream, 1);
-	textStream << QStringLiteral("%1->SetFeatureId(\"%2\");").arg(featureVarName, QString::fromUtf8(featureId));
+
+	// QByteArray featurePath = imtlic::CalculateFeaturePath(featureInfo);
+	textStream << QStringLiteral("%1->SetFeatureId(\"%2\");").arg(featureVarName, QString::fromUtf8(featureInfo.GetFeatureId()));
 	WriteNewLine(textStream, 1);
 
 	if (!featureName.isEmpty()){
 		WriteTab(textStream, 1);
 		textStream << QStringLiteral("%1->SetFeatureName(QT_TRANSLATE_NOOP(\"%2\", \"%3\"));")
-					.arg(featureVarName, s_featureContext, featureName);
+						  .arg(featureVarName, s_featureContext, featureName);
 		WriteNewLine(textStream, 1);
 	}
 
 	if (!featureDescription.isEmpty()){
 		WriteTab(textStream, 1);
 		textStream << QStringLiteral("%1->SetFeatureDescription(QT_TRANSLATE_NOOP(\"%2\", \"%3\"));")
-					.arg(featureVarName, s_featureContext, featureDescription);
+						  .arg(featureVarName, s_featureContext, featureDescription);
 		WriteNewLine(textStream, 1);
 	}
 
 	WriteTab(textStream, 1);
 	textStream << QStringLiteral("%1->SetOptional(%2);")
-				.arg(featureVarName, isOptional ? QStringLiteral("true") : QStringLiteral("false"));
+					  .arg(featureVarName, isOptional ? QStringLiteral("true") : QStringLiteral("false"));
 	WriteNewLine(textStream, 1);
 
 	WriteTab(textStream, 1);
 	textStream << QStringLiteral("%1->SetIsPermission(%2);")
-				.arg(featureVarName, isPermission ? QStringLiteral("true") : QStringLiteral("false"));
+					  .arg(featureVarName, isPermission ? QStringLiteral("true") : QStringLiteral("false"));
 	WriteNewLine(textStream, 1);
 
 	if (!dependencyList.isEmpty()){
 		QByteArray dependencies = dependencyList.join(';');
 		if (!dependencies.isEmpty()){
-			WriteTab(textStream, 1);
-			textStream << QStringLiteral("%1->SetDependencies(%2);").arg(featureVarName, QString("QByteArray(\"%1\").split(';')").arg(QString::fromUtf8(dependencies)));
+		// QByteArray dependenciesPaths;
+		// imtbase::IObjectCollection* featureCollectionPtr = productInfo.GetFeatures();
+		// if (featureCollectionPtr != nullptr){
+		// 	QByteArrayList Ids = featureCollectionPtr->GetElementIds();
+		// 	WriteTab(textStream, 1);
+		// 	for (int index = 1; index < dependencyList.count(); index++){
+		// 		QByteArray dependencyId = dependencyList[index];
+		// 		for (QByteArray fetureId: Ids){
+		// 			imtbase::IObjectCollection::DataPtr dataPtr;
+		// 			if (featureCollectionPtr->GetObjectData(fetureId, dataPtr)){
+		// 				const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
+		// 				if (featureInfoPtr != nullptr){
+		// 					if (featureInfoPtr->GetFeatureId() ==  dependencyId){
+		// 						dependenciesPaths.append(';');
+		// 						dependenciesPaths.append(imtlic::CalculateFeaturePath(*featureInfoPtr));
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+			textStream << QStringLiteral("%1->SetRequirements(%2);").arg(featureVarName, QString("QByteArray(\"%1\").split(';')").arg(QString::fromUtf8(dependencies)));
 			WriteNewLine(textStream, 1);
 		}
+		// }
 	}
-	
+
 	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
 	if (!subFeatures.isEmpty()){
 		for (int i = 0; i < subFeatures.count(); i++){
 			imtlic::IFeatureInfoSharedPtr subFeatureInfoPtr = subFeatures.at(i);
 			if (subFeatureInfoPtr.IsValid()){
 				WriteNewLine(textStream, 1);
-				WriteFeatureInfo(textStream, *subFeatureInfoPtr, "");
+				WriteFeatureInfo(textStream, *subFeatureInfoPtr, productInfo, "");
 
 				const QByteArray subFeatureId = subFeatureInfoPtr->GetFeatureId();
 				const QString subFeatureVarName = CreateFeatureVarName(subFeatureId);

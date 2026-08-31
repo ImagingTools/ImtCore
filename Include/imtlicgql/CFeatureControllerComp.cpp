@@ -315,7 +315,7 @@ bool CFeatureControllerComp::CreateFeatureFromRepresentationModel(
 		featureIds = dependencies.split(';');
 	}
 
-	featureInfo.SetDependencies(featureIds);
+	featureInfo.SetRequirements(featureIds);
 
 	return true;
 }
@@ -333,7 +333,7 @@ bool CFeatureControllerComp::CreateRepresentationModelFromFeatureInfo(
 	representationModel.SetData("FeatureName", featureInfo.GetFeatureName());
 	representationModel.SetData("Optional", featureInfo.IsOptional());
 	representationModel.SetData("FeatureDescription", featureInfo.GetFeatureDescription());
-	representationModel.SetData("Dependencies", featureInfo.GetDependencies().join(';'));
+	representationModel.SetData("Dependencies", featureInfo.GetRequirements().join(';'));
 	representationModel.AddTreeModel("ChildModel");
 
 	if (parentModelPtr != nullptr){

@@ -338,50 +338,54 @@ ViewBase {
 			}
 		})
 		let graph = []
-		appendDependencyGraphNodes(tree, graph)
+		appendDependencyGraphNodes(tree, [], graph)
 		dependencyGraph = graph
 
 		let leaves = []
-		appendDependencyEntries(tree, [], leaves)
+		appendDependencyEntries(tree, [], [], leaves)
 		dependencyEntries = leaves
 	}
 
-	function appendDependencyGraphNodes(nodes, target) {
+	function appendDependencyGraphNodes(nodes, pathIds, target) {
 		for (let i = 0; i < nodes.length; ++i) {
 			let node = nodes[i]
 			let data = node.data || {}
 			let id = data[FeatureItemTypeMetaInfo.s_featureId] || ""
+			let currentPathIds = pathIds.concat([id])
 			if (id !== "") {
 				target.push({
-					"featureId": id,
+					"featureId": "/" + currentPathIds.join("/"), //id,
 					"dependencies": data[FeatureItemTypeMetaInfo.s_dependencies] || ""
 				})
 			}
 			if (node.children && node.children.length > 0)
-				appendDependencyGraphNodes(node.children, target)
+				appendDependencyGraphNodes(node.children, currentPathIds, target)
 		}
 	}
 
 	// Flattens the shared feature collection into one flat row per leaf feature,
 	// each carrying the full path it sits at - a plain list reads better here
 	// than a tree, because a dependency is picked by what it is, not by where.
-	function appendDependencyEntries(nodes, pathNames, target) {
+	function appendDependencyEntries(nodes, pathNames, pathIds, target) {
 		for (let i = 0; i < nodes.length; ++i) {
 			let node = nodes[i]
 			let data = node.data || {}
 			let name = data[FeatureItemTypeMetaInfo.s_featureName] || data[FeatureItemTypeMetaInfo.s_featureId] || ""
 			let currentPath = pathNames.concat([name])
-			if (node.children && node.children.length > 0) {
-				appendDependencyEntries(node.children, currentPath, target)
-				continue
-			}
 			let id = data[FeatureItemTypeMetaInfo.s_featureId] || ""
 			if (id === "")
 				continue
+			let currentPathId = pathIds.concat([id])
+
+			if (node.children && node.children.length > 0) {
+				appendDependencyEntries(node.children, currentPath, currentPathId, target)
+				continue
+			}
 			target.push({
 				"featureName": name,
 				"fullPath": currentPath.join(" / "),
-				"featureId": id
+				"fullPathId": "/" + currentPathId.join("/"),
+				"featureId": "/" + currentPathId.join("/") //id
 			})
 		}
 	}
@@ -1315,7 +1319,7 @@ ViewBase {
 					entrySearchableTextProvider: function(entry) { return entry.fullPath + " " + entry.featureId }
 					entryCheckStateProvider: function(entry) { return featureEditor.isDirectDependency(entry.featureId) ? Qt.Checked : Qt.Unchecked }
 					entryCheckEnabledProvider: function(entry) { return featureEditor.dependencyIsEnabled(entry.featureId) }
-					onToggleRequested: featureEditor.toggleDependency(entry.featureId)
+					onToggleRequested: featureEditor.toggleDependency(entry.fullPathId)
 					onActionRequested: featureEditor.clearDependencies()
 				}
 			}

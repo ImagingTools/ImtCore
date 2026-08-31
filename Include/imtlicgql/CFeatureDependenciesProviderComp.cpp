@@ -92,11 +92,11 @@ QByteArrayList CFeatureDependenciesProviderComp::GetFeatureDependencies(const QB
 				if (featureInfoPtr->GetFeatureId() != featureId){
 					imtlic::IFeatureInfoSharedPtr subfeatureInfoPtr = featureInfoPtr->GetSubFeature(featureId);
 					if (subfeatureInfoPtr.IsValid()){
-						featureDependencies = subfeatureInfoPtr->GetDependencies();
+						featureDependencies = subfeatureInfoPtr->GetRequirements();
 					}
 				}
 				else{
-					featureDependencies = featureInfoPtr->GetDependencies();
+					featureDependencies = featureInfoPtr->GetRequirements();
 				}
 
 				retVal += featureDependencies;

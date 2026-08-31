@@ -50,6 +50,7 @@ private:
 	void WriteFeatureInfo(
 				QTextStream& textStream,
 				const imtlic::IFeatureInfo& featureInfo,
+				imtlic::IProductInfo &productInfo,
 				const QByteArray& objectUuid) const;
 	void WriteNewLine(QTextStream& textStream, int count = 1) const;
 	void WriteTab(QTextStream& textStream, int count = 1) const;

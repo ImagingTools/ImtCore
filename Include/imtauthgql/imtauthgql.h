@@ -640,6 +640,7 @@ inline bool CollectPermissionEntries(
 			imtsdl::TElementList<TEntry>& entries,
 			const QByteArray& languageId,
 			const QSet<QByteArray>* allowedPermissionsPtr,
+			const QString& parentName,
 			const QString& parentPath,
 			const iqt::ITranslationManager* translationManagerPtr,
 			bool parentSelected = false)
@@ -648,7 +649,7 @@ inline bool CollectPermissionEntries(
 		return false;
 	}
 
-	QByteArray featureId = imtlic::CalculateFeaturePath(featureInfo);
+	QByteArray featureId = featureInfo.GetFeatureId();
 	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
 
 	QString featureName = featureInfo.GetFeatureName();
@@ -656,7 +657,8 @@ inline bool CollectPermissionEntries(
 		featureName = iqt::GetTranslation(translationManagerPtr, featureName.toUtf8(), languageId, QByteArrayLiteral("Feature"));
 	}
 
-	QString displayName = parentPath.isEmpty() ? featureName : (parentPath + QStringLiteral(" / ") + featureName);
+	QString displayName = parentName.isEmpty() ? featureName : (parentName + QStringLiteral(" / ") + featureName);
+	QString currentPath = parentPath.isEmpty() ? "/" + featureId : (parentPath + QStringLiteral("/") + featureId);
 
 	if (subFeatures.isEmpty()){
 		if (allowedPermissionsPtr != nullptr && !parentSelected && !allowedPermissionsPtr->contains(featureId)){
@@ -669,7 +671,7 @@ inline bool CollectPermissionEntries(
 		}
 
 		TEntry entry;
-		entry.permissionId = featureId;
+		entry.permissionId = currentPath.toUtf8(); //featureId;
 		entry.displayName = displayName;
 		entry.description = featureDescription;
 		entries.append(entry);
@@ -698,6 +700,7 @@ inline bool CollectPermissionEntries(
 					languageId,
 					allowedPermissionsPtr,
 					displayName,
+					currentPath,
 					translationManagerPtr,
 					thisNodeSelected)){
 			childCount++;
@@ -771,6 +774,7 @@ inline void BuildPermissionGroups(
 					languageId,
 					allowedPermissionsPtr,
 					QString(),
+					QString(),
 					translationManagerPtr,
 					groupSelected);
 		}
@@ -788,6 +792,7 @@ inline void BuildPermissionGroups(
 							*group.entries,
 							languageId,
 							allowedPermissionsPtr,
+							QString(),
 							QString(),
 							translationManagerPtr,
 							groupSelected)){
@@ -855,6 +860,7 @@ inline void BuildPermissionGroupsFromProvider(
 					languageId,
 					allowedPermissionsPtr,
 					QString(),
+					QString(),
 					translationManagerPtr,
 					groupSelected);
 		}
@@ -869,6 +875,7 @@ inline void BuildPermissionGroupsFromProvider(
 							*group.entries,
 							languageId,
 							allowedPermissionsPtr,
+							QString(),
 							QString(),
 							translationManagerPtr,
 							groupSelected)){

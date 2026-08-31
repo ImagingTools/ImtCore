@@ -78,12 +78,12 @@ void CFeatureInfo::SetParentFeature(const IFeatureInfo *parentFeaturePtr)
 }
 
 
-void CFeatureInfo::SetDependencies(const QByteArrayList& dependencies)
+void CFeatureInfo::SetRequirements(const QByteArrayList& requirements)
 {
-	if (m_dependencies != dependencies){
+	if (m_requirements != requirements){
 		istd::CChangeNotifier notifier(this);
 
-		m_dependencies = dependencies;
+		m_requirements = requirements;
 	}
 }
 
@@ -196,9 +196,9 @@ void CFeatureInfo::DeleteSubFeature(const QByteArray& subFeatureId)
 }
 
 
-QByteArrayList CFeatureInfo::GetDependencies() const
+QByteArrayList CFeatureInfo::GetRequirements() const
 {
-	return m_dependencies;
+	return m_requirements;
 }
 
 
@@ -249,7 +249,7 @@ bool CFeatureInfo::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.EndTag(permissionTag);
 	}
 
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_dependencies, "Dependencies", "Dependency");
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_requirements, "Dependencies", "Dependency");
 
 	iser::CArchiveTag subFeaturesTag("SubFeatures", "Subfeatures of the feature", iser::CArchiveTag::TT_MULTIPLE);
 	iser::CArchiveTag subfeatureTag("Object", "Object item", iser::CArchiveTag::TT_GROUP, &subFeaturesTag);
@@ -306,7 +306,7 @@ bool CFeatureInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 		m_name = sourcePtr->m_name;
 		m_description = sourcePtr->m_description;
 		m_optional = sourcePtr->m_optional;
-		m_dependencies =  sourcePtr->m_dependencies;
+		m_requirements =  sourcePtr->m_requirements;
 
 		m_subFeatures.clear();
 
@@ -361,7 +361,7 @@ bool CFeatureInfo::IsEqual(const IChangeable& object) const
 				m_description == sourcePtr->m_description &&
 				m_optional == sourcePtr->m_optional &&
 				m_parentFeaturePtr == sourcePtr->m_parentFeaturePtr &&
-				m_dependencies == sourcePtr->m_dependencies);
+				m_requirements == sourcePtr->m_requirements);
 	}
 
 	return false;
@@ -388,7 +388,7 @@ bool CFeatureInfo::ResetData(CompatibilityMode /*mode*/)
 	m_description.clear();
 	m_subFeatures.clear();
 	m_parentFeaturePtr = nullptr;
-	m_dependencies.clear();
+	m_requirements.clear();
 	m_optional = false;
 
 	return true;

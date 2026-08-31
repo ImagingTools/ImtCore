@@ -77,7 +77,7 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 	if (featureRepresentationData.dependencies){
 		dependencies = *featureRepresentationData.dependencies;
 	}
-	featureInfo.SetDependencies(dependencies.split(';'));
+	featureInfo.SetRequirements(dependencies.split(';'));
 
 	bool isOptional = bool(featureRepresentationData.optional && *featureRepresentationData.optional);
 	featureInfo.SetOptional(isOptional);
@@ -120,7 +120,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 	featureRepresentationData.featureName = featureName;
 	featureRepresentationData.name = featureName;
 
-	QByteArrayList dependencyList = featureInfo.GetDependencies();
+	QByteArrayList dependencyList = featureInfo.GetRequirements();
 	QByteArray dependencies = dependencyList.join(';');
 	featureRepresentationData.dependencies = std::move(dependencies);
 
@@ -240,7 +240,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isDependenciesRequested){
-		QByteArray dependencies = featureInfoPtr->GetDependencies().join(';');
+		QByteArray dependencies = featureInfoPtr->GetRequirements().join(';');
 		representationObject.dependencies = dependencies;
 	}
 

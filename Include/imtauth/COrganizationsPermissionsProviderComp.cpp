@@ -92,7 +92,7 @@ void COrganizationsPermissionsProviderComp::CreateOrganizationFeatures()
 	viewOrganizationMembersFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows viewing Organization Members."));
 	viewOrganizationMembersFeatureInfo->SetOptional(false);
 	viewOrganizationMembersFeatureInfo->SetIsPermission(true);
-	viewOrganizationMembersFeatureInfo->SetDependencies(QByteArray("EditOrganizationMember;InviteOrganizationMember;ExcludeOrganizationMember;ChangeOrganizationMember;ChangeOrganizationMemberRole").split(';'));
+	viewOrganizationMembersFeatureInfo->SetRequirements(QByteArray("EditOrganizationMember;InviteOrganizationMember;ExcludeOrganizationMember;ChangeOrganizationMember;ChangeOrganizationMemberRole").split(';'));
 	memberManagementFeatureInfo->InsertSubFeature(viewOrganizationMembersFeatureInfo.PopPtr());
 
 	istd::TDelPtr<imtlic::CFeatureInfo> editOrganizationMemberFeatureInfo;
@@ -157,7 +157,7 @@ void COrganizationsPermissionsProviderComp::CreateOrganizationFeatures()
 	viewOrganizationRolesFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows viewing Organization Roles."));
 	viewOrganizationRolesFeatureInfo->SetOptional(false);
 	viewOrganizationRolesFeatureInfo->SetIsPermission(true);
-	viewOrganizationRolesFeatureInfo->SetDependencies(QByteArray("EditOrganizationRole;ChangeOrganizationRole;RemoveOrganizationRole;AddOrganizationRole").split(';'));
+	viewOrganizationRolesFeatureInfo->SetRequirements(QByteArray("EditOrganizationRole;ChangeOrganizationRole;RemoveOrganizationRole;AddOrganizationRole").split(';'));
 	roleManagementFeatureInfo->InsertSubFeature(viewOrganizationRolesFeatureInfo.PopPtr());
 
 	istd::TDelPtr<imtlic::CFeatureInfo> editOrganizationRoleFeatureInfo;
@@ -213,7 +213,7 @@ void COrganizationsPermissionsProviderComp::CreateOrganizationFeatures()
 	viewOrganizationGroupsFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows viewing Organization Groups."));
 	viewOrganizationGroupsFeatureInfo->SetOptional(false);
 	viewOrganizationGroupsFeatureInfo->SetIsPermission(true);
-	viewOrganizationGroupsFeatureInfo->SetDependencies(QByteArray("EditOrganizationGroup;ChangeOrganizationGroup;RemoveOrganizationGroup;AddOrganizationGroup").split(';'));
+	viewOrganizationGroupsFeatureInfo->SetRequirements(QByteArray("EditOrganizationGroup;ChangeOrganizationGroup;RemoveOrganizationGroup;AddOrganizationGroup").split(';'));
 	groupManagementFeatureInfo->InsertSubFeature(viewOrganizationGroupsFeatureInfo.PopPtr());
 
 	istd::TDelPtr<imtlic::CFeatureInfo> editOrganizationGroupFeatureInfo;
@@ -297,7 +297,7 @@ void COrganizationsPermissionsProviderComp::CreateOrganizationFeatures()
 	viewOrganizationConnectionsFeatureInfo->SetFeatureDescription(QT_TRANSLATE_NOOP("Feature", "Allows viewing Organization Connections."));
 	viewOrganizationConnectionsFeatureInfo->SetOptional(false);
 	viewOrganizationConnectionsFeatureInfo->SetIsPermission(true);
-	viewOrganizationConnectionsFeatureInfo->SetDependencies(QByteArray("EditOrganizationConnection;ConnectOrganization;RemoveOrganizationConnection").split(';'));
+	viewOrganizationConnectionsFeatureInfo->SetRequirements(QByteArray("EditOrganizationConnection;ConnectOrganization;RemoveOrganizationConnection").split(';'));
 	connectionManagementFeatureInfo->InsertSubFeature(viewOrganizationConnectionsFeatureInfo.PopPtr());
 
 	istd::TDelPtr<imtlic::CFeatureInfo> editOrganizationConnectionFeatureInfo;
