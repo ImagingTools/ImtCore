@@ -42,7 +42,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	imtlicguiqml
 )
 
-set(DEPLOY_QT_QML_DIRS"${IMTCOREDIR}/Qml")
+set(DEPLOY_QT_QML_DIRS "${IMTCOREDIR}/Qml")
 deploy_qt(TARGET ${PROJECT_NAME})
 
 
