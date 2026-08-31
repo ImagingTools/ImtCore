@@ -189,6 +189,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		HomeButton->hide();
 	}
 
+	UpdateVersionKindLabel();
+
 	if (*m_viewPageNavigationAttrPtr == false){
 		BackPageButton->hide();
 		NextPageButton->hide();
@@ -453,6 +455,8 @@ void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 			}
 		}
 	}
+
+	UpdateVersionKindLabel();
 }
 
 
@@ -1228,6 +1232,19 @@ void CThumbnailDecoratorGuiComp::ExitApplication()
 bool CThumbnailDecoratorGuiComp::IsHomePageEnabled() const
 {
 	return !*m_hideHomeButtonAttrPtr;
+}
+
+
+void CThumbnailDecoratorGuiComp::UpdateVersionKindLabel()
+{
+	// make the application version kind visible for non-release builds (e.g. "Beta Version")
+	QString versionKindText;
+	if (m_applicationInfoCompPtr.IsValid() && (m_applicationInfoCompPtr->GetVersionKind() != ibase::IApplicationInfo::VK_RELEASE)){
+		versionKindText = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_VERSION_KIND);
+	}
+
+	VersionKindLabel->setText(versionKindText);
+	VersionKindLabel->setVisible(!versionKindText.isEmpty());
 }
 
 

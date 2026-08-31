@@ -23,6 +23,7 @@
 #include <imeas/INumericValue.h>
 #include <iauth/ILogin.h>
 #include <iauth/IRightsProvider.h>
+#include <ibase/IApplicationInfo.h>
 
 // ImtCore includes
 #include <imtgui/IWidgetProvider.h>
@@ -153,6 +154,7 @@ public:
 		I_ASSIGN(m_pageNavigationControllerCompPtr, "NavigationController", "Page navigation controller", false, "NavigationController");
 		I_ASSIGN(m_dashboardGuiCompPtr, "Dashboard", "Dashboard UI", false, "Dashboard");
 		I_ASSIGN(m_preferencesDialogCompPtr, "PreferencesDialog", "Preferences dialog", false, "Preferences");
+		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info used to show the version kind (e.g. 'Beta Version') next to the home button", false, "ApplicationInfo");
 	I_END_COMPONENT;
 
 	enum
@@ -247,6 +249,7 @@ private:
 	bool IsUserActionAllowed(UserAction action);
 	void ExitApplication();
 	bool IsHomePageEnabled() const;
+	void UpdateVersionKindLabel();
 	const ibase::IHierarchicalCommand* FindCommand(const ibase::IHierarchicalCommand* commandPtr, const QByteArray& commandId) const;
 
 	/**
@@ -404,6 +407,7 @@ private:
 	I_REF(imtgui::IPageNavigationController, m_pageNavigationControllerCompPtr);
 	I_REF(iqtgui::IGuiObject, m_dashboardGuiCompPtr);
 	I_REF(iqtgui::IDialog, m_preferencesDialogCompPtr);
+	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 
 	QToolBar* m_mainToolBar;
 	QToolBar* m_additionalCommandsToolBar;
