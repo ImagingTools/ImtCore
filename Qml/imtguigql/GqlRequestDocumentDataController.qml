@@ -189,8 +189,6 @@ QtObject {
 			if (headers && container.context && container.context != "")
 				headers["context"] = container.context
 
-			root.setGqlQuery(query.GetQuery(), headers)
-
 			this.setGqlQuery(gqlData, headers);
 		}
 
