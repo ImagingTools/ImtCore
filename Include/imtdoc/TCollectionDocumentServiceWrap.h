@@ -115,8 +115,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoCreateNewDocument(
 			const QByteArray& taskId,
 			const TaskParams& params)
 {
-	istd::CChangeNotifier notifier(this);
 	QMutexLocker locker(&this->m_mutex);
+	istd::CChangeNotifier notifier(this);
 
 	// Delegate to base class which handles UUID generation, events, and
 	// spawning the async object-creation thread.  On completion the base
@@ -147,8 +147,6 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 			const QByteArray& taskId,
 			const TaskParams& params)
 {
-	istd::CChangeNotifier notifier(this);
-
 	const QUrl& url = params.url;
 	const QByteArray& userId = params.userId;
 
@@ -233,6 +231,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 
 		if (isSharedDocument){
 			QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+			istd::CChangeNotifier notifier(this);
 
 			{
 				QMutexLocker locker(&this->m_mutex);
@@ -303,6 +302,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	QString documentName = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+	istd::CChangeNotifier notifier(this);
 
 	{
 		QMutexLocker locker(&this->m_mutex);
