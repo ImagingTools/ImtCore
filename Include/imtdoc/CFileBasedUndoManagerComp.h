@@ -16,6 +16,7 @@
 #include <icomp/CComponentBase.h>
 #include <ifile/IFilePersistence.h>
 #include <ifile/IFileNameParam.h>
+#include <idoc/CDocumentStateComparator.h>
 #include <idoc/IUndoManager.h>
 #include <imtbase/TModelUpdateBinder.h>
 
@@ -56,6 +57,7 @@ namespace imtdoc
 class CFileBasedUndoManagerComp:
 			public icomp::CComponentBase,
 			public imod::TSingleModelObserverBase<iser::ISerializable>,
+			public idoc::CDocumentStateComparator,
 			virtual public imtdoc::IPersistentUndoManager,
 			virtual public iser::ISerializable
 {
@@ -127,6 +129,12 @@ protected:
 	};
 
 	bool DoListShift(int steps, UndoList& fromList, UndoList& toList);
+	bool SerializeStep(
+		iser::IArchive& archive,
+		UndoStepInfo& step,
+		const iser::CArchiveTag& containerTag,
+		const iser::CArchiveTag& descriptionTag,
+		const iser::CArchiveTag& stateTag) const;
 	IUndoState* CreateState(iser::ISerializable& object, const QString& stepFileName);
 	bool RestoreState(const IUndoState& state, iser::ISerializable& object);
 	bool AreStatesEqual(const IUndoState& state1, const IUndoState& state2) const;

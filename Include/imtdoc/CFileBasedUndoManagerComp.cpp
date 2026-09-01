@@ -217,22 +217,6 @@ bool CFileBasedUndoManagerComp::Serialize(iser::IArchive& archive)
 	UndoList& redoList = m_redoList;
 
 	bool retVal = true;
-	auto serializeStep = [&](UndoStepInfo& step, const iser::CArchiveTag& containerTag, const iser::CArchiveTag& descriptionTag, const iser::CArchiveTag& stateTag)->bool {
-		FileUndoState* fileStatePtr = static_cast<FileUndoState*>(step.statePtr.GetPtr());
-		if (fileStatePtr == NULL){
-			return false;
-		}
-
-		bool localRetVal = true;
-		localRetVal = localRetVal && archive.BeginTag(containerTag);
-		localRetVal = localRetVal && archive.TagAndProcess(descriptionTag, step.description);
-		localRetVal = localRetVal && archive.BeginTag(stateTag);
-		localRetVal = localRetVal && fileStatePtr->Serialize(archive);
-		localRetVal = localRetVal && archive.EndTag(stateTag);
-		localRetVal = localRetVal && archive.EndTag(containerTag);
-
-		return localRetVal;
-	};
 
 	if (archive.IsStoring()){
 		m_currentState.statePtr.Reset();
@@ -253,14 +237,14 @@ bool CFileBasedUndoManagerComp::Serialize(iser::IArchive& archive)
 		int undoStepsCount = undoList.size();
 		retVal = retVal && archive.BeginMultiTag(undoStepsTag, undoStepTag, undoStepsCount);
 		for (int i = 0; (i < undoStepsCount) && retVal; ++i){
-			retVal = retVal && serializeStep(undoList[i], undoStepTag, stepDescriptionTag, stepStateTag);
+			retVal = retVal && SerializeStep(archive, undoList[i], undoStepTag, stepDescriptionTag, stepStateTag);
 		}
 		retVal = retVal && archive.EndTag(undoStepsTag);
 
 		int redoStepsCount = redoList.size();
 		retVal = retVal && archive.BeginMultiTag(redoStepsTag, redoStepTag, redoStepsCount);
 		for (int i = 0; (i < redoStepsCount) && retVal; ++i){
-			retVal = retVal && serializeStep(redoList[i], redoStepTag, stepDescriptionTag, stepStateTag);
+			retVal = retVal && SerializeStep(archive, redoList[i], redoStepTag, stepDescriptionTag, stepStateTag);
 		}
 		retVal = retVal && archive.EndTag(redoStepsTag);
 
@@ -360,6 +344,30 @@ bool CFileBasedUndoManagerComp::Serialize(iser::IArchive& archive)
 
 
 // protected methods
+
+bool CFileBasedUndoManagerComp::SerializeStep(
+			iser::IArchive& archive,
+			UndoStepInfo& step,
+			const iser::CArchiveTag& containerTag,
+			const iser::CArchiveTag& descriptionTag,
+			const iser::CArchiveTag& stateTag) const
+{
+	FileUndoState* fileStatePtr = static_cast<FileUndoState*>(step.statePtr.GetPtr());
+	if (fileStatePtr == NULL){
+		return false;
+	}
+
+	bool localRetVal = true;
+	localRetVal = localRetVal && archive.BeginTag(containerTag);
+	localRetVal = localRetVal && archive.TagAndProcess(descriptionTag, step.description);
+	localRetVal = localRetVal && archive.BeginTag(stateTag);
+	localRetVal = localRetVal && fileStatePtr->Serialize(archive);
+	localRetVal = localRetVal && archive.EndTag(stateTag);
+	localRetVal = localRetVal && archive.EndTag(containerTag);
+
+	return localRetVal;
+}
+
 
 bool CFileBasedUndoManagerComp::DoListShift(int steps, UndoList& fromList, UndoList& toList)
 {
