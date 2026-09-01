@@ -11,7 +11,6 @@
 #include <istd/IPolymorphic.h>
 #include <istd/TDelPtr.h>
 #include <iser/ISerializable.h>
-#include <iser/CMemoryWriteArchive.h>
 #include <imod/TSingleModelObserverBase.h>
 #include <icomp/CComponentBase.h>
 #include <ifile/IFilePersistence.h>
@@ -57,7 +56,7 @@ namespace imtdoc
 class CFileBasedUndoManagerComp:
 			public icomp::CComponentBase,
 			public imod::TSingleModelObserverBase<iser::ISerializable>,
-			public idoc::CDocumentStateComparator,
+			virtual public idoc::CDocumentStateComparator,
 			virtual public imtdoc::IPersistentUndoManager,
 			virtual public iser::ISerializable
 {
@@ -152,12 +151,6 @@ protected:
 	virtual void BeforeUpdate(imod::IModel* modelPtr) override;
 	virtual void AfterUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet) override;
 
-	// reimplemented (idoc::IDocumentStateComparator)
-	virtual bool HasStoredDocumentState() const override;
-	virtual bool StoreDocumentState() override;
-	virtual bool RestoreDocumentState() override;
-	virtual DocumentChangeFlag GetDocumentChangeFlag() const override;
-
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentDestroyed() override;
 
@@ -170,15 +163,9 @@ private:
 	int m_uniqueFileCounter;
 	UndoStepInfo m_currentState;
 
-	bool m_hasStoredDocumentState;
 	bool m_isBlocked;
 	bool m_isDestroying;
 	bool m_isInitialized;
-
-	iser::CMemoryWriteArchive m_storedStateArchive;
-
-	mutable DocumentChangeFlag m_stateChangedFlag;
-	mutable bool m_isStateChangedFlagValid;
 
 	QByteArray m_documentId;
 	QByteArray m_documentTypeId;
