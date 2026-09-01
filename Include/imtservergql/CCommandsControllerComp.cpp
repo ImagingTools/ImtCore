@@ -7,7 +7,9 @@
 #include <iqt/iqt.h>
 
 // ImtCore includes
+#include <imtserverapp/imtserverapp.h>
 #include <imtserverapp/IGuiElementModel.h>
+#include <imtservergql/imtservergql.h>
 
 
 namespace imtservergql
@@ -49,7 +51,7 @@ bool CCommandsControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 
 sdl::V1_0::imtbase::CGuiElementContainer CCommandsControllerComp::OnGetCommands(
 			const sdl::V1_0::imtbase::CGetCommandsGqlRequest& getCommandsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CGuiElementContainer response;
@@ -77,7 +79,7 @@ sdl::V1_0::imtbase::CGuiElementContainer CCommandsControllerComp::OnGetCommands(
 		userInfoPtr = gqlContextPtr->GetUserInfo();
 	}
 
-	if (!GetRepresentationFromGuiElementContainer(*m_guiElementContainerCompPtr, response, languageId, userInfoPtr)){
+	if (!GetRepresentationFromGuiElementContainer(*m_guiElementContainerCompPtr, response, languageId, userInfoPtr, GetPermissionPath(gqlRequest))){
 		errorMessage = QString("Unable to get commands for type-ID '%1'. Error: Get representation failed").arg(qPrintable(typeId));
 		SendErrorMessage(0, errorMessage, "CCommandsControllerComp");
 		return sdl::V1_0::imtbase::CGuiElementContainer();
@@ -99,7 +101,8 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 			const imtserverapp::IGuiElementContainer& guiElementContainer,
 			sdl::V1_0::imtbase::CGuiElementContainer& representation,
 			const QByteArray& languageId,
-			const imtauth::IUserInfo* userInfoPtr) const
+			const imtauth::IUserInfo* userInfoPtr,
+			const QByteArray& permissionPath) const
 {
 	imtauth::IUserInfo::FeatureIds userPermissions;
 	bool isAdmin = false;
@@ -115,16 +118,14 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 	for (const QByteArray& elementId : elementIds){
 		const imtserverapp::IGuiElementModel* guiElementPtr = guiElementContainer.GetGuiElementModel(elementId);
 		if (guiElementPtr != nullptr){
-			if (!isAdmin){
-				if (m_commandPermissionsCompPtr.IsValid()){
-					QByteArrayList elementPermissions = m_commandPermissionsCompPtr->GetCommandPermissions(elementId);
-					if (m_checkPermissionCompPtr.IsValid() && !elementPermissions.isEmpty()){
-						bool result = m_checkPermissionCompPtr->CheckPermission(userPermissions, elementPermissions);
-						if (!result){
-							continue;
-						}
-					}
-				}
+			if (!imtserverapp::IsElementAccessible(
+					m_commandPermissionsCompPtr.GetPtr(),
+					m_checkPermissionCompPtr.GetPtr(),
+					elementId,
+					userPermissions,
+					isAdmin,
+					permissionPath)){
+				continue;
 			}
 			
 			sdl::V1_0::imtbase::CGuiElementModel element;
@@ -135,7 +136,7 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 			const imtserverapp::IGuiElementContainer* subElementContainerPtr = guiElementPtr->GetSubElements();
 			if (subElementContainerPtr != nullptr){
 				sdl::V1_0::imtbase::CGuiElementContainer subElements;
-				if (!GetRepresentationFromGuiElementContainer(*subElementContainerPtr, subElements, languageId, userInfoPtr)){
+				if (!GetRepresentationFromGuiElementContainer(*subElementContainerPtr, subElements, languageId, userInfoPtr, permissionPath)){
 					return false;
 				}
 				

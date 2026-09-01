@@ -14,6 +14,8 @@ QtObject {
     id: permissionsProvider
 
     property string productId: ""
+    // Part of the product the provider works in; travels with every request it sends.
+    property string permissionPath: ""
     property bool loading: false
     property string lastError: ""
 

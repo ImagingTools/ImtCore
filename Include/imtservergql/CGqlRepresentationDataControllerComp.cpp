@@ -12,6 +12,11 @@
 #include <iprm/CIdParam.h>
 #include <imod/TModelWrap.h>
 
+// ImtCore includes
+#include <imtbase/imtbase.h>
+#include <imtservergql/imtservergql.h>
+
+
 namespace imtservergql
 {
 
@@ -140,6 +145,11 @@ iprm::IParamsSetUniquePtr CGqlRepresentationDataControllerComp::CreateContextPar
 		productIdParamPtr->SetId(productId);
 
 		paramsPtr->SetEditableParameter("ProductId", productIdParamPtr, true);
+
+		iprm::CIdParam* permissionPathParamPtr = new iprm::CIdParam();
+		permissionPathParamPtr->SetId(GetPermissionPath(gqlRequest));
+
+		paramsPtr->SetEditableParameter("PermissionPath", permissionPathParamPtr, true);
 	}
 
 	return paramsPtr.release();

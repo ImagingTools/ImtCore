@@ -73,11 +73,11 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 	}
 	featureInfo.SetFeatureDescription(description);
 
-	QByteArray dependencies;
-	if (featureRepresentationData.dependencies){
-		dependencies = *featureRepresentationData.dependencies;
+	QByteArray requirements;
+	if (featureRepresentationData.requirements){
+		requirements = *featureRepresentationData.requirements;
 	}
-	featureInfo.SetRequirements(dependencies.split(';'));
+	featureInfo.SetRequirements(requirements.split(';'));
 
 	bool isOptional = bool(featureRepresentationData.optional && *featureRepresentationData.optional);
 	featureInfo.SetOptional(isOptional);
@@ -120,9 +120,9 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 	featureRepresentationData.featureName = featureName;
 	featureRepresentationData.name = featureName;
 
-	QByteArrayList dependencyList = featureInfo.GetRequirements();
-	QByteArray dependencies = dependencyList.join(';');
-	featureRepresentationData.dependencies = std::move(dependencies);
+	QByteArrayList requirementList = featureInfo.GetRequirements();
+	QByteArray requirements = requirementList.join(';');
+	featureRepresentationData.requirements = std::move(requirements);
 
 	QString description = featureInfo.GetFeatureDescription();
 	featureRepresentationData.description = std::move(description);
@@ -239,9 +239,9 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.optional = isOptional;
 	}
 
-	if (requestInfo.items.isDependenciesRequested){
-		QByteArray dependencies = featureInfoPtr->GetRequirements().join(';');
-		representationObject.dependencies = dependencies;
+	if (requestInfo.items.isRequirementsRequested){
+		QByteArray requirements = featureInfoPtr->GetRequirements().join(';');
+		representationObject.requirements = requirements;
 	}
 
 	if (requestInfo.items.isSubFeaturesRequested){

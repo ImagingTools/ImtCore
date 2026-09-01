@@ -175,7 +175,7 @@
                                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewOrganizationRoles</Value>
+                                            <Value>/RoleManagement/ViewOrganizationRoles</Value>
                                             <Value>ViewRoles</Value>
                                         </Values>
                                     </Data>
@@ -212,7 +212,7 @@
                                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ChangeOrganizationRole</Value>
+                                            <Value>/RoleManagement/EditOrganizationRole/ChangeOrganizationRole</Value>
                                             <Value>ChangeRole</Value>
                                         </Values>
                                     </Data>

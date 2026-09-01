@@ -28,6 +28,8 @@ ViewBase {
 	property var parentLicenseIds: []
 	property string productId: ""
 	property bool canEdit: false
+	// Part of the product this editor works in; scopes its permission checks.
+	property string permissionPath: ""
 
 	Component.onCompleted: {
 		canEdit = PermissionsController.checkPermission("ChangeLicenseDefinition")

@@ -71,8 +71,12 @@ QByteArrayList CFeatureDependenciesProviderComp::GetFeatureDependencies(const QB
 
 	QByteArrayList retVal;
 
+	// Requirements are written as full feature paths, so the identifier the
+	// collection is indexed by is the last segment of whatever came in.
+	const QByteArray featureLeafId = featureId.mid(featureId.lastIndexOf('/') + 1);
+
 	iprm::CIdParam idParam;
-	idParam.SetId(featureId);
+	idParam.SetId(featureLeafId);
 
 	iprm::CParamsSet paramsSet1;
 	paramsSet1.SetEditableParameter("FeatureId", &idParam);
@@ -88,21 +92,21 @@ QByteArrayList CFeatureDependenciesProviderComp::GetFeatureDependencies(const QB
 		if (m_featureCollectionCompPtr->GetObjectData(featureUuid, dataPtr)){
 			const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
 			if (featureInfoPtr != nullptr){
-				QByteArrayList featureDependencies;
-				if (featureInfoPtr->GetFeatureId() != featureId){
-					imtlic::IFeatureInfoSharedPtr subfeatureInfoPtr = featureInfoPtr->GetSubFeature(featureId);
+				QByteArrayList requirements;
+				if (featureInfoPtr->GetFeatureId() != featureLeafId){
+					imtlic::IFeatureInfoSharedPtr subfeatureInfoPtr = featureInfoPtr->GetSubFeature(featureLeafId);
 					if (subfeatureInfoPtr.IsValid()){
-						featureDependencies = subfeatureInfoPtr->GetRequirements();
+						requirements = subfeatureInfoPtr->GetRequirements();
 					}
 				}
 				else{
-					featureDependencies = featureInfoPtr->GetRequirements();
+					requirements = featureInfoPtr->GetRequirements();
 				}
 
-				retVal += featureDependencies;
+				retVal += requirements;
 
-				for (const QByteArray& dependencyId : std::as_const(featureDependencies)){
-					retVal += GetFeatureDependencies(dependencyId);
+				for (const QByteArray& requirement : std::as_const(requirements)){
+					retVal += GetFeatureDependencies(requirement);
 				}
 			}
 		}

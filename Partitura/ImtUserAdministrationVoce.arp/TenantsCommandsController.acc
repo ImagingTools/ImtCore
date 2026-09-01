@@ -16,8 +16,8 @@
                     <AttributeInfo Id="EditPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ChangeOrganizationName</Value>
-                                <Value>ChangeOrganizationDescription</Value>
+                                <Value>/EditOrganization/ChangeOrganizationName</Value>
+                                <Value>/EditOrganization/ChangeOrganizationDescription</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

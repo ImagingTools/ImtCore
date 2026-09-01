@@ -43,17 +43,20 @@ sdl::V1_0::imtauth::CProfileData CRemoteProfileControllerComp::OnGetProfile(
 					const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(permissionDataPtr.GetPtr());
 					if (featureInfoPtr != nullptr){
 						for (imtbase::ICollectionInfo::Id& subFeatureId : featureInfoPtr->GetSubFeatureIds()){
-							if (permissions.contains(subFeatureId)){
-								imtlic::IFeatureInfoSharedPtr subFeatureInfoPtr = featureInfoPtr->GetSubFeature(subFeatureId);
-								if (subFeatureInfoPtr.IsValid()){
-									sdl::V1_0::imtauth::CPermissionInfo info;
+							imtlic::IFeatureInfoSharedPtr subFeatureInfoPtr = featureInfoPtr->GetSubFeature(subFeatureId);
+							if (!subFeatureInfoPtr.IsValid()){
+								continue;
+							}
 
-									info.id = QByteArray(subFeatureInfoPtr->GetFeatureId());
-									info.name = QString(subFeatureInfoPtr->GetFeatureName());
-									info.description = QString(subFeatureInfoPtr->GetFeatureDescription());
+							QByteArray subFeaturePath = imtlic::CalculateFeaturePath(*subFeatureInfoPtr);
+							if (permissions.contains(subFeaturePath)){
+								sdl::V1_0::imtauth::CPermissionInfo info;
 
-									permissionList << info;
-								}
+								info.id = subFeaturePath;
+								info.name = QString(subFeatureInfoPtr->GetFeatureName());
+								info.description = QString(subFeatureInfoPtr->GetFeatureDescription());
+
+								permissionList << info;
 							}
 						}
 					}

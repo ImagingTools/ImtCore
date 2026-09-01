@@ -43,7 +43,7 @@ GqlModel {
 
     property string gqlCommandId;
     property int requestType: 0; // 0 - Query, 1 - Mutation, 2 - Subscription
-    property string context
+    property string permissionPath
 
     function onResult(data){}
 
@@ -92,8 +92,8 @@ GqlModel {
         createQueryParams(query, params);
 
         let headers = root.getHeaders()
-		if (headers && root.context && root.context != "")
-			headers["context"] = root.context
+		if (headers && root.permissionPath && root.permissionPath != "")
+			headers["permissionPath"] = root.permissionPath
 
 		root.setGqlQuery(query.GetQuery(), headers)
     }

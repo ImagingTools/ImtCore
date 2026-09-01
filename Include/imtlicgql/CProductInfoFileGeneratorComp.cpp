@@ -193,7 +193,6 @@ void CProductInfoFileGeneratorComp::WriteFeatureInfo(
 	const QString featureDescription = featureInfo.GetFeatureDescription();
 	const bool isOptional = featureInfo.IsOptional();
 	const bool isPermission = featureInfo.IsPermission();
-	QByteArrayList dependencyList = featureInfo.GetRequirements();
 
 	const QString featureVarName = CreateFeatureVarName(featureId);
 
@@ -220,8 +219,7 @@ void CProductInfoFileGeneratorComp::WriteFeatureInfo(
 
 	WriteTab(textStream, 1);
 
-	// QByteArray featurePath = imtlic::CalculateFeaturePath(featureInfo);
-	textStream << QStringLiteral("%1->SetFeatureId(\"%2\");").arg(featureVarName, QString::fromUtf8(featureInfo.GetFeatureId()));
+	textStream << QStringLiteral("%1->SetFeatureId(\"%2\");").arg(featureVarName, QString::fromUtf8(featureId));
 	WriteNewLine(textStream, 1);
 
 	if (!featureName.isEmpty()){
@@ -248,33 +246,12 @@ void CProductInfoFileGeneratorComp::WriteFeatureInfo(
 					  .arg(featureVarName, isPermission ? QStringLiteral("true") : QStringLiteral("false"));
 	WriteNewLine(textStream, 1);
 
-	if (!dependencyList.isEmpty()){
-		QByteArray dependencies = dependencyList.join(';');
-		if (!dependencies.isEmpty()){
-		// QByteArray dependenciesPaths;
-		// imtbase::IObjectCollection* featureCollectionPtr = productInfo.GetFeatures();
-		// if (featureCollectionPtr != nullptr){
-		// 	QByteArrayList Ids = featureCollectionPtr->GetElementIds();
-		// 	WriteTab(textStream, 1);
-		// 	for (int index = 1; index < dependencyList.count(); index++){
-		// 		QByteArray dependencyId = dependencyList[index];
-		// 		for (QByteArray fetureId: Ids){
-		// 			imtbase::IObjectCollection::DataPtr dataPtr;
-		// 			if (featureCollectionPtr->GetObjectData(fetureId, dataPtr)){
-		// 				const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
-		// 				if (featureInfoPtr != nullptr){
-		// 					if (featureInfoPtr->GetFeatureId() ==  dependencyId){
-		// 						dependenciesPaths.append(';');
-		// 						dependenciesPaths.append(imtlic::CalculateFeaturePath(*featureInfoPtr));
-		// 					}
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-			textStream << QStringLiteral("%1->SetRequirements(%2);").arg(featureVarName, QString("QByteArray(\"%1\").split(';')").arg(QString::fromUtf8(dependencies)));
-			WriteNewLine(textStream, 1);
-		}
-		// }
+	const QByteArrayList requirementPaths = ResolveRequirementPaths(productInfo, featureInfo.GetRequirements());
+	if (!requirementPaths.isEmpty()){
+		WriteTab(textStream, 1);
+		textStream << QStringLiteral("%1->SetRequirements(QByteArray(\"%2\").split(';'));")
+						  .arg(featureVarName, QString::fromUtf8(requirementPaths.join(';')));
+		WriteNewLine(textStream, 1);
 	}
 
 	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
@@ -295,6 +272,66 @@ void CProductInfoFileGeneratorComp::WriteFeatureInfo(
 			}
 		}
 	}
+}
+
+
+QByteArrayList CProductInfoFileGeneratorComp::ResolveRequirementPaths(
+	imtlic::IProductInfo& productInfo,
+	const QByteArrayList& requirements) const
+{
+	QByteArrayList retVal;
+
+	imtbase::IObjectCollection* featureCollectionPtr = productInfo.GetFeatures();
+	if (featureCollectionPtr == nullptr){
+		return retVal;
+	}
+
+	const imtbase::ICollectionInfo::Ids featureElementIds = featureCollectionPtr->GetElementIds();
+
+	for (const QByteArray& requirement : requirements){
+		// A requirement is stored either as a bare feature identifier (older
+		// products) or as a full path; the generated file always carries the path.
+		const QByteArray requirementId = requirement.mid(requirement.lastIndexOf('/') + 1);
+		if (requirementId.isEmpty()){
+			continue;
+		}
+
+		QByteArray requirementPath;
+		for (const imtbase::ICollectionInfo::Id& featureElementId : featureElementIds){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (!featureCollectionPtr->GetObjectData(featureElementId, dataPtr)){
+				continue;
+			}
+
+			const imtlic::IFeatureInfo* rootFeatureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
+			if (rootFeatureInfoPtr == nullptr){
+				continue;
+			}
+
+			if (rootFeatureInfoPtr->GetFeatureId() == requirementId){
+				requirementPath = imtlic::CalculateFeaturePath(*rootFeatureInfoPtr);
+				break;
+			}
+
+			imtlic::IFeatureInfo::FeatureInfoPtr subFeatureInfoPtr = rootFeatureInfoPtr->GetSubFeature(requirementId);
+			if (subFeatureInfoPtr.IsValid()){
+				requirementPath = imtlic::CalculateFeaturePath(*subFeatureInfoPtr);
+				break;
+			}
+		}
+
+		if (requirementPath.isEmpty()){
+			SendWarningMessage(0, QString("Requirement '%1' does not match any feature of product '%2'.")
+					.arg(QString::fromUtf8(requirement), QString::fromUtf8(productInfo.GetProductId())),
+					"CProductInfoFileGeneratorComp");
+
+			continue;
+		}
+
+		retVal.append(requirementPath);
+	}
+
+	return retVal;
 }
 
 

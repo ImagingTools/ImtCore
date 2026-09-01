@@ -35,6 +35,33 @@ inline QString GetUserName(const imtbase::IObjectCollection& userCollection, con
 }
 
 
+inline bool HasPermission(const IUserInfo::FeatureIds& userPermissions, const QByteArray& permissionId)
+{
+	if (permissionId.isEmpty()){
+		return false;
+	}
+
+	if (userPermissions.contains(permissionId)){
+		return true;
+	}
+
+	const bool isPath = permissionId.startsWith('/');
+	const QByteArray featureId = isPath ? permissionId.mid(permissionId.lastIndexOf('/') + 1) : permissionId;
+
+	for (const QByteArray& userPermission : userPermissions){
+		if (isPath && userPermission.startsWith('/')){
+			continue;
+		}
+
+		if (userPermission.mid(userPermission.lastIndexOf('/') + 1) == featureId){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 } // namespace imtauth
 
 
