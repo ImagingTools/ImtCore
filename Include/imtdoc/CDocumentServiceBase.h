@@ -171,6 +171,20 @@ protected:
 	QUrl ObjectIdToUrl(const QByteArray& objectId);
 	void OnDocumentDataLoaded(const QByteArray& userId, const QByteArray& documentId);
 	void OnUndoManagerChanged(int modelId);
+	void OnCreateDocumentThreadStarted(
+		const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+		const QByteArray& documentTypeId,
+		const QByteArray& userId,
+		const QByteArray& documentId,
+		const QByteArray& taskId,
+		QObject* worker,
+		const istd::IChangeable* defaultDataPtr);
+	void OnCreateDocumentThreadFinished(
+		const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+		const QByteArray& userId,
+		const QByteArray& documentId,
+		const QByteArray& taskId,
+		const iprm::IParamsSet* initParamsPtr);
 
 	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const;
 	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const;

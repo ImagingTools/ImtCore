@@ -7,6 +7,9 @@
 #include <QtCore/QUuid>
 #include <QtCore/QThread>
 
+// STL includes
+#include <functional>
+
 // ACF includes
 #include <imod/IModel.h>
 #include <imod/IObserver.h>
@@ -237,95 +240,139 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 	worker->moveToThread(thread);
 
 	std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
-	QObject::connect(thread, &QThread::started, worker, [this, aliveGuard, documentTypeId, userId, documentId, taskId, worker, defaultDataPtr](){
-		auto isAlive = aliveGuard.lock();
-		if (!isAlive || !isAlive->load()){
-			CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")});
-			worker->deleteLater();
-			return;
-		}
-
-		istd::IChangeableSharedPtr objectPtr = CreateObject(documentTypeId);
-
-		isAlive = aliveGuard.lock();
-		if (!isAlive || !isAlive->load()){
-			CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")});
-			worker->deleteLater();
-			return;
-		}
-
-		{
-			QMutexLocker locker(&m_mutex);
-			WorkingDocument* docPtr = FindDocument(userId, documentId);
-
-			if (docPtr != nullptr){
-				if (objectPtr.IsValid()){
-					if (defaultDataPtr != nullptr){
-						bool retVal = objectPtr->CopyFrom(*defaultDataPtr);
-						Q_ASSERT_X(retVal, Q_FUNC_INFO, "Unable to copy from default data");
-
-						if (!retVal){
-							docPtr->isLoading = false;
-							CompleteTask(taskId, TaskResult{ OS_FAILED, QByteArray(), QStringLiteral("Object creation failed") });
-							worker->deleteLater();
-							return;
-						}
-					}
-
-					docPtr->objectPtr = objectPtr;
-				}
-				else{
-					// Creation failed - close the document and notify client
-					docPtr->isLoading = false;
-					CloseDocumentInternal(userId, documentId);
-					CompleteTask(taskId, TaskResult{ OS_FAILED, QByteArray(), QStringLiteral("Object creation failed") });
-					worker->deleteLater();
-					return;
-				}
-			}
-		}
-
-		worker->deleteLater();
-	});
+	QObject::connect(
+		thread,
+		&QThread::started,
+		worker,
+		std::bind(
+			&CDocumentServiceBase::OnCreateDocumentThreadStarted,
+			this,
+			aliveGuard,
+			documentTypeId,
+			userId,
+			documentId,
+			taskId,
+			worker,
+			defaultDataPtr));
 
 	// Initialize observers and fire events in the main thread after background work completes
-	QObject::connect(thread, &QThread::finished, QCoreApplication::instance(), [this, aliveGuard, userId, documentId, taskId, initParamsPtr](){
-		auto isAlive = aliveGuard.lock();
-		if (!isAlive || !isAlive->load()){
-			return;
-		}
-
-		{
-			QMutexLocker locker(&m_mutex);
-			WorkingDocument* docPtr = FindDocument(userId, documentId);
-
-			if (docPtr == nullptr || !docPtr->objectPtr.IsValid() || !docPtr->isLoading){
-				return;
-			}
-
-			QString errorMessage;
-			if (!OnDocumentCreated(docPtr->typeId, initParamsPtr, *docPtr->objectPtr, errorMessage)){
-				docPtr->isLoading = false;
-				CloseDocumentInternal(userId, documentId);
-				if (errorMessage.isEmpty()){
-					errorMessage = QStringLiteral("Document initialization failed");
-				}
-				CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), errorMessage});
-				return;
-			}
-
-			InitializeDocumentObservers(*docPtr, userId, documentId);
-		}
-
-		OnDocumentDataLoaded(userId, documentId);
-
-		CompleteTask(taskId, TaskResult{OS_OK, documentId, QString()});
-	});
+	QObject::connect(
+		thread,
+		&QThread::finished,
+		QCoreApplication::instance(),
+		std::bind(
+			&CDocumentServiceBase::OnCreateDocumentThreadFinished,
+			this,
+			aliveGuard,
+			userId,
+			documentId,
+			taskId,
+			initParamsPtr));
 
 	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit, Qt::DirectConnection);
 	QObject::connect(thread, &QThread::finished, thread, &QObject::deleteLater);
 
 	thread->start();
+}
+
+
+void CDocumentServiceBase::OnCreateDocumentThreadStarted(
+	const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+	const QByteArray& documentTypeId,
+	const QByteArray& userId,
+	const QByteArray& documentId,
+	const QByteArray& taskId,
+	QObject* worker,
+	const istd::IChangeable* defaultDataPtr)
+{
+	auto isAlive = aliveGuard.lock();
+	if (!isAlive || !isAlive->load()){
+		CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")});
+		worker->deleteLater();
+		return;
+	}
+
+	istd::IChangeableSharedPtr objectPtr = CreateObject(documentTypeId);
+
+	isAlive = aliveGuard.lock();
+	if (!isAlive || !isAlive->load()){
+		CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")});
+		worker->deleteLater();
+		return;
+	}
+
+	{
+		QMutexLocker locker(&m_mutex);
+		WorkingDocument* docPtr = FindDocument(userId, documentId);
+
+		if (docPtr != nullptr){
+			if (objectPtr.IsValid()){
+				if (defaultDataPtr != nullptr){
+					bool retVal = objectPtr->CopyFrom(*defaultDataPtr);
+					Q_ASSERT_X(retVal, Q_FUNC_INFO, "Unable to copy from default data");
+
+					if (!retVal){
+						docPtr->isLoading = false;
+						CompleteTask(taskId, TaskResult{ OS_FAILED, QByteArray(), QStringLiteral("Object creation failed") });
+						worker->deleteLater();
+						return;
+					}
+				}
+
+				docPtr->objectPtr = objectPtr;
+			}
+			else{
+				// Creation failed - close the document and notify client
+				docPtr->isLoading = false;
+				CloseDocumentInternal(userId, documentId);
+				CompleteTask(taskId, TaskResult{ OS_FAILED, QByteArray(), QStringLiteral("Object creation failed") });
+				worker->deleteLater();
+				return;
+			}
+		}
+	}
+
+	worker->deleteLater();
+}
+
+
+void CDocumentServiceBase::OnCreateDocumentThreadFinished(
+	const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+	const QByteArray& userId,
+	const QByteArray& documentId,
+	const QByteArray& taskId,
+	const iprm::IParamsSet* initParamsPtr)
+{
+	auto isAlive = aliveGuard.lock();
+	if (!isAlive || !isAlive->load()){
+		return;
+	}
+
+	{
+		QMutexLocker locker(&m_mutex);
+		WorkingDocument* docPtr = FindDocument(userId, documentId);
+
+		if (docPtr == nullptr || !docPtr->objectPtr.IsValid() || !docPtr->isLoading){
+			return;
+		}
+
+		QString errorMessage;
+		if (!OnDocumentCreated(docPtr->typeId, initParamsPtr, *docPtr->objectPtr, errorMessage)){
+			docPtr->isLoading = false;
+			CloseDocumentInternal(userId, documentId);
+			if (errorMessage.isEmpty()){
+				errorMessage = QStringLiteral("Document initialization failed");
+			}
+			CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), errorMessage});
+			return;
+		}
+
+		InitializeDocumentObservers(*docPtr, userId, documentId);
+	}
+
+	OnDocumentDataLoaded(userId, documentId);
+
+	CompleteTask(taskId, TaskResult{OS_OK, documentId, QString()});
 }
 
 

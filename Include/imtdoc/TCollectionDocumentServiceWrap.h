@@ -9,6 +9,9 @@
 #include <QtCore/QUuid>
 #include <QtCore/QThread>
 
+// STL includes
+#include <functional>
+
 // ACF includes
 #include <istd/CChangeGroup.h>
 #include <istd/CChangeNotifier.h>
@@ -103,11 +106,199 @@ protected:
 	virtual imtbase::IObjectCollection* GetCollection() const = 0;
 
 private:
+	void OnDeferredDocumentDataLoaded(
+		const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+		const QByteArray& userId,
+		const QByteArray& documentId);
+	void OnOpenDocumentThreadStarted(
+		const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+		bool singleCopyMode,
+		const QByteArray& objectId,
+		const QByteArray& userId,
+		const QByteArray& documentId,
+		QObject* worker);
+	void OnOpenDocumentThreadFinished(
+		const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+		bool singleCopyMode,
+		const QByteArray& objectId,
+		const QByteArray& userId,
+		const QByteArray& documentId);
+
 	QMap<QByteArray, QByteArray> m_proposedSourceDocumentIds; ///< Maps new documentId → proposed source element ID for copy-on-create.
 };
 
 
 // ─── Inline implementations ────────────────────────────────────────────────
+
+
+template<class Base>
+inline void TCollectionDocumentServiceWrap<Base>::OnDeferredDocumentDataLoaded(
+			const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+			const QByteArray& userId,
+			const QByteArray& documentId)
+{
+	auto isAlive = aliveGuard.lock();
+	if (!isAlive || !isAlive->load()){
+		return;
+	}
+
+	this->OnDocumentDataLoaded(userId, documentId);
+}
+
+
+template<class Base>
+inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
+			const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+			bool singleCopyMode,
+			const QByteArray& objectId,
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			QObject* worker)
+{
+	auto isAlive = aliveGuard.lock();
+	if (!isAlive || !isAlive->load()){
+		worker->deleteLater();
+		return;
+	}
+
+	imtbase::IObjectCollection* collPtr = GetCollection();
+	if (collPtr == nullptr){
+		UserDocumentPairList docsToClose;
+		{
+			istd::CChangeNotifier notifier(this);
+			QMutexLocker locker(&this->m_mutex);
+			if (singleCopyMode && this->m_sharedDocuments.contains(objectId)){
+				this->m_sharedDocuments[objectId].isLoading = false;
+				docsToClose = this->FindDocumentsByObjectId(objectId);
+			}
+			else{
+				docsToClose.append(qMakePair(userId, documentId));
+			}
+		}
+
+		for (const UserDocumentPair& pair : docsToClose){
+			this->CloseDocumentInternal(pair.first, pair.second);
+		}
+		worker->deleteLater();
+		return;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	bool success = collPtr->GetObjectData(objectId, dataPtr);
+	isAlive = aliveGuard.lock();
+	if (!isAlive || !isAlive->load()){
+		worker->deleteLater();
+		return;
+	}
+
+	{
+		istd::CChangeNotifier notifier(this);
+		QMutexLocker locker(&this->m_mutex);
+
+		if (singleCopyMode){
+			if (success && dataPtr.IsValid()){
+				if (this->m_sharedDocuments.contains(objectId)){
+					this->m_sharedDocuments[objectId].objectPtr = dataPtr;
+				}
+
+				UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
+				for (const UserDocumentPair& pair : docs){
+					WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
+					if (dp != nullptr){
+						dp->objectPtr = dataPtr;
+					}
+				}
+			}
+			else {
+				if (this->m_sharedDocuments.contains(objectId)){
+					this->m_sharedDocuments[objectId].isLoading = false;
+				}
+
+				UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
+				for (const UserDocumentPair& pair : docs){
+					WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
+					if (dp != nullptr){
+						dp->isLoading = false;
+						this->CloseDocumentInternal(pair.first, pair.second);
+					}
+				}
+			}
+		}
+		else {
+			WorkingDocument* docPtr = this->FindDocument(userId, documentId);
+
+			if (docPtr != nullptr && success && dataPtr.IsValid()){
+				docPtr->objectPtr = dataPtr;
+			}
+			else if (docPtr != nullptr){
+				docPtr->isLoading = false;
+				this->CloseDocumentInternal(userId, documentId);
+			}
+		}
+	}
+
+	worker->deleteLater();
+}
+
+
+template<class Base>
+inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadFinished(
+			const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+			bool singleCopyMode,
+			const QByteArray& objectId,
+			const QByteArray& userId,
+			const QByteArray& documentId)
+{
+	auto isAlive = aliveGuard.lock();
+	if (!isAlive || !isAlive->load()){
+		return;
+	}
+
+	UserDocumentPairList docsToNotify;
+
+	{
+		istd::CChangeNotifier notifier(this);
+		QMutexLocker locker(&this->m_mutex);
+
+		if (singleCopyMode){
+			if (this->m_sharedDocuments.contains(objectId)){
+				SharedDocumentData& shared = this->m_sharedDocuments[objectId];
+				if (shared.objectPtr.IsValid() && shared.isLoading){
+					shared.isLoading = false;
+
+					bool observersInitialized = false;
+					UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
+					for (const UserDocumentPair& pair : docs){
+						WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
+						if (dp != nullptr && dp->isLoading){
+							if (!observersInitialized){
+								this->InitializeDocumentObservers(*dp, pair.first, pair.second);
+								shared.undoManagerModelId = dp->undoManagerModelId;
+								observersInitialized = true;
+							}
+
+							docsToNotify.append(pair);
+						}
+					}
+
+				}
+			}
+		}
+		else {
+			WorkingDocument* docPtr = this->FindDocument(userId, documentId);
+
+			if (docPtr != nullptr && docPtr->objectPtr.IsValid() && docPtr->isLoading){
+				this->InitializeDocumentObservers(*docPtr, userId, documentId);
+				docsToNotify.append(qMakePair(userId, documentId));
+			}
+		}
+	}
+
+	// OnDocumentDataLoaded sets isLoading=false
+	for (const UserDocumentPair& pair : docsToNotify){
+		this->OnDocumentDataLoaded(pair.first, pair.second);
+	}
+}
 
 
 template<class Base>
@@ -277,13 +468,12 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 				std::weak_ptr<std::atomic<bool>> deferredAliveGuard(this->m_isAlive);
 				QMetaObject::invokeMethod(
 							QCoreApplication::instance(),
-							[this, deferredAliveGuard, deferredUserId, deferredDocumentId]() {
-								auto isAlive = deferredAliveGuard.lock();
-								if (!isAlive || !isAlive->load()){
-									return;
-								}
-								this->OnDocumentDataLoaded(deferredUserId, deferredDocumentId);
-							},
+							std::bind(
+								&TCollectionDocumentServiceWrap<Base>::OnDeferredDocumentDataLoaded,
+								this,
+								deferredAliveGuard,
+								deferredUserId,
+								deferredDocumentId),
 							Qt::QueuedConnection);
 			}
 
@@ -350,144 +540,33 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 
 	bool singleCopyMode = this->IsSingleCopyMode();
 	std::weak_ptr<std::atomic<bool>> aliveGuard(this->m_isAlive);
-	QObject::connect(thread, &QThread::started, worker, [this, aliveGuard, singleCopyMode, objectId, userId, documentId, worker](){
-		auto isAlive = aliveGuard.lock();
-		if (!isAlive || !isAlive->load()){
-			worker->deleteLater();
-			return;
-		}
-
-		imtbase::IObjectCollection* collPtr = GetCollection();
-		if (collPtr == nullptr){
-			UserDocumentPairList docsToClose;
-			{
-				istd::CChangeNotifier notifier(this);
-				QMutexLocker locker(&this->m_mutex);
-				if (singleCopyMode && this->m_sharedDocuments.contains(objectId)){
-					this->m_sharedDocuments[objectId].isLoading = false;
-					docsToClose = this->FindDocumentsByObjectId(objectId);
-				}
-				else{
-					docsToClose.append(qMakePair(userId, documentId));
-				}
-			}
-
-			for (const UserDocumentPair& pair : docsToClose){
-				this->CloseDocumentInternal(pair.first, pair.second);
-			}
-			worker->deleteLater();
-			return;
-		}
-
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		bool success = collPtr->GetObjectData(objectId, dataPtr);
-		isAlive = aliveGuard.lock();
-		if (!isAlive || !isAlive->load()){
-			worker->deleteLater();
-			return;
-		}
-
-		{
-			istd::CChangeNotifier notifier(this);
-			QMutexLocker locker(&this->m_mutex);
-
-			if (singleCopyMode){
-				if (success && dataPtr.IsValid()){
-					if (this->m_sharedDocuments.contains(objectId)){
-						this->m_sharedDocuments[objectId].objectPtr = dataPtr;
-					}
-
-					UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
-					for (const UserDocumentPair& pair : docs){
-						WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
-						if (dp != nullptr){
-							dp->objectPtr = dataPtr;
-						}
-					}
-				}
-				else {
-					if (this->m_sharedDocuments.contains(objectId)){
-						this->m_sharedDocuments[objectId].isLoading = false;
-					}
-
-					UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
-					for (const UserDocumentPair& pair : docs){
-						WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
-						if (dp != nullptr){
-							dp->isLoading = false;
-							this->CloseDocumentInternal(pair.first, pair.second);
-						}
-					}
-				}
-			}
-			else {
-				WorkingDocument* docPtr = this->FindDocument(userId, documentId);
-
-				if (docPtr != nullptr && success && dataPtr.IsValid()){
-					docPtr->objectPtr = dataPtr;
-				}
-				else if (docPtr != nullptr){
-					docPtr->isLoading = false;
-					this->CloseDocumentInternal(userId, documentId);
-				}
-			}
-		}
-
-		worker->deleteLater();
-	});
+	QObject::connect(
+		thread,
+		&QThread::started,
+		worker,
+		std::bind(
+			&TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted,
+			this,
+			aliveGuard,
+			singleCopyMode,
+			objectId,
+			userId,
+			documentId,
+			worker));
 
 	// Initialize observers and fire events in the main thread after background work completes
-	QObject::connect(thread, &QThread::finished, QCoreApplication::instance(), [this, aliveGuard, singleCopyMode, objectId, userId, documentId](){
-		auto isAlive = aliveGuard.lock();
-		if (!isAlive || !isAlive->load()){
-			return;
-		}
-
-		UserDocumentPairList docsToNotify;
-
-		{
-			istd::CChangeNotifier notifier(this);
-			QMutexLocker locker(&this->m_mutex);
-
-			if (singleCopyMode){
-				if (this->m_sharedDocuments.contains(objectId)){
-					SharedDocumentData& shared = this->m_sharedDocuments[objectId];
-					if (shared.objectPtr.IsValid() && shared.isLoading){
-						shared.isLoading = false;
-
-						bool observersInitialized = false;
-						UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
-						for (const UserDocumentPair& pair : docs){
-							WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
-							if (dp != nullptr && dp->isLoading){
-								if (!observersInitialized){
-									this->InitializeDocumentObservers(*dp, pair.first, pair.second);
-									shared.undoManagerModelId = dp->undoManagerModelId;
-									observersInitialized = true;
-								}
-
-								docsToNotify.append(pair);
-							}
-						}
-
-					}
-				}
-			}
-			else {
-				WorkingDocument* docPtr = this->FindDocument(userId, documentId);
-
-				if (docPtr != nullptr && docPtr->objectPtr.IsValid() && docPtr->isLoading){
-					this->InitializeDocumentObservers(*docPtr, userId, documentId);
-					docsToNotify.append(qMakePair(userId, documentId));
-				}
-			}
-		}
-
-		// OnDocumentDataLoaded sets isLoading=false
-		for (const UserDocumentPair& pair : docsToNotify){
-			this->OnDocumentDataLoaded(pair.first, pair.second);
-		}
-	});
+	QObject::connect(
+		thread,
+		&QThread::finished,
+		QCoreApplication::instance(),
+		std::bind(
+			&TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadFinished,
+			this,
+			aliveGuard,
+			singleCopyMode,
+			objectId,
+			userId,
+			documentId));
 
 	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit, Qt::DirectConnection);
 	QObject::connect(thread, &QThread::finished, thread, &QObject::deleteLater);
