@@ -32,16 +32,6 @@ public:
 		Set input-ID of the task in the collection.
 	*/
 	virtual void SetTaskInputId(const QByteArray& inputId) = 0;
-
-	/**
-		Get input-SubID of the task in the collection.
-	*/
-	virtual QByteArray GetTaskInputSubId() const = 0;
-
-	/**
-		Set input-SubID of the task in the collection.
-	*/
-	virtual void SetTaskInputSubId(const QByteArray& inputSubId) = 0;
 };
 
 

@@ -62,8 +62,6 @@ public:
 	virtual bool SetUserTaskId(const QByteArray& taskUuid, const QByteArray& userTaskId) override;
 	virtual QByteArray GetTaskInputId(const QByteArray& taskUuid) const override;
 	virtual bool SetTaskInputId(const QByteArray& taskUuid, const QByteArray& inputId) override;
-	virtual QByteArray GetTaskInputSubId(const QByteArray& taskUuid) const override;
-	virtual bool SetTaskInputSubId(const QByteArray& taskUuid, const QByteArray& inputSubId) override;
 	virtual const iinsp::ISupplier* GetTask(const QByteArray& taskId) const override;
 	virtual const ITaskResultCollection* GetTaskResults(const QByteArray& taskId) const override;
 	virtual const imtbase::IObjectCollection* GetTaskInputs() const override;
@@ -186,7 +184,6 @@ protected:
 		QString description;
 		QByteArray userDefinedTaskId;
 		QByteArray inputId;
-		QByteArray inputSubId;
 	};
 
 	typedef QVector<Task> TaskList;
