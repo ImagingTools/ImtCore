@@ -55,14 +55,13 @@ namespace imtdoc
 */
 class CFileBasedUndoManagerComp:
 			public icomp::CComponentBase,
-			public imod::TSingleModelObserverBase<iser::ISerializable>,
-			virtual public idoc::CDocumentStateComparator,
+			public idoc::CDocumentStateComparator,
 			virtual public imtdoc::IPersistentUndoManager,
 			virtual public iser::ISerializable
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
-	typedef imod::TSingleModelObserverBase<iser::ISerializable> BaseClass2;
+	typedef idoc::CDocumentStateComparator BaseClass2;
 
 	I_BEGIN_COMPONENT(CFileBasedUndoManagerComp);
 		I_REGISTER_INTERFACE(idoc::IUndoManager);
@@ -98,51 +97,39 @@ public:
 	virtual bool Serialize(iser::IArchive& archive) override;
 
 protected:
-	class IUndoState: virtual public istd::IPolymorphic
+	struct UndoStep: virtual public iser::ISerializable
 	{
-	};
-
-	typedef istd::TDelPtr<IUndoState> UndoStatePtr;
-
-	struct UndoStepInfo
-	{
-		UndoStatePtr statePtr;
-		QString description;
-	};
-
-	typedef QList<UndoStepInfo> UndoList;
-
-	class FileUndoState: public IUndoState, virtual public iser::ISerializable
-	{
-	public:
-		explicit FileUndoState(const QString& filePath);
-		virtual ~FileUndoState();
+		explicit UndoStep(const QString& filePath = QString());
+		virtual ~UndoStep();
 
 		const QString& GetFilePath() const;
 
 		// reimplemented (iser::ISerializable)
 		virtual bool Serialize(iser::IArchive& archive) override;
 
+		QString description;
+
 	private:
-		QString m_filePath;
+		QString filePath;
 	};
 
+	typedef std::shared_ptr<UndoStep> UndoStepPtr;
+	typedef QList<UndoStepPtr> UndoList;
+
 	bool DoListShift(int steps, UndoList& fromList, UndoList& toList);
-	bool SerializeStep(
-		iser::IArchive& archive,
-		UndoStepInfo& step,
-		const iser::CArchiveTag& containerTag,
-		const iser::CArchiveTag& descriptionTag,
-		const iser::CArchiveTag& stateTag) const;
-	IUndoState* CreateState(iser::ISerializable& object, const QString& stepFileName);
-	bool RestoreState(const IUndoState& state, iser::ISerializable& object);
-	bool AreStatesEqual(const IUndoState& state1, const IUndoState& state2) const;
-	bool RestoreObservedObject(const IUndoState& state);
+	UndoStep* CreateState(iser::ISerializable& object, const QString& stepFileName);
+	bool RestoreState(const UndoStep& state, iser::ISerializable& object);
+	bool AreStatesEqual(const UndoStep& state1, const UndoStep& state2) const;
+	bool RestoreObservedObject(const UndoStep& state);
 	QString CreateStepFilePath(const QString& stepFileName) const;
 	QString GetStorageDirectoryPath() const;
 	QString GetPersistenceFileExtension(ifile::IFilePersistence* persistencePtr) const;
 	QString GetUndoManagerFilePath() const;
 	void OnUndoManagerStateChanged(const istd::IChangeable::ChangeSet& changeSet, const istd::IChangeable* objectPtr);
+
+	// reimplemented (idoc::IDocumentStateComparator)
+	virtual bool StoreDocumentState() override;
+	virtual bool RestoreDocumentState() override;
 
 	// reimplemented (imod::TSingleModelObserverBase<iser::ISerializable>)
 	virtual iser::ISerializable* CastFromModel(imod::IModel* modelPtr) const override;
@@ -155,13 +142,18 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 private:
+	I_REF(ifile::IFilePersistence, m_documentPersistenceCompPtr);
+	I_REF(ifile::IFilePersistence, m_undoManagerPersistenceCompPtr);
+	I_REF(ifile::IFileNameParam, m_rootFolderCompPtr);
+	I_REF(ifile::IFileNameParam, m_undoManagerFilePathCompPtr);
+
 	UndoList m_undoList;
 	UndoList m_redoList;
 
-	UndoStatePtr m_beginStatePtr;
+	UndoStepPtr m_beginStatePtr;
 
 	int m_uniqueFileCounter;
-	UndoStepInfo m_currentState;
+	UndoStepPtr m_currentStatePtr;
 
 	bool m_isBlocked;
 	bool m_isDestroying;
@@ -170,10 +162,6 @@ private:
 	QByteArray m_documentId;
 	QByteArray m_documentTypeId;
 
-	I_REF(ifile::IFilePersistence, m_documentPersistenceCompPtr);
-	I_REF(ifile::IFilePersistence, m_undoManagerPersistenceCompPtr);
-	I_REF(ifile::IFileNameParam, m_rootFolderCompPtr);
-	I_REF(ifile::IFileNameParam, m_undoManagerFilePathCompPtr);
 	imtbase::TModelUpdateBinder<istd::IChangeable, CFileBasedUndoManagerComp> m_modelObserver;
 };
 
