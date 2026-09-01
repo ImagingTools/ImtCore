@@ -126,7 +126,9 @@ void CFileBasedUndoManagerComp::Initialize(const QByteArray& documentId, const Q
 	if (m_undoManagerPersistenceCompPtr.IsValid()){
 		const QString filePath = GetUndoManagerFilePath();
 		if (!filePath.isEmpty()){
-			m_undoManagerPersistenceCompPtr->LoadFromFile(*this, filePath);
+			if (m_undoManagerPersistenceCompPtr->LoadFromFile(*this, filePath) != ifile::IFilePersistence::OS_OK){
+				SendWarningMessage(0, QObject::tr("Failed to load undo manager state from file: ") + filePath);
+			}
 
 			m_modelObserver.RegisterObject(this, &CFileBasedUndoManagerComp::OnUndoManagerStateChanged);
 		}
@@ -187,6 +189,9 @@ bool CFileBasedUndoManagerComp::OnModelDetached(imod::IModel* modelPtr)
 
 bool CFileBasedUndoManagerComp::Serialize(iser::IArchive& archive)
 {
+	istd::CChangeNotifier notifier(!archive.IsStoring() ? this : nullptr);
+	Q_UNUSED(notifier);
+
 	if (m_isDestroying){
 		return true;
 	}
@@ -198,11 +203,6 @@ bool CFileBasedUndoManagerComp::Serialize(iser::IArchive& archive)
 	static iser::CArchiveTag hasCurrentStateTag("HasCurrentState", "Flag indicating whether the current observed document state is stored", iser::CArchiveTag::TT_LEAF);
 	static iser::CArchiveTag currentStateTag("CurrentState", "Stored current observed document state", iser::CArchiveTag::TT_GROUP);
 
-	UndoList& undoList = m_undoList;
-	UndoList& redoList = m_redoList;
-
-	bool retVal = true;
-
 	if (archive.IsStoring()){
 		m_currentStatePtr.reset();
 
@@ -213,94 +213,29 @@ bool CFileBasedUndoManagerComp::Serialize(iser::IArchive& archive)
 				m_currentStatePtr.reset(currentStatePtr);
 			}
 		}
-
-		bool hasCurrentState = m_currentStatePtr != nullptr;
-
-		retVal = retVal && archive.TagAndProcess(hasCurrentStateTag, hasCurrentState);
-
-		int undoStepsCount = undoList.size();
-		retVal = retVal && archive.BeginMultiTag(undoStepsTag, undoStepTag, undoStepsCount);
-		for (int i = 0; (i < undoStepsCount) && retVal; ++i){
-			retVal = retVal && archive.BeginTag(undoStepTag);
-			retVal = retVal && undoList[i]->Serialize(archive);
-			retVal = retVal && archive.EndTag(undoStepTag);
-		}
-		retVal = retVal && archive.EndTag(undoStepsTag);
-
-		int redoStepsCount = redoList.size();
-		retVal = retVal && archive.BeginMultiTag(redoStepsTag, redoStepTag, redoStepsCount);
-		for (int i = 0; (i < redoStepsCount) && retVal; ++i){
-			retVal = retVal && archive.BeginTag(redoStepTag);
-			retVal = retVal && redoList[i]->Serialize(archive);
-			retVal = retVal && archive.EndTag(redoStepTag);
-		}
-		retVal = retVal && archive.EndTag(redoStepsTag);
-
-		if (retVal && hasCurrentState){
-			retVal = retVal && archive.BeginTag(currentStateTag);
-			retVal = retVal && m_currentStatePtr->Serialize(archive);
-			retVal = retVal && archive.EndTag(currentStateTag);
-		}
+	}else{
+		m_undoList.clear();
+		m_redoList.clear();
 	}
-	else{
-		istd::CChangeNotifier notifier(this);
-		Q_UNUSED(notifier);
 
-		bool hasCurrentState = false;
-		retVal = retVal && archive.TagAndProcess(hasCurrentStateTag, hasCurrentState);
+	bool retVal = true;
+	retVal = retVal && SerializeUndoList(archive, m_undoList, undoStepsTag, undoStepTag);
+	retVal = retVal && SerializeUndoList(archive, m_redoList, redoStepsTag, redoStepTag);
 
-		int undoStepsCount = 0;
-		retVal = retVal && archive.BeginMultiTag(undoStepsTag, undoStepTag, undoStepsCount);
-		if (!retVal){
-			return false;
+	bool hasCurrentState = m_currentStatePtr != nullptr;
+	retVal = retVal && archive.TagAndProcess(hasCurrentStateTag, hasCurrentState);
+	if (retVal && hasCurrentState){
+		if (!archive.IsStoring()){
+			m_currentStatePtr.reset(new UndoStep);
 		}
 
-		undoList.clear();
-		redoList.clear();
-		m_currentStatePtr.reset();
+		retVal = retVal && archive.BeginTag(currentStateTag);
+		retVal = retVal && m_currentStatePtr->Serialize(archive);
+		retVal = retVal && archive.EndTag(currentStateTag);
+	}
 
-		for (int i = 0; (i < undoStepsCount) && retVal; ++i){
-			UndoStepPtr stepPtr(new UndoStep());
-
-			retVal = retVal && archive.BeginTag(undoStepTag);
-			retVal = retVal && stepPtr->Serialize(archive);
-			retVal = retVal && archive.EndTag(undoStepTag);
-
-			if (retVal){
-				undoList.push_back(stepPtr);
-			}
-		}
-		retVal = retVal && archive.EndTag(undoStepsTag);
-
-		int redoStepsCount = 0;
-		retVal = retVal && archive.BeginMultiTag(redoStepsTag, redoStepTag, redoStepsCount);
-		if (!retVal){
-			return false;
-		}
-		for (int i = 0; (i < redoStepsCount) && retVal; ++i){
-			UndoStepPtr stepPtr(new UndoStep());
-
-			retVal = retVal && archive.BeginTag(redoStepTag);
-			retVal = retVal && stepPtr->Serialize(archive);
-			retVal = retVal && archive.EndTag(redoStepTag);
-
-			if (retVal){
-				redoList.push_back(stepPtr);
-			}
-		}
-		retVal = retVal && archive.EndTag(redoStepsTag);
-
-		if (retVal && hasCurrentState){
-			m_currentStatePtr.reset(new UndoStep());
-
-			retVal = retVal && archive.BeginTag(currentStateTag);
-			retVal = retVal && m_currentStatePtr->Serialize(archive);
-			retVal = retVal && archive.EndTag(currentStateTag);
-		}
-
-		if (retVal && m_currentStatePtr){
-			RestoreObservedObject(*m_currentStatePtr);
-		}
+	if (retVal && m_currentStatePtr){
+		RestoreObservedObject(*m_currentStatePtr);
 	}
 
 	return retVal;
@@ -308,6 +243,34 @@ bool CFileBasedUndoManagerComp::Serialize(iser::IArchive& archive)
 
 
 // protected methods
+
+bool CFileBasedUndoManagerComp::SerializeUndoList(
+	iser::IArchive& archive,
+	UndoList& undoList,
+	const iser::CArchiveTag& listTag,
+	const iser::CArchiveTag& stepTag) const
+{
+	bool retVal = true;
+	int undoStepsCount = undoList.size();
+
+	retVal = retVal && archive.BeginMultiTag(listTag, stepTag, undoStepsCount);
+	if (retVal && !archive.IsStoring()){
+		undoList.resize(undoStepsCount);
+		for (int i = 0; i < undoStepsCount; i++){
+			undoList[i].reset(new UndoStep);
+		}
+	}
+
+	for (int i = 0; i < undoStepsCount; ++i){
+		retVal = retVal && archive.BeginTag(stepTag);
+		retVal = retVal && undoList[i]->Serialize(archive);
+		retVal = retVal && archive.EndTag(stepTag);
+	}
+	retVal = retVal && archive.EndTag(listTag);
+
+	return retVal;
+}
+
 
 bool CFileBasedUndoManagerComp::DoListShift(int steps, UndoList& fromList, UndoList& toList)
 {
@@ -531,8 +494,8 @@ QString CFileBasedUndoManagerComp::GetUndoManagerFilePath() const
 
 
 void CFileBasedUndoManagerComp::OnUndoManagerStateChanged(
-	const istd::IChangeable::ChangeSet& /*changeSet*/,
-	const istd::IChangeable* /*objectPtr*/)
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const istd::IChangeable* /*objectPtr*/)
 {
 	if (!m_undoManagerPersistenceCompPtr.IsValid()){
 		return;

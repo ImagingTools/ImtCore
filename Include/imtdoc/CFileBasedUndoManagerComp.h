@@ -12,7 +12,7 @@
 #include <istd/TDelPtr.h>
 #include <iser/ISerializable.h>
 #include <imod/TSingleModelObserverBase.h>
-#include <icomp/CComponentBase.h>
+#include <ilog/TLoggerCompWrap.h>
 #include <ifile/IFilePersistence.h>
 #include <ifile/IFileNameParam.h>
 #include <idoc/CDocumentStateComparator.h>
@@ -21,6 +21,12 @@
 
 // ImtCore includes
 #include <imtdoc/IPersistentUndoManager.h>
+
+
+namespace iser
+{
+class CArchiveTag;
+}
 
 
 namespace imtdoc
@@ -54,7 +60,7 @@ namespace imtdoc
 	current step by deserializing it from the file corresponding to that step.
 */
 class CFileBasedUndoManagerComp:
-			public icomp::CComponentBase,
+			public ilog::CLoggerComponentBase,
 			public idoc::CDocumentStateComparator,
 			virtual public imtdoc::IPersistentUndoManager,
 			virtual public iser::ISerializable
@@ -117,6 +123,11 @@ protected:
 	typedef QList<UndoStepPtr> UndoList;
 
 	bool DoListShift(int steps, UndoList& fromList, UndoList& toList);
+	bool SerializeUndoList(
+		iser::IArchive& archive,
+		UndoList& undoList,
+		const iser::CArchiveTag& listTag,
+		const iser::CArchiveTag& stepTag) const;
 	UndoStep* CreateState(iser::ISerializable& object, const QString& stepFileName);
 	bool RestoreState(const UndoStep& state, iser::ISerializable& object);
 	bool AreStatesEqual(const UndoStep& state1, const UndoStep& state2) const;
