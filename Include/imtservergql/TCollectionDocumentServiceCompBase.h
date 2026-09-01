@@ -10,7 +10,6 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtdoc/TCollectionDocumentServiceWrap.h>
-#include <imtdoc/IPersistentUndoManager.h>
 #include <imtbasesdl/SDL/1.0/CPP/DocumentService_fwd.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager_fwd.h>
 
@@ -92,7 +91,7 @@ protected:
 	// reimplemented (imtdoc::TCollectionDocumentServiceWrap)
 	virtual imtbase::IObjectCollection* GetCollection() const override;
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const override;
-	virtual imtdoc::IPersistentUndoManagerUniquePtr CreateUndoManager() const override;
+	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override;
 
 	// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)
 	bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
@@ -101,7 +100,7 @@ protected:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_objectTypeIdAttrPtr);
 	I_REF(imtbase::IObjectCollection, m_collectionCompPtr);
-	I_FACT(imtdoc::IPersistentUndoManager, m_undoManagerFactPtr);
+	I_FACT(idoc::IUndoManager, m_undoManagerFactPtr);
 	I_MULTIFACT(istd::IChangeable, m_objectFactPtr);
 };
 
@@ -193,7 +192,7 @@ inline istd::IChangeableUniquePtr TCollectionDocumentServiceCompBase<Base, Color
 
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
-inline imtdoc::IPersistentUndoManagerUniquePtr TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
+inline idoc::IUndoManagerUniquePtr TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
 			CreateUndoManager() const
 {
 	return m_undoManagerFactPtr.CreateInstance();
@@ -280,7 +279,6 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 	typename BaseClass::TaskParams taskParams;
 	taskParams.userId = userId;
 	taskParams.documentTypeId = *documentTypeId->typeId;
-	taskParams.singleDocumentInstance = documentTypeId->singleDocumentInstance.value_or(false);
 	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass::TT_NEW, taskParams);
 	typename BaseClass::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
 	QByteArray documentId = taskResult.documentId;
