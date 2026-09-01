@@ -885,6 +885,21 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 			workingDocumentPtr->name = resultDocumentName;
 			workingDocumentPtr->isDirty = false;
 			workingDocumentPtr->undoManagerPtr->StoreDocumentState();
+
+			// The document received an objectId for the first time. In single-copy mode
+			// create a shared entry so that other users opening the same object reuse it.
+			if (this->IsSingleCopyMode() && !this->m_sharedDocuments.contains(savedObjectId)){
+				SharedDocumentData shared;
+				shared.typeId = workingDocumentPtr->typeId;
+				shared.name = workingDocumentPtr->name;
+				shared.objectPtr = workingDocumentPtr->objectPtr;
+				shared.undoManagerPtr = workingDocumentPtr->undoManagerPtr;
+				shared.refCount = 1;
+				shared.isLoading = false;
+				shared.undoManagerModelId = workingDocumentPtr->undoManagerModelId;
+
+				this->m_sharedDocuments[savedObjectId] = shared;
+			}
 		}
 
 		locker.unlock();

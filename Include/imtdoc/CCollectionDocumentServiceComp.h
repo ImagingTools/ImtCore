@@ -54,6 +54,29 @@ protected:
 	virtual bool IsSingleCopyMode() const override;
 
 private:
+	struct DocumentInfo
+	{
+		QByteArray documentId;
+		QByteArray objectId;
+		QByteArray typeId;
+		QString url;
+		QString name;
+		bool singleDocumentInstance = false;
+	};
+	typedef QList<DocumentInfo> DocumentInfoList;
+	typedef QMap<QByteArray, DocumentInfoList> DocumentMap;
+
+	bool SerializeDocumentMap(iser::IArchive& archive, DocumentMap& documentMap) const;
+	void PrepareDocumentMap(DocumentMap& documentMap) const;
+	bool RestoreDocumentMap(const DocumentMap& documentMap);
+	void ClearRestoredDocuments();
+	bool RestoreSharedDocument(const DocumentInfo& documentInfo, const QByteArray& userId);
+	bool RestoreDocument(const DocumentInfo& documentInfo, const QByteArray& userId, bool isSingleCopyMode,
+		imtbase::IObjectCollection* collectionPtr);
+	void RegisterRestoredDocument(const DocumentInfo& documentInfo, const QByteArray& userId, bool isSingleCopyMode,
+		const idoc::IUndoManagerSharedPtr& undoManagerPtr);
+
+private:
 	I_REF(imtbase::IObjectCollection, m_collectionCompPtr);
 	I_ATTR(bool, m_isSingleCopyModeAttrPtr);
 };

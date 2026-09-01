@@ -288,7 +288,7 @@
                         <Data IsEnabled="true" Flags="1">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="FileLoader" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="JsonFileSerializer"/>
+                                    <Data IsEnabled="true" Value="Serializer"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="FilePath" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="FileNameParam"/>
@@ -404,7 +404,7 @@
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
-                                    <Data IsEnabled="true" Value="w:\CollectionDM.json"/>
+                                    <Data IsEnabled="true" Value="w:\CollectionDM.bin"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="PathType" Type="Integer" ExportId="">
                                     <Data IsEnabled="true" Value="1"/>
@@ -424,7 +424,7 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="JsonFileSerializer" PackageId="FilePck" ComponentId="JsonFileSerializer">
+                    <Element Id="Serializer" PackageId="FilePck" ComponentId="BinaryFileSerializer">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="AutoCreatePath" Type="Boolean" ExportId="">
@@ -433,7 +433,7 @@
                                 <AttributeInfo Id="FileExtensions" Type="String[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>json</Value>
+                                            <Value>bin</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
