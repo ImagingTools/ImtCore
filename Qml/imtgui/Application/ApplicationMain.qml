@@ -270,7 +270,14 @@ Item {
 				context.appName = serverApplicationInfo.m_applicationName;
 				Style.logoIconName = serverApplicationInfo.m_logoIconName;
 
-				pageAboutProvider.serverVersion = serverApplicationInfo.m_version
+				// make the application version kind (e.g. "Beta Version") visible in the UI
+				let serverVersion = serverApplicationInfo.m_version ? serverApplicationInfo.m_version : "";
+				let versionKind = serverApplicationInfo.m_versionKind ? serverApplicationInfo.m_versionKind : "";
+				if (versionKind !== ""){
+					serverVersion = serverVersion === "" ? versionKind : serverVersion + " - " + versionKind;
+				}
+
+				pageAboutProvider.serverVersion = serverVersion
 
 				AuthorizationController.productId = serverApplicationInfo.m_applicationId
 			}
