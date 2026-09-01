@@ -111,11 +111,11 @@ protected:
 
 	typedef QList<UndoStepInfo> UndoList;
 
-	class CFileUndoState: public IUndoState, virtual public iser::ISerializable
+	class FileUndoState: public IUndoState, virtual public iser::ISerializable
 	{
 	public:
-		explicit CFileUndoState(const QString& filePath);
-		virtual ~CFileUndoState();
+		explicit FileUndoState(const QString& filePath);
+		virtual ~FileUndoState();
 
 		const QString& GetFilePath() const;
 
