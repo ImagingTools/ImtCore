@@ -95,6 +95,7 @@ ViewBase {
 		featureIds = ids
 		if (licenseData)
 			licenseData.m_features = ids.join(';')
+		rebuildRequirementIndex()
 		updatePageBadges()
 	}
 
@@ -158,7 +159,8 @@ ViewBase {
 				featureName: FeatureItemTypeMetaInfo.s_featureName,
 				featureId: FeatureItemTypeMetaInfo.s_featureId,
 				description: FeatureItemTypeMetaInfo.s_description,
-				optional: FeatureItemTypeMetaInfo.s_optional
+				optional: FeatureItemTypeMetaInfo.s_optional,
+				requirements: FeatureItemTypeMetaInfo.s_requirements
 			}
 		})
 		let nodes = []
@@ -167,22 +169,25 @@ ViewBase {
 			let id = data.id || ""
 			if (wanted.indexOf(id) < 0)
 				continue
-			nodes.push(buildFeatureNode(tree[i], id, true))
+			nodes.push(buildFeatureNode(tree[i], id, true, ""))
 		}
 		featureNodes = nodes
+		rebuildRequirementIndex()
 		updatePageBadges()
 	}
 
-	function buildFeatureNode(treeNode, rootId, isRoot) {
+	function buildFeatureNode(treeNode, rootId, isRoot, parentPath) {
 		let data = treeNode.data || {}
 		let name = data.featureName || data.featureId || ""
 		// The root of a branch is granted under the feature's document id; a
 		// node inside it under the composite key.
 		let grantId = isRoot ? rootId : rootId + "/" + (data.featureId || "")
+		// Requirements name features by this path, not by the grant id.
+		let featurePath = parentPath + "/" + (data.featureId || "")
 		let sourceChildren = treeNode.children || []
 		let children = []
 		for (let i = 0; i < sourceChildren.length; ++i)
-			children.push(buildFeatureNode(sourceChildren[i], rootId, false))
+			children.push(buildFeatureNode(sourceChildren[i], rootId, false, featurePath))
 		return {
 			"key": grantId,
 			"text": name,
@@ -196,6 +201,8 @@ ViewBase {
 					"isLeaf": children.length === 0,
 					"featureName": name,
 					"featureId": data.featureId || "",
+					"featurePath": featurePath,
+					"requirements": data.requirements || "",
 					"description": data.description || "",
 					"subFeatureCount": children.length
 				}
@@ -203,12 +210,68 @@ ViewBase {
 		}
 	}
 
+	// A feature may require others, written as full feature paths separated by ';'.
+	// One that names a feature this product offers is pointed at in the tree; one
+	// that names a feature from elsewhere can only be listed, because this license
+	// has no row to tick for it.
+	property var requiredByIndex: ({})
+	property var externalRequirements: []
+
+	function rebuildRequirementIndex() {
+		let index = {}
+		let external = []
+		collectRequirements(featureNodes, index, external)
+		requiredByIndex = index
+		externalRequirements = external
+	}
+
+	function collectRequirements(nodes, index, external) {
+		for (let i = 0; i < nodes.length; ++i) {
+			let entry = nodes[i].data.entry
+			if (entryIsSelected(entry)) {
+				let paths = entry.requirements ? entry.requirements.split(';') : []
+				for (let j = 0; j < paths.length; ++j) {
+					let path = paths[j]
+					if (path === "")
+						continue
+					let target = findEntryByFeaturePath(featureNodes, path)
+					if (target) {
+						if (!index[target.id])
+							index[target.id] = []
+						if (index[target.id].indexOf(entry.featureName) < 0)
+							index[target.id].push(entry.featureName)
+					}
+					else if (external.indexOf(path) < 0) {
+						external.push(path)
+					}
+				}
+			}
+			collectRequirements(nodes[i].children || [], index, external)
+		}
+	}
+
+	function findEntryByFeaturePath(nodes, path) {
+		for (let i = 0; i < nodes.length; ++i) {
+			let entry = nodes[i].data.entry
+			if (entry.featurePath === path)
+				return entry
+			let child = findEntryByFeaturePath(nodes[i].children || [], path)
+			if (child)
+				return child
+		}
+		return null
+	}
+
+	function entryRequiredBy(entry) {
+		return entry && requiredByIndex[entry.id] ? requiredByIndex[entry.id] : []
+	}
+
 	// What a tick means, per kind of row:
 	//   a product feature      - granted by this license, on its own id
 	//   a mandatory part       - comes with its feature, nothing to decide
 	//   an optional part       - granted separately, once the feature is granted
 	//   a part that has parts  - a grouping; its children carry the decision
-	function entryIsGranted(entry) {
+	function entryIsSelected(entry) {
 		if (!entry)
 			return false
 		if (entry.isRoot)
@@ -216,6 +279,12 @@ ViewBase {
 		if (!entry.isLeaf || !entry.optional)
 			return featureIsIncluded(entry.rootId)
 		return featureIds.indexOf(entry.id) >= 0
+	}
+
+	// A feature required by one that is granted comes with it, so it reads as
+	// granted here even though nobody ticked it.
+	function entryIsGranted(entry) {
+		return entryIsSelected(entry) || entryRequiredBy(entry).length > 0
 	}
 
 	function entryIsChangeable(entry) {
@@ -244,6 +313,9 @@ ViewBase {
 
 	// Why a row cannot be ticked, in the words the table shows next to it.
 	function entryStateText(entry) {
+		let requiredBy = entryRequiredBy(entry)
+		if (requiredBy.length > 0)
+			return qsTr("Required by %1").arg(requiredBy.join(", "))
 		if (!entry || entry.isRoot)
 			return ""
 		if (!entry.isLeaf)
@@ -888,6 +960,9 @@ ViewBase {
 					? qsTr("Pick a product on the General page first") : ""
 				idleHintText: qsTr("Tick the features this license grants; open one to reach its optional parts")
 				selectedHintText: qsTr("Open a feature to grant its optional parts one by one")
+				footerText: licenseEditor.externalRequirements.length > 0
+					? qsTr("Also required, from outside this product: %1").arg(licenseEditor.externalRequirements.join(", "))
+					: ""
 				editable: licenseEditor.canEdit
 				createVisible: false
 				removeVisible: false

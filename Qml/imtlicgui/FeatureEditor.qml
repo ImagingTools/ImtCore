@@ -772,18 +772,19 @@ ViewBase {
 							description: qsTr("How this feature is addressed by requirements and permissions")
 
 							controlComp: Component {
-								Row {
-									spacing: Style.spacingS
+								Item {
+									id: fullPathControl
+									// A Row here would size to the whole path and overflow past the
+									// panel instead of shrinking, so the control gets a hard cap and
+									// the text elides inside it like every other path field does.
+									width: Math.min(implicitWidth, fullPathElement.controlWidth)
+									implicitWidth: fullPathText.implicitWidth + Style.spacingS + copyFullPathButton.width
 									height: Style.controlHeightM
-
-									BaseText {
-										anchors.verticalCenter: parent.verticalCenter
-										text: featureEditor.rootFeaturePath !== "" ? featureEditor.rootFeaturePath : "-"
-										font.family: Style.fontFamilyBold
-										color: featureEditor.rootFeaturePath !== "" ? Style.textColor : Style.inactiveTextColor
-									}
+									clip: true
 
 									ToolButton {
+										id: copyFullPathButton
+										anchors.right: parent.right
 										anchors.verticalCenter: parent.verticalCenter
 										width: Style.buttonWidthM
 										height: width
@@ -791,6 +792,18 @@ ViewBase {
 										iconSource: featureEditor.copyIconSource(featureEditor.rootFeaturePath)
 										tooltipText: qsTr("Copy the full path")
 										onClicked: featureEditor.copyFeaturePath(featureEditor.featureData)
+									}
+
+									BaseText {
+										id: fullPathText
+										anchors.left: parent.left
+										anchors.verticalCenter: parent.verticalCenter
+										width: Math.max(0, parent.width - copyFullPathButton.width - Style.spacingS)
+										clip: true
+										elide: Text.ElideLeft
+										text: featureEditor.rootFeaturePath !== "" ? featureEditor.rootFeaturePath : "-"
+										font.family: Style.fontFamilyBold
+										color: featureEditor.rootFeaturePath !== "" ? Style.textColor : Style.inactiveTextColor
 									}
 								}
 							}
@@ -887,8 +900,8 @@ ViewBase {
 			// Column geometry, shared by the header and the rows so the two can
 			// never drift. A column whose breakpoint is above the current table
 			// width folds away and its share is handed to the columns that stay.
-			property var columnFractions: [0.20, 0.13, 0.18, 0.07, 0.08, 0.08, 0.20, 0.06]
-			property var columnBreakpoints: [0, 340, 720, 0, 540, 440, 620, 800]
+			property var columnFractions: [0.20, 0.13, 0.16, 0.07, 0.08, 0.08, 0.16, 0.12]
+			property var columnBreakpoints: [0, 340, 720, 0, 540, 440, 620, 0]
 
 			function columnVisible(index, width) {
 				return width >= subfeaturesPage.columnBreakpoints[index]
@@ -1021,9 +1034,10 @@ ViewBase {
 						height: headerRow.height
 						visible: width > 0
 						BaseText {
-							anchors.centerIn: parent
-							width: parent.width
-							horizontalAlignment: Text.AlignHCenter
+							anchors.left: parent.left
+							anchors.leftMargin: Style.marginXS
+							anchors.right: parent.right
+							anchors.verticalCenter: parent.verticalCenter
 							text: qsTr("Path")
 							font.family: Style.fontFamilyBold
 							font.pixelSize: Style.fontSizeS
@@ -1379,41 +1393,42 @@ ViewBase {
 						height: Style.controlHeightM
 						anchors.verticalCenter: parent.verticalCenter
 						visible: width > 0
+						// Neither child ever paints past this box, however tight the column gets.
+						clip: true
 
 						property string path: featureEditor.featurePath(rowContent.sourceItem)
 						property bool copyable: pathCell.path !== "" && !rowContent.editing
+						// Below this the cell only has room for the path itself.
+						property bool buttonFits: pathCell.width >= Style.buttonWidthS + 3 * Style.marginXS
 
-						Rectangle {
-							anchors.centerIn: parent
-							width: Style.controlHeightS
-							height: Style.controlHeightS
-							radius: height / 2
-							color: pathMouse.containsMouse && pathCell.copyable
-								? Style.backgroundColor2 : "transparent"
-							border.color: pathCell.copyable ? Style.borderColor : "transparent"
-							border.width: 1
-
-							Image {
-								anchors.centerIn: parent
-								width: Style.iconSizeXS
-								height: Style.iconSizeXS
-								opacity: pathCell.copyable ? 1.0 : 0.35
-								source: featureEditor.copyIconSource(pathCell.path)
-							}
-						}
-
-						MouseArea {
-							id: pathMouse
-							anchors.fill: parent
-							hoverEnabled: true
-							cursorShape: pathCell.copyable ? Qt.PointingHandCursor : Qt.ArrowCursor
+						ToolButton {
+							id: copyPathButton
+							anchors.right: parent.right
+							anchors.rightMargin: Style.marginXS
+							anchors.verticalCenter: parent.verticalCenter
+							width: Style.buttonWidthS
+							height: width
+							visible: pathCell.buttonFits
+							enabled: pathCell.copyable
+							iconSource: featureEditor.copyIconSource(pathCell.path)
+							tooltipText: pathCell.copyable ? qsTr("Copy %1").arg(pathCell.path) : ""
 							onClicked: featureEditor.copyFeaturePath(rowContent.sourceItem)
 						}
 
-						TooltipArea {
-							anchors.fill: parent
-							mouseArea: pathMouse
-							text: pathCell.copyable ? qsTr("Copy %1").arg(pathCell.path) : ""
+						BaseText {
+							anchors.left: parent.left
+							anchors.leftMargin: Style.marginXS
+							anchors.verticalCenter: parent.verticalCenter
+							// Computed instead of anchored to the button's edge, so the two
+							// can never share a pixel even while the button is toggling away.
+							width: Math.max(0, pathCell.width - Style.marginXS - (pathCell.buttonFits
+								? Style.buttonWidthS + 2 * Style.marginXS : Style.marginXS))
+							clip: true
+							// The tail tells the features apart, so drop the shared prefix first.
+							elide: Text.ElideLeft
+							text: pathCell.path !== "" ? pathCell.path : "-"
+							font.pixelSize: Style.fontSizeXS
+							color: pathCell.path !== "" ? Style.subtitleColor : Style.inactiveTextColor
 						}
 					}
 
