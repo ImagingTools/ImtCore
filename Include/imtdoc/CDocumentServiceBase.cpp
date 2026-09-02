@@ -2,13 +2,13 @@
 #include <imtdoc/CDocumentServiceBase.h>
 
 
+// STL includes
+#include <functional>
+
 // Qt includes
 #include <QtCore/QCoreApplication>
 #include <QtCore/QUuid>
 #include <QtCore/QThread>
-
-// STL includes
-#include <functional>
 
 // ACF includes
 #include <imod/IModel.h>
@@ -270,15 +270,15 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 		&QThread::started,
 		worker,
 		std::bind(
-			&CDocumentServiceBase::OnCreateDocumentThreadStarted,
-			this,
-			aliveGuard,
-			documentTypeId,
-			userId,
-			documentId,
-			taskId,
-			worker,
-			defaultDataPtr));
+					&CDocumentServiceBase::OnCreateDocumentThreadStarted,
+					this,
+					aliveGuard,
+					documentTypeId,
+					userId,
+					documentId,
+					taskId,
+					worker,
+					defaultDataPtr));
 
 	// Initialize observers and fire events in the main thread after background work completes
 	QObject::connect(
@@ -286,13 +286,13 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 		&QThread::finished,
 		QCoreApplication::instance(),
 		std::bind(
-			&CDocumentServiceBase::OnCreateDocumentThreadFinished,
-			this,
-			aliveGuard,
-			userId,
-			documentId,
-			taskId,
-			initParamsPtr));
+					&CDocumentServiceBase::OnCreateDocumentThreadFinished,
+					this,
+					aliveGuard,
+					userId,
+					documentId,
+					taskId,
+					initParamsPtr));
 
 	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit, Qt::DirectConnection);
 	QObject::connect(thread, &QThread::finished, thread, &QObject::deleteLater);
@@ -1036,10 +1036,10 @@ bool CDocumentServiceBase::HasDocumentNameProvider(const QByteArray& /*typeId*/)
 
 
 bool CDocumentServiceBase::ValidateDocumentData(
-	const WorkingDocument& /*document*/,
-	OperationStatus& status,
-	QString* errorMessage,
-	const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const WorkingDocument& /*document*/,
+			OperationStatus& status,
+			QString* errorMessage,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	status = OS_OK;
 	if (errorMessage != nullptr){

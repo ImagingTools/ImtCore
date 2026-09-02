@@ -69,10 +69,10 @@ protected:
 	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const override;
 	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const override;
 	virtual bool ValidateDocumentData(
-		const WorkingDocument& document,
-		OperationStatus& status,
-		QString* errorMessage = nullptr,
-		const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+				const WorkingDocument& document,
+				OperationStatus& status,
+				QString* errorMessage = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentServiceEventHandlers() const override;
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const override;
 	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override;

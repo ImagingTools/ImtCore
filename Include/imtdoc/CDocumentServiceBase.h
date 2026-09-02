@@ -2,6 +2,10 @@
 #pragma once
 
 
+// STL includes
+#include <atomic>
+#include <memory>
+
 // Qt includes
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
@@ -9,10 +13,6 @@
 #include <QtCore/QString>
 #include <QtCore/QThread>
 #include <QtCore/QWaitCondition>
-
-// STL includes
-#include <atomic>
-#include <memory>
 
 // ACF includes
 #include <idoc/IUndoManager.h>
@@ -173,27 +173,27 @@ protected:
 	void OnDocumentDataLoaded(const QByteArray& userId, const QByteArray& documentId);
 	void OnUndoManagerChanged(int modelId);
 	void OnCreateDocumentThreadStarted(
-		const std::weak_ptr<std::atomic<bool>>& aliveGuard,
-		const QByteArray& documentTypeId,
-		const QByteArray& userId,
-		const QByteArray& documentId,
-		const QByteArray& taskId,
-		QObject* worker,
-		const istd::IChangeable* defaultDataPtr);
+				const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+				const QByteArray& documentTypeId,
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				const QByteArray& taskId,
+				QObject* worker,
+				const istd::IChangeable* defaultDataPtr);
 	void OnCreateDocumentThreadFinished(
-		const std::weak_ptr<std::atomic<bool>>& aliveGuard,
-		const QByteArray& userId,
-		const QByteArray& documentId,
-		const QByteArray& taskId,
-		const iprm::IParamsSet* initParamsPtr);
+				const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				const QByteArray& taskId,
+				const iprm::IParamsSet* initParamsPtr);
 
 	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const;
 	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const;
 	virtual bool ValidateDocumentData(
-		const WorkingDocument& document,
-		OperationStatus& status,
-		QString* errorMessage = nullptr,
-		const imtbase::IOperationContext* operationContextPtr = nullptr) const;
+				const WorkingDocument& document,
+				OperationStatus& status,
+				QString* errorMessage = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
 	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentServiceEventHandlers() const;
 
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const = 0;

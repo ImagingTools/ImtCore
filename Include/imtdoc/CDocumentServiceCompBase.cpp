@@ -32,10 +32,10 @@ bool CDocumentServiceCompBase::HasDocumentNameProvider(const QByteArray& typeId)
 
 
 bool CDocumentServiceCompBase::ValidateDocumentData(
-	const WorkingDocument& document,
-	OperationStatus& status,
-	QString* errorMessage,
-	const imtbase::IOperationContext* operationContextPtr) const
+			const WorkingDocument& document,
+			OperationStatus& status,
+			QString* errorMessage,
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	status = OS_OK;
 	if (errorMessage != nullptr){
