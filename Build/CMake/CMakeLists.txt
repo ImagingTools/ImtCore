@@ -570,3 +570,4 @@ include("${IMTCOREDIR}/Config/CMake/ImtCoreLibraryDependencies.cmake")
 # Export ImtCore libraries as a find_package(ImtCore) package (build + install tree) so
 # downstream modules consume them via ImtCore::<lib> targets instead of env vars/manual paths.
 include("${IMTCOREDIR}/Config/CMake/ImtCorePackageExport.cmake")
+
