@@ -77,8 +77,8 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnCreateNewDocument
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		const QByteArray proposedSourceDocumentId = documentTypeId->proposedSourceDocumentId
-			? *documentTypeId->proposedSourceDocumentId
-			: QByteArray();
+					? *documentTypeId->proposedSourceDocumentId
+					: QByteArray();
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
 		taskParams.documentTypeId = *documentTypeId->typeId;
@@ -154,8 +154,8 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 		QByteArray documentId = taskResult.documentId;
 		if (documentId.isEmpty()){
 			errorMessage = taskResult.errorMessage.isEmpty()
-				? QStringLiteral("Unable to open document or create undo manager")
-				: taskResult.errorMessage;
+						? QStringLiteral("Unable to open document or create undo manager")
+						: taskResult.errorMessage;
 
 			return retVal;
 		}
@@ -797,3 +797,4 @@ QByteArray CCollectionDocumentServiceControllerComp::GetUserId(const ::imtgql::C
 
 
 } // namespace imtservergql
+

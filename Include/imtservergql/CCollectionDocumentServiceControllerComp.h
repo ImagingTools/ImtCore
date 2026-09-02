@@ -34,49 +34,49 @@ public:
 
 protected:
 	virtual sdl::V1_0::imtbase::CDocumentList OnGetOpenedDocumentList(
-		const sdl::V1_0::imtbase::CGetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::V1_0::imtbase::CGetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CDocumentInfo OnCreateNewDocument(
-		const sdl::V1_0::imtbase::CCreateNewDocumentGqlRequest& createNewDocumentRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::V1_0::imtbase::CCreateNewDocumentGqlRequest& createNewDocumentRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CDocumentInfo OnOpenDocument(
-		const sdl::V1_0::imtbase::COpenDocumentGqlRequest& openDocumentRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::V1_0::imtbase::COpenDocumentGqlRequest& openDocumentRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CDocumentInfo OnGetDocumentName(
-		const sdl::V1_0::imtbase::CGetDocumentNameGqlRequest& getDocumentNameRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::V1_0::imtbase::CGetDocumentNameGqlRequest& getDocumentNameRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnSetDocumentName(
-		const sdl::V1_0::imtbase::CSetDocumentNameGqlRequest& setDocumentNameRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::V1_0::imtbase::CSetDocumentNameGqlRequest& setDocumentNameRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnSaveDocument(
-		const sdl::V1_0::imtbase::CSaveDocumentGqlRequest& saveDocumentRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::V1_0::imtbase::CSaveDocumentGqlRequest& saveDocumentRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnCloseDocument(
-		const sdl::V1_0::imtbase::CCloseDocumentGqlRequest& closeDocumentRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::V1_0::imtbase::CCloseDocumentGqlRequest& closeDocumentRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CUndoInfo OnGetUndoInfo(
-		const sdl::V1_0::imtbase::CGetUndoInfoGqlRequest& getUndoInfoRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::V1_0::imtbase::CGetUndoInfoGqlRequest& getUndoInfoRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CUndoStatus OnDoUndo(
-		const sdl::V1_0::imtbase::CDoUndoGqlRequest& doUndoRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::V1_0::imtbase::CDoUndoGqlRequest& doUndoRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CUndoStatus OnDoRedo(
-		const sdl::V1_0::imtbase::CDoRedoGqlRequest& doRedoRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::V1_0::imtbase::CDoRedoGqlRequest& doRedoRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CUndoStatus OnResetUndo(
-		const sdl::V1_0::imtbase::CResetUndoGqlRequest& resetUndoRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const sdl::V1_0::imtbase::CResetUndoGqlRequest& resetUndoRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 	// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)
 	bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
