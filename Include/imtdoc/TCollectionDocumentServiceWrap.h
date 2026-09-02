@@ -355,6 +355,20 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	}
 
 	QByteArray objectId = parts.first().toUtf8();
+	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+
+	auto clearReservedOpen = [this, &userId, &documentId](){
+		QMutexLocker locker(&this->m_mutex);
+		auto userDocsIt = this->m_userDocuments.find(userId);
+		if (userDocsIt == this->m_userDocuments.end()){
+			return;
+		}
+
+		userDocsIt.value().remove(documentId);
+		if (userDocsIt.value().isEmpty()){
+			this->m_userDocuments.erase(userDocsIt);
+		}
+	};
 
 	// Single-instance constraints (per user/object):
 	// - opening in single-instance mode is forbidden when the object is already open;
@@ -383,10 +397,17 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 				}
 			}
 		}
+
+		WorkingDocument& reservedDoc = this->m_userDocuments[userId][documentId];
+		reservedDoc.objectId = objectId;
+		reservedDoc.url = url;
+		reservedDoc.isLoading = true;
+		reservedDoc.singleDocumentInstance = params.singleDocumentInstance;
 	}
 
 	imtbase::IObjectCollection* collectionPtr = GetCollection();
 	if (collectionPtr == nullptr){
+		clearReservedOpen();
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("No collection available")});
 		return;
 	}
@@ -394,6 +415,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	QByteArray objectTypeId = collectionPtr->GetObjectTypeId(objectId);
 
 	if (objectTypeId.isEmpty()){
+		clearReservedOpen();
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Unknown object type")});
 		return;
 	}
@@ -421,7 +443,6 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		}
 
 		if (isSharedDocument){
-			QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 			istd::CChangeNotifier notifier(this);
 
 			{
@@ -485,11 +506,10 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	idoc::IUndoManagerSharedPtr undoManagerPtr;
 	undoManagerPtr.FromUnique(std::move(this->CreateUndoManager()));
 	if (!undoManagerPtr.IsValid()){
+		clearReservedOpen();
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Failed to create undo manager")});
 		return;
 	}
-
-	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	QString documentName = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 	istd::CChangeNotifier notifier(this);
