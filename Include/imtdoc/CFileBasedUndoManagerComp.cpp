@@ -206,18 +206,6 @@ bool CFileBasedUndoManagerComp::OnModelAttached(imod::IModel* modelPtr, istd::IC
 }
 
 
-bool CFileBasedUndoManagerComp::OnModelDetached(imod::IModel* modelPtr)
-{
-	if (BaseClass2::OnModelDetached(modelPtr)){
-		m_currentStatePtr.reset();
-
-		return true;
-	}
-
-	return false;
-}
-
-
 // reimplemented (iser::ISerializable)
 
 bool CFileBasedUndoManagerComp::Serialize(iser::IArchive& archive)

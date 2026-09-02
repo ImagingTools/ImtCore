@@ -69,7 +69,7 @@ IDocumentService::OperationStatus CCollectionDocumentServiceComp::CloseDocumentI
 		if (!ValidateInputParams(userId, documentId, validationStatus)){
 			return validationStatus;
 		}
-		const WorkingDocument& workingDocument = m_userDocuments[userId][documentId];
+
 		const WorkingDocument& workingDocument = m_userDocuments[userId][documentId];
 
 		shouldRemoveStorageDirectory = true;
