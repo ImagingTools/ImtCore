@@ -107,22 +107,23 @@ protected:
 
 private:
 	void OnDeferredDocumentDataLoaded(
-		const std::weak_ptr<std::atomic<bool>>& aliveGuard,
-		const QByteArray& userId,
-		const QByteArray& documentId);
+				const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+				const QByteArray& userId,
+				const QByteArray& documentId);
+	void ClearReservedOpen(const QByteArray& userId, const QByteArray& documentId);
 	void OnOpenDocumentThreadStarted(
-		const std::weak_ptr<std::atomic<bool>>& aliveGuard,
-		bool singleCopyMode,
-		const QByteArray& objectId,
-		const QByteArray& userId,
-		const QByteArray& documentId,
-		QObject* worker);
+				const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+				bool singleCopyMode,
+				const QByteArray& objectId,
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				QObject* worker);
 	void OnOpenDocumentThreadFinished(
-		const std::weak_ptr<std::atomic<bool>>& aliveGuard,
-		bool singleCopyMode,
-		const QByteArray& objectId,
-		const QByteArray& userId,
-		const QByteArray& documentId);
+				const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+				bool singleCopyMode,
+				const QByteArray& objectId,
+				const QByteArray& userId,
+				const QByteArray& documentId);
 
 	QMap<QByteArray, QByteArray> m_proposedSourceDocumentIds; ///< Maps new documentId → proposed source element ID for copy-on-create.
 };
@@ -143,6 +144,24 @@ inline void TCollectionDocumentServiceWrap<Base>::OnDeferredDocumentDataLoaded(
 	}
 
 	this->OnDocumentDataLoaded(userId, documentId);
+}
+
+
+template<class Base>
+inline void TCollectionDocumentServiceWrap<Base>::ClearReservedOpen(
+			const QByteArray& userId,
+			const QByteArray& documentId)
+{
+	QMutexLocker locker(&this->m_mutex);
+	auto userDocsIt = this->m_userDocuments.find(userId);
+	if (userDocsIt == this->m_userDocuments.end()){
+		return;
+	}
+
+	userDocsIt.value().remove(documentId);
+	if (userDocsIt.value().isEmpty()){
+		this->m_userDocuments.erase(userDocsIt);
+	}
 }
 
 
@@ -357,19 +376,6 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	QByteArray objectId = parts.first().toUtf8();
 	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
-	auto clearReservedOpen = [this, &userId, &documentId](){
-		QMutexLocker locker(&this->m_mutex);
-		auto userDocsIt = this->m_userDocuments.find(userId);
-		if (userDocsIt == this->m_userDocuments.end()){
-			return;
-		}
-
-		userDocsIt.value().remove(documentId);
-		if (userDocsIt.value().isEmpty()){
-			this->m_userDocuments.erase(userDocsIt);
-		}
-	};
-
 	// Single-instance constraints (per user/object):
 	// - opening in single-instance mode is forbidden when the object is already open;
 	// - opening without single-instance mode is forbidden when the object is already
@@ -407,7 +413,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 
 	imtbase::IObjectCollection* collectionPtr = GetCollection();
 	if (collectionPtr == nullptr){
-		clearReservedOpen();
+		this->ClearReservedOpen(userId, documentId);
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("No collection available")});
 		return;
 	}
@@ -415,7 +421,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	QByteArray objectTypeId = collectionPtr->GetObjectTypeId(objectId);
 
 	if (objectTypeId.isEmpty()){
-		clearReservedOpen();
+		this->ClearReservedOpen(userId, documentId);
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Unknown object type")});
 		return;
 	}
@@ -437,8 +443,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 				sharedName = shared.name;
 				sharedIsLoading = shared.isLoading;
 				docIsDirty = shared.undoManagerPtr.IsValid()
-					? (shared.undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL)
-					: false;
+							? (shared.undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL)
+							: false;
 			}
 		}
 
@@ -490,12 +496,12 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 				QMetaObject::invokeMethod(
 							QCoreApplication::instance(),
 							std::bind(
-								&TCollectionDocumentServiceWrap<Base>::OnDeferredDocumentDataLoaded,
-								this,
-								deferredAliveGuard,
-								deferredUserId,
-								deferredDocumentId),
-							Qt::QueuedConnection);
+										&TCollectionDocumentServiceWrap<Base>::OnDeferredDocumentDataLoaded,
+										this,
+										deferredAliveGuard,
+										deferredUserId,
+										deferredDocumentId),
+										Qt::QueuedConnection);
 			}
 
 			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_OK, documentId, QString()});
@@ -506,7 +512,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	idoc::IUndoManagerSharedPtr undoManagerPtr;
 	undoManagerPtr.FromUnique(std::move(this->CreateUndoManager()));
 	if (!undoManagerPtr.IsValid()){
-		clearReservedOpen();
+		this->ClearReservedOpen(userId, documentId);
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Failed to create undo manager")});
 		return;
 	}
@@ -798,7 +804,14 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 			QByteArray oldObjectId = workingDocumentPtr->objectId;
 
 			QByteArray newObjectId = collectionPtr->InsertNewObject(
-				workingDocumentPtr->typeId, resultDocumentName, "", documentSnapshotPtr.GetPtr(), QByteArray(), nullptr, nullptr, params.operationContextPtr);
+						workingDocumentPtr->typeId,
+						resultDocumentName,
+						"",
+						documentSnapshotPtr.GetPtr(),
+						QByteArray(),
+						nullptr,
+						nullptr,
+						params.operationContextPtr);
 
 			if (newObjectId.isEmpty()){
 				this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, documentId, QStringLiteral("Failed to insert copy")});
@@ -980,8 +993,15 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 		}
 	}
 
-	workingDocumentPtr->objectId =
-		collectionPtr->InsertNewObject(workingDocumentPtr->typeId, resultDocumentName, "", documentSnapshotPtr.GetPtr(), proposedElementId, nullptr, nullptr, params.operationContextPtr);
+	workingDocumentPtr->objectId = collectionPtr->InsertNewObject(
+				workingDocumentPtr->typeId,
+				resultDocumentName,
+				"",
+				documentSnapshotPtr.GetPtr(),
+				proposedElementId,
+				nullptr,
+				nullptr,
+				params.operationContextPtr);
 
 	if (this->HasDocumentNameProvider(workingDocumentPtr->typeId)){
 		resultDocumentName = this->GetDefaultDocumentName(*workingDocumentPtr);
