@@ -7,10 +7,6 @@ namespace imtserverapp
 {
 
 
-// protected methods
-
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CParamsSet>)
-
 QByteArray CParamSetRepresentationControllerComp::GetTypeId() const
 {
 	return m_representationController.GetTypeId();
@@ -40,23 +36,31 @@ bool CParamSetRepresentationControllerComp::GetDataModelFromSdlRepresentation(
 }
 
 
-// reimplemented (icomp::CComponentBase)
-
 void CParamSetRepresentationControllerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_paramRepresentationControllersCompPtr.IsValid()){
-		for (int i = 0; i < m_paramRepresentationControllersCompPtr.GetCount(); ++i){
-			const imtserverapp::IJsonRepresentationController* representationControllerPtr = m_paramRepresentationControllersCompPtr[i];
-			if (representationControllerPtr != nullptr){
-				m_representationController.RegisterSubController(*representationControllerPtr);
-			}
+	RegisterSubControllers(m_paramRepresentationControllersCompPtr);
+
+	if (m_customParamRepresentationControllerCompPtr.IsValid()){
+		m_representationController.RegisterSubController(*m_customParamRepresentationControllerCompPtr);
+	}
+}
+
+
+void CParamSetRepresentationControllerComp::RegisterSubControllers(const icomp::TMultiReferenceMember<IJsonRepresentationController>& controllers)
+{
+	if (!controllers.IsValid()){
+		return;
+	}
+
+	for (int index = 0; index < controllers.GetCount(); ++index){
+		const IJsonRepresentationController* representationControllerPtr = controllers[index];
+		if (representationControllerPtr != nullptr){
+			m_representationController.RegisterSubController(*representationControllerPtr);
 		}
 	}
 }
 
 
 } // namespace imtserverapp
-
-

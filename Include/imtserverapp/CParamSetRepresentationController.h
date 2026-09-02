@@ -14,7 +14,7 @@ namespace imtserverapp
 class CParamSetRepresentationController: public imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CParamsSet>
 {
 public:
-	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CParamsSet>)
+	// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CParamsSet>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetSdlRepresentationFromDataModel(
@@ -28,7 +28,10 @@ public:
 	bool RegisterSubController(const imtserverapp::IJsonRepresentationController& controller) const;
 
 private:
-	mutable QMap<QByteArray, const imtserverapp::IJsonRepresentationController*> m_representationControllersMap;
+	const IJsonRepresentationController* GetRepresentationController(const istd::IChangeable& dataModel) const;
+
+private:
+	mutable QList<const IJsonRepresentationController*> m_representationControllers;
 };
 
 

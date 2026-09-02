@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6556" Description="ACF"/>
+            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="396034" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Parameter set representation controller with all standard parameter representation controllers attached. Application specific controllers can be added using the exported attribute 'CustomParamRepresentationControllers'.</Description>
+    <Keywords>ParamsSet Representation Controller Standard Json</Keywords>
+    <ElementsList>
+        <Element Id="ComplexFilterRepresentation" PackageId="ImtServerAppPck" ComponentId="ComplexCollectionFilterRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="DocumentFilterRepresentation" PackageId="ImtServerAppPck" ComponentId="DocumentFilterRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="DocumentIdFilterRepresentation" PackageId="ImtServerAppPck" ComponentId="DocumentIdFilterRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="DoubleParamRepresentationController" PackageId="ImtServerAppPck" ComponentId="DoubleParamRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="EnableableParamRepresentationController" PackageId="ImtServerAppPck" ComponentId="EnableableParamRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="IdParamRepresentationController" PackageId="ImtServerAppPck" ComponentId="IdParamRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="IntegerParamRepresentationController" PackageId="ImtServerAppPck" ComponentId="IntegerParamRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ParamSetRepresentation" PackageId="ImtServerAppPck" ComponentId="ParamSetRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CustomParamRepresentationControllers" Type="Reference[]" ExportId="CustomParamRepresentationControllers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParamRepresentationControllers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ComplexFilterRepresentation</Value>
+                                <Value>DocumentFilterRepresentation</Value>
+                                <Value>DocumentIdFilterRepresentation</Value>
+                                <Value>TimeFilterRepresentation</Value>
+                                <Value>DoubleParamRepresentationController</Value>
+                                <Value>IntegerParamRepresentationController</Value>
+                                <Value>EnableableParamRepresentationController</Value>
+                                <Value>IdParamRepresentationController</Value>
+                                <Value>TextParamRepresentationController</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TextParamRepresentationController" PackageId="ImtServerAppPck" ComponentId="TextParamRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TimeFilterRepresentation" PackageId="ImtServerAppPck" ComponentId="TimeFilterParamRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtserverapp::IJsonRepresentationController" ComponentId="ParamSetRepresentation"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ParamSetRepresentation"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

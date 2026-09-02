@@ -16,10 +16,12 @@ public:
 	typedef CTextParamRepresentationControllerComp BaseClass;
 
 	I_BEGIN_COMPONENT(CTextViewRepresentationControllerComp)
+		I_REGISTER_INTERFACE(IJsonRepresentationController);
 	I_END_COMPONENT;
 
+
 protected:
-	// reimplemented (TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CTextParam>)
+	// reimplemented (TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CTextParam>)
 	virtual QByteArray GetTypeId() const override;
 };
 
