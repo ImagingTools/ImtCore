@@ -34,6 +34,11 @@ public:
 		\param documentTypeId ID identifying the type of the document.
 	*/
 	virtual void InitializeDocumentContext(const QByteArray& documentId, const QByteArray& documentTypeId) = 0;
+
+	/**
+		\brief Remove undo/redo snapshots and keep only the current document snapshot.
+	*/
+	virtual void CleanupHistory() = 0;
 };
 
 using IPersistentUndoManagerUniquePtr = istd::TUniqueInterfacePtr<IPersistentUndoManager>;

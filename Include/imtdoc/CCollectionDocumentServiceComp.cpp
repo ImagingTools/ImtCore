@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
+#include <imtdoc/CFileBasedUndoManagerComp.h>
 
 
 namespace imtdoc
@@ -50,6 +51,44 @@ imtbase::IObjectCollection* CCollectionDocumentServiceComp::GetCollection() cons
 bool CCollectionDocumentServiceComp::IsSingleCopyMode() const
 {
 	return m_isSingleCopyModeAttrPtr.IsValid() && *m_isSingleCopyModeAttrPtr;
+}
+
+
+IDocumentService::OperationStatus CCollectionDocumentServiceComp::CloseDocumentInternal(
+	const QByteArray& userId,
+	const QByteArray& documentId)
+{
+	bool shouldRemoveStorageDirectory = false;
+	idoc::IUndoManagerSharedPtr undoManagerPtr;
+
+	{
+		QMutexLocker locker(&m_mutex);
+		OperationStatus validationStatus;
+		if (!ValidateInputParams(userId, documentId, validationStatus)){
+			return validationStatus;
+		}
+
+		const WorkingDocument& workingDocument = m_userDocuments[userId][documentId];
+		undoManagerPtr = workingDocument.undoManagerPtr;
+
+		shouldRemoveStorageDirectory = true;
+		if (IsSingleCopyMode()
+			&& !workingDocument.objectId.isEmpty()
+			&& m_sharedDocuments.contains(workingDocument.objectId)){
+			shouldRemoveStorageDirectory = m_sharedDocuments[workingDocument.objectId].refCount <= 1;
+		}
+	}
+
+	OperationStatus status = BaseClass::CloseDocumentInternal(userId, documentId);
+
+	if (status == OS_OK && shouldRemoveStorageDirectory){
+		CFileBasedUndoManagerComp* fileBasedUndoManagerPtr = dynamic_cast<CFileBasedUndoManagerComp*>(undoManagerPtr.GetPtr());
+		if (fileBasedUndoManagerPtr != nullptr){
+			fileBasedUndoManagerPtr->RemoveStorageDirectory();
+		}
+	}
+
+	return status;
 }
 
 

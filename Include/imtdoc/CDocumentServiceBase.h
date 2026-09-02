@@ -153,7 +153,7 @@ protected:
 		both \c DoCloseDocument and failure paths of \c DoCreateNewDocument /
 		\c DoOpenDocument).
 	*/
-	OperationStatus CloseDocumentInternal(const QByteArray& userId, const QByteArray& documentId);
+	virtual OperationStatus CloseDocumentInternal(const QByteArray& userId, const QByteArray& documentId);
 
 	/**
 		\brief Mark a pending task as finished.

@@ -94,6 +94,9 @@ public:
 
 	// reimplemented (imtdoc::IPersistentUndoManager)
 	virtual void InitializeDocumentContext(const QByteArray& documentId, const QByteArray& documentTypeId) override;
+	virtual void CleanupHistory() override;
+
+	void RemoveStorageDirectory();
 
 	// reimplemented (imod::IObserver)
 	virtual bool OnModelAttached(imod::IModel* modelPtr, istd::IChangeable::ChangeSet& changeMask) override;
@@ -117,6 +120,10 @@ protected:
 
 	private:
 		QString filePath;
+		bool autoRemoveOnDestroy = true;
+
+	public:
+		void SetAutoRemoveOnDestroy(bool value);
 	};
 
 	typedef std::shared_ptr<UndoStep> UndoStepPtr;
@@ -128,6 +135,7 @@ protected:
 		UndoList& undoList,
 		const iser::CArchiveTag& listTag,
 		const iser::CArchiveTag& stepTag) const;
+	void SetStepFileAutoRemoveEnabled(bool value);
 	UndoStep* CreateState(iser::ISerializable& object, const QString& stepFileName);
 	bool RestoreState(const UndoStep& state, iser::ISerializable& object);
 	bool AreStatesEqual(const UndoStep& state1, const UndoStep& state2) const;

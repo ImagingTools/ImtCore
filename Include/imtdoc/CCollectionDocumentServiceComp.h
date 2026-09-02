@@ -52,6 +52,7 @@ protected:
 
 	// reimplemented (imtdoc::CDocumentServiceBase)
 	virtual bool IsSingleCopyMode() const override;
+	virtual OperationStatus CloseDocumentInternal(const QByteArray& userId, const QByteArray& documentId) override;
 
 private:
 	struct DocumentInfo
@@ -83,4 +84,3 @@ private:
 
 
 } // namespace imtdoc
-

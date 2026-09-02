@@ -31,7 +31,7 @@ CFileBasedUndoManagerComp::UndoStep::UndoStep(const QString& filePath)
 
 CFileBasedUndoManagerComp::UndoStep::~UndoStep()
 {
-	if (!filePath.isEmpty() && QFile::exists(filePath)){
+	if (autoRemoveOnDestroy && !filePath.isEmpty() && QFile::exists(filePath)){
 		QFile::remove(filePath);
 	}
 }
@@ -52,6 +52,12 @@ bool CFileBasedUndoManagerComp::UndoStep::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.TagAndProcess(descriptionTag, description);
 
 	return retVal;
+}
+
+
+void CFileBasedUndoManagerComp::UndoStep::SetAutoRemoveOnDestroy(bool value)
+{
+	autoRemoveOnDestroy = value;
 }
 
 
@@ -130,6 +136,47 @@ void CFileBasedUndoManagerComp::InitializeDocumentContext(const QByteArray& docu
 			}
 
 			m_modelObserver.RegisterObject(this, &CFileBasedUndoManagerComp::OnUndoManagerStateChanged);
+		}
+	}
+}
+
+
+void CFileBasedUndoManagerComp::CleanupHistory()
+{
+	istd::CChangeNotifier notifier(this);
+	Q_UNUSED(notifier);
+
+	UndoStepPtr newCurrentStatePtr;
+	iser::ISerializable* observedObjectPtr = GetObservedObject();
+	const QString currentStateFilePath = CreateStepFilePath("CurrentState");
+	if (m_currentStatePtr && m_currentStatePtr->GetFilePath() == currentStateFilePath){
+		m_currentStatePtr->SetAutoRemoveOnDestroy(false);
+	}
+	m_currentStatePtr.reset();
+
+	if (observedObjectPtr != nullptr
+		&& !currentStateFilePath.isEmpty()
+		&& m_documentPersistenceCompPtr.IsValid()
+		&& m_documentPersistenceCompPtr->SaveToFile(*observedObjectPtr, currentStateFilePath) == ifile::IFilePersistence::OS_OK){
+		newCurrentStatePtr.reset(new UndoStep(currentStateFilePath));
+	}
+
+	m_beginStatePtr.reset();
+	m_undoList.clear();
+	m_redoList.clear();
+	m_currentStatePtr = newCurrentStatePtr;
+}
+
+
+void CFileBasedUndoManagerComp::RemoveStorageDirectory()
+{
+	SetStepFileAutoRemoveEnabled(false);
+
+	QString storageDirectoryPath = GetStorageDirectoryPath();
+	if (!storageDirectoryPath.isEmpty()){
+		QDir storageDirectory(storageDirectoryPath);
+		if (storageDirectory.exists()){
+			storageDirectory.removeRecursively();
 		}
 	}
 }
@@ -269,6 +316,30 @@ bool CFileBasedUndoManagerComp::SerializeUndoList(
 	retVal = retVal && archive.EndTag(listTag);
 
 	return retVal;
+}
+
+
+void CFileBasedUndoManagerComp::SetStepFileAutoRemoveEnabled(bool value)
+{
+	for (const UndoStepPtr& stepPtr : m_undoList){
+		if (stepPtr){
+			stepPtr->SetAutoRemoveOnDestroy(value);
+		}
+	}
+
+	for (const UndoStepPtr& stepPtr : m_redoList){
+		if (stepPtr){
+			stepPtr->SetAutoRemoveOnDestroy(value);
+		}
+	}
+
+	if (m_beginStatePtr){
+		m_beginStatePtr->SetAutoRemoveOnDestroy(value);
+	}
+
+	if (m_currentStatePtr){
+		m_currentStatePtr->SetAutoRemoveOnDestroy(value);
+	}
 }
 
 
@@ -613,14 +684,7 @@ void CFileBasedUndoManagerComp::OnComponentDestroyed()
 	m_modelObserver.UnregisterAllObjects();
 
 	EnsureModelDetached();
-
-	QString storageDirectoryPath = GetStorageDirectoryPath();
-	if (!storageDirectoryPath.isEmpty()){
-		QDir storageDirectory(storageDirectoryPath);
-		if (storageDirectory.exists()){
-			storageDirectory.removeRecursively();
-		}
-	}
+	SetStepFileAutoRemoveEnabled(false);
 
 	BaseClass::OnComponentDestroyed();
 }
