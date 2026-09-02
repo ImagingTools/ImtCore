@@ -21,7 +21,7 @@ void CAddressEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeS
 
 	CountryEdit->setText(addressPtr->GetCountry());
 	CityEdit->setText(addressPtr->GetCity());
-	PostalCodeEdit->setText(QString("%1").arg(addressPtr->GetPostalCode()));
+	PostalCodeEdit->setText(QStringLiteral("%1").arg(addressPtr->GetPostalCode()));
 }
 
 

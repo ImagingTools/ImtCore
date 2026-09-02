@@ -236,15 +236,15 @@ void CRulerShape::DrawOverlay(QPainter& painter)
 	QPoint pos2d2 = ModelToWindow(posB);
 	QPoint pos2dDistance = (pos2d1 + pos2d2) / 2;
 
-	QString point1Text = QString("(%1,%2,%3)")
+	QString point1Text = QStringLiteral("(%1,%2,%3)")
 				.arg(pos3d1.x(), 0, 'f', 3)
 				.arg(pos3d1.y(), 0, 'f', 3)
 				.arg(pos3d1.z(), 0, 'f', 3);
-	QString point2Text = QString("(%1,%2,%3)")
+	QString point2Text = QStringLiteral("(%1,%2,%3)")
 				.arg(pos3d2.x(), 0, 'f', 3)
 				.arg(pos3d2.y(), 0, 'f', 3)
 				.arg(pos3d2.z(), 0, 'f', 3);
-	QString distanceText = QString("%1").arg(distance, 0, 'f', 3);
+	QString distanceText = QStringLiteral("%1").arg(distance, 0, 'f', 3);
 
 	static QFont font("Arial", 8);
 	font.setBold(true);

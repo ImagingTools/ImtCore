@@ -106,6 +106,11 @@ public:
 protected:
 	virtual void OnViewContraintsChanged();
 
+	virtual void CreateViewCommands(
+		ibase::ICommandsProvider& commandsProvider, 
+		iqtgui::CHierarchicalCommand& commands, 
+		QToolBar* toolBarPtr);
+
 	// reimplemented (imod::CMultiModelDispatcherBase)
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet);
 
@@ -258,6 +263,7 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	UI::RedoButton->setDefaultAction(&m_redoCommand);
 
 	UI::CloseButton->setDefaultAction(&m_closeCommand);
+	UI::CloseButton->setIconSize(QSize(configuration.iconSize, configuration.iconSize));
 
 	UI::SaveButton->setToolButtonStyle(configuration.fileButtonsStyle);
 	UI::SaveButton->setDefaultAction(&m_saveCommand);
@@ -267,6 +273,7 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	UI::SaveAsButton->setToolButtonStyle(configuration.fileButtonsStyle);
 	UI::SaveAsButton->setDefaultAction(&m_saveAsCommand);
 	UI::SaveAsButton->setVisible(configuration.commandOptions & CO_SHOW_SAVE_AS);
+	UI::SaveAsButton->setIconSize(QSize(configuration.iconSize, configuration.iconSize));
 
 	connect(&m_newCommand, &QAction::triggered, parentPtr, &WorkspaceImpl::OnNew);
 	connect(&m_openCommand, &QAction::triggered, parentPtr, &WorkspaceImpl::OnOpen);
@@ -369,7 +376,7 @@ inline void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::UpdateAppearance(
 	m_redoCommand.SetVisuals(QObject::tr("&Redo"), QObject::tr("Redo"), QObject::tr("Redo last document changes"), m_uiResourcesManager.GetIcon(":/Icons/Redo"));
 	m_closeCommand.SetVisuals(QObject::tr("&Close"), QObject::tr("Close"), QObject::tr("Close the document"), m_uiResourcesManager.GetIcon(":/Icons/Close"));
 	m_saveCommand.SetVisuals(QObject::tr("&Save"), QObject::tr("Save"), QObject::tr("Save the document changes"), m_uiResourcesManager.GetIcon(":/Icons/Save"));
-	m_saveAsCommand.SetVisuals(QObject::tr("Save As"), QObject::tr("Save As"), QObject::tr("Save the document as..."), QIcon());
+	m_saveAsCommand.SetVisuals(QObject::tr("Save As"), QObject::tr("Save As"), QObject::tr("Save the document as..."));
 }
 
 
@@ -462,6 +469,24 @@ const ibase::IHierarchicalCommand * TStandardDocumentViewDecorator<WorkspaceImpl
 
 // protected methods
 
+template <class WorkspaceImpl, class UI>
+void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::CreateViewCommands(
+	ibase::ICommandsProvider& commandsProvider,
+	iqtgui::CHierarchicalCommand& commands,
+	QToolBar* toolBarPtr)
+{
+	const ibase::IHierarchicalCommand* viewCommandsPtr = commandsProvider.GetCommands();
+	if (viewCommandsPtr != nullptr) {
+		m_commands.JoinLinkFrom(viewCommandsPtr);
+	}
+
+	m_commands.InsertChild(&m_undoCommand);
+	m_commands.InsertChild(&m_redoCommand);
+	m_commands.InsertChild(&m_saveCommand);
+	m_commands.InsertChild(&m_closeCommand);
+}
+
+
 // reimplemented (imod::CMultiModelDispatcherBase)
 
 template <class WorkspaceImpl, class UI>
@@ -488,26 +513,19 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::OnModelChanged(int model
 			ibase::ICommandsProvider* commandsProviderPtr = CompCastPtr<ibase::ICommandsProvider>(m_viewObjectPtr);
 			m_commands.ResetChilds();
 
-			if (commandsProviderPtr != nullptr){
+			if (commandsProviderPtr != nullptr) {
 				iwidgets::ClearLayout(UI::CommandToolBarFrame->layout());
 				const iqtgui::CHierarchicalCommand* guiCommandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(commandsProviderPtr->GetCommands());
-				if (guiCommandPtr != nullptr){
-					QToolBar* toolBarPtr = new QToolBar(UI::CommandToolBarFrame);
+				QToolBar* toolBarPtr = nullptr;
+				if (guiCommandPtr != nullptr) {
+					toolBarPtr = new QToolBar(UI::CommandToolBarFrame);
 					toolBarPtr->setToolButtonStyle(m_configuration.documentButtonsStyle);
 					UI::CommandToolBarFrame->layout()->addWidget(toolBarPtr);
 					iqtgui::CCommandTools::SetupToolbar(*guiCommandPtr, *toolBarPtr, -1, m_configuration.includedCommandGroups, m_configuration.excludedCommandGroups);
 					toolBarPtr->setIconSize(QSize(m_configuration.iconSize, m_configuration.iconSize));
 				}
 
-				const ibase::IHierarchicalCommand* viewCommandsPtr = commandsProviderPtr->GetCommands();
-				if (viewCommandsPtr != nullptr){
-					m_commands.JoinLinkFrom(viewCommandsPtr);
-				}
-
-				m_commands.InsertChild(&m_undoCommand);
-				m_commands.InsertChild(&m_redoCommand);
-				m_commands.InsertChild(&m_saveCommand);
-				m_commands.InsertChild(&m_closeCommand);
+				CreateViewCommands(*commandsProviderPtr, m_commands, toolBarPtr);
 			}
 		}
 		break;

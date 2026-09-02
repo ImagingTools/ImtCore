@@ -85,13 +85,13 @@ bool CUserGroupChangeGeneratorComp::CompareDocuments(
 {
 	const imtauth::CUserGroupInfo* oldUserGroupInfoPtr = dynamic_cast<const imtauth::CUserGroupInfo*>(&oldDocument);
 	if (oldUserGroupInfoPtr == nullptr){
-		errorMessage = QString("Unable to compare groups. Error: Old group is invalid");
+		errorMessage = QStringLiteral("Unable to compare groups. Error: Old group is invalid");
 		return false;
 	}
 
 	const imtauth::CUserGroupInfo* newUserGroupInfoPtr = dynamic_cast<const imtauth::CUserGroupInfo*>(&newDocument);
 	if (newUserGroupInfoPtr == nullptr){
-		errorMessage = QString("Unable to compare groups. Error: New group is invalid");
+		errorMessage = QStringLiteral("Unable to compare groups. Error: New group is invalid");
 		return false;
 	}
 

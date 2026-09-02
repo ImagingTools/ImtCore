@@ -30,9 +30,9 @@ QByteArray CUsersSettingsDatabaseDelegateComp::GetSelectionQuery(
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!objectId.isEmpty()){
-		return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
-					.arg(qPrintable(*m_tableNameAttrPtr))
-					.arg(qPrintable(*m_objectIdColumnAttrPtr))
+		return QStringLiteral(R"(SELECT * FROM "%1" WHERE "%2" = '%3')")
+					.arg(*m_tableNameAttrPtr)
+					.arg(*m_objectIdColumnAttrPtr)
 					.arg(SqlEncode(QString::fromUtf8(objectId)))
 					.toUtf8();
 	}
@@ -114,7 +114,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSettingsDatabaseDelegateCom
 
 	NewObjectQuery retVal;
 
-	retVal.query += QString("\nINSERT INTO \"UserSettings\" (\"UserId\", \"Settings\") VALUES ('%1', '%2');")
+	retVal.query += QStringLiteral("\nINSERT INTO \"UserSettings\" (\"UserId\", \"Settings\") VALUES ('%1', '%2');")
 				.arg(SqlEncode(QString::fromUtf8(userId)))
 				.arg(SqlEncode(QString::fromUtf8(data))).toUtf8();
 
@@ -133,7 +133,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateDeleteObjectsQuery(
 
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
-		quotedIds << QString("'%1'").arg(SqlEncode(QString::fromUtf8(objectId)));
+		quotedIds << QStringLiteral("'%1'").arg(SqlEncode(QString::fromUtf8(objectId)));
 	}
 
 	QString query = QString(
@@ -186,7 +186,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
 		data = archive.GetString();
 	}
 
-	QByteArray retVal = QString("UPDATE \"UserSettings\" SET \"UserId\" ='%1', \"Settings\" = '%2' WHERE \"UserId\" ='%3';")
+	QByteArray retVal = QStringLiteral(R"(UPDATE "UserSettings" SET "UserId" ='%1', "Settings" = '%2' WHERE "UserId" ='%3';)")
 			.arg(SqlEncode(QString::fromUtf8(userId)))
 			.arg(SqlEncode(QString::fromUtf8(data)))
 			.arg(SqlEncode(QString::fromUtf8(objectId)))

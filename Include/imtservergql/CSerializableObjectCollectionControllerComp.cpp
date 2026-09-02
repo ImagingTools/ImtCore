@@ -35,7 +35,7 @@ bool CSerializableObjectCollectionControllerComp::SerializeObject(
 	const iser::ISerializable* objectConst = dynamic_cast<const iser::ISerializable*>(object);
 	iser::ISerializable* serializableObject = dynamic_cast<iser::ISerializable*>(const_cast<iser::ISerializable*>(objectConst));
 	if (serializableObject == nullptr){
-		QByteArray errorMessage = QString("Object data metainfo is not Serializable").toUtf8();
+		QByteArray errorMessage = QStringLiteral("Object data metainfo is not Serializable").toUtf8();
 		SendErrorMessage(0, errorMessage);
 
 		return false;
@@ -50,7 +50,7 @@ bool CSerializableObjectCollectionControllerComp::SerializeObject(
 	}
 
 	if (!serializableObject->Serialize(*archivePtr.GetPtr())){
-		QByteArray errorMessage = QString("Error when serializing an object").toUtf8();
+		QByteArray errorMessage = QStringLiteral("Error when serializing an object").toUtf8();
 		SendErrorMessage(0, errorMessage);
 
 		return false;
@@ -68,7 +68,7 @@ bool CSerializableObjectCollectionControllerComp::DeSerializeObject(
 {
 	iser::ISerializable* serializableObject = dynamic_cast<iser::ISerializable*>(object);
 	if (serializableObject == nullptr){
-		QByteArray errorMessage = QString("Unable to deserialize object. Error: Object is not ISerializable").toUtf8();
+		QByteArray errorMessage = QStringLiteral("Unable to deserialize object. Error: Object is not ISerializable").toUtf8();
 		SendErrorMessage(0, errorMessage);
 
 		return false;
@@ -77,7 +77,7 @@ bool CSerializableObjectCollectionControllerComp::DeSerializeObject(
 	const int bufferSize = imtbase::narrow_cast<int>(objectData.length());
 	iser::CMemoryReadArchive archive(objectData.data(), bufferSize);
 	if (!serializableObject->Serialize(archive)){
-		QByteArray errorMessage = QString("Unable to deserialize object '%1'").arg(qPrintable(objectData)).toUtf8();
+		QByteArray errorMessage = QStringLiteral("Unable to deserialize object '%1'").arg(objectData).toUtf8();
 		SendErrorMessage(0, errorMessage);
 
 		return false;
@@ -113,7 +113,7 @@ QJsonObject CSerializableObjectCollectionControllerComp::GetMetaInfo(
 	QByteArray data;
 
 	if (!SerializeObject(metaInfo.GetPtr(), data)){
-		errorMessage = QString("Unable to get meta info for object with ID '%1'. Error: Serialization failed").arg(qPrintable(objectId));
+		errorMessage = QStringLiteral("Unable to get meta info for object with ID '%1'. Error: Serialization failed").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CSerializableObjectCollectionControllerComp");
 
 		return QJsonObject();
@@ -186,7 +186,7 @@ QJsonObject CSerializableObjectCollectionControllerComp::GetDataMetaInfo(
 	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
 
 	if (!SerializeObject(metaInfo.GetPtr(), data)){
-		errorMessage = QString("Unable to get a data meta info for object with ID '%1'. Error: Serialization failed").arg(qPrintable(objectId));
+		errorMessage = QStringLiteral("Unable to get a data meta info for object with ID '%1'. Error: Serialization failed").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CSerializableObjectCollectionControllerComp");
 		return QJsonObject();
 	}
@@ -218,9 +218,9 @@ QJsonObject CSerializableObjectCollectionControllerComp::GetObjectFromRequest(
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		iser::ISerializable* object = dynamic_cast<iser::ISerializable*>(dataPtr.GetPtr());
 		if (object == nullptr){
-			errorMessage =  QString("Unable to get object for command-ID '%1'. Error: Object with ID '%2' is invalid")
-						.arg(qPrintable(gqlRequest.GetCommandId()))
-						.arg(qPrintable(objectId)).toUtf8();
+			errorMessage =  QStringLiteral("Unable to get object for command-ID '%1'. Error: Object with ID '%2' is invalid")
+						.arg(gqlRequest.GetCommandId())
+						.arg(objectId).toUtf8();
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -238,9 +238,9 @@ QJsonObject CSerializableObjectCollectionControllerComp::GetObjectFromRequest(
 
 		if (archivePtr.IsValid()){
 			if (!object->Serialize(*archivePtr.GetPtr())){
-				errorMessage = QString("Unable to get object for command-ID '%1'. Error: Object with ID '%2' cannot be serialized")
-							.arg(qPrintable(gqlRequest.GetCommandId()))
-							.arg(qPrintable(objectId)).toUtf8();
+				errorMessage = QStringLiteral("Unable to get object for command-ID '%1'. Error: Object with ID '%2' cannot be serialized")
+							.arg(gqlRequest.GetCommandId())
+							.arg(objectId).toUtf8();
 				SendErrorMessage(0, errorMessage);
 
 				return QJsonObject();
@@ -251,9 +251,9 @@ QJsonObject CSerializableObjectCollectionControllerComp::GetObjectFromRequest(
 		}
 	}
 	else{
-		errorMessage = QString("Unable to get object for command-ID '%1'. Error: Object with ID '%2' not found")
-				.arg(qPrintable(gqlRequest.GetCommandId()))
-				.arg(qPrintable(objectId)).toUtf8();
+		errorMessage = QStringLiteral("Unable to get object for command-ID '%1'. Error: Object with ID '%2' not found")
+				.arg(gqlRequest.GetCommandId())
+				.arg(objectId).toUtf8();
 
 		return QJsonObject();
 	}
@@ -275,7 +275,7 @@ istd::IChangeableUniquePtr CSerializableObjectCollectionControllerComp::CreateOb
 
 	const imtgql::CGqlParamObject* inputObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputObjectPtr == nullptr){
-		errorMessage = QString("Unable to create object from request. Error: GraphQL input parameters is invalid");
+		errorMessage = QStringLiteral("Unable to create object from request. Error: GraphQL input parameters is invalid");
 		SendErrorMessage(0, errorMessage);
 
 		return nullptr;
@@ -285,7 +285,7 @@ istd::IChangeableUniquePtr CSerializableObjectCollectionControllerComp::CreateOb
 	QByteArray objectData64 = inputObjectPtr->GetParamArgumentValue("item").toByteArray();
 	QByteArray objectData = QByteArray::fromBase64(objectData64);
 	if (objectData.isEmpty()){
-		errorMessage = QString("Unable to create object from request. Error: 'item' from input params is empty");
+		errorMessage = QStringLiteral("Unable to create object from request. Error: 'item' from input params is empty");
 		SendErrorMessage(0, errorMessage);
 
 		return nullptr;
@@ -299,7 +299,7 @@ istd::IChangeableUniquePtr CSerializableObjectCollectionControllerComp::CreateOb
 
 	istd::IChangeableUniquePtr objectPtr = m_objectFactCompPtr.CreateInstance(index);
 	if (!objectPtr.IsValid()){
-		errorMessage = QString("Unable to create object from request. Error: Object is invalid");
+		errorMessage = QStringLiteral("Unable to create object from request. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage);
 
 		return nullptr;
@@ -320,7 +320,7 @@ bool CSerializableObjectCollectionControllerComp::UpdateObjectFromRequest(
 {
 	const imtgql::CGqlParamObject* inputObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputObjectPtr == nullptr){
-		errorMessage = QString("Unable to create object from request. Error: GraphQL input parameters is invalid");
+		errorMessage = QStringLiteral("Unable to create object from request. Error: GraphQL input parameters is invalid");
 		SendErrorMessage(0, errorMessage);
 
 		return false;
@@ -329,7 +329,7 @@ bool CSerializableObjectCollectionControllerComp::UpdateObjectFromRequest(
 	QByteArray objectData64 = inputObjectPtr->GetParamArgumentValue("item").toByteArray();
 	QByteArray objectData = QByteArray::fromBase64(objectData64);
 	if (objectData.isEmpty()){
-		errorMessage = QString("Unable to create object from request. Error: 'item' from input params is empty");
+		errorMessage = QStringLiteral("Unable to create object from request. Error: 'item' from input params is empty");
 		SendErrorMessage(0, errorMessage);
 
 		return false;
@@ -405,7 +405,7 @@ QJsonObject CSerializableObjectCollectionControllerComp::GetObjectListFromReques
 			itemObj.insert(QStringLiteral("metaInfo"), QJsonValue::fromVariant(serializedMetaIndoData.toBase64()));
 		}
 		else{
-			SendWarningMessage(0, QString("Unable to set meta info for element '%1'. Error: Meta info serialization failed").arg(qPrintable(id)), "CSerializableObjectCollectionControllerComp");
+			SendWarningMessage(0, QStringLiteral("Unable to set meta info for element '%1'. Error: Meta info serialization failed").arg(id), "CSerializableObjectCollectionControllerComp");
 		}
 
 		serializedMetaIndoData.clear();
@@ -415,7 +415,7 @@ QJsonObject CSerializableObjectCollectionControllerComp::GetObjectListFromReques
 			itemObj.insert(QStringLiteral("dataMetaInfo"), QJsonValue::fromVariant(serializedMetaIndoData.toBase64()));
 		}
 		else{
-			SendWarningMessage(0, QString("Unable to set data meta info for element '%1'. Error: Data meta info serialization failed").arg(qPrintable(id)), "CSerializableObjectCollectionControllerComp");
+			SendWarningMessage(0, QStringLiteral("Unable to set data meta info for element '%1'. Error: Data meta info serialization failed").arg(id), "CSerializableObjectCollectionControllerComp");
 		}
 
 		itemsArray.append(itemObj);

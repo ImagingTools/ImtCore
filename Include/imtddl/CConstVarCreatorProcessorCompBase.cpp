@@ -27,7 +27,7 @@ bool CConstVarCreatorProcessorCompBase::OpenFile(const QString& filePath, QFile&
 	QFileInfo fileInfo(filePath);
 
 	if (!istd::CSystem::EnsurePathExists(fileInfo.dir().absolutePath())){
-		SendErrorMessage(__LINE__, QT_TR_NOOP(QString("Cannot create path to file %1").arg(filePath)));
+		SendErrorMessage(__LINE__, QT_TR_NOOP(QStringLiteral("Cannot create path to file %1").arg(filePath)));
 
 		return false;
 	}
@@ -35,7 +35,7 @@ bool CConstVarCreatorProcessorCompBase::OpenFile(const QString& filePath, QFile&
 	file.setFileName(filePath);
 
 	if (!file.open(openMode)){
-		SendErrorMessage(__LINE__, QT_TR_NOOP(QString("Cannot read file '%1'; Error: '%2'").arg(file.fileName(), file.errorString())));
+		SendErrorMessage(__LINE__, QT_TR_NOOP(QStringLiteral("Cannot read file '%1'; Error: '%2'").arg(file.fileName(), file.errorString())));
 
 		return false;
 	}
@@ -142,7 +142,7 @@ iproc::IProcessor::TaskState CConstVarCreatorProcessorCompBase::DoProcessing(
 		QFile templateFile(fileInfo.filePath());
 
 		if (!templateFile.open(QFile::ReadOnly)){
-			SendErrorMessage(__LINE__, QT_TR_NOOP(QString("Cannot read file '%1'; Error: '%2'").arg(templateFile.fileName(), templateFile.errorString())));
+			SendErrorMessage(__LINE__, QT_TR_NOOP(QStringLiteral("Cannot read file '%1'; Error: '%2'").arg(templateFile.fileName(), templateFile.errorString())));
 
 			return TS_INVALID;
 		}
@@ -152,7 +152,7 @@ iproc::IProcessor::TaskState CConstVarCreatorProcessorCompBase::DoProcessing(
 		QJsonDocument templateDocument = QJsonDocument::fromJson(fileData, &jsonParseError);
 
 		if (jsonParseError.error != QJsonParseError::NoError){
-			SendErrorMessage(__LINE__, QT_TR_NOOP(QString("The document template is invalid. Error: '%1'").arg(jsonParseError.errorString())));
+			SendErrorMessage(__LINE__, QT_TR_NOOP(QStringLiteral("The document template is invalid. Error: '%1'").arg(jsonParseError.errorString())));
 
 			return TS_INVALID;
 		}

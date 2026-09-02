@@ -64,13 +64,13 @@ bool CUserChangeGeneratorComp::CompareDocuments(
 {
 	const imtauth::CUserInfo* oldUserInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(&oldDocument);
 	if (oldUserInfoPtr == nullptr){
-		errorMessage = QString("Unable to compare users. Error: old user is invalid");
+		errorMessage = QStringLiteral("Unable to compare users. Error: old user is invalid");
 		return false;
 	}
 
 	const imtauth::CUserInfo* newUserInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(&newDocument);
 	if (newUserInfoPtr == nullptr){
-		errorMessage = QString("Unable to compare users. Error: New user is invalid");
+		errorMessage = QStringLiteral("Unable to compare users. Error: New user is invalid");
 		return false;
 	}
 

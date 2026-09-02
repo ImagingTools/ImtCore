@@ -524,7 +524,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 								lookupField.SetType(sdlType);
 								std::shared_ptr<imtsdl::CSdlEntryBase> foundType = GetSdlTypeOrEnumOrUnionForField(lookupField, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false));
 								if (!foundType){
-									SendCriticalMessage(0, QString("Unable to find type %1").arg(sdlType));
+									SendCriticalMessage(0, QStringLiteral("Unable to find type %1").arg(sdlType));
 									I_CRITICAL();
 								}
 								stream << convertedType << QStringLiteral("Object *newObjectPtr = new ");

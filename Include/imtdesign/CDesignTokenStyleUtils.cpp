@@ -160,7 +160,7 @@ QPalette CDesignTokenStyleUtils::GetPaletteFromMultiEntry(const QJsonValue& styl
 							palette.setColor(colorRoleGroup, s_colorRolesNamesMap[roleName], color);
 						}
 						else{
-							qDebug() << QString("Color value: '%1' could not be set").arg(colorTextValue);
+							qDebug() << QStringLiteral("Color value: '%1' could not be set").arg(colorTextValue);
 						}
 					}
 				}
@@ -299,7 +299,7 @@ bool CDesignTokenStyleUtils::GetColorRoleGroup(const QString& name, QPalette::Co
 
 	for(const QString& groupName: groupNames){
 
-		QRegularExpression groupRegEx(QString("^" + groupName), QRegularExpression::PatternOption::CaseInsensitiveOption);
+		QRegularExpression groupRegEx(QString('^' + groupName), QRegularExpression::PatternOption::CaseInsensitiveOption);
 		QRegularExpressionMatchIterator globalMatch = groupRegEx.globalMatch(name);
 
 		if(globalMatch.hasNext()){

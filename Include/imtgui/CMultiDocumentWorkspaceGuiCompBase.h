@@ -99,9 +99,9 @@ protected:
 
 protected Q_SLOTS:
 	virtual void UpdateCommands();
-	void OnNew();
-	void OnOpen();
-	void OnSaveDocumentAs();
+	virtual void OnNew();
+	virtual void OnOpen();
+	virtual void OnSaveDocumentAs();
 	virtual void OnCloseDocument();
 	virtual void OnUndo();
 	virtual void OnRedo();

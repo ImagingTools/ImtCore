@@ -136,15 +136,15 @@ QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId,
 	}
 
 	if (userId.isEmpty() || tenantId.isEmpty()){
-		SendErrorMessage(0, QString("Cannot add membership: userId or tenantId is empty (userId='%1', tenantId='%2')")
-			.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId)), "CTenantMembershipManagerComp");
+		SendErrorMessage(0, QStringLiteral("Cannot add membership: userId or tenantId is empty (userId='%1', tenantId='%2')")
+			.arg(userId, tenantId), QStringLiteral("CTenantMembershipManagerComp"));
 		return QByteArray();
 	}
 
 	// Check if membership already exists
 	if (FindMembership(userId, tenantId).IsValid()){
-		SendErrorMessage(0, QString("User '%1' is already a member of tenant '%2'")
-			.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId)), "CTenantMembershipManagerComp");
+		SendErrorMessage(0, QStringLiteral("User '%1' is already a member of tenant '%2'")
+			.arg(userId, tenantId), QStringLiteral("CTenantMembershipManagerComp"));
 		return QByteArray();
 	}
 
@@ -178,8 +178,8 @@ QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId,
 		m_bindingManagerCompPtr->AddBinding(tenantId, entityType, userId);
 	}
 
-	SendInfoMessage(0, QString("Added membership for user '%1' in tenant '%2'")
-		.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId)), "CTenantMembershipManagerComp");
+	SendInfoMessage(0, QStringLiteral("Added membership for user '%1' in tenant '%2'")
+		.arg(userId, tenantId), QStringLiteral("CTenantMembershipManagerComp"));
 
 	return membershipId;
 }
@@ -193,7 +193,7 @@ bool CTenantMembershipManagerComp::RemoveMembership(const QByteArray& membership
 	}
 
 	if (IsOwnerMembership(membershipId)){
-		SendErrorMessage(0, QString("Cannot remove the tenant owner's membership (membership '%1')").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
+		SendErrorMessage(0, QStringLiteral("Cannot remove the tenant owner's membership (membership '%1')").arg(membershipId), QStringLiteral("CTenantMembershipManagerComp"));
 		return false;
 	}
 
@@ -214,7 +214,7 @@ bool CTenantMembershipManagerComp::RemoveMembership(const QByteArray& membership
 	istd::CChangeNotifier changeNotifier(this);
 
 	if (!m_membershipCollectionCompPtr->RemoveElements({membershipId})){
-		SendErrorMessage(0, QString("Failed to remove membership '%1'").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
+		SendErrorMessage(0, QStringLiteral("Failed to remove membership '%1'").arg(membershipId), "CTenantMembershipManagerComp");
 		return false;
 	}
 
@@ -222,17 +222,17 @@ bool CTenantMembershipManagerComp::RemoveMembership(const QByteArray& membership
 	if (m_bindingManagerCompPtr.IsValid() && !userId.isEmpty() && !tenantId.isEmpty()){
 		QByteArray entityType = m_bindingEntityTypeAttrPtr.IsValid() ? *m_bindingEntityTypeAttrPtr : QByteArrayLiteral("Users");
 		if (!m_bindingManagerCompPtr->RemoveBinding(tenantId, entityType, userId)){
-			SendWarningMessage(0, QString("Failed to clean up TenantEntityBindings for user '%1' in tenant '%2'")
+			SendWarningMessage(0, QStringLiteral("Failed to clean up TenantEntityBindings for user '%1' in tenant '%2'")
 				.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId)), "CTenantMembershipManagerComp");
 		}
 	}
 
 	if (!CleanupTenantAssignedUserData(userId, tenantId)) {
-		SendWarningMessage(0, QString("Failed to fully clean up tenant-assigned user data for user '%1' in tenant '%2'")
+		SendWarningMessage(0, QStringLiteral("Failed to fully clean up tenant-assigned user data for user '%1' in tenant '%2'")
 			.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId)), "CTenantMembershipManagerComp");
 	}
 
-	SendInfoMessage(0, QString("Removed membership '%1'").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
+	SendInfoMessage(0, QStringLiteral("Removed membership '%1'").arg(membershipId), "CTenantMembershipManagerComp");
 
 	return true;
 }
@@ -247,7 +247,7 @@ bool CTenantMembershipManagerComp::UpdateMembershipOrganizationPermissions(const
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_membershipCollectionCompPtr->GetObjectData(membershipId, dataPtr)){
-		SendErrorMessage(0, QString("Membership '%1' not found").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
+		SendErrorMessage(0, QStringLiteral("Membership '%1' not found").arg(membershipId), "CTenantMembershipManagerComp");
 		return false;
 	}
 
@@ -262,11 +262,11 @@ bool CTenantMembershipManagerComp::UpdateMembershipOrganizationPermissions(const
 	membershipPtr->SetOrganizationPermissions(permissions);
 
 	if (!m_membershipCollectionCompPtr->SetObjectData(membershipId, *membershipPtr)){
-		SendErrorMessage(0, QString("Failed to update membership '%1' permissions").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
+		SendErrorMessage(0, QStringLiteral("Failed to update membership '%1' permissions").arg(membershipId), "CTenantMembershipManagerComp");
 		return false;
 	}
 
-	SendInfoMessage(0, QString("Updated organization permissions for membership '%1'").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
+	SendInfoMessage(0, QStringLiteral("Updated organization permissions for membership '%1'").arg(membershipId), "CTenantMembershipManagerComp");
 
 	return true;
 }

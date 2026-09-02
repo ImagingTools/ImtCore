@@ -65,12 +65,12 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 	}
 
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to change password for user '%1'. Error: The user does not exist").arg(qPrintable(login));
+		errorMessage = QStringLiteral("Unable to change password for user '%1'. Error: The user does not exist").arg(login);
 		return sdl::V1_0::imtauth::CChangePasswordPayload();
 	}
 
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to change password for user '%1'. Error: The user does not exist").arg(qPrintable(login));
+		errorMessage = QStringLiteral("Unable to change password for user '%1'. Error: The user does not exist").arg(login);
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
 		return sdl::V1_0::imtauth::CChangePasswordPayload();
@@ -79,7 +79,7 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
 		if (systemInfo.enabled && !systemInfo.systemId.isEmpty()){
-			errorMessage = QString("Unable to change password for user '%1'. Error: A user from an external system").arg(qPrintable(login));
+			errorMessage = QStringLiteral("Unable to change password for user '%1'. Error: A user from an external system").arg(login);
 			SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
 			return sdl::V1_0::imtauth::CChangePasswordPayload();
@@ -108,7 +108,7 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 	}
 
 	if (!ok){
-		errorMessage = QString("Unable to change password for user '%1'. Error: Invalid login or password.").arg(qPrintable(login));
+		errorMessage = QStringLiteral("Unable to change password for user '%1'. Error: Invalid login or password.").arg(login);
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
 		return sdl::V1_0::imtauth::CChangePasswordPayload();
@@ -123,7 +123,7 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 	}
 
 	if (!m_userCollectionCompPtr->SetObjectData(userId, *userInfoPtr, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
-		errorMessage = QString("Unable to change password for user '%1'").arg(qPrintable(login));
+		errorMessage = QStringLiteral("Unable to change password for user '%1'").arg(login);
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
 		return sdl::V1_0::imtauth::CChangePasswordPayload();
@@ -158,7 +158,7 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 
 	sdl::V1_0::imtauth::RegisterUserRequestArguments arguments = registerUserRequest.GetRequestedArguments();
 	if (!arguments.input->userData){
-		errorMessage = QString("Unable to register user. Error: User data is invalid");
+		errorMessage = QStringLiteral("Unable to register user. Error: User data is invalid");
 		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
@@ -195,7 +195,7 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 	userIdentifierPtr->SetObjectUuid(userId);
 
 	if (!m_userRepresentationController.FillUserInfoFromRepresentation(userData, *userInfoPtr, m_userCollectionCompPtr.GetPtr(), userId, errorMessage)){
-		errorMessage = QString("Unable to register user. Error: %1").arg(errorMessage);
+		errorMessage = QStringLiteral("Unable to register user. Error: %1").arg(errorMessage);
 
 		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
@@ -209,13 +209,13 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 	}
 
 	if (password.isEmpty()){
-		errorMessage = QString("Unable to register user. Error: password cannot be empty");
+		errorMessage = QStringLiteral("Unable to register user. Error: password cannot be empty");
 
 		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
 	if (!userData.username){
-		errorMessage = QString("Unable to register user. Error: Invalid username");
+		errorMessage = QStringLiteral("Unable to register user. Error: Invalid username");
 
 		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
@@ -244,7 +244,7 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 
 	QByteArray objectId = m_userCollectionCompPtr->InsertNewObject("User", userInfoPtr->GetName(), "", userInfoPtr.GetPtr(), userId);
 	if (objectId.isEmpty()){
-		errorMessage = QString("Unable to register user. Error: Insert object to collection failed");
+		errorMessage = QStringLiteral("Unable to register user. Error: Insert object to collection failed");
 		SendWarningMessage(0, errorMessage, "CUserControllerComp");
 
 		return sdl::V1_0::imtauth::CRegisterUserPayload();
@@ -284,7 +284,7 @@ sdl::V1_0::imtauth::CCheckEmailPayload CUserControllerComp::OnCheckEmail(
 	}
 
 	if (email.isEmpty()){
-		response.message = QString("Unable to check email. Error: email is empty");
+		response.message = QStringLiteral("Unable to check email. Error: email is empty");
 
 		return retVal;
 	}
@@ -298,7 +298,7 @@ sdl::V1_0::imtauth::CCheckEmailPayload CUserControllerComp::OnCheckEmail(
 	}
 
 	if (userInfoPtr == nullptr){
-		response.message = QString("There are no users with email '%1' in the system").arg(email);
+		response.message = QStringLiteral("There are no users with email '%1' in the system").arg(email);
 		return retVal;
 	}
 
@@ -335,7 +335,7 @@ sdl::V1_0::imtauth::CSendEmailCodePayload CUserControllerComp::OnSendEmailCode(
 	QByteArray objectId = GetUserIdByLogin(login);
 	imtauth::IUserInfoSharedPtr userInfoPtr = GetUserInfoByLogin(login);
 	if (!userInfoPtr.IsValid()){
-		response.message = QString("Unable to send email code. Error: User is invalid");
+		response.message = QStringLiteral("Unable to send email code. Error: User is invalid");
 	}
 	else{
 		bool ok = SendUserCode(objectId, *userInfoPtr.GetPtr());
@@ -343,7 +343,7 @@ sdl::V1_0::imtauth::CSendEmailCodePayload CUserControllerComp::OnSendEmailCode(
 			response.success = ok;
 		}
 		else{
-			response.message = QString("Unable to send email code. Error: Unknown error");
+			response.message = QStringLiteral("Unable to send email code. Error: Unknown error");
 		}
 	}
 
@@ -448,7 +448,7 @@ sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperus
 
 	imtauth::IUserInfoSharedPtr userInfoPtr = GetUserInfoByLogin("su");
 	if (userInfoPtr.IsValid()){
-		response.message = QString("Superuser already exists");
+		response.message = QStringLiteral("Superuser already exists");
 
 		return retVal;
 	}
@@ -470,7 +470,7 @@ sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperus
 	}
 
 	if (mail.isEmpty()){
-		response.message = QString("Unable to create superuser with empty email");
+		response.message = QStringLiteral("Unable to create superuser with empty email");
 		return retVal;
 	}
 
@@ -480,7 +480,7 @@ sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperus
 	}
 
 	if (password.isEmpty()){
-		response.message = QString("Unable to create superuser with empty password");
+		response.message = QStringLiteral("Unable to create superuser with empty password");
 		return retVal;
 	}
 
@@ -517,7 +517,7 @@ sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperus
 
 	QByteArray result = m_userCollectionCompPtr->InsertNewObject("User", "superuser", "System administrator", superuserInfoPtr.GetPtr(), objectId);
 	if (result.isEmpty()){
-		response.message = QString("Unable to insert superuser to user collection");
+		response.message = QStringLiteral("Unable to insert superuser to user collection");
 		return retVal;
 	}
 
@@ -536,12 +536,12 @@ sdl::V1_0::imtauth::CUserObjectId CUserControllerComp::OnGetUserObjectId(
 
 	sdl::V1_0::imtauth::GetUserObjectIdRequestArguments arguments = getUserObjectIdRequest.GetRequestedArguments();
 	if (!arguments.input.HasValue()){
-		errorMessage = QString("Unable to get user object-ID. Error: GraphQL version is invalid");
+		errorMessage = QStringLiteral("Unable to get user object-ID. Error: GraphQL version is invalid");
 		return response;
 	}
 
 	if (!arguments.input->login.HasValue()){
-		errorMessage = QString("Unable to get user object-ID. Error: Login field is invalid");
+		errorMessage = QStringLiteral("Unable to get user object-ID. Error: Login field is invalid");
 		return response;
 	}
 
@@ -588,7 +588,7 @@ bool CUserControllerComp::SendUserCode(const QByteArray& userId, const imtauth::
 	if (ok){
 		if (!m_userVerificationCodeSenderCompPtr->SendCode(userInfo, userVerification.GetVerificationCode())){
 			SendErrorMessage(0,
-							QString("Unable to send verification code to '%1' for user '%2'. Error: Unknown error")
+							QStringLiteral("Unable to send verification code to '%1' for user '%2'. Error: Unknown error")
 								.arg(userInfo.GetMail(), userInfo.GetName()),
 							"CUserControllerComp");
 

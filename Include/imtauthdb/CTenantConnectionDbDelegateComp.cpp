@@ -18,10 +18,10 @@ namespace imtauthdb
 static QString NullableSqlDateTime(const QString& value)
 {
 	if (value.isEmpty()){
-		return QStringLiteral("NULL");
+		return imtdb::NULL_DATA_LITERAL;
 	}
 
-	return QString("'%1'").arg(imtdb::EscapeSql(value));
+	return QStringLiteral("'%1'").arg(imtdb::EscapeSql(value));
 }
 
 
@@ -141,10 +141,10 @@ QByteArray CTenantConnectionDbDelegateComp::CreateDeleteObjectsQuery(
 
 	QStringList escapedIds;
 	for (const QByteArray& id : objectIds){
-		escapedIds << QString("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
+		escapedIds << QStringLiteral("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
 	}
 
-	return QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
+	return QStringLiteral(R"(DELETE FROM "%1" WHERE "Id" IN (%2);)")
 			.arg(*m_tableNameAttrPtr, escapedIds.join(", ")).toUtf8();
 }
 

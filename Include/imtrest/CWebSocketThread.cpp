@@ -149,7 +149,7 @@ void CWebSocketThread::ProcessTextMessage(const QString& textMessage)
 		return;
 	}
 
-	QString message = QString("Web socket text message received: %1").arg(textMessage);
+	QString message = QStringLiteral("Web socket text message received: %1").arg(textMessage);
 	m_server->SendVerboseMessage(message, "CWebSocketServerComp");
 
 	imtrest::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*m_requestServerHandlerPtr);
@@ -279,7 +279,7 @@ void CWebSocketThread::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
 		return;
 	}
 
-	QString message = QString("Web socket binary message received: '%1'").arg(qPrintable(dataMessage));
+	QString message = QStringLiteral("Web socket binary message received: '%1'").arg(dataMessage);
 	m_server->SendInfoMessage(0, message, "CWebSocketServerComp");
 }
 
@@ -293,7 +293,7 @@ void CWebSocketThread::OnError(QAbstractSocket::SocketError error)
 
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 	if (webSocketPtr != nullptr && m_server != nullptr){
-		QString errorMessage = QString("Web socket server error: '%1'").arg(webSocketPtr->errorString());
+		QString errorMessage = QStringLiteral("Web socket server error: '%1'").arg(webSocketPtr->errorString());
 
 		m_server->SendErrorMessage(0, errorMessage, "CWebSocketServerComp");
 	}
@@ -306,7 +306,7 @@ void CWebSocketThread::OnTimeout()
 	if (webSocketPtr.isNull()){
 		return;
 	}
-	webSocketPtr->sendTextMessage(QString(R"({"type": "ka"})"));
+	webSocketPtr->sendTextMessage(QStringLiteral(R"({"type": "ka"})"));
 }
 
 

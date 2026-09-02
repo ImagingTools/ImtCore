@@ -56,9 +56,9 @@ QByteArray CSqliteJsonDatabaseDelegateComp::GetSelectionQuery(
 
 	// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
 	QString retVal = baseSelelectionQuery;
-	retVal += QString(" ") + filterQuery;
-	retVal += QString(" ") + sortQuery;
-	retVal += QString(" ") + qPrintable(paginationQuery);
+	retVal += QStringLiteral(" ") + filterQuery;
+	retVal += QStringLiteral(" ") + sortQuery;
+	retVal += QStringLiteral(" ") + QString(paginationQuery);
 
 	return retVal.toUtf8();
 }
@@ -86,10 +86,10 @@ bool CSqliteJsonDatabaseDelegateComp::CreateSortQuery(const imtbase::ICollection
 
 	if (!columnId.isEmpty() && !sortOrder.isEmpty()){
 		if (columnId == "LastModified" || columnId == "Added"){
-			sortQuery = QString("ORDER BY \"%1\" %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
+			sortQuery = QStringLiteral(R"(ORDER BY "%1" %2)").arg(columnId, sortOrder);
 		}
 		else{
-			sortQuery = QString("ORDER BY json_extract(\"Document\",'$.%1') %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
+			sortQuery = QStringLiteral(R"(ORDER BY json_extract("Document",'$.%1') %2)").arg(columnId, sortOrder);
 		}
 	}
 
@@ -120,7 +120,7 @@ bool CSqliteJsonDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParam
 			}
 
 			QString value = textParamPtr->GetText();
-			filterQuery += QString("json_extract(\"Document\",'$.%1') = '%2'").arg(qPrintable(key)).arg(SqlEncode(value));
+			filterQuery += QStringLiteral(R"(json_extract("Document",'$.%1') = '%2')").arg(key, SqlEncode(value));
 		}
 	}
 
@@ -138,12 +138,12 @@ bool CSqliteJsonDatabaseDelegateComp::CreateTextFilterQuery(const imtbase::IColl
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
 		QString encodedFilter = SqlEncode(textFilter);
-		textFilterQuery = QString("json_extract(\"Document\",'$.%1') LIKE '%%2%'").arg(qPrintable(filteringColumnIds.first())).arg(encodedFilter);
+		textFilterQuery = QStringLiteral(R"(json_extract("Document",'$.%1') LIKE '%%2%')").arg(filteringColumnIds.first(), encodedFilter);
 
 		for (int i = 1; i < filteringColumnIds.count(); ++i){
 			textFilterQuery += " OR ";
 
-			textFilterQuery += QString("json_extract(\"Document\",'$.%1') LIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(encodedFilter);
+			textFilterQuery += QStringLiteral(R"(json_extract("Document",'$.%1') LIKE '%%2%')").arg(filteringColumnIds[i], encodedFilter);
 		}
 	}
 
@@ -156,7 +156,7 @@ bool CSqliteJsonDatabaseDelegateComp::CreatePaginationQuery(int offset, int coun
 	paginationQuery.clear();
 
 	if (offset >= 0 && count > 0){
-		paginationQuery = QString("LIMIT %1 OFFSET %2").arg(count).arg(offset).toUtf8();
+		paginationQuery = QStringLiteral("LIMIT %1 OFFSET %2").arg(count, offset).toUtf8();
 	}
 
 	return true;
@@ -180,38 +180,36 @@ QByteArray CSqliteJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteA
 				imtcol::IDocumentCollectionFilter::DocumentStates states = documentFilterParamPtr->GetDocumentStates();
 
 				if (states.contains(imtcol::IDocumentCollectionFilter::DS_ACTIVE)){
-					stateDocumentFilter += QString("\"IsActive\" = true");
+					stateDocumentFilter += QStringLiteral(R"("IsActive" = true)");
 				}
 
 				if (states.contains(imtcol::IDocumentCollectionFilter::DS_INACTIVE)){
 					if (!stateDocumentFilter.isEmpty()){
-						stateDocumentFilter += QString(" OR ");
+						stateDocumentFilter += QStringLiteral(" OR ");
 					}
 
-					stateDocumentFilter += QString("\"IsActive\" = false");
+					stateDocumentFilter += QStringLiteral(R"("IsActive" = false)");
 				}
 			}
 		}
 	}
 
 	if (stateDocumentFilter.isEmpty()){
-		stateDocumentFilter = QString("\"IsActive\" = true");
+		stateDocumentFilter = QStringLiteral(R"("IsActive" = true)");
 	}
 
 	QString schemaPrefix;
 	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
+		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
 	}
 
-	return QString("SELECT * FROM %0\"%1\" WHERE (%2) AND \"%3\" = '%4' ORDER BY \"RevisionNumber\" DESC;")
+	return QStringLiteral(R"(SELECT * FROM %0"%1" WHERE (%2) AND "%3" = '%4' ORDER BY "RevisionNumber" DESC;)")
 		.arg(schemaPrefix)
-		.arg(qPrintable(*m_tableNameAttrPtr))
+		.arg(*m_tableNameAttrPtr)
 		.arg(stateDocumentFilter)
-		.arg(qPrintable(*m_objectIdColumnAttrPtr))
-		.arg(qPrintable(objectId)).toUtf8();
+		.arg(*m_objectIdColumnAttrPtr)
+		.arg(objectId).toUtf8();
 }
 
 
 } // namespace imtdb
-
-

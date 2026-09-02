@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtdb/CSqlDatabaseDocumentDelegateComp.h>
+#include <imtdb/CSqlDatabaseDocumentDelegateCompBase.h>
 #include <imtbase/CTreeItemModel.h>
 
 
@@ -11,10 +11,10 @@ namespace imtdb
 {
 
 
-class CSqlJsonDatabaseDelegateComp: public imtdb::CSqlDatabaseDocumentDelegateComp
+class CSqlJsonDatabaseDelegateComp: public imtdb::CSqlDatabaseDocumentDelegateCompBase
 {
 public:
-	typedef imtdb::CSqlDatabaseDocumentDelegateComp BaseClass;
+	typedef imtdb::CSqlDatabaseDocumentDelegateCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSqlJsonDatabaseDelegateComp)
 		I_ASSIGN(m_isMultiTypeAttrPtr, "IsMultiType", "Is document multitype supported", true, false);
@@ -48,7 +48,7 @@ public:
 				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual QByteArray GetCountQuery(const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
-	// reimplemented (imtdb::CSqlDatabaseDocumentDelegateComp)
+	// reimplemented (imtdb::CSqlDatabaseDocumentDelegateCompBase)
 	virtual QString GetBaseSelectionQuery() const override;
 	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
@@ -57,7 +57,7 @@ public:
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual bool CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const override;
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
-	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& timeFieldId = QStringLiteral("root1.\"TimeStamp\"")) const override;
+	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& timeFieldId = QStringLiteral(R"(root1."TimeStamp")")) const override;
 	virtual QByteArray GetObjectSelectionQuery(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
 	// reimplemented (imtbase::IRevisionController)

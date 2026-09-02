@@ -340,7 +340,7 @@ void CConnectionCodesNotificationPublisherComp::PublishNotification(
 
 	const QByteArray commandId = m_commandIdsAttrPtr.IsValid() && m_commandIdsAttrPtr.GetCount() > 0
 		? m_commandIdsAttrPtr[0]
-		: QByteArray("OnConnectionCodesNotification");
+		: QByteArrayLiteral("OnConnectionCodesNotification");
 
 	// Filter: only push to subscribers whose context userId matches targetUserId.
 	PublishDataFiltered(commandId, data, [targetUserId](const imtgql::CGqlRequest& gqlRequest) -> bool {

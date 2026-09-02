@@ -42,6 +42,11 @@ I_EXPORT_COMPONENT(
 			"Database Document");
 
 I_EXPORT_COMPONENT(
+			SqlDatabaseBinaryDocumentDelegate,
+			"Binary delegate for the document-oriented tables",
+			"Database Document Binary");
+
+I_EXPORT_COMPONENT(
 			SqlDatabaseJsonDelegate,
 			"Delegate for the json document-oriented tables",
 			"Database Document Json SQL");

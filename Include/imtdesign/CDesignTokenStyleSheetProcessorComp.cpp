@@ -58,7 +58,7 @@ int CDesignTokenStyleSheetProcessorComp::Exec()
 		QVariantMap currentBasePalette;
 		m_designTokenFileParserCompPtr->GetStyleSheetColorPalette(styleName, palette);
 		m_designTokenFileParserCompPtr->GetBasePalette(styleName, currentBasePalette);
-		QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + QByteArray("Resources") + QDir::separator().toLatin1() + QByteArray("Styles") + QDir::separator().toLatin1() + styleName.constData();
+		QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + QByteArrayLiteral("Resources") + QDir::separator().toLatin1() + QByteArrayLiteral("Styles") + QDir::separator().toLatin1() + styleName.constData();
 
 		m_currentPalette = palette;
 		m_currentBasePalette = currentBasePalette;
@@ -148,7 +148,7 @@ bool CDesignTokenStyleSheetProcessorComp::ProcesCssFile(const QByteArray& fileNa
 	while (variableGlobalMatch.hasNext()){
 		QRegularExpressionMatch variableMatch = variableGlobalMatch.next();
 		SendErrorMessage(0,
-						 QString("The unsettled variable remains at: '%1' value : '%2'")
+						 QStringLiteral("The unsettled variable remains at: '%1' value : '%2'")
 							 .arg(QString::number(variableMatch.capturedStart()), variableMatch.captured()));
 
 		hasUnsettedValues = true;

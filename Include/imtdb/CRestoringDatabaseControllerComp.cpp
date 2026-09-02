@@ -39,7 +39,7 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
-		SendErrorMessage(0, QString("Unable to open file with name '%1'").arg(filePathTmp), "CRestoringDatabaseControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to open file with name '%1'").arg(filePathTmp), "CRestoringDatabaseControllerComp");
 
 		return false;
 	}
@@ -66,45 +66,45 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 			folder.mkdir(backupFolderPath);
 		}
 
-		QString fmt = "yyyyMMddhhmmss";
-		QString fileName = dbName + "_" + QDateTime::currentDateTime().toString(fmt);
+		QString fmt = QStringLiteral("yyyyMMddhhmmss");
+		QString fileName = dbName + QStringLiteral("_") + QDateTime::currentDateTime().toString(fmt);
 
-		QString fullPath = backupFolderPath + "/" + fileName;
+		QString fullPath = backupFolderPath + QStringLiteral("/") + fileName;
 
-		QString pgDumpCommand = QString("pg_dump -h %1 -U %2 -p %3 -b -v -f \"%4\" \"%5\"")
+		QString pgDumpCommand = QStringLiteral(R"(pg_dump -h %1 -U %2 -p %3 -b -v -f "%4" "%5")")
 									.arg(host, userName, QString::number(port), fullPath, dbName);
 
 		if (!ExecuteCommand(process, pgDumpCommand)){
-			SendErrorMessage(0, QString("Unable to execute command %1").arg(pgDumpCommand), "CRestoringDatabaseControllerComp");
+			SendErrorMessage(0, QStringLiteral("Unable to execute command %1").arg(pgDumpCommand), "CRestoringDatabaseControllerComp");
 
 			return false;
 		}
 	}
 
-	QString dropCommand = QString("psql -h %1 -U %2 -p %3 -c \"%4\"")
-							  .arg(host, userName, QString::number(port), QString("DROP DATABASE \"%1\" WITH (FORCE)").arg(dbName));
+	QString dropCommand = QStringLiteral(R"(psql -h %1 -U %2 -p %3 -c "%4")")
+							  .arg(host, userName, QString::number(port), QStringLiteral(R"(DROP DATABASE "%1" WITH (FORCE))").arg(dbName));
 
 	if (!ExecuteCommand(process, dropCommand)){
-		SendErrorMessage(0, QString("Unable to execute command %1").arg(dropCommand), "CRestoringDatabaseControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to execute command %1").arg(dropCommand), "CRestoringDatabaseControllerComp");
 
 		return false;
 	}
 
-	QString createCommand = QString("psql -h %1 -U %2 -p %3 -c \"%4\"")
-								.arg(host, userName, QString::number(port), QString("CREATE DATABASE \"%1\"").arg(dbName));
+	QString createCommand = QStringLiteral(R"(psql -h %1 -U %2 -p %3 -c "%4")")
+								.arg(host, userName, QString::number(port), QStringLiteral(R"(CREATE DATABASE "%1")").arg(dbName));
 
 	if (!ExecuteCommand(process, createCommand)){
-		SendErrorMessage(0, QString("Unable to execute command %1").arg(createCommand), "CRestoringDatabaseControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to execute command %1").arg(createCommand), "CRestoringDatabaseControllerComp");
 
 		return false;
 	}
 
-	QString pgRestoreCommand = QString("pg_restore -h %1 -U %2 -p %3 -d %4 \"%5\"")
+	QString pgRestoreCommand = QStringLiteral(R"(pg_restore -h %1 -U %2 -p %3 -d %4 "%5")")
 								   .arg(host, userName, QString::number(port), dbName, filePathTmp);
 
 
 	if (!ExecuteCommand(process, pgRestoreCommand)){
-		SendErrorMessage(0, QString("Unable to execute command %1").arg(pgRestoreCommand), "CRestoringDatabaseControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to execute command %1").arg(pgRestoreCommand), "CRestoringDatabaseControllerComp");
 
 		return false;
 	}
@@ -113,7 +113,7 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 	QByteArray output = process.readAllStandardOutput();
 
 	if (!error.isEmpty()){
-		SendErrorMessage(0, QString("Unable to restore database: %1").arg(qPrintable(error)), "CRestoringDatabaseControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to restore database: %1").arg(error), "CRestoringDatabaseControllerComp");
 
 		return false;
 	}
@@ -149,7 +149,7 @@ bool CRestoringDatabaseControllerComp::GetData(
 	}
 
 	if (*m_commandIdAttrPtr != dataId){
-		SendWarningMessage(0, QString("Unable to get data with command-ID %1").arg(qPrintable(dataId)), "CRestoringDatabaseControllerComp");
+		SendWarningMessage(0, QStringLiteral("Unable to get data with command-ID %1").arg(dataId), "CRestoringDatabaseControllerComp");
 
 		return false;
 	}
@@ -169,18 +169,18 @@ bool CRestoringDatabaseControllerComp::GetData(
 	QTemporaryDir tempDir;
 	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".backup";
 
-	QString pgDumpCommand = QString("pg_dump -h %1 -U %2 -p %3 -b -v -f \"%4\" \"%5\"")
+	QString pgDumpCommand = QStringLiteral(R"(pg_dump -h %1 -U %2 -p %3 -b -v -f "%4" "%5")")
 								.arg(host, userName, QString::number(port), filePathTmp, dbName);
 
 	if (!ExecuteCommand(process, pgDumpCommand)){
-		SendErrorMessage(0, QString("Unable to execute command %1").arg(pgDumpCommand), "CRestoringDatabaseControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to execute command %1").arg(pgDumpCommand), "CRestoringDatabaseControllerComp");
 
 		return false;
 	}
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::ReadOnly)){
-		SendErrorMessage(0, QString("Unable to open file with name %1").arg(filePathTmp), "CRestoringDatabaseControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to open file with name %1").arg(filePathTmp), "CRestoringDatabaseControllerComp");
 
 		return false;
 	}
@@ -208,5 +208,4 @@ bool CRestoringDatabaseControllerComp::ExecuteCommand(QProcess& process, const Q
 
 
 } // namespace imtdb
-
 

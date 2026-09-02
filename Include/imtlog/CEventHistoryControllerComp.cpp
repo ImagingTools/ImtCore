@@ -236,7 +236,7 @@ void CEventHistoryControllerComp::InitializeMessagesController(int id)
 				maxMessageCount,
 				savingPeriod,
 				cachingTime,
-				m_logFolderCompPtr->GetPath() + "/" + QString("%1").arg(id),
+				m_logFolderCompPtr->GetPath() + "/" + QStringLiteral("%1").arg(id),
 				"xml", "arc",
 				m_versionInfoCompPtr.GetPtr(),
 				m_compressorCompPtr.GetPtr(),

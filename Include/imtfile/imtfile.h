@@ -250,7 +250,7 @@
 	        // Generate timestamp-based archive name
 	        QString timestamp = QDateTime::currentDateTime()
 	            .toString("yyyyMMdd_hhmmss");
-	        QString archivePath = QString("backup_%1.zip").arg(timestamp);
+	        QString archivePath = QStringLiteral("backup_%1.zip").arg(timestamp);
 	        
 	        // Compress entire data directory
 	        return m_compression->CompressFolder(
@@ -283,7 +283,7 @@
 	        SaveReportToXml(report, tempFile);
 	        
 	        // Convert to target format
-	        QString outputFile = QString("report.%1").arg(format);
+	        QString outputFile = QStringLiteral("report.%1").arg(format);
 	        
 	        if (format == "json") {
 	            m_converter->SetAttribute("Persistence", m_jsonPersistence);
@@ -317,7 +317,7 @@
 	        }
 	        
 	        // Build resource path
-	        QString resourcePath = QString(":/resources/%1").arg(resourceId);
+	        QString resourcePath = QStringLiteral(":/resources/%1").arg(resourceId);
 	        
 	        // Load from file
 	        QByteArray resourceData;
@@ -371,7 +371,7 @@
 	        QString timestamp = QDateTime::currentDateTime()
 	            .toString("yyyyMMdd_hhmmss");
 	        QString archivePath = backupDir.filePath(
-	            QString("backup_%1.zip").arg(timestamp));
+	            QStringLiteral("backup_%1.zip").arg(timestamp));
 	        
 	        // Compress application data
 	        bool success = m_compression->CompressFolder(

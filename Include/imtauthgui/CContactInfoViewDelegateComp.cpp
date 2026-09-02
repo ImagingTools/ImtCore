@@ -27,29 +27,29 @@ bool CContactInfoViewDelegateComp::GetSummaryInformation(
 		SummaryInformation summaryInformation;
 		summaryInformation.infoId = informationId;
 		if (metaInfoPtr.IsValid()){
-			if (informationId == QByteArray("EMail")){
+			if (informationId == QByteArrayLiteral("EMail")){
 				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_MAIL).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
-			else if (informationId == QByteArray("Birthday")){
+			else if (informationId == QByteArrayLiteral("Birthday")){
 				QDate birthday = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_BIRTHDAY).toDate();
 				QLocale locale;
 				summaryInformation.text = locale.toString(birthday, QLocale::ShortFormat);
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
-			else if (informationId == QByteArray("FirstName")){
+			else if (informationId == QByteArrayLiteral("FirstName")){
 				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_FIRST_NAME).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
-			else if (informationId == QByteArray("LastName")){
+			else if (informationId == QByteArrayLiteral("LastName")){
 				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_LAST_NAME).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
-			else if (informationId == QByteArray("Nickname")){
+			else if (informationId == QByteArrayLiteral("Nickname")){
 				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_NICKNAME).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
@@ -83,16 +83,16 @@ void CContactInfoViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationTypes.InsertItem("EMail", tr("E-Mail"), "");
 	m_summaryInformationHeaders["EMail"] = HeaderInfo(true, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
-	m_summaryInformationTypes.InsertItem(QByteArray("Birthday"), tr("Birthday"), "");
+	m_summaryInformationTypes.InsertItem(QByteArrayLiteral("Birthday"), tr("Birthday"), "");
 	m_summaryInformationHeaders["Birthday"] = HeaderInfo(false);
 
-	m_summaryInformationTypes.InsertItem(QByteArray("FirstName"), tr("First Name"), "");
+	m_summaryInformationTypes.InsertItem(QByteArrayLiteral("FirstName"), tr("First Name"), "");
 	m_summaryInformationHeaders["FirstName"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
-	m_summaryInformationTypes.InsertItem(QByteArray("LastName"), tr("Last Name"), "");
+	m_summaryInformationTypes.InsertItem(QByteArrayLiteral("LastName"), tr("Last Name"), "");
 	m_summaryInformationHeaders["LastName"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
-	m_summaryInformationTypes.InsertItem(QByteArray("Nickname"), tr("Nickname"), "");
+	m_summaryInformationTypes.InsertItem(QByteArrayLiteral("Nickname"), tr("Nickname"), "");
 	m_summaryInformationHeaders["Nickname"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 }
 

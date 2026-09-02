@@ -40,7 +40,7 @@ bool CSdlClassCodeGeneratorComp::ProcessEntry (
 
 	// First create all files with basic methods
 	if (!BeginClassFiles(*sdlTypePtr, headerDevicePtr, sourceDevicePtr, paramsPtr)){
-		SendErrorMessage(0, QString("Unable to process files"));
+		SendErrorMessage(0, QStringLiteral("Unable to process files"));
 
 		return false;
 	}

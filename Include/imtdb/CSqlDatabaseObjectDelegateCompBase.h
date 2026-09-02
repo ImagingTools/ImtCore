@@ -39,7 +39,7 @@ public:
 	I_END_COMPONENT
 
 	virtual QString SqlEncode(const QString& sqlQuery) const;
-
+	
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
@@ -47,6 +47,12 @@ public:
 	virtual const iprm::IOptionsList* GetObjectTypeInfos() const override;
 	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
 	virtual QByteArray GetCountQuery(const iprm::IParamsSet* paramsPtr = nullptr) const override;
+	virtual NewObjectQuery CreateUpdateObjectQueryWithParameters(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
+				const imtbase::IOperationContext* operationContextPtr,
+				bool useExternDelegate = true) const override;
 	virtual QByteArray GetSelectionQuery(
 				const QByteArray& objectId = QByteArray(),
 				int offset = 0,
@@ -82,6 +88,7 @@ public:
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 
 protected:
+	virtual bool IsSqliteDriver() const;
 	virtual QString GetBaseSelectionQuery() const;
 	virtual idoc::IDocumentMetaInfo* CreateCollectionItemMetaInfo(const QByteArray& typeId) const;
 	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const;
@@ -93,7 +100,7 @@ protected:
 	virtual bool CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const;
 	virtual bool CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const;
 	virtual bool CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const;
-	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& timeFieldId = QStringLiteral("root1.\"TimeStamp\"")) const;
+	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& timeFieldId = QStringLiteral(R"(root1."TimeStamp")")) const;
 	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const;
 	virtual bool CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const;
 	virtual bool CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const;
@@ -115,5 +122,3 @@ protected:
 
 
 } // namespace imtdb
-
-

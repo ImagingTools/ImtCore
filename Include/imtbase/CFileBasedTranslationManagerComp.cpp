@@ -32,12 +32,12 @@ void CFileBasedTranslationManagerComp::LoadTranslations()
 				}
 			}
 
-			QString translatorFile = translationsPath + QString("/") + translationFilePrefix + QString("_") + languageId + QString(".qm");
+			QString translatorFile = translationsPath + QStringLiteral("/") + translationFilePrefix + QStringLiteral("_") + languageId + QStringLiteral(".qm");
 
 			istd::TDelPtr<QTranslator> qtTranslatorPtr(new QTranslator(qApp));
 
 			if (!qtTranslatorPtr->load(translatorFile)){
-				SendVerboseMessage(QString("Cannot load translator for: %1").arg(translatorFile), "TranslationManager");
+				SendVerboseMessage(QStringLiteral("Cannot load translator for: %1").arg(translatorFile), "TranslationManager");
 			}
 
 			Translator translator;

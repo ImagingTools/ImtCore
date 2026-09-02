@@ -59,7 +59,7 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 		}
 	}
 	if (!istd::CSystem::EnsurePathExists(outputDirectoryPath)){
-		SendErrorMessage(0, QString("Unable to create path '%1'").arg(outputDirectoryPath));
+		SendErrorMessage(0, QStringLiteral("Unable to create path '%1'").arg(outputDirectoryPath));
 		I_CRITICAL();
 
 		return TS_INVALID;
@@ -89,13 +89,13 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 		m_qmlFilePtr.SetPtr(new QFile(outputDirectoryPath + '/' + sdlType.GetName() + ".qml"));
 
 		if (!BeginQmlFile(sdlType)){
-			SendErrorMessage(0, QString("Unable to process files"));
+			SendErrorMessage(0, QStringLiteral("Unable to process files"));
 			return TS_INVALID;
 		}
 
 		// Close files so that extenders can make their own changes
 		if (!CloseFiles()){
-			SendErrorMessage(0, QString("Unable to close files"));
+			SendErrorMessage(0, QStringLiteral("Unable to close files"));
 			I_CRITICAL();
 
 			return TS_INVALID;
@@ -119,7 +119,7 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 	for (const imtsdl::CSdlType& sdlType: sdlTypeList){
 		m_qmlFilePtr.SetPtr(new QFile(outputDirectoryPath + '/' + sdlType.GetName() + ".qml"));
 		if (!ReOpenFiles()){
-			SendErrorMessage(0, QString("Unable to reopen files"));
+			SendErrorMessage(0, QStringLiteral("Unable to reopen files"));
 			I_CRITICAL();
 
 			return TS_INVALID;
@@ -133,7 +133,7 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 	QFile qmldirFile(outputDirectoryPath + "/qmldir");
 	if (!qmldirFile.open(QIODevice::WriteOnly)){
 		SendCriticalMessage(0,
-						 QString("Unable to open file: '%1'. Error: %2")
+						 QStringLiteral("Unable to open file: '%1'. Error: %2")
 							 .arg(qmldirFile.fileName(), qmldirFile.errorString()));
 		I_CRITICAL();
 
@@ -168,7 +168,7 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 	QFile qrcFile(qrcFilePath);
 	if (!qrcFile.open(QIODevice::WriteOnly)){
 		SendCriticalMessage(0,
-						 QString("Unable to open file: '%1'. Error: %2")
+						 QStringLiteral("Unable to open file: '%1'. Error: %2")
 							 .arg(qrcFile.fileName(), qrcFile.errorString()));
 		I_CRITICAL();
 
@@ -221,7 +221,7 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 		const QString generationInfoPath = depFileInfo.absolutePath() + QStringLiteral("/generation_info.json");
 		
 		if (!CQmlGenTools::UpdateGenerationResult(generationInfoPath, generationResult)){
-			SendWarningMessage(0, QString("Unable to create generation info file: '%1'").arg(generationInfoPath));
+			SendWarningMessage(0, QStringLiteral("Unable to create generation info file: '%1'").arg(generationInfoPath));
 		}
 	}
 
@@ -236,7 +236,7 @@ bool CQmlCodeGeneratorComp::ReOpenFiles()
 	Q_ASSERT(m_qmlFilePtr != nullptr);
 	if (!m_qmlFilePtr->open(QIODevice::WriteOnly | QIODevice::Append)){
 		SendCriticalMessage(0,
-					QString("Unable to open file: '%1'. Error: %2")
+					QStringLiteral("Unable to open file: '%1'. Error: %2")
 							 .arg(m_qmlFilePtr->fileName(), m_qmlFilePtr->errorString()));
 
 		AbortCurrentProcessing();
@@ -265,7 +265,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	Q_ASSERT(m_qmlFilePtr != nullptr);
 	if (!m_qmlFilePtr->open(QIODevice::WriteOnly)){
 		SendCriticalMessage(0,
-						 QString("Unable to open file: '%1'. Error: %2")
+						 QStringLiteral("Unable to open file: '%1'. Error: %2")
 							 .arg(m_qmlFilePtr->fileName(), m_qmlFilePtr->errorString()));
 		I_CRITICAL();
 
@@ -290,7 +290,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 
 		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = GetSdlTypeOrEnumOrUnionForField(field, allTypes, enumList, unionList);
 		if (!foundEntry){
-			SendCriticalMessage(0, QString("Unable to find type for %1:%2").arg(field.GetId(), field.GetType()));
+			SendCriticalMessage(0, QStringLiteral("Unable to find type for %1:%2").arg(field.GetId(), field.GetType()));
 
 			return false;
 		}

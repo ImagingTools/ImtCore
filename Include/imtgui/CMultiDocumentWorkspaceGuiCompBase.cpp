@@ -136,7 +136,7 @@ void CMultiDocumentWorkspaceGuiCompBase::UpdateAllTitles()
 
 				frequency++;
 
-				titleName = tr("%1 <%2>").arg(titleName).arg(frequency + 1);
+				titleName = tr("%1 <%2>").arg(titleName, QString::number(frequency + 1));
 			}
 			else{
 				nameFrequencies[titleName] = 0;

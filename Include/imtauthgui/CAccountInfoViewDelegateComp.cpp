@@ -27,22 +27,22 @@ bool CAccountInfoViewDelegateComp::GetSummaryInformation(
 		SummaryInformation summaryInformation;
 		summaryInformation.infoId = informationId;
 		if (metaInfoPtr.IsValid()){
-			if (informationId == QByteArray("AccountName")){
+			if (informationId == QByteArrayLiteral("AccountName")){
 				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_NAME).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
-			else if (informationId == QByteArray("Email")){
+			else if (informationId == QByteArrayLiteral("Email")){
 				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_CONTACT_EMAIL).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
-			else if (informationId == QByteArray("AccountType")){
+			else if (informationId == QByteArrayLiteral("AccountType")){
 				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_TYPE).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
-			else if (informationId == QByteArray("AccountDesciption")){
+			else if (informationId == QByteArrayLiteral("AccountDesciption")){
 				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_DESCRIPTION).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
@@ -73,16 +73,16 @@ void CAccountInfoViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationTypes.ResetData();
 	m_summaryInformationHeaders.clear();
 
-	m_summaryInformationTypes.InsertItem(QByteArray("AccountName"), tr("Account Name"), "");
+	m_summaryInformationTypes.InsertItem(QByteArrayLiteral("AccountName"), tr("Account Name"), "");
 	m_summaryInformationHeaders["AccountName"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
-	m_summaryInformationTypes.InsertItem(QByteArray("Email"), tr("E-Mail"), "");
+	m_summaryInformationTypes.InsertItem(QByteArrayLiteral("Email"), tr("E-Mail"), "");
 	m_summaryInformationHeaders["Email"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
-	m_summaryInformationTypes.InsertItem(QByteArray("AccountType"), tr("Account Type"), "");
+	m_summaryInformationTypes.InsertItem(QByteArrayLiteral("AccountType"), tr("Account Type"), "");
 	m_summaryInformationHeaders["AccountType"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
-	m_summaryInformationTypes.InsertItem(QByteArray("AccountDescription"), tr("Account Description"), "");
+	m_summaryInformationTypes.InsertItem(QByteArrayLiteral("AccountDescription"), tr("Account Description"), "");
 	m_summaryInformationHeaders["AccountDescription"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 }
 

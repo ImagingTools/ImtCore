@@ -27,6 +27,7 @@ type SuperuserCheckResult {
 
 type ApplicationInfo {
 	version: String
+	versionKind: String
 	companyName: String
 	productName: String
 	applicationId: String
