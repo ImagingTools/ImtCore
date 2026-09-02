@@ -293,11 +293,7 @@ bool CFileBasedUndoManagerComp::DoListShift(int steps, UndoList& fromList, UndoL
 			QString targetFileName = QString("%1%2").arg(targetPrefix).arg(toList.size());
 			UndoStepPtr currentStatePtr(CreateState(*objectPtr, targetFileName));
 			if (currentStatePtr){
-				toList.push_back(UndoStepPtr());
-
-				UndoStep& currentStep = *toList.back();
-
-				toList.back() = currentStatePtr;
+				toList.push_back(currentStatePtr);
 			}
 
 			const UndoStepPtr& sourceStatePtr = fromList[fromList.size() - steps];
