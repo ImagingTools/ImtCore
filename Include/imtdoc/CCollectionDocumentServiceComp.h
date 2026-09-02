@@ -2,12 +2,12 @@
 #pragma once
 
 
+// ACF includes
+#include <ifile/IFileNameParam.h>
+
 // ImtCore includes
 #include <imtdoc/TCollectionDocumentServiceWrap.h>
 #include <imtdoc/CDocumentServiceCompBase.h>
-
-// ACF includes
-#include <ifile/IFileNameParam.h>
 
 
 namespace imtdoc
@@ -76,12 +76,18 @@ private:
 	bool SerializeDocumentMap(iser::IArchive& archive, DocumentMap& documentMap) const;
 	void PrepareDocumentMap(DocumentMap& documentMap) const;
 	bool RestoreDocumentMap(const DocumentMap& documentMap);
-	void ClearRestoredDocuments();
+	void RemoveAllDocuments();
 	bool RestoreSharedDocument(const DocumentInfo& documentInfo, const QByteArray& userId);
-	bool RestoreDocument(const DocumentInfo& documentInfo, const QByteArray& userId, bool isSingleCopyMode,
-		imtbase::IObjectCollection* collectionPtr);
-	void RegisterRestoredDocument(const DocumentInfo& documentInfo, const QByteArray& userId, bool isSingleCopyMode,
-		const idoc::IUndoManagerSharedPtr& undoManagerPtr);
+	bool RestoreDocument(
+				const DocumentInfo& documentInfo,
+				const QByteArray& userId,
+				bool isSingleCopyMode,
+				imtbase::IObjectCollection* collectionPtr);
+	void RegisterRestoredDocument(
+				const DocumentInfo& documentInfo,
+				const QByteArray& userId,
+				bool isSingleCopyMode,
+				const idoc::IUndoManagerSharedPtr& undoManagerPtr);
 	void RemoveUndoManagerDocumentDirectory(const QByteArray& documentId) const;
 
 private:

@@ -58,8 +58,8 @@ bool CCollectionDocumentServiceComp::IsSingleCopyMode() const
 
 
 IDocumentService::OperationStatus CCollectionDocumentServiceComp::CloseDocumentInternal(
-	const QByteArray& userId,
-	const QByteArray& documentId)
+			const QByteArray& userId,
+			const QByteArray& documentId)
 {
 	bool shouldRemoveStorageDirectory = false;
 
@@ -74,8 +74,8 @@ IDocumentService::OperationStatus CCollectionDocumentServiceComp::CloseDocumentI
 
 		shouldRemoveStorageDirectory = true;
 		if (IsSingleCopyMode()
-			&& !workingDocument.objectId.isEmpty()
-			&& m_sharedDocuments.contains(workingDocument.objectId)){
+					&& !workingDocument.objectId.isEmpty()
+					&& m_sharedDocuments.contains(workingDocument.objectId)){
 			shouldRemoveStorageDirectory = m_sharedDocuments[workingDocument.objectId].refCount <= 1;
 		}
 	}
@@ -105,10 +105,10 @@ bool CCollectionDocumentServiceComp::SerializeDocumentMap(iser::IArchive& archiv
 	static const iser::CArchiveTag urlTag("Url", "Document URL", iser::CArchiveTag::TT_LEAF, &documentTag);
 	static const iser::CArchiveTag nameTag("Name", "Document name", iser::CArchiveTag::TT_LEAF, &documentTag);
 	static const iser::CArchiveTag singleDocumentInstanceTag(
-		"SingleDocumentInstance",
-		"Single-document-instance mode flag",
-		iser::CArchiveTag::TT_LEAF,
-		&documentTag);
+				"SingleDocumentInstance",
+				"Single-document-instance mode flag",
+				iser::CArchiveTag::TT_LEAF,
+				&documentTag);
 
 	bool retVal = true;
 	bool isStoring = archive.IsStoring();
@@ -199,18 +199,17 @@ bool CCollectionDocumentServiceComp::RestoreDocumentMap(const DocumentMap& docum
 {
 	istd::CChangeNotifier notifier(this);
 
+	RemoveAllDocuments();
+
 	const bool isSingleCopyMode = IsSingleCopyMode();
 	imtbase::IObjectCollection* collectionPtr = GetCollection();
+
 	if (collectionPtr == nullptr){
-		ClearRestoredDocuments();
 		return false;
 	}
 
-	ClearRestoredDocuments();
-
 	for (auto userIt = documentMap.constBegin(); userIt != documentMap.constEnd(); ++userIt){
 		const QByteArray& userId = userIt.key();
-
 		for (const DocumentInfo& documentInfo : userIt.value()){
 			if (documentInfo.documentId.isEmpty()){
 				continue;
@@ -224,7 +223,7 @@ bool CCollectionDocumentServiceComp::RestoreDocumentMap(const DocumentMap& docum
 }
 
 
-void CCollectionDocumentServiceComp::ClearRestoredDocuments()
+void CCollectionDocumentServiceComp::RemoveAllDocuments()
 {
 	QMutexLocker locker(&m_mutex);
 	QSet<int> undoModelIds;
@@ -275,8 +274,8 @@ bool CCollectionDocumentServiceComp::RestoreSharedDocument(const DocumentInfo& d
 	document.singleDocumentInstance = documentInfo.singleDocumentInstance;
 	document.undoManagerModelId = -1;
 	document.isDirty = shared.undoManagerPtr.IsValid()
-		? (shared.undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL)
-		: false;
+				? (shared.undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL)
+				: false;
 
 	shared.refCount++;
 
@@ -285,10 +284,10 @@ bool CCollectionDocumentServiceComp::RestoreSharedDocument(const DocumentInfo& d
 
 
 bool CCollectionDocumentServiceComp::RestoreDocument(
-	const DocumentInfo& documentInfo,
-	const QByteArray& userId,
-	bool isSingleCopyMode,
-	imtbase::IObjectCollection* collectionPtr)
+			const DocumentInfo& documentInfo,
+			const QByteArray& userId,
+			bool isSingleCopyMode,
+			imtbase::IObjectCollection* collectionPtr)
 {
 	if (isSingleCopyMode && RestoreSharedDocument(documentInfo, userId)){
 		return true;
@@ -361,10 +360,10 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 
 
 void CCollectionDocumentServiceComp::RegisterRestoredDocument(
-	const DocumentInfo& documentInfo,
-	const QByteArray& userId,
-	bool isSingleCopyMode,
-	const idoc::IUndoManagerSharedPtr& undoManagerPtr)
+			const DocumentInfo& documentInfo,
+			const QByteArray& userId,
+			bool isSingleCopyMode,
+			const idoc::IUndoManagerSharedPtr& undoManagerPtr)
 {
 	auto& registeredDocument = m_userDocuments[userId][documentInfo.documentId];
 
