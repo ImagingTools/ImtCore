@@ -167,6 +167,7 @@ BarChart 1.0 ./Views/BarChart.qml
 BasicTableView 1.0 ./Views/BasicTableView.qml
 BasicTreeView 1.0 ./Views/BasicTreeView.qml
 TreeExplorerView 1.0 ./Views/TreeExplorerView.qml
+TableColumnLayout 1.0 ./Views/TableColumnLayout.qml
 CheckableListPanel 1.0 ./Views/CheckableListPanel.qml
 EditableTableCell 1.0 ./Views/EditableTableCell.qml
 ToolbarButton 1.0 ./Views/ToolbarButton.qml

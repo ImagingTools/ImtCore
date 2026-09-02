@@ -45,9 +45,18 @@ FocusScope {
 	// Short note rendered as a chip next to the entry's name - the reason it is
 	// unavailable, or what kind of entry it is. It replaces a whole column.
 	property var entryBadgeProvider: null
+	// How loud the chip is: "neutral" reads as a note, "accent" as something the
+	// list did on the reader's behalf, "warning" as something still to be dealt
+	// with. Only the chip changes - the row itself stays a row.
+	property var entryBadgeToneProvider: null
 	property var entrySearchableTextProvider: null
 	property var entryCheckStateProvider: null
 	property var entryCheckEnabledProvider: null
+	// Groups consecutive entries under a heading. Entries must arrive already
+	// ordered by section; the heading is drawn wherever the section changes,
+	// which keeps grouping a property of the list rather than of the model.
+	property var entrySectionProvider: null
+	property real sectionHeaderHeight: Style.controlHeightM
 
 	property string filterText: ""
 	property var visibleEntries: []
@@ -161,6 +170,31 @@ FocusScope {
 		if (entryBadgeProvider)
 			return entryBadgeProvider(entry)
 		return ""
+	}
+
+	function entryBadgeTone(entry) {
+		if (entryBadgeToneProvider)
+			return entryBadgeToneProvider(entry)
+		return "neutral"
+	}
+
+	function entrySection(entry) {
+		if (entrySectionProvider)
+			return entrySectionProvider(entry)
+		return ""
+	}
+
+	// A heading is drawn on the first row of the list and wherever the section
+	// changes, so a row never has to know its own position.
+	function entryStartsSection(index) {
+		if (!root.entrySectionProvider || index < 0 || index >= root.visibleEntries.length)
+			return false
+		let section = root.entrySection(root.visibleEntries[index])
+		if (section === "")
+			return false
+		if (index === 0)
+			return true
+		return root.entrySection(root.visibleEntries[index - 1]) !== section
 	}
 
 	function entrySearchableText(entry) {
@@ -297,91 +331,135 @@ FocusScope {
 			clip: true
 			boundsBehavior: Flickable.StopAtBounds
 
-			delegate: Rectangle {
-				id: entryRow
+			delegate: Item {
+				id: entryItem
 				width: entriesView.width
-				height: root.rowHeight
-				color: root.currentRow === index ? Style.selectedColor
-					: entryMouse.containsMouse && entryRow.entryEnabled ? Style.hover
-					: index % 2 === 1 ? Style.backgroundColor2 : "transparent"
+				height: sectionHeader.height + root.rowHeight
 
 				property var entry: modelData
-				property bool entryEnabled: root.entryCheckEnabled(entryRow.entry)
-				property bool entryChecked: root.entryCheckState(entryRow.entry) === Qt.Checked
+				property bool entryEnabled: root.entryCheckEnabled(entryItem.entry)
+				property bool entryChecked: root.entryCheckState(entryItem.entry) === Qt.Checked
 
-				CheckBox {
-					id: entryCheck
+				// Sits above the row rather than beside it, so the rows below stay
+				// aligned with the rows of every other section.
+				Item {
+					id: sectionHeader
+					anchors.top: parent.top
 					anchors.left: parent.left
-					anchors.leftMargin: Style.marginL
-					anchors.verticalCenter: parent.verticalCenter
-					isActive: entryRow.entryEnabled
-					checkState: entryRow.entryChecked ? Qt.Checked : Qt.Unchecked
-					mouseArea.enabled: false
-				}
-
-				Column {
-					anchors.left: entryCheck.right
-					anchors.leftMargin: Style.marginM
 					anchors.right: parent.right
-					anchors.rightMargin: Style.marginL
-					anchors.verticalCenter: parent.verticalCenter
-					spacing: Style.spacingXXS
-
-					Row {
-						width: parent.width
-						spacing: Style.spacingS
-
-						BaseText {
-							anchors.verticalCenter: parent.verticalCenter
-							width: Math.max(0, parent.width - badgeChip.width - parent.spacing)
-							text: root.entryTitle(entryRow.entry)
-							color: entryRow.entryEnabled || entryRow.entryChecked ? Style.textColor : Style.inactiveTextColor
-							elide: Text.ElideRight
-						}
-
-						// Reason chip: why this entry cannot be picked, or what kind
-						// of entry it is. Sits with the name instead of in a column.
-						Rectangle {
-							id: badgeChip
-							anchors.verticalCenter: parent.verticalCenter
-							width: badgeText.text === "" ? 0 : badgeText.width + 2 * Style.marginS
-							height: Style.controlHeightS
-							radius: height / 2
-							visible: badgeText.text !== ""
-							color: Style.backgroundColor2
-							border.color: Style.borderColor
-							border.width: 1
-
-							BaseText {
-								id: badgeText
-								anchors.centerIn: parent
-								text: root.entryBadge(entryRow.entry)
-								font.pixelSize: Style.fontSizeS
-								color: Style.subtitleColor
-							}
-						}
-					}
+					height: visible ? root.sectionHeaderHeight : 0
+					visible: root.entryStartsSection(index)
 
 					BaseText {
-						width: parent.width
-						visible: text !== ""
-						text: root.entrySubtitle(entryRow.entry)
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginL
+						anchors.bottom: parent.bottom
+						anchors.bottomMargin: Style.marginXS
+						text: root.entrySection(entryItem.entry)
+						font.family: Style.fontFamilyBold
 						font.pixelSize: Style.fontSizeS
 						color: Style.subtitleColor
-						elide: Text.ElideRight
+					}
+
+					Rectangle {
+						anchors.left: parent.left
+						anchors.right: parent.right
+						anchors.bottom: parent.bottom
+						height: 1
+						color: Style.borderColor
+						opacity: 0.6
 					}
 				}
 
-				MouseArea {
-					id: entryMouse
-					anchors.fill: parent
-					hoverEnabled: true
-					enabled: entryRow.entryEnabled
-					cursorShape: Qt.PointingHandCursor
-					onClicked: {
-						root.forceActiveFocus()
-						root.currentRow = index
-						root.toggleRequested(entryRow.entry)
+				Rectangle {
+					id: entryRow
+					anchors.top: sectionHeader.bottom
+					anchors.left: parent.left
+					anchors.right: parent.right
+					height: root.rowHeight
+					color: root.currentRow === index ? Style.selectedColor
+						: entryMouse.containsMouse && entryItem.entryEnabled ? Style.hover
+						: index % 2 === 1 ? Style.backgroundColor2 : "transparent"
+
+					CheckBox {
+						id: entryCheck
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginL
+						anchors.verticalCenter: parent.verticalCenter
+						isActive: entryItem.entryEnabled
+						checkState: entryItem.entryChecked ? Qt.Checked : Qt.Unchecked
+						mouseArea.enabled: false
+					}
+
+					Column {
+						anchors.left: entryCheck.right
+						anchors.leftMargin: Style.marginM
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginL
+						anchors.verticalCenter: parent.verticalCenter
+						spacing: Style.spacingXXS
+
+						Row {
+							width: parent.width
+							spacing: Style.spacingS
+
+							BaseText {
+								anchors.verticalCenter: parent.verticalCenter
+								width: Math.max(0, parent.width - badgeChip.width - parent.spacing)
+								text: root.entryTitle(entryItem.entry)
+								color: entryItem.entryEnabled || entryItem.entryChecked ? Style.textColor : Style.inactiveTextColor
+								elide: Text.ElideRight
+							}
+
+							// Reason chip: why this entry cannot be picked, or what kind
+							// of entry it is. Sits with the name instead of in a column.
+							Rectangle {
+								id: badgeChip
+								anchors.verticalCenter: parent.verticalCenter
+								width: badgeText.text === "" ? 0 : badgeText.width + 2 * Style.marginS
+								height: Style.controlHeightS
+								radius: height / 2
+								visible: badgeText.text !== ""
+								color: badgeChip.tone === "warning" ? Style.popupWarningBackgroundColor
+									: badgeChip.tone === "accent" ? Style.selectedColor : Style.backgroundColor2
+								border.color: badgeChip.tone === "warning" ? Style.secondColor
+									: badgeChip.tone === "accent" ? Style.titleColor : Style.borderColor
+								border.width: 1
+
+								property string tone: root.entryBadgeTone(entryItem.entry)
+
+								BaseText {
+									id: badgeText
+									anchors.centerIn: parent
+									text: root.entryBadge(entryItem.entry)
+									font.pixelSize: Style.fontSizeS
+									color: badgeChip.tone === "warning" ? Style.secondColor
+										: badgeChip.tone === "accent" ? Style.titleColor : Style.subtitleColor
+								}
+							}
+						}
+
+						BaseText {
+							width: parent.width
+							visible: text !== ""
+							text: root.entrySubtitle(entryItem.entry)
+							font.pixelSize: Style.fontSizeS
+							color: Style.subtitleColor
+							elide: Text.ElideRight
+						}
+					}
+
+					MouseArea {
+						id: entryMouse
+						anchors.fill: parent
+						hoverEnabled: true
+						enabled: entryItem.entryEnabled
+						cursorShape: Qt.PointingHandCursor
+						onClicked: {
+							root.forceActiveFocus()
+							root.currentRow = index
+							root.toggleRequested(entryItem.entry)
+						}
 					}
 				}
 			}

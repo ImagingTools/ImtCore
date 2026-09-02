@@ -581,28 +581,22 @@ ViewBase {
 			function updateModel() {
 			}
 
-			// Column geometry, shared by the header and the rows so the two can
-			// never drift. A column whose breakpoint is above the current table
-			// width folds away and its share is handed to the columns that stay.
-			property var columnFractions: [0.26, 0.18, 0.26, 0.12, 0.18]
-			property var columnBreakpoints: [0, 380, 640, 300, 480]
+			// Column geometry, shared by the header, the rows and the drag handles
+			// the explorer draws, so none of the three can drift from the others.
+			// A column whose breakpoint is above the current table width folds
+			// away and its share is handed to the columns that stay.
+			TableColumnLayout {
+				id: featureColumns
+				fractions: [0.26, 0.18, 0.26, 0.12, 0.18]
+				breakpoints: [0, 380, 640, 300, 480]
+			}
 
 			function columnVisible(index, width) {
-				return width >= featuresPage.columnBreakpoints[index]
+				return featureColumns.isVisible(index, width)
 			}
 
 			function columnWidth(index, width, spacing) {
-				if (!featuresPage.columnVisible(index, width))
-					return 0
-				let sum = 0
-				let count = 0
-				for (let i = 0; i < featuresPage.columnFractions.length; ++i) {
-					if (!featuresPage.columnVisible(i, width))
-						continue
-					sum += featuresPage.columnFractions[i]
-					++count
-				}
-				return (width - (count - 1) * spacing) * featuresPage.columnFractions[index] / sum
+				return featureColumns.widthOf(index, width, spacing)
 			}
 
 			property Component productFeaturesHeaderComp: Component {
@@ -855,6 +849,7 @@ ViewBase {
 				rowIconVisible: false
 				headerContentComponent: featuresPage.productFeaturesHeaderComp
 				rowContentComponent: featuresPage.productFeatureRowComp
+				columnLayout: featureColumns
 				sidePanelComponent: featuresPage.featureContentPanelComp
 				textProvider: function(node) { return node && node.data ? node.data.featureName || qsTr("Untitled feature") : "" }
 				descriptionProvider: function(node) { return node && node.data ? node.data.description || "" : "" }

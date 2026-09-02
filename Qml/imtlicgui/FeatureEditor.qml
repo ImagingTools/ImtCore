@@ -18,6 +18,10 @@ ViewBase {
 	property var featureTree: []
 	property var requirementEntries: []
 	property var requirementGraph: []
+	// Paths of this feature's branch as the server last saw it. Anything in the
+	// live branch that is not in here is a row created or renamed since the last
+	// save, and the requirements list says so rather than pretending otherwise.
+	property var savedRequirementPaths: ({})
 	property var selectedFeature: null
 	property var activeFeature: null
 	property bool canEdit: false
@@ -134,6 +138,7 @@ ViewBase {
 		if (!featureData || !featureData.m_subFeatures) {
 			featureTree = []
 			updatePageBadges()
+			rebuildRequirementEntries()
 			return
 		}
 		featureTree = TreeModelBuilder.fromBaseModelByFields(featureData.m_subFeatures, {
@@ -149,6 +154,10 @@ ViewBase {
 			}
 		})
 		updatePageBadges()
+		// The requirements list is a flattening of this same tree plus the rest
+		// of the collection, so it goes stale exactly when the tree changes -
+		// which is what kept a just-created sub-feature out of it.
+		rebuildRequirementEntries()
 		if (itemToSelect) {
 			let node = findNodeBySourceItem(featureTree, itemToSelect)
 			let page = multiPageView.getPageById("Subfeatures")
@@ -395,6 +404,15 @@ ViewBase {
 		return featurePath(activeFeature)
 	}
 
+	// The shared collection is what the server last saw, so the branch being
+	// edited here appears in it as it was when it was last saved: a sub-feature
+	// created a minute ago is not in it at all, and a renamed one is in it under
+	// its old identifier. Requirements picked from that list could therefore
+	// never point at anything new until the whole feature had been saved once.
+	//
+	// So the branch under edit is read from the live document instead, and the
+	// saved copy of it is left out. The rest of the collection is used as it
+	// comes, because nothing else on this page can have changed it.
 	function rebuildRequirementEntries() {
 		if (!featureCollectionModel)
 			return
@@ -402,18 +420,84 @@ ViewBase {
 			key: FeatureItemTypeMetaInfo.s_featureId,
 			children: FeatureItemTypeMetaInfo.s_subFeatures,
 			columns: {
+				id: FeatureItemTypeMetaInfo.s_id,
 				featureName: FeatureItemTypeMetaInfo.s_featureName,
 				featureId: FeatureItemTypeMetaInfo.s_featureId,
 				requirements: FeatureItemTypeMetaInfo.s_requirements
 			}
 		})
+		let merged = []
+		let savedBranch = []
+		let ownId = featureData && featureData.m_id ? featureData.m_id : ""
+		let ownFeatureId = featureData && featureData.m_featureId ? featureData.m_featureId : ""
+		for (let i = 0; i < tree.length; ++i) {
+			let data = tree[i].data || {}
+			// Matched by document id first, so renaming the feature cannot leave
+			// the saved version of it standing beside the live one.
+			let isOwn = ownId !== "" ? (data.id || "") === ownId
+				: ownFeatureId !== "" && (data.featureId || "") === ownFeatureId
+			if (isOwn) {
+				appendRequirementGraphNodes([tree[i]], "", savedBranch)
+				continue
+			}
+			merged.push(tree[i])
+		}
+		let saved = {}
+		for (let s = 0; s < savedBranch.length; ++s)
+			saved[savedBranch[s].featurePath] = true
+		savedRequirementPaths = saved
+
+		let liveBranch = liveFeatureNode()
+		if (liveBranch)
+			merged.push(liveBranch)
+
 		let graph = []
-		appendRequirementGraphNodes(tree, "", graph)
+		appendRequirementGraphNodes(merged, "", graph)
 		requirementGraph = graph
 
 		let leaves = []
-		appendRequirementEntries(tree, [], "", leaves)
+		appendRequirementEntries(merged, [], "", leaves)
 		requirementEntries = leaves
+	}
+
+	// The feature being edited, in the node shape the two walkers below expect,
+	// read straight off the document so that unsaved rows are part of it.
+	function liveFeatureNode() {
+		if (!featureData || !featureData.m_featureId)
+			return null
+		return {
+			"data": liveNodeData(featureData),
+			"children": liveChildNodes(featureData.m_subFeatures)
+		}
+	}
+
+	function liveNodeData(item) {
+		return {
+			"id": item.m_id ? item.m_id : "",
+			"featureId": item.m_featureId ? item.m_featureId : "",
+			"featureName": item.m_featureName ? item.m_featureName : "",
+			"requirements": item.m_requirements ? item.m_requirements : ""
+		}
+	}
+
+	function liveChildNodes(subFeatures) {
+		let children = []
+		if (!subFeatures)
+			return children
+		for (let i = 0; i < subFeatures.getItemsCount(); ++i) {
+			let wrapper = subFeatures.get(i)
+			let item = wrapper ? wrapper.item : null
+			// A row without an identifier cannot be pointed at by a requirement -
+			// the path is made of identifiers - so it stays out of the list until
+			// it has been given one.
+			if (!item || !item.m_featureId)
+				continue
+			children.push({
+				"data": liveNodeData(item),
+				"children": liveChildNodes(item.m_subFeatures)
+			})
+		}
+		return children
 	}
 
 	function appendRequirementGraphNodes(nodes, parentPath, target) {
@@ -573,7 +657,20 @@ ViewBase {
 		return !requirementReaches(featurePathValue, path, {})
 	}
 
-	// Chip next to a requirement row: why the entry cannot be picked.
+	// A row of this feature's own branch that the server has not seen yet - it
+	// can be required right away, but the requirement only becomes real when
+	// this feature is saved, and that is worth saying out loud.
+	function requirementIsUnsaved(featurePathValue) {
+		if (rootFeaturePath === "")
+			return false
+		if (featurePathValue !== rootFeaturePath
+			&& featurePathValue.indexOf(rootFeaturePath + "/") !== 0)
+			return false
+		return savedRequirementPaths[featurePathValue] !== true
+	}
+
+	// Chip next to a requirement row: why the entry cannot be picked, or what is
+	// special about it.
 	function requirementBadge(featurePathValue) {
 		let path = activeFeaturePath()
 		if (path === "")
@@ -584,7 +681,13 @@ ViewBase {
 			return qsTr("Parent")
 		if (requirementReaches(featurePathValue, path, {}))
 			return qsTr("Cycle")
+		if (requirementIsUnsaved(featurePathValue))
+			return qsTr("Not saved yet")
 		return ""
+	}
+
+	function requirementBadgeTone(featurePathValue) {
+		return requirementBadge(featurePathValue) === qsTr("Not saved yet") ? "accent" : "neutral"
 	}
 
 	function toggleRequirement(featurePathValue) {
@@ -897,28 +1000,22 @@ ViewBase {
 			function currentParentNode() { return treeExplorer.currentParentNode() }
 				function commandTargets() { return treeExplorer.commandTargets() }
 
-			// Column geometry, shared by the header and the rows so the two can
-			// never drift. A column whose breakpoint is above the current table
-			// width folds away and its share is handed to the columns that stay.
-			property var columnFractions: [0.20, 0.13, 0.16, 0.07, 0.08, 0.08, 0.16, 0.12]
-			property var columnBreakpoints: [0, 340, 720, 0, 540, 440, 620, 0]
+			// Column geometry, shared by the header, the rows and the drag handles
+			// the explorer draws, so none of the three can drift from the others.
+			// A column whose breakpoint is above the current table width folds
+			// away and its share is handed to the columns that stay.
+			TableColumnLayout {
+				id: subfeatureColumns
+				fractions: [0.20, 0.13, 0.16, 0.07, 0.08, 0.08, 0.16, 0.12]
+				breakpoints: [0, 340, 720, 0, 540, 440, 620, 0]
+			}
 
 			function columnVisible(index, width) {
-				return width >= subfeaturesPage.columnBreakpoints[index]
+				return subfeatureColumns.isVisible(index, width)
 			}
 
 			function columnWidth(index, width, spacing) {
-				if (!subfeaturesPage.columnVisible(index, width))
-					return 0
-				let sum = 0
-				let count = 0
-				for (let i = 0; i < subfeaturesPage.columnFractions.length; ++i) {
-					if (!subfeaturesPage.columnVisible(i, width))
-						continue
-					sum += subfeaturesPage.columnFractions[i]
-					++count
-				}
-				return (width - (count - 1) * spacing) * subfeaturesPage.columnFractions[index] / sum
+				return subfeatureColumns.widthOf(index, width, spacing)
 			}
 
 			property Component subfeaturesHeaderComp: Component {
@@ -1161,6 +1258,10 @@ ViewBase {
 						}
 						if (grouped)
 							item.endChanges()
+						// The tree is deliberately not rebuilt here - that would
+						// drop the caret - but the identifier may just have
+						// changed, and a requirement points at the identifier.
+						featureEditor.rebuildRequirementEntries()
 					}
 
 					// Escape belongs to the whole row: the drafts are simply dropped.
@@ -1485,11 +1586,15 @@ ViewBase {
 					searchPlaceholder: qsTr("Search features")
 					emptyText: qsTr("No features to require")
 					emptyDescription: qsTr("Requirements are picked from the shared feature collection")
+					// Sub-features created here are in the list before they are
+					// saved, so a level can be built and wired up in one sitting.
+					footerText: qsTr("Rows of this feature marked \"Not saved yet\" can be required now; the requirement takes effect when the feature is saved")
 					actionText: qsTr("Clear")
 					actionEnabled: featureEditor.canEdit && featureEditor.directRequirements().length > 0
 					entryTitleProvider: function(entry) { return entry.featureName }
 					entrySubtitleProvider: function(entry) { return entry.featurePath }
 					entryBadgeProvider: function(entry) { return featureEditor.requirementBadge(entry.featurePath) }
+					entryBadgeToneProvider: function(entry) { return featureEditor.requirementBadgeTone(entry.featurePath) }
 					entrySearchableTextProvider: function(entry) { return entry.fullPath + " " + entry.featurePath }
 					entryCheckStateProvider: function(entry) { return featureEditor.isDirectRequirement(entry.featurePath) ? Qt.Checked : Qt.Unchecked }
 					entryCheckEnabledProvider: function(entry) { return featureEditor.requirementIsEnabled(entry.featurePath) }
@@ -1528,6 +1633,7 @@ ViewBase {
 				rowIconVisible: false
 				headerContentComponent: subfeaturesPage.subfeaturesHeaderComp
 				rowContentComponent: subfeaturesPage.subfeatureRowComp
+				columnLayout: subfeatureColumns
 				sidePanelComponent: subfeaturesPage.requirementsPanelComp
 				// Read through to the live model item rather than the cached node, so
 				// inline renames show up in the breadcrumb and in search right away.
