@@ -109,6 +109,7 @@ protected:
 		virtual ~UndoStep();
 
 		const QString& GetFilePath() const;
+		void SetAutoRemoveOnDestroy(bool value);
 
 		// reimplemented (iser::ISerializable)
 		virtual bool Serialize(iser::IArchive& archive) override;
@@ -118,9 +119,6 @@ protected:
 	private:
 		QString filePath;
 		bool autoRemoveOnDestroy = true;
-
-	public:
-		void SetAutoRemoveOnDestroy(bool value);
 	};
 
 	typedef std::shared_ptr<UndoStep> UndoStepPtr;
@@ -128,13 +126,13 @@ protected:
 
 	bool DoListShift(int steps, UndoList& fromList, UndoList& toList);
 	bool SerializeUndoList(
-		iser::IArchive& archive,
-		UndoList& undoList,
-		const iser::CArchiveTag& listTag,
-		const iser::CArchiveTag& stepTag) const;
+				iser::IArchive& archive,
+				UndoList& undoList,
+				const iser::CArchiveTag& listTag,
+				const iser::CArchiveTag& stepTag) const;
 	void SetStepFileAutoRemoveEnabled(bool value);
-	UndoStep* CreateState(iser::ISerializable& object, const QString& stepFileName);
-	bool RestoreState(const UndoStep& state, iser::ISerializable& object);
+	UndoStep* CreateStep(iser::ISerializable& object, const QString& stepFileName);
+	bool RestoreObject(const UndoStep& state, iser::ISerializable& object);
 	bool AreStatesEqual(const UndoStep& state1, const UndoStep& state2) const;
 	bool RestoreObservedObject(const UndoStep& state);
 	QString CreateStepFilePath(const QString& stepFileName) const;
@@ -144,7 +142,6 @@ protected:
 	void OnUndoManagerStateChanged(const istd::IChangeable::ChangeSet& changeSet, const istd::IChangeable* objectPtr);
 
 	// reimplemented (idoc::IDocumentStateComparator)
-	virtual bool StoreDocumentState() override;
 	virtual bool RestoreDocumentState() override;
 
 	// reimplemented (imod::TSingleModelObserverBase<iser::ISerializable>)

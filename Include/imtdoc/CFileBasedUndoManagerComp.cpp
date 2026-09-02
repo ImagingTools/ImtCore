@@ -17,54 +17,13 @@ namespace imtdoc
 {
 
 
-// static attributes
 static const istd::IChangeable::ChangeSet s_undoChangeSet(istd::IChangeable::CF_NO_UNDO, "UNDO");
-
-
-// UndoStep
-
-CFileBasedUndoManagerComp::UndoStep::UndoStep(const QString& filePath)
-	: filePath(filePath)
-{
-}
-
-
-CFileBasedUndoManagerComp::UndoStep::~UndoStep()
-{
-	if (autoRemoveOnDestroy && !filePath.isEmpty() && QFile::exists(filePath)){
-		QFile::remove(filePath);
-	}
-}
-
-
-const QString& CFileBasedUndoManagerComp::UndoStep::GetFilePath() const
-{
-	return filePath;
-}
-
-
-bool CFileBasedUndoManagerComp::UndoStep::Serialize(iser::IArchive& archive)
-{
-	static iser::CArchiveTag filePathTag("FilePath", "Path to the file storing the document state", iser::CArchiveTag::TT_LEAF);
-	static iser::CArchiveTag descriptionTag("Description", "Description of the undo step", iser::CArchiveTag::TT_LEAF);
-
-	bool retVal = archive.TagAndProcess(filePathTag, filePath);
-	retVal = retVal && archive.TagAndProcess(descriptionTag, description);
-
-	return retVal;
-}
-
-
-void CFileBasedUndoManagerComp::UndoStep::SetAutoRemoveOnDestroy(bool value)
-{
-	autoRemoveOnDestroy = value;
-}
 
 
 // public methods
 
 CFileBasedUndoManagerComp::CFileBasedUndoManagerComp()
-:	m_uniqueFileCounter(0),
+:m_uniqueFileCounter(0),
 	m_isBlocked(false),
 	m_isDestroying(false),
 	m_isInitialized(false),
@@ -154,11 +113,10 @@ void CFileBasedUndoManagerComp::CleanupHistory()
 	}
 	m_currentStatePtr.reset();
 
-	if (observedObjectPtr != nullptr
-		&& !currentStateFilePath.isEmpty()
-		&& m_documentPersistenceCompPtr.IsValid()
-		&& m_documentPersistenceCompPtr->SaveToFile(*observedObjectPtr, currentStateFilePath) == ifile::IFilePersistence::OS_OK){
-		newCurrentStatePtr.reset(new UndoStep(currentStateFilePath));
+	if (observedObjectPtr != nullptr && !currentStateFilePath.isEmpty() && m_documentPersistenceCompPtr.IsValid()){
+		if (m_documentPersistenceCompPtr->SaveToFile(*observedObjectPtr, currentStateFilePath) == ifile::IFilePersistence::OS_OK){
+			newCurrentStatePtr.reset(new UndoStep(currentStateFilePath));
+		}
 	}
 
 	m_beginStatePtr.reset();
@@ -229,7 +187,7 @@ bool CFileBasedUndoManagerComp::Serialize(iser::IArchive& archive)
 
 		iser::ISerializable* observedObjectPtr = GetObservedObject();
 		if (observedObjectPtr != NULL){
-			UndoStep* currentStatePtr = CreateState(*observedObjectPtr, "CurrentState");
+			UndoStep* currentStatePtr = CreateStep(*observedObjectPtr, "CurrentState");
 			if (currentStatePtr != NULL){
 				m_currentStatePtr.reset(currentStatePtr);
 			}
@@ -267,10 +225,10 @@ bool CFileBasedUndoManagerComp::Serialize(iser::IArchive& archive)
 // protected methods
 
 bool CFileBasedUndoManagerComp::SerializeUndoList(
-	iser::IArchive& archive,
-	UndoList& undoList,
-	const iser::CArchiveTag& listTag,
-	const iser::CArchiveTag& stepTag) const
+			iser::IArchive& archive,
+			UndoList& undoList,
+			const iser::CArchiveTag& listTag,
+			const iser::CArchiveTag& stepTag) const
 {
 	bool retVal = true;
 	int undoStepsCount = undoList.size();
@@ -337,7 +295,7 @@ bool CFileBasedUndoManagerComp::DoListShift(int steps, UndoList& fromList, UndoL
 
 			QString targetPrefix = (&toList == &m_undoList) ? "Undo_" : "Redo_";
 			QString targetFileName = QString("%1%2").arg(targetPrefix).arg(toList.size());
-			UndoStepPtr currentStatePtr(CreateState(*objectPtr, targetFileName));
+			UndoStepPtr currentStatePtr(CreateStep(*objectPtr, targetFileName));
 			if (currentStatePtr){
 				toList.push_back(currentStatePtr);
 			}
@@ -345,7 +303,7 @@ bool CFileBasedUndoManagerComp::DoListShift(int steps, UndoList& fromList, UndoL
 			const UndoStepPtr& sourceStatePtr = fromList[fromList.size() - steps];
 			Q_ASSERT(sourceStatePtr);
 
-			if (RestoreState(*sourceStatePtr, *objectPtr)){
+			if (RestoreObject(*sourceStatePtr, *objectPtr)){
 				for (int i = 1; i < steps; ++i){
 					toList.push_back(fromList.back());
 					fromList.pop_back();
@@ -366,7 +324,7 @@ bool CFileBasedUndoManagerComp::DoListShift(int steps, UndoList& fromList, UndoL
 }
 
 
-CFileBasedUndoManagerComp::UndoStep* CFileBasedUndoManagerComp::CreateState(iser::ISerializable& object, const QString& stepFileName)
+CFileBasedUndoManagerComp::UndoStep* CFileBasedUndoManagerComp::CreateStep(iser::ISerializable& object, const QString& stepFileName)
 {
 	if (!m_documentPersistenceCompPtr.IsValid() || !m_rootFolderCompPtr.IsValid() || m_documentId.isEmpty()){
 		return NULL;
@@ -394,7 +352,7 @@ CFileBasedUndoManagerComp::UndoStep* CFileBasedUndoManagerComp::CreateState(iser
 }
 
 
-bool CFileBasedUndoManagerComp::RestoreState(const UndoStep& state, iser::ISerializable& object)
+bool CFileBasedUndoManagerComp::RestoreObject(const UndoStep& state, iser::ISerializable& object)
 {
 	if (!m_documentPersistenceCompPtr.IsValid()){
 		return false;
@@ -441,7 +399,7 @@ bool CFileBasedUndoManagerComp::RestoreObservedObject(const UndoStep& state)
 	istd::CChangeNotifier objectNotifier(objectPtr, &s_undoChangeSet);
 	Q_UNUSED(objectNotifier);
 
-	bool retVal = RestoreState(state, *objectPtr);
+	bool retVal = RestoreObject(state, *objectPtr);
 
 	objectNotifier.Reset();
 
@@ -551,12 +509,6 @@ void CFileBasedUndoManagerComp::OnUndoManagerStateChanged(
 
 // reimplemented (idoc::IDocumentStateComparator)
 
-bool CFileBasedUndoManagerComp::StoreDocumentState()
-{
-	return BaseClass2::StoreDocumentState();
-}
-
-
 bool CFileBasedUndoManagerComp::RestoreDocumentState()
 {
 	if (!HasStoredDocumentState()){
@@ -599,7 +551,7 @@ void CFileBasedUndoManagerComp::BeforeUpdate(imod::IModel* modelPtr)
 		iser::ISerializable* objectPtr = GetObservedObject();
 		if (objectPtr != NULL){
 			QString stateFileName = QString("Undo_%1").arg(m_undoList.size());
-			UndoStepPtr statePtr(CreateState(*objectPtr, stateFileName));
+			UndoStepPtr statePtr(CreateStep(*objectPtr, stateFileName));
 
 			if (statePtr && (m_undoList.isEmpty() || !AreStatesEqual(*statePtr, *m_undoList.back()))){
 				m_beginStatePtr = statePtr;
@@ -624,7 +576,7 @@ void CFileBasedUndoManagerComp::AfterUpdate(imod::IModel* modelPtr, const istd::
 		iser::ISerializable* objectPtr = GetObservedObject();
 		if (objectPtr != NULL){
 			QString stateFileName = QString("Undo_%1").arg(m_undoList.size());
-			UndoStepPtr statePtr(CreateState(*objectPtr, stateFileName));
+			UndoStepPtr statePtr(CreateStep(*objectPtr, stateFileName));
 
 			if (statePtr){
 				if (!AreStatesEqual(*statePtr, *m_beginStatePtr)){
@@ -660,6 +612,47 @@ void CFileBasedUndoManagerComp::OnComponentDestroyed()
 	SetStepFileAutoRemoveEnabled(false);
 
 	BaseClass::OnComponentDestroyed();
+}
+
+
+// public methods of embedded class UndoStep
+
+CFileBasedUndoManagerComp::UndoStep::UndoStep(const QString& filePath)
+	: filePath(filePath)
+{}
+
+
+CFileBasedUndoManagerComp::UndoStep::~UndoStep()
+{
+	if (autoRemoveOnDestroy && !filePath.isEmpty() && QFile::exists(filePath)){
+		QFile::remove(filePath);
+	}
+}
+
+
+const QString& CFileBasedUndoManagerComp::UndoStep::GetFilePath() const
+{
+	return filePath;
+}
+
+
+void CFileBasedUndoManagerComp::UndoStep::SetAutoRemoveOnDestroy(bool value)
+{
+	autoRemoveOnDestroy = value;
+}
+
+
+// reimplemented (iser::ISerializable)
+
+bool CFileBasedUndoManagerComp::UndoStep::Serialize(iser::IArchive& archive)
+{
+	static iser::CArchiveTag filePathTag("FilePath", "Path to the file storing the document state", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag descriptionTag("Description", "Description of the undo step", iser::CArchiveTag::TT_LEAF);
+
+	bool retVal = archive.TagAndProcess(filePathTag, filePath);
+	retVal = retVal && archive.TagAndProcess(descriptionTag, description);
+
+	return retVal;
 }
 
 
