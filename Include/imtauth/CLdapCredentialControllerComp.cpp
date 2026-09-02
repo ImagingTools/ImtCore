@@ -52,11 +52,11 @@ bool CLdapCredentialControllerComp::CheckCredential(const QByteArray& login, con
 			0,
 			NULL);
 
-		QString errorMessage = QString("LogonUser failed for user '%1' in domain '%2', error code: %3")
-			.arg(QString::fromUtf8(username), QString::fromUtf8(domain), QString::number(errorCode));
+		QString errorMessage = QStringLiteral("LogonUser failed for user '%1' in domain '%2', error code: %3")
+			.arg(username, domain, QString::number(errorCode));
 
 		if (size > 0 && messageBuffer != nullptr){
-			errorMessage += QString(" - %1").arg(QString::fromWCharArray(messageBuffer).trimmed());
+			errorMessage += QStringLiteral(" - %1").arg(QString::fromWCharArray(messageBuffer).trimmed());
 		}
 
 		if (messageBuffer != nullptr){

@@ -19,21 +19,21 @@ namespace imtlicgql
 QJsonObject CProductPermissionsControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_productProviderCompPtr.IsValid()){
-		SendErrorMessage(0, QString("Internal error."), "CProductPermissionsControllerComp");
+		SendErrorMessage(0, QStringLiteral("Internal error."), "CProductPermissionsControllerComp");
 
 		return QJsonObject();
 	}
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		SendErrorMessage(0, QString("Unable to create object. GQL input params is invalid."), "CProductPermissionsControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to create object. GQL input params is invalid."), "CProductPermissionsControllerComp");
 
 		return QJsonObject();
 	}
 
 	QByteArray productId = inputParamPtr->GetParamArgumentValue("productId").toByteArray();
 	if (productId.isEmpty()){
-		SendErrorMessage(0, QString("Unable to get permission for product with empty ID."), "CProductPermissionsControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to get permission for product with empty ID."), "CProductPermissionsControllerComp");
 
 		return QJsonObject();
 	}

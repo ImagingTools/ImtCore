@@ -207,7 +207,7 @@
 	        // Create timestamped backup
 	        QString timestamp = QDateTime::currentDateTime()
 	            .toString("yyyyMMdd_hhmmss");
-	        QString archivePath = QString("%1/backup_%2.zip")
+	        QString archivePath = QStringLiteral("%1/backup_%2.zip")
 	            .arg(backupPath)
 	            .arg(timestamp);
 	        
@@ -440,7 +440,7 @@
 	            // Create timestamped archive name
 	            QString timestamp = QDateTime::currentDateTime()
 	                .toString("yyyyMMdd_hhmmss");
-	            QString archivePath = QString("%1/backup_%2.zip")
+	            QString archivePath = QStringLiteral("%1/backup_%2.zip")
 	                .arg(backupDir)
 	                .arg(timestamp);
 	            

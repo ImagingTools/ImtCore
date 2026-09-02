@@ -90,11 +90,11 @@ void CAsyncApiClientComp::SendRequestInternal(
 	promisePtr->start();
 
 	const auto uuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	SendVerboseMessage(QString("Send async request with ID ") + uuid + "\n" + requestPtr->GetQuery());
+	SendVerboseMessage(QStringLiteral("Send async request with ID ") + uuid + "\n" + requestPtr->GetQuery());
 
 	auto replyPtr = m_networkManager->post(networkRequest, requestPtr->GetQuery());
 	if (replyPtr == nullptr){
-		SendErrorMessage(0, QString("Null reply for request-ID ") + uuid);
+		SendErrorMessage(0, QStringLiteral("Null reply for request-ID ") + uuid);
 		promisePtr->addResult(GqlResult{GqlResponsePtr(), EC_NETWORK, "Failed to start network request"});
 		promisePtr->finish();
 		return;
@@ -159,7 +159,7 @@ void CAsyncApiClientComp::SendRequestInternal(
 		}
 		else if (error == QNetworkReply::OperationCanceledError){
 			if (*timedOutFlagPtr){
-				const QString message = QString("Request ") + uuid + " timed out";
+				const QString message = QStringLiteral("Request ") + uuid + " timed out";
 				SendErrorMessage(0, message);
 				promisePtr->addResult(GqlResult{GqlResponsePtr(), EC_TIMEOUT, message});
 				promisePtr->finish();
@@ -169,7 +169,7 @@ void CAsyncApiClientComp::SendRequestInternal(
 			}
 		}
 		else{
-			const QString message = QString("Response for request-ID ") + uuid + "\n" + replyPtr->errorString();
+			const QString message = QStringLiteral("Response for request-ID ") + uuid + "\n" + replyPtr->errorString();
 			SendErrorMessage(0, message);
 			promisePtr->addResult(GqlResult{GqlResponsePtr(), EC_NETWORK, replyPtr->errorString()});
 			promisePtr->finish();

@@ -42,13 +42,13 @@ bool CRoleChangeGeneratorComp::CompareDocuments(
 {
 	const imtauth::CRole* oldRoleInfoPtr = dynamic_cast<const imtauth::CRole*>(&oldDocument);
 	if (oldRoleInfoPtr == nullptr){
-		errorMessage = QString("Unable to compare roles. Error: old role is invalid");
+		errorMessage = QStringLiteral("Unable to compare roles. Error: old role is invalid");
 		return false;
 	}
 
 	const imtauth::CRole* newRoleInfoPtr = dynamic_cast<const imtauth::CRole*>(&newDocument);
 	if (newRoleInfoPtr == nullptr){
-		errorMessage = QString("Unable to compare roles. Error: New role is invalid");
+		errorMessage = QStringLiteral("Unable to compare roles. Error: New role is invalid");
 		return false;
 	}
 

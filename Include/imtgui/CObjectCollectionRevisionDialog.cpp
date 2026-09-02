@@ -124,7 +124,7 @@ void CObjectCollectionRevisionDialog::OnExport()
 			QString filePath = QFileDialog::getSaveFileName(
 						this,
 						tr("Export File"),
-						QString("%1 (revision %2)").arg(m_fileName).arg(revision),
+						QStringLiteral("%1 (revision %2)").arg(m_fileName, QString::number(revision)),
 						m_filter);
 
 			if (!filePath.isEmpty()){

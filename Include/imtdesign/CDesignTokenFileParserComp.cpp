@@ -74,7 +74,7 @@ bool CDesignTokenFileParserComp::SetFile(const QByteArray& filePath)
 		}
 	}
 	else{
-		qDebug() << (qPrintable(QString("Theme file doesn't exist: '%1'").arg(qPrintable(filePath))));
+		qDebug() << (QStringLiteral("Theme file doesn't exist: '%1'").arg(filePath));
 
 		return false;
 	}
@@ -96,7 +96,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 		}
 		else{
 			if (!m_designTokenFileInfo.absoluteFilePath().isEmpty()){
-				SendErrorMessage(__LINE__, QString("Unable to open theme file : '%1'").arg(m_designTokenFileInfo.absoluteFilePath()));
+				SendErrorMessage(__LINE__, QStringLiteral("Unable to open theme file : '%1'").arg(m_designTokenFileInfo.absoluteFilePath()));
 			}
 
 			return false;
@@ -104,7 +104,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 	}
 
 	if (!designTokenFile.open(QFile::ReadOnly)){
-		SendErrorMessage(__LINE__, QString("Cannot read file '%1'; Error: '%2'").arg(designTokenFile.fileName(), designTokenFile.errorString()));
+		SendErrorMessage(__LINE__, QStringLiteral("Cannot read file '%1'; Error: '%2'").arg(designTokenFile.fileName(), designTokenFile.errorString()));
 
 		return false;
 	}
@@ -116,7 +116,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 	QJsonObject designTokenObject = jsonDocument.object();
 
 	if (designTokenObject.isEmpty()){
-		SendErrorMessage(__LINE__, QString("Error occured '%1' at symbol: %2  during the processing file : '%3'")
+		SendErrorMessage(__LINE__, QStringLiteral("Error occured '%1' at symbol: %2  during the processing file : '%3'")
 					.arg(jsonParseError.errorString(), QString::number(jsonParseError.offset), designTokenFile.fileName()));
 
 		return false;
@@ -127,7 +127,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 	designTokenStylesArray << singleStyle;
 
 	if (designTokenStylesArray.isEmpty()){
-		SendErrorMessage(__LINE__, QString("Error occured '%1' during the styles processing in the file :'%2'").arg(jsonParseError.errorString(), designTokenFile.fileName()));
+		SendErrorMessage(__LINE__, QStringLiteral("Error occured '%1' during the styles processing in the file :'%2'").arg(jsonParseError.errorString(), designTokenFile.fileName()));
 
 		return false;
 	}
@@ -141,13 +141,13 @@ bool CDesignTokenFileParserComp::ParseFile()
 		QString styleName = styleEntry["Name"].toString();
 
 		if (styleName.compare(designTokenFileFileBaseName, Qt::CaseInsensitive) != 0){
-			SendErrorMessage(0, QString("The file name does not match the theme name '%1' VS '%2'").arg(designTokenFileFileBaseName).arg(styleName));
+			SendErrorMessage(0, QStringLiteral("The file name does not match the theme name '%1' VS '%2'").arg(designTokenFileFileBaseName, styleName));
 
 			return false;
 		}
 
 		if (styleName != designTokenFileFileBaseName){
-			SendVerboseMessage(QString("The file name and the theme name have different case '%1' VS '%2'").arg(designTokenFileFileBaseName).arg(styleName));
+			SendVerboseMessage(QStringLiteral("The file name and the theme name have different case '%1' VS '%2'").arg(designTokenFileFileBaseName, styleName));
 		}
 
 		ReplaceColorNamesRecursive(styleEntry, colorPaletteVariables);
@@ -238,7 +238,7 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 	if (!outputDir.exists()){
 		bool createOutputDir = istd::CSystem::EnsurePathExists(outputDirPath.toUtf8());
 		if (!createOutputDir){
-			SendErrorMessage(__LINE__, QString("Cannot create output dir '%1'").arg(outputDirPath));
+			SendErrorMessage(__LINE__, QStringLiteral("Cannot create output dir '%1'").arg(outputDirPath));
 
 			return false;
 		}
@@ -252,7 +252,7 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 	}
 
 	if (!designTokenFile.open(QFile::ReadOnly)){
-		SendErrorMessage(__LINE__, QString("Cannot read file '%1'; Error: '%2'").arg(designTokenFile.fileName(), designTokenFile.errorString()));
+		SendErrorMessage(__LINE__, QStringLiteral("Cannot read file '%1'; Error: '%2'").arg(designTokenFile.fileName(), designTokenFile.errorString()));
 
 		return false;
 	}
@@ -262,7 +262,7 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 	QJsonParseError jsonParseError;
 	QJsonObject designTokenObject = QJsonDocument::fromJson(designTokenFile.readAll(), &jsonParseError).object();
 	if(designTokenObject.isEmpty()){
-		SendErrorMessage(__LINE__, QString("Error occured '%1' during the styles processing in the file :'%2'").arg(jsonParseError.errorString(), designTokenFile.fileName()));
+		SendErrorMessage(__LINE__, QStringLiteral("Error occured '%1' during the styles processing in the file :'%2'").arg(jsonParseError.errorString(), designTokenFile.fileName()));
 
 		return false;
 	}
@@ -304,7 +304,7 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 		QFile outputSingleThemeFile(outputSingleThemeFileName);
 		bool openOutputFile = outputSingleThemeFile.open(QFile::WriteOnly);
 		if(!openOutputFile){
-			SendErrorMessage(__LINE__, QString("Cannot read file '%1'; Error: '%2'").arg(outputSingleThemeFile.fileName(), outputSingleThemeFile.errorString()));
+			SendErrorMessage(__LINE__, QStringLiteral("Cannot read file '%1'; Error: '%2'").arg(outputSingleThemeFile.fileName(), outputSingleThemeFile.errorString()));
 
 			return false;
 		}

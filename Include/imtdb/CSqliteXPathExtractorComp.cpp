@@ -16,15 +16,15 @@ QString CSqliteXPathExtractorComp::ExtractXPath(
 			QMetaType::Type metaType,
 			const QString& tableAlias) const
 {
-	QString jsonPath = QString("$.%1").arg(fieldId);
+	QString jsonPath = QStringLiteral("$.%1").arg(fieldId);
 	QString fieldWithAlias = tableAlias.isEmpty()
-								 ? QString(R"("%1")").arg(jsonKey)
-								 : QString(R"(%1."%2")").arg(tableAlias, jsonKey);
+								 ? QStringLiteral(R"("%1")").arg(jsonKey)
+								 : QStringLiteral(R"(%1."%2")").arg(tableAlias, jsonKey);
 
 	switch (metaType){
 	case QMetaType::QString:
 	case QMetaType::QByteArray:
-		return QString(R"(json_extract(%1, '%2'))").arg(fieldWithAlias, jsonPath);
+		return QStringLiteral(R"(json_extract(%1, '%2'))").arg(fieldWithAlias, jsonPath);
 
 	case QMetaType::Int:
 	case QMetaType::UInt:
@@ -32,17 +32,17 @@ QString CSqliteXPathExtractorComp::ExtractXPath(
 	case QMetaType::UShort:
 	case QMetaType::LongLong:
 	case QMetaType::ULongLong:
-		return QString(R"(CAST(json_extract(%1, '%2') AS INTEGER))").arg(fieldWithAlias, jsonPath);
+		return QStringLiteral(R"(CAST(json_extract(%1, '%2') AS INTEGER))").arg(fieldWithAlias, jsonPath);
 
 	case QMetaType::Double:
 	case QMetaType::Float:
-		return QString(R"(CAST(json_extract(%1, '%2') AS REAL))").arg(fieldWithAlias, jsonPath);
+		return QStringLiteral(R"(CAST(json_extract(%1, '%2') AS REAL))").arg(fieldWithAlias, jsonPath);
 
 	case QMetaType::Bool:
-		return QString(R"(CAST(json_extract(%1, '%2') AS BOOLEAN))").arg(fieldWithAlias, jsonPath);
+		return QStringLiteral(R"(CAST(json_extract(%1, '%2') AS BOOLEAN))").arg(fieldWithAlias, jsonPath);
 
 	case QMetaType::QJsonObject:
-		return QString(R"(json_extract(%1, '%2'))").arg(fieldWithAlias, jsonPath);
+		return QStringLiteral(R"(json_extract(%1, '%2'))").arg(fieldWithAlias, jsonPath);
 
 	default:
 		return QString();

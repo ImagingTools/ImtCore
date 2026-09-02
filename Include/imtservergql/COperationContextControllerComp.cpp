@@ -30,14 +30,14 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 	}
 
 	if (gqlRequestPtr == nullptr){
-		SendErrorMessage(0, QString("Unable to create operation context. Error: GraphQL request invalid"), "COperationContextControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to create operation context. Error: GraphQL request invalid"), "COperationContextControllerComp");
 
 		return nullptr;
 	}
 
 	const imtgql::IGqlContext* requestContextPtr = gqlRequestPtr->GetRequestContext();
 	if (requestContextPtr == nullptr){
-		SendErrorMessage(0, QString("Unable to create operation context. Error: GraphQL context is invalid"), "COperationContextControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to create operation context. Error: GraphQL context is invalid"), "COperationContextControllerComp");
 
 		return nullptr;
 	}
@@ -51,7 +51,7 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 		objectInfo.name = userInfoPtr->GetName();
 	}
 	else{
-		SendWarningMessage(0, QString("User info from GraphQL context is invalid, operation '%1' will not be attributed").arg(QString::fromUtf8(operationTypeId)), "COperationContextControllerComp");
+		SendWarningMessage(0, QStringLiteral("User info from GraphQL context is invalid, operation '%1' will not be attributed").arg(operationTypeId), "COperationContextControllerComp");
 	}
 
 	istd::TDelPtr<imtbase::COperationContext> operationContextPtr;
@@ -65,7 +65,7 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 	if (m_documentChangeGeneratorCompPtr.IsValid()){
 		imtbase::CObjectCollection* changeCollectionPtr = dynamic_cast<imtbase::CObjectCollection*>(operationContextPtr->GetChangesCollection());
 		if (changeCollectionPtr == nullptr){
-			SendErrorMessage(0, QString("Unable to create operation context. Error: Change collection is invalid"), "COperationContextControllerComp");
+			SendErrorMessage(0, QStringLiteral("Unable to create operation context. Error: Change collection is invalid"), "COperationContextControllerComp");
 
 			return nullptr;
 		}
@@ -74,7 +74,7 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 		if (!m_documentChangeGeneratorCompPtr->GenerateDocumentChanges(operationTypeId, objectId, objectPtr, *changeCollectionPtr, errorMessage, paramsPtr)){
 			SendWarningMessage(
 				0,
-				QString("Unable to generate document changes for operation '%1' on object '%2'. '%3'")
+				QStringLiteral("Unable to generate document changes for operation '%1' on object '%2'. '%3'")
 							.arg(QString::fromUtf8(operationTypeId), QString::fromUtf8(objectId), errorMessage),
 				"COperationContextControllerComp");
 		}

@@ -28,7 +28,7 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 {
 
 	if (!featureRepresentationData.featureId || featureRepresentationData.featureId->isEmpty()){
-		errorMessage = QString("Unable to create feature with an empty 'Feature-ID'");
+		errorMessage = QStringLiteral("Unable to create feature with an empty 'Feature-ID'");
 
 		return false;
 	}
@@ -52,13 +52,13 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 	if (!collectionIds.isEmpty()){
 		QByteArray id = collectionIds[0];
 		if (rootFeatureId != id){
-			errorMessage = QT_TR_NOOP(QString("Feature-ID: '%1' already exists")).arg(qPrintable(featureId));
+			errorMessage = QT_TR_NOOP(QStringLiteral("Feature-ID: '%1' already exists")).arg(featureId);
 			return false;
 		}
 	}
 
 	if (!featureRepresentationData.featureName || featureRepresentationData.featureName->isEmpty()){
-		errorMessage = QString("Feature Name cannot be empty");
+		errorMessage = QStringLiteral("Feature Name cannot be empty");
 		return false;
 	}
 	
@@ -180,7 +180,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to create representation from object. Error: Attribute 'm_objectCollectionCompPtr' was not set");
+		errorMessage = QStringLiteral("Unable to create representation from object. Error: Attribute 'm_objectCollectionCompPtr' was not set");
 		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
 
 		return false;
@@ -195,7 +195,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (featureInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
+		errorMessage = QStringLiteral("Unable to create representation from object '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
 
 		return false;
@@ -275,7 +275,7 @@ istd::IChangeableUniquePtr CFeatureCollectionControllerComp::CreateObjectFromRep
 			QString& errorMessage) const
 {
 	if (!m_featureInfoFactCompPtr.IsValid()){
-		errorMessage = QString("Unable to create object from representation. Error: Attribute 'm_featureInfoFactCompPtr' was not set");
+		errorMessage = QStringLiteral("Unable to create object from representation. Error: Attribute 'm_featureInfoFactCompPtr' was not set");
 		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
 
 		return nullptr;
@@ -283,7 +283,7 @@ istd::IChangeableUniquePtr CFeatureCollectionControllerComp::CreateObjectFromRep
 
 	imtlic::IFeatureInfoUniquePtr featureInstancePtr = m_featureInfoFactCompPtr.CreateInstance();
 	if (!featureInstancePtr.IsValid()){
-		errorMessage = QString("Unable to create feature instance. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to create feature instance. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
 
 		return nullptr;
@@ -291,7 +291,7 @@ istd::IChangeableUniquePtr CFeatureCollectionControllerComp::CreateObjectFromRep
 
 	imtlic::CIdentifiableFeatureInfo* featureInfoPtr = dynamic_cast<imtlic::CIdentifiableFeatureInfo*>(featureInstancePtr.GetPtr());
 	if (featureInfoPtr == nullptr){
-		errorMessage = QString("Unable to cast feature instance to identifable object. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to cast feature instance to identifable object. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
 
 		return nullptr;
@@ -337,7 +337,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 {
 	const imtlic::CIdentifiableFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CIdentifiableFeatureInfo*>(&data);
 	if (featureInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		errorMessage = QStringLiteral("Unable to create representation from object. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
 
 		return false;
@@ -352,7 +352,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 
 	bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, representationPayload, errorMessage);
 	if (!ok){
-		errorMessage = QString("Unable to create representaion from object. Error: '%1'").arg(errorMessage);
+		errorMessage = QStringLiteral("Unable to create representaion from object. Error: '%1'").arg(errorMessage);
 		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
 
 		return false;
@@ -370,7 +370,7 @@ bool CFeatureCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 {
 	imtlic::CIdentifiableFeatureInfo* featureInfoPtr = dynamic_cast<imtlic::CIdentifiableFeatureInfo*>(&object);
 	if (featureInfoPtr == nullptr){
-		errorMessage = QString("Unable to update feature from representation. Error: Object is invalid");
+		errorMessage = QStringLiteral("Unable to update feature from representation. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
 
 		return false;
@@ -396,7 +396,7 @@ bool CFeatureCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 	bool ok = CreateFeatureFromRepresentationModel(featureData, featureId, *featureInfoPtr, errorMessage);
 	if (!ok){
-		errorMessage = QString("Unable to update feature from representation. Error: '%1'").arg(errorMessage);
+		errorMessage = QStringLiteral("Unable to update feature from representation. Error: '%1'").arg(errorMessage);
 		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
 
 		return false;

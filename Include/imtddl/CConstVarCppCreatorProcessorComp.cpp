@@ -61,7 +61,7 @@ QString CConstVarCppCreatorProcessorComp::GetModuleName(const iprm::IParamsSet* 
 	iprm::TParamsPtr<iprm::ITextParam> moduleNameParamPtr(paramsPtr, "ModuleCppName");
 
 	if (!moduleNameParamPtr.IsValid()){
-		SendErrorMessage(__LINE__, QString("The params module name is invalid"));
+		SendErrorMessage(__LINE__, QStringLiteral("The params module name is invalid"));
 
 		return QString();
 	}

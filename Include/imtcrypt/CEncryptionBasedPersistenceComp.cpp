@@ -113,7 +113,7 @@ ifile::IFilePersistence::OperationState CEncryptionBasedPersistenceComp::LoadFro
 			}
 
 			if (!m_encryptionCompPtr->DecryptData(encryptedData,encryptionAlgorithm, *m_encryptionKeysProviderCompPtr, decryptedData)){
-				SendErrorMessage(0, QString("Encryption Persistence: Data decryption failed. File '%1' could not be loaded").arg(filePath));
+				SendErrorMessage(0, QStringLiteral("Encryption Persistence: Data decryption failed. File '%1' could not be loaded").arg(filePath));
 
 				file.close();
 

@@ -104,8 +104,8 @@ imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& r
 		return responsePtr;
 	}
 	else if (commandId.isEmpty()){
-		QByteArray body = QByteArray("<html><head><title>Error</title></head><body><p>Empty command-ID</p></body></html>");
-		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
+		QByteArray body = QByteArrayLiteral(R"(<html><head><title>Error</title></head><body><p>Empty command-ID</p></body></html>)");
+		QByteArray reponseTypeId = QByteArrayLiteral("text/html; charset=utf-8");
 
 		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId).PopInterfacePtr());
 
@@ -114,12 +114,12 @@ imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& r
 	else{
 		QString commandIdSafe = commandId;
 		commandIdSafe = commandIdSafe.replace(QRegularExpression("[<>\":;()= .]"),"_");
-		QByteArray body = QString("<html><head><title>Error</title></head><body><p>The requested command could not be executed. No servlet was found for the given command: '%1'</p></body></html>").arg(qPrintable(commandIdSafe)).toUtf8();
-		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
+		QByteArray body = QStringLiteral("<html><head><title>Error</title></head><body><p>The requested command could not be executed. No servlet was found for the given command: '%1'</p></body></html>").arg(commandIdSafe).toUtf8();
+		QByteArray reponseTypeId = QByteArrayLiteral("text/html; charset=utf-8");
 
 		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId).PopInterfacePtr());
 
-		SendErrorMessage(0, QString("No request handler found for: '%1'").arg(qPrintable(commandId)));
+		SendErrorMessage(0, QStringLiteral("No request handler found for: '%1'").arg(commandId));
 
 		return responsePtr;
 	}

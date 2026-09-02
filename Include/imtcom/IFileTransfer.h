@@ -92,7 +92,7 @@ namespace imtcom
 	    
 	    bool UploadDocument(const QString& localPath, const QString& documentId) {
 	        QUrl uploadUrl = m_baseUrl;
-	        uploadUrl.setPath(QString("/documents/%1").arg(documentId));
+	        uploadUrl.setPath(QStringLiteral("/documents/%1").arg(documentId));
 	        
 	        qInfo() << "Uploading document" << documentId << "from" << localPath;
 	        
@@ -109,7 +109,7 @@ namespace imtcom
 	    
 	    bool DownloadDocument(const QString& documentId, const QString& localPath) {
 	        QUrl downloadUrl = m_baseUrl;
-	        downloadUrl.setPath(QString("/documents/%1").arg(documentId));
+	        downloadUrl.setPath(QStringLiteral("/documents/%1").arg(documentId));
 	        
 	        qInfo() << "Downloading document" << documentId << "to" << localPath;
 	        

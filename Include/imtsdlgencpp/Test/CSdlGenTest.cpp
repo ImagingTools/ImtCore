@@ -146,7 +146,7 @@ void ExecuteTest(
 	QTemporaryDir tempOutputDir;
 	const QString tempOutputDirPath = tempOutputDir.path();
 	if (!istd::CSystem::EnsurePathExists(tempOutputDirPath)){
-		qCritical() <<  QString("Unable to create temp dir at '%1'").arg(tempOutputDirPath);
+		qCritical() <<  QStringLiteral("Unable to create temp dir at '%1'").arg(tempOutputDirPath);
 
 		return;
 	}

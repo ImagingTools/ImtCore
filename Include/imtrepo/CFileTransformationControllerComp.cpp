@@ -173,7 +173,7 @@ bool CFileTransformationControllerComp::TransformRepository(IFileObjectCollectio
 				const TransformationStep& step = transformations[stepIndex];
 
 				if (!step.transformationPtr->TransformFile(repositoryItemInfo, step.from, step.to)){
-					SendErrorMessage(0, QString("Repository file '%1' could not be transformed").arg(itemInfo.absoluteFilePath()));
+					SendErrorMessage(0, QStringLiteral("Repository file '%1' could not be transformed").arg(itemInfo.absoluteFilePath()));
 
 					isFailed = true;
 					break;

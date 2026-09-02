@@ -124,7 +124,7 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 	}
 
 	if (!IsObjectTypeSupported(typeId)){
-		SendErrorMessage(0, QString("Object type ID \"%1\" not supported").arg(qPrintable(typeId)));
+		SendErrorMessage(0, QStringLiteral(R"(Object type ID "%1" not supported)").arg(typeId));
 
 		return QByteArray();
 	}
@@ -611,7 +611,7 @@ imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObje
 
 	QString queryWithTotalCount = QStringLiteral(
 										"SELECT *, COUNT(*) OVER() AS \"TotalCount\" FROM (%1) AS _base")
-										.arg(QString::fromUtf8(baseSelectionQuery));
+										.arg(baseSelectionQuery);
 
 	const QByteArray driverId = m_dbEngineCompPtr->GetDatabaseDriverId();
 	const bool isSQLite = (driverId == "QSQLITE");
@@ -619,13 +619,11 @@ imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObje
 	if (count > 0){
 		if (isSQLite){
 			queryWithTotalCount += QStringLiteral(" LIMIT %1 OFFSET %2")
-									.arg(count)
-									.arg(qMax(0, offset));
+									.arg(QString::number(count), QString::number(qMax(0, offset)));
 		}
 		else{
 			queryWithTotalCount += QStringLiteral(" OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY")
-									.arg(qMax(0, offset))
-									.arg(count);
+									.arg(QString::number(qMax(0, offset)), QString::number(count));
 		}
 	}
 	else if (offset > 0 && isSQLite){

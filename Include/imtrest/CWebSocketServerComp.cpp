@@ -71,7 +71,7 @@ void CWebSocketServerComp::SetConnectionStatus(const QByteArray& clientId)
 {
 	imtcom::IConnectionStatusProvider::ConnectionStatus loginStatus = imtcom::IConnectionStatusProvider::CS_CONNECTED;
 
-	istd::IChangeable::ChangeSet loginChangeSet(loginStatus, QString("Login"));
+	istd::IChangeable::ChangeSet loginChangeSet(loginStatus, QStringLiteral("Login"));
 	loginChangeSet.SetChangeInfo("ClientId", clientId);
 	istd::CChangeNotifier notifier(this, &loginChangeSet);
 
@@ -267,12 +267,12 @@ bool CWebSocketServerComp::StartListening(const QHostAddress& address, quint16 p
 				m_webSocketServerPtr.SetPtr(new QWebSocketServer("", QWebSocketServer::SecureMode, this));
 				m_webSocketServerPtr->setSslConfiguration(sslConfiguration);
 
-				SendInfoMessage(0, QString("Secure connection (SSL) enabled on web socket server"));
+				SendInfoMessage(0, QStringLiteral("Secure connection (SSL) enabled on web socket server"));
 
 				isSecureConnection = true;
 			}
 			else{
-				QString message = QString("Could not enable secure connection (SSL) on web socket server");
+				QString message = QStringLiteral("Could not enable secure connection (SSL) on web socket server");
 				SendErrorMessage(0, message);
 			}
 		}
@@ -296,7 +296,7 @@ bool CWebSocketServerComp::StartListening(const QHostAddress& address, quint16 p
 #endif
 
 	if (m_webSocketServerPtr->listen(address, port)){
-		SendInfoMessage(0, QString("Web socket server successfully started on port %1").arg(port));
+		SendInfoMessage(0, QStringLiteral("Web socket server successfully started on port %1").arg(port));
 
 		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections);
 		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::acceptError, this, &CWebSocketServerComp::OnAcceptError);
@@ -305,7 +305,7 @@ bool CWebSocketServerComp::StartListening(const QHostAddress& address, quint16 p
 		return true;
 	}
 	else{
-		SendErrorMessage(0, QString("Web socket server could not be started on port %1").arg(port));
+		SendErrorMessage(0, QStringLiteral("Web socket server could not be started on port %1").arg(port));
 	}
 
 	return false;
@@ -326,7 +326,7 @@ void CWebSocketServerComp::HandleNewConnections()
 	while (QWebSocket* webSocketPtr = webSocketServerPtr->nextPendingConnection()){
 #if QT_VERSION >= QT_VERSION_CHECK(6,4,0)
 		QString subprotocol = webSocketPtr->subprotocol();
-		QString message = QString("Handle new web socket connection, (Subprotocol: '%1', Threads: %2)").arg(subprotocol, m_webSocketThreadList.count()) ;
+		QString message = QStringLiteral("Handle new web socket connection, (Subprotocol: '%1', Threads: %2)").arg(subprotocol, m_webSocketThreadList.count()) ;
 		SendVerboseMessage(message, "CWebSocketServerComp");
 
 		if (!subprotocol.isEmpty() && !supportedSubprotocols.contains(subprotocol)) {
@@ -393,7 +393,7 @@ void CWebSocketServerComp::OnSocketDisconnected()
 	// callbacks synchronously, and an observer that calls back into SendResponse()/RegisterSender()
 	// would re-enter the (non-recursive) m_sendersLock and deadlock.
 	for (const QByteArray& key: removedKeys){
-		istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));
+		istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QStringLiteral("Logout"));
 		loginChangeSet.SetChangeInfo("ClientId", key);
 		istd::CChangeNotifier notifier(this, &loginChangeSet);
 	}
@@ -416,10 +416,10 @@ void CWebSocketServerComp::OnTimeout()
 
 			if (subProtocolId == "graphql-transport-ws"){
 				//optional ToDo: Remember send ping and disconnect websocket if no pong is received
-				webSocketPtr->sendTextMessage(QString(R"({"type": "ping"})"));
+				webSocketPtr->sendTextMessage(QStringLiteral(R"({"type": "ping"})"));
 			}
 			else{
-				webSocketPtr->sendTextMessage(QString(R"({"type": "ka"})"));
+				webSocketPtr->sendTextMessage(QStringLiteral(R"({"type": "ka"})"));
 			}
 
 			sendedSockets.append(webSocketPtr);

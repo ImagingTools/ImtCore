@@ -98,17 +98,17 @@ bool CLicenseManagerViewDelegateComp::GetSummaryInformation(
 	for (const QByteArray& informationId: fieldIds){
 		SummaryInformation summaryInformation;
 		summaryInformation.infoId = informationId;
-		if (informationId == QByteArray("Id")){
+		if (informationId == QByteArrayLiteral("Id")){
 			summaryInformation.text = licenseInfoPtr->GetLicenseId();//Изменил LicenseId на Id
 			summaryInformation.sortValue = summaryInformation.text;
 			objectMetaInfo.append(summaryInformation);
 		}
-		else if (informationId == QByteArray("Name")){
+		else if (informationId == QByteArrayLiteral("Name")){
 			summaryInformation.text = licenseInfoPtr->GetLicenseName();
 			summaryInformation.sortValue = summaryInformation.text;
 			objectMetaInfo.append(summaryInformation);
 		}
-		else if (informationId == QByteArray("Description")){
+		else if (informationId == QByteArrayLiteral("Description")){
 			summaryInformation.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 			summaryInformation.sortValue = summaryInformation.text;
 			objectMetaInfo.append(summaryInformation);
