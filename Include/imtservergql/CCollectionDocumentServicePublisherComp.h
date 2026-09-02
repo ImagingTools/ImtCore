@@ -59,12 +59,12 @@ protected:
 
 protected:
 	void FillDocumentNotification(
-		const imtdoc::CEventBase* eventPtr,
-		imtdoc::IDocumentService::DocumentNotification& notification) const;
+				const imtdoc::CEventBase* eventPtr,
+				imtdoc::IDocumentService::DocumentNotification& notification) const;
 	void FillSdlNotification(
-		const imtdoc::IDocumentService::DocumentNotification& notification,
-		sdl::V1_0::imtbase::EDocumentOperation operation,
-		sdl::V1_0::imtbase::CDocumentServiceNotification& sdlNotification) const;
+				const imtdoc::IDocumentService::DocumentNotification& notification,
+				sdl::V1_0::imtbase::EDocumentOperation operation,
+				sdl::V1_0::imtbase::CDocumentServiceNotification& sdlNotification) const;
 	QByteArray ConvertUrlToObjectId(const QUrl& url) const;
 
 	/**
@@ -115,9 +115,9 @@ private:
 
 template<class Representation>
 void CCollectionDocumentServicePublisherComp::PublishRepresentation(
-	const QByteArray& commandId,
-	const QByteArray& userId,
-	const Representation& representation) const
+			const QByteArray& commandId,
+			const QByteArray& userId,
+			const Representation& representation) const
 {
 	QJsonObject jsonObject;
 	if (!representation.WriteToJsonObject(jsonObject)){

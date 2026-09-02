@@ -39,9 +39,9 @@ void CCollectionDocumentServicePublisherComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	QObject::connect(
-		&m_closeIdleDocumentsTimer,
-		&QTimer::timeout,
-		[this]{ CloseIdleDocuments(); });
+				&m_closeIdleDocumentsTimer,
+				&QTimer::timeout,
+				[this]{ CloseIdleDocuments(); });
 	m_closeIdleDocumentsTimer.start(1000);
 }
 
@@ -199,8 +199,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentChanged(imtdoc::CEventBa
 }
 
 
-bool CCollectionDocumentServicePublisherComp::OnDocumentUndoRedoChanged(
-	imtdoc::CEventBase* eventPtr) const
+bool CCollectionDocumentServicePublisherComp::OnDocumentUndoRedoChanged(imtdoc::CEventBase* eventPtr) const
 {
 	imtdoc::CDocumentUndoRedoChangedEvent* concreteEventPtr = dynamic_cast<imtdoc::CDocumentUndoRedoChangedEvent*>(eventPtr);
 	if (concreteEventPtr == nullptr){
@@ -315,8 +314,8 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentDataLoaded(imtdoc::CEven
 
 
 void CCollectionDocumentServicePublisherComp::FillDocumentNotification(
-	const imtdoc::CEventBase* eventPtr,
-	imtdoc::IDocumentService::DocumentNotification& notification) const
+			const imtdoc::CEventBase* eventPtr,
+			imtdoc::IDocumentService::DocumentNotification& notification) const
 {
 	notification.userId = eventPtr->GetUserId();
 	notification.documentId = eventPtr->GetDocumentId();
@@ -328,9 +327,9 @@ void CCollectionDocumentServicePublisherComp::FillDocumentNotification(
 
 
 void CCollectionDocumentServicePublisherComp::FillSdlNotification(
-	const imtdoc::IDocumentService::DocumentNotification& notification,
-	sdl::V1_0::imtbase::EDocumentOperation operation,
-	sdl::V1_0::imtbase::CDocumentServiceNotification& sdlNotification) const
+			const imtdoc::IDocumentService::DocumentNotification& notification,
+			sdl::V1_0::imtbase::EDocumentOperation operation,
+			sdl::V1_0::imtbase::CDocumentServiceNotification& sdlNotification) const
 {
 	sdlNotification.documentOperation = operation;
 	sdlNotification.documentId = notification.documentId;
@@ -354,8 +353,8 @@ QByteArray CCollectionDocumentServicePublisherComp::ConvertUrlToObjectId(const Q
 
 
 void CCollectionDocumentServicePublisherComp::TrackDocument(
-	const QByteArray& userId,
-	const QByteArray& documentId) const
+			const QByteArray& userId,
+			const QByteArray& documentId) const
 {
 	if (documentId.isEmpty()){
 		return;
