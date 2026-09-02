@@ -120,7 +120,7 @@ idoc::IUndoManagerUniquePtr CDocumentServiceCompBase::CreateUndoManager() const
 	}
 
 	const QByteArray errorMessage = QStringLiteral("Factory not found").toUtf8();
-	Q_ASSERT_X(false, "CDocumentServiceCompBase::CreateUndoManager", errorMessage.constData());
+	Q_ASSERT_X(retVal.IsValid(), "CDocumentServiceCompBase::CreateUndoManager", errorMessage.constData());
 
 	return retVal;
 }

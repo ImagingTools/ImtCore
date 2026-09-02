@@ -347,8 +347,7 @@ bool CFileBasedUndoManagerComp::DoListShift(int steps, UndoList& fromList, UndoL
 
 			if (RestoreState(*sourceStatePtr, *objectPtr)){
 				for (int i = 1; i < steps; ++i){
-					toList.push_back(UndoStepPtr());
-					toList.back() = fromList.back();
+					toList.push_back(fromList.back());
 					fromList.pop_back();
 				}
 
@@ -632,8 +631,7 @@ void CFileBasedUndoManagerComp::AfterUpdate(imod::IModel* modelPtr, const istd::
 					istd::CChangeNotifier notifier(this);
 					Q_UNUSED(notifier);
 
-					m_undoList.push_back(UndoStepPtr());
-					m_undoList.back() = m_beginStatePtr;
+					m_undoList.push_back(m_beginStatePtr);
 					m_undoList.back()->description = changeSet.GetDescription();
 
 					m_redoList.clear();
