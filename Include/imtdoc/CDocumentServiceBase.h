@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
+#include <QtCore/QPointer>
 #include <QtCore/QString>
 #include <QtCore/QThread>
 #include <QtCore/QWaitCondition>
@@ -309,6 +310,9 @@ protected:
 
 	QMap<QByteArray, std::shared_ptr<TaskContext>> m_pendingTasks; ///< Currently executing or pending tasks (taskId → context).
 	mutable QMutex m_tasksMutex; ///< Guards \c m_pendingTasks.
+
+	QList<QPointer<QThread>> m_workerThreads; ///< Background threads spawned for async document creation.
+	mutable QMutex m_workerThreadsMutex; ///< Guards \c m_workerThreads.
 
 	QList<IDocumentServiceEventHandler*> m_registeredEventHandlers; ///< Runtime-registered event handlers.
 };

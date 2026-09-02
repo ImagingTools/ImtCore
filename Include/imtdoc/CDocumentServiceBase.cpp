@@ -45,6 +45,25 @@ CDocumentServiceBase::~CDocumentServiceBase()
 {
 	m_isAlive->store(false);
 
+	QList<QPointer<QThread>> workerThreads;
+	{
+		QMutexLocker locker(&m_workerThreadsMutex);
+		workerThreads = m_workerThreads;
+	}
+
+	for (const QPointer<QThread>& threadPtr : workerThreads){
+		if (threadPtr.isNull()){
+			continue;
+		}
+
+		if (threadPtr.data() == QThread::currentThread()){
+			continue;
+		}
+
+		threadPtr->quit();
+		threadPtr->wait();
+	}
+
 	// Complete all pending tasks so that any thread blocked in
 	// WaitForTaskFinished is unblocked before destruction continues.
 	{
@@ -60,6 +79,9 @@ CDocumentServiceBase::~CDocumentServiceBase()
 		}
 		m_pendingTasks.clear();
 	}
+
+	QCoreApplication::sendPostedEvents(nullptr, QEvent::MetaCall);
+	QCoreApplication::processEvents(QEventLoop::AllEvents);
 }
 
 
@@ -237,6 +259,10 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 	QThread* thread = new QThread();
 	QObject* worker = new QObject();
 	worker->moveToThread(thread);
+	{
+		QMutexLocker locker(&m_workerThreadsMutex);
+		m_workerThreads.append(QPointer<QThread>(thread));
+	}
 
 	std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
 	QObject::connect(

@@ -557,6 +557,10 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	QThread* thread = new QThread();
 	QObject* worker = new QObject();
 	worker->moveToThread(thread);
+	{
+		QMutexLocker locker(&this->m_workerThreadsMutex);
+		this->m_workerThreads.append(QPointer<QThread>(thread));
+	}
 
 	bool singleCopyMode = this->IsSingleCopyMode();
 	std::weak_ptr<std::atomic<bool>> aliveGuard(this->m_isAlive);
@@ -564,29 +568,40 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		thread,
 		&QThread::started,
 		worker,
-		std::bind(
-			&TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted,
-			this,
-			aliveGuard,
-			singleCopyMode,
-			objectId,
-			userId,
-			documentId,
-			worker));
+		[this, aliveGuard, singleCopyMode, objectId, userId, documentId, worker](){
+			auto isAlive = aliveGuard.lock();
+			if (!isAlive || !isAlive->load()){
+				worker->deleteLater();
+				return;
+			}
+
+			this->OnOpenDocumentThreadStarted(
+						aliveGuard,
+						singleCopyMode,
+						objectId,
+						userId,
+						documentId,
+						worker);
+		});
 
 	// Initialize observers and fire events in the main thread after background work completes
 	QObject::connect(
 		thread,
 		&QThread::finished,
 		QCoreApplication::instance(),
-		std::bind(
-			&TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadFinished,
-			this,
-			aliveGuard,
-			singleCopyMode,
-			objectId,
-			userId,
-			documentId));
+		[this, aliveGuard, singleCopyMode, objectId, userId, documentId](){
+			auto isAlive = aliveGuard.lock();
+			if (!isAlive || !isAlive->load()){
+				return;
+			}
+
+			this->OnOpenDocumentThreadFinished(
+						aliveGuard,
+						singleCopyMode,
+						objectId,
+						userId,
+						documentId);
+		});
 
 	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit, Qt::DirectConnection);
 	QObject::connect(thread, &QThread::finished, thread, &QObject::deleteLater);
