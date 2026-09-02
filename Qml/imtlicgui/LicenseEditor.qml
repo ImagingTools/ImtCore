@@ -31,16 +31,6 @@ ViewBase {
 	// Part of the product this editor works in; scopes its permission checks.
 	property string permissionPath: ""
 
-	// Raised while the page is being filled in from the document - by an open,
-	// by Undo, by Redo. Every control that writes back on change has to sit
-	// still for that, because the value it is being handed is the document's
-	// own. ViewBase's guard cannot be used here: doUpdateGui() raises
-	// blockingUpdateModel, while guiIsBlocked() reports blockingUpdateGui, so
-	// the combo box read "nothing is blocked", took the -1 it was being reset
-	// with for a choice, and cleared the product, the features and the
-	// inherited licenses on every Undo.
-	property bool applyingGui: false
-
 	Component.onCompleted: {
 		canEdit = PermissionsController.checkPermission("ChangeLicenseDefinition")
 		CachedFeatureCollection.updateModel()
@@ -75,12 +65,10 @@ ViewBase {
 		// compare against the product this license was loaded with. Refreshing
 		// afterwards was clearing m_features on every open.
 		refreshIds()
-		licenseEditor.applyingGui = true
 		var generalPageInstance = multiPageView.getPageByIndex(0)
 		if (generalPageInstance)
 			generalPageInstance.updateGui()
-		licenseEditor.applyingGui = false
-		reloadFromDocument()
+		rebuildEntries()
 	}
 
 	function updateModel() {
@@ -103,23 +91,19 @@ ViewBase {
 		productId = licenseData.m_productId || ""
 	}
 
-	// Writing the same string back would still count as a change to the
-	// document, which is how a plain redraw used to become an undo step.
 	function applyFeatureIds(ids) {
 		featureIds = ids
-		let joined = ids.join(';')
-		if (licenseData && (licenseData.m_features || "") !== joined)
-			licenseData.m_features = joined
+		if (licenseData)
+			licenseData.m_features = ids.join(';')
+		rebuildRequirementIndex()
 		updatePageBadges()
 	}
 
 	function applyParentLicenseIds(ids) {
 		parentLicenseIds = ids
-		let joined = ids.join(';')
-		if (licenseData && (licenseData.m_parentLicenses || "") !== joined)
-			licenseData.m_parentLicenses = joined
+		if (licenseData)
+			licenseData.m_parentLicenses = ids.join(';')
 		rebuildInheritedEntries()
-		rebuildLicenseContent()
 		updatePageBadges()
 	}
 
@@ -130,7 +114,6 @@ ViewBase {
 		if (licenseData)
 			licenseData.m_productId = newProductId
 		// Both picks belong to the old product, so neither survives the switch.
-		explicitPaths = []
 		applyFeatureIds([])
 		applyParentLicenseIds([])
 		rebuildEntries()
@@ -145,38 +128,7 @@ ViewBase {
 		return ""
 	}
 
-	// The features this product offers, as document ids. Read once per rebuild
-	// and kept, because the requirement closure asks "is this one of ours?"
-	// for every feature it walks through.
-	property var productFeatureIdList: []
-	// Which products offer a given feature, so a feature reached by a
-	// requirement can be introduced by where it comes from rather than by a
-	// bare identifier.
-	property var productNamesByFeature: ({})
-
-	function buildProductIndex() {
-		let index = {}
-		for (let i = 0; i < CachedProductCollection.collectionModel.getItemsCount(); ++i) {
-			let name = CachedProductCollection.collectionModel.getData(ProductItemTypeMetaInfo.s_productName, i) || ""
-			let features = CachedProductCollection.collectionModel.getData(ProductItemTypeMetaInfo.s_features, i) || ""
-			let list = features === "" ? [] : features.split(';')
-			for (let j = 0; j < list.length; ++j) {
-				if (list[j] === "")
-					continue
-				if (!index[list[j]])
-					index[list[j]] = []
-				if (index[list[j]].indexOf(name) < 0)
-					index[list[j]].push(name)
-			}
-		}
-		productNamesByFeature = index
-	}
-
-	function productsOffering(rootUuid) {
-		return productNamesByFeature[rootUuid] ? productNamesByFeature[rootUuid] : []
-	}
-
-	function readProductFeatureIds() {
+	function productFeatureIds() {
 		for (let i = 0; i < CachedProductCollection.collectionModel.getItemsCount(); ++i) {
 			let id = CachedProductCollection.collectionModel.getData(ProductItemTypeMetaInfo.s_id, i)
 			if (id !== licenseEditor.productId)
@@ -187,72 +139,18 @@ ViewBase {
 		return []
 	}
 
-	function productFeatureIds() {
-		return productFeatureIdList
-	}
-
-	// Re-reads the collections and works the page out again from the picks that
-	// are already in hand. Everything a change of collection can affect is
-	// covered - names, new sub-features, new requirements - and the picks
-	// themselves are left alone, because a notification from the server is not
-	// somebody changing their mind.
 	function rebuildEntries() {
-		buildFeatureIndex()
-		buildProductIndex()
-		productFeatureIdList = readProductFeatureIds()
 		rebuildFeatureNodes()
-		recomputeGrants()
 		rebuildLicenseEntries()
 		rebuildInheritedEntries()
-		rebuildLicenseContent()
 	}
 
-	// The document arrived - an open, an Undo, a Redo - so the picks come from
-	// it rather than from the page. Reading them back and running them through
-	// the same rules is what makes a requirement added upstream take effect on
-	// opening a license that was saved before it existed.
-	//
-	// A requirement-driven grant is remembered as a pick here, which is the one
-	// place the two differ: within a session, dropping the feature that pulled
-	// something in drops it again, whereas a license reopened from the server
-	// keeps it and lets it be unticked by hand. Nothing is ever lost that way,
-	// which is the trade that matters.
-	function reloadFromDocument() {
-		refreshIds()
-		buildFeatureIndex()
-		buildProductIndex()
-		productFeatureIdList = readProductFeatureIds()
-		deriveExplicitPaths()
-		rebuildFeatureNodes()
-		recomputeGrants()
-		rebuildLicenseEntries()
-		rebuildInheritedEntries()
-		rebuildLicenseContent()
-	}
-
-	// --- the feature collection, indexed by path ---------------------------- //
-	//
-	// Requirements name a feature by the path of identifiers that leads to it,
-	// e.g. "/Administration/EditUser/AddUser" - the same form FeatureEditor
-	// writes. The index below is built over the WHOLE collection, not just over
-	// this product's features, because a requirement is free to point at a
-	// feature this product does not offer and the user has to be told so by
-	// name rather than by path.
-	//
-	// A license stores its picks differently: a whole feature under its document
-	// id, an optional part inside one under "<featureUuid>/<subFeatureId>".
-	// Everything below works in paths and converts to that form once, on the way
-	// into the document.
-	property var featureIndex: ({})
-	property var rootPathByUuid: ({})
-	// leafPathsUnder() is asked the same question by every binding in every
-	// visible row, and the answer only changes when the collection does.
-	property var leafPathCache: ({})
-
-	function buildFeatureIndex() {
-		let index = {}
-		let rootPaths = {}
-		leafPathCache = {}
+	// The features the license's product offers, as a tree: the top level is the
+	// product's features, and opening one shows what is inside it. A whole
+	// feature is granted by its own id; an optional part inside one is granted
+	// by "<featureUuid>/<subFeatureId>", which the license stores verbatim.
+	function rebuildFeatureNodes() {
+		let wanted = productFeatureIds()
 		let tree = TreeModelBuilder.fromTreeItemModelByFields(allFeaturesModel, {
 			key: FeatureItemTypeMetaInfo.s_id,
 			children: FeatureItemTypeMetaInfo.s_subFeatures,
@@ -265,571 +163,184 @@ ViewBase {
 				requirements: FeatureItemTypeMetaInfo.s_requirements
 			}
 		})
+		let nodes = []
 		for (let i = 0; i < tree.length; ++i) {
 			let data = tree[i].data || {}
-			let uuid = data.id || ""
-			let featureId = data.featureId || ""
-			if (uuid === "" || featureId === "")
+			let id = data.id || ""
+			if (wanted.indexOf(id) < 0)
 				continue
-			let rootPath = "/" + featureId
-			rootPaths[uuid] = rootPath
-			indexFeatureNode(tree[i], uuid, rootPath, true, index)
-		}
-		featureIndex = index
-		rootPathByUuid = rootPaths
-	}
-
-	function indexFeatureNode(treeNode, rootUuid, path, isRoot, index) {
-		let data = treeNode.data || {}
-		let sourceChildren = treeNode.children || []
-		let childPaths = []
-		let requirements = []
-		let rawRequirements = data.requirements ? data.requirements.split(';') : []
-		for (let r = 0; r < rawRequirements.length; ++r) {
-			if (rawRequirements[r] !== "")
-				requirements.push(rawRequirements[r])
-		}
-		index[path] = {
-			"path": path,
-			"rootUuid": rootUuid,
-			"isRoot": isRoot,
-			"isLeaf": sourceChildren.length === 0,
-			"featureId": data.featureId || "",
-			"featureName": data.featureName || data.featureId || "",
-			"description": data.description || "",
-			"optional": data.optional === true,
-			"requirements": requirements,
-			"childPaths": childPaths
-		}
-		for (let i = 0; i < sourceChildren.length; ++i) {
-			let childData = sourceChildren[i].data || {}
-			let childPath = path + "/" + (childData.featureId || "")
-			childPaths.push(childPath)
-			indexFeatureNode(sourceChildren[i], rootUuid, childPath, false, index)
-		}
-	}
-
-	function collectLeafPaths(path, target) {
-		let descriptor = featureIndex[path]
-		if (!descriptor)
-			return
-		if (descriptor.isLeaf) {
-			if (target.indexOf(path) < 0)
-				target.push(path)
-			return
-		}
-		for (let i = 0; i < descriptor.childPaths.length; ++i)
-			collectLeafPaths(descriptor.childPaths[i], target)
-	}
-
-	// The leaves of a branch are what it actually grants: a feature that owns
-	// sub-features is a grouping, and a grouping grants whatever is inside it.
-	function leafPathsUnder(path) {
-		let cached = leafPathCache[path]
-		if (cached !== undefined)
-			return cached
-		let result = []
-		collectLeafPaths(path, result)
-		leafPathCache[path] = result
-		return result
-	}
-
-	// The leaves under a branch that are a decision of their own. A mandatory
-	// part is not one: it comes with its feature and cannot be left out.
-	function choosableLeafPathsUnder(path) {
-		let leaves = leafPathsUnder(path)
-		let result = []
-		for (let i = 0; i < leaves.length; ++i) {
-			let descriptor = featureIndex[leaves[i]]
-			if (descriptor && (descriptor.isRoot || descriptor.optional))
-				result.push(leaves[i])
-		}
-		return result
-	}
-
-
-	// "Administration / Users / Add user" - a requirement is written as a path
-	// of identifiers, and identifiers are not what the reader picked rows by.
-	function displayPath(path) {
-		let segments = path.split('/')
-		let names = []
-		let current = ""
-		for (let i = 1; i < segments.length; ++i) {
-			current += "/" + segments[i]
-			let descriptor = featureIndex[current]
-			names.push(descriptor ? descriptor.featureName : segments[i])
-		}
-		return names.join(" / ")
-	}
-
-	function featureNameOfPath(path) {
-		let descriptor = featureIndex[path]
-		return descriptor ? descriptor.featureName : path
-	}
-
-	// The features the license's product offers, as rows for the table: the top
-	// level is the product's features, and opening one shows what is inside it.
-	// The row carries nothing but a path - what it means is worked out from the
-	// index and from what the license currently grants.
-	function rebuildFeatureNodes() {
-		let nodes = []
-		for (let i = 0; i < productFeatureIdList.length; ++i) {
-			let rootPath = rootPathByUuid[productFeatureIdList[i]]
-			if (rootPath === undefined)
-				continue
-			nodes.push(buildFeatureNode(rootPath))
+			nodes.push(buildFeatureNode(tree[i], id, true, ""))
 		}
 		featureNodes = nodes
+		rebuildRequirementIndex()
+		updatePageBadges()
 	}
 
-	function buildFeatureNode(path) {
-		let descriptor = featureIndex[path]
+	function buildFeatureNode(treeNode, rootId, isRoot, parentPath) {
+		let data = treeNode.data || {}
+		let name = data.featureName || data.featureId || ""
+		// The root of a branch is granted under the feature's document id; a
+		// node inside it under the composite key.
+		let grantId = isRoot ? rootId : rootId + "/" + (data.featureId || "")
+		// Requirements name features by this path, not by the grant id.
+		let featurePath = parentPath + "/" + (data.featureId || "")
+		let sourceChildren = treeNode.children || []
 		let children = []
-		for (let i = 0; i < descriptor.childPaths.length; ++i)
-			children.push(buildFeatureNode(descriptor.childPaths[i]))
+		for (let i = 0; i < sourceChildren.length; ++i)
+			children.push(buildFeatureNode(sourceChildren[i], rootId, false, featurePath))
 		return {
-			"key": path,
-			"text": descriptor.featureName,
+			"key": grantId,
+			"text": name,
 			"children": children,
 			"data": {
 				"entry": {
-					"path": path,
-					"rootUuid": descriptor.rootUuid,
-					"isRoot": descriptor.isRoot,
-					"isLeaf": descriptor.isLeaf,
-					"optional": descriptor.optional,
-					"featureName": descriptor.featureName,
-					"featureId": descriptor.featureId,
-					"description": descriptor.description,
+					"id": grantId,
+					"rootId": rootId,
+					"isRoot": isRoot,
+					"optional": data.optional === true,
+					"isLeaf": children.length === 0,
+					"featureName": name,
+					"featureId": data.featureId || "",
+					"featurePath": featurePath,
+					"requirements": data.requirements || "",
+					"description": data.description || "",
 					"subFeatureCount": children.length
 				}
 			}
 		}
 	}
 
-	// --- what the license grants -------------------------------------------- //
-	//
-	// explicitPaths is what the user ticked. Everything else is worked out from
-	// it: the parts that come with a feature, the features pulled in by
-	// requirements, and the requirements of those in turn.
-	property var explicitPaths: []
-	// Leaf paths this license ends up granting, and why - grantedReasons maps a
-	// leaf path to { requirers: [{name, rootUuid}], chain: [names] }. A leaf
-	// with requirers cannot be unticked while they are in the license.
-	property var grantedLeafPaths: []
-	property var grantedLeafSet: ({})
-	property var grantedReasons: ({})
-	// Requirements whose path leads nowhere at all - the feature they name has
-	// been deleted or renamed. A requirement pointing at another product is not
-	// one of these: that is ordinary, and it is simply granted.
-	property var unresolvedRequirements: []
-	// Grants this license carries for features its product no longer offers.
-	// Kept as they are and reported, because no row on this page owns them.
-	property var orphanGrantIds: []
+	// A feature may require others, written as full feature paths separated by ';'.
+	// One that names a feature this product offers is pointed at in the tree; one
+	// that names a feature from elsewhere can only be listed, because this license
+	// has no row to tick for it.
+	property var requiredByIndex: ({})
+	property var externalRequirements: []
 
-	// The document keeps grant ids, not picks. Turning them back into picks is
-	// what lets a saved license be edited with the same rules as a fresh one.
-	function deriveExplicitPaths() {
-		let result = []
-		for (let i = 0; i < featureIds.length; ++i) {
-			let grantId = featureIds[i]
-			if (grantId === "" || grantId.indexOf('/') >= 0)
-				continue
-			let rootPath = rootPathByUuid[grantId]
-			if (rootPath === undefined)
-				continue
-			// Only what the Features page can show is treated as a pick. A
-			// feature outside this product has no row, so calling it a pick
-			// would make it impossible to ever get rid of; it is left to the
-			// requirement that pulled it in, or carried over untouched.
-			if (productFeatureIdList.indexOf(grantId) < 0)
-				continue
-			let choosable = choosableLeafPathsUnder(rootPath)
-			let picked = []
-			for (let j = 0; j < choosable.length; ++j) {
-				let descriptor = featureIndex[choosable[j]]
-				if (descriptor.isRoot || featureIds.indexOf(grantId + "/" + descriptor.featureId) >= 0)
-					picked.push(choosable[j])
+	function rebuildRequirementIndex() {
+		let index = {}
+		let external = []
+		collectRequirements(featureNodes, index, external)
+		requiredByIndex = index
+		externalRequirements = external
+	}
+
+	function collectRequirements(nodes, index, external) {
+		for (let i = 0; i < nodes.length; ++i) {
+			let entry = nodes[i].data.entry
+			if (entryIsSelected(entry)) {
+				let paths = entry.requirements ? entry.requirements.split(';') : []
+				for (let j = 0; j < paths.length; ++j) {
+					let path = paths[j]
+					if (path === "")
+						continue
+					let target = findEntryByFeaturePath(featureNodes, path)
+					if (target) {
+						if (!index[target.id])
+							index[target.id] = []
+						if (index[target.id].indexOf(entry.featureName) < 0)
+							index[target.id].push(entry.featureName)
+					}
+					else if (external.indexOf(path) < 0) {
+						external.push(path)
+					}
+				}
 			}
-			// A feature that is in the license without any of its optional parts
-			// picked still grants its mandatory ones, so the feature itself is
-			// the pick that has to be remembered.
-			if (picked.length === 0)
-				result.push(rootPath)
-			else
-				result = result.concat(picked)
-		}
-		explicitPaths = result
-	}
-
-	function setExplicitPaths(paths) {
-		explicitPaths = paths
-		recomputeGrants()
-		rebuildLicenseContent()
-	}
-
-	// Grants a leaf and records why. requirerName is empty when the leaf is
-	// there because it was ticked or because it comes with its feature.
-	function closureAddLeaf(state, leafPath, requirer, chain) {
-		let descriptor = featureIndex[leafPath]
-		if (!descriptor)
-			return
-		if (!state.reasons[leafPath])
-			state.reasons[leafPath] = { "requirers": [], "chain": chain }
-		if (requirer) {
-			let requirers = state.reasons[leafPath].requirers
-			let known = false
-			for (let i = 0; i < requirers.length; ++i) {
-				if (requirers[i].path === requirer.path)
-					known = true
-			}
-			if (!known)
-				requirers.push(requirer)
-		}
-		if (state.granted[leafPath] === true)
-			return
-		state.granted[leafPath] = true
-		state.queue.push(leafPath)
-	}
-
-	// A feature is granted whole or not at all: the moment anything inside it is
-	// in the license, its mandatory parts are in too, and their own requirements
-	// come with them.
-	function closureAddRoot(state, rootUuid) {
-		if (state.roots[rootUuid] === true)
-			return
-		state.roots[rootUuid] = true
-		let rootPath = rootPathByUuid[rootUuid]
-		if (rootPath === undefined)
-			return
-		let leaves = leafPathsUnder(rootPath)
-		for (let i = 0; i < leaves.length; ++i) {
-			let descriptor = featureIndex[leaves[i]]
-			if (descriptor && !descriptor.isRoot && !descriptor.optional)
-				closureAddLeaf(state, leaves[i], null, [])
+			collectRequirements(nodes[i].children || [], index, external)
 		}
 	}
 
-	// A requirement may name a grouping, in which case everything inside it is
-	// required. It may also name a feature of another product entirely, which is
-	// an ordinary thing for a requirement to do: the license simply grants that
-	// feature too, and says where it came from. The only requirement this page
-	// cannot honour is one whose path leads nowhere at all.
-	function closureRequire(state, path, requirer, chain) {
-		let descriptor = featureIndex[path]
-		if (!descriptor) {
-			closureNoteUnresolved(state, path, requirer, chain)
-			return
+	function findEntryByFeaturePath(nodes, path) {
+		for (let i = 0; i < nodes.length; ++i) {
+			let entry = nodes[i].data.entry
+			if (entry.featurePath === path)
+				return entry
+			let child = findEntryByFeaturePath(nodes[i].children || [], path)
+			if (child)
+				return child
 		}
-		let leaves = leafPathsUnder(path)
-		for (let i = 0; i < leaves.length; ++i)
-			closureAddLeaf(state, leaves[i], requirer, chain)
+		return null
 	}
 
-	function closureNoteUnresolved(state, path, requirer, chain) {
-		if (!state.unresolved[path]) {
-			state.unresolved[path] = {
-				"path": path,
-				"requirers": [],
-				"chain": chain
-			}
-			state.unresolvedOrder.push(path)
-		}
-		if (requirer) {
-			let requirers = state.unresolved[path].requirers
-			let known = false
-			for (let i = 0; i < requirers.length; ++i) {
-				if (requirers[i].path === requirer.path)
-					known = true
-			}
-			if (!known)
-				requirers.push(requirer)
-		}
-	}
-
-	// Features a requirement reached outside this product's own list, in the
-	// order the walk found them. They have no row on the Features page - there
-	// is nothing to decide about them - but they are part of the license.
-	function grantedRootsOutsideProduct(state) {
-		let roots = []
-		let leaves = Object.keys(state.granted)
-		for (let i = 0; i < leaves.length; ++i) {
-			let descriptor = featureIndex[leaves[i]]
-			if (!descriptor || productFeatureIdList.indexOf(descriptor.rootUuid) >= 0)
-				continue
-			if (roots.indexOf(descriptor.rootUuid) < 0)
-				roots.push(descriptor.rootUuid)
-		}
-		return roots
-	}
-
-	// Walks out from what was ticked until nothing new is reached: A pulls in B,
-	// B pulls in C and D, and every one of them arrives with the chain that
-	// brought it, so the table can say what it is here for.
-	function recomputeGrants() {
-		let state = {
-			"granted": {},
-			"roots": {},
-			"heldRoots": {},
-			"reasons": {},
-			"unresolved": {},
-			"unresolvedOrder": [],
-			"queue": []
-		}
-		for (let i = 0; i < explicitPaths.length; ++i) {
-			let descriptor = featureIndex[explicitPaths[i]]
-			if (!descriptor)
-				continue
-			// A feature picked with none of its optional parts is still in the
-			// license, so its presence is held here rather than read off a leaf.
-			state.heldRoots[descriptor.rootUuid] = true
-			let leaves = leafPathsUnder(explicitPaths[i])
-			for (let j = 0; j < leaves.length; ++j)
-				closureAddLeaf(state, leaves[j], null, [])
-		}
-
-		let head = 0
-		while (head < state.queue.length) {
-			let leafPath = state.queue[head++]
-			let descriptor = featureIndex[leafPath]
-			if (!descriptor)
-				continue
-			closureAddRoot(state, descriptor.rootUuid)
-			let reason = state.reasons[leafPath]
-			let chain = (reason && reason.chain ? reason.chain : []).concat([descriptor.featureName])
-			let requirer = {
-				"path": leafPath,
-				"name": descriptor.featureName,
-				"rootUuid": descriptor.rootUuid
-			}
-			for (let r = 0; r < descriptor.requirements.length; ++r)
-				closureRequire(state, descriptor.requirements[r], requirer, chain)
-		}
-
-		// Out into the form the document keeps: the product's own features first,
-		// in table order, then whatever the requirements reached beyond them.
-		let ids = []
-		let grantedLeaves = []
-		let emitted = {}
-		let ordered = productFeatureIdList.concat(grantedRootsOutsideProduct(state))
-		for (let p = 0; p < ordered.length; ++p) {
-			let rootUuid = ordered[p]
-			if (emitted[rootUuid] === true)
-				continue
-			emitted[rootUuid] = true
-			let rootPath = rootPathByUuid[rootUuid]
-			if (rootPath === undefined)
-				continue
-			let leaves = leafPathsUnder(rootPath)
-			let optionalIds = []
-			let anyGranted = false
-			for (let i = 0; i < leaves.length; ++i) {
-				if (state.granted[leaves[i]] !== true)
-					continue
-				anyGranted = true
-				grantedLeaves.push(leaves[i])
-				let descriptor = featureIndex[leaves[i]]
-				if (descriptor && !descriptor.isRoot && descriptor.optional)
-					optionalIds.push(rootUuid + "/" + descriptor.featureId)
-			}
-			if (!anyGranted && state.heldRoots[rootUuid] !== true)
-				continue
-			ids.push(rootUuid)
-			ids = ids.concat(optionalIds)
-		}
-
-		// A grant that nothing on this page accounts for any more - the product
-		// dropped the feature, or the requirement that once pulled it in is
-		// gone - is kept exactly as it stands. There is no row to work it out
-		// from, and dropping it would quietly take a capability away from a
-		// license nobody asked to change.
-		let orphans = []
-		for (let o = 0; o < featureIds.length; ++o) {
-			let grantId = featureIds[o]
-			if (grantId === "" || ids.indexOf(grantId) >= 0)
-				continue
-			let separator = grantId.indexOf('/')
-			let rootUuid = separator < 0 ? grantId : grantId.substring(0, separator)
-			if (productFeatureIdList.indexOf(rootUuid) >= 0)
-				continue
-			orphans.push(grantId)
-			ids.push(grantId)
-		}
-		orphanGrantIds = orphans
-
-		grantedLeafPaths = grantedLeaves
-		grantedLeafSet = state.granted
-		grantedReasons = state.reasons
-		let unresolved = []
-		for (let m = 0; m < state.unresolvedOrder.length; ++m)
-			unresolved.push(state.unresolved[state.unresolvedOrder[m]])
-		unresolvedRequirements = unresolved
-		applyFeatureIds(ids)
-	}
-
-	// --- what a row means ---------------------------------------------------- //
-
-	function pathIsGranted(path) {
-		return grantedLeafSet[path] === true
-	}
-
-	// Requirers of everything under a branch, minus the ones that live inside
-	// the branch itself: a feature is not held in place by its own parts, so a
-	// feature whose sub-features require each other can still be removed whole.
 	function entryRequiredBy(entry) {
-		if (!entry)
-			return []
-		let leaves = leafPathsUnder(entry.path)
-		let names = []
-		for (let i = 0; i < leaves.length; ++i) {
-			if (!pathIsGranted(leaves[i]))
-				continue
-			let reason = grantedReasons[leaves[i]]
-			if (!reason)
-				continue
-			for (let j = 0; j < reason.requirers.length; ++j) {
-				let requirer = reason.requirers[j]
-				if (requirer.path === entry.path || requirer.path.indexOf(entry.path + "/") === 0)
-					continue
-				if (names.indexOf(requirer.name) < 0)
-					names.push(requirer.name)
-			}
-		}
-		return names
+		return entry && requiredByIndex[entry.id] ? requiredByIndex[entry.id] : []
 	}
 
-	// The chain that brought a row in: "A -> B -> C" reads back as "C is here
-	// because A needs B and B needs C".
-	function entryRequirementChain(entry) {
-		if (!entry)
-			return ""
-		let leaves = leafPathsUnder(entry.path)
-		for (let i = 0; i < leaves.length; ++i) {
-			let reason = grantedReasons[leaves[i]]
-			if (reason && reason.requirers.length > 0 && reason.chain && reason.chain.length > 0)
-				return reason.chain.join(" → ")
-		}
-		return ""
-	}
-
-	function entryIsGranted(entry) {
+	// What a tick means, per kind of row:
+	//   a product feature      - granted by this license, on its own id
+	//   a mandatory part       - comes with its feature, nothing to decide
+	//   an optional part       - granted separately, once the feature is granted
+	//   a part that has parts  - a grouping; its children carry the decision
+	function entryIsSelected(entry) {
 		if (!entry)
 			return false
-		let leaves = leafPathsUnder(entry.path)
-		for (let i = 0; i < leaves.length; ++i) {
-			if (pathIsGranted(leaves[i]))
-				return true
-		}
-		return false
+		if (entry.isRoot)
+			return featureIsIncluded(entry.id)
+		if (!entry.isLeaf || !entry.optional)
+			return featureIsIncluded(entry.rootId)
+		return featureIds.indexOf(entry.id) >= 0
 	}
 
-	function entryLeafCount(entry) {
-		return entry ? leafPathsUnder(entry.path).length : 0
+	// A feature required by one that is granted comes with it, so it reads as
+	// granted here even though nobody ticked it.
+	function entryIsGranted(entry) {
+		return entryIsSelected(entry) || entryRequiredBy(entry).length > 0
 	}
 
-	function entryGrantedLeafCount(entry) {
-		if (!entry)
-			return 0
-		let leaves = leafPathsUnder(entry.path)
-		let granted = 0
-		for (let i = 0; i < leaves.length; ++i) {
-			if (pathIsGranted(leaves[i]))
-				++granted
-		}
-		return granted
-	}
-
-	// A grouping is ticked when everything inside it is, and half-ticked when
-	// only part of it is: the tick on a feature is a reading of its leaves
-	// rather than a decision of its own.
-	function entryCheckState(entry) {
-		if (!entry)
-			return Qt.Unchecked
-		let leaves = leafPathsUnder(entry.path)
-		if (leaves.length === 0)
-			return Qt.Unchecked
-		let granted = 0
-		for (let i = 0; i < leaves.length; ++i) {
-			if (pathIsGranted(leaves[i]))
-				++granted
-		}
-		if (granted === 0)
-			return Qt.Unchecked
-		return granted === leaves.length ? Qt.Checked : Qt.PartiallyChecked
-	}
-
-	// Only the leaves of the tree are a decision, plus the feature itself, which
-	// is how a whole feature is taken or dropped in one go. A grouping that
-	// holds nothing optional carries no decision at all - it is in exactly when
-	// its feature is.
 	function entryIsChangeable(entry) {
 		if (!canEdit || !entry)
 			return false
-		if (entryRequiredBy(entry).length > 0)
-			return false
 		if (entry.isRoot)
 			return true
-		if (entry.isLeaf)
-			return entry.optional
-		return choosableLeafPathsUnder(entry.path).length > 0
+		return entry.isLeaf && entry.optional && featureIsIncluded(entry.rootId)
 	}
 
 	function toggleEntry(entry) {
 		if (!entryIsChangeable(entry))
 			return
-		let next = []
-		if (entryCheckState(entry) === Qt.Checked) {
-			// Dropping a branch drops everything picked inside it, otherwise a
-			// pick would linger under something that is no longer granted.
-			for (let i = 0; i < explicitPaths.length; ++i) {
-				let path = explicitPaths[i]
-				if (path !== entry.path && path.indexOf(entry.path + "/") !== 0)
-					next.push(path)
-			}
+		if (entry.isRoot) {
+			toggleFeature(entry.id)
+			return
 		}
-		else {
-			next = explicitPaths.slice()
-			let targets = choosableLeafPathsUnder(entry.path)
-			// Nothing inside is optional, so taking the branch is the pick.
-			if (targets.length === 0)
-				targets = [entry.path]
-			for (let j = 0; j < targets.length; ++j) {
-				if (next.indexOf(targets[j]) < 0)
-					next.push(targets[j])
-			}
-		}
-		setExplicitPaths(next)
+		let ids = featureIds.slice()
+		let index = ids.indexOf(entry.id)
+		if (index >= 0)
+			ids.splice(index, 1)
+		else
+			ids.push(entry.id)
+		applyFeatureIds(ids)
 	}
 
-	// Why a row is the way it is, in the words the table shows next to it.
+	// Why a row cannot be ticked, in the words the table shows next to it.
 	function entryStateText(entry) {
-		if (!entry)
-			return ""
 		let requiredBy = entryRequiredBy(entry)
 		if (requiredBy.length > 0)
 			return qsTr("Required by %1").arg(requiredBy.join(", "))
-		if (entry.isLeaf && !entry.isRoot && !entry.optional)
+		if (!entry || entry.isRoot)
+			return ""
+		if (!entry.isLeaf)
+			return qsTr("Set inside")
+		if (!entry.optional)
 			return qsTr("Always included")
-		if (!entry.isLeaf && !entry.isRoot && choosableLeafPathsUnder(entry.path).length === 0)
-			return qsTr("Always included")
-		return ""
+		if (!featureIsIncluded(entry.rootId))
+			return qsTr("Grant the feature first")
+		return qsTr("Optional")
 	}
 
-	// Counts on the page panel: how much of the product this license grants, and
-	// whether anything is still owed to it.
+	// Counts on the page panel: how many features the product offers, and how
+	// many of them this license grants.
 	function updatePageBadges() {
+		// Only whole features are counted; the optional parts granted inside
+		// them carry a slash and are not features of the product.
 		let granted = 0
 		for (let i = 0; i < featureIds.length; ++i) {
 			if (featureIds[i] !== "" && featureIds[i].indexOf('/') < 0)
 				++granted
 		}
-		multiPageView.setPageBadge("Features", unresolvedRequirements.length > 0
-			? granted + " / " + featureNodes.length + " !"
-			: featureNodes.length > 0 ? granted + " / " + featureNodes.length : "")
+		multiPageView.setPageBadge("Features", featureNodes.length > 0
+			? granted + " / " + featureNodes.length : "")
 		multiPageView.setPageBadge("Inheritance", parentLicenseIds.length > 0
 			? "" + parentLicenseIds.length : "")
-		multiPageView.setPageBadge("General", licenseContentEntries.length > 0
-			? "" + licenseContentEntries.length : "")
 	}
 
 	// Sibling licenses of the same product, minus this one and minus anything
@@ -858,35 +369,26 @@ ViewBase {
 		return node && node.data ? node.data.entry : null
 	}
 
-	function featureIsIncluded(grantId) {
-		return featureIds.indexOf(grantId) >= 0
+	function featureIsIncluded(entryId) {
+		return featureIds.indexOf(entryId) >= 0
 	}
 
-	// A grant id read back as something a person can recognise: a feature by its
-	// name, a part inside one by the path of names that leads to it.
-	function grantDisplayName(grantId) {
-		let separator = grantId.indexOf('/')
-		let rootUuid = separator < 0 ? grantId : grantId.substring(0, separator)
-		let rootPath = rootPathByUuid[rootUuid]
-		if (rootPath === undefined)
-			return grantId
-		if (separator < 0)
-			return featureIndex[rootPath].featureName
-		let subFeatureId = grantId.substring(separator + 1)
-		let leaves = leafPathsUnder(rootPath)
-		for (let i = 0; i < leaves.length; ++i) {
-			if (featureIndex[leaves[i]].featureId === subFeatureId)
-				return displayPath(leaves[i])
+	function toggleFeature(entryId) {
+		if (!canEdit || entryId === "")
+			return
+		let ids = []
+		let wasIncluded = featureIsIncluded(entryId)
+		for (let i = 0; i < featureIds.length; ++i) {
+			let id = featureIds[i]
+			// Dropping a feature drops the optional parts picked inside it,
+			// otherwise they would linger as grants for something not granted.
+			if (wasIncluded && (id === entryId || id.indexOf(entryId + "/") === 0))
+				continue
+			ids.push(id)
 		}
-		return featureIndex[rootPath].featureName + " / " + subFeatureId
-	}
-
-	function grantFeatureCode(grantId) {
-		let separator = grantId.indexOf('/')
-		if (separator >= 0)
-			return grantId.substring(separator + 1)
-		let rootPath = rootPathByUuid[grantId]
-		return rootPath === undefined ? "" : featureIndex[rootPath].featureId
+		if (!wasIncluded)
+			ids.push(entryId)
+		applyFeatureIds(ids)
 	}
 
 	// --- inherited features ----------------------------------------------- //
@@ -903,6 +405,22 @@ ViewBase {
 				return i
 		}
 		return -1
+	}
+
+	function featureNameOf(featureId) {
+		for (let i = 0; i < allFeaturesModel.getItemsCount(); ++i) {
+			if (allFeaturesModel.getData(FeatureItemTypeMetaInfo.s_id, i) === featureId)
+				return allFeaturesModel.getData(FeatureItemTypeMetaInfo.s_featureName, i) || featureId
+		}
+		return featureId
+	}
+
+	function featureCodeOf(featureId) {
+		for (let i = 0; i < allFeaturesModel.getItemsCount(); ++i) {
+			if (allFeaturesModel.getData(FeatureItemTypeMetaInfo.s_id, i) === featureId)
+				return allFeaturesModel.getData(FeatureItemTypeMetaInfo.s_featureId, i) || ""
+		}
+		return ""
 	}
 
 	// Walks the parents of the parents too, and remembers which license first
@@ -939,163 +457,20 @@ ViewBase {
 		collectInherited(parentLicenseIds, seen, origins, order)
 		let entries = []
 		for (let i = 0; i < order.length; ++i) {
-			let grantId = order[i]
+			let featureId = order[i]
 			entries.push({
-				"id": grantId,
-				"featureName": grantDisplayName(grantId),
-				"featureId": grantFeatureCode(grantId),
-				"licenseName": origins[grantId]
+				"id": featureId,
+				"featureName": featureNameOf(featureId),
+				"featureId": featureCodeOf(featureId),
+				"licenseName": origins[featureId]
 			})
 		}
 		inheritedEntries = entries
 	}
 
-	// --- everything this license will contain -------------------------------- //
-	//
-	// Ticks on the Features page are only one of the ways a feature ends up in a
-	// license: a requirement can bring one in, and so can an inherited license.
-	// One list answers "what does this license actually grant" for the General
-	// page and for the panel beside the features table, so the two can never
-	// disagree with each other.
-	property var licenseContentEntries: []
-
-	readonly property string sectionPicked: qsTr("Picked here")
-	readonly property string sectionRequired: qsTr("Added by requirements")
-	readonly property string sectionInherited: qsTr("Inherited")
-	readonly property string sectionUnresolved: qsTr("Requirements that lead nowhere")
-	readonly property string sectionOrphan: qsTr("Kept from an earlier state")
-
-	// A pick can be a whole branch, so a leaf counts as picked when it or
-	// anything it hangs below was ticked.
-	function pathIsExplicit(path) {
-		for (let i = 0; i < explicitPaths.length; ++i) {
-			let explicit = explicitPaths[i]
-			if (explicit === path || path.indexOf(explicit + "/") === 0)
-				return true
-		}
-		return false
-	}
-
-	function requirerNames(requirers) {
-		let names = []
-		for (let i = 0; i < requirers.length; ++i) {
-			if (names.indexOf(requirers[i].name) < 0)
-				names.push(requirers[i].name)
-		}
-		return names
-	}
-
-	// A requirement whose path names no feature at all. The path is shown as it
-	// stands, because there is nothing left to translate it into.
-	function unresolvedRequirementDetail(entry) {
-		return qsTr("Required by %1, but no feature has this path any more")
-			.arg(requirerNames(entry.requirers).join(", "))
-	}
-
-	// Where a feature came from, for one that this product does not list itself.
-	// Belonging to another product is an ordinary thing for a requirement to
-	// reach into, so this is a note about origin and not a complaint.
-	function originNote(rootUuid) {
-		let products = productsOffering(rootUuid)
-		if (products.length === 0)
-			return qsTr("not offered by any product")
-		return qsTr("from %1").arg(products.join(", "))
-	}
-
-	function rebuildLicenseContent() {
-		let picked = []
-		let required = []
-		for (let i = 0; i < grantedLeafPaths.length; ++i) {
-			let path = grantedLeafPaths[i]
-			let descriptor = featureIndex[path]
-			if (!descriptor)
-				continue
-			let reason = grantedReasons[path]
-			let requirers = reason ? reason.requirers : []
-			let isPicked = pathIsExplicit(path) || requirers.length === 0
-			if (isPicked) {
-				picked.push({
-					"key": "picked:" + path,
-					"section": licenseEditor.sectionPicked,
-					"title": displayPath(path),
-					"subtitle": descriptor.featureId,
-					"badge": !descriptor.isRoot && !descriptor.optional ? qsTr("Always included") : "",
-					"tone": "neutral"
-				})
-			}
-			else {
-				let chain = reason && reason.chain && reason.chain.length > 0 ? reason.chain.join(" → ")
-					: requirerNames(requirers).join(", ")
-				// A feature this product does not list is reached through a
-				// requirement like any other; it just says where it came from,
-				// because there is no row for it on the Features page.
-				let fromElsewhere = productFeatureIdList.indexOf(descriptor.rootUuid) < 0
-				required.push({
-					"key": "required:" + path,
-					"section": licenseEditor.sectionRequired,
-					"title": displayPath(path),
-					"subtitle": fromElsewhere
-						? qsTr("Required by %1 · %2").arg(chain).arg(originNote(descriptor.rootUuid))
-						: qsTr("Required by %1").arg(chain),
-					"badge": qsTr("Requirement"),
-					"tone": "accent"
-				})
-			}
-		}
-
-		let inherited = []
-		for (let j = 0; j < inheritedEntries.length; ++j) {
-			let entry = inheritedEntries[j]
-			inherited.push({
-				"key": "inherited:" + entry.id,
-				"section": licenseEditor.sectionInherited,
-				"title": entry.featureName,
-				"subtitle": qsTr("from %1").arg(entry.licenseName),
-				"badge": isAlsoGrantedHere(entry.id) ? qsTr("Also granted here") : "",
-				"tone": "neutral"
-			})
-		}
-
-		let unresolved = []
-		for (let k = 0; k < unresolvedRequirements.length; ++k) {
-			let entry = unresolvedRequirements[k]
-			unresolved.push({
-				"key": "unresolved:" + entry.path,
-				"section": licenseEditor.sectionUnresolved,
-				"title": entry.path,
-				"subtitle": unresolvedRequirementDetail(entry),
-				"badge": qsTr("Unknown feature"),
-				"tone": "warning"
-			})
-		}
-
-		let orphans = []
-		for (let o = 0; o < orphanGrantIds.length; ++o) {
-			let grantId = orphanGrantIds[o]
-			orphans.push({
-				"key": "orphan:" + grantId,
-				"section": licenseEditor.sectionOrphan,
-				"title": grantDisplayName(grantId),
-				"subtitle": qsTr("Granted, but nothing on this page accounts for it any more - it stays until it is removed by hand"),
-				"badge": qsTr("Kept as it was"),
-				"tone": "warning"
-			})
-		}
-
-		licenseContentEntries = picked.concat(required).concat(inherited).concat(unresolved).concat(orphans)
-		updatePageBadges()
-	}
-
-	function unresolvedRequirementDetails() {
-		let details = []
-		for (let i = 0; i < unresolvedRequirements.length; ++i)
-			details.push(unresolvedRequirements[i].path + " - " + unresolvedRequirementDetail(unresolvedRequirements[i]))
-		return details
-	}
-
 	// Granted twice: once by this license and once by a license it inherits.
-	function isAlsoGrantedHere(grantId) {
-		return featureIds.indexOf(grantId) >= 0
+	function isAlsoGrantedHere(entryId) {
+		return featureIds.indexOf(entryId) >= 0
 	}
 	function licenseIsInherited(entryId) {
 		return parentLicenseIds.indexOf(entryId) >= 0
@@ -1228,12 +603,8 @@ ViewBase {
 							model: CachedProductCollection.collectionModel
 							nameId: "productName"
 							changeable: licenseEditor.canEdit
-							// updateGui() clears the box before it puts the stored
-							// product back, and that clearing step is not a choice
-							// anybody made - acting on it dropped the product, the
-							// features and the inherited licenses on every Undo.
 							onCurrentIndexChanged: {
-								if (licenseEditor.applyingGui || licenseEditor.guiIsBlocked())
+								if (licenseEditor.guiIsBlocked())
 									return
 								licenseEditor.setProductId(generalGroup.currentProductId())
 								licenseEditor.doUpdateModel()
@@ -1271,149 +642,6 @@ ViewBase {
 							licenseEditor.licenseData.m_description = descriptionInput.text
 						}
 					}
-
-					// Everything this license grants, however it got there: the
-					// ticks from the Features page, whatever their requirements
-					// pulled in, and whatever the inherited licenses bring. The
-					// decisions are made elsewhere - this is the answer to "so
-					// what is in it", which is the question the General page is
-					// otherwise silent about.
-					GroupHeaderView {
-						width: parent.width
-						title: qsTr("In this license")
-					}
-
-					Rectangle {
-						width: parent.width
-						height: contentColumn.height + 2 * Style.marginL
-						radius: Style.marginXS
-						color: Style.baseColor
-						border.width: 1
-						border.color: Style.borderColor
-
-						Column {
-							id: contentColumn
-							anchors.top: parent.top
-							anchors.topMargin: Style.marginL
-							anchors.left: parent.left
-							anchors.leftMargin: Style.marginL
-							anchors.right: parent.right
-							anchors.rightMargin: Style.marginL
-							spacing: Style.spacingS
-
-							BaseText {
-								width: parent.width
-								visible: licenseEditor.licenseContentEntries.length === 0
-								text: licenseEditor.productId === ""
-									? qsTr("Pick a product above, then tick its features on the Features page")
-									: qsTr("Nothing granted yet - tick features on the Features page")
-								color: Style.inactiveTextColor
-								wrapMode: Text.WordWrap
-							}
-
-							Repeater {
-								model: licenseEditor.licenseContentEntries
-
-								Column {
-									id: contentRow
-									width: contentColumn.width
-									spacing: Style.spacingS
-
-									property bool startsSection: index === 0
-										|| licenseEditor.licenseContentEntries[index - 1].section !== modelData.section
-
-									Item {
-										width: parent.width
-										height: visible ? Style.controlHeightM : 0
-										visible: contentRow.startsSection
-
-										BaseText {
-											anchors.left: parent.left
-											anchors.bottom: parent.bottom
-											anchors.bottomMargin: Style.marginXS
-											text: modelData.section
-											font.family: Style.fontFamilyBold
-											font.pixelSize: Style.fontSizeS
-											color: modelData.tone === "warning" ? Style.secondColor : Style.subtitleColor
-										}
-
-										Rectangle {
-											anchors.left: parent.left
-											anchors.right: parent.right
-											anchors.bottom: parent.bottom
-											height: 1
-											color: Style.borderColor
-											opacity: 0.6
-										}
-									}
-
-									Row {
-										width: parent.width
-										spacing: Style.spacingS
-
-										Rectangle {
-											anchors.verticalCenter: parent.verticalCenter
-											width: Style.marginXS
-											height: Style.marginXS
-											radius: width / 2
-											color: modelData.tone === "warning" ? Style.secondColor
-												: modelData.tone === "accent" ? Style.titleColor : Style.borderColor
-										}
-
-										Column {
-											width: parent.width - Style.marginXS - parent.spacing
-											spacing: Style.spacingXXS
-
-											Row {
-												width: parent.width
-												spacing: Style.spacingS
-
-												BaseText {
-													anchors.verticalCenter: parent.verticalCenter
-													width: Math.max(0, parent.width - rowBadge.width - parent.spacing)
-													text: modelData.title
-													color: Style.textColor
-													elide: Text.ElideRight
-												}
-
-												Rectangle {
-													id: rowBadge
-													anchors.verticalCenter: parent.verticalCenter
-													width: modelData.badge === "" ? 0 : rowBadgeText.width + 2 * Style.marginS
-													height: Style.controlHeightS
-													radius: height / 2
-													visible: modelData.badge !== ""
-													color: modelData.tone === "warning" ? Style.popupWarningBackgroundColor
-														: modelData.tone === "accent" ? Style.selectedColor : Style.backgroundColor2
-													border.width: 1
-													border.color: modelData.tone === "warning" ? Style.secondColor
-														: modelData.tone === "accent" ? Style.titleColor : Style.borderColor
-
-													BaseText {
-														id: rowBadgeText
-														anchors.centerIn: parent
-														text: modelData.badge
-														font.pixelSize: Style.fontSizeS
-														color: modelData.tone === "warning" ? Style.secondColor
-															: modelData.tone === "accent" ? Style.titleColor : Style.subtitleColor
-													}
-												}
-											}
-
-											BaseText {
-												width: parent.width
-												visible: text !== ""
-												text: modelData.subtitle
-												font.pixelSize: Style.fontSizeS
-												color: Style.subtitleColor
-												wrapMode: Text.WordWrap
-											}
-										}
-									}
-								}
-							}
-						}
-					}
 				}
 			}
 		}
@@ -1427,30 +655,35 @@ ViewBase {
 			anchors.fill: parent
 
 			function updateGui() {
-				licenseEditor.reloadFromDocument()
+				licenseEditor.refreshIds()
+				licenseEditor.rebuildEntries()
 			}
 
 			function updateModel() {
 			}
 
-			// Column geometry, shared by the header, the rows and the drag handles
-			// the explorer draws, so none of the three can drift from the others.
-			// A column whose breakpoint is above the current table width folds
-			// away and its share is handed to the columns that stay.
-			// The first column carries the tick and, beside it, the reason a tick
-			// cannot be cleared - which is a sentence, not a glyph.
-			TableColumnLayout {
-				id: featureColumns
-				fractions: [0.20, 0.26, 0.15, 0.25, 0.14]
-				breakpoints: [0, 0, 380, 620, 300]
-			}
+			// Column geometry, shared by the header and the rows so the two can
+			// never drift. A column whose breakpoint is above the current table
+			// width folds away and its share is handed to the columns that stay.
+			property var columnFractions: [0.10, 0.28, 0.20, 0.28, 0.14]
+			property var columnBreakpoints: [0, 0, 380, 620, 300]
 
 			function columnVisible(index, width) {
-				return featureColumns.isVisible(index, width)
+				return width >= featuresPage.columnBreakpoints[index]
 			}
 
 			function columnWidth(index, width, spacing) {
-				return featureColumns.widthOf(index, width, spacing)
+				if (!featuresPage.columnVisible(index, width))
+					return 0
+				let sum = 0
+				let count = 0
+				for (let i = 0; i < featuresPage.columnFractions.length; ++i) {
+					if (!featuresPage.columnVisible(i, width))
+						continue
+					sum += featuresPage.columnFractions[i]
+					++count
+				}
+				return (width - (count - 1) * spacing) * featuresPage.columnFractions[index] / sum
 			}
 
 			property Component featuresHeaderComp: Component {
@@ -1547,66 +780,43 @@ ViewBase {
 					property var node: parent ? parent.node : null
 					property var entry: licenseEditor.nodeEntry(rowContent.node)
 
-					// Every row carries a box, including the groupings: a feature
-					// that owns sub-features is ticked when all of them are and
-					// half-ticked when only some are, so the state of a whole
-					// branch is readable without opening it, and one click takes
-					// or drops the branch entire.
 					Item {
-						id: stateCell
 						width: featuresPage.columnWidth(0, rowContent.width, rowContent.spacing)
 						height: rowContent.height
 						visible: width > 0
 
-						property bool changeable: licenseEditor.entryIsChangeable(rowContent.entry)
-						property string stateText: licenseEditor.entryStateText(rowContent.entry)
-
 						CheckBox {
-							id: stateCheck
 							anchors.left: parent.left
 							anchors.leftMargin: Style.marginXS
 							anchors.verticalCenter: parent.verticalCenter
-							visible: rowContent.entry !== null
-							isActive: stateCell.changeable
-							tristate: true
-							checkState: licenseEditor.entryCheckState(rowContent.entry)
+							visible: rowContent.entry !== null && (rowContent.entry.isRoot
+								|| (rowContent.entry.isLeaf && rowContent.entry.optional))
+							isActive: licenseEditor.entryIsChangeable(rowContent.entry)
+							checkState: licenseEditor.entryIsGranted(rowContent.entry) ? Qt.Checked : Qt.Unchecked
 							mouseArea.enabled: false
 						}
 
-						// A box that cannot be cleared says why right beside
-						// itself, rather than leaving the reader to guess which
-						// other row is holding it down.
+						// A row that carries no decision of its own says why
+						// instead of showing a box nobody can tick.
 						BaseText {
-							anchors.left: stateCheck.right
-							anchors.leftMargin: Style.marginS
+							anchors.left: parent.left
+							anchors.leftMargin: Style.marginXS
 							anchors.right: parent.right
 							anchors.rightMargin: Style.marginXS
 							anchors.verticalCenter: parent.verticalCenter
-							visible: stateCell.stateText !== ""
-							text: stateCell.stateText
+							visible: rowContent.entry !== null && !rowContent.entry.isRoot
+								&& !(rowContent.entry.isLeaf && rowContent.entry.optional)
+							text: licenseEditor.entryStateText(rowContent.entry)
 							font.pixelSize: Style.fontSizeS
-							color: licenseEditor.entryRequiredBy(rowContent.entry).length > 0
-								? Style.titleColor : Style.inactiveTextColor
+							color: Style.inactiveTextColor
 							elide: Text.ElideRight
 						}
 
-						// Stays live even when the row cannot be ticked: hovering a
-						// box that is held down is how the reader finds out what
-						// is holding it.
 						MouseArea {
-							id: stateMouse
 							anchors.fill: parent
-							hoverEnabled: true
-							cursorShape: stateCell.changeable ? Qt.PointingHandCursor : Qt.ArrowCursor
+							enabled: licenseEditor.entryIsChangeable(rowContent.entry)
+							cursorShape: Qt.PointingHandCursor
 							onClicked: licenseEditor.toggleEntry(rowContent.entry)
-						}
-
-						TooltipArea {
-							anchors.fill: parent
-							mouseArea: stateMouse
-							text: licenseEditor.entryRequirementChain(rowContent.entry) !== ""
-								? qsTr("Pulled in by %1").arg(licenseEditor.entryRequirementChain(rowContent.entry))
-								: stateCell.stateText
 						}
 					}
 					Item {
@@ -1664,15 +874,10 @@ ViewBase {
 						visible: width > 0
 
 						property int count: rowContent.entry ? rowContent.entry.subFeatureCount : 0
-						// Opening a feature is how the parts inside it are reached,
-						// and they are what is actually picked - so a feature opens
-						// whether or not anything in it is granted yet.
+						// Opening a feature is how its optional parts are reached,
+						// and there is nothing to reach until it is granted.
 						property bool openable: subfeaturesCell.count > 0
-						// "2 / 5" rather than "5": a feature is a grouping, so what
-						// this column has to answer is how much of the grouping is
-						// in the license, without the reader having to open it.
-						property int leafTotal: licenseEditor.entryLeafCount(rowContent.entry)
-						property int leafGranted: licenseEditor.entryGrantedLeafCount(rowContent.entry)
+							&& licenseEditor.entryIsGranted(rowContent.entry)
 
 						Rectangle {
 							anchors.centerIn: parent
@@ -1680,15 +885,14 @@ ViewBase {
 							height: Style.controlHeightS
 							radius: height / 2
 							visible: subfeaturesCell.count > 0
-							color: subfeaturesMouse.containsMouse ? Style.titleColor
-								: subfeaturesCell.leafGranted > 0 ? Style.selectedColor : Style.backgroundColor2
-							border.color: subfeaturesCell.leafGranted > 0 ? Style.titleColor : Style.borderColor
+							color: subfeaturesMouse.containsMouse ? Style.titleColor : Style.backgroundColor2
+							border.color: Style.borderColor
 							border.width: 1
 
 							BaseText {
 								id: countText
 								anchors.centerIn: parent
-								text: subfeaturesCell.leafGranted + " / " + subfeaturesCell.leafTotal
+								text: subfeaturesCell.count
 								font.pixelSize: Style.fontSizeS
 								font.family: Style.fontFamilyBold
 								color: subfeaturesMouse.containsMouse ? Style.baseColor
@@ -1715,40 +919,32 @@ ViewBase {
 				}
 			}
 
-			// Right-hand table of the page: everything this license ends up
-			// granting, whichever way it got there. Read-only - the ticks are on
-			// the left, the inheritance on its own page - but it is where the
-			// consequences of both are spelled out, including the requirements
-			// that lead out of this product and cannot be met here at all.
-			property Component licenseContentPanelComp: Component {
+			// Right-hand table of the page: what this license gets for free from
+			// the licenses it inherits. Read-only - the ticks that produce it are
+			// on the Inherited licenses page.
+			property Component inheritedFeaturesPanelComp: Component {
 				CheckableListPanel {
-					title: qsTr("In this license")
-					subtitle: licenseEditor.unresolvedRequirements.length > 0
-						? qsTr("%1 requirements lead nowhere").arg(licenseEditor.unresolvedRequirements.length)
-						: licenseEditor.licenseContentEntries.length > 0
-							? qsTr("%1 entries").arg(licenseEditor.licenseContentEntries.length) : ""
-					model: licenseEditor.licenseContentEntries
-					contentActive: licenseEditor.productId !== ""
-					revealKey: licenseEditor.productId
-					placeholderText: qsTr("No product chosen")
-					placeholderDescription: qsTr("Pick a product on the General page first")
+					title: qsTr("Inherited features")
+					subtitle: licenseEditor.inheritedEntries.length > 0
+						? qsTr("from %1 licenses").arg(licenseEditor.parentLicenseIds.length) : ""
+					model: licenseEditor.inheritedEntries
+					contentActive: licenseEditor.parentLicenseIds.length > 0
+					revealKey: licenseEditor.parentLicenseIds.join(';')
+					placeholderText: qsTr("Nothing inherited")
+					placeholderDescription: qsTr("Licenses picked on the Inherited licenses page bring their features here, and this license grants them too")
 					nameColumnTitle: qsTr("Feature")
-					iconSource: "Icons/FeatureList"
-					searchPlaceholder: qsTr("Search license content")
-					emptyText: qsTr("Nothing granted yet")
-					emptyDescription: qsTr("Tick a feature on the left, or inherit a license, and what it brings appears here")
-					footerText: qsTr("Ticked here, pulled in by a requirement, or inherited - all of it ends up in the license")
-					entrySectionProvider: function(entry) { return entry.section }
-					entryTitleProvider: function(entry) { return entry.title }
-					entrySubtitleProvider: function(entry) { return entry.subtitle }
-					entryBadgeProvider: function(entry) { return entry.badge }
-					entryBadgeToneProvider: function(entry) { return entry.tone }
-					entrySearchableTextProvider: function(entry) { return entry.title + " " + entry.subtitle + " " + entry.badge }
-					// A requirement that cannot be met is the one row here that
-					// is not a grant, so it is the one row without a tick.
-					entryCheckStateProvider: function(entry) {
-						return entry.section === licenseEditor.sectionUnresolved ? Qt.Unchecked : Qt.Checked
+					iconSource: "Icons/License"
+					searchPlaceholder: qsTr("Search inherited features")
+					emptyText: qsTr("The inherited licenses grant nothing")
+					emptyDescription: qsTr("They carry no features of their own yet")
+					footerText: qsTr("Granted on top of the features ticked on the left")
+					entryTitleProvider: function(entry) { return entry.featureName }
+					entrySubtitleProvider: function(entry) { return qsTr("from %1").arg(entry.licenseName) }
+					entryBadgeProvider: function(entry) {
+						return licenseEditor.isAlsoGrantedHere(entry.id) ? qsTr("Also ticked here") : ""
 					}
+					entrySearchableTextProvider: function(entry) { return entry.featureName + " " + entry.featureId + " " + entry.licenseName }
+					entryCheckStateProvider: function(entry) { return Qt.Checked }
 					entryCheckEnabledProvider: function(entry) { return false }
 				}
 			}
@@ -1762,15 +958,11 @@ ViewBase {
 					: qsTr("This product has no features")
 				emptyDescription: licenseEditor.productId === ""
 					? qsTr("Pick a product on the General page first") : ""
-				idleHintText: qsTr("Tick what this license grants; a feature is a grouping, so ticking one takes everything inside it")
-				selectedHintText: qsTr("Open a feature to pick its parts one by one")
-				// A requirement reaching into another product is ordinary and is
-				// simply granted. One whose path names nothing at all is not,
-				// and is reported the way an unfinished level is: a chip on the
-				// path, details on hover.
-				levelStatusText: licenseEditor.unresolvedRequirements.length > 0
-					? qsTr("%1 requirements lead nowhere").arg(licenseEditor.unresolvedRequirements.length) : ""
-				levelStatusDetails: licenseEditor.unresolvedRequirementDetails()
+				idleHintText: qsTr("Tick the features this license grants; open one to reach its optional parts")
+				selectedHintText: qsTr("Open a feature to grant its optional parts one by one")
+				footerText: licenseEditor.externalRequirements.length > 0
+					? qsTr("Also required, from outside this product: %1").arg(licenseEditor.externalRequirements.join(", "))
+					: ""
 				editable: licenseEditor.canEdit
 				createVisible: false
 				removeVisible: false
@@ -1781,14 +973,12 @@ ViewBase {
 				rowIconVisible: false
 				headerContentComponent: featuresPage.featuresHeaderComp
 				rowContentComponent: featuresPage.featureRowComp
-				columnLayout: featureColumns
-				sidePanelComponent: featuresPage.licenseContentPanelComp
-				// A feature opens whenever it holds anything: what is inside it
-				// is what gets picked, so it has to be reachable before anything
-				// in it is granted.
+				sidePanelComponent: featuresPage.inheritedFeaturesPanelComp
+				// Only a granted feature can be opened - there is nothing to
+				// decide inside one that is not granted at all.
 				containerProvider: function(node) {
 					let entry = licenseEditor.nodeEntry(node)
-					return entry !== null && entry.subFeatureCount > 0
+					return entry !== null && entry.subFeatureCount > 0 && licenseEditor.entryIsGranted(entry)
 				}
 				textProvider: function(node) { return licenseEditor.nodeEntry(node) ? licenseEditor.nodeEntry(node).featureName : "" }
 				descriptionProvider: function(node) { return licenseEditor.nodeEntry(node) ? licenseEditor.nodeEntry(node).description : "" }
@@ -1805,7 +995,8 @@ ViewBase {
 			anchors.fill: parent
 
 			function updateGui() {
-				licenseEditor.reloadFromDocument()
+				licenseEditor.refreshIds()
+				licenseEditor.rebuildEntries()
 			}
 
 			function updateModel() {

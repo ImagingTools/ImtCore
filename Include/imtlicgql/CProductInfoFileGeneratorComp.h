@@ -57,7 +57,7 @@ private:
 				const QByteArrayList& requirements) const;
 	void WriteNewLine(QTextStream& textStream, int count = 1) const;
 	void WriteTab(QTextStream& textStream, int count = 1) const;
-	QString CreateFeatureVarName(const QByteArray& featureId) const;
+	QString CreateFeatureVarName(const QByteArray& featurePath) const;
 };
 
 

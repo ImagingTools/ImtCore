@@ -166,8 +166,8 @@ void CProductInfoFileGeneratorComp::WriteFunction(QTextStream& textStream, imtli
 					WriteFeatureInfo(textStream, *featureInfoPtr, productInfo, featureElementId);
 					WriteNewLine(textStream, 1);
 
-					const QByteArray featureId = featureInfoPtr->GetFeatureId();
-					const QString featureVarName = CreateFeatureVarName(featureId);
+					const QByteArray featurePath = imtlic::CalculateFeaturePath(*featureInfoPtr);
+					const QString featureVarName = CreateFeatureVarName(featurePath);
 
 					WriteTab(textStream, 1);
 					textStream << QStringLiteral("productInfo.AddFeature(\"%1\", *%2.GetPtr());").arg(QString::fromUtf8(featureElementId), featureVarName);
@@ -194,7 +194,10 @@ void CProductInfoFileGeneratorComp::WriteFeatureInfo(
 	const bool isOptional = featureInfo.IsOptional();
 	const bool isPermission = featureInfo.IsPermission();
 
-	const QString featureVarName = CreateFeatureVarName(featureId);
+	// Feature-IDs may repeat across the tree as long as the parent path differs, so the
+	// variable name must be derived from the full path to stay unique within the function.
+	const QByteArray featurePath = imtlic::CalculateFeaturePath(featureInfo);
+	const QString featureVarName = CreateFeatureVarName(featurePath);
 
 	if (objectUuid.isEmpty()){
 		WriteTab(textStream, 1);
@@ -262,8 +265,8 @@ void CProductInfoFileGeneratorComp::WriteFeatureInfo(
 				WriteNewLine(textStream, 1);
 				WriteFeatureInfo(textStream, *subFeatureInfoPtr, productInfo, "");
 
-				const QByteArray subFeatureId = subFeatureInfoPtr->GetFeatureId();
-				const QString subFeatureVarName = CreateFeatureVarName(subFeatureId);
+				const QByteArray subFeaturePath = imtlic::CalculateFeaturePath(*subFeatureInfoPtr);
+				const QString subFeatureVarName = CreateFeatureVarName(subFeaturePath);
 
 				WriteNewLine(textStream, 1);
 				WriteTab(textStream, 1);
@@ -351,13 +354,19 @@ void CProductInfoFileGeneratorComp::WriteTab(QTextStream& textStream, int count)
 }
 
 
-QString CProductInfoFileGeneratorComp::CreateFeatureVarName(const QByteArray& featureId) const
+QString CProductInfoFileGeneratorComp::CreateFeatureVarName(const QByteArray& featurePath) const
 {
-	if (featureId.isEmpty()){
+	if (featurePath.isEmpty()){
 		return QString();
 	}
 
-	QString retVal = QString::fromUtf8(featureId);
+	QByteArray sanitizedPath = featurePath;
+	if (sanitizedPath.startsWith('/')){
+		sanitizedPath.remove(0, 1);
+	}
+	sanitizedPath.replace('/', '_');
+
+	QString retVal = QString::fromUtf8(sanitizedPath);
 	retVal[0] = retVal[0].toLower();
 
 	return retVal + "FeatureInfo";
