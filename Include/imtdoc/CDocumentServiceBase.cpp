@@ -14,7 +14,6 @@
 #include <imod/IModel.h>
 #include <imod/IObserver.h>
 #include <istd/CChangeNotifier.h>
-#include <ifile/CAutoPersistenceComp.h>
 
 // ImtCore includes
 #include <imtdoc/CDocumentChangedEvent.h>

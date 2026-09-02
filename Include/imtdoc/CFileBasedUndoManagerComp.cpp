@@ -11,7 +11,6 @@
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
-#include <icomp/CComponentBase.h>
 
 
 namespace imtdoc
@@ -56,7 +55,7 @@ bool CFileBasedUndoManagerComp::UndoStep::Serialize(iser::IArchive& archive)
 }
 
 
-// CFileBasedUndoManagerComp
+// public methods
 
 CFileBasedUndoManagerComp::CFileBasedUndoManagerComp()
 :	m_uniqueFileCounter(0),
@@ -88,7 +87,7 @@ QString CFileBasedUndoManagerComp::GetUndoLevelDescription(int stepIndex) const
 		return m_undoList[m_undoList.size() - stepIndex]->description;
 	}
 
-	return "";
+	return QString();
 }
 
 
@@ -98,7 +97,7 @@ QString CFileBasedUndoManagerComp::GetRedoLevelDescription(int stepIndex) const
 		return m_redoList[m_redoList.size() - stepIndex]->description;
 	}
 
-	return "";
+	return QString();
 }
 
 
@@ -213,7 +212,8 @@ bool CFileBasedUndoManagerComp::Serialize(iser::IArchive& archive)
 				m_currentStatePtr.reset(currentStatePtr);
 			}
 		}
-	}else{
+	}
+	else{
 		m_undoList.clear();
 		m_redoList.clear();
 	}
@@ -556,8 +556,7 @@ void CFileBasedUndoManagerComp::BeforeUpdate(imod::IModel* modelPtr)
 			QString stateFileName = QString("Undo_%1").arg(m_undoList.size());
 			UndoStepPtr statePtr(CreateState(*objectPtr, stateFileName));
 
-			if (		statePtr &&
-				(m_undoList.isEmpty() || !AreStatesEqual(*statePtr, *m_undoList.back()))){
+			if (statePtr && (m_undoList.isEmpty() || !AreStatesEqual(*statePtr, *m_undoList.back()))){
 				m_beginStatePtr = statePtr;
 			}
 		}
@@ -576,9 +575,7 @@ void CFileBasedUndoManagerComp::AfterUpdate(imod::IModel* modelPtr, const istd::
 
 	bool skipUndo = changeSet.ContainsExplicit(istd::IChangeable::CF_NO_UNDO, true);
 
-	if (		!m_isBlocked &&
-				!skipUndo &&
-				m_beginStatePtr != nullptr){
+	if (!m_isBlocked && !skipUndo && m_beginStatePtr != nullptr){
 		iser::ISerializable* objectPtr = GetObservedObject();
 		if (objectPtr != NULL){
 			QString stateFileName = QString("Undo_%1").arg(m_undoList.size());
