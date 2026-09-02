@@ -32,7 +32,7 @@ public:
 		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler)
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID", true, "DummyCollection");
 		I_ASSIGN(m_documentServiceCompPtr, "DocumentService", "Document service used to close documents without active subscribers", false, "DocumentService");
-		I_ASSIGN(m_closeDocumentTimeoutAttrPtr, "CloseDocumentTimeout", "Time (in ms) an open document may stay without an active OnSingleDocumentChanged subscriber before it is closed", true, 30000);
+		I_ASSIGN(m_closeDocumentTimeoutAttrPtr, "CloseDocumentTimeout", "Time (in ms) an open document may stay without an active OnDocumentChanged subscriber before it is closed", true, 30000);
 	I_END_COMPONENT;
 
 	// reimplemented (icomp::CComponentBase)
