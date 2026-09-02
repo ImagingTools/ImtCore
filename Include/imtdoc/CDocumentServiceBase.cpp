@@ -765,7 +765,7 @@ void CDocumentServiceBase::InitializeDocumentObservers(
 
 	imtdoc::IPersistentUndoManager* persistentUndoManagerPtr = dynamic_cast<imtdoc::IPersistentUndoManager*>(document.undoManagerPtr.GetPtr());
 	if (persistentUndoManagerPtr != nullptr){
-		persistentUndoManagerPtr->Initialize(documentId, document.typeId);
+		persistentUndoManagerPtr->InitializeDocumentContext(documentId, document.typeId);
 	}
 
 	document.undoManagerPtr->StoreDocumentState();

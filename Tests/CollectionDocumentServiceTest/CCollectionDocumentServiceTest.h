@@ -143,7 +143,7 @@ public:
 	virtual void ResetUndo() override {}
 
 	// reimplemented (imtdoc::IPersistentUndoManager)
-	virtual void Initialize(const QByteArray& /*documentId*/, const QByteArray& /*documentTypeId*/) override {}
+	virtual void InitializeDocumentContext(const QByteArray& /*documentId*/, const QByteArray& /*documentTypeId*/) override {}
 
 	// reimplemented (idoc::IDocumentStateComparator)
 	virtual bool HasStoredDocumentState() const override { return true; }

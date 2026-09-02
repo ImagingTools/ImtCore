@@ -47,7 +47,7 @@ namespace imtdoc
 
 	The steps are stored in a subdirectory of \b RootFolder identified by the document whose
 	state is undone/redone: \c <RootFolder>/<DocumentTypeId>/<DocumentId>. The document identity
-	must be provided via \ref imtdoc::IPersistentUndoManager::Initialize. Auto-persistence can be
+	must be provided via \ref imtdoc::IPersistentUndoManager::InitializeDocumentContext. Auto-persistence can be
 	initialized by the owner through a component cast.
 	The document type ID is optional
 	and is simply omitted from the path (steps are then stored directly under
@@ -93,7 +93,7 @@ public:
 	virtual bool DoRedo(int steps = 1) override;
 
 	// reimplemented (imtdoc::IPersistentUndoManager)
-	virtual void Initialize(const QByteArray& documentId, const QByteArray& documentTypeId) override;
+	virtual void InitializeDocumentContext(const QByteArray& documentId, const QByteArray& documentTypeId) override;
 
 	// reimplemented (imod::IObserver)
 	virtual bool OnModelAttached(imod::IModel* modelPtr, istd::IChangeable::ChangeSet& changeMask) override;

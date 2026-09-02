@@ -33,7 +33,7 @@ public:
 		\param documentId     Unique ID identifying the document instance.
 		\param documentTypeId ID identifying the type of the document.
 	*/
-	virtual void Initialize(const QByteArray& documentId, const QByteArray& documentTypeId) = 0;
+	virtual void InitializeDocumentContext(const QByteArray& documentId, const QByteArray& documentTypeId) = 0;
 };
 
 using IPersistentUndoManagerUniquePtr = istd::TUniqueInterfacePtr<IPersistentUndoManager>;

@@ -104,7 +104,7 @@ QString CFileBasedUndoManagerComp::GetRedoLevelDescription(int stepIndex) const
 
 // reimplemented (imtdoc::IPersistentUndoManager)
 
-void CFileBasedUndoManagerComp::Initialize(const QByteArray& documentId, const QByteArray& documentTypeId)
+void CFileBasedUndoManagerComp::InitializeDocumentContext(const QByteArray& documentId, const QByteArray& documentTypeId)
 {
 	Q_ASSERT(!m_isInitialized);
 	if (m_isInitialized){
