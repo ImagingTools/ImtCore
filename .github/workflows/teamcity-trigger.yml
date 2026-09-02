@@ -24,9 +24,9 @@ jobs:
         platform: [windows, linux]
         include:
           - platform: windows
-            build_type: ${{ vars.TEAMCITY_BUILD_TYPE_WINDOWS }}
+            build_type: ${{ github.event_name == 'pull_request' && vars.TEAMCITY_BUILD_TYPE_WINDOWS || vars.TEAMCITY_BUILD_TYPE_WINDOWS_MAIN }}
           - platform: linux
-            build_type: ${{ vars.TEAMCITY_BUILD_TYPE_LINUX }}
+            build_type: ${{ github.event_name == 'pull_request' && vars.TEAMCITY_BUILD_TYPE_LINUX || vars.TEAMCITY_BUILD_TYPE_LINUX_MAIN }}
 
     steps:
       - name: Checkout repository
@@ -83,11 +83,11 @@ jobs:
       - name: Trigger TeamCity Build (JSON)
         id: teamcity
         env:
-          TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
-          TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
-          TEAMCITY_BUILD_TYPE: ${{ matrix.build_type }}
-          TEAMCITY_BRANCH: ${{ env.TEAMCITY_BRANCH }}
-          COMMIT_SHA: ${{ env.COMMIT_SHA }}
+          TEAMCITY_URL: "${{ vars.TEAMCITY_URL }}"
+          TEAMCITY_TOKEN: "${{ secrets.TEAMCITY_TOKEN }}"
+          TEAMCITY_BUILD_TYPE: "${{ matrix.build_type }}"
+          TEAMCITY_BRANCH: "${{ env.TEAMCITY_BRANCH }}"
+          COMMIT_SHA: "${{ env.COMMIT_SHA }}"
         shell: bash
         run: |
           set -euo pipefail
@@ -98,8 +98,10 @@ jobs:
             echo "Please configure the following repository variables:"
             echo "  - TEAMCITY_URL: Your TeamCity server URL (e.g., https://teamcity.example.com)"
             echo "  - TEAMCITY_TOKEN: TeamCity access token with build trigger permissions"
-            echo "  - TEAMCITY_BUILD_TYPE_WINDOWS: TeamCity build configuration ID for Windows (e.g., ImtCore_Build_Windows)"
-            echo "  - TEAMCITY_BUILD_TYPE_LINUX: TeamCity build configuration ID for Linux (e.g., ImtCore_Build_Linux)"
+            echo "  - TEAMCITY_BUILD_TYPE_WINDOWS: TeamCity build configuration ID for Windows pull requests (e.g., ImtCore_Build_Windows)"
+            echo "  - TEAMCITY_BUILD_TYPE_WINDOWS_MAIN: TeamCity build configuration ID for Windows main branch pushes (e.g., ImtCore_Build_Windows_Main)"
+            echo "  - TEAMCITY_BUILD_TYPE_LINUX: TeamCity build configuration ID for Linux pull requests (e.g., ImtCore_Build_Linux)"
+            echo "  - TEAMCITY_BUILD_TYPE_LINUX_MAIN: TeamCity build configuration ID for Linux main branch pushes (e.g., ImtCore_Build_Linux_Main)"
             exit 1
           fi
 

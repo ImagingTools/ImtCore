@@ -84,9 +84,18 @@ Configure the following variables in your GitHub repository settings (Settings �
 | Variable Name | Description | Example |
 |------------|-------------|---------|
 | `TEAMCITY_URL` | Your TeamCity server URL (without trailing slash) | `https://teamcity.example.com` |
-| `TEAMCITY_TOKEN` | TeamCity access token with build trigger permissions | `eyJ0eXAiOiJKV1Q...` |
-| `TEAMCITY_BUILD_TYPE_WINDOWS` | TeamCity build configuration ID for Windows builds | `ImtCore_Build_Windows` or `ProjectId_BuildConfigId_Windows` |
-| `TEAMCITY_BUILD_TYPE_LINUX` | TeamCity build configuration ID for Linux builds | `ImtCore_Build_Linux` or `ProjectId_BuildConfigId_Linux` |
+| `TEAMCITY_BUILD_TYPE_WINDOWS` | TeamCity build configuration ID for Windows pull requests | `ImtCore_Build_Windows` |
+| `TEAMCITY_BUILD_TYPE_WINDOWS_MAIN` | TeamCity build configuration ID for Windows `main`/`master` pushes | `ImtCore_Build_Windows_Main` |
+| `TEAMCITY_BUILD_TYPE_LINUX` | TeamCity build configuration ID for Linux pull requests | `ImtCore_Build_Linux` |
+| `TEAMCITY_BUILD_TYPE_LINUX_MAIN` | TeamCity build configuration ID for Linux `main`/`master` pushes | `ImtCore_Build_Linux_Main` |
+
+### Required GitHub Repository Secret
+
+Configure this value in your GitHub repository settings (Settings → Secrets and variables → Actions → Secrets tab):
+
+| Secret Name | Description |
+|------------|-------------|
+| `TEAMCITY_TOKEN` | TeamCity access token with permission to queue builds and read build results |
 
 ### How to Get TeamCity Configuration Values
 
@@ -103,15 +112,17 @@ Your TeamCity server base URL, for example: `https://teamcity.example.com`
 7. Copy the generated token
 
 #### 3. TeamCity Build Configuration IDs
-You need to set up two separate build configurations in TeamCity - one for Windows and one for Linux.
+You need separate TeamCity build configurations for pull requests and `main`/`master` pushes on both Windows and Linux.
 
 For each build configuration:
 1. Open your build configuration in TeamCity
 2. The build configuration ID is shown in the URL or in the build configuration settings
 3. Format is usually: `ProjectId_BuildConfigurationId`
 4. Examples:
-   - Windows: `ImtCore_CMakeBuild_Windows` or `ImagingTools_ImtCore_Build_Windows`
-   - Linux: `ImtCore_CMakeBuild_Linux` or `ImagingTools_ImtCore_Build_Linux`
+  - Windows pull request: `ImtCore_CMakeBuild_Windows`
+  - Windows `main`/`master`: `ImtCore_CMakeBuild_Windows_Main`
+  - Linux pull request: `ImtCore_CMakeBuild_Linux`
+  - Linux `main`/`master`: `ImtCore_CMakeBuild_Linux_Main`
 
 ## Setting Up GitHub Repository Variables
 
@@ -119,11 +130,13 @@ For each build configuration:
 2. Click **Settings** → **Secrets and variables** → **Actions**
 3. Click on the **Variables** tab
 4. Click **New repository variable**
-5. Add each of the four variables listed above:
+5. Add each of the five variables listed above:
    - `TEAMCITY_URL`
-   - `TEAMCITY_TOKEN`
    - `TEAMCITY_BUILD_TYPE_WINDOWS`
+   - `TEAMCITY_BUILD_TYPE_WINDOWS_MAIN`
    - `TEAMCITY_BUILD_TYPE_LINUX`
+   - `TEAMCITY_BUILD_TYPE_LINUX_MAIN`
+6. Click the **Secrets** tab and add `TEAMCITY_TOKEN` as a repository secret
 
 ## Workflow Triggers
 
@@ -131,7 +144,7 @@ The workflow triggers on:
 - **Pull Requests**: Any pull request event (opened, synchronized, reopened)
 - **Push to main/master**: Direct commits to main or master branches
 
-Both Windows and Linux builds are triggered in parallel using a matrix strategy for each event.
+Both Windows and Linux builds are triggered in parallel using a matrix strategy. Pull requests use `TEAMCITY_BUILD_TYPE_WINDOWS` and `TEAMCITY_BUILD_TYPE_LINUX`; `main`/`master` pushes use `TEAMCITY_BUILD_TYPE_WINDOWS_MAIN` and `TEAMCITY_BUILD_TYPE_LINUX_MAIN`.
 
 ## Build Information Passed to TeamCity
 
@@ -157,7 +170,8 @@ You can adjust these by modifying the `MAX_QUEUED_SECONDS`, `MAX_RUNNING_SECONDS
 ## Troubleshooting
 
 ### "TeamCity configuration not found in repository variables"
-- Ensure all four required variables (TEAMCITY_URL, TEAMCITY_TOKEN, TEAMCITY_BUILD_TYPE_WINDOWS, TEAMCITY_BUILD_TYPE_LINUX) are configured in your repository settings under the Variables tab
+- Ensure `TEAMCITY_URL` and all four build-type variables are configured under the Variables tab
+- Ensure `TEAMCITY_TOKEN` is configured under the Secrets tab
 
 ### "Failed to trigger TeamCity build"
 - Verify the TeamCity URL is correct and accessible
