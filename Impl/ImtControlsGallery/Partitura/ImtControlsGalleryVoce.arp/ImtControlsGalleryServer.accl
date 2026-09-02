@@ -23,24 +23,10 @@
         <Element ComponentName="WebSocketServerFramework" X="400" Y="375" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="ContactInfoDocCollectionManager">
+        <EmbededRegistry Id="Migrations">
             <PositionMap>
-                <Element ComponentName="AutoPersistence" X="875" Y="325" Note=""/>
-                <Element ComponentName="CollectionDocumentService" X="575" Y="325" Note=""/>
-                <Element ComponentName="CollectionDocumentServiceController" X="575" Y="225" Note=""/>
-                <Element ComponentName="CollectionDocumentServicePublisher" X="800" Y="550" Note=""/>
-                <Element ComponentName="ContactInfo" X="150" Y="375" Note=""/>
-                <Element ComponentName="FileBasedUndoManager" X="425" Y="550" Note=""/>
-                <Element ComponentName="FileNameParam" X="1075" Y="325" Note=""/>
-                <Element ComponentName="FileNameParam_2" X="425" Y="650" Note=""/>
-                <Element ComponentName="Serializer" X="875" Y="425" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="Subscribers">
-            <PositionMap>
-                <Element ComponentName="ContactCollectionChangeNotifier" X="575" Y="350" Note=""/>
-                <Element ComponentName="SlaveSubscriberController" X="575" Y="125" Note=""/>
+                <Element ComponentName="CompositeMigrationController" X="550" Y="125" Note=""/>
+                <Element ComponentName="ObjectCollectionMigrationController" X="575" Y="425" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
@@ -50,10 +36,25 @@
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
-        <EmbededRegistry Id="Migrations">
+        <EmbededRegistry Id="ContactInfoDocCollectionManager">
             <PositionMap>
-                <Element ComponentName="CompositeMigrationController" X="550" Y="125" Note=""/>
-                <Element ComponentName="ObjectCollectionMigrationController" X="575" Y="425" Note=""/>
+                <Element ComponentName="AutoPersistence" X="850" Y="325" Note=""/>
+                <Element ComponentName="CollectionDocumentService" X="575" Y="325" Note=""/>
+                <Element ComponentName="CollectionDocumentServiceController" X="575" Y="225" Note=""/>
+                <Element ComponentName="CollectionDocumentServicePublisher" X="800" Y="550" Note=""/>
+                <Element ComponentName="ContactInfo" X="150" Y="375" Note=""/>
+                <Element ComponentName="DocManagerFileName" X="1075" Y="325" Note=""/>
+                <Element ComponentName="FileBasedUndoManager" X="425" Y="550" Note=""/>
+                <Element ComponentName="Serializer" X="850" Y="425" Note=""/>
+                <Element ComponentName="SystemLocation" X="1075" Y="675" Note=""/>
+                <Element ComponentName="UndoManagerFolder" X="425" Y="675" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="Subscribers">
+            <PositionMap>
+                <Element ComponentName="ContactCollectionChangeNotifier" X="575" Y="350" Note=""/>
+                <Element ComponentName="SlaveSubscriberController" X="575" Y="125" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

@@ -13,6 +13,9 @@
         <Element Id="ContactInfoDocCollectionManager" PackageId="" ComponentId="ContactInfoDocCollectionManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ContactInfoCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Repositories/ContactsCollection"/>
                     </AttributeInfo>
@@ -25,8 +28,8 @@
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ControlsGallerySettings/TracingConfiguration"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ImtCoreLocalization"/>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -291,7 +294,7 @@
                                     <Data IsEnabled="true" Value="Serializer"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="FilePath" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="FileNameParam"/>
+                                    <Data IsEnabled="true" Value="DocManagerFileName"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Object" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="CollectionDocumentService"/>
@@ -382,6 +385,21 @@
                             <AttributeInfoMap/>
                         </Data>
                     </Element>
+                    <Element Id="DocManagerFileName" PackageId="FilePck" ComponentId="RelativeFileNameParam">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
+                                    <Data IsEnabled="true" Value="ContactInfoDocumentManager.bin"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="PathType" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="1"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ReferencePath" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SystemLocation"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
                     <Element Id="FileBasedUndoManager" PackageId="ImtServerVoce" ComponentId="FileBasedUndoManager">
                         <Data IsEnabled="true" Flags="2">
                             <AttributeInfoMap>
@@ -389,37 +407,13 @@
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="RootFolder" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="FileNameParam_2"/>
+                                    <Data IsEnabled="true" Value="UndoManagerFolder"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                                     <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="FileNameParam" PackageId="FilePck" ComponentId="FileNameParam">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
-                                    <Data IsEnabled="true" Value="w:\CollectionDM.bin"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="PathType" Type="Integer" ExportId="">
-                                    <Data IsEnabled="true" Value="1"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="FileNameParam_2" PackageId="FilePck" ComponentId="FileNameParam">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
-                                    <Data IsEnabled="true" Value="w:\_UndoManagers"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="PathType" Type="Integer" ExportId="">
-                                    <Data IsEnabled="true" Value="2"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -436,6 +430,33 @@
                                             <Value>bin</Value>
                                         </Values>
                                     </Data>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="SystemLocation" PackageId="FilePck" ComponentId="SystemLocation">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="LocationType" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="105"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="UndoManagerFolder" PackageId="FilePck" ComponentId="RelativeFileNameParam">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
+                                    <Data IsEnabled="true" Value="ContactInfoUndoManager"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="PathType" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="2"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ReferencePath" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SystemLocation"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -594,7 +615,6 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="HttpServerFramework"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="AutoPersistence" ComponentId="ContactInfoDocCollectionManager/AutoPersistence"/>
         <Component ExportedId="DatabaseEngine" ComponentId="DatabaseEngine"/>
         <Component ExportedId="HttpServerFramework" ComponentId="HttpServerFramework"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>

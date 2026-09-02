@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6556" Description="ACF"/>
+            <Version Id="0" Number="6560" Description="ACF"/>
             <Version Id="1" Number="2449" Description="ACF-Solutions"/>
             <Version Id="1023" Number="396033" Description="Qt Framework"/>
         </VersionInfos>
@@ -36,7 +36,6 @@
                                 <Value>ControlsGalleryServer/DatabaseEngine</Value>
                                 <Value>ClientApplication/ObserverQml</Value>
                                 <Value>GqlClientBridge</Value>
-                                <Value>ControlsGalleryServer/AutoPersistence</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
