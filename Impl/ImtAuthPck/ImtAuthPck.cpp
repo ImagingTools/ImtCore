@@ -231,6 +231,26 @@ I_EXPORT_COMPONENT(
 			"Personal Access Token Meta Info Creator");
 
 I_EXPORT_COMPONENT(
+			OidcClient,
+			"OIDC client registration data",
+			"OIDC Client");
+
+I_EXPORT_COMPONENT(
+			OidcAuthorizationCode,
+			"OIDC authorization code",
+			"OIDC Authorization Code");
+
+I_EXPORT_COMPONENT(
+			OidcTokenInfo,
+			"OIDC token info",
+			"OIDC Token Info");
+
+I_EXPORT_COMPONENT(
+			Rs256JwtTokenProvider,
+			"RS256 JWT token provider for OIDC",
+			"RS256 JWT Token Provider OIDC");
+
+I_EXPORT_COMPONENT(
 			TenantInfo,
 			"Tenant entity storing organization data (name, description, status, relationships)",
 			"Tenant Info");
@@ -357,6 +377,29 @@ I_EXPORT_COMPONENT(
 			"Tenant Document Name Provider");
 
 I_EXPORT_COMPONENT(
+			ExternalIdentity,
+			"External identity linking external provider to local user",
+			"External Identity OIDC Provider");
+
+I_EXPORT_COMPONENT(
+			GoogleOidcProvider,
+			"Google external OIDC provider configuration",
+			"Google OIDC Provider External");
+
+I_EXPORT_COMPONENT(
+			AppleOidcProvider,
+			"Apple external OIDC provider configuration",
+			"Apple OIDC Provider External");
+
+I_EXPORT_COMPONENT(
+			FacebookOidcProvider,
+			"Facebook external OIDC provider configuration",
+			"Facebook OIDC Provider External");
+
+I_EXPORT_COMPONENT(
+			ExternalOidcAuthController,
+			"External OIDC authentication controller for provider login flows",
+			"External OIDC Auth Controller");
 			TenantRelationshipDocumentNameProvider,
 			"Provides default document name from target tenant name",
 			"Tenant Relationship Document Name Provider");
