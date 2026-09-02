@@ -168,19 +168,6 @@ void CFileBasedUndoManagerComp::CleanupHistory()
 }
 
 
-void CFileBasedUndoManagerComp::RemoveStorageDirectory()
-{
-	SetStepFileAutoRemoveEnabled(false);
-
-	QString storageDirectoryPath = GetStorageDirectoryPath();
-	if (!storageDirectoryPath.isEmpty()){
-		QDir storageDirectory(storageDirectoryPath);
-		if (storageDirectory.exists()){
-			storageDirectory.removeRecursively();
-		}
-	}
-}
-
 void CFileBasedUndoManagerComp::ResetUndo()
 {
 	istd::CChangeNotifier notifier(this);

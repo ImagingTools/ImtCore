@@ -96,8 +96,6 @@ public:
 	virtual void InitializeDocumentContext(const QByteArray& documentId, const QByteArray& documentTypeId) override;
 	virtual void CleanupHistory() override;
 
-	void RemoveStorageDirectory();
-
 	// reimplemented (imod::IObserver)
 	virtual bool OnModelAttached(imod::IModel* modelPtr, istd::IChangeable::ChangeSet& changeMask) override;
 	virtual bool OnModelDetached(imod::IModel* modelPtr) override;

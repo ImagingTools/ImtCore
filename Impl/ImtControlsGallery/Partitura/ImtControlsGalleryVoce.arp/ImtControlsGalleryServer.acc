@@ -344,6 +344,9 @@
                                 <AttributeInfo Id="UndoManager" Type="Factory" ExportId="">
                                     <Data IsEnabled="true" Value="FileBasedUndoManager"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="UndoManagerFolder" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="UndoManagerFolder"/>
+                                </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
                     </Element>
