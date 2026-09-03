@@ -98,6 +98,17 @@ public:
 	virtual bool RemoveFromGroup(const QByteArray& groupId) = 0;
 
 	/**
+		Check if this user account is enabled.
+		Disabled accounts must be denied authorization without being removed (IEC 62443-3-3 SR 1.3).
+	*/
+	virtual bool IsEnabled() const = 0;
+
+	/**
+		Enable or disable this user account.
+	*/
+	virtual void SetEnabled(bool enabled) = 0;
+
+	/**
 		Get information about the system in which this user is located.
 	*/
 	virtual SystemInfoList GetSystemInfos() const = 0;

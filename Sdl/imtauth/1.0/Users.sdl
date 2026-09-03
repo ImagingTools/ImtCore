@@ -26,6 +26,7 @@ type UserItemData {
 	systemName: String
 	roles: ID
 	groups: ID
+	enabled: Bool
 	added: String
 	lastModified: String
 	lastConnection: String
@@ -53,6 +54,7 @@ type UserData {
 	roles: [ID]
 	permissions: [ID]
 	systemInfos: [SystemInfo]
+	enabled: Bool
 }
 
 input UserDataInput {
