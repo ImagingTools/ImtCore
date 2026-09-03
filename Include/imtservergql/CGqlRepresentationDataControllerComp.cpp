@@ -133,6 +133,22 @@ iprm::IParamsSetUniquePtr CGqlRepresentationDataControllerComp::CreateContextPar
 			userInfoParamPtr.MoveCastedPtr(userInfoPtr->CloneMe());
 			Q_ASSERT(userInfoParamPtr.IsValid());
 
+			// The representation controllers decide what this user may see from
+			// the permissions of this copy alone, so what those permissions
+			// imply through feature requirements is written into it. The copy
+			// lives for this request only and is never stored back.
+			const imtauth::IUserInfo::FeatureIds impliedPermissions = userInfoPtr->IsAdmin()
+					? imtauth::IUserInfo::FeatureIds()
+					: gqlRequest.GetRequestContext()->GetImpliedPermissions();
+			if (!impliedPermissions.isEmpty()){
+				imtauth::IUserInfo* clonedUserInfoPtr = dynamic_cast<imtauth::IUserInfo*>(userInfoParamPtr.GetPtr());
+				if (clonedUserInfoPtr != nullptr){
+					clonedUserInfoPtr->SetLocalPermissions(
+							productId,
+							clonedUserInfoPtr->GetLocalPermissions(productId) + impliedPermissions);
+				}
+			}
+
 			paramsPtr->SetEditableParameter("UserInfo", userInfoParamPtr);
 		}
 

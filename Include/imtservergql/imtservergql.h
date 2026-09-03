@@ -34,6 +34,41 @@ inline QByteArray GetPermissionPath(const imtgql::CGqlRequest& gqlRequest)
 }
 
 
+/**
+	Get every permission the user of this request holds.
+
+	A permission grants what it requires: a user holding 'A' whose requirements
+	name 'B' holds 'B' as well, and so on through the requirements of 'B'. Those
+	requirements are declared in the feature tree of the product, so a context
+	without product info answers with the permissions held directly only.
+*/
+inline imtauth::IUserInfo::FeatureIds GetUserPermissions(const imtgql::IGqlContext& gqlContext)
+{
+	const imtauth::IUserInfo* userInfoPtr = gqlContext.GetUserInfo();
+	if (userInfoPtr == nullptr){
+		return imtauth::IUserInfo::FeatureIds();
+	}
+
+	return userInfoPtr->GetPermissions() + gqlContext.GetImpliedPermissions();
+}
+
+
+/**
+	Check the permissions held by the user of the given context, requirements included.
+*/
+inline bool CheckUserPermissions(
+			const imtgql::IGqlContext& gqlContext,
+			imtauth::IPermissionChecker& permissionChecker,
+			const QByteArrayList& permissions)
+{
+	if (gqlContext.GetUserInfo() == nullptr){
+		return false;
+	}
+
+	return permissionChecker.CheckPermission(GetUserPermissions(gqlContext), permissions);
+}
+
+
 inline bool CheckPermissions(
 			const imtgql::CGqlRequest& gqlRequest,
 			imtauth::IPermissionChecker* permissionCheckerPtr,
@@ -69,14 +104,17 @@ inline bool CheckPermissions(
 
 	const QByteArray permissionPath = GetPermissionPath(gqlRequest);
 	if (!permissionPath.isEmpty()){
-		if (!permissions.contains(permissionPath)){
+		// The path the request runs under and the permissions declared for the
+		// command may be written in different generations of the permission
+		// format, so they are matched by the same rule as the held ones.
+		if (!imtauth::HasPermission(permissions, permissionPath)){
 			refusalReason = QStringLiteral("the permission path '%1' is none of '%2' this request runs under")
 					.arg(QString::fromUtf8(permissionPath), QString::fromUtf8(permissions.join(';')));
 
 			return false;
 		}
 
-		if (!permissionCheckerPtr->CheckPermission(userInfoPtr->GetPermissions(), {permissionPath})){
+		if (!CheckUserPermissions(*gqlContextPtr, *permissionCheckerPtr, {permissionPath})){
 			refusalReason = QStringLiteral("the user does not hold '%1'")
 					.arg(QString::fromUtf8(permissionPath));
 
@@ -86,7 +124,7 @@ inline bool CheckPermissions(
 		return true;
 	}
 
-	if (!permissionCheckerPtr->CheckPermission(userInfoPtr->GetPermissions(), permissions)){
+	if (!CheckUserPermissions(*gqlContextPtr, *permissionCheckerPtr, permissions)){
 		refusalReason = QStringLiteral("the user holds none of '%1'")
 				.arg(QString::fromUtf8(permissions.join(';')));
 

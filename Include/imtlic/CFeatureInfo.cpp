@@ -306,6 +306,7 @@ bool CFeatureInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 		m_name = sourcePtr->m_name;
 		m_description = sourcePtr->m_description;
 		m_optional = sourcePtr->m_optional;
+		m_isPermission = sourcePtr->m_isPermission;
 		m_requirements =  sourcePtr->m_requirements;
 
 		m_subFeatures.clear();
@@ -360,6 +361,7 @@ bool CFeatureInfo::IsEqual(const IChangeable& object) const
 				m_name == sourcePtr->m_name &&
 				m_description == sourcePtr->m_description &&
 				m_optional == sourcePtr->m_optional &&
+				m_isPermission == sourcePtr->m_isPermission &&
 				m_parentFeaturePtr == sourcePtr->m_parentFeaturePtr &&
 				m_requirements == sourcePtr->m_requirements);
 	}
@@ -390,6 +392,7 @@ bool CFeatureInfo::ResetData(CompatibilityMode /*mode*/)
 	m_parentFeaturePtr = nullptr;
 	m_requirements.clear();
 	m_optional = false;
+	m_isPermission = true;
 
 	return true;
 }

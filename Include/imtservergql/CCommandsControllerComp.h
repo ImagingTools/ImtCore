@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtauth/IUserInfo.h>
 #include <imtserverapp/IGuiElementContainer.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Commands_fwd.h>
 
@@ -35,7 +36,8 @@ private:
 			const imtserverapp::IGuiElementContainer& guiElementContainer,
 			sdl::V1_0::imtbase::CGuiElementContainer& representation,
 			const QByteArray& languageId,
-			const imtauth::IUserInfo* userInfoPtr,
+			const imtauth::IUserInfo::FeatureIds& userPermissions,
+			bool isAdmin,
 			const QByteArray& permissionPath) const;
 	bool GetRepresentationFromGuiElement(
 	const imtserverapp::IGuiElementModel& guiElementModel,

@@ -30,6 +30,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QByteArrayList>
 #include <imtauth/IUserInfo.h>
+#include <imtauth/imtauth.h>
 
 
 /**
@@ -660,7 +661,9 @@ inline bool CollectPermissionEntries(
 	QByteArray currentPath = imtlic::CalculateFeaturePath(featureInfo);
 
 	if (subFeatures.isEmpty()){
-		if (allowedPermissionsPtr != nullptr && !parentSelected && !allowedPermissionsPtr->contains(currentPath)){
+		// Held permissions may still be stored by feature id alone, so what the
+		// user holds is matched against the tree by the common rule.
+		if (allowedPermissionsPtr != nullptr && !parentSelected && !imtauth::HasPermission(*allowedPermissionsPtr, currentPath)){
 			return false;
 		}
 
@@ -680,7 +683,8 @@ inline bool CollectPermissionEntries(
 
 	imtsdl::TElementList<TEntry> childEntries;
 	int childCount = 0;
-	const bool thisNodeSelected = parentSelected || (allowedPermissionsPtr != nullptr && allowedPermissionsPtr->contains(currentPath));
+	const bool thisNodeSelected = parentSelected
+				|| (allowedPermissionsPtr != nullptr && imtauth::HasPermission(*allowedPermissionsPtr, currentPath));
 
 	for (int i = 0; i < subFeatures.count(); i++){
 		const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr = subFeatures.at(i);
@@ -764,7 +768,7 @@ inline void BuildPermissionGroups(
 		const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
 		bool hasEntries = false;
 		const bool groupSelected = (allowedPermissionsPtr != nullptr
-					&& allowedPermissionsPtr->contains(imtlic::CalculateFeaturePath(*featureInfoPtr)));
+					&& imtauth::HasPermission(*allowedPermissionsPtr, imtlic::CalculateFeaturePath(*featureInfoPtr)));
 
 		if (subFeatures.isEmpty()){
 			hasEntries = CollectPermissionEntries<TEntry>(
@@ -849,7 +853,7 @@ inline void BuildPermissionGroupsFromProvider(
 		const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
 		bool hasEntries = false;
 		const bool groupSelected = (allowedPermissionsPtr != nullptr
-					&& allowedPermissionsPtr->contains(imtlic::CalculateFeaturePath(*featureInfoPtr)));
+					&& imtauth::HasPermission(*allowedPermissionsPtr, imtlic::CalculateFeaturePath(*featureInfoPtr)));
 
 		if (subFeatures.isEmpty()){
 			hasEntries = CollectPermissionEntries<TEntry>(

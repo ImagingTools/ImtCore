@@ -4,6 +4,7 @@
 
 
 // ImtCore includes
+#include <imtauth/imtauth.h>
 #include <imtlic/IFeatureInfo.h>
 #include <GeneratedFiles/imtlicsdl/SDL/1.0/CPP/Features.h>
 
@@ -49,7 +50,9 @@ sdl::V1_0::imtauth::CProfileData CRemoteProfileControllerComp::OnGetProfile(
 							}
 
 							QByteArray subFeaturePath = imtlic::CalculateFeaturePath(*subFeatureInfoPtr);
-							if (permissions.contains(subFeaturePath)){
+							// The profile may name a permission by feature id
+							// alone, as older versions stored them.
+							if (imtauth::HasPermission(permissions, subFeaturePath)){
 								sdl::V1_0::imtauth::CPermissionInfo info;
 
 								info.id = subFeaturePath;

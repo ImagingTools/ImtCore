@@ -13,6 +13,9 @@
         <Element Id="AuthenticationManager" PackageId="ImtServerGqlPck" ComponentId="AuthenticationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="FeatureContainer">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GqlContextFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="GqlContext"/>
                     </AttributeInfo>

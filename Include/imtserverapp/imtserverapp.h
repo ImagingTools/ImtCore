@@ -59,7 +59,10 @@ inline bool IsElementAccessible(
 	}
 
 	if (!permissionPath.isEmpty()){
-		return elementPermissions.contains(permissionPath)
+		// The path the request runs under and the permissions declared for the
+		// element may be written in different generations of the permission
+		// format, so they are matched by the same rule as the held ones.
+		return imtauth::HasPermission(elementPermissions, permissionPath)
 				&& permissionCheckerPtr->CheckPermission(userPermissions, {permissionPath});
 	}
 

@@ -2,6 +2,10 @@
 #include <imtlic/CProductInfo.h>
 
 
+// Qt includes
+#include <QtCore/QHash>
+#include <QtCore/QSet>
+
 // ACF includes
 #include <istd/CChangeNotifier.h>
 #include <istd/TSingleFactory.h>
@@ -301,6 +305,146 @@ bool CProductInfo::ResetData(CompatibilityMode mode)
 	m_optionalFeatures.clear();
 
 	return true;
+}
+
+
+namespace
+{
+
+
+typedef QHash<QByteArray, QByteArrayList> RequirementsByPath;
+typedef QHash<QByteArray, QByteArrayList> PathsByFeatureId;
+
+
+void CollectFeatureRequirements(
+			const IFeatureInfo& featureInfo,
+			const QByteArray& parentPath,
+			RequirementsByPath& requirementsByPath,
+			PathsByFeatureId& pathsByFeatureId)
+{
+	const QByteArray featureId = featureInfo.GetFeatureId();
+	if (featureId.isEmpty()){
+		return;
+	}
+
+	const QByteArray featurePath = parentPath + '/' + featureId;
+
+	requirementsByPath.insert(featurePath, featureInfo.GetRequirements());
+
+	// Permissions stored before paths existed name a feature by its id alone,
+	// and such an id holds for every feature carrying it - that is how the
+	// permission check itself reads them (\see imtauth::HasPermission), so the
+	// requirements of all of them are kept reachable under that id.
+	pathsByFeatureId[featureId].append(featurePath);
+
+	const IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
+	for (const IFeatureInfo::FeatureInfoPtr& subFeaturePtr : subFeatures){
+		if (subFeaturePtr.IsValid()){
+			CollectFeatureRequirements(*subFeaturePtr, featurePath, requirementsByPath, pathsByFeatureId);
+		}
+	}
+}
+
+
+void CollectProductRequirements(
+			IProductInfo& productInfo,
+			RequirementsByPath& requirementsByPath,
+			PathsByFeatureId& pathsByFeatureId)
+{
+	imtbase::IObjectCollection* featureCollectionPtr = productInfo.GetFeatures();
+	if (featureCollectionPtr == nullptr){
+		return;
+	}
+
+	// Reading an element hands out a deep copy of a whole feature tree, so the
+	// product is flattened once here and every lookup is answered from the maps.
+	const imtbase::ICollectionInfo::Ids elementIds = featureCollectionPtr->GetElementIds();
+	for (const imtbase::ICollectionInfo::Id& elementId : elementIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (!featureCollectionPtr->GetObjectData(elementId, dataPtr)){
+			continue;
+		}
+
+		const IFeatureInfo* featureInfoPtr = dynamic_cast<const IFeatureInfo*>(dataPtr.GetPtr());
+		if (featureInfoPtr != nullptr){
+			CollectFeatureRequirements(*featureInfoPtr, QByteArray(), requirementsByPath, pathsByFeatureId);
+		}
+	}
+}
+
+
+QByteArrayList GetPermissionRequirements(
+			const QByteArray& permissionId,
+			const RequirementsByPath& requirementsByPath,
+			const PathsByFeatureId& pathsByFeatureId)
+{
+	if (permissionId.isEmpty()){
+		return QByteArrayList();
+	}
+
+	const QByteArray featurePath = permissionId.startsWith('/') ? permissionId : ('/' + permissionId);
+
+	RequirementsByPath::const_iterator requirementsIter = requirementsByPath.constFind(featurePath);
+	if (requirementsIter != requirementsByPath.constEnd()){
+		return requirementsIter.value();
+	}
+
+	// A permission stored in the old format names a feature by its id alone,
+	// which every feature carrying that id answers for. A path that names no
+	// feature is not resolved by its last segment instead: it says which parent
+	// it belongs to, and another branch grants requirements of its own.
+	if (permissionId.contains('/')){
+		return QByteArrayList();
+	}
+
+	QByteArrayList retVal;
+	for (const QByteArray& knownPath : pathsByFeatureId.value(permissionId)){
+		retVal += requirementsByPath.value(knownPath);
+	}
+
+	return retVal;
+}
+
+
+} // anonymous namespace
+
+
+// public functions
+
+QByteArrayList CollectImpliedPermissions(IProductInfo& productInfo, const QByteArrayList& permissionIds)
+{
+	if (permissionIds.isEmpty()){
+		return QByteArrayList();
+	}
+
+	RequirementsByPath requirementsByPath;
+	PathsByFeatureId pathsByFeatureId;
+	CollectProductRequirements(productInfo, requirementsByPath, pathsByFeatureId);
+	if (requirementsByPath.isEmpty()){
+		return QByteArrayList();
+	}
+
+	QByteArrayList retVal;
+
+	QSet<QByteArray> knownPermissions(permissionIds.begin(), permissionIds.end());
+	QByteArrayList pendingPermissions = permissionIds;
+
+	while (!pendingPermissions.isEmpty()){
+		const QByteArray permissionId = pendingPermissions.takeFirst();
+
+		const QByteArrayList requirements = GetPermissionRequirements(permissionId, requirementsByPath, pathsByFeatureId);
+		for (const QByteArray& requirement : requirements){
+			if (requirement.isEmpty() || knownPermissions.contains(requirement)){
+				continue;
+			}
+
+			knownPermissions.insert(requirement);
+			retVal.append(requirement);
+			pendingPermissions.append(requirement);
+		}
+	}
+
+	return retVal;
 }
 
 
