@@ -17,9 +17,9 @@
 #include <ifile/IFileNameParam.h>
 #include <idoc/CDocumentStateComparator.h>
 #include <idoc/IUndoManager.h>
-#include <imtbase/TModelUpdateBinder.h>
 
 // ImtCore includes
+#include <imtbase/TModelUpdateBinder.h>
 #include <imtdoc/IPersistentUndoManager.h>
 
 
