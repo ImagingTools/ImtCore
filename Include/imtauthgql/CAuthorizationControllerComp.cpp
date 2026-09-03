@@ -266,6 +266,12 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
+	if (!userInfoPtr->IsEnabled()){
+		SendWarningMessage(0, QStringLiteral("Authorization denied for disabled account. Login: '%1'").arg(QString(login)), "imtgql::CAuthorizationControllerComp");
+
+		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+	}
+
 	QByteArray activeSystemId;
 	bool ok = false;
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
@@ -329,6 +335,12 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 	}
 
 	if (userInfoPtr == nullptr){
+		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+	}
+
+	if (!userInfoPtr->IsEnabled()){
+		SendWarningMessage(0, QStringLiteral("Authorization denied for disabled account. Login: '%1'").arg(QString(login)), "imtgql::CAuthorizationControllerComp");
+
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
