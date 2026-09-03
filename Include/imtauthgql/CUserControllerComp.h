@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtauth/ICredentialController.h>
+#include <imtauth/IAccountLockoutController.h>
 #include <imtauth/IUserVerificationController.h>
 #include <imtauthgql/CUserRepresentationController.h>
 #include <imtcrypt/IHashGenerator.h>
@@ -32,6 +33,7 @@ public:
 		I_ASSIGN(m_userOperationContextControllerCompPtr, "UserOperationContextController", "User operation context controller", false, "UserOperationContextController");
 		I_ASSIGN(m_userVerificationCodeSenderCompPtr, "UserVerificationCodeSender", "User verification code sender", false, "UserVerificationCodeSender");
 		I_ASSIGN(m_databaseConnectionCheckerCompPtr, "DatabaseConnectionChecker", "Database connection checker", false, "DatabaseConnectionChecker");
+		I_ASSIGN(m_accountLockoutControllerCompPtr, "AccountLockoutController", "Account lockout controller used to unlock accounts locked after consecutive invalid access attempts", false, "AccountLockoutController");
 	I_END_COMPONENT;
 
 protected:
@@ -68,6 +70,10 @@ protected:
 				const sdl::V1_0::imtauth::CGetUserObjectIdGqlRequest& getUserObjectIdRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CUnlockUserPayload OnUnlockUser(
+				const sdl::V1_0::imtauth::CUnlockUserGqlRequest& unlockUserRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
@@ -88,6 +94,7 @@ private:
 	I_REF(imtbase::IOperationContextController, m_userOperationContextControllerCompPtr);
 	I_REF(imtauth::IUserVerificationCodeSender, m_userVerificationCodeSenderCompPtr);
 	I_REF(imtdb::IDatabaseServerConnectionChecker, m_databaseConnectionCheckerCompPtr);
+	I_REF(imtauth::IAccountLockoutController, m_accountLockoutControllerCompPtr);
 
 private:
 	imtauthgql::CUserRepresentationController m_userRepresentationController;
