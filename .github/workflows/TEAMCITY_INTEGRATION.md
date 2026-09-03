@@ -84,9 +84,9 @@ Configure the following variables in your GitHub repository settings (Settings â
 | Variable Name | Description | Example |
 |------------|-------------|---------|
 | `TEAMCITY_URL` | Your TeamCity server URL (without trailing slash) | `https://teamcity.example.com` |
-| `TEAMCITY_BUILD_TYPE_WINDOWS` | TeamCity build configuration ID for Windows pull requests | `ImtCore_Build_Windows` |
+| `TEAMCITY_BUILD_TYPE_WINDOWS_PR` | TeamCity build configuration ID for Windows pull requests | `ImtCore_Build_Windows` |
 | `TEAMCITY_BUILD_TYPE_WINDOWS_MAIN` | TeamCity build configuration ID for Windows `main`/`master` pushes | `ImtCore_Build_Windows_Main` |
-| `TEAMCITY_BUILD_TYPE_LINUX` | TeamCity build configuration ID for Linux pull requests | `ImtCore_Build_Linux` |
+| `TEAMCITY_BUILD_TYPE_LINUX_PR` | TeamCity build configuration ID for Linux pull requests | `ImtCore_Build_Linux` |
 | `TEAMCITY_BUILD_TYPE_LINUX_MAIN` | TeamCity build configuration ID for Linux `main`/`master` pushes | `ImtCore_Build_Linux_Main` |
 
 ### Required GitHub Repository Secret
@@ -132,9 +132,9 @@ For each build configuration:
 4. Click **New repository variable**
 5. Add each of the five variables listed above:
    - `TEAMCITY_URL`
-   - `TEAMCITY_BUILD_TYPE_WINDOWS`
+   - `TEAMCITY_BUILD_TYPE_WINDOWS_PR`
    - `TEAMCITY_BUILD_TYPE_WINDOWS_MAIN`
-   - `TEAMCITY_BUILD_TYPE_LINUX`
+   - `TEAMCITY_BUILD_TYPE_LINUX_PR`
    - `TEAMCITY_BUILD_TYPE_LINUX_MAIN`
 6. Click the **Secrets** tab and add `TEAMCITY_TOKEN` as a repository secret
 
@@ -144,7 +144,7 @@ The workflow triggers on:
 - **Pull Requests**: Any pull request event (opened, synchronized, reopened)
 - **Push to main/master**: Direct commits to main or master branches
 
-Both Windows and Linux builds are triggered in parallel using a matrix strategy. Pull requests use `TEAMCITY_BUILD_TYPE_WINDOWS` and `TEAMCITY_BUILD_TYPE_LINUX`; `main`/`master` pushes use `TEAMCITY_BUILD_TYPE_WINDOWS_MAIN` and `TEAMCITY_BUILD_TYPE_LINUX_MAIN`.
+Both Windows and Linux builds are triggered in parallel using a matrix strategy. Pull requests use `TEAMCITY_BUILD_TYPE_WINDOWS_PR` and `TEAMCITY_BUILD_TYPE_LINUX_PR`; `main`/`master` pushes use `TEAMCITY_BUILD_TYPE_WINDOWS_MAIN` and `TEAMCITY_BUILD_TYPE_LINUX_MAIN`.
 
 ## Build Information Passed to TeamCity
 
