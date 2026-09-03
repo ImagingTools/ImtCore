@@ -34,7 +34,8 @@ namespace imtdb
 
 	Referenced files that are missing or have an unexpected size are reported as errors
 	(integrity audit). With 'AuditOnly' enabled (the default) nothing is ever deleted;
-	candidates are only reported.
+	candidates are only reported. At the end of a deletion pass, fan-out folders left
+	empty by the sweep are removed as well.
 */
 class CFileDocumentGarbageCollectorComp:
 			public QObject,

@@ -27,6 +27,10 @@ namespace
 	// except stale staging leftovers ('<name>.bin.XXXXXX' from QSaveFile).
 	const QRegularExpression contentFileNamePattern(QStringLiteral("^[0-9a-f]{64}\\.bin$"));
 	const QRegularExpression stagingFileNamePattern(QStringLiteral("^[0-9a-f]{64}\\.bin\\.[^.]+$"));
+
+	// Two-hex-character fan-out folders created by the delegate; emptied ones are
+	// removed at the end of a deletion pass.
+	const QRegularExpression fanOutFolderNamePattern(QStringLiteral("^[0-9a-f]{2}$"));
 }
 
 
@@ -171,11 +175,27 @@ bool CFileDocumentGarbageCollectorComp::SweepStore(const LivenessInfo& livenessI
 					"CFileDocumentGarbageCollectorComp");
 	}
 
-	SendInfoMessage(0, QString("Document store pass finished: %1 referenced, %2 unreferenced past grace period, %3 deleted, %4 missing")
+	// Remove fan-out folders emptied by this or an earlier pass. QDir::rmdir fails
+	// on a non-empty folder, so a folder that received a file concurrently is left
+	// alone; the delegate re-creates a folder removed between its mkpath and the
+	// staging file creation.
+	int removedFolderCount = 0;
+	if (isDeletionAllowed){
+		QDir storageRootDir(storageRootPath);
+		const QStringList folderNames = storageRootDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+		for (const QString& folderName: folderNames){
+			if (fanOutFolderNamePattern.match(folderName).hasMatch() && storageRootDir.rmdir(folderName)){
+				++removedFolderCount;
+			}
+		}
+	}
+
+	SendInfoMessage(0, QString("Document store pass finished: %1 referenced, %2 unreferenced past grace period, %3 deleted, %4 missing, %5 empty folders removed")
 				.arg(livenessInfo.referencedHashes.count())
 				.arg(unreferencedCount)
 				.arg(deletedCount)
-				.arg(missingHashes.count()),
+				.arg(missingHashes.count())
+				.arg(removedFolderCount),
 				"CFileDocumentGarbageCollectorComp");
 
 	return missingHashes.isEmpty();

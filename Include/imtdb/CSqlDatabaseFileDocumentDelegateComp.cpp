@@ -92,8 +92,11 @@ bool CSqlDatabaseFileDocumentDelegateComp::WriteDataToMemory(
 		// QSaveFile stages in a temporary file next to the target (same volume, so
 		// the promotion is an atomic rename) and removes that temporary itself on
 		// cancel, commit failure or destruction - staging cannot outlive this scope.
+		// The open is retried once with a re-created folder: the garbage collector
+		// may remove an emptied fan-out folder between the mkpath above and here.
 		QSaveFile stagingFile(targetFilePath);
-		if (!stagingFile.open(QIODevice::WriteOnly)){
+		if (!stagingFile.open(QIODevice::WriteOnly)
+				&& (!QDir().mkpath(targetInfo.absolutePath()) || !stagingFile.open(QIODevice::WriteOnly))){
 			SendErrorMessage(0, QString("Unable to open staging file for '%1': %2")
 						.arg(targetFilePath, stagingFile.errorString()),
 						"CSqlDatabaseFileDocumentDelegateComp");
