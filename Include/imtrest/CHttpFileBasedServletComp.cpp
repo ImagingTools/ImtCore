@@ -28,7 +28,7 @@ ConstResponsePtr CHttpFileBasedServletComp::ProcessRequest(const IRequest& reque
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";
-	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
+	QByteArray reponseTypeId = QByteArrayLiteral("text/html; charset=utf-8");
 
 	ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId).PopInterfacePtr());
 

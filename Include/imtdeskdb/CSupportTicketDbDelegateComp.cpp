@@ -51,18 +51,18 @@ QString CSupportTicketDbDelegateComp::CreateVisibilityCondition(
 
 	const QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(userId));
 	const QString escapedUserIdForLike = EscapeSqlLikePattern(QString::fromUtf8(userId));
-	const QString assigneeLikePattern = QString("%%,%1,%%").arg(escapedUserIdForLike);
+	const QString assigneeLikePattern = QStringLiteral("%%,%1,%%").arg(escapedUserIdForLike);
 	QStringList escapedCurrentUserGroups;
 	for (const QByteArray& groupId : currentUserGroups){
 		const QString escapedGroupId = imtdb::EscapeSql(QString::fromUtf8(groupId));
 		if (!escapedGroupId.isEmpty()){
-			escapedCurrentUserGroups << QString("'%1'").arg(escapedGroupId);
+			escapedCurrentUserGroups << QStringLiteral("'%1'").arg(escapedGroupId);
 		}
 	}
 
 	QStringList visibilityConditions;
-	visibilityConditions << QString("\"ReporterId\"='%1'").arg(escapedUserId);
-	visibilityConditions << QString("(\"AssigneeIds\" IS NOT NULL AND (',' || \"AssigneeIds\" || ',') LIKE '%1' ESCAPE '\\')").arg(assigneeLikePattern);
+	visibilityConditions << QStringLiteral(R"("ReporterId"='%1')").arg(escapedUserId);
+	visibilityConditions << QStringLiteral("(\"AssigneeIds\" IS NOT NULL AND (',' || \"AssigneeIds\" || ',') LIKE '%1' ESCAPE '\\')").arg(assigneeLikePattern);
 	if (!escapedCurrentUserGroups.isEmpty()){
 		if (IsSqliteDatabase()){
 			const QString groupsInClause = escapedCurrentUserGroups.join(", ");
@@ -80,7 +80,7 @@ QString CSupportTicketDbDelegateComp::CreateVisibilityCondition(
 				"AND \"AssigneeGroup\".\"value\" IN (%1)))").arg(groupsInClause);
 		}
 		else{
-			const QString groupsArray = QString("array[%1]").arg(escapedCurrentUserGroups.join(", "));
+			const QString groupsArray = QStringLiteral("array[%1]").arg(escapedCurrentUserGroups.join(", "));
 			visibilityConditions << QString(
 				"(EXISTS (SELECT 1 FROM \"Users\" AS \"ReporterUser\" "
 				"WHERE \"ReporterUser\".\"State\"='Active' "
@@ -94,7 +94,7 @@ QString CSupportTicketDbDelegateComp::CreateVisibilityCondition(
 		}
 	}
 
-	return QString("(%1)").arg(visibilityConditions.join(" OR "));
+	return QStringLiteral("(%1)").arg(visibilityConditions.join(" OR "));
 }
 
 
@@ -118,12 +118,12 @@ QByteArray CSupportTicketDbDelegateComp::GetSelectionQuery(
 				groupFilterParamPtr->GetUserId(),
 				groupFilterParamPtr->GetGroupIds());
 	if (visibilityCondition.isEmpty()){
-		return QString("SELECT * FROM (%1) AS \"FilteredTickets\" WHERE 1=0")
-				.arg(QString::fromUtf8(baseQuery)).toUtf8();
+		return QStringLiteral(R"(SELECT * FROM (%1) AS "FilteredTickets" WHERE 1=0)")
+				.arg(baseQuery).toUtf8();
 	}
 
 	const QString baseQueryStr = QString::fromUtf8(baseQuery);
-	return QString("SELECT * FROM (%1) AS \"FilteredTickets\" WHERE %2")
+	return QStringLiteral(R"(SELECT * FROM (%1) AS "FilteredTickets" WHERE %2)")
 			.arg(baseQueryStr, visibilityCondition).toUtf8();
 }
 
@@ -280,15 +280,15 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 	const QString resolvedAt = ticketPtr->GetResolvedAt();
 	const QString closedAt = ticketPtr->GetClosedAt();
 
-	const QString assigneesSql = assigneeIdsStr.isEmpty() ? "''" : QString("'%1'").arg(assigneeIdsStr);
-	const QString convSql = conversationId.isEmpty() ? "NULL" : QString("'%1'").arg(conversationId);
-	const QString msgSql = messageId.isEmpty() ? "NULL" : QString("'%1'").arg(messageId);
-	const QString resolvedSql = resolvedAt.isEmpty() ? "NULL" : QString("'%1'").arg(resolvedAt);
-	const QString closedSql = closedAt.isEmpty() ? "NULL" : QString("'%1'").arg(closedAt);
+	const QString assigneesSql = assigneeIdsStr.isEmpty() ? "''" : QStringLiteral("'%1'").arg(assigneeIdsStr);
+	const QString convSql = conversationId.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(conversationId);
+	const QString msgSql = messageId.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(messageId);
+	const QString resolvedSql = resolvedAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(resolvedAt);
+	const QString closedSql = closedAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(closedAt);
 
 	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty()
 			? "NULL"
-			: QString("'%1'").arg(imtdb::EscapeSql(ticketPtr->GetLockReason()));
+			: QStringLiteral("'%1'").arg(imtdb::EscapeSql(ticketPtr->GetLockReason()));
 
 	const QString nowUtc = imtdb::UtcNow();
 
@@ -302,7 +302,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 		"\"Locked\", \"LockReason\", "
 		"\"ResolvedAt\", \"ClosedAt\", \"CreatedAt\", \"UpdatedAt\") "
 		"VALUES('%1', '%2', '%3', %4, %5, %6, %7, %8, '%9', %10, %11, %12, %13, %14, %15, '%16', '%17');")
-		.arg(QString::fromUtf8(ticketId))
+		.arg(ticketId)
 		.arg(imtdb::EscapeSql(title))
 		.arg(imtdb::EscapeSql(ticketPtr->GetDescription()))
 		.arg(ticketPtr->GetTicketType())
@@ -329,7 +329,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 			"\nINSERT INTO \"TicketEntityReferences\" "
 			"(\"TicketId\", \"EntityReferenceId\", \"CreatedAt\") "
 			"VALUES('%1', '%2', '%3');")
-			.arg(QString::fromUtf8(ticketId))
+			.arg(ticketId)
 			.arg(escapedRefId)
 			.arg(nowUtc);
 	}
@@ -364,15 +364,15 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 	const QString messageId = QString::fromUtf8(ticketPtr->GetMessageId());
 	const QString resolvedAt = ticketPtr->GetResolvedAt();
 	const QString closedAt = ticketPtr->GetClosedAt();
-	const QString assigneesSql = assigneeIdsStr.isEmpty() ? "''" : QString("'%1'").arg(assigneeIdsStr);
-	const QString convSql = conversationId.isEmpty() ? "NULL" : QString("'%1'").arg(conversationId);
-	const QString msgSql = messageId.isEmpty() ? "NULL" : QString("'%1'").arg(messageId);
-	const QString resolvedSql = resolvedAt.isEmpty() ? "NULL" : QString("'%1'").arg(resolvedAt);
-	const QString closedSql = closedAt.isEmpty() ? "NULL" : QString("'%1'").arg(closedAt);
+	const QString assigneesSql = assigneeIdsStr.isEmpty() ? "''" : QStringLiteral("'%1'").arg(assigneeIdsStr);
+	const QString convSql = conversationId.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(conversationId);
+	const QString msgSql = messageId.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(messageId);
+	const QString resolvedSql = resolvedAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(resolvedAt);
+	const QString closedSql = closedAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(closedAt);
 
 	const QString lockReasonSql = ticketPtr->GetLockReason().isEmpty()
 			? "NULL"
-			: QString("'%1'").arg(imtdb::EscapeSql(ticketPtr->GetLockReason()));
+			: QStringLiteral("'%1'").arg(imtdb::EscapeSql(ticketPtr->GetLockReason()));
 
 	const QString nowUtc = imtdb::UtcNow();
 
@@ -409,12 +409,12 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 		.arg(resolvedSql)
 		.arg(closedSql)
 		.arg(nowUtc)
-		.arg(QString::fromUtf8(objectId));
+		.arg(objectId);
 
 	// Delete old junction rows and re-insert entity references using IDs
 	combinedQuery += QString(
 		"\nDELETE FROM \"TicketEntityReferences\" WHERE \"TicketId\"='%1';")
-		.arg(QString::fromUtf8(objectId));
+		.arg(objectId);
 
 	const QByteArrayList entityRefIds = ticketPtr->GetEntityReferences();
 	for (const QByteArray& refId : entityRefIds){
@@ -424,7 +424,7 @@ QByteArray CSupportTicketDbDelegateComp::CreateUpdateObjectQuery(
 			"\nINSERT INTO \"TicketEntityReferences\" "
 			"(\"TicketId\", \"EntityReferenceId\", \"CreatedAt\") "
 			"VALUES('%1', '%2', '%3');")
-			.arg(QString::fromUtf8(objectId))
+			.arg(objectId)
 			.arg(escapedRefId)
 			.arg(nowUtc);
 	}
@@ -445,11 +445,11 @@ QByteArray CSupportTicketDbDelegateComp::CreateDeleteObjectsQuery(
 	QString idsStr;
 	for (int i = 0; i < objectIds.size(); ++i){
 		if (i > 0) idsStr += ", ";
-		idsStr += QString("'%1'").arg(QString::fromUtf8(objectIds[i]));
+		idsStr += QStringLiteral("'%1'").arg(objectIds[i]);
 	}
 
 	// Delete junction records first, then the tickets
-	return QString("DELETE FROM \"TicketEntityReferences\" WHERE \"TicketId\" IN (%1);\n"
+	return QStringLiteral("DELETE FROM \"TicketEntityReferences\" WHERE \"TicketId\" IN (%1);\n"
 		"DELETE FROM \"Tickets\" WHERE \"Id\" IN (%1);")
 		.arg(idsStr)
 		.toUtf8();
@@ -475,10 +475,10 @@ QByteArray CSupportTicketDbDelegateComp::CreateRenameObjectQuery(
 		return QByteArray();
 	}
 
-	return QString("UPDATE \"Tickets\" SET \"Title\"='%1', \"UpdatedAt\"='%2' WHERE \"Id\"='%3';")
+	return QStringLiteral(R"(UPDATE "Tickets" SET "Title"='%1', "UpdatedAt"='%2' WHERE "Id"='%3';)")
 		.arg(imtdb::EscapeSql(newObjectName))
 		.arg(imtdb::UtcNow())
-		.arg(QString::fromUtf8(objectId))
+		.arg(objectId)
 		.toUtf8();
 }
 
@@ -493,10 +493,10 @@ QByteArray CSupportTicketDbDelegateComp::CreateDescriptionObjectQuery(
 		return QByteArray();
 	}
 
-	return QString("UPDATE \"Tickets\" SET \"Description\"='%1', \"UpdatedAt\"='%2' WHERE \"Id\"='%3';")
+	return QStringLiteral(R"(UPDATE "Tickets" SET "Description"='%1', "UpdatedAt"='%2' WHERE "Id"='%3';)")
 		.arg(imtdb::EscapeSql(description))
 		.arg(imtdb::UtcNow())
-		.arg(QString::fromUtf8(objectId))
+		.arg(objectId)
 		.toUtf8();
 }
 
@@ -539,7 +539,7 @@ void CSupportTicketDbDelegateComp::OnComponentCreated()
 	if (!TableExists("TicketEntityReferences")){
 		QFile junctionScriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateTicketEntityReferencesTable.sql")));
 		if (!junctionScriptFile.open(QFile::ReadOnly)){
-			SendErrorMessage(0, QString("TicketEntityReferences table creation script '%1' could not be loaded").arg(junctionScriptFile.fileName()));
+			SendErrorMessage(0, QStringLiteral("TicketEntityReferences table creation script '%1' could not be loaded").arg(junctionScriptFile.fileName()));
 			return;
 		}
 
@@ -555,7 +555,7 @@ void CSupportTicketDbDelegateComp::OnComponentCreated()
 						<< "\n\t| TicketEntityReferences table could not be created"
 						<< "\n\t| Error:" << junctionError
 						<< "\n\t| Query:" << junctionQuery;
-			SendErrorMessage(0, QString("TicketEntityReferences table could not be created: %1").arg(junctionError.text()));
+			SendErrorMessage(0, QStringLiteral("TicketEntityReferences table could not be created: %1").arg(junctionError.text()));
 		}
 	}
 

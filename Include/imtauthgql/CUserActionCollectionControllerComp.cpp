@@ -44,7 +44,7 @@ bool CUserActionCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (userRecentActionPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
+		errorMessage = QStringLiteral("Unable to create representation from object '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CUserActionCollectionControllerComp");
 		return false;
 	}

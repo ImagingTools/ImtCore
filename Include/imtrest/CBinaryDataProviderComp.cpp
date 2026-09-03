@@ -92,7 +92,7 @@ bool CBinaryDataProviderComp::GetData(
 		}
 
 		if (!destinationFile.seek(readFromPosition)){
-			SendErrorMessage(0, QString("Unable to seek in file. File: '%1', pos: %2").arg(destinationFileAbsoluteFilePath, QString::number(readFromPosition)));
+			SendErrorMessage(0, QStringLiteral("Unable to seek in file. File: '%1', pos: %2").arg(destinationFileAbsoluteFilePath, QString::number(readFromPosition)));
 			destinationFile.errorString();
 
 			return false;

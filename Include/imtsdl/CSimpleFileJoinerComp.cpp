@@ -41,7 +41,7 @@ iproc::IProcessor::TaskState CSimpleFileJoinerComp::DoProcessing(
 		istd::IChangeable* /*processingReportPtr*/)
 {
 	if (paramsPtr == nullptr){
-		SendErrorMessage(0, QString("Input params is required"));
+		SendErrorMessage(0, QStringLiteral("Input params is required"));
 
 		return TS_INVALID;
 	}
@@ -49,7 +49,7 @@ iproc::IProcessor::TaskState CSimpleFileJoinerComp::DoProcessing(
 	// ensure all required params is set
 	iprm::TParamsPtr<ifile::IFileNameParam> sourceDirPathParamPtr(paramsPtr, s_sourceDirPathParamId, true);
 	if (!sourceDirPathParamPtr.IsValid()){
-		SendErrorMessage(0, QString("Source directory is not set"));
+		SendErrorMessage(0, QStringLiteral("Source directory is not set"));
 
 		return TS_INVALID;
 	}
@@ -57,7 +57,7 @@ iproc::IProcessor::TaskState CSimpleFileJoinerComp::DoProcessing(
 
 	iprm::TParamsPtr<ifile::IFileNameParam> targetFilePathParamPtr(paramsPtr, s_targetFilePathParamId, true);
 	if (!targetFilePathParamPtr.IsValid()){
-		SendErrorMessage(0, QString("Target file path is not set"));
+		SendErrorMessage(0, QStringLiteral("Target file path is not set"));
 
 		return TS_INVALID;
 	}
@@ -72,7 +72,7 @@ iproc::IProcessor::TaskState CSimpleFileJoinerComp::DoProcessing(
 
 	auto filesToJoinListPtr = dynamic_cast<const iprm::IOptionsList*>(inputPtr);
 	if (filesToJoinListPtr == nullptr){
-		SendErrorMessage(0, QString("Files to join is not set"));
+		SendErrorMessage(0, QStringLiteral("Files to join is not set"));
 
 		return TS_INVALID;
 	}
@@ -80,7 +80,7 @@ iproc::IProcessor::TaskState CSimpleFileJoinerComp::DoProcessing(
 	QFileInfo targetFileInfo(targetFilePath);
 	const QString targetFileDirPath = targetFileInfo.absoluteDir().absolutePath();
 	if (!istd::CSystem::EnsurePathExists(targetFileDirPath)){
-		SendErrorMessage(0, QString("Unable to create directory: '%1'").arg(targetFileDirPath));
+		SendErrorMessage(0, QStringLiteral("Unable to create directory: '%1'").arg(targetFileDirPath));
 
 		return TS_INVALID;
 	}
@@ -107,13 +107,13 @@ iproc::IProcessor::TaskState CSimpleFileJoinerComp::DoProcessing(
 		isOpen = targetFile.open(openFlags);
 		if (!isOpen){
 			--attempts;
-			SendWarningMessage(0, QString("Unable to open target file: '%1'. Error: %2. Retrying... Remained: %3").arg(targetFilePath, targetFile.errorString(), QString::number(attempts)));
+			SendWarningMessage(0, QStringLiteral("Unable to open target file: '%1'. Error: %2. Retrying... Remained: %3").arg(targetFilePath, targetFile.errorString(), QString::number(attempts)));
 			QThread::sleep(1);
 		}
 	} while (attempts > 0 && !isOpen);
 
 	if (!targetFile.isOpen()){
-		SendErrorMessage(0, QString("Unable to open target file: '%1'. Error: %2.").arg(targetFilePath, targetFile.errorString()));
+		SendErrorMessage(0, QStringLiteral("Unable to open target file: '%1'. Error: %2.").arg(targetFilePath, targetFile.errorString()));
 
 		return TS_INVALID;
 	}
@@ -126,15 +126,15 @@ iproc::IProcessor::TaskState CSimpleFileJoinerComp::DoProcessing(
 	}
 
 	// process files
-	SendVerboseMessage(QString("Joining files. Output: '%1'").arg(targetFile.fileName()));
+	SendVerboseMessage(QStringLiteral("Joining files. Output: '%1'").arg(targetFile.fileName()));
 	int filesCount = filesToJoinListPtr->GetOptionsCount();
 	for (int fileNameIndex = 0; fileNameIndex < filesCount; ++fileNameIndex){
 		const QString currentRelativePath = filesToJoinListPtr->GetOptionName(fileNameIndex);
 		const QString currentFilePath = sourceDir.absoluteFilePath(currentRelativePath);
-		SendVerboseMessage(QString("Joining files. [%1]'%2'").arg(QString::number(fileNameIndex), currentFilePath));
+		SendVerboseMessage(QStringLiteral("Joining files. [%1]'%2'").arg(QString::number(fileNameIndex), currentFilePath));
 		QFile currentFile(currentFilePath);
 		if (!currentFile.open(QIODevice::ReadOnly)){
-			SendErrorMessage(0, QString("Unable to open processing file: '%1'. Error: %2").arg(currentFilePath, currentFile.errorString()));
+			SendErrorMessage(0, QStringLiteral("Unable to open processing file: '%1'. Error: %2").arg(currentFilePath, currentFile.errorString()));
 
 			return TS_INVALID;
 		}

@@ -54,8 +54,8 @@ bool CHttpSender::SendResponse(ConstResponsePtr& response) const
 		const QByteArray& contentData = response->GetData();
 		quint64 contentLength = contentData.size();
 
-		retVal = retVal && WriteHeader(QByteArray("Content-Length"), QByteArray::number(contentLength), *m_tcpSocketPtr);
-		retVal = retVal && WriteHeader(QByteArray("Content-Type"), response->GetDataTypeId(), *m_tcpSocketPtr);
+		retVal = retVal && WriteHeader(QByteArrayLiteral("Content-Length"), QByteArray::number(contentLength), *m_tcpSocketPtr);
+		retVal = retVal && WriteHeader(QByteArrayLiteral("Content-Type"), response->GetDataTypeId(), *m_tcpSocketPtr);
 
 		retVal = retVal && WriteBody(contentData, *m_tcpSocketPtr);
 

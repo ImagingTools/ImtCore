@@ -82,7 +82,7 @@ ICollectionInfo::Id CObjectCollectionBase::ImportFile(
 
 					QString newObjectName = objectName.isEmpty() ? fileInfo.baseName() : objectName;
 
-					return (const_cast<CObjectCollectionBase*>(this))->InsertNewObject(typeId, newObjectName, QString("Imported from %1").arg(sourceFilePath), objectDataPtr.GetPtr());
+					return (const_cast<CObjectCollectionBase*>(this))->InsertNewObject(typeId, newObjectName, QStringLiteral("Imported from %1").arg(sourceFilePath), objectDataPtr.GetPtr());
 				}
 			}
 		}

@@ -141,7 +141,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
-	QUrl url(QString("collection:///%1").arg(*objectId->id));
+	QUrl url(QStringLiteral("collection:///%1").arg(*objectId->id));
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		imtdoc::IDocumentService::TaskParams taskParams;
@@ -752,12 +752,12 @@ void CCollectionDocumentServiceControllerComp::GenerateDocumentChanges(
 
 	// An empty object-ID means the document was never stored, so saving it creates a new element.
 	const QByteArray objectId = GetCollectionObjectId(userId, documentId);
-	const QByteArray operationTypeId = objectId.isEmpty() ? QByteArray("Create") : QByteArray("Update");
+	const QByteArray operationTypeId = objectId.isEmpty() ? QByteArrayLiteral("Create") : QByteArrayLiteral("Update");
 
 	QString errorMessage;
 	if (!m_documentChangeGeneratorCompPtr->GenerateDocumentChanges(
 				operationTypeId, objectId, documentDataPtr, *changesCollectionPtr, errorMessage, nullptr)){
-		SendWarningMessage(0, QString("Unable to generate document changes for '%1'. Error: %2")
+		SendWarningMessage(0, QStringLiteral("Unable to generate document changes for '%1'. Error: %2")
 					.arg(QString::fromUtf8(objectId), errorMessage));
 	}
 }

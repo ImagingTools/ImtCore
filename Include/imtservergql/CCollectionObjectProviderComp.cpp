@@ -37,7 +37,7 @@ QJsonObject CCollectionObjectProviderComp::CreateInternalResponse(
 		iser::IObject* objectInfoPtr = dynamic_cast<iser::IObject*>(dataPtr.GetPtr());
 		Q_ASSERT_X(objectInfoPtr != nullptr, __FILE__, "iser::IObject interface not supported");
 		if (objectInfoPtr == nullptr){
-			errorMessage = QString("INTERNAL: Object implementation doesn't support iser::IObject interface").toUtf8();
+			errorMessage = QStringLiteral("INTERNAL: Object implementation doesn't support iser::IObject interface").toUtf8();
 
 			SendErrorMessage(0, errorMessage);
 
@@ -48,7 +48,7 @@ QJsonObject CCollectionObjectProviderComp::CreateInternalResponse(
 		{
 			iser::CJsonMemWriteArchive archive;
 			if (!objectInfoPtr->Serialize(archive)){
-				errorMessage = QString("Object serialization failed").toUtf8();
+				errorMessage = QStringLiteral("Object serialization failed").toUtf8();
 
 				SendErrorMessage(0, errorMessage);
 
@@ -60,7 +60,7 @@ QJsonObject CCollectionObjectProviderComp::CreateInternalResponse(
 
 		QJsonDocument doc = QJsonDocument::fromJson(json);
 		if (doc.isNull() || !doc.isObject()){
-			errorMessage = QString("JSON object creation from serialized data failed").toUtf8();
+			errorMessage = QStringLiteral("JSON object creation from serialized data failed").toUtf8();
 			SendErrorMessage(0, errorMessage);
 
 			return QJsonObject();
@@ -71,7 +71,7 @@ QJsonObject CCollectionObjectProviderComp::CreateInternalResponse(
 		return rootObj;
 	}
 	else{
-		errorMessage = QString("Object with the ID '%1' doesn't exist").arg(qPrintable(objectId)).toUtf8();
+		errorMessage = QStringLiteral("Object with the ID '%1' doesn't exist").arg(objectId).toUtf8();
 		SendErrorMessage(0, errorMessage);
 
 		return QJsonObject();

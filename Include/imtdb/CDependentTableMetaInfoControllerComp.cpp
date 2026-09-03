@@ -39,7 +39,7 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 			}
 
 			if (!m_dependentMetaInfoControllerCompPtr->ClearDependentMetaInfo(metaFieldCleanupPlan)){
-				SendErrorMessage(0, QString("Unable to clear dependent meta info"), "CDependentTableMetaInfoControllerComp");
+				SendErrorMessage(0, QStringLiteral("Unable to clear dependent meta info"), "CDependentTableMetaInfoControllerComp");
 			}
 
 			return;
@@ -80,17 +80,17 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 
 		dependentMetaInfo.metaInfoIds << metaInfoName;
 		QString selectValue =
-			QString(R"((SELECT "%0"->>'%1' FROM "%2" WHERE "State" = 'Active' AND "DocumentId" = '%3' LIMIT 1)
+			QStringLiteral(R"((SELECT "%0"->>'%1' FROM "%2" WHERE "State" = 'Active' AND "DocumentId" = '%3' LIMIT 1)
 					)").arg(isDocumentSource ? "Document" : "DataMetaInfo",
 							dependentMetaInfoName,
 							*m_dependentTableNameAttrPtr,
-							qPrintable(elementId));
+							elementId);
 
 		dependentMetaInfo.metaInfoValues << selectValue;
 	}
 
 	if (!m_dependentMetaInfoControllerCompPtr->UpdateDependentMetaInfo(dependentMetaInfo)){
-		SendErrorMessage(0, QString("Unable to update dependent meta info"), "CDependentTableMetaInfoControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to update dependent meta info"), "CDependentTableMetaInfoControllerComp");
 	}
 }
 

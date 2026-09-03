@@ -14,7 +14,8 @@ imtgql::CGqlRequest MakeGetFileSystemEntriesRequest(const QString& path = QStrin
 	if (!path.isEmpty()){
 		arguments.input->path = path;
 	}
-	sdl::V1_0::imtbase::CGetFileSystemEntriesGqlRequest::SetupGqlRequest(request, arguments);
+
+	[[maybe_unused]] auto unused = sdl::V1_0::imtbase::CGetFileSystemEntriesGqlRequest::SetupGqlRequest(request, arguments);
 	request.AddSimpleField(QByteArrayLiteral("path"));
 	request.AddSimpleField(QByteArrayLiteral("parentPath"));
 	request.AddSimpleField(QByteArrayLiteral("totalCount"));
@@ -85,7 +86,7 @@ void CFileSystemControllerTest::HappyPathMapsPayloadTest()
 	QString error;
 	const auto payload = controller.OnGetFileSystemEntries(typedRequest, request, error);
 
-	QVERIFY2(error.isEmpty(), qPrintable(error));
+	QVERIFY2(error.isEmpty(), error.toUtf8().constData());
 	QVERIFY(payload.path.has_value());
 	QCOMPARE(*payload.path, QStringLiteral("/root/sub"));
 	QVERIFY(payload.parentPath.has_value());

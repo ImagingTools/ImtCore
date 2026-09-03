@@ -40,6 +40,7 @@ typedef imtclientgql::CAsyncApiClientComp AsyncApiClient;
 typedef imtclientgql::CGqlClientSyncAdapterComp GqlClientSyncAdapter;
 typedef imtclientgql::CGqlClientEngineComp GraphQLClientEngine;
 typedef icomp::TModelCompWrap<imtclientgql::CGqlObjectCollectionComp> GqlObjectCollection;
+/// \todo change alias of CGqlRemoteRepresentationControllerCompBase and CGqlRemoteRepresentationControllerComp
 typedef imtclientgql::CGqlRemoteRepresentationControllerCompBase GraphQLRemoteRepresentationController;
 typedef imtclientgql::CGqlRemoteRepresentationControllerComp PumaGqlRemoteRepresentationController;
 typedef imtclientgql::CSubscriptionManagerComp SubscriptionManager;

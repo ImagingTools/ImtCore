@@ -61,7 +61,7 @@ iproc::IProcessor::TaskState CQmlCodeRequestGeneratorComp::DoProcessing(
 	}
 
 	if (!istd::CSystem::EnsurePathExists(outputDirectoryPath)){
-		SendErrorMessage(0, QString("Unable to create path '%1'").arg(outputDirectoryPath));
+		SendErrorMessage(0, QStringLiteral("Unable to create path '%1'").arg(outputDirectoryPath));
 		I_CRITICAL();
 
 		return TS_INVALID;
@@ -70,7 +70,7 @@ iproc::IProcessor::TaskState CQmlCodeRequestGeneratorComp::DoProcessing(
 	iprm::CParamsSet qmldirDataParams;
 	int loadStatus = m_qmldirFilePersistanceCompPtr->LoadFromFile(qmldirDataParams, outputDirectoryPath + "/qmldir");
 	if (loadStatus != ifile::IFilePersistence::OS_OK){
-		SendErrorMessage(0, QString("Unable to load qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir"));
+		SendErrorMessage(0, QStringLiteral("Unable to load qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir"));
 
 		return TS_INVALID;
 	}
@@ -122,7 +122,7 @@ iproc::IProcessor::TaskState CQmlCodeRequestGeneratorComp::DoProcessing(
 		file.setFileName(outputDirectoryPath + '/' + qmlClassFileName);
 
 		if (!file.open(QIODevice::WriteOnly)){
-			SendCriticalMessage(0, QString("Unable to open file: '%1'. Error: %2").arg(file.fileName(), file.errorString()));
+			SendCriticalMessage(0, QStringLiteral("Unable to open file: '%1'. Error: %2").arg(file.fileName(), file.errorString()));
 			I_CRITICAL();
 			return TS_INVALID;
 		}
@@ -237,7 +237,7 @@ iproc::IProcessor::TaskState CQmlCodeRequestGeneratorComp::DoProcessing(
 
 	int saveStatus = m_qmldirFilePersistanceCompPtr->SaveToFile(qmldirDataParams, outputDirectoryPath + "/qmldir");
 	if (saveStatus != ifile::IFilePersistence::OS_OK){
-		SendErrorMessage(0, QString("Unable to save qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir"));
+		SendErrorMessage(0, QStringLiteral("Unable to save qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir"));
 
 		return TS_INVALID;
 	}

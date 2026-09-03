@@ -180,7 +180,7 @@ bool CUserDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& 
 			filterQuery += " AND ";
 		}
 
-		filterQuery += QString(R"((('%1' = '' AND NOT root."Document" ? 'SystemInfos') OR EXISTS (SELECT 1 FROM jsonb_array_elements(root."Document"->'SystemInfos') as s WHERE s->>'SystemId' = '%1')))").arg(SqlEncode(systemId));
+		filterQuery += QStringLiteral(R"((('%1' = '' AND NOT root."Document" ? 'SystemInfos') OR EXISTS (SELECT 1 FROM jsonb_array_elements(root."Document"->'SystemInfos') as s WHERE s->>'SystemId' = '%1')))").arg(SqlEncode(systemId));
 	}
 	else{
 		return BaseClass::CreateObjectFilterQuery(filterParams, filterQuery);
@@ -195,7 +195,7 @@ bool CUserDatabaseDelegateComp::CreateSortQuery(const imtbase::IComplexCollectio
 	QByteArrayList infoIds = imtbase::CComplexCollectionFilterHelper::GetSortingFieldIds(collectionFilter).values();
 	imtbase::IComplexCollectionFilter::SortingOrder sortingOrder = imtbase::CComplexCollectionFilterHelper::GetSortingOrder(collectionFilter, infoIds);
 	if (infoIds.contains("LastConnection")){
-		sortQuery = QString(R"(ORDER BY "LastConnection" %1)").arg(sortingOrder == imtbase::IComplexCollectionFilter::SO_ASC ? "ASC" : "DESC");
+		sortQuery = QStringLiteral(R"(ORDER BY "LastConnection" %1)").arg(sortingOrder == imtbase::IComplexCollectionFilter::SO_ASC ? "ASC" : "DESC");
 	}
 	else{
 		return BaseClass::CreateSortQuery(collectionFilter, sortQuery);

@@ -57,12 +57,12 @@ CHttpFileDownloaderComp::DownloadStatus CHttpFileDownloaderComp::DownloadFile(
 			if (downloadingFile.open(QIODevice::WriteOnly)){
 				const qint64 written = downloadingFile.write(body);
 
-				Q_ASSERT_X (written == body.length(), __FILE__, QString("Write error. Length: %1, written: %2").arg(QString::number(written), QString::number(body.length())).toLocal8Bit());
+				Q_ASSERT_X (written == body.length(), __FILE__, QStringLiteral("Write error. Length: %1, written: %2").arg(QString::number(written), QString::number(body.length())).toLocal8Bit());
 				if (written == body.length()){
 					downloadingStatus = IDownloader::DS_OK;
 				}
 				else {
-					SendErrorMessage(0, QString("Write error. Length: %1, written: %2. Error: '%3'")
+					SendErrorMessage(0, QStringLiteral("Write error. Length: %1, written: %2. Error: '%3'")
 								.arg(QString::number(written), QString::number(body.length()), downloadingFile.errorString()));
 				}
 			}

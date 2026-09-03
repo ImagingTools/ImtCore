@@ -39,7 +39,7 @@ void CFeatureDependencyEditorBase::OnFeaturePackageCollectionUpdate()
 		return;
 	}
 
-	imtbase::ICollectionInfo::Ids packageIds = collectionPtr->GetElementIds();
+	const imtbase::ICollectionInfo::Ids packageIds = collectionPtr->GetElementIds();
 
 	m_packageFeatureMap.clear();
 
@@ -50,7 +50,7 @@ void CFeatureDependencyEditorBase::OnFeaturePackageCollectionUpdate()
 			if (packagePtr != nullptr){
 				FeatureDescriptionList featureDescriptionList;
 
-				imtbase::ICollectionInfo::Ids featureIds = packagePtr->GetFeatureList().GetElementIds();
+				const imtbase::ICollectionInfo::Ids featureIds = packagePtr->GetFeatureList().GetElementIds();
 				for (const QByteArray& featureId : featureIds){
 					imtlic::IFeatureInfoSharedPtr featureInfoPtr = packagePtr->GetFeatureInfo(featureId);
 					if (featureInfoPtr.IsValid()){
@@ -85,7 +85,7 @@ void CFeatureDependencyEditorBase::EnumerateMissingDependencies()
 {
 	QByteArrayList allFeatureIds;
 
-	QByteArrayList packageIds = m_packageFeatureMap.keys();
+	const QByteArrayList packageIds = m_packageFeatureMap.keys();
 	for (const QByteArray& packageId : packageIds){
 		FeatureDescriptionList featureDescriptionList = m_packageFeatureMap[packageId];
 		for (const FeatureDescription& featureDescription : featureDescriptionList){
@@ -125,7 +125,7 @@ void CFeatureDependencyEditorBase::UpdateFeatureTree()
 		return;
 	}
 
-	QByteArrayList packageIds = m_packageFeatureMap.keys();
+	const QByteArrayList packageIds = m_packageFeatureMap.keys();
 	for (const QByteArray& packageId : packageIds){
 		QTreeWidgetItem* packageItemPtr = new QTreeWidgetItem({m_packageNameMap[packageId]});
 		m_treeWidgetPtr->addTopLevelItem(packageItemPtr);
@@ -178,8 +178,8 @@ void CFeatureDependencyEditorBase::UpdateFeatureTree()
 		packageItemPtr->setData(0, DR_ITEM_TYPE, IT_PACKAGE);
 		packageItemPtr->setForeground(0, QBrush(Qt::red));
 
-		for (const QByteArray& featureId : m_missingDependencies){
-			QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({QObject::tr("ID: %1").arg(QString(featureId))});
+		for (const QByteArray& featureId : std::as_const(m_missingDependencies)){
+			QTreeWidgetItem* featureItemPtr = new QTreeWidgetItem({QObject::tr("ID: %1").arg(featureId)});
 			packageItemPtr->addChild(featureItemPtr);
 			featureItemPtr->setData(0, DR_ITEM_ID, featureId);
 			featureItemPtr->setData(0, DR_ITEM_TYPE, IT_FEATURE);
@@ -247,7 +247,7 @@ void CFeatureDependencyEditorBase::UpdateFeatureTreeCheckStates()
 		if (packageItemPtr != nullptr){
 			packageItemPtr->setCheckState(0, Qt::Checked);
 
-			for (const QByteArray& featureId : m_missingDependencies){
+			for (const QByteArray& featureId : std::as_const(m_missingDependencies)){
 				QTreeWidgetItem* featureItemPtr = GetItem(featureId);
 				if (featureItemPtr != nullptr){
 					featureItemPtr->setCheckState(0, Qt::Checked);
@@ -288,11 +288,10 @@ void CFeatureDependencyEditorBase::BuildDependencyMap(const imtbase::IObjectColl
 {
 	m_packageDependenciyMap.clear();
 
-	imtbase::ICollectionInfo::Ids packageIds = packageCollection.GetElementIds();
+	const imtbase::ICollectionInfo::Ids packageIds = packageCollection.GetElementIds();
 	for (const QByteArray& packageId : packageIds){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		packageCollection.GetObjectData(packageId, dataPtr);
-
 	}
 }
 
@@ -338,8 +337,7 @@ void CFeatureDependencyEditorBase::on_FeatureTree_itemChanged(QTreeWidgetItem *i
 									m_treeWidgetPtr,
 									QObject::tr("Warning"),
 									QObject::tr("Feature with ID '%1' depends on feature with ID '%2'")
-												.arg(QString(featureId))
-												.arg(QString(m_selectedFeatureId)));
+												.arg(featureId, m_selectedFeatureId));
 
 						break;
 					}
@@ -365,8 +363,7 @@ void CFeatureDependencyEditorBase::on_FeatureTree_itemChanged(QTreeWidgetItem *i
 								m_treeWidgetPtr,
 								QObject::tr("Warning"),
 								QObject::tr("Feature with ID '%1' depends on feature with ID '%2'")
-											.arg(QString(featureId))
-											.arg(QString(m_selectedFeatureId)));
+											.arg(featureId, m_selectedFeatureId));
 				}
 			}
 		}

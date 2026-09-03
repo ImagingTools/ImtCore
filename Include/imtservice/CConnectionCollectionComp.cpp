@@ -210,7 +210,7 @@ void CConnectionCollectionComp::OnComponentCreated()
 			if (retVal.isEmpty()){
 				SendErrorMessage(
 					0,
-					QString("Unable to insert connection '%1' to collection. Insert to collection failed").arg(qPrintable(serviceConnectionTypeId)),
+					QStringLiteral("Unable to insert connection '%1' to collection. Insert to collection failed").arg(serviceConnectionTypeId),
 					"CConnectionCollectionComp");
 			}
 		}

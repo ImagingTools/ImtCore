@@ -9,6 +9,9 @@
 // ACF includes
 #include <istd/CChangeNotifier.h>
 
+// ImtCore includes
+#include <imtdb/imtdb.h>
+
 
 namespace imtauth
 {
@@ -34,7 +37,7 @@ bool IsValidInvitationId(const QByteArray& invitationId)
 	}
 
 	QString idText = QString::fromUtf8(invitationId).trimmed();
-	if (idText.compare(QStringLiteral("null"), Qt::CaseInsensitive) == 0){
+	if (idText.compare(imtdb::NULL_DATA_LITERAL, Qt::CaseInsensitive) == 0){
 		return false;
 	}
 
@@ -46,6 +49,7 @@ bool IsValidInvitationId(const QByteArray& invitationId)
 	}
 
 	const QUuid uuid(idText);
+
 	return !uuid.isNull();
 }
 
