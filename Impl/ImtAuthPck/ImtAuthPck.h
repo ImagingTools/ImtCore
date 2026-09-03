@@ -31,6 +31,7 @@
 #include <imtauth/CLdapUserCollectionControllerComp.h>
 #include <imtauth/CLdapCredentialControllerComp.h>
 #include <imtauth/CCredentialControllerComp.h>
+#include <imtauth/CAccountLockoutControllerComp.h>
 #include <imtauth/CLdapUserCollectionJoinerComp.h>
 #include <imtauth/CUserChangeGeneratorComp.h>
 #include <imtauth/CRoleChangeGeneratorComp.h>
@@ -148,6 +149,7 @@ typedef icomp::TModelCompWrap<
 typedef imtauth::CLdapUserCollectionControllerComp LdapUserCollectionController;
 typedef imtauth::CCredentialControllerComp CredentialController;
 typedef imtauth::CLdapCredentialControllerComp LdapCredentialController;
+typedef imtauth::CAccountLockoutControllerComp AccountLockoutController;
 typedef imtauth::CLdapUserCollectionJoinerComp LdapUserCollectionJoiner;
 typedef imtauth::CUserChangeGeneratorComp UserChangeGenerator;
 typedef imtauth::CRoleChangeGeneratorComp RoleChangeGenerator;

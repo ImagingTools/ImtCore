@@ -10,9 +10,30 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="AccountLockoutController" PackageId="ImtAuthPck" ComponentId="AccountLockoutController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="FailedAttemptsPeriod" Type="Integer" ExportId="FailedAttemptsPeriod">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LockoutDuration" Type="Integer" ExportId="LockoutDuration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MaxFailedAttempts" Type="Integer" ExportId="MaxFailedAttempts">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="AuthorizationController" PackageId="ImtAuthGqlPck" ComponentId="AuthorizationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccountLockoutController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="AccountLockoutController"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -186,6 +207,7 @@
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="AccountLockoutController" ComponentId="AccountLockoutController"/>
         <Component ExportedId="UserSessionRepository" ComponentId="UserSessionRepository"/>
     </ExportedComponents>
 </Acf>
