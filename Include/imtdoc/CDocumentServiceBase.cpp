@@ -2,6 +2,9 @@
 #include <imtdoc/CDocumentServiceBase.h>
 
 
+// STL includes
+#include <functional>
+
 // Qt includes
 #include <QtCore/QCoreApplication>
 #include <QtCore/QUuid>
@@ -10,6 +13,7 @@
 // ACF includes
 #include <imod/IModel.h>
 #include <imod/IObserver.h>
+#include <istd/CChangeNotifier.h>
 
 // ImtCore includes
 #include <imtdoc/CDocumentChangedEvent.h>
@@ -21,6 +25,7 @@
 #include <imtdoc/CDocumentSavedAsEvent.h>
 #include <imtdoc/CDocumentSavedEvent.h>
 #include <imtdoc/CDocumentUndoRedoChangedEvent.h>
+#include <imtdoc/IPersistentUndoManager.h>
 
 
 namespace imtdoc
@@ -40,6 +45,25 @@ CDocumentServiceBase::~CDocumentServiceBase()
 {
 	m_isAlive->store(false);
 
+	QList<QPointer<QThread>> workerThreads;
+	{
+		QMutexLocker locker(&m_workerThreadsMutex);
+		workerThreads = m_workerThreads;
+	}
+
+	for (const QPointer<QThread>& threadPtr : workerThreads){
+		if (threadPtr.isNull()){
+			continue;
+		}
+
+		if (threadPtr.data() == QThread::currentThread()){
+			continue;
+		}
+
+		threadPtr->quit();
+		threadPtr->wait();
+	}
+
 	// Complete all pending tasks so that any thread blocked in
 	// WaitForTaskFinished is unblocked before destruction continues.
 	{
@@ -55,6 +79,9 @@ CDocumentServiceBase::~CDocumentServiceBase()
 		}
 		m_pendingTasks.clear();
 	}
+
+	QCoreApplication::sendPostedEvents(nullptr, QEvent::MetaCall);
+	QCoreApplication::processEvents(QEventLoop::AllEvents);
 }
 
 
@@ -173,6 +200,7 @@ IDocumentService::DocumentList CDocumentServiceBase::GetOpenedDocumentList(const
 			info.isDirty = workingDocument.isDirty;
 			info.hasNameProvider = HasDocumentNameProvider(workingDocument.typeId);
 			info.isLoading = workingDocument.isLoading;
+			info.singleDocumentInstance = workingDocument.singleDocumentInstance;
 
 			list.append(info);
 		}
@@ -186,13 +214,16 @@ IDocumentService::DocumentList CDocumentServiceBase::GetOpenedDocumentList(const
 
 void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const TaskParams& params)
 {
-	idoc::IUndoManagerSharedPtr undoManagerPtr = CreateUndoManager();
+	idoc::IUndoManagerSharedPtr undoManagerPtr;
+	undoManagerPtr.FromUnique(std::move(CreateUndoManager()));
 	if (!undoManagerPtr.IsValid()){
 		CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Failed to create undo manager")});
 		return;
 	}
 
 	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+
+	istd::CChangeNotifier notifier(this);
 
 	QString documentName;
 	{
@@ -203,6 +234,7 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 		doc.isDirty = true;
 		doc.name = params.documentName;
 		doc.isLoading = true;
+		doc.singleDocumentInstance = params.singleDocumentInstance;
 		documentName = doc.name;
 	}
 
@@ -227,97 +259,145 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 	QThread* thread = new QThread();
 	QObject* worker = new QObject();
 	worker->moveToThread(thread);
+	{
+		QMutexLocker locker(&m_workerThreadsMutex);
+		m_workerThreads.append(QPointer<QThread>(thread));
+	}
 
 	std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
-	QObject::connect(thread, &QThread::started, worker, [this, aliveGuard, documentTypeId, userId, documentId, taskId, worker, defaultDataPtr](){
-		auto isAlive = aliveGuard.lock();
-		if (!isAlive || !isAlive->load()){
-			CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")});
-			worker->deleteLater();
-			return;
-		}
-
-		istd::IChangeableSharedPtr objectPtr = CreateObject(documentTypeId);
-
-		isAlive = aliveGuard.lock();
-		if (!isAlive || !isAlive->load()){
-			CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")});
-			worker->deleteLater();
-			return;
-		}
-
-		{
-			QMutexLocker locker(&m_mutex);
-			WorkingDocument* docPtr = FindDocument(userId, documentId);
-
-			if (docPtr != nullptr){
-				if (objectPtr.IsValid()){
-					if (defaultDataPtr != nullptr){
-						bool retVal = objectPtr->CopyFrom(*defaultDataPtr);
-						Q_ASSERT_X(retVal, Q_FUNC_INFO, "Unable to copy from default data");
-
-						if (!retVal){
-							docPtr->isLoading = false;
-							CompleteTask(taskId, TaskResult{ OS_FAILED, QByteArray(), QStringLiteral("Object creation failed") });
-							worker->deleteLater();
-							return;
-						}
-					}
-
-					docPtr->objectPtr = objectPtr;
-				}
-				else{
-					// Creation failed - close the document and notify client
-					docPtr->isLoading = false;
-					CloseDocumentInternal(userId, documentId);
-					CompleteTask(taskId, TaskResult{ OS_FAILED, QByteArray(), QStringLiteral("Object creation failed") });
-					worker->deleteLater();
-					return;
-				}
-			}
-		}
-
-		worker->deleteLater();
-	});
+	QObject::connect(
+		thread,
+		&QThread::started,
+		worker,
+		std::bind(
+					&CDocumentServiceBase::OnCreateDocumentThreadStarted,
+					this,
+					aliveGuard,
+					documentTypeId,
+					userId,
+					documentId,
+					taskId,
+					worker,
+					defaultDataPtr));
 
 	// Initialize observers and fire events in the main thread after background work completes
-	QObject::connect(thread, &QThread::finished, QCoreApplication::instance(), [this, aliveGuard, userId, documentId, taskId, initParamsPtr](){
-		auto isAlive = aliveGuard.lock();
-		if (!isAlive || !isAlive->load()){
-			return;
-		}
-
-		{
-			QMutexLocker locker(&m_mutex);
-			WorkingDocument* docPtr = FindDocument(userId, documentId);
-
-			if (docPtr == nullptr || !docPtr->objectPtr.IsValid() || !docPtr->isLoading){
-				return;
-			}
-
-			QString errorMessage;
-			if (!OnDocumentCreated(docPtr->typeId, initParamsPtr, *docPtr->objectPtr, errorMessage)){
-				docPtr->isLoading = false;
-				CloseDocumentInternal(userId, documentId);
-				if (errorMessage.isEmpty()){
-					errorMessage = QStringLiteral("Document initialization failed");
-				}
-				CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), errorMessage});
-				return;
-			}
-
-			InitializeDocumentObservers(*docPtr, userId);
-		}
-
-		OnDocumentDataLoaded(userId, documentId);
-
-		CompleteTask(taskId, TaskResult{OS_OK, documentId, QString()});
-	});
+	QObject::connect(
+		thread,
+		&QThread::finished,
+		QCoreApplication::instance(),
+		std::bind(
+					&CDocumentServiceBase::OnCreateDocumentThreadFinished,
+					this,
+					aliveGuard,
+					userId,
+					documentId,
+					taskId,
+					initParamsPtr));
 
 	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit, Qt::DirectConnection);
 	QObject::connect(thread, &QThread::finished, thread, &QObject::deleteLater);
 
 	thread->start();
+}
+
+
+void CDocumentServiceBase::OnCreateDocumentThreadStarted(
+	const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+	const QByteArray& documentTypeId,
+	const QByteArray& userId,
+	const QByteArray& documentId,
+	const QByteArray& taskId,
+	QObject* worker,
+	const istd::IChangeable* defaultDataPtr)
+{
+	auto isAlive = aliveGuard.lock();
+	if (!isAlive || !isAlive->load()){
+		CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")});
+		worker->deleteLater();
+		return;
+	}
+
+	istd::IChangeableSharedPtr objectPtr = CreateObject(documentTypeId);
+
+	isAlive = aliveGuard.lock();
+	if (!isAlive || !isAlive->load()){
+		CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")});
+		worker->deleteLater();
+		return;
+	}
+
+	{
+		QMutexLocker locker(&m_mutex);
+		WorkingDocument* docPtr = FindDocument(userId, documentId);
+
+		if (docPtr != nullptr){
+			if (objectPtr.IsValid()){
+				if (defaultDataPtr != nullptr){
+					bool retVal = objectPtr->CopyFrom(*defaultDataPtr);
+					Q_ASSERT_X(retVal, Q_FUNC_INFO, "Unable to copy from default data");
+
+					if (!retVal){
+						docPtr->isLoading = false;
+						CompleteTask(taskId, TaskResult{ OS_FAILED, QByteArray(), QStringLiteral("Object creation failed") });
+						worker->deleteLater();
+						return;
+					}
+				}
+
+				docPtr->objectPtr = objectPtr;
+			}
+			else{
+				// Creation failed - close the document and notify client
+				docPtr->isLoading = false;
+				CloseDocumentInternal(userId, documentId);
+				CompleteTask(taskId, TaskResult{ OS_FAILED, QByteArray(), QStringLiteral("Object creation failed") });
+				worker->deleteLater();
+				return;
+			}
+		}
+	}
+
+	worker->deleteLater();
+}
+
+
+void CDocumentServiceBase::OnCreateDocumentThreadFinished(
+	const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+	const QByteArray& userId,
+	const QByteArray& documentId,
+	const QByteArray& taskId,
+	const iprm::IParamsSet* initParamsPtr)
+{
+	auto isAlive = aliveGuard.lock();
+	if (!isAlive || !isAlive->load()){
+		return;
+	}
+
+	{
+		QMutexLocker locker(&m_mutex);
+		WorkingDocument* docPtr = FindDocument(userId, documentId);
+
+		if (docPtr == nullptr || !docPtr->objectPtr.IsValid() || !docPtr->isLoading){
+			return;
+		}
+
+		QString errorMessage;
+		if (!OnDocumentCreated(docPtr->typeId, initParamsPtr, *docPtr->objectPtr, errorMessage)){
+			docPtr->isLoading = false;
+			CloseDocumentInternal(userId, documentId);
+			if (errorMessage.isEmpty()){
+				errorMessage = QStringLiteral("Document initialization failed");
+			}
+			CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), errorMessage});
+			return;
+		}
+
+		InitializeDocumentObservers(*docPtr, userId, documentId);
+	}
+
+	OnDocumentDataLoaded(userId, documentId);
+
+	CompleteTask(taskId, TaskResult{OS_OK, documentId, QString()});
 }
 
 
@@ -362,25 +442,21 @@ IDocumentService::OperationStatus CDocumentServiceBase::CloseDocumentInternal(
 	QByteArray objectId;
 	QString name;
 	bool isDirty = false;
-	WorkingDocument* workingDocumentPtr = nullptr;
 
 	{
 		QMutexLocker locker(&m_mutex);
+
 		OperationStatus validationStatus;
 		if (!ValidateInputParams(userId, documentId, validationStatus)){
 			return validationStatus;
 		}
-	}
 
-	{
-		QMutexLocker locker(&m_mutex);
-		if (!m_userDocuments.contains(userId) || !m_userDocuments[userId].contains(documentId)){
-			return OS_INVALID_DOCUMENT_ID;
-		}
+		istd::CChangeNotifier notifier(this);
 
-		workingDocumentPtr = &m_userDocuments[userId][documentId];
+		WorkingDocument* workingDocumentPtr = &m_userDocuments[userId][documentId];
 
 		bool isLastSharedUser = true;
+		bool isUndoObserverUnregistered = false;
 		if (IsSingleCopyMode() && !workingDocumentPtr->objectId.isEmpty()
 			&& m_sharedDocuments.contains(workingDocumentPtr->objectId)){
 			SharedDocumentData& shared = m_sharedDocuments[workingDocumentPtr->objectId];
@@ -390,12 +466,18 @@ IDocumentService::OperationStatus CDocumentServiceBase::CloseDocumentInternal(
 				imod::IModel* undoModelPtr = dynamic_cast<imod::IModel*>(shared.undoManagerPtr.GetPtr());
 				if (undoModelPtr != nullptr && shared.undoManagerModelId >= 0){
 					m_undoManagerObserver.UnregisterModel(shared.undoManagerModelId);
+					isUndoObserverUnregistered = true;
 				}
 				m_sharedDocuments.remove(workingDocumentPtr->objectId);
 			}
 		}
 
 		if (isLastSharedUser){
+			if (!isUndoObserverUnregistered && workingDocumentPtr->undoManagerModelId >= 0){
+				m_undoManagerObserver.UnregisterModel(workingDocumentPtr->undoManagerModelId);
+				workingDocumentPtr->undoManagerModelId = -1;
+			}
+
 			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(workingDocumentPtr->undoManagerPtr.GetPtr());
 			if (modelPtr != nullptr){
 				modelPtr->DetachAllObservers();
@@ -689,11 +771,10 @@ int CDocumentServiceBase::GetUndoManagerNextModelId(const QByteArray& /*userId*/
 }
 
 
-
-
 void CDocumentServiceBase::InitializeDocumentObservers(
 			WorkingDocument& document,
-			const QByteArray& userId)
+			const QByteArray& userId,
+			const QByteArray& documentId)
 {
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(document.objectPtr.GetPtr());
 	imod::IModel* undoModelPtr = dynamic_cast<imod::IModel*>(document.undoManagerPtr.GetPtr());
@@ -705,6 +786,11 @@ void CDocumentServiceBase::InitializeDocumentObservers(
 		}
 
 		modelPtr->AttachObserver(this);
+	}
+
+	imtdoc::IPersistentUndoManager* persistentUndoManagerPtr = dynamic_cast<imtdoc::IPersistentUndoManager*>(document.undoManagerPtr.GetPtr());
+	if (persistentUndoManagerPtr != nullptr){
+		persistentUndoManagerPtr->InitializeDocumentContext(documentId, document.typeId);
 	}
 
 	document.undoManagerPtr->StoreDocumentState();
@@ -950,10 +1036,10 @@ bool CDocumentServiceBase::HasDocumentNameProvider(const QByteArray& /*typeId*/)
 
 
 bool CDocumentServiceBase::ValidateDocumentData(
-	const WorkingDocument& /*document*/,
-	OperationStatus& status,
-	QString* errorMessage,
-	const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const WorkingDocument& /*document*/,
+			OperationStatus& status,
+			QString* errorMessage,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	status = OS_OK;
 	if (errorMessage != nullptr){

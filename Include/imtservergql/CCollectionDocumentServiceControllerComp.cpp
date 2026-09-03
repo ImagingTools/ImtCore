@@ -77,12 +77,13 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnCreateNewDocument
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		const QByteArray proposedSourceDocumentId = documentTypeId->proposedSourceDocumentId
-			? *documentTypeId->proposedSourceDocumentId
-			: QByteArray();
+					? *documentTypeId->proposedSourceDocumentId
+					: QByteArray();
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
 		taskParams.documentTypeId = *documentTypeId->typeId;
 		taskParams.proposedSourceDocumentId = proposedSourceDocumentId;
+		taskParams.singleDocumentInstance = documentTypeId->singleDocumentInstance.value_or(false);
 		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, taskParams);
 		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
 		QByteArray documentId = taskResult.documentId;
@@ -147,11 +148,14 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
 		taskParams.url = url;
+		taskParams.singleDocumentInstance = objectId->singleInstanceMode.value_or(false);
 		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, taskParams);
 		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
 		QByteArray documentId = taskResult.documentId;
 		if (documentId.isEmpty()){
-			errorMessage = "Unable to open document or create undo manager";
+			errorMessage = taskResult.errorMessage.isEmpty()
+						? QStringLiteral("Unable to open document or create undo manager")
+						: taskResult.errorMessage;
 
 			return retVal;
 		}
@@ -389,6 +393,18 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnCloseD
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
+		imtdoc::IDocumentService::DocumentList openedList = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+		for (const imtdoc::IDocumentService::DocumentListItem& info : openedList){
+			if (info.documentId == *documentId->id && info.singleDocumentInstance){
+				const QString responseMessage = "Close document is forbidden for single-instance document";
+				retVal.status = CDM::EDocumentOperationStatus::Failed;
+				retVal.message = responseMessage;
+				errorMessage = responseMessage;
+
+				return retVal;
+			}
+		}
+
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
 		taskParams.documentId = *documentId->id;
@@ -677,8 +693,11 @@ bool CCollectionDocumentServiceControllerComp::IsRequestSupported(const imtgql::
 		}
 
 		QByteArray collectionId = inputParamPtr->GetParamArgumentValue("collectionId").toByteArray();
+		if (!m_documentManagerCompPtr.IsValid() || (collectionId != *m_collectionIdAttrPtr)){
+			return false;
+		}
 
-		return m_documentManagerCompPtr.IsValid() && (collectionId == *m_collectionIdAttrPtr);
+		return true;
 	}
 
 	return false;
@@ -778,3 +797,4 @@ QByteArray CCollectionDocumentServiceControllerComp::GetUserId(const ::imtgql::C
 
 
 } // namespace imtservergql
+
