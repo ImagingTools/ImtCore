@@ -170,7 +170,7 @@ jobs:
         timeout-minutes: 90
         env:
           TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
-          TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
+          TEAMCITY_TOKEN: ${{ secrets.TEAMCITY_TOKEN }}
           BUILD_ID: ${{ steps.teamcity.outputs.build_id }}
           TRIGGERED_WEB_URL: ${{ steps.teamcity.outputs.web_url }}
         shell: bash
@@ -250,7 +250,7 @@ jobs:
         continue-on-error: true
         env:
           TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
-          TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
+          TEAMCITY_TOKEN: ${{ secrets.TEAMCITY_TOKEN }}
           BUILD_ID: ${{ steps.teamcity.outputs.build_id }}
         shell: bash
         run: |
@@ -408,7 +408,7 @@ jobs:
         if: steps.extract_ids.outputs.build_ids != ''
         env:
           TEAMCITY_URL: ${{ vars.TEAMCITY_URL }}
-          TEAMCITY_TOKEN: ${{ vars.TEAMCITY_TOKEN }}
+          TEAMCITY_TOKEN: ${{ secrets.TEAMCITY_TOKEN }}
         shell: bash
         run: |
           BUILD_IDS='${{ steps.extract_ids.outputs.build_ids }}'
