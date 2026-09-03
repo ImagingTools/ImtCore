@@ -30,9 +30,6 @@ namespace imtservergql
 {
 
 
-namespace CDM = sdl::V1_0::imtbase;
-
-
 // public methods
 
 // reimplemented (icomp::CComponentBase)
@@ -133,7 +130,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentCreated(imtdoc::CEventBa
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, CDM::EDocumentOperation::NewDocumentCreated, sdlNotification);
+	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::NewDocumentCreated, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -154,7 +151,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentOpened(imtdoc::CEventBas
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentOpened, sdlNotification);
+	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentOpened, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -175,7 +172,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentRenamed(imtdoc::CEventBa
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentRenamed, sdlNotification);
+	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentRenamed, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -194,7 +191,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentChanged(imtdoc::CEventBa
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentChanged, sdlNotification);
+	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentChanged, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
@@ -251,7 +248,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentSaved(imtdoc::CEventBase
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentSaved, sdlNotification);
+	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentSaved, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -270,7 +267,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentSavedAs(imtdoc::CEventBa
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentSavedAs, sdlNotification);
+	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentSavedAs, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
@@ -286,7 +283,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentClosed(imtdoc::CEventBas
 	}
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	sdlNotification.documentOperation = CDM::EDocumentOperation::DocumentClosed;
+	sdlNotification.documentOperation = sdl::V1_0::imtbase::EDocumentOperation::DocumentClosed;
 	sdlNotification.documentId = concreteEventPtr->GetDocumentId();
 	sdlNotification.documentName.emplace();
 
@@ -309,7 +306,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentDataLoaded(imtdoc::CEven
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentDataLoaded, sdlNotification);
+	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentDataLoaded, sdlNotification);
 
 	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
