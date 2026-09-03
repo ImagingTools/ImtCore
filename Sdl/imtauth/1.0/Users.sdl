@@ -77,6 +77,8 @@ input ChangePasswordInput {
 
 input ChangePasswordPayload {
 	success: Boolean
+	message: String
+	violatedRules: [String]
 }
 
 input RegisterUserInput {

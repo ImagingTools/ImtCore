@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtauth/ICredentialController.h>
+#include <imtauth/IPasswordPolicy.h>
 #include <imtauth/IUserVerificationController.h>
 #include <imtauthgql/CUserRepresentationController.h>
 #include <imtcrypt/IHashGenerator.h>
@@ -32,6 +33,7 @@ public:
 		I_ASSIGN(m_userOperationContextControllerCompPtr, "UserOperationContextController", "User operation context controller", false, "UserOperationContextController");
 		I_ASSIGN(m_userVerificationCodeSenderCompPtr, "UserVerificationCodeSender", "User verification code sender", false, "UserVerificationCodeSender");
 		I_ASSIGN(m_databaseConnectionCheckerCompPtr, "DatabaseConnectionChecker", "Database connection checker", false, "DatabaseConnectionChecker");
+		I_ASSIGN(m_passwordPolicyCompPtr, "PasswordPolicy", "Password policy for strength, history and lifetime checks", false, "PasswordPolicy");
 	I_END_COMPONENT;
 
 protected:
@@ -88,6 +90,7 @@ private:
 	I_REF(imtbase::IOperationContextController, m_userOperationContextControllerCompPtr);
 	I_REF(imtauth::IUserVerificationCodeSender, m_userVerificationCodeSenderCompPtr);
 	I_REF(imtdb::IDatabaseServerConnectionChecker, m_databaseConnectionCheckerCompPtr);
+	I_REF(imtauth::IPasswordPolicy, m_passwordPolicyCompPtr);
 
 private:
 	imtauthgql::CUserRepresentationController m_userRepresentationController;
