@@ -100,7 +100,7 @@ void CFileBasedUndoManagerComp::InitializeDocumentContext(const QByteArray& docu
 }
 
 
-void CFileBasedUndoManagerComp::CleanupHistory()
+void CFileBasedUndoManagerComp::ResetHistory()
 {
 	istd::CChangeNotifier notifier(this);
 	Q_UNUSED(notifier);
