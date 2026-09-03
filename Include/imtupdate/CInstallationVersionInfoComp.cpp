@@ -38,7 +38,7 @@ QString CInstallationVersionInfoComp::GetVersionIdDescription(int /*versionId*/)
 
 QString CInstallationVersionInfoComp::GetEncodedVersionName(int /*versionId*/, quint32 /*versionNumber*/) const
 {
-	return QString("%0.%1.%2.%3").arg(QString::number(*m_majorVersionAttrPtr)).arg(QString::number(*m_minorVersionAttrPtr)).arg(QString::number(*m_fixVersionAttrPtr)).arg(QString::number(*m_buildVersionAttrPtr));
+	return QStringLiteral("%0.%1.%2.%3").arg(QString::number(*m_majorVersionAttrPtr)).arg(QString::number(*m_minorVersionAttrPtr)).arg(QString::number(*m_fixVersionAttrPtr)).arg(QString::number(*m_buildVersionAttrPtr));
 }
 
 

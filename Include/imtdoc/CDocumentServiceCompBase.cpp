@@ -61,10 +61,10 @@ bool CDocumentServiceCompBase::ValidateDocumentData(
 		if (errorMessage != nullptr){
 			*errorMessage = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;
 		}
-		QString warningMessage = QString("Document validation failed for type '%1'")
-			.arg(QString::fromUtf8(document.typeId));
+		QString warningMessage = QStringLiteral("Document validation failed for type '%1'")
+			.arg(document.typeId);
 		if (!validationMessage.isEmpty()){
-			warningMessage = QString("%1: %2").arg(warningMessage, validationMessage);
+			warningMessage = QStringLiteral("%1: %2").arg(warningMessage, validationMessage);
 			SendWarningMessage(kValidationFailureWarningId, warningMessage);
 		}
 		else{
@@ -100,7 +100,8 @@ istd::IChangeableUniquePtr CDocumentServiceCompBase::CreateObject(const QByteArr
 		return m_objectFactListCompPtr.CreateInstance(index);
 	}
 
-	Q_ASSERT_X(false, "CDocumentServiceCompBase::CreateObject", qPrintable(QString("Factory not found for the type: '%1'").arg(qPrintable(typeId))));
+	const QByteArray errorMessage = QStringLiteral("Factory not found for the type: '%1'").arg(typeId).toUtf8();
+	Q_ASSERT_X(false, "CDocumentServiceCompBase::CreateObject", errorMessage.constData());
 
 	return nullptr;
 }
@@ -112,7 +113,8 @@ idoc::IUndoManagerUniquePtr CDocumentServiceCompBase::CreateUndoManager() const
 		return m_undoManagerFactPtr.CreateInstance();
 	}
 
-	Q_ASSERT_X(false, "CDocumentServiceCompBase::CreateUndoManager", qPrintable(QString("Factory not found")));
+	const QByteArray errorMessage = QStringLiteral("Factory not found").toUtf8();
+	Q_ASSERT_X(false, "CDocumentServiceCompBase::CreateUndoManager", errorMessage.constData());
 
 	return nullptr;
 }

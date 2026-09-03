@@ -75,8 +75,8 @@ bool CContactInfoCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (contactInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
-		SendErrorMessage(0, errorMessage, "CContactInfoCollectionControllerComp");
+		errorMessage = QStringLiteral("Unable to create representation from object '%1'").arg(objectId);
+		SendErrorMessage(0, errorMessage, QStringLiteral("CContactInfoCollectionControllerComp"));
 
 		return false;
 	}
@@ -130,8 +130,8 @@ bool CContactInfoCollectionControllerComp::CreateRepresentationFromObject(
 {
 	const imtauth::CContactInfo* contactInfoPtr = dynamic_cast<const imtauth::CContactInfo*>(&data);
 	if (contactInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
-		SendErrorMessage(0, errorMessage, "CContactInfoCollectionControllerComp");
+		errorMessage = QStringLiteral("Unable to create representation from object. Error: Object is invalid");
+		SendErrorMessage(0, errorMessage, QStringLiteral("CContactInfoCollectionControllerComp"));
 		return false;
 	}
 
@@ -185,13 +185,13 @@ istd::IChangeableUniquePtr CContactInfoCollectionControllerComp::CreateObjectFro
 	
 	istd::TUniqueInterfacePtr<istd::IChangeable> contactInstanceInfoPtr = m_objectFactCompPtr.CreateInstance(typeIdIndex);
 	if (!contactInstanceInfoPtr.IsValid()){
-		errorMessage = QString("Unable to create contact info instance. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to create contact info instance. Error: Invalid object");
 		return nullptr;
 	}
 
 	imtauth::CContactInfo* contactInfoPtr = dynamic_cast<imtauth::CContactInfo*>(contactInstanceInfoPtr.GetPtr());
 	if (contactInfoPtr == nullptr){
-		errorMessage = QString("Unable to cast object to contact info. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to cast object to contact info. Error: Invalid object");
 		return nullptr;
 	}
 

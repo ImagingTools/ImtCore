@@ -374,7 +374,7 @@ void CLayoutManagerGuiComp::OnLoad()
 	ILayout* rootLayoutPtr = GetObservedObject();
 	Q_ASSERT(rootLayoutPtr != nullptr);
 
-	QString fileName = QFileDialog::getOpenFileName(GetWidget(), tr("Import Layout"), QString(), QString("Layout Files (*.layout)"));
+	QString fileName = QFileDialog::getOpenFileName(GetWidget(), tr("Import Layout"), QString(), QStringLiteral("Layout Files (*.layout)"));
 	if (!fileName.isEmpty()){
 		ifile::CCompactXmlFileReadArchive archive(fileName);
 
@@ -391,7 +391,7 @@ void CLayoutManagerGuiComp::OnSave()
 	ILayout* rootLayoutPtr = GetObservedObject();
 	Q_ASSERT(rootLayoutPtr != nullptr);
 
-	QString fileName = QFileDialog::getSaveFileName(GetWidget(), tr("Export Layout"), QString(), QString("Layout Files (*.layout)"));
+	QString fileName = QFileDialog::getSaveFileName(GetWidget(), tr("Export Layout"), QString(), QStringLiteral("Layout Files (*.layout)"));
 	if (!fileName.isEmpty()){
 		ifile::CCompactXmlFileWriteArchive archive(fileName);
 

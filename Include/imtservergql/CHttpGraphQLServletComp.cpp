@@ -75,7 +75,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	const QByteArray requestBody = request.GetBody();
 	if (!m_lastRequest.ParseQuery(requestBody, errorPosition)){
 		qCritical() << __FILE__ << __LINE__ << QStringLiteral("Error when parsing request: '%1'; Error position: '%2'")
-														.arg(QString(request.GetBody()),
+														.arg(request.GetBody(),
 															 QString::number(errorPosition));
 
 		return GenerateError(StatusCode::SC_BAD_REQUEST, QStringLiteral("Request is incorrect"), request);
@@ -104,7 +104,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 				SendWarningMessage(
 							0,
 							QStringLiteral("HTTP GraphQL auth rejected (401 Unauthorized) for Command-ID '%1', token %2: %3")
-									.arg(QString(gqlCommand), maskedToken, contextError.message),
+									.arg(gqlCommand, maskedToken, contextError.message),
 							QStringLiteral("GraphQL - servlet"));
 				return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
 			}
@@ -112,7 +112,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 				SendWarningMessage(
 							0,
 							QStringLiteral("HTTP GraphQL auth rejected (403 Forbidden) for Command-ID '%1', token %2: %3")
-									.arg(QString(gqlCommand), maskedToken, contextError.message),
+									.arg(gqlCommand, maskedToken, contextError.message),
 							QStringLiteral("GraphQL - servlet"));
 				return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
 			}
@@ -138,7 +138,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		SendCriticalMessage(
 					0,
 					QStringLiteral("GqlContextCreator is not configured for this servlet - Command-ID: '%1' will be processed with no request context (caller will appear anonymous to every permission check).")
-										.arg(QString(gqlCommand)),
+										.arg(gqlCommand),
 					QStringLiteral("GraphQL - servlet"));
 	}
 
@@ -185,7 +185,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 				SendWarningMessage(
 							0,
 							QStringLiteral("HTTP GraphQL auth rejected (401 Unauthorized) for Command-ID '%1': %2")
-									.arg(QString(gqlCommand), errorMessage),
+									.arg(gqlCommand, errorMessage),
 							QStringLiteral("GraphQL - servlet"));
 				return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
 			}
@@ -230,7 +230,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			invalidCommandMessage = QStringLiteral("Invalid GraphQL command");
 		}
 		else{
-			invalidCommandMessage = QStringLiteral("Invalid command request: '%1'").arg(QString(gqlCommand));
+			invalidCommandMessage = QStringLiteral("Invalid command request: '%1'").arg(gqlCommand);
 		}
 
 		SendErrorMessage(0, invalidCommandMessage, QStringLiteral("GraphQL - servlet"));
@@ -245,7 +245,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	}
 
 	// Fallback for unexpected internal state
-	SendErrorMessage(0, QStringLiteral("Internal server error for command '%1'").arg(QString(gqlCommand)), QStringLiteral("GraphQL - servlet"));
+	SendErrorMessage(0, QStringLiteral("Internal server error for command '%1'").arg(gqlCommand), QStringLiteral("GraphQL - servlet"));
 	return GenerateError(StatusCode::SC_INTERNAL_SERVER_ERROR, QStringLiteral("Request is incorrect"), request);
 }
 
@@ -283,7 +283,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
 									   request,
 									   errorCode,
 									   responseJson,
-									   QByteArray("application/json;charset=utf-8")).PopInterfacePtr());
+									   QByteArrayLiteral("application/json;charset=utf-8")).PopInterfacePtr());
 }
 
 

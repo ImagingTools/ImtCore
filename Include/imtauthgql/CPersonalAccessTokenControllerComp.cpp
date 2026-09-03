@@ -230,7 +230,7 @@ sdl::V1_0::imtauth::CPersonalAccessToken CPersonalAccessTokenControllerComp::OnG
 	// exist and when the caller is not authorized to see it, so an
 	// unauthorized caller cannot use this to enumerate other users' token ids.
 	if (!tokenPtr.IsValid() || !IsCallerAuthorizedForUser(gqlRequest, tokenPtr->GetUserId())){
-		errorMessage = QString("Token with id '%1' not found").arg(QString::fromUtf8(tokenId));
+		errorMessage = QStringLiteral("Token with id '%1' not found").arg(tokenId);
 		return response;
 	}
 
@@ -451,7 +451,7 @@ sdl::V1_0::imtauth::CRevokeTokenPayload CPersonalAccessTokenControllerComp::OnRe
 	// which token ids exist for other users.
 	imtauth::IPersonalAccessTokenSharedPtr existingTokenPtr = m_tokenManagerCompPtr->GetToken(tokenId);
 	if (!existingTokenPtr.IsValid() || !IsCallerAuthorizedForUser(gqlRequest, existingTokenPtr->GetUserId())){
-		errorMessage = QString("Token with id '%1' not found").arg(QString::fromUtf8(tokenId));
+		errorMessage = QStringLiteral("Token with id '%1' not found").arg(tokenId);
 		response.message = errorMessage;
 		return response;
 	}
@@ -465,7 +465,7 @@ sdl::V1_0::imtauth::CRevokeTokenPayload CPersonalAccessTokenControllerComp::OnRe
 		response.message = "Token revoked successfully";
 	}
 	else{
-		errorMessage = QString("Failed to revoke token with id '%1'").arg(QString::fromUtf8(tokenId));
+		errorMessage = QStringLiteral("Failed to revoke token with id '%1'").arg(tokenId);
 		response.message = errorMessage;
 	}
 
@@ -514,7 +514,7 @@ sdl::V1_0::imtauth::CDeleteTokenPayload CPersonalAccessTokenControllerComp::OnDe
 	// which token ids exist for other users.
 	imtauth::IPersonalAccessTokenSharedPtr existingTokenPtr = m_tokenManagerCompPtr->GetToken(tokenId);
 	if (!existingTokenPtr.IsValid() || !IsCallerAuthorizedForUser(gqlRequest, existingTokenPtr->GetUserId())){
-		errorMessage = QString("Token with id '%1' not found").arg(QString::fromUtf8(tokenId));
+		errorMessage = QStringLiteral("Token with id '%1' not found").arg(tokenId);
 		response.message = errorMessage;
 		return response;
 	}
@@ -528,7 +528,7 @@ sdl::V1_0::imtauth::CDeleteTokenPayload CPersonalAccessTokenControllerComp::OnDe
 		response.message = "Token deleted successfully";
 	}
 	else{
-		errorMessage = QString("Failed to delete token with id '%1'").arg(QString::fromUtf8(tokenId));
+		errorMessage = QStringLiteral("Failed to delete token with id '%1'").arg(tokenId);
 		response.message = errorMessage;
 	}
 

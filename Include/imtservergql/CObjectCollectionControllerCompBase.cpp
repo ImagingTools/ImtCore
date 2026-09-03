@@ -422,7 +422,7 @@ sdl::V1_0::imtbase::CDuplicateElementsPayload CObjectCollectionControllerCompBas
 	}
 
 	if (elementIds.isEmpty()){
-		errorMessage = QString("Unable to duplicate elements. Error: Element-IDs is empty");
+		errorMessage = QStringLiteral("Unable to duplicate elements. Error: Element-IDs is empty");
 		return response;
 	}
 
@@ -486,7 +486,7 @@ sdl::V1_0::imtbase::CVisualStatus CObjectCollectionControllerCompBase::OnGetObje
 		}
 	}
 	else{
-		SendCriticalMessage(0, QString("Unknown type-ID provided '%1'").arg(qPrintable(typeId)));
+		SendCriticalMessage(0, QStringLiteral("Unknown type-ID provided '%1'").arg(typeId));
 	}
 
 	response.objectId = objectId;
@@ -516,14 +516,14 @@ sdl::V1_0::imtbase::CRemoveElementsPayload CObjectCollectionControllerCompBase::
 	}
 
 	if (elementIds.isEmpty()){
-		errorMessage = QString("Unable to remove elements for collection: '%1'. Error: Element-IDs not provided").arg(QString::fromUtf8(collectionId));
+		errorMessage = QStringLiteral("Unable to remove elements for collection: '%1'. Error: Element-IDs not provided").arg(collectionId);
 		return sdl::V1_0::imtbase::CRemoveElementsPayload();
 	}
 
 	imtbase::ICollectionInfo::Ids allElementIds = m_objectCollectionCompPtr->GetElementIds();
 	for (const QByteArray& elementId : elementIds){
 		if (!allElementIds.contains(elementId)){
-			errorMessage = QString("Unable to delete object. Object with ID '%1' does not exists").arg(QString(elementId));
+			errorMessage = QStringLiteral("Unable to delete object. Object with ID '%1' does not exists").arg(elementId);
 			SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 			return sdl::V1_0::imtbase::CRemoveElementsPayload();
 		}
@@ -565,7 +565,7 @@ sdl::V1_0::imtbase::CRemoveElementSetPayload CObjectCollectionControllerCompBase
 		if (filterParams.CopyFrom(m_selectionParams)){
 			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
-				errorMessage = QString("Unable to remove element set for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+				errorMessage = QStringLiteral("Unable to remove element set for collection '%1'. Error: Selection Params parsing failed").arg(*m_collectionIdAttrPtr);
 				return sdl::V1_0::imtbase::CRemoveElementSetPayload();
 			}
 		}
@@ -637,7 +637,7 @@ sdl::V1_0::imtbase::CRestoreObjectSetPayload CObjectCollectionControllerCompBase
 		if (filterParams.CopyFrom(m_selectionParams)){
 			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
-				errorMessage = QString("Unable to restore object set for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+				errorMessage = QStringLiteral("Unable to restore object set for collection '%1'. Error: Selection Params parsing failed").arg(*m_collectionIdAttrPtr);
 				return sdl::V1_0::imtbase::CRestoreObjectSetPayload();
 			}
 		}
@@ -682,7 +682,7 @@ sdl::V1_0::imtbase::CSetObjectNamePayload CObjectCollectionControllerCompBase::O
 	QString oldName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
 	if (!m_objectCollectionCompPtr->SetElementName(objectId, newName)){
-		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(newName, QString::fromUtf8(objectId));
+		errorMessage = QStringLiteral("Unable to set name '%1' for element with ID: '%2'").arg(newName, QString::fromUtf8(objectId));
 		return sdl::V1_0::imtbase::CSetObjectNamePayload();
 	}
 
@@ -730,7 +730,7 @@ sdl::V1_0::imtbase::CSetObjectDescriptionPayload CObjectCollectionControllerComp
 	if (!m_objectCollectionCompPtr->SetElementDescription(objectId, description)){
 		changeGroup.Reset();
 
-		errorMessage = QString("Unable to set description '%1' for element with ID: '%2'").arg(description, QString::fromUtf8(objectId));
+		errorMessage = QStringLiteral("Unable to set description '%1' for element with ID: '%2'").arg(description, QString::fromUtf8(objectId));
 		return sdl::V1_0::imtbase::CSetObjectDescriptionPayload();
 	}
 
@@ -776,7 +776,7 @@ sdl::V1_0::imtbase::CExportObjectPayload CObjectCollectionControllerCompBase::On
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Object does not exists").arg(qPrintable(objectId));
+		errorMessage = QStringLiteral("Unable to export the object with ID: '%1'. Error: Object does not exists").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
@@ -802,7 +802,7 @@ sdl::V1_0::imtbase::CExportObjectPayload CObjectCollectionControllerCompBase::On
 
 	imtbase::CMimeType mime;
 	if (!mime.FromString(mimeType)){
-		errorMessage = QString("Unable to parse mime type");
+		errorMessage = QStringLiteral("Unable to parse mime type");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
@@ -816,14 +816,14 @@ sdl::V1_0::imtbase::CExportObjectPayload CObjectCollectionControllerCompBase::On
 
 	istd::IChangeableUniquePtr objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
 	if (!objectPersistenceInstancePtr.IsValid()){
-		errorMessage = QString("Unable to import object to the collection. Error: Object persistence instance is invalid");
+		errorMessage = QStringLiteral("Unable to import object to the collection. Error: Object persistence instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
 
 	if (!ConvertObject(*dataPtr.GetPtr(), *objectPersistenceInstancePtr.GetPtr(), errorMessage)){
 		if (errorMessage.isEmpty()){
-			errorMessage = QString("Unable to export the object with ID: '%1'. Error: Object conversion failed").arg(qPrintable(objectId));
+			errorMessage = QStringLiteral("Unable to export the object with ID: '%1'. Error: Object conversion failed").arg(objectId);
 		}
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
@@ -831,14 +831,14 @@ sdl::V1_0::imtbase::CExportObjectPayload CObjectCollectionControllerCompBase::On
 	}
 
 	if (m_filePersistenceCompPtr[index]->SaveToFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
-		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Saving data to the file '%1' failed").arg(qPrintable(objectId), filePathTmp);
+		errorMessage = QStringLiteral("Unable to export the object with ID: '%1'. Error: Saving data to the file '%1' failed").arg(objectId, filePathTmp);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::ReadOnly)){
-		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Unable to open file with name '%1'").arg(qPrintable(objectId), filePathTmp);
+		errorMessage = QStringLiteral("Unable to export the object with ID: '%1'. Error: Unable to open file with name '%1'").arg(objectId, filePathTmp);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 		return sdl::V1_0::imtbase::CExportObjectPayload();
@@ -917,7 +917,7 @@ sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::On
 
 	istd::IChangeableUniquePtr objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
 	if (!objectPersistenceInstancePtr.IsValid()){
-		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
+		errorMessage = QStringLiteral("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return sdl::V1_0::imtbase::CImportObjectPayload();
@@ -925,7 +925,7 @@ sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::On
 
 	imtbase::CMimeType mime;
 	if (!mime.FromString(mimeType)){
-		errorMessage = QString("Unable to parse mime type");
+		errorMessage = QStringLiteral("Unable to parse mime type");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return sdl::V1_0::imtbase::CImportObjectPayload();
@@ -938,7 +938,7 @@ sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::On
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
-		SendErrorMessage(0, QString("Unable to open file with name '%1'").arg(filePathTmp), "CObjectCollectionControllerCompBase");
+		SendErrorMessage(0, QStringLiteral("Unable to open file with name '%1'").arg(filePathTmp), "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
@@ -946,7 +946,7 @@ sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::On
 	file.close();
 
 	if (m_filePersistenceCompPtr[index]->LoadFromFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
-		errorMessage = QString("Unable to import object to the collection");
+		errorMessage = QStringLiteral("Unable to import object to the collection");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
@@ -960,7 +960,7 @@ sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::On
 	}
 
 	if (m_objectCollectionCompPtr->GetElementIds().contains(objectUuid)){
-		errorMessage = QString("Unable to import object with ID: '%1' to the collection. Error: The object already exists inside the collection").arg(qPrintable(objectUuid));
+		errorMessage = QStringLiteral("Unable to import object with ID: '%1' to the collection. Error: The object already exists inside the collection").arg(objectUuid);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
@@ -972,14 +972,14 @@ sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::On
 
 	istd::IChangeableUniquePtr collectionObjectInstancePtr = m_objectFactCompPtr.CreateInstance(typeIdIndex);
 	if (!collectionObjectInstancePtr.IsValid()){
-		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
+		errorMessage = QStringLiteral("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
 	if (!ConvertObject(*objectPersistenceInstancePtr.GetPtr(), *collectionObjectInstancePtr.GetPtr(), errorMessage)){
 		if (errorMessage.isEmpty()){
-			errorMessage = QString("Unable to import object to the collection. Error: Object conversion failed");
+			errorMessage = QStringLiteral("Unable to import object to the collection. Error: Object conversion failed");
 		}
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
@@ -988,7 +988,7 @@ sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::On
 
 	QByteArray insertRetVal = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, collectionObjectInstancePtr.GetPtr(), objectUuid);
 	if (insertRetVal.isEmpty()){
-		errorMessage = QString("Unable to import object with ID: '%1' to the collection. Error: The object could not be inserted into the collection").arg(qPrintable(objectUuid));
+		errorMessage = QStringLiteral("Unable to import object with ID: '%1' to the collection. Error: The object could not be inserted into the collection").arg(objectUuid);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 		return sdl::V1_0::imtbase::CImportObjectPayload();
@@ -1041,7 +1041,7 @@ sdl::V1_0::imtbase::CGetCollectionHeadersPayload CObjectCollectionControllerComp
 
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr == nullptr){
-		errorMessage = QString("Unable to get collection headers. Error: GraphQL context is invalid");
+		errorMessage = QStringLiteral("Unable to get collection headers. Error: GraphQL context is invalid");
 		return sdl::V1_0::imtbase::CGetCollectionHeadersPayload();
 	}
 
@@ -1106,7 +1106,7 @@ sdl::V1_0::imtbase::CGetElementsCountPayload CObjectCollectionControllerCompBase
 		if (filterParams.CopyFrom(m_selectionParams)){
 			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
-				errorMessage = QString("Unable to get elements count for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+				errorMessage = QStringLiteral("Unable to get elements count for collection '%1'. Error: Selection Params parsing failed").arg(*m_collectionIdAttrPtr);
 				return sdl::V1_0::imtbase::CGetElementsCountPayload();
 			}
 		}
@@ -1146,7 +1146,7 @@ sdl::V1_0::imtbase::CGetElementIdsPayload CObjectCollectionControllerCompBase::O
 		if (filterParams.CopyFrom(m_selectionParams)){
 			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
-				errorMessage = QString("Unable to get element IDs for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+				errorMessage = QStringLiteral("Unable to get element IDs for collection '%1'. Error: Selection Params parsing failed").arg(*m_collectionIdAttrPtr);
 				return sdl::V1_0::imtbase::CGetElementIdsPayload();
 			}
 		}
@@ -1202,12 +1202,12 @@ sdl::V1_0::imtbase::CInsertNewObjectPayload CObjectCollectionControllerCompBase:
 	if (!objectData.isEmpty()){
 		objectPtr = CreateObject(typeId);
 		if (!objectPtr.IsValid()){
-			errorMessage = QString("Unable to insert new object to collection '%1'. Error: Object of type '%2' could not be created").arg(QString::fromUtf8(*m_collectionIdAttrPtr), QString::fromUtf8(typeId));
+			errorMessage = QStringLiteral("Unable to insert new object to collection '%1'. Error: Object of type '%2' could not be created").arg(QString::fromUtf8(*m_collectionIdAttrPtr), QString::fromUtf8(typeId));
 			return sdl::V1_0::imtbase::CInsertNewObjectPayload();
 		}
 
 		if (!DeSerializeObject(*objectPtr.GetPtr(), objectData)){
-			errorMessage = QString("Unable to insert new object to collection '%1'. Error: Object serialization failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+			errorMessage = QStringLiteral("Unable to insert new object to collection '%1'. Error: Object serialization failed").arg(*m_collectionIdAttrPtr);
 			return sdl::V1_0::imtbase::CInsertNewObjectPayload();
 		}
 	}
@@ -1219,7 +1219,7 @@ sdl::V1_0::imtbase::CInsertNewObjectPayload CObjectCollectionControllerCompBase:
 
 	QByteArray result = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, objectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
 	if (result.isEmpty()){
-		errorMessage = QString("Unable to insert new object to collection '%1'").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+		errorMessage = QStringLiteral("Unable to insert new object to collection '%1'").arg(*m_collectionIdAttrPtr);
 		return sdl::V1_0::imtbase::CInsertNewObjectPayload();
 	}
 
@@ -1256,18 +1256,18 @@ sdl::V1_0::imtbase::CSetObjectDataPayload CObjectCollectionControllerCompBase::O
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
 
 	if (objectData.isEmpty()){
-		errorMessage = QString("Unable to set object data to collection '%1'. Error: Object data not provided").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+		errorMessage = QStringLiteral("Unable to set object data to collection '%1'. Error: Object data not provided").arg(*m_collectionIdAttrPtr);
 		return sdl::V1_0::imtbase::CSetObjectDataPayload();
 	}
 
 	istd::IChangeableUniquePtr objectPtr = CreateObject(typeId);
 	if (!objectPtr.IsValid()){
-		errorMessage = QString("Unable to set object data to collection '%1'. Error: Object of type '%2' could not be created").arg(QString::fromUtf8(*m_collectionIdAttrPtr), QString::fromUtf8(typeId));
+		errorMessage = QStringLiteral("Unable to set object data to collection '%1'. Error: Object of type '%2' could not be created").arg(QString::fromUtf8(*m_collectionIdAttrPtr), QString::fromUtf8(typeId));
 		return sdl::V1_0::imtbase::CSetObjectDataPayload();
 	}
 
 	if (!DeSerializeObject(*objectPtr.GetPtr(), objectData)){
-		errorMessage = QString("Unable to set object data to collection '%1'. Error: Object serialization failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+		errorMessage = QStringLiteral("Unable to set object data to collection '%1'. Error: Object serialization failed").arg(*m_collectionIdAttrPtr);
 		return sdl::V1_0::imtbase::CSetObjectDataPayload();
 	}
 
@@ -1307,7 +1307,7 @@ sdl::V1_0::imtbase::CGetObjectDataPayload CObjectCollectionControllerCompBase::O
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QString("Unable to get object data '%1'. Error: Object does not exists").arg(QString::fromUtf8(objectId));
+		errorMessage = QStringLiteral("Unable to get object data '%1'. Error: Object does not exists").arg(objectId);
 		return sdl::V1_0::imtbase::CGetObjectDataPayload();
 	}
 
@@ -1316,7 +1316,7 @@ sdl::V1_0::imtbase::CGetObjectDataPayload CObjectCollectionControllerCompBase::O
 
 	QByteArray objectData;
 	if (!SerializeObject(*objectToSerializePtr, objectData)){
-		errorMessage = QString("Unable to get object data '%1'. Error: Object serializaion failed").arg(QString::fromUtf8(objectId));
+		errorMessage = QStringLiteral("Unable to get object data '%1'. Error: Object serializaion failed").arg(objectId);
 		return sdl::V1_0::imtbase::CGetObjectDataPayload();
 	}
 
@@ -1347,7 +1347,7 @@ sdl::V1_0::imtbase::CGetDataMetaInfoPayload CObjectCollectionControllerCompBase:
 	QByteArray metaInfoData;
 	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
 	if (!SerializeObject(*metaInfo.GetPtr(), metaInfoData)){
-		errorMessage = QString("Unable to get data meta info for object '%1'. Error: Meta Info serializaion failed").arg(QString::fromUtf8(objectId));
+		errorMessage = QStringLiteral("Unable to get data meta info for object '%1'. Error: Meta Info serializaion failed").arg(objectId);
 		return sdl::V1_0::imtbase::CGetDataMetaInfoPayload();
 	}
 
@@ -1416,7 +1416,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CObjectCollectionControllerCompBa
 
 	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
 	if (!metaInfo.IsValid()){
-		errorMessage = QString("Unable to get element meta info for object '%1'. Error: Meta Info is invalid").arg(QString::fromUtf8(objectId));
+		errorMessage = QStringLiteral("Unable to get element meta info for object '%1'. Error: Meta Info is invalid").arg(objectId);
 		return sdl::V1_0::imtbase::CGetElementMetaInfoPayload();
 	}
 
@@ -1473,7 +1473,7 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompB
 	if (arguments.input->selectionParams && filterParams.CopyFrom(m_selectionParams)){
 		sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
 		if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
-			errorMessage = QStringLiteral("Unable to create sub collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+			errorMessage = QStringLiteral("Unable to create sub collection '%1'. Error: Selection Params parsing failed").arg(*m_collectionIdAttrPtr);
 
 			return {};
 		}
@@ -1485,7 +1485,7 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompB
 
 	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> objectCollectionIterator = m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams);
 	if(!objectCollectionIterator.IsValid()){
-		errorMessage = QStringLiteral("Unable to create sub-collection '%1'. Error: failed to create an iterator on collection.").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+		errorMessage = QStringLiteral("Unable to create sub-collection '%1'. Error: failed to create an iterator on collection.").arg(*m_collectionIdAttrPtr);
 
 		return {};
 	}
@@ -1754,7 +1754,7 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectFromRequest(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to get data object. Error: Attribute 'm_objectCollectionCompPtr' was not set").toUtf8();
+		errorMessage = QStringLiteral("Unable to get data object. Error: Attribute 'm_objectCollectionCompPtr' was not set").toUtf8();
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -1762,7 +1762,7 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectFromRequest(
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QString("Unable to get data object. Error: GraphQL input params is invalid.").toUtf8();
+		errorMessage = QStringLiteral("Unable to get data object. Error: GraphQL input params is invalid.").toUtf8();
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -1773,7 +1773,7 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectFromRequest(
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QString("Unable to get document. Error: Document does not exists");
+		errorMessage = QStringLiteral("Unable to get document. Error: Document does not exists");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -1784,7 +1784,7 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectFromRequest(
 
 	if (!CreateRepresentationFromObject(*dataPtr, objectTypeId, gqlRequest, dataObj, errorMessage)){
 		if (errorMessage.isEmpty()){
-			errorMessage = QString("Unable create object representation for the object with ID: '%1'.").arg(qPrintable(objectId));
+			errorMessage = QStringLiteral("Unable create object representation for the object with ID: '%1'.").arg(objectId);
 		}
 
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
@@ -1810,7 +1810,7 @@ QJsonObject CObjectCollectionControllerCompBase::InsertObject(
 
 	const imtgql::CGqlParamObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
-		errorMessage = QString("Unable to insert an object. GraphQL input params is invalid.");
+		errorMessage = QStringLiteral("Unable to insert an object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -1844,7 +1844,7 @@ QJsonObject CObjectCollectionControllerCompBase::InsertObject(
 
 	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
 	if (elementIds.contains(objectId)){
-		errorMessage = QString("Object with ID: '%1' already exists").arg(qPrintable(objectId));
+		errorMessage = QStringLiteral("Object with ID: '%1' already exists").arg(objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -1857,7 +1857,7 @@ QJsonObject CObjectCollectionControllerCompBase::InsertObject(
 
 	QByteArray newObjectId = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, newObjectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
 	if (newObjectId.isEmpty()){
-		errorMessage = QString("Error when creating a new object. Object-ID: '%1'.").arg(qPrintable(objectId));
+		errorMessage = QStringLiteral("Error when creating a new object. Object-ID: '%1'.").arg(objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -1872,7 +1872,7 @@ QJsonObject CObjectCollectionControllerCompBase::InsertObject(
 	QJsonObject dataObj;
 
 	if (!response.WriteToJsonObject(dataObj)){
-		errorMessage = QString("Unable to insert object '%1'. Error: Unable to write notification data to the model").arg(qPrintable(newObjectId));
+		errorMessage = QStringLiteral("Unable to insert object '%1'. Error: Unable to write notification data to the model").arg(newObjectId);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		return QJsonObject();
 	}
@@ -1887,7 +1887,7 @@ QJsonObject CObjectCollectionControllerCompBase::UpdateObject(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to update an object. Internal error.");
+		errorMessage = QStringLiteral("Unable to update an object. Internal error.");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -1895,7 +1895,7 @@ QJsonObject CObjectCollectionControllerCompBase::UpdateObject(
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QString("Unable to update an object. GraphQL input params is invalid.");
+		errorMessage = QStringLiteral("Unable to update an object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -1913,7 +1913,7 @@ QJsonObject CObjectCollectionControllerCompBase::UpdateObject(
 
 	imtbase::IObjectCollection::DataPtr savedObjectPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, savedObjectPtr)){
-		errorMessage = QString("Unable to find object with id '%1'").arg(qPrintable(objectId));
+		errorMessage = QStringLiteral("Unable to find object with id '%1'").arg(objectId);
 
 		return QJsonObject();
 	}
@@ -1922,7 +1922,7 @@ QJsonObject CObjectCollectionControllerCompBase::UpdateObject(
 
 	if (!UpdateObjectFromRequest(gqlRequest, *savedObjectPtr, errorMessage)){
 		if (errorMessage.isEmpty()){
-			errorMessage = QString("Can't update object in the collection: '%1'").arg(qPrintable(objectId));
+			errorMessage = QStringLiteral("Can't update object in the collection: '%1'").arg(objectId);
 		}
 
 		return QJsonObject();
@@ -1934,7 +1934,7 @@ QJsonObject CObjectCollectionControllerCompBase::UpdateObject(
 	}
 
 	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObjectPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
-		errorMessage = QString("Can not update object: '%1'").arg(qPrintable(objectId));
+		errorMessage = QStringLiteral("Can not update object: '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -1966,7 +1966,7 @@ QJsonObject CObjectCollectionControllerCompBase::UpdateObject(
 	QJsonObject dataObj;
 
 	if (!response.WriteToJsonObject(dataObj)){
-		errorMessage = QString("Unable to update object '%1'. Error: Unable to write notification data to the model").arg(qPrintable(objectId));
+		errorMessage = QStringLiteral("Unable to update object '%1'. Error: Unable to write notification data to the model").arg(objectId);
 		return QJsonObject();
 	}
 
@@ -1980,7 +1980,7 @@ QJsonObject CObjectCollectionControllerCompBase::RenameObject(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to rename object. Component reference 'ObjectCollection' was not set");
+		errorMessage = QStringLiteral("Unable to rename object. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
 		return QJsonObject();
@@ -1988,7 +1988,7 @@ QJsonObject CObjectCollectionControllerCompBase::RenameObject(
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QString("Unable to rename object. GraphQL input params is invalid.");
+		errorMessage = QStringLiteral("Unable to rename object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -2000,7 +2000,7 @@ QJsonObject CObjectCollectionControllerCompBase::RenameObject(
 	const QString oldName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
 	if (!m_objectCollectionCompPtr->SetElementName(objectId, newName)){
-		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(newName, qPrintable(objectId));
+		errorMessage = QStringLiteral("Unable to set name '%1' for element with ID: '%2'").arg(newName, objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -2024,7 +2024,7 @@ QJsonObject CObjectCollectionControllerCompBase::SetObjectDescription(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to set the object description. Component reference 'ObjectCollection' was not set");
+		errorMessage = QStringLiteral("Unable to set the object description. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
 		return QJsonObject();
@@ -2032,7 +2032,7 @@ QJsonObject CObjectCollectionControllerCompBase::SetObjectDescription(
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QString("Unable to set description for object. GraphQL input params is invalid.");
+		errorMessage = QStringLiteral("Unable to set description for object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -2044,7 +2044,7 @@ QJsonObject CObjectCollectionControllerCompBase::SetObjectDescription(
 	const QString oldDescription = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
 	if (!m_objectCollectionCompPtr->SetElementDescription(objectId, description)){
-		errorMessage = QString("Unable to set description '%1' for element with ID: '%2'").arg(description, qPrintable(objectId));
+		errorMessage = QStringLiteral("Unable to set description '%1' for element with ID: '%2'").arg(description, objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -2070,7 +2070,7 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectListFromRequest(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to list objects. Component reference 'ObjectCollection' was not set");
+		errorMessage = QStringLiteral("Unable to list objects. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
 		return QJsonObject();
@@ -2112,7 +2112,7 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectListFromRequest(
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
 		m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
 	if (objectCollectionIterator == nullptr){
-		errorMessage = QString("Object collection iterator creation failed");
+		errorMessage = QStringLiteral("Object collection iterator creation failed");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -2156,7 +2156,7 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectListFromRequest(
 QJsonObject CObjectCollectionControllerCompBase::GetElementsCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to get the element count. Component reference 'ObjectCollection' was not set");
+		errorMessage = QStringLiteral("Unable to get the element count. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
 		return QJsonObject();
@@ -2164,7 +2164,7 @@ QJsonObject CObjectCollectionControllerCompBase::GetElementsCount(const imtgql::
 
 	const imtgql::CGqlParamObject* inputParamsPtr = gqlRequest.GetParamObject("input");
 	if (inputParamsPtr == nullptr){
-		errorMessage = QString("Unable to rename object. GraphQL input params is invalid.");
+		errorMessage = QStringLiteral("Unable to rename object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
@@ -2198,7 +2198,7 @@ QJsonObject CObjectCollectionControllerCompBase::DeleteObject(
 	QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to remove the object from the collection. Component reference 'ObjectCollection' was not set");
+		errorMessage = QStringLiteral("Unable to remove the object from the collection. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
 		return QJsonObject();
@@ -2212,7 +2212,7 @@ QJsonObject CObjectCollectionControllerCompBase::DeleteObject(
 	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
 	for (const QByteArray& objectId : objectIds){
 		if (!elementIds.contains(objectId)){
-			errorMessage = QString("Unable to delete object. Object with ID '%1' does not exists").arg(QString(objectId));
+			errorMessage = QStringLiteral("Unable to delete object. Object with ID '%1' does not exists").arg(objectId);
 			SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 			return QJsonObject();
 		}
@@ -2224,7 +2224,7 @@ QJsonObject CObjectCollectionControllerCompBase::DeleteObject(
 	}
 
 	if (!m_objectCollectionCompPtr->RemoveElements(objectIds, operationContextPtr.GetPtr())){
-		errorMessage = QString("Can't remove object with ID: '%1'").arg(QString(objectIds.toList().join(';')));
+		errorMessage = QStringLiteral("Can't remove object with ID: '%1'").arg(objectIds.toList().join(';'));
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -2238,7 +2238,7 @@ QJsonObject CObjectCollectionControllerCompBase::DeleteObject(
 	QJsonObject dataObj;
 
 	if (!response.WriteToJsonObject(dataObj)){
-		errorMessage = QString("Unable to delete object '%1'. Error: Unable to write notification data to the model").arg(qPrintable(objectIds.toList().join(';')));
+		errorMessage = QStringLiteral("Unable to delete object '%1'. Error: Unable to write notification data to the model").arg(objectIds.toList().join(';'));
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		return QJsonObject();
 	}
@@ -2337,7 +2337,7 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 
 	istd::IChangeableUniquePtr objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
 	if (!objectPersistenceInstancePtr.IsValid()){
-		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
+		errorMessage = QStringLiteral("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -2345,7 +2345,7 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 
 	imtbase::CMimeType mime;
 	if (!mime.FromString(mimeType)){
-		errorMessage = QString("Unable to parse mime type");
+		errorMessage = QStringLiteral("Unable to parse mime type");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -2358,7 +2358,7 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
-		SendErrorMessage(0, QString("Unable to open file with name '%1'").arg(filePathTmp), "CObjectCollectionControllerCompBase");
+		SendErrorMessage(0, QStringLiteral("Unable to open file with name '%1'").arg(filePathTmp), "CObjectCollectionControllerCompBase");
 		return QJsonObject();
 	}
 
@@ -2366,7 +2366,7 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 	file.close();
 
 	if (m_filePersistenceCompPtr[index]->LoadFromFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
-		errorMessage = QString("Unable to import object to the collection");
+		errorMessage = QStringLiteral("Unable to import object to the collection");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
@@ -2380,7 +2380,7 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 	}
 
 	if (m_objectCollectionCompPtr->GetElementIds().contains(objectUuid)){
-		errorMessage = QString("Unable to import object with ID: '%1' to the collection. Error: The object already exists inside the collection").arg(qPrintable(objectUuid));
+		errorMessage = QStringLiteral("Unable to import object with ID: '%1' to the collection. Error: The object already exists inside the collection").arg(objectUuid);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
@@ -2392,7 +2392,7 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 
 	istd::IChangeableUniquePtr collectionObjectInstancePtr = m_objectFactCompPtr.CreateInstance(typeIdIndex);
 	if (!collectionObjectInstancePtr.IsValid()){
-		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
+		errorMessage = QStringLiteral("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -2400,7 +2400,7 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 
 	if (!ConvertObject(*objectPersistenceInstancePtr.GetPtr(), *collectionObjectInstancePtr.GetPtr(), errorMessage)){
 		if (errorMessage.isEmpty()){
-			errorMessage = QString("Unable to import object to the collection. Error: Object conversion failed");
+			errorMessage = QStringLiteral("Unable to import object to the collection. Error: Object conversion failed");
 		}
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
@@ -2409,7 +2409,7 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 
 	QByteArray retVal = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, collectionObjectInstancePtr.GetPtr(), objectUuid);
 	if (retVal.isEmpty()){
-		errorMessage = QString("Unable to import object with ID: '%1' to the collection. Error: The object could not be inserted into the collection").arg(qPrintable(objectUuid));
+		errorMessage = QStringLiteral("Unable to import object with ID: '%1' to the collection. Error: The object could not be inserted into the collection").arg(objectUuid);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
@@ -2444,7 +2444,7 @@ QJsonObject CObjectCollectionControllerCompBase::ExportObject(const imtgql::CGql
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Object does not exists").arg(qPrintable(objectId));
+		errorMessage = QStringLiteral("Unable to export the object with ID: '%1'. Error: Object does not exists").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -2472,7 +2472,7 @@ QJsonObject CObjectCollectionControllerCompBase::ExportObject(const imtgql::CGql
 
 	imtbase::CMimeType mime;
 	if (!mime.FromString(mimeType)){
-		errorMessage = QString("Unable to parse mime type");
+		errorMessage = QStringLiteral("Unable to parse mime type");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -2487,7 +2487,7 @@ QJsonObject CObjectCollectionControllerCompBase::ExportObject(const imtgql::CGql
 
 	istd::IChangeableUniquePtr objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
 	if (!objectPersistenceInstancePtr.IsValid()){
-		errorMessage = QString("Unable to import object to the collection. Error: Object persistence instance is invalid");
+		errorMessage = QStringLiteral("Unable to import object to the collection. Error: Object persistence instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -2495,7 +2495,7 @@ QJsonObject CObjectCollectionControllerCompBase::ExportObject(const imtgql::CGql
 
 	if (!ConvertObject(*dataPtr.GetPtr(), *objectPersistenceInstancePtr.GetPtr(), errorMessage)){
 		if (errorMessage.isEmpty()){
-			errorMessage = QString("Unable to export the object with ID: '%1'. Error: Object conversion failed").arg(qPrintable(objectId));
+			errorMessage = QStringLiteral("Unable to export the object with ID: '%1'. Error: Object conversion failed").arg(objectId);
 		}
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
@@ -2503,7 +2503,7 @@ QJsonObject CObjectCollectionControllerCompBase::ExportObject(const imtgql::CGql
 	}
 
 	if (m_filePersistenceCompPtr[index]->SaveToFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
-		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Saving data to the file '%1' failed").arg(qPrintable(objectId), filePathTmp);
+		errorMessage = QStringLiteral("Unable to export the object with ID: '%1'. Error: Saving data to the file '%1' failed").arg(objectId, filePathTmp);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return QJsonObject();
@@ -2511,7 +2511,7 @@ QJsonObject CObjectCollectionControllerCompBase::ExportObject(const imtgql::CGql
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::ReadOnly)){
-		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Unable to open file with name '%1'").arg(qPrintable(objectId), filePathTmp);
+		errorMessage = QStringLiteral("Unable to export the object with ID: '%1'. Error: Unable to open file with name '%1'").arg(objectId, filePathTmp);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
@@ -2614,14 +2614,14 @@ imtbase::ICollectionInfo::Ids CObjectCollectionControllerCompBase::ExtractObject
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QString("Failed to delete objects: 'input' parameter is missing or invalid.");
+		errorMessage = QStringLiteral("Failed to delete objects: 'input' parameter is missing or invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 		return retVal;
 	}
 
 	sdl::V1_0::imtbase::CRemoveElementsInput removeElementsInput;
 	if (!removeElementsInput.ReadFromGraphQlObject(*inputParamPtr)){
-		errorMessage = QString("Failed to delete objects: unable to parse 'input' parameters.");
+		errorMessage = QStringLiteral("Failed to delete objects: unable to parse 'input' parameters.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 		return retVal;
 	}
@@ -2630,7 +2630,7 @@ imtbase::ICollectionInfo::Ids CObjectCollectionControllerCompBase::ExtractObject
 		retVal = removeElementsInput.elementIds->ToList();
 	}
 	else{
-		errorMessage = QString("Failed to delete objects: 'elementIds' list is empty.");
+		errorMessage = QStringLiteral("Failed to delete objects: 'elementIds' list is empty.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 	}
 
@@ -2673,23 +2673,23 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 	for (const QByteArray& informationId : informationIds){
 		QVariant elementInformation;
 
-		if(informationId == QByteArray("id")){
+		if(informationId == QByteArrayLiteral("id")){
 			elementInformation = QString(collectionId);
 		}
-		else if(informationId == QByteArray("name")){
+		else if(informationId == QByteArrayLiteral("name")){
 			elementInformation = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_NAME);
 		}
-		else if(informationId == QByteArray("description")){
+		else if(informationId == QByteArrayLiteral("description")){
 			elementInformation = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION);
 		}
 		else{
 			idoc::MetaInfoPtr elementMetaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(collectionId);
 			if (elementMetaInfo.IsValid()){
-				if (informationId == QByteArray("added")){
+				if (informationId == QByteArrayLiteral("added")){
 					elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
 					.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
-				else if (informationId == QByteArray("lastModified")){
+				else if (informationId == QByteArrayLiteral("lastModified")){
 					elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
 					.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
@@ -2735,22 +2735,22 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 	for (const QByteArray& informationId : informationIds){
 		QVariant elementInformation;
 
-		if(informationId == QByteArray("id")){
+		if(informationId == QByteArrayLiteral("id")){
 			elementInformation = QString(collectionId);
 		}
-		else if(informationId == QByteArray("name")){
+		else if(informationId == QByteArrayLiteral("name")){
 			elementInformation = objectCollectionIterator->GetElementInfo("Name");
 		}
-		else if(informationId == QByteArray("description")){
+		else if(informationId == QByteArrayLiteral("description")){
 			elementInformation = objectCollectionIterator->GetElementInfo("Description");
 		}
 		else{
 			if (elementMetaInfo.IsValid()){
-				if (informationId == QByteArray("added")){
+				if (informationId == QByteArrayLiteral("added")){
 					elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
 					.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
-				else if (informationId == QByteArray("lastModified")){
+				else if (informationId == QByteArrayLiteral("lastModified")){
 					elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
 					.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
@@ -2876,7 +2876,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 			}
 		}
 		if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
-			SendErrorMessage(0, QString("Unable to read filter params set for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr)));
+			SendErrorMessage(0, QStringLiteral("Unable to read filter params set for collection '%1'. Error: Selection Params parsing failed").arg(*m_collectionIdAttrPtr));
 		}
 	}
 
@@ -2892,11 +2892,11 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 				filterParams.SetEditableParameter("ComplexFilter", complexFilterPtr.PopPtr(), true);
 			}
 			else{
-				SendErrorMessage(0, QString("Unable to create collection filter from SDL representation"));
+				SendErrorMessage(0, QStringLiteral("Unable to create collection filter from SDL representation"));
 			}
 		}
 		else{
-			SendErrorMessage(0, QString("Unable to read SDL filter model from GraphQL object"));
+			SendErrorMessage(0, QStringLiteral("Unable to read SDL filter model from GraphQL object"));
 		}
 	}
 
@@ -3051,7 +3051,7 @@ bool CObjectCollectionControllerCompBase::DoUpdateObjectFromRequest(
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
-		errorMessage = QString("Unable to update an object. GraphQL input params is invalid.");
+		errorMessage = QStringLiteral("Unable to update an object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return false;
@@ -3061,7 +3061,7 @@ bool CObjectCollectionControllerCompBase::DoUpdateObjectFromRequest(
 	istd::IChangeableUniquePtr savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, createErrorMessage);
 	if (!savedObjectPtr.IsValid()){
 		if (errorMessage.isEmpty()){
-			errorMessage = QString("Can not create object for update: '%1'").arg(qPrintable(objectId));
+			errorMessage = QStringLiteral("Can not create object for update: '%1'").arg(objectId);
 		}
 
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -3197,7 +3197,7 @@ bool CObjectCollectionControllerCompBase::CreateElementAttributeHistoryEntry(
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr) || !dataPtr.IsValid()){
 		SendWarningMessage(
 			0,
-			QString("Unable to write history entry for object '%1'. Error: Object data is not available").arg(QString::fromUtf8(objectId)),
+			QStringLiteral("Unable to write history entry for object '%1'. Error: Object data is not available").arg(objectId),
 			"CObjectCollectionControllerCompBase");
 
 		return false;
@@ -3231,7 +3231,7 @@ bool CObjectCollectionControllerCompBase::CreateElementAttributeHistoryEntry(
 	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *dataPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
 		SendWarningMessage(
 			0,
-			QString("Unable to write history entry for object '%1'. Error: Storing the document revision failed").arg(QString::fromUtf8(objectId)),
+			QStringLiteral("Unable to write history entry for object '%1'. Error: Storing the document revision failed").arg(objectId),
 			"CObjectCollectionControllerCompBase");
 
 		return false;

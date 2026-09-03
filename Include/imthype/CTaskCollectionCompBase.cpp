@@ -800,7 +800,7 @@ bool CTaskCollectionCompBase::Serialize(iser::IArchive& archive)
 					}
 				}
 				else{
-					SendErrorMessage(0, QString("Task (type-ID: '%1') could not be created").arg(task.typeId.constData()));
+					SendErrorMessage(0, QStringLiteral("Task (type-ID: '%1') could not be created").arg(task.typeId.constData()));
 				}
 			}
 		}

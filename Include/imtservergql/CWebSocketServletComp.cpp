@@ -65,7 +65,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 			return imtrest::ConstResponsePtr();
 
 		default:{
-			QByteArray errorMessage = QString("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
+			QByteArray errorMessage = QStringLiteral("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
 			return CreateErrorResponse(errorMessage, request);
 		}
 		break;
@@ -99,7 +99,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::InitConnection(const imtrest::I
 {
 	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 	if (webSocketRequest != nullptr){
-		QByteArray data = QString(R"({"type": "connection_ack","payload": {"connectionTimeoutMs": 300000}})").toUtf8();
+		QByteArray data = QStringLiteral(R"({"type": "connection_ack","payload": {"connectionTimeoutMs": 300000}})").toUtf8();
 
 		return CreateDataResponse(data, request);
 	}
@@ -116,7 +116,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::KeepAliveAcknowledge(const imtr
 		return imtrest::ConstResponsePtr();
 	}
 
-	QByteArray data = QString(R"({"type": "pong"})").toUtf8();
+	QByteArray data = QStringLiteral(R"({"type": "pong"})").toUtf8();
 
 	return CreateDataResponse(data, request);
 }
@@ -146,7 +146,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	QByteArray body = request.GetBody();
 	const QJsonDocument document = QJsonDocument::fromJson(body);
 	if (document.isNull() || !document.isObject()) {
-		QString errorMessage = QString("Error when parsing JSON request for command Id: '%1'").arg(request.GetCommandId());
+		QString errorMessage = QStringLiteral("Error when parsing JSON request for command Id: '%1'").arg(request.GetCommandId());
 		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
 
@@ -170,8 +170,8 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	imtgql::CGqlRequest gqlRequest;
 	qsizetype errorPosition;
 	if (!gqlRequest.ParseQuery(body, errorPosition)){
-		QString errorMessage = QString("Error when parsing request: '%1'; Error position: '%2'")
-								.arg(qPrintable(body)).arg(errorPosition);
+		QString errorMessage = QStringLiteral("Error when parsing request: '%1'; Error position: '%2'")
+								.arg(body, errorPosition);
 		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
 
@@ -266,8 +266,8 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 					: errorMessage.toUtf8(), request);
 	}
 	else{
-		QByteArray errorMessage = QString("The requested command could not be executed. No servlet was found for the given command: '%1")
-		.arg(QString(commandId)).toUtf8();
+		QByteArray errorMessage = QStringLiteral("The requested command could not be executed. No servlet was found for the given command: '%1")
+		.arg(commandId).toUtf8();
 		return CreateErrorResponse(errorMessage, request);
 	}
 
@@ -289,13 +289,13 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 		if (controllerPtr != nullptr){
 			QByteArray subscriptionId = webSocketRequest->GetRequestId();
 			if (controllerPtr->UnregisterSubscription(subscriptionId)){
-				QByteArray data = QString(R"({"type": "complete","id": "%1"})").arg(QString(subscriptionId)).toUtf8();
+				QByteArray data = QStringLiteral(R"({"type": "complete","id": "%1"})").arg(subscriptionId).toUtf8();
 				return CreateDataResponse(data, request);
 			}
 		}
 	}
 
-	QByteArray errorMessage = QByteArray("Unable to unregister subscription'. Error: Subscription is unregistered");
+	QByteArray errorMessage = QByteArrayLiteral("Unable to unregister subscription'. Error: Subscription is unregistered");
 	return CreateErrorResponse(errorMessage, request);
 }
 
@@ -304,7 +304,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateDataResponse(const QByteA
 {
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
-	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
+	QByteArray reponseTypeId = QByteArrayLiteral("text/html; charset=utf-8");
 	QByteArray commandId = request.GetCommandId();
 
 	imtrest::ConstResponsePtr responsePtr(

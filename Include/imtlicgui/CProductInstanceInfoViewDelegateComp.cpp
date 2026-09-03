@@ -44,19 +44,19 @@ bool CProductInstanceInfoViewDelegateComp::GetSummaryInformation(
 		SummaryInformation summaryInformation;
 		summaryInformation.infoId = informationId;
 		
-		if (informationId == QByteArray("InstanceId")){
+		if (informationId == QByteArrayLiteral("InstanceId")){
 			Q_ASSERT(metaInfoPtr.IsValid());
 
 			imtgui::ICollectionViewDelegate::SummaryInformation retVal;
 
-			retVal.text = qPrintable(metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_PRODUCT_INSTANCE_ID).toByteArray());
+			retVal.text = QString(metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_PRODUCT_INSTANCE_ID).toByteArray());
 			retVal.sortValue = retVal.text;
 			objectMetaInfo.append(summaryInformation);
 		}
-		else if (informationId == QByteArray("Customer")){
+		else if (informationId == QByteArrayLiteral("Customer")){
 			imtgui::ICollectionViewDelegate::SummaryInformation retVal;
 
-			retVal.text = qPrintable(metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_CUSTOMER_NAME).toString());
+			retVal.text = metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_CUSTOMER_NAME).toString();
 			retVal.sortValue = retVal.text;
 			retVal.infoId = informationId;
 			objectMetaInfo.append(summaryInformation);
@@ -177,5 +177,4 @@ void CProductInstanceInfoViewDelegateComp::OnExportLicense()
 
 
 } // namespace imtlicgui
-
 

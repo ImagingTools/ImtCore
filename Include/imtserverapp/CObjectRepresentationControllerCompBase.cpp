@@ -46,7 +46,7 @@ QByteArray CObjectRepresentationControllerCompBase::GetModelId() const
 bool CObjectRepresentationControllerCompBase::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, QJsonObject& representation, const iprm::IParamsSet* paramsPtr) const
 {
 	if (!IsModelSupported(dataModel)){
-		SendErrorMessage(0, QString("Unable to get representation model from data model. Model is not supported."));
+		SendErrorMessage(0, QStringLiteral("Unable to get representation model from data model. Model is not supported."));
 
 		return false;
 	}
@@ -78,7 +78,7 @@ bool CObjectRepresentationControllerCompBase::GetRepresentationFromDataModel(con
 	}
 
 	if (m_translationManagerCompPtr.IsValid()){
-		QString elementNameTr = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), paramName.toUtf8(), languageId, QByteArray("Attribute"));
+		QString elementNameTr = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), paramName.toUtf8(), languageId, QByteArrayLiteral("Attribute"));
 
 		paramName = elementNameTr;
 	}

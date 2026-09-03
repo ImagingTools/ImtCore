@@ -136,7 +136,7 @@ void CProductInfoFileGeneratorComp::WriteFunction(QTextStream& textStream, imtli
 
 	WriteNewLine(textStream, 1);
 	WriteTab(textStream, 1);
-	textStream << QStringLiteral("productInfo.SetProductId(\"%1\");").arg(QString::fromUtf8(productId));
+	textStream << QStringLiteral("productInfo.SetProductId(\"%1\");").arg(productId);
 	WriteNewLine(textStream, 1);
 
 	if (!productName.isEmpty()){
@@ -152,7 +152,7 @@ void CProductInfoFileGeneratorComp::WriteFunction(QTextStream& textStream, imtli
 	}
 
 	WriteTab(textStream, 1);
-	textStream << QStringLiteral("productInfo.SetCategoryId(\"%1\");").arg(QString::fromUtf8(categoryId));
+	textStream << QStringLiteral("productInfo.SetCategoryId(\"%1\");").arg(categoryId);
 	WriteNewLine(textStream, 2);
 
 	imtbase::IObjectCollection* featureCollectionPtr = productInfo.GetFeatures();

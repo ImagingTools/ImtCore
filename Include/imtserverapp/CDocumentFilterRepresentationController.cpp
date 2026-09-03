@@ -21,7 +21,7 @@ CDocumentFilterRepresentationController::CDocumentFilterRepresentationController
 }
 
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<Filter::CDocumentCollectionFilter>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<Filter::CDocumentCollectionFilter>)
 
 QByteArray CDocumentFilterRepresentationController::GetTypeId() const
 {

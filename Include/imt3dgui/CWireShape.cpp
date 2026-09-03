@@ -86,8 +86,8 @@ void CWireShape::FillMaterial(imt3dview::Material& material) const
 void CWireShape::DrawOverlay(QPainter& painter)
 {
 	if (m_isInfoBoxEnabled && m_pointsDataPtr != nullptr){
-		QString text = QString("<b><p>Total vertices: %1</p>").arg(m_pointsDataPtr->GetPointsCount());
-		text += QString("<p>Total faces: %1</p>").arg(m_indices.size() / 3);
+		QString text = QStringLiteral("<b><p>Total vertices: %1</p>").arg(m_pointsDataPtr->GetPointsCount());
+		text += QStringLiteral("<p>Total faces: %1</p>").arg(m_indices.size() / 3);
 
 		painter.save();
 

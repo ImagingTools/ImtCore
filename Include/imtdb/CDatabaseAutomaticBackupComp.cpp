@@ -88,7 +88,7 @@ bool CDatabaseAutomaticBackupComp::Backup()
 	QDir folder(backupFolderPath);
 
 	if (!folder.exists() && !folder.mkpath(backupFolderPath)){
-		SendErrorMessage(0, QString("Failed to create backup folder: '%1'").arg(backupFolderPath), QStringLiteral("CDatabaseAutomaticBackupComp"));
+		SendErrorMessage(0, QStringLiteral("Failed to create backup folder: '%1'").arg(backupFolderPath), QStringLiteral("CDatabaseAutomaticBackupComp"));
 
 		return false;
 	}
@@ -98,7 +98,7 @@ bool CDatabaseAutomaticBackupComp::Backup()
 	const QString filePath = folder.filePath(fileName);
 
 	// Use pg_dump with compression to reduce backup size
-	QString pgDumpCommand = QStringLiteral("pg_dump -h %1 -U %2 -p %3 -Fc -f \"%4\" \"%5\"")
+	QString pgDumpCommand = QStringLiteral(R"(pg_dump -h %1 -U %2 -p %3 -Fc -f "%4" "%5")")
 								.arg(host, userName, QString::number(port), filePath, dbName);
 
 	QProcess process;
@@ -118,7 +118,7 @@ bool CDatabaseAutomaticBackupComp::Backup()
 	}
 
 	if (process.exitCode() != 0){
-		SendErrorMessage(0, QStringLiteral("Backup failed: '%1'").arg(QString::fromUtf8(process.readAllStandardError())), QStringLiteral("CDatabaseAutomaticBackupComp"));
+		SendErrorMessage(0, QStringLiteral("Backup failed: '%1'").arg(process.readAllStandardError()), QStringLiteral("CDatabaseAutomaticBackupComp"));
 
 		return false;
 	}

@@ -26,7 +26,7 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 {
 	imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<imtauth::CIdentifiableRoleInfo*>(&object);
 	if (roleInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		errorMessage = QStringLiteral("Unable to create representation from object. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CRoleCollectionControllerComp");
 
 		return false;
@@ -38,7 +38,7 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	if (roleId.isEmpty()){
-		errorMessage = QString("Role-ID can't be empty!");
+		errorMessage = QStringLiteral("Role-ID can't be empty!");
 		return false;
 	}
 
@@ -60,7 +60,7 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 					QByteArray currentProductId = currentRoleInfoPtr->GetProductId();
 
 					if (currentRoleId == roleId && currentProductId == productId){
-						errorMessage = QString("Role with ID: '%1' already exists").arg(qPrintable(currentRoleId));
+						errorMessage = QStringLiteral("Role with ID: '%1' already exists").arg(currentRoleId);
 						return false;
 					}
 				}
@@ -91,8 +91,8 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 
 		for (const QByteArray& parentRoleId : parentRoles){
 			if (parentRoleId == objectId || !roleInfoPtr->IncludeRole(parentRoleId)){
-				errorMessage = QT_TR_NOOP(QString("Unable include role '%1' to the role '%2'. Check the dependencies between them.")
-											.arg(qPrintable(parentRoleId), qPrintable(roleId)));
+				errorMessage = QT_TR_NOOP(QStringLiteral("Unable include role '%1' to the role '%2'. Check the dependencies between them.")
+											.arg(parentRoleId, roleId));
 
 				return false;
 			}
@@ -120,7 +120,7 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 				const imtgql::IGqlContext* gqlContextPtr = gqlRequestPtr->GetRequestContext();
 				if (gqlContextPtr != nullptr){
 					if (!gqlContextPtr->GetUserInfo()->IsAdmin()){
-						errorMessage = QString("Only the admin can change the default/guest role");
+						errorMessage = QStringLiteral("Only the admin can change the default/guest role");
 						return false;
 					}
 				}
@@ -266,7 +266,7 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (roleInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
+		errorMessage = QStringLiteral("Unable to create representation from object '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CRoleCollectionControllerComp");
 
 		return false;
@@ -326,7 +326,7 @@ istd::IChangeableUniquePtr CRoleCollectionControllerComp::CreateObjectFromRepres
 			QString& errorMessage) const
 {
 	if (!m_roleInfoFactCompPtr.IsValid()){
-		errorMessage = QString("Unable to create object from representation. Error: Attribute 'm_roleInfoFactCompPtr' was not set");
+		errorMessage = QStringLiteral("Unable to create object from representation. Error: Attribute 'm_roleInfoFactCompPtr' was not set");
 		SendErrorMessage(0, errorMessage, "CRoleCollectionControllerComp");
 
 		return nullptr;
@@ -334,7 +334,7 @@ istd::IChangeableUniquePtr CRoleCollectionControllerComp::CreateObjectFromRepres
 
 	imtauth::IRoleUniquePtr roleInstancePtr = m_roleInfoFactCompPtr.CreateInstance();
 	if (!roleInstancePtr.IsValid()){
-		errorMessage = QString("Unable to create role instance. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to create role instance. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CRoleCollectionControllerComp");
 
 		return nullptr;
@@ -342,7 +342,7 @@ istd::IChangeableUniquePtr CRoleCollectionControllerComp::CreateObjectFromRepres
 
 	imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<imtauth::CIdentifiableRoleInfo*>(roleInstancePtr.GetPtr());
 	if (roleInfoPtr == nullptr){
-		errorMessage = QString("Unable to cast role instance to identifable object. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to cast role instance to identifable object. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CRoleCollectionControllerComp");
 
 		return nullptr;
@@ -375,7 +375,7 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 {
 	const imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<const imtauth::CIdentifiableRoleInfo*>(&data);
 	if (roleInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		errorMessage = QStringLiteral("Unable to create representation from object. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CRoleCollectionControllerComp");
 
 		return false;
@@ -513,7 +513,7 @@ bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	sdl::V1_0::imtauth::CRoleData roleDataRepresentation = *roleUpdateRequest.GetRequestedArguments().input->item;
 	imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<imtauth::CIdentifiableRoleInfo*>(&object);
 	if (roleInfoPtr == nullptr){
-		errorMessage = QString("Unable to cast role instance to identifable object. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to cast role instance to identifable object. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CRoleCollectionControllerComp");
 
 		return false;

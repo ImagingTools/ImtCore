@@ -434,7 +434,7 @@ bool CUserCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* eventP
 
 	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(newUserId, tenantId);
 	if (membershipId.isEmpty()){
-		SendWarningMessage(0, QString("Auto-membership creation failed for user '%1' in tenant '%2'").arg(QString::fromUtf8(newUserId), QString::fromUtf8(tenantId)), "CUserCollectionDocumentServiceComp");
+		SendWarningMessage(0, QStringLiteral("Auto-membership creation failed for user '%1' in tenant '%2'").arg(QString::fromUtf8(newUserId), QString::fromUtf8(tenantId)), "CUserCollectionDocumentServiceComp");
 	}
 
 	return true;

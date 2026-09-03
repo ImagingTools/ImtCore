@@ -25,7 +25,7 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 {
 	auto userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&userObject);
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		errorMessage = QStringLiteral("Unable to create representation from object. Error: Object is invalid");
 
 		return false;
 	}
@@ -86,7 +86,7 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 	}
 
 	if (name.isEmpty()){
-		errorMessage = QString("Name cannot be empty");
+		errorMessage = QStringLiteral("Name cannot be empty");
 		return false;
 	}
 

@@ -28,7 +28,7 @@ bool V1_0::modsdl::CDigitalPrinterSpecification::WriteToModel(::imtbase::CTreeIt
 		::imtbase::CTreeItemModel* baseNewModelPtr = model.AddTreeModel("base", modelIndex);
 		const bool isBaseAdded = base->WriteToModel(*baseNewModelPtr, 0);
 		if (!isBaseAdded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -62,7 +62,7 @@ bool V1_0::modsdl::CDigitalPrinterSpecification::ReadFromModel(const ::imtbase::
 		base = V1_0::modsdl::CPrinterSpecificationBase();
 		const bool isBaseRead = base->ReadFromModel(*baseDataModelPtr, modelIndex);
 		if (!isBaseRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -78,7 +78,7 @@ bool V1_0::modsdl::CDigitalPrinterSpecification::ReadFromModel(const ::imtbase::
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
 
 			return false;
 		}
@@ -95,7 +95,7 @@ bool V1_0::modsdl::CDigitalPrinterSpecification::OptReadFromModel(const ::imtbas
 		base = V1_0::modsdl::CPrinterSpecificationBase();
 		const bool isBaseRead = base->ReadFromModel(*baseDataModelPtr, modelIndex);
 		if (!isBaseRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -111,7 +111,7 @@ bool V1_0::modsdl::CDigitalPrinterSpecification::OptReadFromModel(const ::imtbas
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
 
 			return false;
 		}
@@ -127,7 +127,7 @@ bool V1_0::modsdl::CDigitalPrinterSpecification::WriteToGraphQlObject(::imtgql::
 		::imtgql::CGqlParamObject baseGqlObject;
 		const bool isBaseAdded = base->WriteToGraphQlObject(baseGqlObject);
 		if (!isBaseAdded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -162,7 +162,7 @@ bool V1_0::modsdl::CDigitalPrinterSpecification::ReadFromGraphQlObject(const ::i
 		base = V1_0::modsdl::CPrinterSpecificationBase();
 		const bool isBaseRead = base->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -177,7 +177,7 @@ bool V1_0::modsdl::CDigitalPrinterSpecification::ReadFromGraphQlObject(const ::i
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
 
 			return false;
 		}
@@ -193,7 +193,7 @@ bool V1_0::modsdl::CDigitalPrinterSpecification::OptReadFromGraphQlObject(const 
 		base = V1_0::modsdl::CPrinterSpecificationBase();
 		const bool isBaseRead = base->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -208,7 +208,7 @@ bool V1_0::modsdl::CDigitalPrinterSpecification::OptReadFromGraphQlObject(const 
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
 
 			return false;
 		}
@@ -224,7 +224,7 @@ bool V1_0::modsdl::CDigitalPrinterSpecification::WriteToJsonObject(QJsonObject& 
 		QJsonObject baseJsonObject;
 		const bool isBaseAdded = base->WriteToJsonObject(baseJsonObject);
 		if (!isBaseAdded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -259,7 +259,7 @@ bool V1_0::modsdl::CDigitalPrinterSpecification::ReadFromJsonObject(const QJsonO
 		base = V1_0::modsdl::CPrinterSpecificationBase();
 		const bool isBaseRead = base->ReadFromJsonObject(jsonObject["base"].toObject());
 		if (!isBaseRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -274,7 +274,7 @@ bool V1_0::modsdl::CDigitalPrinterSpecification::ReadFromJsonObject(const QJsonO
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
 
 			return false;
 		}
@@ -290,7 +290,7 @@ bool V1_0::modsdl::CDigitalPrinterSpecification::OptReadFromJsonObject(const QJs
 		base = V1_0::modsdl::CPrinterSpecificationBase();
 		const bool isBaseRead = base->OptReadFromJsonObject(jsonObject["base"].toObject());
 		if (!isBaseRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -305,7 +305,7 @@ bool V1_0::modsdl::CDigitalPrinterSpecification::OptReadFromJsonObject(const QJs
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
 
 			return false;
 		}
@@ -340,7 +340,7 @@ bool V1_0::modsdl::CDigitalPrinter::WriteToModel(::imtbase::CTreeItemModel& mode
 		::imtbase::CTreeItemModel* baseNewModelPtr = model.AddTreeModel("base", modelIndex);
 		const bool isBaseAdded = base->WriteToModel(*baseNewModelPtr, 0);
 		if (!isBaseAdded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -374,7 +374,7 @@ bool V1_0::modsdl::CDigitalPrinter::ReadFromModel(const ::imtbase::CTreeItemMode
 		base = V1_0::modsdl::CPrinterBase();
 		const bool isBaseRead = base->ReadFromModel(*baseDataModelPtr, modelIndex);
 		if (!isBaseRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -390,7 +390,7 @@ bool V1_0::modsdl::CDigitalPrinter::ReadFromModel(const ::imtbase::CTreeItemMode
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
 
 			return false;
 		}
@@ -407,7 +407,7 @@ bool V1_0::modsdl::CDigitalPrinter::OptReadFromModel(const ::imtbase::CTreeItemM
 		base = V1_0::modsdl::CPrinterBase();
 		const bool isBaseRead = base->ReadFromModel(*baseDataModelPtr, modelIndex);
 		if (!isBaseRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -423,7 +423,7 @@ bool V1_0::modsdl::CDigitalPrinter::OptReadFromModel(const ::imtbase::CTreeItemM
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
 
 			return false;
 		}
@@ -439,7 +439,7 @@ bool V1_0::modsdl::CDigitalPrinter::WriteToGraphQlObject(::imtgql::CGqlParamObje
 		::imtgql::CGqlParamObject baseGqlObject;
 		const bool isBaseAdded = base->WriteToGraphQlObject(baseGqlObject);
 		if (!isBaseAdded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -474,7 +474,7 @@ bool V1_0::modsdl::CDigitalPrinter::ReadFromGraphQlObject(const ::imtgql::CGqlPa
 		base = V1_0::modsdl::CPrinterBase();
 		const bool isBaseRead = base->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -489,7 +489,7 @@ bool V1_0::modsdl::CDigitalPrinter::ReadFromGraphQlObject(const ::imtgql::CGqlPa
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
 
 			return false;
 		}
@@ -505,7 +505,7 @@ bool V1_0::modsdl::CDigitalPrinter::OptReadFromGraphQlObject(const ::imtgql::CGq
 		base = V1_0::modsdl::CPrinterBase();
 		const bool isBaseRead = base->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -520,7 +520,7 @@ bool V1_0::modsdl::CDigitalPrinter::OptReadFromGraphQlObject(const ::imtgql::CGq
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
 
 			return false;
 		}
@@ -536,7 +536,7 @@ bool V1_0::modsdl::CDigitalPrinter::WriteToJsonObject(QJsonObject& jsonObject) c
 		QJsonObject baseJsonObject;
 		const bool isBaseAdded = base->WriteToJsonObject(baseJsonObject);
 		if (!isBaseAdded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -571,7 +571,7 @@ bool V1_0::modsdl::CDigitalPrinter::ReadFromJsonObject(const QJsonObject& jsonOb
 		base = V1_0::modsdl::CPrinterBase();
 		const bool isBaseRead = base->ReadFromJsonObject(jsonObject["base"].toObject());
 		if (!isBaseRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -586,7 +586,7 @@ bool V1_0::modsdl::CDigitalPrinter::ReadFromJsonObject(const QJsonObject& jsonOb
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
 
 			return false;
 		}
@@ -602,7 +602,7 @@ bool V1_0::modsdl::CDigitalPrinter::OptReadFromJsonObject(const QJsonObject& jso
 		base = V1_0::modsdl::CPrinterBase();
 		const bool isBaseRead = base->OptReadFromJsonObject(jsonObject["base"].toObject());
 		if (!isBaseRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -617,7 +617,7 @@ bool V1_0::modsdl::CDigitalPrinter::OptReadFromJsonObject(const QJsonObject& jso
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
 
 			return false;
 		}
@@ -774,10 +774,10 @@ QVariant CDigitalPrinterSpecificationObject::CreateObject(const QString& key)
 
 QString CDigitalPrinterSpecificationObject::getJSONKeyForProperty(const QString& propertyName) const
 {
-	if (propertyName == (QString("m_") + "base")){
+	if (propertyName == (QStringLiteral("m_") + "base")){
 		return "base";
 	}
-	if (propertyName == (QString("m_") + "printingTechnology")){
+	if (propertyName == (QStringLiteral("m_") + "printingTechnology")){
 		return "printingTechnology";
 	}
 
@@ -1035,10 +1035,10 @@ QVariant CDigitalPrinterObject::CreateObject(const QString& key)
 
 QString CDigitalPrinterObject::getJSONKeyForProperty(const QString& propertyName) const
 {
-	if (propertyName == (QString("m_") + "base")){
+	if (propertyName == (QStringLiteral("m_") + "base")){
 		return "base";
 	}
-	if (propertyName == (QString("m_") + "printingTechnology")){
+	if (propertyName == (QStringLiteral("m_") + "printingTechnology")){
 		return "printingTechnology";
 	}
 

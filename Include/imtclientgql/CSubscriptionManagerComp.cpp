@@ -164,7 +164,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		QJsonParseError jsonError;
 		QJsonDocument jsonDocument = QJsonDocument::fromJson(message, &jsonError);
 		if (jsonDocument.isNull()){
-			QByteArray errorMessage = QString("Unable to convert message to JSON: '%1'").arg(qPrintable(jsonError.errorString())).toUtf8();
+			QByteArray errorMessage = QStringLiteral("Unable to convert message to JSON: '%1'").arg(jsonError.errorString()).toUtf8();
 			qDebug() << errorMessage;
 
 			locker.unlock();
@@ -273,7 +273,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 
 		default:
 			{
-				QByteArray errorMessage = QString("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
+				QByteArray errorMessage = QStringLiteral("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
 
 				return CreateErrorResponse(errorMessage, request);
 			}
@@ -371,7 +371,7 @@ QFuture<CSubscriptionManagerComp::GqlResult> CSubscriptionManagerComp::SendReque
 
 	if (!SendRequestInternal(*requestPtr, constRequestPtr)){
 		FailPending(key, EC_NETWORK,
-					QString("Request could not be sent: '%1'").arg(QString(requestPtr->GetCommandId())));
+					QStringLiteral("Request could not be sent: '%1'").arg(requestPtr->GetCommandId()));
 		return future;
 	}
 
@@ -483,7 +483,7 @@ bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& re
 			SendErrorMessage(
 				0,
 				QStringLiteral("No WebSocket sender registered for clientid '%1' (client offline or id mismatch)")
-				.arg(QString::fromUtf8(clientId)),
+				.arg(clientId),
 				"SubscriptionManager");
 		}
 	}
@@ -537,7 +537,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::CreateErrorResponse(const QB
 
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
-	QString body = QString(R"({"id": "%1","type": "error","payload": [ {"message": "%2", "extensions": { "type": "Warning" }} ]})")
+	QString body = QStringLiteral(R"({"id": "%1","type": "error","payload": [ {"message": "%2", "extensions": { "type": "Warning" }} ]})")
 		.arg(object["id"].toString())
 		.arg(errorMessage);
 
