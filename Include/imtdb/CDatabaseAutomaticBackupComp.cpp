@@ -25,6 +25,10 @@ void CDatabaseAutomaticBackupComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
+#ifdef QT_DEBUG
+	return;
+#endif
+
 	if (!m_backupSettingsCompPtr.IsValid()){
 		return;
 	}
