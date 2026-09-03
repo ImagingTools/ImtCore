@@ -218,6 +218,42 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAu
 }
 
 
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAuthorizationResponseWithLifetimeCheck(
+			imtauth::CUserInfo& userInfo,
+			const QByteArray& systemId,
+			const QByteArray& productId,
+			QString& errorMessage) const
+{
+	int daysUntilExpiration = -1;
+	imtauth::IPasswordPolicy::LifetimeStatus lifetimeStatus = imtauth::IPasswordPolicy::LS_OK;
+
+	// Password lifetime is only evaluated for password-based accounts of the internal system;
+	// externally managed users (e.g. LDAP) are governed by their own system.
+	if (m_passwordPolicyCompPtr.IsValid() && systemId.isEmpty()){
+		lifetimeStatus = m_passwordPolicyCompPtr->GetPasswordLifetimeStatus(userInfo, daysUntilExpiration);
+	}
+
+	if (lifetimeStatus == imtauth::IPasswordPolicy::LS_EXPIRED || lifetimeStatus == imtauth::IPasswordPolicy::LS_CHANGE_REQUIRED){
+		errorMessage = QT_TR_NOOP(QStringLiteral("The password has expired and must be changed. Login: '%1'").arg(userInfo.GetId()));
+		SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
+
+		sdl::V1_0::imtauth::CAuthorizationPayload payload;
+		payload.passwordExpired = true;
+
+		return payload;
+	}
+
+	sdl::V1_0::imtauth::CAuthorizationPayload payload = CreateAuthorizationSuccessfulResponse(userInfo, systemId, productId, errorMessage);
+
+	if (lifetimeStatus == imtauth::IPasswordPolicy::LS_EXPIRES_SOON){
+		payload.passwordExpired = false;
+		payload.passwordExpiresInDays = daysUntilExpiration;
+	}
+
+	return payload;
+}
+
+
 // reimplemented (sdl::V1_0::imtauth::CAuthorizationGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthorization(
@@ -282,7 +318,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
-	return CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
+	return CreateAuthorizationResponseWithLifetimeCheck(*userInfoPtr, activeSystemId, productId, errorMessage);
 }
 
 
@@ -348,7 +384,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
-	return CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
+	return CreateAuthorizationResponseWithLifetimeCheck(*userInfoPtr, activeSystemId, productId, errorMessage);
 }
 
 

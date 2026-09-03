@@ -34,6 +34,9 @@
                     <AttributeInfo Id="PatPrefix" Type="Id" ExportId="PatPrefix">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="PasswordPolicy" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PasswordPolicy"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="PersonalAccessTokenManager" Type="Reference" ExportId="PersonalAccessTokenManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -95,6 +98,48 @@
         <Element Id="LdapCredentialController" PackageId="ImtAuthPck" ComponentId="LdapCredentialController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="PasswordPolicy" PackageId="ImtAuthPck" ComponentId="PasswordPolicy">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="BlocklistFilePath" Type="Text" ExportId="PasswordBlocklistFilePath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ExpirationWarningPeriod" Type="Integer" ExportId="PasswordExpirationWarningPeriod">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MaxPasswordAge" Type="Integer" ExportId="MaxPasswordAge">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MaxPasswordLength" Type="Integer" ExportId="MaxPasswordLength">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MinPasswordAge" Type="Integer" ExportId="MinPasswordAge">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MinPasswordLength" Type="Integer" ExportId="MinPasswordLength">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PasswordHistoryDepth" Type="Integer" ExportId="PasswordHistoryDepth">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RejectLoginAsPassword" Type="Boolean" ExportId="RejectLoginAsPassword">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequireDigit" Type="Boolean" ExportId="RequireDigit">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequireLowercase" Type="Boolean" ExportId="RequireLowercase">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequireSpecialChar" Type="Boolean" ExportId="RequireSpecialChar">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequireUppercase" Type="Boolean" ExportId="RequireUppercase">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="SessionController" PackageId="ImtAuthGqlPck" ComponentId="SessionController">
