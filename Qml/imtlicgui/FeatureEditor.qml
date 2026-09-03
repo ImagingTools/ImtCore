@@ -421,6 +421,7 @@ ViewBase {
 			columns: {
 				featureName: FeatureItemTypeMetaInfo.s_featureName,
 				featureId: FeatureItemTypeMetaInfo.s_featureId,
+				optional: FeatureItemTypeMetaInfo.s_optional,
 				requirements: FeatureItemTypeMetaInfo.s_requirements
 			}
 		})
@@ -429,8 +430,43 @@ ViewBase {
 		requirementGraph = graph
 
 		let leaves = []
-		appendRequirementEntries(tree, [], "", leaves)
+		appendRequirementEntries(tree, [], "", "", "", leaves)
 		requirementEntries = leaves
+		rebuildMandatoryLeafCounts()
+	}
+
+	// How many parts of each feature are not optional. A product takes a feature
+	// whole, so requiring any part of one takes all of these along - that is what
+	// the picker warns about before a requirement is written.
+	property var mandatoryLeafCounts: ({})
+
+	function rebuildMandatoryLeafCounts() {
+		let counts = ({})
+		for (let i = 0; i < requirementEntries.length; ++i) {
+			let entry = requirementEntries[i]
+			if (entry.optional || entry.rootPath === entry.featurePath)
+				continue
+			counts[entry.rootPath] = (counts[entry.rootPath] ? counts[entry.rootPath] : 0) + 1
+		}
+		mandatoryLeafCounts = counts
+	}
+
+	function requirementEntryOf(featurePathValue) {
+		for (let i = 0; i < requirementEntries.length; ++i) {
+			if (requirementEntries[i].featurePath === featurePathValue)
+				return requirementEntries[i]
+		}
+		return null
+	}
+
+	// What else a product has to swallow to satisfy this requirement: the parts
+	// of the same feature that are not optional and so cannot be left out.
+	function requirementBringsAlong(featurePathValue) {
+		let entry = requirementEntryOf(featurePathValue)
+		if (!entry || entry.rootPath === entry.featurePath)
+			return 0
+		let mandatory = mandatoryLeafCounts[entry.rootPath] ? mandatoryLeafCounts[entry.rootPath] : 0
+		return entry.optional ? mandatory : mandatory - 1
 	}
 
 	function appendRequirementGraphNodes(nodes, parentPath, target) {
@@ -453,7 +489,7 @@ ViewBase {
 	// Flattens the shared feature collection into one flat row per leaf feature,
 	// each carrying the full path it sits at - a plain list reads better here
 	// than a tree, because a requirement is picked by what it is, not by where.
-	function appendRequirementEntries(nodes, pathNames, parentPath, target) {
+	function appendRequirementEntries(nodes, pathNames, parentPath, rootPath, rootName, target) {
 		for (let i = 0; i < nodes.length; ++i) {
 			let node = nodes[i]
 			let data = node.data || {}
@@ -463,15 +499,21 @@ ViewBase {
 			let name = data[FeatureItemTypeMetaInfo.s_featureName] || id
 			let currentNames = pathNames.concat([name])
 			let path = parentPath + "/" + id
+			// The feature a part belongs to, which is what a product takes.
+			let currentRootPath = rootPath === "" ? path : rootPath
+			let currentRootName = rootName === "" ? name : rootName
 
 			if (node.children && node.children.length > 0) {
-				appendRequirementEntries(node.children, currentNames, path, target)
+				appendRequirementEntries(node.children, currentNames, path, currentRootPath, currentRootName, target)
 				continue
 			}
 			target.push({
 				"featureName": name,
 				"fullPath": currentNames.join(" / "),
-				"featurePath": path
+				"featurePath": path,
+				"optional": data[FeatureItemTypeMetaInfo.s_optional] === true,
+				"rootPath": currentRootPath,
+				"rootName": currentRootName
 			})
 		}
 	}
@@ -601,6 +643,15 @@ ViewBase {
 			return qsTr("Parent")
 		if (requirementReaches(featurePathValue, path, {}))
 			return qsTr("Cycle")
+		// A product takes a feature whole. Requiring a part of one therefore
+		// takes its mandatory siblings along, whether they are wanted or not -
+		// said here, where the requirement is written, rather than discovered
+		// later in a product that grew by itself.
+		let bringsAlong = requirementBringsAlong(featurePathValue)
+		if (bringsAlong > 0) {
+			let entry = requirementEntryOf(featurePathValue)
+			return qsTr("Brings all of %1").arg(entry ? entry.rootName : "")
+		}
 		return ""
 	}
 
@@ -1544,6 +1595,9 @@ ViewBase {
 					? qsTr("Create a sub-feature to start this level")
 					: qsTr("Give this feature a name and an ID before adding sub-features")
 				editable: featureEditor.canEdit
+				// One row at a time: a tick in front of every sub-feature reads as
+				// a decision about the feature, which it is not.
+				multiSelectEnabled: false
 				// A blank feature owns nothing: no new children until it is filled in.
 				createEnabled: featureEditor.levelAcceptsChildren(treeExplorer.navigationStack)
 				levelStatusText: featureEditor.incompleteCount(treeExplorer.currentEntries) > 0

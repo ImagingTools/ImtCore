@@ -59,6 +59,9 @@ FocusScope {
 	// Off when the level cannot take new children - e.g. its owner is still blank.
 	property bool createEnabled: true
 	property bool removeVisible: true
+	// Off while what is selected must not be dropped - the command greys out
+	// instead of refusing the click afterwards.
+	property bool removeEnabled: true
 	property bool renameVisible: true
 	property bool moveVisible: true
 	// Row editing: the Edit command and the per-row pencil. Off for tables whose
@@ -562,7 +565,7 @@ FocusScope {
 
 	function removeSelection() {
 		let targets = commandTargets()
-		if (!editable || targets.length === 0)
+		if (!editable || !removeEnabled || targets.length === 0)
 			return
 		removeNodesRequested(targets, currentParentNode())
 	}
@@ -882,7 +885,7 @@ FocusScope {
 					id: removeCommand
 					visible: root.removeVisible && root.movingNode === null
 						&& root.editingNode === null && !commandRow.compact
-					active: root.editable && root.commandTargets().length > 0
+					active: root.editable && root.removeEnabled && root.commandTargets().length > 0
 					iconSource: "qrc:/" + Style.getIconPath("Icons/Delete", Icon.State.On,
 						removeCommand.active ? Icon.Mode.Normal : Icon.Mode.Disabled)
 					text: root.checkedNodes.length > 1
@@ -1578,7 +1581,7 @@ FocusScope {
 						width: overflowColumn.width
 						leftAligned: true
 						visible: root.removeVisible
-						active: root.editable && root.commandTargets().length > 0
+						active: root.editable && root.removeEnabled && root.commandTargets().length > 0
 						iconSource: "qrc:/" + Style.getIconPath("Icons/Delete", Icon.State.On,
 							overflowRemove.active ? Icon.Mode.Normal : Icon.Mode.Disabled)
 						text: root.checkedNodes.length > 1
