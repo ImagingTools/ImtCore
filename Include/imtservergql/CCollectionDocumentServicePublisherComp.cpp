@@ -8,6 +8,9 @@
 #include <QtCore/QList>
 #include <QtCore/QPair>
 
+// STL includes
+#include <functional>
+
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
 #include <imtgql/IGqlContext.h>
@@ -41,7 +44,8 @@ void CCollectionDocumentServicePublisherComp::OnComponentCreated()
 	QObject::connect(
 				&m_closeIdleDocumentsTimer,
 				&QTimer::timeout,
-				[this]{ CloseIdleDocuments(); });
+				this,
+				&CCollectionDocumentServicePublisherComp::CloseIdleDocuments);
 	m_closeIdleDocumentsTimer.start(1000);
 }
 

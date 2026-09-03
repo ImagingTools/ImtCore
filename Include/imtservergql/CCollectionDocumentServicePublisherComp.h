@@ -22,9 +22,11 @@ namespace imtservergql
 
 
 class CCollectionDocumentServicePublisherComp:
+	public QObject,
 	public CGqlPublisherCompBase,
 	virtual public imtdoc::IDocumentServiceEventHandler
 {
+	Q_OBJECT
 public:
 	typedef CGqlPublisherCompBase BaseClass;
 
@@ -81,17 +83,19 @@ protected:
 		OnSingleDocumentChanged command of this collection for the given \a documentId.
 	*/
 	bool HasActiveSingleDocumentChangedSubscriber(const QByteArray& documentId) const;
-	/**
-		Close every tracked document whose grace period without an active
-		OnSingleDocumentChanged subscriber has elapsed.
-	*/
-	void CloseIdleDocuments();
 
 	template<class Representation>
 	void PublishRepresentation(
 		const QByteArray& commandId,
 		const QByteArray& userId,
 		const Representation& representation) const;
+
+protected Q_SLOTS:
+	/**
+		Close every tracked document whose grace period without an active
+		OnSingleDocumentChanged subscriber has elapsed.
+	*/
+	void CloseIdleDocuments();
 
 private:
 	I_REF(imtdoc::IDocumentService, m_documentServiceCompPtr);
