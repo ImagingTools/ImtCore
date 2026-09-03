@@ -293,7 +293,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 						userInfoPtr.MoveCastedPtr(dataPtr.GetPtr()->CloneMe());
 						if (userInfoPtr.IsValid()){
 							if (!userInfoPtr->IsEnabled()){
-								SendWarningMessage(0, QStringLiteral("Authorization denied for disabled account. Login: '%1'").arg(QString(login)), "CLdapAuthorizationControllerComp");
+								SendWarningMessage(0, QStringLiteral("Authorization denied for disabled account. Login: '%1'").arg(login), "CLdapAuthorizationControllerComp");
 
 								return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 							}

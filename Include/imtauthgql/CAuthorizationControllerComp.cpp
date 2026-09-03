@@ -267,7 +267,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 	}
 
 	if (!userInfoPtr->IsEnabled()){
-		SendWarningMessage(0, QStringLiteral("Authorization denied for disabled account. Login: '%1'").arg(QString(login)), "imtgql::CAuthorizationControllerComp");
+		SendWarningMessage(0, QStringLiteral("Authorization denied for disabled account. Login: '%1'").arg(login), "imtgql::CAuthorizationControllerComp");
 
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
@@ -339,7 +339,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 	}
 
 	if (!userInfoPtr->IsEnabled()){
-		SendWarningMessage(0, QStringLiteral("Authorization denied for disabled account. Login: '%1'").arg(QString(login)), "imtgql::CAuthorizationControllerComp");
+		SendWarningMessage(0, QStringLiteral("Authorization denied for disabled account. Login: '%1'").arg(login), "imtgql::CAuthorizationControllerComp");
 
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
