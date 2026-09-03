@@ -555,6 +555,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${TESTS_DIR}/PersonalAccessTokenTest/CMake" "${AUX_INCLUDE_DIR}/PersonalAccessTokenTest")
 		add_dependencies(PersonalAccessTokenTest imtbase imtauth)
 
+		add_subdirectory("${TESTS_DIR}/PasswordPolicyTest/CMake" "${AUX_INCLUDE_DIR}/PasswordPolicyTest")
+		add_dependencies(PasswordPolicyTest imtbase imtauth)
+
 		add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceTest")
 		add_dependencies(CollectionDocumentServiceTest imtbase imtdoc)
 
