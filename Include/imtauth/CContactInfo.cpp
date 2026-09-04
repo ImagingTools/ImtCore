@@ -19,6 +19,12 @@ namespace imtauth
 
 // public static methods
 
+QByteArray CContactInfo::GetTypeId()
+{
+	return "ContactInfo";
+}
+
+
 // public methods
 
 CContactInfo::CContactInfo()
