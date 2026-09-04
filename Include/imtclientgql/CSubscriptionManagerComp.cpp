@@ -124,8 +124,10 @@ void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& chan
 	for (const QByteArray& subscriptionId : subscriptionIds){
 		if (changeSet.Contains(imtcom::IConnectionStatusProvider::CF_CONNECTED)){
 			if (m_registeredClients[subscriptionId].m_clientId == clientId){
-				SubscriptionRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
-				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_REGISTERED;
+				const bool isRegistered = SubscriptionRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
+				m_registeredClients[subscriptionId].m_status = isRegistered
+						? IGqlSubscriptionClient::SS_REGISTERED
+						: IGqlSubscriptionClient::SS_IN_REGISTRATION;
 			}
 		}
 		else{
