@@ -25,6 +25,12 @@ void CDatabaseAutomaticBackupComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
+#ifndef AUTOMATIC_DB_BACKUPS
+	qDebug() << "Automatic database backups are disabled. Use ImtCore's CMake option 'AUTOMATIC_DB_BACKUPS' to enable them.";
+	
+	return;
+#endif
+
 	if (!m_backupSettingsCompPtr.IsValid()){
 		return;
 	}
