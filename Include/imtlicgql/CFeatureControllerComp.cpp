@@ -59,7 +59,7 @@ istd::IChangeableUniquePtr CFeatureControllerComp::CreateObjectFromRequest(
 
 	imtbase::CTreeItemModel featureModel;
 	if (!featureModel.CreateFromJson(jsonItemData)){
-		errorMessage = QT_TR_NOOP(QString("Unable to create tree item model from json: %1.").arg(qPrintable(jsonItemData)));
+		errorMessage = QT_TR_NOOP(QStringLiteral("Unable to create tree item model from json: %1.").arg(jsonItemData));
 		SendErrorMessage(0, errorMessage, "Feature controller");
 
 		return nullptr;
@@ -95,7 +95,7 @@ istd::IChangeableUniquePtr CFeatureControllerComp::CreateObjectFromRequest(
 QJsonObject CFeatureControllerComp::GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Internal error.").toUtf8();
+		errorMessage = QStringLiteral("Internal error.").toUtf8();
 		SendErrorMessage(0, errorMessage, "Feature controller");
 
 		return QJsonObject();
@@ -145,7 +145,7 @@ QJsonObject CFeatureControllerComp::GetObjectFromRequest(const imtgql::CGqlReque
 		}
 	}
 
-	errorMessage = QT_TR_NOOP(QString("Unable to get feature by ID: %1.").arg(qPrintable(objectId)));
+	errorMessage = QT_TR_NOOP(QStringLiteral("Unable to get feature by ID: %1.").arg(objectId));
 	SendErrorMessage(0, errorMessage, "Feature controller");
 
 	return QJsonObject();
@@ -191,7 +191,7 @@ QJsonObject CFeatureControllerComp::GetTreeItemModel(const imtgql::CGqlRequest& 
 				}
 
 				itemObj.insert(QStringLiteral("RootFeatureId"), QJsonValue::fromVariant(featureId));
-				itemObj.insert(QStringLiteral("ParentFeatureId"), QJsonValue::fromVariant(QString("")));
+				itemObj.insert(QStringLiteral("ParentFeatureId"), QJsonValue::fromVariant(QStringLiteral("")));
 				itemObj.insert(QStringLiteral("Id"), QJsonValue::fromVariant(collectionId));
 
 				dataArray.append(itemObj);
@@ -236,7 +236,7 @@ bool CFeatureControllerComp::CreateFeatureFromRepresentationModel(
 	}
 
 	if (featureId.isEmpty()){
-		errorMessage = QT_TR_NOOP(QString("Unable to create feature with an empty ID."));
+		errorMessage = QT_TR_NOOP(QStringLiteral("Unable to create feature with an empty ID."));
 		SendErrorMessage(0, errorMessage, "Feature controller");
 
 		return false;
@@ -255,7 +255,7 @@ bool CFeatureControllerComp::CreateFeatureFromRepresentationModel(
 	if (!collectionIds.isEmpty()){
 		QByteArray id = collectionIds[0];
 		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QString("Feature-ID: '%1' already exists. Please rename.")).arg(qPrintable(featureId));
+			errorMessage = QT_TR_NOOP(QStringLiteral("Feature-ID: '%1' already exists. Please rename.")).arg(featureId);
 			return false;
 		}
 	}
@@ -266,7 +266,7 @@ bool CFeatureControllerComp::CreateFeatureFromRepresentationModel(
 	}
 
 	if (featureName.isEmpty()){
-		errorMessage = QT_TR_NOOP(QString("Unable to create feature with an empty Name."));
+		errorMessage = QT_TR_NOOP(QStringLiteral("Unable to create feature with an empty Name."));
 
 		return false;
 	}
@@ -354,7 +354,7 @@ bool CFeatureControllerComp::CreateRepresentationModelFromFeatureInfo(
 		for (int i = 0; i < subFeatures.count(); i++){
 			imtlic::IFeatureInfoSharedPtr featureInfoPtr = subFeatures.at(i);
 			if (!featureInfoPtr.IsValid()){
-				errorMessage = QString("Unable to create representation model for invalid subfeature. Parent feature id: %1.").arg(qPrintable(featureId));
+				errorMessage = QStringLiteral("Unable to create representation model for invalid subfeature. Parent feature id: %1.").arg(featureId);
 				return false;
 			}
 

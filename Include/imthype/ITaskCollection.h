@@ -49,16 +49,6 @@ public:
 	virtual bool SetTaskInputId(const QByteArray& taskUuid, const QByteArray& inputId) = 0;
 
 	/**
-		Get sub ID of the task.
-	*/
-	virtual QByteArray GetTaskInputSubId(const QByteArray& taskUuid) const = 0;
-
-	/**
-		Set sub ID for the task.
-	*/
-	virtual bool SetTaskInputSubId(const QByteArray& taskUuid, const QByteArray& inputSubId) =0;
-
-	/**
 		Get access to the task instance.
 		\param taskId	Unique ID of the task.
 	*/
@@ -78,32 +68,7 @@ public:
 		Generates and sets next available numbered id for the collection:taskId.
 		Returns -1 if failed.
 	*/
-	static inline int AssignNextNumberedTaskId(ITaskCollection& collection, const QByteArray& taskId)
-	{
-		int lastUserId = 0;
-
-		imtbase::IObjectCollection::Ids ids = collection.GetElementIds();
-		for (imtbase::IObjectCollection::Id id : ids) {
-			QByteArray userId = collection.GetUserTaskId(id);
-
-			bool isOk = false;
-			int convertedUserId = userId.toInt(&isOk);
-
-			if (isOk) {
-				if (convertedUserId > lastUserId) {
-					lastUserId = convertedUserId;
-				}
-			}
-		}
-
-		if (lastUserId >= 0) {
-			collection.SetUserTaskId(taskId, QByteArray(QString::number(lastUserId + 1).toUtf8()));
-			return lastUserId + 1;
-		}
-
-		// failed by some reason
-		return -1;
-	}
+	static int AssignNextNumberedTaskId(ITaskCollection& collection, const QByteArray& taskId);
 };
 
 

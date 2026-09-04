@@ -13,7 +13,7 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CSchedulerParam>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CSchedulerParam>)
 
 QByteArray CSchedulerParamsRepresentationControllerComp::GetTypeId() const
 {
@@ -44,7 +44,7 @@ bool CSchedulerParamsRepresentationControllerComp::GetSdlRepresentationFromDataM
 
 	QDateTime startTime = schedulerParamsPtr->GetStartTime();
 
-	QString format = m_dateFormatAttrPtr.IsValid() ? *m_dateFormatAttrPtr : "dd-MM-yyyy HH:mm";
+	const QString format = m_dateFormatAttrPtr.IsValid() ? *m_dateFormatAttrPtr : QStringLiteral("dd-MM-yyyy HH:mm");
 	sdlRepresentation.startTime = startTime.toString(format);
 
 	return true;
@@ -70,7 +70,7 @@ bool CSchedulerParamsRepresentationControllerComp::GetDataModelFromSdlRepresenta
 
 	QString startTime = *sdlRepresentation.startTime;
 
-	QString format = m_dateFormatAttrPtr.IsValid() ? *m_dateFormatAttrPtr : "dd-MM-yyyy HH:mm";
+	const QString format = m_dateFormatAttrPtr.IsValid() ? *m_dateFormatAttrPtr : QStringLiteral("dd-MM-yyyy HH:mm");
 	QDateTime startDateTime = QDateTime::fromString(startTime, format);
 
 	schedulerParamsPtr->SetStartTime(startDateTime);

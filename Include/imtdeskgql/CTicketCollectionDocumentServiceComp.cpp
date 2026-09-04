@@ -219,7 +219,7 @@ sdl::V1_0::imtdesk::CTicketData CTicketCollectionDocumentServiceComp::OnGetTicke
 								att.id = aid;
 								// Build HTTP download URL — aid is a pure UUID from the DB.
 								// Append file extension so the GET endpoint returns the correct MIME type.
-								QString httpUrl = QString("../../files/%1").arg(QString::fromUtf8(aid));
+								QString httpUrl = QStringLiteral("../../files/%1").arg(aid);
 								if (m_attachmentStorageCompPtr.IsValid()){
 									QByteArray data;
 									QString fileName;
@@ -229,7 +229,7 @@ sdl::V1_0::imtdesk::CTicketData CTicketCollectionDocumentServiceComp::OnGetTicke
 										att.mimeType = mimeType;
 										QString ext = QFileInfo(fileName).suffix().toLower();
 										if (!ext.isEmpty()){
-											httpUrl = QString("../../files/%1.%2").arg(QString::fromUtf8(aid), ext);
+											httpUrl = QStringLiteral("../../files/%1.%2").arg(QString::fromUtf8(aid), ext);
 										}
 									}
 								}

@@ -24,7 +24,7 @@ ConstResponsePtr CHttpFileControllerServletComp::OnPost(
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";
-	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
+	QByteArray reponseTypeId = QByteArrayLiteral("text/html; charset=utf-8");
 
 	ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId).PopInterfacePtr());
 
@@ -70,8 +70,8 @@ ConstResponsePtr CHttpFileControllerServletComp::OnPost(
 	}
 
 	if(fileExists){
-		QString errorString = QString("<p>File already exists</p><p>%1</p>");
-		errorString = errorString.arg(QString(commandIdFileName));
+		QString errorString = QStringLiteral(R"(<p>File already exists</p><p>%1</p>)");
+		errorString = errorString.arg(commandIdFileName);
 		return generateErrorResponsePtr(errorString.toUtf8(), IProtocolEngine::SC_CONFLICT);
 	}
 	else if(!loadRes){
@@ -90,7 +90,7 @@ ConstResponsePtr CHttpFileControllerServletComp::OnDelete(
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";
-	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
+	QByteArray reponseTypeId = QByteArrayLiteral("text/html; charset=utf-8");
 
 	ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId).PopInterfacePtr());
 

@@ -61,7 +61,7 @@ bool CSdlJsonServletBaseComp::ReadRequestToSdlStruct(
 	const QJsonDocument payloadDocument = QJsonDocument::fromJson(requestBody);
 	if (!payloadDocument.isObject()){
 		const QString baseErrorString = QObject::tr("The request is not a valid json object");
-		SendErrorMessage(0, baseErrorString + QString(": '%1'").arg(QString(requestBody)), __func__);
+		SendErrorMessage(0, baseErrorString + QStringLiteral(": '%1'").arg(QString(requestBody)), __func__);
 
 		responsePtr = CreateDefaultErrorResponse(
 			400,
@@ -77,7 +77,7 @@ bool CSdlJsonServletBaseComp::ReadRequestToSdlStruct(
 	const bool isCreated = SdlClass::ReadFromJsonObject(out, payloadObject);
 	if (!isCreated){
 		const QString baseErrorString = QObject::tr("The request does not match the scheme");
-		SendErrorMessage(0, baseErrorString + QString(": '%1'").arg(QString(requestBody)), __func__);
+		SendErrorMessage(0, baseErrorString + QStringLiteral(": '%1'").arg(QString(requestBody)), __func__);
 		responsePtr = CreateDefaultErrorResponse(
 			400,
 			"Incorrect request",
@@ -122,7 +122,7 @@ bool CSdlJsonServletBaseComp::CreateResponseFromSdlStruct(
 		request,
 		protocolStatusCode,
 		replyPayload,
-		QByteArray("application/json; charset=utf-8")).PopInterfacePtr());
+		QByteArrayLiteral("application/json; charset=utf-8")).PopInterfacePtr());
 
 	return true;
 }

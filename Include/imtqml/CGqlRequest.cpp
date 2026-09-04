@@ -60,7 +60,7 @@ bool CGqlRequest::SetGqlQuery(QString query, QVariantMap headers)
 			}
 		}
 
-		QString message = QString("Post to url '%1' query '%2'").arg(requestUrl.toString()).arg(query);
+		QString message = QStringLiteral("Post to url '%1' query '%2'").arg(requestUrl.toString(), query);
 		qDebug() << message;
 
 		QNetworkReply* reply = accessManager->post(networkRequest, query.toUtf8());

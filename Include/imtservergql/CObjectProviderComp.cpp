@@ -29,7 +29,7 @@ QJsonObject CObjectProviderComp::CreateInternalResponse(
 	{
 		iser::CJsonMemWriteArchive archive;
 		if (!m_objectCompPtr->Serialize(archive)){
-			errorMessage = QString("Failed to perform serialization to the archive from the object").toUtf8();
+			errorMessage = QStringLiteral("Failed to perform serialization to the archive from the object").toUtf8();
 
 			return QJsonObject();
 		}
@@ -40,7 +40,7 @@ QJsonObject CObjectProviderComp::CreateInternalResponse(
 	QJsonObject rootObj;
 	QJsonDocument doc = QJsonDocument::fromJson(json);
 	if (doc.isNull() || !doc.isObject()){
-		errorMessage = QString("Failed to convert to a json object from json").toUtf8();
+		errorMessage = QStringLiteral("Failed to convert to a json object from json").toUtf8();
 
 		return QJsonObject();
 	}

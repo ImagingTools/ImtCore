@@ -16,7 +16,7 @@ class CIdParamRepresentationController: public imtserverapp::TJsonRepresentation
 public:
 	CIdParamRepresentationController(QByteArray modelId, QString name = QString(), QString description = QString());
 
-	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CParamsSet>)
+	// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CParamsSet>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetSdlRepresentationFromDataModel(

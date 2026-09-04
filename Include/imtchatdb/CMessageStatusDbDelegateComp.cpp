@@ -58,10 +58,10 @@ QByteArray CMessageStatusDbDelegateComp::CreateDeleteObjectsQuery(
 	QString idsStr;
 	for (int i = 0; i < objectIds.size(); ++i){
 		if (i > 0) idsStr += ", ";
-		idsStr += QString("'%1'").arg(QString::fromUtf8(objectIds[i]));
+		idsStr += QStringLiteral("'%1'").arg(objectIds[i]);
 	}
 
-	return QString("DELETE FROM \"MessageStatus\" WHERE \"Id\" IN (%1);")
+	return QStringLiteral(R"(DELETE FROM "MessageStatus" WHERE "Id" IN (%1);)")
 		.arg(idsStr)
 		.toUtf8();
 }
@@ -116,8 +116,8 @@ QByteArray CMessageStatusDbDelegateComp::CreateUpsertStatusQuery(
 			"INSERT OR REPLACE INTO \"MessageStatus\" (\"Id\", \"MessageId\", \"UserId\", \"Status\") "
 			"VALUES('%1', '%2', '%3', %4);")
 			.arg(newId)
-			.arg(QString::fromUtf8(messageId))
-			.arg(QString::fromUtf8(userId))
+			.arg(messageId)
+			.arg(userId)
 			.arg(status)
 			.toUtf8();
 	}
@@ -127,8 +127,8 @@ QByteArray CMessageStatusDbDelegateComp::CreateUpsertStatusQuery(
 		"INSERT INTO \"MessageStatus\" (\"MessageId\", \"UserId\", \"Status\") "
 		"VALUES('%1', '%2', %3) "
 		"ON CONFLICT (\"MessageId\", \"UserId\") DO UPDATE SET \"Status\"=%3, \"UpdatedAt\"=NOW();")
-		.arg(QString::fromUtf8(messageId))
-		.arg(QString::fromUtf8(userId))
+		.arg(messageId)
+		.arg(userId)
 		.arg(status)
 		.toUtf8();
 }

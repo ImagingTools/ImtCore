@@ -180,7 +180,7 @@ type Parameter {
 }
 
 type ParamsSet {
-	## \warning ALL id in parameters MUST be uinque
+	## \warning ALL ids in the parameters MUST be unique
 	parameters: [Parameter]!
 }
 

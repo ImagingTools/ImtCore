@@ -35,7 +35,7 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 	QByteArray userId = *arguments.input->userId;
 
 	if (userId.isEmpty()){
-		errorMessage = QString("Unable to set settings. User-ID is empty!");
+		errorMessage = QStringLiteral("Unable to set settings. User-ID is empty!");
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
@@ -51,7 +51,7 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 
 	imtauth::IUserSettingsSharedPtr userSettingsPtr = GetOrCreateUserSettings(userId);
 	if (!userSettingsPtr.IsValid()){
-		errorMessage = QString("Unable to set settings for user '%1'. Error: User settings is invalid");
+		errorMessage = QStringLiteral("Unable to set settings for user '%1'. Error: User settings is invalid");
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
@@ -59,7 +59,7 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 	iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
 	if (paramSetPtr == nullptr){
 		Q_ASSERT(false);
-		errorMessage = QString("Unable to set settings for user '%1'. Error: User settings is invalid");
+		errorMessage = QStringLiteral("Unable to set settings for user '%1'. Error: User settings is invalid");
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
@@ -67,19 +67,19 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 	QJsonParseError error;
 	QJsonDocument representationDoc = QJsonDocument::fromJson(settings.toUtf8(), &error);
 	if (error.error != QJsonParseError::NoError){
-		errorMessage = QString("Unable to set settings for user '%1'. Error: Settings json invalid").arg(qPrintable(userId));
+		errorMessage = QStringLiteral("Unable to set settings for user '%1'. Error: Settings json invalid").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
 	
 	if (!m_userSettingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(representationDoc.object(), *paramSetPtr)){
-		errorMessage = QString("Unable to set settings for user '%1'. Error: Get data model from representation failed").arg(qPrintable(userId));
+		errorMessage = QStringLiteral("Unable to set settings for user '%1'. Error: Get data model from representation failed").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
 	
 	if (!SetUserSettings(userId, *userSettingsPtr)){
-		errorMessage = QString("Unable to set settings for user '%1'").arg(qPrintable(userId));
+		errorMessage = QStringLiteral("Unable to set settings for user '%1'").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
@@ -124,7 +124,7 @@ sdl::V1_0::imtbase::CParamsSet CSettingsControllerComp::OnGetSettings(
 	}
 
 	if (userId.isEmpty()){
-		errorMessage = QString("Unable to get settings. User-ID is empty!");
+		errorMessage = QStringLiteral("Unable to get settings. User-ID is empty!");
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
@@ -142,7 +142,7 @@ sdl::V1_0::imtbase::CParamsSet CSettingsControllerComp::OnGetSettings(
 	
 	imtauth::IUserSettingsSharedPtr userSettingsPtr = GetOrCreateUserSettings(userId);
 	if (!userSettingsPtr.IsValid()){
-		errorMessage = QString("Unable to get settings for user '%1'. Error: User settings is invalid").arg(qPrintable(userId));
+		errorMessage = QStringLiteral("Unable to get settings for user '%1'. Error: User settings is invalid").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
@@ -150,20 +150,20 @@ sdl::V1_0::imtbase::CParamsSet CSettingsControllerComp::OnGetSettings(
 	iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
 	Q_ASSERT(paramSetPtr != nullptr);
 	if (paramSetPtr == nullptr){
-		errorMessage = QString("Unable to create representation for user settings. Error: Params set from user settings is invalid.");
+		errorMessage = QStringLiteral("Unable to create representation for user settings. Error: Params set from user settings is invalid.");
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
 	
 	QJsonObject representationObject;
 	if (!m_userSettingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*paramSetPtr, representationObject, &paramsSet)){
-		errorMessage = QString("Unable to get settings for user '%1'. Error: Get representation failed").arg(qPrintable(userId));
+		errorMessage = QStringLiteral("Unable to get settings for user '%1'. Error: Get representation failed").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
 	
 	if (!response.ReadFromJsonObject(representationObject)){
-		errorMessage = QString("Unable to get settings for user '%1'. Error: Read from Json object failed").arg(qPrintable(userId));
+		errorMessage = QStringLiteral("Unable to get settings for user '%1'. Error: Read from Json object failed").arg(userId);
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
@@ -191,7 +191,7 @@ sdl::V1_0::imtbase::CStyleData CSettingsControllerComp::OnGetStyleData(
 	}
 	
 	if(schemeId.isEmpty()){
-		errorMessage = QString("Unable to get style data. Error: Scheme is empty");
+		errorMessage = QStringLiteral("Unable to get style data. Error: Scheme is empty");
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
@@ -204,7 +204,7 @@ sdl::V1_0::imtbase::CStyleData CSettingsControllerComp::OnGetStyleData(
 	QString pathToTheme = prefix + schemeId.toLower() + ".theme";
 	QFile resource(":/Style/" + pathToTheme);
 	if (!resource.open(QIODevice::ReadOnly)){
-		errorMessage = QString("Unable to get style data. Error: '%1'").arg(resource.errorString());
+		errorMessage = QStringLiteral("Unable to get style data. Error: '%1'").arg(resource.errorString());
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
 	}
@@ -248,7 +248,7 @@ sdl::V1_0::imtbase::CUrlParam CSettingsControllerComp::OnGetWebSocketUrl(
 imtauth::IUserSettingsSharedPtr CSettingsControllerComp::GetOrCreateUserSettings(const QByteArray& userId) const
 {
 	if (userId.isEmpty()){
-		SendErrorMessage(0, QString("Unable to get or create user settings. User-ID is empty!"), "CSettingsControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to get or create user settings. User-ID is empty!"), "CSettingsControllerComp");
 		return nullptr;
 	}
 

@@ -14,17 +14,17 @@ namespace imtserverapp
 bool CLabConverter::ConvertRepresentationToModel(const sdl::V1_0::imtcolor::CLab& sdlStruct, icmm::CLab& lab)
 {
 	if (!sdlStruct.L){
-		qWarning() << qPrintable(__FILE__) << __LINE__ << "L is missing, but required";
+		qWarning() << __FILE__ << __LINE__ << "L is missing, but required";
 
 		return false;
 	}
 	if (!sdlStruct.a){
-		qWarning() << qPrintable(__FILE__) << __LINE__ << "a is missing, but required";
+		qWarning() << __FILE__ << __LINE__ << "a is missing, but required";
 
 		return false;
 	}
 	if (!sdlStruct.b){
-		qWarning() << qPrintable(__FILE__) << __LINE__ << "b is missing, but required";
+		qWarning() << __FILE__ << __LINE__ << "b is missing, but required";
 
 		return false;
 	}

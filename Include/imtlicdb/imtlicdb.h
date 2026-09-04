@@ -290,7 +290,7 @@
 	**ID-Based Filtering:**
 	```cpp
 	// CLicenseDatabaseDelegateComp::CreateObjectFilterQuery()
-	QString filter = QString("(Document->>'LicenseId') = '%1'").arg(licenseId);
+	QString filter = QStringLiteral("(Document->>'LicenseId') = '%1'").arg(licenseId);
 	```
 	
 	**Text Search (ILIKE):**
@@ -305,7 +305,7 @@
 	**Category Filtering:**
 	```cpp
 	// CProductsDatabaseDelegateComp - Category filter
-	QString filter = QString("(Document->>'CategoryId') = '%1'").arg(categoryId);
+	QString filter = QStringLiteral("(Document->>'CategoryId') = '%1'").arg(categoryId);
 	```
 	
 	**Compound Filtering:**

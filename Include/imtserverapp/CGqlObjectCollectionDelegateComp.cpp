@@ -128,8 +128,8 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 	if (objectPtr != nullptr){
 		if (!SerializeObject(objectPtr, objectData)){
 			SendErrorMessage(0,
-						QString("Unable to create insert request for object with id '%1', typeId '%2'. Error: Serialization object failed")
-							.arg(qPrintable(proposedObjectId), qPrintable(typeId)),
+						QStringLiteral("Unable to create insert request for object with id '%1', typeId '%2'. Error: Serialization object failed")
+							.arg(proposedObjectId, typeId),
 							"CGqlObjectCollectionDelegateComp");
 
 			return nullptr;
@@ -642,17 +642,6 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 }
 
 
-// reimplemented (icomp::CComponentBase)
-
-void CGqlObjectCollectionDelegateComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-	m_paramSetRepresentationController.RegisterSubController(m_complexCollectionFilterRepresentationController);
-	m_paramSetRepresentationController.RegisterSubController(m_documentIdFilterRepresentationController);
-	m_paramSetRepresentationController.RegisterSubController(m_documentFilterRepresentationController);
-}
-
-
 // private methods
 
 istd::IChangeableUniquePtr CGqlObjectCollectionDelegateComp::CreateObject(const QByteArray& typeId) const
@@ -708,7 +697,7 @@ CGqlObjectCollectionDelegateComp::ResponseData CGqlObjectCollectionDelegateComp:
 bool CGqlObjectCollectionDelegateComp::SerializeObject(const istd::IPolymorphic* object, QByteArray& objectData) const
 {
 	if (object == nullptr){
-		SendErrorMessage(0, QString("Unable to serialize object. Error: Object is nullptr"));
+		SendErrorMessage(0, QStringLiteral("Unable to serialize object. Error: Object is nullptr"));
 		return false;
 	}
 
@@ -716,7 +705,7 @@ bool CGqlObjectCollectionDelegateComp::SerializeObject(const istd::IPolymorphic*
 	iser::ISerializable* serializableObject = dynamic_cast<iser::ISerializable*>(const_cast<iser::ISerializable*>(objectConst));
 
 	if (serializableObject == nullptr){
-		SendErrorMessage(0, QString("Unable to serialize object. Error: Object is not serializable"));
+		SendErrorMessage(0, QStringLiteral("Unable to serialize object. Error: Object is not serializable"));
 		return false;
 	}
 
@@ -731,7 +720,7 @@ bool CGqlObjectCollectionDelegateComp::SerializeObject(const istd::IPolymorphic*
 	}
 
 	if (!serializableObject->Serialize(*archivePtr.GetPtr())){
-		SendErrorMessage(0, QString("Unable to serialize object. Error: Serialization failed"));
+		SendErrorMessage(0, QStringLiteral("Unable to serialize object. Error: Serialization failed"));
 		return false;
 	}
 	objectData = archivePtr->GetData();
@@ -743,19 +732,19 @@ bool CGqlObjectCollectionDelegateComp::SerializeObject(const istd::IPolymorphic*
 bool CGqlObjectCollectionDelegateComp::DeSerializeObject(istd::IPolymorphic* object, const QByteArray& objectData) const
 {
 	if (object == nullptr){
-		SendErrorMessage(0, QString("Unable to deserialize object. Error: Object is invalid"));
+		SendErrorMessage(0, QStringLiteral("Unable to deserialize object. Error: Object is invalid"));
 		return false;
 	}
 
 	iser::ISerializable* serializableObjectPtr = dynamic_cast<iser::ISerializable*>(object);
 	if (serializableObjectPtr == nullptr){
-		SendErrorMessage(0, QString("Unable to deserialize object. Error: Object is not serializable"));
+		SendErrorMessage(0, QStringLiteral("Unable to deserialize object. Error: Object is not serializable"));
 		return false;
 	}
 
 	iser::CJsonMemReadArchive archive(objectData, !objectData.isEmpty());
 	if (!serializableObjectPtr->Serialize(archive)){
-		SendErrorMessage(0, QString("Unable to deserialize object. Error: Deserialization failed"));
+		SendErrorMessage(0, QStringLiteral("Unable to deserialize object. Error: Deserialization failed"));
 
 		return false;
 	}
@@ -769,7 +758,7 @@ bool CGqlObjectCollectionDelegateComp::GetParamsSetRepresentation(
 			sdl::V1_0::imtbase::CParamsSet& representation) const
 {
 	QJsonObject jsonObject;
-	if (m_paramSetRepresentationController.GetRepresentationFromDataModel(paramsSet, jsonObject)){
+	if (m_paramSetRepresentationControllerCompPtr.IsValid() && m_paramSetRepresentationControllerCompPtr->GetRepresentationFromDataModel(paramsSet, jsonObject)){
 		if (representation.ReadFromJsonObject(jsonObject)){
 			return true;
 		}

@@ -77,33 +77,6 @@ void CTaskCollectionContextDemultiplexerComp::SetTaskInputId(const QByteArray& t
 	}
 }
 
-QByteArray CTaskCollectionContextDemultiplexerComp::GetTaskInputSubId() const
-{
-	QMutexLocker lock(&m_dataMutex);
-
-	if (m_outputsCompPtr.IsValid() && m_outputsCompPtr.GetCount()) {
-		ITaskCollectionContext* contextPtr = m_outputsCompPtr[0];
-		if (contextPtr != nullptr) {
-			return contextPtr->GetTaskInputSubId();
-		}
-	}
-
-	return QByteArray();
-}
-
-
-void CTaskCollectionContextDemultiplexerComp::SetTaskInputSubId(const QByteArray& taskInputSubId)
-{
-	QMutexLocker lock(&m_dataMutex);
-
-	for (int i = 0; i < m_outputsCompPtr.GetCount(); ++i) {
-		ITaskCollectionContext* outputPtr = m_outputsCompPtr[i];
-		if (outputPtr != nullptr) {
-			outputPtr->SetTaskInputSubId(taskInputSubId);
-		}
-	}
-}
-
 
 // reimplemented (iser::ISerializable)
 

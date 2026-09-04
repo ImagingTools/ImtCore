@@ -44,7 +44,7 @@ namespace imtdb
  * QString extracted = extractor->ExtractXPath("metadata", "userName");
  * 
  * // Use in SQL query
- * QString whereClause = QString("WHERE %1 = 'john'").arg(extracted);
+ * QString whereClause = QStringLiteral("WHERE %1 = 'john'").arg(extracted);
  * @endcode
  * 
  * @section isjx_path_syntax Path Syntax

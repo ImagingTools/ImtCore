@@ -399,7 +399,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 			stream << QStringLiteral("QMetaType::Bool");
 		}
 		else {
-			SendCriticalMessage(0, QString("Unexpected type for field '%1'").arg(field.GetId()));
+			SendCriticalMessage(0, QStringLiteral("Unexpected type for field '%1'").arg(field.GetId()));
 			I_CRITICAL();
 
 			return false;
@@ -647,7 +647,7 @@ QString CSdlClassGqlModificatorComp::GetConvertEndForFieldString(const imtsdl::C
 		retVal += QStringLiteral("Bool");
 	}
 	else {
-		SendCriticalMessage(0, QString("Unexpected type for field %1").arg(field.GetId()));
+		SendCriticalMessage(0, QStringLiteral("Unexpected type for field %1").arg(field.GetId()));
 		I_CRITICAL();
 
 		return QString();
@@ -709,7 +709,7 @@ void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& 
 		stream << QStringLiteral("->ContainsParam(\"__typename\")){");
 		FeedStream(stream, 1, false);
 
-		AddErrorReport(stream, QStringLiteral("__typename for field '%3' is missing, but expected"), hIndents + 1, QStringList({QString("\"%1\"").arg(field.GetId())}));
+		AddErrorReport(stream, QStringLiteral("__typename for field '%3' is missing, but expected"), hIndents + 1, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
 
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("return false;");

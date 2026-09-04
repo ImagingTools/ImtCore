@@ -73,7 +73,7 @@ int CDesignTokenIconProcessorComp::Exec()
 				m_onSelectedColor[templateColor] = m_designTokenFileParserCompPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_SELECTED, templateColor);
 			}
 
-			QString outputDirName = m_outputDirName + QDir::separator().toLatin1() + QByteArray("Resources") + QDir::separator().toLatin1() + QByteArray("Icons") + QDir::separator().toLatin1() + styleName.constData();
+			QString outputDirName = m_outputDirName + QDir::separator().toLatin1() + QByteArrayLiteral("Resources") + QDir::separator().toLatin1() + QByteArrayLiteral("Icons") + QDir::separator().toLatin1() + styleName.constData();
 
 			QDir resourceDir(m_inputDirName);
 			QDir colorResourceDir(m_inputDirName);
@@ -120,28 +120,28 @@ QByteArray CDesignTokenIconProcessorComp::GetFileNameForState(const QString& fil
 
 		switch (iconState){
 		case IDesignTokenFileParser::IS_OFF_NORMAL:
-			iconStateFileName = CDesignTokenStyleUtils::s_offNormalColorParamName + QString(".") + fileInfo.suffix();
+			iconStateFileName = CDesignTokenStyleUtils::s_offNormalColorParamName + QStringLiteral(".") + fileInfo.suffix();
 			break;
 		case IDesignTokenFileParser::IS_OFF_DISABLED:
-			iconStateFileName = CDesignTokenStyleUtils::s_offDisabledColorParamName + QString(".") + fileInfo.suffix();
+			iconStateFileName = CDesignTokenStyleUtils::s_offDisabledColorParamName + QStringLiteral(".") + fileInfo.suffix();
 			break;
 		case IDesignTokenFileParser::IS_OFF_ACTIVE:
-			iconStateFileName = CDesignTokenStyleUtils::s_offActiveColorParamName + QString(".") + fileInfo.suffix();
+			iconStateFileName = CDesignTokenStyleUtils::s_offActiveColorParamName + QStringLiteral(".") + fileInfo.suffix();
 			break;
 		case IDesignTokenFileParser::IS_OFF_SELECTED:
-			iconStateFileName = CDesignTokenStyleUtils::s_offSelectedColorParamName + QString(".") + fileInfo.suffix();
+			iconStateFileName = CDesignTokenStyleUtils::s_offSelectedColorParamName + QStringLiteral(".") + fileInfo.suffix();
 			break;
 		case IDesignTokenFileParser::IS_ON_NORMAL:
-			iconStateFileName = CDesignTokenStyleUtils::s_onNormalColorParamName + QString(".") + fileInfo.suffix();
+			iconStateFileName = CDesignTokenStyleUtils::s_onNormalColorParamName + QStringLiteral(".") + fileInfo.suffix();
 			break;
 		case IDesignTokenFileParser::IS_ON_DISABLED:
-			iconStateFileName = CDesignTokenStyleUtils::s_onDisabledColorParamName + QString(".") + fileInfo.suffix();
+			iconStateFileName = CDesignTokenStyleUtils::s_onDisabledColorParamName + QStringLiteral(".") + fileInfo.suffix();
 			break;
 		case IDesignTokenFileParser::IS_ON_ACTIVE:
-			iconStateFileName = CDesignTokenStyleUtils::s_onActiveColorParamName + QString(".") + fileInfo.suffix();
+			iconStateFileName = CDesignTokenStyleUtils::s_onActiveColorParamName + QStringLiteral(".") + fileInfo.suffix();
 			break;
 		case IDesignTokenFileParser::IS_ON_SELECTED:
-			iconStateFileName = CDesignTokenStyleUtils::s_onSelectedColorParamName + QString(".") + fileInfo.suffix();
+			iconStateFileName = CDesignTokenStyleUtils::s_onSelectedColorParamName + QStringLiteral(".") + fileInfo.suffix();
 			break;
 		default:
 			break;

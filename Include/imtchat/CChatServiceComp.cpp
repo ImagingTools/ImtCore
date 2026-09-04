@@ -47,7 +47,7 @@ QByteArray CChatServiceComp::SendMessage(
 	chatMessagePtr->SetReplyToId(replyToId);
 
 	QByteArray objectId = messageCollectionPtr->InsertNewObject(
-				QByteArray("ChatMessage"),
+				QByteArrayLiteral("ChatMessage"),
 				QString(),
 				QString(),
 				messagePtr.GetPtr(),
@@ -117,7 +117,7 @@ QByteArray CChatServiceComp::CreateConversation(
 	convPtr->SetParticipantIds(participantIds);
 
 	QByteArray objectId = conversationCollectionPtr->InsertNewObject(
-				QByteArray("Conversation"),
+				QByteArrayLiteral("Conversation"),
 				name,
 				QString(),
 				conversationPtr.GetPtr(),

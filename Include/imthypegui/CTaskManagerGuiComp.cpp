@@ -141,7 +141,7 @@ void CTaskManagerGuiComp::ShowContextMenu(const QPoint& position, QListView& lis
 		}
 
 		// trigger table
-		if (*m_showTriggerTableAttrPtr && m_triggerTableGuiCompPtr.IsValid()) {
+		if (m_showTriggerTableCompPtr.IsValid() && m_showTriggerTableCompPtr->IsEnabled() && m_triggerTableGuiCompPtr.IsValid()){
 			itemMenu.addAction(m_showTriggerTableCommand.icon(), tr("Trigger Table..."), this, SLOT(OnShowTriggerTable()));
 		}
 
@@ -602,7 +602,8 @@ void CTaskManagerGuiComp::OnGuiCreated()
 	ShowInputManagerButton->setVisible(m_showInputsManagerCommand.isVisible());
 	connect(ShowInputManagerButton, &QToolButton::clicked, this, &CTaskManagerGuiComp::OnShowInputsManager, uniqueQueued);
 
-	m_showTriggerTableCommand.setVisible(*m_showTriggerTableAttrPtr && m_triggerTableGuiCompPtr.IsValid());
+	bool show = m_showTriggerTableCompPtr.IsValid() ? m_showTriggerTableCompPtr->IsEnabled() : false;
+	m_showTriggerTableCommand.setVisible(show && m_triggerTableGuiCompPtr.IsValid());
 	ShowTriggerTableButton->setVisible(m_showTriggerTableCommand.isVisible());
 	if (m_showTriggerTableCommand.isVisible()) {
 		connect(ShowTriggerTableButton, &QToolButton::clicked, this, &CTaskManagerGuiComp::OnShowTriggerTable, uniqueQueued);

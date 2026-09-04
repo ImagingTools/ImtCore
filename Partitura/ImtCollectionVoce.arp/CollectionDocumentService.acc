@@ -48,6 +48,9 @@
                     <AttributeInfo Id="UndoManager" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="SerializedUndoManager"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UndoManagerFolder" Type="Reference" ExportId="UndoManagerFolder">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>

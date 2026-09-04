@@ -13,7 +13,7 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CCollectionImportParam>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CCollectionImportParam>)
 
 QByteArray CCollectionImportParamRepresentationControllerComp::GetTypeId() const
 {

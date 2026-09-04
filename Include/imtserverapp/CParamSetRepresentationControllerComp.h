@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtserverapp/TJsonRepresentationControllerCompWrap.h>
+#include <ilog/TLoggerCompWrap.h>
 #include <imtserverapp/CParamSetRepresentationController.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtBaseTypes_fwd.h>
 
@@ -12,17 +12,21 @@ namespace imtserverapp
 {
 
 
-class CParamSetRepresentationControllerComp: public TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CParamsSet>
+class CParamSetRepresentationControllerComp:
+			public ilog::CLoggerComponentBase,
+			public TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CParamsSet>
 {
 public:
-	typedef TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CParamsSet> BaseClass;
+	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CParamSetRepresentationControllerComp)
+		I_REGISTER_INTERFACE(IJsonRepresentationController);
 		I_ASSIGN_MULTI_0(m_paramRepresentationControllersCompPtr, "ParamRepresentationControllers", "Sub parameters representation controllers", false);
+		I_ASSIGN(m_customParamRepresentationControllerCompPtr, "CustomParamRepresentationController", "Additional application-specific sub parameter representation controller", false, "");
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CParamsSet>)
+	// reimplemented (TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CParamsSet>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetSdlRepresentationFromDataModel(
@@ -37,7 +41,11 @@ protected:
 	virtual void OnComponentCreated() override;
 
 protected:
+	void RegisterSubControllers(const icomp::TMultiReferenceMember<IJsonRepresentationController>& controllers);
+
+protected:
 	I_MULTIREF(IJsonRepresentationController, m_paramRepresentationControllersCompPtr);
+	I_REF(IJsonRepresentationController, m_customParamRepresentationControllerCompPtr);
 
 private:
 	CParamSetRepresentationController m_representationController;
@@ -45,5 +53,3 @@ private:
 
 
 } // namespace imtserverapp
-
-

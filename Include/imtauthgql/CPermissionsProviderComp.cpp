@@ -32,7 +32,7 @@ sdl::V1_0::imtauth::CGetProductPermissionsPayload CPermissionsProviderComp::OnGe
 	}
 
 	if (!arguments.input->productId || arguments.input->productId->isEmpty()){
-		errorMessage = QString("Unable to get permissions. Product-ID is empty.");
+		errorMessage = QStringLiteral("Unable to get permissions. Product-ID is empty.");
 		SendErrorMessage(0, errorMessage, "CPermissionsProviderComp");
 		response.errorMessage = errorMessage;
 		return response;
@@ -48,7 +48,7 @@ sdl::V1_0::imtauth::CGetProductPermissionsPayload CPermissionsProviderComp::OnGe
 
 	if (!tenantId.isEmpty()){
 		if (!m_tenantManagerCompPtr.IsValid()){
-			errorMessage = QString("Unable to get tenant permissions. Tenant manager is not configured.");
+			errorMessage = QStringLiteral("Unable to get tenant permissions. Tenant manager is not configured.");
 			SendErrorMessage(0, errorMessage, "CPermissionsProviderComp");
 			response.errorMessage = errorMessage;
 			return response;
@@ -102,7 +102,7 @@ sdl::V1_0::imtauth::CGetProductPermissionsPayload CPermissionsProviderComp::OnGe
 	}
 
 	if (!arguments.input->productId || arguments.input->productId->isEmpty()){
-		errorMessage = QString("Unable to get permissions. Product-ID is empty.");
+		errorMessage = QStringLiteral("Unable to get permissions. Product-ID is empty.");
 		SendErrorMessage(0, errorMessage, "CPermissionsProviderComp");
 		response.errorMessage = errorMessage;
 		return response;
@@ -119,7 +119,7 @@ sdl::V1_0::imtauth::CGetProductPermissionsPayload CPermissionsProviderComp::OnGe
 	}
 
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to get user permissions. No authenticated user.");
+		errorMessage = QStringLiteral("Unable to get user permissions. No authenticated user.");
 		SendErrorMessage(0, errorMessage, "CPermissionsProviderComp");
 		response.errorMessage = errorMessage;
 		return response;

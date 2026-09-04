@@ -70,7 +70,7 @@ ifile::IFilePersistence::OperationState CQmldirFilePersistenceComp::LoadFromFile
 
 	QFile loadFile(filePath);
 	if (!loadFile.open(QIODevice::ReadOnly | QIODevice::Text)){
-		SendErrorMessage(0, QString("Unable to open file '%1'").arg(loadFile.fileName()), __func__);
+		SendErrorMessage(0, QStringLiteral("Unable to open file '%1'").arg(loadFile.fileName()), __func__);
 
 		return OS_FAILED;
 	}
@@ -105,7 +105,7 @@ ifile::IFilePersistence::OperationState CQmldirFilePersistenceComp::LoadFromFile
 
 			// ensure that the entry is valid schema of entry: [singleton] <TypeName> <VersionName> <FileName>(relative path)
 			if (capturedTexts.size() < 3){
-				SendWarningMessage(0, QString("Unexpected string! '%1' at %2. It will be ignored.").arg(readLine, QString::number(lastReadLine)));
+				SendWarningMessage(0, QStringLiteral("Unexpected string! '%1' at %2. It will be ignored.").arg(readLine, QString::number(lastReadLine)));
 
 				continue;
 			}
@@ -174,7 +174,7 @@ ifile::IFilePersistence::OperationState CQmldirFilePersistenceComp::SaveToFile(
 		paramsSetPtr = &paramsSetRef;
 	}
 	catch (std::bad_cast& ex){
-		SendCriticalMessage(0, QString("Unexpected input data. Error: %1").arg(ex.what()), __func__);
+		SendCriticalMessage(0, QStringLiteral("Unexpected input data. Error: %1").arg(ex.what()), __func__);
 		I_CRITICAL();
 
 		return OS_FAILED;
@@ -184,7 +184,7 @@ ifile::IFilePersistence::OperationState CQmldirFilePersistenceComp::SaveToFile(
 
 	QFile saveFile(filePath);
 	if (!saveFile.open(QIODevice::WriteOnly | QIODevice::Text)){
-		SendErrorMessage(0, QString("Unable to open file '%1'").arg(saveFile.fileName()), __func__);
+		SendErrorMessage(0, QStringLiteral("Unable to open file '%1'").arg(saveFile.fileName()), __func__);
 
 		return OS_FAILED;
 	}
@@ -194,7 +194,7 @@ ifile::IFilePersistence::OperationState CQmldirFilePersistenceComp::SaveToFile(
 	// module name
 	iprm::TParamsPtr<iprm::INameParam> moduleNameParam(paramsSetPtr, QmldirModelParamIds::ModuleName);
 	if (!moduleNameParam.IsValid()){
-		SendErrorMessage(0, QString("Name param '%1' is missing").arg(qPrintable(QmldirModelParamIds::ModuleName)));
+		SendErrorMessage(0, QStringLiteral("Name param '%1' is missing").arg(QmldirModelParamIds::ModuleName));
 		I_CRITICAL();
 
 		return OS_FAILED;

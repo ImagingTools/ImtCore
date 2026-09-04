@@ -135,8 +135,8 @@ bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) con
 	if (httpResponsePtr != nullptr && !data.isEmpty()){
 		QByteArray body = data;
 		imtrest::IResponse::Headers headers = response->GetHeaders();
-		data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
-				   .arg(qPrintable(headers.value("id"))).arg(qPrintable(body)).toUtf8();
+		data = QStringLiteral(R"({"type": "query_data","id": "%1","payload": %2})")
+				   .arg(headers.value("id"), body).toUtf8();
 	}
 
 	EmitSendTextMessage(data);
@@ -339,7 +339,7 @@ void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError error)
 void CWebSocketClientComp::OnSslErrors(const QList<QSslError>& sslErrors)
 {
 	for (const QSslError& error : sslErrors){
-		SendErrorMessage(0, QString("SSL client error: %1").arg(error.errorString()));
+		SendErrorMessage(0, QStringLiteral("SSL client error: %1").arg(error.errorString()));
 	}
 
 	m_webSocket.ignoreSslErrors(sslErrors);
@@ -525,7 +525,7 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 		}
 	}
 
-	SendInfoMessage(0, QString("Try connect to the WebSocket-server: Host: %1; Port: %2, Protocol: %3").arg(url.host()).arg(url.port()).arg(url.scheme()));
+	SendInfoMessage(0, QStringLiteral("Try connect to the WebSocket-server: Host: %1; Port: %2, Protocol: %3").arg(url.host(), QString::number(url.port()), url.scheme()));
 
 #if QT_VERSION >= QT_VERSION_CHECK(6,4,0)
 	QWebSocketHandshakeOptions handshakeOptions;
@@ -606,5 +606,3 @@ imtcom::IConnectionStatusProvider::ConnectionStatus CWebSocketClientComp::Connec
 
 
 } // namespace imtclientgql
-
-

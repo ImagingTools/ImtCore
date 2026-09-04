@@ -282,7 +282,7 @@
 	                "<th>Description</th></tr>";
 	        
 	        for (ITestInfo* test : tests) {
-	            html += QString("<tr>"
+	            html += QStringLiteral("<tr>"
 	                          "<td>%1</td>"
 	                          "<td>%2</td>"
 	                          "<td>%3</td>"

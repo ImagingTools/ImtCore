@@ -14,6 +14,7 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtdb
@@ -46,13 +47,13 @@ IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseBinaryDocumentDelegateComp::
 		return result;
 	}
 
-	const QByteArray objectId =
-		proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray(QUuid::WithoutBraces) : proposedObjectId;
-	const auto query = CreatePreparedInsertQuery(
-		typeId, objectId, objectName, objectDescription, *documentPtr, operationContextPtr, 1);
+	const QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray(QUuid::WithoutBraces) : proposedObjectId;
+	const NewObjectQuery query = CreatePreparedInsertQuery(typeId, objectId, objectName, objectDescription, *documentPtr, operationContextPtr, 1);
+
 	result.query = query.query;
 	result.bindValues = query.bindValues;
 	result.objectName = objectName;
+	
 	return result;
 }
 
@@ -73,14 +74,15 @@ IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseBinaryDocumentDelegateComp::
 	if (m_tableSchemaAttrPtr.IsValid()) {
 		schemaPrefix = QString::fromUtf8(*m_tableSchemaAttrPtr) + '.';
 	}
+
 	RawSqlExpression revision;
-	revision.sql = QString(
-						   "(SELECT MAX(%1) + 1 FROM %2\"%3\" WHERE \"%4\" = :documentId)")
-						   .arg(
-							   CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
-							   schemaPrefix,
-							   QString::fromUtf8(GetTableName()),
-							   QString::fromUtf8(s_documentIdColumn));
+	revision.sql = QStringLiteral(R"((SELECT MAX(%1) + 1 FROM %2"%3" WHERE "%4" = :documentId))")
+						.arg(
+							/*1*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
+							/*2*/ schemaPrefix,
+							/*3*/ GetTableName(),
+							/*4*/ s_documentIdColumn
+						);
 
 	return CreatePreparedInsertQuery(
 		typeId,
@@ -89,7 +91,8 @@ IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseBinaryDocumentDelegateComp::
 		collection.GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString(),
 		object,
 		operationContextPtr,
-		QVariant::fromValue(revision));
+		QVariant::fromValue(revision)
+	);
 }
 
 
@@ -100,10 +103,8 @@ QByteArray CSqlDatabaseBinaryDocumentDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IOperationContext* /*operationContextPtr*/,
 			bool /*useExternDelegate*/) const
 {
-	SendErrorMessage(
-		0,
-		"Binary document updates require parameter binding",
-		"CSqlDatabaseBinaryDocumentDelegateComp");
+	SendErrorMessage(0, QStringLiteral("Binary document updates require parameter binding"), QStringLiteral("CSqlDatabaseBinaryDocumentDelegateComp"));
+		
 	return QByteArray();
 }
 
@@ -121,7 +122,8 @@ IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseBinaryDocumentDelegateComp::
 
 	if (!m_databaseEngineCompPtr.IsValid() ||
 		m_databaseEngineCompPtr->GetDatabaseDriverId().compare(QByteArrayLiteral("QPSQL"), Qt::CaseInsensitive) != 0) {
-		SendErrorMessage(0, "Binary document persistence requires a PostgreSQL database", "CSqlDatabaseBinaryDocumentDelegateComp");
+		SendErrorMessage(0, QStringLiteral("Binary document persistence requires a PostgreSQL database"), QStringLiteral("CSqlDatabaseBinaryDocumentDelegateComp"));
+
 		return result;
 	}
 
@@ -130,8 +132,7 @@ IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseBinaryDocumentDelegateComp::
 		return result;
 	}
 
-	const quint32 checksum = istd::CCrcCalculator::GetCrcFromData(
-		reinterpret_cast<const quint8*>(document.constData()), imtbase::narrow_cast<int>(document.size()));
+	const quint32 checksum = istd::CCrcCalculator::GetCrcFromData(reinterpret_cast<const quint8*>(document.constData()), imtbase::narrow_cast<int>(document.size()));
 	const QString revisionInfo = QString::fromUtf8(CreateRevisionInfoQuery(operationContextPtr, revisionArgument, checksum));
 
 	QString schemaPrefix;
@@ -145,8 +146,8 @@ IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseBinaryDocumentDelegateComp::
 		idoc::MetaInfoPtr metaInfoPtr;
 		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(&object, typeId, metaInfoPtr) && metaInfoPtr.IsValid() &&
 			!m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr(), metaInfoRepresentation, typeId)) {
-			SendWarningMessage(0, QString("Unable to create meta info representation for the object '%1' from the table '%2'")
-									  .arg(QString::fromUtf8(objectId), QString::fromUtf8(GetTableName())));
+			SendWarningMessage(0, QStringLiteral("Unable to create meta info representation for the object '%1' from the table '%2'")
+									  .arg(objectId, GetTableName()));
 		}
 	}
 
@@ -157,65 +158,83 @@ IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseBinaryDocumentDelegateComp::
 		EnsureTenantBindingTableExists();
 	}
 
-	const QString documentTable = QString::fromUtf8(GetTableName());
-	const QString documentIdColumn = QString::fromUtf8(s_documentIdColumn);
-	const QString stateColumn = QString::fromUtf8(s_stateColumn);
-	const QString columns = QString(
-		"\"%1\", \"%2\", \"%3\", \"%4\", \"%5\", \"%6\", \"%7\", \"%8\", \"%9\", \"%10\"")
-								.arg(
-									QString::fromUtf8(s_idColumn),
-									QString::fromUtf8(s_typeIdColumn),
-									documentIdColumn,
-									QString::fromUtf8(s_nameColumn),
-									QString::fromUtf8(s_descriptionColumn),
-									QString::fromUtf8(s_documentColumn),
-									QString::fromUtf8(s_dataMetaInfoColumn),
-									QString::fromUtf8(s_revisionInfoColumn),
-									QString::fromUtf8(s_lastModifiedColumn),
-									stateColumn);
-	const QString values = QString(
-		":id, :typeId, :documentId, :name, :description, :document, %1, %2, :timeStamp, 'Active'")
-							   .arg(
-								   metaInfoRepresentation.isEmpty() ? QStringLiteral("NULL") : QStringLiteral("CAST(:dataMetaInfo AS jsonb)"),
-								   revisionInfo);
-	const QString insertDocument = QString("INSERT INTO %1\"%2\" (%3) VALUES (%4) RETURNING \"%5\"")
-									   .arg(schemaPrefix, documentTable, columns, values, documentIdColumn);
-	const QString deactivate = QString(
-		"UPDATE %1\"%2\" SET \"%3\" = 'InActive' WHERE \"%4\" = :documentId AND \"%3\" = 'Active'")
-									 .arg(schemaPrefix, documentTable, stateColumn, documentIdColumn);
+	const QString documentTable		= GetTableName();
+	const QString documentIdColumn	= s_documentIdColumn;
+	const QString stateColumn		= s_stateColumn;
 
-	if (addTenantBinding) {
+	const QString columns = QStringLiteral(R"("%1", "%2", "%3", "%4", "%5", "%6", "%7", "%8", "%9", "%10")")
+								.arg(
+									/*1*/ s_idColumn,
+									/*2*/ s_typeIdColumn,
+									/*3*/ documentIdColumn,
+									/*4*/ s_nameColumn,
+									/*5*/ s_descriptionColumn,
+									/*6*/ s_documentColumn,
+									/*7*/ s_dataMetaInfoColumn,
+									/*8*/ s_revisionInfoColumn,
+									/*9*/ s_lastModifiedColumn,
+									/*10*/ stateColumn
+								);
+
+	const QString values = QStringLiteral(":id, :typeId, :documentId, :name, :description, :document, %1, %2, :timeStamp, 'Active'")
+								.arg(
+									metaInfoRepresentation.isEmpty() ? imtdb::NULL_DATA_LITERAL : QStringLiteral("CAST(:dataMetaInfo AS jsonb)"),
+									revisionInfo
+								);
+
+	const QString insertDocument = QStringLiteral(R"(INSERT INTO %1"%2" (%3) VALUES (%4) RETURNING "%5")")
+										.arg(
+											/*1*/ schemaPrefix,
+											/*2*/ documentTable,
+											/*3*/ columns,
+											/*4*/ values,
+											/*5*/ documentIdColumn
+										);
+
+	const QString deactivate = QStringLiteral(R"(UPDATE %1"%2" SET "%3" = 'InActive' WHERE "%4" = :documentId AND "%3" = 'Active')")
+									.arg(
+										/*1*/ schemaPrefix,
+										/*2*/ documentTable,
+										/*3*/ stateColumn,
+										/*4*/ documentIdColumn
+									);
+
+	if (!addTenantBinding) {
+		result.query = QStringLiteral("WITH deactivated AS (%1) %2").arg(deactivate, insertDocument).toUtf8();
+	}
+	else{
 		const QByteArray ownerId = operationContextPtr->GetOperationOwnerId().id;
-		const QString createdBy = ownerId.isEmpty() ? QStringLiteral("NULL") : QStringLiteral(":ownerId");
-		result.query = QString(
-			"WITH deactivated AS (%1), inserted AS (%2) "
-			"INSERT INTO %3 (\"Id\", \"TenantId\", \"EntityType\", \"EntityId\", \"CreatedAt\", \"CreatedByUserId\") "
-			"SELECT :tenantBindingId, :tenantId, :entityType, \"%4\", :bindingCreatedAt, %5 FROM inserted "
-			"ON CONFLICT (\"TenantId\", \"EntityType\", \"EntityId\") DO NOTHING")
-						   .arg(deactivate, insertDocument, CreateTenantBindingTableName(), documentIdColumn, createdBy)
-						   .toUtf8();
-		result.bindValues[":tenantBindingId"] = QUuid::createUuid().toString(QUuid::WithoutBraces);
-		result.bindValues[":tenantId"] = QString::fromUtf8(tenantId);
-		result.bindValues[":entityType"] = documentTable;
-		result.bindValues[":bindingCreatedAt"] = QDateTime::currentDateTimeUtc();
+		const QString createdBy = ownerId.isEmpty() ? imtdb::NULL_DATA_LITERAL : QStringLiteral(":ownerId");
+		result.query = QStringLiteral(R"(WITH deactivated AS (%1), inserted AS (%2) INSERT INTO %3 ("Id", "TenantId", "EntityType", "EntityId", "CreatedAt", "CreatedByUserId") SELECT :tenantBindingId, :tenantId, :entityType, "%4", :bindingCreatedAt, %5 FROM inserted ON CONFLICT ("TenantId", "EntityType", "EntityId") DO NOTHING)")
+							.arg(
+								/*1*/ deactivate,
+								/*2*/ insertDocument,
+								/*3*/ CreateTenantBindingTableName(),
+								/*4*/ documentIdColumn,
+								/*5*/ createdBy
+							).toUtf8();
+
+		result.bindValues[QStringLiteral(":tenantBindingId")] = QUuid::createUuid().toString(QUuid::WithoutBraces);
+		result.bindValues[QStringLiteral(":tenantId")] = QString::fromUtf8(tenantId);
+		result.bindValues[QStringLiteral(":entityType")] = documentTable;
+		result.bindValues[QStringLiteral(":bindingCreatedAt")] = QDateTime::currentDateTimeUtc();
 		if (!ownerId.isEmpty()) {
-			result.bindValues[":ownerId"] = QString::fromUtf8(ownerId);
+			result.bindValues[QStringLiteral(":ownerId")] = QString::fromUtf8(ownerId);
 		}
 	}
-	else {
-		result.query = QString("WITH deactivated AS (%1) %2").arg(deactivate, insertDocument).toUtf8();
-	}
 
-	result.bindValues[":id"] = QUuid::createUuid().toString(QUuid::WithoutBraces);
-	result.bindValues[":typeId"] = QString::fromUtf8(typeId);
-	result.bindValues[":documentId"] = QString::fromUtf8(objectId);
-	result.bindValues[":name"] = objectName;
-	result.bindValues[":description"] = objectDescription;
-	result.bindValues[":document"] = document;
-	result.bindValues[":timeStamp"] = QDateTime::currentDateTimeUtc();
+	result.bindValues[QStringLiteral(":id")] = QUuid::createUuid().toString(QUuid::WithoutBraces);
+	result.bindValues[QStringLiteral(":typeId")] = QString::fromUtf8(typeId);
+	result.bindValues[QStringLiteral(":documentId")] = QString::fromUtf8(objectId);
+	result.bindValues[QStringLiteral(":name")] = objectName;
+	result.bindValues[QStringLiteral(":description")] = objectDescription;
+	result.bindValues[QStringLiteral(":document")] = document;
+	result.bindValues[QStringLiteral(":timeStamp")] = QDateTime::currentDateTimeUtc();
+
 	if (!metaInfoRepresentation.isEmpty()) {
-		result.bindValues[":dataMetaInfo"] = QString::fromUtf8(metaInfoRepresentation);
+		result.bindValues[QStringLiteral(":dataMetaInfo")] = QString::fromUtf8(metaInfoRepresentation);
 	}
+	
 	return result;
 }
 
@@ -225,13 +244,15 @@ bool CSqlDatabaseBinaryDocumentDelegateComp::WriteDataToMemory(const QByteArray&
 	auto serializableObjectPtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(&object));
 	if (serializableObjectPtr == nullptr){
 		Q_ASSERT(0);
+
 		return false;
 	}
 
 	iser::CMemoryWriteArchive writeArchive(m_versionInfoCompPtr.GetPtr());
 	iser::CBinaryWriteArchiveBase& archive = writeArchive;
 	if (!serializableObjectPtr->Serialize(archive)){
-		SendErrorMessage(0, "Unable to write data to memory. Error: Serialization failed", "CSqlDatabaseBinaryDocumentDelegateComp");
+		SendErrorMessage(0, QStringLiteral("Unable to write data to memory. Error: Serialization failed"), QStringLiteral("CSqlDatabaseBinaryDocumentDelegateComp"));
+
 		return false;
 	}
 
@@ -246,6 +267,7 @@ bool CSqlDatabaseBinaryDocumentDelegateComp::ReadDataFromMemory(const QByteArray
 	auto serializableObjectPtr = dynamic_cast<iser::ISerializable*>(&object);
 	if (serializableObjectPtr == nullptr){
 		Q_ASSERT(0);
+
 		return false;
 	}
 
@@ -253,7 +275,8 @@ bool CSqlDatabaseBinaryDocumentDelegateComp::ReadDataFromMemory(const QByteArray
 	iser::CMemoryReadArchive readArchive(data.constData(), bufferSize);
 	iser::CBinaryReadArchiveBase& archive = readArchive;
 	if (!serializableObjectPtr->Serialize(archive)){
-		SendErrorMessage(0, "Unable to read data from memory. Error: Serialization failed", "CSqlDatabaseBinaryDocumentDelegateComp");
+		SendErrorMessage(0, QStringLiteral("Unable to read data from memory. Error: Serialization failed"), QStringLiteral("CSqlDatabaseBinaryDocumentDelegateComp"));
+
 		return false;
 	}
 
@@ -262,3 +285,4 @@ bool CSqlDatabaseBinaryDocumentDelegateComp::ReadDataFromMemory(const QByteArray
 
 
 } // namespace imtdb
+

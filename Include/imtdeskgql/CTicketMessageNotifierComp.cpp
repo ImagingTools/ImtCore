@@ -140,7 +140,7 @@ void CTicketMessageNotifierComp::OnUpdate(const istd::IChangeable::ChangeSet& ch
 	QJsonDocument doc(payload);
 	const QByteArray data = doc.toJson(QJsonDocument::Compact);
 
-	const QByteArray commandId = m_commandIdAttrPtr.IsValid() ? *m_commandIdAttrPtr : QByteArray("OnTicketMessageReceived");
+	const QByteArray commandId = m_commandIdAttrPtr.IsValid() ? *m_commandIdAttrPtr : QByteArrayLiteral("OnTicketMessageReceived");
 
 	// Publish only to subscribers whose user is reporter / assignee / admin,
 	// excluding the sender itself (no need to notify yourself).

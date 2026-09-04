@@ -42,7 +42,7 @@ void CJobExecutionControllerCompBase::OnComponentCreated()
 	if (idealThreadCount > 0){
 		m_threadPool.setMaxThreadCount(idealThreadCount / 2);
 
-		SendVerboseMessage(QString("Job processing will be started on %1 cores").arg(idealThreadCount / 2));
+		SendVerboseMessage(QStringLiteral("Job processing will be started on %1 cores").arg(idealThreadCount / 2));
 	}
 
 	connect(&m_updateJobQueueTimer, SIGNAL(timeout()), this, SLOT(OnJobPolling()));
@@ -74,7 +74,7 @@ void CJobExecutionControllerCompBase::OnJobPolling()
 	Q_ASSERT(m_jobQueueManagerCompPtr.IsValid());
 
 	if (m_stopAllTasks){
-		SendVerboseMessage(QString("Job queue shutting down"));
+		SendVerboseMessage(QStringLiteral("Job queue shutting down"));
 
 		return;
 	}
@@ -89,13 +89,13 @@ void CJobExecutionControllerCompBase::OnJobPolling()
 			IJobQueueManager::ProcessingStatus jobStatus = m_jobQueueManagerCompPtr->GetProcessingStatus(jobId);
 
 			if (jobStatus == IJobQueueManager::PS_WAITING_FOR_ACCEPTING){
-				SendVerboseMessage(QString("Job accepted: %1").arg(jobId.constData()));
+				SendVerboseMessage(QStringLiteral("Job accepted: %1").arg(jobId.constData()));
 			
 				m_jobQueueManagerCompPtr->SetProcessingStatus(jobId, IJobQueueManager::PS_WAITING_FOR_PROCESSING);
 			}
 
 			if (jobStatus == IJobQueueManager::PS_WAITING_FOR_PROCESSING){
-				SendVerboseMessage(QString("Trying to start job: %1").arg(jobId.constData()));
+				SendVerboseMessage(QStringLiteral("Trying to start job: %1").arg(jobId.constData()));
 
 				m_jobQueueManagerCompPtr->SetProcessingStatus(jobId, IJobQueueManager::PS_RUNNING);
 
@@ -112,10 +112,10 @@ void CJobExecutionControllerCompBase::OnJobPolling()
 
 						m_jobQueueManagerCompPtr->SetProcessingStatus(jobId, IJobQueueManager::PS_WAITING_FOR_PROCESSING);
 
-						SendErrorMessage(0, QString("Job failed to start: %1").arg(jobId.constData()));
+						SendErrorMessage(0, QStringLiteral("Job failed to start: %1").arg(jobId.constData()));
 					}
 					else{
-						SendVerboseMessage(QString("Job started: %1").arg(jobId.constData()));
+						SendVerboseMessage(QStringLiteral("Job started: %1").arg(jobId.constData()));
 					}
 				}
 			}
@@ -134,7 +134,7 @@ void CJobExecutionControllerCompBase::OnJobFinished(const QByteArray& jobId, con
 
 	m_jobProgressList.remove(jobId);
 
-	SendVerboseMessage(QString("Job finished: %1").arg(jobId.constData()));
+	SendVerboseMessage(QStringLiteral("Job finished: %1").arg(jobId.constData()));
 }
 
 

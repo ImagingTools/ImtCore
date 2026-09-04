@@ -147,7 +147,7 @@ bool CLicenseControllerComp::CheckLicense(const QByteArray& key) const
 
 	QFileInfo licenseFileInfo(licenseFilePath);
 	if (!licenseFileInfo.exists()){
-		SendErrorMessage(0, QT_TR_NOOP(QString("License file '%1' doesn't exist").arg(licenseFilePath)), "License Management");
+		SendErrorMessage(0, QT_TR_NOOP(QStringLiteral("License file '%1' doesn't exist").arg(licenseFilePath)), "License Management");
 
 		m_licenseStatus.SetLicenseStatusFlags(imtlic::ILicenseStatus::LSF_LICENSE_INVALID | imtlic::ILicenseStatus::LSF_NO_LICENSE);
 
@@ -182,7 +182,7 @@ bool CLicenseControllerComp::CheckLicense(const QByteArray& key, const QString& 
 
 	QFileInfo licenseFileInfo(licensePath);
 	if (!licenseFileInfo.exists()){
-		SendWarningMessage(0, QT_TR_NOOP(QString("License file '%1' doesn't exist").arg(licensePath)), "CLicenseControllerComp::CheckLicense");
+		SendWarningMessage(0, QT_TR_NOOP(QStringLiteral("License file '%1' doesn't exist").arg(licensePath)), "CLicenseControllerComp::CheckLicense");
 		return false;
 	}
 
@@ -276,7 +276,7 @@ bool CLicenseControllerComp::ReadLicenseFromFile(imtlic::IProductInstanceInfo& l
 
 	QFileInfo licenseFileInfo(licenseFilePath);
 	if (!licenseFileInfo.exists()){
-		SendErrorMessage(0, QT_TR_NOOP(QString("License file '%1' doesn't exist").arg(licenseFilePath)), "License Management");
+		SendErrorMessage(0, QT_TR_NOOP(QStringLiteral("License file '%1' doesn't exist").arg(licenseFilePath)), "License Management");
 
 		m_licenseStatus.SetLicenseStatusFlags(imtlic::ILicenseStatus::LSF_LICENSE_INVALID | imtlic::ILicenseStatus::LSF_NO_LICENSE);
 
@@ -294,17 +294,17 @@ bool CLicenseControllerComp::ReadLicenseFromFile(imtlic::IProductInstanceInfo& l
 				publicKey = m_licenseKeysProviderCompPtr->GetEncryptionKey(imtcrypt::IEncryptionKeysProvider::KT_PASSWORD);
 			}
 			if (!publicKey.contains("[Not Available]")){
-				SendWarningMessage(0, QT_TR_NOOP(QString("You have no valid license to run this software anymore. You have %1 day(s) to update your system with a valid license").arg(daysUntilExpire)), "License Management");
+				SendWarningMessage(0, QT_TR_NOOP(QStringLiteral("You have no valid license to run this software anymore. You have %1 day(s) to update your system with a valid license").arg(daysUntilExpire)), "License Management");
 			}
 			else{
-				SendWarningMessage(0, QT_TR_NOOP(QString("Sensor is not connected. You have %1 day(s) for running the software without the sensor.").arg(daysUntilExpire)), "License Management");
+				SendWarningMessage(0, QT_TR_NOOP(QStringLiteral("Sensor is not connected. You have %1 day(s) for running the software without the sensor.").arg(daysUntilExpire)), "License Management");
 			}
 			m_licenseStatus.SetLicenseStatusFlags(imtlic::ILicenseStatus::LSF_LICENSE_INVALID | imtlic::ILicenseStatus::LSF_GOODWILL);
 
 			m_licenseStatus.SetGoodwillRemainingDays(daysUntilExpire);
 		}
 		else{
-			SendErrorMessage(0, QT_TR_NOOP(QString("You have no license to run this software. License file: '%1'").arg(licenseFilePath)), "License Management");
+			SendErrorMessage(0, QT_TR_NOOP(QStringLiteral("You have no license to run this software. License file: '%1'").arg(licenseFilePath)), "License Management");
 
 			return false;
 		}
