@@ -1185,6 +1185,11 @@ sdl::V1_0::imtauth::CCreateContractPayload CTenantManagerControllerComp::OnCreat
 		terms = *arguments.input->terms;
 	}
 
+	if (!imtbase::isValidUuid(relationshipId)){
+		response.errorMessage = QStringLiteral("Valid relationship ID is required");
+		return response;
+	}
+
 	QByteArray contractId = m_contractManagerCompPtr->CreateContract(
 								relationshipId,
 								sourceTenantId,

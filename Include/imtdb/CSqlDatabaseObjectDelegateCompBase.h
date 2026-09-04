@@ -36,6 +36,7 @@ public:
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
 		I_ASSIGN(m_autoCreateTableAttrPtr, "AutoCreateTable", "Auto create collection table if it does not exist", false, false);
 		I_ASSIGN(m_createTableScriptPathAttrPtr, "CreateTableScriptPath", "QRC path or file name of SQL script used to create collection table", false, "");
+		I_ASSIGN(m_prerequisiteTableScriptPathAttrPtr, "PrerequisiteTableScriptPath", "QRC path or file name of SQL script creating tables the collection table references (executed before CreateTableScriptPath)", false, "");
 	I_END_COMPONENT
 
 	virtual QString SqlEncode(const QString& sqlQuery) const;
@@ -106,6 +107,7 @@ protected:
 	virtual QString EncodeTextArgument(const QString& argument) const;
 	virtual bool CreateTableIfNeeded();
 	virtual bool TableExists(const QString& tableName) const;
+	bool ExecuteTableScript(const QByteArray& scriptPath, const QString& tableName);
 
 protected:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
@@ -117,6 +119,7 @@ protected:
 	I_ATTR(QByteArray, m_objectTypeIdColumnAttrPtr);
 	I_ATTR(bool, m_autoCreateTableAttrPtr);
 	I_ATTR(QByteArray, m_createTableScriptPathAttrPtr);
+	I_ATTR(QByteArray, m_prerequisiteTableScriptPathAttrPtr);
 };
 
 

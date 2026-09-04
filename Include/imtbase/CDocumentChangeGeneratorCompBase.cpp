@@ -226,7 +226,19 @@ bool CDocumentChangeGeneratorCompBase::GenerateDocumentChanges(
 	}
 
 	if (operationTypeId == QByteArray("Update")){
-		return AppendDocumentComparison(documentId, documentPtr, documentChangeCollection, errorMessage);
+		const auto changeCountBefore = documentChangeCollection.GetElementIds().size();
+
+		if (!AppendDocumentComparison(documentId, documentPtr, documentChangeCollection, errorMessage)){
+			InsertOperationDescription(documentChangeCollection, "ChangesUnavailable", "", "");
+
+			return false;
+		}
+
+		if (documentChangeCollection.GetElementIds().size() == changeCountBefore){
+			InsertOperationDescription(documentChangeCollection, "NoChanges", "", "");
+		}
+
+		return true;
 	}
 
 	// Attributes stored outside of the document body describe themselves through the optional
@@ -377,6 +389,19 @@ QString CDocumentChangeGeneratorCompBase::CreateStandardOperationDescription(
 
 	if (typeId == "Clear"){
 		return Translate(QT_TR_NOOP("'%1' was cleared"), languageId, translationContext).arg(keyName);
+	}
+
+	if (typeId == "NoChanges"){
+		return Translate(QT_TR_NOOP("Saved without changes"), languageId, translationContext);
+	}
+
+	if (typeId == "ChangesUnavailable"){
+		return Translate(QT_TR_NOOP("The changes of this revision could not be determined"), languageId, translationContext);
+	}
+
+	if (!typeId.isEmpty()){
+		return Translate(QT_TR_NOOP("Operation '%1'"), languageId, translationContext)
+				.arg(QString::fromUtf8(typeId).toHtmlEscaped());
 	}
 
 	return QString();
