@@ -197,7 +197,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>ViewGroups</Value>
-                                            <Value>ViewOrganizationGroups</Value>
+                                            <Value>/GroupManagement/ViewOrganizationGroups</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -234,7 +234,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>ChangeGroup</Value>
-                                            <Value>ChangeOrganizationGroup</Value>
+                                            <Value>/GroupManagement/EditOrganizationGroup/ChangeOrganizationGroup</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

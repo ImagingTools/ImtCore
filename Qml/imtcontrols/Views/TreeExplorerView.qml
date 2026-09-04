@@ -59,6 +59,9 @@ FocusScope {
 	// Off when the level cannot take new children - e.g. its owner is still blank.
 	property bool createEnabled: true
 	property bool removeVisible: true
+	// Off while what is selected must not be dropped - the command greys out
+	// instead of refusing the click afterwards.
+	property bool removeEnabled: true
 	property bool renameVisible: true
 	property bool moveVisible: true
 	// Row editing: the Edit command and the per-row pencil. Off for tables whose
@@ -87,6 +90,15 @@ FocusScope {
 	// the row enters edit mode.
 	property Component headerContentComponent: null
 	property Component rowContentComponent: null
+	// Shared column geometry for that header/row pair. Setting it puts a drag
+	// handle on every boundary between two visible columns, so the widths both
+	// components read from it can be changed by hand. Without it they size
+	// their own cells and nothing drags.
+	property TableColumnLayout columnLayout: null
+	// Gap between the cells of the header and row components. It has to match
+	// what those components space their cells by, because the handles sit in
+	// the gaps rather than on top of the cells.
+	property real columnSpacing: Style.spacingM
 	// Detail pane docked to the right of the table behind a draggable split.
 	// It stays on screen with nothing selected - a panel that comes and goes
 	// makes the whole page jump - and shows its own placeholder instead.
@@ -553,7 +565,7 @@ FocusScope {
 
 	function removeSelection() {
 		let targets = commandTargets()
-		if (!editable || targets.length === 0)
+		if (!editable || !removeEnabled || targets.length === 0)
 			return
 		removeNodesRequested(targets, currentParentNode())
 	}
@@ -873,7 +885,7 @@ FocusScope {
 					id: removeCommand
 					visible: root.removeVisible && root.movingNode === null
 						&& root.editingNode === null && !commandRow.compact
-					active: root.editable && root.commandTargets().length > 0
+					active: root.editable && root.removeEnabled && root.commandTargets().length > 0
 					iconSource: "qrc:/" + Style.getIconPath("Icons/Delete", Icon.State.On,
 						removeCommand.active ? Icon.Mode.Normal : Icon.Mode.Disabled)
 					text: root.checkedNodes.length > 1
@@ -1012,6 +1024,86 @@ FocusScope {
 				anchors.rightMargin: root.rowRightInset
 				active: root.headerContentComponent !== null
 				sourceComponent: root.headerContentComponent
+			}
+
+			// Column dividers, one per boundary between two visible columns.
+			// They sit in the gap the header and rows already leave between
+			// cells, so nothing has to move to make room for them, and they
+			// reach a little past the header on both sides so the grab area is
+			// comfortable without the line itself getting fat.
+			Item {
+				id: columnHandles
+				anchors.fill: parent
+				anchors.leftMargin: root.rowLeftInset
+				anchors.rightMargin: root.rowRightInset
+				visible: root.columnLayout !== null
+				z: 1
+
+				Repeater {
+					// Read off the array rather than through columnCount(), so
+					// the handles follow a layout whose columns are replaced.
+					model: root.columnLayout ? root.columnLayout.fractions.length : 0
+
+					Item {
+						id: handle
+						width: root.columnSpacing + 2 * Style.marginXS
+						height: columnHandles.height + Style.marginS
+						y: -Style.marginXS
+						// Sits on the trailing edge of its column, centred in
+						// the gap that follows it.
+						x: root.columnLayout.offsetOf(index, columnHandles.width, root.columnSpacing)
+							+ root.columnLayout.widthOf(index, columnHandles.width, root.columnSpacing)
+							- Style.marginXS
+						// The last visible column has no boundary of its own:
+						// there is nothing on its right to trade width with.
+						visible: root.columnLayout.isVisible(index, columnHandles.width)
+							&& root.columnLayout.nextVisible(index, columnHandles.width) >= 0
+
+						Rectangle {
+							anchors.horizontalCenter: parent.horizontalCenter
+							anchors.top: parent.top
+							anchors.bottom: parent.bottom
+							width: 1
+							color: handleMouse.pressed ? Style.titleColor
+								: handleMouse.containsMouse ? Style.borderColor : "transparent"
+						}
+
+						MouseArea {
+							id: handleMouse
+							anchors.fill: parent
+							hoverEnabled: true
+							cursorShape: Qt.SplitHCursor
+							preventStealing: true
+
+							// Tracked as a running delta against the header
+							// rather than as an absolute position: the handle
+							// moves as the column resizes, so its own
+							// coordinates shift under the pointer mid-drag.
+							property real lastX: 0
+
+							onPressed: {
+								handleMouse.lastX = handleMouse.mapToItem(columnHandles, mouse.x, 0).x
+							}
+
+							onPositionChanged: {
+								if (!handleMouse.pressed)
+									return
+								let current = handleMouse.mapToItem(columnHandles, mouse.x, 0).x
+								root.columnLayout.resize(index, current - handleMouse.lastX,
+									columnHandles.width, root.columnSpacing)
+								handleMouse.lastX = current
+							}
+
+							onDoubleClicked: root.columnLayout.reset()
+						}
+
+						TooltipArea {
+							anchors.fill: parent
+							mouseArea: handleMouse
+							text: qsTr("Drag to resize, double-click to reset the columns")
+						}
+					}
+				}
 			}
 		}
 
@@ -1489,7 +1581,7 @@ FocusScope {
 						width: overflowColumn.width
 						leftAligned: true
 						visible: root.removeVisible
-						active: root.editable && root.commandTargets().length > 0
+						active: root.editable && root.removeEnabled && root.commandTargets().length > 0
 						iconSource: "qrc:/" + Style.getIconPath("Icons/Delete", Icon.State.On,
 							overflowRemove.active ? Icon.Mode.Normal : Icon.Mode.Disabled)
 						text: root.checkedNodes.length > 1

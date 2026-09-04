@@ -228,7 +228,8 @@ bool CFeatureControllerComp::CreateFeatureFromRepresentationModel(
 			const imtbase::CTreeItemModel& representationModel,
 			imtlic::CFeatureInfo& featureInfo,
 			const QByteArray& objectId,
-			QString& errorMessage) const
+			QString& errorMessage,
+			bool isRootFeature) const
 {
 	QByteArray featureId;
 	if (representationModel.ContainsKey("FeatureId")){
@@ -242,21 +243,26 @@ bool CFeatureControllerComp::CreateFeatureFromRepresentationModel(
 		return false;
 	}
 
-	iprm::CIdParam idParam;
-	idParam.SetId(featureId);
+	if (isRootFeature){
+		// Only the root feature's ID is stored as a separate collection object, so uniqueness
+		// only needs to (and can only meaningfully) be checked at the root level; sub-features
+		// are allowed to reuse a Feature-ID as long as their parent path differs (checked below).
+		iprm::CIdParam idParam;
+		idParam.SetId(featureId);
 
-	iprm::CParamsSet paramsSet1;
-	paramsSet1.SetEditableParameter("FeatureId", &idParam);
+		iprm::CParamsSet paramsSet1;
+		paramsSet1.SetEditableParameter("FeatureId", &idParam);
 
-	iprm::CParamsSet filterParam;
-	filterParam.SetEditableParameter("ObjectFilter", &paramsSet1);
+		iprm::CParamsSet filterParam;
+		filterParam.SetEditableParameter("ObjectFilter", &paramsSet1);
 
-	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-	if (!collectionIds.isEmpty()){
-		QByteArray id = collectionIds[0];
-		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QStringLiteral("Feature-ID: '%1' already exists. Please rename.")).arg(featureId);
-			return false;
+		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+		if (!collectionIds.isEmpty()){
+			QByteArray id = collectionIds[0];
+			if (objectId != id){
+				errorMessage = QT_TR_NOOP(QStringLiteral("Feature-ID: '%1' already exists. Please rename.")).arg(featureId);
+				return false;
+			}
 		}
 	}
 
@@ -295,8 +301,14 @@ bool CFeatureControllerComp::CreateFeatureFromRepresentationModel(
 				Q_ASSERT(featureRepresentationModelPtr != nullptr);
 
 				imtlic::CFeatureInfo* subFeatureInfoPtr = new imtlic::CFeatureInfo();
-				bool ok = CreateFeatureFromRepresentationModel(*featureRepresentationModelPtr, *subFeatureInfoPtr, objectId, errorMessage);
+				bool ok = CreateFeatureFromRepresentationModel(*featureRepresentationModelPtr, *subFeatureInfoPtr, objectId, errorMessage, false);
 				if (!ok){
+					return false;
+				}
+
+				const QByteArray subFeatureId = subFeatureInfoPtr->GetFeatureId();
+				if (featureInfo.GetSubFeature(subFeatureId, 1).IsValid()){
+					errorMessage = QT_TR_NOOP(QString("Feature-ID: '%1' already exists among sibling features of '%2'.")).arg(qPrintable(subFeatureId), qPrintable(featureId));
 					return false;
 				}
 
@@ -315,7 +327,7 @@ bool CFeatureControllerComp::CreateFeatureFromRepresentationModel(
 		featureIds = dependencies.split(';');
 	}
 
-	featureInfo.SetDependencies(featureIds);
+	featureInfo.SetRequirements(featureIds);
 
 	return true;
 }
@@ -333,7 +345,7 @@ bool CFeatureControllerComp::CreateRepresentationModelFromFeatureInfo(
 	representationModel.SetData("FeatureName", featureInfo.GetFeatureName());
 	representationModel.SetData("Optional", featureInfo.IsOptional());
 	representationModel.SetData("FeatureDescription", featureInfo.GetFeatureDescription());
-	representationModel.SetData("Dependencies", featureInfo.GetDependencies().join(';'));
+	representationModel.SetData("Dependencies", featureInfo.GetRequirements().join(';'));
 	representationModel.AddTreeModel("ChildModel");
 
 	if (parentModelPtr != nullptr){

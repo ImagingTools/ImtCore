@@ -27,6 +27,34 @@ ViewBase {
 	// it travels next to that feature instead of being glued onto it.
 	property var optionalFeatures: []
 	property bool canEdit: false
+	// Part of the product this view works in; scopes its permission checks.
+	property string permissionPath: ""
+
+	// The feature catalog, flattened: what each requirement path names, and the
+	// nodes of every feature with the requirements they declare. Requirements
+	// travel as paths ("/Reports/Advanced"), while a product holds feature
+	// document ids - this is what maps the one onto the other.
+	property var catalogNodesByPath: ({})
+	property var catalogNodesByFeatureId: ({})
+	// Who asked for what: a feature document id, or "<featureId>/<subFeatureId>"
+	// for a part, against the names of the features requiring it. Nothing of this
+	// is stored with the product - it follows from the requirements again, so it
+	// cannot go stale when a feature is edited.
+	property var requiredByIndex: ({})
+	// The parts that were actually asked for, by the feature they belong to. A
+	// product takes a feature whole, so what else came with it is only knowable
+	// by comparing the two.
+	property var requiredPartsIndex: ({})
+	// Requirements of this product that the catalog has no feature for, and
+	// features it requires but does not hold yet. Both are shown as a warning
+	// rather than repaired behind the user's back.
+	property var unresolvedRequirements: []
+	property var missingRequiredNames: []
+	// Features that nothing requires any more after the last change, and that
+	// stayed in the product. They are named rather than dropped: a license may
+	// already grant them, and a product that offers one feature too many is a
+	// smaller problem than a license that grants what its product no longer has.
+	property var freedFeatureNames: []
 
 	Component.onCompleted: {
 		canEdit = PermissionsController.checkPermission("ChangeProduct")
@@ -132,9 +160,321 @@ ViewBase {
 		productData.modelChanged([])
 	}
 
+	// Every feature and part of the catalog, by the path requirements name it
+	// with. Rebuilt whenever the catalog changes, which is what updateFeaturesGui
+	// answers to.
+	function rebuildCatalogIndex() {
+		let byPath = ({})
+		let byFeatureId = ({})
+		let tree = TreeModelBuilder.fromTreeItemModelByFields(allFeaturesModel, {
+			key: FeatureItemTypeMetaInfo.s_id,
+			children: FeatureItemTypeMetaInfo.s_subFeatures,
+			columns: {
+				id: FeatureItemTypeMetaInfo.s_id,
+				featureName: FeatureItemTypeMetaInfo.s_featureName,
+				featureId: FeatureItemTypeMetaInfo.s_featureId,
+				optional: FeatureItemTypeMetaInfo.s_optional,
+				requirements: FeatureItemTypeMetaInfo.s_requirements
+			}
+		})
+		for (let i = 0; i < tree.length; ++i) {
+			let data = tree[i].data || {}
+			collectCatalogNodes(tree[i], data.id || "", "", true, byPath, byFeatureId)
+		}
+		catalogNodesByPath = byPath
+		catalogNodesByFeatureId = byFeatureId
+	}
+
+	function collectCatalogNodes(node, featureId, parentPath, isRoot, byPath, byFeatureId) {
+		let data = node.data || {}
+		let nodeId = data.featureId || ""
+		if (featureId === "" || nodeId === "")
+			return
+		let nodePath = parentPath + "/" + nodeId
+		let entry = {
+			"featureId": featureId,
+			"subFeatureId": isRoot ? "" : nodeId,
+			"optional": data.optional === true,
+			"featureName": data.featureName || nodeId,
+			"requirements": data.requirements ? data.requirements.split(';') : []
+		}
+		byPath[nodePath] = entry
+		if (!byFeatureId[featureId])
+			byFeatureId[featureId] = []
+		byFeatureId[featureId].push(entry)
+		let children = node.children || []
+		for (let i = 0; i < children.length; ++i)
+			collectCatalogNodes(children[i], featureId, nodePath, false, byPath, byFeatureId)
+	}
+
+	function takenSubFeaturesOf(taken, featureId) {
+		return taken[featureId] ? taken[featureId] : []
+	}
+
+	// Follows the requirements of the given features to the end and answers with
+	// what the product has to hold: the features, the parts taken from them, and
+	// who asked for each of them. A part that is not taken says nothing - what an
+	// optional part requires counts once the product takes it.
+	function resolveRequirements(featureIdList, optionalList) {
+		let ids = featureIdList.slice()
+		let taken = ({})
+		for (let i = 0; i < optionalList.length; ++i) {
+			if (ids.indexOf(optionalList[i].featureId) >= 0)
+				taken[optionalList[i].featureId] = optionalList[i].subFeatureIds.slice()
+		}
+		let requiredBy = ({})
+		// Which parts of a feature were actually asked for. A product takes a
+		// feature whole, so the rest of it comes along - that is worth saying.
+		let requiredParts = ({})
+		let unresolved = []
+		let pending = ids.slice()
+		while (pending.length > 0) {
+			let featureId = pending.shift()
+			let nodes = catalogNodesByFeatureId[featureId] ? catalogNodesByFeatureId[featureId] : []
+			for (let n = 0; n < nodes.length; ++n) {
+				let node = nodes[n]
+				if (node.subFeatureId !== "" && node.optional
+						&& takenSubFeaturesOf(taken, featureId).indexOf(node.subFeatureId) < 0)
+					continue
+				for (let r = 0; r < node.requirements.length; ++r) {
+					let path = node.requirements[r]
+					if (path === "")
+						continue
+					let target = catalogNodesByPath[path]
+					if (!target) {
+						if (unresolved.indexOf(path) < 0)
+							unresolved.push(path)
+						continue
+					}
+					noteRequiredBy(requiredBy, target.featureId, node.featureName)
+					if (ids.indexOf(target.featureId) < 0) {
+						ids.push(target.featureId)
+						pending.push(target.featureId)
+					}
+					if (target.subFeatureId === "")
+						continue
+					// A part is required, so the feature it belongs to stays as
+					// well; an optional part on top of that has to be taken.
+					noteRequiredBy(requiredBy, target.featureId + "/" + target.subFeatureId, node.featureName)
+					noteRequiredBy(requiredParts, target.featureId, target.featureName)
+					if (target.optional
+							&& takenSubFeaturesOf(taken, target.featureId).indexOf(target.subFeatureId) < 0) {
+						if (!taken[target.featureId])
+							taken[target.featureId] = []
+						taken[target.featureId].push(target.subFeatureId)
+						pending.push(target.featureId)
+					}
+				}
+			}
+		}
+		return {
+			"featureIds": ids,
+			"optionalFeatures": takenToOptionalFeatures(taken, ids),
+			"requiredBy": requiredBy,
+			"requiredParts": requiredParts,
+			"unresolved": unresolved
+		}
+	}
+
+	function noteRequiredBy(requiredBy, key, featureName) {
+		if (!requiredBy[key])
+			requiredBy[key] = []
+		if (requiredBy[key].indexOf(featureName) < 0)
+			requiredBy[key].push(featureName)
+	}
+
+	function takenToOptionalFeatures(taken, ids) {
+		let result = []
+		for (let i = 0; i < ids.length; ++i) {
+			let subFeatureIds = takenSubFeaturesOf(taken, ids[i])
+			if (subFeatureIds.length > 0)
+				result.push({ "featureId": ids[i], "subFeatureIds": subFeatureIds.slice() })
+		}
+		return result
+	}
+
+	function sameIds(first, second) {
+		if (first.length !== second.length)
+			return false
+		for (let i = 0; i < first.length; ++i) {
+			if (second.indexOf(first[i]) < 0)
+				return false
+		}
+		return true
+	}
+
+	function sameOptionalFeatures(first, second) {
+		if (first.length !== second.length)
+			return false
+		for (let i = 0; i < first.length; ++i) {
+			let ids = takenSubFeatureIdsIn(second, first[i].featureId)
+			if (!sameIds(first[i].subFeatureIds, ids))
+				return false
+		}
+		return true
+	}
+
+	function takenSubFeatureIdsIn(entries, featureId) {
+		for (let i = 0; i < entries.length; ++i) {
+			if (entries[i].featureId === featureId)
+				return entries[i].subFeatureIds
+		}
+		return []
+	}
+
+	// Brings the product in line with what its features require. With applyChanges
+	// the missing ones are added - that is what every edit of the feature set
+	// does; without it the product is only marked, so that opening one never
+	// writes to it behind the user's back. Running it twice changes nothing the
+	// first run did not.
+	// Answers whether the list of features itself changed, which is what decides
+	// if the table has to be built anew.
+	function applyRequirements(applyChanges) {
+		let closure = resolveRequirements(selectedFeatureIds(), optionalFeatures)
+		requiredByIndex = closure.requiredBy
+		requiredPartsIndex = closure.requiredParts
+		unresolvedRequirements = closure.unresolved
+		if (!applyChanges) {
+			missingRequiredNames = missingFeatureNames(closure.featureIds)
+			return false
+		}
+		missingRequiredNames = []
+		let featuresChanged = !sameIds(closure.featureIds, selectedFeatureIds())
+		if (featuresChanged)
+			applyFeatureIds(closure.featureIds)
+		if (!sameOptionalFeatures(closure.optionalFeatures, optionalFeatures))
+			applyOptionalFeatures(closure.optionalFeatures)
+		return featuresChanged
+	}
+
+	function missingFeatureNames(closureIds) {
+		let names = []
+		let ids = selectedFeatureIds()
+		for (let i = 0; i < closureIds.length; ++i) {
+			if (ids.indexOf(closureIds[i]) >= 0)
+				continue
+			let nodes = catalogNodesByFeatureId[closureIds[i]]
+			names.push(nodes && nodes.length > 0 ? nodes[0].featureName : closureIds[i])
+		}
+		return names
+	}
+
+	// The features that asked for this one; while there is any, the row stays.
+	function requiredByNames(featureId) {
+		return requiredByIndex[featureId] ? requiredByIndex[featureId] : []
+	}
+
+	function subFeatureRequiredByNames(featureId, subFeatureId) {
+		let key = featureId + "/" + subFeatureId
+		return requiredByIndex[key] ? requiredByIndex[key] : []
+	}
+
+	function featureIsRequired(featureId) {
+		return requiredByNames(featureId).length > 0
+	}
+
+	// Requirement paths by the name of what they point at. An unknown one is
+	// shown as the path it was written as, so a stale requirement is visible
+	// instead of silently missing.
+	function requirementNamesFor(paths) {
+		let names = []
+		for (let i = 0; i < paths.length; ++i) {
+			let path = paths[i]
+			if (path === "")
+				continue
+			let target = catalogNodesByPath[path]
+			let name = target ? target.featureName : path
+			if (names.indexOf(name) < 0)
+				names.push(name)
+		}
+		return names
+	}
+
+	// What one part of a feature asks for. The feature itself is the part with
+	// an empty sub-feature id.
+	function requirementNamesOf(featureId, subFeatureId) {
+		let nodes = catalogNodesByFeatureId[featureId] ? catalogNodesByFeatureId[featureId] : []
+		for (let i = 0; i < nodes.length; ++i) {
+			if (nodes[i].subFeatureId === subFeatureId)
+				return requirementNamesFor(nodes[i].requirements)
+		}
+		return []
+	}
+
+	// What this feature asks for, by name: its own requirements and those of the
+	// parts the product takes from it - the ones the product really pulls in.
+	function featureRequirementNames(featureId) {
+		let names = []
+		let nodes = catalogNodesByFeatureId[featureId] ? catalogNodesByFeatureId[featureId] : []
+		for (let n = 0; n < nodes.length; ++n) {
+			let node = nodes[n]
+			if (node.subFeatureId !== "" && node.optional
+					&& takenSubFeatureIds(featureId).indexOf(node.subFeatureId) < 0)
+				continue
+			let nodeNames = requirementNamesFor(node.requirements)
+			for (let i = 0; i < nodeNames.length; ++i) {
+				if (names.indexOf(nodeNames[i]) < 0)
+					names.push(nodeNames[i])
+			}
+		}
+		return names
+	}
+
+	function requiredPartNames(featureId) {
+		return requiredPartsIndex[featureId] ? requiredPartsIndex[featureId] : []
+	}
+
+	// The line under the panel: what holds the selected feature in this product,
+	// or what it drags along, and only failing both the general note.
+	function selectedFeatureFooterText() {
+		let featureId = selectedRootFeatureId()
+		let requiredBy = requiredByNames(featureId)
+		if (requiredBy.length > 0) {
+			// Naming the part that was asked for is what tells a feature that
+			// belongs here as a whole from one whose single part was wanted -
+			// the case where the parts below are worth making optional.
+			let parts = requiredPartNames(featureId)
+			if (parts.length > 0) {
+				return qsTr("%1 needs %2; the rest of this feature comes with it, as its parts are not optional")
+					.arg(namesSummary(requiredBy)).arg(namesSummary(parts))
+			}
+			return qsTr("%1 needs this feature, so it stays in the product").arg(namesSummary(requiredBy))
+		}
+		let requires = featureRequirementNames(featureId)
+		if (requires.length > 0)
+			return qsTr("This feature needs %1, which the product takes along").arg(namesSummary(requires))
+		return qsTr("Which optional parts a license actually unlocks is decided on the Features page of that license")
+	}
+
+	function requirementWarningText() {
+		if (missingRequiredNames.length > 0)
+			return qsTr("%1 required missing").arg(missingRequiredNames.length)
+		if (unresolvedRequirements.length > 0)
+			return qsTr("%1 requirements unknown").arg(unresolvedRequirements.length)
+		if (freedFeatureNames.length > 0)
+			return qsTr("%1 no longer required").arg(freedFeatureNames.length)
+		return ""
+	}
+
+	function requirementWarningDetails() {
+		if (missingRequiredNames.length > 0)
+			return missingRequiredNames
+		if (unresolvedRequirements.length > 0)
+			return unresolvedRequirements
+		return freedFeatureNames
+	}
+
 	function updateFeaturesGui() {
 		productFeaturesViewModel.clear()
+		freedFeatureNames = []
+		rebuildCatalogIndex()
 		refreshFeatureIds()
+		// A product is completed as it is opened, not only as it is edited: one
+		// saved before a requirement was declared would otherwise show a feature
+		// list its own features contradict, and would only right itself once the
+		// user happened to touch something. A reader who may not change the
+		// product gets the warning instead.
+		applyRequirements(canEdit)
 		selectRootFeature(null)
 		if (!productData || !productData.m_features) {
 			featureTree = []
@@ -224,15 +564,21 @@ ViewBase {
 		removeRootFeatures(selectedNode ? [selectedNode] : [])
 	}
 
-	// Drops the features and everything picked underneath them in one pass.
+	// Drops the features and everything picked underneath them in one pass. A
+	// feature another one requires is not dropped: it would come straight back,
+	// so the row keeps its "Required by" mark instead of appearing to resist.
+	// Removing the feature that asked for it first is what frees it.
 	function removeRootFeatures(nodes) {
 		if (!canEdit || !nodes || nodes.length === 0)
 			return
 		let doomed = []
 		for (let i = 0; i < nodes.length; ++i) {
 			let data = nodes[i] && nodes[i].data ? nodes[i].data : null
-			if (data && data.id)
-				doomed.push(data.id)
+			if (!data || !data.id)
+				continue
+			if (featureIsRequiredByOthers(data.id, nodes))
+				continue
+			doomed.push(data.id)
 		}
 		if (doomed.length === 0)
 			return
@@ -259,7 +605,31 @@ ViewBase {
 		}
 		applyOptionalFeatures(remainingOptional)
 		applyFeatureIds(remainingIds)
+		applyRequirements(true)
 		updateFeaturesGui()
+	}
+
+	// Whether some feature that stays behind requires this one. Features removed
+	// in the same pass do not count - dropping a feature together with what it
+	// alone required is one decision, not a contradiction.
+	function featureIsRequiredByOthers(featureId, removedNodes) {
+		let remainingIds = []
+		let ids = selectedFeatureIds()
+		for (let i = 0; i < ids.length; ++i) {
+			if (!nodesContainFeatureId(removedNodes, ids[i]))
+				remainingIds.push(ids[i])
+		}
+		let closure = resolveRequirements(remainingIds, optionalFeatures)
+		return closure.featureIds.indexOf(featureId) >= 0
+	}
+
+	function nodesContainFeatureId(nodes, featureId) {
+		for (let i = 0; i < nodes.length; ++i) {
+			let data = nodes[i] && nodes[i].data ? nodes[i].data : null
+			if (data && data.id === featureId)
+				return true
+		}
+		return false
 	}
 
 	// Only the leaves of a product feature. A node that has children of its own
@@ -294,6 +664,24 @@ ViewBase {
 
 	function subFeatureCount(node) {
 		return node && node.children ? node.children.length : 0
+	}
+
+	// The chip in the Sub-features column: plain count for a feature the product
+	// took, "1 / 3" for one it holds because a single part of it was required -
+	// the two numbers say at a glance how much of it nobody asked for.
+	function subFeatureSummary(node) {
+		let count = subFeatureCount(node)
+		if (count === 0)
+			return ""
+		let featureId = node && node.data ? node.data.id || "" : ""
+		let needed = requiredPartNames(featureId).length
+		if (needed === 0 || needed >= count)
+			return "" + count
+		return needed + " / " + count
+	}
+
+	function subFeaturePartlyNeeded(node) {
+		return subFeatureSummary(node).indexOf("/") >= 0
 	}
 
 	function rebuildSubFeatureEntries() {
@@ -345,10 +733,77 @@ ViewBase {
 		applyOptionalFeatures(result)
 	}
 
-	function toggleSubFeature(entry) {
+	function entryIsChangeable(entry) {
 		if (!canEdit || !entry || !entry.optional)
+			return false
+		// A part another feature requires stays taken as long as that feature does.
+		return subFeatureRequiredByNames(entry.rootId, entry.featureId).length === 0
+	}
+
+	function toggleSubFeature(entry) {
+		if (!entryIsChangeable(entry))
 			return
+		let previousRequiredBy = requiredByIndex
 		setSubFeatureTaken(entry.rootId, entry.featureId, !entryIsIncluded(entry))
+		// Taking a part brings in what it requires. The table is only built anew
+		// when that added a feature to the product - otherwise the row the user
+		// is working in would lose its selection under their hands.
+		let featuresChanged = applyRequirements(true)
+		freedFeatureNames = collectFreedFeatures(previousRequiredBy)
+		if (featuresChanged)
+			updateFeaturesGui()
+	}
+
+	// What this change let go of: features the product still holds, that were
+	// there for a requirement which no longer speaks. Whether they are wanted on
+	// their own is a question only the user can answer, so they are listed.
+	function collectFreedFeatures(previousRequiredBy) {
+		let names = []
+		let ids = selectedFeatureIds()
+		for (let i = 0; i < ids.length; ++i) {
+			let featureId = ids[i]
+			if (!previousRequiredBy[featureId] || previousRequiredBy[featureId].length === 0)
+				continue
+			if (requiredByNames(featureId).length > 0)
+				continue
+			let nodes = catalogNodesByFeatureId[featureId]
+			names.push(nodes && nodes.length > 0 ? nodes[0].featureName : featureId)
+		}
+		return names
+	}
+
+	// What the table says about a part: what holds it, or what it is otherwise.
+	// What it requires is not spelled out here - a part may name a long list of
+	// them, and the badge has one line.
+	function entryStateText(entry) {
+		if (!entry)
+			return ""
+		let requiredBy = subFeatureRequiredByNames(entry.rootId, entry.featureId)
+		if (requiredBy.length > 0)
+			return qsTr("Required by %1").arg(namesSummary(requiredBy))
+		// A feature that is here for one of its parts brings the rest of them
+		// with it, because they are not optional. Those are the parts nobody
+		// asked for, and they say so instead of passing as a choice.
+		if (entryCameAlong(entry))
+			return qsTr("Came along")
+		return entry.optional ? qsTr("Optional") : qsTr("Always included")
+	}
+
+	// A mandatory part of a feature that is in this product only because another
+	// feature needs a different part of it.
+	function entryCameAlong(entry) {
+		if (!entry || entry.optional)
+			return false
+		if (subFeatureRequiredByNames(entry.rootId, entry.featureId).length > 0)
+			return false
+		return requiredPartNames(entry.rootId).length > 0
+	}
+
+	// Names for a place with one line to spare: the first few, and how many more.
+	function namesSummary(names) {
+		if (names.length <= 3)
+			return names.join(", ")
+		return qsTr("%1 and %2 more").arg(names.slice(0, 3).join(", ")).arg(names.length - 3)
 	}
 
 	function optionalEntries() {
@@ -378,8 +833,9 @@ ViewBase {
 		let takeAll = !allOptionalIncluded()
 		let featureId = selectedRootFeatureId()
 		let ids = []
-		if (takeAll) {
-			for (let i = 0; i < entries.length; ++i)
+		for (let i = 0; i < entries.length; ++i) {
+			// Clearing leaves the parts another feature requires where they are.
+			if (takeAll || !entryIsChangeable(entries[i]))
 				ids.push(entries[i].featureId)
 		}
 		let result = []
@@ -389,7 +845,12 @@ ViewBase {
 		}
 		if (ids.length > 0)
 			result.push({ "featureId": featureId, "subFeatureIds": ids })
+		let previousRequiredBy = requiredByIndex
 		applyOptionalFeatures(result)
+		let featuresChanged = applyRequirements(true)
+		freedFeatureNames = collectFreedFeatures(previousRequiredBy)
+		if (featuresChanged)
+			updateFeaturesGui()
 	}
 
 	// "taken / total" over the optional parts of one product feature, so the
@@ -429,6 +890,10 @@ ViewBase {
 					let featureId = tableModel.getData("id", selectedIndexes[i])
 					productViewContainer.addFeature(featureId)
 				}
+				// A feature is worth nothing without what it requires, so those
+				// come along - transitively, and with the optional parts a
+				// requirement points at.
+				productViewContainer.applyRequirements(true)
 				productViewContainer.productData.endChanges()
 				productViewContainer.updateFeaturesGui()
 			}
@@ -582,8 +1047,8 @@ ViewBase {
 			// Column geometry, shared by the header and the rows so the two can
 			// never drift. A column whose breakpoint is above the current table
 			// width folds away and its share is handed to the columns that stay.
-			property var columnFractions: [0.26, 0.18, 0.26, 0.12, 0.18]
-			property var columnBreakpoints: [0, 380, 640, 300, 480]
+			property var columnFractions: [0.22, 0.14, 0.20, 0.10, 0.14, 0.20]
+			property var columnBreakpoints: [0, 460, 720, 300, 560, 380]
 
 			function columnVisible(index, width) {
 				return width >= featuresPage.columnBreakpoints[index]
@@ -682,6 +1147,21 @@ ViewBase {
 							color: Style.subtitleColor
 						}
 					}
+					Item {
+						width: featuresPage.columnWidth(5, headerRow.width, headerRow.spacing)
+						height: headerRow.height
+						visible: width > 0
+						BaseText {
+							anchors.left: parent.left
+							anchors.leftMargin: Style.marginXS
+							anchors.right: parent.right
+							anchors.verticalCenter: parent.verticalCenter
+							text: qsTr("Requirements")
+							font.family: Style.fontFamilyBold
+							font.pixelSize: Style.fontSizeS
+							color: Style.subtitleColor
+						}
+					}
 				}
 			}
 
@@ -698,12 +1178,33 @@ ViewBase {
 					property var node: parent ? parent.node : null
 					property var nodeData: rowContent.node && rowContent.node.data ? rowContent.node.data : null
 
+					// The name, with a lock in front of it while another feature
+					// holds this one in the product. The mark sits here rather than
+					// only in the Requirements column, which folds away on a narrow
+					// table.
 					Item {
+						id: featureNameCell
 						width: featuresPage.columnWidth(0, rowContent.width, rowContent.spacing)
 						height: rowContent.height
 						visible: width > 0
-						BaseText {
+
+						property bool locked: rowContent.nodeData
+							? productViewContainer.featureIsRequired(rowContent.nodeData.id || "") : false
+
+						Image {
+							id: lockIcon
 							anchors.left: parent.left
+							anchors.leftMargin: Style.marginXS
+							anchors.verticalCenter: parent.verticalCenter
+							width: Style.iconSizeS
+							height: width
+							visible: featureNameCell.locked
+							source: "qrc:/" + Style.getIconPath("Icons/Lock", Icon.State.On, Icon.Mode.Normal)
+							fillMode: Image.PreserveAspectFit
+						}
+
+						BaseText {
+							anchors.left: lockIcon.visible ? lockIcon.right : parent.left
 							anchors.leftMargin: Style.marginXS
 							anchors.right: parent.right
 							anchors.rightMargin: Style.marginXS
@@ -756,6 +1257,9 @@ ViewBase {
 						visible: width > 0
 
 						property int count: productViewContainer.subFeatureCount(rowContent.node)
+						// "needed / total" while only part of this feature was asked
+						// for, so the parts that came along are visible from the row.
+						property bool partlyNeeded: productViewContainer.subFeaturePartlyNeeded(rowContent.node)
 
 						Rectangle {
 							anchors.centerIn: parent
@@ -764,16 +1268,16 @@ ViewBase {
 							radius: height / 2
 							visible: subfeaturesCell.count > 0
 							color: Style.backgroundColor2
-							border.color: Style.borderColor
+							border.color: subfeaturesCell.partlyNeeded ? Style.highlightColor : Style.borderColor
 							border.width: 1
 
 							BaseText {
 								id: countText
 								anchors.centerIn: parent
-								text: subfeaturesCell.count
+								text: productViewContainer.subFeatureSummary(rowContent.node)
 								font.pixelSize: Style.fontSizeS
 								font.family: Style.fontFamilyBold
-								color: Style.titleColor
+								color: subfeaturesCell.partlyNeeded ? Style.highlightColor : Style.titleColor
 							}
 						}
 
@@ -798,6 +1302,74 @@ ViewBase {
 							elide: Text.ElideRight
 						}
 					}
+
+					// What ties this feature to the others: the features that
+					// brought it into the product - such a row stays while they do -
+					// and, failing that, what it asks for itself.
+					Item {
+						id: requirementsCell
+						width: featuresPage.columnWidth(5, rowContent.width, rowContent.spacing)
+						height: rowContent.height
+						visible: width > 0
+
+						property string featureId: rowContent.nodeData ? rowContent.nodeData.id || "" : ""
+						property var requiredBy: productViewContainer.requiredByNames(requirementsCell.featureId)
+						property var requires: productViewContainer.featureRequirementNames(requirementsCell.featureId)
+
+						Rectangle {
+							id: requiredByChip
+							anchors.left: parent.left
+							anchors.leftMargin: Style.marginXS
+							anchors.right: parent.right
+							anchors.rightMargin: Style.marginXS
+							anchors.verticalCenter: parent.verticalCenter
+							height: Style.controlHeightS
+							radius: height / 2
+							visible: requirementsCell.requiredBy.length > 0
+							color: Style.backgroundColor2
+							border.color: Style.borderColor
+							border.width: 1
+
+							Row {
+								anchors.left: parent.left
+								anchors.leftMargin: Style.marginS
+								anchors.right: parent.right
+								anchors.rightMargin: Style.marginS
+								anchors.verticalCenter: parent.verticalCenter
+								spacing: Style.spacingXS
+
+								Image {
+									anchors.verticalCenter: parent.verticalCenter
+									width: Style.iconSizeS
+									height: width
+									source: "qrc:/" + Style.getIconPath("Icons/Lock", Icon.State.On, Icon.Mode.Normal)
+									fillMode: Image.PreserveAspectFit
+								}
+
+								BaseText {
+									anchors.verticalCenter: parent.verticalCenter
+									width: requiredByChip.width - Style.iconSizeS - 3 * Style.marginS
+									text: qsTr("Required by %1").arg(productViewContainer.namesSummary(requirementsCell.requiredBy))
+									font.pixelSize: Style.fontSizeS
+									color: Style.titleColor
+									elide: Text.ElideRight
+								}
+							}
+						}
+
+						BaseText {
+							anchors.left: parent.left
+							anchors.leftMargin: Style.marginXS
+							anchors.right: parent.right
+							anchors.rightMargin: Style.marginXS
+							anchors.verticalCenter: parent.verticalCenter
+							visible: !requiredByChip.visible
+							text: requirementsCell.requires.length > 0
+								? qsTr("Requires %1").arg(productViewContainer.namesSummary(requirementsCell.requires)) : "-"
+							color: requirementsCell.requires.length > 0 ? Style.subtitleColor : Style.inactiveTextColor
+							elide: Text.ElideRight
+						}
+					}
 				}
 			}
 
@@ -817,17 +1389,17 @@ ViewBase {
 					searchPlaceholder: qsTr("Search sub-features")
 					emptyText: qsTr("No sub-features")
 					emptyDescription: qsTr("This feature is included as a whole")
-					footerText: qsTr("Which optional parts a license actually unlocks is decided on the Features page of that license")
+					footerText: productViewContainer.selectedFeatureFooterText()
 					subtitle: productViewContainer.selectedFeatureName()
 					actionText: productViewContainer.optionalEntries().length === 0 ? ""
 						: productViewContainer.allOptionalIncluded() ? qsTr("Clear") : qsTr("Take all")
 					actionEnabled: productViewContainer.canEdit
 					entryTitleProvider: function(entry) { return entry.featureName }
 					entrySubtitleProvider: function(entry) { return entry.fullPath }
-					entryBadgeProvider: function(entry) { return entry.optional ? qsTr("Optional") : qsTr("Always included") }
+					entryBadgeProvider: function(entry) { return productViewContainer.entryStateText(entry) }
 					entrySearchableTextProvider: function(entry) { return entry.fullPath + " " + entry.featureId }
 					entryCheckStateProvider: function(entry) { return productViewContainer.entryIsIncluded(entry) ? Qt.Checked : Qt.Unchecked }
-					entryCheckEnabledProvider: function(entry) { return productViewContainer.canEdit && entry.optional }
+					entryCheckEnabledProvider: function(entry) { return productViewContainer.entryIsChangeable(entry) }
 					onToggleRequested: productViewContainer.toggleSubFeature(entry)
 					onActionRequested: productViewContainer.toggleAllOptional()
 				}
@@ -844,9 +1416,25 @@ ViewBase {
 				emptyText: qsTr("No features added")
 				emptyDescription: qsTr("Use Add feature to build this product")
 				idleHintText: qsTr("Select a feature to choose which of its parts this product includes")
-				selectedHintText: qsTr("Tick the optional parts on the right; the rest always comes with the feature")
+				selectedHintText: productViewContainer.featureIsRequired(productViewContainer.selectedRootFeatureId())
+					? qsTr("%1 needs this feature; remove it first to drop this one")
+						.arg(productViewContainer.requiredByNames(productViewContainer.selectedRootFeatureId()).join(", "))
+					: qsTr("Tick the optional parts on the right; the rest always comes with the feature")
+				// What this product still owes: features its own ones require but
+				// that are not in it (added as soon as the feature set is touched,
+				// and by the server on save), and requirements naming a feature
+				// the catalog no longer has.
+				levelStatusText: productViewContainer.requirementWarningText()
+				levelStatusDetails: productViewContainer.requirementWarningDetails()
 				editable: productViewContainer.canEdit
 				navigationEnabled: false
+				// One row at a time: a tick in front of every feature reads as a
+				// choice about the product, which it is not - the choices are the
+				// optional parts on the right.
+				multiSelectEnabled: false
+				// A feature another one requires cannot be dropped, so the command
+				// says so before it is pressed.
+				removeEnabled: !productViewContainer.featureIsRequired(productViewContainer.selectedRootFeatureId())
 				renameVisible: false
 				moveVisible: false
 				editVisible: false

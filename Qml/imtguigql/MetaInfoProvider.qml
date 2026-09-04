@@ -9,7 +9,7 @@ Item {
     id: container;
 
     property string getMetaInfoGqlCommand;
-    property string context;
+    property string permissionPath;
 
     property TreeItemModel metaInfoModel: TreeItemModel {}
 
@@ -44,8 +44,8 @@ Item {
 
             var gqlData = query.GetQuery();
             let headers = container.getHeaders()
-			if (headers && container.context && container.context != "")
-				headers["context"] = container.context
+			if (headers && container.permissionPath && container.permissionPath != "")
+				headers["permissionPath"] = container.permissionPath
 
             this.setGqlQuery(gqlData, headers);
         }

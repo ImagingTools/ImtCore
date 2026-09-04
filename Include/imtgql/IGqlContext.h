@@ -12,6 +12,12 @@
 #include <imtauth/IUserInfo.h>
 
 
+namespace imtlic
+{
+	class IProductInfo;
+}
+
+
 namespace imtgql
 {
 
@@ -48,6 +54,25 @@ public:
 
 	virtual const imtauth::IUserInfo* GetUserInfo() const = 0;
 	virtual void SetUserInfo(const imtauth::IUserInfo* userInfoPtr) = 0;
+
+	/**
+		Get information about the product this request runs against, if available.
+		It carries the feature tree the permissions of the product are declared in,
+		which is what a permission check needs to resolve requirements between them.
+	*/
+	virtual imtlic::IProductInfo* GetProductInfo() const = 0;
+	virtual void SetProductInfo(imtlic::IProductInfo* productInfoPtr) = 0;
+
+	/**
+		Get the permissions the user of this request holds through the requirements
+		of the permissions given to them, transitively: holding 'A' whose
+		requirements name 'B' is holding 'B' as well.
+
+		The permissions held directly are not part of the returned list, and the
+		list is empty while the context carries no user or no product info to
+		resolve the requirements in.
+	*/
+	virtual imtauth::IUserInfo::FeatureIds GetImpliedPermissions() const = 0;
 
 	virtual bool IsTenantOwner() const = 0;
 	virtual void SetIsTenantOwner(bool isTenantOwner) = 0;

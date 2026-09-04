@@ -12,6 +12,7 @@
 #include <imtlic/CLicenseDefinition.h>
 #include <imtlic/CProductInfo.h>
 #include <imtlic/IFeatureInfo.h>
+#include <imtlicgql/imtlicgql.h>
 
 
 namespace imtlicgql
@@ -486,22 +487,13 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 	QByteArrayList featureIds;
 	if (!features.isEmpty()){
 		featureIds = features.split(';');
-
-		for (const QByteArray& featureId : featureIds){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_featureCollectionCompPtr->GetObjectData(featureId, dataPtr)){
-				const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
-				if (featureInfoPtr != nullptr){
-					productInfoPtr->AddFeature(featureId, *featureInfoPtr);
-				}
-			}
-		}
+		featureIds.removeAll(QByteArray());
 	}
 
-	// Kept out of the loop above on purpose. Every id in "features" is a feature
-	// document id and is looked up as one; the ids below are nodes inside such a
-	// document and are never resolved against the collection. featureId is only
-	// matched against what the product actually has, to drop stale entries.
+	// Every id in "features" is a feature document id and is looked up as one;
+	// the ids below are nodes inside such a document and are never resolved
+	// against the collection. featureId is only matched against what the product
+	// actually has, to drop stale entries.
 	imtlic::IProductInfo::OptionalFeatureInfos optionalFeatures;
 	if (productDataRepresentation.optionalFeatures){
 		for (const sdl::V1_0::imtlic::CProductOptionalFeature& optionalFeature : productDataRepresentation.optionalFeatures->ToList()){
@@ -528,7 +520,36 @@ bool CProductCollectionControllerComp::FillObjectFromRepresentation(
 		}
 	}
 
-	productInfoPtr->SetOptionalFeatures(optionalFeatures);
+	// A feature is worth nothing without what it requires, so the product is
+	// completed here rather than trusted to arrive complete: the editor resolves
+	// the same requirements while the user works, but a product also arrives from
+	// an older client, from another one, or from a direct request - and a product
+	// missing a required feature is one whose generated product info silently
+	// drops that requirement (\see CProductInfoFileGeneratorComp).
+	const ProductFeatureClosure featureClosure = CompleteProductFeatures(
+			*m_featureCollectionCompPtr,
+			featureIds,
+			optionalFeatures);
+
+	for (const QByteArray& unresolvedRequirement : featureClosure.unresolvedRequirements){
+		SendWarningMessage(
+				0,
+				QStringLiteral("Product '%1' requires '%2', which no feature of the catalog carries")
+						.arg(name, QString::fromUtf8(unresolvedRequirement)),
+				"CProductCollectionControllerComp");
+	}
+
+	for (const QByteArray& featureId : featureClosure.featureIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_featureCollectionCompPtr->GetObjectData(featureId, dataPtr)){
+			const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
+			if (featureInfoPtr != nullptr){
+				productInfoPtr->AddFeature(featureId, *featureInfoPtr);
+			}
+		}
+	}
+
+	productInfoPtr->SetOptionalFeatures(featureClosure.optionalFeatures);
 
 	return true;
 }

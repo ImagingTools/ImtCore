@@ -18,6 +18,8 @@ Rectangle {
 
 	property int contentWidth: Style.sizeHintL
 	property string documentId: ""
+	// Part of the product this panel works in; scopes its permission checks.
+	property alias permissionPath: historyView.permissionPath
 	property alias collectionId: historyView.collectionId
 	property alias contentHeight: historyView.contentHeight
 
