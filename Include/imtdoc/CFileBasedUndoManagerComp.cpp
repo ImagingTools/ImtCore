@@ -8,6 +8,7 @@
 #include <QtCore/QFile>
 
 // ACF includes
+#include <istd/CChangeGroup.h>
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
@@ -214,7 +215,7 @@ bool CFileBasedUndoManagerComp::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.EndTag(currentStateTag);
 	}
 
-	if (retVal && m_currentStatePtr){
+	if (retVal && !archive.IsStoring() && m_currentStatePtr){
 		RestoreObservedObject(*m_currentStatePtr);
 	}
 
@@ -569,6 +570,8 @@ void CFileBasedUndoManagerComp::AfterUpdate(imod::IModel* modelPtr, const istd::
 	}
 
 	Q_ASSERT(!changeSet.IsEmpty());
+
+	istd::CChangeGroup changeGroup(this);
 
 	bool skipUndo = changeSet.ContainsExplicit(istd::IChangeable::CF_NO_UNDO, true);
 
