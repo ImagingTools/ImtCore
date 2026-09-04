@@ -428,10 +428,10 @@ bool CSqlDatabaseObjectDelegateCompBase::CreatePaginationQuery(int offset, int c
 
 	if (offset >= 0 && count > 0){
 		if (IsSqliteDriver()){
-			paginationQuery = QStringLiteral("LIMIT %1 OFFSET %2").arg(count, offset).toUtf8();
+			paginationQuery = QStringLiteral("LIMIT %1 OFFSET %2").arg(QString::number(count), QString::number(offset)).toUtf8();
 		}
 		else{
-			paginationQuery = QStringLiteral("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset, count).toUtf8();
+			paginationQuery = QStringLiteral("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(QString::number(offset), QString::number(count)).toUtf8();
 		}
 	}
 
