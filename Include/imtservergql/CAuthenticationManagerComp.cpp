@@ -149,6 +149,11 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 		}
 	}
 
+	const QByteArray forwardedLanguageId = headers.value(imtbase::s_languageIdHeaderId);
+	if (!forwardedLanguageId.isEmpty()){
+		gqlContextPtr->SetLanguageId(forwardedLanguageId);
+	}
+
 	if (m_userSettingsCollectionCompPtr.IsValid() && !resolvedUserId.isEmpty()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_userSettingsCollectionCompPtr->GetObjectData(resolvedUserId, dataPtr)){
@@ -161,7 +166,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 						const iprm::IOptionsList* optionListPtr = languageParamPtr->GetSelectionConstraints();
 						if (optionListPtr != nullptr){
 							int index = languageParamPtr->GetSelectedOptionIndex();
-							if (index >= 0){
+							if (index >= 0 && forwardedLanguageId.isEmpty()){
 								QByteArray languageId = optionListPtr->GetOptionId(index);
 								gqlContextPtr->SetLanguageId(languageId);
 							}

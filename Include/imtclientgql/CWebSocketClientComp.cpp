@@ -17,6 +17,7 @@
 #include <iprm/TParamsPtr.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtgql/CGqlResponse.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtrest/CWebSocketRequest.h>
@@ -55,6 +56,11 @@ QByteArray CWebSocketClientComp::BuildRequestEnvelope(const GqlRequestPtr& reque
 		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
 		for (const QByteArray& headerId: headers.keys()){
 			headersObject[headerId] = QString(headers.value(headerId));
+		}
+
+		const QByteArray languageId = contextPtr->GetLanguageId();
+		if (!languageId.isEmpty()){
+			headersObject[QString::fromUtf8(imtbase::s_languageIdHeaderId)] = QString::fromUtf8(languageId);
 		}
 	}
 	dataObject["headers"] = headersObject;
