@@ -49,6 +49,10 @@
 #include <imtauth/CPersonalAccessTokenManagerComp.h>
 #include <imtauth/CPersonalAccessTokenMetaInfoCreatorComp.h>
 #include <imtauth/CUserRecentActionComp.h>
+#include <imtauth/COidcClient.h>
+#include <imtauth/COidcAuthorizationCode.h>
+#include <imtauth/COidcTokenInfo.h>
+#include <imtauth/CRs256JwtTokenProviderComp.h>
 #include <imtauth/CTenantInfoComp.h>
 #include <imtauth/CTenantMetaInfoCreatorComp.h>
 #include <imtauth/CTenantManagerComp.h>
@@ -74,6 +78,11 @@
 #include <imtauth/COrderRequestComp.h>
 #include <imtauth/COrderRequestHandlerComp.h>
 #include <imtauth/CTenantDocumentNameProviderComp.h>
+#include <imtauth/CExternalIdentity.h>
+#include <imtauth/CGoogleOidcProviderComp.h>
+#include <imtauth/CAppleOidcProviderComp.h>
+#include <imtauth/CFacebookOidcProviderComp.h>
+#include <imtauth/CExternalOidcAuthControllerComp.h>
 #include <imtauth/CTenantRelationshipDocumentNameProviderComp.h>
 #include <imtauth/CRoleDocumentNameProviderComp.h>
 #include <imtauth/CUserDocumentNameProviderComp.h>
@@ -175,6 +184,25 @@ typedef icomp::TModelCompWrap<
 typedef imtauth::CPersonalAccessTokenManagerComp PersonalAccessTokenManager;
 typedef imtauth::CPersonalAccessTokenMetaInfoCreatorComp PersonalAccessTokenMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CUserRecentActionComp> UserRecentAction;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap <
+						imtauth::COidcClient,
+						imtauth::IOidcClient,
+						iser::ISerializable,
+						istd::IChangeable>> OidcClient;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap <
+						imtauth::COidcAuthorizationCode,
+						imtauth::IOidcAuthorizationCode,
+						iser::ISerializable,
+						istd::IChangeable>> OidcAuthorizationCode;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap <
+						imtauth::COidcTokenInfo,
+						imtauth::IOidcTokenInfo,
+						iser::ISerializable,
+						istd::IChangeable>> OidcTokenInfo;
+typedef imtauth::CRs256JwtTokenProviderComp Rs256JwtTokenProvider;
 typedef icomp::TModelCompWrap<imtauth::CTenantInfoComp> TenantInfo;
 typedef imtauth::CTenantMetaInfoCreatorComp TenantMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CTenantManagerComp> TenantManager;
@@ -200,6 +228,16 @@ typedef icomp::TModelCompWrap<imtauth::CCrossTenantMessageBrokerComp> CrossTenan
 typedef icomp::TModelCompWrap<imtauth::COrderRequestComp> OrderRequestInfo;
 typedef icomp::TModelCompWrap<imtauth::COrderRequestHandlerComp> OrderRequestHandler;
 typedef imtauth::CTenantDocumentNameProviderComp TenantDocumentNameProvider;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap <
+						imtauth::CExternalIdentity,
+						imtauth::IExternalIdentity,
+						iser::ISerializable,
+						istd::IChangeable>> ExternalIdentity;
+typedef imtauth::CGoogleOidcProviderComp GoogleOidcProvider;
+typedef imtauth::CAppleOidcProviderComp AppleOidcProvider;
+typedef imtauth::CFacebookOidcProviderComp FacebookOidcProvider;
+typedef imtauth::CExternalOidcAuthControllerComp ExternalOidcAuthController;
 typedef imtauth::CTenantRelationshipDocumentNameProviderComp TenantRelationshipDocumentNameProvider;
 typedef imtauth::CRoleDocumentNameProviderComp RoleDocumentNameProvider;
 typedef imtauth::CUserDocumentNameProviderComp UserDocumentNameProvider;
