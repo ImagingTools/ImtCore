@@ -734,6 +734,12 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTableIfNeeded()
 		return false;
 	}
 
+	const QByteArray prerequisiteScriptPath = m_prerequisiteTableScriptPathAttrPtr.IsValid()
+			? *m_prerequisiteTableScriptPathAttrPtr : QByteArray();
+	if (!prerequisiteScriptPath.isEmpty() && !ExecuteTableScript(prerequisiteScriptPath, tableName)){
+		return false;
+	}
+
 	if (TableExists(tableName)){
 		return true;
 	}
@@ -741,12 +747,6 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTableIfNeeded()
 	const QByteArray scriptPath = m_createTableScriptPathAttrPtr.IsValid() ? *m_createTableScriptPathAttrPtr : QByteArray();
 	if (scriptPath.isEmpty()){
 		SendErrorMessage(0, QT_TR_NOOP("Table creation script path is empty"));
-		return false;
-	}
-
-	const QByteArray prerequisiteScriptPath = m_prerequisiteTableScriptPathAttrPtr.IsValid()
-			? *m_prerequisiteTableScriptPathAttrPtr : QByteArray();
-	if (!prerequisiteScriptPath.isEmpty() && !ExecuteTableScript(prerequisiteScriptPath, tableName)){
 		return false;
 	}
 
