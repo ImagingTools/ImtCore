@@ -134,6 +134,10 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 	}
 	userInfoPtr->SetMail(mail);
 
+	if (representation.enabled){
+		userInfoPtr->SetEnabled(*representation.enabled);
+	}
+
 	QByteArrayList roleIds;
 	if (representation.roles){
 		roleIds = representation.roles->ToList();

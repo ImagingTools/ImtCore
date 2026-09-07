@@ -97,6 +97,7 @@ sdl::V1_0::imtauth::CUserData CUserCollectionDocumentServiceComp::OnGetUserRepre
 	response.name = userPtr->GetName();
 	response.username = userPtr->GetId();
 	response.email = userPtr->GetMail();
+	response.enabled = bool(userPtr->IsEnabled());
 
 	response.groups.Emplace();
 	for (const QByteArray& groupId : effectiveUserPtr->GetGroups()){
@@ -223,6 +224,9 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	}
 	if (userData.username){
 		userPtr->SetId(*userData.username);
+	}
+	if (userData.enabled){
+		userPtr->SetEnabled(*userData.enabled);
 	}
 
 	// Handle system info: remove existing systems and apply the new ones

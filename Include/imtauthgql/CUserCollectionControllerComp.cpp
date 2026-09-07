@@ -151,6 +151,10 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 
 	userInfoPtr->SetMail(mail);
 
+	if (representation.enabled){
+		userInfoPtr->SetEnabled(*representation.enabled);
+	}
+
 	imtauth::IUserInfo::FeatureIds permissions;
 	if (representation.permissions){
 		permissions = representation.permissions->ToList();
@@ -383,6 +387,10 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.mail = QString(userInfoPtr->GetMail());
 	}
 
+	if (requestInfo.items.isEnabledRequested){
+		representationObject.enabled = bool(userInfoPtr->IsEnabled());
+	}
+
 	if (requestInfo.items.isSystemIdRequested){
 		QByteArrayList systemIdList;
 		imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
@@ -580,6 +588,8 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 
 	QString mail = userInfoPtr->GetMail();
 	representationPayload.email = QString(mail);
+
+	representationPayload.enabled = bool(userInfoPtr->IsEnabled());
 
 	QByteArrayList groupList = userInfoPtr->GetGroups();
 	std::sort(groupList.begin(), groupList.end());
