@@ -166,6 +166,7 @@ class Property extends BaseObject {
         let middleValue = oldValue
 
         if(typeof value === 'function'){
+            target[name + '__fn'] = value
             try {
                 global.queueFlag.push(true)
                 this.queueLink.push({
@@ -219,6 +220,7 @@ class Property extends BaseObject {
             }
 
             if(target.__properties) delete target.__properties[name]
+            if(typeof value !== 'function') delete target[name + '__fn']
         }
         return this.set(target, name, value, meta)
     }

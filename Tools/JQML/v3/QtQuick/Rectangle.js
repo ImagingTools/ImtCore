@@ -12,10 +12,12 @@ class Rectangle extends Item {
         radius: {type: Real, value: 0},
         gradient: {type: Var, value: undefined},
         border: {type:Border},
+        JQOpacityMultiplier: {type: Real, value: 1},
 
         colorChanged: {type:Signal, args:[]},
         radiusChanged: {type:Signal, args:[]},
         gradientChanged: {type:Signal, args:[]},
+        JQOpacityMultiplierChanged: {type:Signal, args:[]},
     })
 
     static create(parent=null, properties = {}, context = {}){
@@ -57,10 +59,10 @@ class Rectangle extends Item {
     }
 
     SLOT_colorChanged(oldValue, newValue){
-        let alphaMultiplier = newValue === 'transparent' ? 0 : this.opacity
+        let alphaMultiplier = newValue === 'transparent' ? 0 : this.JQOpacityMultiplier
         let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
         this.__setDOMStyle({
-            opacity: this.opacity > 0 ? 1 : 0,
+            opacity: this.JQOpacityMultiplier > 0 ? 1 : 0,
             backgroundColor: `rgba(${rgba.r},${rgba.g},${rgba.b},${rgba.a * alphaMultiplier})`
         })
     }
@@ -73,13 +75,17 @@ class Rectangle extends Item {
         })
     }
 
-    SLOT_opacityChanged(oldValue, newValue){
+    SLOT_JQOpacityMultiplierChanged(oldValue, newValue){
         let alphaMultiplier = this.color === 'transparent' ? 0 : newValue
         let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
         this.__setDOMStyle({
             opacity: newValue > 0 ? 1 : 0,
             backgroundColor: `rgba(${rgba.r},${rgba.g},${rgba.b},${rgba.a * alphaMultiplier})`
         })
+    }
+
+    SLOT_opacityChanged(oldValue, newValue){
+        
     }
 
     __destroy(){

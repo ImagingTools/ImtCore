@@ -127,7 +127,10 @@ const handler = {
                     priority: true
                 }
 
-                target.__connections[name].unshift(connection)
+                // FIFO: parent size bindings are registered before child overflow
+                // checks (scrollbar.visible). LIFO unshift made the overflow check
+                // steal width before the parent could grow with contentHeight.
+                target.__connections[name].push(connection)
                 
                 let connectionObj = {
                     target: target,

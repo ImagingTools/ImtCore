@@ -44,6 +44,7 @@ class Item extends QtObject {
         activeFocus: { type: Bool, value: false},
         clip: { type: Bool, value: false},
         activeFocusOnTab: { type: Bool, value: false},
+        JQOpacityMultiplier: { type: Real, value: 1},
 
         Layout: {type:Layout},
 
@@ -83,6 +84,7 @@ class Item extends QtObject {
         activeFocusChanged: {type:Signal, args:[]},
         clipChanged: {type:Signal, args:[]},
         activeFocusOnTabChanged: {type:Signal, args:[]},
+        JQOpacityMultiplierChanged: {type:Signal, args:[]},
 
         'Keys.asteriskPressed': {type:Signal, args: ['event'] },
         'Keys.backPressed': {type:Signal, args: ['event'] },
@@ -137,6 +139,8 @@ class Item extends QtObject {
 
         dom.qml = obj
         obj.__connectDOM(this.parent)
+
+        obj.JQOpacityMultiplier = ()=>{return obj.parent ? obj.parent.JQOpacityMultiplier * obj.opacity : obj.opacity}
 
         return obj
     }
@@ -497,7 +501,7 @@ class Item extends QtObject {
             }
         }
 
-        this.__updateSiblingAnchors()
+        this.__updateAnchoredGeometry()
     }
 
     SLOT_AWidthChanged(oldValue, newValue){
@@ -564,7 +568,7 @@ class Item extends QtObject {
             }
         }
 
-        this.__updateSiblingAnchors()
+        this.__updateAnchoredGeometry()
     }
 
     SLOT_AHeightChanged(oldValue, newValue){
@@ -646,44 +650,54 @@ class Item extends QtObject {
         Geometry.setAuto(this.__self, 'height', newValue, this.__self.constructor.meta.height)
     }
 
-    __updateSiblingAnchors(){
-        if(!this.parent) return
-        for(const sibling of this.parent.children){
-            if(sibling === this) continue
-            const s = sibling.__self || sibling
-            if(typeof s.AY === 'function'){
-                const val = s.AY()
-                if(s.AY__prevent){
-                    if(s.y !== val) s.__proxy.y = val
-                } else {
-                    Real.set(s, 'y', val, s.constructor.meta.y)
-                }
-            }
-            if(typeof s.AX === 'function'){
-                const val = s.AX()
-                if(s.AX__prevent){
-                    if(s.x !== val) s.__proxy.x = val
-                } else {
-                    Real.set(s, 'x', val, s.constructor.meta.x)
-                }
-            }
-            if(typeof s.AHeight === 'function'){
-                const val = s.AHeight()
-                if(s.AHeight__prevent){
-                    if(s.height !== val) s.__proxy.height = val
-                } else {
-                    Real.set(s, 'height', val, s.constructor.meta.height)
-                }
-            }
-            if(typeof s.AWidth === 'function'){
-                const val = s.AWidth()
-                if(s.AWidth__prevent){
-                    if(s.width !== val) s.__proxy.width = val
-                } else {
-                    Real.set(s, 'width', val, s.constructor.meta.width)
-                }
-            }
+    __applyAnchorFn(item, fnName, propName){
+        const s = item.__self || item
+        const fn = s[fnName]
+        if(typeof fn !== 'function') return
+
+        const val = fn.call(s.__proxy || item)
+        const meta = s.constructor.meta[propName]
+        if(!meta) return
+
+        const current = s[propName] || 0
+        if(Math.abs(current - val) <= 1e-7) return
+
+        if(s[fnName.replace('__fn', '') + '__prevent']){
+            if(s.__proxy[propName] !== val) s.__proxy[propName] = val
+        } else {
+            Real.set(s, propName, val, meta)
         }
+    }
+
+    __applyAnchorFns(items, skip){
+        if(!items) return
+        for(const item of items){
+            if(!item || item === skip || item === this) continue
+            this.__applyAnchorFn(item, 'AY__fn', 'y')
+            this.__applyAnchorFn(item, 'AX__fn', 'x')
+            this.__applyAnchorFn(item, 'AHeight__fn', 'height')
+            this.__applyAnchorFn(item, 'AWidth__fn', 'width')
+        }
+    }
+
+    // Re-evaluate anchor expressions on siblings AND children. The stored
+    // value of AX/AY/AWidth/AHeight is a number; the expression lives in
+    // name+'__fn'. Without this, a parent that grew with contentHeight
+    // left children at the old size long enough for a scrollbar to steal
+    // width (1000 → 990) and deadlock.
+    __updateAnchoredGeometry(){
+        if(this.__updatingAnchors) return
+        this.__updatingAnchors = true
+        try {
+            if(this.parent) this.__applyAnchorFns(this.parent.children, this)
+            this.__applyAnchorFns(this.children, null)
+        } finally {
+            delete this.__updatingAnchors
+        }
+    }
+
+    __updateSiblingAnchors(){
+        this.__updateAnchoredGeometry()
     }
 
     SLOT_rotationChanged(oldValue, newValue){

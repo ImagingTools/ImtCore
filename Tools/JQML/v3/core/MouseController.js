@@ -540,7 +540,7 @@ module.exports = {
             this.event.originX = e.pageX
             this.event.originY = e.pageY
             this.event.angleDelta.x = e.deltaX / 8
-            this.event.angleDelta.y = e.deltaY / 8
+            this.event.angleDelta.y = -e.deltaY / 8
             this.event.path = this.getObjectsFromPoint(e.pageX, e.pageY)
 
             for(let obj of this.event.path){
@@ -571,8 +571,10 @@ module.exports = {
                 _button.timeStamp = e.timeStamp
                 _button.target = event.target
                 event.target.__onMouseClick(event)
+                this.__propagateComposedEvent(event, event.target, 'click')
             } else {
                 event.target.__onMouseDblClick(event)
+                this.__propagateComposedEvent(event, event.target, 'dblclick')
             }
             
             event.target.__onMouseLeave(event)
@@ -581,6 +583,37 @@ module.exports = {
         }
 
         this.event = null
+    },
+
+    __propagateComposedEvent: function(event, origin, kind){
+        if(!event || !origin || origin.__destroyed) return
+        if(!origin.propagateComposedEvents || event.accepted) return
+
+        let path = event.path && event.path.length ? event.path : this.getObjectsFromPoint(event.originX, event.originY)
+        let start = 0
+        for(let i = 0; i < path.length; i++){
+            if(path[i] === origin){
+                start = i + 1
+                break
+            }
+        }
+
+        for(let i = start; i < path.length; i++){
+            let obj = path[i]
+            if(!obj || obj === origin || obj.__destroyed) continue
+
+            if(kind === 'click'){
+                if(typeof obj.__emitComposedClick !== 'function') continue
+                event.relative(obj)
+                obj.__emitComposedClick(event)
+            } else {
+                if(typeof obj.__emitComposedDoubleClick !== 'function') continue
+                event.relative(obj)
+                obj.__emitComposedDoubleClick(event)
+            }
+
+            if(event.accepted) return
+        }
     },
 }
 
