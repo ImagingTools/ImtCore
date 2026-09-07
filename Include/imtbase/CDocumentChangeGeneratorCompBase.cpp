@@ -401,7 +401,7 @@ QString CDocumentChangeGeneratorCompBase::CreateStandardOperationDescription(
 
 	if (!typeId.isEmpty()){
 		return Translate(QT_TR_NOOP("Operation '%1'"), languageId, translationContext)
-				.arg(QString::fromUtf8(typeId).toHtmlEscaped());
+				.arg(QString(typeId).toHtmlEscaped());
 	}
 
 	return QString();
