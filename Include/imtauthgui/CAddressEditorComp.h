@@ -6,7 +6,7 @@
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
 // ImtCore includes
-#include <imtauth/IAddress.h>
+#include <imtaccount/IAddress.h>
 #include <GeneratedFiles/imtauthgui/ui_CAddressEditorComp.h>
 
 
@@ -20,12 +20,12 @@ namespace imtauthgui
 */
 class CAddressEditorComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
-						Ui::CAddressEditorComp, imtauth::IAddress>
+						Ui::CAddressEditorComp, imtaccount::IAddress>
 {
 	Q_OBJECT
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
-				Ui::CAddressEditorComp, imtauth::IAddress> BaseClass;
+				Ui::CAddressEditorComp, imtaccount::IAddress> BaseClass;
 
 	I_BEGIN_COMPONENT(CAddressEditorComp);
 	I_END_COMPONENT;

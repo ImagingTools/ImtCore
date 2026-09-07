@@ -163,6 +163,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 	endif()
 
 	#-------- Libraries --------
+	add_subdirectory("${INCLUDE_DIR}/imtaccount/CMake"		"${AUX_INCLUDE_DIR}/imtaccount")
 	add_subdirectory("${INCLUDE_DIR}/imtauth/CMake"			"${AUX_INCLUDE_DIR}/imtauth")
 	add_subdirectory("${INCLUDE_DIR}/imtapp/CMake"			"${AUX_INCLUDE_DIR}/imtapp")
 	add_subdirectory("${INCLUDE_DIR}/imtcrypt/CMake"		"${AUX_INCLUDE_DIR}/imtcrypt")
@@ -328,6 +329,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${IMPL_DIR}/ImtStylePck/CMake" "${AUX_INCLUDE_DIR}/ImtStylePck")
 		add_dependencies(ImtStylePck imtstyle DesignTokenCreator)
 
+		add_subdirectory("${IMPL_DIR}/ImtAccountPck/CMake" "${AUX_INCLUDE_DIR}/ImtAccountPck")
+		add_dependencies(ImtAccountPck imtbase imtaccount)
+
 		add_subdirectory("${IMPL_DIR}/ImtAuthPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthPck")
 		add_dependencies(ImtAuthPck imtbase imtauth)
 
@@ -336,7 +340,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 		if((NOT DEFINED USE_QTQML OR USE_QTQML) AND (NOT DEFINED USE_QTDB OR USE_QTDB))
 			add_subdirectory("${IMPL_DIR}/ImtAuthGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGuiPck")
-			add_dependencies(ImtAuthGuiPck imtbase imtauth imtauthgui imtgui)
+			add_dependencies(ImtAuthGuiPck imtbase imtaccount imtauth imtauthgui imtgui)
 		endif()
 
 		if(USE_MDBX)
@@ -396,13 +400,13 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 		if(NOT DEFINED USE_QTDB OR USE_QTDB)
 			add_subdirectory("${IMPL_DIR}/ImtAuthDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthDbPck")
-			add_dependencies(ImtAuthDbPck imtbase imtdb imtauth imtauthdb)
+			add_dependencies(ImtAuthDbPck imtbase imtdb imtauth imtaccount imtauthdb)
 
 			add_subdirectory("${IMPL_DIR}/ImtChatPck/CMake" "${AUX_INCLUDE_DIR}/ImtChatPck")
 			add_dependencies(ImtChatPck imtbase imtchat)
 
 			add_subdirectory("${IMPL_DIR}/ImtDatabasePck/CMake" "${AUX_INCLUDE_DIR}/ImtDatabasePck")
-			add_dependencies(ImtDatabasePck imtbase imtauth imtcol imtdb)
+			add_dependencies(ImtDatabasePck imtbase imtauth imtaccount imtcol imtdb)
 			imt_chain_windeploy_target(ImtDatabasePck)
 
 			add_subdirectory("${IMPL_DIR}/ImtClientGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtClientGqlPck")
@@ -450,7 +454,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 			add_dependencies(ImtServicePck imtbase imtcom imtservice)
 
 			add_subdirectory("${IMPL_DIR}/ImtServerGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtServerGqlPck")
-			add_dependencies(ImtServerGqlPck imtbasesdl imtcom imtauth imtrest imtserverapp imtdoc imthype imtservergql)
+			add_dependencies(ImtServerGqlPck imtbasesdl imtcom imtauth imtaccount imtrest imtserverapp imtdoc imthype imtservergql)
 
 			if((NOT DEFINED USE_GEO OR USE_GEO) AND (NOT DEFINED USE_QTDB OR USE_QTDB))
 				add_subdirectory("${IMPL_DIR}/ImtGeoPck/CMake" "${AUX_INCLUDE_DIR}/ImtGeoPck")
@@ -529,10 +533,10 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 			add_dependencies(ImtTestPck imtbase imtdb imttest)
 
 			add_subdirectory("${TESTS_DIR}/ObjectCollectionTest/CMake" "${AUX_INCLUDE_DIR}/ObjectCollectionTest")
-			add_dependencies(ImtCoreObjectCollectionTest imtbase imtauth imtdb imttest)
+			add_dependencies(ImtCoreObjectCollectionTest imtbase imtaccount imtauth imtdb imttest)
 
 			add_subdirectory("${TESTS_DIR}/StructureTest/CMake" "${AUX_INCLUDE_DIR}/StructureTest")
-			add_dependencies(StructureTest imtbase imtauth imtdb imttest)
+			add_dependencies(StructureTest imtbase imtaccount imtauth imtdb imttest)
 		endif()
 
 		if(USE_MDBX)
@@ -548,13 +552,13 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_dependencies(imtgqltest imtcom imtrest imtbase)
 
 		add_subdirectory("${TESTS_DIR}/FileCollectionTest/CMake" "${AUX_INCLUDE_DIR}/FileCollectionTest")
-		add_dependencies(ImtCoreFileCollectionTest imtbase imtauth imtrepo)
+		add_dependencies(ImtCoreFileCollectionTest imtbase imtaccount imtauth imtrepo)
 
 		add_subdirectory("${TESTS_DIR}/RevisionControllerTest/CMake" "${AUX_INCLUDE_DIR}/RevisionControllerTest")
-		add_dependencies(ImtCoreRevisionControllerTest imtauth imtbase)
+		add_dependencies(ImtCoreRevisionControllerTest imtaccount imtauth imtbase)
 
 		add_subdirectory("${TESTS_DIR}/PersonalAccessTokenTest/CMake" "${AUX_INCLUDE_DIR}/PersonalAccessTokenTest")
-		add_dependencies(PersonalAccessTokenTest imtbase imtauth)
+		add_dependencies(PersonalAccessTokenTest imtbase imtauth imtaccount)
 
 		add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceTest")
 		add_dependencies(CollectionDocumentServiceTest imtbase imtdoc)

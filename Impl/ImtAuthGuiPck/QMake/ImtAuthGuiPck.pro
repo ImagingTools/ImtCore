@@ -11,7 +11,7 @@ LIBS += -limtbase \
 		-limtdb \
 		-limtgui \
 		-liauth \
-		-limtauth \
+		-limtauth -limtaccount \
 		-limtauthgui \
 		-limtwidgets \
 		-limtstyle \

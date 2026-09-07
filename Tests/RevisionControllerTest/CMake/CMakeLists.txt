@@ -6,7 +6,7 @@ include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-	imtauth
+	imtauth imtaccount
 	Acf::itest
 	Acf::ipackage
 	Qt${QT_VERSION_MAJOR}::Test

@@ -7,14 +7,6 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtCore includes
-#include <imtauth/CContactInfo.h>
-#include <imtauth/CAddress.h>
-#include <imtauth/CAccountInfo.h>
-#include <imtauth/CCompanyInfo.h>
-#include <imtauth/CContactInfoMetaInfoCreatorComp.h>
-#include <imtauth/CAddressMetaInfoCreatorComp.h>
-#include <imtauth/CAccountInfoMetaInfoCreatorComp.h>
-#include <imtauth/CCompanyInfoMetaInfoCreatorComp.h>
 #include <imtauth/CRoleComp.h>
 #include <imtauth/CRoleMetaInfoCreatorComp.h>
 #include <imtauth/CUserInfoMetaInfoCreatorComp.h>
@@ -22,7 +14,6 @@
 #include <imtauth/CUserGroupInfoComp.h>
 #include <imtauth/CRoleCollectionAdapterComp.h>
 #include <imtauth/CCheckPermissionCompBase.h>
-#include <imtauth/CCollectionPermissionsProviderComp.h>
 #include <imtauth/CCheckPermissionOrComp.h>
 #include <imtauth/CUserSettingsComp.h>
 #include <imtauth/CUserGroupInfoProviderComp.h>
@@ -39,9 +30,6 @@
 #include <imtauth/CUserVerificationControllerComp.h>
 #include <imtauth/CUserVerificationCodeSenderComp.h>
 #include <imtauth/CJwtSessionControllerComp.h>
-#include <imtauth/CSessionMetaInfoCreatorComp.h>
-#include <imtauth/CUserMetaInfoCreatorComp.h>
-#include <imtauth/CGroupMetaInfoCreatorComp.h>
 #include <imtauth/CUserConnectionInfo.h>
 #include <imtauth/CUserActionMetaInfoCreatorComp.h>
 #include <imtauth/CUserActionManagerComp.h>
@@ -50,7 +38,6 @@
 #include <imtauth/CPersonalAccessTokenMetaInfoCreatorComp.h>
 #include <imtauth/CUserRecentActionComp.h>
 #include <imtauth/CTenantInfoComp.h>
-#include <imtauth/CTenantMetaInfoCreatorComp.h>
 #include <imtauth/CTenantManagerComp.h>
 #include <imtauth/CTenantMembershipComp.h>
 #include <imtauth/CTenantMembershipManagerComp.h>
@@ -92,33 +79,6 @@ namespace ImtAuthPck
 {
 
 
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<imtauth::CAddress>> Address;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap <
-						imtauth::CAccountInfo,
-						imtauth::IAccountInfo,
-						iser::IObject,
-						iser::ISerializable,
-						istd::IChangeable>> AccountInfo;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap <
-						imtauth::CContactInfo,
-						imtauth::IContactInfo,
-						iser::ISerializable,
-						istd::IChangeable>> ContactInfo;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<
-						imtauth::CIdentifiableCompanyInfo,
-						imtauth::IContactBaseInfo,
-						imtauth::ICompanyInfo,
-						iser::IObject,
-						iser::ISerializable,
-						istd::IChangeable>> CompanyInfo;
-typedef imtauth::CContactInfoMetaInfoCreatorComp ContactInfoMetaInfoCreator;
-typedef imtauth::CAddressMetaInfoCreatorComp AddressMetaInfoCreator;
-typedef imtauth::CAccountInfoMetaInfoCreatorComp AccountInfoMetaInfoCreator;
-typedef imtauth::CCompanyInfoMetaInfoCreatorComp CompanyInfoMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CRoleComp> Role;
 typedef imtauth::CRoleMetaInfoCreatorComp RoleMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CUserInfoComp> UserInfo;
@@ -133,7 +93,6 @@ typedef imtauth::CUserInfoMetaInfoCreatorComp UserInfoMetaInfoCreator;
 typedef imtauth::CRoleCollectionAdapterComp RoleCollectionAdapter;
 typedef imtauth::CUserCollectionAdapterComp UserCollectionAdapter;
 typedef imtauth::CCheckPermissionCompBase CheckPermissions;
-typedef imtauth::CCollectionPermissionsProviderComp CollectionPermissionsProvider;
 typedef imtauth::COrganizationsPermissionsProviderComp OrganizationsPermissionsProvider;
 typedef imtauth::CCheckPermissionOrComp CheckPermissionOr;
 typedef icomp::TModelCompWrap<imtauth::CUserSettingsComp> UserSettings;
@@ -155,9 +114,6 @@ typedef imtauth::CUserGroupChangeGeneratorComp UserGroupChangeGenerator;
 typedef imtauth::CUserVerificationControllerComp UserVerificationController;
 typedef imtauth::CUserVerificationCodeSenderComp UserVerificationCodeSender;
 typedef imtauth::CJwtSessionControllerComp JwtSessionController;
-typedef imtauth::CSessionMetaInfoCreatorComp SessionMetaInfoCreator;
-typedef imtauth::CUserMetaInfoCreatorComp UserMetaInfoCreator;
-typedef imtauth::CGroupMetaInfoCreatorComp GroupMetaInfoCreator;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtauth::CUserConnectionInfo,
@@ -176,7 +132,6 @@ typedef imtauth::CPersonalAccessTokenManagerComp PersonalAccessTokenManager;
 typedef imtauth::CPersonalAccessTokenMetaInfoCreatorComp PersonalAccessTokenMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CUserRecentActionComp> UserRecentAction;
 typedef icomp::TModelCompWrap<imtauth::CTenantInfoComp> TenantInfo;
-typedef imtauth::CTenantMetaInfoCreatorComp TenantMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CTenantManagerComp> TenantManager;
 typedef icomp::TModelCompWrap<imtauth::CTenantMembershipComp> TenantMembershipInfo;
 typedef icomp::TModelCompWrap<imtauth::CTenantMembershipManagerComp> TenantMembershipManager;

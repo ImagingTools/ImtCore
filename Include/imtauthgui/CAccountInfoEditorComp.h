@@ -18,8 +18,8 @@
 #include <iqtgui/IGuiObject.h>
 
 // ImtCore includes
-#include <imtauth/IAccountInfo.h>
-#include <imtauth/IAddress.h>
+#include <imtaccount/IAccountInfo.h>
+#include <imtaccount/IAddress.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h>
@@ -35,12 +35,12 @@ namespace imtauthgui
 */
 class CAccountInfoEditorComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
-						Ui::CAccountInfoEditorComp, imtauth::IAccountInfo>
+						Ui::CAccountInfoEditorComp, imtaccount::IAccountInfo>
 {
 	Q_OBJECT
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
-				Ui::CAccountInfoEditorComp, imtauth::IAccountInfo> BaseClass;
+				Ui::CAccountInfoEditorComp, imtaccount::IAccountInfo> BaseClass;
 
 	I_BEGIN_COMPONENT(CAccountInfoEditorComp);
 		I_ASSIGN(m_accountPictureGuiCompPtr, "AccountPictureView", "Account picture view", true, "ImageView");
@@ -72,8 +72,8 @@ protected:
 private:
 	void SetCompanyAddressVisibility(bool visibility) const;
 	void SetupCompanyAddress() const;
-	void OnAddressUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtauth::IAddress* addressPtr);
-	imtauth::IAddress* GetCompanyAddress();
+	void OnAddressUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtaccount::IAddress* addressPtr);
+	imtaccount::IAddress* GetCompanyAddress();
 
 private Q_SLOTS:
 	void on_ContactCombo_currentIndexChanged(int index);
@@ -105,7 +105,7 @@ private:
 
 	bool m_blockComboChanged;
 
-	mutable imtbase::TModelUpdateBinder<imtauth::IAddress, CAccountInfoEditorComp> m_addressObserver;
+	mutable imtbase::TModelUpdateBinder<imtaccount::IAddress, CAccountInfoEditorComp> m_addressObserver;
 };
 
 

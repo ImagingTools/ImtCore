@@ -7,8 +7,8 @@
 
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
-#include <imtauth/IAddressManager.h>
-#include <imtauth/CAddress.h>
+#include <imtaccount/IAddressManager.h>
+#include <imtaccount/CAddress.h>
 
 
 namespace imtauthgui
@@ -21,17 +21,17 @@ namespace imtauthgui
 
 void CContactInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	imtauth::IContactInfo* contactPtr = GetObservedObject();
+	imtaccount::IContactInfo* contactPtr = GetObservedObject();
 	Q_ASSERT(contactPtr != nullptr);
 
 	GenderCombo->addItem(tr("Diverse"));
 	GenderCombo->addItem(tr("Female"));
 	GenderCombo->addItem(tr("Male"));
 	switch (contactPtr->GetGenderType()){
-	case imtauth::IContactInfo::GT_FEMALE:
+	case imtaccount::IContactInfo::GT_FEMALE:
 		GenderCombo->setCurrentIndex(1);
 		break;
-	case imtauth::IContactInfo::GT_MALE:
+	case imtaccount::IContactInfo::GT_MALE:
 		GenderCombo->setCurrentIndex(2);
 		break;
 	default:
@@ -40,17 +40,17 @@ void CContactInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 
 	EMailEdit->setText(contactPtr->GetEmail());
 	BirthdayEdit->setDate(contactPtr->GetBirthday());
-	FirstNameEdit->setText(contactPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME));
-	LastNameEdit->setText(contactPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME));
-	NicknameEdit->setText(contactPtr->GetNameField(imtauth::IContactInfo::NFT_NICKNAME));
+	FirstNameEdit->setText(contactPtr->GetNameField(imtaccount::IContactInfo::NFT_FIRST_NAME));
+	LastNameEdit->setText(contactPtr->GetNameField(imtaccount::IContactInfo::NFT_LAST_NAME));
+	NicknameEdit->setText(contactPtr->GetNameField(imtaccount::IContactInfo::NFT_NICKNAME));
 
 	Addresses->clear();
 
-	const imtauth::IAddressProvider* addressesPtr = contactPtr->GetAddresses();
+	const imtaccount::IAddressProvider* addressesPtr = contactPtr->GetAddresses();
 	if (addressesPtr != nullptr){
 		imtbase::ICollectionInfo::Ids ids = addressesPtr->GetAddressList().GetElementIds();
 		for (const QByteArray& id : ids){
-			const imtauth::IAddress* addressPtr = addressesPtr->GetAddress(id);
+			const imtaccount::IAddress* addressPtr = addressesPtr->GetAddress(id);
 			if (addressPtr != nullptr){
 				auto* itemPtr = new QTreeWidgetItem({
 							addressPtr->GetCountry(),
@@ -83,20 +83,20 @@ void CContactInfoEditorComp::OnGuiModelDetached()
 
 void CContactInfoEditorComp::UpdateModel() const
 {
-	imtauth::IContactInfo* contactPtr = GetObservedObject();
+	imtaccount::IContactInfo* contactPtr = GetObservedObject();
 	Q_ASSERT(contactPtr != nullptr);
 
 	istd::CChangeGroup changeGroup(contactPtr);
 
 	contactPtr->SetEmail(EMailEdit->text());
 	contactPtr->SetBirthday(BirthdayEdit->date());
-	contactPtr->SetGenderType(imtauth::IContactInfo::GenderType(GenderCombo->currentIndex()));
-	contactPtr->SetNameField(imtauth::IContactInfo::NFT_FIRST_NAME, FirstNameEdit->text());
-	contactPtr->SetNameField(imtauth::IContactInfo::NFT_LAST_NAME, LastNameEdit->text());
-	contactPtr->SetNameField(imtauth::IContactInfo::NFT_NICKNAME, NicknameEdit->text());
+	contactPtr->SetGenderType(imtaccount::IContactInfo::GenderType(GenderCombo->currentIndex()));
+	contactPtr->SetNameField(imtaccount::IContactInfo::NFT_FIRST_NAME, FirstNameEdit->text());
+	contactPtr->SetNameField(imtaccount::IContactInfo::NFT_LAST_NAME, LastNameEdit->text());
+	contactPtr->SetNameField(imtaccount::IContactInfo::NFT_NICKNAME, NicknameEdit->text());
 
-	auto addressesPtr = dynamic_cast<imtauth::IAddressManager*>(
-				const_cast<imtauth::IAddressProvider*>(contactPtr->GetAddresses()));
+	auto addressesPtr = dynamic_cast<imtaccount::IAddressManager*>(
+				const_cast<imtaccount::IAddressProvider*>(contactPtr->GetAddresses()));
 
 	if (addressesPtr != nullptr){
 		istd::CChangeGroup addressesChangeGroup(addressesPtr);
@@ -107,7 +107,7 @@ void CContactInfoEditorComp::UpdateModel() const
 		for (int i = 0; i < count; i++){
 			QTreeWidgetItem* itemPtr = Addresses->topLevelItem(i);
 
-			imtauth::CAddress address;
+			imtaccount::CAddress address;
 			address.SetCountry(itemPtr->text(0));
 			address.SetCity(itemPtr->text(1));
 			address.SetPostalCode(itemPtr->text(2).toInt());
@@ -198,11 +198,11 @@ void CContactInfoEditorComp::on_Addresses_itemChanged(QTreeWidgetItem* item, int
 	if (!m_isReadOnly && !IsUpdateBlocked() && IsModelAttached()){
 		UpdateBlocker updateBlocker(this);
 
-		imtauth::IContactInfo* contactPtr = GetObservedObject();
+		imtaccount::IContactInfo* contactPtr = GetObservedObject();
 		Q_ASSERT(contactPtr != nullptr);
 
-		auto addressManagerPtr = dynamic_cast<imtauth::IAddressManager*>(
-					const_cast<imtauth::IAddressProvider*>(contactPtr->GetAddresses()));
+		auto addressManagerPtr = dynamic_cast<imtaccount::IAddressManager*>(
+					const_cast<imtaccount::IAddressProvider*>(contactPtr->GetAddresses()));
 
 		if (addressManagerPtr != nullptr){
 			QByteArray changedAddressId = item->data(0, Qt::UserRole).toByteArray();
@@ -210,7 +210,7 @@ void CContactInfoEditorComp::on_Addresses_itemChanged(QTreeWidgetItem* item, int
 			imtbase::ICollectionInfo::Ids ids = addressManagerPtr->GetAddressList().GetElementIds();
 			for (const QByteArray& id : ids){
 				if (id == changedAddressId){
-					auto addressPtr = const_cast<imtauth::IAddress*>(addressManagerPtr->GetAddress(id));
+					auto addressPtr = const_cast<imtaccount::IAddress*>(addressManagerPtr->GetAddress(id));
 					if (addressManagerPtr != nullptr){
 						istd::CChangeGroup changeGroup(addressManagerPtr);
 
@@ -228,14 +228,14 @@ void CContactInfoEditorComp::on_Addresses_itemChanged(QTreeWidgetItem* item, int
 
 void CContactInfoEditorComp::on_AddAddress_triggered(QAction * /*action*/)
 {
-	imtauth::IContactInfo* personPtr = GetObservedObject();
+	imtaccount::IContactInfo* personPtr = GetObservedObject();
 	Q_ASSERT(personPtr != nullptr);
 
-	auto addressesPtr = dynamic_cast<imtauth::IAddressManager*>(
-				const_cast<imtauth::IAddressProvider*>(personPtr->GetAddresses()));
+	auto addressesPtr = dynamic_cast<imtaccount::IAddressManager*>(
+				const_cast<imtaccount::IAddressProvider*>(personPtr->GetAddresses()));
 
 	if (addressesPtr != nullptr){
-		imtauth::CAddress address;
+		imtaccount::CAddress address;
 
 		addressesPtr->AddAddress(&address);
 	}
@@ -244,11 +244,11 @@ void CContactInfoEditorComp::on_AddAddress_triggered(QAction * /*action*/)
 
 void CContactInfoEditorComp::on_RemoveAddress_triggered(QAction* /*action*/)
 {
-	imtauth::IContactInfo* personPtr = GetObservedObject();
+	imtaccount::IContactInfo* personPtr = GetObservedObject();
 	Q_ASSERT(personPtr != nullptr);
 
-	auto addressesPtr = dynamic_cast<imtauth::IAddressManager*>(
-		const_cast<imtauth::IAddressProvider*>(personPtr->GetAddresses()));
+	auto addressesPtr = dynamic_cast<imtaccount::IAddressManager*>(
+		const_cast<imtaccount::IAddressProvider*>(personPtr->GetAddresses()));
 
 	if (addressesPtr != nullptr){
 		istd::CChangeGroup changeGroup(addressesPtr);
