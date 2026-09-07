@@ -46,12 +46,13 @@ if(NOT DEFINED IMTCOREDIR_BUILD)
 	set(IMTCOREDIR_BUILD "${IMTCOREDIR}")
 endif()
 
-option(USE_MDBX "Use 3rdParty/libmdbx" OFF)
-
 # Enable modern target-based architecture:
 # find_package(IAcf) provides Acf::/AcfSln::/IAcf:: imported targets with transitive include dirs and link deps.
 # Legacy global include_directories()/link_directories() in the Env chain are skipped.
 option(ACF_MODERN_CMAKE "Enable modern target-based architecture" ON)
+
+option(AUTOMATIC_DB_BACKUPS "Enable automatic database backups" ON)
+option(USE_MDBX "Use 3rdParty/libmdbx" OFF)
 
 # Collect ImtCore libraries in their own export set so they are published as the
 # ImtCore:: package. Read by StaticConfig.cmake / acf_register_library().
