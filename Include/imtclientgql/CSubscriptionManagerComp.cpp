@@ -332,6 +332,11 @@ QFuture<CSubscriptionManagerComp::GqlResult> CSubscriptionManagerComp::SendReque
 				headersObject[headerId] = QString(headers.value(headerId));
 			}
 		}
+
+		const QByteArray languageId = contextPtr->GetLanguageId();
+		if (!languageId.isEmpty()){
+			headersObject[QString(imtbase::s_languageIdHeaderId)] = QString(languageId);
+		}
 	}
 	dataObject["headers"] = headersObject;
 
@@ -445,6 +450,11 @@ bool CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& s
 			if (headerId != "accept-encoding"){
 				headersObject[headerId] = QString(headers.value(headerId));
 			}
+		}
+
+		const QByteArray languageId = contextPtr->GetLanguageId();
+		if (!languageId.isEmpty()){
+			headersObject[QString(imtbase::s_languageIdHeaderId)] = QString(languageId);
 		}
 	}
 	registerSubscription["headers"] = headersObject;
