@@ -60,7 +60,7 @@ QByteArray CWebSocketClientComp::BuildRequestEnvelope(const GqlRequestPtr& reque
 
 		const QByteArray languageId = contextPtr->GetLanguageId();
 		if (!languageId.isEmpty()){
-			headersObject[QString::fromUtf8(imtbase::s_languageIdHeaderId)] = QString::fromUtf8(languageId);
+			headersObject[imtbase::s_languageIdHeaderId] = languageId;
 		}
 	}
 	dataObject["headers"] = headersObject;
