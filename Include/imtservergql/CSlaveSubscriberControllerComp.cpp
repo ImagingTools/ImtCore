@@ -33,20 +33,19 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 			const imtrest::IRequest& networkRequest,
 			QString& errorMessage)
 {
-	// Re-registering an id (the client resubscribes after refreshing its access token) has to
-	// rebind the publisher: reporting success while leaving the previous binding in place kept
-	// the subscription attached to a request that can no longer deliver anything.
 	imtgql::IGqlSubscriberController* stalePublisherPtr = nullptr;
+	quint64 generation = 0;
 	{
 		QMutexLocker lock(&m_publisherMapMutex);
+		generation = m_subscriptionGenerationMap.value(subscriptionId) + 1;
+		m_subscriptionGenerationMap.insert(subscriptionId, generation);
+
 		auto iter = m_publisherMap.find(subscriptionId);
 		if (iter != m_publisherMap.end()){
 			stalePublisherPtr = iter.value();
-			m_publisherMap.erase(iter);
 		}
 	}
 
-	// Outside the lock — publishers may block or re-enter Unregister.
 	if (stalePublisherPtr != nullptr){
 		stalePublisherPtr->UnregisterSubscription(subscriptionId);
 	}
@@ -60,20 +59,30 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 			continue;
 		}
 
-		// Nested register without the map lock — publishers may block or re-enter
-		// Unregister; holding the mutex across that call risks deadlock.
 		if (!publisherPtr->RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage)){
 			continue;
 		}
 
+		bool isCurrentGeneration = false;
 		{
 			QMutexLocker lock(&m_publisherMapMutex);
-			// Another connection may have raced the same id (unlikely UUID) — keep first.
-			if (!m_publisherMap.contains(subscriptionId)){
+			isCurrentGeneration = (m_subscriptionGenerationMap.value(subscriptionId) == generation);
+			if (isCurrentGeneration){
 				m_publisherMap.insert(subscriptionId, publisherPtr);
 			}
 		}
-		return true;
+		if (isCurrentGeneration){
+			return true;
+		}
+
+		publisherPtr->UnregisterSubscription(subscriptionId);
+	}
+
+	{
+		QMutexLocker lock(&m_publisherMapMutex);
+		if (m_subscriptionGenerationMap.value(subscriptionId) == generation){
+			m_publisherMap.remove(subscriptionId);
+		}
 	}
 
 	return false;
@@ -83,8 +92,12 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 bool CSlaveSubscriberControllerComp::UnregisterSubscription(const QByteArray& subscriptionId)
 {
 	imtgql::IGqlSubscriberController* publisherPtr = nullptr;
+	quint64 generation = 0;
 	{
 		QMutexLocker lock(&m_publisherMapMutex);
+		generation = m_subscriptionGenerationMap.value(subscriptionId) + 1;
+		m_subscriptionGenerationMap.insert(subscriptionId, generation);
+
 		auto iter = m_publisherMap.find(subscriptionId);
 		if (iter == m_publisherMap.end()){
 			return false;
@@ -98,9 +111,11 @@ bool CSlaveSubscriberControllerComp::UnregisterSubscription(const QByteArray& su
 	}
 
 	const bool res = publisherPtr->UnregisterSubscription(subscriptionId);
-	if (res){
+	{
 		QMutexLocker lock(&m_publisherMapMutex);
-		m_publisherMap.remove(subscriptionId);
+		if (m_subscriptionGenerationMap.value(subscriptionId) == generation){
+			m_publisherMap.remove(subscriptionId);
+		}
 	}
 	return res;
 }
