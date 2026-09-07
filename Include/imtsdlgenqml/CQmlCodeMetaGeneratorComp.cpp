@@ -241,6 +241,21 @@ iproc::IProcessor::TaskState CQmlCodeMetaGeneratorComp::DoProcessing(
 		}
 	}
 
+	// add QML files for generated typed list models (<Name>List.qml)
+	const imtsdl::SdlUnionList unionListForLists =
+		m_sdlUnionListCompPtr.IsValid() ? m_sdlUnionListCompPtr->GetUnions(false) : imtsdl::SdlUnionList();
+	const QStringList listElementNames = CollectListElementTypeNames(
+				sdlTypeList,
+				m_sdlTypeListCompPtr->GetSdlTypes(false),
+				unionListForLists);
+	for (const QString& listElementName: listElementNames){
+		const QString listTypeName = listElementName + QStringLiteral("List");
+		xmlWriter.writeStartElement("file");
+		xmlWriter.writeAttribute("alias", qmlModuleName + '/' + listTypeName + ".qml");
+		xmlWriter.writeCharacters(listTypeName + ".qml");
+		xmlWriter.writeEndElement();
+	}
+
 	// also add qmldir file
 	xmlWriter.writeStartElement("file");
 	xmlWriter.writeAttribute("alias", qmlModuleName + "/qmldir");

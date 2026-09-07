@@ -7,6 +7,9 @@ ArrayFieldFilter 1.0 ArrayFieldFilter.qml
 GroupFilter 1.0 GroupFilter.qml 
 TextFilter 1.0 TextFilter.qml 
 ComplexCollectionFilter 1.0 ComplexCollectionFilter.qml 
+FieldFilterUnionList 1.0 FieldFilterUnionList.qml 
+GroupFilterList 1.0 GroupFilterList.qml 
+FieldSortingInfoList 1.0 FieldSortingInfoList.qml 
 singleton TimeFilterTypeMetaInfo 1.0 TimeFilterTypeMetaInfo.qml 
 singleton FieldSortingInfoTypeMetaInfo 1.0 FieldSortingInfoTypeMetaInfo.qml 
 singleton FieldFilterTypeMetaInfo 1.0 FieldFilterTypeMetaInfo.qml 
