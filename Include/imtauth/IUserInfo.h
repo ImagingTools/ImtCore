@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QDateTime>
+
 // ImtCore includes
 #include <imtauth/IUserGroupInfo.h>
 #include <imtauth/IUserBaseInfo.h>
@@ -111,6 +114,58 @@ public:
 		Remove an user from the system.
 	*/
 	virtual bool RemoveFromSystem(const QByteArray& systemId) = 0;
+
+	/**
+		Get hashes of previously used passwords, ordered from the most recently used one.
+		\note Default implementation is provided for backward compatibility.
+	*/
+	virtual QByteArrayList GetPasswordHistory() const
+	{
+		return QByteArrayList();
+	}
+
+	/**
+		Set hashes of previously used passwords, ordered from the most recently used one.
+		\note Default implementation is provided for backward compatibility.
+	*/
+	virtual void SetPasswordHistory(const QByteArrayList& /*passwordHistory*/)
+	{
+	}
+
+	/**
+		Get timestamp (UTC) of the last password change.
+		An invalid timestamp means that the change time is unknown (legacy user).
+		\note Default implementation is provided for backward compatibility.
+	*/
+	virtual QDateTime GetPasswordChangedAt() const
+	{
+		return QDateTime();
+	}
+
+	/**
+		Set timestamp (UTC) of the last password change.
+		\note Default implementation is provided for backward compatibility.
+	*/
+	virtual void SetPasswordChangedAt(const QDateTime& /*passwordChangedAt*/)
+	{
+	}
+
+	/**
+		Check if the user must change the password on the next login.
+		\note Default implementation is provided for backward compatibility.
+	*/
+	virtual bool MustChangePassword() const
+	{
+		return false;
+	}
+
+	/**
+		Set flag indicating that the user must change the password on the next login.
+		\note Default implementation is provided for backward compatibility.
+	*/
+	virtual void SetMustChangePassword(bool /*mustChangePassword*/)
+	{
+	}
 };
 
 

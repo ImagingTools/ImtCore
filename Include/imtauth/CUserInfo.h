@@ -36,6 +36,12 @@ public:
 	virtual SystemInfoList GetSystemInfos() const override;
 	virtual bool AddToSystem(SystemInfo systemInfo) override;
 	virtual bool RemoveFromSystem(const QByteArray& systemId) override;
+	virtual QByteArrayList GetPasswordHistory() const override;
+	virtual void SetPasswordHistory(const QByteArrayList& passwordHistory) override;
+	virtual QDateTime GetPasswordChangedAt() const override;
+	virtual void SetPasswordChangedAt(const QDateTime& passwordChangedAt) override;
+	virtual bool MustChangePassword() const override;
+	virtual void SetMustChangePassword(bool mustChangePassword) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -53,6 +59,9 @@ private:
 	IUserGroupInfo::GroupIds m_groupIds;
 	QDateTime m_lastConnection;
 	SystemInfoList m_systemInfos;
+	QByteArrayList m_passwordHistory;
+	QDateTime m_passwordChangedAt;
+	bool m_mustChangePassword = false;
 };
 
 

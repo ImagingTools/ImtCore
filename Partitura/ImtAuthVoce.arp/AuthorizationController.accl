@@ -13,6 +13,7 @@
         <Element ComponentName="Demultiplexer" X="575" Y="125" Note=""/>
         <Element ComponentName="HashCalculator" X="425" Y="625" Note=""/>
         <Element ComponentName="LdapCredentialController" X="125" Y="450" Note=""/>
+        <Element ComponentName="PasswordPolicy" X="125" Y="625" Note=""/>
         <Element ComponentName="SessionController" X="825" Y="300" Note=""/>
         <Element ComponentName="SessionInfoProvider" X="1050" Y="450" Note=""/>
         <Element ComponentName="UserSessionRepository" X="750" Y="450" Note=""/>

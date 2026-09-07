@@ -182,6 +182,54 @@ bool CUserInfo::RemoveFromSystem(const QByteArray& systemId)
 }
 
 
+QByteArrayList CUserInfo::GetPasswordHistory() const
+{
+	return m_passwordHistory;
+}
+
+
+void CUserInfo::SetPasswordHistory(const QByteArrayList& passwordHistory)
+{
+	if (m_passwordHistory != passwordHistory){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_passwordHistory = passwordHistory;
+	}
+}
+
+
+QDateTime CUserInfo::GetPasswordChangedAt() const
+{
+	return m_passwordChangedAt;
+}
+
+
+void CUserInfo::SetPasswordChangedAt(const QDateTime& passwordChangedAt)
+{
+	if (m_passwordChangedAt != passwordChangedAt){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_passwordChangedAt = passwordChangedAt;
+	}
+}
+
+
+bool CUserInfo::MustChangePassword() const
+{
+	return m_mustChangePassword;
+}
+
+
+void CUserInfo::SetMustChangePassword(bool mustChangePassword)
+{
+	if (m_mustChangePassword != mustChangePassword){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_mustChangePassword = mustChangePassword;
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CUserInfo::Serialize(iser::IArchive &archive)
@@ -276,6 +324,25 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 		retVal = retVal && archive.EndTag(sidTag);
 	}
 
+	if (imtCoreVersion >= 23000){
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_passwordHistory, "PasswordHistory", "PasswordHash");
+
+		iser::CArchiveTag passwordChangedAtTag("PasswordChangedAt", "Timestamp of the last password change", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(passwordChangedAtTag);
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_passwordChangedAt);
+		retVal = retVal && archive.EndTag(passwordChangedAtTag);
+
+		iser::CArchiveTag mustChangePasswordTag("MustChangePassword", "Password change required flag", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(mustChangePasswordTag);
+		retVal = retVal && archive.Process(m_mustChangePassword);
+		retVal = retVal && archive.EndTag(mustChangePasswordTag);
+	}
+	else if (!archive.IsStoring()){
+		m_passwordHistory.clear();
+		m_passwordChangedAt = QDateTime();
+		m_mustChangePassword = false;
+	}
+
 	return retVal;
 }
 
@@ -295,6 +362,9 @@ bool CUserInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 		m_mail = sourcePtr->m_mail;
 		m_groupIds = sourcePtr->m_groupIds;
 		m_systemInfos = sourcePtr->m_systemInfos;
+		m_passwordHistory = sourcePtr->m_passwordHistory;
+		m_passwordChangedAt = sourcePtr->m_passwordChangedAt;
+		m_mustChangePassword = sourcePtr->m_mustChangePassword;
 
 		return true;
 	}
@@ -315,6 +385,9 @@ bool CUserInfo::IsEqual(const IChangeable& object) const
 		retVal = retVal && m_groupIds == sourcePtr->m_groupIds;
 		retVal = retVal && m_lastConnection == sourcePtr->m_lastConnection;
 		retVal = retVal && m_systemInfos == sourcePtr->m_systemInfos;
+		retVal = retVal && m_passwordHistory == sourcePtr->m_passwordHistory;
+		retVal = retVal && m_passwordChangedAt == sourcePtr->m_passwordChangedAt;
+		retVal = retVal && m_mustChangePassword == sourcePtr->m_mustChangePassword;
 
 		return retVal;
 	}
@@ -344,6 +417,9 @@ bool CUserInfo::ResetData(CompatibilityMode mode)
 	m_passwordHash.clear();
 	m_sid.clear();
 	m_groupIds.clear();
+	m_passwordHistory.clear();
+	m_passwordChangedAt = QDateTime();
+	m_mustChangePassword = false;
 
 	return true;
 }

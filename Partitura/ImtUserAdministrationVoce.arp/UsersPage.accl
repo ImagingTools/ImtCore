@@ -14,6 +14,7 @@
         <Element ComponentName="Demultiplexer" X="550" Y="75" Note=""/>
         <Element ComponentName="HashCalculator" X="825" Y="550" Note=""/>
         <Element ComponentName="OperationContextController" X="1050" Y="200" Note=""/>
+        <Element ComponentName="PasswordPolicy" X="325" Y="450" Note=""/>
         <Element ComponentName="SmtpMessageCreator" X="325" Y="200" Note=""/>
         <Element ComponentName="UserChangeGenerator" X="750" Y="200" Note=""/>
         <Element ComponentName="UserCommands" X="425" Y="300" Note=""/>
