@@ -38,13 +38,12 @@ protected:
 	I_MULTIREF(imtgql::IGqlSubscriberController, m_subscriberControllerListCompPtr);
 
 	typedef QMap<QByteArray, imtgql::IGqlSubscriberController*> PublisherMap;
-	typedef QMap<QByteArray, quint64> SubscriptionGenerationMap;
 	// Shared across WebSocket threads (CWebSocketThread per connection) — must be locked.
 	mutable QMutex m_publisherMapMutex;
 	PublisherMap m_publisherMap;
-	SubscriptionGenerationMap m_subscriptionGenerationMap;
 };
 
 
 } // namespace imtservergql
+
 
