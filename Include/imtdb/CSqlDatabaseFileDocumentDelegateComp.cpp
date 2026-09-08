@@ -87,11 +87,13 @@ bool CSqlDatabaseFileDocumentDelegateComp::WriteDataToMemory(
 	const QString targetFilePath = GetContentFilePath(contentHash);
 	const QFileInfo targetInfo(targetFilePath);
 
-	if (targetInfo.exists()){
-		// Identical content is already in the store.
-		if (targetInfo.size() != bufferSize){
-			SendErrorMessage(0, QString("Store integrity error: '%1' exists with size %2, expected %3")
-						.arg(targetFilePath).arg(targetInfo.size()).arg(bufferSize),
+if (targetInfo.exists()){
+		QFile existingFile(targetFilePath);
+		if (!existingFile.open(QIODevice::ReadOnly)
+				|| existingFile.size() != bufferSize
+				|| QCryptographicHash::hash(existingFile.readAll(), QCryptographicHash::Sha256).toHex() != contentHash){
+			SendErrorMessage(0, QString("Store integrity error: '%1' does not match the expected content")
+						.arg(targetFilePath),
 						"CSqlDatabaseFileDocumentDelegateComp");
 			return false;
 		}
