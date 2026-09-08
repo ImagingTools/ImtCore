@@ -8,7 +8,6 @@
 
 // ImtCore includes
 #include <imtdb/CSqlDatabaseDocumentDelegateCompBase.h>
-#include <imtdb/IFileDocumentGarbageCollector.h>
 
 
 namespace imtdb
@@ -37,7 +36,6 @@ public:
 
 	I_BEGIN_COMPONENT(CSqlDatabaseFileDocumentDelegateComp)
 		I_ASSIGN(m_storageRootCompPtr, "StorageRoot", "Root folder of the document file store.\nMust be used exclusively by this collection's table: the garbage collector's liveness scan relies on this", true, "StorageRoot");
-		I_ASSIGN(m_garbageCollectorCompPtr, "GarbageCollector", "Garbage collector reclaiming store content left unreferenced by rolled-back writes.\nRequired: a file store without a collector leaks disk indefinitely", true, "GarbageCollector");
 		I_ASSIGN_MULTI_0(m_persistenceListCompPtr, "PersistenceList", "List of persistence components used to read and write the document content in its native format;\nthe first component supporting the object is used", true);
 	I_END_COMPONENT
 
@@ -45,9 +43,6 @@ protected:
 	// reimplemented (imtdb::CSqlDatabaseDocumentDelegateCompBase)
 	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const override;
 	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const override;
-
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
 
 private:
 	QString GetContentFilePath(const QByteArray& contentHashHex) const;
@@ -58,14 +53,6 @@ protected:
 		Root folder of the content-addressed document file store.
 	*/
 	I_REF(ifile::IFileNameParam, m_storageRootCompPtr);
-
-	/**
-		Garbage collector reclaiming store content whose referencing transaction was
-		rolled back. Referenced as a required dependency so that no file-document store
-		can be wired without a collector; held through the interface to keep this
-		delegate testable with a mock collector.
-	*/
-	I_REF(imtdb::IFileDocumentGarbageCollector, m_garbageCollectorCompPtr);
 
 	/**
 		Persistence components writing and reading the native document representation.

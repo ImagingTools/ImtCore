@@ -13,7 +13,6 @@
 
 // ImtCore includes
 #include <imtdb/IDatabaseEngine.h>
-#include <imtdb/IFileDocumentGarbageCollector.h>
 
 
 namespace imtdb
@@ -40,15 +39,13 @@ namespace imtdb
 */
 class CFileDocumentGarbageCollectorComp:
 			public QObject,
-			public ilog::CLoggerComponentBase,
-			virtual public imtdb::IFileDocumentGarbageCollector
+			public ilog::CLoggerComponentBase
 {
 	Q_OBJECT
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFileDocumentGarbageCollectorComp)
-		I_REGISTER_INTERFACE(imtdb::IFileDocumentGarbageCollector);
 		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine used for the liveness scan of the collection table", true, "DatabaseEngine");
 		I_ASSIGN(m_storageRootCompPtr, "StorageRoot", "Root folder of the document file store.\nMust be the same folder assigned to the collection's file document delegate, and used exclusively by that collection's table", true, "StorageRoot");
 		I_ASSIGN(m_tableSchemaAttrPtr, "TableSchema", "Name of the schema containing the document table", false, "");

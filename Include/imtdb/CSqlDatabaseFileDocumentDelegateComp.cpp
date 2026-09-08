@@ -29,19 +29,6 @@ namespace
 }
 
 
-// reimplemented (icomp::CComponentBase)
-
-void CSqlDatabaseFileDocumentDelegateComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-
-	// The store is only reclaimed by the garbage collector; a delegate wired without
-	// one would leak every rolled-back write forever. Fail loudly rather than run a
-	// silently-leaking store.
-	Q_ASSERT(m_garbageCollectorCompPtr.IsValid());
-}
-
-
 // reimplemented (imtdb::CSqlDatabaseDocumentDelegateCompBase)
 
 bool CSqlDatabaseFileDocumentDelegateComp::WriteDataToMemory(
