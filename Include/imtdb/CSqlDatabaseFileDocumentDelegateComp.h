@@ -28,6 +28,12 @@ namespace imtdb
 	the SQL layer, so a committed row always points at existing, verified content.
 	Files are never overwritten and never deleted by a writer: content whose referencing
 	transaction failed or was rolled back is reclaimed by CFileDocumentGarbageCollectorComp.
+
+	A file's modification time is its reuse lease. A writer that deduplicates onto
+	existing content refreshes that time so the collector's grace period protects the
+	blob for the current, not-yet-committed transaction; the collector re-checks the
+	time immediately before deleting, so reuse and reclamation cannot both act on the
+	same blob.
 */
 class CSqlDatabaseFileDocumentDelegateComp: public imtdb::CSqlDatabaseDocumentDelegateCompBase
 {
@@ -45,6 +51,17 @@ protected:
 	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const override;
 
 private:
+	// Writes content to its hashed store path via an atomic stage-and-rename, creating
+	// the fan-out folder as needed. Idempotent for identical content and safe against a
+	// concurrent writer promoting the same content.
+	bool WriteContentFile(const QString& targetFilePath, const char* contentPtr, qint64 contentSize) const;
+
+	// Refreshes the modification time of already-stored content - its reuse lease - so
+	// the garbage collector's grace period protects it for the current transaction.
+	// Returns false when the file could no longer be re-dated (it left the store), so
+	// the caller re-writes it.
+	bool RefreshContentLease(const QString& targetFilePath) const;
+
 	QString GetContentFilePath(const QByteArray& contentHashHex) const;
 	const ifile::IDeviceBasedPersistence* GetObjectPersistence(const istd::IChangeable& object, QIODevice& device, int deviceOperation) const;
 

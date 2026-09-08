@@ -5,7 +5,9 @@
 // Qt includes
 #include <QtCore/QBuffer>
 #include <QtCore/QCryptographicHash>
+#include <QtCore/QDateTime>
 #include <QtCore/QDir>
+#include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
@@ -74,7 +76,14 @@ bool CSqlDatabaseFileDocumentDelegateComp::WriteDataToMemory(
 	const QString targetFilePath = GetContentFilePath(contentHash);
 	const QFileInfo targetInfo(targetFilePath);
 
-if (targetInfo.exists()){
+	// The modification time of stored content is its reuse lease: the garbage
+	// collector's grace period protects any freshly written - or freshly re-dated -
+	// file for the current, not-yet-committed transaction. A plain existence check is
+	// not enough for a deduplicated hit, because the blob may be an old orphan the
+	// collector is about to reclaim; refreshing its lease re-arms that protection, and
+	// if the collector has already won the race the content is simply re-written.
+	if (targetInfo.exists()){
+		// Identical content is already in the store.
 		QFile existingFile(targetFilePath);
 		if (!existingFile.open(QIODevice::ReadOnly)
 				|| existingFile.size() != bufferSize
@@ -84,45 +93,13 @@ if (targetInfo.exists()){
 						"CSqlDatabaseFileDocumentDelegateComp");
 			return false;
 		}
-	}
-	else{
-		if (!QDir().mkpath(targetInfo.absolutePath())){
-			SendErrorMessage(0, QString("Unable to create store folder '%1'").arg(targetInfo.absolutePath()),
-						"CSqlDatabaseFileDocumentDelegateComp");
-			return false;
-		}
 
-		// QSaveFile stages in a temporary file next to the target (same volume, so
-		// the promotion is an atomic rename) and removes that temporary itself on
-		// cancel, commit failure or destruction - staging cannot outlive this scope.
-		// The open is retried once with a re-created folder: the garbage collector
-		// may remove an emptied fan-out folder between the mkpath above and here.
-		QSaveFile stagingFile(targetFilePath);
-		if (!stagingFile.open(QIODevice::WriteOnly)
-				&& (!QDir().mkpath(targetInfo.absolutePath()) || !stagingFile.open(QIODevice::WriteOnly))){
-			SendErrorMessage(0, QString("Unable to open staging file for '%1': %2")
-						.arg(targetFilePath, stagingFile.errorString()),
-						"CSqlDatabaseFileDocumentDelegateComp");
+		if (!RefreshContentLease(targetFilePath) && !WriteContentFile(targetFilePath, bufferPtr, bufferSize)){
 			return false;
 		}
-		if (stagingFile.write(bufferPtr, bufferSize) != bufferSize){
-			stagingFile.cancelWriting();
-			SendErrorMessage(0, QString("Unable to write document content to '%1': %2")
-						.arg(targetFilePath, stagingFile.errorString()),
-						"CSqlDatabaseFileDocumentDelegateComp");
-			return false;
-		}
-		if (!stagingFile.commit()){
-			// A concurrent writer of identical content may have won the rename race;
-			// the store is correct either way if the target now exists with our size.
-			const QFileInfo raceInfo(targetFilePath);
-			if (!raceInfo.exists() || raceInfo.size() != bufferSize){
-				SendErrorMessage(0, QString("Unable to promote document content to '%1': %2")
-							.arg(targetFilePath, stagingFile.errorString()),
-							"CSqlDatabaseFileDocumentDelegateComp");
-				return false;
-			}
-		}
+	}
+	else if (!WriteContentFile(targetFilePath, bufferPtr, bufferSize)){
+		return false;
 	}
 
 	// Only now, with the content durably in the store, is the reference handed to
@@ -198,6 +175,75 @@ bool CSqlDatabaseFileDocumentDelegateComp::ReadDataFromMemory(
 
 
 // private methods
+
+bool CSqlDatabaseFileDocumentDelegateComp::WriteContentFile(
+			const QString& targetFilePath,
+			const char* contentPtr,
+			qint64 contentSize) const
+{
+	const QFileInfo targetInfo(targetFilePath);
+	if (!QDir().mkpath(targetInfo.absolutePath())){
+		SendErrorMessage(0, QString("Unable to create store folder '%1'").arg(targetInfo.absolutePath()),
+					"CSqlDatabaseFileDocumentDelegateComp");
+		return false;
+	}
+
+	// QSaveFile stages in a temporary file next to the target (same volume, so
+	// the promotion is an atomic rename) and removes that temporary itself on
+	// cancel, commit failure or destruction - staging cannot outlive this scope.
+	// The open is retried once with a re-created folder: the garbage collector
+	// may remove an emptied fan-out folder between the mkpath above and here.
+	QSaveFile stagingFile(targetFilePath);
+	if (!stagingFile.open(QIODevice::WriteOnly)
+			&& (!QDir().mkpath(targetInfo.absolutePath()) || !stagingFile.open(QIODevice::WriteOnly))){
+		SendErrorMessage(0, QString("Unable to open staging file for '%1': %2")
+					.arg(targetFilePath, stagingFile.errorString()),
+					"CSqlDatabaseFileDocumentDelegateComp");
+		return false;
+	}
+	if (stagingFile.write(contentPtr, contentSize) != contentSize){
+		stagingFile.cancelWriting();
+		SendErrorMessage(0, QString("Unable to write document content to '%1': %2")
+					.arg(targetFilePath, stagingFile.errorString()),
+					"CSqlDatabaseFileDocumentDelegateComp");
+		return false;
+	}
+	if (!stagingFile.commit()){
+		// A concurrent writer of identical content may have won the rename race;
+		// the store is correct either way if the target now exists with our size.
+		const QFileInfo raceInfo(targetFilePath);
+		if (!raceInfo.exists() || raceInfo.size() != contentSize){
+			SendErrorMessage(0, QString("Unable to promote document content to '%1': %2")
+						.arg(targetFilePath, stagingFile.errorString()),
+						"CSqlDatabaseFileDocumentDelegateComp");
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+bool CSqlDatabaseFileDocumentDelegateComp::RefreshContentLease(const QString& targetFilePath) const
+{
+	// ExistingOnly keeps a lost race - the collector reclaimed the blob between the
+	// existence check and here - from silently re-creating an empty file; the caller
+	// re-writes the real content instead.
+	QFile contentFile(targetFilePath);
+	if (!contentFile.open(QIODevice::ReadWrite | QIODevice::ExistingOnly)){
+		return false;
+	}
+	if (!contentFile.setFileTime(QDateTime::currentDateTimeUtc(), QFileDevice::FileModificationTime)){
+		return false;
+	}
+	contentFile.close();
+
+	// On POSIX a racing collector can unlink the path while this open handle keeps the
+	// inode - and thus setFileTime - alive; re-confirm the entry still resolves so a
+	// descriptor is never returned for content that has left the store.
+	return QFileInfo::exists(targetFilePath);
+}
+
 
 QString CSqlDatabaseFileDocumentDelegateComp::GetContentFilePath(const QByteArray& contentHashHex) const
 {

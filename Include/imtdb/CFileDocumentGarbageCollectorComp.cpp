@@ -7,6 +7,7 @@
 #include <QtCore/QDirIterator>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
 #include <QtCore/QRegularExpression>
 #include <QtConcurrent/QtConcurrent>
 
@@ -20,7 +21,21 @@ namespace imtdb
 
 namespace
 {
+	// Store descriptor schema written by CSqlDatabaseFileDocumentDelegateComp. Every
+	// field is validated before a row is trusted to reference content: an incomplete
+	// or malformed descriptor gives no safe way to know which file it points at, so it
+	// must count as foreign content rather than silently permitting deletion.
+	const QString descriptorFormatKey = QStringLiteral("fmt");
+	const QString descriptorAlgorithmKey = QStringLiteral("alg");
 	const QString descriptorHashKey = QStringLiteral("hash");
+	const QString descriptorSizeKey = QStringLiteral("size");
+
+	const int descriptorFormatVersion = 1;
+	const QString descriptorAlgorithm = QStringLiteral("sha256");
+
+	// The hash names the content file, so it must be exactly the 64-character
+	// lowercase SHA-256 hex the store uses everywhere else.
+	const QRegularExpression contentHashPattern(QStringLiteral("^[0-9a-f]{64}$"));
 
 	// <sha256-hex>.bin - the only files the collector may ever delete inside the
 	// grace period rules; everything else in the store is reported, not touched,
@@ -31,6 +46,40 @@ namespace
 	// Two-hex-character fan-out folders created by the delegate; emptied ones are
 	// removed at the end of a deletion pass.
 	const QRegularExpression fanOutFolderNamePattern(QStringLiteral("^[0-9a-f]{2}$"));
+
+	// Returns the referenced content hash of a fully valid store descriptor, or an
+	// empty array when the value is not one. A caller must treat the empty result as
+	// foreign content: the referenced file cannot be determined, so nothing may be
+	// deleted on this row's behalf.
+	QByteArray GetValidatedContentHash(const QByteArray& descriptorValue)
+	{
+		const QJsonDocument descriptorDoc = QJsonDocument::fromJson(descriptorValue);
+		if (!descriptorDoc.isObject()){
+			return QByteArray();
+		}
+
+		const QJsonObject descriptor = descriptorDoc.object();
+
+		if (descriptor.value(descriptorFormatKey).toInt(-1) != descriptorFormatVersion){
+			return QByteArray();
+		}
+
+		if (descriptor.value(descriptorAlgorithmKey).toString() != descriptorAlgorithm){
+			return QByteArray();
+		}
+
+		const QJsonValue sizeValue = descriptor.value(descriptorSizeKey);
+		if (!sizeValue.isDouble() || sizeValue.toDouble() < 0.0){
+			return QByteArray();
+		}
+
+		const QString contentHash = descriptor.value(descriptorHashKey).toString();
+		if (!contentHashPattern.match(contentHash).hasMatch()){
+			return QByteArray();
+		}
+
+		return contentHash.toLatin1();
+	}
 }
 
 
@@ -96,10 +145,7 @@ bool CFileDocumentGarbageCollectorComp::GetLivenessInfo(LivenessInfo& livenessIn
 			continue;
 		}
 
-		const QJsonDocument descriptorDoc = QJsonDocument::fromJson(documentValue);
-		const QByteArray contentHash = descriptorDoc.isObject()
-					? descriptorDoc.object().value(descriptorHashKey).toString().toLatin1()
-					: QByteArray();
+		const QByteArray contentHash = GetValidatedContentHash(documentValue);
 		if (contentHash.isEmpty()){
 			livenessInfo.hasForeignContent = true;
 
@@ -156,6 +202,18 @@ bool CFileDocumentGarbageCollectorComp::SweepStore(const LivenessInfo& livenessI
 			SendInfoMessage(0, QString("Unreferenced document content (audit): '%1'").arg(fileInfo.absoluteFilePath()),
 						"CFileDocumentGarbageCollectorComp");
 
+			continue;
+		}
+
+		// Re-stat immediately before removal. A writer that reuses this content
+		// refreshes the file's modification time - its store lease - and that refresh
+		// can land after the SQL liveness snapshot and the directory walk above. This
+		// final, fresh check must observe it, or reuse and deletion could both act on
+		// the same blob and leave the writer's transaction committing a dangling
+		// reference. A file that vanished, or was re-dated within the grace period, is
+		// left alone.
+		const QDateTime currentModified = QFileInfo(fileInfo.absoluteFilePath()).lastModified().toUTC();
+		if (!currentModified.isValid() || currentModified >= graceLimit){
 			continue;
 		}
 
