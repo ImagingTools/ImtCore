@@ -10,6 +10,8 @@ DataModelProvider {
 	property var responseModel
 	property var inputModel
 	property string permissionPath
+	property string context
+	property bool canEmitDataModelReady: true
 	
 	function requestDataModel(paramsObj){
 		root.requestStarted(paramsObj)
@@ -87,7 +89,9 @@ DataModelProvider {
 
 					root.prepareDataModel()
 
-					root.dataModelReady(root.dataModel)
+					if(root.canEmitDataModelReady){
+						root.dataModelReady(root.dataModel)
+					}
 					
 					return
 				}

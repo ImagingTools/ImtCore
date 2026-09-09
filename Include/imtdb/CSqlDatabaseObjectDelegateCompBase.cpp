@@ -428,10 +428,10 @@ bool CSqlDatabaseObjectDelegateCompBase::CreatePaginationQuery(int offset, int c
 
 	if (offset >= 0 && count > 0){
 		if (IsSqliteDriver()){
-			paginationQuery = QStringLiteral("LIMIT %1 OFFSET %2").arg(count, offset).toUtf8();
+			paginationQuery = QStringLiteral("LIMIT %1 OFFSET %2").arg(QString::number(count), QString::number(offset)).toUtf8();
 		}
 		else{
-			paginationQuery = QStringLiteral("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset, count).toUtf8();
+			paginationQuery = QStringLiteral("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(QString::number(offset), QString::number(count)).toUtf8();
 		}
 	}
 
@@ -734,6 +734,12 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTableIfNeeded()
 		return false;
 	}
 
+	const QByteArray prerequisiteScriptPath = m_prerequisiteTableScriptPathAttrPtr.IsValid()
+			? *m_prerequisiteTableScriptPathAttrPtr : QByteArray();
+	if (!prerequisiteScriptPath.isEmpty() && !ExecuteTableScript(prerequisiteScriptPath, tableName)){
+		return false;
+	}
+
 	if (TableExists(tableName)){
 		return true;
 	}
@@ -744,6 +750,12 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTableIfNeeded()
 		return false;
 	}
 
+	return ExecuteTableScript(scriptPath, tableName);
+}
+
+
+bool CSqlDatabaseObjectDelegateCompBase::ExecuteTableScript(const QByteArray& scriptPath, const QString& tableName)
+{
 	QString resourcePath = QString::fromUtf8(scriptPath);
 	if (!resourcePath.startsWith(QStringLiteral(":/"))){
 		resourcePath = GetSqlResourcePath(*m_databaseEngineCompPtr, resourcePath);

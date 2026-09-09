@@ -7,6 +7,7 @@
 #include <iprm/IIdParam.h>
 #include <iprm/IParamsInfoProvider.h>
 #include <iprm/TParamsPtr.h>
+#include <iqt/iqt.h>
 
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
@@ -45,6 +46,14 @@ bool CParamSetRepresentationController::GetSdlRepresentationFromDataModel(
 		return false;
 	}
 
+	QByteArray languageId;
+	if (paramsPtr != nullptr){
+		iprm::TParamsPtr<iprm::IIdParam> languageParamPtr(paramsPtr, "LanguageParam");
+		if (languageParamPtr.IsValid()){
+			languageId = languageParamPtr->GetId();
+		}
+	}
+
 	iprm::IParamsSet::Ids paramSetIds = paramsSetPtr->GetParamIds();
 	QByteArrayList parameterIds = paramSetIds.values();
 	std::sort(parameterIds.begin(), parameterIds.end());
@@ -77,19 +86,27 @@ bool CParamSetRepresentationController::GetSdlRepresentationFromDataModel(
 
 		parameter.data = jsonDocument.toJson(QJsonDocument::Compact);
 
-		IJsonRepresentationController::RepresentationInfo representationInfo = subControllerPtr->GetRepresentationInfo();
-		QByteArray typeId = subControllerPtr->GetTypeId();
-
 		parameter.id = parameterId;
-		parameter.typeId = typeId;
+		parameter.typeId = subControllerPtr->GetTypeId();
 
-		if(paramsInfoProviderPtr){
+		QString name;
+		QString description;
+
+		if (paramsInfoProviderPtr != nullptr){
 			std::unique_ptr<iprm::IParamsInfoProvider::ParamInfo> paramInfoPtr = paramsInfoProviderPtr->GetParamInfo(parameterId);
-			if(paramInfoPtr){
-				parameter.name = paramInfoPtr->name;
-				parameter.description = paramInfoPtr->description;
+			if (paramInfoPtr){
+				name = paramInfoPtr->name;
+				description = paramInfoPtr->description;
 			}
 		}
+
+		if (m_translationManagerPtr != nullptr){
+			name = iqt::GetTranslation(m_translationManagerPtr, name.toUtf8(), languageId, "Attribute");
+			description = iqt::GetTranslation(m_translationManagerPtr, description.toUtf8(), languageId, "Attribute");
+		}
+
+		parameter.name = name;
+		parameter.description = description;
 
 		parameterList << parameter;
 	}
@@ -178,6 +195,12 @@ bool CParamSetRepresentationController::RegisterSubController(const imtserverapp
 	m_representationControllers << &controller;
 
 	return true;
+}
+
+
+void CParamSetRepresentationController::SetTranslationManager(iqt::ITranslationManager* translationManagerPtr)
+{
+	m_translationManagerPtr = translationManagerPtr;
 }
 
 

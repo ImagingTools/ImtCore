@@ -3,11 +3,13 @@
 
 
 // ACF includes
+#include <ibase/TModelObserverCompWrap.h>
 #include <icomp/TMakeComponentWrap.h>
 #include <icomp/TModelCompWrap.h>
 
 // ImtCore includes
 #include <imtdoc/CCollectionDocumentServiceComp.h>
+#include <imtdoc/CFileBasedUndoManagerComp.h>
 #include <imtdoc/CDocumentServiceEventHandlerDemultiplexerComp.h>
 
 
@@ -19,9 +21,9 @@ namespace ImtDocPck
 
 
 typedef icomp::TModelCompWrap<imtdoc::CCollectionDocumentServiceComp> CollectionDocumentService;
+typedef ibase::TModelObserverCompWrap<icomp::TModelCompWrap<imtdoc::CFileBasedUndoManagerComp>> FileBasedUndoManager;
 typedef imtdoc::CDocumentServiceEventHandlerDemultiplexerComp DocumentServiceEventHandlerDemultiplexer;
 
 
 } // namespace ImtDocPck
-
 

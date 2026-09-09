@@ -109,6 +109,7 @@ public:
 		| url                        |        |    X    |         |          |
 		| documentId                 |        |         |    X    |    X     |
 		| documentName               |        |         |  (opt)  |          |
+		| singleDocumentInstance     |  (opt) |  (opt)  |         |          |
 	*/
 	struct TaskParams
 	{
@@ -121,6 +122,7 @@ public:
 		const imtbase::IOperationContext* operationContextPtr = nullptr; ///< Optional operation context for tenant/owner propagation during save.
 		const istd::IChangeable* defaultDataPtr = nullptr;
 		const iprm::IParamsSet* initParamsPtr = nullptr; ///< Optional initialization parameters passed to the init delegate (TT_NEW only).
+		bool singleDocumentInstance = false; ///< Optional. For \c TT_OPEN, when \c true the document is opened in single-instance mode: opening a second instance of an already-open document URL is forbidden. For \c TT_NEW, when \c true the newly created document is marked as single-instance so that it cannot be opened again elsewhere. Defaults to \c false.
 	};
 
 	/**
@@ -155,6 +157,7 @@ public:
 		bool isDirty = false;     ///< \c true when the document has unsaved changes.
 		bool hasNameProvider = false; ///< \c true when a name provider is registered for this type.
 		bool isLoading = false;   ///< \c true while the document data is still being loaded asynchronously.
+		bool singleDocumentInstance = false; ///< \c true when opened with \c TaskParams::singleDocumentInstance.
 	};
 
 	/**
@@ -323,5 +326,4 @@ public:
 
 
 Q_DECLARE_METATYPE(imtdoc::IDocumentService::DocumentNotification);
-
 

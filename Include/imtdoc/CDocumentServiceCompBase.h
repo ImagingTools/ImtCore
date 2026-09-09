@@ -11,6 +11,7 @@
 #include <imtdoc/CDocumentServiceBase.h>
 #include <imtdoc/IDocumentInitDelegate.h>
 #include <imtdoc/IDocumentNameProvider.h>
+#include <imtdoc/IPersistentUndoManager.h>
 #include <imtdoc/IDocumentValidator.h>
 
 
@@ -56,6 +57,7 @@ public:
 		I_ASSIGN_MULTI_0(m_handlerCompPtr, "DocumentServiceEventHandler", "Document service event handler", false);
 		I_ASSIGN_MULTI_0(m_objectTypeIdsAttrPtr, "ObjectTypeIdList", "List of the object type-IDs according to the list of factories ('ObjectFactories')", true);
 		I_ASSIGN(m_undoManagerFactPtr, "UndoManager", "Factory of the undo manager", false, "UndoManager");
+		I_ASSIGN_TO(m_persistUndoManagerFactPtr, m_undoManagerFactPtr, false);
 		I_ASSIGN_MULTI_0(m_documentNameProviderCompPtr, "DocumentNameProviders", "List of document name providers related to registered type-IDs ('ObjectTypeIdList')", false);
 		I_ASSIGN_MULTI_0(m_objectFactListCompPtr, "ObjectFactories", "List of object factories related to registered type-IDs ('ObjectTypeIdList')", true);
 		I_ASSIGN_MULTI_0(m_documentValidatorCompPtr, "DocumentValidators", "List of document data validators related to registered type-IDs ('ObjectTypeIdList')", false);
@@ -67,10 +69,10 @@ protected:
 	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const override;
 	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const override;
 	virtual bool ValidateDocumentData(
-		const WorkingDocument& document,
-		OperationStatus& status,
-		QString* errorMessage = nullptr,
-		const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+				const WorkingDocument& document,
+				OperationStatus& status,
+				QString* errorMessage = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentServiceEventHandlers() const override;
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const override;
 	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override;
@@ -90,6 +92,7 @@ protected:
 	I_MULTIREF(imtdoc::IDocumentServiceEventHandler, m_handlerCompPtr);
 	I_MULTIATTR(QByteArray, m_objectTypeIdsAttrPtr);
 	I_FACT(idoc::IUndoManager, m_undoManagerFactPtr);
+	I_FACT(imtdoc::IPersistentUndoManager, m_persistUndoManagerFactPtr);
 	I_MULTIREF(imtdoc::IDocumentNameProvider, m_documentNameProviderCompPtr);
 	I_MULTIFACT(istd::IChangeable, m_objectFactListCompPtr);
 	I_MULTIREF(imtdoc::IDocumentValidator, m_documentValidatorCompPtr);

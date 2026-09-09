@@ -27,6 +27,8 @@ public:
 
 	bool RegisterSubController(const imtserverapp::IJsonRepresentationController& controller) const;
 
+	void SetTranslationManager(iqt::ITranslationManager* translationManagerPtr);
+
 private:
 	const IJsonRepresentationController* GetRepresentationController(const istd::IChangeable& dataModel) const;
 
