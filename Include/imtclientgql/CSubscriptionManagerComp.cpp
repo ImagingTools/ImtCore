@@ -470,10 +470,14 @@ bool CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& s
 	// its token is the one that was current back then. The server authenticates
 	// every registration, so a re-registration after a refresh has to present the
 	// token that is current now, not the captured one.
-	if (m_accessTokenProviderCompPtr.IsValid()){
+if (m_accessTokenProviderCompPtr.IsValid()){
 		const QByteArray accessToken = m_accessTokenProviderCompPtr->GetToken(QByteArray());
-		if (!accessToken.isEmpty()){
-			headersObject[QString(imtbase::s_authenticationTokenHeaderId)] = QString(accessToken);
+		const QString authenticationTokenHeaderId(imtbase::s_authenticationTokenHeaderId);
+		if (accessToken.isEmpty()){
+			headersObject.remove(authenticationTokenHeaderId);
+		}
+		else{
+			headersObject[authenticationTokenHeaderId] = QString(accessToken);
 		}
 	}
 
