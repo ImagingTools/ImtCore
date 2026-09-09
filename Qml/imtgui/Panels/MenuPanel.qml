@@ -4,6 +4,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtauthgui 1.0
 import imtcontrols 1.0
+import Qt.labs.settings 1.0
 
 Rectangle {
 	id: menuPanel;
@@ -23,6 +24,14 @@ Rectangle {
 	property string firstElementImageSources: "";
 
 	property int activePageIndex: -1;
+
+	// Keeps the selected page across a browser reload.
+	property Settings storage: Settings {
+		category: "MenuPanel";
+	}
+
+	// Set while updateGui() falls back to the first page because the stored one is missing.
+	property bool __keepStoredPage: false;
 
 	property TreeItemModel model: TreeItemModel {};
 
@@ -141,6 +150,18 @@ Rectangle {
 
 			NavigationController.push(activePageId)
 		}
+	}
+
+	onActivePageIndexChanged: {
+		if (menuPanel.__keepStoredPage){
+			return;
+		}
+
+		if (menuPanel.activePageIndex < 0 || !menuPanel.model || menuPanel.activePageIndex >= menuPanel.model.getItemsCount()){
+			return;
+		}
+
+		menuPanel.storage.setValue("activePageId", menuPanel.model.getData("id", menuPanel.activePageIndex));
 	}
 
 	onWidthChanged: {
@@ -290,13 +311,16 @@ Rectangle {
 			return;
 		}
 
-		let savedActivePageId = menuPanel.activePageIndex >= 0 ? menuPanel.activePageId : "";
+		let storedPageId = menuPanel.storage.value("activePageId", "");
+		let savedActivePageId = menuPanel.activePageIndex >= 0 ? menuPanel.activePageId : (storedPageId ? storedPageId : "");
 		let targetIndex = 0;
+		let isPageFound = false;
 		if (savedActivePageId !== "" && model.getItemsCount() > 0){
 			for (let i = 0; i < model.getItemsCount(); i++){
 				let id = model.getData("id", i);
 				if (id === savedActivePageId){
 					targetIndex = i;
+					isPageFound = true;
 					break;
 				}
 			}
@@ -310,8 +334,10 @@ Rectangle {
 		bottomAlignmentPages.model = 0;
 
 		if (model.getItemsCount() > 0){
+			menuPanel.__keepStoredPage = savedActivePageId !== "" && !isPageFound;
 			menuPanel.activePageIndex = targetIndex;
 			menuPanel.activePageId = model.getData("id", targetIndex);
+			menuPanel.__keepStoredPage = false;
 		}
 
 		for (let i = 0; i < model.getItemsCount(); i++){
