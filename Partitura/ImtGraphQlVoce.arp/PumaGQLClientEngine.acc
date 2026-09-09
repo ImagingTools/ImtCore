@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6435" Description="ACF"/>
-            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6560" Description="ACF"/>
+            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -136,18 +136,27 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PublisherSubscriberBridge" PackageId="ImtServerGqlPck" ComponentId="PublisherSubscriberBridge">
+        <Element Id="PublisherSubscriberBridge" PackageId="ImtServerGqlPck" ComponentId="DocumentServiceSubscriberBridge">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionIds" Type="Id[]" ExportId="CollectionIds">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Roles</Value>
+                                <Value>Users</Value>
+                                <Value>Groups</Value>
+                                <Value>Tenants</Value>
+                                <Value>TenantRelationships</Value>
+                                <Value>CrossOrgGrants</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>OnRolesDocumentChanged</Value>
-                                <Value>OnRolesUndoChanged</Value>
-                                <Value>OnUsersDocumentChanged</Value>
-                                <Value>OnUsersUndoChanged</Value>
-                                <Value>OnGroupsDocumentChanged</Value>
-                                <Value>OnGroupsUndoChanged</Value>
+                                <Value>OnDocumentManagerChanged</Value>
+                                <Value>OnUndoRedoChanged</Value>
+                                <Value>OnDocumentChanged</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -337,18 +346,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SuperuserProvider" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestRemoteSuperuserProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApiClient"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SuperuserId" Type="Id" ExportId="SuperuserId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="SubscriberDemultiplexer" PackageId="ImtServerGqlPck" ComponentId="SlaveSubscriberController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -396,6 +393,18 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SuperuserProvider" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestRemoteSuperuserProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SuperuserId" Type="Id" ExportId="SuperuserId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

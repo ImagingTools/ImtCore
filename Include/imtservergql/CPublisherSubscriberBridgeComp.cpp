@@ -38,6 +38,7 @@ bool CPublisherSubscriberBridgeComp::RegisterSubscription(
 	// Build the upstream subscription request using the client's gqlRequest
 	// which already contains the user's IGqlContext (token, userId, tenantId)
 	imtgql::CGqlRequest upstreamRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, gqlRequest.GetCommandId());
+	upstreamRequest.SetParams(gqlRequest.GetParams());
 
 	imtgql::CGqlFieldObject subscriptionField;
 	subscriptionField.InsertField("id");
