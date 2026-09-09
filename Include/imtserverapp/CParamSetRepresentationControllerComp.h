@@ -2,8 +2,11 @@
 #pragma once
 
 
-// ImtCore includes
+// ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <iqt/ITranslationManager.h>
+
+// ImtCore includes
 #include <imtserverapp/CParamSetRepresentationController.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtBaseTypes_fwd.h>
 
@@ -23,6 +26,7 @@ public:
 		I_REGISTER_INTERFACE(IJsonRepresentationController);
 		I_ASSIGN_MULTI_0(m_paramRepresentationControllersCompPtr, "ParamRepresentationControllers", "Sub parameters representation controllers", false);
 		I_ASSIGN(m_customParamRepresentationControllerCompPtr, "CustomParamRepresentationController", "Additional application-specific sub parameter representation controller", false, "");
+		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
 protected:
@@ -46,6 +50,7 @@ protected:
 protected:
 	I_MULTIREF(IJsonRepresentationController, m_paramRepresentationControllersCompPtr);
 	I_REF(IJsonRepresentationController, m_customParamRepresentationControllerCompPtr);
+	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 
 private:
 	CParamSetRepresentationController m_representationController;
