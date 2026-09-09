@@ -312,7 +312,10 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 		QStringLiteral("Unregister requested for subscription '%1', which is not registered.").arg(subscriptionId),
 		QStringLiteral("CWebSocketServletComp"));
 
-	QByteArray data = QStringLiteral(R"({"type": "complete","id": "%1"})").arg(subscriptionId).toUtf8();
+QJsonObject completeObject;
+	completeObject.insert(QStringLiteral("type"), QStringLiteral("complete"));
+	completeObject.insert(QStringLiteral("id"), QString(subscriptionId));
+	const QByteArray data = QJsonDocument(completeObject).toJson(QJsonDocument::Compact);
 	return CreateDataResponse(data, request);
 }
 
