@@ -135,8 +135,10 @@ WebSocket {
 	}
 
 	function onAccessTokenRefreshed(parameters) {
-		// Re-submit only unregistered subscriptions (auth failure marked them so)
-		// with the new access token from the reactive refresh path.
+		for (let index = 0; index < container.subscriptionModel.length; index++){
+			container.subscriptionModel[index]["status"] = "unregistered"
+		}
+
 		registerSubscriptionToServer()
 	}
 
@@ -208,6 +210,11 @@ WebSocket {
 		let commandId = query.GetCommandId()
 		if (commandId === ""){
 			console.error("Unable to register subscription with empty command-ID")
+			return;
+		}
+
+		if (!subscriptionClient || subscriptionClient.subscriptionId === ""){
+			console.error("Unable to register subscription with empty subscription-ID. Command-ID:", commandId)
 			return;
 		}
 

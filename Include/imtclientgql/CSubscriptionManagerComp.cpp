@@ -27,6 +27,12 @@ namespace imtclientgql
 
 // public methods
 
+CSubscriptionManagerComp::CSubscriptionManagerComp()
+	:m_accessTokenObserver(*this)
+{
+}
+
+
 // reimplemented (imtgql::IGqlSubscriptionManager)
 
 QByteArray CSubscriptionManagerComp::RegisterSubscription(
@@ -459,6 +465,18 @@ bool CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& s
 			headersObject[QString(imtbase::s_languageIdHeaderId)] = QString(languageId);
 		}
 	}
+
+	// The request context is a clone taken when the subscription was created, so
+	// its token is the one that was current back then. The server authenticates
+	// every registration, so a re-registration after a refresh has to present the
+	// token that is current now, not the captured one.
+	if (m_accessTokenProviderCompPtr.IsValid()){
+		const QByteArray accessToken = m_accessTokenProviderCompPtr->GetToken(QByteArray());
+		if (!accessToken.isEmpty()){
+			headersObject[QString(imtbase::s_authenticationTokenHeaderId)] = QString(accessToken);
+		}
+	}
+
 	registerSubscription["headers"] = headersObject;
 
 	QByteArray queryData = QJsonDocument(registerSubscription).toJson(QJsonDocument::Compact);
@@ -517,6 +535,54 @@ void CSubscriptionManagerComp::OnComponentCreated()
 	if (m_connectionStatusProviderModelCompPtr.IsValid()){
 		m_connectionStatusProviderModelCompPtr->AttachObserver(this);
 	}
+
+	if (m_accessTokenProviderModelCompPtr.IsValid()){
+		m_accessTokenProviderModelCompPtr->AttachObserver(&m_accessTokenObserver);
+	}
+}
+
+
+void CSubscriptionManagerComp::ReregisterSubscriptions() const
+{
+	QByteArrayList subscriptionIds;
+	{
+		QMutexLocker locker(&m_registeredClientsMutex);
+		subscriptionIds = m_registeredClients.keys();
+	}
+
+	for (const QByteArray& subscriptionId : subscriptionIds){
+		imtgql::CGqlRequest request;
+		{
+			QMutexLocker locker(&m_registeredClientsMutex);
+			if (!m_registeredClients.contains(subscriptionId)){
+				continue;
+			}
+
+			request = m_registeredClients[subscriptionId].m_request;
+		}
+
+		// Sent outside the lock: registration goes through the transport and
+		// may re-enter this component.
+		SubscriptionRegister(request, subscriptionId);
+	}
+}
+
+
+// public methods of the embedded class AccessTokenObserver
+
+CSubscriptionManagerComp::AccessTokenObserver::AccessTokenObserver(CSubscriptionManagerComp& parent)
+	:m_parent(parent)
+{
+}
+
+
+// protected methods of the embedded class AccessTokenObserver
+
+// reimplemented (imod::CSingleModelObserverBase)
+
+void CSubscriptionManagerComp::AccessTokenObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	m_parent.ReregisterSubscriptions();
 }
 
 
