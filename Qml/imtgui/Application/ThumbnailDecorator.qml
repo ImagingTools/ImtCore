@@ -29,6 +29,10 @@ Rectangle {
 	property alias loadPageByClick: pagesManager.loadByClick;
 	property bool canRecoveryPassword: true;
 
+	// Applications that decorate TopPanel themselves keep it; the ones that opt out
+	// hand its duties to the navigation rail and get the whole height for content.
+	readonly property bool topPanelVisible: Style.enableTopPanel !== undefined ? Style.enableTopPanel : true;
+
 	property SettingsController settingsController: SettingsController {}
 	
 	Component.onCompleted: {
@@ -156,7 +160,7 @@ Rectangle {
 	PagesManager {
 		id: pagesManager;
 		
-		anchors.left: menuPanel.right;
+		anchors.left: menuPanel.visible ? menuPanel.right : parent.left;
 		anchors.right: thumbnailDecoratorContainer.right;
 		anchors.top: topPanel_.bottom;
 		anchors.bottom: thumbnailDecoratorContainer.bottom;
@@ -177,7 +181,10 @@ Rectangle {
 		edge: Qt.RightEdge;
 	}
 	
-	TopPanel {
+	// Loaded rather than merely hidden: the panel brings a UserPanel of its own,
+	// which would otherwise sit here invisible and repeat every profile request
+	// the rail's account row already makes.
+	Loader {
 		id: topPanel_;
 		
 		z: 10;
@@ -186,7 +193,14 @@ Rectangle {
 		anchors.topMargin: thumbnailDecoratorContainer.mainMargin;
 		
 		width: parent.width;
-		height: Style.sizePanelsHeight !== undefined ? Style.sizePanelsHeight : 60;
+		height: !active ? 0 : Style.sizePanelsHeight !== undefined ? Style.sizePanelsHeight : 60;
+		
+		active: thumbnailDecoratorContainer.topPanelVisible;
+		sourceComponent: thumbnailDecoratorContainer.topPanelComp;
+	}
+	
+	property Component topPanelComp: Component {
+		TopPanel {}
 	}
 	
 	function showPreferencePage(){
@@ -200,6 +214,42 @@ Rectangle {
 		z: topPanel_.z + 1;
 		
 		anchors.fill: parent;
+	}
+	
+	// The server address is edited in the preferences, and on desktop it has to be
+	// reachable before there is a session - sign-in and "no connection" both cover
+	// the rail that otherwise carries this button. Same z as the stack view and
+	// declared after it, so the dialogs below still come out on top.
+	ToolButton {
+		id: shellPreferenceButton;
+		objectName: "ShellPreferenceButton";
+		
+		z: stackView_.z;
+		
+		anchors.top: parent.top;
+		anchors.right: parent.right;
+		anchors.margins: Style.marginM;
+		
+		width: Style.controlHeightL;
+		height: width;
+		
+		visible: !thumbnailDecoratorContainer.topPanelVisible
+			&& Qt.platform.os !== "web"
+			&& stackView_.count > 0;
+		
+		tooltipText: qsTr("Settings");
+		iconSource: "qrc:/" + Style.getIconPath("Icons/Settings", Icon.State.On, Icon.Mode.Normal);
+		
+		decorator: Component {
+			ToolButtonDecorator {
+				icon.width: Style.iconSizeM;
+				radius: height / 2;
+			}
+		}
+		
+		onClicked: {
+			Events.sendEvent("ShowPreferencePage");
+		}
 	}
 	
 	DialogManagerView {

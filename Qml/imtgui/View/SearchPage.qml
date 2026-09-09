@@ -20,6 +20,9 @@ Item {
 	property string pendingRequestKey: ""
 	property var tabDataArrays: ({})
 
+	// Applications that still search from TopPanel keep their search box there.
+	readonly property bool ownSearchField: Style.enableTopPanel !== undefined ? !Style.enableTopPanel : false;
+
 	// Accumulating model for paged items of the currently active group/tab.
 	// We use ListModel to support append on loadMore (plain list assignment would lose previous pages).
 	ListModel {
@@ -32,6 +35,96 @@ Item {
 	
 	Component.onDestruction: {
 		Events.unSubscribeEvent("GlobalSearchActivated", root.updateSearch)
+	}
+
+	// Empty, the field stands alone in the middle of the page; once there is
+	// something to show it moves up out of the way of the results.
+	Item {
+		id: searchHeader;
+
+		anchors.top: parent.top;
+		anchors.left: parent.left;
+		anchors.right: parent.right;
+
+		height: !root.ownSearchField ? 0
+			: root.currentText === "" ? root.height
+			: Style.controlHeightL + 2 * Style.marginL;
+
+		visible: root.ownSearchField;
+
+		Behavior on height {
+			NumberAnimation {
+				duration: 180;
+				easing.type: Easing.InOutQuad;
+			}
+		}
+
+		Column {
+			id: searchColumn;
+
+			anchors.centerIn: parent;
+
+			width: Math.min(parent.width - 2 * Style.marginXL, Style.sizeHintXXL);
+
+			spacing: Style.marginL;
+
+			Text {
+				id: searchTitle;
+
+				width: parent.width;
+
+				horizontalAlignment: Text.AlignHCenter;
+
+				text: qsTr("Search everything");
+				color: Style.titleColor;
+				font.family: Style.fontFamilyBold;
+				font.pixelSize: Style.fontSizeBXL;
+
+				opacity: root.currentText === "" ? 1 : 0;
+				visible: searchTitle.opacity > 0;
+				height: visible ? implicitHeight : 0;
+
+				Behavior on opacity {
+					NumberAnimation {
+						duration: 120;
+					}
+				}
+			}
+
+			SearchTextInput {
+				id: searchField;
+
+				width: parent.width;
+				height: Style.controlHeightL;
+
+				radius: height / 2;
+				color: Style.baseColor;
+				textSize: Style.fontSizeL;
+				placeHolderText: qsTr("Search across the whole application");
+
+				onSearchChanged: {
+					Events.sendEvent("GlobalSearchActivated", searchField.text);
+				}
+			}
+
+			Text {
+				id: searchSubtitle;
+
+				width: parent.width;
+
+				horizontalAlignment: Text.AlignHCenter;
+
+				text: qsTr("Documents, records and settings from every section are searched at once");
+				color: Style.inactiveTextColor;
+				font.family: Style.fontFamily;
+				font.pixelSize: Style.fontSizeM;
+				wrapMode: Text.WordWrap;
+
+				opacity: searchTitle.opacity;
+				visible: searchSubtitle.opacity > 0;
+				height: visible ? implicitHeight : 0;
+			}
+		}
 	}
 	
 	function makeRequestKey(text, rid, off) {
@@ -152,7 +245,13 @@ Item {
 
 	SearchResultsView {
 		id: searchResultsView;
-		anchors.fill: parent;
+
+		anchors.top: searchHeader.bottom;
+		anchors.left: parent.left;
+		anchors.right: parent.right;
+		anchors.bottom: parent.bottom;
+
+		visible: !root.ownSearchField || root.currentText !== "";
 
 		categories: root.categories
 		activeItems: root.activeTabItems

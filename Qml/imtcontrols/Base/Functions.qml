@@ -3,6 +3,19 @@ import QtQuick 2.12
 
 
 QtObject {
+	function initialsOf(text){
+		if (!text || text === ""){
+			return "?"
+		}
+
+		let parts = String(text).trim().split(/\s+/)
+		if (parts.length === 1){
+			return parts[0].substring(0, 2).toUpperCase()
+		}
+
+		return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase()
+	}
+
 	function formatDigitRev(digit){
 		return digit.replace(/\s/g,'')
 	}
