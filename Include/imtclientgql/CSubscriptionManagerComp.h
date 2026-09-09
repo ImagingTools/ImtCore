@@ -95,6 +95,7 @@ public:
 
 protected:
 	virtual bool SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const;
+	virtual bool SubscriptionUnregister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const;
 	virtual bool SendRequestInternal(const imtgql::IGqlRequest& request, imtrest::ConstRequestPtr& requestPtr) const;
 
 	// reimplemented (icomp::CComponentBase)
@@ -105,6 +106,9 @@ protected:
 		Re-send the "start" message of every known subscription.
 		The server binds a subscription to the identity presented at registration
 		time, so a replaced access token has to be carried to it explicitly.
+		Every re-registration is preceded by a "stop" message with the same
+		subscription ID, because server side controllers append a new
+		registration instead of replacing the existing one.
 	*/
 	void ReregisterSubscriptions() const;
 

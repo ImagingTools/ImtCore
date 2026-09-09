@@ -491,6 +491,40 @@ if (m_accessTokenProviderCompPtr.IsValid()){
 }
 
 
+bool CSubscriptionManagerComp::SubscriptionUnregister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const
+{
+	if (!m_engineCompPtr.IsValid()){
+		Q_ASSERT(0);
+
+		return false;
+	}
+
+	QJsonObject unregisterSubscription;
+	unregisterSubscription["id"] = QString(subscriptionId);
+	unregisterSubscription["type"] = "stop";
+	unregisterSubscription["payload"] = QJsonObject();
+
+	QJsonObject headersObject;
+	const imtgql::IGqlContext* contextPtr = subscriptionRequest.GetRequestContext();
+	if (contextPtr != nullptr){
+		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
+		for (const QByteArray& headerId : headers.keys()){
+			if (headerId != "accept-encoding"){
+				headersObject[headerId] = QString(headers.value(headerId));
+			}
+		}
+	}
+
+	unregisterSubscription["headers"] = headersObject;
+
+	QByteArray queryData = QJsonDocument(unregisterSubscription).toJson(QJsonDocument::Compact);
+
+	imtrest::ConstRequestPtr requestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, "").PopInterfacePtr());
+
+	return SendRequestInternal(subscriptionRequest, requestPtr);
+}
+
+
 bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& request, imtrest::ConstRequestPtr& requestPtr) const
 {
 	bool retVal = false;
@@ -567,6 +601,11 @@ void CSubscriptionManagerComp::ReregisterSubscriptions() const
 
 		// Sent outside the lock: registration goes through the transport and
 		// may re-enter this component.
+		// The "stop" is sent first, because server side controllers append a new
+		// registration for a repeated "start" instead of replacing the old one.
+		// The transport keeps the message order, so the server drops the previous
+		// registration before the new one arrives.
+		SubscriptionUnregister(request, subscriptionId);
 		SubscriptionRegister(request, subscriptionId);
 	}
 }
