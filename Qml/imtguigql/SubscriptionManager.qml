@@ -136,10 +136,30 @@ WebSocket {
 
 	function onAccessTokenRefreshed(parameters) {
 		for (let index = 0; index < container.subscriptionModel.length; index++){
+			// The "stop" is sent first, because server side controllers append a new
+			// registration for a repeated "start" instead of replacing the old one.
+			// The socket keeps the message order, so the server drops the previous
+			// registration before the new one arrives.
+			container.unregisterSubscriptionOnServer(index)
 			container.subscriptionModel[index]["status"] = "unregistered"
 		}
 
 		registerSubscriptionToServer()
+	}
+
+	function unregisterSubscriptionOnServer(index){
+		if (container.status != WebSocket.Open){
+			return;
+		}
+
+		let request = {}
+		request["id"] = container.subscriptionModel[index]["subscriptionId"]
+		request["headers"] = container.subscriptionModel[index]["headers"]
+		request["type"] = "stop"
+		let payload = {}
+		request["payload"] = payload
+
+		container.sendTextMessage(JSON.stringify(request))
 	}
 
 	function registerSubscriptionEvent(parameters){
