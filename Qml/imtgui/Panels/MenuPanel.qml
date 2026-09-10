@@ -72,6 +72,10 @@ Rectangle {
 
 	property bool loggedIn: false;
 
+	// Without user management there are no accounts to show, exactly as
+	// TopRightPanelDecorator hides its UserPanel in that mode.
+	property bool userManagementAvailable: true;
+
 	// On the web build settings only make sense once there is a session to settle
 	// them against.
 	readonly property bool settingsAvailable: Qt.platform.os !== "web" || menuPanel.loggedIn;
@@ -110,6 +114,19 @@ Rectangle {
 		Events.subscribeEvent("ExpandMenu", menuPanel.setCollapsed);
 
 		menuPanel.updateAutoCollapse();
+
+		menuPanel.setUserMode(AuthorizationController.getUserMode());
+	}
+
+	// An empty mode means the server has not answered yet, and the account row
+	// stays as it is until it does.
+	function setUserMode(userMode){
+		if (userMode === "NO_USER_MANAGEMENT"){
+			menuPanel.userManagementAvailable = false;
+		}
+		else if (userMode !== ""){
+			menuPanel.userManagementAvailable = true;
+		}
 	}
 
 	Connections {
@@ -122,6 +139,10 @@ Rectangle {
 
 		function onLoggedOut(){
 			menuPanel.loggedIn = false;
+		}
+
+		function onUserModeChanged(userMode){
+			menuPanel.setUserMode(userMode);
 		}
 	}
 
@@ -743,7 +764,9 @@ Rectangle {
 				id: userPanel;
 
 				width: parent.width;
-				height: menuPanel.rowHeight;
+				height: menuPanel.userManagementAvailable ? menuPanel.rowHeight : 0;
+
+				visible: menuPanel.userManagementAvailable;
 
 				collapsed: menuPanel.collapsed;
 				menuPanelRef: menuPanel;
@@ -764,7 +787,9 @@ Rectangle {
 				width: parent.width;
 				height: menuPanel.rowHeight;
 
-				visible: menuPanel.settingsAvailable && menuPanel.collapsed;
+				// Without the account row the gear has nowhere to ride along, so it
+				// keeps its own row also when the rail is open.
+				visible: menuPanel.settingsAvailable && (menuPanel.collapsed || !menuPanel.userManagementAvailable);
 
 				text: qsTr("Settings");
 				textColor: Style.textColor;
