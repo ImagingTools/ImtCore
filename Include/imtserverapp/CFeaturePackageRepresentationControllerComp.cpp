@@ -87,7 +87,7 @@ bool CFeaturePackageRepresentationControllerComp::CreateRepresentationModelFromF
 	representationModel.insert(QStringLiteral("FeatureName"), featureInfo.GetFeatureName());
 	representationModel.insert(QStringLiteral("Optional"), featureInfo.IsOptional());
 	representationModel.insert(QStringLiteral("FeatureDescription"), featureInfo.GetFeatureDescription());
-	representationModel.insert(QStringLiteral("Dependencies"), QString(featureInfo.GetDependencies().join(';')));
+	representationModel.insert(QStringLiteral("Dependencies"), QString(featureInfo.GetRequirements().join(';')));
 
 	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
 	if (!subFeatures.isEmpty()){

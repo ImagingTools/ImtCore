@@ -20,8 +20,9 @@ CollectionView {
 	property var additionalFieldIds: ["id", "name"]
 	property var requestedFields: []
 
-	// Context for requests, placed in the headers  
-	property string context: ""
+	// Permission path per GQL command id, for the commands this view and its
+	// representation issue.
+	property var permissionPaths: ({})
 
 	property alias subscriptionCommandId: collectionChangeListener.gqlCommandId
 
@@ -76,7 +77,7 @@ CollectionView {
 			collectionId: root.collectionId;
 			gqlGetListCommandId: root.gqlGetListCommandId
 			requestedFields: root.requestedFields
-			context: root.context
+			permissionPaths: root.permissionPaths
 
 			additionalFieldIds: root.additionalFieldIds;
 

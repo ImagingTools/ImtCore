@@ -9,6 +9,7 @@ DataModelProvider {
 	property string getCommandId
 	property var responseModel
 	property var inputModel
+	property string permissionPath
 	property string context
 	property bool canEmitDataModelReady: true
 	
@@ -38,8 +39,8 @@ DataModelProvider {
 		query.AddParam(inputObject)
 		
 		let headers = root.getHeaders()
-		if (headers && root.context && root.context != "")
-			headers["context"] = root.context
+		if (headers && root.permissionPath && root.permissionPath != "")
+			headers["permissionPath"] = root.permissionPath
 
 		gqlRequest.setGqlQuery(query.GetQuery(), headers)
 	}

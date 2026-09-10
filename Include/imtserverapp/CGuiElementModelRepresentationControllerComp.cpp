@@ -12,6 +12,7 @@
 #include <QtCore/QJsonValue>
 
 // ImtCore includes
+#include <imtserverapp/imtserverapp.h>
 #include <imtserverapp/IGuiElementContainer.h>
 #include <imtserverapp/IGuiElementModel.h>
 
@@ -74,16 +75,14 @@ bool CGuiElementModelRepresentationControllerComp::GetRepresentationFromDataMode
 
 	QByteArray elementId = guiElementPtr->GetElementId();
 
-	if (!isAdmin){
-		if (m_commandPermissionsProviderCompPtr.IsValid()){
-			QByteArrayList elementPermissions = m_commandPermissionsProviderCompPtr->GetCommandPermissions(elementId);
-			if (m_checkPermissionCompPtr.IsValid() && !elementPermissions.isEmpty()){
-				bool result = m_checkPermissionCompPtr->CheckPermission(userPermissions, elementPermissions);
-				if (!result){
-					return false;
-				}
-			}
-		}
+	if (!IsElementAccessible(
+				m_commandPermissionsProviderCompPtr.GetPtr(),
+				m_checkPermissionCompPtr.GetPtr(),
+				elementId,
+				userPermissions,
+				isAdmin,
+				GetPermissionPath(paramsPtr))){
+		return false;
 	}
 
 	QString elementName = guiElementPtr->GetElementName();

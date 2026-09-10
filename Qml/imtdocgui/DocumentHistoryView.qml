@@ -28,6 +28,8 @@ Rectangle {
 
 	property string documentId: ""
 	property string collectionId: ""
+	// Part of the product this view works in; scopes its permission checks.
+	property string permissionPath: ""
 
 	// Opt-in row selection (used by DocumentRevisionDialog to pick a revision
 	// to restore/delete); plain history tabs leave this off.

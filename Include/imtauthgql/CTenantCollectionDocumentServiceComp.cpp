@@ -40,7 +40,7 @@ namespace
 bool HasAnyPermission(const QByteArrayList& userPermissions, const QByteArrayList& requiredPermissions)
 {
 	for (const QByteArray& permissionId : requiredPermissions){
-		if (!permissionId.isEmpty() && userPermissions.contains(permissionId)){
+		if (imtauth::HasPermission(userPermissions, permissionId)){
 			return true;
 		}
 	}
@@ -334,7 +334,10 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 
 		QByteArrayList scopedPermissions;
 		for (const QByteArray& permissionId : contextUserPermissions){
-			if (!permissionId.isEmpty() && tenantPermissionSet.contains(permissionId)){
+			// A permission held in the old format ("EditUser") is the one the
+			// tenant grants as a path ("/Administration/EditUser"), so the two
+			// are matched by the common rule instead of by equality.
+			if (imtauth::HasPermission(tenantPermissionSet, permissionId)){
 				scopedPermissions.push_back(permissionId);
 			}
 		}

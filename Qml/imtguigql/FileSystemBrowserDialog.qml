@@ -22,7 +22,7 @@ import imtbaseFileSystemSdl 1.0
 Dialog {
 	id: root
 
-	property string context: ""
+	property string permissionPath: ""
 	title: root.computeTitle()
 	width: Math.max(Style.sizeHintXXL, Math.min(ModalDialogManager.activeView.width - 100, 1000))
 	height: Math.max(Style.sizeHintXL, Math.min(ModalDialogManager.activeView.height - 100, 800))
@@ -473,7 +473,7 @@ Dialog {
 	}
 
 	GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		id: requestSender
 
 		gqlCommandId: ImtbaseFileSystemSdlCommandIds.s_getFileSystemEntries

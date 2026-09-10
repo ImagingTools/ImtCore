@@ -25,6 +25,9 @@ Item {
 	// is what points at the blanks of a freshly created row.
 	property bool required: false
 	property bool missing: cell.required && (cell.editing ? cell.draft === "" : cell.value === "")
+	// Set by the caller when the draft fails validation it alone knows about
+	// (e.g. a duplicate key); gets the same red border as a missing value.
+	property bool invalid: false
 	// Live text of the open editor - the row watches it to derive other cells.
 	property string draft: editor.text
 	property real textInset: Style.marginXS
@@ -92,7 +95,7 @@ Item {
 		readOnly: cell.readOnly
 		margin: cell.textInset
 		radius: Style.radiusM
-		borderColorConst: cell.missing ? Style.errorTextColor : ""
+		borderColorConst: (cell.missing || cell.invalid) ? Style.errorTextColor : ""
 		autoEditingFinished: false
 		placeHolderText: cell.placeHolderText
 		KeyNavigation.tab: cell.nextEditor

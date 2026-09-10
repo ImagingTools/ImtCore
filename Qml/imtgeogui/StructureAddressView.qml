@@ -12,7 +12,7 @@ import imtbaseComplexCollectionFilterSdl 1.0
 
 Item {
 	id: structureAddressesContainer;
-	property string context: ""
+	property string permissionPath: ""
 	anchors.fill: parent;
 
 	property TreeItemModel addressModel: TreeItemModel{};
@@ -51,7 +51,7 @@ Item {
 	property Component addressTreeSdlObjectComp: null
 
 	property GqlRequestSender addAddressRequest: GqlRequestSender{
-		context: structureAddressesContainer.context
+		permissionPath: structureAddressesContainer.permissionPath
 		gqlCommandId: "AddressAdd";
 
 		function createQueryParams(query){
@@ -81,7 +81,7 @@ Item {
 	}
 
 	property GqlRequestSender updateAddressRequest: GqlRequestSender{
-		context: structureAddressesContainer.context
+		permissionPath: structureAddressesContainer.permissionPath
 		gqlCommandId: "AddressUpdate";
 
 		function createQueryParams(query){
@@ -100,7 +100,7 @@ Item {
 	}
 
 	property GqlSdlRequestSender removeAddressRequest: GqlSdlRequestSender{
-		context: structureAddressesContainer.context
+		permissionPath: structureAddressesContainer.permissionPath
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
 		requestType: 1
 	}

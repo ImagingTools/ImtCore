@@ -17,6 +17,7 @@ CollectionDataProvider {
         FeatureItemTypeMetaInfo.s_featureName,
         FeatureItemTypeMetaInfo.s_description,
         FeatureItemTypeMetaInfo.s_optional,
+        FeatureItemTypeMetaInfo.s_requirements,
         FeatureItemTypeMetaInfo.s_subFeatures
     ];
     sortByField: FeatureItemTypeMetaInfo.s_featureName;

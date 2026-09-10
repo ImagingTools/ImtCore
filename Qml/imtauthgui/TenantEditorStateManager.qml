@@ -18,6 +18,9 @@ QtObject {
 	// --- Wired by the orchestrator ---
 	property var tenantData: null
 	property var apiClient: null
+	// Part of the organization permission tree the editor works in; scopes the
+	// checks below the same way the GQL senders scope the requests they send.
+	property string permissionPath: ""
 
 	// --- Local UI state ---
 	property var pendingMembers: []
@@ -114,12 +117,15 @@ QtObject {
 	// Org-level permissions (ViewOrganizationMembers, EditOrganizationMember, etc.) are
 	// distinct from product-level role permissions and are served via
 	// TenantData.currentUserOrganizationPermissions, NOT via PermissionsController.
+	// They are held as full paths, e.g. "/MemberManagement/ViewOrganizationMembers";
+	// asking by the feature id alone matches the last segment of such a path.
 	function hasPermission(permissionId) {
 		if (!permissionId || permissionId === "")
 			return false
 		if (stateManager.isNewTenant || stateManager.isCreator || stateManager.isOwner || stateManager.isAdmin)
 			return true
-		return stateManager.__currentUserOrgPerms.indexOf(permissionId) !== -1
+
+		return PermissionsController.hasPermission(stateManager.__currentUserOrgPerms, permissionId)
 	}
 
 	function hasAnyPermission(permissionIds) {

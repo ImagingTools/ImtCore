@@ -22,7 +22,7 @@ Item {
 	
 	property var additionalFieldIds: []
 	property var requestedFields: []
-	property string context
+	property var permissionPaths: ({})
 
 	signal removed()
 	signal elementsRemoved(var elementIds)
@@ -248,7 +248,7 @@ Item {
 	GqlSdlRequestSender {
 		id: duplicateElementsRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_duplicateElements
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		sdlObjectComp: Component {
 			DuplicateElementsPayload {
@@ -271,7 +271,7 @@ Item {
 	GqlSdlRequestSender {
 		id: getElementMetaInfoRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getElementMetaInfo
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		sdlObjectComp: Component {
 			GetElementMetaInfoPayload {
@@ -289,7 +289,7 @@ Item {
 	GqlSdlRequestSender {
 		id: restoreObjectsRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_restoreObjects
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		requestType: 1
 		sdlObjectComp: Component {
@@ -304,7 +304,7 @@ Item {
 	GqlSdlRequestSender {
 		id: restoreObjectSetRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_restoreObjectSet
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		requestType: 1
 		sdlObjectComp: Component {
@@ -319,7 +319,7 @@ Item {
 	GqlSdlRequestSender {
 		id: removeElementSetSender
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElementSet
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		requestType: 1
 		sdlObjectComp: Component {
@@ -344,7 +344,7 @@ Item {
 	GqlSdlRequestSender {
 		id: removeGqlSender
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		requestType: 1
 		sdlObjectComp: Component {
@@ -374,7 +374,7 @@ Item {
 	GqlSdlRequestSender {
 		id: setObjectNameRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_setObjectName
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		requestType: 1
 		sdlObjectComp: Component {
@@ -403,7 +403,7 @@ Item {
 	GqlSdlRequestSender {
 		id: getObjectVisualStatusRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectVisualStatus
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		sdlObjectComp: Component {
 			VisualStatus {
@@ -426,7 +426,7 @@ Item {
 	GqlSdlRequestSender {
 		id: setObjectDescriptionRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_setObjectDescription
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		requestType: 1
 		sdlObjectComp: Component {
@@ -449,7 +449,7 @@ Item {
 	GqlSdlRequestSender {
 		id: getCollectionHeadersRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getCollectionHeaders
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		sdlObjectComp: Component {
 			GetCollectionHeadersPayload {
@@ -501,7 +501,7 @@ Item {
 	GqlRequestSender {
 		id: elementsGqlModel;
 		gqlCommandId: root.gqlGetListCommandId;
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		
 		function createQueryParams(query, params){
 			var viewParams = Gql.GqlObject("viewParams");
@@ -552,7 +552,7 @@ Item {
 	GqlSdlRequestSender {
 		id: importObjectRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_importObject
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 
 		requestType: 1
 		sdlObjectComp: Component {
@@ -572,7 +572,7 @@ Item {
 	GqlSdlRequestSender {
 		id: exportObjectRequest
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_exportObject
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		
 		sdlObjectComp: Component {
 			ExportObjectPayload {

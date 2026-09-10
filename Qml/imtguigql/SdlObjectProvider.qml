@@ -6,10 +6,10 @@ import imtguigql 1.0
 QtObject {
     id: root
 
-    property string context: ""
+    property string permissionPath: ""
 
     GqlSdlRequestSender {
-        context: root.context
+        permissionPath: root.permissionPath
     }
 }
 
