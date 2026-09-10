@@ -114,10 +114,11 @@ class Loader extends Item {
             } else {
                 Geometry.setAuto(this.__self, 'width', newValue.width, this.__self.constructor.meta.width)
 
-                let originSlot = newValue.SLOT_widthChanged
-                newValue.SLOT_widthChanged = (o, n)=>{
-                    Geometry.setAuto(this.__self, 'width', n, this.__self.constructor.meta.width)
-                    if(originSlot) originSlot.call(newValue, o, n)
+                // Before item.widthChanged bindings, like Qt itemGeometryChanged before width notify.
+                if(newValue.widthChanged && newValue.widthChanged.connectFirst){
+                    newValue.widthChanged.connectFirst((o, n)=>{
+                        Geometry.setAuto(this.__self, 'width', n, this.__self.constructor.meta.width)
+                    })
                 }
             }
 
@@ -131,10 +132,10 @@ class Loader extends Item {
             } else {
                 Geometry.setAuto(this.__self, 'height', newValue.height, this.__self.constructor.meta.height)
 
-                let originSlot = newValue.SLOT_heightChanged
-                newValue.SLOT_heightChanged = (o, n)=>{
-                    Geometry.setAuto(this.__self, 'height', n, this.__self.constructor.meta.height)
-                    if(originSlot) originSlot.call(newValue, o, n)
+                if(newValue.heightChanged && newValue.heightChanged.connectFirst){
+                    newValue.heightChanged.connectFirst((o, n)=>{
+                        Geometry.setAuto(this.__self, 'height', n, this.__self.constructor.meta.height)
+                    })
                 }
             }
         }
