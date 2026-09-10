@@ -478,7 +478,8 @@ Rectangle {
 		// has to be read off the panel and not off the mouse area alone: a disabled
 		// area keeps whatever containsMouse it had when it went quiet, which left
 		// the unfold arrow frozen in place after the first click.
-		readonly property bool brandHovered: menuPanel.collapsed && brandArea.containsMouse;
+		readonly property bool brandHovered: menuPanel.collapsed
+			&& (brandArea.containsMouse || brandArea.activeFocus);
 
 		// Held back until the rail is most of the way open - drawn any earlier the
 		// name is squeezed against the mark and reads as crawling out from under it.
@@ -524,10 +525,29 @@ Rectangle {
 			hoverEnabled: true;
 			cursorShape: menuPanel.collapsed ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
-			onClicked: {
+			// Folded, this is the only way back out of the rail, so it has to be
+			// reachable and operable without a pointer as well.
+			activeFocusOnTab: menuPanel.collapsed;
+
+			Accessible.role: Accessible.Button;
+			Accessible.name: qsTr("Expand menu");
+			Accessible.onPressAction: brandArea.expandMenu();
+
+			function expandMenu(){
 				if (menuPanel.collapsed){
 					Events.sendEvent("ExpandMenu", false);
 					menuPanel.storeCollapsed(false);
+				}
+			}
+
+			onClicked: {
+				brandArea.expandMenu();
+			}
+
+			Keys.onPressed: {
+				if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space){
+					brandArea.expandMenu();
+					event.accepted = true;
 				}
 			}
 		}
@@ -708,6 +728,7 @@ Rectangle {
 			onClicked: {
 				Events.sendEvent("CollapseMenu", true);
 				menuPanel.storeCollapsed(true);
+				brandArea.forceActiveFocus();
 			}
 		}
 	}
