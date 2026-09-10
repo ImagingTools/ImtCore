@@ -98,12 +98,8 @@ Rectangle {
 
 	Component.onCompleted: {
 		if (Style.enableMenuPanelCollapse){
-			if (menuPanel.railMode){
-				menuPanel.collapsed = railSettings.value("collapsed", "") === "true";
-			}
+			menuPanel.restoreCollapsed();
 
-			widthAnimation.stop();
-			menuPanel.width = menuPanel.collapsed ? menuPanel.collapsedWidth : menuPanel.expandedWidth;
 			menuPanel.menuDefaultWidth = menuPanel.expandedWidth;
 		}
 
@@ -121,6 +117,7 @@ Rectangle {
 
 		function onLoggedIn(){
 			menuPanel.loggedIn = true;
+			menuPanel.restoreCollapsed();
 		}
 
 		function onLoggedOut(){
@@ -242,8 +239,29 @@ Rectangle {
 	// narrow window is not a preference.
 	function storeCollapsed(stateArg){
 		if (menuPanel.railMode){
-			railSettings.setValue("collapsed", stateArg ? "true" : "false");
+			railSettings.setValue(menuPanel.collapsedKey(), stateArg ? "true" : "false");
 		}
+	}
+
+	// The fold is a personal choice, so the key carries the user it belongs to.
+	// Before a login there is no identity yet and the shared key is used.
+	function collapsedKey(){
+		let userId = AuthorizationController.userTokenProvider ? AuthorizationController.userTokenProvider.userId : "";
+
+		return userId ? "collapsed_" + userId : "collapsed";
+	}
+
+	function restoreCollapsed(){
+		if (!Style.enableMenuPanelCollapse){
+			return;
+		}
+
+		if (menuPanel.railMode){
+			menuPanel.collapsed = railSettings.value(menuPanel.collapsedKey(), "") === "true";
+		}
+
+		widthAnimation.stop();
+		menuPanel.width = menuPanel.collapsed ? menuPanel.collapsedWidth : menuPanel.expandedWidth;
 	}
 
 	function updateAutoCollapse(){
