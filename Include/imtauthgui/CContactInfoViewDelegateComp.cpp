@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtauth/IContactInfo.h>
+#include <imtaccount/IContactInfo.h>
 
 
 namespace imtauthgui
@@ -28,29 +28,29 @@ bool CContactInfoViewDelegateComp::GetSummaryInformation(
 		summaryInformation.infoId = informationId;
 		if (metaInfoPtr.IsValid()){
 			if (informationId == QByteArrayLiteral("EMail")){
-				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_MAIL).toString();
+				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtaccount::IContactInfo::MIT_MAIL).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArrayLiteral("Birthday")){
-				QDate birthday = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_BIRTHDAY).toDate();
+				QDate birthday = metaInfoPtr->GetMetaInfo(imtaccount::IContactInfo::MIT_BIRTHDAY).toDate();
 				QLocale locale;
 				summaryInformation.text = locale.toString(birthday, QLocale::ShortFormat);
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArrayLiteral("FirstName")){
-				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_FIRST_NAME).toString();
+				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtaccount::IContactInfo::MIT_FIRST_NAME).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArrayLiteral("LastName")){
-				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_LAST_NAME).toString();
+				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtaccount::IContactInfo::MIT_LAST_NAME).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArrayLiteral("Nickname")){
-				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_NICKNAME).toString();
+				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtaccount::IContactInfo::MIT_NICKNAME).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}

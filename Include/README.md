@@ -15,9 +15,10 @@ Foundation libraries that provide base functionality used throughout the system.
 - **imtfile** - File I/O operations and management
 - **imtzip** - Compression and archive handling
 
-### Authentication & Authorization (4 libraries)
+### Authentication & Authorization (5 libraries)
 Complete authentication and authorization system with multiple interfaces.
 
+- **imtaccount** - Account, contact, person, company and address data (no authentication logic)
 - **imtauth** - Core authentication/authorization logic (users, roles, sessions, permissions)
 - **imtauthdb** - Authentication database persistence layer (SQLite, PostgreSQL)
 - **imtauthgql** - Authentication GraphQL API endpoints

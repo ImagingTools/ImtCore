@@ -59,12 +59,12 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ContactInfo" PackageId="ImtAuthPck" ComponentId="ContactInfo">
+        <Element Id="ContactInfo" PackageId="ImtAccountPck" ComponentId="ContactInfo">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="ContactInfoMetaInfoCreator" PackageId="ImtAuthPck" ComponentId="ContactInfoMetaInfoCreator">
+        <Element Id="ContactInfoMetaInfoCreator" PackageId="ImtAccountPck" ComponentId="ContactInfoMetaInfoCreator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">

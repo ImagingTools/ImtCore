@@ -10,9 +10,9 @@
 #include <istd/CChangeGroup.h>
 
 // ImtCore includes
-#include <imtauth/IAddressManager.h>
-#include <imtauth/IContactInfo.h>
-#include <imtauth/CAddress.h>
+#include <imtaccount/IAddressManager.h>
+#include <imtaccount/IContactInfo.h>
+#include <imtaccount/CAddress.h>
 
 
 namespace imtauthgui
@@ -34,16 +34,16 @@ CAccountInfoEditorComp::CAccountInfoEditorComp()
 
 void CAccountInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	imtauth::IAccountInfo* accountPtr = GetObservedObject();
+	imtaccount::IAccountInfo* accountPtr = GetObservedObject();
 	Q_ASSERT(accountPtr != nullptr);
 
 	switch (accountPtr->GetAccountType()){
-	case imtauth::IAccountInfo::AT_PERSON:
+	case imtaccount::IAccountInfo::AT_PERSON:
 		AccountTypeCombo->setCurrentIndex(0);
 		ContactStackedWidget->setCurrentIndex(0);
 		break;
 
-	case imtauth::IAccountInfo::AT_COMPANY:
+	case imtaccount::IAccountInfo::AT_COMPANY:
 		AccountTypeCombo->setCurrentIndex(1);
 		ContactStackedWidget->setCurrentIndex(1);
 		break;
@@ -55,7 +55,7 @@ void CAccountInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 
 	AccountNameEdit->setText(accountPtr->GetAccountName());
 	AccountDescriptionEdit->setText(accountPtr->GetAccountDescription());
-	SetCompanyAddressVisibility(accountPtr->GetAccountType() == imtauth::IAccountInfo::AT_COMPANY);
+	SetCompanyAddressVisibility(accountPtr->GetAccountType() == imtaccount::IAccountInfo::AT_COMPANY);
 
 	if (m_accountPictureObserverCompPtr.IsValid()){
 		const iimg::IBitmap* bitmapPtr = &GetObservedObject()->GetAccountPicture();
@@ -82,7 +82,7 @@ void CAccountInfoEditorComp::OnGuiModelAttached()
 	BaseClass::OnGuiModelAttached();
 
 	auto contactModelPtr = dynamic_cast<imod::IModel*>(
-				const_cast<imtauth::IContactInfo*>(
+				const_cast<imtaccount::IContactInfo*>(
 							GetObservedObject()->GetAccountOwner()));
 
 	if (contactModelPtr != nullptr){
@@ -100,7 +100,7 @@ void CAccountInfoEditorComp::OnGuiModelAttached()
 void CAccountInfoEditorComp::OnGuiModelDetached()
 {
 	auto contactModelPtr = dynamic_cast<imod::IModel*>(
-				const_cast<imtauth::IContactInfo*>(
+				const_cast<imtaccount::IContactInfo*>(
 							GetObservedObject()->GetAccountOwner()));
 
 	if (contactModelPtr != nullptr){
@@ -120,20 +120,20 @@ void CAccountInfoEditorComp::OnGuiModelDetached()
 
 void CAccountInfoEditorComp::UpdateModel() const
 {
-	imtauth::IAccountInfo* accountPtr = GetObservedObject();
+	imtaccount::IAccountInfo* accountPtr = GetObservedObject();
 	Q_ASSERT(accountPtr != nullptr);
 
 	istd::CChangeGroup changeGroup(accountPtr);
 
-	accountPtr->SetAccountType((imtauth::IAccountInfo::AccountType)AccountTypeCombo->currentIndex());
+	accountPtr->SetAccountType((imtaccount::IAccountInfo::AccountType)AccountTypeCombo->currentIndex());
 	accountPtr->SetAccountName(AccountNameEdit->text());
 	accountPtr->SetAccountDescription(AccountDescriptionEdit->text());
 
-	if (accountPtr->GetAccountType() == imtauth::IAccountInfo::AT_COMPANY){
+	if (accountPtr->GetAccountType() == imtaccount::IAccountInfo::AT_COMPANY){
 		SetupCompanyAddress();
 	}
 
-	SetCompanyAddressVisibility(accountPtr->GetAccountType() == imtauth::IAccountInfo::AT_COMPANY);
+	SetCompanyAddressVisibility(accountPtr->GetAccountType() == imtaccount::IAccountInfo::AT_COMPANY);
 }
 
 
@@ -218,11 +218,11 @@ void CAccountInfoEditorComp::OnComponentDestroyed()
 void CAccountInfoEditorComp::SetCompanyAddressVisibility(bool visibility) const
 {
 	if (visibility){
-		imtauth::IAccountInfo* accountPtr = GetObservedObject();
+		imtaccount::IAccountInfo* accountPtr = GetObservedObject();
 		if (accountPtr != nullptr){
-			const imtauth::IContactInfo* contactPtr = accountPtr->GetAccountOwner();
+			const imtaccount::IContactInfo* contactPtr = accountPtr->GetAccountOwner();
 			if (contactPtr != nullptr){
-				const imtauth::IAddressProvider* addressProviderPtr = contactPtr->GetAddresses();
+				const imtaccount::IAddressProvider* addressProviderPtr = contactPtr->GetAddresses();
 
 				imtbase::ICollectionInfo::Ids ids = addressProviderPtr->GetAddressList().GetElementIds();
 				Q_ASSERT(ids.count() == 1);
@@ -244,17 +244,17 @@ void CAccountInfoEditorComp::SetCompanyAddressVisibility(bool visibility) const
 
 void CAccountInfoEditorComp::SetupCompanyAddress() const
 {
-	imtauth::IAccountInfo* accountPtr = GetObservedObject();
+	imtaccount::IAccountInfo* accountPtr = GetObservedObject();
 	if (accountPtr != nullptr){
-		const imtauth::IContactInfo* contactPtr = accountPtr->GetAccountOwner();
+		const imtaccount::IContactInfo* contactPtr = accountPtr->GetAccountOwner();
 		if (contactPtr != nullptr){
-			auto addressManager = dynamic_cast<imtauth::IAddressManager*>(
-						const_cast<imtauth::IAddressProvider*>(contactPtr->GetAddresses()));
+			auto addressManager = dynamic_cast<imtaccount::IAddressManager*>(
+						const_cast<imtaccount::IAddressProvider*>(contactPtr->GetAddresses()));
 
 			if (addressManager != nullptr){
 				imtbase::ICollectionInfo::Ids ids = addressManager->GetAddressList().GetElementIds();
 				if (ids.isEmpty()){
-					auto addressPtr = new imtauth::CAddress();
+					auto addressPtr = new imtaccount::CAddress();
 
 					addressManager->AddAddress(addressPtr);
 				}
@@ -269,7 +269,7 @@ void CAccountInfoEditorComp::SetupCompanyAddress() const
 }
 
 
-void CAccountInfoEditorComp::OnAddressUpdated(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtauth::IAddress* addressPtr)
+void CAccountInfoEditorComp::OnAddressUpdated(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtaccount::IAddress* addressPtr)
 {
 	CountryEdit->setText(addressPtr->GetCountry());
 	CityEdit->setText(addressPtr->GetCity());
@@ -278,19 +278,19 @@ void CAccountInfoEditorComp::OnAddressUpdated(const istd::IChangeable::ChangeSet
 }
 
 
-imtauth::IAddress* CAccountInfoEditorComp::GetCompanyAddress()
+imtaccount::IAddress* CAccountInfoEditorComp::GetCompanyAddress()
 {
-	imtauth::IAccountInfo* accountPtr = GetObservedObject();
+	imtaccount::IAccountInfo* accountPtr = GetObservedObject();
 	if (accountPtr != nullptr){
-		const imtauth::IContactInfo* contactPtr = accountPtr->GetAccountOwner();
+		const imtaccount::IContactInfo* contactPtr = accountPtr->GetAccountOwner();
 		if (contactPtr != nullptr){
-			const imtauth::IAddressProvider* addressProviderPtr = contactPtr->GetAddresses();
+			const imtaccount::IAddressProvider* addressProviderPtr = contactPtr->GetAddresses();
 
 			if (addressProviderPtr != nullptr){
 				imtbase::ICollectionInfo::Ids ids = addressProviderPtr->GetAddressList().GetElementIds();
 				Q_ASSERT(ids.count() == 1);
 
-				return const_cast<imtauth::IAddress*>(addressProviderPtr->GetAddress(ids[0]));
+				return const_cast<imtaccount::IAddress*>(addressProviderPtr->GetAddress(ids[0]));
 			}
 		}
 	}
@@ -315,13 +315,13 @@ void CAccountInfoEditorComp::on_AccountTypeCombo_currentIndexChanged(int /*index
 
 	DoUpdateModel();
 
-	imtauth::IAccountInfo* accountPtr = GetObservedObject();
+	imtaccount::IAccountInfo* accountPtr = GetObservedObject();
 	if (accountPtr != nullptr){
 		switch (accountPtr->GetAccountType()){
-		case imtauth::IAccountInfo::AT_PERSON:
+		case imtaccount::IAccountInfo::AT_PERSON:
 			ContactStackedWidget->setCurrentIndex(0);
 			break;
-		case imtauth::IAccountInfo::AT_COMPANY:
+		case imtaccount::IAccountInfo::AT_COMPANY:
 			ContactStackedWidget->setCurrentIndex(1);
 			break;
 		default:
@@ -348,7 +348,7 @@ void CAccountInfoEditorComp::on_CountryEdit_editingFinished()
 	if (!m_isReadOnly && !IsUpdateBlocked() && IsModelAttached()){
 		UpdateBlocker updateBlocker(this);
 
-		imtauth::IAddress* addressPtr = GetCompanyAddress();
+		imtaccount::IAddress* addressPtr = GetCompanyAddress();
 		if (addressPtr != nullptr){
 			addressPtr->SetCountry(CountryEdit->text());
 		}
@@ -361,7 +361,7 @@ void CAccountInfoEditorComp::on_CityEdit_editingFinished()
 	if (!m_isReadOnly && !IsUpdateBlocked() && IsModelAttached()){
 		UpdateBlocker updateBlocker(this);
 
-		imtauth::IAddress* addressPtr = GetCompanyAddress();
+		imtaccount::IAddress* addressPtr = GetCompanyAddress();
 		if (addressPtr != nullptr){
 			addressPtr->SetCity(CityEdit->text());
 		}
@@ -374,7 +374,7 @@ void CAccountInfoEditorComp::on_PostalCodeEdit_editingFinished()
 	if (!m_isReadOnly && !IsUpdateBlocked() && IsModelAttached()){
 		UpdateBlocker updateBlocker(this);
 
-		imtauth::IAddress* addressPtr = GetCompanyAddress();
+		imtaccount::IAddress* addressPtr = GetCompanyAddress();
 		if (addressPtr != nullptr){
 			addressPtr->SetPostalCode(PostalCodeEdit->text().toInt());
 		}
@@ -387,7 +387,7 @@ void CAccountInfoEditorComp::on_StreetEdit_editingFinished()
 	if (!m_isReadOnly && !IsUpdateBlocked() && IsModelAttached()){
 		UpdateBlocker updateBlocker(this);
 
-		imtauth::IAddress* addressPtr = GetCompanyAddress();
+		imtaccount::IAddress* addressPtr = GetCompanyAddress();
 		if (addressPtr != nullptr){
 			addressPtr->SetStreet(StreetEdit->text());
 		}
@@ -397,7 +397,7 @@ void CAccountInfoEditorComp::on_StreetEdit_editingFinished()
 
 void CAccountInfoEditorComp::on_LoadPicture_triggered(QAction* /*action*/)
 {
-	imtauth::IAccountInfo* accountPtr = GetObservedObject();
+	imtaccount::IAccountInfo* accountPtr = GetObservedObject();
 	Q_ASSERT(accountPtr != nullptr);
 
 	QStringList allExt;
@@ -433,7 +433,7 @@ void CAccountInfoEditorComp::on_LoadPicture_triggered(QAction* /*action*/)
 
 void CAccountInfoEditorComp::on_RemovePicture_triggered(QAction* /*action*/)
 {
-	imtauth::IAccountInfo* accountPtr = GetObservedObject();
+	imtaccount::IAccountInfo* accountPtr = GetObservedObject();
 	Q_ASSERT(accountPtr != nullptr);
 
 	iimg::CBitmap bitmap;

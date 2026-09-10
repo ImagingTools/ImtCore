@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtauth/IContactInfo.h>
+#include <imtaccount/IContactInfo.h>
 
 
 namespace controlsgallerygql
@@ -20,13 +20,13 @@ bool CContactInfoMetaInfoDelegateComp::ToJsonRepresentation(
 {
 	sdl::V1_0::controlsgallery::CContactInfoItemData representation;
 
-	QString firstName = metaInfo.GetMetaInfo(imtauth::IContactInfo::MIT_FIRST_NAME).toString();
+	QString firstName = metaInfo.GetMetaInfo(imtaccount::IContactInfo::MIT_FIRST_NAME).toString();
 	representation.firstName = firstName;
 
-	QString lastName = metaInfo.GetMetaInfo(imtauth::IContactInfo::MIT_LAST_NAME).toString();
+	QString lastName = metaInfo.GetMetaInfo(imtaccount::IContactInfo::MIT_LAST_NAME).toString();
 	representation.lastName = lastName;
 
-	QString mail = metaInfo.GetMetaInfo(imtauth::IContactInfo::MIT_MAIL).toString();
+	QString mail = metaInfo.GetMetaInfo(imtaccount::IContactInfo::MIT_MAIL).toString();
 	representation.email = mail;
 
 	QJsonObject object;
@@ -58,15 +58,15 @@ bool CContactInfoMetaInfoDelegateComp::FromJsonRepresentation(
 	metaInfo.ResetData();
 
 	if (representation.firstName){
-		metaInfo.SetMetaInfo(imtauth::IContactInfo::MIT_FIRST_NAME, *representation.firstName);
+		metaInfo.SetMetaInfo(imtaccount::IContactInfo::MIT_FIRST_NAME, *representation.firstName);
 	}
 
 	if (representation.lastName){
-		metaInfo.SetMetaInfo(imtauth::IContactInfo::MIT_LAST_NAME, *representation.lastName);
+		metaInfo.SetMetaInfo(imtaccount::IContactInfo::MIT_LAST_NAME, *representation.lastName);
 	}
 
 	if (representation.email){
-		metaInfo.SetMetaInfo(imtauth::IContactInfo::MIT_MAIL, *representation.email);
+		metaInfo.SetMetaInfo(imtaccount::IContactInfo::MIT_MAIL, *representation.email);
 	}
 
 	return true;
