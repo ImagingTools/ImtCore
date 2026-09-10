@@ -17,7 +17,7 @@ Rectangle {
 	
 	property alias drawingContainer: drawingContainer_;
 	property alias stackView: stackView_;
-	property alias topPanel: topPanel_;
+	property alias topPanel: topPanelLoader_.item;
 	
 	property int mainMargin: Style.mainWindowMargin !== undefined ? Style.mainWindowMargin : 0;
 	property int pageMargin: Style.pageMargin !== undefined ? Style.pageMargin : 0;
@@ -101,7 +101,7 @@ Rectangle {
 		z: 9
 		anchors.left: parent.left;
 		anchors.leftMargin: thumbnailDecoratorContainer.mainMargin;
-		anchors.top: topPanel_.bottom;
+		anchors.top: topPanelLoader_.bottom;
 		anchors.topMargin: thumbnailDecoratorContainer.mainMargin;
 		anchors.bottom: bottomPanel.top;
 		anchors.bottomMargin: thumbnailDecoratorContainer.mainMargin;
@@ -162,7 +162,7 @@ Rectangle {
 		
 		anchors.left: menuPanel.visible ? menuPanel.right : parent.left;
 		anchors.right: thumbnailDecoratorContainer.right;
-		anchors.top: topPanel_.bottom;
+		anchors.top: topPanelLoader_.bottom;
 		anchors.bottom: thumbnailDecoratorContainer.bottom;
 		
 		anchors.topMargin: thumbnailDecoratorContainer.pageMargin;
@@ -175,7 +175,7 @@ Rectangle {
 	
 	DrawingContainer{
 		id: drawingContainer_;
-		z: topPanel_.z + 1;
+		z: topPanelLoader_.z + 1;
 		anchors.bottom: parent.bottom;
 		anchors.bottomMargin: 50;
 		edge: Qt.RightEdge;
@@ -185,7 +185,7 @@ Rectangle {
 	// which would otherwise sit here invisible and repeat every profile request
 	// the rail's account row already makes.
 	Loader {
-		id: topPanel_;
+		id: topPanelLoader_;
 		
 		z: 10;
 		
@@ -211,7 +211,7 @@ Rectangle {
 	StackView {
 		id: stackView_;
 		
-		z: topPanel_.z + 1;
+		z: topPanelLoader_.z + 1;
 		
 		anchors.fill: parent;
 	}
@@ -255,7 +255,7 @@ Rectangle {
 	DialogManagerView {
 		anchors.fill: parent;
 		
-		z: topPanel_.z + 1;
+		z: topPanelLoader_.z + 1;
 	}
 	
 	function showPage(pageComp){
@@ -271,7 +271,7 @@ Rectangle {
 			id: authorizationPage;
 			
 			anchors.fill: parent;
-			anchors.topMargin: topPanel_.height;
+			anchors.topMargin: topPanelLoader_.height;
 			
 			canRecoveryPassword: thumbnailDecoratorContainer.canRecoveryPassword;
 			
@@ -298,7 +298,7 @@ Rectangle {
 			id: superuserPasswordPage;
 
 			anchors.fill: parent;
-			anchors.topMargin: topPanel_.height;
+			anchors.topMargin: topPanelLoader_.height;
 
 			Component.onCompleted: {
 				Events.sendEvent("SetUserPanelEnabled", false);
