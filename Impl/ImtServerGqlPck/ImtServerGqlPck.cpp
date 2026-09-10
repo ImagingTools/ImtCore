@@ -181,6 +181,11 @@ I_EXPORT_COMPONENT(
 			"Publisher Subscriber Bridge");
 
 I_EXPORT_COMPONENT(
+			DocumentServiceSubscriberBridge,
+			"Publisher-subscriber bridge forwarding the document service of the listed collections",
+			"Document Service Subscriber Bridge");
+
+I_EXPORT_COMPONENT(
 			AuthenticationManager,
 			"Authentication manager",
 			"Authentication Manager GraphQL Context Creator");

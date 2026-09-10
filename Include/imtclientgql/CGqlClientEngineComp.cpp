@@ -82,6 +82,11 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 		if (!token.isEmpty()){
 			networkRequest->setRawHeader(imtbase::s_authenticationTokenHeaderId, token);
 		}
+
+		QByteArray languageId = contextPtr->GetLanguageId();
+		if (!languageId.isEmpty()){
+			networkRequest->setRawHeader(imtbase::s_languageIdHeaderId, languageId);
+		}
 	}
 
 	const QByteArray protocolVersion = request.GetProtocolVersion();
