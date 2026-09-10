@@ -9,8 +9,10 @@ Item {
 	id: userPanel;
 	
 	property string context: ""
-	width: Style.sizeHintXXS;
-	height: Style.controlHeightL;
+	// Only the rail row is as wide as the navigation panel; in the classic top
+	// panel the row keeps its legacy button-sized geometry.
+	width: userPanel.menuPanelRef ? Style.sizeHintXXS : 50;
+	height: userPanel.menuPanelRef ? Style.controlHeightL : Style.controlHeightM;
 	
 	property bool enabled: false;
 	
@@ -166,7 +168,7 @@ Item {
 		id: accountAvatar;
 
 		anchors.left: parent.left;
-		anchors.leftMargin: Style.marginL - (width - Style.menuPanelIconSize) / 2;
+		anchors.leftMargin: userPanel.menuPanelRef ? Style.marginL - (width - Style.menuPanelIconSize) / 2 : (userPanel.width - width) / 2;
 		anchors.verticalCenter: userPanel.verticalCenter;
 
 		width: Style.iconSizeL - Style.marginXXS;
@@ -197,7 +199,9 @@ Item {
 		anchors.rightMargin: Style.marginXS;
 		anchors.verticalCenter: userPanel.verticalCenter;
 
-		visible: !userPanel.collapsed;
+		// The classic top panel reserves room for the avatar only, so the login
+		// and the organisation are shown in the rail row alone.
+		visible: userPanel.menuPanelRef !== null && !userPanel.collapsed;
 
 		Text {
 			id: usernameText;
