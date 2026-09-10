@@ -355,6 +355,44 @@ Item {
 				popupMenuDialog.placeNextToPanel();
 			}
 
+			// Only enabled actions can be reached with the keyboard - headers,
+			// separators and captions are passed over.
+			function isSelectableIndex(index){
+				if (index < 0 || index >= popupMenuDialog.model.count){
+					return false;
+				}
+
+				return popupMenuDialog.model.get(index).itemType === "action" && popupMenuDialog.model.get(index).isEnabled;
+			}
+
+			function onKeyboardUp(){
+				for (var i = popupMenuDialog.selectedIndex - 1; i >= 0; i--){
+					if (popupMenuDialog.isSelectableIndex(i)){
+						popupMenuDialog.selectedIndex = i;
+						popupMenuDialog.decorator_.contentYCorrection(false);
+						return;
+					}
+				}
+			}
+
+			function onKeyboardDown(){
+				for (var i = popupMenuDialog.selectedIndex + 1; i < popupMenuDialog.model.count; i++){
+					if (popupMenuDialog.isSelectableIndex(i)){
+						popupMenuDialog.selectedIndex = i;
+						popupMenuDialog.decorator_.contentYCorrection(true);
+						return;
+					}
+				}
+			}
+
+			function onReturn(){
+				if (!popupMenuDialog.isSelectableIndex(popupMenuDialog.selectedIndex)){
+					return;
+				}
+
+				popupMenuDialog.finished(popupMenuDialog.model.get(popupMenuDialog.selectedIndex).id, popupMenuDialog.selectedIndex);
+			}
+
 			function placeNextToPanel(){
 				if (popupMenuDialog.height === 0){
 					return;
@@ -489,7 +527,7 @@ Item {
 							anchors.bottomMargin: Style.marginXXXS;
 
 							radius: Style.marginS;
-							color: actionArea.containsMouse ? Style.alternateBaseColor : "transparent";
+							color: actionArea.containsMouse || popupMenuDialog.selectedIndex === model.index ? Style.alternateBaseColor : "transparent";
 						}
 
 						Image {
@@ -507,7 +545,7 @@ Item {
 							visible: model.icon !== "";
 							source: model.icon === "" ? "" : "qrc:/" + Style.getIconPath(model.icon, Icon.State.On,
 																model.isEnabled ? Icon.Mode.Normal : Icon.Mode.Disabled);
-							opacity: actionArea.containsMouse ? 1.0 : Style.opacityHigh;
+							opacity: actionArea.containsMouse || popupMenuDialog.selectedIndex === model.index ? 1.0 : Style.opacityHigh;
 						}
 
 						Rectangle {
@@ -567,6 +605,10 @@ Item {
 
 							onClicked: {
 								popupMenuDialog.finished(model.id, model.index);
+							}
+
+							onEntered: {
+								popupMenuDialog.selectedIndex = model.index;
 							}
 						}
 					}
