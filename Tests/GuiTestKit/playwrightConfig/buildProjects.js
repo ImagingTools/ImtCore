@@ -27,30 +27,69 @@ function specToRegExp(spec) {
  * @param {(key: string) => string} opts.authFile
  * @param {string} [opts.testDir]             default './tests'
  * @param {RegExp} [opts.guestTestMatch]      which spec files are guest-only (default *.guest.test.js)
+ * @param {Object<string, string>} [opts.specPages]  spec filename -> the page id it exercises. A user
+ *   who cannot see that page has the spec removed from its project entirely, so Playwright never
+ *   schedules it: no browser context, no app boot, no worker time. Without this the spec is scheduled,
+ *   boots the app in its beforeAll/beforeEach, and only then hits the test body's own
+ *   `test.skip(!canSeePage(...))` - paying the full cold-boot cost to discover it had nothing to do.
+ *   Requires `canSeePage`. Specs not listed here are always scheduled.
+ * @param {(user: object, pageId: string) => boolean} [opts.canSeePage]
+ * @param {string[]} [opts.mutatingUserKeys]  users allowed to run @mutating specs. Mutating tests run
+ *   serially (one shared database), so their cost is linear in the number of users AND unaffected by
+ *   worker count - and running the same mutation again as a different user re-proves the flow, not the
+ *   permission (which the structural checks already cover). Users outside this list get a project-level
+ *   grepInvert so the mutating phase stays the same size however wide the matrix gets. Omit to let
+ *   every user run them, as before.
  * @returns {object[]}
  */
-function buildProjects({ users, guest, authFile, testDir = './tests', guestTestMatch = /.*\.guest\.test\.js/ }) {
+function buildProjects({
+  users,
+  guest,
+  authFile,
+  testDir = './tests',
+  guestTestMatch = /.*\.guest\.test\.js/,
+  specPages,
+  canSeePage,
+  mutatingUserKeys,
+}) {
   // Every isolated spec across the active users - regular projects must exclude ALL of them, not just
   // their own, so an isolated editor spec never runs under a general matrix user.
   const isolatedMatchers = users.filter((u) => u.isolatedSpec).map((u) => specToRegExp(u.isolatedSpec));
 
+  // Specs this user provably has nothing to do in, decided from static permission data alone.
+  function unreachableSpecs(user) {
+    if (!specPages || !canSeePage) return [];
+    return Object.entries(specPages)
+      .filter(([, pageId]) => pageId && !canSeePage(user, pageId))
+      .map(([spec]) => specToRegExp(spec));
+  }
+
+  // An isolated user must keep its mutating tests: its spec runs under that user and no other, so
+  // excluding them there would drop the coverage entirely rather than deduplicate it.
+  function runsMutating(user) {
+    return !mutatingUserKeys || !!user.isolatedSpec || mutatingUserKeys.includes(user.key);
+  }
+
   const userProjects = users.map((u) => {
-    if (u.isolatedSpec) {
-      // Dedicated project: runs ONLY its one isolated spec (still excluding guest-only specs).
-      return {
-        name: u.key,
-        testDir,
-        testMatch: specToRegExp(u.isolatedSpec),
-        use: { storageState: authFile(u.key) },
-      };
-    }
-    // Regular authenticated project: everything that is neither a guest-only spec nor any isolated spec.
-    return {
-      name: u.key,
-      testDir,
-      testIgnore: [guestTestMatch, ...isolatedMatchers],
-      use: { storageState: authFile(u.key) },
-    };
+    const project = u.isolatedSpec
+      ? {
+          // Dedicated project: runs ONLY its one isolated spec (still excluding guest-only specs).
+          name: u.key,
+          testDir,
+          testMatch: specToRegExp(u.isolatedSpec),
+          use: { storageState: authFile(u.key) },
+        }
+      : {
+          // Regular authenticated project: everything that is neither a guest-only spec, nor any
+          // isolated spec, nor a spec for a page this user cannot open.
+          name: u.key,
+          testDir,
+          testIgnore: [guestTestMatch, ...isolatedMatchers, ...unreachableSpecs(u)],
+          use: { storageState: authFile(u.key) },
+        };
+
+    if (!runsMutating(u)) project.grepInvert = /@mutating/;
+    return project;
   });
 
   const guestProject = {
