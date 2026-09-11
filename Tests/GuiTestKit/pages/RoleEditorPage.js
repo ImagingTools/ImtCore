@@ -20,10 +20,6 @@ class RoleEditorPage extends BasePage {
 
   async setRoleName(text) { await this.roleName.fill(text); return this; }
   async setDescription(text) { await this.description.fill(text); return this; }
-
-  expectFieldVisible(objectName) {
-    return gui.expectVisible(this.page, [objectName]);
-  }
 }
 
 module.exports = { RoleEditorPage };

@@ -24,6 +24,11 @@ class AdministrationPage extends BasePage {
   openSubPage(pageId) {
     return gui.click(this.page, [`Page_${pageId}`], { what: `Administration subpage "${pageId}"` });
   }
+
+  /** Whether the logged-in user can reach a subpage - each has its own independent gating. */
+  hasSubPage(pageId) {
+    return gui.dom.isVisible(this.page, [`Page_${pageId}`]);
+  }
 }
 
 module.exports = { AdministrationPage };

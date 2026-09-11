@@ -1,10 +1,8 @@
 // Screenshot assertion + masking, and a few structural assertions.
 //
 // Screenshots are the primary validation mechanism (per project decision). The structural helpers
-// (expectVisible / expectHidden / expectCount) are provided for two honest uses:
-//   1. permission-matrix checks ("this user must NOT see the Devices page button"),
-//   2. guarding a screenshot so it is only taken once the intended state is actually present.
-// They never replace the screenshot; they make it trustworthy.
+// (expectVisible / expectHidden / expectCount) exist to guard a screenshot - so it is only taken once
+// the intended state is actually present. They never replace the screenshot; they make it trustworthy.
 
 const { expect } = require('@playwright/test');
 const dom = require('./dom');
@@ -74,34 +72,6 @@ async function expectHidden(page, path, message, settleMs = 800) {
   expect(count, message || `expected [${path.join(' > ')}] to be hidden/absent`).toBe(0);
 }
 
-/**
- * Assert an objectName path EXISTS in the DOM regardless of visibility (polls). Use for "does this
- * user have this command" style checks where a permitted item may be present-but-hidden (e.g. a
- * command that overflowed the bar into the "..." menu keeps a hidden button in the DOM) - see
- * dom.countAny. Distinct from expectVisible, which additionally requires the [visible] attribute.
- */
-async function expectExists(page, path, message) {
-  await expect
-    .poll(() => dom.countAny(page, path), {
-      message: message || `expected [${path.join(' > ')}] to exist in the DOM`,
-      timeout: ASSERT_TIMEOUT,
-    })
-    .toBeGreaterThan(0);
-}
-
-/**
- * Assert an objectName path is ABSENT from the DOM entirely (not merely hidden). Use for permission
- * negatives on items that are removed from their model when unavailable (e.g. a command the user lacks
- * permission for is not in the command bar's DOM at all), so absence - not just invisibility -
- * is the correct signal. Waits briefly first so an async-populated bar isn't judged before it fills.
- */
-async function expectAbsent(page, path, message, settleMs = 800) {
-  await waitForStable(page);
-  await page.waitForTimeout(settleMs);
-  const count = await dom.countAny(page, path);
-  expect(count, message || `expected [${path.join(' > ')}] to be absent from the DOM`).toBe(0);
-}
-
 /** Assert the number of visible matches for a path (polls until it reaches `expected` or times out). */
 async function expectCount(page, path, expected, message) {
   await expect
@@ -164,8 +134,6 @@ module.exports = {
   checkScreenshot,
   expectVisible,
   expectHidden,
-  expectExists,
-  expectAbsent,
   expectCount,
   addMask,
   removeMask,

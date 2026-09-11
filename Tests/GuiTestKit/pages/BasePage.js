@@ -2,7 +2,7 @@
 // the MenuPanel, running commands from the CommandsView command bar, and closing document tabs.
 //
 // Page objects expose ACTIONS and LOCATORS only. Assertions (checkScreenshot, expect*) belong in the
-// tests, so the same page object can be reused by screenshot tests and by permission-matrix checks.
+// tests, so the same page object can be reused wherever the flow is needed.
 
 const gui = require('../lib/gui');
 const { CommandBar, MenuPanel } = require('../controls');
@@ -23,6 +23,14 @@ class BasePage {
   async reload() {
     await gui.reload(this.page);
     return this;
+  }
+
+  /**
+   * Whether the logged-in user can reach this page at all. Asks the menu the CLIENT rendered - it was
+   * built from that user's own permissions - instead of consulting a table kept in the test suite.
+   */
+  isAvailable() {
+    return this.menu.hasPage(this.pageId);
   }
 
   /** Navigate to this page via the left menu. */

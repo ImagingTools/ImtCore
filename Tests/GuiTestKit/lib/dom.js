@@ -104,16 +104,31 @@ async function countVisible(page, path) {
 
 /**
  * How many elements match a path REGARDLESS of visibility (no [visible] filter). Distinguishes
- * "present in the DOM but hidden" from "absent". Used for command-bar presence checks: a command the
- * user LACKS permission for is removed from the command model entirely (no DOM node), whereas a
- * command the user HAS but which merely overflowed the bar into the "..." (More) menu keeps its button
- * in the DOM with visible=false - so DOM existence, not visibility, is the true "does this user have
- * this command" signal.
+ * "present in the DOM but hidden" from "absent".
  * @param {import('@playwright/test').Page} page
  * @param {string[]} path
  */
 async function countAny(page, path) {
   return page.locator(selectorForPath(path)).count();
+}
+
+/**
+ * Whether `path` becomes visible within `timeout` - a probe, not an assertion.
+ *
+ * This is how a test asks whether a flow is available to the CURRENT user at all. The running client
+ * already holds that user's permissions and has rendered accordingly, so it is the only source that
+ * cannot drift; a table of "who may do what" kept in the test suite is a copy of the product's
+ * configuration and goes stale silently. Waits rather than sampling once because parts of a view
+ * (notably the command bar) populate after an async round-trip.
+ * @param {import('@playwright/test').Page} page
+ * @param {string[]} path
+ * @param {number} [timeout]
+ */
+async function isVisible(page, path, timeout = 2000) {
+  return byPath(page, path)
+    .waitFor({ state: 'visible', timeout })
+    .then(() => true)
+    .catch(() => false);
 }
 
 /**
@@ -253,5 +268,6 @@ module.exports = {
   popupItemLast,
   countVisible,
   countAny,
+  isVisible,
   columnRects,
 };

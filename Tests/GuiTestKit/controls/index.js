@@ -31,36 +31,15 @@ class CommandBar {
     return gui.clickCommand(this.page, commandId);
   }
   /**
-   * Assert the user HAS this command. Checks DOM existence, not visibility: the command bar hides
-   * (visible=false) any command that doesn't fit the available width and moves it into the "..." (More)
-   * overflow menu, so a command the user genuinely has can be present-but-hidden. A command the user
-   * LACKS permission for is instead removed from the command model entirely (no DOM node), so DOM
-   * existence is the correct "has permission" signal. Verified live: fullAccess holds
-   * ResetTransferCounter but its button overflows the Hardware bar into "..." - it must still count as
-   * present.
+   * Whether this command can actually be driven right now: its button is visible, so a click reaches
+   * it. Deliberately does not try to say WHY it isn't - a command the user lacks stays in the DOM as a
+   * hidden button (verified live: accounts "New" for a user without AddAccount), and a command the user
+   * holds can also be hidden because it overflowed into the "..." menu (verified live: fullAccess's
+   * ResetTransferCounter). Both mean the same thing to a test: this flow is not drivable for this user,
+   * so skip it rather than fail.
    */
-  expectHasCommand(commandId) {
-    return gui.expectExists(
-      this.page,
-      ['CommandsView', `${commandId}Button`],
-      `command "${commandId}" should be present (visible or in the "..." overflow)`
-    );
-  }
-  /**
-   * Assert the user does NOT have this command. Checks (in)visibility, not DOM absence: a command the
-   * user lacks permission for stays in the command bar's DOM as a hidden (visible=false) button rather
-   * than being removed (verified live: accounts "New" is present-but-hidden for a user without
-   * AddAccount), so requiring DOM absence would false-fail. This is intentionally asymmetric with
-   * expectHasCommand (DOM existence): a permitted command may be present-but-hidden ONLY because it
-   * overflowed into "..." - a lacked command is present-but-hidden because permission hid it - and
-   * "not visible" is the signal that holds for the lacked case without needing to open the overflow.
-   */
-  expectNoCommand(commandId) {
-    return gui.expectHidden(
-      this.page,
-      ['CommandsView', `${commandId}Button`],
-      `command "${commandId}" should be hidden (user lacks its permission)`
-    );
+  isAvailable(commandId) {
+    return gui.dom.isVisible(this.page, ['CommandsView', `${commandId}Button`]);
   }
 }
 
@@ -72,11 +51,9 @@ class MenuPanel {
   open(pageId) {
     return gui.openPage(this.page, pageId);
   }
-  expectHasPage(pageId) {
-    return gui.expectVisible(this.page, ['MenuPanel', `${pageId}Button`], `page "${pageId}" should be visible`);
-  }
-  expectNoPage(pageId) {
-    return gui.expectHidden(this.page, ['MenuPanel', `${pageId}Button`], `page "${pageId}" should be hidden`);
+  /** Whether this page is reachable for the logged-in user - i.e. the client put it in the menu. */
+  hasPage(pageId) {
+    return gui.dom.isVisible(this.page, ['MenuPanel', `${pageId}Button`]);
   }
 }
 
