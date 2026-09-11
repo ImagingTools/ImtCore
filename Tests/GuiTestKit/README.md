@@ -15,11 +15,14 @@ this is meant to be consumed by each app's own `Tests/<AppName>Gui` project inst
   (barrel of all of the above).
 - **`controls/index.js`** - control wrappers over `lib/actions` (Button, CommandBar, MenuPanel,
   ComboBox, TextInput, FilterPanel, Table, Pagination, Switch, Dialog, TableConfigDialog).
-- **`pages/`** - `BasePage` and `CollectionPage` (the generic base classes every app's own
-  `XxxCollectionPage`/`XxxEditorPage` extend), plus three page objects for views ImtCore itself owns
+- **`pages/`** - `BasePage` and `CollectionPage` (a standard collection needs no subclass: declare its
+  filter ids and its non-deterministic columns), plus page objects for views ImtCore itself owns
   (`AdministrationPage`, `SearchPage`, `OrganizationsPage` - grounded in
   `ImtCore/Qml/imtauthgui/AdministrationView.qml`, `ImtCore/Qml/imtgui/View/SearchPage.qml`,
   `ImtCore/Qml/imtauthgui/TenantCollectionView.qml`).
+- **`specs/collectionSpec.js`** - generates a whole standard collection spec from a declaration
+  (which page, which filters, which screenshots), and owns the names those screenshots get so tooling
+  can ask instead of guessing.
 - **`fixtures/defineUsers.js`** - builds an app's whole fixture-user module (`byKey`/`activeUsers`/
   `authFile`/`seededUsers`/`GUEST`) from a plain list of users, and validates it.
 - **`fixtures/createTest.js`** - factory for the `test`/`expect`/`gui`/`newUserPage`/`forEachUser`
@@ -94,23 +97,41 @@ module.exports = createGuiConfig({
 });
 ```
 
-A first spec:
+A first spec - a whole standard collection view is a declaration, not code:
 
 ```js
-const { test } = require('../fixtures/test');
-const { CollectionPage } = require('imtcore-gui-testkit/pages');
+// tests/orders.collection.test.js
+const fixtures = require('../fixtures/test');
+const { defineCollectionSpec } = require('imtcore-gui-testkit/specs/collectionSpec');
 
-test('orders landing', async ({ page, gui }) => {
-  const orders = new CollectionPage(page, 'Orders');
-  await orders.reload();
-  test.skip(!(await orders.isAvailable()), 'Orders is not available to this user');
-  await orders.open();
-  await gui.checkScreenshot(page, 'orders-landing');   // baseline is per-user automatically
+defineCollectionSpec({ ...fixtures, defineTest: (title, body) => fixtures.test(title, body) }, {
+  title: 'Orders / collection',
+  pageId: 'Orders',
+  prefix: 'orders',                                   // -> orders-landing, orders-filter-text, ...
+  filters: { customers: 'CustomersFilter', creationDate: 'CreationDateFilter' },
+  maskColumns: ['added', 'timeStamp'],                // non-deterministic columns, masked everywhere
+  scenarios: [
+    { name: 'filter-text', search: 'test' },
+    { name: 'filter-customer', filter: 'customers', option: 'QUISS', optional: true },
+    { name: 'filter-creation-date', dateFilter: 'creationDate', preset: 'Year_Last' },
+    { name: 'filter-cleared', clearAll: true, apply: [{ search: 'test' }] },
+    { name: 'sort-delivery-id', sort: 'orderId' },    // -> ...-1 and ...-2
+    { name: 'pagination', pagination: { size: 50, page: 2 } },
+    { name: 'remove-dialog', command: 'Remove' },
+  ],
 });
 ```
 
-Beyond that, an app adds its own `pages/XxxCollectionPage.js` / `XxxEditorPage.js` extending
-`CollectionPage`/`BasePage`, and whatever DB seeding its fixture users need.
+That generates the landing screenshot on a cold page, a `describe.serial` block sharing one page,
+the per-user skip, the filter reset between tests and one screenshot per scenario. `defineTest` has to
+be the arrow shown above, declared in the spec file: Playwright files a test under the source location
+that called `test()`, and that is what `snapshotPathTemplate` uses to place the baselines.
+
+Anything a declaration cannot express stays an ordinary hand-written spec using the same page objects -
+the two mix freely in one suite.
+
+Beyond that, an app adds its own `pages/XxxEditorPage.js` extending `BasePage` for flows that are
+genuinely its own, and whatever DB seeding its fixture users need.
 
 ## Consuming this from an app
 
