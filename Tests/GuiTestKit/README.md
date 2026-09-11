@@ -20,17 +20,97 @@ this is meant to be consumed by each app's own `Tests/<AppName>Gui` project inst
   (`AdministrationPage`, `SearchPage`, `OrganizationsPage` - grounded in
   `ImtCore/Qml/imtauthgui/AdministrationView.qml`, `ImtCore/Qml/imtgui/View/SearchPage.qml`,
   `ImtCore/Qml/imtauthgui/TenantCollectionView.qml`).
+- **`fixtures/defineUsers.js`** - builds an app's whole fixture-user module (`byKey`/`activeUsers`/
+  `authFile`/`seededUsers`/`GUEST`) from a plain list of users, and validates it.
 - **`fixtures/createTest.js`** - factory for the `test`/`expect`/`gui`/`newUserPage`/`forEachUser`
   fixture bundle.
 - **`globalSetup/createGlobalSetup.js`** - factory for the Playwright `globalSetup` function
   (logs in each fixture user, saves storageState, retries a dropped WASM-canvas click, waits for a
   real access token before snapshotting).
-- **`playwrightConfig/buildProjects.js`** - factory for the one-project-per-user + guest
-  `projects` array.
+- **`playwrightConfig/createConfig.js`** - factory for the whole `playwright.config.js` (per-user
+  snapshot dirs, timeouts, reporters, per-phase output dirs, projects), over
+  **`buildProjects.js`** - the one-project-per-user + guest `projects` array.
 
 What's **not** here, by design: any app's own business page objects (e.g. ProLife's
-`DeviceCollectionPage`), its permission matrix, its fixture users/roles, its DB seeding, or its CI
-script - those are app-specific and stay in the app's own repo.
+`DeviceCollectionPage`), its fixture users/roles, its DB seeding, or its CI script - those are
+app-specific and stay in the app's own repo.
+
+## No permission model
+
+These suites do not describe who may do what. A test authenticates, drives the UI and compares
+screenshots; the server enforces permissions and the client was already built from the logged-in
+user's own set. Where a flow simply is not offered to the current user, ask the running client and
+skip - `page.isAvailable()`, `page.commands.isAvailable(id)`, `admin.hasSubPage(id)`. A table of
+rules kept in a test suite is a copy of the product's configuration and goes stale silently.
+
+## Adding GUI tests to a new app
+
+Four small files, then specs. Nothing else is required.
+
+```jsonc
+// YourApp/Tests/YourAppGui/package.json
+{ "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "imtcore-gui-testkit": "file:../../../ImtCore/Tests/GuiTestKit" } }
+```
+
+```js
+// fixtures/users.js - the only file with real content
+const { defineUsers } = require('imtcore-gui-testkit/fixtures/defineUsers');
+module.exports = defineUsers({
+  users: [
+    { key: 'su',    title: 'Superuser', login: 'su',    password: '1' },
+    { key: 'viewer', title: 'Viewer',   login: 'viewer', password: 'Secret_1', seed: true,
+      roleName: 'Viewer', roleId: 'Viewer', permissions: ['ViewOrders'] },
+  ],
+  defaultUserKeys: ['su'],          // the fast subset; omit to always run everyone
+  allUsersEnv: 'YOURAPP_GUI_ALL_USERS',
+});
+```
+
+```js
+// fixtures/test.js
+const path = require('path');
+const { createGuiTest } = require('imtcore-gui-testkit/fixtures/createTest');
+module.exports = createGuiTest(require('./users'), { rootDir: path.resolve(__dirname, '..') });
+```
+
+```js
+// global-setup.js
+const { createGlobalSetup } = require('imtcore-gui-testkit/globalSetup/createGlobalSetup');
+const { activeUsers, authFile } = require('./fixtures/users');
+module.exports = createGlobalSetup({ activeUsers, authFile, rootDir: __dirname, baseUrl: BASE_URL });
+```
+
+```js
+// playwright.config.js
+const { createGuiConfig } = require('imtcore-gui-testkit/playwrightConfig/createConfig');
+module.exports = createGuiConfig({
+  rootDir: __dirname,
+  baseUrl: process.env.YOURAPP_BASE_URL || 'http://localhost:17778',
+  users: require('./fixtures/users'),
+  globalSetup: require.resolve('./global-setup.js'),
+  mutatingUserKeys: ['su'],         // who runs @mutating specs in the serial phase
+});
+```
+
+A first spec:
+
+```js
+const { test } = require('../fixtures/test');
+const { CollectionPage } = require('imtcore-gui-testkit/pages');
+
+test('orders landing', async ({ page, gui }) => {
+  const orders = new CollectionPage(page, 'Orders');
+  await orders.reload();
+  test.skip(!(await orders.isAvailable()), 'Orders is not available to this user');
+  await orders.open();
+  await gui.checkScreenshot(page, 'orders-landing');   // baseline is per-user automatically
+});
+```
+
+Beyond that, an app adds its own `pages/XxxCollectionPage.js` / `XxxEditorPage.js` extending
+`CollectionPage`/`BasePage`, and whatever DB seeding its fixture users need.
 
 ## Consuming this from an app
 
@@ -69,15 +149,5 @@ anything here, refresh every consumer with:
 ```bash
 rm -rf node_modules/imtcore-gui-testkit && npm install
 ```
-
-A consuming app needs, at minimum:
-
-- **`fixtures/users.js`** exposing `byKey(key)`, `can(user, permission)`, `authFile(key)`,
-  `activeUsers()`, and a `GUEST` pseudo-user - see ProLife's `fixtures/users.js` for the shape.
-- Thin shims wiring the three factories above to that `users.js` (see each factory's own header
-  comment for the exact snippet) for `fixtures/test.js`, `global-setup.js`, and `playwright.config.js`.
-- Its own `pages/XxxCollectionPage.js` / `XxxEditorPage.js` extending `imtcore-gui-testkit/pages`'
-  `CollectionPage`/`BasePage`, and a `matrix/permissions.js` describing which permission gates which
-  page/command/field (see ProLife's for the pattern - it's app-specific data, not shared code).
 
 See `ProLife/Tests/ProLifeGui` for a complete, working example of all of the above wired together.

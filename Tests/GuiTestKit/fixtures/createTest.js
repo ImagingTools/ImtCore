@@ -10,8 +10,8 @@
 //
 // `users` must expose:
 //   byKey(key)                 -> the fixture user for a Playwright project name, or undefined
-//   can(user, permission)      -> boolean
 //   authFile(key)              -> storageState path, relative to the app's project root (see rootDir)
+// fixtures/defineUsers.js builds all of that from a plain user list.
 
 const path = require('path');
 const base = require('@playwright/test');
@@ -19,13 +19,13 @@ const gui = require('../lib/gui');
 const { captureConsoleErrors } = require('../lib/consoleErrors');
 
 /**
- * @param {{byKey: Function, can: Function, authFile: Function}} users
+ * @param {{byKey: Function, authFile: Function}} users
  * @param {{rootDir: string}} opts  rootDir: the app's PROJECT ROOT (the directory playwright.config.js
  *   lives in) - NOT __dirname of the calling file if that file sits in a subfolder like `fixtures/`.
  *   authFile()'s return value is resolved relative to this.
  */
 function createGuiTest(users, { rootDir }) {
-  const { byKey, can, authFile } = users;
+  const { byKey, authFile } = users;
 
   const test = base.test.extend({
     // Worker-startup stagger (worker-scoped, runs once per worker before its first test, auto).
@@ -55,9 +55,7 @@ function createGuiTest(users, { rootDir }) {
           `No test user maps to project "${testInfo.project.name}". Project names must match your users module's keys.`
         );
       }
-      // Attach a convenience predicate.
-      const decorated = { ...user, can: (perm) => can(user, perm) };
-      await use(decorated);
+      await use(user);
     },
 
     // The GUI helper barrel, handed to tests so they don't each require it.
@@ -108,7 +106,6 @@ function createGuiTest(users, { rootDir }) {
         `newUserPage: no test user maps to project "${testInfo.project.name}". Project names must match your users module's keys.`
       );
     }
-    const decorated = { ...user, can: (perm) => can(user, perm) };
     const context = await browser.newContext({ storageState: path.resolve(rootDir, authFile(user.key)) });
     const page = await context.newPage();
     // Same browser-error watching as the default `page` fixture (see lib/consoleErrors.js), but this
@@ -123,7 +120,7 @@ function createGuiTest(users, { rootDir }) {
         console.error(`[browser pageerror] project="${testInfo.project.name}": ${err.message}`);
       },
     });
-    return { context, page, user: decorated };
+    return { context, page, user };
   }
 
   /**
