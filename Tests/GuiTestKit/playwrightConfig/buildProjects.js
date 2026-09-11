@@ -70,6 +70,17 @@ function buildProjects({
     return !mutatingUserKeys || !!user.isolatedSpec || mutatingUserKeys.includes(user.key);
   }
 
+  // A misspelled or stale key matches nobody, every project then gets grepInvert, and the whole
+  // mutating phase disappears into a green run with nothing to show it went missing. Naming a user who
+  // is simply outside this run's scope is legitimate (the fast default subset is narrower than the full
+  // matrix), so what is checked is the dangerous outcome itself: that SOMETHING still runs them.
+  if (mutatingUserKeys && users.length && !users.some(runsMutating)) {
+    throw new Error(
+      `buildProjects: mutatingUserKeys [${mutatingUserKeys.join(', ')}] matches none of the active ` +
+        `users [${users.map((u) => u.key).join(', ')}], so no project would run @mutating tests at all.`
+    );
+  }
+
   const userProjects = users.map((u) => {
     const project = u.isolatedSpec
       ? {

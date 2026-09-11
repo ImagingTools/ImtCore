@@ -231,14 +231,29 @@ async function fill(page, path, text, opts = {}) {
   }
 }
 
-/** A locked text control keeps its value when typed into. */
+// How long to keep watching for a side effect that must NOT happen. A single sample right after
+// waitForStable is not enough: openComboPopup below documents that a popup can open a beat late under
+// worker contention and retries for exactly that reason, so sampling once would read a slow unlock as
+// a lock - a false pass in a negative assertion.
+const NEGATIVE_SETTLE_MS = 2500;
+
+/**
+ * A locked text control keeps its value when typed into.
+ *
+ * The probe string is looked for across the WHOLE page afterwards, not just in the target. A read-only
+ * CustomTextField sets `activeFocusOnPress: !readOnly`, so clicking it never gives it focus and the
+ * keystrokes go to whatever still holds focus - typically a field edited earlier in the same document.
+ * The target would then read unchanged and the assertion would "pass" while silently corrupting another
+ * field. Finding the probe anywhere means the check never reached its target and its result is worthless.
+ */
 async function expectTextRejectsInput(page, path, input) {
   const before = await readTextValue(input);
   if (before == null) {
     throw new Error(`GUI expectReadOnly: [${fmtPath(path)}] exposes no readable value - cannot tell whether it accepted input`);
   }
 
-  const probe = `RO${Date.now() % 100000}`;
+  const probe = `RO${Date.now().toString(36)}${Math.floor(Math.random() * 1e6).toString(36)}`;
+  await input.scrollIntoViewIfNeeded();
   const box = await input.boundingBox();
   if (!box) throw new Error(`GUI expectReadOnly target has no bounding box: [${fmtPath(path)}]`);
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
@@ -253,9 +268,26 @@ async function expectTextRejectsInput(page, path, input) {
         `(was "${before}", now "${after}")`
     );
   }
+
+  const landedElsewhere = await page.evaluate((p) => document.body.innerText.includes(p), probe);
+  if (landedElsewhere) {
+    throw new Error(
+      `GUI expectReadOnly: typing aimed at [${fmtPath(path)}] landed somewhere else on the page ` +
+        '(a read-only field takes no focus, so the keystrokes went to whatever did) - the field may ' +
+        'well be locked, but this check cannot say so, and another control now holds the probe text'
+    );
+  }
 }
 
-/** A locked popup-driven control (combo box, picker) does not open its popup when clicked. */
+/**
+ * A popup-driven control (combo box, picker) that the user may not change does not open its popup.
+ *
+ * ASYMMETRIC on purpose, and this is the limit of the check: ComboBox.qml's onMouseAreaClicked returns
+ * early for `!changeable` (the permission case) but ALSO for a missing model or `getItemsCount() === 0`.
+ * A combo whose catalogue is empty therefore behaves exactly like a locked one. So a popup that opens is
+ * proof the control is NOT locked and fails here; a popup that stays shut is consistent with locked but
+ * does not establish it. This branch catches a wrongly-unlocked combo; it cannot confirm a locked one.
+ */
 async function expectPopupDoesNotOpen(page, path) {
   const mouse = dom.mouseAreaOf(page, path);
   if ((await mouse.count()) === 0) {
@@ -268,12 +300,17 @@ async function expectPopupDoesNotOpen(page, path) {
   const box = await mouse.boundingBox();
   if (!box) throw new Error(`GUI expectReadOnly target has no bounding box: [${fmtPath(path)}]`);
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-  await waitForStable(page);
 
-  if ((await dom.countVisible(page, ['PopupMenuDialog'])) > 0) {
-    await page.keyboard.press('Escape');
+  const deadline = Date.now() + NEGATIVE_SETTLE_MS;
+  for (;;) {
     await waitForStable(page);
-    throw new Error(`GUI field [${fmtPath(path)}] opened its popup but this user has no permission to edit it`);
+    if ((await dom.countVisible(page, ['PopupMenuDialog'])) > 0) {
+      await page.keyboard.press('Escape');
+      await waitForStable(page);
+      throw new Error(`GUI field [${fmtPath(path)}] opened its popup but this user has no permission to edit it`);
+    }
+    if (Date.now() >= deadline) return;
+    await page.waitForTimeout(200);
   }
 }
 
@@ -291,6 +328,13 @@ async function expectPopupDoesNotOpen(page, path) {
  * probed by typing, anything else by clicking and requiring no popup. A control that is neither throws
  * instead of being skipped, so a field this cannot check is reported rather than silently dropped.
  *
+ * Being a NEGATIVE assertion, every way the interaction can fail to reach the control reads as success,
+ * so each known one is closed deliberately: the click scrolls first (a field below the fold still
+ * satisfies requireVisible, which reads QML's own `visible`, not the viewport), the popup branch watches
+ * for a whole settle window rather than sampling once, and the typing branch checks that the probe did
+ * not land on some other control. The one case that stays ambiguous - an empty combo catalogue looking
+ * exactly like a locked combo - is documented on expectPopupDoesNotOpen rather than papered over.
+ *
  * Restores nothing: if the field does accept the edit, the assertion fails anyway.
  * @param {import('@playwright/test').Page} page
  * @param {string[]} path
@@ -298,7 +342,18 @@ async function expectPopupDoesNotOpen(page, path) {
 async function expectReadOnly(page, path) {
   const container = await requireVisible(page, path, { what: 'field' });
   const input = container.locator(TEXT_INPUT_SELECTOR).first();
-  if ((await input.count()) > 0) {
+  // Wait rather than count() once: under worker contention a control can be in the DOM a moment before
+  // it is laid out, and a bare count() would send it down the wrong branch. The wait is short because
+  // requireVisible has already waited for the CONTAINER - a text control inside an already-visible
+  // container is either there or this is not a text control, which is the legitimate other branch.
+  // Kept separate from the assertion so a real failure inside it can never be read as "not a text
+  // control" and retried as a combo.
+  const isTextControl = await input
+    .waitFor({ state: 'visible', timeout: 1000 })
+    .then(() => true)
+    .catch(() => false);
+
+  if (isTextControl) {
     await expectTextRejectsInput(page, path, input);
     return;
   }
@@ -323,12 +378,12 @@ async function expectReadOnly(page, path) {
  */
 async function waitForTextInputValue(page, path, predicate = (v) => v === '', timeout = DEFAULT_TIMEOUT) {
   const container = dom.byPath(page, path);
-  const input = container.locator('[objectName="TextInput"] input, input[objectName="TextInput"], [objectName="TextInput"]').first();
+  const input = container.locator(TEXT_INPUT_SELECTOR).first();
 
   const deadline = Date.now() + timeout;
   let consecutiveMatches = 0;
   for (;;) {
-    const value = await input.evaluate((el) => (el.tagName === 'INPUT' ? el.value : el.getAttribute('text'))).catch(() => null);
+    const value = await readTextValue(input);
     if (value == null) return; // not a readable TextInput at this path - nothing to wait for
     if (predicate(value)) {
       // Require the match to hold for two consecutive reads (~100ms apart), not just one instant: the
