@@ -202,15 +202,28 @@ const TEXT_INPUT_SELECTOR = '[objectName="TextInput"] input, input[objectName="T
 function readTextValue(input) {
   return input
     .evaluate((el) => {
-      if (el.tagName === 'INPUT') return el.value;
-      const attr = el.getAttribute('text');
-      if (attr !== null) return attr;
-      const nestedInput = el.querySelector('input');
-      if (nestedInput) return nestedInput.value;
-      const impl = el.classList.contains('impl') ? el : el.querySelector('.impl');
-      return impl ? impl.textContent.trim() : null;
+      const read = () => {
+        if (el.tagName === 'INPUT') return el.value;
+        const attr = el.getAttribute('text');
+        if (attr !== null) return attr;
+        const nestedInput = el.querySelector('input');
+        if (nestedInput) return nestedInput.value;
+        const impl = el.classList.contains('impl') ? el : el.querySelector('.impl');
+        return impl ? impl.textContent.trim() : null;
+      };
+      const value = read();
+      // An EMPTY field renders a zero-width space rather than nothing (confirmed live: every
+      // "never reached the expected value" failure reported last seen U+200B), so a caller waiting for
+      // "" would wait forever on a field that is, in every sense that matters, empty.
+      return value === null ? null : value.replace(/[\u200B\uFEFF]/g, '');
     })
     .catch(() => null);
+}
+
+// A masked field (password echo) renders one glyph per character, so its value can be read but says
+// nothing about what was typed - verifying a fill against it compares the text to a row of bullets.
+function isMasked(value, typed) {
+  return value.length > 0 && /^[\u2022\u25CF\u00B7*]+$/.test(value) && !/[\u2022\u25CF\u00B7*]/.test(typed);
 }
 
 async function fill(page, path, text, opts = {}) {
@@ -237,14 +250,11 @@ async function fill(page, path, text, opts = {}) {
   await waitForStable(page);
 
   if (verify && text.length > 0) {
-    // Best-effort structural check: the DOM <input> should now carry the typed value. Some QML text
-    // controls proxy through a real <input>; when present, assert it, otherwise skip quietly.
     const value = await readTextValue(input);
     // An empty field after typing non-empty text is the ONE outcome that must never pass: it is what a
     // read-only field, or a click that missed the input, leaves behind - exactly the silent no-op this
-    // whole action layer exists to prevent. It used to be excluded from the check (`value !== ''`),
-    // which let a fill into a field the user cannot edit report success.
-    if (value != null && !String(value).includes(text)) {
+    // whole action layer exists to prevent.
+    if (value != null && !isMasked(value, text) && !String(value).includes(text)) {
       const why = value === '' ? ' (field is empty - read-only, or the click missed it)' : '';
       throw new Error(`GUI fill did not take effect at [${fmtPath(path)}]: expected to contain "${text}", got "${value}"${why}`);
     }
