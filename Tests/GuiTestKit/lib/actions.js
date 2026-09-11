@@ -226,6 +226,28 @@ function isMasked(value, typed) {
   return value.length > 0 && /^[\u2022\u25CF\u00B7*]+$/.test(value) && !/[\u2022\u25CF\u00B7*]/.test(typed);
 }
 
+/**
+ * The value the control MIRRORS - a real <input>, or the wrapper's `text` attribute - or null when it
+ * mirrors none.
+ *
+ * Deliberately does NOT fall back to the rendered `.impl` text the way readTextValue does. An empty
+ * `.impl` means one of two things that cannot be told apart: the field is empty, or the control keeps
+ * its text somewhere else. A multi-line editor is the second (confirmed live: the Support ticket's
+ * Description shows the typed text on screen while its `.impl` reads empty), so treating "" as proof
+ * that a fill did nothing fails a working app.
+ */
+function readMirroredValue(input) {
+  return input
+    .evaluate((el) => {
+      if (el.tagName === 'INPUT') return el.value;
+      const attr = el.getAttribute('text');
+      if (attr !== null) return attr;
+      const nestedInput = el.querySelector('input');
+      return nestedInput ? nestedInput.value : null;
+    })
+    .catch(() => null);
+}
+
 async function fill(page, path, text, opts = {}) {
   const clear = opts.clear !== false;
   const verify = opts.verify !== false;
@@ -250,7 +272,7 @@ async function fill(page, path, text, opts = {}) {
   await waitForStable(page);
 
   if (verify && text.length > 0) {
-    const value = await readTextValue(input);
+    const value = await readMirroredValue(input);
     // An empty field after typing non-empty text is the ONE outcome that must never pass: it is what a
     // read-only field, or a click that missed the input, leaves behind - exactly the silent no-op this
     // whole action layer exists to prevent.
