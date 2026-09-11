@@ -185,12 +185,32 @@ async function clickButton(page, pathOrName) {
  * @param {{clear?: boolean, verify?: boolean}} [opts]
  */
 // A QML text control reaches the DOM in one of three shapes depending on the control - a real <input>
-// inside the wrapper, an <input> carrying the objectName itself, or the wrapper alone.
+// inside the wrapper, an <input> carrying the objectName itself, or the wrapper alone. The comma list
+// is resolved in DOCUMENT order, so .first() on it lands on the wrapper whenever one exists, never on
+// the inner <input>: readTextValue below has to cope with the wrapper, not assume an <input>.
 const TEXT_INPUT_SELECTOR = '[objectName="TextInput"] input, input[objectName="TextInput"], [objectName="TextInput"]';
 
-/** Current value of a text control, or null if this element exposes none. */
+/**
+ * Current value of a text control, or null if this element exposes none.
+ *
+ * Three readings, in order, because the QML->DOM bridge renders the same logical control differently
+ * depending on whether it is editable: an editable field mirrors its value onto a real <input> and onto
+ * the wrapper's `text` attribute, while a READ-ONLY one has neither - its rendered string lives as the
+ * textContent of an inner `<div class="impl">`. Reading only the first two is what made this return null
+ * for exactly the fields expectReadOnly exists to check.
+ */
 function readTextValue(input) {
-  return input.evaluate((el) => (el.tagName === 'INPUT' ? el.value : el.getAttribute('text'))).catch(() => null);
+  return input
+    .evaluate((el) => {
+      if (el.tagName === 'INPUT') return el.value;
+      const attr = el.getAttribute('text');
+      if (attr !== null) return attr;
+      const nestedInput = el.querySelector('input');
+      if (nestedInput) return nestedInput.value;
+      const impl = el.classList.contains('impl') ? el : el.querySelector('.impl');
+      return impl ? impl.textContent.trim() : null;
+    })
+    .catch(() => null);
 }
 
 async function fill(page, path, text, opts = {}) {
@@ -269,7 +289,12 @@ async function expectTextRejectsInput(page, path, input) {
     );
   }
 
-  const landedElsewhere = await page.evaluate((p) => document.body.innerText.includes(p), probe);
+  // innerText alone misses a probe typed into another <input> (its value is not rendered text), which
+  // is the likeliest destination for keystrokes a read-only field refused - so check both.
+  const landedElsewhere = await page.evaluate((p) => {
+    if (document.body.innerText.includes(p)) return true;
+    return Array.from(document.querySelectorAll('input,textarea')).some((el) => String(el.value || '').includes(p));
+  }, probe);
   if (landedElsewhere) {
     throw new Error(
       `GUI expectReadOnly: typing aimed at [${fmtPath(path)}] landed somewhere else on the page ` +
@@ -342,18 +367,18 @@ async function expectPopupDoesNotOpen(page, path) {
 async function expectReadOnly(page, path) {
   const container = await requireVisible(page, path, { what: 'field' });
   const input = container.locator(TEXT_INPUT_SELECTOR).first();
-  // Wait rather than count() once: under worker contention a control can be in the DOM a moment before
-  // it is laid out, and a bare count() would send it down the wrong branch. The wait is short because
-  // requireVisible has already waited for the CONTAINER - a text control inside an already-visible
-  // container is either there or this is not a text control, which is the legitimate other branch.
-  // Kept separate from the assertion so a real failure inside it can never be read as "not a text
-  // control" and retried as a combo.
-  const isTextControl = await input
-    .waitFor({ state: 'visible', timeout: 1000 })
-    .then(() => true)
-    .catch(() => false);
+  // PRESENCE, not visibility. The bridge's wrapper for a text control is frequently not "visible" to
+  // Playwright even when its inner .impl child is rendered, so waiting for visibility here sent real
+  // text fields down the popup branch - which a text field passes unconditionally, reporting an
+  // editable field as locked. Presence also settles the branch honestly: a control with a TextInput
+  // descendant is a text control, full stop, and anything else is not.
+  await container
+    .locator(TEXT_INPUT_SELECTOR)
+    .first()
+    .waitFor({ state: 'attached', timeout: 1000 })
+    .catch(() => {});
 
-  if (isTextControl) {
+  if ((await container.locator(TEXT_INPUT_SELECTOR).count()) > 0) {
     await expectTextRejectsInput(page, path, input);
     return;
   }

@@ -70,16 +70,11 @@ function buildProjects({
     return !mutatingUserKeys || !!user.isolatedSpec || mutatingUserKeys.includes(user.key);
   }
 
-  // A misspelled or stale key matches nobody, every project then gets grepInvert, and the whole
-  // mutating phase disappears into a green run with nothing to show it went missing. Naming a user who
-  // is simply outside this run's scope is legitimate (the fast default subset is narrower than the full
-  // matrix), so what is checked is the dangerous outcome itself: that SOMETHING still runs them.
-  if (mutatingUserKeys && users.length && !users.some(runsMutating)) {
-    throw new Error(
-      `buildProjects: mutatingUserKeys [${mutatingUserKeys.join(', ')}] matches none of the active ` +
-        `users [${users.map((u) => u.key).join(', ')}], so no project would run @mutating tests at all.`
-    );
-  }
+  // NOTE: a misspelled or stale key here matches nobody and silently drops @mutating from every matrix
+  // project. This cannot be caught reliably from inside buildProjects - naming a user outside a narrower
+  // run's scope is legitimate, and any isolatedSpec user keeps its own mutating tests regardless, so
+  // "somebody still runs them" is always true and proves nothing. Validate the keys against the full
+  // user list in the consuming config, where that list is known (ProLife's playwright.config.js does).
 
   const userProjects = users.map((u) => {
     const project = u.isolatedSpec
