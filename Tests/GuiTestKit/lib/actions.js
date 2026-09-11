@@ -184,12 +184,21 @@ async function clickButton(page, pathOrName) {
  * @param {string} text
  * @param {{clear?: boolean, verify?: boolean}} [opts]
  */
+// A QML text control reaches the DOM in one of three shapes depending on the control - a real <input>
+// inside the wrapper, an <input> carrying the objectName itself, or the wrapper alone.
+const TEXT_INPUT_SELECTOR = '[objectName="TextInput"] input, input[objectName="TextInput"], [objectName="TextInput"]';
+
+/** Current value of a text control, or null if this element exposes none. */
+function readTextValue(input) {
+  return input.evaluate((el) => (el.tagName === 'INPUT' ? el.value : el.getAttribute('text'))).catch(() => null);
+}
+
 async function fill(page, path, text, opts = {}) {
   const clear = opts.clear !== false;
   const verify = opts.verify !== false;
 
   const container = await requireVisible(page, path, { what: 'text input' });
-  const input = container.locator('[objectName="TextInput"] input, input[objectName="TextInput"], [objectName="TextInput"]').first();
+  const input = container.locator(TEXT_INPUT_SELECTOR).first();
   try {
     await input.waitFor({ state: 'visible', timeout: opts.timeout || DEFAULT_TIMEOUT });
   } catch (_) {
@@ -210,7 +219,7 @@ async function fill(page, path, text, opts = {}) {
   if (verify && text.length > 0) {
     // Best-effort structural check: the DOM <input> should now carry the typed value. Some QML text
     // controls proxy through a real <input>; when present, assert it, otherwise skip quietly.
-    const value = await input.evaluate((el) => (el.tagName === 'INPUT' ? el.value : el.getAttribute('text'))).catch(() => null);
+    const value = await readTextValue(input);
     // An empty field after typing non-empty text is the ONE outcome that must never pass: it is what a
     // read-only field, or a click that missed the input, leaves behind - exactly the silent no-op this
     // whole action layer exists to prevent. It used to be excluded from the check (`value !== ''`),
@@ -219,6 +228,54 @@ async function fill(page, path, text, opts = {}) {
       const why = value === '' ? ' (field is empty - read-only, or the click missed it)' : '';
       throw new Error(`GUI fill did not take effect at [${fmtPath(path)}]: expected to contain "${text}", got "${value}"${why}`);
     }
+  }
+}
+
+/**
+ * Assert a text field REJECTS input - the positive counterpart of fill(), for a field the current
+ * user has no permission to edit.
+ *
+ * Checks behaviour rather than an attribute on purpose. Editability here is decided imperatively in
+ * QML (the editor's own checkPermissions() sets `readOnly` on each control from the user's permission
+ * list), and how that surfaces in the DOM differs between controls, so "does this field accept typing"
+ * is both the question that matters and the only one with a single reliable answer. It is also the
+ * assertion that distinguishes a field that is genuinely locked from one that merely LOOKS locked -
+ * which a screenshot cannot tell apart.
+ *
+ * Restores nothing: if the field does accept input the assertion fails anyway, and the caller's block
+ * is over. Only works on text controls; combo boxes gate editability through `changeable` instead and
+ * need their own check.
+ * @param {import('@playwright/test').Page} page
+ * @param {string[]} path
+ */
+async function expectReadOnly(page, path) {
+  const container = await requireVisible(page, path, { what: 'text input' });
+  const input = container.locator(TEXT_INPUT_SELECTOR).first();
+  try {
+    await input.waitFor({ state: 'visible', timeout: DEFAULT_TIMEOUT });
+  } catch (_) {
+    throw new Error(`GUI expectReadOnly target has no TextInput: [${fmtPath(path)}]`);
+  }
+
+  const before = await readTextValue(input);
+  if (before == null) {
+    throw new Error(`GUI expectReadOnly: [${fmtPath(path)}] exposes no readable value - cannot tell whether it accepted input`);
+  }
+
+  const probe = `RO${Date.now() % 100000}`;
+  const box = await input.boundingBox();
+  if (!box) throw new Error(`GUI expectReadOnly target has no bounding box: [${fmtPath(path)}]`);
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await page.keyboard.press('Control+A');
+  await page.keyboard.type(probe);
+  await waitForStable(page);
+
+  const after = await readTextValue(input);
+  if (after != null && String(after).includes(probe)) {
+    throw new Error(
+      `GUI field [${fmtPath(path)}] accepted input but this user has no permission to edit it ` +
+        `(was "${before}", now "${after}")`
+    );
   }
 }
 
@@ -489,6 +546,7 @@ module.exports = {
   openPage,
   clickCommand,
   fill,
+  expectReadOnly,
   waitForTextInputValue,
   select,
   selectIndex,

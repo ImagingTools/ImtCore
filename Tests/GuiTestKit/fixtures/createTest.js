@@ -95,6 +95,9 @@ function createGuiTest(users, { rootDir }) {
    * per-step-independent failure signal you get from a fresh page per test. Reserve this for tests
    * that are already a deliberate narrative sequence (fill field A, then B, then save), not for
    * unrelated checks that happen to share a page.
+   * Clean up in the block's afterAll with `page.context().close()` (or the returned `context`), not
+   * `page.close()`: this creates one BrowserContext per block, and closing only the page leaks it for
+   * the rest of the run.
    * @param {import('@playwright/test').Browser} browser
    * @param {import('@playwright/test').TestInfo} testInfo
    */
