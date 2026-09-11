@@ -231,32 +231,8 @@ async function fill(page, path, text, opts = {}) {
   }
 }
 
-/**
- * Assert a text field REJECTS input - the positive counterpart of fill(), for a field the current
- * user has no permission to edit.
- *
- * Checks behaviour rather than an attribute on purpose. Editability here is decided imperatively in
- * QML (the editor's own checkPermissions() sets `readOnly` on each control from the user's permission
- * list), and how that surfaces in the DOM differs between controls, so "does this field accept typing"
- * is both the question that matters and the only one with a single reliable answer. It is also the
- * assertion that distinguishes a field that is genuinely locked from one that merely LOOKS locked -
- * which a screenshot cannot tell apart.
- *
- * Restores nothing: if the field does accept input the assertion fails anyway, and the caller's block
- * is over. Only works on text controls; combo boxes gate editability through `changeable` instead and
- * need their own check.
- * @param {import('@playwright/test').Page} page
- * @param {string[]} path
- */
-async function expectReadOnly(page, path) {
-  const container = await requireVisible(page, path, { what: 'text input' });
-  const input = container.locator(TEXT_INPUT_SELECTOR).first();
-  try {
-    await input.waitFor({ state: 'visible', timeout: DEFAULT_TIMEOUT });
-  } catch (_) {
-    throw new Error(`GUI expectReadOnly target has no TextInput: [${fmtPath(path)}]`);
-  }
-
+/** A locked text control keeps its value when typed into. */
+async function expectTextRejectsInput(page, path, input) {
   const before = await readTextValue(input);
   if (before == null) {
     throw new Error(`GUI expectReadOnly: [${fmtPath(path)}] exposes no readable value - cannot tell whether it accepted input`);
@@ -273,10 +249,60 @@ async function expectReadOnly(page, path) {
   const after = await readTextValue(input);
   if (after != null && String(after).includes(probe)) {
     throw new Error(
-      `GUI field [${fmtPath(path)}] accepted input but this user has no permission to edit it ` +
+      `GUI field [${fmtPath(path)}] accepted typing but this user has no permission to edit it ` +
         `(was "${before}", now "${after}")`
     );
   }
+}
+
+/** A locked popup-driven control (combo box, picker) does not open its popup when clicked. */
+async function expectPopupDoesNotOpen(page, path) {
+  const mouse = dom.mouseAreaOf(page, path);
+  if ((await mouse.count()) === 0) {
+    throw new Error(
+      `GUI expectReadOnly: [${fmtPath(path)}] has neither a text control nor a clickable area - ` +
+        'cannot determine whether it is locked'
+    );
+  }
+  await mouse.scrollIntoViewIfNeeded();
+  const box = await mouse.boundingBox();
+  if (!box) throw new Error(`GUI expectReadOnly target has no bounding box: [${fmtPath(path)}]`);
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await waitForStable(page);
+
+  if ((await dom.countVisible(page, ['PopupMenuDialog'])) > 0) {
+    await page.keyboard.press('Escape');
+    await waitForStable(page);
+    throw new Error(`GUI field [${fmtPath(path)}] opened its popup but this user has no permission to edit it`);
+  }
+}
+
+/**
+ * Assert a field REJECTS editing - the negative counterpart of fill(), for a field the current user
+ * has no permission to change.
+ *
+ * Checks behaviour rather than an attribute on purpose. Editability is decided imperatively in QML
+ * (each editor's checkPermissions() sets readOnly/changeable from the user's permission list) and
+ * surfaces differently per control, so "can this actually be changed" is both the question that
+ * matters and the only one with a single reliable answer. It is also what separates a field that is
+ * genuinely locked from one that merely LOOKS locked, which no screenshot can do.
+ *
+ * Works out which kind of control it is rather than making the caller pass that in: a text control is
+ * probed by typing, anything else by clicking and requiring no popup. A control that is neither throws
+ * instead of being skipped, so a field this cannot check is reported rather than silently dropped.
+ *
+ * Restores nothing: if the field does accept the edit, the assertion fails anyway.
+ * @param {import('@playwright/test').Page} page
+ * @param {string[]} path
+ */
+async function expectReadOnly(page, path) {
+  const container = await requireVisible(page, path, { what: 'field' });
+  const input = container.locator(TEXT_INPUT_SELECTOR).first();
+  if ((await input.count()) > 0) {
+    await expectTextRejectsInput(page, path, input);
+    return;
+  }
+  await expectPopupDoesNotOpen(page, path);
 }
 
 /**
