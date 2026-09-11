@@ -211,8 +211,13 @@ async function fill(page, path, text, opts = {}) {
     // Best-effort structural check: the DOM <input> should now carry the typed value. Some QML text
     // controls proxy through a real <input>; when present, assert it, otherwise skip quietly.
     const value = await input.evaluate((el) => (el.tagName === 'INPUT' ? el.value : el.getAttribute('text'))).catch(() => null);
-    if (value != null && value !== '' && !String(value).includes(text)) {
-      throw new Error(`GUI fill did not take effect at [${fmtPath(path)}]: expected to contain "${text}", got "${value}"`);
+    // An empty field after typing non-empty text is the ONE outcome that must never pass: it is what a
+    // read-only field, or a click that missed the input, leaves behind - exactly the silent no-op this
+    // whole action layer exists to prevent. It used to be excluded from the check (`value !== ''`),
+    // which let a fill into a field the user cannot edit report success.
+    if (value != null && !String(value).includes(text)) {
+      const why = value === '' ? ' (field is empty - read-only, or the click missed it)' : '';
+      throw new Error(`GUI fill did not take effect at [${fmtPath(path)}]: expected to contain "${text}", got "${value}"${why}`);
     }
   }
 }

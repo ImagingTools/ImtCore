@@ -30,9 +30,13 @@ async function checkScreenshot(page, name, mask) {
   // hundred pixels of unavoidable non-determinism per full-page shot (focus ring, sub-pixel text,
   // caret), which failed genuinely-correct screens. Allow a small absolute budget instead - large
   // enough to swallow that noise, far too small to hide a real UI change.
-  await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true, threshold: 0.05, maxDiffPixels: 600 });
-
-  for (const h of handles) await removeMask(page, h);
+  try {
+    await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true, threshold: 0.05, maxDiffPixels: 600 });
+  } finally {
+    // Masks are injected DOM nodes, so they outlive a failed assertion and would sit over every later
+    // screenshot in the same test - turning one real failure into a run of unrelated-looking ones.
+    for (const h of handles) await removeMask(page, h).catch(() => {});
+  }
 }
 
 // How long the polling structural assertions wait for the target to reach the expected state. The
