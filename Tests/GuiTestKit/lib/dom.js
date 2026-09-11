@@ -176,7 +176,9 @@ async function columnRects(page, headerIds) {
       groups.get(scope).push(row);
     }
 
-    const dialogEls = Array.from(document.querySelectorAll('[objectName="Dialog"]'));
+    // Same [visible] filter as the rows above: a dismissed Dialog can linger in the DOM with a real
+    // bounding rect, and subtracting it would punch a hole through the mask it is no longer covering.
+    const dialogEls = Array.from(document.querySelectorAll('[objectName="Dialog"][visible]'));
 
     // Subtract `occluder` from `rect` (same x-range only, since these are vertical column strips) -
     // returns 0, 1 (untouched or trimmed), or 2 (split above/below) rects.

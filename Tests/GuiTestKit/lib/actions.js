@@ -599,9 +599,15 @@ async function closeAllDocumentTabs(page) {
     await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
     await waitForStable(page);
 
-    // Dirty document -> "Save all changes?" (Yes/No) confirm. Click No to discard and proceed.
+    // Dirty document -> "Save all changes?" (Yes/No) confirm. Click No to discard and proceed. Waited
+    // for rather than sampled once: under worker contention it can paint just after the click's own
+    // settle, and a missed No leaves a modal that swallows every later click in the run.
     const noBtn = page.locator('[objectName="NoButton"][visible]').first();
-    if ((await noBtn.count()) > 0) {
+    const confirmShown = await noBtn
+      .waitFor({ state: 'visible', timeout: 1500 })
+      .then(() => true)
+      .catch(() => false);
+    if (confirmShown) {
       const nMouse = noBtn.locator('[objectName="MouseArea"]').first();
       const nTarget = (await nMouse.count()) > 0 ? nMouse : noBtn;
       const nbox = await nTarget.boundingBox();

@@ -109,11 +109,18 @@ async function waitForNetworkIdle(page, options = {}) {
   const state = trackNetwork(page);
   if (state.pending === 0) return;
   await new Promise((resolve) => {
-    const timer = setTimeout(resolve, Math.max(0, timeout));
-    state.waiters.push(() => {
+    const waiter = () => {
       clearTimeout(timer);
       resolve();
-    });
+    };
+    // state lives as long as the page, so a waiter left behind on the timeout path accumulates for the
+    // rest of a shared-page block and gets re-invoked by every later settle().
+    const timer = setTimeout(() => {
+      const index = state.waiters.indexOf(waiter);
+      if (index !== -1) state.waiters.splice(index, 1);
+      resolve();
+    }, Math.max(0, timeout));
+    state.waiters.push(waiter);
   });
 }
 

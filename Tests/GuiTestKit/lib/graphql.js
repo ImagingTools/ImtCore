@@ -30,10 +30,19 @@ function spyOn(page, operationName, opts = {}) {
     (resp) => resp.request().method() === 'POST' && matchesOperation(resp.request(), operationName),
     { timeout }
   );
+  // Nothing awaits responsePromise until wait(), and the action between the two can throw - which is
+  // the normal case when a save regression is what the test is catching. Its timeout rejection would
+  // then be unhandled and tear down the worker mid-run, failing an unrelated test. Absorb it here and
+  // re-throw only from wait(), where a caller is actually listening.
+  const settled = responsePromise.then(
+    (response) => ({ response }),
+    (error) => ({ error })
+  );
 
   return {
     async wait() {
-      const response = await responsePromise;
+      const { response, error } = await settled;
+      if (error) throw error;
       let json;
       try {
         json = await response.json();
