@@ -229,14 +229,23 @@ const TEXT_INPUT_SELECTOR = '[objectName="TextInput"] input, input[objectName="T
 function readTextValue(input) {
   return input
     .evaluate((el) => {
+      // A single-line TextInput and a multi-line TextEdit render differently: the bridge gives the
+      // first an <input> and the second a <textarea class="impl">, and BOTH carry their text in
+      // .value. Reading a textarea's textContent returns its initial markup, which stays empty when
+      // the value is set by property - so a description field that visibly held the typed text read
+      // back as "" and fill() called it a no-op.
+      const valueOf = (node) => (node.tagName === 'INPUT' || node.tagName === 'TEXTAREA' ? node.value : null);
       const read = () => {
-        if (el.tagName === 'INPUT') return el.value;
+        const own = valueOf(el);
+        if (own !== null) return own;
         const attr = el.getAttribute('text');
         if (attr !== null) return attr;
-        const nestedInput = el.querySelector('input');
-        if (nestedInput) return nestedInput.value;
+        const nested = el.querySelector('input, textarea');
+        if (nested) return valueOf(nested);
         const impl = el.classList.contains('impl') ? el : el.querySelector('.impl');
-        return impl ? impl.textContent.trim() : null;
+        if (!impl) return null;
+        const implValue = valueOf(impl);
+        return implValue !== null ? implValue : impl.textContent.trim();
       };
       const value = read();
       // An EMPTY field renders a zero-width space rather than nothing (confirmed live: every
@@ -266,11 +275,14 @@ function isMasked(value, typed) {
 function readMirroredValue(input) {
   return input
     .evaluate((el) => {
-      if (el.tagName === 'INPUT') return el.value;
+      // textarea as well as input: a multi-line TextEdit mirrors its text there (see readTextValue).
+      const valueOf = (node) => (node.tagName === 'INPUT' || node.tagName === 'TEXTAREA' ? node.value : null);
+      const own = valueOf(el);
+      if (own !== null) return own;
       const attr = el.getAttribute('text');
       if (attr !== null) return attr;
-      const nestedInput = el.querySelector('input');
-      return nestedInput ? nestedInput.value : null;
+      const nested = el.querySelector('input, textarea');
+      return nested ? valueOf(nested) : null;
     })
     .catch(() => null);
 }
