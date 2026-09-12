@@ -400,9 +400,16 @@ class TableConfigDialog {
       what: `column ${rowIndex} visibility checkbox`,
     });
   }
-  /** Select a column's row (needed before moveUp()/moveDown(), which act on the current selection). */
+  /**
+   * Select a column's row (needed before moveUp()/moveDown(), which act on the current selection).
+   *
+   * clickSelf, not click: the row IS the clickable surface (its delegate is filled by a bare MouseArea
+   * that sets currentRow on press), while click() targets the first inner [objectName="MouseArea"] -
+   * and the row contains a checkbox that has one of those. Selecting a row must not be able to land on
+   * a control inside it.
+   */
   selectColumn(rowIndex) {
-    return gui.click(this.page, [`ColumnRow_${rowIndex}`], { what: `column row ${rowIndex}` });
+    return gui.clickSelf(this.page, [`ColumnRow_${rowIndex}`], { what: `column row ${rowIndex}` });
   }
   moveUp() {
     return gui.clickButton(this.page, ['MoveColumnUpButton']);
