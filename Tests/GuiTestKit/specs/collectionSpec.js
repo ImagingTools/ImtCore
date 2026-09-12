@@ -42,8 +42,10 @@ function denied(user, permission) {
 
 /**
  * @param {object} fixtures  the app's fixtures/test.js, plus `defineTest`
- * @param {(title: string, body: Function) => void} fixtures.defineTest  a one-line shim the SPEC FILE
- *   declares: `defineTest: (t, b) => fixtures.test(t, b)`. Playwright attributes a test to the file
+ * @param {Function} fixtures.defineTest  a one-line shim the SPEC FILE
+ *   declares: `defineTest: (...args) => fixtures.test(...args)`. Spread, not `(t, b)`: a tagged test is
+ *   `test(title, { tag }, body)`, and a two-parameter shim silently drops the body - Playwright still
+ *   parses the tag, so --list and --grep look right while every tagged test fails. Playwright attributes a test to the file
  *   whose stack frame called `test()`, and that attribution is what testIgnore / testMatch /
  *   isolatedSpec match on - register from inside this module and every generated test is filed under
  *   the kit's own path in node_modules, so a spec could no longer be pinned to a user or excluded from
@@ -61,10 +63,15 @@ function denied(user, permission) {
  * @param {string[]} [declaration.maskColumns]              non-deterministic columns to mask
  * @param {(page) => CollectionPage} [declaration.createPage]  for a page that needs its own subclass
  * @param {object[]} [declaration.scenarios]  one test (and one screenshot) each - see runScenario
+ * @param {(ctx: object) => void} [declaration.extra]  hand-written tests for this page's own flows,
+ *   registered inside the SAME shared-page block so they cost no extra app boot. Called with
+ *   { test, gui, page, collection, user } where page/collection/user are getters resolved at test time
+ *   (they are assigned in beforeAll). Use it for what a declaration genuinely cannot express - a bind
+ *   dialog, a column-configuration flow - not to avoid declaring a standard scenario.
  */
 function defineCollectionSpec(fixtures, declaration) {
   const { test, newUserPage, gui, defineTest } = fixtures;
-  const { title, pageId, prefix, requires, filters, maskColumns, createPage, scenarios = [] } = declaration;
+  const { title, pageId, prefix, requires, filters, maskColumns, createPage, scenarios = [], extra } = declaration;
 
   if (!title || !pageId || !prefix) {
     throw new Error('defineCollectionSpec: `title`, `pageId` and `prefix` are required');
@@ -132,6 +139,24 @@ function defineCollectionSpec(fixtures, declaration) {
       for (const scenario of scenarios) {
         defineTest(scenario.title || scenario.name, async () => {
           await runScenario({ test, gui, page, user: specUser, collection, prefix, scenario });
+        });
+      }
+
+      if (extra) {
+        extra({
+          test: defineTest,
+          gui,
+          // Getters: these are only assigned once beforeAll has run, so a plain value captured here
+          // would be undefined for every test in the block.
+          get page() {
+            return page;
+          },
+          get collection() {
+            return collection;
+          },
+          get user() {
+            return specUser;
+          },
         });
       }
     });
