@@ -33,12 +33,12 @@ async function requireVisible(page, path, opts = {}) {
   try {
     await locator.waitFor({ state: 'visible', timeout });
   } catch (_) {
-    const total = await page.locator(dom.selectorForPath(path)).count();
-    const hint =
-      total === 0
-        ? 'no element with this objectName path exists in the DOM'
-        : `${total} element(s) exist but none became visible`;
-    throw new Error(`GUI target not found: [${fmtPath(path)}] (${opts.what || 'element'}) - ${hint}`);
+    const what = opts.what || 'element';
+    throw new Error(
+      [`GUI target not found: [${fmtPath(path)}] (${what}) after ${timeout}ms`, await dom.describePath(page, path)].join(
+        '\n'
+      )
+    );
   }
   return locator;
 }
@@ -55,7 +55,13 @@ async function click(page, path, opts = {}) {
   try {
     await mouse.waitFor({ state: 'visible', timeout: opts.timeout || DEFAULT_TIMEOUT });
   } catch (_) {
-    throw new Error(`GUI click target has no visible MouseArea: [${fmtPath(path)}]`);
+    const timeout = opts.timeout || DEFAULT_TIMEOUT;
+    throw new Error(
+      [
+        `GUI click target has no visible MouseArea: [${fmtPath(path)}] after ${timeout}ms`,
+        await dom.describePath(page, path, ['MouseArea']),
+      ].join('\n')
+    );
   }
   await mouse.scrollIntoViewIfNeeded();
   const box = await mouse.boundingBox();
@@ -110,13 +116,21 @@ async function clickWithin(page, scopeLocator, objectName) {
   try {
     await target.waitFor({ state: 'visible', timeout: DEFAULT_TIMEOUT });
   } catch (_) {
-    throw new Error(`GUI click target not found within scope: [objectName="${objectName}"]`);
+    const total = await scopeLocator.locator(`[objectName="${cssEscapeLocal(objectName)}"]`).count();
+    throw new Error(
+      `GUI click target not found within scope: [objectName="${objectName}"] after ${DEFAULT_TIMEOUT}ms - ` +
+        (total === 0 ? 'nothing matches it inside the scope' : `${total} match(es) inside the scope, none visible`)
+    );
   }
   const mouse = target.locator('[objectName="MouseArea"][visible]').first();
   try {
     await mouse.waitFor({ state: 'visible', timeout: DEFAULT_TIMEOUT });
   } catch (_) {
-    throw new Error(`GUI click target has no visible MouseArea within scope: [objectName="${objectName}"]`);
+    const total = await target.locator('[objectName="MouseArea"]').count();
+    throw new Error(
+      `GUI click target has no visible MouseArea within scope: [objectName="${objectName}"] - ` +
+        (total === 0 ? 'it has no MouseArea child at all' : `${total} MouseArea(s) present, none visible`)
+    );
   }
   await mouse.scrollIntoViewIfNeeded();
   const box = await mouse.boundingBox();
@@ -257,7 +271,13 @@ async function fill(page, path, text, opts = {}) {
   try {
     await input.waitFor({ state: 'visible', timeout: opts.timeout || DEFAULT_TIMEOUT });
   } catch (_) {
-    throw new Error(`GUI fill target has no TextInput: [${fmtPath(path)}]`);
+    const timeout = opts.timeout || DEFAULT_TIMEOUT;
+    throw new Error(
+      [
+        `GUI fill target has no visible TextInput: [${fmtPath(path)}] after ${timeout}ms`,
+        await dom.describePath(page, path, ['TextInput']),
+      ].join('\n')
+    );
   }
 
   const box = await input.boundingBox();

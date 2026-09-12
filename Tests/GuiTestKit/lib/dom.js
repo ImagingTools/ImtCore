@@ -113,6 +113,41 @@ async function countAny(page, path) {
 }
 
 /**
+ * Walk a path prefix by prefix and report where it stops resolving.
+ *
+ * "[FilterPanel > CreationDateFilter] has no visible MouseArea" does not say whether the panel was
+ * missing, the filter was missing, or the filter was there but not clickable - three different bugs
+ * with one message, and telling them apart meant opening the failure screenshot by hand. This answers
+ * it in the error itself. Only ever called on a failure path, so it costs nothing on a passing run.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {string[]} path
+ * @param {string[]} [extra]  segments to append and probe as well (e.g. ['MouseArea'], ['TextInput'])
+ * @returns {Promise<string>} one indented line per segment, ready to append to an error message
+ */
+async function describePath(page, path, extra = []) {
+  const segments = [...path, ...extra];
+  const lines = [];
+  const walked = [];
+  for (const segment of segments) {
+    walked.push(segment);
+    // eslint-disable-next-line no-await-in-loop
+    const [total, visible] = await Promise.all([countAny(page, walked), countVisible(page, walked)]);
+    const mark = total === 0 ? 'MISSING' : visible === 0 ? 'present but not visible' : `${visible} visible`;
+    lines.push(`    ${walked.join(' > ')}: ${mark}${total > 0 ? ` (${total} in DOM)` : ''}`);
+    if (total === 0) {
+      // Everything deeper is missing too; only worth saying when there WAS anything deeper.
+      const remaining = segments.length - walked.length;
+      if (remaining > 0) {
+        lines.push(`    -> the remaining ${remaining} segment(s) cannot resolve under a missing parent`);
+      }
+      break;
+    }
+  }
+  return lines.join('\n');
+}
+
+/**
  * Whether `path` becomes visible within `timeout` - a probe, not an assertion.
  *
  * This is how a test asks whether a flow is available to the CURRENT user at all. The running client
@@ -267,6 +302,7 @@ module.exports = {
   popupItemByIndex,
   popupItemLast,
   countVisible,
+  describePath,
   countAny,
   isVisible,
   columnRects,
