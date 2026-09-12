@@ -253,6 +253,26 @@ class Table {
     }
   }
   /**
+   * The visible column header ids, left to right.
+   *
+   * Use this to assert a REORDER instead of comparing one header's x before and after. A pixel
+   * comparison needs its column to be on screen, and the rightmost ones are not always: selecting a row
+   * opens a details panel beside the table, which narrows it enough to push the last column out of
+   * view - so the measurement hung until the test timed out, on a table that was in fact perfectly fine.
+   * Order is what the test actually means, and it survives a narrower table.
+   * @returns {Promise<string[]>}
+   */
+  headerOrder() {
+    return this.page.evaluate(() => {
+      const headers = document.querySelector('[objectName="TableHeaders"]');
+      if (!headers) return [];
+      return Array.from(headers.querySelectorAll('[objectName][visible]'))
+        .map((el) => el.getAttribute('objectName'))
+        .filter((name) => name && name !== 'MouseArea');
+    });
+  }
+
+  /**
    * Sort by a column, addressed by its header field id - this is the page's HeaderIds entry, NOT the
    * visible HeaderNames caption (the two lists are independently ordered per *Page.acc, e.g. Devices/
    * SoftwareProducts's "Name" caption maps to id "licenseName", not "name"). Confirm the real id in
