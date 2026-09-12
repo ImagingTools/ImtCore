@@ -272,11 +272,20 @@ async function fill(page, path, text, opts = {}) {
   await waitForStable(page);
 
   if (verify && text.length > 0) {
-    const value = await readMirroredValue(input);
-    // An empty field after typing non-empty text is the ONE outcome that must never pass: it is what a
-    // read-only field, or a click that missed the input, leaves behind - exactly the silent no-op this
-    // whole action layer exists to prevent.
-    if (value != null && !isMasked(value, text) && !String(value).includes(text)) {
+    // readMirroredValue is deliberately narrow - it reads only what the control MIRRORS back, so a
+    // formatted or masked rendering is never mistaken for the typed text. But it returns null for a
+    // control with neither an <input> nor a `text` attribute, and that is precisely the shape of a
+    // READ-ONLY field: `value != null` then skipped the check, and a fill into a field the user cannot
+    // edit passed silently - the exact no-op this layer exists to prevent. Fall back to the full reader
+    // (which also sees the .impl rendering) rather than letting the unreadable case through.
+    const value = (await readMirroredValue(input)) ?? (await readTextValue(input));
+    if (value == null) {
+      throw new Error(
+        `GUI fill cannot verify [${fmtPath(path)}]: the control exposes no readable value, so whether ` +
+          'the text arrived is unknown'
+      );
+    }
+    if (!isMasked(value, text) && !String(value).includes(text)) {
       const why = value === '' ? ' (field is empty - read-only, or the click missed it)' : '';
       throw new Error(`GUI fill did not take effect at [${fmtPath(path)}]: expected to contain "${text}", got "${value}"${why}`);
     }

@@ -21,25 +21,42 @@
 //   - a 'cold load' block with one landing screenshot, taken on a fresh page (that is the point of it)
 //   - an 'interactions' describe.serial block sharing ONE page for the whole file, since these tests
 //     need a clean filter panel rather than a cold WASM boot; clearAllFilters() resets between them
-// Both skip when the page is not in this user's menu - asked of the client, never of a permission
-// table. Anything a declaration cannot express stays a hand-written spec using the same page objects.
+// Both skip when the user lacks the permission the declaration names (`requires`), checked against the
+// permission list the SERVER granted at login - never against a hand-maintained page/permission table,
+// and never against whether a button happened to render in time.
+// Anything a declaration cannot express stays a hand-written spec using the same page objects.
 
 const { CollectionPage } = require('../pages/CollectionPage');
 
 /**
+ * Skip only on an explicit "no".
+ *
+ * `user.can()` answers from the permissions the server granted at login (see createTest), and returns
+ * undefined when they could not be determined. Spelling this as `!user.can(x)` would turn that undefined
+ * into a skip - the same mistake as the old timeout-based probe, where "not rendered yet" became "not
+ * permitted" and the run went green. Unknown must reach a real attempt and fail there if it is wrong.
+ */
+function denied(user, permission) {
+  return permission ? user.can(permission) === false : false;
+}
+
+/**
  * @param {object} fixtures  the app's fixtures/test.js, plus `defineTest`
+ * @param {(title: string, body: Function) => void} fixtures.defineTest  a one-line shim the SPEC FILE
+ *   declares: `defineTest: (t, b) => fixtures.test(t, b)`. Playwright attributes a test to the file
+ *   whose stack frame called `test()`, and that attribution is what testIgnore / testMatch /
+ *   isolatedSpec match on - register from inside this module and every generated test is filed under
+ *   the kit's own path in node_modules, so a spec could no longer be pinned to a user or excluded from
+ *   a project by filename. (Baselines are keyed by user + name and are unaffected either way.)
  * @param {Function} fixtures.test
  * @param {Function} fixtures.newUserPage
  * @param {object} fixtures.gui
- * @param {(title: string, body: Function) => void} fixtures.defineTest  MUST be an arrow declared in
- *   the spec file itself: Playwright takes a test's file and line from the stack frame that called
- *   `test()`, so registering from inside this module would file every declared test - and therefore
- *   every baseline, via snapshotPathTemplate's {testFilePath} - under the kit's own path in
- *   node_modules. Verified live.
  * @param {object} declaration
  * @param {string} declaration.title       describe() title
  * @param {string} declaration.pageId      MenuPanel PageId
  * @param {string} declaration.prefix      screenshot name prefix ("orders" -> "orders-landing")
+ * @param {string} [declaration.requires]  permission this page needs; the spec skips for a user the
+ *   server did not grant it. Omit only for a page open to everyone.
  * @param {Object<string,string>} [declaration.filters]     filter key -> objectName
  * @param {string[]} [declaration.maskColumns]              non-deterministic columns to mask
  * @param {(page) => CollectionPage} [declaration.createPage]  for a page that needs its own subclass
@@ -47,7 +64,7 @@ const { CollectionPage } = require('../pages/CollectionPage');
  */
 function defineCollectionSpec(fixtures, declaration) {
   const { test, newUserPage, gui, defineTest } = fixtures;
-  const { title, pageId, prefix, filters, maskColumns, createPage, scenarios = [] } = declaration;
+  const { title, pageId, prefix, requires, filters, maskColumns, createPage, scenarios = [] } = declaration;
 
   if (!title || !pageId || !prefix) {
     throw new Error('defineCollectionSpec: `title`, `pageId` and `prefix` are required');
@@ -55,7 +72,7 @@ function defineCollectionSpec(fixtures, declaration) {
   if (typeof defineTest !== 'function') {
     throw new Error(
       'defineCollectionSpec: `defineTest` is required and must be declared in the spec file itself - ' +
-        'see its doc comment (it decides which file Playwright files the tests, and the baselines, under)'
+        'see its doc comment (it decides which file Playwright attributes the generated tests to)'
     );
   }
   const names = new Set();
@@ -69,32 +86,36 @@ function defineCollectionSpec(fixtures, declaration) {
   }
 
   const build = createPage || ((page) => new CollectionPage(page, pageId, { filters, maskColumns }));
-  const unavailable = `${pageId} is not available to this user`;
+  const unavailable = requires ? `needs ${requires}` : `${pageId} is not available to this user`;
 
   test.describe(title, () => {
     // Its own describe so the fresh-page reload does NOT also fire for the shared-page block below:
     // an outer beforeEach runs for nested describes too, booting a whole app instance per nested test
     // that nothing then uses.
     test.describe('cold load', () => {
-      defineTest('landing', async ({ page }) => {
+      defineTest('landing', async ({ page, user }) => {
+        test.skip(denied(user, requires), unavailable);
         const collection = build(page);
         await collection.reload();
-        test.skip(!(await collection.isAvailable()), unavailable);
+        // No probe: the permission check above already decided this. If the user holds it and the app
+        // still does not render the page, open() fails loudly rather than the test quietly skipping.
         await collection.open();
+        await collection.expectOpen();
         await gui.checkScreenshot(page, `${prefix}-landing`, await collection.masks());
       });
     });
 
     test.describe.serial('interactions', () => {
-      let page, collection, available;
+      let page, specUser, collection, skip;
 
       test.beforeAll(async ({ browser }, testInfo) => {
-        ({ page } = await newUserPage(browser, testInfo));
+        ({ page, user: specUser } = await newUserPage(browser, testInfo));
+        skip = denied(specUser, requires);
+        if (skip) return;
         collection = build(page);
         // newUserPage() only opens a blank page - nothing has navigated to the app yet.
         await collection.reload();
-        available = await collection.isAvailable();
-        if (available) await collection.open();
+        await collection.open();
       });
 
       test.afterAll(async () => {
@@ -102,7 +123,7 @@ function defineCollectionSpec(fixtures, declaration) {
       });
 
       test.beforeEach(async () => {
-        test.skip(!available, unavailable);
+        test.skip(skip, unavailable);
         // Collection view state (filters, sorting) is server-persisted per user session, so a prior
         // test's filter would otherwise leak into this one's screenshot.
         await collection.clearAllFilters();
@@ -110,7 +131,7 @@ function defineCollectionSpec(fixtures, declaration) {
 
       for (const scenario of scenarios) {
         defineTest(scenario.title || scenario.name, async () => {
-          await runScenario({ test, gui, page, collection, prefix, scenario });
+          await runScenario({ test, gui, page, user: specUser, collection, prefix, scenario });
         });
       }
     });
@@ -149,10 +170,12 @@ function collectionScreenshotNames({ prefix, scenarios = [] }) {
 function collectionScreenshotNamesFromSource(source) {
   const call = 'defineCollectionSpec(';
   const names = [];
+  let calls = 0;
   let from = 0;
   for (;;) {
     const start = source.indexOf(call, from);
     if (start === -1) break;
+    calls++;
     from = start + call.length;
     // The call takes two object arguments; the first is the fixtures bundle. Take the first one that
     // evaluates to a declaration - the fixtures object references identifiers that do not exist here,
@@ -178,6 +201,17 @@ function collectionScreenshotNamesFromSource(source) {
       }
     }
   }
+  // "No declaration here" and "there IS one but it could not be read" are different answers, and only
+  // the first is safe to act on. A declaration that references a module-level constant does not evaluate
+  // in this empty scope; returning null for it would tell a pruning caller the file declares nothing,
+  // and every real baseline it owns would look like an orphan.
+  if (calls > 0 && names.length === 0) {
+    throw new Error(
+      'collectionScreenshotNamesFromSource: found defineCollectionSpec() but could not evaluate its ' +
+        'declaration (a value referencing an identifier outside the literal?) - refusing to report ' +
+        '"no screenshots", which a caller would read as "these baselines are orphans"'
+    );
+  }
   return names.length ? names : null;
 }
 
@@ -199,21 +233,22 @@ function matchingBrace(source, open) {
  *   { dateFilter: key, preset: 'Year_Last' }     pick a date-range preset
  *   { clearAll: true, apply: [...] }             apply the listed filters, then clear them all
  *   { sort: 'headerId' }                         sort, screenshot, sort again, screenshot ("-1"/"-2")
- *   { pagination: { size, page, restore } }      page size + navigation
+ *   { pagination: { size, page } }               page size + navigation (state restored afterwards
+ *                                                unless `restore: false`)
  *   { command: 'Remove' }                        select row 0, run the command, screenshot, dismiss
  *
  * `optional: true` on a filter scenario skips when the option is not offered to this user - a
  * data-driven filter (customers an org cannot see) legitimately has nothing to pick.
  */
-async function runScenario({ test, gui, page, collection, prefix, scenario }) {
+async function runScenario({ test, gui, page, user, collection, prefix, scenario }) {
   const [firstName, secondName] = scenarioScreenshotNames(prefix, scenario);
   const masks = () => collection.masks();
 
   if (scenario.command) {
-    test.skip(
-      !(await collection.commands.isAvailable(scenario.command)),
-      `${scenario.command} is not available to this user`
-    );
+    // Gated on the permission the scenario DECLARES, checked against what the server granted at login -
+    // not on whether the button happened to have rendered yet. The old probe returned false on timeout,
+    // so a slow command bar skipped the test and the run stayed green.
+    test.skip(denied(user, scenario.requires), `${scenario.command} needs ${scenario.requires}`);
     test.skip(!(await collection.table.hasRows()), 'this collection is empty for this user');
     await collection.selectRow(0);
     await collection.runCommand(scenario.command);
@@ -232,7 +267,10 @@ async function runScenario({ test, gui, page, collection, prefix, scenario }) {
   }
 
   if (scenario.pagination) {
-    const { size = 50, page: pageNumber = 2, restore = false } = scenario.pagination;
+    // Restore by DEFAULT: neither the page size nor the current page survives clearAllFilters(), so
+    // leaving them set silently changes what every later test in this serial block is looking at. Opt
+    // out only for a scenario that is deliberately the last one and wants the state left as it is.
+    const { size = 50, page: pageNumber = 2, restore = true } = scenario.pagination;
     await collection.pagination.setPageSize(size);
     await gui.checkScreenshot(page, firstName, await masks());
     // A collection that fits on one page legitimately has no page-2 button.

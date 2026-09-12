@@ -9,6 +9,7 @@
 //
 // Subclass only to add genuinely page-specific flows (a Bind dialog, a license-file command).
 
+const gui = require('../lib/gui');
 const { BasePage } = require('./BasePage');
 const { FilterPanel, Table, Pagination } = require('../controls');
 
@@ -34,6 +35,16 @@ class CollectionPage extends BasePage {
   /** The declared filter's objectName; an undeclared key is taken to be an objectName already. */
   filterId(key) {
     return this.filterIds[key] || key;
+  }
+
+  /**
+   * Assert this collection is actually the thing on screen. Cheap, and it closes a whole failure class:
+   * navigation that quietly did not happen leaves the PREVIOUS page up, and a screenshot taken then is
+   * committed as this page's baseline - which is how a Support landing baseline came to be byte-identical
+   * to the Workspace one. Every collection view has a table, and no non-collection page does.
+   */
+  expectOpen() {
+    return gui.expectVisible(this.page, ['Table'], `${this.pageId}: expected a collection table on screen`);
   }
 
   /** Screenshot masks for this collection's non-deterministic columns (see `maskColumns`). */

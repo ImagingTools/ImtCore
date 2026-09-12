@@ -18,21 +18,22 @@ const { waitForStable } = require('./stability');
 async function checkScreenshot(page, name, mask) {
   const masks = mask ? (Array.isArray(mask) ? mask : [mask]) : [];
   const handles = [];
-  for (const m of masks) handles.push(await addMask(page, m));
-
-  await waitForStable(page);
-  // playwright.config.js's snapshotPathTemplate derives {ext} from this argument's own extension, so
-  // toHaveScreenshot needs it spelled out here - a bare name like "devices-landing" makes Playwright
-  // reject the call with "Screenshot name ... must have '.png' extension" before it ever compares pixels.
-  // maxDiffPixelRatio: 0 (zero tolerance) made every run flaky: a WASM-rendered canvas has a few
-  // hundred pixels of unavoidable non-determinism per full-page shot (focus ring, sub-pixel text,
-  // caret), which failed genuinely-correct screens. Allow a small absolute budget instead - large
-  // enough to swallow that noise, far too small to hide a real UI change.
+  // Inside the try from the first mask onwards: addMask can throw partway through the loop (a target
+  // that never resolves), and the masks already injected would then stay in the DOM, black-barring
+  // every later screenshot in the same shared-page block.
   try {
+    for (const m of masks) handles.push(await addMask(page, m));
+
+    await waitForStable(page);
+    // snapshotPathTemplate derives {ext} from this argument's own extension, so toHaveScreenshot needs
+    // it spelled out here - a bare name is rejected before any pixels are compared.
+    // maxDiffPixelRatio: 0 made every run flaky: a WASM-rendered canvas has a few hundred pixels of
+    // unavoidable non-determinism per full-page shot (focus ring, sub-pixel text, caret). A small
+    // absolute budget swallows that noise and is far too small to hide a real UI change.
     await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true, threshold: 0.05, maxDiffPixels: 600 });
   } finally {
-    // Masks are injected DOM nodes, so they outlive a failed assertion and would sit over every later
-    // screenshot in the same test - turning one real failure into a run of unrelated-looking ones.
+    // Masks are injected DOM nodes, so they outlive a failure and would sit over every later screenshot
+    // in the same shared page - turning one real failure into a run of unrelated-looking ones.
     for (const h of handles) await removeMask(page, h).catch(() => {});
   }
 }

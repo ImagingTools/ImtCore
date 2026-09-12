@@ -73,7 +73,7 @@ function isTrackedRequest(req) {
 function trackNetwork(page) {
   let state = networkStateByPage.get(page);
   if (state) return state;
-  state = { pending: 0, waiters: [] };
+  state = { pending: 0, inFlight: new Set(), waiters: [] };
   const settle = () => {
     if (state.pending === 0 && state.waiters.length) {
       const waiters = state.waiters;
@@ -81,12 +81,19 @@ function trackNetwork(page) {
       waiters.forEach((resolve) => resolve());
     }
   };
+  // Track the request OBJECTS, not just a count. A bare counter also decremented for requests that
+  // started before these listeners attached - they were never counted up, so each one cancelled out a
+  // genuinely in-flight request and `pending` could reach 0 while something was still running, letting
+  // waitForStable return mid-update.
   page.on('request', (req) => {
-    if (isTrackedRequest(req)) state.pending++;
+    if (isTrackedRequest(req)) {
+      state.inFlight.add(req);
+      state.pending = state.inFlight.size;
+    }
   });
   const onDone = (req) => {
-    if (isTrackedRequest(req)) {
-      state.pending = Math.max(0, state.pending - 1);
+    if (state.inFlight.delete(req)) {
+      state.pending = state.inFlight.size;
       settle();
     }
   };

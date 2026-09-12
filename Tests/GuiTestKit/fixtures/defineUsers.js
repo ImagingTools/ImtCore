@@ -38,8 +38,9 @@
  * @param {string} [opts.allUsersEnv]        Env var that switches on the full matrix ('1'/'true').
  * @param {TestUser} [opts.guest]            Override the unauthenticated pseudo-user.
  * @param {(key: string) => string} [opts.authFile]
+ * @param {string} [opts.suKey]  the bootstrap superuser global-setup logs in even without `seed` (default "su")
  */
-function defineUsers({ users, defaultUserKeys, allUsersEnv, guest, authFile }) {
+function defineUsers({ users, defaultUserKeys, allUsersEnv, guest, authFile, suKey = 'su' }) {
   const GUEST = guest || { key: 'guest', title: 'Guest', login: null, password: null, seed: false, permissions: [] };
 
   // Fail loudly here, at config-load time, rather than somewhere far away at run time: a duplicate key
@@ -61,6 +62,17 @@ function defineUsers({ users, defaultUserKeys, allUsersEnv, guest, authFile }) {
   for (const key of defaultUserKeys || []) {
     if (!seen.has(key)) {
       throw new Error(`defineUsers: defaultUserKeys names unknown user "${key}" (known: ${[...seen].join(', ')})`);
+    }
+  }
+  // global-setup logs in su plus every SEEDED user, and nobody else. A user without `seed` still gets a
+  // project pointed at a storageState path, so that project's every test dies at context creation with
+  // an unhelpful ENOENT. Say it here instead, where the mistake is.
+  for (const user of users) {
+    if (!user.seed && user.key !== suKey) {
+      throw new Error(
+        `defineUsers: user "${user.key}" has no \`seed: true\`, so global-setup never logs it in and its ` +
+          'storageState is never written - every test in its project would fail at context creation'
+      );
     }
   }
 

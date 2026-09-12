@@ -44,19 +44,27 @@ function createGuiConfig({
 }) {
   if (!rootDir) throw new Error('createGuiConfig: `rootDir` is required (pass __dirname)');
   if (!baseUrl) throw new Error('createGuiConfig: `baseUrl` is required');
-  if (!users || typeof users.activeUsers !== 'function') {
+  if (!users || typeof users.activeUsers !== 'function' || !Array.isArray(users.USERS)) {
     throw new Error('createGuiConfig: `users` must be a users module (see fixtures/defineUsers)');
   }
 
   // A stale or misspelled key matches nobody, every project then gets the grepInvert, and the entire
-  // mutating phase vanishes into a green run with nothing to show it went missing. buildProjects cannot
-  // catch this (it only sees the ACTIVE subset); here the full list is known.
+  // mutating phase vanishes into a green run with nothing to show it went missing.
   if (mutatingUserKeys) {
     const known = new Set(users.USERS.map((u) => u.key));
     for (const key of mutatingUserKeys) {
       if (!known.has(key)) {
         throw new Error(`createGuiConfig: mutatingUserKeys names unknown user "${key}" (known: ${[...known].join(', ')})`);
       }
+    }
+    // Knowing the key is a real user is not enough: if none of them is ACTIVE this run, every active
+    // project still gets the grepInvert and the phase still disappears - the very outcome this guards.
+    const active = new Set(users.activeUsers().map((u) => u.key));
+    if (!mutatingUserKeys.some((key) => active.has(key))) {
+      throw new Error(
+        `createGuiConfig: none of mutatingUserKeys [${mutatingUserKeys.join(', ')}] is active this run ` +
+          `(active: ${[...active].join(', ')}), so no project would run @mutating tests at all`
+      );
     }
   }
 
@@ -86,8 +94,12 @@ function createGuiConfig({
     // outputDir at the start of every invocation - without per-phase paths the second phase silently
     // wipes the first's screenshots/diffs/traces before anyone can look at them.
     outputDir: process.env.PLAYWRIGHT_OUTPUT_DIR || 'test-results',
-    // Per-user baselines: __screenshots__/<userKey>/<specPath>/<name>-<platform>.png
-    snapshotPathTemplate: '{testDir}/__screenshots__/{projectName}/{testFilePath}/{arg}-{platform}{ext}',
+    // No {testFilePath}: the baseline is keyed by user + screenshot name, so it no longer matters which
+    // FILE registered the test. That is what let the spec generators drop the `defineTest` shim every
+    // spec had to repeat purely so Playwright would file generated tests under the right path.
+    // Screenshot names are therefore global: two specs using one name would share a baseline, which
+    // prune-orphan-baselines.js reports.
+    snapshotPathTemplate: '{testDir}/__screenshots__/{projectName}/{arg}-{platform}{ext}',
     use: {
       headless: true,
       viewport: { width: 1920, height: 1080 },
