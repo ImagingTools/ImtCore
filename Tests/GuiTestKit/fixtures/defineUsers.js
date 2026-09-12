@@ -64,6 +64,19 @@ function defineUsers({ users, defaultUserKeys, allUsersEnv, guest, authFile, suK
       throw new Error(`defineUsers: defaultUserKeys names unknown user "${key}" (known: ${[...seen].join(', ')})`);
     }
   }
+  // The superuser holds no permissions in the server's own list - it bypasses the checks entirely - so
+  // its granted set comes back EMPTY, indistinguishable from a user granted nothing. `permissions: ['*']`
+  // is the only thing that tells the two apart, and without it `requires()` would skip the superuser out
+  // of every permission-gated test in the suite, silently and green. Not optional, therefore.
+  const su = users.find((u) => u.key === suKey);
+  if (su && !(Array.isArray(su.permissions) && su.permissions.includes('*'))) {
+    throw new Error(
+      `defineUsers: the superuser "${suKey}" must declare permissions: ['*']. The server sends it an ` +
+        'empty permission list (it bypasses the checks), so without that marker every permission-gated ' +
+        'test would skip for it instead of running.'
+    );
+  }
+
   // global-setup logs in su plus every SEEDED user, and nobody else. A user without `seed` still gets a
   // project pointed at a storageState path, so that project's every test dies at context creation with
   // an unhelpful ENOENT. Say it here instead, where the mistake is.
