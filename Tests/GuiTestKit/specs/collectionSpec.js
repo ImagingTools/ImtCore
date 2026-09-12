@@ -65,7 +65,8 @@ function denied(user, permission) {
  * @param {object[]} [declaration.scenarios]  one test (and one screenshot) each - see runScenario
  * @param {(ctx: object) => void} [declaration.extra]  hand-written tests for this page's own flows,
  *   registered inside the SAME shared-page block so they cost no extra app boot. Called with
- *   { test, gui, page, collection, user } where page/collection/user are getters resolved at test time
+ *   { test, requires, gui, page, collection, user }, where page/collection/user are getters resolved at
+ *   test time
  *   (they are assigned in beforeAll). Use it for what a declaration genuinely cannot express - a bind
  *   dialog, a column-configuration flow - not to avoid declaring a standard scenario.
  */
@@ -146,6 +147,12 @@ function defineCollectionSpec(fixtures, declaration) {
         extra({
           test: defineTest,
           gui,
+          // Same spelling as fixtures' own requires(), bound to this block's user - so a flow written
+          // here states the permission it needs in one line, exactly like a declared scenario does in
+          // its `requires`, and nobody has to remember why it is `=== false` rather than `!`.
+          requires(permission) {
+            test.skip(specUser.can(permission) === false, `${specUser.key} was not granted ${permission}`);
+          },
           // Getters: these are only assigned once beforeAll has run, so a plain value captured here
           // would be undefined for every test in the block.
           get page() {

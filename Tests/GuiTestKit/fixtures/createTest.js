@@ -197,7 +197,27 @@ function createGuiTest(users, { rootDir }) {
     }
   }
 
-  return { test, expect, gui, newUserPage, forEachUser };
+  /**
+   * Skip this test unless the server granted the user this permission. Call it as the first line of a
+   * test body:
+   *
+   *   test('bind dialog', async ({ user }) => {
+   *     requires(user, 'BindSensor');
+   *     ...
+   *   });
+   *
+   * The whole point is that there is one spelling and it cannot be got wrong. Written by hand it is
+   * `user.can(x) === false`, never `!user.can(x)`: can() returns undefined when the permissions could
+   * not be read, and the `!` form turns that into a skip - which is how "not permitted" and "could not
+   * tell" became the same answer and a run went green without testing anything.
+   * @param {{can: Function, key: string}} user
+   * @param {string} permission
+   */
+  function requires(user, permission) {
+    test.skip(user.can(permission) === false, `${user.key} was not granted ${permission}`);
+  }
+
+  return { test, expect, gui, newUserPage, forEachUser, requires };
 }
 
 module.exports = { createGuiTest };
