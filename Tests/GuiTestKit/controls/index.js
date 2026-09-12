@@ -342,14 +342,27 @@ class Dialog {
  * The "Table configuration" dialog (imtcontrols/Views/TableHeaderParamComp.qml), opened by
  * right-clicking any sortable column header (CollectionViewBase.qml's headerRightClickEnabled).
  * Lets a user toggle column visibility (checkbox per row) and reorder columns (Up/Down), or reset
- * to defaults. Its column list is itself a Table, so rows are addressed the same way
- * ("TableRow_<i>") - scoped to `['Dialog']` since this dialog sits over the collection page's OWN
- * table, which numbers its rows starting from 0 too (see Table's class comment).
+ * to defaults. Its column list used to be a Table, whose rows the bridge named "TableRow_<i>"; it is
+ * now a ListView whose delegate carries its own "ColumnRow_<i>" (added for these tests - a plain
+ * delegate has no name of its own). Addressing by that name also retires the old ambiguity with the
+ * collection's own table behind the dialog, which numbers its rows from 0 as well.
  */
 class TableConfigDialog {
   constructor(page) {
     this.page = page;
-    this.columns = new Table(page, ['Dialog']);
+  }
+  /**
+   * How many columns the dialog lists. Throws on zero rather than returning it: every caller derives an
+   * index from this ("the last row" is `rowCount() - 1`), so a zero silently becomes -1 and the failure
+   * surfaces far away as a missing "ColumnRow_-1". Zero here means the list did not render, which is
+   * worth saying where it happens.
+   */
+  async rowCount() {
+    const count = await this.page.locator('[objectName^="ColumnRow_"]').count();
+    if (count === 0) {
+      throw new Error('GUI table-configuration dialog lists no columns - it did not render, or its rows are not named');
+    }
+    return count;
   }
   /** Right-click a column header (by its header/field id) to open this dialog. */
   async openViaHeader(headerId) {
@@ -363,15 +376,13 @@ class TableConfigDialog {
   }
   /** Toggle a column's visibility checkbox by its zero-based row position in the column list. */
   toggleColumn(rowIndex) {
-    return this.columns.toggleRowCheck(rowIndex);
+    return gui.click(this.page, [`ColumnRow_${rowIndex}`, 'ColumnCheckBox'], {
+      what: `column ${rowIndex} visibility checkbox`,
+    });
   }
   /** Select a column's row (needed before moveUp()/moveDown(), which act on the current selection). */
   selectColumn(rowIndex) {
-    return this.columns.selectRow(rowIndex);
-  }
-  /** Number of columns listed in the dialog (one row per table column, in current order). */
-  rowCount() {
-    return this.columns.rowCount();
+    return gui.click(this.page, [`ColumnRow_${rowIndex}`], { what: `column row ${rowIndex}` });
   }
   moveUp() {
     return gui.clickButton(this.page, ['MoveColumnUpButton']);
