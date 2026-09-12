@@ -50,21 +50,34 @@ async function requireVisible(page, path, opts = {}) {
  * @param {string[]} path
  */
 async function click(page, path, opts = {}) {
-  await requireVisible(page, path, opts);
+  const self = await requireVisible(page, path, opts);
   const mouse = dom.mouseAreaOf(page, path);
+  let target = mouse;
   try {
     await mouse.waitFor({ state: 'visible', timeout: opts.timeout || DEFAULT_TIMEOUT });
   } catch (_) {
-    const timeout = opts.timeout || DEFAULT_TIMEOUT;
-    throw new Error(
-      [
-        `GUI click target has no visible MouseArea: [${fmtPath(path)}] after ${timeout}ms`,
-        await dom.describePath(page, path, ['MouseArea']),
-      ].join('\n')
-    );
+    // An imtcontrols Button wraps its clickable surface in an inner [objectName="MouseArea"], and that
+    // convention is what this addresses. Some controls ARE the surface instead, with no such child - a
+    // bare QML MouseArea carrying the objectName itself. The filter chips became one of those when
+    // ImtCore 9230d4c847 (2026-08-03) reworked FilterDelegateBase's two Buttons into bare MouseAreas,
+    // which silently put every filter click in this suite out of reach.
+    //
+    // So: NO MouseArea child at all means the element itself is the thing to click. One that exists but
+    // never became visible is still a failure - that is a control which should have been clickable and
+    // was not, and collapsing the two would hide it.
+    if ((await dom.countAny(page, [...path, 'MouseArea'])) > 0) {
+      const timeout = opts.timeout || DEFAULT_TIMEOUT;
+      throw new Error(
+        [
+          `GUI click target has a MouseArea that never became visible: [${fmtPath(path)}] after ${timeout}ms`,
+          await dom.describePath(page, path, ['MouseArea']),
+        ].join('\n')
+      );
+    }
+    target = self;
   }
-  await mouse.scrollIntoViewIfNeeded();
-  const box = await mouse.boundingBox();
+  await target.scrollIntoViewIfNeeded();
+  const box = await target.boundingBox();
   if (!box) throw new Error(`GUI click target has no bounding box: [${fmtPath(path)}]`);
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
   await waitForStable(page);
