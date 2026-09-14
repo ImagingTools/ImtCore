@@ -41,8 +41,20 @@ the behavior is identical to previous releases (no policy enforcement).
 | `MaxPasswordAge` | Integer | 0 | Maximum password age in days before the password expires (0 = disabled). |
 | `ExpirationWarningPeriod` | Integer | 14 | Number of days before expiration during which the user is prompted to change the password (0 = disabled). |
 
-All lifetime restrictions are disabled by default (value 0), so existing deployments
-are unaffected unless the policy is explicitly configured.
+These defaults live in `imtauth::PasswordPolicyDefaults` and are used both in `I_ASSIGN` and
+wherever an unset attribute is read. ACF applies an `I_ASSIGN` default only to **obligatory**
+attributes, so for these optional ones the component itself has to supply the value — a
+fallback that disagrees with the declared default silently changes the policy.
+
+Lifetime restrictions (`MinPasswordAge`, `MaxPasswordAge`) are disabled by default (value 0),
+so no existing password expires because the policy component was added.
+
+Strength and reuse checks, however, are **active as soon as the component is wired**, with their
+defaults: a password shorter than 8 characters, a password equal to the login, and reuse of one of
+the last 5 passwords are rejected. Existing accounts keep working and are never locked out by this,
+but their owners may be unable to set a password that was acceptable before. Set
+`MinPasswordLength` and `PasswordHistoryDepth` explicitly if a deployment needs the previous
+behavior.
 
 ## Behavior
 
@@ -70,11 +82,42 @@ are unaffected unless the policy is explicitly configured.
   payload carries `passwordExpiresInDays` so clients can prompt the user to change the
   password before it expires.
 
+### Policy publication (`GetPasswordPolicy` query)
+
+`GetPasswordPolicy` returns the configured strength rules (`minLength`, `maxLength`,
+`requireLowercase`, `requireUppercase`, `requireDigit`, `requireSpecialChar`,
+`rejectLoginAsPassword`, `blocklistUsed`) and `historyDepth`. It carries no secrets and is
+reachable without authentication, because the superuser-creation and password-recovery flows
+need it before a session exists.
+
+Clients use it to check a password candidate **before** sending it, so a rejection does not
+require a round trip, and to render the concrete requirements next to the input. The check is
+a convenience only — the server-side check stays authoritative, and the blocklist is never
+published (it is only evaluated on the server).
+
+On the client the policy follows the same contract/transport split as `PermissionsProvider`:
+`imtauthgui/PasswordPolicyController.qml` is the transport-free contract (rules, the mirrored
+rule evaluation and the texts derived from a `violatedRules` list), and
+`imtguigql/GqlBasedPasswordPolicyProvider.qml` derives from it and overrides `load()` with the
+actual `GetPasswordPolicy` request, so `imtauthgui` stays free of GQL.
+
+An instance is injected into the views: `GqlBasedProfileApiClient` and
+`GqlBasedUserAdministrationApiClient` expose it as `passwordPolicy`, while the two pre-login
+screens (`SuperuserPasswordPage`, `PasswordRecoveryDialog`) create their own. A view without
+an injected policy keeps working — only the extra checks are skipped.
+
 ### User data model
 
 `imtauth::CUserInfo` stores the password history, the UTC timestamp of the last password
 change and the "must change password" flag. Serialization is guarded by the archive version,
 so previously persisted user collections load unchanged (empty history, unknown change time).
+
+The version gate in `CUserInfo::Serialize` (`imtCoreVersion >= 23244`) must be **at or above
+the ImtCore version number the change is released with**. The number is
+`git rev-list --count origin/main + 10000` (see `Build/Git/UpdateVersion.sh`). A gate below
+the released version makes archives written by earlier builds — which do not contain the
+fields — be read as if they did. Re-check the value before merging if `main` advanced in the
+meantime.
 
 Users without a stored password change timestamp (created before this feature) are **not**
 locked out: expiration is enforced starting from their next password change.
@@ -102,4 +145,5 @@ so integrators can tune them per deployment and per target security level.
 
 `Tests/PasswordPolicyTest` covers the strength acceptance/rejection matrix, history reuse
 across generations, history trimming, minimum-age rejection, maximum-age expiry, the warning
-window and the extended `CUserInfo` data model (copy/clone/equality/reset).
+window, the extended `CUserInfo` data model (copy/clone/equality/reset) and the serialization
+round trip for both a current archive and a pre-feature one.

@@ -15,17 +15,34 @@ namespace imtauth
 
 // reimplemented (imtauth::IPasswordPolicy)
 
+IPasswordPolicy::StrengthRules CPasswordPolicyControllerComp::GetStrengthRules() const
+{
+	StrengthRules retVal;
+
+	retVal.minLength = m_minPasswordLengthAttrPtr.IsValid() ? *m_minPasswordLengthAttrPtr : PasswordPolicyDefaults::MIN_PASSWORD_LENGTH;
+	retVal.maxLength = m_maxPasswordLengthAttrPtr.IsValid() ? *m_maxPasswordLengthAttrPtr : PasswordPolicyDefaults::MAX_PASSWORD_LENGTH;
+	retVal.requireLowercase = m_requireLowercaseAttrPtr.IsValid() ? *m_requireLowercaseAttrPtr : PasswordPolicyDefaults::REQUIRE_LOWERCASE;
+	retVal.requireUppercase = m_requireUppercaseAttrPtr.IsValid() ? *m_requireUppercaseAttrPtr : PasswordPolicyDefaults::REQUIRE_UPPERCASE;
+	retVal.requireDigit = m_requireDigitAttrPtr.IsValid() ? *m_requireDigitAttrPtr : PasswordPolicyDefaults::REQUIRE_DIGIT;
+	retVal.requireSpecialChar = m_requireSpecialCharAttrPtr.IsValid() ? *m_requireSpecialCharAttrPtr : PasswordPolicyDefaults::REQUIRE_SPECIAL_CHAR;
+	retVal.rejectLoginAsPassword = m_rejectLoginAsPasswordAttrPtr.IsValid() ? *m_rejectLoginAsPasswordAttrPtr : PasswordPolicyDefaults::REJECT_LOGIN_AS_PASSWORD;
+	retVal.blocklistUsed = !m_blockedPasswords.isEmpty();
+
+	return retVal;
+}
+
+
 bool CPasswordPolicyControllerComp::ValidatePasswordStrength(const QByteArray& login, const QString& password, QStringList& violatedRuleIds) const
 {
 	violatedRuleIds.clear();
 
-	int minLength = m_minPasswordLengthAttrPtr.IsValid() ? *m_minPasswordLengthAttrPtr : 8;
-	if (password.length() < minLength){
+	StrengthRules rules = GetStrengthRules();
+
+	if (password.length() < rules.minLength){
 		violatedRuleIds << QStringLiteral("MinLength");
 	}
 
-	int maxLength = m_maxPasswordLengthAttrPtr.IsValid() ? *m_maxPasswordLengthAttrPtr : 128;
-	if (maxLength > 0 && password.length() > maxLength){
+	if (rules.maxLength > 0 && password.length() > rules.maxLength){
 		violatedRuleIds << QStringLiteral("MaxLength");
 	}
 
@@ -43,29 +60,28 @@ bool CPasswordPolicyControllerComp::ValidatePasswordStrength(const QByteArray& l
 		else if (character.isDigit()){
 			hasDigit = true;
 		}
-		else{
+		else if (!character.isSpace()){
 			hasSpecialChar = true;
 		}
 	}
 
-	if (m_requireLowercaseAttrPtr.IsValid() && *m_requireLowercaseAttrPtr && !hasLowercase){
+	if (rules.requireLowercase && !hasLowercase){
 		violatedRuleIds << QStringLiteral("LowercaseRequired");
 	}
 
-	if (m_requireUppercaseAttrPtr.IsValid() && *m_requireUppercaseAttrPtr && !hasUppercase){
+	if (rules.requireUppercase && !hasUppercase){
 		violatedRuleIds << QStringLiteral("UppercaseRequired");
 	}
 
-	if (m_requireDigitAttrPtr.IsValid() && *m_requireDigitAttrPtr && !hasDigit){
+	if (rules.requireDigit && !hasDigit){
 		violatedRuleIds << QStringLiteral("DigitRequired");
 	}
 
-	if (m_requireSpecialCharAttrPtr.IsValid() && *m_requireSpecialCharAttrPtr && !hasSpecialChar){
+	if (rules.requireSpecialChar && !hasSpecialChar){
 		violatedRuleIds << QStringLiteral("SpecialCharRequired");
 	}
 
-	bool rejectLoginAsPassword = !m_rejectLoginAsPasswordAttrPtr.IsValid() || *m_rejectLoginAsPasswordAttrPtr;
-	if (rejectLoginAsPassword && !login.isEmpty() && password.compare(QString(login), Qt::CaseInsensitive) == 0){
+	if (rules.rejectLoginAsPassword && !login.isEmpty() && password.compare(QString(login), Qt::CaseInsensitive) == 0){
 		violatedRuleIds << QStringLiteral("LoginAsPassword");
 	}
 
@@ -101,7 +117,7 @@ bool CPasswordPolicyControllerComp::IsPasswordReused(const IUserInfo& userInfo, 
 
 bool CPasswordPolicyControllerComp::IsPasswordChangeAllowed(const IUserInfo& userInfo) const
 {
-	int minPasswordAge = m_minPasswordAgeAttrPtr.IsValid() ? *m_minPasswordAgeAttrPtr : 0;
+	int minPasswordAge = m_minPasswordAgeAttrPtr.IsValid() ? *m_minPasswordAgeAttrPtr : PasswordPolicyDefaults::MIN_PASSWORD_AGE;
 	if (minPasswordAge <= 0){
 		return true;
 	}
@@ -127,7 +143,7 @@ IPasswordPolicy::LifetimeStatus CPasswordPolicyControllerComp::GetPasswordLifeti
 		return LS_CHANGE_REQUIRED;
 	}
 
-	int maxPasswordAge = m_maxPasswordAgeAttrPtr.IsValid() ? *m_maxPasswordAgeAttrPtr : 0;
+	int maxPasswordAge = m_maxPasswordAgeAttrPtr.IsValid() ? *m_maxPasswordAgeAttrPtr : PasswordPolicyDefaults::MAX_PASSWORD_AGE;
 	if (maxPasswordAge <= 0){
 		return LS_OK;
 	}
@@ -147,7 +163,7 @@ IPasswordPolicy::LifetimeStatus CPasswordPolicyControllerComp::GetPasswordLifeti
 
 	daysUntilExpiration = static_cast<int>(currentTime.daysTo(expirationTime));
 
-	int warningPeriod = m_expirationWarningPeriodAttrPtr.IsValid() ? *m_expirationWarningPeriodAttrPtr : 0;
+	int warningPeriod = m_expirationWarningPeriodAttrPtr.IsValid() ? *m_expirationWarningPeriodAttrPtr : PasswordPolicyDefaults::EXPIRATION_WARNING_PERIOD;
 	if (warningPeriod > 0 && daysUntilExpiration <= warningPeriod){
 		return LS_EXPIRES_SOON;
 	}
@@ -158,7 +174,7 @@ IPasswordPolicy::LifetimeStatus CPasswordPolicyControllerComp::GetPasswordLifeti
 
 int CPasswordPolicyControllerComp::GetPasswordHistoryDepth() const
 {
-	return m_passwordHistoryDepthAttrPtr.IsValid() ? *m_passwordHistoryDepthAttrPtr : 0;
+	return m_passwordHistoryDepthAttrPtr.IsValid() ? *m_passwordHistoryDepthAttrPtr : PasswordPolicyDefaults::PASSWORD_HISTORY_DEPTH;
 }
 
 

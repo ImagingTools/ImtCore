@@ -53,6 +53,28 @@ public:
 	};
 
 	/**
+		Configured password strength rules, as they have to be applied to a password candidate.
+	*/
+	struct StrengthRules
+	{
+		int minLength = 0;
+		int maxLength = 0; // 0 = unlimited
+		bool requireLowercase = false;
+		bool requireUppercase = false;
+		bool requireDigit = false;
+		bool requireSpecialChar = false;
+		bool rejectLoginAsPassword = false;
+		bool blocklistUsed = false;
+	};
+
+	/**
+		Get the configured password strength rules.
+		Intended to be published to clients, so that a password candidate can be
+		checked before it is sent to the server. The server-side check stays authoritative.
+	*/
+	virtual StrengthRules GetStrengthRules() const = 0;
+
+	/**
 		Validate the strength of a plain-text password candidate.
 		\param login Login of the user, used to reject passwords equal to the login.
 		\param password Plain-text password candidate.

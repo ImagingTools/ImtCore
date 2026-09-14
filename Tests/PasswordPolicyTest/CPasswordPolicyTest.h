@@ -53,10 +53,19 @@ private slots:
 	void testUserInfo_IsEqual();
 	void testUserInfo_ResetDataDefaults();
 
+	// User info serialization
+	void testUserInfo_SerializationRoundTrip();
+	void testUserInfo_SerializationLegacyArchive();
+
+	// Defaults of an unconfigured component
+	void testDefaults_UnsetAttributes();
+	void testDefaults_HistoryIsKeptWhenUnconfigured();
+
 private:
 	QString m_imtCorePath;
 	QString m_registryFile;
 	QString m_configFile;
 	istd::TDelPtr<ipackage::CComponentAccessor> m_compositePtr;
 	imtauth::IPasswordPolicy* m_passwordPolicyPtr = nullptr;
+	imtauth::IPasswordPolicy* m_unconfiguredPasswordPolicyPtr = nullptr;
 };

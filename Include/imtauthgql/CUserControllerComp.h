@@ -70,11 +70,18 @@ protected:
 				const sdl::V1_0::imtauth::CGetUserObjectIdGqlRequest& getUserObjectIdRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CPasswordPolicyPayload OnGetPasswordPolicy(
+				const sdl::V1_0::imtauth::CGetPasswordPolicyGqlRequest& getPasswordPolicyRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
+	sdl::V1_0::imtauth::CChangePasswordPayload CreateChangePasswordFailure(
+				const QString& message,
+				const QStringList& violatedRuleIds) const;
 	bool SendUserCode(const QByteArray& userId, const imtauth::IUserInfo& userInfo) const;
 	imtauth::IUserInfoSharedPtr GetUserInfoByLogin(const QByteArray& login) const;
 	QByteArray GetUserIdByLogin(const QByteArray& login) const;

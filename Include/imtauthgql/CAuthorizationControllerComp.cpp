@@ -234,8 +234,11 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAu
 	}
 
 	if (lifetimeStatus == imtauth::IPasswordPolicy::LS_EXPIRED || lifetimeStatus == imtauth::IPasswordPolicy::LS_CHANGE_REQUIRED){
-		errorMessage = QT_TR_NOOP(QStringLiteral("The password has expired and must be changed. Login: '%1'").arg(userInfo.GetId()));
-		SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
+		// Reported through the payload, not through errorMessage: a non-empty
+		// errorMessage makes the generated handler drop the payload, and with it the flag.
+		SendErrorMessage(0,
+						QStringLiteral("The password has expired and must be changed. Login: '%1'").arg(userInfo.GetId()),
+						"imtgql::CAuthorizationControllerComp");
 
 		sdl::V1_0::imtauth::CAuthorizationPayload payload;
 		payload.passwordExpired = true;

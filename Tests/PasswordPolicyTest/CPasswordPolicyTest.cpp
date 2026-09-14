@@ -6,14 +6,64 @@
 #include <QtCore/QDateTime>
 
 // ACF includes
+#include <iser/CMemoryReadArchive.h>
+#include <iser/CMemoryWriteArchive.h>
 #include <itest/CStandardTestExecutor.h>
 
 // ImtCore includes
+#include <imtauth/CPasswordPolicyControllerComp.h>
 #include <imtauth/CUserInfo.h>
+#include <imtcore/Version.h>
 
 
 namespace
 {
+
+
+// Keep in sync with the version gate in CUserInfo::Serialize.
+const quint32 s_passwordFieldsVersion = 23239;
+
+
+class CFixedVersionInfo: virtual public iser::IVersionInfo
+{
+public:
+	explicit CFixedVersionInfo(quint32 imtCoreVersion): m_imtCoreVersion(imtCoreVersion)
+	{
+	}
+
+	// reimplemented (iser::IVersionInfo)
+	virtual VersionIds GetVersionIds() const override
+	{
+		VersionIds retVal;
+		retVal.insert(imtcore::VI_IMTCORE);
+
+		return retVal;
+	}
+
+	virtual bool GetVersionNumber(int versionId, quint32& result) const override
+	{
+		if (versionId == imtcore::VI_IMTCORE){
+			result = m_imtCoreVersion;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	virtual QString GetVersionIdDescription(int /*versionId*/) const override
+	{
+		return "ImtCore";
+	}
+
+	virtual QString GetEncodedVersionName(int /*versionId*/, quint32 versionNumber) const override
+	{
+		return QString::number(versionNumber);
+	}
+
+private:
+	quint32 m_imtCoreVersion;
+};
 
 
 imtauth::CUserInfo MakeUserInfo(
@@ -45,12 +95,16 @@ void CPasswordPolicyTest::initTestCase()
 
 	m_passwordPolicyPtr = m_compositePtr->GetComponentInterface<imtauth::IPasswordPolicy>();
 	QVERIFY2(m_passwordPolicyPtr != nullptr, "Failed to get PasswordPolicy component");
+
+	m_unconfiguredPasswordPolicyPtr = m_compositePtr->GetComponentInterface<imtauth::IPasswordPolicy>("UnconfiguredPasswordPolicy");
+	QVERIFY2(m_unconfiguredPasswordPolicyPtr != nullptr, "Failed to get UnconfiguredPasswordPolicy component");
 }
 
 
 void CPasswordPolicyTest::cleanupTestCase()
 {
 	m_passwordPolicyPtr = nullptr;
+	m_unconfiguredPasswordPolicyPtr = nullptr;
 	m_compositePtr.SetPtr(nullptr);
 }
 
@@ -286,6 +340,80 @@ void CPasswordPolicyTest::testUserInfo_ResetDataDefaults()
 	QVERIFY(userInfo.GetPasswordHistory().isEmpty());
 	QVERIFY(!userInfo.GetPasswordChangedAt().isValid());
 	QVERIFY(!userInfo.MustChangePassword());
+}
+
+
+void CPasswordPolicyTest::testUserInfo_SerializationRoundTrip()
+{
+	// The archive version must be at or above the one the password fields were added at,
+	// otherwise they are neither written nor read.
+	CFixedVersionInfo versionInfo(s_passwordFieldsVersion);
+
+	QDateTime passwordChangedAt(QDate(2026, 1, 2), QTime(3, 4, 5));
+	passwordChangedAt.setTimeSpec(Qt::UTC);
+	imtauth::CUserInfo source = MakeUserInfo("hash-current", QByteArrayList() << "hash-1" << "hash-2", passwordChangedAt, true);
+	source.SetId("user1");
+
+	iser::CMemoryWriteArchive writeArchive(&versionInfo);
+	QVERIFY(source.Serialize(writeArchive));
+	QVERIFY(writeArchive.GetBufferSize() > 0);
+
+	iser::CMemoryReadArchive readArchive(writeArchive);
+	imtauth::CUserInfo restored;
+	QVERIFY(restored.Serialize(readArchive));
+
+	QCOMPARE(restored.GetPasswordHash(), QByteArray("hash-current"));
+	QCOMPARE(restored.GetPasswordHistory(), QByteArrayList() << "hash-1" << "hash-2");
+	QCOMPARE(restored.GetPasswordChangedAt(), passwordChangedAt);
+	QVERIFY(restored.MustChangePassword());
+}
+
+
+void CPasswordPolicyTest::testUserInfo_SerializationLegacyArchive()
+{
+	// An archive written before the password fields existed must still be readable,
+	// and must not be interpreted as carrying them.
+	CFixedVersionInfo versionInfo(s_passwordFieldsVersion - 1);
+
+	imtauth::CUserInfo source = MakeUserInfo("hash-current", QByteArrayList() << "hash-1", QDateTime::currentDateTimeUtc(), true);
+	source.SetId("user1");
+
+	iser::CMemoryWriteArchive writeArchive(&versionInfo);
+	QVERIFY(source.Serialize(writeArchive));
+
+	iser::CMemoryReadArchive readArchive(writeArchive);
+	imtauth::CUserInfo restored = MakeUserInfo("stale", QByteArrayList() << "stale-1", QDateTime::currentDateTimeUtc(), true);
+	QVERIFY(restored.Serialize(readArchive));
+
+	QCOMPARE(restored.GetPasswordHash(), QByteArray("hash-current"));
+	QVERIFY(restored.GetPasswordHistory().isEmpty());
+	QVERIFY(!restored.GetPasswordChangedAt().isValid());
+	QVERIFY(!restored.MustChangePassword());
+}
+
+
+void CPasswordPolicyTest::testDefaults_UnsetAttributes()
+{
+	// ACF applies an I_ASSIGN default only to obligatory attributes, so a component
+	// whose optional attributes are all unset must still report the documented defaults.
+	imtauth::IPasswordPolicy::StrengthRules rules = m_unconfiguredPasswordPolicyPtr->GetStrengthRules();
+
+	QCOMPARE(rules.minLength, imtauth::PasswordPolicyDefaults::MIN_PASSWORD_LENGTH);
+	QCOMPARE(rules.maxLength, imtauth::PasswordPolicyDefaults::MAX_PASSWORD_LENGTH);
+	QCOMPARE(rules.rejectLoginAsPassword, imtauth::PasswordPolicyDefaults::REJECT_LOGIN_AS_PASSWORD);
+	QCOMPARE(m_unconfiguredPasswordPolicyPtr->GetPasswordHistoryDepth(), imtauth::PasswordPolicyDefaults::PASSWORD_HISTORY_DEPTH);
+}
+
+
+void CPasswordPolicyTest::testDefaults_HistoryIsKeptWhenUnconfigured()
+{
+	// A zero history depth would silently drop the previous hash instead of storing it.
+	imtauth::CUserInfo userInfo = MakeUserInfo("hash-new");
+
+	m_unconfiguredPasswordPolicyPtr->OnPasswordChanged(userInfo, "hash-old");
+
+	QCOMPARE(userInfo.GetPasswordHistory(), QByteArrayList() << "hash-old");
+	QVERIFY(m_unconfiguredPasswordPolicyPtr->IsPasswordReused(userInfo, "hash-old"));
 }
 
 

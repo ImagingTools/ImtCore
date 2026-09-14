@@ -324,7 +324,7 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 		retVal = retVal && archive.EndTag(sidTag);
 	}
 
-	if (imtCoreVersion >= 23000){
+	if (imtCoreVersion >= 23239){
 		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_passwordHistory, "PasswordHistory", "PasswordHash");
 
 		iser::CArchiveTag passwordChangedAtTag("PasswordChangedAt", "Timestamp of the last password change", iser::CArchiveTag::TT_LEAF);
