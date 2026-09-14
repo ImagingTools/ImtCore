@@ -4,7 +4,6 @@
 
 // Qt includes
 #include <QtCore/QSet>
-#include <QtCore/QStringList>
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
