@@ -199,12 +199,23 @@ bool CProductInfo::Serialize(iser::IArchive& archive)
 			QByteArrayList featureIds;
 			retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, featureIds, "Features", "Feature");
 
-			if (m_featureInfoProviderPtr != nullptr){
-				for (const QByteArray& featureId : featureIds){
-					IFeatureInfoSharedPtr featureInfoPtr = m_featureInfoProviderPtr->GetFeatureInfo(featureId);
-					if (featureInfoPtr.IsValid()){
-						AddFeature(featureId, *featureInfoPtr.GetPtr());
-					}
+			for (const QByteArray& featureId : featureIds){
+				IFeatureInfoSharedPtr featureInfoPtr;
+				if (m_featureInfoProviderPtr != nullptr){
+					featureInfoPtr = m_featureInfoProviderPtr->GetFeatureInfo(featureId);
+				}
+
+				if (featureInfoPtr.IsValid()){
+					AddFeature(featureId, *featureInfoPtr.GetPtr());
+				}
+				else{
+					// The old format carried nothing but the ID, so without a provider there is no
+					// feature data to restore - keep the membership rather than drop the feature.
+					CIdentifiableFeatureInfo featureInfo;
+					featureInfo.SetObjectUuid(featureId);
+					featureInfo.SetFeatureId(featureId);
+
+					AddFeature(featureId, featureInfo);
 				}
 			}
 		}
