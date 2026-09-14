@@ -459,7 +459,12 @@ DocumentViewBase {
 		// Stop updating GUI if user was removed from assignees (readOnly, no new data)
 		if (ticketEditor._removedFromAssignees) return
 		
-		editTitleInput.text = ticketData.m_title || ""
+		// Not while the title is being edited: updateGui runs on every model change, including ones
+		// pushed by OTHER users' activity, and assigning here mid-edit throws away what is being typed.
+		// A new ticket starts in edit mode with nothing to load, so this skips nothing it needed.
+		if (!ticketEditor._titleEditing){
+			editTitleInput.text = ticketData.m_title || ""
+		}
 		editDescriptionInput.text = ticketData.m_description || ""
 		editTypeCB.currentIndex = findComboIndex(editTypeCB, ticketData.m_ticketType, 1)
 		editPriorityCB.currentIndex = findComboIndex(editPriorityCB, ticketData.m_priority, 1)
@@ -1383,7 +1388,18 @@ DocumentViewBase {
 								}
 								
 								Flow {
+									id: assigneesFlow
+
+									// Rows counted out rather than read from implicitHeight, which a Repeater-filled
+									// positioner reports as zero in the web build - the chips were in the model with
+									// nothing on screen.
+									readonly property int chipHeight: 28
+									readonly property int chipMaxWidth: 200
+									readonly property int perRow: Math.max(1, Math.floor((width + spacing) / (chipMaxWidth + spacing)))
+									readonly property int rows: Math.max(1, Math.ceil(ticketEditor.pendingAssignees.length / perRow))
+
 									width: parent.width
+									height: assigneesFlow.visible ? assigneesFlow.rows * assigneesFlow.chipHeight + (assigneesFlow.rows - 1) * spacing : 0
 									clip: true
 									spacing: Style.spacingXS
 									visible: ticketEditor.pendingAssignees.length > 0
@@ -1392,8 +1408,8 @@ DocumentViewBase {
 										model: ticketEditor.pendingAssignees
 										delegate: Rectangle {
 											objectName: "AssigneeChip_" + index
-											width: Math.min(assigneeChipText.contentWidth + assigneeChipRemove.width + Style.paddingS * 3, 200)
-											height: 28
+											width: Math.min(assigneeChipText.contentWidth + assigneeChipRemove.width + Style.paddingS * 3, assigneesFlow.chipMaxWidth)
+											height: assigneesFlow.chipHeight
 											radius: 14
 											color: editView.accentBgLight
 											border.color: editView.accentBorderLight
@@ -1591,7 +1607,16 @@ DocumentViewBase {
 								
 								// Entity chips (tags-style)
 								Flow {
+									id: contextFlow
+
+									// Rows counted out rather than read from implicitHeight - see assigneesFlow above.
+									readonly property int chipHeight: 28
+									readonly property int chipMaxWidth: 260
+									readonly property int perRow: Math.max(1, Math.floor((width + spacing) / (chipMaxWidth + spacing)))
+									readonly property int rows: Math.max(1, Math.ceil(ticketEditor.pendingEntityRefs.length / perRow))
+
 									width: parent.width
+									height: contextFlow.visible ? contextFlow.rows * contextFlow.chipHeight + (contextFlow.rows - 1) * spacing : 0
 									clip: true
 									spacing: Style.spacingXS
 									visible: ticketEditor.pendingEntityRefs.length > 0
@@ -1600,9 +1625,8 @@ DocumentViewBase {
 										model: ticketEditor.pendingEntityRefs
 										delegate: Rectangle {
 											objectName: "ContextChip_" + index
-											readonly property real maxRefWidth: 260
-											width: Math.min(refLabelText.contentWidth + refRemoveBtn.width + Style.paddingS * 3, maxRefWidth)
-											height: 28
+											width: Math.min(refLabelText.contentWidth + refRemoveBtn.width + Style.paddingS * 3, contextFlow.chipMaxWidth)
+											height: contextFlow.chipHeight
 											radius: 14
 											color: editView.accentBgLight
 											border.color: editView.accentBorderLight
@@ -2306,6 +2330,9 @@ DocumentViewBase {
 														Row {
 															spacing: Style.spacingXS
 															Text {
+																// Test instrumentation: a comment's time differs on every run, so a screenshot of the
+																// thread has to mask it - which needs a name per row. Inert.
+																objectName: "CommentTimestamp_" + index
 																text: ticketEditor.formatTimestamp(model.item.m_timestamp)
 																font.pixelSize: Style.fontSizeM - 1
 																color: editView.timestampColor
@@ -2776,13 +2803,25 @@ DocumentViewBase {
 						
 						// Pending attachments
 						Flow {
+							id: pendingAttachmentsFlow
+
+							// Rows counted out rather than read from implicitHeight - see assigneesFlow above. Without it
+							// the uploaded file's own chip was in the DOM but its container had no height, so nothing about
+							// the attachment was ever actually on screen.
+							readonly property int rowHeight: Style.controlHeightM
+							readonly property int rows: Math.max(1, ticketEditor.pendingAttachments.length)
+
 							width: parent.width
+							height: pendingAttachmentsFlow.visible
+								? pendingAttachmentsFlow.rows * pendingAttachmentsFlow.rowHeight + (pendingAttachmentsFlow.rows - 1) * spacing
+								: 0
 							spacing: Style.spacingS
 							visible: ticketEditor.pendingAttachments.length > 0 || ticketEditor.uploadsInProgress > 0
 							
 							Repeater {
 								model: ticketEditor.pendingAttachments
 								delegate: Row {
+									height: pendingAttachmentsFlow.rowHeight
 									spacing: Style.spacingXS
 									
 									Image {
