@@ -42,7 +42,6 @@ public:
 		I_REGISTER_INTERFACE(iser::ISerializable)
 		I_ASSIGN(m_collectionCompPtr, "Collection", "Document collection containing related documents", true, "Collection");
 		I_ASSIGN(m_isSingleCopyModeAttrPtr, "IsSingleCopyMode", "When enabled, all users share a single copy of each document", false, false);
-		I_ASSIGN(m_undoManagerFolderCompPtr, "UndoManagerFolder", "Root folder for undo manager snapshots", false, "UndoManagerFolder");
 	I_END_COMPONENT
 
 	// reimplemented (iser::ISerializable)
