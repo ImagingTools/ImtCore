@@ -28,6 +28,12 @@ QtObject {
 	id: root
 
 	property string context: ""
+
+	// Password policy for the user editor's password fields (imtauthgui owns no GQL).
+	property GqlBasedPasswordPolicyProvider passwordPolicy: GqlBasedPasswordPolicyProvider {
+		context: root.context
+	}
+
 	property string productId: AuthorizationController.productId
 	property string tenantId: AuthorizationController.currentTenantId
 	property string rolePermissionsTenantId: ""
@@ -395,6 +401,7 @@ QtObject {
 		UserView {
 			id: userEditor
 			productId: root.productId
+			passwordPolicy: root.passwordPolicy
 			commandsControllerComp: Component {
 				GqlBasedCommandsController {
 					typeId: root.userObjectTypeId

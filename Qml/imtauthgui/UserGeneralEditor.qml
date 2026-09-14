@@ -12,6 +12,9 @@ Column {
 	property UserData userData;
 	property bool readOnly: false;
 
+	// PasswordPolicyController instance, injected by the owning view.
+	property var passwordPolicy: null;
+
 	signal emitUpdateModel();
 	signal emitUpdateGui();
 
@@ -138,6 +141,26 @@ Column {
 		id: passwordGroup;
 		width: parent.width;
 
+		property string policyErrorText: "";
+
+		Component.onCompleted: {
+			if (container.passwordPolicy){
+				container.passwordPolicy.load();
+			}
+		}
+
+		Component {
+			id: policyErrorComp;
+
+			Text {
+				text: passwordGroup.policyErrorText;
+				wrapMode: Text.WordWrap;
+				color: Style.errorTextColor;
+				font.family: Style.fontFamily;
+				font.pixelSize: Style.fontSizeM;
+			}
+		}
+
 		Component {
 			id: errorComp;
 
@@ -175,6 +198,15 @@ Column {
 
 			if (passwordInput_.text !== confirmPassword.text){
 				confirmPassword.bottomComp = errorComp;
+
+				return;
+			}
+
+			let login = container.userData ? container.userData.m_username : "";
+			let violatedRules = container.passwordPolicy ? container.passwordPolicy.validate(login, passwordInput_.text) : [];
+			if (violatedRules.length > 0){
+				passwordGroup.policyErrorText = container.passwordPolicy.describeFailure(violatedRules, "");
+				confirmPassword.bottomComp = policyErrorComp;
 
 				return;
 			}
@@ -244,11 +276,35 @@ Column {
 				ChangePasswordDialog {
 					title: qsTr("Change Password");
 					currentPasswordInputVisible: !AuthorizationController.loggedUserIsSuperuser();
+					login: container.userData ? container.userData.m_username : "";
+					policy: container.passwordPolicy;
 					onFinished: {
 						if (buttonId == Enums.save){
+							passwordChangeConnections.enabled = true;
 							AuthorizationController.changePassword(container.userData.m_username, contentItem.oldPassword, contentItem.newPassword);
 						}
 					}
+				}
+			}
+
+			Connections {
+				id: passwordChangeConnections;
+				target: AuthorizationController;
+				enabled: false;
+
+				function onChangePasswordFailed(message, violatedRules) {
+					passwordChangeConnections.enabled = false;
+
+					let fallback = qsTr("Unable to change the password.");
+					PopupManager.addErrorMessage(
+								container.passwordPolicy
+									? container.passwordPolicy.describeFailure(violatedRules, fallback)
+									: fallback,
+								true);
+				}
+
+				function onChangePasswordSuccessfully() {
+					passwordChangeConnections.enabled = false;
 				}
 			}
 		}
