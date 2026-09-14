@@ -27,10 +27,13 @@ async function checkScreenshot(page, name, mask) {
     await waitForStable(page);
     // snapshotPathTemplate derives {ext} from this argument's own extension, so toHaveScreenshot needs
     // it spelled out here - a bare name is rejected before any pixels are compared.
-    // maxDiffPixelRatio: 0 made every run flaky: a WASM-rendered canvas has a few hundred pixels of
-    // unavoidable non-determinism per full-page shot (focus ring, sub-pixel text, caret). A small
-    // absolute budget swallows that noise and is far too small to hide a real UI change.
-    await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true, threshold: 0.05, maxDiffPixels: 600 });
+    //
+    // maxDiffPixels: 0 - every pixel matches, or the shot fails. A budget cannot tell "render noise"
+    // from "a date nobody masked": both are a handful of pixels, and the second is a screenshot that
+    // quietly stopped checking what it was written to check. Anything genuinely non-deterministic
+    // (timestamps, generated ids, secrets) gets a mask instead; `threshold` still absorbs sub-pixel
+    // colour variation inside a pixel.
+    await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true, threshold: 0.05, maxDiffPixels: 0 });
   } finally {
     // Masks are injected DOM nodes, so they outlive a failure and would sit over every later screenshot
     // in the same shared page - turning one real failure into a run of unrelated-looking ones.
@@ -83,6 +86,33 @@ async function expectCount(page, path, expected, message) {
     .toBe(expected);
 }
 
+/**
+ * The same comparison as checkScreenshot, but of ONE element instead of the whole page.
+ *
+ * For a modal: what is behind it is not what the test is about, and it is not under the test's
+ * control either - every spec signed in as the same user shares the server-side column layout and
+ * last-open page, so the backdrop changes when an unrelated test runs beside this one (measured as a
+ * 21524-pixel diff behind an identical Profile dialog). Shooting the dialog says what the test means.
+ * @param {import('@playwright/test').Page} page
+ * @param {string[]} path  objectName path of the element to compare
+ * @param {string} name
+ * @param {Object|Object[]} [mask]
+ */
+async function checkElementScreenshot(page, path, name, mask) {
+  const masks = mask ? (Array.isArray(mask) ? mask : [mask]) : [];
+  const handles = [];
+  try {
+    for (const m of masks) handles.push(await addMask(page, m));
+
+    await waitForStable(page);
+    const locator = dom.byPath(page, path);
+    await locator.waitFor({ state: 'visible' });
+    await expect(locator).toHaveScreenshot(`${name}.png`, { threshold: 0.05, maxDiffPixels: 0 });
+  } finally {
+    for (const h of handles) await removeMask(page, h).catch(() => {});
+  }
+}
+
 // --- masking (ported and de-duplicated from the old utils.addMask/removeMask) -------------------
 
 let maskSeq = 0;
@@ -131,8 +161,31 @@ async function removeMask(page, id) {
   }, id);
 }
 
+/**
+ * Masks for every VISIBLE element matching an objectName prefix, as plain rects.
+ *
+ * Rects, not paths: a mask given a path waits for that exact element and fails the screenshot if it
+ * is not there - which is the wrong outcome for "mask the comment timestamps" or "mask the product
+ * rows", where how many there are is part of what the test is exercising. Nothing to mask is a valid
+ * answer, and a caller that needs the element to exist should assert that separately.
+ * @param {import('@playwright/test').Page} page
+ * @param {string} objectNamePrefix
+ * @param {number} [padding]
+ */
+async function masksForPrefix(page, objectNamePrefix, padding = 3) {
+  const rects = await page.evaluate((prefix) => {
+    return Array.from(document.querySelectorAll(`[objectName^="${prefix}"][visible]`))
+      .map((el) => el.getBoundingClientRect())
+      .filter((r) => r.width > 0 && r.height > 0)
+      .map((r) => ({ x: r.x, y: r.y, width: r.width, height: r.height }));
+  }, objectNamePrefix);
+  return rects.map((r) => ({ ...r, padding }));
+}
+
 module.exports = {
   checkScreenshot,
+  checkElementScreenshot,
+  masksForPrefix,
   expectVisible,
   expectHidden,
   expectCount,

@@ -61,6 +61,10 @@ function denied(user, permission) {
  *   server did not grant it. Omit only for a page open to everyone.
  * @param {Object<string,string>} [declaration.filters]     filter key -> objectName
  * @param {string[]} [declaration.maskColumns]              non-deterministic columns to mask
+ * @param {string} [declaration.stableSort]  header id to sort by before each interaction test. Clearing
+ *   the filters clears the sort too, and an unsorted collection has no defined row order - so any
+ *   screenshot of one differs run to run. Name a column that gives it one (ideally a unique-valued
+ *   one) for any collection large enough to show this.
  * @param {(page) => CollectionPage} [declaration.createPage]  for a page that needs its own subclass
  * @param {object[]} [declaration.scenarios]  one test (and one screenshot) each - see runScenario
  * @param {(ctx: object) => void} [declaration.extra]  hand-written tests for this page's own flows,
@@ -72,7 +76,7 @@ function denied(user, permission) {
  */
 function defineCollectionSpec(fixtures, declaration) {
   const { test, newUserPage, gui, defineTest } = fixtures;
-  const { title, pageId, prefix, requires, filters, maskColumns, createPage, scenarios = [], extra } = declaration;
+  const { title, pageId, prefix, requires, filters, maskColumns, createPage, stableSort, scenarios = [], extra } = declaration;
 
   if (!title || !pageId || !prefix) {
     throw new Error('defineCollectionSpec: `title`, `pageId` and `prefix` are required');
@@ -135,6 +139,13 @@ function defineCollectionSpec(fixtures, declaration) {
         // Collection view state (filters, sorting) is server-persisted per user session, so a prior
         // test's filter would otherwise leak into this one's screenshot.
         await collection.clearAllFilters();
+        // Clearing the filters clears the SORTING with them, and a collection with no sort comes back
+        // from the server in whatever order it likes - the same rows in a different sequence on the
+        // next run, which makes every screenshot of that table a coin flip (measured on Lisa's
+        // licences: 17-32k differing pixels on a table that was perfectly correct). Declaring
+        // `stableSort` puts a known order back before each test. One click, from the just-cleared
+        // state, so it is the same direction every time.
+        if (stableSort) await collection.table.sortBy(stableSort);
       });
 
       for (const scenario of scenarios) {

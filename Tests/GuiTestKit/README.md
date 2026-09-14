@@ -11,15 +11,45 @@ this is meant to be consumed by each app's own `Tests/<AppName>Gui` project inst
 
 - **`lib/`** - `dom.js` (objectName-path locator engine), `actions.js` (click/fill/select/openPage,
   hard-fail-if-missing), `stability.js` (`waitForStable`, a MutationObserver-based settle wait),
-  `screenshot.js` (`checkScreenshot`/`expectVisible`/`expectHidden`/`expectCount`/masking), `gui.js`
-  (barrel of all of the above).
+  `screenshot.js` (`checkScreenshot`/`checkElementScreenshot`/`expectVisible`/`expectHidden`/
+  `expectCount`/masking), `gui.js` (barrel of all of the above).
+  - `checkElementScreenshot(page, path, name)` compares ONE element instead of the whole page. Use it
+    for a modal: what is behind it is not what the test is about and is not under the test's control
+    either - every spec signed in as the same user shares the server-side column layout and last-open
+    page, so an unrelated test running beside this one changes the backdrop (measured: 21524 pixels
+    behind an identical dialog).
+  - `settleLoginFocus(page, { field })` (in `actions.js`) makes a screenshot of the login form
+    reproducible. Two things move the focus ring and both need handling: AuthorizationPage.qml's
+    `decoratorPause` re-focuses the username field up to 500ms after the form appears, and Qt paints
+    the ring only for a FOCUSED window - so a headless page nobody has clicked may show no ring at
+    all. Hence: wait the animation out, then click the field the shot wants. Naming a field is
+    effectively required; for "the form as it greets a visitor" that field is `LoginInput`.
 - **`controls/index.js`** - control wrappers over `lib/actions` (Button, CommandBar, MenuPanel,
-  ComboBox, TextInput, FilterPanel, Table, Pagination, Switch, Dialog, TableConfigDialog).
+  ComboBox, TextInput, FilterPanel, Table, Pagination, Switch, Dialog, TableConfigDialog,
+  TreeExplorer, CheckableListPanel).
+  - `TableConfigDialog.columnNames()` reads the dialog's OWN list of columns, in order. Assert a
+    reorder on that and Cancel, rather than applying it and reading the table back: the column layout
+    is per-user server-side state, so an Apply is immediately visible to every other test signed in as
+    the same user - it put a differently-arranged table behind an unrelated screenshot, a 28987-pixel
+    diff with nothing wrong in either view.
+  - `TreeExplorer` wraps `imtcontrols/Views/TreeExplorerView.qml` - the breadcrumb + command row +
+    search + row list used wherever a nested collection is edited in place (Lisa's sub-features, a
+    product's or a license's features). Its rows are `ExplorerRow_<i>`, deliberately NOT
+    `TableRow_<i>`, so an editor's tree never collides with the collection table behind it. Note that
+    selecting and ticking are ONE set there: `checkRow()` on an already-selected row unticks it.
+  - `CheckableListPanel` wraps `imtcontrols/Views/CheckableListPanel.qml` - the searchable,
+    tick-per-row list that sits beside an explorer or fills a picker dialog. Addressed by its own
+    objectName, so a dialog's panel over a page's panel stays unambiguous.
+  - Both expose `filter(text)` rather than raw `search.fill(...)`: `SearchTextInput` debounces 500ms,
+    so typing settles the DOM long before the list is actually filtered.
 - **`pages/`** - `BasePage` and `CollectionPage` (a standard collection needs no subclass: declare its
-  filter ids and its non-deterministic columns), plus page objects for views ImtCore itself owns
+  filter ids and its non-deterministic columns; `openColumnConfig(headerId)` opens the column
+  configuration dialog every collection has), plus page objects for views ImtCore itself owns
   (`AdministrationPage`, `SearchPage`, `OrganizationsPage` - grounded in
   `ImtCore/Qml/imtauthgui/AdministrationView.qml`, `ImtCore/Qml/imtgui/View/SearchPage.qml`,
-  `ImtCore/Qml/imtauthgui/TenantCollectionView.qml`).
+  `ImtCore/Qml/imtauthgui/TenantCollectionView.qml`). `SearchPage.search()` drives the GLOBAL search
+  box, addressed by its own `GlobalSearchInput` name - a bare `SearchTextInput` is ambiguous wherever
+  a collection's FilterPanel is on screen, since that box carries the same name.
 - **`specs/collectionSpec.js`** - generates a whole standard collection spec from a declaration
   (which page, which filters, which screenshots), and owns the names those screenshots get so tooling
   can ask instead of guessing.

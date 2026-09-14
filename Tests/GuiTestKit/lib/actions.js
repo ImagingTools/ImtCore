@@ -15,6 +15,11 @@ const { waitForStable } = require('./stability');
 // 10000ms gives 10-worker contention enough headroom while still being far under a dead-wait tax on a
 // genuinely-missing element. This is a ceiling (time-to-fail), so raising it never slows a passing test.
 const DEFAULT_TIMEOUT = 10000;
+// How long a value READ may wait for its element - deliberately short, and separate from the action
+// timeout above. locator.evaluate AUTO-WAITS, and with no action timeout configured that wait is
+// unbounded: reading a field that is not on the open sub-page hung the whole test instead of
+// answering "not readable", which is what sat two save-and-reopen tests at their own 240s cap.
+const READ_TIMEOUT = 1000;
 
 function fmtPath(path) {
   return Array.isArray(path) ? path.join(' > ') : String(path);
@@ -192,7 +197,19 @@ async function openPage(page, pageId) {
  * 'Edit', 'Save', 'Undo', 'Bind'); the button objectName is `<commandId>Button`.
  */
 async function clickCommand(page, commandId) {
-  await click(page, ['CommandsView', `${commandId}Button`], { what: `command "${commandId}"` });
+  if ((await dom.countVisible(page, ['CommandsView', `${commandId}Button`])) > 0) {
+    await click(page, ['CommandsView', `${commandId}Button`], { what: `command "${commandId}"` });
+    return;
+  }
+  // Not on the bar does not mean not available: a command declared with priority -1 (ResetTransferCounter
+  // is one) never gets a bar button at all, and any command can also be pushed off a bar too narrow for
+  // it - both end up in the "..." overflow menu, which is where a user would go for them too.
+  if ((await dom.countVisible(page, ['MoreCommandsButton'])) === 0) {
+    await click(page, ['CommandsView', `${commandId}Button`], { what: `command "${commandId}"` });
+    return;
+  }
+  await click(page, ['MoreCommandsButton'], { what: 'the "..." command overflow menu' });
+  await click(page, ['PopupMenuDialog', `PopupItem_${commandId}`], { what: `command "${commandId}" in the overflow menu` });
 }
 
 /**
@@ -252,7 +269,7 @@ function readTextValue(input) {
       // "never reached the expected value" failure reported last seen U+200B), so a caller waiting for
       // "" would wait forever on a field that is, in every sense that matters, empty.
       return value === null ? null : value.replace(/[\u200B\uFEFF]/g, '');
-    })
+    }, undefined, { timeout: READ_TIMEOUT })
     .catch(() => null);
 }
 
@@ -283,7 +300,7 @@ function readMirroredValue(input) {
       if (attr !== null) return attr;
       const nested = el.querySelector('input, textarea');
       return nested ? valueOf(nested) : null;
-    })
+    }, undefined, { timeout: READ_TIMEOUT })
     .catch(() => null);
 }
 
@@ -338,6 +355,15 @@ async function fill(page, path, text, opts = {}) {
 }
 
 /**
+ * Read a text control's current value, or null when the control at `path` exposes none (it isn't a text
+ * input, or it isn't there). Same three readings as fill's own verification - see readTextValue.
+ */
+async function textInputValue(page, path) {
+  const container = dom.byPath(page, path);
+  return readTextValue(container.locator(TEXT_INPUT_SELECTOR).first());
+}
+
+/**
  * Poll a TextInput control's current DOM value until it satisfies `predicate` (default: becomes empty),
  * or throw after `timeout`. Use after an action that's SUPPOSED to change a text field as a side effect
  * (e.g. a "Clear all filters" command clearing the search box) instead of trusting generic DOM-quiet:
@@ -346,8 +372,12 @@ async function fill(page, path, text, opts = {}) {
  * showed the OLD search text (stably, not a one-off glitch - "captured a stable screenshot" fired in
  * Playwright's own log, i.e. two consecutive frames already agreed with EACH OTHER, just not yet with
  * the field's final value) under concurrent-worker load, where the value-commit lags the click's own
- * settle by more than the generic quiet window. Silently returns without waiting if the path doesn't
- * resolve to a readable TextInput at all (matches fill()'s own "best-effort" treatment of that case).
+ * settle by more than the generic quiet window.
+ *
+ * A path that never resolves to a readable field FAILS, it does not pass. This used to return silently
+ * on that case, which turned the suite's persistence checks ("save, close, reopen, read the value back")
+ * into no-ops whenever the reopened editor happened to land on a different sub-page than the field: the
+ * field was invisible, nothing was read, and the check reported success having compared nothing.
  * @param {import('@playwright/test').Page} page
  * @param {string[]} path
  * @param {(value: string) => boolean} [predicate]
@@ -361,7 +391,21 @@ async function waitForTextInputValue(page, path, predicate = (v) => v === '', ti
   let consecutiveMatches = 0;
   for (;;) {
     const value = await readTextValue(input);
-    if (value == null) return; // not a readable TextInput at this path - nothing to wait for
+    if (value == null) {
+      // Not readable YET is normal right after an action - keep polling, and only call it a failure
+      // once the whole window has gone by without the field ever showing up.
+      consecutiveMatches = 0;
+      if (Date.now() >= deadline) {
+        throw new Error(
+          [
+            `GUI text input at [${fmtPath(path)}] never became readable after ${timeout}ms, so its value could not be checked`,
+            await dom.describePath(page, path),
+          ].join('\n')
+        );
+      }
+      await page.waitForTimeout(100);
+      continue;
+    }
     if (predicate(value)) {
       // Require the match to hold for two consecutive reads (~100ms apart), not just one instant: the
       // DOM attribute this reads can apparently flip to the target value briefly before the WASM
@@ -599,8 +643,44 @@ async function login(page, username, password) {
   await waitForStable(page, { timeout: 15000, quietMs: 600 });
 }
 
+// AuthorizationPage.qml's decoratorPause: a 500ms PauseAnimation started in Component.onCompleted
+// whose onFinished calls loginTextInput.forceActiveFocus(). Nothing else moves focus afterwards.
+const LOGIN_FOCUS_SETTLE = 1000;
+
+/**
+ * Put the login form's focus ring in one known place, so a screenshot of the form is reproducible.
+ *
+ * The ring is painted by Qt onto the canvas: document.activeElement never leaves <body> and no border
+ * style reaches the DOM, so there is nothing to wait for and Playwright's own "stable screenshot"
+ * retry is happy with either state. TWO things move it, and both need handling:
+ *
+ * 1. ORDER. decoratorPause re-asserts focus on the username field up to 500ms after the form appears,
+ *    so a click on the password field landed before it on a fast run and after it on a slow one -
+ *    measured as a 1272-pixel difference. Hence the wait, before anything else.
+ * 2. WINDOW FOCUS. Qt paints the ring only for a focused window, and a headless page nobody has
+ *    clicked is not one. Waiting alone therefore does NOT pin the default state: the same untouched
+ *    form came back with and without a ring on Username across two runs (636 pixels). Only a click
+ *    makes it deterministic - so the field option is effectively required, and the field to name for "the form
+ *    as it greets a visitor" is the one the form focuses itself, LoginInput.
+ *
+ * A timeout is the honest tool for (1): the thing being waited on emits no signal at all.
+ * @param {import('@playwright/test').Page} page
+ * @param {{ field?: string[] }} [options]  field to click afterwards, e.g. ['PasswordInput']
+ */
+async function settleLoginFocus(page, options = {}) {
+  await requireVisible(page, ['LoginInput'], { what: 'login field', timeout: 20000 });
+  await page.waitForTimeout(LOGIN_FOCUS_SETTLE);
+
+  if (options.field) {
+    await click(page, options.field, { what: `the ${options.field.join(' > ')} field` });
+    await page.waitForTimeout(250);
+  }
+}
+
 module.exports = {
   DEFAULT_TIMEOUT,
+  LOGIN_FOCUS_SETTLE,
+  settleLoginFocus,
   requireVisible,
   click,
   clickSelf,
@@ -610,6 +690,7 @@ module.exports = {
   openPage,
   clickCommand,
   fill,
+  textInputValue,
   waitForTextInputValue,
   select,
   selectIndex,

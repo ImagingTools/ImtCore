@@ -17,7 +17,6 @@ class UserEditorPage extends BasePage {
     this.confirmPassword = new TextInput(page, ['ConfirmPasswordInput']);
   }
 
-  save() { return this.runCommand('Save'); }
   undo() { return this.runCommand('Undo'); }
   redo() { return this.runCommand('Redo'); }
 

@@ -23,12 +23,19 @@ const NETWORK_IDLE_TIMEOUT = 5000;
 // followed by a GetCommands refresh), bounded overall by `timeout` below regardless of round count.
 const MAX_SETTLE_ROUNDS = 3;
 
-// ImtCore's two spinner components (imtcontrols/Views/BusyIndicator.qml, Loading.qml) both animate
-// via a Timer mutating a `rotation`/transform property every 10ms - never touching objectName,
-// visible, or childList, i.e. none of the attributes the MutationObserver above watches. DOM can go
-// quiet while one is still visibly spinning (caught live: a screenshot mid-redo captured the spinner
-// itself). Both were given the same objectName as test instrumentation - poll for it directly instead
-// of assuming "DOM quiet" implies "no pending async work".
+// ImtCore's two spinner components (imtcontrols/Views/BusyIndicator.qml, Loading.qml) animate via a
+// Timer mutating a rotation/transform property, which reaches the DOM as a `style` rewrite about
+// eleven times a second (measured). The observer above watches every attribute, so it sees them - and
+// on a screen where a spinner never stops (Lisa's authorization page keeps a full-size one up) the
+// quiet window never opens and every settle burns its ceiling: ~20s per reload()/login() there.
+//
+// Filtering those frames out was tried and REVERTED: a spinner still turning is also the only signal
+// that a view is still arriving, and without it screenshots started capturing half-loaded collections
+// (a 32031-pixel diff on a table that was simply not finished). It also bought nothing measurable once
+// the suite ran on several workers, since the affected page's tests overlap with everything else. If
+// this is worth optimising, fix the never-ending spinner rather than teaching the wait to ignore it.
+// Both spinners carry the same objectName as test instrumentation - poll for it directly rather than
+// assuming "DOM quiet" implies "no pending async work".
 const BUSY_SELECTOR = '[objectName="BusyIndicator"][visible]';
 const BUSY_INDICATOR_TIMEOUT = 5000;
 

@@ -270,17 +270,23 @@ async function columnRects(page, headerIds) {
       const occluders = dialogEls.filter((d) => d !== scope).map((d) => d.getBoundingClientRect());
 
       for (const id of ids) {
-        let colRect = null;
+        // The WIDEST cell in the column, not the first one found: a cell can render slightly past its
+        // neighbours (longer text, a different row height), and a mask cut to one row left those few
+        // pixels of somebody else's timestamp showing - invisible under a pixel budget, a failure
+        // without one.
+        let left = null;
+        let right = null;
         for (const row of groupRows) {
           const cell = row.querySelector(`[objectName="${id}"][visible]`);
-          if (cell) {
-            colRect = cell.getBoundingClientRect();
-            break;
-          }
+          if (!cell) continue;
+          const r = cell.getBoundingClientRect();
+          if (r.width <= 0) continue;
+          left = left === null ? r.x : Math.min(left, r.x);
+          right = right === null ? r.x + r.width : Math.max(right, r.x + r.width);
         }
-        if (!colRect || colRect.width <= 0) continue;
+        if (left === null || right - left <= 0) continue;
 
-        let pieces = [{ x: colRect.x, y: groupTop, width: colRect.width, height: groupBottom - groupTop }];
+        let pieces = [{ x: left, y: groupTop, width: right - left, height: groupBottom - groupTop }];
         for (const occluder of occluders) {
           pieces = pieces.flatMap((p) => subtractOccluder(p, occluder));
         }

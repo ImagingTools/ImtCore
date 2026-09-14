@@ -14,7 +14,6 @@ class RoleEditorPage extends BasePage {
     this.description = new TextInput(page, ['RoleDescriptionInput']);
   }
 
-  save() { return this.runCommand('Save'); }
   undo() { return this.runCommand('Undo'); }
   redo() { return this.runCommand('Redo'); }
 

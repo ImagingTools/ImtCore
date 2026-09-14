@@ -12,7 +12,6 @@ class GroupEditorPage extends BasePage {
     this.description = new TextInput(page, ['GroupDescriptionInput']);
   }
 
-  save() { return this.runCommand('Save'); }
   undo() { return this.runCommand('Undo'); }
   redo() { return this.runCommand('Redo'); }
 

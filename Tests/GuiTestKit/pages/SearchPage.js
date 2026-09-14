@@ -15,19 +15,26 @@ class SearchPage extends BasePage {
   }
 
   /**
-   * Type into the GLOBAL search box (TopCenterPanelDecorator.qml's bare `SearchTextInput`, NOT the
-   * FilterPanel's own same-objectName search box used on collection pages). SearchTextInput.qml
-   * debounces 500ms after the last keystroke, then fires `searchChanged` -> the app sends
-   * "GlobalSearchActivated" -> SearchPage.updateSearch() runs the query and (per NavigationController)
-   * lands on the Search page automatically - no Enter key or button click needed.
+   * Type into the GLOBAL search box (TopCenterPanelDecorator.qml). SearchTextInput.qml debounces 500ms
+   * after the last keystroke, then fires `searchChanged` -> the app sends "GlobalSearchActivated" ->
+   * SearchPage.updateSearch() runs the query and (per NavigationController) lands on the Search page
+   * automatically - no Enter key or button click needed.
    *
-   * Call this from a page WITHOUT its own FilterPanel (e.g. Workspace) - on a collection page, TWO
-   * elements would match the bare `SearchTextInput` path (the global one AND the FilterPanel's), and
-   * this targets whichever the DOM happens to list first.
+   * Addressed by "GlobalSearchInput", its own name. A bare `SearchTextInput` used to be the path here,
+   * and it is ambiguous wherever a collection's FilterPanel is on screen - that box carries the same
+   * objectName, so the click landed on whichever the DOM happened to list first and the query went
+   * into the page's own filter instead of the global search. Confirmed live on Lisa, whose Workspace
+   * has a FilterPanel too, so "call it from a page without one" was no longer an escape.
    * @param {string} text
    */
   async search(text) {
-    await gui.fill(this.page, ['SearchTextInput'], text);
+    // Falls back to the old bare path for a client built before that objectName existed: the name
+    // lives in ImtCore's QML, but each app ships its own compiled copy of it, so a sibling suite
+    // running against a binary built earlier would otherwise fail here for a reason that has nothing
+    // to do with its own code. The fallback is ambiguous where a FilterPanel is on screen - which is
+    // the whole point of the new name - so it is a bridge, not a second supported path.
+    const named = (await gui.dom.countVisible(this.page, ['GlobalSearchInput'])) > 0;
+    await gui.fill(this.page, [named ? 'GlobalSearchInput' : 'SearchTextInput'], text);
     return this;
   }
 

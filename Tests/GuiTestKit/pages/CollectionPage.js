@@ -11,7 +11,7 @@
 
 const gui = require('../lib/gui');
 const { BasePage } = require('./BasePage');
-const { FilterPanel, Table, Pagination } = require('../controls');
+const { FilterPanel, Table, Pagination, TableConfigDialog } = require('../controls');
 
 class CollectionPage extends BasePage {
   /**
@@ -102,6 +102,19 @@ class CollectionPage extends BasePage {
    */
   columnMasks(headerIds) {
     return this.table.columnMasks(headerIds);
+  }
+
+  /**
+   * Open the "Table configuration" dialog by right-clicking a sortable column header
+   * (CollectionViewBase.qml's headerRightClickEnabled). Generic to every collection, so it lives here
+   * rather than in an app's own subclass.
+   * @param {string} headerId the header/field id to right-click - any sortable column will do
+   * @returns {Promise<TableConfigDialog>}
+   */
+  async openColumnConfig(headerId) {
+    const dialog = new TableConfigDialog(this.page);
+    await dialog.openViaHeader(headerId);
+    return dialog;
   }
 
   // New / Edit / Remove / Revision via the command bar (present on every collection page).
