@@ -156,7 +156,7 @@ bool CSqliteJsonDatabaseDelegateComp::CreatePaginationQuery(int offset, int coun
 	paginationQuery.clear();
 
 	if (offset >= 0 && count > 0){
-		paginationQuery = QStringLiteral("LIMIT %1 OFFSET %2").arg(count, offset).toUtf8();
+		paginationQuery = QStringLiteral("LIMIT %1 OFFSET %2").arg(QString::number(count), QString::number(offset)).toUtf8();
 	}
 
 	return true;

@@ -135,13 +135,44 @@ class MouseArea extends Item {
         }
     }
 
+    __hasComposedHandler(name){
+        let self = this.__self
+        if(typeof self['SLOT_' + name] === 'function') return true
+        let list = self.__connections[name]
+        return !!(list && list.length)
+    }
+
+    __emitComposedClick(mouse){
+        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)){
+            mouse.accepted = false
+            return
+        }
+
+        this.mouseX = mouse.x
+        this.mouseY = mouse.y
+        mouse.accepted = this.__hasComposedHandler('clicked')
+        this.clicked(mouse)
+    }
+
+    __emitComposedDoubleClick(mouse){
+        if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)){
+            mouse.accepted = false
+            return
+        }
+
+        this.mouseX = mouse.x
+        this.mouseY = mouse.y
+        mouse.accepted = this.__hasComposedHandler('doubleClicked')
+        this.doubleClicked(mouse)
+    }
+
     __onMouseClick(mouse){
         if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
 
         this.__self.pressed = false
 
         if(mouse.target === this && this.__pressed){
-            this.clicked(mouse)
+            this.__emitComposedClick(mouse)
         }
 
         this.__pressed = false 
@@ -154,7 +185,7 @@ class MouseArea extends Item {
 
         if(mouse.target === this && this.__pressed){
             this.clicked(mouse)
-            this.doubleClicked(mouse)
+            this.__emitComposedDoubleClick(mouse)
         }
 
         this.__pressed = false

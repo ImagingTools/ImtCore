@@ -528,19 +528,25 @@ class ListView extends Flickable {
     }
 
     __initView(isCompleted) {
-        if (this.delegate && this.model && isCompleted) {
+        // model: 0 is a valid integer model; `this.model &&` would skip it.
+        if (this.delegate && this.model !== undefined && isCompleted) {
             let length = 0
             if (Array.isArray(this.model)) {
                 length = this.model.length
             } else if (typeof this.model === 'object') {
-                length = this.model.count
+                length = this.model ? this.model.count : 0
             } else if (typeof this.model === 'number') {
                 length = this.model
             } else {
                 return
             }
 
-            if (length === 0) return
+            if (length === 0) {
+                this.count = 0
+                this.__normalizeCurrentIndex(0)
+                this.__updateGeometry()
+                return
+            }
 
             // Through the property setter, not __self: a raw write skips the change
             // notification, and the countChanged() emitted by hand later in the same
@@ -627,19 +633,23 @@ class ListView extends Flickable {
     }
 
     __updateView() {
-        if (this.delegate && this.model && this.__completed) {
+        if (this.delegate && this.model !== undefined && this.__completed) {
             let length = 0
             if (Array.isArray(this.model)) {
                 length = this.model.length
             } else if (typeof this.model === 'object') {
-                length = this.model.count
+                length = this.model ? this.model.count : 0
             } else if (typeof this.model === 'number') {
                 length = this.model
             } else {
                 return
             }
 
-            if (length === 0 && Object.keys(this.__items).length === 0) return
+            if (length === 0 && Object.keys(this.__items).length === 0) {
+                this.count = 0
+                this.__updateGeometry()
+                return
+            }
 
             // Set only past the early exits: a leftover flag stops __endUpdate from
             // ever calling this again, which freezes the view at its first batch.

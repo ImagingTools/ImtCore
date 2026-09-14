@@ -48,6 +48,7 @@ constexpr T narrow_cast(U v) noexcept
 static const inline QByteArray s_protocolVersionHeaderId = QByteArrayLiteral("X-Protocol-Version");
 static const inline QByteArray s_authenticationTokenHeaderId = QByteArrayLiteral("x-authentication-token");
 static const inline QByteArray s_productIdHeaderId = QByteArrayLiteral("productid");
+static const inline QByteArray s_languageIdHeaderId = QByteArrayLiteral("languageid");
 
 
 inline bool isValidUuid(const QByteArray& value)

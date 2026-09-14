@@ -10,7 +10,14 @@ DocumentServiceBase {
 	property string context: ""
 	property string collectionId
 
+	property CollectionId collectionIdObj: CollectionId{
+		m_collectionId: root.collectionId
+	}
+
 	property SubscriptionClient documentManagerSubscription: SubscriptionClient{
+		autoSubscribe: false
+		sdlInputObject: root.collectionIdObj
+
 		function getHeaders(){
 			return root.getHeaders()
 		}
@@ -40,6 +47,9 @@ DocumentServiceBase {
 	}
 
 	property SubscriptionClient undoManagerSubscription: SubscriptionClient {
+		autoSubscribe: false
+		sdlInputObject: root.collectionIdObj
+
 		function getHeaders(){
 			return root.getHeaders()
 		}
@@ -56,8 +66,11 @@ DocumentServiceBase {
 
 	onCollectionIdChanged: {
 		if (collectionId !== ""){
-			documentManagerSubscription.gqlCommandId = "On" + root.collectionId + "DocumentChanged"
-			undoManagerSubscription.gqlCommandId = "On" + root.collectionId + "UndoChanged"
+			root.collectionIdObj.m_collectionId = root.collectionId
+			documentManagerSubscription.gqlCommandId = "On" + "DocumentManagerChanged"
+			undoManagerSubscription.gqlCommandId = "On" + "UndoRedoChanged"
+			documentManagerSubscription.registerSubscription()
+			undoManagerSubscription.registerSubscription()
 			getOpenedDocumentList()
 		}
 	}

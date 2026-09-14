@@ -219,7 +219,7 @@ class Flickable extends Item {
 
         if(!wheel.target){
             let deltaX = wheel.angleDelta.x * 4
-            let deltaY = wheel.angleDelta.y * 4
+            let deltaY = -wheel.angleDelta.y * 4
 
             if(this.flickableDirection === Flickable.AutoFlickDirection || this.flickableDirection === Flickable.AutoFlickIfNeeded){
                 if(this.contentWidth > 0 && this.contentWidth > this.width){

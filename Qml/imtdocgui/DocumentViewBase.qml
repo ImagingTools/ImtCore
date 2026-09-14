@@ -2,6 +2,8 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
+import imtguigql 1.0
+import imtcontrols 1.0
 
 /**
  * DocumentViewBase
@@ -29,6 +31,9 @@ ViewBase {
 	property var documentManager: null; // DocumentServiceBase
 	property Item documentManagerView: null;
 	property DocumentRepresentationController representationController: null;
+
+	property BaseClass subscriptionInput: BaseClass{}
+	property string  subscriptionCommandId: ""
 
 	/**
 	 * True until the document has actually been persisted.
@@ -208,6 +213,16 @@ ViewBase {
 			if (documentId === root.documentId){
 				root.documentName = newName
 			}
+		}
+	}
+
+	SubscriptionClient {
+		id: subscriptionClient
+		gqlCommandId: root.subscriptionCommandId
+
+		sdlInputObject: root.subscriptionInput
+
+		onMessageReceived: {
 		}
 	}
 }

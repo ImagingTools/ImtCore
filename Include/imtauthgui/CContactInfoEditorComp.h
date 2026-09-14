@@ -15,7 +15,7 @@
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
 // ImtCore includes
-#include <imtauth/IContactInfo.h>
+#include <imtaccount/IContactInfo.h>
 #include <GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h>
 
 
@@ -29,12 +29,12 @@ namespace imtauthgui
 */
 class CContactInfoEditorComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
-						Ui::CContactInfoEditorComp, imtauth::IContactInfo>
+						Ui::CContactInfoEditorComp, imtaccount::IContactInfo>
 {
 	Q_OBJECT
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
-				Ui::CContactInfoEditorComp, imtauth::IContactInfo> BaseClass;
+				Ui::CContactInfoEditorComp, imtaccount::IContactInfo> BaseClass;
 
 	I_BEGIN_COMPONENT(CContactInfoEditorComp);
 		I_ASSIGN(m_showMailEditAttrPtr, "ShowMailEditor", "Show mail editor", true, true);
