@@ -16,6 +16,8 @@ ViewBase {
 	contentColor: Style.baseColor
 	property GroupData groupData: model;
 	property string productId;
+	// Part of the product this view works in; scopes its permission checks.
+	property string permissionPath: "";
 
 	function updateGui(){
 		var generalPageInstance = multiPageView.getPageByIndex(0)

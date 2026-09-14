@@ -12,10 +12,9 @@ import Qt.labs.platform 1.0
 
 RemoteCollectionView {
 	id: featureCollectionViewContainer;
-	
-	property string context: ""
+
 	visibleMetaInfo: false;
-	
+
 	collectionId: "Features";
 	documentCollectionFilter: null
 	commandsDelegateComp: Component {DocumentCollectionViewDelegate {
@@ -60,14 +59,16 @@ RemoteCollectionView {
 		id: dataControllerComp;
 		
 		GqlRequestDocumentDataController {
-			context: featureCollectionViewContainer.context
 			id: requestDocumentDataController
 			
 			property FeatureData featureData: documentModel
 			
 			gqlGetCommandId: ImtlicFeaturesSdlCommandIds.s_getFeatureItem;
+			getPermissionPath: "/FeatureManagement/ViewFeatures";
 			gqlUpdateCommandId: ImtlicFeaturesSdlCommandIds.s_updateFeature;
+			updatePermissionPath: "/FeatureManagement/EditFeature/ChangeFeature";
 			gqlAddCommandId: ImtlicFeaturesSdlCommandIds.s_addFeature;
+			addPermissionPath: "/FeatureManagement/EditFeature/AddFeature";
 			
 			typeId: "Feature";
 			documentName: featureData ? featureData.m_featureName: "";

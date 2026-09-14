@@ -7,7 +7,9 @@
 #include <iqt/iqt.h>
 
 // ImtCore includes
+#include <imtserverapp/imtserverapp.h>
 #include <imtserverapp/IGuiElementModel.h>
+#include <imtservergql/imtservergql.h>
 
 
 namespace imtservergql
@@ -49,7 +51,7 @@ bool CCommandsControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 
 sdl::V1_0::imtbase::CGuiElementContainer CCommandsControllerComp::OnGetCommands(
 			const sdl::V1_0::imtbase::CGetCommandsGqlRequest& getCommandsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CGuiElementContainer response;
@@ -69,15 +71,27 @@ sdl::V1_0::imtbase::CGuiElementContainer CCommandsControllerComp::OnGetCommands(
 		typeId = *arguments.input->typeId;
 	}
 
-	const imtauth::IUserInfo* userInfoPtr = nullptr;
+	imtauth::IUserInfo::FeatureIds userPermissions;
+	bool isAdmin = false;
 	QByteArray languageId;
 	const imtgql::IGqlContext* gqlContextPtr = getCommandsRequest.GetRequestContext();
 	if (gqlContextPtr !=  nullptr){
 		languageId = gqlContextPtr->GetLanguageId();
-		userInfoPtr = gqlContextPtr->GetUserInfo();
+
+		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+		if (userInfoPtr != nullptr){
+			isAdmin = userInfoPtr->IsAdmin();
+		}
+
+		if (!isAdmin){
+			// Resolved once for the whole command tree: every element below is
+			// checked against it, and what those permissions require is the
+			// same for all of them.
+			userPermissions = GetUserPermissions(*gqlContextPtr);
+		}
 	}
 
-	if (!GetRepresentationFromGuiElementContainer(*m_guiElementContainerCompPtr, response, languageId, userInfoPtr)){
+	if (!GetRepresentationFromGuiElementContainer(*m_guiElementContainerCompPtr, response, languageId, userPermissions, isAdmin, GetPermissionPath(gqlRequest))){
 		errorMessage = QStringLiteral("Unable to get commands for type-ID '%1'. Error: Get representation failed").arg(typeId);
 		SendErrorMessage(0, errorMessage, "CCommandsControllerComp");
 		return sdl::V1_0::imtbase::CGuiElementContainer();
@@ -99,15 +113,10 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 			const imtserverapp::IGuiElementContainer& guiElementContainer,
 			sdl::V1_0::imtbase::CGuiElementContainer& representation,
 			const QByteArray& languageId,
-			const imtauth::IUserInfo* userInfoPtr) const
+			const imtauth::IUserInfo::FeatureIds& userPermissions,
+			bool isAdmin,
+			const QByteArray& permissionPath) const
 {
-	imtauth::IUserInfo::FeatureIds userPermissions;
-	bool isAdmin = false;
-	if (userInfoPtr != nullptr){
-		userPermissions = userInfoPtr->GetPermissions();
-		isAdmin = userInfoPtr->IsAdmin();
-	}
-	
 	QByteArrayList elementIds = guiElementContainer.GetElementIds();
 	
 	imtsdl::TElementList<sdl::V1_0::imtbase::CGuiElementModel> elementList;
@@ -115,16 +124,14 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 	for (const QByteArray& elementId : elementIds){
 		const imtserverapp::IGuiElementModel* guiElementPtr = guiElementContainer.GetGuiElementModel(elementId);
 		if (guiElementPtr != nullptr){
-			if (!isAdmin){
-				if (m_commandPermissionsCompPtr.IsValid()){
-					QByteArrayList elementPermissions = m_commandPermissionsCompPtr->GetCommandPermissions(elementId);
-					if (m_checkPermissionCompPtr.IsValid() && !elementPermissions.isEmpty()){
-						bool result = m_checkPermissionCompPtr->CheckPermission(userPermissions, elementPermissions);
-						if (!result){
-							continue;
-						}
-					}
-				}
+			if (!imtserverapp::IsElementAccessible(
+					m_commandPermissionsCompPtr.GetPtr(),
+					m_checkPermissionCompPtr.GetPtr(),
+					elementId,
+					userPermissions,
+					isAdmin,
+					permissionPath)){
+				continue;
 			}
 			
 			sdl::V1_0::imtbase::CGuiElementModel element;
@@ -135,7 +142,7 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 			const imtserverapp::IGuiElementContainer* subElementContainerPtr = guiElementPtr->GetSubElements();
 			if (subElementContainerPtr != nullptr){
 				sdl::V1_0::imtbase::CGuiElementContainer subElements;
-				if (!GetRepresentationFromGuiElementContainer(*subElementContainerPtr, subElements, languageId, userInfoPtr)){
+				if (!GetRepresentationFromGuiElementContainer(*subElementContainerPtr, subElements, languageId, userPermissions, isAdmin, permissionPath)){
 					return false;
 				}
 				

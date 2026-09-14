@@ -8,7 +8,7 @@ import imtbaseImtBaseTypesSdl 1.0
 OptionManager {
 	id: container
 
-	property string context: ""
+	property string permissionPath: ""
 	property alias inputModel: dataModelProvider.inputModel
 	property alias responseModel: dataModelProvider.responseModel
 	property alias getCommandId: dataModelProvider.getCommandId
@@ -23,7 +23,7 @@ OptionManager {
 	}
 
 	GqlBasedDataModelProvider {
-		context: container.context
+		permissionPath: container.permissionPath
 		id: dataModelProvider
 
 		dataModel: optionsListModel.m_options

@@ -2,6 +2,10 @@
 #include <imtauth/CCheckPermissionOrComp.h>
 
 
+// ImtCore includes
+#include <imtauth/imtauth.h>
+
+
 namespace imtauth
 {
 
@@ -17,7 +21,7 @@ bool CCheckPermissionOrComp::CheckPermission(const IUserInfo::FeatureIds& userPe
 			return true;
 		}
 
-		if (userPermissions.contains(permissionId)){
+		if (HasPermission(userPermissions, permissionId)){
 			return true;
 		}
 	}

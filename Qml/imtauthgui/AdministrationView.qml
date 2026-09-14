@@ -15,8 +15,11 @@ Item {
 	signal multiPageUpdated();
 
 	property string productId: AuthorizationController.productId
+	// Part of the product this view works in; scopes its permission checks.
+	property string permissionPath: ""
 	property GqlBasedUserAdministrationApiClient apiClient: GqlBasedUserAdministrationApiClient {
 		productId: administrationContainer.productId
+		permissionPath: administrationContainer.permissionPath
 	}
 
 	Component.onCompleted: {

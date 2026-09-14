@@ -27,6 +27,8 @@ ViewBase {
 	// it travels next to that feature instead of being glued onto it.
 	property var optionalFeatures: []
 	property bool canEdit: false
+	// Part of the product this view works in; scopes its permission checks.
+	property string permissionPath: ""
 
 	Component.onCompleted: {
 		canEdit = PermissionsController.checkPermission("ChangeProduct")

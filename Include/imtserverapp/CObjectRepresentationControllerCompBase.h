@@ -38,7 +38,10 @@ protected:
 				const istd::IChangeable& dataModel,
 				QJsonObject& representation,
 				const iprm::IParamsSet* paramsPtr = nullptr) const = 0;
-	virtual bool CheckPermissions(const imtauth::IUserInfo::FeatureIds& userPermissions, const QByteArray& paramId) const;
+	virtual bool CheckPermissions(
+				const imtauth::IUserInfo::FeatureIds& userPermissions,
+				const QByteArray& paramId,
+				const iprm::IParamsSet* paramsPtr = nullptr) const;
 
 	// reimplemented (IRepresentationController)
 	virtual QByteArray GetModelId() const override;

@@ -277,12 +277,14 @@ public:
 		These dependencies must be satisfied for this feature to function properly.
 		\return List of feature IDs that this feature depends on
 	*/
-	virtual QByteArrayList GetDependencies() const = 0;
+	virtual QByteArrayList GetRequirements() const = 0;
 };
 
 
 typedef istd::TUniqueInterfacePtr<IFeatureInfo> IFeatureInfoUniquePtr;
 typedef istd::TSharedInterfacePtr<IFeatureInfo> IFeatureInfoSharedPtr;
+
+QByteArray CalculateFeaturePath(const IFeatureInfo& featureInfo);
 
 
 } // namespace imtlic

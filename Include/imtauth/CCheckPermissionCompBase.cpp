@@ -2,6 +2,10 @@
 #include <imtauth/CCheckPermissionCompBase.h>
 
 
+// ImtCore includes
+#include <imtauth/imtauth.h>
+
+
 namespace imtauth
 {
 
@@ -9,7 +13,7 @@ namespace imtauth
 bool CCheckPermissionCompBase::CheckPermission(const IUserInfo::FeatureIds &userPermissions, const QByteArrayList &permissionIds)
 {
 	for (const QByteArray& permissionId : permissionIds){
-		if (!userPermissions.contains(permissionId)){
+		if (!HasPermission(userPermissions, permissionId)){
 			return false;
 		}
 	}

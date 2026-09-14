@@ -50,10 +50,14 @@ private:
 	void WriteFeatureInfo(
 				QTextStream& textStream,
 				const imtlic::IFeatureInfo& featureInfo,
+				imtlic::IProductInfo &productInfo,
 				const QByteArray& objectUuid) const;
+	QByteArrayList ResolveRequirementPaths(
+				imtlic::IProductInfo& productInfo,
+				const QByteArrayList& requirements) const;
 	void WriteNewLine(QTextStream& textStream, int count = 1) const;
 	void WriteTab(QTextStream& textStream, int count = 1) const;
-	QString CreateFeatureVarName(const QByteArray& featureId) const;
+	QString CreateFeatureVarName(const QByteArray& featurePath) const;
 };
 
 

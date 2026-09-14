@@ -154,6 +154,7 @@
                 <file alias="imtcontrols/Views/BasicTableView.qml">Views/BasicTableView.qml</file>
                 <file alias="imtcontrols/Views/BasicTreeView.qml">Views/BasicTreeView.qml</file>
                 <file alias="imtcontrols/Views/TreeExplorerView.qml">Views/TreeExplorerView.qml</file>
+                <file alias="imtcontrols/Views/TableColumnLayout.qml">Views/TableColumnLayout.qml</file>
                 <file alias="imtcontrols/Views/CheckableListPanel.qml">Views/CheckableListPanel.qml</file>
                 <file alias="imtcontrols/Views/EditableTableCell.qml">Views/EditableTableCell.qml</file>
                 <file alias="imtcontrols/Views/ToolbarButton.qml">Views/ToolbarButton.qml</file>
