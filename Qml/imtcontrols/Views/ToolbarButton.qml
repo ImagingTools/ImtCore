@@ -96,6 +96,7 @@ Item {
 
 	MouseArea {
 		id: commandArea
+		objectName: "MouseArea"
 		anchors.fill: parent
 		hoverEnabled: true
 		cursorShape: control.active ? Qt.PointingHandCursor : Qt.ArrowCursor

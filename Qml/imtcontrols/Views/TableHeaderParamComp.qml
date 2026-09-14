@@ -454,6 +454,9 @@ Dialog {
 						}
 
 						BaseText {
+							// Named so a test can read the dialog's own order without applying it.
+							objectName: "ColumnRowTitle"
+
 							anchors.left: checkArea.right;
 							anchors.leftMargin: Style.marginS;
 							anchors.right: parent.right;
