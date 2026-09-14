@@ -21,6 +21,11 @@ I_EXPORT_COMPONENT(
 			"Collection Document");
 
 I_EXPORT_COMPONENT(
+			DocumentService,
+			"Document service",
+			"Document Service");
+
+I_EXPORT_COMPONENT(
 			FileBasedUndoManager,
 			"File-based undo manager for serialized documents",
 			"File Based Undo Manager");
@@ -32,4 +37,3 @@ I_EXPORT_COMPONENT(
 
 
 } // namespace ImtDocPck
-
