@@ -435,6 +435,42 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 }
 
 
+// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
+
+void CUserGroupCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const
+{
+	// Remove the deleted groups from the membership lists of all users,
+	// so that users no longer reference groups that do not exist anymore.
+	if (m_userCollectionCompPtr.IsValid()){
+		QByteArrayList userIds = m_userCollectionCompPtr->GetElementIds();
+		for (const QByteArray& userId : userIds){
+			imtbase::IObjectCollection::DataPtr userDataPtr;
+			if (!m_userCollectionCompPtr->GetObjectData(userId, userDataPtr)){
+				continue;
+			}
+
+			imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(userDataPtr.GetPtr());
+			if (userInfoPtr == nullptr){
+				continue;
+			}
+
+			bool hasChanges = false;
+			for (const QByteArray& groupId : elementIds){
+				if (userInfoPtr->RemoveFromGroup(groupId)){
+					hasChanges = true;
+				}
+			}
+
+			if (hasChanges){
+				m_userCollectionCompPtr->SetObjectData(userId, *userInfoPtr);
+			}
+		}
+	}
+
+	BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
+}
+
+
 // reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 
 bool CUserGroupCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
