@@ -198,7 +198,7 @@ class TextInput extends Item {
                     if(this.text === previousText){
                         this.__renderImplText()
                     }
-                    this.select(Math.min(result.cursor, this.text.length), Math.min(result.cursor, this.text.length))
+                    this.__restoreCursorAfterEdit(result)
                     break
                 }
                 case 'insertFromPaste': {
@@ -476,6 +476,25 @@ class TextInput extends Item {
         }
     }
 
+    __syncCursorToEnd(){
+        let pos = this.text.length
+        this.cursorPosition = pos
+        this.selectionStart = pos
+        this.selectionEnd = pos
+        this.selectedText = ''
+
+        if(!this.__impl) return
+        if(!this.activeFocus && typeof document !== 'undefined' && document.activeElement !== this.__impl) return
+
+        this.select(pos, pos)
+    }
+
+    __restoreCursorAfterEdit(result){
+        let cursor = result && this.text === result.newText ? result.cursor : this.text.length
+        cursor = Math.max(0, Math.min(cursor, this.text.length))
+        this.select(cursor, cursor)
+    }
+
     SLOT_textChanged(oldValue, newValue){
         let maximumLength = this.__getMaximumLength()
         if(this.text.length > maximumLength){
@@ -484,6 +503,7 @@ class TextInput extends Item {
         }
 
         this.__renderImplText()
+        this.__syncCursorToEnd()
 
         this.__checkValidator()
 
@@ -552,7 +572,7 @@ class TextInput extends Item {
         navigator.clipboard.readText().then((text) => {
             let result = this.__applyTextInsertWithLimit(this.selectionStart, this.selectionEnd, text)
             this.text = result.newText
-            this.select(result.cursor, result.cursor)
+            this.__restoreCursorAfterEdit(result)
         })
     }
     positionAt(x, y, position){

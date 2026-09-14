@@ -612,7 +612,7 @@ class ListView extends Flickable {
             }
         }
 
-        for (let i = startIndex; i < Number(Object.keys(this.__items).pop()); i++) {
+        for (let i = startIndex; i < this.count; i++) {
             let item = this.__items[i]
             if (!item) continue
 
@@ -747,6 +747,10 @@ class ListView extends Flickable {
 
             if (currentIndex !== this.currentIndex) {
                 this.currentIndex = currentIndex
+            }
+
+            if (layoutFrom !== undefined) {
+                this.__realignItems(layoutFrom)
             }
 
             let keys = Object.keys(this.__items)
