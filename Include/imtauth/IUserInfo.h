@@ -117,55 +117,34 @@ public:
 
 	/**
 		Get hashes of previously used passwords, ordered from the most recently used one.
-		\note Default implementation is provided for backward compatibility.
 	*/
-	virtual QByteArrayList GetPasswordHistory() const
-	{
-		return QByteArrayList();
-	}
+	virtual QByteArrayList GetPasswordHistory() const = 0;
 
 	/**
 		Set hashes of previously used passwords, ordered from the most recently used one.
-		\note Default implementation is provided for backward compatibility.
 	*/
-	virtual void SetPasswordHistory(const QByteArrayList& /*passwordHistory*/)
-	{
-	}
+	virtual void SetPasswordHistory(const QByteArrayList& passwordHistory) = 0;
 
 	/**
 		Get timestamp (UTC) of the last password change.
 		An invalid timestamp means that the change time is unknown (legacy user).
-		\note Default implementation is provided for backward compatibility.
 	*/
-	virtual QDateTime GetPasswordChangedAt() const
-	{
-		return QDateTime();
-	}
+	virtual QDateTime GetPasswordChangedAt() const = 0;
 
 	/**
 		Set timestamp (UTC) of the last password change.
-		\note Default implementation is provided for backward compatibility.
 	*/
-	virtual void SetPasswordChangedAt(const QDateTime& /*passwordChangedAt*/)
-	{
-	}
+	virtual void SetPasswordChangedAt(const QDateTime& passwordChangedAt) = 0;
 
 	/**
 		Check if the user must change the password on the next login.
-		\note Default implementation is provided for backward compatibility.
 	*/
-	virtual bool MustChangePassword() const
-	{
-		return false;
-	}
+	virtual bool MustChangePassword() const = 0;
 
 	/**
 		Set flag indicating that the user must change the password on the next login.
-		\note Default implementation is provided for backward compatibility.
 	*/
-	virtual void SetMustChangePassword(bool /*mustChangePassword*/)
-	{
-	}
+	virtual void SetMustChangePassword(bool mustChangePassword) = 0;
 };
 
 
