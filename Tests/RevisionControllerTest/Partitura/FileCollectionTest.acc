@@ -10,12 +10,12 @@
     <Description>Acula's data repository containing all resources need for the execution of the production workflow</Description>
     <Keywords>Inspection Application Product Workflow</Keywords>
     <ElementsList>
-        <Element Id="AccountInfo" PackageId="ImtAuthPck" ComponentId="AccountInfo">
+        <Element Id="AccountInfo" PackageId="ImtAccountPck" ComponentId="AccountInfo">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="AccountInfoMetaInfoCreator" PackageId="ImtAuthPck" ComponentId="AccountInfoMetaInfoCreator">
+        <Element Id="AccountInfoMetaInfoCreator" PackageId="ImtAccountPck" ComponentId="AccountInfoMetaInfoCreator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ObjectTypeIds" Type="Id[]" ExportId="">

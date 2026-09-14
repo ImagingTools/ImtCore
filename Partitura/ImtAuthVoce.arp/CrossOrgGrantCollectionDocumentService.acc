@@ -128,7 +128,11 @@
         </Element>
         <Element Id="SerializedUndoManager" PackageId="BasePck" ComponentId="SerializedUndoManager">
             <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap/>
+                <AttributeInfoMap>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="CrossOrgGrantDocumentValidator" PackageId="ImtAuthGqlPck" ComponentId="CrossOrgGrantDocumentValidator">

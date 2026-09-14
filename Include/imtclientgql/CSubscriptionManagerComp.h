@@ -19,6 +19,7 @@
 #include <imod/CSingleModelObserverBase.h>
 
 // ImtCore includes
+#include <imtauth/IAccessTokenProvider.h>
 #include <imtcom/IConnectionStatusProvider.h>
 #include <imtrest/ITransport.h>
 #include <imtrest/IResponseDispatcher.h>
@@ -56,6 +57,8 @@ public:
 	typedef IAsyncGqlClient::GqlResponsePtr GqlResponsePtr;
 	typedef IAsyncGqlClient::GqlResult GqlResult;
 
+	CSubscriptionManagerComp();
+
 	I_BEGIN_COMPONENT(CSubscriptionManagerComp);
 		I_REGISTER_INTERFACE(IGqlSubscriptionManager);
 		I_REGISTER_INTERFACE(IAsyncGqlClient);
@@ -65,6 +68,8 @@ public:
 		I_ASSIGN(m_engineCompPtr, "ProtocolEngine", "Protocol engine for subscription", true, "ProtocolEngine");
 		I_ASSIGN(m_connectionStatusProviderCompPtr, "WebLoginStatus", "Web login status", false, "WebLoginStatus");
 		I_ASSIGN_TO(m_connectionStatusProviderModelCompPtr, m_connectionStatusProviderCompPtr, true);
+		I_ASSIGN(m_accessTokenProviderCompPtr, "AccessTokenProvider", "Provider of the current access token", false, "AccessTokenProvider");
+		I_ASSIGN_TO(m_accessTokenProviderModelCompPtr, m_accessTokenProviderCompPtr, false);
 		I_ASSIGN(m_requestTimeoutMsAttrPtr, "RequestTimeoutMs", "Async request timeout (ms)", false, 100000);
 	I_END_COMPONENT;
 
@@ -90,10 +95,35 @@ public:
 
 protected:
 	virtual bool SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const;
+	virtual bool SubscriptionUnregister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const;
 	virtual bool SendRequestInternal(const imtgql::IGqlRequest& request, imtrest::ConstRequestPtr& requestPtr) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+
+protected:
+	/**
+		Re-send the "start" message of every known subscription.
+		The server binds a subscription to the identity presented at registration
+		time, so a replaced access token has to be carried to it explicitly.
+		Every re-registration is preceded by a "stop" message with the same
+		subscription ID, because server side controllers append a new
+		registration instead of replacing the existing one.
+	*/
+	void ReregisterSubscriptions() const;
+
+	class AccessTokenObserver: public imod::CSingleModelObserverBase
+	{
+	public:
+		AccessTokenObserver(CSubscriptionManagerComp& parent);
+
+	protected:
+		// reimplemented (imod::CSingleModelObserverBase)
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+
+	private:
+		CSubscriptionManagerComp& m_parent;
+	};
 
 Q_SIGNALS:
 	void OnQueryDataReceived(int resultCode = 1) const;
@@ -116,8 +146,12 @@ private:
 	I_REF(imtrest::IResponseDispatcher, m_requestManagerCompPtr);
 	I_REF(imtcom::IConnectionStatusProvider, m_connectionStatusProviderCompPtr);
 	I_REF(imod::IModel, m_connectionStatusProviderModelCompPtr);
+	I_REF(imtauth::IAccessTokenProvider, m_accessTokenProviderCompPtr);
+	I_REF(imod::IModel, m_accessTokenProviderModelCompPtr);
 	I_REF(imtrest::IProtocolEngine, m_engineCompPtr);
 	I_ATTR(int, m_requestTimeoutMsAttrPtr);
+
+	AccessTokenObserver m_accessTokenObserver;
 
 	class SubscriptionHelper
 	{

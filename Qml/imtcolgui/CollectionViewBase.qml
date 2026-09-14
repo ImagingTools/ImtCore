@@ -22,6 +22,11 @@ ViewBase {
 	
 	property alias filterMenu: filterMenu_;
 	property alias loading: loading_;
+	// Tracks the request itself rather than the loading indicator, which is
+	// held back by loadingIndicatorDelay - during that window an empty table
+	// is still an unanswered request, not an empty collection.
+	property bool updating: false;
+	property bool contentLoaded: false;
 	property bool filterMenuVisible: collectionViewBaseContainer.hasFilter;
 	property alias pagination: pagination_;
 	property alias elementsCount: tableInternal.elementsCount;
@@ -369,7 +374,8 @@ ViewBase {
 
 			spacing: Style.marginM;
 
-			visible: tableInternal.elementsCount === 0 && !loading_.visible;
+			visible: tableInternal.elementsCount === 0 && !loading_.visible
+					&& collectionViewBaseContainer.contentLoaded && !collectionViewBaseContainer.updating;
 
 			readonly property bool filtered: collectionViewBaseContainer.activeFilterCount > 0;
 

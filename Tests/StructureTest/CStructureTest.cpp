@@ -6,9 +6,9 @@
 // // #include <imtbase/IObjectCollection.h>
 // #include <ifile/CCompactXmlFileReadArchive.h>
 // #include <ifile/CCompactXmlFileWriteArchive.h>
-// #include <imtauth/CAccountInfo.h>
-// #include <imtauth/CAccountInfoMetaInfo.h>
-// #include <imtauth/IAccountInfo.h>
+// #include <imtaccount/CAccountInfo.h>
+// #include <imtaccount/CAccountInfoMetaInfo.h>
+// #include <imtaccount/IAccountInfo.h>
 
 // Partitura test registrations for StructureTest
 const char partituraStructureTest[] = "StructureTest";

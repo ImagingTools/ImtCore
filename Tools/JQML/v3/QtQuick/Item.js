@@ -44,6 +44,7 @@ class Item extends QtObject {
         activeFocus: { type: Bool, value: false},
         clip: { type: Bool, value: false},
         activeFocusOnTab: { type: Bool, value: false},
+        JQOpacityMultiplier: { type: Real, value: 1},
 
         Layout: {type:Layout},
 
@@ -83,6 +84,7 @@ class Item extends QtObject {
         activeFocusChanged: {type:Signal, args:[]},
         clipChanged: {type:Signal, args:[]},
         activeFocusOnTabChanged: {type:Signal, args:[]},
+        JQOpacityMultiplierChanged: {type:Signal, args:[]},
 
         'Keys.asteriskPressed': {type:Signal, args: ['event'] },
         'Keys.backPressed': {type:Signal, args: ['event'] },
@@ -137,6 +139,8 @@ class Item extends QtObject {
 
         dom.qml = obj
         obj.__connectDOM(this.parent)
+
+        obj.JQOpacityMultiplier = ()=>{return obj.parent ? obj.parent.JQOpacityMultiplier * obj.opacity : obj.opacity}
 
         return obj
     }

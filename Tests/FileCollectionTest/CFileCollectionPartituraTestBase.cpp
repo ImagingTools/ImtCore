@@ -4,7 +4,7 @@
 // ImtCore includes
 #include <imtrepo/IFileObjectCollection.h>
 #include <imtrepo/CFileCollectionItem.h>
-#include <imtauth/CAccountInfo.h>
+#include <imtaccount/CAccountInfo.h>
 
 
 void CFileCollectionPartituraTestBase::InsertFileTest_data()

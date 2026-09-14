@@ -226,6 +226,7 @@ Item {
             if(!spinBox.editable){
                 return
             }
+			spinBox.baseElement.wheel(wheel)
             if(wheel.angleDelta.y > 0){
                 spinBox.baseElement.increase();
             }

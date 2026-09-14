@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtauth/IAccountInfo.h>
+#include <imtaccount/IAccountInfo.h>
 
 
 namespace imtauthgui
@@ -28,22 +28,22 @@ bool CAccountInfoViewDelegateComp::GetSummaryInformation(
 		summaryInformation.infoId = informationId;
 		if (metaInfoPtr.IsValid()){
 			if (informationId == QByteArrayLiteral("AccountName")){
-				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_NAME).toString();
+				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtaccount::IAccountInfo::MIT_ACCOUNT_NAME).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArrayLiteral("Email")){
-				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_CONTACT_EMAIL).toString();
+				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtaccount::IAccountInfo::MIT_CONTACT_EMAIL).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArrayLiteral("AccountType")){
-				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_TYPE).toString();
+				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtaccount::IAccountInfo::MIT_ACCOUNT_TYPE).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArrayLiteral("AccountDesciption")){
-				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_DESCRIPTION).toString();
+				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtaccount::IAccountInfo::MIT_ACCOUNT_DESCRIPTION).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}

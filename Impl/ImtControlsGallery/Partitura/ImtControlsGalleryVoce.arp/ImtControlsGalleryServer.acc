@@ -383,7 +383,7 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="ContactInfo" PackageId="ImtAuthPck" ComponentId="ContactInfo">
+                    <Element Id="ContactInfo" PackageId="ImtAccountPck" ComponentId="ContactInfo">
                         <Data IsEnabled="true" Flags="2">
                             <AttributeInfoMap/>
                         </Data>

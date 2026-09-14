@@ -55,6 +55,7 @@ Rectangle {
 	property alias elementsList: elementsListObj;
 	property alias cacheBuffer: elementsListObj.cacheBuffer;
 	property alias contentHeight: elementsListObj.contentHeight;
+	property real contentHeightTotal: headerHeight + contentHeight + scrollHoriz.visible * (scrollHoriz.secondSize + scrollHoriz.anchors.topMargin)
 	property real contentWidth: elementsListObj.contentWidth;
 	property alias originX: elementsListObj.originX;
 	property alias originY: elementsListObj.originY;
