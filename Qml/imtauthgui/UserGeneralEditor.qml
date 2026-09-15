@@ -29,6 +29,10 @@ Column {
 
 	property bool showAccountEnabled: false;
 
+	// Mirrors the server side guard: only the superuser may enable or disable an account,
+	// so for everyone else the switch is absent and the model keeps the stored state.
+	readonly property bool accountEnabledAvailable: container.showAccountEnabled && AuthorizationController.loggedUserIsSuperuser();
+
 	property bool updatingGui: false;
 
 	function updateGui(){
@@ -42,7 +46,7 @@ Column {
 		nameInput_.text = container.userData.m_name;
 		mailInput_.text = container.userData.m_email;
 		passwordInput_.text = container.userData.m_password;
-		if (container.showAccountEnabled){
+		if (container.accountEnabledAvailable){
 			enabledSwitch_.checked = container.userData.m_enabled === false ? false : true;
 		}
 
@@ -58,7 +62,7 @@ Column {
 		container.userData.m_name = nameInput_.text;
 		container.userData.m_email = mailInput_.text;
 		container.userData.m_password = passwordInput_.text;
-		if (container.showAccountEnabled){
+		if (container.accountEnabledAvailable){
 			container.userData.m_enabled = enabledSwitch_.checked;
 		}
 	}
@@ -158,7 +162,7 @@ Column {
 
 			name: qsTr("Account enabled");
 			description: qsTr("Disabled accounts cannot log in");
-			visible: container.showAccountEnabled;
+			visible: container.accountEnabledAvailable;
 			readOnly: container.readOnly;
 
 			onCheckedChanged: {

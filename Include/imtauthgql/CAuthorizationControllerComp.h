@@ -50,6 +50,11 @@ protected:
 	bool CheckCredential(const QByteArray& systemId, const QByteArray& login, const QByteArray& password) const;
 	QByteArrayList CalculateGlobalPermissions(const imtauth::IUserInfo& userInfo, const QByteArray& userId, const QByteArray& productId) const;
 	sdl::V1_0::imtauth::CAuthorizationPayload CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const;
+	/**
+		Response for an account that is disabled. Only for callers whose credentials were
+		already verified - otherwise it would turn a login attempt into an account-state probe.
+	*/
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateAccountDisabledResponse(const QByteArray& login) const;
 	sdl::V1_0::imtauth::CAuthorizationPayload CreateAuthorizationSuccessfulResponse(
 				imtauth::CUserInfo& userInfo,
 				const QByteArray& systemId,

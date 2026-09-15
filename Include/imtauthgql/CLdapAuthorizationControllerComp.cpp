@@ -292,10 +292,9 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 					if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
 						userInfoPtr.MoveCastedPtr(dataPtr.GetPtr()->CloneMe());
 						if (userInfoPtr.IsValid()){
+							// Reached only after CheckCredential succeeded, so naming the account state is safe.
 							if (!userInfoPtr->IsEnabled()){
-								SendWarningMessage(0, QStringLiteral("Authorization denied for disabled account. Login: '%1'").arg(login), "CLdapAuthorizationControllerComp");
-
-								return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+								return CreateAccountDisabledResponse(login);
 							}
 
 							bool needsUpdate = false;

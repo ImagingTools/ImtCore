@@ -359,7 +359,7 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 		m_mustChangePassword = false;
 	}
 
-	if (imtCoreVersion >= 23300){
+	if (imtCoreVersion >= 23245){
 		iser::CArchiveTag enabledTag("Enabled", "Account enabled", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(enabledTag);
 		retVal = retVal && archive.Process(m_enabled);
