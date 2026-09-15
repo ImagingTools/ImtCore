@@ -5,9 +5,12 @@
 
 // ACF includes
 #include <iqt/iqt.h>
+#include <istd/TDelPtr.h>
+#include <iprm/CParamsSet.h>
 
 // ImtCore includes
 #include <imtauth/CUserGroupInfo.h>
+#include <imtauth/CUserGroupFilter.h>
 #include <imtauth/IUserInfoProvider.h>
 
 
@@ -439,10 +442,15 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 void CUserGroupCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const
 {
-	// Remove the deleted groups from the membership lists of all users,
+	// Remove the deleted groups from the membership lists of their member users,
 	// so that users no longer reference groups that do not exist anymore.
 	if (m_userCollectionCompPtr.IsValid()){
-		QByteArrayList userIds = m_userCollectionCompPtr->GetElementIds();
+		iprm::CParamsSet filterParams;
+		istd::TDelPtr<imtauth::CUserGroupFilter> groupFilterPtr = new imtauth::CUserGroupFilter();
+		groupFilterPtr->SetGroupIds(elementIds);
+		filterParams.SetEditableParameter("GroupFilter", groupFilterPtr.PopPtr(), true);
+
+		imtbase::ICollectionInfo::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParams);
 		for (const QByteArray& userId : userIds){
 			imtbase::IObjectCollection::DataPtr userDataPtr;
 			if (!m_userCollectionCompPtr->GetObjectData(userId, userDataPtr)){
