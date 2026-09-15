@@ -5,10 +5,6 @@
 // Qt includes
 #include <QtWebSockets/QWebSocket>
 
-// ImtCore includes
-#include <imtrest/IResponse.h>
-#include <imtrest/IProtocolEngine.h>
-
 
 namespace imtrest
 {
@@ -33,42 +29,17 @@ bool CWebSocketSender::IsSocketValid() const
 	return !m_webSocketPtr.isNull() && m_webSocketPtr->isValid();
 }
 
-// reimplemented (IRequest)
+// reimplemented (ITransport)
 
-bool CWebSocketSender::SendResponse(ConstResponsePtr& response) const
+bool CWebSocketSender::SendData(QByteArray& data) const
 {
-	int protocolStatusCode = -1;
-	QByteArray statusLiteral;
-
-	bool retVal = response->GetProtocolEngine().GetProtocolStatusCode(response->GetStatusCode(), protocolStatusCode, statusLiteral);
-	if (!retVal){
+	if (!IsSocketValid()){
 		return false;
 	}
 
-	if (IsSocketValid()){
-		const QByteArray& contentData = response->GetData();
+	emit SendTextMessage(data);
 
-		emit SendTextMessage(contentData);
-
-		return true;
-	}
-
-	return false;
-}
-
-
-bool CWebSocketSender::SendRequest(ConstRequestPtr& request) const
-{
-	if (IsSocketValid()){
-		const QByteArray& contentData = request->GetBody();
-
-		emit SendTextMessage(contentData);
-
-		return true;
-	}
-
-	return false;
-
+	return true;
 }
 
 

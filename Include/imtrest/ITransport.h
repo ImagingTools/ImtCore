@@ -2,9 +2,11 @@
 #pragma once
 
 
-// ImtCore includes
-#include <imtrest/IRequest.h>
-#include <imtrest/IResponse.h>
+// Qt includes
+#include <QtCore/QByteArray>
+
+// ACF includes
+#include <istd/IPolymorphic.h>
 
 
 namespace imtrest
@@ -12,22 +14,15 @@ namespace imtrest
 
 
 /**
-	Interface describing the transport layer for sending responses and requests to the client.
+	Interface describing the transport layer for sending already-serialized data to the client.
 */
 class ITransport: virtual public istd::IPolymorphic
 {
 public:
-	/**
-		Send a response to the client.
-		The transfer should be realized over the socket instance provided by the response object.
-	*/
-	virtual bool SendResponse(ConstResponsePtr& response) const = 0;
 	/*!
-		Send a request to the client.
-		The transfer should be realized over the socket instance provided by the request object.
-
+		Send a piece of already-serialized data to the client.
 	*/
-	virtual bool SendRequest(ConstRequestPtr& request) const = 0;
+	virtual bool SendData(QByteArray& data) const = 0;
 };
 
 
