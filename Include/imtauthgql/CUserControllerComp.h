@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtauth/ICredentialController.h>
+#include <imtauth/IPasswordPolicy.h>
 #include <imtauth/IUserVerificationController.h>
 #include <imtauthgql/CUserRepresentationController.h>
 #include <imtcrypt/IHashGenerator.h>
@@ -32,6 +33,7 @@ public:
 		I_ASSIGN(m_userOperationContextControllerCompPtr, "UserOperationContextController", "User operation context controller", false, "UserOperationContextController");
 		I_ASSIGN(m_userVerificationCodeSenderCompPtr, "UserVerificationCodeSender", "User verification code sender", false, "UserVerificationCodeSender");
 		I_ASSIGN(m_databaseConnectionCheckerCompPtr, "DatabaseConnectionChecker", "Database connection checker", false, "DatabaseConnectionChecker");
+		I_ASSIGN(m_passwordPolicyCompPtr, "PasswordPolicy", "Password policy for strength, history and lifetime checks", false, "PasswordPolicy");
 	I_END_COMPONENT;
 
 protected:
@@ -68,11 +70,18 @@ protected:
 				const sdl::V1_0::imtauth::CGetUserObjectIdGqlRequest& getUserObjectIdRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CPasswordPolicyPayload OnGetPasswordPolicy(
+				const sdl::V1_0::imtauth::CGetPasswordPolicyGqlRequest& getPasswordPolicyRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
+	sdl::V1_0::imtauth::CChangePasswordPayload CreateChangePasswordFailure(
+				const QString& message,
+				const QStringList& violatedRuleIds) const;
 	bool SendUserCode(const QByteArray& userId, const imtauth::IUserInfo& userInfo) const;
 	imtauth::IUserInfoSharedPtr GetUserInfoByLogin(const QByteArray& login) const;
 	QByteArray GetUserIdByLogin(const QByteArray& login) const;
@@ -88,6 +97,7 @@ private:
 	I_REF(imtbase::IOperationContextController, m_userOperationContextControllerCompPtr);
 	I_REF(imtauth::IUserVerificationCodeSender, m_userVerificationCodeSenderCompPtr);
 	I_REF(imtdb::IDatabaseServerConnectionChecker, m_databaseConnectionCheckerCompPtr);
+	I_REF(imtauth::IPasswordPolicy, m_passwordPolicyCompPtr);
 
 private:
 	imtauthgql::CUserRepresentationController m_userRepresentationController;

@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QDateTime>
+
 // ImtCore includes
 #include <imtauth/IUserGroupInfo.h>
 #include <imtauth/IUserBaseInfo.h>
@@ -111,6 +114,37 @@ public:
 		Remove an user from the system.
 	*/
 	virtual bool RemoveFromSystem(const QByteArray& systemId) = 0;
+
+	/**
+		Get hashes of previously used passwords, ordered from the most recently used one.
+	*/
+	virtual QByteArrayList GetPasswordHistory() const = 0;
+
+	/**
+		Set hashes of previously used passwords, ordered from the most recently used one.
+	*/
+	virtual void SetPasswordHistory(const QByteArrayList& passwordHistory) = 0;
+
+	/**
+		Get timestamp (UTC) of the last password change.
+		An invalid timestamp means that the change time is unknown (legacy user).
+	*/
+	virtual QDateTime GetPasswordChangedAt() const = 0;
+
+	/**
+		Set timestamp (UTC) of the last password change.
+	*/
+	virtual void SetPasswordChangedAt(const QDateTime& passwordChangedAt) = 0;
+
+	/**
+		Check if the user must change the password on the next login.
+	*/
+	virtual bool MustChangePassword() const = 0;
+
+	/**
+		Set flag indicating that the user must change the password on the next login.
+	*/
+	virtual void SetMustChangePassword(bool mustChangePassword) = 0;
 };
 
 
