@@ -17,6 +17,7 @@
 
 const { defineConfig } = require('@playwright/test');
 const { buildProjects } = require('./buildProjects');
+const { resolveOutputPaths } = require('./output');
 
 /**
  * @param {object} opts
@@ -47,6 +48,8 @@ function createGuiConfig({
   if (!users || typeof users.activeUsers !== 'function' || !Array.isArray(users.USERS)) {
     throw new Error('createGuiConfig: `users` must be a users module (see fixtures/defineUsers)');
   }
+
+  const output = resolveOutputPaths(rootDir);
 
   // A stale or misspelled key matches nobody, every project then gets the grepInvert, and the entire
   // mutating phase vanishes into a green run with nothing to show it went missing.
@@ -82,16 +85,16 @@ function createGuiConfig({
     workers,
     // No retries - a flaky test reports red immediately instead of being masked by a re-run.
     retries: 0,
-    // The HTML report is opt-in, via PLAYWRIGHT_HTML_OUTPUT_DIR. It duplicates what the junit file and
+    // The HTML report is opt-in, via PLAYWRIGHT_HTML_REPORT. It duplicates what the junit file and
     // the failure artifacts already carry, and costs a directory per phase to say it - so a suite that
     // reads its results from the junit XML and the diff PNGs (all of them, so far) should not have to
     // keep sweeping those folders up. Setting the variable brings it back.
     reporter: process.env.CI
       ? [
           ['list'],
-          ['junit', { outputFile: process.env.PLAYWRIGHT_JUNIT_OUTPUT || 'test-output/junit.xml' }],
-          ...(process.env.PLAYWRIGHT_HTML_OUTPUT_DIR
-            ? [['html', { outputFolder: process.env.PLAYWRIGHT_HTML_OUTPUT_DIR, open: 'never' }]]
+          ['junit', { outputFile: output.junit }],
+          ...(process.env.PLAYWRIGHT_HTML_REPORT
+            ? [['html', { outputFolder: output.html, open: 'never' }]]
             : []),
         ]
       : 'list',
@@ -101,7 +104,7 @@ function createGuiConfig({
     // wipes the first's screenshots/diffs/traces before anyone can look at them.
     // Everything a run leaves behind goes under one directory, so a suite root stays readable: an ad
     // hoc `npx playwright test` lands here too, not in a test-results/ of its own.
-    outputDir: process.env.PLAYWRIGHT_OUTPUT_DIR || 'test-output/artifacts',
+    outputDir: output.artifacts,
     // No {testFilePath}: the baseline is keyed by user + screenshot name, so it no longer matters which
     // FILE registered the test. That is what let the spec generators drop the `defineTest` shim every
     // spec had to repeat purely so Playwright would file generated tests under the right path.

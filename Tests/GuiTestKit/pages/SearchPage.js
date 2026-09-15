@@ -8,6 +8,7 @@
 
 const { BasePage } = require('./BasePage');
 const gui = require('../lib/gui');
+const { waitForBusyIndicatorGone } = require('../lib/stability');
 
 class SearchPage extends BasePage {
   constructor(page) {
@@ -49,6 +50,7 @@ class SearchPage extends BasePage {
   async waitForResults() {
     try {
       await gui.expectVisible(this.page, ['Tab0'], 'search results tab should appear');
+      await waitForBusyIndicatorGone(this.page, { timeout: 15_000 });
     } catch (_) {
       // no results for this query - tabCount() will correctly report 0
     }
