@@ -231,6 +231,9 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
+	// Self-registration never carries an account state: only the superuser may disable an account.
+	userInfoPtr->SetEnabled(true);
+
 	imtauth::IUserInfo::SystemInfo systemInfo;
 	userInfoPtr->AddToSystem(systemInfo);
 

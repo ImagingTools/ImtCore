@@ -27,15 +27,30 @@ Column {
 
 	property bool canHideGroup: true;
 
+	property bool showAccountEnabled: false;
+
+	// Mirrors the server side guard: only the superuser may enable or disable an account,
+	// so for everyone else the switch is absent and the model keeps the stored state.
+	readonly property bool accountEnabledAvailable: container.showAccountEnabled && AuthorizationController.loggedUserIsSuperuser();
+
+	property bool updatingGui: false;
+
 	function updateGui(){
 		if (!container.userData){
 			return
 		}
 
+		container.updatingGui = true;
+
 		usernameInput_.text = container.userData.m_username;
 		nameInput_.text = container.userData.m_name;
 		mailInput_.text = container.userData.m_email;
 		passwordInput_.text = container.userData.m_password;
+		if (container.accountEnabledAvailable){
+			enabledSwitch_.checked = container.userData.m_enabled === false ? false : true;
+		}
+
+		container.updatingGui = false;
 	}
 
 	function updateModel(){
@@ -47,6 +62,9 @@ Column {
 		container.userData.m_name = nameInput_.text;
 		container.userData.m_email = mailInput_.text;
 		container.userData.m_password = passwordInput_.text;
+		if (container.accountEnabledAvailable){
+			container.userData.m_enabled = enabledSwitch_.checked;
+		}
 	}
 
 	GroupElementView {
@@ -134,6 +152,26 @@ Column {
 
 			KeyNavigation.tab: passwordInput_.visible ? passwordInput_ : usernameInput_;
 			KeyNavigation.backtab: nameInput_;
+		}
+
+		SwitchElementView {
+			id: enabledSwitch_;
+
+			// Test instrumentation - see usernameInput_'s comment above. Inert.
+			objectName: "AccountEnabledSwitch";
+
+			name: qsTr("Account enabled");
+			description: qsTr("Disabled accounts cannot log in");
+			visible: container.accountEnabledAvailable;
+			readOnly: container.readOnly;
+
+			onCheckedChanged: {
+				if (container.updatingGui){
+					return;
+				}
+
+				container.emitUpdateModel();
+			}
 		}
 	}
 

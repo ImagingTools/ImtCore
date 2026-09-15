@@ -137,6 +137,24 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateIn
 }
 
 
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAccountDisabledResponse(
+			const QByteArray& login) const
+{
+	// Only reached once the credentials were verified, so naming the account state
+	// discloses nothing the caller has not already proven. Reported through the
+	// payload, not through errorMessage: a non-empty errorMessage makes the
+	// generated handler drop the payload, and with it the flag.
+	SendWarningMessage(0,
+					QStringLiteral("Authorization denied for disabled account. Login: '%1'").arg(login),
+					"imtgql::CAuthorizationControllerComp");
+
+	sdl::V1_0::imtauth::CAuthorizationPayload payload;
+	payload.accountDisabled = true;
+
+	return payload;
+}
+
+
 sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAccountLockedResponse(
 			const QByteArray& login,
 			QString& errorMessage) const
@@ -365,6 +383,11 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
+	// Checked after the credentials, so a wrong password cannot be used to probe account states.
+	if (!userInfoPtr->IsEnabled()){
+		return CreateAccountDisabledResponse(login);
+	}
+
 	return CreateAuthorizationResponseWithLifetimeCheck(*userInfoPtr, activeSystemId, productId, errorMessage);
 }
 
@@ -437,6 +460,11 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 
 	if (!ok){
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+	}
+
+	// Checked after the credentials, so a wrong password cannot be used to probe account states.
+	if (!userInfoPtr->IsEnabled()){
+		return CreateAccountDisabledResponse(login);
 	}
 
 	return CreateAuthorizationResponseWithLifetimeCheck(*userInfoPtr, activeSystemId, productId, errorMessage);
