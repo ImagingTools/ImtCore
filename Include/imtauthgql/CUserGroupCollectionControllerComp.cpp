@@ -5,9 +5,12 @@
 
 // ACF includes
 #include <iqt/iqt.h>
+#include <istd/TDelPtr.h>
+#include <iprm/CParamsSet.h>
 
 // ImtCore includes
 #include <imtauth/CUserGroupInfo.h>
+#include <imtauth/CUserGroupFilter.h>
 #include <imtauth/IUserInfoProvider.h>
 
 
@@ -432,6 +435,47 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	}
 
 	return FillObjectFromRepresentation(representation, object, objectId, errorMessage);
+}
+
+
+// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
+
+void CUserGroupCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const
+{
+	// Remove the deleted groups from the membership lists of their member users,
+	// so that users no longer reference groups that do not exist anymore.
+	if (m_userCollectionCompPtr.IsValid()){
+		iprm::CParamsSet filterParams;
+		istd::TDelPtr<imtauth::CUserGroupFilter> groupFilterPtr = new imtauth::CUserGroupFilter();
+		groupFilterPtr->SetGroupIds(elementIds);
+		filterParams.SetEditableParameter("GroupFilter", groupFilterPtr.PopPtr(), true);
+
+		imtbase::ICollectionInfo::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParams);
+		for (const QByteArray& userId : userIds){
+			imtbase::IObjectCollection::DataPtr userDataPtr;
+			if (!m_userCollectionCompPtr->GetObjectData(userId, userDataPtr)){
+				continue;
+			}
+
+			imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(userDataPtr.GetPtr());
+			if (userInfoPtr == nullptr){
+				continue;
+			}
+
+			bool hasChanges = false;
+			for (const QByteArray& groupId : elementIds){
+				if (userInfoPtr->RemoveFromGroup(groupId)){
+					hasChanges = true;
+				}
+			}
+
+			if (hasChanges){
+				m_userCollectionCompPtr->SetObjectData(userId, *userInfoPtr);
+			}
+		}
+	}
+
+	BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
 }
 
 
