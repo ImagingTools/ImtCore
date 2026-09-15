@@ -175,6 +175,15 @@ input UserLogin {
 	login: ID!
 }
 
+input UnlockUserInput {
+	login: ID!
+}
+
+type UnlockUserPayload {
+	success: Boolean!
+	message: String
+}
+
 type UserObjectId {
 	objectId: ID!
 }
@@ -196,6 +205,7 @@ type Mutation {
 	ChangePassword (input: ChangePasswordInput): ChangePasswordPayload!
 	RegisterUser (input: RegisterUserInput): RegisterUserPayload!
 	CreateSuperuser (input: CreateSuperuserInput): CreateSuperuserPayload!
+	UnlockUser (input: UnlockUserInput): UnlockUserPayload!
 }
 
 collectionSchema {

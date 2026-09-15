@@ -61,6 +61,10 @@ protected:
 				const sdl::V1_0::imtauth::CGetUserObjectIdGqlRequest& getUserObjectIdRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CUnlockUserPayload OnUnlockUser(
+				const sdl::V1_0::imtauth::CUnlockUserGqlRequest& unlockUserRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CPasswordPolicyPayload OnGetPasswordPolicy(
 				const sdl::V1_0::imtauth::CGetPasswordPolicyGqlRequest& getPasswordPolicyRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
