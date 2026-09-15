@@ -75,7 +75,18 @@ void CWebSocketServerComp::SetConnectionStatus(const QByteArray& clientId)
 	loginChangeSet.SetChangeInfo("ClientId", clientId);
 	istd::CChangeNotifier notifier(this, &loginChangeSet);
 
-	m_senderLoginStatusMap.insert(clientId, loginStatus);
+	{
+		// This runs on a per-socket CWebSocketThread (every MT_CONNECTION_INIT), while the main thread
+		// removes the same map's entries in OnSocketDisconnected under this very lock - so the insert
+		// was one half of a two-thread mutation of one QMap. Confirmed from a crash dump: rcx =
+		// 0xdddddddddddddddd, walking a freed std::map node inside _Insert_node.
+		//
+		// Scoped tighter than the notifier above on purpose: it fires observers synchronously when it
+		// goes out of scope, and they must not run while this lock is held - see OnSocketDisconnected.
+		QWriteLocker locker(&m_sendersLock);
+
+		m_senderLoginStatusMap.insert(clientId, loginStatus);
+	}
 }
 
 

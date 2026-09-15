@@ -24,6 +24,17 @@ class AdministrationPage extends BasePage {
   openSubPage(pageId) {
     return gui.click(this.page, [`Page_${pageId}`], { what: `Administration subpage "${pageId}"` });
   }
+
+  /**
+   * Whether the logged-in user can reach a subpage - each has its own independent gating.
+   *
+   * Anchored on the nav's other items: MultiPageView fills its sidebar in one go once the view's data
+   * has arrived, so a look taken before that answered "not offered" for a superuser and took the
+   * Roles/Users/Groups blocks down with it.
+   */
+  hasSubPage(pageId) {
+    return gui.dom.isOffered(this.page, [`Page_${pageId}`], { anchorSelector: '[objectName^="Page_"]' });
+  }
 }
 
 module.exports = { AdministrationPage };

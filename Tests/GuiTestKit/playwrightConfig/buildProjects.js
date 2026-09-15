@@ -27,30 +27,57 @@ function specToRegExp(spec) {
  * @param {(key: string) => string} opts.authFile
  * @param {string} [opts.testDir]             default './tests'
  * @param {RegExp} [opts.guestTestMatch]      which spec files are guest-only (default *.guest.test.js)
+ * @param {string[]} [opts.mutatingUserKeys]  users allowed to run @mutating specs. Mutating tests run
+ *   serially (one shared database), so their cost is linear in the number of users AND unaffected by
+ *   worker count, and running the same mutation again as another user re-proves the flow, nothing more.
+ *   Users outside this list get a project-level grepInvert so the mutating phase stays the same size
+ *   however wide the matrix gets. Omit to let every user run them.
  * @returns {object[]}
  */
-function buildProjects({ users, guest, authFile, testDir = './tests', guestTestMatch = /.*\.guest\.test\.js/ }) {
+function buildProjects({
+  users,
+  guest,
+  authFile,
+  testDir = './tests',
+  guestTestMatch = /.*\.guest\.test\.js/,
+  mutatingUserKeys,
+}) {
   // Every isolated spec across the active users - regular projects must exclude ALL of them, not just
   // their own, so an isolated editor spec never runs under a general matrix user.
   const isolatedMatchers = users.filter((u) => u.isolatedSpec).map((u) => specToRegExp(u.isolatedSpec));
 
+  // An isolated user must keep its mutating tests: its spec runs under that user and no other, so
+  // excluding them there would drop the coverage entirely rather than deduplicate it.
+  function runsMutating(user) {
+    return !mutatingUserKeys || !!user.isolatedSpec || mutatingUserKeys.includes(user.key);
+  }
+
+  // NOTE: a misspelled or stale key here matches nobody and silently drops @mutating from every matrix
+  // project. This cannot be caught reliably from inside buildProjects - naming a user outside a narrower
+  // run's scope is legitimate, and any isolatedSpec user keeps its own mutating tests regardless, so
+  // "somebody still runs them" is always true and proves nothing. Validate the keys against the full
+  // user list in the consuming config, where that list is known (ProLife's playwright.config.js does).
+
   const userProjects = users.map((u) => {
-    if (u.isolatedSpec) {
-      // Dedicated project: runs ONLY its one isolated spec (still excluding guest-only specs).
-      return {
-        name: u.key,
-        testDir,
-        testMatch: specToRegExp(u.isolatedSpec),
-        use: { storageState: authFile(u.key) },
-      };
-    }
-    // Regular authenticated project: everything that is neither a guest-only spec nor any isolated spec.
-    return {
-      name: u.key,
-      testDir,
-      testIgnore: [guestTestMatch, ...isolatedMatchers],
-      use: { storageState: authFile(u.key) },
-    };
+    const project = u.isolatedSpec
+      ? {
+          // Dedicated project: runs ONLY its one isolated spec (still excluding guest-only specs).
+          name: u.key,
+          testDir,
+          testMatch: specToRegExp(u.isolatedSpec),
+          use: { storageState: authFile(u.key) },
+        }
+      : {
+          // Regular authenticated project: everything that is neither a guest-only spec nor any
+          // isolated spec.
+          name: u.key,
+          testDir,
+          testIgnore: [guestTestMatch, ...isolatedMatchers],
+          use: { storageState: authFile(u.key) },
+        };
+
+    if (!runsMutating(u)) project.grepInvert = /@mutating/;
+    return project;
   });
 
   const guestProject = {

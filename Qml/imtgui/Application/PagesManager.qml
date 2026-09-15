@@ -16,6 +16,27 @@ Item {
     */
     property bool loadByClick: true;
 
+    // Whether anybody is signed in. Kept as a property rather than read from
+    // AuthorizationController inside a binding: that is a plain function call,
+    // so a binding on it would evaluate once and never hear a sign-in.
+    property bool userIsLoggedIn: false;
+
+    Component.onCompleted: {
+        container.userIsLoggedIn = AuthorizationController.getLoggedUserId() !== "";
+    }
+
+    Connections {
+        target: AuthorizationController;
+
+        function onLoggedIn(){
+            container.userIsLoggedIn = true;
+        }
+
+        function onLoggedOut(){
+            container.userIsLoggedIn = false;
+        }
+    }
+
 	LocalizationEvent {
 		id: localizationEvent;
 
@@ -71,6 +92,13 @@ Item {
     // Between signing in and the page list coming back there was nothing here at
     // all - the window sat on its own background colour, which reads as the
     // application having stopped rather than as it still working.
+    //
+    // Only while somebody is signed in. An empty page list is also the normal
+    // state BEFORE signing in, so without that condition this spun every moment
+    // the login screen was up - invisible behind it, and never stopping. It cost
+    // more than the wasted frames: its animation rewrites the DOM about eleven
+    // times a second, so every "wait until the page stops changing" in the GUI
+    // suites ran to its ceiling on that screen instead of settling.
     Loading {
         id: pagesLoading;
 
@@ -78,7 +106,7 @@ Item {
 
         // Keyed on the repeater, not on getItemsCount(): that is a plain call and
         // a binding on it would never hear the model fill up.
-        visible: pagesData.count === 0 && container.modelState !== "Error";
+        visible: container.userIsLoggedIn && pagesData.count === 0 && container.modelState !== "Error";
     }
 
     Repeater {

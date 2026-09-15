@@ -69,8 +69,25 @@ FocusScope {
 		}
 	}
 
+	// Kept in sync BOTH ways, explicitly. `property string text: textField.text` above is a binding,
+	// and the first assignment from outside breaks it for good - which every view does on load
+	// (TicketEditor's updateGui assigns the stored value, empty for a new record). From then on typing
+	// only reached the inner field, this property stayed at whatever was assigned, and whoever read it
+	// back wrote that into the model: a ticket saved with no title while its title was on screen.
+	// The guards keep the two from writing to each other in a loop.
 	onTextChanged: {
-		textField.text = text;// for web TEMP!!!
+		if (textField.text !== containerTextField.text){
+			textField.text = containerTextField.text;
+		}
+	}
+
+	Connections {
+		target: textField
+		function onTextChanged(){
+			if (containerTextField.text !== textField.text){
+				containerTextField.text = textField.text;
+			}
+		}
 	}
 	
 	function select(from, to){

@@ -175,11 +175,29 @@ ElementView {
 
 	bottomComp: Component {
 		Column {
+			id: bottomColumn
+
 			width: parent.width
+			// Stated, not left implicit. ElementView reads its bottom section's height back off this
+			// item, and a positioner filled by a Repeater reports none in the web build - so the whole
+			// section stayed zero high and its clip hid everything inside it: chips in the model,
+			// nothing on screen, and the same for the empty-state line.
+			height: chipsFlow.height + emptyLabel.height
 			spacing: Style.spacingXS
 
 			Flow {
+				id: chipsFlow
+
+				// Rows counted out rather than read from implicitHeight, which a Repeater-filled
+				// positioner reports as zero in the web build. Counted against the widest a chip is
+				// allowed to be, so the row never comes out too short for what is in it.
+				readonly property int chipHeight: 28
+				readonly property int chipMaxWidth: 200
+				readonly property int perRow: Math.max(1, Math.floor((width + spacing) / (chipMaxWidth + spacing)))
+				readonly property int rows: Math.max(1, Math.ceil(itemSelectElementView.items.length / perRow))
+
 				width: parent.width
+				height: chipsFlow.visible ? chipsFlow.rows * chipsFlow.chipHeight + (chipsFlow.rows - 1) * spacing : 0
 				clip: true
 				spacing: Style.spacingXS
 				visible: itemSelectElementView.items.length > 0
@@ -188,8 +206,8 @@ ElementView {
 					model: itemSelectElementView.items
 					delegate: Rectangle {
 						objectName: "AssignedItem_" + index
-						width: Math.min(chipText.implicitWidth + chipRemove.width + Style.paddingS * 3, 200)
-						height: 28
+						width: Math.min(chipText.implicitWidth + chipRemove.width + Style.paddingS * 3, chipsFlow.chipMaxWidth)
+						height: chipsFlow.chipHeight
 						radius: 14
 						color: itemSelectElementView.accentBgLight
 						border.color: itemSelectElementView.accentBorderLight
@@ -246,8 +264,11 @@ ElementView {
 			}
 
 			Text {
+				id: emptyLabel
+
 				visible: itemSelectElementView.items.length === 0
 				width: parent.width
+				height: emptyLabel.visible ? emptyLabel.contentHeight : 0
 				text: itemSelectElementView.emptyText
 				font.pixelSize: Style.fontSizeM
 				color: Style.inactiveTextColor

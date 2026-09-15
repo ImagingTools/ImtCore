@@ -10,22 +10,82 @@
 //
 // `users` must expose:
 //   byKey(key)                 -> the fixture user for a Playwright project name, or undefined
-//   can(user, permission)      -> boolean
 //   authFile(key)              -> storageState path, relative to the app's project root (see rootDir)
+// fixtures/defineUsers.js builds all of that from a plain user list.
 
+const fs = require('fs');
 const path = require('path');
 const base = require('@playwright/test');
 const gui = require('../lib/gui');
 const { captureConsoleErrors } = require('../lib/consoleErrors');
 
+const PERMISSIONS_STORAGE_KEY = 'AuthorizationController/permissions';
+
 /**
- * @param {{byKey: Function, can: Function, authFile: Function}} users
+ * The permission codes the server granted this user, out of the storageState global-setup saved after
+ * logging in. Returns null when they cannot be determined at all - which is NOT the same as "none".
+ * @param {string} authFilePath
+ * @returns {Set<string>|null}
+ */
+function readGrantedPermissions(authFilePath) {
+  let state;
+  try {
+    state = JSON.parse(fs.readFileSync(authFilePath, 'utf8'));
+  } catch (_) {
+    return null;
+  }
+  for (const origin of state.origins || []) {
+    for (const entry of origin.localStorage || []) {
+      if (entry.name !== PERMISSIONS_STORAGE_KEY) continue;
+      // Stored as a JSON string holding a ';'-separated list (an empty one for a user with none).
+      let raw = entry.value;
+      try {
+        raw = JSON.parse(raw);
+      } catch (_) {
+        /* already a bare string */
+      }
+      return new Set(String(raw).split(';').filter(Boolean));
+    }
+  }
+  return null;
+}
+
+/**
+ * @param {{byKey: Function, authFile: Function}} users
  * @param {{rootDir: string}} opts  rootDir: the app's PROJECT ROOT (the directory playwright.config.js
  *   lives in) - NOT __dirname of the calling file if that file sits in a subfolder like `fixtures/`.
  *   authFile()'s return value is resolved relative to this.
  */
 function createGuiTest(users, { rootDir }) {
-  const { byKey, can, authFile } = users;
+  const { byKey, authFile } = users;
+
+  /**
+   * The user, plus `can(permission)` answered from the permissions the SERVER granted at login.
+   *
+   * The authorization response carries the user's permission list, and the app stores it under
+   * `AuthorizationController/permissions` - which means global-setup's storageState already contains it,
+   * with no extra capture step. Reading it here gives tests a straight, instant answer to "may this user
+   * do X", instead of the old probe that waited a couple of seconds for a button to appear and returned
+   * false on timeout: that could not tell "not permitted" from "not rendered yet", so a slow render
+   * became a silent skip and a green run.
+   *
+   * A user declared with '*' is the superuser - the server sends it an empty list because it bypasses
+   * permission checks entirely, so an empty list there means "everything", not "nothing".
+   *
+   * `can()` returns undefined when the permissions are genuinely unknown (no storageState yet, or the
+   * guest pseudo-user). Callers must not treat that as "no" - see how the spec generator skips only on
+   * an explicit false.
+   */
+  function decorate(user) {
+    const granted = readGrantedPermissions(path.resolve(rootDir, authFile(user.key)));
+    const isSuperuser = Array.isArray(user.permissions) && user.permissions.includes('*');
+    const can = (permission) => {
+      if (isSuperuser) return true;
+      if (!granted) return undefined;
+      return granted.has(permission);
+    };
+    return { ...user, grantedPermissions: granted, can };
+  }
 
   const test = base.test.extend({
     // Worker-startup stagger (worker-scoped, runs once per worker before its first test, auto).
@@ -55,9 +115,7 @@ function createGuiTest(users, { rootDir }) {
           `No test user maps to project "${testInfo.project.name}". Project names must match your users module's keys.`
         );
       }
-      // Attach a convenience predicate.
-      const decorated = { ...user, can: (perm) => can(user, perm) };
-      await use(decorated);
+      await use(decorate(user));
     },
 
     // The GUI helper barrel, handed to tests so they don't each require it.
@@ -95,6 +153,9 @@ function createGuiTest(users, { rootDir }) {
    * per-step-independent failure signal you get from a fresh page per test. Reserve this for tests
    * that are already a deliberate narrative sequence (fill field A, then B, then save), not for
    * unrelated checks that happen to share a page.
+   * Clean up in the block's afterAll with `page.context().close()` (or the returned `context`), not
+   * `page.close()`: this creates one BrowserContext per block, and closing only the page leaks it for
+   * the rest of the run.
    * @param {import('@playwright/test').Browser} browser
    * @param {import('@playwright/test').TestInfo} testInfo
    */
@@ -105,7 +166,7 @@ function createGuiTest(users, { rootDir }) {
         `newUserPage: no test user maps to project "${testInfo.project.name}". Project names must match your users module's keys.`
       );
     }
-    const decorated = { ...user, can: (perm) => can(user, perm) };
+    const decorated = decorate(user);
     const context = await browser.newContext({ storageState: path.resolve(rootDir, authFile(user.key)) });
     const page = await context.newPage();
     // Same browser-error watching as the default `page` fixture (see lib/consoleErrors.js), but this
@@ -136,7 +197,27 @@ function createGuiTest(users, { rootDir }) {
     }
   }
 
-  return { test, expect, gui, newUserPage, forEachUser };
+  /**
+   * Skip this test unless the server granted the user this permission. Call it as the first line of a
+   * test body:
+   *
+   *   test('bind dialog', async ({ user }) => {
+   *     requires(user, 'BindSensor');
+   *     ...
+   *   });
+   *
+   * The whole point is that there is one spelling and it cannot be got wrong. Written by hand it is
+   * `user.can(x) === false`, never `!user.can(x)`: can() returns undefined when the permissions could
+   * not be read, and the `!` form turns that into a skip - which is how "not permitted" and "could not
+   * tell" became the same answer and a run went green without testing anything.
+   * @param {{can: Function, key: string}} user
+   * @param {string} permission
+   */
+  function requires(user, permission) {
+    test.skip(user.can(permission) === false, `${user.key} was not granted ${permission}`);
+  }
+
+  return { test, expect, gui, newUserPage, forEachUser, requires };
 }
 
 module.exports = { createGuiTest };

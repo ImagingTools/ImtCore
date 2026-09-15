@@ -160,6 +160,9 @@ ViewBase {
 
 	MultiPageView {
 		id: multiPageView
+		// Same scoping as UserView.qml's: this editor's nav shares "Page_<id>" ids with the
+		// AdministrationView nav it opens inside. Inert.
+		objectName: "RoleEditorPages"
 		anchors.fill: parent
 		panelWidth: Style.sizeHintXXS
 

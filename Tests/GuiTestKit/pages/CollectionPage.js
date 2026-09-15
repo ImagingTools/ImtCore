@@ -1,19 +1,80 @@
 // Base for the table+filter+CRUD collection pages (Customers, Devices/Hardware, Orders, Licenses).
-// Concrete pages subclass this and add page-specific filters/editors.
+//
+// A standard collection needs no subclass at all - declare the two things that differ between apps:
+//
+//   new CollectionPage(page, 'Orders', {
+//     filters: { customers: 'CustomersFilter', creationDate: 'CreationDateFilter' },
+//     maskColumns: ['added', 'timeStamp'],
+//   })
+//
+// Subclass only to add genuinely page-specific flows (a Bind dialog, a license-file command).
 
+const gui = require('../lib/gui');
 const { BasePage } = require('./BasePage');
-const { FilterPanel, Table, Pagination } = require('../controls');
+const { FilterPanel, Table, Pagination, TableConfigDialog } = require('../controls');
 
 class CollectionPage extends BasePage {
   /**
    * @param {import('@playwright/test').Page} page
    * @param {string} pageId   MenuPanel PageId (e.g. 'Accounts', 'Devices')
+   * @param {{filters?: Object<string, string>, maskColumns?: string[]}} [declaration]
+   *   `filters` maps a short key to the filter's objectName, so a test names a filter by what it means
+   *   rather than by an id out of the app's own configuration. `maskColumns` lists header ids whose
+   *   values are not deterministic across runs (timestamps, generated ids) and must be masked out of
+   *   every screenshot of this collection.
    */
-  constructor(page, pageId) {
+  constructor(page, pageId, { filters = {}, maskColumns = [] } = {}) {
     super(page, pageId);
     this.filters = new FilterPanel(page);
     this.table = new Table(page);
     this.pagination = new Pagination(page);
+    this.filterIds = filters;
+    this.maskColumns = maskColumns;
+  }
+
+  /** The declared filter's objectName; an undeclared key is taken to be an objectName already. */
+  filterId(key) {
+    return this.filterIds[key] || key;
+  }
+
+  /**
+   * Assert this collection is actually the thing on screen. Cheap, and it closes a whole failure class:
+   * navigation that quietly did not happen leaves the PREVIOUS page up, and a screenshot taken then is
+   * committed as this page's baseline - which is how a Support landing baseline came to be byte-identical
+   * to the Workspace one. Every collection view has a table, and no non-collection page does.
+   */
+  expectOpen() {
+    return gui.expectVisible(this.page, ['Table'], `${this.pageId}: expected a collection table on screen`);
+  }
+
+  /** Screenshot masks for this collection's non-deterministic columns (see `maskColumns`). */
+  masks() {
+    return this.maskColumns.length ? this.columnMasks(this.maskColumns) : [];
+  }
+
+  selectFilterOption(key, optionText) {
+    return this.filters.combo(this.filterId(key)).select(optionText);
+  }
+
+  selectFilterOptionByIndex(key, index) {
+    return this.filters.combo(this.filterId(key)).selectIndex(index);
+  }
+
+  /** Whether this filter currently offers an option - data-driven filters legitimately may not. */
+  hasFilterOption(key, optionText) {
+    return this.filters.combo(this.filterId(key)).hasOption(optionText);
+  }
+
+  setDateFilter(key, preset) {
+    return this.filters.dateFilter(this.filterId(key), preset);
+  }
+
+  clearFilter(key) {
+    return this.filters.clearFilter(this.filterId(key));
+  }
+
+  clearAllFilters() {
+    return this.filters.clearAllFilters();
   }
 
   /** Text-search the collection. */
@@ -41,6 +102,19 @@ class CollectionPage extends BasePage {
    */
   columnMasks(headerIds) {
     return this.table.columnMasks(headerIds);
+  }
+
+  /**
+   * Open the "Table configuration" dialog by right-clicking a sortable column header
+   * (CollectionViewBase.qml's headerRightClickEnabled). Generic to every collection, so it lives here
+   * rather than in an app's own subclass.
+   * @param {string} headerId the header/field id to right-click - any sortable column will do
+   * @returns {Promise<TableConfigDialog>}
+   */
+  async openColumnConfig(headerId) {
+    const dialog = new TableConfigDialog(this.page);
+    await dialog.openViaHeader(headerId);
+    return dialog;
   }
 
   // New / Edit / Remove / Revision via the command bar (present on every collection page).

@@ -348,6 +348,10 @@ Dialog {
 
 					delegate: Rectangle {
 						id: entryRow;
+						// Addressable per row for the GUI suite. This list used to be a Table, whose rows the
+						// bridge named TableRow_<i>; it became a ListView with a plain delegate, which has no
+						// name of its own.
+						objectName: "ColumnRow_" + index
 
 						width: entriesView.width;
 						height: dialog.rowHeight;
@@ -427,6 +431,8 @@ Dialog {
 
 							CheckBox {
 								id: entryCheck;
+								// The row's visibility checkbox.
+								objectName: "ColumnCheckBox"
 
 								anchors.centerIn: parent;
 
@@ -448,6 +454,9 @@ Dialog {
 						}
 
 						BaseText {
+							// Named so a test can read the dialog's own order without applying it.
+							objectName: "ColumnRowTitle"
+
 							anchors.left: checkArea.right;
 							anchors.leftMargin: Style.marginS;
 							anchors.right: parent.right;

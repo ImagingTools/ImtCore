@@ -349,11 +349,11 @@ onCommandsModelChanged: {
 		
 		updateModel();
 		
-		viewBase.internal__.blockingUpdateGui = false;
-		
 		if (model.endChanges !== undefined){
 			model.endChanges();
 		}
+
+		viewBase.internal__.blockingUpdateGui = false;
 	}
 
 	// Update GUI from representation model
