@@ -7,6 +7,7 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtcrypt/IHashGenerator.h>
 #include <imtauth/ICredentialController.h>
+#include <imtauth/IAccountLockoutController.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauth/IJwtSessionController.h>
 #include <imtauth/IPasswordPolicy.h>
@@ -32,6 +33,7 @@ public:
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", true, "UserCollection");
 		I_ASSIGN(m_userConnectionCollectionCompPtr, "UserConnectionCollection", "User connection collection", false, "UserConnectionCollection");
 		I_ASSIGN_MULTI_0(m_credentialControllersCompPtr, "CredentialControllers", "Credential Controllers", true);
+		I_ASSIGN(m_accountLockoutControllerCompPtr, "AccountLockoutController", "Account lockout controller limiting consecutive invalid access attempts", false, "AccountLockoutController");
 		I_ASSIGN_MULTI_0(m_systemIdsAttrPtr, "SystemIds", "System-IDs", true);
 		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "JWT session controller", false, "JwtSessionController");
 		I_ASSIGN(m_personalAccessTokenManagerCompPtr, "PersonalAccessTokenManager", "Personal access token manager", false, "PersonalAccessTokenManager");
@@ -55,6 +57,9 @@ protected:
 		already verified - otherwise it would turn a login attempt into an account-state probe.
 	*/
 	sdl::V1_0::imtauth::CAuthorizationPayload CreateAccountDisabledResponse(const QByteArray& login) const;
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateAccountLockedResponse(const QByteArray& login, QString& errorMessage) const;
+	bool IsAccountLocked(const QByteArray& login) const;
+	void RegisterAccessAttempt(const QByteArray& login, bool successful) const;
 	sdl::V1_0::imtauth::CAuthorizationPayload CreateAuthorizationSuccessfulResponse(
 				imtauth::CUserInfo& userInfo,
 				const QByteArray& systemId,
@@ -99,6 +104,7 @@ protected:
 	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
 	I_REF(imtauth::IPasswordPolicy, m_passwordPolicyCompPtr);
 	I_MULTIREF(imtauth::ICredentialController, m_credentialControllersCompPtr);
+	I_REF(imtauth::IAccountLockoutController, m_accountLockoutControllerCompPtr);
 	I_MULTIATTR(QByteArray, m_systemIdsAttrPtr);
 	I_ATTR(QByteArray, m_patPrefixAttrPtr);
 };
