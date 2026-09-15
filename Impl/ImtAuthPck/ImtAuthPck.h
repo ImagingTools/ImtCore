@@ -23,6 +23,7 @@
 #include <imtauth/CLdapCredentialControllerComp.h>
 #include <imtauth/CCredentialControllerComp.h>
 #include <imtauth/CAccountLockoutControllerComp.h>
+#include <imtauth/CPasswordPolicyControllerComp.h>
 #include <imtauth/CLdapUserCollectionJoinerComp.h>
 #include <imtauth/CUserChangeGeneratorComp.h>
 #include <imtauth/CRoleChangeGeneratorComp.h>
@@ -107,6 +108,7 @@ typedef icomp::TModelCompWrap<
 						istd::IChangeable>> SessionInfo;
 typedef imtauth::CLdapUserCollectionControllerComp LdapUserCollectionController;
 typedef imtauth::CCredentialControllerComp CredentialController;
+typedef imtauth::CPasswordPolicyControllerComp PasswordPolicy;
 typedef imtauth::CLdapCredentialControllerComp LdapCredentialController;
 typedef imtauth::CAccountLockoutControllerComp AccountLockoutController;
 typedef imtauth::CLdapUserCollectionJoinerComp LdapUserCollectionJoiner;

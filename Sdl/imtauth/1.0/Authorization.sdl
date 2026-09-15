@@ -12,6 +12,8 @@ type AuthorizationPayload {
 	refreshToken: ID
 	systemId: ID
 	permissions: ID
+	passwordExpired: Boolean
+	passwordExpiresInDays: Int
 }
 
 input AuthorizationInput {

@@ -10,6 +10,7 @@
 #include <imtauth/IAccountLockoutController.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauth/IJwtSessionController.h>
+#include <imtauth/IPasswordPolicy.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
@@ -42,6 +43,7 @@ public:
 		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for tenant-scoped adaptation of user roles/groups/permissions", false, "TenantEntityBindingManager");
 		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
 		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider (used for delegated role product validation)", false, "RoleInfoProvider");
+		I_ASSIGN(m_passwordPolicyCompPtr, "PasswordPolicy", "Password policy for password lifetime checks", false, "PasswordPolicy");
 	I_END_COMPONENT;
 
 protected:
@@ -54,6 +56,11 @@ protected:
 	bool IsAccountLocked(const QByteArray& login) const;
 	void RegisterAccessAttempt(const QByteArray& login, bool successful) const;
 	sdl::V1_0::imtauth::CAuthorizationPayload CreateAuthorizationSuccessfulResponse(
+				imtauth::CUserInfo& userInfo,
+				const QByteArray& systemId,
+				const QByteArray& productId,
+				QString& errorMessage) const;
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateAuthorizationResponseWithLifetimeCheck(
 				imtauth::CUserInfo& userInfo,
 				const QByteArray& systemId,
 				const QByteArray& productId,
@@ -90,6 +97,7 @@ protected:
 	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
 	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
 	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
+	I_REF(imtauth::IPasswordPolicy, m_passwordPolicyCompPtr);
 	I_MULTIREF(imtauth::ICredentialController, m_credentialControllersCompPtr);
 	I_REF(imtauth::IAccountLockoutController, m_accountLockoutControllerCompPtr);
 	I_MULTIATTR(QByteArray, m_systemIdsAttrPtr);
