@@ -21,11 +21,15 @@ I_EXPORT_COMPONENT(
 			"Collection Document");
 
 I_EXPORT_COMPONENT(
+			FileBasedUndoManager,
+			"File-based undo manager for serialized documents",
+			"File Based Undo Manager");
+
+I_EXPORT_COMPONENT(
 			DocumentServiceEventHandlerDemultiplexer,
 			"Document service event handler demultiplexer",
 			"Document Manager Event Handler Demultiplexer");
 
 
 } // namespace ImtDocPck
-
 

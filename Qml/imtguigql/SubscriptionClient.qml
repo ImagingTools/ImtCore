@@ -6,7 +6,7 @@ import imtcontrols 1.0
 
 GqlModel {
 	id: container;
-	property string subscriptionId;
+	property string subscriptionId: UuidGenerator.generateUUID();
 	property string gqlCommandId;
 	property string state;
 
@@ -29,8 +29,6 @@ GqlModel {
 	}
 
 	Component.onCompleted: {
-		subscriptionId = UuidGenerator.generateUUID();
-
 		// If SubscriptionManager is created after this client, the initial
 		// RegisterSubscription event is lost.  Listen for the manager's
 		// ready signal and re-register.

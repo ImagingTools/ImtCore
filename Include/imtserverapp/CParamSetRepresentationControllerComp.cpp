@@ -45,6 +45,10 @@ void CParamSetRepresentationControllerComp::OnComponentCreated()
 	if (m_customParamRepresentationControllerCompPtr.IsValid()){
 		m_representationController.RegisterSubController(*m_customParamRepresentationControllerCompPtr);
 	}
+
+	if (m_translationManagerCompPtr.IsValid()){
+		m_representationController.SetTranslationManager(m_translationManagerCompPtr.GetPtr());
+	}
 }
 
 

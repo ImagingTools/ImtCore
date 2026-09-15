@@ -163,19 +163,25 @@ class Text extends Item {
     }
 
     SLOT_colorChanged(oldValue, newValue){
+        let alphaMultiplier = newValue === 'transparent' ? 0 : this.JQOpacityMultiplier
         let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
         this.__setDOMStyle({
-            opacity: 1,
-            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${newValue === 'transparent' ? 0 : rgba.a * this.__proxy.opacity})`
+            opacity: this.JQOpacityMultiplier > 0 ? 1 : 0,
+            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${rgba.a * alphaMultiplier})`
+        })
+    }
+
+    SLOT_JQOpacityMultiplierChanged(oldValue, newValue){
+        let alphaMultiplier = this.color === 'transparent' ? 0 : newValue
+        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
+        this.__setDOMStyle({
+            opacity: newValue > 0 ? 1 : 0,
+            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${rgba.a * alphaMultiplier})`
         })
     }
 
     SLOT_opacityChanged(oldValue, newValue){
-        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
-        this.__setDOMStyle({
-            opacity: 1,
-            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * newValue})`
-        })
+
     }
 
     SLOT_visibleChanged(oldValue, newValue){

@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6435" Description="ACF"/>
-            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6560" Description="ACF"/>
+            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -46,16 +46,10 @@
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>OnTenantsDocumentChanged</Value>
-                                <Value>OnTenantsUndoChanged</Value>
                                 <Value>OnTenantsCollectionChanged</Value>
                                 <Value>OnMembershipNotification</Value>
                                 <Value>OnConnectionCodesNotification</Value>
-                                <Value>OnTenantRelationshipsDocumentChanged</Value>
-                                <Value>OnTenantRelationshipsUndoChanged</Value>
                                 <Value>OnTenantRelationshipsCollectionChanged</Value>
-                                <Value>OnCrossOrgGrantsUndoChanged</Value>
-                                <Value>OnCrossOrgGrantsDocumentChanged</Value>
                                 <Value>OnCrossTenantMessageNotification</Value>
                                 <Value>OnCrossOrgGrantsCollectionChanged</Value>
                                 <Value>OnUsersForInvitationCollectionChanged</Value>
@@ -227,9 +221,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductInfo" Type="Reference" ExportId="ProductInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">

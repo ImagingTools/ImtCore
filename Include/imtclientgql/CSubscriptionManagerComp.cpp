@@ -27,6 +27,12 @@ namespace imtclientgql
 
 // public methods
 
+CSubscriptionManagerComp::CSubscriptionManagerComp()
+	:m_accessTokenObserver(*this)
+{
+}
+
+
 // reimplemented (imtgql::IGqlSubscriptionManager)
 
 QByteArray CSubscriptionManagerComp::RegisterSubscription(
@@ -124,8 +130,10 @@ void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& chan
 	for (const QByteArray& subscriptionId : subscriptionIds){
 		if (changeSet.Contains(imtcom::IConnectionStatusProvider::CF_CONNECTED)){
 			if (m_registeredClients[subscriptionId].m_clientId == clientId){
-				SubscriptionRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
-				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_REGISTERED;
+				const bool isRegistered = SubscriptionRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
+				m_registeredClients[subscriptionId].m_status = isRegistered
+						? IGqlSubscriptionClient::SS_REGISTERED
+						: IGqlSubscriptionClient::SS_IN_REGISTRATION;
 			}
 		}
 		else{
@@ -332,6 +340,11 @@ QFuture<CSubscriptionManagerComp::GqlResult> CSubscriptionManagerComp::SendReque
 				headersObject[headerId] = QString(headers.value(headerId));
 			}
 		}
+
+		const QByteArray languageId = contextPtr->GetLanguageId();
+		if (!languageId.isEmpty()){
+			headersObject[QString(imtbase::s_languageIdHeaderId)] = QString(languageId);
+		}
 	}
 	dataObject["headers"] = headersObject;
 
@@ -446,10 +459,65 @@ bool CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& s
 				headersObject[headerId] = QString(headers.value(headerId));
 			}
 		}
+
+		const QByteArray languageId = contextPtr->GetLanguageId();
+		if (!languageId.isEmpty()){
+			headersObject[QString(imtbase::s_languageIdHeaderId)] = QString(languageId);
+		}
 	}
+
+	// The request context is a clone taken when the subscription was created, so
+	// its token is the one that was current back then. The server authenticates
+	// every registration, so a re-registration after a refresh has to present the
+	// token that is current now, not the captured one.
+if (m_accessTokenProviderCompPtr.IsValid()){
+		const QByteArray accessToken = m_accessTokenProviderCompPtr->GetToken(QByteArray());
+		const QString authenticationTokenHeaderId(imtbase::s_authenticationTokenHeaderId);
+		if (accessToken.isEmpty()){
+			headersObject.remove(authenticationTokenHeaderId);
+		}
+		else{
+			headersObject[authenticationTokenHeaderId] = QString(accessToken);
+		}
+	}
+
 	registerSubscription["headers"] = headersObject;
 
 	QByteArray queryData = QJsonDocument(registerSubscription).toJson(QJsonDocument::Compact);
+
+	imtrest::ConstRequestPtr requestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, "").PopInterfacePtr());
+
+	return SendRequestInternal(subscriptionRequest, requestPtr);
+}
+
+
+bool CSubscriptionManagerComp::SubscriptionUnregister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const
+{
+	if (!m_engineCompPtr.IsValid()){
+		Q_ASSERT(0);
+
+		return false;
+	}
+
+	QJsonObject unregisterSubscription;
+	unregisterSubscription["id"] = QString(subscriptionId);
+	unregisterSubscription["type"] = "stop";
+	unregisterSubscription["payload"] = QJsonObject();
+
+	QJsonObject headersObject;
+	const imtgql::IGqlContext* contextPtr = subscriptionRequest.GetRequestContext();
+	if (contextPtr != nullptr){
+		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
+		for (const QByteArray& headerId : headers.keys()){
+			if (headerId != "accept-encoding"){
+				headersObject[headerId] = QString(headers.value(headerId));
+			}
+		}
+	}
+
+	unregisterSubscription["headers"] = headersObject;
+
+	QByteArray queryData = QJsonDocument(unregisterSubscription).toJson(QJsonDocument::Compact);
 
 	imtrest::ConstRequestPtr requestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, "").PopInterfacePtr());
 
@@ -505,6 +573,59 @@ void CSubscriptionManagerComp::OnComponentCreated()
 	if (m_connectionStatusProviderModelCompPtr.IsValid()){
 		m_connectionStatusProviderModelCompPtr->AttachObserver(this);
 	}
+
+	if (m_accessTokenProviderModelCompPtr.IsValid()){
+		m_accessTokenProviderModelCompPtr->AttachObserver(&m_accessTokenObserver);
+	}
+}
+
+
+void CSubscriptionManagerComp::ReregisterSubscriptions() const
+{
+	QByteArrayList subscriptionIds;
+	{
+		QMutexLocker locker(&m_registeredClientsMutex);
+		subscriptionIds = m_registeredClients.keys();
+	}
+
+	for (const QByteArray& subscriptionId : subscriptionIds){
+		imtgql::CGqlRequest request;
+		{
+			QMutexLocker locker(&m_registeredClientsMutex);
+			if (!m_registeredClients.contains(subscriptionId)){
+				continue;
+			}
+
+			request = m_registeredClients[subscriptionId].m_request;
+		}
+
+		// Sent outside the lock: registration goes through the transport and
+		// may re-enter this component.
+		// The "stop" is sent first, because server side controllers append a new
+		// registration for a repeated "start" instead of replacing the old one.
+		// The transport keeps the message order, so the server drops the previous
+		// registration before the new one arrives.
+		SubscriptionUnregister(request, subscriptionId);
+		SubscriptionRegister(request, subscriptionId);
+	}
+}
+
+
+// public methods of the embedded class AccessTokenObserver
+
+CSubscriptionManagerComp::AccessTokenObserver::AccessTokenObserver(CSubscriptionManagerComp& parent)
+	:m_parent(parent)
+{
+}
+
+
+// protected methods of the embedded class AccessTokenObserver
+
+// reimplemented (imod::CSingleModelObserverBase)
+
+void CSubscriptionManagerComp::AccessTokenObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	m_parent.ReregisterSubscriptions();
 }
 
 

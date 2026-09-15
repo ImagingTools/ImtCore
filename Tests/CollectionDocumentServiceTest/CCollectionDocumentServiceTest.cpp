@@ -527,6 +527,38 @@ void CCollectionDocumentServiceTest::OpenDocumentMultiplePathSegmentsTest()
 }
 
 
+void CCollectionDocumentServiceTest::OpenDocumentWithoutSingleInstanceModeFailsWhenSingleInstanceAlreadyOpenedTest()
+{
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("testData")));
+
+	imtdoc::IDocumentService::TaskParams singleInstanceOpenParams;
+	singleInstanceOpenParams.userId = TEST_USER_ID;
+	singleInstanceOpenParams.url = QUrl("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
+	singleInstanceOpenParams.singleDocumentInstance = true;
+
+	QByteArray firstTaskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, singleInstanceOpenParams);
+	QVERIFY2(!firstTaskId.isEmpty(), "First single-instance open should start successfully");
+
+	imtdoc::IDocumentService::TaskResult firstOpenResult = m_managerPtr->WaitForTaskFinished(firstTaskId);
+	QVERIFY2(!firstOpenResult.documentId.isEmpty(), "First single-instance open should succeed");
+
+	imtdoc::IDocumentService::TaskParams regularOpenParams;
+	regularOpenParams.userId = TEST_USER_ID;
+	regularOpenParams.url = QUrl("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
+	regularOpenParams.singleDocumentInstance = false;
+
+	QByteArray secondTaskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, regularOpenParams);
+	QVERIFY2(!secondTaskId.isEmpty(), "Second open should start and fail on completion");
+
+	imtdoc::IDocumentService::TaskResult secondOpenResult = m_managerPtr->WaitForTaskFinished(secondTaskId);
+	QCOMPARE(secondOpenResult.status, imtdoc::IDocumentService::OS_FAILED);
+	QVERIFY2(secondOpenResult.documentId.isEmpty(),
+		"Open without single-instance mode must fail when the document is already open in single-instance mode");
+}
+
+
 // ======================================================================
 // GetDocumentName tests
 // ======================================================================

@@ -79,6 +79,8 @@ input ChangePasswordInput {
 
 input ChangePasswordPayload {
 	success: Boolean
+	message: String
+	violatedRules: [String]
 }
 
 input RegisterUserInput {
@@ -99,6 +101,24 @@ type CheckEmailPayload {
 
 type RegisterUserPayload {
 	id: ID!
+	message: String
+	violatedRules: [String]
+}
+
+input PasswordPolicyInput {
+	productId: ID
+}
+
+type PasswordPolicyPayload {
+	minLength: Int!
+	maxLength: Int!
+	requireLowercase: Boolean!
+	requireUppercase: Boolean!
+	requireDigit: Boolean!
+	requireSpecialChar: Boolean!
+	rejectLoginAsPassword: Boolean!
+	blocklistUsed: Boolean!
+	historyDepth: Int!
 }
 
 input SendEmailCodeInput {
@@ -169,6 +189,7 @@ type Query {
 	CheckEmailCode (input: CheckEmailCodeInput): CheckEmailCodePayload!
 	CheckSuperuserExists (input: CheckSuperuserInput): CheckSuperuserPayload!
 	GetUserObjectId (input: UserLogin): UserObjectId!
+	GetPasswordPolicy (input: PasswordPolicyInput): PasswordPolicyPayload!
 }
 
 type Mutation {
