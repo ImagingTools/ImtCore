@@ -13,6 +13,15 @@ this is meant to be consumed by each app's own `Tests/<AppName>Gui` project inst
   hard-fail-if-missing), `stability.js` (`waitForStable`, a MutationObserver-based settle wait),
   `screenshot.js` (`checkScreenshot`/`checkElementScreenshot`/`expectVisible`/`expectHidden`/
   `expectCount`/masking), `gui.js` (barrel of all of the above).
+  - `dom.isOffered(page, path, { anchorSelector, anchorScope })` is how a test asks whether the client
+    OFFERS something to the logged-in user. It waits for the SIBLINGS of what it is looking for - the
+    other buttons on the bar, the other items in the menu - before answering, because the naive form
+    (`isVisible(path, 2000)`) answers "not offered" whenever a GetCommands round-trip outruns two
+    seconds, and a `beforeEach` that skips on that quietly removes a whole describe block. Measured in
+    one suite at 12, 26, 34, 48 and once 100 tests skipped green in a run, on identical code and data.
+    `MenuPanel.hasPage`, `CommandBar.isAvailable` and `AdministrationPage.hasSubPage` all go through it.
+    A suite whose fixture user cannot legitimately be refused should treat a `false` from these as a
+    FAILURE, not a skip.
   - `checkElementScreenshot(page, path, name)` compares ONE element instead of the whole page. Use it
     for a modal: what is behind it is not what the test is about and is not under the test's control
     either - every spec signed in as the same user shares the server-side column layout and last-open

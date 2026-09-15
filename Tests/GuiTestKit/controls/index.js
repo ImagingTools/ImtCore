@@ -39,7 +39,14 @@ class CommandBar {
    * overflow - and run() drives those, so they count as available.
    */
   async isAvailable(commandId) {
-    if (await gui.dom.isVisible(this.page, ['CommandsView', `${commandId}Button`])) return true;
+    // Anchored on the bar's OTHER buttons: they arrive together, on a GetCommands round-trip that
+    // regularly outlasts a two-second look under four workers. Asking before any of them is on screen
+    // answered "not offered" for a superuser and skipped whole blocks green - see dom.isOffered.
+    const offered = await gui.dom.isOffered(this.page, ['CommandsView', `${commandId}Button`], {
+      anchorSelector: '[objectName$="Button"]',
+      anchorScope: ['CommandsView'],
+    });
+    if (offered) return true;
     if (!(await gui.dom.isVisible(this.page, ['MoreCommandsButton'], 1000))) return false;
     await gui.click(this.page, ['MoreCommandsButton'], { what: 'the "..." command overflow menu' });
     const present = (await gui.dom.countVisible(this.page, ['PopupMenuDialog', `PopupItem_${commandId}`])) > 0;
@@ -80,7 +87,12 @@ class MenuPanel {
           'offered to this user cannot be answered - treating that as "not offered" would skip tests green'
       );
     }
-    return gui.dom.isVisible(this.page, ['MenuPanel', `${pageId}Button`], 2000);
+    // The menu frame paints before the pages inside it do, so "MenuPanel is up" is not yet an answer -
+    // anchor on the page buttons themselves.
+    return gui.dom.isOffered(this.page, ['MenuPanel', `${pageId}Button`], {
+      anchorSelector: '[objectName$="Button"]',
+      anchorScope: ['MenuPanel'],
+    });
   }
 }
 

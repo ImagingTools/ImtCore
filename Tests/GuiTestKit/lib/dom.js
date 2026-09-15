@@ -166,6 +166,66 @@ async function isVisible(page, path, timeout = 2000) {
     .catch(() => false);
 }
 
+// How long a view may take to paint before "is this offered?" stops being answerable by waiting.
+// Generous on purpose: this is a cold app boot competing with every other worker, and the cost is only
+// ever paid when something is genuinely wrong.
+const OFFER_ANCHOR_TIMEOUT = 30000;
+// Once the view around it has rendered, the element either exists or it does not - a short look is
+// enough and a long one would only add dead time to every negative answer.
+const OFFER_PROBE_TIMEOUT = 2000;
+// Used only when the anchor never appeared, i.e. the view rendered nothing recognisable at all. Then
+// the short probe is not trustworthy, so the question is asked the slow way before answering "no".
+const OFFER_FALLBACK_TIMEOUT = 10000;
+
+/** How many VISIBLE elements match a raw attribute selector, optionally inside an objectName path. */
+async function countVisibleMatching(page, selector, scope = []) {
+  const prefix = scope.length ? `${selectorForPath(scope)} ` : '';
+  return page.locator(`${prefix}${selector}[visible]`).count();
+}
+
+/**
+ * Whether the client OFFERS `path` to the logged-in user - the permission question, asked of the
+ * running client rather than of a table kept in the suite.
+ *
+ * The naive form of this is `isVisible(path, 2000)`, and it is what made a green run meaningless: the
+ * parts of a view that carry commands and pages arrive on an async round-trip that regularly takes
+ * longer than two seconds under four workers, so the probe answered "not offered" for a SUPERUSER and
+ * whole describe blocks skipped themselves green - measured at 12, 26, 34, 48 and once 100 tests in a
+ * run, on identical code and data.
+ *
+ * The fix is to ask only once the answer is knowable. `anchorSelector` names the SIBLINGS of what is
+ * being looked for - the other buttons on the same bar, the other items in the same menu. While none
+ * of them is on screen the view has not rendered and "no" would be a guess; once any of them is, the
+ * one being asked about is either there or genuinely not offered.
+ *
+ * If no sibling ever appears the view rendered nothing at all, which is not the same as a refusal -
+ * so rather than lie, the question is then put the slow way (OFFER_FALLBACK_TIMEOUT) before "no" is
+ * returned. Callers that can tell the difference should say so in their own error instead.
+ * @param {import('@playwright/test').Page} page
+ * @param {string[]} path
+ * @param {{anchorSelector: string, anchorScope?: string[], anchorTimeout?: number}} options
+ */
+async function isOffered(page, path, options) {
+  const {
+    anchorSelector,
+    anchorScope = [],
+    anchorTimeout = OFFER_ANCHOR_TIMEOUT,
+  } = options;
+
+  const deadline = Date.now() + anchorTimeout;
+  let anchored = false;
+  for (;;) {
+    if ((await countVisibleMatching(page, anchorSelector, anchorScope)) > 0) {
+      anchored = true;
+      break;
+    }
+    if (Date.now() >= deadline) break;
+    await page.waitForTimeout(150);
+  }
+
+  return isVisible(page, path, anchored ? OFFER_PROBE_TIMEOUT : OFFER_FALLBACK_TIMEOUT);
+}
+
 /**
  * ONE bounding rect per requested column PER TABLE INSTANCE currently on screen (viewport-relative,
  * {x,y,width,height}) - spanning the full visible row area rather than one rect per row-cell. Used to
@@ -299,6 +359,11 @@ async function columnRects(page, headerIds) {
 
 module.exports = {
   OBJ,
+  OFFER_ANCHOR_TIMEOUT,
+  OFFER_PROBE_TIMEOUT,
+  OFFER_FALLBACK_TIMEOUT,
+  countVisibleMatching,
+  isOffered,
   cssEscape,
   selectorForPath,
   byPath,
