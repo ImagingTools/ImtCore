@@ -443,44 +443,47 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 void CUserGroupCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const
 {
+	BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
+
 	// Remove the deleted groups from the membership lists of their member users,
 	// so that users no longer reference groups that do not exist anymore.
-	if (m_userCollectionCompPtr.IsValid()){
-		iprm::CParamsSet filterParams;
-		istd::TUniqueInterfacePtr<imtauth::CUserGroupFilter> groupFilterPtr = new imtauth::CUserGroupFilter();
-		groupFilterPtr->SetGroupIds(elementIds);
-		iser::ISerializableUniquePtr groupFilterParamPtr = std::move(groupFilterPtr);
-		filterParams.SetEditableParameter("GroupFilter", groupFilterParamPtr);
-
-		istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> userIteratorPtr =
-					m_userCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &filterParams);
-		if (userIteratorPtr.IsValid()){
-			while (userIteratorPtr->Next()){
-				imtbase::IObjectCollection::DataPtr userDataPtr;
-				if (!userIteratorPtr->GetObjectData(userDataPtr)){
-					continue;
-				}
-
-				imtauth::IUserInfo* userInfoPtr = userDataPtr.GetPtr<imtauth::IUserInfo>();
-				if (userInfoPtr == nullptr){
-					continue;
-				}
-
-				bool hasChanges = false;
-				for (const QByteArray& groupId : elementIds){
-					if (userInfoPtr->RemoveFromGroup(groupId)){
-						hasChanges = true;
-					}
-				}
-
-				if (hasChanges){
-					m_userCollectionCompPtr->SetObjectData(userIteratorPtr->GetObjectId(), *userInfoPtr);
-				}
-			}
-		}
+	if (!m_userCollectionCompPtr.IsValid()){
+		return;
 	}
 
-	BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
+	iprm::CParamsSet filterParams;
+	istd::TUniqueInterfacePtr<imtauth::CUserGroupFilter> groupFilterPtr = new imtauth::CUserGroupFilter();
+	groupFilterPtr->SetGroupIds(elementIds);
+	filterParams.SetEditableParameter(QByteArrayLiteral("GroupFilter"), groupFilterPtr.PopPtr(), true);
+
+	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> userIteratorPtr =
+				m_userCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &filterParams);
+	if (!userIteratorPtr.IsValid()){
+		return;
+	}
+
+	while (userIteratorPtr->Next()){
+		imtbase::IObjectCollection::DataPtr userDataPtr;
+		if (!userIteratorPtr->GetObjectData(userDataPtr)){
+			continue;
+		}
+
+		imtauth::IUserInfo* userInfoPtr = userDataPtr.GetPtr<imtauth::IUserInfo>();
+		if (userInfoPtr == nullptr){
+			continue;
+		}
+
+		bool hasChanges = false;
+		for (const QByteArray& groupId : elementIds){
+			if (userInfoPtr->RemoveFromGroup(groupId)){
+				hasChanges = true;
+			}
+		}
+
+		if (hasChanges){
+			m_userCollectionCompPtr->SetObjectData(userIteratorPtr->GetObjectId(), *userInfoPtr);
+		}
+	}
 }
 
 
