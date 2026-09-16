@@ -521,7 +521,7 @@ async function closeAllDocumentTabs(page) {
  */
 async function reload(page, url) {
   await page.goto(url || '/');
-  await waitForStable(page, { timeout: 15000, quietMs: 600 });
+  await waitForStable(page, { timeout: 15000, quietMs: 300 });
 }
 
 /**
