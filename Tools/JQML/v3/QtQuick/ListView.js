@@ -477,39 +477,19 @@ class ListView extends Flickable {
             this.__items[index] = item
 
             item.xChanged.connect(() => {
-                if (this.orientation === ListView.Horizontal) {
-                    let _index = item.JQAbstractModel.index
-                    if (_index >= 0 && this.__items[_index + 1]) {
-                        this.__items[_index + 1].x = this.__items[_index].x + this.__items[_index].width + this.spacing
-                    }
-                }
+                this.__followItemGeometry(item, true)
                 JQApplication.updateLater(this)
             })
             item.yChanged.connect(() => {
-                if (this.orientation === ListView.Vertical) {
-                    let _index = item.JQAbstractModel.index
-                    if (_index >= 0 && this.__items[_index + 1]) {
-                        this.__items[_index + 1].y = this.__items[_index].y + this.__items[_index].height + this.spacing
-                    }
-                }
+                this.__followItemGeometry(item, false)
                 JQApplication.updateLater(this)
             })
             item.widthChanged.connect(() => {
-                if (this.orientation === ListView.Horizontal) {
-                    let _index = item.JQAbstractModel.index
-                    if (_index >= 0 && this.__items[_index + 1]) {
-                        this.__items[_index + 1].x = this.__items[_index].x + this.__items[_index].width + this.spacing
-                    }
-                }
+                this.__followItemGeometry(item, true)
                 JQApplication.updateLater(this)
             })
             item.heightChanged.connect(() => {
-                if (this.orientation === ListView.Vertical) {
-                    let _index = item.JQAbstractModel.index
-                    if (_index >= 0 && this.__items[_index + 1]) {
-                        this.__items[_index + 1].y = this.__items[_index].y + this.__items[_index].height + this.spacing
-                    }
-                }
+                this.__followItemGeometry(item, false)
                 JQApplication.updateLater(this)
             })
             item.visibleChanged.connect(() => {
@@ -600,7 +580,52 @@ class ListView extends Flickable {
         this.__items = shifted
     }
 
+    // Neighbour follow during insert/realign shoves the displaced row before the
+    // new one has its final size, which leaves a gap (PopupContainer insert(0)).
+    __followItemGeometry(item, horizontal) {
+        if (this.__aligning) return
+        if ((this.orientation === ListView.Horizontal) !== !!horizontal) return
+
+        let index = item && item.JQAbstractModel ? item.JQAbstractModel.index : -1
+        if (index < 0 || !this.__items[index + 1]) return
+
+        let next = this.__items[index + 1]
+        if (horizontal) {
+            let x = item.x + item.width + this.spacing
+            if (next.x !== x) next.x = x
+        } else {
+            let y = item.y + item.height + this.spacing
+            if (next.y !== y) next.y = y
+        }
+    }
+
+    __insertSlotPosition(leftTop, bottomRight) {
+        let displaced = this.__items[bottomRight]
+        if (displaced) {
+            return { x: displaced.x, y: displaced.y }
+        }
+
+        let previous = undefined
+        for (let i = leftTop - 1; i >= 0; i--) {
+            if (this.__items[i]) {
+                previous = this.__items[i]
+                break
+            }
+        }
+
+        if (previous) {
+            return {
+                x: previous.x + previous.width + this.spacing,
+                y: previous.y + previous.height + this.spacing,
+            }
+        }
+
+        return { x: this.originX, y: this.originY }
+    }
+
     __realignItems(startIndex = 0) {
+        if (this.__aligning) return
+
         let previousItem = undefined
 
         if (startIndex > 0) {
@@ -612,23 +637,31 @@ class ListView extends Flickable {
             }
         }
 
-        for (let i = startIndex; i < this.count; i++) {
-            let item = this.__items[i]
-            if (!item) continue
+        this.__aligning = true
+        try {
+            for (let i = startIndex; i < this.count; i++) {
+                let item = this.__items[i]
+                if (!item) continue
 
-            if (this.orientation === ListView.Horizontal) {
-                let x = previousItem
-                    ? previousItem.x + previousItem.width + this.spacing
-                    : this.originX + (this.__middleWidth + this.spacing) * i
-                if (item.x !== x) item.x = x
-            } else {
-                let y = previousItem
-                    ? previousItem.y + previousItem.height + this.spacing
-                    : this.originY + (this.__middleHeight + this.spacing) * i
-                if (item.y !== y) item.y = y
+                if (!previousItem) {
+                    // Keep the first row of this range on its insert slot. Snapping it
+                    // to originY after a negative estimate opens a hole at the top.
+                    previousItem = item
+                    continue
+                }
+
+                if (this.orientation === ListView.Horizontal) {
+                    let x = previousItem.x + previousItem.width + this.spacing
+                    if (item.x !== x) item.x = x
+                } else {
+                    let y = previousItem.y + previousItem.height + this.spacing
+                    if (item.y !== y) item.y = y
+                }
+
+                previousItem = item
             }
-
-            previousItem = item
+        } finally {
+            this.__aligning = false
         }
     }
 
@@ -696,11 +729,30 @@ class ListView extends Flickable {
                 } else if (role === 'insert') {
                     this.__shiftItemsIndex(leftTop, bottomRight - leftTop)
 
-                    for (let i = leftTop; i < bottomRight; i++) {
-                        let itemInfo = this.__getItemInfo(i)
-                        if (itemInfo.inner) {
-                            if (this.__createItem(i, itemInfo)) this.__updateGeometry()
+                    // Occupy the displaced row's slot, then push the rest down.
+                    // Placing above it (y - height) sends originY negative and,
+                    // with height: contentHeight, leaves a gap at the top.
+                    let slot = this.__insertSlotPosition(leftTop, bottomRight)
+                    this.__aligning = true
+
+                    try {
+                        for (let i = leftTop; i < bottomRight; i++) {
+                            let itemInfo = this.__getItemInfo(i)
+                            if (this.orientation === ListView.Horizontal) {
+                                itemInfo.x = slot.x
+                                itemInfo.inner = !(slot.x + itemInfo.width < this.contentX - this.cacheBuffer
+                                    || slot.x > this.contentX + this.width + this.cacheBuffer)
+                            } else {
+                                itemInfo.y = slot.y
+                                itemInfo.inner = !(slot.y + itemInfo.height < this.contentY - this.cacheBuffer
+                                    || slot.y > this.contentY + this.height + this.cacheBuffer)
+                            }
+                            if (itemInfo.inner) {
+                                if (this.__createItem(i, itemInfo)) this.__updateGeometry()
+                            }
                         }
+                    } finally {
+                        this.__aligning = false
                     }
 
                     if (currentIndex >= leftTop) {
