@@ -1,16 +1,8 @@
-// Spy on GraphQL requests to structurally confirm a Save/mutation actually round-tripped and
-// succeeded server-side, independent of any screenshot pixel comparison - a Save whose server call
-// silently failed (network error, validation rejection) but left the UI LOOKING saved (the screenshot
-// only captures whatever the client currently renders) would otherwise be invisible to the suite.
+// Spy on GraphQL requests to structurally confirm a Save/mutation actually round-tripped and succeeded
+// server-side, independent of any screenshot comparison. The command id appears verbatim in the POST
+// body, so matching on it identifies the operation without parsing GraphQL.
 //
-// Every ImtCore GraphQL call goes through GqlRequestSender.qml's send(), which builds
-// `Gql.GqlRequest(type, gqlCommandId)` - the command id (e.g. "UpdateDeviceFromRepresentation",
-// "CreateNewDocument") appears verbatim in the outgoing query text, so matching on it in the POST body
-// reliably identifies the operation without needing to parse GraphQL syntax.
-//
-// Usage - start the spy BEFORE the triggering action (the network round-trip can complete before your
-// `await` on the action itself returns), then await its result after:
-//
+// Start the spy BEFORE the triggering action (the round-trip can complete before your await returns):
 //   const spy = gql.spyOn(page, 'UpdateDeviceFromRepresentation');
 //   await editor.save();
 //   const result = await spy.wait();
@@ -18,7 +10,7 @@
 
 /**
  * Begin watching for the next GraphQL POST whose body mentions `operationName`. Must be called before
- * the action that triggers it (mirrors Playwright's own `page.waitForResponse` ordering requirement).
+ * the action that triggers it.
  * @param {import('@playwright/test').Page} page
  * @param {string} operationName  the gqlCommandId, e.g. "UpdateDeviceFromRepresentation"
  * @param {{timeout?: number}} [opts]
@@ -30,10 +22,8 @@ function spyOn(page, operationName, opts = {}) {
     (resp) => resp.request().method() === 'POST' && matchesOperation(resp.request(), operationName),
     { timeout }
   );
-  // Nothing awaits responsePromise until wait(), and the action between the two can throw - which is
-  // the normal case when a save regression is what the test is catching. Its timeout rejection would
-  // then be unhandled and tear down the worker mid-run, failing an unrelated test. Absorb it here and
-  // re-throw only from wait(), where a caller is actually listening.
+  // Absorb the rejection here so a timeout while the action throws can't tear down the worker; re-throw
+  // only from wait(), where a caller is listening.
   const settled = responsePromise.then(
     (response) => ({ response }),
     (error) => ({ error })

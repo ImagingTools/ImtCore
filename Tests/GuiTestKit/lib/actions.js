@@ -1,24 +1,12 @@
-// GUI action layer. Every function here HARD-FAILS if its target objectName is missing, invisible,
-// or ambiguous - it never silently no-ops (the bug in the old fillTextInput). This is what keeps a
-// screenshot-only suite honest: you can never capture a screenshot of a state reached by an action
-// that quietly did nothing.
+// GUI action layer. Every function here hard-fails if its target objectName is missing, invisible,
+// or ambiguous - it never silently no-ops.
 
 const dom = require('./dom');
 const { waitForStable } = require('./stability');
 
-// Passing interactions resolve their target within ~1-2s solo, but with multiple Playwright workers
-// running concurrently (see playwright.config.js's `workers`) the WASM app's initial render + async
-// data loads (the customers filter list, the command bar's GetCommands round-trip, table rows) take
-// noticeably longer under shared CPU/server contention - confirmed empirically: 3000ms caused spurious
-// "DevicesButton not found" failures at 3 workers; at the mandated 10 workers, 5000ms in turn was too
-// tight (late-arriving combo items / command buttons / rows failed the locator before they rendered).
-// 10000ms gives 10-worker contention enough headroom while still being far under a dead-wait tax on a
-// genuinely-missing element. This is a ceiling (time-to-fail), so raising it never slows a passing test.
+// Ceiling (time-to-fail) sized for 10-worker contention; raising it never slows a passing test.
 const DEFAULT_TIMEOUT = 10000;
-// How long a value READ may wait for its element - deliberately short, and separate from the action
-// timeout above. locator.evaluate AUTO-WAITS, and with no action timeout configured that wait is
-// unbounded: reading a field that is not on the open sub-page hung the whole test instead of
-// answering "not readable", which is what sat two save-and-reopen tests at their own 240s cap.
+// Short, separate bound for value READS, so an unbounded evaluate auto-wait can't hang the test.
 const READ_TIMEOUT = 1000;
 
 function fmtPath(path) {
@@ -61,15 +49,8 @@ async function click(page, path, opts = {}) {
   try {
     await mouse.waitFor({ state: 'visible', timeout: opts.timeout || DEFAULT_TIMEOUT });
   } catch (_) {
-    // An imtcontrols Button wraps its clickable surface in an inner [objectName="MouseArea"], and that
-    // convention is what this addresses. Some controls ARE the surface instead, with no such child - a
-    // bare QML MouseArea carrying the objectName itself. The filter chips became one of those when
-    // ImtCore 9230d4c847 (2026-08-03) reworked FilterDelegateBase's two Buttons into bare MouseAreas,
-    // which silently put every filter click in this suite out of reach.
-    //
-    // So: NO MouseArea child at all means the element itself is the thing to click. One that exists but
-    // never became visible is still a failure - that is a control which should have been clickable and
-    // was not, and collapsing the two would hide it.
+    // No MouseArea child means the element itself is clickable; one that exists but never became
+    // visible is still a failure.
     if ((await dom.countAny(page, [...path, 'MouseArea'])) > 0) {
       const timeout = opts.timeout || DEFAULT_TIMEOUT;
       throw new Error(
@@ -90,12 +71,7 @@ async function click(page, path, opts = {}) {
 
 /**
  * Click an element addressed by `path` at ITS OWN centre, for controls where the addressed node IS the
- * clickable surface (a bare MouseArea carrying its own objectName directly, e.g.
- * AuthorizationPage.qml's "Forgot password?"/"Sign up" links: `MouseArea { objectName: "RegisterUser" }`
- * with no wrapper) - unlike click(), which assumes the Button/ToolButton convention of a wrapper
- * objectName with a NESTED `[objectName="MouseArea"]` child, and throws "has no visible MouseArea" on
- * a bare self-named MouseArea like this (confirmed live). Use click() by default; reach for this only
- * when click() throws that specific error for a control that's genuinely just a MouseArea.
+ * clickable surface (a bare MouseArea carrying its own objectName). Use click() by default.
  * @param {import('@playwright/test').Page} page
  * @param {string[]} path
  */
@@ -109,9 +85,7 @@ async function clickSelf(page, path, opts = {}) {
 }
 
 /**
- * Click by raw coordinates. Kept ONLY for cases with no addressable objectName (e.g. a table cell on
- * a build where rows are not named). Prefer click()/page objects. Documented as a deliberate escape
- * hatch so its use is greppable.
+ * Click by raw coordinates. Kept ONLY for cases with no addressable objectName. Prefer click().
  */
 async function clickAt(page, x, y) {
   await page.mouse.click(x, y);
@@ -119,12 +93,8 @@ async function clickAt(page, x, y) {
 }
 
 /**
- * Click a button-like element addressed by objectName WITHIN a given Locator scope, instead of by an
- * absolute path from the page root. For repeated per-row controls whose OWN objectName isn't uniquely
- * addressable page-wide - e.g. OrderProductDelegate's Edit/Remove buttons are identical in every row
- * (the row itself carries the PRODUCT's own name as its objectName, e.g. "WidgetLicenseElementView",
- * colliding whenever two rows share a product - so tests instead locate the row by POSITION, then must
- * reach into that specific row instance for its Edit/Remove button).
+ * Click a button-like element addressed by objectName WITHIN a given Locator scope, for repeated
+ * per-row controls whose OWN objectName isn't uniquely addressable page-wide.
  * @param {import('@playwright/test').Page} page
  * @param {import('@playwright/test').Locator} scopeLocator  a locator already narrowed to one row/instance
  * @param {string} objectName
@@ -157,7 +127,7 @@ async function clickWithin(page, scopeLocator, objectName) {
   await waitForStable(page);
 }
 
-// Same escaping rule as dom.js's cssEscape - objectNames are simple identifiers in practice, but be safe.
+// Same escaping rule as dom.js's cssEscape.
 function cssEscapeLocal(value) {
   return String(value).replace(/["\\]/g, '\\$&');
 }
@@ -167,12 +137,8 @@ function cssEscapeLocal(value) {
  * 'Accounts', 'Devices', 'Administration'); the button objectName is `<PageId>Button`.
  */
 async function openPage(page, pageId) {
-  // The MenuPanel button is often the FIRST thing a test touches after a cold page load, and under
-  // workers:10 the left menu can take a while to reach [visible] on that contended first render -
-  // surfacing as "[MenuPanel > XButton] - N element(s) exist but none became visible" (the button node
-  // is in the DOM but its visible attribute lags). That is transient, so retry the whole click a few
-  // times, letting the DOM settle between tries, before giving up. click() waits for [visible] BEFORE
-  // clicking and throws without clicking if it never appears, so a retry never double-navigates.
+  // Under workers:10 the left menu button can lag reaching [visible] on a cold render; retry the
+  // whole click a few times. click() waits for [visible] before clicking, so a retry never double-navigates.
   const path = ['MenuPanel', `${pageId}Button`];
   let lastErr;
   for (let attempt = 1; attempt <= 3; attempt++) {
@@ -186,9 +152,8 @@ async function openPage(page, pageId) {
     }
   }
   if (lastErr) throw lastErr;
-  // A prior test may have left an editor document tab open on this page; the app restores it on
-  // navigation, which hides the collection command bar (New/Edit/... become present-but-not-visible)
-  // and the table. Close leftover tabs so the page lands on its clean, single collection tab.
+  // A prior test may have left an editor document tab open; the app restores it on navigation, hiding
+  // the collection command bar and table. Close leftover tabs so the page lands on its clean collection tab.
   await closeAllDocumentTabs(page);
 }
 
@@ -201,9 +166,7 @@ async function clickCommand(page, commandId) {
     await click(page, ['CommandsView', `${commandId}Button`], { what: `command "${commandId}"` });
     return;
   }
-  // Not on the bar does not mean not available: a command declared with priority -1 (ResetTransferCounter
-  // is one) never gets a bar button at all, and any command can also be pushed off a bar too narrow for
-  // it - both end up in the "..." overflow menu, which is where a user would go for them too.
+  // Commands with priority -1, or pushed off a too-narrow bar, live in the "..." overflow menu.
   if ((await dom.countVisible(page, ['MoreCommandsButton'])) === 0) {
     await click(page, ['CommandsView', `${commandId}Button`], { what: `command "${commandId}"` });
     return;
@@ -228,29 +191,20 @@ async function clickButton(page, pathOrName) {
  * @param {string} text
  * @param {{clear?: boolean, verify?: boolean}} [opts]
  */
-// A QML text control reaches the DOM in one of three shapes depending on the control - a real <input>
-// inside the wrapper, an <input> carrying the objectName itself, or the wrapper alone. The comma list
-// is resolved in DOCUMENT order, so .first() on it lands on the wrapper whenever one exists, never on
-// the inner <input>: readTextValue below has to cope with the wrapper, not assume an <input>.
+// A QML text control reaches the DOM as a real <input> inside the wrapper, an <input> carrying the
+// objectName itself, or the wrapper alone. Resolved in document order, so .first() lands on the wrapper.
 const TEXT_INPUT_SELECTOR = '[objectName="TextInput"] input, input[objectName="TextInput"], [objectName="TextInput"]';
 
 /**
  * Current value of a text control, or null if this element exposes none.
  *
- * Three readings, in order, because the QML->DOM bridge renders the same logical control differently
- * depending on whether it is editable: an editable field mirrors its value onto a real <input> and onto
- * the wrapper's `text` attribute, while a READ-ONLY one has neither - its rendered string lives as the
- * textContent of an inner `<div class="impl">`. Reading only the first two is what made this return null
- * for exactly the fields expectReadOnly exists to check.
+ * Reads an <input>/<textarea> value, then the wrapper's `text` attribute, then a read-only field's
+ * inner `<div class="impl">` textContent.
  */
 function readTextValue(input) {
   return input
     .evaluate((el) => {
-      // A single-line TextInput and a multi-line TextEdit render differently: the bridge gives the
-      // first an <input> and the second a <textarea class="impl">, and BOTH carry their text in
-      // .value. Reading a textarea's textContent returns its initial markup, which stays empty when
-      // the value is set by property - so a description field that visibly held the typed text read
-      // back as "" and fill() called it a no-op.
+      // Single-line TextInput renders an <input>, multi-line TextEdit a <textarea>; both carry text in .value.
       const valueOf = (node) => (node.tagName === 'INPUT' || node.tagName === 'TEXTAREA' ? node.value : null);
       const read = () => {
         const own = valueOf(el);
@@ -265,34 +219,26 @@ function readTextValue(input) {
         return implValue !== null ? implValue : impl.textContent.trim();
       };
       const value = read();
-      // An EMPTY field renders a zero-width space rather than nothing (confirmed live: every
-      // "never reached the expected value" failure reported last seen U+200B), so a caller waiting for
-      // "" would wait forever on a field that is, in every sense that matters, empty.
+      // An empty field renders a zero-width space rather than nothing; strip it so "" compares equal.
       return value === null ? null : value.replace(/[\u200B\uFEFF]/g, '');
     }, undefined, { timeout: READ_TIMEOUT })
     .catch(() => null);
 }
 
-// A masked field (password echo) renders one glyph per character, so its value can be read but says
-// nothing about what was typed - verifying a fill against it compares the text to a row of bullets.
+// A masked field renders one glyph per character, so its value says nothing about what was typed.
 function isMasked(value, typed) {
   return value.length > 0 && /^[\u2022\u25CF\u00B7*]+$/.test(value) && !/[\u2022\u25CF\u00B7*]/.test(typed);
 }
 
 /**
  * The value the control MIRRORS - a real <input>, or the wrapper's `text` attribute - or null when it
- * mirrors none.
- *
- * Deliberately does NOT fall back to the rendered `.impl` text the way readTextValue does. An empty
- * `.impl` means one of two things that cannot be told apart: the field is empty, or the control keeps
- * its text somewhere else. A multi-line editor is the second (confirmed live: the Support ticket's
- * Description shows the typed text on screen while its `.impl` reads empty), so treating "" as proof
- * that a fill did nothing fails a working app.
+ * mirrors none. Deliberately does NOT fall back to rendered `.impl` text (a multi-line editor mirrors
+ * nothing there while still holding the typed text).
  */
 function readMirroredValue(input) {
   return input
     .evaluate((el) => {
-      // textarea as well as input: a multi-line TextEdit mirrors its text there (see readTextValue).
+      // textarea as well as input: a multi-line TextEdit mirrors its text there.
       const valueOf = (node) => (node.tagName === 'INPUT' || node.tagName === 'TEXTAREA' ? node.value : null);
       const own = valueOf(el);
       if (own !== null) return own;
@@ -334,12 +280,8 @@ async function fill(page, path, text, opts = {}) {
   await waitForStable(page);
 
   if (verify && text.length > 0) {
-    // readMirroredValue is deliberately narrow - it reads only what the control MIRRORS back, so a
-    // formatted or masked rendering is never mistaken for the typed text. But it returns null for a
-    // control with neither an <input> nor a `text` attribute, and that is precisely the shape of a
-    // READ-ONLY field: `value != null` then skipped the check, and a fill into a field the user cannot
-    // edit passed silently - the exact no-op this layer exists to prevent. Fall back to the full reader
-    // (which also sees the .impl rendering) rather than letting the unreadable case through.
+    // readMirroredValue returns null for a read-only field (no <input>, no `text`); fall back to the
+    // full reader so a fill into an uneditable field fails rather than passing silently.
     const value = (await readMirroredValue(input)) ?? (await readTextValue(input));
     if (value == null) {
       throw new Error(
@@ -365,19 +307,10 @@ async function textInputValue(page, path) {
 
 /**
  * Poll a TextInput control's current DOM value until it satisfies `predicate` (default: becomes empty),
- * or throw after `timeout`. Use after an action that's SUPPOSED to change a text field as a side effect
- * (e.g. a "Clear all filters" command clearing the search box) instead of trusting generic DOM-quiet:
- * waitForStable's MutationObserver can report quiet on a brief pause mid-update, before the field's own
- * value has actually settled - confirmed live, a "clear all filters" screenshot occasionally still
- * showed the OLD search text (stably, not a one-off glitch - "captured a stable screenshot" fired in
- * Playwright's own log, i.e. two consecutive frames already agreed with EACH OTHER, just not yet with
- * the field's final value) under concurrent-worker load, where the value-commit lags the click's own
- * settle by more than the generic quiet window.
+ * or throw after `timeout`. Use after an action SUPPOSED to change a text field as a side effect;
+ * waitForStable can report quiet mid-update, before the field's value has actually settled.
  *
- * A path that never resolves to a readable field FAILS, it does not pass. This used to return silently
- * on that case, which turned the suite's persistence checks ("save, close, reopen, read the value back")
- * into no-ops whenever the reopened editor happened to land on a different sub-page than the field: the
- * field was invisible, nothing was read, and the check reported success having compared nothing.
+ * A path that never resolves to a readable field FAILS, it does not pass.
  * @param {import('@playwright/test').Page} page
  * @param {string[]} path
  * @param {(value: string) => boolean} [predicate]
@@ -392,8 +325,7 @@ async function waitForTextInputValue(page, path, predicate = (v) => v === '', ti
   for (;;) {
     const value = await readTextValue(input);
     if (value == null) {
-      // Not readable YET is normal right after an action - keep polling, and only call it a failure
-      // once the whole window has gone by without the field ever showing up.
+      // Not readable yet is normal right after an action - keep polling until the window elapses.
       consecutiveMatches = 0;
       if (Date.now() >= deadline) {
         throw new Error(
@@ -407,12 +339,8 @@ async function waitForTextInputValue(page, path, predicate = (v) => v === '', ti
       continue;
     }
     if (predicate(value)) {
-      // Require the match to hold for two consecutive reads (~100ms apart), not just one instant: the
-      // DOM attribute this reads can apparently flip to the target value briefly before the WASM
-      // canvas's own repaint has actually caught up (confirmed live - a single successful read here
-      // still preceded a screenshot stably showing the OLD text), so one read isn't proof the visible
-      // canvas has settled. Mirrors Playwright's own toHaveScreenshot stability check (two identical
-      // frames in a row) applied to this attribute instead of pixels.
+      // Require the match to hold for two consecutive reads: the DOM attribute can flip to the target
+      // value briefly before the WASM canvas repaint catches up.
       consecutiveMatches++;
       if (consecutiveMatches >= 2) return;
     } else {
@@ -427,11 +355,7 @@ async function waitForTextInputValue(page, path, predicate = (v) => v === '', ti
 
 /**
  * Click a combo box and confirm its PopupMenuDialog actually opened, retrying the click once if not.
- * A click that lands right after an unrelated DOM update elsewhere on the page (e.g. a search box's
- * live-filtered table re-render) can occasionally miss/no-op on WASM canvas coordinates without
- * throwing - the combo just silently doesn't open. That leaves nothing for the caller to find (an
- * item lookup then fails misleadingly as "not found"), so verify the actual postcondition here rather
- * than assuming the click worked.
+ * A click on WASM canvas coordinates can occasionally no-op without throwing, so verify the postcondition.
  * @param {import('@playwright/test').Page} page
  * @param {string[]} comboPath
  */
@@ -439,10 +363,7 @@ async function openComboPopup(page, comboPath) {
   const ATTEMPTS = 3;
   for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
     await click(page, comboPath, { what: 'combo box' });
-    // WAIT for the popup rather than sampling its presence once: under concurrent-worker load the
-    // PopupMenuDialog can open a beat after the click's own settle returns, and an immediate count()
-    // then reads 0 and wrongly declares the click a no-op. Give each attempt a short window before
-    // re-clicking, so a merely-slow open isn't mistaken for a dropped click.
+    // Wait for the popup rather than sampling once: under load it can open a beat after the click settles.
     try {
       await page
         .locator('[objectName="PopupMenuDialog"][visible]')
@@ -479,11 +400,8 @@ async function select(page, comboPath, itemText) {
 }
 
 /**
- * Select an item in a ComboBox / dropdown BY POSITION instead of its display text. Catalogue-driven
- * combos (device type, hardware configuration, ...) are populated from seeded/live server data, so a
- * hardcoded caption ("RTV", "Sensorswithalicense", ...) silently drifts out of sync with whatever the
- * test database actually contains - this instead just opens the popup and clicks its Nth row, which
- * works regardless of what that row's real catalogue text is.
+ * Select an item in a ComboBox / dropdown BY POSITION instead of its display text - for catalogue-driven
+ * combos whose captions come from live server data and would drift out of sync if hardcoded.
  * @param {import('@playwright/test').Page} page
  * @param {string[]} comboPath
  * @param {number} index
@@ -504,10 +422,7 @@ async function selectIndex(page, comboPath, index) {
 
 /**
  * Click the Nth item of an ALREADY-OPEN PopupMenuDialog, by position - for popups a command opens
- * directly (not via a ComboBox click), e.g. CreateLicenseFile's Encrypt/Unencrypt choice
- * (DeviceCollectionViewCommandsDelegate.qml's encryptPopupMenuDialog uses PopupMenuDialog's own
- * default delegate, which - unlike ComboBox.qml's inline delegate - does NOT give each item a
- * text-based objectName, so only positional addressing works here).
+ * directly (not via a ComboBox click), whose default delegate gives items no text-based objectName.
  * @param {import('@playwright/test').Page} page
  * @param {number} index
  */
@@ -526,9 +441,7 @@ async function clickPopupItemByIndex(page, index) {
 
 /**
  * Click the LAST item of an ALREADY-OPEN PopupMenuDialog - for a menu whose trailing item is at a
- * variable position because earlier rows are data-driven (e.g. UserPanel.qml's account menu: Profile,
- * then one row per organization the user belongs to, then "No organization", then Logout always last).
- * Same no-text-objectName reasoning as clickPopupItemByIndex.
+ * variable position because earlier rows are data-driven (e.g. Logout always last after per-org rows).
  * @param {import('@playwright/test').Page} page
  */
 async function clickPopupItemLast(page) {
@@ -545,13 +458,8 @@ async function clickPopupItemLast(page) {
 }
 
 /**
- * Dismiss the currently-open modal Dialog (imtcontrols/Dialogs/Dialog.qml, and everything built on
- * it - Revision/Remove/Bind/TransferLicenses/info dialogs) via Escape, which every such dialog wires
- * to `finished(Enums.cancel)` as long as `escapeEnabled` (the default). Use after a test that only
- * screenshots a dialog and doesn't otherwise interact with it, so a chained/shared-page test suite
- * (test.describe.serial with one page for the whole block) doesn't leave a modal blocking the next
- * test's clicks - a bare reload() used to paper over this by wiping the dialog along with everything
- * else, which a shared page no longer does.
+ * Dismiss the currently-open modal Dialog via Escape (wired to cancel while `escapeEnabled`, the
+ * default). Use after a screenshot-only dialog test so it doesn't block the next test in a shared page.
  * @param {import('@playwright/test').Page} page
  */
 async function dismissDialog(page) {
@@ -571,19 +479,13 @@ async function scroll(page, deltaY, at) {
 /**
  * Close every open document tab, so the workspace is a clean single collection tab.
  *
- * ProLife (MultiDocumentCollectionView.qml) persists the user's open document tabs in server-side
- * workspace state, so a fresh page.goto RESTORES whatever tabs a previous test left open - a test that
- * opened a "New" editor and didn't close it strands the next test inside that editor (no collection
- * command bar, so "New" etc. are present-but-not-visible). That is a pure test-isolation defect, not a
- * server/timeout issue. This closes the leftovers: the pinned collection tab has no CloseButton (only
- * document tabs do), and closing a dirty document raises a "Save all changes?" confirm - we answer No
- * (discard) so cleanup never blocks on unsaved edits.
+ * The app restores server-persisted document tabs on a fresh goto, so a test that left an editor open
+ * strands the next test inside it. The pinned collection tab has no CloseButton; closing a dirty
+ * document raises a "Save all changes?" confirm which we answer No (discard).
  */
 async function closeAllDocumentTabs(page) {
   for (let i = 0; i < 12; i++) {
-    // The tab's close "X" carries objectName "CloseButton" and (per TabPanelDecorator.qml) is only
-    // visible for closeable document tabs - the pinned collection tab has none. Click its inner
-    // MouseArea, which is what QML actually reacts to.
+    // CloseButton is only visible for closeable document tabs; click its inner MouseArea.
     const closeBtn = page.locator('[objectName="CloseButton"][visible]').first();
     if ((await closeBtn.count()) === 0) {
       return;
@@ -595,9 +497,8 @@ async function closeAllDocumentTabs(page) {
     await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
     await waitForStable(page);
 
-    // Dirty document -> "Save all changes?" (Yes/No) confirm. Click No to discard and proceed. Waited
-    // for rather than sampled once: under worker contention it can paint just after the click's own
-    // settle, and a missed No leaves a modal that swallows every later click in the run.
+    // Dirty document -> "Save all changes?" confirm; click No to discard. Waited for rather than
+    // sampled once, since it can paint just after the click settles.
     const noBtn = page.locator('[objectName="NoButton"][visible]').first();
     const confirmShown = await noBtn
       .waitFor({ state: 'visible', timeout: 1500 })
@@ -616,11 +517,7 @@ async function closeAllDocumentTabs(page) {
 }
 
 /**
- * Reload the app root and wait for it to settle.
- *
- * NOTE: a leaked editor tab is NOT closed here - the app opens to the Workspace landing, and a Devices
- * (etc.) editor tab a prior test left open only re-appears once you navigate to that page. Tab cleanup
- * therefore happens in openPage() (right after navigation), not here.
+ * Reload the app root and wait for it to settle. A leaked editor tab is closed in openPage(), not here.
  */
 async function reload(page, url) {
   await page.goto(url || '/');
@@ -628,9 +525,7 @@ async function reload(page, url) {
 }
 
 /**
- * Log in through the authorization page using objectName-addressed fields (LoginInput /
- * PasswordInput / LoginButton from ImtCore's AuthorizationPage.qml). Throws if the form is missing.
- * Used by global-setup to mint each user's storageState.
+ * Log in through the authorization page using objectName-addressed fields. Throws if the form is missing.
  * @param {import('@playwright/test').Page} page
  * @param {string} username
  * @param {string} password
@@ -643,27 +538,15 @@ async function login(page, username, password) {
   await waitForStable(page, { timeout: 15000, quietMs: 600 });
 }
 
-// AuthorizationPage.qml's decoratorPause: a 500ms PauseAnimation started in Component.onCompleted
-// whose onFinished calls loginTextInput.forceActiveFocus(). Nothing else moves focus afterwards.
+// AuthorizationPage.qml re-asserts focus on the login field via a 500ms PauseAnimation on load.
 const LOGIN_FOCUS_SETTLE = 1000;
 
 /**
  * Put the login form's focus ring in one known place, so a screenshot of the form is reproducible.
  *
- * The ring is painted by Qt onto the canvas: document.activeElement never leaves <body> and no border
- * style reaches the DOM, so there is nothing to wait for and Playwright's own "stable screenshot"
- * retry is happy with either state. TWO things move it, and both need handling:
- *
- * 1. ORDER. decoratorPause re-asserts focus on the username field up to 500ms after the form appears,
- *    so a click on the password field landed before it on a fast run and after it on a slow one -
- *    measured as a 1272-pixel difference. Hence the wait, before anything else.
- * 2. WINDOW FOCUS. Qt paints the ring only for a focused window, and a headless page nobody has
- *    clicked is not one. Waiting alone therefore does NOT pin the default state: the same untouched
- *    form came back with and without a ring on Username across two runs (636 pixels). Only a click
- *    makes it deterministic - so the field option is effectively required, and the field to name for "the form
- *    as it greets a visitor" is the one the form focuses itself, LoginInput.
- *
- * A timeout is the honest tool for (1): the thing being waited on emits no signal at all.
+ * The ring is painted by Qt onto the canvas, so nothing in the DOM signals it. Two things move it:
+ * the 500ms decoratorPause re-asserting focus, and window focus (Qt paints the ring only for a focused
+ * window, which a click provides). Hence the wait, then an optional click on the given field.
  * @param {import('@playwright/test').Page} page
  * @param {{ field?: string[] }} [options]  field to click afterwards, e.g. ['PasswordInput']
  */

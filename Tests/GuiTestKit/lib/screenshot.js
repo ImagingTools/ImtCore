@@ -1,8 +1,7 @@
 // Screenshot assertion + masking, and a few structural assertions.
 //
-// Screenshots are the primary validation mechanism (per project decision). The structural helpers
-// (expectVisible / expectHidden / expectCount) exist to guard a screenshot - so it is only taken once
-// the intended state is actually present. They never replace the screenshot; they make it trustworthy.
+// Screenshots are the primary validation mechanism. The structural helpers (expectVisible /
+// expectHidden / expectCount) guard a screenshot so it is only taken once the intended state is present.
 
 const { expect } = require('@playwright/test');
 const dom = require('./dom');
@@ -18,41 +17,26 @@ const { waitForStable } = require('./stability');
 async function checkScreenshot(page, name, mask) {
   const masks = mask ? (Array.isArray(mask) ? mask : [mask]) : [];
   const handles = [];
-  // Inside the try from the first mask onwards: addMask can throw partway through the loop (a target
-  // that never resolves), and the masks already injected would then stay in the DOM, black-barring
-  // every later screenshot in the same shared-page block.
+  // Injected from the try so a mask that throws mid-loop is still cleaned up in finally.
   try {
     for (const m of masks) handles.push(await addMask(page, m));
 
     await waitForStable(page);
-    // snapshotPathTemplate derives {ext} from this argument's own extension, so toHaveScreenshot needs
-    // it spelled out here - a bare name is rejected before any pixels are compared.
-    //
-    // maxDiffPixels: 0 - every pixel matches, or the shot fails. A budget cannot tell "render noise"
-    // from "a date nobody masked": both are a handful of pixels, and the second is a screenshot that
-    // quietly stopped checking what it was written to check. Anything genuinely non-deterministic
-    // (timestamps, generated ids, secrets) gets a mask instead; `threshold` still absorbs sub-pixel
-    // colour variation inside a pixel.
+    // maxDiffPixels: 0 - every pixel matches or the shot fails; non-deterministic content gets a mask
+    // instead. threshold still absorbs sub-pixel colour variation.
     await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true, threshold: 0.05, maxDiffPixels: 0 });
   } finally {
-    // Masks are injected DOM nodes, so they outlive a failure and would sit over every later screenshot
-    // in the same shared page - turning one real failure into a run of unrelated-looking ones.
+    // Masks are injected DOM nodes; remove them so a failure doesn't leave bars over later screenshots.
     for (const h of handles) await removeMask(page, h).catch(() => {});
   }
 }
 
-// How long the polling structural assertions wait for the target to reach the expected state. The
-// WASM UI populates parts of a view asynchronously (e.g. the command bar fills in after a GraphQL
-// GetCommands round-trip that can land AFTER waitForStable's quiet window), so a single-shot count is
-// inherently racy - poll instead. 10000ms matches lib/actions' DEFAULT_TIMEOUT: under the mandated 10
-// concurrent workers that GetCommands round-trip (and other async view population) is slow enough that
-// the old 5000ms poll could give up before a legitimately-present command/element appeared.
+// Poll timeout for the structural assertions; matches actions' DEFAULT_TIMEOUT, since the WASM UI
+// populates parts of a view asynchronously (e.g. the command bar after a GetCommands round-trip).
 const ASSERT_TIMEOUT = 10000;
 
 /**
- * Assert an objectName path becomes visible. Polls until at least one visible match exists or the
- * timeout elapses - so a target that renders a moment after the page "settles" is waited for, not
- * failed on instantly (the old single-shot countVisible was the top source of flaky failures).
+ * Assert an objectName path becomes visible. Polls until at least one visible match exists or timeout.
  */
 async function expectVisible(page, path, message) {
   await expect
@@ -64,10 +48,8 @@ async function expectVisible(page, path, message) {
 }
 
 /**
- * Assert an objectName path is NOT visible (used for permission negatives). Waits briefly and requires
- * the count to be (and stay) 0 - a plain single-shot check could pass simply because the element had
- * not rendered yet. `settleMs` gives an async-appearing element a chance to show before we conclude
- * it is genuinely absent.
+ * Assert an objectName path is NOT visible (used for permission negatives). `settleMs` gives an
+ * async-appearing element a chance to show before we conclude it is genuinely absent.
  */
 async function expectHidden(page, path, message, settleMs = 800) {
   await waitForStable(page);
@@ -87,12 +69,8 @@ async function expectCount(page, path, expected, message) {
 }
 
 /**
- * The same comparison as checkScreenshot, but of ONE element instead of the whole page.
- *
- * For a modal: what is behind it is not what the test is about, and it is not under the test's
- * control either - every spec signed in as the same user shares the server-side column layout and
- * last-open page, so the backdrop changes when an unrelated test runs beside this one (measured as a
- * 21524-pixel diff behind an identical Profile dialog). Shooting the dialog says what the test means.
+ * The same comparison as checkScreenshot, but of ONE element instead of the whole page - for a modal
+ * whose backdrop is shared, non-deterministic state the test doesn't control.
  * @param {import('@playwright/test').Page} page
  * @param {string[]} path  objectName path of the element to compare
  * @param {string} name
@@ -113,7 +91,7 @@ async function checkElementScreenshot(page, path, name, mask) {
   }
 }
 
-// --- masking (ported and de-duplicated from the old utils.addMask/removeMask) -------------------
+// --- masking -------------------
 
 let maskSeq = 0;
 
@@ -162,12 +140,8 @@ async function removeMask(page, id) {
 }
 
 /**
- * Masks for every VISIBLE element matching an objectName prefix, as plain rects.
- *
- * Rects, not paths: a mask given a path waits for that exact element and fails the screenshot if it
- * is not there - which is the wrong outcome for "mask the comment timestamps" or "mask the product
- * rows", where how many there are is part of what the test is exercising. Nothing to mask is a valid
- * answer, and a caller that needs the element to exist should assert that separately.
+ * Masks for every VISIBLE element matching an objectName prefix, as plain rects. Rects, not paths:
+ * "nothing to mask" is a valid answer, so this never fails when there are no matches.
  * @param {import('@playwright/test').Page} page
  * @param {string} objectNamePrefix
  * @param {number} [padding]

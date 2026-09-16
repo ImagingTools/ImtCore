@@ -1,51 +1,24 @@
 // Wait for the QML/WASM canvas DOM to settle after an interaction.
 //
-// The old suite polled `document.documentElement.outerHTML` every 100 ms and diffed the whole string
-// - O(document size) per tick and easily fooled by tiny animated attributes. This version installs a
-// single in-page MutationObserver and resolves once there have been no DOM mutations for `quietMs`,
-// or bails out after `timeout`. It is cheap (the browser pushes mutations to us) and robust across
-// navigations (the injected function is self-contained and re-injected on each call).
-//
-// A flat DOM-quiet window alone is a guess, not a fact: too long when the app was already idle (dead
-// time on every click/fill in the suite - measured live at ~400ms each, the single biggest line item
-// in a test's own wall-clock), too short when a GraphQL round-trip is still in flight (the DOM can go
-// quiet WHILE waiting for the network response, then mutate again once it arrives - exactly the shape
-// of bug that produced the "search debounce" race fixed by hand in administration.editor.multiuser
-// .test.js). Network tracking below turns "is a request still in flight" from a guess into a fact,
-// so quietMs only has to cover the tail-end render flush after mutations genuinely stop, not an
-// entire round-trip - hence it can be much shorter than before.
+// Installs a single in-page MutationObserver and resolves once there have been no DOM mutations for
+// `quietMs`, or bails out after `timeout`. Network tracking below turns "is a request still in flight"
+// from a guess into a fact, so quietMs only has to cover the render flush after mutations stop.
 
 const DEFAULTS = { quietMs: 150, timeout: 6000 };
 const NETWORK_IDLE_TIMEOUT = 5000;
-// A settled action is typically: DOM mutates (click feedback) -> quiet while a request is in flight ->
-// response arrives -> DOM mutates again (view updates) -> quiet for real. That's one extra round after
-// the first network wait; a couple more are allowed for a rarer chained-request flow (e.g. a save
-// followed by a GetCommands refresh), bounded overall by `timeout` below regardless of round count.
+// A settled action is: DOM mutates -> quiet while a request is in flight -> response -> DOM mutates ->
+// quiet for real. Allow a couple of rounds for chained requests, bounded overall by `timeout`.
 const MAX_SETTLE_ROUNDS = 3;
 
-// ImtCore's two spinner components (imtcontrols/Views/BusyIndicator.qml, Loading.qml) animate via a
-// Timer mutating a rotation/transform property, which reaches the DOM as a `style` rewrite about
-// eleven times a second (measured). The observer above watches every attribute, so it sees them - and
-// on a screen where a spinner never stops (Lisa's authorization page keeps a full-size one up) the
-// quiet window never opens and every settle burns its ceiling: ~20s per reload()/login() there.
-//
-// Filtering those frames out was tried and REVERTED: a spinner still turning is also the only signal
-// that a view is still arriving, and without it screenshots started capturing half-loaded collections
-// (a 32031-pixel diff on a table that was simply not finished). It also bought nothing measurable once
-// the suite ran on several workers, since the affected page's tests overlap with everything else. If
-// this is worth optimising, fix the never-ending spinner rather than teaching the wait to ignore it.
-// Both spinners carry the same objectName as test instrumentation - poll for it directly rather than
-// assuming "DOM quiet" implies "no pending async work".
+// The busy/loading spinners animate a style property ~11x/second, so the observer never sees the DOM
+// go quiet while one is up. They also legitimately signal a view is still arriving (filtering their
+// frames was tried and reverted), so poll for the spinner directly rather than relying on DOM-quiet.
 const BUSY_SELECTOR = '[objectName="BusyIndicator"][visible]';
 const BUSY_INDICATOR_TIMEOUT = 5000;
 
 /**
- * Wait for any visible busy/loading indicator to disappear. Near-zero cost when none is showing (a
- * single in-page check, no polling loop needed); polls efficiently in-browser (Playwright's own
- * `waitForFunction` polling, not repeated Node<->browser round trips) when one is. Swallows its own
- * timeout rather than throwing - this is a screenshot-noise reducer, not a structural assertion, so a
- * spinner that's still up after `timeout` shouldn't fail the caller's real action/assertion; whatever
- * it's waiting on taking unusually long will surface via the caller's own outcome instead.
+ * Wait for any visible busy/loading indicator to disappear. Swallows its own timeout rather than
+ * throwing - this is a screenshot-noise reducer, not a structural assertion.
  * @param {import('@playwright/test').Page} page
  * @param {{timeout?: number}} [options]
  */
@@ -63,13 +36,8 @@ async function waitForBusyIndicatorGone(page, options = {}) {
 
 // --- network tracking ---------------------------------------------------------------------------
 //
-// Per-page in-flight XHR/fetch counter, attached lazily (once) and kept for the page's whole life -
-// event-driven (Playwright pushes request/requestfinished/requestfailed to us), not polled, so
-// checking it is free when nothing is in flight. Deliberately narrowed to xhr/fetch (GraphQL calls go
-// through fetch/XHR): a WASM app's own asset requests (the .wasm/.js bundle itself, images) fire once
-// at boot and would otherwise pad every later wait, and this must never count long-lived connections
-// (websocket/eventsource, if the app ever adds one) as "in flight" - those never finish, which would
-// make waitForNetworkIdle time out on every call instead of resolving instantly.
+// Per-page in-flight XHR/fetch counter, attached lazily and event-driven. Narrowed to xhr/fetch
+// (GraphQL calls) so boot-time asset requests and long-lived connections don't pad or stall the wait.
 const networkStateByPage = new WeakMap();
 
 function isTrackedRequest(req) {
@@ -88,10 +56,8 @@ function trackNetwork(page) {
       waiters.forEach((resolve) => resolve());
     }
   };
-  // Track the request OBJECTS, not just a count. A bare counter also decremented for requests that
-  // started before these listeners attached - they were never counted up, so each one cancelled out a
-  // genuinely in-flight request and `pending` could reach 0 while something was still running, letting
-  // waitForStable return mid-update.
+  // Track the request OBJECTS, not just a count: a bare counter also decremented for requests started
+  // before these listeners attached, letting `pending` hit 0 while something was still in flight.
   page.on('request', (req) => {
     if (isTrackedRequest(req)) {
       state.inFlight.add(req);
@@ -112,9 +78,7 @@ function trackNetwork(page) {
 
 /**
  * Wait for currently in-flight XHR/fetch requests to drain to zero. Resolves immediately if nothing
- * is in flight (the common case - most UI actions are purely client-side). Swallows its own timeout
- * like waitForBusyIndicatorGone - a stuck request should surface via the caller's own action/assertion,
- * not from this internal settle helper.
+ * is in flight. Swallows its own timeout like waitForBusyIndicatorGone.
  * @param {import('@playwright/test').Page} page
  * @param {{timeout?: number}} [options]
  */
@@ -127,8 +91,7 @@ async function waitForNetworkIdle(page, options = {}) {
       clearTimeout(timer);
       resolve();
     };
-    // state lives as long as the page, so a waiter left behind on the timeout path accumulates for the
-    // rest of a shared-page block and gets re-invoked by every later settle().
+    // Remove the waiter on the timeout path, so it doesn't accumulate and get re-invoked by later settle().
     const timer = setTimeout(() => {
       const index = state.waiters.indexOf(waiter);
       if (index !== -1) state.waiters.splice(index, 1);
@@ -193,9 +156,7 @@ async function waitForStable(page, options = {}) {
 
       const state = networkStateByPage.get(page);
       if (!state || state.pending === 0 || Date.now() >= deadline) break;
-      // A request was still in flight when the DOM went quiet - its response is very likely about to
-      // mutate the DOM again (a view update), so wait for it and loop back for one more quiet pass
-      // instead of declaring victory on a merely-temporary lull.
+      // A request was still in flight when the DOM went quiet - wait for it and loop for one more pass.
       await waitForNetworkIdle(page, { timeout: Math.max(0, deadline - Date.now()) });
     }
   } catch (err) {
@@ -211,7 +172,6 @@ async function waitForStable(page, options = {}) {
   }
 
   // DOM-quiet doesn't guarantee a busy/loading spinner has finished - see BUSY_SELECTOR's comment.
-  // Near-zero added cost on the common path (nothing showing).
   await waitForBusyIndicatorGone(page);
 }
 

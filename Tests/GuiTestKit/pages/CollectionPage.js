@@ -1,13 +1,13 @@
 // Base for the table+filter+CRUD collection pages (Customers, Devices/Hardware, Orders, Licenses).
 //
-// A standard collection needs no subclass at all - declare the two things that differ between apps:
+// A standard collection needs no subclass - declare the two things that differ between apps:
 //
 //   new CollectionPage(page, 'Orders', {
 //     filters: { customers: 'CustomersFilter', creationDate: 'CreationDateFilter' },
 //     maskColumns: ['added', 'timeStamp'],
 //   })
 //
-// Subclass only to add genuinely page-specific flows (a Bind dialog, a license-file command).
+// Subclass only to add genuinely page-specific flows.
 
 const gui = require('../lib/gui');
 const { BasePage } = require('./BasePage');
@@ -18,10 +18,8 @@ class CollectionPage extends BasePage {
    * @param {import('@playwright/test').Page} page
    * @param {string} pageId   MenuPanel PageId (e.g. 'Accounts', 'Devices')
    * @param {{filters?: Object<string, string>, maskColumns?: string[]}} [declaration]
-   *   `filters` maps a short key to the filter's objectName, so a test names a filter by what it means
-   *   rather than by an id out of the app's own configuration. `maskColumns` lists header ids whose
-   *   values are not deterministic across runs (timestamps, generated ids) and must be masked out of
-   *   every screenshot of this collection.
+   *   `filters` maps a short key to the filter's objectName. `maskColumns` lists header ids whose
+   *   values are not deterministic across runs and must be masked out of every screenshot.
    */
   constructor(page, pageId, { filters = {}, maskColumns = [] } = {}) {
     super(page, pageId);
@@ -38,10 +36,9 @@ class CollectionPage extends BasePage {
   }
 
   /**
-   * Assert this collection is actually the thing on screen. Cheap, and it closes a whole failure class:
-   * navigation that quietly did not happen leaves the PREVIOUS page up, and a screenshot taken then is
-   * committed as this page's baseline - which is how a Support landing baseline came to be byte-identical
-   * to the Workspace one. Every collection view has a table, and no non-collection page does.
+   * Assert this collection is actually on screen. Cheap, and it closes a failure class: navigation
+   * that quietly didn't happen leaves the previous page up, and its screenshot gets committed as this
+   * page's baseline. Every collection view has a table, and no non-collection page does.
    */
   expectOpen() {
     return gui.expectVisible(this.page, ['Table'], `${this.pageId}: expected a collection table on screen`);
@@ -91,13 +88,8 @@ class CollectionPage extends BasePage {
 
   /**
    * Screenshot masks ({x,y,width,height}[]) for one or more columns, addressed by header id (the
-   * HeaderIds entry from the collection's own *Page.acc, NOT the visible HeaderNames caption - e.g.
-   * Orders/Devices/SoftwareProducts all use "added"/"timeStamp" for their Added/Last Modified
-   * columns). Use for any column whose value isn't deterministic across runs (timestamps, generated
-   * ids, ...) so `checkScreenshot` stays reproducible instead of asserting on it. Thin forwarder to
-   * `this.table.columnMasks` - exists so a concrete page can call `this.columnMasks([...])` directly
-   * without reaching through `.table`, and so it reads the same regardless of which collection it's
-   * called on.
+   * HeaderIds entry from the collection's *Page.acc, NOT the visible caption). Use for any column whose
+   * value isn't deterministic across runs. Thin forwarder to `this.table.columnMasks`.
    * @param {string|string[]} headerIds
    */
   columnMasks(headerIds) {
@@ -105,9 +97,8 @@ class CollectionPage extends BasePage {
   }
 
   /**
-   * Open the "Table configuration" dialog by right-clicking a sortable column header
-   * (CollectionViewBase.qml's headerRightClickEnabled). Generic to every collection, so it lives here
-   * rather than in an app's own subclass.
+   * Open the "Table configuration" dialog by right-clicking a sortable column header. Generic to every
+   * collection, so it lives here rather than in a subclass.
    * @param {string} headerId the header/field id to right-click - any sortable column will do
    * @returns {Promise<TableConfigDialog>}
    */

@@ -1,19 +1,11 @@
 // Generic Playwright `projects` array builder for the "one project per fixture user, storageState
 // reused across all its tests" model, plus a guest project for unauthenticated specs.
 //
-// A consuming app's own playwright.config.js:
-//
-//   const { buildProjects } = require('imtcore-gui-testkit/playwrightConfig/buildProjects');
-//   const { GUEST, authFile, activeUsers } = require('./fixtures/users');
-//   ...
-//   projects: buildProjects({ users: activeUsers(), guest: GUEST, authFile }),
-//
 // Spec isolation: a user may carry an `isolatedSpec` (a spec filename or RegExp). That user's project
 // then runs ONLY that spec, and every OTHER authenticated project testIgnores it. Use this to pin a
-// spec that must not share server-side per-user state with any other spec (e.g. a document-editor spec
-// whose open-document workspace is keyed per user server-side) to its own dedicated fixture user.
+// spec that must not share server-side per-user state with any other spec to its own fixture user.
 
-// Turn an isolatedSpec value (filename string or RegExp) into a RegExp suitable for testMatch/testIgnore.
+// Turn an isolatedSpec value (filename string or RegExp) into a RegExp for testMatch/testIgnore.
 function specToRegExp(spec) {
   if (spec instanceof RegExp) return spec;
   // Match the filename anywhere in the path; escape regex metacharacters (notably the dots).
@@ -28,10 +20,8 @@ function specToRegExp(spec) {
  * @param {string} [opts.testDir]             default './tests'
  * @param {RegExp} [opts.guestTestMatch]      which spec files are guest-only (default *.guest.test.js)
  * @param {string[]} [opts.mutatingUserKeys]  users allowed to run @mutating specs. Mutating tests run
- *   serially (one shared database), so their cost is linear in the number of users AND unaffected by
- *   worker count, and running the same mutation again as another user re-proves the flow, nothing more.
- *   Users outside this list get a project-level grepInvert so the mutating phase stays the same size
- *   however wide the matrix gets. Omit to let every user run them.
+ *   serially, so re-running the same mutation as another user re-proves the flow, nothing more. Users
+ *   outside this list get a project-level grepInvert. Omit to let every user run them.
  * @returns {object[]}
  */
 function buildProjects({
@@ -42,21 +32,16 @@ function buildProjects({
   guestTestMatch = /.*\.guest\.test\.js/,
   mutatingUserKeys,
 }) {
-  // Every isolated spec across the active users - regular projects must exclude ALL of them, not just
-  // their own, so an isolated editor spec never runs under a general matrix user.
+  // Every isolated spec across the active users - regular projects must exclude ALL of them.
   const isolatedMatchers = users.filter((u) => u.isolatedSpec).map((u) => specToRegExp(u.isolatedSpec));
 
-  // An isolated user must keep its mutating tests: its spec runs under that user and no other, so
-  // excluding them there would drop the coverage entirely rather than deduplicate it.
+  // An isolated user keeps its mutating tests: its spec runs under that user and no other.
   function runsMutating(user) {
     return !mutatingUserKeys || !!user.isolatedSpec || mutatingUserKeys.includes(user.key);
   }
 
   // NOTE: a misspelled or stale key here matches nobody and silently drops @mutating from every matrix
-  // project. This cannot be caught reliably from inside buildProjects - naming a user outside a narrower
-  // run's scope is legitimate, and any isolatedSpec user keeps its own mutating tests regardless, so
-  // "somebody still runs them" is always true and proves nothing. Validate the keys against the full
-  // user list in the consuming config, where that list is known (ProLife's playwright.config.js does).
+  // project. Validate the keys against the full user list in the consuming config, where it is known.
 
   const userProjects = users.map((u) => {
     const project = u.isolatedSpec

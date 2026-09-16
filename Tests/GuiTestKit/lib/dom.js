@@ -4,15 +4,12 @@
 // DOM as an element carrying an `objectName="..."` attribute, and (for anything clickable) contains
 // an inner `[objectName="MouseArea"]`. Visible elements also carry a `visible` attribute.
 //
-// A "path" is an array of objectNames from an outer container to the target, e.g.
-//   ['FilterPanel', 'SearchTextInput']  ->  [objectName="FilterPanel"] [objectName="SearchTextInput"]
-// The descendant combinator means intermediate nesting is allowed - you only list the meaningful
-// anchors, not every wrapper.
+// A "path" is an array of objectNames from an outer container to the target; the descendant combinator
+// means intermediate nesting is allowed, so you only list the meaningful anchors.
 
 const OBJ = (name) => `[objectName="${cssEscape(name)}"]`;
 
-// Escape a value for use inside an attribute-selector string. objectNames are simple identifiers in
-// practice, but ids can contain generated segments, so be safe.
+// Escape a value for use inside an attribute-selector string.
 function cssEscape(value) {
   return String(value).replace(/["\\]/g, '\\$&');
 }
@@ -61,8 +58,7 @@ function mouseAreaOf(page, path) {
 
 /**
  * A text item inside an open PopupMenuDialog (combo-box dropdown / context menu).
- * QML controls that render a text-keyed delegate expose it as [objectName="<text>"]; spaces are
- * stripped in the auto-generated names, matching imtcontrols/Buttons/Button.qml behaviour.
+ * Text-keyed delegates expose it as [objectName="<text>"] with spaces stripped from the name.
  * @param {import('@playwright/test').Page} page
  * @param {string} text
  */
@@ -71,11 +67,8 @@ function popupItem(page, text) {
 }
 
 /**
- * The Nth selectable item in an open PopupMenuDialog, addressed by position instead of its display
- * text. Every delegate row is a Button-derived ItemDelegate (PopupMenuDelegate.qml), so it always
- * carries an inner [objectName="MouseArea"]; that MouseArea is explicitly hidden for separator rows
- * (PopupMenuDelegate.qml's isSeparator handling), so filtering on [visible] here already skips them
- * without needing to know the model's real item text/id - just its position in the list.
+ * The Nth selectable item in an open PopupMenuDialog, addressed by position. Separator rows have their
+ * MouseArea hidden, so the [visible] filter already skips them.
  * @param {import('@playwright/test').Page} page
  * @param {number} index  zero-based position among the popup's selectable (non-separator) rows
  */
@@ -113,12 +106,8 @@ async function countAny(page, path) {
 }
 
 /**
- * Walk a path prefix by prefix and report where it stops resolving.
- *
- * "[FilterPanel > CreationDateFilter] has no visible MouseArea" does not say whether the panel was
- * missing, the filter was missing, or the filter was there but not clickable - three different bugs
- * with one message, and telling them apart meant opening the failure screenshot by hand. This answers
- * it in the error itself. Only ever called on a failure path, so it costs nothing on a passing run.
+ * Walk a path prefix by prefix and report where it stops resolving, so an error can say whether a
+ * container, the target, or its clickability was the missing piece. Only called on a failure path.
  *
  * @param {import('@playwright/test').Page} page
  * @param {string[]} path
@@ -148,13 +137,8 @@ async function describePath(page, path, extra = []) {
 }
 
 /**
- * Whether `path` becomes visible within `timeout` - a probe, not an assertion.
- *
- * This is how a test asks whether a flow is available to the CURRENT user at all. The running client
- * already holds that user's permissions and has rendered accordingly, so it is the only source that
- * cannot drift; a table of "who may do what" kept in the test suite is a copy of the product's
- * configuration and goes stale silently. Waits rather than sampling once because parts of a view
- * (notably the command bar) populate after an async round-trip.
+ * Whether `path` becomes visible within `timeout` - a probe, not an assertion. Waits rather than
+ * sampling once because parts of a view (notably the command bar) populate after an async round-trip.
  * @param {import('@playwright/test').Page} page
  * @param {string[]} path
  * @param {number} [timeout]
@@ -166,15 +150,11 @@ async function isVisible(page, path, timeout = 2000) {
     .catch(() => false);
 }
 
-// How long a view may take to paint before "is this offered?" stops being answerable by waiting.
-// Generous on purpose: this is a cold app boot competing with every other worker, and the cost is only
-// ever paid when something is genuinely wrong.
+// Generous timeout for a cold view to paint before "is this offered?" stops being answerable.
 const OFFER_ANCHOR_TIMEOUT = 30000;
-// Once the view around it has rendered, the element either exists or it does not - a short look is
-// enough and a long one would only add dead time to every negative answer.
+// Once the view has rendered, the element either exists or not - a short look is enough.
 const OFFER_PROBE_TIMEOUT = 2000;
-// Used only when the anchor never appeared, i.e. the view rendered nothing recognisable at all. Then
-// the short probe is not trustworthy, so the question is asked the slow way before answering "no".
+// Used only when the anchor never appeared: ask the slow way before answering "no".
 const OFFER_FALLBACK_TIMEOUT = 10000;
 
 /** How many VISIBLE elements match a raw attribute selector, optionally inside an objectName path. */
@@ -187,20 +167,9 @@ async function countVisibleMatching(page, selector, scope = []) {
  * Whether the client OFFERS `path` to the logged-in user - the permission question, asked of the
  * running client rather than of a table kept in the suite.
  *
- * The naive form of this is `isVisible(path, 2000)`, and it is what made a green run meaningless: the
- * parts of a view that carry commands and pages arrive on an async round-trip that regularly takes
- * longer than two seconds under four workers, so the probe answered "not offered" for a SUPERUSER and
- * whole describe blocks skipped themselves green - measured at 12, 26, 34, 48 and once 100 tests in a
- * run, on identical code and data.
- *
- * The fix is to ask only once the answer is knowable. `anchorSelector` names the SIBLINGS of what is
- * being looked for - the other buttons on the same bar, the other items in the same menu. While none
- * of them is on screen the view has not rendered and "no" would be a guess; once any of them is, the
- * one being asked about is either there or genuinely not offered.
- *
- * If no sibling ever appears the view rendered nothing at all, which is not the same as a refusal -
- * so rather than lie, the question is then put the slow way (OFFER_FALLBACK_TIMEOUT) before "no" is
- * returned. Callers that can tell the difference should say so in their own error instead.
+ * `anchorSelector` names the SIBLINGS of what is being looked for; while none is on screen the view
+ * hasn't rendered and "no" would be a guess. Once any sibling is visible, probe the target quickly.
+ * If no sibling ever appears the view rendered nothing, so ask the slow way before returning "no".
  * @param {import('@playwright/test').Page} page
  * @param {string[]} path
  * @param {{anchorSelector: string, anchorScope?: string[], anchorTimeout?: number}} options
@@ -228,48 +197,12 @@ async function isOffered(page, path, options) {
 
 /**
  * ONE bounding rect per requested column PER TABLE INSTANCE currently on screen (viewport-relative,
- * {x,y,width,height}) - spanning the full visible row area rather than one rect per row-cell. Used to
- * mask non-deterministic columns (e.g. Added/Last Modified timestamps) in screenshots:
- * TableCellDelegateBase's objectName is bound to its own column's headerId, so a cell for headerId
- * "added" is `[objectName="TableRow_i"] [objectName="added"]`.
+ * {x,y,width,height}), spanning the full visible row area. Used to mask non-deterministic columns
+ * (e.g. Added/Last Modified timestamps) in screenshots.
  *
- * Masking per-ROW (one rect per cell) was tried first and had two problems: table rows have no gap
- * between them, so the per-row rects visually merge into one solid bar anyway - and the last row's
- * rect could extend past the table's actual bottom edge into the pagination bar below it (a small
- * per-row rounding/virtualization difference compounds over ~25 rows). Building one rect per column
- * instead - x/width from any single matching cell, y/height clamped to the union of all currently
- * rendered rows' own top/bottom - covers exactly the table's real extent and nothing past it.
- *
- * "TableRow_<i>" numbering also isn't globally unique (every Table instance counts its own rows from
- * 0 - see the Table class comment in controls/index.js), so a naive single min/max span across EVERY
- * matching row on the page mixes unrelated tables together whenever more than one is on screen at once
- * (e.g. a "Select device" dialog that embeds its own full collection table over the page's own table
- * behind it) - the combined span can overshoot past either table's real bottom edge into blank space.
- * Group rows by their nearest enclosing `[objectName="Dialog"]` (or the page root if none) and compute
- * each group's span independently.
- *
- * That grouping alone still isn't enough: a full page of rows (e.g. a 25-row page inside a Dialog whose
- * own scrollable content area is shorter than 25*rowHeight) reports `getBoundingClientRect()` positions
- * for its last few rows that run past the Dialog's own clipped/visible bottom edge - the QML `clip:
- * true` on the Table's Flickable stops those rows from actually being *drawn* past the boundary, but
- * doesn't stop the WASM-to-DOM bridge from reporting their real, unclipped scene position for the
- * `[visible]` attribute and bounding rect (confirmed by dumping row rects live: a Dialog whose own
- * bounding box bottom was 1030 still had rows whose bottom exceeded it). A span built from those raw
- * rects can run well past the Dialog's real bottom edge into whatever sliver of the page is still
- * visible below/around it - which is exactly the "mask covers the whole page height" bug this was
- * built to avoid. Clamp each group's span to its own scope's bounding rect (the Dialog's box, or the
- * viewport for the un-dialogued page group) so it can never extend past what's actually visible there.
- *
- * One more source of the same visual bug: the mask itself is a `position: fixed`, high-z-index DOM div
- * (see screenshot.js's addMask) painted in viewport coordinates - it has no idea about QML stacking
- * order, so a background-page group's column rect paints straight over a foreground Dialog sitting on
- * top of it wherever their x-ranges overlap (a Dialog rarely covers the full viewport - e.g. a 1820x980
- * Dialog centered in a 1920x1080 page leaves ~50px of the real page visible on every edge - but the
- * background table's OWN "Added"/"Last Modified" columns commonly line up in x with the Dialog's, since
- * both are the rightmost columns of a similarly-proportioned table). Subtract every open Dialog's rect
- * from every OTHER group's column rects before returning (splitting a rect that straddles a Dialog
- * vertically into the strip above it and the strip below, when the Dialog actually covers its x-range) -
- * a group scoped to a Dialog never has its own Dialog subtracted from itself.
+ * Rows are grouped by their nearest enclosing `[objectName="Dialog"]` (or the page root) so multiple
+ * tables on screen don't merge, each group's span is clamped to its table/dialog/viewport bounds, and
+ * every other open Dialog's rect is subtracted so a background column can't paint over a foreground Dialog.
  * @param {import('@playwright/test').Page} page
  * @param {string[]} headerIds
  * @returns {Promise<{x:number,y:number,width:number,height:number}[]>}
@@ -286,12 +219,10 @@ async function columnRects(page, headerIds) {
       groups.get(scope).push(row);
     }
 
-    // Same [visible] filter as the rows above: a dismissed Dialog can linger in the DOM with a real
-    // bounding rect, and subtracting it would punch a hole through the mask it is no longer covering.
+    // [visible] filter: a dismissed Dialog can linger in the DOM and subtracting it would punch a hole.
     const dialogEls = Array.from(document.querySelectorAll('[objectName="Dialog"][visible]'));
 
-    // Subtract `occluder` from `rect` (same x-range only, since these are vertical column strips) -
-    // returns 0, 1 (untouched or trimmed), or 2 (split above/below) rects.
+    // Subtract `occluder` from `rect` (same x-range only) - returns 0, 1, or 2 (split above/below) rects.
     function subtractOccluder(rect, occluder) {
       const overlapsX = rect.x < occluder.right && rect.x + rect.width > occluder.left;
       if (!overlapsX) return [rect];
@@ -310,19 +241,14 @@ async function columnRects(page, headerIds) {
     const rects = [];
     for (const [scope, groupRows] of groups.entries()) {
       const scopeRect = scope.getBoundingClientRect();
-      // Clamping to the enclosing Dialog's own outer rect is still too generous: a Dialog's outer box
-      // includes its title bar and footer (pagination controls, OK/Cancel buttons) below the table, so
-      // a mask clamped only to the Dialog can bleed down through those - genuinely non-table content -
-      // instead of stopping at the table's own real bottom edge. Clamp to the nearest enclosing
-      // `[objectName="Table"]` (the actual clipped row viewport) when there is one; it's always at
-      // least as tight as the Dialog/page bound, often tighter.
+      // Clamp to the nearest enclosing Table (the clipped row viewport) when there is one, so the mask
+      // stops at the table's real bottom rather than bleeding through the dialog's title bar/footer.
       const tableEl = groupRows[0].closest('[objectName="Table"]');
       const containerRect = tableEl ? tableEl.getBoundingClientRect() : scopeRect;
       const rowRects = groupRows.map((r) => r.getBoundingClientRect());
       const rawTop = Math.min(...rowRects.map((r) => r.top));
       const rawBottom = Math.max(...rowRects.map((r) => r.bottom));
-      // Never past the scope's or the table container's own visible bounds, and never above/below the
-      // viewport itself.
+      // Never past the scope's or the table container's own visible bounds, nor the viewport.
       const groupTop = Math.max(rawTop, scopeRect.top, containerRect.top, 0);
       const groupBottom = Math.min(rawBottom, scopeRect.bottom, containerRect.bottom, window.innerHeight);
       if (groupBottom <= groupTop) continue;
@@ -330,10 +256,8 @@ async function columnRects(page, headerIds) {
       const occluders = dialogEls.filter((d) => d !== scope).map((d) => d.getBoundingClientRect());
 
       for (const id of ids) {
-        // The WIDEST cell in the column, not the first one found: a cell can render slightly past its
-        // neighbours (longer text, a different row height), and a mask cut to one row left those few
-        // pixels of somebody else's timestamp showing - invisible under a pixel budget, a failure
-        // without one.
+        // The WIDEST cell in the column, not the first found: a cell can render slightly past its
+        // neighbours, and a mask cut to one row would leave a few pixels of another timestamp showing.
         let left = null;
         let right = null;
         for (const row of groupRows) {

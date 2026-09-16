@@ -1,11 +1,5 @@
 // Builds an app's fixture-user module from just its user list.
 //
-// Every consumer of this kit - createGuiTest, createGlobalSetup and buildProjects - needs the same
-// four things from an app's users module (byKey / activeUsers / authFile / seededUsers). Each app used
-// to hand-write them, which made the contract implicit: a renamed export or a key typo surfaced much
-// later as a confusing failure inside a fixture, or as a project that silently ran nothing. Declare the
-// users, get the module:
-//
 //   const { defineUsers } = require('imtcore-gui-testkit/fixtures/defineUsers');
 //   module.exports = defineUsers({
 //     users: [ { key: 'su', title: 'Superuser', login: 'su', password: '1' }, ... ],
@@ -13,8 +7,7 @@
 //     allUsersEnv: 'MYAPP_GUI_ALL_USERS',
 //   });
 //
-// Anything extra an app needs (its own permission bundles, a shared PASSWORD constant) stays in its
-// own file - this only owns the plumbing every app would otherwise copy.
+// It owns the plumbing (byKey / activeUsers / authFile / seededUsers) every app would otherwise copy.
 
 /**
  * @typedef {Object} TestUser
@@ -23,11 +16,9 @@
  * @property {string} login          Username used at the login screen
  * @property {string} password       Password used at the login screen
  * @property {boolean} [seed]        If true, the app's seeding step creates this user
- * @property {string[]} [permissions] Permission codes GRANTED when seeding this user's role. Not a
- *   claim about what the product requires anywhere - tests never branch on these.
+ * @property {string[]} [permissions] Permission codes GRANTED when seeding this user's role.
  * @property {string|RegExp} [isolatedSpec]  Pin this user to exactly one spec file, which then runs
- *   under this user and no other (see buildProjects). For specs whose server-side per-user state
- *   cannot be shared with a concurrently-running spec.
+ *   under this user and no other (see buildProjects).
  */
 
 /**
@@ -43,9 +34,8 @@
 function defineUsers({ users, defaultUserKeys, allUsersEnv, guest, authFile, suKey = 'su' }) {
   const GUEST = guest || { key: 'guest', title: 'Guest', login: null, password: null, seed: false, permissions: [] };
 
-  // Fail loudly here, at config-load time, rather than somewhere far away at run time: a duplicate key
-  // silently shadows a project, and a defaultUserKeys entry that matches nobody quietly shrinks the
-  // default run to less than it claims to cover.
+  // Fail loudly here at config-load time: a duplicate key silently shadows a project, and a
+  // defaultUserKeys entry matching nobody quietly shrinks the default run.
   if (!Array.isArray(users) || users.length === 0) {
     throw new Error('defineUsers: `users` must be a non-empty array');
   }
@@ -64,10 +54,9 @@ function defineUsers({ users, defaultUserKeys, allUsersEnv, guest, authFile, suK
       throw new Error(`defineUsers: defaultUserKeys names unknown user "${key}" (known: ${[...seen].join(', ')})`);
     }
   }
-  // The superuser holds no permissions in the server's own list - it bypasses the checks entirely - so
-  // its granted set comes back EMPTY, indistinguishable from a user granted nothing. `permissions: ['*']`
-  // is the only thing that tells the two apart, and without it `requires()` would skip the superuser out
-  // of every permission-gated test in the suite, silently and green. Not optional, therefore.
+  // The superuser holds no permissions in the server's own list (it bypasses the checks), so its
+  // granted set comes back empty. `permissions: ['*']` is the only thing distinguishing it from a user
+  // granted nothing, without which `requires()` would skip it out of every permission-gated test.
   const su = users.find((u) => u.key === suKey);
   if (su && !(Array.isArray(su.permissions) && su.permissions.includes('*'))) {
     throw new Error(
@@ -77,9 +66,8 @@ function defineUsers({ users, defaultUserKeys, allUsersEnv, guest, authFile, suK
     );
   }
 
-  // global-setup logs in su plus every SEEDED user, and nobody else. A user without `seed` still gets a
-  // project pointed at a storageState path, so that project's every test dies at context creation with
-  // an unhelpful ENOENT. Say it here instead, where the mistake is.
+  // global-setup logs in su plus every SEEDED user. A user without `seed` still gets a project pointed
+  // at a storageState path that is never written, so its tests die at context creation. Say it here.
   for (const user of users) {
     if (!user.seed && user.key !== suKey) {
       throw new Error(
@@ -98,12 +86,8 @@ function defineUsers({ users, defaultUserKeys, allUsersEnv, guest, authFile, suK
   };
 
   /**
-   * The users that get a Playwright project / storageState this run.
-   *
-   * `isolatedSpec` users are ALWAYS active, in both the fast subset and the full matrix: their whole
-   * point is that their dedicated spec runs under them and no other user, so leaving one out would mean
-   * that spec runs under nobody at all (every other project testIgnores it). They add no matrix breadth
-   * - one user, one spec - so including them costs one extra project, not a full re-run of everything.
+   * The users that get a Playwright project / storageState this run. `isolatedSpec` users are always
+   * active (their dedicated spec runs under them and no other, so leaving one out runs it under nobody).
    */
   const activeUsers = () => {
     const matrix = useAllUsers() || !defaultUserKeys ? users : users.filter((u) => defaultUserKeys.includes(u.key));
