@@ -5,13 +5,14 @@
 
 // ACF includes
 #include <iqt/iqt.h>
-#include <istd/TDelPtr.h>
+#include <istd/TInterfacePtr.h>
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
 #include <imtauth/CUserGroupInfo.h>
 #include <imtauth/CUserGroupFilter.h>
 #include <imtauth/IUserInfoProvider.h>
+#include <imtbase/IObjectCollectionIterator.h>
 
 
 namespace imtauthgql
@@ -446,31 +447,35 @@ void CUserGroupCollectionControllerComp::OnAfterRemoveElements(const QByteArrayL
 	// so that users no longer reference groups that do not exist anymore.
 	if (m_userCollectionCompPtr.IsValid()){
 		iprm::CParamsSet filterParams;
-		istd::TDelPtr<imtauth::CUserGroupFilter> groupFilterPtr = new imtauth::CUserGroupFilter();
+		istd::TUniqueInterfacePtr<imtauth::CUserGroupFilter> groupFilterPtr = new imtauth::CUserGroupFilter();
 		groupFilterPtr->SetGroupIds(elementIds);
-		filterParams.SetEditableParameter("GroupFilter", groupFilterPtr.PopPtr(), true);
+		iser::ISerializableUniquePtr groupFilterParamPtr = std::move(groupFilterPtr);
+		filterParams.SetEditableParameter("GroupFilter", groupFilterParamPtr);
 
-		imtbase::ICollectionInfo::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParams);
-		for (const QByteArray& userId : userIds){
-			imtbase::IObjectCollection::DataPtr userDataPtr;
-			if (!m_userCollectionCompPtr->GetObjectData(userId, userDataPtr)){
-				continue;
-			}
-
-			imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(userDataPtr.GetPtr());
-			if (userInfoPtr == nullptr){
-				continue;
-			}
-
-			bool hasChanges = false;
-			for (const QByteArray& groupId : elementIds){
-				if (userInfoPtr->RemoveFromGroup(groupId)){
-					hasChanges = true;
+		istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> userIteratorPtr =
+					m_userCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &filterParams);
+		if (userIteratorPtr.IsValid()){
+			while (userIteratorPtr->Next()){
+				imtbase::IObjectCollection::DataPtr userDataPtr;
+				if (!userIteratorPtr->GetObjectData(userDataPtr)){
+					continue;
 				}
-			}
 
-			if (hasChanges){
-				m_userCollectionCompPtr->SetObjectData(userId, *userInfoPtr);
+				imtauth::IUserInfo* userInfoPtr = userDataPtr.GetPtr<imtauth::IUserInfo>();
+				if (userInfoPtr == nullptr){
+					continue;
+				}
+
+				bool hasChanges = false;
+				for (const QByteArray& groupId : elementIds){
+					if (userInfoPtr->RemoveFromGroup(groupId)){
+						hasChanges = true;
+					}
+				}
+
+				if (hasChanges){
+					m_userCollectionCompPtr->SetObjectData(userIteratorPtr->GetObjectId(), *userInfoPtr);
+				}
 			}
 		}
 	}
