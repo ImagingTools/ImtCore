@@ -147,6 +147,22 @@ IUserBaseInfo::FeatureIds CUserInfo::GetPermissions(const QByteArray& productId)
 }
 
 
+bool CUserInfo::IsEnabled() const
+{
+	return m_enabled;
+}
+
+
+void CUserInfo::SetEnabled(bool enabled)
+{
+	if (m_enabled != enabled){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_enabled = enabled;
+	}
+}
+
+
 IUserInfo::SystemInfoList CUserInfo::GetSystemInfos() const
 {
 	return m_systemInfos;
@@ -343,6 +359,18 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 		m_mustChangePassword = false;
 	}
 
+	if (imtCoreVersion >= 23245){
+		iser::CArchiveTag enabledTag("Enabled", "Account enabled", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(enabledTag);
+		retVal = retVal && archive.Process(m_enabled);
+		retVal = retVal && archive.EndTag(enabledTag);
+	}
+	else{
+		if (!archive.IsStoring()){
+			m_enabled = true;
+		}
+	}
+
 	return retVal;
 }
 
@@ -362,6 +390,7 @@ bool CUserInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 		m_mail = sourcePtr->m_mail;
 		m_groupIds = sourcePtr->m_groupIds;
 		m_systemInfos = sourcePtr->m_systemInfos;
+		m_enabled = sourcePtr->m_enabled;
 		m_passwordHistory = sourcePtr->m_passwordHistory;
 		m_passwordChangedAt = sourcePtr->m_passwordChangedAt;
 		m_mustChangePassword = sourcePtr->m_mustChangePassword;
@@ -385,6 +414,7 @@ bool CUserInfo::IsEqual(const IChangeable& object) const
 		retVal = retVal && m_groupIds == sourcePtr->m_groupIds;
 		retVal = retVal && m_lastConnection == sourcePtr->m_lastConnection;
 		retVal = retVal && m_systemInfos == sourcePtr->m_systemInfos;
+		retVal = retVal && m_enabled == sourcePtr->m_enabled;
 		retVal = retVal && m_passwordHistory == sourcePtr->m_passwordHistory;
 		retVal = retVal && m_passwordChangedAt == sourcePtr->m_passwordChangedAt;
 		retVal = retVal && m_mustChangePassword == sourcePtr->m_mustChangePassword;
@@ -417,6 +447,7 @@ bool CUserInfo::ResetData(CompatibilityMode mode)
 	m_passwordHash.clear();
 	m_sid.clear();
 	m_groupIds.clear();
+	m_enabled = true;
 	m_passwordHistory.clear();
 	m_passwordChangedAt = QDateTime();
 	m_mustChangePassword = false;

@@ -231,6 +231,9 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
+	// Self-registration never carries an account state: only the superuser may disable an account.
+	userInfoPtr->SetEnabled(true);
+
 	imtauth::IUserInfo::SystemInfo systemInfo;
 	userInfoPtr->AddToSystem(systemInfo);
 
@@ -620,6 +623,43 @@ sdl::V1_0::imtauth::CUserObjectId CUserControllerComp::OnGetUserObjectId(
 	QByteArray objectId = GetUserIdByLogin(login);
 
 	response.objectId = objectId;
+
+	return response;
+}
+
+
+sdl::V1_0::imtauth::CUnlockUserPayload CUserControllerComp::OnUnlockUser(
+			const sdl::V1_0::imtauth::CUnlockUserGqlRequest& unlockUserRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& errorMessage) const
+{
+	sdl::V1_0::imtauth::CUnlockUserPayload response;
+	response.success = false;
+
+	if (!m_accountLockoutControllerCompPtr.IsValid()){
+		errorMessage = QStringLiteral("Unable to unlock user account. Error: Component 'AccountLockoutController' was not set");
+		SendErrorMessage(0, errorMessage, "CUserControllerComp");
+
+		return response;
+	}
+
+	sdl::V1_0::imtauth::UnlockUserRequestArguments arguments = unlockUserRequest.GetRequestedArguments();
+	if (!arguments.input.HasValue()){
+		errorMessage = QStringLiteral("Unable to unlock user account. Error: Input argument is invalid");
+		return response;
+	}
+
+	if (!arguments.input->login.HasValue()){
+		errorMessage = QStringLiteral("Unable to unlock user account. Error: Login field is invalid");
+		return response;
+	}
+
+	QByteArray login = *arguments.input->login;
+
+	m_accountLockoutControllerCompPtr->UnlockAccount(login);
+
+	response.success = true;
+	response.message = QStringLiteral("Account '%1' has been unlocked").arg(QString(login));
 
 	return response;
 }

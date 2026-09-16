@@ -251,6 +251,7 @@ DocumentViewBase {
 						id: userGeneralEditor;
 						width: parent.width;
 						userData: container.userData;
+						showAccountEnabled: true;
 						passwordPolicy: container.passwordPolicy;
 						
 						onEmitUpdateModel: {
