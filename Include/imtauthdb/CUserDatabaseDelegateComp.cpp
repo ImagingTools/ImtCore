@@ -193,29 +193,22 @@ bool CUserDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& 
 
 QString CUserDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
 {
-	QString filterQuery;
-
-	iprm::TParamsPtr<imtauth::IUserGroupFilter> groupFilterParamPtr(&filterParams, "GroupFilter");
-	if (groupFilterParamPtr.IsValid() && !IsSQLite()){
-		QByteArrayList groupIds = groupFilterParamPtr->GetGroupIds();
-		if (!groupIds.isEmpty()){
-			QString array = "array[";
-
-			for (int i = 0; i < groupIds.size(); i++){
-				if (i > 0){
-					array += ",";
-				}
-
-				array += "'" + SqlEncode(QString(groupIds[i])) + "'";
-			}
-
-			array += "]";
-
-			filterQuery = QStringLiteral(R"((root."Document"->'Groups' ?| %1))").arg(array);
-		}
+	iprm::TParamsPtr<imtauth::IUserGroupFilter> groupFilterParamPtr(&filterParams, QByteArrayLiteral("GroupFilter"));
+	if (!groupFilterParamPtr.IsValid() || IsSQLite()){
+		return QString();
 	}
 
-	return filterQuery;
+	QByteArrayList groupIds = groupFilterParamPtr->GetGroupIds();
+	if (groupIds.isEmpty()){
+		return QString();
+	}
+
+	QStringList quotedGroupIds;
+	for (const QByteArray& groupId : groupIds){
+		quotedGroupIds << QStringLiteral("'%1'").arg(SqlEncode(QString(groupId)));
+	}
+
+	return QStringLiteral(R"((root."Document"->'Groups' ?| array[%1]))").arg(quotedGroupIds.join(','));
 }
 
 
