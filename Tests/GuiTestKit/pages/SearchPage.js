@@ -33,13 +33,7 @@ class SearchPage extends BasePage {
    * rather than sleeping, and swallows its own timeout - a search returning zero results is a valid
    * outcome the caller detects via tabCount() === 0, not a hang.
    */
-  async waitForResults(options = {}) {
-    if (options.allowEmpty) {
-      await this.page.waitForTimeout(700);
-      await waitForBusyIndicatorGone(this.page, { timeout: 1500 });
-      return this;
-    }
-
+  async waitForResults() {
     try {
       await gui.expectVisible(this.page, ['Tab0'], 'search results tab should appear');
       await waitForBusyIndicatorGone(this.page, { timeout: 15_000 });
