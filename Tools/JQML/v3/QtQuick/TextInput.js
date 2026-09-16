@@ -437,16 +437,40 @@ class TextInput extends Item {
         }
     }
 
-    SLOT_activeFocusChanged(oldValue, newValue){
-        if(!newValue){
-            this.__impl.blur()
+    forceActiveFocus(){
+        super.forceActiveFocus()
+        this.__ensureDomFocus()
+    }
 
-            if(this.validator){
-                if(this.validator.validate(this.text)) this.editingFinished()
-            } else {
-                this.editingFinished()
-            }
-            
+    __ensureDomFocus(){
+        if(!this.__impl || !this.enabled || !this.visible) return
+        if(typeof document === 'undefined') return
+
+        if(document.activeElement !== this.__impl){
+            this.__impl.focus()
+        }
+
+        if(this.selectionStart !== this.selectionEnd){
+            try {
+                this.select(this.selectionStart, this.selectionEnd)
+            } catch (e) {}
+        }
+    }
+
+    SLOT_activeFocusChanged(oldValue, newValue){
+        if(newValue){
+            this.__ensureDomFocus()
+            return
+        }
+
+        if(this.__impl && typeof document !== 'undefined' && document.activeElement === this.__impl){
+            this.__impl.blur()
+        }
+
+        if(this.validator){
+            if(this.validator.validate(this.text)) this.editingFinished()
+        } else {
+            this.editingFinished()
         }
     }
 

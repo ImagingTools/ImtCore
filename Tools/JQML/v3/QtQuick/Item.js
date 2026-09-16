@@ -318,8 +318,12 @@ class Item extends QtObject {
     }
 
     forceActiveFocus(){
-        if(this.parent instanceof JQModules.QtQuick.FocusScope){
-            this.parent.focus = true
+        let parent = this.parent
+        while(parent){
+            if(parent instanceof JQModules.QtQuick.FocusScope){
+                parent.focus = true
+            }
+            parent = parent.parent
         }
 
         if(!this.focus){
