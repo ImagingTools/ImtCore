@@ -443,11 +443,11 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 void CUserGroupCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const
 {
-	BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
-
 	// Remove the deleted groups from the membership lists of their member users,
 	// so that users no longer reference groups that do not exist anymore.
 	if (!m_userCollectionCompPtr.IsValid()){
+		BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
+
 		return;
 	}
 
@@ -459,6 +459,8 @@ void CUserGroupCollectionControllerComp::OnAfterRemoveElements(const QByteArrayL
 	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> userIteratorPtr =
 				m_userCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &filterParams);
 	if (!userIteratorPtr.IsValid()){
+		BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
+
 		return;
 	}
 
@@ -484,6 +486,8 @@ void CUserGroupCollectionControllerComp::OnAfterRemoveElements(const QByteArrayL
 			m_userCollectionCompPtr->SetObjectData(userIteratorPtr->GetObjectId(), *userInfoPtr);
 		}
 	}
+
+	BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
 }
 
 
