@@ -459,9 +459,8 @@ DocumentViewBase {
 		// Stop updating GUI if user was removed from assignees (readOnly, no new data)
 		if (ticketEditor._removedFromAssignees) return
 		
-		// Not while the title is being edited: updateGui runs on every model change, including ones
-		// pushed by OTHER users' activity, and assigning here mid-edit throws away what is being typed.
-		// A new ticket starts in edit mode with nothing to load, so this skips nothing it needed.
+		// Not while the title is being edited: updateGui runs on every model change, and
+		// assigning here mid-edit throws away what is being typed.
 		if (!ticketEditor._titleEditing){
 			editTitleInput.text = ticketData.m_title || ""
 		}
@@ -1391,8 +1390,7 @@ DocumentViewBase {
 									id: assigneesFlow
 
 									// Rows counted out rather than read from implicitHeight, which a Repeater-filled
-									// positioner reports as zero in the web build - the chips were in the model with
-									// nothing on screen.
+									// positioner reports as zero in the web build.
 									readonly property int chipHeight: 28
 									readonly property int chipMaxWidth: 200
 									readonly property int perRow: Math.max(1, Math.floor((width + spacing) / (chipMaxWidth + spacing)))
@@ -2330,8 +2328,6 @@ DocumentViewBase {
 														Row {
 															spacing: Style.spacingXS
 															Text {
-																// Test instrumentation: a comment's time differs on every run, so a screenshot of the
-																// thread has to mask it - which needs a name per row. Inert.
 																objectName: "CommentTimestamp_" + index
 																text: ticketEditor.formatTimestamp(model.item.m_timestamp)
 																font.pixelSize: Style.fontSizeM - 1
@@ -2805,9 +2801,7 @@ DocumentViewBase {
 						Flow {
 							id: pendingAttachmentsFlow
 
-							// Rows counted out rather than read from implicitHeight - see assigneesFlow above. Without it
-							// the uploaded file's own chip was in the DOM but its container had no height, so nothing about
-							// the attachment was ever actually on screen.
+							// Rows counted out rather than read from implicitHeight - see assigneesFlow above.
 							readonly property int rowHeight: Style.controlHeightM
 							readonly property int rows: Math.max(1, ticketEditor.pendingAttachments.length)
 

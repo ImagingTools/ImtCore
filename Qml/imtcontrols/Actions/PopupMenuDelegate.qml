@@ -5,8 +5,6 @@ import imtcontrols 1.0
 
 ItemDelegate {
 	id: popupMenuDelegate;
-	// Test instrumentation: named for the item it stands for, so a menu row can be addressed by
-	// what it does instead of by position. Separators keep the generic name. Inert.
 	objectName: popupMenuDelegate.itemId === "" ? "PopupMenuDelegate" : "PopupItem_" + popupMenuDelegate.itemId
 	readonly property string itemId: String(model.item ? model.item.m_id : model.Id ? model.Id : model.id ? model.id : "")
 	

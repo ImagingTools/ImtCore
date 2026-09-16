@@ -181,8 +181,6 @@ Item {
 	
 	ToolButton {
 		id: button;
-		// Test instrumentation: commands with priority -1 (and any that no longer fit) are only
-		// reachable through this overflow menu, and it had no name to click. Inert.
 		objectName: "MoreCommandsButton"
 		anchors.verticalCenter: parent.verticalCenter;
 		anchors.right: parent.right;

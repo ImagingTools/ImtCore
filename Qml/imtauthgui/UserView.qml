@@ -93,9 +93,6 @@ DocumentViewBase {
 
 	MultiPageView {
 		id: multiPageView
-		// Test instrumentation: MultiPageView names its nav items "Page_<id>" and this editor opens
-		// inside AdministrationView, whose own nav uses the same ids (Roles, Groups) - so an unscoped
-		// "Page_Groups" resolves to the collection behind the editor. A name here scopes it. Inert.
 		objectName: "UserEditorPages"
 		anchors.fill: parent
 		panelWidth: Style.sizeHintXXS
