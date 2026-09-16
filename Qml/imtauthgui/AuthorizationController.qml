@@ -28,9 +28,9 @@ QtObject {
 	signal tenantSelected(string tenantId);
 	signal tenantSelectionFailed(string error);
 	signal changePasswordSuccessfully();
-	signal changePasswordFailed();
+	signal changePasswordFailed(string message, var violatedRules);
 	signal registerSuccessfully();
-	signal registerFailed();
+	signal registerFailed(string message, var violatedRules);
 
 	// --- Tenant membership lifecycle events ---
 	// Emitted by membership-aware views (e.g. TenantCollectionView) so other
@@ -718,11 +718,16 @@ QtObject {
 						root.registerSuccessfully();
 					}
 					else{
-						root.registerFailed();
+						root.registerFailed(m_message, m_violatedRules);
 					}
 
 				}
 			}
+		}
+
+		function onError(message, type) {
+			console.warn("Auth: registerUser request error:", message, type);
+			root.registerFailed(message, []);
 		}
 	}
 	
@@ -740,13 +745,18 @@ QtObject {
 						root.changePasswordSuccessfully();
 					}
 					else{
-						root.changePasswordFailed();
+						root.changePasswordFailed(m_message, m_violatedRules);
 					}
 				}
 			}
 		}
+
+		function onError(message, type) {
+			console.warn("Auth: changePassword request error:", message, type);
+			root.changePasswordFailed(message, []);
+		}
 	}
-	
+
 	property GqlSdlRequestSender logoutGqlSender: GqlSdlRequestSender {
 		context: root.context
 		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_logout;
