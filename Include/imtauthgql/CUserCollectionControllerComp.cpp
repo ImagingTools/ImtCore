@@ -33,6 +33,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 			const sdl::V1_0::imtauth::CUserData& representation,
 			istd::IChangeable& object,
 			QByteArray& newObjectId,
+			bool isAccountStateChangeAllowed,
 			QString& errorMessage) const
 {
 	auto userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&object);
@@ -150,6 +151,17 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	userInfoPtr->SetMail(mail);
+
+	if (representation.enabled && (*representation.enabled != userInfoPtr->IsEnabled())){
+		if (!isAccountStateChangeAllowed){
+			errorMessage = QStringLiteral("Unable to change the account state of user '%1'. Error: Only the superuser can enable or disable an account").arg(QString::fromUtf8(userInfoPtr->GetId()));
+			SendWarningMessage(0, errorMessage, "CUserCollectionControllerComp");
+
+			return false;
+		}
+
+		userInfoPtr->SetEnabled(*representation.enabled);
+	}
 
 	imtauth::IUserInfo::FeatureIds permissions;
 	if (representation.permissions){
@@ -383,6 +395,10 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.mail = QString(userInfoPtr->GetMail());
 	}
 
+	if (requestInfo.items.isEnabledRequested){
+		representationObject.enabled = bool(userInfoPtr->IsEnabled());
+	}
+
 	if (requestInfo.items.isSystemIdRequested){
 		QByteArrayList systemIdList;
 		imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
@@ -516,7 +532,8 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRepres
 	}
 	userInfoPtr->SetObjectUuid(newObjectId);
 
-	if (!FillObjectFromRepresentation(userDataRepresentation, *userInfoPtr, newObjectId, errorMessage)){
+	// The account state of the new object is validated against the caller in CreateObjectFromRequest.
+	if (!FillObjectFromRepresentation(userDataRepresentation, *userInfoPtr, newObjectId, true, errorMessage)){
 		return nullptr;
 	}
 
@@ -581,6 +598,8 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	QString mail = userInfoPtr->GetMail();
 	representationPayload.email = QString(mail);
 
+	representationPayload.enabled = bool(userInfoPtr->IsEnabled());
+
 	QByteArrayList groupList = userInfoPtr->GetGroups();
 	std::sort(groupList.begin(), groupList.end());
 	representationPayload.groups.Emplace().FromList(groupList);
@@ -618,7 +637,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 
 
 bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
-			const imtgql::CGqlRequest& /*rawGqlRequest*/,
+			const imtgql::CGqlRequest& rawGqlRequest,
 			const sdl::V1_0::imtauth::CUserUpdateGqlRequest& userUpdateRequest,
 			istd::IChangeable& object,
 			QString& errorMessage) const
@@ -653,7 +672,26 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		userInfoPtr->RemoveFromSystem(systemInfo.systemId);
 	}
 
-	return FillObjectFromRepresentation(userData, object, objectId, errorMessage);
+	return FillObjectFromRepresentation(userData, object, objectId, IsSuperuserRequest(rawGqlRequest), errorMessage);
+}
+
+
+istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRequest(
+			const imtgql::CGqlRequest& gqlRequest,
+			QByteArray& newObjectId,
+			QString& errorMessage) const
+{
+	istd::IChangeableUniquePtr objectPtr = BaseClass::CreateObjectFromRequest(gqlRequest, newObjectId, errorMessage);
+
+	auto userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(objectPtr.GetPtr());
+	if ((userInfoPtr != nullptr) && !userInfoPtr->IsEnabled() && !IsSuperuserRequest(gqlRequest)){
+		errorMessage = QStringLiteral("Unable to create user '%1'. Error: Only the superuser can enable or disable an account").arg(QString::fromUtf8(userInfoPtr->GetId()));
+		SendWarningMessage(0, errorMessage, "CUserCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	return objectPtr;
 }
 
 

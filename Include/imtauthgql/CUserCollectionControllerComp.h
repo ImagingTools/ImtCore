@@ -42,10 +42,17 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	/**
+		Fill \a object from \a representation.
+		\param isAccountStateChangeAllowed
+			If false, a representation that flips the 'enabled' flag of \a object is rejected.
+			Only the superuser may enable or disable an account.
+	*/
 	virtual bool FillObjectFromRepresentation(
 				const sdl::V1_0::imtauth::CUserData& representation,
 				istd::IChangeable& object,
 				QByteArray& newObjectId,
+				bool isAccountStateChangeAllowed,
 				QString& errorMessage) const;
 
 	// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
@@ -77,6 +84,12 @@ protected:
 				const ::imtgql::CGqlRequest& rawGqlRequest,
 				const sdl::V1_0::imtauth::CUserUpdateGqlRequest& userUpdateRequest,
 				istd::IChangeable& object,
+				QString& errorMessage) const override;
+
+	// reimplemented (sdl::V1_0::imtauth::CUserCollectionControllerCompBase)
+	virtual istd::IChangeableUniquePtr CreateObjectFromRequest(
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QByteArray& newObjectId,
 				QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
