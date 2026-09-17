@@ -453,6 +453,7 @@ module.exports = {
     pendingFocusOwner: null,
     pendingFocusLosers: [],
     pendingFocusFlushScheduled: false,
+    focusTreeSuppressed: 0,
     setFocusTree(tree, options = {}){
         if(!tree || !tree.length) return false
 
