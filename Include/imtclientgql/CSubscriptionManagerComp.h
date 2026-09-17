@@ -158,7 +158,7 @@ private:
 	public:
 		imtgql::CGqlRequest m_request;
 		QByteArray m_clientId;
-		IGqlSubscriptionClient::SubscriptionStatus m_status;
+		IGqlSubscriptionClient::SubscriptionStatus m_status = IGqlSubscriptionClient::SS_UNKNOWN;
 		QList<IGqlSubscriptionClient*> m_clients;
 	};
 
