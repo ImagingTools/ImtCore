@@ -118,13 +118,16 @@
         <Element Id="ParamSetRepresentation" PackageId="ImtCoreVoce" ComponentId="StandardParamSetRepresentation">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CustomParamRepresentationControllers" Type="Reference[]" ExportId="CustomParamRepresentationControllers">
+                    <AttributeInfo Id="CustomParamRepresentationController" Type="Reference" ExportId="CustomParamRepresentationController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
