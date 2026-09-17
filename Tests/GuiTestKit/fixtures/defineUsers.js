@@ -86,13 +86,18 @@ function defineUsers({ users, defaultUserKeys, allUsersEnv, guest, authFile, suK
   };
 
   /**
-   * The users that get a Playwright project / storageState this run. `isolatedSpec` users are always
-   * active (their dedicated spec runs under them and no other, so leaving one out runs it under nobody).
+   * The users that get a Playwright project / storageState this run. `isolatedSpec` users are added on
+   * top of the default subset (their dedicated spec runs under them and no other, so leaving one out
+   * runs it under nobody) - UNLESS defaultUserKeys names an isolated user itself, which means the app
+   * is choosing the isolated set by hand and the list is then taken verbatim.
    */
+  const defaultsPickIsolated = (defaultUserKeys || []).some((key) => users.find((u) => u.key === key)?.isolatedSpec);
+
   const activeUsers = () => {
-    const matrix = useAllUsers() || !defaultUserKeys ? users : users.filter((u) => defaultUserKeys.includes(u.key));
-    const isolated = users.filter((u) => u.isolatedSpec && !matrix.includes(u));
-    return [...matrix, ...isolated];
+    if (useAllUsers() || !defaultUserKeys) return users;
+    const matrix = users.filter((u) => defaultUserKeys.includes(u.key));
+    if (defaultsPickIsolated) return matrix;
+    return [...matrix, ...users.filter((u) => u.isolatedSpec && !matrix.includes(u))];
   };
 
   return {

@@ -111,6 +111,7 @@ function createGuiConfig({
     },
     projects: buildProjects({
       users: users.activeUsers(),
+      allUsers: users.USERS,
       guest: users.GUEST,
       authFile: users.authFile,
       testDir,

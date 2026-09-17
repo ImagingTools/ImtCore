@@ -15,6 +15,8 @@ function specToRegExp(spec) {
 /**
  * @param {object} opts
  * @param {object[]} opts.users               activeUsers() - fixture users to build a project for
+ * @param {object[]} [opts.allUsers]          the full user list, so isolated specs stay excluded from
+ *   the matrix projects even when their dedicated user is not active this run (defaults to `users`)
  * @param {{key: string}} opts.guest          the guest pseudo-user (no storageState)
  * @param {(key: string) => string} opts.authFile
  * @param {string} [opts.testDir]             default './tests'
@@ -26,14 +28,17 @@ function specToRegExp(spec) {
  */
 function buildProjects({
   users,
+  allUsers,
   guest,
   authFile,
   testDir = './tests',
   guestTestMatch = /.*\.guest\.test\.js/,
   mutatingUserKeys,
 }) {
-  // Every isolated spec across the active users - regular projects must exclude ALL of them.
-  const isolatedMatchers = users.filter((u) => u.isolatedSpec).map((u) => specToRegExp(u.isolatedSpec));
+  // Every isolated spec in the WHOLE user list, not just this run's active subset: a spec pinned to a
+  // dedicated user must not fall back onto a matrix project when that user is inactive - it was pinned
+  // precisely because it cannot share per-user server state. It simply doesn't run until its user does.
+  const isolatedMatchers = (allUsers || users).filter((u) => u.isolatedSpec).map((u) => specToRegExp(u.isolatedSpec));
 
   // An isolated user keeps its mutating tests: its spec runs under that user and no other.
   function runsMutating(user) {

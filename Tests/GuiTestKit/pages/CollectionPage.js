@@ -87,6 +87,40 @@ class CollectionPage extends BasePage {
   }
 
   /**
+   * Open this collection with no view state left over from an earlier test.
+   *
+   * Filters, search and sorting are persisted per user session on the SERVER, not in the page, so they
+   * outlive a reload, leak into the next spec, and survive into the second CI phase - which is how a
+   * spec that never touched a filter ends up looking at a filtered (or differently ordered) collection.
+   */
+  async openClean() {
+    await this.open();
+    await this.clearAllFilters();
+    return this;
+  }
+
+  /**
+   * Select the one row matching `text`, and fail if it is not exactly one.
+   *
+   * Prefer this over selectRow(index) whenever a specific RECORD is meant. Row order is the server's,
+   * and a header click TOGGLES the sort it then persists for the session
+   * (imtcontrols/Views/TableHeaderDelegate.qml), so the same index addresses a different record
+   * depending on what ran before it.
+   */
+  async selectRecord(text) {
+    await this.clearAllFilters();
+    await this.search(text);
+    const matches = await this.table.visibleRowCount();
+    if (matches !== 1) {
+      throw new Error(
+        `${this.pageId}: "${text}" must match exactly one row to address a record, but matched ${matches}`
+      );
+    }
+    await this.selectRow(0);
+    return this;
+  }
+
+  /**
    * Screenshot masks ({x,y,width,height}[]) for one or more columns, addressed by header id (the
    * HeaderIds entry from the collection's *Page.acc, NOT the visible caption). Use for any column whose
    * value isn't deterministic across runs. Thin forwarder to `this.table.columnMasks`.

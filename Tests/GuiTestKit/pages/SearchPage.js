@@ -5,7 +5,10 @@
 
 const { BasePage } = require('./BasePage');
 const gui = require('../lib/gui');
-const { waitForBusyIndicatorGone } = require('../lib/stability');
+const { waitForBusyIndicatorGone, waitForNetworkIdle } = require('../lib/stability');
+
+// SearchTextInput's debounce, before which no query has been sent yet.
+const SEARCH_DEBOUNCE_MS = 500;
 
 class SearchPage extends BasePage {
   constructor(page) {
@@ -29,17 +32,22 @@ class SearchPage extends BasePage {
   }
 
   /**
-   * Wait for the debounced auto-navigation to land with results (a first result tab rendered). Polls
-   * rather than sleeping, and swallows its own timeout - a search returning zero results is a valid
-   * outcome the caller detects via tabCount() === 0, not a hang.
+   * Wait for the debounced auto-navigation to land, whether or not it matched anything.
+   *
+   * Zero results is a valid outcome the caller reads via tabCount(), so this must not be expressed as
+   * "wait for a result tab": that spent the full assertion timeout on a tab that was never going to
+   * appear and then swallowed it, which is why a nonsense search cost ten seconds. Each wait below
+   * finishes as soon as it is genuinely done instead.
    */
   async waitForResults() {
-    try {
-      await gui.expectVisible(this.page, ['Tab0'], 'search results tab should appear');
-      await waitForBusyIndicatorGone(this.page, { timeout: 15_000 });
-    } catch (_) {
-      // no results for this query - tabCount() will correctly report 0
-    }
+    // Nothing has been sent yet while the debounce is running, so neither the network nor the DOM
+    // means anything until it has elapsed.
+    await this.page.waitForTimeout(SEARCH_DEBOUNCE_MS);
+    await waitForNetworkIdle(this.page, { timeout: 15_000 });
+    await waitForBusyIndicatorGone(this.page, { timeout: 15_000 });
+    // The response has landed; a result tab may still be painting. Its absence is an answer here, not
+    // a failure, so this is a short look rather than an assertion.
+    await gui.dom.isVisible(this.page, ['Tab0'], 1000);
     return this;
   }
 

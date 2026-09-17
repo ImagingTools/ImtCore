@@ -470,7 +470,10 @@ DocumentViewBase {
 		editStatusCB.currentIndex = findComboIndex(editStatusCB, ticketData.m_status, 0)
 		editStateReasonCB.currentIndex = findComboIndex(editStateReasonCB, ticketData.m_stateReason, 0)
 		editLockReasonInput.text = ticketData.m_lockReason || ""
+		// Model-driven flip: must not raise the lock confirmation dialog.
+		ticketEditor.__lockCheckboxSuppressHandler = true
 		editLockedCB.checkState = ticketData.m_locked ? Qt.Checked : Qt.Unchecked
+		ticketEditor.__lockCheckboxSuppressHandler = false
 		
 		// Populate entity type model from server-provided data
 		entityTypeModel.clear()

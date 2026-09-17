@@ -94,6 +94,11 @@ function defineCollectionSpec(fixtures, declaration) {
         // doesn't render for a user who holds the permission.
         await collection.open();
         await collection.expectOpen();
+        // Filters and sorting live in the user's SESSION on the server, not in the page, so this
+        // collection comes up however the previous spec left it - and the landing shot would be of that
+        // residue rather than of the collection. Cleared (and re-sorted) so the shot means one thing.
+        await collection.clearAllFilters();
+        if (stableSort) await collection.table.sortBy(stableSort);
         await gui.checkScreenshot(page, `${prefix}-landing`, await collection.masks());
       });
     });
@@ -268,6 +273,10 @@ async function runScenario({ test, gui, page, user, collection, prefix, scenario
   }
 
   if (scenario.sort) {
+    // Cleared first so the first click always lands on ASC: a header click TOGGLES the direction when
+    // its column is already the sorted one (imtcontrols/Views/TableHeaderDelegate.qml), and stableSort
+    // may have just made it exactly that - which flips both shots, sort arrow included.
+    await collection.clearAllFilters();
     await collection.table.sortBy(scenario.sort);
     await gui.checkScreenshot(page, firstName, await masks());
     await collection.table.sortBy(scenario.sort);

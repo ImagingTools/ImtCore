@@ -7,6 +7,13 @@ const { expect } = require('@playwright/test');
 const dom = require('./dom');
 const { waitForStable } = require('./stability');
 
+// A screenshot is the only assertion that compares EVERY pixel, so it settles harder than an action
+// does. A cold view arrives in chunks (shell, icons, command bar, first page of rows) and is DOM-quiet
+// BETWEEN them - with nothing in flight yet, because the next request has not been sent - so the short
+// quiet window an action is happy with can land inside such a gap and capture a half-drawn view. As a
+// baseline that is permanent: every later run then compares against a page that never finished loading.
+const SCREENSHOT_SETTLE = { quietMs: 600, timeout: 20000 };
+
 /**
  * Compare the current page against a stored baseline. `name` is the logical snapshot name; the
  * per-user directory and platform suffix are applied by snapshotPathTemplate in playwright.config.js.
@@ -21,7 +28,7 @@ async function checkScreenshot(page, name, mask) {
   try {
     for (const m of masks) handles.push(await addMask(page, m));
 
-    await waitForStable(page);
+    await waitForStable(page, SCREENSHOT_SETTLE);
     // maxDiffPixels: 0 - every pixel matches or the shot fails; non-deterministic content gets a mask
     // instead. threshold still absorbs sub-pixel colour variation.
     await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true, threshold: 0.05, maxDiffPixels: 0 });
@@ -53,9 +60,17 @@ async function expectVisible(page, path, message) {
  */
 async function expectHidden(page, path, message, settleMs = 800) {
   await waitForStable(page);
-  await page.waitForTimeout(settleMs);
-  const count = await dom.countVisible(page, path);
-  expect(count, message || `expected [${path.join(' > ')}] to be hidden/absent`).toBe(0);
+  // Sampled ACROSS the settle window rather than once at the end of it. A single late sample turns a
+  // slow arrival into a PASS, which is the one failure mode a negative assertion must not have: under
+  // load the element this is meant to catch is exactly the one that arrives late.
+  const deadline = Date.now() + settleMs;
+  const fail = message || `expected [${path.join(' > ')}] to be hidden/absent`;
+  for (;;) {
+    const count = await dom.countVisible(page, path);
+    if (count > 0) expect(count, fail).toBe(0);
+    if (Date.now() >= deadline) return;
+    await page.waitForTimeout(100);
+  }
 }
 
 /** Assert the number of visible matches for a path (polls until it reaches `expected` or times out). */
@@ -82,7 +97,7 @@ async function checkElementScreenshot(page, path, name, mask) {
   try {
     for (const m of masks) handles.push(await addMask(page, m));
 
-    await waitForStable(page);
+    await waitForStable(page, SCREENSHOT_SETTLE);
     const locator = dom.byPath(page, path);
     await locator.waitFor({ state: 'visible' });
     await expect(locator).toHaveScreenshot(`${name}.png`, { threshold: 0.05, maxDiffPixels: 0 });
