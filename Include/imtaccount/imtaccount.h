@@ -10,8 +10,9 @@
 	Entity model:
 	- IContactInfo holds communication channels and is owned by every contactable entity.
 	- IContactInfoProvider is implemented by everything owning a contact info.
-	- IParty describes a subject and is implemented by IPersonInfo and ICompanyInfo.
-	- ICustomerInfo is a role played by a party, extended by each product.
+	- IPersonInfo and ICompanyInfo describe a subject; only ICompanyInfo owns a contact info directly.
+	- IAccountInfo already distinguishes person/company/representative accounts via AccountType.
+	- ICustomerInfo is a role played by an account, extended by each product.
 */
 namespace imtaccount
 {

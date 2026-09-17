@@ -6,9 +6,9 @@
 #include <iser/IObject.h>
 
 // ImtCore includes
+#include <imtaccount/IAccountInfo.h>
 #include <imtaccount/IContactInfoProvider.h>
-#include <imtaccount/IParty.h>
-#include <imtbase/IGroupScopedObject.h>
+#include <imtbase/IUserGroupScope.h>
 
 
 namespace imtaccount
@@ -16,26 +16,27 @@ namespace imtaccount
 
 
 /**
-	Role of a party acting as a customer.
+	Role of an account acting as a customer.
 	Product independent part only: concrete products derive from this interface and add their own data.
 	\ingroup Account
 */
 class ICustomerInfo:
 	virtual public IContactInfoProvider,
-	virtual public imtbase::IGroupScopedObject,
+	virtual public imtbase::IUserGroupScope,
 	virtual public iser::IObject
 {
 public:
 	/**
-		Get the party acting as this customer.
+		Get the account acting as this customer.
+		IAccountInfo::GetAccountType() tells whether it is a person or a company.
 	*/
-	virtual IParty* GetParty() const = 0;
+	virtual IAccountInfo* GetAccount() const = 0;
 
 	/**
-		Get parties acting on behalf of this customer, for example employees or branch offices.
+		Get accounts representing this customer, for example employees.
 		Unrelated to GetContactInfo(), which describes how to reach the customer itself.
 	*/
-	virtual const PartyList& GetRepresentatives() const = 0;
+	virtual const AccountInfoList& GetRepresentatives() const = 0;
 };
 
 

@@ -25,7 +25,7 @@ public:
 		Get communication channels of this entity itself.
 		Never returns null: an entity without contact data owns an empty contact info.
 	*/
-	virtual IContactInfo* GetContactInfo() const = 0;
+	virtual const IContactInfo* GetContactInfo() const = 0;
 };
 
 

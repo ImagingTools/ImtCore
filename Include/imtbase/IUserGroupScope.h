@@ -19,7 +19,7 @@ namespace imtbase
 	An user may access the object if at least one of his groups is listed here.
 	\ingroup Collection
 */
-class IGroupScopedObject: virtual public istd::IChangeable
+class IUserGroupScope: virtual public istd::IChangeable
 {
 public:
 	typedef QByteArrayList GroupIds;

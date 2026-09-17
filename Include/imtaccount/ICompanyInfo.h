@@ -3,10 +3,12 @@
 
 
 // ACF includes
+#include <idoc/IDocumentMetaInfo.h>
+#include <iser/IObject.h>
 #include <istd/TPointerVector.h>
 
 // ImtCore includes
-#include <imtaccount/IParty.h>
+#include <imtaccount/IContactInfoProvider.h>
 
 
 namespace imtaccount
@@ -17,7 +19,9 @@ namespace imtaccount
 	A legal entity.
 	\ingroup Account
 */
-class ICompanyInfo: virtual public IParty
+class ICompanyInfo:
+	virtual public iser::IObject,
+	virtual public IContactInfoProvider
 {
 public:
 	enum MetaInfoTypes
@@ -25,7 +29,7 @@ public:
 		/**
 			Registered name of the company given as QString.
 		*/
-		MIT_LEGAL_NAME = IParty::MIT_DESCRIPTION + 1
+		MIT_LEGAL_NAME = idoc::IDocumentMetaInfo::MIT_USER + 1
 	};
 
 	virtual QString GetLegalName() const = 0;

@@ -6,10 +6,8 @@
 #include <QtCore/QDate>
 
 // ACF includes
-#include <istd/TPointerVector.h>
-
-// ImtCore includes
-#include <imtaccount/IParty.h>
+#include <idoc/IDocumentMetaInfo.h>
+#include <iser/IObject.h>
 
 
 namespace imtaccount
@@ -20,7 +18,7 @@ namespace imtaccount
 	A natural person.
 	\ingroup Account
 */
-class IPersonInfo: virtual public IParty
+class IPersonInfo: virtual public iser::IObject
 {
 public:
 	enum GenderType
@@ -48,7 +46,7 @@ public:
 		/**
 			Gender type given as GenderType.
 		*/
-		MIT_GENDER_TYPE = IParty::MIT_DESCRIPTION + 1,
+		MIT_GENDER_TYPE = idoc::IDocumentMetaInfo::MIT_USER + 1,
 
 		/**
 			Birthday given as QDate.
