@@ -184,9 +184,16 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		switch (webSocketRequest->GetMethodType())
 		{
 		case imtrest::CWebSocketRequest::MT_CONNECTION_ACK:
+			// keys() is a copy, so it stays valid while the lock is released below;
+			// the map itself must be re-checked on every iteration for the same reason.
 			for (const QByteArray& subscriptionId : m_registeredClients.keys()){
-				if (m_registeredClients[subscriptionId].m_status == IGqlSubscriptionClient::SS_IN_REGISTRATION){
-					istd::IChangeableUniquePtr objectPtr(m_registeredClients[subscriptionId].m_request.CloneMe());
+				const auto foundIt = m_registeredClients.constFind(subscriptionId);
+				if (foundIt == m_registeredClients.constEnd()){
+					continue;
+				}
+
+				if (foundIt->m_status == IGqlSubscriptionClient::SS_IN_REGISTRATION){
+					istd::IChangeableUniquePtr objectPtr(foundIt->m_request.CloneMe());
 					locker.unlock();
 					auto requestPtr = dynamic_cast<imtgql::CGqlRequest*>(objectPtr.GetPtr());
 					if (requestPtr != nullptr){
@@ -199,35 +206,46 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 
 		case imtrest::CWebSocketRequest::MT_START_ACK:{
 			QByteArray subscriptionId = rootObject.value("id").toString().toLocal8Bit();
-			if (m_registeredClients.contains(subscriptionId)){
-				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_REGISTERED;
+			const auto foundIt = m_registeredClients.find(subscriptionId);
+			if (foundIt != m_registeredClients.end()){
+				foundIt->m_status = IGqlSubscriptionClient::SS_REGISTERED;
 
+				// Dispatched outside the lock, like MT_DATA below: the client callback
+				// may re-enter this component and m_registeredClientsMutex is not recursive.
+				locker.unlock();
 				UpdateCustomerSubscriptionStatuses(subscriptionId, message);
+				locker.relock();
 			}
 		}
 		break;
 
 		case imtrest::CWebSocketRequest::MT_DATA:{
 			QByteArray subscriptionId = rootObject.value("id").toString().toLocal8Bit();
-			if (m_registeredClients.contains(subscriptionId)){
-				for (IGqlSubscriptionClient* subscriptionClientPtr : m_registeredClients[subscriptionId].m_clients){
+			if (!rootObject.contains("payload")){
+				break;
+			}
+
+			const auto foundIt = m_registeredClients.constFind(subscriptionId);
+			if (foundIt != m_registeredClients.constEnd()){
+				// Copied before dispatching: the client list must not be iterated while
+				// the lock is released, because a callback may re-enter this component
+				// (UnregisterSubscription()) and mutate it.
+				const QList<IGqlSubscriptionClient*> clients = foundIt->m_clients;
+
+				QJsonObject payloadObject = rootObject.value("payload").toObject().value("data").toObject();
+
+				QJsonDocument document;
+				document.setObject(payloadObject);
+
+				QByteArray payload = document.toJson(QJsonDocument::Compact);
+
+				locker.unlock();
+				for (IGqlSubscriptionClient* subscriptionClientPtr : clients){
 					if (subscriptionClientPtr != nullptr){
-						if (!rootObject.contains("payload")){
-							break;
-						}
-
-						QJsonObject payloadObject = rootObject.value("payload").toObject().value("data").toObject();
-
-						QJsonDocument document;
-						document.setObject(payloadObject);
-
-						QByteArray payload = document.toJson(QJsonDocument::Compact);
-
-						locker.unlock();
 						subscriptionClientPtr->OnResponseReceived(subscriptionId, payload);
-						locker.relock();
 					}
 				}
+				locker.relock();
 			}
 		}
 		break;
@@ -634,17 +652,25 @@ void CSubscriptionManagerComp::AccessTokenObserver::OnUpdate(const istd::IChange
 void CSubscriptionManagerComp::UpdateCustomerSubscriptionStatuses(const QByteArray& subscriptionId, const QString& message) const
 {
 	QList<IGqlSubscriptionClient*> clients;
+	IGqlSubscriptionClient::SubscriptionStatus status = IGqlSubscriptionClient::SS_UNKNOWN;
 
 	{
-		QMutexLocker lock(&m_pendingAsyncMutex);
-		if (m_registeredClients.contains(subscriptionId)){
-			clients = m_registeredClients[subscriptionId].m_clients;
+		QMutexLocker lock(&m_registeredClientsMutex);
+		const auto foundIt = m_registeredClients.constFind(subscriptionId);
+		if (foundIt == m_registeredClients.constEnd()){
+			return;
 		}
+
+		clients = foundIt->m_clients;
+		status = foundIt->m_status;
 	}
 
+	// Dispatched outside the lock: a client callback may re-enter this component
+	// (typically through UnregisterSubscription()) and m_registeredClientsMutex is
+	// not recursive. Callers must therefore not hold it across this call.
 	for (IGqlSubscriptionClient* subscriptionClientPtr : clients){
 		if (subscriptionClientPtr != nullptr){
-			subscriptionClientPtr->OnSubscriptionStatusChanged(subscriptionId, m_registeredClients[subscriptionId].m_status, message);
+			subscriptionClientPtr->OnSubscriptionStatusChanged(subscriptionId, status, message);
 		}
 	}
 }
