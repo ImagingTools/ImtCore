@@ -14000,22 +14000,22 @@ bool CExtendedMetaDataObject::hasKey()
 QVariant CExtendedMetaDataObject::GetValue()
 {
 	if (m_valueQObjectPtr.isValid()){
-		if (const CCoordinates* val = std::get_if<CCoordinates>((CExtendedMetaData::value).GetPtr())){
+		if (const CCoordinates* coordinatesVal = std::get_if<CCoordinates>((CExtendedMetaData::value).GetPtr())){
 			CCoordinatesObject *newObjectPtr = new CCoordinatesObject(this);
-						newObjectPtr->CCoordinates::x = val->CCoordinates::x;
-			newObjectPtr->CCoordinates::y = val->CCoordinates::y;
-			newObjectPtr->CCoordinates::z = val->CCoordinates::z;
+						newObjectPtr->CCoordinates::x = coordinatesVal->CCoordinates::x;
+			newObjectPtr->CCoordinates::y = coordinatesVal->CCoordinates::y;
+			newObjectPtr->CCoordinates::z = coordinatesVal->CCoordinates::z;
 
 			m_valueQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
-		if (const double* val = std::get_if<double>((CExtendedMetaData::value).GetPtr())){
-			m_valueQObjectPtr = QVariant::fromValue(val);
+		if (const double* floatVal = std::get_if<double>((CExtendedMetaData::value).GetPtr())){
+			m_valueQObjectPtr = QVariant::fromValue(floatVal);
 		}
-		if (const bool* val = std::get_if<bool>((CExtendedMetaData::value).GetPtr())){
-			m_valueQObjectPtr = QVariant::fromValue(val);
+		if (const bool* booleanVal = std::get_if<bool>((CExtendedMetaData::value).GetPtr())){
+			m_valueQObjectPtr = QVariant::fromValue(booleanVal);
 		}
-		if (const QString* val = std::get_if<QString>((CExtendedMetaData::value).GetPtr())){
-			m_valueQObjectPtr = QVariant::fromValue(val);
+		if (const QString* stringVal = std::get_if<QString>((CExtendedMetaData::value).GetPtr())){
+			m_valueQObjectPtr = QVariant::fromValue(stringVal);
 		}
 	}
 	return m_valueQObjectPtr;
@@ -14025,17 +14025,17 @@ QVariant CExtendedMetaDataObject::GetValue()
 void CExtendedMetaDataObject::SetValue(const QVariant& v)
 {
 	if (v.isValid()){
-		if (const CCoordinatesObject* val = v.value<const CCoordinatesObject*>()){
-			CExtendedMetaData::value = *val;
+		if (const CCoordinatesObject* coordinatesVal = v.value<const CCoordinatesObject*>()){
+			CExtendedMetaData::value = *coordinatesVal;
 		}
-		if (const double* val = v.value<const double*>()){
-			CExtendedMetaData::value = *val;
+		if (const double* floatVal = v.value<const double*>()){
+			CExtendedMetaData::value = *floatVal;
 		}
-		if (const bool* val = v.value<const bool*>()){
-			CExtendedMetaData::value = *val;
+		if (const bool* booleanVal = v.value<const bool*>()){
+			CExtendedMetaData::value = *booleanVal;
 		}
-		if (const QString* val = v.value<const QString*>()){
-			CExtendedMetaData::value = *val;
+		if (const QString* stringVal = v.value<const QString*>()){
+			CExtendedMetaData::value = *stringVal;
 		}
 	}
 	else {
@@ -14981,14 +14981,14 @@ CUnionTestingTypeObject::CUnionTestingTypeObject(QObject* parent): ::imtbase::CI
 QVariant CUnionTestingTypeObject::GetSimpleUnion()
 {
 	if (m_simpleUnionQObjectPtr.isValid()){
-		if (const double* val = std::get_if<double>((CUnionTestingType::simpleUnion).GetPtr())){
-			m_simpleUnionQObjectPtr = QVariant::fromValue(val);
+		if (const double* floatVal = std::get_if<double>((CUnionTestingType::simpleUnion).GetPtr())){
+			m_simpleUnionQObjectPtr = QVariant::fromValue(floatVal);
 		}
-		if (const bool* val = std::get_if<bool>((CUnionTestingType::simpleUnion).GetPtr())){
-			m_simpleUnionQObjectPtr = QVariant::fromValue(val);
+		if (const bool* booleanVal = std::get_if<bool>((CUnionTestingType::simpleUnion).GetPtr())){
+			m_simpleUnionQObjectPtr = QVariant::fromValue(booleanVal);
 		}
-		if (const QString* val = std::get_if<QString>((CUnionTestingType::simpleUnion).GetPtr())){
-			m_simpleUnionQObjectPtr = QVariant::fromValue(val);
+		if (const QString* stringVal = std::get_if<QString>((CUnionTestingType::simpleUnion).GetPtr())){
+			m_simpleUnionQObjectPtr = QVariant::fromValue(stringVal);
 		}
 	}
 	return m_simpleUnionQObjectPtr;
@@ -14998,14 +14998,14 @@ QVariant CUnionTestingTypeObject::GetSimpleUnion()
 void CUnionTestingTypeObject::SetSimpleUnion(const QVariant& v)
 {
 	if (v.isValid()){
-		if (const double* val = v.value<const double*>()){
-			CUnionTestingType::simpleUnion = *val;
+		if (const double* floatVal = v.value<const double*>()){
+			CUnionTestingType::simpleUnion = *floatVal;
 		}
-		if (const bool* val = v.value<const bool*>()){
-			CUnionTestingType::simpleUnion = *val;
+		if (const bool* booleanVal = v.value<const bool*>()){
+			CUnionTestingType::simpleUnion = *booleanVal;
 		}
-		if (const QString* val = v.value<const QString*>()){
-			CUnionTestingType::simpleUnion = *val;
+		if (const QString* stringVal = v.value<const QString*>()){
+			CUnionTestingType::simpleUnion = *stringVal;
 		}
 	}
 	else {
@@ -15043,23 +15043,23 @@ void CUnionTestingTypeObject::ResetSimpleUnion()
 QVariant CUnionTestingTypeObject::GetComplexUnion()
 {
 	if (m_complexUnionQObjectPtr.isValid()){
-		if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((CUnionTestingType::complexUnion).GetPtr())){
+		if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>((CUnionTestingType::complexUnion).GetPtr())){
 			CCDMResultVarStringObject *newObjectPtr = new CCDMResultVarStringObject(this);
-						newObjectPtr->CCDMResultVarString::dataModelTitle = val->CCDMResultVarString::dataModelTitle;
-			newObjectPtr->CCDMResultVarString::dataModelVersion = val->CCDMResultVarString::dataModelVersion;
-			newObjectPtr->CCDMResultVarString::resultMetaData = val->CCDMResultVarString::resultMetaData;
-			newObjectPtr->CCDMResultVarString::resultContent = val->CCDMResultVarString::resultContent;
-			newObjectPtr->CCDMResultVarString::overallResultValues = val->CCDMResultVarString::overallResultValues;
+						newObjectPtr->CCDMResultVarString::dataModelTitle = cDMResultVarStringVal->CCDMResultVarString::dataModelTitle;
+			newObjectPtr->CCDMResultVarString::dataModelVersion = cDMResultVarStringVal->CCDMResultVarString::dataModelVersion;
+			newObjectPtr->CCDMResultVarString::resultMetaData = cDMResultVarStringVal->CCDMResultVarString::resultMetaData;
+			newObjectPtr->CCDMResultVarString::resultContent = cDMResultVarStringVal->CCDMResultVarString::resultContent;
+			newObjectPtr->CCDMResultVarString::overallResultValues = cDMResultVarStringVal->CCDMResultVarString::overallResultValues;
 
 			m_complexUnionQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
-		if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>((CUnionTestingType::complexUnion).GetPtr())){
+		if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>((CUnionTestingType::complexUnion).GetPtr())){
 			CCDMResultVarRecursiveObject *newObjectPtr = new CCDMResultVarRecursiveObject(this);
-						newObjectPtr->CCDMResultVarRecursive::dataModelTitle = val->CCDMResultVarRecursive::dataModelTitle;
-			newObjectPtr->CCDMResultVarRecursive::dataModelVersion = val->CCDMResultVarRecursive::dataModelVersion;
-			newObjectPtr->CCDMResultVarRecursive::resultMetaData = val->CCDMResultVarRecursive::resultMetaData;
-			newObjectPtr->CCDMResultVarRecursive::resultContent = val->CCDMResultVarRecursive::resultContent;
-			newObjectPtr->CCDMResultVarRecursive::overallResultValues = val->CCDMResultVarRecursive::overallResultValues;
+						newObjectPtr->CCDMResultVarRecursive::dataModelTitle = cDMResultVarRecursiveVal->CCDMResultVarRecursive::dataModelTitle;
+			newObjectPtr->CCDMResultVarRecursive::dataModelVersion = cDMResultVarRecursiveVal->CCDMResultVarRecursive::dataModelVersion;
+			newObjectPtr->CCDMResultVarRecursive::resultMetaData = cDMResultVarRecursiveVal->CCDMResultVarRecursive::resultMetaData;
+			newObjectPtr->CCDMResultVarRecursive::resultContent = cDMResultVarRecursiveVal->CCDMResultVarRecursive::resultContent;
+			newObjectPtr->CCDMResultVarRecursive::overallResultValues = cDMResultVarRecursiveVal->CCDMResultVarRecursive::overallResultValues;
 
 			m_complexUnionQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
@@ -15071,11 +15071,11 @@ QVariant CUnionTestingTypeObject::GetComplexUnion()
 void CUnionTestingTypeObject::SetComplexUnion(const QVariant& v)
 {
 	if (v.isValid()){
-		if (const CCDMResultVarStringObject* val = v.value<const CCDMResultVarStringObject*>()){
-			CUnionTestingType::complexUnion = *val;
+		if (const CCDMResultVarStringObject* cDMResultVarStringVal = v.value<const CCDMResultVarStringObject*>()){
+			CUnionTestingType::complexUnion = *cDMResultVarStringVal;
 		}
-		if (const CCDMResultVarRecursiveObject* val = v.value<const CCDMResultVarRecursiveObject*>()){
-			CUnionTestingType::complexUnion = *val;
+		if (const CCDMResultVarRecursiveObject* cDMResultVarRecursiveVal = v.value<const CCDMResultVarRecursiveObject*>()){
+			CUnionTestingType::complexUnion = *cDMResultVarRecursiveVal;
 		}
 	}
 	else {
@@ -15113,22 +15113,22 @@ void CUnionTestingTypeObject::ResetComplexUnion()
 QVariant CUnionTestingTypeObject::GetMixedUnion()
 {
 	if (m_mixedUnionQObjectPtr.isValid()){
-		if (const CCoordinates* val = std::get_if<CCoordinates>((CUnionTestingType::mixedUnion).GetPtr())){
+		if (const CCoordinates* coordinatesVal = std::get_if<CCoordinates>((CUnionTestingType::mixedUnion).GetPtr())){
 			CCoordinatesObject *newObjectPtr = new CCoordinatesObject(this);
-						newObjectPtr->CCoordinates::x = val->CCoordinates::x;
-			newObjectPtr->CCoordinates::y = val->CCoordinates::y;
-			newObjectPtr->CCoordinates::z = val->CCoordinates::z;
+						newObjectPtr->CCoordinates::x = coordinatesVal->CCoordinates::x;
+			newObjectPtr->CCoordinates::y = coordinatesVal->CCoordinates::y;
+			newObjectPtr->CCoordinates::z = coordinatesVal->CCoordinates::z;
 
 			m_mixedUnionQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
-		if (const double* val = std::get_if<double>((CUnionTestingType::mixedUnion).GetPtr())){
-			m_mixedUnionQObjectPtr = QVariant::fromValue(val);
+		if (const double* floatVal = std::get_if<double>((CUnionTestingType::mixedUnion).GetPtr())){
+			m_mixedUnionQObjectPtr = QVariant::fromValue(floatVal);
 		}
-		if (const bool* val = std::get_if<bool>((CUnionTestingType::mixedUnion).GetPtr())){
-			m_mixedUnionQObjectPtr = QVariant::fromValue(val);
+		if (const bool* booleanVal = std::get_if<bool>((CUnionTestingType::mixedUnion).GetPtr())){
+			m_mixedUnionQObjectPtr = QVariant::fromValue(booleanVal);
 		}
-		if (const QString* val = std::get_if<QString>((CUnionTestingType::mixedUnion).GetPtr())){
-			m_mixedUnionQObjectPtr = QVariant::fromValue(val);
+		if (const QString* stringVal = std::get_if<QString>((CUnionTestingType::mixedUnion).GetPtr())){
+			m_mixedUnionQObjectPtr = QVariant::fromValue(stringVal);
 		}
 	}
 	return m_mixedUnionQObjectPtr;
@@ -15138,17 +15138,17 @@ QVariant CUnionTestingTypeObject::GetMixedUnion()
 void CUnionTestingTypeObject::SetMixedUnion(const QVariant& v)
 {
 	if (v.isValid()){
-		if (const CCoordinatesObject* val = v.value<const CCoordinatesObject*>()){
-			CUnionTestingType::mixedUnion = *val;
+		if (const CCoordinatesObject* coordinatesVal = v.value<const CCoordinatesObject*>()){
+			CUnionTestingType::mixedUnion = *coordinatesVal;
 		}
-		if (const double* val = v.value<const double*>()){
-			CUnionTestingType::mixedUnion = *val;
+		if (const double* floatVal = v.value<const double*>()){
+			CUnionTestingType::mixedUnion = *floatVal;
 		}
-		if (const bool* val = v.value<const bool*>()){
-			CUnionTestingType::mixedUnion = *val;
+		if (const bool* booleanVal = v.value<const bool*>()){
+			CUnionTestingType::mixedUnion = *booleanVal;
 		}
-		if (const QString* val = v.value<const QString*>()){
-			CUnionTestingType::mixedUnion = *val;
+		if (const QString* stringVal = v.value<const QString*>()){
+			CUnionTestingType::mixedUnion = *stringVal;
 		}
 	}
 	else {
@@ -17029,22 +17029,22 @@ QVariant CExtendedMetaDataUnionTypeObjectList::GetOrCreateCachedObject(int index
 		retVal = this->m_objectDataTypeMap[index];
 	}
 	else{
-		if (const CCoordinates* val = std::get_if<CCoordinates>(this->Version_1_0->at(index).GetPtr())){
+		if (const CCoordinates* coordinatesVal = std::get_if<CCoordinates>(this->Version_1_0->at(index).GetPtr())){
 			CCoordinatesObject *newObjectPtr = new CCoordinatesObject();
-			static_cast<CCoordinates&>(*newObjectPtr) = *val;
+			static_cast<CCoordinates&>(*newObjectPtr) = *coordinatesVal;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
-		if (const double* val = std::get_if<double>(this->Version_1_0->at(index).GetPtr())){
-			retVal =  QVariant::fromValue(val);
+		if (const double* floatVal = std::get_if<double>(this->Version_1_0->at(index).GetPtr())){
+			retVal =  QVariant::fromValue(floatVal);
 		}
 
-		if (const bool* val = std::get_if<bool>(this->Version_1_0->at(index).GetPtr())){
-			retVal =  QVariant::fromValue(val);
+		if (const bool* booleanVal = std::get_if<bool>(this->Version_1_0->at(index).GetPtr())){
+			retVal =  QVariant::fromValue(booleanVal);
 		}
 
-		if (const QString* val = std::get_if<QString>(this->Version_1_0->at(index).GetPtr())){
-			retVal =  QVariant::fromValue(val);
+		if (const QString* stringVal = std::get_if<QString>(this->Version_1_0->at(index).GetPtr())){
+			retVal =  QVariant::fromValue(stringVal);
 		}
 
 		this->m_objectDataTypeMap.insert(index, retVal);
@@ -17076,24 +17076,24 @@ void CExtendedMetaDataUnionTypeObjectList::append(QVariant item)
 	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<CCoordinatesObject*>()){
-		CCoordinatesObject* val = item.value<CCoordinatesObject*>();
-		CCoordinates* newItemPtr = dynamic_cast<CCoordinates*>(val);
+		CCoordinatesObject* coordinatesVal = item.value<CCoordinatesObject*>();
+		CCoordinates* newItemPtr = dynamic_cast<CCoordinates*>(coordinatesVal);
 		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(*newItemPtr));
 	}
 
 	if (item.canConvert<double>()){
-		double val = item.value<double>();
-		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
+		double floatVal = item.value<double>();
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(floatVal));
 	}
 
 	if (item.canConvert<bool>()){
-		bool val = item.value<bool>();
-		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
+		bool booleanVal = item.value<bool>();
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(booleanVal));
 	}
 
 	if (item.canConvert<QString>()){
-		QString val = item.value<QString>();
-		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
+		QString stringVal = item.value<QString>();
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(stringVal));
 	}
 
 	ClearCache();
@@ -17109,23 +17109,23 @@ sdl::V1_0::complextest::CExtendedMetaDataUnionTypeObjectList* CExtendedMetaDataU
 		QVariant item = this->getData("item", i);
 
 		if (item.canConvert<CCoordinatesObject*>()){
-			CCoordinatesObject* val = item.value<CCoordinatesObject*>();
-			objectListPtr->addElement(QVariant::fromValue(val->copyMe()));
+			CCoordinatesObject* coordinatesVal = item.value<CCoordinatesObject*>();
+			objectListPtr->addElement(QVariant::fromValue(coordinatesVal->copyMe()));
 		}
 
 		if (item.canConvert<double>()){
-			double val = item.value<double>();
-			objectListPtr->addElement(val);
+			double floatVal = item.value<double>();
+			objectListPtr->addElement(floatVal);
 		}
 
 		if (item.canConvert<bool>()){
-			bool val = item.value<bool>();
-			objectListPtr->addElement(val);
+			bool booleanVal = item.value<bool>();
+			objectListPtr->addElement(booleanVal);
 		}
 
 		if (item.canConvert<QString>()){
-			QString val = item.value<QString>();
-			objectListPtr->addElement(val);
+			QString stringVal = item.value<QString>();
+			objectListPtr->addElement(stringVal);
 		}
 	}
 	return objectListPtr;
@@ -17144,23 +17144,23 @@ QString CExtendedMetaDataUnionTypeObjectList::toJson()
 		QVariant item = this->getData("item", i);
 
 		if (item.canConvert<CCoordinatesObject*>()){
-			CCoordinatesObject* val = item.value<CCoordinatesObject*>();
-			retVal += val->toJson();
+			CCoordinatesObject* coordinatesVal = item.value<CCoordinatesObject*>();
+			retVal += coordinatesVal->toJson();
 		}
 
 		if (item.canConvert<double>()){
-			double val = item.value<double>();
-			retVal += QString::number(val);
+			double floatVal = item.value<double>();
+			retVal += QString::number(floatVal);
 		}
 
 		if (item.canConvert<bool>()){
-			bool val = item.value<bool>();
-			retVal += QString(val ? "true" : "false");
+			bool booleanVal = item.value<bool>();
+			retVal += QString(booleanVal ? "true" : "false");
 		}
 
 		if (item.canConvert<QString>()){
-			QString val = item.value<QString>();
-			retVal += QString(val);
+			QString stringVal = item.value<QString>();
+			retVal += QString(stringVal);
 		}
 	}
 
@@ -17182,23 +17182,23 @@ QString CExtendedMetaDataUnionTypeObjectList::toGraphQL()
 		QVariant item = this->getData("item", i);
 
 		if (item.canConvert<CCoordinatesObject*>()){
-			CCoordinatesObject* val = item.value<CCoordinatesObject*>();
-			retVal += val->toGraphQL();
+			CCoordinatesObject* coordinatesVal = item.value<CCoordinatesObject*>();
+			retVal += coordinatesVal->toGraphQL();
 		}
 
 		if (item.canConvert<double>()){
-			double val = item.value<double>();
-			retVal += QString::number(val);
+			double floatVal = item.value<double>();
+			retVal += QString::number(floatVal);
 		}
 
 		if (item.canConvert<bool>()){
-			bool val = item.value<bool>();
-			retVal += QString(val ? "true" : "false");
+			bool booleanVal = item.value<bool>();
+			retVal += QString(booleanVal ? "true" : "false");
 		}
 
 		if (item.canConvert<QString>()){
-			QString val = item.value<QString>();
-			retVal += QString(val);
+			QString stringVal = item.value<QString>();
+			retVal += QString(stringVal);
 		}
 	}
 
@@ -17251,24 +17251,24 @@ void CExtendedMetaDataUnionTypeObjectList::insert(int index, QVariant item)
 	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<CCoordinatesObject*>()){
-		CCoordinatesObject* val = item.value<CCoordinatesObject*>();
-		CCoordinates* newItemPtr = dynamic_cast<CCoordinates*>(val);
+		CCoordinatesObject* coordinatesVal = item.value<CCoordinatesObject*>();
+		CCoordinates* newItemPtr = dynamic_cast<CCoordinates*>(coordinatesVal);
 		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(*newItemPtr));
 	}
 
 	if (item.canConvert<double>()){
-		double val = item.value<double>();
-		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
+		double floatVal = item.value<double>();
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(floatVal));
 	}
 
 	if (item.canConvert<bool>()){
-		bool val = item.value<bool>();
-		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
+		bool booleanVal = item.value<bool>();
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(booleanVal));
 	}
 
 	if (item.canConvert<QString>()){
-		QString val = item.value<QString>();
-		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
+		QString stringVal = item.value<QString>();
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(stringVal));
 	}
 
 	ClearCache();
@@ -17306,16 +17306,16 @@ QVariant CExtendedMetaDataUnionSimpleTypeObjectList::GetOrCreateCachedObject(int
 		retVal = this->m_objectDataTypeMap[index];
 	}
 	else{
-		if (const double* val = std::get_if<double>(this->Version_1_0->at(index).GetPtr())){
-			retVal =  QVariant::fromValue(val);
+		if (const double* floatVal = std::get_if<double>(this->Version_1_0->at(index).GetPtr())){
+			retVal =  QVariant::fromValue(floatVal);
 		}
 
-		if (const bool* val = std::get_if<bool>(this->Version_1_0->at(index).GetPtr())){
-			retVal =  QVariant::fromValue(val);
+		if (const bool* booleanVal = std::get_if<bool>(this->Version_1_0->at(index).GetPtr())){
+			retVal =  QVariant::fromValue(booleanVal);
 		}
 
-		if (const QString* val = std::get_if<QString>(this->Version_1_0->at(index).GetPtr())){
-			retVal =  QVariant::fromValue(val);
+		if (const QString* stringVal = std::get_if<QString>(this->Version_1_0->at(index).GetPtr())){
+			retVal =  QVariant::fromValue(stringVal);
 		}
 
 		this->m_objectDataTypeMap.insert(index, retVal);
@@ -17347,18 +17347,18 @@ void CExtendedMetaDataUnionSimpleTypeObjectList::append(QVariant item)
 	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<double>()){
-		double val = item.value<double>();
-		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
+		double floatVal = item.value<double>();
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(floatVal));
 	}
 
 	if (item.canConvert<bool>()){
-		bool val = item.value<bool>();
-		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
+		bool booleanVal = item.value<bool>();
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(booleanVal));
 	}
 
 	if (item.canConvert<QString>()){
-		QString val = item.value<QString>();
-		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
+		QString stringVal = item.value<QString>();
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(stringVal));
 	}
 
 	ClearCache();
@@ -17374,18 +17374,18 @@ sdl::V1_0::complextest::CExtendedMetaDataUnionSimpleTypeObjectList* CExtendedMet
 		QVariant item = this->getData("item", i);
 
 		if (item.canConvert<double>()){
-			double val = item.value<double>();
-			objectListPtr->addElement(val);
+			double floatVal = item.value<double>();
+			objectListPtr->addElement(floatVal);
 		}
 
 		if (item.canConvert<bool>()){
-			bool val = item.value<bool>();
-			objectListPtr->addElement(val);
+			bool booleanVal = item.value<bool>();
+			objectListPtr->addElement(booleanVal);
 		}
 
 		if (item.canConvert<QString>()){
-			QString val = item.value<QString>();
-			objectListPtr->addElement(val);
+			QString stringVal = item.value<QString>();
+			objectListPtr->addElement(stringVal);
 		}
 	}
 	return objectListPtr;
@@ -17404,18 +17404,18 @@ QString CExtendedMetaDataUnionSimpleTypeObjectList::toJson()
 		QVariant item = this->getData("item", i);
 
 		if (item.canConvert<double>()){
-			double val = item.value<double>();
-			retVal += QString::number(val);
+			double floatVal = item.value<double>();
+			retVal += QString::number(floatVal);
 		}
 
 		if (item.canConvert<bool>()){
-			bool val = item.value<bool>();
-			retVal += QString(val ? "true" : "false");
+			bool booleanVal = item.value<bool>();
+			retVal += QString(booleanVal ? "true" : "false");
 		}
 
 		if (item.canConvert<QString>()){
-			QString val = item.value<QString>();
-			retVal += QString(val);
+			QString stringVal = item.value<QString>();
+			retVal += QString(stringVal);
 		}
 	}
 
@@ -17437,18 +17437,18 @@ QString CExtendedMetaDataUnionSimpleTypeObjectList::toGraphQL()
 		QVariant item = this->getData("item", i);
 
 		if (item.canConvert<double>()){
-			double val = item.value<double>();
-			retVal += QString::number(val);
+			double floatVal = item.value<double>();
+			retVal += QString::number(floatVal);
 		}
 
 		if (item.canConvert<bool>()){
-			bool val = item.value<bool>();
-			retVal += QString(val ? "true" : "false");
+			bool booleanVal = item.value<bool>();
+			retVal += QString(booleanVal ? "true" : "false");
 		}
 
 		if (item.canConvert<QString>()){
-			QString val = item.value<QString>();
-			retVal += QString(val);
+			QString stringVal = item.value<QString>();
+			retVal += QString(stringVal);
 		}
 	}
 
@@ -17501,18 +17501,18 @@ void CExtendedMetaDataUnionSimpleTypeObjectList::insert(int index, QVariant item
 	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<double>()){
-		double val = item.value<double>();
-		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
+		double floatVal = item.value<double>();
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(floatVal));
 	}
 
 	if (item.canConvert<bool>()){
-		bool val = item.value<bool>();
-		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
+		bool booleanVal = item.value<bool>();
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(booleanVal));
 	}
 
 	if (item.canConvert<QString>()){
-		QString val = item.value<QString>();
-		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
+		QString stringVal = item.value<QString>();
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(stringVal));
 	}
 
 	ClearCache();
@@ -17550,15 +17550,15 @@ QVariant CCDMResultUnionTypeObjectList::GetOrCreateCachedObject(int index) const
 		retVal = this->m_objectDataTypeMap[index];
 	}
 	else{
-		if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>(this->Version_1_0->at(index).GetPtr())){
+		if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(this->Version_1_0->at(index).GetPtr())){
 			CCDMResultVarStringObject *newObjectPtr = new CCDMResultVarStringObject();
-			static_cast<CCDMResultVarString&>(*newObjectPtr) = *val;
+			static_cast<CCDMResultVarString&>(*newObjectPtr) = *cDMResultVarStringVal;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
-		if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(this->Version_1_0->at(index).GetPtr())){
+		if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(this->Version_1_0->at(index).GetPtr())){
 			CCDMResultVarRecursiveObject *newObjectPtr = new CCDMResultVarRecursiveObject();
-			static_cast<CCDMResultVarRecursive&>(*newObjectPtr) = *val;
+			static_cast<CCDMResultVarRecursive&>(*newObjectPtr) = *cDMResultVarRecursiveVal;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
@@ -17591,14 +17591,14 @@ void CCDMResultUnionTypeObjectList::append(QVariant item)
 	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<CCDMResultVarStringObject*>()){
-		CCDMResultVarStringObject* val = item.value<CCDMResultVarStringObject*>();
-		CCDMResultVarString* newItemPtr = dynamic_cast<CCDMResultVarString*>(val);
+		CCDMResultVarStringObject* cDMResultVarStringVal = item.value<CCDMResultVarStringObject*>();
+		CCDMResultVarString* newItemPtr = dynamic_cast<CCDMResultVarString*>(cDMResultVarStringVal);
 		Version_1_0->append(istd::TNullableValue<CDMResultUnionType>(*newItemPtr));
 	}
 
 	if (item.canConvert<CCDMResultVarRecursiveObject*>()){
-		CCDMResultVarRecursiveObject* val = item.value<CCDMResultVarRecursiveObject*>();
-		CCDMResultVarRecursive* newItemPtr = dynamic_cast<CCDMResultVarRecursive*>(val);
+		CCDMResultVarRecursiveObject* cDMResultVarRecursiveVal = item.value<CCDMResultVarRecursiveObject*>();
+		CCDMResultVarRecursive* newItemPtr = dynamic_cast<CCDMResultVarRecursive*>(cDMResultVarRecursiveVal);
 		Version_1_0->append(istd::TNullableValue<CDMResultUnionType>(*newItemPtr));
 	}
 
@@ -17615,13 +17615,13 @@ sdl::V1_0::complextest::CCDMResultUnionTypeObjectList* CCDMResultUnionTypeObject
 		QVariant item = this->getData("item", i);
 
 		if (item.canConvert<CCDMResultVarStringObject*>()){
-			CCDMResultVarStringObject* val = item.value<CCDMResultVarStringObject*>();
-			objectListPtr->addElement(QVariant::fromValue(val->copyMe()));
+			CCDMResultVarStringObject* cDMResultVarStringVal = item.value<CCDMResultVarStringObject*>();
+			objectListPtr->addElement(QVariant::fromValue(cDMResultVarStringVal->copyMe()));
 		}
 
 		if (item.canConvert<CCDMResultVarRecursiveObject*>()){
-			CCDMResultVarRecursiveObject* val = item.value<CCDMResultVarRecursiveObject*>();
-			objectListPtr->addElement(QVariant::fromValue(val->copyMe()));
+			CCDMResultVarRecursiveObject* cDMResultVarRecursiveVal = item.value<CCDMResultVarRecursiveObject*>();
+			objectListPtr->addElement(QVariant::fromValue(cDMResultVarRecursiveVal->copyMe()));
 		}
 	}
 	return objectListPtr;
@@ -17640,13 +17640,13 @@ QString CCDMResultUnionTypeObjectList::toJson()
 		QVariant item = this->getData("item", i);
 
 		if (item.canConvert<CCDMResultVarStringObject*>()){
-			CCDMResultVarStringObject* val = item.value<CCDMResultVarStringObject*>();
-			retVal += val->toJson();
+			CCDMResultVarStringObject* cDMResultVarStringVal = item.value<CCDMResultVarStringObject*>();
+			retVal += cDMResultVarStringVal->toJson();
 		}
 
 		if (item.canConvert<CCDMResultVarRecursiveObject*>()){
-			CCDMResultVarRecursiveObject* val = item.value<CCDMResultVarRecursiveObject*>();
-			retVal += val->toJson();
+			CCDMResultVarRecursiveObject* cDMResultVarRecursiveVal = item.value<CCDMResultVarRecursiveObject*>();
+			retVal += cDMResultVarRecursiveVal->toJson();
 		}
 	}
 
@@ -17668,13 +17668,13 @@ QString CCDMResultUnionTypeObjectList::toGraphQL()
 		QVariant item = this->getData("item", i);
 
 		if (item.canConvert<CCDMResultVarStringObject*>()){
-			CCDMResultVarStringObject* val = item.value<CCDMResultVarStringObject*>();
-			retVal += val->toGraphQL();
+			CCDMResultVarStringObject* cDMResultVarStringVal = item.value<CCDMResultVarStringObject*>();
+			retVal += cDMResultVarStringVal->toGraphQL();
 		}
 
 		if (item.canConvert<CCDMResultVarRecursiveObject*>()){
-			CCDMResultVarRecursiveObject* val = item.value<CCDMResultVarRecursiveObject*>();
-			retVal += val->toGraphQL();
+			CCDMResultVarRecursiveObject* cDMResultVarRecursiveVal = item.value<CCDMResultVarRecursiveObject*>();
+			retVal += cDMResultVarRecursiveVal->toGraphQL();
 		}
 	}
 
@@ -17727,14 +17727,14 @@ void CCDMResultUnionTypeObjectList::insert(int index, QVariant item)
 	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<CCDMResultVarStringObject*>()){
-		CCDMResultVarStringObject* val = item.value<CCDMResultVarStringObject*>();
-		CCDMResultVarString* newItemPtr = dynamic_cast<CCDMResultVarString*>(val);
+		CCDMResultVarStringObject* cDMResultVarStringVal = item.value<CCDMResultVarStringObject*>();
+		CCDMResultVarString* newItemPtr = dynamic_cast<CCDMResultVarString*>(cDMResultVarStringVal);
 		Version_1_0->append(istd::TNullableValue<CDMResultUnionType>(*newItemPtr));
 	}
 
 	if (item.canConvert<CCDMResultVarRecursiveObject*>()){
-		CCDMResultVarRecursiveObject* val = item.value<CCDMResultVarRecursiveObject*>();
-		CCDMResultVarRecursive* newItemPtr = dynamic_cast<CCDMResultVarRecursive*>(val);
+		CCDMResultVarRecursiveObject* cDMResultVarRecursiveVal = item.value<CCDMResultVarRecursiveObject*>();
+		CCDMResultVarRecursive* newItemPtr = dynamic_cast<CCDMResultVarRecursive*>(cDMResultVarRecursiveVal);
 		Version_1_0->append(istd::TNullableValue<CDMResultUnionType>(*newItemPtr));
 	}
 
