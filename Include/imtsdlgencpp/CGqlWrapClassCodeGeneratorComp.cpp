@@ -616,7 +616,16 @@ QString CGqlWrapClassCodeGeneratorComp::GetVariableBaseName(const QString& compl
 
 	const QStringList fieldIdList = complexFieldName.split('.', Qt::SkipEmptyParts);
 	for (const QString& fieldId: fieldIdList){
-		retVal += retVal.isEmpty() ? GetDecapitalizedValue(fieldId) : GetCapitalizedValue(fieldId);
+		if (!retVal.isEmpty()){
+			retVal += '_';
+		}
+
+		// field names are used unchanged and separators inside of them are escaped,
+		// so that different field paths are always mapped to different variable names
+		QString escapedFieldId = fieldId;
+		escapedFieldId.replace('_', QStringLiteral("__"));
+
+		retVal += escapedFieldId;
 	}
 
 	return retVal;
