@@ -556,8 +556,10 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 		}
 		newComplexFieldName += typeField.GetId();
 
-		const QString newGqlContainerVarName = GetDecapitalizedValue(typeField.GetId()) + QStringLiteral("RequestedFieldsPtr");
-		const QString newIdListContainerVarName = GetDecapitalizedValue(typeField.GetId()) + QStringLiteral("RequestedIds");
+		// variable names contain a full field path to avoid hiding of variables declared in outer scopes
+		const QString newVariableBaseName = GetVariableBaseName(newComplexFieldName);
+		const QString newGqlContainerVarName = newVariableBaseName + QStringLiteral("RequestedFieldsPtr");
+		const QString newIdListContainerVarName = newVariableBaseName + QStringLiteral("RequestedIds");
 
 		// first create a GQL-info object
 		FeedStreamHorizontally(stream, hIndents + 1);
@@ -605,6 +607,19 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
 	FeedStream(stream, 1, false);
+}
+
+
+QString CGqlWrapClassCodeGeneratorComp::GetVariableBaseName(const QString& complexFieldName)
+{
+	QString retVal;
+
+	const QStringList fieldIdList = complexFieldName.split('.', Qt::SkipEmptyParts);
+	for (const QString& fieldId: fieldIdList){
+		retVal += retVal.isEmpty() ? GetDecapitalizedValue(fieldId) : GetCapitalizedValue(fieldId);
+	}
+
+	return retVal;
 }
 
 

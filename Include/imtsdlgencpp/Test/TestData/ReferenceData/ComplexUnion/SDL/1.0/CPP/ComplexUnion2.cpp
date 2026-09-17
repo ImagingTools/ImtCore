@@ -17813,34 +17813,34 @@ CGetLastProductionResultsGqlRequest::CGetLastProductionResultsGqlRequest(const :
 						m_requestInfo.Inspections.isNameRequested = true;
 						m_requestInfo.Inspections.isStatusRequested = true;
 						m_requestInfo.Inspections.isAnalyzersRequested = inspectionsRequestedIds.contains("Analyzers");
-						const imtgql::CGqlFieldObject* analyzersRequestedFieldsPtr = inspectionsRequestedFieldsPtr->GetFieldArgumentObjectPtr("Analyzers");
-						if (analyzersRequestedFieldsPtr != nullptr){
-							const QByteArrayList analyzersRequestedIds = analyzersRequestedFieldsPtr->GetFieldIds();
-							if (!analyzersRequestedIds.isEmpty()){
+						const imtgql::CGqlFieldObject* inspectionsAnalyzersRequestedFieldsPtr = inspectionsRequestedFieldsPtr->GetFieldArgumentObjectPtr("Analyzers");
+						if (inspectionsAnalyzersRequestedFieldsPtr != nullptr){
+							const QByteArrayList inspectionsAnalyzersRequestedIds = inspectionsAnalyzersRequestedFieldsPtr->GetFieldIds();
+							if (!inspectionsAnalyzersRequestedIds.isEmpty()){
 								m_requestInfo.Inspections.Analyzers.isAnalyzerNameRequested = true;
 								m_requestInfo.Inspections.Analyzers.isAnalyzerResultRequested = true;
-								m_requestInfo.Inspections.Analyzers.isAreasRequested = analyzersRequestedIds.contains("Areas");
-								const imtgql::CGqlFieldObject* areasRequestedFieldsPtr = analyzersRequestedFieldsPtr->GetFieldArgumentObjectPtr("Areas");
-								if (areasRequestedFieldsPtr != nullptr){
-									const QByteArrayList areasRequestedIds = areasRequestedFieldsPtr->GetFieldIds();
-									if (!areasRequestedIds.isEmpty()){
+								m_requestInfo.Inspections.Analyzers.isAreasRequested = inspectionsAnalyzersRequestedIds.contains("Areas");
+								const imtgql::CGqlFieldObject* inspectionsAnalyzersAreasRequestedFieldsPtr = inspectionsAnalyzersRequestedFieldsPtr->GetFieldArgumentObjectPtr("Areas");
+								if (inspectionsAnalyzersAreasRequestedFieldsPtr != nullptr){
+									const QByteArrayList inspectionsAnalyzersAreasRequestedIds = inspectionsAnalyzersAreasRequestedFieldsPtr->GetFieldIds();
+									if (!inspectionsAnalyzersAreasRequestedIds.isEmpty()){
 										m_requestInfo.Inspections.Analyzers.Areas.isAreaNameRequested = true;
 										m_requestInfo.Inspections.Analyzers.Areas.isStatusRequested = true;
 										m_requestInfo.Inspections.Analyzers.Areas.isIconPositionRequested = true;
 										m_requestInfo.Inspections.Analyzers.Areas.isErrorTypeRequested = true;
 										m_requestInfo.Inspections.Analyzers.Areas.isResultsRequested = true;
-										const imtgql::CGqlFieldObject* iconPositionRequestedFieldsPtr = areasRequestedFieldsPtr->GetFieldArgumentObjectPtr("IconPosition");
-										if (iconPositionRequestedFieldsPtr != nullptr){
-											const QByteArrayList iconPositionRequestedIds = iconPositionRequestedFieldsPtr->GetFieldIds();
-											if (!iconPositionRequestedIds.isEmpty()){
+										const imtgql::CGqlFieldObject* inspectionsAnalyzersAreasIconPositionRequestedFieldsPtr = inspectionsAnalyzersAreasRequestedFieldsPtr->GetFieldArgumentObjectPtr("IconPosition");
+										if (inspectionsAnalyzersAreasIconPositionRequestedFieldsPtr != nullptr){
+											const QByteArrayList inspectionsAnalyzersAreasIconPositionRequestedIds = inspectionsAnalyzersAreasIconPositionRequestedFieldsPtr->GetFieldIds();
+											if (!inspectionsAnalyzersAreasIconPositionRequestedIds.isEmpty()){
 												m_requestInfo.Inspections.Analyzers.Areas.IconPosition.isXRequested = true;
 												m_requestInfo.Inspections.Analyzers.Areas.IconPosition.isYRequested = true;
 											}
 										}
-										const imtgql::CGqlFieldObject* resultsRequestedFieldsPtr = areasRequestedFieldsPtr->GetFieldArgumentObjectPtr("Results");
-										if (resultsRequestedFieldsPtr != nullptr){
-											const QByteArrayList resultsRequestedIds = resultsRequestedFieldsPtr->GetFieldIds();
-											if (!resultsRequestedIds.isEmpty()){
+										const imtgql::CGqlFieldObject* inspectionsAnalyzersAreasResultsRequestedFieldsPtr = inspectionsAnalyzersAreasRequestedFieldsPtr->GetFieldArgumentObjectPtr("Results");
+										if (inspectionsAnalyzersAreasResultsRequestedFieldsPtr != nullptr){
+											const QByteArrayList inspectionsAnalyzersAreasResultsRequestedIds = inspectionsAnalyzersAreasResultsRequestedFieldsPtr->GetFieldIds();
+											if (!inspectionsAnalyzersAreasResultsRequestedIds.isEmpty()){
 												m_requestInfo.Inspections.Analyzers.Areas.Results.isAreaResultRequested = true;
 												m_requestInfo.Inspections.Analyzers.Areas.Results.isExpectedMinValueRequested = true;
 												m_requestInfo.Inspections.Analyzers.Areas.Results.isExpectedMaxValueRequested = true;
@@ -17853,35 +17853,35 @@ CGetLastProductionResultsGqlRequest::CGetLastProductionResultsGqlRequest(const :
 												m_requestInfo.Inspections.Analyzers.Areas.Results.isLengthRequested = true;
 												m_requestInfo.Inspections.Analyzers.Areas.Results.isErrorTypeRequested = true;
 												m_requestInfo.Inspections.Analyzers.Areas.Results.isGeometryRequested = true;
-												const imtgql::CGqlFieldObject* geometryRequestedFieldsPtr = resultsRequestedFieldsPtr->GetFieldArgumentObjectPtr("Geometry");
-												if (geometryRequestedFieldsPtr != nullptr){
-													const QByteArrayList geometryRequestedIds = geometryRequestedFieldsPtr->GetFieldIds();
-													if (!geometryRequestedIds.isEmpty()){
+												const imtgql::CGqlFieldObject* inspectionsAnalyzersAreasResultsGeometryRequestedFieldsPtr = inspectionsAnalyzersAreasResultsRequestedFieldsPtr->GetFieldArgumentObjectPtr("Geometry");
+												if (inspectionsAnalyzersAreasResultsGeometryRequestedFieldsPtr != nullptr){
+													const QByteArrayList inspectionsAnalyzersAreasResultsGeometryRequestedIds = inspectionsAnalyzersAreasResultsGeometryRequestedFieldsPtr->GetFieldIds();
+													if (!inspectionsAnalyzersAreasResultsGeometryRequestedIds.isEmpty()){
 														m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.isGeometryTypeRequested = true;
-														m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.isRadiusRequested = geometryRequestedIds.contains("Radius");
+														m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.isRadiusRequested = inspectionsAnalyzersAreasResultsGeometryRequestedIds.contains("Radius");
 														m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.isPointsRequested = true;
 														m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.isRequiredPointsRequested = true;
-														m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.isOptionalPointsRequested = geometryRequestedIds.contains("OptionalPoints");
-														const imtgql::CGqlFieldObject* pointsRequestedFieldsPtr = geometryRequestedFieldsPtr->GetFieldArgumentObjectPtr("Points");
-														if (pointsRequestedFieldsPtr != nullptr){
-															const QByteArrayList pointsRequestedIds = pointsRequestedFieldsPtr->GetFieldIds();
-															if (!pointsRequestedIds.isEmpty()){
+														m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.isOptionalPointsRequested = inspectionsAnalyzersAreasResultsGeometryRequestedIds.contains("OptionalPoints");
+														const imtgql::CGqlFieldObject* inspectionsAnalyzersAreasResultsGeometryPointsRequestedFieldsPtr = inspectionsAnalyzersAreasResultsGeometryRequestedFieldsPtr->GetFieldArgumentObjectPtr("Points");
+														if (inspectionsAnalyzersAreasResultsGeometryPointsRequestedFieldsPtr != nullptr){
+															const QByteArrayList inspectionsAnalyzersAreasResultsGeometryPointsRequestedIds = inspectionsAnalyzersAreasResultsGeometryPointsRequestedFieldsPtr->GetFieldIds();
+															if (!inspectionsAnalyzersAreasResultsGeometryPointsRequestedIds.isEmpty()){
 																m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.Points.isXRequested = true;
 																m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.Points.isYRequested = true;
 															}
 														}
-														const imtgql::CGqlFieldObject* requiredPointsRequestedFieldsPtr = geometryRequestedFieldsPtr->GetFieldArgumentObjectPtr("RequiredPoints");
-														if (requiredPointsRequestedFieldsPtr != nullptr){
-															const QByteArrayList requiredPointsRequestedIds = requiredPointsRequestedFieldsPtr->GetFieldIds();
-															if (!requiredPointsRequestedIds.isEmpty()){
+														const imtgql::CGqlFieldObject* inspectionsAnalyzersAreasResultsGeometryRequiredPointsRequestedFieldsPtr = inspectionsAnalyzersAreasResultsGeometryRequestedFieldsPtr->GetFieldArgumentObjectPtr("RequiredPoints");
+														if (inspectionsAnalyzersAreasResultsGeometryRequiredPointsRequestedFieldsPtr != nullptr){
+															const QByteArrayList inspectionsAnalyzersAreasResultsGeometryRequiredPointsRequestedIds = inspectionsAnalyzersAreasResultsGeometryRequiredPointsRequestedFieldsPtr->GetFieldIds();
+															if (!inspectionsAnalyzersAreasResultsGeometryRequiredPointsRequestedIds.isEmpty()){
 																m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.RequiredPoints.isXRequested = true;
 																m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.RequiredPoints.isYRequested = true;
 															}
 														}
-														const imtgql::CGqlFieldObject* optionalPointsRequestedFieldsPtr = geometryRequestedFieldsPtr->GetFieldArgumentObjectPtr("OptionalPoints");
-														if (optionalPointsRequestedFieldsPtr != nullptr){
-															const QByteArrayList optionalPointsRequestedIds = optionalPointsRequestedFieldsPtr->GetFieldIds();
-															if (!optionalPointsRequestedIds.isEmpty()){
+														const imtgql::CGqlFieldObject* inspectionsAnalyzersAreasResultsGeometryOptionalPointsRequestedFieldsPtr = inspectionsAnalyzersAreasResultsGeometryRequestedFieldsPtr->GetFieldArgumentObjectPtr("OptionalPoints");
+														if (inspectionsAnalyzersAreasResultsGeometryOptionalPointsRequestedFieldsPtr != nullptr){
+															const QByteArrayList inspectionsAnalyzersAreasResultsGeometryOptionalPointsRequestedIds = inspectionsAnalyzersAreasResultsGeometryOptionalPointsRequestedFieldsPtr->GetFieldIds();
+															if (!inspectionsAnalyzersAreasResultsGeometryOptionalPointsRequestedIds.isEmpty()){
 																m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.OptionalPoints.isXRequested = true;
 																m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.OptionalPoints.isYRequested = true;
 															}
@@ -17995,20 +17995,20 @@ CGetLastProductionResultsCDMGqlRequest::CGetLastProductionResultsCDMGqlRequest(c
 						m_requestInfo.resultMetaData.isClassificationRequested = resultMetaDataRequestedIds.contains("classification");
 						m_requestInfo.resultMetaData.isDescriptionRequested = resultMetaDataRequestedIds.contains("description");
 						m_requestInfo.resultMetaData.isExtendedMetaDataRequested = resultMetaDataRequestedIds.contains("extendedMetaData");
-						const imtgql::CGqlFieldObject* descriptionRequestedFieldsPtr = resultMetaDataRequestedFieldsPtr->GetFieldArgumentObjectPtr("description");
-						if (descriptionRequestedFieldsPtr != nullptr){
-							const QByteArrayList descriptionRequestedIds = descriptionRequestedFieldsPtr->GetFieldIds();
-							if (!descriptionRequestedIds.isEmpty()){
+						const imtgql::CGqlFieldObject* resultMetaDataDescriptionRequestedFieldsPtr = resultMetaDataRequestedFieldsPtr->GetFieldArgumentObjectPtr("description");
+						if (resultMetaDataDescriptionRequestedFieldsPtr != nullptr){
+							const QByteArrayList resultMetaDataDescriptionRequestedIds = resultMetaDataDescriptionRequestedFieldsPtr->GetFieldIds();
+							if (!resultMetaDataDescriptionRequestedIds.isEmpty()){
 								m_requestInfo.resultMetaData.description.isTextRequested = true;
 								m_requestInfo.resultMetaData.description.isLocaleRequested = true;
 							}
 						}
-						const imtgql::CGqlFieldObject* extendedMetaDataRequestedFieldsPtr = resultMetaDataRequestedFieldsPtr->GetFieldArgumentObjectPtr("extendedMetaData");
-						if (extendedMetaDataRequestedFieldsPtr != nullptr){
-							const QByteArrayList extendedMetaDataRequestedIds = extendedMetaDataRequestedFieldsPtr->GetFieldIds();
-							if (!extendedMetaDataRequestedIds.isEmpty()){
-								m_requestInfo.resultMetaData.extendedMetaData.isKeyRequested = extendedMetaDataRequestedIds.contains("key");
-								m_requestInfo.resultMetaData.extendedMetaData.isValueRequested = extendedMetaDataRequestedIds.contains("value");
+						const imtgql::CGqlFieldObject* resultMetaDataExtendedMetaDataRequestedFieldsPtr = resultMetaDataRequestedFieldsPtr->GetFieldArgumentObjectPtr("extendedMetaData");
+						if (resultMetaDataExtendedMetaDataRequestedFieldsPtr != nullptr){
+							const QByteArrayList resultMetaDataExtendedMetaDataRequestedIds = resultMetaDataExtendedMetaDataRequestedFieldsPtr->GetFieldIds();
+							if (!resultMetaDataExtendedMetaDataRequestedIds.isEmpty()){
+								m_requestInfo.resultMetaData.extendedMetaData.isKeyRequested = resultMetaDataExtendedMetaDataRequestedIds.contains("key");
+								m_requestInfo.resultMetaData.extendedMetaData.isValueRequested = resultMetaDataExtendedMetaDataRequestedIds.contains("value");
 							}
 						}
 					}

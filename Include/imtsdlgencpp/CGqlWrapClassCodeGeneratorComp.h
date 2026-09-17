@@ -65,6 +65,9 @@ private:
 	void GenerateRequestedFieldsParsing(QTextStream& stream, const imtsdl::CSdlType& sdlType, const QString& idListContainerParamName, const QString& gqlObjectVarName, const QString& complexFieldName = QString(), uint hIndents = 1) const;
 	void GenerateRequestSetup(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, uint hIndents = 1) const;
 
+	/// Create an unique local variable base name for the nested field path, e.g. "labch.color" -> "labchColor".
+	[[nodiscard]] static QString GetVariableBaseName(const QString& complexFieldName);
+
 	// header methods
 	void AddMethodDeclarations(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest) const;
 	void AddClassProperties(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest) const;
