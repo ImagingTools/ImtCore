@@ -53,6 +53,13 @@ void CWorkerThread::SetRequestPtr(const IRequest* requestPtr)
 }
 
 
+void CWorkerThread::SetPendingTask(Task task, const QByteArray& orderingKey)
+{
+	m_pendingTask = std::move(task);
+	m_pendingOrderingKey = orderingKey;
+}
+
+
 bool CWorkerThread::SendResponse(const QByteArray& requestId, ConstResponsePtr& response)
 {
 	if (m_workerManager == nullptr){
@@ -89,8 +96,15 @@ void CWorkerThread::run()
 	m_workerPtr.SetPtr(new CWorker(std::move(m_servletPtr), this));
 	m_workerPtr->moveToThread(this);
 
+	// Exactly one of the two arms is set by the manager before start(): a thread is
+	// created to run one queued work item, which is either a request or a task.
 	if (m_requestPtr != nullptr){
 		PostRequest(m_requestPtr, m_subCommandId);
+	}
+	else if (m_pendingTask){
+		PostTask(std::move(m_pendingTask), m_pendingOrderingKey);
+
+		m_pendingTask = Task();
 	}
 
 	exec();
@@ -118,6 +132,25 @@ void CWorkerThread::PostRequest(const IRequest* requestPtr, const QByteArray& su
 }
 
 
+void CWorkerThread::PostTask(Task task, const QByteArray& orderingKey)
+{
+	CWorker* workerPtr = m_workerPtr.GetPtr();
+	if (workerPtr == nullptr){
+		return;
+	}
+
+	// Same captured-argument lambda as PostRequest: a queued signal would need every
+	// argument type registered as a queued metatype, and Qt silently drops the call
+	// otherwise, leaving the worker idle in exec() forever.
+	QMetaObject::invokeMethod(
+				workerPtr,
+				[workerPtr, task = std::move(task), orderingKey]() {
+					workerPtr->ProcessTask(task, orderingKey);
+				},
+				Qt::QueuedConnection);
+}
+
+
 void CWorkerThread::NotifyFinished(const IRequest* requestPtr, const QByteArray& subCommandId)
 {
 	CWorkerManagerComp* workerManager = m_workerManager;
@@ -131,6 +164,26 @@ void CWorkerThread::NotifyFinished(const IRequest* requestPtr, const QByteArray&
 				workerManager,
 				[workerManager, requestPtr, subCommandId]() {
 					workerManager->OnFinish(requestPtr, subCommandId);
+				},
+				Qt::QueuedConnection);
+}
+
+
+
+void CWorkerThread::NotifyTaskFinished(const QByteArray& orderingKey)
+{
+	CWorkerManagerComp* workerManager = m_workerManager;
+	if (workerManager == nullptr){
+		return;
+	}
+
+	// Hop to the manager's own thread (same lambda rationale as PostRequest); the
+	// manager's OnTaskFinish releases the ordering key and dispatches the next queued
+	// work item.
+	QMetaObject::invokeMethod(
+				workerManager,
+				[workerManager, orderingKey]() {
+					workerManager->OnTaskFinish(orderingKey);
 				},
 				Qt::QueuedConnection);
 }

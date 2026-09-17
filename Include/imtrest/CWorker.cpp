@@ -55,6 +55,24 @@ void CWorker::ProcessRequest(const IRequest* request, const QByteArray& subComma
 }
 
 
+
+void CWorker::ProcessTask(Task task, const QByteArray& orderingKey)
+{
+	m_workerThread->SetStatus(CWorkerThread::ST_PROCESS);
+
+	if (task){
+		QMutexLocker lock(&m_processMutex);
+
+		task();
+	}
+
+	m_workerThread->SetStatus(CWorkerThread::ST_CLOSE);
+
+	// Report only once the status is back to ST_CLOSE: the manager dispatches the next
+	// work item from OnTaskFinish and hands it to an idle worker, so reporting earlier
+	// could make it skip this one.
+	m_workerThread->NotifyTaskFinished(orderingKey);
+}
+
+
 } // namespace imtrest
-
-

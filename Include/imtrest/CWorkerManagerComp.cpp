@@ -14,6 +14,7 @@ namespace imtrest
 
 
 CWorkerManagerComp::CWorkerManagerComp()
+	: m_isShuttingDown(false)
 {
 	// Prime Qt network/SSL globals on the application thread before any
 	// CWorkerThread runs CreateGqlContext / DoSyncPost. Otherwise the first
@@ -55,59 +56,17 @@ bool CWorkerManagerComp::SendResponse(const QByteArray& requestId, ConstResponse
 
 ConstResponsePtr CWorkerManagerComp::ProcessRequest(const IRequest& request, const QByteArray& subCommandId) const
 {
-	QMutexLocker loc(&m_requestListMutex);
+	QMutexLocker loc(&m_workItemListMutex);
 
-	ConstResponsePtr retVal;
+	WorkItem item;
+	item.requestPtr = &request;
+	item.subCommandId = subCommandId;
 
-	m_requestList << &request;
+	m_workItemList.append(std::move(item));
 
-	for (CWorkerThread* workerPtr: m_workerList){
-		if (workerPtr->GetStatus() == CWorkerThread::ST_CLOSE){
-			const IRequest* requestPtr = m_requestList.at(0);
+	DispatchNext();
 
-			m_requestList.removeAt(0);
-
-			workerPtr->SetStatus(CWorkerThread::ST_PROCESS);
-
-			workerPtr->PostRequest(requestPtr, subCommandId);
-
-			return retVal;
-		}
-	}
-
-	if (m_workerList.count() < *m_threadsLimitAttrPtr){
-		// Re-prime if constructor ran before QCoreApplication was fully up
-		// (defensive); no-op when already initialized on main.
-		imtcom::CRequestSender::InitializeNetworkBackend();
-
-		CWorkerThread* workerPtr = new CWorkerThread(this, subCommandId);
-		// The worker notifies completion by calling OnFinish via a queued lambda
-		// (CWorkerThread::NotifyFinished) - no FinishProcess signal / raw-pointer
-		// queued metatype involved.
-		m_workerList.append(workerPtr);
-
-		// Pop request from the queue:
-		const IRequest* requestPtr = m_requestList.at(0);
-		m_requestList.removeAt(0);
-
-		// Create servlet on THIS (manager/app) thread — not inside CWorkerThread::run().
-		IRequestServletPtr servletPtr = CreateServlet();
-		if (!servletPtr.IsValid()){
-			Q_ASSERT(false);
-			m_workerList.removeOne(workerPtr);
-			delete workerPtr;
-			return retVal;
-		}
-		workerPtr->SetServlet(std::move(servletPtr));
-
-		// Set popped request to the worker thread:
-		workerPtr->SetRequestPtr(requestPtr);
-
-		// Start processing of the request:
-		workerPtr->start();
-	}
-
-	return retVal;
+	return ConstResponsePtr();
 }
 
 
@@ -117,43 +76,177 @@ bool CWorkerManagerComp::IsCommandSupported(const QByteArray& /*commandId*/) con
 }
 
 
-void CWorkerManagerComp::OnFinish(const IRequest* request, const QByteArray& subCommandId)
+// reimplemented (IWorkerTaskQueue)
+
+bool CWorkerManagerComp::PostTask(const QByteArray& orderingKey, Task task)
 {
-	QMutexLocker loc(&m_requestListMutex);
+	if (!task){
+		return false;
+	}
+
+	QMutexLocker loc(&m_workItemListMutex);
+
+	if (m_isShuttingDown){
+		return false;
+	}
+
+	WorkItem item;
+	item.task = std::move(task);
+	item.orderingKey = orderingKey;
+
+	m_workItemList.append(std::move(item));
+
+	DispatchNext();
+
+	return true;
+}
+
+
+void CWorkerManagerComp::OnFinish(const IRequest* request, const QByteArray& /*subCommandId*/)
+{
+	QMutexLocker loc(&m_workItemListMutex);
 
 	delete request;
 
-	if (m_requestList.isEmpty()){
+	// The finished request's subCommandId is deliberately not reused for the next item:
+	// each queued item carries its own.
+	DispatchNext();
+}
+
+
+void CWorkerManagerComp::OnTaskFinish(const QByteArray& orderingKey)
+{
+	QMutexLocker loc(&m_workItemListMutex);
+
+	if (!orderingKey.isEmpty()){
+		m_busyKeys.remove(orderingKey);
+	}
+
+	DispatchNext();
+}
+
+
+int CWorkerManagerComp::FindDispatchableIndex() const
+{
+	for (int index = 0; index < m_workItemList.count(); ++index){
+		const WorkItem& item = m_workItemList.at(index);
+
+		if (!item.IsTask() || item.orderingKey.isEmpty() || !m_busyKeys.contains(item.orderingKey)){
+			return index;
+		}
+	}
+
+	return -1;
+}
+
+
+void CWorkerManagerComp::MarkInFlight(const WorkItem& item) const
+{
+	if (item.IsTask() && !item.orderingKey.isEmpty()){
+		m_busyKeys.insert(item.orderingKey);
+	}
+}
+
+
+void CWorkerManagerComp::DispatchNext() const
+{
+	const int index = FindDispatchableIndex();
+	if (index < 0){
 		return;
 	}
 
-	for (CWorkerThread* workerPtr : m_workerList){
+	for (CWorkerThread* workerPtr: m_workerList){
 		if (workerPtr->GetStatus() == CWorkerThread::ST_CLOSE){
-			const IRequest* requestPtr = m_requestList.at(0);
-			m_requestList.removeAt(0);
+			WorkItem item = m_workItemList.takeAt(index);
+
+			MarkInFlight(item);
 
 			workerPtr->SetStatus(CWorkerThread::ST_PROCESS);
-			workerPtr->PostRequest(requestPtr, subCommandId);
+
+			if (item.IsTask()){
+				workerPtr->PostTask(std::move(item.task), item.orderingKey);
+			}
+			else{
+				workerPtr->PostRequest(item.requestPtr, item.subCommandId);
+			}
 
 			return;
 		}
 	}
+
+	if (m_workerList.count() >= *m_threadsLimitAttrPtr){
+		// Pool saturated: the item stays queued until a worker reports back.
+		return;
+	}
+
+	// Re-prime if the constructor ran before QCoreApplication was fully up
+	// (defensive); no-op when already initialized on main.
+	imtcom::CRequestSender::InitializeNetworkBackend();
+
+	// Create the servlet on THIS (manager) thread - not inside CWorkerThread::run().
+	// A factory's OnComponentCreated() may construct QObjects parented to qApp
+	// (translators, timers, etc.), and doing that from a worker logs the one-shot
+	// affinity warning. Created before the item is dequeued, so that a failure here
+	// leaves the item queued rather than dropping it.
+	IRequestServletPtr servletPtr = CreateServlet();
+	if (!servletPtr.IsValid()){
+		Q_ASSERT(false);
+
+		return;
+	}
+
+	WorkItem item = m_workItemList.takeAt(index);
+
+	MarkInFlight(item);
+
+	CWorkerThread* workerPtr = new CWorkerThread(this, item.subCommandId);
+	// The worker notifies completion by calling OnFinish / OnTaskFinish via a queued
+	// lambda (CWorkerThread::NotifyFinished) - no FinishProcess signal / raw-pointer
+	// queued metatype involved.
+	workerPtr->SetServlet(std::move(servletPtr));
+
+	m_workerList.append(workerPtr);
+
+	if (item.IsTask()){
+		workerPtr->SetPendingTask(std::move(item.task), item.orderingKey);
+	}
+	else{
+		workerPtr->SetRequestPtr(item.requestPtr);
+	}
+
+	// Start processing of the work item:
+	workerPtr->start();
 }
 
 
 void CWorkerManagerComp::AboutToQuit()
 {
-	for (CWorkerThread* workerPtr : m_workerList){
+	QList<CWorkerThread*> workerList;
+
+	{
+		QMutexLocker loc(&m_workItemListMutex);
+
+		m_isShuttingDown = true;
+
+		// Queued tasks are simply dropped; only the request arm owns memory here.
+		for (const WorkItem& item: m_workItemList){
+			delete item.requestPtr;
+		}
+
+		m_workItemList.clear();
+		m_busyKeys.clear();
+
+		workerList = m_workerList;
+	}
+
+	// Joined without the queue mutex held: a worker finishing in the meantime hops to
+	// this thread through a queued call, and nothing here may hold the lock it needs.
+	for (CWorkerThread* workerPtr: workerList){
 		workerPtr->quit();
 		workerPtr->wait(1000);
 		workerPtr->deleteLater();
 	}
-
-	qDeleteAll(m_requestList);
-	m_requestList.clear();
 }
 
 
 } // namespace imtrest
-
-

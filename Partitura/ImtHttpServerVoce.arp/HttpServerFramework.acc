@@ -99,5 +99,7 @@
         <Interface InterfaceId="imtrest::IServer" ComponentId="TcpServer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="TcpServer"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="WorkerManager" ComponentId="WorkerManager"/>
+    </ExportedComponents>
 </Acf>

@@ -11,6 +11,7 @@
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/IResponse.h>
+#include <imtrest/IWorkerTaskQueue.h>
 #include <imtrest/CWorker.h>
 
 
@@ -24,6 +25,8 @@ class CWorkerThread: public QThread
 {
 	Q_OBJECT
 public:
+	typedef IWorkerTaskQueue::Task Task;
+
 	CWorkerThread(const CWorkerManagerComp* workerManager, const QByteArray& subCommandId);
 
 	enum Status
@@ -45,6 +48,13 @@ public:
 	bool SendResponse(const QByteArray& requestId, ConstResponsePtr& response);
 
 	/**
+		Set the task this thread runs as soon as it is up, as the task counterpart of
+		\ref SetRequestPtr. Used only for the work item a freshly created thread is
+		started with; afterwards work arrives through \ref PostRequest / \ref PostTask.
+	*/
+	void SetPendingTask(Task task, const QByteArray& orderingKey);
+
+	/**
 		Post \a requestPtr to this worker's CWorker on the worker thread. Uses a
 		captured-argument lambda instead of a queued signal carrying a raw IRequest*:
 		a queued signal needs that pointer type registered as a queued metatype, and
@@ -55,10 +65,24 @@ public:
 	void PostRequest(const IRequest* requestPtr, const QByteArray& subCommandId);
 
 	/**
+		Post \a task to this worker's CWorker on the worker thread - the IWorkerTaskQueue
+		counterpart of \ref PostRequest, with no servlet and no response involved. Same
+		captured-lambda rationale as \ref PostRequest.
+	*/
+	void PostTask(Task task, const QByteArray& orderingKey);
+
+	/**
 		Notify the manager, on its own thread, that a request finished. Called by CWorker.
 		Same lambda-hop rationale as \ref PostRequest.
 	*/
 	void NotifyFinished(const IRequest* requestPtr, const QByteArray& subCommandId);
+
+	/**
+		Notify the manager, on its own thread, that a posted task finished, so that
+		\a orderingKey is released and the next queued work item is dispatched. Called by
+		CWorker. Same lambda-hop rationale as \ref PostRequest.
+	*/
+	void NotifyTaskFinished(const QByteArray& orderingKey);
 
 	//reimplemented (QThread)
 	virtual void run() override;
@@ -69,6 +93,8 @@ private:
 	istd::TDelPtr<CWorker> m_workerPtr;
 	IRequestServletPtr m_servletPtr;
 	const IRequest* m_requestPtr;
+	Task m_pendingTask;
+	QByteArray m_pendingOrderingKey;
 	mutable QMutex m_statusMutex;
 	QByteArray m_subCommandId;
 };
