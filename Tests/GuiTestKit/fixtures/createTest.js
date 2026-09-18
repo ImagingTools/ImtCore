@@ -1,42 +1,81 @@
 // Generic Playwright test/fixture factory for any ImtCore-based app's GUI test suite.
 //
-// A consuming app's own fixtures/test.js (which lives in a `fixtures/` subfolder of the project, one
-// level below playwright.config.js) is a thin shim:
+// A consuming app's own fixtures/test.js is a thin shim:
 //
-//   const path = require('path');
 //   const { createGuiTest } = require('imtcore-gui-testkit/fixtures/createTest');
 //   const users = require('./users');
 //   module.exports = createGuiTest(users, { rootDir: path.resolve(__dirname, '..') });
 //
-// `users` must expose:
-//   byKey(key)                 -> the fixture user for a Playwright project name, or undefined
-//   can(user, permission)      -> boolean
-//   authFile(key)              -> storageState path, relative to the app's project root (see rootDir)
+// `users` must expose byKey(key) and authFile(key); fixtures/defineUsers.js builds that from a user list.
 
+const fs = require('fs');
 const path = require('path');
 const base = require('@playwright/test');
 const gui = require('../lib/gui');
 const { captureConsoleErrors } = require('../lib/consoleErrors');
 
+const PERMISSIONS_STORAGE_KEY = 'AuthorizationController/permissions';
+
 /**
- * @param {{byKey: Function, can: Function, authFile: Function}} users
+ * The permission codes the server granted this user, from the storageState saved after login. Returns
+ * null when they cannot be determined at all - which is NOT the same as "none".
+ * @param {string} authFilePath
+ * @returns {Set<string>|null}
+ */
+function readGrantedPermissions(authFilePath) {
+  let state;
+  try {
+    state = JSON.parse(fs.readFileSync(authFilePath, 'utf8'));
+  } catch (_) {
+    return null;
+  }
+  for (const origin of state.origins || []) {
+    for (const entry of origin.localStorage || []) {
+      if (entry.name !== PERMISSIONS_STORAGE_KEY) continue;
+      // Stored as a JSON string holding a ';'-separated list (an empty one for a user with none).
+      let raw = entry.value;
+      try {
+        raw = JSON.parse(raw);
+      } catch (_) {
+        /* already a bare string */
+      }
+      return new Set(String(raw).split(';').filter(Boolean));
+    }
+  }
+  return null;
+}
+
+/**
+ * @param {{byKey: Function, authFile: Function}} users
  * @param {{rootDir: string}} opts  rootDir: the app's PROJECT ROOT (the directory playwright.config.js
  *   lives in) - NOT __dirname of the calling file if that file sits in a subfolder like `fixtures/`.
  *   authFile()'s return value is resolved relative to this.
  */
 function createGuiTest(users, { rootDir }) {
-  const { byKey, can, authFile } = users;
+  const { byKey, authFile } = users;
+
+  /**
+   * The user, plus `can(permission)` answered from the permissions the server granted at login.
+   *
+   * A user declared with '*' is the superuser - the server sends it an empty list because it bypasses
+   * permission checks, so an empty list there means "everything", not "nothing". `can()` returns
+   * undefined when the permissions are genuinely unknown; callers must not treat that as "no".
+   */
+  function decorate(user) {
+    const granted = readGrantedPermissions(path.resolve(rootDir, authFile(user.key)));
+    const isSuperuser = Array.isArray(user.permissions) && user.permissions.includes('*');
+    const can = (permission) => {
+      if (isSuperuser) return true;
+      if (!granted) return undefined;
+      return granted.has(permission);
+    };
+    return { ...user, grantedPermissions: granted, can };
+  }
 
   const test = base.test.extend({
-    // Worker-startup stagger (worker-scoped, runs once per worker before its first test, auto).
-    // The app is a Qt/QML->WASM canvas that is expensive to cold-boot. At workers:10 every worker
-    // otherwise boots its first app instance at t=0, and 10 simultaneous WASM boots saturate the one
-    // Debug server + CPU so badly that the earliest tests' first render / menu never reaches the
-    // "visible" state within even a generous locator timeout (seen live as "[MenuPanel > XButton] -
-    // 2 element(s) exist but none became visible", only ever on the very first tests of the run).
-    // Offsetting each worker's start by parallelIndex * STAGGER spreads that one-time boot storm over
-    // ~15s instead of all-at-once. It fires once per worker, NOT per test, so steady-state throughput
-    // is unchanged; parallelIndex (0..workers-1, reused on worker replacement) caps the max delay.
+    // Worker-startup stagger (worker-scoped, once per worker before its first test). The app is a
+    // Qt/QML->WASM canvas that is expensive to cold-boot, so offset each worker's start to spread the
+    // one-time boot storm; parallelIndex caps the max delay.
     _workerStartupStagger: [
       async ({}, use, workerInfo) => {
         const STAGGER_MS = 1500;
@@ -55,9 +94,7 @@ function createGuiTest(users, { rootDir }) {
           `No test user maps to project "${testInfo.project.name}". Project names must match your users module's keys.`
         );
       }
-      // Attach a convenience predicate.
-      const decorated = { ...user, can: (perm) => can(user, perm) };
-      await use(decorated);
+      await use(decorate(user));
     },
 
     // The GUI helper barrel, handed to tests so they don't each require it.
@@ -65,13 +102,9 @@ function createGuiTest(users, { rootDir }) {
       await use(gui);
     },
 
-    // Overrides Playwright's built-in `page` fixture to also watch for browser-side errors (see
-    // lib/consoleErrors.js) - an uncaught pageerror hard-fails the test (unambiguous - nothing
-    // legitimate throws one), while console.error/warn text is attached to the report as diagnostic
-    // context rather than failing the test outright (this codebase has legitimate expected
-    // warn/error calls for handled edge cases - see consoleErrors.js's own header comment). Only
-    // covers the default per-test `page` fixture; a describe.serial block's newUserPage()-created page
-    // isn't wrapped by this (see newUserPage's own comment on why it can't hard-fail the same way).
+    // Overrides Playwright's `page` fixture to also watch for browser-side errors (see
+    // lib/consoleErrors.js): an uncaught pageerror hard-fails the test, while console.error/warn text
+    // is attached to the report as diagnostic context. Only covers the default per-test `page`.
     page: async ({ page }, use, testInfo) => {
       const finish = captureConsoleErrors(page);
       await use(page);
@@ -83,18 +116,12 @@ function createGuiTest(users, { rootDir }) {
 
   /**
    * Open one browser page for a whole `test.describe.serial(...)` block, logged in as the current
-   * project's user, instead of the default per-test `page` fixture. Use in a `test.beforeAll` and
-   * keep the returned `page`/`user` in a describe-scoped closure variable - every test in that block
-   * then continues working against the SAME app instance (no full reboot/re-login between steps),
-   * which is both much faster and a more honest model of most Imt-based apps' reality: document
-   * tabs/filters/sort are typically server-side session state, i.e. already "one continuous session"
-   * in production, not independent page loads.
+   * project's user, instead of the default per-test `page`. Every test in the block works against the
+   * same app instance (no reboot/re-login between steps).
    *
-   * Trade-off (why this isn't the default for every test): test.describe.serial stops running the
-   * rest of the block after the first failure (reported as "skipped", not "failed") - you lose the
-   * per-step-independent failure signal you get from a fresh page per test. Reserve this for tests
-   * that are already a deliberate narrative sequence (fill field A, then B, then save), not for
-   * unrelated checks that happen to share a page.
+   * Trade-off: test.describe.serial stops after the first failure, so you lose per-step failure signal;
+   * reserve this for a deliberate narrative sequence. Clean up in afterAll with `page.context().close()`
+   * (this creates one BrowserContext per block), not `page.close()`.
    * @param {import('@playwright/test').Browser} browser
    * @param {import('@playwright/test').TestInfo} testInfo
    */
@@ -105,15 +132,11 @@ function createGuiTest(users, { rootDir }) {
         `newUserPage: no test user maps to project "${testInfo.project.name}". Project names must match your users module's keys.`
       );
     }
-    const decorated = { ...user, can: (perm) => can(user, perm) };
+    const decorated = decorate(user);
     const context = await browser.newContext({ storageState: path.resolve(rootDir, authFile(user.key)) });
     const page = await context.newPage();
-    // Same browser-error watching as the default `page` fixture (see lib/consoleErrors.js), but this
-    // page is shared across every test in a describe.serial block, so a pageerror can't be attributed to
-    // one specific test the way the per-test `page` fixture does - log it to the Node/CI console instead
-    // of throwing into whichever test happens to be running when it fires. Nothing calls the returned
-    // finish() here (there's no single natural "end" short of the block's own afterAll closing the
-    // page); the listeners are harmless to leave attached until the page/context closes.
+    // Same browser-error watching as the default `page` fixture, but this page is shared across a
+    // describe.serial block, so a pageerror can't be attributed to one test - log it instead of throwing.
     captureConsoleErrors(page, {
       onPageError: (err) => {
         // eslint-disable-next-line no-console
@@ -125,8 +148,7 @@ function createGuiTest(users, { rootDir }) {
 
   /**
    * Run the same body for several users inside ONE spec, for side-by-side permission comparisons.
-   * Prefer the per-project model (one project per user) for the common case; use this only when a
-   * test genuinely needs to compare multiple users in a single body.
+   * Prefer the per-project model for the common case; use this only for genuine multi-user comparisons.
    * @param {object[]} userList
    * @param {(user: object) => void} defineTests
    */
@@ -136,7 +158,18 @@ function createGuiTest(users, { rootDir }) {
     }
   }
 
-  return { test, expect, gui, newUserPage, forEachUser };
+  /**
+   * Skip this test unless the server granted the user this permission. Call it as the first line of a
+   * test body. Uses `can(x) === false`, never `!user.can(x)`: can() returns undefined when permissions
+   * could not be read, and the `!` form would wrongly skip on that.
+   * @param {{can: Function, key: string}} user
+   * @param {string} permission
+   */
+  function requires(user, permission) {
+    test.skip(user.can(permission) === false, `${user.key} was not granted ${permission}`);
+  }
+
+  return { test, expect, gui, newUserPage, forEachUser, requires };
 }
 
 module.exports = { createGuiTest };

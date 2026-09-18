@@ -260,6 +260,11 @@ Item {
 			readonly property var statusColors: ({"Open": "#1a7f37", "Closed": "#8957e5"})
 			readonly property var priorityColors: ({"Low": "#3FB950", "Medium": "#D29922", "High": "#DB6D28", "Critical": "#F85149"})
 
+			// Model values are wrappers, not JS strings: used raw as a map key they
+			// never match, so normalize once here.
+			readonly property string statusText: ticketDelegate.ticket ? String(ticketDelegate.ticket.status || "") : ""
+			readonly property string priorityText: ticketDelegate.ticket ? String(ticketDelegate.ticket.priority || "") : ""
+
 			function formatTimestamp(isoStr) {
 				if (!isoStr)
 					return ""
@@ -303,14 +308,14 @@ Item {
 						height: Style.buttonHeightS
 						radius: height / 2
 						color: ticketDelegate.ticket
-							? (ticketDelegate.statusColors[ticketDelegate.ticket.status] || Style.buttonInactiveTextColor)
+							? (ticketDelegate.statusColors[ticketDelegate.statusText] || Style.buttonInactiveTextColor)
 							: Style.buttonInactiveTextColor
-						visible: ticketDelegate.ticket && ticketDelegate.ticket.status !== ""
+						visible: ticketDelegate.statusText !== ""
 
 						Text {
 							id: statusLabel
 							anchors.centerIn: parent
-							text: ticketDelegate.ticket ? qsTr(ticketDelegate.ticket.status) : ""
+							text: ticketDelegate.statusText ? qsTr(ticketDelegate.statusText) : ""
 							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: "white"
@@ -330,14 +335,14 @@ Item {
 						height: Style.buttonHeightS
 						radius: height / 2
 						color: ticketDelegate.ticket
-							? (ticketDelegate.priorityColors[ticketDelegate.ticket.priority] || Style.buttonInactiveTextColor)
+							? (ticketDelegate.priorityColors[ticketDelegate.priorityText] || Style.buttonInactiveTextColor)
 							: Style.buttonInactiveTextColor
-						visible: ticketDelegate.ticket && ticketDelegate.ticket.priority !== ""
+						visible: ticketDelegate.priorityText !== ""
 
 						Text {
 							id: priorityLabel
 							anchors.centerIn: parent
-							text: ticketDelegate.ticket ? qsTr(ticketDelegate.ticket.priority) : ""
+							text: ticketDelegate.priorityText ? qsTr(ticketDelegate.priorityText) : ""
 							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: "white"
