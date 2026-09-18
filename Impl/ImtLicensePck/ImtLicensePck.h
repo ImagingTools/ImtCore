@@ -61,13 +61,7 @@ typedef imtlic::CProductInstanceMetaInfoCreatorComp ProductInstanceMetaInfoCreat
 typedef imtlic::CLicenseControllerComp LicenseController;
 typedef imtlic::CFeatureInfoProviderComp FeatureInfoProvider;
 typedef imtlic::CProductInfoComp ProductInfo;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<
-						imtlic::CIdentifiableProductInfo,
-						imtbase::IIdentifiable,
-						imtlic::IProductInfo,
-						iprm::INameParam,
-						iser::ISerializable>> IdentifiableProductInfo;
+typedef icomp::TModelCompWrap<imtlic::CProductInfoComp> IdentifiableProductInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtlic::CLicenseDefinition,

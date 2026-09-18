@@ -512,7 +512,9 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 							FeedStreamHorizontally(stream, 2);
 							const QString sourceVariableName = dataClassName + QStringLiteral("::") + field.GetId();
 
-							stream << QStringLiteral("if (const ") << convertedType << QStringLiteral("* val = std::get_if<") << convertedType << QStringLiteral(">((");
+							const QString valueVarName = GetValueVariableName(sdlType);
+
+							stream << QStringLiteral("if (const ") << convertedType << QStringLiteral("* ") << valueVarName << QStringLiteral(" = std::get_if<") << convertedType << QStringLiteral(">((");
 							stream << sourceVariableName;
 							stream << QStringLiteral(").GetPtr())){");
 
@@ -539,7 +541,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 									const imtsdl::SdlFieldList subFields = sdlTypeField->GetFields();
 									for (const imtsdl::CSdlField& subField : subFields){
 										FeedStreamHorizontally(stream, 3);
-										stream << QStringLiteral("newObjectPtr->") << subFieldClassName << QStringLiteral("::") << subField.GetId() << QStringLiteral(" = val->") << subFieldClassName << QStringLiteral("::") << subField.GetId() << ';';
+										stream << QStringLiteral("newObjectPtr->") << subFieldClassName << QStringLiteral("::") << subField.GetId() << QStringLiteral(" = ") << valueVarName << QStringLiteral("->") << subFieldClassName << QStringLiteral("::") << subField.GetId() << ';';
 										FeedStream(stream, 1, false);
 									}
 								}
@@ -551,7 +553,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 							}
 							else{
 								stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
-								stream << QStringLiteral("QObjectPtr = QVariant::fromValue(val);");
+								stream << QStringLiteral("QObjectPtr = QVariant::fromValue(") << valueVarName << QStringLiteral(");");
 								FeedStream(stream, 1, false);
 							}
 
@@ -749,9 +751,11 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 							objectConvertedType += "Object";
 						}
 
+						const QString valueVarName = GetValueVariableName(sdlType);
+
 						stream << QStringLiteral("if (const ") << objectConvertedType;
 
-						stream << QStringLiteral("* val = v.value<const ") << convertedType;
+						stream << QStringLiteral("* ") << valueVarName << QStringLiteral(" = v.value<const ") << convertedType;
 						if (isCustom){
 							stream << QStringLiteral("Object");
 						}
@@ -759,7 +763,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 						FeedStream(stream, 1, false);
 
 						FeedStreamHorizontally(stream, 3);
-						stream << sourceVariableName << QStringLiteral(" = *val;");;
+						stream << sourceVariableName << QStringLiteral(" = *") << valueVarName << ';';
 						FeedStream(stream, 1, false);
 
 						FeedStreamHorizontally(stream, 2);
