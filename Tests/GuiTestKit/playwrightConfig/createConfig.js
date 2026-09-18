@@ -115,7 +115,12 @@ function createGuiConfig({
       viewport: { width: 1920, height: 1080 },
       baseURL: baseUrl,
       screenshot: 'only-on-failure',
-      trace: 'off',
+      // Kept for FAILURES only, which is what makes a downloaded CI artifact worth having: a trace
+      // replays the whole test - every action, the DOM at each step, console and network - and that is
+      // the only way to diagnose a GUI failure you cannot reproduce locally. Not 'on-first-retry',
+      // which never fires here because retries are 0 by design. A green run writes none, so the
+      // published archive stays a couple of junit files.
+      trace: 'retain-on-failure',
       ...use,
     },
     projects: buildProjects({
