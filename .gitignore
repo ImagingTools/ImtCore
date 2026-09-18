@@ -15,6 +15,7 @@ Testing/
 _deps/
 Build/*/*.dir/
 **/CMake/build/
+**/CMake/.qtcreator/
 .cmake/
 
 # Playwright test artifacts
