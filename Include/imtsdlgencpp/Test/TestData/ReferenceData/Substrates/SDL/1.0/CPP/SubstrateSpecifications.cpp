@@ -4780,26 +4780,26 @@ bool CSubstrateSpecificationInputObject::hasDescription()
 QVariant CSubstrateSpecificationInputObject::GetItem()
 {
 	if (m_itemQObjectPtr.isValid()){
-		if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
+		if (const CCardboardSubstrateSpecification* cardboardSubstrateSpecificationVal = std::get_if<CCardboardSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
 			CCardboardSubstrateSpecificationObject *newObjectPtr = new CCardboardSubstrateSpecificationObject(this);
-						newObjectPtr->CCardboardSubstrateSpecification::color = val->CCardboardSubstrateSpecification::color;
-			newObjectPtr->CCardboardSubstrateSpecification::grammage = val->CCardboardSubstrateSpecification::grammage;
+						newObjectPtr->CCardboardSubstrateSpecification::color = cardboardSubstrateSpecificationVal->CCardboardSubstrateSpecification::color;
+			newObjectPtr->CCardboardSubstrateSpecification::grammage = cardboardSubstrateSpecificationVal->CCardboardSubstrateSpecification::grammage;
 
 			m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
-		if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
+		if (const CPaperSubstrateSpecification* paperSubstrateSpecificationVal = std::get_if<CPaperSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
 			CPaperSubstrateSpecificationObject *newObjectPtr = new CPaperSubstrateSpecificationObject(this);
-						newObjectPtr->CPaperSubstrateSpecification::grammage = val->CPaperSubstrateSpecification::grammage;
-			newObjectPtr->CPaperSubstrateSpecification::color = val->CPaperSubstrateSpecification::color;
-			newObjectPtr->CPaperSubstrateSpecification::coatType = val->CPaperSubstrateSpecification::coatType;
+						newObjectPtr->CPaperSubstrateSpecification::grammage = paperSubstrateSpecificationVal->CPaperSubstrateSpecification::grammage;
+			newObjectPtr->CPaperSubstrateSpecification::color = paperSubstrateSpecificationVal->CPaperSubstrateSpecification::color;
+			newObjectPtr->CPaperSubstrateSpecification::coatType = paperSubstrateSpecificationVal->CPaperSubstrateSpecification::coatType;
 
 			m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
-		if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
+		if (const CFilmSubstrateSpecification* filmSubstrateSpecificationVal = std::get_if<CFilmSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
 			CFilmSubstrateSpecificationObject *newObjectPtr = new CFilmSubstrateSpecificationObject(this);
-						newObjectPtr->CFilmSubstrateSpecification::transparency = val->CFilmSubstrateSpecification::transparency;
-			newObjectPtr->CFilmSubstrateSpecification::color = val->CFilmSubstrateSpecification::color;
-			newObjectPtr->CFilmSubstrateSpecification::material = val->CFilmSubstrateSpecification::material;
+						newObjectPtr->CFilmSubstrateSpecification::transparency = filmSubstrateSpecificationVal->CFilmSubstrateSpecification::transparency;
+			newObjectPtr->CFilmSubstrateSpecification::color = filmSubstrateSpecificationVal->CFilmSubstrateSpecification::color;
+			newObjectPtr->CFilmSubstrateSpecification::material = filmSubstrateSpecificationVal->CFilmSubstrateSpecification::material;
 
 			m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
@@ -4811,14 +4811,14 @@ QVariant CSubstrateSpecificationInputObject::GetItem()
 void CSubstrateSpecificationInputObject::SetItem(const QVariant& v)
 {
 	if (v.isValid()){
-		if (const CCardboardSubstrateSpecificationObject* val = v.value<const CCardboardSubstrateSpecificationObject*>()){
-			CSubstrateSpecificationInput::item = *val;
+		if (const CCardboardSubstrateSpecificationObject* cardboardSubstrateSpecificationVal = v.value<const CCardboardSubstrateSpecificationObject*>()){
+			CSubstrateSpecificationInput::item = *cardboardSubstrateSpecificationVal;
 		}
-		if (const CPaperSubstrateSpecificationObject* val = v.value<const CPaperSubstrateSpecificationObject*>()){
-			CSubstrateSpecificationInput::item = *val;
+		if (const CPaperSubstrateSpecificationObject* paperSubstrateSpecificationVal = v.value<const CPaperSubstrateSpecificationObject*>()){
+			CSubstrateSpecificationInput::item = *paperSubstrateSpecificationVal;
 		}
-		if (const CFilmSubstrateSpecificationObject* val = v.value<const CFilmSubstrateSpecificationObject*>()){
-			CSubstrateSpecificationInput::item = *val;
+		if (const CFilmSubstrateSpecificationObject* filmSubstrateSpecificationVal = v.value<const CFilmSubstrateSpecificationObject*>()){
+			CSubstrateSpecificationInput::item = *filmSubstrateSpecificationVal;
 		}
 	}
 	else {
@@ -5277,21 +5277,21 @@ QVariant CSubstrateSpecificationDocumentObjectList::GetOrCreateCachedObject(int 
 		retVal = this->m_objectDataTypeMap[index];
 	}
 	else{
-		if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(this->Version_1_0->at(index).GetPtr())){
+		if (const CCardboardSubstrateSpecification* cardboardSubstrateSpecificationVal = std::get_if<CCardboardSubstrateSpecification>(this->Version_1_0->at(index).GetPtr())){
 			CCardboardSubstrateSpecificationObject *newObjectPtr = new CCardboardSubstrateSpecificationObject();
-			static_cast<CCardboardSubstrateSpecification&>(*newObjectPtr) = *val;
+			static_cast<CCardboardSubstrateSpecification&>(*newObjectPtr) = *cardboardSubstrateSpecificationVal;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
-		if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(this->Version_1_0->at(index).GetPtr())){
+		if (const CPaperSubstrateSpecification* paperSubstrateSpecificationVal = std::get_if<CPaperSubstrateSpecification>(this->Version_1_0->at(index).GetPtr())){
 			CPaperSubstrateSpecificationObject *newObjectPtr = new CPaperSubstrateSpecificationObject();
-			static_cast<CPaperSubstrateSpecification&>(*newObjectPtr) = *val;
+			static_cast<CPaperSubstrateSpecification&>(*newObjectPtr) = *paperSubstrateSpecificationVal;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
-		if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(this->Version_1_0->at(index).GetPtr())){
+		if (const CFilmSubstrateSpecification* filmSubstrateSpecificationVal = std::get_if<CFilmSubstrateSpecification>(this->Version_1_0->at(index).GetPtr())){
 			CFilmSubstrateSpecificationObject *newObjectPtr = new CFilmSubstrateSpecificationObject();
-			static_cast<CFilmSubstrateSpecification&>(*newObjectPtr) = *val;
+			static_cast<CFilmSubstrateSpecification&>(*newObjectPtr) = *filmSubstrateSpecificationVal;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
@@ -5324,20 +5324,20 @@ void CSubstrateSpecificationDocumentObjectList::append(QVariant item)
 	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<CCardboardSubstrateSpecificationObject*>()){
-		CCardboardSubstrateSpecificationObject* val = item.value<CCardboardSubstrateSpecificationObject*>();
-		CCardboardSubstrateSpecification* newItemPtr = dynamic_cast<CCardboardSubstrateSpecification*>(val);
+		CCardboardSubstrateSpecificationObject* cardboardSubstrateSpecificationVal = item.value<CCardboardSubstrateSpecificationObject*>();
+		CCardboardSubstrateSpecification* newItemPtr = dynamic_cast<CCardboardSubstrateSpecification*>(cardboardSubstrateSpecificationVal);
 		Version_1_0->append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	if (item.canConvert<CPaperSubstrateSpecificationObject*>()){
-		CPaperSubstrateSpecificationObject* val = item.value<CPaperSubstrateSpecificationObject*>();
-		CPaperSubstrateSpecification* newItemPtr = dynamic_cast<CPaperSubstrateSpecification*>(val);
+		CPaperSubstrateSpecificationObject* paperSubstrateSpecificationVal = item.value<CPaperSubstrateSpecificationObject*>();
+		CPaperSubstrateSpecification* newItemPtr = dynamic_cast<CPaperSubstrateSpecification*>(paperSubstrateSpecificationVal);
 		Version_1_0->append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	if (item.canConvert<CFilmSubstrateSpecificationObject*>()){
-		CFilmSubstrateSpecificationObject* val = item.value<CFilmSubstrateSpecificationObject*>();
-		CFilmSubstrateSpecification* newItemPtr = dynamic_cast<CFilmSubstrateSpecification*>(val);
+		CFilmSubstrateSpecificationObject* filmSubstrateSpecificationVal = item.value<CFilmSubstrateSpecificationObject*>();
+		CFilmSubstrateSpecification* newItemPtr = dynamic_cast<CFilmSubstrateSpecification*>(filmSubstrateSpecificationVal);
 		Version_1_0->append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
@@ -5354,18 +5354,18 @@ sdl::V1_0::substrate::CSubstrateSpecificationDocumentObjectList* CSubstrateSpeci
 		QVariant item = this->getData("item", i);
 
 		if (item.canConvert<CCardboardSubstrateSpecificationObject*>()){
-			CCardboardSubstrateSpecificationObject* val = item.value<CCardboardSubstrateSpecificationObject*>();
-			objectListPtr->addElement(QVariant::fromValue(val->copyMe()));
+			CCardboardSubstrateSpecificationObject* cardboardSubstrateSpecificationVal = item.value<CCardboardSubstrateSpecificationObject*>();
+			objectListPtr->addElement(QVariant::fromValue(cardboardSubstrateSpecificationVal->copyMe()));
 		}
 
 		if (item.canConvert<CPaperSubstrateSpecificationObject*>()){
-			CPaperSubstrateSpecificationObject* val = item.value<CPaperSubstrateSpecificationObject*>();
-			objectListPtr->addElement(QVariant::fromValue(val->copyMe()));
+			CPaperSubstrateSpecificationObject* paperSubstrateSpecificationVal = item.value<CPaperSubstrateSpecificationObject*>();
+			objectListPtr->addElement(QVariant::fromValue(paperSubstrateSpecificationVal->copyMe()));
 		}
 
 		if (item.canConvert<CFilmSubstrateSpecificationObject*>()){
-			CFilmSubstrateSpecificationObject* val = item.value<CFilmSubstrateSpecificationObject*>();
-			objectListPtr->addElement(QVariant::fromValue(val->copyMe()));
+			CFilmSubstrateSpecificationObject* filmSubstrateSpecificationVal = item.value<CFilmSubstrateSpecificationObject*>();
+			objectListPtr->addElement(QVariant::fromValue(filmSubstrateSpecificationVal->copyMe()));
 		}
 	}
 	return objectListPtr;
@@ -5384,18 +5384,18 @@ QString CSubstrateSpecificationDocumentObjectList::toJson()
 		QVariant item = this->getData("item", i);
 
 		if (item.canConvert<CCardboardSubstrateSpecificationObject*>()){
-			CCardboardSubstrateSpecificationObject* val = item.value<CCardboardSubstrateSpecificationObject*>();
-			retVal += val->toJson();
+			CCardboardSubstrateSpecificationObject* cardboardSubstrateSpecificationVal = item.value<CCardboardSubstrateSpecificationObject*>();
+			retVal += cardboardSubstrateSpecificationVal->toJson();
 		}
 
 		if (item.canConvert<CPaperSubstrateSpecificationObject*>()){
-			CPaperSubstrateSpecificationObject* val = item.value<CPaperSubstrateSpecificationObject*>();
-			retVal += val->toJson();
+			CPaperSubstrateSpecificationObject* paperSubstrateSpecificationVal = item.value<CPaperSubstrateSpecificationObject*>();
+			retVal += paperSubstrateSpecificationVal->toJson();
 		}
 
 		if (item.canConvert<CFilmSubstrateSpecificationObject*>()){
-			CFilmSubstrateSpecificationObject* val = item.value<CFilmSubstrateSpecificationObject*>();
-			retVal += val->toJson();
+			CFilmSubstrateSpecificationObject* filmSubstrateSpecificationVal = item.value<CFilmSubstrateSpecificationObject*>();
+			retVal += filmSubstrateSpecificationVal->toJson();
 		}
 	}
 
@@ -5417,18 +5417,18 @@ QString CSubstrateSpecificationDocumentObjectList::toGraphQL()
 		QVariant item = this->getData("item", i);
 
 		if (item.canConvert<CCardboardSubstrateSpecificationObject*>()){
-			CCardboardSubstrateSpecificationObject* val = item.value<CCardboardSubstrateSpecificationObject*>();
-			retVal += val->toGraphQL();
+			CCardboardSubstrateSpecificationObject* cardboardSubstrateSpecificationVal = item.value<CCardboardSubstrateSpecificationObject*>();
+			retVal += cardboardSubstrateSpecificationVal->toGraphQL();
 		}
 
 		if (item.canConvert<CPaperSubstrateSpecificationObject*>()){
-			CPaperSubstrateSpecificationObject* val = item.value<CPaperSubstrateSpecificationObject*>();
-			retVal += val->toGraphQL();
+			CPaperSubstrateSpecificationObject* paperSubstrateSpecificationVal = item.value<CPaperSubstrateSpecificationObject*>();
+			retVal += paperSubstrateSpecificationVal->toGraphQL();
 		}
 
 		if (item.canConvert<CFilmSubstrateSpecificationObject*>()){
-			CFilmSubstrateSpecificationObject* val = item.value<CFilmSubstrateSpecificationObject*>();
-			retVal += val->toGraphQL();
+			CFilmSubstrateSpecificationObject* filmSubstrateSpecificationVal = item.value<CFilmSubstrateSpecificationObject*>();
+			retVal += filmSubstrateSpecificationVal->toGraphQL();
 		}
 	}
 
@@ -5481,20 +5481,20 @@ void CSubstrateSpecificationDocumentObjectList::insert(int index, QVariant item)
 	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<CCardboardSubstrateSpecificationObject*>()){
-		CCardboardSubstrateSpecificationObject* val = item.value<CCardboardSubstrateSpecificationObject*>();
-		CCardboardSubstrateSpecification* newItemPtr = dynamic_cast<CCardboardSubstrateSpecification*>(val);
+		CCardboardSubstrateSpecificationObject* cardboardSubstrateSpecificationVal = item.value<CCardboardSubstrateSpecificationObject*>();
+		CCardboardSubstrateSpecification* newItemPtr = dynamic_cast<CCardboardSubstrateSpecification*>(cardboardSubstrateSpecificationVal);
 		Version_1_0->append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	if (item.canConvert<CPaperSubstrateSpecificationObject*>()){
-		CPaperSubstrateSpecificationObject* val = item.value<CPaperSubstrateSpecificationObject*>();
-		CPaperSubstrateSpecification* newItemPtr = dynamic_cast<CPaperSubstrateSpecification*>(val);
+		CPaperSubstrateSpecificationObject* paperSubstrateSpecificationVal = item.value<CPaperSubstrateSpecificationObject*>();
+		CPaperSubstrateSpecification* newItemPtr = dynamic_cast<CPaperSubstrateSpecification*>(paperSubstrateSpecificationVal);
 		Version_1_0->append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	if (item.canConvert<CFilmSubstrateSpecificationObject*>()){
-		CFilmSubstrateSpecificationObject* val = item.value<CFilmSubstrateSpecificationObject*>();
-		CFilmSubstrateSpecification* newItemPtr = dynamic_cast<CFilmSubstrateSpecification*>(val);
+		CFilmSubstrateSpecificationObject* filmSubstrateSpecificationVal = item.value<CFilmSubstrateSpecificationObject*>();
+		CFilmSubstrateSpecification* newItemPtr = dynamic_cast<CFilmSubstrateSpecification*>(filmSubstrateSpecificationVal);
 		Version_1_0->append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 

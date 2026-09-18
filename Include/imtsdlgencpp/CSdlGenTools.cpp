@@ -643,4 +643,10 @@ std::shared_ptr<imtsdl::CSdlEntryBase> CSdlGenTools::GetCollectionReferenceForDo
 }
 
 
+QString CSdlGenTools::GetValueVariableName(const QString& sdlTypeName)
+{
+	return imtsdl::CSdlTools::GetDecapitalizedValue(sdlTypeName) + QStringLiteral("Val");
+}
+
+
 } // namespace imtsdlgencpp
