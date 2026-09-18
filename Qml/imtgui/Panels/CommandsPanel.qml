@@ -181,6 +181,7 @@ Item {
 	
 	ToolButton {
 		id: button;
+		objectName: "MoreCommandsButton"
 		anchors.verticalCenter: parent.verticalCenter;
 		anchors.right: parent.right;
 		width: visible ? Style.controlHeightM : 0;

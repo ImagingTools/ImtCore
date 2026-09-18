@@ -58,6 +58,7 @@ Item {
 	}
 
 	BaseText {
+		objectName: "CellText"
 		anchors.left: parent.left
 		anchors.leftMargin: cell.textInset
 		anchors.right: parent.right

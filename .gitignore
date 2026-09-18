@@ -151,3 +151,7 @@ $RECYCLE.BIN/
 *.imtsdl
 *.imtsdlgencpp
 *.imtsdlgenqml
+
+# GuiTestKit is a JS package - its lib/ is source, not build output (the Lib/ rule above
+# matches it case-insensitively on Windows).
+!Tests/GuiTestKit/lib/
