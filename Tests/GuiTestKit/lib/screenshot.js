@@ -125,6 +125,12 @@ async function addMask(page, maskParams) {
   if (!rect) throw new Error('mask must specify either { path } or { x, y, width, height }');
 
   const pad = maskParams.padding || 0;
+  // fixedWidth/fixedHeight pin the mask to a size that is the same on every run, unlike rect.width/
+  // height which is only as wide as the masked element's CURRENT content (e.g. a text label with no
+  // explicit width). A tight mask bakes in whatever size happened to be true when the baseline was
+  // captured, so a later run whose content renders a different width leaves a boundary sliver exposed.
+  const width = maskParams.fixedWidth !== undefined ? maskParams.fixedWidth : rect.width + pad * 2;
+  const height = maskParams.fixedHeight !== undefined ? maskParams.fixedHeight : rect.height + pad * 2;
   const id = `pw-mask-${++maskSeq}`;
   await page.evaluate(
     ({ id, x, y, width, height }) => {
@@ -142,7 +148,7 @@ async function addMask(page, maskParams) {
       mask.setAttribute('data-mask-id', id);
       document.body.appendChild(mask);
     },
-    { id, x: rect.x - pad, y: rect.y - pad, width: rect.width + pad * 2, height: rect.height + pad * 2 }
+    { id, x: rect.x - pad, y: rect.y - pad, width, height }
   );
   return id;
 }
@@ -160,15 +166,18 @@ async function removeMask(page, id) {
  * @param {import('@playwright/test').Page} page
  * @param {string} objectNamePrefix
  * @param {number} [padding]
+ * @param {number} [fixedWidth]  pin the mask to this width instead of the element's own (variable)
+ *   rendered width - needed for content whose text width isn't stable run to run (e.g. an unpadded
+ *   day-of-month), so the mask doesn't leave a different-sized sliver exposed each time.
  */
-async function masksForPrefix(page, objectNamePrefix, padding = 3) {
+async function masksForPrefix(page, objectNamePrefix, padding = 3, fixedWidth) {
   const rects = await page.evaluate((prefix) => {
     return Array.from(document.querySelectorAll(`[objectName^="${prefix}"][visible]`))
       .map((el) => el.getBoundingClientRect())
       .filter((r) => r.width > 0 && r.height > 0)
       .map((r) => ({ x: r.x, y: r.y, width: r.width, height: r.height }));
   }, objectNamePrefix);
-  return rects.map((r) => ({ ...r, padding }));
+  return rects.map((r) => ({ ...r, padding, ...(fixedWidth !== undefined ? { fixedWidth } : {}) }));
 }
 
 module.exports = {
