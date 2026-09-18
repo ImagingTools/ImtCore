@@ -25,6 +25,7 @@ private Q_SLOTS:
 	void TestComplexCollectionFilter();
 	void TestUnion();
 	void TestComplexUnion();
+	void TestNestedFieldNameCollision();
 	void PrinterTest();
 	void SubstrateSpecifications();
 
