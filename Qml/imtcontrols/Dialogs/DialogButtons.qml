@@ -59,6 +59,7 @@ Item {
                 id: buttonContainer;
                 enabled: model.enabled;
                 focus: model.active !==undefined ? model.active: false;
+				activeFocus: model.active !==undefined ? model.active: false;
                 text: model.name;
 				widthFromDecorator: true;
 				decorator: Component {
@@ -71,7 +72,7 @@ Item {
 						// the dialog chrome behind it.
 						color: !baseElement ? "transparent" :
 							!baseElement.enabled ? Style.alternateBaseColor :
-							baseElement.down || baseElement.checked ? Style.selectedColor :
+							baseElement.down || baseElement.checked || baseElement.focus ? Style.selectedColor :
 							baseElement.hovered ? Style.alternateBaseColor :
 							Style.baseColor;
 					}
