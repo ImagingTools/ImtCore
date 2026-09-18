@@ -245,7 +245,7 @@ CMessagesReader::EventContainerPtr CMessagesReader::ImportContainer(const QStrin
 	containerPtr.SetPtr(new CEventContainer);
 	if (!containerPtr->Serialize(xmlArchive)){
 		containerPtr.Reset();
-		SendErrorMessage(QT_TR_NOOP(QString("Unable to deserialize history container \"%1\". History container skipped").arg(containerPath)));
+		SendErrorMessage(QT_TR_NOOP(QStringLiteral("Unable to deserialize history container \"%1\". History container skipped").arg(containerPath)));
 	}
 
 	if (QDir(tempDir).exists()){

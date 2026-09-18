@@ -41,7 +41,7 @@ bool CNumericParamSummaryRepresentationControllerComp::CreateSummaryRepresentati
 				}
 			}
 
-			retVal += QString("%1%2").arg(vars[i]).arg(units) + ", ";
+			retVal += QStringLiteral("%1%2").arg(QString::number(vars[i]), units) + QStringLiteral(", ");
 		}
 
 		retVal.chop(2);

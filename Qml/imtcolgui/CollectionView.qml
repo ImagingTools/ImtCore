@@ -48,6 +48,7 @@ Item {
 	property bool commandsPanelVisible: true
 	property bool loadingDataAfterHeadersReceived: true
 	property bool backgroundUpdatesEnabled: false
+	property int loadingIndicatorDelay: 0
 
 	property alias canResetFilters: container.canResetFilters;
 	property int metaInfoWidth: Style.sizeHintXXS;
@@ -293,10 +294,16 @@ Item {
 			target: container.dataController;
 			
 			function onBeginUpdate(){
-				container.loading.start();
+				container.updating = true;
+
+				loadingIndicatorDelayTimer.restart()
 			}
-			
+
 			function onEndUpdate(){
+				container.updating = false;
+				container.contentLoaded = true;
+
+				loadingIndicatorDelayTimer.stop()
 				container.loading.stop();
 
 				if(root.visibleMetaInfo ){
@@ -343,6 +350,11 @@ Item {
 				if (root.loadingDataAfterHeadersReceived){
 					container.doUpdateGui()
 				}
+				else{
+					container.updating = false;
+					loadingIndicatorDelayTimer.stop()
+					container.loading.stop();
+				}
 			}
 
 			function onElementsReceived(elements){
@@ -370,6 +382,18 @@ Item {
 					let pagesCount = notificationModel.getData("pagesCount")
 					container.pagination.pagesSize = pagesCount;
 				}
+			}
+		}
+
+		Timer {
+			id: loadingIndicatorDelayTimer
+			// Zero before the first load so the indicator appears at once, but only on
+			// the next tick - the view may still be unsized while the request goes out.
+			interval: container.contentLoaded ? root.loadingIndicatorDelay : 0
+			repeat: false
+
+			onTriggered: {
+				container.loading.start()
 			}
 		}
 		
@@ -495,16 +519,31 @@ Item {
 		}
 	}
 	
+	Rectangle {
+		id: metaInfoSeparator;
+
+		anchors.right: collectionMetaInfo.left;
+		anchors.top: parent.top;
+		anchors.topMargin: container.viewContentY
+		anchors.bottom: parent.bottom;
+
+		width: 1;
+		color: Style.borderColor;
+		opacity: 0.5;
+
+		visible: root.visibleMetaInfo;
+	}
+
 	MetaInfo {
 		id: collectionMetaInfo;
-		
+
 		anchors.top: parent.top;
 		anchors.topMargin: container.viewContentY
 		anchors.right: parent.right;
-		
+
 		width: visible ? root.metaInfoWidth : 0;
 		height: parent.height;
-		
+
 		visible: root.visibleMetaInfo;
 	}
 	
@@ -532,8 +571,6 @@ Item {
 			text: qsTr("Please select an item for showing additional informations");
 		}
 	}
-
-
 }
 
 

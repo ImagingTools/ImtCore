@@ -31,6 +31,16 @@ QString CApplicationInfoDelegatorComp::GetApplicationAttribute(int attributeId, 
 }
 
 
+ibase::IApplicationInfo::VersionKind CApplicationInfoDelegatorComp::GetVersionKind() const
+{
+	if (m_applicationInfoCompPtr.IsValid()){
+		return m_applicationInfoCompPtr->GetVersionKind();
+	}
+
+	return VK_DEVELOPER;
+}
+
+
 int CApplicationInfoDelegatorComp::GetMainVersionId() const
 {
 	if (m_applicationInfoCompPtr.IsValid()){

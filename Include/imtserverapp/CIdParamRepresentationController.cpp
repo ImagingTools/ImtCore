@@ -21,7 +21,7 @@ CIdParamRepresentationController::CIdParamRepresentationController(QByteArray mo
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CParamsSet>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CParamsSet>)
 
 QByteArray CIdParamRepresentationController::GetTypeId() const
 {

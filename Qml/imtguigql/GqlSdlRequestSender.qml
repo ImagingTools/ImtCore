@@ -1,7 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtcontrols 1.0
+import imtgui 1.0
 import imtguigql 1.0
 
 
@@ -31,6 +31,7 @@ GqlRequest {
 	
 	property string gqlCommandId;
 	property int requestType: 0; // 0 - Query, 1 - Mutation, 2 - Subscription
+	property string context
 	
 	/**
 		SDL object created from sdlObjectComp
@@ -52,11 +53,16 @@ GqlRequest {
 	}
 	
 	function onResult(data){
+		// A resolver that failed server-side (dead DB connection, unhandled exception)
+		// answers 200 with `data: { <command>: null }`. Routing that through onError()
+		// rather than returning silently is what keeps callers - which clear their
+		// `loading` flag in onError()/finished() - from waiting forever.
 		if (!data){
-			console.error("Unable to parse response. Response data is invalid");
+			console.warn("GraphQL request returned no data:", root.gqlCommandId);
+			root.onError(qsTr("The server returned no data. Please try again."), "");
 			return;
 		}
-		
+
 		if (sdlObjectComp){
 			sdlObject = sdlObjectComp.createObject(root)
 		}
@@ -75,16 +81,16 @@ GqlRequest {
 	
 	function onError(message, type){
 		if (type == "Critical"){
-			ModalDialogManager.showCriticalDialog(message);
+			PopupManager.addErrorMessage(message, true);
 		}
 		else if (type == "Warning"){
-			ModalDialogManager.showWarningDialog(message);
+			PopupManager.addWarningMessage(message, true);
 		}
 		else if (type == "Info"){
-			ModalDialogManager.showInfoDialog(message);
+			PopupManager.addInfoMessage(message, true);
 		}
 		else if (type == "Error"){
-			ModalDialogManager.showErrorDialog(message);
+			PopupManager.addErrorMessage(message, true);
 		}
 		
 		root.finished(-1);
@@ -140,7 +146,11 @@ GqlRequest {
 			query.AddField(requestedFields);
 		}
 		
-		root.setGqlQuery(query.GetQuery(), root.getHeaders());
+		let headers = root.getHeaders()
+		if (headers && root.context && root.context != "")
+			headers["context"] = root.context
+
+		root.setGqlQuery(query.GetQuery(), headers)
 	}
 	
 	function createQueryParams(query){
@@ -153,7 +163,19 @@ GqlRequest {
 
 	onStateChanged: {
 		if (state === "Error"){
-			root.onError(qsTr("Network error"), "Critical");
+			// Transport-level failure (server unreachable, 5xx, empty body). Passing
+			// no type deliberately opens no modal: this state is now reached by every
+			// failed request, including startup polling and background refreshes, and
+			// a critical dialog per attempt would bury the UI. Senders that care
+			// override onError(); everyone else still gets finished(-1).
+			console.warn("GraphQL request failed:", root.gqlCommandId);
+			root.onError(qsTr("Network error"), "");
+		}
+		else if (state === "Unauthorized" || state === "Forbidden"){
+			// Auth recovery is owned by XmlHttpRequestProxy / AuthorizationController
+			// (refresh + retry). Do not open a modal for every 401/403, but complete
+			// the request so callers waiting on finished() are not stuck forever.
+			root.finished(-1);
 		}
 		else if (state === "Ready"){
 			let responseObj = null
@@ -199,9 +221,13 @@ GqlRequest {
 			
 			if ("data" in responseObj){
 				let dataObject = responseObj["data"];
-				let itemObject = dataObject[root.gqlCommandId];
-				
+				let itemObject = dataObject ? dataObject[root.gqlCommandId] : null;
+
 				root.onResult(itemObject);
+			}
+			else{
+				// 200 with neither "data" nor "errors" is still a terminal outcome.
+				root.onResult(null);
 			}
 		}
 	}

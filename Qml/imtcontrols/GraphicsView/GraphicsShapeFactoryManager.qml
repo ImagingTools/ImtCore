@@ -9,7 +9,7 @@ QtObject {
 	id: factoryManager
 
 	property Item graphicsViewItem: null
-	property BaseModel sdlShapeModel: null
+	property var sdlShapeModel: null
 
 	property Component textShapeComp: Component{TextShape{}}
 	property Component imageShapeComp: Component{ImageShape2d{}}
@@ -112,6 +112,19 @@ QtObject {
 
 				let point1 = Qt.point(topLeft.m_x , topLeft.m_y )
 				let point2 = Qt.point(bottomRight.m_x , bottomRight.m_y)
+
+				if(fontFamily == undefined){
+					 fontFamily = Style.fontFamily
+				}
+				if(fontSize == undefined){
+					fontSize = Style.fontSizeM
+				}
+				if(fillStyle == undefined){
+					fillStyle = Style.textColor
+				}
+				if(strokeStyle == undefined){
+					strokeStyle = Style.textColor
+				}
 
 				textObj.points = [point1, point2]
 				textObj.fontFamily = fontFamily
@@ -217,7 +230,7 @@ QtObject {
 			function createQmlShape(shapeItemArg, layerArg) {
 				let lineObj = qmlShapeComp.createObject(factoryManager)
 
-				let line = shapeItemArg.m_line
+				let line = shapeItemArg.m_polyline2d
 				let points__ = line.m_points
 				let arr = []
 				for(let i = 0; i < points__.count; i++){
@@ -228,9 +241,10 @@ QtObject {
 
 				lineObj.points = arr;
 
-				lineObj.color = shapeItemArg.m_painter.m_fill.m_color.m_color
-				lineObj.penAlpha = shapeItemArg.m_painter.m_stroke.m_alpha/255
-				lineObj.lineWidht = shapeItemArg.m_painter.m_stroke.m_width
+				let stroke = shapeItemArg.m_painter.m_stroke
+				lineObj.color = stroke.m_color && stroke.m_color.m_color ? stroke.m_color.m_color : 'black'
+				lineObj.penAlpha = stroke.m_alpha ? stroke.m_alpha/255 : 1
+				lineObj.lineWidth = stroke.m_width ? stroke.m_width : 1
 				layerArg.addShape(lineObj)
 			}
 		}
@@ -251,7 +265,7 @@ QtObject {
 
 				lineObj.color = shapeItemArg.m_painter.m_fill.m_color.m_color
 				lineObj.penAlpha = shapeItemArg.m_painter.m_stroke.m_alpha/255
-				lineObj.lineWidht = shapeItemArg.m_painter.m_stroke.m_width
+				lineObj.lineWidth = shapeItemArg.m_painter.m_stroke.m_width
 				layerArg.addShape(lineObj)
 			}
 		}

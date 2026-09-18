@@ -4,7 +4,6 @@
 
 // Qt includes
 #include <QtCore/QObject>
-#include <QtCore/QPointer>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -34,15 +33,13 @@ namespace imtclientgql
 	is a drop-in replacement in partitura files when the async transport
 	is desired.
 
-	The response handler is invoked on this component's QObject thread
-	(the thread of the owned \c QNetworkAccessManager).
+	The future is completed on this component's QObject thread (the thread
+	of the owned \c QNetworkAccessManager).
 */
 class CAsyncApiClientComp:
-			public QObject,
 			public ilog::CLoggerComponentBase,
 			virtual public IAsyncGqlClient
 {
-	Q_OBJECT
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
@@ -56,23 +53,28 @@ public:
 	virtual ~CAsyncApiClientComp();
 
 	// reimplemented (IAsyncGqlClient)
-	virtual IAsyncGqlRequestTokenPtr SendRequest(
+	virtual QFuture<GqlResult> SendRequest(
 				GqlRequestPtr requestPtr,
-				IAsyncGqlResponseHandler* handlerPtr,
 				imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 private:
+	void SendRequestInternal(
+			std::shared_ptr<QPromise<GqlResult>> promisePtr,
+			GqlRequestPtr requestPtr,
+			const QNetworkRequest& networkRequest) const;
+
 	I_REF(imtclientgql::IClientProtocolEngine, m_protocolEngineCompPtr);
 	I_ATTR(double, m_timeoutAttrPtr);
 
-	int m_timeout;
-	mutable QNetworkAccessManager* m_networkManagerPtr;
+	int m_timeout = 30000; // milliseconds
+	QThread* m_thread = nullptr;
+	QNetworkAccessManager* m_networkManager = nullptr;
 };
 
 
 } // namespace imtclientgql
-

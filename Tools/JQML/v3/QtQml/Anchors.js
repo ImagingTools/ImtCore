@@ -23,8 +23,8 @@ class Anchors extends GroupProperty {
         rightMargin: { type: Real, value: 0},
         bottomMargin: { type: Real, value: 0},
         margins: { type: Real, value: 0},
-        // horizontalCenterOffset: { type: real, value: 0},
-        // verticalCenterOffset: { type: real, value: 0},
+        horizontalCenterOffset: { type: Real, value: 0},
+        verticalCenterOffset: { type: Real, value: 0},
 
         fillChanged: {type:Signal, args:[]},
         centerInChanged: {type:Signal, args:[]},
@@ -43,6 +43,8 @@ class Anchors extends GroupProperty {
         verticalCenterChanged: {type:Signal, args:[]},
 
         marginsChanged: {type:Signal, args:[]},
+        horizontalCenterOffsetChanged: {type:Signal, args:[]},
+        verticalCenterOffsetChanged: {type:Signal, args:[]}
     }
 
     SLOT_fillChanged(oldValue, newValue){
@@ -95,19 +97,19 @@ class Anchors extends GroupProperty {
 
             if(self.parent === target){
                 if(targetFloat === AnchorLine.Left){
-                    self.AX = ()=>{return -self.AWidth / 2}
+                    self.AX = ()=>{return -self.AWidth / 2 + this.__proxy.horizontalCenterOffset}
                 } else if(targetFloat === AnchorLine.Right){
-                    self.AX = ()=>{return target.AWidth - self.AWidth / 2}
+                    self.AX = ()=>{return target.AWidth - self.AWidth / 2 + this.__proxy.horizontalCenterOffset}
                 } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.AX = ()=>{return target.AWidth / 2 - self.AWidth / 2}
+                    self.AX = ()=>{return target.AWidth / 2 - self.AWidth / 2 + this.__proxy.horizontalCenterOffset}
                 }
             } else {
                 if(targetFloat === AnchorLine.Left){
-                    self.AX = ()=>{return target.AX - self.AWidth / 2}
+                    self.AX = ()=>{return target.AX - self.AWidth / 2 + this.__proxy.horizontalCenterOffset}
                 } else if(targetFloat === AnchorLine.Right){
-                    self.AX = ()=>{return target.AX + target.AWidth - self.AWidth / 2}
+                    self.AX = ()=>{return target.AX + target.AWidth - self.AWidth / 2 + this.__proxy.horizontalCenterOffset}
                 } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.AX = ()=>{return target.AX + target.AWidth / 2 - self.AWidth / 2}
+                    self.AX = ()=>{return target.AX + target.AWidth / 2 - self.AWidth / 2 + this.__proxy.horizontalCenterOffset}
                 }
             }
         }
@@ -123,19 +125,19 @@ class Anchors extends GroupProperty {
 
             if(self.parent === target){
                 if(targetFloat === AnchorLine.Top){
-                    self.AY = ()=>{return -self.AHeight / 2}
+                    self.AY = ()=>{return -self.AHeight / 2 + this.__proxy.verticalCenterOffset}
                 } else if(targetFloat === AnchorLine.Bottom){
-                    self.AY = ()=>{return target.AHeight - self.AHeight / 2}
+                    self.AY = ()=>{return target.AHeight - self.AHeight / 2 + this.__proxy.verticalCenterOffset}
                 } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.AY = ()=>{return target.AHeight / 2 - self.AHeight / 2}
+                    self.AY = ()=>{return target.AHeight / 2 - self.AHeight / 2 + this.__proxy.verticalCenterOffset}
                 }
             } else {
                 if(targetFloat === AnchorLine.Top){
-                    self.AY = ()=>{return target.AY - self.AHeight / 2}
+                    self.AY = ()=>{return target.AY - self.AHeight / 2 + this.__proxy.verticalCenterOffset}
                 } else if(targetFloat === AnchorLine.Bottom){
-                    self.AY = ()=>{return target.AY + target.AHeight - self.AHeight / 2}
+                    self.AY = ()=>{return target.AY + target.AHeight - self.AHeight / 2 + this.__proxy.verticalCenterOffset}
                 } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.AY = ()=>{return target.AY + target.AHeight / 2 - self.AHeight / 2}
+                    self.AY = ()=>{return target.AY + target.AHeight / 2 - self.AHeight / 2 + this.__proxy.verticalCenterOffset}
                 }               
             }
         }

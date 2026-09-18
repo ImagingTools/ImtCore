@@ -29,6 +29,7 @@ class GqlModel extends TreeItemModel {
         this.state = "Loading"
         let xhr = new XMLHttpRequest
         xhr.open("POST", "../../graphql")
+        xhr.gqlRequest = this
 
         if(headers && typeof headers === 'object'){
             for(let name in headers){

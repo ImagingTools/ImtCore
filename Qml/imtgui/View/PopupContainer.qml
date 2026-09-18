@@ -7,7 +7,8 @@ import imtcontrols 1.0
 Item {
 	id: popupContainer
 
-	width: Style.sizeHintXS
+	width: Style.sizeHintS
+	z: 10000
 
 	property int autoCloseInterval: 5000
 	property int maxPopupCount: 5
@@ -28,65 +29,135 @@ Item {
 			property bool closable: false
 			property var popupContainer: null
 
-			width: parent ? parent.width : Style.sizeHintXS
-			height: Style.sizeHintBXS
-			color: messageType === "error" ? "#ffcccc" : messageType === "warning" ? "#fff4cc" : messageType === "info" ? "#cce5ff" : "#ccffcc"
-			radius: Style.radiusM
-			border.color: Style.borderColor2
+			readonly property string accentColor: messageType === "error" ? Style.popupErrorAccentColor
+					: messageType === "warning" ? Style.popupWarningAccentColor
+					: messageType === "success" ? Style.popupSuccessAccentColor
+					: Style.popupInfoAccentColor
 
-			Item {
-				id: iconItem
-				width: 50
-				height: parent.height
+			readonly property string panelColor: messageType === "error" ? Style.popupErrorBackgroundColor
+					: messageType === "warning" ? Style.popupWarningBackgroundColor
+					: messageType === "success" ? Style.popupSuccessBackgroundColor
+					: Style.popupInfoBackgroundColor
 
-				Image {
-					id: icon
-					anchors.centerIn: parent
-					width: Style.iconSizeM
-					height: width
-					sourceSize.height: height
-					sourceSize.width: width
-					source: defaultDelegateRoot.messageType === "warning" ? "../../../" + Style.getIconPath("Icons/Alert", Icon.State.On, Icon.Mode.Normal) :
-							defaultDelegateRoot.messageType === "error" ? "../../../" + Style.getIconPath("Icons/Error", Icon.State.On, Icon.Mode.Normal) :
-							defaultDelegateRoot.messageType === "success" ? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal) :
-							defaultDelegateRoot.messageType === "info" ? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal) : ""
-				}
+			readonly property string iconSource: messageType === "warning"
+					? "../../../" + Style.getIconPath("Icons/Alert", Icon.State.On, Icon.Mode.Normal)
+					: messageType === "error"
+					? "../../../" + Style.getIconPath("Icons/Error", Icon.State.On, Icon.Mode.Normal)
+					: messageType === "success"
+					? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
+					: messageType === "info"
+					? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
+					: ""
+
+			width: parent ? parent.width : Style.sizeHintS
+			height: Math.max(Style.sizeHintBXS, contentRow.height + 2 * Style.marginL)
+			radius: Style.radiusM + 2
+			color: defaultDelegateRoot.panelColor
+			border.width: 1
+			border.color: Style.borderColor
+			clip: true
+
+			opacity: 0
+			x: 24
+
+			Component.onCompleted: {
+				enterOpacity.start()
+				enterX.start()
 			}
 
-			BaseText {
-				id: messageTextItem
-				anchors.verticalCenter: parent.verticalCenter
-				anchors.left: iconItem.right
-				anchors.right: closeArea.left
-				anchors.rightMargin: Style.marginM
-				text: defaultDelegateRoot.messageText
-				wrapMode: Text.WordWrap
+			NumberAnimation {
+				id: enterOpacity
+				target: defaultDelegateRoot
+				property: "opacity"
+				from: 0
+				to: 1
+				duration: 200
+			}
+
+			NumberAnimation {
+				id: enterX
+				target: defaultDelegateRoot
+				property: "x"
+				from: 24
+				to: 0
+				duration: 200
 			}
 
 			Rectangle {
-				id: closeArea
-				anchors.right: parent.right
+				id: accentRail
+				anchors.left: parent.left
 				anchors.top: parent.top
-				anchors.margins: Style.marginS
-				width: 24
-				height: 24
-				radius: 12
-				color: closeMouseArea.containsMouse ? "#dddddd" : "transparent"
+				anchors.bottom: parent.bottom
+				width: 4
+				color: defaultDelegateRoot.accentColor
+			}
 
-				BaseText {
-					anchors.centerIn: parent
-					text: "✕"
-					font.pixelSize: 14
+			Row {
+				id: contentRow
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.leftMargin: Style.marginL + accentRail.width
+				anchors.rightMargin: Style.marginS
+				spacing: Style.marginM
+
+				Item {
+					id: iconArea
+					width: Style.iconSizeMedium
+					height: Style.iconSizeMedium
+					anchors.verticalCenter: parent.verticalCenter
+
+					Rectangle {
+						anchors.fill: parent
+						radius: width / 2
+						color: defaultDelegateRoot.accentColor
+						opacity: Style.popupIconChipOpacity
+					}
+
+					Image {
+						anchors.centerIn: parent
+						width: Style.iconSizeM
+						height: width
+						sourceSize.height: height
+						sourceSize.width: width
+						source: defaultDelegateRoot.iconSource
+					}
 				}
 
-				MouseArea {
-					id: closeMouseArea
-					anchors.fill: parent
-					hoverEnabled: true
-					cursorShape: Qt.PointingHandCursor
-					onClicked: {
-						if (defaultDelegateRoot.popupContainer){
-							defaultDelegateRoot.popupContainer.removeMessageById(defaultDelegateRoot.messageId)
+				BaseText {
+					id: messageTextItem
+					width: Math.max(0, contentRow.width - iconArea.width - closeButton.width - 2 * contentRow.spacing)
+					anchors.verticalCenter: parent.verticalCenter
+					text: defaultDelegateRoot.messageText
+					wrapMode: Text.WordWrap
+					color: Style.textColor
+					font.pixelSize: Style.fontSizeNormal
+				}
+
+				Rectangle {
+					id: closeButton
+					width: 28
+					height: 28
+					radius: 14
+					anchors.verticalCenter: parent.verticalCenter
+					color: closeMouseArea.containsMouse ? Style.popupCloseHoverColor : Style.popupCloseIdleColor
+
+					BaseText {
+						anchors.centerIn: parent
+						text: "✕"
+						font.pixelSize: Style.fontSizeSmall
+						color: Style.subtitleColor
+					}
+
+					MouseArea {
+						id: closeMouseArea
+						anchors.fill: parent
+						hoverEnabled: true
+						cursorShape: Qt.PointingHandCursor
+						onClicked: {
+							if (defaultDelegateRoot.popupContainer){
+								defaultDelegateRoot.popupContainer.removeMessageById(defaultDelegateRoot.messageId)
+							}
 						}
 					}
 				}
@@ -141,7 +212,6 @@ Item {
 						if (item.hasOwnProperty("popupContainer"))
 							item.popupContainer = popupContainer
 
-						// Inject extra custom properties from addCustomMessage
 						var extra = popupContainer.__customProperties[model.id]
 						if (extra){
 							var keys = Object.keys(extra)
@@ -272,4 +342,3 @@ Item {
 		__customProperties = {}
 	}
 }
-

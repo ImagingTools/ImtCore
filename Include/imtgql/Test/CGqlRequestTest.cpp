@@ -646,13 +646,13 @@ void CGqlRequestTest::ParseQueryWithOperationName()
 	const imtgql::CGqlParamObject* inputPtr = vars.GetParamArgumentObjectPtr("input");
 	QVERIFY(inputPtr != nullptr);
 	QCOMPARE(inputPtr->GetParamArgumentValue("id").toString(),
-			 QString("X-Rite i1Pro 2 SN-Virtual-1234#Agent-2"));
+			 QStringLiteral("X-Rite i1Pro 2 SN-Virtual-1234#Agent-2"));
 
 	// // Objects
 	const imtgql::CGqlParamObject* rootInput = request.GetParamObject("input");
 	QVERIFY(rootInput != nullptr);
 	QCOMPARE(rootInput->GetParamArgumentValue("id").toString(),
-			 QString("X-Rite i1Pro 2 SN-Virtual-1234#Agent-2"));
+			 QStringLiteral("X-Rite i1Pro 2 SN-Virtual-1234#Agent-2"));
 }
 
 

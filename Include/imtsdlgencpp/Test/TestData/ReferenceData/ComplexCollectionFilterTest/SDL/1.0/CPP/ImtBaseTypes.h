@@ -606,6 +606,7 @@ class CTimeRangeObjectList;
 class CTimeRangeObject: public ::imtbase::CItemModelBase, public CTimeRange
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_begin READ GetBegin WRITE SetBegin NOTIFY beginChanged)
 	Q_PROPERTY(QVariant m_end READ GetEnd WRITE SetEnd NOTIFY endChanged)
 
@@ -615,6 +616,7 @@ public:
 	CTimeRangeObject(QObject* parent = nullptr);
 
 	QVariant GetBegin();
+	QString Get__Typename() {return QStringLiteral("TimeRange");}
 	void SetBegin(const QVariant& v);
 	Q_INVOKABLE bool hasBegin();
 	QVariant GetEnd();
@@ -674,6 +676,7 @@ class CSdlSizeObjectList;
 class CSdlSizeObject: public ::imtbase::CItemModelBase, public CSdlSize
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_width READ GetWidth WRITE SetWidth NOTIFY widthChanged)
 	Q_PROPERTY(QVariant m_height READ GetHeight WRITE SetHeight NOTIFY heightChanged)
 
@@ -683,6 +686,7 @@ public:
 	CSdlSizeObject(QObject* parent = nullptr);
 
 	QVariant GetWidth();
+	QString Get__Typename() {return QStringLiteral("SdlSize");}
 	void SetWidth(const QVariant& v);
 	Q_INVOKABLE bool hasWidth();
 	QVariant GetHeight();
@@ -742,6 +746,7 @@ class CSdlPointObjectList;
 class CSdlPointObject: public ::imtbase::CItemModelBase, public CSdlPoint
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_x READ GetX WRITE SetX NOTIFY xChanged)
 	Q_PROPERTY(QVariant m_y READ GetY WRITE SetY NOTIFY yChanged)
 
@@ -751,6 +756,7 @@ public:
 	CSdlPointObject(QObject* parent = nullptr);
 
 	QVariant GetX();
+	QString Get__Typename() {return QStringLiteral("SdlPoint");}
 	void SetX(const QVariant& v);
 	Q_INVOKABLE bool hasX();
 	QVariant GetY();
@@ -810,6 +816,7 @@ class CParamTypeIdsObjectList;
 class CParamTypeIdsObject: public ::imtbase::CItemModelBase, public CParamTypeIds
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_urlParam READ GetUrlParam WRITE SetUrlParam NOTIFY urlParamChanged)
 	Q_PROPERTY(QVariant m_idParam READ GetIdParam WRITE SetIdParam NOTIFY idParamChanged)
 	Q_PROPERTY(QVariant m_textParam READ GetTextParam WRITE SetTextParam NOTIFY textParamChanged)
@@ -831,6 +838,7 @@ public:
 	CParamTypeIdsObject(QObject* parent = nullptr);
 
 	QVariant GetUrlParam();
+	QString Get__Typename() {return QStringLiteral("ParamTypeIds");}
 	void SetUrlParam(const QVariant& v);
 	Q_INVOKABLE bool hasUrlParam();
 	QVariant GetIdParam();
@@ -938,6 +946,7 @@ class CUrlParamObjectList;
 class CUrlParamObject: public ::imtbase::CItemModelBase, public CUrlParam
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_scheme READ GetScheme WRITE SetScheme NOTIFY schemeChanged)
 	Q_PROPERTY(QVariant m_host READ GetHost WRITE SetHost NOTIFY hostChanged)
 	Q_PROPERTY(QVariant m_port READ GetPort WRITE SetPort NOTIFY portChanged)
@@ -949,6 +958,7 @@ public:
 	CUrlParamObject(QObject* parent = nullptr);
 
 	QVariant GetScheme();
+	QString Get__Typename() {return QStringLiteral("UrlParam");}
 	void SetScheme(const QVariant& v);
 	Q_INVOKABLE bool hasScheme();
 	QVariant GetHost();
@@ -1016,6 +1026,7 @@ class CIdParamObjectList;
 class CIdParamObject: public ::imtbase::CItemModelBase, public CIdParam
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_id READ GetId WRITE SetId NOTIFY idChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
@@ -1024,6 +1035,7 @@ public:
 	CIdParamObject(QObject* parent = nullptr);
 
 	QVariant GetId();
+	QString Get__Typename() {return QStringLiteral("IdParam");}
 	void SetId(const QVariant& v);
 	Q_INVOKABLE bool hasId();
 	// CItemModelBase implemented
@@ -1079,6 +1091,7 @@ class CTextParamObjectList;
 class CTextParamObject: public ::imtbase::CItemModelBase, public CTextParam
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_text READ GetText WRITE SetText NOTIFY textChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
@@ -1087,6 +1100,7 @@ public:
 	CTextParamObject(QObject* parent = nullptr);
 
 	QVariant GetText();
+	QString Get__Typename() {return QStringLiteral("TextParam");}
 	void SetText(const QVariant& v);
 	Q_INVOKABLE bool hasText();
 	// CItemModelBase implemented
@@ -1142,6 +1156,7 @@ class CEnableableParamObjectList;
 class CEnableableParamObject: public ::imtbase::CItemModelBase, public CEnableableParam
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
@@ -1150,6 +1165,7 @@ public:
 	CEnableableParamObject(QObject* parent = nullptr);
 
 	QVariant GetValue();
+	QString Get__Typename() {return QStringLiteral("EnableableParam");}
 	void SetValue(const QVariant& v);
 	Q_INVOKABLE bool hasValue();
 	// CItemModelBase implemented
@@ -1205,6 +1221,7 @@ class CIntegerParamObjectList;
 class CIntegerParamObject: public ::imtbase::CItemModelBase, public CIntegerParam
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
@@ -1213,6 +1230,7 @@ public:
 	CIntegerParamObject(QObject* parent = nullptr);
 
 	QVariant GetValue();
+	QString Get__Typename() {return QStringLiteral("IntegerParam");}
 	void SetValue(const QVariant& v);
 	Q_INVOKABLE bool hasValue();
 	// CItemModelBase implemented
@@ -1268,6 +1286,7 @@ class CDoubleParamObjectList;
 class CDoubleParamObject: public ::imtbase::CItemModelBase, public CDoubleParam
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
@@ -1276,6 +1295,7 @@ public:
 	CDoubleParamObject(QObject* parent = nullptr);
 
 	QVariant GetValue();
+	QString Get__Typename() {return QStringLiteral("DoubleParam");}
 	void SetValue(const QVariant& v);
 	Q_INVOKABLE bool hasValue();
 	// CItemModelBase implemented
@@ -1331,6 +1351,7 @@ class COptionObjectList;
 class COptionObject: public ::imtbase::CItemModelBase, public COption
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_id READ GetId WRITE SetId NOTIFY idChanged)
 	Q_PROPERTY(QVariant m_name READ GetName WRITE SetName NOTIFY nameChanged)
 	Q_PROPERTY(QVariant m_description READ GetDescription WRITE SetDescription NOTIFY descriptionChanged)
@@ -1342,6 +1363,7 @@ public:
 	COptionObject(QObject* parent = nullptr);
 
 	QVariant GetId();
+	QString Get__Typename() {return QStringLiteral("Option");}
 	void SetId(const QVariant& v);
 	Q_INVOKABLE bool hasId();
 	QVariant GetName();
@@ -1409,6 +1431,7 @@ class COptionsListObjectList;
 class COptionsListObject: public ::imtbase::CItemModelBase, public COptionsList
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_totalCount READ GetTotalCount WRITE SetTotalCount NOTIFY totalCountChanged)
 	Q_PROPERTY(QVariant m_offset READ GetOffset WRITE SetOffset NOTIFY offsetChanged)
 	Q_PROPERTY(QVariant m_options READ GetOptions WRITE SetOptions NOTIFY optionsChanged)
@@ -1419,6 +1442,7 @@ public:
 	COptionsListObject(QObject* parent = nullptr);
 
 	QVariant GetTotalCount();
+	QString Get__Typename() {return QStringLiteral("OptionsList");}
 	void SetTotalCount(const QVariant& v);
 	Q_INVOKABLE bool hasTotalCount();
 	QVariant GetOffset();
@@ -1486,6 +1510,7 @@ class CSelectionParamObjectList;
 class CSelectionParamObject: public ::imtbase::CItemModelBase, public CSelectionParam
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_selectedIndex READ GetSelectedIndex WRITE SetSelectedIndex NOTIFY selectedIndexChanged)
 	Q_PROPERTY(QVariant m_constraints READ GetConstraints WRITE SetConstraints NOTIFY constraintsChanged)
 
@@ -1495,6 +1520,7 @@ public:
 	CSelectionParamObject(QObject* parent = nullptr);
 
 	QVariant GetSelectedIndex();
+	QString Get__Typename() {return QStringLiteral("SelectionParam");}
 	void SetSelectedIndex(const QVariant& v);
 	Q_INVOKABLE bool hasSelectedIndex();
 	QVariant GetConstraints();
@@ -1557,6 +1583,7 @@ class CSchedulerParamObjectList;
 class CSchedulerParamObject: public ::imtbase::CItemModelBase, public CSchedulerParam
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_startTime READ GetStartTime WRITE SetStartTime NOTIFY startTimeChanged)
 	Q_PROPERTY(QVariant m_interval READ GetInterval WRITE SetInterval NOTIFY intervalChanged)
 
@@ -1566,6 +1593,7 @@ public:
 	CSchedulerParamObject(QObject* parent = nullptr);
 
 	QVariant GetStartTime();
+	QString Get__Typename() {return QStringLiteral("SchedulerParam");}
 	void SetStartTime(const QVariant& v);
 	Q_INVOKABLE bool hasStartTime();
 	QVariant GetInterval();
@@ -1625,6 +1653,7 @@ class CBackupSettingsObjectList;
 class CBackupSettingsObject: public ::imtbase::CItemModelBase, public CBackupSettings
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_schedulerParam READ GetSchedulerParam WRITE SetSchedulerParam NOTIFY schedulerParamChanged)
 	Q_PROPERTY(QVariant m_folderPath READ GetFolderPath WRITE SetFolderPath NOTIFY folderPathChanged)
 
@@ -1634,6 +1663,7 @@ public:
 	CBackupSettingsObject(QObject* parent = nullptr);
 
 	QVariant GetSchedulerParam();
+	QString Get__Typename() {return QStringLiteral("BackupSettings");}
 	void SetSchedulerParam(const QVariant& v);
 	Q_INVOKABLE bool hasSchedulerParam();
 	Q_INVOKABLE void emplaceSchedulerParam();
@@ -1696,6 +1726,7 @@ class CDatabaseAccessSettingsObjectList;
 class CDatabaseAccessSettingsObject: public ::imtbase::CItemModelBase, public CDatabaseAccessSettings
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_dbName READ GetDbName WRITE SetDbName NOTIFY dbNameChanged)
 	Q_PROPERTY(QVariant m_host READ GetHost WRITE SetHost NOTIFY hostChanged)
 	Q_PROPERTY(QVariant m_port READ GetPort WRITE SetPort NOTIFY portChanged)
@@ -1709,6 +1740,7 @@ public:
 	CDatabaseAccessSettingsObject(QObject* parent = nullptr);
 
 	QVariant GetDbName();
+	QString Get__Typename() {return QStringLiteral("DatabaseAccessSettings");}
 	void SetDbName(const QVariant& v);
 	Q_INVOKABLE bool hasDbName();
 	QVariant GetHost();
@@ -1784,6 +1816,7 @@ class CFileNameParamObjectList;
 class CFileNameParamObject: public ::imtbase::CItemModelBase, public CFileNameParam
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_pathType READ GetPathType WRITE SetPathType NOTIFY pathTypeChanged)
 	Q_PROPERTY(QVariant m_path READ GetPath WRITE SetPath NOTIFY pathChanged)
 
@@ -1793,6 +1826,7 @@ public:
 	CFileNameParamObject(QObject* parent = nullptr);
 
 	QVariant GetPathType();
+	QString Get__Typename() {return QStringLiteral("FileNameParam");}
 	void SetPathType(const QVariant& v);
 	Q_INVOKABLE bool hasPathType();
 	QVariant GetPath();
@@ -1852,6 +1886,7 @@ class CParamsSetObjectList;
 class CParamsSetObject: public ::imtbase::CItemModelBase, public CParamsSet
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_paramIds READ GetParamIds WRITE SetParamIds NOTIFY paramIdsChanged)
 	Q_PROPERTY(QVariant m_paramTypeIds READ GetParamTypeIds WRITE SetParamTypeIds NOTIFY paramTypeIdsChanged)
 	Q_PROPERTY(QVariant m_paramNames READ GetParamNames WRITE SetParamNames NOTIFY paramNamesChanged)
@@ -1864,6 +1899,7 @@ public:
 	CParamsSetObject(QObject* parent = nullptr);
 
 	QVariant GetParamIds();
+	QString Get__Typename() {return QStringLiteral("ParamsSet");}
 	void SetParamIds(const QVariant& v);
 	Q_INVOKABLE bool hasParamIds();
 	QVariant GetParamTypeIds();
@@ -1935,6 +1971,7 @@ class CMimeTypeObjectList;
 class CMimeTypeObject: public ::imtbase::CItemModelBase, public CMimeType
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_type READ GetType WRITE SetType NOTIFY typeChanged)
 	Q_PROPERTY(QVariant m_tree READ GetTree WRITE SetTree NOTIFY treeChanged)
 	Q_PROPERTY(QVariant m_subType READ GetSubType WRITE SetSubType NOTIFY subTypeChanged)
@@ -1947,6 +1984,7 @@ public:
 	CMimeTypeObject(QObject* parent = nullptr);
 
 	QVariant GetType();
+	QString Get__Typename() {return QStringLiteral("MimeType");}
 	void SetType(const QVariant& v);
 	Q_INVOKABLE bool hasType();
 	QVariant GetTree();

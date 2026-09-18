@@ -44,6 +44,7 @@ class Item extends QtObject {
         activeFocus: { type: Bool, value: false},
         clip: { type: Bool, value: false},
         activeFocusOnTab: { type: Bool, value: false},
+        JQOpacityMultiplier: { type: Real, value: 1},
 
         Layout: {type:Layout},
 
@@ -83,6 +84,7 @@ class Item extends QtObject {
         activeFocusChanged: {type:Signal, args:[]},
         clipChanged: {type:Signal, args:[]},
         activeFocusOnTabChanged: {type:Signal, args:[]},
+        JQOpacityMultiplierChanged: {type:Signal, args:[]},
 
         'Keys.asteriskPressed': {type:Signal, args: ['event'] },
         'Keys.backPressed': {type:Signal, args: ['event'] },
@@ -137,6 +139,8 @@ class Item extends QtObject {
 
         dom.qml = obj
         obj.__connectDOM(this.parent)
+
+        obj.JQOpacityMultiplier = ()=>{return obj.parent ? obj.parent.JQOpacityMultiplier * obj.opacity : obj.opacity}
 
         return obj
     }
@@ -248,10 +252,10 @@ class Item extends QtObject {
     }
 
     __checkVisibility(){
-        if(this.__getPropertyValue('visible')){
+        if(this.visible){
             this.__proxy.__DOM.setAttribute('visible', '') // temp
             this.__proxy.__DOM.removeAttribute('invisible')
-            if(this.__getPropertyValue('width') > 0 && this.__getPropertyValue('height') > 0){
+            if(this.width > 0 && this.height > 0){
                 this.__proxy.__DOM.removeAttribute('no-view')
             } else {
                 this.__proxy.__DOM.setAttribute('no-view', '')
@@ -278,6 +282,13 @@ class Item extends QtObject {
     SLOT_focusChanged(oldValue, newValue){
         if(newValue){
             if(this.__isListViewDelegateItem()){
+                return
+            }
+
+            // forceActiveFocus() assigns focus to this item and ancestor
+            // FocusScopes in one batch. Those intermediate assignments must
+            // not claim the focus tree — Qt keeps the original item as owner.
+            if(JQApplication.focusTreeSuppressed){
                 return
             }
 
@@ -314,12 +325,22 @@ class Item extends QtObject {
     }
 
     forceActiveFocus(){
-        if(this.parent instanceof JQModules.QtQuick.FocusScope){
-            this.parent.focus = true
-        }
+        JQApplication.focusTreeSuppressed++
+        try {
+            // Qt: setFocus(this) first, then ancestor FocusScopes.
+            if(!this.focus){
+                this.focus = true
+            }
 
-        if(!this.focus){
-            this.focus = true
+            let parent = this.parent
+            while(parent){
+                if(parent instanceof JQModules.QtQuick.FocusScope){
+                    parent.focus = true
+                }
+                parent = parent.parent
+            }
+        } finally {
+            JQApplication.focusTreeSuppressed--
         }
 
         JQApplication.setFocusTree(this.__getTree(), {
@@ -363,17 +384,252 @@ class Item extends QtObject {
     }
 
     SLOT_xChanged(oldValue, newValue){
-        this.__setDOMStyle({
-            left: newValue+'px'
-        })
-        Geometry.setAuto(this.__self, 'AX', newValue, this.__self.constructor.meta.AX)
+        this.__setDOMStyle({ left: newValue + "px" })
+
+        // Prevent echo AX -> x -> AX
+        if(!this.__self.__syncingFromAX){
+            this.__self.__fromXChanged = true
+            try {
+                Geometry.setAuto(this.__self, "AX", newValue, this.__self.constructor.meta.AX)
+            } finally {
+                delete this.__self.__fromXChanged
+            }
+        }
+    }
+
+    SLOT_AXChanged(oldValue, newValue){
+        const self = this.__self
+        const eps = 1e-7
+        const maxPasses = 32
+
+        // Cut direct echo from SLOT_xChanged
+        if(self.__fromXChanged){
+            return
+        }
+
+        if(self.__syncingFromAX){
+            self.__pendingAX = newValue
+            return
+        }
+
+        self.__syncingFromAX = true
+        try {
+            let next = newValue
+            let pass = 0
+
+            while(next !== undefined && pass < maxPasses){
+                delete self.__pendingAX
+
+                if(Math.abs((this.x || 0) - next) > eps){
+                    if(self.AX__prevent){
+                        this.x = next
+                    } else {
+                        Real.set(self, "x", next, self.constructor.meta.x)
+                    }
+                }
+
+                next = self.__pendingAX
+                pass++
+            }
+
+            if(pass >= maxPasses && location.hash === "#jqdebugdetail"){
+                console.warn("AX sync limit reached")
+            }
+        } finally {
+            delete self.__syncingFromAX
+            delete self.__pendingAX
+        }
     }
 
     SLOT_yChanged(oldValue, newValue){
+        this.__setDOMStyle({ top: newValue + "px" })
+
+        // Prevent echo AY -> y -> AY
+        if(!this.__self.__syncingFromAY){
+            this.__self.__fromYChanged = true
+            try {
+                Geometry.setAuto(this.__self, "AY", newValue, this.__self.constructor.meta.AY)
+            } finally {
+                delete this.__self.__fromYChanged
+            }
+        }
+    }
+
+    SLOT_AYChanged(oldValue, newValue){
+        const self = this.__self
+        const eps = 1e-7
+        const maxPasses = 32
+
+        // Cut direct echo from SLOT_yChanged
+        if(self.__fromYChanged){
+            return
+        }
+
+        if(self.__syncingFromAY){
+            self.__pendingAY = newValue
+            return
+        }
+
+        self.__syncingFromAY = true
+        try {
+            let next = newValue
+            let pass = 0
+
+            while(next !== undefined && pass < maxPasses){
+                delete self.__pendingAY
+
+                if(Math.abs((this.y || 0) - next) > eps){
+                    if(self.AY__prevent){
+                        this.y = next
+                    } else {
+                        Real.set(self, "y", next, self.constructor.meta.y)
+                    }
+                }
+
+                next = self.__pendingAY
+                pass++
+            }
+
+            if(pass >= maxPasses && location.hash === "#jqdebugdetail"){
+                console.warn("AY sync limit reached")
+            }
+        } finally {
+            delete self.__syncingFromAY
+            delete self.__pendingAY
+        }
+    }
+
+    SLOT_widthChanged(oldValue, newValue){
+        this.__checkVisibility()
         this.__setDOMStyle({
-            top: newValue+'px'
+            width: newValue > 0 ? newValue + "px" : "0px",
+            minWidth: newValue > 0 ? newValue + "px" : "0px",
         })
-        Geometry.setAuto(this.__self, 'AY', newValue, this.__self.constructor.meta.AY)
+        Geometry.setAuto(this.__self, "implicitWidth", newValue, this.__self.constructor.meta.implicitWidth)
+        JQApplication.updateLater(this.parent)
+
+        // Prevent echo AWidth -> width -> AWidth
+        if(!this.__self.__syncingFromAWidth){
+            this.__self.__fromWidthChanged = true
+            try {
+                Geometry.setAuto(this.__self, "AWidth", newValue, this.__self.constructor.meta.AWidth)
+            } finally {
+                delete this.__self.__fromWidthChanged
+            }
+        }
+
+        this.__updateSiblingAnchors()
+    }
+
+    SLOT_AWidthChanged(oldValue, newValue){
+        const self = this.__self
+        const eps = 1e-7
+        const maxPasses = 32
+
+        // Cut direct echo from SLOT_widthChanged
+        if(self.__fromWidthChanged){
+            return
+        }
+
+        if(self.__syncingFromAWidth){
+            self.__pendingAWidth = newValue
+            return
+        }
+
+        self.__syncingFromAWidth = true
+        try {
+            let next = newValue
+            let pass = 0
+
+            while(next !== undefined && pass < maxPasses){
+                delete self.__pendingAWidth
+
+                if(Math.abs((this.width || 0) - next) > eps){
+                    if(self.AWidth__prevent){
+                        this.width = next
+                    } else {
+                        Real.set(self, "width", next, self.constructor.meta.width)
+                    }
+                }
+
+                next = self.__pendingAWidth
+                pass++
+            }
+
+            if(pass >= maxPasses && location.hash === "#jqdebugdetail"){
+                console.warn("AWidth sync limit reached")
+            }
+        } finally {
+            delete self.__syncingFromAWidth
+            delete self.__pendingAWidth
+        }
+    }
+
+    SLOT_heightChanged(oldValue, newValue){
+        this.__checkVisibility()
+        this.__setDOMStyle({
+            height: newValue > 0 ? newValue + "px" : "0px",
+            minHeight: newValue > 0 ? newValue + "px" : "0px",
+        })
+
+        Geometry.setAuto(this.__self, "implicitHeight", newValue, this.__self.constructor.meta.implicitHeight)
+        JQApplication.updateLater(this.parent)
+
+        // Prevent echo AHeight -> height -> AHeight
+        if(!this.__self.__syncingFromAHeight){
+            this.__self.__fromHeightChanged = true
+            try {
+                Geometry.setAuto(this.__self, "AHeight", newValue, this.__self.constructor.meta.AHeight)
+            } finally {
+                delete this.__self.__fromHeightChanged
+            }
+        }
+
+        this.__updateSiblingAnchors()
+    }
+
+    SLOT_AHeightChanged(oldValue, newValue){
+        const self = this.__self
+        const eps = 1e-7
+        const maxPasses = 32
+
+        // Cut direct echo from SLOT_heightChanged
+        if(self.__fromHeightChanged){
+            return
+        }
+
+        if(self.__syncingFromAHeight){
+            self.__pendingAHeight = newValue
+            return
+        }
+
+        self.__syncingFromAHeight = true
+        try {
+            let next = newValue
+            let pass = 0
+
+            while(next !== undefined && pass < maxPasses){
+                delete self.__pendingAHeight
+
+                if(Math.abs((this.height || 0) - next) > eps){
+                    if(self.AHeight__prevent){
+                        this.height = next
+                    } else {
+                        Real.set(self, "height", next, self.constructor.meta.height)
+                    }
+                }
+
+                next = self.__pendingAHeight
+                pass++
+            }
+
+            if(pass >= maxPasses && location.hash === "#jqdebugdetail"){
+                console.warn("AHeight sync limit reached")
+            }
+        } finally {
+            delete self.__syncingFromAHeight
+            delete self.__pendingAHeight
+        }
     }
 
     SLOT_enabledChanged(oldValue, newValue){
@@ -403,28 +659,12 @@ class Item extends QtObject {
         this.__setDOMStyle({ zIndex: newValue })
     }
 
-    SLOT_widthChanged(oldValue, newValue){
-        this.__checkVisibility()
-        this.__setDOMStyle({
-            width: newValue > 0 ? newValue + 'px' : '0px',
-            minWidth: newValue > 0 ? newValue + 'px' : '0px',
-        })
-        this.implicitWidth = newValue
-        JQApplication.updateLater(this.parent)
-        Geometry.setAuto(this.__self, 'AWidth', newValue, this.__self.constructor.meta.AWidth)
-        this.__updateSiblingAnchors()
+    SLOT_implicitWidthChanged(oldValue, newValue){
+        Geometry.setAuto(this.__self, 'width', newValue, this.__self.constructor.meta.width)
     }
 
-    SLOT_heightChanged(oldValue, newValue){
-        this.__checkVisibility()
-        this.__setDOMStyle({
-            height: newValue > 0 ? newValue + 'px' : '0px',
-            minHeight: newValue > 0 ? newValue + 'px' : '0px',
-        })
-        this.implicitHeight = newValue
-        JQApplication.updateLater(this.parent)
-        Geometry.setAuto(this.__self, 'AHeight', newValue, this.__self.constructor.meta.AHeight)
-        this.__updateSiblingAnchors()
+    SLOT_implicitHeightChanged(oldValue, newValue){
+        Geometry.setAuto(this.__self, 'height', newValue, this.__self.constructor.meta.height)
     }
 
     __updateSiblingAnchors(){
@@ -464,38 +704,6 @@ class Item extends QtObject {
                     Real.set(s, 'width', val, s.constructor.meta.width)
                 }
             }
-        }
-    }
-
-    SLOT_AXChanged(oldValue, newValue){
-        if(this.__self.AX__prevent){
-            this.x = newValue
-        } else {
-            Real.set(this.__self, 'x', newValue, this.__self.constructor.meta.x)
-        }
-    }
-
-    SLOT_AYChanged(oldValue, newValue){
-        if(this.__self.AY__prevent){
-            this.y = newValue
-        } else {
-            Real.set(this.__self, 'y', newValue, this.__self.constructor.meta.y)
-        }
-    }
-
-    SLOT_AWidthChanged(oldValue, newValue){
-        if(this.__self.AWidth__prevent){
-            this.width = newValue
-        } else {
-            Real.set(this.__self, 'width', newValue, this.__self.constructor.meta.width)
-        }
-    }
-
-    SLOT_AHeightChanged(oldValue, newValue){
-        if(this.__self.AHeight__prevent){
-            this.height = newValue
-        } else {
-            Real.set(this.__self, 'height', newValue, this.__self.constructor.meta.height)
         }
     }
 

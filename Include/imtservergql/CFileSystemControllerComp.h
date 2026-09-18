@@ -2,12 +2,9 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QJsonObject>
-
 // ImtCore includes
 #include <imtfile/IFileSystemStructureProvider.h>
-#include <imtservergql/CGqlRequestHandlerCompBase.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FileSystem_fwd.h>
 
 
 namespace imtservergql
@@ -16,21 +13,27 @@ namespace imtservergql
 
 /**
 	GraphQL controller providing the folder hierarchy of a file system.
-	It handles the 'GetFileSystemEntries' query and delegates
-	the file system access to a IFileSystemStructureProvider component.
+	Handles 'GetFileSystemEntries' via generated SDL types and permission checks.
+	File system access is delegated to IFileSystemStructureProvider (local or remote).
  */
-class CFileSystemControllerComp: public CGqlRequestHandlerCompBase
+class CFileSystemControllerComp: public sdl::V1_0::imtbase::CFileSystemGqlHandlerCompBase
 {
 public:
-	typedef CGqlRequestHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtbase::CFileSystemGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFileSystemControllerComp);
 		I_ASSIGN(m_fileSystemProviderCompPtr, "FileSystemProvider", "Provider of the file system structure", true, "FileSystemProvider");
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (CGqlRequestHandlerCompBase)
-	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	// reimplemented (sdl::V1_0::imtbase::CFileSystemGqlHandlerCompBase)
+	virtual sdl::V1_0::imtbase::CGetFileSystemEntriesPayload OnGetFileSystemEntries(
+				const sdl::V1_0::imtbase::CGetFileSystemEntriesGqlRequest& getFileSystemEntriesRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+
+	// Hook for unit tests (default: component reference).
+	virtual imtfile::IFileSystemStructureProvider* GetFileSystemProvider() const;
 
 protected:
 	I_REF(imtfile::IFileSystemStructureProvider, m_fileSystemProviderCompPtr);

@@ -10,6 +10,12 @@ View comprehensive code metrics including lines of code, number of classes and c
 
 The documentation and statistics are automatically generated from the source code and deployed to GitHub Pages.
 
+### Build & Project Configuration
+
+How the CMake build is organized — the target-based `*LibraryDependencies.cmake` files, link-scope variables, the `find_package` package export, and a step-by-step guide to configuring a **new** end product:
+
+- **[📦 Project Configuration Documentation](Docs/ProjectConfiguration/README.md)** — index (🇬🇧 / 🇷🇺)
+
 ## Technical Domains Overview
 
 ImtCore SDK consists of 61 libraries organized into 14 technical domains. Each domain provides specialized functionality for different aspects of software development.

@@ -14,10 +14,13 @@ WebSocket {
 	property var subscriptionModel: []
 
 	property GqlModel __tokenHelper: GqlModel {}
+	// Auth HTTP header name (QML-side constant; keep equal to server header id).
+	readonly property string authenticationTokenHeaderId: "x-authentication-token"
 
 	Component.onCompleted: {
 		Events.subscribeEvent("RegisterSubscription", container.registerSubscriptionEvent);
 		Events.subscribeEvent("UnregisterSubscription", container.unRegisterSubscription);
+		Events.subscribeEvent("AccessTokenRefreshed", container.onAccessTokenRefreshed);
 
 		// Notify any SubscriptionClient instances that were created before this
 		// manager.  Their initial RegisterSubscription events were lost because
@@ -29,6 +32,7 @@ WebSocket {
 	Component.onDestruction: {
 		Events.unSubscribeEvent("RegisterSubscription", container.registerSubscriptionEvent);
 		Events.unSubscribeEvent("UnregisterSubscription", container.unRegisterSubscription);
+		Events.unSubscribeEvent("AccessTokenRefreshed", container.onAccessTokenRefreshed);
 	}
 	
 	onUrlChanged: {
@@ -83,6 +87,9 @@ WebSocket {
 				}
 			}
 		}
+		else if (socketModel.getData("type") === "error"){
+			container.handleSubscriptionError(socketModel.getData("id"), message)
+		}
 		else if (socketModel.getData("type") === "data"){
 			for (let index = 0; index < subscriptionModel.length; index++){
 				if (subscriptionModel[index]["subscriptionId"] == socketModel.getData("id")){
@@ -97,12 +104,62 @@ WebSocket {
 					if (subscription && dataModelLocal){
 						subscription.copy(dataModelLocal)
 						subscription.state = "Ready"
+						// Deliver synchronously, before the next incoming message overwrites
+						// this subscription's model. Relying on the (async) onStateChanged
+						// signal coalesced back-to-back messages so only the last one of a
+						// burst surfaced - see SubscriptionClient.deliverReady().
+						if (subscription.deliverReady !== undefined){
+							subscription.deliverReady()
+						}
 					}
 
 					return;
 				}
 			}
 		}
+	}
+
+	function handleSubscriptionError(subscriptionId, rawMessage) {
+		console.warn("SubscriptionManager: error for id", subscriptionId, rawMessage)
+
+		// Mark matching subscription unregistered so a later AccessTokenRefreshed
+		// (or reconnect) can re-submit it with a fresh token.
+		for (let index = 0; index < subscriptionModel.length; index++){
+			if (subscriptionModel[index]["subscriptionId"] == subscriptionId){
+				subscriptionModel[index]["status"] = "unregistered"
+				let subscription = subscriptionModel[index]["subscription"]
+				if (subscription)
+					subscription.state = "Error"
+			}
+		}
+	}
+
+	function onAccessTokenRefreshed(parameters) {
+		for (let index = 0; index < container.subscriptionModel.length; index++){
+			// The "stop" is sent first, because server side controllers append a new
+			// registration for a repeated "start" instead of replacing the old one.
+			// The socket keeps the message order, so the server drops the previous
+			// registration before the new one arrives.
+			container.unregisterSubscriptionOnServer(index)
+			container.subscriptionModel[index]["status"] = "unregistered"
+		}
+
+		registerSubscriptionToServer()
+	}
+
+	function unregisterSubscriptionOnServer(index){
+		if (container.status != WebSocket.Open){
+			return;
+		}
+
+		let request = {}
+		request["id"] = container.subscriptionModel[index]["subscriptionId"]
+		request["headers"] = container.subscriptionModel[index]["headers"]
+		request["type"] = "stop"
+		let payload = {}
+		request["payload"] = payload
+
+		container.sendTextMessage(JSON.stringify(request))
 	}
 
 	function registerSubscriptionEvent(parameters){
@@ -115,6 +172,9 @@ WebSocket {
 
 	function clear(){
 		container.subscriptionModel = []
+		// Auto-subscribe clients (e.g. PumaWsConnection) were wiped with the model;
+		// ask them to re-register so connection status keeps working after logout.
+		Events.sendEvent("SubscriptionManagerReady", {});
 	}
 
 	function registerSubscriptionToServer(){
@@ -132,15 +192,25 @@ WebSocket {
 					headers = {}
 				}
 
+				// Keep auth header in sync with the current global token.
+				// - If a token is present: always overwrite (stale JWT caused refresh loops).
+				// - If empty: remove header so pre-login / public subs (e.g. PumaWsConnection)
+				//   can still register with an anonymous server context.
+				// Do NOT block registration when token is empty.
 				let accessToken = container.__tokenHelper.GetGlobalAccessToken()
-				if (accessToken && !headers["x-authentication-token"]){
-					headers["x-authentication-token"] = accessToken
+				if (accessToken && accessToken !== ""){
+					headers[container.authenticationTokenHeaderId] = accessToken
+				}
+				else if (headers[container.authenticationTokenHeaderId] !== undefined){
+					delete headers[container.authenticationTokenHeaderId]
 				}
 
 				let productId = container.__tokenHelper.GetProductId()
-				if (productId && !headers["productId"]){
+				if (productId){
 					headers["productId"] = productId
 				}
+
+				subscriptionModel[index]["headers"] = headers
 
 				request["headers"] = headers
 				request["type"] = "start"
@@ -160,6 +230,11 @@ WebSocket {
 		let commandId = query.GetCommandId()
 		if (commandId === ""){
 			console.error("Unable to register subscription with empty command-ID")
+			return;
+		}
+
+		if (!subscriptionClient || subscriptionClient.subscriptionId === ""){
+			console.error("Unable to register subscription with empty subscription-ID. Command-ID:", commandId)
 			return;
 		}
 

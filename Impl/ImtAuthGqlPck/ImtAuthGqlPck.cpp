@@ -41,11 +41,6 @@ I_EXPORT_COMPONENT(
 		"User Group Collection Controller");
 
 I_EXPORT_COMPONENT(
-		AuthorizationOptionsController,
-		"AuthorizationOptionsController",
-		"Authorization Options Controller");
-
-I_EXPORT_COMPONENT(
 		SessionController,
 		"Session controller",
 		"Session Controller");

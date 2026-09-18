@@ -1,5 +1,6 @@
 project(EagleView LANGUAGES CXX)
 
+
 set(ARXC_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/ImtCore.awc")
 set(ARXC_FILES "${PROJECT_SOURCE_DIR}/../EagleView.acc")
 set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
@@ -12,25 +13,20 @@ endif()
 
 include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
-include(${ACFDIR}/Config/CMake/AcfQt.cmake)
-include(${ACFDIR}/Config/CMake/AcfStd.cmake)
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
-include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
+include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-target_link_libraries(${PROJECT_NAME} imtbase imtdesign imtgui imtstyle imt3d imt3dview imt3dgui)
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Xml)
-
 if(QT_VERSION_MAJOR GREATER 4)
-	target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::PrintSupport)
+	set(EAGLE_VIEW_QT_LIBRARIES Qt${QT_VERSION_MAJOR}::PrintSupport)
 endif()
 
-if(QT_VERSION_MAJOR GREATER 5)
-	target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
-endif()
+target_link_libraries(${PROJECT_NAME} PRIVATE
+	imtgui
+	imtstyle
+	imt3dgui
+	Qt${QT_VERSION_MAJOR}::Xml
+	${EAGLE_VIEW_QT_LIBRARIES}
+)
 
-if(WIN32)
-	set(listFiles \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
-	windeploy(${PROJECT_NAME} "" "${listFiles}")
-endif()
+deploy_qt(TARGET ${PROJECT_NAME})
 

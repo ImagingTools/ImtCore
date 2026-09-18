@@ -151,12 +151,12 @@ bool CPluginStatusMonitorViewDelegateComp::GetSummaryInformation(
 		imtbase::IPluginStatusMonitor* pluginStatusMonitorPtr = dynamic_cast<imtbase::IPluginStatusMonitor*>(m_collectionPtr);
 
 		if (informationProviderPtr != nullptr && pluginStatusMonitorPtr != nullptr){
-			if (informationId == QByteArray("LoadedAt")){
+			if (informationId == QByteArrayLiteral("LoadedAt")){
 				summaryInformation.text = informationProviderPtr->GetInformationTimeStamp().toString("dd.MM.yyyy hh:mm:ss");
 				summaryInformation.sortValue = informationProviderPtr->GetInformationTimeStamp();
 				objectMetaInfo.append(summaryInformation);
 			}
-			else if (informationId == QByteArray("Name")){
+			else if (informationId == QByteArrayLiteral("Name")){
 				summaryInformation.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				switch (informationProviderPtr->GetInformationCategory()){
@@ -178,17 +178,17 @@ bool CPluginStatusMonitorViewDelegateComp::GetSummaryInformation(
 				}
 				objectMetaInfo.append(summaryInformation);
 			}
-			else if (informationId == QByteArray("TypeId")){
+			else if (informationId == QByteArrayLiteral("TypeId")){
 				summaryInformation.text = pluginStatusMonitorPtr->GetPluginTypeId(objectId);
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
-			else if (informationId == QByteArray("Path")){
+			else if (informationId == QByteArrayLiteral("Path")){
 				summaryInformation.text = informationProviderPtr->GetInformationSource();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
-			else if (informationId == QByteArray("StatusMessage")){
+			else if (informationId == QByteArrayLiteral("StatusMessage")){
 				summaryInformation.text = informationProviderPtr->GetInformationDescription();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);

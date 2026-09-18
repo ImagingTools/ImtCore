@@ -71,10 +71,10 @@ bsoncxx::document::view_or_value CMongoDatabaseObjectDelegateCompBase::GetSelect
 			const iprm::IParamsSet* paramsPtr) const
 {
 //	if (!objectId.isEmpty()){
-//		return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
-//					.arg(qPrintable(*m_tableNameAttrPtr))
-//					.arg(qPrintable(*m_objectIdColumnAttrPtr))
-//					.arg(qPrintable(objectId))
+//		return QStringLiteral("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
+//					.arg(*m_tableNameAttrPtr)
+//					.arg(*m_objectIdColumnAttrPtr)
+//					.arg(objectId)
 //					.toLocal8Bit();
 //	}
 //	else{
@@ -105,9 +105,9 @@ bsoncxx::document::view_or_value CMongoDatabaseObjectDelegateCompBase::GetSelect
 
 //		// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
 //		QString retVal = "(" + baseSelelectionQuery;
-//		retVal += QString(" ") + filterQuery;
-//		retVal += QString(" ") + qPrintable(paginationQuery) + ")";
-//		retVal += QString(" ") + sortQuery;
+//		retVal += QStringLiteral(" ") + filterQuery;
+//		retVal += QStringLiteral(" ") + paginationQuery + ")";
+//		retVal += QStringLiteral(" ") + sortQuery;
 
 //		return retVal.toLocal8Bit();
 //	}
@@ -209,12 +209,12 @@ bool CMongoDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
 
 //	QString textFilter = collectionFilter.GetTextFilter();
 //	if (!textFilter.isEmpty()){
-//        textFilterQuery = QString("\"%1\" ILIKE '%%2%'").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
+//        textFilterQuery = QStringLiteral(R"("%1" ILIKE '%%2%')").arg(filteringColumnIds.first(), textFilter);
 
 //		for (int i = 1; i < filteringColumnIds.count(); ++i){
 //			textFilterQuery += " OR ";
 
-//            textFilterQuery += QString("\"%1\" ILIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+//            textFilterQuery += QStringLiteral("\"%1\" ILIKE '%%2%'").arg(filteringColumnIds[i], textFilter);
 //		}
 //	}
 
@@ -306,5 +306,4 @@ QString CMongoDatabaseObjectDelegateCompBase::GetTableName() const
 }
 
 } // namespace imtmongo
-
 

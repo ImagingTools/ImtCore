@@ -44,7 +44,17 @@ protected:
 	virtual imtrest::ConstResponsePtr RegisterSubscription(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr UnregisterSubscription(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr CreateDataResponse(const QByteArray& data, const imtrest::IRequest& request) const;
-	virtual imtrest::ConstResponsePtr CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const;
+	/**
+		Build a GraphQL-over-WebSocket error frame for \p request.
+		\param errorMessage human-readable reason (must already include any status prefix).
+		\param logMessage when true (default), also write \p errorMessage to the component log.
+			Callers that already logged a richer line (e.g. auth failure with masked token)
+			should pass false to avoid a second, less useful log entry.
+	*/
+	virtual imtrest::ConstResponsePtr CreateErrorResponse(
+				const QByteArray& errorMessage,
+				const imtrest::IRequest& request,
+				bool logMessage = true) const;
 
 private:
 	I_MULTIREF(imtgql::IGqlSubscriberController, m_gqlSubscriberControllersCompPtr);

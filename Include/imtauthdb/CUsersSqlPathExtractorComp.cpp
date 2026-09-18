@@ -18,7 +18,7 @@ QString CUsersSqlPathExtractorComp::ExtractXPath(
 			const QString& tableAlias) const
 {
 	if (fieldId == QByteArrayLiteral("SystemId")){
-		return QString(R"(COALESCE(root."Document"->'SystemInfos'->0->>'SystemId', ''))");
+		return QStringLiteral(R"(COALESCE(root."Document"->'SystemInfos'->0->>'SystemId', ''))");
 	}
 	
 	return BaseClass::ExtractXPath(jsonKey, fieldId, metaType, tableAlias);

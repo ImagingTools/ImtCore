@@ -156,7 +156,7 @@ Item {
 			}
 
 			if(message !==""){
-				ModalDialogManager.showErrorDialog(message)
+				PopupManager.addErrorMessage(message, true)
 			}
 		}
 
@@ -169,7 +169,7 @@ Item {
 			}
 
 			if(message !==""){
-				ModalDialogManager.showErrorDialog(message)
+				PopupManager.addErrorMessage(message, true)
 			}
 		}
 
@@ -223,7 +223,7 @@ Item {
 			contentView.stopLoading(documentId)
 			
 			if(message !==""){
-				ModalDialogManager.showErrorDialog(message)
+				PopupManager.addErrorMessage(message, true)
 			}
 		}
 

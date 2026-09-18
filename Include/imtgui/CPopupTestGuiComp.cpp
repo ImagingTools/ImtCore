@@ -106,28 +106,28 @@ void CPopupTestGuiComp::on_AnchorBR_clicked()
 
 void CPopupTestGuiComp::on_InfoButton_clicked()
 {
-	SendInfoMessage(0, QString("Message %1").arg(m_messageCounter));
+	SendInfoMessage(0, QStringLiteral("Message %1").arg(m_messageCounter));
 	m_messageCounter++;
 }
 
 
 void CPopupTestGuiComp::on_WarningButton_clicked()
 {
-	SendWarningMessage(0, QString("Message %1").arg(m_messageCounter));
+	SendWarningMessage(0, QStringLiteral("Message %1").arg(m_messageCounter));
 	m_messageCounter++;
 }
 
 
 void CPopupTestGuiComp::on_ErrorButton_clicked()
 {
-	SendErrorMessage(0, QString("Message %1").arg(m_messageCounter));
+	SendErrorMessage(0, QStringLiteral("Message %1").arg(m_messageCounter));
 	m_messageCounter++;
 }
 
 
 void CPopupTestGuiComp::on_CriticalButton_clicked()
 {
-	SendCriticalMessage(0, QString("Message %1").arg(m_messageCounter));
+	SendCriticalMessage(0, QStringLiteral("Message %1").arg(m_messageCounter));
 	m_messageCounter++;
 }
 

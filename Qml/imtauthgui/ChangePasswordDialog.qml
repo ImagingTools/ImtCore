@@ -1,16 +1,17 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
 import imtcontrols 1.0
 
 Dialog {
 	id: rootDialog;
 	
-	width: Style.sizeHintXXL;
-	
+	width: Math.max(Style.sizeHintL, Math.min(ModalDialogManager.activeView.width - 100, Style.sizeHintXXL));
+
 	property bool currentPasswordInputVisible: true;
-	
+	property string login: "";
+	property var policy: null;
+
 	Component.onCompleted: {
 		addButton(Enums.save, qsTr("Save"), false)
 		addButton(Enums.cancel, qsTr("Cancel"), true)
@@ -42,7 +43,9 @@ Dialog {
 				anchors.right: parent.right;
 				anchors.rightMargin: Style.marginXL;
 				currentPasswordInputVisible: rootDialog.currentPasswordInputVisible;
-				
+				login: rootDialog.login;
+				policy: rootDialog.policy;
+
 				onAcceptedChanged: {
 					if (rootDialog.buttons){
 						rootDialog.buttons.setButtonState(Enums.save, accepted)

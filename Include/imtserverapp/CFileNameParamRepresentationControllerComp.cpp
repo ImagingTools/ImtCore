@@ -13,11 +13,11 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CFileNameParam>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CFileNameParam>)
 
 QByteArray CFileNameParamRepresentationControllerComp::GetTypeId() const
 {
-	return QByteArray("FileNameParam");
+	return QByteArrayLiteral("FileNameParam");
 }
 
 

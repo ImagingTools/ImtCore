@@ -8,6 +8,7 @@ import imtauthAuthorizationSdl 1.0
 QtObject {
     id: container;
 
+    property string context: ""
 	property string accessToken: "";
 	property string refreshToken: "";
     property string login: "";
@@ -46,11 +47,20 @@ QtObject {
 	}
 
     property GqlSdlRequestSender request : GqlSdlRequestSender {
+        context: container.context
         gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_authorization;
         sdlObjectComp:
             Component {
             AuthorizationPayload {
                 onFinished: {
+                    // Credentials were accepted but the account is deactivated: the payload
+                    // carries no token, so this must not go through setLoginData().
+                    if (m_accountDisabled === true){
+                        container.failed(qsTr("This account has been deactivated. Please contact your administrator."));
+
+                        return;
+                    }
+
                     container.setLoginData(m_refreshToken, m_token, m_userId, m_username, m_systemId, m_permissions.split(';'))
                 }
             }

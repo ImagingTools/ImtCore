@@ -2,10 +2,8 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
 import imtcontrols 1.0
-import imtcolgui 1.0
-import imtguigql 1.0
+import imtdocgui 1.0
 import imtauthgui 1.0
 
 /**
@@ -16,7 +14,7 @@ import imtauthgui 1.0
  * Read-only list of protocol messages. Clicking a message opens a
  * MessageView (ViewBase) with GqlBasedCommandsController for detail view.
  */
-TenantSimpleCollectionPage {
+SimpleCollectionPage {
 id: messagesPage
 
 entityName: qsTr("Message")
@@ -30,20 +28,20 @@ headerButtonsComponent: emptyHeaderComp
 delegateComponent: messageDelegateComp
 
 function updateGui() {
-if (messagesPage.apiClient && messagesPage.tenantData && messagesPage.tenantData.m_id) {
-messagesPage.apiClient.fetchCrossTenantMessages(messagesPage.tenantData.m_id)
+if (messagesPage.apiClient && messagesPage.model && messagesPage.model.m_id) {
+messagesPage.apiClient.fetchCrossTenantMessages(messagesPage.model.m_id)
 }
 }
 
 Component.onCompleted: {
-if (messagesPage.apiClient && messagesPage.tenantData && messagesPage.tenantData.m_id) {
-messagesPage.apiClient.fetchCrossTenantMessages(messagesPage.tenantData.m_id)
+if (messagesPage.apiClient && messagesPage.model && messagesPage.model.m_id) {
+messagesPage.apiClient.fetchCrossTenantMessages(messagesPage.model.m_id)
 }
 }
 
 onVisibleChanged: {
-if (messagesPage.visible && messagesPage.apiClient && messagesPage.tenantData && messagesPage.tenantData.m_id) {
-messagesPage.apiClient.fetchCrossTenantMessages(messagesPage.tenantData.m_id)
+if (messagesPage.visible && messagesPage.apiClient && messagesPage.model && messagesPage.model.m_id) {
+messagesPage.apiClient.fetchCrossTenantMessages(messagesPage.model.m_id)
 }
 }
 
@@ -51,14 +49,14 @@ Connections {
 target: messagesPage.apiClient
 
 function onSubscriptionCrossTenantMessageReceived(notification) {
-if (messagesPage.visible && messagesPage.apiClient && messagesPage.tenantData && messagesPage.tenantData.m_id) {
-messagesPage.apiClient.fetchCrossTenantMessages(messagesPage.tenantData.m_id)
+if (messagesPage.visible && messagesPage.apiClient && messagesPage.model && messagesPage.model.m_id) {
+messagesPage.apiClient.fetchCrossTenantMessages(messagesPage.model.m_id)
 }
 }
 
 function onSubscriptionCrossTenantMessageStatusChanged(notification) {
-if (messagesPage.visible && messagesPage.apiClient && messagesPage.tenantData && messagesPage.tenantData.m_id) {
-messagesPage.apiClient.fetchCrossTenantMessages(messagesPage.tenantData.m_id)
+if (messagesPage.visible && messagesPage.apiClient && messagesPage.model && messagesPage.model.m_id) {
+messagesPage.apiClient.fetchCrossTenantMessages(messagesPage.model.m_id)
 }
 }
 }
@@ -82,9 +80,12 @@ radius: Style.radiusS
 border.color: Style.borderColor
 border.width: 1
 
-readonly property var __msg: modelData
-readonly property bool __isOutgoing: messagesPage.tenantData
-&& msgDelegate.__msg.sourceTenantId === messagesPage.tenantData.m_id
+// crossTenantMessagesModel is a role-based ListModel, so rows arrive as
+// `model` and `modelData` is undefined - resolve both, as the shared
+// delegate base does.
+readonly property var __msg: (typeof modelData !== "undefined" && modelData !== null) ? modelData : model
+readonly property bool __isOutgoing: messagesPage.model
+&& msgDelegate.__msg.sourceTenantId === messagesPage.model.m_id
 
 Column {
 id: msgDelegateContent

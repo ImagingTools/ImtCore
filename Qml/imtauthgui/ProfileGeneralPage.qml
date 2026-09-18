@@ -129,6 +129,7 @@ ViewBase {
 
 					CustomTextField {
 						id: nameInput
+						objectName: "NameInput"
 						width: parent.width
 						height: Style.controlHeightM
 						readOnly: generalPage.readOnly
@@ -153,6 +154,7 @@ ViewBase {
 
 					CustomTextField {
 						id: mailInput
+						objectName: "EmailInput"
 						width: parent.width
 						height: Style.controlHeightM
 						readOnly: generalPage.readOnly
@@ -214,9 +216,44 @@ ViewBase {
 					return newPasswordInput.text === confirmPasswordInput.text
 				}
 
+				// PasswordPolicyController instance, supplied by the injected transport.
+				readonly property var policy: generalPage.apiClient ? generalPage.apiClient.passwordPolicy : null
+
+				// Mirrors the server policy so the user is not sent to the server just to be rejected.
+				function policyViolations() {
+					if (!passwordSection.policy)
+						return []
+
+					let login = generalPage.profileData ? generalPage.profileData.m_username : ""
+					return passwordSection.policy.validate(login, newPasswordInput.text)
+				}
+
+				function policyHint() {
+					if (!passwordSection.policy)
+						return ""
+
+					let violations = passwordSection.policyViolations()
+					if (violations.length > 0)
+						return passwordSection.policy.describeFailure(violations, "")
+
+					return passwordSection.policy.requirementsText()
+				}
+
 				function canSubmit() {
 					return !passwordSection.submitting && newPasswordInput.text !== "" && passwordSection.passwordsMatch()
 						&& (!needsCurrentPassword || currentPasswordInput.text !== "")
+						&& passwordSection.policyViolations().length === 0
+				}
+
+				// apiClient is injected by binding, so the policy may appear after this page.
+				onPolicyChanged: {
+					if (passwordSection.policy)
+						passwordSection.policy.load()
+				}
+
+				Component.onCompleted: {
+					if (passwordSection.policy)
+						passwordSection.policy.load()
 				}
 
 				function reset() {
@@ -242,11 +279,15 @@ ViewBase {
 						passwordSection.reset()
 						passwordCard.visible = false
 					}
-					function onChangePasswordFailed() {
+					function onChangePasswordFailed(message, violatedRules) {
 						if (!passwordSection.submitting)
 							return
 						passwordSection.submitting = false
-						banner.show(qsTr("Unable to change the password. Check your current password and try again."), true)
+
+						let fallback = qsTr("Unable to change the password. Check your current password and try again.")
+						banner.show(passwordSection.policy
+									? passwordSection.policy.describeFailure(violatedRules, fallback)
+									: fallback, true)
 					}
 				}
 
@@ -314,6 +355,7 @@ ViewBase {
 
 							CustomTextField {
 								id: currentPasswordInput
+								objectName: "CurrentPasswordInput"
 								width: parent.width
 								height: Style.controlHeightM
 								echoMode: TextInput.Password
@@ -337,6 +379,7 @@ ViewBase {
 
 								CustomTextField {
 									id: newPasswordInput
+									objectName: "NewPasswordInput"
 									width: parent.width
 									height: Style.controlHeightM
 									echoMode: TextInput.Password
@@ -356,6 +399,7 @@ ViewBase {
 
 								CustomTextField {
 									id: confirmPasswordInput
+									objectName: "ConfirmPasswordInput"
 									width: parent.width
 									height: Style.controlHeightM
 									echoMode: TextInput.Password
@@ -369,6 +413,15 @@ ViewBase {
 							visible: passwordSection.passwordsFilled() && !passwordSection.passwordsMatch()
 							font.pixelSize: Style.fontSizeS
 							color: Style.errorTextColor
+						}
+
+						Text {
+							width: parent.width
+							wrapMode: Text.WordWrap
+							text: passwordSection.policyHint()
+							visible: text !== ""
+							font.pixelSize: Style.fontSizeS
+							color: passwordSection.policyViolations().length > 0 ? Style.errorTextColor : Style.inactiveTextColor
 						}
 
 						Row {

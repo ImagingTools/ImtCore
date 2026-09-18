@@ -14,9 +14,15 @@ CustomTextField {
 	height: Style.controlHeightM;
 	
 	signal searchChanged()
-	
-	onTextChanged: {
-		timer.restart();
+
+	// A directly-declared onTextChanged here would shadow CustomTextField's own
+	// internal onTextChanged (which pushes the text property into the visible
+	// TextInput) - Connections attaches independently so both keep working.
+	Connections {
+		target: tfc
+		function onTextChanged(){
+			timer.restart();
+		}
 	}
 
 	Timer {
@@ -34,7 +40,7 @@ CustomTextField {
 		anchors.verticalCenter: parent.verticalCenter
 		width: Style.buttonWidthXS;
 		height: width;
-		source: "../../../" + Style.getIconPath("Icons/Search", Icon.State.On, Icon.Mode.Normal);
+		source: "qrc:/" + Style.getIconPath("Icons/Search", Icon.State.On, Icon.Mode.Normal);
 		sourceSize.width: width
 		sourceSize.height: height
 	}
@@ -58,7 +64,7 @@ CustomTextField {
 		
 		visible: tfc.text != "";
 		
-		iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
+		iconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 		decorator: Component {
 			ToolButtonDecorator {
 				color: "transparent";

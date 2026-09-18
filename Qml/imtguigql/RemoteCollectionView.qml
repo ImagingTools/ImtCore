@@ -3,7 +3,6 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
-import imtgui 1.0
 import imtauthgui 1.0
 import imtcolgui 1.0
 
@@ -13,12 +12,16 @@ CollectionView {
 	property bool hasRemoteChanges: false;
 	property bool tableViewParamsStoredServer: true;
 	property bool showRemoteChangesAlert: true
+	loadingIndicatorDelay: 300
 
 	property string gqlGetListCommandId: root.collectionId + "List";
 
 	// Invisible fields that will be requested for collection
 	property var additionalFieldIds: ["id", "name"]
 	property var requestedFields: []
+
+	// Context for requests, placed in the headers  
+	property string context: ""
 
 	property alias subscriptionCommandId: collectionChangeListener.gqlCommandId
 
@@ -63,7 +66,9 @@ CollectionView {
 	}
 
 	function getHeaders(){
-		return {}
+		let headers = {}
+
+		return headers
 	}
 
 	dataControllerComp: Component {
@@ -71,6 +76,7 @@ CollectionView {
 			collectionId: root.collectionId;
 			gqlGetListCommandId: root.gqlGetListCommandId
 			requestedFields: root.requestedFields
+			context: root.context
 
 			additionalFieldIds: root.additionalFieldIds;
 

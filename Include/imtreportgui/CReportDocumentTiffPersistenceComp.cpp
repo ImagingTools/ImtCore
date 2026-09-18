@@ -97,7 +97,7 @@ ifile::IFilePersistence::OperationState CReportDocumentTiffPersistenceComp::Save
 
 		QString fileCounter;
 		if (!*m_saveFirstPageOnlyAttrPtr){
-			fileCounter = QString(" - %1").arg(i + 1, 2, 10, QChar('0'));
+			fileCounter = QStringLiteral(" - %1").arg(i + 1, 2, 10, QChar('0'));
 		}
 
 		imgFilePath = fileInfo.path() + "/" +

@@ -124,7 +124,7 @@ QString CLdapUserCollectionControllerComp::GetEmailForUser(const QByteArray& use
 			SysFreeString(propName);
 
 			if (SUCCEEDED(hr) && var.vt == VT_BSTR){
-				QString searchPath = QString("LDAP://%1").arg(QString::fromWCharArray(var.bstrVal));
+				QString searchPath = QStringLiteral("LDAP://%1").arg(QString::fromWCharArray(var.bstrVal));
 				VariantClear(&var);
 
 				IDirectorySearch* searchPtr = nullptr;
@@ -139,7 +139,7 @@ QString CLdapUserCollectionControllerComp::GetEmailForUser(const QByteArray& use
 					escapedSamName.replace(QLatin1Char('\0'), QLatin1String("\\00"));
 					escapedSamName.replace(QLatin1String("/"), QLatin1String("\\2f"));
 
-					QString filter = QString("(&(objectClass=user)(sAMAccountName=%1))").arg(escapedSamName);
+					QString filter = QStringLiteral("(&(objectClass=user)(sAMAccountName=%1))").arg(escapedSamName);
 					std::wstring filterW = filter.toStdWString();
 					WCHAR mailAttrName[] = L"mail";
 					LPWSTR searchAttrs[] = { mailAttrName };

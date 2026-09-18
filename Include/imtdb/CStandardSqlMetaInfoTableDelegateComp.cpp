@@ -17,7 +17,7 @@ QByteArrayList CStandardSqlMetaInfoTableDelegateComp::GetColumnIds() const
 	QByteArrayList retVal;
 
 	for (const QPair<int, QByteArray>& item : m_metaInfoIds){
-		retVal += QByteArray("\"") + item.second + QByteArray("\"");
+		retVal += QByteArrayLiteral("\"") + item.second + QByteArrayLiteral("\"");
 	}
 
 	return retVal;

@@ -132,7 +132,7 @@ Item {
 
 		function onOpenedDocumentListReceiveFailed(message){
 			globalLoading.stop()
-			ModalDialogManager.showErrorDialog(message)
+			PopupManager.addErrorMessage(message, true)
 		}
 
 		function onDocumentGuiUpdated(documentId, representation){
@@ -153,7 +153,7 @@ Item {
 		}
 
 		function onUpdateRepresentationFailed(documentId, message){
-			ModalDialogManager.showErrorDialog(message)
+			PopupManager.addErrorMessage(message, true)
 			if (!workspaceView.documentManager.documentIsLoading(documentId)){
 				workspaceView.stopLoading(documentId)
 			}
@@ -218,7 +218,7 @@ Item {
 			workspaceView.reopenAfterCloseTypeId = ""
 			workspaceView.reopenAfterCloseObjectId = ""
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			PopupManager.addErrorMessage(message, true)
 		}
 
 		// Close document signals
@@ -251,7 +251,7 @@ Item {
 
 		function onCloseDocumentFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			PopupManager.addErrorMessage(message, true)
 			onDocumentClosed(documentId)
 		}
 
@@ -266,7 +266,7 @@ Item {
 
 		function onSaveDocumentFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			PopupManager.addErrorMessage(message, true)
 		}
 
 		// Create document signals
@@ -274,7 +274,7 @@ Item {
 		}
 
 		function onCreateDocumentFailed(documentTypeId, message){
-			ModalDialogManager.showErrorDialog(message)
+			PopupManager.addErrorMessage(message, true)
 		}
 
 		function onDocumentCreated(documentId, documentTypeId){
@@ -298,7 +298,7 @@ Item {
 
 		function onUndoInfoReceiveFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			PopupManager.addErrorMessage(message, true)
 		}
 
 		// Undo signals
@@ -311,7 +311,7 @@ Item {
 
 		function onUndoFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			PopupManager.addErrorMessage(message, true)
 		}
 
 		// Redo signals
@@ -324,7 +324,7 @@ Item {
 
 		function onRedoFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			PopupManager.addErrorMessage(message, true)
 		}
 
 		function onTryCloseDirtyDocument(documentId, callback){

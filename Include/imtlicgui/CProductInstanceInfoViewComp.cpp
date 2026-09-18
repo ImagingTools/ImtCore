@@ -113,7 +113,7 @@ void CProductInstanceInfoViewComp::UpdateProductName()
 	Q_ASSERT(productInstanceInfoPtr != nullptr);
 
 	QString selectedProductId = productInstanceInfoPtr->GetProductId();
-	ProductNameEdit->setText(qPrintable(selectedProductId));
+	ProductNameEdit->setText(selectedProductId);
 
 	const imtbase::IObjectCollection* productsCollectionPtr = productInstanceInfoPtr->GetProductDatabase();
 	if (productsCollectionPtr != nullptr){
@@ -222,7 +222,7 @@ void CProductInstanceInfoViewComp::on_NewLicenseRequestButton_clicked()
 			filterList.prepend(tr("All file types (%1)").arg("*.*"));
 		}
 
-		QString defaultFileName = QString("Transaction_Code_%1").arg(QDateTime::currentDateTime().toString("dd_MM_yyyy hh_mm_ss"));
+		QString defaultFileName = QStringLiteral("Transaction_Code_%1").arg(QDateTime::currentDateTime().toString("dd_MM_yyyy hh_mm_ss"));
 
 		QString defaultExportPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 

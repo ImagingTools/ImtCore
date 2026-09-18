@@ -1,20 +1,17 @@
 project(ImtCoreObjectCollectionTest)
 
+
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
+include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-target_link_libraries(${PROJECT_NAME} itest ipackage imtbase imtauth imtdb imttest)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+	imtaccount
+	imttest
+	Acf::ipackage
+	Acf::itest
+	Qt${QT_VERSION_MAJOR}::Test
+)
 
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
-include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
+deploy_qt(TARGET ${PROJECT_NAME})
 
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test)
-
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Test)
-
-# file(COPY ../../Migrations DESTINATION ${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
-if(WIN32)
-		set(listFiles \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
-
-	windeploy(${PROJECT_NAME} "" "${listFiles}")
-endif()

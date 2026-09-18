@@ -53,7 +53,7 @@ CComplexCollectionFilterRepresentationController::CComplexCollectionFilterRepres
 }
 
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CParamsSet>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CParamsSet>)
 
 QByteArray CComplexCollectionFilterRepresentationController::GetTypeId() const
 {

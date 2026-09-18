@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6435" Description="ACF"/>
-            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6560" Description="ACF"/>
+            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -24,6 +24,7 @@
         <Element ComponentName="RemoteTenantController" X="750" Y="525" Note=""/>
         <Element ComponentName="SubscriberDemultiplexer" X="925" Y="75" Note=""/>
         <Element ComponentName="Subscription" X="1075" Y="525" Note=""/>
+        <Element ComponentName="SuperuserProvider" X="600" Y="50" Note=""/>
         <Element ComponentName="UserInfo" X="1050" Y="650" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>

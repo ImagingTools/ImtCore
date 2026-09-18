@@ -180,6 +180,26 @@ I_EXPORT_COMPONENT(
 			"System status",
 			"System Status");
 
+I_EXPORT_COMPONENT(
+			ComplexCollectionFilterRepresentationController,
+			"Complex collection filter representation controller",
+			"Complex Collection Filter Representation Controller");
+
+I_EXPORT_COMPONENT(
+			DocumentFilterRepresentationController,
+			"Document collection filter representation controller",
+			"Document Collection Filter Representation Controller");
+
+I_EXPORT_COMPONENT(
+			DocumentIdFilterRepresentationController,
+			"Document ID filter representation controller",
+			"Document ID Filter Representation Controller");
+
+I_EXPORT_COMPONENT(
+			TimeFilterParamRepresentationController,
+			"Time filter param representation controller",
+			"Time Filter Param Representation Controller");
+
 
 } // namespace ImtServerAppPck
 

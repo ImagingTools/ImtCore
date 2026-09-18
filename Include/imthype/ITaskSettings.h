@@ -23,8 +23,6 @@ public:
 	virtual void SetUserTaskId(const QByteArray& userTaskId) = 0;
 	virtual QByteArray GetTaskInputId() const = 0;
 	virtual void SetTaskInputId(const QByteArray& inputId) = 0;
-	virtual QByteArray GetTaskInputSubId() const = 0;
-	virtual void SetTaskInputSubId(const QByteArray& inputSubId) = 0;
 	virtual const imtbase::IObjectCollection* GetTaskInputs() const = 0;
 };
 

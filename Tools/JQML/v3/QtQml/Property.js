@@ -94,18 +94,50 @@ class Property extends BaseObject {
             }
 
             if(!found){
-                const signalFunc = target.constructor.meta[name + 'Changed'].type.get(target, name + 'Changed')
-                // Cross-item bindings use connectBefore so they fire before the source item's own SLOT_
+                const sourceIsSameProperty = link.target.__self === target.__self && link.name === name
+                if (sourceIsSameProperty) {
+                    return name in target ? target[name] : ("value" in meta ? meta.value : meta.type.getDefaultValue())
+                }
+
+                const signalFunc = target.constructor.meta[name + "Changed"].type.get(target, name + "Changed")
                 const isCrossItem = link.target !== target
                 const connectFn = isCrossItem && signalFunc.connectBefore ? signalFunc.connectBefore : signalFunc.connect
-                let connectionObj = connectFn(()=>{
-                    if(!link.target[link.name+'__updating']){
-                        link.target[link.name+'__updating'] = true
-                        link.meta.type.set(link.target, link.name, link.func, link.meta)
-                        delete link.target[link.name+'__updating']
+
+                let connectionObj = connectFn(() => {
+                    const updatingKey = link.name + "__updating"
+                    const pendingKey = link.name + "__pendingRecalc"
+                    const maxFlushPasses = 16
+
+                    if (link.target[updatingKey]) {
+                        link.target[pendingKey] = true
+                        return
+                    }
+
+                    link.target[updatingKey] = true
+                    let flushPass = 0
+                    try {
+                        while (true) {
+                            link.target[pendingKey] = false
+                            link.meta.type.set(link.target, link.name, link.func, link.meta)
+
+                            if (!link.target[pendingKey]) {
+                                break
+                            }
+
+                            flushPass++
+                            if (flushPass >= maxFlushPasses) {
+                                if (location.hash === "#jqdebugdetail") {
+                                    console.warn("Binding flush limit reached for " + link.name)
+                                }
+                                break
+                            }
+                        }
+                    } finally {
+                        delete link.target[updatingKey]
+                        delete link.target[pendingKey]
                     }
                 })
-    
+
                 link.target.__depends[link.name].push(connectionObj)
             }
             
@@ -131,6 +163,7 @@ class Property extends BaseObject {
         // }
 
         let oldValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
+        let middleValue = oldValue
 
         if(typeof value === 'function'){
             try {
@@ -141,7 +174,7 @@ class Property extends BaseObject {
                     meta: meta,
                     func: value,
                 })
-                target[name] = this.typeCasting(value.call(target))
+                middleValue = this.typeCasting(value.call(target))
             } catch(error) {
                 if(location.hash === '#jqdebugdetail')console.error(error)
             } finally {
@@ -150,7 +183,7 @@ class Property extends BaseObject {
             }
         } else {
             try {
-                target[name] = this.typeCasting(value)
+                middleValue = this.typeCasting(value)
             } catch (error) {
                 if(location.hash === '#jqdebugdetail')console.error(error)
             }
@@ -158,8 +191,9 @@ class Property extends BaseObject {
 
         let currentValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
 
-        if(oldValue !== currentValue){
-            target.constructor.meta[name + 'Changed'].type.get(target, name + 'Changed')(oldValue, currentValue)
+        if(oldValue !== middleValue && oldValue === currentValue){
+            target[name] = middleValue
+            target.constructor.meta[name + 'Changed'].type.get(target, name + 'Changed')(oldValue, middleValue)
         }
 
         return true

@@ -32,10 +32,10 @@ bool CDocumentServiceCompBase::HasDocumentNameProvider(const QByteArray& typeId)
 
 
 bool CDocumentServiceCompBase::ValidateDocumentData(
-	const WorkingDocument& document,
-	OperationStatus& status,
-	QString* errorMessage,
-	const imtbase::IOperationContext* operationContextPtr) const
+			const WorkingDocument& document,
+			OperationStatus& status,
+			QString* errorMessage,
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	status = OS_OK;
 	if (errorMessage != nullptr){
@@ -61,10 +61,10 @@ bool CDocumentServiceCompBase::ValidateDocumentData(
 		if (errorMessage != nullptr){
 			*errorMessage = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;
 		}
-		QString warningMessage = QString("Document validation failed for type '%1'")
-			.arg(QString::fromUtf8(document.typeId));
+		QString warningMessage = QStringLiteral("Document validation failed for type '%1'")
+			.arg(document.typeId);
 		if (!validationMessage.isEmpty()){
-			warningMessage = QString("%1: %2").arg(warningMessage, validationMessage);
+			warningMessage = QStringLiteral("%1: %2").arg(warningMessage, validationMessage);
 			SendWarningMessage(kValidationFailureWarningId, warningMessage);
 		}
 		else{
@@ -100,7 +100,8 @@ istd::IChangeableUniquePtr CDocumentServiceCompBase::CreateObject(const QByteArr
 		return m_objectFactListCompPtr.CreateInstance(index);
 	}
 
-	Q_ASSERT_X(false, "CDocumentServiceCompBase::CreateObject", qPrintable(QString("Factory not found for the type: '%1'").arg(qPrintable(typeId))));
+	const QByteArray errorMessage = QStringLiteral("Factory not found for the type: '%1'").arg(typeId).toUtf8();
+	Q_ASSERT_X(false, "CDocumentServiceCompBase::CreateObject", errorMessage.constData());
 
 	return nullptr;
 }
@@ -108,13 +109,20 @@ istd::IChangeableUniquePtr CDocumentServiceCompBase::CreateObject(const QByteArr
 
 idoc::IUndoManagerUniquePtr CDocumentServiceCompBase::CreateUndoManager() const
 {
-	if (m_undoManagerFactPtr.IsValid()){
-		return m_undoManagerFactPtr.CreateInstance();
+	idoc::IUndoManagerUniquePtr retVal;
+
+	if (m_persistUndoManagerFactPtr.IsValid()){
+		retVal = m_persistUndoManagerFactPtr.CreateInstance();
+	}
+	
+	if (!retVal.IsValid() && m_undoManagerFactPtr.IsValid()){
+		retVal = m_undoManagerFactPtr.CreateInstance();
 	}
 
-	Q_ASSERT_X(false, "CDocumentServiceCompBase::CreateUndoManager", qPrintable(QString("Factory not found")));
+	const QByteArray errorMessage = QStringLiteral("Factory not found").toUtf8();
+	Q_ASSERT_X(retVal.IsValid(), "CDocumentServiceCompBase::CreateUndoManager", errorMessage.constData());
 
-	return nullptr;
+	return retVal;
 }
 
 
@@ -149,6 +157,36 @@ const imtdoc::IDocumentValidator* CDocumentServiceCompBase::GetDocumentValidator
 	int index = GetObjectFactoryIndex(typeId);
 	if ((index >= 0) && (index < m_documentValidatorCompPtr.GetCount())){
 		return m_documentValidatorCompPtr[index];
+	}
+
+	return nullptr;
+}
+
+
+bool CDocumentServiceCompBase::OnDocumentCreated(const QByteArray& typeId, const iprm::IParamsSet* initParams, istd::IChangeable& document, QString& errorMessage)
+{
+	imtdoc::IDocumentInitDelegate* delegatePtr = GetDocumentInitDelegate(typeId);
+	if (delegatePtr != nullptr){
+		if (!delegatePtr->InitializeDocument(typeId, document, errorMessage, initParams)){
+			return false;
+		}
+		return true;
+	}
+
+	if (initParams != nullptr){
+		errorMessage = QStringLiteral("Document initialization failed: init parameters provided but no init delegate registered");
+		return false;
+	}
+
+	return true;
+}
+
+
+imtdoc::IDocumentInitDelegate* CDocumentServiceCompBase::GetDocumentInitDelegate(const QByteArray& typeId) const
+{
+	int index = GetObjectFactoryIndex(typeId);
+	if ((index >= 0) && (index < m_documentInitDelegateCompPtr.GetCount())){
+		return m_documentInitDelegateCompPtr[index];
 	}
 
 	return nullptr;

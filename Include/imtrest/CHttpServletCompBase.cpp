@@ -22,7 +22,7 @@ ConstResponsePtr CHttpServletCompBase::ProcessRequest(const imtrest::IRequest& r
 	imtrest::CHttpRequest* httpRequestPtr = dynamic_cast<imtrest::CHttpRequest*>(const_cast<imtrest::IRequest*>(&request));
 	if (httpRequestPtr == nullptr){
 		Q_ASSERT_X(false, "CHttpServletCompBase::ProcessRequest", "Invalid request type, a HTTP request was expected");
-		SendErrorMessage(0, QString("Invalid request type, a HTTP request was expected"));
+		SendErrorMessage(0, QStringLiteral("Invalid request type, a HTTP request was expected"));
 
 		return ConstResponsePtr();
 	}
@@ -253,7 +253,7 @@ ConstResponsePtr CHttpServletCompBase::CreateDefaultErrorResponse(const QByteArr
 				request,
 				imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
 				errorString,
-				QByteArray("text/plain; charset=utf-8")).PopInterfacePtr());
+				QByteArrayLiteral("text/plain; charset=utf-8")).PopInterfacePtr());
 
 	return retVal;
 }

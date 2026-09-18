@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6435" Description="ACF"/>
-            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6560" Description="ACF"/>
+            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -14,7 +14,9 @@
         <Element ComponentName="HashCalculator" X="200" Y="500" Note=""/>
         <Element ComponentName="Permissions" X="175" Y="375" Note=""/>
         <Element ComponentName="RoleCollectionAdapter" X="575" Y="600" Note=""/>
+        <Element ComponentName="UserChangeGenerator" X="0" Y="0" Note=""/>
         <Element ComponentName="UserCollectionDocumentService" X="175" Y="250" Note=""/>
+        <Element ComponentName="UserDocumentNameProvider" X="0" Y="0" Note=""/>
         <Element ComponentName="UserDocumentValidator" X="957" Y="249" Note=""/>
         <Element ComponentName="UserGroupInfoProvider" X="950" Y="425" Note=""/>
         <Element ComponentName="UserInfo" X="575" Y="425" Note=""/>

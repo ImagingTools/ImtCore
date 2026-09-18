@@ -87,7 +87,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 	// RequestInfo struct props
 	const bool isRequestInfoCreated = GenerateFieldRequestInfo(ifStream, outputArgument);
 	if (!isRequestInfoCreated){
-		SendErrorMessage(0, QString("Unable to create request info for request %1").arg(sdlRequest.GetName()));
+		SendErrorMessage(0, QStringLiteral("Unable to create request info for request %1").arg(sdlRequest.GetName()));
 
 		return false;
 	}
@@ -299,7 +299,7 @@ bool CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 	}
 
 	if (!isTypeFound){
-		SendErrorMessage(0, QString("Field %1 is not custom. Only cutom field allowed").arg(sdlField.GetType()));
+		SendErrorMessage(0, QStringLiteral("Field %1 is not custom. Only cutom field allowed").arg(sdlField.GetType()));
 
 		return false;
 	}
@@ -350,7 +350,7 @@ bool CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 		if (customType.GetType() != sdlField.GetType()){
 			const bool isRequestInfoCreated = GenerateFieldRequestInfo(stream, customType, hIndents + 1, true);
 			if (!isRequestInfoCreated){
-				SendErrorMessage(0, QString("Unable to create request info for type %1").arg(customType.GetType()));
+				SendErrorMessage(0, QStringLiteral("Unable to create request info for type %1").arg(customType.GetType()));
 
 				return false;
 			}
@@ -556,8 +556,10 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 		}
 		newComplexFieldName += typeField.GetId();
 
-		const QString newGqlContainerVarName = GetDecapitalizedValue(typeField.GetId()) + QStringLiteral("RequestedFieldsPtr");
-		const QString newIdListContainerVarName = GetDecapitalizedValue(typeField.GetId()) + QStringLiteral("RequestedIds");
+		// variable names contain a full field path to avoid hiding of variables declared in outer scopes
+		const QString newVariableBaseName = GetVariableBaseName(newComplexFieldName);
+		const QString newGqlContainerVarName = newVariableBaseName + QStringLiteral("RequestedFieldsPtr");
+		const QString newIdListContainerVarName = newVariableBaseName + QStringLiteral("RequestedIds");
 
 		// first create a GQL-info object
 		FeedStreamHorizontally(stream, hIndents + 1);
@@ -605,6 +607,28 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
 	FeedStream(stream, 1, false);
+}
+
+
+QString CGqlWrapClassCodeGeneratorComp::GetVariableBaseName(const QString& complexFieldName)
+{
+	QString retVal;
+
+	const QStringList fieldIdList = complexFieldName.split('.', Qt::SkipEmptyParts);
+	for (const QString& fieldId: fieldIdList){
+		if (!retVal.isEmpty()){
+			retVal += '_';
+		}
+
+		// field names are used unchanged and separators inside of them are escaped,
+		// so that different field paths are always mapped to different variable names
+		QString escapedFieldId = fieldId;
+		escapedFieldId.replace('_', QStringLiteral("__"));
+
+		retVal += escapedFieldId;
+	}
+
+	return retVal;
 }
 
 
@@ -711,7 +735,7 @@ bool CGqlWrapClassCodeGeneratorComp::AddFieldReadFromRequestCode(QTextStream& st
 	ConvertType(field, &isCustom, nullptr, &isArray);
 
 	if (isArray){
-		QString errorString = QString("Arrays is not allowed in request arguments! FieldID = '%1', FieldType = '%2'").arg(field.GetId(), field.GetType());
+		QString errorString = QStringLiteral("Arrays is not allowed in request arguments! FieldID = '%1', FieldType = '%2'").arg(field.GetId(), field.GetType());
 		SendCriticalMessage(0, errorString);
 		Q_ASSERT_X(false, __func__, errorString.toLocal8Bit());
 
@@ -791,7 +815,7 @@ bool CGqlWrapClassCodeGeneratorComp::AddFieldWriteToRequestCode(QTextStream& str
 	ConvertType(field, &isCustom, nullptr, &isArray);
 
 	if (isArray){
-		QString errorString = QString("Arrays is not allowed in request arguments! FieldID = '%1', FieldType = '%2'").arg(field.GetId(), field.GetType());
+		QString errorString = QStringLiteral("Arrays is not allowed in request arguments! FieldID = '%1', FieldType = '%2'").arg(field.GetId(), field.GetType());
 		SendCriticalMessage(0, errorString);
 		Q_ASSERT_X(false, __func__, errorString.toLocal8Bit());
 

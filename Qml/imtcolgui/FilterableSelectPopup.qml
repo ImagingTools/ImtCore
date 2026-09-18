@@ -27,6 +27,7 @@ import imtgui 1.0
 	- Split loading states (initial vs page loading)
 	- Optional CheckBox selection mode (\c showCheckBox)
 	- Optional separator lines between delegates (\c showSeparator)
+	- Alternating row background (\c enableAlternating), replacing the separators
 	- Customizable filter placeholder text (\c filterPlaceholder)
 	- Optional selected items group at top with "Clear all" button (\c showSelectedGroup)
 	- Optional header component above filter (\c headerComponent) for custom controls like type selectors
@@ -35,6 +36,10 @@ import imtgui 1.0
 */
 PopupView {
 	id: root
+
+	// Test instrumentation: PopupView has no objectName of its own. Only one of these is ever open at a
+	// time (it's a modal picker), so a generic name is unambiguous. Inert - no runtime/visual effect.
+	objectName: "FilterableSelectPopup"
 
 	width: root.embedded ? (parent ? parent.width : itemWidth) : (itemWidth + 2 * Style.marginL)
 	height: root.embedded ? contentColumn.height : Math.min(contentColumn.height + 2 * Style.marginL, root.__maxPopupHeight)
@@ -64,7 +69,40 @@ PopupView {
 	property bool showCheckBox: false
 
 	// --- Separator between delegates ---
+	// Ignored while the zebra is on: alternating fills already separate the rows, and
+	// drawing both makes the list look ruled.
 	property bool showSeparator: false
+
+	// --- Alternating row background, following the table views ---
+	property bool enableAlternating: (Style.enableAlternating !== undefined && Style.enableAlternating !== null)
+		? Style.enableAlternating
+		: true
+	property color alternatingColor: Style.backgroundColor2
+	property color hoverColor: Style.hover
+	property color selectedRowColor: Style.selectedColor
+
+	readonly property bool separatorVisible: root.showSeparator && !root.enableAlternating
+
+	/*!
+		Background of a row, by the same priority the table rows use: selected, then
+		hovered or keyboard-focused, then the zebra stripe. Call it from an overriding
+		\c delegate that paints its own background.
+		\param index The index in the dataProvider.items array.
+		\param hovered Whether the pointer is over the row.
+		\param selected Whether the row is the selected one.
+	*/
+	function rowBackgroundColor(index, hovered, selected){
+		if (selected){
+			return root.selectedRowColor
+		}
+		if (hovered || root.focusedIndex === index){
+			return root.hoverColor
+		}
+		if (root.enableAlternating && (index % 2 === 1)){
+			return root.alternatingColor
+		}
+		return "transparent"
+	}
 
 	// --- Filter field placeholder ---
 	property string filterPlaceholder: qsTr("Filter...")
@@ -80,6 +118,23 @@ PopupView {
 
 	// --- Private: max popup height (screen height minus margins) ---
 	property int __maxPopupHeight: 600
+
+	// --- Private: fixed height of the list stage ---
+	// Loading / empty / error / results all reserve this SAME height regardless of
+	// how many rows actually load - so the popup never resizes once opened. An
+	// animated transition was tried first, but the popup opening at one size and
+	// then visibly resizing shortly after (open then shrink/grow) reads as an
+	// unstable window even when the resize itself is eased - a fixed stage removes
+	// the resize entirely instead of smoothing it. When there are fewer results than
+	// maxVisibleItems the list simply leaves blank space below, the same tradeoff
+	// any fixed-height dropdown/autocomplete makes.
+	readonly property int __listStageHeight: root.maxVisibleItems > 0
+		? root.maxVisibleItems * root.itemHeight
+		: 200
+
+	// --- Private: floor so loading/empty/error still show something in embedded
+	// "-1" mode when there are (as yet) zero rows to size against ---
+	readonly property int __placeholderMinHeight: 100
 
 	// --- Private: suppress selectionChanged during initialization ---
 	property bool __initializing: false
@@ -107,19 +162,53 @@ PopupView {
 
 			height: root.itemHeight
 
+			// Test instrumentation: PopupMenuDelegate.qml hardcodes objectName: "PopupMenuDelegate" on
+			// every instance (identical for every row, not text/index-derived), and this popup has no
+			// separate "OK"/confirm button - a single click on a row toggles its selection immediately.
+			// Without a per-row objectName there was no way to address a SPECIFIC row at all. Inert -
+			// overrides the base's objectName binding, no runtime/visual effect.
+			objectName: "FilterableSelectItem_" + model.index
+
 			isSeparator: false
 
 			text: root.showCheckBox ? "" : root.getItemText(model.index)
 
-			selected: root.__internal.focusedIndex === model.index
-			highlighted: !root.showCheckBox && root.dataProvider ? root.dataProvider.isItemSelected(root.getItemId(model.index)) : false
+			// Painted by the row itself below, so the decorator adds nothing on top.
+			selected: false
+			highlighted: false
 
 			onClicked: {
 				root.handleItemClick(root.getItemId(model.index), model.index)
 			}
 
 			onEntered: {
-				root.__internal.focusedIndex = model.index
+				root.focusItem(model.index)
+			}
+
+			// The row paints its own state and handles its own pointer: the content
+			// below sits above the delegate decorator, whose hover never fires then.
+			Rectangle {
+				anchors.fill: parent
+				color: root.rowBackgroundColor(model.index,
+					defaultRowMouseArea.containsMouse,
+					root.dataProvider ? root.dataProvider.isItemSelected(root.getItemId(model.index)) : false)
+			}
+
+			MouseArea {
+				id: defaultRowMouseArea
+
+				anchors.fill: parent
+				z: 20
+				hoverEnabled: true
+				cursorShape: Qt.PointingHandCursor
+
+				onEntered: {
+					root.focusItem(model.index)
+				}
+
+				onClicked: {
+					root.handleItemClick(root.getItemId(model.index), model.index)
+				}
 			}
 
 			Row {
@@ -160,7 +249,7 @@ PopupView {
 				width: parent.width
 				height: 1
 				color: Style.borderColor
-				visible: root.showSeparator
+				visible: root.separatorVisible
 				opacity: 0.4
 			}
 		}
@@ -206,14 +295,80 @@ PopupView {
 		return root.dataProvider.items[index]
 	}
 
+	//! Row the keyboard/hover focus is on. Read it from an overriding \c delegate.
+	property int focusedIndex: -1
+
+	/*!
+		Moves the focus to the given row. Call it from an overriding \c delegate.
+		\param index The index in the dataProvider.items array.
+	*/
+	function focusItem(index){
+		root.focusedIndex = index
+	}
+
 	// --- Internal state (UI-only) ---
 	property QtObject __internal: QtObject {
-		property int focusedIndex: -1
 		property int selectedFocusedIndex: -1
 		property bool clearAllFocused: false
 		property bool hoverBlocked: true
 		property var selectedItemsList: []
 		property int selectedItemsCount: 0
+		property int rowCount: 0
+		property real restoredContentY: 0
+		property bool restoreAfterFetch: false
+		property bool selectionRevealed: false
+	}
+
+	// The model is an item count, so appending a page recreates the delegates and drops
+	// the scroll position; it is restored once the view has laid out again.
+	Timer {
+		id: __restoreScrollTimer
+
+		interval: 0
+		repeat: false
+
+		onTriggered: {
+			var maxContentY = Math.max(0, popupListView.contentHeight - popupListView.height)
+			popupListView.contentY = Math.min(root.__internal.restoredContentY, maxContentY)
+		}
+	}
+
+	/*!
+		Brings the selected row into view once, when the first page of a freshly opened
+		popup arrives. Rows loaded later are left alone - the reader is scrolling then.
+	*/
+	function __revealSelectedItem(){
+		if (root.__internal.selectionRevealed || !root.dataProvider){
+			return
+		}
+
+		var selectedIds = root.dataProvider.getSelectedIds()
+		if (selectedIds.length === 0){
+			return
+		}
+
+		var items = root.dataProvider.items
+		for (var i = 0; i < items.length; i++){
+			if (String(items[i][root.idRole] || "") === String(selectedIds[0])){
+				root.__internal.selectionRevealed = true
+				root.focusedIndex = i
+				root.__scrollToRow(i)
+				return
+			}
+		}
+	}
+
+	function __scrollToRow(index){
+		var maxContentY = Math.max(0, popupListView.contentHeight - popupListView.height)
+		var rowTop = index * root.itemHeight
+		var rowBottom = rowTop + root.itemHeight
+
+		if (rowTop < popupListView.contentY){
+			popupListView.contentY = Math.min(rowTop, maxContentY)
+		}
+		else if (rowBottom > popupListView.contentY + popupListView.height){
+			popupListView.contentY = Math.min(rowBottom - popupListView.height, maxContentY)
+		}
 	}
 
 	// --- Lifecycle (called by ModalDialogManager via DialogManagerView) ---
@@ -221,10 +376,13 @@ PopupView {
 		root.__initializing = true
 		root.__started = true
 
-		root.__internal.focusedIndex = -1
+		root.focusedIndex = -1
 		root.__internal.selectedFocusedIndex = -1
 		root.__internal.hoverBlocked = true
 		root.__internal.clearAllFocused = false
+		root.__internal.rowCount = 0
+		root.__internal.restoreAfterFetch = false
+		root.__internal.selectionRevealed = false
 		popupListView.itemCount = 0
 
 		filterField.text = ""
@@ -289,6 +447,12 @@ PopupView {
 		if (!root.dataProvider || !itemId){
 			return
 		}
+		// toggleItem() re-selects in single-select mode, so removing the one selected
+		// item there means clearing the selection.
+		if (!root.dataProvider.multiSelect){
+			root.dataProvider.clearSelection()
+			return
+		}
 		// When removing, toggleItem only needs the ID (item is already selected,
 		// so __removeFromSelection uses only the ID, not the item object)
 		root.dataProvider.toggleItem(String(itemId), null)
@@ -318,10 +482,32 @@ PopupView {
 
 		function onDataChanged() {
 			var count = root.dataProvider ? root.dataProvider.items.length : 0
+			var previousCount = root.__internal.rowCount
+			var previousContentY = popupListView.contentY
+
 			popupListView.itemCount = count
-			if (root.__internal.focusedIndex >= count){
-				root.__internal.focusedIndex = count > 0 ? count - 1 : -1
+			root.__internal.rowCount = count
+
+			if (root.focusedIndex >= count){
+				root.focusedIndex = count > 0 ? count - 1 : -1
 			}
+
+			// A page appended to an existing list must not scroll the reader back to the
+			// top: rebuilding the model resets contentY, so it is put back afterwards.
+			if (count > previousCount && previousCount > 0 && previousContentY > 0){
+				root.__internal.restoredContentY = previousContentY
+				__restoreScrollTimer.restart()
+				return
+			}
+
+			// Same for the list rebuilt after a selection change.
+			if (count > 0 && root.__internal.restoreAfterFetch){
+				root.__internal.restoreAfterFetch = false
+				__restoreScrollTimer.restart()
+				return
+			}
+
+			root.__revealSelectedItem()
 		}
 
 		function onSelectionChanged(){
@@ -332,8 +518,12 @@ PopupView {
 			root.selectionChanged(root.dataProvider.getSelectedIds())
 			root.__rebuildSelectedGroup()
 
-			// Re-fetch to apply server-side excludeIds filtering after selection change
+			// Re-fetch to apply server-side excludeIds filtering after selection change.
+			// The list is rebuilt by it, so the reading position is carried over -
+			// ticking a row must not throw the reader back to the top.
 			if (root.showSelectedGroup && root.dataProvider){
+				root.__internal.restoredContentY = popupListView.contentY
+				root.__internal.restoreAfterFetch = true
 				root.dataProvider.fetch(filterField.text)
 			}
 		}
@@ -354,7 +544,7 @@ PopupView {
 		duration: root.debounceInterval
 		onFinished: {
 			if (root.dataProvider){
-				root.__internal.focusedIndex = -1
+				root.focusedIndex = -1
 				root.dataProvider.fetch(filterField.text)
 			}
 		}
@@ -423,8 +613,7 @@ PopupView {
 				radius: Style.radiusL
 
 				onTextChanged: {
-					console.log("filterField", text)
-					root.__internal.focusedIndex = -1
+					root.focusedIndex = -1
 					debounce.stop()
 					debounce.start()
 				}
@@ -432,7 +621,7 @@ PopupView {
 				onAccepted: {
 					debounce.stop()
 					if (root.dataProvider){
-						root.__internal.focusedIndex = -1
+						root.focusedIndex = -1
 						root.dataProvider.fetch(filterField.text)
 					}
 				}
@@ -449,7 +638,7 @@ PopupView {
 					z: filterField.z + 1
 
 					decorator: Component { IconButtonDecorator {} }
-					iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+					iconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 
 					visible: filterField.text !== ""
 					enabled: visible
@@ -532,11 +721,28 @@ PopupView {
 							property var __selItem: model.index >= 0 && model.index < root.__internal.selectedItemsList.length
 								? root.__internal.selectedItemsList[model.index] : null
 
-							// Highlight when keyboard-focused
+							// Same reading as the list below: hover or keyboard focus, then
+							// the zebra stripe.
 							Rectangle {
 								anchors.fill: parent
-								color: root.__internal.selectedFocusedIndex === model.index ? Style.buttonHoverColor : "transparent"
-								opacity: 0.5
+								color: {
+									if (selectedRowMouseArea.containsMouse
+											|| root.__internal.selectedFocusedIndex === model.index){
+										return root.hoverColor
+									}
+									if (root.enableAlternating && (model.index % 2 === 1)){
+										return root.alternatingColor
+									}
+									return "transparent"
+								}
+							}
+
+							MouseArea {
+								id: selectedRowMouseArea
+
+								anchors.fill: parent
+								hoverEnabled: true
+								acceptedButtons: Qt.NoButton
 							}
 
 							Row {
@@ -588,7 +794,7 @@ PopupView {
 								height: Style.iconSizeXS
 
 								decorator: Component { IconButtonDecorator {} }
-								iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+								iconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 
 								onClicked: {
 									var si = parent.__selItem
@@ -604,7 +810,7 @@ PopupView {
 								width: parent.width
 								height: 1
 								color: Style.borderColor
-								visible: root.showSeparator
+								visible: root.separatorVisible
 								opacity: 0.4
 							}
 						}
@@ -634,22 +840,23 @@ PopupView {
 			}
 
 			// --- List Body ---
+			// Fixed to __listStageHeight (uncapped in the maxVisibleItems === -1
+			// "embedded, show everything" mode, where the surrounding page already
+			// scrolls) so switching between loading/empty/error/results never
+			// resizes the popup - see __listStageHeight above for why.
 			Item {
 				id: itemBody
 
 				width: parent.width
-				height: loadingOverlay.visible ? loadingOverlay.height
-						: errorItem.visible ? errorItem.height
-						: noDataItem.visible ? noDataItem.height
-						: popupListView.height
+				height: root.maxVisibleItems === -1
+					? Math.max(popupListView.height, root.__placeholderMinHeight)
+					: root.__listStageHeight
 
 				Item {
 					id: noDataItem
 
 					width: parent.width
-					// Match loadingOverlay reserved height so the popup does not visibly
-					// shrink when the initial fetch completes with no results.
-					height: root.maxVisibleItems > 0 ? root.maxVisibleItems * root.itemHeight : 100
+					height: parent.height
 					visible: root.dataProvider
 							&& !root.dataProvider.isInitialLoading
 							&& !root.dataProvider.error
@@ -667,9 +874,7 @@ PopupView {
 					id: errorItem
 
 					width: parent.width
-					// Match loadingOverlay reserved height so the popup does not visibly
-					// shrink when the initial fetch completes with an error.
-					height: root.maxVisibleItems > 0 ? root.maxVisibleItems * root.itemHeight : 100
+					height: parent.height
 					visible: root.dataProvider
 							&& root.dataProvider.error !== null
 							&& !root.dataProvider.isInitialLoading
@@ -698,7 +903,7 @@ PopupView {
 					id: loadingOverlay
 
 					width: parent.width
-					height: root.maxVisibleItems > 0 ? root.maxVisibleItems * root.itemHeight : 100
+					height: parent.height
 					visible: false
 					indicatorSize: 30
 					background.color: "transparent"
@@ -724,8 +929,12 @@ PopupView {
 					property int itemCount: 0
 
 					width: parent.width
-					height: itemCount === 0 ? 0
-							: (root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)) * root.itemHeight
+					// Fixed to the reserved stage height (see __listStageHeight) instead of
+					// shrinking to fit the actual item count - fewer results just leave
+					// blank space below rather than resizing the popup. Uncapped in
+					// embedded "-1" mode, where the surrounding page already scrolls.
+					height: root.maxVisibleItems === -1 ? itemCount * root.itemHeight : parent.height
+					visible: itemCount > 0
 
 					boundsBehavior: Flickable.StopAtBounds
 					clip: true
@@ -799,7 +1008,7 @@ PopupView {
 
 	// --- Helper: clear all focus indicators ---
 	function __clearAllFocusIndicators(){
-		root.__internal.focusedIndex = -1
+		root.focusedIndex = -1
 		root.__internal.selectedFocusedIndex = -1
 		root.__internal.clearAllFocused = false
 	}
@@ -844,9 +1053,9 @@ PopupView {
 			return
 		}
 		// Main list item — toggle
-		if (root.__internal.focusedIndex >= 0){
-			var id = root.getItemId(root.__internal.focusedIndex)
-			root.handleItemClick(id, root.__internal.focusedIndex)
+		if (root.focusedIndex >= 0){
+			var id = root.getItemId(root.focusedIndex)
+			root.handleItemClick(id, root.focusedIndex)
 		}
 	}
 
@@ -888,11 +1097,11 @@ PopupView {
 				if (root.showSelectedGroup && root.__internal.selectedItemsCount > 0){
 					root.__internal.clearAllFocused = true
 					root.__internal.selectedFocusedIndex = -1
-					root.__internal.focusedIndex = -1
+					root.focusedIndex = -1
 				} else {
 					var count = root.dataProvider ? root.dataProvider.items.length : 0
-					if (root.__internal.focusedIndex < 0 && count > 0){
-						root.__internal.focusedIndex = 0
+					if (root.focusedIndex < 0 && count > 0){
+						root.focusedIndex = 0
 					}
 				}
 			} else if (root.__internal.clearAllFocused){
@@ -902,13 +1111,13 @@ PopupView {
 					root.__internal.selectedFocusedIndex = 0
 				} else {
 					var cnt = root.dataProvider ? root.dataProvider.items.length : 0
-					root.__internal.focusedIndex = cnt > 0 ? 0 : -1
+					root.focusedIndex = cnt > 0 ? 0 : -1
 				}
 			} else if (root.__internal.selectedFocusedIndex >= 0){
 				// Tab from selected group → main list
 				root.__internal.selectedFocusedIndex = -1
 				var mainCount = root.dataProvider ? root.dataProvider.items.length : 0
-				root.__internal.focusedIndex = mainCount > 0 ? 0 : -1
+				root.focusedIndex = mainCount > 0 ? 0 : -1
 			} else {
 				// Tab from main list → back to filter
 				root.__focusFilter()
@@ -920,9 +1129,9 @@ PopupView {
 	Shortcut {
 		sequence: "Shift+Tab"
 		onActivated: {
-			if (root.__internal.focusedIndex >= 0){
+			if (root.focusedIndex >= 0){
 				// Shift+Tab from main list → selected group (last item) or "Clear all" or filter
-				root.__internal.focusedIndex = -1
+				root.focusedIndex = -1
 				if (root.showSelectedGroup && root.__internal.selectedItemsCount > 0){
 					root.__internal.selectedFocusedIndex = root.__internal.selectedItemsCount - 1
 				} else {
@@ -971,12 +1180,12 @@ PopupView {
 			}
 
 			// Navigate within main list
-			if (root.__internal.focusedIndex > 0){
-				root.__internal.focusedIndex--
+			if (root.focusedIndex > 0){
+				root.focusedIndex--
 				root.contentYCorrection(false)
-			} else if (root.__internal.focusedIndex === 0){
+			} else if (root.focusedIndex === 0){
 				// Up from first main item → last selected item (if exists) or filter
-				root.__internal.focusedIndex = -1
+				root.focusedIndex = -1
 				if (root.showSelectedGroup && root.__internal.selectedItemsCount > 0){
 					root.__internal.selectedFocusedIndex = root.__internal.selectedItemsCount - 1
 					root.__selectedContentYCorrection(false)
@@ -1003,7 +1212,7 @@ PopupView {
 					root.__selectedContentYCorrection(true)
 				} else {
 					var mc = root.dataProvider ? root.dataProvider.items.length : 0
-					root.__internal.focusedIndex = mc > 0 ? 0 : -1
+					root.focusedIndex = mc > 0 ? 0 : -1
 				}
 				return
 			}
@@ -1017,40 +1226,40 @@ PopupView {
 					// Down from last selected item → first main list item
 					root.__internal.selectedFocusedIndex = -1
 					var mainCount = root.dataProvider ? root.dataProvider.items.length : 0
-					root.__internal.focusedIndex = mainCount > 0 ? 0 : -1
+					root.focusedIndex = mainCount > 0 ? 0 : -1
 				}
 				return
 			}
 
 			// Navigate within main list
 			var itemCount = root.dataProvider ? root.dataProvider.items.length : 0
-			if (root.__internal.focusedIndex < 0){
+			if (root.focusedIndex < 0){
 				// Down from filter → "Clear all" if selected group visible, else first main item
 				if (root.showSelectedGroup && root.__internal.selectedItemsCount > 0){
 					root.__internal.clearAllFocused = true
 				} else if (itemCount > 0){
-					root.__internal.focusedIndex = 0
+					root.focusedIndex = 0
 				}
 				return
 			}
-			if (root.__internal.focusedIndex < itemCount - 1){
-				root.__internal.focusedIndex++
+			if (root.focusedIndex < itemCount - 1){
+				root.focusedIndex++
 				root.contentYCorrection(true)
 			}
-			else if (root.__internal.focusedIndex === itemCount - 1 && root.dataProvider){
+			else if (root.focusedIndex === itemCount - 1 && root.dataProvider){
 				root.dataProvider.fetchMore()
 			}
 		}
 	}
 
 	function contentYCorrection(down_){
-		if (root.__internal.focusedIndex >= 0){
+		if (root.focusedIndex >= 0){
 			var contentY = popupListView.contentY
 			var itemH = root.itemHeight
 			var itemCount = root.dataProvider ? root.dataProvider.items.length : 0
 			var visibleCount = root.maxVisibleItems === -1 ? itemCount : Math.min(root.maxVisibleItems, itemCount)
 			if (visibleCount <= 0) return
-			var index = root.__internal.focusedIndex
+			var index = root.focusedIndex
 
 			if (down_){
 				if ((index + 1) * itemH > contentY + visibleCount * itemH){

@@ -31,7 +31,7 @@ QByteArray CStructureControllerComp::GetElementsQuery(iprm::IParamsSet* filterPa
 	if (parentNodeIdParamPtr.IsValid()){
 		QString parentNodeId = parentNodeIdParamPtr->GetText();
 
-		elementsQuery = QString(R"(
+		elementsQuery = QStringLiteral(R"(
 SELECT "DocumentId" AS "Id", "TypeId", "Name", "Description", "Size", "Permissions", false AS "IsNode",
 	false AS "HasChildren" FROM public."NodeDocuments" WHERE "NodeId" = '%1'
 UNION SELECT "NodeId", 'Node' AS "TypeId", "Name", "Description", 0 AS "Size", "Permissions", true AS "IsNode",
@@ -52,7 +52,7 @@ QJsonObject CStructureControllerComp::GetElements(
 	QString& errorMessage) const
 {
 	if (!m_collectionStructureCompPtr.IsValid()){
-		errorMessage = QString("Unable to list nodes. Component reference 'CollectionStructure' was not set");
+		errorMessage = QStringLiteral("Unable to list nodes. Component reference 'CollectionStructure' was not set");
 
 		SendCriticalMessage(0, errorMessage);
 

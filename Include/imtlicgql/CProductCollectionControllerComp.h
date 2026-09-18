@@ -58,6 +58,14 @@ protected:
 				QString& errorMessage) const override;
 
 	virtual QString GetExtensionFromMimeType(const imtbase::CMimeType& mimeType) const override;
+
+private:
+	/**
+		Turn the product's optional-part record into its wire form: one entry per
+		feature, each carrying the ids of the parts taken from it.
+	*/
+	static imtsdl::TElementList<sdl::V1_0::imtlic::CProductOptionalFeature> CreateOptionalFeaturesRepresentation(
+				const imtlic::IProductInfo& productInfo);
 	virtual QString GetExportFileName(const QByteArray& objectId) const override;
 
 private:

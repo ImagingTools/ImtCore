@@ -11,7 +11,6 @@
 #include <imtgeo/CAddressElementInfo.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <iprm/CParamsSet.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
 namespace imtgeo
@@ -94,7 +93,7 @@ istd::IChangeableUniquePtr CAddressControllerComp::CreateObjectFromRequest(
 			QString& errorMessage) const
 {
 	if (!m_addressInfoFactCompPtr.IsValid()){
-		errorMessage = QObject::tr("Can not create Address: %1").arg(QString::fromUtf8(objectId));
+		errorMessage = QObject::tr("Can not create Address: %1").arg(objectId);
 
 		return nullptr;
 	}
@@ -114,7 +113,7 @@ istd::IChangeableUniquePtr CAddressControllerComp::CreateObjectFromRequest(
 
 	QByteArray itemData = inputParamPtr->GetParamArgumentValue(QByteArrayLiteral("item")).toByteArray();
 	if (itemData.isEmpty()){
-		errorMessage = QObject::tr("Can not create address: %1").arg(QString::fromUtf8(objectId));
+		errorMessage = QObject::tr("Can not create address: %1").arg(objectId);
 
 		return nullptr;
 	}

@@ -2,13 +2,13 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
-import imtgui 1.0
 import imtguigql 1.0
 import imtauthProfileSdl 1.0
 
 Item {
 	id: userPanel;
 	
+	property string context: ""
 	width: 50;
 	height: Style.controlHeightM;
 	
@@ -73,6 +73,7 @@ Item {
 	}
 
 	GqlSdlRequestSender {
+		context: userPanel.context
 		id: organizationsRequest
 		requestType: 0
 		gqlCommandId: ImtauthProfileSdlCommandIds.s_getUserOrganizations
@@ -137,7 +138,13 @@ Item {
 	
 	ToolButton {
 		id: loginButton;
-		
+
+		// Test instrumentation: this ToolButton sets no `text` (icon-only), so it would otherwise
+		// resolve to the generic, non-unique "Button" shared by every untexted ToolButton on the page -
+		// and unlike a one-off dialog button, THIS one is present on every single page. Inert - no
+		// runtime/visual effect.
+		objectName: "UserPanelButton";
+
 		anchors.right: parent ? parent.right : undefined;
 		anchors.verticalCenter: userPanel.verticalCenter;
 		

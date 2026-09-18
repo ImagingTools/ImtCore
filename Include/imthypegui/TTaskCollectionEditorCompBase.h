@@ -127,8 +127,6 @@ private:
 		virtual void SetUserTaskId(const QByteArray& userTaskId) override;
 		virtual QByteArray GetTaskInputId() const override;
 		virtual void SetTaskInputId(const QByteArray& inputId) override;
-		virtual QByteArray GetTaskInputSubId() const override;
-		virtual void SetTaskInputSubId(const QByteArray& inputSubId) override;
 		virtual const imtbase::IObjectCollection* GetTaskInputs() const override;
 
 	private:
@@ -139,7 +137,6 @@ private:
 		bool m_isEnabled = false;
 		QByteArray m_userTaskId;
 		QByteArray m_inputId;
-		QByteArray m_inputSubId;
 	};
 
 	template <typename InterfaceType>
@@ -390,7 +387,13 @@ void TTaskCollectionEditorCompBase<UI>::DuplicateTask()
 		istd::CChangeGroup changeGroup(objectPtr);
 		Q_UNUSED(changeGroup);
 
-		QByteArray newTaskId = objectPtr->InsertNewObject(taskTypeId, QString("Copy of %1").arg(sourceTaskName), "", objectPtr->GetObjectPtr(taskId));
+		QByteArray newTaskId = objectPtr->InsertNewObject(
+			taskTypeId, 
+			sourceTaskName, 
+			tr("Copy of") + " " + sourceTaskName, 
+			objectPtr->GetObjectPtr(taskId)
+		);
+
 		if (newTaskId.isEmpty()){
 			QMessageBox::critical(BaseClass::GetWidget(), QObject::tr("Task Error"), QObject::tr("Task could not be duplicated!"));
 			return;
@@ -664,7 +667,6 @@ void TTaskCollectionEditorCompBase<UI>::InfoFromTaskSettings()
 		bool isEnabled = m_taskSettings.GetTaskEnabled();
 		QByteArray userTaskId = m_taskSettings.GetUserTaskId();
 		QByteArray inputId = m_taskSettings.GetTaskInputId();
-		QByteArray inputSubId = m_taskSettings.GetTaskInputSubId();
 
 		imthype::ITaskCollection* taskCollectionPtr = BaseClass::GetObservedObject();
 		if (taskCollectionPtr != nullptr && taskCollectionPtr->GetElementIds().contains(m_selectedTaskId)){
@@ -674,7 +676,6 @@ void TTaskCollectionEditorCompBase<UI>::InfoFromTaskSettings()
 			taskCollectionPtr->SetElementDescription(m_selectedTaskId, description);
 			taskCollectionPtr->SetElementEnabled(m_selectedTaskId, isEnabled);
 			taskCollectionPtr->SetTaskInputId(m_selectedTaskId, inputId);
-			taskCollectionPtr->SetTaskInputSubId(m_selectedTaskId, inputSubId);
 			if (!taskCollectionPtr->SetUserTaskId(m_selectedTaskId, userTaskId)){
 				QByteArray userId = taskCollectionPtr->GetUserTaskId(m_selectedTaskId);
 				m_taskSettings.SetUserTaskId(userId);
@@ -961,7 +962,6 @@ TTaskCollectionEditorCompBase<UI>::TaskSettings::TaskSettings()
 	m_isEnabled(false)
 {
 	// set default values for task settings here if needed
-	m_inputSubId = "0";
 }
 
 
@@ -1062,24 +1062,6 @@ void TTaskCollectionEditorCompBase<UI>::TaskSettings::SetTaskInputId(const QByte
 		istd::CChangeNotifier notifier(this);
 
 		m_inputId = inputId;
-	}
-}
-
-
-template <class UI>
-QByteArray TTaskCollectionEditorCompBase<UI>::TaskSettings::GetTaskInputSubId() const
-{
-	return m_inputSubId;
-}
-
-
-template <class UI>
-void TTaskCollectionEditorCompBase<UI>::TaskSettings::SetTaskInputSubId(const QByteArray& inputSubId)
-{
-	if (m_inputSubId != inputSubId){
-		istd::CChangeNotifier notifier(this);
-
-		m_inputSubId = inputSubId;
 	}
 }
 

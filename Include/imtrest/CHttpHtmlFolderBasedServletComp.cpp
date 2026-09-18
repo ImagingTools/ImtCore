@@ -222,7 +222,7 @@ ConstResponsePtr CHttpHtmlFolderBasedServletComp::ProcessRequest(const IRequest&
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";
-	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
+	QByteArray reponseTypeId = QByteArrayLiteral("text/html; charset=utf-8");
 
 	ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId).PopInterfacePtr());
 
@@ -289,11 +289,11 @@ ConstResponsePtr CHttpHtmlFolderBasedServletComp::ProcessRequest(const IRequest&
 		QFile destinationFile(destinationFileAbsoluteFilePath);
 
 		if (!destinationFile.open(QFile::ReadOnly)){
-			generateErrorResponsePtr(QByteArray("Cannot open file for read ").append(destinationFile.fileName().toUtf8()));
+			generateErrorResponsePtr(QByteArrayLiteral("Cannot open file for read ").append(destinationFile.fileName().toUtf8()));
 		}
 
 		reponseTypeId = this->GetMimeType(QFileInfo(destinationFileAbsoluteFilePath));
-		reponseTypeId.append(QByteArray("; charset=utf-8"));
+		reponseTypeId.append(QByteArrayLiteral("; charset=utf-8"));
 
 		body = destinationFile.readAll();
 

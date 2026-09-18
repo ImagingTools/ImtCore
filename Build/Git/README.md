@@ -29,6 +29,14 @@ A git hook that automatically runs after a merge operation. It detects the opera
 
 This hook is automatically installed by the `InstallHooks` script.
 
+### CheckoutRepo.bat
+
+Checks out a sibling repository to a tag/branch/commit (or `main` if no version is given), pulls LFS objects, updates submodules, and runs a post-checkout version script if present. Used by the TeamCity release pipelines (`ItDevProjects / Releases`) to avoid repeating the same checkout block for every dependency repository.
+
+**Usage:** `CheckoutRepo.bat <repoDir> <versionValue> [postCheckoutScript]`
+
+See also `Build/CMake/BuildProject.bat`, the equivalent shared script for the "configure + build" step of the same release pipelines.
+
 ## Platform Support
 
 - **Windows**: Uses `.bat` scripts

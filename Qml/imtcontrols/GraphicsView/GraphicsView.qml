@@ -20,7 +20,7 @@ Rectangle {
 			graphicsView.sdlShapesCreated();
 		}
 	}
-	property BaseModel sdlShapeModel: null
+	property var sdlShapeModel: null
 
 
 	property alias selectedIndex: canvas.selectedIndex;
@@ -679,10 +679,10 @@ Rectangle {
 
 					requestPaintPause.restart()
 
-					if(!found){
-						controlArea.cursorShape = Qt.ClosedHandCursor;
-					}
 
+				}
+				if(!found){
+					controlArea.cursorShape = Qt.OpenHandCursor;
 				}
 			}
 

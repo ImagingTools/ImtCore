@@ -580,6 +580,7 @@ class CResultObjectList;
 class CResultObject: public ::imtbase::CItemModelBase, public CResult
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_areaResult READ GetAreaResult WRITE SetAreaResult NOTIFY areaResultChanged)
 	Q_PROPERTY(QVariant m_expectedMinValue READ GetExpectedMinValue WRITE SetExpectedMinValue NOTIFY expectedMinValueChanged)
 	Q_PROPERTY(QVariant m_expectedMaxValue READ GetExpectedMaxValue WRITE SetExpectedMaxValue NOTIFY expectedMaxValueChanged)
@@ -599,6 +600,7 @@ public:
 	CResultObject(QObject* parent = nullptr);
 
 	QVariant GetAreaResult();
+	QString Get__Typename() {return QStringLiteral("Result");}
 	void SetAreaResult(const QVariant& v);
 	Q_INVOKABLE bool hasAreaResult();
 	QVariant GetExpectedMinValue();
@@ -701,6 +703,7 @@ class CAreaObjectList;
 class CAreaObject: public ::imtbase::CItemModelBase, public CArea
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_areaName READ GetAreaName WRITE SetAreaName NOTIFY areaNameChanged)
 	Q_PROPERTY(QVariant m_status READ GetStatus WRITE SetStatus NOTIFY statusChanged)
 	Q_PROPERTY(QVariant m_iconPosition READ GetIconPosition WRITE SetIconPosition NOTIFY iconPositionChanged)
@@ -713,6 +716,7 @@ public:
 	CAreaObject(QObject* parent = nullptr);
 
 	QVariant GetAreaName();
+	QString Get__Typename() {return QStringLiteral("Area");}
 	void SetAreaName(const QVariant& v);
 	Q_INVOKABLE bool hasAreaName();
 	QVariant GetStatus();
@@ -791,6 +795,7 @@ class CAnalyzerObjectList;
 class CAnalyzerObject: public ::imtbase::CItemModelBase, public CAnalyzer
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_analyzerName READ GetAnalyzerName WRITE SetAnalyzerName NOTIFY analyzerNameChanged)
 	Q_PROPERTY(QVariant m_analyzerResult READ GetAnalyzerResult WRITE SetAnalyzerResult NOTIFY analyzerResultChanged)
 	Q_PROPERTY(QVariant m_areas READ GetAreas WRITE SetAreas NOTIFY areasChanged)
@@ -801,6 +806,7 @@ public:
 	CAnalyzerObject(QObject* parent = nullptr);
 
 	QVariant GetAnalyzerName();
+	QString Get__Typename() {return QStringLiteral("Analyzer");}
 	void SetAnalyzerName(const QVariant& v);
 	Q_INVOKABLE bool hasAnalyzerName();
 	QVariant GetAnalyzerResult();
@@ -868,6 +874,7 @@ class CInspectionObjectList;
 class CInspectionObject: public ::imtbase::CItemModelBase, public CInspection
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_iD READ GetID WRITE SetID NOTIFY iDChanged)
 	Q_PROPERTY(QVariant m_typeID READ GetTypeID WRITE SetTypeID NOTIFY typeIDChanged)
 	Q_PROPERTY(QVariant m_name READ GetName WRITE SetName NOTIFY nameChanged)
@@ -880,6 +887,7 @@ public:
 	CInspectionObject(QObject* parent = nullptr);
 
 	QVariant GetID();
+	QString Get__Typename() {return QStringLiteral("Inspection");}
 	void SetID(const QVariant& v);
 	Q_INVOKABLE bool hasID();
 	QVariant GetTypeID();
@@ -955,6 +963,7 @@ class CProductOverviewObjectList;
 class CProductOverviewObject: public ::imtbase::CItemModelBase, public CProductOverview
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_productID READ GetProductID WRITE SetProductID NOTIFY productIDChanged)
 	Q_PROPERTY(QVariant m_name READ GetName WRITE SetName NOTIFY nameChanged)
 	Q_PROPERTY(QVariant m_status READ GetStatus WRITE SetStatus NOTIFY statusChanged)
@@ -969,6 +978,7 @@ public:
 	CProductOverviewObject(QObject* parent = nullptr);
 
 	QVariant GetProductID();
+	QString Get__Typename() {return QStringLiteral("ProductOverview");}
 	void SetProductID(const QVariant& v);
 	Q_INVOKABLE bool hasProductID();
 	QVariant GetName();
@@ -1052,6 +1062,7 @@ class CLocalizedTextObjectList;
 class CLocalizedTextObject: public ::imtbase::CItemModelBase, public CLocalizedText
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_text READ GetText WRITE SetText NOTIFY textChanged)
 	Q_PROPERTY(QVariant m_locale READ GetLocale WRITE SetLocale NOTIFY localeChanged)
 
@@ -1061,6 +1072,7 @@ public:
 	CLocalizedTextObject(QObject* parent = nullptr);
 
 	QVariant GetText();
+	QString Get__Typename() {return QStringLiteral("LocalizedText");}
 	void SetText(const QVariant& v);
 	Q_INVOKABLE bool hasText();
 	QVariant GetLocale();
@@ -1120,6 +1132,7 @@ class CCoordinatesObjectList;
 class CCoordinatesObject: public ::imtbase::CItemModelBase, public CCoordinates
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_x READ GetX WRITE SetX NOTIFY xChanged)
 	Q_PROPERTY(QVariant m_y READ GetY WRITE SetY NOTIFY yChanged)
 	Q_PROPERTY(QVariant m_z READ GetZ WRITE SetZ NOTIFY zChanged)
@@ -1130,6 +1143,7 @@ public:
 	CCoordinatesObject(QObject* parent = nullptr);
 
 	QVariant GetX();
+	QString Get__Typename() {return QStringLiteral("Coordinates");}
 	void SetX(const QVariant& v);
 	Q_INVOKABLE bool hasX();
 	QVariant GetY();
@@ -1193,6 +1207,7 @@ class CExtendedMetaDataObjectList;
 class CExtendedMetaDataObject: public ::imtbase::CItemModelBase, public CExtendedMetaData
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_key READ GetKey WRITE SetKey NOTIFY keyChanged)
 	Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)
 
@@ -1202,6 +1217,7 @@ public:
 	CExtendedMetaDataObject(QObject* parent = nullptr);
 
 	QVariant GetKey();
+	QString Get__Typename() {return QStringLiteral("ExtendedMetaData");}
 	void SetKey(const QVariant& v);
 	Q_INVOKABLE bool hasKey();
 	QVariant GetValue();
@@ -1264,6 +1280,7 @@ class CResultMetaDataObjectList;
 class CResultMetaDataObject: public ::imtbase::CItemModelBase, public CResultMetaData
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_resultId READ GetResultId WRITE SetResultId NOTIFY resultIdChanged)
 	Q_PROPERTY(QVariant m_creationTime READ GetCreationTime WRITE SetCreationTime NOTIFY creationTimeChanged)
 	Q_PROPERTY(QVariant m_partId READ GetPartId WRITE SetPartId NOTIFY partIdChanged)
@@ -1279,6 +1296,7 @@ public:
 	CResultMetaDataObject(QObject* parent = nullptr);
 
 	QVariant GetResultId();
+	QString Get__Typename() {return QStringLiteral("ResultMetaData");}
 	void SetResultId(const QVariant& v);
 	Q_INVOKABLE bool hasResultId();
 	QVariant GetCreationTime();
@@ -1369,6 +1387,7 @@ class COverallResultValuesObjectList;
 class COverallResultValuesObject: public ::imtbase::CItemModelBase, public COverallResultValues
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_name READ GetName WRITE SetName NOTIFY nameChanged)
 	Q_PROPERTY(QVariant m_valueId READ GetValueId WRITE SetValueId NOTIFY valueIdChanged)
 	Q_PROPERTY(QVariant m_measuredValue READ GetMeasuredValue WRITE SetMeasuredValue NOTIFY measuredValueChanged)
@@ -1381,6 +1400,7 @@ public:
 	COverallResultValuesObject(QObject* parent = nullptr);
 
 	QVariant GetName();
+	QString Get__Typename() {return QStringLiteral("OverallResultValues");}
 	void SetName(const QVariant& v);
 	Q_INVOKABLE bool hasName();
 	QVariant GetValueId();
@@ -1452,6 +1472,7 @@ class CUnionTestingTypeObjectList;
 class CUnionTestingTypeObject: public ::imtbase::CItemModelBase, public CUnionTestingType
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_simpleUnion READ GetSimpleUnion WRITE SetSimpleUnion NOTIFY simpleUnionChanged)
 	Q_PROPERTY(QVariant m_complexUnion READ GetComplexUnion WRITE SetComplexUnion NOTIFY complexUnionChanged)
 	Q_PROPERTY(QVariant m_mixedUnion READ GetMixedUnion WRITE SetMixedUnion NOTIFY mixedUnionChanged)
@@ -1462,6 +1483,7 @@ public:
 	CUnionTestingTypeObject(QObject* parent = nullptr);
 
 	QVariant GetSimpleUnion();
+	QString Get__Typename() {return QStringLiteral("UnionTestingType");}
 	void SetSimpleUnion(const QVariant& v);
 	Q_INVOKABLE bool hasSimpleUnion();
 	Q_INVOKABLE void emplaceSimpleUnion();
@@ -1534,6 +1556,7 @@ class CCDMResultVarRecursiveObjectList;
 class CCDMResultVarRecursiveObject: public ::imtbase::CItemModelBase, public CCDMResultVarRecursive
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_dataModelTitle READ GetDataModelTitle WRITE SetDataModelTitle NOTIFY dataModelTitleChanged)
 	Q_PROPERTY(QVariant m_dataModelVersion READ GetDataModelVersion WRITE SetDataModelVersion NOTIFY dataModelVersionChanged)
 	Q_PROPERTY(QVariant m_resultMetaData READ GetResultMetaData WRITE SetResultMetaData NOTIFY resultMetaDataChanged)
@@ -1546,6 +1569,7 @@ public:
 	CCDMResultVarRecursiveObject(QObject* parent = nullptr);
 
 	QVariant GetDataModelTitle();
+	QString Get__Typename() {return QStringLiteral("CDMResultVarRecursive");}
 	void SetDataModelTitle(const QVariant& v);
 	Q_INVOKABLE bool hasDataModelTitle();
 	QVariant GetDataModelVersion();
@@ -1627,6 +1651,7 @@ class CCDMResultVarStringObjectList;
 class CCDMResultVarStringObject: public ::imtbase::CItemModelBase, public CCDMResultVarString
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_dataModelTitle READ GetDataModelTitle WRITE SetDataModelTitle NOTIFY dataModelTitleChanged)
 	Q_PROPERTY(QVariant m_dataModelVersion READ GetDataModelVersion WRITE SetDataModelVersion NOTIFY dataModelVersionChanged)
 	Q_PROPERTY(QVariant m_resultMetaData READ GetResultMetaData WRITE SetResultMetaData NOTIFY resultMetaDataChanged)
@@ -1639,6 +1664,7 @@ public:
 	CCDMResultVarStringObject(QObject* parent = nullptr);
 
 	QVariant GetDataModelTitle();
+	QString Get__Typename() {return QStringLiteral("CDMResultVarString");}
 	void SetDataModelTitle(const QVariant& v);
 	Q_INVOKABLE bool hasDataModelTitle();
 	QVariant GetDataModelVersion();
@@ -1717,6 +1743,7 @@ class CCDMResultObjectList;
 class CCDMResultObject: public ::imtbase::CItemModelBase, public CCDMResult
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_dataModelTitle READ GetDataModelTitle WRITE SetDataModelTitle NOTIFY dataModelTitleChanged)
 	Q_PROPERTY(QVariant m_dataModelVersion READ GetDataModelVersion WRITE SetDataModelVersion NOTIFY dataModelVersionChanged)
 	Q_PROPERTY(QVariant m_resultMetaData READ GetResultMetaData WRITE SetResultMetaData NOTIFY resultMetaDataChanged)
@@ -1729,6 +1756,7 @@ public:
 	CCDMResultObject(QObject* parent = nullptr);
 
 	QVariant GetDataModelTitle();
+	QString Get__Typename() {return QStringLiteral("CDMResult");}
 	void SetDataModelTitle(const QVariant& v);
 	Q_INVOKABLE bool hasDataModelTitle();
 	QVariant GetDataModelVersion();
@@ -1810,6 +1838,7 @@ class CPointsInCoordinateFormatObjectList;
 class CPointsInCoordinateFormatObject: public ::imtbase::CItemModelBase, public CPointsInCoordinateFormat
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_pointAsCoordinates READ GetPointAsCoordinates WRITE SetPointAsCoordinates NOTIFY pointAsCoordinatesChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
@@ -1818,6 +1847,7 @@ public:
 	CPointsInCoordinateFormatObject(QObject* parent = nullptr);
 
 	QVariant GetPointAsCoordinates();
+	QString Get__Typename() {return QStringLiteral("PointsInCoordinateFormat");}
 	void SetPointAsCoordinates(const QVariant& v);
 	Q_INVOKABLE bool hasPointAsCoordinates();
 	// CItemModelBase implemented
@@ -1873,6 +1903,7 @@ class CCollectionViewParamsTestObjectList;
 class CCollectionViewParamsTestObject: public ::imtbase::CItemModelBase, public CCollectionViewParamsTest
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_count READ GetCount WRITE SetCount NOTIFY countChanged)
 	Q_PROPERTY(QVariant m_offset READ GetOffset WRITE SetOffset NOTIFY offsetChanged)
 	Q_PROPERTY(QVariant m_filterModel READ GetFilterModel WRITE SetFilterModel NOTIFY filterModelChanged)
@@ -1883,6 +1914,7 @@ public:
 	CCollectionViewParamsTestObject(QObject* parent = nullptr);
 
 	QVariant GetCount();
+	QString Get__Typename() {return QStringLiteral("CollectionViewParamsTest");}
 	void SetCount(const QVariant& v);
 	Q_INVOKABLE bool hasCount();
 	QVariant GetOffset();

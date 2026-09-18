@@ -2,16 +2,17 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QMap>
-#include <QtCore/QMutex>
-#include <QtCore/QString>
-#include <QtCore/QThread>
-#include <QtCore/QWaitCondition>
-
 // STL includes
 #include <atomic>
 #include <memory>
+
+// Qt includes
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
+#include <QtCore/QPointer>
+#include <QtCore/QString>
+#include <QtCore/QThread>
+#include <QtCore/QWaitCondition>
 
 // ACF includes
 #include <idoc/IUndoManager.h>
@@ -152,7 +153,7 @@ protected:
 		both \c DoCloseDocument and failure paths of \c DoCreateNewDocument /
 		\c DoOpenDocument).
 	*/
-	OperationStatus CloseDocumentInternal(const QByteArray& userId, const QByteArray& documentId);
+	virtual OperationStatus CloseDocumentInternal(const QByteArray& userId, const QByteArray& documentId);
 
 	/**
 		\brief Mark a pending task as finished.
@@ -164,25 +165,57 @@ protected:
 
 	bool ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const;
 	int GetUndoManagerNextModelId(const QByteArray& userId);
-	void InitializeDocumentObservers(WorkingDocument& document, const QByteArray& userId);
+	void InitializeDocumentObservers(WorkingDocument& document, const QByteArray& userId, const QByteArray& documentId);
 	WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId);
 	const WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId) const;
 	bool FindDocument(int undoManagerModelId, QByteArray& outUserId, QByteArray& outDocumentId);
 	QUrl ObjectIdToUrl(const QByteArray& objectId);
 	void OnDocumentDataLoaded(const QByteArray& userId, const QByteArray& documentId);
 	void OnUndoManagerChanged(int modelId);
+	void OnCreateDocumentThreadStarted(
+				const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+				const QByteArray& documentTypeId,
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				const QByteArray& taskId,
+				QObject* worker,
+				const istd::IChangeable* defaultDataPtr);
+	void OnCreateDocumentThreadFinished(
+				const std::weak_ptr<std::atomic<bool>>& aliveGuard,
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				const QByteArray& taskId,
+				const iprm::IParamsSet* initParamsPtr);
 
 	virtual QString GetDefaultDocumentName(const WorkingDocument& document) const;
 	virtual bool HasDocumentNameProvider(const QByteArray& typeId) const;
 	virtual bool ValidateDocumentData(
-		const WorkingDocument& document,
-		OperationStatus& status,
-		QString* errorMessage = nullptr,
-		const imtbase::IOperationContext* operationContextPtr = nullptr) const;
+				const WorkingDocument& document,
+				OperationStatus& status,
+				QString* errorMessage = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
 	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentServiceEventHandlers() const;
 
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const = 0;
 	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const = 0;
+
+	/**
+		\brief Called after a new document is created from the factory but before
+		the undo manager is attached.
+
+		Subclasses must implement to perform initialization that should not
+		generate undo history.
+
+		\param typeId       Registered object type-ID of the document.
+		\param initParams   Optional initialization parameters (may be \c nullptr).
+		\param document     Mutable reference to the document data object.
+		\param errorMessage Out-parameter for a human-readable error
+		                    description when the method returns \c false.
+		\return             \c true on success; \c false if initialization failed
+		                    (e.g.\ init params provided but no delegate registered,
+		                    or the delegate rejected the parameters).
+	*/
+	virtual bool OnDocumentCreated(const QByteArray& typeId, const iprm::IParamsSet* initParams, istd::IChangeable& document, QString& errorMessage) = 0;
 
 	static QString GetInvalidDocumentMessage();
 
@@ -205,6 +238,7 @@ protected:
 		idoc::IUndoManagerSharedPtr undoManagerPtr;///< Associated undo/redo manager.
 		bool isDirty;                              ///< \c true when there are unsaved changes.
 		bool isLoading = false;                    ///< \c true while the background load is in progress.
+		bool singleDocumentInstance = false;       ///< \c true when the document was opened with \c TaskParams::singleDocumentInstance.
 		int undoManagerModelId = -1;               ///< Model registration ID in \c UndoManagerObserver.
 	};
 
@@ -277,10 +311,11 @@ protected:
 	QMap<QByteArray, std::shared_ptr<TaskContext>> m_pendingTasks; ///< Currently executing or pending tasks (taskId → context).
 	mutable QMutex m_tasksMutex; ///< Guards \c m_pendingTasks.
 
+	QList<QPointer<QThread>> m_workerThreads; ///< Background threads spawned for async document creation.
+	mutable QMutex m_workerThreadsMutex; ///< Guards \c m_workerThreads.
+
 	QList<IDocumentServiceEventHandler*> m_registeredEventHandlers; ///< Runtime-registered event handlers.
 };
 
 
 } // namespace imtdoc
-
-

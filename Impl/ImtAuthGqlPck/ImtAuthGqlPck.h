@@ -12,7 +12,6 @@
 #include <imtauthgql/CUserCollectionControllerComp.h>
 #include <imtauthgql/CUserControllerComp.h>
 #include <imtauthgql/CUserGroupCollectionControllerComp.h>
-#include <imtauthgql/CAuthorizationOptionsControllerComp.h>
 #include <imtauthgql/CSessionControllerComp.h>
 #include <imtauthgql/CClientRequestRemoteSuperuserProviderComp.h>
 #include <imtauthgql/CRemoteSuperuserControllerComp.h>
@@ -83,7 +82,6 @@ typedef imtauthgql::CRoleCollectionControllerComp RoleCollectionController;
 typedef imtauthgql::CUserCollectionControllerComp UserCollectionController;
 typedef imtauthgql::CUserControllerComp UserController;
 typedef imtauthgql::CUserGroupCollectionControllerComp UserGroupCollectionController;
-typedef imtauthgql::CAuthorizationOptionsControllerComp AuthorizationOptionsController;
 typedef imtauthgql::CSessionControllerComp SessionController;
 typedef imtauthgql::CClientRequestRemoteSuperuserProviderComp ClientRequestRemoteSuperuserProvider;
 typedef imtauthgql::CRemoteSuperuserControllerComp RemoteSuperuserController;

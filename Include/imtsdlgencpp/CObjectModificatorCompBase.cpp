@@ -313,7 +313,7 @@ void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& st
 
 	if (isStrict){
 
-		AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+		AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
 
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;\n\t}");
@@ -442,7 +442,7 @@ void CObjectModificatorCompBase::AddCustomFieldWriteToObjectImplCode(
 	stream << QStringLiteral("Added){");
 	FeedStream(stream, 1, false);
 
-	AddErrorReport(stream, QStringLiteral("Unable to write field: '%3'"), hIndents + 1, QStringList({QString("\"%1\"").arg(field.GetId())}));
+	AddErrorReport(stream, QStringLiteral("Unable to write field: '%3'"), hIndents + 1, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
 
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("return false;");
@@ -651,7 +651,7 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldWriteToObjectImplCode(
 	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
 
-	AddErrorReport(stream, QStringLiteral("Unable to write field: '%3'"), hIndents + 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+	AddErrorReport(stream, QStringLiteral("Unable to write field: '%3'"), hIndents + 2, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
 
 	// inLoop: error report
 	FeedStreamHorizontally(stream, hIndents + 2);
@@ -703,7 +703,7 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 	FeedStream(stream, 1, false);
 
 	if (isStrict){
-		AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+		AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
 
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;");
@@ -830,7 +830,7 @@ void CObjectModificatorCompBase::AddCustomFieldReadFromObjectCode(QTextStream& s
 	FeedStream(stream, 1, false);
 
 	if (isStrict){
-		AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+		AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
 
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;");
@@ -892,7 +892,7 @@ void CObjectModificatorCompBase::AddCustomFieldReadFromObjectImplCode(
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
-	AddErrorReport(stream, QStringLiteral("Unable to read field: '%3'"), hIndents + 1, QStringList({QString("\"%1\"").arg(field.GetId())}));
+	AddErrorReport(stream, QStringLiteral("Unable to read field: '%3'"), hIndents + 1, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
 
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("return false;");
@@ -913,7 +913,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectCode(QTextStream& st
 	FeedStream(stream, 1, false);
 
 	if (isStrict){
-		AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+		AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
 
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;");
@@ -955,7 +955,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		stream << QStringLiteral("if (") << result.listCountVariableName << QStringLiteral(" <= 0){");
 		FeedStream(stream, 1, false);
 
-		AddErrorReport(stream, QStringLiteral("Field: '%3' is empty"), hIndents, QStringList({QString("\"%1\"").arg(field.GetId())}));
+		AddErrorReport(stream, QStringLiteral("Field: '%3' is empty"), hIndents, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
 
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("return false;");
@@ -1110,7 +1110,7 @@ void CObjectModificatorCompBase::AddCustomArrayFieldReadFromObjectCode(QTextStre
 	FeedStream(stream, 1, false);
 
 	if (isStrict){
-		AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+		AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
 
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;");
@@ -1149,7 +1149,7 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldReadToObjectImplCode(
 		stream << QStringLiteral("if (") << result.listCountVariableName << QStringLiteral(" <= 0){");
 		FeedStream(stream, 1, false);
 
-		AddErrorReport(stream, QStringLiteral("Field: '%3' is empty"), hIndents, QStringList({QString("\"%1\"").arg(field.GetId())}));
+		AddErrorReport(stream, QStringLiteral("Field: '%3' is empty"), hIndents, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
 
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("return false;");
@@ -1213,7 +1213,7 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldReadToObjectImplCode(
 	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
 
-	AddErrorReport(stream, QStringLiteral("Unable to read field '%3'"), hIndents + 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+	AddErrorReport(stream, QStringLiteral("Unable to read field '%3'"), hIndents + 2, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
 
 	FeedStreamHorizontally(stream, hIndents + 2);
 	stream << QStringLiteral("return false;");

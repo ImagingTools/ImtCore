@@ -28,17 +28,17 @@ bool CFeatureCollectionViewDelegateComp::GetSummaryInformation(
 		SummaryInformation summaryInformation;
 		summaryInformation.infoId = informationId;
 		if (featureInfoPtr != nullptr){
-			if (informationId == QByteArray("Name")){
+			if (informationId == QByteArrayLiteral("Name")){
 				summaryInformation.text = featureInfoPtr->GetFeatureName();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
-			else if (informationId == QByteArray("Id")){
+			else if (informationId == QByteArrayLiteral("Id")){
 				summaryInformation.text = featureInfoPtr->GetFeatureId();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);
 			}
-			else if (informationId == QByteArray("Description")){
+			else if (informationId == QByteArrayLiteral("Description")){
 				summaryInformation.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 				summaryInformation.sortValue = summaryInformation.text;
 				objectMetaInfo.append(summaryInformation);

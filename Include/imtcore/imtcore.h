@@ -147,5 +147,5 @@
 
 namespace imtcore
 {
-	// Namespace for core SDK version and metadata
+// Namespace for core SDK version and metadata
 }

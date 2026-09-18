@@ -41,7 +41,7 @@ QJsonObject CHeadersDataProviderComp::CreateInternalResponse(
 	}
 
 	if (gqlContextPtr == nullptr){
-		errorMessage = QString("Unable to create response. Error: GraphQL context is invalid");
+		errorMessage = QStringLiteral("Unable to create response. Error: GraphQL context is invalid");
 		return QJsonObject();
 	}
 

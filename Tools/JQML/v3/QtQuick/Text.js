@@ -139,7 +139,7 @@ class Text extends Item {
             this.implicitWidth = textMetrics.width
             this.implicitHeight = textMetrics.height
         } else {
-            let textMetrics = JQApplication.TextController.measureText(this.text, this.font, !this.width__prevent ? 0 : this.width, this.wrapMode, isHTML, this.elide)
+            let textMetrics = JQApplication.TextController.measureText(this.text, this.font, !this.width__prevent ? 0 : this.width, this.wrapMode, isHTML, this.elide && this.wrapMode === Text.NoWrap)
 
             this.contentWidth = textMetrics.width
             this.contentHeight = textMetrics.height
@@ -163,19 +163,25 @@ class Text extends Item {
     }
 
     SLOT_colorChanged(oldValue, newValue){
+        let alphaMultiplier = newValue === 'transparent' ? 0 : this.JQOpacityMultiplier
         let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
         this.__setDOMStyle({
-            opacity: 1,
-            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${newValue === 'transparent' ? 0 : rgba.a * this.__proxy.opacity})`
+            opacity: this.JQOpacityMultiplier > 0 ? 1 : 0,
+            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${rgba.a * alphaMultiplier})`
+        })
+    }
+
+    SLOT_JQOpacityMultiplierChanged(oldValue, newValue){
+        let alphaMultiplier = this.color === 'transparent' ? 0 : newValue
+        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
+        this.__setDOMStyle({
+            opacity: newValue > 0 ? 1 : 0,
+            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${rgba.a * alphaMultiplier})`
         })
     }
 
     SLOT_opacityChanged(oldValue, newValue){
-        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
-        this.__setDOMStyle({
-            opacity: 1,
-            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * newValue})`
-        })
+
     }
 
     SLOT_visibleChanged(oldValue, newValue){
@@ -184,8 +190,8 @@ class Text extends Item {
         JQApplication.updateLater(this)
     }
 
-    SLOT_elideChanged(oldValue, newValue){
-        if(newValue === Text.ElideRight){
+    __updateElide(){
+        if(this.elide === Text.ElideRight && this.wrapMode === Text.NoWrap){
             this.__setImplStyle({
                 textOverflow: 'ellipsis',
                 overflow: 'auto',
@@ -196,6 +202,10 @@ class Text extends Item {
                 overflow: 'unset',
             })
         }
+    }
+
+    SLOT_elideChanged(oldValue, newValue){
+        this.__updateElide()
 
         JQApplication.updateLater(this)
     }
@@ -229,6 +239,7 @@ class Text extends Item {
             case Text.Wrap: this.__setDOMStyle({ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }); break;
             case Text.WrapAtWordBoundaryOrAnywhere: this.__setDOMStyle({ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }); break;
         }
+        this.__updateElide()
 
         JQApplication.updateLater(this)
     }

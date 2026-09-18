@@ -35,7 +35,7 @@ const IJobProcessor* CPluginBasedJobExecutionComp::GetTaskProcessor(const QByteA
 					return nullptr;
 				}
 
-				m_jobProcessorMap[workerTypeId].FromUnique(processorPtr);
+				m_jobProcessorMap[workerTypeId].FromUnique(std::move(processorPtr));
 
 				return m_jobProcessorMap[workerTypeId].GetPtr();
 			}

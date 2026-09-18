@@ -17,6 +17,13 @@ QtObject {
 	signal representationUpdated(string documentId, var representation)
 	signal updateRepresentationFailed(string documentId, string message)
 
+	onRepresentationModelChanged: {
+		if (view){
+			view.model = representationModel
+			representationUpdated(documentId, representationModel)
+		}
+	}
+
 	function updateRepresentationFromDocument(){
 		startUpdateRepresentation(documentId, representationModel)
 		console.warn("updateRepresentationFromDocument() should be implemented in a subclass")

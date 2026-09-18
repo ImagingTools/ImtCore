@@ -58,7 +58,7 @@ istd::IChangeableUniquePtr TMessageDatabaseDelegateComp<BaseDelegate>::CreateObj
 	}
 
 	if (record.contains("Document")){
-		QByteArray documentContent = record.value(qPrintable("Document")).toByteArray();
+		QByteArray documentContent = record.value("Document").toByteArray();
 
 		if (BaseDelegate::ReadDataFromMemory("MessageInfo", documentContent, *documentPtr)){
 			return documentPtr;
@@ -95,31 +95,31 @@ bool TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFilterQuery(const i
 					if (!filterQuery.isEmpty()){
 						filterQuery += " AND ";
 					}
-					filterQuery += QString("json_extract(\"Document\",'$.Category') != 0");
+					filterQuery += QStringLiteral(R"(json_extract("Document",'$.Category') != 0)");
 				}
 				else if (key == "InfoFilter" && value == "false"){
 					if (!filterQuery.isEmpty()){
 						filterQuery += " AND ";
 					}
-					filterQuery += QString("json_extract(\"Document\",'$.Category') != 1");
+					filterQuery += QStringLiteral(R"(json_extract("Document",'$.Category') != 1)");
 				}
 				else if (key == "WarningFilter" && value == "false"){
 					if (!filterQuery.isEmpty()){
 						filterQuery += " AND ";
 					}
-					filterQuery += QString("json_extract(\"Document\",'$.Category') != 2");
+					filterQuery += QStringLiteral(R"(json_extract("Document",'$.Category') != 2)");
 				}
 				else if (key == "ErrorFilter" && value == "false"){
 					if (!filterQuery.isEmpty()){
 						filterQuery += " AND ";
 					}
-					filterQuery += QString("json_extract(\"Document\",'$.Category') != 3");
+					filterQuery += QStringLiteral(R"(json_extract("Document",'$.Category') != 3)");
 				}
 				else if (key == "CriticalFilter" && value == "false"){
 					if (!filterQuery.isEmpty()){
 						filterQuery += " AND ";
 					}
-					filterQuery += QString("json_extract(\"Document\",'$.Category') != 4");
+					filterQuery += QStringLiteral(R"(json_extract("Document",'$.Category') != 4)");
 				}
 			}
 		}
@@ -148,7 +148,7 @@ bool TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFilterQuery(const i
 					if (!filterQuery.isEmpty()){
 						filterQuery += " AND ";
 					}
-					filterQuery += QString("json_extract(\"Document\",'$.Source') != '%1'").arg(qPrintable(key));
+					filterQuery += QStringLiteral(R"(json_extract("Document",'$.Source') != '%1')").arg(key);
 				}
 			}
 		}

@@ -485,6 +485,7 @@ class CPointObjectList;
 class CPointObject: public ::imtbase::CItemModelBase, public CPoint
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_x READ GetX WRITE SetX NOTIFY xChanged)
 	Q_PROPERTY(QVariant m_y READ GetY WRITE SetY NOTIFY yChanged)
 
@@ -494,6 +495,7 @@ public:
 	CPointObject(QObject* parent = nullptr);
 
 	QVariant GetX();
+	QString Get__Typename() {return QStringLiteral("Point");}
 	void SetX(const QVariant& v);
 	Q_INVOKABLE bool hasX();
 	QVariant GetY();
@@ -553,6 +555,7 @@ class CGeometryObjectList;
 class CGeometryObject: public ::imtbase::CItemModelBase, public CGeometry
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_geometryType READ GetGeometryType WRITE SetGeometryType NOTIFY geometryTypeChanged)
 	Q_PROPERTY(QVariant m_radius READ GetRadius WRITE SetRadius NOTIFY radiusChanged)
 	Q_PROPERTY(QVariant m_points READ GetPoints WRITE SetPoints NOTIFY pointsChanged)
@@ -565,6 +568,7 @@ public:
 	CGeometryObject(QObject* parent = nullptr);
 
 	QVariant GetGeometryType();
+	QString Get__Typename() {return QStringLiteral("Geometry");}
 	void SetGeometryType(const QVariant& v);
 	Q_INVOKABLE bool hasGeometryType();
 	QVariant GetRadius();

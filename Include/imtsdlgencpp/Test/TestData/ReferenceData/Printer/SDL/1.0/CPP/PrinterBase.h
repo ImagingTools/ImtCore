@@ -165,6 +165,7 @@ class CPrinterSpecificationBaseObjectList;
 class CPrinterSpecificationBaseObject: public ::imtbase::CItemModelBase, public CPrinterSpecificationBase
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_name READ GetName WRITE SetName NOTIFY nameChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
@@ -173,6 +174,7 @@ public:
 	CPrinterSpecificationBaseObject(QObject* parent = nullptr);
 
 	QVariant GetName();
+	QString Get__Typename() {return QStringLiteral("PrinterSpecificationBase");}
 	void SetName(const QVariant& v);
 	Q_INVOKABLE bool hasName();
 	// CItemModelBase implemented
@@ -228,6 +230,7 @@ class CLinkObjectList;
 class CLinkObject: public ::imtbase::CItemModelBase, public CLink
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_link READ GetLink WRITE SetLink NOTIFY linkChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
@@ -236,6 +239,7 @@ public:
 	CLinkObject(QObject* parent = nullptr);
 
 	QVariant GetLink();
+	QString Get__Typename() {return QStringLiteral("Link");}
 	void SetLink(const QVariant& v);
 	Q_INVOKABLE bool hasLink();
 	// CItemModelBase implemented
@@ -291,6 +295,7 @@ class CPrinterBaseObjectList;
 class CPrinterBaseObject: public ::imtbase::CItemModelBase, public CPrinterBase
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_name READ GetName WRITE SetName NOTIFY nameChanged)
 	Q_PROPERTY(QVariant m_specification READ GetSpecification WRITE SetSpecification NOTIFY specificationChanged)
 	Q_PROPERTY(QVariant m_simpleTest READ GetSimpleTest WRITE SetSimpleTest NOTIFY simpleTestChanged)
@@ -302,6 +307,7 @@ public:
 	CPrinterBaseObject(QObject* parent = nullptr);
 
 	QVariant GetName();
+	QString Get__Typename() {return QStringLiteral("PrinterBase");}
 	void SetName(const QVariant& v);
 	Q_INVOKABLE bool hasName();
 	QVariant GetSpecification();
@@ -378,6 +384,7 @@ class CPrinterListObjectList;
 class CPrinterListObject: public ::imtbase::CItemModelBase, public CPrinterList
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_data READ GetData WRITE SetData NOTIFY dataChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
@@ -386,6 +393,7 @@ public:
 	CPrinterListObject(QObject* parent = nullptr);
 
 	QVariant GetData();
+	QString Get__Typename() {return QStringLiteral("PrinterList");}
 	void SetData(const QVariant& v);
 	Q_INVOKABLE bool hasData();
 	Q_INVOKABLE void emplaceData();

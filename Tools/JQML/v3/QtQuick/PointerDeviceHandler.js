@@ -23,18 +23,15 @@ class PointerDeviceHandler extends PointerHandler {
     static meta = Object.assign({}, PointerHandler.meta, {
         acceptedButtons: { type: Int, value: QtEnums.LeftButton},
         acceptedDevices: { type: Int, value: PointerDevice.AllDevices},
-        acceptedModifiers: { type: Int, value: QtEnums.KeyboardModifierMask},
+        acceptedModifiers: { type: Int, value: QtEnums.ShiftModifier | QtEnums.ControlModifier | QtEnums.AltModifier | QtEnums.MetaModifier},
         acceptedPointerTypes: { type: Int, value: PointerDevice.AllPointerTypes},
-        dragThreshold: { type: Int, value: 15},
+        dragThreshold: { type: Int, value: 16},
 
         acceptedButtonsChanged: { type:Signal, args:[] },
         acceptedDevicesChanged: { type:Signal, args:[] },
         acceptedModifiersChanged: { type:Signal, args:[] },
         acceptedPointerTypesChanged: { type:Signal, args:[] },
         dragThresholdChanged: { type:Signal, args:[] },
-
-        canceled: { type:Signal, args:['point'] },
-        grabChanged: { type:Signal, args:['transition', 'point'] },
     })
 }
 

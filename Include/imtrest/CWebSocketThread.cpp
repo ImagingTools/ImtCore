@@ -117,6 +117,29 @@ void CWebSocketThread::run()
 
 void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 {
+	// Queue the message and process it (plus anything queued while we work) in a
+	// single flat drain loop. If we are re-entered while a previous message is
+	// still being processed - which happens because ProcessTextMessage() can
+	// block in a nested QEventLoop during synchronous JWT validation, and that
+	// loop keeps dispatching queued TextMessageReceived events on this thread -
+	// we must not process here: that would recurse per message and overflow the
+	// stack. Instead the already-running drain loop below will pick it up once
+	// the blocking call returns, keeping the call stack depth bounded.
+	m_pendingMessages.append(textMessage);
+	if (m_isProcessingMessage){
+		return;
+	}
+
+	m_isProcessingMessage = true;
+	while (!m_pendingMessages.isEmpty()){
+		ProcessTextMessage(m_pendingMessages.takeFirst());
+	}
+	m_isProcessingMessage = false;
+}
+
+
+void CWebSocketThread::ProcessTextMessage(const QString& textMessage)
+{
 	if (m_requestServerHandlerPtr == nullptr || m_server == nullptr || textMessage.isEmpty()){
 		return;
 	}
@@ -126,7 +149,7 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 		return;
 	}
 
-	QString message = QString("Web socket text message received: %1").arg(textMessage);
+	QString message = QStringLiteral("Web socket text message received: %1").arg(textMessage);
 	m_server->SendVerboseMessage(message, "CWebSocketServerComp");
 
 	imtrest::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*m_requestServerHandlerPtr);
@@ -181,8 +204,9 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 					imtrest::IRequestUniquePtr requestPtr = m_httpEnginePtr->CreateRequest(*m_requestServerHandlerPtr);
 					CHttpRequest* newHttpRequestPtr = dynamic_cast<CHttpRequest*>(requestPtr.GetPtr());
 					if (newHttpRequestPtr != nullptr){
-						if (!clientId.isEmpty() && !webSocketPtr.isNull()){
-							m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr.data());
+						const QByteArray queryRequestId = webSocketRequest->GetRequestId();
+						if (!queryRequestId.isEmpty() && !webSocketPtr.isNull()){
+							m_server->RegisterSender(queryRequestId, webSocketPtr.data());
 						}
 	
 						QJsonDocument document = QJsonDocument::fromJson(textMessage.toUtf8());
@@ -192,6 +216,11 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 						QJsonObject headers = object.value("headers").toObject();
 						for (QString& key: headers.keys()){
 							newHttpRequestPtr->SetHeader(key.toUtf8().toLower(), headers.value(key).toString().toUtf8());
+						}
+						// Correlate the HTTP response with the WS query id (agent CWebSocketClientComp
+						// waits for type=query_data with this id).
+						if (!queryRequestId.isEmpty()){
+							newHttpRequestPtr->SetHeader(QByteArrayLiteral("id"), queryRequestId);
 						}
 						newHttpRequestPtr->SetBody(body);
 						newHttpRequestPtr->SetMethodType(CHttpRequest::MT_POST);
@@ -208,6 +237,17 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 
 		if (responsePtr.IsValid()){
 			QByteArray data = responsePtr->GetData();
+			if (methodType == CWebSocketRequest::MT_QUERY){
+				const QByteArray queryRequestId = webSocketRequest->GetRequestId();
+				if (!queryRequestId.isEmpty()){
+					const QByteArray payload = data.isEmpty() ? QByteArrayLiteral("{}") : data;
+					data = QByteArrayLiteral("{\"type\":\"query_data\",\"id\":\"")
+								+ queryRequestId
+								+ QByteArrayLiteral("\",\"payload\":")
+								+ payload
+								+ QByteArrayLiteral("}");
+				}
+			}
 			emit SendTextMessage(data);
 		}
 
@@ -239,7 +279,7 @@ void CWebSocketThread::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
 		return;
 	}
 
-	QString message = QString("Web socket binary message received: '%1'").arg(qPrintable(dataMessage));
+	QString message = QStringLiteral("Web socket binary message received: '%1'").arg(dataMessage);
 	m_server->SendInfoMessage(0, message, "CWebSocketServerComp");
 }
 
@@ -253,7 +293,7 @@ void CWebSocketThread::OnError(QAbstractSocket::SocketError error)
 
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 	if (webSocketPtr != nullptr && m_server != nullptr){
-		QString errorMessage = QString("Web socket server error: '%1'").arg(webSocketPtr->errorString());
+		QString errorMessage = QStringLiteral("Web socket server error: '%1'").arg(webSocketPtr->errorString());
 
 		m_server->SendErrorMessage(0, errorMessage, "CWebSocketServerComp");
 	}
@@ -266,7 +306,7 @@ void CWebSocketThread::OnTimeout()
 	if (webSocketPtr.isNull()){
 		return;
 	}
-	webSocketPtr->sendTextMessage(QString(R"({"type": "ka"})"));
+	webSocketPtr->sendTextMessage(QStringLiteral(R"({"type": "ka"})"));
 }
 
 

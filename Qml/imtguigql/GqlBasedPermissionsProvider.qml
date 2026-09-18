@@ -2,7 +2,6 @@
 import QtQuick 2.0
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
 import imtguigql 1.0
 import imtauthPermissionsSdl 1.0
 import imtauthTenantMembershipsSdl 1.0
@@ -19,6 +18,7 @@ import imtauthgui 1.0
 PermissionsProvider {
     id: root
 
+    property string context: ""
     property GetProductPermissionsInput __requestInput: GetProductPermissionsInput {}
     property GetUserPermissionsInput __userRequestInput: GetUserPermissionsInput {}
     property GetOrganizationPermissionsInput __orgRequestInput: GetOrganizationPermissionsInput {}
@@ -27,8 +27,21 @@ PermissionsProvider {
     property string __pendingTenantId: ""
     property string __pendingOrgTenantId: ""
 
+    function __onRequestFailed(status, tenantId) {
+        if (status === 1) {
+            return
+        }
+
+        root.loading = false
+        root.lastError = qsTr("Unable to load permissions")
+        root.requestFailed(root.lastError, tenantId)
+    }
+
     property GqlSdlRequestSender __requestSender: GqlSdlRequestSender {
+        context: root.context
         gqlCommandId: ImtauthPermissionsSdlCommandIds.s_getProductPermissions
+
+        onFinished: root.__onRequestFailed(status, root.__pendingTenantId)
 
         sdlObjectComp: Component {
             GetProductPermissionsPayload {
@@ -66,7 +79,10 @@ PermissionsProvider {
     }
 
     property GqlSdlRequestSender __userRequestSender: GqlSdlRequestSender {
+        context: root.context
         gqlCommandId: ImtauthPermissionsSdlCommandIds.s_getUserPermissions
+
+        onFinished: root.__onRequestFailed(status, "")
 
         sdlObjectComp: Component {
             GetProductPermissionsPayload {
@@ -99,7 +115,10 @@ PermissionsProvider {
     }
 
     property GqlSdlRequestSender __orgRequestSender: GqlSdlRequestSender {
+        context: root.context
         gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_getOrganizationPermissions
+
+        onFinished: root.__onRequestFailed(status, root.__pendingOrgTenantId)
 
         sdlObjectComp: Component {
             GetOrganizationPermissionsPayload {

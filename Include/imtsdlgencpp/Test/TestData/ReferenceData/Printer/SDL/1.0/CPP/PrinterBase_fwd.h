@@ -25,6 +25,7 @@ class CMixedUnionObject;
 class CMixedUnionObjectList;
 
 // request forward declarations
+struct GetPrintersRequestInfo;
 class CGetPrintersGqlRequest;
 
 class CPrinterBaseGqlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp

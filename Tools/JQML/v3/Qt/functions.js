@@ -257,13 +257,61 @@ module.exports = {
     btoa: function(data){
         return btoa(data)
     },
+
+    __cacheComponents: {
+        modules: new Map(),
+        notModules: new Map(),
+
+        get(source, currentModule){
+            if(currentModule){
+                return this.modules.get(currentModule).get(source)
+            } else {
+                return this.notModules.get(source)
+            }
+        },
+        set(source, currentModule, component){
+            if(currentModule){
+                if(this.modules.has(currentModule)){
+                    this.modules.get(currentModule).set(source, component)
+                } else {
+                    let map = new Map()
+                    map.set(source, component)
+                    this.modules.set(map)
+                }
+            } else {
+                this.notModules.set(source, component)
+            }
+        },
+        has(source, currentModule){
+            if(currentModule){
+                if(this.modules.has(currentModule)){
+                    return this.modules.get(currentModule).has(source)
+                } else {
+                    return false
+                }
+            } else {
+                return this.notModules.has(source)
+            }
+
+            return false
+        }
+    },
     createComponent(source, currentModule){
         if(!source || source === '') return null
+        if(this.__cacheComponents.has(source, currentModule)) return this.__cacheComponents.get(source, currentModule)
         let path = source.replaceAll('qrc:/', '').replaceAll('.qml', '').split('/')
         let className = path[path.length-1]
 
-        if(className in JQModules.QtQml) return JQModules.QtQml.Component.create(null, {}, JQModules.QtQml[className])
-        if(className in JQModules.QtQml.Models) return JQModules.QtQml.Component.create(null, {}, JQModules.QtQml.Models[className])
+        if(className in JQModules.QtQml) {
+            let component = JQModules.QtQml.Component.create(null, {}, JQModules.QtQml[className])
+            this.__cacheComponents.set(source, currentModule, component)
+            return component
+        }
+        if(className in JQModules.QtQml.Models) {
+            let component = JQModules.QtQml.Component.create(null, {}, JQModules.QtQml.Models[className])
+            this.__cacheComponents.set(source, currentModule, component)
+            return component
+        }
 
         let cls = currentModule
 
@@ -317,7 +365,9 @@ module.exports = {
         
 
         if(cls && cls.isAssignableFrom && cls.isAssignableFrom(JQModules.QtBase.BaseObject)){
-            return JQModules.QtQml.Component.create(null, {}, cls)
+            let component = JQModules.QtQml.Component.create(null, {}, cls)
+            this.__cacheComponents.set(source, currentModule, component)
+            return component
         }
 
         console.error(`${source} is not founded | className: ${className} | cls:`, cls)

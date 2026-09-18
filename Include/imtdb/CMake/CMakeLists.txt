@@ -1,10 +1,10 @@
 project(imtdb)
 
+
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Sql)
-target_link_libraries(${PROJECT_NAME} imtbase)
-
-acf_use_qt_graphics_modules()
+if(AUTOMATIC_DB_BACKUPS)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE AUTOMATIC_DB_BACKUPS)
+endif()
 

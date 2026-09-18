@@ -11,7 +11,7 @@
 
 
 /**
-	Library containing interface and implementation related to user authentification and account management.
+	Library containing interface and implementation related to user authentification and authorization.
 */
 namespace imtauth
 {

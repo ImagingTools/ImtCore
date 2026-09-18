@@ -119,6 +119,8 @@ StyleComponents {
 	property int marginM: 10;
 	property int marginS: 8;
 	property int marginXS: 6;
+	property int marginXXS: 4;
+	property int marginXXXS: 2;
 
 	//SizeHint
 	property int sizeHintXXXL: 1000
@@ -207,7 +209,7 @@ StyleComponents {
 	property int menuMinWidth: 200
 
 	//table sizes
-	property int tableRowHeight: 35
+	property int tableRowHeight: controlHeightL + marginXS
 	property int tableHeaderHeight: 35
 
 	//grid cell size
@@ -229,7 +231,13 @@ StyleComponents {
 	//Other sizes
 	property int sizePanelsHeight: 50;
 	property int headerHeight: 50;
-	property int menuPanelMinWidth: 26;
+	property int menuPanelIconSize: iconSizeM;
+
+	property int menuPanelMinWidth: 2 * marginL + menuPanelIconSize;
+	property int menuPanelWidth: sizeHintXXS;
+	property int menuPanelAutoCollapseWidth: sizeHintXXL;
+	//Upper bound for centered, readability-limited page content (lists, forms).
+	property int contentWidthMax: 1000;
 
 	//Opacity
 	property real opacityFaint: 0.05
@@ -245,11 +253,11 @@ StyleComponents {
 	property real alternatingOpacity: 0.05
 
 	//Gradient
-	property string imagingToolsGradient0: "#f6f6f6";
-	property string imagingToolsGradient1: "#e3e3e5";
-	property string imagingToolsGradient2: "#d4d4d6";
-	property string imagingToolsGradient3: "#bebec0";
-	property string imagingToolsGradient4: "#b4b4b6";
+	property string imagingToolsGradient0: "#fafafa";
+	property string imagingToolsGradient1: "#f6f6f8";
+	property string imagingToolsGradient2: "#f0f0f2";
+	property string imagingToolsGradient3: "#c9c9cc";
+	property string imagingToolsGradient4: "#c2c2c5";
 
 
 	//Colors
@@ -260,7 +268,7 @@ StyleComponents {
 	property string firstColor: "#4682B4";
 	property string secondColor: "#F18C16";
 	property string firstColorHighlight: "#B0C4DE";
-	property string colorMenuPanel: imagingToolsGradient1;
+	property string colorMenuPanel: baseColor;
 
 		//error
 	property string errorColor: errorTextColor
@@ -283,12 +291,25 @@ StyleComponents {
 	property string selectedLinkFromColor: "#1974d2";
 	property string selectedLinkToColor: "#51AC2A";
 
+		//popup / toast (PopupManager → PopupContainer)
+	property string popupErrorBackgroundColor: "#FFF5F3";
+	property string popupWarningBackgroundColor: "#FFFBF2";
+	property string popupSuccessBackgroundColor: "#F3FBF6";
+	property string popupInfoBackgroundColor: "#F3F8FD";
+	property string popupErrorAccentColor: errorTextColor;
+	property string popupWarningAccentColor: secondColor;
+	property string popupSuccessAccentColor: selectedLinkToColor;
+	property string popupInfoAccentColor: linkColor;
+	property string popupCloseHoverColor: "#1A000000";
+	property string popupCloseIdleColor: "#00000000";
+	property real popupIconChipOpacity: 0.14;
+
 		//border
 	property string borderColor: "#d0d0d2";
 	property string borderColor2: "#a4a4a6";
 
 		//background
-	property string backgroundColor: "#e6e6e8";
+	property string backgroundColor: "#f4f4f6";
 	property string backgroundColor2: "#f7f7f7";
 	property string menuPanelBackgroundColor: "#e2e2e8";
 
@@ -308,15 +329,20 @@ StyleComponents {
 	property string iconColorOnSelected: "#1a76e7";
 
 		//button
-	property string buttonColor: "#dddddd";
-	property string buttonBorderColor: "#b0b0b0";
-	property string buttonHoverColor: "#d2d2d2";
-	property string buttonPressedColor: "#c6c6c6";
+	property string buttonColor: "#f3f3f5";
+	property string buttonBorderColor: "#dcdce0";
+	property string buttonHoverColor: "#eeeef0";
+	property string buttonPressedColor: "#e3e3e6";
 	property string buttonAccentColor: imaginToolsAccentColor;
-	property string buttonInactiveColor: "#C0C0C0";
+	property string buttonInactiveColor: "#f3f3f5";
 	property string buttonBorderFocusColor: borderColor;
+	property string buttonBorderInactiveColor: "#eeeef0";
 	property string buttonTextColor: "#335777";
-	property string buttonInactiveTextColor: "#335777";
+	property string buttonInactiveTextColor: "#aaaaaa";
+	// Text drawn on top of an accent-colored surface (e.g. a selected/active chip
+	// or badge) - not simply "the opposite of textColor", since an accent fill's
+	// own brightness doesn't track baseColor/backgroundColor at all.
+	property string highlightedTextColor: "white";
 
 		//Table
 	property string tableHeaderColor: "#E5E5E5";
@@ -327,13 +353,13 @@ StyleComponents {
 	property string tableCellFontColor: "#686671";
 
 		//scroll
-	property string scrollBackgroundColor: styleContainer.imagingToolsGradient0;
-	property string scrollIndicatorColor: styleContainer.imagingToolsGradient3;
-	property string scrollHighlightColor: styleContainer.imagingToolsGradient0;
+	property string scrollBackgroundColor: styleContainer.backgroundColor2;
+	property string scrollIndicatorColor: styleContainer.borderColor2;
+	property string scrollHighlightColor: styleContainer.backgroundColor;
 
 		//shadow, hover
 	property string shadowColor: "#ececec";
-	property string hover: "#e6e6e8";
+	property string hover: "#f2f2f4";
 
 		//Alternating
 	property color alternatingColor: '#000'
@@ -347,7 +373,7 @@ StyleComponents {
 	//other parameters
 	property real maximumFlickVelocity: 75
 	property bool enableHoverEffect: true
-	property bool enableMenuPanelCollapse: false
+	property bool enableMenuPanelCollapse: true
 
 
 	function getIconPath(iconName, state, mode, extention /* = '.svg'*/){
@@ -381,6 +407,11 @@ StyleComponents {
 		}
 
 		return iconPath;
+	}
+
+	function getLogoIconPath(state, mode, extention){
+		let iconName = styleContainer.logoIconName !== "" ? styleContainer.logoIconName : "Icons/AppIcon";
+		return styleContainer.getIconPath(iconName, state, mode, extention);
 	}
 
 	function getThemeColor(colorType, colorKey, themeType){
@@ -585,13 +616,16 @@ StyleComponents {
 			styleContainer.buttonColor = styleContainer.getThemeColor("ActiveColors", "Button", dataSource);
 			styleContainer.buttonBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonBorder", dataSource);
 			styleContainer.buttonInactiveColor = styleContainer.getThemeColor("InactiveColors", "Button", dataSource);
+			styleContainer.buttonBorderInactiveColor = styleContainer.getThemeColor("InactiveColors", "ButtonBorder", dataSource);
 			styleContainer.buttonTextColor = styleContainer.getThemeColor("ActiveColors", "ButtonText", dataSource);
 			styleContainer.buttonInactiveTextColor = styleContainer.getThemeColor("InactiveColors", "ButtonText", dataSource);
+			styleContainer.highlightedTextColor = styleContainer.getThemeColor("ActiveColors", "HighlightedText", dataSource);
 
 			styleContainer.inactiveTextColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource);
 
-			styleContainer.buttonHoverColor = styleContainer.alternateBaseColor;
-			styleContainer.buttonPressedColor = styleContainer.getThemeColor("ActiveColors", "BackgroundSelected", dataSource);
+			styleContainer.buttonHoverColor = styleContainer.getThemeColor("ActiveColors", "Midlight", dataSource);
+			styleContainer.buttonPressedColor = styleContainer.getThemeColor("ActiveColors", "Mid", dataSource);
+			styleContainer.hover = styleContainer.getThemeColor("ActiveColors", "Midlight", dataSource);
 
 			styleContainer.imagingToolsGradient0 = dataSource.getData("ColorPalette").getData("ImagingToolsGradient0");
 			styleContainer.imagingToolsGradient1 = dataSource.getData("ColorPalette").getData("ImagingToolsGradient1");
@@ -604,6 +638,11 @@ StyleComponents {
 
 			styleContainer.tabSelectedColor = styleContainer.getThemeColor("ActiveColors", "TabSelected", dataSource);
 			styleContainer.errorTextColor = styleContainer.getThemeColor("ActiveColors", "ErrorText", dataSource);
+
+			styleContainer.popupErrorBackgroundColor = styleContainer.getThemeColor("ActiveColors", "PopupErrorBackground", dataSource);
+			styleContainer.popupWarningBackgroundColor = styleContainer.getThemeColor("ActiveColors", "PopupWarningBackground", dataSource);
+			styleContainer.popupSuccessBackgroundColor = styleContainer.getThemeColor("ActiveColors", "PopupSuccessBackground", dataSource);
+			styleContainer.popupInfoBackgroundColor = styleContainer.getThemeColor("ActiveColors", "PopupInfoBackground", dataSource);
 
 			styleContainer.imaginToolsAccentColor = dataSource.getData("ColorPalette").getData("ImaginTools Accent");
 

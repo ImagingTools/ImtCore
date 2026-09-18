@@ -31,7 +31,7 @@ public:
 		I_ASSIGN(m_taskInputManagerGuiCompPtr, "TaskInputEditor", "Editor of task inputs", false, "TaskInputEditor");
 		I_ASSIGN_TO(m_taskInputManagerObserverCompPtr, m_taskInputManagerGuiCompPtr, true);
 		I_ASSIGN(m_triggerTableGuiCompPtr, "TriggerTableEditor", "Editor of trigger table", false, "");
-		I_ASSIGN(m_showTriggerTableAttrPtr, "ShowTriggerTableCommand", "Show trigger table", true, false);
+		I_ASSIGN(m_showTriggerTableCompPtr, "ShowTriggerTableCommand", "Show trigger table", true, "");
 	I_END_COMPONENT;
 
 	CTaskManagerGuiComp();
@@ -88,7 +88,7 @@ private:
 	I_REF(imod::IObserver, m_taskInputManagerObserverCompPtr);
 
 	I_REF(iqtgui::IGuiObject, m_triggerTableGuiCompPtr);
-	I_ATTR(bool, m_showTriggerTableAttrPtr);
+	I_REF(iprm::IEnableableParam, m_showTriggerTableCompPtr);
 };
 
 

@@ -43,7 +43,9 @@ class CCDMResultUnionTypeObject;
 class CCDMResultUnionTypeObjectList;
 
 // request forward declarations
+struct GetLastProductionResultsRequestInfo;
 class CGetLastProductionResultsGqlRequest;
+struct GetLastProductionResultsCDMRequestInfo;
 class CGetLastProductionResultsCDMGqlRequest;
 
 class CComplexUnion2GqlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp

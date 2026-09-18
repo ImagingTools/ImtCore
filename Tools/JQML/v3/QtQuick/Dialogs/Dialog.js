@@ -37,9 +37,11 @@ class Dialog extends QtObject {
             dom = document.createElement('input')
             dom.type = 'file'
             dom.style.display = 'none'
+
             this.__DOM = dom
 
             this.__DOM.addEventListener('change', (e)=>{this.__change(e)})
+            this.__DOM.addEventListener('click', (e)=>{e.stopPropagation()})
             return dom
         }
     }

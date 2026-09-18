@@ -31,6 +31,7 @@ public:
 
 	// reimplemented (IGqlClient)
 	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
+	virtual bool SendRequestNoWait(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)

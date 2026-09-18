@@ -50,7 +50,7 @@ QString GetExportFileName(const imtbase::IObjectCollection& collection, const QB
 {
 	QVariant title = collection.GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME);
 
-	return title.isValid() && !title.toString().isEmpty() ? title.toString() : QString("export");
+	return title.isValid() && !title.toString().isEmpty() ? title.toString() : QStringLiteral("export");
 }
 
 
@@ -71,7 +71,7 @@ QString ComposeExportFilePath(const QString& olderPath, const QString& projectNa
 namespace imtgui
 {
 
-QString CObjectCollectionViewDelegate::s_dateTimeFormat = QString("dd.MM.yyyy hh:mm:ss");
+QString CObjectCollectionViewDelegate::s_dateTimeFormat = QStringLiteral("dd.MM.yyyy hh:mm:ss");
 
 CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
 	:m_editCommands(tr("&Edit"), 100),
@@ -371,12 +371,12 @@ bool CObjectCollectionViewDelegate::GetSummaryInformation(
 	for (const QByteArray& informationId: fieldIds){
 		SummaryInformation summaryInformation;
 		summaryInformation.infoId = informationId;
-		if (informationId == QByteArray("Name")){
+		if (informationId == QByteArrayLiteral("Name")){
 			summaryInformation.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 			summaryInformation.sortValue = summaryInformation.text;
 			objectMetaInfo.append(summaryInformation);
 		}
-		else if (informationId == QByteArray("TypeId")){
+		else if (informationId == QByteArrayLiteral("TypeId")){
 			const iprm::IOptionsList* typeListInfoPtr = m_collectionPtr->GetObjectTypesInfo();
 			QByteArray typeId = m_collectionPtr->GetObjectTypeId(objectId);
 
@@ -393,19 +393,19 @@ bool CObjectCollectionViewDelegate::GetSummaryInformation(
 			summaryInformation.sortValue = summaryInformation.text;
 			objectMetaInfo.append(summaryInformation);
 		}
-		else if (informationId == QByteArray("Description")){
+		else if (informationId == QByteArrayLiteral("Description")){
 			summaryInformation.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 			summaryInformation.sortValue = summaryInformation.text;
 			objectMetaInfo.append(summaryInformation);
 		}
 
 		if (metaInfo.IsValid()){
-			if (informationId == QByteArray("Added")){
+			if (informationId == QByteArrayLiteral("Added")){
 				summaryInformation.sortValue = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME);
 				summaryInformation.text = summaryInformation.sortValue.toDateTime().toString(s_dateTimeFormat);
 				objectMetaInfo.append(summaryInformation);
 			}
-			else if (informationId == QByteArray("ModificationTime")){
+			else if (informationId == QByteArrayLiteral("ModificationTime")){
 				summaryInformation.sortValue = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME);
 				summaryInformation.text = summaryInformation.sortValue.toDateTime().toString(s_dateTimeFormat);
 				objectMetaInfo.append(summaryInformation);
@@ -524,7 +524,7 @@ QString CObjectCollectionViewDelegate::GetUniqueName(const QString& name) const
 
 	while (!IsNameUnique(uniqueName, existingNames)){
 		counter++;
-		uniqueName = name + QString(" - %1").arg(counter);
+		uniqueName = name + QStringLiteral(" - %1").arg(counter);
 	}
 
 	return uniqueName;
@@ -540,16 +540,16 @@ void CObjectCollectionViewDelegate::SetupSummaryInformation()
 	m_summaryInformationTypes.InsertItem("Name", tr("Name"), "");
 	m_summaryInformationHeaders["Name"] = HeaderInfo(true, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
-	m_summaryInformationTypes.InsertItem(QByteArray("TypeId"), tr("Type"), "");
+	m_summaryInformationTypes.InsertItem(QByteArrayLiteral("TypeId"), tr("Type"), "");
 	m_summaryInformationHeaders["TypeId"] = HeaderInfo(false);
 
-	m_summaryInformationTypes.InsertItem(QByteArray("Description"), tr("Description"), "");
+	m_summaryInformationTypes.InsertItem(QByteArrayLiteral("Description"), tr("Description"), "");
 	m_summaryInformationHeaders["Description"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
-	m_summaryInformationTypes.InsertItem(QByteArray("Added"), tr("Added"), "");
+	m_summaryInformationTypes.InsertItem(QByteArrayLiteral("Added"), tr("Added"), "");
 	m_summaryInformationHeaders["Added"] = HeaderInfo(false);
 
-	m_summaryInformationTypes.InsertItem(QByteArray("ModificationTime"), tr("Last Modified"), "");
+	m_summaryInformationTypes.InsertItem(QByteArrayLiteral("ModificationTime"), tr("Last Modified"), "");
 	m_summaryInformationHeaders["ModificationTime"] = HeaderInfo(false);
 }
 
@@ -835,7 +835,7 @@ void CObjectCollectionViewDelegate::OnDuplicate()
 			QString sourceName = m_collectionPtr->GetElementInfo(selectedItemId, imtbase::ICollectionInfo::EIT_NAME).toString();
 			QString sourceDescription = m_collectionPtr->GetElementInfo(selectedItemId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
-			QString copyName = QString("Copy of %1").arg(sourceName);
+			QString copyName = QStringLiteral("Copy of %1").arg(sourceName);
 			QString newName = GetUniqueName(copyName);
 
 			QByteArray objectId = this->CObjectCollectionViewDelegate::CreateNewObject(m_collectionPtr->GetObjectTypeId(selectedItemId), newName, sourceDescription, sourceDataPtr.GetPtr());

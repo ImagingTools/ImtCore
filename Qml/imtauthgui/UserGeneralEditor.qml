@@ -4,7 +4,6 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtauthUsersSdl 1.0
-import imtdocgui 1.0
 
 Column {
 	id: container;
@@ -12,6 +11,9 @@ Column {
 
 	property UserData userData;
 	property bool readOnly: false;
+
+	// PasswordPolicyController instance, injected by the owning view.
+	property var passwordPolicy: null;
 
 	signal emitUpdateModel();
 	signal emitUpdateGui();
@@ -25,15 +27,30 @@ Column {
 
 	property bool canHideGroup: true;
 
+	property bool showAccountEnabled: false;
+
+	// Mirrors the server side guard: only the superuser may enable or disable an account,
+	// so for everyone else the switch is absent and the model keeps the stored state.
+	readonly property bool accountEnabledAvailable: container.showAccountEnabled && AuthorizationController.loggedUserIsSuperuser();
+
+	property bool updatingGui: false;
+
 	function updateGui(){
 		if (!container.userData){
 			return
 		}
 
+		container.updatingGui = true;
+
 		usernameInput_.text = container.userData.m_username;
 		nameInput_.text = container.userData.m_name;
 		mailInput_.text = container.userData.m_email;
 		passwordInput_.text = container.userData.m_password;
+		if (container.accountEnabledAvailable){
+			enabledSwitch_.checked = container.userData.m_enabled === false ? false : true;
+		}
+
+		container.updatingGui = false;
 	}
 
 	function updateModel(){
@@ -45,6 +62,9 @@ Column {
 		container.userData.m_name = nameInput_.text;
 		container.userData.m_email = mailInput_.text;
 		container.userData.m_password = passwordInput_.text;
+		if (container.accountEnabledAvailable){
+			container.userData.m_enabled = enabledSwitch_.checked;
+		}
 	}
 
 	GroupElementView {
@@ -133,11 +153,51 @@ Column {
 			KeyNavigation.tab: passwordInput_.visible ? passwordInput_ : usernameInput_;
 			KeyNavigation.backtab: nameInput_;
 		}
+
+		SwitchElementView {
+			id: enabledSwitch_;
+
+			// Test instrumentation - see usernameInput_'s comment above. Inert.
+			objectName: "AccountEnabledSwitch";
+
+			name: qsTr("Account enabled");
+			description: qsTr("Disabled accounts cannot log in");
+			visible: container.accountEnabledAvailable;
+			readOnly: container.readOnly;
+
+			onCheckedChanged: {
+				if (container.updatingGui){
+					return;
+				}
+
+				container.emitUpdateModel();
+			}
+		}
 	}
 
 	GroupElementView {
 		id: passwordGroup;
 		width: parent.width;
+
+		property string policyErrorText: "";
+
+		Component.onCompleted: {
+			if (container.passwordPolicy){
+				container.passwordPolicy.load();
+			}
+		}
+
+		Component {
+			id: policyErrorComp;
+
+			Text {
+				text: passwordGroup.policyErrorText;
+				wrapMode: Text.WordWrap;
+				color: Style.errorTextColor;
+				font.family: Style.fontFamily;
+				font.pixelSize: Style.fontSizeM;
+			}
+		}
 
 		Component {
 			id: errorComp;
@@ -176,6 +236,15 @@ Column {
 
 			if (passwordInput_.text !== confirmPassword.text){
 				confirmPassword.bottomComp = errorComp;
+
+				return;
+			}
+
+			let login = container.userData ? container.userData.m_username : "";
+			let violatedRules = container.passwordPolicy ? container.passwordPolicy.validate(login, passwordInput_.text) : [];
+			if (violatedRules.length > 0){
+				passwordGroup.policyErrorText = container.passwordPolicy.describeFailure(violatedRules, "");
+				confirmPassword.bottomComp = policyErrorComp;
 
 				return;
 			}
@@ -245,11 +314,35 @@ Column {
 				ChangePasswordDialog {
 					title: qsTr("Change Password");
 					currentPasswordInputVisible: !AuthorizationController.loggedUserIsSuperuser();
+					login: container.userData ? container.userData.m_username : "";
+					policy: container.passwordPolicy;
 					onFinished: {
 						if (buttonId == Enums.save){
+							passwordChangeConnections.enabled = true;
 							AuthorizationController.changePassword(container.userData.m_username, contentItem.oldPassword, contentItem.newPassword);
 						}
 					}
+				}
+			}
+
+			Connections {
+				id: passwordChangeConnections;
+				target: AuthorizationController;
+				enabled: false;
+
+				function onChangePasswordFailed(message, violatedRules) {
+					passwordChangeConnections.enabled = false;
+
+					let fallback = qsTr("Unable to change the password.");
+					PopupManager.addErrorMessage(
+								container.passwordPolicy
+									? container.passwordPolicy.describeFailure(violatedRules, fallback)
+									: fallback,
+								true);
+				}
+
+				function onChangePasswordSuccessfully() {
+					passwordChangeConnections.enabled = false;
 				}
 			}
 		}

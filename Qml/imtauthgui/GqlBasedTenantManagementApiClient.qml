@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+﻿// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
@@ -10,12 +10,6 @@ import imtauthTenantMembershipsSdl 1.0
 import imtauthTenantsSdl 1.0
 import imtbaseImtCollectionSdl 1.0
 import imtbaseCollectionDocumentServiceSdl 1.0
-import imtauthRolesSdl 1.0
-import imtauthGroupsSdl 1.0
-import imtauthUsersSdl 1.0
-import imtauthRoleCollectionDocumentServiceSdl 1.0
-import imtauthGroupCollectionDocumentServiceSdl 1.0
-import imtauthUserCollectionDocumentServiceSdl 1.0
 import imtauthRelationshipCollectionDocumentServiceSdl 1.0
 import imtauthCrossOrgGrantCollectionDocumentServiceSdl 1.0
 import imtauthgui 1.0
@@ -24,9 +18,8 @@ import imtauthgui 1.0
  * GqlBasedTenantManagementApiClient
  *
  * GQL/SDL implementation of the abstract TenantManagementApiClient contract.
- * This is the ONLY place that imports the membership / roles / groups / users SDL
- * modules and owns GqlSdlRequestSender / GqlBasedCollectionDocumentService /
- * GqlBasedCommandsController instances for these operations.
+ * Roles/Users/Groups are delegated to GqlBasedUserAdministrationApiClient
+ * (shared with AdministrationView); everything else here is TenantEditor-only.
  *
  * Pages depend only on the abstract contract; the orchestrator (TenantEditor)
  * injects this concrete client.
@@ -34,33 +27,34 @@ import imtauthgui 1.0
 QtObject {
 	id: root
 
+	property string context: ""
 	// =========================================================================
 	// Configuration
 	// =========================================================================
 
 	property string productId: AuthorizationController.productId
 	property string tenantId: AuthorizationController.currentTenantId
-	property string rolePermissionsTenantId: ""
+	property alias rolePermissionsTenantId: __userAdminObj.rolePermissionsTenantId
 
 	// =========================================================================
 	// Abstract contract (must mirror TenantManagementApiClient.qml)
 	// =========================================================================
 
 	// --- Document services (concrete instances expose abstract managers) ---
-	property string roleObjectTypeId: "Role"
-	property string groupObjectTypeId: "Group"
-	property string userObjectTypeId: "User"
+	property alias roleObjectTypeId: __userAdminObj.roleObjectTypeId
+	property alias groupObjectTypeId: __userAdminObj.groupObjectTypeId
+	property alias userObjectTypeId: __userAdminObj.userObjectTypeId
 	property string crossOrgGrantObjectTypeId: "CrossOrgGrant"
 	property string contractObjectTypeId: "Contract"
 	property string relationshipObjectTypeId: "TenantRelationship"
 	property string crossTenantMessageObjectTypeId: "CrossTenantMessage"
 
-	readonly property var roleDocumentManager: __roleDocumentService
-	readonly property var groupDocumentManager: __groupDocumentService
-	readonly property var userDocumentManager: __userDocumentService
+	readonly property alias roleDocumentManager: __userAdminObj.roleDocumentManager
+	readonly property alias groupDocumentManager: __userAdminObj.groupDocumentManager
+	readonly property alias userDocumentManager: __userAdminObj.userDocumentManager
 	readonly property var relationshipDocumentManager: __relationshipDocumentService
 	readonly property var crossOrgGrantDocumentManager: __crossOrgGrantDocumentService
-	readonly property var permissionsProvider: __permissionsProvider
+	readonly property alias permissionsProvider: __userAdminObj.permissionsProvider
 
 	signal invitationCreated()
 	signal invitationRevoked(string invitationId)
@@ -108,31 +102,31 @@ QtObject {
 	signal orderRequestStatusUpdated(string requestId)
 	signal orderRequestsReceived(var orderRequests)
 
-	property GqlBasedPermissionsProvider __permissionsProvider: GqlBasedPermissionsProvider {
-		productId: root.productId || ""
+	// Roles/Users/Groups document services, editors and permissions - shared with AdministrationView.
+	property GqlBasedUserAdministrationApiClient __userAdmin: GqlBasedUserAdministrationApiClient {
+		id: __userAdminObj
+		productId: root.productId
+		tenantId: root.tenantId
 	}
 
-	property Connections __permissionsProviderConnections: Connections {
-		target: root.__permissionsProvider
+	property Connections __userAdminConnections: Connections {
+		target: root.__userAdmin
 
-		function onRequestFailed(message, tenantId) {
-			if (message && message !== "") {
-				ModalDialogManager.showInfoDialog(message)
-				root.requestFailed(message)
-			}
-		}
-
-		function onAllPermissionsReceived() {
-			root.allPermissionsReceived()
-		}
-
-		function onTenantPermissionsReceived(sourceTenantId) {
-			root.tenantPermissionsReceived()
-		}
-
-		function onOrganizationPermissionsReceived() {
-			root.organizationPermissionsReceived()
-		}
+		function onRequestFailed(message) { root.requestFailed(message) }
+		function onRoleCreated() { root.roleCreated() }
+		function onRolesRemoved() { root.rolesRemoved() }
+		function onRoleUpdated(roleId) { root.roleUpdated(roleId) }
+		function onRoleDataReceived(data) { root.roleDataReceived(data) }
+		function onGroupCreated() { root.groupCreated() }
+		function onGroupsRemoved() { root.groupsRemoved() }
+		function onGroupUpdated(groupId) { root.groupUpdated(groupId) }
+		function onGroupDataReceived(data) { root.groupDataReceived(data) }
+		function onUsersRemoved() { root.usersRemoved() }
+		function onUserUpdated(userId) { root.userUpdated(userId) }
+		function onUserDataReceived(data) { root.userDataReceived(data) }
+		function onAllPermissionsReceived() { root.allPermissionsReceived() }
+		function onTenantPermissionsReceived() { root.tenantPermissionsReceived() }
+		function onOrganizationPermissionsReceived() { root.organizationPermissionsReceived() }
 	}
 
 	function __refreshDataProvider(provider) {
@@ -228,6 +222,7 @@ QtObject {
 	// --- Invitations ---
 	property CreateTenantInvitationInput __createInvitationInput: CreateTenantInvitationInput {}
 	property GqlSdlRequestSender __createInvitationSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_createTenantInvitation
 
@@ -235,7 +230,7 @@ QtObject {
 			CreateTenantInvitationPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.invitationCreated()
@@ -247,18 +242,21 @@ QtObject {
 
 	property RevokeTenantInvitationInput __revokeInvitationInput: RevokeTenantInvitationInput {}
 	property GqlSdlRequestSender __revokeInvitationSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_revokeTenantInvitation
 	}
 
 	property ResendTenantInvitationInput __resendInvitationInput: ResendTenantInvitationInput {}
 	property GqlSdlRequestSender __resendInvitationSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_resendTenantInvitation
 	}
 
 	property TransferTenantOwnershipInput __transferOwnershipInput: TransferTenantOwnershipInput {}
 	property GqlSdlRequestSender __transferOwnershipSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_transferTenantOwnership
 
@@ -266,7 +264,7 @@ QtObject {
 			TransferTenantOwnershipPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.ownershipTransferred()
@@ -276,32 +274,9 @@ QtObject {
 		}
 	}
 
-	property RemoveElementsInput __removeRoleInput: RemoveElementsInput {}
-	property GqlSdlRequestSender __removeRoleSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
-
-		sdlObjectComp: Component {
-			RemoveElementsPayload {
-				onFinished: { root.rolesRemoved() }
-			}
-		}
-	}
-
-	property RemoveElementsInput __removeGroupInput: RemoveElementsInput {}
-	property GqlSdlRequestSender __removeGroupSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
-
-		sdlObjectComp: Component {
-			RemoveElementsPayload {
-				onFinished: { root.groupsRemoved() }
-			}
-		}
-	}
-
 	property AddMembershipInput __addMembershipInput: AddMembershipInput {}
 	property GqlSdlRequestSender __addMembershipSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_addMembership
 
@@ -309,7 +284,7 @@ QtObject {
 			AddMembershipPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					}
 					root.userCreated()
@@ -320,6 +295,7 @@ QtObject {
 
 	property RemoveElementsInput __removeUserInput: RemoveElementsInput {}
 	property GqlSdlRequestSender __removeUserSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
 
@@ -386,28 +362,25 @@ QtObject {
 	}
 
 	function removeRoles(roleIds) {
-		root.__removeRoleInput.m_collectionId = "Roles"
-		root.__removeRoleInput.m_elementIds = roleIds
-		root.__removeRoleSender.send(root.__removeRoleInput)
+		__userAdmin.removeRoles(roleIds)
 	}
 
 	function removeGroups(groupIds) {
-		root.__removeGroupInput.m_collectionId = "Groups"
-		root.__removeGroupInput.m_elementIds = groupIds
-		root.__removeGroupSender.send(root.__removeGroupInput)
+		__userAdmin.removeGroups(groupIds)
 	}
 
 	// --- Internal parse helpers ---
 
 	property FindMembershipInput __findMembershipForRemoveInput: FindMembershipInput {}
 	property GqlSdlRequestSender __findMembershipForRemoveSender: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_findMembership
 
 		sdlObjectComp: Component {
 			FindMembershipPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else if (m_membership && m_membership.m_id) {
 						root.__removeMembershipInput.m_membershipId = m_membership.m_id
@@ -420,13 +393,14 @@ QtObject {
 
 	property FindMembershipInput __findMembershipForOrgPermsInput: FindMembershipInput {}
 	property GqlSdlRequestSender __findMembershipForOrgPermsSender: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_findMembership
 
 		sdlObjectComp: Component {
 			FindMembershipPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else if (root.__pendingOrgPermsUserId && root.__pendingOrgPermsList !== null && m_membership && m_membership.m_id) {
 						root.setMemberOrganizationPermissions(m_membership.m_id, root.__pendingOrgPermsList)
@@ -441,6 +415,7 @@ QtObject {
 	// Support updating org permissions on a specific membership
 	property UpdateMembershipPermissionsInput __updateMembershipPermissionsInput: UpdateMembershipPermissionsInput {}
 	property GqlSdlRequestSender __updateMembershipPermissionsSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_updateMembershipPermissions
 
@@ -448,7 +423,7 @@ QtObject {
 			UpdateMembershipPermissionsPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 					} else {
 						root.memberPermissionsUpdated()
 					}
@@ -460,6 +435,7 @@ QtObject {
 
 	property RemoveMembershipInput __removeMembershipInput: RemoveMembershipInput {}
 	property GqlSdlRequestSender __removeMembershipSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_removeMembership
 
@@ -467,7 +443,7 @@ QtObject {
 			RemoveMembershipPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.memberRemoved(root.__findMembershipForRemoveInput.m_userId)
@@ -477,92 +453,34 @@ QtObject {
 		}
 	}
 
-	function __handleRoleDataReceived(roleData) {
-		if (!roleData)
-			return
-		var data = {
-			name: roleData.m_name || "",
-			description: roleData.m_description || "",
-			roleId: roleData.m_roleId || "",
-			productId: roleData.m_productId || "",
-			parentRoles: roleData.m_parentRoles || [],
-			permissions: roleData.m_permissions || "",
-			isDefault: roleData.m_isDefault || false,
-			isGuest: roleData.m_isGuest || false
-		}
-		root.roleDataReceived(data)
-	}
-
-	function __handleGroupDataReceived(groupData) {
-		if (!groupData)
-			return
-		var data = {
-			name: groupData.m_name || "",
-			description: groupData.m_description || "",
-			productId: groupData.m_productId || "",
-			roles: groupData.m_roles || [],
-			users: groupData.m_users || [],
-			parentGroups: groupData.m_parentGroups || []
-		}
-		root.groupDataReceived(data)
-	}
-
-	function __handleUserDataReceived(userData) {
-		if (!userData)
-			return
-		var data = {
-			name: userData.m_name || "",
-			description: userData.m_email || "",
-			username: userData.m_username || "",
-			email: userData.m_email || "",
-			productId: userData.m_productId || "",
-			groups: userData.m_groups || [],
-			roles: userData.m_roles || [],
-			permissions: userData.m_permissions || []
-		}
-		root.userDataReceived(data)
-	}
-
 	// =========================================================================
-	// Permissions (delegated to GqlBasedPermissionsProvider)
+	// Permissions (delegated to __userAdmin's GqlBasedPermissionsProvider)
 	// =========================================================================
 
-	// All product permissions (unfiltered) — for TenantPermissionsPage
-	property var allPermissions: root.__permissionsProvider ? root.__permissionsProvider.allPermissions : []
+	property alias allPermissions: __userAdminObj.allPermissions
 	signal allPermissionsReceived()
 
-	// Tenant-scoped permissions — for RoleView
-	property var tenantPermissions: root.__permissionsProvider ? root.__permissionsProvider.tenantPermissions : []
+	property alias tenantPermissions: __userAdminObj.tenantPermissions
 	signal tenantPermissionsReceived()
 
-	// Organization-only special permissions tree
-	property var organizationPermissions: root.__permissionsProvider ? root.__permissionsProvider.organizationPermissions : []
-	// Assigned permissions for the last requested member (populated when userId passed to fetchOrganizationPermissions)
-	property var memberOrganizationPermissions: root.__permissionsProvider ? root.__permissionsProvider.memberOrganizationPermissions : []
+	property alias organizationPermissions: __userAdminObj.organizationPermissions
+	property alias memberOrganizationPermissions: __userAdminObj.memberOrganizationPermissions
 	signal organizationPermissionsReceived()
 
 	function setRolePermissionsTenantId(tenantId) {
-		root.rolePermissionsTenantId = tenantId || ""
+		__userAdmin.setRolePermissionsTenantId(tenantId)
 	}
 
 	function fetchAllPermissions() {
-		if (!root.__permissionsProvider)
-			return
-		root.__permissionsProvider.productId = root.productId || ""
-		root.__permissionsProvider.requestAllPermissions()
+		__userAdmin.fetchAllPermissions()
 	}
 
 	function fetchTenantPermissions(tenantId) {
-		if (!root.__permissionsProvider)
-			return
-		root.__permissionsProvider.productId = root.productId || ""
-		root.__permissionsProvider.requestPermissions(tenantId || root.tenantId || "")
+		__userAdmin.fetchTenantPermissions(tenantId)
 	}
 
 	function fetchOrganizationPermissions(tenantId, userId) {
-		if (!root.__permissionsProvider)
-			return
-		root.__permissionsProvider.requestOrganizationPermissions(tenantId || root.tenantId || "", userId || "")
+		__userAdmin.fetchOrganizationPermissions(tenantId, userId)
 	}
 
 	// =========================================================================
@@ -576,6 +494,7 @@ QtObject {
 
 	property RevokeCrossOrgGrantInput __revokeCrossOrgGrantInput: RevokeCrossOrgGrantInput {}
 	property GqlSdlRequestSender __revokeCrossOrgGrantSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_revokeCrossOrgGrant
 
@@ -583,7 +502,7 @@ QtObject {
 			RevokeCrossOrgGrantPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.crossOrgGrantsRemoved()
@@ -595,6 +514,7 @@ QtObject {
 
 	property RemoveCrossOrgGrantsInput __removeCrossOrgGrantsInput: RemoveCrossOrgGrantsInput {}
 	property GqlSdlRequestSender __removeCrossOrgGrantsSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_removeCrossOrgGrants
 
@@ -602,7 +522,7 @@ QtObject {
 			RemoveCrossOrgGrantsPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.crossOrgGrantsRemoved()
@@ -637,6 +557,7 @@ QtObject {
 
 	property CreateContractInput __createContractInput: CreateContractInput {}
 	property GqlSdlRequestSender __createContractSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_createContract
 
@@ -644,7 +565,7 @@ QtObject {
 			CreateContractPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.contractCreated(m_contractId || "")
@@ -657,6 +578,7 @@ QtObject {
 	property UpdateContractStatusInput __updateContractStatusInput: UpdateContractStatusInput {}
 	property string __pendingUpdateContractId: ""
 	property GqlSdlRequestSender __updateContractStatusSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_updateContractStatus
 
@@ -664,7 +586,7 @@ QtObject {
 			UpdateContractStatusPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.contractStatusUpdated(root.__pendingUpdateContractId)
@@ -677,6 +599,7 @@ QtObject {
 	property TerminateContractInput __terminateContractInput: TerminateContractInput {}
 	property string __pendingTerminateContractId: ""
 	property GqlSdlRequestSender __terminateContractSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_terminateContract
 
@@ -684,7 +607,7 @@ QtObject {
 			TerminateContractPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.contractTerminated(root.__pendingTerminateContractId)
@@ -696,13 +619,14 @@ QtObject {
 
 	property GetContractsInput __getContractsInput: GetContractsInput {}
 	property GqlSdlRequestSender __getContractsSender: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getContracts
 
 		sdlObjectComp: Component {
 			GetContractsPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.__populateContractsModel(m_contracts)
@@ -803,6 +727,7 @@ QtObject {
 	// --- Connection Code ---
 	property GetConnectionCodeInput __getConnectionCodeInput: GetConnectionCodeInput {}
 	property GqlSdlRequestSender __getConnectionCodeSender: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getConnectionCode
 		sdlObjectComp: Component {
 			GetConnectionCodePayload {
@@ -822,6 +747,7 @@ QtObject {
 
 	property RegenerateConnectionCodeInput __regenerateConnectionCodeInput: RegenerateConnectionCodeInput {}
 	property GqlSdlRequestSender __regenerateConnectionCodeSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_regenerateConnectionCode
 		sdlObjectComp: Component {
@@ -839,6 +765,7 @@ QtObject {
 
 	property SetAllowConnectionsByCodeInput __setAllowConnectionsByCodeInput: SetAllowConnectionsByCodeInput {}
 	property GqlSdlRequestSender __setAllowConnectionsByCodeSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_setAllowConnectionsByCode
 		sdlObjectComp: Component {
@@ -873,6 +800,7 @@ QtObject {
 	// --- Connection Requests ---
 	property CreateConnectionRequestInput __createConnectionRequestInput: CreateConnectionRequestInput {}
 	property GqlSdlRequestSender __createConnectionRequestSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_createConnectionRequest
 		sdlObjectComp: Component {
@@ -890,6 +818,7 @@ QtObject {
 
 	property ApproveConnectionRequestInput __approveConnectionRequestInput: ApproveConnectionRequestInput {}
 	property GqlSdlRequestSender __approveConnectionRequestSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_approveConnectionRequest
 		sdlObjectComp: Component {
@@ -908,6 +837,7 @@ QtObject {
 
 	property RejectConnectionRequestInput __rejectConnectionRequestInput: RejectConnectionRequestInput {}
 	property GqlSdlRequestSender __rejectConnectionRequestSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_rejectConnectionRequest
 		sdlObjectComp: Component {
@@ -925,6 +855,7 @@ QtObject {
 
 	property CancelConnectionRequestInput __cancelConnectionRequestInput: CancelConnectionRequestInput {}
 	property GqlSdlRequestSender __cancelConnectionRequestSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_cancelConnectionRequest
 		sdlObjectComp: Component {
@@ -942,6 +873,7 @@ QtObject {
 
 	property GetConnectionRequestsInput __getConnectionRequestsInput: GetConnectionRequestsInput {}
 	property GqlSdlRequestSender __getConnectionRequestsSender: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getConnectionRequests
 		sdlObjectComp: Component {
 			GetConnectionRequestsPayload {
@@ -1014,6 +946,7 @@ QtObject {
 	// --- Connections ---
 	property GetConnectionsInput __getConnectionsInput: GetConnectionsInput {}
 	property GqlSdlRequestSender __getConnectionsSender: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getConnections
 		sdlObjectComp: Component {
 			GetConnectionsPayload {
@@ -1030,6 +963,7 @@ QtObject {
 
 	property RemoveConnectionInput __removeConnectionInput: RemoveConnectionInput {}
 	property GqlSdlRequestSender __removeConnectionSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_removeConnection
 		sdlObjectComp: Component {
@@ -1087,6 +1021,7 @@ QtObject {
 	// --- Tenant Relationships ---
 	property GetTenantRelationshipsInput __getTenantRelationshipsInput: GetTenantRelationshipsInput {}
 	property GqlSdlRequestSender __getTenantRelationshipsSender: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getTenantRelationships
 		sdlObjectComp: Component {
 			GetTenantRelationshipsPayload {
@@ -1103,6 +1038,7 @@ QtObject {
 
 	property RemoveTenantRelationshipInput __removeTenantRelationshipInput: RemoveTenantRelationshipInput {}
 	property GqlSdlRequestSender __removeTenantRelationshipSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_removeTenantRelationship
 		sdlObjectComp: Component {
@@ -1160,6 +1096,7 @@ QtObject {
 	// --- Relationship Proposals ---
 	property GetRelationshipProposalsInput __getRelationshipProposalsInput: GetRelationshipProposalsInput {}
 	property GqlSdlRequestSender __getRelationshipProposalsSender: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getRelationshipProposals
 		sdlObjectComp: Component {
 			GetRelationshipProposalsPayload {
@@ -1177,6 +1114,7 @@ QtObject {
 	property CreateRelationshipProposalInput __createRelationshipProposalInput: CreateRelationshipProposalInput {}
 	property RelationshipProposal __createRelationshipProposalData: RelationshipProposal {}
 	property GqlSdlRequestSender __createRelationshipProposalSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_createRelationshipProposal
 		sdlObjectComp: Component {
@@ -1194,6 +1132,7 @@ QtObject {
 
 	property ApproveRelationshipProposalInput __approveRelationshipProposalInput: ApproveRelationshipProposalInput {}
 	property GqlSdlRequestSender __approveRelationshipProposalSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_approveRelationshipProposal
 		sdlObjectComp: Component {
@@ -1211,6 +1150,7 @@ QtObject {
 
 	property RejectRelationshipProposalInput __rejectRelationshipProposalInput: RejectRelationshipProposalInput {}
 	property GqlSdlRequestSender __rejectRelationshipProposalSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_rejectRelationshipProposal
 		sdlObjectComp: Component {
@@ -1228,6 +1168,7 @@ QtObject {
 
 	property CancelRelationshipProposalInput __cancelRelationshipProposalInput: CancelRelationshipProposalInput {}
 	property GqlSdlRequestSender __cancelRelationshipProposalSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_cancelRelationshipProposal
 		sdlObjectComp: Component {
@@ -1316,6 +1257,7 @@ QtObject {
 
 	property SendCrossTenantMessageInput __sendMessageInput: SendCrossTenantMessageInput {}
 	property GqlSdlRequestSender __sendMessageSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_sendCrossTenantMessage
 
@@ -1323,7 +1265,7 @@ QtObject {
 			SendCrossTenantMessagePayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.crossTenantMessageSent(m_messageId || "")
@@ -1336,6 +1278,7 @@ QtObject {
 	property UpdateCrossTenantMessageStatusInput __updateMessageStatusInput: UpdateCrossTenantMessageStatusInput {}
 	property string __pendingUpdateMessageId: ""
 	property GqlSdlRequestSender __updateMessageStatusSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_updateCrossTenantMessageStatus
 
@@ -1343,7 +1286,7 @@ QtObject {
 			UpdateCrossTenantMessageStatusPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.crossTenantMessageStatusUpdated(root.__pendingUpdateMessageId)
@@ -1357,13 +1300,14 @@ QtObject {
 		m_direction: "Incoming"
 	}
 	property GqlSdlRequestSender __getMessagesSender: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getCrossTenantMessages
 
 		sdlObjectComp: Component {
 			GetCrossTenantMessagesPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.__populateCrossTenantMessagesModel(m_messages)
@@ -1439,6 +1383,7 @@ QtObject {
 	property ConfirmOrderRequestInput __confirmOrderRequestInput: ConfirmOrderRequestInput {}
 	property string __pendingConfirmOrderRequestId: ""
 	property GqlSdlRequestSender __confirmOrderRequestSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_confirmOrderRequest
 
@@ -1446,7 +1391,7 @@ QtObject {
 			ConfirmOrderRequestPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.orderRequestConfirmed(root.__pendingConfirmOrderRequestId)
@@ -1459,6 +1404,7 @@ QtObject {
 	property RejectOrderRequestInput __rejectOrderRequestInput: RejectOrderRequestInput {}
 	property string __pendingRejectOrderRequestId: ""
 	property GqlSdlRequestSender __rejectOrderRequestSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_rejectOrderRequest
 
@@ -1466,7 +1412,7 @@ QtObject {
 			RejectOrderRequestPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.orderRequestRejected(root.__pendingRejectOrderRequestId)
@@ -1479,6 +1425,7 @@ QtObject {
 	property UpdateOrderRequestStatusInput __updateOrderRequestStatusInput: UpdateOrderRequestStatusInput {}
 	property string __pendingUpdateOrderRequestId: ""
 	property GqlSdlRequestSender __updateOrderRequestStatusSender: GqlSdlRequestSender {
+		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_updateOrderRequestStatus
 
@@ -1486,7 +1433,7 @@ QtObject {
 			UpdateOrderRequestStatusPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.orderRequestStatusUpdated(root.__pendingUpdateOrderRequestId)
@@ -1498,13 +1445,14 @@ QtObject {
 
 	property GetOrderRequestsInput __getOrderRequestsInput: GetOrderRequestsInput {}
 	property GqlSdlRequestSender __getOrderRequestsSender: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getOrderRequests
 
 		sdlObjectComp: Component {
 			GetOrderRequestsPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
+						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.__populateOrderRequestsModel(m_orderRequests)
@@ -1662,29 +1610,6 @@ QtObject {
 		}
 	}
 
-	// =========================================================================
-	// Document services (Roles / Groups / Users)
-	//
-	// These three services drive the SingleDocumentWorkspaceShellView in the
-	// Roles / Groups / Members pages. The pages themselves do NOT instantiate
-	// any GqlBasedCollectionDocumentService / SingleDocumentTypeRegistrar /
-	// DocumentRepresentationController — they only consume the abstract
-	// `roleDocumentManager` / `groupDocumentManager` / `userDocumentManager`
-	// properties.
-	// =========================================================================
-
-	property GqlBasedCollectionDocumentService __roleDocumentService: GqlBasedCollectionDocumentService {
-		collectionId: "Roles"
-	}
-
-	property GqlBasedCollectionDocumentService __groupDocumentService: GqlBasedCollectionDocumentService {
-		collectionId: "Groups"
-	}
-
-	property GqlBasedCollectionDocumentService __userDocumentService: GqlBasedCollectionDocumentService {
-		collectionId: "Users"
-	}
-
 	property GqlBasedCollectionDocumentService __relationshipDocumentService: GqlBasedCollectionDocumentService {
 		collectionId: "TenantRelationships"
 	}
@@ -1710,276 +1635,6 @@ QtObject {
 		onChanged: {
 			if (changeInfo && changeInfo.valid)
 				root.__refreshDataProvider(root.crossOrgGrantsListDataProvider)
-		}
-	}
-
-	// --- Role editor + representation controller ---
-	property Component __roleEditorComp: Component {
-		RoleView {
-			productId: root.productId
-			tenantId: root.rolePermissionsTenantId
-			permissionsProvider: root.__permissionsProvider
-			commandsControllerComp: Component {
-				GqlBasedCommandsController {
-					typeId: root.roleObjectTypeId
-				}
-			}
-		}
-	}
-
-	property Component __roleControllerComp: Component {
-		DocumentRepresentationController {
-			id: roleReprController
-
-			representationModel: RoleData {
-				m_id: UuidGenerator.generateUUID()
-			}
-
-			onDocumentIdChanged: {
-				if (documentId !== ""){
-					var objId = root.__roleDocumentService.getDocumentObjectId(documentId)
-					if (objId !== "")
-						representationModel.m_id = objId
-				}
-			}
-
-			function updateRepresentationFromDocument(){
-				startUpdateRepresentation(documentId, representationModel)
-
-				getRoleInput.m_id = documentId
-				getRoleInput.m_collectionId = "Roles"
-				getRoleRequest.send(getRoleInput)
-			}
-
-			function updateDocumentFromRepresentation(){
-				startUpdateDocument(documentId)
-
-				updateRoleInput.m_documentId = documentId
-				updateRoleInput.m_role = representationModel
-				updateRoleRequest.send(updateRoleInput)
-			}
-
-			property DocumentId getRoleInput: DocumentId {}
-			property UpdateRoleFromRepresentationInput updateRoleInput: UpdateRoleFromRepresentationInput {}
-
-			property GqlSdlRequestSender getRoleRequest: GqlSdlRequestSender {
-				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_getRoleRepresentation
-				sdlObjectComp: Component {
-					RoleData {
-						onFinished: {
-							roleReprController.representationModel.copyFrom(this)
-							roleReprController.representationUpdated(
-								roleReprController.documentId,
-								roleReprController.representationModel)
-						}
-					}
-				}
-
-				function onError(message, type){
-					roleReprController.updateRepresentationFailed(roleReprController.documentId, message)
-				}
-			}
-
-			property GqlSdlRequestSender updateRoleRequest: GqlSdlRequestSender {
-				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_updateRoleFromRepresentation
-				requestType: 1
-				sdlObjectComp: Component {
-					DocumentOperationStatus {
-						onFinished: {
-							if (m_status === "Success"){
-								roleReprController.documentUpdated(roleReprController.documentId)
-							}
-						}
-					}
-				}
-
-				function onError(message, type){
-					roleReprController.updateDocumentFailed(roleReprController.documentId, message)
-				}
-			}
-		}
-	}
-
-	// --- Group editor + representation controller ---
-	property Component __groupEditorComp: Component {
-		UserGroupView {
-			productId: root.productId
-			commandsControllerComp: Component {
-				GqlBasedCommandsController {
-					typeId: root.groupObjectTypeId
-				}
-			}
-		}
-	}
-
-	property Component __groupControllerComp: Component {
-		DocumentRepresentationController {
-			id: groupReprController
-
-			representationModel: GroupData {
-				m_id: UuidGenerator.generateUUID()
-			}
-
-			onDocumentIdChanged: {
-				if (documentId !== ""){
-					var objId = root.__groupDocumentService.getDocumentObjectId(documentId)
-					if (objId !== "")
-						representationModel.m_id = objId
-				}
-			}
-
-			function updateRepresentationFromDocument(){
-				startUpdateRepresentation(documentId, representationModel)
-
-				getGroupInput.m_id = documentId
-				getGroupInput.m_collectionId = "Groups"
-				getGroupRequest.send(getGroupInput)
-			}
-
-			function updateDocumentFromRepresentation(){
-				startUpdateDocument(documentId)
-
-				updateGroupInput.m_documentId = documentId
-				updateGroupInput.m_group = representationModel
-				updateGroupRequest.send(updateGroupInput)
-			}
-
-			property DocumentId getGroupInput: DocumentId {}
-			property UpdateGroupFromRepresentationInput updateGroupInput: UpdateGroupFromRepresentationInput {}
-
-			property GqlSdlRequestSender getGroupRequest: GqlSdlRequestSender {
-				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_getGroupRepresentation
-				sdlObjectComp: Component {
-					GroupData {
-						onFinished: {
-							groupReprController.representationModel.copyFrom(this)
-							groupReprController.representationUpdated(
-								groupReprController.documentId,
-								groupReprController.representationModel)
-						}
-					}
-				}
-
-				function onError(message, type){
-					groupReprController.updateRepresentationFailed(groupReprController.documentId, message)
-				}
-			}
-
-			property GqlSdlRequestSender updateGroupRequest: GqlSdlRequestSender {
-				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_updateGroupFromRepresentation
-				requestType: 1
-				sdlObjectComp: Component {
-					DocumentOperationStatus {
-						onFinished: {
-							if (m_status === "Success"){
-								groupReprController.documentUpdated(groupReprController.documentId)
-							}
-						}
-					}
-				}
-
-				function onError(message, type){
-					groupReprController.updateDocumentFailed(groupReprController.documentId, message)
-				}
-			}
-		}
-	}
-
-	// --- User editor + representation controller ---
-	property Component __userEditorComp: Component {
-		UserView {
-			id: userEditor
-			productId: root.productId
-			commandsControllerComp: Component {
-				GqlBasedCommandsController {
-					typeId: root.userObjectTypeId
-				}
-			}
-
-			onUserDataChanged: {
-				if (userData && root.userDocumentManager){
-					userEditor.isNew = root.userDocumentManager.documentIsNew(userEditor.documentId)
-				}
-			}
-
-			onDocumentSaved: {
-				userEditor.isNew = false
-				userEditor.checkChangePasswordLogic()
-			}
-		}
-	}
-
-	property Component __userControllerComp: Component {
-		DocumentRepresentationController {
-			id: userReprController
-
-			representationModel: UserData {
-				m_id: UuidGenerator.generateUUID()
-			}
-
-			onDocumentIdChanged: {
-				if (documentId !== ""){
-					var objId = root.__userDocumentService.getDocumentObjectId(documentId)
-					if (objId !== "")
-						representationModel.m_id = objId
-				}
-			}
-
-			function updateRepresentationFromDocument(){
-				startUpdateRepresentation(documentId, representationModel)
-
-				getUserInput.m_id = documentId
-				getUserInput.m_collectionId = "Users"
-				getUserRequest.send(getUserInput)
-			}
-
-			function updateDocumentFromRepresentation(){
-				startUpdateDocument(documentId)
-
-				updateUserInput.m_documentId = documentId
-				updateUserInput.m_user = representationModel
-				updateUserInput.m_tenantId = root.tenantId
-				updateUserRequest.send(updateUserInput)
-			}
-
-			property DocumentId getUserInput: DocumentId {}
-			property UpdateUserFromRepresentationInput updateUserInput: UpdateUserFromRepresentationInput {}
-
-			property GqlSdlRequestSender getUserRequest: GqlSdlRequestSender {
-				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_getUserRepresentation
-				sdlObjectComp: Component {
-					UserData {
-						onFinished: {
-							userReprController.representationModel.copyFrom(this)
-							userReprController.representationUpdated(
-								userReprController.documentId,
-								userReprController.representationModel)
-						}
-					}
-				}
-
-				function onError(message, type){
-					userReprController.updateRepresentationFailed(userReprController.documentId, message)
-				}
-			}
-
-			property GqlSdlRequestSender updateUserRequest: GqlSdlRequestSender {
-				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_updateUserFromRepresentation
-				requestType: 1
-				sdlObjectComp: Component {
-					DocumentOperationStatus {
-						onFinished: {
-							if (m_status === "Success"){
-								userReprController.documentUpdated(userReprController.documentId)
-							}
-						}
-					}
-				}
-
-				function onError(message, type){
-					userReprController.updateDocumentFailed(userReprController.documentId, message)
-				}
-			}
 		}
 	}
 
@@ -2031,6 +1686,7 @@ QtObject {
 			property UpdateRelationshipFromRepresentationInput updateRelationshipInput: UpdateRelationshipFromRepresentationInput {}
 
 			property GqlSdlRequestSender getRelationshipRequest: GqlSdlRequestSender {
+				context: root.context
 				gqlCommandId: ImtauthRelationshipCollectionDocumentServiceSdlCommandIds.s_getRelationshipRepresentation
 				sdlObjectComp: Component {
 					TenantRelationship {
@@ -2049,6 +1705,7 @@ QtObject {
 			}
 
 			property GqlSdlRequestSender updateRelationshipRequest: GqlSdlRequestSender {
+				context: root.context
 				gqlCommandId: ImtauthRelationshipCollectionDocumentServiceSdlCommandIds.s_updateRelationshipFromRepresentation
 				requestType: 1
 				sdlObjectComp: Component {
@@ -2108,6 +1765,7 @@ QtObject {
 			property UpdateGrantFromRepresentationInput updateCrossOrgGrantInputInput: UpdateGrantFromRepresentationInput {}
 
 			property GqlSdlRequestSender getCrossOrgGrantInputRequest: GqlSdlRequestSender {
+				context: root.context
 				gqlCommandId: ImtauthCrossOrgGrantCollectionDocumentServiceSdlCommandIds.s_getGrantRepresentation
 				sdlObjectComp: Component {
 					CrossOrgGrant {
@@ -2126,6 +1784,7 @@ QtObject {
 			}
 
 			property GqlSdlRequestSender updateCrossOrgGrantRequest: GqlSdlRequestSender {
+				context: root.context
 				gqlCommandId: ImtauthCrossOrgGrantCollectionDocumentServiceSdlCommandIds.s_updateGrantFromRepresentation
 				requestType: 1
 				sdlObjectComp: Component {
@@ -2145,18 +1804,11 @@ QtObject {
 		}
 	}
 
-	// Register each editor + controller pair with its document service so that
-	// pages only need to bind to the abstract `xDocumentManager` / `xObjectTypeId`.
 	Component.onCompleted: {
 		root.__crossOrgGrantDocumentService.registerDocumentViewData(
 			root.crossOrgGrantObjectTypeId, "Editor", root.__crossOrgGrantEditorComp, root.__crossOrgGrantControllerComp)
-		root.__roleDocumentService.registerDocumentViewData(
-			root.roleObjectTypeId, "Editor", root.__roleEditorComp, root.__roleControllerComp)
-		root.__groupDocumentService.registerDocumentViewData(
-			root.groupObjectTypeId, "Editor", root.__groupEditorComp, root.__groupControllerComp)
-		root.__userDocumentService.registerDocumentViewData(
-			root.userObjectTypeId, "Editor", root.__userEditorComp, root.__userControllerComp)
 		root.__relationshipDocumentService.registerDocumentViewData(
 			root.relationshipObjectTypeId, "Editor", root.__relationshipEditorComp, root.__relationshipControllerComp)
 	}
 }
+

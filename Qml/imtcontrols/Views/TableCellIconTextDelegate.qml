@@ -30,10 +30,13 @@ TableCellDelegateBase {
 		anchors.leftMargin:  delegateContainer.rowDelegate && image_.visible ? delegateContainer.rowDelegate.textLeftMargin : 0
 		anchors.right: parent.right;
 		anchors.rightMargin: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.textRightMargin : 0
-		anchors.verticalCenter: parent.verticalCenter
+		anchors.top: parent.top
+		anchors.bottom: parent.bottom
 
 		rowDelegate:  delegateContainer.rowDelegate
-		text: delegateContainer.getValue()
+		text: String(delegateContainer.getValue()).replace(/[\r\n]+/g, " ")
+		wrapMode: Text.NoWrap
+		elide: Text.ElideRight
 	}
 }
 

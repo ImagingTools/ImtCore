@@ -9,6 +9,7 @@
 
 // Qt includes
 #include <QtCore/QFileInfo>
+#include <QtCore/QUuid>
 
 // ImtCore includes
 #include <imtdesk/ISupportTicket.h>
@@ -218,7 +219,7 @@ sdl::V1_0::imtdesk::CTicketData CTicketCollectionDocumentServiceComp::OnGetTicke
 								att.id = aid;
 								// Build HTTP download URL — aid is a pure UUID from the DB.
 								// Append file extension so the GET endpoint returns the correct MIME type.
-								QString httpUrl = QString("../../files/%1").arg(QString::fromUtf8(aid));
+								QString httpUrl = QStringLiteral("../../files/%1").arg(aid);
 								if (m_attachmentStorageCompPtr.IsValid()){
 									QByteArray data;
 									QString fileName;
@@ -228,7 +229,7 @@ sdl::V1_0::imtdesk::CTicketData CTicketCollectionDocumentServiceComp::OnGetTicke
 										att.mimeType = mimeType;
 										QString ext = QFileInfo(fileName).suffix().toLower();
 										if (!ext.isEmpty()){
-											httpUrl = QString("../../files/%1.%2").arg(QString::fromUtf8(aid), ext);
+											httpUrl = QStringLiteral("../../files/%1.%2").arg(QString::fromUtf8(aid), ext);
 										}
 									}
 								}
@@ -341,8 +342,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTicketCollectionDocumentServiceCom
 		}
 	}
 
-	const bool canEditCoreFields = CanLockTicket(gqlRequest.GetRequestContext(), ticketPtr)
-			|| ticketPtr->GetReporterId().isEmpty();
+	const bool canEditCoreFields = CanLockTicket(gqlRequest.GetRequestContext(), ticketPtr);
 	const bool titleChanged = ticketInfo.title && *ticketInfo.title != ticketPtr->GetTitle();
 	const bool descriptionChanged = ticketInfo.description && *ticketInfo.description != ticketPtr->GetDescription();
 	const bool assigneesChanged = ticketInfo.assigneeIds && ticketInfo.assigneeIds->ToList() != ticketPtr->GetAssigneeIds();
@@ -476,6 +476,10 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTicketCollectionDocumentServiceCom
 				// Existing messages (with id) may be edited or deleted.
 				if (sdlItem->id && !sdlItem->id->isEmpty()){
 					QByteArray messageId = *sdlItem->id;
+
+					if (QUuid::fromString(QString::fromUtf8(messageId)).isNull()){
+						continue;
+					}
 
 					// Delete request (explicit `deleted: true` flag from client).
 					if (sdlItem->deleted && *sdlItem->deleted){

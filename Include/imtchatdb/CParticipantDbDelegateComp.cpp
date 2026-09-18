@@ -58,10 +58,10 @@ QByteArray CParticipantDbDelegateComp::CreateDeleteObjectsQuery(
 	QString idsStr;
 	for (int i = 0; i < objectIds.size(); ++i){
 		if (i > 0) idsStr += ", ";
-		idsStr += QString("'%1'").arg(QString::fromUtf8(objectIds[i]));
+		idsStr += QStringLiteral("'%1'").arg(objectIds[i]);
 	}
 
-	return QString("DELETE FROM \"ConversationParticipants\" WHERE \"Id\" IN (%1);")
+	return QStringLiteral(R"(DELETE FROM "ConversationParticipants" WHERE "Id" IN (%1);)")
 		.arg(idsStr)
 		.toUtf8();
 }
@@ -114,16 +114,16 @@ QByteArray CParticipantDbDelegateComp::CreateAddParticipantQuery(
 			"INSERT OR IGNORE INTO \"ConversationParticipants\" (\"Id\", \"ConversationId\", \"UserId\") "
 			"VALUES('%1', '%2', '%3');")
 			.arg(newId)
-			.arg(QString::fromUtf8(conversationId))
-			.arg(QString::fromUtf8(userId))
+			.arg(conversationId)
+			.arg(userId)
 			.toUtf8();
 	}
 
 	return QString(
 		"INSERT INTO \"ConversationParticipants\" (\"ConversationId\", \"UserId\") "
 		"VALUES('%1', '%2') ON CONFLICT DO NOTHING;")
-		.arg(QString::fromUtf8(conversationId))
-		.arg(QString::fromUtf8(userId))
+		.arg(conversationId)
+		.arg(userId)
 		.toUtf8();
 }
 
@@ -139,8 +139,8 @@ QByteArray CParticipantDbDelegateComp::CreateRemoveParticipantQuery(
 	return QString(
 		"DELETE FROM \"ConversationParticipants\" "
 		"WHERE \"ConversationId\"='%1' AND \"UserId\"='%2';")
-		.arg(QString::fromUtf8(conversationId))
-		.arg(QString::fromUtf8(userId))
+		.arg(conversationId)
+		.arg(userId)
 		.toUtf8();
 }
 

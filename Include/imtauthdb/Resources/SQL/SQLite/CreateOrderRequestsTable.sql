@@ -15,8 +15,7 @@ CREATE TABLE IF NOT EXISTS "OrderRequests" (
 	"UpdatedAt" TEXT NOT NULL,
 	FOREIGN KEY ("SourceTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE,
 	FOREIGN KEY ("TargetTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE,
-	FOREIGN KEY ("RelationshipId") REFERENCES "TenantRelationships" ("Id") ON DELETE CASCADE,
-	FOREIGN KEY ("ContractId") REFERENCES "Contracts" ("Id") ON DELETE SET NULL
+	FOREIGN KEY ("RelationshipId") REFERENCES "TenantRelationships" ("Id") ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS "IdxOrderRequestsSourceTenantId" ON "OrderRequests" ("SourceTenantId");

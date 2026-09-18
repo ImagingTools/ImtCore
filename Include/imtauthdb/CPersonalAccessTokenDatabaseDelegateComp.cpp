@@ -173,10 +173,10 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CPersonalAccessTokenDatabaseDeleg
 		description = objectDescription;
 	}
 
-	const QString createdAtSql = createdAt.isEmpty() ? "NULL" : QString("'%1'").arg(createdAt);
-	const QString lastUsedAtSql = lastUsedAt.isEmpty() ? "NULL" : QString("'%1'").arg(lastUsedAt);
-	const QString expiresAtSql = expiresAt.isEmpty() ? "NULL" : QString("'%1'").arg(expiresAt);
-	const QString productIdSql = productId.isEmpty() ? "NULL" : QString("'%1'").arg(SqlEncode(productId));
+	const QString createdAtSql = createdAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(createdAt);
+	const QString lastUsedAtSql = lastUsedAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(lastUsedAt);
+	const QString expiresAtSql = expiresAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(expiresAt);
+	const QString productIdSql = productId.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(SqlEncode(productId));
 	const QString revokedSql = revoked ? "TRUE" : "FALSE";
 
 	NewObjectQuery retVal;
@@ -239,9 +239,9 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	const bool revoked = tokenPtr->IsRevoked();
 
-	const QString lastUsedAtSql = lastUsedAt.isEmpty() ? "NULL" : QString("'%1'").arg(lastUsedAt);
-	const QString expiresAtSql = expiresAt.isEmpty() ? "NULL" : QString("'%1'").arg(expiresAt);
-	const QString productIdSql = productId.isEmpty() ? "NULL" : QString("'%1'").arg(SqlEncode(productId));
+	const QString lastUsedAtSql = lastUsedAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(lastUsedAt);
+	const QString expiresAtSql = expiresAt.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(expiresAt);
+	const QString productIdSql = productId.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(SqlEncode(productId));
 	const QString revokedSql = revoked ? "TRUE" : "FALSE";
 
 	const QByteArray retVal = QString(
@@ -286,10 +286,10 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDeleteObjectsQuery(
 		if (i > 0){
 			idsStr += ", ";
 		}
-		idsStr += QString("'%1'").arg(SqlEncode(QString::fromUtf8(objectIds[i])));
+		idsStr += QStringLiteral("'%1'").arg(SqlEncode(QString::fromUtf8(objectIds[i])));
 	}
 
-	const QByteArray retVal = QString("DELETE FROM \"PersonalAccessTokens\" WHERE \"Id\" IN (%1);")
+	const QByteArray retVal = QStringLiteral(R"(DELETE FROM "PersonalAccessTokens" WHERE "Id" IN (%1);)")
 		.arg(idsStr)
 		.toUtf8();
 

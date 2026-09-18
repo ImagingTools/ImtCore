@@ -6,7 +6,7 @@ import imtcontrols 1.0
 
 GqlModel {
 	id: container;
-	property string subscriptionId;
+	property string subscriptionId: UuidGenerator.generateUUID();
 	property string gqlCommandId;
 	property string state;
 
@@ -15,9 +15,13 @@ GqlModel {
 	// should only be registered after an external trigger (e.g. login).
 	property bool autoSubscribe: true
 
+	property bool ok: subscriptionId !== "" && gqlCommandId !== "";
+
+	property BaseClass sdlInputObject: null
+	property Component sdlInputObjectComp: null;
+
 	signal messageReceived(var data);
 
-	property bool ok: subscriptionId !== "" && gqlCommandId !== "";
 	onOkChanged: {
 		if (ok && autoSubscribe){
 			registerSubscription();
@@ -25,8 +29,6 @@ GqlModel {
 	}
 
 	Component.onCompleted: {
-		subscriptionId = UuidGenerator.generateUUID();
-
 		// If SubscriptionManager is created after this client, the initial
 		// RegisterSubscription event is lost.  Listen for the manager's
 		// ready signal and re-register.
@@ -44,29 +46,53 @@ GqlModel {
 		}
 	}
 
-	onStateChanged: {
-		if (container.state === "Ready"){
-			if (container.containsKey("data")){
-				let dataModelLocal = container.getData("data")
-				
-				if (dataModelLocal.containsKey(gqlCommandId)){
-					dataModelLocal = dataModelLocal.getData(gqlCommandId)
-				}
+	// Delivery is driven synchronously by SubscriptionManager (which calls deliverReady()
+	// right after copying each payload) rather than from this deferred onStateChanged. The
+	// state signal is delivered asynchronously, so when several subscription messages arrive
+	// back-to-back the next message overwrote this model before the previous message's
+	// deferred handler ran - only the last message of a burst was ever surfaced (observed
+	// live: after an agent reconnect only one of two open services' status updates reached
+	// the GUI). Synchronous delivery per message fixes that; onStateChanged no longer emits.
 
-				container.messageReceived(dataModelLocal);
+	// Fire messageReceived for the data currently held by this subscription.
+	function deliverReady(){
+		if (container.containsKey("data")){
+			let dataModelLocal = container.getData("data")
+
+			if (dataModelLocal.containsKey(gqlCommandId)){
+				dataModelLocal = dataModelLocal.getData(gqlCommandId)
 			}
+
+			container.messageReceived(dataModelLocal);
 		}
 	}
 
 	function getGqlQuery(){
 		var query = Gql.GqlRequest("subscription", gqlCommandId);
 		var inputParams = Gql.GqlObject("input");
-		query.AddParam(inputParams);
+		if (sdlInputObject != null){
+			inputParams.fromObject(sdlInputObject)
+			query.AddParam(inputParams);
+		}
+		else if (sdlInputObjectComp != null){
+			let inputObject = sdlInputObjectComp.createObject(container);
+			inputParams.fromObject(inputObject)
+			query.AddParam(inputParams);
+
+			inputObject.destroy()
+		}
+		else {
+			createQueryParams(query, inputParams)
+		}
 		var queryFields = Gql.GqlObject("notification");
 		queryFields.InsertField("id");
 		query.AddField(queryFields);
 
 		return query;
+	}
+
+	function createQueryParams(query, inputParams){
+		query.AddParam(inputParams);
 	}
 
 	function registerSubscription(){

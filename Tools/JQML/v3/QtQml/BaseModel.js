@@ -2,6 +2,7 @@ const ListModel = require('./Models/ListModel')
 const Bool = require('./Bool')
 const Var = require('./Var')
 const Signal = require('./Signal')
+const QtFunctions = require("../Qt/functions")
 
 class BaseModel extends ListModel {
 	static meta = Object.assign({}, ListModel.meta, {
@@ -9,7 +10,14 @@ class BaseModel extends ListModel {
 		owner: { type: Var, value: null },
 
 		internalModelChanged: { type:Signal, args: ['name', 'sender'] },
+		finished: { type:Signal, args: [] },
     })
+
+	SLOT_ownerChanged(){
+		for(let i = 0; i < this.count; i++){
+			this.get(i).item.owner = this.owner
+		}
+	}
 
 	escapeSpecialChars(jsonString) {
 		return jsonString.replace(/\\/g, "\\\\")
@@ -195,6 +203,43 @@ class BaseModel extends ListModel {
 		return retVal
 	}
 
+	copyFrom(sourceObject) {
+		for(let i = 0; i < sourceObject.count; i++){
+			let item = sourceObject.get(i).item
+			this.addElement(item.copyMe())
+		}
+
+		return true
+	}
+
+	createFromJson(json){
+		return this.fromJSON(json);
+	}
+
+	fromJSON(json){
+		let arr = JSON.parse(json)
+		return this.fromObject(arr)
+	}
+
+	fromObject(sourceObject){
+		this.clear()
+
+		for(let i = 0; i < sourceObject.length; i++){
+			let sourceTypename
+			if (sourceObject[i]['__typename']){
+				sourceTypename = sourceObject[i]['__typename']
+			}
+			else {
+				continue
+			}
+			let obj = QtFunctions.createComponent(sourceTypename + ".qml").createObject(this)
+			obj.fromObject(sourceObject[i])
+			this.addElement(obj)
+		}
+
+		this.finished()
+	}
+
 	addElement(element){
 		element.owner = this.owner
 		this.append({item: element})
@@ -223,6 +268,9 @@ class BaseModel extends ListModel {
 	}
 
 	containsKey(key, index){
+		if (index < 0 || index >= this.count){
+			return false
+		}
 		return this.get(index).item[key] != undefined
 	}
 

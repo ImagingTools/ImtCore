@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtbase/CDocumentChangeGeneratorCompBase.h>
+#include <imtauth/IUserBaseInfo.h>
 
 
 namespace imtauth
@@ -24,6 +25,14 @@ protected:
 	QString GetRoleName(const QByteArray& roleId) const;
 	QString GetUserName(const QByteArray& userId) const;
 	QString GetGroupName(const QByteArray& groupId) const;
+
+	/**
+		Record the added and removed products together with the role assignments they carry.
+	*/
+	void CompareProductRoles(
+				const imtauth::IUserBaseInfo& oldGroupInfo,
+				const imtauth::IUserBaseInfo& newGroupInfo,
+				imtbase::CObjectCollection& documentChangeCollection);
 
 	// reimplemented (imtbase::CDocumentChangeGeneratorCompBase)
 	virtual bool CompareDocuments(

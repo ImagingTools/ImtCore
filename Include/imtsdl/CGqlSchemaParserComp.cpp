@@ -64,7 +64,7 @@ template <class T>
 			if (isTypeSchema){
 				const bool isSet = CSdlTools::UpdateTypeInfo(sdlEntry, &schemaParams, &argumentParser);
 				if (!isSet){
-					log.SendLogMessage(istd::IInformationProvider::IC_ERROR, 0, QString("Unable to set output file for entry: '%1' in '%2'").arg(sdlEntry.GetName(), currentSchemaFilePath), QString());
+					log.SendLogMessage(istd::IInformationProvider::IC_ERROR, 0, QStringLiteral("Unable to set output file for entry: '%1' in '%2'").arg(sdlEntry.GetName(), currentSchemaFilePath), QString());
 
 					return false;
 				}
@@ -156,7 +156,7 @@ iproc::IProcessor::TaskState CGqlSchemaParserComp::DoProcessing(
 		int optionsCount = processedFilesPtr->GetOptionsCount();
 		for (int i = 0; i < optionsCount; ++i){
 			if (m_currentSchemaFilePath == processedFilesPtr->GetOptionName(i)){
-				SendVerboseMessage(0, QString("File '%1' already processed. Skipping...").arg(m_currentSchemaFilePath));
+				SendVerboseMessage(0, QStringLiteral("File '%1' already processed. Skipping...").arg(m_currentSchemaFilePath));
 
 				return TS_OK;
 			}
@@ -174,7 +174,7 @@ iproc::IProcessor::TaskState CGqlSchemaParserComp::DoProcessing(
 	QFile inputFile(m_currentSchemaFilePath);
 
 	if (!inputFile.open(QIODevice::ReadOnly)){
-		SendErrorMessage(0, QString("Unable to open file '%1'").arg(inputFile.fileName()));
+		SendErrorMessage(0, QStringLiteral("Unable to open file '%1'").arg(inputFile.fileName()));
 
 		return TS_INVALID;
 	}
@@ -204,7 +204,7 @@ iproc::IProcessor::TaskState CGqlSchemaParserComp::DoProcessing(
 	QFile outputFile(outputFileName);
 
 	if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)){
-		SendErrorMessage(0, QString("Cannot open output file '%1'").arg(outputFileName));
+		SendErrorMessage(0, QStringLiteral("Cannot open output file '%1'").arg(outputFileName));
 
 		return TS_INVALID;
 	}
@@ -216,7 +216,7 @@ iproc::IProcessor::TaskState CGqlSchemaParserComp::DoProcessing(
 	// and parse file with removed remarks
 	m_currentInputFilePtr.SetPtr(new QFile(outputFileName));
 	if (!m_currentInputFilePtr->open(QIODevice::ReadOnly | QIODevice::Text)){
-		SendErrorMessage(0, QString("Unable to open file '%1'").arg(m_currentInputFilePtr->fileName()));
+		SendErrorMessage(0, QStringLiteral("Unable to open file '%1'").arg(m_currentInputFilePtr->fileName()));
 
 		return TS_INVALID;
 	}
@@ -241,7 +241,7 @@ iproc::IProcessor::TaskState CGqlSchemaParserComp::DoProcessing(
 		for (const CSdlType& sdlType: std::as_const(m_sdlTypes)){
 			CSdlType* sdlTypePtr = new CSdlType(sdlType);
 			typeListParamsPtr->SetEditableParameter(QByteArray::number(typeListParamsPtr->GetParamIds().size()), sdlTypePtr, true);
-			SendVerboseMessage(QString("'%1': Add SDL for import. Name:'%2' [%3]").arg(m_currentSchemaFilePath, sdlType.GetName(), QByteArray::number(typeListParamsPtr->GetParamIds().size() - 1)));
+			SendVerboseMessage(QStringLiteral("'%1': Add SDL for import. Name:'%2' [%3]").arg(m_currentSchemaFilePath, sdlType.GetName(), QByteArray::number(typeListParamsPtr->GetParamIds().size() - 1)));
 		}
 	}
 
@@ -288,7 +288,7 @@ QStringList CGqlSchemaParserComp::GetPathsFromImportEntry(QString importDirectiv
 		for (auto importDirectiveSymbol = importDirective.crbegin(); importDirectiveSymbol != importDirective.crend(); ++importDirectiveSymbol){
 			auto nextSymbol = importDirectiveSymbol + 1;
 			if (nextSymbol == importDirective.crend()){
-				SendErrorMessage(0, QString("Unexpected import directive '%1'").arg(importDirective));
+				SendErrorMessage(0, QStringLiteral("Unexpected import directive '%1'").arg(importDirective));
 			}
 			if (!importDirectiveSymbol->isDigit() && *importDirectiveSymbol != '.'){
 				// we are finished version parsing
@@ -398,7 +398,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 
 		int processingResult = newSchemaProcessor->DoProcessing(nullptr, &schemaFilePathParam, &outputParams, nullptr, nullptr);
 		if (processingResult != TS_OK){
-			SendErrorMessage(0, QString("Unable to process file '%1'").arg(schemaPath));
+			SendErrorMessage(0, QStringLiteral("Unable to process file '%1'").arg(schemaPath));
 
 			return false;
 		}
@@ -436,7 +436,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 				CSdlType copiedType(*sdlTypeParam);
 				// maybe already imported from another file
 				if (!m_sdlTypes.contains(copiedType)){
-					SendVerboseMessage(QString("'%1': Add SDL from import '%2'. Name:'%3' [%4]").arg(m_currentSchemaFilePath, schemaPath, copiedType.GetName(), paramId));
+					SendVerboseMessage(QStringLiteral("'%1': Add SDL from import '%2'. Name:'%3' [%4]").arg(m_currentSchemaFilePath, schemaPath, copiedType.GetName(), paramId));
 					m_sdlTypes << copiedType;
 				}
 			}
@@ -457,7 +457,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 				const QString sdlRequestName = sdlRequestParam->GetName();
 				for (const CSdlRequest& sdlRequest: std::as_const(m_requests)){
 					if (sdlRequest.GetName() == sdlRequestName && sdlRequest != *sdlRequestParam){
-						SendErrorMessage(0, QString("Redifinition of '%1' in '%2'. Alreadty defined at %3 and %4").arg(
+						SendErrorMessage(0, QStringLiteral("Redifinition of '%1' in '%2'. Alreadty defined at %3 and %4").arg(
 												sdlRequestName,
 												schemaPath,
 												sdlRequest.GetSchemaFilePath(),
@@ -487,7 +487,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 				const QString sdlDocumentName = sdlDocumentTypeParam->GetName();
 				for (const CSdlDocumentType& sdlDocumentType: std::as_const(m_documentTypes)){
 					if (sdlDocumentType.GetName() == sdlDocumentName && sdlDocumentType != *sdlDocumentTypeParam){
-						SendErrorMessage(0, QString("Redifinition of '%1' in '%2'. alreadty defined at %3 and %4").arg(
+						SendErrorMessage(0, QStringLiteral("Redifinition of '%1' in '%2'. alreadty defined at %3 and %4").arg(
 												sdlDocumentName,
 												schemaPath,
 												sdlDocumentType.GetSchemaFilePath(),
@@ -517,7 +517,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 				const QString sdlEnumName = sdlEnumParam->GetName();
 				for (const CSdlEnum& sdlEnum: std::as_const(m_enums)){
 					if (sdlEnum.GetName() == sdlEnumName && sdlEnum != *sdlEnumParam){
-						SendErrorMessage(0, QString("Redifinition of '%1' in '%2'. alreadty defined at %3 and %4").arg(
+						SendErrorMessage(0, QStringLiteral("Redifinition of '%1' in '%2'. alreadty defined at %3 and %4").arg(
 												sdlEnumName,
 												schemaPath,
 												sdlEnum.GetSchemaFilePath(),
@@ -550,7 +550,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 				const QString sdlUnionName = sdlUnionParam->GetName();
 				for (const CSdlUnion& sdlUnion : std::as_const(m_unions)){
 					if (sdlUnion.GetName() == sdlUnionName && sdlUnion != *sdlUnionParam){
-						SendErrorMessage(0, QString("Redifinition of '%1' in '%2'. alreadty defined at %3 and %4").arg(
+						SendErrorMessage(0, QStringLiteral("Redifinition of '%1' in '%2'. alreadty defined at %3 and %4").arg(
 												sdlUnionName,
 												schemaPath,
 												sdlUnion.GetSchemaFilePath(),
@@ -595,7 +595,7 @@ bool CGqlSchemaParserComp::SetupSchemaFilePath(const istd::IPolymorphic* inputPt
 	}
 
 	if (m_currentSchemaFilePath.isEmpty()){
-		SendErrorMessage(0, QString("Unable to setup schema path, because it is empty"));
+		SendErrorMessage(0, QStringLiteral("Unable to setup schema path, because it is empty"));
 		return false;
 	}
 
@@ -619,7 +619,7 @@ bool CGqlSchemaParserComp::ProcessFilesImports()
 
 		retVal = retVal && ReadToDelimeter(QByteArray(&foundDelimiter, 1) + '}', importedFilePath);
 		if (foundDelimiter == '}'){
-			SendErrorMessage(0, QString("Syntax error. In '%1' Expected ' or \" at %3").arg(m_currentSchemaFilePath, QString::number(m_lastReadLine + 1)));
+			SendErrorMessage(0, QStringLiteral("Syntax error. In '%1' Expected ' or \" at %3").arg(m_currentSchemaFilePath, QString::number(m_lastReadLine + 1)));
 
 			return false;
 		}
@@ -646,7 +646,7 @@ bool CGqlSchemaParserComp::ProcessFilesImports()
 		}
 	}
 	if (!schemaImportList.isEmpty()){
-		SendErrorMessage(0, QString("Unable to find import files in '%1' : %2").arg(m_currentSchemaFilePath, schemaImportList.join("; ")));
+		SendErrorMessage(0, QStringLiteral("Unable to find import files in '%1' : %2").arg(m_currentSchemaFilePath, schemaImportList.join("; ")));
 
 		return false;
 	}
@@ -666,7 +666,7 @@ bool CGqlSchemaParserComp::ProcessJavaStyleImports()
 	retVal = retVal && ReadToDelimeter(QByteArrayLiteral("}"), importedFilesSectionData);
 
 	if (!retVal){
-		SendErrorMessage(0, QString("Unable to process schema's imports. File: '%1'").arg(m_currentSchemaFilePath));
+		SendErrorMessage(0, QStringLiteral("Unable to process schema's imports. File: '%1'").arg(m_currentSchemaFilePath));
 
 		return false;
 	}
@@ -743,7 +743,7 @@ bool CGqlSchemaParserComp::ValidateSchema()
 			if (!isExternal){
 				const bool isSet = UpdateTypeInfo(sdlRequest, m_schemaParamsPtr.get(), m_argumentParserCompPtr.GetPtr());
 				if (!isSet){
-					SendErrorMessage(0, QString("Unable to set output file for type: '%1' in '%2'").arg(sdlRequest.GetName(), m_currentSchemaFilePath));
+					SendErrorMessage(0, QStringLiteral("Unable to set output file for type: '%1' in '%2'").arg(sdlRequest.GetName(), m_currentSchemaFilePath));
 
 					return false;
 				}

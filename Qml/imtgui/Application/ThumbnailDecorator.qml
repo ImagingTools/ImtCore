@@ -104,7 +104,10 @@ Rectangle {
 		
 		model: pagesManager.pageModel;
 		
-		color: !pagesManager.pageModel.getItemsCount() ? "transparent" : Style.colorMenuPanel !==undefined ? Style.colorMenuPanel : Style.imagingToolsGradient1;
+		// The rail keeps its own colour even before the page list arrives. Left
+		// transparent while empty it showed the window's darker backdrop through
+		// itself, so the panel came up grey and turned white once data landed.
+		color: Style.colorMenuPanel !== undefined ? Style.colorMenuPanel : Style.baseColor;
 		
 		Component.onCompleted: {
 			MainDocumentService.documentOpened.connect(onDocumentOpened);
@@ -236,42 +239,30 @@ Rectangle {
 		}
 	}
 	
+	// SuperuserPasswordPage manages its own submitting/error state inline (in-button
+	// loading indicator, inline error banner) rather than the startLoading()/
+	// stopLoading() full-screen overlay - that used to get stuck on screen forever
+	// after a failed CreateSuperuser call, since nothing ever turned it back off.
 	property Component superuserPasswordPageComp: Component {
 		SuperuserPasswordPage {
 			id: superuserPasswordPage;
-			
+
 			anchors.fill: parent;
 			anchors.topMargin: topPanel_.height;
-			
+
 			Component.onCompleted: {
 				Events.sendEvent("SetUserPanelEnabled", false);
 			}
-			
-			onBeforeSetted: {
-				thumbnailDecoratorContainer.startLoading();
-			}
-			
-			onVisibleChanged: {
-				if (visible){
-					thumbnailDecoratorContainer.stopLoading();
-				}
-			}
-			
+
 			onPasswordSetted: {
-				thumbnailDecoratorContainer.stopLoading();
-				
 				thumbnailDecoratorContainer.showPage(thumbnailDecoratorContainer.authorizationPageComp);
-			}
-			
-			onFailed: {
-				thumbnailDecoratorContainer.stopLoading();
-				thumbnailDecoratorContainer.showPage(thumbnailDecoratorContainer.superuserPasswordPageComp);
 			}
 		}
 	}
 	
 	PopupContainer {
 		id: popupContainer;
+		z: 10000
 		anchors.right: parent.right;
 		anchors.rightMargin: Style.marginM;
 		anchors.bottom: parent.bottom;

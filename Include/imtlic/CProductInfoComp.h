@@ -19,6 +19,7 @@ public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CProductInfoComp);
+		I_REGISTER_INTERFACE(imtbase::IIdentifiable);
 		I_REGISTER_INTERFACE(imtlic::IProductInfo);
 		I_REGISTER_INTERFACE(iprm::INameParam);
 		I_REGISTER_INTERFACE(iser::ISerializable);

@@ -7,14 +7,6 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtCore includes
-#include <imtauth/CContactInfo.h>
-#include <imtauth/CAddress.h>
-#include <imtauth/CAccountInfo.h>
-#include <imtauth/CCompanyInfo.h>
-#include <imtauth/CContactInfoMetaInfoCreatorComp.h>
-#include <imtauth/CAddressMetaInfoCreatorComp.h>
-#include <imtauth/CAccountInfoMetaInfoCreatorComp.h>
-#include <imtauth/CCompanyInfoMetaInfoCreatorComp.h>
 #include <imtauth/CRoleComp.h>
 #include <imtauth/CRoleMetaInfoCreatorComp.h>
 #include <imtauth/CUserInfoMetaInfoCreatorComp.h>
@@ -22,7 +14,6 @@
 #include <imtauth/CUserGroupInfoComp.h>
 #include <imtauth/CRoleCollectionAdapterComp.h>
 #include <imtauth/CCheckPermissionCompBase.h>
-#include <imtauth/CCollectionPermissionsProviderComp.h>
 #include <imtauth/CCheckPermissionOrComp.h>
 #include <imtauth/CUserSettingsComp.h>
 #include <imtauth/CUserGroupInfoProviderComp.h>
@@ -31,6 +22,8 @@
 #include <imtauth/CLdapUserCollectionControllerComp.h>
 #include <imtauth/CLdapCredentialControllerComp.h>
 #include <imtauth/CCredentialControllerComp.h>
+#include <imtauth/CAccountLockoutControllerComp.h>
+#include <imtauth/CPasswordPolicyControllerComp.h>
 #include <imtauth/CLdapUserCollectionJoinerComp.h>
 #include <imtauth/CUserChangeGeneratorComp.h>
 #include <imtauth/CRoleChangeGeneratorComp.h>
@@ -39,9 +32,6 @@
 #include <imtauth/CUserVerificationControllerComp.h>
 #include <imtauth/CUserVerificationCodeSenderComp.h>
 #include <imtauth/CJwtSessionControllerComp.h>
-#include <imtauth/CSessionMetaInfoCreatorComp.h>
-#include <imtauth/CUserMetaInfoCreatorComp.h>
-#include <imtauth/CGroupMetaInfoCreatorComp.h>
 #include <imtauth/CUserConnectionInfo.h>
 #include <imtauth/CUserActionMetaInfoCreatorComp.h>
 #include <imtauth/CUserActionManagerComp.h>
@@ -54,7 +44,6 @@
 #include <imtauth/COidcTokenInfo.h>
 #include <imtauth/CRs256JwtTokenProviderComp.h>
 #include <imtauth/CTenantInfoComp.h>
-#include <imtauth/CTenantMetaInfoCreatorComp.h>
 #include <imtauth/CTenantManagerComp.h>
 #include <imtauth/CTenantMembershipComp.h>
 #include <imtauth/CTenantMembershipManagerComp.h>
@@ -84,6 +73,9 @@
 #include <imtauth/CFacebookOidcProviderComp.h>
 #include <imtauth/CExternalOidcAuthControllerComp.h>
 #include <imtauth/CTenantRelationshipDocumentNameProviderComp.h>
+#include <imtauth/CRoleDocumentNameProviderComp.h>
+#include <imtauth/CUserDocumentNameProviderComp.h>
+#include <imtauth/CUserGroupDocumentNameProviderComp.h>
 #include <imtauth/CTenantDocumentValidatorComp.h>
 #include <imtauth/CRelationshipDocumentValidatorComp.h>
 #include <imtauth/CCrossOrgGrantDocumentValidatorComp.h>
@@ -98,33 +90,6 @@ namespace ImtAuthPck
 {
 
 
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<imtauth::CAddress>> Address;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap <
-						imtauth::CAccountInfo,
-						imtauth::IAccountInfo,
-						iser::IObject,
-						iser::ISerializable,
-						istd::IChangeable>> AccountInfo;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap <
-						imtauth::CContactInfo,
-						imtauth::IContactInfo,
-						iser::ISerializable,
-						istd::IChangeable>> ContactInfo;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<
-						imtauth::CIdentifiableCompanyInfo,
-						imtauth::IContactBaseInfo,
-						imtauth::ICompanyInfo,
-						iser::IObject,
-						iser::ISerializable,
-						istd::IChangeable>> CompanyInfo;
-typedef imtauth::CContactInfoMetaInfoCreatorComp ContactInfoMetaInfoCreator;
-typedef imtauth::CAddressMetaInfoCreatorComp AddressMetaInfoCreator;
-typedef imtauth::CAccountInfoMetaInfoCreatorComp AccountInfoMetaInfoCreator;
-typedef imtauth::CCompanyInfoMetaInfoCreatorComp CompanyInfoMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CRoleComp> Role;
 typedef imtauth::CRoleMetaInfoCreatorComp RoleMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CUserInfoComp> UserInfo;
@@ -139,7 +104,6 @@ typedef imtauth::CUserInfoMetaInfoCreatorComp UserInfoMetaInfoCreator;
 typedef imtauth::CRoleCollectionAdapterComp RoleCollectionAdapter;
 typedef imtauth::CUserCollectionAdapterComp UserCollectionAdapter;
 typedef imtauth::CCheckPermissionCompBase CheckPermissions;
-typedef imtauth::CCollectionPermissionsProviderComp CollectionPermissionsProvider;
 typedef imtauth::COrganizationsPermissionsProviderComp OrganizationsPermissionsProvider;
 typedef imtauth::CCheckPermissionOrComp CheckPermissionOr;
 typedef icomp::TModelCompWrap<imtauth::CUserSettingsComp> UserSettings;
@@ -153,7 +117,9 @@ typedef icomp::TModelCompWrap<
 						istd::IChangeable>> SessionInfo;
 typedef imtauth::CLdapUserCollectionControllerComp LdapUserCollectionController;
 typedef imtauth::CCredentialControllerComp CredentialController;
+typedef imtauth::CPasswordPolicyControllerComp PasswordPolicy;
 typedef imtauth::CLdapCredentialControllerComp LdapCredentialController;
+typedef imtauth::CAccountLockoutControllerComp AccountLockoutController;
 typedef imtauth::CLdapUserCollectionJoinerComp LdapUserCollectionJoiner;
 typedef imtauth::CUserChangeGeneratorComp UserChangeGenerator;
 typedef imtauth::CRoleChangeGeneratorComp RoleChangeGenerator;
@@ -161,9 +127,6 @@ typedef imtauth::CUserGroupChangeGeneratorComp UserGroupChangeGenerator;
 typedef imtauth::CUserVerificationControllerComp UserVerificationController;
 typedef imtauth::CUserVerificationCodeSenderComp UserVerificationCodeSender;
 typedef imtauth::CJwtSessionControllerComp JwtSessionController;
-typedef imtauth::CSessionMetaInfoCreatorComp SessionMetaInfoCreator;
-typedef imtauth::CUserMetaInfoCreatorComp UserMetaInfoCreator;
-typedef imtauth::CGroupMetaInfoCreatorComp GroupMetaInfoCreator;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtauth::CUserConnectionInfo,
@@ -201,7 +164,6 @@ typedef icomp::TModelCompWrap<
 						istd::IChangeable>> OidcTokenInfo;
 typedef imtauth::CRs256JwtTokenProviderComp Rs256JwtTokenProvider;
 typedef icomp::TModelCompWrap<imtauth::CTenantInfoComp> TenantInfo;
-typedef imtauth::CTenantMetaInfoCreatorComp TenantMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CTenantManagerComp> TenantManager;
 typedef icomp::TModelCompWrap<imtauth::CTenantMembershipComp> TenantMembershipInfo;
 typedef icomp::TModelCompWrap<imtauth::CTenantMembershipManagerComp> TenantMembershipManager;
@@ -236,6 +198,9 @@ typedef imtauth::CAppleOidcProviderComp AppleOidcProvider;
 typedef imtauth::CFacebookOidcProviderComp FacebookOidcProvider;
 typedef imtauth::CExternalOidcAuthControllerComp ExternalOidcAuthController;
 typedef imtauth::CTenantRelationshipDocumentNameProviderComp TenantRelationshipDocumentNameProvider;
+typedef imtauth::CRoleDocumentNameProviderComp RoleDocumentNameProvider;
+typedef imtauth::CUserDocumentNameProviderComp UserDocumentNameProvider;
+typedef imtauth::CUserGroupDocumentNameProviderComp UserGroupDocumentNameProvider;
 typedef imtauth::CTenantDocumentValidatorComp TenantDocumentValidator;
 typedef imtauth::CCrossOrgGrantDocumentValidatorComp CrossOrgGrantDocumentValidator;
 typedef imtauth::CRelationshipDocumentValidatorComp RelationshipDocumentValidator;

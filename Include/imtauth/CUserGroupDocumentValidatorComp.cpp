@@ -44,7 +44,7 @@ bool CUserGroupDocumentValidatorComp::ValidateDocumentData(
 			const imtauth::IUserGroupInfo* currentGroupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
 			if (currentGroupInfoPtr != nullptr){
 				if (currentGroupInfoPtr->GetName() == name){
-					errorMessage = QString("Group Name '%1' already exists").arg(name);
+					errorMessage = QStringLiteral("Group Name '%1' already exists").arg(name);
 					return false;
 				}
 			}

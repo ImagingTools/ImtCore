@@ -331,6 +331,12 @@ Item {
 
         Item {
             id: delegateRoot
+            // Test instrumentation: this generic, shared tree delegate had no per-row objectName at
+            // all (rows were only addressable by index/text via internal ListView machinery, not
+            // through Playwright's objectName-based locators) - mirrors the existing TableRow_<index>
+            // convention on the unrelated Table/TableRowDelegateBase control. Inert - no runtime/visual
+            // effect on any of this component's other consumers.
+            objectName: "TreeRow_" + index
 
             property string nodeKey: model.key
             property int    nodeLevel: model.level
@@ -357,6 +363,7 @@ Item {
 
             MouseArea {
                 id: rowMouseArea
+                objectName: "MouseArea"
                 anchors.fill: parent
                 hoverEnabled: true
                 acceptedButtons: Qt.LeftButton
@@ -483,6 +490,11 @@ Item {
 
                             // Tri-state checkbox (tree column, checkable nodes)
                             CheckBox {
+                                // Test instrumentation: matches Table/TableRowDelegateBase's own
+                                // "RowCheckBox" convention for a row's checkbox, nested MouseArea
+                                // named "MouseArea" so click()'s standard nested-MouseArea lookup
+                                // finds it via path ['TreeRow_<i>', 'RowCheckBox']. Inert.
+                                objectName: "RowCheckBox"
                                 visible: cellRoot.treeColumn && delegateRoot.nodeCheckable
                                 anchors.verticalCenter: parent.verticalCenter
                                 tristate: root.tristate
@@ -490,6 +502,7 @@ Item {
                                 isActive: delegateRoot.nodeIsEnabled
 
                                 MouseArea {
+                                    objectName: "MouseArea"
                                     anchors.fill: parent
                                     enabled: delegateRoot.nodeIsEnabled
                                     visible: delegateRoot.nodeIsEnabled
@@ -785,7 +798,10 @@ Item {
             __autoLeaveEdit()
     }
 
-    onModelChanged: rebuildTree()
+    onModelChanged: {
+        rebuildTree()
+    }
+
     onColumnsChanged: {
         __hasUserColumnWidths = false
         __recomputeColumnWidths()
@@ -933,7 +949,6 @@ Item {
             for (var c = childCount - 1; c >= 0; --c)
                 stack.push({ item: __itemAt(children, c), row: c, parentKey: keyValue, level: entry.level + 1, path: entry.path + "/" + c })
         }
-
         __pruneExpandedState()
         cleanupSelection()
         buildVisibleTree()

@@ -262,6 +262,12 @@ QtObject {
 		var selected = ({})
 		var list = ids || []
 		for (var i = 0; i < list.length; i++){
+			// String(null) === "null" and String(undefined) === "undefined" — skip these
+			// explicitly so a missing/null entry in the source list can't masquerade as a
+			// real selected ID (it would otherwise round-trip back to the server as one).
+			if (list[i] === null || list[i] === undefined){
+				continue
+			}
 			var sid = String(list[i])
 			if (sid !== ""){
 				selected[sid] = true

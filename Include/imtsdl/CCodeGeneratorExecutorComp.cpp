@@ -46,7 +46,7 @@ void CCodeGeneratorExecutorComp:: OnComponentCreated()
 			m_sdlSchemaDependenciesCollectorCompPtr->DoProcessing(nullptr, nullptr, &outputParams, nullptr, nullptr);
 		if (collectionResult != iproc::IProcessor::TS_OK){
 			SendErrorMessage(
-				0, QString("Unable to collect dependencies for schema: '%1'")
+				0, QStringLiteral("Unable to collect dependencies for schema: '%1'")
 					.arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
 
 			qApp->exit(1);
@@ -57,7 +57,7 @@ void CCodeGeneratorExecutorComp:: OnComponentCreated()
 			&outputParams, QByteArrayLiteral("ProcessedFiles"), true);
 		if (!processedFilesPtr.IsValid()){
 			SendCriticalMessage(
-				0, QString("Unexpected dependencies list for schema: '%1'")
+				0, QStringLiteral("Unexpected dependencies list for schema: '%1'")
 					.arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
 
 			qApp->exit(2);
@@ -93,7 +93,7 @@ void CCodeGeneratorExecutorComp:: OnComponentCreated()
 		m_gqlSchemaParser->DoProcessing(nullptr, nullptr, &outputParamsSet, nullptr, nullptr);
 	if (parsingResult != iproc::IProcessor::TS_OK){
 		SendErrorMessage(
-			0, QString("Unable to parse schema '%1'")
+			0, QStringLiteral("Unable to parse schema '%1'")
 				.arg(QFileInfo(m_sdlArgumentParserCompPtr->GetSchemaFilePath())
 						 .absoluteFilePath()));
 

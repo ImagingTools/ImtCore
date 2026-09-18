@@ -11,10 +11,13 @@
 #include <imtdb/CSqlDatabaseObjectCollectionComp.h>
 #include <imtdb/CDatabaseAccessSettingsComp.h>
 #include <imtdb/CSqlDatabaseDocumentDelegateLegacyComp.h>
+#include <imtdb/CSqlDatabaseDocumentDelegateCompBase.h>
 #include <imtdb/CSqlDatabaseDocumentDelegateComp.h>
+#include <imtdb/CSqlDatabaseFileDocumentDelegateComp.h>
 #include <imtdb/CSqlJsonDatabaseDelegateComp.h>
 #include <imtdb/CStandardSqlMetaInfoTableDelegateComp.h>
 #include <imtdb/CDatabaseAutomaticBackupComp.h>
+#include <imtdb/CFileDocumentGarbageCollectorComp.h>
 #include <imtdb/CRestoringDatabaseControllerComp.h>
 #include <imtdb/CSqlStructureDelegateComp.h>
 #include <imtdb/CSqliteJsonDatabaseDelegateComp.h>
@@ -42,9 +45,11 @@ typedef icomp::TModelCompWrap<imtdb::CSqlDatabaseObjectCollectionComp> SqlDataba
 typedef icomp::TModelCompWrap<imtdb::CDatabaseAccessSettingsComp> DatabaseAccessSettings;
 typedef imtdb::CSqlDatabaseDocumentDelegateLegacyComp SqlDatabaseDocumentDelegateLegacy;
 typedef imtdb::CSqlDatabaseDocumentDelegateComp SqlDatabaseDocumentDelegate;
+typedef imtdb::CSqlDatabaseFileDocumentDelegateComp SqlDatabaseFileDocumentDelegate;
 typedef imtdb::CSqlJsonDatabaseDelegateComp SqlDatabaseJsonDelegate;
 typedef imtdb::CStandardSqlMetaInfoTableDelegateComp StandardMetaInfoTableDelegate;
 typedef imtdb::CDatabaseAutomaticBackupComp DatabaseAutomaticBackup;
+typedef imtdb::CFileDocumentGarbageCollectorComp FileDocumentGarbageCollector;
 typedef imtdb::CRestoringDatabaseControllerComp RestoringDatabaseController;
 typedef imtdb::CSqlStructureDelegateComp SqlStructureDelegate;
 typedef imtdb::CSqliteJsonDatabaseDelegateComp SqliteJsonDatabaseDelegate;

@@ -27,17 +27,31 @@ ViewBase {
 	// PersonalAccessTokenList model (opaque), used as the table's elements source.
 	property var tokenList: null
 
+	// Same onCompleted + onApiClientChanged race as ProfileView — load once.
+	property bool __tokenListLoadDone: false
+
 	Component.onCompleted: {
-		if (tokensPage.apiClient)
-			tokensPage.apiClient.getTokenList()
+		tokensPage.__ensureTokenListLoad()
 	}
 
 	// See ProfileView's onApiClientChanged for why this is needed: apiClient is
 	// injected through several Loader layers and may not be settled yet when
 	// Component.onCompleted above runs.
 	onApiClientChanged: {
-		if (tokensPage.apiClient)
-			tokensPage.apiClient.getTokenList()
+		if (!tokensPage.apiClient) {
+			tokensPage.__tokenListLoadDone = false
+			return
+		}
+		tokensPage.__ensureTokenListLoad()
+	}
+
+	function __ensureTokenListLoad() {
+		if (!tokensPage.apiClient)
+			return
+		if (tokensPage.__tokenListLoadDone)
+			return
+		tokensPage.__tokenListLoadDone = true
+		tokensPage.apiClient.getTokenList()
 	}
 
 	Connections {
@@ -214,6 +228,9 @@ ViewBase {
 						TableCellDelegateBase {
 							id: removeColumnDelegateBase
 							ToolButton {
+								// Test instrumentation: icon-only ToolButton (no text) falls back to
+								// the generic, non-unique "Button" objectName otherwise. Inert.
+								objectName: "DeleteTokenButton"
 								anchors.centerIn: parent
 								width: Style.buttonWidthM
 								height: width
@@ -234,6 +251,7 @@ ViewBase {
 							id: revokeColumnDelegateBase
 							ToolButton {
 								id: revokeButton
+								objectName: "RevokeTokenButton"
 								anchors.centerIn: parent
 								width: Style.buttonWidthM
 								height: width
@@ -318,6 +336,7 @@ ViewBase {
 
 						CustomTextField {
 							id: tokenInput
+							objectName: "TokenValueField"
 							width: parent.width
 							readOnly: true
 							text: tokenCreatedDialog.token
@@ -326,6 +345,7 @@ ViewBase {
 
 							property bool copied: false
 							ToolButton {
+								objectName: "CopyTokenButton"
 								z: parent.z + 1
 								anchors.verticalCenter: parent.verticalCenter
 								anchors.right: parent.right
@@ -359,8 +379,8 @@ ViewBase {
 		Dialog {
 			id: addDialog
 			title: qsTr("New Personal Access Token")
-			width: 780
-			height: 720
+			width: Math.max(Style.sizeHintXXL, Math.min(ModalDialogManager.activeView.width - 100, 780))
+			height: Math.max(Style.sizeHintL, Math.min(ModalDialogManager.activeView.height - 100, 720))
 			backgroundColor: Style.baseColor
 
 			property string tokenName: ""
@@ -391,7 +411,7 @@ ViewBase {
 				Item {
 					id: contentItem
 					width: addDialog.width
-					height: 600
+					height: addDialog.height - 120
 
 					function checkAddButtonEnabled() {
 						var hasName = nameInputElementView.text !== ""
@@ -462,6 +482,7 @@ ViewBase {
 								}
 								CustomTextField {
 									id: nameInputElementView
+									objectName: "TokenNameInput"
 									width: parent.width
 									height: Style.controlHeightM
 									placeHolderText: qsTr("e.g. CI/CD Pipeline, API Client...")
@@ -552,6 +573,7 @@ ViewBase {
 								color: Style.inactiveTextColor
 							}
 							CustomTextField {
+								objectName: "TokenDescriptionInput"
 								width: parent.width
 								height: Style.controlHeightM
 								placeHolderText: qsTr("What will this token be used for?")

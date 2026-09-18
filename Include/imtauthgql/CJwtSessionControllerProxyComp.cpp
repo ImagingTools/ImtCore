@@ -19,11 +19,19 @@ sdl::V1_0::imtauth::CValidateSessionPayload CJwtSessionControllerProxyComp::OnVa
 
 
 sdl::V1_0::imtauth::CValidateJwtPayload CJwtSessionControllerProxyComp::OnValidateJwt(
-			const sdl::V1_0::imtauth::CValidateJwtGqlRequest& /*validateJwtRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
+			const sdl::V1_0::imtauth::CValidateJwtGqlRequest& validateJwtRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::V1_0::imtauth::CValidateJwtPayload>(gqlRequest, errorMessage);
+	imtgql::CGqlRequest proxyRequest;
+	if (!sdl::V1_0::imtauth::CValidateJwtGqlRequest::SetupGqlRequest(
+				proxyRequest,
+				validateJwtRequest.GetRequestedArguments())){
+		errorMessage = QStringLiteral("Unable to build ValidateJwt proxy request");
+		return sdl::V1_0::imtauth::CValidateJwtPayload();
+	}
+
+	return SendModelRequest<sdl::V1_0::imtauth::CValidateJwtPayload>(proxyRequest, errorMessage);
 }
 
 
@@ -37,11 +45,19 @@ sdl::V1_0::imtauth::CGetSessionPayload CJwtSessionControllerProxyComp::OnGetSess
 
 
 sdl::V1_0::imtauth::CRefreshTokenPayload CJwtSessionControllerProxyComp::OnRefreshToken(
-			const sdl::V1_0::imtauth::CRefreshTokenGqlRequest& /*refreshTokenRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
+			const sdl::V1_0::imtauth::CRefreshTokenGqlRequest& refreshTokenRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::V1_0::imtauth::CRefreshTokenPayload>(gqlRequest, errorMessage);
+	imtgql::CGqlRequest proxyRequest;
+	if (!sdl::V1_0::imtauth::CRefreshTokenGqlRequest::SetupGqlRequest(
+				proxyRequest,
+				refreshTokenRequest.GetRequestedArguments())){
+		errorMessage = QStringLiteral("Unable to build RefreshToken proxy request");
+		return sdl::V1_0::imtauth::CRefreshTokenPayload();
+	}
+
+	return SendModelRequest<sdl::V1_0::imtauth::CRefreshTokenPayload>(proxyRequest, errorMessage);
 }
 
 

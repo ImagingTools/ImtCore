@@ -9,6 +9,8 @@ DataModelProvider {
 	property string getCommandId
 	property var responseModel
 	property var inputModel
+	property string context
+	property bool canEmitDataModelReady: true
 	
 	function requestDataModel(paramsObj){
 		root.requestStarted(paramsObj)
@@ -35,7 +37,11 @@ DataModelProvider {
 		
 		query.AddParam(inputObject)
 		
-		gqlRequest.setGqlQuery(query.GetQuery(), root.getHeaders())
+		let headers = root.getHeaders()
+		if (headers && root.context && root.context != "")
+			headers["context"] = root.context
+
+		gqlRequest.setGqlQuery(query.GetQuery(), headers)
 	}
 
 	function prepareInputModel(paramsObj){
@@ -82,7 +88,9 @@ DataModelProvider {
 
 					root.prepareDataModel()
 
-					root.dataModelReady(root.dataModel)
+					if(root.canEmitDataModelReady){
+						root.dataModelReady(root.dataModel)
+					}
 					
 					return
 				}

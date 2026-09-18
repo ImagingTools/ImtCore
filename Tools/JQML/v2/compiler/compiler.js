@@ -165,7 +165,8 @@ function qmlaliasdef(meta, instructions){
 }
 function qmlpropdef(meta, instructions){
     instructions.propertiesNames.push(meta[2])
-    if(meta[4] && meta[4][1][0] === 'qmlelem'){
+    // An anonymous function is ['function', null, args, body] - position [1] is not always a node.
+    if(meta[4] && meta[4][1] && meta[4][1][0] === 'qmlelem'){
         let childInstructions = getBaseStructure()
         childInstructions.parent = instructions
         childInstructions.fileName = instructions.fileName
@@ -205,7 +206,7 @@ function qmlpropdef(meta, instructions){
     
 }
 function qmlprop(meta, instructions){
-    if(meta[2][0] === "block" || meta[2][1][0] === "assign"){
+    if(meta[2][0] === "block" || (meta[2][1] && meta[2][1][0] === "assign")){
         if(meta[1][0] === "dot"){
             let name = meta[1].slice(1)
 
@@ -218,7 +219,7 @@ function qmlprop(meta, instructions){
                 })
             } else {
                 instructions.propertiesNames.push(name.join('.'))
-                if(meta[2][1][0] === 'qmlelem'){
+                if(meta[2][1] && meta[2][1][0] === 'qmlelem'){
                     let childInstructions = getBaseStructure()
                     childInstructions.parent = instructions
                     childInstructions.fileName = instructions.fileName
@@ -251,7 +252,7 @@ function qmlprop(meta, instructions){
             } else {
                 instructions.propertiesNames.push(name)
 
-                if(meta[2][1][0] === 'qmlelem'){
+                if(meta[2][1] && meta[2][1][0] === 'qmlelem'){
                     let childInstructions = getBaseStructure()
                     childInstructions.parent = instructions
                     childInstructions.fileName = instructions.fileName
@@ -301,7 +302,7 @@ function qmlprop(meta, instructions){
             } else {
                 instructions.propertiesNames.push(name)
 
-                if(meta[2][1][0] === 'qmlelem'){
+                if(meta[2][1] && meta[2][1][0] === 'qmlelem'){
                     let childInstructions = getBaseStructure()
                     childInstructions.parent = instructions
                     childInstructions.fileName = instructions.fileName
@@ -881,7 +882,12 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
             }
             stat.value.push(`)`)
             stat.value.push(`{`)
+            // The body belongs to the nested function, not to the enclosing binding
+            let outerCompute = stat.compute
+            let outerReturn = stat.return
             prepare(tree[3], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.compute = outerCompute
+            stat.return = outerReturn
             stat.value.push(`}`)
             break
         }

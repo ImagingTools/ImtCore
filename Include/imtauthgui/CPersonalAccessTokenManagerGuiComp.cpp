@@ -151,7 +151,7 @@ void CPersonalAccessTokenManagerGuiComp::RefreshTokenList()
 	}
 	
 	// Update user ID label
-	UserIdLabel->setText(QString("User: %1").arg(QString::fromUtf8(m_currentUserId)));
+	UserIdLabel->setText(QStringLiteral("User: %1").arg(m_currentUserId));
 }
 
 
@@ -171,17 +171,17 @@ void CPersonalAccessTokenManagerGuiComp::UpdateTokenDetails(const QByteArray& to
 	
 	// Format token details
 	QString details;
-	details += QString("<b>Token ID:</b> %1<br>").arg(QString::fromUtf8(tokenPtr->GetId()));
-	details += QString("<b>Name:</b> %1<br>").arg(tokenPtr->GetName());
-	details += QString("<b>Description:</b> %1<br>").arg(tokenPtr->GetDescription());
-	details += QString("<b>Scopes:</b> %1<br>").arg(FormatScopes(tokenPtr->GetScopes()));
-	details += QString("<b>Created At:</b> %1<br>").arg(FormatDateTime(tokenPtr->GetCreatedAt()));
-	details += QString("<b>Expires At:</b> %1<br>").arg(FormatDateTime(tokenPtr->GetExpiresAt()));
-	details += QString("<b>Last Used At:</b> %1<br>").arg(FormatDateTime(tokenPtr->GetLastUsedAt()));
-	details += QString("<b>Revoked:</b> %1<br>").arg(tokenPtr->IsRevoked() ? "Yes" : "No");
+	details += QStringLiteral("<b>Token ID:</b> %1<br>").arg(tokenPtr->GetId());
+	details += QStringLiteral("<b>Name:</b> %1<br>").arg(tokenPtr->GetName());
+	details += QStringLiteral("<b>Description:</b> %1<br>").arg(tokenPtr->GetDescription());
+	details += QStringLiteral("<b>Scopes:</b> %1<br>").arg(FormatScopes(tokenPtr->GetScopes()));
+	details += QStringLiteral("<b>Created At:</b> %1<br>").arg(FormatDateTime(tokenPtr->GetCreatedAt()));
+	details += QStringLiteral("<b>Expires At:</b> %1<br>").arg(FormatDateTime(tokenPtr->GetExpiresAt()));
+	details += QStringLiteral("<b>Last Used At:</b> %1<br>").arg(FormatDateTime(tokenPtr->GetLastUsedAt()));
+	details += QStringLiteral("<b>Revoked:</b> %1<br>").arg(tokenPtr->IsRevoked() ? "Yes" : "No");
 	
 	if (tokenPtr->IsRevoked()){
-		details += QString("<b>Revoked At:</b> %1<br>").arg(FormatDateTime(tokenPtr->GetExpiresAt()));
+		details += QStringLiteral("<b>Revoked At:</b> %1<br>").arg(FormatDateTime(tokenPtr->GetExpiresAt()));
 	}
 	
 	TokenDetailsText->setHtml(details);
@@ -284,8 +284,8 @@ void CPersonalAccessTokenManagerGuiComp::OnCreateTokenClicked()
 			"Token created successfully!\n\n"
 			"Token ID: %1\n\n"
 			"RAW TOKEN (save this, you won't be able to see it again):\n%2")
-			.arg(QString::fromUtf8(result.tokenId))
-			.arg(QString::fromUtf8(result.rawToken));
+			.arg(result.tokenId)
+			.arg(result.rawToken);
 		
 		QMessageBox::information(GetWidget(), "Token Created", message);
 		

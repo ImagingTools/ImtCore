@@ -21,87 +21,87 @@ Rectangle {
 
 	MultiDocumentCollectionView {
 		anchors.fill: parent;
-		documentManager: GqlBasedCollectionDocumentManager {
-			collectionId: "ContactInfos"
-			Component.onCompleted: {
-				registerDocumentViewData("ContactInfo", "ContactInfoEditor", contactInfoEditorComp, contactInfoDataControllerFactory)
-				createDocument("ContactInfo")
-			}
+		// documentManager: GqlBasedCollectionDocumentManager {
+		// 	collectionId: "ContactInfos"
+		// 	Component.onCompleted: {
+		// 		registerDocumentViewData("ContactInfo", "ContactInfoEditor", contactInfoEditorComp, contactInfoDataControllerFactory)
+		// 		createDocument("ContactInfo")
+		// 	}
 
-			Component {
-				id: contactInfoEditorComp
+		// 	Component {
+		// 		id: contactInfoEditorComp
 				
-				ContactInfoEditor {
-					id: contactInfoEditor
-					commandsControllerComp: Component {
-						GqlBasedCommandsController {
-							typeId: "ContactInfo"
-						}
-					}
-				}
-			}
+		// 		ContactInfoEditor {
+		// 			id: contactInfoEditor
+		// 			commandsControllerComp: Component {
+		// 				GqlBasedCommandsController {
+		// 					typeId: "ContactInfo"
+		// 				}
+		// 			}
+		// 		}
+		// 	}
 			
-			Component {
-				id: contactInfoDataControllerFactory
+		// 	Component {
+		// 		id: contactInfoDataControllerFactory
 
-				DocumentRepresentationController {
-					id: root
+		// 		DocumentRepresentationController {
+		// 			id: root
 
-					representationModel: ContactInfoData {}
+		// 			representationModel: ContactInfoData {}
 
-					function updateRepresentationFromDocument(){
-						startUpdateRepresentation(documentId, representationModel)
+		// 			function updateRepresentationFromDocument(){
+		// 				startUpdateRepresentation(documentId, representationModel)
 
-						documentIdInput.m_id = documentId
-						getContactInfoRequest.send(documentIdInput)
-					}
+		// 				documentIdInput.m_id = documentId
+		// 				getContactInfoRequest.send(documentIdInput)
+		// 			}
 
-					function updateDocumentFromRepresentation(){
-						startUpdateDocument(documentId)
+		// 			function updateDocumentFromRepresentation(){
+		// 				startUpdateDocument(documentId)
 
-						updateContactInfoInput.m_documentId = documentId
-						updateContactInfoInput.m_contactInfo = representationModel
+		// 				updateContactInfoInput.m_documentId = documentId
+		// 				updateContactInfoInput.m_contactInfo = representationModel
 
-						updateContactInfoRequest.send(updateContactInfoInput)
-					}
+		// 				updateContactInfoRequest.send(updateContactInfoInput)
+		// 			}
 
-					property DocumentId documentIdInput: DocumentId {}
-					property GqlSdlRequestSender getContactInfoRequest: GqlSdlRequestSender {
-						gqlCommandId: ControlsgalleryContactInfoCollectionDocumentManagerSdlCommandIds.s_getContactInfoRepresentation
-						sdlObjectComp: Component {
-							ContactInfoData {
-								onFinished: {
-									root.representationModel.copyFrom(this)
-									root.representationUpdated(root.documentId, root.representationModel)
-								}
-							}
-						}
+		// 			property DocumentId documentIdInput: DocumentId {}
+		// 			property GqlSdlRequestSender getContactInfoRequest: GqlSdlRequestSender {
+		// 				gqlCommandId: ControlsgalleryContactInfoCollectionDocumentManagerSdlCommandIds.s_getContactInfoRepresentation
+		// 				sdlObjectComp: Component {
+		// 					ContactInfoData {
+		// 						onFinished: {
+		// 							root.representationModel.copyFrom(this)
+		// 							root.representationUpdated(root.documentId, root.representationModel)
+		// 						}
+		// 					}
+		// 				}
 
-						function onError(message, type){
-							root.updateRepresentationFailed(root.documentId, message)
-						}
-					}
+		// 				function onError(message, type){
+		// 					root.updateRepresentationFailed(root.documentId, message)
+		// 				}
+		// 			}
 
-					property UpdateContactInfoInput updateContactInfoInput: UpdateContactInfoInput {}
-					property GqlSdlRequestSender updateContactInfoRequest: GqlSdlRequestSender {
-						gqlCommandId: ControlsgalleryContactInfoCollectionDocumentManagerSdlCommandIds.s_updateContactInfoFromRepresentation
-						requestType: 1
-						sdlObjectComp: Component {
-							DocumentOperationStatus {
-								onFinished: {
-									if (m_status === "Success"){
-										root.documentUpdated(root.documentId)
-									}
-								}
-							}
-						}
+		// 			property UpdateContactInfoInput updateContactInfoInput: UpdateContactInfoInput {}
+		// 			property GqlSdlRequestSender updateContactInfoRequest: GqlSdlRequestSender {
+		// 				gqlCommandId: ControlsgalleryContactInfoCollectionDocumentManagerSdlCommandIds.s_updateContactInfoFromRepresentation
+		// 				requestType: 1
+		// 				sdlObjectComp: Component {
+		// 					DocumentOperationStatus {
+		// 						onFinished: {
+		// 							if (m_status === "Success"){
+		// 								root.documentUpdated(root.documentId)
+		// 							}
+		// 						}
+		// 					}
+		// 				}
 
-						function onError(message, type){
-							root.updateDocumentFailed(root.documentId, message)
-						}
-					}
-				}
-			}
-		}
+		// 				function onError(message, type){
+		// 					root.updateDocumentFailed(root.documentId, message)
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// }
 	}
 }

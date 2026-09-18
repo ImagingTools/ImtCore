@@ -32,20 +32,20 @@ static QString RecordDateTimeToString(const QSqlRecord& record, const char* fiel
 static QString NullableSqlText(const QString& value)
 {
 	if (value.isEmpty()){
-		return QStringLiteral("NULL");
+		return imtdb::NULL_DATA_LITERAL;
 	}
 
-	return QString("'%1'").arg(imtdb::EscapeSql(value));
+	return QStringLiteral("'%1'").arg(imtdb::EscapeSql(value));
 }
 
 
 static QString NullableSqlDateTime(const QString& value)
 {
 	if (value.isEmpty()){
-		return QStringLiteral("NULL");
+		return imtdb::NULL_DATA_LITERAL;
 	}
 
-	return QString("'%1'").arg(imtdb::EscapeSql(value));
+	return QStringLiteral("'%1'").arg(imtdb::EscapeSql(value));
 }
 
 
@@ -185,10 +185,10 @@ QByteArray CCrossOrgGrantDbDelegateComp::CreateDeleteObjectsQuery(
 
 	QStringList escapedIds;
 	for (const QByteArray& id : objectIds){
-		escapedIds << QString("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
+		escapedIds << QStringLiteral("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
 	}
 
-	return QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
+	return QStringLiteral(R"(DELETE FROM "%1" WHERE "Id" IN (%2);)")
 			.arg(*m_tableNameAttrPtr, escapedIds.join(", ")).toUtf8();
 }
 
@@ -212,7 +212,7 @@ QByteArray CCrossOrgGrantDbDelegateComp::CreateRenameObjectQuery(
 		return QByteArray();
 	}
 
-	return QString("UPDATE \"%1\" SET \"Name\"=%2 WHERE \"Id\"='%3';")
+	return QStringLiteral(R"(UPDATE "%1" SET "Name"=%2 WHERE "Id"='%3';)")
 			.arg(*m_tableNameAttrPtr)
 			.arg(NullableSqlText(newObjectName))
 			.arg(imtdb::EscapeSql(QString::fromUtf8(objectId))).toUtf8();
@@ -251,7 +251,7 @@ QString CCrossOrgGrantDbDelegateComp::GetBaseSelectionQuery() const
 {
 	// The "Name" column is stored directly on the grant (auto-generated from the
 	// target tenant and roles when not set explicitly), so no join is required.
-	return QString("SELECT * FROM \"%1\"").arg(qPrintable(*m_tableNameAttrPtr));
+	return QStringLiteral(R"(SELECT * FROM "%1")").arg(*m_tableNameAttrPtr);
 }
 
 
@@ -264,7 +264,7 @@ QString CCrossOrgGrantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::I
 		QByteArray tenantId = tenantFilterPtr->GetTenantId();
 		if (!tenantId.isEmpty()){
 			QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
-			return QString("(\"SourceTenantId\"='%1' OR \"TargetTenantId\"='%1')")
+			return QStringLiteral(R"(("SourceTenantId"='%1' OR "TargetTenantId"='%1'))")
 					.arg(escapedTenantId);
 		}
 	}

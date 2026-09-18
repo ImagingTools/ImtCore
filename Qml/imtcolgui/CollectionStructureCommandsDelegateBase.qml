@@ -440,7 +440,7 @@ Item {
                             type = dataModelLocal.getData("type");
                         }
 
-                        ModalDialogManager.showWarningDialog(message)
+                        PopupManager.addWarningMessage(message, true)
                     }
 
                     return;
@@ -514,7 +514,7 @@ Item {
                             type = dataModelLocal.getData("type");
                         }
 
-                        ModalDialogManager.showWarningDialog(message)
+                        PopupManager.addWarningMessage(message, true)
                     }
 
                     return;
@@ -591,7 +591,7 @@ Item {
                             type = dataModelLocal.getData("type");
                         }
 
-                        ModalDialogManager.showWarningDialog(message)
+                        PopupManager.addWarningMessage(message, true)
                     }
 
                     return;

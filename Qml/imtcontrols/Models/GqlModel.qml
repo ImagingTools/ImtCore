@@ -3,6 +3,9 @@ import QtQuick 2.0
 TreeItemModel {
     id: container;
 
+    // Must stay in sync with imtbase::s_authenticationTokenHeaderId
+    readonly property string authenticationTokenHeaderId: "x-authentication-token"
+
     function SetGlobalAccessToken(token){
         XMLHttpRequest.QMLAuthToken = token
     }

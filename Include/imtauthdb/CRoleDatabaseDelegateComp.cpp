@@ -69,7 +69,7 @@ QString CRoleDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IPar
 	iprm::TParamsPtr<iprm::IIdParam> idParamPtr(&filterParams, "ParentListFilter");
 	if (idParamPtr.IsValid()){
 		QByteArray targetId = idParamPtr->GetId();
-		return QString(R"(
+		return QStringLiteral(R"(
 			NOT EXISTS (
 				WITH RECURSIVE descendants AS (
 					SELECT g."DocumentId"
@@ -89,7 +89,7 @@ QString CRoleDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IPar
 				FROM descendants d
 				WHERE d."DocumentId" = root."DocumentId"
 			)
-					)").arg(QString::fromUtf8(targetId));
+					)").arg(targetId);
 					}
 
 	return QString();

@@ -143,7 +143,7 @@ IServer::ServerStatus CTcpServerComp::GetServerStatus() const
 bool CTcpServerComp::StartListening(const QHostAddress &address, quint16 port)
 {
 	if (m_serverPtr->listen(address, port)){
-		QString message = QString("Tcp server successfully started on port %1").arg(port);
+		QString message = QStringLiteral("Tcp server successfully started on port %1").arg(port);
 
 		SendInfoMessage(0, message);
 
@@ -152,7 +152,7 @@ bool CTcpServerComp::StartListening(const QHostAddress &address, quint16 port)
 		return true;
 	}
 	else{
-		QString errorMessage = QString("Tcp server could not be started on port %1. Error: %2").arg(port).arg(m_serverPtr->errorString());
+		QString errorMessage = QStringLiteral("Tcp server could not be started on port %1. Error: %2").arg(QString::number(port), m_serverPtr->errorString());
 		qDebug() << errorMessage;
 
 		SendErrorMessage(0, errorMessage);
@@ -186,11 +186,11 @@ bool CTcpServerComp::EnsureServerStarted()
 
 			m_serverPtr->SetSslConfiguration(sslConfiguration);
 
-			QString message = QString("Secure connection (SSL) enabled on Tcp server");
+			QString message = QStringLiteral("Secure connection (SSL) enabled on Tcp server");
 			SendInfoMessage(0, message);
 		}
 		else{
-			QString message = QString("Could not enable secure connection (SSL) on Tcp server");
+			QString message = QStringLiteral("Could not enable secure connection (SSL) on Tcp server");
 			SendErrorMessage(0, message);
 		}
 	}

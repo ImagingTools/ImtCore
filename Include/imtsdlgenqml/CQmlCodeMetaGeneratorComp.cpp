@@ -71,7 +71,7 @@ iproc::IProcessor::TaskState CQmlCodeMetaGeneratorComp::DoProcessing(
 	}
 
 	if (!istd::CSystem::EnsurePathExists(outputDirectoryPath)){
-		SendErrorMessage(0, QString("Unable to create path '%1'").arg(outputDirectoryPath));
+		SendErrorMessage(0, QStringLiteral("Unable to create path '%1'").arg(outputDirectoryPath));
 		I_CRITICAL();
 
 		return TS_INVALID;
@@ -85,14 +85,14 @@ iproc::IProcessor::TaskState CQmlCodeMetaGeneratorComp::DoProcessing(
 		m_qmlKeysFilePtr.SetPtr(new QFile(outputDirectoryPath + '/' + GetQmlKeysWrappedName(sdlType.GetName()) + ".qml"));
 
 		if (!BeginQmlFile(sdlType)){
-			SendErrorMessage(0, QString("Unable to process files"));
+			SendErrorMessage(0, QStringLiteral("Unable to process files"));
 
 			return TS_INVALID;
 		}
 
 		// Close files so that extenders can make their own changes
 		if (!CloseFiles()){
-			SendErrorMessage(0, QString("Unable to close files"));
+			SendErrorMessage(0, QStringLiteral("Unable to close files"));
 			I_CRITICAL();
 
 			return TS_INVALID;
@@ -103,7 +103,7 @@ iproc::IProcessor::TaskState CQmlCodeMetaGeneratorComp::DoProcessing(
 	for (const imtsdl::CSdlType& sdlType: sdlTypeList){
 		m_qmlKeysFilePtr.SetPtr(new QFile(outputDirectoryPath + '/' + GetQmlKeysWrappedName(sdlType.GetName()) + ".qml"));
 		if (!ReOpenFiles()){
-			SendErrorMessage(0, QString("Unable to reopen files"));
+			SendErrorMessage(0, QStringLiteral("Unable to reopen files"));
 			I_CRITICAL();
 
 			return TS_INVALID;
@@ -119,7 +119,7 @@ iproc::IProcessor::TaskState CQmlCodeMetaGeneratorComp::DoProcessing(
 	iprm::CParamsSet qmldirDataParams;
 	int loadStatus = m_qmldirFilePersistanceCompPtr->LoadFromFile(qmldirDataParams, outputDirectoryPath + "/qmldir");
 	if (loadStatus != ifile::IFilePersistence::OS_OK){
-		SendErrorMessage(0, QString("Unable to load qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir"));
+		SendErrorMessage(0, QStringLiteral("Unable to load qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir"));
 
 		return TS_INVALID;
 	}
@@ -176,7 +176,7 @@ iproc::IProcessor::TaskState CQmlCodeMetaGeneratorComp::DoProcessing(
 
 	int saveStatus = m_qmldirFilePersistanceCompPtr->SaveToFile(qmldirDataParams, outputDirectoryPath + "/qmldir");
 	if (saveStatus != ifile::IFilePersistence::OS_OK){
-		SendErrorMessage(0, QString("Unable to save qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir"));
+		SendErrorMessage(0, QStringLiteral("Unable to save qmldir file data from '%1'").arg(outputDirectoryPath + "/qmldir"));
 
 		return TS_INVALID;
 	}
@@ -194,7 +194,7 @@ iproc::IProcessor::TaskState CQmlCodeMetaGeneratorComp::DoProcessing(
 	QFile qrcFile(outputDirectoryPath + "/" + qmlModuleName + ".qrc");
 	if (!qrcFile.open(QIODevice::WriteOnly)){
 		SendCriticalMessage(0,
-						 QString("Unable to open file: '%1'. Error: %2")
+						 QStringLiteral("Unable to open file: '%1'. Error: %2")
 							 .arg(qrcFile.fileName(), qrcFile.errorString()));
 		I_CRITICAL();
 
@@ -319,7 +319,7 @@ bool CQmlCodeMetaGeneratorComp::ReOpenFiles()
 {
 	if (!m_qmlKeysFilePtr->open(QIODevice::WriteOnly | QIODevice::Append)){
 		SendCriticalMessage(0,
-						 QString("Unable to open file: '%1'. Error: %2")
+						 QStringLiteral("Unable to open file: '%1'. Error: %2")
 							 .arg(m_qmlKeysFilePtr->fileName(), m_qmlKeysFilePtr->errorString()));
 
 		AbortCurrentProcessing();
@@ -347,7 +347,7 @@ bool CQmlCodeMetaGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 {
 	if (!m_qmlKeysFilePtr->open(QIODevice::WriteOnly)){
 		SendCriticalMessage(0,
-						 QString("Unable to open file: '%1'. Error: %2")
+						 QStringLiteral("Unable to open file: '%1'. Error: %2")
 							 .arg(m_qmlKeysFilePtr->fileName(), m_qmlKeysFilePtr->errorString()));
 		I_CRITICAL();
 
@@ -433,7 +433,7 @@ bool CQmlCodeMetaGeneratorComp::GenerateCollectionSchemaInfoForType(const imtsdl
 
 	QFile collectionSchemaInfoFile(outputDirectoryPath + '/' + GetQmlCollectionInfoWrappedName(typeName, subtypeName));
 	if (!collectionSchemaInfoFile.open(QIODevice::WriteOnly)){
-		SendErrorMessage(0, QString("Unable to open file '%1'. Error: %2").arg(collectionSchemaInfoFile.fileName(), collectionSchemaInfoFile.errorString()));
+		SendErrorMessage(0, QStringLiteral("Unable to open file '%1'. Error: %2").arg(collectionSchemaInfoFile.fileName(), collectionSchemaInfoFile.errorString()));
 		return false;
 	}
 	QTextStream stream(&collectionSchemaInfoFile);

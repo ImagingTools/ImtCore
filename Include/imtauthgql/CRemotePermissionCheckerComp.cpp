@@ -22,7 +22,7 @@ bool CRemotePermissionCheckerComp::CheckPermission(const imtauth::IUserInfo::Fea
 	qDebug() << "CheckPermission" << userPermissions << permissions;
 
 	if (!m_gqlRequestHandlerCompPtr.IsValid() || !m_permissionCheckerCompPtr.IsValid()){
-		SendErrorMessage(0, QString("Unable to check user permissions. Internal error."), "CRemotePermissionCheckerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to check user permissions. Internal error."), "CRemotePermissionCheckerComp");
 
 		return false;
 	}
@@ -34,7 +34,7 @@ bool CRemotePermissionCheckerComp::CheckPermission(const imtauth::IUserInfo::Fea
 
 	imtgql::CGqlRequest gqlRequest(imtgql::CGqlRequest::RT_QUERY, "GetFeatureDependencies");
 	imtgql::CGqlParamObject inputParam;
-	inputParam.InsertParam(QByteArray("FeatureIds"), QVariant(permissions.join(';')));
+	inputParam.InsertParam(QByteArrayLiteral("FeatureIds"), QVariant(permissions.join(';')));
 	gqlRequest.AddParam("input", inputParam);
 
 	QString errorMessage;

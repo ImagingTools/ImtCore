@@ -20,10 +20,22 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="BindingManager" Type="Reference" ExportId="BindingManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DelegatedAccess" Type="Reference" ExportId="DelegatedAccess">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="FeatureContainer">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="TenantMembershipManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="RoleInfoProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">

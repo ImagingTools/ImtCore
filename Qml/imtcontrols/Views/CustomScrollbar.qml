@@ -7,7 +7,14 @@ Rectangle{
 
     height: targetItem && vertical ? targetItem.height : _crossSize;
     width: targetItem && !vertical ? targetItem.width : _crossSize;
-    color: backgroundColor;
+    // The track shows itself only when it is being reached for. It used to be a
+    // solid light bar down the edge of every list whether or not anyone wanted
+    // it, and the colour was assigned from onPressed/onReleased - which broke
+    // the binding on the first press and left the track stuck on that colour.
+    color: scrollContainer.decorator_ ? "transparent"
+           : (scrollContainerMA.pressed || scrollMA.pressed) ? scrollContainer.highlightColor
+           : (scrollContainerMA.containsMouse || scrollMA.containsMouse) ? scrollContainer.backgroundColor
+           : "transparent";
 	radius: Style.radiusXS;
 
     // Cross-axis size: use decorator's implicit size (not its actual size
@@ -24,7 +31,9 @@ Rectangle{
 
 	property real minSize: secondSize;
 	property real secondSize: Style.controlHeightS;
-	property int indicatorRadius: radius;
+	// A pill rather than a barely-rounded block: at ten pixels across, a
+	// two-pixel radius reads as a square.
+	property int indicatorRadius: Math.round((vertical ? scrollIndicator.width : scrollIndicator.height) / 2);
     property string backgroundColor: decorator_ ? "transparent" : Style.scrollBackgroundColor !== undefined ? Style.scrollBackgroundColor  : "#efefef";
     property string indicatorColor: decorator_ ? "transparent" : Style.scrollIndicatorColor !== undefined ? Style.scrollIndicatorColor : "lightgray";
     property string highlightColor: decorator_ ? "transparent" : Style.scrollHighlightColor !== undefined ? Style.scrollHighlightColor : "lightgray";
@@ -245,14 +254,6 @@ Rectangle{
             }
 
             scrollMA.coord = newCoords;
-        }
-
-        onPressed: {
-            scrollContainer.color = scrollContainer.highlightColor;
-        }
-
-        onReleased: {
-            scrollContainer.color = scrollContainer.backgroundColor;
         }
 
         onWheel: {

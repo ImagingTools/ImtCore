@@ -32,6 +32,7 @@ protected:
 
 	// reimplemented (ibase::IApplicationInfo)
 	virtual QString GetApplicationAttribute(int attributeId, bool allowTranslation = true) const override;
+	virtual VersionKind GetVersionKind() const override;
 	virtual int GetMainVersionId() const override;
 	virtual const iser::IVersionInfo& GetVersionInfo() const override;
 

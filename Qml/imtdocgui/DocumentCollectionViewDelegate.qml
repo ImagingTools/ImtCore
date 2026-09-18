@@ -3,8 +3,6 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
-import imtguigql 1.0
-import imtauthgui 1.0
 import imtbaseDocumentRevisionSdl 1.0
 
 CollectionViewCommandsDelegateBase {
@@ -104,7 +102,7 @@ CollectionViewCommandsDelegateBase {
 		}
 	}
 
-	function openDocumentEditor(objectId, typeId){
+	function openDocumentEditor(objectId, typeId, documentName){
 		if (!documentManager){
 			console.log("Unable to open document editor for type-ID: '" + typeId + "'. Error: Document manager is invalid")
 			return
@@ -117,7 +115,13 @@ CollectionViewCommandsDelegateBase {
 			}
 		}
 
-		documentManager.openDocument(objectId, typeId);
+		// Pass row name when known (e.g. Services grid) so MultiDoc tabs do not fall back to
+		// "<no name>" when GetObjectVisualStatus / GetService are slow or unavailable
+		// (agent disconnected). Topology already did openDocument(id, type, name).
+		if (documentName !== undefined && documentName !== null && documentName !== "")
+			documentManager.openDocument(objectId, typeId, documentName);
+		else
+			documentManager.openDocument(objectId, typeId);
 		NavigationController.push(documentManagerId+"/"+typeId+"/"+objectId)
 	}
 
@@ -134,9 +138,14 @@ CollectionViewCommandsDelegateBase {
 			if (elementsModel.containsKey("id", index)){
 				let itemId = elementsModel.getData("id", index);
 				let typeId = elementsModel.getData("typeId", index);
+				let documentName = ""
+				if (elementsModel.containsKey("name", index))
+					documentName = elementsModel.getData("name", index)
+				else if (elementsModel.containsKey("mainText", index))
+					documentName = elementsModel.getData("mainText", index)
 
 				if (documentTypeIds.length === 0){
-					collectionViewCommandsDelegateBase.openDocumentEditor(itemId, documentTypeId);
+					collectionViewCommandsDelegateBase.openDocumentEditor(itemId, documentTypeId, documentName);
 					return;
 				}
 
@@ -145,7 +154,7 @@ CollectionViewCommandsDelegateBase {
 					console.error('Document with type-ID: "', typeId ,'" unsupported');
 				}
 				else{
-					collectionViewCommandsDelegateBase.openDocumentEditor(itemId, documentTypeIds[typeIdindex]);
+					collectionViewCommandsDelegateBase.openDocumentEditor(itemId, documentTypeIds[typeIdindex], documentName);
 				}
 			}
 		}

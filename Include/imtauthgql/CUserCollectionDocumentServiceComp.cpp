@@ -97,23 +97,27 @@ sdl::V1_0::imtauth::CUserData CUserCollectionDocumentServiceComp::OnGetUserRepre
 	response.name = userPtr->GetName();
 	response.username = userPtr->GetId();
 	response.email = userPtr->GetMail();
+	response.enabled = bool(userPtr->IsEnabled());
 
 	response.groups.Emplace();
 	for (const QByteArray& groupId : effectiveUserPtr->GetGroups()){
 		response.groups->push_back(groupId);
 	}
 
-	// Roles and permissions across all products this user has any role in.
-	// (filtered by AdaptUserForTenant for current tenant/product context)
+	// Roles and permissions of the request's product only. Other products are not
+	// just invisible here, they must not round-trip: OnUpdateUserFromRepresentation
+	// writes the returned list back with SetRoles(userData.productId, ...), so a
+	// cross-product list would be re-filed under the current product on the next save.
+	response.productId = currentProductId;
+
 	response.roles.Emplace();
+	for (const QByteArray& roleId : effectiveUserPtr->GetRoles(currentProductId)){
+		response.roles->push_back(roleId);
+	}
+
 	response.permissions.Emplace();
-	for (const QByteArray& productId : effectiveUserPtr->GetProducts()){
-		for (const QByteArray& roleId : effectiveUserPtr->GetRoles(productId)){
-			response.roles->push_back(roleId);
-		}
-		for (const QByteArray& permissionId : effectiveUserPtr->GetLocalPermissions(productId)){
-			response.permissions->push_back(permissionId);
-		}
+	for (const QByteArray& permissionId : effectiveUserPtr->GetLocalPermissions(currentProductId)){
+		response.permissions->push_back(permissionId);
 	}
 
 	response.systemInfos.Emplace();
@@ -184,6 +188,16 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		return ShouldKeepEntityForTenant(bindingPtr, tenantId, entityType, entityId);
 	};
 
+	auto shouldKeepPermissionForTenant = [&](const QByteArray& permissionId) -> bool {
+		if (tenantId.isEmpty() || bindingPtr == nullptr || permissionId.isEmpty()){
+			return true;
+		}
+		if (!bindingPtr->HasAnyTenantBinding(permsEntity, permissionId)){
+			return true;
+		}
+		return ShouldKeepEntityForTenant(bindingPtr, tenantId, permsEntity, permissionId);
+	};
+
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
@@ -213,6 +227,18 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	}
 	if (userData.username){
 		userPtr->SetId(*userData.username);
+	}
+	if (userData.enabled && (*userData.enabled != userPtr->IsEnabled())){
+		if (!IsSuperuserRequest(gqlRequest)){
+			QString message = QStringLiteral("Unable to change the account state of user '%1'. Error: Only the superuser can enable or disable an account").arg(QString::fromUtf8(userPtr->GetId()));
+			SendWarningMessage(0, message, "CUserCollectionDocumentServiceComp");
+
+			response.message = message;
+
+			return response;
+		}
+
+		userPtr->SetEnabled(*userData.enabled);
 	}
 
 	// Handle system info: remove existing systems and apply the new ones
@@ -344,7 +370,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		for (const auto& permissionIdPtr : *userData.permissions){
 			if (permissionIdPtr){
 				QByteArray pid = *permissionIdPtr;
-				if (shouldKeepForTenant(permsEntity, pid)){
+				if (shouldKeepPermissionForTenant(pid)){
 					incomingPerms.append(pid);
 				}
 			}
@@ -353,7 +379,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		imtauth::IUserBaseInfo::FeatureIds currentPerms = userPtr->GetLocalPermissions(productId);
 		imtauth::IUserBaseInfo::FeatureIds finalPerms;
 		for (const QByteArray& cp : currentPerms){
-			if (!shouldKeepForTenant(permsEntity, cp) || incomingPerms.contains(cp)){
+			if (!shouldKeepPermissionForTenant(cp) || incomingPerms.contains(cp)){
 				finalPerms.append(cp);
 			}
 		}
@@ -424,7 +450,7 @@ bool CUserCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* eventP
 
 	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(newUserId, tenantId);
 	if (membershipId.isEmpty()){
-		SendWarningMessage(0, QString("Auto-membership creation failed for user '%1' in tenant '%2'").arg(QString::fromUtf8(newUserId), QString::fromUtf8(tenantId)), "CUserCollectionDocumentServiceComp");
+		SendWarningMessage(0, QStringLiteral("Auto-membership creation failed for user '%1' in tenant '%2'").arg(QString::fromUtf8(newUserId), QString::fromUtf8(tenantId)), "CUserCollectionDocumentServiceComp");
 	}
 
 	return true;

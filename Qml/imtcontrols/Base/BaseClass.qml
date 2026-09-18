@@ -83,7 +83,9 @@ QtObject {
 	onModelChanged: {
 		if(owner && owner.enableNotifications && owner.modelChanged){
 			if (owner._internal.isTransaction){
-				owner._internal.changeList.concat(changeSet)
+				// concat() returns a new array rather than growing this one, so
+				// the batched changes were counted but never actually kept.
+				owner._internal.changeList = owner._internal.changeList.concat(changeSet)
 				owner._internal.countChanges++
 			}
 			else{

@@ -4,7 +4,6 @@ import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 import imtcolgui 1.0
 import imtgui 1.0
-import imtauthgui 1.0
 import imtbaseComplexCollectionFilterSdl 1.0
 
 DecoratorBase {
@@ -16,6 +15,9 @@ DecoratorBase {
 	property alias segmentedButton: segmentedButton_
 	property alias filtermenu: filtermenu_
 	property CollectionFilter complexFilter: baseElement ? baseElement.complexFilter : null;	
+	property int filterRightMargin: 0
+	property bool clearLogVisible: false
+	signal clearLogRequested()
 	
 	Component.onCompleted: {
 		checkWidth();
@@ -24,9 +26,14 @@ DecoratorBase {
 	onWidthChanged: {
 		checkWidth();
 	}
+
+	onFilterRightMarginChanged: {
+		checkWidth();
+	}
 	
 	function checkWidth(){
-		if (width - filtermenu.width <= segmentedButton.width + 2 * segmentedButton.spacing){
+		let clearLogWidth = clearLogButton.visible ? clearLogButton.width + Style.marginM : 0
+		if (width - filtermenu.width - filterRightMargin - clearLogWidth <= segmentedButton.width + 2 * segmentedButton.spacing){
 			segmentedButton.visible = false;
 		}
 		else{
@@ -96,6 +103,7 @@ DecoratorBase {
 		complexFilter.filterChanged()
 	}
 	
+	// Uses Style first/middle/last segment decorators (selectedColor fill + textSelectedColor).
 	SegmentedButton {
 		id: segmentedButton_
 		anchors.left: parent.left;
@@ -180,11 +188,39 @@ DecoratorBase {
 		}
 		
 	}
+
+	ToolButton {
+		id: clearLogButton
+
+		anchors.left: segmentedButton_.right
+		anchors.leftMargin: Style.marginM
+		anchors.verticalCenter: parent.verticalCenter
+
+		width: Style.controlHeightM
+		height: width
+
+		visible: mainItem.clearLogVisible
+		iconSource: "qrc:/" + Style.getIconPath("Icons/Delete", Icon.State.On, Icon.Mode.Normal)
+		tooltipText: qsTr("Clear log")
+
+		onClicked: mainItem.clearLogRequested()
+
+		decorator: Component {
+			ToolButtonDecorator {
+				color: clearLogButton.hovered ? Style.errorTextColor : Style.negativeAccentColor
+				border.width: 1
+				border.color: clearLogButton.hovered ? Style.errorTextColor : Style.negativeAccentColor
+				radius: width / 2
+				icon.width: Style.iconSizeM
+			}
+		}
+	}
 	
 	FilterPanelDecorator {
 		id: filtermenu_
 		anchors.verticalCenter: parent.verticalCenter;
 		anchors.right: parent.right;
+		anchors.rightMargin: mainItem.filterRightMargin
 		
 		baseElement: mainItem.baseElement;
 		complexFilter: mainItem.complexFilter;

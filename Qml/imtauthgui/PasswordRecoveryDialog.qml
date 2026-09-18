@@ -9,8 +9,9 @@ import imtguigql 1.0
 Dialog {
 	id: passwordRecoveryDialog;
 
-	width: Style.sizeHintXXL;
-	height: Style.sizeHintL;
+	property string context: ""
+	width: Math.max(Style.sizeHintL, Math.min(ModalDialogManager.activeView.width - 100, Style.sizeHintXXL));
+	height: Math.max(Style.sizeHintM, Math.min(ModalDialogManager.activeView.height - 100, Style.sizeHintL));
 
 	title: qsTr("Password Recovery");
 	canMove: false;
@@ -104,7 +105,7 @@ Dialog {
 			currentIndex = -1;
 		}
 		else if (buttonId === Enums.no){
-			ModalDialogManager.showInfoDialog(qsTr("Check the email you entered"));
+			PopupManager.addWarningMessage(qsTr("Check the email you entered"), true);
 
 			currentIndex = 0;
 			finished(Enums.cancel);
@@ -145,6 +146,7 @@ Dialog {
 
 				TextInputElementView {
 					id: emailElementView;
+					objectName: "EmailInput"
 					placeHolderText: qsTr("Enter the email");
 					name: qsTr("Email");
 					description: qsTr("Enter the email address that was specified on your account, a code will be sent to it");
@@ -274,6 +276,8 @@ Dialog {
 				anchors.right: parent.right;
 				anchors.rightMargin: Style.marginXL;
 				currentPasswordInputVisible: false;
+				login: passwordRecoveryDialog.login;
+				policy: passwordPolicyProvider;
 				onAcceptedChanged: {
 					passwordRecoveryDialog.setButtonEnabled(Enums.yes, accepted);
 				}
@@ -285,6 +289,7 @@ Dialog {
 	}
 
 	GqlSdlRequestSender {
+		context: passwordRecoveryDialog.context
 		id: checkEmailRequestSender;
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_checkEmail;
 
@@ -303,7 +308,7 @@ Dialog {
 					}
 					else{
 						if (m_message !== ""){
-							ModalDialogManager.showErrorDialog(m_message);
+							PopupManager.addErrorMessage(m_message, true);
 						}
 					}
 
@@ -320,6 +325,7 @@ Dialog {
 	}
 
 	GqlSdlRequestSender {
+		context: passwordRecoveryDialog.context
 		id: checkEmailCodeRequestSender;
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_checkEmailCode;
 
@@ -346,6 +352,7 @@ Dialog {
 	}
 
 	GqlSdlRequestSender {
+		context: passwordRecoveryDialog.context
 		id: sendEmailCodeRequestSender;
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_sendEmailCode;
 
@@ -362,7 +369,7 @@ Dialog {
 					}
 					else{
 						if (m_message !== ""){
-							ModalDialogManager.showErrorDialog(m_message);
+							PopupManager.addErrorMessage(m_message, true);
 						}
 					}
 				}
@@ -370,7 +377,14 @@ Dialog {
 		}
 	}
 
+	// Reached before any API client exists, so the policy is instantiated here.
+	GqlBasedPasswordPolicyProvider {
+		id: passwordPolicyProvider;
+		context: passwordRecoveryDialog.context;
+	}
+
 	GqlSdlRequestSender {
+		context: passwordRecoveryDialog.context
 		id: changePasswordRequestSender;
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_changePassword;
 
@@ -385,7 +399,15 @@ Dialog {
 			ChangePasswordPayload {
 				onFinished: {
 					if (m_success){
+						PopupManager.addSuccessMessage(qsTr("Password changed successfully"), true);
 						passwordRecoveryDialog.finished(Enums.cancel)
+					}
+					else{
+						PopupManager.addErrorMessage(
+									passwordPolicyProvider.describeFailure(
+										m_violatedRules,
+										qsTr("Unable to change the password.")),
+									true);
 					}
 				}
 			}
@@ -394,9 +416,6 @@ Dialog {
 		onFinished: {
 			if (status < 0){
 				passwordRecoveryDialog.currentIndex = 2;
-			}
-			else{
-				ModalDialogManager.showInfoDialog(qsTr("Password changed successfully"));
 			}
 		}
 	}

@@ -2,6 +2,10 @@
 #include <imtservergql/CSlaveSubscriberControllerComp.h>
 
 
+// Qt includes
+#include <QtCore/QMutexLocker>
+
+
 namespace imtservergql
 {
 
@@ -29,24 +33,47 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 			const imtrest::IRequest& networkRequest,
 			QString& errorMessage)
 {
+	// Re-registering an id (the client resubscribes after refreshing its access token) has to
+	// rebind the publisher: reporting success while leaving the previous binding in place kept
+	// the subscription attached to a request that can no longer deliver anything.
+	imtgql::IGqlSubscriberController* stalePublisherPtr = nullptr;
+	{
+		QMutexLocker lock(&m_publisherMapMutex);
+		auto iter = m_publisherMap.find(subscriptionId);
+		if (iter != m_publisherMap.end()){
+			stalePublisherPtr = iter.value();
+			m_publisherMap.erase(iter);
+		}
+	}
+
+	// Outside the lock — publishers may block or re-enter Unregister.
+	if (stalePublisherPtr != nullptr){
+		stalePublisherPtr->UnregisterSubscription(subscriptionId);
+	}
+
 	for (int index = 0; index < m_subscriberControllerListCompPtr.GetCount(); index++){
 		imtgql::IGqlSubscriberController* publisherPtr = m_subscriberControllerListCompPtr[index];
-		if (publisherPtr != nullptr){
-			if (publisherPtr->IsRequestSupported(gqlRequest)){
-				if (!m_publisherMap.contains(subscriptionId)){
-					if (publisherPtr->RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage)){
-						m_publisherMap[subscriptionId] = publisherPtr;
+		if (publisherPtr == nullptr){
+			continue;
+		}
+		if (!publisherPtr->IsRequestSupported(gqlRequest)){
+			continue;
+		}
 
-						return true;
-					}
-				}
-				else{
-					qWarning("Subscription already registered");
+		// Nested register without the map lock — publishers may block or re-enter
+		// Unregister; holding the mutex across that call risks deadlock.
+		if (!publisherPtr->RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage)){
+			continue;
+		}
 
-					return true;
-				}
+		{
+			QMutexLocker lock(&m_publisherMapMutex);
+			// Another connection may have raced the same id (unlikely UUID) — keep first.
+			if (!m_publisherMap.contains(subscriptionId)){
+				m_publisherMap.insert(subscriptionId, publisherPtr);
 			}
 		}
+		return true;
 	}
 
 	return false;
@@ -55,20 +82,28 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 
 bool CSlaveSubscriberControllerComp::UnregisterSubscription(const QByteArray& subscriptionId)
 {
-	if (m_publisherMap.contains(subscriptionId)){
-		imtgql::IGqlSubscriberController* publisherPtr = m_publisherMap[subscriptionId];
-		Q_ASSERT(publisherPtr != nullptr);
-		bool res = publisherPtr->UnregisterSubscription(subscriptionId);
-		if(res){
-			m_publisherMap.remove(subscriptionId);
+	imtgql::IGqlSubscriberController* publisherPtr = nullptr;
+	{
+		QMutexLocker lock(&m_publisherMapMutex);
+		auto iter = m_publisherMap.find(subscriptionId);
+		if (iter == m_publisherMap.end()){
+			return false;
 		}
-		return res;
+		publisherPtr = iter.value();
 	}
 
-	return false;
+	Q_ASSERT(publisherPtr != nullptr);
+	if (publisherPtr == nullptr){
+		return false;
+	}
+
+	const bool res = publisherPtr->UnregisterSubscription(subscriptionId);
+	if (res){
+		QMutexLocker lock(&m_publisherMapMutex);
+		m_publisherMap.remove(subscriptionId);
+	}
+	return res;
 }
 
 
 } // namespace imtservergql
-
-

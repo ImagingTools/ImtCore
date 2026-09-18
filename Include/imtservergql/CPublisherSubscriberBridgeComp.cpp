@@ -38,6 +38,7 @@ bool CPublisherSubscriberBridgeComp::RegisterSubscription(
 	// Build the upstream subscription request using the client's gqlRequest
 	// which already contains the user's IGqlContext (token, userId, tenantId)
 	imtgql::CGqlRequest upstreamRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, gqlRequest.GetCommandId());
+	upstreamRequest.SetParams(gqlRequest.GetParams());
 
 	imtgql::CGqlFieldObject subscriptionField;
 	subscriptionField.InsertField("id");
@@ -50,12 +51,12 @@ bool CPublisherSubscriberBridgeComp::RegisterSubscription(
 		if (clonedPtr.IsValid()){
 			imtgql::IGqlContextUniquePtr castedPtr;
 			castedPtr.MoveCastedPtr(std::move(clonedPtr));
-			upstreamRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(castedPtr));
+			upstreamRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(castedPtr)));
 		}
 	}
 
 	// Register with the upstream subscription manager (forwards to remote server with user context)
-	QByteArray upstreamSubscriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(upstreamRequest, this);
+	QByteArray upstreamSubscriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(upstreamRequest, *this);
 	if (upstreamSubscriptionId.isEmpty()){
 		BaseClass::UnregisterSubscription(subscriptionId);
 		errorMessage = QStringLiteral("Failed to register upstream subscription");
@@ -100,7 +101,7 @@ bool CPublisherSubscriberBridgeComp::UnregisterSubscription(const QByteArray& su
 
 	// Unregister from the upstream subscription manager
 	if (m_subscriptionManagerCompPtr.IsValid() && !upstreamSubscriptionId.isEmpty()){
-		m_subscriptionManagerCompPtr->UnregisterSubscription(upstreamSubscriptionId);
+		m_subscriptionManagerCompPtr->UnregisterSubscription(upstreamSubscriptionId, *this);
 	}
 
 	return BaseClass::UnregisterSubscription(subscriptionId);
@@ -123,7 +124,7 @@ void CPublisherSubscriberBridgeComp::OnComponentDestroyed()
 		QMutexLocker locker(&m_bridgeMutex);
 
 		for (const QByteArray& upstreamSubscriptionId : m_upstreamToClientsMap.keys()){
-			m_subscriptionManagerCompPtr->UnregisterSubscription(upstreamSubscriptionId);
+			m_subscriptionManagerCompPtr->UnregisterSubscription(upstreamSubscriptionId, *this);
 		}
 
 		m_clientToUpstreamMap.clear();

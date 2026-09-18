@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="6524" Description="ACF"/>
+            <Version Id="1" Number="2438" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="396033" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -14,6 +14,7 @@
         <Element ComponentName="CommandPermissionsJoiner" X="350" Y="475" Note=""/>
         <Element ComponentName="CommandsController" X="600" Y="50" Note=""/>
         <Element ComponentName="GuiElementContainer" X="625" Y="150" Note=""/>
+        <Element ComponentName="InvisibleCommandsGroup" X="975" Y="100" Note=""/>
         <Element ComponentName="LeftCommands" X="225" Y="300" Note=""/>
         <Element ComponentName="LeftCommandsPermissions" X="200" Y="600" Note=""/>
         <Element ComponentName="RightCommands" X="975" Y="300" Note=""/>

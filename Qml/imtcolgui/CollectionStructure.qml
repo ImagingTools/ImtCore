@@ -4,7 +4,6 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtdocgui 1.0
 import imtcontrols 1.0
-import imtlicgui 1.0
 import imtguigql 1.0
 
 Item {
@@ -132,11 +131,6 @@ Item {
         commandsProviderLocal.uuid = collectionStructureContainer.commandId;
 
         collectionStructureBase.commands.additionInputParams = getHeaders()
-
-//        collectionStructureBase.commandId = collectionViewContainer.commandId;
-
-        collectionMetaInfo.getMetaInfoGqlCommand = collectionStructureContainer.commandId + "MetaInfo";
-
         if (commandsDelegateLoader.item){
             commandsDelegateLoader.item.commandId = collectionStructureContainer.commandId;
         }
@@ -515,7 +509,6 @@ Item {
 				anchors.rightMargin: Style.marginM;
 
 				width: Style.buttonWidthXL;
-				height: Style.conntrolHeightM;
 
                 text: qsTr("Update");
 

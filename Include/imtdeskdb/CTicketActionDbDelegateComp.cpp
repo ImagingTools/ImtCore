@@ -106,13 +106,13 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CTicketActionDbDelegateComp::Crea
 	const imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo = actionPtr->GetActionTypeInfo();
 	const QDateTime timestamp = actionPtr->GetTimestamp();
 
-	const QString ticketIdSql = actionPtr->GetTicketId().isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(actionPtr->GetTicketId())));
-	const QString userIdSql = userInfo.id.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(userInfo.id)));
-	const QString userNameSql = userInfo.name.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(userInfo.name));
-	const QString actionTypeIdSql = actionTypeInfo.id.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(actionTypeInfo.id)));
-	const QString actionTypeNameSql = actionTypeInfo.name.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionTypeInfo.name));
-	const QString actionTypeDescSql = actionTypeInfo.description.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionTypeInfo.description));
-	const QString timestampSql = timestamp.isNull() ? "NULL" : QString("'%1'").arg(sqlEscape(timestamp.toString(Qt::ISODate)));
+	const QString ticketIdSql = actionPtr->GetTicketId().isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(sqlEscape(QString::fromUtf8(actionPtr->GetTicketId())));
+	const QString userIdSql = userInfo.id.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(sqlEscape(QString::fromUtf8(userInfo.id)));
+	const QString userNameSql = userInfo.name.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(sqlEscape(userInfo.name));
+	const QString actionTypeIdSql = actionTypeInfo.id.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(sqlEscape(QString::fromUtf8(actionTypeInfo.id)));
+	const QString actionTypeNameSql = actionTypeInfo.name.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(sqlEscape(actionTypeInfo.name));
+	const QString actionTypeDescSql = actionTypeInfo.description.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(sqlEscape(actionTypeInfo.description));
+	const QString timestampSql = timestamp.isNull() ? "NULL" : QStringLiteral("'%1'").arg(sqlEscape(timestamp.toString(Qt::ISODate)));
 	const QString actionDataSql = "NULL";
 
 	NewObjectQuery retVal;
@@ -153,12 +153,12 @@ QByteArray CTicketActionDbDelegateComp::CreateUpdateObjectQuery(
 	const imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo = actionPtr->GetActionTypeInfo();
 	const QDateTime timestamp = actionPtr->GetTimestamp();
 
-	const QString userIdSql = userInfo.id.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(userInfo.id)));
-	const QString userNameSql = userInfo.name.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(userInfo.name));
-	const QString actionTypeIdSql = actionTypeInfo.id.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(QString::fromUtf8(actionTypeInfo.id)));
-	const QString actionTypeNameSql = actionTypeInfo.name.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionTypeInfo.name));
-	const QString actionTypeDescSql = actionTypeInfo.description.isEmpty() ? "NULL" : QString("'%1'").arg(sqlEscape(actionTypeInfo.description));
-	const QString timestampSql = timestamp.isNull() ? "NULL" : QString("'%1'").arg(sqlEscape(timestamp.toString(Qt::ISODate)));
+	const QString userIdSql = userInfo.id.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(sqlEscape(QString::fromUtf8(userInfo.id)));
+	const QString userNameSql = userInfo.name.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(sqlEscape(userInfo.name));
+	const QString actionTypeIdSql = actionTypeInfo.id.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(sqlEscape(QString::fromUtf8(actionTypeInfo.id)));
+	const QString actionTypeNameSql = actionTypeInfo.name.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(sqlEscape(actionTypeInfo.name));
+	const QString actionTypeDescSql = actionTypeInfo.description.isEmpty() ? "NULL" : QStringLiteral("'%1'").arg(sqlEscape(actionTypeInfo.description));
+	const QString timestampSql = timestamp.isNull() ? "NULL" : QStringLiteral("'%1'").arg(sqlEscape(timestamp.toString(Qt::ISODate)));
 	const QString actionDataSql = "NULL";
 
 	return QString(
@@ -195,10 +195,10 @@ QByteArray CTicketActionDbDelegateComp::CreateDeleteObjectsQuery(
 	QString idsStr;
 	for (int i = 0; i < objectIds.size(); ++i){
 		if (i > 0) idsStr += ", ";
-		idsStr += QString("'%1'").arg(sqlEscape(QString::fromUtf8(objectIds[i])));
+		idsStr += QStringLiteral("'%1'").arg(sqlEscape(QString::fromUtf8(objectIds[i])));
 	}
 
-	return QString("DELETE FROM \"TicketActions\" WHERE \"Id\" IN (%1);")
+	return QStringLiteral(R"(DELETE FROM "TicketActions" WHERE "Id" IN (%1);)")
 		.arg(idsStr)
 		.toUtf8();
 }
@@ -242,7 +242,7 @@ QString CTicketActionDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IP
 		if (idParamPtr.IsValid()){
 			QByteArray ticketId = idParamPtr->GetId();
 			if (!ticketId.isEmpty()){
-				return QString("\"TicketId\"='%1'").arg(sqlEscape(QString::fromUtf8(ticketId)));
+				return QStringLiteral(R"("TicketId"='%1')").arg(sqlEscape(QString::fromUtf8(ticketId)));
 			}
 		}
 	}

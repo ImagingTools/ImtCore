@@ -8,12 +8,7 @@ import imtbaseCommandsSdl 1.0
 CommandsController {
 	id: root;
 	
-	onTypeIdChanged: {
-		if (typeId !== ""){
-			getCommands()
-		}
-	}
-	
+	property string context: ""
 	function getCommands(){
 		commandsRequest.send()
 	}
@@ -23,6 +18,7 @@ CommandsController {
 	}
 	
 	property GqlSdlRequestSender commandsRequest: GqlSdlRequestSender {
+		context: root.context
 		gqlCommandId: ImtbaseCommandsSdlCommandIds.s_getCommands;
 		inputObjectComp: Component {
 			GetCommandsInput {

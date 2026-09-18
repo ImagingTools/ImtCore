@@ -202,7 +202,7 @@ QByteArrayList CFeatureInfo::GetDependencies() const
 
 QByteArray CFeatureInfo::GetFactoryId() const
 {
-	return QByteArray("Feature");
+	return QByteArrayLiteral("Feature");
 }
 
 

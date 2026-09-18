@@ -33,11 +33,12 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 			const sdl::V1_0::imtauth::CUserData& representation,
 			istd::IChangeable& object,
 			QByteArray& newObjectId,
+			bool isAccountStateChangeAllowed,
 			QString& errorMessage) const
 {
 	auto userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&object);
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		errorMessage = QStringLiteral("Unable to create representation from object. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
@@ -101,7 +102,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	if (name.isEmpty()){
-		errorMessage = QString("Name cannot be empty");
+		errorMessage = QStringLiteral("Name cannot be empty");
 		return false;
 	}
 
@@ -150,6 +151,17 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	userInfoPtr->SetMail(mail);
+
+	if (representation.enabled && (*representation.enabled != userInfoPtr->IsEnabled())){
+		if (!isAccountStateChangeAllowed){
+			errorMessage = QStringLiteral("Unable to change the account state of user '%1'. Error: Only the superuser can enable or disable an account").arg(QString::fromUtf8(userInfoPtr->GetId()));
+			SendWarningMessage(0, errorMessage, "CUserCollectionControllerComp");
+
+			return false;
+		}
+
+		userInfoPtr->SetEnabled(*representation.enabled);
+	}
 
 	imtauth::IUserInfo::FeatureIds permissions;
 	if (representation.permissions){
@@ -236,7 +248,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserCollectionControllerComp::On
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QString("Unable to get element meta info for user '%1'. Error: User does not exists").arg(objectId);
+		errorMessage = QStringLiteral("Unable to get element meta info for user '%1'. Error: User does not exists").arg(objectId);
 		return response;
 	}
 
@@ -324,7 +336,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (contextUserInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'. Error: GraphQL context is invalid").arg(qPrintable(objectId));
+		errorMessage = QStringLiteral("Unable to create representation from object '%1'. Error: GraphQL context is invalid").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
@@ -344,14 +356,14 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object '%1'").arg(qPrintable(objectId));
+		errorMessage = QStringLiteral("Unable to create representation from object '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
 	}
 
 	if (!contextUserInfoPtr->IsAdmin() && userInfoPtr->IsAdmin()){
-		errorMessage = QString("Unable to create representation from object 'su'. Error: User '%1' permission denied").arg(qPrintable(contextUserInfoPtr->GetId()));
+		errorMessage = QStringLiteral("Unable to create representation from object 'su'. Error: User '%1' permission denied").arg(contextUserInfoPtr->GetId());
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
@@ -381,6 +393,10 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 
 	if (requestInfo.items.isMailRequested){
 		representationObject.mail = QString(userInfoPtr->GetMail());
+	}
+
+	if (requestInfo.items.isEnabledRequested){
+		representationObject.enabled = bool(userInfoPtr->IsEnabled());
 	}
 
 	if (requestInfo.items.isSystemIdRequested){
@@ -494,7 +510,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRepres
 
 	imtauth::IUserInfoUniquePtr userInstancePtr = m_userInfoFactCompPtr.CreateInstance();
 	if (!userInstancePtr.IsValid()){
-		errorMessage = QString("Unable to create user instance. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to create user instance. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return nullptr;
@@ -502,7 +518,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRepres
 
 	auto userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(userInstancePtr.GetPtr());
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to cast user instance to identifable object. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to cast user instance to identifable object. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return nullptr;
@@ -516,7 +532,8 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRepres
 	}
 	userInfoPtr->SetObjectUuid(newObjectId);
 
-	if (!FillObjectFromRepresentation(userDataRepresentation, *userInfoPtr, newObjectId, errorMessage)){
+	// The account state of the new object is validated against the caller in CreateObjectFromRequest.
+	if (!FillObjectFromRepresentation(userDataRepresentation, *userInfoPtr, newObjectId, true, errorMessage)){
 		return nullptr;
 	}
 
@@ -528,7 +545,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRepres
 			}
 
 			if (password.isEmpty()){
-				errorMessage = QString("Password cannot be empty");
+				errorMessage = QStringLiteral("Password cannot be empty");
 				return nullptr;
 			}
 
@@ -552,7 +569,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 {
 	auto userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(&data);
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to create representation from object. Error: Object is invalid");
+		errorMessage = QStringLiteral("Unable to create representation from object. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
@@ -581,6 +598,8 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	QString mail = userInfoPtr->GetMail();
 	representationPayload.email = QString(mail);
 
+	representationPayload.enabled = bool(userInfoPtr->IsEnabled());
+
 	QByteArrayList groupList = userInfoPtr->GetGroups();
 	std::sort(groupList.begin(), groupList.end());
 	representationPayload.groups.Emplace().FromList(groupList);
@@ -601,7 +620,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		info.id = QByteArray(systemInfo.systemId);
 
 		if (systemInfo.systemId.isEmpty()){
-			info.name = QString("Internal");
+			info.name = QStringLiteral("Internal");
 		}
 		else{
 			info.name = QString(systemInfo.systemName);
@@ -618,7 +637,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 
 
 bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
-			const imtgql::CGqlRequest& /*rawGqlRequest*/,
+			const imtgql::CGqlRequest& rawGqlRequest,
 			const sdl::V1_0::imtauth::CUserUpdateGqlRequest& userUpdateRequest,
 			istd::IChangeable& object,
 			QString& errorMessage) const
@@ -633,7 +652,7 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 	auto userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&object);
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to cast user instance to identifable object. Error: Invalid object");
+		errorMessage = QStringLiteral("Unable to cast user instance to identifable object. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
 
 		return false;
@@ -653,7 +672,26 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		userInfoPtr->RemoveFromSystem(systemInfo.systemId);
 	}
 
-	return FillObjectFromRepresentation(userData, object, objectId, errorMessage);
+	return FillObjectFromRepresentation(userData, object, objectId, IsSuperuserRequest(rawGqlRequest), errorMessage);
+}
+
+
+istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRequest(
+			const imtgql::CGqlRequest& gqlRequest,
+			QByteArray& newObjectId,
+			QString& errorMessage) const
+{
+	istd::IChangeableUniquePtr objectPtr = BaseClass::CreateObjectFromRequest(gqlRequest, newObjectId, errorMessage);
+
+	auto userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(objectPtr.GetPtr());
+	if ((userInfoPtr != nullptr) && !userInfoPtr->IsEnabled() && !IsSuperuserRequest(gqlRequest)){
+		errorMessage = QStringLiteral("Unable to create user '%1'. Error: Only the superuser can enable or disable an account").arg(QString::fromUtf8(userInfoPtr->GetId()));
+		SendWarningMessage(0, errorMessage, "CUserCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	return objectPtr;
 }
 
 
@@ -785,7 +823,7 @@ QJsonObject CUserCollectionControllerComp::InsertObject(
 
 	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(newUserId, tenantId);
 	if (membershipId.isEmpty()){
-		SendWarningMessage(0, QString("Auto-membership creation failed for user '%1' in tenant '%2'").arg(QString::fromUtf8(newUserId), QString::fromUtf8(tenantId)), "CUserCollectionControllerComp");
+		SendWarningMessage(0, QStringLiteral("Auto-membership creation failed for user '%1' in tenant '%2'").arg(QString::fromUtf8(newUserId), QString::fromUtf8(tenantId)), "CUserCollectionControllerComp");
 	}
 
 	return result;
@@ -801,7 +839,7 @@ bool CUserCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList&
 			for (const QByteArray& tenantId : tenantIds){
 				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
 				if (tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId){
-					errorMessage = QString("Cannot delete user '%1' who owns tenant '%2'. Transfer ownership first.")
+					errorMessage = QStringLiteral("Cannot delete user '%1' who owns tenant '%2'. Transfer ownership first.")
 						.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId));
 					return false;
 				}

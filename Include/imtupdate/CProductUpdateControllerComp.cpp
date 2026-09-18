@@ -71,7 +71,7 @@ bool CProductUpdateControllerComp::CheckForNewVersion(quint32* releaseVersion) c
 
 		if (availableReleaseVersion > currentVersion){
 			SendInfoMessage(0,
-							QString("Product version '%1' is available ")
+							QStringLiteral("Product version '%1' is available ")
 								.arg(instalationInfoPtr->GetProductVersion().GetEncodedVersionName(*m_versionIdAttrPtr, availableReleaseVersion)));
 
 			return true;
@@ -122,13 +122,13 @@ bool CProductUpdateControllerComp::InstallVersion(qint32 /*version*/)
 		QProcess process;
 		process.setEnvironment(environment);
 		if (!process.startDetached(qApp->arguments()[0], QStringList() << "--terminate-process-pid" << QString::number(qApp->applicationPid()))){
-			SendErrorMessage(0, QString("Unable to open file '%1' to begin the update process").arg(newAppFileInfo.absoluteFilePath()));
+			SendErrorMessage(0, QStringLiteral("Unable to open file '%1' to begin the update process").arg(newAppFileInfo.absoluteFilePath()));
 
 			I_CRITICAL();
 		}
 	}
 	else{
-		SendErrorMessage(0, QString("Unable to copy file '%1' to begin the update process").arg(newAppFileInfo.absoluteFilePath()));
+		SendErrorMessage(0, QStringLiteral("Unable to copy file '%1' to begin the update process").arg(newAppFileInfo.absoluteFilePath()));
 
 		I_CRITICAL();
 	}
@@ -153,7 +153,7 @@ IDownloader::DownloadStatus CProductUpdateControllerComp::DownloadNewVersion(iba
 	}
 
 	QString releaseDownloadLink = instalationInfoPtr->GetReleaseDownloadLink();
-	SendInfoMessage(0, QString("Starting download new version DownloadLink = %1").arg(releaseDownloadLink), "UpdateController");
+	SendInfoMessage(0, QStringLiteral("Starting download new version DownloadLink = %1").arg(releaseDownloadLink), "UpdateController");
 
 	m_downloadedFilePath = GetPathToInstall() + '/' + releaseDownloadLink.split('/').last();
 	downloadResult = m_downloaderCompPtr->DownloadFile(releaseDownloadLink, m_downloadedFilePath, true, progressManagerPtr);
@@ -217,7 +217,7 @@ bool CProductUpdateControllerComp::FinishAppInstallation(iprm::IParamsSet& param
 	}
 	bool retVal = QDir(GetPathToInstall()).removeRecursively();
 	if(!retVal){
-		SendErrorMessage(0, QString("Unable te remove dir '%1'").arg(GetPathToInstall()));
+		SendErrorMessage(0, QStringLiteral("Unable te remove dir '%1'").arg(GetPathToInstall()));
 		I_CRITICAL();
 	}
 	return retVal;
@@ -330,7 +330,7 @@ bool CProductUpdateControllerComp::InstallDelayedUpdate()
 	QProcess process;
 	process.setEnvironment(environment);
 	if (!process.startDetached(qApp->arguments()[0], QStringList() << "--terminate-process-pid" << QString::number(qApp->applicationPid()))){
-		SendErrorMessage(0, QString("Unable to open file '%1' to begin the update process").arg(qApp->arguments()[0]));
+		SendErrorMessage(0, QStringLiteral("Unable to open file '%1' to begin the update process").arg(qApp->arguments()[0]));
 
 		I_CRITICAL();
 	}

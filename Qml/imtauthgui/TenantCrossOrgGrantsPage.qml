@@ -4,8 +4,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-import imtcolgui 1.0
-import imtguigql 1.0
+import imtdocgui 1.0
 import imtauthgui 1.0
 import imtbaseImtBaseTypesSdl 1.0
 
@@ -14,10 +13,10 @@ import imtbaseImtBaseTypesSdl 1.0
  *
  * Cross-Org Grants tab of the TenantEditor.
  *
- * Displays grants via TenantSimpleCollectionPage with a document manager
+ * Displays grants via SimpleCollectionPage with a document manager
  * for full Create/Edit/Remove workflow.
  */
-TenantSimpleCollectionPage {
+SimpleCollectionPage {
 	id: grantsPage
 
 	entityName: qsTr("Grant")
@@ -35,10 +34,10 @@ TenantSimpleCollectionPage {
 	deletePermissionIds: ["RemoveOrganizationConnection", "EditOrganizationConnection"]
 
 	delegateComponent: Component {
-		TenantCollectionItemDelegateBase {
+		SimpleCollectionItemDelegateBase {
 			id: grantDelegate
 			selectionManager: grantsPage.selectionManager
-			collectionPage: grantsPage
+			actionHandler: grantsPage
 
 			property TextParam __targetTenantParam: TextParam {}
 			property TextParam __rolesParam: TextParam {}

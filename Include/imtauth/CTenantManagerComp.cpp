@@ -43,7 +43,7 @@ ITenantInfoUniquePtr CTenantManagerComp::GetTenant(const QByteArray& tenantId) c
 	}
 
 	if (!imtbase::isValidUuid(tenantId)){
-		SendErrorMessage(0, QString("Invalid tenant id '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+		SendErrorMessage(0, QStringLiteral("Invalid tenant id '%1'").arg(tenantId), QStringLiteral("CTenantManagerComp"));
 		return nullptr;
 	}
 
@@ -126,7 +126,7 @@ QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QSt
 		return QByteArray();
 	}
 
-	SendInfoMessage(0, QString("Created tenant '%1' (id: %2)").arg(tenantName, QString::fromUtf8(tenantId)), "CTenantManagerComp");
+	SendInfoMessage(0, QStringLiteral("Created tenant '%1' (id: %2)").arg(tenantName, tenantId), QStringLiteral("CTenantManagerComp"));
 
 	return tenantId;
 }
@@ -142,11 +142,11 @@ bool CTenantManagerComp::RemoveTenant(const QByteArray& tenantId)
 	istd::CChangeNotifier changeNotifier(this);
 
 	if (!m_tenantCollectionCompPtr->RemoveElements({tenantId})){
-		SendErrorMessage(0, QString("Failed to remove tenant '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+		SendErrorMessage(0, QStringLiteral("Failed to remove tenant '%1'").arg(tenantId), "CTenantManagerComp");
 		return false;
 	}
 
-	SendInfoMessage(0, QString("Removed tenant '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+	SendInfoMessage(0, QStringLiteral("Removed tenant '%1'").arg(tenantId), "CTenantManagerComp");
 
 	return true;
 }
@@ -161,7 +161,7 @@ bool CTenantManagerComp::UpdateTenant(const QByteArray& tenantId, const QString&
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_tenantCollectionCompPtr->GetObjectData(tenantId, dataPtr)){
-		SendErrorMessage(0, QString("Tenant '%1' not found").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+		SendErrorMessage(0, QStringLiteral("Tenant '%1' not found").arg(tenantId), "CTenantManagerComp");
 		return false;
 	}
 
@@ -181,11 +181,11 @@ bool CTenantManagerComp::UpdateTenant(const QByteArray& tenantId, const QString&
 	tenantPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
 
 	if (!m_tenantCollectionCompPtr->SetObjectData(tenantId, *tenantPtr)){
-		SendErrorMessage(0, QString("Failed to update tenant '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+		SendErrorMessage(0, QStringLiteral("Failed to update tenant '%1'").arg(tenantId), "CTenantManagerComp");
 		return false;
 	}
 
-	SendInfoMessage(0, QString("Updated tenant '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+	SendInfoMessage(0, QStringLiteral("Updated tenant '%1'").arg(tenantId), "CTenantManagerComp");
 
 	return true;
 }
@@ -200,7 +200,7 @@ bool CTenantManagerComp::SetTenantActive(const QByteArray& tenantId, bool isActi
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_tenantCollectionCompPtr->GetObjectData(tenantId, dataPtr)){
-		SendErrorMessage(0, QString("Tenant '%1' not found").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+		SendErrorMessage(0, QStringLiteral("Tenant '%1' not found").arg(tenantId), "CTenantManagerComp");
 		return false;
 	}
 
@@ -216,11 +216,11 @@ bool CTenantManagerComp::SetTenantActive(const QByteArray& tenantId, bool isActi
 	tenantPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
 
 	if (!m_tenantCollectionCompPtr->SetObjectData(tenantId, *tenantPtr)){
-		SendErrorMessage(0, QString("Failed to set tenant '%1' active state").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+		SendErrorMessage(0, QStringLiteral("Failed to set tenant '%1' active state").arg(tenantId), "CTenantManagerComp");
 		return false;
 	}
 
-	SendInfoMessage(0, QString("Set tenant '%1' active=%2").arg(QString::fromUtf8(tenantId)).arg(isActive), "CTenantManagerComp");
+	SendInfoMessage(0, QStringLiteral("Set tenant '%1' active=%2").arg(tenantId, QString::number(isActive)), QStringLiteral("CTenantManagerComp"));
 
 	return true;
 }
@@ -235,7 +235,7 @@ bool CTenantManagerComp::SetTenantHierarchy(const QByteArray& tenantId, const QB
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_tenantCollectionCompPtr->GetObjectData(tenantId, dataPtr)){
-		SendErrorMessage(0, QString("Tenant '%1' not found").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+		SendErrorMessage(0, QStringLiteral("Tenant '%1' not found").arg(tenantId), "CTenantManagerComp");
 		return false;
 	}
 
@@ -252,11 +252,11 @@ bool CTenantManagerComp::SetTenantHierarchy(const QByteArray& tenantId, const QB
 	tenantPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
 
 	if (!m_tenantCollectionCompPtr->SetObjectData(tenantId, *tenantPtr)){
-		SendErrorMessage(0, QString("Failed to set hierarchy for tenant '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+		SendErrorMessage(0, QStringLiteral("Failed to set hierarchy for tenant '%1'").arg(tenantId), "CTenantManagerComp");
 		return false;
 	}
 
-	SendInfoMessage(0, QString("Set hierarchy for tenant '%1' (parent: %2)").arg(
+	SendInfoMessage(0, QStringLiteral("Set hierarchy for tenant '%1' (parent: %2)").arg(
 		QString::fromUtf8(tenantId), parentTenantId.isEmpty() ? "none" : QString::fromUtf8(parentTenantId)), "CTenantManagerComp");
 
 	return true;

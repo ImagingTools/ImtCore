@@ -14,6 +14,14 @@ input ProductsListInput {
 	viewParams: CollectionViewParams
 }
 
+# The optional parts of one feature that a product takes. A sub-feature id is
+# only unique inside its own feature, so it travels next to the feature it
+# belongs to instead of being glued onto it.
+type ProductOptionalFeature {
+	featureId: ID
+	subFeatureIds: [ID]
+}
+
 type LicenseData {
 	id: ID
 	name: String
@@ -30,6 +38,7 @@ type ProductItem {
 	categoryId: ID!
 	description: String
 	features: ID
+	optionalFeatures: [ProductOptionalFeature]
 	licenses: [LicenseData]
 	added: String
 	timeStamp: String
@@ -48,6 +57,7 @@ type ProductData {
 	productId: ID
 	categoryId: ID
 	features: ID
+	optionalFeatures: [ProductOptionalFeature]
 }
 
 input ProductDataInput {

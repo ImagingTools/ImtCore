@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QObject>
+#include <QtCore/QSemaphore>
 #include <QtTest/QtTest>
 
 // ACF includes
@@ -18,6 +19,7 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtdoc/CCollectionDocumentServiceBase.h>
 #include <imtdoc/IDocumentServiceEventHandler.h>
+#include <imtdoc/IPersistentUndoManager.h>
 
 
 /**
@@ -113,7 +115,7 @@ private:
 */
 class CMockUndoManager:
 	public imod::IModel,
-	virtual public idoc::IUndoManager
+	virtual public imtdoc::IPersistentUndoManager
 {
 public:
 	CMockUndoManager()
@@ -139,6 +141,10 @@ public:
 	virtual QString GetUndoLevelDescription(int stepIndex) const override { return QString(); }
 	virtual QString GetRedoLevelDescription(int stepIndex) const override { return QString(); }
 	virtual void ResetUndo() override {}
+
+	// reimplemented (imtdoc::IPersistentUndoManager)
+	virtual void InitializeDocumentContext(const QByteArray& /*documentId*/, const QByteArray& /*documentTypeId*/) override {}
+	virtual void ResetHistory() override {}
 
 	// reimplemented (idoc::IDocumentStateComparator)
 	virtual bool HasStoredDocumentState() const override { return true; }
@@ -174,6 +180,7 @@ public:
 		, m_setObjectDataShouldFail(false)
 		, m_getObjectDataShouldFail(false)
 		, m_setElementNameShouldFail(false)
+		, m_blockGetObjectData(false)
 	{
 	}
 
@@ -182,6 +189,9 @@ public:
 	void SetSetObjectDataShouldFail(bool fail) { m_setObjectDataShouldFail = fail; }
 	void SetGetObjectDataShouldFail(bool fail) { m_getObjectDataShouldFail = fail; }
 	void SetSetElementNameShouldFail(bool fail) { m_setElementNameShouldFail = fail; }
+	void SetBlockGetObjectData(bool block) { m_blockGetObjectData = block; }
+	bool WaitForGetObjectData(int timeout) { return m_getObjectDataStarted.tryAcquire(1, timeout); }
+	void ContinueGetObjectData() { m_continueGetObjectData.release(); }
 
 	void AddObject(const QByteArray& objectId, const QByteArray& typeId, const QString& name,
 		istd::IChangeableSharedPtr dataPtr = istd::IChangeableSharedPtr())
@@ -370,6 +380,11 @@ public:
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr,
 		const iprm::IParamsSet* /*dataConfigurationPtr*/ = nullptr) const override
 	{
+		if (m_blockGetObjectData) {
+			m_getObjectDataStarted.release();
+			m_continueGetObjectData.acquire();
+		}
+
 		if (m_getObjectDataShouldFail) {
 			return false;
 		}
@@ -421,6 +436,9 @@ private:
 	bool m_setObjectDataShouldFail;
 	bool m_getObjectDataShouldFail;
 	bool m_setElementNameShouldFail;
+	bool m_blockGetObjectData;
+	mutable QSemaphore m_getObjectDataStarted;
+	mutable QSemaphore m_continueGetObjectData;
 };
 
 
@@ -597,6 +615,16 @@ protected:
 		return true;
 	}
 
+	// reimplemented (CDocumentServiceBase)
+	virtual bool OnDocumentCreated(
+		const QByteArray& /*typeId*/,
+		const iprm::IParamsSet* /*initParams*/,
+		istd::IChangeable& /*document*/,
+		QString& /*errorMessage*/) override
+	{
+		return true;
+	}
+
 private:
 	CMockObjectCollection m_mockCollection;
 	CMockEventHandler m_mockEventHandler;
@@ -662,8 +690,11 @@ private slots:
 	void OpenDocumentUndoManagerFailTest();
 	void OpenDocumentEventFiredTest();
 	void OpenDocumentIsLoadingTest();
+	void OpenDocumentCompletesBeforeDataLoadedTest();
+	void OpenDocumentDataLoadFailClosesDocumentTest();
 	void OpenDocumentWithHostTest();
 	void OpenDocumentMultiplePathSegmentsTest();
+	void OpenDocumentWithoutSingleInstanceModeFailsWhenSingleInstanceAlreadyOpenedTest();
 
 	// GetDocumentName tests
 	void GetDocumentNameSuccessTest();

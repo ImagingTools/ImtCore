@@ -922,6 +922,25 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRe
 }
 
 /**
+	Check whether a request was issued by the superuser.
+
+	Only the superuser may change the account state (imtauth::IUserInfo::IsEnabled),
+	so every write path accepting the 'enabled' field guards it with this check.
+	A request without a resolved user info is never treated as superuser.
+*/
+inline bool IsSuperuserRequest(const imtgql::CGqlRequest& gqlRequest)
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return false;
+	}
+
+	const imtauth::IUserInfo* contextUserInfoPtr = gqlContextPtr->GetUserInfo();
+
+	return (contextUserInfoPtr != nullptr) && contextUserInfoPtr->IsAdmin();
+}
+
+/**
 	Adapts (filters) the roles, groups and permissions of a user according to the
 	current tenant context, and enriches with delegated roles when appropriate.
 
@@ -1124,6 +1143,49 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	}
 
 	return adaptedObjectPtr;
+}
+
+
+/**
+	Get the effective permission set of a user for the given tenant and
+	product context.
+
+	This applies the same tenant-based adaptation as GetProfile
+	(AdaptUserForTenant): only roles/groups/permissions visible in the
+	current tenant - or true globals for "No Organization" - plus delegated
+	role enrichment are considered. Use this instead of a raw
+	IUserBaseInfo::GetPermissions() call whenever the result must reflect
+	what the user actually possesses in the caller's current context (e.g.
+	for building the personal-access-token scope tree or for validating
+	requested token scopes).
+*/
+inline imtauth::IUserBaseInfo::FeatureIds GetEffectiveUserPermissions(
+				const QByteArray& userId,
+				const imtauth::IUserInfo& userInfo,
+				const QByteArray& tenantId,
+				const QByteArray& productId,
+				imtauth::ITenantEntityBindingManager* bindingManager,
+				imtauth::IDelegatedAccess* delegatedAccess,
+				imtauth::ITenantMembershipManager* membershipManager,
+				imtauth::IRoleInfoProvider* roleInfoProvider)
+{
+	istd::IChangeableUniquePtr adaptedPtr = AdaptUserForTenant(
+				userId,
+				userInfo,
+				tenantId,
+				productId,
+				bindingManager,
+				delegatedAccess,
+				membershipManager,
+				roleInfoProvider);
+	if (adaptedPtr.IsValid()){
+		const imtauth::IUserInfo* adaptedUserPtr = dynamic_cast<const imtauth::IUserInfo*>(adaptedPtr.GetPtr());
+		if (adaptedUserPtr != nullptr){
+			return adaptedUserPtr->GetPermissions(productId);
+		}
+	}
+
+	return userInfo.GetPermissions(productId);
 }
 
 

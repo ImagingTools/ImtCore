@@ -293,6 +293,7 @@ class CTimeFilterObjectList;
 class CTimeFilterObject: public ::imtbase::CItemModelBase, public CTimeFilter
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_timeRange READ GetTimeRange WRITE SetTimeRange NOTIFY timeRangeChanged)
 	Q_PROPERTY(QVariant m_timeUnit READ GetTimeUnit WRITE SetTimeUnit NOTIFY timeUnitChanged)
 	Q_PROPERTY(QVariant m_interpretationMode READ GetInterpretationMode WRITE SetInterpretationMode NOTIFY interpretationModeChanged)
@@ -304,6 +305,7 @@ public:
 	CTimeFilterObject(QObject* parent = nullptr);
 
 	QVariant GetTimeRange();
+	QString Get__Typename() {return QStringLiteral("TimeFilter");}
 	void SetTimeRange(const QVariant& v);
 	Q_INVOKABLE bool hasTimeRange();
 	Q_INVOKABLE void emplaceTimeRange();
@@ -374,6 +376,7 @@ class CFieldSortingInfoObjectList;
 class CFieldSortingInfoObject: public ::imtbase::CItemModelBase, public CFieldSortingInfo
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_fieldId READ GetFieldId WRITE SetFieldId NOTIFY fieldIdChanged)
 	Q_PROPERTY(QVariant m_sortingOrder READ GetSortingOrder WRITE SetSortingOrder NOTIFY sortingOrderChanged)
 
@@ -383,6 +386,7 @@ public:
 	CFieldSortingInfoObject(QObject* parent = nullptr);
 
 	QVariant GetFieldId();
+	QString Get__Typename() {return QStringLiteral("FieldSortingInfo");}
 	void SetFieldId(const QVariant& v);
 	Q_INVOKABLE bool hasFieldId();
 	QVariant GetSortingOrder();
@@ -442,6 +446,7 @@ class CFieldFilterObjectList;
 class CFieldFilterObject: public ::imtbase::CItemModelBase, public CFieldFilter
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_fieldId READ GetFieldId WRITE SetFieldId NOTIFY fieldIdChanged)
 	Q_PROPERTY(QVariant m_filterValue READ GetFilterValue WRITE SetFilterValue NOTIFY filterValueChanged)
 	Q_PROPERTY(QVariant m_filterValueType READ GetFilterValueType WRITE SetFilterValueType NOTIFY filterValueTypeChanged)
@@ -453,6 +458,7 @@ public:
 	CFieldFilterObject(QObject* parent = nullptr);
 
 	QVariant GetFieldId();
+	QString Get__Typename() {return QStringLiteral("FieldFilter");}
 	void SetFieldId(const QVariant& v);
 	Q_INVOKABLE bool hasFieldId();
 	QVariant GetFilterValue();
@@ -520,6 +526,7 @@ class CGroupFilterObjectList;
 class CGroupFilterObject: public ::imtbase::CItemModelBase, public CGroupFilter
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_fieldFilters READ GetFieldFilters WRITE SetFieldFilters NOTIFY fieldFiltersChanged)
 	Q_PROPERTY(QVariant m_groupFilters READ GetGroupFilters WRITE SetGroupFilters NOTIFY groupFiltersChanged)
 	Q_PROPERTY(QVariant m_logicalOperation READ GetLogicalOperation WRITE SetLogicalOperation NOTIFY logicalOperationChanged)
@@ -530,6 +537,7 @@ public:
 	CGroupFilterObject(QObject* parent = nullptr);
 
 	QVariant GetFieldFilters();
+	QString Get__Typename() {return QStringLiteral("GroupFilter");}
 	void SetFieldFilters(const QVariant& v);
 	Q_INVOKABLE bool hasFieldFilters();
 	Q_INVOKABLE void emplaceFieldFilters();
@@ -601,6 +609,7 @@ class CComplexCollectionFilterObjectList;
 class CComplexCollectionFilterObject: public ::imtbase::CItemModelBase, public CComplexCollectionFilter
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_sortingInfo READ GetSortingInfo WRITE SetSortingInfo NOTIFY sortingInfoChanged)
 	Q_PROPERTY(QVariant m_fieldsFilter READ GetFieldsFilter WRITE SetFieldsFilter NOTIFY fieldsFilterChanged)
 	Q_PROPERTY(QVariant m_timeFilter READ GetTimeFilter WRITE SetTimeFilter NOTIFY timeFilterChanged)
@@ -612,6 +621,7 @@ public:
 	CComplexCollectionFilterObject(QObject* parent = nullptr);
 
 	QVariant GetSortingInfo();
+	QString Get__Typename() {return QStringLiteral("ComplexCollectionFilter");}
 	void SetSortingInfo(const QVariant& v);
 	Q_INVOKABLE bool hasSortingInfo();
 	Q_INVOKABLE void emplaceSortingInfo();

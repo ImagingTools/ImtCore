@@ -264,7 +264,7 @@ bool CClientRequestGroupManagerComp::SetGroupDataSdl(const QByteArray& groupId, 
 	groupssdl::GroupUpdateRequestArguments arguments;
 	arguments.input.emplace();
 	arguments.input->id = groupId;
-	arguments.input->typeId = QByteArray("Group");
+	arguments.input->typeId = QByteArrayLiteral("Group");
 	arguments.input->item = groupData;
 
 	if (m_applicationInfoCompPtr.IsValid()){

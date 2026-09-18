@@ -63,7 +63,7 @@ void CUsersSessionsDatabaseDelegateComp::OnComponentCreated()
 	}
 
 	if (sqlQuery.next() && !sqlQuery.value(0).toBool()){
-		QString alterQuery = QString("ALTER TABLE \"%1\" ADD COLUMN \"TenantId\" VARCHAR(1000);").arg(tableName);
+		QString alterQuery = QStringLiteral(R"(ALTER TABLE "%1" ADD COLUMN "TenantId" VARCHAR(1000);)").arg(tableName);
 		m_databaseEngineCompPtr->ExecSqlQuery(alterQuery.toUtf8(), &sqlError);
 	}
 }
@@ -78,8 +78,8 @@ QByteArray CUsersSessionsDatabaseDelegateComp::GetSelectionQuery(
 			const iprm::IParamsSet* paramsPtr) const
 {
 	if (!objectId.isEmpty()){
-		return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
-			.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(*m_objectIdColumnAttrPtr), SqlEncode(QString::fromUtf8(objectId))).toUtf8();
+		return QStringLiteral(R"(SELECT * FROM "%1" WHERE "%2" = '%3')")
+			.arg(*m_tableNameAttrPtr, *m_objectIdColumnAttrPtr, SqlEncode(QString::fromUtf8(objectId))).toUtf8();
 	}
 
 	QString filterQuery;
@@ -87,8 +87,8 @@ QByteArray CUsersSessionsDatabaseDelegateComp::GetSelectionQuery(
 		CreateFilterQuery(*paramsPtr, filterQuery);
 	}
 
-	return QString("SELECT * FROM \"%1\" %2;")
-		.arg(qPrintable(*m_tableNameAttrPtr), filterQuery).toUtf8();
+	return QStringLiteral(R"(SELECT * FROM "%1" %2;)")
+		.arg(*m_tableNameAttrPtr, filterQuery).toUtf8();
 }
 
 
@@ -160,13 +160,13 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateCom
 
 	QString driverId = m_databaseEngineCompPtr->GetDatabaseDriverId();
 	if (driverId == "QPSQL"){
-		retVal.query += QString("\nDELETE FROM \"UserSessions\" WHERE \"ExpirationDate\" < NOW();").toUtf8();
+		retVal.query += QStringLiteral("\nDELETE FROM \"UserSessions\" WHERE \"ExpirationDate\" < NOW();").toUtf8();
 	}
 	else if (driverId == "QSQLITE"){
-		retVal.query += QString("\nDELETE FROM \"UserSessions\" WHERE \"ExpirationDate\" < strftime('%Y-%m-%dT%H:%M:%S', 'now');").toUtf8();
+		retVal.query += QStringLiteral("\nDELETE FROM \"UserSessions\" WHERE \"ExpirationDate\" < strftime('%Y-%m-%dT%H:%M:%S', 'now');").toUtf8();
 	}
 
-	retVal.query += QString("\nINSERT INTO \"UserSessions\" (\"Id\", \"RefreshToken\", \"UserId\", \"TenantId\", \"CreationDate\", \"ExpirationDate\") VALUES ('%0', '%1', '%2', '%3', '%4', '%5');")
+	retVal.query += QStringLiteral("\nINSERT INTO \"UserSessions\" (\"Id\", \"RefreshToken\", \"UserId\", \"TenantId\", \"CreationDate\", \"ExpirationDate\") VALUES ('%0', '%1', '%2', '%3', '%4', '%5');")
 				.arg(SqlEncode(QString::fromUtf8(proposedObjectId)), SqlEncode(QString::fromUtf8(token)), SqlEncode(QString::fromUtf8(userId)), SqlEncode(QString::fromUtf8(tenantId)), creationDate.toString(Qt::ISODate), expirationDate.toString(Qt::ISODate)).toUtf8();
 
 	return retVal;
@@ -193,14 +193,14 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	QByteArray retVal;
 
-	retVal += QString("\nUPDATE \"%0\" SET \"RefreshToken\" = '%1', \"TenantId\" = '%2', \"CreationDate\" = '%3', \"ExpirationDate\" = '%4' WHERE \"%5\" = '%6'")
+	retVal += QStringLiteral("\nUPDATE \"%0\" SET \"RefreshToken\" = '%1', \"TenantId\" = '%2', \"CreationDate\" = '%3', \"ExpirationDate\" = '%4' WHERE \"%5\" = '%6'")
 				  .arg(
-					  qPrintable(*m_tableNameAttrPtr),
+					  *m_tableNameAttrPtr,
 					  SqlEncode(QString::fromUtf8(token)),
 					  SqlEncode(QString::fromUtf8(tenantId)),
 					creationDate.toString(Qt::ISODate),
 					expirationDate.toString(Qt::ISODate),
-					qPrintable(*m_objectIdColumnAttrPtr),
+					*m_objectIdColumnAttrPtr,
 					SqlEncode(QString::fromUtf8(objectId))).toUtf8();
 
 	return retVal;
@@ -209,7 +209,7 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 QByteArray CUsersSessionsDatabaseDelegateComp::GetObjectTypeId(const QByteArray& /*objectId*/) const
 {
-	return QByteArray("Session");
+	return QByteArrayLiteral("Session");
 }
 
 
@@ -224,13 +224,13 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateDeleteObjectsQuery(
 	
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
-		quotedIds << QString("'%1'").arg(SqlEncode(QString::fromUtf8(objectId)));
+		quotedIds << QStringLiteral("'%1'").arg(SqlEncode(QString::fromUtf8(objectId)));
 	}
 	
 	QString query = QString(
 						"DELETE FROM \"%1\" WHERE \"%2\" IN (%3);")
 						.arg(
-							QString::fromUtf8(qPrintable(*m_tableNameAttrPtr)),
+							QString::fromUtf8(*m_tableNameAttrPtr),
 							QString::fromUtf8(*m_objectIdColumnAttrPtr),
 							quotedIds.join(", ")
 							);
@@ -248,7 +248,7 @@ bool CUsersSessionsDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSe
 			return false;
 		}
 
-		filterQuery += QString(R"( WHERE "RefreshToken" = '%1')").arg(SqlEncode(textParamPtr->GetText()));
+		filterQuery += QStringLiteral(R"( WHERE "RefreshToken" = '%1')").arg(SqlEncode(textParamPtr->GetText()));
 
 		return true;
 	}

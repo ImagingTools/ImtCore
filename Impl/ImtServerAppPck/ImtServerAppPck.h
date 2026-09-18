@@ -40,6 +40,10 @@
 #include <imtserverapp/CFeaturePackageRepresentationControllerComp.h>
 #include <imtserverapp/CSystemStatusComp.h>
 #include <imtserverapp/CGqlObjectCollectionDelegateComp.h>
+#include <imtserverapp/CComplexCollectionFilterRepresentationController.h>
+#include <imtserverapp/CDocumentFilterRepresentationController.h>
+#include <imtserverapp/CDocumentIdFilterRepresentationController.h>
+#include <imtserverapp/CTimeFilterParamRepresentationController.h>
 
 
 /**
@@ -82,6 +86,10 @@ typedef imtserverapp::CObserverQmlComp ObserverQml;
 typedef imtserverapp::CFeaturePackageRepresentationControllerComp FeaturePackageRepresentationController;
 typedef imtserverapp::CGqlObjectCollectionDelegateComp GqlObjectCollectionDelegate;
 typedef icomp::TModelCompWrap<imtserverapp::CSystemStatusComp> SystemStatus;
+typedef icomp::TMakeComponentWrap<imtserverapp::CComplexCollectionFilterRepresentationController, imtserverapp::IJsonRepresentationController> ComplexCollectionFilterRepresentationController;
+typedef icomp::TMakeComponentWrap<imtserverapp::CDocumentFilterRepresentationController, imtserverapp::IJsonRepresentationController> DocumentFilterRepresentationController;
+typedef icomp::TMakeComponentWrap<imtserverapp::CDocumentIdFilterRepresentationController, imtserverapp::IJsonRepresentationController> DocumentIdFilterRepresentationController;
+typedef icomp::TMakeComponentWrap<imtserverapp::CTimeFilterParamRepresentationController, imtserverapp::IJsonRepresentationController> TimeFilterParamRepresentationController;
 
 
 } // namespace ImtServerAppPck

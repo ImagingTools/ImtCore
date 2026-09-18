@@ -65,7 +65,7 @@
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreatePersonalAccessTokenTable.sql"/>
+                        <Data IsEnabled="true" Value="CreatePersonalAccessTokenTable.sql"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>

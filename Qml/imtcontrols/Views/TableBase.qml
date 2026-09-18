@@ -25,7 +25,7 @@ Rectangle {
 	property bool showHeaders: true;
 
 	property bool enableAlternating: (Style.enableAlternating !== undefined && Style.enableAlternating !== null) ? Style.enableAlternating : false;
-	property color alternatingColor: Style.alternatingColor ? Style.alternatingColor : Style.baseColorInverted;
+	property color alternatingColor: Style.backgroundColor2;
 	property color alternatingCellColor: 'transparent';
 	property real alternatingOpacity: Style.alternatingOpacity ? Style.alternatingOpacity : 0.05;
 	property bool hoverEnabled: (Style.enableHoverEffect !== undefined && Style.enableHoverEffect !== null) ? Style.enableHoverEffect : true;
@@ -55,6 +55,7 @@ Rectangle {
 	property alias elementsList: elementsListObj;
 	property alias cacheBuffer: elementsListObj.cacheBuffer;
 	property alias contentHeight: elementsListObj.contentHeight;
+	property real contentHeightTotal: headerHeight + contentHeight + scrollHoriz.visible * (scrollHoriz.secondSize + scrollHoriz.anchors.topMargin)
 	property real contentWidth: elementsListObj.contentWidth;
 	property alias originX: elementsListObj.originX;
 	property alias originY: elementsListObj.originY;
@@ -240,7 +241,10 @@ Rectangle {
 	}
 
 	onElementsChanged: {
+		// Clear selection and notify rows. Without checkedItemsChanged the row CheckBox keeps
+		// a stale checkedState while _checkedItems is already empty (breaks undo/redo restore).
 		properties._checkedItems = []
+		properties.checkedItemsChanged()
 
 		tableContainer.setWidth();
 	}
@@ -731,7 +735,8 @@ Rectangle {
 			height: 1;
 
 			color: Style.borderColor;
-			visible: tableContainer.emptyDecor;
+			opacity: 0.5;
+			visible: false;
 		}
 	}//headers
 

@@ -16,12 +16,12 @@ namespace imtauthgui
 
 void CAddressEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	imtauth::IAddress* addressPtr = GetObservedObject();
+	imtaccount::IAddress* addressPtr = GetObservedObject();
 	Q_ASSERT(addressPtr != nullptr);
 
 	CountryEdit->setText(addressPtr->GetCountry());
 	CityEdit->setText(addressPtr->GetCity());
-	PostalCodeEdit->setText(QString("%1").arg(addressPtr->GetPostalCode()));
+	PostalCodeEdit->setText(QStringLiteral("%1").arg(addressPtr->GetPostalCode()));
 }
 
 
@@ -39,7 +39,7 @@ void CAddressEditorComp::OnGuiModelDetached()
 
 void CAddressEditorComp::UpdateModel() const
 {
-	imtauth::IAddress* addressPtr = GetObservedObject();
+	imtaccount::IAddress* addressPtr = GetObservedObject();
 	Q_ASSERT(addressPtr != nullptr);
 
 	istd::CChangeGroup changeGroup(addressPtr);

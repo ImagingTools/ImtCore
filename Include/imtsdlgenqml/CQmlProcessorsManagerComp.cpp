@@ -40,7 +40,7 @@ iproc::IProcessor::TaskState CQmlProcessorsManagerComp::DoProcessing(
 	if (!isOutputDirExsists){
 		SendErrorMessage(
 			0,
-			QString("Unable to create output directory '%1'").arg(outputDirPath));
+			QStringLiteral("Unable to create output directory '%1'").arg(outputDirPath));
 
 		return TS_INVALID;
 	}
@@ -100,7 +100,7 @@ bool CQmlProcessorsManagerComp::CreateCode()
 			int processResultResult = codeGeneratorPtr->DoProcessing(nullptr, nullptr, nullptr, nullptr, nullptr);
 
 			if (processResultResult != iproc::IProcessor::TS_OK){
-				SendCriticalMessage(0, QString("Unable to process schema: '%1'").arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
+				SendCriticalMessage(0, QStringLiteral("Unable to process schema: '%1'").arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
 
 				return false;
 			}

@@ -1375,7 +1375,7 @@ void CSdlTools::PrintFiles(std::ostream& outStream, const QStringList& files, IS
 	QString outputString = files.join(glue);
 
 	// remove empty elements
-	outputString = outputString.remove(QString("%1%1").arg(glue));
+	outputString = outputString.remove(QStringLiteral("%1%1").arg(glue));
 	while (outputString.endsWith(glue)){
 		outputString.chop(1);
 	}

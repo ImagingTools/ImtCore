@@ -223,7 +223,7 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 			else if (conversionType == CT_JSON_SCALAR){
 				if (!customModelTarget.isEmpty()){
 					// direct write to custom JSON target object
-					QString isAddedVariableName = QString("is") + targetVariableName + QString("Added");
+					QString isAddedVariableName = QStringLiteral("is") + targetVariableName + QStringLiteral("Added");
 					FeedStreamHorizontally(stream, hIndents + 1);
 					stream << QStringLiteral("const bool ") << isAddedVariableName << QStringLiteral(" = ");
 					stream << valName << QStringLiteral("->WriteToJsonObject(") << customModelTarget << QStringLiteral(");");
@@ -248,12 +248,12 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 					FeedStream(stream, 1, false);
 				}
 				else{
-					QString jsonVariable = targetName + QString("JsonObject");
+					QString jsonVariable = targetName + QStringLiteral("JsonObject");
 					FeedStreamHorizontally(stream, hIndents + 1);
 					stream << QStringLiteral("QJsonObject ") << jsonVariable << QStringLiteral(";");
 					FeedStream(stream, 1, false);
 
-					QString isAddedVariableName = QString("is") + targetVariableName + QString("Added");
+					QString isAddedVariableName = QStringLiteral("is") + targetVariableName + QStringLiteral("Added");
 					FeedStreamHorizontally(stream, hIndents + 1);
 					stream << QStringLiteral("const bool ") << isAddedVariableName << QStringLiteral(" = ");
 					stream << valName << QStringLiteral("->WriteToJsonObject(") << jsonVariable << QStringLiteral(");");
@@ -283,12 +283,12 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 				}
 			}
 			else if (conversionType == CT_JSON_ARRAY){
-				QString jsonVariable = targetName + QString("JsonObject");
+				QString jsonVariable = targetName + QStringLiteral("JsonObject");
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << QStringLiteral("QJsonObject ") << jsonVariable << QStringLiteral(";");
 				FeedStream(stream, 1, false);
 
-				QString isAddedVariableName = QString("is") + targetName + QString("Added");
+				QString isAddedVariableName = QStringLiteral("is") + targetName + QStringLiteral("Added");
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << QStringLiteral("const bool ") << isAddedVariableName << QStringLiteral(" = ");
 				stream << valName << QStringLiteral("->WriteToJsonObject(") << jsonVariable << QStringLiteral(");");
@@ -464,7 +464,7 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 			FeedStream(stream, 1, false);
 
 			if (conversionType == CT_MODEL_ARRAY || conversionType == CT_MODEL_SCALAR){
-				QString readVariable = QString("is") + targetVariableName + QString("Read");
+				QString readVariable = QStringLiteral("is") + targetVariableName + QStringLiteral("Read");
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << QStringLiteral("const bool ") << readVariable << QStringLiteral(" = ");
 				stream << tempVar << QStringLiteral(".ReadFromModel(*model.GetTreeItemModel(\"");
@@ -497,7 +497,7 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 				FeedStream(stream, 1, false);
 			}
 			else if (conversionType == CT_JSON_SCALAR || conversionType == CT_JSON_ARRAY){
-				QString readVariable = QString("is") + targetVariableName + QString("Read");
+				QString readVariable = QStringLiteral("is") + targetVariableName + QStringLiteral("Read");
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << QStringLiteral("const bool ") << readVariable << QStringLiteral(" = ");
 				stream << tempVar<< QStringLiteral(".ReadFromJsonObject(");
@@ -529,7 +529,7 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 				FeedStream(stream, 1, false);
 			}
 			else{
-				QString readVariable = QString("is") + imtsdl::CSdlTools::GetCapitalizedValue(targetName) + QString("Read");
+				QString readVariable = QStringLiteral("is") + imtsdl::CSdlTools::GetCapitalizedValue(targetName) + QStringLiteral("Read");
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << QStringLiteral("const bool ") << readVariable << QStringLiteral(" = ");
 				stream << tempVar << QStringLiteral(".ReadFromGraphQlObject(*") << arraySourceVariableName << QStringLiteral(");");

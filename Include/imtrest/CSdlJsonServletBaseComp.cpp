@@ -26,7 +26,7 @@ CSdlJsonServletBaseComp::ResponsePtr CSdlJsonServletBaseComp::CreateDefaultError
 		request,
 		protocolStatusCode,
 		replyPayload,
-		QByteArray("application/json; charset=utf-8")).PopInterfacePtr());
+		QByteArrayLiteral("application/json; charset=utf-8")).PopInterfacePtr());
 
 	return retVal;
 }

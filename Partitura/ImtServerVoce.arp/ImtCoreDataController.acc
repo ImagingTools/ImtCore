@@ -19,7 +19,6 @@
                     <AttributeInfo Id="GqlRequestHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>AuthorizationManagementController</Value>
                                 <Value>PermissionController</Value>
                                 <Value>WebSocketPortController</Value>
                             </Values>

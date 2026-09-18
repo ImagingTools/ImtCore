@@ -32,7 +32,7 @@ sdl::V1_0::imtauth::CGetProductPermissionsPayload CPermissionsProviderComp::OnGe
 	}
 
 	if (!arguments.input->productId || arguments.input->productId->isEmpty()){
-		errorMessage = QString("Unable to get permissions. Product-ID is empty.");
+		errorMessage = QStringLiteral("Unable to get permissions. Product-ID is empty.");
 		SendErrorMessage(0, errorMessage, "CPermissionsProviderComp");
 		response.errorMessage = errorMessage;
 		return response;
@@ -48,7 +48,7 @@ sdl::V1_0::imtauth::CGetProductPermissionsPayload CPermissionsProviderComp::OnGe
 
 	if (!tenantId.isEmpty()){
 		if (!m_tenantManagerCompPtr.IsValid()){
-			errorMessage = QString("Unable to get tenant permissions. Tenant manager is not configured.");
+			errorMessage = QStringLiteral("Unable to get tenant permissions. Tenant manager is not configured.");
 			SendErrorMessage(0, errorMessage, "CPermissionsProviderComp");
 			response.errorMessage = errorMessage;
 			return response;
@@ -102,7 +102,7 @@ sdl::V1_0::imtauth::CGetProductPermissionsPayload CPermissionsProviderComp::OnGe
 	}
 
 	if (!arguments.input->productId || arguments.input->productId->isEmpty()){
-		errorMessage = QString("Unable to get permissions. Product-ID is empty.");
+		errorMessage = QStringLiteral("Unable to get permissions. Product-ID is empty.");
 		SendErrorMessage(0, errorMessage, "CPermissionsProviderComp");
 		response.errorMessage = errorMessage;
 		return response;
@@ -119,7 +119,7 @@ sdl::V1_0::imtauth::CGetProductPermissionsPayload CPermissionsProviderComp::OnGe
 	}
 
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to get user permissions. No authenticated user.");
+		errorMessage = QStringLiteral("Unable to get user permissions. No authenticated user.");
 		SendErrorMessage(0, errorMessage, "CPermissionsProviderComp");
 		response.errorMessage = errorMessage;
 		return response;
@@ -129,7 +129,19 @@ sdl::V1_0::imtauth::CGetProductPermissionsPayload CPermissionsProviderComp::OnGe
 	QSet<QByteArray> allowedPermissions;
 	const QSet<QByteArray>* allowedPermissionsPtr = nullptr;
 	if (!userInfoPtr->IsAdmin()){
-		const imtauth::IUserInfo::FeatureIds userPermissions = userInfoPtr->GetPermissions(productId);
+		// Use the tenant-adapted effective permission set (same adaptation as
+		// GetProfile): only permissions the user actually possesses in the
+		// current tenant context - or true globals for "No Organization" -
+		// may be offered, e.g. as personal access token scopes.
+		const imtauth::IUserInfo::FeatureIds userPermissions = GetEffectiveUserPermissions(
+					gqlContextPtr->GetUserId(),
+					*userInfoPtr,
+					gqlContextPtr->GetTenantId(),
+					productId,
+					m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr,
+					m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr,
+					m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
+					m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr);
 		for (const QByteArray& permissionId : userPermissions){
 			QByteArray normalizedPermissionId = permissionId.trimmed();
 			if (!normalizedPermissionId.isEmpty()){

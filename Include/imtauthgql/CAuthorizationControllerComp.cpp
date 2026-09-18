@@ -3,6 +3,9 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
+// Qt includes
+#include <QtCore/QMutableListIterator>
+
 // ACF includes
 #include <iprm/CParamsSet.h>
 
@@ -11,6 +14,7 @@
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CUserConnectionInfo.h>
 #include <imtauth/ITenantInfo.h>
+#include <imtauthgql/imtauthgql.h>
 
 
 namespace imtauthgql
@@ -68,7 +72,8 @@ bool CAuthorizationControllerComp::CheckCredential(
 			const QByteArray& password) const
 {
 	int index = m_systemIdsAttrPtr.FindValue(systemId);
-	Q_ASSERT_X(index >= 0, "CAuthorizationControllerComp::CreateInternalResponse", QString("System-ID '%1' cannot found").arg(qPrintable(systemId)).toUtf8());
+	const QByteArray errorMessage = QStringLiteral("System-ID '%1' cannot found").arg(systemId).toUtf8();
+	Q_ASSERT_X(index >= 0, "CAuthorizationControllerComp::CreateInternalResponse", errorMessage.constData());
 
 	const imtauth::ICredentialController* credentialControllerPtr = m_credentialControllersCompPtr[index];
 	Q_ASSERT_X(credentialControllerPtr != nullptr, "CAuthorizationControllerComp::CreateInternalResponse", "Invalid credential controller");
@@ -125,10 +130,64 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateIn
 			const QByteArray& login,
 			QString& errorMessage) const
 {
-	errorMessage = QT_TR_NOOP(QString("Invalid login or password. Login: '%1'").arg(qPrintable(login)));
+	errorMessage = QT_TR_NOOP(QStringLiteral("Invalid login or password. Login: '%1'").arg(login));
 	SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
 
 	return sdl::V1_0::imtauth::CAuthorizationPayload();
+}
+
+
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAccountDisabledResponse(
+			const QByteArray& login) const
+{
+	// Only reached once the credentials were verified, so naming the account state
+	// discloses nothing the caller has not already proven. Reported through the
+	// payload, not through errorMessage: a non-empty errorMessage makes the
+	// generated handler drop the payload, and with it the flag.
+	SendWarningMessage(0,
+					QStringLiteral("Authorization denied for disabled account. Login: '%1'").arg(login),
+					"imtgql::CAuthorizationControllerComp");
+
+	sdl::V1_0::imtauth::CAuthorizationPayload payload;
+	payload.accountDisabled = true;
+
+	return payload;
+}
+
+
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAccountLockedResponse(
+			const QByteArray& login,
+			QString& errorMessage) const
+{
+	errorMessage = QT_TR_NOOP(QStringLiteral("Account is temporarily locked due to too many invalid access attempts. Login: '%1'").arg(login));
+	SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
+
+	return sdl::V1_0::imtauth::CAuthorizationPayload();
+}
+
+
+bool CAuthorizationControllerComp::IsAccountLocked(const QByteArray& login) const
+{
+	if (!m_accountLockoutControllerCompPtr.IsValid()){
+		return false;
+	}
+
+	return m_accountLockoutControllerCompPtr->IsAccountLocked(login);
+}
+
+
+void CAuthorizationControllerComp::RegisterAccessAttempt(const QByteArray& login, bool successful) const
+{
+	if (!m_accountLockoutControllerCompPtr.IsValid()){
+		return;
+	}
+
+	if (successful){
+		m_accountLockoutControllerCompPtr->RegisterSuccessfulAttempt(login);
+	}
+	else{
+		m_accountLockoutControllerCompPtr->RegisterFailedAttempt(login);
+	}
 }
 
 
@@ -144,7 +203,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAu
 	QByteArray objectId = GetUserObjectId(login);
 	Q_ASSERT(!objectId.isEmpty());
 	if (objectId.isEmpty()){
-		errorMessage = QString("Unable to create authorization request. Error: User with login '%1' does not exists").arg(qPrintable(login));
+		errorMessage = QStringLiteral("Unable to create authorization request. Error: User with login '%1' does not exists").arg(login);
 		return payload;
 	}
 
@@ -213,6 +272,45 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAu
 }
 
 
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAuthorizationResponseWithLifetimeCheck(
+			imtauth::CUserInfo& userInfo,
+			const QByteArray& systemId,
+			const QByteArray& productId,
+			QString& errorMessage) const
+{
+	int daysUntilExpiration = -1;
+	imtauth::IPasswordPolicy::LifetimeStatus lifetimeStatus = imtauth::IPasswordPolicy::LS_OK;
+
+	// Password lifetime is only evaluated for password-based accounts of the internal system;
+	// externally managed users (e.g. LDAP) are governed by their own system.
+	if (m_passwordPolicyCompPtr.IsValid() && systemId.isEmpty()){
+		lifetimeStatus = m_passwordPolicyCompPtr->GetPasswordLifetimeStatus(userInfo, daysUntilExpiration);
+	}
+
+	if (lifetimeStatus == imtauth::IPasswordPolicy::LS_EXPIRED || lifetimeStatus == imtauth::IPasswordPolicy::LS_CHANGE_REQUIRED){
+		// Reported through the payload, not through errorMessage: a non-empty
+		// errorMessage makes the generated handler drop the payload, and with it the flag.
+		SendErrorMessage(0,
+						QStringLiteral("The password has expired and must be changed. Login: '%1'").arg(userInfo.GetId()),
+						"imtgql::CAuthorizationControllerComp");
+
+		sdl::V1_0::imtauth::CAuthorizationPayload payload;
+		payload.passwordExpired = true;
+
+		return payload;
+	}
+
+	sdl::V1_0::imtauth::CAuthorizationPayload payload = CreateAuthorizationSuccessfulResponse(userInfo, systemId, productId, errorMessage);
+
+	if (lifetimeStatus == imtauth::IPasswordPolicy::LS_EXPIRES_SOON){
+		payload.passwordExpired = false;
+		payload.passwordExpiresInDays = daysUntilExpiration;
+	}
+
+	return payload;
+}
+
+
 // reimplemented (sdl::V1_0::imtauth::CAuthorizationGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthorization(
@@ -246,8 +344,13 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		password = inputArgument->password->toUtf8();
 	}
 
+	if (IsAccountLocked(login)){
+		return CreateAccountLockedResponse(login, errorMessage);
+	}
+
 	QByteArray userObjectId = GetUserObjectId(login);
 	if (userObjectId.isEmpty()){
+		RegisterAccessAttempt(login, false);
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
@@ -258,6 +361,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 	}
 
 	if (userInfoPtr == nullptr){
+		RegisterAccessAttempt(login, false);
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
@@ -273,11 +377,18 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		}
 	}
 
+	RegisterAccessAttempt(login, ok);
+
 	if (!ok){
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
-	return CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
+	// Checked after the credentials, so a wrong password cannot be used to probe account states.
+	if (!userInfoPtr->IsEnabled()){
+		return CreateAccountDisabledResponse(login);
+	}
+
+	return CreateAuthorizationResponseWithLifetimeCheck(*userInfoPtr, activeSystemId, productId, errorMessage);
 }
 
 
@@ -312,8 +423,13 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 		password = inputArgument->password->toUtf8();
 	}
 
+	if (IsAccountLocked(login)){
+		return CreateAccountLockedResponse(login, errorMessage);
+	}
+
 	QByteArray userObjectId = GetUserObjectId(login);
 	if (userObjectId.isEmpty()){
+		RegisterAccessAttempt(login, false);
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
@@ -324,6 +440,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 	}
 
 	if (userInfoPtr == nullptr){
+		RegisterAccessAttempt(login, false);
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
@@ -339,11 +456,18 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 		}
 	}
 
+	RegisterAccessAttempt(login, ok);
+
 	if (!ok){
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
-	return CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
+	// Checked after the credentials, so a wrong password cannot be used to probe account states.
+	if (!userInfoPtr->IsEnabled()){
+		return CreateAccountDisabledResponse(login);
+	}
+
+	return CreateAuthorizationResponseWithLifetimeCheck(*userInfoPtr, activeSystemId, productId, errorMessage);
 }
 
 
@@ -355,7 +479,7 @@ sdl::V1_0::imtauth::CLogoutPayload CAuthorizationControllerComp::OnLogout(
 	sdl::V1_0::imtauth::CLogoutPayload response;
 	const imtgql::IGqlContext* gqlContextPtr = logoutRequest.GetRequestContext();
 	if (gqlContextPtr == nullptr){
-		errorMessage = QString("Unable to logout user with token '%1'. Error: GraphQL context is invalid");
+		errorMessage = QStringLiteral("Unable to logout user with token '%1'. Error: GraphQL context is invalid");
 		SendErrorMessage(0, errorMessage, "CAuthorizationControllerComp");
 		return response;
 	}
@@ -388,11 +512,6 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 		return response;
 	}
 
-	if (!m_jwtSessionControllerCompPtr.IsValid()){
-		Q_ASSERT_X(false, "Component 'JwtSessionControlle' was not set", "CAuthorizationControllerComp");
-		return response;
-	}
-
 	istd::TNullableValue<sdl::V1_0::imtauth::CTokenInput> arguments = getPermissionsRequest.GetRequestedArguments().input;
 	if (!arguments.HasValue()){
 		SendWarningMessage(0, "GetPermissions called without input arguments", "imtauthgql::CAuthorizationControllerComp");
@@ -409,8 +528,28 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 		token = gqlContextPtr->GetToken();
 	}
 
-	QByteArray userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
-	QByteArray tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(token);
+	QByteArray userId;
+	QByteArray tenantId;
+	QByteArray tokenId;
+	QByteArrayList tokenScopes;
+	bool isPat = false;
+
+	const QByteArray patPrefix = m_patPrefixAttrPtr.IsValid() ? *m_patPrefixAttrPtr : QByteArrayLiteral("imt_pat_");
+	if (!patPrefix.isEmpty() && token.size() > patPrefix.size() && token.startsWith(patPrefix)){
+		isPat = true;
+		if (!m_personalAccessTokenManagerCompPtr.IsValid() ||
+			!m_personalAccessTokenManagerCompPtr->ValidateToken(token, userId, tokenId, tokenScopes)){
+			SendWarningMessage(0, "GetPermissions called with invalid or expired personal access token", "imtauthgql::CAuthorizationControllerComp");
+			return response;
+		}
+
+		m_personalAccessTokenManagerCompPtr->UpdateLastUsedAt(tokenId);
+	}
+	else if (m_jwtSessionControllerCompPtr.IsValid()){
+		userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
+		tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(token);
+	}
+
 	if (userId.isEmpty()){
 		SendWarningMessage(0, "GetPermissions called with invalid or expired token", "imtauthgql::CAuthorizationControllerComp");
 		return response;
@@ -419,6 +558,22 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 	QByteArray productId;
 	if (gqlContextPtr != nullptr){
 		productId = gqlContextPtr->GetProductId();
+	}
+	if (isPat){
+		imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_personalAccessTokenManagerCompPtr->GetToken(tokenId);
+		if (!tokenPtr.IsValid()){
+			SendWarningMessage(0, "GetPermissions cannot resolve personal access token", "imtauthgql::CAuthorizationControllerComp");
+			return response;
+		}
+
+		const QByteArray tokenProductId = tokenPtr->GetProductId();
+		if (!tokenProductId.isEmpty()){
+			if (!productId.isEmpty() && productId != tokenProductId){
+				SendWarningMessage(0, "GetPermissions called with personal access token for a different product", "imtauthgql::CAuthorizationControllerComp");
+				return response;
+			}
+			productId = tokenProductId;
+		}
 	}
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
@@ -432,13 +587,30 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 		return response;
 	}
 
-	QByteArrayList userPermissions = productId.isEmpty()
-		? userInfoPtr->GetPermissions()
-		: userInfoPtr->GetPermissions(productId);
+	QByteArrayList userPermissions = tenantId.isEmpty()
+		? (productId.isEmpty() ? userInfoPtr->GetPermissions() : userInfoPtr->GetPermissions(productId))
+		: GetEffectiveUserPermissions(
+					userId,
+					*userInfoPtr,
+					tenantId,
+					productId,
+					m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr,
+					m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr,
+					m_tenantMembershipManagerCompPtr.IsValid() ? m_tenantMembershipManagerCompPtr.GetPtr() : nullptr,
+					m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr);
 
 	// Empty tenantId means global (non-tenant) scope.
 	if (tenantId.isEmpty()){
 		QByteArrayList globalPermissions = CalculateGlobalPermissions(*userInfoPtr, userId, productId);
+		if (isPat){
+			const QSet<QByteArray> scopeSet(tokenScopes.begin(), tokenScopes.end());
+			QMutableListIterator permissionsIter(globalPermissions);
+			while (permissionsIter.hasNext()){
+				if (!scopeSet.contains(permissionsIter.next())){
+					permissionsIter.remove();
+				}
+			}
+		}
 		response.permissions.Emplace().FromList(globalPermissions);
 		return response;
 	}
@@ -478,5 +650,3 @@ bool CAuthorizationControllerComp::CheckPermissions(const imtgql::CGqlRequest& /
 
 
 } // namespace imtauthgql
-
-

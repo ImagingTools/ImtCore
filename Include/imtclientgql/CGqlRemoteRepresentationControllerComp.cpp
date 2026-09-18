@@ -22,7 +22,7 @@ QJsonObject CGqlRemoteRepresentationControllerComp::CreateInternalResponse(
 			QString& errorMessage) const
 {
 	if (!IsRequestSupported(gqlRequest)){
-		errorMessage = QString("GraphQL-request is not supported").toUtf8();
+		errorMessage = QStringLiteral("GraphQL-request is not supported").toUtf8();
 		SendErrorMessage(0, errorMessage, "CGqlRemoteRepresentationControllerComp");
 
 		return QJsonObject();
@@ -32,7 +32,7 @@ QJsonObject CGqlRemoteRepresentationControllerComp::CreateInternalResponse(
 	gqlRequestPtr.MoveCastedPtr(gqlRequest.CloneMe());
 
 	if (!gqlRequestPtr.IsValid()){
-		errorMessage = QString("GraphQL-request could not be copied").toUtf8();
+		errorMessage = QStringLiteral("GraphQL-request could not be copied").toUtf8();
 		SendErrorMessage(0, errorMessage, "CGqlRemoteRepresentationControllerComp");
 
 		return QJsonObject();
@@ -52,7 +52,7 @@ QJsonObject CGqlRemoteRepresentationControllerComp::CreateInternalResponse(
 		istd::TUniqueInterfacePtr<imtgql::CGqlParamObject> newInputParamPtr;
 		newInputParamPtr.MoveCastedPtr(inputParam->CloneMe());
 		if (!newInputParamPtr.IsValid()){
-			errorMessage = QString("Creation of input parameters related to the GraphQL-request failed").toUtf8();
+			errorMessage = QStringLiteral("Creation of input parameters related to the GraphQL-request failed").toUtf8();
 			SendErrorMessage(0, errorMessage, "CGqlRemoteRepresentationControllerComp");
 
 			return QJsonObject();
@@ -77,7 +77,7 @@ QJsonObject CGqlRemoteRepresentationControllerComp::CreateInternalResponse(
 		}
 	}
 
-	errorMessage = QString("Failed to create a network request to a remote server").toUtf8();
+	errorMessage = QStringLiteral("Failed to create a network request to a remote server").toUtf8();
 	SendErrorMessage(0, errorMessage, "CGqlRemoteRepresentationControllerComp");
 
 	return QJsonObject();

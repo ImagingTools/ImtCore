@@ -309,7 +309,7 @@ Item {
 			if (documentId !== _internal.documentId){
 				return
 			}
-			ModalDialogManager.showErrorDialog(message)
+			PopupManager.addErrorMessage(message, true)
 		}
 
 		function onTryCloseDirtyDocument(documentId, callback){

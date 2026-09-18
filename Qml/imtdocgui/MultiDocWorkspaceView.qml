@@ -11,8 +11,34 @@ Item {
 	property DocumentService documentManager
 	property int popupWidth: Style.sizeHintXXS
 	property ObjectVisualStatusProvider visualStatusProvider: null
+	// Optional surface overrides (defaults keep the global MultiDoc look).
+	property color contentColor: Style.baseColor
+	property color tabPanelColor: Style.baseColor
+	// Optional per-instance tab chrome; default is the global Style.tabPanelDecorator.
+	property alias tabDelegateDecorator: tabView.tabDelegateDecorator
+	// Fallback icon for document tabs when visual-status does not supply one.
+	property string defaultDocumentIcon: ""
+
+	// Nested open/save loads — only this workspace is blocked, not the whole app
+	// (Events StartLoading/StopLoading are listened by Configurator app-wide).
+	property int __localLoadingDepth: 0
 
 	signal viewLoaded(string viewId, var view)
+
+	function startLocalLoading(){
+		workspaceView.__localLoadingDepth = workspaceView.__localLoadingDepth + 1
+		if (workspaceView.__localLoadingDepth === 1)
+			localLoading.start()
+	}
+
+	function stopLocalLoading(){
+		if (workspaceView.__localLoadingDepth > 0)
+			workspaceView.__localLoadingDepth = workspaceView.__localLoadingDepth - 1
+		if (workspaceView.__localLoadingDepth <= 0){
+			workspaceView.__localLoadingDepth = 0
+			localLoading.stop()
+		}
+	}
 
 	Connections {
 		target: workspaceView.visualStatusProvider ? workspaceView.visualStatusProvider : undefined
@@ -25,13 +51,23 @@ Item {
 
 			tabView.setTabName(objectId, name)
 			tabView.setTabDescription(objectId, description)
-			tabView.setTabIcon(objectId, icon)
+			if (icon !== ""){
+				tabView.setTabIcon(objectId, icon)
+			}
+			else if (workspaceView.defaultDocumentIcon !== ""){
+				tabView.setTabIcon(objectId, workspaceView.defaultDocumentIcon)
+			}
 		}
 		
 		function onVisualStatusReceiveFailed(objectId, errorMessage){
 			tabView.setTabName(objectId, workspaceView.documentManager.defaultDocumentName)
 			tabView.setTabDescription(objectId, "")
-			tabView.setTabIcon(objectId, "")
+			if (workspaceView.defaultDocumentIcon !== ""){
+				tabView.setTabIcon(objectId, workspaceView.defaultDocumentIcon)
+			}
+			else{
+				tabView.setTabIcon(objectId, "")
+			}
 		}
 	}
 
@@ -70,18 +106,27 @@ Item {
 		}
 
 		function onDocumentSaved(documentId){
-			Events.sendEvent("StopLoading")
+			workspaceView.stopLocalLoading()
 			if (workspaceView.visualStatusProvider){
 				let typeId = workspaceView.documentManager.getDocumentTypeId(documentId)
 				workspaceView.visualStatusProvider.getVisualStatus(documentId, typeId)
 			}
+
+			// documentManager just refreshed its cached name (see DocumentService.onDocumentSaved)
+			// from whatever the save actually confirmed - push it into the tab, otherwise a
+			// newly created document keeps showing its "New <Type>" placeholder title forever.
+			let savedName = workspaceView.documentManager.getDocumentName(documentId)
+			if (savedName !== undefined && savedName !== ""){
+				workspaceView.setDocumentName(documentId, savedName)
+			}
 		}
 		
 		function onDocumentSavingStarted(documentId){
-			Events.sendEvent("StartLoading")
+			workspaceView.startLocalLoading()
 		}
 		
 		function onDocumentSavingFailed(documentId, message){
+			workspaceView.stopLocalLoading()
 			workspaceView.openErrorDialog(message)
 		}
 
@@ -89,27 +134,31 @@ Item {
 			let typeId = workspaceView.documentManager.getDocumentTypeId(documentId)
 			let documentName = workspaceView.documentManager.getDocumentName(documentId)
 
-			let wait = false
-			if (workspaceView.visualStatusProvider){
-				documentName = ""
-				wait = true
-				workspaceView.visualStatusProvider.getVisualStatus(documentId, typeId)
+			// Always show a provisional title immediately. Waiting on GetObjectVisualStatus
+			// (waitName=true) used to leave the tab spinner stuck forever when the request
+			// hangs or fails without objectId — e.g. opening a Service while its agent is
+			// disconnected. Visual status still refreshes the title when it arrives.
+			if (documentName === ""){
+				documentName = workspaceView.documentManager.defaultDocumentName
 			}
-			else{
-				if (documentName === ""){
-					documentName = workspaceView.documentManager.defaultDocumentName
-				}
+			if (workspaceView.visualStatusProvider){
+				workspaceView.visualStatusProvider.getVisualStatus(documentId, typeId)
 			}
 
 			let documentData = workspaceView.documentManager.getDocumentDataById(documentId)
 
 			let tabIndex = tabView.getIndexById(documentId)
 			if (tabIndex < 0){
-				tabView.addTab(documentData.documentId, documentName, documentData.viewComp, "", "", wait)
+				tabView.addTab(
+							documentData.documentId,
+							documentName,
+							documentData.viewComp,
+							workspaceView.defaultDocumentIcon,
+							"",
+							false)
 				tabIndex = tabView.tabModel.count - 1
 			}
 
-			console.log("onDocumentAdded", tabIndex)
 			
 			tabView.currentIndex = tabIndex
 		}
@@ -119,40 +168,41 @@ Item {
 			tabView.removeTab(documentId)
 		}
 
+		// The marker is stripped before it is applied, so a title never collects
+		// more than one. The dirty branch used to prepend without looking, and a
+		// document reported dirty twice ended up titled "* * name".
 		function onDocumentIsDirtyChanged(documentId, isDirty){
 			let tabIndex = tabView.getIndexById(documentId)
-			if (tabIndex >= 0){
-				let tabName = tabView.getTabName(documentId)
-				if (tabName === ""){
-					tabName = workspaceView.documentManager.defaultDocumentName
-				}
-
-				let dirtyPrefix = "* "
-
-				if (isDirty){
-					tabView.setTabName(documentId, dirtyPrefix + tabName)
-				}
-				else{
-					if (tabName.startsWith(dirtyPrefix)){
-						tabName = tabName.slice(dirtyPrefix.length)
-						tabView.setTabName(documentId, tabName)
-					}
-				}
+			if (tabIndex < 0){
+				return
 			}
+
+			let dirtyPrefix = "* "
+
+			let tabName = tabView.getTabName(documentId)
+			while (tabName.startsWith(dirtyPrefix)){
+				tabName = tabName.slice(dirtyPrefix.length)
+			}
+
+			if (tabName === ""){
+				tabName = workspaceView.documentManager.defaultDocumentName
+			}
+
+			tabView.setTabName(documentId, isDirty ? dirtyPrefix + tabName : tabName)
 		}
 		
 		function onDocumentOpened(documentId){
-			console.log("onDocumentOpened", documentId)
-			Events.sendEvent("StopLoading")
+			workspaceView.stopLocalLoading()
 		}
 		
 		function onDocumentOpeningStarted(documentId){
-			Events.sendEvent("StartLoading")
+			workspaceView.startLocalLoading()
 		}
 		
 		function onDocumentOpeningFailed(documentId, message){
-			Events.sendEvent("StopLoading")
-			// workspaceView.openErrorDialog(message)
+			workspaceView.stopLocalLoading()
+			if (message !== undefined && message !== "")
+				workspaceView.openErrorDialog(message)
 		}
 		
 		function onTryCloseDirtyDocument(documentId, callback){
@@ -180,19 +230,22 @@ Item {
 	}
 
 	function openErrorDialog(message){
-		ModalDialogManager.showErrorDialog(message)
+		PopupManager.addErrorMessage(message, true)
 	}
 	
 	function setDocumentName(documentId, name){
 		tabView.setTabName(documentId, name)
 	}
 
-	function addFixedView(viewComp, name, id, forceFocus, pinned){
+	function addFixedView(viewComp, name, id, forceFocus, pinned, icon){
 		if (!forceFocus){
 			forceFocus = false
 		}
 		if (pinned === undefined){
 			pinned = true
+		}
+		if (icon === undefined || icon === null){
+			icon = ""
 		}
 
 		if (!id || id === ""){
@@ -205,7 +258,7 @@ Item {
 			return
 		}
 
-		tabView.addTab(id, name, viewComp, "", "", true, pinned)
+		tabView.addTab(id, name, viewComp, icon, "", true, pinned)
 
 		if (forceFocus){
 			tabView.currentIndex = tabView.tabModel.count - 1
@@ -214,7 +267,7 @@ Item {
 
 	Rectangle {
 		anchors.fill: parent
-		color: Style.backgroundColor2
+		color: workspaceView.contentColor
 	}
 
 	Component {
@@ -263,6 +316,8 @@ Item {
 		id: tabView
 		anchors.fill: parent
 		closable: true
+		contentColor: workspaceView.contentColor
+		tabPanelColor: workspaceView.tabPanelColor
 
 		onTabLoaded: {
 			workspaceView.documentManager.setupDocumentView(tabId, tabItem)
@@ -277,6 +332,10 @@ Item {
 		}
 
 		function onCloseTab(index){
+			// Pinned / Fixed tabs (e.g. collection list) must not be closable.
+			if (index >= 0 && index < tabModel.count && tabModel.get(index).pinned){
+				return
+			}
 			let tabId = getTabIdByIndex(index)
 			let documentData = workspaceView.documentManager.getDocumentDataById(tabId)
 			if (documentData){
@@ -286,5 +345,15 @@ Item {
 				removeTab(tabId)
 			}
 		}
+	}
+
+	// Local busy overlay — scoped to this workspace only (not Configurator / whole app).
+	Loading {
+		id: localLoading
+		anchors.fill: parent
+		z: 100
+		visible: false
+		indicatorSize: Style.iconSizeL
+		background.color: Style.baseColor
 	}
 }

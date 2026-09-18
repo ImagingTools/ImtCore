@@ -1,5 +1,6 @@
 module.exports = {
     GroupProperty: require("./GroupProperty"),
+    Axis: require("./Axis"),
     AnchorLine: require("./AnchorLine"),
     Anchors: require("./Anchors"),
     Border: require("./Border"),

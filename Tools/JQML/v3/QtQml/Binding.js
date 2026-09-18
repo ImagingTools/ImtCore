@@ -32,6 +32,7 @@ class Binding extends QtObject {
         let obj = super.create(parent, properties)
 
         obj.__getValue = ()=>{return obj.value}
+        obj.__getValue.isSubscription = true
 
         return obj
     }

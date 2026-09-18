@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QMutex>
+
 // ImtCore includes
 #include <imtservergql/CGqlPublisherCompBase.h>
 
@@ -35,6 +38,8 @@ protected:
 	I_MULTIREF(imtgql::IGqlSubscriberController, m_subscriberControllerListCompPtr);
 
 	typedef QMap<QByteArray, imtgql::IGqlSubscriberController*> PublisherMap;
+	// Shared across WebSocket threads (CWebSocketThread per connection) — must be locked.
+	mutable QMutex m_publisherMapMutex;
 	PublisherMap m_publisherMap;
 };
 

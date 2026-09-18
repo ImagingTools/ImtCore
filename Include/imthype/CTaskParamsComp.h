@@ -58,16 +58,9 @@ private:
 		virtual QByteArray GetId() const override;
 	};
 
-	class TaskInputSubIdParam : public TaskIdParam
-	{
-	public:
-		// reimplemented (iprm::IIdParam)
-		virtual QByteArray GetId() const override;
-	};
 
 	imod::TModelWrap<TaskIdParam> m_taskIdParam;
 	imod::TModelWrap<TaskInputIdParam> m_taskInputIdParam;
-	imod::TModelWrap<TaskInputSubIdParam> m_taskInputSubIdParam;
 private:
 	I_REF(ITaskCollectionContext, m_collectionContextCompPtr);
 };

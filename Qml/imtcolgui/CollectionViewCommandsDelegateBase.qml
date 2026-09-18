@@ -2,7 +2,6 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
-import imtdocgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0 as ImtControls
 import imtcontrols 1.0
@@ -46,6 +45,7 @@ ViewCommandsDelegateBase {
 	signal removed(string id);
 	signal selectionChanged(var selectedIds, var selectedIndexes)
 	signal beginImport(string fileName, string filePath, int fileSize);
+	signal exportFinished()
 
 	Component.onDestruction: {
 		if (collectionViewCommandsDelegate.collectionView){
@@ -62,8 +62,6 @@ ViewCommandsDelegateBase {
 			if (collectionView.dataController){
 				controllerConnections.target = collectionView.dataController;
 			}
-
-			updateBaseCommandsAccent()
 		}
 	}
 
@@ -94,7 +92,6 @@ ViewCommandsDelegateBase {
 		target: null
 
 		function onSelectionChanged(selectedIds, selectedIndexes){
-			collectionViewCommandsDelegate.updateBaseCommandsAccent();
 			collectionViewCommandsDelegate.updateItemSelection(selectedIndexes);
 
 			collectionViewCommandsDelegate.selectionChanged(selectedIds, selectedIndexes);
@@ -120,7 +117,7 @@ ViewCommandsDelegateBase {
 		target: null
 
 		function onImported(objectId){
-			ModalDialogManager.showInfoDialog(qsTr("The object has been successfully imported"));
+			PopupManager.addSuccessMessage(qsTr("The object has been successfully imported"), true);
 		}
 
 		function onExported(name, data){
@@ -130,6 +127,8 @@ ViewCommandsDelegateBase {
 
 			let encodedStr = Qt.atob(data);
 			exportFileIO.write(encodedStr);
+
+			collectionViewCommandsDelegate.exportFinished()
 		}
 	}
 
@@ -155,32 +154,6 @@ ViewCommandsDelegateBase {
 	function getContextMenuModel(){
 		return collectionViewCommandsDelegate.contextMenuModel;
 	}
-
-	function updateBaseCommandsAccent(){
-		let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
-		let isEnabled = indexes.length > 0;
-
-		let commandsView = collectionViewCommandsDelegate.collectionView.commandsView;
-		if (commandsView){
-			if (commandsView.setPositiveAccentCommandIds !== undefined){
-				commandsView.setPositiveAccentCommandIds(["New"]);
-			}
-
-			if (isEnabled){
-				if (commandsView.setNegativeAccentCommandIds !== undefined){
-					commandsView.setNegativeAccentCommandIds(["Remove"]);
-				}
-
-				if (commandsView.setPositiveAccentCommandIds !== undefined){
-					commandsView.setPositiveAccentCommandIds(["Edit"]);
-				}
-			}
-		}
-
-		collectionViewCommandsDelegate.updateCustomCommandsAccent();
-	}
-
-	function updateCustomCommandsAccent(){}
 
 	function updateItemSelection(selectedItems){
 		if (collectionViewCommandsDelegate.collectionView && collectionViewCommandsDelegate.collectionView.commandsController){

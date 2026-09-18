@@ -19,14 +19,13 @@ DocumentCollectionViewDelegate {
 	importFileDialog.nameFilters: ["Xml files (*.xml)"];
 	importDialogMimeTypes: ["application/xml"]
 	exportDialogMimeTypes: ["application/xml", "text/x-c"]
-	exportFileDialog.title: qsTr("Select product");
-	
+	exportFileDialog.title: qsTr("Export the product to a file");
+	importFileDialog.title: qsTr("Choose a product file to import");
+
 	importObjectTypeId: "Product";
 	canSetDescription: true
 	canRename: true
 
-	property bool force: false;
-	
 	function updateItemSelection(selectedItems){
 		if (container.collectionView && container.collectionView.commandsController){
 			let elementsModel = container.collectionView.table.elements;
@@ -61,32 +60,34 @@ DocumentCollectionViewDelegate {
 		ErrorDialog {}
 	}
 	
+	// Shown before the file dialog, because it warns about what importing does at
+	// all rather than about one particular file. Overwriting is not a choice -
+	// CProductCollectionControllerComp::OnImportObject always writes the features
+	// carried in the file into the shared feature collection, creating the ones
+	// that are new and replacing the ones that already exist - so the dialog says
+	// so plainly instead of offering an option that does not exist.
+	//
+	// One string literal, not a concatenation: lupdate cannot extract qsTr() when
+	// its argument is built with "+".
 	Component {
-		id: messageDialogComp;
-		
+		id: importWarningComp;
+
 		MessageDialog {
-			title: qsTr("Feature overwriting");
-			message: qsTr("Overwrite features ?");
-			
+			title: qsTr("Import a product");
+			message: qsTr("Importing overwrites features.\n\nThe product from the file is added to the collection, and every feature it carries is written into the shared feature collection: features that are not there yet are created, and features that already exist are replaced by the version from the file. Other products and licenses that use those features get the replacement as well.\n\nChoose a file and import?");
+
 			onFinished: {
-				container.force = false;
-				if (buttonId == Enums.yes){
-					container.force = true;
+				if (buttonId !== Enums.yes){
+					return;
 				}
-				
-				container.importFileDialog.open()
+
+				container.importFileDialog.open();
 			}
 		}
 	}
 
 	function onImport(){
-		ModalDialogManager.openDialog(messageDialogComp, {});
-	}
-
-	function onImportDialogResult(name, fileData, mimeType){
-		if (collectionView && collectionView.dataController){
-			collectionView.dataController.importObject(importObjectTypeId, name, "", fileData, mimeType, {"force":container.force});
-		}
+		ModalDialogManager.openDialog(importWarningComp, {});
 	}
 	
 	function onRename(){

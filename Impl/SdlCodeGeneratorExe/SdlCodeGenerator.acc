@@ -50,10 +50,10 @@
                                     <Data IsEnabled="true" Value="Client (CommandLine)"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="CompanyName" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Imaging tools"/>
+                                    <Data IsEnabled="true" Value="ImagingTools"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="LegalCopyright" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="? Imaging tools"/>
+                                    <Data IsEnabled="true" Value="? ImagingTools"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="MainVersionId" Type="Integer" ExportId="">
                                     <Data IsEnabled="true" Value="2000"/>

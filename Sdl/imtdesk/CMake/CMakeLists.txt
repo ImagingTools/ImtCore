@@ -1,5 +1,6 @@
 project(imtdesksdl LANGUAGES CXX)
 
+
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCoreSdlCustomConfig.cmake)
@@ -16,3 +17,4 @@ ImtCoreCustomConfigureSdlCppQml(CXX QML
 ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/TicketCollectionDocumentService.sdl"
 			VERSION		"1.0")
+

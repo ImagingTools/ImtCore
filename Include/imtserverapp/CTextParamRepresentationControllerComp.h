@@ -3,7 +3,8 @@
 
 
 // ImtCore includes
-#include <imtserverapp/TJsonRepresentationControllerCompWrap.h>
+#include <ilog/TLoggerCompWrap.h>
+#include <imtserverapp/TJsonRepresentationControllerWrap.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings_fwd.h>
 
 
@@ -11,16 +12,20 @@ namespace imtserverapp
 {
 
 
-class CTextParamRepresentationControllerComp: public TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CTextParam>
+class CTextParamRepresentationControllerComp:
+			public ilog::CLoggerComponentBase,
+			public TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CTextParam>
 {
 public:
-	typedef TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CTextParam> BaseClass;
+	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTextParamRepresentationControllerComp)
+		I_REGISTER_INTERFACE(IJsonRepresentationController);
 	I_END_COMPONENT;
 
+
 protected:
-	// reimplemented (TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CTextParam>)
+	// reimplemented (TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CTextParam>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetSdlRepresentationFromDataModel(
@@ -30,6 +35,7 @@ protected:
 	virtual bool GetDataModelFromSdlRepresentation(
 				istd::IChangeable& dataModel,
 				const sdl::V1_0::imtbase::CTextParam& sdlRepresentation) const override;
+
 };
 
 

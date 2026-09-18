@@ -49,7 +49,7 @@ imtauth::IUserInfoUniquePtr CClientRequestUserInfoProviderComp::GetUser(const QB
 		istd::IChangeableUniquePtr clonedPtr = gqlContextPtr->CloneMe();
 		imtgql::IGqlContextUniquePtr castedPtr;
 		castedPtr.MoveCastedPtr(std::move(clonedPtr));
-		gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(castedPtr));
+		gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(std::move(castedPtr)));
 	}
 
 	if (!userssdl::CUserItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){

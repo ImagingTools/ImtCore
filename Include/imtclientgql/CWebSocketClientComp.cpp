@@ -17,6 +17,7 @@
 #include <iprm/TParamsPtr.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtgql/CGqlResponse.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtrest/CWebSocketRequest.h>
@@ -39,9 +40,9 @@ CWebSocketClientComp::CWebSocketClientComp()
 
 // reimplemented (imtclientgql::IGqlClient)
 
-IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* /*urlParamPtr*/) const
+QByteArray CWebSocketClientComp::BuildRequestEnvelope(const GqlRequestPtr& requestPtr, QString& key) const
 {
-	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
+	key = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
 	QJsonObject dataObject;
 	dataObject["type"] = "query";
@@ -56,6 +57,11 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr reque
 		for (const QByteArray& headerId: headers.keys()){
 			headersObject[headerId] = QString(headers.value(headerId));
 		}
+
+		const QByteArray languageId = contextPtr->GetLanguageId();
+		if (!languageId.isEmpty()){
+			headersObject[imtbase::s_languageIdHeaderId] = QString(languageId);
+		}
 	}
 	dataObject["headers"] = headersObject;
 
@@ -67,14 +73,26 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr reque
 		dataObject["clientid"] = clientId;
 	}
 
-	QByteArray data = QJsonDocument(dataObject).toJson(QJsonDocument::Compact);
+	return QJsonDocument(dataObject).toJson(QJsonDocument::Compact);
+}
+
+
+IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* /*urlParamPtr*/) const
+{
+	QString key;
+	QByteArray data = BuildRequestEnvelope(requestPtr, key);
 
 	m_webSocket.sendTextMessage(data);
 	NetworkOperation networkOperation(100, this);
 
 	GqlResponsePtr retVal;
 
-	for (int i = 0; i < 100; i++){
+	// 300 * 100ms = 30s. The server may legitimately take a few seconds to answer a
+	// request that arrives while it is mid-processing another exchange on the same
+	// connection (e.g. a deferred server->client sync push queued right after this
+	// client's own request) — 10s used to be tight enough to time out under that kind
+	// of transient, non-error latency.
+	for (int i = 0; i < 300; i++){
 		networkOperation.timer.start();
 		networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 		QCoreApplication::processEvents();
@@ -94,6 +112,20 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr reque
 }
 
 
+bool CWebSocketClientComp::SendRequestNoWait(GqlRequestPtr requestPtr, imtbase::IUrlParam* /*urlParamPtr*/) const
+{
+	QString key;
+	const QByteArray data = BuildRequestEnvelope(requestPtr, key);
+
+	// No NetworkOperation / wait loop: the caller does not need a response, only that the
+	// message was handed to the socket - avoids blocking this component's thread for up to
+	// SendRequest()'s 30s budget for requests whose result is never actually consumed.
+	m_webSocket.sendTextMessage(data);
+
+	return true;
+}
+
+
 // reimplemented (imtrest::ITransport)
 
 bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) const
@@ -103,8 +135,8 @@ bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) con
 	if (httpResponsePtr != nullptr && !data.isEmpty()){
 		QByteArray body = data;
 		imtrest::IResponse::Headers headers = response->GetHeaders();
-		data = QString(R"({"type": "query_data","id": "%1","payload": %2})")
-				   .arg(qPrintable(headers.value("id"))).arg(qPrintable(body)).toUtf8();
+		data = QStringLiteral(R"({"type": "query_data","id": "%1","payload": %2})")
+				   .arg(headers.value("id"), body).toUtf8();
 	}
 
 	EmitSendTextMessage(data);
@@ -307,7 +339,7 @@ void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError error)
 void CWebSocketClientComp::OnSslErrors(const QList<QSslError>& sslErrors)
 {
 	for (const QSslError& error : sslErrors){
-		SendErrorMessage(0, QString("SSL client error: %1").arg(error.errorString()));
+		SendErrorMessage(0, QStringLiteral("SSL client error: %1").arg(error.errorString()));
 	}
 
 	m_webSocket.ignoreSslErrors(sslErrors);
@@ -341,8 +373,23 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 			){
 	}
 	else if (methodType == imtrest::CWebSocketRequest::MT_QUERY_DATA){
+		// Envelope is {"type":"query_data","id":"...","payload":{...GQL JSON...}}.
+		// Callers of SendRequest expect the GraphQL body only.
+		QByteArray gqlBody = webSocketRequest->GetBody();
+		{
+			const QJsonDocument envelope = QJsonDocument::fromJson(gqlBody);
+			if (envelope.isObject()){
+				const QJsonValue payloadVal = envelope.object().value(QStringLiteral("payload"));
+				if (payloadVal.isObject()){
+					gqlBody = QJsonDocument(payloadVal.toObject()).toJson(QJsonDocument::Compact);
+				}
+				else if (payloadVal.isString()){
+					gqlBody = payloadVal.toString().toUtf8();
+				}
+			}
+		}
 		QWriteLocker writeLock(&m_queryDataMapLock);
-		m_queryDataMap.insert(webSocketRequest->GetRequestId(), webSocketRequest->GetBody());
+		m_queryDataMap.insert(webSocketRequest->GetRequestId(), gqlBody);
 		writeLock.unlock();
 
 		emit EmitQueryDataReceived(1);
@@ -382,7 +429,19 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 
 	if (responsePtr.IsValid()){
 		QByteArray data = responsePtr->GetData();
-
+		// Server CSubscriptionManagerComp sends type=query with a correlation id and waits
+		// for type=query_data. Reply with the same envelope (same as SendResponse path).
+		if (methodType == imtrest::CWebSocketRequest::MT_QUERY){
+			const QByteArray queryRequestId = webSocketRequest->GetRequestId();
+			if (!queryRequestId.isEmpty()){
+				const QByteArray payload = data.isEmpty() ? QByteArrayLiteral("{}") : data;
+				data = QByteArrayLiteral("{\"type\":\"query_data\",\"id\":\"")
+							+ queryRequestId
+							+ QByteArrayLiteral("\",\"payload\":")
+							+ payload
+							+ QByteArrayLiteral("}");
+			}
+		}
 		webSocketPtr->sendTextMessage(data);
 	}
 }
@@ -466,7 +525,7 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 		}
 	}
 
-	SendInfoMessage(0, QString("Try connect to the WebSocket-server: Host: %1; Port: %2, Protocol: %3").arg(url.host()).arg(url.port()).arg(url.scheme()));
+	SendInfoMessage(0, QStringLiteral("Try connect to the WebSocket-server: Host: %1; Port: %2, Protocol: %3").arg(url.host(), QString::number(url.port()), url.scheme()));
 
 #if QT_VERSION >= QT_VERSION_CHECK(6,4,0)
 	QWebSocketHandshakeOptions handshakeOptions;
@@ -530,7 +589,7 @@ CWebSocketClientComp::ConnectionStatusProvider::ConnectionStatusProvider()
 void CWebSocketClientComp::ConnectionStatusProvider::SetConnectionStatus(ConnectionStatus status)
 {
 	if (m_connectionStatus != status){
-		istd::IChangeable::ChangeSet changeSet(status);
+		istd::IChangeable::ChangeSet changeSet(status == CS_CONNECTED ? CF_CONNECTED : CF_DISCONNECTED);
 		istd::CChangeNotifier notifier(this, &changeSet);
 
 		m_connectionStatus = status;
@@ -547,5 +606,3 @@ imtcom::IConnectionStatusProvider::ConnectionStatus CWebSocketClientComp::Connec
 
 
 } // namespace imtclientgql
-
-

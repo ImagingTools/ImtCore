@@ -23,7 +23,7 @@ QJsonObject CGetStyleDataControllerComp::CreateInternalResponse(const imtgql::CG
 {
 	const imtgql::CGqlParamObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
-		errorMessage = QString("Unable to get style. GraphQL input params is invalid.");
+		errorMessage = QStringLiteral("Unable to get style. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "CGetStyleDataControllerComp");
 
 		return QJsonObject();
@@ -43,7 +43,7 @@ QJsonObject CGetStyleDataControllerComp::CreateInternalResponse(const imtgql::CG
 	}
 
 	if(theme.isEmpty()){
-		errorMessage = QString("Unable to get style. Theme is empty.");
+		errorMessage = QStringLiteral("Unable to get style. Theme is empty.");
 		SendErrorMessage(0, errorMessage, "CGetStyleDataControllerComp");
 
 		return QJsonObject();
@@ -57,7 +57,7 @@ QJsonObject CGetStyleDataControllerComp::CreateInternalResponse(const imtgql::CG
 	QString pathToTheme = prefix + theme.toLower() + ".theme";
 	QFile resource(":/Style/" + pathToTheme);
 	if (!resource.open(QIODevice::ReadOnly)){
-		errorMessage = QString("Unable to open the style file. Error: '%1'.").arg(resource.errorString());
+		errorMessage = QStringLiteral("Unable to open the style file. Error: '%1'.").arg(resource.errorString());
 		SendErrorMessage(0, errorMessage, "CGetStyleDataControllerComp");
 
 		return QJsonObject();
@@ -70,7 +70,7 @@ QJsonObject CGetStyleDataControllerComp::CreateInternalResponse(const imtgql::CG
 	QJsonParseError parseError;
 	QJsonDocument sourceDoc = QJsonDocument::fromJson(resources, &parseError);
 	if (parseError.error != QJsonParseError::NoError){
-		SendWarningMessage(0, QString("Unable to create style model from file: '%1'. Error: %2").arg(pathToTheme, parseError.errorString()), "CGetStyleDataControllerComp");
+		SendWarningMessage(0, QStringLiteral("Unable to create style model from file: '%1'. Error: %2").arg(pathToTheme, parseError.errorString()), "CGetStyleDataControllerComp");
 	}
 	else{
 		sourceObj = sourceDoc.object();

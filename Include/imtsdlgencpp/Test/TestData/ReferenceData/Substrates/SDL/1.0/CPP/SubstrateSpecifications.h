@@ -371,6 +371,7 @@ class CInputIdObjectList;
 class CInputIdObject: public ::imtbase::CItemModelBase, public CInputId
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_id READ GetId WRITE SetId NOTIFY idChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
@@ -379,6 +380,7 @@ public:
 	CInputIdObject(QObject* parent = nullptr);
 
 	QVariant GetId();
+	QString Get__Typename() {return QStringLiteral("InputId");}
 	void SetId(const QVariant& v);
 	Q_INVOKABLE bool hasId();
 	// CItemModelBase implemented
@@ -434,6 +436,7 @@ class CCollectionViewParamsTestObjectList;
 class CCollectionViewParamsTestObject: public ::imtbase::CItemModelBase, public CCollectionViewParamsTest
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_count READ GetCount WRITE SetCount NOTIFY countChanged)
 	Q_PROPERTY(QVariant m_offset READ GetOffset WRITE SetOffset NOTIFY offsetChanged)
 
@@ -443,6 +446,7 @@ public:
 	CCollectionViewParamsTestObject(QObject* parent = nullptr);
 
 	QVariant GetCount();
+	QString Get__Typename() {return QStringLiteral("CollectionViewParamsTest");}
 	void SetCount(const QVariant& v);
 	Q_INVOKABLE bool hasCount();
 	QVariant GetOffset();
@@ -502,6 +506,7 @@ class CSubstrateSpecificationDocumentTypeIdsObjectList;
 class CSubstrateSpecificationDocumentTypeIdsObject: public ::imtbase::CItemModelBase, public CSubstrateSpecificationDocumentTypeIds
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_paperID READ GetPaperID WRITE SetPaperID NOTIFY paperIDChanged)
 	Q_PROPERTY(QVariant m_cardboardID READ GetCardboardID WRITE SetCardboardID NOTIFY cardboardIDChanged)
 	Q_PROPERTY(QVariant m_filmID READ GetFilmID WRITE SetFilmID NOTIFY filmIDChanged)
@@ -512,6 +517,7 @@ public:
 	CSubstrateSpecificationDocumentTypeIdsObject(QObject* parent = nullptr);
 
 	QVariant GetPaperID();
+	QString Get__Typename() {return QStringLiteral("SubstrateSpecificationDocumentTypeIds");}
 	void SetPaperID(const QVariant& v);
 	Q_INVOKABLE bool hasPaperID();
 	QVariant GetCardboardID();
@@ -575,6 +581,7 @@ class CSubstrateSpecificationListInputObjectList;
 class CSubstrateSpecificationListInputObject: public ::imtbase::CItemModelBase, public CSubstrateSpecificationListInput
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_viewParams READ GetViewParams WRITE SetViewParams NOTIFY viewParamsChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
@@ -583,6 +590,7 @@ public:
 	CSubstrateSpecificationListInputObject(QObject* parent = nullptr);
 
 	QVariant GetViewParams();
+	QString Get__Typename() {return QStringLiteral("SubstrateSpecificationListInput");}
 	void SetViewParams(const QVariant& v);
 	Q_INVOKABLE bool hasViewParams();
 	Q_INVOKABLE void emplaceViewParams();
@@ -641,6 +649,7 @@ class CSubstrateSpecificationListItemObjectList;
 class CSubstrateSpecificationListItemObject: public ::imtbase::CItemModelBase, public CSubstrateSpecificationListItem
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_id READ GetId WRITE SetId NOTIFY idChanged)
 	Q_PROPERTY(QVariant m_typeId READ GetTypeId WRITE SetTypeId NOTIFY typeIdChanged)
 	Q_PROPERTY(QVariant m_name READ GetName WRITE SetName NOTIFY nameChanged)
@@ -656,6 +665,7 @@ public:
 	CSubstrateSpecificationListItemObject(QObject* parent = nullptr);
 
 	QVariant GetId();
+	QString Get__Typename() {return QStringLiteral("SubstrateSpecificationListItem");}
 	void SetId(const QVariant& v);
 	Q_INVOKABLE bool hasId();
 	QVariant GetTypeId();
@@ -739,6 +749,7 @@ class CSubstrateSpecificationListResponseObjectList;
 class CSubstrateSpecificationListResponseObject: public ::imtbase::CItemModelBase, public CSubstrateSpecificationListResponse
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_items READ GetItems WRITE SetItems NOTIFY itemsChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
@@ -747,6 +758,7 @@ public:
 	CSubstrateSpecificationListResponseObject(QObject* parent = nullptr);
 
 	QVariant GetItems();
+	QString Get__Typename() {return QStringLiteral("SubstrateSpecificationListResponse");}
 	void SetItems(const QVariant& v);
 	Q_INVOKABLE bool hasItems();
 	Q_INVOKABLE void emplaceItems();
@@ -806,6 +818,7 @@ class CCardboardSubstrateSpecificationObjectList;
 class CCardboardSubstrateSpecificationObject: public ::imtbase::CItemModelBase, public CCardboardSubstrateSpecification
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_color READ GetColor WRITE SetColor NOTIFY colorChanged)
 	Q_PROPERTY(QVariant m_grammage READ GetGrammage WRITE SetGrammage NOTIFY grammageChanged)
 
@@ -815,6 +828,7 @@ public:
 	CCardboardSubstrateSpecificationObject(QObject* parent = nullptr);
 
 	QVariant GetColor();
+	QString Get__Typename() {return QStringLiteral("CardboardSubstrateSpecification");}
 	void SetColor(const QVariant& v);
 	Q_INVOKABLE bool hasColor();
 	QVariant GetGrammage();
@@ -874,6 +888,7 @@ class CPaperSubstrateSpecificationObjectList;
 class CPaperSubstrateSpecificationObject: public ::imtbase::CItemModelBase, public CPaperSubstrateSpecification
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_grammage READ GetGrammage WRITE SetGrammage NOTIFY grammageChanged)
 	Q_PROPERTY(QVariant m_color READ GetColor WRITE SetColor NOTIFY colorChanged)
 	Q_PROPERTY(QVariant m_coatType READ GetCoatType WRITE SetCoatType NOTIFY coatTypeChanged)
@@ -884,6 +899,7 @@ public:
 	CPaperSubstrateSpecificationObject(QObject* parent = nullptr);
 
 	QVariant GetGrammage();
+	QString Get__Typename() {return QStringLiteral("PaperSubstrateSpecification");}
 	void SetGrammage(const QVariant& v);
 	Q_INVOKABLE bool hasGrammage();
 	QVariant GetColor();
@@ -947,6 +963,7 @@ class CFilmSubstrateSpecificationObjectList;
 class CFilmSubstrateSpecificationObject: public ::imtbase::CItemModelBase, public CFilmSubstrateSpecification
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_transparency READ GetTransparency WRITE SetTransparency NOTIFY transparencyChanged)
 	Q_PROPERTY(QVariant m_color READ GetColor WRITE SetColor NOTIFY colorChanged)
 	Q_PROPERTY(QVariant m_material READ GetMaterial WRITE SetMaterial NOTIFY materialChanged)
@@ -957,6 +974,7 @@ public:
 	CFilmSubstrateSpecificationObject(QObject* parent = nullptr);
 
 	QVariant GetTransparency();
+	QString Get__Typename() {return QStringLiteral("FilmSubstrateSpecification");}
 	void SetTransparency(const QVariant& v);
 	Q_INVOKABLE bool hasTransparency();
 	QVariant GetColor();
@@ -1020,6 +1038,7 @@ class CSubstrateSpecificationInputObjectList;
 class CSubstrateSpecificationInputObject: public ::imtbase::CItemModelBase, public CSubstrateSpecificationInput
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_id READ GetId WRITE SetId NOTIFY idChanged)
 	Q_PROPERTY(QVariant m_name READ GetName WRITE SetName NOTIFY nameChanged)
 	Q_PROPERTY(QVariant m_description READ GetDescription WRITE SetDescription NOTIFY descriptionChanged)
@@ -1032,6 +1051,7 @@ public:
 	CSubstrateSpecificationInputObject(QObject* parent = nullptr);
 
 	QVariant GetId();
+	QString Get__Typename() {return QStringLiteral("SubstrateSpecificationInput");}
 	void SetId(const QVariant& v);
 	Q_INVOKABLE bool hasId();
 	QVariant GetName();
@@ -1106,6 +1126,7 @@ class CSubstrateSpecificationDocumentMetaInfoObjectList;
 class CSubstrateSpecificationDocumentMetaInfoObject: public ::imtbase::CItemModelBase, public CSubstrateSpecificationDocumentMetaInfo
 {
 	Q_OBJECT
+	Q_PROPERTY(QString __typename READ Get__Typename CONSTANT)
 	Q_PROPERTY(QVariant m_materialId READ GetMaterialId WRITE SetMaterialId NOTIFY materialIdChanged)
 	Q_PROPERTY(QVariant m_lab READ GetLab WRITE SetLab NOTIFY labChanged)
 
@@ -1115,6 +1136,7 @@ public:
 	CSubstrateSpecificationDocumentMetaInfoObject(QObject* parent = nullptr);
 
 	QVariant GetMaterialId();
+	QString Get__Typename() {return QStringLiteral("SubstrateSpecificationDocumentMetaInfo");}
 	void SetMaterialId(const QVariant& v);
 	Q_INVOKABLE bool hasMaterialId();
 	QVariant GetLab();

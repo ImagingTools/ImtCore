@@ -131,14 +131,50 @@ class Alias extends Property {
             }
 
             if(!found){
-                let connectionObj = Signal.get(target, name + 'Changed').connect(()=>{
-                    if(!link.target[link.name+'__updating']){
-                        link.target[link.name+'__updating'] = true
-                        link.meta.type.set(link.target, link.name, link.func, link.meta)
-                        delete link.target[link.name+'__updating']
+                const sourceIsSameProperty = link.target.__self === target.__self && link.name === name
+                if (sourceIsSameProperty) {
+                    return name in target ? target[name] : ("value" in meta ? meta.value : meta.type.getDefaultValue())
+                }
+
+                const signalFunc = target.constructor.meta[name + "Changed"].type.get(target, name + "Changed")
+                const isCrossItem = link.target !== target
+                const connectFn = isCrossItem && signalFunc.connectBefore ? signalFunc.connectBefore : signalFunc.connect
+
+                let connectionObj = connectFn(() => {
+                    const updatingKey = link.name + "__updating"
+                    const pendingKey = link.name + "__pendingRecalc"
+                    const maxFlushPasses = 16
+
+                    if (link.target[updatingKey]) {
+                        link.target[pendingKey] = true
+                        return
+                    }
+
+                    link.target[updatingKey] = true
+                    let flushPass = 0
+                    try {
+                        while (true) {
+                            link.target[pendingKey] = false
+                            link.meta.type.set(link.target, link.name, link.func, link.meta)
+
+                            if (!link.target[pendingKey]) {
+                                break
+                            }
+
+                            flushPass++
+                            if (flushPass >= maxFlushPasses) {
+                                if (location.hash === "#jqdebugdetail") {
+                                    console.warn("Binding flush limit reached for " + link.name)
+                                }
+                                break
+                            }
+                        }
+                    } finally {
+                        delete link.target[updatingKey]
+                        delete link.target[pendingKey]
                     }
                 })
-    
+
                 link.target.__depends[link.name].push(connectionObj)
             }
             

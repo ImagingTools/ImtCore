@@ -11,13 +11,9 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtserverapp/TJsonRepresentationControllerCompWrap.h>
+#include <imtserverapp/IJsonRepresentationController.h>
 #include <imtclientgql/IGqlClient.h>
 #include <imtclientgql/IGqlObjectCollectionDelegate.h>
-#include <imtserverapp/CParamSetRepresentationController.h>
-#include <imtserverapp/CComplexCollectionFilterRepresentationController.h>
-#include <imtserverapp/CDocumentFilterRepresentationController.h>
-#include <imtserverapp/CDocumentIdFilterRepresentationController.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection_fwd.h>
 
 
@@ -37,6 +33,9 @@ public:
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", false, "");
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", false, "ObjectCollection");
+		I_ASSIGN(m_paramSetRepresentationControllerCompPtr, "ParamSetRepresentationController", "Representation controller used to convert parameter sets, e.g. selection filters", true, "ParamSetRepresentationController");
+		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "List of type-ID corresponding to the registered factories", false);
+		I_ASSIGN_MULTI_0(m_objectFactoriesCompPtr, "ObjectFactories", "Factory list for creating object instances by type-ID", false);
 	I_END_COMPONENT;
 
 	virtual imtgql::IGqlRequest* CreateGetObjectTypeIdRequest(const QByteArray& objectId) const override;
@@ -106,9 +105,6 @@ public:
 				const imtgql::IGqlResponse& response,
 				QList<imtbase::IMetaInfoCreator*> metaInfoCreatorList) const override;
 
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-
 private:
 	struct ResponseData
 	{
@@ -121,20 +117,18 @@ private:
 	bool SerializeObject(const istd::IPolymorphic* object, QByteArray& objectData) const;
 	bool DeSerializeObject(istd::IPolymorphic* object, const QByteArray& objectData) const;
 	bool GetParamsSetRepresentation(const iprm::IParamsSet& paramsSet, sdl::V1_0::imtbase::CParamsSet& representation) const;
+	istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const;
 
 	template<class Arguments,class SdlRequest>
 	istd::TUniqueInterfacePtr<imtgql::IGqlRequest> CreateGqlRequest(Arguments arguments) const;
 
 private:
-	imtserverapp::CParamSetRepresentationController m_paramSetRepresentationController;
-	imtserverapp::CDocumentFilterRepresentationController m_documentFilterRepresentationController;
-	imtserverapp::CComplexCollectionFilterRepresentationController m_complexCollectionFilterRepresentationController;
-	imtserverapp::CDocumentIdFilterRepresentationController m_documentIdFilterRepresentationController;
-
-private:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
+	I_REF(IJsonRepresentationController, m_paramSetRepresentationControllerCompPtr);
+	I_MULTIATTR(QByteArray, m_typeIdsAttrPtr);
+	I_MULTIFACT(istd::IChangeable, m_objectFactoriesCompPtr);
 };
 
 

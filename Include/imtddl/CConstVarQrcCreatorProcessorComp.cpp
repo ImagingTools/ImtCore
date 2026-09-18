@@ -25,7 +25,7 @@ bool CConstVarQrcCreatorProcessorComp::OpenFiles(const iprm::IParamsSet* paramsP
 	}
 
 	QString moduleName = GetModuleName(paramsPtr);
-	filePath += QString("/../%1.qrc").arg(moduleName);
+	filePath += QStringLiteral("/../%1.qrc").arg(moduleName);
 	if (OpenFile(filePath, m_outputFile, QFile::ReadWrite)){
 		m_outputFile.resize(0);
 		QTextStream textStream(&m_outputFile);
@@ -33,7 +33,7 @@ bool CConstVarQrcCreatorProcessorComp::OpenFiles(const iprm::IParamsSet* paramsP
 		textStream << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << "\n";
 		textStream << "<RCC>" << "\n";
 		textStream << "	<qresource prefix=\"/qml\">" << "\n";
-		textStream << QString("		<file alias=\"%1/qmldir\">%1/qmldir</file>").arg(moduleName) << "\n";
+		textStream << QStringLiteral("		<file alias=\"%1/qmldir\">%1/qmldir</file>").arg(moduleName) << "\n";
 
 
 		return true;
@@ -67,7 +67,7 @@ QString CConstVarQrcCreatorProcessorComp::GetModuleName(const iprm::IParamsSet* 
 	iprm::TParamsPtr<iprm::ITextParam> moduleNameParamPtr(paramsPtr, "ModuleQmlName");
 
 	if (!moduleNameParamPtr.IsValid()){
-		SendErrorMessage(__LINE__, QString("The params module name is invalid"));
+		SendErrorMessage(__LINE__, QStringLiteral("The params module name is invalid"));
 
 		return QString();
 	}
@@ -82,14 +82,14 @@ bool CConstVarQrcCreatorProcessorComp::CreateBody(const QString& moduleName, con
 
 	QString name = rootObject.value("name").toString();
 
-	QString newLineData = QString("		<file alias=\"%1/%2.qml\">%1/%2.qml</file>").arg(moduleName).arg(name);
+	QString newLineData = QStringLiteral("		<file alias=\"%1/%2.qml\">%1/%2.qml</file>").arg(moduleName).arg(name);
 
 	QString filePath = GetQmlDirPath(paramsPtr);
 	if (filePath.isEmpty()){
 		return false;
 	}
 
-	filePath += QString("/../%1.qrc").arg(moduleName);
+	filePath += QStringLiteral("/../%1.qrc").arg(moduleName);
 	QFile outputFile;
 	if (!OpenFile(filePath, outputFile, QFile::ReadWrite)){
 		return false;

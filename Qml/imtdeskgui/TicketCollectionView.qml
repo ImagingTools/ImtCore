@@ -16,6 +16,7 @@ import imtbaseComplexCollectionFilterSdl 1.0
 RemoteCollectionView {
 	id: container
 
+	property string context: ""
 	collectionId: "Tickets"
 	gqlGetListCommandId: ImtdeskImtDeskSdlCommandIds.s_ticketsList
 	documentCollectionFilter: null
@@ -48,16 +49,16 @@ RemoteCollectionView {
 			id: priorityDelegate
 
 			readonly property var _priorityColors: ({
-				"Low": "#3FB950",       // green
-				"Medium": "#D29922",    // amber
-				"High": "#DB6D28",      // orange
-				"Critical": "#F85149"   // red
+				"Low": Style.greenColor,
+				"Medium": Style.middleAccentColor,
+				"High": Style.errorTextColor,
+				"Critical": Style.negativeAccentColor
 			})
 
 			onReused: {
 				var val = priorityDelegate.getValue()
 				priorityLabel.text = val ? qsTr(String(val)) : ""
-				priorityCircle.color = _priorityColors[val] || "#8C95A6"
+				priorityCircle.color = _priorityColors[val] || Style.buttonInactiveTextColor
 			}
 
 			Row {
@@ -72,7 +73,7 @@ RemoteCollectionView {
 					width: 10
 					height: 10
 					radius: width / 2
-					color: "#8C95A6"
+					color: Style.buttonInactiveTextColor
 				}
 
 				Text {
@@ -90,14 +91,9 @@ RemoteCollectionView {
 		TableCellDelegateBase {
 			id: statusDelegate
 
-			readonly property var _statusIndex: ({
-				"Open": 0,
-				"Closed": 1
-			})
-
 			onReused: {
-				var val = statusDelegate.getValue()
-				statusBadge.value = _statusIndex[val] !== undefined ? _statusIndex[val] : 0
+				var val = String(statusDelegate.getValue())
+				statusBadge.value = val === String("Open") ? 0 : 1
 			}
 
 			TicketBadge {
@@ -241,6 +237,7 @@ RemoteCollectionView {
 
 					property DocumentId documentIdInput: DocumentId {}
 					property GqlSdlRequestSender getTicketRequest: GqlSdlRequestSender {
+						context: container.context
 						gqlCommandId: ImtdeskTicketCollectionDocumentServiceSdlCommandIds.s_getTicketRepresentation
 						sdlObjectComp: Component {
 							TicketData {
@@ -258,6 +255,7 @@ RemoteCollectionView {
 
 					property UpdateTicketInput updateTicketInput: UpdateTicketInput {}
 					property GqlSdlRequestSender updateTicketRequest: GqlSdlRequestSender {
+						context: container.context
 						gqlCommandId: ImtdeskTicketCollectionDocumentServiceSdlCommandIds.s_updateTicketFromRepresentation
 						requestType: 1
 						sdlObjectComp: Component {

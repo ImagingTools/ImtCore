@@ -136,7 +136,7 @@ void CProductInfoFileGeneratorComp::WriteFunction(QTextStream& textStream, imtli
 
 	WriteNewLine(textStream, 1);
 	WriteTab(textStream, 1);
-	textStream << QStringLiteral("productInfo.SetProductId(\"%1\");").arg(QString::fromUtf8(productId));
+	textStream << QStringLiteral("productInfo.SetProductId(\"%1\");").arg(productId);
 	WriteNewLine(textStream, 1);
 
 	if (!productName.isEmpty()){
@@ -152,7 +152,7 @@ void CProductInfoFileGeneratorComp::WriteFunction(QTextStream& textStream, imtli
 	}
 
 	WriteTab(textStream, 1);
-	textStream << QStringLiteral("productInfo.SetCategoryId(\"%1\");").arg(QString::fromUtf8(categoryId));
+	textStream << QStringLiteral("productInfo.SetCategoryId(\"%1\");").arg(categoryId);
 	WriteNewLine(textStream, 2);
 
 	imtbase::IObjectCollection* featureCollectionPtr = productInfo.GetFeatures();
@@ -249,7 +249,7 @@ void CProductInfoFileGeneratorComp::WriteFeatureInfo(
 		QByteArray dependencies = dependencyList.join(';');
 		if (!dependencies.isEmpty()){
 			WriteTab(textStream, 1);
-			textStream << QStringLiteral("%1->SetDependencies(%2);").arg(featureVarName, QString("QByteArray(\"%1\").split(';')").arg(QString::fromUtf8(dependencies)));
+			textStream << QStringLiteral("%1->SetDependencies(%2);").arg(featureVarName, QStringLiteral("QByteArray(\"%1\").split(';')").arg(dependencies));
 			WriteNewLine(textStream, 1);
 		}
 	}

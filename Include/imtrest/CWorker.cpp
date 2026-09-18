@@ -51,7 +51,7 @@ void CWorker::ProcessRequest(const IRequest* request, const QByteArray& subComma
 
 	m_workerThread->SetStatus(CWorkerThread::ST_CLOSE);
 
-	Q_EMIT FinishProcess(request, subCommandId);
+	m_workerThread->NotifyFinished(request, subCommandId);
 }
 
 

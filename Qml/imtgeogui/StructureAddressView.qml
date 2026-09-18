@@ -4,8 +4,6 @@ import Qt5Compat.GraphicalEffects
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
-import imtgui 1.0
-import imtcolgui 1.0
 import imtguigql 1.0
 // SDL imports
 import imtbaseImtCollectionSdl 1.0
@@ -14,6 +12,7 @@ import imtbaseComplexCollectionFilterSdl 1.0
 
 Item {
 	id: structureAddressesContainer;
+	property string context: ""
 	anchors.fill: parent;
 
 	property TreeItemModel addressModel: TreeItemModel{};
@@ -52,6 +51,7 @@ Item {
 	property Component addressTreeSdlObjectComp: null
 
 	property GqlRequestSender addAddressRequest: GqlRequestSender{
+		context: structureAddressesContainer.context
 		gqlCommandId: "AddressAdd";
 
 		function createQueryParams(query){
@@ -81,6 +81,7 @@ Item {
 	}
 
 	property GqlRequestSender updateAddressRequest: GqlRequestSender{
+		context: structureAddressesContainer.context
 		gqlCommandId: "AddressUpdate";
 
 		function createQueryParams(query){
@@ -99,6 +100,7 @@ Item {
 	}
 
 	property GqlSdlRequestSender removeAddressRequest: GqlSdlRequestSender{
+		context: structureAddressesContainer.context
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
 		requestType: 1
 	}
@@ -131,8 +133,8 @@ Item {
 
 		Dialog{
 			id: editAddressDialog
-			width: 1000;
-			height: 700;
+			width: Math.max(Style.sizeHintXXL, Math.min(ModalDialogManager.activeView.width - 100, 1000));
+			height: Math.max(Style.sizeHintXL, Math.min(ModalDialogManager.activeView.height - 100, 700));
 			radius:8;
 
 			canMove: false;

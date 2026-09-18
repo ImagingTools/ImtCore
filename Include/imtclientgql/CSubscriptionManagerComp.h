@@ -3,9 +3,15 @@
 
 
 // Qt includes
-#include <QtCore/QTimer>
+#include <QtCore/QFuture>
+#include <QtCore/QHash>
 #include <QtCore/QMutex>
-#include <QReadWriteLock>
+#include <QtCore/QPromise>
+#include <QtCore/QReadWriteLock>
+#include <QtCore/QTimer>
+
+// stdlib
+#include <memory>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -13,13 +19,14 @@
 #include <imod/CSingleModelObserverBase.h>
 
 // ImtCore includes
+#include <imtauth/IAccessTokenProvider.h>
 #include <imtcom/IConnectionStatusProvider.h>
 #include <imtrest/ITransport.h>
 #include <imtrest/IResponseDispatcher.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtgql/CGqlRequest.h>
-#include <imtclientgql/IGqlClient.h>
+#include <imtclientgql/IAsyncGqlClient.h>
 #include <imtclientgql/IGqlSubscriptionManager.h>
 
 
@@ -27,32 +34,52 @@ namespace imtclientgql
 {
 
 
+/**
+	Subscription manager and **asynchronous** outbound GQL client over WebSocket.
+
+	Implements \c IAsyncGqlClient only (no nested event loop).
+	For synchronous \c IGqlClient semantics, wire \c CGqlClientSyncAdapterComp
+	on top of this component (see WebSocketServerFramework).
+*/
 class CSubscriptionManagerComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
 			public imod::CSingleModelObserverBase,
 			virtual public IGqlSubscriptionManager,
 			virtual public imtrest::IRequestServlet,
-			virtual public IGqlClient
+			virtual public IAsyncGqlClient
 {
 	Q_OBJECT
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
+	typedef IAsyncGqlClient::GqlRequestPtr GqlRequestPtr;
+	typedef IAsyncGqlClient::GqlResponsePtr GqlResponsePtr;
+	typedef IAsyncGqlClient::GqlResult GqlResult;
+
+	CSubscriptionManagerComp();
+
 	I_BEGIN_COMPONENT(CSubscriptionManagerComp);
 		I_REGISTER_INTERFACE(IGqlSubscriptionManager);
-		I_REGISTER_INTERFACE(IGqlClient);
+		I_REGISTER_INTERFACE(IAsyncGqlClient);
 		I_REGISTER_INTERFACE(imtrest::IRequestServlet);
 		I_ASSIGN(m_subscriptionSenderCompPtr, "SubscriptionSender", "Subscription sender", false, "SubscriptionSender");
 		I_ASSIGN(m_requestManagerCompPtr, "RequestManager", "Response dispatcher for sending a request", false, "RequestManager");
 		I_ASSIGN(m_engineCompPtr, "ProtocolEngine", "Protocol engine for subscription", true, "ProtocolEngine");
 		I_ASSIGN(m_connectionStatusProviderCompPtr, "WebLoginStatus", "Web login status", false, "WebLoginStatus");
 		I_ASSIGN_TO(m_connectionStatusProviderModelCompPtr, m_connectionStatusProviderCompPtr, true);
+		I_ASSIGN(m_accessTokenProviderCompPtr, "AccessTokenProvider", "Provider of the current access token", false, "AccessTokenProvider");
+		I_ASSIGN_TO(m_accessTokenProviderModelCompPtr, m_accessTokenProviderCompPtr, false);
+		I_ASSIGN(m_requestTimeoutMsAttrPtr, "RequestTimeoutMs", "Async request timeout (ms)", false, 100000);
 	I_END_COMPONENT;
 
 	// reimplemented (imtclientgql::IGqlSubscriptionManager)
-	virtual QByteArray RegisterSubscription(const imtgql::IGqlRequest& subscriptionRequest, imtclientgql::IGqlSubscriptionClient * subscriptionClientPtr) override;
-	virtual bool UnregisterSubscription(const QByteArray& subscriptionId) override;
+	virtual QByteArray RegisterSubscription(
+			const imtgql::IGqlRequest& subscriptionRequest,
+			imtclientgql::IGqlSubscriptionClient& subscriptionClient) override;
+	virtual bool UnregisterSubscription(
+			const QByteArray& subscriptionId,
+			const imtclientgql::IGqlSubscriptionClient& subscriptionClient) override;
 
 	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
@@ -61,28 +88,70 @@ public:
 	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
 	virtual imtrest::ConstResponsePtr ProcessRequest(const imtrest::IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
-	// reimplemented (IGqlClient)
-	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
+	// reimplemented (IAsyncGqlClient)
+	virtual QFuture<GqlResult> SendRequest(
+				GqlRequestPtr requestPtr,
+				imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
 protected:
-	virtual void SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const;
+	virtual bool SubscriptionRegister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const;
+	virtual bool SubscriptionUnregister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const;
 	virtual bool SendRequestInternal(const imtgql::IGqlRequest& request, imtrest::ConstRequestPtr& requestPtr) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
+protected:
+	/**
+		Re-send the "start" message of every known subscription.
+		The server binds a subscription to the identity presented at registration
+		time, so a replaced access token has to be carried to it explicitly.
+		Every re-registration is preceded by a "stop" message with the same
+		subscription ID, because server side controllers append a new
+		registration instead of replacing the existing one.
+	*/
+	void ReregisterSubscriptions() const;
+
+	class AccessTokenObserver: public imod::CSingleModelObserverBase
+	{
+	public:
+		AccessTokenObserver(CSubscriptionManagerComp& parent);
+
+	protected:
+		// reimplemented (imod::CSingleModelObserverBase)
+		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+
+	private:
+		CSubscriptionManagerComp& m_parent;
+	};
+
 Q_SIGNALS:
 	void OnQueryDataReceived(int resultCode = 1) const;
 
 private:
+	void UpdateCustomerSubscriptionStatuses(const QByteArray& subscriptionId, const QString& message = QString()) const;
 	virtual imtrest::ConstResponsePtr CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const;
+
+	struct PendingAsync
+	{
+		std::shared_ptr<QPromise<GqlResult>> promisePtr;
+		GqlRequestPtr requestPtr;
+	};
+
+	void CompletePending(const QString& key, const QByteArray& body, bool isError) const;
+	void FailPending(const QString& key, ErrorCategory category, const QString& message) const;
 
 private:
 	I_REF(imtrest::ITransport, m_subscriptionSenderCompPtr);
 	I_REF(imtrest::IResponseDispatcher, m_requestManagerCompPtr);
 	I_REF(imtcom::IConnectionStatusProvider, m_connectionStatusProviderCompPtr);
 	I_REF(imod::IModel, m_connectionStatusProviderModelCompPtr);
+	I_REF(imtauth::IAccessTokenProvider, m_accessTokenProviderCompPtr);
+	I_REF(imod::IModel, m_accessTokenProviderModelCompPtr);
 	I_REF(imtrest::IProtocolEngine, m_engineCompPtr);
+	I_ATTR(int, m_requestTimeoutMsAttrPtr);
+
+	AccessTokenObserver m_accessTokenObserver;
 
 	class SubscriptionHelper
 	{
@@ -93,25 +162,13 @@ private:
 		QList<IGqlSubscriptionClient*> m_clients;
 	};
 
-	class NetworkOperation
-	{
-	public:
-		NetworkOperation() = delete;
-		NetworkOperation(int timeout, const CSubscriptionManagerComp* parent);
-		~NetworkOperation();
-
-		QEventLoop connectionLoop;
-		bool timerFlag;
-		QTimer timer;
-	};
-
 	mutable QMap <QByteArray, SubscriptionHelper> m_registeredClients;
-	mutable QMap<QString, QByteArray> m_queryDataMap;
 	mutable QMutex m_registeredClientsMutex;
-	mutable QReadWriteLock m_queryDataMapLock;
+
+	mutable QHash<QString, PendingAsync> m_pendingAsync;
+	mutable QMutex m_pendingAsyncMutex;
+	int m_requestTimeoutMs = 100000;
 };
 
 
 } // namespace imtclientgql
-
-

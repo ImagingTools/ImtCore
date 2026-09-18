@@ -12,6 +12,7 @@ import imtlicLicensesSdl 1.0
 RemoteCollectionView {
 	id: root;
 	
+	property string context: ""
 	visibleMetaInfo: false;
 	
 	collectionId: "Licenses";
@@ -52,6 +53,7 @@ RemoteCollectionView {
 		id: dataControllerComp;
 		
 		GqlRequestDocumentDataController {
+			context: root.context
 			id: requestDocumentDataController
 			
 			property LicenseDefinitionData licenseData: documentModel

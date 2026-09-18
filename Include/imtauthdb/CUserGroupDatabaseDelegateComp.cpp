@@ -133,7 +133,7 @@ QString CUserGroupDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm:
 	iprm::TParamsPtr<iprm::IIdParam> idParamPtr(&filterParams, "ParentListFilter");
 	if (idParamPtr.IsValid()){
 		QByteArray targetId = idParamPtr->GetId();
-		return QString(R"(
+		return QStringLiteral(R"(
 			NOT EXISTS (
 				WITH RECURSIVE descendants AS (
 					SELECT g."DocumentId"
@@ -153,7 +153,7 @@ QString CUserGroupDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm:
 				FROM descendants d
 				WHERE d."DocumentId" = root."DocumentId"
 			)
-					)").arg(QString::fromUtf8(targetId));
+					)").arg(targetId);
 					}
 
 	return QString();

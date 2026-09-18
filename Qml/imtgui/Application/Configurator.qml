@@ -88,20 +88,6 @@ Rectangle {
 			buttons.addButton({"id":Enums.apply, "name": qsTr("Apply"), "enabled": false});
 			buttons.addButton({"id":Enums.close, "name": qsTr("Close"), "enabled": true});
 		}
-		
-		onButtonClicked: {
-			if (buttonId == Enums.apply){
-				window.saveSettings(window.paramsSet.toJson());
-			}
-			else if (buttonId == Enums.close){
-				if (preferenceDialog.modelIsDirty){
-					ModalDialogManager.openDialog(saveDialog, {"message": qsTr("Save all changes ?")});
-				}
-				else{
-					Qt.quit();
-				}
-			}
-		}
 	}
 	
 	Component {

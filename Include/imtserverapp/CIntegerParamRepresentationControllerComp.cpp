@@ -4,7 +4,7 @@
 
 
 // ACF includes
-#include <iprm/ITextParam.h>
+#include <iprm/ISelectionParam.h>
 
 
 namespace imtserverapp
@@ -13,7 +13,7 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CIntegerParam>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CIntegerParam>)
 
 QByteArray CIntegerParamRepresentationControllerComp::GetTypeId() const
 {
@@ -23,9 +23,9 @@ QByteArray CIntegerParamRepresentationControllerComp::GetTypeId() const
 
 bool CIntegerParamRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
-	const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(&dataModel);
+	const iprm::ISelectionParam* selectionParamPtr = dynamic_cast<const iprm::ISelectionParam*>(&dataModel);
 
-	return textParamPtr != nullptr;
+	return selectionParamPtr != nullptr;
 }
 
 
@@ -34,18 +34,13 @@ bool CIntegerParamRepresentationControllerComp::GetSdlRepresentationFromDataMode
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
-	const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(&dataModel);
-	Q_ASSERT(textParamPtr != nullptr);
-	if (textParamPtr == nullptr){
+	const iprm::ISelectionParam* selectionParamPtr = dynamic_cast<const iprm::ISelectionParam*>(&dataModel);
+	Q_ASSERT(selectionParamPtr != nullptr);
+	if (selectionParamPtr == nullptr){
 		return false;
 	}
 
-	bool ok = false;
-	QString text = textParamPtr->GetText();
-	sdlRepresentation.value = text.toInt(&ok, 10);
-	if (!ok){
-		return false;
-	}
+	sdlRepresentation.value = selectionParamPtr->GetSelectedOptionIndex();
 
 	return true;
 }
@@ -55,9 +50,9 @@ bool CIntegerParamRepresentationControllerComp::GetDataModelFromSdlRepresentatio
 			istd::IChangeable& dataModel,
 			const sdl::V1_0::imtbase::CIntegerParam& sdlRepresentation) const
 {
-	iprm::ITextParam* textParamPtr = dynamic_cast<iprm::ITextParam*>(&dataModel);
-	Q_ASSERT(textParamPtr != nullptr);
-	if (textParamPtr == nullptr){
+	iprm::ISelectionParam* selectionParamPtr = dynamic_cast<iprm::ISelectionParam*>(&dataModel);
+	Q_ASSERT(selectionParamPtr != nullptr);
+	if (selectionParamPtr == nullptr){
 		return false;
 	}
 
@@ -65,8 +60,7 @@ bool CIntegerParamRepresentationControllerComp::GetDataModelFromSdlRepresentatio
 		return false;
 	}
 
-	QString text = QString::number(*sdlRepresentation.value);
-	textParamPtr->SetText(text);
+	selectionParamPtr->SetSelectedOptionIndex(*sdlRepresentation.value);
 
 	return true;
 }

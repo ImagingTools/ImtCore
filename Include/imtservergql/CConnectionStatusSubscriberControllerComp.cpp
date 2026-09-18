@@ -14,7 +14,7 @@ QString CConnectionStatusSubscriberControllerComp::CreateBodySubscription() cons
 		return QString();
 	}
 
-	QString data = QString("{\"status\": \"%1\"}");
+	QString data = QStringLiteral("{\"status\": \"%1\"}");
 
 	switch (m_connectionStatusProviderCompPtr->GetConnectionStatus())
 	{

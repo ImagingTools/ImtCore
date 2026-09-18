@@ -1,0 +1,53 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#pragma once
+
+
+// ACF includes
+#include <imtaccount/IAddress.h>
+
+
+namespace imtaccount
+{
+
+
+class CAddress: virtual public IAddress
+{
+public:
+	static QByteArray GetTypeId();
+
+	CAddress();
+
+	// reimplemented (IAddress)
+	virtual QString GetCountry() const override;
+	virtual void SetCountry(const QString & country) override;
+	virtual QString GetCity() const override;
+	virtual void SetCity(const QString & city) override;
+	virtual int GetPostalCode() const override;
+	virtual void SetPostalCode(int postalCode) override;
+	virtual QString GetStreet() const override;
+	virtual void SetStreet(const QString& street) override;
+
+	// reimplemented (iser::IObject)
+	virtual QByteArray GetFactoryId() const override;
+
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
+
+	// reimplemented (istd::IChangeable)
+	virtual int GetSupportedOperations() const override;
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool IsEqual(const IChangeable& object) const override;
+	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+
+private:
+	QString m_country;
+	QString m_city;
+	int m_postalCode;
+	QString m_street;
+};
+
+
+} // namespace imtaccount
+
+

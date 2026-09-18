@@ -141,7 +141,7 @@ void CTaskManagerGuiComp::ShowContextMenu(const QPoint& position, QListView& lis
 		}
 
 		// trigger table
-		if (*m_showTriggerTableAttrPtr && m_triggerTableGuiCompPtr.IsValid()) {
+		if (m_showTriggerTableCompPtr.IsValid() && m_showTriggerTableCompPtr->IsEnabled() && m_triggerTableGuiCompPtr.IsValid()){
 			itemMenu.addAction(m_showTriggerTableCommand.icon(), tr("Trigger Table..."), this, SLOT(OnShowTriggerTable()));
 		}
 
@@ -267,17 +267,19 @@ void CTaskManagerGuiComp::OnDuplicateTask()
 
 		for (const QByteArray& taskId : selectedIds){
 			const QByteArray taskTypeId = objectPtr->GetObjectTypeId(taskId);
+			
 			const QString sourceTaskName = objectPtr->GetElementInfo(
 				taskId,
 				imtbase::ICollectionInfo::EIT_NAME).toString();
+				
 			const bool sourceEnabled = objectPtr->GetElementInfo(
 				taskId,
 				imtbase::ICollectionInfo::EIT_ENABLED).toBool();
 
 			QByteArray newTaskId = objectPtr->InsertNewObject(
 				taskTypeId,
-				QString("Copy of %1").arg(sourceTaskName),
-				QString(),
+				sourceTaskName, 
+				tr("Copy of") + " " + sourceTaskName,
 				objectPtr->GetObjectPtr(taskId));
 
 			if (newTaskId.isEmpty()){
@@ -600,7 +602,8 @@ void CTaskManagerGuiComp::OnGuiCreated()
 	ShowInputManagerButton->setVisible(m_showInputsManagerCommand.isVisible());
 	connect(ShowInputManagerButton, &QToolButton::clicked, this, &CTaskManagerGuiComp::OnShowInputsManager, uniqueQueued);
 
-	m_showTriggerTableCommand.setVisible(*m_showTriggerTableAttrPtr && m_triggerTableGuiCompPtr.IsValid());
+	bool show = m_showTriggerTableCompPtr.IsValid() ? m_showTriggerTableCompPtr->IsEnabled() : false;
+	m_showTriggerTableCommand.setVisible(show && m_triggerTableGuiCompPtr.IsValid());
 	ShowTriggerTableButton->setVisible(m_showTriggerTableCommand.isVisible());
 	if (m_showTriggerTableCommand.isVisible()) {
 		connect(ShowTriggerTableButton, &QToolButton::clicked, this, &CTaskManagerGuiComp::OnShowTriggerTable, uniqueQueued);

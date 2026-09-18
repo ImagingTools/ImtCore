@@ -113,7 +113,7 @@ bool CDeviceIdBasedConfigurationManagerComp::Serialize(iser::IArchive& archive)
 			ConfigurationFactory* factoryPtr = FindConfigurationFactory(deviceTypeId);
 			if (factoryPtr != nullptr){
 				auto configurationUniquePtr = factoryPtr->CreateInstance();
-				configurationPtr = DeviceConfigurationPtr::CreateFromUnique(configurationUniquePtr);
+				configurationPtr = DeviceConfigurationPtr::CreateFromUnique(std::move(configurationUniquePtr));
 				Q_ASSERT(configurationPtr.IsValid());
 				if (!configurationPtr.IsValid()){
 					retVal = false;

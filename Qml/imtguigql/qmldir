@@ -17,13 +17,13 @@ ClientStyle 1.0 ClientStyle.qml
 CollectionRepresentation 1.0 CollectionRepresentation.qml
 RemoteCollectionView 1.0 RemoteCollectionView.qml
 MetaInfoProvider 1.0 MetaInfoProvider.qml
-WebSocketPortProvider 1.0 WebSocketPortProvider.qml
 ComboBoxGqlSimpleElementView 1.0 ComboBoxGqlSimpleElementView.qml
 GqlRequestDocumentDataController 1.0 GqlRequestDocumentDataController.qml
 TableViewParamController 1.0 TableViewParamController.qml
 GqlRequestSender 1.0 GqlRequestSender.qml
 WebSocketConnectionChecker 1.0 WebSocketConnectionChecker.qml
 GqlSdlRequestSender 1.0 GqlSdlRequestSender.qml
+GqlBasedPasswordPolicyProvider 1.0 GqlBasedPasswordPolicyProvider.qml
 GqlBasedPermissionsProvider 1.0 GqlBasedPermissionsProvider.qml
 XmlHttpRequestProxy 1.0 XmlHttpRequestProxy.qml
 GqlBasedCommandsController 1.0 GqlBasedCommandsController.qml
@@ -42,3 +42,4 @@ FilterableSelectGqlDataProvider 1.0 FilterableSelectGqlDataProvider.qml
 GqlBasedItemSelectElementView 1.0 GqlBasedItemSelectElementView.qml
 FileSystemBrowserDialog 1.0 FileSystemBrowserDialog.qml
 ServerPathPicker 1.0 ServerPathPicker.qml
+ServerPathPickerElementView 1.0 ServerPathPickerElementView.qml

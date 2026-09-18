@@ -43,6 +43,19 @@ QtObject {
         CloseOnEscape                = 0x10
     }
 
+    // -------------------------------------------------------------------- //
+    // imtguigql.FileSystemBrowserDialog / ServerPathPicker selectable-kind
+    // bit flags. Combine with | (e.g. pathKindFile | pathKindDir to allow
+    // picking either). Mirrors the popupCloseOn* bit-flag style above.
+    // -------------------------------------------------------------------- //
+    readonly property int pathKindFile: 0x01
+    readonly property int pathKindDir:  0x02
+
+    enum PathKind {
+        File = 0x01,
+        Dir  = 0x02
+    }
+
     enum ButtonType {
         Ok = 1024,
         Open = 8192,

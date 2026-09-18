@@ -5,44 +5,25 @@ schema {
 
 import {
 	"Geometry.sdl"
-	"../../imtcolor/1.0/RgbColorHex.sdl"
-}
-
-type Brush {
-	alpha: Integer # 0-255
-	color: RgbColorHex!
-}
-
-type Pen {
-	alpha: Integer # 0-255
-	color: RgbColorHex!
-	width: Int
-	brush: Brush
+	"PaintPrimitives.sdl"
 }
 
 type Painter {
-	stroke: Pen!
-	fill: Brush!
-}
-
-## Supported image formats for ImageShape
-enum ImageFormat {
-	PNG
-	JPEG
-	SVG
+	stroke: Pen
+	fill: Brush
 }
 
 ## Union of all shape types that can be drawn on a canvas.
 ## The client must implement a rendering procedure for every member of this union.
-union GraphicsShape = Point2dShape | TextLabelShape | ImageShape | Rectangle2dShape | Polygon2dShape | Polyline2dShape | Line2dShape | CircleShape | AnnulusShape | ShapeGroup
+union GraphicsShape = Point2dShape | TextLabelShape | ImageShape | Rectangle2dShape | Polygon2dShape | Polyline2dShape | Line2dShape | CircleShape | AnnulusShape | AnnulusSegmentShape | ShapeGroup
 
 type ShapeGroup{
-        origin: Point2d!
+	origin: Point2d!
 	shapes: [GraphicsShape]!
 }
 
 type GraphicsModel{
-        shapes: [GraphicsShape]
+	shapes: [GraphicsShape]!
 }
 
 type Point2dShape {
@@ -71,12 +52,17 @@ type Rectangle2dShape {
 }
 
 type CircleShape {
-	Circle: Circle!
+	circle: Circle!
 	painter: Painter
 }
 
 type AnnulusShape {
-        annulus: AnnulusSegment!
+	annulus: Annulus!
+	painter: Painter
+}
+
+type AnnulusSegmentShape {
+	annulusSegment: AnnulusSegment!
 	painter: Painter
 }
 

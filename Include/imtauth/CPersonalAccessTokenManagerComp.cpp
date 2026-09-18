@@ -80,7 +80,7 @@ IPersonalAccessTokenManager::TokenCreationResult CPersonalAccessTokenManagerComp
 	result.rawToken = rawToken;
 	result.success = true;
 
-	SendInfoMessage(0, QString("Created personal access token '%1' for user '%2'").arg(name).arg(QString::fromUtf8(userId)), "CPersonalAccessTokenManagerComp");
+	SendInfoMessage(0, QStringLiteral("Created personal access token '%1' for user '%2'").arg(name, userId), QStringLiteral("CPersonalAccessTokenManagerComp"));
 
 	return result;
 }
@@ -131,7 +131,7 @@ bool CPersonalAccessTokenManagerComp::ValidateToken(
 
 		// Check if token is valid
 		if (!tokenPtr->IsValid()){
-			SendWarningMessage(0, QString("Token '%1' is not valid (revoked or expired)").arg(QString::fromUtf8(currentTokenId)), "CPersonalAccessTokenManagerComp");
+			SendWarningMessage(0, QStringLiteral("Token '%1' is not valid (revoked or expired)").arg(currentTokenId), QStringLiteral("CPersonalAccessTokenManagerComp"));
 			return false;
 		}
 
@@ -215,7 +215,7 @@ bool CPersonalAccessTokenManagerComp::RevokeToken(const QByteArray& tokenId)
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_tokenCollectionCompPtr->GetObjectData(tokenId, dataPtr)){
-		SendErrorMessage(0, QString("Token '%1' not found").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");
+		SendErrorMessage(0, QStringLiteral("Token '%1' not found").arg(tokenId), "CPersonalAccessTokenManagerComp");
 		return false;
 	}
 
@@ -231,11 +231,11 @@ bool CPersonalAccessTokenManagerComp::RevokeToken(const QByteArray& tokenId)
 	tokenPtr->SetRevoked(true);
 
 	if (!m_tokenCollectionCompPtr->SetObjectData(tokenId, *tokenPtr)){
-		SendErrorMessage(0, QString("Failed to update token '%1'").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");
+		SendErrorMessage(0, QStringLiteral("Failed to update token '%1'").arg(tokenId), "CPersonalAccessTokenManagerComp");
 		return false;
 	}
 
-	SendInfoMessage(0, QString("Revoked token '%1'").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");
+	SendInfoMessage(0, QStringLiteral("Revoked token '%1'").arg(tokenId), "CPersonalAccessTokenManagerComp");
 
 	return true;
 }
@@ -275,11 +275,11 @@ bool CPersonalAccessTokenManagerComp::DeleteToken(const QByteArray& tokenId)
 	istd::CChangeNotifier changeNotifier(this);
 
 	if (!m_tokenCollectionCompPtr->RemoveElements({tokenId})){
-		SendErrorMessage(0, QString("Failed to delete token '%1'").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");
+		SendErrorMessage(0, QStringLiteral("Failed to delete token '%1'").arg(tokenId), "CPersonalAccessTokenManagerComp");
 		return false;
 	}
 
-	SendInfoMessage(0, QString("Deleted token '%1'").arg(QString::fromUtf8(tokenId)), "CPersonalAccessTokenManagerComp");
+	SendInfoMessage(0, QStringLiteral("Deleted token '%1'").arg(tokenId), "CPersonalAccessTokenManagerComp");
 
 	return true;
 }

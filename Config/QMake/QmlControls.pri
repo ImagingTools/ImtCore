@@ -38,6 +38,7 @@ defineTest(prepareWebQml) {
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseDocumentIdFilterSdl, $$buildwebdir/src/imtbaseDocumentIdFilterSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseMimeTypeSdl, $$buildwebdir/src/imtbaseMimeTypeSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseFilterableSelectSdl, $$buildwebdir/src/imtbaseFilterableSelectSdl)
+	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseFileSystemSdl, $$buildwebdir/src/imtbaseFileSystemSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imt2dsdl/SDL/1.0/QML/imt2dGeometrySdl, $$buildwebdir/src/imt2dGeometrySdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imt2dsdl/SDL/1.0/QML/imt2dPaintSystemSdl, $$buildwebdir/src/imt2dPaintSystemSdl)
 
@@ -45,7 +46,6 @@ defineTest(prepareWebQml) {
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthRolesSdl, $$buildwebdir/src/imtauthRolesSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthUsersSdl, $$buildwebdir/src/imtauthUsersSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAuthorizationSdl, $$buildwebdir/src/imtauthAuthorizationSdl)
-	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAuthorizationOptionsSdl, $$buildwebdir/src/imtauthAuthorizationOptionsSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthProfileSdl, $$buildwebdir/src/imtauthProfileSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthSessionsSdl, $$buildwebdir/src/imtauthSessionsSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthPersonalAccessTokensSdl, $$buildwebdir/src/imtauthPersonalAccessTokensSdl)

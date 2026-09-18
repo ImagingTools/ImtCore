@@ -175,7 +175,7 @@ QString UtcNow();
  * Example:
  * \code{.cpp}
  * QString name = "O'Reilly";
- * QString sql = QString("INSERT INTO t(name) VALUES('%1')").arg(imtdb::EscapeSql(name));
+ * QString sql = QStringLiteral("INSERT INTO t(name) VALUES('%1')").arg(imtdb::EscapeSql(name));
  * // sql = "INSERT INTO t(name) VALUES('O''Reilly')"
  * \endcode
  */

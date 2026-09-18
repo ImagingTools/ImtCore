@@ -62,7 +62,7 @@ void CMenuBasedCommandsProviderComp::OnSystemStarted()
 		QObject::connect(m_menuCommand, &QAction::triggered, this, &CMenuBasedCommandsProviderComp::OnCommandActivated);
 	}
 	else{
-		SendCriticalMessage(0, QString("Unable to create GUI for component ").append(m_menuGuiCompPtr->GetWidget()->objectName()));
+		SendCriticalMessage(0, QStringLiteral("Unable to create GUI for component ").append(m_menuGuiCompPtr->GetWidget()->objectName()));
 	}
 
 	if (m_menuCommandVisualStatusProviderCompPtr.IsValid()){

@@ -6,10 +6,13 @@ namespace imtqml
 {
 
 
-void CNetworkEventInterceptor::InterceptRequest(QNetworkReply* reply, CGqlRequest* gqlRequestPtr)
+void CNetworkEventInterceptor::InterceptRequest(QNetworkReply* reply, QObject* gqlRequestPtr)
 {
 	m_replyOwners.insert(reply, gqlRequestPtr);
 	connect(reply, &QNetworkReply::finished, this, &CNetworkEventInterceptor::OnReplyFinished);
+	connect(reply, &QObject::destroyed, this, [this, reply](){
+		m_replyOwners.remove(reply);
+	});
 }
 
 
@@ -22,10 +25,7 @@ void CNetworkEventInterceptor::OnReplyFinished()
 		int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 		QByteArray requestBody = reply->property("requestBody").toByteArray();
 
-		CGqlRequest* gqlRequestPtr = nullptr;
-		if (m_replyOwners.contains(reply)){
-			gqlRequestPtr = m_replyOwners.take(reply);
-		}
+		QObject* gqlRequestPtr = m_replyOwners.take(reply).data();
 
 		if (statusCode == 401){
 			emit unauthorized(requestBody, gqlRequestPtr);

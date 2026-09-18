@@ -34,10 +34,10 @@ protected:
 	virtual QJsonObject GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual QJsonObject GetInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual QJsonObject GetDataMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual QJsonObject GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray &objectId, QString& errorMessage) const override;
 	virtual bool UpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QString& errorMessage) const override;
-	virtual QJsonObject ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject GetObjectListFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 };
 
 

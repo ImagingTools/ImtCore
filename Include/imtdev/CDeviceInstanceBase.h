@@ -47,7 +47,7 @@ namespace imtdev
 	// Set device identifier
 	deviceInstance.SetIdentifier(
 		IDeviceInstance::IT_SERIAL, 
-		QByteArray("SN12345"));
+		QByteArrayLiteral("SN12345"));
 	
 	// Set version information
 	deviceInstance.SetVersion(

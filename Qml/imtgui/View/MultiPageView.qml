@@ -33,7 +33,8 @@ Item {
             expanded: false,
             loaded: false,
             submenuVisited: false,
-            lastSubpageId: ""
+            lastSubpageId: "",
+            badge: ""
         })
     }
 
@@ -62,8 +63,16 @@ Item {
             expanded: false,
             loaded: false,
             submenuVisited: false,
-            lastSubpageId: ""
+            lastSubpageId: "",
+            badge: ""
         })
+    }
+
+    function setPageBadge(pageId, badgeText){
+        var idx = getIndexById(pageId)
+        if (idx >= 0) {
+            pagesModel.setProperty(idx, "badge", badgeText)
+        }
     }
 
     function removePage(pageId){
@@ -249,12 +258,6 @@ Item {
 
                 delegate: Item {
                     id: navDelegate
-
-                    // Test instrumentation: every MultiPageView consumer (e.g. Administration's
-                    // Roles/Users/Groups) gets a per-nav-item selector keyed by the same pageId passed
-                    // to addPage()/addSubPage() - previously this delegate had no objectName at all, so
-                    // subpage navigation was only clickable by visible text. Inert - no runtime/visual
-                    // effect.
                     objectName: "Page_" + model.id;
 
                     readonly property bool __isParentWithSubs: root.hasSubPages(model.id)
@@ -273,7 +276,7 @@ Item {
                         radius: Style.marginS
                         color: navDelegate.__isSelected
                             ? Style.selectedColor
-                            : navMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
+                            : navMouseArea.containsMouse ? Style.alternateBaseColor : "transparent"
 
                         Row {
                             anchors.fill: parent
@@ -306,6 +309,17 @@ Item {
                                 color: navDelegate.__isSelected ? Style.textSelectedColor : Style.textColor
                                 elide: Text.ElideRight
                                 width: parent.width - ((!navDelegate.__isSubpage && model.icon) ? Style.iconSizeS + parent.spacing : 0)
+                                    - (navBadge.visible ? navBadge.width + parent.spacing : 0)
+                            }
+
+                            Text {
+                                id: navBadge
+                                visible: model.badge !== undefined && model.badge !== ""
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: model.badge !== undefined ? model.badge : ""
+                                font.family: Style.fontFamily
+                                font.pixelSize: Style.fontSizeS
+                                color: navDelegate.__isSelected ? Style.textSelectedColor : Style.subtitleColor
                             }
                         }
 
@@ -325,9 +339,6 @@ Item {
 
                         MouseArea {
                             id: navMouseArea
-
-                            // Test instrumentation: matches the "[objectName=Page_x] [objectName=MouseArea]"
-                            // click convention used everywhere else in this codebase. Inert.
                             objectName: "MouseArea";
 
                             anchors.fill: parent
@@ -369,24 +380,18 @@ Item {
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
         anchors.left: sidebarPanel.right;
-        anchors.topMargin: root.mainMargin;
-        anchors.bottomMargin: root.mainMargin;
         anchors.leftMargin: root.mainMargin;
 
         width: 1;
         color: Style.borderColor;
+        opacity: 0.5
     }
 
     Item {
-        id: bodyAdministration;
-
         anchors.left: separator.right;
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
         anchors.right: parent.right;
-        anchors.topMargin: root.mainMargin;
-        anchors.leftMargin: root.mainMargin;
-        anchors.rightMargin: root.mainMargin;
 
         Repeater {
             id: bodyRepeater;

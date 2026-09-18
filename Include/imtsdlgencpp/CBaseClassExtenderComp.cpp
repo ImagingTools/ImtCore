@@ -209,9 +209,9 @@ bool CBaseClassExtenderComp::ProcessHeaderClassFile(
 	QStringList classList;
 	int baseListCount = baseClassList.GetOptionsCount();
 	for (int i = 0; i < baseListCount; ++i){
-		const QString includeDirective = QString("#include <%1>").arg(baseClassList.GetOptionName(i));
+		const QString includeDirective = QStringLiteral("#include <%1>").arg(baseClassList.GetOptionName(i));
 		QString classLib = QString(baseClassList.GetOptionId(i).split(':').constFirst());
-		classLib = (QString("// %1 includes").arg(classLib));
+		classLib = (QStringLiteral("// %1 includes").arg(classLib));
 		necessaryDireciveIncludeMap.insert(includeDirective, classLib);
 		classList << QString(baseClassList.GetOptionId(i));
 	}
@@ -365,7 +365,7 @@ bool CBaseClassExtenderComp::BeginClassFiles()
 	// Create new files in temp path
 	if (!m_headerFilePtr->open(QIODevice::WriteOnly)){
 		SendCriticalMessage(0,
-					QString("Unable to open file: '%1'. Error: %2")
+					QStringLiteral("Unable to open file: '%1'. Error: %2")
 						.arg(m_headerFilePtr->fileName(), m_headerFilePtr->errorString()));
 
 		AbortCurrentProcessing();
@@ -376,7 +376,7 @@ bool CBaseClassExtenderComp::BeginClassFiles()
 	// Open original files to read data
 	if (!m_originalHeaderFilePtr->open(QIODevice::ReadOnly)){
 		SendCriticalMessage(0,
-						 QString("Unable to open file: '%1'. Error: %2")
+						 QStringLiteral("Unable to open file: '%1'. Error: %2")
 						 .arg(m_originalHeaderFilePtr->fileName(), m_originalHeaderFilePtr->errorString()));
 
 		AbortCurrentProcessing();
@@ -408,7 +408,7 @@ bool CBaseClassExtenderComp::CloseFiles()
 	const QString sourceFile = m_headerFilePtr->fileName();
 	bool isMoved = istd::CSystem::FileMove(sourceFile, originalHeaderFilePath, true);
 	if (!isMoved){
-		SendErrorMessage(0, QString("Unable to move file '%1' to '%2'").arg(sourceFile, originalHeaderFilePath));
+		SendErrorMessage(0, QStringLiteral("Unable to move file '%1' to '%2'").arg(sourceFile, originalHeaderFilePath));
 	}
 
 	retVal = retVal && isMoved;

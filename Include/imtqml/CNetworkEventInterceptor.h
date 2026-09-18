@@ -3,10 +3,8 @@
 
 
 // Qt includes
+#include <QtCore/QPointer>
 #include <QtNetwork/QNetworkReply>
-
-// ImtCore includes
-#include <imtqml/CGqlRequest.h>
 
 
 namespace imtqml
@@ -24,17 +22,17 @@ public:
 		return &instance;
 	}
 
-	void InterceptRequest(QNetworkReply* reply, CGqlRequest* gqlRequestPtr);
+	void InterceptRequest(QNetworkReply* reply, QObject* gqlRequestPtr);
 
 public Q_SLOTS:
 	void OnReplyFinished();
 
 signals:
-	void unauthorized(QString requestBody, CGqlRequest* request);
-	void forbidden(QString requestBody, CGqlRequest* request);
+	void unauthorized(QString requestBody, QObject* request);
+	void forbidden(QString requestBody, QObject* request);
 
 private:
-	QHash<QNetworkReply*, CGqlRequest*> m_replyOwners;
+	QHash<QNetworkReply*, QPointer<QObject>> m_replyOwners;
 };
 
 

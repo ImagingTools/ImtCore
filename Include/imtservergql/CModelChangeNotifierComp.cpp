@@ -47,11 +47,11 @@ void CModelChangeNotifierComp::OnUpdate(const istd::IChangeable::ChangeSet& /*ch
 				continue;
 			}
 
-			QByteArray body = QString(R"({"type": "data","id": "%1","payload": {"data": {"%2": {}}}})")
-				.arg(qPrintable(id))
-				.arg(qPrintable(networkRequest->GetCommandId()))
+			QByteArray body = QStringLiteral(R"({"type": "data","id": "%1","payload": {"data": {"%2": {}}}})")
+				.arg(id)
+				.arg(networkRequest->GetCommandId())
 				.toUtf8();
-			QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
+			QByteArray reponseTypeId = QByteArrayLiteral("application/json; charset=utf-8");
 			const imtrest::IProtocolEngine& engine = networkRequest->GetProtocolEngine();
 
 			imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());

@@ -146,7 +146,7 @@ void ExecuteTest(
 	QTemporaryDir tempOutputDir;
 	const QString tempOutputDirPath = tempOutputDir.path();
 	if (!istd::CSystem::EnsurePathExists(tempOutputDirPath)){
-		qCritical() <<  QString("Unable to create temp dir at '%1'").arg(tempOutputDirPath);
+		qCritical() <<  QStringLiteral("Unable to create temp dir at '%1'").arg(tempOutputDirPath);
 
 		return;
 	}
@@ -254,6 +254,20 @@ void CSdlGenTest::TestComplexUnion()
 
 		ExecuteTest(testSuite, "ComplexUnion2.sdl", "ComplexUnion", "complextestsdl");
 	}
+}
+
+
+void CSdlGenTest::TestNestedFieldNameCollision()
+{
+	CImtSdlGenTest testSuite;
+	PrepareSuite(testSuite, m_tempOutputDir);
+
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	argParserPtr->SetCppEnabled();
+	argParserPtr->SetGqlEnabled();
+	argParserPtr->SetQmlEnabled(false);
+
+	ExecuteTest(testSuite, "NestedFieldNameCollision.sdl");
 }
 
 

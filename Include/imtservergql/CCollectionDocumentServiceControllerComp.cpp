@@ -77,12 +77,13 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnCreateNewDocument
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		const QByteArray proposedSourceDocumentId = documentTypeId->proposedSourceDocumentId
-			? *documentTypeId->proposedSourceDocumentId
-			: QByteArray();
+					? *documentTypeId->proposedSourceDocumentId
+					: QByteArray();
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
 		taskParams.documentTypeId = *documentTypeId->typeId;
 		taskParams.proposedSourceDocumentId = proposedSourceDocumentId;
+		taskParams.singleDocumentInstance = documentTypeId->singleDocumentInstance.value_or(false);
 		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, taskParams);
 		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
 		QByteArray documentId = taskResult.documentId;
@@ -141,17 +142,20 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
-	QUrl url(QString("collection:///%1").arg(*objectId->id));
+	QUrl url(QStringLiteral("collection:///%1").arg(*objectId->id));
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
 		taskParams.url = url;
+		taskParams.singleDocumentInstance = objectId->singleInstanceMode.value_or(false);
 		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, taskParams);
 		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
 		QByteArray documentId = taskResult.documentId;
 		if (documentId.isEmpty()){
-			errorMessage = "Unable to open document or create undo manager";
+			errorMessage = taskResult.errorMessage.isEmpty()
+						? QStringLiteral("Unable to open document or create undo manager")
+						: taskResult.errorMessage;
 
 			return retVal;
 		}
@@ -311,6 +315,10 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 		istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
 		operationContextPtr.SetPtr(CreateOperationContextFromGqlRequest(gqlRequest));
 
+		if (operationContextPtr.IsValid()){
+			GenerateDocumentChanges(userId, *saveDocumentInput->documentId, *operationContextPtr);
+		}
+
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
 		taskParams.documentId = *saveDocumentInput->documentId;
@@ -385,6 +393,18 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnCloseD
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
+		imtdoc::IDocumentService::DocumentList openedList = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+		for (const imtdoc::IDocumentService::DocumentListItem& info : openedList){
+			if (info.documentId == *documentId->id && info.singleDocumentInstance){
+				const QString responseMessage = "Close document is forbidden for single-instance document";
+				retVal.status = CDM::EDocumentOperationStatus::Failed;
+				retVal.message = responseMessage;
+				errorMessage = responseMessage;
+
+				return retVal;
+			}
+		}
+
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
 		taskParams.documentId = *documentId->id;
@@ -673,8 +693,11 @@ bool CCollectionDocumentServiceControllerComp::IsRequestSupported(const imtgql::
 		}
 
 		QByteArray collectionId = inputParamPtr->GetParamArgumentValue("collectionId").toByteArray();
+		if (!m_documentManagerCompPtr.IsValid() || (collectionId != *m_collectionIdAttrPtr)){
+			return false;
+		}
 
-		return m_documentManagerCompPtr.IsValid() && (collectionId == *m_collectionIdAttrPtr);
+		return true;
 	}
 
 	return false;
@@ -709,6 +732,56 @@ imtbase::IOperationContext* CCollectionDocumentServiceControllerComp::CreateOper
 }
 
 
+QByteArray CCollectionDocumentServiceControllerComp::GetCollectionObjectId(const QByteArray& userId, const QByteArray& documentId) const
+{
+	if (!m_documentManagerCompPtr.IsValid()){
+		return QByteArray();
+	}
+
+	const imtdoc::IDocumentService::DocumentList documentList = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+	for (const imtdoc::IDocumentService::DocumentListItem& documentItem : documentList){
+		if (documentItem.documentId == documentId){
+			// Documents bound to a collection element carry a 'collection:///<objectId>' source URL.
+			return documentItem.url.path().mid(1).toUtf8();
+		}
+	}
+
+	return QByteArray();
+}
+
+
+void CCollectionDocumentServiceControllerComp::GenerateDocumentChanges(
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			imtbase::IOperationContext& operationContext) const
+{
+	if (!m_documentChangeGeneratorCompPtr.IsValid() || !m_documentManagerCompPtr.IsValid()){
+		return;
+	}
+
+	imtbase::CObjectCollection* changesCollectionPtr = dynamic_cast<imtbase::CObjectCollection*>(operationContext.GetChangesCollection());
+	if (changesCollectionPtr == nullptr){
+		return;
+	}
+
+	const istd::IChangeable* documentDataPtr = m_documentManagerCompPtr->GetDocumentPtr(userId, documentId);
+	if (documentDataPtr == nullptr){
+		return;
+	}
+
+	// An empty object-ID means the document was never stored, so saving it creates a new element.
+	const QByteArray objectId = GetCollectionObjectId(userId, documentId);
+	const QByteArray operationTypeId = objectId.isEmpty() ? QByteArrayLiteral("Create") : QByteArrayLiteral("Update");
+
+	QString errorMessage;
+	if (!m_documentChangeGeneratorCompPtr->GenerateDocumentChanges(
+				operationTypeId, objectId, documentDataPtr, *changesCollectionPtr, errorMessage, nullptr)){
+		SendWarningMessage(0, QStringLiteral("Unable to generate document changes for '%1'. Error: %2")
+					.arg(QString::fromUtf8(objectId), errorMessage));
+	}
+}
+
+
 QByteArray CCollectionDocumentServiceControllerComp::GetUserId(const ::imtgql::CGqlRequest& gqlRequest) const
 {
 	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
@@ -724,3 +797,4 @@ QByteArray CCollectionDocumentServiceControllerComp::GetUserId(const ::imtgql::C
 
 
 } // namespace imtservergql
+

@@ -1749,7 +1749,9 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
       }
       var attrs = [false, false, false] // default, required, readonly
 
-      while (S.token.value == "default" || S.token.value == "required" || S.token.value == "readonly") {
+      // These are contextual keywords: "required: true" is an ordinary property assignment.
+      while ((S.token.value == "default" || S.token.value == "required" || S.token.value == "readonly")
+             && !is_token(peek(), "punc", ":")) {
         switch(S.token.value){
           case "default": attrs[0] = true; next(); break;
           case "required": attrs[1] = true; next(); break;

@@ -30,7 +30,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CSchedulerParam>)
+	// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CSchedulerParam>)
 	virtual RepresentationInfo GetRepresentationInfo() const override;
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable &dataModel) const override;

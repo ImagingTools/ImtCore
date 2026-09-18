@@ -13,6 +13,7 @@ import Qt.labs.platform 1.0
 RemoteCollectionView {
 	id: featureCollectionViewContainer;
 	
+	property string context: ""
 	visibleMetaInfo: false;
 	
 	collectionId: "Features";
@@ -59,6 +60,7 @@ RemoteCollectionView {
 		id: dataControllerComp;
 		
 		GqlRequestDocumentDataController {
+			context: featureCollectionViewContainer.context
 			id: requestDocumentDataController
 			
 			property FeatureData featureData: documentModel

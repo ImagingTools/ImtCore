@@ -2,7 +2,6 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
 import imtcontrols 1.0
 
 /**
@@ -67,16 +66,18 @@ Item {
 
 	// --- Public API ---
 
+	// Leaf node keys are the raw permission ids (see rebuildFromFlatArray /
+	// __buildFlatModel below); only synthetic group wrappers use the
+	// "__group__:" key prefix. Reading the raw checked keys avoids allocating
+	// a createIndex() wrapper (with its half-dozen closures) for every node
+	// in the tree, which is what used to make this O(nodeCount) with a heavy
+	// constant factor for large permission sets.
 	function getCheckedIds() {
+		var keys = permissionsTreeView.getCheckedKeys()
 		var result = []
-		var checkedNodes = permissionsTreeView.getCheckedNodes()
-		for (var i = 0; i < checkedNodes.length; i++) {
-			var node = checkedNodes[i]
-			if (root.__isLeafNode(node)) {
-				var nodeData = node.data || {}
-				if (nodeData.id)
-					result.push(nodeData.id)
-			}
+		for (var i = 0; i < keys.length; i++) {
+			if (keys[i].indexOf("__group__:") !== 0)
+				result.push(keys[i])
 		}
 		result.sort()
 		return result
@@ -106,32 +107,19 @@ Item {
 		permissionsTreeView.collapseAll()
 	}
 
-	// Returns true for leaf permission nodes (the actual selectable entries),
-	// false for group/category nodes (even if tristate checked them).
-	// Uses the original source node from .item because createIndex wrappers
-	// do not expose the 'children' array.
-	function __isLeafNode(nodeIdx) {
-		if (!nodeIdx)
-			return true
-		var src = nodeIdx.item || nodeIdx
-		var ch = src ? (src.children || []) : []
-		return ch.length === 0
-	}
-
 	function applySelection(ids) {
 		__beginSelectionUpdate()
 		var prevFilter = permissionsTreeView.filterText
 		permissionsTreeView.filterText = ""
 		permissionsTreeView.uncheckAll()
-		var allNodesList = permissionsTreeView.allNodes()
-		for (var i = 0; i < allNodesList.length; i++) {
-			var nodeObj = allNodesList[i]
-			if (root.__isLeafNode(nodeObj)) {
-				var nodeData = nodeObj.data || {}
-				if (ids.includes(nodeData.id))
-					permissionsTreeView.checkItem(nodeObj.key)
-			}
-		}
+		// Leaf keys are the raw permission ids, so each granted id can be
+		// checked directly in O(1) instead of enumerating every node in the
+		// tree (allNodes()) and testing membership with ids.includes() for
+		// each one. That used to be O(totalPermissionCount * ids.length) -
+		// with a large permission set and a few hundred granted ids this
+		// reached millions of comparisons and froze the GUI on every load.
+		for (var i = 0; i < ids.length; i++)
+			permissionsTreeView.checkItem(ids[i])
 		permissionsTreeView.filterText = prevFilter
 		__endSelectionUpdate()
 	}
@@ -187,10 +175,12 @@ Item {
 	 * Each entry becomes a checkable leaf with permissionId as the key.
 	 */
 	function rebuildFromFlatArray(groups) {
+		loading.start()
 		__beginSelectionUpdate()
 		if (!groups || groups.length === 0) {
 			permissionsTreeView.model = []
 			__endSelectionUpdate()
+			__buildSettleTimer.restart()
 			return
 		}
 
@@ -238,6 +228,7 @@ Item {
 
 		permissionsTreeView.model = result
 		__endSelectionUpdate()
+		__buildSettleTimer.restart()
 	}
 
 	function __beginSelectionUpdate() {
@@ -470,12 +461,18 @@ Item {
 
 			Text {
 				id: checkAllBtn
+				// Test instrumentation: this reusable control's Text+MouseArea "buttons" had no
+				// objectName at all - inner MouseArea named "MouseArea" so click()'s standard nested
+				// lookup finds it (same pattern already used for ItemSelectElementView.qml's add
+				// button). Inert.
+				objectName: "CheckAllButton"
 				anchors.verticalCenter: parent.verticalCenter
 				text: qsTr("Check All")
 				font.pixelSize: Style.fontSizeM
 				color: root.readOnly ? Style.inactiveTextColor : Style.linkColor
 
 				MouseArea {
+					objectName: "MouseArea"
 					anchors.fill: parent
 					hoverEnabled: true
 					cursorShape: root.readOnly ? Qt.ArrowCursor : Qt.PointingHandCursor
@@ -486,12 +483,14 @@ Item {
 
 			Text {
 				id: uncheckAllBtn
+				objectName: "UncheckAllButton"
 				anchors.verticalCenter: parent.verticalCenter
 				text: qsTr("Uncheck All")
 				font.pixelSize: Style.fontSizeM
 				color: root.readOnly ? Style.inactiveTextColor : Style.linkColor
 
 				MouseArea {
+					objectName: "MouseArea"
 					anchors.fill: parent
 					hoverEnabled: true
 					cursorShape: root.readOnly ? Qt.ArrowCursor : Qt.PointingHandCursor
@@ -502,12 +501,14 @@ Item {
 
 			Text {
 				id: expandBtn
+				objectName: "ExpandAllButton"
 				anchors.verticalCenter: parent.verticalCenter
 				text: qsTr("Expand All")
 				font.pixelSize: Style.fontSizeM
 				color: Style.linkColor
 
 				MouseArea {
+					objectName: "MouseArea"
 					anchors.fill: parent
 					hoverEnabled: true
 					cursorShape: Qt.PointingHandCursor
@@ -517,12 +518,14 @@ Item {
 
 			Text {
 				id: collapseBtn
+				objectName: "CollapseAllButton"
 				anchors.verticalCenter: parent.verticalCenter
 				text: qsTr("Collapse All")
 				font.pixelSize: Style.fontSizeM
 				color: Style.linkColor
 
 				MouseArea {
+					objectName: "MouseArea"
 					anchors.fill: parent
 					hoverEnabled: true
 					cursorShape: Qt.PointingHandCursor
@@ -573,5 +576,21 @@ Item {
 			if (!root.readOnly && root.__selectionUpdateDepth === 0)
 				root.selectionChanged()
 		}
+	}
+
+	// Rebuilding + settling the tree's layout (see GroupElementView's own
+	// deferred relayout) spans a few frames; cover it so the user sees a
+	// spinner instead of the tree reflowing mid-render.
+	Timer {
+		id: __buildSettleTimer
+		interval: 80
+		repeat: false
+		onTriggered: loading.stop()
+	}
+
+	Loading {
+		id: loading
+		anchors.fill: parent
+		visible: false
 	}
 }

@@ -25,7 +25,7 @@ public:
 protected:
 	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 	virtual istd::IChangeableUniquePtr CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray &objectId, QString& errorMessage) const override;
-	virtual QJsonObject GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual QJsonObject GetTreeItemModel(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const override;
 

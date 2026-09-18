@@ -1,24 +1,30 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
+import imtgui 1.0
 import imtauthgui 1.0
 import imtbaseDocumentRevisionSdl 1.0
 
 Dialog {
 	id: documentRevisionDialog;
-	title: qsTr("Revision Manager");
+	property string context: ""
+	title: qsTr("Revisions (%1)").arg(documentRevisionDialog.contentItem ? documentRevisionDialog.contentItem.revisionsCount : 0);
 	canMove: false;
+	backgroundColor: Style.baseColor;
+
+	// Set on the dialog itself (not on the content item) and mirrored by the
+	// content below - matching ProfileTokensPage's addDialog, which is what
+	// actually keeps this reactive to live window resizes.
+	width: Math.max(Style.sizeHintXXL, Math.min(ModalDialogManager.activeView.width - 100, Style.sizeHintXXXL));
+	height: Math.max(Style.sizeHintXL, Math.min(ModalDialogManager.activeView.height - 100, Style.sizeHintXXL));
 
 	notClosingButtons: Enums.no | Enums.save;
 
 	property string collectionId;
 	property string documentId;
 	property int selectedRevision: -1;
-	property int currentRevision: -1;
-	property BaseModel revisionsModel: BaseModel {};
 
 	Component.onCompleted: {
 		if (PermissionsController.checkPermission("RestoreRevision")){
@@ -32,10 +38,6 @@ Dialog {
 		addButton(Enums.cancel, qsTr("Close"), true)
 	}
 
-	signal revisionModelReceived()
-	signal receiveRevisionModelStarted()
-	signal receiveRevisionModelFailed()
-
 	onFinished: {
 		if (buttonId == Enums.save){
 			setRevisionRequest.send();
@@ -45,65 +47,28 @@ Dialog {
 		}
 	}
 
-	function getRevisionList(){
-		receiveRevisionModelStarted()
-		request.send();
+	// The content Loader (and this dialog's own documentId/collectionId) are not
+	// guaranteed to be settled yet at Component.onCompleted for modal content;
+	// started() fires once the dialog is actually up, so fetch there instead.
+	onStarted: {
+		if (documentRevisionDialog.contentItem)
+			documentRevisionDialog.contentItem.refresh();
 	}
 
 	function getHeaders(){
 		return {};
 	}
 
-	GqlSdlRequestSender {
-		id: request;
-		gqlCommandId: ImtbaseDocumentRevisionSdlCommandIds.s_getRevisionInfoList;
-		inputObjectComp: Component {
-			GetRevisionInfoListInput {
-				m_documentId: documentRevisionDialog.documentId;
-				m_collectionId: documentRevisionDialog.collectionId;
-			}
-		}
-
-		sdlObjectComp: Component { RevisionInfoList {
-				onFinished: {
-					documentRevisionDialog.revisionsModel = m_revisions;
-					documentRevisionDialog.currentRevision = m_activeRevision;
-
-					documentRevisionDialog.revisionModelReceived()
-				}
-			}
-		}
-
-		function getHeaders(){
-			return documentRevisionDialog.getHeaders();
-		}
+	function refresh(){
+		documentRevisionDialog.selectedRevision = -1;
+		documentRevisionDialog.buttons.setButtonState(Enums.save, false);
+		documentRevisionDialog.buttons.setButtonState(Enums.no, false);
+		if (documentRevisionDialog.contentItem)
+			documentRevisionDialog.contentItem.refresh();
 	}
 
 	GqlSdlRequestSender {
-		id: deleteRevisionRequest;
-		gqlCommandId: ImtbaseDocumentRevisionSdlCommandIds.s_deleteRevision;
-		inputObjectComp: Component {
-			DeleteRevisionInput {
-				m_objectId: documentRevisionDialog.documentId;
-				m_revision: documentRevisionDialog.selectedRevision;
-				m_collectionId: documentRevisionDialog.collectionId;
-			}
-		}
-
-		sdlObjectComp: Component { DeleteRevisionResponse {
-				onFinished: {
-					documentRevisionDialog.getRevisionList()
-					ModalDialogManager.showInfoDialog(qsTr("The document revision has been successfully delete"));
-				}
-			}
-		}
-
-		function getHeaders(){
-			return documentRevisionDialog.getHeaders();
-		}
-	}
-
-	GqlSdlRequestSender {
+		context: documentRevisionDialog.context
 		id: setRevisionRequest;
 		requestType: 1;
 		gqlCommandId: ImtbaseDocumentRevisionSdlCommandIds.s_restoreRevision;
@@ -117,14 +82,39 @@ Dialog {
 
 		sdlObjectComp: Component { RestoreRevisionResponse {
 				onFinished: {
-					documentRevisionDialog.getRevisionList()
-					ModalDialogManager.showInfoDialog(qsTr("The document revision has been successfully set"));
+					documentRevisionDialog.refresh()
+					PopupManager.addSuccessMessage(qsTr("The document revision has been successfully set"))
 				}
 			}
 		}
 
 		function getHeaders(){
 			return {};
+		}
+	}
+
+	GqlSdlRequestSender {
+		context: documentRevisionDialog.context
+		id: deleteRevisionRequest;
+		gqlCommandId: ImtbaseDocumentRevisionSdlCommandIds.s_deleteRevision;
+		inputObjectComp: Component {
+			DeleteRevisionInput {
+				m_objectId: documentRevisionDialog.documentId;
+				m_revision: documentRevisionDialog.selectedRevision;
+				m_collectionId: documentRevisionDialog.collectionId;
+			}
+		}
+
+		sdlObjectComp: Component { DeleteRevisionResponse {
+				onFinished: {
+					documentRevisionDialog.refresh()
+					PopupManager.addSuccessMessage(qsTr("The document revision has been successfully delete"));
+				}
+			}
+		}
+
+		function getHeaders(){
+			return documentRevisionDialog.getHeaders();
 		}
 	}
 
@@ -145,196 +135,50 @@ Dialog {
 	contentComp: Component {
 		Item {
 			id: contentItem;
-			width: Style.sizeHintXXL;
-			height: Style.sizeHintXL;
+			width: documentRevisionDialog.width;
+			// The dialog's own height above is the TOTAL popup size; the title bar
+			// and button row are stacked above/below this content (~120px), so the
+			// content must be shorter than the dialog by that much - otherwise the
+			// whole popup grows past what was computed as "fits the screen" and
+			// the button row is pushed off it.
+			height: documentRevisionDialog.height - 120;
 
-			Connections {
-				target: documentRevisionDialog;
+			property alias revisionsCount: historyView.revisionsCount;
 
-				function onStarted(){
-					documentRevisionDialog.getRevisionList()
-				}
-
-				function onReceiveRevisionModelStarted(){
-					loading.start()
-				}
-
-				function onReceiveRevisionModelFailed(){
-					loading.stop()
-				}
-
-				function onRevisionModelReceived(){
-					loading.stop()
-				}
+			function refresh(){
+				historyView.sendRequest();
 			}
 
-			Component {
-				id: isActiveColumnDelegateComp;
-				TableCellDelegateBase {
-					id: cellDelegate
+			function selectRevision(revision){
+				documentRevisionDialog.selectedRevision = revision;
 
-					Image {
-						id: image;
-						anchors.verticalCenter: parent.verticalCenter;
-						anchors.left: parent.left;
-						anchors.leftMargin: Style.marginM;
-						width: Style.iconSizeM;
-						height: width;
-						source: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal);
-						sourceSize.width: width;
-						sourceSize.height: height;
-					}
-
-					onReused: {
-						if (!rowDelegate){
-							return
-						}
-
-						if (rowIndex >= 0){
-							let isActive = table.elements.get(rowIndex).item.m_isActive;
-							image.visible = isActive;
-						}
-					}
-				}
+				let isActive = revision === historyView.activeRevision;
+				documentRevisionDialog.buttons.setButtonState(Enums.save, !isActive);
+				documentRevisionDialog.buttons.setButtonState(Enums.no, !isActive);
 			}
 
-			Item {
-				id: splitView;
-				anchors.fill: parent
-				anchors.margins: Style.marginM
-
-				Table {
-					id: table;
-					anchors.top: parent.top
-					width: parent.width;
-					height: Style.sizeHintM;
-					elements: documentRevisionDialog.revisionsModel
-
-					onElementsChanged: {
-						table.resetSelection();
-					}
-
-					onHeadersChanged: {
-						setColumnContentById("isActive", isActiveColumnDelegateComp);
-					}
-
-					onSelectionChanged: {
-						documentRevisionDialog.buttons.setButtonState(Enums.save, false);
-						documentRevisionDialog.buttons.setButtonState(Enums.no, false);
-
-						let isEnabled = selection.length === 1;
-						if (isEnabled){
-							if (selection.length > 0){
-								let index = selection[0]
-								let selectedRevision = table.elements.get(index).item.m_revision;
-								if (selectedRevision !== documentRevisionDialog.currentRevision){
-									documentRevisionDialog.selectedRevision = selectedRevision;
-									documentRevisionDialog.buttons.setButtonState(Enums.save, true);
-									documentRevisionDialog.buttons.setButtonState(Enums.no, true);
-								}
-
-								descriptionTextField.text = table.elements.get(index).item.m_description;
-							}
-						}
-					}
-
-					TreeItemModel {
-						id: revisionHeadersModel
-						Component.onCompleted: {
-							updateHeaders()
-							table.headers = revisionHeadersModel
-						}
-				
-						function updateHeaders(){
-							revisionHeadersModel.clear()
-				
-							let index = revisionHeadersModel.insertNewItem();
-							revisionHeadersModel.setData("id", "user", index)
-							revisionHeadersModel.setData("name", qsTr("User"), index)
-				
-							index = revisionHeadersModel.insertNewItem();
-							revisionHeadersModel.setData("id", "revision", index)
-							revisionHeadersModel.setData("name", qsTr("Revision"), index)
-				
-							index = revisionHeadersModel.insertNewItem();
-							revisionHeadersModel.setData("id", "isActive", index)
-							revisionHeadersModel.setData("name", qsTr("Active"), index)
-				
-							index = revisionHeadersModel.insertNewItem();
-							revisionHeadersModel.setData("id", "timestamp", index)
-							revisionHeadersModel.setData("name", qsTr("Time"), index)
-						}
-					}
-				}
-
-				Rectangle {
-					id: descriptionItem;
-					anchors.top: table.bottom
-					width: parent.width;
-					height: Style.sizeHintXXS;
-					clip: true
-					color: Style.backgroundColor2
-
-					Text {
-						id: descriptionTitle;
-						anchors.top: parent.top;
-						anchors.topMargin: Style.marginM;
-						color: Style.buttonTextColor;
-						font.family: Style.fontFamilyBold;
-						font.pixelSize: Style.fontSizeM;
-						font.bold: true;
-						text: qsTr("Description");
-					}
-
-					Rectangle {
-						id: background;
-						anchors.top: descriptionTitle.bottom;
-						anchors.topMargin: Style.marginM;
-						anchors.bottom: parent.bottom;
-						width: parent.width;
-						border.width: 1;
-						border.color: Style.borderColor2;
-						radius: 3;
-					}
-
-					CustomScrollbar {
-						id: scrollbar;
-						z: parent.z + 1;
-						anchors.right: parent.right;
-						anchors.top: parent.top;
-						anchors.bottom: parent.bottom;
-						secondSize: Style.marginXS;
-						targetItem: flickable;
-					}
-
-					Flickable {
-						id: flickable;
-						anchors.centerIn: background;
-						width: background.width - 2 * Style.marginM;
-						height: background.height - 2 * Style.marginM;
-						contentHeight: descriptionTextField.height;
-						clip: true;
-						boundsBehavior: Flickable.StopAtBounds;
-
-						Text {
-							id: descriptionTextField;
-							width: parent.width;
-							font.family: Style.fontFamily;
-							font.pixelSize: Style.fontSizeM;
-							color: Style.textColor;
-							wrapMode: Text.WordWrap;
-						}
-					}
-				}
-			}
-
-			Loading {
-				id: loading;
+			Rectangle {
 				anchors.fill: parent;
-				visible: false
-				background.color: Style.backgroundColor2
+				color: Style.baseColor;
+			}
+
+			DocumentHistoryView {
+				id: historyView;
+				anchors.fill: parent;
+				anchors.margins: Style.marginL;
+				documentId: documentRevisionDialog.documentId;
+				collectionId: documentRevisionDialog.collectionId;
+				selectable: true;
+				selectedRevision: documentRevisionDialog.selectedRevision;
+
+				onRevisionSelected: {
+					contentItem.selectRevision(revision);
+				}
+
+				function getHeaders(){
+					return documentRevisionDialog.getHeaders();
+				}
 			}
 		}
 	}
 }
-

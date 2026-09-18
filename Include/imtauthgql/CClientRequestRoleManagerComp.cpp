@@ -235,7 +235,7 @@ bool CClientRequestRoleManagerComp::SetRoleDataSdl(const QByteArray& roleId, con
 	rolessdl::RoleUpdateRequestArguments arguments;
 	arguments.input.emplace();
 	arguments.input->id = roleId;
-	arguments.input->typeId = QByteArray("Role");
+	arguments.input->typeId = QByteArrayLiteral("Role");
 	arguments.input->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	arguments.input->item = roleData;
 

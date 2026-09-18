@@ -72,7 +72,7 @@ void CObjectCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
 
 		switch (type){
 		case idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM:
-			textValue = QString("%1").arg(value.toLongLong(), 8, 16, QChar('0')).toUpper();
+			textValue = QStringLiteral("%1").arg(value.toLongLong(), 8, 16, QChar('0')).toUpper();
 			break;
 
 		case imtbase::IObjectCollection::MIT_PREVIEW_THUMBNAIL:

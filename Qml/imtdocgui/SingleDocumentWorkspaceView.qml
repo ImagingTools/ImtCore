@@ -1,14 +1,13 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtguigql 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 
 Rectangle {
 	id: root;
 
-	color: Style.backgroundColor2;
+	color: Style.baseColor;
 
 	property string titleSeparation: "/";
 	property bool initialItemTitleVisible: false;
@@ -142,7 +141,7 @@ Rectangle {
 	}
 	
 	function openErrorDialog(message){
-		ModalDialogManager.showErrorDialog(message)
+		PopupManager.addErrorMessage(message, true)
 	}
 
 	function addInitialItem(viewComp, name){

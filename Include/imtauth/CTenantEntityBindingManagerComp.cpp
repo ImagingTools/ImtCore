@@ -46,8 +46,8 @@ bool CTenantEntityBindingManagerComp::AddBinding(const QByteArray& tenantId, con
 	if (retVal.isEmpty()){
 		// ON CONFLICT DO NOTHING means the insert succeeds silently for duplicates,
 		// but if this collection doesn't support that, log and return true (idempotent)
-		SendInfoMessage(0, QString("Binding may already exist for tenant '%1', entity '%2'/'%3'")
-			.arg(QString::fromUtf8(tenantId), QString::fromUtf8(entityType), QString::fromUtf8(entityId)), "CTenantEntityBindingManagerComp");
+		SendInfoMessage(0, QStringLiteral("Binding may already exist for tenant '%1', entity '%2'/'%3'")
+			.arg(tenantId, entityType, entityId), QStringLiteral("CTenantEntityBindingManagerComp"));
 		return true;
 	}
 
@@ -68,8 +68,8 @@ bool CTenantEntityBindingManagerComp::RemoveBinding(const QByteArray& tenantId, 
 	}
 
 	if (!m_bindingsCollectionCompPtr->RemoveElements(idsToRemove)){
-		SendErrorMessage(0, QString("Failed to remove binding for tenant '%1', entity '%2'/'%3'")
-			.arg(QString::fromUtf8(tenantId), QString::fromUtf8(entityType), QString::fromUtf8(entityId)), "CTenantEntityBindingManagerComp");
+		SendErrorMessage(0, QStringLiteral("Failed to remove binding for tenant '%1', entity '%2'/'%3'")
+			.arg(tenantId, entityType, entityId), QStringLiteral("CTenantEntityBindingManagerComp"));
 		return false;
 	}
 
@@ -95,8 +95,8 @@ bool CTenantEntityBindingManagerComp::RemoveAllBindingsForEntity(const QByteArra
 	filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
 
 	if (!m_bindingsCollectionCompPtr->RemoveElementSet(&filterParams)){
-		SendErrorMessage(0, QString("Failed to remove all bindings for entity '%1'/'%2'")
-			.arg(QString::fromUtf8(entityType), QString::fromUtf8(entityId)), "CTenantEntityBindingManagerComp");
+		SendErrorMessage(0, QStringLiteral("Failed to remove all bindings for entity '%1'/'%2'")
+			.arg(entityType, entityId), QStringLiteral("CTenantEntityBindingManagerComp"));
 		return false;
 	}
 
@@ -122,8 +122,8 @@ bool CTenantEntityBindingManagerComp::RemoveAllBindingsForTenant(const QByteArra
 	filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
 
 	if (!m_bindingsCollectionCompPtr->RemoveElementSet(&filterParams)){
-		SendErrorMessage(0, QString("Failed to remove all bindings for tenant '%1', type '%2'")
-			.arg(QString::fromUtf8(tenantId), QString::fromUtf8(entityType)), "CTenantEntityBindingManagerComp");
+		SendErrorMessage(0, QStringLiteral("Failed to remove all bindings for tenant '%1', type '%2'")
+			.arg(tenantId, entityType), QStringLiteral("CTenantEntityBindingManagerComp"));
 		return false;
 	}
 

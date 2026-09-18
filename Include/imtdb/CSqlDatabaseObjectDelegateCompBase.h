@@ -36,10 +36,11 @@ public:
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
 		I_ASSIGN(m_autoCreateTableAttrPtr, "AutoCreateTable", "Auto create collection table if it does not exist", false, false);
 		I_ASSIGN(m_createTableScriptPathAttrPtr, "CreateTableScriptPath", "QRC path or file name of SQL script used to create collection table", false, "");
+		I_ASSIGN(m_prerequisiteTableScriptPathAttrPtr, "PrerequisiteTableScriptPath", "QRC path or file name of SQL script creating tables the collection table references (executed before CreateTableScriptPath)", false, "");
 	I_END_COMPONENT
 
 	virtual QString SqlEncode(const QString& sqlQuery) const;
-
+	
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
@@ -47,6 +48,12 @@ public:
 	virtual const iprm::IOptionsList* GetObjectTypeInfos() const override;
 	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
 	virtual QByteArray GetCountQuery(const iprm::IParamsSet* paramsPtr = nullptr) const override;
+	virtual NewObjectQuery CreateUpdateObjectQueryWithParameters(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
+				const imtbase::IOperationContext* operationContextPtr,
+				bool useExternDelegate = true) const override;
 	virtual QByteArray GetSelectionQuery(
 				const QByteArray& objectId = QByteArray(),
 				int offset = 0,
@@ -82,6 +89,7 @@ public:
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 
 protected:
+	virtual bool IsSqliteDriver() const;
 	virtual QString GetBaseSelectionQuery() const;
 	virtual idoc::IDocumentMetaInfo* CreateCollectionItemMetaInfo(const QByteArray& typeId) const;
 	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const;
@@ -93,13 +101,14 @@ protected:
 	virtual bool CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const;
 	virtual bool CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const;
 	virtual bool CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const;
-	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& timeFieldId = QStringLiteral("root1.\"TimeStamp\"")) const;
+	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& timeFieldId = QStringLiteral(R"(root1."TimeStamp")")) const;
 	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const;
 	virtual bool CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const;
 	virtual bool CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const;
 	virtual QString EncodeTextArgument(const QString& argument) const;
 	virtual bool CreateTableIfNeeded();
 	virtual bool TableExists(const QString& tableName) const;
+	bool ExecuteTableScript(const QByteArray& scriptPath, const QString& tableName);
 
 protected:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
@@ -111,9 +120,8 @@ protected:
 	I_ATTR(QByteArray, m_objectTypeIdColumnAttrPtr);
 	I_ATTR(bool, m_autoCreateTableAttrPtr);
 	I_ATTR(QByteArray, m_createTableScriptPathAttrPtr);
+	I_ATTR(QByteArray, m_prerequisiteTableScriptPathAttrPtr);
 };
 
 
 } // namespace imtdb
-
-

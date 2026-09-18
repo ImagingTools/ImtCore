@@ -35,23 +35,39 @@ public:
 	Status GetStatus();
 	void SetStatus(Status status);
 	void SetRequestPtr(const IRequest* requestPtr);
+	/**
+		Provide a servlet created on the manager/application thread.
+		CreateServlet() must not run on the worker: factory OnComponentCreated()
+		may construct QObjects parented to qApp (translators, timers, etc.), and
+		doing that from CWorkerThread logs the one-shot affinity warning.
+	*/
+	void SetServlet(IRequestServletPtr&& servletPtr);
 	bool SendResponse(const QByteArray& requestId, ConstResponsePtr& response);
+
+	/**
+		Post \a requestPtr to this worker's CWorker on the worker thread. Uses a
+		captured-argument lambda instead of a queued signal carrying a raw IRequest*:
+		a queued signal needs that pointer type registered as a queued metatype, and
+		without it Qt silently drops the call, so ProcessRequest never runs and the
+		worker idles forever in exec() (server hang). A lambda captures the pointer
+		directly and needs no metatype registration.
+	*/
+	void PostRequest(const IRequest* requestPtr, const QByteArray& subCommandId);
+
+	/**
+		Notify the manager, on its own thread, that a request finished. Called by CWorker.
+		Same lambda-hop rationale as \ref PostRequest.
+	*/
+	void NotifyFinished(const IRequest* requestPtr, const QByteArray& subCommandId);
 
 	//reimplemented (QThread)
 	virtual void run() override;
-
-Q_SIGNALS:
-	void StartProcess(const IRequest* request, const QByteArray& subCommandId);
-	void FinishProcess(const IRequest* request, const QByteArray& subCommandId);
-
-protected Q_SLOTS:
-	void OnStarted();
-	void OnFinishProcess(const IRequest* request, const QByteArray& subCommandId);
 
 private:
 	Status m_status;
 	mutable CWorkerManagerComp* m_workerManager;
 	istd::TDelPtr<CWorker> m_workerPtr;
+	IRequestServletPtr m_servletPtr;
 	const IRequest* m_requestPtr;
 	mutable QMutex m_statusMutex;
 	QByteArray m_subCommandId;

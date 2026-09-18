@@ -120,7 +120,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 		// check option names
 		for (const QString& optionName: option.names()){
 			if (optionNames.contains(optionName)){
-				SendCriticalMessage(0, QString("Duplication of option '%1' is detected. All option IDs MUST be unique! Select another name for this option").arg(optionName));
+				SendCriticalMessage(0, QStringLiteral("Duplication of option '%1' is detected. All option IDs MUST be unique! Select another name for this option").arg(optionName));
 				isOptionsAcceptable = false;
 			}
 			optionNames << optionName;
@@ -130,7 +130,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 		const QString optionValueName = option.valueName();
 		if (!optionValueName.isEmpty()){
 			if (optionValueNames.contains(optionValueName)){
-				SendCriticalMessage(0, QString("Duplication of option value ID '%1' is detected. All option value's IDs MUST be unique! Select another name for this option").arg(optionValueName));
+				SendCriticalMessage(0, QStringLiteral("Duplication of option value ID '%1' is detected. All option value's IDs MUST be unique! Select another name for this option").arg(optionValueName));
 				isOptionsAcceptable = false;
 			}
 			optionValueNames << optionValueName;
@@ -202,7 +202,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 		const QStringList baseClassList = commandLineParser.values(baseClassOption);
 		for (const QString& baseClassDeclaration: baseClassList){
 			if (!baseClassDeclaration.contains('=')){
-				SendCriticalMessage(0, QString("Declaration '%1' does not contains include directive").arg(baseClassDeclaration));
+				SendCriticalMessage(0, QStringLiteral("Declaration '%1' does not contains include directive").arg(baseClassDeclaration));
 				Q_ASSERT_X(false, "base class declarations parsing", "Declaration does not contains include directive");
 
 				return false;
@@ -242,7 +242,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 			}
 		}
 		else {
-			SendErrorMessage(0, QString("Unexpected generator option '%1'. See %2 help for details").arg(generatorName, generatorOption.names().join('/')));
+			SendErrorMessage(0, QStringLiteral("Unexpected generator option '%1'. See %2 help for details").arg(generatorName, generatorOption.names().join('/')));
 		}
 	}
 
@@ -268,7 +268,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 			m_cppGenerationMode = CGM_IMPLEMENTATION_ONLY;
 		}
 		else {
-			SendErrorMessage(0, QString("Unexpected value for option '--cpp-mode' expected one of: ALL | HEADER | IMPL"));
+			SendErrorMessage(0, QStringLiteral("Unexpected value for option '--cpp-mode' expected one of: ALL | HEADER | IMPL"));
 
 			return false;
 		}
@@ -286,7 +286,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 			m_typenameWriteMode = TWM_NEVER;
 		}
 		else {
-			SendErrorMessage(0, QString("Unexpected value for option '--typename-mode' expected one of: ALWAYS | IF_REQUIRED | NEVER"));
+			SendErrorMessage(0, QStringLiteral("Unexpected value for option '--typename-mode' expected one of: ALWAYS | IF_REQUIRED | NEVER"));
 
 			return false;
 		}
@@ -332,7 +332,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 		if (depFileInfo.exists()){
 			const bool removed = QFile::remove(depFileInfo.absoluteFilePath());
 			if (!removed){
-				SendErrorMessage(0, QString("Unable to remove dependency file '%1'").arg(depFileInfo.absoluteFilePath()));
+				SendErrorMessage(0, QStringLiteral("Unable to remove dependency file '%1'").arg(depFileInfo.absoluteFilePath()));
 
 				return false;
 			}
@@ -342,7 +342,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 		if (!depFileDir.exists()){
 			const bool dirCreated = depFileDir.mkpath(depFileDir.absolutePath());
 			if (!dirCreated){
-				SendErrorMessage(0, QString("Unable to create folder '%1'").arg(depFileDir.absolutePath()));
+				SendErrorMessage(0, QStringLiteral("Unable to create folder '%1'").arg(depFileDir.absolutePath()));
 
 				return false;
 			}

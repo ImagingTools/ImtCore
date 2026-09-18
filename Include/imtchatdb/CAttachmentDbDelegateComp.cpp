@@ -104,10 +104,10 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAttachmentDbDelegateComp::Create
 		"INSERT INTO \"Attachments\" "
 		"(\"Id\", \"FileName\", \"MimeType\", \"Data\", \"FileSize\", \"CreatedAt\") "
 		"VALUES('%1', '%2', '%3', E'\\\\x%4', %5, '%6');")
-		.arg(QString::fromUtf8(attachId))
+		.arg(attachId)
 		.arg(escapedFileName)
 		.arg(escapedMimeType)
-		.arg(QString::fromUtf8(hexData))
+		.arg(hexData)
 		.arg(attachPtr->GetFileSize())
 		.arg(nowUtc)
 		.toUtf8();
@@ -142,10 +142,10 @@ QByteArray CAttachmentDbDelegateComp::CreateDeleteObjectsQuery(
 		if (i > 0) idsStr += ", ";
 		QString escaped = QString::fromUtf8(objectIds[i]);
 		escaped.replace('\'', "''");
-		idsStr += QString("'%1'").arg(escaped);
+		idsStr += QStringLiteral("'%1'").arg(escaped);
 	}
 
-	return QString("DELETE FROM \"Attachments\" WHERE \"Id\" IN (%1);")
+	return QStringLiteral(R"(DELETE FROM "Attachments" WHERE "Id" IN (%1);)")
 		.arg(idsStr)
 		.toUtf8();
 }

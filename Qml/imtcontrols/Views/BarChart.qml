@@ -163,10 +163,10 @@ Item {
 		componentHeight: Style.controlHeightM;
 		fontPixelSize:  Style.fontSizeM;
 
-		color: Style.color_buttonText;
+		color: Style.buttonColor;
 		fontColor: "#ffffff";
 
-		borderColor: Style.color_elementBorder;
+		borderColor: Style.borderColor;
 		property string shownValPos: Math.trunc((barChart.positiveValue + barChart.addToValue)*1000)/1000;
 		property string shownValNeg: Math.trunc((barChart.negativeValue + barChart.addToValue)*1000)/1000;
 		property string shownVal: barChart.isPositiveTooltip ? shownValPos : barChart.isNegativeTooltip ? shownValNeg : "";

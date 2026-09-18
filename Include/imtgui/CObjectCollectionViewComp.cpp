@@ -132,7 +132,9 @@ ICollectionViewDelegate* CObjectCollectionViewComp::GetViewDelegatePtr(const QBy
 	}
 
 	QByteArray componentId = GetComponentId(GetComponentContext().get());
-	Q_ASSERT_X(false, qPrintable(QString("%1").arg(__LINE__)), qPrintable(QString("Type-ID of the view delegate: '%1' not found, %2").arg(qPrintable(typeId)).arg(qPrintable(componentId))));
+	const QByteArray componentName = QStringLiteral("%1").arg(__LINE__).toUtf8();
+	const QByteArray errorMessage = QStringLiteral("Type-ID of the view delegate: '%1' not found, %2").arg(typeId, componentId).toUtf8();
+	Q_ASSERT_X(false, componentName.constData(), errorMessage.constData());
 
 	return nullptr;
 }
@@ -1936,5 +1938,3 @@ void CObjectCollectionViewComp::TableModel::fetchMore(const QModelIndex& parent)
 
 
 } // namespace imtgui
-
-

@@ -9,6 +9,7 @@ DataModelController {
 	property string gqlCommandId
 	property var responseModel
 	property var inputModel
+	property string context
 
 	function saveDataModel(params, documentId, documentName, documentDescription, documentTypeId){
 		root.requestStarted(params)
@@ -34,7 +35,11 @@ DataModelController {
 
 		query.AddParam(inputObject)
 
-		gqlRequest.setGqlQuery(query.GetQuery(), root.getHeaders())
+		let headers = root.getHeaders()
+		if (headers && root.context && root.context != "")
+			headers["context"] = root.context
+
+		gqlRequest.setGqlQuery(query.GetQuery(), headers)
 	}
 
 	function prepareInputModel(params, documentId, documentName, documentDescription){
@@ -57,7 +62,7 @@ DataModelController {
 					responseObj = JSON.parse(json)
 				}
 				catch(e){
-					root.dataModelLoadFailed("Json convertation failed")
+					root.dataModelSaveFailed("Json convertation failed")
 					return
 				}
 
@@ -73,7 +78,7 @@ DataModelController {
 					}
 
 					if (!responseModel){
-						root.dataModelLoadFailed("Unable to create data model from json. Error: Result model is invalid")
+						root.dataModelSaveFailed("Unable to create data model from json. Error: Result model is invalid")
 						return
 					}
 

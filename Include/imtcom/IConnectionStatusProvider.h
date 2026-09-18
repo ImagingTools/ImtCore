@@ -320,6 +320,12 @@ namespace imtcom
 class IConnectionStatusProvider: virtual public istd::IChangeable
 {
 public:
+	enum ChangeFlags
+	{
+		CF_DISCONNECTED = 10000,
+		CF_CONNECTED
+	};
+
 	/**
 		\enum ConnectionStatus
 		\brief Connection status enumeration.

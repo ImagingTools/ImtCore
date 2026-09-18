@@ -22,10 +22,10 @@ public:
 	I_END_COMPONENT
 
 protected:
-	virtual QJsonObject ListObjects(
+	virtual QJsonObject GetObjectListFromRequest(
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual QJsonObject GetObject(
+	virtual QJsonObject GetObjectFromRequest(
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

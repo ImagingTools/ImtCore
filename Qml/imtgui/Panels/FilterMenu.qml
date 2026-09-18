@@ -9,7 +9,9 @@ ControlBase {
     objectName: "FilterMenu"
     
     decorator: Style.filterPanelDecorator
-    
+
+    z: 1
+
     heightFromDecorator: true
     
     property bool canResetFilters: true
@@ -36,15 +38,20 @@ ControlBase {
     }
 
     function hasActiveFilter(){
+        return activeFilterCount() > 0
+    }
+
+    function activeFilterCount(){
+        let count = 0
         for (let i = 0; i < filtersModel.count; i++){
             if (filtersModel.get(i).item){
                 if (filtersModel.get(i).item.isActive){
-                    return true
+                    count++
                 }
             }
         }
 
-        return false
+        return count
     }
 
     function setFilterIsEnabled(filterId, enabled){

@@ -28,32 +28,19 @@ Rectangle {
 			console.error("property 'groupView' is invalid");
 			return;
 		}
-		
-		if (opened){
-			animation.from = 0;
-			animation.to = groupView.contentHeight;
-		}
-		else{
-			animation.from = groupView.contentHeight;
-			animation.to = 0;
-		}
-		
-		animation.start();
+
+		// The group owns the collapse/expand animation via its 'opened' state and a
+		// Behavior on height. Driving it here keeps the group's height binding intact
+		// (reactive to content changes), instead of overwriting height imperatively.
+		groupView.opened = opened;
 	}
-	
+
 	onGroupViewChanged: {
 		if (groupView){
-			animation.target = groupView;
+			groupView.opened = root.opened;
 		}
 	}
-	
-	NumberAnimation {
-		id: animation;
-		
-		property: "height";
-		duration: 200;
-	}
-	
+
 	Loader {
 		id: controlLoader;
 		

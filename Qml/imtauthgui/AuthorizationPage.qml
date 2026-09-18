@@ -14,7 +14,7 @@ Rectangle {
 	property string state:"";
 
 	property int mainRadius: Style.radiusL;
-	property string mainColor: Style.backgroundColor2
+	property string mainColor: Style.baseColor
 
 	property bool canRecoveryPassword: true;
 	property bool canRegisterUser: true;
@@ -76,7 +76,8 @@ Rectangle {
 			authPageContainer.isAuthenticating = false;
 			// Clear password on error (common good UX: don't leave bad credentials; username stays)
 			passwordTextInput.text = "";
-			errorMessage.text = (message && message !== "") ? message : qsTr("Username or password is incorrect");
+			var errorText = (message && message !== "") ? message : qsTr("Username or password is incorrect");
+			PopupManager.addErrorMessage(errorText, true);
 			passwordTextInput.forceActiveFocus();
 		}
 
@@ -243,12 +244,6 @@ Rectangle {
 				KeyNavigation.tab: passwordTextInput;
 				KeyNavigation.backtab: passwordTextInput;
 
-				onTextChanged: {
-					if (errorMessage.text != ""){
-						errorMessage.text = "";
-					}
-				}
-
 				onAccepted: {
 					if (!authPageContainer.isAuthenticating && passwordTextInput.text != "" && loginTextInput.text != ""){
 						loginButton.clicked();
@@ -298,12 +293,6 @@ Rectangle {
 
 				KeyNavigation.tab: loginTextInput;
 				KeyNavigation.backtab: loginTextInput;
-
-				onTextChanged: {
-					if (errorMessage.text != ""){
-						errorMessage.text = "";
-					}
-				}
 
 				onAccepted: {
 					if (!authPageContainer.isAuthenticating && passwordTextInput.text != "" && loginTextInput.text != ""){
@@ -391,6 +380,7 @@ Rectangle {
 
 				MouseArea{
 					id: passwordRecoveryMA;
+					objectName: "PasswordRecoveryLink"
 
 					anchors.fill: titlePasswordRecovery;
 					visible: authPageContainer.canRecoveryPassword;
@@ -429,7 +419,6 @@ Rectangle {
 						text: qsTr("Sign in");
 
 						onClicked: {
-							errorMessage.text = "";
 							authPageContainer.isAuthenticating = true;
 							authPageContainer.login(loginTextInput.text, passwordTextInput.text)
 						}
@@ -447,31 +436,6 @@ Rectangle {
 							background.color: "transparent";
 							indicatorSize: 14;
 							z: 20;
-						}
-					}
-
-					// Fixed-height container for error placed right under the Sign in button.
-					// The reserved space ensures the login card height never jumps when an error is shown/hidden.
-					Item {
-						id: errorContainer;
-						width: parent.width;
-						height: Style.controlHeightS + Style.marginS;
-
-						Text {
-							id: errorMessage;
-
-							anchors.top: parent.top;
-							anchors.topMargin: 2;
-							anchors.horizontalCenter: parent.horizontalCenter;
-							width: parent.width;
-
-							color: Style.errorTextColor;
-							font.family: Style.fontFamily;
-							font.pixelSize: Style.fontSizeM;
-
-							visible: text !== "";
-							horizontalAlignment: Text.AlignHCenter;
-							wrapMode: Text.Wrap;
 						}
 					}
 				}
@@ -535,7 +499,7 @@ Rectangle {
 		id: registerDialogComp;
 		Dialog {
 			id: registerDialog;
-			width: Style.sizeHintXXL;
+			width: Math.max(Style.sizeHintL, Math.min(ModalDialogManager.activeView.width - 100, Style.sizeHintXXL));
 			height: ModalDialogManager.activeView.height - 100;
 			title: qsTr("Sign up");
 			canMove: false;

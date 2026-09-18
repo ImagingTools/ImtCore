@@ -189,6 +189,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		HomeButton->hide();
 	}
 
+	UpdateVersionKindLabel();
+
 	if (*m_viewPageNavigationAttrPtr == false){
 		BackPageButton->hide();
 		NextPageButton->hide();
@@ -342,6 +344,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 	connect(&m_autoLogoutTimer, SIGNAL(timeout()), this, SLOT(OnAutoLogoutTimer()));
 	connect(&m_checkIsFullScreenTimer, SIGNAL(timeout()), this, SLOT(OnCheckIsFullScreenTimer()));
+	connect(&m_versionKindBlinkTimer, SIGNAL(timeout()), this, SLOT(OnVersionKindBlinkTimer()));
 
 	m_checkIsFullScreenTimer.start(500);
 
@@ -398,6 +401,7 @@ void CThumbnailDecoratorGuiComp::OnGuiDestroyed()
 
 	m_autoLogoutTimer.stop();
 	m_checkIsFullScreenTimer.stop();
+	m_versionKindBlinkTimer.stop();
 
 	if (m_loginGuiCompPtr.IsValid() && m_loginGuiCompPtr->IsGuiCreated()){
 		m_loginGuiCompPtr->DestroyGui();
@@ -453,6 +457,8 @@ void CThumbnailDecoratorGuiComp::OnGuiRetranslate()
 			}
 		}
 	}
+
+	UpdateVersionKindLabel();
 }
 
 
@@ -678,6 +684,16 @@ void CThumbnailDecoratorGuiComp::OnCheckIsFullScreenTimer()
 	else{
 		ExitButton->setVisible(false);
 	}
+}
+
+
+void CThumbnailDecoratorGuiComp::OnVersionKindBlinkTimer()
+{
+	// let the version kind text blink by toggling the text color between red and transparent
+	bool isTransparent = VersionKindLabel->property("BlinkTransparent").toBool();
+
+	VersionKindLabel->setStyleSheet(isTransparent? QStringLiteral("color: red;"): QStringLiteral("color: transparent;"));
+	VersionKindLabel->setProperty("BlinkTransparent", !isTransparent);
 }
 
 
@@ -1228,6 +1244,28 @@ void CThumbnailDecoratorGuiComp::ExitApplication()
 bool CThumbnailDecoratorGuiComp::IsHomePageEnabled() const
 {
 	return !*m_hideHomeButtonAttrPtr;
+}
+
+
+void CThumbnailDecoratorGuiComp::UpdateVersionKindLabel()
+{
+	// make the application version kind visible for non-release builds (e.g. "Beta Version")
+	QString versionKindText;
+	if (m_applicationInfoCompPtr.IsValid() && (m_applicationInfoCompPtr->GetVersionKind() != ibase::IApplicationInfo::VK_RELEASE)){
+		versionKindText = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_VERSION_KIND);
+	}
+
+	VersionKindLabel->setText(versionKindText);
+	VersionKindLabel->setVisible(!versionKindText.isEmpty());
+
+	if (!versionKindText.isEmpty()){
+		if (!m_versionKindBlinkTimer.isActive()){
+			m_versionKindBlinkTimer.start(500);
+		}
+	}
+	else{
+		m_versionKindBlinkTimer.stop();
+	}
 }
 
 

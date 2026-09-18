@@ -16,46 +16,6 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
-			Address,
-			"Address information",
-			"Address Information Authority");
-
-I_EXPORT_COMPONENT(
-			ContactInfo,
-			"Contact information",
-			"Contact Information");
-
-I_EXPORT_COMPONENT(
-			AccountInfo,
-			"Account information",
-			"Account Information Authority");
-
-I_EXPORT_COMPONENT(
-			CompanyInfo,
-			"Account company information",
-			"Account company Information");
-
-I_EXPORT_COMPONENT(
-			ContactInfoMetaInfoCreator,
-			"Contact info metainfo creator",
-			"Contact Metainfo Creator");
-
-I_EXPORT_COMPONENT(
-			AddressMetaInfoCreator,
-			"Address metainfo creator",
-			"Address Metainfo Creator");
-
-I_EXPORT_COMPONENT(
-			AccountInfoMetaInfoCreator,
-			"Account info metainfo creator",
-			"Account Metainfo Creator");
-
-I_EXPORT_COMPONENT(
-			CompanyInfoMetaInfoCreator,
-			"Company info metainfo creator",
-			"Company Metainfo Creator");
-
-I_EXPORT_COMPONENT(
 			Role,
 			"Role",
 			"Role");
@@ -96,11 +56,6 @@ I_EXPORT_COMPONENT(
 			"Check Permissions");
 
 I_EXPORT_COMPONENT(
-			CollectionPermissionsProvider,
-			"Collection permissions provider",
-			"Collection Permissions Provider");
-
-I_EXPORT_COMPONENT(
 			OrganizationsPermissionsProvider,
 			"Organizations permissions provider",
 			"Organizations Permissions Provider");
@@ -136,9 +91,19 @@ I_EXPORT_COMPONENT(
 			"Credential Controller");
 
 I_EXPORT_COMPONENT(
+			PasswordPolicy,
+			"Password policy",
+			"Password Policy Strength History Lifetime");
+
+I_EXPORT_COMPONENT(
 			LdapCredentialController,
 			"Ldap credential controller",
 			"Ldap Credential Controller");
+
+I_EXPORT_COMPONENT(
+			AccountLockoutController,
+			"Account lockout controller",
+			"Account Lockout Controller");
 
 I_EXPORT_COMPONENT(
 			LdapUserCollectionJoiner,
@@ -179,21 +144,6 @@ I_EXPORT_COMPONENT(
 			JwtSessionController,
 			"Json web token session controller",
 			"JWT JsonWebToken Session Controller");
-
-I_EXPORT_COMPONENT(
-			SessionMetaInfoCreator,
-			"Session meta info creator",
-			"Session Meta Info Creator");
-
-I_EXPORT_COMPONENT(
-			UserMetaInfoCreator,
-			"User meta info creator",
-			"User Meta Info Creator");
-
-I_EXPORT_COMPONENT(
-			GroupMetaInfoCreator,
-			"Group meta info creator",
-			"Group Meta Info Creator");
 
 I_EXPORT_COMPONENT(
 			UserConnectionInfo,
@@ -254,11 +204,6 @@ I_EXPORT_COMPONENT(
 			TenantInfo,
 			"Tenant entity storing organization data (name, description, status, relationships)",
 			"Tenant Info");
-
-I_EXPORT_COMPONENT(
-			TenantMetaInfoCreator,
-			"Creates meta-information descriptors for tenant entity fields",
-			"Tenant Meta Info Creator");
 
 I_EXPORT_COMPONENT(
 			TenantManager,
@@ -403,6 +348,21 @@ I_EXPORT_COMPONENT(
 			TenantRelationshipDocumentNameProvider,
 			"Provides default document name from target tenant name",
 			"Tenant Relationship Document Name Provider");
+
+I_EXPORT_COMPONENT(
+			RoleDocumentNameProvider,
+			"Provides default document name from role name",
+			"Role Document Name Provider");
+
+I_EXPORT_COMPONENT(
+			UserDocumentNameProvider,
+			"Provides default document name from user name",
+			"User Document Name Provider");
+
+I_EXPORT_COMPONENT(
+			UserGroupDocumentNameProvider,
+			"Provides default document name from user group name",
+			"User Group Document Name Provider");
 
 I_EXPORT_COMPONENT(
 			TenantDocumentValidator,

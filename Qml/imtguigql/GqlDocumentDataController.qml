@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
+import imtgui 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
 import imtdocgui 1.0
@@ -8,6 +9,7 @@ import imtdocgui 1.0
 DocumentDataController {
     id: container;
 
+    property string context: ""
     property string gqlGetCommandId;
     property string gqlAddCommandId;
     property string gqlUpdateCommandId;
@@ -25,7 +27,7 @@ DocumentDataController {
     }
 
     onError: {
-        ModalDialogManager.showWarningDialog(message)
+        PopupManager.addWarningMessage(message, true)
     }
 
     onDocumentIdChanged: {
@@ -87,6 +89,7 @@ DocumentDataController {
     }
 
     property GqlRequestSender gqlUpdateModel: GqlRequestSender {
+        context: container.context
         requestType: 1; // Mutation
         gqlCommandId: container.gqlUpdateCommandId;
 
@@ -130,6 +133,7 @@ DocumentDataController {
     }
 
     property GqlRequestSender gqlGetModel: GqlRequestSender {
+        context: container.context
         requestType: 0; // Query
         gqlCommandId: container.gqlGetCommandId;
 
@@ -171,6 +175,7 @@ DocumentDataController {
     }
 
     property GqlRequestSender gqlAddModel: GqlRequestSender {
+        context: container.context
         requestType: 1; // Mutation
         gqlCommandId: container.gqlAddCommandId;
 

@@ -58,10 +58,10 @@ QString CUserActionDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm
 
 				array += "]";
 
-				filterQuery += QString(R"((users."Document"->'Groups' ?| %1))").arg(array);
+				filterQuery += QStringLiteral(R"((users."Document"->'Groups' ?| %1))").arg(array);
 			}
 			else{
-				filterQuery += QString(R"(users."Document"->>'Id' = '%1')").arg(SqlEncode(QString::fromUtf8(userId)));
+				filterQuery += QStringLiteral(R"(users."Document"->>'Id' = '%1')").arg(SqlEncode(QString::fromUtf8(userId)));
 			}
 		}
 	}

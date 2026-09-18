@@ -3,8 +3,6 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
-import imtguigql 1.0
-import imtauthgui 1.0
 import imtbaseDocumentRevisionSdl 1.0
 
 CollectionViewCommandsDelegateBase{
@@ -69,8 +67,13 @@ CollectionViewCommandsDelegateBase{
 	}
 
 	onDocumentManagerIdChanged:{
-		if (documentManagerId !== ""){
-			documentManager = MainDocumentService.getDocumentService(documentManagerId)
+		if (documentManagerId === "" || documentManager){
+			return
+		}
+
+		let docManager = MainDocumentService.getDocumentService(documentManagerId)
+		if (docManager){
+			documentManager = docManager
 		}
 	}
 

@@ -5,6 +5,7 @@
 
 // ACF includes
 #include <iprm/IIdParam.h>
+#include <iprm/IParamsInfoProvider.h>
 #include <iprm/TParamsPtr.h>
 #include <iqt/iqt.h>
 
@@ -18,7 +19,7 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CParamsSet>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CParamsSet>)
 
 QByteArray CParamSetRepresentationController::GetTypeId() const
 {
@@ -59,51 +60,70 @@ bool CParamSetRepresentationController::GetSdlRepresentationFromDataModel(
 
 	imtsdl::TElementList<sdl::V1_0::imtbase::CParameter> parameterList;
 
-	for (const QByteArray& parameterId : parameterIds){
-		if (!parameterId.contains("/")){
-			const iser::ISerializable* parameterPtr = paramsSetPtr->GetParameter(parameterId);
-			if (parameterPtr == nullptr){
-				continue;
-			}
+	const iprm::IParamsInfoProvider* paramsInfoProviderPtr = paramsSetPtr->GetParamsInfoProvider();
+	for (const QByteArray& parameterId : std::as_const(parameterIds)){
+		if (parameterId.contains('/')){
+			continue;
+		}
 
-			if (!m_representationControllersMap.contains(parameterId)){
-				continue;
-			}
+		const iser::ISerializable* parameterPtr = paramsSetPtr->GetParameter(parameterId);
+		if (parameterPtr == nullptr){
+			continue;
+		}
 
-			const IJsonRepresentationController* subControllerPtr = m_representationControllersMap[parameterId];
-			if (subControllerPtr == nullptr){
-				return false;
-			}
+		QByteArray typeId;
+		QJsonObject parameterRepresentation;
 
-			QJsonObject parameterRepresentation;
+		// a registered (e.g. custom) sub-controller for this specific type takes priority over generic nested paramset handling
+		const IJsonRepresentationController* subControllerPtr = GetRepresentationController(*parameterPtr);
+		if (subControllerPtr != nullptr){
+			typeId = subControllerPtr->GetTypeId();
+
 			if (!subControllerPtr->GetRepresentationFromDataModel(*parameterPtr, parameterRepresentation, paramsPtr)){
 				return false;
 			}
-
-			sdl::V1_0::imtbase::CParameter parameter;
-			QJsonDocument jsonDocument(parameterRepresentation);
-
-			parameter.data = jsonDocument.toJson(QJsonDocument::Compact);
-
-			IJsonRepresentationController::RepresentationInfo representationInfo = subControllerPtr->GetRepresentationInfo();
-			QByteArray typeId = subControllerPtr->GetTypeId();
-
-			parameter.id = representationInfo.modelId;
-			parameter.typeId = typeId;
-
-			QString name = representationInfo.name;
-			QString description = representationInfo.description;
-
-			if (m_translationManagerPtr != nullptr){
-				name = iqt::GetTranslation(m_translationManagerPtr, name.toUtf8(), languageId, "Attribute");
-				description = iqt::GetTranslation(m_translationManagerPtr, description.toUtf8(), languageId, "Attribute");
+		}
+		else{
+			const iprm::IParamsSet* subParamsSetPtr = dynamic_cast<const iprm::IParamsSet*>(parameterPtr);
+			if (subParamsSetPtr == nullptr){
+				continue;
 			}
 
-			parameter.name = name;
-			parameter.description = description;
+			typeId = GetTypeId();
 
-			parameterList << parameter;
+			if (!GetRepresentationFromDataModel(*subParamsSetPtr, parameterRepresentation, paramsPtr)){
+				return false;
+			}
 		}
+
+		sdl::V1_0::imtbase::CParameter parameter;
+		QJsonDocument jsonDocument(parameterRepresentation);
+
+		parameter.data = jsonDocument.toJson(QJsonDocument::Compact);
+
+		parameter.id = parameterId;
+		parameter.typeId = typeId;
+
+		QString name;
+		QString description;
+
+		if (paramsInfoProviderPtr != nullptr){
+			std::unique_ptr<iprm::IParamsInfoProvider::ParamInfo> paramInfoPtr = paramsInfoProviderPtr->GetParamInfo(parameterId);
+			if (paramInfoPtr){
+				name = paramInfoPtr->name;
+				description = paramInfoPtr->description;
+			}
+		}
+
+		if (m_translationManagerPtr != nullptr){
+			name = iqt::GetTranslation(m_translationManagerPtr, name.toUtf8(), languageId, "Attribute");
+			description = iqt::GetTranslation(m_translationManagerPtr, description.toUtf8(), languageId, "Attribute");
+		}
+
+		parameter.name = name;
+		parameter.description = description;
+
+		parameterList << parameter;
 	}
 
 	sdlRepresentation.parameters = parameterList;
@@ -153,17 +173,22 @@ bool CParamSetRepresentationController::GetDataModelFromSdlRepresentation(
 			return false;
 		}
 
-		if (!m_representationControllersMap.contains(parameterId)){
-			return false;
+		// a registered (e.g. custom) sub-controller for this specific type takes priority over generic nested paramset handling
+		const IJsonRepresentationController* subControllerPtr = GetRepresentationController(*parameterPtr);
+		if (subControllerPtr != nullptr){
+			if (!subControllerPtr->GetDataModelFromRepresentation(document.object(), *parameterPtr)){
+				return false;
+			}
 		}
+		else{
+			iprm::IParamsSet* subParamsSetPtr = dynamic_cast<iprm::IParamsSet*>(parameterPtr);
+			if (subParamsSetPtr == nullptr){
+				return false;
+			}
 
-		const IJsonRepresentationController* subControllerPtr = m_representationControllersMap[parameterId];
-		if (subControllerPtr == nullptr){
-			return false;
-		}
-
-		if (!subControllerPtr->GetDataModelFromRepresentation(document.object(), *parameterPtr)){
-			return false;
+			if (!GetDataModelFromRepresentation(document.object(), *subParamsSetPtr)){
+				return false;
+			}
 		}
 	}
 
@@ -173,16 +198,33 @@ bool CParamSetRepresentationController::GetDataModelFromSdlRepresentation(
 
 // private methods
 
+const IJsonRepresentationController* CParamSetRepresentationController::GetRepresentationController(
+			const istd::IChangeable& dataModel) const
+{
+	for (const IJsonRepresentationController* controllerPtr : m_representationControllers){
+		if (controllerPtr != nullptr && controllerPtr->IsModelSupported(dataModel)){
+			return controllerPtr;
+		}
+	}
+
+	return nullptr;
+}
+
 bool CParamSetRepresentationController::RegisterSubController(const imtserverapp::IJsonRepresentationController& controller) const
 {
-	imtserverapp::IJsonRepresentationController::RepresentationInfo representationInfo = controller.GetRepresentationInfo();
-	if (m_representationControllersMap.contains(representationInfo.modelId)){
+	if (m_representationControllers.contains(&controller)){
 		return false;
 	}
 
-	m_representationControllersMap[representationInfo.modelId] = &controller;
+	m_representationControllers << &controller;
 
 	return true;
+}
+
+
+void CParamSetRepresentationController::SetTranslationManager(iqt::ITranslationManager* translationManagerPtr)
+{
+	m_translationManagerPtr = translationManagerPtr;
 }
 
 

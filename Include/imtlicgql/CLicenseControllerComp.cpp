@@ -53,7 +53,7 @@ istd::IChangeableUniquePtr CLicenseControllerComp::CreateObjectFromRequest(
 
 	imtbase::CTreeItemModel licenseModel;
 	if (!licenseModel.CreateFromJson(jsonItemData)){
-		errorMessage = QT_TR_NOOP(QString("Unable to create tree item model from json: %1.").arg(qPrintable(jsonItemData)));
+		errorMessage = QT_TR_NOOP(QStringLiteral("Unable to create tree item model from json: %1.").arg(jsonItemData));
 		SendErrorMessage(0, errorMessage, "License controller");
 
 		return nullptr;
@@ -89,7 +89,7 @@ istd::IChangeableUniquePtr CLicenseControllerComp::CreateObjectFromRequest(
 	if (!collectionIds.isEmpty()){
 		QByteArray id = collectionIds[0];
 		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QString("License-ID: %1 already exists.")).arg(qPrintable(licenseId));
+			errorMessage = QT_TR_NOOP(QStringLiteral("License-ID: %1 already exists.")).arg(licenseId);
 
 			return nullptr;
 		}
@@ -157,7 +157,7 @@ istd::IChangeableUniquePtr CLicenseControllerComp::CreateObjectFromRequest(
 }
 
 
-QJsonObject CLicenseControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CLicenseControllerComp::GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -204,7 +204,7 @@ QJsonObject CLicenseControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequ
 		}
 	}
 
-	errorMessage = QT_TR_NOOP(QString("Unable to get license by ID: %1.").arg(qPrintable(objectId)));
+	errorMessage = QT_TR_NOOP(QStringLiteral("Unable to get license by ID: %1.").arg(objectId));
 	SendErrorMessage(0, errorMessage, "License controller");
 
 	return QJsonObject();

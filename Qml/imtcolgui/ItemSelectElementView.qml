@@ -54,6 +54,67 @@ ElementView {
 	signal selectionChanged(var selectedItems)
 	signal popupClosed()
 
+	// --- Name resolution ------------------------------------------------------------
+	// Items are usually assigned as bare ids, so a derived view feeds the rows of a
+	// second provider through here to turn them into readable names. Guarded against
+	// re-entering itemsChanged while the resolved list is written back.
+	property bool __resolvingNames: false
+
+	/*!
+		Returns whether any item still shows its id instead of a name - a derived view
+		uses it to decide if a resolving request is worth sending.
+	*/
+	function hasUnresolvedItems(){
+		if (!itemSelectElementView.items || itemSelectElementView.items.length === 0){
+			return false
+		}
+		for (var i = 0; i < itemSelectElementView.items.length; i++){
+			var item = itemSelectElementView.items[i]
+			if (!item.name || item.name === item.id){
+				return true
+			}
+		}
+		return false
+	}
+
+	/*!
+		Fills in the names of the current items from normalized provider rows.
+		\param providerItems Array of { id, title } as delivered by a data provider.
+	*/
+	function resolveItemNames(providerItems){
+		if (!providerItems || providerItems.length === 0){
+			return
+		}
+
+		var nameMap = ({})
+		for (var i = 0; i < providerItems.length; i++){
+			var providerItem = providerItems[i]
+			if (providerItem.id && providerItem.title && providerItem.title !== ""){
+				nameMap[providerItem.id] = providerItem.title
+			}
+		}
+
+		var updated = false
+		var newItems = []
+		for (var j = 0; j < itemSelectElementView.items.length; j++){
+			var current = itemSelectElementView.items[j]
+			var resolved = nameMap[current.id]
+			if (resolved && current.name !== resolved){
+				newItems.push({ id: current.id, name: resolved })
+				updated = true
+			}
+			else {
+				newItems.push(current)
+			}
+		}
+
+		if (updated){
+			itemSelectElementView.__resolvingNames = true
+			itemSelectElementView.items = newItems
+			itemSelectElementView.__resolvingNames = false
+		}
+	}
+
 	function __applyRemoval(newItems, removedIndex, removedData) {
 		itemSelectElementView.items = newItems
 		itemSelectElementView.itemRemoved(removedIndex, removedData)
@@ -67,6 +128,14 @@ ElementView {
 	controlComp: Component {
 		Text {
 			id: addBtn
+
+			// Test instrumentation: this reusable control has no objectName of its own (it's a plain
+			// Text with a MouseArea, not a Button-derived control that would auto-derive one from
+			// `text`), and it's used more than once per document (e.g. UserView.qml's "Roles" AND
+			// "Groups" sections) - derive a distinct name from `label` (e.g. "AddRoles"/"AddGroups") so
+			// each usage is addressable. Inert - no runtime/visual effect.
+			objectName: "Add" + itemSelectElementView.label.replace(/[^A-Za-z0-9]/g, "")
+
 			visible: itemSelectElementView.editable
 			text: "+ " + itemSelectElementView.addButtonText
 			font.pixelSize: Style.fontSizeM
@@ -74,6 +143,12 @@ ElementView {
 			color: itemSelectElementView.accentColor
 
 			MouseArea {
+				// Test instrumentation: click()'s mouseAreaOf() helper specifically looks for
+				// [objectName="MouseArea"] inside the target - every other clickable control in this
+				// codebase names its inner MouseArea this way (see TabDelegate.qml etc.); this one had
+				// none. Inert - no runtime/visual effect.
+				objectName: "MouseArea"
+
 				anchors.fill: parent
 				hoverEnabled: true
 				cursorShape: Qt.PointingHandCursor
@@ -112,6 +187,7 @@ ElementView {
 				Repeater {
 					model: itemSelectElementView.items
 					delegate: Rectangle {
+						objectName: "AssignedItem_" + index
 						width: Math.min(chipText.implicitWidth + chipRemove.width + Style.paddingS * 3, 200)
 						height: 28
 						radius: 14
@@ -135,6 +211,7 @@ ElementView {
 
 						ToolButton {
 							id: chipRemove
+							objectName: "RemoveButton"
 							visible: itemSelectElementView.editable && itemSelectElementView.nonRemovableIds.indexOf(modelData.id) < 0
 							anchors.right: parent.right
 							anchors.verticalCenter: parent.verticalCenter

@@ -170,19 +170,19 @@ bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::LoadPlugi
 			const QByteArray& pluginExtension,
 			const QByteArray& pluginTypeId)
 {
-	m_logger.SendInfoMessage(0, QString("Looking for the plug-ins in '%1'").arg(pluginDirectoryPath));
+	m_logger.SendInfoMessage(0, QStringLiteral("Looking for the plug-ins in '%1'").arg(pluginDirectoryPath));
 
 	if (!pluginDirectoryPath.isEmpty() && QFileInfo(pluginDirectoryPath).exists()){
 		QDir pluginsDirectory(pluginDirectoryPath);
 
-		QFileInfoList pluginsList = pluginsDirectory.entryInfoList(QStringList() << (QString("*.") + pluginExtension));
+		QFileInfoList pluginsList = pluginsDirectory.entryInfoList(QStringList() << (QStringLiteral("*.") + pluginExtension));
 
 		for (const QFileInfo& pluginPath : pluginsList){
 #ifdef Q_OS_WIN
 			std::wstring path = pluginPath.absolutePath().toStdWString();
 			SetDllDirectory(path.c_str());
 #endif
-			m_logger.SendInfoMessage(0, QString("Load: '%1'").arg(pluginPath.canonicalFilePath()));
+			m_logger.SendInfoMessage(0, QStringLiteral("Load: '%1'").arg(pluginPath.canonicalFilePath()));
 
 			QString pluginName = pluginPath.completeBaseName();
 			QByteArray instanceTypeId;
@@ -207,41 +207,41 @@ bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::LoadPlugi
 							if (InitializePlugin(pluginInfo.pluginPtr)){
 								m_plugins.push_back(pluginInfo);
 
-								m_logger.SendInfoMessage(0, QString("Plug-in loaded: '%1'").arg(pluginPath.canonicalFilePath()));
+								m_logger.SendInfoMessage(0, QStringLiteral("Plug-in loaded: '%1'").arg(pluginPath.canonicalFilePath()));
 
 								category = istd::IInformationProvider::IC_INFO;
 								statusMessage = QObject::tr("Plug-in loaded");
 							}
 							else{
-								m_logger.SendErrorMessage(0, QString("Plug-in initialization failed for: '%1'").arg(pluginPath.canonicalFilePath()));
+								m_logger.SendErrorMessage(0, QStringLiteral("Plug-in initialization failed for: '%1'").arg(pluginPath.canonicalFilePath()));
 
 								category = istd::IInformationProvider::IC_ERROR;
 								statusMessage = QObject::tr("Plug-in initialization failed");
 							}
 						}
 						else{
-							m_logger.SendWarningMessage(0, QString("Plug-in unsupported type-ID: '%1'").arg(pluginPath.canonicalFilePath()));
+							m_logger.SendWarningMessage(0, QStringLiteral("Plug-in unsupported type-ID: '%1'").arg(pluginPath.canonicalFilePath()));
 
 							category = istd::IInformationProvider::IC_WARNING;
 							statusMessage = QObject::tr("Plug-in unsupported type-ID");
 						}
 					}
 					else{
-						m_logger.SendErrorMessage(0, QString("Plug-in instance creation failed: '%1'").arg(pluginPath.canonicalFilePath()));
+						m_logger.SendErrorMessage(0, QStringLiteral("Plug-in instance creation failed: '%1'").arg(pluginPath.canonicalFilePath()));
 
 						category = istd::IInformationProvider::IC_ERROR;
 						statusMessage = QObject::tr("Plug-in instance creation failed");
 					}
 				}
 				else{
-					m_logger.SendErrorMessage(0, QString("Plug-in entry point was not found: '%1'. %2").arg(pluginPath.canonicalFilePath()).arg(library.errorString()));
+					m_logger.SendErrorMessage(0, QStringLiteral("Plug-in entry point was not found: '%1'. %2").arg(pluginPath.canonicalFilePath(), library.errorString()));
 
 					category = istd::IInformationProvider::IC_ERROR;
 					statusMessage = QObject::tr("Plug-in entry point was not found: '%1'").arg(library.errorString());
 				}
 			}
 			else{
-				m_logger.SendErrorMessage(0, QString("%1").arg(library.errorString()));
+				m_logger.SendErrorMessage(0, QStringLiteral("%1").arg(library.errorString()));
 
 				category = istd::IInformationProvider::IC_ERROR;
 				statusMessage = QObject::tr("%1").arg(library.errorString());

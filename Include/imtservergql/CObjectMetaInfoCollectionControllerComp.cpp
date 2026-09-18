@@ -22,7 +22,7 @@ namespace imtservergql
 // protected methods
 
 
-QJsonObject CObjectMetaInfoCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CObjectMetaInfoCollectionControllerComp::GetObjectListFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	QJsonObject rootObj;
 

@@ -71,7 +71,7 @@ bool CGqlExtSchemaParser::ProcessCollectionSchema()
 			SendLogMessage(
 						istd::IInformationProvider::IC_ERROR,
 						0,
-						QString("Unexpected directive '%1' at %2").arg(typeName, QString::number(m_lastReadLine + 1)),
+						QStringLiteral("Unexpected directive '%1' at %2").arg(typeName, QString::number(m_lastReadLine + 1)),
 						__func__);
 			I_CRITICAL();
 
@@ -89,7 +89,7 @@ bool CGqlExtSchemaParser::ProcessCollectionSchema()
 				SendLogMessage(
 					istd::IInformationProvider::InformationCategory::IC_ERROR,
 					0,
-					QString("Redifinition of '%1' at %2. Alreadty defined in %3")
+					QStringLiteral("Redifinition of '%1' at %2. Alreadty defined in %3")
 						.arg(documentType.GetName(), QString::number(m_lastReadLine), iDocumentType.GetSchemaFilePath()),
 					"CGqlSchemaParser");
 
@@ -139,7 +139,7 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 			SendLogMessage(
 						istd::IInformationProvider::IC_WARNING,
 						0,
-						QString("Reference is not supported now; it will be ignored and removed in the next version. Found for '%1' at %2").arg(documentType.GetName(), QString::number(m_lastReadLine + 1)),
+						QStringLiteral("Reference is not supported now; it will be ignored and removed in the next version. Found for '%1' at %2").arg(documentType.GetName(), QString::number(m_lastReadLine + 1)),
 						__func__);
 		}
 		// extract operations
@@ -165,7 +165,7 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 					SendLogMessage(
 								istd::IInformationProvider::IC_ERROR,
 								0,
-								QString("Unexpected operation type :'%1' at line %2").arg(operationTypeId, QString::number(m_lastReadLine + 1)),
+								QStringLiteral("Unexpected operation type :'%1' at line %2").arg(operationTypeId, QString::number(m_lastReadLine + 1)),
 								__func__);
 
 					return false;
@@ -186,7 +186,7 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 						SendLogMessage(
 							istd::IInformationProvider::IC_ERROR,
 							0,
-							QString("Unable to find request '%1' at %2").arg(requestName, QString::number(m_lastReadLine + 1)),
+							QStringLiteral("Unable to find request '%1' at %2").arg(requestName, QString::number(m_lastReadLine + 1)),
 							__func__);
 						I_CRITICAL();
 
@@ -225,7 +225,7 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 			SendLogMessage(
 						istd::IInformationProvider::IC_ERROR,
 						0,
-						QString("Unexpected directive '%1' at %2").arg(keyword, QString::number(m_lastReadLine + 1)),
+						QStringLiteral("Unexpected directive '%1' at %2").arg(keyword, QString::number(m_lastReadLine + 1)),
 						__func__);
 
 			return false;
@@ -301,7 +301,7 @@ bool CGqlExtSchemaParser::ProcessCustomSchemaValue(const QString& key, const QSt
 			SendLogMessage(
 				istd::IInformationProvider::IC_ERROR,
 				0,
-				QString("Unexpected enumConversion type. Actual: '%1'. Expected one of: {%2}.").arg(
+				QStringLiteral("Unexpected enumConversion type. Actual: '%1'. Expected one of: {%2}.").arg(
 							value,
 							QStringList({
 										EnumConversionTypes::AsIs,

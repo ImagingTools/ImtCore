@@ -3,7 +3,8 @@
 
 
 // ImtCore includes
-#include <imtserverapp/TJsonRepresentationControllerCompWrap.h>
+#include <ilog/TLoggerCompWrap.h>
+#include <imtserverapp/TJsonRepresentationControllerWrap.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings_fwd.h>
 
 
@@ -11,17 +12,21 @@ namespace imtserverapp
 {
 
 
-class CSchedulerParamsRepresentationControllerComp: public TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CSchedulerParam>
+class CSchedulerParamsRepresentationControllerComp:
+			public ilog::CLoggerComponentBase,
+			public TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CSchedulerParam>
 {
 public:
-	typedef TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CSchedulerParam> BaseClass;
+	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSchedulerParamsRepresentationControllerComp)
+		I_REGISTER_INTERFACE(IJsonRepresentationController);
 		I_ASSIGN(m_dateFormatAttrPtr, "DateFormat", "Date format", false, "dd-MM-yyyy HH:mm");
 	I_END_COMPONENT;
 
+
 protected:
-	// reimplemented (TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CSchedulerParam>)
+	// reimplemented (TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CSchedulerParam>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable &dataModel) const override;
 	virtual bool GetSdlRepresentationFromDataModel(
@@ -31,6 +36,7 @@ protected:
 	virtual bool GetDataModelFromSdlRepresentation(
 				istd::IChangeable& dataModel,
 				const sdl::V1_0::imtbase::CSchedulerParam& sdlRepresentation) const override;
+
 private:
 	I_ATTR(QString, m_dateFormatAttrPtr);
 };

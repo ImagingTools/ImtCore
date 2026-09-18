@@ -3,6 +3,12 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/PersonalAccessTokens.h>
 
 
+// ImtCore includes
+#include <imtauth/IUserInfo.h>
+#include <imtauthgql/imtauthgql.h>
+#include <imtgql/IGqlContext.h>
+
+
 namespace imtauthgql
 {
 
@@ -48,13 +54,90 @@ static sdl::V1_0::imtauth::CPersonalAccessToken ConvertToSdlToken(
 }
 
 
+// private methods
+
+bool CPersonalAccessTokenControllerComp::IsCallerAuthorizedForUser(
+			const ::imtgql::CGqlRequest& gqlRequest,
+			const QByteArray& targetUserId) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return false;
+	}
+
+	// GetUserId() reflects token resolution (JWT or PAT) directly and is set
+	// whenever authentication succeeded; GetUserInfo() additionally requires
+	// that id to resolve against the user collection, which is only needed
+	// here for the IsAdmin() privilege check below.
+	const QByteArray callerId = gqlContextPtr->GetUserId();
+	if (callerId.isEmpty()){
+		return false;
+	}
+
+	const imtauth::IUserInfo* callerInfoPtr = gqlContextPtr->GetUserInfo();
+	if (callerInfoPtr != nullptr && callerInfoPtr->IsAdmin()){
+		return true;
+	}
+
+	return !targetUserId.isEmpty() && callerId == targetUserId;
+}
+
+
+bool CPersonalAccessTokenControllerComp::AreRequestedScopesAllowed(
+			const ::imtgql::CGqlRequest& gqlRequest,
+			const QByteArrayList& scopes,
+			const QByteArray& productId) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return false;
+	}
+
+	// Without resolvable user info the caller's permissions cannot be
+	// determined, so no scope may be granted (fail closed).
+	const imtauth::IUserInfo* callerInfoPtr = gqlContextPtr->GetUserInfo();
+	if (callerInfoPtr == nullptr){
+		return false;
+	}
+
+	// Administrators may grant any scope, mirroring OnGetUserPermissions()
+	// which presents them the full permission tree.
+	if (callerInfoPtr->IsAdmin()){
+		return true;
+	}
+
+	// A caller authenticated with a PAT gets user info already restricted to
+	// the token's scopes (see CAuthenticationManagerComp), so this check also
+	// prevents a scoped token from minting a broader one. The permission set
+	// is tenant-adapted (same adaptation as GetProfile and
+	// OnGetUserPermissions), so only scopes the caller actually possesses in
+	// the current tenant context can be granted.
+	const imtauth::IUserInfo::FeatureIds callerPermissions = GetEffectiveUserPermissions(
+				gqlContextPtr->GetUserId(),
+				*callerInfoPtr,
+				gqlContextPtr->GetTenantId(),
+				productId,
+				m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr,
+				m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr,
+				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
+				m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr);
+	for (const QByteArray& scope : scopes){
+		if (!callerPermissions.contains(scope)){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
 // protected methods
 
 // reimplemented (sdl::V1_0::imtauth::CPersonalAccessTokensGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CPersonalAccessTokenList CPersonalAccessTokenControllerComp::OnGetTokenList(
 			const sdl::V1_0::imtauth::CGetTokenListGqlRequest& getTokenListRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CPersonalAccessTokenList response;
@@ -65,7 +148,7 @@ sdl::V1_0::imtauth::CPersonalAccessTokenList CPersonalAccessTokenControllerComp:
 	}
 
 	// Get request arguments
-	sdl::V1_0::imtauth::GetTokenListRequestArguments arguments = 
+	sdl::V1_0::imtauth::GetTokenListRequestArguments arguments =
 		getTokenListRequest.GetRequestedArguments();
 
 	if (!arguments.input.has_value()){
@@ -82,6 +165,11 @@ sdl::V1_0::imtauth::CPersonalAccessTokenList CPersonalAccessTokenControllerComp:
 
 	if (userId.isEmpty()){
 		errorMessage = "Invalid request: userId is required";
+		return response;
+	}
+
+	if (!IsCallerAuthorizedForUser(gqlRequest, userId)){
+		errorMessage = "Not authorized to list personal access tokens for this user";
 		return response;
 	}
 
@@ -105,7 +193,7 @@ sdl::V1_0::imtauth::CPersonalAccessTokenList CPersonalAccessTokenControllerComp:
 
 sdl::V1_0::imtauth::CPersonalAccessToken CPersonalAccessTokenControllerComp::OnGetToken(
 			const sdl::V1_0::imtauth::CGetTokenGqlRequest& getTokenRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CPersonalAccessToken response;
@@ -116,7 +204,7 @@ sdl::V1_0::imtauth::CPersonalAccessToken CPersonalAccessTokenControllerComp::OnG
 	}
 
 	// Get request arguments
-	sdl::V1_0::imtauth::GetTokenRequestArguments arguments = 
+	sdl::V1_0::imtauth::GetTokenRequestArguments arguments =
 		getTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.has_value()){
@@ -138,8 +226,11 @@ sdl::V1_0::imtauth::CPersonalAccessToken CPersonalAccessTokenControllerComp::OnG
 
 	// Get token from manager
 	imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerCompPtr->GetToken(tokenId);
-	if (!tokenPtr.IsValid()){
-		errorMessage = QString("Token with id '%1' not found").arg(QString::fromUtf8(tokenId));
+	// The same "not found" message is used both when the token truly does not
+	// exist and when the caller is not authorized to see it, so an
+	// unauthorized caller cannot use this to enumerate other users' token ids.
+	if (!tokenPtr.IsValid() || !IsCallerAuthorizedForUser(gqlRequest, tokenPtr->GetUserId())){
+		errorMessage = QStringLiteral("Token with id '%1' not found").arg(tokenId);
 		return response;
 	}
 
@@ -206,7 +297,7 @@ sdl::V1_0::imtauth::CValidateTokenPayload CPersonalAccessTokenControllerComp::On
 
 sdl::V1_0::imtauth::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCreateToken(
 			const sdl::V1_0::imtauth::CCreateTokenGqlRequest& createTokenRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CCreateTokenPayload response;
@@ -284,6 +375,21 @@ sdl::V1_0::imtauth::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCr
 		return response;
 	}
 
+	if (!IsCallerAuthorizedForUser(gqlRequest, userId)){
+		errorMessage = "Not authorized to create a personal access token for this user";
+		response.message = errorMessage;
+		return response;
+	}
+
+	// A token must never carry permissions its creator does not have
+	// themselves; otherwise a user could escalate privileges via a
+	// hand-crafted createToken request bypassing the UI's filtered scope tree.
+	if (!AreRequestedScopesAllowed(gqlRequest, scopes, productId)){
+		errorMessage = "Not authorized to grant one or more of the requested permission scopes";
+		response.message = errorMessage;
+		return response;
+	}
+
 	// Create token
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result = 
 		m_tokenManagerCompPtr->CreateToken(userId, productId, name, description, scopes, expiresAt);
@@ -306,7 +412,7 @@ sdl::V1_0::imtauth::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCr
 
 sdl::V1_0::imtauth::CRevokeTokenPayload CPersonalAccessTokenControllerComp::OnRevokeToken(
 			const sdl::V1_0::imtauth::CRevokeTokenGqlRequest& revokeTokenRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CRevokeTokenPayload response;
@@ -319,7 +425,7 @@ sdl::V1_0::imtauth::CRevokeTokenPayload CPersonalAccessTokenControllerComp::OnRe
 	}
 
 	// Get request arguments
-	sdl::V1_0::imtauth::RevokeTokenRequestArguments arguments = 
+	sdl::V1_0::imtauth::RevokeTokenRequestArguments arguments =
 		revokeTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.has_value()){
@@ -340,6 +446,16 @@ sdl::V1_0::imtauth::CRevokeTokenPayload CPersonalAccessTokenControllerComp::OnRe
 		return response;
 	}
 
+	// Look the token up first so ownership can be checked before mutating it;
+	// unknown and unauthorized ids are reported identically to avoid leaking
+	// which token ids exist for other users.
+	imtauth::IPersonalAccessTokenSharedPtr existingTokenPtr = m_tokenManagerCompPtr->GetToken(tokenId);
+	if (!existingTokenPtr.IsValid() || !IsCallerAuthorizedForUser(gqlRequest, existingTokenPtr->GetUserId())){
+		errorMessage = QStringLiteral("Token with id '%1' not found").arg(tokenId);
+		response.message = errorMessage;
+		return response;
+	}
+
 	// Revoke token
 	bool success = m_tokenManagerCompPtr->RevokeToken(tokenId);
 
@@ -349,7 +465,7 @@ sdl::V1_0::imtauth::CRevokeTokenPayload CPersonalAccessTokenControllerComp::OnRe
 		response.message = "Token revoked successfully";
 	}
 	else{
-		errorMessage = QString("Failed to revoke token with id '%1'").arg(QString::fromUtf8(tokenId));
+		errorMessage = QStringLiteral("Failed to revoke token with id '%1'").arg(tokenId);
 		response.message = errorMessage;
 	}
 
@@ -359,7 +475,7 @@ sdl::V1_0::imtauth::CRevokeTokenPayload CPersonalAccessTokenControllerComp::OnRe
 
 sdl::V1_0::imtauth::CDeleteTokenPayload CPersonalAccessTokenControllerComp::OnDeleteToken(
 			const sdl::V1_0::imtauth::CDeleteTokenGqlRequest& deleteTokenRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CDeleteTokenPayload response;
@@ -372,7 +488,7 @@ sdl::V1_0::imtauth::CDeleteTokenPayload CPersonalAccessTokenControllerComp::OnDe
 	}
 
 	// Get request arguments
-	sdl::V1_0::imtauth::DeleteTokenRequestArguments arguments = 
+	sdl::V1_0::imtauth::DeleteTokenRequestArguments arguments =
 		deleteTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.has_value()){
@@ -393,6 +509,16 @@ sdl::V1_0::imtauth::CDeleteTokenPayload CPersonalAccessTokenControllerComp::OnDe
 		return response;
 	}
 
+	// Look the token up first so ownership can be checked before mutating it;
+	// unknown and unauthorized ids are reported identically to avoid leaking
+	// which token ids exist for other users.
+	imtauth::IPersonalAccessTokenSharedPtr existingTokenPtr = m_tokenManagerCompPtr->GetToken(tokenId);
+	if (!existingTokenPtr.IsValid() || !IsCallerAuthorizedForUser(gqlRequest, existingTokenPtr->GetUserId())){
+		errorMessage = QStringLiteral("Token with id '%1' not found").arg(tokenId);
+		response.message = errorMessage;
+		return response;
+	}
+
 	// Delete token
 	bool success = m_tokenManagerCompPtr->DeleteToken(tokenId);
 
@@ -402,7 +528,7 @@ sdl::V1_0::imtauth::CDeleteTokenPayload CPersonalAccessTokenControllerComp::OnDe
 		response.message = "Token deleted successfully";
 	}
 	else{
-		errorMessage = QString("Failed to delete token with id '%1'").arg(QString::fromUtf8(tokenId));
+		errorMessage = QStringLiteral("Failed to delete token with id '%1'").arg(tokenId);
 		response.message = errorMessage;
 	}
 

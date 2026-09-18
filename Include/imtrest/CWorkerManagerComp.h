@@ -36,18 +36,18 @@ public:
 
 	CWorkerManagerComp();
 
-	IRequestServletPtr CreateServlet();
+	IRequestServletPtr CreateServlet() const;
 	bool SendResponse(const QByteArray& requestId, ConstResponsePtr& response);
 
 	// reimplemented (imtrest::IRequestServlet)
 	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
 	virtual ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
-Q_SIGNALS:
-	void Start(const IRequest* request);
+	// Called (via a queued lambda) by CWorkerThread when a request finishes: frees the
+	// request and dispatches the next queued one. Runs on this component's thread.
+	void OnFinish(const IRequest* request, const QByteArray& subCommandId);
 
 protected Q_SLOTS:
-	void OnFinish(const IRequest* request, const QByteArray& subCommandId);
 	void AboutToQuit();
 
 private:

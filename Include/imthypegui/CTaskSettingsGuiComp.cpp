@@ -79,17 +79,9 @@ void CTaskSettingsGuiComp::UpdateModel() const
 
 		if (taskSettingsPtr->GetTaskInputs() == nullptr){
 			taskSettingsPtr->SetTaskInputId(InputIdEdit->text().toUtf8());
-			taskSettingsPtr->SetTaskInputSubId(QByteArray());
 		}
 		else {
 			taskSettingsPtr->SetTaskInputId(InputSelector->currentData().toByteArray());
-			QByteArray subId = TriggerSelector->text().toUtf8();
-			if (subId.isEmpty()){
-				taskSettingsPtr->SetTaskInputSubId(QByteArray::number(0));
-			}
-			else{
-				taskSettingsPtr->SetTaskInputSubId(subId);
-			}
 		}
 	}
 }
@@ -121,17 +113,6 @@ void CTaskSettingsGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*chang
 		if (oldIndex != InputSelector->currentIndex()){
 			taskSettingsPtr->SetTaskInputId(InputSelector->currentData().toByteArray());
 		}
-
-		int oldTriggerId = TriggerSelector->text().toInt();
-		TriggerSelector->blockSignals(true);
-		TriggerSelector->setText(taskSettingsPtr->GetTaskInputSubId());
-		
-		TriggerSelector->blockSignals(false);
-		if (oldTriggerId != TriggerSelector->text().toInt()){
-			taskSettingsPtr->SetTaskInputSubId(TriggerSelector->text().toUtf8());
-		}
-		TriggerSelector->setVisible(showAcqSubId);
-		TriggerLabel->setVisible(showAcqSubId);
 	}
 }
 

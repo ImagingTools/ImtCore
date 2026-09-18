@@ -105,6 +105,6 @@ bool CUrlConnectionLinkParam::ResetData(CompatibilityMode mode)
 }
 
 
-} // namespace agentinodata
+} // namespace imtservice
 
 

@@ -19,15 +19,15 @@ ParamEditorBase {
 		prefix: "/files/";
 		
 		onFileUploaded: {
-			ModalDialogManager.showInfoDialog(qsTr("Database restore was successful"))
+			PopupManager.addSuccessMessage(qsTr("Database restore was successful"), true)
 		}
-		
+
 		onFileUploadFailed: {
-			ModalDialogManager.showErrorDialog(qsTr("Error when trying to restore the database"))
+			PopupManager.addErrorMessage(qsTr("Error when trying to restore the database"), true)
 		}
-		
+
 		onFileDownloadFailed: {
-			ModalDialogManager.showErrorDialog(qsTr("Error when trying to create a database backup"))
+			PopupManager.addErrorMessage(qsTr("Error when trying to create a database backup"), true)
 		}
 		
 		onStateChanged: {

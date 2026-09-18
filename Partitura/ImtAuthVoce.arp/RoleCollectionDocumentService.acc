@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6435" Description="ACF"/>
-            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6560" Description="ACF"/>
+            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -23,6 +23,16 @@
                     </AttributeInfo>
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Roles"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentChangeGenerator" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleChangeGenerator"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentNameProviders" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RoleDocumentNameProvider</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="DocumentValidators" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -58,6 +68,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -104,6 +117,24 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="RoleChangeGenerator" PackageId="ImtAuthPck" ComponentId="RoleChangeGenerator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="RoleCollectionAdapter" PackageId="ImtAuthPck" ComponentId="RoleCollectionAdapter">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -135,6 +166,11 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RoleDocumentNameProvider" PackageId="ImtAuthPck" ComponentId="RoleDocumentNameProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="RoleDocumentValidator" PackageId="ImtAuthPck" ComponentId="RoleDocumentValidator">

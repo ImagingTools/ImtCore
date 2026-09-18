@@ -601,6 +601,13 @@
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Tickets"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>OnTicketsCollectionChanged</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

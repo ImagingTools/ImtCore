@@ -2,8 +2,6 @@
 import QtQuick 2.15
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
-import imtcontrols 1.0
 
 Item {
 	id: messageBubbleRoot
@@ -51,7 +49,7 @@ Item {
 			width: bubbleColumn.width
 			height: contentText.height + Style.paddingS * 2
 			radius: Style.radiusS
-			color: messageBubbleRoot.isOwn ? Style.imaginToolsAccentColor : Style.surfaceColor
+			color: messageBubbleRoot.isOwn ? Style.imaginToolsAccentColor : Style.baseColor
 
 			Text {
 				id: contentText
@@ -78,7 +76,7 @@ Item {
 					height: 24
 					width: reactionText.width + Style.paddingS * 2
 					radius: height / 2
-					color: Style.surfaceColor
+					color: Style.baseColor
 					border.color: Style.borderColor2
 
 					Text {

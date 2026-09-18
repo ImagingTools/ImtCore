@@ -36,7 +36,7 @@ bool CConversationCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (convPtr == nullptr){
-		errorMessage = QString("Unable to create representation from conversation '%1'").arg(qPrintable(objectId));
+		errorMessage = QStringLiteral("Unable to create representation from conversation '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CConversationCollectionControllerComp");
 		return false;
 	}

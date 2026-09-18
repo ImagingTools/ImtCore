@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
-#include <imtauth/CCompanyInfo.h>
+#include <imtaccount/CCompanyInfo.h>
 
 
 namespace imtlicgql
@@ -18,10 +18,10 @@ namespace imtlicgql
 
 // reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 
-QJsonObject CAccountControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CAccountControllerComp::GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Internal error");
+		errorMessage = QStringLiteral("Internal error");
 		SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 		return QJsonObject();
@@ -31,7 +31,7 @@ QJsonObject CAccountControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequ
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(accountId, dataPtr)){
-		const imtauth::CCompanyInfo* companyInfoPtr = dynamic_cast<const imtauth::CCompanyInfo*>(dataPtr.GetPtr());
+		const imtaccount::CCompanyInfo* companyInfoPtr = dynamic_cast<const imtaccount::CCompanyInfo*>(dataPtr.GetPtr());
 		if (companyInfoPtr != nullptr){
 			QJsonObject rootObj;
 			QJsonObject dataObj;
@@ -43,11 +43,11 @@ QJsonObject CAccountControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequ
 
 			std::sort(groups.begin(), groups.end());
 
-			const imtauth::IAddressProvider* addressProviderPtr = companyInfoPtr->GetAddresses();
+			const imtaccount::IAddressProvider* addressProviderPtr = companyInfoPtr->GetAddresses();
 			if (addressProviderPtr != nullptr){
 				imtbase::ICollectionInfo::Ids addressesIds = addressProviderPtr->GetAddressList().GetElementIds();
 				for (const imtbase::ICollectionInfo::Id& addressId : addressesIds){
-					const imtauth::IAddress* addressPtr = addressProviderPtr->GetAddress(addressId);
+					const imtaccount::IAddress* addressPtr = addressProviderPtr->GetAddress(addressId);
 					if (addressPtr != nullptr){
 						dataObj.insert(QStringLiteral("Country"), QJsonValue::fromVariant(addressPtr->GetCountry()));
 						dataObj.insert(QStringLiteral("City"), QJsonValue::fromVariant(addressPtr->GetCity()));
@@ -78,7 +78,7 @@ QJsonObject CAccountControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequ
 		}
 	}
 
-	errorMessage = QT_TR_NOOP(QString("Unable to get an account with ID: '%1'.").arg(qPrintable(accountId)));
+	errorMessage = QT_TR_NOOP(QStringLiteral("Unable to get an account with ID: '%1'.").arg(accountId));
 	SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 	return QJsonObject();
@@ -91,7 +91,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 			QString& errorMessage) const
 {
 	if (!m_accountInfoFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Internal error");
+		errorMessage = QStringLiteral("Internal error");
 		SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 		return nullptr;
@@ -106,15 +106,15 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 
 	QByteArray itemData = inputParams.at(0).GetParamArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
-		istd::TUniqueInterfacePtr<imtauth::ICompanyInfo> companyInstancePtr = m_accountInfoFactCompPtr.CreateInstance();
+		istd::TUniqueInterfacePtr<imtaccount::ICompanyInfo> companyInstancePtr = m_accountInfoFactCompPtr.CreateInstance();
 		if (!companyInstancePtr.IsValid()){
-			errorMessage = QString("Unable to create an instance of the company object.");
+			errorMessage = QStringLiteral("Unable to create an instance of the company object.");
 			SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 			return nullptr;
 		}
 
-		imtauth::CIdentifiableCompanyInfo* companyInfoPtr = dynamic_cast<imtauth::CIdentifiableCompanyInfo*>(companyInstancePtr.GetPtr());
+		imtaccount::CIdentifiableCompanyInfo* companyInfoPtr = dynamic_cast<imtaccount::CIdentifiableCompanyInfo*>(companyInstancePtr.GetPtr());
 		if (companyInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get an account info!");
 			SendErrorMessage(0, errorMessage, "CAccountControllerComp");
@@ -145,7 +145,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 		for (const imtbase::ICollectionInfo::Id& collectionId : collectionIds){
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
-				imtauth::IContactBaseInfo* accountInfoPtr = dynamic_cast<imtauth::IContactBaseInfo*>(dataPtr.GetPtr());
+				imtaccount::IContactBaseInfo* accountInfoPtr = dynamic_cast<imtaccount::IContactBaseInfo*>(dataPtr.GetPtr());
 				if (accountInfoPtr != nullptr){
 					if (collectionId != objectId){
 						QString currentName = accountInfoPtr->GetName();
@@ -174,7 +174,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 			QString companyName = itemModel.GetData("CompanyName").toString();
 		}
 
-		imtauth::CAddress address;
+		imtaccount::CAddress address;
 		if (itemModel.ContainsKey("Country")){
 			QString country = itemModel.GetData("Country").toString();
 			address.SetCountry(country);
@@ -211,7 +211,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 		return companyInfoPtr;
 	}
 
-	errorMessage = QString("Can not create account: %1").arg(QString(objectId));
+	errorMessage = QStringLiteral("Can not create account: %1").arg(objectId);
 	SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 	return nullptr;

@@ -91,6 +91,7 @@ public:
 
 	// reimplemented (imtclientgql::IGqlClient)
 	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
+	virtual bool SendRequestNoWait(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
 	// reimplemented (imtrest::ITransport)
 	virtual bool SendResponse(imtrest::ConstResponsePtr& response) const override;
@@ -106,6 +107,10 @@ public:
 
 protected:
 	QByteArray Sign(const QByteArray& message, const QByteArray& key = "") const;
+
+	// Builds the {"type":"query",...} envelope shared by SendRequest() and SendRequestNoWait();
+	// 'key' receives the generated correlation id used to key m_queryDataMap.
+	QByteArray BuildRequestEnvelope(const GqlRequestPtr& requestPtr, QString& key) const;
 
 	// reimplemented (imod::CMultiModelDispatcherBase)
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;

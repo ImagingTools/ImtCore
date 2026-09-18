@@ -104,7 +104,7 @@ QByteArray CLdapAuthorizationControllerComp::InsertNewIdentifiableRoleInfo(
 	roleInfoPtr->SetProductId(productId);
 
 	QByteArray result = m_roleCollectionCompPtr->InsertNewObject(
-		QByteArray("Role"),
+		QByteArrayLiteral("Role"),
 		roleInfoPtr->GetRoleName(),
 		roleInfoPtr->GetRoleDescription(),
 		roleInfoPtr.GetPtr(),
@@ -283,7 +283,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 
 					QByteArray retVal = m_userCollectionCompPtr->InsertNewObject("User", userInfoPtr->GetName(), "", userInfoPtr.GetPtr(), userObjectId);
 					if (retVal.isEmpty()){
-						errorMessage = QString("Unable to insert LDAP user to the collection");
+						errorMessage = QStringLiteral("Unable to insert LDAP user to the collection");
 						return sdl::V1_0::imtauth::CAuthorizationPayload();
 					}
 				}
@@ -292,6 +292,11 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 					if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
 						userInfoPtr.MoveCastedPtr(dataPtr.GetPtr()->CloneMe());
 						if (userInfoPtr.IsValid()){
+							// Reached only after CheckCredential succeeded, so naming the account state is safe.
+							if (!userInfoPtr->IsEnabled()){
+								return CreateAccountDisabledResponse(login);
+							}
+
 							bool needsUpdate = false;
 
 							// Update login in case the user logged in with a different format
@@ -326,7 +331,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 								if (!m_userCollectionCompPtr->SetObjectData(userObjectId, *userInfoPtr.GetPtr())){
 									SendWarningMessage(
 										0,
-										QString("Unable to update user data for user '%1'").arg(qPrintable(userObjectId)),
+										QStringLiteral("Unable to update user data for user '%1'").arg(userObjectId),
 										"CLdapAuthorizationControllerComp");
 								}
 							}

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
+
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <iproc/IProcessor.h>
@@ -12,6 +13,7 @@
 namespace imtddl
 {
 
+
 class CDdlCodeCreatorProcessorsControllerComp: public ilog::CLoggerComponentBase
 {
 public:
@@ -21,8 +23,6 @@ public:
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentsParser", "Arguments Parser", true, "IDesignTokenArgumentsParser")
 		I_ASSIGN_MULTI_0(m_ddlProcessors, "DesignTokenProcessors", "Arguments Parser", true)
 	I_END_COMPONENT;
-
-
 
 protected:
 	// reimplemented (ilog::CLoggerComponentBase)

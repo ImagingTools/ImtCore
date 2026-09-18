@@ -58,7 +58,7 @@ bool CInstallationInfoProviderComp::AcquireInstallationInfo(
 	const char* const operationSystemPath = "/LINUX";
 #endif
 
-	QByteArray downloadPrefix =  QByteArray("UPDATES/") + m_productNameAttrPtr->GetValue().toUtf8() + QByteArray(operationSystemPath);
+	QByteArray downloadPrefix =  QByteArrayLiteral("UPDATES/") + m_productNameAttrPtr->GetValue().toUtf8() + QByteArray(operationSystemPath);
 	QByteArray downloadLink = downloadPrefix + "/MANIFEST";
 	QFile manifestTempFile(GetPathToInstall() + '/' + QFileInfo(QCoreApplication::applicationFilePath()).baseName() + ".xmanifest");
 

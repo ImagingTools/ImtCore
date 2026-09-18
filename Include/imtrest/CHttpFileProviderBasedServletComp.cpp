@@ -92,7 +92,7 @@ ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";
-	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
+	QByteArray reponseTypeId = QByteArrayLiteral("text/html; charset=utf-8");
 
 	ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId).PopInterfacePtr());
 
@@ -163,7 +163,7 @@ ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
 		responsePtr = ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());
 	}
 	else{
-		responsePtr = generateErrorResponsePtr(QByteArray("Unable to open file ") + commandIdFileName, IProtocolEngine::SC_NOT_FOUND);
+		responsePtr = generateErrorResponsePtr(QByteArrayLiteral("Unable to open file ") + commandIdFileName, IProtocolEngine::SC_NOT_FOUND);
 	}
 
 	return responsePtr;

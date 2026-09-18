@@ -16,6 +16,25 @@ Item {
     */
     property bool loadByClick: true;
 
+    // A property rather than a call inside a binding, which would never hear a sign-in.
+    property bool userIsLoggedIn: false;
+
+    Component.onCompleted: {
+        container.userIsLoggedIn = AuthorizationController.getLoggedUserId() !== "";
+    }
+
+    Connections {
+        target: AuthorizationController;
+
+        function onLoggedIn(){
+            container.userIsLoggedIn = true;
+        }
+
+        function onLoggedOut(){
+            container.userIsLoggedIn = false;
+        }
+    }
+
 	LocalizationEvent {
 		id: localizationEvent;
 
@@ -66,6 +85,21 @@ Item {
         if (page){
             page.load();
         }
+    }
+
+    // Between signing in and the page list coming back there was nothing here at
+    // all - the window sat on its own background colour, which reads as the
+    // application having stopped rather than as it still working.
+    // Only while somebody is signed in: an empty page list is also the normal
+    // state before signing in, where this would spin invisibly behind the login screen.
+    Loading {
+        id: pagesLoading;
+
+        anchors.fill: parent;
+
+        // Keyed on the repeater, not on getItemsCount(): that is a plain call and
+        // a binding on it would never hear the model fill up.
+        visible: container.userIsLoggedIn && pagesData.count === 0 && container.modelState !== "Error";
     }
 
     Repeater {

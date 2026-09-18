@@ -122,7 +122,7 @@ ifile::IFilePersistence::OperationState CObjPointCloudPersistenceComp::SaveToFil
 
 	QFile file(filePath);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
-		SendErrorMessage(0, QString("File could not be written: '%1'").arg(filePath));
+		SendErrorMessage(0, QStringLiteral("File could not be written: '%1'").arg(filePath));
 
 		return OS_FAILED;
 	}
@@ -191,7 +191,7 @@ void CObjPointCloudPersistenceComp::SaveToFileHelper(const CPointCloud3d& pointC
 		Q_ASSERT(pointDataPtr != nullptr);
 
 		QString textLine;
-		textLine = QString("v %1 %2 %3").arg(pointDataPtr->data[0]).arg(pointDataPtr->data[1]).arg(pointDataPtr->data[2]);
+		textLine = QStringLiteral("v %1 %2 %3").arg(QString::number(pointDataPtr->data[0]), QString::number(pointDataPtr->data[1]), QString::number(pointDataPtr->data[2]));
 
 		stream << textLine << "\n";
 	}

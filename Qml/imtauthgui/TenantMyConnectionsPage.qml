@@ -4,6 +4,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtdocgui 1.0
 import imtauthgui 1.0
 import imtbaseImtBaseTypesSdl 1.0
 
@@ -11,12 +12,12 @@ import imtbaseImtBaseTypesSdl 1.0
  * TenantMyRelationshipsPage
  *
  * Displays confirmed relationships for the tenant.
- * Uses standard TenantSimpleCollectionPage with FilterableSelectGqlDataProvider
+ * Uses standard SimpleCollectionPage with FilterableSelectGqlDataProvider
  * (same mechanism as TenantRolesPage). Supports Remove/Edit/Create.
  * Create opens the RelationshipView which creates a relationship proposal
  * (bilateral approval required).
  */
-TenantSimpleCollectionPage {
+SimpleCollectionPage {
 	id: relationshipsPage
 
 	entityName: qsTr("Relationship")
@@ -34,10 +35,10 @@ TenantSimpleCollectionPage {
 	deletePermissionIds: ["RemoveOrganizationConnection", "EditOrganizationConnection"]
 
 	delegateComponent: Component {
-		TenantCollectionItemDelegateBase {
+		SimpleCollectionItemDelegateBase {
 			id: relDelegate
 			selectionManager: relationshipsPage.selectionManager
-			collectionPage: relationshipsPage
+			actionHandler: relationshipsPage
 
 			property TextParam __partnerTenantParam: TextParam {}
 			property TextParam __myTenantParam: TextParam {}
@@ -121,8 +122,8 @@ TenantSimpleCollectionPage {
 	}
 
 	function removeItems(ids) {
-		if (relationshipsPage.apiClient && relationshipsPage.tenantData) {
-			relationshipsPage.apiClient.removeTenantRelationship(relationshipsPage.tenantData.m_id, ids[0])
+		if (relationshipsPage.apiClient && relationshipsPage.model) {
+			relationshipsPage.apiClient.removeTenantRelationship(relationshipsPage.model.m_id, ids[0])
 		}
 	}
 

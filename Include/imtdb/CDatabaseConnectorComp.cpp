@@ -24,14 +24,14 @@ bool CDatabaseConnectorComp::ConnectToDatabase(const IDatabaseLoginSettings& log
 	QString userName = loginSettings.GetUserName();
 	QString password = loginSettings.GetPassword();
 	
-	QString importQuery = QString(R"(IMPORT FOREIGN SCHEMA %0 FROM SERVER "%1" INTO public;)");
+	QString importQuery = QStringLiteral(R"(IMPORT FOREIGN SCHEMA %0 FROM SERVER "%1" INTO public;)");
 	
 	int tableCount = m_tableNamesAttrPtr.GetCount();
 	if (tableCount == 0){
 		importQuery = importQuery.arg("", *m_serverNameAttrPtr);
 	}
 	else{
-		QString value = QString("\"%0\" LIMIT TO (").arg(*m_schemaNameAttrPtr);
+		QString value = QStringLiteral(R"("%0" LIMIT TO ()").arg(*m_schemaNameAttrPtr);
 		for (int i = 0; i < m_tableNamesAttrPtr.GetCount(); i++){
 			QString tableName = m_tableNamesAttrPtr[i];
 			
@@ -48,7 +48,7 @@ bool CDatabaseConnectorComp::ConnectToDatabase(const IDatabaseLoginSettings& log
 	}
 	
 	QString query =
-		QString(R"(
+		QStringLiteral(R"(
 			CREATE EXTENSION IF NOT EXISTS postgres_fdw;
 			CREATE OR REPLACE FUNCTION setup_foreign_table_%0(
 				server_nam TEXT,
@@ -84,7 +84,7 @@ bool CDatabaseConnectorComp::ConnectToDatabase(const IDatabaseLoginSettings& log
 		)").arg(*m_serverNameAttrPtr, importQuery);
 	
 	query +=
-		QString(R"(
+		QStringLiteral(R"(
 			SELECT setup_foreign_table_%0(
 				'%0',
 				'%1',
@@ -109,7 +109,7 @@ bool CDatabaseConnectorComp::ConnectToDatabase(const IDatabaseLoginSettings& log
 
 bool CDatabaseConnectorComp::DisconnectFromDatabase(const QString& connectionName) const
 {
-	QString query = QString(R"(DROP SERVER IF EXISTS "%0" CASCADE;)").arg(connectionName);
+	QString query = QStringLiteral(R"(DROP SERVER IF EXISTS "%0" CASCADE;)").arg(connectionName);
 	
 	QSqlError sqlError;
 	m_databaseEngineCompPtr->ExecSqlQuery(query.toUtf8(), &sqlError);

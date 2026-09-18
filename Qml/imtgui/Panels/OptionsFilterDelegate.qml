@@ -181,6 +181,50 @@ FilterDelegateBase {
 		return true
 	}
 
+	// The list this filter offers, for a menu that would rather show the options
+	// beside it than send the reader through a second popup to reach them.
+	function optionCount(){
+		if (!filterDelegate.isValidModel()){
+			return 0
+		}
+
+		return filterDelegate.selectionParam.m_constraints.m_options.count
+	}
+
+	function optionName(index){
+		if (!filterDelegate.isValidModel()){
+			return ""
+		}
+
+		let options = filterDelegate.selectionParam.m_constraints.m_options
+		if (index < 0 || index >= options.count){
+			return ""
+		}
+
+		return options.get(index).item.m_name
+	}
+
+	function optionEnabled(index){
+		if (!filterDelegate.isValidModel()){
+			return false
+		}
+
+		let options = filterDelegate.selectionParam.m_constraints.m_options
+		if (index < 0 || index >= options.count){
+			return false
+		}
+
+		return options.get(index).item.m_enabled
+	}
+
+	function optionChecked(index){
+		return filterDelegate.selectionParam ? filterDelegate.selectionParam.m_selectedIndex === index : false
+	}
+
+	function selectOption(index){
+		filterDelegate.setSelectedIndex(index)
+	}
+
 	function isValidModel(){
 		return	selectionParam &&
 				selectionParam.hasConstraints() &&
@@ -219,7 +263,7 @@ FilterDelegateBase {
 	}
 
 	onOpenFilter: {
-		var point = mapToItem(null, x, y + height);
+		var point = filterDelegate.popupPoint();
 		ModalDialogManager.openDialog(popupMenuDialogComp, {"x": point.x, "y": point.y})
 	}
 

@@ -42,6 +42,11 @@ I_EXPORT_COMPONENT(
 			"Database Document");
 
 I_EXPORT_COMPONENT(
+			SqlDatabaseFileDocumentDelegate,
+			"File store delegate for the document-oriented tables",
+			"Database Document File Store External");
+
+I_EXPORT_COMPONENT(
 			SqlDatabaseJsonDelegate,
 			"Delegate for the json document-oriented tables",
 			"Database Document Json SQL");
@@ -55,6 +60,11 @@ I_EXPORT_COMPONENT(
 			DatabaseAutomaticBackup,
 			"Database automatic backup",
 			"Database Automatic Backup PostgreSQL SQL");
+
+I_EXPORT_COMPONENT(
+			FileDocumentGarbageCollector,
+			"Garbage collector and integrity auditor for the document file store",
+			"Database Document File Store Garbage Collector GC Audit");
 
 I_EXPORT_COMPONENT(
 			RestoringDatabaseController,

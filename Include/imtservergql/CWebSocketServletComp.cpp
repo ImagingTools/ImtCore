@@ -3,6 +3,7 @@
 
 
 // Qt includes
+#include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QPointer>
@@ -64,7 +65,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 			return imtrest::ConstResponsePtr();
 
 		default:{
-			QByteArray errorMessage = QString("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
+			QByteArray errorMessage = QStringLiteral("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
 			return CreateErrorResponse(errorMessage, request);
 		}
 		break;
@@ -98,7 +99,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::InitConnection(const imtrest::I
 {
 	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 	if (webSocketRequest != nullptr){
-		QByteArray data = QString(R"({"type": "connection_ack","payload": {"connectionTimeoutMs": 300000}})").toUtf8();
+		QByteArray data = QStringLiteral(R"({"type": "connection_ack","payload": {"connectionTimeoutMs": 300000}})").toUtf8();
 
 		return CreateDataResponse(data, request);
 	}
@@ -115,7 +116,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::KeepAliveAcknowledge(const imtr
 		return imtrest::ConstResponsePtr();
 	}
 
-	QByteArray data = QString(R"({"type": "pong"})").toUtf8();
+	QByteArray data = QStringLiteral(R"({"type": "pong"})").toUtf8();
 
 	return CreateDataResponse(data, request);
 }
@@ -142,10 +143,15 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	// to QWebSocket via setParent(m_socket) in CWebSocketThread, so it can be
 	// cascade-destroyed if the socket disconnects during processing.
 	const QByteArray subscriptionId = webSocketRequest->GetRequestId();
+
+	if (subscriptionId.isEmpty()){
+		return CreateErrorResponse(QByteArrayLiteral("Unable to register subscription with empty subscription-ID"), request);
+	}
+
 	QByteArray body = request.GetBody();
 	const QJsonDocument document = QJsonDocument::fromJson(body);
 	if (document.isNull() || !document.isObject()) {
-		QString errorMessage = QString("Error when parsing JSON request for command Id: '%1'").arg(request.GetCommandId());
+		QString errorMessage = QStringLiteral("Error when parsing JSON request for command Id: '%1'").arg(request.GetCommandId());
 		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
 
@@ -169,8 +175,14 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	imtgql::CGqlRequest gqlRequest;
 	qsizetype errorPosition;
 	if (!gqlRequest.ParseQuery(body, errorPosition)){
-		QString errorMessage = QString("Error when parsing request: '%1'; Error position: '%2'")
-								.arg(qPrintable(body)).arg(errorPosition);
+		// Chained, not arg(body, errorPosition): that binds the position to the
+		// arg(text, fieldWidth) overload, which pads the message with as many
+		// spaces as the position - hundreds of megabytes of them for a failure
+		// late in a query, built in memory and then written out one message at a
+		// time until the server stops answering anything else.
+		QString errorMessage = QStringLiteral("Error when parsing request: '%1'; Error position: '%2'")
+								.arg(QString::fromUtf8(body))
+								.arg(errorPosition);
 		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
 
@@ -201,17 +213,31 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	imtgql::IGqlContextCreator::ContextCreationError contextError;
 	imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(gqlHeaders, contextError);
 	if (!gqlContextPtr.IsValid()){
-		QByteArray errorMessage;
+		const QByteArray authToken = gqlHeaders.value(imtbase::s_authenticationTokenHeaderId);
+		const QString maskedToken = authToken.isEmpty()
+					? QStringLiteral("<empty>")
+					: (QStringLiteral("***") + QString::fromUtf8(authToken.right(4)));
+
+		const QString detail = contextError.message.isEmpty()
+					? QStringLiteral("Unable to create GraphQL context")
+					: contextError.message;
+
+		QString statusLabel;
+		QString wireMessage;
 		if (contextError.status == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED){
-			errorMessage = QByteArrayLiteral("Unauthorized");
+			statusLabel = QStringLiteral("401 Unauthorized");
+			wireMessage = QStringLiteral("Unauthorized: %1").arg(detail);
 		}
 		else if (contextError.status == imtgql::IGqlContextCreator::CCS_FORBIDDEN){
-			errorMessage = QByteArrayLiteral("Forbidden");
+			statusLabel = QStringLiteral("403 Forbidden");
+			wireMessage = QStringLiteral("Forbidden: %1").arg(detail);
 		}
 		else{
-			errorMessage = QByteArrayLiteral("Unable to create GraphQL context: ") + contextError.message.toUtf8();
+			statusLabel = QStringLiteral("internal error");
+			wireMessage = detail;
 		}
-		return CreateErrorResponse(errorMessage, request);
+
+		return CreateErrorResponse(wireMessage.toUtf8(), request, /*logMessage*/ false);
 	}
 
 	gqlRequest.SetGqlContext(std::move(gqlContextPtr));
@@ -245,10 +271,14 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		if (subscriberControllerPtr->RegisterSubscription(subscriptionId, gqlRequest, request, errorMessage)){
 			return imtrest::ConstResponsePtr();
 		}
+
+		return CreateErrorResponse(errorMessage.isEmpty()
+					? QByteArrayLiteral("Failed to register subscription")
+					: errorMessage.toUtf8(), request);
 	}
 	else{
-		QByteArray errorMessage = QString("The requested command could not be executed. No servlet was found for the given command: '%1")
-		.arg(QString(commandId)).toUtf8();
+		QByteArray errorMessage = QStringLiteral("The requested command could not be executed. No servlet was found for the given command: '%1")
+		.arg(commandId).toUtf8();
 		return CreateErrorResponse(errorMessage, request);
 	}
 
@@ -265,19 +295,28 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 		return imtrest::ConstResponsePtr();
 	}
 
+	const QByteArray subscriptionId = webSocketRequest->GetRequestId();
+
 	for (int index = 0; index < m_gqlSubscriberControllersCompPtr.GetCount(); index++){
 		imtgql::IGqlSubscriberController* controllerPtr = m_gqlSubscriberControllersCompPtr[index];
 		if (controllerPtr != nullptr){
-			QByteArray subscriptionId = webSocketRequest->GetRequestId();
 			if (controllerPtr->UnregisterSubscription(subscriptionId)){
-				QByteArray data = QString(R"({"type": "complete","id": "%1"})").arg(QString(subscriptionId)).toUtf8();
+				QByteArray data = QStringLiteral(R"({"type": "complete","id": "%1"})").arg(subscriptionId).toUtf8();
 				return CreateDataResponse(data, request);
 			}
 		}
 	}
 
-	QByteArray errorMessage = QByteArray("Unable to unregister subscription'. Error: Subscription is unregistered");
-	return CreateErrorResponse(errorMessage, request);
+	SendWarningMessage(
+		0,
+		QStringLiteral("Unregister requested for subscription '%1', which is not registered.").arg(subscriptionId),
+		QStringLiteral("CWebSocketServletComp"));
+
+QJsonObject completeObject;
+	completeObject.insert(QStringLiteral("type"), QStringLiteral("complete"));
+	completeObject.insert(QStringLiteral("id"), QString(subscriptionId));
+	const QByteArray data = QJsonDocument(completeObject).toJson(QJsonDocument::Compact);
+	return CreateDataResponse(data, request);
 }
 
 
@@ -285,7 +324,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateDataResponse(const QByteA
 {
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
-	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
+	QByteArray reponseTypeId = QByteArrayLiteral("text/html; charset=utf-8");
 	QByteArray commandId = request.GetCommandId();
 
 	imtrest::ConstResponsePtr responsePtr(
@@ -299,29 +338,53 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateDataResponse(const QByteA
 }
 
 
-imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(const QByteArray& errorMessage, const imtrest::IRequest& request) const
+imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(
+			const QByteArray& errorMessage,
+			const imtrest::IRequest& request,
+			bool logMessage) const
 {
 	QByteArray requestBody = request.GetBody();
 	QJsonDocument document = QJsonDocument::fromJson(requestBody);
 	QJsonObject object = document.object();
 
+	QString subscriptionId = object.value(QStringLiteral("id")).toString();
+	if (subscriptionId.isEmpty()){
+		auto webSocketRequestPtr = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
+		if (webSocketRequestPtr != nullptr){
+			subscriptionId = QString::fromUtf8(webSocketRequestPtr->GetRequestId());
+		}
+	}
+
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
-	QString body = QString(R"({"id": "%1","type": "error","payload": [ {"message": "%2", "extensions": { "type": "Warning" }} ]})")
-					   .arg(object["id"].toString())
-					   .arg(errorMessage);
+	// Build JSON via QJsonDocument so quotes/newlines in errorMessage cannot break the frame.
+	QJsonObject errorObj;
+	errorObj.insert(QStringLiteral("message"), QString::fromUtf8(errorMessage));
+	QJsonObject extensionsObj;
+	extensionsObj.insert(QStringLiteral("type"), QStringLiteral("Warning"));
+	errorObj.insert(QStringLiteral("extensions"), extensionsObj);
 
+	QJsonArray payloadArr;
+	payloadArr.append(errorObj);
 
-	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
+	QJsonObject rootObj;
+	rootObj.insert(QStringLiteral("id"), subscriptionId);
+	rootObj.insert(QStringLiteral("type"), QStringLiteral("error"));
+	rootObj.insert(QStringLiteral("payload"), payloadArr);
+
+	const QByteArray body = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+	const QByteArray reponseTypeId = QByteArrayLiteral("text/html; charset=utf-8");
 
 	imtrest::ConstResponsePtr responsePtr(
 		engine.CreateResponse(
 			request,
 			imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
-			body.toUtf8(),
+			body,
 			reponseTypeId).PopInterfacePtr());
 
-	SendErrorMessage(0, QString(errorMessage));
+	if (logMessage){
+		SendErrorMessage(0, QString::fromUtf8(errorMessage), QStringLiteral("CWebSocketServletComp"));
+	}
 
 	return responsePtr;
 }

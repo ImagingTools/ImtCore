@@ -1,14 +1,13 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
 import imtcontrols 1.0
 import imtbaseImtCollectionSdl 1.0
 
 Rectangle {
 	id: container;
 	
-	color: Style.backgroundColor2;
+	color: Style.baseColor;
 	
 	clip: true;
 

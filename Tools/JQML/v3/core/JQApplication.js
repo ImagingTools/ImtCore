@@ -326,6 +326,11 @@ module.exports = {
                 pointer-events: all;
             }
 
+            .Window {
+                width: 100vw;
+                height: 100vh;
+            }
+
             .Item {
                 position: absolute;
                 display: flex;
@@ -388,6 +393,18 @@ module.exports = {
                 display: none;
             }
 
+            .GridView > div {
+                display: grid;
+            }
+
+            .GridView > div > * {
+                overflow: unset;
+            }
+
+            .GridView > div > *[no-view] {
+                display: none;
+            }
+
             *[invisible] {
                 display: none;
             }
@@ -436,6 +453,7 @@ module.exports = {
     pendingFocusOwner: null,
     pendingFocusLosers: [],
     pendingFocusFlushScheduled: false,
+    focusTreeSuppressed: 0,
     setFocusTree(tree, options = {}){
         if(!tree || !tree.length) return false
 
@@ -488,27 +506,89 @@ module.exports = {
     },
 
     _applyFocusTree(tree){
-        let unionTree = []
-        let focusTree = this.focusTree
-        while(focusTree.length || tree.length){
-            let origin = focusTree.pop()
-            let current = tree.pop()
+        let oldTree = this.focusTree.slice()
+        let newTree = []
+        for(let i = 0; i < tree.length; i++){
+            let item = tree[i]
+            if(item && !item.__destroyed) newTree.push(item)
+        }
 
-            if(origin === current){
-                if(current.__destroyed) continue
-                unionTree.unshift(current)
-            } else if(current){
-                if(current.__destroyed) continue
-                unionTree.unshift(current)
-            } else if(origin){
-                if(origin.__destroyed) continue
-                unionTree.unshift(origin)
+        this.root.__setFocusTree(newTree)
+        this.focusTree = newTree
+        this._syncActiveFocus(oldTree, newTree)
+    },
+
+    _syncActiveFocus(oldTree, newTree){
+        let owner = newTree.length ? newTree[0] : null
+        let canActivate = !!(owner && !owner.__destroyed && owner.enabled && owner.visible)
+
+        let shouldHave = new Set()
+        if(canActivate){
+            for(let i = 0; i < newTree.length; i++){
+                let item = newTree[i]
+                if(!item || item.__destroyed) continue
+                if(i === 0 || item instanceof JQModules.QtQuick.FocusScope){
+                    shouldHave.add(item)
+                }
+            }
+            if(owner instanceof JQModules.QtQuick.FocusScope){
+                this._collectFocusedDescendants(owner, shouldHave)
             }
         }
-        
-        this.root.__setFocusTree(unionTree)
 
-        this.focusTree = unionTree
+        let seen = new Set()
+        let all = oldTree.concat(newTree)
+        for(let item of all){
+            if(!item || item.__destroyed || seen.has(item)) continue
+            seen.add(item)
+            let want = shouldHave.has(item)
+            if(item.activeFocus !== want){
+                item.activeFocus = want
+            }
+        }
+
+        for(let item of oldTree){
+            if(!item || item.__destroyed || shouldHave.has(item)) continue
+            this._clearDescendantActiveFocus(item, shouldHave)
+        }
+
+        if(canActivate && owner instanceof JQModules.QtQuick.FocusScope){
+            this._forwardScopeActiveFocus(owner)
+        }
+    },
+
+    _clearDescendantActiveFocus(item, shouldHave){
+        if(!item || !item.children) return
+        for(let child of item.children){
+            if(!child || child.__destroyed) continue
+            if(!shouldHave.has(child) && child.activeFocus){
+                child.activeFocus = false
+            }
+            this._clearDescendantActiveFocus(child, shouldHave)
+        }
+    },
+
+    _collectFocusedDescendants(scope, shouldHave){
+        if(!scope || !scope.children) return
+        for(let child of scope.children){
+            if(!child || child.__destroyed || !child.focus) continue
+            shouldHave.add(child)
+            if(child instanceof JQModules.QtQuick.FocusScope){
+                this._collectFocusedDescendants(child, shouldHave)
+            }
+        }
+    },
+
+    _forwardScopeActiveFocus(scope){
+        if(!scope || !scope.children) return
+        for(let child of scope.children){
+            if(!child || !child.focus) continue
+            if(!child.activeFocus) child.activeFocus = true
+            else if(typeof child.__ensureDomFocus === 'function') child.__ensureDomFocus()
+            if(child instanceof JQModules.QtQuick.FocusScope){
+                this._forwardScopeActiveFocus(child)
+            }
+        }
     },
 
     _clearPendingFocusLosers(){

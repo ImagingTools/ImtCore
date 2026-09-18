@@ -17,7 +17,7 @@ namespace imtauthgql
 
 // reimplemented (CObjectCollectionControllerCompBase)
 
-QJsonObject CSessionControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
+QJsonObject CSessionControllerComp::GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribure 'ObjectCollection' was not set", "CSessionControllerComp");

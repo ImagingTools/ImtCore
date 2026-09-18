@@ -7,3 +7,4 @@
 %QTDIR%\bin\lrelease.exe ImtCore_zh_ZH.ts
 %QTDIR%\bin\lrelease.exe ImtCore_jp_JP.ts
 %QTDIR%\bin\lrelease.exe ImtCore_it_IT.ts
+%QTDIR%\bin\lrelease.exe ImtCore_sv_SE.ts

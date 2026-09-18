@@ -142,7 +142,7 @@ bool CSmtpClientComp::SendEmail(const ISmtpMessage& smtpMessage) const
 	m_socketPtr->connectToHostEncrypted(host, port);
 
 	if (!m_socketPtr->waitForConnected(*m_timeoutAttrPtr)){
-		qDebug() << QString("Error during the connection establishing: %1").arg(m_socketPtr->errorString());
+		qDebug() << QStringLiteral("Error during the connection establishing: %1").arg(m_socketPtr->errorString());
 	}
 
 	return true;
@@ -254,14 +254,14 @@ void CSmtpClientComp::OnReadyRead()
 	else if (m_currentMailSendState == MS_MAIL && code == RC_AUTHENTIFICATION_SUCCESSFUL)
 	{
 		if (m_smtpMessagePtr.IsValid()){
-			SendCommand(QString("MAIL FROM:<%1>").arg(m_smtpMessagePtr->GetFrom()));
+			SendCommand(QStringLiteral("MAIL FROM:<%1>").arg(m_smtpMessagePtr->GetFrom()));
 			m_currentMailSendState = MS_RCPT;
 		}
 	}
 	else if (m_currentMailSendState == MS_RCPT && code == RC_OK)
 	{
 		if (m_smtpMessagePtr.IsValid()){
-			SendCommand(QString("RCPT TO:<%1>").arg(m_smtpMessagePtr->GetTo()));
+			SendCommand(QStringLiteral("RCPT TO:<%1>").arg(m_smtpMessagePtr->GetTo()));
 			m_currentMailSendState = MS_DATA;
 		}
 	}
@@ -272,7 +272,7 @@ void CSmtpClientComp::OnReadyRead()
 	}
 	else if (m_currentMailSendState == MS_BODY && code == RC_START_MAIL_INPUT)
 	{
-		SendCommand(QString("%1%2").arg(m_message).arg("\r\n."));
+		SendCommand(QStringLiteral("%1%2").arg(m_message, QStringLiteral("\r\n.")));
 
 		m_currentMailSendState = MS_QUIT;
 	}
@@ -280,7 +280,7 @@ void CSmtpClientComp::OnReadyRead()
 	{
 		SendCommand("QUIT");
 		m_currentMailSendState = MS_CLOSE;
-		SendInfoMessage(0, QString("Message  succesfully sended"), "CSmtpClientComp");
+		SendInfoMessage(0, QStringLiteral("Message  succesfully sended"), "CSmtpClientComp");
 		m_message.clear();
 	}
 	else if (m_currentMailSendState == MS_CLOSE)
@@ -289,7 +289,7 @@ void CSmtpClientComp::OnReadyRead()
 	}
 	else
 	{
-		SendErrorMessage(0, QString("Failed to send message"), "CSmtpClientComp");
+		SendErrorMessage(0, QStringLiteral("Failed to send message"), "CSmtpClientComp");
 		m_currentMailSendState = MS_CLOSE;
 		m_message.clear();
 	}

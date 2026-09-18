@@ -26,7 +26,7 @@ QJsonObject CFeatureDependenciesProviderComp::CreateInternalResponse(const imtgq
 {
 	const imtgql::CGqlParamObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
-		errorMessage = QString("Unable to get a feature dependencies. GraphQL input params is invalid.");
+		errorMessage = QStringLiteral("Unable to get a feature dependencies. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "CFeatureDependenciesProviderComp");
 
 		return QJsonObject();
@@ -34,7 +34,7 @@ QJsonObject CFeatureDependenciesProviderComp::CreateInternalResponse(const imtgq
 
 	QByteArray features = gqlInputParamPtr->GetParamArgumentValue("FeatureIds").toByteArray();
 	if (features.isEmpty()){
-		errorMessage = QString("Unable to get dependencies for feature with empty Feature-ID.");
+		errorMessage = QStringLiteral("Unable to get dependencies for feature with empty Feature-ID.");
 		SendErrorMessage(0, errorMessage, "CFeatureDependenciesProviderComp");
 
 		return QJsonObject();
@@ -64,7 +64,7 @@ QJsonObject CFeatureDependenciesProviderComp::CreateInternalResponse(const imtgq
 QByteArrayList CFeatureDependenciesProviderComp::GetFeatureDependencies(const QByteArray& featureId) const
 {
 	if (!m_featureCollectionCompPtr.IsValid()){
-		SendErrorMessage(0, QString("Unable to get a feature dependencies. Internal error."), "CFeatureDependenciesProviderComp");
+		SendErrorMessage(0, QStringLiteral("Unable to get a feature dependencies. Internal error."), "CFeatureDependenciesProviderComp");
 
 		return QByteArrayList();
 	}

@@ -25,7 +25,7 @@
                         <Data IsEnabled="true" Value="Conversation"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateConversationsTable.sql"/>
+                        <Data IsEnabled="true" Value="CreateConversationsTable.sql"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>

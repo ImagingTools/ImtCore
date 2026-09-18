@@ -18,10 +18,10 @@ namespace imtauthdb
 static QString NullableSqlText(const QString& value)
 {
 	if (value.isEmpty()){
-		return QStringLiteral("NULL");
+		return imtdb::NULL_DATA_LITERAL;
 	}
 
-	return QString("'%1'").arg(imtdb::EscapeSql(value));
+	return QStringLiteral("'%1'").arg(imtdb::EscapeSql(value));
 }
 
 
@@ -178,10 +178,10 @@ QByteArray CTenantRelationshipDbDelegateComp::CreateDeleteObjectsQuery(
 	QString tableName = GetTableName();
 	QStringList idList;
 	for (const QByteArray& id : objectIds){
-		idList.append(QString("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id))));
+		idList.append(QStringLiteral("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id))));
 	}
 
-	return QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2)")
+	return QStringLiteral(R"(DELETE FROM "%1" WHERE "Id" IN (%2))")
 			.arg(tableName)
 			.arg(idList.join(", "))
 			.toUtf8();
@@ -194,7 +194,7 @@ QByteArray CTenantRelationshipDbDelegateComp::CreateDeleteObjectSetQuery(
 		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QString tableName = GetTableName();
-	return QString("DELETE FROM \"%1\"").arg(tableName).toUtf8();
+	return QStringLiteral(R"(DELETE FROM "%1")").arg(tableName).toUtf8();
 }
 
 
@@ -215,7 +215,7 @@ QByteArray CTenantRelationshipDbDelegateComp::CreateDescriptionObjectQuery(
 		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QString tableName = GetTableName();
-	return QString("UPDATE \"%1\" SET \"Description\" = %2 WHERE \"Id\" = '%3'")
+	return QStringLiteral(R"(UPDATE "%1" SET "Description" = %2 WHERE "Id" = '%3')")
 			.arg(tableName)
 			.arg(NullableSqlText(description))
 			.arg(imtdb::EscapeSql(QString::fromUtf8(objectId)))

@@ -1,7 +1,6 @@
 import QtQuick 2.0
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtcontrols 1.0
 import imtauthgui 1.0
 
 
@@ -62,6 +61,16 @@ QtObject {
 	}
 
 	function handleResponse(gqlBody, xhr, gqlRequestRef){
+		// Both the wrapped onreadystatechange (DONE) and the "loadend" listener fire
+		// for the same reply, so every response used to be dispatched twice — which
+		// on 401 queued the same request twice in AuthorizationController's retry
+		// queue and re-sent it twice after the token refresh.
+		if (xhr.__imtResponseHandled){
+			return;
+		}
+
+		xhr.__imtResponseHandled = true;
+
 		switch(xhr.status){
 			case 200:
 				ok(gqlBody, gqlRequestRef);

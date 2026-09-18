@@ -78,6 +78,7 @@ class QmlWheelEvent {
     path = []
 
     accepted = false
+    modifiers = QtEnums.NoModifier
     angleDelta = {
         x: 0,
         y: 0,
@@ -114,6 +115,7 @@ class QmlWheelEvent {
 module.exports = {
     objects: new Set(),
     dropAreas: new Set(),
+    activePointerHandlers: new Set(),
 
     buttons: {
         0: {
@@ -379,7 +381,7 @@ module.exports = {
 
                 event.relative(this.entered[i])
                 if(event.x < 0 || event.y < 0 || event.x >= this.entered[i].width || event.y >= this.entered[i].height) {
-                    this.entered[i].__onMouseLeave(event)
+                    if(typeof this.entered[i].__onMouseLeave === 'function') this.entered[i].__onMouseLeave(event)
                     this.entered.splice(i, 1)
                 } else {
                     i++
@@ -397,13 +399,29 @@ module.exports = {
                 if(event.x >= 0 && event.y >= 0 && event.x < event.path[i].width && event.y < event.path[i].height){
                     if(this.entered.indexOf(event.path[i]) < 0) {
                         this.entered.push(event.path[i])
-                        event.path[i].__onMouseEnter(event)
+                        if(typeof event.path[i].__onMouseEnter === 'function') event.path[i].__onMouseEnter(event)
                     }
                 } 
-                event.path[i].__onMouseMove(event)
+                if(typeof event.path[i].__onMouseMove === 'function') event.path[i].__onMouseMove(event)
 
                 i++
             }
+
+            let activeHandlers = []
+            for(let handler of this.activePointerHandlers){
+                if(!handler || handler.__destroyed || !handler.active){
+                    this.activePointerHandlers.delete(handler)
+                    continue
+                }
+                if(event.path.indexOf(handler) < 0){
+                    activeHandlers.push(handler)
+                }
+            }
+
+            for(let handler of activeHandlers){
+                if(typeof handler.__onMouseMove === 'function') handler.__onMouseMove(event)
+            }
+
         })
 
         window.addEventListener('click', (e)=>{
@@ -438,8 +456,12 @@ module.exports = {
             for(let obj of this.event.path){
                 this.event.accepted = true
                 this.event.relative(obj)
-                obj.__onMouseDown(this.event) 
-            }  
+                if(typeof obj.__onMouseDown === 'function') obj.__onMouseDown(this.event)
+                if(obj.active && this.activePointerHandlers.indexOf && false){}
+                if(obj.active && this.activePointerHandlers.add){
+                    this.activePointerHandlers.add(obj)
+                }
+            }
         })
         window.addEventListener('mouseup', (e)=>{
             if(this.event){
@@ -459,12 +481,19 @@ module.exports = {
                 this.event.fillButton(e)
                 this.event.originX = e.pageX
                 this.event.originY = e.pageY
+
+                for(let handler of this.activePointerHandlers){
+                    if(!handler || handler.__destroyed) continue
+                    if(typeof handler.__onMouseUp === 'function') handler.__onMouseUp(this.event)
+                }
                 
                 if(this.event.target) {
                     this.event.relative(this.event.target)
-                    this.event.target.__onMouseUp(this.event)
+                    if(typeof this.event.target.__onMouseUp === 'function') this.event.target.__onMouseUp(this.event)
                     this.__finishMouseAreaDrag(this.event.target)
                 }
+
+                this.activePointerHandlers.clear()
             }
         })
         window.addEventListener('contextmenu', (e)=>{
@@ -495,16 +524,29 @@ module.exports = {
         // })
         window.addEventListener('wheel', (e)=>{
             this.event = new QmlWheelEvent()
+
+            let modifiers = QtEnums.NoModifier
+            if(e.shiftKey) {
+                modifiers |= QtEnums.ShiftModifier
+            }
+            if(e.altKey) {
+                modifiers |= QtEnums.AltModifier
+            }
+            if(e.ctrlKey) {
+                modifiers |= QtEnums.ControlModifier
+            }
+
+            this.event.modifiers = modifiers
             this.event.originX = e.pageX
             this.event.originY = e.pageY
             this.event.angleDelta.x = e.deltaX / 8
-            this.event.angleDelta.y = e.deltaY / 8
+            this.event.angleDelta.y = -e.deltaY / 8
             this.event.path = this.getObjectsFromPoint(e.pageX, e.pageY)
 
             for(let obj of this.event.path){
                 if(!this.event.accepted || !this.event.target){
                     this.event.relative(obj)
-                    obj.__onWheel(this.event)
+                    if(typeof obj.__onWheel === 'function') obj.__onWheel(this.event)
                 }
             }
 
@@ -529,8 +571,10 @@ module.exports = {
                 _button.timeStamp = e.timeStamp
                 _button.target = event.target
                 event.target.__onMouseClick(event)
+                this.__propagateComposedEvent(event, event.target, 'click')
             } else {
                 event.target.__onMouseDblClick(event)
+                this.__propagateComposedEvent(event, event.target, 'dblclick')
             }
             
             event.target.__onMouseLeave(event)
@@ -540,5 +584,35 @@ module.exports = {
 
         this.event = null
     },
-}
 
+    __propagateComposedEvent: function(event, origin, kind){
+        if(!event || !origin || origin.__destroyed) return
+        if(!origin.propagateComposedEvents || event.accepted) return
+
+        let path = event.path && event.path.length ? event.path : this.getObjectsFromPoint(event.originX, event.originY)
+        let start = 0
+        for(let i = 0; i < path.length; i++){
+            if(path[i] === origin){
+                start = i + 1
+                break
+            }
+        }
+
+        for(let i = start; i < path.length; i++){
+            let obj = path[i]
+            if(!obj || obj === origin || obj.__destroyed) continue
+
+            if(kind === 'click'){
+                if(typeof obj.__emitComposedClick !== 'function') continue
+                event.relative(obj)
+                obj.__emitComposedClick(event)
+            } else {
+                if(typeof obj.__emitComposedDoubleClick !== 'function') continue
+                event.relative(obj)
+                obj.__emitComposedDoubleClick(event)
+            }
+
+            if(event.accepted) return
+        }
+    },
+}

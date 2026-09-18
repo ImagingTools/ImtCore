@@ -40,7 +40,7 @@ bool CLoginStatusSubscriberControllerComp::RegisterSubscription(
 			status = "Connected";
 		}
 
-		QString data = QString("{\"status\": \"%1\"}").arg(qPrintable(status));
+		QString data = QStringLiteral("{\"status\": \"%1\"}").arg(status);
 
 		QByteArray commandId = m_commandIdsAttrPtr[0];
 
@@ -72,7 +72,7 @@ void CLoginStatusSubscriberControllerComp::OnUpdate(const istd::IChangeable::Cha
 	}
 
 	if (changeSet.Contains(0) || changeSet.Contains(imtauth::ILoginStatusProvider::LSF_LOGGED_IN)){
-		QString data = QString("{\"status\": \"%1\"}").arg(qPrintable(status));
+		QString data = QStringLiteral("{\"status\": \"%1\"}").arg(status);
 
 		PublishData(m_commandIdsAttrPtr[0], data.toUtf8());
 	}

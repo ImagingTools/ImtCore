@@ -132,7 +132,7 @@ void CTicketAssigneeNotifierComp::OnUpdate(const istd::IChangeable::ChangeSet& c
 
 	const QByteArray commandId = m_commandIdAttrPtr.IsValid()
 			? *m_commandIdAttrPtr
-			: QByteArray("OnTicketAssigneeChanged");
+			: QByteArrayLiteral("OnTicketAssigneeChanged");
 
 	// Publish only to the newly added assignees — they are the ones who
 	// need a notification. The user who made the change is excluded.

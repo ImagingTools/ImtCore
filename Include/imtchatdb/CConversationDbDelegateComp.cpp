@@ -104,7 +104,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CConversationDbDelegateComp::Crea
 		"INSERT INTO \"Conversations\" "
 		"(\"Id\", \"Name\", \"ConversationType\", \"CreatedAt\", \"UpdatedAt\") "
 		"VALUES('%1', '%2', %3, '%4', '%5');")
-		.arg(QString::fromUtf8(convId))
+		.arg(convId)
 		.arg(imtdb::SqlEncode(name))
 		.arg(conversationType)
 		.arg(nowUtc)
@@ -136,7 +136,7 @@ QByteArray CConversationDbDelegateComp::CreateUpdateObjectQuery(
 		.arg(imtdb::SqlEncode(convPtr->GetName()))
 		.arg(convPtr->GetConversationType())
 		.arg(utcNow())
-		.arg(QString::fromUtf8(objectId))
+		.arg(objectId)
 		.toUtf8();
 }
 
@@ -153,10 +153,10 @@ QByteArray CConversationDbDelegateComp::CreateDeleteObjectsQuery(
 	QString idsStr;
 	for (int i = 0; i < objectIds.size(); ++i){
 		if (i > 0) idsStr += ", ";
-		idsStr += QString("'%1'").arg(QString::fromUtf8(objectIds[i]));
+		idsStr += QStringLiteral("'%1'").arg(objectIds[i]);
 	}
 
-	return QString("DELETE FROM \"Conversations\" WHERE \"Id\" IN (%1);")
+	return QStringLiteral(R"(DELETE FROM "Conversations" WHERE "Id" IN (%1);)")
 		.arg(idsStr)
 		.toUtf8();
 }
@@ -181,10 +181,10 @@ QByteArray CConversationDbDelegateComp::CreateRenameObjectQuery(
 		return QByteArray();
 	}
 
-	return QString("UPDATE \"Conversations\" SET \"Name\"='%1', \"UpdatedAt\"='%2' WHERE \"Id\"='%3';")
+	return QStringLiteral(R"(UPDATE "Conversations" SET "Name"='%1', "UpdatedAt"='%2' WHERE "Id"='%3';)")
 		.arg(imtdb::SqlEncode(newObjectName))
 		.arg(utcNow())
-		.arg(QString::fromUtf8(objectId))
+		.arg(objectId)
 		.toUtf8();
 }
 

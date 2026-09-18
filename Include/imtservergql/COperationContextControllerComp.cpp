@@ -30,28 +30,29 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 	}
 
 	if (gqlRequestPtr == nullptr){
-		SendErrorMessage(0, QString("Unable to create operation context. Error: GraphQL request invalid"), "COperationContextControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to create operation context. Error: GraphQL request invalid"), "COperationContextControllerComp");
 
 		return nullptr;
 	}
 
 	const imtgql::IGqlContext* requestContextPtr = gqlRequestPtr->GetRequestContext();
 	if (requestContextPtr == nullptr){
-		SendErrorMessage(0, QString("Unable to create operation context. Error: GraphQL context is invalid"), "COperationContextControllerComp");
-
-		return nullptr;
-	}
-
-	const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(requestContextPtr->GetUserInfo());
-	if (userInfoPtr == nullptr){
-		SendErrorMessage(0, QString("Unable to create operation context. Error:  User info from GraphQL context is invalid"), "COperationContextControllerComp");
+		SendErrorMessage(0, QStringLiteral("Unable to create operation context. Error: GraphQL context is invalid"), "COperationContextControllerComp");
 
 		return nullptr;
 	}
 
 	imtbase::IOperationContext::IdentifableObjectInfo objectInfo;
-	objectInfo.id = userInfoPtr->GetObjectUuid();
-	objectInfo.name = userInfoPtr->GetName();
+
+	// An unknown initiator must not suppress the change history, the entry is then just not attributed.
+	const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(requestContextPtr->GetUserInfo());
+	if (userInfoPtr != nullptr){
+		objectInfo.id = userInfoPtr->GetObjectUuid();
+		objectInfo.name = userInfoPtr->GetName();
+	}
+	else{
+		SendWarningMessage(0, QStringLiteral("User info from GraphQL context is invalid, operation '%1' will not be attributed").arg(operationTypeId), "COperationContextControllerComp");
+	}
 
 	istd::TDelPtr<imtbase::COperationContext> operationContextPtr;
 	operationContextPtr.SetPtr(new imtbase::COperationContext);
@@ -63,10 +64,19 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 
 	if (m_documentChangeGeneratorCompPtr.IsValid()){
 		imtbase::CObjectCollection* changeCollectionPtr = dynamic_cast<imtbase::CObjectCollection*>(operationContextPtr->GetChangesCollection());
+		if (changeCollectionPtr == nullptr){
+			SendErrorMessage(0, QStringLiteral("Unable to create operation context. Error: Change collection is invalid"), "COperationContextControllerComp");
+
+			return nullptr;
+		}
 
 		QString errorMessage;
 		if (!m_documentChangeGeneratorCompPtr->GenerateDocumentChanges(operationTypeId, objectId, objectPtr, *changeCollectionPtr, errorMessage, paramsPtr)){
-			SendWarningMessage(0, QString("Unable to generate document changes. '%1'").arg(errorMessage), "COperationContextControllerComp");
+			SendWarningMessage(
+				0,
+				QStringLiteral("Unable to generate document changes for operation '%1' on object '%2'. '%3'")
+							.arg(QString::fromUtf8(operationTypeId), QString::fromUtf8(objectId), errorMessage),
+				"COperationContextControllerComp");
 		}
 	}
 

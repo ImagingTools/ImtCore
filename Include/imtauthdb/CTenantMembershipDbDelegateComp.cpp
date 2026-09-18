@@ -158,10 +158,10 @@ QByteArray CTenantMembershipDbDelegateComp::CreateDeleteObjectsQuery(
 
 	QStringList escapedIds;
 	for (const QByteArray& id : objectIds){
-		escapedIds << QString("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
+		escapedIds << QStringLiteral("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
 	}
 
-	return QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
+	return QStringLiteral(R"(DELETE FROM "%1" WHERE "Id" IN (%2);)")
 			.arg(*m_tableNameAttrPtr, escapedIds.join(", ")).toUtf8();
 }
 

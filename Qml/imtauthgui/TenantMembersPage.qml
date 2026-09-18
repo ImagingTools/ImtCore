@@ -1,8 +1,7 @@
-﻿// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
 import imtdocgui 1.0
@@ -12,11 +11,11 @@ import imtauthgui 1.0
  * TenantMembersPage
  *
  * Members tab — list / create / edit / exclude tenant members.
- * Extends TenantSimpleCollectionPage with custom header buttons,
+ * Extends SimpleCollectionPage with custom header buttons,
  * a custom delegate (TenantMemberDelegate), and member-specific
  * commands (invite, exclude, role management).
  */
-TenantSimpleCollectionPage {
+SimpleCollectionPage {
 	id: membersPage
 
 	entityName: qsTr("User")
@@ -565,7 +564,7 @@ TenantSimpleCollectionPage {
 			memberData: modelData.sourceData || modelData
 			tenantData: membersPage.model
 			stateManager: membersPage.stateManager
-			collectionPage: membersPage
+			actionHandler: membersPage
 			isOwner: membersPage.stateManager ? membersPage.stateManager.isOwner : false
 			selectionManager: membersPage.selectionManager
 			showCheckBox: true

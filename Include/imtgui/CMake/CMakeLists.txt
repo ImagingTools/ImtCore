@@ -1,5 +1,6 @@
 project(imtgui LANGUAGES CXX)
 
+
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
@@ -31,3 +32,4 @@ GenerateDdlCode(${MODULE_CPP_NAME}
 
 ADD_DEFINITIONS(-DUNICODE)
 ADD_DEFINITIONS(-D_UNICODE)
+

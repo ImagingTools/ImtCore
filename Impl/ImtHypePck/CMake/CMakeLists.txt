@@ -1,14 +1,13 @@
 project(ImtHypePck LANGUAGES CXX)
 
+
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
+include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} PRIVATE
 	imthype
-	imtbase)
-
-include(${ACFDIR}/Config/CMake/AcfQt.cmake)
-include(${ACFDIR}/Config/CMake/AcfStd.cmake)
-include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
+)
 
 ADD_DEFINITIONS(-DUNICODE)
 ADD_DEFINITIONS(-D_UNICODE)
+

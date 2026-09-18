@@ -41,7 +41,7 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 	Q_ASSERT(IsRequestSupported(gqlRequest));
 
 	if (!IsRequestSupported(gqlRequest)){
-		errorMessage = QString("Request with command-ID: '%1 'is not supported").arg(qPrintable(gqlRequest.GetCommandId()));
+		errorMessage = QStringLiteral("Request with command-ID: '%1 'is not supported").arg(gqlRequest.GetCommandId());
 		SendErrorMessage(0, errorMessage, "CGqlPublisherCompBase");
 
 		return false;
@@ -50,7 +50,7 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 	const imtrest::CWebSocketRequest* constWebSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
 	imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<imtrest::CWebSocketRequest*>(const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequest));
 	if (webSocketRequest == nullptr){
-		errorMessage = QString("Internal error");
+		errorMessage = QStringLiteral("Internal error");
 		SendErrorMessage(0, errorMessage, "CGqlPublisherCompBase");
 
 		return false;
@@ -126,24 +126,24 @@ bool CGqlPublisherCompBase::PushDataToSubscriber(
 		typeId = "next";
 	}
 
-	QByteArray body = QString(R"({"type": "%1","id": "%2","payload": {"data": {"%3": %4}}})")
+	QByteArray body = QStringLiteral(R"({"type": "%1","id": "%2","payload": {"data": {"%3": %4}}})")
 			.arg(typeId)
-			.arg(qPrintable(subscriptionId))
-			.arg(qPrintable(commandId))
-			.arg(qPrintable(data)).toUtf8();
+			.arg(subscriptionId)
+			.arg(commandId)
+			.arg(data).toUtf8();
 
-	QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
+	QByteArray reponseTypeId = QByteArrayLiteral("application/json; charset=utf-8");
 	const imtrest::IProtocolEngine& engine = networkRequest.GetProtocolEngine();
 
 	imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(networkRequest, imtrest::IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());
 	if (!responsePtr.IsValid()){
-		SendErrorMessage(0, QString("Unable to send response to subscriber. Error: Response is invalid"), "CGqlPublisherCompBase");
+		SendErrorMessage(0, QStringLiteral("Unable to send response to subscriber. Error: Response is invalid"), "CGqlPublisherCompBase");
 		return false;
 	}
 
 	bool retVal = m_requestManagerCompPtr->SendResponse(networkRequest.GetRequestId(), responsePtr);
 	if (!retVal){
-		QString message = QString("Unable to send response to subscriber. Data: '%1'").arg(qPrintable(data));
+		QString message = QStringLiteral("Unable to send response to subscriber. Data: '%1'").arg(data);
 		SendErrorMessage(0, message, "CGqlPublisherCompBase");
 	}
 
@@ -196,7 +196,7 @@ bool CGqlPublisherCompBase::PublishDataFiltered(
 
 			bool retVal = PushDataToSubscriber(it.key(), commandId, data, *networkRequestPtr);
 			if (!retVal){
-				QString message = QString("Unable to notify subscriber about the changes. Subscription-ID: '%1', '%2'").arg(qPrintable(commandId), qPrintable(data));
+				QString message = QStringLiteral("Unable to notify subscriber about the changes. Subscription-ID: '%1', '%2'").arg(commandId, data);
 				SendErrorMessage(0, message, "CGqlPublisherCompBase");
 			}
 		}

@@ -5,9 +5,14 @@ schema {
 	mutation: Mutation
 }
 
+import {
+	"../../imtbase/1.0/ImtCollection.sdl"
+}
+
 input GetRevisionInfoListInput {
 	documentId: ID
 	collectionId: ID
+	viewParams: CollectionViewParams
 }
 
 input BackupRevisionInput {
@@ -47,6 +52,7 @@ type RevisionInfoList {
 	documentId: ID
 	activeRevision: Integer
 	revisions: [RevisionItem]
+	totalCount: Integer
 }
 
 type BackupRevisionResponse {

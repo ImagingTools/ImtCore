@@ -10,28 +10,6 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="AuthorizationOptionsController" PackageId="ImtAuthGqlPck" ComponentId="AuthorizationOptionsController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>GetUserMode</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SelectionParam" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserMode"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="UserMode" PackageId="BasePck" ComponentId="SelectionParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -75,8 +53,8 @@
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
-    <ExportedInterfaces>
-        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="AuthorizationOptionsController"/>
-    </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedInterfaces/>
+    <ExportedComponents>
+        <Component ExportedId="UserMode" ComponentId="UserMode"/>
+    </ExportedComponents>
 </Acf>

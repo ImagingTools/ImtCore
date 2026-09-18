@@ -89,7 +89,7 @@ QJsonObject CStructureControllerCompBase::CreateInternalResponse(
 		return GetElements(gqlRequest, errorMessage);
 	}
 
-	errorMessage = QString("Unable to create internal response. Operation is not supported");
+	errorMessage = QStringLiteral("Unable to create internal response. Operation is not supported");
 	SendErrorMessage(0, errorMessage, "CStructureControllerCompBase");
 
 	return QJsonObject();
@@ -167,7 +167,7 @@ bool CStructureControllerCompBase::GetOperationFromRequest(
 		return true;
 	}
 
-	errorMessage = QString("Unable to get the operation type from the request");
+	errorMessage = QStringLiteral("Unable to get the operation type from the request");
 
 	SendErrorMessage(0, errorMessage, "CStructureControllerCompBase");
 
@@ -192,7 +192,7 @@ QJsonObject CStructureControllerCompBase::InsertNewNode(
 		QString& errorMessage) const
 {
 	if (!m_collectionStructureCompPtr.IsValid()){
-		errorMessage = QString("Unable to insert new node. Component reference 'CollectionStructure' was not set");
+		errorMessage = QStringLiteral("Unable to insert new node. Component reference 'CollectionStructure' was not set");
 
 		SendCriticalMessage(0, errorMessage);
 
@@ -230,7 +230,7 @@ QJsonObject CStructureControllerCompBase::SetNodeName(
 			QString& errorMessage) const
 {
 	if (!m_collectionStructureCompPtr.IsValid()){
-		errorMessage = QString("Unable to rename object. Component reference 'CollectionStructure' was not set");
+		errorMessage = QStringLiteral("Unable to rename object. Component reference 'CollectionStructure' was not set");
 
 		SendCriticalMessage(0, errorMessage);
 
@@ -345,8 +345,8 @@ QJsonObject CStructureControllerCompBase::InsertNewObject(
 
 	QByteArray newObjectId =  collectionStructureController->InsertNewObjectIntoCollection(m_objectCollectionCompPtr.GetPtr(), nodeId, typeId, name, description, newObjectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
 	if (newObjectId.isEmpty()){
-		errorMessage = QT_TR_NOOP(QString("Can not insert object: %1").arg(qPrintable(objectId)));
-		SendErrorMessage(0, QString("Can not insert object: %1").arg(qPrintable(objectId)), "Object collection controller");
+		errorMessage = QT_TR_NOOP(QStringLiteral("Can not insert object: %1").arg(objectId));
+		SendErrorMessage(0, QStringLiteral("Can not insert object: %1").arg(objectId), "Object collection controller");
 
 		return QJsonObject();
 	}
@@ -422,7 +422,7 @@ QJsonObject CStructureControllerCompBase::GetNodes(
 	QString& errorMessage) const
 {
 	if (!m_collectionStructureCompPtr.IsValid()){
-		errorMessage = QString("Unable to list nodes. Component reference 'CollectionStructure' was not set");
+		errorMessage = QStringLiteral("Unable to list nodes. Component reference 'CollectionStructure' was not set");
 
 		SendCriticalMessage(0, errorMessage);
 
