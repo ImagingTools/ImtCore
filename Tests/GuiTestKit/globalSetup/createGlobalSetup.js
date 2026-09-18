@@ -175,7 +175,15 @@ function createGlobalSetup({
     const requestedKeys = parseRequestedProjectKeys((config && config.argv) || process.argv);
     const activeForThisRun = requestedKeys.length > 0 ? users.filter((u) => requestedKeys.includes(u.key)) : users;
 
-    const browser = await chromium.launch();
+    // Honour PLAYWRIGHT_BROWSER_CHANNEL here too. globalSetup launches its own browser rather than
+    // going through the projects' `use`, so without this it would fall back to Playwright's bundled
+    // binary - and on a machine that only has an installed Chrome/Edge (see createConfig's note on
+    // build agents that cannot reach cdn.playwright.dev) there is no bundled binary to launch. The
+    // failure is confusing when it happens: the run reports "Executable doesn't exist at
+    // ...chromium_headless_shell..." even though the step just said it was using an installed browser.
+    const browser = await chromium.launch(
+      process.env.PLAYWRIGHT_BROWSER_CHANNEL ? { channel: process.env.PLAYWRIGHT_BROWSER_CHANNEL } : {}
+    );
     try {
       // su (when this run has it) leads and logs in alone: seeded users are typically created/verified
       // via su-authenticated GraphQL calls elsewhere in the pipeline (Generate-Backups.ps1 /
