@@ -66,8 +66,15 @@ I_EXPORT_COMPONENT(
 			"FileProvider - based HTTP servlet");
 
 I_EXPORT_COMPONENT(
-			WorkerManaqer,
+			WorkerManager,
 			"The manager of request handlers factory for multi-thread request server",
+			"REST HTTP Handler Request Factory");
+
+// Deprecated: the component was registered under this misspelled id, and .acc files outside
+// this repository still reference it. Remove once they have been migrated.
+I_EXPORT_COMPONENT(
+			WorkerManaqer,
+			"Deprecated misspelled alias of WorkerManager",
 			"REST HTTP Handler Request Factory");
 
 I_EXPORT_COMPONENT(
