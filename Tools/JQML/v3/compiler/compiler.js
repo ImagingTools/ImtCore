@@ -1427,7 +1427,7 @@ function compile(options){
                     }
 
                     if (path.type === QtQml.Component && assignProperty.value.extends !== 'Component') {
-                        resultCode.add(`let ${assignProperty.value.name}=JQModules.QtQml.Component.create(${this.name},__context,`)
+                        resultCode.add(`let ${assignProperty.value.name}=JQModules.QtQml.Component.create(null,__context,`)
                         resultCode.add('\n')
 
                         let childTypeInfo = assignProperty.value.getTypeInfo()

@@ -270,27 +270,19 @@ class QtObject extends QObject {
     __destroy(){
         if(this.__destroyed || !this.__destroying) return
 
-        let incubator = this.__incubator
-        if(incubator && incubator.__objects){
-            let proxy = this.__proxy || this
-            let index = incubator.__objects.indexOf(proxy)
-            if(index < 0) index = incubator.__objects.indexOf(this)
-            if(index >= 0) incubator.__objects.splice(index, 1)
-        }
-
         JQApplication.MemoryController.delete(this)
         super.__destroy()
+
+        this.blockSignals(true)
+
+        if(this.__children)
+        for(let i = this.__children.length-1; i >= 0; i--){
+            this.__children[i].destroy()
+        }
 
         this.blockSignals(false)
         this['Component.destruction']()
         this.blockSignals(true)
-
-        if(this.__children){
-            let children = this.__children.slice()
-            for(let i = children.length-1; i >= 0; i--){
-                children[i].destroy()
-            }
-        }
 
         if(this.parent && !this.parent.__destroyed) this.parent.__removeChild(this)
 

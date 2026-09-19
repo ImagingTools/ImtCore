@@ -100,11 +100,10 @@ class JQContext {
             if(key in target){
                 let flag = global.queueFlag[global.queueFlag.length - 1]
                 let link = Property.queueLink[Property.queueLink.length-1]
-                let depends = target[key+'__depends']
-                if(link && flag && target[key] && depends) {
+                if(link && flag && target[key]) {
                     let found = false
 
-                    for(let _link of depends){
+                    for(let _link of target[key+'__depends']){
                         if(link.name === _link.name && link.target === _link.target){
                             found = true
                             break
@@ -112,7 +111,7 @@ class JQContext {
                     }
 
                     if(!found){
-                        depends.push(link)
+                        target[key+'__depends'].push(link)
                     }
                     
                 }
@@ -132,12 +131,7 @@ class JQContext {
             target[key]['JQDestruction'].connect(()=>{
                 // target[key] = null
 
-                let depends = target[key+'__depends']
-                delete target[key+'__depends']
-
-                if(!depends) return
-
-                for(let property of depends){
+                for(let property of target[key+'__depends']){
                     if(!property.target.__destroyed){
                         try {
                             property.target.__proxy[property.name] = property.func()
@@ -149,6 +143,8 @@ class JQContext {
                     
                     
                 }
+
+                delete target[key+'__depends']
             })
 
             return true
