@@ -18,8 +18,7 @@ class CTcpSender: public QObject, virtual public ITransport
 public:
     CTcpSender(QAbstractSocket* tcpSocketPtr);
 	// reimplemented (ITransport)
-	virtual bool SendResponse(ConstResponsePtr& response) const override;
-	virtual bool SendRequest(ConstRequestPtr& request) const override;
+	virtual bool SendData(QByteArray& data) const override;
 
 protected:
     virtual bool WriteBody(const QByteArray& data, QAbstractSocket& socket) const;

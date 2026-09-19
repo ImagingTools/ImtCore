@@ -21,8 +21,7 @@ public:
 	CUdpSender(CUdpRequest* request);
 
 	// reimplemented (ITransport)
-	virtual bool SendResponse(ConstResponsePtr& response) const override;
-	virtual bool SendRequest(ConstRequestPtr& request) const override;
+	virtual bool SendData(QByteArray& data) const override;
 
 Q_SIGNALS:
     void sended(QByteArray requestId) const;

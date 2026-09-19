@@ -52,13 +52,12 @@ public:
 	virtual ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
 	// reimplemented (ITransport)
-	virtual bool SendResponse(ConstResponsePtr& response) const override;
-	virtual bool SendRequest(ConstRequestPtr& request) const override;
+	virtual bool SendData(QByteArray& data) const override;
 
 Q_SIGNALS:
 	void Error(QTcpSocket::SocketError socketerror);
 	void SocketDisconnected(QByteArray requestId);
-	void OnSendResponse(ConstResponsePtr response) const;
+	void OnSendResponse(QByteArray data) const;
 	void Abort();
 
 private:
