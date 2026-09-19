@@ -1,0 +1,66 @@
+{
+    "name": "jqml",
+    "displayName": "JQML",
+    "description": "Syntax highlighting, completions and diagnostics for the JQML engine",
+    "version": "1.0.2",
+    "publisher": "imtcore",
+    "engines": {
+        "vscode": "^1.74.0"
+    },
+    "categories": [
+        "Programming Languages",
+        "Linters"
+    ],
+    "activationEvents": [
+        "onLanguage:jqml"
+    ],
+    "main": "./src/extension.js",
+    "contributes": {
+        "languages": [
+            {
+                "id": "jqml",
+                "aliases": [
+                    "JQML",
+                    "QML"
+                ],
+                "extensions": [
+                    ".qml"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "jqml",
+                "scopeName": "source.jqml",
+                "path": "./syntaxes/qml.tmLanguage.json"
+            }
+        ],
+        "configuration": {
+            "title": "JQML",
+            "properties": {
+                "jqml.enginePath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Optional path to a JQML v3 engine root. Leave empty to use the types bundled in the extension."
+                },
+                "jqml.configPath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Path to a JQML compiler JSON config with dirs/includes. Absolute path, ${workspaceFolder}, and ${env:NAME} are supported. IMTCOREDIR/PROLIFEDIR/TARGETNAME are inferred from this file if they are not in the environment."
+                },
+                "jqml.env": {
+                    "type": "object",
+                    "additionalProperties": { "type": "string" },
+                    "default": {},
+                    "description": "Optional environment variables used when resolving ${IMTCOREDIR}, ${PROLIFEDIR}, ${TARGETNAME} and similar placeholders in compiler configs."
+                },
+                "jqml.hideInternalMembers": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Hide engine-internal members such as JQ* and AX/AY from completions."
+                }
+            }
+        }
+    }
+}

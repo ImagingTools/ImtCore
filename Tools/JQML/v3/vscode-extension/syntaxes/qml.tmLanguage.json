@@ -1,0 +1,153 @@
+{
+    "name": "JQML",
+    "scopeName": "source.jqml",
+    "patterns": [
+        { "include": "#comments" },
+        { "include": "#strings" },
+        { "include": "#import" },
+        { "include": "#pragma" },
+        { "include": "#keywords" },
+        { "include": "#property-def" },
+        { "include": "#signal-def" },
+        { "include": "#function-def" },
+        { "include": "#id" },
+        { "include": "#element" },
+        { "include": "#binding" },
+        { "include": "#numbers" },
+        { "include": "#constants" }
+    ],
+    "repository": {
+        "comments": {
+            "patterns": [
+                {
+                    "name": "comment.line.double-slash.jqml",
+                    "match": "//.*$"
+                },
+                {
+                    "name": "comment.block.jqml",
+                    "begin": "/\\*",
+                    "end": "\\*/"
+                }
+            ]
+        },
+        "strings": {
+            "patterns": [
+                {
+                    "name": "string.quoted.double.jqml",
+                    "begin": "\"",
+                    "end": "\"",
+                    "patterns": [
+                        { "name": "constant.character.escape.jqml", "match": "\\\\." }
+                    ]
+                },
+                {
+                    "name": "string.quoted.single.jqml",
+                    "begin": "'",
+                    "end": "'",
+                    "patterns": [
+                        { "name": "constant.character.escape.jqml", "match": "\\\\." }
+                    ]
+                },
+                {
+                    "name": "string.quoted.other.jqml",
+                    "begin": "`",
+                    "end": "`",
+                    "patterns": [
+                        { "name": "constant.character.escape.jqml", "match": "\\\\." }
+                    ]
+                }
+            ]
+        },
+        "import": {
+            "name": "meta.import.jqml",
+            "match": "^\\s*(import)\\s+([A-Za-z_][\\w.]*)(?:\\s+(\\d+(?:\\.\\d+)?))?(?:\\s+(as)\\s+([A-Za-z_]\\w*))?",
+            "captures": {
+                "1": { "name": "keyword.control.import.jqml" },
+                "2": { "name": "entity.name.namespace.jqml" },
+                "3": { "name": "constant.numeric.jqml" },
+                "4": { "name": "keyword.control.as.jqml" },
+                "5": { "name": "variable.other.alias.jqml" }
+            }
+        },
+        "pragma": {
+            "match": "^\\s*(pragma)\\s+([A-Za-z_]\\w*)",
+            "captures": {
+                "1": { "name": "keyword.control.pragma.jqml" },
+                "2": { "name": "support.constant.pragma.jqml" }
+            }
+        },
+        "keywords": {
+            "patterns": [
+                {
+                    "name": "keyword.other.jqml",
+                    "match": "\\b(readonly|required|default|property|signal|alias|enum|as)\\b"
+                },
+                {
+                    "name": "storage.type.function.jqml",
+                    "match": "\\bfunction\\b"
+                },
+                {
+                    "name": "keyword.control.jqml",
+                    "match": "\\b(if|else|for|while|do|switch|case|break|continue|return|try|catch|finally|throw|new|in|of|typeof|instanceof|delete)\\b"
+                }
+            ]
+        },
+        "property-def": {
+            "match": "\\b((?:readonly|required|default)\\s+)*property\\s+([A-Za-z_][\\w.]*(?:\\s*<\\s*[A-Za-z_]\\w*\\s*>)?)\\s+([A-Za-z_]\\w*)",
+            "captures": {
+                "1": { "name": "storage.modifier.jqml" },
+                "2": { "name": "storage.type.jqml" },
+                "3": { "name": "variable.other.property.jqml" }
+            }
+        },
+        "signal-def": {
+            "match": "\\bsignal\\s+([A-Za-z_]\\w*)",
+            "captures": {
+                "1": { "name": "entity.name.function.signal.jqml" }
+            }
+        },
+        "function-def": {
+            "begin": "\\bfunction\\s+([A-Za-z_]\\w*)\\s*\\(",
+            "beginCaptures": {
+                "1": { "name": "entity.name.function.jqml" }
+            },
+            "end": "\\)",
+            "patterns": [
+                { "name": "variable.parameter.jqml", "match": "[A-Za-z_]\\w*" }
+            ]
+        },
+        "id": {
+            "match": "\\bid\\s*:\\s*([A-Za-z_]\\w*)",
+            "captures": {
+                "1": { "name": "entity.name.tag.id.jqml" }
+            }
+        },
+        "element": {
+            "match": "\\b([A-Z][A-Za-z0-9_]*(?:\\.[A-Z][A-Za-z0-9_]*)*)\\b(?=\\s*(?:on\\s+[A-Za-z_]\\w*)?\\s*\\{)",
+            "name": "support.class.qmltype.jqml"
+        },
+        "binding": {
+            "begin": "(?<![A-Za-z0-9_])((?:on)?[A-Za-z_][\\w.]*)\\s*(:)",
+            "beginCaptures": {
+                "1": { "name": "variable.other.property.jqml" },
+                "2": { "name": "keyword.operator.assignment.jqml" }
+            },
+            "end": "(?=[\\n;])|(?=\\s*[A-Za-z_][\\w.]*\\s*:)|(?=\\s*[A-Z][\\w.]*\\s*\\{)|(?=\\s*\\})",
+            "patterns": [
+                { "include": "#comments" },
+                { "include": "#strings" },
+                { "include": "#numbers" },
+                { "include": "#constants" },
+                { "include": "source.js" }
+            ]
+        },
+        "numbers": {
+            "name": "constant.numeric.jqml",
+            "match": "\\b(?:0x[0-9A-Fa-f]+|\\d+(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)\\b"
+        },
+        "constants": {
+            "name": "constant.language.jqml",
+            "match": "\\b(true|false|null|undefined)\\b"
+        }
+    }
+}
