@@ -4,7 +4,7 @@ import imtcontrols 1.0
 BaseClass {
 	id: complexCollectionFilter
 	readonly property string __typename: 'ComplexCollectionFilter'
-	property BaseModel m_sortingInfo: null
+	property FieldSortingInfoList m_sortingInfo: null
 	property GroupFilter m_fieldsFilter: null
 	property TimeFilter m_timeFilter: null
 	property TextFilter m_textFilter: null
@@ -108,7 +108,7 @@ BaseClass {
 		let retVal;
 		switch (propertyId){
 			case 'm_sortingInfo':{
-				retVal = Qt.createComponent('qrc:/qml/imtcontrols/Base/BaseModel.qml')
+				retVal = Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/FieldSortingInfoList.qml')
 				retVal.owner = complexCollectionFilter
 				return retVal
 			}
@@ -124,7 +124,7 @@ BaseClass {
 
 	function getPropertyType(propertyId){
 		switch (propertyId){
-			case 'm_sortingInfo': return 'BaseModel'
+			case 'm_sortingInfo': return 'FieldSortingInfoList'
 			case 'm_fieldsFilter': return 'GroupFilter'
 			case 'm_timeFilter': return 'TimeFilter'
 			case 'm_textFilter': return 'TextFilter'

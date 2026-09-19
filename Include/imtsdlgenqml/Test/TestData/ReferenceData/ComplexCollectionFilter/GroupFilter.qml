@@ -4,8 +4,8 @@ import imtcontrols 1.0
 BaseClass {
 	id: groupFilter
 	readonly property string __typename: 'GroupFilter'
-	property BaseModel m_fieldFilters: null
-	property BaseModel m_groupFilters: null
+	property FieldFilterUnionList m_fieldFilters: null
+	property GroupFilterList m_groupFilters: null
 	property string m_logicalOperation: ''
 
 	Component.onCompleted: {
@@ -81,12 +81,12 @@ BaseClass {
 		let retVal;
 		switch (propertyId){
 			case 'm_fieldFilters':{
-				retVal = Qt.createComponent('qrc:/qml/imtcontrols/Base/BaseModel.qml')
+				retVal = Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/FieldFilterUnionList.qml')
 				retVal.owner = groupFilter
 				return retVal
 			}
 			case 'm_groupFilters':{
-				retVal = Qt.createComponent('qrc:/qml/imtcontrols/Base/BaseModel.qml')
+				retVal = Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/GroupFilterList.qml')
 				retVal.owner = groupFilter
 				return retVal
 			}
@@ -99,8 +99,8 @@ BaseClass {
 
 	function getPropertyType(propertyId){
 		switch (propertyId){
-			case 'm_fieldFilters': return 'BaseModel'
-			case 'm_groupFilters': return 'BaseModel'
+			case 'm_fieldFilters': return 'FieldFilterUnionList'
+			case 'm_groupFilters': return 'GroupFilterList'
 			case 'm_logicalOperation': return 'string'
 		}
 	}
