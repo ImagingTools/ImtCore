@@ -1,6 +1,8 @@
 import QtQuick 2.12
+import Qt.labs.settings 1.0
 import Acf 1.0
 import com.imtcore.imtqml 1.0
+import imtauthgui 1.0
 import imtcontrols 1.0
 import Qt.labs.settings 1.0
 
@@ -51,7 +53,8 @@ Rectangle {
 
 	property int iconSize: Style.menuPanelIconSize;
 	property int rowHeight: Style.controlHeightL;
-	property int expandedWidth: Style.menuPanelWidth !== undefined ? Style.menuPanelWidth : Style.sizeHintXXS;
+	property int expandedWidth: menuPanel.railMode && Style.menuPanelRailWidth !== undefined ? Style.menuPanelRailWidth
+		: Style.menuPanelWidth !== undefined ? Style.menuPanelWidth : Style.sizeHintXXS;
 	property int collapsedWidth: Style.menuPanelMinWidth;
 
 	property int autoCollapseWidth: Style.menuPanelAutoCollapseWidth !== undefined ? Style.menuPanelAutoCollapseWidth : 0;
@@ -62,11 +65,45 @@ Rectangle {
 	property string hintText: "";
 	property real hintY: 0;
 
+	// Without a top bar the rail has to carry the brand and the account controls
+	// itself. Applications that keep TopPanel keep the plain list of pages they
+	// always had.
+	readonly property bool railMode: Style.enableTopPanel !== undefined ? !Style.enableTopPanel : false;
+
+	property bool loggedIn: false;
+
+	// Without user management there are no accounts to show, exactly as
+	// TopRightPanelDecorator hides its UserPanel in that mode.
+	property bool userManagementAvailable: true;
+
+	// On the web build settings only make sense once there is a session to settle
+	// them against.
+	readonly property bool settingsAvailable: Qt.platform.os !== "web" || menuPanel.loggedIn;
+
+	// Every icon in the rail - brand, pages, account - sits on this line, so
+	// nothing shifts sideways when the panel collapses.
+	readonly property real railCenterX: Style.marginL + menuPanel.iconSize / 2;
+	readonly property int headerHeight: Style.controlHeightL + Style.marginS;
+
 	width: Style.enableMenuPanelCollapse ? menuPanel.collapsedWidth : menuPanel.rowWidth;
+
+	// Logged out the page list is cleared, and a rail with nothing in it is just a
+	// white stripe beside the sign-in page.
+	visible: !menuPanel.railMode || allPages.count > 0;
+
+	// Folded or open is the user's choice, so it outlives a page reload. Read and
+	// written by key like AuthorizationController does - declared properties on
+	// Settings are not carried over by the web build.
+	Settings {
+		id: railSettings;
+
+		category: "MenuPanel";
+	}
 
 	Component.onCompleted: {
 		if (Style.enableMenuPanelCollapse){
-			menuPanel.width = menuPanel.collapsed ? menuPanel.collapsedWidth : menuPanel.expandedWidth;
+			menuPanel.restoreCollapsed();
+
 			menuPanel.menuDefaultWidth = menuPanel.expandedWidth;
 		}
 
@@ -77,6 +114,36 @@ Rectangle {
 		Events.subscribeEvent("ExpandMenu", menuPanel.setCollapsed);
 
 		menuPanel.updateAutoCollapse();
+
+		menuPanel.setUserMode(AuthorizationController.getUserMode());
+	}
+
+	// An empty mode means the server has not answered yet, and the account row
+	// stays as it is until it does.
+	function setUserMode(userMode){
+		if (userMode === "NO_USER_MANAGEMENT"){
+			menuPanel.userManagementAvailable = false;
+		}
+		else if (userMode !== ""){
+			menuPanel.userManagementAvailable = true;
+		}
+	}
+
+	Connections {
+		target: AuthorizationController;
+
+		function onLoggedIn(){
+			menuPanel.loggedIn = true;
+			menuPanel.restoreCollapsed();
+		}
+
+		function onLoggedOut(){
+			menuPanel.loggedIn = false;
+		}
+
+		function onUserModeChanged(userMode){
+			menuPanel.setUserMode(userMode);
+		}
 	}
 
 	Connections {
@@ -93,7 +160,6 @@ Rectangle {
 		Events.unSubscribeEvent("ChangePage", menuPanel.setActivePage);
 		Events.unSubscribeEvent("CollapseMenu", menuPanel.setCollapsed);
 		Events.unSubscribeEvent("ExpandMenu", menuPanel.setCollapsed);
-
 	}
 
 	onActivePageIdChanged: {
@@ -188,6 +254,35 @@ Rectangle {
 
 	function setCollapsed(stateArg){
 		collapsed = stateArg;
+	}
+
+	// Only a deliberate fold is remembered - the automatic one that happens in a
+	// narrow window is not a preference.
+	function storeCollapsed(stateArg){
+		if (menuPanel.railMode){
+			railSettings.setValue(menuPanel.collapsedKey(), stateArg ? "true" : "false");
+		}
+	}
+
+	// The fold is a personal choice, so the key carries the user it belongs to.
+	// Before a login there is no identity yet and the shared key is used.
+	function collapsedKey(){
+		let userId = AuthorizationController.userTokenProvider ? AuthorizationController.userTokenProvider.userId : "";
+
+		return userId ? "collapsed_" + userId : "collapsed";
+	}
+
+	function restoreCollapsed(){
+		if (!Style.enableMenuPanelCollapse){
+			return;
+		}
+
+		if (menuPanel.railMode){
+			menuPanel.collapsed = railSettings.value(menuPanel.collapsedKey(), "") === "true";
+		}
+
+		widthAnimation.stop();
+		menuPanel.width = menuPanel.collapsed ? menuPanel.collapsedWidth : menuPanel.expandedWidth;
 	}
 
 	function updateAutoCollapse(){
@@ -364,10 +459,381 @@ Rectangle {
 		sourceComponent: Style.menuPanelDecorator//backgroundComp
 	}
 
+	// Brand corner. Open it reads as a title with a way to fold the rail away;
+	// folded it is just the product mark, and only becomes a control once the
+	// pointer is on it - so the collapsed rail stays quiet until you reach for it.
+	Item {
+		id: header;
+
+		anchors.top: parent.top;
+		anchors.left: parent.left;
+		anchors.right: parent.right;
+
+		height: menuPanel.railMode ? menuPanel.headerHeight : 0;
+
+		visible: menuPanel.railMode;
+		clip: true;
+
+		// Folded, the mark doubles as the control that unfolds the rail. The state
+		// has to be read off the panel and not off the mouse area alone: a disabled
+		// area keeps whatever containsMouse it had when it went quiet, which left
+		// the unfold arrow frozen in place after the first click.
+		readonly property bool brandHovered: menuPanel.collapsed
+			&& (brandArea.containsMouse || brandArea.activeFocus);
+
+		// Held back until the rail is most of the way open - drawn any earlier the
+		// name is squeezed against the mark and reads as crawling out from under it.
+		readonly property int brandNameRevealWidth: menuPanel.collapsedWidth
+			+ Math.round((menuPanel.expandedWidth - menuPanel.collapsedWidth) * 0.6);
+
+		Rectangle {
+			id: brandTarget;
+
+			x: menuPanel.railCenterX - width / 2;
+			anchors.verticalCenter: parent.verticalCenter;
+
+			width: Style.controlHeightM;
+			height: width;
+			radius: width / 2;
+
+			color: header.brandHovered ? Style.alternateBaseColor : "transparent";
+		}
+
+		Image {
+			id: brandIcon;
+
+			anchors.centerIn: brandTarget;
+
+			width: menuPanel.iconSize;
+			height: width;
+
+			fillMode: Image.PreserveAspectFit;
+			sourceSize.width: width;
+			sourceSize.height: height;
+
+			source: header.brandHovered ? "qrc:/" + Style.getIconPath("Icons/SidebarExpand", Icon.State.On, Icon.Mode.Normal)
+				: context && context.appIcon && context.appIcon !== "" ? context.appIcon
+				: "qrc:/" + Style.getLogoIconPath(Icon.State.On, Icon.Mode.Normal);
+		}
+
+		MouseArea {
+			id: brandArea;
+
+			anchors.fill: brandTarget;
+
+			enabled: Style.enableMenuPanelCollapse;
+			hoverEnabled: true;
+			cursorShape: menuPanel.collapsed ? Qt.PointingHandCursor : Qt.ArrowCursor;
+
+			// Folded, this is the only way back out of the rail, so it has to be
+			// reachable and operable without a pointer as well.
+			activeFocusOnTab: menuPanel.collapsed;
+
+			Accessible.role: Accessible.Button;
+			Accessible.name: qsTr("Expand menu");
+			Accessible.onPressAction: brandArea.expandMenu();
+
+			function expandMenu(){
+				if (menuPanel.collapsed){
+					Events.sendEvent("ExpandMenu", false);
+					menuPanel.storeCollapsed(false);
+				}
+			}
+
+			onClicked: {
+				brandArea.expandMenu();
+			}
+
+			Keys.onPressed: {
+				if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space){
+					brandArea.expandMenu();
+					event.accepted = true;
+				}
+			}
+		}
+
+		onBrandHoveredChanged: {
+			if (header.brandHovered){
+				menuPanel.showHint(qsTr("Expand menu"),
+					brandTarget.mapToItem(menuPanel, 0, brandTarget.height / 2).y);
+			}
+			else {
+				menuPanel.hideHint();
+			}
+		}
+
+		Text {
+			id: brandName;
+
+			anchors.left: brandTarget.right;
+			anchors.leftMargin: Style.marginS;
+			anchors.right: navButtons.visible ? navButtons.left : collapseButton.left;
+			anchors.rightMargin: Style.marginXXS;
+			anchors.verticalCenter: parent.verticalCenter;
+
+			opacity: !menuPanel.collapsed && menuPanel.width >= header.brandNameRevealWidth ? 1 : 0;
+			visible: brandName.opacity > 0;
+
+			text: context && context.appName ? context.appName : "";
+			color: Style.titleColor;
+			font.family: Style.fontFamilyBold;
+			font.pixelSize: Style.fontSizeL;
+			elide: Text.ElideRight;
+			maximumLineCount: 1;
+			verticalAlignment: Text.AlignVCenter;
+
+			Behavior on opacity {
+				NumberAnimation {
+					duration: 120;
+					easing.type: Easing.OutQuad;
+				}
+			}
+		}
+
+		// A name too long for the header is cut, so the whole of it is still
+		// readable on hover.
+		Text {
+			id: brandNameMeasure;
+
+			font.family: brandName.font.family;
+			font.pixelSize: brandName.font.pixelSize;
+			text: brandName.text;
+			wrapMode: Text.NoWrap;
+			visible: false;
+		}
+
+		MouseArea {
+			id: brandNameArea;
+
+			anchors.fill: brandName;
+
+			enabled: brandName.visible && brandNameMeasure.width > brandName.width;
+			hoverEnabled: true;
+		}
+
+		TooltipArea {
+			anchors.fill: brandName;
+
+			mouseArea: brandNameArea;
+			text: brandNameArea.enabled ? brandName.text : "";
+		}
+
+		// Back and forward followed the top bar out. They earn their place in the
+		// header only once there is a trail to walk, so the usual header is just
+		// the mark, the name and the fold control.
+		Row {
+			id: navButtons;
+
+			anchors.right: collapseButton.left;
+			anchors.rightMargin: Style.marginXXS;
+			anchors.verticalCenter: parent.verticalCenter;
+
+			height: Style.controlHeightM;
+
+			// Anchored to the folding button rather than to the panel edge, the row
+			// slid in over the brand mark while the rail was still narrow. It waits
+			// for the same width the name does.
+			visible: !menuPanel.collapsed
+				&& menuPanel.width >= header.brandNameRevealWidth
+				&& (prevButton.enabled || nextButton.enabled);
+
+			Component.onCompleted: {
+				prevButton.enabled = NavigationController.hasPrev();
+				nextButton.enabled = NavigationController.hasNext();
+			}
+
+			Connections {
+				target: NavigationController;
+
+				function onCurrentIndexChanged(index){
+					prevButton.enabled = NavigationController.hasPrev();
+					nextButton.enabled = NavigationController.hasNext();
+				}
+			}
+
+			ToolButton {
+				id: prevButton;
+				objectName: "NavigatePrevButton";
+
+				width: Style.buttonWidthM;
+				height: Style.controlHeightM;
+
+				enabled: false;
+
+				tooltipText: qsTr("Back");
+				iconSource: enabled ? "qrc:/" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal)
+									: "qrc:/" + Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled);
+
+				decorator: Component {
+					ToolButtonDecorator {
+						icon.width: Style.iconSizeS;
+						radius: height / 2;
+					}
+				}
+
+				onClicked: {
+					NavigationController.prev();
+				}
+			}
+
+			ToolButton {
+				id: nextButton;
+				objectName: "NavigateNextButton";
+
+				width: Style.buttonWidthM;
+				height: Style.controlHeightM;
+
+				enabled: false;
+
+				tooltipText: qsTr("Forward");
+				iconSource: enabled ? "qrc:/" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal)
+									: "qrc:/" + Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled);
+
+				decorator: Component {
+					ToolButtonDecorator {
+						icon.width: Style.iconSizeS;
+						radius: height / 2;
+					}
+				}
+
+				onClicked: {
+					NavigationController.next();
+				}
+			}
+		}
+
+		ToolButton {
+			id: collapseButton;
+			objectName: "CollapseMenuButton";
+
+			anchors.right: parent.right;
+			anchors.rightMargin: Style.marginS;
+			anchors.verticalCenter: parent.verticalCenter;
+
+			width: Style.controlHeightM;
+			height: width;
+
+			visible: Style.enableMenuPanelCollapse && !menuPanel.collapsed;
+
+			tooltipText: qsTr("Collapse menu");
+			iconSource: "qrc:/" + Style.getIconPath("Icons/SidebarCollapse", Icon.State.On, Icon.Mode.Normal);
+
+			decorator: Component {
+				ToolButtonDecorator {
+					icon.width: Style.iconSizeS;
+					radius: height / 2;
+				}
+			}
+
+			onClicked: {
+				Events.sendEvent("CollapseMenu", true);
+				menuPanel.storeCollapsed(true);
+				brandArea.forceActiveFocus();
+			}
+		}
+	}
+
+	// Account and settings live at the foot of the rail, where the top-right
+	// corner of the old bar used to put them. Loaded only in rail mode: a second
+	// UserPanel would otherwise sit here invisibly and repeat its organisation
+	// requests alongside the one in TopPanel.
+	Item {
+		id: footer;
+
+		anchors.bottom: parent.bottom;
+		anchors.left: parent.left;
+		anchors.right: parent.right;
+
+		height: menuPanel.railMode ? footerLoader.height + 2 * Style.marginXS : 0;
+
+		visible: menuPanel.railMode;
+		clip: true;
+
+		Rectangle {
+			anchors.top: parent.top;
+			anchors.left: parent.left;
+			anchors.leftMargin: Style.marginS;
+			anchors.right: parent.right;
+			anchors.rightMargin: Style.marginS;
+
+			height: 1;
+			opacity: 0.5;
+			color: Style.borderColor;
+		}
+
+		Loader {
+			id: footerLoader;
+
+			anchors.top: parent.top;
+			anchors.topMargin: Style.marginXS;
+			anchors.left: parent.left;
+
+			width: menuPanel.rowWidth;
+
+			active: menuPanel.railMode;
+			sourceComponent: menuPanel.footerComp;
+		}
+	}
+
+	property Component footerComp: Component {
+		Column {
+			id: footerColumn;
+
+			width: menuPanel.rowWidth;
+
+			UserPanel {
+				id: userPanel;
+
+				width: parent.width;
+				height: menuPanel.userManagementAvailable ? menuPanel.rowHeight : 0;
+
+				visible: menuPanel.userManagementAvailable;
+
+				collapsed: menuPanel.collapsed;
+				menuPanelRef: menuPanel;
+
+				// Open, the gear rides along on the account row; folded there is no
+				// room for two controls on one line, so it becomes a row of its own.
+				settingsButtonVisible: menuPanel.settingsAvailable && !menuPanel.collapsed;
+
+				onSettingsClicked: {
+					Events.sendEvent("ShowPreferencePage");
+				}
+			}
+
+			MenuPanelButton {
+				id: settingsButton;
+				objectName: "PreferenceButton";
+
+				width: parent.width;
+				height: menuPanel.rowHeight;
+
+				// Without the account row the gear has nowhere to ride along, so it
+				// keeps its own row also when the rail is open.
+				visible: menuPanel.settingsAvailable && (menuPanel.collapsed || !menuPanel.userManagementAvailable);
+
+				text: qsTr("Settings");
+				textColor: Style.textColor;
+				fontName: menuPanel.fontName;
+				menuPanelRef: menuPanel;
+
+				iconSource: highlighted ? "qrc:/" + Style.getIconPath("Icons/Settings", Icon.State.On, Icon.Mode.Selected)
+										: "qrc:/" + Style.getIconPath("Icons/Settings", Icon.State.On, Icon.Mode.Normal);
+
+				onClicked: {
+					Events.sendEvent("ShowPreferencePage");
+				}
+			}
+		}
+	}
+
 	Item {
 		id: contentArea;
 
-		anchors.fill: parent;
+		anchors.top: header.bottom;
+		anchors.bottom: footer.top;
+		anchors.left: parent.left;
+		anchors.right: parent.right;
 
 		clip: true;
 
@@ -375,7 +841,8 @@ Rectangle {
 			id: allPagesFlick;
 
 			anchors.top: parent.top;
-			anchors.topMargin: Style.enableMenuPanelCollapse ? Style.marginXL + Style.marginXXXS : Style.marginM;
+			anchors.topMargin: menuPanel.railMode ? Style.marginXS
+				: Style.enableMenuPanelCollapse ? Style.marginXL + Style.marginXXXS : Style.marginM;
 			anchors.left: parent.left;
 			anchors.right: parent.right;
 			anchors.bottom: parent.bottom;
@@ -417,9 +884,10 @@ Rectangle {
 
 			width: menuPanel.rowWidth;
 
-			anchors.topMargin: Style.menuPanelTopMargin !==undefined ? Style.menuPanelTopMargin :
-																	   !menuPanel.centered ? (Style.enableMenuPanelCollapse ? Style.marginXL + Style.marginXXXS : Style.marginM):
-																							 parent.height - bottomAlignmentColumn.height -  height > 0 ? (parent.height - bottomAlignmentColumn.height - height)/2 : 0
+anchors.topMargin: menuPanel.railMode ? Style.marginXS
+				: Style.menuPanelTopMargin !== undefined ? Style.menuPanelTopMargin
+				: !menuPanel.centered ? (Style.enableMenuPanelCollapse ? Style.marginXL + Style.marginXXXS : Style.marginM)
+				: parent.height - bottomAlignmentColumn.height - height > 0 ? (parent.height - bottomAlignmentColumn.height - height) / 2 : 0
 
 			visible: !allPagesFlick.visible;
 
@@ -481,11 +949,13 @@ Rectangle {
 			}
 		}
 
+		// Classic shell only - in rail mode the folding control lives in the header
+		// next to the product name.
 		Item{
 			id: controlPanel
 			width: parent.width
 			height: Style.controlHeightS
-			visible: Style.enableMenuPanelCollapse
+			visible: Style.enableMenuPanelCollapse && !menuPanel.railMode
 			Rectangle{
 				anchors.fill: parent
 				color: Style.backgroundColor2
@@ -510,7 +980,7 @@ Rectangle {
 				width: collapseMarker.width
 				height: collapseMarker.height
 
-				visible: Style.enableMenuPanelCollapse
+				visible: controlPanel.visible
 
 				Rectangle {
 					id: collapseMarker
@@ -570,7 +1040,6 @@ Rectangle {
 				}
 			}
 		}
-
 	}
 
 	Rectangle {
