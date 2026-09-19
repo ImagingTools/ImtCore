@@ -144,8 +144,8 @@ void CWorkerThread::PostTask(Task task, const QByteArray& orderingKey)
 	// otherwise, leaving the worker idle in exec() forever.
 	QMetaObject::invokeMethod(
 				workerPtr,
-				[workerPtr, task = std::move(task), orderingKey]() {
-					workerPtr->ProcessTask(task, orderingKey);
+				[workerPtr, task = std::move(task), orderingKey]() mutable {
+					workerPtr->ProcessTask(std::move(task), orderingKey);
 				},
 				Qt::QueuedConnection);
 }
