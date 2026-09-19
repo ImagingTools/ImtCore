@@ -22,6 +22,27 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="RequestDispatcher" PackageId="ImtRestPck" ComponentId="ServletRequestDispatcher">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestHandler" Type="Factory" ExportId="RequestHandler">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TcpServer"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WorkerTaskQueue" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WorkerManager"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="SslConfigurationManager" PackageId="ImtComPck" ComponentId="SslConfigurationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -44,7 +65,7 @@
                         <Data IsEnabled="true" Value="HttpProtocolEngine"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RequestHandler" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="WorkerManager"/>
+                        <Data IsEnabled="true" Value="RequestDispatcher"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
                         <Data IsEnabled="false"/>
@@ -70,17 +91,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WorkerManager" PackageId="ImtRestPck" ComponentId="WorkerManager">
+        <Element Id="WorkerManager" PackageId="ImtRestPck" ComponentId="WorkerPool">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestHandler" Type="Factory" ExportId="RequestHandler">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TcpServer"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="ThreadsLimit">
                         <Data IsEnabled="true" Value="100"/>

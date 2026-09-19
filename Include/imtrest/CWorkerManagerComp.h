@@ -56,6 +56,7 @@ public:
 	// reimplemented (imtrest::IWorkerTaskQueue)
 	virtual bool PostTask(const QByteArray& orderingKey, Task task) override;
 	virtual istd::IPolymorphic* GetWorkerContext() const override;
+	virtual void SetWorkerContextFactory(WorkerContextFactory workerContextFactory) override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)

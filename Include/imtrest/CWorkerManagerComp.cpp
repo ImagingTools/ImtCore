@@ -13,7 +13,7 @@ namespace imtrest
 
 
 CWorkerManagerComp::CWorkerManagerComp()
-	:m_requestDispatcher(*this, *this),
+	:m_requestDispatcher(*this),
 	m_pool(*this)
 {
 	// Prime Qt network/SSL globals on the application thread before any worker runs
@@ -63,6 +63,12 @@ istd::IPolymorphic* CWorkerManagerComp::GetWorkerContext() const
 }
 
 
+void CWorkerManagerComp::SetWorkerContextFactory(WorkerContextFactory workerContextFactory)
+{
+	m_pool.SetWorkerContextFactory(std::move(workerContextFactory));
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CWorkerManagerComp::OnComponentCreated()
@@ -70,6 +76,8 @@ void CWorkerManagerComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	m_pool.SetThreadsLimit(*m_threadsLimitAttrPtr);
+
+	m_requestDispatcher.SetTaskQueue(this);
 
 	// Only when a servlet factory is wired: a pool without one still runs posted tasks, it
 	// just has no context to offer them - and requests, which are the only tasks needing one,

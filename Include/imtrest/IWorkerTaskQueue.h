@@ -10,6 +10,7 @@
 
 // ACF includes
 #include <istd/IPolymorphic.h>
+#include <istd/TInterfacePtr.h>
 
 
 namespace imtrest
@@ -27,6 +28,8 @@ class IWorkerTaskQueue: virtual public istd::IPolymorphic
 {
 public:
 	typedef std::function<void()> Task;
+	typedef istd::TUniqueInterfacePtr<istd::IPolymorphic> WorkerContextPtr;
+	typedef std::function<WorkerContextPtr()> WorkerContextFactory;
 
 	/**
 		Post \a task for execution on one of the pool's worker threads.
@@ -71,6 +74,18 @@ public:
 		        or when the pool was given no context factory.
 	*/
 	virtual istd::IPolymorphic* GetWorkerContext() const = 0;
+
+	/**
+		Set the factory producing that context, or leave it unset for a pool whose tasks need
+		none. It is called on the pool's own thread, once per worker thread created, and never
+		on the worker itself: building a context may construct QObjects parented to the
+		application, which from a worker leaves them with the wrong thread affinity.
+
+		A pool has one context per worker and therefore one factory: the client that needs a
+		context owns it. Setting a second factory replaces the first, and workers already
+		running keep the context they were built with.
+	*/
+	virtual void SetWorkerContextFactory(WorkerContextFactory workerContextFactory) = 0;
 };
 
 

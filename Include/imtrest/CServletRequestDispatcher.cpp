@@ -12,11 +12,17 @@ namespace imtrest
 {
 
 
-CServletRequestDispatcher::CServletRequestDispatcher(IWorkerTaskQueue& taskQueue, QObject& requestOwner)
-	:m_taskQueue(taskQueue),
+CServletRequestDispatcher::CServletRequestDispatcher(QObject& requestOwner)
+	:m_taskQueuePtr(nullptr),
 	m_requestOwnerPtr(&requestOwner),
 	m_responseDispatcherPtr(nullptr)
 {
+}
+
+
+void CServletRequestDispatcher::SetTaskQueue(IWorkerTaskQueue* taskQueuePtr)
+{
+	m_taskQueuePtr = taskQueuePtr;
 }
 
 
@@ -30,13 +36,19 @@ bool CServletRequestDispatcher::ProcessRequest(const IRequest& request, const QB
 {
 	OwnedRequestPtr ownedRequestPtr = MakeOwnedRequest(request);
 
+	if (m_taskQueuePtr == nullptr){
+		Q_ASSERT_X(false, "CServletRequestDispatcher", "No worker pool was set");
+
+		return false;
+	}
+
 	// An empty ordering key: requests carry no ordering constraint of their own. A transport
 	// that needs its requests serialised - per connection, per subscription - is what a
 	// non-empty key here would express.
-	const bool isPosted = m_taskQueue.PostTask(
+	const bool isPosted = m_taskQueuePtr->PostTask(
 				QByteArray(),
 				[this, ownedRequestPtr, subCommandId](){
-					auto* servletPtr = dynamic_cast<IRequestServlet*>(m_taskQueue.GetWorkerContext());
+					auto* servletPtr = dynamic_cast<IRequestServlet*>(m_taskQueuePtr->GetWorkerContext());
 					if (servletPtr == nullptr){
 						Q_ASSERT_X(false, "CServletRequestDispatcher", "Worker context is not a request servlet");
 

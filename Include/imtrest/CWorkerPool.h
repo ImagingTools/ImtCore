@@ -47,8 +47,8 @@ class CWorkerPool
 {
 public:
 	typedef IWorkerTaskQueue::Task Task;
-	typedef istd::TUniqueInterfacePtr<istd::IPolymorphic> ContextPtr;
-	typedef std::function<ContextPtr()> WorkerContextFactory;
+	typedef IWorkerTaskQueue::WorkerContextPtr ContextPtr;
+	typedef IWorkerTaskQueue::WorkerContextFactory WorkerContextFactory;
 
 	/**
 		\param dispatchOwner  QObject whose thread dispatches tasks and creates worker

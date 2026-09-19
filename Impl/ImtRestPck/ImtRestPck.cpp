@@ -66,8 +66,18 @@ I_EXPORT_COMPONENT(
 			"FileProvider - based HTTP servlet");
 
 I_EXPORT_COMPONENT(
+			WorkerPool,
+			"Pool of worker threads running posted tasks",
+			"Worker Pool Task Queue");
+
+I_EXPORT_COMPONENT(
+			ServletRequestDispatcher,
+			"Runs requests on a worker pool, one servlet instance per worker",
+			"REST HTTP Handler Request Factory");
+
+I_EXPORT_COMPONENT(
 			WorkerManager,
-			"The manager of request handlers factory for multi-thread request server",
+			"Worker pool together with the transport path running on it",
 			"REST HTTP Handler Request Factory");
 
 // Deprecated: the component was registered under this misspelled id, and .acc files outside

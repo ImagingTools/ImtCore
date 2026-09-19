@@ -18,7 +18,9 @@
 #include <imtrest/CHttpRedirectComp.h>
 #include <imtrest/CHttpFileProviderBasedServletComp.h>
 #include <imtrest/CHttpFileControllerServletComp.h>
+#include <imtrest/CServletRequestDispatcherComp.h>
 #include <imtrest/CWorkerManagerComp.h>
+#include <imtrest/CWorkerPoolComp.h>
 #include <imtrest/CTcpProtocolEngineComp.h>
 #include <imtrest/CDelegatedServletComp.h>
 #include <imtrest/CDelegatedBinaryDataProviderComp.h>
@@ -46,6 +48,8 @@ typedef imtrest::CHttpHtmlFolderBasedServletComp HttpHtmlFolderBasedServlet;
 typedef imtrest::CHttpRedirectComp HttpRedirectServlet;
 typedef imtrest::CHttpFileProviderBasedServletComp HttpFileProviderBasedServlet;
 typedef imtrest::CHttpFileControllerServletComp HttpFileControllerServlet;
+typedef imtrest::CWorkerPoolComp WorkerPool;
+typedef imtrest::CServletRequestDispatcherComp ServletRequestDispatcher;
 typedef imtrest::CWorkerManagerComp WorkerManager;
 /** \deprecated Misspelled alias of WorkerManager, kept so that existing .acc files resolve. */
 typedef imtrest::CWorkerManagerComp WorkerManaqer;
