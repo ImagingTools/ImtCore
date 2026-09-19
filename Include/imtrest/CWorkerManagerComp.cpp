@@ -56,15 +56,27 @@ bool CWorkerManagerComp::SendResponse(const QByteArray& requestId, ConstResponse
 
 ConstResponsePtr CWorkerManagerComp::ProcessRequest(const IRequest& request, const QByteArray& subCommandId) const
 {
-	QMutexLocker loc(&m_workItemListMutex);
+	{
+		QMutexLocker loc(&m_workItemListMutex);
 
-	WorkItem item;
-	item.requestPtr = &request;
-	item.subCommandId = subCommandId;
+		if (!m_isShuttingDown){
+			WorkItem item;
+			item.requestPtr = &request;
+			item.subCommandId = subCommandId;
 
-	m_workItemList.append(std::move(item));
+			m_workItemList.append(std::move(item));
 
-	DispatchNext();
+			DispatchNext();
+
+			return ConstResponsePtr();
+		}
+	}
+
+	// Shutting down: the queue has already been drained and the workers torn down, so this
+	// request would neither be dispatched nor freed by anyone else. Ownership passed to this
+	// queue together with the reference, so release it here - the task arm reports the same
+	// condition by returning false from PostTask, which a request cannot do.
+	delete &request;
 
 	return ConstResponsePtr();
 }
@@ -237,6 +249,10 @@ void CWorkerManagerComp::AboutToQuit()
 		m_busyKeys.clear();
 
 		workerList = m_workerList;
+
+		// Cleared under the lock: these threads are being torn down, so no later dispatch may
+		// reach them.
+		m_workerList.clear();
 	}
 
 	// Joined without the queue mutex held: a worker finishing in the meantime hops to
