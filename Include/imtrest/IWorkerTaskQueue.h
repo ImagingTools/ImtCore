@@ -17,19 +17,11 @@ namespace imtrest
 
 
 /**
-	Direct access to the server's worker-thread pool for work that is not a request.
+	A pool of worker threads running posted tasks.
 
-	The pool is otherwise only reachable through the transport/servlet path
-	(IRequestServlet::ProcessRequest, which needs an IRequest, creates a servlet per
-	worker and sends a response). This interface exists so that callers which merely
-	want to run something on a pool worker do not have to fabricate an IRequest and a
-	throw-away response just to get scheduled: it bypasses transport rather than
-	faking a request.
-
-	Typical use is a component that must keep its own thread responsive - for example
-	an asynchronous measurement session that receives a batch of results on a
-	non-blocking session thread but must apply them to a document, which pulls a long
-	synchronous notify/publish stack in behind it.
+	This is the general entry point to the pool. Work that belongs to a transport - an
+	IRequest, a servlet, a response - is one special case of a task, built on this interface
+	rather than beside it.
 */
 class IWorkerTaskQueue: virtual public istd::IPolymorphic
 {
@@ -40,21 +32,45 @@ public:
 		Post \a task for execution on one of the pool's worker threads.
 
 		Tasks sharing a non-empty \a orderingKey run in submission order and never
-		concurrently with one another; tasks with different keys may run in parallel.
-		An empty key means "no ordering constraint". The key matters whenever the
-		posted tasks mutate shared state: the dispatcher hands work to whichever
-		worker is idle, so without a key two batches posted in order could be applied
-		out of order.
+		concurrently with one another; tasks with different keys may run in parallel. An empty
+		key means "no ordering constraint". The key matters whenever the posted tasks mutate
+		shared state: the dispatcher hands work to whichever worker is idle, so without a key
+		two batches posted in order could be applied out of order. Note that a lock around the
+		shared state does not replace a key - it grants exclusion, while the key is what
+		decides which of two waiting tasks goes first.
+
+		A task whose key is in flight is skipped rather than blocking the queue behind it, so
+		one busy key never holds up unrelated work.
+
+		Accepting a task is not a promise to run it: tasks still queued when the pool shuts
+		down are dropped, and a caller that must know the work happened has to observe that
+		from the task itself.
+
+		The task runs on a thread with a running event loop, so it may own QObjects and post
+		queued calls; by the same token, a task that never returns also stalls that worker.
+		It must not throw - an exception would unwind into the worker's event loop.
 
 		Thread-safe, callable from any thread, and never blocks the posting thread.
 
 		\param  orderingKey Serialisation key, or an empty array for none.
-		\param  task        Callable to run. It must not block waiting on the thread
-							that posted it - that thread is free to be a caller which
-							is itself waiting for this task.
+		\param  task        Callable to run. It must not block waiting on the thread that
+		                    posted it - that thread is free to be a caller which is itself
+		                    waiting for this task.
 		\return false if the task could not be queued because the pool is shutting down.
 	*/
 	virtual bool PostTask(const QByteArray& orderingKey, Task task) = 0;
+
+	/**
+		The context object of the worker thread running the calling task.
+
+		A pool has one context per worker, created once when the worker starts. It is how a
+		task reaches something that has to be bound to the thread it runs on rather than
+		shared - a servlet, a connection, a cache - without the pool knowing what that is.
+
+		\return The context, or nullptr when the caller is not a pool worker running a task,
+		        or when the pool was given no context factory.
+	*/
+	virtual istd::IPolymorphic* GetWorkerContext() const = 0;
 };
 
 

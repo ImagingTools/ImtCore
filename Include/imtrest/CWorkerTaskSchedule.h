@@ -56,6 +56,11 @@ public:
 	bool TakeDispatchable(Item& result);
 
 	/**
+		Whether \ref TakeDispatchable would return a task now.
+	*/
+	bool HasDispatchable() const;
+
+	/**
 		Report that the task holding \a orderingKey has finished, making the next task that
 		carries it dispatchable again. A no-op for an empty key.
 	*/

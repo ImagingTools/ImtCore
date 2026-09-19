@@ -6,28 +6,33 @@
 #include <QtCore/QThread>
 
 // ACF includes
+#include <istd/IPolymorphic.h>
 #include <istd/TDelPtr.h>
+#include <istd/TInterfacePtr.h>
 
 // ImtCore includes
-#include <imtrest/IRequest.h>
-#include <imtrest/IResponse.h>
-#include <imtrest/IWorkerTaskQueue.h>
 #include <imtrest/CWorker.h>
+#include <imtrest/IWorkerTaskQueue.h>
 
 
 namespace imtrest
 {
 
-class CWorkerManagerComp;
+class CWorkerPool;
 
 
+/**
+	One thread of \ref CWorkerPool. It runs an event loop and executes the tasks the pool hands
+	it, one at a time, for as long as the pool lives.
+*/
 class CWorkerThread: public QThread
 {
 	Q_OBJECT
 public:
 	typedef IWorkerTaskQueue::Task Task;
+	typedef istd::TUniqueInterfacePtr<istd::IPolymorphic> ContextPtr;
 
-	CWorkerThread(const CWorkerManagerComp* workerManager, const QByteArray& subCommandId);
+	explicit CWorkerThread(CWorkerPool& pool);
 
 	enum Status
 	{
@@ -37,69 +42,57 @@ public:
 
 	Status GetStatus();
 	void SetStatus(Status status);
-	void SetRequestPtr(const IRequest* requestPtr);
-	/**
-		Provide a servlet created on the manager/application thread.
-		CreateServlet() must not run on the worker: factory OnComponentCreated()
-		may construct QObjects parented to qApp (translators, timers, etc.), and
-		doing that from CWorkerThread logs the one-shot affinity warning.
-	*/
-	void SetServlet(IRequestServletPtr&& servletPtr);
-	bool SendResponse(const QByteArray& requestId, ConstResponsePtr& response);
 
 	/**
-		Set the task this thread runs as soon as it is up, as the task counterpart of
-		\ref SetRequestPtr. Used only for the work item a freshly created thread is
-		started with; afterwards work arrives through \ref PostRequest / \ref PostTask.
+		Provide the context object this worker offers to the tasks it runs.
+
+		The pool creates it on its own thread and never on the worker: a factory's
+		OnComponentCreated() may construct QObjects parented to qApp (translators, timers),
+		and doing that from a worker thread logs the one-shot affinity warning and leaves the
+		objects with the wrong thread affinity.
+	*/
+	void SetContext(ContextPtr&& contextPtr);
+
+	/**
+		Set the task this thread runs as soon as it is up. Used only for the task a freshly
+		created thread is started with; afterwards work arrives through \ref PostTask.
 	*/
 	void SetPendingTask(Task task, const QByteArray& orderingKey);
 
 	/**
-		Post \a requestPtr to this worker's CWorker on the worker thread. Uses a
-		captured-argument lambda instead of a queued signal carrying a raw IRequest*:
-		a queued signal needs that pointer type registered as a queued metatype, and
-		without it Qt silently drops the call, so ProcessRequest never runs and the
-		worker idles forever in exec() (server hang). A lambda captures the pointer
-		directly and needs no metatype registration.
-	*/
-	void PostRequest(const IRequest* requestPtr, const QByteArray& subCommandId);
-
-	/**
-		Post \a task to this worker's CWorker on the worker thread - the IWorkerTaskQueue
-		counterpart of \ref PostRequest, with no servlet and no response involved. Same
-		captured-lambda rationale as \ref PostRequest.
+		Post \a task to this worker's CWorker on the worker thread. Uses a captured-argument
+		lambda rather than a queued signal: a queued signal needs every argument type
+		registered as a queued metatype, and without it Qt silently drops the call, so the
+		task never runs and the worker idles forever in exec().
 	*/
 	void PostTask(Task task, const QByteArray& orderingKey);
 
 	/**
-		Notify the manager, on its own thread, that a request finished. Called by CWorker.
-		Same lambda-hop rationale as \ref PostRequest.
-	*/
-	void NotifyFinished(const IRequest* requestPtr, const QByteArray& subCommandId);
-
-	/**
-		Notify the manager, on its own thread, that a posted task finished, so that
-		\a orderingKey is released and the next queued work item is dispatched. Called by
-		CWorker. Same lambda-hop rationale as \ref PostRequest.
+		Notify the pool, on the pool's own thread, that a task finished, so that
+		\a orderingKey is released and the next queued task is dispatched. Called by CWorker.
 	*/
 	void NotifyTaskFinished(const QByteArray& orderingKey);
+
+	/**
+		Context of the pool worker running the calling task, or nullptr when the caller is not
+		a pool worker executing a task. \ref SetCurrentContext is called by CWorker around
+		each task.
+	*/
+	static istd::IPolymorphic* GetCurrentContext();
+	static void SetCurrentContext(istd::IPolymorphic* contextPtr);
 
 	//reimplemented (QThread)
 	virtual void run() override;
 
 private:
 	Status m_status;
-	mutable CWorkerManagerComp* m_workerManager;
+	CWorkerPool* m_poolPtr;
 	istd::TDelPtr<CWorker> m_workerPtr;
-	IRequestServletPtr m_servletPtr;
-	const IRequest* m_requestPtr;
+	ContextPtr m_contextPtr;
 	Task m_pendingTask;
 	QByteArray m_pendingOrderingKey;
 	mutable QMutex m_statusMutex;
-	QByteArray m_subCommandId;
 };
 
 
 } // namespace imtrest
-
-

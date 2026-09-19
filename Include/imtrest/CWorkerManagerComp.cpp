@@ -3,7 +3,6 @@
 
 // Qt includes
 #include <QtCore/QCoreApplication>
-#include <QtCore/QDebug>
 
 // ImtCore includes
 #include <imtcom/CRequestSender.h>
@@ -14,11 +13,12 @@ namespace imtrest
 
 
 CWorkerManagerComp::CWorkerManagerComp()
-	: m_isShuttingDown(false)
+	:m_requestDispatcher(*this, *this),
+	m_pool(*this)
 {
-	// Prime Qt network/SSL globals on the application thread before any
-	// CWorkerThread runs CreateGqlContext / DoSyncPost. Otherwise the first
-	// worker request owns that one-shot init and Qt logs:
+	// Prime Qt network/SSL globals on the application thread before any worker runs
+	// CreateGqlContext / DoSyncPost. Otherwise the first worker task owns that one-shot init
+	// and Qt logs:
 	//   QObject: Cannot create children for a parent that is in a different thread
 	//   (Parent is QCoreApplication..., current thread is CWorkerThread...)
 	imtcom::CRequestSender::InitializeNetworkBackend();
@@ -32,55 +32,7 @@ CWorkerManagerComp::CWorkerManagerComp()
 }
 
 
-IRequestServletPtr CWorkerManagerComp::CreateServlet() const
-{
-	if (m_requestHandlerCompPtr.IsValid()){
-		return m_requestHandlerCompPtr.CreateInstance();
-	}
-
-	return nullptr;
-}
-
-
-bool CWorkerManagerComp::SendResponse(const QByteArray& requestId, ConstResponsePtr& response)
-{
-	if (!m_requestManagerCompPtr.IsValid()){
-		return false;
-	}
-
-	return m_requestManagerCompPtr->SendResponse(requestId, response);
-}
-
-
-// reimplemented (IRequestHandler)
-
-ConstResponsePtr CWorkerManagerComp::ProcessRequest(const IRequest& request, const QByteArray& subCommandId) const
-{
-	{
-		QMutexLocker loc(&m_workItemListMutex);
-
-		if (!m_isShuttingDown){
-			WorkItem item;
-			item.requestPtr = &request;
-			item.subCommandId = subCommandId;
-
-			m_workItemList.append(std::move(item));
-
-			DispatchNext();
-
-			return ConstResponsePtr();
-		}
-	}
-
-	// Shutting down: the queue has already been drained and the workers torn down, so this
-	// request would neither be dispatched nor freed by anyone else. Ownership passed to this
-	// queue together with the reference, so release it here - the task arm reports the same
-	// condition by returning false from PostTask, which a request cannot do.
-	delete &request;
-
-	return ConstResponsePtr();
-}
-
+// reimplemented (imtrest::IRequestServlet)
 
 bool CWorkerManagerComp::IsCommandSupported(const QByteArray& /*commandId*/) const
 {
@@ -88,192 +40,56 @@ bool CWorkerManagerComp::IsCommandSupported(const QByteArray& /*commandId*/) con
 }
 
 
-// reimplemented (IWorkerTaskQueue)
+ConstResponsePtr CWorkerManagerComp::ProcessRequest(const IRequest& request, const QByteArray& subCommandId) const
+{
+	m_requestDispatcher.ProcessRequest(request, subCommandId);
+
+	// The transport path is asynchronous: the response is dispatched by the task.
+	return ConstResponsePtr();
+}
+
+
+// reimplemented (imtrest::IWorkerTaskQueue)
 
 bool CWorkerManagerComp::PostTask(const QByteArray& orderingKey, Task task)
 {
-	if (!task){
-		return false;
-	}
-
-	QMutexLocker loc(&m_workItemListMutex);
-
-	if (m_isShuttingDown){
-		return false;
-	}
-
-	WorkItem item;
-	item.task = std::move(task);
-	item.orderingKey = orderingKey;
-
-	m_workItemList.append(std::move(item));
-
-	DispatchNext();
-
-	return true;
+	return m_pool.PostTask(orderingKey, std::move(task));
 }
 
 
-void CWorkerManagerComp::OnFinish(const IRequest* request, const QByteArray& /*subCommandId*/)
+istd::IPolymorphic* CWorkerManagerComp::GetWorkerContext() const
 {
-	// Destroyed before the queue lock is taken: ~CWebSocketRequest notifies its subscription
-	// publisher, which serialises that callback on its own mutex and holds that same mutex
-	// across publishing. Deleting under m_workItemListMutex couples the two lock orders for
-	// no reason.
-	delete request;
-
-	QMutexLocker loc(&m_workItemListMutex);
-
-	// The finished request's subCommandId is deliberately not reused for the next item:
-	// each queued item carries its own.
-	DispatchNext();
+	return m_pool.GetWorkerContext();
 }
 
 
-void CWorkerManagerComp::OnTaskFinish(const QByteArray& orderingKey)
+// reimplemented (icomp::CComponentBase)
+
+void CWorkerManagerComp::OnComponentCreated()
 {
-	QMutexLocker loc(&m_workItemListMutex);
+	BaseClass::OnComponentCreated();
 
-	if (!orderingKey.isEmpty()){
-		m_busyKeys.remove(orderingKey);
+	m_pool.SetThreadsLimit(*m_threadsLimitAttrPtr);
+
+	// Only when a servlet factory is wired: a pool without one still runs posted tasks, it
+	// just has no context to offer them - and requests, which are the only tasks needing one,
+	// cannot arrive without a servlet anyway.
+	if (m_requestHandlerCompPtr.IsValid()){
+		m_pool.SetWorkerContextFactory(
+					[this]() -> CWorkerPool::ContextPtr {
+						return m_requestHandlerCompPtr.CreateInstance();
+					});
 	}
 
-	DispatchNext();
-}
-
-
-int CWorkerManagerComp::FindDispatchableIndex() const
-{
-	for (int index = 0; index < m_workItemList.count(); ++index){
-		const WorkItem& item = m_workItemList.at(index);
-
-		if (!item.IsTask() || item.orderingKey.isEmpty() || !m_busyKeys.contains(item.orderingKey)){
-			return index;
-		}
+	if (m_requestManagerCompPtr.IsValid()){
+		m_requestDispatcher.SetResponseDispatcher(m_requestManagerCompPtr.GetPtr());
 	}
-
-	return -1;
-}
-
-
-void CWorkerManagerComp::MarkInFlight(const WorkItem& item) const
-{
-	if (item.IsTask() && !item.orderingKey.isEmpty()){
-		m_busyKeys.insert(item.orderingKey);
-	}
-}
-
-
-void CWorkerManagerComp::DispatchNext() const
-{
-	const int index = FindDispatchableIndex();
-	if (index < 0){
-		return;
-	}
-
-	for (CWorkerThread* workerPtr: m_workerList){
-		if (workerPtr->GetStatus() == CWorkerThread::ST_CLOSE){
-			WorkItem item = m_workItemList.takeAt(index);
-
-			MarkInFlight(item);
-
-			workerPtr->SetStatus(CWorkerThread::ST_PROCESS);
-
-			if (item.IsTask()){
-				workerPtr->PostTask(std::move(item.task), item.orderingKey);
-			}
-			else{
-				workerPtr->PostRequest(item.requestPtr, item.subCommandId);
-			}
-
-			return;
-		}
-	}
-
-	if (m_workerList.count() >= *m_threadsLimitAttrPtr){
-		// Pool saturated: the item stays queued until a worker reports back.
-		return;
-	}
-
-	// Re-prime if the constructor ran before QCoreApplication was fully up
-	// (defensive); no-op when already initialized on main.
-	imtcom::CRequestSender::InitializeNetworkBackend();
-
-	// Create the servlet on THIS (manager) thread - not inside CWorkerThread::run().
-	// A factory's OnComponentCreated() may construct QObjects parented to qApp
-	// (translators, timers, etc.), and doing that from a worker logs the one-shot
-	// affinity warning. Created before the item is dequeued, so that a failure here
-	// leaves the item queued rather than dropping it.
-	IRequestServletPtr servletPtr = CreateServlet();
-	if (!servletPtr.IsValid()){
-		Q_ASSERT(false);
-
-		return;
-	}
-
-	WorkItem item = m_workItemList.takeAt(index);
-
-	MarkInFlight(item);
-
-	CWorkerThread* workerPtr = new CWorkerThread(this, item.subCommandId);
-	// The worker notifies completion by calling OnFinish / OnTaskFinish via a queued
-	// lambda (CWorkerThread::NotifyFinished) - no FinishProcess signal / raw-pointer
-	// queued metatype involved.
-	workerPtr->SetServlet(std::move(servletPtr));
-
-	m_workerList.append(workerPtr);
-
-	if (item.IsTask()){
-		workerPtr->SetPendingTask(std::move(item.task), item.orderingKey);
-	}
-	else{
-		workerPtr->SetRequestPtr(item.requestPtr);
-	}
-
-	// Start processing of the work item:
-	workerPtr->start();
 }
 
 
 void CWorkerManagerComp::AboutToQuit()
 {
-	QList<CWorkerThread*> workerList;
-	QList<const IRequest*> abandonedRequestList;
-
-	{
-		QMutexLocker loc(&m_workItemListMutex);
-
-		m_isShuttingDown = true;
-
-		// Queued tasks are simply dropped; only the request arm owns memory here.
-		for (const WorkItem& item: m_workItemList){
-			if (item.requestPtr != nullptr){
-				abandonedRequestList.append(item.requestPtr);
-			}
-		}
-
-		m_workItemList.clear();
-		m_busyKeys.clear();
-
-		workerList = m_workerList;
-
-		// Cleared under the lock: these threads are being torn down, so no later dispatch may
-		// reach them.
-		m_workerList.clear();
-	}
-
-	// Destroyed outside the lock, for the reason given in OnFinish.
-	for (const IRequest* requestPtr: abandonedRequestList){
-		delete requestPtr;
-	}
-
-	// Joined without the queue mutex held: a worker finishing in the meantime hops to
-	// this thread through a queued call, and nothing here may hold the lock it needs.
-	for (CWorkerThread* workerPtr: workerList){
-		workerPtr->quit();
-		workerPtr->wait(1000);
-		workerPtr->deleteLater();
-	}
+	m_pool.Shutdown();
 }
 
 

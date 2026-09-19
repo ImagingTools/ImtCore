@@ -39,6 +39,12 @@ bool CWorkerTaskSchedule::TakeDispatchable(Item& result)
 }
 
 
+bool CWorkerTaskSchedule::HasDispatchable() const
+{
+	return FindDispatchableIndex() >= 0;
+}
+
+
 void CWorkerTaskSchedule::ReleaseKey(const QByteArray& orderingKey)
 {
 	if (!orderingKey.isEmpty()){

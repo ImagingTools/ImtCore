@@ -3,57 +3,45 @@
 
 
 // ImtCore includes
-#include <imtrest/ITransport.h>
 #include <imtrest/CWorkerThread.h>
-#include <imtrest/CWebSocketRequest.h>
-#include <imtclientgql/CWebSocketClientComp.h>
-
-// Qt includes
-#include <QtCore/QDebug>
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
 
 
 namespace imtrest
 {
 
 
-CWorker::CWorker(imtrest::IRequestServletPtr&& requestServletPtr, CWorkerThread* workerThread)
-	:m_requestServletPtr(std::move(requestServletPtr)),
-	m_workerThread(workerThread)
+namespace
 {
-}
 
 
-void CWorker::ProcessRequest(const IRequest* request, const QByteArray& subCommandId)
+/**
+	Publishes \a contextPtr as the calling thread's worker context for as long as it lives, so
+	that a task can reach it through IWorkerTaskQueue::GetWorkerContext without being handed
+	anything.
+*/
+class CContextGuard
 {
-	m_workerThread->SetStatus(CWorkerThread::ST_PROCESS);
-
-	if (m_requestServletPtr.IsValid() && request != nullptr){
-		QMutexLocker lock(&m_processMutex);
-
-		QByteArray body = request->GetBody();
-		if (body.size() > 100){
-			body.resize(100);
-			body += "...";
-		}
-
-		qDebug() << "Start process " << request->GetCommandId() << body;
-
-		ConstResponsePtr responsePtr = m_requestServletPtr->ProcessRequest(*request, subCommandId);
-		if (responsePtr.IsValid()){
-			m_workerThread->SendResponse(request->GetRequestId(), responsePtr);
-		}
-		else{
-			Q_ASSERT_X(false, __FILE__, "Request result invalid");
-		}
+public:
+	explicit CContextGuard(istd::IPolymorphic* contextPtr)
+	{
+		CWorkerThread::SetCurrentContext(contextPtr);
 	}
 
-	m_workerThread->SetStatus(CWorkerThread::ST_CLOSE);
+	~CContextGuard()
+	{
+		CWorkerThread::SetCurrentContext(nullptr);
+	}
+};
 
-	m_workerThread->NotifyFinished(request, subCommandId);
+
+} // anonymous namespace
+
+
+CWorker::CWorker(CWorkerThread* workerThread, istd::IPolymorphic* contextPtr)
+	:m_workerThread(workerThread),
+	m_contextPtr(contextPtr)
+{
 }
-
 
 
 void CWorker::ProcessTask(Task task, const QByteArray& orderingKey)
@@ -63,14 +51,16 @@ void CWorker::ProcessTask(Task task, const QByteArray& orderingKey)
 	if (task){
 		QMutexLocker lock(&m_processMutex);
 
+		CContextGuard contextGuard(m_contextPtr);
+
 		task();
 	}
 
 	m_workerThread->SetStatus(CWorkerThread::ST_CLOSE);
 
-	// Report only once the status is back to ST_CLOSE: the manager dispatches the next
-	// work item from OnTaskFinish and hands it to an idle worker, so reporting earlier
-	// could make it skip this one.
+	// Reported only once the status is back to ST_CLOSE: the pool dispatches the next task
+	// from OnTaskFinished and hands it to an idle worker, so reporting earlier could make it
+	// skip this one.
 	m_workerThread->NotifyTaskFinished(orderingKey);
 }
 

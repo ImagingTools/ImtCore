@@ -3,31 +3,35 @@
 
 
 // Qt includes
-#include <QtCore/QDebug>
 #include <QtCore/QMetaObject>
 
 // ImtCore includes
-#include <imtrest/CWorkerManagerComp.h>
+#include <imtrest/CWorkerPool.h>
 
 
 namespace imtrest
 {
 
 
-CWorkerThread::CWorkerThread(const CWorkerManagerComp* workerManager, const QByteArray& subCommandId)
+namespace
+{
+
+
+/**
+	Worker context of the calling thread. Per-thread rather than per-pool: a thread belongs to
+	exactly one pool and runs exactly one task at a time.
+*/
+thread_local istd::IPolymorphic* g_currentContextPtr = nullptr;
+
+
+} // anonymous namespace
+
+
+CWorkerThread::CWorkerThread(CWorkerPool& pool)
 	: m_status(ST_PROCESS),
-	  m_workerManager(nullptr),
-	  m_workerPtr(nullptr),
-	  m_requestPtr(nullptr),
-	  m_subCommandId(subCommandId)
+	  m_poolPtr(&pool),
+	  m_workerPtr(nullptr)
 {
-	m_workerManager = const_cast<CWorkerManagerComp*>(workerManager);
-}
-
-
-void CWorkerThread::SetServlet(IRequestServletPtr&& servletPtr)
-{
-	m_servletPtr = std::move(servletPtr);
 }
 
 
@@ -47,9 +51,9 @@ void CWorkerThread::SetStatus(Status status)
 }
 
 
-void CWorkerThread::SetRequestPtr(const IRequest* requestPtr)
+void CWorkerThread::SetContext(ContextPtr&& contextPtr)
 {
-	m_requestPtr = requestPtr;
+	m_contextPtr = std::move(contextPtr);
 }
 
 
@@ -60,13 +64,15 @@ void CWorkerThread::SetPendingTask(Task task, const QByteArray& orderingKey)
 }
 
 
-bool CWorkerThread::SendResponse(const QByteArray& requestId, ConstResponsePtr& response)
+istd::IPolymorphic* CWorkerThread::GetCurrentContext()
 {
-	if (m_workerManager == nullptr){
-		return false;
-	}
+	return g_currentContextPtr;
+}
 
-	return m_workerManager->SendResponse(requestId, response);
+
+void CWorkerThread::SetCurrentContext(istd::IPolymorphic* contextPtr)
+{
+	g_currentContextPtr = contextPtr;
 }
 
 
@@ -74,61 +80,19 @@ bool CWorkerThread::SendResponse(const QByteArray& requestId, ConstResponsePtr& 
 
 void CWorkerThread::run()
 {
-	// Servlet must already be created on the manager thread (SetServlet). Creating it
-	// here ran factory OnComponentCreated() on the worker and could parent QObjects to
-	// qApp → one-shot "Cannot create children... Parent is QCoreApplication".
-
-	if (!m_servletPtr.IsValid()){
-		// Fallback only if a caller forgot SetServlet (should not happen).
-		if (m_workerManager != nullptr){
-			m_servletPtr = m_workerManager->CreateServlet();
-		}
-	}
-
-	if (!m_servletPtr.IsValid()){
-		Q_ASSERT(false);
-
-		return;
-	}
-
-	// CWorker is a QObject bound to THIS worker thread. ProcessRequest is posted so it
-	// runs only after exec() pumps the event loop (timers / nested loops need a dispatcher).
-	m_workerPtr.SetPtr(new CWorker(std::move(m_servletPtr), this));
+	// CWorker is a QObject bound to THIS worker thread. The task is posted so that it runs
+	// only after exec() pumps the event loop: a task may block in a nested event loop, and
+	// timers need a dispatcher.
+	m_workerPtr.SetPtr(new CWorker(this, m_contextPtr.GetPtr()));
 	m_workerPtr->moveToThread(this);
 
-	// Exactly one of the two arms is set by the manager before start(): a thread is
-	// created to run one queued work item, which is either a request or a task.
-	if (m_requestPtr != nullptr){
-		PostRequest(m_requestPtr, m_subCommandId);
-	}
-	else if (m_pendingTask){
+	if (m_pendingTask){
 		PostTask(std::move(m_pendingTask), m_pendingOrderingKey);
 
 		m_pendingTask = Task();
 	}
 
 	exec();
-}
-
-
-void CWorkerThread::PostRequest(const IRequest* requestPtr, const QByteArray& subCommandId)
-{
-	CWorker* workerPtr = m_workerPtr.GetPtr();
-	if (workerPtr == nullptr){
-		return;
-	}
-
-	// Deliver to the worker on its own thread via a captured-argument lambda. This is
-	// the fix for the hang: the previous queued StartProcess signal carried a raw
-	// 'const IRequest*', which is not a registered queued metatype, so Qt dropped the
-	// call and ProcessRequest never ran (worker stuck idle in exec()). A lambda captures
-	// the pointer directly and needs no metatype.
-	QMetaObject::invokeMethod(
-				workerPtr,
-				[workerPtr, requestPtr, subCommandId]() {
-					workerPtr->ProcessRequest(requestPtr, subCommandId);
-				},
-				Qt::QueuedConnection);
 }
 
 
@@ -139,9 +103,6 @@ void CWorkerThread::PostTask(Task task, const QByteArray& orderingKey)
 		return;
 	}
 
-	// Same captured-argument lambda as PostRequest: a queued signal would need every
-	// argument type registered as a queued metatype, and Qt silently drops the call
-	// otherwise, leaving the worker idle in exec() forever.
 	QMetaObject::invokeMethod(
 				workerPtr,
 				[workerPtr, task = std::move(task), orderingKey]() mutable {
@@ -151,41 +112,19 @@ void CWorkerThread::PostTask(Task task, const QByteArray& orderingKey)
 }
 
 
-void CWorkerThread::NotifyFinished(const IRequest* requestPtr, const QByteArray& subCommandId)
-{
-	CWorkerManagerComp* workerManager = m_workerManager;
-	if (workerManager == nullptr){
-		return;
-	}
-
-	// Hop to the manager's own thread (same lambda rationale as PostRequest); the
-	// manager's OnFinish frees the request and dispatches the next queued one.
-	QMetaObject::invokeMethod(
-				workerManager,
-				[workerManager, requestPtr, subCommandId]() {
-					workerManager->OnFinish(requestPtr, subCommandId);
-				},
-				Qt::QueuedConnection);
-}
-
-
-
 void CWorkerThread::NotifyTaskFinished(const QByteArray& orderingKey)
 {
-	CWorkerManagerComp* workerManager = m_workerManager;
-	if (workerManager == nullptr){
+	CWorkerPool* poolPtr = m_poolPtr;
+	if (poolPtr == nullptr){
 		return;
 	}
 
-	// Hop to the manager's own thread (same lambda rationale as PostRequest); the
-	// manager's OnTaskFinish releases the ordering key and dispatches the next queued
-	// work item.
-	QMetaObject::invokeMethod(
-				workerManager,
-				[workerManager, orderingKey]() {
-					workerManager->OnTaskFinish(orderingKey);
-				},
-				Qt::QueuedConnection);
+	// Hop to the pool's own thread: the pool releases the ordering key and dispatches the
+	// next queued task there, and every change to its schedule but an append happens there.
+	poolPtr->PostToOwnThread(
+				[poolPtr, orderingKey](){
+					poolPtr->OnTaskFinished(orderingKey);
+				});
 }
 
 
