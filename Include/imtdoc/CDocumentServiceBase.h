@@ -90,6 +90,7 @@ public:
 	virtual const istd::IChangeable* GetDocumentPtr(const QByteArray& userId, const QByteArray& documentId) const override;
 	virtual OperationStatus GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const override;
 	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) override;
+	virtual OperationStatus ExecuteDocumentMethod(const QByteArray& userId, const QByteArray& documentId, const CDocumentMethod& method) override;
 	virtual OperationStatus GetDocumentUndoManager(
 				const QByteArray& userId,
 				const QByteArray& documentId,
