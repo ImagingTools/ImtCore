@@ -116,9 +116,13 @@ bool CWorkerManagerComp::PostTask(const QByteArray& orderingKey, Task task)
 
 void CWorkerManagerComp::OnFinish(const IRequest* request, const QByteArray& /*subCommandId*/)
 {
-	QMutexLocker loc(&m_workItemListMutex);
-
+	// Destroyed before the queue lock is taken: ~CWebSocketRequest notifies its subscription
+	// publisher, which serialises that callback on its own mutex and holds that same mutex
+	// across publishing. Deleting under m_workItemListMutex couples the two lock orders for
+	// no reason.
 	delete request;
+
+	QMutexLocker loc(&m_workItemListMutex);
 
 	// The finished request's subCommandId is deliberately not reused for the next item:
 	// each queued item carries its own.
@@ -234,6 +238,7 @@ void CWorkerManagerComp::DispatchNext() const
 void CWorkerManagerComp::AboutToQuit()
 {
 	QList<CWorkerThread*> workerList;
+	QList<const IRequest*> abandonedRequestList;
 
 	{
 		QMutexLocker loc(&m_workItemListMutex);
@@ -242,7 +247,9 @@ void CWorkerManagerComp::AboutToQuit()
 
 		// Queued tasks are simply dropped; only the request arm owns memory here.
 		for (const WorkItem& item: m_workItemList){
-			delete item.requestPtr;
+			if (item.requestPtr != nullptr){
+				abandonedRequestList.append(item.requestPtr);
+			}
 		}
 
 		m_workItemList.clear();
@@ -253,6 +260,11 @@ void CWorkerManagerComp::AboutToQuit()
 		// Cleared under the lock: these threads are being torn down, so no later dispatch may
 		// reach them.
 		m_workerList.clear();
+	}
+
+	// Destroyed outside the lock, for the reason given in OnFinish.
+	for (const IRequest* requestPtr: abandonedRequestList){
+		delete requestPtr;
 	}
 
 	// Joined without the queue mutex held: a worker finishing in the meantime hops to
