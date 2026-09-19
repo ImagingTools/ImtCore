@@ -51,6 +51,7 @@ public:
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 private:
 	I_REF(imtrest::IWorkerTaskQueue, m_taskQueueCompPtr);

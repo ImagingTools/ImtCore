@@ -56,4 +56,16 @@ void CServletRequestDispatcherComp::OnComponentCreated()
 }
 
 
+void CServletRequestDispatcherComp::OnComponentDestroyed()
+{
+	// The factory above captures this component, and the pool is a separate element whose
+	// destruction order relative to this one is not fixed. Take it back before going away.
+	m_taskQueueCompPtr->SetWorkerContextFactory(IWorkerTaskQueue::WorkerContextFactory());
+
+	m_requestDispatcher.SetTaskQueue(nullptr);
+
+	BaseClass::OnComponentDestroyed();
+}
+
+
 } // namespace imtrest
