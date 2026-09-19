@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include "ImtDesignPck.h"
 
 
@@ -66,6 +65,10 @@ I_EXPORT_COMPONENT(
 		"Generate icon qml files",
 		"Design Token Web QRC");
 
+I_EXPORT_COMPONENT(
+		FigmaTokenProcessor,
+		"Converts Figma design tokens to theme format",
+		"Figma Design Token Processor");
 
 
 } // namespace ImtDesignPck
