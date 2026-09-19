@@ -29,7 +29,8 @@ class QObject extends QBaseObject {
         }
  
         if(parent) {
-            if(parent instanceof JQModules.QtQuick.Flickable){
+            let parentToFlickableContent = parent instanceof JQModules.QtQuick.Flickable && obj.__DOM
+            if(parentToFlickableContent){
                 if(parent.__children.length === 0){
                     parent.__children.push(obj)
                     obj.setParent(parent)

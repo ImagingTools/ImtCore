@@ -625,10 +625,37 @@ module.exports = {
         this.callLayers.push([])
     },
 
+    _detachDestroyingDOM(obj, hideIncubated){
+        if(!obj) return
+        let self = obj.__self || obj
+        if(self.__DOM){
+            try { self.__DOM.remove() } catch(e) {}
+        }
+        if(hideIncubated && self.__objects){
+            for(let i = 0; i < self.__objects.length; i++){
+                this._detachDestroyingDOM(self.__objects[i], true)
+            }
+        }
+        if(self.__children){
+            for(let i = 0; i < self.__children.length; i++){
+                this._detachDestroyingDOM(self.__children[i], true)
+            }
+        }
+    },
+
     deleteLater: function(obj){
         if(!obj || obj.__destroyed || obj.__destroying) return
 
         obj.__destroying = true
+
+        // destroy() is deferred until the current update batch ends.
+        // Hide this object and createObject() instances (e.g. popup
+        // content living on the overlay) immediately so they cannot
+        // linger on unrelated items until __destroy runs.
+        let parent = obj.parent
+        let ownerDying = !parent || parent.__destroying || parent.__destroyed
+        let isFactory = !!obj.__component
+        this._detachDestroyingDOM(obj, ownerDying || !isFactory)
 
         if(this.updateLayers.length){
             if(this.deleteObjects.indexOf(obj) < 0) this.deleteObjects.push(obj)

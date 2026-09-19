@@ -836,9 +836,12 @@ class Item extends QtObject {
     }
 
     __destroy(){
-        let dom = this.__DOM
-        if(dom) dom.remove()
         super.__destroy()
+
+        let dom = this.__DOM
+        if(dom){
+            try { dom.remove() } catch(e) {}
+        }
         
         let index = JQApplication.focusTree.indexOf(this)
         if(index >= 0) JQApplication.focusTree.splice(index, 1)

@@ -157,7 +157,7 @@ class Loader extends Item {
 
         this.status = Loader.Loading
 
-        if(newValue){
+        if(newValue && newValue.__component){
             this.__updateProperty('visible')
             let initialProperties = this.__cachedInitialProperties || {}
             delete this.__cachedInitialProperties
