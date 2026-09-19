@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtbase/CComplexCollectionFilterHelper.h>
 #include <imtauth/IUserInfo.h>
+#include <imtauth/IUserGroupFilter.h>
 
 
 namespace imtauthdb
@@ -187,6 +188,27 @@ bool CUserDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& 
 	}
 
 	return true;
+}
+
+
+QString CUserDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
+{
+	iprm::TParamsPtr<imtauth::IUserGroupFilter> groupFilterParamPtr(&filterParams, QByteArrayLiteral("GroupFilter"));
+	if (!groupFilterParamPtr.IsValid() || IsSQLite()){
+		return QString();
+	}
+
+	QByteArrayList groupIds = groupFilterParamPtr->GetGroupIds();
+	if (groupIds.isEmpty()){
+		return QString();
+	}
+
+	QStringList quotedGroupIds;
+	for (const QByteArray& groupId : groupIds){
+		quotedGroupIds << QStringLiteral("'%1'").arg(SqlEncode(QString(groupId)));
+	}
+
+	return QStringLiteral(R"((root."Document"->'Groups' ?| array[%1]))").arg(quotedGroupIds.join(','));
 }
 
 

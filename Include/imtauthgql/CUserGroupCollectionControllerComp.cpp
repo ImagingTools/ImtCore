@@ -5,10 +5,14 @@
 
 // ACF includes
 #include <iqt/iqt.h>
+#include <istd/TInterfacePtr.h>
+#include <iprm/CParamsSet.h>
 
 // ImtCore includes
 #include <imtauth/CUserGroupInfo.h>
+#include <imtauth/CUserGroupFilter.h>
 #include <imtauth/IUserInfoProvider.h>
+#include <imtbase/IObjectCollectionIterator.h>
 
 
 namespace imtauthgql
@@ -432,6 +436,58 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	}
 
 	return FillObjectFromRepresentation(representation, object, objectId, errorMessage);
+}
+
+
+// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
+
+void CUserGroupCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const
+{
+	// Remove the deleted groups from the membership lists of their member users,
+	// so that users no longer reference groups that do not exist anymore.
+	if (!m_userCollectionCompPtr.IsValid()){
+		BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
+
+		return;
+	}
+
+	iprm::CParamsSet filterParams;
+	istd::TUniqueInterfacePtr<imtauth::CUserGroupFilter> groupFilterPtr = new imtauth::CUserGroupFilter();
+	groupFilterPtr->SetGroupIds(elementIds);
+	filterParams.SetEditableParameter(QByteArrayLiteral("GroupFilter"), groupFilterPtr.PopPtr(), true);
+
+	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> userIteratorPtr =
+				m_userCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &filterParams);
+	if (!userIteratorPtr.IsValid()){
+		BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
+
+		return;
+	}
+
+	while (userIteratorPtr->Next()){
+		imtbase::IObjectCollection::DataPtr userDataPtr;
+		if (!userIteratorPtr->GetObjectData(userDataPtr)){
+			continue;
+		}
+
+		imtauth::IUserInfo* userInfoPtr = userDataPtr.GetPtr<imtauth::IUserInfo>();
+		if (userInfoPtr == nullptr){
+			continue;
+		}
+
+		bool hasChanges = false;
+		for (const QByteArray& groupId : elementIds){
+			if (userInfoPtr->RemoveFromGroup(groupId)){
+				hasChanges = true;
+			}
+		}
+
+		if (hasChanges){
+			m_userCollectionCompPtr->SetObjectData(userIteratorPtr->GetObjectId(), *userInfoPtr);
+		}
+	}
+
+	BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
 }
 
 
