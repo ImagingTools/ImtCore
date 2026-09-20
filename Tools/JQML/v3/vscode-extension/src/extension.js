@@ -190,10 +190,11 @@ function activate(context) {
                 const completion = new vscode.CompletionItem(item.label, KIND_MAP[item.kind] || vscode.CompletionItemKind.Text)
                 completion.detail = item.detail
                 completion.insertText = item.insertText || item.label
+                if (item.sortText) completion.sortText = item.sortText
                 return completion
             })
         }
-    }, '.', ' '))
+    }, '.'))
 
     context.subscriptions.push(vscode.languages.registerDefinitionProvider('jqml', {
         provideDefinition(document, position) {

@@ -36,6 +36,10 @@ function hasLabel(items, name) {
     assert.ok(labels(items).indexOf(name) >= 0, 'missing completion ' + name + ' in ' + labels(items).slice(0, 30).join(', '))
 }
 
+function noLabel(items, name) {
+    assert.ok(labels(items).indexOf(name) < 0, 'unexpected completion ' + name + ' in ' + labels(items).slice(0, 40).join(', '))
+}
+
 test('syntax error diagnostic', () => {
     const lang = service()
     const file = path.join(fixtures, 'SyntaxError.qml')
@@ -328,6 +332,10 @@ test('follows typed property to nested method', () => {
 
     const items = lang.getCompletions(file, text, text.indexOf('designProvider.setDesignSchema') + 'designProvider.'.length)
     hasLabel(items, 'setDesignSchema')
+    noLabel(items, 'import')
+    noLabel(items, 'Item')
+    noLabel(items, 'hasOwnProperty')
+    noLabel(items, '$complete')
 
     const hover = lang.getHover(file, text, offset)
     assert.ok(hover && hover.detail, 'hover')
@@ -351,6 +359,62 @@ test('Gallery designProvider.setDesignSchema goes to DesignSchemaProvider', () =
     const locs = lang.getDefinition(web, text, offset)
     assert.ok(locs.length, 'setDesignSchema definition in gallery')
     assert.ok(/DesignSchemaProvider\.qml$/i.test(String(locs[0].filePath).replace(/\\/g, '/')), locs[0].filePath)
+})
+
+test('header completions are import pragma and types', () => {
+    const lang = service()
+    const file = path.join(fixtures, 'App.qml')
+    const text = 'import QtQuick\n\n'
+    const items = lang.getCompletions(file, text, text.length)
+    hasLabel(items, 'import')
+    hasLabel(items, 'pragma')
+    hasLabel(items, 'Item')
+    noLabel(items, 'width')
+    noLabel(items, 'property')
+})
+
+test('element body completions include members handlers types and qml keywords', () => {
+    const lang = service()
+    const file = path.join(fixtures, 'App.qml')
+    const text = require('fs').readFileSync(file, 'utf8')
+    const offset = text.indexOf('property int foo')
+    const items = lang.getCompletions(file, text, offset)
+    hasLabel(items, 'width')
+    hasLabel(items, 'property')
+    hasLabel(items, 'function')
+    hasLabel(items, 'MyBox')
+    noLabel(items, 'import')
+    noLabel(items, 'pragma')
+})
+
+test('function body completions are script members not qml types', () => {
+    const lang = service()
+    const file = path.join(fixtures, 'MyBox.qml')
+    const text = require('fs').readFileSync(file, 'utf8')
+    const offset = text.indexOf('root.count')
+    const items = lang.getCompletions(file, text, offset)
+    hasLabel(items, 'count')
+    hasLabel(items, 'bump')
+    hasLabel(items, 'root')
+    hasLabel(items, 'tapped')
+    noLabel(items, 'property')
+    noLabel(items, 'import')
+    noLabel(items, 'MyBox')
+    noLabel(items, 'Rectangle')
+})
+
+test('handler body completions are script members', () => {
+    const lang = service()
+    const file = path.join(fixtures, 'App.qml')
+    const text = require('fs').readFileSync(file, 'utf8')
+    const offset = text.indexOf('root.foo = box.count')
+    const items = lang.getCompletions(file, text, offset)
+    hasLabel(items, 'root')
+    hasLabel(items, 'box')
+    hasLabel(items, 'count')
+    noLabel(items, 'property')
+    noLabel(items, 'import')
+    noLabel(items, 'ListModel')
 })
 
 console.log('')

@@ -21,12 +21,22 @@ const QML_KEYWORDS = [
     'readonly', 'required', 'default', 'enum', 'id', 'Singleton',
 ]
 
+const HEADER_KEYWORDS = ['import', 'pragma']
+const ELEMENT_KEYWORDS = ['property', 'signal', 'function', 'readonly', 'required', 'default', 'enum', 'id', 'alias']
+
 const PROPERTY_TYPE_NAMES = [
     'int', 'real', 'double', 'string', 'bool', 'var', 'variant', 'color',
     'list', 'alias', 'date', 'url', 'point', 'rect',
 ]
 
 const INTERNAL_NAME = /^(JQ|__)|^(AX|AY|AWidth|AHeight)(Changed)?$/
+
+const COMPLETION_NOISE = new Set([
+    'hasOwnProperty', 'setParent', '$complete', 'blockSignals', 'signalsBlocked',
+    'deleteLater', 'toString', 'valueOf', 'isPrototypeOf', 'propertyIsEnumerable',
+    'toLocaleString', 'constructor',
+    'model', 'modelData', 'index', 'modelChanged', 'modelDataChanged', 'indexChanged',
+])
 
 const JS_GLOBALS = ['parent', 'this', 'console', 'Qt', 'true', 'false', 'null', 'undefined', 'Math']
 
@@ -268,7 +278,21 @@ function isDunderName(name) {
 
 function isInternalMember(name) {
     if (isDunderName(name)) return true
-    return INTERNAL_NAME.test(name)
+    if (INTERNAL_NAME.test(name)) return true
+    const signal = handlerToSignal(name)
+    if (signal && (isDunderName(signal) || INTERNAL_NAME.test(signal))) return true
+    return false
+}
+
+function isCompletionNoise(member) {
+    const name = member && member.name
+    if (!name) return true
+    if (isDunderName(name) || isInternalMember(name)) return true
+    if (name.indexOf('.') >= 0) return true
+    if (name[0] === '$') return true
+    if (COMPLETION_NOISE.has(name)) return true
+    if (COMPLETION_NOISE.has(handlerToSignal(name))) return true
+    return false
 }
 
 function escapeRegExp(value) {
@@ -487,6 +511,106 @@ function braceRangeAfter(text, fromPos) {
     return { start: open, end: matchingBrace(text, open) }
 }
 
+function skipStringOrComment(text, i) {
+    const ch = text[i]
+    const next = text[i + 1]
+    if (ch === '/' && next === '/') {
+        const nl = text.indexOf('\n', i)
+        return nl < 0 ? text.length : nl + 1
+    }
+    if (ch === '/' && next === '*') {
+        const end = text.indexOf('*/', i + 2)
+        return end < 0 ? text.length : end + 2
+    }
+    if (ch === '"' || ch === "'" || ch === '`') {
+        const quote = ch
+        i++
+        while (i < text.length) {
+            if (text[i] === '\\') {
+                i += 2
+                continue
+            }
+            if (text[i] === quote) return i + 1
+            i++
+        }
+        return text.length
+    }
+    return i
+}
+
+function innermostBraceStart(text, offset, from, to) {
+    const stack = from != null ? [from] : []
+    const limit = Math.min(offset, to != null ? to : text.length)
+    let i = (from != null ? from + 1 : 0)
+    while (i < limit) {
+        const next = skipStringOrComment(text, i)
+        if (next !== i) {
+            i = next
+            continue
+        }
+        if (text[i] === '{') stack.push(i)
+        else if (text[i] === '}' && stack.length) stack.pop()
+        i++
+    }
+    return stack.length ? stack[stack.length - 1] : from
+}
+
+function looksLikeQmlTypeToken(token) {
+    return /^[A-Z][\w.]*$/.test(String(token || ''))
+}
+
+function isBindingValueOnLine(text, offset) {
+    const lineStart = text.lastIndexOf('\n', offset - 1) + 1
+    const line = text.slice(lineStart, offset)
+    if (/^\s*on[A-Z]\w*\s*:/.test(line)) return true
+    if (/^\s*(?:readonly|required|default\s+)?property\b[^:\n]*:\s*/.test(line)) return true
+    if (/^\s*[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*\s*:\s*$/.test(line)) return true
+    if (/^\s*[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*\s*:\s+\S/.test(line) && !/^\s*[A-Z][\w.]*\s*\{/.test(line)) return true
+    return false
+}
+
+function valueRangeAfterColon(text, from, limit) {
+    const endLimit = limit != null ? limit : Math.min(text.length, from + 400)
+    let colon = -1
+    for (let i = from; i < endLimit; i++) {
+        const next = skipStringOrComment(text, i)
+        if (next !== i) {
+            i = next - 1
+            continue
+        }
+        if (text[i] === '\n' || text[i] === '{') break
+        if (text[i] === ':') {
+            colon = i
+            break
+        }
+    }
+    if (colon < 0) return null
+    let i = colon + 1
+    while (i < text.length && (text[i] === ' ' || text[i] === '\t')) i++
+    if (i < text.length && text[i] === '{') {
+        return { start: i, end: matchingBrace(text, i) }
+    }
+    const rest = text.slice(i, i + 80)
+    if (looksLikeQmlTypeToken(rest.trim().split(/\s+/)[0]) && rest.replace(/^[A-Za-z_][\w.]*/, '').trim().charAt(0) === '{') {
+        return null
+    }
+    let end = i
+    let depth = 0
+    while (end < text.length) {
+        const next = skipStringOrComment(text, end)
+        if (next !== end) {
+            end = next
+            continue
+        }
+        const ch = text[end]
+        if (ch === '(' || ch === '[' || ch === '{') depth++
+        else if ((ch === ')' || ch === ']' || ch === '}') && depth > 0) depth--
+        else if (depth === 0 && (ch === '\n' || ch === ';')) break
+        end++
+    }
+    return { start: colon + 1, end }
+}
+
 function wordPrefix(lineBefore) {
     const match = lineBefore.match(/([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*\.?)$/)
     if (!match) return { path: [], prefix: '', token: '' }
@@ -554,7 +678,8 @@ function collectPrototypeMethods(cls) {
             if (seen.has(name)) continue
             seen.add(name)
             if (name === 'constructor') continue
-            if (name.startsWith('__') || name.startsWith('SLOT_') || name.startsWith('PROXY_')) continue
+            if (name.startsWith('__') || name.startsWith('SLOT_') || name.startsWith('PROXY_') || name.startsWith('$')) continue
+            if (COMPLETION_NOISE.has(name)) continue
             if (typeof proto[name] === 'function') {
                 methods.push({
                     name,
@@ -900,6 +1025,7 @@ function walkQmlTree(node, parent, document, text) {
             },
             offsetStart: start,
             offsetEnd: braces.end,
+            braceOffset: braces.start,
             nameRange: rangeFromName(info, typeName.split('.').shift()),
             info,
         }
@@ -927,11 +1053,15 @@ function walkQmlTree(node, parent, document, text) {
                     || locationInText(text, document.filePath, idName)
             }
         } else {
+            const from = info && info.pos != null ? info.pos : parent.offsetStart
+            const script = valueRangeAfterColon(text, from, parent.offsetEnd)
             parent.assigns.push({
                 name,
                 info,
                 range: rangeFromName(info, String(name).split('.')[0]),
                 handler: isHandlerName(name),
+                scriptStart: script && script.start,
+                scriptEnd: script && script.end,
             })
         }
         const inner = node[2] && node[2][1]
@@ -969,6 +1099,14 @@ function walkQmlTree(node, parent, document, text) {
         })
         const inner = node[4] && node[4][1]
         if (inner && inner[0] === 'qmlelem') walkQmlTree(inner, parent, document, text)
+        else {
+            const from = (loc && loc.range && parent.offsetStart != null) ? (infoOf(node) && infoOf(node).pos) || parent.offsetStart : parent.offsetStart
+            const script = valueRangeAfterColon(text, from, parent.offsetEnd)
+            if (script) {
+                parent.properties[parent.properties.length - 1].scriptStart = script.start
+                parent.properties[parent.properties.length - 1].scriptEnd = script.end
+            }
+        }
         return
     }
 
@@ -1017,6 +1155,13 @@ function walkQmlTree(node, parent, document, text) {
         const args = ((node[2] && node[2][2]) || []).join(', ')
         const loc = locationFromInfo(text, document.filePath, infoOf(node), node[1])
             || locationInText(text, document.filePath, node[1])
+        const source = typeof node[3] === 'string' ? node[3] : ''
+        let from = parent.offsetStart || 0
+        if (source) {
+            const idx = text.indexOf(source, parent.offsetStart || 0)
+            if (idx >= 0) from = idx
+        }
+        const braces = braceRangeAfter(text, from)
         parent.methods.push({
             name: node[1],
             args: (node[2] && node[2][2]) || [],
@@ -1024,6 +1169,8 @@ function walkQmlTree(node, parent, document, text) {
             detail: 'function ' + node[1] + '(' + args + ')',
             filePath: document.filePath,
             range: loc && loc.range,
+            offsetStart: braces.start,
+            offsetEnd: braces.end,
         })
         return
     }
@@ -1641,7 +1788,7 @@ class LanguageService {
         const seen = new Set()
         for (const member of members) {
             if (!member || !member.name) continue
-            if (isDunderName(member.name)) continue
+            if (isCompletionNoise(member)) continue
             if (!includeInternal && this.hideInternal && isInternalMember(member.name)) continue
             if (lower && String(member.name).toLowerCase().indexOf(lower) !== 0) continue
             if (seen.has(member.name)) continue
@@ -1652,12 +1799,83 @@ class LanguageService {
     }
 
     completionItem(member, extra) {
-        return Object.assign({
+        const item = Object.assign({
             label: member.name,
             kind: member.kind || KIND.property,
             detail: member.detail || '',
             insertText: member.insertText || member.name,
+            sortText: member.sortText || member.name,
         }, extra || {})
+        if (!item.sortText) item.sortText = item.label
+        return item
+    }
+
+    completionElement(document, offset) {
+        let found = null
+        for (const element of document.elements) {
+            const start = element.braceOffset != null ? element.braceOffset : element.offsetStart
+            const end = element.offsetEnd
+            if (offset > start && offset <= end) {
+                if (!found || (end - start) <= (found.offsetEnd - (found.braceOffset != null ? found.braceOffset : found.offsetStart))) {
+                    found = element
+                }
+            }
+        }
+        return found
+    }
+
+    isHeaderPosition(document, offset) {
+        if (!document.root) return true
+        const brace = document.root.braceOffset != null ? document.root.braceOffset : document.root.offsetStart
+        return offset <= brace
+    }
+
+    isScriptPosition(text, offset, element) {
+        if (!element) return false
+        for (const method of element.methods || []) {
+            if (method.offsetStart != null && offset > method.offsetStart && offset <= method.offsetEnd) return true
+        }
+        for (const assign of element.assigns || []) {
+            if (assign.scriptStart != null && offset >= assign.scriptStart && offset <= assign.scriptEnd) {
+                if (assign.handler || assign.name && isHandlerName(assign.name)) return true
+                if (assign.group) continue
+                return true
+            }
+        }
+        for (const prop of element.properties || []) {
+            if (prop.scriptStart != null && offset >= prop.scriptStart && offset <= prop.scriptEnd) return true
+        }
+        if (isBindingValueOnLine(text, offset)) return true
+        const brace = innermostBraceStart(text, offset, element.braceOffset, element.offsetEnd)
+        if (brace == null || brace === element.braceOffset) return false
+        for (const child of element.children || []) {
+            if (child.braceOffset === brace) return false
+        }
+        const from = Math.max(element.braceOffset || 0, brace - 120)
+        const header = text.slice(from, brace)
+        const lastLine = header.split('\n').pop() || ''
+        if (/^\s*[a-z_]\w*\s*$/.test(lastLine)) return false
+        return true
+    }
+
+    groupNameAtBrace(text, brace, element) {
+        if (!element || brace == null || brace === element.braceOffset) return ''
+        const from = Math.max(element.braceOffset || 0, brace - 80)
+        const lastLine = text.slice(from, brace).split('\n').pop() || ''
+        const match = lastLine.match(/^\s*([a-z_]\w*)\s*$/)
+        return match ? match[1] : ''
+    }
+
+    detectCompletion(document, text, offset, accessPath) {
+        if (accessPath && accessPath.length) {
+            return { kind: 'member', element: this.completionElement(document, offset) || this.findInnermostElement(document, offset), path: accessPath }
+        }
+        const element = this.completionElement(document, offset)
+        if (!element) return { kind: 'header', element: null, path: [] }
+        const group = this.groupNameAtBrace(text, innermostBraceStart(text, offset, element.braceOffset, element.offsetEnd), element)
+        if (group) return { kind: 'member', element, path: [group] }
+        if (this.isScriptPosition(text, offset, element)) return { kind: 'script', element, path: [] }
+        return { kind: 'element', element, path: [] }
     }
 
     typesForAlias(document, aliasName) {
@@ -1768,17 +1986,34 @@ class LanguageService {
                 items.push(this.completionItem(item, extra))
             }
         }
+        const addMembers = (element, withHandlers) => {
+            if (!element) return
+            for (const member of this.membersOfElement(element, document)) {
+                if (isCompletionNoise(member)) continue
+                if (member.kind === KIND.variable) continue
+                add(member, { sortText: '0_' + member.name })
+                if (withHandlers && member.kind === KIND.signal) {
+                    const handler = 'on' + member.name[0].toUpperCase() + member.name.slice(1)
+                    add({ name: handler, kind: KIND.handler, detail: 'handler for ' + member.name, sortText: '0_' + handler }, { forcePrefix: prefix })
+                }
+            }
+        }
+        const addTypes = () => {
+            for (const type of this.availableTypes(document)) {
+                add({ name: type.name, kind: KIND.class, detail: type.qualifiedName, sortText: '1_' + type.name })
+            }
+        }
 
         if (/^\s*import\s+[\w.]*$/.test(lineBefore)) {
             const modules = new Set(this.engine.modules.concat([...this.localTypes.values()].map(item => item.module)))
             for (const name of modules) add({ name, kind: KIND.module, detail: 'module' })
-            return items
+            return uniqueCompletions(items)
         }
 
         if (/^\s*(?:(?:readonly|required|default)\s+)*property\s+[\w.]*$/.test(lineBefore)) {
             for (const name of PROPERTY_TYPE_NAMES) add({ name, kind: KIND.class, detail: 'type' })
             for (const type of this.availableTypes(document)) add({ name: type.name, kind: KIND.class, detail: type.qualifiedName })
-            return items
+            return uniqueCompletions(items)
         }
 
         if (/^\s*pragma\s+\w*$/.test(lineBefore)) {
@@ -1786,44 +2021,47 @@ class LanguageService {
             return items
         }
 
-        const element = this.findInnermostElement(document, offset)
+        const ctx = this.detectCompletion(document, text, offset, accessPath)
 
-        if (accessPath.length) {
-            const resolved = this.resolveAccess(accessPath, document, element)
+        if (ctx.kind === 'member') {
+            const element = ctx.element || this.findInnermostElement(document, offset)
+            const resolved = this.resolveAccess(ctx.path, document, element)
+            const wantHandlers = prefix.slice(0, 2).toLowerCase() === 'on'
             for (const member of resolved.members || []) {
-                add(member)
-                if (member.kind === KIND.signal) {
+                if (member.name === 'id' || member.kind === KIND.variable) continue
+                if (isCompletionNoise(member)) continue
+                add(member, { sortText: '0_' + member.name })
+                if (wantHandlers && member.kind === KIND.signal) {
                     const handler = 'on' + member.name[0].toUpperCase() + member.name.slice(1)
-                    if (!prefix || handler.toLowerCase().indexOf(prefix.toLowerCase()) === 0) {
-                        items.push(this.completionItem({ name: handler, kind: KIND.handler, detail: 'handler for ' + member.name }))
-                    }
+                    items.push(this.completionItem({
+                        name: handler,
+                        kind: KIND.handler,
+                        detail: 'handler for ' + member.name,
+                        sortText: '0_' + handler,
+                    }))
                 }
             }
             return uniqueCompletions(items)
         }
 
-        if (element) {
-            for (const member of this.membersOfElement(element, document)) {
-                add(member)
-                if (member.kind === KIND.signal) {
-                    const handler = 'on' + member.name[0].toUpperCase() + member.name.slice(1)
-                    add({ name: handler, kind: KIND.handler, detail: 'handler for ' + member.name }, { forcePrefix: prefix })
-                }
+        if (ctx.kind === 'header') {
+            for (const word of HEADER_KEYWORDS) add({ name: word, kind: KIND.keyword, detail: 'keyword', sortText: '0_' + word })
+            addTypes()
+            return uniqueCompletions(items)
+        }
+
+        if (ctx.kind === 'script') {
+            addMembers(ctx.element, false)
+            for (const idName of Object.keys(document.ids)) {
+                add({ name: idName, kind: KIND.variable, detail: 'id', sortText: '0_' + idName })
             }
+            for (const word of JS_GLOBALS) add({ name: word, kind: KIND.variable, detail: 'builtin', sortText: '2_' + word })
+            return uniqueCompletions(items)
         }
 
-        for (const idName of Object.keys(document.ids)) {
-            add({ name: idName, kind: KIND.variable, detail: 'id' })
-        }
-        for (const type of this.availableTypes(document)) {
-            add({ name: type.name, kind: KIND.class, detail: type.qualifiedName })
-        }
-        for (const item of document.imports) {
-            if (item.as) add({ name: item.as, kind: KIND.module, detail: item.path })
-        }
-        for (const word of QML_KEYWORDS) add({ name: word, kind: KIND.keyword, detail: 'keyword' })
-        for (const word of JS_GLOBALS) add({ name: word, kind: KIND.variable, detail: 'builtin' })
-
+        addMembers(ctx.element, true)
+        for (const word of ELEMENT_KEYWORDS) add({ name: word, kind: KIND.keyword, detail: 'keyword', sortText: '2_' + word })
+        addTypes()
         return uniqueCompletions(items)
     }
 

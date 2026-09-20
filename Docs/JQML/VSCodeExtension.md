@@ -10,12 +10,12 @@ The extension is installed as a VSIX, not launched from source:
 npm run package-extension
 ```
 
-Then in VS Code: **Extensions: Install from VSIX...** and choose `Tools/JQML/v3/vscode-extension/jqml-1.0.3.vsix`.
+Then in VS Code: **Extensions: Install from VSIX...** and choose `Tools/JQML/v3/vscode-extension/jqml-1.0.4.vsix`.
 
 Or from a terminal:
 
 ```
-code --install-extension Tools/JQML/v3/vscode-extension/jqml-1.0.3.vsix
+code --install-extension Tools/JQML/v3/vscode-extension/jqml-1.0.4.vsix
 ```
 
 The package includes the parser and a snapshot of engine component types, so a live JQML tree is not required after install.
@@ -28,6 +28,8 @@ The package includes the parser and a snapshot of engine component types, so a l
 - `jqml.hideInternalMembers` — hide `JQ*` / `AX` members from completions. Names starting with `__` are always hidden.
 
 Ctrl+click (Go to Definition) on a property, method, or signal opens its QML declaration, or the engine/QML file it was inherited from.
+
+Completions follow the cursor context: `import`/`pragma`/root types outside the first element; properties, signals, handlers, functions, inherited members and child types inside an element; members and ids inside a function or slot; members of that object after a `.`.
 
 After changing settings, reload the window or re-open a `.qml` file.
 
