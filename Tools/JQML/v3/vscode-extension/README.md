@@ -10,10 +10,10 @@ Build the package once:
 npm run package-extension
 ```
 
-This creates `vscode-extension/jqml-1.0.2.vsix`. Then install it into VS Code in any of these ways:
+This creates `vscode-extension/jqml-1.0.3.vsix`. Then install it into VS Code in any of these ways:
 
 - Command Palette: **Extensions: Install from VSIX...** and pick the `.vsix` file
-- CLI: `code --install-extension Tools/JQML/v3/vscode-extension/jqml-1.0.2.vsix`
+- CLI: `code --install-extension Tools/JQML/v3/vscode-extension/jqml-1.0.3.vsix`
 
 After that the extension is a normal installed extension. It starts itself when you open a `.qml` file. Restart VS Code if it does not appear immediately.
 

@@ -10,12 +10,12 @@ The extension is installed as a VSIX, not launched from source:
 npm run package-extension
 ```
 
-Then in VS Code: **Extensions: Install from VSIX...** and choose `Tools/JQML/v3/vscode-extension/jqml-1.0.2.vsix`.
+Then in VS Code: **Extensions: Install from VSIX...** and choose `Tools/JQML/v3/vscode-extension/jqml-1.0.3.vsix`.
 
 Or from a terminal:
 
 ```
-code --install-extension Tools/JQML/v3/vscode-extension/jqml-1.0.2.vsix
+code --install-extension Tools/JQML/v3/vscode-extension/jqml-1.0.3.vsix
 ```
 
 The package includes the parser and a snapshot of engine component types, so a live JQML tree is not required after install.

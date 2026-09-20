@@ -956,6 +956,7 @@ function walkQmlTree(node, parent, document, text) {
             kind: KIND.property,
             detail: 'property ' + type + ' ' + name,
             info: infoOf(node),
+            typeName: type,
             filePath: document.filePath,
             range: loc && loc.range,
         })
@@ -981,6 +982,9 @@ function walkQmlTree(node, parent, document, text) {
             kind: KIND.property,
             detail: 'property alias ' + name,
             info: infoOf(node),
+            typeName: 'alias',
+            aliasId: node[2] || '',
+            aliasPath: node[3] || '',
             filePath: document.filePath,
             range: loc && loc.range,
         })
@@ -1401,7 +1405,48 @@ class LanguageService {
             if (found) return found
         }
 
-        return this.engineTypes.get(typeName) || null
+        return this.lookupTypeByName(typeName, document)
+    }
+
+    lookupTypeByName(typeName, document) {
+        if (!typeName) return null
+        const imported = document ? this.importedModules(document) : []
+        const locals = [...this.localTypes.values()].filter(entry => entry.name === typeName)
+        const preferred = locals.find(entry => imported.indexOf(entry.module) >= 0)
+            || (document && document.moduleName && locals.find(entry => entry.module === document.moduleName))
+            || (locals.length ? locals[0] : null)
+        if (preferred) return this.findType(preferred.module + '.' + preferred.name)
+        return [...this.engineTypes.values()].find(type => type.name === typeName) || null
+    }
+
+    typeOfMember(member, document, ownerType) {
+        if (!member) return null
+        const ctx = (ownerType && ownerType.context) || document
+        if (member.group) return this.groupType(member, ctx)
+        if ((member.type === 'alias' || member.typeName === 'alias') && member.aliasId) {
+            return this.resolveAliasType(member, ctx, ownerType)
+        }
+        const typeName = member.typeName || member.type
+        if (!typeName || typeName === 'alias') return null
+        if (PROPERTY_TYPE_NAMES.indexOf(String(typeName).toLowerCase()) >= 0) return null
+        return this.resolveType(typeName, ctx) || this.lookupTypeByName(typeName, ctx)
+    }
+
+    resolveAliasType(member, document, ownerType) {
+        const ctx = (ownerType && ownerType.context) || document
+        if (!ctx) return null
+        const idName = member.aliasId
+        const rest = String(member.aliasPath || '').split('.').filter(Boolean)
+        const target = ctx.ids && ctx.ids[idName]
+        let type = target ? this.resolveType(target.typeName, ctx) : this.lookupTypeByName(idName, ctx)
+        let members = target ? memberMap(this.membersOfElement(target, ctx)) : memberMap(this.collectMembers(type, ctx))
+        for (const part of rest) {
+            const found = members.get(part)
+            if (!found) return type
+            type = this.typeOfMember(found, ctx, type)
+            members = memberMap(this.collectMembers(type, (type && type.context) || ctx))
+        }
+        return type
     }
 
     collectMembers(type, document, visited) {
@@ -1630,7 +1675,7 @@ class LanguageService {
     }
 
     resolveAccess(pathParts, document, element) {
-        if (!pathParts.length) return { members: this.membersOfElement(element, document) }
+        if (!pathParts.length) return { members: this.membersOfElement(element, document), type: this.resolveType(element && element.typeName, document) }
         let currentMembers = memberMap(this.membersOfElement(element, document))
         let currentType = this.resolveType(element && element.typeName, document)
 
@@ -1652,6 +1697,9 @@ class LanguageService {
                     detail: type.qualifiedName,
                 })) }
             }
+            if (i === 0 && (part === 'this' || part === 'self')) {
+                continue
+            }
             if (i === 0 && document.ids[part]) {
                 currentType = this.resolveType(document.ids[part].typeName, document)
                 currentMembers = memberMap(this.membersOfElement(document.ids[part], document))
@@ -1662,30 +1710,48 @@ class LanguageService {
                 currentMembers = memberMap(this.membersOfElement(element.parent, document))
                 continue
             }
+            if (i === 0 && !currentMembers.has(part)) {
+                let ancestor = element && element.parent
+                while (ancestor && !currentMembers.has(part)) {
+                    const ancestorMembers = memberMap(this.membersOfElement(ancestor, document))
+                    if (ancestorMembers.has(part)) {
+                        currentMembers = ancestorMembers
+                        currentType = this.resolveType(ancestor.typeName, document)
+                        break
+                    }
+                    ancestor = ancestor.parent
+                }
+                if (!currentMembers.has(part) && document.root) {
+                    const rootMembers = memberMap(this.membersOfElement(document.root, document))
+                    if (rootMembers.has(part)) {
+                        currentMembers = rootMembers
+                        currentType = this.resolveType(document.root.typeName, document)
+                    }
+                }
+            }
             if (i === 0) {
                 const asType = this.resolveType(part, document)
-                if (asType && asType.statics && asType.statics.length) {
+                if (asType && asType.statics && asType.statics.length && !currentMembers.has(part)) {
                     currentMembers = memberMap(asType.statics)
                     currentType = asType
                     continue
                 }
             }
             const member = currentMembers.get(part)
-            if (!member) return { members: [] }
-            if (member.group || member.kind === KIND.property) {
-                const group = this.groupType(member, document)
-                if (group) {
-                    currentType = group
-                    currentMembers = memberMap(this.collectMembers(group, document).concat(group.members || []))
-                    continue
-                }
+            if (!member) return { members: [], type: currentType }
+            const nextType = this.typeOfMember(member, document, currentType) || this.groupType(member, document)
+            if (nextType) {
+                currentType = nextType
+                const ctx = nextType.context || document
+                currentMembers = memberMap(this.collectMembers(nextType, ctx).concat(nextType.members || []))
+                continue
             }
-            if (member.typeName) {
-                currentType = this.resolveType(member.typeName, document)
+            if (member.typeName || member.type) {
+                currentType = this.resolveType(member.typeName || member.type, (currentType && currentType.context) || document)
                 currentMembers = memberMap(this.collectMembers(currentType, document))
                 continue
             }
-            return { members: [] }
+            return { members: [], type: currentType }
         }
         return { members: [...currentMembers.values()], type: currentType }
     }
@@ -1898,31 +1964,30 @@ class LanguageService {
         return null
     }
 
-    getDefinition(filePath, text, offset) {
+    resolveSymbol(filePath, text, offset) {
         const document = this.getDocument(filePath, text)
         const source = text != null ? text : document.text || ''
         const token = tokenAtOffset(source, offset)
-        if (!token) return []
+        if (!token) return null
         const pos = offsetToPosition(source, offset)
         const element = this.findInnermostElement(document, offset)
 
         for (const el of document.elements) {
             if (positionInRange(pos, el.nameRange) && el.typeName) {
-                const type = this.resolveType(el.typeName, document)
-                const loc = this.typeLocation(type)
-                return loc ? [loc] : []
+                const type = this.resolveType(el.typeName, document) || this.lookupTypeByName(el.typeName, document)
+                return { kind: 'type', name: el.typeName, type, document, token }
             }
         }
 
-        for (const item of document.imports) {
-            if (item.path === token.name && (!token.path.length)) {
-                const loc = this.moduleLocation(item.path)
-                if (loc) return [loc]
+        if (!token.path.length) {
+            for (const item of document.imports) {
+                if (item.path === token.name || item.path.split('.').pop() === token.name) {
+                    return { kind: 'module', name: item.path, document, token }
+                }
             }
-        }
-
-        if (!token.path.length && document.ids[token.name] && document.ids[token.name].idRange) {
-            return [document.ids[token.name].idRange]
+            if (document.ids[token.name]) {
+                return { kind: 'id', name: token.name, element: document.ids[token.name], document, token }
+            }
         }
 
         let memberName = token.name
@@ -1932,36 +1997,83 @@ class LanguageService {
             const resolved = this.resolveAccess(token.path, document, element)
             const members = memberMap(resolved.members || [])
             const member = members.get(token.name) || members.get(memberName)
-            if (member && member.filePath && member.range) return [{ filePath: member.filePath, range: member.range }]
-            if (member) {
-                const loc = this.memberOrigin(member.name, resolved.type, document)
-                if (loc) return [loc]
-            }
-            if (token.path.length === 1 && document.ids[token.path[0]]) {
-                const target = document.ids[token.path[0]]
-                const loc = this.memberOrigin(memberName, this.resolveType(target.typeName, document), document)
-                if (loc) return [loc]
-            }
+            if (member) return { kind: 'member', name: member.name, member, type: resolved.type, document, token }
         }
 
         if (element) {
             const members = memberMap(this.membersOfElement(element, document))
             const member = members.get(token.name) || members.get(memberName)
-            if (member && member.filePath && member.range) return [{ filePath: member.filePath, range: member.range }]
             if (member) {
-                const loc = this.memberOrigin(member.name, this.resolveType(element.typeName, document), document)
-                    || this.memberOrigin(member.name, this.groupType(member, document), document)
-                if (loc) return [loc]
+                return {
+                    kind: 'member',
+                    name: member.name,
+                    member,
+                    type: this.resolveType(element.typeName, document),
+                    document,
+                    token,
+                }
             }
         }
 
-        const asType = this.resolveType(token.name, document)
-        if (asType) {
-            const loc = this.typeLocation(asType)
-            if (loc) return [loc]
-        }
+        const asType = this.resolveType(token.name, document) || this.lookupTypeByName(token.name, document)
+        if (asType) return { kind: 'type', name: token.name, type: asType, document, token }
+        return null
+    }
 
+    locationOfSymbol(symbol) {
+        if (!symbol) return []
+        if (symbol.kind === 'type') {
+            const loc = this.typeLocation(symbol.type)
+            return loc ? [loc] : []
+        }
+        if (symbol.kind === 'module') {
+            const loc = this.moduleLocation(symbol.name)
+            return loc ? [loc] : []
+        }
+        if (symbol.kind === 'id' && symbol.element && symbol.element.idRange) {
+            return [symbol.element.idRange]
+        }
+        if (symbol.kind === 'member') {
+            const member = symbol.member
+            if (member.filePath && member.range) return [{ filePath: member.filePath, range: member.range }]
+            const loc = this.memberOrigin(member.name, symbol.type, symbol.document)
+                || this.memberOrigin(member.name, this.typeOfMember(member, symbol.document, symbol.type), symbol.document)
+                || this.memberOrigin(member.name, this.groupType(member, symbol.document), symbol.document)
+            return loc ? [loc] : []
+        }
         return []
+    }
+
+    getHover(filePath, text, offset) {
+        const symbol = this.resolveSymbol(filePath, text, offset)
+        if (!symbol) return null
+        if (symbol.kind === 'member') {
+            return {
+                detail: symbol.member.detail || symbol.member.name,
+                range: symbol.token.range,
+            }
+        }
+        if (symbol.kind === 'type') {
+            return {
+                detail: (symbol.type && (symbol.type.qualifiedName || symbol.type.name)) || symbol.name,
+                range: symbol.token.range,
+            }
+        }
+        if (symbol.kind === 'id') {
+            const typeName = symbol.element && symbol.element.typeName ? symbol.element.typeName : ''
+            return {
+                detail: typeName ? 'id ' + symbol.name + ' : ' + typeName : 'id ' + symbol.name,
+                range: symbol.token.range,
+            }
+        }
+        if (symbol.kind === 'module') {
+            return { detail: 'module ' + symbol.name, range: symbol.token.range }
+        }
+        return null
+    }
+
+    getDefinition(filePath, text, offset) {
+        return this.locationOfSymbol(this.resolveSymbol(filePath, text, offset))
     }
 }
 

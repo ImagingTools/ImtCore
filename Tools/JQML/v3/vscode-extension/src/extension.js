@@ -217,14 +217,19 @@ function activate(context) {
             if (!service) return null
             const text = document.getText()
             const offset = document.offsetAt(position)
-            const items = service.getCompletions(document.uri.fsPath, text, offset + 1)
-            const range = document.getWordRangeAtPosition(position)
-            if (!range) return null
-            const word = document.getText(range)
-            const match = items.find(item => item.label === word)
-            if (!match) return null
+            const hover = service.getHover(document.uri.fsPath, text, offset)
+            if (!hover) return null
             const md = new vscode.MarkdownString()
-            md.appendCodeblock(match.detail ? match.detail : match.label, 'qml')
+            md.appendCodeblock(hover.detail || '', 'qml')
+            if (hover.range && hover.range.start && hover.range.end) {
+                const range = new vscode.Range(
+                    hover.range.start.line,
+                    hover.range.start.character,
+                    hover.range.end.line,
+                    hover.range.end.character
+                )
+                return new vscode.Hover(md, range)
+            }
             return new vscode.Hover(md)
         }
     }))

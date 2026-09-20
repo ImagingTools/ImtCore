@@ -309,6 +309,50 @@ test('definition of inherited engine property goes to engine file', () => {
     assert.ok(/Item\.js$/i.test(locs[0].filePath.replace(/\\/g, '/')), locs[0].filePath)
 })
 
+test('follows typed property to nested method', () => {
+    const lang = service()
+    const providerFile = path.join(fixtures, 'DeepProvider.qml')
+    const file = path.join(fixtures, 'DeepAccess.qml')
+    lang.indexQmlFile(providerFile)
+    lang.indexQmlFile(file)
+    const text = require('fs').readFileSync(file, 'utf8')
+    const offset = text.indexOf('designProvider.setDesignSchema') + 'designProvider.'.length
+    const locs = lang.getDefinition(file, text, offset)
+    assert.ok(locs.length, 'setDesignSchema definition')
+    assert.strictEqual(path.normalize(locs[0].filePath).toLowerCase(), path.normalize(providerFile).toLowerCase())
+
+    const nestedOffset = text.indexOf('window.designProvider.setDesignSchema') + 'window.designProvider.'.length
+    const nestedLocs = lang.getDefinition(file, text, nestedOffset)
+    assert.ok(nestedLocs.length, 'window.designProvider.setDesignSchema definition')
+    assert.strictEqual(path.normalize(nestedLocs[0].filePath).toLowerCase(), path.normalize(providerFile).toLowerCase())
+
+    const items = lang.getCompletions(file, text, text.indexOf('designProvider.setDesignSchema') + 'designProvider.'.length)
+    hasLabel(items, 'setDesignSchema')
+
+    const hover = lang.getHover(file, text, offset)
+    assert.ok(hover && hover.detail, 'hover')
+    assert.ok(String(hover.detail).indexOf('setDesignSchema') >= 0, hover.detail)
+})
+
+test('Gallery designProvider.setDesignSchema goes to DesignSchemaProvider', () => {
+    const fs = require('fs')
+    const web = path.resolve(__dirname, '../../../../Impl/ImtControlsGallery/Qml/controlsgalleryqml/ImtControlsGalleryWeb.qml')
+    const provider = path.resolve(__dirname, '../../../../Qml/imtgui/Application/DesignSchemaProvider.qml')
+    const qmldir = path.resolve(__dirname, '../../../../Qml/imtgui/qmldir')
+    if (!fs.existsSync(web) || !fs.existsSync(provider) || !fs.existsSync(qmldir)) return
+    const lang = new LanguageService({ enginePath })
+    lang.indexQmldir(qmldir)
+    lang.indexQmlFile(provider)
+    lang.indexQmlFile(path.resolve(__dirname, '../../../../Impl/ImtControlsGallery/Qml/controlsgalleryqml/ImtControlsGalleryMain.qml'))
+    lang.indexQmlFile(web)
+    const text = fs.readFileSync(web, 'utf8')
+    const marker = 'designProvider.setDesignSchema'
+    const offset = text.indexOf(marker) + 'designProvider.'.length
+    const locs = lang.getDefinition(web, text, offset)
+    assert.ok(locs.length, 'setDesignSchema definition in gallery')
+    assert.ok(/DesignSchemaProvider\.qml$/i.test(String(locs[0].filePath).replace(/\\/g, '/')), locs[0].filePath)
+})
+
 console.log('')
 console.log(passed + ' passed, ' + failed + ' failed')
 if (failed) process.exit(1)
