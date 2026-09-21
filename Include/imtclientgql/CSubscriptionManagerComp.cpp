@@ -54,9 +54,16 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 
 	QMutexLocker locker(&m_registeredClientsMutex);
 
+	const auto createRegistration = [&subscriptionClient]() {
+		auto registrationPtr = std::make_shared<ClientRegistration>();
+		registrationPtr->clientPtr = &subscriptionClient;
+
+		return registrationPtr;
+	};
+
 	for (QByteArray subscriptionId : m_registeredClients.keys()){
 		if (m_registeredClients[subscriptionId].m_request.IsEqual(subscriptionRequest) && m_registeredClients[subscriptionId].m_clientId == clientId){
-			m_registeredClients[subscriptionId].m_clients.append(&subscriptionClient);
+			m_registeredClients[subscriptionId].m_clients.append(createRegistration());
 
 			return subscriptionId;
 		}
@@ -68,7 +75,7 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 	subscriptionHelper.m_request = *requestImplPtr;
 	subscriptionHelper.m_clientId = clientId;
 	subscriptionHelper.m_status = IGqlSubscriptionClient::SS_IN_REGISTRATION;
-	subscriptionHelper.m_clients.append(&subscriptionClient);
+	subscriptionHelper.m_clients.append(createRegistration());
 	m_registeredClients.insert(subscriptionId, subscriptionHelper);
 
 	locker.unlock();
@@ -99,18 +106,41 @@ bool CSubscriptionManagerComp::UnregisterSubscription(
 			const QByteArray& subscriptionId,
 			const imtclientgql::IGqlSubscriptionClient& subscriptionClient)
 {
-	QMutexLocker locker(&m_registeredClientsMutex);
+	std::shared_ptr<ClientRegistration> registrationPtr;
 
-	if (m_registeredClients.contains(subscriptionId)){
-		m_registeredClients[subscriptionId].m_clients.removeAll(const_cast<imtclientgql::IGqlSubscriptionClient*>(&subscriptionClient));
-		if (m_registeredClients[subscriptionId].m_clients.isEmpty()){
-			m_registeredClients.remove(subscriptionId);
+	{
+		QMutexLocker locker(&m_registeredClientsMutex);
+
+		const auto foundIt = m_registeredClients.find(subscriptionId);
+		if (foundIt == m_registeredClients.end()){
+			return false;
 		}
 
-		return true;
+		for (int index = 0; index < foundIt->m_clients.size(); index++){
+			if (foundIt->m_clients.at(index)->clientPtr == &subscriptionClient){
+				registrationPtr = foundIt->m_clients.takeAt(index);
+
+				break;
+			}
+		}
+
+		if (foundIt->m_clients.isEmpty()){
+			m_registeredClients.erase(foundIt);
+		}
 	}
 
-	return false;
+	if (registrationPtr == nullptr){
+		return false;
+	}
+
+	// Dropping the registration stops new callbacks; taking dispatchMutex waits out one
+	// already running. The registry lock must be released first: dispatch takes
+	// dispatchMutex and may then re-enter this method, so the reverse order would invert
+	// the hierarchy.
+	QMutexLocker dispatchLocker(&registrationPtr->dispatchMutex);
+	registrationPtr->isRegistered = false;
+
+	return true;
 }
 
 
@@ -210,8 +240,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 			if (foundIt != m_registeredClients.end()){
 				foundIt->m_status = IGqlSubscriptionClient::SS_REGISTERED;
 
-				// Dispatched outside the lock, like MT_DATA below: the client callback
-				// may re-enter this component and m_registeredClientsMutex is not recursive.
+				// Dispatched outside the lock, like MT_DATA below.
 				locker.unlock();
 				UpdateCustomerSubscriptionStatuses(subscriptionId, message);
 				locker.relock();
@@ -227,10 +256,9 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 
 			const auto foundIt = m_registeredClients.constFind(subscriptionId);
 			if (foundIt != m_registeredClients.constEnd()){
-				// Copied before dispatching: the client list must not be iterated while
-				// the lock is released, because a callback may re-enter this component
-				// (UnregisterSubscription()) and mutate it.
-				const QList<IGqlSubscriptionClient*> clients = foundIt->m_clients;
+				// Copied: a callback may re-enter this component and mutate the list. The
+				// shared_ptrs keep the copy valid even if the registry entry goes away.
+				const auto clients = foundIt->m_clients;
 
 				QJsonObject payloadObject = rootObject.value("payload").toObject().value("data").toObject();
 
@@ -240,10 +268,15 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 				QByteArray payload = document.toJson(QJsonDocument::Compact);
 
 				locker.unlock();
-				for (IGqlSubscriptionClient* subscriptionClientPtr : clients){
-					if (subscriptionClientPtr != nullptr){
-						subscriptionClientPtr->OnResponseReceived(subscriptionId, payload);
+				for (const auto& registrationPtr : clients){
+					// Held across the callback so UnregisterSubscription() blocks until it
+					// returns. The copy can name a client unregistered since it was taken.
+					QMutexLocker dispatchLocker(&registrationPtr->dispatchMutex);
+					if (!registrationPtr->isRegistered || registrationPtr->clientPtr == nullptr){
+						continue;
 					}
+
+					registrationPtr->clientPtr->OnResponseReceived(subscriptionId, payload);
 				}
 				locker.relock();
 			}
@@ -651,7 +684,7 @@ void CSubscriptionManagerComp::AccessTokenObserver::OnUpdate(const istd::IChange
 
 void CSubscriptionManagerComp::UpdateCustomerSubscriptionStatuses(const QByteArray& subscriptionId, const QString& message) const
 {
-	QList<IGqlSubscriptionClient*> clients;
+	QList<std::shared_ptr<ClientRegistration>> clients;
 	IGqlSubscriptionClient::SubscriptionStatus status = IGqlSubscriptionClient::SS_UNKNOWN;
 
 	{
@@ -665,13 +698,16 @@ void CSubscriptionManagerComp::UpdateCustomerSubscriptionStatuses(const QByteArr
 		status = foundIt->m_status;
 	}
 
-	// Dispatched outside the lock: a client callback may re-enter this component
-	// (typically through UnregisterSubscription()) and m_registeredClientsMutex is
-	// not recursive. Callers must therefore not hold it across this call.
-	for (IGqlSubscriptionClient* subscriptionClientPtr : clients){
-		if (subscriptionClientPtr != nullptr){
-			subscriptionClientPtr->OnSubscriptionStatusChanged(subscriptionId, status, message);
+	// Dispatched outside the lock: callbacks run arbitrary code, and holding
+	// m_registeredClientsMutex across them would serialise every subscription in the
+	// component behind each one. Callers must not hold it across this call.
+	for (const auto& registrationPtr : clients){
+		QMutexLocker dispatchLocker(&registrationPtr->dispatchMutex);
+		if (!registrationPtr->isRegistered || registrationPtr->clientPtr == nullptr){
+			continue;
 		}
+
+		registrationPtr->clientPtr->OnSubscriptionStatusChanged(subscriptionId, status, message);
 	}
 }
 
