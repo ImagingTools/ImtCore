@@ -14,6 +14,21 @@
 	<file alias="CreateTenantRelationshipsTable.sql">Resources/SQL/Postgres/CreateTenantRelationshipsTable.sql</file>
 	<file alias="CreateTenantEntityBindingsTable.sql">Resources/SQL/Postgres/CreateTenantEntityBindingsTable.sql</file>
     </qresource>
+    <qresource prefix="/SQL/Duck">
+        <file alias="CreatePersonalAccessTokenTable.sql">Resources/SQL/Postgres/CreatePersonalAccessTokenTable.sql</file>
+	<file alias="CreateUserSessionsTable.sql">Resources/SQL/Postgres/CreateUserSessionsTable.sql</file>
+	<file alias="CreateUserSettingsTable.sql">Resources/SQL/Postgres/CreateUserSettingsTable.sql</file>
+        <file alias="CreateTenantsTable.sql">Resources/SQL/Postgres/CreateTenantsTable.sql</file>
+        <file alias="CreateTenantMembershipsTable.sql">Resources/SQL/Postgres/CreateTenantMembershipsTable.sql</file>
+	<file alias="CreateTenantInvitationsTable.sql">Resources/SQL/Postgres/CreateTenantInvitationsTable.sql</file>
+	<file alias="CreateTenantPermissionsTable.sql">Resources/SQL/Postgres/CreateTenantPermissionsTable.sql</file>
+	<file alias="CreateCrossOrgGrantsTable.sql">Resources/SQL/Postgres/CreateCrossOrgGrantsTable.sql</file>
+	<file alias="CreateContractsTable.sql">Resources/SQL/Postgres/CreateContractsTable.sql</file>
+	<file alias="CreateCrossTenantMessagesTable.sql">Resources/SQL/Postgres/CreateCrossTenantMessagesTable.sql</file>
+	<file alias="CreateOrderRequestsTable.sql">Resources/SQL/Postgres/CreateOrderRequestsTable.sql</file>
+	<file alias="CreateTenantRelationshipsTable.sql">Resources/SQL/Postgres/CreateTenantRelationshipsTable.sql</file>
+	<file alias="CreateTenantEntityBindingsTable.sql">Resources/SQL/Postgres/CreateTenantEntityBindingsTable.sql</file>
+    </qresource>
     <qresource prefix="/SQL/SQLite">
         <file alias="CreatePersonalAccessTokenTable.sql">Resources/SQL/SQLite/CreatePersonalAccessTokenTable.sql</file>
 	<file alias="CreateUserSessionsTable.sql">Resources/SQL/SQLite/CreateUserSessionsTable.sql</file>

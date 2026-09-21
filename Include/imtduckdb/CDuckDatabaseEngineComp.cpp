@@ -251,8 +251,36 @@ bool CDuckDatabaseEngineComp::EnsureDatabaseOpen() const
 		}
 	}
 
+	bool retVal = true;
 	if (justCreated){
-		ExecuteDatabasePatches();
+		retVal = CreateDatabaseMetaInfo();
+	}
+
+	if (retVal){
+		retVal = ExecuteDatabasePatches();
+	}
+
+	return retVal;
+}
+
+
+bool CDuckDatabaseEngineComp::CreateDatabaseMetaInfo() const
+{
+	QSqlError sqlError;
+
+	ExecSqlQuery(
+				QByteArrayLiteral(
+					"CREATE TABLE IF NOT EXISTS \"Revisions\" ("
+					"Revision INTEGER NOT NULL PRIMARY KEY, "
+					"CreationDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+					"Description VARCHAR"
+					")"),
+				&sqlError);
+
+	if (sqlError.type() != QSqlError::NoError){
+		SendErrorMessage(0, QStringLiteral("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text()), __FILE__);
+
+		return false;
 	}
 
 	return true;
@@ -270,7 +298,9 @@ bool CDuckDatabaseEngineComp::ExecuteDatabasePatches() const
 	}
 
 	int newRevision = -1;
-	bool retVal = m_migrationControllerCompPtr->DoMigration(newRevision);
+	int databaseVersion = GetDatabaseVersion();
+
+	bool retVal = m_migrationControllerCompPtr->DoMigration(newRevision, istd::CIntRange(databaseVersion + 1, -1));
 	if (!retVal){
 		CancelTransaction();
 
@@ -278,6 +308,23 @@ bool CDuckDatabaseEngineComp::ExecuteDatabasePatches() const
 	}
 
 	return FinishTransaction();
+}
+
+
+int CDuckDatabaseEngineComp::GetDatabaseVersion() const
+{
+	QSqlError sqlError;
+
+	QSqlQuery queryGetRevision = ExecSqlQuery(QByteArrayLiteral("SELECT * FROM \"Revisions\" ORDER BY Revision DESC LIMIT 1"), &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		return -1;
+	}
+
+	if (queryGetRevision.next()){
+		return queryGetRevision.value(0).toInt();
+	}
+
+	return -1;
 }
 
 

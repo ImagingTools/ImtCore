@@ -85,9 +85,21 @@ private:
 	bool EnsureDatabaseOpen() const;
 
 	/**
+		Creates the "Revisions" meta-info table used to track applied migrations, if it does not
+		already exist.
+	*/
+	bool CreateDatabaseMetaInfo() const;
+
+	/**
 		Runs pending migrations through the (optional) MigrationController.
 	*/
 	bool ExecuteDatabasePatches() const;
+
+	/**
+		Reads the current schema revision from the "Revisions" table.
+		\return the highest applied revision, or -1 if none has been set yet.
+	*/
+	int GetDatabaseVersion() const;
 
 	QString GetDatabasePath() const;
 
