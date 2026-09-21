@@ -57,8 +57,6 @@ public:
 	template <typename Document, typename... Args>
 	explicit CDocumentMethod(void (Document::*method)(Args...), std::decay_t<Args>... args) :
 				m_invoke([method, ...args = std::move(args)](istd::IChangeable& document) {
-					static_assert(std::is_polymorphic_v<Document>, "Document must be polymorphic");
-
 					auto* documentPtr = dynamic_cast<Document*>(&document);
 					Q_ASSERT(documentPtr != nullptr);
 					if (documentPtr == nullptr){
