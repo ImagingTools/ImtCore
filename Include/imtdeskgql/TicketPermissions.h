@@ -47,6 +47,22 @@ inline bool IsCurrentUserAdmin(const imtgql::IGqlContext* contextPtr)
 
 
 /**
+Returns true if the ticket has no reporter yet. Such a ticket is a newly
+created document that has not been saved; the authenticated user who is
+editing it becomes its reporter on save, so it is fully accessible to them.
+*/
+inline bool IsUnclaimedTicket(
+		const imtgql::IGqlContext* contextPtr,
+		const imtdesk::ISupportTicket* ticketPtr)
+{
+	return ticketPtr != nullptr
+			&& ticketPtr->GetReporterId().isEmpty()
+			&& contextPtr != nullptr
+			&& !contextPtr->GetUserId().isEmpty();
+}
+
+
+/**
 Determines whether the current user is the reporter or an assignee of the
 given ticket. Returns true if the user is related to the ticket in either
 role; sets \a isReporter and \a isAssignee accordingly.
@@ -151,6 +167,10 @@ inline bool HasTicketVisibility(
 		return true;
 	}
 
+	if (IsUnclaimedTicket(contextPtr, ticketPtr)){
+		return true;
+	}
+
 	bool isReporter = false;
 	bool isAssignee = false;
 	if (IsCurrentUserRelatedToTicket(contextPtr, ticketPtr, isReporter, isAssignee)){
@@ -178,6 +198,10 @@ inline bool CanEditTicket(
 		return true;
 	}
 
+	if (IsUnclaimedTicket(contextPtr, ticketPtr)){
+		return true;
+	}
+
 	bool isReporter = false;
 	bool isAssignee = false;
 	IsCurrentUserRelatedToTicket(contextPtr, ticketPtr, isReporter, isAssignee);
@@ -198,6 +222,10 @@ inline bool CanLockTicket(
 	}
 
 	if (IsCurrentUserAdmin(contextPtr)){
+		return true;
+	}
+
+	if (IsUnclaimedTicket(contextPtr, ticketPtr)){
 		return true;
 	}
 
@@ -226,6 +254,10 @@ inline sdl::V1_0::imtdesk::TicketAccessLevel GetTicketAccessLevel(
 	}
 
 	if (IsCurrentUserAdmin(contextPtr)){
+		return sdl::V1_0::imtdesk::TicketAccessLevel::FullAccess;
+	}
+
+	if (IsUnclaimedTicket(contextPtr, ticketPtr)){
 		return sdl::V1_0::imtdesk::TicketAccessLevel::FullAccess;
 	}
 

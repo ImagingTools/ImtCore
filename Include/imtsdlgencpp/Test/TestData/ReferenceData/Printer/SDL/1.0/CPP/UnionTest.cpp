@@ -2425,25 +2425,25 @@ QVariant CPrinterBaseObject::createLinkListArrayElement(const QVariant& v)
 QVariant CPrinterBaseObject::GetSpecification()
 {
 	if (m_specificationQObjectPtr.isValid()){
-		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((CPrinterBase::specification).GetPtr())){
+		if (const CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<CPrinterSpecificationBase>((CPrinterBase::specification).GetPtr())){
 			CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject(this);
-						newObjectPtr->CPrinterSpecificationBase::name = val->CPrinterSpecificationBase::name;
+						newObjectPtr->CPrinterSpecificationBase::name = printerSpecificationBaseVal->CPrinterSpecificationBase::name;
 
 			m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
-		if (const CLink* val = std::get_if<CLink>((CPrinterBase::specification).GetPtr())){
+		if (const CLink* linkVal = std::get_if<CLink>((CPrinterBase::specification).GetPtr())){
 			CLinkObject *newObjectPtr = new CLinkObject(this);
-						newObjectPtr->CLink::link = val->CLink::link;
-			newObjectPtr->CLink::status = val->CLink::status;
-			newObjectPtr->CLink::statusList = val->CLink::statusList;
+						newObjectPtr->CLink::link = linkVal->CLink::link;
+			newObjectPtr->CLink::status = linkVal->CLink::status;
+			newObjectPtr->CLink::statusList = linkVal->CLink::statusList;
 
 			m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
-		if (const QString* val = std::get_if<QString>((CPrinterBase::specification).GetPtr())){
-			m_specificationQObjectPtr = QVariant::fromValue(val);
+		if (const QString* stringVal = std::get_if<QString>((CPrinterBase::specification).GetPtr())){
+			m_specificationQObjectPtr = QVariant::fromValue(stringVal);
 		}
-		if (const double* val = std::get_if<double>((CPrinterBase::specification).GetPtr())){
-			m_specificationQObjectPtr = QVariant::fromValue(val);
+		if (const double* doubleVal = std::get_if<double>((CPrinterBase::specification).GetPtr())){
+			m_specificationQObjectPtr = QVariant::fromValue(doubleVal);
 		}
 	}
 	return m_specificationQObjectPtr;
@@ -2453,17 +2453,17 @@ QVariant CPrinterBaseObject::GetSpecification()
 void CPrinterBaseObject::SetSpecification(const QVariant& v)
 {
 	if (v.isValid()){
-		if (const CPrinterSpecificationBaseObject* val = v.value<const CPrinterSpecificationBaseObject*>()){
-			CPrinterBase::specification = *val;
+		if (const CPrinterSpecificationBaseObject* printerSpecificationBaseVal = v.value<const CPrinterSpecificationBaseObject*>()){
+			CPrinterBase::specification = *printerSpecificationBaseVal;
 		}
-		if (const CLinkObject* val = v.value<const CLinkObject*>()){
-			CPrinterBase::specification = *val;
+		if (const CLinkObject* linkVal = v.value<const CLinkObject*>()){
+			CPrinterBase::specification = *linkVal;
 		}
-		if (const QString* val = v.value<const QString*>()){
-			CPrinterBase::specification = *val;
+		if (const QString* stringVal = v.value<const QString*>()){
+			CPrinterBase::specification = *stringVal;
 		}
-		if (const double* val = v.value<const double*>()){
-			CPrinterBase::specification = *val;
+		if (const double* doubleVal = v.value<const double*>()){
+			CPrinterBase::specification = *doubleVal;
 		}
 	}
 	else {
@@ -2741,24 +2741,24 @@ QVariant CPrinterSpecificationObjectList::GetOrCreateCachedObject(int index) con
 		retVal = this->m_objectDataTypeMap[index];
 	}
 	else{
-		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(this->Version_1_0->at(index).GetPtr())){
+		if (const CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<CPrinterSpecificationBase>(this->Version_1_0->at(index).GetPtr())){
 			CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject();
-			static_cast<CPrinterSpecificationBase&>(*newObjectPtr) = *val;
+			static_cast<CPrinterSpecificationBase&>(*newObjectPtr) = *printerSpecificationBaseVal;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
-		if (const CLink* val = std::get_if<CLink>(this->Version_1_0->at(index).GetPtr())){
+		if (const CLink* linkVal = std::get_if<CLink>(this->Version_1_0->at(index).GetPtr())){
 			CLinkObject *newObjectPtr = new CLinkObject();
-			static_cast<CLink&>(*newObjectPtr) = *val;
+			static_cast<CLink&>(*newObjectPtr) = *linkVal;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
-		if (const QString* val = std::get_if<QString>(this->Version_1_0->at(index).GetPtr())){
-			retVal =  QVariant::fromValue(val);
+		if (const QString* stringVal = std::get_if<QString>(this->Version_1_0->at(index).GetPtr())){
+			retVal =  QVariant::fromValue(stringVal);
 		}
 
-		if (const double* val = std::get_if<double>(this->Version_1_0->at(index).GetPtr())){
-			retVal =  QVariant::fromValue(val);
+		if (const double* doubleVal = std::get_if<double>(this->Version_1_0->at(index).GetPtr())){
+			retVal =  QVariant::fromValue(doubleVal);
 		}
 
 		this->m_objectDataTypeMap.insert(index, retVal);
@@ -2790,25 +2790,25 @@ void CPrinterSpecificationObjectList::append(QVariant item)
 	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<CPrinterSpecificationBaseObject*>()){
-		CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
-		CPrinterSpecificationBase* newItemPtr = dynamic_cast<CPrinterSpecificationBase*>(val);
+		CPrinterSpecificationBaseObject* printerSpecificationBaseVal = item.value<CPrinterSpecificationBaseObject*>();
+		CPrinterSpecificationBase* newItemPtr = dynamic_cast<CPrinterSpecificationBase*>(printerSpecificationBaseVal);
 		Version_1_0->append(istd::TNullableValue<PrinterSpecification>(*newItemPtr));
 	}
 
 	if (item.canConvert<CLinkObject*>()){
-		CLinkObject* val = item.value<CLinkObject*>();
-		CLink* newItemPtr = dynamic_cast<CLink*>(val);
+		CLinkObject* linkVal = item.value<CLinkObject*>();
+		CLink* newItemPtr = dynamic_cast<CLink*>(linkVal);
 		Version_1_0->append(istd::TNullableValue<PrinterSpecification>(*newItemPtr));
 	}
 
 	if (item.canConvert<QString>()){
-		QString val = item.value<QString>();
-		Version_1_0->append(istd::TNullableValue<PrinterSpecification>(val));
+		QString stringVal = item.value<QString>();
+		Version_1_0->append(istd::TNullableValue<PrinterSpecification>(stringVal));
 	}
 
 	if (item.canConvert<double>()){
-		double val = item.value<double>();
-		Version_1_0->append(istd::TNullableValue<PrinterSpecification>(val));
+		double doubleVal = item.value<double>();
+		Version_1_0->append(istd::TNullableValue<PrinterSpecification>(doubleVal));
 	}
 
 	ClearCache();
@@ -2824,23 +2824,23 @@ sdl::V1_0::modsdl::CPrinterSpecificationObjectList* CPrinterSpecificationObjectL
 		QVariant item = this->getData("item", i);
 
 		if (item.canConvert<CPrinterSpecificationBaseObject*>()){
-			CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
-			objectListPtr->addElement(QVariant::fromValue(val->copyMe()));
+			CPrinterSpecificationBaseObject* printerSpecificationBaseVal = item.value<CPrinterSpecificationBaseObject*>();
+			objectListPtr->addElement(QVariant::fromValue(printerSpecificationBaseVal->copyMe()));
 		}
 
 		if (item.canConvert<CLinkObject*>()){
-			CLinkObject* val = item.value<CLinkObject*>();
-			objectListPtr->addElement(QVariant::fromValue(val->copyMe()));
+			CLinkObject* linkVal = item.value<CLinkObject*>();
+			objectListPtr->addElement(QVariant::fromValue(linkVal->copyMe()));
 		}
 
 		if (item.canConvert<QString>()){
-			QString val = item.value<QString>();
-			objectListPtr->addElement(val);
+			QString stringVal = item.value<QString>();
+			objectListPtr->addElement(stringVal);
 		}
 
 		if (item.canConvert<double>()){
-			double val = item.value<double>();
-			objectListPtr->addElement(val);
+			double doubleVal = item.value<double>();
+			objectListPtr->addElement(doubleVal);
 		}
 	}
 	return objectListPtr;
@@ -2859,23 +2859,23 @@ QString CPrinterSpecificationObjectList::toJson()
 		QVariant item = this->getData("item", i);
 
 		if (item.canConvert<CPrinterSpecificationBaseObject*>()){
-			CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
-			retVal += val->toJson();
+			CPrinterSpecificationBaseObject* printerSpecificationBaseVal = item.value<CPrinterSpecificationBaseObject*>();
+			retVal += printerSpecificationBaseVal->toJson();
 		}
 
 		if (item.canConvert<CLinkObject*>()){
-			CLinkObject* val = item.value<CLinkObject*>();
-			retVal += val->toJson();
+			CLinkObject* linkVal = item.value<CLinkObject*>();
+			retVal += linkVal->toJson();
 		}
 
 		if (item.canConvert<QString>()){
-			QString val = item.value<QString>();
-			retVal += QString(val);
+			QString stringVal = item.value<QString>();
+			retVal += QString(stringVal);
 		}
 
 		if (item.canConvert<double>()){
-			double val = item.value<double>();
-			retVal += QString::number(val);
+			double doubleVal = item.value<double>();
+			retVal += QString::number(doubleVal);
 		}
 	}
 
@@ -2897,23 +2897,23 @@ QString CPrinterSpecificationObjectList::toGraphQL()
 		QVariant item = this->getData("item", i);
 
 		if (item.canConvert<CPrinterSpecificationBaseObject*>()){
-			CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
-			retVal += val->toGraphQL();
+			CPrinterSpecificationBaseObject* printerSpecificationBaseVal = item.value<CPrinterSpecificationBaseObject*>();
+			retVal += printerSpecificationBaseVal->toGraphQL();
 		}
 
 		if (item.canConvert<CLinkObject*>()){
-			CLinkObject* val = item.value<CLinkObject*>();
-			retVal += val->toGraphQL();
+			CLinkObject* linkVal = item.value<CLinkObject*>();
+			retVal += linkVal->toGraphQL();
 		}
 
 		if (item.canConvert<QString>()){
-			QString val = item.value<QString>();
-			retVal += QString(val);
+			QString stringVal = item.value<QString>();
+			retVal += QString(stringVal);
 		}
 
 		if (item.canConvert<double>()){
-			double val = item.value<double>();
-			retVal += QString::number(val);
+			double doubleVal = item.value<double>();
+			retVal += QString::number(doubleVal);
 		}
 	}
 
@@ -2966,25 +2966,25 @@ void CPrinterSpecificationObjectList::insert(int index, QVariant item)
 	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<CPrinterSpecificationBaseObject*>()){
-		CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
-		CPrinterSpecificationBase* newItemPtr = dynamic_cast<CPrinterSpecificationBase*>(val);
+		CPrinterSpecificationBaseObject* printerSpecificationBaseVal = item.value<CPrinterSpecificationBaseObject*>();
+		CPrinterSpecificationBase* newItemPtr = dynamic_cast<CPrinterSpecificationBase*>(printerSpecificationBaseVal);
 		Version_1_0->append(istd::TNullableValue<PrinterSpecification>(*newItemPtr));
 	}
 
 	if (item.canConvert<CLinkObject*>()){
-		CLinkObject* val = item.value<CLinkObject*>();
-		CLink* newItemPtr = dynamic_cast<CLink*>(val);
+		CLinkObject* linkVal = item.value<CLinkObject*>();
+		CLink* newItemPtr = dynamic_cast<CLink*>(linkVal);
 		Version_1_0->append(istd::TNullableValue<PrinterSpecification>(*newItemPtr));
 	}
 
 	if (item.canConvert<QString>()){
-		QString val = item.value<QString>();
-		Version_1_0->append(istd::TNullableValue<PrinterSpecification>(val));
+		QString stringVal = item.value<QString>();
+		Version_1_0->append(istd::TNullableValue<PrinterSpecification>(stringVal));
 	}
 
 	if (item.canConvert<double>()){
-		double val = item.value<double>();
-		Version_1_0->append(istd::TNullableValue<PrinterSpecification>(val));
+		double doubleVal = item.value<double>();
+		Version_1_0->append(istd::TNullableValue<PrinterSpecification>(doubleVal));
 	}
 
 	ClearCache();

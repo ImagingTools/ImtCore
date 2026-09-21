@@ -324,7 +324,9 @@ bool CSdlUnionObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& strea
 				qFatal() << __func__ << "Invalid field: " << sdlType.toUtf8();
 			}
 
-			stream << QStringLiteral("if (const ") << convertedType << QStringLiteral("* val = std::get_if<") << convertedType << QStringLiteral(">(this->Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->at(index).GetPtr())){");
+			const QString valueVarName = GetValueVariableName(sdlType);
+
+			stream << QStringLiteral("if (const ") << convertedType << QStringLiteral("* ") << valueVarName << QStringLiteral(" = std::get_if<") << convertedType << QStringLiteral(">(this->Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->at(index).GetPtr())){");
 			FeedStream(stream, 1, false);
 			FeedStreamHorizontally(stream, 3);
 
@@ -334,14 +336,14 @@ bool CSdlUnionObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& strea
 				FeedStream(stream, 1, false);
 
 					FeedStreamHorizontally(stream, 3);
-				stream << QStringLiteral("static_cast<") << convertedType << QStringLiteral("&>(*newObjectPtr) = *val;");
+				stream << QStringLiteral("static_cast<") << convertedType << QStringLiteral("&>(*newObjectPtr) = *") << valueVarName << ';';
 				FeedStream(stream, 1, false);
 				FeedStreamHorizontally(stream, 3);
 				stream << QStringLiteral("retVal = QVariant::fromValue(newObjectPtr);");
 				FeedStream(stream, 1, false);
 			}
 			else{
-				stream << QStringLiteral("retVal =  QVariant::fromValue(val);");
+				stream << QStringLiteral("retVal =  QVariant::fromValue(") << valueVarName << QStringLiteral(");");
 				FeedStream(stream, 1, false);
 			}
 
@@ -465,18 +467,20 @@ bool CSdlUnionObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& strea
 		stream << QStringLiteral("if (item.canConvert<") << objectConvertedType << QStringLiteral(">()){");
 		FeedStream(stream, 1, false);
 
+		const QString valueVarName = GetValueVariableName(sdlType);
+
 		FeedStreamHorizontally(stream, 3);
-		stream << objectConvertedType << QStringLiteral(" val = ") << QStringLiteral("item.value<") << objectConvertedType << QStringLiteral(">();");
+		stream << objectConvertedType << ' ' << valueVarName << QStringLiteral(" = ") << QStringLiteral("item.value<") << objectConvertedType << QStringLiteral(">();");
 		FeedStream(stream, 1, false);
 
 		if (isCustom){
 			FeedStreamHorizontally(stream, 3);
-			stream << QStringLiteral("objectListPtr->addElement(QVariant::fromValue(val->copyMe()));");
+			stream << QStringLiteral("objectListPtr->addElement(QVariant::fromValue(") << valueVarName << QStringLiteral("->copyMe()));");
 			FeedStream(stream, 1, false);
 		}
 		else{
 			FeedStreamHorizontally(stream, 3);
-			stream << QStringLiteral("objectListPtr->addElement(val);");
+			stream << QStringLiteral("objectListPtr->addElement(") << valueVarName << QStringLiteral(");");
 			FeedStream(stream, 1, false);
 		}
 
@@ -739,13 +743,15 @@ bool CSdlUnionObjectGeneratorComp::ProcessInsertToList(QTextStream& stream, cons
 		stream << QStringLiteral("if (item.canConvert<") << objectConvertedType << QStringLiteral(">()){");
 		FeedStream(stream, 1, false);
 
+		const QString valueVarName = GetValueVariableName(sdlType);
+
 		FeedStreamHorizontally(stream, 2);
-		stream << objectConvertedType << QStringLiteral(" val = item.value<") << objectConvertedType << QStringLiteral(">();");
+		stream << objectConvertedType << ' ' << valueVarName << QStringLiteral(" = item.value<") << objectConvertedType << QStringLiteral(">();");
 		FeedStream(stream, 1, false);
 
 		if (isCustom){
 			FeedStreamHorizontally(stream, 2);
-			stream << convertedType << QStringLiteral("* newItemPtr = dynamic_cast<") << convertedType << QStringLiteral("*>(val);");
+			stream << convertedType << QStringLiteral("* newItemPtr = dynamic_cast<") << convertedType << QStringLiteral("*>(") << valueVarName << QStringLiteral(");");
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, 2);
@@ -754,7 +760,7 @@ bool CSdlUnionObjectGeneratorComp::ProcessInsertToList(QTextStream& stream, cons
 		}
 		else{
 			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->append(istd::TNullableValue<") << sdlUnion->GetName() << QStringLiteral(">(val));");
+			stream << QStringLiteral("Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->append(istd::TNullableValue<") << sdlUnion->GetName() << QStringLiteral(">(") << valueVarName << QStringLiteral("));");
 			FeedStream(stream, 1, false);
 		}
 
@@ -839,25 +845,27 @@ bool CSdlUnionObjectGeneratorComp::ProcessConvertListData(QTextStream& stream, c
 		stream << QStringLiteral("if (item.canConvert<") << objectConvertedType << QStringLiteral(">()){");
 		FeedStream(stream, 1, false);
 
+		const QString valueVarName = GetValueVariableName(sdlType);
+
 		FeedStreamHorizontally(stream, 3);
-		stream << objectConvertedType << QStringLiteral(" val = ") << QStringLiteral("item.value<") << objectConvertedType << QStringLiteral(">();");
+		stream << objectConvertedType << ' ' << valueVarName << QStringLiteral(" = ") << QStringLiteral("item.value<") << objectConvertedType << QStringLiteral(">();");
 		FeedStream(stream, 1, false);
 
 		if (isCustom){
 			FeedStreamHorizontally(stream, 3);
-			stream << QStringLiteral("retVal += val->to") << convertFormat  << QStringLiteral("();");
+			stream << QStringLiteral("retVal += ") << valueVarName << QStringLiteral("->to") << convertFormat  << QStringLiteral("();");
 			FeedStream(stream, 1, false);
 		}
 		else{
 			FeedStreamHorizontally(stream, 3);
 			if (convertedType == "double" || convertedType == "int"){
-				stream << QStringLiteral("retVal += QString::number(val);");
+				stream << QStringLiteral("retVal += QString::number(") << valueVarName << QStringLiteral(");");
 			}
 			else if (convertedType == "bool"){
-				stream << QStringLiteral("retVal += QString(val ? \"true\" : \"false\");");
+				stream << QStringLiteral("retVal += QString(") << valueVarName << QStringLiteral(" ? \"true\" : \"false\");");
 			}
 			else{
-				stream << QStringLiteral("retVal += QString(val);");
+				stream << QStringLiteral("retVal += QString(") << valueVarName << QStringLiteral(");");
 			}
 			FeedStream(stream, 1, false);
 		}

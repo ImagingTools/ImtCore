@@ -3,15 +3,31 @@ cmake_minimum_required(VERSION 3.26)
 project(ImtCore)
 
 
-if(NOT DEFINED QT_VERSION_MAJOR)
-	find_package(QT NAMES Qt6 Qt5 COMPONENTS Core)
-	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core Concurrent Gui Network PrintSupport Sql Svg Xml WebSockets Widgets REQUIRED)
+# Enable modern target-based architecture:
+# find_package(IAcf) provides Acf::/AcfSln::/IAcf:: imported targets
+set(ACF_MODERN_CMAKE ON)
 
-	if(QT_VERSION_MAJOR EQUAL 6)
-		find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core5Compat REQUIRED)
-	endif()
+if(NOT DEFINED IMTCOREDIR)
+	get_filename_component(IMTCOREDIR "../.." ABSOLUTE BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 endif()
 
+include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
+
+message(VERBOSE "ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
+
+option(AUTOMATIC_DB_BACKUPS "Enable automatic database backups" ON)
+option(BUILD_TESTING "Configures projects for testing" OFF)
+option(USE_MDBX "Use 3rdParty/libmdbx" OFF)
+option(USE_DUCKDB "Use 3rdParty/libduckdb" OFF)
+
+# Collect ImtCore libraries in their own export set so they are published as the
+# ImtCore:: package. Read by StaticConfig.cmake / acf_register_library().
+set(ACF_PACKAGE_NAME "ImtCore")
+
+find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core Concurrent Gui Network PrintSupport Sql Svg Xml WebSockets Widgets REQUIRED)
+if(QT_VERSION_MAJOR EQUAL 6)
+	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core5Compat REQUIRED)
+endif()
 
 if(NOT DEFINED USE_GEO OR USE_GEO)
 	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Positioning REQUIRED)
@@ -29,7 +45,6 @@ if(NOT DEFINED USE_QT3D OR USE_QT3D)
 	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS OpenGL OpenGLWidgets REQUIRED)
 endif()
 
-option(BUILD_TESTING "Configures projects for testing" OFF)
 if(BUILD_TESTING)
 	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Test REQUIRED)
 endif()
@@ -40,39 +55,12 @@ if(UNIX AND NOT APPLE)
 	endif()
 endif()
 
-get_filename_component(IMTCOREDIR "../.." ABSOLUTE BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
-
-if(NOT DEFINED IMTCOREDIR_BUILD)
-	set(IMTCOREDIR_BUILD "${IMTCOREDIR}")
-endif()
-
-# Enable modern target-based architecture:
-# find_package(IAcf) provides Acf::/AcfSln::/IAcf:: imported targets with transitive include dirs and link deps.
-# Legacy global include_directories()/link_directories() in the Env chain are skipped.
-option(ACF_MODERN_CMAKE "Enable modern target-based architecture" ON)
-
-option(AUTOMATIC_DB_BACKUPS "Enable automatic database backups" ON)
-option(USE_MDBX "Use 3rdParty/libmdbx" OFF)
-option(USE_DUCKDB "Use 3rdParty/libduckdb" OFF)
-
-# Collect ImtCore libraries in their own export set so they are published as the
-# ImtCore:: package. Read by StaticConfig.cmake / acf_register_library().
-set(ACF_PACKAGE_NAME "ImtCore")
-
-include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
-
-message(VERBOSE "ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
-
 set(INCLUDE_DIR "${IMTCOREDIR}/Include")
 set(IMPL_DIR	"${IMTCOREDIR}/Impl")
 set(QML_DIR		"${IMTCOREDIR}/Qml")
 set(SDL_DIR		"${IMTCOREDIR}/Sdl")
 set(TESTS_DIR	"${IMTCOREDIR}/Tests")
 set(AUX_INCLUDE_DIR "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles")
-
-include_directories(${AUX_INCLUDE_DIR}/..)
-include_directories(${AUX_INCLUDE_DIR})
-
 
 #------ Required libs ------
 add_subdirectory("${INCLUDE_DIR}/imtcore/CMake" "${AUX_INCLUDE_DIR}/imtcore")
@@ -592,4 +580,3 @@ include("${IMTCOREDIR}/Config/CMake/ImtCoreLibraryDependencies.cmake")
 # Export ImtCore libraries as a find_package(ImtCore) package (build + install tree) so
 # downstream modules consume them via ImtCore::<lib> targets instead of env vars/manual paths.
 include("${IMTCOREDIR}/Config/CMake/ImtCorePackageExport.cmake")
-

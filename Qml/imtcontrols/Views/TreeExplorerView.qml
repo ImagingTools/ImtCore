@@ -19,6 +19,7 @@ import imtcontrols 1.0
 // never be swallowed by an input field.
 FocusScope {
 	id: root
+	objectName: "TreeExplorerView"
 
 	property var model: []
 	property var navigationStack: []
@@ -638,6 +639,7 @@ FocusScope {
 
 			ToolButton {
 				id: upButton
+				objectName: "NavigateUpButton"
 				anchors.left: parent.left
 				anchors.verticalCenter: parent.verticalCenter
 				width: Style.controlHeightM
@@ -686,6 +688,7 @@ FocusScope {
 
 							BaseText {
 								id: segmentText
+								objectName: "Breadcrumb_" + index
 								anchors.verticalCenter: parent.verticalCenter
 								text: root.pathSegmentText(index)
 								font.pixelSize: Style.fontSizeL
@@ -695,6 +698,7 @@ FocusScope {
 
 								MouseArea {
 									id: segmentMouse
+									objectName: "MouseArea"
 									anchors.fill: parent
 									hoverEnabled: true
 									enabled: !breadcrumbSegment.isLast
@@ -711,6 +715,7 @@ FocusScope {
 			// with the path so the state of a level is visible before you read it.
 			Rectangle {
 				id: statusChip
+				objectName: "LevelStatusChip"
 				anchors.right: countText.visible ? countText.left : parent.right
 				anchors.rightMargin: countText.visible ? Style.marginM : 0
 				anchors.verticalCenter: parent.verticalCenter
@@ -736,6 +741,7 @@ FocusScope {
 					}
 					BaseText {
 						id: statusText
+						objectName: "LevelStatusText"
 						anchors.verticalCenter: parent.verticalCenter
 						text: root.levelStatusText
 						font.pixelSize: Style.fontSizeS
@@ -754,6 +760,7 @@ FocusScope {
 
 			BaseText {
 				id: countText
+				objectName: "ItemCountText"
 				anchors.right: parent.right
 				anchors.verticalCenter: parent.verticalCenter
 				// First thing to go when the pane gets narrow - it is a nicety,
@@ -803,6 +810,7 @@ FocusScope {
 				spacing: Style.spacingXS
 
 				ToolbarButton {
+					objectName: "CreateButton"
 					primary: true
 					plusGlyph: true
 					visible: root.createVisible && root.movingNode === null && root.editingNode === null
@@ -816,6 +824,7 @@ FocusScope {
 					}
 				}
 				ToolbarButton {
+					objectName: "CommitRowButton"
 					primary: true
 					visible: root.editingNode !== null
 					iconSource: "qrc:/" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Selected)
@@ -823,6 +832,7 @@ FocusScope {
 					onClicked: root.commitEditRow()
 				}
 				ToolbarButton {
+					objectName: "CancelRowButton"
 					visible: root.editingNode !== null
 					iconSource: "qrc:/" + Style.getIconPath("Icons/Cancel", Icon.State.On, Icon.Mode.Normal)
 					text: qsTr("Cancel")
@@ -830,6 +840,7 @@ FocusScope {
 				}
 				ToolbarButton {
 					id: openCommand
+					objectName: "OpenLevelButton"
 					visible: root.navigationEnabled && root.movingNode === null
 						&& root.editingNode === null && !commandRow.compact
 					active: root.canOpenSelected() && root.singleTargetOnly()
@@ -841,6 +852,7 @@ FocusScope {
 				}
 				ToolbarButton {
 					id: editCommand
+					objectName: "EditRowButton"
 					visible: root.rowEditingEnabled && root.movingNode === null
 						&& root.editingNode === null && !commandRow.compact
 					active: root.editable && root.selectedNode !== null && root.singleTargetOnly()
@@ -851,6 +863,7 @@ FocusScope {
 				}
 				ToolbarButton {
 					id: renameCommand
+					objectName: "RenameRowButton"
 					visible: root.renameVisible && root.movingNode === null
 						&& root.editingNode === null && !commandRow.compact
 					active: root.editable && root.selectedNode !== null && root.singleTargetOnly()
@@ -861,6 +874,7 @@ FocusScope {
 				}
 				ToolbarButton {
 					id: moveCommand
+					objectName: "MoveRowButton"
 					visible: root.moveVisible && root.movingNode === null
 						&& root.editingNode === null && !commandRow.compact
 					active: root.editable && root.selectedNode !== null && root.singleTargetOnly()
@@ -871,6 +885,7 @@ FocusScope {
 				}
 				ToolbarButton {
 					id: removeCommand
+					objectName: "RemoveRowsButton"
 					visible: root.removeVisible && root.movingNode === null
 						&& root.editingNode === null && !commandRow.compact
 					active: root.editable && root.commandTargets().length > 0
@@ -882,6 +897,7 @@ FocusScope {
 				}
 				ToolbarButton {
 					id: overflowButton
+					objectName: "ExplorerMoreButton"
 					visible: commandRow.compact && root.movingNode === null && root.editingNode === null
 						&& (root.rowEditingEnabled || root.renameVisible || root.moveVisible
 							|| root.removeVisible || root.navigationEnabled)
@@ -890,6 +906,7 @@ FocusScope {
 					onClicked: overflowMenu.visible = !overflowMenu.visible
 				}
 				ToolbarButton {
+					objectName: "MoveHereButton"
 					visible: root.movingNode !== null
 					primary: true
 					active: root.canMoveHere()
@@ -897,6 +914,7 @@ FocusScope {
 					onClicked: root.finishMove()
 				}
 				ToolbarButton {
+					objectName: "CancelMoveButton"
 					visible: root.movingNode !== null
 					iconSource: "qrc:/" + Style.getIconPath("Icons/Cancel", Icon.State.On, Icon.Mode.Normal)
 					text: qsTr("Cancel")
@@ -908,6 +926,7 @@ FocusScope {
 			// same strip in all three states, so the eye always looks in one place.
 			BaseText {
 				id: hintText
+				objectName: "ExplorerHint"
 				anchors.left: actions.right
 				anchors.leftMargin: Style.marginL
 				anchors.right: searchField.visible ? searchField.left : parent.right
@@ -932,6 +951,7 @@ FocusScope {
 
 			SearchTextInput {
 				id: searchField
+				objectName: "ExplorerSearchInput"
 				anchors.right: parent.right
 				anchors.top: commandRow.stacked ? actions.bottom : parent.top
 				anchors.topMargin: commandRow.stacked ? Style.marginS : 0
@@ -965,6 +985,7 @@ FocusScope {
 			// is visible from the header alone.
 			CheckBox {
 				id: headerCheck
+				objectName: "SelectAllCheckBox"
 				anchors.left: parent.left
 				anchors.leftMargin: Style.marginL
 				anchors.verticalCenter: parent.verticalCenter
@@ -977,6 +998,7 @@ FocusScope {
 			}
 
 			MouseArea {
+				objectName: "SelectAllCheckBoxHit"
 				anchors.left: parent.left
 				anchors.top: parent.top
 				anchors.bottom: parent.bottom
@@ -1017,6 +1039,7 @@ FocusScope {
 
 		Rectangle {
 			id: entriesFrame
+			objectName: "ExplorerTable"
 			anchors.top: columnHeader.bottom
 			anchors.topMargin: Style.marginXS
 			anchors.left: parent.left
@@ -1040,6 +1063,7 @@ FocusScope {
 
 				delegate: Rectangle {
 					id: entryRow
+					objectName: "ExplorerRow_" + index
 					width: entriesView.width
 					height: root.rowHeight
 					// currentEntries[index], not modelData: a JS object handed to a
@@ -1070,6 +1094,7 @@ FocusScope {
 					// row in edit mode keep it for themselves.
 					MouseArea {
 						id: rowHoverArea
+						objectName: "MouseArea"
 						anchors.fill: parent
 						hoverEnabled: true
 						enabled: root.renamingNode !== entryRow.treeNode
@@ -1111,6 +1136,7 @@ FocusScope {
 					// it left the tick no longer following checkState.
 					CheckBox {
 						id: rowCheck
+						objectName: "RowCheckBox"
 						anchors.left: parent.left
 						anchors.leftMargin: Style.marginL
 						anchors.verticalCenter: parent.verticalCenter
@@ -1122,6 +1148,7 @@ FocusScope {
 
 					MouseArea {
 						id: rowCheckHit
+						objectName: "RowCheckBoxHit"
 
 						anchors.left: parent.left
 						anchors.top: parent.top
@@ -1181,6 +1208,7 @@ FocusScope {
 							}
 							CustomTextField {
 								id: renameInput
+								objectName: "RenameInput"
 								width: parent.width
 								height: Style.controlHeightM
 								visible: root.renamingNode === entryRow.treeNode
@@ -1234,6 +1262,7 @@ FocusScope {
 					// or the selection, and turns into a tick while the row is open.
 					ToolButton {
 						id: cancelButton
+						objectName: "RowCancelButton"
 						anchors.right: parent.right
 						anchors.rightMargin: Style.marginM
 						anchors.verticalCenter: parent.verticalCenter
@@ -1248,6 +1277,7 @@ FocusScope {
 					// abandoned without going back up to the toolbar.
 					ToolButton {
 						id: editButton
+						objectName: "RowEditButton"
 						anchors.right: cancelButton.visible ? cancelButton.left : parent.right
 						anchors.rightMargin: Style.marginM
 						anchors.verticalCenter: parent.verticalCenter
@@ -1277,6 +1307,7 @@ FocusScope {
 			}
 
 			Column {
+				objectName: "ExplorerPlaceholder"
 				anchors.centerIn: parent
 				width: Math.min(parent.width - 2 * Style.marginXL, Style.sizeHintM)
 				spacing: Style.spacingL
@@ -1313,6 +1344,7 @@ FocusScope {
 		// nothing in the layout has to make room for it.
 		Rectangle {
 			id: statusPopup
+			objectName: "LevelStatusPopup"
 			z: 100
 			anchors.top: locationBar.bottom
 			anchors.topMargin: Style.marginXS
@@ -1380,6 +1412,7 @@ FocusScope {
 		// which is what the full-size area underneath the panel is for.
 		Item {
 			id: overflowMenu
+			objectName: "ExplorerOverflowMenu"
 			anchors.fill: parent
 			z: 100
 			visible: false
@@ -1430,6 +1463,7 @@ FocusScope {
 
 					ToolbarButton {
 						id: overflowOpen
+						objectName: "OverflowOpenButton"
 						width: overflowColumn.width
 						leftAligned: true
 						visible: root.navigationEnabled
@@ -1444,6 +1478,7 @@ FocusScope {
 					}
 					ToolbarButton {
 						id: overflowEdit
+						objectName: "OverflowEditButton"
 						width: overflowColumn.width
 						leftAligned: true
 						visible: root.rowEditingEnabled
@@ -1458,6 +1493,7 @@ FocusScope {
 					}
 					ToolbarButton {
 						id: overflowRename
+						objectName: "OverflowRenameButton"
 						width: overflowColumn.width
 						leftAligned: true
 						visible: root.renameVisible
@@ -1472,6 +1508,7 @@ FocusScope {
 					}
 					ToolbarButton {
 						id: overflowMove
+						objectName: "OverflowMoveButton"
 						width: overflowColumn.width
 						leftAligned: true
 						visible: root.moveVisible
@@ -1486,6 +1523,7 @@ FocusScope {
 					}
 					ToolbarButton {
 						id: overflowRemove
+						objectName: "OverflowRemoveButton"
 						width: overflowColumn.width
 						leftAligned: true
 						visible: root.removeVisible
@@ -1547,6 +1585,7 @@ FocusScope {
 
 	Item {
 		id: sidePanel
+		objectName: "ExplorerSidePanel"
 		anchors.top: parent.top
 		anchors.right: parent.right
 		anchors.bottom: parent.bottom

@@ -46,6 +46,8 @@ typedef imtrest::CHttpHtmlFolderBasedServletComp HttpHtmlFolderBasedServlet;
 typedef imtrest::CHttpRedirectComp HttpRedirectServlet;
 typedef imtrest::CHttpFileProviderBasedServletComp HttpFileProviderBasedServlet;
 typedef imtrest::CHttpFileControllerServletComp HttpFileControllerServlet;
+typedef imtrest::CWorkerManagerComp WorkerManager;
+/** \deprecated Misspelled alias of WorkerManager, kept so that existing .acc files resolve. */
 typedef imtrest::CWorkerManagerComp WorkerManaqer;
 typedef imtrest::CTcpProtocolEngineComp TcpProtocolEngine;
 typedef imtrest::CDelegatedServletComp DelegatedServlet;

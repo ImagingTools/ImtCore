@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QDataStream>
 #include <QtCore/QRegularExpression>
+#include <QtCore/QThread>
 #include <QtCore/QUuid>
 
 
@@ -835,6 +836,24 @@ bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray& sqlQuery) const
 
 void CDatabaseEngineComp::OnThreadFinished()
 {
+	// Called on the finishing thread itself (the connection is a direct one), so
+	// GetConnectionName() and currentThreadId() still describe that thread.
+	QThread* threadPtr = QThread::currentThread();
+
+	{
+		std::lock_guard lock(m_connectedThreadsMutex);
+
+		// The key is an operating system thread id, and the system reuses it once the thread
+		// is gone. Leaving it behind made EnsureDatabaseConnected() take its "already known"
+		// branch for the next thread that inherits the id, so that thread never connected to
+		// its own finished() and its connection was never removed.
+		m_connectedThreads.erase(reinterpret_cast<quintptr>(QThread::currentThreadId()));
+	}
+
+	// A QThread object may be started again after it has finished; without this the restarted
+	// thread would be connected a second time and remove its connection twice.
+	disconnect(threadPtr, &QThread::finished, this, &CDatabaseEngineComp::OnThreadFinished);
+
 	if (m_shuttingDown){
 		return;
 	}
