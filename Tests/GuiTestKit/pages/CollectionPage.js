@@ -70,8 +70,38 @@ class CollectionPage extends BasePage {
     return this.filters.clearFilter(this.filterId(key));
   }
 
-  clearAllFilters() {
-    return this.filters.clearAllFilters();
+  /**
+   * Clear every filter, then wait for the collection to come back before returning.
+   *
+   * Clearing is server-persisted and re-queries the collection, and callers click a column header
+   * straight after. Without this wait that click intermittently found no header at all: the view
+   * comes back half-built - no headers, no command bar, the server reporting 0 objects for a
+   * collection that has rows - and it hit every collection, including unrelated ones. Waiting for
+   * "TableHeaders" alone is what fixes it; the click waits for a header AND a named column, which is
+   * a stricter thing that was never going to appear mid-rebuild.
+   *
+   * The reload below is a bounded fallback for the case where the collection stays empty. NOTE it has
+   * not been seen to fire since the wait was added, so it is untested in practice - it is here
+   * because an empty collection WAS observed to survive a full 10s wait before. It is loud on
+   * purpose, and a collection that still does not come back fails with what was observed. That hides
+   * flakiness, not a broken feature.
+   */
+  async clearAllFilters() {
+    await this.filters.clearAllFilters();
+    if (await gui.dom.isVisible(this.page, ['TableHeaders'], 5000)) return this;
+
+    // eslint-disable-next-line no-console
+    console.warn(`${this.pageId}: collection came back empty after clearing filters - reloading once`);
+    await this.reload();
+    await this.open();
+    await this.filters.clearAllFilters();
+    if (!(await gui.dom.isVisible(this.page, ['TableHeaders'], 10000))) {
+      throw new Error(
+        `${this.pageId}: the collection is still empty after clearing filters and reloading once. ` +
+          'The server reports 0 objects and the view has no headers or command bar.'
+      );
+    }
+    return this;
   }
 
   /** Text-search the collection. */
