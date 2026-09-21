@@ -53,6 +53,7 @@ option(ACF_MODERN_CMAKE "Enable modern target-based architecture" ON)
 
 option(AUTOMATIC_DB_BACKUPS "Enable automatic database backups" ON)
 option(USE_MDBX "Use 3rdParty/libmdbx" OFF)
+option(USE_DUCKDB "Use 3rdParty/libduckdb" OFF)
 
 # Collect ImtCore libraries in their own export set so they are published as the
 # ImtCore:: package. Read by StaticConfig.cmake / acf_register_library().
@@ -227,9 +228,6 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${INCLUDE_DIR}/imtchatdb/CMake"	"${AUX_INCLUDE_DIR}/imtchatdb")
 		add_subdirectory("${INCLUDE_DIR}/imtcom/CMake"		"${AUX_INCLUDE_DIR}/imtcom")
 		add_subdirectory("${INCLUDE_DIR}/imtdb/CMake"		"${AUX_INCLUDE_DIR}/imtdb")
-		if(APPLE)
-			add_subdirectory("${INCLUDE_DIR}/imtduckdb/CMake"	"${AUX_INCLUDE_DIR}/imtduckdb")
-		endif()
 		add_subdirectory("${INCLUDE_DIR}/imtdbgql/CMake"	"${AUX_INCLUDE_DIR}/imtdbgql")
 		add_subdirectory("${INCLUDE_DIR}/imtdeskdb/CMake"	"${AUX_INCLUDE_DIR}/imtdeskdb")
 		add_subdirectory("${INCLUDE_DIR}/imthttp/CMake"		"${AUX_INCLUDE_DIR}/imthttp")
@@ -252,6 +250,10 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 		add_subdirectory("${INCLUDE_DIR}/imtservergql/CMake" "${AUX_INCLUDE_DIR}/imtservergql")
 		add_dependencies(imtservergql imtappsdl)
+
+		if(NOT DEFINED USE_DUCKDB OR USE_DUCKDB)
+			add_subdirectory("${INCLUDE_DIR}/imtduckdb/CMake"	"${AUX_INCLUDE_DIR}/imtduckdb")
+		endif()
 
 		if(NOT DEFINED USE_GEO OR USE_GEO)
 			add_subdirectory("${INCLUDE_DIR}/imtgeo/CMake" "${AUX_INCLUDE_DIR}/imtgeo")
