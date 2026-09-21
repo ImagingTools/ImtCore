@@ -635,6 +635,10 @@ TCollectionDocumentServiceWrap<Base>::SetDocumentName(
 			return validationStatus;
 		}
 
+		if (this->IsLockedByOtherUser(userId, documentId)){
+			return IDocumentService::OS_DOCUMENT_LOCKED;
+		}
+
 		WorkingDocument* workingDocumentPtr = &this->m_userDocuments[userId][documentId];
 
 		if (workingDocumentPtr->name == documentName){
@@ -764,6 +768,11 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 	OperationStatus validationStatus = IDocumentService::OS_OK;
 	if (!this->ValidateInputParams(userId, documentId, validationStatus)){
 		this->CompleteTask(taskId, TaskResult{validationStatus, documentId, QString()});
+		return;
+	}
+
+	if (this->IsLockedByOtherUser(userId, documentId)){
+		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_DOCUMENT_LOCKED, documentId, this->GetLockedDocumentMessage()});
 		return;
 	}
 
@@ -1066,17 +1075,21 @@ inline void TCollectionDocumentServiceWrap<Base>::DoCloseDocument(
 {
 	QMutexLocker locker(&this->m_mutex);
 
-	m_proposedSourceDocumentIds.remove(params.documentId);
-
 	OperationStatus status = this->CloseDocumentInternal(params.userId, params.documentId);
 	QString message;
-	if (status != IDocumentService::OS_OK){
+	if (status == IDocumentService::OS_OK){
+		m_proposedSourceDocumentIds.remove(params.documentId);
+	}
+	else{
 		switch (status){
 			case IDocumentService::OS_INVALID_USER_ID:
 				message = QStringLiteral("Invalid user ID");
 				break;
 			case IDocumentService::OS_INVALID_DOCUMENT_ID:
 				message = QStringLiteral("Invalid document ID");
+				break;
+			case IDocumentService::OS_DOCUMENT_LOCKED:
+				message = this->GetLockedDocumentMessage();
 				break;
 			default:
 				message = QStringLiteral("Close failed");

@@ -16,6 +16,7 @@
 
 // ACF includes
 #include <idoc/IUndoManager.h>
+#include <istd/CChangeNotifier.h>
 #include <imod/TMultiModelObserverBase.h>
 #include <imod/CMultiModelDispatcherBase.h>
 
@@ -90,6 +91,11 @@ public:
 	virtual const istd::IChangeable* GetDocumentPtr(const QByteArray& userId, const QByteArray& documentId) const override;
 	virtual OperationStatus GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const override;
 	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) override;
+	virtual ExclusiveDocumentPtr LockDocumentForEdit(
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				int waitTimeoutMs = 0,
+				OperationStatus* statusPtr = nullptr) override;
 	virtual OperationStatus GetDocumentUndoManager(
 				const QByteArray& userId,
 				const QByteArray& documentId,
@@ -104,6 +110,23 @@ public:
 
 protected:
 	struct WorkingDocument;
+
+	/**
+		\brief State of the exclusive edit lock of a single document.
+
+		The lock is owned by the \c ExclusiveDocumentPtr handed out by
+		\c LockDocumentForEdit: \c issuedPtr is a weak reference to that
+		handle, so an expired \c issuedPtr means the lock has already been
+		released.
+	*/
+	struct EditLock
+	{
+		QByteArray ownerUserId;                        ///< User session holding the lock.
+		QByteArray token;                              ///< Unique token of the issued handle.
+		std::weak_ptr<istd::IChangeable> issuedPtr;    ///< Weak reference to the issued exclusive pointer.
+		std::shared_ptr<istd::CChangeNotifier> notifierPtr; ///< Open change group, closed when the lock is released.
+		bool isLocked = false;                         ///< \c true while the lock is taken.
+	};
 
 	// Protected virtual methods for task dispatch — override in
 	// subclasses to provide task-type-specific behaviour.
@@ -164,6 +187,63 @@ protected:
 	void CompleteTask(const QByteArray& taskId, const TaskResult& result);
 
 	bool ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const;
+
+	/**
+		\brief Return the edit-lock state governing the given document.
+
+		In single-copy mode the lock of the shared entry is returned, so it is
+		effective for all user sessions working on the same collection object.
+
+		\note Must be called with \c m_mutex locked.
+
+		\return  Pointer to the lock state, or \c nullptr when the document
+		         is unknown.
+	*/
+	EditLock* FindEditLock(const QByteArray& userId, const QByteArray& documentId);
+	const EditLock* FindEditLock(const QByteArray& userId, const QByteArray& documentId) const;
+
+	/**
+		\brief Check whether an exclusive edit pointer of \e another user is
+		currently held for the given document.
+
+		\note Must be called with \c m_mutex locked.
+	*/
+	bool IsLockedByOtherUser(const QByteArray& userId, const QByteArray& documentId) const;
+
+	/**
+		\brief Check whether any exclusive edit pointer is currently held for
+		the given document.
+
+		\note Must be called with \c m_mutex locked.
+	*/
+	bool IsLockedForEdit(const QByteArray& userId, const QByteArray& documentId) const;
+
+	static bool IsEditLockActive(const EditLock& editLock);
+
+	/**
+		\brief Take the edit lock and create the handle that owns it.
+
+		\note Must be called with \c m_mutex locked and only when
+		      \a editLock is not active.
+	*/
+	ExclusiveDocumentPtr CreateExclusiveDocumentPtr(
+				EditLock& editLock,
+				WorkingDocument& workingDocument,
+				const QByteArray& userId,
+				const QByteArray& documentId);
+
+	/**
+		\brief Release an exclusive edit lock.
+
+		Called only by the deleter of the \c ExclusiveDocumentPtr returned by
+		\c LockDocumentForEdit.  Closing the pending change group notifies the
+		undo manager and all registered observers about the modifications done
+		through the exclusive pointer.
+	*/
+	void ReleaseDocumentEditLock(
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				const QByteArray& lockToken);
 	int GetUndoManagerNextModelId(const QByteArray& userId);
 	void InitializeDocumentObservers(WorkingDocument& document, const QByteArray& userId, const QByteArray& documentId);
 	WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId);
@@ -218,6 +298,7 @@ protected:
 	virtual bool OnDocumentCreated(const QByteArray& typeId, const iprm::IParamsSet* initParams, istd::IChangeable& document, QString& errorMessage) = 0;
 
 	static QString GetInvalidDocumentMessage();
+	static QString GetLockedDocumentMessage();
 
 	// reimplemented (imod::CMultiModelObserverBase)
 	virtual void OnUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet) override;
@@ -240,6 +321,7 @@ protected:
 		bool isLoading = false;                    ///< \c true while the background load is in progress.
 		bool singleDocumentInstance = false;       ///< \c true when the document was opened with \c TaskParams::singleDocumentInstance.
 		int undoManagerModelId = -1;               ///< Model registration ID in \c UndoManagerObserver.
+		EditLock editLock;                         ///< Exclusive edit lock (used when not in single-copy mode).
 	};
 
 	/**
@@ -257,6 +339,7 @@ protected:
 		int refCount = 0;                          ///< Number of user sessions holding this entry.
 		bool isLoading = false;                    ///< \c true while the background load is in progress.
 		int undoManagerModelId = -1;               ///< Model registration ID in \c UndoManagerObserver.
+		EditLock editLock;                         ///< Exclusive edit lock shared by all users of this object.
 	};
 
 	/**

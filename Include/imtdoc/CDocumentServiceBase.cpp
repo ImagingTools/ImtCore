@@ -7,6 +7,7 @@
 
 // Qt includes
 #include <QtCore/QCoreApplication>
+#include <QtCore/QDeadlineTimer>
 #include <QtCore/QUuid>
 #include <QtCore/QThread>
 
@@ -30,6 +31,14 @@
 
 namespace imtdoc
 {
+
+
+namespace
+{
+
+const int LOCK_POLLING_INTERVAL_MS = 10; ///< Polling interval used while waiting for an exclusive edit lock.
+
+}
 
 
 // public methods
@@ -201,6 +210,12 @@ IDocumentService::DocumentList CDocumentServiceBase::GetOpenedDocumentList(const
 			info.hasNameProvider = HasDocumentNameProvider(workingDocument.typeId);
 			info.isLoading = workingDocument.isLoading;
 			info.singleDocumentInstance = workingDocument.singleDocumentInstance;
+
+			const EditLock* editLockPtr = FindEditLock(userId, id);
+			if (editLockPtr != nullptr && IsEditLockActive(*editLockPtr)){
+				info.isLockedForEdit = true;
+				info.lockOwnerUserId = editLockPtr->ownerUserId;
+			}
 
 			list.append(info);
 		}
@@ -425,6 +440,9 @@ void CDocumentServiceBase::DoCloseDocument(const QByteArray& taskId, const TaskP
 			case OS_INVALID_DOCUMENT_ID:
 				message = QStringLiteral("Invalid document ID");
 				break;
+			case OS_DOCUMENT_LOCKED:
+				message = GetLockedDocumentMessage();
+				break;
 			default:
 				message = QStringLiteral("Close failed");
 				break;
@@ -449,6 +467,12 @@ IDocumentService::OperationStatus CDocumentServiceBase::CloseDocumentInternal(
 		OperationStatus validationStatus;
 		if (!ValidateInputParams(userId, documentId, validationStatus)){
 			return validationStatus;
+		}
+
+		// Closing is forbidden while an exclusive edit pointer exists, also for
+		// its owner, because the issued pointer would become dangling.
+		if (IsLockedForEdit(userId, documentId)){
+			return OS_DOCUMENT_LOCKED;
 		}
 
 		istd::CChangeNotifier notifier(this);
@@ -620,6 +644,10 @@ IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentData(
 		return validationStatus;
 	}
 
+	if (IsLockedByOtherUser(userId, documentId)){
+		return OS_DOCUMENT_LOCKED;
+	}
+
 	WorkingDocument* workingDocumentPtr = &m_userDocuments[userId][documentId];
 
 	if (workingDocumentPtr->isLoading){
@@ -629,6 +657,93 @@ IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentData(
 	bool isCopySuccessful = workingDocumentPtr->objectPtr->CopyFrom(document);
 
 	return isCopySuccessful ? OS_OK : OS_FAILED;
+}
+
+
+IDocumentService::ExclusiveDocumentPtr CDocumentServiceBase::LockDocumentForEdit(
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			int waitTimeoutMs,
+			OperationStatus* statusPtr)
+{
+	QDeadlineTimer deadlineTimer = (waitTimeoutMs < 0) ? QDeadlineTimer(QDeadlineTimer::Forever) : QDeadlineTimer(waitTimeoutMs);
+
+	while (true){
+		{
+			QMutexLocker locker(&m_mutex);
+
+			OperationStatus validationStatus;
+			if (!ValidateInputParams(userId, documentId, validationStatus)){
+				if (statusPtr != nullptr){
+					*statusPtr = validationStatus;
+				}
+
+				return ExclusiveDocumentPtr();
+			}
+
+			WorkingDocument& workingDocument = m_userDocuments[userId][documentId];
+			if (workingDocument.isLoading){
+				if (statusPtr != nullptr){
+					*statusPtr = OS_DOCUMENT_LOADING;
+				}
+
+				return ExclusiveDocumentPtr();
+			}
+
+			if (!workingDocument.objectPtr.IsValid()){
+				if (statusPtr != nullptr){
+					*statusPtr = OS_FAILED;
+				}
+
+				return ExclusiveDocumentPtr();
+			}
+
+			EditLock* editLockPtr = FindEditLock(userId, documentId);
+			Q_ASSERT(editLockPtr != nullptr);
+
+			if (!IsEditLockActive(*editLockPtr)){
+				ExclusiveDocumentPtr retVal = CreateExclusiveDocumentPtr(*editLockPtr, workingDocument, userId, documentId);
+				if (statusPtr != nullptr){
+					*statusPtr = retVal ? OS_OK : OS_FAILED;
+				}
+
+				return retVal;
+			}
+
+			if (editLockPtr->ownerUserId == userId){
+				// The same user already owns the lock - share the issued handle
+				// instead of taking a nested one.
+				ExclusiveDocumentPtr retVal = editLockPtr->issuedPtr.lock();
+				if (retVal){
+					if (statusPtr != nullptr){
+						*statusPtr = OS_OK;
+					}
+
+					return retVal;
+				}
+			}
+		}
+
+		if (deadlineTimer.hasExpired()){
+			if (statusPtr != nullptr){
+				*statusPtr = OS_DOCUMENT_LOCKED;
+			}
+
+			return ExclusiveDocumentPtr();
+		}
+
+		// The lock is released by the deleter of the issued handle, possibly
+		// from another thread, so the state is polled here. m_mutex is a
+		// recursive mutex and cannot be used with QWaitCondition; it is also
+		// released while waiting, so the task queue is not blocked.
+		QCoreApplication* appPtr = QCoreApplication::instance();
+		if (appPtr != nullptr && QThread::currentThread() == appPtr->thread()){
+			QCoreApplication::processEvents(QEventLoop::AllEvents, LOCK_POLLING_INTERVAL_MS);
+		}
+		else{
+			QThread::msleep(LOCK_POLLING_INTERVAL_MS);
+		}
+	}
 }
 
 
@@ -643,6 +758,10 @@ IDocumentService::OperationStatus CDocumentServiceBase::GetDocumentUndoManager(
 	OperationStatus validationStatus;
 	if (!ValidateInputParams(userId, documentId, validationStatus)){
 		return validationStatus;
+	}
+
+	if (IsLockedByOtherUser(userId, documentId)){
+		return OS_DOCUMENT_LOCKED;
 	}
 
 	undoManagerPtr = m_userDocuments[userId][documentId].undoManagerPtr.GetPtr();
@@ -740,6 +859,130 @@ bool CDocumentServiceBase::ValidateInputParams(const QByteArray& userId, const Q
 	}
 
 	return true;
+}
+
+
+CDocumentServiceBase::EditLock* CDocumentServiceBase::FindEditLock(
+			const QByteArray& userId,
+			const QByteArray& documentId)
+{
+	WorkingDocument* documentPtr = FindDocument(userId, documentId);
+	if (documentPtr == nullptr){
+		return nullptr;
+	}
+
+	if (IsSingleCopyMode() && !documentPtr->objectId.isEmpty()){
+		auto sharedIt = m_sharedDocuments.find(documentPtr->objectId);
+		if (sharedIt != m_sharedDocuments.end()){
+			return &sharedIt.value().editLock;
+		}
+	}
+
+	return &documentPtr->editLock;
+}
+
+
+const CDocumentServiceBase::EditLock* CDocumentServiceBase::FindEditLock(
+			const QByteArray& userId,
+			const QByteArray& documentId) const
+{
+	return const_cast<CDocumentServiceBase*>(this)->FindEditLock(userId, documentId);
+}
+
+
+bool CDocumentServiceBase::IsEditLockActive(const EditLock& editLock)
+{
+	return editLock.isLocked && !editLock.issuedPtr.expired();
+}
+
+
+bool CDocumentServiceBase::IsLockedByOtherUser(const QByteArray& userId, const QByteArray& documentId) const
+{
+	const EditLock* editLockPtr = FindEditLock(userId, documentId);
+	if (editLockPtr == nullptr || !IsEditLockActive(*editLockPtr)){
+		return false;
+	}
+
+	return editLockPtr->ownerUserId != userId;
+}
+
+
+bool CDocumentServiceBase::IsLockedForEdit(const QByteArray& userId, const QByteArray& documentId) const
+{
+	const EditLock* editLockPtr = FindEditLock(userId, documentId);
+
+	return editLockPtr != nullptr && IsEditLockActive(*editLockPtr);
+}
+
+
+IDocumentService::ExclusiveDocumentPtr CDocumentServiceBase::CreateExclusiveDocumentPtr(
+			EditLock& editLock,
+			WorkingDocument& workingDocument,
+			const QByteArray& userId,
+			const QByteArray& documentId)
+{
+	istd::IChangeable* documentObjectPtr = workingDocument.objectPtr.GetPtr();
+	if (documentObjectPtr == nullptr){
+		return ExclusiveDocumentPtr();
+	}
+
+	QByteArray lockToken = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+
+	CDocumentServiceBase* servicePtr = this;
+	std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
+
+	// The handle does not own the document data: its deleter only releases the lock.
+	ExclusiveDocumentPtr retVal(
+				documentObjectPtr,
+				[servicePtr, aliveGuard, userId, documentId, lockToken](istd::IChangeable*){
+					auto isAlive = aliveGuard.lock();
+					if (!isAlive || !isAlive->load()){
+						return;
+					}
+
+					servicePtr->ReleaseDocumentEditLock(userId, documentId, lockToken);
+				});
+
+	editLock.ownerUserId = userId;
+	editLock.token = lockToken;
+	editLock.issuedPtr = retVal;
+	editLock.isLocked = true;
+
+	// The change group is opened now and closed when the lock is released, so
+	// that all modifications done through the handle form a single undo step.
+	editLock.notifierPtr = std::make_shared<istd::CChangeNotifier>(documentObjectPtr);
+
+	return retVal;
+}
+
+
+void CDocumentServiceBase::ReleaseDocumentEditLock(
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			const QByteArray& lockToken)
+{
+	std::shared_ptr<istd::CChangeNotifier> notifierPtr;
+
+	{
+		QMutexLocker locker(&m_mutex);
+
+		EditLock* editLockPtr = FindEditLock(userId, documentId);
+		if (editLockPtr == nullptr || editLockPtr->token != lockToken){
+			return;
+		}
+
+		notifierPtr = editLockPtr->notifierPtr;
+		*editLockPtr = EditLock();
+
+		WorkingDocument* documentPtr = FindDocument(userId, documentId);
+		if (documentPtr != nullptr){
+			documentPtr->isDirty = true;
+		}
+	}
+
+	// Closing the change group notifies the undo manager and all registered
+	// observers about the modifications done through the exclusive pointer.
+	notifierPtr.reset();
 }
 
 
@@ -1078,6 +1321,12 @@ void CDocumentServiceBase::UnregisterEventHandler(IDocumentServiceEventHandler& 
 QString CDocumentServiceBase::GetInvalidDocumentMessage()
 {
 	return QStringLiteral("Document data is invalid");
+}
+
+
+QString CDocumentServiceBase::GetLockedDocumentMessage()
+{
+	return QStringLiteral("Document is exclusively locked for editing");
 }
 
 

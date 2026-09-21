@@ -79,7 +79,9 @@ public:
 		OS_INVALID_USER_ID,    ///< The supplied \a userId is unknown or empty.
 		OS_INVALID_DOCUMENT_ID,///< The supplied \a documentId is unknown or empty.
 		OS_INVALID_DOCUMENT_DATA,///< The document data failed validation.
-		OS_FAILED              ///< A generic, unspecified failure occurred.
+		OS_FAILED,             ///< A generic, unspecified failure occurred.
+		OS_DOCUMENT_LOCKED,    ///< The document is exclusively locked for editing by another owner.
+		OS_DOCUMENT_LOADING    ///< The document data is still being loaded asynchronously.
 	};
 
 	/**
@@ -158,6 +160,8 @@ public:
 		bool hasNameProvider = false; ///< \c true when a name provider is registered for this type.
 		bool isLoading = false;   ///< \c true while the document data is still being loaded asynchronously.
 		bool singleDocumentInstance = false; ///< \c true when opened with \c TaskParams::singleDocumentInstance.
+		bool isLockedForEdit = false; ///< \c true while an exclusive edit pointer is held (see \c LockDocumentForEdit).
+		QByteArray lockOwnerUserId;   ///< Identity of the session holding the exclusive edit pointer, empty when not locked.
 	};
 
 	/**
@@ -180,6 +184,29 @@ public:
 		QByteArray userId; ///< Identity of the user session that owns this document instance.
 	};
 	typedef std::shared_ptr<DocumentNotification> DocumentNotificationPtr;
+
+	/**
+		\brief Owning handle that grants exclusive write access to an open document.
+
+		The pointer is returned by \c LockDocumentForEdit and refers directly
+		to the document data object stored inside the service, so the document
+		can be modified in place through it.
+
+		Holding the pointer \e is the lock:
+		- while at least one copy of the handle exists, no other client can
+		  change (\c SetDocumentData, \c SetDocumentName, undo/redo), save or
+		  close this document — such operations fail with \c OS_DOCUMENT_LOCKED;
+		- copying the handle prolongs the lock, so several places of the same
+		  client may share it;
+		- the lock is released automatically as soon as the last copy goes out
+		  of scope, including on early returns and during stack unwinding;
+		- a \c std::weak_ptr created from the handle may be kept for observation
+		  but does \e not hold the lock.
+
+		The handle does \e not own the document data: its deleter only releases
+		the lock inside the service.
+	*/
+	typedef std::shared_ptr<istd::IChangeable> ExclusiveDocumentPtr;
 
 	/**
 		\brief Start an asynchronous document operation.
@@ -250,6 +277,10 @@ public:
 		The pointer remains valid only as long as the document is open.
 		Prefer \c GetDocumentData when shared ownership is needed.
 
+		\note Reading is always allowed, also while another client holds an
+		      exclusive edit pointer (see \c LockDocumentForEdit); only writing
+		      and closing are forbidden then.
+
 		\return  Pointer to the data object, or \c nullptr when not found.
 	*/
 	virtual const istd::IChangeable* GetDocumentPtr(const QByteArray& userId, const QByteArray& documentId) const = 0;
@@ -257,11 +288,50 @@ public:
 	/**
 		\brief Retrieve a shared-ownership handle to the document's data object.
 
+		\note Reading is always allowed, also while another client holds an
+		      exclusive edit pointer (see \c LockDocumentForEdit).
+
 		\param documentPtr  Receives the shared pointer on success.
 		\return             \c OS_OK, \c OS_INVALID_USER_ID, or
 		                    \c OS_INVALID_DOCUMENT_ID.
 	*/
 	virtual OperationStatus GetDocumentData(const QByteArray & userId, const QByteArray & documentId, istd::IChangeableSharedPtr& documentPtr) const = 0;
+
+	/**
+		\brief Acquire exclusive write access to an open document.
+
+		This is the only way to modify the stored document in place.  On
+		success the returned \c ExclusiveDocumentPtr both refers to the
+		document data object and holds the lock; the lock is released
+		automatically when the last copy of the handle is destroyed.
+
+		While the lock is held all modifying operations of other clients
+		(\c SetDocumentData, \c SetDocumentName, undo/redo, save) as well as
+		closing the document fail with \c OS_DOCUMENT_LOCKED.  Closing is
+		rejected for the lock owner too, because the returned pointer would
+		otherwise become dangling.
+
+		A second call by the same \a userId while the lock is still held
+		returns the very same handle instead of a new lock.
+
+		\param userId         Owning user session.
+		\param documentId     Instance ID of the document.
+		\param waitTimeoutMs  \c 0 — do not wait and fail immediately when the
+		                      document is already locked; \c >0 — wait at most
+		                      this number of milliseconds; \c <0 — wait
+		                      indefinitely.
+		\param statusPtr      Optional.  Receives \c OS_OK on success, or the
+		                      failure reason (\c OS_INVALID_USER_ID,
+		                      \c OS_INVALID_DOCUMENT_ID, \c OS_DOCUMENT_LOADING,
+		                      \c OS_DOCUMENT_LOCKED, \c OS_FAILED).
+		\return               A valid handle on success, an empty handle on
+		                      failure.
+	*/
+	virtual ExclusiveDocumentPtr LockDocumentForEdit(
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				int waitTimeoutMs = 0,
+				OperationStatus* statusPtr = nullptr) = 0;
 
 	/**
 		\brief Replace the in-memory data of an open document.
