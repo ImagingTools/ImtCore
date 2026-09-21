@@ -23,6 +23,15 @@ const SCREENSHOT_SETTLE = { quietMs: 600, timeout: 20000 };
 // belongs in a mask, never in this budget.
 const MAX_DIFF_PIXELS = 100;
 
+// Per-pixel colour tolerance, and the right knob for cross-machine rasterisation: antialiasing is
+// MANY pixels differing by almost nothing, so raising this drops them out of the count entirely,
+// whereas MAX_DIFF_PIXELS would let a few pixels differ by any amount at all. Measured on one
+// icon-dense page across two machines: 18224 pixels differ at all, but the median difference is 1 of
+// 255 and only a single pixel exceeds 95. At 0.05 that still counted 105 and failed the shot; 0.2 -
+// Playwright's own default, which this kit had tightened - leaves a handful. Real changes are not
+// affected: dark text on white differs by 200+, well beyond any threshold.
+const THRESHOLD = 0.2;
+
 /**
  * Compare the current page against a stored baseline. `name` is the logical snapshot name; the
  * per-user directory and platform suffix are applied by snapshotPathTemplate in playwright.config.js.
@@ -39,8 +48,8 @@ async function checkScreenshot(page, name, mask) {
 
     await waitForStable(page, SCREENSHOT_SETTLE);
     // MAX_DIFF_PIXELS absorbs cross-machine font antialiasing and nothing else; non-deterministic
-    // CONTENT still gets a mask, never this budget. threshold handles sub-pixel colour variation.
-    await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true, threshold: 0.05, maxDiffPixels: MAX_DIFF_PIXELS });
+    // CONTENT still gets a mask, never this budget. THRESHOLD handles the rasterisation noise.
+    await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true, threshold: THRESHOLD, maxDiffPixels: MAX_DIFF_PIXELS });
   } finally {
     // Masks are injected DOM nodes; remove them so a failure doesn't leave bars over later screenshots.
     for (const h of handles) await removeMask(page, h).catch(() => {});
@@ -109,7 +118,7 @@ async function checkElementScreenshot(page, path, name, mask) {
     await waitForStable(page, SCREENSHOT_SETTLE);
     const locator = dom.byPath(page, path);
     await locator.waitFor({ state: 'visible' });
-    await expect(locator).toHaveScreenshot(`${name}.png`, { threshold: 0.05, maxDiffPixels: MAX_DIFF_PIXELS });
+    await expect(locator).toHaveScreenshot(`${name}.png`, { threshold: THRESHOLD, maxDiffPixels: MAX_DIFF_PIXELS });
   } finally {
     for (const h of handles) await removeMask(page, h).catch(() => {});
   }
