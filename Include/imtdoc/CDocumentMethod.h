@@ -56,7 +56,13 @@ public:
 	*/
 	template <typename Document, typename... Args>
 	explicit CDocumentMethod(void (Document::*method)(Args...), std::decay_t<Args>... args) :
-				m_invoke([method, ...args = std::move(args)](istd::IChangeable& document) {
+				m_invoke([method,
+#if __cplusplus >= 202002L // C++20 or newer
+							...args = std::move(args)
+#else
+							args...
+#endif
+							](istd::IChangeable& document) {
 					auto* documentPtr = dynamic_cast<Document*>(&document);
 					Q_ASSERT(documentPtr != nullptr);
 					if (documentPtr == nullptr){
