@@ -7,6 +7,8 @@ project(ImtCore)
 # find_package(IAcf) provides Acf::/AcfSln::/IAcf:: imported targets
 set(ACF_MODERN_CMAKE ON)
 
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core)
+
 if(NOT DEFINED IMTCOREDIR)
 	get_filename_component(IMTCOREDIR "../.." ABSOLUTE BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 endif()
