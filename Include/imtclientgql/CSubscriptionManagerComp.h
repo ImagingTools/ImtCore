@@ -141,6 +141,30 @@ private:
 	void CompletePending(const QString& key, const QByteArray& body, bool isError) const;
 	void FailPending(const QString& key, ErrorCategory category, const QString& message) const;
 
+	/**
+		One client's registration in one subscription. Held by shared_ptr so it outlives
+		its entry in m_registeredClients, which UnregisterSubscription() can drop while a
+		dispatch is still walking its copy of the client list.
+	*/
+	class ClientRegistration
+	{
+	public:
+		IGqlSubscriptionClient* clientPtr = nullptr;
+
+		/**
+			Held across every callback to this client; UnregisterSubscription() acquires
+			it to wait one out, which is the revocation guarantee of
+			IGqlSubscriptionManager.
+
+			Recursive so that unregistering from inside this client's own callback passes
+			straight through instead of deadlocking on a frame that cannot be waited for.
+		*/
+		QRecursiveMutex dispatchMutex;
+
+		/// Cleared by UnregisterSubscription(). Guarded by dispatchMutex.
+		bool isRegistered = true;
+	};
+
 private:
 	I_REF(imtrest::ITransport, m_subscriptionSenderCompPtr);
 	I_REF(imtrest::IResponseDispatcher, m_requestManagerCompPtr);
@@ -159,7 +183,7 @@ private:
 		imtgql::CGqlRequest m_request;
 		QByteArray m_clientId;
 		IGqlSubscriptionClient::SubscriptionStatus m_status = IGqlSubscriptionClient::SS_UNKNOWN;
-		QList<IGqlSubscriptionClient*> m_clients;
+		QList<std::shared_ptr<ClientRegistration>> m_clients;
 	};
 
 	mutable QMap <QByteArray, SubscriptionHelper> m_registeredClients;
