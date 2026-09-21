@@ -2,6 +2,9 @@
 #include "CCollectionDocumentServiceTest.h"
 
 
+// STL includes
+#include <stdexcept>
+
 // Qt includes
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
@@ -862,6 +865,352 @@ void CCollectionDocumentServiceTest::SetDocumentDataWhileLoadingTest()
 	auto status = m_managerPtr->SetDocumentData(TEST_USER_ID, docId, newData);
 
 	QCOMPARE(status, imtdoc::IDocumentService::OS_FAILED);
+}
+
+
+// ======================================================================
+// LockDocumentForEdit tests
+// ======================================================================
+
+void CCollectionDocumentServiceTest::LockDocumentForEditSuccessTest()
+{
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+
+	imtdoc::IDocumentService::OperationStatus status = imtdoc::IDocumentService::OS_FAILED;
+	auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId, 0, &status);
+
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
+	QVERIFY2(documentPtr != nullptr, "Exclusive pointer should be valid");
+	QCOMPARE(documentPtr.get(), const_cast<istd::IChangeable*>(m_managerPtr->GetDocumentPtr(TEST_USER_ID, docId)));
+}
+
+
+void CCollectionDocumentServiceTest::LockDocumentForEditInvalidUserTest()
+{
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+
+	imtdoc::IDocumentService::OperationStatus status = imtdoc::IDocumentService::OS_OK;
+	auto documentPtr = m_managerPtr->LockDocumentForEdit("unknownUser", docId, 0, &status);
+
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
+	QVERIFY2(documentPtr == nullptr, "Exclusive pointer should be empty");
+}
+
+
+void CCollectionDocumentServiceTest::LockDocumentForEditInvalidDocumentTest()
+{
+	SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+
+	imtdoc::IDocumentService::OperationStatus status = imtdoc::IDocumentService::OS_OK;
+	auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, "unknownDocument", 0, &status);
+
+	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
+	QVERIFY2(documentPtr == nullptr, "Exclusive pointer should be empty");
+}
+
+
+void CCollectionDocumentServiceTest::LockDocumentForEditWhileLoadingTest()
+{
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentTypeId = TEST_TYPE_ID;
+
+	m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, params);
+
+	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+	QCOMPARE(list.size(), 1);
+
+	imtdoc::IDocumentService::OperationStatus status = imtdoc::IDocumentService::OS_OK;
+	auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, list[0].documentId, 0, &status);
+
+	QCOMPARE(status, imtdoc::IDocumentService::OS_DOCUMENT_LOADING);
+	QVERIFY2(documentPtr == nullptr, "Exclusive pointer should be empty while loading");
+}
+
+
+void CCollectionDocumentServiceTest::LockDocumentForEditReleasedOnScopeExitTest()
+{
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+
+	{
+		auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId, 0);
+		QVERIFY2(documentPtr != nullptr, "Exclusive pointer should be valid");
+
+		imtdoc::IDocumentService::OperationStatus blockedStatus = imtdoc::IDocumentService::OS_OK;
+		auto blockedPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID_2, docId, 0, &blockedStatus);
+		QVERIFY2(blockedPtr == nullptr, "Other user should not get the lock");
+	}
+
+	// The lock is released as soon as the handle leaves the scope
+	imtdoc::IDocumentService::OperationStatus status = imtdoc::IDocumentService::OS_FAILED;
+	auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId, 0, &status);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
+	QVERIFY2(documentPtr != nullptr, "Exclusive pointer should be valid again");
+}
+
+
+void CCollectionDocumentServiceTest::LockDocumentForEditReleasedOnExceptionTest()
+{
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+
+	try{
+		auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId, 0);
+		QVERIFY2(documentPtr != nullptr, "Exclusive pointer should be valid");
+
+		throw std::runtime_error("edit failed");
+	}
+	catch (const std::runtime_error&){
+	}
+
+	imtdoc::IDocumentService::OperationStatus status = imtdoc::IDocumentService::OS_FAILED;
+	auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID_2, docId, 0, &status);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
+	QVERIFY2(documentPtr != nullptr, "Lock should be released during stack unwinding");
+}
+
+
+void CCollectionDocumentServiceTest::LockDocumentForEditSecondUserFailsTest()
+{
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+
+	auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId, 0);
+	QVERIFY2(documentPtr != nullptr, "Exclusive pointer should be valid");
+
+	imtdoc::IDocumentService::OperationStatus status = imtdoc::IDocumentService::OS_OK;
+	auto blockedPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID_2, docId, 0, &status);
+
+	QCOMPARE(status, imtdoc::IDocumentService::OS_DOCUMENT_LOCKED);
+	QVERIFY2(blockedPtr == nullptr, "Second user should not get the lock");
+}
+
+
+void CCollectionDocumentServiceTest::LockDocumentForEditSameUserReturnsSameHandleTest()
+{
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+
+	auto firstPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId, 0);
+	QVERIFY2(firstPtr != nullptr, "First exclusive pointer should be valid");
+
+	imtdoc::IDocumentService::OperationStatus status = imtdoc::IDocumentService::OS_FAILED;
+	auto secondPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId, 0, &status);
+
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(secondPtr.get(), firstPtr.get());
+}
+
+
+void CCollectionDocumentServiceTest::LockDocumentForEditCopyProlongsLockTest()
+{
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+
+	imtdoc::IDocumentService::ExclusiveDocumentPtr keptPtr;
+	{
+		auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId, 0);
+		QVERIFY2(documentPtr != nullptr, "Exclusive pointer should be valid");
+		keptPtr = documentPtr;
+	}
+
+	imtdoc::IDocumentService::OperationStatus status = imtdoc::IDocumentService::OS_OK;
+	auto blockedPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID_2, docId, 0, &status);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_DOCUMENT_LOCKED);
+
+	keptPtr.reset();
+
+	auto freePtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID_2, docId, 0, &status);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
+	QVERIFY2(freePtr != nullptr, "Lock should be released with the last copy");
+}
+
+
+void CCollectionDocumentServiceTest::LockDocumentForEditWaitTimeoutTest()
+{
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+
+	auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId, 0);
+	QVERIFY2(documentPtr != nullptr, "Exclusive pointer should be valid");
+
+	QElapsedTimer timer;
+	timer.start();
+
+	imtdoc::IDocumentService::OperationStatus status = imtdoc::IDocumentService::OS_OK;
+	auto blockedPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID_2, docId, 100, &status);
+
+	QCOMPARE(status, imtdoc::IDocumentService::OS_DOCUMENT_LOCKED);
+	QVERIFY2(blockedPtr == nullptr, "Second user should not get the lock");
+	QVERIFY2(timer.elapsed() >= 100, "The call should wait for the requested timeout");
+}
+
+
+void CCollectionDocumentServiceTest::LockDocumentForEditReportedInDocumentListTest()
+{
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+
+	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+	QCOMPARE(list.size(), 1);
+	QVERIFY2(!list[0].isLockedForEdit, "Document should not be locked initially");
+
+	{
+		auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId, 0);
+		QVERIFY2(documentPtr != nullptr, "Exclusive pointer should be valid");
+
+		list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+		QCOMPARE(list.size(), 1);
+		QVERIFY2(list[0].isLockedForEdit, "Document should be reported as locked");
+		QCOMPARE(list[0].lockOwnerUserId, TEST_USER_ID);
+	}
+
+	list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+	QCOMPARE(list.size(), 1);
+	QVERIFY2(!list[0].isLockedForEdit, "Document should not be locked after release");
+}
+
+
+void CCollectionDocumentServiceTest::LockDocumentForEditAllowsReadingByOtherUserTest()
+{
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+
+	auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId, 0);
+	QVERIFY2(documentPtr != nullptr, "Exclusive pointer should be valid");
+
+	QVERIFY2(m_managerPtr->GetDocumentPtr(TEST_USER_ID, docId) != nullptr, "Reading should still be allowed");
+
+	istd::IChangeableSharedPtr copyPtr;
+	QCOMPARE(m_managerPtr->GetDocumentData(TEST_USER_ID, docId, copyPtr), imtdoc::IDocumentService::OS_OK);
+}
+
+
+void CCollectionDocumentServiceTest::LockDocumentForEditModificationIsVisibleTest()
+{
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+
+	{
+		auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId, 0);
+		QVERIFY2(documentPtr != nullptr, "Exclusive pointer should be valid");
+
+		CMockDocumentObject* mockPtr = dynamic_cast<CMockDocumentObject*>(documentPtr.get());
+		QVERIFY2(mockPtr != nullptr, "Should be able to cast to CMockDocumentObject");
+		mockPtr->SetData("modifiedInPlace");
+	}
+
+	const CMockDocumentObject* storedPtr = dynamic_cast<const CMockDocumentObject*>(m_managerPtr->GetDocumentPtr(TEST_USER_ID, docId));
+	QVERIFY2(storedPtr != nullptr, "Stored document should be valid");
+	QCOMPARE(storedPtr->GetData(), QByteArray("modifiedInPlace"));
+}
+
+
+void CCollectionDocumentServiceTest::SetDocumentDataLockedByOtherUserTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("sharedData")));
+
+	QByteArray docId1 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QByteArray docId2 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID);
+	QVERIFY2(!docId1.isEmpty() && !docId2.isEmpty(), "Both users should open the document");
+
+	auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId1, 0);
+	QVERIFY2(documentPtr != nullptr, "Exclusive pointer should be valid");
+
+	CMockDocumentObject newData("otherUserData");
+	QCOMPARE(m_managerPtr->SetDocumentData(TEST_USER_ID_2, docId2, newData), imtdoc::IDocumentService::OS_DOCUMENT_LOCKED);
+
+	// The owner itself may still use the regular API
+	CMockDocumentObject ownerData("ownerData");
+	QCOMPARE(m_managerPtr->SetDocumentData(TEST_USER_ID, docId1, ownerData), imtdoc::IDocumentService::OS_OK);
+}
+
+
+void CCollectionDocumentServiceTest::SetDocumentNameLockedByOtherUserTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("sharedData")));
+
+	QByteArray docId1 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QByteArray docId2 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID);
+	QVERIFY2(!docId1.isEmpty() && !docId2.isEmpty(), "Both users should open the document");
+
+	auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId1, 0);
+	QVERIFY2(documentPtr != nullptr, "Exclusive pointer should be valid");
+
+	auto status = m_managerPtr->SetDocumentName(TEST_USER_ID_2, docId2, QStringLiteral("New name"));
+	QCOMPARE(status, imtdoc::IDocumentService::OS_DOCUMENT_LOCKED);
+}
+
+
+void CCollectionDocumentServiceTest::GetDocumentUndoManagerLockedByOtherUserTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("sharedData")));
+
+	QByteArray docId1 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QByteArray docId2 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID);
+	QVERIFY2(!docId1.isEmpty() && !docId2.isEmpty(), "Both users should open the document");
+
+	auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId1, 0);
+	QVERIFY2(documentPtr != nullptr, "Exclusive pointer should be valid");
+
+	idoc::IUndoManager* undoManagerPtr = nullptr;
+	auto status = m_managerPtr->GetDocumentUndoManager(TEST_USER_ID_2, docId2, undoManagerPtr);
+
+	QCOMPARE(status, imtdoc::IDocumentService::OS_DOCUMENT_LOCKED);
+	QVERIFY2(undoManagerPtr == nullptr, "Undo manager should not be returned");
+}
+
+
+void CCollectionDocumentServiceTest::SaveDocumentLockedByOtherUserTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("sharedData")));
+
+	QByteArray docId1 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QByteArray docId2 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID);
+	QVERIFY2(!docId1.isEmpty() && !docId2.isEmpty(), "Both users should open the document");
+
+	auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId1, 0);
+	QVERIFY2(documentPtr != nullptr, "Exclusive pointer should be valid");
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID_2;
+	params.documentId = docId2;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_DOCUMENT_LOCKED);
+}
+
+
+void CCollectionDocumentServiceTest::CloseDocumentLockedTest()
+{
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+
+	{
+		auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId, 0);
+		QVERIFY2(documentPtr != nullptr, "Exclusive pointer should be valid");
+
+		QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, params);
+		auto result = m_managerPtr->WaitForTaskFinished(taskId);
+
+		QCOMPARE(result.status, imtdoc::IDocumentService::OS_DOCUMENT_LOCKED);
+		QCOMPARE(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID).size(), 1);
+	}
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_OK);
+	QCOMPARE(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID).size(), 0);
 }
 
 
@@ -1800,3 +2149,36 @@ void CCollectionDocumentServiceTest::SingleCopySetDocumentNameUpdatesAllTest()
 
 
 I_ADD_TEST(CCollectionDocumentServiceTest);
+
+
+void CCollectionDocumentServiceTest::SingleCopyLockBlocksOtherUserTest()
+{
+	m_managerPtr->SetSingleCopyMode(true);
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("sharedData")));
+
+	QByteArray docId1 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
+	QByteArray docId2 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID);
+	QVERIFY2(!docId1.isEmpty() && !docId2.isEmpty(), "Both users should open the document");
+
+	{
+		auto documentPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID, docId1, 0);
+		QVERIFY2(documentPtr != nullptr, "Exclusive pointer should be valid");
+
+		imtdoc::IDocumentService::OperationStatus status = imtdoc::IDocumentService::OS_OK;
+		auto blockedPtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID_2, docId2, 0, &status);
+		QCOMPARE(status, imtdoc::IDocumentService::OS_DOCUMENT_LOCKED);
+		QVERIFY2(blockedPtr == nullptr, "The lock should be shared between users of the same object");
+
+		auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID_2);
+		QCOMPARE(list.size(), 1);
+		QVERIFY2(list[0].isLockedForEdit, "Second user should see the document as locked");
+		QCOMPARE(list[0].lockOwnerUserId, TEST_USER_ID);
+	}
+
+	imtdoc::IDocumentService::OperationStatus status = imtdoc::IDocumentService::OS_FAILED;
+	auto freePtr = m_managerPtr->LockDocumentForEdit(TEST_USER_ID_2, docId2, 0, &status);
+	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
+	QVERIFY2(freePtr != nullptr, "Second user should get the lock after release");
+}

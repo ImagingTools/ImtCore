@@ -68,6 +68,10 @@ QString StatusToErrorMessage(imtdoc::IDocumentService::OperationStatus status)
 			return QStringLiteral("Invalid document id");
 		case imtdoc::IDocumentService::OS_INVALID_DOCUMENT_DATA:
 			return QStringLiteral("Invalid document data");
+		case imtdoc::IDocumentService::OS_DOCUMENT_LOCKED:
+			return QStringLiteral("Document is exclusively locked for editing");
+		case imtdoc::IDocumentService::OS_DOCUMENT_LOADING:
+			return QStringLiteral("Document is still loading");
 		case imtdoc::IDocumentService::OS_FAILED:
 		default:
 			return QStringLiteral("Operation failed");

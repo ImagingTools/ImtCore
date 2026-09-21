@@ -728,6 +728,26 @@ private slots:
 	void SetDocumentDataInvalidDocumentTest();
 	void SetDocumentDataWhileLoadingTest();
 
+	// LockDocumentForEdit tests
+	void LockDocumentForEditSuccessTest();
+	void LockDocumentForEditInvalidUserTest();
+	void LockDocumentForEditInvalidDocumentTest();
+	void LockDocumentForEditWhileLoadingTest();
+	void LockDocumentForEditReleasedOnScopeExitTest();
+	void LockDocumentForEditReleasedOnExceptionTest();
+	void LockDocumentForEditSecondUserFailsTest();
+	void LockDocumentForEditSameUserReturnsSameHandleTest();
+	void LockDocumentForEditCopyProlongsLockTest();
+	void LockDocumentForEditWaitTimeoutTest();
+	void LockDocumentForEditReportedInDocumentListTest();
+	void LockDocumentForEditAllowsReadingByOtherUserTest();
+	void LockDocumentForEditModificationIsVisibleTest();
+	void SetDocumentDataLockedByOtherUserTest();
+	void SetDocumentNameLockedByOtherUserTest();
+	void GetDocumentUndoManagerLockedByOtherUserTest();
+	void SaveDocumentLockedByOtherUserTest();
+	void CloseDocumentLockedTest();
+
 	// SaveDocument tests
 	void SaveDocumentNewDocumentTest();
 	void SaveDocumentExistingDocumentTest();
@@ -788,6 +808,7 @@ private slots:
 	void MultiUserIsolationTest();
 
 	// Single-copy mode tests
+	void SingleCopyLockBlocksOtherUserTest();
 	void SingleCopyOpenSameObjectByTwoUsersTest();
 	void SingleCopySecondUserGetsDataLoadedEventTest();
 	void SingleCopySetDocumentDataSharedTest();

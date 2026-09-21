@@ -700,6 +700,13 @@ IDocumentService::ExclusiveDocumentPtr CDocumentServiceBase::LockDocumentForEdit
 
 			EditLock* editLockPtr = FindEditLock(userId, documentId);
 			Q_ASSERT(editLockPtr != nullptr);
+			if (editLockPtr == nullptr){
+				if (statusPtr != nullptr){
+					*statusPtr = OS_FAILED;
+				}
+
+				return ExclusiveDocumentPtr();
+			}
 
 			if (!IsEditLockActive(*editLockPtr)){
 				ExclusiveDocumentPtr retVal = CreateExclusiveDocumentPtr(*editLockPtr, workingDocument, userId, documentId);
