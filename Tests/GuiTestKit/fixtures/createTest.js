@@ -16,6 +16,33 @@ const { captureConsoleErrors } = require('../lib/consoleErrors');
 
 const PERMISSIONS_STORAGE_KEY = 'AuthorizationController/permissions';
 
+// Chrome draws a red squiggle under words its spellchecker does not know, inside ordinary text
+// inputs - and whether it does depends on the dictionaries installed for the profile, not on the
+// browser version. The build agent (running as SYSTEM) has one and a developer box may not, so the
+// squiggle lands in screenshots taken on one machine and not the other: 991px of diff on a single
+// product-editor shot. spellcheck is an inherited HTML attribute, so setting it on <html> covers
+// fields the app creates later; the observer is for anything that sets the attribute on itself.
+function suppressSpellcheck(page) {
+  return page.addInitScript(() => {
+    const off = (node) => {
+      if (node.setAttribute) node.setAttribute('spellcheck', 'false');
+      if (node.querySelectorAll) {
+        for (const el of node.querySelectorAll('input, textarea, [contenteditable]')) {
+          el.setAttribute('spellcheck', 'false');
+        }
+      }
+    };
+    const start = () => {
+      off(document.documentElement);
+      new MutationObserver((records) => {
+        for (const r of records) for (const n of r.addedNodes) if (n.nodeType === 1) off(n);
+      }).observe(document.documentElement, { childList: true, subtree: true });
+    };
+    if (document.documentElement) start();
+    else document.addEventListener('DOMContentLoaded', start);
+  });
+}
+
 /**
  * The permission codes the server granted this user, from the storageState saved after login. Returns
  * null when they cannot be determined at all - which is NOT the same as "none".
@@ -106,6 +133,7 @@ function createGuiTest(users, { rootDir }) {
     // lib/consoleErrors.js): an uncaught pageerror hard-fails the test, while console.error/warn text
     // is attached to the report as diagnostic context. Only covers the default per-test `page`.
     page: async ({ page }, use, testInfo) => {
+      await suppressSpellcheck(page);
       const finish = captureConsoleErrors(page);
       await use(page);
       await finish(testInfo);
@@ -135,6 +163,7 @@ function createGuiTest(users, { rootDir }) {
     const decorated = decorate(user);
     const context = await browser.newContext({ storageState: path.resolve(rootDir, authFile(user.key)) });
     const page = await context.newPage();
+    await suppressSpellcheck(page);
     // Same browser-error watching as the default `page` fixture, but this page is shared across a
     // describe.serial block, so a pageerror can't be attributed to one test - log it instead of throwing.
     captureConsoleErrors(page, {
