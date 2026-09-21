@@ -194,18 +194,34 @@ bool CUserDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& 
 QString CUserDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
 {
 	iprm::TParamsPtr<imtauth::IUserGroupFilter> groupFilterParamPtr(&filterParams, QByteArrayLiteral("GroupFilter"));
-	if (!groupFilterParamPtr.IsValid() || IsSQLite()){
+	if (!groupFilterParamPtr.IsValid()){
 		return QString();
 	}
 
+	const bool isSqlite = IsSQLite();
+
 	QByteArrayList groupIds = groupFilterParamPtr->GetGroupIds();
 	if (groupIds.isEmpty()){
-		return QString();
+		// An empty group list must not widen the selection to the whole collection, so it falls
+		// back to the filter's own user, like CUserActionDatabaseDelegateComp does. An empty user
+		// id then matches nothing.
+		const QString userId = SqlEncode(QString::fromUtf8(groupFilterParamPtr->GetUserId()));
+
+		if (isSqlite){
+			return QStringLiteral(R"(json_extract(root."Document", '$.Id') = '%1')").arg(userId);
+		}
+
+		return QStringLiteral(R"(root."Document"->>'Id' = '%1')").arg(userId);
 	}
 
 	QStringList quotedGroupIds;
 	for (const QByteArray& groupId : groupIds){
-		quotedGroupIds << QStringLiteral("'%1'").arg(SqlEncode(QString(groupId)));
+		quotedGroupIds << QStringLiteral("'%1'").arg(SqlEncode(QString::fromUtf8(groupId)));
+	}
+
+	if (isSqlite){
+		return QStringLiteral(R"(EXISTS (SELECT 1 FROM json_each(json_extract(root."Document", '$.Groups')) AS userGroup WHERE userGroup.value IN (%1)))")
+				.arg(quotedGroupIds.join(','));
 	}
 
 	return QStringLiteral(R"((root."Document"->'Groups' ?| array[%1]))").arg(quotedGroupIds.join(','));

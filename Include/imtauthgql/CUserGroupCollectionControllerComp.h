@@ -69,7 +69,7 @@ protected:
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 
-	// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
+	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 	virtual void OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const override;
 
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
