@@ -1566,11 +1566,25 @@ class LanguageService {
         return [...this.engineTypes.values()].find(type => type.name === typeName) || null
     }
 
+    isAliasMember(member) {
+        return !!(member && (member.type === 'alias' || member.typeName === 'alias') && member.aliasId)
+    }
+
+    aliasDeclaringDocument(member, ownerType, document) {
+        if (member && member.filePath) {
+            const abs = normalizePath(path.resolve(member.filePath))
+            if (this.qmlDocuments.has(abs)) return this.qmlDocuments.get(abs)
+            if (fs.existsSync(abs)) return this.getDocument(abs)
+        }
+        if (ownerType && ownerType.context) return ownerType.context
+        return document || null
+    }
+
     typeOfMember(member, document, ownerType) {
         if (!member) return null
         const ctx = (ownerType && ownerType.context) || document
         if (member.group) return this.groupType(member, ctx)
-        if ((member.type === 'alias' || member.typeName === 'alias') && member.aliasId) {
+        if (this.isAliasMember(member)) {
             return this.resolveAliasType(member, ctx, ownerType)
         }
         const typeName = member.typeName || member.type
@@ -1580,7 +1594,7 @@ class LanguageService {
     }
 
     resolveAliasType(member, document, ownerType) {
-        const ctx = (ownerType && ownerType.context) || document
+        const ctx = this.aliasDeclaringDocument(member, ownerType, document)
         if (!ctx) return null
         const idName = member.aliasId
         const rest = String(member.aliasPath || '').split('.').filter(Boolean)
@@ -1590,10 +1604,40 @@ class LanguageService {
         for (const part of rest) {
             const found = members.get(part)
             if (!found) return type
-            type = this.typeOfMember(found, ctx, type)
+            type = this.typeOfMember(found, ctx, type) || this.groupType(found, ctx)
             members = memberMap(this.collectMembers(type, (type && type.context) || ctx))
         }
         return type
+    }
+
+    nestedMembers(head, document, ownerType) {
+        const resolved = this.typeOfMember(head, document, ownerType) || this.groupType(head, document)
+        if (!resolved) return new Map()
+        const ctx = resolved.context || document
+        return memberMap(this.collectMembers(resolved, ctx).concat(resolved.members || []))
+    }
+
+    aliasTargetLocations(member, ownerType, document) {
+        const ctx = this.aliasDeclaringDocument(member, ownerType, document)
+        if (!ctx || !this.isAliasMember(member)) return []
+        const locs = []
+        const target = ctx.ids && ctx.ids[member.aliasId]
+        if (target && target.idRange) locs.push(target.idRange)
+        const rest = String(member.aliasPath || '').split('.').filter(Boolean)
+        let type = target ? this.resolveType(target.typeName, ctx) : null
+        let members = target ? memberMap(this.membersOfElement(target, ctx)) : memberMap()
+        for (const part of rest) {
+            const found = members.get(part)
+            if (!found) break
+            if (found.filePath && found.range) locs.push({ filePath: found.filePath, range: found.range })
+            else {
+                const loc = this.memberOrigin(part, type, ctx)
+                if (loc) locs.push(loc)
+            }
+            type = this.typeOfMember(found, ctx, type) || this.groupType(found, ctx)
+            members = memberMap(this.collectMembers(type, (type && type.context) || ctx))
+        }
+        return locs
     }
 
     collectMembers(type, document, visited) {
@@ -1625,7 +1669,7 @@ class LanguageService {
     groupType(member, document) {
         if (!member) return null
         const groupName = (member.groupType && member.groupType.name) || member.groupTypeName || member.typeName
-        if (groupName) {
+        if (groupName && String(groupName).toLowerCase() !== 'alias') {
             return this.engineTypes.get('QtQml.' + groupName)
                 || this.engineTypes.get('QtQuick.Layouts.' + groupName)
                 || this.engineTypes.get('QtQuick.' + groupName)
@@ -1702,9 +1746,9 @@ class LanguageService {
                     if (attached === 'Component' && (signalName === 'completed' || signalName === 'destruction')) continue
                     if (parts.length > 1) {
                         const group = members.get(parts[0]) || this.resolveType(parts[0], document)
-                        const groupMembers = group && (group.members || this.collectMembers(this.groupType(group, document) || group, document))
-                        const ok = groupMembers && [...(groupMembers || [])].some(member => member.name === signalName || member.name === parts[parts.length - 1] || handlerToSignal(parts[parts.length - 1]) === member.name)
-                        if (!ok && group) {
+                        const groupMembers = group ? this.nestedMembers(group, document, type) : new Map()
+                        const ok = [...groupMembers.values()].some(member => member.name === signalName || member.name === parts[parts.length - 1] || handlerToSignal(parts[parts.length - 1]) === member.name)
+                        if (!ok && group && !this.isAliasMember(group)) {
                             diagnostics.push({
                                 message: assign.name + ' is not found',
                                 severity: 'warning',
@@ -1743,10 +1787,10 @@ class LanguageService {
                     })
                     continue
                 }
-                const group = this.groupType(head, document) || head
-                const groupMembers = memberMap(this.collectMembers(group, document).concat(group.members || []))
+                const groupMembers = this.nestedMembers(head, document, type)
                 const tail = parts[1]
                 if (tail && !groupMembers.has(tail) && !isHandlerName(assign.name)) {
+                    if (this.isAliasMember(head) && !groupMembers.size) continue
                     diagnostics.push({
                         message: assign.name + ' is not found',
                         severity: 'warning',
@@ -1765,8 +1809,8 @@ class LanguageService {
                     })
                     continue
                 }
-                const groupType = this.groupType(head, document) || head
-                const groupMembers = memberMap(this.collectMembers(groupType, document).concat(groupType.members || []))
+                const groupMembers = this.nestedMembers(head, document, type)
+                if (!groupMembers.size && this.isAliasMember(head)) continue
                 for (const assign of group.assigns) {
                     if (!groupMembers.has(assign.name)) {
                         diagnostics.push({
@@ -2273,11 +2317,18 @@ class LanguageService {
         }
         if (symbol.kind === 'member') {
             const member = symbol.member
-            if (member.filePath && member.range) return [{ filePath: member.filePath, range: member.range }]
-            const loc = this.memberOrigin(member.name, symbol.type, symbol.document)
-                || this.memberOrigin(member.name, this.typeOfMember(member, symbol.document, symbol.type), symbol.document)
-                || this.memberOrigin(member.name, this.groupType(member, symbol.document), symbol.document)
-            return loc ? [loc] : []
+            const locs = []
+            if (member.filePath && member.range) locs.push({ filePath: member.filePath, range: member.range })
+            if (this.isAliasMember(member)) {
+                for (const loc of this.aliasTargetLocations(member, symbol.type, symbol.document)) locs.push(loc)
+            }
+            if (!locs.length) {
+                const loc = this.memberOrigin(member.name, symbol.type, symbol.document)
+                    || this.memberOrigin(member.name, this.typeOfMember(member, symbol.document, symbol.type), symbol.document)
+                    || this.memberOrigin(member.name, this.groupType(member, symbol.document), symbol.document)
+                if (loc) locs.push(loc)
+            }
+            return uniqueLocations(locs)
         }
         return []
     }
@@ -2286,8 +2337,16 @@ class LanguageService {
         const symbol = this.resolveSymbol(filePath, text, offset)
         if (!symbol) return null
         if (symbol.kind === 'member') {
+            let detail = symbol.member.detail || symbol.member.name
+            if (this.isAliasMember(symbol.member)) {
+                const resolved = this.resolveAliasType(symbol.member, symbol.document, symbol.type)
+                const path = [symbol.member.aliasId, symbol.member.aliasPath].filter(Boolean).join('.')
+                detail = resolved
+                    ? 'property alias ' + symbol.member.name + ' : ' + (resolved.qualifiedName || resolved.name)
+                    : 'property alias ' + symbol.member.name + (path ? ' : ' + path : '')
+            }
             return {
-                detail: symbol.member.detail || symbol.member.name,
+                detail,
                 range: symbol.token.range,
             }
         }
@@ -2323,6 +2382,19 @@ function uniqueCompletions(items) {
         if (seen.has(key)) continue
         seen.add(key)
         result.push(item)
+    }
+    return result
+}
+
+function uniqueLocations(locs) {
+    const seen = new Set()
+    const result = []
+    for (const loc of locs || []) {
+        if (!loc || !loc.filePath || !loc.range || !loc.range.start) continue
+        const key = normalizePath(loc.filePath) + ':' + loc.range.start.line + ':' + loc.range.start.character
+        if (seen.has(key)) continue
+        seen.add(key)
+        result.push(loc)
     }
     return result
 }

@@ -6,10 +6,11 @@
         { "include": "#strings" },
         { "include": "#import" },
         { "include": "#pragma" },
-        { "include": "#keywords" },
+        { "include": "#function-def" },
         { "include": "#property-def" },
         { "include": "#signal-def" },
-        { "include": "#function-def" },
+        { "include": "#script-block" },
+        { "include": "#keywords" },
         { "include": "#id" },
         { "include": "#element" },
         { "include": "#binding" },
@@ -79,66 +80,91 @@
         "keywords": {
             "patterns": [
                 {
-                    "name": "keyword.other.jqml",
-                    "match": "\\b(readonly|required|default|property|signal|alias|enum|as)\\b"
-                },
-                {
-                    "name": "storage.type.function.jqml",
-                    "match": "\\bfunction\\b"
+                    "name": "keyword.control.jqml",
+                    "match": "\\b(readonly|required|default|property|signal|alias|enum|as|function|id)\\b"
                 },
                 {
                     "name": "keyword.control.jqml",
-                    "match": "\\b(if|else|for|while|do|switch|case|break|continue|return|try|catch|finally|throw|new|in|of|typeof|instanceof|delete)\\b"
+                    "match": "\\b(if|else|for|while|do|switch|case|break|continue|return|try|catch|finally|throw|new|in|of|typeof|instanceof|delete|var|let|const)\\b"
                 }
             ]
         },
         "property-def": {
-            "match": "\\b((?:readonly|required|default)\\s+)*property\\s+([A-Za-z_][\\w.]*(?:\\s*<\\s*[A-Za-z_]\\w*\\s*>)?)\\s+([A-Za-z_]\\w*)",
+            "match": "\\b((?:readonly|required|default)\\s+)*(property)\\s+([A-Za-z_][\\w.]*(?:\\s*<\\s*[A-Za-z_]\\w*\\s*>)?)\\s+([A-Za-z_]\\w*)",
             "captures": {
                 "1": { "name": "storage.modifier.jqml" },
-                "2": { "name": "storage.type.jqml" },
-                "3": { "name": "variable.other.property.jqml" }
+                "2": { "name": "keyword.control.jqml" },
+                "3": { "name": "storage.type.jqml" },
+                "4": { "name": "variable.other.property.jqml" }
             }
         },
         "signal-def": {
-            "match": "\\bsignal\\s+([A-Za-z_]\\w*)",
+            "match": "\\b(signal)\\s+([A-Za-z_]\\w*)",
             "captures": {
-                "1": { "name": "entity.name.function.signal.jqml" }
+                "1": { "name": "keyword.control.jqml" },
+                "2": { "name": "entity.name.function.signal.jqml" }
             }
         },
         "function-def": {
-            "begin": "\\bfunction\\s+([A-Za-z_]\\w*)\\s*\\(",
-            "beginCaptures": {
-                "1": { "name": "entity.name.function.jqml" }
-            },
-            "end": "\\)",
-            "patterns": [
-                { "name": "variable.parameter.jqml", "match": "[A-Za-z_]\\w*" }
-            ]
+            "match": "\\b(function)\\s+([A-Za-z_]\\w*)",
+            "captures": {
+                "1": { "name": "keyword.control.jqml" },
+                "2": { "name": "entity.name.function.jqml" }
+            }
         },
         "id": {
-            "match": "\\bid\\s*:\\s*([A-Za-z_]\\w*)",
+            "match": "\\b(id)\\s*:\\s*([A-Za-z_]\\w*)",
             "captures": {
-                "1": { "name": "entity.name.tag.id.jqml" }
+                "1": { "name": "keyword.control.jqml" },
+                "2": { "name": "entity.name.tag.id.jqml" }
             }
         },
         "element": {
             "match": "\\b([A-Z][A-Za-z0-9_]*(?:\\.[A-Z][A-Za-z0-9_]*)*)\\b(?=\\s*(?:on\\s+[A-Za-z_]\\w*)?\\s*\\{)",
             "name": "support.class.qmltype.jqml"
         },
+        "code": {
+            "patterns": [
+                { "include": "#comments" },
+                { "include": "#strings" },
+                { "include": "#js-braces" },
+                { "include": "#function-def" },
+                { "include": "#keywords" },
+                { "include": "#numbers" },
+                { "include": "#constants" }
+            ]
+        },
+        "js-braces": {
+            "begin": "\\{",
+            "end": "\\}",
+            "patterns": [
+                { "include": "#code" }
+            ]
+        },
+        "script-block": {
+            "begin": "(?<![A-Za-z0-9_])([A-Za-z_][\\w.]*)\\s*(:)[ \\t]*(?:\\r?\\n[ \\t]*)?(\\{)",
+            "beginCaptures": {
+                "1": { "name": "variable.other.property.jqml" },
+                "2": { "name": "keyword.operator.assignment.jqml" },
+                "3": { "name": "punctuation.section.block.begin.jqml" }
+            },
+            "end": "\\}",
+            "endCaptures": {
+                "0": { "name": "punctuation.section.block.end.jqml" }
+            },
+            "patterns": [
+                { "include": "#code" }
+            ]
+        },
         "binding": {
-            "begin": "(?<![A-Za-z0-9_])((?:on)?[A-Za-z_][\\w.]*)\\s*(:)",
+            "begin": "(?<![A-Za-z0-9_])([A-Za-z_][\\w.]*)\\s*(:)",
             "beginCaptures": {
                 "1": { "name": "variable.other.property.jqml" },
                 "2": { "name": "keyword.operator.assignment.jqml" }
             },
-            "end": "(?=[\\n;])|(?=\\s*[A-Za-z_][\\w.]*\\s*:)|(?=\\s*[A-Z][\\w.]*\\s*\\{)|(?=\\s*\\})",
+            "end": "(?=[\\r\\n;])|(?=\\s*[A-Za-z_][\\w.]*\\s*:)|(?=\\s*[A-Z][\\w.]*\\s*\\{)|(?=\\s*\\})",
             "patterns": [
-                { "include": "#comments" },
-                { "include": "#strings" },
-                { "include": "#numbers" },
-                { "include": "#constants" },
-                { "include": "source.js" }
+                { "include": "#code" }
             ]
         },
         "numbers": {

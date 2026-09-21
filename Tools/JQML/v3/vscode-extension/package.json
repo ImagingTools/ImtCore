@@ -2,7 +2,7 @@
     "name": "jqml",
     "displayName": "JQML",
     "description": "Syntax highlighting, completions and diagnostics for the JQML engine",
-    "version": "1.0.4",
+    "version": "1.0.8",
     "publisher": "imtcore",
     "engines": {
         "vscode": "^1.74.0"

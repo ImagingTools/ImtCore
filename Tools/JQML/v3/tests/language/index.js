@@ -25,6 +25,8 @@ function service() {
     lang.indexQmlFile(path.join(fixtures, 'MyBox.qml'))
     lang.indexQmlFile(path.join(fixtures, 'App.qml'))
     lang.indexQmlFile(path.join(fixtures, 'mod', 'Card.qml'))
+    lang.indexQmlFile(path.join(fixtures, 'AliasBox.qml'))
+    lang.indexQmlFile(path.join(fixtures, 'AliasChild.qml'))
     return lang
 }
 
@@ -415,6 +417,40 @@ test('handler body completions are script members', () => {
     noLabel(items, 'property')
     noLabel(items, 'import')
     noLabel(items, 'ListModel')
+})
+
+test('inherited alias group members are valid', () => {
+    const lang = service()
+    const file = path.join(fixtures, 'AliasChild.qml')
+    const text = require('fs').readFileSync(file, 'utf8')
+    const diags = lang.getDiagnostics(file, text)
+    const messages = diags.map(item => item.message)
+    assert.ok(!messages.some(msg => msg.indexOf('border.width') >= 0), messages.join(' | '))
+    assert.ok(!messages.some(msg => msg.indexOf('border.color') >= 0), messages.join(' | '))
+    assert.ok(!messages.some(msg => msg === 'border is not found'), messages.join(' | '))
+})
+
+test('inherited alias group definition and completions', () => {
+    const lang = service()
+    const file = path.join(fixtures, 'AliasChild.qml')
+    const boxFile = path.join(fixtures, 'AliasBox.qml')
+    const text = require('fs').readFileSync(file, 'utf8')
+
+    const borderLocs = lang.getDefinition(file, text, text.indexOf('border.width'))
+    assert.ok(borderLocs.length, 'border alias definition')
+    assert.ok(borderLocs.some(loc => path.normalize(loc.filePath).toLowerCase() === path.normalize(boxFile).toLowerCase()), JSON.stringify(borderLocs))
+
+    const widthLocs = lang.getDefinition(file, text, text.indexOf('border.width') + 'border.'.length)
+    assert.ok(widthLocs.length, 'border.width definition')
+    assert.ok(widthLocs.some(loc => /Border\.js$/i.test(String(loc.filePath).replace(/\\/g, '/'))), JSON.stringify(widthLocs))
+
+    const items = lang.getCompletions(file, text, text.indexOf('border.width') + 'border.'.length)
+    hasLabel(items, 'width')
+    hasLabel(items, 'color')
+
+    const hover = lang.getHover(file, text, text.indexOf('border.width'))
+    assert.ok(hover && hover.detail, 'alias hover')
+    assert.ok(String(hover.detail).indexOf('alias') >= 0, hover.detail)
 })
 
 console.log('')
