@@ -203,6 +203,9 @@
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="UserGroupFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="UserGroupInfo"/>
                     </AttributeInfo>
