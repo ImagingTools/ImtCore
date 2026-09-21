@@ -254,9 +254,6 @@
                                 <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="UserGroupInfoProvider" Type="Reference" ExportId="UserGroupInfoProvider">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
@@ -270,6 +267,9 @@
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="UserProvider" Type="Reference" ExportId="UserProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserRepository" Type="Reference" ExportId="UserRepository">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
