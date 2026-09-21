@@ -20,24 +20,24 @@ namespace imtclientgql
 
 
 /**
-	QObject-based IGqlSubscriptionClient: registers itself with the given manager on
-	construction, re-emits incoming callbacks as signals instead of requiring the
-	caller to implement IGqlSubscriptionClient.
+	IGqlSubscriptionClient as a QObject: registers on construction, unregisters on
+	destruction, and re-emits the manager's callbacks as signals.
 
-	Lifetime: prefer ScheduleDestruction() over a bare `delete`/unique_ptr reset
-	whenever dispatch for this subscription could concurrently be in flight on
-	another thread. Unregistering is safe to do synchronously (it only removes a
-	pointer from the manager's dispatch list, under the manager's own mutex); it is
-	only the deletion of this QObject itself that must be deferred, since a virtual
-	call onto it could still be executing on another thread. ScheduleDestruction()
-	unregisters immediately (so no further dispatch is possible) and defers the
-	actual C++ object destruction via deleteLater().
+	Shall live on the subscriber's thread. The signals are emitted on whatever thread the
+	manager dispatches on, so connect with the subscriber as context object and Qt
+	delivers on the subscriber's thread.
+
+	Destroying the handle revokes the subscription.
 */
 class CGqlSubscriptionHandle: public QObject, public IGqlSubscriptionClient
 {
 	Q_OBJECT
 
 public:
+	/**
+		Constructs a subscription handle, registering it with the given manager and request.
+		Check \c IsRegistered() to see if the subscription was successfully registered.
+	*/
 	CGqlSubscriptionHandle(IGqlSubscriptionManager& manager, const imtgql::IGqlRequest& request);
 
 	CGqlSubscriptionHandle(const CGqlSubscriptionHandle&) = delete;
@@ -51,11 +51,9 @@ public:
 	}
 
 	/**
-		Unregisters (if not already unregistered) and schedules this object's
-		deletion via deleteLater(). Use this instead of `delete`/unique_ptr::reset()
-		for normal teardown of a handle.
+		Revokes the subscription. No signal is emitted after this returns.
 	*/
-	void ScheduleDestruction();
+	void Unregister();
 
 Q_SIGNALS:
 	void payloadReceived(const QByteArray& subscriptionData);
@@ -63,12 +61,9 @@ Q_SIGNALS:
 
 protected:
 	// reimplemented (imtclientgql::IGqlSubscriptionClient)
-	void OnResponseReceived(const QByteArray& subscriptionId, const QByteArray& subscriptionData) override;
+	void OnResponseReceived(const QByteArray& subscriptionId, const QByteArray& subscriptionData) final;
 	void OnSubscriptionStatusChanged(
-		const QByteArray& subscriptionId, const SubscriptionStatus& status, const QString& message) override;
-
-private:
-	void Unregister();
+		const QByteArray& subscriptionId, const SubscriptionStatus& status, const QString& message) final;
 
 private:
 	IGqlSubscriptionManager& m_manager;

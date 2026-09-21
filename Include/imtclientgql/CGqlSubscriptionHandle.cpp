@@ -22,16 +22,23 @@ CGqlSubscriptionHandle::~CGqlSubscriptionHandle()
 }
 
 
-void CGqlSubscriptionHandle::ScheduleDestruction()
+void CGqlSubscriptionHandle::Unregister()
 {
-	Unregister();
-	deleteLater();
+	if (m_subscriptionId.isEmpty()) {
+		return;
+	}
+	m_manager.UnregisterSubscription(m_subscriptionId, *this);
+	m_subscriptionId.clear();
 }
 
 
 // protected methods
 
 // reimplemented (imtclientgql::IGqlSubscriptionClient)
+
+// Pure relays: they run on whichever thread the manager dispatches on and touch no member
+// state, so the only cross-thread operation is the emission itself. Everything the handle
+// owns is read and written on its own thread.
 
 void CGqlSubscriptionHandle::OnResponseReceived(
 	const QByteArray& /*subscriptionId*/, const QByteArray& subscriptionData)
@@ -44,19 +51,6 @@ void CGqlSubscriptionHandle::OnSubscriptionStatusChanged(
 	const QByteArray& /*subscriptionId*/, const SubscriptionStatus& status, const QString& message)
 {
 	Q_EMIT statusChanged(status, message);
-}
-
-
-// private methods
-
-void CGqlSubscriptionHandle::Unregister()
-{
-	if (m_subscriptionId.isEmpty()) {
-		return;
-	}
-
-	m_manager.UnregisterSubscription(m_subscriptionId, *this);
-	m_subscriptionId.clear();
 }
 
 
