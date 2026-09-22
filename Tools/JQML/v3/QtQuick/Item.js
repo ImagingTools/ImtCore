@@ -285,6 +285,13 @@ class Item extends QtObject {
                 return
             }
 
+            // forceActiveFocus() assigns focus to this item and ancestor
+            // FocusScopes in one batch. Those intermediate assignments must
+            // not claim the focus tree — Qt keeps the original item as owner.
+            if(JQApplication.focusTreeSuppressed){
+                return
+            }
+
             let tree = this.__getTree()
             let accepted = JQApplication.setFocusTree(tree, {
                 owner: this,
@@ -318,12 +325,22 @@ class Item extends QtObject {
     }
 
     forceActiveFocus(){
-        if(this.parent instanceof JQModules.QtQuick.FocusScope){
-            this.parent.focus = true
-        }
+        JQApplication.focusTreeSuppressed++
+        try {
+            // Qt: setFocus(this) first, then ancestor FocusScopes.
+            if(!this.focus){
+                this.focus = true
+            }
 
-        if(!this.focus){
-            this.focus = true
+            let parent = this.parent
+            while(parent){
+                if(parent instanceof JQModules.QtQuick.FocusScope){
+                    parent.focus = true
+                }
+                parent = parent.parent
+            }
+        } finally {
+            JQApplication.focusTreeSuppressed--
         }
 
         JQApplication.setFocusTree(this.__getTree(), {

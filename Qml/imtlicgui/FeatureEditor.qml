@@ -727,6 +727,7 @@ ViewBase {
 
 						TextInputElementView {
 							id: featureNameInput
+							objectName: "FeatureNameInput"
 							// Both of these must be filled in before the feature can be
 							// given sub-features, so the page says so where they are
 							// rather than leaving the reader to infer it from a command
@@ -746,6 +747,7 @@ ViewBase {
 
 						TextInputElementView {
 							id: featureIdInput
+							objectName: "FeatureIdInput"
 							name: qsTr("Feature ID") + " *"
 							description: featureIdInput.text === "" ? qsTr("Required. Filled in from the name if you leave it empty.") : ""
 							descriptionColor: Style.errorTextColor
@@ -758,6 +760,7 @@ ViewBase {
 
 						TextInputElementView {
 							id: descriptionInput
+							objectName: "DescriptionInput"
 							name: qsTr("Description")
 							placeHolderText: qsTr("Enter the description")
 							readOnly: !featureEditor.canEdit
@@ -767,6 +770,7 @@ ViewBase {
 
 						SwitchElementView {
 							id: optionalSwitch
+							objectName: "OptionalSwitch"
 							name: qsTr("Optional")
 							readOnly: !featureEditor.canEdit
 							onCheckedChanged: featureEditor.doUpdateModel()
@@ -774,6 +778,7 @@ ViewBase {
 
 						SwitchElementView {
 							id: permissionSwitch
+							objectName: "PermissionSwitch"
 							name: qsTr("Permission")
 							readOnly: !featureEditor.canEdit
 							onCheckedChanged: featureEditor.doUpdateModel()
@@ -1199,6 +1204,7 @@ ViewBase {
 
 					EditableTableCell {
 						id: nameCell
+						objectName: "SubfeatureNameCell"
 						width: subfeaturesPage.columnWidth(0, rowContent.width, rowContent.spacing)
 						height: Style.controlHeightM
 						anchors.verticalCenter: parent.verticalCenter
@@ -1229,6 +1235,7 @@ ViewBase {
 
 					EditableTableCell {
 						id: idCell
+						objectName: "SubfeatureIdCell"
 						width: subfeaturesPage.columnWidth(1, rowContent.width, rowContent.spacing)
 						height: Style.controlHeightM
 						anchors.verticalCenter: parent.verticalCenter
@@ -1250,6 +1257,7 @@ ViewBase {
 
 					EditableTableCell {
 						id: descriptionCell
+						objectName: "SubfeatureDescriptionCell"
 						width: subfeaturesPage.columnWidth(2, rowContent.width, rowContent.spacing)
 						height: Style.controlHeightM
 						anchors.verticalCenter: parent.verticalCenter
@@ -1270,6 +1278,7 @@ ViewBase {
 					// are driven by hand from syncSwitches() instead.
 					Item {
 						id: optionalCell
+						objectName: "SubfeatureOptionalCell"
 						width: subfeaturesPage.columnWidth(3, rowContent.width, rowContent.spacing)
 						height: Style.controlHeightM
 						anchors.verticalCenter: parent.verticalCenter
@@ -1297,6 +1306,7 @@ ViewBase {
 
 					Item {
 						id: permissionCell
+						objectName: "SubfeaturePermissionCell"
 						width: subfeaturesPage.columnWidth(4, rowContent.width, rowContent.spacing)
 						height: Style.controlHeightM
 						anchors.verticalCenter: parent.verticalCenter
@@ -1329,6 +1339,7 @@ ViewBase {
 					// an unnamed feature cannot own anything.
 					Item {
 						id: subfeaturesCell
+						objectName: "SubfeatureCountCell"
 						width: subfeaturesPage.columnWidth(5, rowContent.width, rowContent.spacing)
 						height: Style.controlHeightM
 						anchors.verticalCenter: parent.verticalCenter
@@ -1380,6 +1391,7 @@ ViewBase {
 
 						MouseArea {
 							id: subfeaturesMouse
+							objectName: "MouseArea"
 							anchors.fill: parent
 							hoverEnabled: true
 							cursorShape: subfeaturesCell.openable ? Qt.PointingHandCursor : Qt.ArrowCursor
@@ -1394,6 +1406,7 @@ ViewBase {
 
 					Item {
 						id: requirementsCell
+						objectName: "SubfeatureDependenciesCell"
 						width: subfeaturesPage.columnWidth(6, rowContent.width, rowContent.spacing)
 						height: Style.controlHeightM
 						anchors.verticalCenter: parent.verticalCenter
@@ -1495,6 +1508,7 @@ ViewBase {
 			property Component requirementsPanelComp: Component {
 				CheckableListPanel {
 					title: qsTr("Requirements")
+					objectName: "DependenciesPanel"
 					subtitle: featureEditor.activeFeature ? featureEditor.activeFeature.m_featureName : ""
 					model: featureEditor.requirementEntries
 					// Requirements belong to exactly one feature, and only to one
@@ -1533,6 +1547,7 @@ ViewBase {
 
 			TreeExplorerView {
 				id: treeExplorer
+				objectName: "SubfeaturesExplorer"
 				anchors.fill: parent
 				anchors.margins: Style.marginXL
 				model: featureEditor.featureTree
@@ -1597,6 +1612,7 @@ ViewBase {
 
 			Rectangle {
 				id: previewPopup
+				objectName: "SubfeaturePreviewPopup"
 				z: 200
 				x: Math.max(Style.marginL, Math.min(subfeaturesPage.previewX - width / 2,
 					subfeaturesPage.width - width - Style.marginL))
@@ -1661,4 +1677,3 @@ ViewBase {
 		}
 	}
 }
-

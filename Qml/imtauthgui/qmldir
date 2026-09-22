@@ -15,6 +15,7 @@ singleton CachedRoleCollection 1.0 CachedRoleCollection.qml
 singleton CachedUserCollection 1.0 CachedUserCollection.qml
 singleton CachedGroupCollection 1.0 CachedGroupCollection.qml
 
+PasswordPolicyController 1.0 PasswordPolicyController.qml
 PermissionsProvider 1.0 PermissionsProvider.qml
 PermissionsTableView 1.0 PermissionsTableView.qml
 

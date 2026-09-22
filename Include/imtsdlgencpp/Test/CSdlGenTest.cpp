@@ -257,6 +257,20 @@ void CSdlGenTest::TestComplexUnion()
 }
 
 
+void CSdlGenTest::TestNestedFieldNameCollision()
+{
+	CImtSdlGenTest testSuite;
+	PrepareSuite(testSuite, m_tempOutputDir);
+
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	argParserPtr->SetCppEnabled();
+	argParserPtr->SetGqlEnabled();
+	argParserPtr->SetQmlEnabled(false);
+
+	ExecuteTest(testSuite, "NestedFieldNameCollision.sdl");
+}
+
+
 void CSdlGenTest::PrinterTest()
 {
 	// printer test

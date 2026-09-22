@@ -929,6 +929,25 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRe
 }
 
 /**
+	Check whether a request was issued by the superuser.
+
+	Only the superuser may change the account state (imtauth::IUserInfo::IsEnabled),
+	so every write path accepting the 'enabled' field guards it with this check.
+	A request without a resolved user info is never treated as superuser.
+*/
+inline bool IsSuperuserRequest(const imtgql::CGqlRequest& gqlRequest)
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return false;
+	}
+
+	const imtauth::IUserInfo* contextUserInfoPtr = gqlContextPtr->GetUserInfo();
+
+	return (contextUserInfoPtr != nullptr) && contextUserInfoPtr->IsAdmin();
+}
+
+/**
 	Adapts (filters) the roles, groups and permissions of a user according to the
 	current tenant context, and enriches with delegated roles when appropriate.
 

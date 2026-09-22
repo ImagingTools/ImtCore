@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtrepo/IFileObjectCollection.h>
-#include <imtauth/CAccountInfo.h>
+#include <imtaccount/CAccountInfo.h>
 #include <imtrepo/CFileCollectionCompBase.h>
 
 
@@ -147,7 +147,7 @@ void CRevisionControllerPartituraTestBase::RestoreRevisionWithCorrectParamsTest(
 			if (revisionControllerPtr != nullptr){
 
 				// declaration input and reference data of object
-				imtbase::IObjectCollection::DataPtr inputDataPtr = new imtauth::CAccountInfo();
+				imtbase::IObjectCollection::DataPtr inputDataPtr = new imtaccount::CAccountInfo();
 				imtbase::IObjectCollection::DataPtr referenceDataPtr;
 
 				// declaration values for object data in type AccountInfo in first revision
@@ -155,7 +155,7 @@ void CRevisionControllerPartituraTestBase::RestoreRevisionWithCorrectParamsTest(
 				QString descriptionAccount = "AccountDescription";
 
 				// set values in input data
-				imtauth::CAccountInfo* inputImplPtr = dynamic_cast<imtauth::CAccountInfo*>(inputDataPtr.GetPtr());
+				imtaccount::CAccountInfo* inputImplPtr = dynamic_cast<imtaccount::CAccountInfo*>(inputDataPtr.GetPtr());
 				inputImplPtr->SetAccountName(nameAccount);
 				inputImplPtr->SetAccountDescription(descriptionAccount);
 
@@ -182,7 +182,7 @@ void CRevisionControllerPartituraTestBase::RestoreRevisionWithCorrectParamsTest(
 							bool checkRestoreFirstRevision = revisionControllerPtr->RestoreRevision(*objectCollectionPtr, idInsertObject, idFirstRevision);
 							if (checkRestoreFirstRevision){
 								objectCollectionPtr->GetObjectData(idInsertObject, referenceDataPtr);
-								imtauth::CAccountInfo* referenceImplPtr = dynamic_cast<imtauth::CAccountInfo*>(referenceDataPtr.GetPtr());
+								imtaccount::CAccountInfo* referenceImplPtr = dynamic_cast<imtaccount::CAccountInfo*>(referenceDataPtr.GetPtr());
 								QString referenceName = referenceImplPtr->GetAccountName();
 								QString referenceDescription = referenceImplPtr->GetAccountDescription();
 								QVERIFY2(((nameAccount == referenceName) && (descriptionAccount == referenceDescription)), "Object don't restored");
@@ -256,14 +256,14 @@ void CRevisionControllerPartituraTestBase::RestoreRevisionWithIncorrectParamsTes
 			if (revisionControllerPtr != nullptr){
 
 				// declaration input data of object
-				imtbase::IObjectCollection::DataPtr inputDataPtr = new imtauth::CAccountInfo();
+				imtbase::IObjectCollection::DataPtr inputDataPtr = new imtaccount::CAccountInfo();
 
 				// declaration values for object data in type AccountInfo in first revision
 				QString nameAccount = "AccountName";
 				QString descriptionAccount = "AccountDescription";
 
 				// set values in input data
-				imtauth::CAccountInfo* inputImplPtr = dynamic_cast<imtauth::CAccountInfo*>(inputDataPtr.GetPtr());
+				imtaccount::CAccountInfo* inputImplPtr = dynamic_cast<imtaccount::CAccountInfo*>(inputDataPtr.GetPtr());
 				inputImplPtr->SetAccountName(nameAccount);
 				inputImplPtr->SetAccountDescription(descriptionAccount);
 

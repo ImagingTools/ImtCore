@@ -53,9 +53,9 @@ function parseRequestedProjectKeys(argv) {
  *   defaults to ImtCore's standard AuthorizationController key. A DOM-quiet login can resolve *before*
  *   the auth round-trip actually wrote the session, so waiting for this - rather than just "login()
  *   settled" - is what makes the saved storageState actually authenticated.
- * @param {string} [opts.suUserKey]                 fixture key that MUST be present in activeUsers()
- *   (default: 'su') - sanity-checked so a misconfigured users module fails loudly instead of silently
- *   producing an all-guest test run.
+ * @param {string} [opts.suUserKey]                 fixture key logged in first and alone when this run
+ *   has it (default: 'su'). Not required to be active - a default subset may leave it out - but an
+ *   activeUsers() that returns nobody at all fails loudly, since every project would then run guest.
  * @param {number} [opts.maxLoginAttempts]          retries for a dropped WASM-canvas login click (default 3)
  * @param {number} [opts.loginConcurrency]          how many non-su users to log in at once (default 3) -
  *   each gets its own browser context/page, so this is real network+WASM-boot parallelism, not just
@@ -160,8 +160,9 @@ function createGlobalSetup({
 
   return async (config) => {
     const users = activeUsers();
-    const su = users.find((u) => u.key === suUserKey);
-    if (!su) throw new Error(`global-setup: "${suUserKey}" must be in activeUsers() (check your users module)`);
+    if (users.length === 0) {
+      throw new Error('global-setup: activeUsers() returned nobody, so every project would run unauthenticated');
+    }
 
     // A run scoped to specific projects (e.g. "npx playwright test --project=guest") only needs
     // storageState for the user(s) those projects actually map to - logging in every OTHER active user
@@ -174,18 +175,29 @@ function createGlobalSetup({
     const requestedKeys = parseRequestedProjectKeys((config && config.argv) || process.argv);
     const activeForThisRun = requestedKeys.length > 0 ? users.filter((u) => requestedKeys.includes(u.key)) : users;
 
-    const browser = await chromium.launch();
+    // Honour PLAYWRIGHT_BROWSER_CHANNEL here too. globalSetup launches its own browser rather than
+    // going through the projects' `use`, so without this it would fall back to Playwright's bundled
+    // binary - and on a machine that only has an installed Chrome/Edge (see createConfig's note on
+    // build agents that cannot reach cdn.playwright.dev) there is no bundled binary to launch. The
+    // failure is confusing when it happens: the run reports "Executable doesn't exist at
+    // ...chromium_headless_shell..." even though the step just said it was using an installed browser.
+    const browser = await chromium.launch(
+      process.env.PLAYWRIGHT_BROWSER_CHANNEL ? { channel: process.env.PLAYWRIGHT_BROWSER_CHANNEL } : {}
+    );
     try {
-      // su first and alone: seeded users are typically created/verified via su-authenticated GraphQL
-      // calls elsewhere in the pipeline (Generate-Backups.ps1 / seed-fixture-users.js), and su logging in
-      // first also means a genuinely broken server fails fast on ONE login instead of after burning
-      // through a whole concurrent batch. Skipped entirely if this run's scope doesn't even include su
-      // (e.g. --project=guest, which needs no authenticated user at all).
-      if (activeForThisRun.some((u) => u.key === suUserKey)) {
-        await saveStateForUser(browser, su);
-      }
+      // su (when this run has it) leads and logs in alone: seeded users are typically created/verified
+      // via su-authenticated GraphQL calls elsewhere in the pipeline (Generate-Backups.ps1 /
+      // seed-fixture-users.js). A run without su keeps the same shape with whoever leads the list, so a
+      // genuinely broken server still fails fast on ONE login instead of a whole concurrent batch. An
+      // empty list here is a scope that needs no authenticated user at all (e.g. --project=guest).
+      const ordered = [
+        ...activeForThisRun.filter((u) => u.key === suUserKey),
+        ...activeForThisRun.filter((u) => u.key !== suUserKey && u.seed),
+      ];
+      const [first, ...rest] = ordered;
+      if (!first) return;
+      await saveStateForUser(browser, first);
 
-      const rest = activeForThisRun.filter((u) => u.key !== suUserKey && u.seed);
       // Chunked concurrency (see loginConcurrency's own comment) - process.all per chunk, chunks
       // sequential, so at most `loginConcurrency` WASM boots are ever in flight at once.
       for (let i = 0; i < rest.length; i += loginConcurrency) {

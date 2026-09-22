@@ -5,13 +5,14 @@ import imtcontrols 1.0
 
 ItemDelegate {
 	id: popupMenuDelegate;
-	objectName: "PopupMenuDelegate"
+	objectName: popupMenuDelegate.itemId === "" ? "PopupMenuDelegate" : "PopupItem_" + popupMenuDelegate.itemId
+	readonly property string itemId: String(model.item ? model.item.m_id : model.Id ? model.Id : model.id ? model.id : "")
 	
 	decorator: Style.popupItemDelegateDecorator;
 	
 	property bool selected: false;
 
-	property bool isSeparator: String(model.item ? model.item.m_id : model.Id ? model.Id : model.id ? model.id : "") === "";
+	property bool isSeparator: popupMenuDelegate.itemId === "";
 	
 	// Reference to the control in which the delegate is declared
 	property Item containerItem: null;

@@ -51,14 +51,19 @@ Item {
 		doUpdateGui()
 	}
 
-onCommandsModelChanged: {
-		viewBase.buttonPanelModel = null
-		if (!hasButtonPanel || !commandsModel){
+onCommandsModelChanged: {
+
+		viewBase.buttonPanelModel = null
+
+		if (!hasButtonPanel || !commandsModel){
+
 			return
 		}
-		for (let i = 0; i < commandsModel.m_elements.count; i++){
+		for (let i = 0; i < commandsModel.m_elements.count; i++){
+
 			let elementGroup = commandsModel.m_elements.get(i).item
-			if (elementGroup.m_alignment === -1){
+			if (elementGroup.m_alignment === -1){
+
 				viewBase.buttonPanelModel = elementGroup.m_subElements
 				break
 			}
@@ -349,11 +354,11 @@ onCommandsModelChanged: {
 		
 		updateModel();
 		
-		viewBase.internal__.blockingUpdateGui = false;
-		
 		if (model.endChanges !== undefined){
 			model.endChanges();
 		}
+
+		viewBase.internal__.blockingUpdateGui = false;
 	}
 
 	// Update GUI from representation model

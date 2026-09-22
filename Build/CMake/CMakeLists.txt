@@ -3,15 +3,32 @@ cmake_minimum_required(VERSION 3.26)
 project(ImtCore)
 
 
-if(NOT DEFINED QT_VERSION_MAJOR)
-	find_package(QT NAMES Qt6 Qt5 COMPONENTS Core)
-	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core Concurrent Gui Network PrintSupport Sql Svg Xml WebSockets Widgets REQUIRED)
+# Enable modern target-based architecture:
+# find_package(IAcf) provides Acf::/AcfSln::/IAcf:: imported targets
+set(ACF_MODERN_CMAKE ON)
 
-	if(QT_VERSION_MAJOR EQUAL 6)
-		find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core5Compat REQUIRED)
-	endif()
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core)
+
+if(NOT DEFINED IMTCOREDIR)
+	get_filename_component(IMTCOREDIR "../.." ABSOLUTE BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 endif()
 
+include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
+
+message(VERBOSE "ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
+
+option(AUTOMATIC_DB_BACKUPS "Enable automatic database backups" ON)
+option(BUILD_TESTING "Configures projects for testing" OFF)
+option(USE_MDBX "Use 3rdParty/libmdbx" OFF)
+
+# Collect ImtCore libraries in their own export set so they are published as the
+# ImtCore:: package. Read by StaticConfig.cmake / acf_register_library().
+set(ACF_PACKAGE_NAME "ImtCore")
+
+find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core Concurrent Gui Network PrintSupport Sql Svg Xml WebSockets Widgets REQUIRED)
+if(QT_VERSION_MAJOR EQUAL 6)
+	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core5Compat REQUIRED)
+endif()
 
 if(NOT DEFINED USE_GEO OR USE_GEO)
 	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Positioning REQUIRED)
@@ -29,7 +46,6 @@ if(NOT DEFINED USE_QT3D OR USE_QT3D)
 	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS OpenGL OpenGLWidgets REQUIRED)
 endif()
 
-option(BUILD_TESTING "Configures projects for testing" OFF)
 if(BUILD_TESTING)
 	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Test REQUIRED)
 endif()
@@ -40,38 +56,12 @@ if(UNIX AND NOT APPLE)
 	endif()
 endif()
 
-get_filename_component(IMTCOREDIR "../.." ABSOLUTE BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
-
-if(NOT DEFINED IMTCOREDIR_BUILD)
-	set(IMTCOREDIR_BUILD "${IMTCOREDIR}")
-endif()
-
-# Enable modern target-based architecture:
-# find_package(IAcf) provides Acf::/AcfSln::/IAcf:: imported targets with transitive include dirs and link deps.
-# Legacy global include_directories()/link_directories() in the Env chain are skipped.
-option(ACF_MODERN_CMAKE "Enable modern target-based architecture" ON)
-
-option(AUTOMATIC_DB_BACKUPS "Enable automatic database backups" ON)
-option(USE_MDBX "Use 3rdParty/libmdbx" OFF)
-
-# Collect ImtCore libraries in their own export set so they are published as the
-# ImtCore:: package. Read by StaticConfig.cmake / acf_register_library().
-set(ACF_PACKAGE_NAME "ImtCore")
-
-include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
-
-message(VERBOSE "ImtCore ACFDIR_BUILD ${ACFDIR_BUILD}")
-
 set(INCLUDE_DIR "${IMTCOREDIR}/Include")
 set(IMPL_DIR	"${IMTCOREDIR}/Impl")
 set(QML_DIR		"${IMTCOREDIR}/Qml")
 set(SDL_DIR		"${IMTCOREDIR}/Sdl")
 set(TESTS_DIR	"${IMTCOREDIR}/Tests")
 set(AUX_INCLUDE_DIR "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles")
-
-include_directories(${AUX_INCLUDE_DIR}/..)
-include_directories(${AUX_INCLUDE_DIR})
-
 
 #------ Required libs ------
 add_subdirectory("${INCLUDE_DIR}/imtcore/CMake" "${AUX_INCLUDE_DIR}/imtcore")
@@ -163,6 +153,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 	endif()
 
 	#-------- Libraries --------
+	add_subdirectory("${INCLUDE_DIR}/imtaccount/CMake"		"${AUX_INCLUDE_DIR}/imtaccount")
 	add_subdirectory("${INCLUDE_DIR}/imtauth/CMake"			"${AUX_INCLUDE_DIR}/imtauth")
 	add_subdirectory("${INCLUDE_DIR}/imtapp/CMake"			"${AUX_INCLUDE_DIR}/imtapp")
 	add_subdirectory("${INCLUDE_DIR}/imtcrypt/CMake"		"${AUX_INCLUDE_DIR}/imtcrypt")
@@ -328,6 +319,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${IMPL_DIR}/ImtStylePck/CMake" "${AUX_INCLUDE_DIR}/ImtStylePck")
 		add_dependencies(ImtStylePck imtstyle DesignTokenCreator)
 
+		add_subdirectory("${IMPL_DIR}/ImtAccountPck/CMake" "${AUX_INCLUDE_DIR}/ImtAccountPck")
+		add_dependencies(ImtAccountPck imtbase imtaccount)
+
 		add_subdirectory("${IMPL_DIR}/ImtAuthPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthPck")
 		add_dependencies(ImtAuthPck imtbase imtauth)
 
@@ -336,7 +330,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 		if((NOT DEFINED USE_QTQML OR USE_QTQML) AND (NOT DEFINED USE_QTDB OR USE_QTDB))
 			add_subdirectory("${IMPL_DIR}/ImtAuthGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGuiPck")
-			add_dependencies(ImtAuthGuiPck imtbase imtauth imtauthgui imtgui)
+			add_dependencies(ImtAuthGuiPck imtbase imtaccount imtauth imtauthgui imtgui)
 		endif()
 
 		if(USE_MDBX)
@@ -396,13 +390,13 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 		if(NOT DEFINED USE_QTDB OR USE_QTDB)
 			add_subdirectory("${IMPL_DIR}/ImtAuthDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthDbPck")
-			add_dependencies(ImtAuthDbPck imtbase imtdb imtauth imtauthdb)
+			add_dependencies(ImtAuthDbPck imtbase imtdb imtauth imtaccount imtauthdb)
 
 			add_subdirectory("${IMPL_DIR}/ImtChatPck/CMake" "${AUX_INCLUDE_DIR}/ImtChatPck")
 			add_dependencies(ImtChatPck imtbase imtchat)
 
 			add_subdirectory("${IMPL_DIR}/ImtDatabasePck/CMake" "${AUX_INCLUDE_DIR}/ImtDatabasePck")
-			add_dependencies(ImtDatabasePck imtbase imtauth imtcol imtdb)
+			add_dependencies(ImtDatabasePck imtbase imtauth imtaccount imtcol imtdb)
 			imt_chain_windeploy_target(ImtDatabasePck)
 
 			add_subdirectory("${IMPL_DIR}/ImtClientGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtClientGqlPck")
@@ -450,7 +444,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 			add_dependencies(ImtServicePck imtbase imtcom imtservice)
 
 			add_subdirectory("${IMPL_DIR}/ImtServerGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtServerGqlPck")
-			add_dependencies(ImtServerGqlPck imtbasesdl imtcom imtauth imtrest imtserverapp imtdoc imthype imtservergql)
+			add_dependencies(ImtServerGqlPck imtbasesdl imtcom imtauth imtaccount imtrest imtserverapp imtdoc imthype imtservergql)
 
 			if((NOT DEFINED USE_GEO OR USE_GEO) AND (NOT DEFINED USE_QTDB OR USE_QTDB))
 				add_subdirectory("${IMPL_DIR}/ImtGeoPck/CMake" "${AUX_INCLUDE_DIR}/ImtGeoPck")
@@ -529,10 +523,10 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 			add_dependencies(ImtTestPck imtbase imtdb imttest)
 
 			add_subdirectory("${TESTS_DIR}/ObjectCollectionTest/CMake" "${AUX_INCLUDE_DIR}/ObjectCollectionTest")
-			add_dependencies(ImtCoreObjectCollectionTest imtbase imtauth imtdb imttest)
+			add_dependencies(ImtCoreObjectCollectionTest imtbase imtaccount imtauth imtdb imttest)
 
 			add_subdirectory("${TESTS_DIR}/StructureTest/CMake" "${AUX_INCLUDE_DIR}/StructureTest")
-			add_dependencies(StructureTest imtbase imtauth imtdb imttest)
+			add_dependencies(StructureTest imtbase imtaccount imtauth imtdb imttest)
 		endif()
 
 		if(USE_MDBX)
@@ -548,13 +542,19 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_dependencies(imtgqltest imtcom imtrest imtbase)
 
 		add_subdirectory("${TESTS_DIR}/FileCollectionTest/CMake" "${AUX_INCLUDE_DIR}/FileCollectionTest")
-		add_dependencies(ImtCoreFileCollectionTest imtbase imtauth imtrepo)
+		add_dependencies(ImtCoreFileCollectionTest imtbase imtaccount imtauth imtrepo)
 
 		add_subdirectory("${TESTS_DIR}/RevisionControllerTest/CMake" "${AUX_INCLUDE_DIR}/RevisionControllerTest")
-		add_dependencies(ImtCoreRevisionControllerTest imtauth imtbase)
+		add_dependencies(ImtCoreRevisionControllerTest imtaccount imtauth imtbase)
 
 		add_subdirectory("${TESTS_DIR}/PersonalAccessTokenTest/CMake" "${AUX_INCLUDE_DIR}/PersonalAccessTokenTest")
-		add_dependencies(PersonalAccessTokenTest imtbase imtauth)
+		add_dependencies(PersonalAccessTokenTest imtbase imtauth imtaccount)
+
+		add_subdirectory("${TESTS_DIR}/PasswordPolicyTest/CMake" "${AUX_INCLUDE_DIR}/PasswordPolicyTest")
+		add_dependencies(PasswordPolicyTest imtbase imtauth)
+
+		add_subdirectory("${TESTS_DIR}/UserAccountStateTest/CMake" "${AUX_INCLUDE_DIR}/UserAccountStateTest")
+		add_dependencies(UserAccountStateTest imtbase imtauth)
 
 		add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceTest")
 		add_dependencies(CollectionDocumentServiceTest imtbase imtdoc)

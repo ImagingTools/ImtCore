@@ -37,6 +37,8 @@ TableSelectionManager 1.0 ./Actions/TableSelectionManager.qml
 LocalizationEvent 1.0 ./Actions/LocalizationEvent.qml
 IdSelectionManager 1.0 ./Actions/IdSelectionManager.qml
 IndexSelectionManager 1.0 ./Actions/IndexSelectionManager.qml
+FocusManager 1.0 ./Actions/FocusManager.qml
+DialogFocusManager 1.0 ./Actions/DialogFocusManager.qml
 
 Button 1.0 ./Buttons/Button.qml
 TextButton 1.0 ./Buttons/TextButton.qml

@@ -276,6 +276,8 @@ Dialog {
 				anchors.right: parent.right;
 				anchors.rightMargin: Style.marginXL;
 				currentPasswordInputVisible: false;
+				login: passwordRecoveryDialog.login;
+				policy: passwordPolicyProvider;
 				onAcceptedChanged: {
 					passwordRecoveryDialog.setButtonEnabled(Enums.yes, accepted);
 				}
@@ -375,6 +377,12 @@ Dialog {
 		}
 	}
 
+	// Reached before any API client exists, so the policy is instantiated here.
+	GqlBasedPasswordPolicyProvider {
+		id: passwordPolicyProvider;
+		context: passwordRecoveryDialog.context;
+	}
+
 	GqlSdlRequestSender {
 		permissionPath: passwordRecoveryDialog.permissionPath
 		id: changePasswordRequestSender;
@@ -391,7 +399,15 @@ Dialog {
 			ChangePasswordPayload {
 				onFinished: {
 					if (m_success){
+						PopupManager.addSuccessMessage(qsTr("Password changed successfully"), true);
 						passwordRecoveryDialog.finished(Enums.cancel)
+					}
+					else{
+						PopupManager.addErrorMessage(
+									passwordPolicyProvider.describeFailure(
+										m_violatedRules,
+										qsTr("Unable to change the password.")),
+									true);
 					}
 				}
 			}
@@ -400,9 +416,6 @@ Dialog {
 		onFinished: {
 			if (status < 0){
 				passwordRecoveryDialog.currentIndex = 2;
-			}
-			else{
-				PopupManager.addSuccessMessage(qsTr("Password changed successfully"), true);
 			}
 		}
 	}
