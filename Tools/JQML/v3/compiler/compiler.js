@@ -106,21 +106,47 @@ function compile(options){
 
     function envFill(source) {
         let result = source
-        for (let key in env) {
+        const keys = Object.keys(env).sort((a, b) => b.length - a.length)
+        for (let key of keys) {
             result = result.replaceAll('${' + key + '}', env[key].replaceAll('\\', '\\\\').trim())
         }
         return result
     }
 
+    function envFillPath(filePath) {
+        let result = String(filePath || '')
+        const keys = Object.keys(env).sort((a, b) => b.length - a.length)
+        for (let key of keys) {
+            if (env[key] == null) continue
+            result = result.replaceAll('${' + key + '}', String(env[key]).trim())
+        }
+        return result
+    }
+
+    function isAbsolutePath(filePath) {
+        if (!filePath) return false
+        if (path.isAbsolute(filePath)) return true
+        if (/^[A-Za-z]:[\\/]/.test(filePath)) return true
+        if (filePath.slice(0, 2) === '\\\\') return true
+        return false
+    }
+
+    function resolveConfigRef(baseDirPath, filePath) {
+        const filled = envFillPath(filePath)
+        if (isAbsolutePath(filled)) return path.normalize(filled)
+        if (filled.indexOf('${') >= 0) return path.normalize(filled)
+        return path.resolve(baseDirPath, filled)
+    }
+
     function includeFiles(sourceFile, baseDirPath = configDirPath) {
         if (sourceFile.includes)
             for (let filePath of sourceFile.includes) {
-                let absoluteConfigPath = path.resolve(baseDirPath, filePath)
+                let absoluteConfigPath = resolveConfigRef(baseDirPath, filePath)
                 let includeConfigDirPath = path.dirname(absoluteConfigPath)
                 let file = JSON.parse(envFill(fs.readFileSync(absoluteConfigPath, { encoding: 'utf8', flag: 'r' })))
                 includeFiles(file, includeConfigDirPath)
                 for (let dirPath of file.dirs) {
-                    let absoluteDirPath = path.resolve(includeConfigDirPath, dirPath)
+                    let absoluteDirPath = resolveConfigRef(includeConfigDirPath, dirPath)
                     sourceFile.dirs.unshift(absoluteDirPath)
                 }
             }
@@ -2235,7 +2261,7 @@ function compile(options){
     let entryDirAbsolutePath = path.resolve(configDirPath, options.entry.replaceAll(/.\w+\.qml/g, ''))
 
     for (let dirPath of config.dirs) {
-        let absolutePath = path.resolve(configDirPath, dirPath)
+        let absolutePath = resolveConfigRef(configDirPath, dirPath)
         let moduleName = ''
         let lines = fs.readFileSync(absolutePath + '/qmldir', { encoding: 'utf8', flag: 'r' }).replaceAll('\r', '').replaceAll(/[ ]+/g, ' ').split('\n')
         let count = 0
