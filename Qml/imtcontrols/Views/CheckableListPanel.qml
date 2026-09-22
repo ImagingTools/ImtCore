@@ -241,6 +241,7 @@ FocusScope {
 
 		BaseText {
 			id: titleText
+			objectName: "PanelTitle"
 			anchors.left: parent.left
 			anchors.verticalCenter: parent.verticalCenter
 			text: root.title
@@ -250,6 +251,7 @@ FocusScope {
 		}
 
 		BaseText {
+			objectName: "PanelSubtitle"
 			anchors.left: titleText.right
 			anchors.leftMargin: Style.marginS
 			anchors.right: actionButton.visible ? actionButton.left : parent.right
@@ -264,6 +266,7 @@ FocusScope {
 
 		ToolbarButton {
 			id: actionButton
+			objectName: "PanelActionButton"
 			anchors.right: parent.right
 			anchors.verticalCenter: parent.verticalCenter
 			visible: root.actionText !== ""
@@ -275,6 +278,7 @@ FocusScope {
 
 	SearchTextInput {
 		id: searchField
+		objectName: "PanelSearchInput"
 		anchors.top: panelHeader.bottom
 		anchors.topMargin: Style.marginM
 		anchors.left: parent.left
@@ -311,6 +315,7 @@ FocusScope {
 
 	Rectangle {
 		id: panelFrame
+		objectName: "PanelTable"
 		anchors.top: columnHeader.bottom
 		anchors.topMargin: Style.marginXS
 		anchors.left: parent.left
@@ -334,6 +339,7 @@ FocusScope {
 
 			delegate: Item {
 				id: entryItem
+				objectName: "PanelRow_" + index
 				width: entriesView.width
 				height: sectionHeader.height + root.rowHeight
 
@@ -384,6 +390,7 @@ FocusScope {
 
 					CheckBox {
 						id: entryCheck
+						objectName: "PanelRowCheckBox"
 						anchors.left: parent.left
 						anchors.leftMargin: Style.marginL
 						anchors.verticalCenter: parent.verticalCenter
@@ -405,6 +412,7 @@ FocusScope {
 							spacing: Style.spacingS
 
 							BaseText {
+								objectName: "PanelRowTitle"
 								anchors.verticalCenter: parent.verticalCenter
 								width: Math.max(0, parent.width - badgeChip.width - parent.spacing)
 								text: root.entryTitle(entryItem.entry)
@@ -416,6 +424,7 @@ FocusScope {
 							// of entry it is. Sits with the name instead of in a column.
 							Rectangle {
 								id: badgeChip
+								objectName: "PanelRowBadge"
 								anchors.verticalCenter: parent.verticalCenter
 								width: badgeText.text === "" ? 0 : badgeText.width + 2 * Style.marginS
 								height: Style.controlHeightS
@@ -441,6 +450,7 @@ FocusScope {
 						}
 
 						BaseText {
+							objectName: "PanelRowSubtitle"
 							width: parent.width
 							visible: text !== ""
 							text: root.entrySubtitle(entryItem.entry)
@@ -452,6 +462,7 @@ FocusScope {
 
 					MouseArea {
 						id: entryMouse
+						objectName: "MouseArea"
 						anchors.fill: parent
 						hoverEnabled: true
 						enabled: entryItem.entryEnabled
@@ -480,6 +491,7 @@ FocusScope {
 		}
 
 		Column {
+			objectName: "PanelPlaceholder"
 			anchors.centerIn: parent
 			width: Math.min(parent.width - 2 * Style.marginXL, Style.sizeHintM)
 			spacing: Style.spacingL
@@ -516,6 +528,7 @@ FocusScope {
 
 	BaseText {
 		id: footerLabel
+		objectName: "PanelFooter"
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.bottom: parent.bottom
