@@ -32,10 +32,13 @@ StyleComponents {
 	property string language;//deprecated?
 
 	//Font properties
-	property string mainFontSource: "../../../Fonts/Ubuntu-Light.ttf";
-	property string boldFontSource: "../../../Fonts/Ubuntu-Medium.ttf";
-	property string fontFamily: "Arial";
-	property string fontFamilyBold: "Arial";
+	property string mainFontSource: "../../../Fonts/Inter-Regular.ttf";
+	property string boldFontSource: "../../../Fonts/Inter-SemiBold.ttf";
+	// Bound to the loader, not a literal: native Qt reports the font's own family
+	// name while the web build derives it from the file name, so no single string
+	// is right on both. Falls back to Arial until the font is loaded.
+	property string fontFamily: mainFont.name !== "" ? mainFont.name : "Arial";
+	property string fontFamilyBold: boldFont.name !== "" ? boldFont.name : "Arial";
 	property string fontFamilyMono: "Consolas";
 
 	property alias mainFontLoader: mainFont;

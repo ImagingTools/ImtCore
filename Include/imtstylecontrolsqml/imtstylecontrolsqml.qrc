@@ -4,6 +4,8 @@
 	<file alias="Acf/Style.qml">Qml/Acf/Style.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
+        <file alias="Inter-Regular.ttf">Qml/Fonts/Inter-Regular.ttf</file>
+        <file alias="Inter-SemiBold.ttf">Qml/Fonts/Inter-SemiBold.ttf</file>
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>
         <file alias="Ubuntu-Medium.ttf">Qml/Fonts/Ubuntu-Medium.ttf</file>
         <file alias="Ubuntu-Bold.ttf">Qml/Fonts/Ubuntu-Bold.ttf</file>

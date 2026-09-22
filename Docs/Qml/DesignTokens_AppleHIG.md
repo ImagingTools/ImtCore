@@ -64,14 +64,30 @@ direction Apple uses on iOS.
 
 ## Typography
 
-Apple's system font is **SF Pro**, which does not ship on Windows and is
-not vendored here. `fontFamily` is therefore `Arial`, the Helvetica
-stand-in at the end of Apple's own font stack
-(`-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial`).
-`fontFamilyMono` is `Consolas`, standing in for SF Mono. Installing SF Pro
-(a free download from Apple) and switching `fontFamily` would give true
-parity; a declared-but-missing family silently falls back to the platform
-default instead, which is why it is not declared that way today.
+Apple's system font is **SF Pro**, and it cannot be used here. Apple's font
+license grants use "solely for creating mock-ups of user interfaces to be
+used in software products running on Apple's iOS, OS X or tvOS", states
+"You may not embed the Apple Font in any software programs or other
+products", and explicitly forbids use "for the purpose of creating mock-ups
+of user interfaces to be used in software products running on any non-Apple
+operating system". ImtCore ships on Windows, Linux and the web, so SF Pro is
+out on all three counts — bundling it would be a licence violation, not just
+a packaging inconvenience.
+
+**Inter** ([rsms/inter](https://github.com/rsms/inter), SIL OFL 1.1) is used
+instead. It is the usual free stand-in for SF Pro: a UI-first grotesque with
+similar proportions and a tall x-height. Regular (400) and SemiBold (600) are
+vendored under `Include/imtstylecontrolsqml/Qml/Fonts/` with the licence
+alongside as `Inter-OFL.txt`, and served from the `/Fonts` resource prefix.
+
+`fontFamily` is **bound to `FontLoader.name`**, not set to a literal. Native
+Qt reports the font's own family name (`Inter`), while the JQML web build
+derives the `@font-face` family from the file name (`Inter-Regular`) — see
+`3rdParty/WebCompiler/qmlcore/core/FontLoader.qml`. No single literal is
+correct on both, so the binding resolves per platform, falling back to
+`Arial` until the font has loaded.
+
+`fontFamilyMono` remains `Consolas`, standing in for SF Mono.
 
 macOS text sizes, not iOS ones, since this is a dense desktop app:
 
@@ -124,7 +140,8 @@ separators, not zebra striping, as in Apple's lists and tables.
 
 ## Not aligned (deliberate)
 
-- **SF Pro.** See Typography — `Arial` is a stand-in, not the real thing.
+- **SF Pro.** Licence-blocked, see Typography. Inter is a close relative,
+  not the same typeface.
 - **Vibrancy and translucency.** Apple's sidebars and sheets blur what is
   behind them. QML can do this natively but not in the JQML web build, and
   the token system has no place to express it.
