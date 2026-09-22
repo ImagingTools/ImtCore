@@ -103,10 +103,24 @@ function createGuiConfig({
     snapshotPathTemplate: '{testDir}/__screenshots__/{projectName}/{arg}-{platform}{ext}',
     use: {
       headless: true,
+      // Drive a browser that is ALREADY on the machine instead of Playwright's own download, when
+      // PLAYWRIGHT_BROWSER_CHANNEL names one ("msedge" / "chrome"). This exists for build agents that
+      // can reach the npm registry but not cdn.playwright.dev: the browser download is the only part
+      // of the suite that needs the open internet, and every Windows box already ships Edge, whose
+      // version tracks the same Chromium release Playwright pins. Unset locally, so nothing changes
+      // for a developer with the normal cached browser.
+      ...(process.env.PLAYWRIGHT_BROWSER_CHANNEL
+        ? { channel: process.env.PLAYWRIGHT_BROWSER_CHANNEL }
+        : {}),
       viewport: { width: 1920, height: 1080 },
       baseURL: baseUrl,
       screenshot: 'only-on-failure',
-      trace: 'off',
+      // Kept for FAILURES only, which is what makes a downloaded CI artifact worth having: a trace
+      // replays the whole test - every action, the DOM at each step, console and network - and that is
+      // the only way to diagnose a GUI failure you cannot reproduce locally. Not 'on-first-retry',
+      // which never fires here because retries are 0 by design. A green run writes none, so the
+      // published archive stays a couple of junit files.
+      trace: 'retain-on-failure',
       ...use,
     },
     projects: buildProjects({

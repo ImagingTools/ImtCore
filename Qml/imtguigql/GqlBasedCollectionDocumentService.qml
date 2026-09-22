@@ -26,13 +26,22 @@ DocumentServiceBase {
 			let objectId = data.getData("objectId")
 			let documentId = data.getData("documentId")
 			let documentName = data.getData("documentName")
+			let objectTypeId = data.getData("objectTypeId")
+			let hasNameProvider = data.getData("hasNameProvider")
+			let isDirty = data.getData("isDirty")
 			let operation = data.getData("documentOperation")
 
 			if (objectId !== undefined && objectId !== ""){
 				root.setDocumentObjectId(documentId, objectId)
 			}
 
-			if (operation === "DocumentDataLoaded"){
+			if (operation === "DocumentOpened"){
+				root.reflectRemoteDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty)
+			}
+			else if (operation === "NewDocumentCreated"){
+				root.reflectRemoteDocumentCreated(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty)
+			}
+			else if (operation === "DocumentDataLoaded"){
 				root.setDocumentIsLoading(documentId, false)
 			}
 			else if (operation === "DocumentClosed"){

@@ -67,6 +67,14 @@ protected:
 				const imtdoc::IDocumentService::DocumentNotification& notification,
 				sdl::V1_0::imtbase::EDocumentOperation operation,
 				sdl::V1_0::imtbase::CDocumentServiceNotification& sdlNotification) const;
+	/**
+		Resolve \c hasNameProvider for the document referenced by \a notification
+		using the attached document service.
+
+		\note Must only be called from event handlers which are invoked outside of
+		the document service's internal locks (document created / document opened).
+	*/
+	void FillNameProviderFlag(imtdoc::IDocumentService::DocumentNotification& notification) const;
 	QByteArray ConvertUrlToObjectId(const QUrl& url) const;
 
 	/**

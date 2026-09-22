@@ -14,6 +14,24 @@ const { waitForStable } = require('./stability');
 // baseline that is permanent: every later run then compares against a page that never finished loading.
 const SCREENSHOT_SETTLE = { quietMs: 600, timeout: 20000 };
 
+// Text glyphs rasterise a few pixels differently from one machine to the next, so a baseline made on a
+// developer box fails on the build agent over antialiasing alone - measured across a full Agentino run
+// on both: 2 differing pixels on a page holding no machine-specific content, 4-21 raw pixels elsewhere.
+// This budget sits well above that, which is a deliberate trade: a real change of the same order passes
+// unnoticed (a drifting build number in a table cell measured 62px). Anything larger still fails - a
+// machine name in a column was 1161px, a mask sized to its content ~5300px. Non-deterministic CONTENT
+// belongs in a mask, never in this budget.
+const MAX_DIFF_PIXELS = 100;
+
+// Per-pixel colour tolerance, and the right knob for cross-machine rasterisation: antialiasing is
+// MANY pixels differing by almost nothing, so raising this drops them out of the count entirely,
+// whereas MAX_DIFF_PIXELS would let a few pixels differ by any amount at all. Measured on one
+// icon-dense page across two machines: 18224 pixels differ at all, but the median difference is 1 of
+// 255 and only a single pixel exceeds 95. At 0.05 that still counted 105 and failed the shot; 0.2 -
+// Playwright's own default, which this kit had tightened - leaves a handful. Real changes are not
+// affected: dark text on white differs by 200+, well beyond any threshold.
+const THRESHOLD = 0.2;
+
 /**
  * Compare the current page against a stored baseline. `name` is the logical snapshot name; the
  * per-user directory and platform suffix are applied by snapshotPathTemplate in playwright.config.js.
@@ -29,9 +47,9 @@ async function checkScreenshot(page, name, mask) {
     for (const m of masks) handles.push(await addMask(page, m));
 
     await waitForStable(page, SCREENSHOT_SETTLE);
-    // maxDiffPixels: 0 - every pixel matches or the shot fails; non-deterministic content gets a mask
-    // instead. threshold still absorbs sub-pixel colour variation.
-    await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true, threshold: 0.05, maxDiffPixels: 0 });
+    // MAX_DIFF_PIXELS absorbs cross-machine font antialiasing and nothing else; non-deterministic
+    // CONTENT still gets a mask, never this budget. THRESHOLD handles the rasterisation noise.
+    await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true, threshold: THRESHOLD, maxDiffPixels: MAX_DIFF_PIXELS });
   } finally {
     // Masks are injected DOM nodes; remove them so a failure doesn't leave bars over later screenshots.
     for (const h of handles) await removeMask(page, h).catch(() => {});
@@ -100,7 +118,7 @@ async function checkElementScreenshot(page, path, name, mask) {
     await waitForStable(page, SCREENSHOT_SETTLE);
     const locator = dom.byPath(page, path);
     await locator.waitFor({ state: 'visible' });
-    await expect(locator).toHaveScreenshot(`${name}.png`, { threshold: 0.05, maxDiffPixels: 0 });
+    await expect(locator).toHaveScreenshot(`${name}.png`, { threshold: THRESHOLD, maxDiffPixels: MAX_DIFF_PIXELS });
   } finally {
     for (const h of handles) await removeMask(page, h).catch(() => {});
   }
@@ -125,6 +143,12 @@ async function addMask(page, maskParams) {
   if (!rect) throw new Error('mask must specify either { path } or { x, y, width, height }');
 
   const pad = maskParams.padding || 0;
+  // fixedWidth/fixedHeight pin the mask to a size that is the same on every run, unlike rect.width/
+  // height which is only as wide as the masked element's CURRENT content (e.g. a text label with no
+  // explicit width). A tight mask bakes in whatever size happened to be true when the baseline was
+  // captured, so a later run whose content renders a different width leaves a boundary sliver exposed.
+  const width = maskParams.fixedWidth !== undefined ? maskParams.fixedWidth : rect.width + pad * 2;
+  const height = maskParams.fixedHeight !== undefined ? maskParams.fixedHeight : rect.height + pad * 2;
   const id = `pw-mask-${++maskSeq}`;
   await page.evaluate(
     ({ id, x, y, width, height }) => {
@@ -142,7 +166,7 @@ async function addMask(page, maskParams) {
       mask.setAttribute('data-mask-id', id);
       document.body.appendChild(mask);
     },
-    { id, x: rect.x - pad, y: rect.y - pad, width: rect.width + pad * 2, height: rect.height + pad * 2 }
+    { id, x: rect.x - pad, y: rect.y - pad, width, height }
   );
   return id;
 }
@@ -160,15 +184,18 @@ async function removeMask(page, id) {
  * @param {import('@playwright/test').Page} page
  * @param {string} objectNamePrefix
  * @param {number} [padding]
+ * @param {number} [fixedWidth]  pin the mask to this width instead of the element's own (variable)
+ *   rendered width - needed for content whose text width isn't stable run to run (e.g. an unpadded
+ *   day-of-month), so the mask doesn't leave a different-sized sliver exposed each time.
  */
-async function masksForPrefix(page, objectNamePrefix, padding = 3) {
+async function masksForPrefix(page, objectNamePrefix, padding = 3, fixedWidth) {
   const rects = await page.evaluate((prefix) => {
     return Array.from(document.querySelectorAll(`[objectName^="${prefix}"][visible]`))
       .map((el) => el.getBoundingClientRect())
       .filter((r) => r.width > 0 && r.height > 0)
       .map((r) => ({ x: r.x, y: r.y, width: r.width, height: r.height }));
   }, objectNamePrefix);
-  return rects.map((r) => ({ ...r, padding }));
+  return rects.map((r) => ({ ...r, padding, ...(fixedWidth !== undefined ? { fixedWidth } : {}) }));
 }
 
 module.exports = {
