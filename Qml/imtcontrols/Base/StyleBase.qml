@@ -32,10 +32,13 @@ StyleComponents {
 	property string language;//deprecated?
 
 	//Font properties
-	property string mainFontSource: "../../../Fonts/Ubuntu-Light.ttf";
-	property string boldFontSource: "../../../Fonts/Ubuntu-Medium.ttf";
-	property string fontFamily: "Segoe UI";
-	property string fontFamilyBold: "Segoe UI";
+	property string mainFontSource: "../../../Fonts/MonaSans-Regular.ttf";
+	property string boldFontSource: "../../../Fonts/MonaSans-SemiBold.ttf";
+	// Bound to the loader, not a literal: native Qt reports the font's own family
+	// name while the web build derives it from the file name, so no single string
+	// is right on both. Falls back to Segoe UI until the font is loaded.
+	property string fontFamily: mainFont.name !== "" ? mainFont.name : "Segoe UI";
+	property string fontFamilyBold: boldFont.name !== "" ? boldFont.name : "Segoe UI";
 	property string fontFamilyMono: "Consolas";
 
 	property alias mainFontLoader: mainFont;
