@@ -530,7 +530,7 @@ Item {
 		ServerNoConnectionView {
 			z: 5;
 			anchors.fill: parent;
-			anchors.topMargin: thumbnailDecorator.topPanel.height;
+			anchors.topMargin: thumbnailDecorator.topPanel ? thumbnailDecorator.topPanel.height : 0;
 			loadingVisible: internal.loadingVisible;
 			text: internal.errorMessage;
 		}

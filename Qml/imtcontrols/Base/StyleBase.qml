@@ -235,6 +235,9 @@ StyleComponents {
 
 	property int menuPanelMinWidth: 2 * marginL + menuPanelIconSize;
 	property int menuPanelWidth: sizeHintXXS;
+	// The rail carries the product name and the account row, so it is given more
+	// room than the plain list of pages next to a TopPanel.
+	property int menuPanelRailWidth: 264;
 	property int menuPanelAutoCollapseWidth: sizeHintXXL;
 	//Upper bound for centered, readability-limited page content (lists, forms).
 	property int contentWidthMax: 1000;
@@ -374,6 +377,11 @@ StyleComponents {
 	property real maximumFlickVelocity: 75
 	property bool enableHoverEffect: true
 	property bool enableMenuPanelCollapse: true
+
+	// Applications built on TopPanel keep it. Turned off, the shell drops the top
+	// bar and the navigation rail carries the brand, the global search and the
+	// account controls instead.
+	property bool enableTopPanel: true
 
 
 	function getIconPath(iconName, state, mode, extention /* = '.svg'*/){

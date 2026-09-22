@@ -11,4 +11,6 @@ ClientStyle {
 
 	sizePanelsHeight: 50;
 
+	enableTopPanel: false;
+
 }
