@@ -54,7 +54,7 @@ class DoubleValidator extends QtObject {
 
         let decimals = str.indexOf(decimalPoint) >= 0 ? str.split(decimalPoint)[1] : []
 
-        return (this.bottom <= value && top >= value) && decimals.length <= decimals
+        return (this.bottom <= value && this.top >= value) && decimals.length <= this.decimals
     }
 
     hasPartialMatch(str){
@@ -63,7 +63,7 @@ class DoubleValidator extends QtObject {
         let locale = this.locale.replaceAll('_', '-')
         let decimalPoint = QtFunctions.locale().decimalPoint
 
-        if(this.bottom < 0 || top < 0){
+        if(this.bottom < 0 || this.top < 0){
             if(str === '-') return true
         }
 
@@ -73,7 +73,7 @@ class DoubleValidator extends QtObject {
         let value = Number(str.replaceAll(decimalPoint,'.'))
         if(isNaN(value)) return false
         let decimals = str.indexOf(decimalPoint) >= 0 ? str.split(decimalPoint)[1] : []
-        return decimals.length <= decimals
+        return decimals.length <= this.decimals
     }
 }
 
