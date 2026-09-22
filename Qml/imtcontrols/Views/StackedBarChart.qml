@@ -238,7 +238,7 @@ Item{
 				Text{
 					id: labelText
 					text: modelData.label + " (" + modelData.total + ")"
-					color: chart.legendClickable ? "#0b5ed7":chart.textColor
+					color: chart.legendClickable ? Style.linkColor:chart.textColor
 					font.pixelSize: Style.fontSizeS
 					anchors.verticalCenter: parent.verticalCenter
 

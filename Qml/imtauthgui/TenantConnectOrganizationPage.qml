@@ -426,7 +426,7 @@ ViewBase {
 							width: approveBtnText.contentWidth + Style.marginL * 2
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: connectPage.processingRequestId === modelData.id ? Style.inactiveTextColor : "#3FB950"
+							color: connectPage.processingRequestId === modelData.id ? Style.inactiveTextColor : Style.successColor
 
 							Text {
 								id: approveBtnText
@@ -456,7 +456,7 @@ ViewBase {
 							width: rejectBtnText.contentWidth + Style.marginL * 2
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: connectPage.processingRequestId === modelData.id ? Style.inactiveTextColor : "#DA3633"
+							color: connectPage.processingRequestId === modelData.id ? Style.inactiveTextColor : Style.dangerColor
 
 							Text {
 								id: rejectBtnText
@@ -690,7 +690,7 @@ ViewBase {
 							width: removeBtnText.contentWidth + Style.marginL * 2
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: "#DA3633"
+							color: Style.dangerColor
 
 							Text {
 								id: removeBtnText

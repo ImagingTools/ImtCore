@@ -39,6 +39,18 @@ DecoratorBase {
 	property bool enabled: baseElement ? baseElement.enabled : false;
 	property bool isMenuButton: (!baseElement || baseElement.isMenuButton == undefined) ? false : baseElement.isMenuButton;
 
+	// "default" | "primary" | "danger": a filled, accent-colored button for the
+	// one affirmative or destructive action on a screen.
+	property string variant: (!baseElement || baseElement.variant == undefined) ? "default" : baseElement.variant;
+	property bool isPrimary: commonButtonDecorator.variant === "primary";
+	property bool isDanger: commonButtonDecorator.variant === "danger";
+
+	property string variantColor: commonButtonDecorator.isPrimary ? Style.buttonPrimaryColor : commonButtonDecorator.isDanger ? Style.buttonDangerColor : Style.buttonColor;
+	property string variantHoverColor: commonButtonDecorator.isPrimary ? Style.buttonPrimaryHoverColor : commonButtonDecorator.isDanger ? Style.buttonDangerHoverColor : Style.buttonHoverColor;
+	property string variantPressedColor: commonButtonDecorator.isPrimary ? Style.buttonPrimaryPressedColor : commonButtonDecorator.isDanger ? Style.buttonDangerPressedColor : Style.buttonPressedColor;
+	property string variantBorderColor: commonButtonDecorator.isPrimary ? Style.buttonPrimaryBorderColor : commonButtonDecorator.isDanger ? Style.buttonDangerBorderColor : Style.buttonBorderColor;
+	property string variantTextColor: commonButtonDecorator.isPrimary ? Style.buttonPrimaryTextColor : commonButtonDecorator.isDanger ? Style.buttonDangerTextColor : Style.buttonTextColor;
+
 	signal mouseEntered(real mouseX, real mouseY);
 	signal mouseExited(real mouseX, real mouseY);
 	signal mousePositionChanged(real mouseX, real mouseY);
@@ -117,13 +129,23 @@ DecoratorBase {
 		color: !commonButtonDecorator.baseElement ? "transparent" :
 													!commonButtonDecorator.baseElement.enabled ?
 														Style.buttonInactiveColor : commonButtonDecorator.baseElement.down || commonButtonDecorator.baseElement.checked ?
-															Style.buttonPressedColor : commonButtonDecorator.baseElement.hovered ?
-																Style.buttonHoverColor : Style.buttonColor
+															commonButtonDecorator.variantPressedColor : commonButtonDecorator.baseElement.hovered ?
+																commonButtonDecorator.variantHoverColor : commonButtonDecorator.variantColor
 		border.width: Style.buttonBorderWidth
 		border.color: !commonButtonDecorator.baseElement ? "transparent" :
 														   !commonButtonDecorator.baseElement.enabled ? Style.buttonBorderInactiveColor :
-														   commonButtonDecorator.baseElement.focus ? Style.buttonBorderFocusColor :
-																									 Style.buttonBorderColor
+																									 commonButtonDecorator.variantBorderColor
+	}
+
+	Rectangle {
+		id: focusRing
+
+		anchors.fill: parent
+		radius: Style.buttonRadius
+		color: "transparent"
+		border.width: Style.focusRingWidth
+		border.color: Style.focusRingColor
+		visible: commonButtonDecorator.baseElement ? commonButtonDecorator.baseElement.enabled && commonButtonDecorator.baseElement.focus : false
 	}
 
 	Item {
@@ -188,7 +210,7 @@ DecoratorBase {
 
 				width: parent.width;
 
-				color: !commonButtonDecorator.baseElement ? "transparent" : (commonButtonDecorator.baseElement.font && commonButtonDecorator.baseElement.font.color !== "") ? commonButtonDecorator.baseElement.font.color : commonButtonDecorator.baseElement.enabled ? Style.buttonTextColor : Style.buttonInactiveTextColor
+				color: !commonButtonDecorator.baseElement ? "transparent" : (commonButtonDecorator.baseElement.font && commonButtonDecorator.baseElement.font.color !== "") ? commonButtonDecorator.baseElement.font.color : commonButtonDecorator.baseElement.enabled ? commonButtonDecorator.variantTextColor : Style.buttonInactiveTextColor
 
 				font.pixelSize: commonButtonDecorator.fontSize;
 				font.family: commonButtonDecorator.fontFamily;

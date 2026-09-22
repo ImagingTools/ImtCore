@@ -17,9 +17,9 @@ Rectangle {
 	property string labelName: ""
 
 	readonly property var _colorMap: ({
-		"status":      ["#1a7f37", "#8957e5"],
-		"priority":    ["#4CAF50", "#FF9800", "#F44336", "#9C27B0"],
-		"stateReason": ["#9E9E9E", "#8957e5", "#9E9E9E", "#2196F3"]
+		"status":      [Style.successColor, Style.doneColor],
+		"priority":    [Style.successColor, Style.attentionColor, Style.severeColor, Style.dangerColor],
+		"stateReason": [Style.neutralEmphasisColor, Style.doneColor, Style.neutralEmphasisColor, Style.imaginToolsAccentColor]
 	})
 
 	readonly property var _labelMap: ({

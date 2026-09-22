@@ -274,7 +274,7 @@ RemoteCollectionView {
 							width: acceptBtnLabel.contentWidth + 2 * Style.marginL
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: "#3FB950"
+							color: Style.successColor
 
 							Text {
 								id: acceptBtnLabel
@@ -300,7 +300,7 @@ RemoteCollectionView {
 							width: rejectBtnLabel.contentWidth + 2 * Style.marginL
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: "#DA3633"
+							color: Style.dangerColor
 
 							Text {
 								id: rejectBtnLabel
@@ -390,7 +390,7 @@ RemoteCollectionView {
 			onReused: {
 				var val = isActiveDelegate.getValue()
 				isActiveLabel.text = val ? qsTr("Active") : qsTr("Inactive")
-				isActiveIndicator.color = val ? "#3FB950" : "#8C95A6"
+				isActiveIndicator.color = val ? Style.successColor : Style.neutralEmphasisColor
 			}
 
 			Row {
@@ -405,7 +405,7 @@ RemoteCollectionView {
 					width: 10
 					height: 10
 					radius: width / 2
-					color: "#8C95A6"
+					color: Style.neutralEmphasisColor
 				}
 
 				Text {
