@@ -223,7 +223,7 @@ Rectangle {
 					width: Style.buttonWidthM
 					height: Style.buttonHeightM
 					radius: Style.radiusS
-					color: titleInput.text.trim().length > 0 ? "#1a7f37" : Style.buttonInactiveColor
+					color: titleInput.text.trim().length > 0 ? Style.successColor : Style.buttonInactiveColor
 
 					Text {
 						anchors.centerIn: parent

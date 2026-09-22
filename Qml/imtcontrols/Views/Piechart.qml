@@ -160,7 +160,7 @@ Item{
 					anchors.verticalCenter: parent.verticalCenter
 					verticalAlignment: Text.AlignVCenter
 					text: modelData.label
-					color: pieChart.legendClickable ? "#0b5ed7": Style.textColor
+					color: pieChart.legendClickable ? Style.linkColor: Style.textColor
 					font.pixelSize: Style.fontSizeS
 					elide: Text.ElideRight
 
