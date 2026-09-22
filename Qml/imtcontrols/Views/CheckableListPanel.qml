@@ -13,6 +13,7 @@ import imtcontrols 1.0
 // so the owner keeps full control over what a row means.
 FocusScope {
 	id: root
+	objectName: "CheckableListPanel"
 
 	// Keyboard-reachable like the table it sits next to: arrows move the cursor,
 	// Space ticks, Home/End and the page keys jump.
