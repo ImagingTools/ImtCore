@@ -433,7 +433,7 @@ ViewBase {
 								anchors.centerIn: parent
 								text: connectPage.processingRequestId === modelData.id ? qsTr("Approving...") : qsTr("Approve")
 								font.pixelSize: Style.fontSizeS
-								color: "#FFFFFF"
+								color: Style.highlightedTextColor
 							}
 
 							MouseArea {
@@ -463,7 +463,7 @@ ViewBase {
 								anchors.centerIn: parent
 								text: connectPage.processingRequestId === modelData.id ? qsTr("Rejecting...") : qsTr("Reject")
 								font.pixelSize: Style.fontSizeS
-								color: "#FFFFFF"
+								color: Style.highlightedTextColor
 							}
 
 							MouseArea {
@@ -582,7 +582,7 @@ ViewBase {
 								anchors.centerIn: parent
 								text: qsTr("Cancel")
 								font.pixelSize: Style.fontSizeS
-								color: "#FFFFFF"
+								color: Style.highlightedTextColor
 							}
 
 							MouseArea {
@@ -697,7 +697,7 @@ ViewBase {
 								anchors.centerIn: parent
 								text: qsTr("Remove")
 								font.pixelSize: Style.fontSizeS
-								color: "#FFFFFF"
+								color: Style.highlightedTextColor
 							}
 
 							MouseArea {

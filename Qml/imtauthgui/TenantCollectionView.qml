@@ -281,7 +281,7 @@ RemoteCollectionView {
 								anchors.centerIn: parent
 								text: qsTr("Accept")
 								font.pixelSize: Style.fontSizeS
-								color: "#FFFFFF"
+								color: Style.highlightedTextColor
 							}
 
 							MouseArea {
@@ -307,7 +307,7 @@ RemoteCollectionView {
 								anchors.centerIn: parent
 								text: qsTr("Reject")
 								font.pixelSize: Style.fontSizeS
-								color: "#FFFFFF"
+								color: Style.highlightedTextColor
 							}
 
 							MouseArea {

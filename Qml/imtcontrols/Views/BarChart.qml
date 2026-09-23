@@ -164,7 +164,7 @@ Item {
 		fontPixelSize:  Style.fontSizeM;
 
 		color: Style.buttonColor;
-		fontColor: "#ffffff";
+		fontColor: Style.highlightedTextColor;
 
 		borderColor: Style.borderColor;
 		property string shownValPos: Math.trunc((barChart.positiveValue + barChart.addToValue)*1000)/1000;

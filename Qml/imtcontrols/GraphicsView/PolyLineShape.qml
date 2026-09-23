@@ -80,8 +80,8 @@ BoundingBox {
 				ctx.beginPath()
 
 				if(invalidPointIndexArr.indexOf(i) > -1){
-					ctx.strokeStyle = "#ff0000"
-					ctx.fillStyle = "#ff0000"
+					ctx.strokeStyle = Style.dangerColor
+					ctx.fillStyle = Style.dangerColor
 				}
 				else if(isSelected){
 					ctx.strokeStyle = DesignScheme.selectionColor
@@ -128,7 +128,7 @@ BoundingBox {
 				DesignScheme.drawEditPoint(ctx, point)
 			}
 			else {
-				DesignScheme.drawEditPoint(ctx, point, "#ff0000")
+				DesignScheme.drawEditPoint(ctx, point, Style.dangerColor)
 			}
 		}
 	}
