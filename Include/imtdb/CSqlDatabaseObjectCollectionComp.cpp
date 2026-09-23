@@ -615,9 +615,11 @@ imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObje
 
 	const QByteArray driverId = m_dbEngineCompPtr->GetDatabaseDriverId();
 	const bool isSQLite = (driverId == "QSQLITE");
+	const bool isDuckDb = driverId.compare(QByteArrayLiteral("DUCKDB"), Qt::CaseInsensitive) == 0;
+	const bool usesLimitOffset = isSQLite || isDuckDb;
 
 	if (count > 0){
-		if (isSQLite){
+		if (usesLimitOffset){
 			queryWithTotalCount += QStringLiteral(" LIMIT %1 OFFSET %2")
 									.arg(QString::number(count), QString::number(qMax(0, offset)));
 		}
@@ -626,7 +628,7 @@ imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObje
 									.arg(QString::number(qMax(0, offset)), QString::number(count));
 		}
 	}
-	else if (offset > 0 && isSQLite){
+	else if (offset > 0 && usesLimitOffset){
 		queryWithTotalCount += QStringLiteral(" LIMIT -1 OFFSET %1")
 								.arg(offset);
 	}
