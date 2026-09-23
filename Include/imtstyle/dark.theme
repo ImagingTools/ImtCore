@@ -49,6 +49,12 @@
 		"ButtonDanger": "#da3633",
 		"ButtonDangerHover": "#b62324",
 		"ButtonDangerPressed": "#8e1519",
+		"TopPanelBackground": "#151b23",
+		"MenuPanelBackground": "#151b23",
+		"MenuPanelItemSelected": "#1a656c76",
+		"MenuPanelItemHover": "#33656c76",
+		"OverlayBorder": "#b33d444d",
+		"OverlayBackdrop": "#212830",
 		"EarthbornBugle": "#0d1117",
 		"PopupErrorBg": "#25171c",
 		"PopupWarningBg": "#272115",
@@ -153,7 +159,14 @@
 			"ButtonPrimaryPressed": "ButtonPrimaryPressed",
 			"ButtonDanger": "ButtonDanger",
 			"ButtonDangerHover": "ButtonDangerHover",
-			"ButtonDangerPressed": "ButtonDangerPressed"
+			"ButtonDangerPressed": "ButtonDangerPressed",
+			"TopPanelBackground": "TopPanelBackground",
+			"TopPanelBorder": "LightGray 4",
+			"MenuPanelBackground": "MenuPanelBackground",
+			"MenuPanelItemSelected": "MenuPanelItemSelected",
+			"MenuPanelItemHover": "MenuPanelItemHover",
+			"OverlayBorder": "OverlayBorder",
+			"OverlayBackground": "OverlayBackdrop"
 		},
 		"InactiveColors": {
 			"Background": "GrayBlue",

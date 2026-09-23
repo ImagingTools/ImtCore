@@ -76,8 +76,8 @@ DecoratorBase {
 		width: (!leftPanelElement.panel ? parent.width : leftPanelElement.panel.width) - 2 * Style.marginS;
 
 		radius: Style.marginS;
-		color: leftPanelElement.isSelected ? Style.selectedColor
-			: leftPanelElement.isHighlighted ? Style.alternateBaseColor : "transparent";
+		color: leftPanelElement.isSelected ? Style.menuPanelItemSelectedColor
+			: leftPanelElement.isHighlighted ? Style.menuPanelItemHoverColor : "transparent";
 	}
 
 	Image {

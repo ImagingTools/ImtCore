@@ -58,6 +58,8 @@ DecoratorBase {
 		height: visible ? popupMenuListView.height + 2 * Style.marginXS : false;
 
 		color: !root.baseElement ? Style.baseColor : root.baseElement.color;//Style.baseColor;
+		border.color: Style.overlayBorderColor;
+		border.width: 1;
 
 		visible: popupMenuListView.count > 0;
 

@@ -273,7 +273,9 @@ StyleComponents {
 	property string firstColor: "#0969da";
 	property string secondColor: "#9a6700";
 	property string firstColorHighlight: "#ddf4ff";
-	property string colorMenuPanel: baseColor;
+	// Kept as an alias so styles that still assign it keep working; it used to
+	// hold its own value and drift away from menuPanelBackgroundColor.
+	property string colorMenuPanel: menuPanelBackgroundColor;
 
 		//error
 	property string errorColor: errorTextColor
@@ -329,10 +331,26 @@ StyleComponents {
 		//background
 	property string backgroundColor: "#f6f8fa";
 	property string backgroundColor2: "#ffffff";
-	property string menuPanelBackgroundColor: "#f6f8fa";
+
+		//chrome: left menu panel (GitHub sidebar / NavList). Inset as a card on
+		//the page canvas, so it takes the elevated surface rather than the muted
+		//one; selected and hovered rows are neutral washes and the accent is
+		//carried by the bar alone.
+	property string menuPanelBackgroundColor: "#ffffff";
+	property string menuPanelItemSelectedColor: "#26818b98";
+	property string menuPanelItemHoverColor: "#1a818b98";
+
+		//chrome: top panel. GitHub's own header is a dark bar, but ours carries
+		//theme-colored icons that would vanish on one, so the panel stays on the
+		//page surface and is separated by a divider instead.
+	property string topPanelBackgroundColor: "#ffffff";
+	property string topPanelBorderColor: "#d1d9e0";
 
 	property string dialogBackgroundColor: "#ffffff";
-	property string overlayBackgroundColor: '#000'
+		//chrome: overlays - dialogs, popups, dropdowns. The backdrop is the base
+		//color only; callers apply their own opacity on top of it.
+	property string overlayBackgroundColor: "#c8d1da";
+	property string overlayBorderColor: "#80d1d9e0";
 	property string tabPanelBackgroundColor: backgroundColor;
 
 		//highlight
@@ -694,7 +712,13 @@ StyleComponents {
 			styleContainer.titleColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource);
 			styleContainer.subtitleColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource);
 			styleContainer.placeHolderTextColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource);
-			styleContainer.menuPanelBackgroundColor = styleContainer.getThemeColor("ActiveColors", "Background", dataSource);
+			styleContainer.menuPanelBackgroundColor = styleContainer.getThemeColor("ActiveColors", "MenuPanelBackground", dataSource);
+			styleContainer.menuPanelItemSelectedColor = styleContainer.getThemeColor("ActiveColors", "MenuPanelItemSelected", dataSource);
+			styleContainer.menuPanelItemHoverColor = styleContainer.getThemeColor("ActiveColors", "MenuPanelItemHover", dataSource);
+			styleContainer.topPanelBackgroundColor = styleContainer.getThemeColor("ActiveColors", "TopPanelBackground", dataSource);
+			styleContainer.topPanelBorderColor = styleContainer.getThemeColor("ActiveColors", "TopPanelBorder", dataSource);
+			styleContainer.overlayBackgroundColor = styleContainer.getThemeColor("ActiveColors", "OverlayBackground", dataSource);
+			styleContainer.overlayBorderColor = styleContainer.getThemeColor("ActiveColors", "OverlayBorder", dataSource);
 			styleContainer.borderColor2 = styleContainer.getThemeColor("ActiveColors", "ScrollIndicator", dataSource);
 
 			styleContainer.tableHeaderColor = styleContainer.getThemeColor("ActiveColors", "HeaderSection", dataSource);

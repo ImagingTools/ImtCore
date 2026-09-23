@@ -21,7 +21,7 @@ Rectangle{
 	property string scrollIndicatorColor: "";
 
 	property string selectionColor: Style.selectedColor !== undefined ? Style.selectedColor : "lightsteelblue";
-	property string hoverColor: "lightsteelblue";
+	property string hoverColor: Style.hover;
 	property string selectedTextColor: Style.textColor;
 	property string textColor: Style.textColor;
 

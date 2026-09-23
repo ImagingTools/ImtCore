@@ -79,6 +79,8 @@ DecoratorBase {
         anchors.fill: parent;
 
         color: dialogContainer.baseElement.backgroundColor;
+        border.color: Style.overlayBorderColor;
+        border.width: 1;
         radius: 4;
     }
 

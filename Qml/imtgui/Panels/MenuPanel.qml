@@ -11,7 +11,7 @@ Rectangle {
 
 	clip: false;
 
-	color: Style.baseColor;
+	color: Style.menuPanelBackgroundColor;
 	radius: 0;
 
 	property string textColor: Style.textColor;
