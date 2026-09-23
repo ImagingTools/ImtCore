@@ -94,6 +94,19 @@ public:
 	*/
 	std::unique_ptr<imtdb::IDatabaseEngine> CreateReadConnection() const;
 
+	/**
+		Atomically replaces \a liveTableName with \a shadowTableName using ALTER TABLE ... RENAME
+		inside a single transaction, so readers never observe a half-built table. Used for the
+		"shadow table" full-rebuild strategy: build a replacement table under a temporary name (e.g.
+		via CreateAppender()), then call this to make it live with one atomic rename. \a
+		shadowTableName no longer exists afterwards; if \a liveTableName did not exist yet (first
+		build), it is simply adopted.
+		\return true on success. On failure the transaction is rolled back, so both tables remain as
+				they were before the call; \a errorMessagePtr, if not null, is filled with the error
+				text.
+	*/
+	bool SwapTable(const QString& liveTableName, const QString& shadowTableName, QString* errorMessagePtr = nullptr) const;
+
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

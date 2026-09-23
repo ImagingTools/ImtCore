@@ -238,6 +238,68 @@ std::unique_ptr<imtdb::IDatabaseEngine> CDuckDatabaseEngineComp::CreateReadConne
 }
 
 
+bool CDuckDatabaseEngineComp::SwapTable(const QString& liveTableName, const QString& shadowTableName, QString* errorMessagePtr) const
+{
+	if (!EnsureDatabaseOpen()){
+		if (errorMessagePtr != nullptr){
+			*errorMessagePtr = QStringLiteral("DuckDB database could not be opened");
+		}
+
+		return false;
+	}
+
+	if (!BeginTransaction()){
+		if (errorMessagePtr != nullptr){
+			*errorMessagePtr = QStringLiteral("Unable to begin transaction");
+		}
+
+		return false;
+	}
+
+	QSqlError sqlError;
+	QSqlQuery existsQuery = ExecSqlQuery(
+				QStringLiteral("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '%1')")
+							.arg(liveTableName).toUtf8(),
+				&sqlError);
+
+	const bool liveTableExists = sqlError.type() == QSqlError::NoError && existsQuery.next() && existsQuery.value(0).toBool();
+
+	if (sqlError.type() == QSqlError::NoError && liveTableExists){
+		// Renaming straight over an existing table is not supported, so park the old one under a backup name first.
+		const QString backupTableName = liveTableName + QStringLiteral("__shadow_swap_backup");
+
+		ExecSqlQuery(QStringLiteral("DROP TABLE IF EXISTS \"%1\"").arg(backupTableName).toUtf8(), &sqlError);
+
+		if (sqlError.type() == QSqlError::NoError){
+			ExecSqlQuery(QStringLiteral("ALTER TABLE \"%1\" RENAME TO \"%2\"").arg(liveTableName, backupTableName).toUtf8(), &sqlError);
+		}
+
+		if (sqlError.type() == QSqlError::NoError){
+			ExecSqlQuery(QStringLiteral("ALTER TABLE \"%1\" RENAME TO \"%2\"").arg(shadowTableName, liveTableName).toUtf8(), &sqlError);
+		}
+
+		if (sqlError.type() == QSqlError::NoError){
+			ExecSqlQuery(QStringLiteral("DROP TABLE \"%1\"").arg(backupTableName).toUtf8(), &sqlError);
+		}
+	}
+	else if (sqlError.type() == QSqlError::NoError){
+		ExecSqlQuery(QStringLiteral("ALTER TABLE \"%1\" RENAME TO \"%2\"").arg(shadowTableName, liveTableName).toUtf8(), &sqlError);
+	}
+
+	if (sqlError.type() != QSqlError::NoError){
+		if (errorMessagePtr != nullptr){
+			*errorMessagePtr = sqlError.text();
+		}
+
+		CancelTransaction();
+
+		return false;
+	}
+
+	return FinishTransaction();
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CDuckDatabaseEngineComp::OnComponentCreated()
