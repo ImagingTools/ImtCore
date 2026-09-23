@@ -273,11 +273,13 @@ StyleComponents {
 	//Colors
 		//main
 	property string baseColor: "#ffffff";
-	property string baseColorInverted: "#1f2328";
-	property string mainColor: "#eaeef2";
-	property string firstColor: "#0969da";
-	property string secondColor: "#9a6700";
-	property string firstColorHighlight: "#ddf4ff";
+	// A true inversion of baseColor: near-black on the light theme, near-white
+	// on the dark one. Do not use it as a surface color.
+	property string baseColorInverted: styleContainer.textColor;
+	property string mainColor: styleContainer.neutralSubtleColor;
+	property string firstColor: styleContainer.linkColor;
+	property string secondColor: styleContainer.attentionColor;
+	property string firstColorHighlight: styleContainer.selectedColor;
 	// Kept as an alias so styles that still assign it keep working; it used to
 	// hold its own value and drift away from menuPanelBackgroundColor.
 	property string colorMenuPanel: menuPanelBackgroundColor;
@@ -288,9 +290,9 @@ StyleComponents {
 
 		//accent
 	property string imaginToolsAccentColor: "#0969da"
-	property string positiveAccentColor: "#1a7f37";
-	property string negativeAccentColor: "#d1242f";
-	property string middleAccentColor: "#9a6700";
+	property string positiveAccentColor: styleContainer.successColor;
+	property string negativeAccentColor: styleContainer.dangerColor;
+	property string middleAccentColor: styleContainer.attentionColor;
 
 		//semantic status colors
 	property string successColor: "#1a7f37";
@@ -313,8 +315,8 @@ StyleComponents {
 	property string inactiveTextColor: "#818b98";
 	property string placeHolderTextColor : "#6e7781"
 	property string linkColor: "#0969da";
-	property string selectedLinkFromColor: "#0969da";
-	property string selectedLinkToColor: "#1a7f37";
+	property string selectedLinkFromColor: styleContainer.linkColor;
+	property string selectedLinkToColor: styleContainer.successColor;
 
 		//popup / toast (PopupManager → PopupContainer)
 	property string popupErrorBackgroundColor: "#ffebe9";
@@ -325,7 +327,7 @@ StyleComponents {
 	property string popupWarningAccentColor: secondColor;
 	property string popupSuccessAccentColor: selectedLinkToColor;
 	property string popupInfoAccentColor: linkColor;
-	property string popupCloseHoverColor: "#1A000000";
+	property string popupCloseHoverColor: styleContainer.menuPanelItemHoverColor;
 	property string popupCloseIdleColor: "#00000000";
 	property real popupIconChipOpacity: 0.14;
 
@@ -360,7 +362,7 @@ StyleComponents {
 		//highlight
 	property string highlightBackgroundColor: '#000'
 	property string highlightColor: selectedColor
-	property string highlightDimmerColor: "#eaeef2"
+	property string highlightDimmerColor: styleContainer.neutralSubtleColor
 	property string secondaryHighlightColor: linkColor
 
 		//selected
@@ -422,7 +424,7 @@ StyleComponents {
 	property string alternateBaseColor: "#f6f8fa";
 
 		//simple colors
-	property string grayColor: "#afb8c1";
+	property string grayColor: styleContainer.borderColor2;
 	property string greenColor: "#1a7f37";
 	property string lightBlueColor: "#54aeff";
 
@@ -657,6 +659,17 @@ StyleComponents {
 	function parseStyleTheme(themeType){
 		if (themeType.containsKey("source")){
 			let dataSource = themeType.getData("source");
+
+			// Icons are a resource directory named after the style ("/Light/Icons",
+			// "/Dark/Icons"), so getIconPath() only finds the right set when the
+			// theme name follows the scheme that was just loaded.
+			if (dataSource.containsKey("Style")){
+				let styleModel = dataSource.getData("Style");
+				if (styleModel.containsKey("Name")){
+					styleContainer.theme = styleModel.getData("Name");
+				}
+			}
+
 			styleContainer.borderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", dataSource);
 			styleContainer.baseColor = styleContainer.getThemeColor("ActiveColors", "Base", dataSource);
 			styleContainer.alternateBaseColor = styleContainer.getThemeColor("ActiveColors", "AlternateBase", dataSource);
@@ -713,6 +726,7 @@ StyleComponents {
 			styleContainer.neutralSubtleColor = styleContainer.getThemeColor("ActiveColors", "NeutralSubtle", dataSource);
 
 			styleContainer.linkColor = styleContainer.getThemeColor("ActiveColors", "Link", dataSource);
+			styleContainer.lightBlueColor = styleContainer.getThemeColor("ActiveColors", "BlueLabel", dataSource);
 			styleContainer.titleColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource);
 			styleContainer.subtitleColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource);
 			styleContainer.placeHolderTextColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource);

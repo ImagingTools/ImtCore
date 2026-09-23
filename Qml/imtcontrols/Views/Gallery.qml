@@ -6,7 +6,7 @@ import imtcontrols 1.0
 Rectangle {
     id: gallery;
 
-	color: Style.baseColorInverted;
+	color: Style.shadowColor;
 
     property TreeItemModel model: TreeItemModel{};
     property string nameId: "Source";
@@ -154,7 +154,7 @@ Rectangle {
 
 		z: 20;
 
-		color: Style.baseColorInverted;
+		color: Style.shadowColor;
 
         MouseArea{
             anchors.fill: parent;

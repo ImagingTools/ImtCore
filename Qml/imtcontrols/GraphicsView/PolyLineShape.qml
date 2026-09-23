@@ -8,7 +8,7 @@ import imtcontrols 1.0
 BoundingBox {
 	id: polylineShape;
 
-	property string color: "#000000";
+	property string color: Style.textColor;
 	property string selectionColor: DesignScheme.selectionColor;
 	property var colorList: [];
 	property int lineWidth: 1;

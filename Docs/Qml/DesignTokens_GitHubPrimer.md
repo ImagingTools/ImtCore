@@ -52,6 +52,55 @@ done `#ab7df8`, severe `#db6d28`.
 Note the inversion relative to the old dark theme: `Base` (rows, cards) is now
 **lighter** than `Background` (page canvas), matching Primer's elevation model.
 
+Three palette entries had not followed that inversion and still pointed at the
+page canvas, so the surface they painted came out *darker* than the surface
+under it:
+
+| Key | Was | Now | Why |
+| --- | --- | --- | --- |
+| `Background2` | `#0d1117` | `#151b23` | Cards, table headers, toolbar buttons and the scroll track. Mirrors light, where `Background` is the canvas and `Background2` the surface on top of it. |
+| `Hover` | `#0d1117` | `#212830` | Hover has to move *away* from the surface. On light that means one step down from white; on dark one step up from `#151b23`. |
+| `OverlayBackdrop` | `#212830` | `#010409` | A modal backdrop has to darken what is behind it. At 40 % over the `#0d1117` canvas the old value lightened it instead. |
+
+`YellowLabel` also had the wrong kind of value: light gives it the subtle
+attention *background* `#fff8c5`, dark gave it the attention *foreground*
+`#d29922`. It now takes `AttentionSubtle` (`#272115`).
+
+### Tokens that never reached the dark theme
+
+`parseStyleTheme()` only re-reads the tokens it names, so any token left on a
+literal keeps its **light** value when the dark scheme loads. Fifteen of them
+were in that state. Each is now bound to a token that is theme-driven, chosen
+so the light value is unchanged to the digit:
+
+| Token | Bound to | Light (unchanged) | Dark (was) |
+| --- | --- | --- | --- |
+| `baseColorInverted` | `textColor` | `#1f2328` | `#f0f6fc` (`#1f2328`) |
+| `mainColor` | `neutralSubtleColor` | `#eaeef2` | `#212830` (`#eaeef2`) |
+| `firstColor` | `linkColor` | `#0969da` | `#4493f8` (`#0969da`) |
+| `secondColor` | `attentionColor` | `#9a6700` | `#d29922` (`#9a6700`) |
+| `firstColorHighlight` | `selectedColor` | `#ddf4ff` | `#121d2f` (`#ddf4ff`) |
+| `positiveAccentColor` | `successColor` | `#1a7f37` | `#3fb950` (`#1a7f37`) |
+| `negativeAccentColor` | `dangerColor` | `#d1242f` | `#f85149` (`#d1242f`) |
+| `middleAccentColor` | `attentionColor` | `#9a6700` | `#d29922` (`#9a6700`) |
+| `selectedLinkFromColor` | `linkColor` | `#0969da` | `#4493f8` (`#0969da`) |
+| `selectedLinkToColor` | `successColor` | `#1a7f37` | `#3fb950` (`#1a7f37`) |
+| `popupCloseHoverColor` | `menuPanelItemHoverColor` | `#1a818b98` | `#33656c76` (10 % black) |
+| `highlightDimmerColor` | `neutralSubtleColor` | `#eaeef2` | `#212830` (`#eaeef2`) |
+| `grayColor` | `borderColor2` | `#afb8c1` | `#6e7681` (`#afb8c1`) |
+| `lightBlueColor` | `ActiveColors/BlueLabel` | `#54aeff` | `#1f6feb` (`#54aeff`) |
+
+`popupCloseIdleColor`, `highlightBackgroundColor` and `alternatingColor` stay
+literal on purpose: they are fully transparent or a black dimmer used under an
+`opacity`, and read the same in both themes.
+
+`baseColorInverted` is now a true inversion of `baseColor`, which is what its
+name always promised, so it must not be used as a surface color. Three call
+sites did exactly that and are fixed: `TableBase.borderColorVertical` takes
+`borderColor`, `BarChart.backgroundColor` takes `baseColor` (the patch
+rectangles mask a bar outline against the surface behind the chart) and the
+`Gallery` lightbox backdrop takes `shadowColor`, which is dark on both themes.
+
 ## Chrome components
 
 Resolved from `github/primer/primitives` (functional token sources, references
@@ -247,6 +296,24 @@ the selection is carried by the row wash, the accent bar and the bold label.
 Sizes follow the Octicon grid (16 / 32 / 64, `iconSizeS` / `iconSizeL` /
 `iconSizeXXL`); `menuPanelIconSize` moved from 20 to `iconSizeS`.
 
+### The dark theme was showing the light icon set
+
+The recolored files are written to a resource directory named after the style,
+`/Light/Icons` and `/Dark/Icons`, and `getIconPath()` picks between them with
+`Style.theme`. That property was declared as a constant `"Light"` and nothing
+ever wrote to it - `getDesignScheme()` sends the scheme id to the server and
+`parseStyleTheme()` applies the colors that come back, but neither touched the
+theme name. So the dark scheme repainted every surface and then kept asking for
+the icons cut for a white page: `#59636e` glyphs on the `#0d1117` canvas, a
+contrast ratio of 1.7, which is why they were invisible rather than merely
+dim.
+
+`parseStyleTheme()` now takes the name from the payload itself (`Style/Name`,
+which the parser already requires to match the `.theme` file name and therefore
+the resource directory) and assigns it to `Style.theme`. Both icon sets are
+compiled in - `DesignTokenCreator.cmake` globs every `*.theme` and `rcc`s one
+`qrc_<project><style>.cpp` per style - so nothing else had to change.
+
 ## Button variants
 
 `Button` carries a `variant` property — `"default"`, `"primary"` or `"danger"` —
@@ -295,10 +362,27 @@ notification type - `assignee` stays green (`successSubtleColor`), everything
 else stays blue (`popupInfoBackgroundColor`, Primer accent-subtle) - so the
 meaning of the color is unchanged for the ten applications that inherit it.
 
+A second pass over the named CSS colors, which the hex sweep had missed, closed
+the ones that do not survive a dark background:
+
+| File | Was | Now |
+| --- | --- | --- |
+| `imtchatgui/ChatPanel.qml`, `ChatView.qml`, `MessageInput.qml`, `ChatNotificationBanner.qml`, `ConversationCreateDialog.qml` | `white` | `highlightedTextColor` |
+| `Inputs/Calendar.qml` | `lightgray` | `shadowColor` |
+| `Views/ValueLevelIndicator.qml` | `red`, `lightgray` | `dangerColor`, `borderColor2` |
+| `Views/CustomScrollbar.qml`, `Views/ScrollIndicator.qml` | `lightgray` fallback | `borderColor2` |
+| `GraphicsView/PolyLineShape.qml` | `#000000` | `textColor` |
+
+The chat `white`s were all text on the accent background - an on-emphasis
+foreground, which is what `highlightedTextColor` is for, and `#ffffff` in both
+themes, so nothing moves on the light theme.
+
 Still holding literals, on purpose: `Qml/imt3dgui/` (3D material, light and
-clear colors - a render scene, not UI chrome) and `Base/DesignScheme.qml`
+clear colors - a render scene, not UI chrome), `Base/DesignScheme.qml`
 (a `QtQuick`-only singleton with no `Acf` import, used by the canvas shape
-editors).
+editors), and the modal scrims in `DialogManagerView.qml` and
+`ConversationCreateDialog.qml`, which are a `black` or `gray` wash under an
+`opacity` and read the same on both themes.
 
 ## Not aligned (deliberate)
 
@@ -330,5 +414,11 @@ editors).
 5. Express icon state with the icon's own state file
    (`Icon.Mode.Normal` / `Active` / `Selected` / `Disabled`), not with
    `opacity`.
-6. QML is loaded from `qrc:/qml`, so style edits need an `imtcontrolsqml` /
+6. Check both themes. A token that is not read back in `parseStyleTheme()`,
+   directly or through a binding onto one that is, silently keeps its light
+   value under the dark scheme.
+7. Do not use `baseColorInverted` as a surface color - it inverts with the
+   theme. Backgrounds come from `baseColor`, `backgroundColor`,
+   `backgroundColor2` or `shadowColor`.
+8. QML is loaded from `qrc:/qml`, so style edits need an `imtcontrolsqml` /
    `imtguiqml` resource rebuild before they show up in a running app.

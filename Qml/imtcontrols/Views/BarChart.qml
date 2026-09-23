@@ -24,7 +24,7 @@ Item {
 
 	property string color_positive: Style.positiveAccentColor;
 	property string color_negative: Style.negativeAccentColor;
-	property string backgroundColor: Style.baseColorInverted;
+	property string backgroundColor: Style.baseColor;
 
 	property bool hasTooltip: true;
 	property bool isPositiveTooltip: true;
