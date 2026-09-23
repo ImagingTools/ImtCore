@@ -144,13 +144,17 @@ StyleComponents {
 	property int controlHeightM: 32
 	property int controlHeightS: 24
 
-	//radius
-	property int radiusXXL: 30
-	property int radiusXL: 16
+	//radius - Primer keeps a three step scale: small, medium (the default) and
+	//large. Anything outside it reads as a different design language, so the
+	//wider names are kept as aliases only, for screens and product styles that
+	//already reference them.
 	property int radiusL: 12
 	property int radiusM: 6
-	property int radiusS: 4
-	property int radiusXS: 3
+	property int radiusS: 3
+	//deprecated
+	property int radiusXXL: radiusL
+	property int radiusXL: radiusL
+	property int radiusXS: radiusS
 
 	//spacing
 	property int spacingXXXL: 50
@@ -235,7 +239,8 @@ StyleComponents {
 	//Other sizes
 	property int sizePanelsHeight: 50;
 	property int headerHeight: 50;
-	property int menuPanelIconSize: iconSizeM;
+	//Octicons are drawn on a 16/32/64 grid and the chrome uses the smallest one.
+	property int menuPanelIconSize: iconSizeS;
 
 	property int menuPanelMinWidth: 2 * marginL + menuPanelIconSize;
 	property int menuPanelWidth: sizeHintXXS;
@@ -717,6 +722,7 @@ StyleComponents {
 			styleContainer.topPanelBackgroundColor = styleContainer.getThemeColor("ActiveColors", "TopPanelBackground", dataSource);
 			styleContainer.topPanelBorderColor = styleContainer.getThemeColor("ActiveColors", "TopPanelBorder", dataSource);
 			styleContainer.overlayBackgroundColor = styleContainer.getThemeColor("ActiveColors", "OverlayBackground", dataSource);
+			styleContainer.dialogBackgroundColor = styleContainer.getThemeColor("ActiveColors", "DialogBackground", dataSource);
 			styleContainer.borderColor2 = styleContainer.getThemeColor("ActiveColors", "ScrollIndicator", dataSource);
 
 			styleContainer.tableHeaderColor = styleContainer.getThemeColor("ActiveColors", "HeaderSection", dataSource);

@@ -74,7 +74,7 @@ Rectangle{
 
 		width: treeViewGql.width -10;
 		height: treeViewGql.height -10;
-		radius: 4;
+		radius: Style.radiusM;
 
 		color : treeViewGql.color;
 

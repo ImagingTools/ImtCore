@@ -531,10 +531,8 @@ Rectangle {
 					sourceSize.width: width
 					sourceSize.height: height
 
-					source: menuPanel.collapsed ? "qrc:/" + Style.getIconPath("Icons/Expand", Icon.State.Off, Icon.Mode.Disabled)
-												: "qrc:/" + Style.getIconPath("Icons/Collapse", Icon.State.Off, Icon.Mode.Disabled)
-
-					opacity: menuButtonArea.containsMouse ? 1.0 : Style.opacityHigh
+					source: menuPanel.collapsed ? "qrc:/" + Style.getIconPath("Icons/Expand", Icon.State.Off, menuButtonArea.containsMouse ? Icon.Mode.Active : Icon.Mode.Normal)
+												: "qrc:/" + Style.getIconPath("Icons/Collapse", Icon.State.Off, menuButtonArea.containsMouse ? Icon.Mode.Active : Icon.Mode.Normal)
 				}
 
 				MouseArea {

@@ -434,7 +434,7 @@ Item{
 
 
 		color: drawer.controlColor;
-		radius: 4;
+		radius: Style.radiusM;
 
 		Rectangle{
 			x: drawer.edge == Qt.LeftEdge ? 0 : drawer.edge == Qt.RightEdge ? parent.width - width : drawer.edge == Qt.TopEdge ? 0 : drawer.edge == Qt.BottomEdge ? 0 : 0;

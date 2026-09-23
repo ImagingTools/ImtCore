@@ -91,11 +91,12 @@ DecoratorBase {
 				anchors.centerIn: imagetabDelegate;
 				width: Style.iconSizeM;
 				height: width;
-				source: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.icon !== "" ? "../../../" + Style.getIconPath(tabPanelDecorator.baseElement.icon, "On", "Normal"): "";
+				// The tab you are on, or the one under the pointer, takes the full
+				// strength foreground; the rest stay muted. Swapped, not faded.
+				source: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.icon !== "" ? "../../../" + Style.getIconPath(tabPanelDecorator.baseElement.icon, "On", tabPanelDecorator.isSelected || tabPanelDecorator.isHovered ? "Active" : "Normal"): "";
 				sourceSize.width: width;
 				sourceSize.height: height;
 				fillMode: Image.PreserveAspectFit;
-				opacity: tabPanelDecorator.isSelected || tabPanelDecorator.isHovered ? 1.0 : Style.opacityHigh;
 			}
 		}
 

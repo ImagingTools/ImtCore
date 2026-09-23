@@ -67,7 +67,6 @@ CSS variables.
 | Top bar surface | `bgColor-default` | `#ffffff` | `#151b23` | `topPanelBackgroundColor` | `TopPanelDecorator.qml` |
 | Top bar divider | `borderColor-default` | `#d1d9e0` | `#3d444d` | `topPanelBorderColor` | `TopPanelDecorator.qml` |
 | Dialog / popup / dropdown surface | `overlay-bgColor` | `#ffffff` | `#151b23` | `dialogBackgroundColor`, `baseColor` | `DialogDecorator.qml`, `PopupDecorator*.qml` |
-| Dialog / popup border | `overlay-borderColor` | `#d1d9e080` | `#3d444db3` | `overlayBorderColor` | `DialogDecorator.qml`, `PopupDecorator*.qml` |
 | Modal backdrop | `overlay-backdrop-bgColor` | `#c8d1da` at 40% | `#212830` at 40% | `overlayBackgroundColor` | `OverlayManager.qml` |
 | Table header | `bgColor-muted` + `fgColor-muted` | `#f6f8fa` / `#59636e` | `#151b23` / `#9198a1` | `tableHeaderColor`, `tableHeaderFontColor` | `TableHeaderDelegate.qml` |
 | Table row border | `borderColor-default` | `#d1d9e0` | `#3d444d` | `tableCellBorderColor` | `TableRowDelegateBase.qml` |
@@ -87,6 +86,29 @@ which would disappear on a dark bar. The panel therefore stays on the page
 surface and is separated by a `borderColor-default` divider. The two tokens
 exist so a product that ships its own light-on-dark icon set can opt into the
 dark header from its `.theme` file alone, without touching QML.
+
+### Dialogs and popups carry no border
+
+Primer does put a 1 px `overlay-borderColor` around an overlay, and it was
+tried here, but it has to be reverted: that token is translucent, and a
+translucent `border.color` cannot survive the JQML web build. `Rectangle.color`
+is converted through `Color.getRGBA()`, which reads Qt's `#AARRGGBB`;
+`border.color` is interpolated straight into a CSS `outline` string
+(`Tools/JQML/v3/QtQml/Border.js`), where the browser reads the same literal as
+`#RRGGBBAA`. `#80d1d9e0` — a 50 % grey in Qt — therefore renders as opaque
+`rgb(128, 209, 217)`, a pale blue ring. Dialogs and popups are separated from
+the page by their shadow and backdrop alone, as before.
+
+**Rule:** never give `border.color` an eight-digit token. Opaque tokens only.
+
+### Dialogs in the dark theme
+
+`dialogBackgroundColor` had no `ActiveColors` entry, so it kept its light
+literal `#ffffff` and dialogs stayed white in the dark theme. It is now mapped
+to the same surface as `Base` in both themes, which also keeps the dialog body
+and the `TopPanelDialog` title strip on one color — needed now that the dialog
+is rounded at 12 px, since a title strip in a different color would show its
+own corners through the rounding.
 
 ### `colorMenuPanel`
 
@@ -138,14 +160,92 @@ lockstep so mixed call sites stay consistent.
 
 | Token | Value | Primer role |
 | --- | --- | --- |
-| `radiusS` / `radiusM` / `radiusL` | 4 / 6 / 12 | small / default / large |
+| `radiusS` / `radiusM` / `radiusL` | 3 / 6 / 12 | `borderRadius-small` / `-medium` (the default) / `-large` |
+| `radiusXS`, `radiusXL`, `radiusXXL` | aliases | deprecated, see below |
 | `buttonRadius`, `textFieldRadius`, `comboBoxRadius` | 6 | control radius |
 | `controlHeightS` / `M` / `L` | 24 / 32 / 40 | xsmall / medium / large control |
 | `buttonHeightXS` / `S` / `M` | 24 / 28 / 32 | xsmall / small / medium button |
 | `menuRowHeight`, `tableHeaderHeight` | 32, 40 | |
+| `focusRingWidth` | 2 | `focus-outline-width` |
+| `buttonBorderWidth` | 1 | `borderWidth-thin` |
 
 The spacing scale (`marginM` = 10, used in ~450 places) was deliberately left
 alone; Primer's 4/8/16/24 grid would be a separate, layout-wide change.
+
+### One radius per kind of object
+
+Primer has exactly three radii — 3, 6 and 12 — plus a full round for pills.
+`radiusS` was 4 and `radiusXL` / `radiusXXL` were 16 and 30, none of which
+appear anywhere in Primer, so the scale now carries the three real values and
+the wider names are aliases (`radiusXS` → `radiusS`, `radiusXL` and `radiusXXL`
+→ `radiusL`). They are kept rather than deleted because a product `Style.qml`
+that reads a missing property fails to load.
+
+Pick by what the object *is*, not by how big it happens to be:
+
+| Kind | Radius | Examples |
+| --- | --- | --- |
+| Floats above the page | `radiusL` (12) | dialogs, popups, dropdown menus, toasts |
+| Interactive control | `radiusM` (6) — or `buttonRadius` / `textFieldRadius` | buttons, inputs, combo boxes, menu and table rows |
+| Small decoration | `radiusS` (3) | chips, swatches, check boxes, cell highlights |
+| Pill or dot | `width / 2` | avatars, status dots, the menu selection bar |
+
+Closed on this pass:
+
+- **Overlays → `radiusL`.** `DialogDecorator` was 4 and `Dialog` / `DialogNew`
+  declared 0; the radius now lives on the dialog, so `MessagePopup` no longer
+  restates it. `PopupMenuDialog` and both popup decorators were 6.
+- **Buttons → `buttonRadius`.** `TextButton` (5), `TextButtonDecorator` (2),
+  `TopButtonDecoratorNew` (4).
+- **Inputs → `textFieldRadius`.** `TextInputWithLabel` (3), `CheckBoxMenu` (3),
+  and `TextArea` / `TextEditCustom` / `CustomTextEdit`, which were square while
+  the single-line fields were rounded.
+- **Rows and panels → `radiusM`.** `MenuPanelButtonDecorator` and
+  `TableHeaderDelegate` were rounding rows on the `marginS` *spacing* step (8);
+  `PopupContainer` was `radiusM + 2`; `TreeViewGql` and `DrawingContainer` 4.
+- **Decorations → `radiusS`.** `CheckBox` (square), `Gallery` (2 and 8),
+  `BasicTreeView` (2).
+
+Left alone: `radius: 1` on the 2 px grip bars in `ToolbarButton` and
+`TableHeaderParamComp` — those are pills, where the radius is half the
+thickness.
+
+Radii inside product screens (`imtdeskgui`, `imtgeogui`, …) were left alone
+where they compute a circle; they are not part of the shared control set.
+
+## Icons
+
+Icon color is not set in QML. `Style.getIconPath()` picks a pre-rendered file
+per state, and those files are produced at build time by
+`imtdesign::CDesignTokenIconProcessorComp`, which substitutes the template
+color (`#D9D9D9`) in `Include/imtgui/Resources/Icons/Template/*.svg` with the
+state color from `IconTemplateList[0].IconColor` in the `.theme`. That map is
+the only lever, and it now follows Primer's foreground roles:
+
+| Icon state | Primer role | Light | Dark |
+| --- | --- | --- | --- |
+| `Normal`, `OffNormal`, `OnNormal` | `fgColor-muted` | `#59636e` | `#9198a1` |
+| `OffActive`, `OnActive` | `fgColor-default` | `#1f2328` | `#f0f6fc` |
+| `OffSelected`, `OnSelected` | `fgColor-accent` | `#0969da` | `#4493f8` |
+| `OffDisabled`, `OnDisabled` | `fgColor-disabled` | `#818b98` | `#656c76` |
+
+Resting icons used to be drawn at `fgColor-default`, which is the near-black
+body-text color; GitHub keeps its icons a step back from the text and brings
+them forward on hover. That is why `Normal` moved to the muted foreground.
+
+**State is told by color, not opacity.** Three chrome components faded resting
+icons with `opacity: Style.opacityHigh`. Stacked on top of the new muted color
+that lands lighter than `fgColor-disabled`, so a resting icon would have read
+as a disabled one. The fades are gone; `TabPanelDecorator` and the `MenuPanel`
+collapse button now swap `Icon.Mode.Normal` ↔ `Icon.Mode.Active` instead. The
+generator emits a file for every state in the map, so both variants exist.
+
+`MenuPanelButtonDecorator` cannot do the same swap: its icon URL arrives
+pre-built on `baseElement.iconSource`, so a selected row's icon stays muted and
+the selection is carried by the row wash, the accent bar and the bold label.
+
+Sizes follow the Octicon grid (16 / 32 / 64, `iconSizeS` / `iconSizeL` /
+`iconSizeXXL`); `menuPanelIconSize` moved from 20 to `iconSizeS`.
 
 ## Button variants
 
@@ -202,7 +302,8 @@ editors).
 
 ## Not aligned (deliberate)
 
-- **Icons.** Still the in-repo SVG set, not Octicons.
+- **Icon artwork.** Still the in-repo SVG set, not Octicons. Only the
+  *colors and sizes* are aligned — see above.
 - **Mona Sans weights.** Only Regular and SemiBold are vendored; Mona Sans
   ships a much wider range, and the variable font is not used because Qt 6.2
   support for variable axes is limited.
@@ -222,5 +323,12 @@ editors).
 2. Use the semantic status tokens (`successColor`, `attentionColor`,
    `dangerColor`, `doneColor`, `severeColor`, `neutralEmphasisColor`) for
    badges and state dots, not raw greens and reds.
-3. QML is loaded from `qrc:/qml`, so style edits need an `imtcontrolsqml` /
+3. Never write a radius literal either. Pick from the table above by what the
+   object is; a new value on the scale needs a reason Primer agrees with.
+4. Keep eight-digit `#AARRGGBB` tokens off `border.color` — they only survive
+   on `Rectangle.color`.
+5. Express icon state with the icon's own state file
+   (`Icon.Mode.Normal` / `Active` / `Selected` / `Disabled`), not with
+   `opacity`.
+6. QML is loaded from `qrc:/qml`, so style edits need an `imtcontrolsqml` /
    `imtguiqml` resource rebuild before they show up in a running app.

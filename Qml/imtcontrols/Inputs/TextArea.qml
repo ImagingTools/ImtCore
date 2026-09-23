@@ -28,7 +28,7 @@ ControlBase {
     property color borderColor:  Style.iconColorOnSelected;
     property string borderColorConst: "";
 
-    property int radius: 0;
+    property int radius: Style.textFieldRadius;
 	property int textSize: Style.fontSizeM;
     property int placeHolderTextSize: textSize;
     property int echoMode: TextInput.Normal;
