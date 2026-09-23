@@ -7,10 +7,60 @@
 
 // ImtCore includes
 #include <imtduckdb/CDuckSqlDriver.h>
+#include <imtduckdb/CDuckValueConverter.h>
 
 
 namespace imtduckdb
 {
+
+
+namespace
+{
+
+
+// Translates Qt's Oracle-style ':name' placeholders into DuckDB's '$name' named-parameter syntax,
+// leaving quoted string/identifier literals and '::type' casts untouched.
+QString ToDuckDbNamedPlaceholders(const QString& query)
+{
+	QString result;
+	result.reserve(query.size());
+
+	QChar closingQuote;
+	const qsizetype queryLength = query.size();
+
+	for (qsizetype i = 0; i < queryLength; ++ i){
+		const QChar ch = query.at(i);
+
+		if (!closingQuote.isNull()){
+			if (ch == closingQuote){
+				closingQuote = QChar();
+			}
+
+			result += ch;
+			continue;
+		}
+
+		const bool isPlaceholderStart = ch == QLatin1Char(':')
+					&& (i == 0 || query.at(i - 1) != QLatin1Char(':'))
+					&& (i + 1 < queryLength && (query.at(i + 1).isLetterOrNumber() || query.at(i + 1) == QLatin1Char('_')));
+
+		if (isPlaceholderStart){
+			result += QLatin1Char('$');
+			continue;
+		}
+
+		if (ch == QLatin1Char('\'') || ch == QLatin1Char('"') || ch == QLatin1Char('`')){
+			closingQuote = ch;
+		}
+
+		result += ch;
+	}
+
+	return result;
+}
+
+
+} // anonymous namespace
 
 
 CDuckSqlResult::CDuckSqlResult(const CDuckSqlDriver* driverPtr, duckdb::Connection& connection)
@@ -33,6 +83,95 @@ bool CDuckSqlResult::reset(const QString& sqlQuery)
 		QString errorText = m_resultPtr ?
 					QString::fromStdString(m_resultPtr->GetError()) :
 					QStringLiteral("DuckDB query could not be executed");
+
+		setLastError(QSqlError(QStringLiteral("Unable to execute statement"), errorText, QSqlError::StatementError));
+
+		return false;
+	}
+
+	setSelect(m_resultPtr->properties.return_type == duckdb::StatementReturnType::QUERY_RESULT);
+	setActive(true);
+
+	return true;
+}
+
+
+bool CDuckSqlResult::prepare(const QString& sqlQuery)
+{
+	// Populates the base class' placeholder-name bookkeeping (used by bindValue()/boundValueNames()).
+	if (!QSqlResult::prepare(sqlQuery)){
+		return false;
+	}
+
+	m_preparedStatementPtr.reset();
+
+	try{
+		m_preparedStatementPtr = m_connection.Prepare(ToDuckDbNamedPlaceholders(sqlQuery).toStdString());
+	}
+	catch (const std::exception& exception){
+		setLastError(QSqlError(QStringLiteral("Unable to prepare statement"), QString::fromUtf8(exception.what()), QSqlError::StatementError));
+
+		return false;
+	}
+
+	if (!m_preparedStatementPtr || m_preparedStatementPtr->HasError()){
+		QString errorText = m_preparedStatementPtr ?
+					QString::fromStdString(m_preparedStatementPtr->GetError()) :
+					QStringLiteral("DuckDB statement could not be prepared");
+
+		setLastError(QSqlError(QStringLiteral("Unable to prepare statement"), errorText, QSqlError::StatementError));
+
+		return false;
+	}
+
+	return true;
+}
+
+
+bool CDuckSqlResult::exec()
+{
+	setActive(false);
+	setAt(QSql::BeforeFirstRow);
+
+	if (!m_preparedStatementPtr){
+		setLastError(QSqlError(QStringLiteral("Unable to execute statement"), QStringLiteral("Statement was not prepared"), QSqlError::StatementError));
+
+		return false;
+	}
+
+	duckdb::case_insensitive_map_t<duckdb::BoundParameterData> namedValues;
+
+	const QStringList names = boundValueNames();
+	const QVariantList values = boundValues();
+	for (qsizetype i = 0; i < names.size() && i < values.size(); ++ i){
+		QString name = names.at(i);
+		if (name.isEmpty()){
+			continue;
+		}
+
+		if (name.startsWith(QLatin1Char(':'))){
+			name.remove(0, 1);
+		}
+
+		namedValues.emplace(name.toStdString(), duckdb::BoundParameterData(CDuckValueConverter::ToDuckDbValue(values.at(i))));
+	}
+
+	try{
+		auto queryResultPtr = m_preparedStatementPtr->Execute(namedValues, false);
+
+		// allow_stream_result is false above, so the concrete result is always materialized.
+		m_resultPtr.reset(static_cast<duckdb::MaterializedQueryResult*>(queryResultPtr.release()));
+	}
+	catch (const std::exception& exception){
+		setLastError(QSqlError(QStringLiteral("Unable to execute statement"), QString::fromUtf8(exception.what()), QSqlError::StatementError));
+
+		return false;
+	}
+
+	if (!m_resultPtr || m_resultPtr->HasError()){
+		QString errorText = m_resultPtr ?
+					QString::fromStdString(m_resultPtr->GetError()) :
+					QStringLiteral("DuckDB statement could not be executed");
 
 		setLastError(QSqlError(QStringLiteral("Unable to execute statement"), errorText, QSqlError::StatementError));
 

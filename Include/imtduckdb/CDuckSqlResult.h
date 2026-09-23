@@ -33,6 +33,8 @@ public:
 protected:
 	// reimplemented (QSqlResult)
 	virtual bool reset(const QString& sqlQuery) override;
+	virtual bool prepare(const QString& sqlQuery) override;
+	virtual bool exec() override;
 	virtual bool fetch(int index) override;
 	virtual bool fetchFirst() override;
 	virtual bool fetchLast() override;
@@ -46,6 +48,7 @@ private:
 
 private:
 	duckdb::Connection& m_connection;
+	std::unique_ptr<duckdb::PreparedStatement> m_preparedStatementPtr;
 	std::unique_ptr<duckdb::MaterializedQueryResult> m_resultPtr;
 };
 
