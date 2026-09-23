@@ -53,7 +53,6 @@
 		"MenuPanelBackground": "#151b23",
 		"MenuPanelItemSelected": "#1a656c76",
 		"MenuPanelItemHover": "#33656c76",
-		"OverlayBorder": "#b33d444d",
 		"OverlayBackdrop": "#212830",
 		"EarthbornBugle": "#0d1117",
 		"PopupErrorBg": "#25171c",
@@ -165,7 +164,6 @@
 			"MenuPanelBackground": "MenuPanelBackground",
 			"MenuPanelItemSelected": "MenuPanelItemSelected",
 			"MenuPanelItemHover": "MenuPanelItemHover",
-			"OverlayBorder": "OverlayBorder",
 			"OverlayBackground": "OverlayBackdrop"
 		},
 		"InactiveColors": {

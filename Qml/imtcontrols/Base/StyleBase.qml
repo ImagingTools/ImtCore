@@ -347,10 +347,9 @@ StyleComponents {
 	property string topPanelBorderColor: "#d1d9e0";
 
 	property string dialogBackgroundColor: "#ffffff";
-		//chrome: overlays - dialogs, popups, dropdowns. The backdrop is the base
-		//color only; callers apply their own opacity on top of it.
+		//chrome: modal backdrop. The base color only; callers apply their own
+		//opacity on top of it.
 	property string overlayBackgroundColor: "#c8d1da";
-	property string overlayBorderColor: "#80d1d9e0";
 	property string tabPanelBackgroundColor: backgroundColor;
 
 		//highlight
@@ -718,7 +717,6 @@ StyleComponents {
 			styleContainer.topPanelBackgroundColor = styleContainer.getThemeColor("ActiveColors", "TopPanelBackground", dataSource);
 			styleContainer.topPanelBorderColor = styleContainer.getThemeColor("ActiveColors", "TopPanelBorder", dataSource);
 			styleContainer.overlayBackgroundColor = styleContainer.getThemeColor("ActiveColors", "OverlayBackground", dataSource);
-			styleContainer.overlayBorderColor = styleContainer.getThemeColor("ActiveColors", "OverlayBorder", dataSource);
 			styleContainer.borderColor2 = styleContainer.getThemeColor("ActiveColors", "ScrollIndicator", dataSource);
 
 			styleContainer.tableHeaderColor = styleContainer.getThemeColor("ActiveColors", "HeaderSection", dataSource);
