@@ -11,7 +11,7 @@ Item{
     property ListModel buttonsModel: ListModel{};
 
     property string backgroundColor: Style.backgroundColor;
-    property int radius: 0;
+    property int radius: Style.radiusL;
 
     property string notClosingButtons: "";
     property bool centered: true;

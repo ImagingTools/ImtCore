@@ -58,7 +58,7 @@ Item {
         width: legendText.width;
         height: 3;
 
-        radius: 5;
+        radius: Style.buttonRadius;
         color: textButton.indicatorColor;
         visible: textButton.active;
     }

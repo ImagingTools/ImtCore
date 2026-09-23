@@ -49,6 +49,5 @@ Dialog {
 		}}
 
 	backgroundColor: Style.baseColor;
-	radius: 2;
 
 }

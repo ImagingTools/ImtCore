@@ -79,7 +79,7 @@ DecoratorBase {
         anchors.fill: parent;
 
         color: dialogContainer.baseElement.backgroundColor;
-        radius: 4;
+        radius: Style.radiusL;
     }
 
     DropShadow {
