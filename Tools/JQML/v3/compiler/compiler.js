@@ -6,6 +6,14 @@ const { SourceMapGenerator, SourceNode } = require('source-map-generator')
 const UglifyJS = require("uglify-js")
 const { Command, Option } = require('commander')
 
+let runtimeBundleCache = null
+function readRuntimeBundle() {
+    if (runtimeBundleCache === null) {
+        runtimeBundleCache = fs.readFileSync(path.resolve(__dirname, '../dist/main.js'), { encoding: 'utf8', flag: 'r' })
+    }
+    return runtimeBundleCache
+}
+
 // for compatibility with web
 global.window = {
     addEventListener: function () { }
@@ -106,19 +114,25 @@ function compile(options){
 
     function envFill(source) {
         let result = source
+        if (result.indexOf('${') < 0) return result
         const keys = Object.keys(env).sort((a, b) => b.length - a.length)
         for (let key of keys) {
-            result = result.replaceAll('${' + key + '}', env[key].replaceAll('\\', '\\\\').trim())
+            let token = '${' + key + '}'
+            if (result.indexOf(token) < 0) continue
+            result = result.replaceAll(token, env[key].replaceAll('\\', '\\\\').trim())
         }
         return result
     }
 
     function envFillPath(filePath) {
         let result = String(filePath || '')
+        if (result.indexOf('${') < 0) return result
         const keys = Object.keys(env).sort((a, b) => b.length - a.length)
         for (let key of keys) {
             if (env[key] == null) continue
-            result = result.replaceAll('${' + key + '}', String(env[key]).trim())
+            let token = '${' + key + '}'
+            if (result.indexOf(token) < 0) continue
+            result = result.replaceAll(token, String(env[key]).trim())
         }
         return result
     }
@@ -183,6 +197,84 @@ function compile(options){
 
     const Enums = {
 
+    }
+
+    // Filled after every module is registered. Until then type lookup must see
+    // each qmldir update, so results are not memoized.
+    let moduleLookupReady = false
+    let moduleResolveCache = new Map()
+    let typeInfoCache = new WeakMap()
+    let typeInstanceCache = new WeakMap()
+    let globalLookupCache = new Map()
+
+    function readJQPath(expr) {
+        if (typeof expr !== 'string' || expr.length < 11 || expr.slice(0, 10) !== 'JQModules.') return undefined
+        let cur = JQModules
+        let start = 9
+        while (start < expr.length) {
+            if (expr.charCodeAt(start) !== 46) return undefined
+            start++
+            let end = start
+            let first = expr.charCodeAt(end)
+            if (!((first >= 65 && first <= 90) || (first >= 97 && first <= 122) || first === 95 || first === 36)) return undefined
+            end++
+            while (end < expr.length) {
+                let code = expr.charCodeAt(end)
+                if ((code >= 65 && code <= 90) || (code >= 97 && code <= 122) || (code >= 48 && code <= 57) || code === 95 || code === 36) {
+                    end++
+                } else {
+                    break
+                }
+            }
+            let key = expr.slice(start, end)
+            if (cur == null || (typeof cur !== 'object' && typeof cur !== 'function')) return undefined
+            cur = cur[key]
+            start = end
+        }
+        return cur
+    }
+
+    function typeInstance(type) {
+        let existing = typeInstanceCache.get(type)
+        if (existing) return existing
+        let obj = new type()
+        typeInstanceCache.set(type, obj)
+        return obj
+    }
+
+    function lookupGlobalName(name) {
+        if (globalLookupCache.has(name)) return globalLookupCache.get(name)
+        let value = eval(name)
+        globalLookupCache.set(name, value)
+        return value
+    }
+
+    function resolveInModules(name) {
+        let recursive = (result, target) => {
+            for (let key in target) {
+                result.push(key)
+                if (name === key) return result.join('.')
+
+                if ((typeof target[key] === 'object' && typeof target[key] !== 'function' && !(target[key] instanceof QmlFile || target[key] instanceof JSFile || target[key] === QtQml.Screen))) {
+                    if (recursive(result, target[key])) {
+                        if (target[key][name] instanceof JSFile || target[key][name] instanceof QmlFile) {
+                            return {
+                                obj: target[key][name],
+                                source: result.join('.'),
+                            }
+                        } else {
+                            return {
+                                obj: readJQPath(result.join('.')),
+                                source: result.join('.'),
+                            }
+                        }
+                    }
+                }
+
+                result.pop()
+            }
+        }
+        return recursive(['JQModules'], JQModules)
     }
 
     class Instruction {
@@ -449,15 +541,11 @@ function compile(options){
                 if (imp.as && imp.as === name) {
                     let path = `JQModules.${imp.path}`
                     if (imp.version !== undefined) {
-                        try {
-                            let imported = eval(path + '_v' + imp.version)
-                            if (imported) return { source: path + '_v' + imp.version, obj: imported }
-                        } catch { }
+                        let imported = readJQPath(path + '_v' + imp.version)
+                        if (imported) return { source: path + '_v' + imp.version, obj: imported }
                     }
-                    try {
-                        let imported = eval(path)
-                        if (imported) return { source: path, obj: imported }
-                    } catch { }
+                    let imported = readJQPath(path)
+                    if (imported) return { source: path, obj: imported }
                 }
             }
             return null
@@ -472,37 +560,15 @@ function compile(options){
             let importedName = this.resolveImportedName(name)
             if (importedName) {
                 return importedName
-            } else {
-                let recursive = (result = [], name, target) => {
-                    for (let key in target) {
-                        result.push(key)
-                        if (name === key) return result.join('.')
-
-                        if ((typeof target[key] === 'object' && typeof target[key] !== 'function' && !(target[key] instanceof QmlFile || target[key] instanceof JSFile || target[key] === QtQml.Screen))) {
-                            if (recursive(result, name, target[key])) {
-                                // console.log(target[key][name])
-                                if (target[key][name] instanceof JSFile || target[key][name] instanceof QmlFile) {
-                                    return {
-                                        obj: target[key][name],
-                                        source: result.join('.'),
-                                    }
-                                } else {
-                                    let type = eval(result.join('.'))
-                                    // console.log(result.join('.'), name)
-                                    return {
-                                        obj: type,
-                                        source: result.join('.'),
-                                    }
-                                }
-
-                            }
-                        }
-
-                        result.pop()
-                    }
-                }
-                return recursive(['JQModules'], name, JQModules)
             }
+
+            if (moduleLookupReady && moduleResolveCache.has(name)) {
+                return moduleResolveCache.get(name)
+            }
+
+            let found = resolveInModules(name)
+            if (moduleLookupReady) moduleResolveCache.set(name, found)
+            return found
         }
 
         resolveInner(name, thisKey) {
@@ -538,18 +604,15 @@ function compile(options){
             if (typeInfo) {
                 if (typeInfo.type instanceof QmlFile) {
                     return typeInfo.type.instruction.resolve(name, thisKey)
-                } else {
-                    let obj = new typeInfo.type()
-                    if (name in typeInfo.type.meta) {
-                        return {
-                            source: `${thisKey}.${name}`,
-                            type: typeInfo.type.meta[name].typeTarget ? typeInfo.type.meta[name].typeTarget : typeInfo.type.meta[name].type,
-                            modifiers: typeInfo.type.meta[name].modifiers,
-                        }
-                    } else if (name in obj) {
-                        return {
-                            source: `${thisKey}.${name}`,
-                        }
+                } else if (name in typeInfo.type.meta) {
+                    return {
+                        source: `${thisKey}.${name}`,
+                        type: typeInfo.type.meta[name].typeTarget ? typeInfo.type.meta[name].typeTarget : typeInfo.type.meta[name].type,
+                        modifiers: typeInfo.type.meta[name].modifiers,
+                    }
+                } else if (name in typeInstance(typeInfo.type)) {
+                    return {
+                        source: `${thisKey}.${name}`,
                     }
                 }
             }
@@ -680,7 +743,7 @@ function compile(options){
                             stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,'JSContext'))
                         } else {
                             try {
-                                let obj = eval(tree[1])
+                                let obj = lookupGlobalName(tree[1])
                                 stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,tree[1]))
                                 stat.dotObj = (typeof obj === 'object' || typeof obj === 'function') ? obj : null
                                 return stat
@@ -716,10 +779,9 @@ function compile(options){
                                 path = stat.dotObj.resolve(tree[2])
                                 if (path) stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
                             } else if (typeof stat.dotObj === "function" && stat.dotObj.meta) {
-                                let obj = new stat.dotObj()
-                                if (tree[2] in obj || tree[2] in stat.dotObj) {
+                                if (tree[2] in stat.dotObj || tree[2] in typeInstance(stat.dotObj)) {
+                                    path = typeInstance(stat.dotObj)
                                     stat.dotObj = null
-                                    path = obj
                                 } else if (tree[2] in stat.dotObj.meta) {
                                     path = this.resolve(stat.dotObj.meta[tree[2]], stat.thisKey)
                                     if (path) stat.dotObj = (typeof path.obj === 'object' || typeof path.obj === 'function') ? path.obj : null
@@ -1194,6 +1256,14 @@ function compile(options){
         getTypeInfo(type) {
             if (!type) type = this.extends
 
+            if (moduleLookupReady) {
+                let byFile = typeInfoCache.get(this.qmlFile)
+                if (byFile) {
+                    let cached = byFile.get(type)
+                    if (cached) return cached
+                }
+            }
+
             let found = false
             let _type = type
             let _path = ''
@@ -1226,20 +1296,15 @@ function compile(options){
                     }
 
                     if (!found && version) {
-                        try {
-                            _type = eval(_path + '_v' + version)
-                            if (_type) {
-                                _path += '_v' + version
-                                found = true
-                                break
-                            }
-                        } catch { }
+                        _type = readJQPath(_path + '_v' + version)
+                        if (_type) {
+                            _path += '_v' + version
+                            found = true
+                            break
+                        }
                     }
                     if (!found) {
-                        let qmlFile = null
-                        try {
-                            qmlFile = eval(_path)
-                        } catch { }
+                        let qmlFile = readJQPath(_path)
 
                         if (qmlFile) {
                             if (version !== undefined && qmlFile instanceof QmlFile) {
@@ -1259,11 +1324,20 @@ function compile(options){
                 while (_typeBase instanceof QmlFile) {
                     _typeBase = _typeBase.instruction.getTypeInfo(_typeBase.instruction.extends).type
                 }
-                return {
+                let info = {
                     path: _path,
                     type: _type,
                     typeBase: _typeBase,
                 }
+                if (moduleLookupReady) {
+                    let byFile = typeInfoCache.get(this.qmlFile)
+                    if (!byFile) {
+                        byFile = new Map()
+                        typeInfoCache.set(this.qmlFile, byFile)
+                    }
+                    byFile.set(type, info)
+                }
+                return info
             } else {
                 throw `${this.qmlFile.fileName}:${this.info.line + 1}:${this.info.col + 1}: error: ${type} is not founded`
             }
@@ -2245,8 +2319,7 @@ function compile(options){
     let fullCode = new SourceNode()
     let compiledFiles = []
 
-    let mainData = fs.readFileSync(path.resolve(__dirname, '../dist/main.js'), { encoding: 'utf8', flag: 'r' })
-    fullCode.add(mainData)
+    let mainData = readRuntimeBundle()
 
     console.time('JQML3: preparation of third party modules')
 
@@ -2341,6 +2414,8 @@ function compile(options){
     }
     console.timeEnd('JQML3: preparation of single files')
 
+    moduleLookupReady = true
+
     console.time('JQML3: compilation of single files')
 
     for (let className in Singletons) {
@@ -2419,52 +2494,39 @@ function compile(options){
 
 
 
+    function emitCompiled(list, deferSingletons) {
+        let index = 0
+        while (index < list.length) {
+            let compiledFile = list[index]
+            if (deferSingletons && compiledFile.file instanceof QmlFile && compiledFile.file.singleton) {
+                singletonList.push(compiledFile)
+                list.splice(index, 1)
+                continue
+            }
+
+            if (compiledFile.file instanceof QmlFile && compiledFile.file.dependencies.size) {
+                let foundAt = -1
+                for (let i = index + 1; i < list.length; i++) {
+                    if (compiledFile.file.dependencies.has(list[i].file)) {
+                        foundAt = i
+                        break
+                    }
+                }
+                if (foundAt >= 0) {
+                    list.splice(index, 1)
+                    list.splice(foundAt, 0, compiledFile)
+                    continue
+                }
+            }
+
+            fullCode.add(compiledFile.code)
+            index++
+        }
+    }
+
     console.time('JQML3: sorting of compiled files')
-    while (compiledFiles.length) {
-        let compiledFile = compiledFiles.shift()
-        if(compiledFile.file instanceof QmlFile && compiledFile.file.singleton){
-            singletonList.push(compiledFile)
-            continue
-        }
-
-        if (compiledFile.file instanceof QmlFile && compiledFile.file.dependencies.size) {
-            let found = false
-            for (let i = 0; i < compiledFiles.length; i++) {
-                if (compiledFile.file.dependencies.has(compiledFiles[i].file)) {
-                    compiledFiles.splice(i + 1, 0, compiledFile)
-                    found = true
-                    break
-                }
-            }
-            if (!found) {
-                fullCode.add(compiledFile.code)
-            }
-        } else {
-            fullCode.add(compiledFile.code)
-        }
-        
-    }
-
-    while (singletonList.length) {
-        let compiledFile = singletonList.shift()
-
-        if (compiledFile.file instanceof QmlFile && compiledFile.file.dependencies.size) {
-            let found = false
-            for (let i = 0; i < singletonList.length; i++) {
-                if (compiledFile.file.dependencies.has(singletonList[i].file)) {
-                    singletonList.splice(i + 1, 0, compiledFile)
-                    found = true
-                    break
-                }
-            }
-            if (!found) {
-                fullCode.add(compiledFile.code)
-            }
-        } else {
-            fullCode.add(compiledFile.code)
-        }
-        
-    }
+    emitCompiled(compiledFiles, true)
+    emitCompiled(singletonList, false)
     console.timeEnd('JQML3: sorting of compiled files')
 
 
@@ -2487,7 +2549,18 @@ function compile(options){
             fullCode.add(`//# sourceMappingURL=${output + '.map'}`)
             let result = fullCode.join('\n').toStringWithSourceMap({ file: output })
 
-            fs.writeFileSync(output, result.code)
+            // dist/main.js has no mappings. Walking it inside SourceNode scans
+            // every character, so it is prepended and the map is shifted instead.
+            let lineOffset = 1
+            for (let i = 0; i < mainData.length; i++) {
+                if (mainData.charCodeAt(i) === 10) lineOffset++
+            }
+            let mappings = result.map._mappings.toArray()
+            for (let i = 0; i < mappings.length; i++) {
+                mappings[i].generatedLine += lineOffset
+            }
+
+            fs.writeFileSync(output, mainData + '\n' + result.code)
 
             fs.writeFileSync(output+'.map', result.map.toString())
 

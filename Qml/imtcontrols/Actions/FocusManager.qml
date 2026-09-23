@@ -26,7 +26,7 @@ QtObject{
 		}
 	}
 
-	Shortcut{
+	property var shortcut: Shortcut {
 		sequence: "Tab"
 		enabled: focusManager.enabled
 		onActivated: {
