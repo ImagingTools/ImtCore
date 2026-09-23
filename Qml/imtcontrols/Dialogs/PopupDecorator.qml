@@ -9,7 +9,7 @@ DecoratorBase {
 	id: root;
 
 	height: bottomContentLoader.y + bottomContentLoader.height;
-	property int radius: !baseElement ? Style.buttonRadius : baseElement.radius;
+	property int radius: !baseElement ? Style.radiusL : baseElement.radius;
 	
 	property int itemHeight: !baseElement ? 0 : baseElement.itemHeight;
 	property int itemWidth: !baseElement ? 0 : baseElement.itemWidth;

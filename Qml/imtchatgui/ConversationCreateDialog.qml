@@ -148,7 +148,7 @@ Rectangle {
 						anchors.centerIn: parent
 						text: qsTr("Create")
 						font.pixelSize: Style.fontSizeS
-						color: "white"
+						color: Style.highlightedTextColor
 						font.bold: true
 					}
 
