@@ -254,6 +254,7 @@ function(jq_compile_web)
 
 	set(INDEX 0)
 	set(DEPEND_LIST)
+	set(TRANSLATION_SRC_DIRS)
 
 	message(VERBOSE "DIRS_COUNT ${DIRS_COUNT}")
 
@@ -261,6 +262,14 @@ function(jq_compile_web)
 		list(GET webdirs ${INDEX} _FOLDER)
 		file(GLOB_RECURSE FOUND_FILES "${_FOLDER}/*.qml")
 		list(APPEND DEPEND_LIST ${FOUND_FILES})
+
+		# QML sources are compiled directly from ${_FOLDER}; a folder is a translation source if it
+		# contains .ts files, regardless of what it (or its destination) is named
+		file(GLOB FOUND_TS_FILES "${_FOLDER}/*.ts")
+		if(FOUND_TS_FILES)
+			list(APPEND TRANSLATION_SRC_DIRS ${_FOLDER})
+		endif()
+
 		math(EXPR INDEX "${INDEX} + 2")
 		set(INDEX ${INDEX})
 	endwhile()
@@ -269,15 +278,19 @@ function(jq_compile_web)
 	list(APPEND webdirs_n ${IMTCOREDIR}/Tools/JQML/v3/dist)
 	list(APPEND webdirs_n ${buildwebdir}/Resources)
 
+	set(TRANSLATIONS_QRC_FILE ${buildwebdir}/Resources/qmlTranslationsWeb.qrc)
+
 	message("PREPARE RESOURCES ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/v3/preparesources.py ${webdirs_n}")
 
 	# HTML build
 	add_custom_command(
 		OUTPUT
 		${buildwebdir}/Resources/index.html
+		${TRANSLATIONS_QRC_FILE}
 		POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
 		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/v3/preparesources.py ${webdirs_n}
+		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/v3/generate_translations_qrc.py ${TRANSLATIONS_QRC_FILE} ${TRANSLATION_SRC_DIRS}
 		WORKING_DIRECTORY ${IMTCOREDIR}/Tools/JQML/v3
 		COMMAND ${CMAKE_COMMAND} -E env ${envvar}
 		TARGETNAME=${TARGETNAME}
@@ -320,10 +333,12 @@ function(jq_compile_web)
 		ARGS
 		-name ${resname}Web
 		${QRC_WEB_FILE}
+		${TRANSLATIONS_QRC_FILE}
 		-o ${QRC_CPP_WEB_FILE}
 		DEPENDS
 		${buildwebdir}/Resources/index.js
 		${buildwebdir}/Resources/index.html
+		${TRANSLATIONS_QRC_FILE}
 		COMMENT
 		"Compile QRC_WEB_FILE"
 	)
