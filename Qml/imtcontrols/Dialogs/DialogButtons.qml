@@ -5,62 +5,61 @@ import imtcontrols 1.0
 import '../Buttons'
 
 Item {
-    id: buttonsDialogContainer;
+	id: buttonsDialogContainer;
 
-    width: rowButtons.width;
+	width: rowButtons.width;
 	height: Style.controlHeightM;
 
-    property alias buttons: buttonsRepeater.model;
-    property int count: buttonsRepeater.count;
+	property alias buttons: buttonsRepeater.model;
+	property int count: buttonsRepeater.count;
 
 	signal buttonClicked(int buttonId);
 
-    function clearButtons(){
-        buttonsRepeater.model = 0;
-    }
+	function clearButtons(){
+		buttonsRepeater.model = 0;
+	}
 
-    function addButton(buttonObj){
-        buttonsRepeater.model.append(buttonObj)
-    }
+	function addButton(buttonObj){
+		buttonsRepeater.model.append(buttonObj)
+	}
 
-    function setButtonState(buttonId, state){
-        for (let i = 0; i < buttonsRepeater.model.count; i++){
-            let id = buttonsRepeater.model.get(i).id;
-            if (id == buttonId){
-                buttonsRepeater.model.setProperty(i, "enabled", state);
-                break;
-            }
-        }
-    }
+	function setButtonState(buttonId, state){
+		for (let i = 0; i < buttonsRepeater.model.count; i++){
+			let id = buttonsRepeater.model.get(i).id;
+			if (id == buttonId){
+				buttonsRepeater.model.setProperty(i, "enabled", state);
+				break;
+			}
+		}
+	}
 
-    function getButtonState(buttonId){
-        for (let i = 0; i < buttonsRepeater.model.count; i++){
-            let id = buttonsRepeater.model.get(i).id;
-            if (id == buttonId){
-                return buttonsRepeater.model.get(i).enabled;
-            }
-        }
+	function getButtonState(buttonId){
+		for (let i = 0; i < buttonsRepeater.model.count; i++){
+			let id = buttonsRepeater.model.get(i).id;
+			if (id == buttonId){
+				return buttonsRepeater.model.get(i).enabled;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    Row {
-        id: rowButtons;
-        height: buttonsDialogContainer.height;
-        spacing: Style.marginM;
+	Row {
+		id: rowButtons;
+		height: buttonsDialogContainer.height;
+		spacing: Style.marginM;
 
-        Repeater {
-            id: buttonsRepeater;
-            model: ListModel {
-            }
+		Repeater {
+			id: buttonsRepeater;
+			model: ListModel {
+			}
 
-            delegate:
-                Button{
-                id: buttonContainer;
-                enabled: model.enabled;
-                focus: model.active !==undefined ? model.active: false;
-				activeFocus: model.active !==undefined ? model.active: false;
-                text: model.name;
+			delegate:
+				Button{
+				id: buttonContainer;
+				enabled: model.enabled;
+				focus: model.active !==undefined ? model.active: false;
+				text: model.name;
 				widthFromDecorator: true;
 				decorator: Component {
 					ButtonDecorator {
@@ -71,18 +70,18 @@ Item {
 						// backgrounds, not a white dialog, and would otherwise render darker than
 						// the dialog chrome behind it.
 						color: !baseElement ? "transparent" :
-							!baseElement.enabled ? Style.alternateBaseColor :
-							baseElement.down || baseElement.checked || baseElement.focus ? Style.selectedColor :
-							baseElement.hovered ? Style.alternateBaseColor :
-							Style.baseColor;
+											  !baseElement.enabled ? Style.alternateBaseColor :
+																	 baseElement.down || baseElement.checked || baseElement.focus ? Style.selectedColor :
+																																	baseElement.hovered ? Style.alternateBaseColor :
+																																						  Style.baseColor;
 					}
 				}
-                onClicked: {
+				onClicked: {
 					let retId = model.id || model.Id || ""
-                    buttonsDialogContainer.buttonClicked(retId);
-                }
-            }//delegate
-        }
-    }
+					buttonsDialogContainer.buttonClicked(retId);
+				}
+			}//delegate
+		}
+	}
 }
 
