@@ -632,6 +632,28 @@ IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentData(
 }
 
 
+IDocumentService::OperationStatus CDocumentServiceBase::ExecuteDocumentMethod(
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			const CDocumentMethod& method)
+{
+	QMutexLocker locker(&m_mutex);
+
+	OperationStatus validationStatus;
+	if (!ValidateInputParams(userId, documentId, validationStatus)){
+		return validationStatus;
+	}
+
+	WorkingDocument& workingDocument = m_userDocuments[userId][documentId];
+
+	if (workingDocument.isLoading){
+		return OS_FAILED;
+	}
+
+	return method(*workingDocument.objectPtr) ? OS_OK : OS_FAILED;
+}
+
+
 IDocumentService::OperationStatus CDocumentServiceBase::GetDocumentUndoManager(
 			const QByteArray& userId,
 			const QByteArray& documentId,

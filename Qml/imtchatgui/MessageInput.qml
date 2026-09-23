@@ -132,7 +132,7 @@ Rectangle {
 					anchors.centerIn: parent
 					text: "➤"
 					font.pixelSize: Style.fontSizeM
-					color: "white"
+					color: Style.highlightedTextColor
 				}
 
 				MouseArea {

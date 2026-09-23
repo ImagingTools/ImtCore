@@ -16,7 +16,7 @@ ControlBase {
 	property alias mouseArea: ma;
 
 	property string borderColor: "";
-	property int radius: 0;
+	property int radius: Style.radiusS;
 	property bool isActive: true;
 	property bool tristate: false;
 

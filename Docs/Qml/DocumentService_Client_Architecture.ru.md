@@ -410,6 +410,11 @@ if (isDirty) setDocumentIsDirty(documentId, true)
 (`onDocumentOpened → createDocumentData`) — повторный вызов безопасен, так как
 `createDocumentData` выходит, если документ уже есть.
 
+Если документ уже известен локально (например, нотификация `DocumentOpened` пришла
+раньше ответа мутации — см. §4.9), `handleDocumentOpened` только обновляет имя,
+`objectId` и флаг «грязности» и **не** эмитит `documentOpened` повторно, чтобы хост
+не создал вторую вкладку. `handleDocumentCreated` устроен симметрично.
+
 5. Хост по `documentOpened` создаёт вкладку → §4.6.
 6. Сервер грузит объект асинхронно и присылает по подписке
    `DocumentDataLoaded` → `setDocumentIsLoading(documentId, false)` → §4.7.
@@ -551,8 +556,22 @@ closeFunc(false)     -> startCloseDocument(documentId)
 
 | Подписка | `gqlCommandId` | Обработка |
 |---|---|---|
-| Документы | `On<CollectionId>DocumentChanged` | `DocumentDataLoaded` → `setDocumentIsLoading(id, false)`; `DocumentClosed` → `documentClosed(id)`; `DocumentRenamed` → `setDocumentName(id, name)`; **в любом случае** эмитится `documentManagerChanged(operation, objectId, documentId, documentName)`. |
+| Документы | `On<CollectionId>DocumentChanged` | `DocumentOpened` → `reflectRemoteDocumentOpened(...)`; `NewDocumentCreated` → `reflectRemoteDocumentCreated(...)`; `DocumentDataLoaded` → `setDocumentIsLoading(id, false)`; `DocumentClosed` → `documentClosed(id)`; `DocumentRenamed` → `setDocumentName(id, name)`; **в любом случае** эмитится `documentManagerChanged(operation, objectId, documentId, documentName)`. |
 | Undo | `On<CollectionId>UndoChanged` | `undoInfoReceived(documentId, undoSteps, redoSteps, isDirty)`. |
+
+Нотификации рассылаются всем подпискам того же пользователя, поэтому **вторая сессия
+того же пользователя полностью отражает работу document service**: документ, открытый
+или созданный в одной сессии, автоматически открывается и во второй
+(`reflectRemoteDocumentOpened` / `reflectRemoteDocumentCreated` →
+`handleDocumentOpened` / `handleDocumentCreated` → `documentOpened` / `documentCreated`
+→ вкладка у хоста), закрытие и переименование отражаются аналогично.
+Документы, уже известные локально, повторно не открываются.
+
+Для этого `DocumentServiceNotification` (SDL) содержит, кроме `documentId` /
+`documentName` / `objectId`, ещё и `objectTypeId` с `hasNameProvider` — без типа
+документа клиент не смог бы создать view. Поля заполняет
+`CCollectionDocumentServicePublisherComp` для событий `NewDocumentCreated` и
+`DocumentOpened`.
 
 `documentManagerChanged` — это широковещательный сигнал, на который реагируют:
 

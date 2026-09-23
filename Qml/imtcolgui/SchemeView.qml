@@ -470,8 +470,8 @@ Rectangle {
 			property string selectedColor: Style.selectedColor
 			property string mainColor: Style.borderColor2
 			property string errorColor: Style.errorColor
-			property string compositeColor: "#bcd2e8";
-			property string compositeSelectedColor: "#1167b1";
+			property string compositeColor: Style.firstColorHighlight;
+			property string compositeSelectedColor: Style.imaginToolsAccentColor;
 			property string selectedLinkFromColor: Style.selectedLinkFromColor
 			property string selectedLinkToColor: Style.selectedLinkToColor
 			property string linkColor: Style.borderColor2

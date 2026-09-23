@@ -24,7 +24,7 @@ Item {
 
     property alias spacing: contentColumn.spacing;
 
-    property int radius: 3;
+    property int radius: Style.textFieldRadius;
 
     signal editingFinished();
 

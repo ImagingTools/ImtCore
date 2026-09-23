@@ -77,8 +77,10 @@ type DocumentServiceNotification {
 	documentId: ID!
 	documentName: String!
 	objectId: ID
+	objectTypeId: ID
 	isDirty: Bool
 	isLoading: Bool
+	hasNameProvider: Bool
 }
 
 type SetDocumentNameInput {

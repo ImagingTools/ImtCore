@@ -257,8 +257,8 @@ Item {
 			enableDefaultDoubleClickEdit: false
 
 			readonly property var ticket: ticketDelegate.modelItem
-			readonly property var statusColors: ({"Open": "#1a7f37", "Closed": "#8957e5"})
-			readonly property var priorityColors: ({"Low": "#3FB950", "Medium": "#D29922", "High": "#DB6D28", "Critical": "#F85149"})
+			readonly property var statusColors: ({"Open": Style.successColor, "Closed": Style.doneColor})
+			readonly property var priorityColors: ({"Low": Style.successColor, "Medium": Style.attentionColor, "High": Style.severeColor, "Critical": Style.dangerColor})
 
 			// Model values are wrappers, not JS strings: used raw as a map key they
 			// never match, so normalize once here.

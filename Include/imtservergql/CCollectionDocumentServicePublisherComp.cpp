@@ -128,6 +128,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentCreated(imtdoc::CEventBa
 
 	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
+	FillNameProviderFlag(notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
 	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::NewDocumentCreated, sdlNotification);
@@ -149,6 +150,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentOpened(imtdoc::CEventBas
 
 	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
+	FillNameProviderFlag(notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
 	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentOpened, sdlNotification);
@@ -336,7 +338,28 @@ void CCollectionDocumentServicePublisherComp::FillSdlNotification(
 	sdlNotification.documentId = notification.documentId;
 	sdlNotification.documentName = notification.name;
 	sdlNotification.objectId = ConvertUrlToObjectId(notification.url);
+	sdlNotification.objectTypeId = notification.typeId;
 	sdlNotification.isDirty = notification.isDirty;
+	sdlNotification.hasNameProvider = notification.hasNameProvider;
+}
+
+
+void CCollectionDocumentServicePublisherComp::FillNameProviderFlag(
+			imtdoc::IDocumentService::DocumentNotification& notification) const
+{
+	if (!m_documentServiceCompPtr.IsValid()){
+		return;
+	}
+
+	const imtdoc::IDocumentService::DocumentList documentList =
+				m_documentServiceCompPtr->GetOpenedDocumentList(notification.userId);
+	for (const imtdoc::IDocumentService::DocumentListItem& documentInfo: documentList){
+		if (documentInfo.documentId == notification.documentId){
+			notification.hasNameProvider = documentInfo.hasNameProvider;
+
+			return;
+		}
+	}
 }
 
 

@@ -548,6 +548,18 @@ QtObject {
 	function handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty){
 		setAutoNamedTypeId(objectTypeId, hasNameProvider)
 		setDocumentName(documentId, documentName)
+
+		// The document may already be known locally, e.g. when the
+		// DocumentOpened subscription notification arrives before the
+		// OpenDocument response. In this case only the state is refreshed,
+		// the documentOpened signal must not be emitted a second time.
+		if (documentIsOpened(documentId)){
+			setDocumentObjectId(documentId, objectId)
+			if (isDirty)
+				setDocumentIsDirty(documentId, true)
+			return
+		}
+
 		__internal.createDocumentData(documentId, objectTypeId, false)
 		setDocumentObjectId(documentId, objectId)
 		setDocumentIsLoading(documentId, true)
@@ -559,6 +571,17 @@ QtObject {
 	function handleDocumentCreated(documentId, objectTypeId, documentName, hasNameProvider, proposedObjectId, isDirty){
 		setAutoNamedTypeId(objectTypeId, hasNameProvider)
 		setDocumentName(documentId, documentName)
+
+		// See handleDocumentOpened(): the NewDocumentCreated notification may
+		// be processed before the CreateNewDocument response.
+		if (documentIsOpened(documentId)){
+			if (proposedObjectId && proposedObjectId !== "")
+				setDocumentObjectId(documentId, proposedObjectId)
+			if (isDirty)
+				setDocumentIsDirty(documentId, true)
+			return
+		}
+
 		__internal.createDocumentData(documentId, objectTypeId, true)
 		if (proposedObjectId && proposedObjectId !== "")
 			setDocumentObjectId(documentId, proposedObjectId)
@@ -566,6 +589,39 @@ QtObject {
 		if (isDirty)
 			setDocumentIsDirty(documentId, true)
 		setDocumentIsLoading(documentId, false)
+	}
+
+	// Applies a DocumentOpened notification received over the subscription, so
+	// that a document opened in another session of the same user is opened here
+	// as well. Documents which are already known locally are ignored.
+	function reflectRemoteDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty){
+		if (!documentId || !objectTypeId){
+			return
+		}
+
+		if (documentIsOpened(documentId)){
+			return
+		}
+
+		let resolvedNameProvider = (hasNameProvider === undefined) ? hasDocumentNameProvider(objectTypeId) : hasNameProvider
+
+		handleDocumentOpened(documentId, objectId || "", objectTypeId, documentName || "", resolvedNameProvider, isDirty === true)
+	}
+
+	// Applies a NewDocumentCreated notification received over the subscription
+	// (symmetric to reflectRemoteDocumentOpened()).
+	function reflectRemoteDocumentCreated(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty){
+		if (!documentId || !objectTypeId){
+			return
+		}
+
+		if (documentIsOpened(documentId)){
+			return
+		}
+
+		let resolvedNameProvider = (hasNameProvider === undefined) ? hasDocumentNameProvider(objectTypeId) : hasNameProvider
+
+		handleDocumentCreated(documentId, objectTypeId, documentName || "", resolvedNameProvider, objectId || "", isDirty === true)
 	}
 
 	function handleSaveDocumentResult(documentId, status, message, documentName){
