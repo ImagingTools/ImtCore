@@ -2,9 +2,16 @@
 #pragma once
 
 
+// STL includes
+#include <memory>
+#include <mutex>
+
 // Qt includes
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
+
+// 3rdParty includes
+#include <duckdb.hpp>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -13,16 +20,7 @@
 // ImtCore includes
 #include <imtdb/IDatabaseEngine.h>
 #include <imtdb/IMigrationController.h>
-
-// imtduckdb includes
 #include <imtduckdb/CDuckSqlDriver.h>
-
-// 3rdParty includes
-#include <duckdb.hpp>
-
-// std includes
-#include <memory>
-#include <mutex>
 
 
 namespace imtduckdb
@@ -60,8 +58,6 @@ public:
 		I_ASSIGN(m_migrationControllerCompPtr, "MigrationController", "Migration controller", false, "MigrationController");
 	I_END_COMPONENT;
 
-	CDuckDatabaseEngineComp();
-
 	// reimplemented (imtdb::IDatabaseEngine)
 	virtual bool BeginTransaction() const override;
 	virtual bool FinishTransaction() const override;
@@ -83,18 +79,15 @@ private:
 		\return \c true if the database is open and ready to use.
 	*/
 	bool EnsureDatabaseOpen() const;
-
 	/**
 		Creates the "Revisions" meta-info table used to track applied migrations, if it does not
 		already exist.
 	*/
 	bool CreateDatabaseMetaInfo() const;
-
 	/**
 		Runs pending migrations through the (optional) MigrationController.
 	*/
 	bool ExecuteDatabasePatches() const;
-
 	/**
 		Reads the current schema revision from the "Revisions" table.
 		\return the highest applied revision, or -1 if none has been set yet.
@@ -108,6 +101,7 @@ private:
 	I_ATTR(QByteArray, m_dbNameAttrPtr);
 	I_REF(imtdb::IMigrationController, m_migrationControllerCompPtr);
 
+private:
 	mutable std::mutex m_connectionMutex;
 	mutable std::unique_ptr<duckdb::DuckDB> m_databasePtr;
 	mutable std::unique_ptr<duckdb::Connection> m_connectionPtr;

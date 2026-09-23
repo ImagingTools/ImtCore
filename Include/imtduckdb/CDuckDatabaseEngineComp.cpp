@@ -5,19 +5,12 @@
 // Qt includes
 #include <QtCore/QFile>
 
-// imtduckdb includes
+// ImtCore includes
 #include <imtduckdb/CDuckSqlResult.h>
 
 
 namespace imtduckdb
 {
-
-
-// public methods
-
-CDuckDatabaseEngineComp::CDuckDatabaseEngineComp()
-{
-}
 
 
 // reimplemented (imtdb::IDatabaseEngine)
@@ -166,7 +159,14 @@ QSqlQuery CDuckDatabaseEngineComp::ExecSqlQuery(
 QSqlQuery CDuckDatabaseEngineComp::ExecSqlQueryFromFile(const QString& filePath, QSqlError* sqlErrorPtr, bool isForwardOnly) const
 {
 	QFile sqlQueryFile(filePath);
-	sqlQueryFile.open(QFile::ReadOnly);
+	if(!sqlQueryFile.open(QFile::ReadOnly)){
+		qCritical() << __FILE__ << __LINE__
+					<< "\n\t| what(): Could not open SQL file"
+					<< "\n\t| File path" << filePath
+					<< "\n\t| Error" << sqlQueryFile.errorString();
+
+		return QSqlQuery();
+	}
 
 	QByteArray queryString = sqlQueryFile.readAll();
 
@@ -183,7 +183,14 @@ QSqlQuery CDuckDatabaseEngineComp::ExecSqlQueryFromFile(
 			bool isForwardOnly) const
 {
 	QFile sqlQueryFile(filePath);
-	sqlQueryFile.open(QFile::ReadOnly);
+	if(!sqlQueryFile.open(QFile::ReadOnly)){
+		qCritical() << __FILE__ << __LINE__
+					<< "\n\t| what(): Could not open SQL file"
+					<< "\n\t| File path" << filePath
+					<< "\n\t| Error" << sqlQueryFile.errorString();
+
+		return QSqlQuery();
+	}
 
 	QByteArray queryString = sqlQueryFile.readAll();
 
@@ -315,7 +322,7 @@ int CDuckDatabaseEngineComp::GetDatabaseVersion() const
 {
 	QSqlError sqlError;
 
-	QSqlQuery queryGetRevision = ExecSqlQuery(QByteArrayLiteral("SELECT * FROM \"Revisions\" ORDER BY Revision DESC LIMIT 1"), &sqlError);
+	QSqlQuery queryGetRevision = ExecSqlQuery(QByteArrayLiteral(R"(SELECT * FROM "Revisions" ORDER BY Revision DESC LIMIT 1)"), &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
 		return -1;
 	}
@@ -341,3 +348,4 @@ QString CDuckDatabaseEngineComp::GetDatabasePath() const
 
 
 } // namespace imtduckdb
+

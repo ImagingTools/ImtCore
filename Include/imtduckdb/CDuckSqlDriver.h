@@ -27,6 +27,11 @@ public:
 
 	// reimplemented (QSqlDriver)
 	virtual bool hasFeature(DriverFeature feature) const override;
+	/**
+		\brief The duckdb::Connection is opened and owned by \sa CDuckDatabaseEngineComp.
+				This driver is never registered with QSqlDatabase, so there is nothing to do here.
+		\return BaseClass::isOpen() - true if the duckdb::Connection is open, false otherwise.
+	*/
 	virtual bool open(
 				const QString& db,
 				const QString& user = QString(),
@@ -45,3 +50,4 @@ private:
 
 
 } // namespace imtduckdb
+

@@ -2,7 +2,7 @@
 #include <imtduckdb/CDuckSqlDriver.h>
 
 
-// imtduckdb includes
+// ImtCore includes
 #include <imtduckdb/CDuckSqlResult.h>
 
 
@@ -23,17 +23,20 @@ bool CDuckSqlDriver::hasFeature(DriverFeature feature) const
 	switch (feature){
 	case QuerySize:
 		return true;
-
 	default:
 		return false;
 	}
 }
 
 
-bool CDuckSqlDriver::open(const QString&, const QString&, const QString&, const QString&, int, const QString&)
+bool CDuckSqlDriver::open(
+			const QString& /*db*/,
+			const QString& /*user*/,
+			const QString& /*password*/,
+			const QString& /*host*/,
+			int /*port*/,
+			const QString& /*connOpts*/)
 {
-	// The duckdb::Connection is opened and owned by CDuckDatabaseEngineComp; this driver is
-	// never registered with QSqlDatabase, so there is nothing to do here.
 	return isOpen();
 }
 
@@ -57,3 +60,4 @@ duckdb::Connection& CDuckSqlDriver::GetConnection() const
 
 
 } // namespace imtduckdb
+

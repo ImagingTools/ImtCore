@@ -5,7 +5,7 @@
 // Qt includes
 #include <QtSql/QSqlError>
 
-// imtduckdb includes
+// ImtCore includes
 #include <imtduckdb/CDuckSqlDriver.h>
 
 

@@ -2,14 +2,14 @@
 #pragma once
 
 
+// STL includes
+#include <memory>
+
 // Qt includes
 #include <QtSql/QSqlResult>
 
 // 3rdParty includes
 #include <duckdb.hpp>
-
-// std includes
-#include <memory>
 
 
 namespace imtduckdb
@@ -51,3 +51,4 @@ private:
 
 
 } // namespace imtduckdb
+

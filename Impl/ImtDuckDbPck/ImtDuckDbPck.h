@@ -21,3 +21,4 @@ typedef imtduckdb::CDuckDatabaseEngineComp DuckDatabaseEngine;
 
 
 } // namespace ImtDuckDbPck
+
