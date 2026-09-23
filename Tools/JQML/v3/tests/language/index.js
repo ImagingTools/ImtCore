@@ -27,6 +27,8 @@ function service() {
     lang.indexQmlFile(path.join(fixtures, 'mod', 'Card.qml'))
     lang.indexQmlFile(path.join(fixtures, 'AliasBox.qml'))
     lang.indexQmlFile(path.join(fixtures, 'AliasChild.qml'))
+    lang.indexQmlFile(path.join(fixtures, 'StyleLike.qml'))
+    lang.indexQmlFile(path.join(fixtures, 'StyleUse.qml'))
     return lang
 }
 
@@ -451,6 +453,105 @@ test('inherited alias group definition and completions', () => {
     const hover = lang.getHover(file, text, text.indexOf('border.width'))
     assert.ok(hover && hover.detail, 'alias hover')
     assert.ok(String(hover.detail).indexOf('alias') >= 0, hover.detail)
+})
+
+test('singleton type member definition and completions', () => {
+    const lang = service()
+    const file = path.join(fixtures, 'StyleUse.qml')
+    const styleFile = path.join(fixtures, 'StyleLike.qml')
+    const text = require('fs').readFileSync(file, 'utf8')
+
+    const styleLocs = lang.getDefinition(file, text, text.indexOf('StyleLike.sizeHintXS'))
+    assert.ok(styleLocs.length, 'StyleLike type definition')
+    assert.ok(styleLocs.some(loc => path.normalize(loc.filePath).toLowerCase() === path.normalize(styleFile).toLowerCase()), JSON.stringify(styleLocs))
+
+    const memberLocs = lang.getDefinition(file, text, text.indexOf('StyleLike.sizeHintXS') + 'StyleLike.'.length)
+    assert.ok(memberLocs.length, 'sizeHintXS definition')
+    assert.ok(memberLocs.some(loc => path.normalize(loc.filePath).toLowerCase() === path.normalize(styleFile).toLowerCase()), JSON.stringify(memberLocs))
+
+    const items = lang.getCompletions(file, text, text.indexOf('StyleLike.sizeHintXS') + 'StyleLike.'.length)
+    hasLabel(items, 'sizeHintXS')
+    hasLabel(items, 'controlHeightS')
+})
+
+test('id member completions match in-element members', () => {
+    const lang = service()
+    const file = path.join(fixtures, 'App.qml')
+    const text = require('fs').readFileSync(file, 'utf8')
+    const inside = lang.getCompletions(file, text, text.indexOf('onTapped:'))
+    const afterId = lang.getCompletions(file, text, text.indexOf('box.count') + 'box.'.length)
+    hasLabel(inside, 'count')
+    hasLabel(inside, 'bump')
+    hasLabel(inside, 'width')
+    hasLabel(afterId, 'count')
+    hasLabel(afterId, 'bump')
+    hasLabel(afterId, 'width')
+    hasLabel(afterId, 'tapped')
+    noLabel(afterId, 'foo')
+    noLabel(afterId, 'import')
+    noLabel(afterId, 'MyBox')
+
+    const broken = text.replace('box.count', 'box.')
+    const incomplete = lang.getCompletions(file, broken, broken.indexOf('box.') + 'box.'.length)
+    hasLabel(incomplete, 'count')
+    hasLabel(incomplete, 'bump')
+    hasLabel(incomplete, 'width')
+    noLabel(incomplete, 'foo')
+    noLabel(incomplete, 'import')
+})
+
+test('id definition from usages in the same file', () => {
+    const lang = service()
+    const file = path.join(fixtures, 'App.qml')
+    const text = require('fs').readFileSync(file, 'utf8')
+
+    const boxDecl = lang.getDefinition(file, text, text.indexOf('id: box') + 'id: '.length)
+    assert.ok(boxDecl.length, 'id: box declaration')
+    assert.strictEqual(path.normalize(boxDecl[0].filePath).toLowerCase(), path.normalize(file).toLowerCase())
+
+    const boxUse = lang.getDefinition(file, text, text.indexOf('box.count'))
+    assert.ok(boxUse.length, 'box.count id')
+    assert.strictEqual(path.normalize(boxUse[0].filePath).toLowerCase(), path.normalize(file).toLowerCase())
+    assert.strictEqual(boxUse[0].range.start.line, boxDecl[0].range.start.line)
+
+    const rootUse = lang.getDefinition(file, text, text.indexOf('root.foo'))
+    assert.ok(rootUse.length, 'root.foo id')
+    assert.strictEqual(path.normalize(rootUse[0].filePath).toLowerCase(), path.normalize(file).toLowerCase())
+
+    const nestedFile = path.join(fixtures, 'StyleUse.qml')
+    const nested = require('fs').readFileSync(nestedFile, 'utf8')
+    const nestedRoot = lang.getDefinition(nestedFile, nested, nested.indexOf('root.width'))
+    assert.ok(nestedRoot.length, 'nested root.width id')
+    assert.strictEqual(path.normalize(nestedRoot[0].filePath).toLowerCase(), path.normalize(nestedFile).toLowerCase())
+
+    const nestedBox = lang.getDefinition(nestedFile, nested, nested.indexOf('box.width'))
+    assert.ok(nestedBox.length, 'nested box.width id')
+    assert.strictEqual(path.normalize(nestedBox[0].filePath).toLowerCase(), path.normalize(nestedFile).toLowerCase())
+})
+
+test('ProgressBar Style.sizeHintXS goes to StyleBase', () => {
+    const fs = require('fs')
+    const bar = path.resolve(__dirname, '../../../../Qml/imtcontrols/Views/ProgressBar.qml')
+    const style = path.resolve(__dirname, '../../../../Include/imtstylecontrolsqml/Qml/Acf/Style.qml')
+    const styleBase = path.resolve(__dirname, '../../../../Qml/imtcontrols/Base/StyleBase.qml')
+    const acfDir = path.resolve(__dirname, '../../../../Include/imtstylecontrolsqml/Qml/Acf/qmldir')
+    const controlsDir = path.resolve(__dirname, '../../../../Qml/imtcontrols/qmldir')
+    const gqlDir = path.resolve(__dirname, '../../../../Qml/imtguigql/qmldir')
+    if (!fs.existsSync(bar) || !fs.existsSync(style) || !fs.existsSync(styleBase) || !fs.existsSync(acfDir)) return
+    const lang = new LanguageService({ enginePath })
+    lang.indexQmldir(acfDir)
+    lang.indexQmldir(controlsDir)
+    if (fs.existsSync(gqlDir)) lang.indexQmldir(gqlDir)
+    lang.indexQmlFile(styleBase)
+    lang.indexQmlFile(path.resolve(__dirname, '../../../../Qml/imtguigql/ClientStyle.qml'))
+    lang.indexQmlFile(style)
+    lang.indexQmlFile(bar)
+    const text = fs.readFileSync(bar, 'utf8')
+    const marker = 'Style.sizeHintXS'
+    const offset = text.indexOf(marker) + 'Style.'.length
+    const locs = lang.getDefinition(bar, text, offset)
+    assert.ok(locs.length, 'sizeHintXS definition in ProgressBar')
+    assert.ok(locs.some(loc => /StyleBase\.qml$/i.test(String(loc.filePath).replace(/\\/g, '/')) || /Style\.qml$/i.test(String(loc.filePath).replace(/\\/g, '/'))), JSON.stringify(locs))
 })
 
 console.log('')
