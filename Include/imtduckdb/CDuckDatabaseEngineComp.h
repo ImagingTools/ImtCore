@@ -21,6 +21,7 @@
 #include <imtdb/IDatabaseEngine.h>
 #include <imtdb/IMigrationController.h>
 #include <imtduckdb/CDuckSqlDriver.h>
+#include <imtduckdb/IDuckAppender.h>
 
 
 namespace imtduckdb
@@ -67,6 +68,16 @@ public:
 	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
 	virtual QSqlQuery ExecSqlQueryFromFile(const QString& filePath, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
 	virtual QSqlQuery ExecSqlQueryFromFile(const QString& filePath, const QVariantMap& bindValues, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
+
+	/**
+		Creates a bulk row-appender for \a tableName (optionally schema-qualified via \a schemaName),
+		backed by duckdb::Appender. Use this instead of ExecSqlQuery() for high-volume inserts, e.g.
+		full cache rebuilds - row-at-a-time INSERT is far too slow for that.
+		\return nullptr if the database could not be opened or the appender could not be created
+				(e.g. unknown table); in that case, \a errorMessagePtr (if not null) is filled with the
+				error text.
+	*/
+	std::unique_ptr<IDuckAppender> CreateAppender(const QString& tableName, const QString& schemaName = QString(), QString* errorMessagePtr = nullptr) const;
 
 protected:
 	// reimplemented (icomp::CComponentBase)

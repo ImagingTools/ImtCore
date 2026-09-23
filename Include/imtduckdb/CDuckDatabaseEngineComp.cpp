@@ -6,6 +6,7 @@
 #include <QtCore/QFile>
 
 // ImtCore includes
+#include <imtduckdb/CDuckAppender.h>
 #include <imtduckdb/CDuckSqlResult.h>
 
 
@@ -197,6 +198,22 @@ QSqlQuery CDuckDatabaseEngineComp::ExecSqlQueryFromFile(
 	sqlQueryFile.close();
 
 	return ExecSqlQuery(queryString, bindValues, sqlErrorPtr, isForwardOnly);
+}
+
+
+std::unique_ptr<IDuckAppender> CDuckDatabaseEngineComp::CreateAppender(const QString& tableName, const QString& schemaName, QString* errorMessagePtr) const
+{
+	if (!EnsureDatabaseOpen()){
+		if (errorMessagePtr != nullptr){
+			*errorMessagePtr = QStringLiteral("DuckDB database could not be opened");
+		}
+
+		return nullptr;
+	}
+
+	std::lock_guard<std::mutex> lock(m_connectionMutex);
+
+	return CDuckAppender::Create(*m_connectionPtr, tableName, schemaName, errorMessagePtr);
 }
 
 
