@@ -344,6 +344,7 @@ function locationInText(text, filePath, name) {
         new RegExp('\\bsignal\\s+' + escaped + '\\b'),
         new RegExp('\\bfunction\\s+' + escaped + '\\b'),
         new RegExp('\\bproperty\\s+(?:(?:readonly|required|default)\\s+)*(?:alias\\s+|[A-Za-z_][\\w.<>]*\\s+)' + escaped + '\\b'),
+        new RegExp('\\bid\\s*:\\s*' + escaped + '\\b'),
         new RegExp('\\b(?:class|id)\\s+' + escaped + '\\b'),
     ]
     for (const re of patterns) {
@@ -367,6 +368,27 @@ function locationInFile(filePath, name) {
     if (!filePath || !pathExists(filePath) || !name) return null
     const loc = locationInText(readFile(filePath), normalizePath(path.resolve(filePath)), name)
     return loc
+}
+
+function idDeclarationLocation(text, filePath, info, idName) {
+    if (!filePath || !idName) return null
+    if (info && info.pos != null) {
+        const window = text.slice(info.pos, info.pos + 96)
+        const match = window.match(new RegExp('id\\s*:\\s*(' + escapeRegExp(idName) + ')\\b'))
+        if (match) {
+            const index = info.pos + match.index + match[0].length - idName.length
+            const start = offsetToPosition(text, index)
+            return {
+                filePath,
+                range: {
+                    start,
+                    end: { line: start.line, character: start.character + idName.length },
+                },
+            }
+        }
+    }
+    return locationFromInfo(text, filePath, info, idName)
+        || locationInText(text, filePath, idName)
 }
 
 function locationFromInfo(text, filePath, info, name) {
@@ -1049,8 +1071,7 @@ function walkQmlTree(node, parent, document, text) {
             parent.id = idName
             if (idName) {
                 document.ids[idName] = parent
-                parent.idRange = locationFromInfo(text, document.filePath, info, idName)
-                    || locationInText(text, document.filePath, idName)
+                parent.idRange = idDeclarationLocation(text, document.filePath, info, idName)
             }
         } else {
             const from = info && info.pos != null ? info.pos : parent.offsetStart
@@ -1244,6 +1265,10 @@ function parseQmlDocument(filePath, text) {
     return document
 }
 
+function stabilizeQmlText(text) {
+    return String(text || '').replace(/([A-Za-z_]\w*)\.(?=\s*[;,)\]}\r]|$)/gm, '$1._')
+}
+
 function ownMembersOf(element) {
     const members = []
     for (const prop of element.properties || []) members.push(prop)
@@ -1414,6 +1439,8 @@ class LanguageService {
         const document = parseQmlDocument(abs, source)
         const moduleName = this.moduleByPath.get(abs) || this.moduleByPath.get(document.directory) || ''
         document.moduleName = moduleName
+        const local = moduleName ? this.localTypes.get(moduleName + '.' + document.className) : null
+        if (local && local.singleton) document.singleton = true
         if (!document.diagnostics.length || !this.qmlDocuments.has(abs)) {
             this.qmlDocuments.set(abs, document)
         }
@@ -1430,6 +1457,26 @@ class LanguageService {
         if (this.qmlDocuments.has(abs)) return this.qmlDocuments.get(abs)
         if (fs.existsSync(abs)) return this.indexQmlFile(abs)
         return parseQmlDocument(abs, '')
+    }
+
+    analysisDocument(filePath, text) {
+        const parsed = this.getDocument(filePath, text)
+        if (!parsed.diagnostics.length) return parsed
+        const source = text != null ? text : parsed.text || ''
+        if (source) {
+            const patched = stabilizeQmlText(source)
+            if (patched !== source) {
+                const retry = parseQmlDocument(parsed.filePath || filePath, patched)
+                const moduleName = this.moduleByPath.get(retry.filePath) || this.moduleByPath.get(retry.directory) || parsed.moduleName || ''
+                retry.moduleName = moduleName
+                const local = moduleName ? this.localTypes.get(moduleName + '.' + retry.className) : null
+                if (local && local.singleton) retry.singleton = true
+                if (!retry.diagnostics.length) return retry
+            }
+        }
+        const cached = this.qmlDocuments.get(normalizePath(path.resolve(filePath)))
+        if (cached && cached.root && !cached.diagnostics.length) return cached
+        return parsed
     }
 
     findInnermostElement(document, offset) {
@@ -1465,13 +1512,15 @@ class LanguageService {
             })
         }
         const baseName = document.root.typeName
+        const qualifiedName = moduleName ? moduleName + '.' + (name || document.className) : (name || document.className)
+        const local = this.localTypes.get(qualifiedName)
         return new TypeRecord({
             name: name || document.className,
-            qualifiedName: moduleName ? moduleName + '.' + (name || document.className) : (name || document.className),
+            qualifiedName,
             module: moduleName || document.moduleName || '',
             baseName,
             filePath: document.filePath,
-            singleton: document.singleton,
+            singleton: document.singleton || !!(local && local.singleton),
             members: ownMembersOf(document.root),
             context: document,
         })
@@ -1657,13 +1706,53 @@ class LanguageService {
     membersOfElement(element, document) {
         if (!element) return []
         const map = memberMap(ownMembersOf(element))
-        const type = this.resolveType(element.typeName, document)
-        for (const member of this.collectMembers(type, document)) {
+        const type = this.resolveType(element.typeName, document) || this.lookupTypeByName(element.typeName, document)
+        for (const member of this.collectMembers(type, (type && type.context) || document)) {
             if (!map.has(member.name)) map.set(member.name, member)
         }
         map.set('parent', { name: 'parent', kind: KIND.variable, detail: 'parent' })
         map.set('Component', { name: 'Component', kind: KIND.property, detail: 'attached Component', group: true, typeName: 'Component' })
         return [...map.values()]
+    }
+
+    findElementById(document, name) {
+        if (!document || !name) return null
+        if (document.ids && document.ids[name]) return document.ids[name]
+        for (const element of document.elements || []) {
+            if (element.id === name) return element
+        }
+        return null
+    }
+
+    membersOfTypeAccess(type, document) {
+        if (!type) return []
+        const ctx = type.context || document
+        return this.collectMembers(type, ctx).concat(type.statics || [])
+    }
+
+    idLocation(element, document) {
+        if (!element) return null
+        if (element.idRange && element.idRange.filePath && element.idRange.range) return element.idRange
+        const filePath = (document && document.filePath) || (element.idRange && element.idRange.filePath) || ''
+        const text = document && document.text
+        if (text && element.id && filePath) {
+            const match = text.match(new RegExp('\\bid\\s*:\\s*' + escapeRegExp(element.id) + '\\b'))
+            if (match) {
+                const index = match.index + match[0].length - element.id.length
+                const start = offsetToPosition(text, index)
+                return {
+                    filePath: normalizePath(filePath),
+                    range: {
+                        start,
+                        end: { line: start.line, character: start.character + element.id.length },
+                    },
+                }
+            }
+        }
+        if (element.nameRange && filePath) {
+            return { filePath: normalizePath(filePath), range: element.nameRange }
+        }
+        return null
     }
 
     groupType(member, document) {
@@ -1962,9 +2051,10 @@ class LanguageService {
             if (i === 0 && (part === 'this' || part === 'self')) {
                 continue
             }
-            if (i === 0 && document.ids[part]) {
-                currentType = this.resolveType(document.ids[part].typeName, document)
-                currentMembers = memberMap(this.membersOfElement(document.ids[part], document))
+            if (i === 0 && this.findElementById(document, part)) {
+                const target = this.findElementById(document, part)
+                currentType = this.resolveType(target.typeName, document) || this.lookupTypeByName(target.typeName, document)
+                currentMembers = memberMap(this.membersOfElement(target, document))
                 continue
             }
             if (i === 0 && part === 'parent' && element && element.parent) {
@@ -1991,12 +2081,15 @@ class LanguageService {
                     }
                 }
             }
-            if (i === 0) {
-                const asType = this.resolveType(part, document)
-                if (asType && asType.statics && asType.statics.length && !currentMembers.has(part)) {
-                    currentMembers = memberMap(asType.statics)
-                    currentType = asType
-                    continue
+            if (i === 0 && !currentMembers.has(part)) {
+                const asType = this.resolveType(part, document) || this.lookupTypeByName(part, document)
+                if (asType) {
+                    const typeMembers = this.membersOfTypeAccess(asType, document)
+                    if (typeMembers.length) {
+                        currentMembers = memberMap(typeMembers)
+                        currentType = asType
+                        continue
+                    }
                 }
             }
             const member = currentMembers.get(part)
@@ -2019,7 +2112,7 @@ class LanguageService {
     }
 
     getCompletions(filePath, text, offset) {
-        const document = this.getDocument(filePath, text)
+        const document = this.analysisDocument(filePath, text)
         const before = text.slice(0, offset)
         const lineStart = before.lastIndexOf('\n') + 1
         const lineBefore = before.slice(lineStart)
@@ -2247,7 +2340,7 @@ class LanguageService {
     }
 
     resolveSymbol(filePath, text, offset) {
-        const document = this.getDocument(filePath, text)
+        const document = this.analysisDocument(filePath, text)
         const source = text != null ? text : document.text || ''
         const token = tokenAtOffset(source, offset)
         if (!token) return null
@@ -2270,6 +2363,8 @@ class LanguageService {
             if (document.ids[token.name]) {
                 return { kind: 'id', name: token.name, element: document.ids[token.name], document, token }
             }
+            const byId = this.findElementById(document, token.name)
+            if (byId) return { kind: 'id', name: token.name, element: byId, document, token }
         }
 
         let memberName = token.name
@@ -2286,6 +2381,10 @@ class LanguageService {
             const members = memberMap(this.membersOfElement(element, document))
             const member = members.get(token.name) || members.get(memberName)
             if (member) {
+                if (member.kind === KIND.variable) {
+                    const byId = this.findElementById(document, token.name)
+                    if (byId) return { kind: 'id', name: token.name, element: byId, document, token }
+                }
                 return {
                     kind: 'member',
                     name: member.name,
@@ -2295,6 +2394,11 @@ class LanguageService {
                     token,
                 }
             }
+        }
+
+        const asId = this.findElementById(document, token.name)
+        if (asId && !token.path.length) {
+            return { kind: 'id', name: token.name, element: asId, document, token }
         }
 
         const asType = this.resolveType(token.name, document) || this.lookupTypeByName(token.name, document)
@@ -2312,8 +2416,9 @@ class LanguageService {
             const loc = this.moduleLocation(symbol.name)
             return loc ? [loc] : []
         }
-        if (symbol.kind === 'id' && symbol.element && symbol.element.idRange) {
-            return [symbol.element.idRange]
+        if (symbol.kind === 'id') {
+            const loc = this.idLocation(symbol.element, symbol.document)
+            return loc ? [loc] : []
         }
         if (symbol.kind === 'member') {
             const member = symbol.member
