@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtduckdb/CDuckAppender.h>
+#include <imtduckdb/CDuckReadConnectionEngine.h>
 #include <imtduckdb/CDuckSqlResult.h>
 
 
@@ -217,6 +218,26 @@ std::unique_ptr<IDuckAppender> CDuckDatabaseEngineComp::CreateAppender(const QSt
 }
 
 
+std::unique_ptr<imtdb::IDatabaseEngine> CDuckDatabaseEngineComp::CreateReadConnection() const
+{
+	if (!EnsureDatabaseOpen()){
+		return nullptr;
+	}
+
+	std::lock_guard<std::mutex> lock(m_connectionMutex);
+
+	try{
+		return std::make_unique<CDuckReadConnectionEngine>(*m_databasePtr);
+	}
+	catch (const std::exception& exception){
+		SendErrorMessage(0, QStringLiteral("DuckDB read connection could not be created. Error: %1")
+					.arg(QString::fromUtf8(exception.what())), __FILE__);
+
+		return nullptr;
+	}
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CDuckDatabaseEngineComp::OnComponentCreated()
@@ -255,9 +276,29 @@ bool CDuckDatabaseEngineComp::EnsureDatabaseOpen() const
 		}
 
 		QString databasePath = GetDatabasePath();
+		const bool readOnly = m_readOnlyAttrPtr.IsValid() && *m_readOnlyAttrPtr;
 
 		try{
-			m_databasePtr = std::make_unique<duckdb::DuckDB>(databasePath.isEmpty() ? std::string() : databasePath.toStdString());
+			duckdb::case_insensitive_map_t<duckdb::Value> configOptions;
+
+			const QByteArray memoryLimit = m_memoryLimitAttrPtr.IsValid() ? *m_memoryLimitAttrPtr : QByteArray();
+			if (!memoryLimit.isEmpty()){
+				configOptions.emplace("memory_limit", duckdb::Value(memoryLimit.toStdString()));
+			}
+
+			const int threadCount = m_threadCountAttrPtr.IsValid() ? *m_threadCountAttrPtr : 0;
+			if (threadCount > 0){
+				configOptions.emplace("threads", duckdb::Value::BIGINT(threadCount));
+			}
+
+			const QByteArray checkpointThreshold = m_checkpointThresholdAttrPtr.IsValid() ? *m_checkpointThresholdAttrPtr : QByteArray();
+			if (!checkpointThreshold.isEmpty()){
+				configOptions.emplace("checkpoint_threshold", duckdb::Value(checkpointThreshold.toStdString()));
+			}
+
+			duckdb::DBConfig config(configOptions, readOnly);
+
+			m_databasePtr = std::make_unique<duckdb::DuckDB>(databasePath.isEmpty() ? std::string() : databasePath.toStdString(), &config);
 			m_connectionPtr = std::make_unique<duckdb::Connection>(*m_databasePtr);
 			m_driverPtr = std::make_unique<CDuckSqlDriver>(*m_connectionPtr);
 
@@ -272,6 +313,11 @@ bool CDuckDatabaseEngineComp::EnsureDatabaseOpen() const
 			m_databasePtr.reset();
 
 			return false;
+		}
+
+		// A read-only database is expected to already be fully migrated; CREATE TABLE / DDL would fail on it.
+		if (readOnly){
+			return true;
 		}
 	}
 

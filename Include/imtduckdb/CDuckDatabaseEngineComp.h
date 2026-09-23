@@ -22,6 +22,7 @@
 #include <imtdb/IMigrationController.h>
 #include <imtduckdb/CDuckSqlDriver.h>
 #include <imtduckdb/IDuckAppender.h>
+#include <imtduckdb/CDuckReadConnectionEngine.h>
 
 
 namespace imtduckdb
@@ -57,6 +58,10 @@ public:
 		I_ASSIGN(m_dbFilePathCompPtr, "DbPath", "Path to the DuckDB database file. Empty means an in-memory database", false, "");
 		I_ASSIGN(m_dbNameAttrPtr, "DbName", "Logical name of the database (used for diagnostic messages only)", true, "duckdb");
 		I_ASSIGN(m_migrationControllerCompPtr, "MigrationController", "Migration controller", false, "MigrationController");
+		I_ASSIGN(m_memoryLimitAttrPtr, "MemoryLimit", "Maximum memory used by the database, e.g. '4GB'. Empty means DuckDB's default (~80% of system memory)", true, "");
+		I_ASSIGN(m_threadCountAttrPtr, "ThreadCount", "Maximum number of CPU threads used by the database. 0 means DuckDB's default (all available)", true, 0);
+		I_ASSIGN(m_checkpointThresholdAttrPtr, "CheckpointThreshold", "Checkpoint when the WAL reaches this size, e.g. '1GB'. Empty means DuckDB's default (16MB)", true, "");
+		I_ASSIGN(m_readOnlyAttrPtr, "ReadOnly", "Opens the database in read-only mode. The database file must already exist", true, false);
 	I_END_COMPONENT;
 
 	// reimplemented (imtdb::IDatabaseEngine)
@@ -78,6 +83,16 @@ public:
 				error text.
 	*/
 	std::unique_ptr<IDuckAppender> CreateAppender(const QString& tableName, const QString& schemaName = QString(), QString* errorMessagePtr = nullptr) const;
+
+	/**
+		Creates a new imtdb::IDatabaseEngine backed by its own duckdb::Connection against this
+		component's database, so callers can run queries concurrently with each other and with this
+		component's own connection (DuckDB's MVCC does not block readers against writers). Intended for
+		one-per-request use, e.g. one per GraphQL request; the returned engine is not thread-safe by
+		itself and must not outlive this component.
+		\return nullptr if the database could not be opened.
+	*/
+	std::unique_ptr<imtdb::IDatabaseEngine> CreateReadConnection() const;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
@@ -111,6 +126,10 @@ private:
 	I_REF(ifile::IFileNameParam, m_dbFilePathCompPtr);
 	I_ATTR(QByteArray, m_dbNameAttrPtr);
 	I_REF(imtdb::IMigrationController, m_migrationControllerCompPtr);
+	I_ATTR(QByteArray, m_memoryLimitAttrPtr);
+	I_ATTR(int, m_threadCountAttrPtr);
+	I_ATTR(QByteArray, m_checkpointThresholdAttrPtr);
+	I_ATTR(bool, m_readOnlyAttrPtr);
 
 private:
 	mutable std::mutex m_connectionMutex;
