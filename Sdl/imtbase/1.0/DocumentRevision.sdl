@@ -46,6 +46,7 @@ type RevisionItem {
 	isActive: Boolean
 	timestamp: String
 	description: String
+	kind: String		# "Revision", or the kind of a history event (e.g. "TagEvent") that cannot be restored
 }
 
 type RevisionInfoList {

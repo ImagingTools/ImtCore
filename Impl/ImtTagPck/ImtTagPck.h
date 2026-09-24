@@ -12,6 +12,7 @@
 #include <imttag/CTagAssignmentManagerComp.h>
 #include <imttag/CSystemTagSeederComp.h>
 #include <imttag/CTaggableEntityTypeComp.h>
+#include <imttag/CTagHistoryEventProviderComp.h>
 
 
 /**
@@ -27,6 +28,7 @@ typedef icomp::TModelCompWrap<imttag::CTagEventComp> TagEvent;
 typedef icomp::TModelCompWrap<imttag::CTagAssignmentManagerComp> TagAssignmentManager;
 typedef imttag::CSystemTagSeederComp SystemTagSeeder;
 typedef imttag::CTaggableEntityTypeComp TaggableEntityType;
+typedef imttag::CTagHistoryEventProviderComp TagHistoryEventProvider;
 
 
 } // namespace ImtTagPck
