@@ -114,7 +114,7 @@ Item {
     property string disabledTextColor:       Style.inactiveTextColor
     property string headerBackgroundColor:   Style.alternateBaseColor
     property string gridLineColor:           Style.borderColor2
-    property string editorErrorColor:        "#d04848"
+    property string editorErrorColor:        Style.dangerColor
 
     // ─── Public readonly state ─────────────────────────────────────────────
 
@@ -452,7 +452,7 @@ Item {
                             color: "transparent"
                             border.width: cellRoot.isEditingHere ? 2 : 0
                             border.color: Style.imaginToolsAccentColor
-                            radius: 2
+                            radius: Style.radiusS
                             z: 10
                         }
 
@@ -641,7 +641,7 @@ Item {
             color: "transparent"
             border.width: root.__editingError.length > 0 ? 1 : 0
             border.color: root.editorErrorColor
-            radius: 2
+            radius: Style.radiusS
 
             function selectAll() { textEditor.selectAll() }
             function forceEditorFocus() { textEditor.forceActiveFocus() }

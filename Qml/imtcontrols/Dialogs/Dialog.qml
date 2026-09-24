@@ -37,7 +37,7 @@ ControlBase {
 	property int buttonIds: 0;//81920;
 
 	property string backgroundColor: Style.dialogBackgroundColor;
-	property int radius: 0;
+	property int radius: Style.radiusL;
 
 	property bool canMove: true;
 	property bool canResize: false;

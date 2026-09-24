@@ -19,7 +19,7 @@ IDocumentService::OperationStatus CDocumentServiceComp::CloseDocumentInternal(
 			const QByteArray& userId,
 			const QByteArray& documentId)
 {
-	bool shouldRemoveStorageDirectory = false;
+	QByteArray objectId;
 
 	{
 		QMutexLocker locker(&m_mutex);
@@ -29,18 +29,21 @@ IDocumentService::OperationStatus CDocumentServiceComp::CloseDocumentInternal(
 		}
 
 		const WorkingDocument& workingDocument = m_userDocuments[userId][documentId];
-
-		shouldRemoveStorageDirectory = true;
-		if (IsSingleCopyMode()
-					&& !workingDocument.objectId.isEmpty()
-					&& m_sharedDocuments.contains(workingDocument.objectId)){
-			shouldRemoveStorageDirectory = m_sharedDocuments[workingDocument.objectId].refCount <= 1;
-		}
+		objectId = workingDocument.objectId;
 	}
 
 	OperationStatus status = BaseClass::CloseDocumentInternal(userId, documentId);
 
-	if (status == OS_OK && shouldRemoveStorageDirectory){
+	if (status != OS_OK){
+		return status;
+	}
+
+	{
+		QMutexLocker locker(&m_mutex);
+		if (IsSingleCopyMode() && !objectId.isEmpty() && m_sharedDocuments.contains(objectId)){
+			return status;
+		}
+
 		RemoveUndoManagerDocumentDirectory(documentId);
 	}
 
