@@ -1869,19 +1869,30 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     }
   }
 
+  function skipPragmaArgument() {
+    if (!is("punc", ":")) return;
+    next();
+    if (is("name") || is("keyword") || is("string") || is("atom") || is("num")) {
+      next();
+    }
+  }
+
   function qml_pragma_statement() {
     next();
     next();
     var pragma = S.token.value;
     next();
+    skipPragmaArgument();
     return as_(undefined, "qmlpragma", pragma);
   }
 
   function qmlpragma() {
     next();
+    var info = S.token;
     var pragma = S.token.value;
     next();
-    return as_(S.prev, "qmlpragma", pragma);
+    skipPragmaArgument();
+    return as_(info, "qmlpragma", pragma);
   }
 
   function qmlimport() {

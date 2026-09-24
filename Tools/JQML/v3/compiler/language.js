@@ -155,75 +155,95 @@ function pathExists(filePath) {
     }
 }
 
-function parentDirs(startPath) {
-    const result = []
-    let dir = path.resolve(startPath)
-    while (dir) {
-        result.push(dir)
-        const parent = path.dirname(dir)
-        if (parent === dir) break
-        dir = parent
-    }
-    return result
-}
-
-function detectImtCoreRoot(dir) {
-    return pathExists(path.join(dir, 'Qml', 'web', 'imtcore.json'))
-}
-
-function detectProLifeRoot(dir) {
-    return pathExists(path.join(dir, 'Qml', 'Include', 'prolifeqml', 'prolife.json'))
-}
-
-function firstAuxTarget(root) {
-    if (!root) return ''
-    const aux = path.join(root, 'AuxInclude')
-    if (!pathExists(aux)) return ''
-    try {
-        const names = fs.readdirSync(aux).filter(name => {
-            try {
-                return fs.statSync(path.join(aux, name)).isDirectory()
-            } catch {
-                return false
-            }
-        })
-        return names[0] || ''
-    } catch {
-        return ''
-    }
-}
-
-function inferProjectEnv(seedPaths) {
-    const inferred = {}
-    const seeds = (seedPaths || []).filter(Boolean)
-
-    for (const seed of seeds) {
-        for (const dir of parentDirs(seed)) {
-            if (!inferred.IMTCOREDIR && detectImtCoreRoot(dir)) inferred.IMTCOREDIR = dir
-            if (!inferred.PROLIFEDIR && detectProLifeRoot(dir)) inferred.PROLIFEDIR = dir
-        }
-    }
-
-    if (inferred.PROLIFEDIR && !inferred.IMTCOREDIR) {
-        const sibling = path.join(path.dirname(inferred.PROLIFEDIR), 'ImtCore')
-        if (detectImtCoreRoot(sibling)) inferred.IMTCOREDIR = sibling
-    }
-    if (inferred.IMTCOREDIR && !inferred.PROLIFEDIR) {
-        const sibling = path.join(path.dirname(inferred.IMTCOREDIR), 'ProLife')
-        if (detectProLifeRoot(sibling)) inferred.PROLIFEDIR = sibling
-    }
-
-    if (inferred.IMTCOREDIR && !inferred.IMTCOREDIR_BUILD) inferred.IMTCOREDIR_BUILD = inferred.IMTCOREDIR
-    if (!inferred.TARGETNAME) {
-        inferred.TARGETNAME = firstAuxTarget(inferred.IMTCOREDIR_BUILD) || firstAuxTarget(inferred.IMTCOREDIR) || firstAuxTarget(inferred.PROLIFEDIR) || ''
-        if (!inferred.TARGETNAME) delete inferred.TARGETNAME
-    }
-    return inferred
-}
-
-const KNOWN_CPP_MODULES = new Set([
-    'com.imtcore.imtqml',
+const CPP_SKIP_DIRS = new Set([
+    'node_modules', '.git', 'Bin', 'Install', 'build', 'Build', 'out', 'Out',
+    'Qml', 'qml', 'Dist', 'dist', '.vs', 'CMakeFiles',
 ])
+
+const CPP_SOURCE_DIRS = ['Include', 'Impl', 'src', 'Src', 'include', 'source', 'Source']
+
+const CPP_ENV_SKIP = new Set([
+    'PATH', 'PATHEXT', 'TEMP', 'TMP', 'TMPDIR', 'WINDIR', 'SYSTEMROOT', 'SYSTEMDRIVE',
+    'USERPROFILE', 'HOMEDRIVE', 'HOMEPATH', 'APPDATA', 'LOCALAPPDATA', 'PROGRAMFILES',
+    'PROGRAMFILES(X86)', 'PROGRAMDATA', 'PUBLIC', 'ALLUSERSPROFILE', 'COMSPEC',
+    'DRIVERDATA', 'COMMONPROGRAMFILES', 'COMMONPROGRAMFILES(X86)', 'PSMODULEPATH',
+])
+
+function cppSourceRoots(env) {
+    const roots = []
+    const seen = new Set()
+    for (const [key, value] of Object.entries(env || {})) {
+        if (CPP_ENV_SKIP.has(String(key).toUpperCase())) continue
+        if (typeof value !== 'string') continue
+        const trimmed = value.trim()
+        if (!trimmed || trimmed.length > 240 || /[;\r\n]/.test(trimmed)) continue
+        let abs
+        try {
+            abs = path.resolve(trimmed)
+        } catch {
+            continue
+        }
+        if (!pathExists(abs)) continue
+        let stat
+        try {
+            stat = fs.statSync(abs)
+        } catch {
+            continue
+        }
+        if (!stat.isDirectory()) continue
+        if (!CPP_SOURCE_DIRS.some(name => pathExists(path.join(abs, name)))) continue
+        const norm = normalizePath(abs)
+        if (seen.has(norm)) continue
+        seen.add(norm)
+        roots.push(abs)
+    }
+    return roots.filter(root => {
+        const norm = normalizePath(root)
+        return !roots.some(other => {
+            const parent = normalizePath(other)
+            return parent !== norm && norm.startsWith(parent + '/')
+        })
+    })
+}
+
+function walkCppFiles(dir, out, depth) {
+    if (depth > 8) return
+    let children
+    try {
+        children = fs.readdirSync(dir, { withFileTypes: true })
+    } catch {
+        return
+    }
+    for (const child of children) {
+        if (child.name.startsWith('.')) continue
+        const childPath = path.join(dir, child.name)
+        if (child.isDirectory()) {
+            if (CPP_SKIP_DIRS.has(child.name)) continue
+            if (depth === 0 && CPP_SOURCE_DIRS.indexOf(child.name) < 0) continue
+            walkCppFiles(childPath, out, depth + 1)
+            continue
+        }
+        if (!/\.(cpp|cc|cxx|h|hpp|hxx)$/i.test(child.name)) continue
+        out.push(childPath)
+    }
+}
+
+function cppRegistrations(text) {
+    const re = /qmlRegister(?:Type|SingletonInstance|SingletonType|UncreatableType)\s*(?:<[^;\n]*>)?\s*\(\s*"([^"]+)"\s*,\s*\d+\s*,\s*\d+\s*,\s*"([^"]+)"/g
+    const found = []
+    let match
+    while ((match = re.exec(text))) {
+        const quoted = '"' + match[1] + '"'
+        const uriAt = text.indexOf(quoted, match.index)
+        found.push({
+            module: match[1],
+            name: match[2],
+            singleton: match[0].indexOf('Singleton') >= 0,
+            index: uriAt >= 0 ? uriAt + 1 : match.index,
+        })
+    }
+    return found
+}
 
 function isClassWithMeta(value) {
     return typeof value === 'function' && value.meta && typeof value.meta === 'object'
@@ -371,30 +391,123 @@ function locationInFile(filePath, name) {
 }
 
 function idDeclarationLocation(text, filePath, info, idName) {
-    if (!filePath || !idName) return null
-    if (info && info.pos != null) {
-        const window = text.slice(info.pos, info.pos + 96)
-        const match = window.match(new RegExp('id\\s*:\\s*(' + escapeRegExp(idName) + ')\\b'))
-        if (match) {
-            const index = info.pos + match.index + match[0].length - idName.length
-            const start = offsetToPosition(text, index)
-            return {
-                filePath,
-                range: {
-                    start,
-                    end: { line: start.line, character: start.character + idName.length },
-                },
-            }
-        }
+    if (!filePath || !idName || !text) return null
+    const re = new RegExp('\\bid\\s*:\\s*' + escapeRegExp(idName) + '\\b', 'g')
+    let match
+    let best = -1
+    const origin = info && info.pos != null ? sourceOffset(text, info.pos) : -1
+    while ((match = re.exec(text))) {
+        const index = match.index + match[0].length - idName.length
+        if (best < 0 || (origin >= 0 && Math.abs(index - origin) < Math.abs(best - origin))) best = index
+        if (origin < 0) break
     }
-    return locationFromInfo(text, filePath, info, idName)
-        || locationInText(text, filePath, idName)
+    if (best < 0) return null
+    const start = offsetToPosition(text, best)
+    return {
+        filePath,
+        range: {
+            start,
+            end: { line: start.line, character: start.character + idName.length },
+        },
+    }
+}
+
+function qmldirModuleRange(filePath, moduleName) {
+    let text = ''
+    try {
+        text = readFile(filePath)
+    } catch {
+        text = ''
+    }
+    const match = text ? new RegExp('^module\\s+' + escapeRegExp(moduleName) + '\\b', 'm').exec(text) : null
+    if (!match) {
+        return { start: { line: 0, character: 0 }, end: { line: 0, character: 1 } }
+    }
+    const index = match.index + match[0].length - moduleName.length
+    const start = offsetToPosition(text, index)
+    return {
+        start,
+        end: { line: start.line, character: start.character + moduleName.length },
+    }
+}
+
+function rangeOfImportModule(text, moduleName) {
+    if (!text || !moduleName) return null
+    const match = new RegExp('^\\s*import\\s+' + escapeRegExp(moduleName) + '\\b', 'm').exec(text)
+    if (!match) return null
+    const index = match.index + match[0].length - moduleName.length
+    const start = offsetToPosition(text, index)
+    return {
+        start,
+        end: { line: start.line, character: start.character + moduleName.length },
+    }
+}
+
+function importModuleAt(text, offset, imports) {
+    if (!text || !imports || !imports.length) return null
+    const lineStart = text.lastIndexOf('\n', Math.max(0, offset - 1)) + 1
+    let lineEnd = text.indexOf('\n', offset)
+    if (lineEnd < 0) lineEnd = text.length
+    const line = text.slice(lineStart, lineEnd)
+    const match = line.match(/^\s*import\s+([A-Za-z_][\w.]*)\b/)
+    if (!match) return null
+    const moduleName = match[1]
+    const moduleStart = lineStart + match[0].lastIndexOf(moduleName)
+    const moduleEnd = moduleStart + moduleName.length
+    if (offset < moduleStart || offset > moduleEnd) return null
+    const start = offsetToPosition(text, moduleStart)
+    return {
+        path: moduleName,
+        range: {
+            start,
+            end: { line: start.line, character: start.character + moduleName.length },
+        },
+    }
+}
+
+function sourceOffset(text, pos) {
+    if (pos == null || pos < 0 || !text || text.indexOf('\r') < 0) return pos
+    let real = 0
+    let logical = 0
+    while (logical < pos && real < text.length) {
+        if (text.charCodeAt(real) === 13) {
+            real++
+            continue
+        }
+        logical++
+        real++
+    }
+    return real
+}
+
+function declaredSymbolAt(text, offset) {
+    if (!text) return null
+    const lineStart = text.lastIndexOf('\n', Math.max(0, offset - 1)) + 1
+    let lineEnd = text.indexOf('\n', offset)
+    if (lineEnd < 0) lineEnd = text.length
+    const line = text.slice(lineStart, lineEnd).replace(/\r$/, '')
+    const rel = offset - lineStart
+    const patterns = [
+        { kind: 'id', re: /^\s*id\s*:\s*([A-Za-z_]\w*)\b/ },
+        { kind: 'property', re: /^\s*(?:default\s+|readonly\s+|required\s+)*property\s+(?:alias\s+|(?:[A-Za-z_]\w*\.)*[A-Za-z_]\w*(?:\s*<[^>\n]+>)?\s+)([A-Za-z_]\w*)\b/ },
+        { kind: 'signal', re: /^\s*signal\s+([A-Za-z_]\w*)\b/ },
+        { kind: 'method', re: /^\s*function\s+([A-Za-z_]\w*)\b/ },
+    ]
+    for (const item of patterns) {
+        const match = item.re.exec(line)
+        if (!match) continue
+        const name = match[1]
+        const nameStart = match.index + match[0].length - name.length
+        if (rel < match.index || rel > nameStart + name.length) continue
+        return { kind: item.kind, name, index: lineStart + nameStart }
+    }
+    return null
 }
 
 function locationFromInfo(text, filePath, info, name) {
     if (!filePath || !name) return null
     if (info && info.pos != null) {
-        const from = info.pos
+        const from = sourceOffset(text, info.pos)
         const window = text.slice(from, from + 160)
         const idx = window.indexOf(name)
         if (idx >= 0) {
@@ -1029,7 +1142,7 @@ function walkQmlTree(node, parent, document, text) {
     if (node[0] === 'qmlelem') {
         const typeName = typeNameOf(node[1])
         const info = infoOf(node)
-        const start = info && info.pos != null ? info.pos : 0
+        const start = info && info.pos != null ? sourceOffset(text, info.pos) : 0
         const braces = braceRangeAfter(text, start)
         const element = {
             typeName,
@@ -1074,7 +1187,7 @@ function walkQmlTree(node, parent, document, text) {
                 parent.idRange = idDeclarationLocation(text, document.filePath, info, idName)
             }
         } else {
-            const from = info && info.pos != null ? info.pos : parent.offsetStart
+            const from = info && info.pos != null ? sourceOffset(text, info.pos) : parent.offsetStart
             const script = valueRangeAfterColon(text, from, parent.offsetEnd)
             parent.assigns.push({
                 name,
@@ -1121,7 +1234,8 @@ function walkQmlTree(node, parent, document, text) {
         const inner = node[4] && node[4][1]
         if (inner && inner[0] === 'qmlelem') walkQmlTree(inner, parent, document, text)
         else {
-            const from = (loc && loc.range && parent.offsetStart != null) ? (infoOf(node) && infoOf(node).pos) || parent.offsetStart : parent.offsetStart
+            const infoPos = infoOf(node) && infoOf(node).pos
+            const from = (loc && loc.range && parent.offsetStart != null) ? (infoPos != null ? sourceOffset(text, infoPos) : parent.offsetStart) : parent.offsetStart
             const script = valueRangeAfterColon(text, from, parent.offsetEnd)
             if (script) {
                 parent.properties[parent.properties.length - 1].scriptStart = script.start
@@ -1259,6 +1373,10 @@ function parseQmlDocument(filePath, text) {
     }
 
     document.imports = extractImports(document.ast[1])
+    for (const item of document.imports) {
+        const range = rangeOfImportModule(text, item.path)
+        if (range) item.range = range
+    }
     document.pragmas = extractPragmas(document.ast[3])
     document.singleton = document.pragmas.indexOf('Singleton') >= 0
     walkQmlTree(document.ast[2], null, document, text)
@@ -1299,7 +1417,11 @@ class LanguageService {
         this.qmlDocuments = new Map()
         this.localTypes = new Map()
         this.moduleByPath = new Map()
+        this.moduleQmldirs = new Map()
         this.configDirs = []
+        this.configIssues = []
+        this.cppModules = new Map()
+        this.cppScanDone = false
         this.workspaceFolders = []
         this.pathEnv = Object.assign({}, process.env)
         this.extraEnv = (options && options.extraEnv) || {}
@@ -1342,50 +1464,140 @@ class LanguageService {
 
     setExtraEnv(extraEnv) {
         this.extraEnv = extraEnv || {}
+        this.cppScanDone = false
+        this.dropCppModules()
     }
 
-    rebuildPathEnv(seedPaths) {
-        this.pathEnv = Object.assign({}, process.env)
-        const inferred = inferProjectEnv(seedPaths)
-        for (const key of Object.keys(inferred)) {
-            if (!this.pathEnv[key]) this.pathEnv[key] = inferred[key]
+    dropCppModules() {
+        if (!this.cppModules) {
+            this.cppModules = new Map()
+            return
         }
-        Object.assign(this.pathEnv, this.extraEnv)
+        for (const moduleName of this.cppModules.keys()) {
+            const list = (this.moduleTypes.get(moduleName) || []).filter(type => !type.cpp)
+            if (list.length) this.moduleTypes.set(moduleName, list)
+            else this.moduleTypes.delete(moduleName)
+        }
+        for (const [key, type] of this.engineTypes) {
+            if (type && type.cpp) this.engineTypes.delete(key)
+        }
+        this.cppModules = new Map()
+    }
+
+    ensureCppModulesFor(document) {
+        if (this.cppScanDone || !document || !document.imports) return
+        const pending = document.imports.some(item => {
+            if (!item.path || item.path.indexOf('.') < 0 || item.path.indexOf('.js') >= 0) return false
+            if (this.engine.modules.indexOf(item.path) >= 0) return false
+            if (this.moduleTypes.has(item.path)) return false
+            return true
+        })
+        if (pending) this.ensureCppModules()
+    }
+
+    ensureCppModules() {
+        if (this.cppScanDone) return
+        this.cppScanDone = true
+        if (!this.cppModules) this.cppModules = new Map()
+        const env = Object.assign({}, this.pathEnv, this.extraEnv)
+        const files = []
+        for (const root of cppSourceRoots(env)) walkCppFiles(root, files, 0)
+        for (const filePath of files) {
+            let text = ''
+            try {
+                if (fs.statSync(filePath).size > 1024 * 1024) continue
+                text = readFile(filePath)
+            } catch {
+                continue
+            }
+            if (text.indexOf('qmlRegister') < 0) continue
+            for (const item of cppRegistrations(text)) {
+                const start = offsetToPosition(text, item.index)
+                const range = {
+                    start,
+                    end: { line: start.line, character: start.character + item.module.length },
+                }
+                const type = new TypeRecord({
+                    name: item.name,
+                    qualifiedName: item.module + '.' + item.name,
+                    module: item.module,
+                    kind: 'element',
+                    singleton: item.singleton,
+                    filePath: normalizePath(filePath),
+                })
+                type.cpp = true
+                type.range = range
+                const list = this.moduleTypes.get(item.module) || []
+                if (!list.some(entry => entry.name === item.name && entry.cpp)) list.push(type)
+                this.moduleTypes.set(item.module, list)
+                this.engineTypes.set(type.qualifiedName, type)
+                if (!this.cppModules.has(item.module)) {
+                    this.cppModules.set(item.module, {
+                        filePath: normalizePath(filePath),
+                        range,
+                    })
+                }
+            }
+        }
+    }
+
+    rebuildPathEnv() {
+        this.pathEnv = Object.assign({}, process.env, this.extraEnv)
         if (!this.engineSourceRoot || !pathExists(path.join(this.engineSourceRoot, 'QtQuick', 'QtQuick.js'))) {
-            const fromCore = this.pathEnv.IMTCOREDIR
-                ? path.join(this.pathEnv.IMTCOREDIR, 'Tools', 'JQML', 'v3')
-                : ''
-            this.engineSourceRoot = detectEngineRoot(this.engineSourceRoot || this.enginePath || fromCore)
+            this.engineSourceRoot = detectEngineRoot(this.engineSourceRoot || this.enginePath)
         }
         return this.pathEnv
     }
 
+    noteConfigIssue(severity, message) {
+        if (!this.configIssues) this.configIssues = []
+        if (this.configIssues.some(item => item.message === message)) return
+        this.configIssues.push({ severity, message })
+    }
+
     loadConfig(configPath) {
         this.configDirs = []
+        this.configIssues = []
         if (!configPath) return
-        this.rebuildPathEnv([configPath].concat(this.workspaceFolders))
+        this.rebuildPathEnv()
         const abs = resolveConfigRef(process.cwd(), envFillPath(configPath, this.pathEnv), this.pathEnv)
-        if (!fs.existsSync(abs)) return
+        if (!fs.existsSync(abs)) {
+            this.noteConfigIssue('error', 'JQML config was not found: ' + abs)
+            return
+        }
         const configDirPath = path.dirname(abs)
         const dirs = []
         const env = this.pathEnv
+
+        const considerPath = (filePath, resolved, kind) => {
+            if (String(resolved).indexOf('${') >= 0) {
+                this.noteConfigIssue('error', 'JQML config ' + kind + ' was not resolved: ' + filePath)
+                return false
+            }
+            if (!fs.existsSync(resolved)) {
+                this.noteConfigIssue('warning', 'JQML config ' + kind + ' was not found: ' + resolved)
+                return false
+            }
+            return true
+        }
 
         const includeFiles = (sourceFile, baseDirPath) => {
             if (!sourceFile.includes) return
             for (const filePath of sourceFile.includes) {
                 const absoluteConfigPath = resolveConfigRef(baseDirPath, filePath, env)
-                if (!fs.existsSync(absoluteConfigPath)) continue
+                if (!considerPath(filePath, absoluteConfigPath, 'include')) continue
                 const includeConfigDirPath = path.dirname(absoluteConfigPath)
                 let file
                 try {
                     file = JSON.parse(envFill(readFile(absoluteConfigPath), env))
-                } catch {
+                } catch (error) {
+                    this.noteConfigIssue('error', 'JQML config include could not be read: ' + absoluteConfigPath + ' (' + error.message + ')')
                     continue
                 }
                 includeFiles(file, includeConfigDirPath)
                 for (const dirPath of file.dirs || []) {
                     const resolved = resolveConfigRef(includeConfigDirPath, dirPath, env)
-                    if (resolved.indexOf('${') >= 0) continue
+                    if (!considerPath(dirPath, resolved, 'dir')) continue
                     dirs.unshift(resolved)
                 }
             }
@@ -1394,13 +1606,14 @@ class LanguageService {
         let config
         try {
             config = JSON.parse(envFill(readFile(abs), env))
-        } catch {
+        } catch (error) {
+            this.noteConfigIssue('error', 'JQML config could not be read: ' + abs + ' (' + error.message + ')')
             return
         }
         includeFiles(config, configDirPath)
         for (const dirPath of config.dirs || []) {
             const resolved = resolveConfigRef(configDirPath, dirPath, env)
-            if (resolved.indexOf('${') >= 0) continue
+            if (!considerPath(dirPath, resolved, 'dir')) continue
             dirs.push(resolved)
         }
         if (fs.existsSync(path.join(configDirPath, 'qmldir'))) {
@@ -1420,6 +1633,8 @@ class LanguageService {
         const dirPath = path.dirname(abs)
         const parsed = parseQmldir(dirPath, readFile(abs))
         if (!parsed.moduleName) return
+        if (!this.moduleQmldirs) this.moduleQmldirs = new Map()
+        this.moduleQmldirs.set(parsed.moduleName, abs)
         this.moduleByPath.set(normalizePath(dirPath), parsed.moduleName)
         for (const item of parsed.types) {
             this.moduleByPath.set(item.filePath, parsed.moduleName)
@@ -1567,6 +1782,7 @@ class LanguageService {
 
     resolveType(typeName, document) {
         if (!typeName) return null
+        this.ensureCppModulesFor(document)
         if (this.engineTypes.has(typeName)) return this.engineTypes.get(typeName)
 
         const parts = String(typeName).split('.')
@@ -1770,6 +1986,7 @@ class LanguageService {
     }
 
     availableTypes(document) {
+        this.ensureCppModulesFor(document)
         const result = new Map()
         for (const local of this.sameDirectoryTypes(document)) result.set(local.name, local)
 
@@ -1801,11 +2018,13 @@ class LanguageService {
 
         for (const item of document.imports) {
             if (!item.path || item.path.indexOf('.js') >= 0) continue
+            if (item.path.indexOf('.') >= 0) this.ensureCppModules()
             const known = this.engine.modules.indexOf(item.path) >= 0
-                || KNOWN_CPP_MODULES.has(item.path)
                 || [...this.localTypes.values()].some(entry => entry.module === item.path)
                 || this.moduleTypes.has(item.path)
+                || (this.cppModules && this.cppModules.has(item.path))
             if (!known) {
+                if (item.path.indexOf('.') >= 0) continue
                 diagnostics.push({
                     message: item.path + ' is not found',
                     severity: 'error',
@@ -1825,6 +2044,7 @@ class LanguageService {
                 continue
             }
             if (element.typeName === 'ListElement') continue
+            if (type.cpp) continue
 
             const members = memberMap(this.membersOfElement(element, document))
             for (const assign of element.assigns) {
@@ -2210,9 +2430,6 @@ class LanguageService {
         add(this.enginePath)
         add(this.engineSourceRoot)
         add(detectEngineRoot(''))
-        if (this.pathEnv && this.pathEnv.IMTCOREDIR) {
-            add(path.join(this.pathEnv.IMTCOREDIR, 'Tools', 'JQML', 'v3'))
-        }
         return roots
     }
 
@@ -2245,6 +2462,9 @@ class LanguageService {
 
     typeLocation(type) {
         if (!type) return null
+        if (type.cpp && type.filePath && type.range) {
+            return { filePath: normalizePath(type.filePath), range: type.range }
+        }
         if (type.filePath && !type.engine && pathExists(type.filePath)) {
             const doc = this.getDocument(type.filePath)
             if (doc && doc.root && doc.root.nameRange) {
@@ -2267,19 +2487,27 @@ class LanguageService {
 
     moduleLocation(moduleName) {
         if (!moduleName) return null
+        if (moduleName.indexOf('.') >= 0) this.ensureCppModules()
+        if (this.cppModules && this.cppModules.has(moduleName)) return this.cppModules.get(moduleName)
+        const indexed = this.moduleQmldirs && this.moduleQmldirs.get(moduleName)
+        if (indexed && pathExists(indexed)) {
+            return { filePath: indexed, range: qmldirModuleRange(indexed, moduleName) }
+        }
         for (const meta of this.localTypes.values()) {
-            if (meta.module === moduleName && meta.filePath && pathExists(meta.filePath)) {
-                const qmldir = path.join(path.dirname(meta.filePath), 'qmldir')
+            if (meta.module !== moduleName || !meta.filePath || !pathExists(meta.filePath)) continue
+            let dir = path.dirname(meta.filePath)
+            for (let depth = 0; depth < 6; depth++) {
+                const qmldir = path.join(dir, 'qmldir')
                 if (pathExists(qmldir)) {
-                    return {
-                        filePath: normalizePath(qmldir),
-                        range: { start: { line: 0, character: 0 }, end: { line: 0, character: 1 } },
-                    }
+                    return { filePath: normalizePath(qmldir), range: qmldirModuleRange(qmldir, moduleName) }
                 }
-                return {
-                    filePath: normalizePath(meta.filePath),
-                    range: { start: { line: 0, character: 0 }, end: { line: 0, character: 1 } },
-                }
+                const parent = path.dirname(dir)
+                if (parent === dir) break
+                dir = parent
+            }
+            return {
+                filePath: normalizePath(meta.filePath),
+                range: { start: { line: 0, character: 0 }, end: { line: 0, character: 1 } },
             }
         }
         return null
@@ -2343,6 +2571,37 @@ class LanguageService {
         const document = this.analysisDocument(filePath, text)
         const source = text != null ? text : document.text || ''
         const token = tokenAtOffset(source, offset)
+        const imported = importModuleAt(source, offset, document.imports)
+        if (imported) {
+            return { kind: 'module', name: imported.path, document, token, range: imported.range }
+        }
+        const declared = declaredSymbolAt(source, offset)
+        if (declared) {
+            const start = offsetToPosition(source, declared.index)
+            const range = {
+                start,
+                end: { line: start.line, character: start.character + declared.name.length },
+            }
+            if (declared.kind === 'id') {
+                const element = (document.ids && document.ids[declared.name]) || this.findElementById(document, declared.name)
+                if (element) return { kind: 'id', name: declared.name, element, document, token, range }
+            }
+            const owner = this.findInnermostElement(document, declared.index)
+            const members = memberMap(owner ? this.membersOfElement(owner, document) : [])
+            const found = members.get(declared.name)
+            const member = found
+                ? Object.assign({}, found, { filePath: document.filePath, range })
+                : { name: declared.name, kind: declared.kind, filePath: document.filePath, range }
+            return {
+                kind: 'member',
+                name: declared.name,
+                member,
+                type: owner && this.resolveType(owner.typeName, document),
+                document,
+                token,
+                range,
+            }
+        }
         if (!token) return null
         const pos = offsetToPosition(source, offset)
         const element = this.findInnermostElement(document, offset)
@@ -2355,11 +2614,6 @@ class LanguageService {
         }
 
         if (!token.path.length) {
-            for (const item of document.imports) {
-                if (item.path === token.name || item.path.split('.').pop() === token.name) {
-                    return { kind: 'module', name: item.path, document, token }
-                }
-            }
             if (document.ids[token.name]) {
                 return { kind: 'id', name: token.name, element: document.ids[token.name], document, token }
             }
@@ -2377,7 +2631,7 @@ class LanguageService {
             if (member) return { kind: 'member', name: member.name, member, type: resolved.type, document, token }
         }
 
-        if (element) {
+        if (element && !token.path.length) {
             const members = memberMap(this.membersOfElement(element, document))
             const member = members.get(token.name) || members.get(memberName)
             if (member) {
@@ -2414,9 +2668,13 @@ class LanguageService {
         }
         if (symbol.kind === 'module') {
             const loc = this.moduleLocation(symbol.name)
-            return loc ? [loc] : []
+            if (loc) return [loc]
+            return []
         }
         if (symbol.kind === 'id') {
+            if (symbol.range && symbol.document && symbol.document.filePath) {
+                return [{ filePath: normalizePath(symbol.document.filePath), range: symbol.range }]
+            }
             const loc = this.idLocation(symbol.element, symbol.document)
             return loc ? [loc] : []
         }
@@ -2469,7 +2727,7 @@ class LanguageService {
             }
         }
         if (symbol.kind === 'module') {
-            return { detail: 'module ' + symbol.name, range: symbol.token.range }
+            return { detail: 'module ' + symbol.name, range: symbol.range || (symbol.token && symbol.token.range) }
         }
         return null
     }
@@ -2477,6 +2735,51 @@ class LanguageService {
     getDefinition(filePath, text, offset) {
         return this.locationOfSymbol(this.resolveSymbol(filePath, text, offset))
     }
+
+    getReferences(filePath, text, offset) {
+        const source = text != null ? text : ''
+        const symbol = this.resolveSymbol(filePath, source, offset)
+        if (!symbol || !symbol.name) return []
+        const defs = this.locationOfSymbol(symbol)
+        const defKeys = new Set(defs.map(locationKey))
+        const refs = []
+        const seen = new Set()
+        const push = loc => {
+            if (!loc || !loc.filePath || !loc.range || !loc.range.start) return
+            const key = locationKey(loc)
+            if (seen.has(key)) return
+            seen.add(key)
+            refs.push(loc)
+        }
+        for (const loc of defs) push(loc)
+        const names = [symbol.name]
+        if (symbol.member && symbol.member.kind === KIND.signal && symbol.name) {
+            names.push('on' + symbol.name.charAt(0).toUpperCase() + symbol.name.slice(1))
+        }
+        const ownerPath = (symbol.document && symbol.document.filePath) || filePath
+        for (const name of names) {
+            const re = new RegExp('\\b' + escapeRegExp(name) + '\\b', 'g')
+            let match
+            while ((match = re.exec(source))) {
+                const hits = this.locationOfSymbol(this.resolveSymbol(filePath, source, match.index))
+                if (!hits.some(loc => defKeys.has(locationKey(loc)))) continue
+                const start = offsetToPosition(source, match.index)
+                push({
+                    filePath: ownerPath,
+                    range: {
+                        start,
+                        end: { line: start.line, character: start.character + name.length },
+                    },
+                })
+            }
+        }
+        return refs
+    }
+}
+
+function locationKey(loc) {
+    if (!loc || !loc.filePath || !loc.range || !loc.range.start) return ''
+    return normalizePath(loc.filePath) + ':' + loc.range.start.line + ':' + loc.range.start.character + ':' + (loc.range.end ? loc.range.end.character : '')
 }
 
 function uniqueCompletions(items) {
@@ -2513,7 +2816,7 @@ module.exports = {
     serializeEngine,
     parseQmldir,
     resolveConfigRef,
-    inferProjectEnv,
+    resolveConfigRef,
     positionToOffset,
     offsetToPosition,
 }

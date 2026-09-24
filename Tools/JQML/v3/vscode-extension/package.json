@@ -2,7 +2,7 @@
     "name": "jqml",
     "displayName": "JQML",
     "description": "Syntax highlighting, completions and diagnostics for the JQML engine",
-    "version": "1.0.10",
+    "version": "1.0.17",
     "publisher": "imtcore",
     "engines": {
         "vscode": "^1.74.0"
@@ -47,13 +47,13 @@
                 "jqml.configPath": {
                     "type": "string",
                     "default": "",
-                    "description": "Path to a JQML compiler JSON config with dirs/includes. Absolute path, ${workspaceFolder}, and ${env:NAME} are supported. IMTCOREDIR/PROLIFEDIR/TARGETNAME are inferred from this file if they are not in the environment."
+                    "description": "Path to a JQML compiler JSON config with dirs/includes. Absolute path, ${workspaceFolder}, and ${env:NAME} are supported. Placeholders inside the config are taken from jqml.env and the process environment."
                 },
                 "jqml.env": {
                     "type": "object",
                     "additionalProperties": { "type": "string" },
                     "default": {},
-                    "description": "Optional environment variables used when resolving ${IMTCOREDIR}, ${PROLIFEDIR}, ${TARGETNAME} and similar placeholders in compiler configs."
+                    "description": "Environment variables used when resolving ${NAME} placeholders in jqml.configPath and in the compiler config. These values override the process environment."
                 },
                 "jqml.hideInternalMembers": {
                     "type": "boolean",
