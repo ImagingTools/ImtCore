@@ -275,6 +275,12 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="PermissionChecker" PackageId="ImtAuthPck" ComponentId="CheckPermissionOr">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="SlaveSubscriberController" PackageId="ImtServerGqlPck" ComponentId="SlaveSubscriberController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -388,8 +394,8 @@
                     <AttributeInfo Id="CommandPermissions" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TagCommandPermissions"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="PermissionChecker">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PermissionChecker"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TagCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TagRepository"/>
@@ -498,8 +504,8 @@
                     <AttributeInfo Id="OperationContextController" Type="Reference" ExportId="OperationContextController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="PermissionChecker">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PermissionChecker"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SystemTagSeeder" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SystemTagSeeder"/>
@@ -623,8 +629,8 @@
                     <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TagRepository"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="PermissionChecker">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PermissionChecker"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantFilterEnabled" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
