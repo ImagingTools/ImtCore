@@ -94,6 +94,8 @@ function createGuiConfig({
         ]
       : 'list',
     ...(globalSetup ? { globalSetup } : {}),
+    // Drops the empty per-test folders a passing run leaves in outputDir (see globalTeardown.js).
+    globalTeardown: require.resolve('./globalTeardown'),
     // A two-phase CI run invokes Playwright twice against this ONE config, and Playwright clears
     // outputDir at the start of every invocation - without per-phase paths the second phase wipes the
     // first's artifacts.
