@@ -265,6 +265,9 @@ imtchat.file = ../../Include/imtchat/QMake/imtchat.pro
 SUBDIRS += imtdesk
 imtdesk.file = ../../Include/imtdesk/QMake/imtdesk.pro
 
+SUBDIRS += imttag
+imttag.file = ../../Include/imttag/QMake/imttag.pro
+
 SUBDIRS += imtchatgql
 imtchatgql.file = ../../Include/imtchatgql/QMake/imtchatgql.pro
 imtchatgql.depends = imtchatsdl
@@ -278,6 +281,9 @@ imtchatdb.file = ../../Include/imtchatdb/QMake/imtchatdb.pro
 
 SUBDIRS += imtdeskdb
 imtdeskdb.file = ../../Include/imtdeskdb/QMake/imtdeskdb.pro
+
+SUBDIRS += imttagdb
+imttagdb.file = ../../Include/imttagdb/QMake/imttagdb.pro
 
 # GUI libraries
 SUBDIRS += imtgui
@@ -533,6 +539,14 @@ ImtChatPck.depends = imtbase imtchat
 SUBDIRS += ImtDeskPck
 ImtDeskPck.file = ../../Impl/ImtDeskPck/QMake/ImtDeskPck.pro
 ImtDeskPck.depends = imtbase imtdesk
+
+SUBDIRS += ImtTagPck
+ImtTagPck.file = ../../Impl/ImtTagPck/QMake/ImtTagPck.pro
+ImtTagPck.depends = imtbase imttag imtauth imtcol
+
+SUBDIRS += ImtTagDbPck
+ImtTagDbPck.file = ../../Impl/ImtTagDbPck/QMake/ImtTagDbPck.pro
+ImtTagDbPck.depends = imttagdb imtdb imttag imtbase imtcol
 
 SUBDIRS += ImtChatDbPck
 ImtChatDbPck.file = ../../Impl/ImtChatDbPck/QMake/ImtChatDbPck.pro
