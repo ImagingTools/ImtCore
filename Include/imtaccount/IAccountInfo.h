@@ -7,6 +7,7 @@
 #include <idoc/IDocumentMetaInfo.h>
 #include <iimg/IBitmap.h>
 #include <iser/IObject.h>
+#include <istd/TPointerVector.h>
 
 // ImtCore includes
 #include <imtaccount/IContactInfo.h>
@@ -145,6 +146,9 @@ public:
 	*/
 	virtual const iauth::IRightsProvider& GetAccountRights() const = 0;
 };
+
+
+typedef istd::TPointerVector<const IAccountInfo> AccountInfoList;
 
 
 } // namespace imtaccount
