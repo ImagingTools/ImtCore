@@ -45,11 +45,6 @@ I_EXPORT_COMPONENT(
 			"Registration of a collection whose entities can be tagged",
 			"Taggable Entity Type");
 
-I_EXPORT_COMPONENT(
-			TagHistoryEventProvider,
-			"Shows tag events in the document history",
-			"Tag History Event Provider");
-
 
 } // namespace ImtTagPck
 

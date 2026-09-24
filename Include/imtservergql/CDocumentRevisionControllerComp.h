@@ -5,7 +5,6 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IDocumentChangeGenerator.h>
-#include <imtbase/IDocumentHistoryEventProvider.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentRevision_fwd.h>
 
@@ -23,7 +22,6 @@ public:
 		I_ASSIGN_MULTI_0(m_collectionIdsAttrPtr, "CollectionIds", "Collection ID-s", false);
 		I_ASSIGN_MULTI_0(m_objectCollectionsCompPtr, "ObjectCollections", "Object collections", false);
 		I_ASSIGN_MULTI_0(m_documentChangeGeneratorsCompPtr, "DocumentChangeGenerators", "Document change generators", false);
-		I_ASSIGN_MULTI_0(m_historyEventProvidersCompPtr, "HistoryEventProviders", "Sources of history entries shown between the revisions (e.g. tag events)", false);
 	I_END_COMPONENT;
 
 protected:
@@ -45,7 +43,6 @@ protected:
 	I_MULTIATTR(QByteArray, m_collectionIdsAttrPtr);
 	I_MULTIREF(imtbase::IObjectCollection, m_objectCollectionsCompPtr);
 	I_MULTIREF(imtbase::IDocumentChangeGenerator, m_documentChangeGeneratorsCompPtr);
-	I_MULTIREF(imtbase::IDocumentHistoryEventProvider, m_historyEventProvidersCompPtr);
 };
 
 

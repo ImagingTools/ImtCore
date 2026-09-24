@@ -3,9 +3,6 @@
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentRevision.h>
 
 
-// STL includes
-#include <algorithm>
-
 // ACF includes
 #include <istd/TSingleFactory.h>
 #include <iser/CJsonMemReadArchive.h>
@@ -170,7 +167,9 @@ sdl::V1_0::imtbase::CRevisionInfoList CDocumentRevisionControllerComp::OnGetRevi
 	imtbase::IRevisionController::RevisionInfoList revisionInfoList = revisionControllerPtr->GetRevisionInfoList(*objectCollectionPtr, documentId);
 	imtsdl::TElementList<sdl::V1_0::imtbase::CRevisionItem> revisionItemList;
 
-	QList<QPair<QDateTime, sdl::V1_0::imtbase::CRevisionItem>> historyEntries;
+	// The active revision and the total are properties of the whole list, not of
+	// the requested page, so both are determined before paging is applied.
+	int matchedCount = 0;
 	for (const imtbase::IRevisionController::RevisionInfo& revisionInfo : revisionInfoList){
 		sdl::V1_0::imtbase::CRevisionItem revisionItem;
 
@@ -182,7 +181,6 @@ sdl::V1_0::imtbase::CRevisionInfoList CDocumentRevisionControllerComp::OnGetRevi
 		revisionItem.user = revisionInfo.user;
 		revisionItem.isActive = (revisionInfo.isRevisionAvailable);
 		revisionItem.timestamp = revisionInfo.timestamp.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		revisionItem.kind = QStringLiteral("Revision");
 
 		if (documentChangeGeneratorPtr != nullptr){
 			imtbase::CObjectCollection changeCollection;
@@ -196,46 +194,6 @@ sdl::V1_0::imtbase::CRevisionInfoList CDocumentRevisionControllerComp::OnGetRevi
 				revisionItem.description = operationDescription;
 			}
 		}
-
-		historyEntries << qMakePair(revisionInfo.timestamp, revisionItem);
-	}
-
-	// Events are ordered into the revisions in the direction the revision controller uses.
-	bool hasEvents = false;
-	for (int providerIndex = 0; providerIndex < m_historyEventProvidersCompPtr.GetCount(); ++providerIndex){
-		const imtbase::IDocumentHistoryEventProvider* providerPtr = m_historyEventProvidersCompPtr[providerIndex];
-		if (providerPtr == nullptr){
-			continue;
-		}
-
-		for (const imtbase::IDocumentHistoryEventProvider::HistoryEvent& historyEvent : providerPtr->GetHistoryEvents(collectionId, documentId, languageId)){
-			sdl::V1_0::imtbase::CRevisionItem eventItem;
-			eventItem.revision = int(historyEvent.revision);
-			eventItem.user = historyEvent.user;
-			eventItem.isActive = false;
-			eventItem.timestamp = historyEvent.timestamp.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-			eventItem.description = historyEvent.description;
-			eventItem.kind = QString::fromUtf8(historyEvent.kind);
-
-			historyEntries << qMakePair(historyEvent.timestamp, eventItem);
-			hasEvents = true;
-		}
-	}
-
-	if (hasEvents){
-		const bool isDescending = (revisionInfoList.count() > 1) && (revisionInfoList.first().timestamp > revisionInfoList.last().timestamp);
-		std::stable_sort(historyEntries.begin(), historyEntries.end(),
-					[isDescending](const QPair<QDateTime, sdl::V1_0::imtbase::CRevisionItem>& first, const QPair<QDateTime, sdl::V1_0::imtbase::CRevisionItem>& second)
-		{
-			return isDescending ? (first.first > second.first) : (first.first < second.first);
-		});
-	}
-
-	// The active revision and the total are properties of the whole list, not of
-	// the requested page, so both are determined before paging is applied.
-	int matchedCount = 0;
-	for (const QPair<QDateTime, sdl::V1_0::imtbase::CRevisionItem>& historyEntry : historyEntries){
-		const sdl::V1_0::imtbase::CRevisionItem& revisionItem = historyEntry.second;
 
 		if (!MatchesRevisionFilter(revisionItem, filterText)){
 			continue;
