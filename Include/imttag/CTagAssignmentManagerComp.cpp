@@ -263,7 +263,6 @@ bool CTagAssignmentManagerComp::ChangeTags(
 	const bool useTransaction = m_transactionManagerCompPtr.IsValid() && m_transactionManagerCompPtr->StartTransaction();
 
 	bool retVal = ApplyChanges(entityType, changes, assignments, operationContextPtr);
-	retVal = retVal && InsertEvents(entityType, changes, visibleTags, operationContextPtr);
 
 	if (useTransaction){
 		if (retVal){
@@ -350,80 +349,6 @@ bool CTagAssignmentManagerComp::ApplyChanges(
 						operationContextPtr);
 			if (newId.isEmpty()){
 				SendErrorMessage(0, QStringLiteral("Tag '%1' could not be assigned to '%2'").arg(QString::fromUtf8(tagId), QString::fromUtf8(change.entityId)));
-
-				return false;
-			}
-		}
-	}
-
-	return true;
-}
-
-
-bool CTagAssignmentManagerComp::InsertEvents(
-			const QByteArray& entityType,
-			const EntityTagChanges& changes,
-			const TagSnapshots& tagSnapshots,
-			const imtbase::IOperationContext* operationContextPtr)
-{
-	if (!m_eventCollectionCompPtr.IsValid() || !m_eventFactoryCompPtr.IsValid()){
-		return true;
-	}
-
-	QByteArray actorId;
-	QString actorName;
-	QByteArray tenantId;
-	if (operationContextPtr != nullptr){
-		const imtbase::IOperationContext::IdentifableObjectInfo ownerInfo = operationContextPtr->GetOperationOwnerId();
-		actorId = ownerInfo.id;
-		actorName = ownerInfo.name;
-		tenantId = operationContextPtr->GetTenantId();
-	}
-
-	const QDateTime now = QDateTime::currentDateTimeUtc();
-
-	for (const EntityTagChange& change : changes){
-		const qlonglong revision = GetEntityRevision(entityType, change.entityId);
-
-		QList<QPair<ITagEvent::Action, QByteArray>> events;
-		for (const QByteArray& tagId : change.removedTagIds){
-			events << qMakePair(ITagEvent::A_UNTAGGED, tagId);
-		}
-		for (const QByteArray& tagId : change.addedTagIds){
-			events << qMakePair(ITagEvent::A_TAGGED, tagId);
-		}
-
-		for (const QPair<ITagEvent::Action, QByteArray>& event : events){
-			ITagEventUniquePtr eventPtr = m_eventFactoryCompPtr.CreateInstance();
-			if (!eventPtr.IsValid()){
-				return false;
-			}
-
-			const TagSnapshot snapshot = tagSnapshots.value(event.second);
-
-			eventPtr->SetAction(event.first);
-			eventPtr->SetTagId(event.second);
-			eventPtr->SetTagName(snapshot.name);
-			eventPtr->SetTagColor(snapshot.color);
-			eventPtr->SetEntityType(entityType);
-			eventPtr->SetEntityId(change.entityId);
-			eventPtr->SetEntityRevision(revision);
-			eventPtr->SetActorId(actorId);
-			eventPtr->SetActorName(actorName);
-			eventPtr->SetTenantId(tenantId);
-			eventPtr->SetTimestamp(now);
-
-			const QByteArray newId = m_eventCollectionCompPtr->InsertNewObject(
-						"TagEvent",
-						QString(),
-						QString(),
-						eventPtr.GetPtr(),
-						QByteArray(),
-						nullptr,
-						nullptr,
-						operationContextPtr);
-			if (newId.isEmpty()){
-				SendErrorMessage(0, QStringLiteral("Tag event could not be stored"));
 
 				return false;
 			}
@@ -550,24 +475,6 @@ void CTagAssignmentManagerComp::InitScopeParams(
 		tenantFilterPtr->SetTenantId(operationContextPtr->GetTenantId());
 		paramsSet.SetEditableParameter("TenantFilter", tenantFilterPtr, true);
 	}
-}
-
-
-qlonglong CTagAssignmentManagerComp::GetEntityRevision(const QByteArray& entityType, const QByteArray& entityId) const
-{
-	const imtbase::IObjectCollection* entityCollectionPtr = GetEntityCollection(entityType);
-	if (entityCollectionPtr == nullptr){
-		return -1;
-	}
-
-	const idoc::MetaInfoPtr metaInfoPtr = entityCollectionPtr->GetElementMetaInfo(entityId);
-	if (!metaInfoPtr.IsValid()){
-		return -1;
-	}
-
-	const QVariant revision = metaInfoPtr->GetMetaInfo(imtbase::ICollectionInfo::MIT_REVISION);
-
-	return revision.isValid() ? revision.toLongLong() : -1;
 }
 
 

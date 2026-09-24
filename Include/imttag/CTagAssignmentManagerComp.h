@@ -13,7 +13,6 @@
 #include <imttag/ITag.h>
 #include <imttag/ITagAssignment.h>
 #include <imttag/ITagAssignmentManager.h>
-#include <imttag/ITagEvent.h>
 
 
 namespace iprm
@@ -37,10 +36,8 @@ public:
 		I_REGISTER_INTERFACE(ITagAssignmentManager);
 		I_ASSIGN(m_tagCollectionCompPtr, "TagCollection", "Tag catalog", true, "TagCollection");
 		I_ASSIGN(m_assignmentCollectionCompPtr, "AssignmentCollection", "SQL-backed TagAssignments collection", true, "TagAssignmentCollection");
-		I_ASSIGN(m_eventCollectionCompPtr, "EventCollection", "SQL-backed TagEvents collection", false, "TagEventCollection");
 		I_ASSIGN(m_assignmentFactoryCompPtr, "AssignmentFactory", "Factory of tag assignments", true, "TagAssignment");
-		I_ASSIGN(m_eventFactoryCompPtr, "EventFactory", "Factory of tag events", false, "TagEvent");
-		I_ASSIGN(m_transactionManagerCompPtr, "TransactionManager", "Transaction manager spanning assignments and events", false, "TransactionManager");
+		I_ASSIGN(m_transactionManagerCompPtr, "TransactionManager", "Transaction manager spanning the assignment changes of one call", false, "TransactionManager");
 		I_ASSIGN_MULTI_0(m_entityTypesCompPtr, "EntityTypes", "Taggable entity types", false);
 		I_ASSIGN_TO(m_entityCollectionsCompPtr, m_entityTypesCompPtr, false);
 	I_END_COMPONENT;
@@ -110,11 +107,6 @@ private:
 				const EntityTagChanges& changes,
 				const QMap<QByteArray, QMap<QByteArray, QByteArray>>& assignmentIds,
 				const imtbase::IOperationContext* operationContextPtr);
-	bool InsertEvents(
-				const QByteArray& entityType,
-				const EntityTagChanges& changes,
-				const TagSnapshots& tagSnapshots,
-				const imtbase::IOperationContext* operationContextPtr);
 
 	/**
 		Load assignments of the entities as entity ID -> (tag ID -> assignment ID).
@@ -133,14 +125,11 @@ private:
 				iprm::CParamsSet& paramsSet,
 				const QByteArrayList& ids,
 				const imtbase::IOperationContext* operationContextPtr) const;
-	qlonglong GetEntityRevision(const QByteArray& entityType, const QByteArray& entityId) const;
 	bool SetError(QString* errorMessagePtr, const QString& message) const;
 
 	I_REF(imtbase::IObjectCollection, m_tagCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_assignmentCollectionCompPtr);
-	I_REF(imtbase::IObjectCollection, m_eventCollectionCompPtr);
 	I_FACT(ITagAssignment, m_assignmentFactoryCompPtr);
-	I_FACT(ITagEvent, m_eventFactoryCompPtr);
 	I_REF(imtbase::ITransactionManager, m_transactionManagerCompPtr);
 	I_MULTIREF(imtbase::IEntityTypeProvider, m_entityTypesCompPtr);
 	I_MULTIREF(imtbase::IObjectCollectionProvider, m_entityCollectionsCompPtr);

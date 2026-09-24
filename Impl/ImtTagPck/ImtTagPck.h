@@ -8,7 +8,6 @@
 // ImtCore includes
 #include <imttag/CTagComp.h>
 #include <imttag/CTagAssignmentComp.h>
-#include <imttag/CTagEventComp.h>
 #include <imttag/CTagAssignmentManagerComp.h>
 #include <imttag/CSystemTagSeederComp.h>
 #include <imttag/CTaggableEntityTypeComp.h>
@@ -23,7 +22,6 @@ namespace ImtTagPck
 
 typedef icomp::TModelCompWrap<imttag::CTagComp> Tag;
 typedef icomp::TModelCompWrap<imttag::CTagAssignmentComp> TagAssignment;
-typedef icomp::TModelCompWrap<imttag::CTagEventComp> TagEvent;
 typedef icomp::TModelCompWrap<imttag::CTagAssignmentManagerComp> TagAssignmentManager;
 typedef imttag::CSystemTagSeederComp SystemTagSeeder;
 typedef imttag::CTaggableEntityTypeComp TaggableEntityType;

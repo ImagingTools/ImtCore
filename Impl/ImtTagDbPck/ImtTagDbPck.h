@@ -5,7 +5,6 @@
 // ImtCore includes
 #include <imttagdb/CTagDbDelegateComp.h>
 #include <imttagdb/CTagAssignmentDbDelegateComp.h>
-#include <imttagdb/CTagEventDbDelegateComp.h>
 
 
 /**
@@ -17,7 +16,6 @@ namespace ImtTagDbPck
 
 typedef imttagdb::CTagDbDelegateComp TagDbDelegate;
 typedef imttagdb::CTagAssignmentDbDelegateComp TagAssignmentDbDelegate;
-typedef imttagdb::CTagEventDbDelegateComp TagEventDbDelegate;
 
 
 } // namespace ImtTagDbPck

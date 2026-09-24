@@ -25,11 +25,6 @@ I_EXPORT_COMPONENT(
 			"Database delegate of tag assignments",
 			"Tag Assignment Database Delegate");
 
-I_EXPORT_COMPONENT(
-			TagEventDbDelegate,
-			"Database delegate of tag events",
-			"Tag Event Database Delegate");
-
 
 } // namespace ImtTagDbPck
 

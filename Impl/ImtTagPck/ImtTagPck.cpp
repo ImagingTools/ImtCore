@@ -26,11 +26,6 @@ I_EXPORT_COMPONENT(
 			"Tag Assignment");
 
 I_EXPORT_COMPONENT(
-			TagEvent,
-			"Tagged/untagged event",
-			"Tag Event");
-
-I_EXPORT_COMPONENT(
 			TagAssignmentManager,
 			"Manager of tag assignments",
 			"Tag Assignment Manager");
