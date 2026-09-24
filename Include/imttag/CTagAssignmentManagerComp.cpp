@@ -6,6 +6,7 @@
 #include <QtCore/QSet>
 
 // ACF includes
+#include <istd/CChangeNotifier.h>
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
@@ -280,6 +281,21 @@ bool CTagAssignmentManagerComp::ChangeTags(
 	if (changesPtr != nullptr){
 		*changesPtr = changes;
 	}
+
+	QVariantList changeList;
+	for (const EntityTagChange& change : changes){
+		QVariantMap changeMap;
+		changeMap["EntityId"] = change.entityId;
+		changeMap["AddedTagIds"] = QVariant::fromValue(change.addedTagIds);
+		changeMap["RemovedTagIds"] = QVariant::fromValue(change.removedTagIds);
+		changeList << changeMap;
+	}
+
+	istd::IChangeable::ChangeSet changeSet(CF_ASSIGNMENTS_CHANGED);
+	changeSet.SetChangeInfo("EntityType", entityType);
+	changeSet.SetChangeInfo("TenantId", (operationContextPtr != nullptr) ? operationContextPtr->GetTenantId() : QByteArray());
+	changeSet.SetChangeInfo("Changes", changeList);
+	istd::CChangeNotifier notifier(this, &changeSet);
 
 	return true;
 }

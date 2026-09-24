@@ -7,7 +7,7 @@
 #include <QtCore/QVector>
 
 // ACF includes
-#include <istd/IPolymorphic.h>
+#include <istd/IChangeable.h>
 
 
 namespace imtbase
@@ -26,12 +26,23 @@ namespace imttag
 
 	Every mutating call is scoped by the tenant of the operation context: a tag must be
 	a system tag or belong to that tenant, and every entity must be visible in that tenant.
-	Tags are never created implicitly. Each effective change is recorded as a tag event.
+	Tags are never created implicitly. Each effective change is recorded as a tag event
+	and announced with CF_ASSIGNMENTS_CHANGED.
 	\ingroup imttag
 */
-class ITagAssignmentManager: virtual public istd::IPolymorphic
+class ITagAssignmentManager: virtual public istd::IChangeable
 {
 public:
+	enum ChangeFlags
+	{
+		/**
+			Assignments changed. The change set carries the info keys
+			"EntityType" (QByteArray), "TenantId" (QByteArray) and
+			"Changes" (QVariantList of QVariantMap with "EntityId", "AddedTagIds", "RemovedTagIds").
+		*/
+		CF_ASSIGNMENTS_CHANGED = 0x7a61e1
+	};
+
 	struct EntityTagChange
 	{
 		QByteArray entityId;

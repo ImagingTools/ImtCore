@@ -24,7 +24,7 @@ namespace ImtTagPck
 typedef icomp::TModelCompWrap<imttag::CTagComp> Tag;
 typedef icomp::TModelCompWrap<imttag::CTagAssignmentComp> TagAssignment;
 typedef icomp::TModelCompWrap<imttag::CTagEventComp> TagEvent;
-typedef imttag::CTagAssignmentManagerComp TagAssignmentManager;
+typedef icomp::TModelCompWrap<imttag::CTagAssignmentManagerComp> TagAssignmentManager;
 typedef imttag::CSystemTagSeederComp SystemTagSeeder;
 typedef imttag::CTaggableEntityTypeComp TaggableEntityType;
 

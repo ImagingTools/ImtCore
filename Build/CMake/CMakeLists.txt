@@ -150,6 +150,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 	if(NOT DEFINED USE_QTDB OR USE_QTDB)
 		add_subdirectory("${SDL_DIR}/imtdesk/CMake" "${AUX_INCLUDE_DIR}/imtdesksdl")
 		add_dependencies(imtdesksdl imtbasesdl)
+
+		add_subdirectory("${SDL_DIR}/imttag/CMake" "${AUX_INCLUDE_DIR}/imttagsdl")
+		add_dependencies(imttagsdl imtbasesdl)
 	endif()
 
 	#-------- Libraries --------
@@ -279,6 +282,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		if(NOT DEFINED USE_QTDB OR USE_QTDB)
 			add_subdirectory("${INCLUDE_DIR}/imtdeskgql/CMake" "${AUX_INCLUDE_DIR}/imtdeskgql")
 			add_dependencies(imtdeskgql imtdesksdl)
+
+			add_subdirectory("${INCLUDE_DIR}/imttaggql/CMake" "${AUX_INCLUDE_DIR}/imttaggql")
+			add_dependencies(imttaggql imttagsdl)
 		endif()
 
 		add_subdirectory("${INCLUDE_DIR}/imtqml/CMake" "${AUX_INCLUDE_DIR}/imtqml")
@@ -507,6 +513,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 				add_subdirectory("${IMPL_DIR}/ImtDeskGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtDeskGqlPck")
 				add_dependencies(ImtDeskGqlPck imtdb imtdesk imtdesksdl imtservergql imtdoc imtdeskgql)
+
+				add_subdirectory("${IMPL_DIR}/ImtTagGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtTagGqlPck")
+				add_dependencies(ImtTagGqlPck imtdb imttag imttagsdl imtservergql imttaggql)
 				if (IMT_BUILD_CONTROLS_GALLERY)
 					add_subdirectory("${IMPL_DIR}/ImtControlsGallery/Build/CMake" "${AUX_INCLUDE_DIR}/ImtControlsGallery")
 					add_dependencies(ControlsGallery imtgui imtauthsdl imtlicsdl)
