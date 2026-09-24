@@ -21,8 +21,8 @@
 #include <imtdb/IDatabaseEngine.h>
 #include <imtdb/IMigrationController.h>
 #include <imtduckdb/CDuckSqlDriver.h>
-#include <imtduckdb/IDuckAppender.h>
 #include <imtduckdb/CDuckReadConnectionEngine.h>
+#include <imtduckdb/IDuckDatabaseMaintenance.h>
 
 
 namespace imtduckdb
@@ -48,13 +48,15 @@ public:
 */
 class CDuckDatabaseEngineComp:
 			virtual public CDuckDatabaseEngineAttr,
-			virtual public imtdb::IDatabaseEngine
+			virtual public imtdb::IDatabaseEngine,
+			virtual public IDuckDatabaseMaintenance
 {
 public:
 	typedef CDuckDatabaseEngineAttr BaseClass;
 
 	I_BEGIN_COMPONENT(CDuckDatabaseEngineComp);
 		I_REGISTER_INTERFACE(imtdb::IDatabaseEngine)
+		I_REGISTER_INTERFACE(IDuckDatabaseMaintenance)
 		I_ASSIGN(m_dbFilePathCompPtr, "DbPath", "Path to the DuckDB database file. Empty means an in-memory database", false, "");
 		I_ASSIGN(m_dbNameAttrPtr, "DbName", "Logical name of the database (used for diagnostic messages only)", true, "duckdb");
 		I_ASSIGN(m_migrationControllerCompPtr, "MigrationController", "Migration controller", false, "MigrationController");
@@ -82,7 +84,7 @@ public:
 				(e.g. unknown table); in that case, \a errorMessagePtr (if not null) is filled with the
 				error text.
 	*/
-	std::unique_ptr<IDuckAppender> CreateAppender(const QString& tableName, const QString& schemaName = QString(), QString* errorMessagePtr = nullptr) const;
+	std::unique_ptr<IDuckAppender> CreateAppender(const QString& tableName, const QString& schemaName = QString(), QString* errorMessagePtr = nullptr) const override;
 
 	/**
 		Creates a new imtdb::IDatabaseEngine backed by its own duckdb::Connection against this
@@ -92,7 +94,7 @@ public:
 		itself and must not outlive this component.
 		\return nullptr if the database could not be opened.
 	*/
-	std::unique_ptr<imtdb::IDatabaseEngine> CreateReadConnection() const;
+	std::unique_ptr<imtdb::IDatabaseEngine> CreateReadConnection() const override;
 
 	/**
 		Atomically replaces \a liveTableName with \a shadowTableName using ALTER TABLE ... RENAME
@@ -105,7 +107,7 @@ public:
 				they were before the call; \a errorMessagePtr, if not null, is filled with the error
 				text.
 	*/
-	bool SwapTable(const QString& liveTableName, const QString& shadowTableName, QString* errorMessagePtr = nullptr) const;
+	bool SwapTable(const QString& liveTableName, const QString& shadowTableName, QString* errorMessagePtr = nullptr) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
