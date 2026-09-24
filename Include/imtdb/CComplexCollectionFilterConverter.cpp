@@ -110,6 +110,19 @@ QString CComplexCollectionFilterConverter::CreateSqlFilterQuery(const imtbase::I
 }
 
 
+QString CComplexCollectionFilterConverter::CreateSqlFilterQuery(
+			const imtbase::IComplexCollectionFilter& filter,
+			SqlContext sqlContext,
+			const FieldRenderer& fieldRenderer)
+{
+	QString retVal = ProcessGroup(filter.GetFilterExpression(), sqlContext, fieldRenderer ? &fieldRenderer : nullptr);
+
+	retVal = retVal.mid(1, retVal.length() - 2);
+
+	return retVal;
+}
+
+
 QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplexCollectionFilter::FieldFilter& filter, SqlContext sqlContext)
 {
 	QString retVal;
@@ -263,7 +276,10 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 };
 
 
-QString CComplexCollectionFilterConverter::ProcessGroup(const imtbase::IComplexCollectionFilter::FilterExpression& filter, SqlContext sqlContext)
+QString CComplexCollectionFilterConverter::ProcessGroup(
+			const imtbase::IComplexCollectionFilter::FilterExpression& filter,
+			SqlContext sqlContext,
+			const FieldRenderer* fieldRendererPtr)
 {
 	QString retVal;
 	QString logicOperation;
@@ -282,7 +298,11 @@ QString CComplexCollectionFilterConverter::ProcessGroup(const imtbase::IComplexC
 	}
 
 	for (const imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter : filter.fieldFilters){
-		QString retValPart = ProcessColumn(fieldFilter, sqlContext);
+		QString retValPart;
+		if ((fieldRendererPtr == nullptr) || !(*fieldRendererPtr)(fieldFilter, retValPart)){
+			retValPart = ProcessColumn(fieldFilter, sqlContext);
+		}
+
 		if (retValPart.isEmpty()){
 			continue;
 		}
@@ -291,7 +311,7 @@ QString CComplexCollectionFilterConverter::ProcessGroup(const imtbase::IComplexC
 	}
 
 	for (const imtbase::IComplexCollectionFilter::FilterExpression& groupFilter : filter.filterExpressions){
-		QString retValPart = ProcessGroup(groupFilter, sqlContext);
+		QString retValPart = ProcessGroup(groupFilter, sqlContext, fieldRendererPtr);
 		if (retValPart.isEmpty()){
 			continue;
 		}

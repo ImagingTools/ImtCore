@@ -577,6 +577,10 @@ SUBDIRS += imtbasetest
 imtbasetest.file = ../../Include/imtbase/Test/QMake/imtbasetest.pro
 imtbasetest.depends = imtbase
 
+SUBDIRS += imtdbtest
+imtdbtest.file = ../../Include/imtdb/Test/QMake/imtdbtest.pro
+imtdbtest.depends = imtdb imttagdb
+
 SUBDIRS += imtgqltest
 imtgqltest.file = ../../Include/imtgql/Test/QMake/imtgqltest.pro
 imtgqltest.depends = imtgql imtbase

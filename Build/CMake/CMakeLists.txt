@@ -535,6 +535,10 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 			add_subdirectory("${TESTS_DIR}/StructureTest/CMake" "${AUX_INCLUDE_DIR}/StructureTest")
 			add_dependencies(StructureTest imtbase imtaccount imtauth imtdb imttest)
+
+			add_subdirectory("${INCLUDE_DIR}/imtdb/Test/CMake" "${AUX_INCLUDE_DIR}/imtdb/Test")
+			add_dependencies(imtdbTest imtdb imttagdb)
+			imt_chain_windeploy_target(imtdbTest)
 		endif()
 
 		if(USE_MDBX)
