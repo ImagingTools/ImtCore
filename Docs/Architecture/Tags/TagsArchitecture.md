@@ -1,6 +1,18 @@
 # Архитектура подсистемы Tags (аналог GitHub Labels)
 
-Статус: проект архитектуры, ревизия 2, код не написан. Дата: 2026-09-24.
+Статус: ревизия 3, этап 1 реализован в ветке `feature/tags`. Дата: 2026-09-25.
+
+## Этап 1: что сделано
+
+Реализовано всё, кроме событий Tagged/Untagged и их показа в истории документа (D5 отложено):
+
+- `imttag` / `imttagdb` — модель, каталог (документная коллекция), таблица `TagAssignments`, менеджер назначений, засев системных тегов;
+- `imtdb` — поле `Tags` в фильтре коллекций (`CTagFilterSqlBuilder`, атрибут делегата `TaggableEntityType`), тест `imtdbTest` на SQLite;
+- `Sdl/imttag` + `imttaggql` — GraphQL-API каталога и назначений, подписка `OnEntityTagsChanged`, права;
+- `Qml/imttaggui` — чипы, страница каталога, редактор тега, поле тегов сущности, фильтр (§12);
+- `Partitura/ImtTagVoce.arp` — всё серверное в одном компоненте `TagController` (§13).
+
+Разделы §5, §6.1, §7, §8 и §10 ниже ещё описывают `TagEvents` и историю — это цель следующего этапа, в коде их нет.
 
 ## 0. Решения владельца
 
@@ -10,7 +22,7 @@
 | D2 | Scope и уникальность | Каталог тенанта плюс системные теги, которые видят все. Имя уникально в пределах «системные + тенант» | Явный флаг `IsSystem` у тега; своя проверка уникальности (§6.3) |
 | D3 | Жизненный цикл | Теги существуют независимо от сущностей | Никакого каскада при удалении или восстановлении сущности; назначение не создаёт тег; тег без назначений — нормальное состояние |
 | D4 | Архивация | Не делаем | Вне объёма v1 |
-| D5 | События Tagged / Untagged | Своя таблица, связанная с историей документа | Таблица `TagEvents` с номером ревизии сущности; события показываются в `GetRevisionInfoList` |
+| D5 | События Tagged / Untagged | Своя таблица, связанная с историей документа. **Отложено: не входит в этап 1** | Таблица `TagEvents` с номером ревизии сущности; события показываются в `GetRevisionInfoList` |
 | D6 | Ограничение тега по типам сущностей | Не нужно | Любой тег ставится на любую сущность, для которой включены теги |
 | D7 | Права | Теги тенанта — отдельные permissions; системные — только SU | Провайдер разрешений `IFeatureInfoProvider`; проверка `IsSuperuserRequest` |
 | D8 | Теги по умолчанию | Да, системные | Засев системных тегов с фиксированными Id при старте |
@@ -389,7 +401,9 @@ sequenceDiagram
 
 ---
 
-## 10. События и история документа (D5)
+## 10. События и история документа (D5, отложено)
+
+В этапе 1 не реализовано. Изменения назначений доступны только как уведомление `CF_ASSIGNMENTS_CHANGED` / подписка `OnEntityTagsChanged`.
 
 - **Запись.** `CTagAssignmentManagerComp` пишет `TagEvents` в той же транзакции, что и назначения. Событие создаётся только при фактическом изменении: повторный `Add` ничего не пишет, а `Set` порождает разницу из `Tagged` и `Untagged`. `EntityRevision` берётся из `ICollectionInfo::MIT_REVISION` сущности, `Actor` — из `IOperationContext`.
 - **Связь с историей документа.**
@@ -423,41 +437,78 @@ TagManagement
 
 ---
 
-## 12. UI (описание, без кода)
+## 12. UI: модуль `Qml/imttaggui`
 
-Только контролы проекта и Style-токены; без Quick Controls, `Qt.binding` и `Qt.callLater`.
+Только контролы проекта и Style-токены; без Quick Controls, `Qt.binding` и `Qt.callLater`. Мультивыбор тегов везде — готовый `FilterableSelectPopup` над коллекцией `"Tags"` (поиск, пейджинг, чекбоксы, тенант-фильтр на сервере), а не новый пикер.
 
-| Элемент | Основа | Что нового |
-|---|---|---|
-| `TagChip` | разметка `TicketView.qml:221-243` | Фон `"#" + color`, контрастный текст; у системного тега — маленький значок |
-| `TagsCellDelegate` | `Repeater` чипов в `Row` | Пакетный `EntityTagsGet` по Id видимой страницы; перечитывание по `OnEntityTagsChanged` |
-| `TagPicker` | `Popup.qml` + `SearchTextInput.qml` + `CheckableListPanel.qml` / `CheckBoxMenu.qml` | Две группы: «Системные» и «Организации»; ссылка «Управлять тегами», если есть `ManageTags` |
-| `TagFilterDelegate` | `FilterDelegateBase.qml`, `OptionsFilterDelegate.qml`, `FilterPanelDecorator.qml`, `FilterMenu.qml` | Мультивыбор, «все / любой», исключение, «без тегов» |
-| `CollectionFilter.qml` | `createGroupFilter` / `addFieldFilter` | **Расширить** сборкой `ArrayFieldFilter` |
-| `TagCatalogView` | коллекционное представление imtcolgui | Колонки «чип / описание / системный / использований»; системные теги доступны на запись только SU; фильтр «Системные / Организации» |
-| Выбор цвета | готового color picker в `Qml/imtcontrols` **нет** | Палитра (Repeater квадратов) + hex-поле `TextField` + «случайный» |
-| Массовое действие | Actions коллекций | «Tags…» над выделением |
-| История документа | представление ревизий imtdocgui | Строка события с чипом-снимком; без кнопок Restore / Export / Delete |
+| Компонент | Назначение |
+|---|---|
+| `TagChip`, `TagChipRow` | Тег как цветная «пилюля»: фон `"#" + color`, чёрный или белый текст по яркости фона, у системного тега — точка. `TagChipRow` переносит чипы по ширине |
+| `TagCatalogPanel` | Страница «Теги»: список тегов организации и системных (чип, описание, «System», число объектов), кнопки «New tag», «Edit», «Delete» |
+| `TagEditorDialog` | Создание и правка тега: имя, описание, цвет, превью. Флажок «System tag» показывается только SU и только при создании |
+| `TagColorPalette` | 20 цветов палитры, hex-поле с проверкой, кнопка «Random» |
+| `EntityTagsField` | Теги одной сущности в её редакторе: чипы + кнопка «Tags...» (без права `AssignTags` — только чипы) |
+| `EntityTagsProvider` | Пакетная загрузка тегов для Id видимой страницы коллекции — один запрос на страницу |
+| `EntityTagsEditor` | Добавить, снять, заменить или очистить теги у одной или нескольких сущностей (массовые действия над выделением) |
+| `TagFilter`, `TagFilterButton` | Фильтр коллекции по тегам: «любой», «все», «исключить», «без тегов» |
+| `CollectionFilter.createArrayFieldFilter()` | Общий построитель `ArrayFieldFilter` в `imtcolgui` |
 
-После изменения QML нужно пересобрать ресурсы (`imtcontrolsqml`, `imtguiqml`, для web — WebCompiler).
+### 12.1 Сценарии
+
+**Создать тег.** Страница `TagCatalogPanel` → «New tag» → `TagEditorDialog` → `TagAdd`. Системные теги по умолчанию появляются сами при первом открытии каталога.
+
+**Дать теги сущности.** В редакторе сущности:
+
+```qml
+EntityTagsField {
+	entityType: "Devices"              // Id коллекции = TaggableEntityType
+	entityId: deviceEditor.documentId
+}
+```
+
+Кнопка «Tags...» открывает поиск по каталогу с чекбоксами. Каждое переключение заменяет набор тегов (`EntityTagsSet`), чипы обновляются.
+
+**Теги в строках коллекции.**
+
+```qml
+EntityTagsProvider { id: pageTags; entityType: "Devices" }
+// после загрузки страницы: pageTags.load(idsOfVisibleRows)
+
+// в делегате строки:
+TagChipRow { tags: pageTags.tagsByEntity ? pageTags.getTags(model.id) : [] }
+```
+
+**Массовое действие над выделением.** `EntityTagsEditor.addTags("Devices", selectedIds, tagIds)` или `removeTags(...)`; для выбора тегов — тот же `FilterableSelectPopup` над `"Tags"`.
+
+**Фильтр.** В панель фильтров коллекции:
+
+```qml
+TagFilterButton { collectionFilter: deviceCollectionView.collectionFilter }
+```
+
+Кнопка открывает поиск по тегам с переключателем режима и кладёт в фильтр `ArrayFieldFilter{fieldId: "Tags"}`. Сервер переводит его в `EXISTS` по `TagAssignments` (§9).
+
+**Инициализация ресурсов** в приложении: `ImtCoreInitTagQmlResources()` (клиент) и `ImtCoreInitTagSqlResources()` (сервер) из `imtcore/CImtCoreTagInitializer.h`. Для web-клиента каталоги модуля уже добавлены в `getImtCoreQmlWebDirs`.
 
 ---
 
-## 13. Подключение продукта и миграция ImtDesk
+## 13. Подключение продукта (`.acc`) и миграция ImtDesk
 
-**Продукт (Lisa / ProLife / Puma):**
-1. Подключить `TagRepository` (скрипты для Postgres и SQLite) и засев.
-2. Для каждой коллекции, где нужны теги: атрибут `TaggableEntityType` у SQL-делегата и регистрация `IEntityTypeProvider` + `IObjectCollectionProvider` в `CTagAssignmentControllerComp`.
-3. `CTagHistoryEventProviderComp` → `CDocumentRevisionControllerComp`.
-4. `CTagPermissionsProviderComp` → `PermissionsProvider` продукта; назначить разрешения ролям.
-5. QML: колонка `TagsCellDelegate`, `TagFilterDelegate`, действие «Tags…», страница `TagCatalogView` в меню администрирования.
+### 13.1 Сервер — один компонент
 
-Коллекции без этих шагов не меняются.
+`Partitura/ImtTagVoce.arp/TagController.acc` (PostgreSQL) или `SQLiteTagController.acc` содержит всё: каталог и таблицу назначений, менеджер, засев системных тегов, GQL-контроллеры каталога, назначений и пикера, уведомления, провайдер прав и соответствие «команда → право». Продукт делает четыре вещи:
 
-**ImtDesk:**
+1. Добавляет элемент `ImtTagVoce / TagController` и задаёт экспортированные атрибуты: `DatabaseEngine`, `RequestManager`, `TaggableEntityTypes`; при желании `PermissionChecker`, `OperationContextController`, `UserActionManager`, `TranslationManager`, `VersionInfo`, `Log`, а также список системных тегов по умолчанию (`SystemTagIds`, `SystemTagNames`, `SystemTagColors`, `SystemTagDescriptions`).
+2. Подключает экспортированные интерфейсы в свой сервер: `imtgql::IGqlRequestHandler` — в список обработчиков GQL, `imtgql::IGqlSubscriberController` — в подписки, `imtlic::IFeatureInfoProvider` (`TagPermissionsProvider`) — в провайдеры прав продукта.
+3. На каждый тип сущности с тегами — элемент `ImtTagPck / TaggableEntityType` (`EntityTypeId` = Id коллекции, `EntityTypeName`, `ObjectCollection`), который вносится в `TaggableEntityTypes`.
+4. У SQL-делегата этой коллекции задаёт атрибут `TaggableEntityType` (тот же Id) — это включает фильтр по полю `Tags`.
+
+Права `ViewTags`, `AssignTags` и `ManageTags` назначаются ролям организации; системными тегами управляет только SU.
+
+### 13.2 ImtDesk (следующий шаг)
+
 - `imtdesk::ILabel` → typedef на `imttag::ITag`, `LabelData` → `TagData`.
-- Одноразовый скрипт переводит `labelIds` и строковые `tags` тикетов в каталог тенанта (дубликаты по имени без учёта регистра склеиваются, совпадения с системными тегами сопоставляются с ними) и в `TagAssignments`. События за прошлое не генерируются.
-- На время перехода `ISupportTicket::GetLabelIds` / `GetTags` читают данные через `ITagAssignmentManager`, `labelIds` в `TicketData` остаётся проекцией.
+- Одноразовый перенос `labelIds` и строковых `tags` тикетов в каталог тенанта и в `TagAssignments`.
 - `TicketView.qml` переходит на `TagChip`.
 
 ---
