@@ -32,6 +32,13 @@ QString CTagDbDelegateComp::CreateTenantBindingFilterQuery(const QByteArray& ten
 }
 
 
+QByteArray CTagDbDelegateComp::CreateTenantBindingDeleteQuery(const QByteArrayList& /*entityIds*/) const
+{
+	// Deletion is soft; the binding keeps the owner of a deleted tag so that only this tenant can restore it.
+	return QByteArray();
+}
+
+
 } // namespace imttagdb
 
 

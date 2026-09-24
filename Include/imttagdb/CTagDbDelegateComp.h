@@ -27,6 +27,7 @@ protected:
 
 	// reimplemented (imtdb::CSqlDatabaseDocumentDelegateCompBase)
 	virtual QString CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode = imtauth::TFM_INCLUDE) const override;
+	virtual QByteArray CreateTenantBindingDeleteQuery(const QByteArrayList& entityIds) const override;
 };
 
 

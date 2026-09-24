@@ -334,15 +334,15 @@
                     <AttributeInfo Id="TagIds" Type="Id[]" ExportId="SystemTagIds">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>system.bug</Value>
-                                <Value>system.documentation</Value>
-                                <Value>system.duplicate</Value>
-                                <Value>system.enhancement</Value>
-                                <Value>system.good-first-issue</Value>
-                                <Value>system.help-wanted</Value>
-                                <Value>system.invalid</Value>
-                                <Value>system.question</Value>
-                                <Value>system.wontfix</Value>
+                                <Value>77d3972c-4b9e-4a5d-9e33-3dbf6c27366b</Value>
+                                <Value>ea57caee-6571-49c1-bd40-76ae0a8f102c</Value>
+                                <Value>3e02b59d-2c00-4805-a338-66e67bb1e379</Value>
+                                <Value>b2acba7f-61a8-472e-9c3f-23c373c3ad6c</Value>
+                                <Value>285ceb3d-e379-4e26-ba43-bbe838e235ed</Value>
+                                <Value>1ca5303d-4d79-49df-bd09-cd1b9b2e4d34</Value>
+                                <Value>fafc6bf2-39ae-480f-885c-8c9a69f4b87a</Value>
+                                <Value>26e85458-7d9a-4156-9152-e76ab9f5c4fe</Value>
+                                <Value>399ecced-5dfc-4861-ab55-3a260f3dd728</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

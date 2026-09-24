@@ -2,17 +2,15 @@
 #pragma once
 
 
+// ACF includes
+#include <istd/TDelPtr.h>
+
 // ImtCore includes
+#include <imtbase/IOperationContext.h>
 #include <imttag/ISystemTagSeeder.h>
 #include <imttag/ITag.h>
 #include <imttag/ITagAssignmentManager.h>
 #include <GeneratedFiles/imttagsdl/SDL/1.0/CPP/Tags_fwd.h>
-
-
-namespace imtbase
-{
-	class IOperationContext;
-}
 
 
 namespace imttaggql
@@ -40,7 +38,8 @@ public:
 
 protected:
 	bool FillTagFromRepresentation(const sdl::V1_0::imttag::CTagData& representation, imttag::ITag& tag, QString& errorMessage) const;
-	bool IsTagVisible(const QByteArray& tagId, const imtgql::CGqlRequest& gqlRequest) const;
+	bool IsTagVisible(const QByteArray& tagId, const imtgql::CGqlRequest& gqlRequest, bool includeDeleted = false) const;
+	void InitOperationContextForTag(const imttag::ITag& tag, const QByteArray& tagId, const QString& operation, const imtgql::CGqlRequest& gqlRequest, istd::TDelPtr<imtbase::IOperationContext>& operationContextPtr) const;
 	bool IsNameAvailable(
 				const QString& name,
 				bool isSystem,
@@ -54,6 +53,7 @@ protected:
 	virtual QJsonObject InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual QJsonObject UpdateObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual QJsonObject GetObjectListFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual bool OnBeforeRemoveElements(const QByteArrayList& elementIds, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual bool OnBeforeSetObjectName(const QByteArray& objectId, QString& newName, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CRestoreObjectsPayload OnRestoreObjects(

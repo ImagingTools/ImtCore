@@ -14,6 +14,7 @@
 #include <imtauth/CTenantFilterParam.h>
 #include <imtbase/COperationContext.h>
 #include <imtbase/IObjectCollectionIterator.h>
+#include <imtcol/CDocumentCollectionFilter.h>
 #include <imtcol/CDocumentIdFilter.h>
 #include <imttag/CTagNameLookup.h>
 #include <imttaggql/imttaggql.h>
@@ -102,7 +103,7 @@ bool CTagCollectionControllerComp::FillTagFromRepresentation(
 }
 
 
-bool CTagCollectionControllerComp::IsTagVisible(const QByteArray& tagId, const imtgql::CGqlRequest& gqlRequest) const
+bool CTagCollectionControllerComp::IsTagVisible(const QByteArray& tagId, const imtgql::CGqlRequest& gqlRequest, bool includeDeleted) const
 {
 	if (gqlRequest.GetRequestContext() == nullptr){
 		return true;
@@ -119,7 +120,34 @@ bool CTagCollectionControllerComp::IsTagVisible(const QByteArray& tagId, const i
 	filterParams.SetEditableParameter("DocumentIdFilter", documentIdFilterPtr, true);
 	filterParams.SetEditableParameter("TenantFilter", tenantFilterPtr, true);
 
+	if (includeDeleted){
+		imtcol::CDocumentCollectionFilter* documentFilterPtr = new imtcol::CDocumentCollectionFilter;
+		documentFilterPtr->AddDocumentState(imtcol::IDocumentCollectionFilter::DS_ACTIVE);
+		documentFilterPtr->AddDocumentState(imtcol::IDocumentCollectionFilter::DS_DISABLED);
+		filterParams.SetEditableParameter("DocumentFilter", documentFilterPtr, true);
+	}
+
 	return m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParams).contains(tagId);
+}
+
+
+void CTagCollectionControllerComp::InitOperationContextForTag(
+			const imttag::ITag& tag,
+			const QByteArray& tagId,
+			const QString& operation,
+			const imtgql::CGqlRequest& gqlRequest,
+			istd::TDelPtr<imtbase::IOperationContext>& operationContextPtr) const
+{
+	// Inserts and updates bind the document to the tenant of the context; a system tag belongs to no tenant.
+	if (tag.IsSystem()){
+		imtbase::COperationContext* systemContextPtr = new imtbase::COperationContext;
+		InitOperationContext(gqlRequest, operation, *systemContextPtr);
+		systemContextPtr->SetTenantId(QByteArray());
+		operationContextPtr.SetPtr(systemContextPtr);
+	}
+	else if (m_operationContextControllerCompPtr.IsValid()){
+		operationContextPtr.SetPtr(m_operationContextControllerCompPtr->CreateOperationContext(operation.toUtf8(), tagId, &tag));
+	}
 }
 
 
@@ -201,17 +229,8 @@ QJsonObject CTagCollectionControllerComp::InsertObject(const imtgql::CGqlRequest
 		return QJsonObject();
 	}
 
-	// A system tag belongs to no tenant, so it must not get the tenant binding of the request.
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
-	if (tagPtr->IsSystem()){
-		imtbase::COperationContext* systemContextPtr = new imtbase::COperationContext;
-		InitOperationContext(gqlRequest, QStringLiteral("Create"), *systemContextPtr);
-		systemContextPtr->SetTenantId(QByteArray());
-		operationContextPtr.SetPtr(systemContextPtr);
-	}
-	else if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr.SetPtr(m_operationContextControllerCompPtr->CreateOperationContext("Create", tagId, tagPtr));
-	}
+	InitOperationContextForTag(*tagPtr, tagId, QStringLiteral("Create"), gqlRequest, operationContextPtr);
 
 	const QByteArray newTagId = m_objectCollectionCompPtr->InsertNewObject(
 				"Tag",
@@ -275,9 +294,7 @@ QJsonObject CTagCollectionControllerComp::UpdateObject(const imtgql::CGqlRequest
 	}
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
-	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr.SetPtr(m_operationContextControllerCompPtr->CreateOperationContext("Update", tagId, tagPtr));
-	}
+	InitOperationContextForTag(*tagPtr, tagId, QStringLiteral("Update"), gqlRequest, operationContextPtr);
 
 	if (!m_objectCollectionCompPtr->SetObjectData(tagId, *tagPtr, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
 		errorMessage = QStringLiteral("Tag '%1' could not be updated").arg(QString::fromUtf8(tagId));
@@ -299,6 +316,20 @@ QJsonObject CTagCollectionControllerComp::GetObjectListFromRequest(const imtgql:
 	}
 
 	return BaseClass::GetObjectListFromRequest(gqlRequest, errorMessage);
+}
+
+
+QJsonObject CTagCollectionControllerComp::GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const QByteArray tagId = (inputParamPtr != nullptr) ? inputParamPtr->GetParamArgumentValue("id").toByteArray() : QByteArray();
+	if (!IsTagVisible(tagId, gqlRequest)){
+		errorMessage = QStringLiteral("Tag '%1' does not exist").arg(QString::fromUtf8(tagId));
+
+		return QJsonObject();
+	}
+
+	return BaseClass::GetObjectFromRequest(gqlRequest, errorMessage);
 }
 
 
@@ -339,15 +370,24 @@ sdl::V1_0::imtbase::CRestoreObjectsPayload CTagCollectionControllerComp::OnResto
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
+	const sdl::V1_0::imtbase::RestoreObjectsRequestArguments arguments = restoreObjectsRequest.GetRequestedArguments();
+	const QByteArrayList tagIds = (arguments.input && arguments.input->objectIds) ? arguments.input->objectIds->ToList() : QByteArrayList();
+
+	// Deleted tags keep their tenant binding, so ownership is checked before anything changes.
+	for (const QByteArray& tagId : tagIds){
+		if (!IsTagVisible(tagId, gqlRequest, true)){
+			errorMessage = QStringLiteral("Tag '%1' does not exist").arg(QString::fromUtf8(tagId));
+
+			return sdl::V1_0::imtbase::CRestoreObjectsPayload();
+		}
+	}
+
 	sdl::V1_0::imtbase::CRestoreObjectsPayload response = BaseClass::OnRestoreObjects(restoreObjectsRequest, gqlRequest, errorMessage);
 	if (!response.success || !*response.success){
 		return response;
 	}
 
-	const sdl::V1_0::imtbase::RestoreObjectsRequestArguments arguments = restoreObjectsRequest.GetRequestedArguments();
-	const QByteArrayList tagIds = (arguments.input && arguments.input->objectIds) ? arguments.input->objectIds->ToList() : QByteArrayList();
-
-	// A deleted tag is only readable after the restore, so the checks run afterwards and revert on failure.
+	// The tag data is readable only after the restore, so these checks run afterwards and revert on failure.
 	for (const QByteArray& tagId : tagIds){
 		imtbase::IObjectCollection::DataPtr dataPtr = GetTagData(tagId);
 		const imttag::ITag* tagPtr = dynamic_cast<const imttag::ITag*>(dataPtr.GetPtr());
