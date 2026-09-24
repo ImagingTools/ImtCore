@@ -10,4 +10,4 @@ TagChipRow 1.0 TagChipRow.qml
 TagColorPalette 1.0 TagColorPalette.qml
 TagEditorDialog 1.0 TagEditorDialog.qml
 TagFilter 1.0 TagFilter.qml
-TagFilterButton 1.0 TagFilterButton.qml
+TagFilterDelegate 1.0 TagFilterDelegate.qml

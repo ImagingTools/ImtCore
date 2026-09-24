@@ -3,48 +3,71 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
+import imtgui 1.0
 import imtcolgui 1.0
 import imtguigql 1.0
 
 /*!
-	\qmltype TagFilterButton
+	\qmltype TagFilterDelegate
 	\inqmlmodule imttaggui
-	\brief Filter-panel button that filters a taggable collection by tags.
+	\brief Filter-panel chip that filters a taggable collection by tags.
 
 	Opens a searchable multi-select of the tag catalog with a mode switch:
 	any of the tags, all of them, none of them, or objects without tags.
 
 	\code
-	TagFilterButton {
-		collectionFilter: deviceCollectionView.collectionFilter
+	registerFieldFilterDelegate("Tags", tagFilterComp)
+
+	Component {
+		id: tagFilterComp
+		TagFilterDelegate {}
 	}
 	\endcode
 */
-Button {
-	id: tagFilterButtonRoot
-	objectName: "TagFilterButton"
+FilterDelegateBase {
+	id: tagFilterDelegateRoot
 
 	property string context: ""
+
+	//! Set by the filter panel.
 	property CollectionFilter collectionFilter: null
 
-	text: tagFilter.isActive ? qsTr("Tags (%1)").arg(tagFilterButtonRoot.modeText()) : qsTr("Tags")
-	variant: tagFilter.isActive ? "primary" : "default"
+	name: qsTr("Tags")
+	isActive: tagFilter.isActive
+	mainButtonText: tagFilter.isActive ? tagFilterDelegateRoot.summaryText() : name
 
-	function modeText(){
+	function summaryText(){
 		if (tagFilter.mode === "none"){
 			return qsTr("none")
 		}
 
-		return String(tagFilter.tagIds.length)
+		if (tagFilter.mode === "all"){
+			return qsTr("all of %1").arg(tagFilter.tagIds.length)
+		}
+
+		if (tagFilter.mode === "exclude"){
+			return qsTr("not %1").arg(tagFilter.tagIds.length)
+		}
+
+		return qsTr("any of %1").arg(tagFilter.tagIds.length)
 	}
 
-	onClicked: {
-		ModalDialogManager.openDialog(tagSelectComp, {})
+	function setTags(tagIds, mode, beQuiet){
+		tagFilter.setFilter(tagIds, mode, beQuiet)
+	}
+
+	onOpenFilter: {
+		var point = tagFilterDelegateRoot.popupPoint()
+		ModalDialogManager.openDialog(tagSelectComp, {"x": point.x, "y": point.y})
+	}
+
+	onClearFilter: {
+		tagFilter.clear(beQuiet)
 	}
 
 	TagFilter {
 		id: tagFilter
-		collectionFilter: tagFilterButtonRoot.collectionFilter
+		collectionFilter: tagFilterDelegateRoot.collectionFilter
 	}
 
 	Component {
@@ -84,14 +107,6 @@ Button {
 					tagFilter.setFilter([], "none")
 				}
 			}
-
-			Button {
-				text: qsTr("Clear")
-				enabled: tagFilter.isActive
-				onClicked: {
-					tagFilter.clear()
-				}
-			}
 		}
 	}
 
@@ -105,7 +120,7 @@ Button {
 			headerComponent: modeSwitchComp
 
 			dataProvider: FilterableSelectGqlDataProvider {
-				context: tagFilterButtonRoot.context
+				context: tagFilterDelegateRoot.context
 				collectionId: "Tags"
 				multiSelect: true
 			}

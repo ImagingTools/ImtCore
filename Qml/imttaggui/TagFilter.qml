@@ -24,21 +24,21 @@ QtObject {
 
 	readonly property bool isActive: tagFilterRoot.mode === "none" || tagFilterRoot.tagIds.length > 0
 
-	function setFilter(tagIds, mode){
+	function setFilter(tagIds, mode, beQuiet){
 		tagFilterRoot.tagIds = tagIds ? tagIds : []
 		tagFilterRoot.mode = mode ? mode : "any"
 
-		tagFilterRoot.apply()
+		tagFilterRoot.apply(beQuiet)
 	}
 
-	function clear(){
+	function clear(beQuiet){
 		tagFilterRoot.tagIds = []
 		tagFilterRoot.mode = "any"
 
-		tagFilterRoot.apply()
+		tagFilterRoot.apply(beQuiet)
 	}
 
-	function apply(){
+	function apply(beQuiet){
 		if (!tagFilterRoot.collectionFilter){
 			return
 		}
@@ -64,6 +64,8 @@ QtObject {
 			filter.addFieldFilter(filter.createArrayFieldFilter(tagFilterRoot.fieldId, values, filter.valueType.STRING, operations))
 		}
 
-		filter.filterChanged()
+		if (!beQuiet){
+			filter.filterChanged()
+		}
 	}
 }

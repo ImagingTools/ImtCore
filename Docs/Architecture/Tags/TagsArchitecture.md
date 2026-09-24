@@ -450,7 +450,7 @@ TagManagement
 | `EntityTagsField` | Теги одной сущности в её редакторе: чипы + кнопка «Tags...» (без права `AssignTags` — только чипы) |
 | `EntityTagsProvider` | Пакетная загрузка тегов для Id видимой страницы коллекции — один запрос на страницу |
 | `EntityTagsEditor` | Добавить, снять, заменить или очистить теги у одной или нескольких сущностей (массовые действия над выделением) |
-| `TagFilter`, `TagFilterButton` | Фильтр коллекции по тегам: «любой», «все», «исключить», «без тегов» |
+| `TagFilter`, `TagFilterDelegate` | Фильтр-чип панели фильтров коллекции: «любой», «все», «исключить», «без тегов» |
 | `CollectionFilter.createArrayFieldFilter()` | Общий построитель `ArrayFieldFilter` в `imtcolgui` |
 
 ### 12.1 Сценарии
@@ -480,13 +480,18 @@ TagChipRow { tags: pageTags.tagsByEntity ? pageTags.getTags(model.id) : [] }
 
 **Массовое действие над выделением.** `EntityTagsEditor.addTags("Devices", selectedIds, tagIds)` или `removeTags(...)`; для выбора тегов — тот же `FilterableSelectPopup` над `"Tags"`.
 
-**Фильтр.** В панель фильтров коллекции:
+**Фильтр.** Обычный фильтр-чип панели фильтров коллекции, рядом с остальными:
 
 ```qml
-TagFilterButton { collectionFilter: deviceCollectionView.collectionFilter }
+registerFieldFilterDelegate("Tags", tagFilterComp)
+
+Component {
+	id: tagFilterComp
+	TagFilterDelegate {}
+}
 ```
 
-Кнопка открывает поиск по тегам с переключателем режима и кладёт в фильтр `ArrayFieldFilter{fieldId: "Tags"}`. Сервер переводит его в `EXISTS` по `TagAssignments` (§9).
+Чип открывает поиск по тегам с переключателем режима и кладёт в фильтр `ArrayFieldFilter{fieldId: "Tags"}`. Сервер переводит его в `EXISTS` по `TagAssignments` (§9).
 
 **Инициализация ресурсов** в приложении: `ImtCoreInitTagQmlResources()` (клиент) и `ImtCoreInitTagSqlResources()` (сервер) из `imtcore/CImtCoreTagInitializer.h`. Для web-клиента каталоги модуля уже добавлены в `getImtCoreQmlWebDirs`.
 

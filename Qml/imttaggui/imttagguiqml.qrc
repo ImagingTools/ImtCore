@@ -11,6 +11,6 @@
         <file alias="imttaggui/TagColorPalette.qml">TagColorPalette.qml</file>
         <file alias="imttaggui/TagEditorDialog.qml">TagEditorDialog.qml</file>
         <file alias="imttaggui/TagFilter.qml">TagFilter.qml</file>
-        <file alias="imttaggui/TagFilterButton.qml">TagFilterButton.qml</file>
+        <file alias="imttaggui/TagFilterDelegate.qml">TagFilterDelegate.qml</file>
     </qresource>
 </RCC>
