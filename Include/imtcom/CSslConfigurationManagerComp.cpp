@@ -343,15 +343,18 @@ bool CSslConfigurationManagerComp::CreateSslConfiguration(const iprm::IParamsSet
 		}
 	}
 
-	// setup CA certificate
+	// setup CA certificate (optional: an unset file path means no CA cert is provided, not a failure)
 	iprm::TParamsPtr<iprm::IParamsSet> caCertificateParamsPtr(&params, ParamKeys::s_caCertParamKey, false);
 	if (caCertificateParamsPtr != nullptr){
-		QSharedPointer<QSslCertificate> sslCaCertificalePtr = CreateSslCertificateFromParams(*caCertificateParamsPtr);
-		if (!sslCaCertificalePtr.isNull()){
-			output.addCaCertificate(*sslCaCertificalePtr);
-		}
-		else{
-			retValue = false;
+		iprm::TParamsPtr<ifile::IFileNameParam> caCertFilePathParamPtr(caCertificateParamsPtr.GetPtr(), ParamKeys::s_filePathParamKey, false);
+		if (caCertFilePathParamPtr.IsValid() && !caCertFilePathParamPtr->GetPath().isEmpty()){
+			QSharedPointer<QSslCertificate> sslCaCertificalePtr = CreateSslCertificateFromParams(*caCertificateParamsPtr);
+			if (!sslCaCertificalePtr.isNull()){
+				output.addCaCertificate(*sslCaCertificalePtr);
+			}
+			else{
+				retValue = false;
+			}
 		}
 	}
 
