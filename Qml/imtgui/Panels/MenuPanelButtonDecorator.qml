@@ -75,9 +75,9 @@ DecoratorBase {
 
 		width: (!leftPanelElement.panel ? parent.width : leftPanelElement.panel.width) - 2 * Style.marginS;
 
-		radius: Style.marginS;
-		color: leftPanelElement.isSelected ? Style.selectedColor
-			: leftPanelElement.isHighlighted ? Style.alternateBaseColor : "transparent";
+		radius: Style.radiusM;
+		color: leftPanelElement.isSelected ? Style.menuPanelItemSelectedColor
+			: leftPanelElement.isHighlighted ? Style.menuPanelItemHoverColor : "transparent";
 	}
 
 	Image {
@@ -93,9 +93,6 @@ DecoratorBase {
 		sourceSize.width: width;
 		sourceSize.height: height;
 		source: leftPanelElement.baseElement && leftPanelElement.baseElement.iconSource ? leftPanelElement.baseElement.iconSource : "";
-		// Full strength where the pointer is or where you already are, held back
-		// everywhere else - the same weighting the tabs use.
-		opacity: leftPanelElement.isSelected || leftPanelElement.isHighlighted ? 1.0 : Style.opacityHigh;
 	}
 
 	Text {

@@ -287,12 +287,12 @@ Rectangle{
 		scrollSize: 8;
 
 		color: Style.color_menu;
-		selectionColor: "lightsteelblue"
+		selectionColor: Style.selectedColor
 		hoverColor: Style.selectedColor;
 		textColor: treeBody.textColor
 		selectionRadius: 4;
 		scrollIndicatorColor: Style.firstColor;
-		scrollBackgroundColor: "#ffffff";
+		scrollBackgroundColor: Style.scrollBackgroundColor;
 		additionalDelegateComp: treeBody.additionalDelegateComp
 
 		property int indexToMove: -1;
