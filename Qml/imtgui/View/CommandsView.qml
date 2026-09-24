@@ -171,6 +171,13 @@ Item {
 						}
 					}
 
+					// The visible binding ignores m_visible, so a command hidden from the start stayed shown until its first model change.
+					Component.onCompleted: {
+						if (model.item){
+							button.checkHidden()
+						}
+					}
+
 					property GuiElementModel element: model.item;
 					
 					enabled: element ? element.m_enabled: false;
