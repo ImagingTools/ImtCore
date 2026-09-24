@@ -1,0 +1,13 @@
+module imttaggui
+
+EntityTagsEditor 1.0 EntityTagsEditor.qml
+EntityTagsField 1.0 EntityTagsField.qml
+EntityTagsProvider 1.0 EntityTagsProvider.qml
+TagCatalogPanel 1.0 TagCatalogPanel.qml
+TagCatalogProvider 1.0 TagCatalogProvider.qml
+TagChip 1.0 TagChip.qml
+TagChipRow 1.0 TagChipRow.qml
+TagColorPalette 1.0 TagColorPalette.qml
+TagEditorDialog 1.0 TagEditorDialog.qml
+TagFilter 1.0 TagFilter.qml
+TagFilterButton 1.0 TagFilterButton.qml
