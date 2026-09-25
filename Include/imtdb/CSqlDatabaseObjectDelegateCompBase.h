@@ -139,6 +139,13 @@ protected:
 	*/
 	QString CreateTagTableReference(const QByteArray& tableName) const;
 
+	/**
+		For taggable objects: a selection column "Tags" with the object's active tags as a JSON array
+		of {id, name, color, isSystem}; empty otherwise. Read it with IObjectCollectionIterator::GetElementInfo("Tags").
+		\param entityIdExpression	SQL expression of the object ID in the outer query, as text.
+	*/
+	QString CreateTagsColumnQuery(const QString& entityIdExpression) const;
+
 protected:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 	I_REF(iprm::IOptionsList, m_typesCompPtr);

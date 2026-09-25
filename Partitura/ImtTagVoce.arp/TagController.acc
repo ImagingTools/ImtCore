@@ -546,7 +546,6 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtbase::IEntityTagInfoProvider" ComponentId="TagAssignmentManager"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
         <Interface InterfaceId="imtlic::IFeatureInfoProvider" ComponentId="TagPermissionsProvider"/>
         <Interface InterfaceId="imttag::ITagAssignmentManager" ComponentId="TagAssignmentManager"/>

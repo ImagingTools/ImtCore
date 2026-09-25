@@ -172,56 +172,6 @@ const imtbase::IObjectCollection* CTagAssignmentManagerComp::GetEntityCollection
 }
 
 
-// reimplemented (imtbase::IEntityTagInfoProvider)
-
-imtbase::IEntityTagInfoProvider::EntityTagInfos CTagAssignmentManagerComp::GetEntityTagInfos(
-			const QByteArray& entityType,
-			const QByteArrayList& entityIds,
-			const imtbase::IOperationContext* operationContextPtr) const
-{
-	EntityTagInfos retVal;
-
-	const imtbase::IObjectCollection* entityCollectionPtr = GetEntityCollection(entityType);
-	if (entityCollectionPtr == nullptr || entityIds.isEmpty()){
-		return retVal;
-	}
-
-	const QByteArrayList visibleEntityIds = GetVisibleIds(*entityCollectionPtr, UniqueIds(entityIds), operationContextPtr);
-	const QMap<QByteArray, QMap<QByteArray, QByteArray>> assignments = LoadAssignments(entityType, visibleEntityIds);
-
-	QByteArrayList assignedTagIds;
-	for (const QMap<QByteArray, QByteArray>& entityAssignments : assignments){
-		assignedTagIds << entityAssignments.keys();
-	}
-
-	const TagSnapshots visibleTags = LoadVisibleTags(UniqueIds(assignedTagIds), operationContextPtr);
-
-	for (auto assignmentIter = assignments.cbegin(); assignmentIter != assignments.cend(); ++assignmentIter){
-		TagInfoList tagInfos;
-		for (const QByteArray& tagId : assignmentIter.value().keys()){
-			auto tagIter = visibleTags.constFind(tagId);
-			if (tagIter == visibleTags.cend()){
-				continue;
-			}
-
-			TagInfo tagInfo;
-			tagInfo.id = tagId;
-			tagInfo.name = tagIter->name;
-			tagInfo.color = tagIter->color;
-			tagInfo.isSystem = tagIter->isSystem;
-
-			tagInfos << tagInfo;
-		}
-
-		if (!tagInfos.isEmpty()){
-			retVal[assignmentIter.key()] = tagInfos;
-		}
-	}
-
-	return retVal;
-}
-
-
 // private methods
 
 bool CTagAssignmentManagerComp::ChangeTags(
@@ -474,7 +424,6 @@ CTagAssignmentManagerComp::TagSnapshots CTagAssignmentManagerComp::LoadVisibleTa
 			TagSnapshot snapshot;
 			snapshot.name = tagPtr->GetName();
 			snapshot.color = tagPtr->GetColor();
-			snapshot.isSystem = tagPtr->IsSystem();
 
 			retVal[tagId] = snapshot;
 		}

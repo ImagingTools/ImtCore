@@ -468,7 +468,7 @@ EntityTagsCommand {
 
 **Теги в строках коллекции** — как метки GitHub сразу после заголовка issue, и без отдельных запросов: теги приходят в том же ответе списка (`DevicesList` и т. п.).
 
-- Сервер: у любого контроллера коллекции на базе `CObjectCollectionControllerCompBase` есть атрибуты `TagInfoProvider` (`imtbase::IEntityTagInfoProvider`, его экспортирует `TagController`) и `TaggableEntityType` (по умолчанию `CollectionId`). Если провайдер задан, после построения страницы каждый элемент с тегами получает `tags: [{id, name, color, isSystem}]` — два запроса на страницу (назначения и теги), независимо от числа строк.
+- Сервер: SQL-делегат коллекции с атрибутом `TaggableEntityType` сам выбирает теги каждой строки колонкой `"Tags"` (JSON `[{id, name, color, isSystem}]`, подзапрос по `TagAssignments` в запросе страницы) — без отдельных запросов и без лишних циклов. Программист добавляет в SDL элемента коллекции поле `tags: [TagInfo]` (`TagInfo` — в `ImtBaseTypes.sdl`) и в `CreateRepresentationFromObject` вызывает `imtservergql::CTagInfoRepresentation::FillTags(objectCollectionIterator, representationObject.tags)` (при `isTagsRequested`). На клиенте поле запрашивается через `additionalFieldIds` (например, `DeviceItemTypeMetaInfo.s_tags`).
 - Клиент: `CollectionView` ставит в первую колонку `TableCellTagsDelegate` (`imtcolgui`), который рисует чипы после текста, если у строки есть `tags`; без тегов ячейка выглядит как обычная текстовая. Колонку со своим содержимым или колонку-ссылку он не трогает; выключается `showItemTags: false`.
 
 **Фильтр.** Обычный фильтр-чип панели фильтров коллекции, рядом с остальными:
@@ -500,7 +500,7 @@ Component {
 2. Подключает экспортированные интерфейсы в свой сервер: `imtgql::IGqlRequestHandler` — в список обработчиков GQL, `imtlic::IFeatureInfoProvider` (`TagPermissionsProvider`) — в провайдеры прав продукта.
 3. На каждый тип сущности с тегами — элемент `ImtTagPck / TaggableEntityType` (`EntityTypeId` = Id коллекции, `EntityTypeName`, `ObjectCollection`), который вносится в `TaggableEntityTypes`.
 4. У SQL-делегата этой коллекции задаёт атрибут `TaggableEntityType` (тот же Id) — это включает фильтр по полю `Tags`.
-5. Чтобы теги были видны в списках, задаёт контроллерам таких коллекций атрибут `TagInfoProvider` = `TagController` (§12.1).
+5. Чтобы теги были видны в списках: поле `tags: [TagInfo]` в SDL элемента коллекции, вызов `CTagInfoRepresentation::FillTags()` в контроллере и `tags` в `additionalFieldIds` представления (§12.1).
 6. Чтобы теги назначались командой, вносит элемент `ImtTagVoce / AssignTagsCommand` в списки команд коллекции и редактора (`CommandsController`), а на клиенте ставит `EntityTagsCommand` (§12.1).
 
 Права `ViewTags`, `AssignTags` и `ManageTags` назначаются ролям организации; системными тегами управляет только SU.

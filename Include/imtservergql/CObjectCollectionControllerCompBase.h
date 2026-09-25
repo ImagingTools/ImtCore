@@ -13,7 +13,6 @@
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtbase/IOperationContext.h>
 #include <imtbase/IDocumentChangeGenerator.h>
-#include <imtbase/IEntityTagInfoProvider.h>
 #include <imtbase/IOperationContextController.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
@@ -53,15 +52,11 @@ public:
 		I_REGISTER_INTERFACE(imtbase::ISearchController)
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", true, "");
 		I_ASSIGN(m_collectionNameAttrPtr, "CollectionName", "Collection Name", true, "");
-		I_ASSIGN(m_tagInfoProviderCompPtr, "TagInfoProvider", "Provider of object tags; when set, every list item gets a 'tags' array", false, "TagInfoProvider");
-		I_ASSIGN(m_taggableEntityTypeAttrPtr, "TaggableEntityType", "Entity type under which the objects are tagged; the collection ID when not set", false, "");
 	I_END_COMPONENT
 
 protected:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_ATTR(QString, m_collectionNameAttrPtr);
-	I_REF(imtbase::IEntityTagInfoProvider, m_tagInfoProviderCompPtr);
-	I_ATTR(QByteArray, m_taggableEntityTypeAttrPtr);
 };
 
 
@@ -210,11 +205,6 @@ protected:
 	virtual QJsonObject RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual QJsonObject SetObjectDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual QJsonObject GetObjectListFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-
-	/**
-		Add the tags of the listed objects ('tags': [{id, name, color, isSystem}]) to the items of a list response.
-	*/
-	void AddTagInfos(const imtgql::CGqlRequest& gqlRequest, QJsonObject& listResponse) const;
 	virtual QJsonObject GetElementsCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual QJsonObject DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	/// \todo rename to GetElementMetaInfo

@@ -1327,6 +1327,11 @@ QString CSqlDatabaseDocumentDelegateCompBase::GetBaseSelectionQuery() const
 		customColumns = QStringLiteral(", ") + customColumns;
 	}
 
+	const QString tagsColumn = CreateTagsColumnQuery(IsSQLite() ? QStringLiteral(R"(root."DocumentId")") : QStringLiteral(R"(root."DocumentId"::text)"));
+	if (!tagsColumn.isEmpty()){
+		customColumns += QStringLiteral(", ") + tagsColumn;
+	}
+
 	if (IsSQLite()){
 		QString query = QStringLiteral(R"(
 							SELECT

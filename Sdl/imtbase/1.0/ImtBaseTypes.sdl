@@ -191,6 +191,14 @@ type ObjectLink {
 	url: UrlParam
 }
 
+# A tag on an object, for a tags field of collection items. Color is hex without the leading hash.
+type TagInfo {
+	id: ID
+	name: String
+	color: String
+	isSystem: Boolean
+}
+
 type FileImportInfo {
 	filePath: String
 	objectTypeId: ID

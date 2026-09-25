@@ -834,6 +834,43 @@ bool CSqlDatabaseObjectDelegateCompBase::IsTaggable() const
 }
 
 
+QString CSqlDatabaseObjectDelegateCompBase::CreateTagsColumnQuery(const QString& entityIdExpression) const
+{
+	if (!IsTaggable()){
+		return QString();
+	}
+
+	const QString assignmentsTable = CreateTagTableReference(GetTagAssignmentsTableName());
+	const QString tagsTable = CreateTagTableReference(GetTagsTableName());
+	const QString entityType = SqlEncode(QString::fromUtf8(*m_taggableEntityTypeAttrPtr));
+
+	if (IsSqliteDriver()){
+		return QStringLiteral(R"sql(
+				(SELECT json_group_array(json_object(
+							'id', tag."DocumentId",
+							'name', json_extract(tag."Document", '$.Name'),
+							'color', json_extract(tag."Document", '$.Color'),
+							'isSystem', json_extract(tag."Document", '$.IsSystem') IN (1, 'true')))
+					FROM %1 AS assignment
+					JOIN %2 AS tag ON tag."DocumentId" = assignment."TagId" AND tag."State" = 'Active'
+					WHERE assignment."EntityType" = '%3' AND assignment."EntityId" = %4) AS "Tags")sql")
+					.arg(assignmentsTable, tagsTable, entityType, entityIdExpression);
+	}
+
+	return QStringLiteral(R"sql(
+			(SELECT json_agg(json_build_object(
+						'id', tag."DocumentId",
+						'name', tag."Document"->>'Name',
+						'color', tag."Document"->>'Color',
+						'isSystem', COALESCE(tag."Document"->>'IsSystem', 'false') = 'true')
+						ORDER BY tag."Document"->>'Name')
+				FROM %1 AS assignment
+				JOIN %2 AS tag ON tag."DocumentId"::text = assignment."TagId" AND tag."State" = 'Active'
+				WHERE assignment."EntityType" = '%3' AND assignment."EntityId" = %4) AS "Tags")sql")
+				.arg(assignmentsTable, tagsTable, entityType, entityIdExpression);
+}
+
+
 QString CSqlDatabaseObjectDelegateCompBase::CreateComplexFilterQuery(
 			const imtbase::IComplexCollectionFilter& collectionFilter,
 			const QString& entityIdExpression,
