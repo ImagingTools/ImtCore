@@ -7,6 +7,7 @@
         "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtcolorsdl/SDL/1.0/QML/generation_info.json",
         "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imt2dsdl/SDL/1.0/QML/generation_info.json",
         "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtdesksdl/SDL/1.0/QML/generation_info.json",
+        "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imttagsdl/SDL/1.0/QML/generation_info.json",
         "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtchatsdl/SDL/1.0/QML/generation_info.json"
     ],
     "dirs": [
@@ -22,6 +23,7 @@
         "${IMTCOREDIR}/Qml/imtguigql",
         "${IMTCOREDIR}/Qml/imtlicgui",
         "${IMTCOREDIR}/Qml/imtdeskgui",
+        "${IMTCOREDIR}/Qml/imttaggui",
         "${IMTCOREDIR}/Qml/imtchatgui"
     ]
 }
