@@ -1591,7 +1591,12 @@ QJsonObject CObjectCollectionControllerCompBase::CreateInternalResponse(
 	case OT_UPDATE:
 		return UpdateObject(gqlRequest, errorMessage);
 	case OT_LIST:
-		return GetObjectListFromRequest(gqlRequest, errorMessage);
+		{
+			QJsonObject listResponse = GetObjectListFromRequest(gqlRequest, errorMessage);
+			AddTagInfos(gqlRequest, listResponse);
+
+			return listResponse;
+		}
 	}
 
 	return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
@@ -2150,6 +2155,71 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectListFromRequest(
 
 	rootObj.insert(QStringLiteral("data"), dataObj);
 	return rootObj;
+}
+
+
+void CObjectCollectionControllerCompBase::AddTagInfos(const imtgql::CGqlRequest& gqlRequest, QJsonObject& listResponse) const
+{
+	if (!m_tagInfoProviderCompPtr.IsValid()){
+		return;
+	}
+
+	QJsonObject dataObj = listResponse.value(QStringLiteral("data")).toObject();
+	QJsonArray itemsArray = dataObj.value(QStringLiteral("items")).toArray();
+	if (itemsArray.isEmpty()){
+		return;
+	}
+
+	QByteArrayList entityIds;
+	for (const QJsonValue& itemValue : itemsArray){
+		const QByteArray entityId = itemValue.toObject().value(QStringLiteral("id")).toString().toUtf8();
+		if (!entityId.isEmpty()){
+			entityIds << entityId;
+		}
+	}
+
+	QByteArray entityType = m_taggableEntityTypeAttrPtr.IsValid() ? *m_taggableEntityTypeAttrPtr : QByteArray();
+	if (entityType.isEmpty() && m_collectionIdAttrPtr.IsValid()){
+		entityType = *m_collectionIdAttrPtr;
+	}
+
+	imtbase::COperationContext operationContext;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		operationContext.SetTenantId(gqlContextPtr->GetTenantId());
+	}
+
+	const imtbase::IEntityTagInfoProvider::EntityTagInfos tagInfos = m_tagInfoProviderCompPtr->GetEntityTagInfos(entityType, entityIds, &operationContext);
+	if (tagInfos.isEmpty()){
+		return;
+	}
+
+	for (int i = 0; i < itemsArray.count(); i++){
+		QJsonObject itemObj = itemsArray.at(i).toObject();
+		const QByteArray entityId = itemObj.value(QStringLiteral("id")).toString().toUtf8();
+
+		auto tagIter = tagInfos.constFind(entityId);
+		if (tagIter == tagInfos.cend()){
+			continue;
+		}
+
+		QJsonArray tagsArray;
+		for (const imtbase::IEntityTagInfoProvider::TagInfo& tagInfo : tagIter.value()){
+			QJsonObject tagObj;
+			tagObj.insert(QStringLiteral("id"), QString::fromUtf8(tagInfo.id));
+			tagObj.insert(QStringLiteral("name"), tagInfo.name);
+			tagObj.insert(QStringLiteral("color"), tagInfo.color);
+			tagObj.insert(QStringLiteral("isSystem"), tagInfo.isSystem);
+
+			tagsArray.append(tagObj);
+		}
+
+		itemObj.insert(QStringLiteral("tags"), tagsArray);
+		itemsArray.replace(i, itemObj);
+	}
+
+	dataObj.insert(QStringLiteral("items"), itemsArray);
+	listResponse.insert(QStringLiteral("data"), dataObj);
 }
 
 

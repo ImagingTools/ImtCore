@@ -6,7 +6,7 @@ import imtcontrols 1.0
 
 /*!
 	\qmltype TagChip
-	\inqmlmodule imttaggui
+	\inqmlmodule imtcolgui
 	\brief A tag rendered as a colored pill, like a GitHub label.
 */
 Rectangle {

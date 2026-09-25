@@ -50,6 +50,9 @@ Item {
 	property bool backgroundUpdatesEnabled: false
 	property int loadingIndicatorDelay: 0
 
+	// Rows that come with a 'tags' list show it as chips in the first column.
+	property bool showItemTags: true
+
 	property alias canResetFilters: container.canResetFilters;
 	property int metaInfoWidth: Style.sizeHintXXS;
 	property alias contentHeight: container.contentHeight
@@ -189,6 +192,26 @@ Item {
 		}
 	}
 	
+	// A column the consumer gave its own content, or a link column, is left alone.
+	function installItemTagsCell(){
+		if (!root.showItemTags || !root.table || !root.table.headers || root.table.headers.getItemsCount() === 0){
+			return
+		}
+
+		let headerId = root.table.getHeaderId(0)
+		if (headerId === "" || headerId.toLowerCase().endsWith("link") || root.table.columnContentComps[headerId]){
+			return
+		}
+
+		root.table.setColumnContentById(headerId, itemTagsCellComp)
+	}
+
+	Component {
+		id: itemTagsCellComp
+
+		TableCellTagsDelegate {}
+	}
+
 	function getSelectedIds(){
 		return container.getSelectedIds()
 	}
@@ -235,6 +258,7 @@ Item {
 		}
 		
 		function onHeadersChanged(){
+			root.installItemTagsCell();
 			root.headersChanged();
 		}
 

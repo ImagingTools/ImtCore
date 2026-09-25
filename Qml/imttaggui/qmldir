@@ -1,12 +1,10 @@
 module imttaggui
 
-EntityTagsColumn 1.0 EntityTagsColumn.qml
 EntityTagsCommand 1.0 EntityTagsCommand.qml
 EntityTagsDialog 1.0 EntityTagsDialog.qml
 EntityTagsEditor 1.0 EntityTagsEditor.qml
 EntityTagsProvider 1.0 EntityTagsProvider.qml
 TagCatalogPanel 1.0 TagCatalogPanel.qml
-TagChip 1.0 TagChip.qml
 TagChipRow 1.0 TagChipRow.qml
 TagColorPalette 1.0 TagColorPalette.qml
 TagEditorDialog 1.0 TagEditorDialog.qml

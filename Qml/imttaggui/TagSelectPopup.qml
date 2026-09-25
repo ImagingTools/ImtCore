@@ -28,6 +28,7 @@ FilterableSelectPopup {
 	readonly property int scrollbarReserve: 8 + Style.marginXS
 	showCheckBox: true
 	filterPlaceholder: qsTr("Filter tags...")
+	filterRadius: Style.radiusM
 
 	delegate: Component {
 		Item {

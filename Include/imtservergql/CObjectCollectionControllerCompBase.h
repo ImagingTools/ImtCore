@@ -13,6 +13,7 @@
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtbase/IOperationContext.h>
 #include <imtbase/IDocumentChangeGenerator.h>
+#include <imtbase/IEntityTagInfoProvider.h>
 #include <imtbase/IOperationContextController.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
@@ -80,6 +81,8 @@ public:
 		I_ASSIGN_MULTI_0(m_importExportObjectFactCompPtr, "ImportExportObjectFactory", "Object factory for the import/export object", false);
 		I_ASSIGN_MULTI_0(m_filePersistenceCompPtr, "FilePersistence", "File persistence for the import/export object", false);
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
+		I_ASSIGN(m_tagInfoProviderCompPtr, "TagInfoProvider", "Provider of object tags; when set, every list item gets a 'tags' array", false, "TagInfoProvider");
+		I_ASSIGN(m_taggableEntityTypeAttrPtr, "TaggableEntityType", "Entity type under which the objects are tagged; the collection ID when not set", false, "");
 	I_END_COMPONENT;
 
 	enum OperationType
@@ -205,6 +208,11 @@ protected:
 	virtual QJsonObject RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual QJsonObject SetObjectDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual QJsonObject GetObjectListFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+
+	/**
+		Add the tags of the listed objects ('tags': [{id, name, color, isSystem}]) to the items of a list response.
+	*/
+	void AddTagInfos(const imtgql::CGqlRequest& gqlRequest, QJsonObject& listResponse) const;
 	virtual QJsonObject GetElementsCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual QJsonObject DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	/// \todo rename to GetElementMetaInfo
@@ -422,6 +430,8 @@ protected:
 	I_MULTIFACT(istd::IChangeable, m_importExportObjectFactCompPtr);
 	I_MULTIREF(ifile::IFilePersistence, m_filePersistenceCompPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
+	I_REF(imtbase::IEntityTagInfoProvider, m_tagInfoProviderCompPtr);
+	I_ATTR(QByteArray, m_taggableEntityTypeAttrPtr);
 };
 
 

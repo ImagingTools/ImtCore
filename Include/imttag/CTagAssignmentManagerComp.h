@@ -6,6 +6,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
+#include <imtbase/IEntityTagInfoProvider.h>
 #include <imtbase/IEntityTypeProvider.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IObjectCollectionProvider.h>
@@ -27,13 +28,15 @@ namespace imttag
 
 class CTagAssignmentManagerComp:
 			public ilog::CLoggerComponentBase,
-			virtual public ITagAssignmentManager
+			virtual public ITagAssignmentManager,
+			virtual public imtbase::IEntityTagInfoProvider
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTagAssignmentManagerComp);
 		I_REGISTER_INTERFACE(ITagAssignmentManager);
+		I_REGISTER_INTERFACE(imtbase::IEntityTagInfoProvider);
 		I_ASSIGN(m_tagCollectionCompPtr, "TagCollection", "Tag catalog", true, "TagCollection");
 		I_ASSIGN(m_assignmentCollectionCompPtr, "AssignmentCollection", "SQL-backed TagAssignments collection", true, "TagAssignmentCollection");
 		I_ASSIGN(m_assignmentFactoryCompPtr, "AssignmentFactory", "Factory of tag assignments", true, "TagAssignment");
@@ -78,6 +81,12 @@ public:
 	virtual bool IsTaggableEntityType(const QByteArray& entityType) const override;
 	virtual const imtbase::IObjectCollection* GetEntityCollection(const QByteArray& entityType) const override;
 
+	// reimplemented (imtbase::IEntityTagInfoProvider)
+	virtual EntityTagInfos GetEntityTagInfos(
+				const QByteArray& entityType,
+				const QByteArrayList& entityIds,
+				const imtbase::IOperationContext* operationContextPtr) const override;
+
 private:
 	enum ChangeMode
 	{
@@ -90,6 +99,7 @@ private:
 	{
 		QString name;
 		QString color;
+		bool isSystem = false;
 	};
 
 	typedef QMap<QByteArray, TagSnapshot> TagSnapshots;
