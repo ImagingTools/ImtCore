@@ -20,6 +20,8 @@ Item {
 	id: tagCatalogPanelRoot
 	objectName: "TagCatalogPanel"
 
+	anchors.fill: parent
+
 	property string context: ""
 
 	readonly property bool canManage: PermissionsController.checkPermission("ManageTags")
