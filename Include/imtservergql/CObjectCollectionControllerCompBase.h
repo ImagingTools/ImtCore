@@ -53,11 +53,15 @@ public:
 		I_REGISTER_INTERFACE(imtbase::ISearchController)
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", true, "");
 		I_ASSIGN(m_collectionNameAttrPtr, "CollectionName", "Collection Name", true, "");
+		I_ASSIGN(m_tagInfoProviderCompPtr, "TagInfoProvider", "Provider of object tags; when set, every list item gets a 'tags' array", false, "TagInfoProvider");
+		I_ASSIGN(m_taggableEntityTypeAttrPtr, "TaggableEntityType", "Entity type under which the objects are tagged; the collection ID when not set", false, "");
 	I_END_COMPONENT
 
 protected:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_ATTR(QString, m_collectionNameAttrPtr);
+	I_REF(imtbase::IEntityTagInfoProvider, m_tagInfoProviderCompPtr);
+	I_ATTR(QByteArray, m_taggableEntityTypeAttrPtr);
 };
 
 
@@ -81,8 +85,6 @@ public:
 		I_ASSIGN_MULTI_0(m_importExportObjectFactCompPtr, "ImportExportObjectFactory", "Object factory for the import/export object", false);
 		I_ASSIGN_MULTI_0(m_filePersistenceCompPtr, "FilePersistence", "File persistence for the import/export object", false);
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
-		I_ASSIGN(m_tagInfoProviderCompPtr, "TagInfoProvider", "Provider of object tags; when set, every list item gets a 'tags' array", false, "TagInfoProvider");
-		I_ASSIGN(m_taggableEntityTypeAttrPtr, "TaggableEntityType", "Entity type under which the objects are tagged; the collection ID when not set", false, "");
 	I_END_COMPONENT;
 
 	enum OperationType
@@ -430,8 +432,6 @@ protected:
 	I_MULTIFACT(istd::IChangeable, m_importExportObjectFactCompPtr);
 	I_MULTIREF(ifile::IFilePersistence, m_filePersistenceCompPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
-	I_REF(imtbase::IEntityTagInfoProvider, m_tagInfoProviderCompPtr);
-	I_ATTR(QByteArray, m_taggableEntityTypeAttrPtr);
 };
 
 

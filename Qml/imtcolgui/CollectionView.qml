@@ -50,8 +50,10 @@ Item {
 	property bool backgroundUpdatesEnabled: false
 	property int loadingIndicatorDelay: 0
 
-	// Rows that come with a 'tags' list show it as chips in the first column.
+	// Rows that come with a 'tags' list show it as chips after the text of one column:
+	// itemTagsHeaderId, or the first column without its own content that is not a link.
 	property bool showItemTags: true
+	property string itemTagsHeaderId: ""
 
 	property alias canResetFilters: container.canResetFilters;
 	property int metaInfoWidth: Style.sizeHintXXS;
@@ -192,18 +194,41 @@ Item {
 		}
 	}
 	
-	// A column the consumer gave its own content, or a link column, is left alone.
 	function installItemTagsCell(){
 		if (!root.showItemTags || !root.table || !root.table.headers || root.table.headers.getItemsCount() === 0){
 			return
 		}
 
-		let headerId = root.table.getHeaderId(0)
-		if (headerId === "" || headerId.toLowerCase().endsWith("link") || root.table.columnContentComps[headerId]){
-			return
+		let contents = root.table.columnContentComps
+		let headerId = root.itemTagsHeaderId
+		if (headerId === ""){
+			for (let i = 0; i < root.table.headers.getItemsCount(); i++){
+				let candidateId = root.table.getHeaderId(i)
+				if (candidateId === "" || candidateId.toLowerCase().endsWith("link")){
+					continue
+				}
+
+				if (!contents[candidateId] || contents[candidateId] === itemTagsCellComp){
+					headerId = candidateId
+					break
+				}
+			}
 		}
 
-		root.table.setColumnContentById(headerId, itemTagsCellComp)
+		if (headerId !== "" && !contents[headerId]){
+			root.table.setColumnContentById(headerId, itemTagsCellComp)
+		}
+	}
+
+	Timer {
+		id: itemTagsInstallTimer
+
+		interval: 0
+		repeat: false
+
+		onTriggered: {
+			root.installItemTagsCell()
+		}
 	}
 
 	Component {
@@ -258,8 +283,10 @@ Item {
 		}
 		
 		function onHeadersChanged(){
-			root.installItemTagsCell();
 			root.headersChanged();
+
+			// After the consumers have put their own column content in place.
+			itemTagsInstallTimer.restart();
 		}
 
 		function onTableDecoratorChanged(){
