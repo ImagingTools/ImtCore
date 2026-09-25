@@ -107,6 +107,9 @@ PopupView {
 	// --- Filter field placeholder ---
 	property string filterPlaceholder: qsTr("Filter...")
 
+	// --- Corner radius of the filter field ---
+	property int filterRadius: Style.radiusL
+
 	// --- Optional header component (rendered above filter field) ---
 	property Component headerComponent: null
 
@@ -610,7 +613,7 @@ PopupView {
 				textSize: root.textSize
 				fontColor: root.fontColor
 				placeHolderText: root.filterPlaceholder
-				radius: Style.radiusL
+				radius: root.filterRadius
 
 				onTextChanged: {
 					root.focusedIndex = -1

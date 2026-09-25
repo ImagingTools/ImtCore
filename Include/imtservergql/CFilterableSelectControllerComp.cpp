@@ -169,6 +169,8 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CFilterableSelectControllerComp::
 			}
 		}
 
+		OnSelectableItemCreated(*iteratorPtr, itemRepresentation, gqlRequest);
+
 		itemsList << itemRepresentation;
 	}
 
@@ -186,6 +188,14 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CFilterableSelectControllerComp::
 	response.notification = notification;
 
 	return response;
+}
+
+
+void CFilterableSelectControllerComp::OnSelectableItemCreated(
+			const imtbase::IObjectCollectionIterator& /*iterator*/,
+			sdl::V1_0::imtbase::CSelectableItemData& /*itemRepresentation*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/) const
+{
 }
 
 

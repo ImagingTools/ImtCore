@@ -37,6 +37,12 @@ ComplexCollectionFilter{
 	property Component fieldFilterFact: Component{ FieldFilter{} }
 
 	/*!
+		\qmlproperty Component arrayFieldFilterFact
+		Factory for creating array field filter objects.
+	*/
+	property Component arrayFieldFilterFact: Component{ ArrayFieldFilter{} }
+
+	/*!
 		\qmlproperty Component baseModelFact
 		Factory for creating base model objects.
 	*/
@@ -60,7 +66,10 @@ ComplexCollectionFilter{
 									   EQUAL: "Equal",
 									   LESS: "Less",
 									   GREATER: "Greater",
-									   CONTAINS: "Contains"
+									   CONTAINS: "Contains",
+									   ARRAY_HAS_ANY: "ArrayHasAny",
+									   ARRAY_HAS_ALL: "ArrayHasAll",
+									   ARRAY_IS_EMPTY: "ArrayIsEmpty"
 								   })
 
 	/*!
@@ -218,6 +227,20 @@ ComplexCollectionFilter{
 		let fieldObj = fieldFilterFact.createObject(m_fieldsFilter)
 		fieldObj.m_fieldId = fieldId
 		fieldObj.m_filterValue = value
+		fieldObj.m_filterValueType = valueType
+		fieldObj.m_filterOperations = operations
+		return fieldObj
+	}
+
+	/*!
+		\qmlmethod object createArrayFieldFilter(string fieldId, var values, string valueType, var operations)
+		Creates and returns a new array field filter, e.g. for the 'Tags' field.
+		Add it with addFieldFilter() or put it into a group filter.
+	*/
+	function createArrayFieldFilter(fieldId, values, valueType, operations){
+		let fieldObj = arrayFieldFilterFact.createObject(m_fieldsFilter)
+		fieldObj.m_fieldId = fieldId
+		fieldObj.m_filterValues = values
 		fieldObj.m_filterValueType = valueType
 		fieldObj.m_filterOperations = operations
 		return fieldObj

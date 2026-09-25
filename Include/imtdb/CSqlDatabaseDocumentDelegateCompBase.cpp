@@ -1327,6 +1327,11 @@ QString CSqlDatabaseDocumentDelegateCompBase::GetBaseSelectionQuery() const
 		customColumns = QStringLiteral(", ") + customColumns;
 	}
 
+	const QString tagsColumn = CreateTagsColumnQuery(IsSQLite() ? QStringLiteral(R"(root."DocumentId")") : QStringLiteral(R"(root."DocumentId"::text)"));
+	if (!tagsColumn.isEmpty()){
+		customColumns += QStringLiteral(", ") + tagsColumn;
+	}
+
 	if (IsSQLite()){
 		QString query = QStringLiteral(R"(
 							SELECT
@@ -1894,18 +1899,18 @@ bool CSqlDatabaseDocumentDelegateCompBase::CreateTimeFilterQuery(const imtbase::
 
 bool CSqlDatabaseDocumentDelegateCompBase::CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const
 {
-	if (IsSQLite()){
-		filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter);
-		if (!filterQuery.isEmpty()){
-			SubstituteFieldIds(filterQuery, false);
-		}
-	}
-	else{
-		filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter, CComplexCollectionFilterConverter::SC_POSTGRES);
-		if (!filterQuery.isEmpty()) {
-			SubstituteFieldIds(filterQuery);
-		}
-	}
+	const bool isSqlite = IsSQLite();
+	const QString entityIdExpression = isSqlite
+				? QStringLiteral(R"(root."%1")").arg(QString::fromUtf8(s_documentIdColumn))
+				: QStringLiteral(R"(root."%1"::text)").arg(QString::fromUtf8(s_documentIdColumn));
+
+	filterQuery = CreateComplexFilterQuery(
+				collectionFilter,
+				entityIdExpression,
+				[this, isSqlite](QString& query)
+				{
+					SubstituteFieldIds(query, !isSqlite);
+				});
 
 	return true;
 }

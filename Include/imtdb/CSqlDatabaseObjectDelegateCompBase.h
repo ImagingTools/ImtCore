@@ -2,6 +2,9 @@
 #pragma once
 
 
+// STL includes
+#include <functional>
+
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/IOptionsList.h>
@@ -37,6 +40,9 @@ public:
 		I_ASSIGN(m_autoCreateTableAttrPtr, "AutoCreateTable", "Auto create collection table if it does not exist", false, false);
 		I_ASSIGN(m_createTableScriptPathAttrPtr, "CreateTableScriptPath", "QRC path or file name of SQL script used to create collection table", false, "");
 		I_ASSIGN(m_prerequisiteTableScriptPathAttrPtr, "PrerequisiteTableScriptPath", "QRC path or file name of SQL script creating tables the collection table references (executed before CreateTableScriptPath)", false, "");
+		I_ASSIGN(m_taggableEntityTypeAttrPtr, "TaggableEntityType", "Entity type (collection ID) under which tags are assigned to the objects; enables the 'Tags' filter field", false, "");
+		I_ASSIGN(m_tagAssignmentsTableNameAttrPtr, "TagAssignmentsTableName", "Name of the tag assignments table", false, "TagAssignments");
+		I_ASSIGN(m_tagsTableNameAttrPtr, "TagsTableName", "Name of the tag catalog table", false, "Tags");
 	I_END_COMPONENT
 
 	virtual QString SqlEncode(const QString& sqlQuery) const;
@@ -110,6 +116,36 @@ protected:
 	virtual bool TableExists(const QString& tableName) const;
 	bool ExecuteTableScript(const QByteArray& scriptPath, const QString& tableName);
 
+	/**
+		Check whether the TaggableEntityType attribute is set.
+	*/
+	bool IsTaggable() const;
+
+	/**
+		Convert a complex filter to SQL; for taggable objects the 'Tags' field becomes tag assignment conditions.
+		\param entityIdExpression	SQL expression of the object ID in the outer query, as text.
+		\param postProcessor	Applied to the converted query before the tag conditions are inserted.
+	*/
+	QString CreateComplexFilterQuery(
+				const imtbase::IComplexCollectionFilter& collectionFilter,
+				const QString& entityIdExpression,
+				const std::function<void(QString&)>& postProcessor = nullptr) const;
+
+	QByteArray GetTagAssignmentsTableName() const;
+	QByteArray GetTagsTableName() const;
+
+	/**
+		Schema-qualified, quoted name of a table in the schema of this delegate.
+	*/
+	QString CreateTagTableReference(const QByteArray& tableName) const;
+
+	/**
+		For taggable objects: a selection column "Tags" with the object's active tags as a JSON array
+		of {id, name, color, isSystem}; empty otherwise. Read it with IObjectCollectionIterator::GetElementInfo("Tags").
+		\param entityIdExpression	SQL expression of the object ID in the outer query, as text.
+	*/
+	QString CreateTagsColumnQuery(const QString& entityIdExpression) const;
+
 protected:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 	I_REF(iprm::IOptionsList, m_typesCompPtr);
@@ -121,6 +157,9 @@ protected:
 	I_ATTR(bool, m_autoCreateTableAttrPtr);
 	I_ATTR(QByteArray, m_createTableScriptPathAttrPtr);
 	I_ATTR(QByteArray, m_prerequisiteTableScriptPathAttrPtr);
+	I_ATTR(QByteArray, m_taggableEntityTypeAttrPtr);
+	I_ATTR(QByteArray, m_tagAssignmentsTableNameAttrPtr);
+	I_ATTR(QByteArray, m_tagsTableNameAttrPtr);
 };
 
 
