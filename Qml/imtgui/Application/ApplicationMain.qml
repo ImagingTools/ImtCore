@@ -22,6 +22,7 @@ Item {
 	property bool serverReady: true; // [deprecated]
 	property bool authorizationServerConnected: false;
 	property bool useWebSocketSubscription: false;
+	property bool useWebSocketProxy: false;
 	
 	property bool firstModelsIsInit: false;
 	property bool serverConnected: subscriptionManager_.status == 1;
@@ -540,14 +541,13 @@ Item {
 		try {
 			let url = new URL(serverUrl);
 
-			let protocol = "ws";
-			if (url.protocol === "https:"){
-				protocol = "wss";
-			}
+			let isHttpsConnection = url.protocol === "https:"
+			let protocol = isHttpsConnection ? "wss" : "ws"
+			let shouldUseWebSocketProxy = isHttpsConnection && application.useWebSocketProxy
 
 			url.protocol = protocol
 
-			if (application.webSocketPort >= 0){
+			if (!shouldUseWebSocketProxy && application.webSocketPort >= 0){
 				url.port = application.webSocketPort;
 			}
 			else{
