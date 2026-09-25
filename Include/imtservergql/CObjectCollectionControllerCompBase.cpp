@@ -2143,6 +2143,9 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectListFromRequest(
 		QJsonObject itemObj;
 		if (!SetupGqlItemWithContext(gqlRequest, setupContext, itemObj, objectCollectionIterator.GetPtr(), errorMessage)){
 			SendWarningMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+			errorMessage.clear();
+
+			continue;
 		}
 		itemsArray.append(itemObj);
 	}

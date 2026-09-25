@@ -152,14 +152,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 
 	userInfoPtr->SetMail(mail);
 
-	if (representation.enabled && (*representation.enabled != userInfoPtr->IsEnabled())){
-		if (!isAccountStateChangeAllowed){
-			errorMessage = QStringLiteral("Unable to change the account state of user '%1'. Error: Only the superuser can enable or disable an account").arg(QString::fromUtf8(userInfoPtr->GetId()));
-			SendWarningMessage(0, errorMessage, "CUserCollectionControllerComp");
-
-			return false;
-		}
-
+	if (representation.enabled && isAccountStateChangeAllowed){
 		userInfoPtr->SetEnabled(*representation.enabled);
 	}
 
@@ -683,12 +676,10 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromReques
 {
 	istd::IChangeableUniquePtr objectPtr = BaseClass::CreateObjectFromRequest(gqlRequest, newObjectId, errorMessage);
 
-	auto userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(objectPtr.GetPtr());
+	// Only the superuser may create a disabled account; for anyone else the requested state is ignored.
+	auto userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(objectPtr.GetPtr());
 	if ((userInfoPtr != nullptr) && !userInfoPtr->IsEnabled() && !IsSuperuserRequest(gqlRequest)){
-		errorMessage = QStringLiteral("Unable to create user '%1'. Error: Only the superuser can enable or disable an account").arg(QString::fromUtf8(userInfoPtr->GetId()));
-		SendWarningMessage(0, errorMessage, "CUserCollectionControllerComp");
-
-		return nullptr;
+		userInfoPtr->SetEnabled(true);
 	}
 
 	return objectPtr;

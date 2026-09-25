@@ -32,4 +32,16 @@ function prepareOutputRoot(outputRoot) {
   return resolved;
 }
 
-module.exports = { DEFAULT_OUTPUT_ROOT, prepareOutputRoot, resolveOutputPaths };
+// Remove every empty directory below `dir` (not `dir` itself). Playwright gives each test its own
+// output folder, and trace 'retain-on-failure' deletes a passing test's trace but leaves the folder.
+function pruneEmptyDirs(dir) {
+  if (!fs.existsSync(dir)) return;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const child = path.join(dir, entry.name);
+    pruneEmptyDirs(child);
+    if (fs.readdirSync(child).length === 0) fs.rmdirSync(child);
+  }
+}
+
+module.exports = { DEFAULT_OUTPUT_ROOT, prepareOutputRoot, pruneEmptyDirs, resolveOutputPaths };

@@ -115,7 +115,10 @@ Rectangle {
 
 		onFinished: {
 			authPageContainer.setDecorators();
-			loginTextInput.forceActiveFocus();
+			// Don't steal focus from a field the user (or a test) is already typing into.
+			if (!passwordTextInput.activeFocus){
+				loginTextInput.forceActiveFocus();
+			}
 		}
 	}
 
