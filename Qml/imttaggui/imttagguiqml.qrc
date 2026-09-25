@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/qml">
         <file alias="imttaggui/qmldir">qmldir</file>
+        <file alias="imttaggui/EntityTagsColumn.qml">EntityTagsColumn.qml</file>
         <file alias="imttaggui/EntityTagsCommand.qml">EntityTagsCommand.qml</file>
         <file alias="imttaggui/EntityTagsDialog.qml">EntityTagsDialog.qml</file>
         <file alias="imttaggui/EntityTagsEditor.qml">EntityTagsEditor.qml</file>

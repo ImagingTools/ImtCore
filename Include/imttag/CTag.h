@@ -3,7 +3,6 @@
 
 
 // ImtCore includes
-#include <imtbase/TIdentifiableWrap.h>
 #include <imttag/ITag.h>
 
 
@@ -45,9 +44,6 @@ protected:
 	QString m_description;
 	bool m_isSystem;
 };
-
-
-typedef imtbase::TIdentifiableWrap<CTag> CIdentifiableTag;
 
 
 } // namespace imttag

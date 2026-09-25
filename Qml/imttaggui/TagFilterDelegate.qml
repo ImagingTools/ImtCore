@@ -13,9 +13,9 @@ import imtguigql 1.0
 	\brief Filter-panel chip that filters a taggable collection by tags.
 
 	Opens a searchable multi-select of the tag catalog. A segmented switch picks how the
-	ticked tags combine (any, all, exclude); "Without tags" finds untagged objects. The chip
+	ticked tags combine (any, all, exclude); "No tags" finds untagged objects. The chip
 	shows the names of the picked tags, the popup keeps them in its "Selected" group.
-	Keyboard: Alt+1 any, Alt+2 all, Alt+3 exclude, Alt+0 without tags.
+	Keyboard: Alt+1 any, Alt+2 all, Alt+3 exclude, Alt+0 no tags.
 
 	\code
 	registerFieldFilterDelegate("Tags", tagFilterComp)
@@ -80,9 +80,9 @@ FilterDelegateBase {
 	Component {
 		id: modeSwitchComp
 
-		Column {
-			id: modeColumn
-			spacing: Style.marginS
+		Row {
+			id: modeRow
+			spacing: Style.marginL
 
 			Shortcut {
 				sequence: "Alt+1"
@@ -114,6 +114,7 @@ FilterDelegateBase {
 
 			SegmentedButton {
 				id: modeSegmented
+				anchors.verticalCenter: parent.verticalCenter
 				objectName: "TagFilterModeSegmented"
 				height: Style.controlHeightM
 				checkable: false
@@ -154,6 +155,7 @@ FilterDelegateBase {
 
 			Row {
 				id: withoutTagsRow
+				anchors.verticalCenter: parent.verticalCenter
 				objectName: "TagFilterWithoutTags"
 				spacing: Style.marginS
 
@@ -172,7 +174,7 @@ FilterDelegateBase {
 
 				BaseText {
 					anchors.verticalCenter: parent.verticalCenter
-					text: qsTr("Without tags")
+					text: qsTr("No tags")
 
 					MouseArea {
 						anchors.fill: parent
@@ -195,6 +197,7 @@ FilterDelegateBase {
 			knownItems: tagFilter.tags
 			showSelectedGroup: true
 			headerComponent: modeSwitchComp
+			itemWidth: 360
 
 			dataProvider: TagSelectDataProvider {
 				context: tagFilterDelegateRoot.context

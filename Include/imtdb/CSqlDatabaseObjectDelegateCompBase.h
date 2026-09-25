@@ -131,6 +131,14 @@ protected:
 				const QString& entityIdExpression,
 				const std::function<void(QString&)>& postProcessor = nullptr) const;
 
+	QByteArray GetTagAssignmentsTableName() const;
+	QByteArray GetTagsTableName() const;
+
+	/**
+		Schema-qualified, quoted name of a table in the schema of this delegate.
+	*/
+	QString CreateTagTableReference(const QByteArray& tableName) const;
+
 protected:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 	I_REF(iprm::IOptionsList, m_typesCompPtr);
@@ -145,11 +153,6 @@ protected:
 	I_ATTR(QByteArray, m_taggableEntityTypeAttrPtr);
 	I_ATTR(QByteArray, m_tagAssignmentsTableNameAttrPtr);
 	I_ATTR(QByteArray, m_tagsTableNameAttrPtr);
-
-private:
-	QByteArray GetTagAssignmentsTableName() const;
-	QByteArray GetTagsTableName() const;
-	QString CreateTagTableReference(const QByteArray& tableName) const;
 };
 
 

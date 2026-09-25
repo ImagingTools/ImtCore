@@ -34,7 +34,10 @@ Dialog {
 	Component.onCompleted: {
 		addButton(Enums.apply, qsTr("Apply"), false)
 		addButton(Enums.cancel, qsTr("Cancel"), true)
+	}
 
+	// The dialog manager assigns entityIds after creation, just before started().
+	onStarted: {
 		entityTagsProvider.load(entityTagsDialog.entityIds)
 	}
 
@@ -42,6 +45,19 @@ Dialog {
 		if (buttonId == Enums.apply){
 			entityTagsDialog.apply()
 		}
+	}
+
+	//! Ticked tags as select items, so the "Selected" group shows their names.
+	function initialTags(){
+		var tags = entityTagsProvider.getTags(entityTagsDialog.entityIds[0])
+		var items = []
+		for (var i = 0; i < tags.length; i++){
+			if (entityTagsDialog.initialTagIds.indexOf(tags[i].id) >= 0){
+				items.push({id: tags[i].id, title: tags[i].name, description: tags[i].description, color: tags[i].color, parameters: []})
+			}
+		}
+
+		return items
 	}
 
 	function commonTagIds(){
@@ -167,6 +183,11 @@ Dialog {
 			}
 
 			function setSelectedIds(tagIds){
+				var knownTags = entityTagsDialog.initialTags()
+				for (var i = 0; i < knownTags.length; i++){
+					tagSelectPopup.dataProvider.addKnownItem(knownTags[i].id, knownTags[i])
+				}
+
 				tagSelectPopup.dataProvider.setPreselectedIds(tagIds)
 			}
 
@@ -187,6 +208,7 @@ Dialog {
 				anchors.right: parent.right
 				anchors.rightMargin: Style.marginL
 				embedded: true
+				showSelectedGroup: true
 				itemWidth: tagsContent.width - 2 * Style.marginL
 				enabled: entityTagsDialog.tagsLoaded
 

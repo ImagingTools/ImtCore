@@ -15,7 +15,7 @@ namespace imttag
 
 class CTagComp:
 			public icomp::CComponentBase,
-			public CIdentifiableTag
+			public CTag
 {
 public:
 	typedef icomp::CComponentBase BaseClass;

@@ -1,5 +1,6 @@
 module imttaggui
 
+EntityTagsColumn 1.0 EntityTagsColumn.qml
 EntityTagsCommand 1.0 EntityTagsCommand.qml
 EntityTagsDialog 1.0 EntityTagsDialog.qml
 EntityTagsEditor 1.0 EntityTagsEditor.qml

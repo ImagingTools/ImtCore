@@ -29,6 +29,9 @@ Dialog {
 
 	readonly property bool isNew: tagEditorDialog.tagId === ""
 	readonly property bool canCreateSystemTag: AuthorizationController.loggedUserIsSuperuser()
+
+	// Without a current organization a new tag can only be a system tag.
+	readonly property bool hasTenant: AuthorizationController.currentTenantId !== ""
 	readonly property bool isInputValid: tagEditorDialog.tagName.trim() !== "" && tagEditorDialog.contentItem && tagEditorDialog.contentItem.isColorValid
 
 	signal saved(string tagId)
@@ -40,6 +43,19 @@ Dialog {
 	Component.onCompleted: {
 		addButton(Enums.save, qsTr("Save"), false)
 		addButton(Enums.cancel, qsTr("Cancel"), true)
+	}
+
+	// The dialog manager assigns tagId and the other fields after creation, just before started().
+	onStarted: {
+		if (tagEditorDialog.isNew && !tagEditorDialog.hasTenant){
+			tagEditorDialog.isSystem = true
+		}
+	}
+
+	function toggleSystem(){
+		if (tagEditorDialog.hasTenant){
+			tagEditorDialog.isSystem = !tagEditorDialog.isSystem
+		}
 	}
 
 	onIsInputValidChanged: {
@@ -257,7 +273,7 @@ Dialog {
 					KeyNavigation.backtab: colorPalette.lastItem
 
 					Keys.onSpacePressed: {
-						tagEditorDialog.isSystem = !tagEditorDialog.isSystem
+						tagEditorDialog.toggleSystem()
 					}
 
 					CheckBox {
@@ -270,7 +286,7 @@ Dialog {
 							anchors.fill: parent
 							cursorShape: Qt.PointingHandCursor
 							onClicked: {
-								tagEditorDialog.isSystem = !tagEditorDialog.isSystem
+								tagEditorDialog.toggleSystem()
 								systemRow.forceActiveFocus()
 							}
 						}
@@ -278,7 +294,7 @@ Dialog {
 
 					BaseText {
 						anchors.verticalCenter: parent.verticalCenter
-						text: qsTr("System tag (visible to every organization)")
+						text: tagEditorDialog.hasTenant ? qsTr("System tag (visible to every organization)") : qsTr("System tag: no organization is selected")
 					}
 				}
 			}

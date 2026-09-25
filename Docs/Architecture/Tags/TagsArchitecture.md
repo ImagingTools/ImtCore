@@ -347,9 +347,9 @@ sequenceDiagram
 | GitHub | ImtCore GQL | Права |
 |---|---|---|
 | `GET /labels` | `GetSelectableItems(collectionId: "Tags", viewParams)` (`FilterableSelect.sdl`) — системные + тенант, текстовый поиск, пейджинг; у элемента `color`, в `params` — `IsSystem` и `UsageCount` | `ViewTags` |
-| `POST /labels` | `TagAdd(TagData)`; `isSystem=true` → только SU | `ManageTags` / SU |
+| `POST /labels` | `TagAdd(TagData)`; `isSystem=true` → только SU; без текущей организации тег всегда системный | `ManageTags` / SU |
 | `PATCH /labels/{name}` | `TagUpdate(TagData)`; для системного тега — только SU | `ManageTags` / SU |
-| `DELETE /labels/{name}` | `RemoveElements` (`ImtCollection.sdl`), мягко; `RestoreObjects` — восстановление | `ManageTags` / SU |
+| `DELETE /labels/{name}` | `RemoveElements` (`ImtCollection.sdl`), мягко; назначения тега удаляются в той же транзакции (`CTagDbDelegateComp`); `RestoreObjects` возвращает тег без назначений | `ManageTags` / SU |
 | `GET /issues/{n}/labels` | `EntityTagsGet(entityType, entityIds[])` | `ViewTags` + чтение сущности |
 | `POST /issues/{n}/labels` | `EntityTagsAdd(entityType, entityIds[], tagIds[])` | `AssignTags` |
 | `DELETE /issues/{n}/labels/{name}` | `EntityTagRemove(entityType, entityIds[], tagIds[])` | `AssignTags` |
@@ -439,8 +439,9 @@ TagManagement
 | `EntityTagsCommand` | Обработчик команды `AssignTags` в коллекции (работает с выделением) и в редакторе (с сохранённым документом); включает и выключает команду; Alt+T открывает диалог |
 | `EntityTagsDialog` | Диалог выбора тегов одной или нескольких сущностей; отмечены общие теги, по «Apply» (Ctrl+Enter) отправляется только разница (`EntityTagsAdd` / `EntityTagRemove`) |
 | `EntityTagsProvider` | Пакетная загрузка тегов для Id видимой страницы коллекции — один запрос на страницу |
+| `EntityTagsColumn` | Чипы тегов в строках коллекции после текста выбранной колонки (`setColumnContentById` таблицы) |
 | `EntityTagsEditor` | Добавить или снять теги у одной или нескольких сущностей |
-| `TagFilter`, `TagFilterDelegate` | Фильтр-чип панели фильтров коллекции: `SegmentedButton` «Any / All / Exclude» (Alt+1..3) и флажок «Without tags» (Alt+0); на чипе — имена выбранных тегов («bug, question», «bug + question», «not bug»), в списке — группа «Selected» |
+| `TagFilter`, `TagFilterDelegate` | Фильтр-чип панели фильтров коллекции: `SegmentedButton` «Any / All / Exclude» (Alt+1..3) и в той же строке флажок «No tags» (Alt+0); на чипе — имена выбранных тегов («bug, question», «bug + question», «not bug»), в списке — группа «Selected» |
 | `CollectionFilter.createArrayFieldFilter()` | Общий построитель `ArrayFieldFilter` в `imtcolgui` |
 
 ### 12.1 Сценарии
@@ -466,14 +467,14 @@ EntityTagsCommand {
 
 Команда открывает `EntityTagsDialog`: поиск по каталогу с цветами и чекбоксами. При нескольких объектах отмечены общие теги; отмеченное добавляется всем, снятое снимается у всех, остальное не трогается.
 
-**Теги в строках коллекции.**
+**Теги в строках коллекции** — как метки GitHub сразу после заголовка issue: цветные чипы идут за текстом первой колонки (или колонки `headerId`), больше `maxChips` сворачиваются в «+N». Теги видимой страницы приходят одним `EntityTagsGet` при каждой перезагрузке строк.
 
 ```qml
-EntityTagsProvider { id: pageTags; entityType: "Devices" }
-// после загрузки страницы: pageTags.load(idsOfVisibleRows)
-
-// в делегате строки:
-TagChipRow { tags: pageTags.tagsByEntity ? pageTags.getTags(model.id) : [] }
+EntityTagsColumn {
+	view: collectionView
+	entityType: "Devices"
+	active: PermissionsController.checkPermission("ViewTags")
+}
 ```
 
 **Фильтр.** Обычный фильтр-чип панели фильтров коллекции, рядом с остальными:

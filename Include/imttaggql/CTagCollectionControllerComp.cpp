@@ -224,6 +224,11 @@ QJsonObject CTagCollectionControllerComp::InsertObject(const imtgql::CGqlRequest
 
 	tagPtr->SetId(tagId);
 
+	// Without a tenant there is no organization to own the tag.
+	if (GetRequestTenantId(gqlRequest).isEmpty()){
+		tagPtr->SetSystem(true);
+	}
+
 	if (!CheckWriteAccess(*tagPtr, gqlRequest, errorMessage) || !IsNameAvailable(tagPtr->GetName(), tagPtr->IsSystem(), QByteArray(), gqlRequest, errorMessage)){
 		return QJsonObject();
 	}

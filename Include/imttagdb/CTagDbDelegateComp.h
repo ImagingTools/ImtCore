@@ -13,6 +13,7 @@ namespace imttagdb
 /**
 	Document delegate of the tag catalog.
 	A tenant sees its own tags plus the system tags, which have no tenant binding.
+	Deleting a tag removes its assignments in the same query.
 */
 class CTagDbDelegateComp: public imtdb::CSqlDatabaseDocumentDelegateComp
 {
@@ -26,6 +27,10 @@ protected:
 	QString CreateIsSystemCondition() const;
 
 	// reimplemented (imtdb::CSqlDatabaseDocumentDelegateCompBase)
+	virtual QByteArray CreateDeleteObjectsQuery(
+				const imtbase::IObjectCollection& collection,
+				const imtbase::ICollectionInfo::Ids& objectIds,
+				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual QString CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode = imtauth::TFM_INCLUDE) const override;
 	virtual QByteArray CreateTenantBindingDeleteQuery(const QByteArrayList& entityIds) const override;
 };

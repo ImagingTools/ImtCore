@@ -21,6 +21,28 @@ QString CTagDbDelegateComp::CreateIsSystemCondition() const
 
 // reimplemented (imtdb::CSqlDatabaseDocumentDelegateCompBase)
 
+QByteArray CTagDbDelegateComp::CreateDeleteObjectsQuery(
+			const imtbase::IObjectCollection& collection,
+			const imtbase::ICollectionInfo::Ids& objectIds,
+			const imtbase::IOperationContext* operationContextPtr) const
+{
+	QByteArray query = BaseClass::CreateDeleteObjectsQuery(collection, objectIds, operationContextPtr);
+	if (query.isEmpty()){
+		return query;
+	}
+
+	QStringList quotedIds;
+	for (const QByteArray& tagId : objectIds){
+		quotedIds.append(QStringLiteral("'%1'").arg(SqlEncode(QString::fromUtf8(tagId))));
+	}
+
+	const QString assignmentsQuery = QStringLiteral(R"(DELETE FROM %1 WHERE "TagId" IN (%2);)")
+				.arg(CreateTagTableReference(GetTagAssignmentsTableName()), quotedIds.join(','));
+
+	return query + assignmentsQuery.toUtf8();
+}
+
+
 QString CTagDbDelegateComp::CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode) const
 {
 	const QString baseQuery = BaseClass::CreateTenantBindingFilterQuery(tenantId, filterMode);

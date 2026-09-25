@@ -23,6 +23,9 @@ FilterableSelectPopup {
 	id: tagSelectPopup
 
 	itemWidth: 320
+
+	// Room kept free at the right of a row for the list scrollbar.
+	readonly property int scrollbarReserve: 8 + Style.marginXS
 	showCheckBox: true
 	filterPlaceholder: qsTr("Filter tags...")
 
@@ -59,13 +62,15 @@ FilterableSelectPopup {
 			}
 
 			Row {
+				id: tagContentRow
 				z: 10
 				anchors.verticalCenter: parent.verticalCenter
 				anchors.left: parent.left
 				anchors.leftMargin: Style.marginM
 				anchors.right: parent.right
-				anchors.rightMargin: Style.marginM
+				anchors.rightMargin: Style.marginM + tagSelectPopup.scrollbarReserve
 				spacing: Style.marginS
+				clip: true
 
 				CheckBox {
 					anchors.verticalCenter: parent.verticalCenter
@@ -94,14 +99,18 @@ FilterableSelectPopup {
 				Text {
 					id: tagNameText
 					anchors.verticalCenter: parent.verticalCenter
+					width: Math.min(tagNameText.implicitWidth, tagContentRow.width * 0.6)
 					font.pixelSize: tagSelectPopup.textSize
 					color: tagSelectPopup.fontColor
 					text: tagSelectPopup.getItemText(model.index)
+					elide: Text.ElideRight
 				}
 
+				// The row places it after the name, so its x never depends on its own width.
 				Text {
+					id: tagDescriptionText
 					anchors.verticalCenter: parent.verticalCenter
-					width: Math.max(0, tagRow.width - tagNameText.x - tagNameText.width - 2 * Style.marginM - Style.marginS)
+					width: Math.max(0, tagContentRow.width - tagDescriptionText.x)
 					font.pixelSize: Style.fontSizeS
 					color: Style.inactiveTextColor
 					text: tagRow.tag ? String(tagRow.tag.description) : ""
