@@ -171,6 +171,11 @@ protected:
 	const WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId) const;
 	bool FindDocument(int undoManagerModelId, QByteArray& outUserId, QByteArray& outDocumentId);
 	QUrl ObjectIdToUrl(const QByteArray& objectId);
+	/**
+		A document that was never saved (no backing objectId) is dirty regardless of its undo state;
+		otherwise it is dirty when the undo manager reports changes since the last save.
+	*/
+	static bool IsDocumentDirty(const WorkingDocument& document);
 	void OnDocumentDataLoaded(const QByteArray& userId, const QByteArray& documentId);
 	void OnUndoManagerChanged(int modelId);
 	void OnCreateDocumentThreadStarted(

@@ -23,6 +23,8 @@ Item {
 		Rectangle {
 			id: defaultDelegateRoot
 
+			objectName: "PopupMessage"
+
 			property string messageId: ""
 			property string messageType: ""
 			property string messageText: ""

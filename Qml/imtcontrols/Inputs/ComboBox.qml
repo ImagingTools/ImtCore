@@ -174,6 +174,9 @@ ControlBase {
 
 				comboBoxContainer.isOpen = false;
 
+				// The popup holds focus while open; without this, whether it returns depends on JQML's focus batching.
+				comboBoxContainer.forceActiveFocus();
+
 				comboBoxContainer.finished(commandId, index)
 			}
 

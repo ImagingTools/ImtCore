@@ -32,20 +32,22 @@ integration with an external account management system.
 Enabling and disabling an account is reserved for the superuser (`imtauth::IUserInfo::IsAdmin()`,
 the account whose login matches the `AdminId` attribute — `su` in the standard configuration). Every
 server-side write path that accepts the `enabled` field guards it with
-`imtauthgql::IsSuperuserRequest()`:
+`imtauthgql::IsSuperuserRequest()` and, for any other caller, ignores the field: the account keeps
+its current state and the rest of the request is applied.
 
 - `imtauthgql::CUserCollectionDocumentServiceComp::OnUpdateUserFromRepresentation` — the path used
-  by the user administration UI; a non-superuser request that flips the flag is answered with a
-  `Failed` document operation status and an explanatory message.
+  by the user administration UI.
 - `imtauthgql::CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest` — the
   `UserUpdate` mutation.
 - `imtauthgql::CUserCollectionControllerComp::CreateObjectFromRequest` — the `UserAdd` mutation;
-  only the superuser may create an account in the disabled state.
+  only the superuser may create an account in the disabled state, anyone else always creates an
+  enabled one.
 - `imtauthgql::CUserControllerComp::OnRegisterUser` — self-registration always creates an enabled
   account, regardless of what the (unauthenticated) request sends.
 
-A request that submits the `enabled` field unchanged is always accepted, so ordinary user
-administration by non-superusers is unaffected. In the UI the switch is shown read-only to everyone
+Ignoring the field rather than refusing the request matters: the administration UI does not fill it
+for a non-superuser, so it arrives as `enabled: false`, and refusing it left non-superusers unable to
+create or save any user. In the UI the switch is shown read-only to everyone
 but the superuser (`Qml/imtauthgui/UserGeneralEditor.qml`), so the account state stays visible
 without being editable.
 
