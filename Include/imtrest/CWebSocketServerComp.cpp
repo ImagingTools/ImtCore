@@ -119,7 +119,9 @@ bool CWebSocketServerComp::SendResponse(const QByteArray& requestId, ConstRespon
 
 	CWebSocketSender* sender = m_senders.value(requestId).data();
 	if (sender != nullptr){
-		return sender->SendResponse(response);
+		QByteArray data = response->GetData();
+
+		return sender->SendData(data);
 	}
 
 	return false;
@@ -132,7 +134,9 @@ bool CWebSocketServerComp::SendRequest(const QByteArray& requestId, ConstRequest
 
 	CWebSocketSender* sender = m_senders.value(requestId).data();
 	if (sender != nullptr){
-		return sender->SendRequest(request);
+		QByteArray data = request->GetBody();
+
+		return sender->SendData(data);
 	}
 
 	return false;

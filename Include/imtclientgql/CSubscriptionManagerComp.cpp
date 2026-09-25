@@ -587,7 +587,8 @@ bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& re
 	}
 
 	if (m_subscriptionSenderCompPtr.IsValid()){
-		retVal = m_subscriptionSenderCompPtr->SendRequest(requestPtr);
+		QByteArray data = requestPtr->GetBody();
+		retVal = m_subscriptionSenderCompPtr->SendData(data);
 	}
 	else if (m_requestManagerCompPtr.IsValid()){
 		if (clientId.isEmpty()){

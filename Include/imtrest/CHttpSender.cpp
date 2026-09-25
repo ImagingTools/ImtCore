@@ -22,101 +22,59 @@ CHttpSender::CHttpSender(QAbstractSocket* tcpSocketPtr)
 }
 
 
-// reimplemented (IRequest)
+// reimplemented (ITransport)
 
-bool CHttpSender::SendResponse(ConstResponsePtr& response) const
+bool CHttpSender::SendData(QByteArray& data) const
 {
-	if (!response.IsValid()){
+	if (m_tcpSocketPtr == nullptr || !m_tcpSocketPtr->isOpen()){
 		return false;
 	}
 
+	m_tcpSocketPtr->write(data);
+
+	return true;
+}
+
+
+// public methods
+
+bool CHttpSender::BuildResponseData(const IResponse& response, QByteArray& data)
+{
 	int protocolStatusCode = -1;
 	QByteArray statusLiteral;
 
-	bool retVal = response->GetProtocolEngine().GetProtocolStatusCode(response->GetStatusCode(), protocolStatusCode, statusLiteral);
-	if (!retVal){
+	if (!response.GetProtocolEngine().GetProtocolStatusCode(response.GetStatusCode(), protocolStatusCode, statusLiteral)){
 		return false;
 	}
 
-	if (m_tcpSocketPtr != nullptr){
-		if (!m_tcpSocketPtr->isOpen()){
-			return false;
-		}
+	data.clear();
+	data.append(QByteArrayLiteral("HTTP/1.0 "));
+	data.append(QByteArray::number(protocolStatusCode));
+	data.append(" ");
+	data.append(statusLiteral);
+	data.append("\r\n");
 
-		retVal = retVal && WriteStatus(protocolStatusCode, statusLiteral, *m_tcpSocketPtr);
+	IResponse::Headers headers = response.GetHeaders();
 
-		IResponse::Headers headers = response->GetHeaders();
-
-		for (IResponse::Headers::ConstIterator headerIter = headers.constBegin(); headerIter != headers.constEnd(); ++headerIter){
-			retVal = retVal && WriteHeader(headerIter.key(), headerIter.value(), *m_tcpSocketPtr);
-		}
-
-		const QByteArray& contentData = response->GetData();
-		quint64 contentLength = contentData.size();
-
-		retVal = retVal && WriteHeader(QByteArrayLiteral("Content-Length"), QByteArray::number(contentLength), *m_tcpSocketPtr);
-		retVal = retVal && WriteHeader(QByteArrayLiteral("Content-Type"), response->GetDataTypeId(), *m_tcpSocketPtr);
-
-		retVal = retVal && WriteBody(contentData, *m_tcpSocketPtr);
-
-		return retVal;
+	for (IResponse::Headers::ConstIterator headerIter = headers.constBegin(); headerIter != headers.constEnd(); ++headerIter){
+		data.append(headerIter.key());
+		data.append(": ");
+		data.append(headerIter.value());
+		data.append("\r\n");
 	}
 
-	// \todo Implement Websocket implementation at this point!
+	const QByteArray& contentData = response.GetData();
+	quint64 contentLength = contentData.size();
 
-	return false;
-}
+	data.append(QByteArrayLiteral("Content-Length: "));
+	data.append(QByteArray::number(contentLength));
+	data.append("\r\n");
+	data.append(QByteArrayLiteral("Content-Type: "));
+	data.append(response.GetDataTypeId());
+	data.append("\r\n");
 
-
-bool imtrest::CHttpSender::SendRequest(ConstRequestPtr& /*request*/) const
-{
-	return false;
-}
-
-
-// protected methods
-
-bool CHttpSender::WriteStatus(int statusCode, const QByteArray& statusCodeLiteral, QAbstractSocket& socket) const
-{
-	Q_ASSERT(socket.isOpen());
-	if (!socket.isOpen()){
-		return false;
-	}
-
-	socket.write("HTTP/");
-	socket.write(QByteArray::number(1));
-	socket.write(".");
-	socket.write(QByteArray::number(0));
-	socket.write(" ");
-	socket.write(QByteArray::number(statusCode));
-	socket.write(" ");
-	socket.write(statusCodeLiteral);
-	socket.write("\r\n");
-
-	return true;
-}
-
-
-bool CHttpSender::WriteHeader(const QByteArray& headerKey, const QByteArray& value, QAbstractSocket& socket) const
-{
-	Q_ASSERT(socket.isOpen());
-	if (!socket.isOpen()){
-		return false;
-	}
-
-	socket.write(headerKey);
-	socket.write(": ");
-	socket.write(value);
-	socket.write("\r\n");
-
-	return true;
-}
-
-
-bool CHttpSender::WriteBody(const QByteArray& data, QAbstractSocket& socket) const
-{
-	socket.write("\r\n");
-	socket.write(data);
+	data.append("\r\n");
+	data.append(contentData);
 
 	return true;
 }
