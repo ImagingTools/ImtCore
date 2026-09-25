@@ -29,6 +29,13 @@ BaseClass {
 		return (m_filterOperations !== undefined && m_filterOperations !== null)
 	}
 
+	function isArrayRequired(propertyId){
+		switch (propertyId){
+			case 'm_filterOperations': return true
+		}
+		return false
+	}
+
 	function removeFieldId(){
 		removeKey('m_fieldId')
 	}

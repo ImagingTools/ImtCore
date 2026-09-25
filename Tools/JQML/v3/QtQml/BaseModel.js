@@ -2,316 +2,414 @@ const ListModel = require('./Models/ListModel')
 const Bool = require('./Bool')
 const Var = require('./Var')
 const Signal = require('./Signal')
-const QtFunctions = require("../Qt/functions")
+const QtFunctions = require('../Qt/functions')
 
 class BaseModel extends ListModel {
-	static meta = Object.assign({}, ListModel.meta, {
-        dynamicRoles: { type: Bool, value: true },
-		owner: { type: Var, value: null },
+  static meta = Object.assign({}, ListModel.meta, {
+    dynamicRoles: {type: Bool, value: true},
+    owner: {type: Var, value: null},
 
-		internalModelChanged: { type:Signal, args: ['name', 'sender'] },
-		finished: { type:Signal, args: [] },
-    })
+    internalModelChanged: {type: Signal, args: ['name', 'sender']},
+    finished: {type: Signal, args: []},
+  })
 
-	SLOT_ownerChanged(){
-		for(let i = 0; i < this.count; i++){
-			this.get(i).item.owner = this.owner
-		}
-	}
+  SLOT_ownerChanged() {
+    for (let i = 0; i < this.count; i++) {
+      let item = this.get(i).item
+      if (item !== null && item !== undefined) {
+        item.owner = this.owner
+      }
+    }
+  }
 
-	escapeSpecialChars(jsonString) {
-		return jsonString.replace(/\\/g, "\\\\")
-		.replace(/\"/g, "\\\"")
-		.replace(/\n/g, "\\n")
-		.replace(/\r/g, "\\r")
-		.replace(/\t/g, "\\t")
-		.replace(/\f/g, "\\f")
-	}
+  escapeSpecialChars(jsonString) {
+    return jsonString.replace(/\\/g, '\\\\')
+        .replace(/\"/g, '\\"')
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r')
+        .replace(/\t/g, '\\t')
+        .replace(/\f/g, '\\f')
+  }
 
-	getProperties(item){
-		return item.getProperties()
-	}
+  getProperties(item) {
+    if (item === null || item === undefined) {
+      return []
+    }
+    return item.getProperties()
+  }
 
-	toJson(){
-		let json = '['
-		for(let i = 0; i < this.count; i++){
-			let item = this.get(i).item
-			let list = this.getProperties(item)
+  hasNullElements() {
+    for (let i = 0; i < this.count; ++i) {
+      let item = this.get(i).item
+      if (item === null || item === undefined) {
+        return true
+      }
+    }
 
-			json += '{'
-			let j = 0
-			for(let key of list){
-				if (item[key] == null){
-					json += '"' + item.getJSONKeyForProperty(key) + '": null'
-				}
-				else if(typeof item[key] === 'object'){
-					if (Array.isArray(item[key])){
-						json += '"' + item.getJSONKeyForProperty(key) + '":'
+    return false
+  }
 
-						json += "["
+  toJson() {
+    let json = '['
+    for (let i = 0; i < this.count; i++) {
+      let item = this.get(i).item
+      if (i > 0) {
+        json += ','
+      }
+      if (item === null || item === undefined) {
+        json += 'null'
+        continue
+      }
+      let list = this.getProperties(item)
+      for (let propertyId of list) {
+        if (item.isArrayValueValid &&
+            !item.isArrayValueValid(propertyId, item[propertyId])) {
+          return ''
+        }
+      }
 
-						for (let k = 0; k < item[key].length; k++){
-							if (k != 0){
-								json += ", "
-							}
+      json += '{'
+      let isFirst = true
+      for (let key of list) {
+        if (!isFirst) json += ','
+          isFirst = false
+          if (item[key] == null) {
+            json += '"' + item.getJSONKeyForProperty(key) + '": null'
+          }
+        else if (typeof item[key] === 'object') {
+          if (Array.isArray(item[key])) {
+            json += '"' + item.getJSONKeyForProperty(key) + '":'
 
-							if (typeof item[key][k] === "string"){
-								json += "\"" + this.escapeSpecialChars(item[key][k]) + "\""
-							}
-							else{
-								json += item[key][k]
-							}
-						}
+            json += '['
 
-						json += "]"
-					}
-					else if (typeof item[key].toJson === "function"){
-						json += '"' + item.getJSONKeyForProperty(key) + '":' + item[key].toJson()
-					}
-				} else {
-					let value = item[key]
-					if (value === undefined){
-						value = null
-					}
-					let safeValue = item[key]
-					if (typeof safeValue === 'string'){
-						safeValue = this.escapeSpecialChars(safeValue)
-					}
+            for (let k = 0; k < item[key].length; k++) {
+              if (k != 0) {
+                json += ', '
+              }
 
-					json += '"' + item.getJSONKeyForProperty(key) + '":' + (typeof item[key] === 'string' ? '"' + safeValue + '"' : value)
-				}
-				if(j < list.size - 1) json += ','
-				j++
-			}
-			json +='}'
+              if (typeof item[key][k] === 'string') {
+                json += '"' + this.escapeSpecialChars(item[key][k]) + '"'
+              } else {
+                json += item[key][k]
+              }
+            }
 
-			if(i < this.count - 1) json += ','
-		}
-		json +=']'
-		return json
-	}
+            json += ']'
+          } else if (typeof item[key].toJson === 'function') {
+            let serializedValue = item[key].toJson()
+            if (serializedValue === '') {
+              return ''
+            }
+            json +=
+                '"' + item.getJSONKeyForProperty(key) + '":' + serializedValue
+          }
+        } else {
+          let value = item[key] if (value === undefined) {
+            value = null
+          }
+          let safeValue = item[key] if (typeof safeValue === 'string') {
+            safeValue = this.escapeSpecialChars(safeValue)
+          }
 
-	toGraphQL(){
-		let graphQL = '['
-		for(let i = 0; i < this.count; i++){
-			let item = this.get(i).item
-			let list = this.getProperties(item)
+          json += '"' + item.getJSONKeyForProperty(key) + '":' +
+              (typeof item[key] === 'string' ? '"' + safeValue + '"' : value)
+        }
+      }
+      json += '}'
+    }
+    json += ']'
+    return json
+  }
 
-			graphQL += '{'
-			let j = 0
-			for(let key of list){
-				if (item[key] == null){
-					graphQL += item.getJSONKeyForProperty(key) + ':null'
-				}
-				else if(typeof item[key] === 'object'){
-					if (Array.isArray(item[key])){
-						graphQL +=  item.getJSONKeyForProperty(key) + ':'
+  toGraphQL() {
+    let graphQL = '['
+    for (let i = 0; i < this.count; i++) {
+      let item = this.get(i).item
+      if (i > 0) {
+        graphQL += ','
+      }
+      if (item === null || item === undefined) {
+        graphQL += 'null'
+        continue
+      }
+      let list = this.getProperties(item)
+      for (let propertyId of list) {
+        if (item.isArrayValueValid &&
+            !item.isArrayValueValid(propertyId, item[propertyId])) {
+          return ''
+        }
+      }
 
-						graphQL += "["
+      graphQL += '{'
+      let isFirst = true
+      for (let key of list) {
+        if (!isFirst) graphQL += ','
+          isFirst = false
+          if (item[key] == null) {
+            graphQL += item.getJSONKeyForProperty(key) + ':null'
+          }
+        else if (typeof item[key] === 'object') {
+          if (Array.isArray(item[key])) {
+            graphQL += item.getJSONKeyForProperty(key) + ':'
 
-						for (let k = 0; k < item[key].length; k++){
-							if (k != 0){
-								graphQL += ", "
-							}
+            graphQL += '['
 
-							if (typeof item[key][k] === "string"){
-								graphQL += "\"" + this.escapeSpecialChars(item[key][k]) + "\""
-							}
-							else{
-								graphQL += item[key][k]
-							}
-						}
+            for (let k = 0; k < item[key].length; k++) {
+              if (k != 0) {
+                graphQL += ', '
+              }
 
-						graphQL += "]"
-					}
-					else{
-						graphQL += item.getJSONKeyForProperty(key) + ':' + item[key].toGraphQL()
-					}
-				} else {
-					let value = item[key]
-					if (value === undefined){
-						value = null
-					}
+              if (typeof item[key][k] === 'string') {
+                graphQL += '"' + this.escapeSpecialChars(item[key][k]) + '"'
+              } else {
+                graphQL += item[key][k]
+              }
+            }
 
-					graphQL += item.getJSONKeyForProperty(key) + ':' + (typeof item[key] === 'string' ? '"' + this.escapeSpecialChars(item[key]) + '"' : value)
-				}
-				if(j < list.size - 1) graphQL += ','
-				j++
-			}
-			graphQL +='}'
+            graphQL += ']'
+          } else {
+            let serializedValue = item[key].toGraphQL()
+            if (serializedValue === '') {
+              return ''
+            }
+            graphQL += item.getJSONKeyForProperty(key) + ':' + serializedValue
+          }
+        } else {
+          let value = item[key] if (value === undefined) {
+            value = null
+          }
 
-			if(i < this.count - 1) graphQL += ','
-		}
-		graphQL +=']'
-		return graphQL
-	}
+          graphQL += item.getJSONKeyForProperty(key) + ':' +
+              (typeof item[key] === 'string' ?
+                   '"' + this.escapeSpecialChars(item[key]) + '"' :
+                   value)
+        }
+      }
+      graphQL += '}'
+    }
+    graphQL += ']'
+    return graphQL
+  }
 
-	isEqualWithModel(model){
-		if (typeof this != typeof model){
-			return false;
-		}
+  isEqualWithModel(model) {
+    if (typeof this != typeof model) {
+      return false;
+    }
 
-		if (this.count !== model.count){
-			return false;
-		}
+    if (this.count !== model.count) {
+      return false;
+    }
 
-		for(let i = 0; i < this.count; i++){
-			let item1 = this.get(i).item
-			let item2 = model.get(i).item
+    for (let i = 0; i < this.count; i++) {
+      let item1 = this.get(i).item
+      let item2 = model.get(i).item
+      let item1IsNull = item1 === null || item1 === undefined
+      let item2IsNull = item2 === null || item2 === undefined
+      if (item1IsNull !== item2IsNull) {
+        return false
+      }
+      if (item1IsNull) {
+        continue
+      }
 
-			let list1 = this.getProperties(item1)
-			let list2 = model.getProperties(item2)
+      let list1 = this.getProperties(item1)
+      let list2 = model.getProperties(item2)
 
-			for(let j = 0; j < list1.length; j++){
-				let key = list1[j]
+      for (let j = 0; j < list1.length; j++) {
+        let key = list1[j]
 
-				if (!list2.includes(key)){
-					return false;
-				}
+            if (!list2.includes(key)) {
+          return false;
+        }
 
-				if(typeof item1[key] !== typeof item2[key]){
-					return false;
-				}
+        if (typeof item1[key] !== typeof item2[key]) {
+          return false;
+        }
 
-				if(typeof item1[key] === 'object'){
-					let ok = item1[key].isEqualWithModel(item2[key])
-					if (!ok){
-						return false
-					}
-				} else {
-					if (item1[key] !== item2[key]){
-						return false
-					}
-				}
-			}
-		}
+        if (typeof item1[key] === 'object') {
+          if (item1[key] && item1[key].isEqualWithModel) {
+            let ok = item1[key].isEqualWithModel(item2[key])
+            if (!ok) {
+              return false
+            }
+          } else if (item1[key] !== item2[key]) {
+            return false
+          }
+        } else {
+          if (item1[key] !== item2[key]) {
+            return false
+          }
+        }
+      }
+    }
 
-		return true;
-	}
+    return true;
+  }
 
-	copyMe(){
-		let retVal = BaseModel.create()
-		if (!retVal){
-			return null
-		}
-		
-		for(let i = 0; i < this.count; i++){
-			let item = this.get(i).item
-			retVal.addElement(item.copyMe())
-		}
-		
-		return retVal
-	}
+  copyMe() {
+    let retVal = BaseModel.create()
+    if (!retVal) {
+      return null
+    }
 
-	copyFrom(sourceObject) {
-		for(let i = 0; i < sourceObject.count; i++){
-			let item = sourceObject.get(i).item
-			this.addElement(item.copyMe())
-		}
+    for (let i = 0; i < this.count; i++) {
+      let item = this.get(i).item
+      retVal.addElement(
+          item === null || item === undefined ? null : item.copyMe())
+    }
 
-		return true
-	}
+    return retVal
+  }
 
-	createFromJson(json){
-		return this.fromJSON(json);
-	}
+  copyFrom(sourceObject) {
+    for (let i = 0; i < sourceObject.count; i++) {
+      let item = sourceObject.get(i).item this.addElement(
+          item === null || item === undefined ? null : item.copyMe())
+    }
 
-	fromJSON(json){
-		let arr = JSON.parse(json)
-		return this.fromObject(arr)
-	}
+    return true
+  }
 
-	fromObject(sourceObject){
-		this.clear()
+  createFromJson(json) {
+    return this.fromJSON(json);
+  }
 
-		for(let i = 0; i < sourceObject.length; i++){
-			let sourceTypename
-			if (sourceObject[i]['__typename']){
-				sourceTypename = sourceObject[i]['__typename']
-			}
-			else {
-				continue
-			}
-			let obj = QtFunctions.createComponent(sourceTypename + ".qml").createObject(this)
-			obj.fromObject(sourceObject[i])
-			this.addElement(obj)
-		}
+  fromJSON(json) {
+    let arr = JSON.parse(json)
+    return this.fromObject(arr)
+  }
 
-		this.finished()
-	}
+  fromObject(sourceObject) {
+    this.clear()
 
-	addElement(element){
-		element.owner = this.owner
-		this.append({item: element})
-		if (this.owner){
-			if (this.owner._internal && this.owner._internal.isTransaction){
-				this.owner._internal.countChanges++
-			} else {
-				this.owner.modelChanged([])
-			}
-		}
-	}
+    for (let i = 0; i < sourceObject.length; i++) {
+      if (sourceObject[i] === null || sourceObject[i] === undefined) {
+        this.addElement(null)
+        continue
+      }
+      let sourceTypename
+      if (sourceObject[i]['__typename']) {
+        sourceTypename = sourceObject[i]['__typename']
+      }
+      else {continue} let obj =
+          QtFunctions.createComponent(sourceTypename + '.qml')
+              .createObject(this)
+      if (!obj || !obj.fromObject(sourceObject[i])) {
+        if (obj) {
+          obj.destroy()
+        }
+        this.clear()
 
-	removeElement(index){
-		this.remove(index)
-		if (this.owner){
-			if (this.owner._internal && this.owner._internal.isTransaction){
-				this.owner._internal.countChanges++
-			} else {
-				this.owner.modelChanged([])
-			}
-		}
-	}
+        return false
+      }
+      this.addElement(obj)
+    }
 
-	getItemsCount(){
-		return this.count
-	}
+    this.finished()
 
-	containsKey(key, index){
-		if (index < 0 || index >= this.count){
-			return false
-		}
-		return this.get(index).item[key] != undefined
-	}
+    return true
+  }
 
-	getData(key, index){
-		return this.get(index).item[key]
-	}
+  addElement(element) {
+    if (element !== null && element !== undefined) {
+      element.owner = this.owner
+    }
+    this.append({item: element})
+    if (this.owner) {
+      if (this.owner._internal && this.owner._internal.isTransaction) {
+        this.owner._internal.countChanges++
+      } else {
+        this.owner.modelChanged([])
+      }
+    }
+  }
 
-	setProperty(index, propName, value){
-		let item = this.get(index).item
-		if (item[propName] !== value){
-			item[propName] = value
-		}
-	}
+  removeElement(index) {
+    this.remove(index)
+    if (this.owner) {
+      if (this.owner._internal && this.owner._internal.isTransaction) {
+        this.owner._internal.countChanges++
+      } else {
+        this.owner.modelChanged([])
+      }
+    }
+  }
 
-	swapItems(index1, index2){
-		if (index1 < 0 || index1 >= this.count || index2 < 0 || index2 >= this.count ){
-			return false
-		}
-		
-		let item1 = this.get(index1).item.copyMe()
-		let item2 = this.get(index2).item.copyMe()
-		item1.owner = this.owner
-		item2.owner = this.owner
+  getItemsCount() {
+    return this.count
+  }
 
-		this.get(index1).item = item2
-		this.get(index2).item = item1
+  containsKey(key, index) {
+    if (index === undefined) {
+      index = 0
+    }
+    if (index < 0 || index >= this.count) {
+      return false
+    }
+    let item = this.get(index).item
+    return item !== null && item !== undefined && item[key] !== undefined
+  }
 
-		return true
-	}
+  getData(key, index) {
+    if (index === undefined) {
+      index = 0
+    }
+    if (index < 0 || index >= this.count) {
+      return undefined
+    }
+    let item = this.get(index).item
+    return item === null || item === undefined ? item : item[key]
+  }
 
-	insertElement(index, element){
-		element.owner = this.owner
-		this.insert(index, {item: element})
-		if (this.owner){
-			if (this.owner._internal && this.owner._internal.isTransaction){
-				this.owner._internal.countChanges++
-			} else {
-				this.owner.modelChanged([])
-			}
-		}
-	}
+  setProperty(index, propName, value) {
+    let item = this.get(index).item
+    if (item === null || item === undefined) {
+      return
+    }
+    if (item[propName] !== value) {
+      item[propName] = value
+    }
+  }
+
+  swapItems(index1, index2) {
+    if (index1 < 0 || index1 >= this.count || index2 < 0 ||
+        index2 >= this.count) {
+      return false
+    }
+
+    let sourceItem1 = this.get(index1).item
+    let sourceItem2 = this.get(index2).item
+    let item1 = sourceItem1 === null || sourceItem1 === undefined ?
+        null :
+        sourceItem1.copyMe()
+    let item2 = sourceItem2 === null || sourceItem2 === undefined ?
+        null :
+        sourceItem2.copyMe()
+    if (item1 !== null) {
+      item1.owner = this.owner
+    }
+    if (item2 !== null) {
+      item2.owner = this.owner
+    }
+
+    this.get(index1).item = item2 this.get(index2).item = item1
+
+    return true
+  }
+
+  insertElement(index, element) {
+    if (element !== null && element !== undefined) {
+      element.owner = this.owner
+    }
+    this.insert(index, {item: element})
+    if (this.owner) {
+      if (this.owner._internal && this.owner._internal.isTransaction) {
+        this.owner._internal.countChanges++
+      } else {
+        this.owner.modelChanged([])
+      }
+    }
+  }
 }
 
 module.exports = BaseModel

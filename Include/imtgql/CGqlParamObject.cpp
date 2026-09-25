@@ -12,8 +12,19 @@ namespace imtgql
 
 // public methods
 
-CGqlParamObject::CGqlParamObject(): m_parentPtr(nullptr)
+CGqlParamObject::CGqlParamObject():
+	m_parentPtr(nullptr),
+	m_isNull(false)
 {
+}
+
+
+CGqlParamObject CGqlParamObject::CreateNull()
+{
+	CGqlParamObject retVal;
+	retVal.m_isNull = true;
+
+	return retVal;
 }
 
 
@@ -27,6 +38,12 @@ QByteArrayList CGqlParamObject::GetParamIds() const
 }
 
 
+bool CGqlParamObject::IsNull() const
+{
+	return m_isNull;
+}
+
+
 QVariant CGqlParamObject::GetParamArgumentValue(const QByteArray &paramId) const
 {
 	QVariant retVal;
@@ -37,7 +54,9 @@ QVariant CGqlParamObject::GetParamArgumentValue(const QByteArray &paramId) const
 		QVariantList objectList;
 		for (int i = 0; i < m_objectParamsArray[paramId].count(); i++){
 			const CGqlParamObject* gqlObject = m_objectParamsArray[paramId][i].GetPtr();
-			objectList.append(QVariant::fromValue(gqlObject));
+			objectList.append(gqlObject != nullptr && !gqlObject->IsNull()
+				? QVariant::fromValue(gqlObject)
+				: QVariant());
 		}
 		retVal = objectList;
 	}
@@ -66,7 +85,7 @@ const CGqlParamObject* CGqlParamObject::GetParamArgumentObjectPtr(const QByteArr
 	if (m_objectParams.contains(paramId)){
 		retVal = m_objectParams[paramId].GetPtr();
 	}
-	else if (m_objectParamsArray.contains(paramId)){
+	else if (m_objectParamsArray.contains(paramId) && index >= 0 && index < m_objectParamsArray[paramId].size()){
 		retVal = m_objectParamsArray[paramId][index].GetPtr();
 	}
 
@@ -85,6 +104,23 @@ QList<const CGqlParamObject *> CGqlParamObject::GetParamArgumentObjectPtrList(co
 	}
 
 	return retVal;
+}
+
+
+bool CGqlParamObject::IsNullArrayElement(const QByteArray& paramId, qsizetype index) const
+{
+	if (m_objectParamsArray.contains(paramId)){
+		const CGqlParamObject* objectPtr = GetParamArgumentObjectPtr(paramId, index);
+
+		return objectPtr == nullptr || objectPtr->IsNull();
+	}
+
+	const QVariantList values = GetParamArgumentValue(paramId).toList();
+	if (index < 0 || index >= values.size()){
+		return false;
+	}
+
+	return !values[index].isValid() || values[index].isNull();
 }
 
 
@@ -216,6 +252,7 @@ bool CGqlParamObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 		m_simpleParams = sourcePtr->m_simpleParams;
 		m_objectId = sourcePtr->m_objectId;
 		m_parentPtr = sourcePtr->m_parentPtr;
+		m_isNull = sourcePtr->m_isNull;
 
 		m_objectParams.clear();
 
@@ -276,6 +313,7 @@ bool CGqlParamObject::ResetData(CompatibilityMode /*mode*/)
 	m_simpleParams.clear();
 	m_objectId.clear();
 	m_parentPtr = nullptr;
+	m_isNull = false;
 	m_objectParams.clear();
 	m_objectParamsArray.clear();
 

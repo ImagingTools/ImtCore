@@ -5,7 +5,7 @@ BaseClass {
 	id: textFilter
 	readonly property string __typename: 'TextFilter'
 	property string m_text: ''
-	property var m_fieldIds: []
+	property var m_fieldIds: null
 
 	Component.onCompleted: {
 		this._internal.removed = ["m_text","m_fieldIds"]

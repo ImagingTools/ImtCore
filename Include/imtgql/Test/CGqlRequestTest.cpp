@@ -828,6 +828,98 @@ void CGqlRequestTest::TestVariablePrimitivesAndLists()
 }
 
 
+void CGqlRequestTest::TestVariableListsWithNullElements()
+{
+	const char* payload = R"(
+	{
+	  "query": "mutation Update($scalars: [String], $objects: [ItemInput], $allNull: [String]) { update(scalars: $scalars, objects: $objects, allNull: $allNull) { success } }",
+	  "variables": {
+		"scalars": ["first", null, "second"],
+		"objects": [{"code": 1}, null, {"code": 2}],
+		"allNull": [null],
+		"empty": []
+	  }
+	}
+	)";
+
+	imtgql::CGqlRequest request;
+	qsizetype errorPosition = -1;
+	QVERIFY(request.ParseQuery(payload, errorPosition));
+	QVERIFY(errorPosition < 0);
+
+	const imtgql::CGqlParamObject& variables = request.GetVariables();
+	const QVariantList scalars = variables.GetParamArgumentValue("scalars").toList();
+	QCOMPARE(scalars.size(), 3);
+	QCOMPARE(scalars[0].toString(), QStringLiteral("first"));
+	QVERIFY(variables.IsNullArrayElement("scalars", 1));
+	QCOMPARE(scalars[2].toString(), QStringLiteral("second"));
+
+	QCOMPARE(variables.GetObjectsCount("objects"), 3);
+	QVERIFY(variables.IsNullArrayElement("objects", 1));
+	QVERIFY(variables.GetParamArgumentObjectPtr("objects", 0) != nullptr);
+	QVERIFY(variables.GetParamArgumentObjectPtr("objects", 2) != nullptr);
+
+	const QVariantList allNull = variables.GetParamArgumentValue("allNull").toList();
+	QCOMPARE(allNull.size(), 1);
+	QVERIFY(!allNull[0].isValid() || allNull[0].isNull());
+	QVERIFY(variables.IsNullArrayElement("allNull", 0));
+
+	QVERIFY(variables.ContainsParam("empty"));
+	QVERIFY(variables.GetParamArgumentValue("empty").toList().isEmpty());
+}
+
+
+void CGqlRequestTest::CreateArraysWithNullElements()
+{
+	imtgql::CGqlRequest request(imtgql::IGqlRequest::RT_MUTATION);
+	request.SetCommandId("Update");
+	request.AddSimpleField("success");
+
+	imtgql::CGqlParamObject input;
+	input.InsertParam("scalars", QVariantList{QStringLiteral("first"), QVariant(), QStringLiteral("second")});
+
+	imtgql::CGqlParamObject firstObject;
+	firstObject.InsertParam("code", 1);
+	imtgql::CGqlParamObject secondObject;
+	secondObject.InsertParam("code", 2);
+	input.InsertParam("objects", QList<imtgql::CGqlParamObject>{
+		firstObject,
+		imtgql::CGqlParamObject::CreateNull(),
+		secondObject});
+	request.AddParam("input", input);
+
+	const QByteArray query = request.GetQuery();
+	QVERIFY(query.contains(QByteArrayLiteral("scalars: [\\\"first\\\", null, \\\"second\\\"]")));
+	QVERIFY(query.contains(QByteArrayLiteral("objects :[ {code: 1}, null, {code: 2} ]")));
+}
+
+
+void CGqlRequestTest::ParseArraysWithNullElements()
+{
+	const char* payload = R"(
+	{
+	  "query": "mutation Update { Update(input: {objects: [{code: 1}, null, {code: 2}]}) { success } }"
+	}
+	)";
+
+	imtgql::CGqlRequest request;
+	qsizetype errorPosition = -1;
+	QVERIFY(request.ParseQuery(payload, errorPosition));
+	QVERIFY(errorPosition < 0);
+
+	const imtgql::CGqlParamObject* input = request.GetParamObject("input");
+	QVERIFY(input != nullptr);
+	QCOMPARE(input->GetObjectsCount("objects"), 3);
+	QVERIFY(!input->IsNullArrayElement("objects", 0));
+	QVERIFY(input->IsNullArrayElement("objects", 1));
+	QVERIFY(!input->IsNullArrayElement("objects", 2));
+	QCOMPARE(input->GetParamArgumentObjectPtr("objects", 0)->GetParamArgumentValue("code").toInt(), 1);
+	QCOMPARE(input->GetParamArgumentObjectPtr("objects", 2)->GetParamArgumentValue("code").toInt(), 2);
+
+	QVERIFY(request.GetQuery().contains(QByteArrayLiteral("objects :[ {code: 1}, null, {code: 2} ]")));
+}
+
+
 void CGqlRequestTest::ParseStringWithEscapeSequences()
 {
 	// Test that \n, \r, \t escape sequences inside GraphQL string literals

@@ -8,7 +8,7 @@ BaseClass {
 	property GroupFilter m_fieldsFilter: null
 	property TimeFilter m_timeFilter: null
 	property TextFilter m_textFilter: null
-	property var m_distinctFields: []
+	property var m_distinctFields: null
 
 	Component.onCompleted: {
 		this._internal.removed = ["m_sortingInfo","m_fieldsFilter","m_timeFilter","m_textFilter","m_distinctFields"]

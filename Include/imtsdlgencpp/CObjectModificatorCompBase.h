@@ -62,6 +62,7 @@ protected:
 		QString customAccessedElementName;
 		bool isCustomAccessedElementPointer = false;
 		QString toObjectTransformMethod;
+		QString elementNullCheck;
 	};
 
 protected:
@@ -169,6 +170,8 @@ protected:
 		\returns true - if write to \c stream is succesfull and false otherwise
 	 */
 	virtual bool AddFieldValueAppendToObjectArray(QTextStream& stream, const imtsdl::CSdlField& field, const QString& arrayContainerVariableName, const QString& variableName, uint horizontalIndents) const = 0;
+	virtual bool AddNullValueAppendToObjectArray(QTextStream& stream, const imtsdl::CSdlField& field, const QString& arrayContainerVariableName, uint horizontalIndents) const = 0;
+	virtual bool AddNullArrayWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, uint horizontalIndents) const = 0;
 
 	/*!
 		\brief writes code, that sets an array \c variableName to an object \c targetObjectVariableName
@@ -246,6 +249,8 @@ protected:
 	// comfort methods
 	void WriteMethodCall(QTextStream& stream, MetdodType type, const QString& objectName = QString(), bool isPointer = false) const;
 	std::shared_ptr<imtsdl::CSdlEntryBase> FindEntryByName(const QString& entryName, bool onlyLocal = false) const;
+	void AddArrayElementWriteNullCheck(QTextStream& stream, const imtsdl::CSdlField& field, const QString& arrayContainerVariableName, const QString& indexVariableName, quint16 hIndents) const;
+	static void AddArrayElementReadNullCheck(QTextStream& stream, const imtsdl::CSdlField& field, const ListAccessResult& result, quint16 hIndents);
 
 	/// Simply generates a start of code, that sets a value to struct like \code *object.value = \endcode
 	void WriteSetValueToStruct(QTextStream& stream, const imtsdl::CSdlField& field, const QString& objectName = QStringLiteral("object")) const;

@@ -46,6 +46,8 @@ protected:
 	virtual bool ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType, QIODevice* headerDevicePtr, const iprm::IParamsSet* paramsPtr) const override;
 
 private:
+	static void AddArrayElementWriteNullCheck(QTextStream& stream, const imtsdl::CSdlField& field, const QString& modelVariableName, const QString& indexVariableName, quint16 hIndents);
+	static void AddArrayElementReadNullCheck(QTextStream& stream, const imtsdl::CSdlField& field, const QString& modelVariableName, const QString& indexVariableName, bool isCustom, quint16 hIndents);
 	/// \todo add error handling for it
 	void AddFieldWriteToModelCode(QTextStream& stream, const imtsdl::CSdlField& field, const imtsdl::CSdlType& sdlType, bool optional) const;
 	void AddFieldReadFromModelCode(QTextStream& stream, const imtsdl::CSdlField& field, const imtsdl::CSdlType& sdlType, bool optional) const;

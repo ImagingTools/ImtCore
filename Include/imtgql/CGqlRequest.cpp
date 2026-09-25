@@ -726,12 +726,17 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlParamObject& gqlObject) con
 				if (objectIndex > 0){
 					retVal += ',';
 				}
-				retVal.append(' ').append('{');
 				const CGqlParamObject* paramsObject = gqlObject.GetParamArgumentObjectPtr(paramId, objectIndex);
-				if (paramsObject != nullptr){
-					retVal += AddObjectParamPart(*paramsObject);
+				if (paramsObject != nullptr && paramsObject->IsNull()){
+					retVal += QByteArrayLiteral(" null");
 				}
-				retVal += '}';
+				else {
+					retVal.append(' ').append('{');
+					if (paramsObject != nullptr){
+					retVal += AddObjectParamPart(*paramsObject);
+					}
+					retVal += '}';
+				}
 			}
 			retVal.append(' ').append(']');
 		}
@@ -753,6 +758,9 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlParamObject& gqlObject) con
 QByteArray CGqlRequest::AddObjectParamValue(const QVariant& value) const
 {
 	QByteArray retVal;
+	if (!value.isValid() || value.isNull()){
+		return QByteArrayLiteral("null");
+	}
 #if QT_VERSION >= 0x060000
 	int valueType = value.typeId();
 #else
@@ -868,10 +876,14 @@ void CGqlRequest::ParseObjectParamPart(CGqlParamObject& gqlObject, const QJsonOb
 			if (arr.isEmpty()) {
 				gqlObject.InsertParam(paramId, QVariantList{});
 			}
-			else if (std::all_of(arr.begin(), arr.end(), [](const QJsonValue& e){ return e.isObject(); })) {
+			else if (std::all_of(arr.begin(), arr.end(), [](const QJsonValue& e){ return e.isObject() || e.isNull(); })) {
 				QList<CGqlParamObject> objList;
 				objList.reserve(arr.size());
-				for (const QJsonValue& elem : arr) {
+				for (const QJsonValue elem : arr) {
+					if (elem.isNull()){
+						objList.append(CGqlParamObject::CreateNull());
+						continue;
+					}
 					CGqlParamObject child;
 					ParseObjectParamPart(child, elem.toObject());
 					objList.append(std::move(child));
@@ -1008,6 +1020,12 @@ void CGqlRequest::SetParseText(const QByteArray& text)
 	}
 
 	if (!lastArrayId.isEmpty() && !m_objectArrayList.isEmpty() && m_objectArrayList.last() == m_activeGqlObjectPtr) {
+		if (text == QByteArrayLiteral("null")){
+			m_activeGqlObjectPtr->AppendParamToArray(lastArrayId, CGqlParamObject::CreateNull());
+			m_currentField.clear();
+
+			return;
+		}
 		CGqlParamObject newObject;
 		m_activeGqlObjectPtr = m_activeGqlObjectPtr->AppendParamToArray(lastArrayId, newObject);
 		m_currentField = text;

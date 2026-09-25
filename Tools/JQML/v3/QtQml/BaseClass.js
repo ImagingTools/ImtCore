@@ -1,586 +1,652 @@
-const QtObject = require("./QtObject")
-const Property = require("./Property")
-const Bool = require("./Bool")
-const Int = require("./Int")
-const Var = require("./Var")
-const String = require("./String")
-const Signal = require("./Signal")
-const BaseModel = require("./BaseModel")
+const QtObject = require('./QtObject')
+const Property = require('./Property')
+const Bool = require('./Bool')
+const Int = require('./Int')
+const Var = require('./Var')
+const String = require('./String')
+const Signal = require('./Signal')
+const BaseModel = require('./BaseModel')
 
 class Internal extends QtObject {
-    static meta = Object.assign({}, QtObject.meta, {
-        isTransaction: { type: Bool, value: false },
-		countChanges: { type: Int, value: 0 },
-		changeList: { type: Var, value: null },
-		removed: { type: Var, value: null },
-		__typename: { type: String, value: '' },
+  static meta = Object.assign({}, QtObject.meta, {
+    isTransaction: {type: Bool, value: false},
+    countChanges: {type: Int, value: 0},
+    changeList: {type: Var, value: null},
+    removed: {type: Var, value: null},
+    __typename: {type: String, value: ''},
 
-		isTransactionChanged: {type:Signal, args:[]},
-		countChangesChanged: {type:Signal, args:[]},
-		changeListChanged: {type:Signal, args:[]},
-		removedChanged: {type:Signal, args:[]},
-		__typenameChanged: {type:Signal, args:[]},
+    isTransactionChanged: {type: Signal, args: []},
+    countChangesChanged: {type: Signal, args: []},
+    changeListChanged: {type: Signal, args: []},
+    removedChanged: {type: Signal, args: []},
+    __typenameChanged: {type: Signal, args: []},
 
-		internalModelChanged: { type:Signal, args: ['name', 'sender'] },
-    })
+    internalModelChanged: {type: Signal, args: ['name', 'sender']},
+  })
 
-	// removed = []
-	// changeList = []
+  // removed = []
+  // changeList = []
 
-	SLOT_internalModelChanged(name, sender){
-		if (this.isTransaction){
-			let changeObj = {"name":name,"sender":sender}
-				this.changeList.push(changeObj)
-				this.countChanges++
-				return
-			}
-		this.__base.modelChanged([{"name":name,"sender":sender}])
-	}
+  SLOT_internalModelChanged(name, sender) {
+    if (this.isTransaction) {
+      let changeObj = {
+        'name': name,
+        'sender': sender
+      } this.changeList.push(changeObj) this.countChanges++ return
+    }
+    this.__base.modelChanged([{'name': name, 'sender': sender}])
+  }
 
-	startTransaction(){
-		if (this.isTransaction){
-			console.error("Unable to start transaction. Error: transaction already started.")
+  startTransaction() {
+    if (this.isTransaction) {
+      console.error(
+          'Unable to start transaction. Error: transaction already started.')
 
-			return
-		}
+      return
+    }
 
-		this.changeList = []
-		this.isTransaction = true
-	}
+    this.changeList = [] this.isTransaction = true
+  }
 
-	stopTransaction(){
-		if (!this.isTransaction){
-			console.error("Unable to stop transaction. Error: there is no active transaction.")
+  stopTransaction() {
+    if (!this.isTransaction) {
+      console.error(
+          'Unable to stop transaction. Error: there is no active transaction.')
 
-			return
-		}
+      return
+    }
 
-		if (this.countChanges > 0){
-			this.__base.modelChanged(this.changeList)
+    if (this.countChanges > 0) {
+      this.__base
+          .modelChanged(this.changeList)
 
-			this.countChanges = 0
-		}
+              this.countChanges = 0
+    }
 
-		this.isTransaction = false
-		delete this.changeList
-	}
+    this.isTransaction = false delete this.changeList
+  }
 
-	removeAt(key){
-	// get index if value found otherwise -1
-		let index = this.removed ? this.removed.indexOf(key) : -1
-		if (index > -1) { //if found
-			this.removed.splice(index, 1)
-			if(this.removed.length === 0) delete this.removed
-		}
-	}
+  removeAt(key) {
+    // get index if value found otherwise -1
+    let index = this.removed ? this.removed.indexOf(key) : -1
+    if (index > -1) {  // if found
+      this.removed.splice(index, 1)
+      if (this.removed.length === 0) delete this.removed
+    }
+  }
 
-	containceInRemoved(key){
-		let index = this.removed ? this.removed.indexOf(key) : -1
-		if (index > -1) {
-			return true
-		}
+  containceInRemoved(key) {
+    let index = this.removed ? this.removed.indexOf(key) : -1
+    if (index > -1) {
+      return true
+    }
 
-		return false
-	}
+    return false
+  }
 }
 
 class BaseClass extends QtObject {
-    static meta = Object.assign({}, QtObject.meta, {
-        enableNotifications: { type: Bool, value: true },
-		propertiesIsConnected: { type: Bool, value: false },
-		owner: { type: Var, value: null },
-		_internal: { type: Var, value: null },
+  static meta = Object.assign({}, QtObject.meta, {
+    enableNotifications: {type: Bool, value: true},
+    propertiesIsConnected: {type: Bool, value: false},
+    owner: {type: Var, value: null},
+    _internal: {type: Var, value: null},
 
-		enableNotificationsChanged: {type:Signal, args:[]},
-		propertiesIsConnectedChanged: {type:Signal, args:[]},
-		ownerChanged: {type:Signal, args:[]},
-		_internalChanged: {type:Signal, args:[]},
+    enableNotificationsChanged: {type: Signal, args: []},
+    propertiesIsConnectedChanged: {type: Signal, args: []},
+    ownerChanged: {type: Signal, args: []},
+    _internalChanged: {type: Signal, args: []},
 
-		modelChanged: { type:Signal, args: ['changeSet'] },
-		finished: { type:Signal, args: [] },
-    })
+    modelChanged: {type: Signal, args: ['changeSet']},
+    finished: {type: Signal, args: []},
+  })
 
-	static handle = {
-        get(target, key){
-			if(key !== '__typename' && target.constructor.cachedPoperties.has(key)){
-				let node = target.constructor.meta[key]
-				if(target.__destroying || target.__destroyed) return node.type.get(target, key, node)
-				if(typeof target[key] === "object" && !(target[key] instanceof QtObject)){
-					let pureData = target[key]
+                    static handle = {
+    get(target, key) {
+      if (key !== '__typename' && target.constructor.cachedPoperties.has(key)) {
+        let node =
+            target.constructor
+                .meta[key] if (
+                    target.__destroying ||
+                    target.__destroyed) return node.type.get(target, key, node)
+        if (typeof target[key] === 'object' &&
+            !(target[key] instanceof QtObject)) {
+          let pureData = target[key]
 
-					if(pureData === null){
-						target[key] = null
-					} else if(typeof pureData === "object") {
-						if(Array.isArray(pureData)){
-							let component = target.__proxy.createComponent(key)
-			
-							if (component) {
-								target[key] = node.typeTarget.create(target.__proxy)
-								target[key].owner = target.__proxy
+              if (pureData === null) {
+            target[key] = null
+          }
+          else if (typeof pureData === 'object') {
+            if (Array.isArray(pureData)) {
+              let component = target.__proxy.createComponent(key)
 
-								for (let _pureData of pureData) {
-									let sourceTypename
-									if (_pureData['__typename']){
-										sourceTypename = _pureData['__typename']
-									}
-									let obj = target.__proxy.createElement(key, sourceTypename).createObject(target.__proxy)
-									
-									target[key].append({ item: obj })
-									obj.owner = target.__proxy
+              if (component) {
+                target[key] = node.typeTarget.create(target.__proxy)
+                target[key].owner = target.__proxy
 
-									obj.fromObject(_pureData)
-								}
+                for (let _pureData of pureData) {
+                  if (_pureData === null || _pureData === undefined) {
+                    target[key].append({item: null})
+                    continue
+                  }
+                  let sourceTypename
+                  if (_pureData['__typename']) {
+                    sourceTypename = _pureData['__typename']
+                  }
+                  let obj = target.__proxy.createElement(key, sourceTypename)
+                                .createObject(target.__proxy)
 
-								target[key].finished()
-							}
-							else {
-								target[key] = pureData
-							}
-						} else {
-							let sourceTypename
-							if (target[key]['__typename']){
-								sourceTypename = target[key]['__typename']
-							}	
-							let obj = target.__proxy.createComponent(key, sourceTypename).createObject(target.__proxy)
+                  target[key].append({item: obj})
+                  obj.owner = target.__proxy
 
-							target[key] = obj
-							obj.owner = target.__proxy
-
-							obj.fromObject(pureData)
-						}
-					} else {
-						target[key] = pureData
-					}
-
-					
-				}
-                return node.type.get(target, key, node)
-			} else if(target.constructor.meta.hasOwnProperty(key)){
-                let node = target.constructor.meta[key]
-                return node.type.get(target, key, node)
-            } else {
-                return target[key]
-            }
-        },
-
-        set(target, key, value){
-            if(target.constructor.meta.hasOwnProperty(key)){
-                let node = target.constructor.meta[key]
-
-                if(node.type.isAssignableFrom(Property)){
-                    return node.type.reset(target, key, value, node)
-                } else {
-                    return node.type.set(target, key, value, node)
+                  obj.fromObject(_pureData)
                 }
-            } else {
-                target[key] = value
 
-                return true
+                target[key].finished()
+              }
+              else {
+                target[key] = pureData
+              }
+            } else {
+              let sourceTypename
+              if (target[key]['__typename']) {
+                sourceTypename = target[key]['__typename']
+              }
+              let obj = target.__proxy.createComponent(key, sourceTypename)
+                            .createObject(target.__proxy)
+
+              target[key] = obj
+              obj.owner = target.__proxy
+
+              obj.fromObject(pureData)
             }
-        },
+          }
+          else {
+            target[key] = pureData
+          }
+        }
+        return node.type.get(target, key, node)
+      } else if (target.constructor.meta.hasOwnProperty(key)) {
+        let node =
+            target.constructor.meta[key] return node.type.get(target, key, node)
+      } else {
+        return target[key]
+      }
+    },
+
+    set(target, key, value) {
+      if (target.constructor.meta.hasOwnProperty(key)) {
+        let node = target.constructor.meta[key]
+
+                   if (node.type.isAssignableFrom(Property)) {
+          return node.type.reset(target, key, value, node)
+        }
+        else {
+          return node.type.set(target, key, value, node)
+        }
+      } else {
+        target[key] = value
+
+        return true
+      }
+    },
+  }
+
+  static create(parent = null, properties = {}) {
+    let proxy = super.create(parent, properties)
+
+    proxy._internal = Internal.create()
+    proxy._internal.__base = proxy
+
+    return proxy
+  }
+
+  static cachedPoperties = new Set(['__typename'])
+
+  SLOT_modelChanged(changeSet) {
+    if (this.owner && this.owner.enableNotifications &&
+        this.owner.modelChanged) {
+      if (this.owner._internal.isTransaction) {
+        this.owner._internal.changeList =
+            this.owner._internal.changeList.concat(changeSet) this.owner
+                ._internal.countChanges++
+      } else {
+        this.owner.modelChanged(changeSet)
+      }
+    }
+  }
+
+  // SLOT_modelChanged(changeSet){
+  // 	if (this.owner && this.owner.enableNotifications &&
+  // this.owner.modelChanged) { 		this.owner.modelChanged(changeSet)
+  // 	}
+  // }
+
+  beginChanges() {
+    this._internal.startTransaction()
+  }
+
+  endChanges() {
+    this._internal.stopTransaction()
+  }
+
+  removeKey(key) {
+    let selfKeys = this.getProperties()
+
+    if (selfKeys.has(key)) {
+      if (this[key] && this[key].destroy) {
+        this[key].destroy()
+      }
+      this[key] = null
     }
 
-	static create(parent = null, properties = {}){
-		let proxy = super.create(parent, properties)
+    if (!this._internal.removed)
+      this._internal.removed =
+          [] if (this._internal.removed.indexOf(key) === -1) this._internal
+              .removed.push(key)
+  }
 
-		proxy._internal = Internal.create()
-		proxy._internal.__base = proxy
+  connectProperties() {}
 
-		return proxy
-	}
+  createMe() {
+    return this.constructor.create()
+  }
 
-	static cachedPoperties = new Set(['__typename'])
+  isEqualWithModel(model) {
+    if (typeof this != typeof model) {
+      return false
+    }
 
-	SLOT_modelChanged(changeSet){
-		if (this.owner && this.owner.enableNotifications && this.owner.modelChanged) {
-			if (this.owner._internal.isTransaction){
-				this.owner._internal.changeList = this.owner._internal.changeList.concat(changeSet)
-				this.owner._internal.countChanges++
-			}
-			else{
-				this.owner.modelChanged(changeSet)
-			}
-		}
-	}
+    let selfKeys = this.getProperties()
+    let sourceKeys = model.getProperties()
 
-	// SLOT_modelChanged(changeSet){
-	// 	if (this.owner && this.owner.enableNotifications && this.owner.modelChanged) {
-	// 		this.owner.modelChanged(changeSet)
-	// 	}
-	// }
+    if (selfKeys.size !== sourceKeys.size) {
+      return false;
+    }
 
-	beginChanges() {
-		this._internal.startTransaction()
-	}
+    for (let key of selfKeys) {
+      if (!sourceKeys.has(key)) {
+        return false
+      }
 
-	endChanges() {
-		this._internal.stopTransaction()
-	}
+      if (typeof this[key] !== typeof model[key]) {
+        return false
+      }
 
-	removeKey(key){
-		let selfKeys = this.getProperties()
+      if (typeof this[key] === 'object') {
+        if (this[key] && this[key].isEqualWithModel) {
+          let ok = this[key].isEqualWithModel(model[key])
+          if (!ok) {
+            return false
+          }
+        } else {
+          let ok = (this[key] === model[key])
+          if (!ok) {
+            return false
+          }
+        }
+      } else {
+        if (this[key] !== model[key]) {
+          return false
+        }
+      }
+    }
 
-		if (selfKeys.has(key)) {
-			if (this[key] && this[key].destroy){
-				this[key].destroy()
-			}
-			this[key] = null
-		}
+    return true
+  }
 
-		if(!this._internal.removed) this._internal.removed = []
-		if(this._internal.removed.indexOf(key) === -1) this._internal.removed.push(key)
-	}
+  refresh() {}
 
-	connectProperties() {}
+  copy(item) {
+    return copyFrom(item)
+  }
 
-	createMe() {
-		return this.constructor.create()
-	}
+  copyMe() {
+    let obj = this.createMe()
+    obj.copyFrom(this)
 
-	isEqualWithModel(model) {
-		if (typeof this != typeof model) {
-			return false
-		}
+    return obj
+  }
 
-		let selfKeys = this.getProperties()
-		let sourceKeys = model.getProperties()
+  copyFrom(item) {
+    this.fromJSON(item.toJson())
+    return true
+  }
 
-		if (selfKeys.size !== sourceKeys.size) {
-			return false;
-		}
+  copyFrom2(item) {
+    let sourceObject = item
+    for (let objKey of this.getProperties()) {
+      if (!(this.getJSONKeyForProperty(objKey) in sourceObject)) {
+        if (this[objKey] && typeof this[objKey] === 'object') {
+          if (this[objKey].clear) {
+            this[objKey].clear()
+          }
+          if (this[objKey].destroy) {
+            this[objKey].destroy()
+          }
+          this[objKey] = null
+        }
+      }
+    }
 
-		for (let key of selfKeys) {
-			if (!sourceKeys.has(key)) {
-				return false
-			}
+    for (let key of item.getProperties()) {
+      if (key === '__typename' ||
+          (sourceObject[key] == null &&
+           sourceObject._internal.containceInRemoved(key))) {
+        continue
+      }
 
-			if (typeof this[key] !== typeof model[key]) {
-				return false
-			}
+      this._internal.removeAt(key)
 
-			if (typeof this[key] === 'object') {
-				if (this[key] && this[key].isEqualWithModel) {
-					let ok = this[key].isEqualWithModel(model[key])
-					if (!ok) {
-						return false
-					}
-				}
-				else {
-					let ok = (this[key] === model[key])
-					if (!ok) {
-						return false
-					}
-				}
-			}
-			else {
-				if (this[key] !== model[key]) {
-					return false
-				}
-			}
-		}
+      if (sourceObject[key] === null) {
+        this[key] = null
+      }
+      else if (typeof sourceObject[key] === 'object') {
+        if (Array.isArray(sourceObject[key])) {
+          let component = this.createComponent(key)
 
-		return true
-	}
+          if (this[key]) {
+            if (this[key].clear) {
+              this[key].clear()
+            }
+          }
+          else {
+            if (component) {
+              let obj = BaseModel.create(this)
+              obj.owner = this this[key] = obj
+            }
+          }
 
-	refresh() {
-	}
+          if (component) {
+            this[key].owner =
+                this for (let sourceObjectInner of sourceObject[key]) {
+              if (sourceObjectInner === null ||
+                  sourceObjectInner === undefined) {
+                this[key].append({item: null})
+                continue
+              }
+              let sourceTypename
+              if (sourceObjectInner['__typename']) {
+                sourceTypename = sourceObjectInner['__typename']
+              }
+              let obj =
+                  this.createElement(key, sourceTypename).createObject(this)
+              obj.copyFrom(sourceObjectInner) this[key].append({item: obj})
+              obj.owner = this
+            }
+          } else {
+            this[key] = sourceObject[key]
+          }
+        } else {
+          let obj
+          if (!this[key]) {
+            let sourceData = sourceObject[key] let sourceTypename
+            if (sourceData['__typename']) {
+              sourceTypename = sourceData['__typename']
+            }
+            obj = this.createComponent(key, sourceTypename).createObject(this)
+          }
+          else {obj = this[key]}
 
-	copy(item) {
-		return copyFrom(item)
-	}
+          obj.copyFrom(sourceObject[key]) this[key] = obj
 
-	copyMe() {
-		let obj = this.createMe()
-		obj.copyFrom(this)
+          obj.owner = this
+        }
+      }
+      else {
+        this[key] = sourceObject[key]
+      }
+    }
 
-		return obj
-	}
+    this.finished()
 
-	copyFrom(item) {
-		this.fromJSON(item.toJson())
-		return true
-	}
+    return true
+  }
 
-	copyFrom2(item) {
-		let sourceObject = item
-		for(let objKey of this.getProperties()){
-			if (!(this.getJSONKeyForProperty(objKey) in sourceObject)){
-				if(this[objKey] && typeof this[objKey] === "object"){
-					if (this[objKey].clear){
-						this[objKey].clear()
-					}
-					if (this[objKey].destroy){
-						this[objKey].destroy()
-					}
-					this[objKey] = null
-				}
-			}
-		}
+  copyTo(item) {
+    item.copyFrom(this)
+    return true
+  }
 
-		for (let key of item.getProperties()) {
-			if (key === '__typename' || (sourceObject[key] == null && sourceObject._internal.containceInRemoved(key))){
-				continue
-			}
-
-			this._internal.removeAt(key)
-
-			if (sourceObject[key] === null){
-				this[key] = null
-			}
-			else if (typeof sourceObject[key] === "object") {
-				if (Array.isArray(sourceObject[key])) {
-					let component = this.createComponent(key)
-
-					if (this[key]) {
-						if (this[key].clear) {
-							this[key].clear()
-						}
-					} else {
-						if (component) {
-							let obj = BaseModel.create(this)
-							obj.owner = this
-							this[key] = obj
-						}
-					}
-
-					if (component) {
-						this[key].owner = this
-						for (let sourceObjectInner of sourceObject[key]) {
-							let sourceTypename
-							if (sourceObjectInner['__typename']){
-								sourceTypename = sourceObjectInner['__typename']
-							}
-							let obj = this.createElement(key, sourceTypename).createObject(this)
-							obj.copyFrom(sourceObjectInner)
-							this[key].append({ item: obj })
-							obj.owner = this
-						}
-					}
-					else {
-						this[key] = sourceObject[key]
-					}
-				} else {
-					let obj
-					if (!this[key]) {
-						let sourceData = sourceObject[key]
-						let sourceTypename
-						if (sourceData['__typename']){
-							sourceTypename = sourceData['__typename']
-						}	
-						obj = this.createComponent(key, sourceTypename).createObject(this)
-					}
-					else {
-						obj = this[key]
-					}
-
-					obj.copyFrom(sourceObject[key])
-					this[key] = obj
-
-					obj.owner = this
-				}
-			} else {
-				this[key] = sourceObject[key]
-			}
-		}
-
-		this.finished()
-		
-		return true
-	}
-
-	copyTo(item) {
-		item.copyFrom(this)
-		return true
-	}
-
-	createComponent(propertyId, typename){
-	}
+  createComponent(propertyId, typename) {}
 
 
-	createElement(propertyId, typename){
-	}
+  createElement(propertyId, typename) {}
 
-	getJSONKeyForProperty(propertyId) {
-		return propertyId
-	}
+  isArrayRequired(propertyId) {
+    return false
+  }
 
-	getProperties() {
-		return this.__self.constructor.cachedPoperties
-	}
+  areArrayElementsRequired(propertyId) {
+    return false
+  }
 
-	createFromJson(json) {
-		return this.fromJSON(json)
-	}
+  isArrayValueValid(propertyId, value) {
+    if (value === null || value === undefined) {
+      return !this.isArrayRequired(propertyId)
+    }
+    if (!this.areArrayElementsRequired(propertyId)) {
+      return true
+    }
+    if (Array.isArray(value)) {
+      for (let element of value) {
+        if (element === null || element === undefined) {
+          return false
+        }
+      }
+    } else if (value.hasNullElements && value.hasNullElements()) {
+      return false
+    }
 
-	toJson() {
-		let json = '{'
-		let isFirst = true
-		for (let key of this.getProperties()) {
-			if(key === '__typename' && this[key] === '') continue
+    return true
+  }
 
-			if (this[key] == null && this._internal.containceInRemoved(key)){
-				continue
-			}
-			if (!isFirst) json += ','
-			isFirst = false
-			if (typeof this[key] === 'object') {
-				if (Array.isArray(this[key])) {
+  getJSONKeyForProperty(propertyId) {
+    return propertyId
+  }
 
-					json += '"' + this.getJSONKeyForProperty(key) + '":'
+  getProperties() {
+    return this.__self.constructor.cachedPoperties
+  }
 
-					json += "["
+  createFromJson(json) {
+    return this.fromJSON(json)
+  }
 
-					for (let j = 0; j < this[key].length; j++) {
-						let value = this[key][j]
-						if (j != 0) {
-							json += ", "
-						}
+  toJson() {
+    let json = '{'
+    let isFirst = true
+    for (let key of this.getProperties()) {
+      if (key === '__typename' && this[key] === '')
+        continue if (!this.isArrayValueValid(key, this[key])) {
+          return ''
+        }
 
-						if (typeof value === "string") {
-							value = JSON.stringify(value)
-						}
-						
-						json += value
-					}
+      if (this[key] == null && this._internal.containceInRemoved(key)) {
+        continue
+      }
+      if (!isFirst) json += ','
+        isFirst = false
+        if (typeof this[key] === 'object') {
+          if (Array.isArray(this[key])) {
+            json += '"' + this.getJSONKeyForProperty(key) + '":'
 
-					json += "]"
-				}
-				else if (this[key] !== null) {
-					json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].toJson()
-				}
-				else{
-					json += '"' + this.getJSONKeyForProperty(key) + '": null'
-				}
-			} else {
-				let value = this[key]
-				if (value === undefined) {
-					value = null
-				}
-				let safeValue = this[key]
-				if (typeof safeValue === 'string') {
-					safeValue = this.escapeSpecialChars(safeValue)
-				}
+            json += '['
 
-				json += '"' + this.getJSONKeyForProperty(key) + '":' + (typeof this[key] === 'string' ? '"' + safeValue + '"' : value)
-			}
-		}
-		json += '}'
-		return json
-	}
+            for (let j = 0; j < this[key].length; j++) {
+              let value = this[key][j] if (j != 0) {
+                json += ', '
+              }
 
-	toGraphQL() {
-		let graphQL = '{'
-		let isFirst = true
-		for (let key of this.getProperties()) {
-			if (this[key] == null && this._internal.containceInRemoved(key)){
-				continue
-			}
-			if (!isFirst) graphQL += ','
-			isFirst = false
-			if (typeof this[key] === 'object') {
-				if (Array.isArray(this[key])) {
-					graphQL += this.getJSONKeyForProperty(key) + ':'
+              if (typeof value === 'string') {
+                value = JSON.stringify(value)
+              }
 
-					graphQL += "["
+              json += value
+            }
 
-					for (let j = 0; j < this[key].length; j++) {
-						if (j != 0) {
-							graphQL += ", "
-						}
+            json += ']'
+          } else if (this[key] !== null) {
+            let serializedValue = this[key].toJson()
+            if (serializedValue === '') {
+              return ''
+            }
+            json +=
+                '"' + this.getJSONKeyForProperty(key) + '":' + serializedValue
+          } else {
+            json += '"' + this.getJSONKeyForProperty(key) + '": null'
+          }
+        }
+      else {
+        let value = this[key] if (value === undefined) {
+          value = null
+        }
+        let safeValue = this[key] if (typeof safeValue === 'string') {
+          safeValue = this.escapeSpecialChars(safeValue)
+        }
 
-						if (typeof this[key][j] === "string") {
-							graphQL += "\"" + this.escapeSpecialChars(this[key][j]) + "\""
-						}
-						else {
-							graphQL += this[key][j]
-						}
-					}
+        json += '"' + this.getJSONKeyForProperty(key) + '":' +
+            (typeof this[key] === 'string' ? '"' + safeValue + '"' : value)
+      }
+    }
+    json += '}'
+    return json
+  }
 
-					graphQL += "]"
-				}
-				else {
-					graphQL += this.getJSONKeyForProperty(key) + ':' + ((this[key] !== null) ? this[key].toGraphQL() : "null")
-				}
-			} else {
-				let value = this[key]
-				if (value === undefined) {
-					value = null
-				}
+  toGraphQL() {
+    let graphQL = '{'
+    let isFirst = true
+    for (let key of this.getProperties()) {
+      if (!this.isArrayValueValid(key, this[key])) {
+        return ''
+      }
+      if (this[key] == null && this._internal.containceInRemoved(key)) {
+        continue
+      }
+      if (!isFirst) graphQL += ','
+        isFirst = false
+        if (typeof this[key] === 'object') {
+          if (Array.isArray(this[key])) {
+            graphQL += this.getJSONKeyForProperty(key) + ':'
 
-				graphQL += this.getJSONKeyForProperty(key) + ':';
-				if (typeof this[key] === 'string') {
-					let data = this[key];
-					
-					graphQL += '"'
-					graphQL += this.escapeSpecialChars(data)
-					graphQL += '"'
-				}
-				else {
-					graphQL += value
-				}
-			}
-		}
-		graphQL += '}'
-		return graphQL
-	}
+            graphQL += '['
 
-	fromJSON(json) {
-		let obj;
-		try {
-			obj = JSON.parse(json.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t").replace(/\f/g, "\\f"))
-		} catch (e) {
-			console.error(e)
-			return false
-		}
+            for (let j = 0; j < this[key].length; j++) {
+              if (j != 0) {
+                graphQL += ', '
+              }
 
-		return this.fromObject(obj)
-	}
+              if (typeof this[key][j] === 'string') {
+                graphQL += '"' + this.escapeSpecialChars(this[key][j]) + '"'
+              } else {
+                graphQL += this[key][j]
+              }
+            }
 
-	escapeSpecialChars(jsonString) {
-		return jsonString.replace(/\\/g, "\\\\")
-		.replace(/\"/g, "\\\"")
-		.replace(/\n/g, "\\n")
-		.replace(/\r/g, "\\r")
-		.replace(/\t/g, "\\t")
-		.replace(/\f/g, "\\f")
-	}
+            graphQL += ']'
+          } else if (this[key] !== null) {
+            let serializedValue = this[key].toGraphQL()
+            if (serializedValue === '') {
+              return ''
+            }
+            graphQL += this.getJSONKeyForProperty(key) + ':' + serializedValue
+          } else {
+            graphQL += this.getJSONKeyForProperty(key) + ':null'
+          }
+        }
+      else {
+        let value = this[key] if (value === undefined) {
+          value = null
+        }
 
-	fromObject(sourceObject) {
-		for(let objKey of this.getProperties()){
-			if (!(this.getJSONKeyForProperty(objKey) in sourceObject)){
-				if(this[objKey] && typeof this[objKey] === "object"){
-					if (this[objKey].clear){
-						this[objKey].clear()
-					}
-					if (this[objKey].destroy){
-						this[objKey].destroy()
-					}
-					this[objKey] = null
-				}
-			}
-		}
+        graphQL += this.getJSONKeyForProperty(key) + ':';
+        if (typeof this[key] === 'string') {
+          let data = this[key];
 
-		for (let key in sourceObject) {
-			let _key = "m_" + key[0].toLowerCase() + key.slice(1, key.length)
+          graphQL += '"'
+          graphQL += this.escapeSpecialChars(data)
+          graphQL += '"'
+        } else {
+          graphQL += value
+        }
+      }
+    }
+    graphQL += '}'
+    return graphQL
+  }
 
-			this._internal.removeAt(_key)
+  fromJSON(json) {
+    let obj;
+    try {
+      obj = JSON.parse(json.replace(/\n/g, '\\n')
+                           .replace(/\r/g, '\\r')
+                           .replace(/\t/g, '\\t')
+                           .replace(/\f/g, '\\f'))
+    } catch (e) {
+      console.error(e)
+      return false
+    }
 
-			if (sourceObject[key] === null){
-				this[_key] = null
-			} else {
-				this[_key] = sourceObject[key]
-			}
-		}
+    return this.fromObject(obj)
+  }
 
-		this.finished()
-		
-		return true
-	}
+  escapeSpecialChars(jsonString) {
+    return jsonString.replace(/\\/g, '\\\\')
+        .replace(/\"/g, '\\"')
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r')
+        .replace(/\t/g, '\\t')
+        .replace(/\f/g, '\\f')
+  }
 
-	destroy(){
-		if(this._internal) this._internal.destroy()
-		super.destroy()
-	}
+  fromObject(sourceObject) {
+    for (let key in sourceObject) {
+      let propertyId = 'm_' + key[0].toLowerCase() + key.slice(1, key.length)
+      if (!this.isArrayValueValid(propertyId, sourceObject[key])) {
+        return false
+      }
+    }
+
+    for (let objKey of this.getProperties()) {
+      if (!(this.getJSONKeyForProperty(objKey) in sourceObject)) {
+        if (this.isArrayRequired(objKey)) {
+          continue
+        }
+        if (this[objKey] && typeof this[objKey] === 'object') {
+          if (this[objKey].clear) {
+            this[objKey].clear()
+          }
+          if (this[objKey].destroy) {
+            this[objKey].destroy()
+          }
+          this[objKey] = null
+        }
+      }
+    }
+
+    for (let key in sourceObject) {
+      let _key = 'm_' + key[0].toLowerCase() +
+          key.slice(1, key.length)
+
+              this._internal.removeAt(_key)
+
+      if (sourceObject[key] === null) {
+        this[_key] = null
+      }
+      else {
+        this[_key] = sourceObject[key]
+      }
+    }
+
+    this.finished()
+
+    return true
+  }
+
+  destroy() {
+    if (this._internal) this._internal.destroy()
+      super.destroy()
+  }
 }
 
 
@@ -589,4 +655,4 @@ module.exports = BaseClass
 
 
 
-// module.exports.BaseClass = BaseClass
+    // module.exports.BaseClass = BaseClass

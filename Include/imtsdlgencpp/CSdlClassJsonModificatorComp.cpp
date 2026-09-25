@@ -178,6 +178,23 @@ bool CSdlClassJsonModificatorComp::AddFieldValueAppendToObjectArray(QTextStream&
 }
 
 
+bool CSdlClassJsonModificatorComp::AddNullValueAppendToObjectArray(QTextStream& stream, const imtsdl::CSdlField& /*field*/, const QString& arrayContainerVariableName, uint /*horizontalIndents*/) const
+{
+	stream << arrayContainerVariableName << QStringLiteral(" << QJsonValue(QJsonValue::Null);");
+
+	return true;
+}
+
+
+bool CSdlClassJsonModificatorComp::AddNullArrayWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, uint /*horizontalIndents*/) const
+{
+	stream << GetContainerObjectVariableName() << QStringLiteral("[\"") << field.GetId();
+	stream << QStringLiteral("\"] = QJsonValue(QJsonValue::Null);");
+
+	return true;
+}
+
+
 bool CSdlClassJsonModificatorComp::AddArrayWriteToObject(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
@@ -204,6 +221,29 @@ bool CSdlClassJsonModificatorComp::AddArrayWriteToObject(
 
 bool CSdlClassJsonModificatorComp::AddContainerValueCheckConditionBegin(QTextStream& stream, const imtsdl::CSdlField& field, bool expected, quint16 horizontalIndents) const
 {
+	bool isArray = false;
+	bool isCustom = false;
+	bool isEnum = false;
+	bool isUnion = false;
+	const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
+
+	if (expected && isArray && !field.IsRequired()){
+		stream << QStringLiteral("if (") << GetContainerObjectVariableName() << QStringLiteral(".contains(\"");
+		stream << field.GetId() << QStringLiteral("\") && ") << GetContainerObjectVariableName();
+		stream << QStringLiteral("[\"") << field.GetId() << QStringLiteral("\"].isNull()){");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, horizontalIndents + 1);
+		stream << field.GetId() << QStringLiteral(".SetNull();");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, horizontalIndents);
+		stream << '}';
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, horizontalIndents);
+	}
+
 	FeedStreamHorizontally(stream, horizontalIndents);
 	stream << QStringLiteral("if (");
 	if (!expected){
@@ -214,11 +254,6 @@ bool CSdlClassJsonModificatorComp::AddContainerValueCheckConditionBegin(QTextStr
 	stream << QStringLiteral(".contains(\"");
 	stream << field.GetId();
 	stream << QStringLiteral("\")");
-	bool isArray = false;
-	bool isCustom = false;
-	bool isEnum = false;
-	bool isUnion = false;
-	const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
 
 	if (!isUnion){
 		stream << ' ';
@@ -342,6 +377,7 @@ bool CSdlClassJsonModificatorComp::AddContainerListAccessCode(
 	result.listCountVariableName			= GetDecapitalizedValue(field.GetId()) + QStringLiteral("ArrayCount");
 	result.listCountVariableType			= QStringLiteral("qsizetype");
 	result.toObjectTransformMethod			= QStringLiteral(".to") + GetConvertEndForFieldString(field, true);
+	result.elementNullCheck					= result.listVariableName + QStringLiteral("[$(index)].isNull()");
 
 
 	return true;
@@ -464,7 +500,7 @@ void CSdlClassJsonModificatorComp::AddUnionFieldValueWriteToObject(QTextStream& 
 }
 
 
-void CSdlClassJsonModificatorComp::WriteTypenameToObjectCode(QTextStream& stream, const imtsdl::CSdlType& sdlType) const 
+void CSdlClassJsonModificatorComp::WriteTypenameToObjectCode(QTextStream& stream, const imtsdl::CSdlType& sdlType) const
 {
 	stream << GetContainerObjectVariableName();
 	stream << QStringLiteral("[\"__typename\"] = \"");
