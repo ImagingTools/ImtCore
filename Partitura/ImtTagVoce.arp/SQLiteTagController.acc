@@ -352,7 +352,7 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="TagFactory" Type="Reference" ExportId="">
+                    <AttributeInfo Id="TagFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="Tag"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TagNames" Type="Text[]" ExportId="SystemTagNames">
@@ -409,7 +409,7 @@
         <Element Id="TagAssignmentDatabaseDelegate" PackageId="ImtTagDbPck" ComponentId="TagAssignmentDbDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="AssignmentFactory" Type="Reference" ExportId="">
+                    <AttributeInfo Id="AssignmentFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="TagAssignment"/>
                     </AttributeInfo>
                     <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
@@ -439,7 +439,7 @@
                     <AttributeInfo Id="AssignmentCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TagAssignmentRepository"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="AssignmentFactory" Type="Reference" ExportId="">
+                    <AttributeInfo Id="AssignmentFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="TagAssignment"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EntityTypes" Type="Reference[]" ExportId="TaggableEntityTypes">
@@ -510,7 +510,7 @@
                     <AttributeInfo Id="SystemTagSeeder" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SystemTagSeeder"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TagFactory" Type="Reference" ExportId="">
+                    <AttributeInfo Id="TagFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="Tag"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantFilterEnabled" Type="Boolean" ExportId="">
