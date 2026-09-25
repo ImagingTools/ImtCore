@@ -28,16 +28,40 @@ namespace imtclientgql
 class CClientRequestModelHelpers
 {
 public:
+	/**
+		Kind of failure \c ParseModelResponse found in a response.
+	*/
+	enum ParseError
+	{
+		PE_NONE = 0,
+		/// The server handled the request and answered with GraphQL \c errors.
+		PE_SERVER_ERROR,
+		/// The response is not a JSON object or does not match the requested model.
+		PE_INVALID_RESPONSE
+	};
+
+	/**
+		Reads the model of \a commandId from a GraphQL response.
+		\param	errorMessage	Receives the first GraphQL error message, or why the response could not be
+								read. Empty on success.
+		\param	parseErrorPtr	Optional; receives the kind of failure, \c PE_NONE on success.
+	*/
 	template<class SdlClass>
 	static SdlClass ParseModelResponse(
 				const QByteArray& responseData,
 				const QByteArray& commandId,
-				QString& errorMessage)
+				QString& errorMessage,
+				ParseError* parseErrorPtr = nullptr)
 	{
 		errorMessage.clear();
+		ParseError localParseError;
+		ParseError& parseError = parseErrorPtr != nullptr ? *parseErrorPtr : localParseError;
+		parseError = PE_NONE;
+
 		const QJsonDocument document = QJsonDocument::fromJson(responseData);
 		if (!document.isObject()){
 			errorMessage = QStringLiteral("Response is invalid");
+			parseError = PE_INVALID_RESPONSE;
 			return SdlClass();
 		}
 
@@ -64,6 +88,7 @@ public:
 			if (errorMessage.isEmpty()){
 				errorMessage = QStringLiteral("GraphQL error");
 			}
+			parseError = PE_SERVER_ERROR;
 			if (!object.contains(QStringLiteral("data"))){
 				return SdlClass();
 			}
@@ -83,6 +108,7 @@ public:
 			if (!response.ReadFromJsonObject(object)){
 				if (errorMessage.isEmpty()){
 					errorMessage = QStringLiteral("Response parsing error");
+					parseError = PE_INVALID_RESPONSE;
 				}
 			}
 		}
