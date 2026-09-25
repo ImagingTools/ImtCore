@@ -30,6 +30,9 @@ ControlBase {
 	property Item root: null;
 
 	property Item rootItem: null;
+	property var dialogManagerView: parentWindow ? parentWindow.dialogManagerView : undefined;
+	property int modality: Qt.ApplicationModal //Qt.ApplicationModal, Qt.WindowModal, Qt.NonModal
+	property var parentWindow: null
 
 	property ListModel buttonsModel: ListModel{};
 	property int buttonsModelCount: buttonsModel.count;
@@ -173,10 +176,10 @@ ControlBase {
 		if (dialogContainer.root){
 			if(!(dialogContainer.notClosingButtons & buttonId)){
 				if(dialogContainer.selfComp){
-					dialogContainer.root.closeByComp(dialogContainer.selfComp);
+					dialogContainer.root.closeByComp(dialogContainer.selfComp, dialogContainer.parentWindow);
 				}
 				else {
-					dialogContainer.root.closeDialog();
+					dialogContainer.root.closeDialog(undefined, dialogContainer.parentWindow);
 				}
 			}
 		}
@@ -246,16 +249,14 @@ ControlBase {
 			if(dialogContainer.root){
 				dialogContainer.closed()
 				if(dialogContainer.selfComp){
-					dialogContainer.root.closeByComp(dialogContainer.selfComp);
+					dialogContainer.root.closeByComp(dialogContainer.selfComp, dialogContainer.parentWindow);
 				}
 				else {
-					dialogContainer.root.closeDialog();
+					dialogContainer.root.closeDialog(undefined, dialogContainer.parentWindow);
 				}
 
 			}
 		}
-
-
 	}
 
 	ResizeItem{
@@ -264,6 +265,7 @@ ControlBase {
 		visible: dialogContainer.canResize;
 
 		targetItem: dialogContainer;
+		globalParent: dialogContainer.dialogManagerView ? dialogContainer.dialogManagerView : ModalDialogManager.activeView
 		onSizeChanged: {
 			if(dialogContainer.contentItem){
 				if(deltaWidth !== 0){
