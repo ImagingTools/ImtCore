@@ -614,9 +614,12 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TagSelectController" PackageId="ImtServerGqlPck" ComponentId="FilterableSelectController">
+        <Element Id="TagSelectController" PackageId="ImtTagGqlPck" ComponentId="TagSelectController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AssignmentManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TagAssignmentManager"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CommandPermissions" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TagCommandPermissions"/>
                     </AttributeInfo>
@@ -631,6 +634,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PermissionChecker"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SystemTagSeeder" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SystemTagSeeder"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantFilterEnabled" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>

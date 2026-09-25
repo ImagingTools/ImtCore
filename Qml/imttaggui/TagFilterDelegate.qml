@@ -74,9 +74,13 @@ FilterDelegateBase {
 		id: modeSwitchComp
 
 		Row {
+			id: modeSwitchRow
 			spacing: Style.spacingS
 
+			readonly property int buttonWidth: (modeSwitchRow.width - 3 * modeSwitchRow.spacing) / 4
+
 			Button {
+				width: modeSwitchRow.buttonWidth
 				text: qsTr("Any")
 				variant: tagFilter.mode === "any" ? "primary" : "default"
 				onClicked: {
@@ -85,6 +89,7 @@ FilterDelegateBase {
 			}
 
 			Button {
+				width: modeSwitchRow.buttonWidth
 				text: qsTr("All")
 				variant: tagFilter.mode === "all" ? "primary" : "default"
 				onClicked: {
@@ -93,6 +98,7 @@ FilterDelegateBase {
 			}
 
 			Button {
+				width: modeSwitchRow.buttonWidth
 				text: qsTr("Exclude")
 				variant: tagFilter.mode === "exclude" ? "primary" : "default"
 				onClicked: {
@@ -101,6 +107,7 @@ FilterDelegateBase {
 			}
 
 			Button {
+				width: modeSwitchRow.buttonWidth
 				text: qsTr("No tags")
 				variant: tagFilter.mode === "none" ? "primary" : "default"
 				onClicked: {
@@ -113,16 +120,12 @@ FilterDelegateBase {
 	Component {
 		id: tagSelectComp
 
-		FilterableSelectPopup {
-			showCheckBox: true
-			filterPlaceholder: qsTr("Filter tags...")
+		TagSelectPopup {
 			preselectedIds: tagFilter.tagIds
 			headerComponent: modeSwitchComp
 
-			dataProvider: FilterableSelectGqlDataProvider {
+			dataProvider: TagSelectDataProvider {
 				context: tagFilterDelegateRoot.context
-				collectionId: "Tags"
-				multiSelect: true
 			}
 
 			onSelectionChanged: {

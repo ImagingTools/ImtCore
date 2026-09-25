@@ -1,16 +1,18 @@
 <RCC>
     <qresource prefix="/qml">
         <file alias="imttaggui/qmldir">qmldir</file>
+        <file alias="imttaggui/EntityTagsCommand.qml">EntityTagsCommand.qml</file>
+        <file alias="imttaggui/EntityTagsDialog.qml">EntityTagsDialog.qml</file>
         <file alias="imttaggui/EntityTagsEditor.qml">EntityTagsEditor.qml</file>
-        <file alias="imttaggui/EntityTagsField.qml">EntityTagsField.qml</file>
         <file alias="imttaggui/EntityTagsProvider.qml">EntityTagsProvider.qml</file>
         <file alias="imttaggui/TagCatalogPanel.qml">TagCatalogPanel.qml</file>
-        <file alias="imttaggui/TagCatalogProvider.qml">TagCatalogProvider.qml</file>
         <file alias="imttaggui/TagChip.qml">TagChip.qml</file>
         <file alias="imttaggui/TagChipRow.qml">TagChipRow.qml</file>
         <file alias="imttaggui/TagColorPalette.qml">TagColorPalette.qml</file>
         <file alias="imttaggui/TagEditorDialog.qml">TagEditorDialog.qml</file>
         <file alias="imttaggui/TagFilter.qml">TagFilter.qml</file>
         <file alias="imttaggui/TagFilterDelegate.qml">TagFilterDelegate.qml</file>
+        <file alias="imttaggui/TagSelectDataProvider.qml">TagSelectDataProvider.qml</file>
+        <file alias="imttaggui/TagSelectPopup.qml">TagSelectPopup.qml</file>
     </qresource>
 </RCC>

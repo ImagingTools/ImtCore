@@ -439,15 +439,18 @@ TagManagement
 
 ## 12. UI: модуль `Qml/imttaggui`
 
-Только контролы проекта и Style-токены; без Quick Controls, `Qt.binding` и `Qt.callLater`. Мультивыбор тегов везде — готовый `FilterableSelectPopup` над коллекцией `"Tags"` (поиск, пейджинг, чекбоксы, тенант-фильтр на сервере), а не новый пикер.
+Только контролы проекта и Style-токены; без Quick Controls, `Qt.binding` и `Qt.callLater`. Каждый список тегов — страница «Теги», пикер назначения и фильтр — строится на одном источнике: `TagSelectDataProvider` (`FilterableSelectGqlDataProvider` над коллекцией `"Tags"`: текстовый поиск, пейджинг, тенант-фильтр на сервере). Серверная сторона — `ImtTagGqlPck / TagSelectController` (наследник `FilterableSelectController`): у каждого элемента заполнен `color`, а в `params` лежат текстовые параметры `IsSystem` и `UsageCount`. Для этого в `CFilterableSelectControllerComp` добавлен виртуальный хук `OnSelectableItemCreated()`, поведение остальных пикеров не меняется.
 
 | Компонент | Назначение |
 |---|---|
 | `TagChip`, `TagChipRow` | Тег как цветная «пилюля»: фон `"#" + color`, чёрный или белый текст по яркости фона, у системного тега — точка. `TagChipRow` переносит чипы по ширине |
-| `TagCatalogPanel` | Страница «Теги»: список тегов организации и системных (чип, описание, «System», число объектов), кнопки «New tag», «Edit», «Delete» |
+| `TagSelectDataProvider` | Единый источник списков тегов; `isSystemTag()`, `getUsageCount()`, `getColor()` читают элемент |
+| `TagSelectPopup` | `FilterableSelectPopup` с чекбоксами, где строка показывает цвет, имя и описание тега |
+| `TagCatalogPanel` | Страница «Теги»: встроенный (`embedded`) список на `TagSelectDataProvider` с поиском и подгрузкой; чип, описание, «System», число объектов, кнопки «New tag», «Edit», «Delete» |
 | `TagEditorDialog` | Создание и правка тега: имя, описание, цвет, превью. Флажок «System tag» показывается только SU и только при создании |
 | `TagColorPalette` | 20 цветов палитры, hex-поле с проверкой, кнопка «Random» |
-| `EntityTagsField` | Теги одной сущности в её редакторе: чипы + кнопка «Tags...» (без права `AssignTags` — только чипы) |
+| `EntityTagsCommand` | Обработчик команды `AssignTags` в коллекции (работает с выделением) и в редакторе (с сохранённым документом); включает и выключает команду |
+| `EntityTagsDialog` | Диалог выбора тегов одной или нескольких сущностей; отмечены общие теги, по «Apply» отправляется только разница (`EntityTagsAdd` / `EntityTagRemove`) |
 | `EntityTagsProvider` | Пакетная загрузка тегов для Id видимой страницы коллекции — один запрос на страницу |
 | `EntityTagsEditor` | Добавить, снять, заменить или очистить теги у одной или нескольких сущностей (массовые действия над выделением) |
 | `TagFilter`, `TagFilterDelegate` | Фильтр-чип панели фильтров коллекции: «любой», «все», «исключить», «без тегов» |
@@ -457,16 +460,24 @@ TagManagement
 
 **Создать тег.** Страница `TagCatalogPanel` → «New tag» → `TagEditorDialog` → `TagAdd`. Системные теги по умолчанию появляются сами при первом открытии каталога.
 
-**Дать теги сущности.** В редакторе сущности:
+**Дать теги сущности — командой.** Одно решение для коллекции и редактора. На сервере в список команд вида добавляется готовая команда `ImtTagVoce / AssignTagsCommand` (Id `AssignTags`, иконка `Icons/Tag`, право `AssignTags`); на клиенте рядом с видом ставится обработчик:
 
 ```qml
-EntityTagsField {
+// коллекция: команда работает с выделенными строками
+EntityTagsCommand {
+	view: collectionView
 	entityType: "Devices"              // Id коллекции = TaggableEntityType
-	entityId: deviceEditor.documentId
+}
+
+// редактор: команда доступна, когда документ сохранён
+EntityTagsCommand {
+	view: deviceEditor
+	entityType: "Devices"
+	entityIds: deviceEditor.isNewDocument ? [] : [deviceEditor.documentObjectId]
 }
 ```
 
-Кнопка «Tags...» открывает поиск по каталогу с чекбоксами. Каждое переключение заменяет набор тегов (`EntityTagsSet`), чипы обновляются.
+Команда открывает `EntityTagsDialog`: поиск по каталогу с цветами и чекбоксами. При нескольких объектах отмечены общие теги; отмеченное добавляется всем, снятое снимается у всех, остальное не трогается.
 
 **Теги в строках коллекции.**
 
@@ -477,8 +488,6 @@ EntityTagsProvider { id: pageTags; entityType: "Devices" }
 // в делегате строки:
 TagChipRow { tags: pageTags.tagsByEntity ? pageTags.getTags(model.id) : [] }
 ```
-
-**Массовое действие над выделением.** `EntityTagsEditor.addTags("Devices", selectedIds, tagIds)` или `removeTags(...)`; для выбора тегов — тот же `FilterableSelectPopup` над `"Tags"`.
 
 **Фильтр.** Обычный фильтр-чип панели фильтров коллекции, рядом с остальными:
 
@@ -501,12 +510,13 @@ Component {
 
 ### 13.1 Сервер — один компонент
 
-`Partitura/ImtTagVoce.arp/TagController.acc` (PostgreSQL) или `SQLiteTagController.acc` содержит всё: каталог и таблицу назначений, менеджер, засев системных тегов, GQL-контроллеры каталога, назначений и пикера, уведомления, провайдер прав и соответствие «команда → право». Продукт делает четыре вещи:
+`Partitura/ImtTagVoce.arp/TagController.acc` (PostgreSQL) или `SQLiteTagController.acc` содержит всё: каталог и таблицу назначений, менеджер, засев системных тегов, GQL-контроллеры каталога, назначений и пикера, уведомления, провайдер прав и соответствие «команда → право». Продукт делает пять вещей:
 
 1. Добавляет элемент `ImtTagVoce / TagController` и задаёт экспортированные атрибуты: `DatabaseEngine`, `RequestManager`, `TaggableEntityTypes`; при желании `PermissionChecker`, `OperationContextController`, `UserActionManager`, `TranslationManager`, `VersionInfo`, `Log`, а также список системных тегов по умолчанию (`SystemTagIds`, `SystemTagNames`, `SystemTagColors`, `SystemTagDescriptions`).
 2. Подключает экспортированные интерфейсы в свой сервер: `imtgql::IGqlRequestHandler` — в список обработчиков GQL, `imtgql::IGqlSubscriberController` — в подписки, `imtlic::IFeatureInfoProvider` (`TagPermissionsProvider`) — в провайдеры прав продукта.
 3. На каждый тип сущности с тегами — элемент `ImtTagPck / TaggableEntityType` (`EntityTypeId` = Id коллекции, `EntityTypeName`, `ObjectCollection`), который вносится в `TaggableEntityTypes`.
 4. У SQL-делегата этой коллекции задаёт атрибут `TaggableEntityType` (тот же Id) — это включает фильтр по полю `Tags`.
+5. Чтобы теги назначались командой, вносит элемент `ImtTagVoce / AssignTagsCommand` в списки команд коллекции и редактора (`CommandsController`), а на клиенте ставит `EntityTagsCommand` (§12.1).
 
 Права `ViewTags`, `AssignTags` и `ManageTags` назначаются ролям организации; системными тегами управляет только SU.
 

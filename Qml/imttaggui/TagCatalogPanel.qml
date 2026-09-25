@@ -4,6 +4,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 import imtgui 1.0
+import imtcolgui 1.0
 import imtguigql 1.0
 import imtauthgui 1.0
 import imtbaseImtCollectionSdl 1.0
@@ -13,8 +14,9 @@ import imtbaseImtCollectionSdl 1.0
 	\inqmlmodule imttaggui
 	\brief Page for managing tags: the organization's tags and the system tags.
 
-	Users with ManageTags create, change and delete the tags of their organization;
-	system tags are read-only for everybody but the superuser.
+	Lists the catalog through the same provider as the tag pickers, with the text
+	filter and paging. Users with ManageTags create, change and delete the tags of
+	their organization; system tags are read-only for everybody but the superuser.
 */
 Item {
 	id: tagCatalogPanelRoot
@@ -30,7 +32,7 @@ Item {
 	property string pendingRemoveTagId: ""
 
 	Component.onCompleted: {
-		tagCatalogProvider.load()
+		tagList.started()
 	}
 
 	function canEdit(isSystem){
@@ -40,11 +42,11 @@ Item {
 	function openEditor(tag){
 		if (tag){
 			ModalDialogManager.openDialog(tagEditorComp, {
-				tagId: tag.id,
-				tagName: tag.name,
-				tagDescription: tag.description,
-				tagColor: tag.color,
-				isSystem: tag.isSystem
+				tagId: String(tag.id),
+				tagName: String(tag.title),
+				tagDescription: String(tag.description),
+				tagColor: tagSelectDataProvider.getColor(tag),
+				isSystem: tagSelectDataProvider.isSystemTag(tag)
 			})
 		}
 		else{
@@ -52,18 +54,15 @@ Item {
 		}
 	}
 
-	function removeTag(tagId){
-		tagCatalogPanelRoot.pendingRemoveTagId = tagId
-		ModalDialogManager.openDialog(removeConfirmComp, {})
-	}
+	function removeTag(tag){
+		tagCatalogPanelRoot.pendingRemoveTagId = String(tag.id)
 
-	TagCatalogProvider {
-		id: tagCatalogProvider
-		context: tagCatalogPanelRoot.context
+		var usageCount = tagSelectDataProvider.getUsageCount(tag)
+		var message = usageCount > 0
+			? qsTr("Delete the tag '%1'? It disappears from %2 objects.").arg(tag.title).arg(usageCount)
+			: qsTr("Delete the tag '%1'?").arg(tag.title)
 
-		onFailed: {
-			PopupManager.addErrorMessage(message)
-		}
+		ModalDialogManager.openDialog(removeConfirmComp, {message: message})
 	}
 
 	Row {
@@ -75,7 +74,7 @@ Item {
 
 		BaseText {
 			anchors.verticalCenter: parent.verticalCenter
-			text: qsTr("Tags (%1)").arg(tagCatalogProvider.tags.length)
+			text: qsTr("Tags")
 			font.pixelSize: Style.fontSizeL
 			font.bold: true
 		}
@@ -91,8 +90,8 @@ Item {
 		}
 	}
 
-	ListView {
-		id: tagListView
+	Item {
+		id: listArea
 		anchors.top: headerRow.bottom
 		anchors.topMargin: Style.marginM
 		anchors.left: parent.left
@@ -100,88 +99,123 @@ Item {
 		anchors.bottom: parent.bottom
 		anchors.leftMargin: Style.marginL
 		anchors.rightMargin: Style.marginL
-		clip: true
-		spacing: 0
-		model: tagCatalogProvider.tags
+		anchors.bottomMargin: Style.marginL
 
-		delegate: Item {
-			id: tagRow
-			width: tagListView.width
-			height: Style.controlHeightL
+		FilterableSelectPopup {
+			id: tagList
+			objectName: "TagCatalogList"
 
-			readonly property var tag: modelData
+			embedded: true
+			itemWidth: listArea.width
+			maxVisibleItems: Math.max(1, Math.floor((listArea.height - Style.controlHeightM - Style.marginM) / tagList.itemHeight))
+			filterPlaceholder: qsTr("Filter tags...")
 
-			Row {
-				anchors.verticalCenter: parent.verticalCenter
-				anchors.left: parent.left
-				anchors.right: rowActions.left
-				anchors.rightMargin: Style.marginM
-				spacing: Style.spacingM
+			dataProvider: TagSelectDataProvider {
+				id: tagSelectDataProvider
+				context: tagCatalogPanelRoot.context
+				pageSize: 50
+			}
 
+			delegate: Component {
 				Item {
-					anchors.verticalCenter: parent.verticalCenter
-					width: tagListView.width * 0.25
-					height: tagChip.height
+					id: tagRow
+					objectName: "TagCatalogItem_" + model.index
+					width: tagList.itemWidth
+					height: tagList.itemHeight
 
-					TagChip {
-						id: tagChip
-						tagName: String(tagRow.tag.name)
-						tagColor: String(tagRow.tag.color)
-						isSystem: tagRow.tag.isSystem === true
+					readonly property var tag: tagList.getItem(model.index)
+					readonly property bool isSystem: tagSelectDataProvider.isSystemTag(tagRow.tag)
+					readonly property bool isEditable: tagCatalogPanelRoot.canEdit(tagRow.isSystem)
+
+					Rectangle {
+						anchors.fill: parent
+						color: tagList.rowBackgroundColor(model.index, tagRowMouseArea.containsMouse, false)
+					}
+
+					MouseArea {
+						id: tagRowMouseArea
+						anchors.fill: parent
+						hoverEnabled: true
+						cursorShape: tagRow.isEditable ? Qt.PointingHandCursor : Qt.ArrowCursor
+
+						onClicked: {
+							if (tagRow.isEditable){
+								tagCatalogPanelRoot.openEditor(tagRow.tag)
+							}
+						}
+					}
+
+					Item {
+						id: chipCell
+						anchors.verticalCenter: parent.verticalCenter
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginM
+						width: tagRow.width * 0.25
+						height: tagChip.height
+
+						TagChip {
+							id: tagChip
+							tagName: tagRow.tag ? String(tagRow.tag.title) : ""
+							tagColor: tagSelectDataProvider.getColor(tagRow.tag)
+							isSystem: tagRow.isSystem
+						}
+					}
+
+					BaseText {
+						anchors.verticalCenter: parent.verticalCenter
+						anchors.left: chipCell.right
+						anchors.leftMargin: Style.marginM
+						anchors.right: infoText.left
+						anchors.rightMargin: Style.marginM
+						text: tagRow.tag ? String(tagRow.tag.description) : ""
+						color: Style.inactiveTextColor
+						elide: Text.ElideRight
+					}
+
+					BaseText {
+						id: infoText
+						anchors.verticalCenter: parent.verticalCenter
+						anchors.right: rowActions.left
+						anchors.rightMargin: Style.marginL
+						text: tagRow.isSystem
+							? qsTr("System · %1 objects").arg(tagSelectDataProvider.getUsageCount(tagRow.tag))
+							: qsTr("%1 objects").arg(tagSelectDataProvider.getUsageCount(tagRow.tag))
+						color: Style.inactiveTextColor
+						font.pixelSize: Style.fontSizeS
+					}
+
+					Row {
+						id: rowActions
+						anchors.verticalCenter: parent.verticalCenter
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginM
+						spacing: Style.spacingS
+						visible: tagRow.isEditable
+
+						Button {
+							text: qsTr("Edit")
+							onClicked: {
+								tagCatalogPanelRoot.openEditor(tagRow.tag)
+							}
+						}
+
+						Button {
+							variant: "danger"
+							text: qsTr("Delete")
+							onClicked: {
+								tagCatalogPanelRoot.removeTag(tagRow.tag)
+							}
+						}
+					}
+
+					Rectangle {
+						anchors.left: parent.left
+						anchors.right: parent.right
+						anchors.bottom: parent.bottom
+						height: 1
+						color: Style.borderColor
 					}
 				}
-
-				BaseText {
-					anchors.verticalCenter: parent.verticalCenter
-					width: tagListView.width * 0.40
-					text: String(tagRow.tag.description)
-					color: Style.inactiveTextColor
-				}
-
-				BaseText {
-					anchors.verticalCenter: parent.verticalCenter
-					text: tagRow.tag.isSystem === true ? qsTr("System") : ""
-					color: Style.inactiveTextColor
-					font.pixelSize: Style.fontSizeS
-				}
-
-				BaseText {
-					anchors.verticalCenter: parent.verticalCenter
-					text: qsTr("%1 objects").arg(tagRow.tag.usageCount)
-					color: Style.inactiveTextColor
-					font.pixelSize: Style.fontSizeS
-				}
-			}
-
-			Row {
-				id: rowActions
-				anchors.verticalCenter: parent.verticalCenter
-				anchors.right: parent.right
-				spacing: Style.spacingS
-				visible: tagCatalogPanelRoot.canEdit(tagRow.tag.isSystem === true)
-
-				Button {
-					text: qsTr("Edit")
-					onClicked: {
-						tagCatalogPanelRoot.openEditor(tagRow.tag)
-					}
-				}
-
-				Button {
-					variant: "danger"
-					text: qsTr("Delete")
-					onClicked: {
-						tagCatalogPanelRoot.removeTag(String(tagRow.tag.id))
-					}
-				}
-			}
-
-			Rectangle {
-				anchors.left: parent.left
-				anchors.right: parent.right
-				anchors.bottom: parent.bottom
-				height: 1
-				color: Style.borderColor
 			}
 		}
 	}
@@ -193,7 +227,7 @@ Item {
 			context: tagCatalogPanelRoot.context
 
 			onSaved: {
-				tagCatalogProvider.load()
+				tagSelectDataProvider.refetch()
 			}
 		}
 	}
@@ -204,7 +238,6 @@ Item {
 		MessageDialog {
 			width: Style.sizeHintM
 			title: qsTr("Delete tag")
-			message: qsTr("Delete the tag? It disappears from all objects.")
 
 			onFinished: {
 				if (buttonId == Enums.yes){
@@ -229,7 +262,7 @@ Item {
 		sdlObjectComp: Component {
 			RemoveElementsPayload {
 				onFinished: {
-					tagCatalogProvider.load()
+					tagSelectDataProvider.refetch()
 				}
 			}
 		}

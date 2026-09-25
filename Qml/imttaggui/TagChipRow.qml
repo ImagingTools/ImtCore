@@ -9,7 +9,7 @@ import com.imtcore.imtqml 1.0
 	\brief Wrapping row of tag chips, e.g. for a collection cell.
 
 	\c tags is an array of objects with \c id, \c name, \c color and \c isSystem,
-	as produced by EntityTagsProvider.getTags() or TagCatalogProvider.tags.
+	as produced by EntityTagsProvider.getTags().
 */
 Flow {
 	id: tagChipRowRoot

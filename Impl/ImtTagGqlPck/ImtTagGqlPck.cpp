@@ -35,6 +35,11 @@ I_EXPORT_COMPONENT(
 			"Provider of the tag permissions",
 			"Tag Permissions Provider");
 
+I_EXPORT_COMPONENT(
+			TagSelectController,
+			"Filterable select of tags with their colors and usage counts",
+			"Tag Select Controller");
+
 
 } // namespace ImtTagGqlPck
 
