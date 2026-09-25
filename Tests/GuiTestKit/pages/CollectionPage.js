@@ -110,6 +110,13 @@ class CollectionPage extends BasePage {
   async selectRecord(text) {
     await this.clearAllFilters();
     await this.search(text);
+    // Wait for the search to have been APPLIED, not merely for the table to hold still: the unfiltered
+    // table is perfectly stable too, so settling alone happily counts the rows the search is about to
+    // drop. Seen under load as "Automatic must match exactly one row, but matched 25" - the whole
+    // collection - which blames the fixture for what is really timing. The round-trip is what to wait
+    // on, so waitForStable (which tracks the in-flight request) comes first.
+    await gui.waitForStable(this.page);
+    await this.table.waitForRowExtent();
     const matches = await this.table.visibleRowCount();
     if (matches !== 1) {
       throw new Error(
