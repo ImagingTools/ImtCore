@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6381" Description="ACF"/>
+            <Version Id="1" Number="2454" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="396032" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="DatabaseFilePath" X="525" Y="300" Note=""/>
+        <Element ComponentName="DuckDatabaseEngine" X="525" Y="175" Note=""/>
+        <Element ComponentName="SystemLocation" X="525" Y="450" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
