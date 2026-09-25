@@ -26,11 +26,6 @@ I_EXPORT_COMPONENT(
 			"Tag Assignment Controller");
 
 I_EXPORT_COMPONENT(
-			EntityTagsChangeNotifier,
-			"Publisher of tag assignment changes",
-			"Entity Tags Change Notifier");
-
-I_EXPORT_COMPONENT(
 			TagPermissionsProvider,
 			"Provider of the tag permissions",
 			"Tag Permissions Provider");

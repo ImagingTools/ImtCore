@@ -12,8 +12,10 @@ import imtguigql 1.0
 	\inqmlmodule imttaggui
 	\brief Filter-panel chip that filters a taggable collection by tags.
 
-	Opens a searchable multi-select of the tag catalog with a mode switch:
-	any of the tags, all of them, none of them, or objects without tags.
+	Opens a searchable multi-select of the tag catalog. A segmented switch picks how the
+	ticked tags combine (any, all, exclude); "Without tags" finds untagged objects. The chip
+	shows the names of the picked tags, the popup keeps them in its "Selected" group.
+	Keyboard: Alt+1 any, Alt+2 all, Alt+3 exclude, Alt+0 without tags.
 
 	\code
 	registerFieldFilterDelegate("Tags", tagFilterComp)
@@ -32,6 +34,8 @@ FilterDelegateBase {
 	//! Set by the filter panel.
 	property CollectionFilter collectionFilter: null
 
+	property Item openedPopup: null
+
 	name: qsTr("Tags")
 	isActive: tagFilter.isActive
 	mainButtonText: tagFilter.isActive ? tagFilterDelegateRoot.summaryText() : name
@@ -41,19 +45,22 @@ FilterDelegateBase {
 			return qsTr("none")
 		}
 
-		if (tagFilter.mode === "all"){
-			return qsTr("all of %1").arg(tagFilter.tagIds.length)
-		}
+		var names = tagFilter.getTagNames()
+		var namesText = names.length > 0 ? names.join(tagFilter.mode === "all" ? " + " : ", ") : qsTr("%1 tags").arg(tagFilter.tagIds.length)
 
-		if (tagFilter.mode === "exclude"){
-			return qsTr("not %1").arg(tagFilter.tagIds.length)
-		}
-
-		return qsTr("any of %1").arg(tagFilter.tagIds.length)
+		return tagFilter.mode === "exclude" ? qsTr("not %1").arg(namesText) : namesText
 	}
 
 	function setTags(tagIds, mode, beQuiet){
 		tagFilter.setFilter(tagIds, mode, beQuiet)
+	}
+
+	function setWithoutTags(withoutTags){
+		if (withoutTags && tagFilterDelegateRoot.openedPopup){
+			tagFilterDelegateRoot.openedPopup.dataProvider.clearSelection()
+		}
+
+		tagFilter.setMode(withoutTags ? "none" : "any")
 	}
 
 	onOpenFilter: {
@@ -73,45 +80,107 @@ FilterDelegateBase {
 	Component {
 		id: modeSwitchComp
 
-		Row {
-			id: modeSwitchRow
-			spacing: Style.spacingS
+		Column {
+			id: modeColumn
+			spacing: Style.marginS
 
-			readonly property int buttonWidth: (modeSwitchRow.width - 3 * modeSwitchRow.spacing) / 4
-
-			Button {
-				width: modeSwitchRow.buttonWidth
-				text: qsTr("Any")
-				variant: tagFilter.mode === "any" ? "primary" : "default"
-				onClicked: {
-					tagFilter.setFilter(tagFilter.tagIds, "any")
+			Shortcut {
+				sequence: "Alt+1"
+				onActivated: {
+					tagFilter.setMode("any")
 				}
 			}
 
-			Button {
-				width: modeSwitchRow.buttonWidth
-				text: qsTr("All")
-				variant: tagFilter.mode === "all" ? "primary" : "default"
-				onClicked: {
-					tagFilter.setFilter(tagFilter.tagIds, "all")
+			Shortcut {
+				sequence: "Alt+2"
+				onActivated: {
+					tagFilter.setMode("all")
 				}
 			}
 
-			Button {
-				width: modeSwitchRow.buttonWidth
-				text: qsTr("Exclude")
-				variant: tagFilter.mode === "exclude" ? "primary" : "default"
-				onClicked: {
-					tagFilter.setFilter(tagFilter.tagIds, "exclude")
+			Shortcut {
+				sequence: "Alt+3"
+				onActivated: {
+					tagFilter.setMode("exclude")
 				}
 			}
 
-			Button {
-				width: modeSwitchRow.buttonWidth
-				text: qsTr("No tags")
-				variant: tagFilter.mode === "none" ? "primary" : "default"
-				onClicked: {
-					tagFilter.setFilter([], "none")
+			Shortcut {
+				sequence: "Alt+0"
+				onActivated: {
+					tagFilterDelegateRoot.setWithoutTags(tagFilter.mode !== "none")
+				}
+			}
+
+			SegmentedButton {
+				id: modeSegmented
+				objectName: "TagFilterModeSegmented"
+				height: Style.controlHeightM
+				checkable: false
+
+				Button {
+					objectName: "TagFilterModeAny"
+					anchors.verticalCenter: parent.verticalCenter
+					text: qsTr("Any")
+					tooltipText: qsTr("Objects with any of the ticked tags (Alt+1)")
+					checked: tagFilter.mode === "any"
+					onClicked: {
+						tagFilter.setMode("any")
+					}
+				}
+
+				Button {
+					objectName: "TagFilterModeAll"
+					anchors.verticalCenter: parent.verticalCenter
+					text: qsTr("All")
+					tooltipText: qsTr("Objects with all of the ticked tags (Alt+2)")
+					checked: tagFilter.mode === "all"
+					onClicked: {
+						tagFilter.setMode("all")
+					}
+				}
+
+				Button {
+					objectName: "TagFilterModeExclude"
+					anchors.verticalCenter: parent.verticalCenter
+					text: qsTr("Exclude")
+					tooltipText: qsTr("Objects without any of the ticked tags (Alt+3)")
+					checked: tagFilter.mode === "exclude"
+					onClicked: {
+						tagFilter.setMode("exclude")
+					}
+				}
+			}
+
+			Row {
+				id: withoutTagsRow
+				objectName: "TagFilterWithoutTags"
+				spacing: Style.marginS
+
+				CheckBox {
+					anchors.verticalCenter: parent.verticalCenter
+					width: Style.itemSizeS
+					height: Style.itemSizeS
+					mainMargin: Style.marginM
+					borderColor: Style.grayColor
+					checkState: tagFilter.mode === "none" ? Qt.Checked : Qt.Unchecked
+
+					function nextCheckState(){
+						tagFilterDelegateRoot.setWithoutTags(tagFilter.mode !== "none")
+					}
+				}
+
+				BaseText {
+					anchors.verticalCenter: parent.verticalCenter
+					text: qsTr("Without tags")
+
+					MouseArea {
+						anchors.fill: parent
+						cursorShape: Qt.PointingHandCursor
+						onClicked: {
+							tagFilterDelegateRoot.setWithoutTags(tagFilter.mode !== "none")
+						}
+					}
 				}
 			}
 		}
@@ -121,14 +190,26 @@ FilterDelegateBase {
 		id: tagSelectComp
 
 		TagSelectPopup {
+			id: tagSelectPopupItem
 			preselectedIds: tagFilter.tagIds
+			knownItems: tagFilter.tags
+			showSelectedGroup: true
 			headerComponent: modeSwitchComp
 
 			dataProvider: TagSelectDataProvider {
 				context: tagFilterDelegateRoot.context
 			}
 
+			Component.onCompleted: {
+				tagFilterDelegateRoot.openedPopup = tagSelectPopupItem
+			}
+
+			Component.onDestruction: {
+				tagFilterDelegateRoot.openedPopup = null
+			}
+
 			onSelectionChanged: {
+				tagFilter.tags = tagSelectPopupItem.dataProvider.getSelectedItems()
 				tagFilter.setFilter(selectedIds, tagFilter.mode === "none" ? "any" : tagFilter.mode)
 			}
 		}

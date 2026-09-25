@@ -113,6 +113,10 @@ Dialog {
 			entityTagsDialog.initialTagIds = entityTagsDialog.commonTagIds()
 			entityTagsDialog.tagsLoaded = true
 			entityTagsDialog.setButtonEnabled(Enums.apply, true)
+
+			if (entityTagsDialog.contentItem){
+				entityTagsDialog.contentItem.setSelectedIds(entityTagsDialog.initialTagIds)
+			}
 		}
 
 		onFailed: {
@@ -134,42 +138,73 @@ Dialog {
 		}
 	}
 
+	Shortcut {
+		sequence: "Ctrl+Return"
+		onActivated: {
+			if (entityTagsDialog.tagsLoaded && entityTagsDialog.pendingRequestCount === 0){
+				entityTagsDialog.apply()
+			}
+		}
+	}
+
+	Shortcut {
+		sequence: "Ctrl+Enter"
+		onActivated: {
+			if (entityTagsDialog.tagsLoaded && entityTagsDialog.pendingRequestCount === 0){
+				entityTagsDialog.apply()
+			}
+		}
+	}
+
 	contentComp: Component {
 		Item {
 			id: tagsContent
 			width: entityTagsDialog.width
-			height: tagSelectLoader.height + 2 * Style.marginL
+			height: tagSelectPopup.height + hintText.height + 2 * Style.marginL
 
 			function getSelectedIds(){
-				return tagSelectLoader.item ? tagSelectLoader.item.dataProvider.getSelectedIds() : entityTagsDialog.initialTagIds
+				return tagSelectPopup.dataProvider.getSelectedIds()
 			}
 
-			Loader {
-				id: tagSelectLoader
+			function setSelectedIds(tagIds){
+				tagSelectPopup.dataProvider.setPreselectedIds(tagIds)
+			}
+
+			Component.onCompleted: {
+				tagSelectPopup.started()
+
+				if (entityTagsDialog.tagsLoaded){
+					tagsContent.setSelectedIds(entityTagsDialog.initialTagIds)
+				}
+			}
+
+			TagSelectPopup {
+				id: tagSelectPopup
 				anchors.top: parent.top
 				anchors.topMargin: Style.marginL
 				anchors.left: parent.left
 				anchors.leftMargin: Style.marginL
 				anchors.right: parent.right
 				anchors.rightMargin: Style.marginL
-				height: item ? item.height : Style.controlHeightL
-				active: entityTagsDialog.tagsLoaded
+				embedded: true
+				itemWidth: tagsContent.width - 2 * Style.marginL
+				enabled: entityTagsDialog.tagsLoaded
 
-				sourceComponent: Component {
-					TagSelectPopup {
-						embedded: true
-						itemWidth: tagSelectLoader.width
-						preselectedIds: entityTagsDialog.initialTagIds
-
-						dataProvider: TagSelectDataProvider {
-							context: entityTagsDialog.context
-						}
-					}
+				dataProvider: TagSelectDataProvider {
+					context: entityTagsDialog.context
 				}
+			}
 
-				onLoaded: {
-					tagSelectLoader.item.started()
-				}
+			BaseText {
+				id: hintText
+				anchors.top: tagSelectPopup.bottom
+				anchors.topMargin: Style.marginS
+				anchors.left: tagSelectPopup.left
+				anchors.right: tagSelectPopup.right
+				text: qsTr("Space toggles a tag, Ctrl+Enter applies, Esc cancels")
+				font.pixelSize: Style.fontSizeXS
+				color: Style.inactiveTextColor
+				elide: Text.ElideRight
 			}
 		}
 	}

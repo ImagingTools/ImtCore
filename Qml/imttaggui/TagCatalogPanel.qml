@@ -4,7 +4,6 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 import imtgui 1.0
-import imtcolgui 1.0
 import imtguigql 1.0
 import imtauthgui 1.0
 import imtbaseImtCollectionSdl 1.0
@@ -14,9 +13,12 @@ import imtbaseImtCollectionSdl 1.0
 	\inqmlmodule imttaggui
 	\brief Page for managing tags: the organization's tags and the system tags.
 
-	Lists the catalog through the same provider as the tag pickers, with the text
-	filter and paging. Users with ManageTags create, change and delete the tags of
-	their organization; system tags are read-only for everybody but the superuser.
+	Built like the Support and History panels: a SimpleCollectionTable with search and
+	paging over TagSelectDataProvider. Users with ManageTags create, change and delete the
+	tags of their organization; system tags are read-only for everybody but the superuser.
+
+	Also the \c actionHandler of its rows (canManage, canEdit, canDelete, openEdit(),
+	confirmRemoveItems()), which drives the rows' Edit/Delete menu.
 */
 Item {
 	id: tagCatalogPanelRoot
@@ -26,17 +28,30 @@ Item {
 
 	property string context: ""
 
-	readonly property bool canManage: PermissionsController.checkPermission("ManageTags")
+	readonly property bool canManage: PermissionsController.checkPermission("ManageTags") || tagCatalogPanelRoot.isSuperuser
+	readonly property bool canEdit: tagCatalogPanelRoot.canManage
+	readonly property bool canDelete: tagCatalogPanelRoot.canManage
 	readonly property bool isSuperuser: AuthorizationController.loggedUserIsSuperuser()
 
 	property string pendingRemoveTagId: ""
 
 	Component.onCompleted: {
-		tagList.started()
+		tagSelectDataProvider.fetch("")
 	}
 
-	function canEdit(isSystem){
+	function canEditTag(isSystem){
 		return isSystem ? tagCatalogPanelRoot.isSuperuser : tagCatalogPanelRoot.canManage
+	}
+
+	function findTag(tagId){
+		var items = tagSelectDataProvider.items
+		for (var i = 0; i < items.length; i++){
+			if (String(items[i].id) === String(tagId)){
+				return items[i]
+			}
+		}
+
+		return null
 	}
 
 	function openEditor(tag){
@@ -54,7 +69,17 @@ Item {
 		}
 	}
 
-	function removeTag(tag){
+	// actionHandler interface of SimpleCollectionItemDelegateBase
+	function openEdit(itemId, itemTitle, itemDescription){
+		tagCatalogPanelRoot.openEditor(tagCatalogPanelRoot.findTag(itemId))
+	}
+
+	function confirmRemoveItems(ids, itemTitle){
+		var tag = tagCatalogPanelRoot.findTag(ids[0])
+		if (!tag){
+			return
+		}
+
 		tagCatalogPanelRoot.pendingRemoveTagId = String(tag.id)
 
 		var usageCount = tagSelectDataProvider.getUsageCount(tag)
@@ -65,157 +90,278 @@ Item {
 		ModalDialogManager.openDialog(removeConfirmComp, {message: message})
 	}
 
-	Row {
-		id: headerRow
-		anchors.top: parent.top
-		anchors.left: parent.left
-		anchors.margins: Style.marginL
-		spacing: Style.spacingM
+	TagSelectDataProvider {
+		id: tagSelectDataProvider
+		context: tagCatalogPanelRoot.context
+		pageSize: 50
 
-		BaseText {
-			anchors.verticalCenter: parent.verticalCenter
-			text: qsTr("Tags")
-			font.pixelSize: Style.fontSizeL
-			font.bold: true
-		}
-
-		Button {
-			anchors.verticalCenter: parent.verticalCenter
-			visible: tagCatalogPanelRoot.canManage || tagCatalogPanelRoot.isSuperuser
-			variant: "primary"
-			text: qsTr("New tag")
-			onClicked: {
-				tagCatalogPanelRoot.openEditor(null)
-			}
+		onDataChanged: {
+			tagsTable.model = tagSelectDataProvider.items
 		}
 	}
 
+	Rectangle {
+		anchors.fill: parent
+		color: Style.baseColor
+	}
+
 	Item {
-		id: listArea
-		anchors.top: headerRow.bottom
-		anchors.topMargin: Style.marginM
-		anchors.left: parent.left
-		anchors.right: parent.right
+		id: pageContent
+		anchors.top: parent.top
 		anchors.bottom: parent.bottom
-		anchors.leftMargin: Style.marginL
-		anchors.rightMargin: Style.marginL
-		anchors.bottomMargin: Style.marginL
+		x: Math.max(0, (tagCatalogPanelRoot.width - width) / 2)
+		width: Math.min(tagCatalogPanelRoot.width, Style.contentWidthMax)
 
-		FilterableSelectPopup {
-			id: tagList
-			objectName: "TagCatalogList"
+		Item {
+			id: pageHeader
+			anchors.top: parent.top
+			anchors.topMargin: Style.marginL
+			anchors.left: parent.left
+			anchors.leftMargin: Style.marginL
+			anchors.right: parent.right
+			anchors.rightMargin: Style.marginL
+			height: headerActions.height
 
-			embedded: true
-			itemWidth: listArea.width
-			maxVisibleItems: Math.max(1, Math.floor((listArea.height - Style.controlHeightM - Style.marginM) / tagList.itemHeight))
-			filterPlaceholder: qsTr("Filter tags...")
+			Row {
+				anchors.left: parent.left
+				anchors.right: headerActions.left
+				anchors.rightMargin: Style.marginL
+				anchors.verticalCenter: parent.verticalCenter
+				spacing: Style.spacingS
+				clip: true
 
-			dataProvider: TagSelectDataProvider {
-				id: tagSelectDataProvider
-				context: tagCatalogPanelRoot.context
-				pageSize: 50
+				Text {
+					anchors.verticalCenter: parent.verticalCenter
+					text: qsTr("Tags")
+					font.pixelSize: Style.fontSizeXL
+					font.family: Style.fontFamilyBold
+					color: Style.textColor
+				}
+
+				Text {
+					anchors.verticalCenter: parent.verticalCenter
+					visible: !tagSelectDataProvider.hasMore && tagSelectDataProvider.items.length > 0 && tagsTable.filterText === ""
+					text: "(" + tagSelectDataProvider.items.length + ")"
+					font.pixelSize: Style.fontSizeXL
+					font.family: Style.fontFamilyBold
+					color: Style.imaginToolsAccentColor
+				}
 			}
 
-			delegate: Component {
-				Item {
-					id: tagRow
-					objectName: "TagCatalogItem_" + model.index
-					width: tagList.itemWidth
-					height: tagList.itemHeight
+			Row {
+				id: headerActions
+				anchors.right: parent.right
+				anchors.verticalCenter: parent.verticalCenter
+				spacing: Style.spacingS
 
-					readonly property var tag: tagList.getItem(model.index)
-					readonly property bool isSystem: tagSelectDataProvider.isSystemTag(tagRow.tag)
-					readonly property bool isEditable: tagCatalogPanelRoot.canEdit(tagRow.isSystem)
-
-					Rectangle {
-						anchors.fill: parent
-						color: tagList.rowBackgroundColor(model.index, tagRowMouseArea.containsMouse, false)
+				ToolButton {
+					id: reloadButton
+					objectName: "TagsReloadButton"
+					anchors.verticalCenter: parent.verticalCenter
+					height: Style.buttonHeightS
+					width: height
+					enabled: !tagSelectDataProvider.isInitialLoading
+					tooltipText: qsTr("Reload tags")
+					iconSource: "qrc:/" + Style.getIconPath("Icons/AutoUpdate", Icon.State.On, enabled ? Icon.Mode.Normal : Icon.Mode.Disabled)
+					onClicked: {
+						tagSelectDataProvider.fetch(tagsTable.filterText)
 					}
+				}
 
-					MouseArea {
-						id: tagRowMouseArea
-						anchors.fill: parent
-						hoverEnabled: true
-						cursorShape: tagRow.isEditable ? Qt.PointingHandCursor : Qt.ArrowCursor
-
-						onClicked: {
-							if (tagRow.isEditable){
-								tagCatalogPanelRoot.openEditor(tagRow.tag)
-							}
+				Button {
+					id: newTagButton
+					objectName: "NewTagButton"
+					visible: tagCatalogPanelRoot.canManage
+					text: qsTr("New tag")
+					tooltipText: qsTr("New tag (Alt+N)")
+					decorator: Component {
+						ButtonDecorator {
+							color: Style.imaginToolsAccentColor
+							textColor: "white"
+							opacity: newTagButton.hovered ? 0.85 : 1
 						}
 					}
+					onClicked: {
+						tagCatalogPanelRoot.openEditor(null)
+					}
+				}
+			}
+		}
+
+		Shortcut {
+			sequence: "Alt+N"
+			enabled: tagCatalogPanelRoot.visible && tagCatalogPanelRoot.canManage
+			onActivated: {
+				tagCatalogPanelRoot.openEditor(null)
+			}
+		}
+
+		Component {
+			id: tagColumnHeaderComp
+
+			Item {
+				height: Style.controlHeightL + Style.marginM
+
+				Rectangle {
+					anchors.fill: parent
+					color: Style.backgroundColor2
+				}
+
+				Row {
+					id: tagHeaderRow
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.leftMargin: Style.marginL
+					anchors.rightMargin: Style.marginL + Style.controlHeightM + Style.marginL
+					anchors.verticalCenter: parent.verticalCenter
+					spacing: Style.marginL
+
+					readonly property int columnCount: 4
+					readonly property real columnsWidth: width - spacing * (columnCount - 1)
+
+					BaseText {
+						width: tagHeaderRow.columnsWidth * 0.28
+						text: qsTr("Tag")
+						font.bold: true
+						font.pixelSize: Style.fontSizeS
+						color: Style.inactiveTextColor
+					}
+
+					BaseText {
+						width: tagHeaderRow.columnsWidth * 0.46
+						text: qsTr("Description")
+						font.bold: true
+						font.pixelSize: Style.fontSizeS
+						color: Style.inactiveTextColor
+					}
+
+					BaseText {
+						width: tagHeaderRow.columnsWidth * 0.12
+						text: qsTr("Type")
+						font.bold: true
+						font.pixelSize: Style.fontSizeS
+						color: Style.inactiveTextColor
+					}
+
+					BaseText {
+						width: tagHeaderRow.columnsWidth * 0.14
+						text: qsTr("Objects")
+						font.bold: true
+						font.pixelSize: Style.fontSizeS
+						color: Style.inactiveTextColor
+					}
+				}
+
+				Rectangle {
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.bottom: parent.bottom
+					height: 1
+					color: Style.borderColor
+				}
+			}
+		}
+
+		Component {
+			id: tagRowDelegateComp
+
+			SimpleCollectionItemDelegateBase {
+				id: tagDelegate
+				objectName: "TagCatalogItem_" + index
+				showCheckBox: false
+				actionHandler: tagCatalogPanelRoot
+				enableDefaultDoubleClickEdit: false
+				canEdit: tagCatalogPanelRoot.canEditTag(tagDelegate.isSystemTag)
+				canDelete: tagDelegate.canEdit
+
+				readonly property bool isSystemTag: tagSelectDataProvider.isSystemTag(tagDelegate.modelItem)
+
+				onItemClicked: {
+					if (tagDelegate.canEdit){
+						tagCatalogPanelRoot.openEditor(tagDelegate.modelItem)
+					}
+				}
+
+				Row {
+					id: tagDataRow
+					width: parent.width
+					spacing: Style.marginL
+
+					readonly property int columnCount: 4
+					readonly property real columnsWidth: width - spacing * (columnCount - 1)
 
 					Item {
-						id: chipCell
 						anchors.verticalCenter: parent.verticalCenter
-						anchors.left: parent.left
-						anchors.leftMargin: Style.marginM
-						width: tagRow.width * 0.25
+						width: tagDataRow.columnsWidth * 0.28
 						height: tagChip.height
 
 						TagChip {
 							id: tagChip
-							tagName: tagRow.tag ? String(tagRow.tag.title) : ""
-							tagColor: tagSelectDataProvider.getColor(tagRow.tag)
-							isSystem: tagRow.isSystem
+							tagName: tagDelegate.itemTitle
+							tagColor: tagSelectDataProvider.getColor(tagDelegate.modelItem)
+							isSystem: tagDelegate.isSystemTag
 						}
 					}
 
-					BaseText {
+					Text {
 						anchors.verticalCenter: parent.verticalCenter
-						anchors.left: chipCell.right
-						anchors.leftMargin: Style.marginM
-						anchors.right: infoText.left
-						anchors.rightMargin: Style.marginM
-						text: tagRow.tag ? String(tagRow.tag.description) : ""
+						width: tagDataRow.columnsWidth * 0.46
+						text: tagDelegate.itemDescription
+						font.pixelSize: Style.fontSizeM
 						color: Style.inactiveTextColor
 						elide: Text.ElideRight
 					}
 
-					BaseText {
-						id: infoText
+					Text {
 						anchors.verticalCenter: parent.verticalCenter
-						anchors.right: rowActions.left
-						anchors.rightMargin: Style.marginL
-						text: tagRow.isSystem
-							? qsTr("System · %1 objects").arg(tagSelectDataProvider.getUsageCount(tagRow.tag))
-							: qsTr("%1 objects").arg(tagSelectDataProvider.getUsageCount(tagRow.tag))
+						width: tagDataRow.columnsWidth * 0.12
+						text: tagDelegate.isSystemTag ? qsTr("System") : qsTr("Organization")
+						font.pixelSize: Style.fontSizeM
 						color: Style.inactiveTextColor
-						font.pixelSize: Style.fontSizeS
+						elide: Text.ElideRight
 					}
 
-					Row {
-						id: rowActions
+					Text {
 						anchors.verticalCenter: parent.verticalCenter
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginM
-						spacing: Style.spacingS
-						visible: tagRow.isEditable
-
-						Button {
-							text: qsTr("Edit")
-							onClicked: {
-								tagCatalogPanelRoot.openEditor(tagRow.tag)
-							}
-						}
-
-						Button {
-							variant: "danger"
-							text: qsTr("Delete")
-							onClicked: {
-								tagCatalogPanelRoot.removeTag(tagRow.tag)
-							}
-						}
-					}
-
-					Rectangle {
-						anchors.left: parent.left
-						anchors.right: parent.right
-						anchors.bottom: parent.bottom
-						height: 1
-						color: Style.borderColor
+						width: tagDataRow.columnsWidth * 0.14
+						text: tagSelectDataProvider.getUsageCount(tagDelegate.modelItem)
+						font.pixelSize: Style.fontSizeM
+						color: Style.inactiveTextColor
+						elide: Text.ElideRight
 					}
 				}
+			}
+		}
+
+		SimpleCollectionTable {
+			id: tagsTable
+			anchors.top: pageHeader.bottom
+			anchors.topMargin: Style.marginM
+			anchors.left: parent.left
+			anchors.right: parent.right
+			anchors.bottom: parent.bottom
+			selectionEnabled: false
+			maximumWidth: pageContent.width
+			horizontalMargin: Style.marginL
+			emptyText: qsTr("No tags yet")
+			filterPlaceholder: qsTr("Filter tags...")
+			columnHeaderComponent: tagColumnHeaderComp
+			delegateComponent: tagRowDelegateComp
+
+			initialLoading: tagSelectDataProvider.isInitialLoading
+			loadingMore: tagSelectDataProvider.isPageLoading
+			errorMessage: tagSelectDataProvider.error ? (tagSelectDataProvider.error.message || qsTr("Error loading tags")) : ""
+
+			onFilterRequested: {
+				tagSelectDataProvider.fetch(text)
+			}
+
+			onLoadMoreRequested: {
+				tagSelectDataProvider.fetchMore()
+			}
+
+			onRetryRequested: {
+				tagSelectDataProvider.retry()
 			}
 		}
 	}
@@ -227,7 +373,7 @@ Item {
 			context: tagCatalogPanelRoot.context
 
 			onSaved: {
-				tagSelectDataProvider.refetch()
+				tagSelectDataProvider.fetch(tagsTable.filterText)
 			}
 		}
 	}
@@ -262,7 +408,7 @@ Item {
 		sdlObjectComp: Component {
 			RemoveElementsPayload {
 				onFinished: {
-					tagSelectDataProvider.refetch()
+					tagSelectDataProvider.fetch(tagsTable.filterText)
 				}
 			}
 		}

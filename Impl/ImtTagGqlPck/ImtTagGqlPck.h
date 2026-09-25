@@ -5,7 +5,6 @@
 // ImtCore includes
 #include <imttaggql/CTagCollectionControllerComp.h>
 #include <imttaggql/CTagAssignmentControllerComp.h>
-#include <imttaggql/CEntityTagsChangeNotifierComp.h>
 #include <imttaggql/CTagPermissionsProviderComp.h>
 #include <imttaggql/CTagSelectControllerComp.h>
 
@@ -19,7 +18,6 @@ namespace ImtTagGqlPck
 
 typedef imttaggql::CTagCollectionControllerComp TagCollectionController;
 typedef imttaggql::CTagAssignmentControllerComp TagAssignmentController;
-typedef imttaggql::CEntityTagsChangeNotifierComp EntityTagsChangeNotifier;
 typedef imttaggql::CTagPermissionsProviderComp TagPermissionsProvider;
 typedef imttaggql::CTagSelectControllerComp TagSelectController;
 

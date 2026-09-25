@@ -54,6 +54,12 @@ Dialog {
 		}
 	}
 
+	function trySave(){
+		if (tagEditorDialog.isInputValid){
+			tagEditorDialog.save()
+		}
+	}
+
 	function save(){
 		tagData.m_id = tagEditorDialog.tagId
 		tagData.m_name = tagEditorDialog.tagName.trim()
@@ -126,12 +132,27 @@ Dialog {
 		}
 	}
 
+	// Tab order: name, description, color swatches (arrow keys pick), hex, "Random", system flag.
+	// Enter in a text field saves, Esc cancels.
 	contentComp: Component {
 		Item {
+			id: editorContent
 			width: tagEditorDialog.width
 			height: editorColumn.height + 2 * Style.marginXL
 
 			property bool isColorValid: colorPalette.isValid
+
+			Component.onCompleted: {
+				focusDelay.start()
+			}
+
+			PauseAnimation {
+				id: focusDelay
+				duration: 50
+				onFinished: {
+					nameField.setFocus(true)
+				}
+			}
 
 			Column {
 				id: editorColumn
@@ -164,13 +185,21 @@ Dialog {
 
 				TextField {
 					id: nameField
+					objectName: "TagNameField"
 					width: parent.width
 					placeHolderText: qsTr("Tag name")
 					text: tagEditorDialog.tagName
 					maximumLength: 50
 
+					KeyNavigation.tab: descriptionField
+					KeyNavigation.backtab: systemRow.visible ? systemRow : colorPalette.lastItem
+
 					onTextEdited: {
 						tagEditorDialog.tagName = nameField.text
+					}
+
+					onAccepted: {
+						tagEditorDialog.trySave()
 					}
 				}
 
@@ -180,13 +209,21 @@ Dialog {
 
 				TextField {
 					id: descriptionField
+					objectName: "TagDescriptionField"
 					width: parent.width
 					placeHolderText: qsTr("Optional description")
 					text: tagEditorDialog.tagDescription
 					maximumLength: 200
 
+					KeyNavigation.tab: colorPalette.firstItem
+					KeyNavigation.backtab: nameField
+
 					onTextEdited: {
 						tagEditorDialog.tagDescription = descriptionField.text
+					}
+
+					onAccepted: {
+						tagEditorDialog.trySave()
 					}
 				}
 
@@ -198,26 +235,43 @@ Dialog {
 					id: colorPalette
 					width: parent.width
 					color: tagEditorDialog.tagColor
+					previousItem: descriptionField
+					nextItem: systemRow.visible ? systemRow : nameField
 
 					onColorEdited: {
 						tagEditorDialog.tagColor = color
 					}
+
+					onAccepted: {
+						tagEditorDialog.trySave()
+					}
 				}
 
 				Row {
+					id: systemRow
+					objectName: "TagSystemFlag"
 					visible: tagEditorDialog.isNew && tagEditorDialog.canCreateSystemTag
 					spacing: Style.spacingS
+
+					KeyNavigation.tab: nameField
+					KeyNavigation.backtab: colorPalette.lastItem
+
+					Keys.onSpacePressed: {
+						tagEditorDialog.isSystem = !tagEditorDialog.isSystem
+					}
 
 					CheckBox {
 						id: systemCheckBox
 						anchors.verticalCenter: parent.verticalCenter
 						checkState: tagEditorDialog.isSystem ? Qt.Checked : Qt.Unchecked
+						borderColor: systemRow.activeFocus ? Style.textSelectedColor : Style.grayColor
 
 						MouseArea {
 							anchors.fill: parent
 							cursorShape: Qt.PointingHandCursor
 							onClicked: {
 								tagEditorDialog.isSystem = !tagEditorDialog.isSystem
+								systemRow.forceActiveFocus()
 							}
 						}
 					}

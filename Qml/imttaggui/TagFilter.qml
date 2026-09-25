@@ -22,6 +22,9 @@ QtObject {
 	property var tagIds: []
 	property string mode: "any"
 
+	//! Picked tags as select items ({ id, title, color }), for showing them; may be partial.
+	property var tags: []
+
 	readonly property bool isActive: tagFilterRoot.mode === "none" || tagFilterRoot.tagIds.length > 0
 
 	function setFilter(tagIds, mode, beQuiet){
@@ -31,8 +34,34 @@ QtObject {
 		tagFilterRoot.apply(beQuiet)
 	}
 
+	function setMode(mode, beQuiet){
+		tagFilterRoot.setFilter(mode === "none" ? [] : tagFilterRoot.tagIds, mode, beQuiet)
+	}
+
+	//! Names of the picked tags, or an empty list when some of them are unknown.
+	function getTagNames(){
+		var names = []
+		for (var i = 0; i < tagFilterRoot.tagIds.length; i++){
+			var name = ""
+			for (var j = 0; j < tagFilterRoot.tags.length; j++){
+				if (String(tagFilterRoot.tags[j].id) === String(tagFilterRoot.tagIds[i])){
+					name = String(tagFilterRoot.tags[j].title)
+				}
+			}
+
+			if (name === ""){
+				return []
+			}
+
+			names.push(name)
+		}
+
+		return names
+	}
+
 	function clear(beQuiet){
 		tagFilterRoot.tagIds = []
+		tagFilterRoot.tags = []
 		tagFilterRoot.mode = "any"
 
 		tagFilterRoot.apply(beQuiet)

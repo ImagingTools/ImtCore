@@ -8,11 +8,10 @@ import imttagTagsSdl 1.0
 /*!
 	\qmltype EntityTagsEditor
 	\inqmlmodule imttaggui
-	\brief Changes the tags of entities: add, remove, replace or clear.
+	\brief Adds tags to entities or removes them.
 
-	The add/remove/clear calls take several entity IDs, so a collection view can
-	apply them to its whole selection. \c changed() is emitted after the server
-	accepted the change.
+	Both calls take several entity IDs, so a collection view can apply them to its
+	whole selection. \c changed() is emitted after the server accepted the change.
 */
 Item {
 	id: entityTagsEditorRoot
@@ -38,36 +37,12 @@ Item {
 		removeRequest.send(removeInput)
 	}
 
-	function clearTags(entityType, entityIds){
-		clearInput.m_entityType = entityType
-		clearInput.m_entityIds = entityIds
-		clearInput.m_tagIds = []
-
-		clearRequest.send(clearInput)
-	}
-
-	function setTags(entityType, entityId, tagIds){
-		setInput.m_entityType = entityType
-		setInput.m_entityId = entityId
-		setInput.m_tagIds = tagIds
-
-		setRequest.send(setInput)
-	}
-
 	EntityTagsChangeInput {
 		id: addInput
 	}
 
 	EntityTagsChangeInput {
 		id: removeInput
-	}
-
-	EntityTagsChangeInput {
-		id: clearInput
-	}
-
-	EntityTagsSetInput {
-		id: setInput
 	}
 
 	Component {
@@ -97,30 +72,6 @@ Item {
 		context: entityTagsEditorRoot.context
 		requestType: 1
 		gqlCommandId: ImttagTagsSdlCommandIds.s_entityTagRemove
-		sdlObjectComp: changedPayloadComp
-
-		function onError(message, type){
-			entityTagsEditorRoot.failed(message)
-		}
-	}
-
-	GqlSdlRequestSender {
-		id: clearRequest
-		context: entityTagsEditorRoot.context
-		requestType: 1
-		gqlCommandId: ImttagTagsSdlCommandIds.s_entityTagsClear
-		sdlObjectComp: changedPayloadComp
-
-		function onError(message, type){
-			entityTagsEditorRoot.failed(message)
-		}
-	}
-
-	GqlSdlRequestSender {
-		id: setRequest
-		context: entityTagsEditorRoot.context
-		requestType: 1
-		gqlCommandId: ImttagTagsSdlCommandIds.s_entityTagsSet
 		sdlObjectComp: changedPayloadComp
 
 		function onError(message, type){

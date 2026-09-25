@@ -8,7 +8,7 @@
 
 - `imttag` / `imttagdb` — модель, каталог (документная коллекция), таблица `TagAssignments`, менеджер назначений, засев системных тегов;
 - `imtdb` — поле `Tags` в фильтре коллекций (`CTagFilterSqlBuilder`, атрибут делегата `TaggableEntityType`), тест `imtdbTest` на SQLite;
-- `Sdl/imttag` + `imttaggql` — GraphQL-API каталога и назначений, подписка `OnEntityTagsChanged`, права;
+- `Sdl/imttag` + `imttaggql` — GraphQL-API каталога и назначений, права;
 - `Qml/imttaggui` — чипы, страница каталога, редактор тега, поле тегов сущности, фильтр (§12);
 - `Partitura/ImtTagVoce.arp` — всё серверное в одном компоненте `TagController` (§13).
 
@@ -80,14 +80,14 @@ Tag — документ каталога (имя, цвет, описание, `
 | Метка | Label | `imttag::ITag` (бывший `imtdesk::ILabel`) + `IsSystem` |
 | Объект с метками | Issue / PR / Discussion | Любой объект коллекции с включёнными тегами: `(EntityType, EntityId)` |
 | Связь | issue ↔ labels | Таблица `TagAssignments` |
-| Add / Set / Remove / Clear | POST / PUT / DELETE / DELETE all | `EntityTagsAdd` / `EntityTagsSet` / `EntityTagRemove` / `EntityTagsClear` |
+| Add / Remove | POST / DELETE | `EntityTagsAdd` / `EntityTagRemove` (оба — для нескольких сущностей сразу) |
 | `label:a label:b` | И | `ArrayFieldFilter{fieldId:"Tags", ArrayHasAll}` |
 | `label:a,b` | ИЛИ | `ArrayHasAny` |
 | `-label:a` | НЕ | `ArrayHasAny` + `Not` |
 | `no:label` | нет меток | `ArrayIsEmpty` |
 | Timeline labeled / unlabeled | Issue events | `TagEvents` → строки `kind=TagEvent` в `GetRevisionInfoList` |
-| Webhook `label.*` | label event | Подписка на коллекцию Tags (`CObjectCollectionChangeNotifierComp`) |
-| Webhook `issues.labeled` | issues event | Подписка `OnEntityTagsChanged` |
+| Webhook `label.*` | label event | Нет (подписки убраны в этапе 1: ими никто не пользовался) |
+| Webhook `issues.labeled` | issues event | Нет; изменение видно как `CF_ASSIGNMENTS_CHANGED` у `ITagAssignmentManager` |
 | Triage / Write | Роли репозитория | Разрешения `AssignTags` / `ManageTags` у организационных ролей |
 | Org owner | Управляет набором по умолчанию | SU управляет системными тегами |
 
@@ -269,8 +269,7 @@ erDiagram
 | `imtservergql` | `CDocumentRevisionControllerComp` | **расширен** `I_MULTIREF(IDocumentHistoryEventProvider)` | Слияние ревизий и событий по времени до пейджинга и фильтра |
 | `Sdl/imtbase/1.0/DocumentRevision.sdl` | `RevisionItem.kind: String` | **расширен** (аддитивно) | `Revision` (по умолчанию) или `TagEvent`; `revision` у события — ревизия сущности на момент события |
 | `imttaggql` | `CTagCollectionControllerComp` | на базе `CSdlCollectionControllerCompBase` | CRUD каталога, уникальность, правила «системный → только SU» |
-| `imttaggql` | `CTagAssignmentControllerComp` | на базе `CPermissibleGqlRequestHandlerComp` | add / set / remove / clear / get / usage; проверки типа, тенанта и чтения сущности |
-| `imttaggql` | `CEntityTagsChangeNotifierComp` | на базе `CGqlPublisherCompBase` | `OnEntityTagsChanged` |
+| `imttaggql` | `CTagAssignmentControllerComp` | на базе `CPermissibleGqlRequestHandlerComp` | get / add / remove; проверки типа, тенанта и чтения сущности |
 | `imttaggql` | `CTagChangeGeneratorComp` | на базе `CDocumentChangeGeneratorCompBase` | История правок тега |
 
 ```mermaid
@@ -284,7 +283,6 @@ flowchart LR
   subgraph GQL[imttaggql / imtservergql]
     TCC[CTagCollectionControllerComp]
     TAC[CTagAssignmentControllerComp]
-    ETN[CEntityTagsChangeNotifierComp]
     DRC[CDocumentRevisionControllerComp]
   end
   subgraph Core[imttag / imtbase]
@@ -306,7 +304,6 @@ flowchart LR
   Picker --> TAC --> TAM --> TA
   TAM --> TEL --> TE
   TAC --> REG
-  TAC --> ETN
   Hist --> DRC --> THP --> TE
   CF -->|ArrayFieldFilter Tags| ED -->|EXISTS| TA
 ```
@@ -324,7 +321,6 @@ sequenceDiagram
   participant R as Реестр + коллекция сущности
   participant M as CTagAssignmentManagerComp
   participant DB as TagAssignments / TagEvents
-  participant N as CEntityTagsChangeNotifierComp
   UI->>C: EntityTagsAdd(entityType, entityIds, tagIds)
   C->>C: CommandPermissions: AssignTags
   C->>R: тип зарегистрирован? сущности существуют и читаемы?
@@ -334,7 +330,6 @@ sequenceDiagram
   M->>R: MIT_REVISION сущностей
   M->>DB: INSERT TagEvents(Tagged, снимок name/color, revision) только для новых; COMMIT
   M-->>C: фактически добавленные
-  C->>N: OnEntityTagsChanged(entityType, ids, added)
   C-->>UI: AddedNotificationPayload
 ```
 
@@ -342,31 +337,23 @@ sequenceDiagram
 
 ## 8. API (SDL / GQL), один к одному с GitHub REST
 
-Файл `Sdl/imttag/1.0/Tags.sdl`, импортирует `ImtCollection.sdl`.
+Файл `Sdl/imttag/1.0/Tags.sdl`, импортирует `ImtCollection.sdl`. В SDL только то, чем пользуется клиент; `TagsList`, `TagItem`, `TagsUsage`, `EntityTagsSet`, `EntityTagsClear` и подписки убраны на этапе 1.
 
 **Типы:**
 - `TagData {id, name, color, description, isSystem}`;
-- `TagItemData` = `TagData` + `usageCount`;
-- `EntityTags {entityType, entityId, tags: [TagData]}`;
-- `EntityTagsChanged {entityType, entityIds, addedTagIds, removedTagIds}`.
+- `EntityTags {entityId, tags: [TagData]}`;
+- `EntityTagsChangedPayload {entityType, changes: [{entityId, addedTagIds, removedTagIds}]}`.
 
 | GitHub | ImtCore GQL | Права |
 |---|---|---|
-| `GET /labels` | `TagsList(viewParams)` — системные + тенант | `ViewTags` |
-| `GET /labels/{name}` | `TagItem(id)` | `ViewTags` |
+| `GET /labels` | `GetSelectableItems(collectionId: "Tags", viewParams)` (`FilterableSelect.sdl`) — системные + тенант, текстовый поиск, пейджинг; у элемента `color`, в `params` — `IsSystem` и `UsageCount` | `ViewTags` |
 | `POST /labels` | `TagAdd(TagData)`; `isSystem=true` → только SU | `ManageTags` / SU |
 | `PATCH /labels/{name}` | `TagUpdate(TagData)`; для системного тега — только SU | `ManageTags` / SU |
 | `DELETE /labels/{name}` | `RemoveElements` (`ImtCollection.sdl`), мягко; `RestoreObjects` — восстановление | `ManageTags` / SU |
 | `GET /issues/{n}/labels` | `EntityTagsGet(entityType, entityIds[])` | `ViewTags` + чтение сущности |
 | `POST /issues/{n}/labels` | `EntityTagsAdd(entityType, entityIds[], tagIds[])` | `AssignTags` |
-| `PUT /issues/{n}/labels` | `EntityTagsSet(entityType, entityId, tagIds[])` | `AssignTags` |
-| `DELETE /issues/{n}/labels/{name}` | `EntityTagRemove(entityType, entityIds[], tagId)` | `AssignTags` |
-| `DELETE /issues/{n}/labels` | `EntityTagsClear(entityType, entityIds[])` | `AssignTags` |
-| Timeline | `GetRevisionInfoList` (существующий) со строками `kind=TagEvent` | как у истории документа |
-| Webhook `label.*` | подписка на коллекцию Tags | `ViewTags` |
-| Webhook `issues.labeled` | `OnEntityTagsChanged(entityType)` | `ViewTags` |
+| `DELETE /issues/{n}/labels/{name}` | `EntityTagRemove(entityType, entityIds[], tagIds[])` | `AssignTags` |
 | `search: label:` | `ArrayFieldFilter{fieldId:"Tags"}` в `viewParams` любой коллекции с включёнными тегами | — |
-| — | `TagsUsage(tagIds[])` | `ViewTags` |
 
 Системные теги назначаются с обычным правом `AssignTags`: они и есть «теги по умолчанию».
 
@@ -403,7 +390,7 @@ sequenceDiagram
 
 ## 10. События и история документа (D5, отложено)
 
-В этапе 1 не реализовано. Изменения назначений доступны только как уведомление `CF_ASSIGNMENTS_CHANGED` / подписка `OnEntityTagsChanged`.
+В этапе 1 не реализовано. Изменения назначений доступны только как уведомление `CF_ASSIGNMENTS_CHANGED` у `ITagAssignmentManager`.
 
 - **Запись.** `CTagAssignmentManagerComp` пишет `TagEvents` в той же транзакции, что и назначения. Событие создаётся только при фактическом изменении: повторный `Add` ничего не пишет, а `Set` порождает разницу из `Tagged` и `Untagged`. `EntityRevision` берётся из `ICollectionInfo::MIT_REVISION` сущности, `Actor` — из `IOperationContext`.
 - **Связь с историей документа.**
@@ -412,7 +399,7 @@ sequenceDiagram
   - Строка события: `kind=TagEvent`, `revision` = `EntityRevision`, `user` = `ActorName`, `description` = локализованное «Добавлен тег "bug"» или «Снят тег "bug"» по снимку имени, `isActive=false`.
 - **Совместимость.** `kind` — новое необязательное поле; без подключённого провайдера ответ не меняется. QML истории (`Qml/imtdocgui/DocumentRevisionsDataProvider.qml` и её представление) скрывает «Restore / Export / Delete» у строк `kind != Revision`.
 - **Правки каталога** — обычная история документа тега через `CTagChangeGeneratorComp`.
-- **Уведомления**: каталог — `CObjectCollectionChangeNotifierComp`; назначения — `OnEntityTagsChanged` после коммита.
+- **Уведомления** (когда понадобятся клиенту): каталог — `CObjectCollectionChangeNotifierComp`; назначения — публикатор поверх `CF_ASSIGNMENTS_CHANGED`.
 
 ---
 
@@ -446,14 +433,14 @@ TagManagement
 | `TagChip`, `TagChipRow` | Тег как цветная «пилюля»: фон `"#" + color`, чёрный или белый текст по яркости фона, у системного тега — точка. `TagChipRow` переносит чипы по ширине |
 | `TagSelectDataProvider` | Единый источник списков тегов; `isSystemTag()`, `getUsageCount()`, `getColor()` читают элемент |
 | `TagSelectPopup` | `FilterableSelectPopup` с чекбоксами, где строка показывает цвет, имя и описание тега |
-| `TagCatalogPanel` | Страница «Теги»: встроенный (`embedded`) список на `TagSelectDataProvider` с поиском и подгрузкой; чип, описание, «System», число объектов, кнопки «New tag», «Edit», «Delete» |
+| `TagCatalogPanel` | Страница «Теги» в стиле панелей Support и History: `SimpleCollectionTable` + `SimpleCollectionItemDelegateBase` на `TagSelectDataProvider` (поиск, подгрузка); колонки «Tag», «Description», «Type», «Objects», меню строки Edit/Delete (панель — `actionHandler` строк), кнопки «Reload» и «New tag» (Alt+N) |
 | `TagEditorDialog` | Создание и правка тега: имя, описание, цвет, превью. Флажок «System tag» показывается только SU и только при создании |
-| `TagColorPalette` | 20 цветов палитры, hex-поле с проверкой, кнопка «Random» |
-| `EntityTagsCommand` | Обработчик команды `AssignTags` в коллекции (работает с выделением) и в редакторе (с сохранённым документом); включает и выключает команду |
-| `EntityTagsDialog` | Диалог выбора тегов одной или нескольких сущностей; отмечены общие теги, по «Apply» отправляется только разница (`EntityTagsAdd` / `EntityTagRemove`) |
+| `TagColorPalette` | 20 цветов палитры (стрелки влево/вправо), hex-поле с проверкой, кнопка «Random» |
+| `EntityTagsCommand` | Обработчик команды `AssignTags` в коллекции (работает с выделением) и в редакторе (с сохранённым документом); включает и выключает команду; Alt+T открывает диалог |
+| `EntityTagsDialog` | Диалог выбора тегов одной или нескольких сущностей; отмечены общие теги, по «Apply» (Ctrl+Enter) отправляется только разница (`EntityTagsAdd` / `EntityTagRemove`) |
 | `EntityTagsProvider` | Пакетная загрузка тегов для Id видимой страницы коллекции — один запрос на страницу |
-| `EntityTagsEditor` | Добавить, снять, заменить или очистить теги у одной или нескольких сущностей (массовые действия над выделением) |
-| `TagFilter`, `TagFilterDelegate` | Фильтр-чип панели фильтров коллекции: «любой», «все», «исключить», «без тегов» |
+| `EntityTagsEditor` | Добавить или снять теги у одной или нескольких сущностей |
+| `TagFilter`, `TagFilterDelegate` | Фильтр-чип панели фильтров коллекции: `SegmentedButton` «Any / All / Exclude» (Alt+1..3) и флажок «Without tags» (Alt+0); на чипе — имена выбранных тегов («bug, question», «bug + question», «not bug»), в списке — группа «Selected» |
 | `CollectionFilter.createArrayFieldFilter()` | Общий построитель `ArrayFieldFilter` в `imtcolgui` |
 
 ### 12.1 Сценарии
@@ -502,6 +489,8 @@ Component {
 
 Чип открывает поиск по тегам с переключателем режима и кладёт в фильтр `ArrayFieldFilter{fieldId: "Tags"}`. Сервер переводит его в `EXISTS` по `TagAssignments` (§9).
 
+**Клавиатура.** В `TagEditorDialog` фокус сразу в имени; Tab / Shift+Tab: имя → описание → палитра → hex → «Random» → флажок «System»; Enter в текстовом поле сохраняет, Esc отменяет. В списках тегов (`TagSelectPopup`, диалог, фильтр) работает навигация `FilterableSelectPopup`: стрелки, Space / Enter — отметить, Tab — между поиском и списком. Строки страницы «Теги», как и у Support / History, открываются мышью: у `SimpleCollectionTable` нет своей клавиатурной навигации.
+
 **Инициализация ресурсов** в приложении: `ImtCoreInitTagQmlResources()` (клиент) и `ImtCoreInitTagSqlResources()` (сервер) из `imtcore/CImtCoreTagInitializer.h`. Для web-клиента каталоги модуля уже добавлены в `getImtCoreQmlWebDirs`.
 
 ---
@@ -510,10 +499,10 @@ Component {
 
 ### 13.1 Сервер — один компонент
 
-`Partitura/ImtTagVoce.arp/TagController.acc` (PostgreSQL) или `SQLiteTagController.acc` содержит всё: каталог и таблицу назначений, менеджер, засев системных тегов, GQL-контроллеры каталога, назначений и пикера, уведомления, провайдер прав и соответствие «команда → право». Продукт делает пять вещей:
+`Partitura/ImtTagVoce.arp/TagController.acc` (PostgreSQL) или `SQLiteTagController.acc` содержит всё: каталог и таблицу назначений, менеджер, засев системных тегов, GQL-контроллеры каталога, назначений и пикера, провайдер прав и соответствие «команда → право». Продукт делает пять вещей:
 
-1. Добавляет элемент `ImtTagVoce / TagController` и задаёт экспортированные атрибуты: `DatabaseEngine`, `RequestManager`, `TaggableEntityTypes`; при желании `PermissionChecker`, `OperationContextController`, `UserActionManager`, `TranslationManager`, `VersionInfo`, `Log`, а также список системных тегов по умолчанию (`SystemTagIds`, `SystemTagNames`, `SystemTagColors`, `SystemTagDescriptions`).
-2. Подключает экспортированные интерфейсы в свой сервер: `imtgql::IGqlRequestHandler` — в список обработчиков GQL, `imtgql::IGqlSubscriberController` — в подписки, `imtlic::IFeatureInfoProvider` (`TagPermissionsProvider`) — в провайдеры прав продукта.
+1. Добавляет элемент `ImtTagVoce / TagController` и задаёт экспортированные атрибуты: `DatabaseEngine`, `TaggableEntityTypes`; при желании `PermissionChecker`, `OperationContextController`, `UserActionManager`, `TranslationManager`, `VersionInfo`, `Log`, а также список системных тегов по умолчанию (`SystemTagIds`, `SystemTagNames`, `SystemTagColors`, `SystemTagDescriptions`).
+2. Подключает экспортированные интерфейсы в свой сервер: `imtgql::IGqlRequestHandler` — в список обработчиков GQL, `imtlic::IFeatureInfoProvider` (`TagPermissionsProvider`) — в провайдеры прав продукта.
 3. На каждый тип сущности с тегами — элемент `ImtTagPck / TaggableEntityType` (`EntityTypeId` = Id коллекции, `EntityTypeName`, `ObjectCollection`), который вносится в `TaggableEntityTypes`.
 4. У SQL-делегата этой коллекции задаёт атрибут `TaggableEntityType` (тот же Id) — это включает фильтр по полю `Tags`.
 5. Чтобы теги назначались командой, вносит элемент `ImtTagVoce / AssignTagsCommand` в списки команд коллекции и редактора (`CommandsController`), а на клиенте ставит `EntityTagsCommand` (§12.1).

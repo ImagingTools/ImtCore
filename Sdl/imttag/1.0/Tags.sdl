@@ -1,7 +1,6 @@
 schema {
 	query: Query
 	mutation: Mutation
-	subscription: Subscription
 	namespace: imttag
 	version: 1.0
 }
@@ -11,18 +10,7 @@ import {
 }
 
 # --- Tag catalog ---
-
-type TagItemData {
-	id: ID!
-	typeId: ID!
-	name: String!
-	color: String
-	description: String
-	isSystem: Boolean
-	usageCount: Integer
-	added: String
-	lastModified: String
-}
+# Listing goes through GetSelectableItems (collection "Tags"), deleting through RemoveElements.
 
 type TagData {
 	id: ID
@@ -30,19 +18,6 @@ type TagData {
 	color: String
 	description: String
 	isSystem: Boolean
-}
-
-input TagsListInput {
-	viewParams: CollectionViewParams
-}
-
-type TagsListPayload {
-	items: [TagItemData]
-	notification: NotificationItem
-}
-
-input TagItemInput {
-	id: ID!
 }
 
 input TagDataInput {
@@ -76,12 +51,6 @@ input EntityTagsChangeInput {
 	tagIds: [ID]
 }
 
-input EntityTagsSetInput {
-	entityType: String!
-	entityId: ID!
-	tagIds: [ID]
-}
-
 type EntityTagChange {
 	entityId: ID!
 	addedTagIds: [ID]
@@ -93,53 +62,21 @@ type EntityTagsChangedPayload {
 	changes: [EntityTagChange]
 }
 
-input TagsUsageInput {
-	tagIds: [ID]!
-}
-
-type TagUsage {
-	tagId: ID!
-	count: Integer
-}
-
-type TagsUsagePayload {
-	items: [TagUsage]
-}
-
-input EntityTypeInput {
-	entityType: String!
-}
-
 type Query {
-	TagsList (input: TagsListInput): TagsListPayload!
-	TagItem (input: TagItemInput): TagData!
 	EntityTagsGet (input: EntityTagsInput): EntityTagsPayload!
-	TagsUsage (input: TagsUsageInput): TagsUsagePayload!
 }
 
 type Mutation {
 	TagAdd (input: TagDataInput): AddedNotificationPayload!
 	TagUpdate (input: TagDataInput): UpdatedNotificationPayload!
 	EntityTagsAdd (input: EntityTagsChangeInput): EntityTagsChangedPayload!
-	EntityTagsSet (input: EntityTagsSetInput): EntityTagsChangedPayload!
 	EntityTagRemove (input: EntityTagsChangeInput): EntityTagsChangedPayload!
-	EntityTagsClear (input: EntityTagsChangeInput): EntityTagsChangedPayload!
-}
-
-type Subscription {
-	OnEntityTagsChanged (input: EntityTypeInput): EntityTagsChangedPayload!
 }
 
 collectionSchema {
 	type Tag {
-		ref: TagItemData
-		operations {
-			list: TagsList
-		}
 		subtype Tag {
-			ref: TagData
 			operations {
-				get: TagItem
 				update: TagUpdate
 				insert: TagAdd
 			}

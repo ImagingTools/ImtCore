@@ -13,7 +13,6 @@
 // ImtCore includes
 #include <imtauth/CTenantFilterParam.h>
 #include <imtbase/COperationContext.h>
-#include <imtbase/IObjectCollectionIterator.h>
 #include <imtcol/CDocumentCollectionFilter.h>
 #include <imtcol/CDocumentIdFilter.h>
 #include <imttag/CTagNameLookup.h>
@@ -309,30 +308,6 @@ QJsonObject CTagCollectionControllerComp::UpdateObject(const imtgql::CGqlRequest
 }
 
 
-QJsonObject CTagCollectionControllerComp::GetObjectListFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	if (m_systemTagSeederCompPtr.IsValid()){
-		m_systemTagSeederCompPtr->EnsureSystemTags();
-	}
-
-	return BaseClass::GetObjectListFromRequest(gqlRequest, errorMessage);
-}
-
-
-QJsonObject CTagCollectionControllerComp::GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
-	const QByteArray tagId = (inputParamPtr != nullptr) ? inputParamPtr->GetParamArgumentValue("id").toByteArray() : QByteArray();
-	if (!IsTagVisible(tagId, gqlRequest)){
-		errorMessage = QStringLiteral("Tag '%1' does not exist").arg(QString::fromUtf8(tagId));
-
-		return QJsonObject();
-	}
-
-	return BaseClass::GetObjectFromRequest(gqlRequest, errorMessage);
-}
-
-
 bool CTagCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList& elementIds, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	for (const QByteArray& tagId : elementIds){
@@ -433,93 +408,6 @@ sdl::V1_0::imtbase::CRestoreObjectSetPayload CTagCollectionControllerComp::OnRes
 
 
 // reimplemented (sdl::V1_0::imttag::CTagCollectionControllerCompBase)
-
-bool CTagCollectionControllerComp::CreateRepresentationFromObject(
-			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::V1_0::imttag::CTagsListGqlRequest& tagsListRequest,
-			sdl::V1_0::imttag::CTagItemData& representationObject,
-			QString& errorMessage) const
-{
-	const QByteArray tagId = objectCollectionIterator.GetObjectId();
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	const imttag::ITag* tagPtr = nullptr;
-	if (objectCollectionIterator.GetObjectData(dataPtr)){
-		tagPtr = dynamic_cast<const imttag::ITag*>(dataPtr.GetPtr());
-	}
-
-	if (tagPtr == nullptr){
-		errorMessage = QStringLiteral("Unable to create representation of tag '%1'").arg(QString::fromUtf8(tagId));
-
-		return false;
-	}
-
-	const sdl::V1_0::imttag::TagsListRequestInfo requestInfo = tagsListRequest.GetRequestInfo();
-
-	if (requestInfo.items.isIdRequested){
-		representationObject.id = tagId;
-	}
-
-	if (requestInfo.items.isTypeIdRequested){
-		representationObject.typeId = objectCollectionIterator.GetObjectTypeId();
-	}
-
-	if (requestInfo.items.isNameRequested){
-		representationObject.name = tagPtr->GetName();
-	}
-
-	if (requestInfo.items.isColorRequested){
-		representationObject.color = tagPtr->GetColor();
-	}
-
-	if (requestInfo.items.isDescriptionRequested){
-		representationObject.description = tagPtr->GetDescription();
-	}
-
-	if (requestInfo.items.isIsSystemRequested){
-		representationObject.isSystem = tagPtr->IsSystem();
-	}
-
-	if (requestInfo.items.isUsageCountRequested && m_assignmentManagerCompPtr.IsValid()){
-		representationObject.usageCount = m_assignmentManagerCompPtr->GetUsageCounts(QByteArrayList() << tagId).value(tagId);
-	}
-
-	if (requestInfo.items.isAddedRequested){
-		const QDateTime added = objectCollectionIterator.GetElementInfo("Added").toDateTime().toUTC();
-		representationObject.added = added.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-	}
-
-	if (requestInfo.items.isLastModifiedRequested){
-		const QDateTime lastModified = objectCollectionIterator.GetElementInfo("LastModified").toDateTime().toUTC();
-		representationObject.lastModified = lastModified.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-	}
-
-	return true;
-}
-
-
-bool CTagCollectionControllerComp::CreateRepresentationFromObject(
-			const istd::IChangeable& data,
-			const sdl::V1_0::imttag::CTagItemGqlRequest& /*tagItemRequest*/,
-			sdl::V1_0::imttag::CTagData& representationPayload,
-			QString& errorMessage) const
-{
-	const imttag::ITag* tagPtr = dynamic_cast<const imttag::ITag*>(&data);
-	if (tagPtr == nullptr){
-		errorMessage = QStringLiteral("Unable to create tag representation. Error: Object is invalid");
-
-		return false;
-	}
-
-	representationPayload.id = tagPtr->GetId();
-	representationPayload.name = tagPtr->GetName();
-	representationPayload.color = tagPtr->GetColor();
-	representationPayload.description = tagPtr->GetDescription();
-	representationPayload.isSystem = tagPtr->IsSystem();
-
-	return true;
-}
-
 
 istd::IChangeableUniquePtr CTagCollectionControllerComp::CreateObjectFromRepresentation(
 			const sdl::V1_0::imttag::CTagData& tagDataRepresentation,

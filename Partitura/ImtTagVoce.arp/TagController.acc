@@ -7,7 +7,7 @@
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description>Tags: catalog, assignments, GraphQL API and permissions in one component. Set DatabaseEngine, RequestManager and the TaggableEntityTypes of the product.</Description>
+    <Description>Tags: catalog, assignments, GraphQL API and permissions in one component. Set DatabaseEngine and the TaggableEntityTypes of the product.</Description>
     <Keywords>Tags</Keywords>
     <ElementsList>
         <Element Id="AssignmentTypes" PackageId="BasePck" ComponentId="SelectionConstraints">
@@ -48,78 +48,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="EntityTagsChangeNotifier" PackageId="ImtTagGqlPck" ComponentId="EntityTagsChangeNotifier">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="AssignmentManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TagAssignmentManager"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>OnEntityTagsChanged</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TagsListPermissions" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="TagsList"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ViewTags</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TagItemPermissions" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="TagItem"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ViewTags</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="EntityTagsGetPermissions" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="EntityTagsGet"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ViewTags</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TagsUsagePermissions" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="TagsUsage"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
@@ -227,22 +160,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="EntityTagsSetPermissions" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="EntityTagsSet"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>AssignTags</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="EntityTagRemovePermissions" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -259,42 +176,9 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="EntityTagsClearPermissions" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="EntityTagsClear"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>AssignTags</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="PermissionChecker" PackageId="ImtAuthPck" ComponentId="CheckPermissionOr">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="SlaveSubscriberController" PackageId="ImtServerGqlPck" ComponentId="SlaveSubscriberController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SubscriberController" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>EntityTagsChangeNotifier</Value>
-                                <Value>TagsChangeNotifier</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -472,9 +356,6 @@
         <Element Id="TagCollectionController" PackageId="ImtTagGqlPck" ComponentId="TagCollectionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="AssignmentManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TagAssignmentManager"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="CollectionObjectFactory" Type="Factory[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -507,9 +388,6 @@
                     <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PermissionChecker"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SystemTagSeeder" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SystemTagSeeder"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="TagFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="Tag"/>
                     </AttributeInfo>
@@ -534,19 +412,14 @@
                     <AttributeInfo Id="CommandPermissionsProvider" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>TagsListPermissions</Value>
-                                <Value>TagItemPermissions</Value>
                                 <Value>EntityTagsGetPermissions</Value>
-                                <Value>TagsUsagePermissions</Value>
                                 <Value>GetSelectableItemsPermissions</Value>
                                 <Value>TagAddPermissions</Value>
                                 <Value>TagUpdatePermissions</Value>
                                 <Value>RemoveElementsPermissions</Value>
                                 <Value>RestoreObjectsPermissions</Value>
                                 <Value>EntityTagsAddPermissions</Value>
-                                <Value>EntityTagsSetPermissions</Value>
                                 <Value>EntityTagRemovePermissions</Value>
-                                <Value>EntityTagsClearPermissions</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -664,31 +537,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TagsChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Tags"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>OnTagsCollectionChanged</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TagRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="XPathExtractor" PackageId="ImtDatabasePck" ComponentId="PostgresXPathExtractor">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -699,7 +547,6 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
-        <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="SlaveSubscriberController"/>
         <Interface InterfaceId="imtlic::IFeatureInfoProvider" ComponentId="TagPermissionsProvider"/>
         <Interface InterfaceId="imttag::ITagAssignmentManager" ComponentId="TagAssignmentManager"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>

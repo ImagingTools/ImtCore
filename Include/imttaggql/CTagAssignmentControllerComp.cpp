@@ -88,33 +88,6 @@ sdl::V1_0::imttag::CEntityTagsPayload CTagAssignmentControllerComp::OnEntityTags
 }
 
 
-sdl::V1_0::imttag::CTagsUsagePayload CTagAssignmentControllerComp::OnTagsUsage(
-			const sdl::V1_0::imttag::CTagsUsageGqlRequest& tagsUsageRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
-{
-	sdl::V1_0::imttag::CTagsUsagePayload response;
-
-	const sdl::V1_0::imttag::TagsUsageRequestArguments arguments = tagsUsageRequest.GetRequestedArguments();
-	const QByteArrayList tagIds = (arguments.input && arguments.input->tagIds) ? arguments.input->tagIds->ToList() : QByteArrayList();
-
-	const QMap<QByteArray, int> usageCounts = m_assignmentManagerCompPtr->GetUsageCounts(tagIds);
-
-	QList<sdl::V1_0::imttag::CTagUsage> items;
-	for (auto usageIter = usageCounts.cbegin(); usageIter != usageCounts.cend(); ++usageIter){
-		sdl::V1_0::imttag::CTagUsage usage;
-		usage.tagId = usageIter.key();
-		usage.count = usageIter.value();
-
-		items << usage;
-	}
-
-	response.items.Emplace().FromList(items);
-
-	return response;
-}
-
-
 sdl::V1_0::imttag::CEntityTagsChangedPayload CTagAssignmentControllerComp::OnEntityTagsAdd(
 			const sdl::V1_0::imttag::CEntityTagsAddGqlRequest& entityTagsAddRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
@@ -131,33 +104,6 @@ sdl::V1_0::imttag::CEntityTagsChangedPayload CTagAssignmentControllerComp::OnEnt
 }
 
 
-sdl::V1_0::imttag::CEntityTagsChangedPayload CTagAssignmentControllerComp::OnEntityTagsSet(
-			const sdl::V1_0::imttag::CEntityTagsSetGqlRequest& entityTagsSetRequest,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	const sdl::V1_0::imttag::EntityTagsSetRequestArguments arguments = entityTagsSetRequest.GetRequestedArguments();
-	if (!arguments.input || !arguments.input->entityType || !arguments.input->entityId){
-		errorMessage = QStringLiteral("Entity is missing");
-
-		return sdl::V1_0::imttag::CEntityTagsChangedPayload();
-	}
-
-	const QString entityType = *arguments.input->entityType;
-	const QByteArrayList tagIds = arguments.input->tagIds ? arguments.input->tagIds->ToList() : QByteArrayList();
-
-	imtbase::COperationContext operationContext;
-	InitOperationContext(gqlRequest, QStringLiteral("SetTags"), operationContext);
-
-	imttag::ITagAssignmentManager::EntityTagChanges changes;
-	if (!m_assignmentManagerCompPtr->SetTags(entityType.toUtf8(), *arguments.input->entityId, tagIds, &operationContext, &changes, &errorMessage)){
-		return sdl::V1_0::imttag::CEntityTagsChangedPayload();
-	}
-
-	return CreateChangedPayload(entityType, changes);
-}
-
-
 sdl::V1_0::imttag::CEntityTagsChangedPayload CTagAssignmentControllerComp::OnEntityTagRemove(
 			const sdl::V1_0::imttag::CEntityTagRemoveGqlRequest& entityTagRemoveRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
@@ -171,22 +117,6 @@ sdl::V1_0::imttag::CEntityTagsChangedPayload CTagAssignmentControllerComp::OnEnt
 	}
 
 	return ChangeTags(CM_REMOVE, *arguments.input, gqlRequest, errorMessage);
-}
-
-
-sdl::V1_0::imttag::CEntityTagsChangedPayload CTagAssignmentControllerComp::OnEntityTagsClear(
-			const sdl::V1_0::imttag::CEntityTagsClearGqlRequest& entityTagsClearRequest,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	const sdl::V1_0::imttag::EntityTagsClearRequestArguments arguments = entityTagsClearRequest.GetRequestedArguments();
-	if (!arguments.input){
-		errorMessage = QStringLiteral("Input is missing");
-
-		return sdl::V1_0::imttag::CEntityTagsChangedPayload();
-	}
-
-	return ChangeTags(CM_CLEAR, *arguments.input, gqlRequest, errorMessage);
 }
 
 
@@ -220,10 +150,6 @@ sdl::V1_0::imttag::CEntityTagsChangedPayload CTagAssignmentControllerComp::Chang
 
 	case CM_REMOVE:
 		isDone = m_assignmentManagerCompPtr->RemoveTags(entityType.toUtf8(), entityIds, tagIds, &operationContext, &changes, &errorMessage);
-		break;
-
-	case CM_CLEAR:
-		isDone = m_assignmentManagerCompPtr->ClearTags(entityType.toUtf8(), entityIds, &operationContext, &changes, &errorMessage);
 		break;
 	}
 

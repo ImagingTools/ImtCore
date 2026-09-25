@@ -13,7 +13,7 @@ namespace imttaggql
 
 
 /**
-	GraphQL controller of tag assignments: read, add, replace, remove and clear
+	GraphQL controller of tag assignments: read, add and remove
 	the tags of entities of the taggable types registered in the assignment manager.
 */
 class CTagAssignmentControllerComp:
@@ -33,24 +33,12 @@ protected:
 				const sdl::V1_0::imttag::CEntityTagsGetGqlRequest& entityTagsGetRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::V1_0::imttag::CTagsUsagePayload OnTagsUsage(
-				const sdl::V1_0::imttag::CTagsUsageGqlRequest& tagsUsageRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
 	virtual sdl::V1_0::imttag::CEntityTagsChangedPayload OnEntityTagsAdd(
 				const sdl::V1_0::imttag::CEntityTagsAddGqlRequest& entityTagsAddRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::V1_0::imttag::CEntityTagsChangedPayload OnEntityTagsSet(
-				const sdl::V1_0::imttag::CEntityTagsSetGqlRequest& entityTagsSetRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
 	virtual sdl::V1_0::imttag::CEntityTagsChangedPayload OnEntityTagRemove(
 				const sdl::V1_0::imttag::CEntityTagRemoveGqlRequest& entityTagRemoveRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imttag::CEntityTagsChangedPayload OnEntityTagsClear(
-				const sdl::V1_0::imttag::CEntityTagsClearGqlRequest& entityTagsClearRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
@@ -58,8 +46,7 @@ private:
 	enum ChangeMode
 	{
 		CM_ADD,
-		CM_REMOVE,
-		CM_CLEAR
+		CM_REMOVE
 	};
 
 	sdl::V1_0::imttag::CEntityTagsChangedPayload ChangeTags(

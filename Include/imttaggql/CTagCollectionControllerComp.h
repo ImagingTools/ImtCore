@@ -7,9 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/IOperationContext.h>
-#include <imttag/ISystemTagSeeder.h>
 #include <imttag/ITag.h>
-#include <imttag/ITagAssignmentManager.h>
 #include <GeneratedFiles/imttagsdl/SDL/1.0/CPP/Tags_fwd.h>
 
 
@@ -32,8 +30,6 @@ public:
 
 	I_BEGIN_COMPONENT(CTagCollectionControllerComp);
 		I_ASSIGN(m_tagFactCompPtr, "TagFactory", "Factory of tags", true, "TagFactory");
-		I_ASSIGN(m_assignmentManagerCompPtr, "AssignmentManager", "Tag assignment manager providing the usage counts", false, "TagAssignmentManager");
-		I_ASSIGN(m_systemTagSeederCompPtr, "SystemTagSeeder", "Seeder of the default system tags", false, "SystemTagSeeder");
 	I_END_COMPONENT;
 
 protected:
@@ -52,8 +48,6 @@ protected:
 	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 	virtual QJsonObject InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual QJsonObject UpdateObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual QJsonObject GetObjectListFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual QJsonObject GetObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual bool OnBeforeRemoveElements(const QByteArrayList& elementIds, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual bool OnBeforeSetObjectName(const QByteArray& objectId, QString& newName, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CRestoreObjectsPayload OnRestoreObjects(
@@ -70,16 +64,6 @@ protected:
 				QString& errorMessage) const override;
 
 	// reimplemented (sdl::V1_0::imttag::CTagCollectionControllerCompBase)
-	virtual bool CreateRepresentationFromObject(
-				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::V1_0::imttag::CTagsListGqlRequest& tagsListRequest,
-				sdl::V1_0::imttag::CTagItemData& representationObject,
-				QString& errorMessage) const override;
-	virtual bool CreateRepresentationFromObject(
-				const istd::IChangeable& data,
-				const sdl::V1_0::imttag::CTagItemGqlRequest& tagItemRequest,
-				sdl::V1_0::imttag::CTagData& representationPayload,
-				QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
 				const sdl::V1_0::imttag::CTagData& tagDataRepresentation,
 				QByteArray& newObjectId,
@@ -92,8 +76,6 @@ protected:
 
 private:
 	I_FACT(imttag::ITag, m_tagFactCompPtr);
-	I_REF(imttag::ITagAssignmentManager, m_assignmentManagerCompPtr);
-	I_REF(imttag::ISystemTagSeeder, m_systemTagSeederCompPtr);
 };
 
 

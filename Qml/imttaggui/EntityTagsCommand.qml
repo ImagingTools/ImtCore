@@ -34,6 +34,9 @@ Item {
 	property string commandId: "AssignTags"
 	property string entityType: ""
 
+	//! Opens the dialog like the command button does.
+	property string shortcut: "Alt+T"
+
 	//! Collection view or document view whose command bar holds the command.
 	property Item view: null
 
@@ -65,6 +68,17 @@ Item {
 			entityType: entityTagsCommandRoot.entityType,
 			entityIds: entityTagsCommandRoot.entityIds
 		})
+	}
+
+	Shortcut {
+		sequence: entityTagsCommandRoot.shortcut
+		enabled: entityTagsCommandRoot.view ? entityTagsCommandRoot.view.visible && entityTagsCommandRoot.entityIds.length > 0 : false
+		onActivated: {
+			var commandsController = entityTagsCommandRoot.view.commandsController
+			if (commandsController && commandsController.commandExists(entityTagsCommandRoot.commandId)){
+				entityTagsCommandRoot.openDialog()
+			}
+		}
 	}
 
 	Connections {

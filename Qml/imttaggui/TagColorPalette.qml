@@ -20,7 +20,16 @@ Column {
 
 	readonly property bool isValid: tagColorPaletteRoot.isValidColor(tagColorPaletteRoot.color)
 
+	//! Tab order around the palette: swatches (arrow keys pick), hex field, "Random".
+	property Item previousItem: null
+	property Item nextItem: null
+	readonly property Item firstItem: swatchFlow
+	readonly property Item lastItem: randomButton
+
 	signal colorEdited(string color)
+
+	//! Enter in the hex field.
+	signal accepted()
 
 	spacing: Style.spacingM
 
@@ -48,14 +57,39 @@ Column {
 		tagColorPaletteRoot.colorEdited(normalized)
 	}
 
+	function moveSelection(step){
+		var index = tagColorPaletteRoot.paletteColors.indexOf(tagColorPaletteRoot.color) + step
+		if (index < 0){
+			index = tagColorPaletteRoot.paletteColors.length - 1
+		}
+		else if (index >= tagColorPaletteRoot.paletteColors.length){
+			index = 0
+		}
+
+		tagColorPaletteRoot.setColor(tagColorPaletteRoot.paletteColors[index])
+	}
+
 	function setRandomColor(){
 		var index = Math.floor(Math.random() * tagColorPaletteRoot.paletteColors.length)
 		tagColorPaletteRoot.setColor(tagColorPaletteRoot.paletteColors[index])
 	}
 
 	Flow {
+		id: swatchFlow
+		objectName: "TagColorSwatches"
 		width: parent.width
 		spacing: Style.spacingS
+
+		KeyNavigation.tab: colorField
+		KeyNavigation.backtab: tagColorPaletteRoot.previousItem
+
+		Keys.onLeftPressed: {
+			tagColorPaletteRoot.moveSelection(-1)
+		}
+
+		Keys.onRightPressed: {
+			tagColorPaletteRoot.moveSelection(1)
+		}
 
 		Repeater {
 			model: tagColorPaletteRoot.paletteColors
@@ -66,13 +100,14 @@ Column {
 				radius: Style.radiusS
 				color: "#" + String(modelData)
 				border.width: String(modelData) === tagColorPaletteRoot.color ? 2 : 1
-				border.color: String(modelData) === tagColorPaletteRoot.color ? Style.textColor : Style.borderColor
+				border.color: String(modelData) !== tagColorPaletteRoot.color ? Style.borderColor : (swatchFlow.activeFocus ? Style.textSelectedColor : Style.textColor)
 
 				MouseArea {
 					anchors.fill: parent
 					cursorShape: Qt.PointingHandCursor
 					onClicked: {
 						tagColorPaletteRoot.setColor(String(modelData))
+						swatchFlow.forceActiveFocus()
 					}
 				}
 			}
@@ -94,20 +129,35 @@ Column {
 
 		TextField {
 			id: colorField
+			objectName: "TagColorHexField"
 			anchors.verticalCenter: parent.verticalCenter
 			width: Style.sizeHintXXS
 			placeHolderText: qsTr("Hex color")
 			text: tagColorPaletteRoot.color
 			maximumLength: 7
 
+			KeyNavigation.tab: randomButton
+			KeyNavigation.backtab: swatchFlow
+
 			onEditingFinished: {
 				tagColorPaletteRoot.setColor(colorField.text)
+			}
+
+			onAccepted: {
+				tagColorPaletteRoot.setColor(colorField.text)
+				tagColorPaletteRoot.accepted()
 			}
 		}
 
 		Button {
+			id: randomButton
+			objectName: "TagColorRandomButton"
 			anchors.verticalCenter: parent.verticalCenter
 			text: qsTr("Random")
+
+			KeyNavigation.tab: tagColorPaletteRoot.nextItem
+			KeyNavigation.backtab: colorField
+
 			onClicked: {
 				tagColorPaletteRoot.setRandomColor()
 			}
