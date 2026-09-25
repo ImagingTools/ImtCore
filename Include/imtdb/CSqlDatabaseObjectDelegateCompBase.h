@@ -147,6 +147,8 @@ protected:
 	I_ATTR(QByteArray, m_tagsTableNameAttrPtr);
 
 private:
+	QByteArray GetTagAssignmentsTableName() const;
+	QByteArray GetTagsTableName() const;
 	QString CreateTagTableReference(const QByteArray& tableName) const;
 };
 

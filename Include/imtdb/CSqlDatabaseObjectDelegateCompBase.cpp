@@ -720,8 +720,8 @@ void CSqlDatabaseObjectDelegateCompBase::OnComponentCreated()
 
 	// The tag filter joins both tables, which may not have been touched by the tag collections yet.
 	if (IsTaggable() && m_databaseEngineCompPtr.IsValid()){
-		ExecuteTableScript(QByteArrayLiteral("CreateTagAssignmentsTable.sql"), QString::fromUtf8(*m_tagAssignmentsTableNameAttrPtr));
-		ExecuteTableScript(QByteArrayLiteral("CreateCollectionTable.sql"), QString::fromUtf8(*m_tagsTableNameAttrPtr));
+		ExecuteTableScript(QByteArrayLiteral("CreateTagAssignmentsTable.sql"), QString::fromUtf8(GetTagAssignmentsTableName()));
+		ExecuteTableScript(QByteArrayLiteral("CreateCollectionTable.sql"), QString::fromUtf8(GetTagsTableName()));
 	}
 }
 
@@ -851,8 +851,8 @@ QString CSqlDatabaseObjectDelegateCompBase::CreateComplexFilterQuery(
 	}
 
 	CTagFilterSqlBuilder::Config config;
-	config.assignmentsTable = CreateTagTableReference(*m_tagAssignmentsTableNameAttrPtr);
-	config.tagsTable = CreateTagTableReference(*m_tagsTableNameAttrPtr);
+	config.assignmentsTable = CreateTagTableReference(GetTagAssignmentsTableName());
+	config.tagsTable = CreateTagTableReference(GetTagsTableName());
 	config.entityType = QString::fromUtf8(*m_taggableEntityTypeAttrPtr);
 	config.entityIdExpression = entityIdExpression;
 	config.isSqlite = IsSqliteDriver();
@@ -862,6 +862,19 @@ QString CSqlDatabaseObjectDelegateCompBase::CreateComplexFilterQuery(
 
 
 // private methods
+
+QByteArray CSqlDatabaseObjectDelegateCompBase::GetTagAssignmentsTableName() const
+{
+	// An optional attribute left out of the registry is invalid; its default is not applied.
+	return m_tagAssignmentsTableNameAttrPtr.IsValid() ? *m_tagAssignmentsTableNameAttrPtr : QByteArrayLiteral("TagAssignments");
+}
+
+
+QByteArray CSqlDatabaseObjectDelegateCompBase::GetTagsTableName() const
+{
+	return m_tagsTableNameAttrPtr.IsValid() ? *m_tagsTableNameAttrPtr : QByteArrayLiteral("Tags");
+}
+
 
 QString CSqlDatabaseObjectDelegateCompBase::CreateTagTableReference(const QByteArray& tableName) const
 {
