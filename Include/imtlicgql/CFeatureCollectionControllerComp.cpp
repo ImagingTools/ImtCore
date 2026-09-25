@@ -24,7 +24,8 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 			const sdl::V1_0::imtlic::CFeatureData& featureRepresentationData,
 			const QByteArray& rootFeatureId,
 			imtlic::CFeatureInfo& featureInfo,
-			QString& errorMessage) const
+			QString& errorMessage,
+			bool isRootFeature) const
 {
 
 	if (!featureRepresentationData.featureId || featureRepresentationData.featureId->isEmpty()){
@@ -35,25 +36,30 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 	
 	QByteArray featureId = *featureRepresentationData.featureId;
 	
-	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
-	fieldFilter.fieldId = "FeatureId";
-	fieldFilter.filterValue = featureId;
-	
-	imtbase::IComplexCollectionFilter::FilterExpression groupFilter;
-	groupFilter.fieldFilters << fieldFilter;
-	
-	imtbase::CComplexCollectionFilter complexFilter;
-	complexFilter.SetFilterExpression(groupFilter);
-	
-	iprm::CParamsSet filterParam;
-	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
+	if (isRootFeature){
+		// Only the root feature's ID is stored as a separate collection object, so uniqueness
+		// only needs to (and can only meaningfully) be checked at the root level; sub-features
+		// are allowed to reuse a Feature-ID as long as their parent path differs (checked below).
+		imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
+		fieldFilter.fieldId = "FeatureId";
+		fieldFilter.filterValue = featureId;
+		
+		imtbase::IComplexCollectionFilter::FilterExpression groupFilter;
+		groupFilter.fieldFilters << fieldFilter;
+		
+		imtbase::CComplexCollectionFilter complexFilter;
+		complexFilter.SetFilterExpression(groupFilter);
+		
+		iprm::CParamsSet filterParam;
+		filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
-	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-	if (!collectionIds.isEmpty()){
-		QByteArray id = collectionIds[0];
-		if (rootFeatureId != id){
-			errorMessage = QT_TR_NOOP(QStringLiteral("Feature-ID: '%1' already exists")).arg(featureId);
-			return false;
+		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+		if (!collectionIds.isEmpty()){
+			QByteArray id = collectionIds[0];
+			if (rootFeatureId != id){
+				errorMessage = QT_TR_NOOP(QStringLiteral("Feature-ID: '%1' already exists")).arg(featureId);
+				return false;
+			}
 		}
 	}
 
@@ -73,11 +79,11 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 	}
 	featureInfo.SetFeatureDescription(description);
 
-	QByteArray dependencies;
-	if (featureRepresentationData.dependencies){
-		dependencies = *featureRepresentationData.dependencies;
+	QByteArray requirements;
+	if (featureRepresentationData.requirements){
+		requirements = *featureRepresentationData.requirements;
 	}
-	featureInfo.SetDependencies(dependencies.split(';'));
+	featureInfo.SetRequirements(requirements.split(';'));
 
 	bool isOptional = bool(featureRepresentationData.optional && *featureRepresentationData.optional);
 	featureInfo.SetOptional(isOptional);
@@ -96,8 +102,14 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 
 		imtlic::CFeatureInfo* subFeatureInfoPtr = new imtlic::CFeatureInfo();
 
-		bool ok = CreateFeatureFromRepresentationModel(*subFeatureData, rootFeatureId, *subFeatureInfoPtr, errorMessage);
+		bool ok = CreateFeatureFromRepresentationModel(*subFeatureData, rootFeatureId, *subFeatureInfoPtr, errorMessage, false);
 		if (!ok){
+			return false;
+		}
+
+		const QByteArray subFeatureId = subFeatureInfoPtr->GetFeatureId();
+		if (featureInfo.GetSubFeature(subFeatureId, 1).IsValid()){
+			errorMessage = QT_TR_NOOP(QString("Feature-ID: '%1' already exists among sibling features of '%2'.")).arg(qPrintable(subFeatureId), qPrintable(featureInfo.GetFeatureId()));
 			return false;
 		}
 
@@ -120,9 +132,9 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 	featureRepresentationData.featureName = featureName;
 	featureRepresentationData.name = featureName;
 
-	QByteArrayList dependencyList = featureInfo.GetDependencies();
-	QByteArray dependencies = dependencyList.join(';');
-	featureRepresentationData.dependencies = std::move(dependencies);
+	QByteArrayList requirementList = featureInfo.GetRequirements();
+	QByteArray requirements = requirementList.join(';');
+	featureRepresentationData.requirements = std::move(requirements);
 
 	QString description = featureInfo.GetFeatureDescription();
 	featureRepresentationData.description = std::move(description);
@@ -239,9 +251,9 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.optional = isOptional;
 	}
 
-	if (requestInfo.items.isDependenciesRequested){
-		QByteArray dependencies = featureInfoPtr->GetDependencies().join(';');
-		representationObject.dependencies = dependencies;
+	if (requestInfo.items.isRequirementsRequested){
+		QByteArray requirements = featureInfoPtr->GetRequirements().join(';');
+		representationObject.requirements = requirements;
 	}
 
 	if (requestInfo.items.isSubFeaturesRequested){

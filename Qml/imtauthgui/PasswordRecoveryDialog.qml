@@ -9,7 +9,7 @@ import imtguigql 1.0
 Dialog {
 	id: passwordRecoveryDialog;
 
-	property string context: ""
+	property string permissionPath: ""
 	width: Math.max(Style.sizeHintL, Math.min(ModalDialogManager.activeView.width - 100, Style.sizeHintXXL));
 	height: Math.max(Style.sizeHintM, Math.min(ModalDialogManager.activeView.height - 100, Style.sizeHintL));
 
@@ -289,7 +289,7 @@ Dialog {
 	}
 
 	GqlSdlRequestSender {
-		context: passwordRecoveryDialog.context
+		permissionPath: passwordRecoveryDialog.permissionPath
 		id: checkEmailRequestSender;
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_checkEmail;
 
@@ -325,7 +325,7 @@ Dialog {
 	}
 
 	GqlSdlRequestSender {
-		context: passwordRecoveryDialog.context
+		permissionPath: passwordRecoveryDialog.permissionPath
 		id: checkEmailCodeRequestSender;
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_checkEmailCode;
 
@@ -352,7 +352,7 @@ Dialog {
 	}
 
 	GqlSdlRequestSender {
-		context: passwordRecoveryDialog.context
+		permissionPath: passwordRecoveryDialog.permissionPath
 		id: sendEmailCodeRequestSender;
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_sendEmailCode;
 
@@ -384,7 +384,7 @@ Dialog {
 	}
 
 	GqlSdlRequestSender {
-		context: passwordRecoveryDialog.context
+		permissionPath: passwordRecoveryDialog.permissionPath
 		id: changePasswordRequestSender;
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_changePassword;
 

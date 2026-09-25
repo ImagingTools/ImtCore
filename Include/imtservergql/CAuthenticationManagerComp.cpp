@@ -72,6 +72,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 	gqlContextPtr->SetToken(token);
 	gqlContextPtr->SetHeaders(headers);
 	gqlContextPtr->SetProductId(productId);
+	gqlContextPtr->SetProductInfo(m_productInfoCompPtr.GetPtr());
 	if (isPat){
 		gqlContextPtr->SetScopes(scopes);
 	}

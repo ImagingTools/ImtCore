@@ -2,6 +2,10 @@
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
 
+// ImtCore includes
+#include <imtservergql/imtservergql.h>
+
+
 namespace imtservergql
 {
 
@@ -34,40 +38,18 @@ QJsonObject CPermissibleGqlRequestHandlerComp::CreateResponse(const imtgql::CGql
 
 bool CPermissibleGqlRequestHandlerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
-	if(!m_commandPermissionsCompPtr.IsValid()){
+	QString refusalReason;
+	if (CheckRequestPermissions(
+				gqlRequest,
+				m_commandPermissionsCompPtr.GetPtr(),
+				m_checkPermissionCompPtr.GetPtr(),
+				true,
+				refusalReason)){
 		return true;
 	}
 
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	if (gqlContextPtr == nullptr){
-		return false;
-	}
-
-	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
-	if (userInfoPtr == nullptr){
-		return false;
-	}
-
-	if (userInfoPtr->IsAdmin()){
-		return true;
-	}
-
-	// Tenant owner acts as superuser within their organization
-	if (gqlContextPtr->IsTenantOwner()){
-		return true;
-	}
-
-	imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();
-
-	QByteArray requestedCommandId = gqlRequest.GetCommandId();
-	QByteArrayList commandIds = m_commandPermissionsCompPtr->GetCommandIds();
-
-	if(commandIds.contains(requestedCommandId)){
-		QByteArrayList permissionIds = m_commandPermissionsCompPtr->GetCommandPermissions(requestedCommandId);
-		if (m_checkPermissionCompPtr.IsValid()){
-			return m_checkPermissionCompPtr->CheckPermission(permissions, permissionIds);
-		}
-	}
+	SendWarningMessage(0, QString("Command '%1' refused: %2")
+			.arg(QString::fromUtf8(gqlRequest.GetCommandId()), refusalReason));
 
 	return false;
 }

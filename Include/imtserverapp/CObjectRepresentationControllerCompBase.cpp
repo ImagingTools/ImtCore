@@ -10,6 +10,9 @@
 // Qt includes
 #include <QtCore/QJsonValue>
 
+// ImtCore includes
+#include <imtserverapp/imtserverapp.h>
+
 
 namespace imtserverapp
 {
@@ -17,18 +20,18 @@ namespace imtserverapp
 
 // protected methods
 
-bool CObjectRepresentationControllerCompBase::CheckPermissions(const imtauth::IUserInfo::FeatureIds& userPermissions, const QByteArray& paramId) const
+bool CObjectRepresentationControllerCompBase::CheckPermissions(
+			const imtauth::IUserInfo::FeatureIds& userPermissions,
+			const QByteArray& paramId,
+			const iprm::IParamsSet* paramsPtr) const
 {
-	if (m_commandPermissionsProviderCompPtr.IsValid()){
-		QByteArrayList elementPermissions = m_commandPermissionsProviderCompPtr->GetCommandPermissions(paramId);
-
-		if (m_checkPermissionCompPtr.IsValid()){
-			bool result = m_checkPermissionCompPtr->CheckPermission(userPermissions, elementPermissions);
-			return result;
-		}
-	}
-
-	return true;
+	return IsElementAccessible(
+			m_commandPermissionsProviderCompPtr.GetPtr(),
+			m_checkPermissionCompPtr.GetPtr(),
+			paramId,
+			userPermissions,
+			false,
+			GetPermissionPath(paramsPtr));
 }
 
 

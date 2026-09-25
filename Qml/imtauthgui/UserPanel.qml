@@ -8,7 +8,7 @@ import imtauthProfileSdl 1.0
 Item {
 	id: userPanel;
 	
-	property string context: ""
+	property string permissionPath: ""
 	width: 50;
 	height: Style.controlHeightM;
 	
@@ -73,7 +73,7 @@ Item {
 	}
 
 	GqlSdlRequestSender {
-		context: userPanel.context
+		permissionPath: userPanel.permissionPath
 		id: organizationsRequest
 		requestType: 0
 		gqlCommandId: ImtauthProfileSdlCommandIds.s_getUserOrganizations
