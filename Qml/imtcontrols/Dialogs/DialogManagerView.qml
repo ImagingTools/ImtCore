@@ -6,14 +6,21 @@ import QtQuick.Window 2.2
 
 Item {
 	id: container;
+
+	property bool isMainView: true
 	
-	property ListModel dialogsModel: ModalDialogManager.modalDialogModels;
+	property ListModel dialogsModel: ModalDialogManager.modalDialogModels
 	
 	Component.onCompleted: {
-		if(visible){
+		if(visible && isMainView){
 			ModalDialogManager.activeView = container;
 		}
+		else if(!isMainView){
+			dialogsModel = localViewModel
+		}
 	}
+
+	ListModel{id: localViewModel}
 	
 	Repeater {
 		id: modalDialogs;

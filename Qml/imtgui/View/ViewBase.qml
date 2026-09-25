@@ -40,6 +40,8 @@ Item {
 	property bool hasButtonPanel: false
 	property BaseModel buttonPanelModel: null
 
+	property alias dialogManagerView: localView
+
 	signal commandsModelChanged(var commandsModel)
 	signal commandActivated(string commandId)
 	signal commandActivatedWithParams(string commandId, var params)
@@ -248,6 +250,14 @@ onCommandsModelChanged: {
 		anchors.bottom: parent.bottom;
 		objectName: "ViewBase";
 		color: viewBase.contentColor;
+	}
+
+	DialogManagerView{
+		id: localView
+		anchors.fill: parent
+		z: 1000
+		isMainView:false
+		objectName: "ViewBase";
 	}
 	
 	Component.onCompleted: {
