@@ -145,7 +145,20 @@ DecoratorBase {
 		color: "transparent"
 		border.width: Style.focusRingWidth
 		border.color: Style.focusRingColor
-		visible: commonButtonDecorator.baseElement ? commonButtonDecorator.baseElement.enabled && commonButtonDecorator.baseElement.focus : false
+		visible: commonButtonDecorator.baseElement ? commonButtonDecorator.baseElement.enabled && commonButtonDecorator.baseElement.activeFocus : false
+	}
+
+	// Primer focusOutlineOnEmphasis: a light band between the ring and a colored fill
+	Rectangle {
+		id: focusRingInner
+
+		anchors.fill: parent
+		anchors.margins: Style.focusRingWidth
+		radius: Style.buttonRadius - Style.focusRingWidth
+		color: "transparent"
+		border.width: 1
+		border.color: Style.buttonPrimaryTextColor
+		visible: focusRing.visible && (commonButtonDecorator.isPrimary || commonButtonDecorator.isDanger)
 	}
 
 	Item {

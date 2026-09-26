@@ -176,18 +176,10 @@ panel from the page canvas up onto the elevated surface.
 
 ## Typography
 
-GitHub's own brand typeface is **Mona Sans**
-([github/mona-sans](https://github.com/github/mona-sans), SIL OFL 1.1), so it
-is vendored rather than approximated. Regular (400) and SemiBold (600) live
-under `Include/imtstylecontrolsqml/Qml/Fonts/` with the licence alongside as
-`MonaSans-OFL.txt`, served from the `/Fonts` resource prefix.
-
-`fontFamily` is **bound to `FontLoader.name`**, not set to a literal. Native
-Qt reports the font's own family name (`Mona Sans`), while the JQML web build
-derives the `@font-face` family from the file name (`MonaSans-Regular`) — see
-`3rdParty/WebCompiler/qmlcore/core/FontLoader.qml`. No single literal is
-correct on both, so the binding resolves per platform, falling back to
-`Segoe UI` until the font has loaded.
+`fontFamily` and `fontFamilyBold` are the literal `Segoe UI`, the first font in
+Primer's system stack on Windows, on desktop and web alike. Mona Sans, GitHub's
+brand typeface, was vendored and then removed: the web build rendered its bold
+very differently from native Qt, and it has no Cyrillic.
 
 `fontFamilyMono` (`Consolas`) was added for code, IDs and hashes.
 
@@ -388,9 +380,7 @@ editors), and the modal scrims in `DialogManagerView.qml` and
 
 - **Icon artwork.** Still the in-repo SVG set, not Octicons. Only the
   *colors and sizes* are aligned — see above.
-- **Mona Sans weights.** Only Regular and SemiBold are vendored; Mona Sans
-  ships a much wider range, and the variable font is not used because Qt 6.2
-  support for variable axes is limited.
+- **Typeface.** `Segoe UI` instead of Mona Sans — see Typography.
 - **Spacing scale.** See above.
 - **Font weights.** Primer leans on 600 semibold for emphasis; QML call sites
   use plain `font.bold`. No weight token exists yet.
