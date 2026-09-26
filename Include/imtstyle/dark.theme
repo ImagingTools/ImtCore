@@ -256,8 +256,8 @@
 				"HintingPreference": "PreferDefaultHinting",
 				"Capitalization": "MixedCase",
 				"Style": "Normal",
-				"Family": "Mona Sans",
-				"Families": [ "Mona Sans", "Segoe UI", "Noto Sans", "Helvetica", "Arial" ],
+				"Family": "Segoe UI",
+				"Families": [ "Segoe UI", "Noto Sans", "Helvetica", "Arial" ],
 				"StyleStrategy": [ "PreferBitmap", "ForceOutline" ],
 				"LetterSpacing": {
 					"SpacingType": "PercentageSpacing",
