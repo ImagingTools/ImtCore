@@ -373,9 +373,9 @@ StyleComponents {
 	property string buttonHoverColor: "#eff2f5";
 	property string buttonPressedColor: "#e6eaef";
 	property string buttonAccentColor: imaginToolsAccentColor;
-	property string buttonInactiveColor: "#f6f8fa";
+	property string buttonInactiveColor: "#eff2f5";
 	property string buttonBorderFocusColor: imaginToolsAccentColor;
-	property string buttonBorderInactiveColor: "#d1d9e0";
+	property string buttonBorderInactiveColor: "#1a818b98";
 	property string buttonTextColor: "#1f2328";
 	property string buttonInactiveTextColor: "#818b98";
 	// Text drawn on top of an accent-colored surface (e.g. a selected/active chip
@@ -689,6 +689,23 @@ StyleComponents {
 
 			styleContainer.inactiveTextColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource);
 
+			// Disabled state: InactiveColors holds the muted text color, not the disabled one
+			let textDisabledColor = styleContainer.getThemeColor("ActiveColors", "TextDisabled", dataSource);
+			if (textDisabledColor !== ""){
+				styleContainer.inactiveTextColor = textDisabledColor;
+				styleContainer.buttonInactiveTextColor = textDisabledColor;
+			}
+
+			let buttonDisabledColor = styleContainer.getThemeColor("ActiveColors", "ButtonDisabled", dataSource);
+			if (buttonDisabledColor !== ""){
+				styleContainer.buttonInactiveColor = buttonDisabledColor;
+			}
+
+			let buttonBorderDisabledColor = styleContainer.getThemeColor("ActiveColors", "ButtonBorderDisabled", dataSource);
+			if (buttonBorderDisabledColor !== ""){
+				styleContainer.buttonBorderInactiveColor = buttonBorderDisabledColor;
+			}
+
 			styleContainer.buttonHoverColor = styleContainer.getThemeColor("ActiveColors", "Midlight", dataSource);
 			styleContainer.buttonPressedColor = styleContainer.getThemeColor("ActiveColors", "Mid", dataSource);
 			styleContainer.hover = styleContainer.getThemeColor("ActiveColors", "Midlight", dataSource);
@@ -754,6 +771,11 @@ StyleComponents {
 			styleContainer.buttonDangerBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonDanger", dataSource);
 			styleContainer.buttonDangerTextColor = styleContainer.getThemeColor("ActiveColors", "HighlightedText", dataSource);
 			styleContainer.focusRingColor = styleContainer.getThemeColor("ActiveColors", "Highlight", dataSource);
+
+			let focusRingThemeColor = styleContainer.getThemeColor("ActiveColors", "FocusRing", dataSource);
+			if (focusRingThemeColor !== ""){
+				styleContainer.focusRingColor = focusRingThemeColor;
+			}
 
 			styleContainer.imaginToolsAccentColor = dataSource.getData("ColorPalette").getData("ImaginTools Accent");
 
