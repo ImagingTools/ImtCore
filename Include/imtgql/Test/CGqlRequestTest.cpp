@@ -955,6 +955,10 @@ void CGqlRequestTest::ParseStringWithEscapeSequences()
 
 void CGqlRequestTest::BenchmarkIsNullArrayElementMillionValues()
 {
+#ifndef IMT_ENABLE_BENCHMARK_TESTS
+	QSKIP("Benchmark test for IsNullArrayElement with a million values.", 1);
+#endif
+
 	static constexpr qsizetype valueCount = 1000000;
 	const QByteArray paramId = QByteArrayLiteral("values");
 	const QVariantList values(valueCount, QVariant(1));
