@@ -38,6 +38,10 @@ void CCollectionDocumentServicePublisherComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
+	if (!IsAutoCloseEnabled()){
+		return;
+	}
+
 	QObject::connect(
 				&m_closeIdleDocumentsTimer,
 				&QTimer::timeout,
@@ -386,11 +390,17 @@ QByteArray CCollectionDocumentServicePublisherComp::ConvertUrlToObjectId(const Q
 }
 
 
+bool CCollectionDocumentServicePublisherComp::IsAutoCloseEnabled() const
+{
+	return m_closeDocumentTimeoutAttrPtr.IsValid() && (*m_closeDocumentTimeoutAttrPtr > 0);
+}
+
+
 void CCollectionDocumentServicePublisherComp::TrackDocument(
 			const QByteArray& userId,
 			const QByteArray& documentId) const
 {
-	if (documentId.isEmpty()){
+	if (documentId.isEmpty() || !IsAutoCloseEnabled()){
 		return;
 	}
 
@@ -471,11 +481,11 @@ QByteArray CCollectionDocumentServicePublisherComp::GetSubscribedDocumentId(cons
 
 void CCollectionDocumentServicePublisherComp::CloseIdleDocuments()
 {
-	if (!m_documentServiceCompPtr.IsValid()){
+	if (!m_documentServiceCompPtr.IsValid() || !IsAutoCloseEnabled()){
 		return;
 	}
 
-	const qint64 timeout = *m_closeDocumentTimeoutAttrPtr;
+	const qint64 timeout = qint64(*m_closeDocumentTimeoutAttrPtr) * 1000;
 	const qint64 now = QDateTime::currentMSecsSinceEpoch();
 
 	QList<QPair<QByteArray, QByteArray> > documentsToClose; // userId, documentId
