@@ -440,6 +440,9 @@ void CSdlGenTest::TestArrayBackendsRoundTrip()
 
 void CSdlGenTest::BenchmarkArrayGraphQlWriteMillionScalars()
 {
+#ifndef IMT_ENABLE_BENCHMARK_TESTS
+	QSKIP("Benchmark test for GraphQl write with a million scalars.", 1);
+#endif
 	static constexpr qsizetype valueCount = 1000000;
 	const CArrayPayload source = CreatePayloadWithRequiredScalars(valueCount);
 
@@ -455,6 +458,9 @@ void CSdlGenTest::BenchmarkArrayGraphQlWriteMillionScalars()
 
 void CSdlGenTest::BenchmarkArrayGraphQlReadMillionScalars()
 {
+#ifndef IMT_ENABLE_BENCHMARK_TESTS
+	QSKIP("Benchmark test for GraphQl read with a million scalars.", 1);
+#endif
 	static constexpr qsizetype valueCount = 1000000;
 	const CArrayPayload source = CreatePayloadWithRequiredScalars(valueCount);
 
