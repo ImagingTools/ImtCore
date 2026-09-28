@@ -361,23 +361,6 @@ class Item extends QtObject {
         return tree
     }
 
-    __setFocusTree(tree){
-        for(let child of this.children){
-            if(tree.indexOf(child) < 0){
-                if(!(typeof child.__isListViewDelegateItem === 'function' && child.__isListViewDelegateItem())){
-                    child.focus = false
-                }
-            }
-
-            // Don't recurse into FocusScopes — they manage their own children's
-            // internal focus state. In Qt, items inside a FocusScope don't fire
-            // focusChanged when the scope loses focus.
-            if(!(child instanceof JQModules.QtQuick.FocusScope)){
-                child.__setFocusTree(tree)
-            }
-        }
-    }
-
     SLOT_parentChanged(oldValue, newValue){
         super.SLOT_parentChanged(oldValue, newValue)
         this.__connectDOM(newValue)
