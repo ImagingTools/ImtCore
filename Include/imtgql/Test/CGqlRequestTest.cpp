@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtgql/CGqlParamObject.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/CGqlFieldFragment.h>
 
@@ -949,6 +950,27 @@ void CGqlRequestTest::ParseStringWithEscapeSequences()
 	// \t should be decoded to actual tab (char 9)
 	QString note = inputPtr->GetParamArgumentValue("Note").toString();
 	QCOMPARE(note, QStringLiteral("Tab\there"));
+}
+
+
+void CGqlRequestTest::BenchmarkIsNullArrayElementMillionValues()
+{
+	static constexpr qsizetype valueCount = 1000000;
+	const QByteArray paramId = QByteArrayLiteral("values");
+	const QVariantList values(valueCount, QVariant(1));
+
+	imtgql::CGqlParamObject paramObject;
+	paramObject.InsertParam(paramId, QVariant::fromValue(values));
+
+	qsizetype nullElementCount = 0;
+	QBENCHMARK_ONCE {
+		for (qsizetype index = 0; index < values.size(); ++index){
+			if (paramObject.IsNullArrayElement(paramId, index)){
+				++nullElementCount;
+			}
+		}
+	}
+	QCOMPARE(nullElementCount, 0);
 }
 
 
