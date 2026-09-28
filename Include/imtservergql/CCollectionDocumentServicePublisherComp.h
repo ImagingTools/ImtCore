@@ -113,6 +113,7 @@ protected:
 		(\a userId, \a documentId) pair.
 	*/
 	bool HasActiveSingleDocumentChangedSubscriber(const QByteArray& userId, const QByteArray& documentId) const;
+	bool HasActiveSingleDocumentChangedSubscriberNoLock(const QByteArray& userId, const QByteArray& documentId) const;
 	/**
 		Extract the document ID of an individual OnDocumentChanged subscription
 		of this collection. Returns an empty value for any other request.

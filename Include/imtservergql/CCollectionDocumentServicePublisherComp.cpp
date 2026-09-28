@@ -450,6 +450,14 @@ bool CCollectionDocumentServicePublisherComp::HasActiveSingleDocumentChangedSubs
 {
 	QMutexLocker locker(&m_mutex);
 
+	return HasActiveSingleDocumentChangedSubscriberNoLock(userId, documentId);
+}
+
+
+bool CCollectionDocumentServicePublisherComp::HasActiveSingleDocumentChangedSubscriberNoLock(
+			const QByteArray& userId,
+			const QByteArray& documentId) const
+{
 	for (const RequestNetworks& entry : m_registeredSubscribers){
 		if (entry.networkRequests.isEmpty()){
 			continue;
@@ -517,7 +525,8 @@ void CCollectionDocumentServicePublisherComp::CloseIdleDocuments()
 	QList<QPair<QByteArray, QByteArray> > documentsToClose; // userId, documentId
 
 	{
-		QMutexLocker locker(&m_trackedDocumentsMutex);
+		QMutexLocker subscribersLocker(&m_mutex);
+		QMutexLocker trackedDocumentsLocker(&m_trackedDocumentsMutex);
 
 		for (auto it = m_trackedDocuments.begin(); it != m_trackedDocuments.end(); ){
 			if (!it.value().hasIndividualSubscription){
@@ -526,7 +535,7 @@ void CCollectionDocumentServicePublisherComp::CloseIdleDocuments()
 				continue;
 			}
 
-			if (HasActiveSingleDocumentChangedSubscriber(it.value().userId, it.key())){
+			if (HasActiveSingleDocumentChangedSubscriberNoLock(it.value().userId, it.key())){
 				it.value().lastSubscriberSeenMs = now;
 				++it;
 
