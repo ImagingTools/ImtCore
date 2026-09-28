@@ -1223,7 +1223,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 
 	for (const imtsdl::CSdlField& field: fieldList){
 		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("if (propertyName == (QString(\"m_\") + \"");
+		stream << QStringLiteral("if (propertyName == (QStringLiteral(\"m_\") + \"");
 		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("\")){");
 		FeedStream(stream, 1, false);
 		FeedStreamHorizontally(stream, 2);

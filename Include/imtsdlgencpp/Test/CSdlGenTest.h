@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QObject>
 #include <QtCore/QDir>
+#include <QtCore/QTemporaryDir>
 
 // ImtCore includes
 #include <imtsdl/ISdlEditableProcessArgumentsParser.h>
@@ -27,6 +28,16 @@ private Q_SLOTS:
 	void TestComplexUnion();
 	void TestArrayNullabilityParsing();
 	void TestTreeModelExplicitNullKey();
+	void TestArrayBackendsRoundTrip_data();
+	void TestArrayBackendsRoundTrip();
+	void TestArrayReadersRejectInvalidValues_data();
+	void TestArrayReadersRejectInvalidValues();
+	void TestArrayWritersRejectInvalidValues_data();
+	void TestArrayWritersRejectInvalidValues();
+	void TestArrayOptionalReadersPreserveMissingFields();
+	void TestArrayQObjectBridge();
+	void TestArrayJsonFileRoundTrip();
+	void TestArrayGraphQlRequestFileRoundTrip();
 	void TestNestedFieldNameCollision();
 	void PrinterTest();
 	void SubstrateSpecifications();
@@ -36,6 +47,7 @@ private Q_SLOTS:
 
 private:
 	QDir m_tempOutputDir;
+	QTemporaryDir m_arraySerializationOutputDirectory;
 	bool m_isAllTestsPassed;
 
 };
