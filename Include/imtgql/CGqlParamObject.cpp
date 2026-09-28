@@ -109,13 +109,31 @@ QList<const CGqlParamObject *> CGqlParamObject::GetParamArgumentObjectPtrList(co
 
 bool CGqlParamObject::IsNullArrayElement(const QByteArray& paramId, qsizetype index) const
 {
-	if (m_objectParamsArray.contains(paramId)){
-		const CGqlParamObject* objectPtr = GetParamArgumentObjectPtr(paramId, index);
+	const auto objectParamsArrayIter = m_objectParamsArray.constFind(paramId);
+	if (objectParamsArrayIter != m_objectParamsArray.cend()){
+		if (index < 0 || index >= objectParamsArrayIter->size()){
+			return true;
+		}
+		const CGqlParamObject* objectPtr = objectParamsArrayIter->at(index).GetPtr();
 
 		return objectPtr == nullptr || objectPtr->IsNull();
 	}
 
-	const QVariantList values = GetParamArgumentValue(paramId).toList();
+	const auto simpleParamIter = m_simpleParams.constFind(paramId);
+	if (simpleParamIter == m_simpleParams.cend()){
+		return false;
+	}
+	const QVariant& value = simpleParamIter.value();
+	if (value.typeId() == QMetaType::QVariantList){
+		const auto* values = static_cast<const QVariantList*>(value.constData());
+		if (index < 0 || index >= values->size()){
+			return false;
+		}
+
+		return !values->at(index).isValid() || values->at(index).isNull();
+	}
+
+	const QVariantList values = value.toList();
 	if (index < 0 || index >= values.size()){
 		return false;
 	}
