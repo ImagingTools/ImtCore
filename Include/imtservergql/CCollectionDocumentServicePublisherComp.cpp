@@ -56,6 +56,24 @@ void CCollectionDocumentServicePublisherComp::OnComponentDestroyed()
 }
 
 
+// reimplemented (imtgql::IGqlSubscriberController)
+
+bool CCollectionDocumentServicePublisherComp::RegisterSubscription(
+			const QByteArray& subscriptionId,
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtrest::IRequest& networkRequest,
+			QString& errorMessage)
+{
+	if (!BaseClass::RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage)){
+		return false;
+	}
+
+	MarkIndividualSubscription(GetSubscribedDocumentId(gqlRequest));
+
+	return true;
+}
+
+
 // protected methods
 
 // reimplemented (imtgql::IGqlSubscriberController)
@@ -82,15 +100,7 @@ bool CCollectionDocumentServicePublisherComp::IsRequestSupported(const imtgql::C
 	}
 
 	if (gqlCommandId == sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId()){
-		const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
-		if (inputParamPtr == nullptr){
-			return false;
-		}
-
-		QByteArray requestCollectionId = inputParamPtr->GetParamArgumentValue("collectionId").toByteArray();
-		QByteArray documentId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
-
-		return requestCollectionId == collectionId && !documentId.isEmpty();
+		return !GetSubscribedDocumentId(gqlRequest).isEmpty();
 	}
 
 	return BaseClass::IsRequestSupported(gqlRequest);
@@ -400,32 +410,62 @@ void CCollectionDocumentServicePublisherComp::UntrackDocument(const QByteArray& 
 }
 
 
+void CCollectionDocumentServicePublisherComp::MarkIndividualSubscription(const QByteArray& documentId) const
+{
+	if (documentId.isEmpty()){
+		return;
+	}
+
+	QMutexLocker locker(&m_trackedDocumentsMutex);
+
+	auto foundIter = m_trackedDocuments.find(documentId);
+	if (foundIter == m_trackedDocuments.end()){
+		return;
+	}
+
+	foundIter.value().hasIndividualSubscription = true;
+	foundIter.value().lastSubscriberSeenMs = QDateTime::currentMSecsSinceEpoch();
+}
+
+
 bool CCollectionDocumentServicePublisherComp::HasActiveSingleDocumentChangedSubscriber(const QByteArray& documentId) const
 {
-	const QByteArray commandId = sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId();
-
 	QMutexLocker locker(&m_mutex);
 
 	for (const RequestNetworks& entry : m_registeredSubscribers){
-		if (entry.gqlRequest.GetCommandId() != commandId){
-			continue;
-		}
-
 		if (entry.networkRequests.isEmpty()){
 			continue;
 		}
 
-		const imtgql::CGqlParamObject* inputParamPtr = entry.gqlRequest.GetParamObject("input");
-		if (inputParamPtr == nullptr){
-			continue;
-		}
-
-		if (inputParamPtr->GetParamArgumentValue("id").toByteArray() == documentId){
+		if (GetSubscribedDocumentId(entry.gqlRequest) == documentId){
 			return true;
 		}
 	}
 
 	return false;
+}
+
+
+QByteArray CCollectionDocumentServicePublisherComp::GetSubscribedDocumentId(const imtgql::CGqlRequest& gqlRequest) const
+{
+	if (!m_collectionIdAttrPtr.IsValid()){
+		return QByteArray();
+	}
+
+	if (gqlRequest.GetCommandId() != sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId()){
+		return QByteArray();
+	}
+
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	if (inputParamPtr == nullptr){
+		return QByteArray();
+	}
+
+	if (inputParamPtr->GetParamArgumentValue("collectionId").toByteArray() != *m_collectionIdAttrPtr){
+		return QByteArray();
+	}
+
+	return inputParamPtr->GetParamArgumentValue("id").toByteArray();
 }
 
 
@@ -445,7 +485,14 @@ void CCollectionDocumentServicePublisherComp::CloseIdleDocuments()
 
 		for (auto it = m_trackedDocuments.begin(); it != m_trackedDocuments.end(); ){
 			if (HasActiveSingleDocumentChangedSubscriber(it.key())){
+				it.value().hasIndividualSubscription = true;
 				it.value().lastSubscriberSeenMs = now;
+				++it;
+
+				continue;
+			}
+
+			if (!it.value().hasIndividualSubscription){
 				++it;
 
 				continue;

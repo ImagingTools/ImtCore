@@ -34,12 +34,19 @@ public:
 		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler)
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID", true, "DummyCollection");
 		I_ASSIGN(m_documentServiceCompPtr, "DocumentService", "Document service used to close documents without active subscribers", false, "DocumentService");
-		I_ASSIGN(m_closeDocumentTimeoutAttrPtr, "CloseDocumentTimeout", "Time (in ms) an open document may stay without an active OnDocumentChanged subscriber before it is closed", true, 30000);
+		I_ASSIGN(m_closeDocumentTimeoutAttrPtr, "CloseDocumentTimeout", "Time (in ms) a document may stay open after its last individual OnDocumentChanged subscriber is gone before it is closed", true, 30000);
 	I_END_COMPONENT;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
+
+	// reimplemented (imtgql::IGqlSubscriberController)
+	virtual bool RegisterSubscription(
+				const QByteArray& subscriptionId,
+				const imtgql::CGqlRequest& gqlRequest,
+				const imtrest::IRequest& networkRequest,
+				QString& errorMessage) override;
 
 protected:
 	// reimplemented (imtgql::IGqlSubscriberController)
@@ -78,8 +85,11 @@ protected:
 	QByteArray ConvertUrlToObjectId(const QUrl& url) const;
 
 	/**
-		Start tracking an open document instance so that it can be closed when it
-		has no active OnSingleDocumentChanged subscriber for CloseDocumentTimeout.
+		Start tracking an open document instance.
+
+		\note The close timeout is not started here. It only becomes active after
+		at least one individual OnDocumentChanged subscription for this document
+		has been registered (see \c MarkIndividualSubscription).
 	*/
 	void TrackDocument(const QByteArray& userId, const QByteArray& documentId) const;
 	/**
@@ -87,10 +97,21 @@ protected:
 	*/
 	void UntrackDocument(const QByteArray& documentId) const;
 	/**
+		Remember that an individual OnDocumentChanged subscription was made for
+		\a documentId. Starting from this moment the document is subject to the
+		close timeout.
+	*/
+	void MarkIndividualSubscription(const QByteArray& documentId) const;
+	/**
 		Return \c true when at least one registered subscriber listens to the
-		OnSingleDocumentChanged command of this collection for the given \a documentId.
+		OnDocumentChanged command of this collection for the given \a documentId.
 	*/
 	bool HasActiveSingleDocumentChangedSubscriber(const QByteArray& documentId) const;
+	/**
+		Extract the document ID of an individual OnDocumentChanged subscription
+		of this collection. Returns an empty value for any other request.
+	*/
+	QByteArray GetSubscribedDocumentId(const imtgql::CGqlRequest& gqlRequest) const;
 
 	template<class Representation>
 	void PublishRepresentation(
@@ -100,8 +121,8 @@ protected:
 
 protected Q_SLOTS:
 	/**
-		Close every tracked document whose grace period without an active
-		OnSingleDocumentChanged subscriber has elapsed.
+		Close every tracked document which had an individual OnDocumentChanged
+		subscription and whose grace period without an active subscriber has elapsed.
 	*/
 	void CloseIdleDocuments();
 
@@ -114,6 +135,7 @@ private:
 	struct TrackedDocument
 	{
 		QByteArray userId;
+		bool hasIndividualSubscription = false; ///< \c true after the first individual OnDocumentChanged subscription for this document.
 		qint64 lastSubscriberSeenMs = 0; ///< Monotonic timestamp of the last moment an active subscriber was observed.
 	};
 
