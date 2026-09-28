@@ -30,6 +30,8 @@ private Q_SLOTS:
 	void TestTreeModelExplicitNullKey();
 	void TestArrayBackendsRoundTrip_data();
 	void TestArrayBackendsRoundTrip();
+	void BenchmarkArrayGraphQlWriteMillionScalars();
+	void BenchmarkArrayGraphQlReadMillionScalars();
 	void TestArrayReadersRejectInvalidValues_data();
 	void TestArrayReadersRejectInvalidValues();
 	void TestArrayWritersRejectInvalidValues_data();

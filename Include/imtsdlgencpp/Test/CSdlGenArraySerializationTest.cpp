@@ -102,6 +102,20 @@ CArrayPayload CreatePayload(ValidPayloadCase payloadCase)
 }
 
 
+CArrayPayload CreatePayloadWithRequiredScalars(qsizetype valueCount)
+{
+	CArrayPayload payload;
+	payload.requiredObjects.emplace();
+	payload.requiredScalars.emplace();
+	payload.requiredScalars->reserve(valueCount);
+	for (qsizetype index = 0; index < valueCount; ++index){
+		payload.requiredScalars->append(QStringLiteral("value"));
+	}
+
+	return payload;
+}
+
+
 template <class T, class Comparator>
 bool NullableValuesEqual(
 		const istd::TNullableValue<T>& left,
@@ -421,6 +435,41 @@ void CSdlGenTest::TestArrayBackendsRoundTrip()
 	CArrayPayload treeResult;
 	QVERIFY(treeResult.ReadFromModel(treeModel));
 	QVERIFY(PayloadsEqual(treeResult, source));
+}
+
+
+void CSdlGenTest::BenchmarkArrayGraphQlWriteMillionScalars()
+{
+	static constexpr qsizetype valueCount = 1000000;
+	const CArrayPayload source = CreatePayloadWithRequiredScalars(valueCount);
+
+	imtgql::CGqlParamObject gqlObject;
+	bool isWritten = false;
+	QBENCHMARK_ONCE {
+		isWritten = source.WriteToGraphQlObject(gqlObject);
+	}
+	QVERIFY(isWritten);
+	QCOMPARE(gqlObject.GetParamArgumentValue("requiredScalars").toList().size(), valueCount);
+}
+
+
+void CSdlGenTest::BenchmarkArrayGraphQlReadMillionScalars()
+{
+	static constexpr qsizetype valueCount = 1000000;
+	const CArrayPayload source = CreatePayloadWithRequiredScalars(valueCount);
+
+	imtgql::CGqlParamObject gqlObject;
+	QVERIFY(source.WriteToGraphQlObject(gqlObject));
+
+	CArrayPayload result;
+	bool isRead = false;
+	QBENCHMARK_ONCE {
+		isRead = result.ReadFromGraphQlObject(gqlObject);
+	}
+	QVERIFY(isRead);
+	QVERIFY(result.requiredScalars.HasValue());
+	QCOMPARE(result.requiredScalars->size(), valueCount);
+	QCOMPARE(*result.requiredScalars->last(), QStringLiteral("value"));
 }
 
 
