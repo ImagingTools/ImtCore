@@ -38,6 +38,7 @@ private slots:
 	void CreateArraysWithNullElements();
 	void ParseArraysWithNullElements();
 	void ParseStringWithEscapeSequences();
+	void BenchmarkIsNullArrayElementMillionValues();
 
 	void cleanupTestCase();
 
