@@ -509,7 +509,7 @@ bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(
 		result.listVariableName = '*' + GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataObjectPtr");
 		result.customAccessedElementName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataObjectPtr");
 		result.isCustomAccessedElementPointer	= true;
-		result.elementNullCheck = QStringLiteral("%1.IsNullArrayElement(\"%2\", $(index))").arg(GetContainerObjectVariableName(), field.GetId());
+		result.elementNullCheck = result.customAccessedElementName + QStringLiteral(" == nullptr || ") + result.customAccessedElementName + QStringLiteral("->IsNull()");
 		result.customListAccessCode.clear();
 		QTextStream accessCodeStream(&result.customListAccessCode);
 		accessCodeStream << QStringLiteral("const ");
@@ -545,7 +545,7 @@ bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(
 		result.listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataList");
 
 		result.customAccessedElementName = "a";
-		result.elementNullCheck = QStringLiteral("%1.IsNullArrayElement(\"%2\", $(index))").arg(GetContainerObjectVariableName(), field.GetId());
+		result.elementNullCheck = result.listVariableName + QStringLiteral("[$(index)] == nullptr || ") + result.listVariableName + QStringLiteral("[$(index)]->IsNull()");
 		QTextStream accessStream(&result.customListAccessCode);
 		accessStream << ' ' << variableName;
 		accessStream << QStringLiteral(" = ");
@@ -590,7 +590,7 @@ bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(
 			result.toObjectTransformMethod		= QStringLiteral(".to") + GetConvertEndForFieldString(field, true);
 		}
 		result.listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataList");
-		result.elementNullCheck = QStringLiteral("%1.IsNullArrayElement(\"%2\", $(index))").arg(GetContainerObjectVariableName(), field.GetId());
+		result.elementNullCheck = QStringLiteral("!%1[$(index)].isValid() || %1[$(index)].isNull()").arg(result.listVariableName);
 	}
 
 	return true;
