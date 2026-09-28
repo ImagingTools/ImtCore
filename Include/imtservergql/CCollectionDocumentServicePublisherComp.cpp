@@ -72,7 +72,7 @@ bool CCollectionDocumentServicePublisherComp::RegisterSubscription(
 		return false;
 	}
 
-	MarkIndividualSubscription(GetSubscribedDocumentId(gqlRequest));
+	MarkIndividualSubscription(GetSubscriberUserId(gqlRequest), GetSubscribedDocumentId(gqlRequest));
 
 	return true;
 }
@@ -420,9 +420,11 @@ void CCollectionDocumentServicePublisherComp::UntrackDocument(const QByteArray& 
 }
 
 
-void CCollectionDocumentServicePublisherComp::MarkIndividualSubscription(const QByteArray& documentId) const
+void CCollectionDocumentServicePublisherComp::MarkIndividualSubscription(
+			const QByteArray& userId,
+			const QByteArray& documentId) const
 {
-	if (documentId.isEmpty()){
+	if (documentId.isEmpty() || userId.isEmpty()){
 		return;
 	}
 
@@ -433,12 +435,18 @@ void CCollectionDocumentServicePublisherComp::MarkIndividualSubscription(const Q
 		return;
 	}
 
+	if (foundIter.value().userId != userId){
+		return;
+	}
+
 	foundIter.value().hasIndividualSubscription = true;
 	foundIter.value().lastSubscriberSeenMs = QDateTime::currentMSecsSinceEpoch();
 }
 
 
-bool CCollectionDocumentServicePublisherComp::HasActiveSingleDocumentChangedSubscriber(const QByteArray& documentId) const
+bool CCollectionDocumentServicePublisherComp::HasActiveSingleDocumentChangedSubscriber(
+			const QByteArray& userId,
+			const QByteArray& documentId) const
 {
 	QMutexLocker locker(&m_mutex);
 
@@ -447,7 +455,11 @@ bool CCollectionDocumentServicePublisherComp::HasActiveSingleDocumentChangedSubs
 			continue;
 		}
 
-		if (GetSubscribedDocumentId(entry.gqlRequest) == documentId){
+		if (GetSubscribedDocumentId(entry.gqlRequest) != documentId){
+			continue;
+		}
+
+		if (GetSubscriberUserId(entry.gqlRequest) == userId){
 			return true;
 		}
 	}
@@ -479,6 +491,20 @@ QByteArray CCollectionDocumentServicePublisherComp::GetSubscribedDocumentId(cons
 }
 
 
+QByteArray CCollectionDocumentServicePublisherComp::GetSubscriberUserId(const imtgql::CGqlRequest& gqlRequest) const
+{
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	if (contextPtr != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
+		if (userInfoPtr != nullptr){
+			return userInfoPtr->GetId();
+		}
+	}
+
+	return QByteArray();
+}
+
+
 void CCollectionDocumentServicePublisherComp::CloseIdleDocuments()
 {
 	if (!m_documentServiceCompPtr.IsValid() || !IsAutoCloseEnabled()){
@@ -500,7 +526,7 @@ void CCollectionDocumentServicePublisherComp::CloseIdleDocuments()
 				continue;
 			}
 
-			if (HasActiveSingleDocumentChangedSubscriber(it.key())){
+			if (HasActiveSingleDocumentChangedSubscriber(it.value().userId, it.key())){
 				it.value().lastSubscriberSeenMs = now;
 				++it;
 

@@ -103,20 +103,22 @@ protected:
 	void UntrackDocument(const QByteArray& documentId) const;
 	/**
 		Remember that an individual OnDocumentChanged subscription was made for
-		\a documentId. Starting from this moment the document is subject to the
-		close timeout.
+		\a documentId by \a userId. Starting from this moment the document is
+		subject to the close timeout.
 	*/
-	void MarkIndividualSubscription(const QByteArray& documentId) const;
+	void MarkIndividualSubscription(const QByteArray& userId, const QByteArray& documentId) const;
 	/**
 		Return \c true when at least one registered subscriber listens to the
-		OnDocumentChanged command of this collection for the given \a documentId.
+		OnDocumentChanged command of this collection for the given
+		(\a userId, \a documentId) pair.
 	*/
-	bool HasActiveSingleDocumentChangedSubscriber(const QByteArray& documentId) const;
+	bool HasActiveSingleDocumentChangedSubscriber(const QByteArray& userId, const QByteArray& documentId) const;
 	/**
 		Extract the document ID of an individual OnDocumentChanged subscription
 		of this collection. Returns an empty value for any other request.
 	*/
 	QByteArray GetSubscribedDocumentId(const imtgql::CGqlRequest& gqlRequest) const;
+	QByteArray GetSubscriberUserId(const imtgql::CGqlRequest& gqlRequest) const;
 
 	template<class Representation>
 	void PublishRepresentation(
@@ -191,4 +193,3 @@ void CCollectionDocumentServicePublisherComp::PublishRepresentation(
 
 
 } // namespace imtservergql
-
