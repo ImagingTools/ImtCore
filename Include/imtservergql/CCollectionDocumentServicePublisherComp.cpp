@@ -484,15 +484,14 @@ void CCollectionDocumentServicePublisherComp::CloseIdleDocuments()
 		QMutexLocker locker(&m_trackedDocumentsMutex);
 
 		for (auto it = m_trackedDocuments.begin(); it != m_trackedDocuments.end(); ){
-			if (HasActiveSingleDocumentChangedSubscriber(it.key())){
-				it.value().hasIndividualSubscription = true;
-				it.value().lastSubscriberSeenMs = now;
+			if (!it.value().hasIndividualSubscription){
 				++it;
 
 				continue;
 			}
 
-			if (!it.value().hasIndividualSubscription){
+			if (HasActiveSingleDocumentChangedSubscriber(it.key())){
+				it.value().lastSubscriberSeenMs = now;
 				++it;
 
 				continue;
