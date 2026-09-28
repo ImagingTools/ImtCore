@@ -515,9 +515,12 @@ module.exports = {
 
         // Only the previous chain can still have focus. Walking the whole
         // item tree here made every focus change visit every control.
+        // Items inside a FocusScope keep their own focus: the scope remembers
+        // which child was active, and the border of CustomTextField reads that.
         let keep = new Set(newTree)
         for(let item of oldTree){
             if(!item || item.__destroyed || keep.has(item)) continue
+            if(this._isInsideFocusScope(item)) continue
             if(item.focus) item.focus = false
         }
 
@@ -564,6 +567,15 @@ module.exports = {
         if(canActivate && owner instanceof JQModules.QtQuick.FocusScope){
             this._forwardScopeActiveFocus(owner)
         }
+    },
+
+    _isInsideFocusScope(item){
+        let parent = item.parent
+        while(parent){
+            if(parent instanceof JQModules.QtQuick.FocusScope) return true
+            parent = parent.parent
+        }
+        return false
     },
 
     _clearDescendantActiveFocus(item, shouldHave){
