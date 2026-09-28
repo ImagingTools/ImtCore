@@ -6,6 +6,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QRegularExpression>
 #include <QtCore/QScopedPointer>
 #include <QtTest/QTest>
 
@@ -377,6 +378,15 @@ void AddInvalidPayloadRows()
 }
 
 
+// Negative tests intentionally violate ArraySerialization.sdl and require one validation warning per backend.
+void ExpectInvalidArrayValueWarning()
+{
+	const QRegularExpression expectedError(QStringLiteral(
+		".*Error: (Field: '[^']+' doesn't exist, but required|Field '[^']+' is missing, but required\\.?|Array field '[^']+' contains a null element)"));
+	QTest::ignoreMessage(QtWarningMsg, expectedError);
+}
+
+
 } // namespace
 
 
@@ -423,18 +433,21 @@ void CSdlGenTest::TestArrayReadersRejectInvalidValues_data()
 void CSdlGenTest::TestArrayReadersRejectInvalidValues()
 {
 	QFETCH(int, invalidCase);
-	const InvalidPayloadCase typedCase = InvalidPayloadCase(invalidCase);
+	const auto typedCase = InvalidPayloadCase(invalidCase);
 
 	CArrayPayload jsonResult;
+	ExpectInvalidArrayValueWarning();
 	QVERIFY(!jsonResult.ReadFromJsonObject(CreateInvalidJsonObject(typedCase)));
 
 	CArrayPayload gqlResult;
+	ExpectInvalidArrayValueWarning();
 	QVERIFY(!gqlResult.ReadFromGraphQlObject(CreateInvalidGraphQlObject(typedCase)));
 
 	imtbase::CTreeItemModel treeModel;
 	QVERIFY(CreatePayload(VPC_ALL_EMPTY).WriteToModel(treeModel));
 	QVERIFY(ApplyInvalidTreeState(treeModel, typedCase));
 	CArrayPayload treeResult;
+	ExpectInvalidArrayValueWarning();
 	QVERIFY(!treeResult.ReadFromModel(treeModel));
 }
 
@@ -451,12 +464,15 @@ void CSdlGenTest::TestArrayWritersRejectInvalidValues()
 	const CArrayPayload payload = CreateInvalidPayload(InvalidPayloadCase(invalidCase));
 
 	QJsonObject jsonObject;
+	ExpectInvalidArrayValueWarning();
 	QVERIFY(!payload.WriteToJsonObject(jsonObject));
 
 	imtgql::CGqlParamObject gqlObject;
+	ExpectInvalidArrayValueWarning();
 	QVERIFY(!payload.WriteToGraphQlObject(gqlObject));
 
 	imtbase::CTreeItemModel treeModel;
+	ExpectInvalidArrayValueWarning();
 	QVERIFY(!payload.WriteToModel(treeModel));
 }
 
