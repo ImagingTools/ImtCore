@@ -38,12 +38,15 @@ void CCollectionDocumentServicePublisherComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	QObject::connect(
-				&m_closeIdleDocumentsTimer,
-				&QTimer::timeout,
-				this,
-				&CCollectionDocumentServicePublisherComp::CloseIdleDocuments);
-	m_closeIdleDocumentsTimer.start(1000);
+	const qint64 timeout = *m_closeDocumentTimeoutAttrPtr;
+	if (timeout > 0){
+		QObject::connect(
+					&m_closeIdleDocumentsTimer,
+					&QTimer::timeout,
+					this,
+					&CCollectionDocumentServicePublisherComp::CloseIdleDocuments);
+		m_closeIdleDocumentsTimer.start(1000);
+	}
 }
 
 
@@ -380,7 +383,7 @@ void CCollectionDocumentServicePublisherComp::TrackDocument(
 			const QByteArray& userId,
 			const QByteArray& documentId) const
 {
-	if (documentId.isEmpty()){
+	if (documentId.isEmpty() || *m_closeDocumentTimeoutAttrPtr <= 0){
 		return;
 	}
 
