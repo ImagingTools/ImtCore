@@ -228,16 +228,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	if (userData.username){
 		userPtr->SetId(*userData.username);
 	}
-	if (userData.enabled && (*userData.enabled != userPtr->IsEnabled())){
-		if (!IsSuperuserRequest(gqlRequest)){
-			QString message = QStringLiteral("Unable to change the account state of user '%1'. Error: Only the superuser can enable or disable an account").arg(QString::fromUtf8(userPtr->GetId()));
-			SendWarningMessage(0, message, "CUserCollectionDocumentServiceComp");
-
-			response.message = message;
-
-			return response;
-		}
-
+	// Only the superuser may change the account state; for anyone else the field is ignored.
+	if (userData.enabled && (*userData.enabled != userPtr->IsEnabled()) && IsSuperuserRequest(gqlRequest)){
 		userPtr->SetEnabled(*userData.enabled);
 	}
 

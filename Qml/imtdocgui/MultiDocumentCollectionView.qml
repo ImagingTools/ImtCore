@@ -80,6 +80,17 @@ Item {
 		tabView.currentIndex = index
 	}
 
+	// The opened-document list replays raw create/open signals, which bypass the service's "already open" check.
+	function focusExistingTab(documentId){
+		let index = tabView.getIndexById(documentId)
+		if (index < 0){
+			return false
+		}
+
+		tabView.currentIndex = index
+		return true
+	}
+
 
 	function onTryCloseDirtyDocument(documentId, callback){
 		if (!workspaceView.documentManager.documentIsDirty(documentId)){
@@ -231,6 +242,10 @@ Item {
 		}
 
 		function onDocumentOpened(documentId, typeId){
+			if (workspaceView.focusExistingTab(documentId)){
+				return
+			}
+
 			tabView.addTab(documentId, "", stackViewComp, "", "", false)
 			tabView.currentIndex = tabView.tabModel.count - 1
 			workspaceView.updateTabName(documentId)
@@ -296,6 +311,10 @@ Item {
 		}
 
 		function onDocumentCreated(documentId, documentTypeId){
+			if (workspaceView.focusExistingTab(documentId)){
+				return
+			}
+
 			tabView.addTab(documentId, "", stackViewComp, "", "", false)
 
 			tabView.currentIndex = tabView.tabModel.count - 1

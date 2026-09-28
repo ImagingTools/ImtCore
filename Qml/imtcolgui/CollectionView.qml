@@ -43,6 +43,8 @@ Item {
 
 	property alias contentColor: container.contentColor;
 
+	property alias dialogManagerView: localView
+
 	property bool visibleMetaInfo: false;
 	property bool headerRightClickEnabled: true;
 	property bool commandsPanelVisible: true
@@ -570,6 +572,13 @@ Item {
 			
 			text: qsTr("Please select an item for showing additional informations");
 		}
+	}
+
+	DialogManagerView{
+		id: localView
+		anchors.fill: parent
+		z: 1000
+		isMainView:false
 	}
 }
 

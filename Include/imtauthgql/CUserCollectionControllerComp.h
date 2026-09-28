@@ -45,8 +45,8 @@ protected:
 	/**
 		Fill \a object from \a representation.
 		\param isAccountStateChangeAllowed
-			If false, a representation that flips the 'enabled' flag of \a object is rejected.
-			Only the superuser may enable or disable an account.
+			If false, the 'enabled' field of \a representation is ignored and \a object keeps its
+			account state. Only the superuser may enable or disable an account.
 	*/
 	virtual bool FillObjectFromRepresentation(
 				const sdl::V1_0::imtauth::CUserData& representation,
