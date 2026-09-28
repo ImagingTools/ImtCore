@@ -229,6 +229,35 @@ bool CSdlClassGqlModificatorComp::AddFieldValueAppendToObjectArray(QTextStream& 
 }
 
 
+bool CSdlClassGqlModificatorComp::AddNullValueAppendToObjectArray(QTextStream& stream, const imtsdl::CSdlField& field, const QString& arrayContainerVariableName, uint /*horizontalIndents*/) const
+{
+	bool isCustom = false;
+	bool isEnum = false;
+	bool isUnion = false;
+	ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, nullptr, &isEnum, &isUnion);
+
+	stream << arrayContainerVariableName << QStringLiteral(" << ");
+	if (isCustom && !isEnum){
+		stream << QStringLiteral("::imtgql::CGqlParamObject::CreateNull()");
+	}
+	else {
+		stream << QStringLiteral("QVariant()");
+	}
+	stream << ';';
+
+	return true;
+}
+
+
+bool CSdlClassGqlModificatorComp::AddNullArrayWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, uint /*horizontalIndents*/) const
+{
+	stream << GetContainerObjectVariableName() << QStringLiteral(".InsertParam(\"");
+	stream << field.GetId() << QStringLiteral("\", QVariant());");
+
+	return true;
+}
+
+
 bool CSdlClassGqlModificatorComp::AddArrayWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, const QString& targetObjectVariableName, uint /*horizontalIndents*/) const
 {
 	if (targetObjectVariableName.isEmpty()){
@@ -259,17 +288,21 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 	uint hIndents = horizontalIndents;
 	FeedStreamHorizontally(stream, hIndents);
 
-	if (expected && isArray && !field.IsNonEmpty()){ ///< if array could be empty emplace property
+	if (expected && isArray && !field.IsRequired()){
 		stream << QStringLiteral("if (");
 		stream << GetContainerObjectVariableName();
 		stream << QStringLiteral(".ContainsParam(\"");
 		stream << field.GetId();
-		stream << QStringLiteral("\")){");
+		stream << QStringLiteral("\") && ");
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral("[\"");
+		stream << field.GetId();
+		stream << QStringLiteral("\"].isNull()){");
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << field.GetId();
-		stream << QStringLiteral(".emplace();");
+		stream << QStringLiteral(".SetNull();");
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, hIndents);
@@ -298,7 +331,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		stream << '(';
 	}
 
-	if (isArray && !isUserType && !isUnion){ // array of scalars
+	if (isArray){
 		if (expected){
 			stream << QStringLiteral(" && !");
 		}
@@ -310,18 +343,6 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		stream << QStringLiteral("[\"");
 		stream << field.GetId();
 		stream << QStringLiteral("\"].isNull())");
-	}
-
-	else if (isArray && !isUnion){
-		if (expected){
-			stream << QStringLiteral(" && (");
-			stream << GetContainerObjectVariableName();
-			stream << QStringLiteral(".GetObjectsCount(\"");
-			stream << field.GetId();
-			stream << QStringLiteral("\") ");
-			stream << '>';
-			stream << QStringLiteral(" 0)");
-		}
 	}
 
 	else if (isUserType){
@@ -381,7 +402,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		{
 			WriteTypeMultiConditionCheck(
 				stream,
-				field, 
+				field,
 				GetContainerObjectVariableName() + QStringLiteral("[\"") + field.GetId() + QStringLiteral("\"].userType() "),
 				s_integerNumberMetaTypes,
 				expected);
@@ -390,7 +411,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		else if (convertedType == QStringLiteral("float") || convertedType == QStringLiteral("double")){
 			WriteTypeMultiConditionCheck(
 				stream,
-				field, 
+				field,
 				GetContainerObjectVariableName() + QStringLiteral("[\"") + field.GetId() + QStringLiteral("\"].userType() "),
 				s_numberMetaTypes,
 				expected);
@@ -488,6 +509,7 @@ bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(
 		result.listVariableName = '*' + GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataObjectPtr");
 		result.customAccessedElementName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataObjectPtr");
 		result.isCustomAccessedElementPointer	= true;
+		result.elementNullCheck = QStringLiteral("%1.IsNullArrayElement(\"%2\", $(index))").arg(GetContainerObjectVariableName(), field.GetId());
 		result.customListAccessCode.clear();
 		QTextStream accessCodeStream(&result.customListAccessCode);
 		accessCodeStream << QStringLiteral("const ");
@@ -500,25 +522,6 @@ bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(
 		accessCodeStream << QStringLiteral("\", $(index));");
 		FeedStream(accessCodeStream, 1, false);
 
-		// check NULL
-		FeedStreamHorizontally(accessCodeStream, horizontalIndents + 1);
-		accessCodeStream << QStringLiteral("if (");
-		accessCodeStream << result.customAccessedElementName;
-		accessCodeStream << QStringLiteral(" == nullptr){");
-		FeedStream(accessCodeStream, 1, false);
-
-		FeedStreamHorizontally(accessCodeStream, horizontalIndents + 2);
-		accessCodeStream << QStringLiteral("qDebug() << \"invalid type\" << ") << result.customAccessedElementName;
-		accessCodeStream << QStringLiteral(";");
-		FeedStream(accessCodeStream, 1, false);
-
-		FeedStreamHorizontally(accessCodeStream, horizontalIndents + 2);
-		accessCodeStream << QStringLiteral("return false;");
-		FeedStream(accessCodeStream, 1, false);
-
-		FeedStreamHorizontally(accessCodeStream, horizontalIndents + 1);
-		accessCodeStream << '}';
-		FeedStream(accessCodeStream, 1, false);
 	}
 	else if (isUnion){
 		stream << QStringLiteral("const QList<const ");
@@ -542,6 +545,7 @@ bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(
 		result.listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataList");
 
 		result.customAccessedElementName = "a";
+		result.elementNullCheck = QStringLiteral("%1.IsNullArrayElement(\"%2\", $(index))").arg(GetContainerObjectVariableName(), field.GetId());
 		QTextStream accessStream(&result.customListAccessCode);
 		accessStream << ' ' << variableName;
 		accessStream << QStringLiteral(" = ");
@@ -550,26 +554,13 @@ bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(
 		FeedStream(accessStream);
 
 		FeedStreamHorizontally(accessStream, horizontalIndents + 1);
-		accessStream << QStringLiteral("if (");
-		accessStream << variableName;
-		accessStream << QStringLiteral(" == nullptr){");
-		FeedStream(accessStream);
-
-		FeedStreamHorizontally(accessStream, horizontalIndents + 2);
-		accessStream << QStringLiteral("return false;");
-		FeedStream(accessStream);
-
-		FeedStreamHorizontally(accessStream, horizontalIndents + 1);
-		accessStream << '}';
-		FeedStream(accessStream);
-
-		FeedStreamHorizontally(accessStream, horizontalIndents + 1);
 		accessStream << QStringLiteral("QString ");
 		/// \bug \todo fix it
 		accessStream << GetDecapitalizedValue(variableName.mid(4));
 		accessStream << ("DataValueTypename = ");
-		accessStream << variableName;
-		accessStream << QStringLiteral("->GetParamArgumentValue(\"__typename\").toString();");
+		accessStream << QStringLiteral("(") << variableName << QStringLiteral(" == nullptr || ");
+		accessStream << variableName << QStringLiteral("->IsNull()) ? QString() : ");
+		accessStream << variableName << QStringLiteral("->GetParamArgumentValue(\"__typename\").toString();");
 	}
 	else{
 		stream << QStringLiteral("const QVariant ");
@@ -599,6 +590,7 @@ bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(
 			result.toObjectTransformMethod		= QStringLiteral(".to") + GetConvertEndForFieldString(field, true);
 		}
 		result.listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataList");
+		result.elementNullCheck = QStringLiteral("%1.IsNullArrayElement(\"%2\", $(index))").arg(GetContainerObjectVariableName(), field.GetId());
 	}
 
 	return true;
@@ -773,7 +765,7 @@ QString CSdlClassGqlModificatorComp::GetUnionListElementType(bool forScalar) con
 }
 
 
-void CSdlClassGqlModificatorComp::WriteTypenameToObjectCode(QTextStream& stream, const imtsdl::CSdlType& sdlType) const 
+void CSdlClassGqlModificatorComp::WriteTypenameToObjectCode(QTextStream& stream, const imtsdl::CSdlType& sdlType) const
 {
 	stream << GetContainerObjectVariableName();
 	stream << QStringLiteral(".InsertParam(");
