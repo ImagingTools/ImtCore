@@ -974,6 +974,11 @@ void CGqlRequest::SetParseText(const QByteArray& text)
 		lastArrayId = m_activeArrayIds.last();
 	}
 	if (!lastArrayId.isEmpty() && m_startArrayPrimitives){
+		if (text == QByteArrayLiteral("null") && m_activeGqlObjectPtr->IsObjectList(lastArrayId)){
+			m_activeGqlObjectPtr->AppendParamToArray(lastArrayId, CGqlParamObject::CreateNull());
+
+			return;
+		}
 
 		QVariant value = m_activeGqlObjectPtr->GetParamArgumentValue(lastArrayId);
 		QVariantList variantList;

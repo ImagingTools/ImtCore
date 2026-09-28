@@ -69,8 +69,11 @@ void TListModelBase<ModelDataType, ModelObjectDataType>::fromMe(TListModelBase<M
 			continue;
 		}
 
-		ModelObjectDataType* copyItem(dynamic_cast<ModelObjectDataType*>(itemObjectPtr->copyMe()));
-		objectListPtr->append(copyItem);
+		ModelObjectDataType copyItem;
+		if (!copyItem.createFromJson(itemObjectPtr->toJson())){
+			return;
+		}
+		objectListPtr->append(&copyItem);
 	}
 }
 
