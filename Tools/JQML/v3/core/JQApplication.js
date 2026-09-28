@@ -513,7 +513,17 @@ module.exports = {
             if(item && !item.__destroyed) newTree.push(item)
         }
 
-        this.root.__setFocusTree(newTree)
+        // Only the previous chain can still have focus. Walking the whole
+        // item tree here made every focus change visit every control.
+        // Items inside a FocusScope keep their own focus: the scope remembers
+        // which child was active, and the border of CustomTextField reads that.
+        let keep = new Set(newTree)
+        for(let item of oldTree){
+            if(!item || item.__destroyed || keep.has(item)) continue
+            if(this._isInsideFocusScope(item)) continue
+            if(item.focus) item.focus = false
+        }
+
         this.focusTree = newTree
         this._syncActiveFocus(oldTree, newTree)
     },
@@ -549,7 +559,9 @@ module.exports = {
 
         for(let item of oldTree){
             if(!item || item.__destroyed || shouldHave.has(item)) continue
-            this._clearDescendantActiveFocus(item, shouldHave)
+            if(item instanceof JQModules.QtQuick.FocusScope){
+                this._clearDescendantActiveFocus(item, shouldHave)
+            }
         }
 
         if(canActivate && owner instanceof JQModules.QtQuick.FocusScope){
@@ -557,14 +569,26 @@ module.exports = {
         }
     },
 
+    _isInsideFocusScope(item){
+        let parent = item.parent
+        while(parent){
+            if(parent instanceof JQModules.QtQuick.FocusScope) return true
+            parent = parent.parent
+        }
+        return false
+    },
+
     _clearDescendantActiveFocus(item, shouldHave){
         if(!item || !item.children) return
         for(let child of item.children){
             if(!child || child.__destroyed) continue
+            if(!child.focus && !child.activeFocus) continue
             if(!shouldHave.has(child) && child.activeFocus){
                 child.activeFocus = false
             }
-            this._clearDescendantActiveFocus(child, shouldHave)
+            if(child instanceof JQModules.QtQuick.FocusScope){
+                this._clearDescendantActiveFocus(child, shouldHave)
+            }
         }
     },
 
