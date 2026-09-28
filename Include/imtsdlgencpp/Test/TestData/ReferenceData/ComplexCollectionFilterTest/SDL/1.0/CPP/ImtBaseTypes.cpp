@@ -2386,7 +2386,7 @@ bool V1_0::imtbase::COptionsList::ReadFromGraphQlObject(const ::imtgql::CGqlPara
 		options = imtsdl::TElementList<V1_0::imtbase::COption>();
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsElementsCount; ++optionsIndex){
 			const ::imtgql::CGqlParamObject* optionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("options", optionsIndex);
-			if (gqlObject.IsNullArrayElement("options", optionsIndex)){
+			if (optionsDataObjectPtr == nullptr || optionsDataObjectPtr->IsNull()){
 				options->AppendNull();
 				continue;
 			}
@@ -2422,7 +2422,7 @@ bool V1_0::imtbase::COptionsList::OptReadFromGraphQlObject(const ::imtgql::CGqlP
 		options = imtsdl::TElementList<V1_0::imtbase::COption>();
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsElementsCount; ++optionsIndex){
 			const ::imtgql::CGqlParamObject* optionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("options", optionsIndex);
-			if (gqlObject.IsNullArrayElement("options", optionsIndex)){
+			if (optionsDataObjectPtr == nullptr || optionsDataObjectPtr->IsNull()){
 				options->AppendNull();
 				continue;
 			}
@@ -3993,7 +3993,7 @@ bool V1_0::imtbase::CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		const qsizetype paramIdsElementsCount = paramIdsDataList.size();
 		paramIds = imtsdl::TElementList<QByteArray>();
 		for (qsizetype paramIdsIndex = 0; paramIdsIndex < paramIdsElementsCount; ++paramIdsIndex){
-			if (gqlObject.IsNullArrayElement("paramIds", paramIdsIndex)){
+			if (!paramIdsDataList[paramIdsIndex].isValid() || paramIdsDataList[paramIdsIndex].isNull()){
 				paramIds->AppendNull();
 				continue;
 			}
@@ -4011,7 +4011,7 @@ bool V1_0::imtbase::CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		const qsizetype paramTypeIdsElementsCount = paramTypeIdsDataList.size();
 		paramTypeIds = imtsdl::TElementList<QByteArray>();
 		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIdsElementsCount; ++paramTypeIdsIndex){
-			if (gqlObject.IsNullArrayElement("paramTypeIds", paramTypeIdsIndex)){
+			if (!paramTypeIdsDataList[paramTypeIdsIndex].isValid() || paramTypeIdsDataList[paramTypeIdsIndex].isNull()){
 				paramTypeIds->AppendNull();
 				continue;
 			}
@@ -4029,7 +4029,7 @@ bool V1_0::imtbase::CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		const qsizetype paramNamesElementsCount = paramNamesDataList.size();
 		paramNames = imtsdl::TElementList<QString>();
 		for (qsizetype paramNamesIndex = 0; paramNamesIndex < paramNamesElementsCount; ++paramNamesIndex){
-			if (gqlObject.IsNullArrayElement("paramNames", paramNamesIndex)){
+			if (!paramNamesDataList[paramNamesIndex].isValid() || paramNamesDataList[paramNamesIndex].isNull()){
 				paramNames->AppendNull();
 				continue;
 			}
@@ -4047,7 +4047,7 @@ bool V1_0::imtbase::CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		const qsizetype paramDescriptionsElementsCount = paramDescriptionsDataList.size();
 		paramDescriptions = imtsdl::TElementList<QString>();
 		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptionsElementsCount; ++paramDescriptionsIndex){
-			if (gqlObject.IsNullArrayElement("paramDescriptions", paramDescriptionsIndex)){
+			if (!paramDescriptionsDataList[paramDescriptionsIndex].isValid() || paramDescriptionsDataList[paramDescriptionsIndex].isNull()){
 				paramDescriptions->AppendNull();
 				continue;
 			}
@@ -4065,7 +4065,7 @@ bool V1_0::imtbase::CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		const qsizetype parametersElementsCount = parametersDataList.size();
 		parameters = imtsdl::TElementList<QString>();
 		for (qsizetype parametersIndex = 0; parametersIndex < parametersElementsCount; ++parametersIndex){
-			if (gqlObject.IsNullArrayElement("parameters", parametersIndex)){
+			if (!parametersDataList[parametersIndex].isValid() || parametersDataList[parametersIndex].isNull()){
 				parameters->AppendNull();
 				continue;
 			}
@@ -4089,7 +4089,7 @@ bool V1_0::imtbase::CParamsSet::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		const qsizetype paramIdsElementsCount = paramIdsDataList.size();
 		paramIds = imtsdl::TElementList<QByteArray>();
 		for (qsizetype paramIdsIndex = 0; paramIdsIndex < paramIdsElementsCount; ++paramIdsIndex){
-			if (gqlObject.IsNullArrayElement("paramIds", paramIdsIndex)){
+			if (!paramIdsDataList[paramIdsIndex].isValid() || paramIdsDataList[paramIdsIndex].isNull()){
 				paramIds->AppendNull();
 				continue;
 			}
@@ -4107,7 +4107,7 @@ bool V1_0::imtbase::CParamsSet::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		const qsizetype paramTypeIdsElementsCount = paramTypeIdsDataList.size();
 		paramTypeIds = imtsdl::TElementList<QByteArray>();
 		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIdsElementsCount; ++paramTypeIdsIndex){
-			if (gqlObject.IsNullArrayElement("paramTypeIds", paramTypeIdsIndex)){
+			if (!paramTypeIdsDataList[paramTypeIdsIndex].isValid() || paramTypeIdsDataList[paramTypeIdsIndex].isNull()){
 				paramTypeIds->AppendNull();
 				continue;
 			}
@@ -4125,7 +4125,7 @@ bool V1_0::imtbase::CParamsSet::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		const qsizetype paramNamesElementsCount = paramNamesDataList.size();
 		paramNames = imtsdl::TElementList<QString>();
 		for (qsizetype paramNamesIndex = 0; paramNamesIndex < paramNamesElementsCount; ++paramNamesIndex){
-			if (gqlObject.IsNullArrayElement("paramNames", paramNamesIndex)){
+			if (!paramNamesDataList[paramNamesIndex].isValid() || paramNamesDataList[paramNamesIndex].isNull()){
 				paramNames->AppendNull();
 				continue;
 			}
@@ -4143,7 +4143,7 @@ bool V1_0::imtbase::CParamsSet::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		const qsizetype paramDescriptionsElementsCount = paramDescriptionsDataList.size();
 		paramDescriptions = imtsdl::TElementList<QString>();
 		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptionsElementsCount; ++paramDescriptionsIndex){
-			if (gqlObject.IsNullArrayElement("paramDescriptions", paramDescriptionsIndex)){
+			if (!paramDescriptionsDataList[paramDescriptionsIndex].isValid() || paramDescriptionsDataList[paramDescriptionsIndex].isNull()){
 				paramDescriptions->AppendNull();
 				continue;
 			}
@@ -4161,7 +4161,7 @@ bool V1_0::imtbase::CParamsSet::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		const qsizetype parametersElementsCount = parametersDataList.size();
 		parameters = imtsdl::TElementList<QString>();
 		for (qsizetype parametersIndex = 0; parametersIndex < parametersElementsCount; ++parametersIndex){
-			if (gqlObject.IsNullArrayElement("parameters", parametersIndex)){
+			if (!parametersDataList[parametersIndex].isValid() || parametersDataList[parametersIndex].isNull()){
 				parameters->AppendNull();
 				continue;
 			}
@@ -4717,7 +4717,7 @@ bool V1_0::imtbase::CMimeType::ReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 		const qsizetype treeElementsCount = treeDataList.size();
 		tree = imtsdl::TElementList<QString>();
 		for (qsizetype treeIndex = 0; treeIndex < treeElementsCount; ++treeIndex){
-			if (gqlObject.IsNullArrayElement("tree", treeIndex)){
+			if (!treeDataList[treeIndex].isValid() || treeDataList[treeIndex].isNull()){
 				tree->AppendNull();
 				continue;
 			}
@@ -4746,7 +4746,7 @@ bool V1_0::imtbase::CMimeType::ReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 		const qsizetype parametersElementsCount = parametersDataList.size();
 		parameters = imtsdl::TElementList<QString>();
 		for (qsizetype parametersIndex = 0; parametersIndex < parametersElementsCount; ++parametersIndex){
-			if (gqlObject.IsNullArrayElement("parameters", parametersIndex)){
+			if (!parametersDataList[parametersIndex].isValid() || parametersDataList[parametersIndex].isNull()){
 				parameters->AppendNull();
 				continue;
 			}
@@ -4774,7 +4774,7 @@ bool V1_0::imtbase::CMimeType::OptReadFromGraphQlObject(const ::imtgql::CGqlPara
 		const qsizetype treeElementsCount = treeDataList.size();
 		tree = imtsdl::TElementList<QString>();
 		for (qsizetype treeIndex = 0; treeIndex < treeElementsCount; ++treeIndex){
-			if (gqlObject.IsNullArrayElement("tree", treeIndex)){
+			if (!treeDataList[treeIndex].isValid() || treeDataList[treeIndex].isNull()){
 				tree->AppendNull();
 				continue;
 			}
@@ -4800,7 +4800,7 @@ bool V1_0::imtbase::CMimeType::OptReadFromGraphQlObject(const ::imtgql::CGqlPara
 		const qsizetype parametersElementsCount = parametersDataList.size();
 		parameters = imtsdl::TElementList<QString>();
 		for (qsizetype parametersIndex = 0; parametersIndex < parametersElementsCount; ++parametersIndex){
-			if (gqlObject.IsNullArrayElement("parameters", parametersIndex)){
+			if (!parametersDataList[parametersIndex].isValid() || parametersDataList[parametersIndex].isNull()){
 				parameters->AppendNull();
 				continue;
 			}

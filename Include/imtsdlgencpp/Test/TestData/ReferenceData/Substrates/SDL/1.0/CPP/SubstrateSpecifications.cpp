@@ -1235,7 +1235,7 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::ReadFromGraphQlObject
 		items = imtsdl::TElementList<V1_0::substrate::CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsElementsCount; ++itemsIndex){
 			const ::imtgql::CGqlParamObject* itemsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("items", itemsIndex);
-			if (gqlObject.IsNullArrayElement("items", itemsIndex)){
+			if (itemsDataObjectPtr == nullptr || itemsDataObjectPtr->IsNull()){
 				items->AppendNull();
 				continue;
 			}
@@ -1263,7 +1263,7 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::OptReadFromGraphQlObj
 		items = imtsdl::TElementList<V1_0::substrate::CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsElementsCount; ++itemsIndex){
 			const ::imtgql::CGqlParamObject* itemsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("items", itemsIndex);
-			if (gqlObject.IsNullArrayElement("items", itemsIndex)){
+			if (itemsDataObjectPtr == nullptr || itemsDataObjectPtr->IsNull()){
 				items->AppendNull();
 				continue;
 			}

@@ -600,7 +600,7 @@ bool V1_0::modsdl::CLink::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		const qsizetype statusListElementsCount = statusListDataList.size();
 		statusList = imtsdl::TElementList<V1_0::modsdl::LinkStatus>();
 		for (qsizetype statusListIndex = 0; statusListIndex < statusListElementsCount; ++statusListIndex){
-			if (gqlObject.IsNullArrayElement("statusList", statusListIndex)){
+			if (!statusListDataList[statusListIndex].isValid() || statusListDataList[statusListIndex].isNull()){
 				statusList->AppendNull();
 				continue;
 			}
@@ -655,7 +655,7 @@ bool V1_0::modsdl::CLink::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 		const qsizetype statusListElementsCount = statusListDataList.size();
 		statusList = imtsdl::TElementList<V1_0::modsdl::LinkStatus>();
 		for (qsizetype statusListIndex = 0; statusListIndex < statusListElementsCount; ++statusListIndex){
-			if (gqlObject.IsNullArrayElement("statusList", statusListIndex)){
+			if (!statusListDataList[statusListIndex].isValid() || statusListDataList[statusListIndex].isNull()){
 				statusList->AppendNull();
 				continue;
 			}
@@ -1290,7 +1290,7 @@ bool V1_0::modsdl::CPrinterBase::ReadFromGraphQlObject(const ::imtgql::CGqlParam
 	linkList = imtsdl::TElementList<V1_0::modsdl::CLink>();
 	for (qsizetype linkListIndex = 0; linkListIndex < linkListElementsCount; ++linkListIndex){
 		const ::imtgql::CGqlParamObject* linkListDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("linkList", linkListIndex);
-		if (gqlObject.IsNullArrayElement("linkList", linkListIndex)){
+		if (linkListDataObjectPtr == nullptr || linkListDataObjectPtr->IsNull()){
 			linkList->AppendNull();
 			continue;
 		}
@@ -1350,7 +1350,7 @@ bool V1_0::modsdl::CPrinterBase::ReadFromGraphQlObject(const ::imtgql::CGqlParam
 	for (qsizetype specificationListIndex = 0; specificationListIndex < specificationListElementsCount; ++specificationListIndex){
 		const ::imtgql::CGqlParamObject* tempSpecificationList = specificationListDataList[specificationListIndex];
 		QString specificationListDataValueTypename = (tempSpecificationList == nullptr || tempSpecificationList->IsNull()) ? QString() : tempSpecificationList->GetParamArgumentValue("__typename").toString();
-		if (gqlObject.IsNullArrayElement("specificationList", specificationListIndex)){
+		if (specificationListDataList[specificationListIndex] == nullptr || specificationListDataList[specificationListIndex]->IsNull()){
 			specificationList->AppendNull();
 			continue;
 		}
@@ -1398,7 +1398,7 @@ bool V1_0::modsdl::CPrinterBase::OptReadFromGraphQlObject(const ::imtgql::CGqlPa
 		linkList = imtsdl::TElementList<V1_0::modsdl::CLink>();
 		for (qsizetype linkListIndex = 0; linkListIndex < linkListElementsCount; ++linkListIndex){
 			const ::imtgql::CGqlParamObject* linkListDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("linkList", linkListIndex);
-			if (gqlObject.IsNullArrayElement("linkList", linkListIndex)){
+			if (linkListDataObjectPtr == nullptr || linkListDataObjectPtr->IsNull()){
 				linkList->AppendNull();
 				continue;
 			}
@@ -1452,7 +1452,7 @@ bool V1_0::modsdl::CPrinterBase::OptReadFromGraphQlObject(const ::imtgql::CGqlPa
 		for (qsizetype specificationListIndex = 0; specificationListIndex < specificationListElementsCount; ++specificationListIndex){
 			const ::imtgql::CGqlParamObject* tempSpecificationList = specificationListDataList[specificationListIndex];
 			QString specificationListDataValueTypename = (tempSpecificationList == nullptr || tempSpecificationList->IsNull()) ? QString() : tempSpecificationList->GetParamArgumentValue("__typename").toString();
-			if (gqlObject.IsNullArrayElement("specificationList", specificationListIndex)){
+			if (specificationListDataList[specificationListIndex] == nullptr || specificationListDataList[specificationListIndex]->IsNull()){
 				specificationList->AppendNull();
 				continue;
 			}
