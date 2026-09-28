@@ -73,6 +73,78 @@ void CObjectModificatorCompBase::WriteSetValueToStruct(
 }
 
 
+void CObjectModificatorCompBase::AddArrayElementWriteNullCheck(
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			const QString& arrayContainerVariableName,
+			const QString& indexVariableName,
+			quint16 hIndents) const
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (!") << field.GetId() << QStringLiteral("->at(") << indexVariableName << QStringLiteral(")){");
+	FeedStream(stream, 1, false);
+
+	if (field.AreArrayElementsRequired()){
+		AddErrorReport(stream, QStringLiteral("Array field '%3' contains a null element"), hIndents + 1, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("return false;");
+	}
+	else {
+		FeedStreamHorizontally(stream, hIndents + 1);
+		AddNullValueAppendToObjectArray(stream, field, arrayContainerVariableName, hIndents + 1);
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("continue;");
+	}
+
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+}
+
+
+void CObjectModificatorCompBase::AddArrayElementReadNullCheck(
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			const ListAccessResult& result,
+			quint16 hIndents)
+{
+	if (result.elementNullCheck.isEmpty()){
+		return;
+	}
+
+	QString elementNullCheck = result.elementNullCheck;
+	elementNullCheck.replace(QStringLiteral("$(index)"), GetDecapitalizedValue(field.GetId()) + QStringLiteral("Index"));
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (") << elementNullCheck << QStringLiteral("){");
+	FeedStream(stream, 1, false);
+
+	if (field.AreArrayElementsRequired()){
+		AddErrorReport(stream, QStringLiteral("Array field '%3' contains a null element"), hIndents + 1, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("return false;");
+	}
+	else {
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << field.GetId() << QStringLiteral("->AppendNull();");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("continue;");
+	}
+
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+}
+
+
 // reimplemented (CSdlClassModificatorBaseComp)
 
 bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& /*sdlType*/, QIODevice* headerDevicePtr, const iprm::IParamsSet* /*paramsPtr*/) const
@@ -161,7 +233,7 @@ bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& 
 		WriteTypenameToObjectCode(ofStream, sdlType);
 		FeedStream(ofStream, 2, false);
 	}
-	
+
 
 	// finish write implementation
 	FeedStreamHorizontally(ofStream);
@@ -462,12 +534,7 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectCode(QTextStream& str
 {
 	const bool isStrict = bool(!optional && field.IsRequired());
 	if (isStrict){
-		if (field.IsArray() && field.IsNonEmpty()){
-			AddArrayInternalChecksFail(stream, field, true);
-		}
-		else if (!field.IsArray() || field.IsNonEmpty()){
-			AddArrayInternalChecksFail(stream, field, false);
-		}
+		AddArrayInternalChecksFail(stream, field, false);
 		AddArrayFieldWriteToObjectImplCode(stream, field, optional);
 	}
 	else {
@@ -476,9 +543,22 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectCode(QTextStream& str
 		stream << GetNullCheckString(field, false);
 		stream << QStringLiteral("){");
 		FeedStream(stream, 1, false);
-		
+
 		AddArrayFieldWriteToObjectImplCode(stream, field, optional, 2);
 		stream << QStringLiteral("\t}");
+		if (!field.IsRequired()){
+			FeedStream(stream, 1, false);
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("else if (") << field.GetId() << QStringLiteral(".IsNull()){");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 2);
+			AddNullArrayWriteToObject(stream, field, 2);
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream);
+			stream << '}';
+		}
 		FeedStream(stream, 1, false);
 	}
 }
@@ -506,6 +586,7 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
+	AddArrayElementWriteNullCheck(stream, field, newObjectArrayVarName, dataIndexVarName, hIndents + 1);
 
 	bool isEnum = false;
 	bool isUnion = false;
@@ -590,9 +671,7 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 void CObjectModificatorCompBase::AddCustomArrayFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional) const
 {
 	if (!optional && field.IsRequired()){
-		if (field.IsArray()){
-			AddArrayInternalChecksFail(stream, field, field.IsNonEmpty());
-		}
+		AddArrayInternalChecksFail(stream, field, false);
 		AddCustomArrayFieldWriteToObjectImplCode(stream, field, optional);
 	}
 	else {
@@ -604,6 +683,19 @@ void CObjectModificatorCompBase::AddCustomArrayFieldWriteToObjectCode(QTextStrea
 
 		AddCustomArrayFieldWriteToObjectImplCode(stream, field, optional, 2);
 		stream << QStringLiteral("\n\t}");
+		if (!field.IsRequired()){
+			FeedStream(stream, 1, false);
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("else if (") << field.GetId() << QStringLiteral(".IsNull()){");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 2);
+			AddNullArrayWriteToObject(stream, field, 2);
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream);
+			stream << '}';
+		}
 	}
 	FeedStream(stream, 1, false);
 }
@@ -630,6 +722,8 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldWriteToObjectImplCode(
 	stream << QStringLiteral("->size(); ++") << dataIndexVarName;
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
+
+	AddArrayElementWriteNullCheck(stream, field, newObjectArrayVarName, dataIndexVarName, hIndents + 1);
 
 	// inLoop: create temp object to contin value
 	FeedStreamHorizontally(stream, hIndents + 1);
@@ -949,23 +1043,6 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 	AddContainerListAccessCode(stream, field, QStringLiteral("temp") + GetCapitalizedValue(field.GetId()), hIndents, result);
 	FeedStream(stream, 1, false);
 
-	// value non empty checks
-	if (field.IsNonEmpty()){
-		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("if (") << result.listCountVariableName << QStringLiteral(" <= 0){");
-		FeedStream(stream, 1, false);
-
-		AddErrorReport(stream, QStringLiteral("Field: '%3' is empty"), hIndents, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
-
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("return false;");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, hIndents);
-		stream << '}';
-		FeedStream(stream, 1, false);
-	}
-
 	// reset a list value
 	FeedStreamHorizontally(stream, hIndents);
 	stream << field.GetId();
@@ -981,6 +1058,10 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 	stream << indexVariableName << QStringLiteral(" < ") << result.listCountVariableName;
 	stream << QStringLiteral("; ++") << indexVariableName << QStringLiteral("){");
 	FeedStream(stream, 1, false);
+
+	if (result.customListAccessCode.isEmpty()){
+		AddArrayElementReadNullCheck(stream, field, result, hIndents + 1);
+	}
 
 	// inLoop: declare temp var
 	FeedStreamHorizontally(stream, hIndents + 1);
@@ -1019,6 +1100,10 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		stream << result.customListAccessCode.replace("$(index)", indexVariableName);
 	}
 	FeedStream(stream, 1, false);
+
+	if (!result.customListAccessCode.isEmpty()){
+		AddArrayElementReadNullCheck(stream, field, result, hIndents + 1);
+	}
 
 	// inLoop: add temp variable to object's List
 	if (isEnum){
@@ -1143,23 +1228,6 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldReadToObjectImplCode(
 	AddContainerListAccessCode(stream, field, QString(), hIndents, result);
 	FeedStream(stream, 1, false);
 
-	// value non empty checks
-	if (field.IsNonEmpty()){
-		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("if (") << result.listCountVariableName << QStringLiteral(" <= 0){");
-		FeedStream(stream, 1, false);
-
-		AddErrorReport(stream, QStringLiteral("Field: '%3' is empty"), hIndents, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
-
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("return false;");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, hIndents);
-		stream << '}';
-		FeedStream(stream, 1, false);
-	}
-
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 	structNameConverter.addVersion = false;
@@ -1188,6 +1256,8 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldReadToObjectImplCode(
 		Q_ASSERT(!result.customAccessedElementName.isEmpty());
 		stream << result.customListAccessCode.replace("$(index)", indexVariableName);
 	}
+
+	AddArrayElementReadNullCheck(stream, field, result, hIndents + 1);
 
 	// inLoop: declare temp var
 	FeedStreamHorizontally(stream, hIndents + 1);

@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtTest/QTest>
+#include <QtCore/QBuffer>
 #include <QtCore/QFile>
 
 // ACF includes
@@ -15,6 +16,8 @@
 
 // ImtCore includes
 #include <GeneratedFiles/ImtSdlGenTest/CImtSdlGenTest.h>
+#include <imtbase/CTreeItemModel.h>
+#include <imtsdl/CGqlSchemaParser.h>
 
 
 namespace imtsdlgentest
@@ -257,6 +260,61 @@ void CSdlGenTest::TestComplexUnion()
 }
 
 
+void CSdlGenTest::TestArrayNullabilityParsing()
+{
+	QByteArray schema = R"(
+		type Attribute {
+			Value: String
+		}
+
+		type Entity {
+			RequiredList: [Attribute!]!
+			OptionalListWithRequiredElements: [Attribute!]
+			OptionalListWithOptionalElements: [Attribute]
+		}
+	)";
+	QBuffer schemaBuffer(&schema);
+	QVERIFY(schemaBuffer.open(QIODevice::ReadOnly));
+
+	imtsdl::CGqlSchemaParser parser(schemaBuffer);
+	QVERIFY(parser.ParseGqlSchema());
+
+	const imtsdl::SdlFieldList fields = parser.GetFields(QStringLiteral("Entity"));
+	QCOMPARE(fields.size(), 3);
+
+	QCOMPARE(fields[0].GetId(), QStringLiteral("RequiredList"));
+	QVERIFY(fields[0].IsArray());
+	QVERIFY(fields[0].IsRequired());
+	QVERIFY(fields[0].AreArrayElementsRequired());
+
+	QCOMPARE(fields[1].GetId(), QStringLiteral("OptionalListWithRequiredElements"));
+	QVERIFY(fields[1].IsArray());
+	QVERIFY(!fields[1].IsRequired());
+	QVERIFY(fields[1].AreArrayElementsRequired());
+
+	QCOMPARE(fields[2].GetId(), QStringLiteral("OptionalListWithOptionalElements"));
+	QVERIFY(fields[2].IsArray());
+	QVERIFY(!fields[2].IsRequired());
+	QVERIFY(!fields[2].AreArrayElementsRequired());
+}
+
+
+void CSdlGenTest::TestTreeModelExplicitNullKey()
+{
+	imtbase::CTreeItemModel model;
+	QVERIFY(!model.ContainsKey("Value"));
+	QVERIFY(model.SetData("Value", QVariant()));
+	QVERIFY(model.ContainsKey("Value"));
+	QVERIFY(!model.GetData("Value").isValid());
+
+	QVERIFY(model.AddTreeModel("Value") != nullptr);
+	QVERIFY(model.GetTreeItemModel("Value") != nullptr);
+	QVERIFY(model.SetData("Value", QVariant()));
+	QVERIFY(model.ContainsKey("Value"));
+	QVERIFY(model.GetTreeItemModel("Value") == nullptr);
+}
+
+
 void CSdlGenTest::TestNestedFieldNameCollision()
 {
 	CImtSdlGenTest testSuite;
@@ -300,7 +358,7 @@ void CSdlGenTest::PrinterTest()
 }
 
 
-void CSdlGenTest::SubstrateSpecifications() 
+void CSdlGenTest::SubstrateSpecifications()
 {
 	CImtSdlGenTest testSuite;
 	PrepareSuite(testSuite, m_tempOutputDir);
@@ -314,7 +372,7 @@ void CSdlGenTest::SubstrateSpecifications()
 }
 
 
-void CSdlGenTest::cleanup() 
+void CSdlGenTest::cleanup()
 {
 	m_isAllTestsPassed = m_isAllTestsPassed && !QTest::currentTestFailed();
 }
