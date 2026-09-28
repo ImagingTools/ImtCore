@@ -360,9 +360,9 @@ bool CDuckDatabaseEngineComp::EnsureDatabaseOpen() const
 
 			duckdb::DBConfig config(configOptions, readOnly);
 
-			m_databasePtr = std::make_unique<duckdb::DuckDB>(databasePath.isEmpty() ? std::string() : databasePath.toStdString(), &config);
+			m_databasePtr	= std::make_unique<duckdb::DuckDB>(databasePath.isEmpty() ? std::string() : databasePath.toStdString(), &config);
 			m_connectionPtr = std::make_unique<duckdb::Connection>(*m_databasePtr);
-			m_driverPtr = std::make_unique<CDuckSqlDriver>(*m_connectionPtr);
+			m_driverPtr		= std::make_unique<CDuckSqlDriver>(*m_connectionPtr);
 
 			justCreated = true;
 		}
@@ -402,7 +402,7 @@ bool CDuckDatabaseEngineComp::CreateDatabaseMetaInfo() const
 
 	ExecSqlQuery(
 				QByteArrayLiteral(
-					"CREATE TABLE IF NOT EXISTS \"Revisions\" ("
+					R"(CREATE TABLE IF NOT EXISTS "Revisions" ()"
 					"Revision INTEGER NOT NULL PRIMARY KEY, "
 					"CreationDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
 					"Description VARCHAR"

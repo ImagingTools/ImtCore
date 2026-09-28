@@ -42,9 +42,11 @@ protected:
 	virtual bool isNull(int index) override;
 	virtual int size() override;
 	virtual int numRowsAffected() override;
+	virtual QSqlRecord record() const override;
 
 private:
 	static QVariant ConvertValue(const duckdb::Value& value);
+	static QMetaType ConvertMetaType(const duckdb::LogicalType& type);
 
 private:
 	duckdb::Connection& m_connection;

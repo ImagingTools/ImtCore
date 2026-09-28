@@ -4,6 +4,8 @@
 
 // Qt includes
 #include <QtSql/QSqlError>
+#include <QtSql/QSqlField>
+#include <QtSql/QSqlRecord>
 
 // ImtCore includes
 #include <imtduckdb/CDuckSqlDriver.h>
@@ -258,7 +260,62 @@ int CDuckSqlResult::numRowsAffected()
 }
 
 
+QSqlRecord CDuckSqlResult::record() const
+{
+	QSqlRecord recordVal;
+
+	if (!m_resultPtr){
+		return recordVal;
+	}
+
+	const duckdb::idx_t columnCount = m_resultPtr->ColumnCount();
+	const bool hasCurrentRow = at() >= 0 && static_cast<duckdb::idx_t>(at()) < m_resultPtr->RowCount();
+
+	for (duckdb::idx_t i = 0; i < columnCount; ++ i){
+		QSqlField field(QString::fromStdString(m_resultPtr->ColumnName(i)), ConvertMetaType(m_resultPtr->types[i]));
+
+		if (hasCurrentRow){
+			field.setValue(ConvertValue(m_resultPtr->GetValue(i, static_cast<duckdb::idx_t>(at()))));
+		}
+
+		recordVal.append(field);
+	}
+
+	return recordVal;
+}
+
+
 // private methods
+
+QMetaType CDuckSqlResult::ConvertMetaType(const duckdb::LogicalType& type)
+{
+	switch (type.id()){
+	case duckdb::LogicalTypeId::BOOLEAN:
+		return QMetaType(QMetaType::Bool);
+
+	case duckdb::LogicalTypeId::TINYINT:
+	case duckdb::LogicalTypeId::SMALLINT:
+	case duckdb::LogicalTypeId::INTEGER:
+	case duckdb::LogicalTypeId::UTINYINT:
+	case duckdb::LogicalTypeId::USMALLINT:
+		return QMetaType(QMetaType::Int);
+
+	case duckdb::LogicalTypeId::BIGINT:
+	case duckdb::LogicalTypeId::UINTEGER:
+		return QMetaType(QMetaType::LongLong);
+
+	case duckdb::LogicalTypeId::FLOAT:
+		return QMetaType(QMetaType::Float);
+
+	case duckdb::LogicalTypeId::DOUBLE:
+	case duckdb::LogicalTypeId::DECIMAL:
+		return QMetaType(QMetaType::Double);
+
+	default:
+		return QMetaType(QMetaType::QString);
+	}
+}
+
 
 QVariant CDuckSqlResult::ConvertValue(const duckdb::Value& value)
 {

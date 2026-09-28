@@ -119,3 +119,4 @@ QString CDuckAppender::GetLastError() const
 
 
 } // namespace imtduckdb
+
