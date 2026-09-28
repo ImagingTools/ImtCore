@@ -362,7 +362,7 @@ macro(getImtBaseQmlWebDirs webdirs buildwebdir useImtControlsStyle)
 		set(useImtControlsStyle TRUE)
 	endif()
 
-	list(APPEND ${webdirs} ${IMTCOREDIR}/Tools/JQML/v2/core/dist)
+	list(APPEND ${webdirs} ${IMTCOREDIR}/Tools/JQML/v3/dist)
 	list(APPEND ${webdirs} ${buildwebdir}/Resources)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml/Fonts)
