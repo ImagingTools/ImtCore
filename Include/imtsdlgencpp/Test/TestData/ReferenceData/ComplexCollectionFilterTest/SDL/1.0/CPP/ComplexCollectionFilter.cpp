@@ -880,7 +880,7 @@ bool V1_0::imtbase::CFieldFilter::ReadFromGraphQlObject(const ::imtgql::CGqlPara
 	const qsizetype filterOperationsElementsCount = filterOperationsDataList.size();
 	filterOperations = imtsdl::TElementList<V1_0::imtbase::FilterOperation>();
 	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsElementsCount; ++filterOperationsIndex){
-		if (gqlObject.IsNullArrayElement("filterOperations", filterOperationsIndex)){
+		if (!filterOperationsDataList[filterOperationsIndex].isValid() || filterOperationsDataList[filterOperationsIndex].isNull()){
 			filterOperations->AppendNull();
 			continue;
 		}
@@ -950,7 +950,7 @@ bool V1_0::imtbase::CFieldFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlP
 		const qsizetype filterOperationsElementsCount = filterOperationsDataList.size();
 		filterOperations = imtsdl::TElementList<V1_0::imtbase::FilterOperation>();
 		for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsElementsCount; ++filterOperationsIndex){
-			if (gqlObject.IsNullArrayElement("filterOperations", filterOperationsIndex)){
+			if (!filterOperationsDataList[filterOperationsIndex].isValid() || filterOperationsDataList[filterOperationsIndex].isNull()){
 				filterOperations->AppendNull();
 				continue;
 			}
@@ -1526,7 +1526,7 @@ bool V1_0::imtbase::CGroupFilter::ReadFromGraphQlObject(const ::imtgql::CGqlPara
 		fieldFilters = imtsdl::TElementList<V1_0::imtbase::CFieldFilter>();
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersElementsCount; ++fieldFiltersIndex){
 			const ::imtgql::CGqlParamObject* fieldFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("fieldFilters", fieldFiltersIndex);
-			if (gqlObject.IsNullArrayElement("fieldFilters", fieldFiltersIndex)){
+			if (fieldFiltersDataObjectPtr == nullptr || fieldFiltersDataObjectPtr->IsNull()){
 				fieldFilters->AppendNull();
 				continue;
 			}
@@ -1548,7 +1548,7 @@ bool V1_0::imtbase::CGroupFilter::ReadFromGraphQlObject(const ::imtgql::CGqlPara
 		groupFilters = imtsdl::TElementList<V1_0::imtbase::CGroupFilter>();
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersElementsCount; ++groupFiltersIndex){
 			const ::imtgql::CGqlParamObject* groupFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("groupFilters", groupFiltersIndex);
-			if (gqlObject.IsNullArrayElement("groupFilters", groupFiltersIndex)){
+			if (groupFiltersDataObjectPtr == nullptr || groupFiltersDataObjectPtr->IsNull()){
 				groupFilters->AppendNull();
 				continue;
 			}
@@ -1594,7 +1594,7 @@ bool V1_0::imtbase::CGroupFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlP
 		fieldFilters = imtsdl::TElementList<V1_0::imtbase::CFieldFilter>();
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersElementsCount; ++fieldFiltersIndex){
 			const ::imtgql::CGqlParamObject* fieldFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("fieldFilters", fieldFiltersIndex);
-			if (gqlObject.IsNullArrayElement("fieldFilters", fieldFiltersIndex)){
+			if (fieldFiltersDataObjectPtr == nullptr || fieldFiltersDataObjectPtr->IsNull()){
 				fieldFilters->AppendNull();
 				continue;
 			}
@@ -1616,7 +1616,7 @@ bool V1_0::imtbase::CGroupFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlP
 		groupFilters = imtsdl::TElementList<V1_0::imtbase::CGroupFilter>();
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersElementsCount; ++groupFiltersIndex){
 			const ::imtgql::CGqlParamObject* groupFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("groupFilters", groupFiltersIndex);
-			if (gqlObject.IsNullArrayElement("groupFilters", groupFiltersIndex)){
+			if (groupFiltersDataObjectPtr == nullptr || groupFiltersDataObjectPtr->IsNull()){
 				groupFilters->AppendNull();
 				continue;
 			}
@@ -2155,7 +2155,7 @@ bool V1_0::imtbase::CComplexCollectionFilter::ReadFromGraphQlObject(const ::imtg
 		sortingInfo = imtsdl::TElementList<V1_0::imtbase::CFieldSortingInfo>();
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoElementsCount; ++sortingInfoIndex){
 			const ::imtgql::CGqlParamObject* sortingInfoDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("sortingInfo", sortingInfoIndex);
-			if (gqlObject.IsNullArrayElement("sortingInfo", sortingInfoIndex)){
+			if (sortingInfoDataObjectPtr == nullptr || sortingInfoDataObjectPtr->IsNull()){
 				sortingInfo->AppendNull();
 				continue;
 			}
@@ -2198,7 +2198,7 @@ bool V1_0::imtbase::CComplexCollectionFilter::ReadFromGraphQlObject(const ::imtg
 		const qsizetype distinctFieldsElementsCount = distinctFieldsDataList.size();
 		distinctFields = imtsdl::TElementList<QByteArray>();
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsElementsCount; ++distinctFieldsIndex){
-			if (gqlObject.IsNullArrayElement("distinctFields", distinctFieldsIndex)){
+			if (!distinctFieldsDataList[distinctFieldsIndex].isValid() || distinctFieldsDataList[distinctFieldsIndex].isNull()){
 				distinctFields->AppendNull();
 				continue;
 			}
@@ -2221,7 +2221,7 @@ bool V1_0::imtbase::CComplexCollectionFilter::OptReadFromGraphQlObject(const ::i
 		sortingInfo = imtsdl::TElementList<V1_0::imtbase::CFieldSortingInfo>();
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoElementsCount; ++sortingInfoIndex){
 			const ::imtgql::CGqlParamObject* sortingInfoDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("sortingInfo", sortingInfoIndex);
-			if (gqlObject.IsNullArrayElement("sortingInfo", sortingInfoIndex)){
+			if (sortingInfoDataObjectPtr == nullptr || sortingInfoDataObjectPtr->IsNull()){
 				sortingInfo->AppendNull();
 				continue;
 			}
@@ -2264,7 +2264,7 @@ bool V1_0::imtbase::CComplexCollectionFilter::OptReadFromGraphQlObject(const ::i
 		const qsizetype distinctFieldsElementsCount = distinctFieldsDataList.size();
 		distinctFields = imtsdl::TElementList<QByteArray>();
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsElementsCount; ++distinctFieldsIndex){
-			if (gqlObject.IsNullArrayElement("distinctFields", distinctFieldsIndex)){
+			if (!distinctFieldsDataList[distinctFieldsIndex].isValid() || distinctFieldsDataList[distinctFieldsIndex].isNull()){
 				distinctFields->AppendNull();
 				continue;
 			}

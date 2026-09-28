@@ -1036,7 +1036,7 @@ bool V1_0::modsdl::CPrinterList::ReadFromGraphQlObject(const ::imtgql::CGqlParam
 		data = imtsdl::TElementList<V1_0::modsdl::CPrinterBase>();
 		for (qsizetype dataIndex = 0; dataIndex < dataElementsCount; ++dataIndex){
 			const ::imtgql::CGqlParamObject* dataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("data", dataIndex);
-			if (gqlObject.IsNullArrayElement("data", dataIndex)){
+			if (dataDataObjectPtr == nullptr || dataDataObjectPtr->IsNull()){
 				data->AppendNull();
 				continue;
 			}
@@ -1064,7 +1064,7 @@ bool V1_0::modsdl::CPrinterList::OptReadFromGraphQlObject(const ::imtgql::CGqlPa
 		data = imtsdl::TElementList<V1_0::modsdl::CPrinterBase>();
 		for (qsizetype dataIndex = 0; dataIndex < dataElementsCount; ++dataIndex){
 			const ::imtgql::CGqlParamObject* dataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("data", dataIndex);
-			if (gqlObject.IsNullArrayElement("data", dataIndex)){
+			if (dataDataObjectPtr == nullptr || dataDataObjectPtr->IsNull()){
 				data->AppendNull();
 				continue;
 			}

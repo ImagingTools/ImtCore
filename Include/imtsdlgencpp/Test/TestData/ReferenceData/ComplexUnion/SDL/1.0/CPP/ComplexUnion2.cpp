@@ -4130,7 +4130,7 @@ bool V1_0::complextest::CArea::ReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 	Results = imtsdl::TElementList<V1_0::complextest::CResult>();
 	for (qsizetype resultsIndex = 0; resultsIndex < resultsElementsCount; ++resultsIndex){
 		const ::imtgql::CGqlParamObject* resultsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Results", resultsIndex);
-		if (gqlObject.IsNullArrayElement("Results", resultsIndex)){
+		if (resultsDataObjectPtr == nullptr || resultsDataObjectPtr->IsNull()){
 			Results->AppendNull();
 			continue;
 		}
@@ -4351,7 +4351,7 @@ bool V1_0::complextest::CArea::OptReadFromGraphQlObject(const ::imtgql::CGqlPara
 		Results = imtsdl::TElementList<V1_0::complextest::CResult>();
 		for (qsizetype resultsIndex = 0; resultsIndex < resultsElementsCount; ++resultsIndex){
 			const ::imtgql::CGqlParamObject* resultsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Results", resultsIndex);
-			if (gqlObject.IsNullArrayElement("Results", resultsIndex)){
+			if (resultsDataObjectPtr == nullptr || resultsDataObjectPtr->IsNull()){
 				Results->AppendNull();
 				continue;
 			}
@@ -5382,7 +5382,7 @@ bool V1_0::complextest::CAnalyzer::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 		Areas = imtsdl::TElementList<V1_0::complextest::CArea>();
 		for (qsizetype areasIndex = 0; areasIndex < areasElementsCount; ++areasIndex){
 			const ::imtgql::CGqlParamObject* areasDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Areas", areasIndex);
-			if (gqlObject.IsNullArrayElement("Areas", areasIndex)){
+			if (areasDataObjectPtr == nullptr || areasDataObjectPtr->IsNull()){
 				Areas->AppendNull();
 				continue;
 			}
@@ -5438,7 +5438,7 @@ bool V1_0::complextest::CAnalyzer::OptReadFromGraphQlObject(const ::imtgql::CGql
 		Areas = imtsdl::TElementList<V1_0::complextest::CArea>();
 		for (qsizetype areasIndex = 0; areasIndex < areasElementsCount; ++areasIndex){
 			const ::imtgql::CGqlParamObject* areasDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Areas", areasIndex);
-			if (gqlObject.IsNullArrayElement("Areas", areasIndex)){
+			if (areasDataObjectPtr == nullptr || areasDataObjectPtr->IsNull()){
 				Areas->AppendNull();
 				continue;
 			}
@@ -6023,7 +6023,7 @@ bool V1_0::complextest::CInspection::ReadFromGraphQlObject(const ::imtgql::CGqlP
 		Analyzers = imtsdl::TElementList<V1_0::complextest::CAnalyzer>();
 		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersElementsCount; ++analyzersIndex){
 			const ::imtgql::CGqlParamObject* analyzersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Analyzers", analyzersIndex);
-			if (gqlObject.IsNullArrayElement("Analyzers", analyzersIndex)){
+			if (analyzersDataObjectPtr == nullptr || analyzersDataObjectPtr->IsNull()){
 				Analyzers->AppendNull();
 				continue;
 			}
@@ -6087,7 +6087,7 @@ bool V1_0::complextest::CInspection::OptReadFromGraphQlObject(const ::imtgql::CG
 		Analyzers = imtsdl::TElementList<V1_0::complextest::CAnalyzer>();
 		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersElementsCount; ++analyzersIndex){
 			const ::imtgql::CGqlParamObject* analyzersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Analyzers", analyzersIndex);
-			if (gqlObject.IsNullArrayElement("Analyzers", analyzersIndex)){
+			if (analyzersDataObjectPtr == nullptr || analyzersDataObjectPtr->IsNull()){
 				Analyzers->AppendNull();
 				continue;
 			}
@@ -6778,7 +6778,7 @@ bool V1_0::complextest::CProductOverview::ReadFromGraphQlObject(const ::imtgql::
 		Inspections = imtsdl::TElementList<V1_0::complextest::CInspection>();
 		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsElementsCount; ++inspectionsIndex){
 			const ::imtgql::CGqlParamObject* inspectionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Inspections", inspectionsIndex);
-			if (gqlObject.IsNullArrayElement("Inspections", inspectionsIndex)){
+			if (inspectionsDataObjectPtr == nullptr || inspectionsDataObjectPtr->IsNull()){
 				Inspections->AppendNull();
 				continue;
 			}
@@ -6850,7 +6850,7 @@ bool V1_0::complextest::CProductOverview::OptReadFromGraphQlObject(const ::imtgq
 		Inspections = imtsdl::TElementList<V1_0::complextest::CInspection>();
 		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsElementsCount; ++inspectionsIndex){
 			const ::imtgql::CGqlParamObject* inspectionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Inspections", inspectionsIndex);
-			if (gqlObject.IsNullArrayElement("Inspections", inspectionsIndex)){
+			if (inspectionsDataObjectPtr == nullptr || inspectionsDataObjectPtr->IsNull()){
 				Inspections->AppendNull();
 				continue;
 			}
@@ -8255,7 +8255,7 @@ bool V1_0::complextest::CResultMetaData::ReadFromGraphQlObject(const ::imtgql::C
 		extendedMetaData = imtsdl::TElementList<V1_0::complextest::CExtendedMetaData>();
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataElementsCount; ++extendedMetaDataIndex){
 			const ::imtgql::CGqlParamObject* extendedMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("extendedMetaData", extendedMetaDataIndex);
-			if (gqlObject.IsNullArrayElement("extendedMetaData", extendedMetaDataIndex)){
+			if (extendedMetaDataDataObjectPtr == nullptr || extendedMetaDataDataObjectPtr->IsNull()){
 				extendedMetaData->AppendNull();
 				continue;
 			}
@@ -8317,7 +8317,7 @@ bool V1_0::complextest::CResultMetaData::OptReadFromGraphQlObject(const ::imtgql
 		extendedMetaData = imtsdl::TElementList<V1_0::complextest::CExtendedMetaData>();
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataElementsCount; ++extendedMetaDataIndex){
 			const ::imtgql::CGqlParamObject* extendedMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("extendedMetaData", extendedMetaDataIndex);
-			if (gqlObject.IsNullArrayElement("extendedMetaData", extendedMetaDataIndex)){
+			if (extendedMetaDataDataObjectPtr == nullptr || extendedMetaDataDataObjectPtr->IsNull()){
 				extendedMetaData->AppendNull();
 				continue;
 			}
@@ -9893,7 +9893,7 @@ bool V1_0::complextest::CCDMResultVarRecursive::ReadFromGraphQlObject(const ::im
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
 			const ::imtgql::CGqlParamObject* tempResultContent = resultContentDataList[resultContentIndex];
 			QString resultContentDataValueTypename = (tempResultContent == nullptr || tempResultContent->IsNull()) ? QString() : tempResultContent->GetParamArgumentValue("__typename").toString();
-			if (gqlObject.IsNullArrayElement("resultContent", resultContentIndex)){
+			if (resultContentDataList[resultContentIndex] == nullptr || resultContentDataList[resultContentIndex]->IsNull()){
 				resultContent->AppendNull();
 				continue;
 			}
@@ -9929,7 +9929,7 @@ bool V1_0::complextest::CCDMResultVarRecursive::ReadFromGraphQlObject(const ::im
 		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
-			if (gqlObject.IsNullArrayElement("overallResultValues", overallResultValuesIndex)){
+			if (overallResultValuesDataObjectPtr == nullptr || overallResultValuesDataObjectPtr->IsNull()){
 				overallResultValues->AppendNull();
 				continue;
 			}
@@ -9977,7 +9977,7 @@ bool V1_0::complextest::CCDMResultVarRecursive::OptReadFromGraphQlObject(const :
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
 			const ::imtgql::CGqlParamObject* tempResultContent = resultContentDataList[resultContentIndex];
 			QString resultContentDataValueTypename = (tempResultContent == nullptr || tempResultContent->IsNull()) ? QString() : tempResultContent->GetParamArgumentValue("__typename").toString();
-			if (gqlObject.IsNullArrayElement("resultContent", resultContentIndex)){
+			if (resultContentDataList[resultContentIndex] == nullptr || resultContentDataList[resultContentIndex]->IsNull()){
 				resultContent->AppendNull();
 				continue;
 			}
@@ -10013,7 +10013,7 @@ bool V1_0::complextest::CCDMResultVarRecursive::OptReadFromGraphQlObject(const :
 		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
-			if (gqlObject.IsNullArrayElement("overallResultValues", overallResultValuesIndex)){
+			if (overallResultValuesDataObjectPtr == nullptr || overallResultValuesDataObjectPtr->IsNull()){
 				overallResultValues->AppendNull();
 				continue;
 			}
@@ -10631,7 +10631,7 @@ bool V1_0::complextest::CCDMResultVarString::ReadFromGraphQlObject(const ::imtgq
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
 		resultContent = imtsdl::TElementList<QString>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
-			if (gqlObject.IsNullArrayElement("resultContent", resultContentIndex)){
+			if (!resultContentDataList[resultContentIndex].isValid() || resultContentDataList[resultContentIndex].isNull()){
 				resultContent->AppendNull();
 				continue;
 			}
@@ -10648,7 +10648,7 @@ bool V1_0::complextest::CCDMResultVarString::ReadFromGraphQlObject(const ::imtgq
 		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
-			if (gqlObject.IsNullArrayElement("overallResultValues", overallResultValuesIndex)){
+			if (overallResultValuesDataObjectPtr == nullptr || overallResultValuesDataObjectPtr->IsNull()){
 				overallResultValues->AppendNull();
 				continue;
 			}
@@ -10695,7 +10695,7 @@ bool V1_0::complextest::CCDMResultVarString::OptReadFromGraphQlObject(const ::im
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
 		resultContent = imtsdl::TElementList<QString>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
-			if (gqlObject.IsNullArrayElement("resultContent", resultContentIndex)){
+			if (!resultContentDataList[resultContentIndex].isValid() || resultContentDataList[resultContentIndex].isNull()){
 				resultContent->AppendNull();
 				continue;
 			}
@@ -10712,7 +10712,7 @@ bool V1_0::complextest::CCDMResultVarString::OptReadFromGraphQlObject(const ::im
 		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
-			if (gqlObject.IsNullArrayElement("overallResultValues", overallResultValuesIndex)){
+			if (overallResultValuesDataObjectPtr == nullptr || overallResultValuesDataObjectPtr->IsNull()){
 				overallResultValues->AppendNull();
 				continue;
 			}
@@ -11342,7 +11342,7 @@ bool V1_0::complextest::CCDMResult::ReadFromGraphQlObject(const ::imtgql::CGqlPa
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
 			const ::imtgql::CGqlParamObject* tempResultContent = resultContentDataList[resultContentIndex];
 			QString resultContentDataValueTypename = (tempResultContent == nullptr || tempResultContent->IsNull()) ? QString() : tempResultContent->GetParamArgumentValue("__typename").toString();
-			if (gqlObject.IsNullArrayElement("resultContent", resultContentIndex)){
+			if (resultContentDataList[resultContentIndex] == nullptr || resultContentDataList[resultContentIndex]->IsNull()){
 				resultContent->AppendNull();
 				continue;
 			}
@@ -11378,7 +11378,7 @@ bool V1_0::complextest::CCDMResult::ReadFromGraphQlObject(const ::imtgql::CGqlPa
 		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
-			if (gqlObject.IsNullArrayElement("overallResultValues", overallResultValuesIndex)){
+			if (overallResultValuesDataObjectPtr == nullptr || overallResultValuesDataObjectPtr->IsNull()){
 				overallResultValues->AppendNull();
 				continue;
 			}
@@ -11426,7 +11426,7 @@ bool V1_0::complextest::CCDMResult::OptReadFromGraphQlObject(const ::imtgql::CGq
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
 			const ::imtgql::CGqlParamObject* tempResultContent = resultContentDataList[resultContentIndex];
 			QString resultContentDataValueTypename = (tempResultContent == nullptr || tempResultContent->IsNull()) ? QString() : tempResultContent->GetParamArgumentValue("__typename").toString();
-			if (gqlObject.IsNullArrayElement("resultContent", resultContentIndex)){
+			if (resultContentDataList[resultContentIndex] == nullptr || resultContentDataList[resultContentIndex]->IsNull()){
 				resultContent->AppendNull();
 				continue;
 			}
@@ -11462,7 +11462,7 @@ bool V1_0::complextest::CCDMResult::OptReadFromGraphQlObject(const ::imtgql::CGq
 		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
-			if (gqlObject.IsNullArrayElement("overallResultValues", overallResultValuesIndex)){
+			if (overallResultValuesDataObjectPtr == nullptr || overallResultValuesDataObjectPtr->IsNull()){
 				overallResultValues->AppendNull();
 				continue;
 			}

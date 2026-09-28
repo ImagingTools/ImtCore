@@ -649,7 +649,7 @@ bool V1_0::complextest::CGeometry::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 	Points = imtsdl::TElementList<V1_0::complextest::CPoint>();
 	for (qsizetype pointsIndex = 0; pointsIndex < pointsElementsCount; ++pointsIndex){
 		const ::imtgql::CGqlParamObject* pointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Points", pointsIndex);
-		if (gqlObject.IsNullArrayElement("Points", pointsIndex)){
+		if (pointsDataObjectPtr == nullptr || pointsDataObjectPtr->IsNull()){
 			Points->AppendNull();
 			continue;
 		}
@@ -671,7 +671,7 @@ bool V1_0::complextest::CGeometry::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 	RequiredPoints = imtsdl::TElementList<V1_0::complextest::CPoint>();
 	for (qsizetype requiredPointsIndex = 0; requiredPointsIndex < requiredPointsElementsCount; ++requiredPointsIndex){
 		const ::imtgql::CGqlParamObject* requiredPointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("RequiredPoints", requiredPointsIndex);
-		if (gqlObject.IsNullArrayElement("RequiredPoints", requiredPointsIndex)){
+		if (requiredPointsDataObjectPtr == nullptr || requiredPointsDataObjectPtr->IsNull()){
 			I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Array field '%3' contains a null element").arg(__FILE__, QString::number(__LINE__), "RequiredPoints").toLocal8Bit().constData();)
 
 			return false;
@@ -693,7 +693,7 @@ bool V1_0::complextest::CGeometry::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 		OptionalPoints = imtsdl::TElementList<V1_0::complextest::CPoint>();
 		for (qsizetype optionalPointsIndex = 0; optionalPointsIndex < optionalPointsElementsCount; ++optionalPointsIndex){
 			const ::imtgql::CGqlParamObject* optionalPointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("OptionalPoints", optionalPointsIndex);
-			if (gqlObject.IsNullArrayElement("OptionalPoints", optionalPointsIndex)){
+			if (optionalPointsDataObjectPtr == nullptr || optionalPointsDataObjectPtr->IsNull()){
 				OptionalPoints->AppendNull();
 				continue;
 			}
@@ -740,7 +740,7 @@ bool V1_0::complextest::CGeometry::OptReadFromGraphQlObject(const ::imtgql::CGql
 		Points = imtsdl::TElementList<V1_0::complextest::CPoint>();
 		for (qsizetype pointsIndex = 0; pointsIndex < pointsElementsCount; ++pointsIndex){
 			const ::imtgql::CGqlParamObject* pointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Points", pointsIndex);
-			if (gqlObject.IsNullArrayElement("Points", pointsIndex)){
+			if (pointsDataObjectPtr == nullptr || pointsDataObjectPtr->IsNull()){
 				Points->AppendNull();
 				continue;
 			}
@@ -759,7 +759,7 @@ bool V1_0::complextest::CGeometry::OptReadFromGraphQlObject(const ::imtgql::CGql
 		RequiredPoints = imtsdl::TElementList<V1_0::complextest::CPoint>();
 		for (qsizetype requiredPointsIndex = 0; requiredPointsIndex < requiredPointsElementsCount; ++requiredPointsIndex){
 			const ::imtgql::CGqlParamObject* requiredPointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("RequiredPoints", requiredPointsIndex);
-			if (gqlObject.IsNullArrayElement("RequiredPoints", requiredPointsIndex)){
+			if (requiredPointsDataObjectPtr == nullptr || requiredPointsDataObjectPtr->IsNull()){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Array field '%3' contains a null element").arg(__FILE__, QString::number(__LINE__), "RequiredPoints").toLocal8Bit().constData();)
 
 				return false;
@@ -782,7 +782,7 @@ bool V1_0::complextest::CGeometry::OptReadFromGraphQlObject(const ::imtgql::CGql
 		OptionalPoints = imtsdl::TElementList<V1_0::complextest::CPoint>();
 		for (qsizetype optionalPointsIndex = 0; optionalPointsIndex < optionalPointsElementsCount; ++optionalPointsIndex){
 			const ::imtgql::CGqlParamObject* optionalPointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("OptionalPoints", optionalPointsIndex);
-			if (gqlObject.IsNullArrayElement("OptionalPoints", optionalPointsIndex)){
+			if (optionalPointsDataObjectPtr == nullptr || optionalPointsDataObjectPtr->IsNull()){
 				OptionalPoints->AppendNull();
 				continue;
 			}
