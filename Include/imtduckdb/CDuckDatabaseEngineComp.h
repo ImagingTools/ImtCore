@@ -22,7 +22,7 @@
 #include <imtdb/IMigrationController.h>
 #include <imtduckdb/CDuckSqlDriver.h>
 #include <imtduckdb/CDuckConnectionEngine.h>
-#include <imtduckdb/IDuckDatabaseMaintenance.h>
+#include <imtduckdb/IDuckConnectionProvider.h>
 
 
 namespace imtduckdb
@@ -49,14 +49,14 @@ public:
 class CDuckDatabaseEngineComp:
 			virtual public CDuckDatabaseEngineAttr,
 			virtual public imtdb::IDatabaseEngine,
-			virtual public IDuckDatabaseMaintenance
+			virtual public IDuckConnectionProvider
 {
 public:
 	typedef CDuckDatabaseEngineAttr BaseClass;
 
 	I_BEGIN_COMPONENT(CDuckDatabaseEngineComp);
 		I_REGISTER_INTERFACE(imtdb::IDatabaseEngine)
-		I_REGISTER_INTERFACE(IDuckDatabaseMaintenance)
+		I_REGISTER_INTERFACE(IDuckConnectionProvider)
 		I_ASSIGN(m_dbFilePathCompPtr, "DbPath", "Path to the DuckDB database file. Empty means an in-memory database", false, "");
 		I_ASSIGN(m_dbNameAttrPtr, "DbName", "Logical name of the database (used for diagnostic messages only)", true, "duckdb");
 		I_ASSIGN(m_migrationControllerCompPtr, "MigrationController", "Migration controller", false, "MigrationController");
@@ -77,35 +77,12 @@ public:
 	virtual QSqlQuery ExecSqlQueryFromFile(const QString& filePath, const QVariantMap& bindValues, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
 
 	/**
-		Creates a bulk row-appender for \a tableName (optionally schema-qualified via \a schemaName),
-		backed by duckdb::Appender. Use this instead of ExecSqlQuery() for high-volume inserts, e.g.
-		full cache rebuilds - row-at-a-time INSERT is far too slow for that.
-		\return nullptr if the database could not be opened or the appender could not be created
-				(e.g. unknown table); in that case, \a errorMessagePtr (if not null) is filled with the
-				error text.
-	*/
-	std::unique_ptr<IDuckAppender> CreateAppender(const QString& tableName, const QString& schemaName = QString(), QString* errorMessagePtr = nullptr) const override;
-
-	/**
 		Creates an exclusively-owned connection to this component's database, able to run queries,
 		DDL, bulk appends and table swaps concurrently with this component's shared connection.
 		Intended for one-per-request reads and for cache builders running off-thread.
 		\return nullptr if the database could not be opened.
 	*/
 	std::unique_ptr<IDuckConnection> CreateConnection() const override;
-
-	/**
-		Atomically replaces \a liveTableName with \a shadowTableName using ALTER TABLE ... RENAME
-		inside a single transaction, so readers never observe a half-built table. Used for the
-		"shadow table" full-rebuild strategy: build a replacement table under a temporary name (e.g.
-		via CreateAppender()), then call this to make it live with one atomic rename. \a
-		shadowTableName no longer exists afterwards; if \a liveTableName did not exist yet (first
-		build), it is simply adopted.
-		\return true on success. On failure the transaction is rolled back, so both tables remain as
-				they were before the call; \a errorMessagePtr, if not null, is filled with the error
-				text.
-	*/
-	bool SwapTable(const QString& liveTableName, const QString& shadowTableName, QString* errorMessagePtr = nullptr) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)

@@ -169,22 +169,6 @@ QSqlQuery CDuckDatabaseEngineComp::ExecSqlQueryFromFile(
 }
 
 
-std::unique_ptr<IDuckAppender> CDuckDatabaseEngineComp::CreateAppender(const QString& tableName, const QString& schemaName, QString* errorMessagePtr) const
-{
-	if (!EnsureDatabaseOpen()){
-		if (errorMessagePtr != nullptr){
-			*errorMessagePtr = QStringLiteral("DuckDB database could not be opened");
-		}
-
-		return nullptr;
-	}
-
-	std::lock_guard<std::recursive_mutex> lock(m_connectionMutex);
-
-	return CDuckAppender::Create(*m_connectionPtr, tableName, schemaName, errorMessagePtr);
-}
-
-
 std::unique_ptr<IDuckConnection> CDuckDatabaseEngineComp::CreateConnection() const
 {
 	if (!EnsureDatabaseOpen()){
@@ -202,23 +186,6 @@ std::unique_ptr<IDuckConnection> CDuckDatabaseEngineComp::CreateConnection() con
 
 		return nullptr;
 	}
-}
-
-
-bool CDuckDatabaseEngineComp::SwapTable(const QString& liveTableName, const QString& shadowTableName, QString* errorMessagePtr) const
-{
-	if (!EnsureDatabaseOpen()){
-		if (errorMessagePtr != nullptr){
-			*errorMessagePtr = QStringLiteral("DuckDB database could not be opened");
-		}
-
-		return false;
-	}
-
-	// Keeps the whole swap atomic for other threads, including the check of the transaction state.
-	std::lock_guard<std::recursive_mutex> lock(m_connectionMutex);
-
-	return imtduckdb::SwapTable(*this, m_isTransactionActive, liveTableName, shadowTableName, errorMessagePtr);
 }
 
 
