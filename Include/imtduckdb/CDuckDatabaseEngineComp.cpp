@@ -298,6 +298,8 @@ void CDuckDatabaseEngineComp::OnComponentDestroyed()
 		m_driverPtr.reset();
 		m_connectionPtr.reset();
 		m_databasePtr.reset();
+
+		m_isTransactionActive = false;
 	}
 
 	BaseClass::OnComponentDestroyed();
@@ -360,12 +362,7 @@ bool CDuckDatabaseEngineComp::EnsureDatabaseOpen() const
 	}
 
 	if (!CreateDatabaseMetaInfo() || !ExecuteDatabasePatches()){
-		// Do not keep a half-initialized database open, the next call will retry the whole initialization.
-		m_driverPtr.reset();
-		m_connectionPtr.reset();
-		m_databasePtr.reset();
-
-		return false;
+		SendErrorMessage(0, QStringLiteral("DuckDB database '%1' could not be migrated. Continuing with the current schema").arg(databasePath), __FILE__);
 	}
 
 	return true;
@@ -455,18 +452,31 @@ bool CDuckDatabaseEngineComp::ExecuteDatabasePatches() const
 		return true;
 	}
 
+	int newRevision = -1;
+	int databaseVersion = GetDatabaseVersion();
+
 	if (!BeginTransaction()){
 		return false;
 	}
-
-	int newRevision = -1;
-	int databaseVersion = GetDatabaseVersion();
 
 	bool retVal = m_migrationControllerCompPtr->DoMigration(newRevision, istd::CIntRange(databaseVersion + 1, -1));
 	if (!retVal){
 		CancelTransaction();
 
 		return false;
+	}
+
+	if (newRevision >= 0){
+		QSqlError sqlError;
+		ExecSqlQuery(QStringLiteral(R"(INSERT OR REPLACE INTO "Revisions" (Revision) VALUES (%1))").arg(newRevision).toUtf8(), &sqlError);
+
+		if (sqlError.type() != QSqlError::NoError){
+			SendErrorMessage(0, QStringLiteral("Setting the database revision failed: '%1'").arg(sqlError.text()), __FILE__);
+
+			CancelTransaction();
+
+			return false;
+		}
 	}
 
 	return FinishTransaction();

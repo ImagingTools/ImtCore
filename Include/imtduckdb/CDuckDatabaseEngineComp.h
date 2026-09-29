@@ -137,9 +137,6 @@ private:
 
 	QString GetDatabasePath() const;
 
-
-	mutable bool m_isTransactionActive = false;
-
 	bool EndTransaction(const char* statement, const QString& actionName) const;
 	bool ReadSqlFile(const QString& filePath, QByteArray& queryString, QSqlError* sqlErrorPtr) const;
 
@@ -157,6 +154,7 @@ private:
 	mutable std::unique_ptr<duckdb::DuckDB> m_databasePtr;
 	mutable std::unique_ptr<duckdb::Connection> m_connectionPtr;
 	mutable std::unique_ptr<CDuckSqlDriver> m_driverPtr;
+	mutable bool m_isTransactionActive = false;
 };
 
 

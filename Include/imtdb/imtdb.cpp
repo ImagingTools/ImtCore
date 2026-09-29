@@ -48,7 +48,7 @@ QString QuoteIdentifier(const QString& identifier)
 {
 	QString escaped = identifier;
 
-	return QStringLiteral("\"%1\"").arg(escaped.replace('"', QStringLiteral("\"\"")));
+	return QStringLiteral(R"("%1")").arg(escaped.replace('"', QStringLiteral(R"("")")));
 }
 
 
