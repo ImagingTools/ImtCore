@@ -3228,7 +3228,11 @@ CGetSpecificationsGqlRequest::CGetSpecificationsGqlRequest(const ::imtgql::CGqlR
 	// reading requested fields
 	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
 	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(gqlRequest.GetFields().GetFieldIds().constFirst());
+		requestedFieldsObjectPtr = &gqlRequest.GetFields();
+		const QByteArrayList topFieldIds = gqlRequest.GetFields().GetFieldIds();
+		if (topFieldIds.count() == 1 && topFieldIds.constFirst() == gqlRequest.GetCommandId()){
+			requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(topFieldIds.constFirst());
+		}
 		if (requestedFieldsObjectPtr != nullptr){
 			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
 		}
