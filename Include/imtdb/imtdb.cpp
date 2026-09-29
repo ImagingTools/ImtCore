@@ -44,6 +44,14 @@ QString EscapeSql(const QString& value)
 }
 
 
+QString QuoteIdentifier(const QString& identifier)
+{
+	QString escaped = identifier;
+
+	return QStringLiteral("\"%1\"").arg(escaped.replace('"', QStringLiteral("\"\"")));
+}
+
+
 QByteArray VariantToByteArray(const QVariant& value)
 {
 	if (value.typeId() == QMetaType::QUuid){
