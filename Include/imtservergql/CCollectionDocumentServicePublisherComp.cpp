@@ -408,7 +408,7 @@ void CCollectionDocumentServicePublisherComp::TrackDocument(
 
 	TrackedDocument& trackedDocument = m_trackedDocuments[documentId];
 	trackedDocument.userId = userId;
-	trackedDocument.lastSubscriberSeenMs = QDateTime::currentMSecsSinceEpoch();
+	trackedDocument.lastSubscriberSeenSecs = QDateTime::currentSecsSinceEpoch();
 }
 
 
@@ -440,7 +440,7 @@ void CCollectionDocumentServicePublisherComp::MarkIndividualSubscription(
 	}
 
 	foundIter.value().hasIndividualSubscription = true;
-	foundIter.value().lastSubscriberSeenMs = QDateTime::currentMSecsSinceEpoch();
+	foundIter.value().lastSubscriberSeenSecs = QDateTime::currentSecsSinceEpoch();
 }
 
 
@@ -519,8 +519,8 @@ void CCollectionDocumentServicePublisherComp::CloseIdleDocuments()
 		return;
 	}
 
-	const qint64 timeout = qint64(*m_closeDocumentTimeoutAttrPtr) * 1000;
-	const qint64 now = QDateTime::currentMSecsSinceEpoch();
+	const qint64 timeout = *m_closeDocumentTimeoutAttrPtr;
+	const qint64 now = QDateTime::currentSecsSinceEpoch();
 
 	QList<QPair<QByteArray, QByteArray> > documentsToClose; // userId, documentId
 
@@ -536,13 +536,13 @@ void CCollectionDocumentServicePublisherComp::CloseIdleDocuments()
 			}
 
 			if (HasActiveSingleDocumentChangedSubscriberNoLock(it.value().userId, it.key())){
-				it.value().lastSubscriberSeenMs = now;
+				it.value().lastSubscriberSeenSecs = now;
 				++it;
 
 				continue;
 			}
 
-			if ((now - it.value().lastSubscriberSeenMs) < timeout){
+			if ((now - it.value().lastSubscriberSeenSecs) < timeout){
 				++it;
 
 				continue;

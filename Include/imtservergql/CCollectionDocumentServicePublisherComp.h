@@ -144,7 +144,7 @@ private:
 	{
 		QByteArray userId;
 		bool hasIndividualSubscription = false; ///< \c true after the first individual OnDocumentChanged subscription for this document.
-		qint64 lastSubscriberSeenMs = 0; ///< Monotonic timestamp of the last moment an active subscriber was observed.
+		qint64 lastSubscriberSeenSecs = 0; ///< Timestamp (in seconds since epoch) of the last moment an active subscriber was observed.
 	};
 
 	mutable QMutex m_trackedDocumentsMutex;
