@@ -9,15 +9,16 @@ Item {
 
 	property bool isMainView: true
 	
-	property ListModel dialogsModel: ModalDialogManager.modalDialogModels
+	property ListModel dialogsModel: isMainView ? ModalDialogManager.modalDialogModels : localViewModel
+	// A local view (one per ViewBase) must never render the global list: a dialog holding a ViewBase recreated itself endlessly.
+	property bool completed: false
 	
 	Component.onCompleted: {
 		if(visible && isMainView){
 			ModalDialogManager.activeView = container;
 		}
-		else if(!isMainView){
-			dialogsModel = localViewModel
-		}
+
+		completed = true
 	}
 
 	ListModel{id: localViewModel}
@@ -29,7 +30,7 @@ Item {
 		
 		visible: container.dialogsModel && container.dialogsModel.count > 0;
 		
-		model: container.dialogsModel;
+		model: container.completed ? container.dialogsModel : null;
 		
 		delegate: Item {
 			id: dialogDelegate;

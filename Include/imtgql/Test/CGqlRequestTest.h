@@ -34,7 +34,11 @@ private slots:
 	void ParseStartPatchMeasurementComplex();
 	void TestVariableObjectList();
 	void TestVariablePrimitivesAndLists();
+	void TestVariableListsWithNullElements();
+	void CreateArraysWithNullElements();
+	void ParseArraysWithNullElements();
 	void ParseStringWithEscapeSequences();
+	void BenchmarkIsNullArrayElementMillionValues();
 
 	void cleanupTestCase();
 

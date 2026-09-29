@@ -1,0 +1,35 @@
+schema {
+	namespace: sdlgentest
+	version: 1.0
+	mutation: Mutation
+}
+
+
+type Attribute
+{
+	value: String!
+}
+
+
+input ArrayPayload
+{
+	requiredObjects: [Attribute!]!
+	nullableObjectsWithRequiredElements: [Attribute!]
+	nullableObjects: [Attribute]
+	requiredScalars: [String!]!
+	nullableScalarsWithRequiredElements: [String!]
+	nullableScalars: [String]
+}
+
+
+type MutationResult
+{
+	accepted: Boolean!
+	payload: ArrayPayload!
+}
+
+
+type Mutation
+{
+	SavePayload(input: ArrayPayload!): MutationResult!
+}

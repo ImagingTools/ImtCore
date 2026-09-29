@@ -1,24 +1,14 @@
 TARGET = controlsgalleryqml
 
 include($(ACFDIR)/Config/QMake/GeneralConfig.pri)
-include($(IMTCOREDIR)/Config/QMake/QmlControls.pri)
+include($(IMTCOREDIR)/Config/QMake/WebCompiler.pri)
 
 buildwebdir = $$PWD/../../../../Bin/web
 
-imtcoredir = $(IMTCOREDIR)
+imtcoredir = $$(IMTCOREDIR)
 
-prepareWebQml($$buildwebdir)
-
-# copy project qml from to
-copyToWebDir($$PWD/../, $$buildwebdir/src)
-copyToWebDir($$imtcoredir/Include/imtstylecontrolsqml/Qml/Fonts/, $$buildwebdir/Resources)
-copyToWebDir($$imtcoredir/Include/imtstylecontrolsqml/Qml/Acf/, $$buildwebdir/src/Acf)
-
-# copy translations
-copyToWebDir($$PWD/../../../../Impl/ProLifeLoc/Translations/, $$buildwebdir/Resources/Translations)
-copyToWebDir($$imtcoredir/Impl/ImtCoreLoc/Translations/, $$buildwebdir/Resources/Translations)
-
-compyleWeb($$buildwebdir, "controlsgallery")
+# compile web application with the JQML v3 compiler, QML sources are taken from the directories listed in gallery.json
+jqCompileWeb($$buildwebdir, $$PWD/../gallery.json, $$PWD/../ImtControlsGalleryWeb.qml, "/ControlsGallery/Views/", "../Icons/GalleryIcon.svg", $$imtcoredir/Impl/ImtCoreLoc/Translations)
 
 GENERATED_RESOURCES = $$_PRO_FILE_PWD_/../empty
 

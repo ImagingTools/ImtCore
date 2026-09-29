@@ -46,7 +46,18 @@ public:
 		EC_NETWORK,
 		EC_TIMEOUT,
 		EC_INVALID_REQUEST,
-		EC_INTERNAL
+		EC_INTERNAL,
+		/**
+			The server handled the request and answered with GraphQL \c errors.
+			Only reported by \c SendModelRequest; a raw \c GqlResult carries such an answer as a
+			successful response.
+		*/
+		EC_SERVER_ERROR,
+		/**
+			The answer is not a JSON object or does not match the requested model.
+			Only reported by \c SendModelRequest.
+		*/
+		EC_INVALID_RESPONSE
 	};
 
 	struct GqlResult
@@ -68,7 +79,7 @@ public:
 		QString errorMessage;
 
 		explicit operator bool() const {
-			return errorCategory == EC_NONE && errorMessage.isEmpty();
+			return errorCategory == EC_NONE;
 		}
 	};
 
@@ -99,14 +110,31 @@ public:
 		const QByteArray commandId = request.GetCommandId();
 		return SendRequest(requestPtr)
 			.then([commandId](const IAsyncGqlClient::GqlResult& result) {
-				if (result.errorCategory != IAsyncGqlClient::EC_NONE || !result.responsePtr.IsValid()) {
+				if (result.errorCategory != IAsyncGqlClient::EC_NONE) {
 					return GqlModelResult<SdlClass>{{}, result.errorCategory, result.errorMessage};
+				}
+				if (!result.responsePtr.IsValid()) {
+					return GqlModelResult<SdlClass>{{}, EC_INVALID_RESPONSE, QStringLiteral("Response is missing")};
 				}
 
 				QString errorMessage;
+				CClientRequestModelHelpers::ParseError parseError = CClientRequestModelHelpers::PE_NONE;
 				auto model = CClientRequestModelHelpers::ParseModelResponse<SdlClass>(
-					result.responsePtr->GetResponseData(), commandId, errorMessage);
-				return GqlModelResult<SdlClass>{model, result.errorCategory, errorMessage};
+					result.responsePtr->GetResponseData(), commandId, errorMessage, &parseError);
+
+				ErrorCategory errorCategory = EC_NONE;
+				switch (parseError){
+				case CClientRequestModelHelpers::PE_NONE:
+					break;
+				case CClientRequestModelHelpers::PE_SERVER_ERROR:
+					errorCategory = EC_SERVER_ERROR;
+					break;
+				case CClientRequestModelHelpers::PE_INVALID_RESPONSE:
+					errorCategory = EC_INVALID_RESPONSE;
+					break;
+				}
+
+				return GqlModelResult<SdlClass>{model, errorCategory, errorMessage};
 			});
 	}
 };

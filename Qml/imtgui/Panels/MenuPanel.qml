@@ -117,9 +117,7 @@ Rectangle {
 	}
 
 	onWidthChanged: {
-		if (!widthAnimation.running){
-			Events.sendEvent("MenuWidthChanged", width)
-		}
+		Events.sendEvent("MenuWidthChanged", width)
 	}
 
 	Keys.onPressed: {
@@ -232,22 +230,7 @@ Rectangle {
 			menuPanel.autoCollapsed = false;
 		}
 
-		widthAnimation.from = menuPanel.width;
-		widthAnimation.to = menuPanel.collapsed ? menuPanel.collapsedWidth : menuPanel.menuDefaultWidth;
-		widthAnimation.restart();
-	}
-
-	NumberAnimation {
-		id: widthAnimation;
-
-		target: menuPanel;
-		property: "width";
-		duration: 220;
-		easing.type: Easing.InOutQuad;
-
-		onFinished: {
-			Events.sendEvent("MenuWidthChanged", menuPanel.width)
-		}
+		menuPanel.width = menuPanel.collapsed ? menuPanel.collapsedWidth : menuPanel.menuDefaultWidth;
 	}
 
 	function updateGui(){
@@ -586,17 +569,14 @@ Rectangle {
 	Item {
 		id: hint;
 
-		x: menuPanel.width + hint.slide;
+		x: menuPanel.width + Style.spacingXS;
 		y: menuPanel.hintY - height / 2 + Style.marginXXS;
 		z: 100;
 
 		width: hintBody.width + Style.spacingS;
 		height: Style.controlHeightS + Style.marginXXS;
 
-		visible: hint.opacity > 0;
-		opacity: 0;
-
-		property real slide: 0;
+		visible: menuPanel.hintText !== "";
 
 		Rectangle {
 			id: arrowTip;
@@ -633,48 +613,6 @@ Rectangle {
 				font.pixelSize: Style.fontSizeM;
 				color: Style.baseColor;
 			}
-		}
-
-		ParallelAnimation {
-			id: hintIn;
-
-			NumberAnimation {
-				target: hint;
-				property: "opacity";
-				to: 1;
-				duration: 120;
-				easing.type: Easing.OutQuad;
-			}
-
-			NumberAnimation {
-				target: hint;
-				property: "slide";
-				to: Style.spacingXS;
-				duration: 120;
-				easing.type: Easing.OutCubic;
-			}
-		}
-
-		NumberAnimation {
-			id: hintOut;
-
-			target: hint;
-			property: "opacity";
-			to: 0;
-			duration: 90;
-			easing.type: Easing.InQuad;
-		}
-	}
-
-	onHintTextChanged: {
-		if (menuPanel.hintText === ""){
-			hintIn.stop();
-			hintOut.restart();
-		}
-		else if (hint.opacity < 1){
-			hintOut.stop();
-			hint.slide = 0;
-			hintIn.restart();
 		}
 	}
 }
