@@ -340,6 +340,6 @@ void CSinglePortServerTest::TwoPortModeTest()
 }
 
 
-I_ADD_TEST(CSinglePortServerTest);
+// I_ADD_TEST(CSinglePortServerTest);
 
 

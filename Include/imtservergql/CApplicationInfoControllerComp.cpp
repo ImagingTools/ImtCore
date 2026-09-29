@@ -104,13 +104,14 @@ void CApplicationInfoControllerComp::FillWebSocketUrl(ApplicationInfo& applicati
 		return;
 	}
 
-	QUrl url;
-	if (!m_webSocketUrlProviderCompPtr->GetUrl(imtcom::IServerConnectionInterface::PT_WEBSOCKET, url)){
+	// Without its own WebSocket port the client connects to the server it already talks to
+	if (!m_webSocketUrlProviderCompPtr->GetSupportedProtocols().contains(imtcom::IServerConnectionInterface::PT_WEBSOCKET)){
 		return;
 	}
 
-	if (*m_useHttpPortForWebSocketAttrPtr){
-		url.setPort(m_webSocketUrlProviderCompPtr->GetPort(imtcom::IServerConnectionInterface::PT_HTTP));
+	QUrl url;
+	if (!m_webSocketUrlProviderCompPtr->GetUrl(imtcom::IServerConnectionInterface::PT_WEBSOCKET, url)){
+		return;
 	}
 
 	sdl::V1_0::imtbase::CUrlParam webSocketUrl;

@@ -217,6 +217,9 @@ public:
 		I_ASSIGN(m_sslEnabledCompPtr, "ExternalEnableSSL", "External SSL configuration", false, "ExternalEnableSSL");
 		I_END_COMPONENT;
 
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
+
 protected:
 	// reimplemented (imtcom/CServerConnectionInterfaceParam)
 	virtual int GetConnectionFlags() const override;

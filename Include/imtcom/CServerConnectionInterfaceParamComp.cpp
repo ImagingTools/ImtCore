@@ -2,8 +2,28 @@
 #include <imtcom/CServerConnectionInterfaceParamComp.h>
 
 
+// ACF includes
+#include <iser/IArchive.h>
+
+
 namespace imtcom
 {
+
+
+// public methods
+
+// reimplemented (iser::ISerializable)
+bool CServerConnectionInterfaceParamComp::Serialize(iser::IArchive& archive)
+{
+	bool retVal = BaseClass2::Serialize(archive);
+
+	// A WebSocket port saved earlier must not return once the configuration serves WebSocket on the HTTP port
+	if (!archive.IsStoring() && !m_defaulWebSocketPortAttrPtr.IsValid()){
+		m_interfaceMap.remove(PT_WEBSOCKET);
+	}
+
+	return retVal;
+}
 
 
 // protected methods

@@ -29,11 +29,18 @@
 | Где | Атрибут | Значение |
 | --- | --- | --- |
 | `HttpServerFramework` | `WebSocketUpgradeHandler` (Reference) | элемент `WebSocketServerFramework` |
-| `ApplicationInfoController` / `RootDataController` | `UseHttpPortForWebSocket` (Boolean) | `true` — в `webSocketUrl` сообщается порт HTTP |
 | `WebSocketServerFramework` | `ListenWebSocketPort` (Boolean) | `true` (по умолчанию) — слушать и отдельный порт WS; `false` — только порт HTTP |
+| параметры соединения (`ServerConnectionInterfaceParam`) | `DefaultWebSocketPort` | не задавать — у сервера нет своего порта WS |
 
-Если используется `ImtCoreServerBase` (`ImtServerVoce`), атрибуты `WebSocketUpgradeHandler` и
-`ListenWebSocketPort` экспортированы из него; ссылку задайте на `<элемент>/WebSocketServerFramework`.
+Если используется `ImtCoreServerBase` (`ImtServerVoce`) или `AuthorizableServerFramework`, атрибуты
+`WebSocketUpgradeHandler` и `ListenWebSocketPort` экспортированы из них; ссылку задайте на
+`<элемент>/WebSocketServerFramework`.
+
+Приложение без своего порта WS (`DefaultWebSocketPort` не задан):
+
+- `IServerConnectionInterface::GetUrl(PT_WEBSOCKET)` возвращает адрес с портом HTTP;
+- порт WS, сохранённый ранее в файле настроек, при загрузке отбрасывается;
+- `GetApplicationInfo` не отдаёт `webSocketUrl`.
 
 Пример:
 
@@ -47,11 +54,12 @@
 
 ## Что меняется для клиентов
 
-- **QML** (`ApplicationMain.qml`, `getWebSocketUrl`) берёт порт из `webSocketUrl` ответа `GetApplicationInfo`.
-  При `UseHttpPortForWebSocket=true` это порт HTTP, и клиент подключается к `ws(s)://host:<порт HTTP>/<appId>/wssub`
-  без изменений в QML.
-- **C++-клиенты** (`imtclientgql`) продолжают работать через отдельный порт WS, пока `ListenWebSocketPort=true`.
-  Чтобы перевести их на один порт, укажите в их конфигурации порт HTTP в качестве порта WebSocket.
+- **QML** (`ApplicationMain.qml`, `getWebSocketUrl`): если в ответе `GetApplicationInfo` нет `webSocketUrl`,
+  клиент подключается к тому же хосту и порту, что и сервер: `ws(s)://host:<порт HTTP>/<appId>/wssub`.
+  Так работают и web (адрес страницы), и desktop (адрес сервера из настроек клиента). Если `webSocketUrl`
+  есть, используется его порт, как раньше. Поле «Web Socket Port» в настройках соединения скрывается,
+  когда порта нет.
+- **C++-клиенты** (`imtclientgql`) берут адрес через `GetUrl(PT_WEBSOCKET)`: без заданного порта WS это порт HTTP.
 - Путь запроса на порту HTTP не проверяется: любой `GET` с `Upgrade: websocket` передаётся WebSocket-серверу.
 
 ## Тесты

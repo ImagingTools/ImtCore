@@ -145,7 +145,7 @@ void CMultiThreadServer::Disconnected(QByteArray requestId)
 	CSocketThread* threadSocket = new CSocketThread(descriptor, m_isSecureConnection, m_sslConfiguration, this);
 
 	m_threadSocketList.append(threadSocket);
-	connect(threadSocket, &CSocketThread::SocketDisconnected, this, &CMultiThreadServer::Disconnected, Qt::DirectConnection);
+	connect(threadSocket, &CSocketThread::SocketDisconnected, this, &CMultiThreadServer::Disconnected, Qt::QueuedConnection);
 
 	threadSocket->start();
 }

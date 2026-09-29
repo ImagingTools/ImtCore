@@ -86,7 +86,7 @@ bool CServerConnectionParamRepresentationControllerComp::GetDataModelFromSdlRepr
 		serverConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, httpPort);
 	}
 
-	if (sdlRepresentation.wsPort){
+	if (sdlRepresentation.wsPort && serverConnectionParamPtr->GetSupportedProtocols().contains(imtcom::IServerConnectionInterface::PT_WEBSOCKET)){
 		int wsPort = *sdlRepresentation.wsPort;
 		serverConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, wsPort);
 	}
