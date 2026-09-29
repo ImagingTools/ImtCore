@@ -37,6 +37,9 @@
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UseHttpPortForWebSocket" Type="Boolean" ExportId="UseHttpPortForWebSocket">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="UserModeSelectionParam" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserMode"/>
                     </AttributeInfo>

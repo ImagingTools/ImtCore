@@ -6,6 +6,7 @@
 #include <QtNetwork/QSslKey>
 
 // ImtCore includes
+#include <imtrest/CHttpRequest.h>
 #include <imtrest/CHttpResponse.h>
 #include <imtrest/CHttpSender.h>
 #include <imtrest/CTcpResponse.h>
@@ -146,6 +147,10 @@ void CSocket::HandleReadyRead()
 		return;
 	}
 
+	if (StartWebSocketUpgrade()){
+		return;
+	}
+
 	// All request data was read:
 	m_socket->commitTransaction();
 
@@ -164,6 +169,10 @@ void CSocket::Disconnected()
 
 void CSocket::OnSendResponse(ConstResponsePtr response)
 {
+	if (m_socket.isNull()){
+		return;
+	}
+
 	CHttpResponse* httpResponsePtr = const_cast<CHttpResponse*>(dynamic_cast<const CHttpResponse*>(response.GetPtr()));
 	CTcpResponse* tcpResponsePtr = const_cast<CTcpResponse*>(dynamic_cast<const CTcpResponse*>(response.GetPtr()));
 
@@ -177,6 +186,56 @@ void CSocket::OnSendResponse(ConstResponsePtr response)
 
 		sender.SendResponse(response);
 	}
+}
+
+
+// private methods
+
+bool CSocket::StartWebSocketUpgrade()
+{
+	if (m_rootSocket->GetWebSocketUpgradeHandler() == nullptr){
+		return false;
+	}
+
+	const CHttpRequest* httpRequestPtr = dynamic_cast<const CHttpRequest*>(m_requestPtr.GetPtr());
+	if ((httpRequestPtr == nullptr) || (httpRequestPtr->GetMethodType() != CHttpRequest::MT_GET)){
+		return false;
+	}
+
+	if (httpRequestPtr->GetHeaderValue(QByteArrayLiteral("upgrade")).trimmed().toLower() != QByteArrayLiteral("websocket")){
+		return false;
+	}
+
+	// Put the handshake back into the read buffer, QWebSocketServer parses it itself.
+	m_socket->rollbackTransaction();
+	m_startTimer.stop();
+	m_requestPtr.Reset();
+
+	disconnect(m_socket.data(), nullptr, this, nullptr);
+
+	// The socket may not change its thread while it is emitting readyRead().
+	QMetaObject::invokeMethod(this, &CSocket::HandOverWebSocket, Qt::QueuedConnection);
+
+	return true;
+}
+
+
+void CSocket::HandOverWebSocket()
+{
+	QTcpSocket* socketPtr = m_socket.data();
+	m_socket.clear();
+
+	if (socketPtr != nullptr){
+		// Called in the thread owning the socket, the handler moves it to its own thread.
+		IWebSocketUpgradeHandler* upgradeHandlerPtr = m_rootSocket->GetWebSocketUpgradeHandler();
+		if (!upgradeHandlerPtr->HandleWebSocketUpgrade(socketPtr)){
+			socketPtr->abort();
+			socketPtr->deleteLater();
+		}
+	}
+
+	// The connection thread is not needed anymore.
+	Disconnected();
 }
 
 

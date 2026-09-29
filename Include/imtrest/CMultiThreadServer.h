@@ -43,6 +43,7 @@ public:
 
 	imtrest::IRequestServlet* GetRequestServlet();
 	imtrest::IProtocolEngine* GetProtocolEngine();
+	imtrest::IWebSocketUpgradeHandler* GetWebSocketUpgradeHandler();
 
 	[[nodiscard]] bool IsSecureConnection() const;
 	void EnableSecureConnection(bool isSecureConnection = true);

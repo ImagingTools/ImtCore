@@ -28,6 +28,7 @@ CSocketThread::CSocketThread(qintptr socketId, bool secureConnection, const QSsl
 
 	m_enginePtr = m_server->GetProtocolEngine();
 	m_requestHandlerPtr = m_server->GetRequestServlet();
+	m_webSocketUpgradeHandlerPtr = m_server->GetWebSocketUpgradeHandler();
 }
 
 
@@ -68,6 +69,12 @@ QByteArray CSocketThread::GetRequestId()
 imtrest::IRequestServlet* CSocketThread::GetRequestServlet()
 {
 	return m_requestHandlerPtr;
+}
+
+
+imtrest::IWebSocketUpgradeHandler* CSocketThread::GetWebSocketUpgradeHandler()
+{
+	return m_webSocketUpgradeHandlerPtr;
 }
 
 

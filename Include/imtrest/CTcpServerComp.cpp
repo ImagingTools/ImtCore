@@ -61,6 +61,16 @@ int CTcpServerComp::GetThreadsLimit()
 }
 
 
+imtrest::IWebSocketUpgradeHandler* CTcpServerComp::GetWebSocketUpgradeHandler()
+{
+	if (!m_webSocketUpgradeHandlerCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	return m_webSocketUpgradeHandlerCompPtr.GetPtr();
+}
+
+
 // protected methods
 
 void CTcpServerComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)

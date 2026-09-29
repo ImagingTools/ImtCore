@@ -109,6 +109,10 @@ void CApplicationInfoControllerComp::FillWebSocketUrl(ApplicationInfo& applicati
 		return;
 	}
 
+	if (*m_useHttpPortForWebSocketAttrPtr){
+		url.setPort(m_webSocketUrlProviderCompPtr->GetPort(imtcom::IServerConnectionInterface::PT_HTTP));
+	}
+
 	sdl::V1_0::imtbase::CUrlParam webSocketUrl;
 	webSocketUrl.host = url.host();
 	webSocketUrl.port = url.port();

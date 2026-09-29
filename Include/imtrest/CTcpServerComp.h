@@ -22,6 +22,7 @@
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/IResponseDispatcher.h>
 #include <imtrest/IServer.h>
+#include <imtrest/IWebSocketUpgradeHandler.h>
 #include <imtcom/ISslConfigurationManager.h>
 
 
@@ -59,6 +60,7 @@ public:
 		I_ASSIGN(m_sslConfigurationCompPtr, "SslConfiguration", "SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the server to control certain features of that connection.", false, "SslConfiguration")
 		I_ASSIGN_TO(m_sslConfigurationModelCompPtr, m_sslConfigurationCompPtr, false)
 		I_ASSIGN(m_sslConfigurationManagerCompPtr, "SslConfigurationManager", "SSL configuration manager, used to create an SSL configuration for server", false, "SslConfigurationManager")
+		I_ASSIGN(m_webSocketUpgradeHandlerCompPtr, "WebSocketUpgradeHandler", "If set, WebSocket upgrade requests received on the HTTP port are passed to this handler (HTTP and WebSocket on one port)", false, "WebSocketUpgradeHandler")
 	I_END_COMPONENT
 
 	CTcpServerComp();
@@ -67,6 +69,7 @@ public:
 	imtrest::IRequestServlet* GetRequestServlet();
 	imtrest::IProtocolEngine* GetProtocolEngine();
 	int GetThreadsLimit();
+	imtrest::IWebSocketUpgradeHandler* GetWebSocketUpgradeHandler();
 
 protected:
 	// reimplemented (imod::CMultiModelDispatcherBase)
@@ -101,6 +104,7 @@ private:
 	I_REF(iprm::IParamsSet, m_sslConfigurationCompPtr);
 	I_REF(imod::IModel, m_sslConfigurationModelCompPtr);
 	I_REF(imtcom::ISslConfigurationManager, m_sslConfigurationManagerCompPtr);
+	I_REF(imtrest::IWebSocketUpgradeHandler, m_webSocketUpgradeHandlerCompPtr);
 
 	I_ATTR(int, m_threadsLimitAttrPtr);
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);

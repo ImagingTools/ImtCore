@@ -48,6 +48,12 @@ imtrest::IProtocolEngine* CMultiThreadServer::GetProtocolEngine()
 }
 
 
+imtrest::IWebSocketUpgradeHandler* CMultiThreadServer::GetWebSocketUpgradeHandler()
+{
+	return m_rootServer.GetWebSocketUpgradeHandler();
+}
+
+
 bool CMultiThreadServer::IsSecureConnection() const
 {
 	return m_isSecureConnection;
