@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtduckdb/CDuckReadConnectionEngine.h>
+#include <imtduckdb/CDuckConnectionEngine.h>
 
 
 // Qt includes
@@ -7,53 +7,80 @@
 #include <QtCore/QLoggingCategory>
 
 // ImtCore includes
+#include <imtduckdb/CDuckAppender.h>
 #include <imtduckdb/CDuckSqlResult.h>
+#include <imtduckdb/CDuckTableOperations.h>
 
 
 namespace imtduckdb
 {
 
 
-CDuckReadConnectionEngine::CDuckReadConnectionEngine(duckdb::DuckDB& database)
+CDuckConnectionEngine::CDuckConnectionEngine(duckdb::DuckDB& database)
 	:m_connectionPtr(std::make_unique<duckdb::Connection>(database))
 {
 	m_driverPtr = std::make_unique<CDuckSqlDriver>(*m_connectionPtr);
 }
 
 
+// reimplemented (imtduckdb::IDuckConnection)
+
+std::unique_ptr<IDuckAppender> CDuckConnectionEngine::CreateAppender(
+			const QString& tableName,
+			const QString& schemaName,
+			QString* errorMessagePtr)
+{
+	return CDuckAppender::Create(*m_connectionPtr, tableName, schemaName, errorMessagePtr);
+}
+
+
+bool CDuckConnectionEngine::SwapTable(
+			const QString& liveTableName,
+			const QString& shadowTableName,
+			QString* errorMessagePtr)
+{
+	return imtduckdb::SwapTable(*this, m_isTransactionActive, liveTableName, shadowTableName, errorMessagePtr);
+}
+
+
 // reimplemented (imtdb::IDatabaseEngine)
 
-bool CDuckReadConnectionEngine::BeginTransaction() const
+bool CDuckConnectionEngine::BeginTransaction() const
 {
 	auto resultPtr = m_connectionPtr->Query("BEGIN TRANSACTION");
 
-	return resultPtr && !resultPtr->HasError();
+	const bool retVal = resultPtr && !resultPtr->HasError();
+	m_isTransactionActive = m_isTransactionActive || retVal;
+
+	return retVal;
 }
 
 
-bool CDuckReadConnectionEngine::FinishTransaction() const
+bool CDuckConnectionEngine::FinishTransaction() const
 {
 	auto resultPtr = m_connectionPtr->Query("COMMIT");
+	m_isTransactionActive = false;
 
 	return resultPtr && !resultPtr->HasError();
 }
 
 
-bool CDuckReadConnectionEngine::CancelTransaction() const
+bool CDuckConnectionEngine::CancelTransaction() const
 {
 	auto resultPtr = m_connectionPtr->Query("ROLLBACK");
+	m_isTransactionActive = false;
 
 	return resultPtr && !resultPtr->HasError();
 }
 
 
-QByteArray CDuckReadConnectionEngine::GetDatabaseDriverId() const
+QByteArray CDuckConnectionEngine::GetDatabaseDriverId() const
 {
 	return QByteArrayLiteral("DUCKDB");
 }
 
 
-QSqlQuery CDuckReadConnectionEngine::ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlErrorPtr, bool isForwardOnly) const
+QSqlQuery CDuckConnectionEngine::ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlErrorPtr, bool isForwardOnly) const
 {
 	QSqlQuery retVal(new CDuckSqlResult(m_driverPtr.get(), *m_connectionPtr));
 
@@ -77,7 +104,7 @@ QSqlQuery CDuckReadConnectionEngine::ExecSqlQuery(const QByteArray& queryString,
 }
 
 
-QSqlQuery CDuckReadConnectionEngine::ExecSqlQuery(
+QSqlQuery CDuckConnectionEngine::ExecSqlQuery(
 			const QByteArray& queryString,
 			const QVariantMap& bindValues,
 			QSqlError* sqlErrorPtr,
@@ -111,7 +138,7 @@ QSqlQuery CDuckReadConnectionEngine::ExecSqlQuery(
 }
 
 
-QSqlQuery CDuckReadConnectionEngine::ExecSqlQueryFromFile(const QString& filePath, QSqlError* sqlErrorPtr, bool isForwardOnly) const
+QSqlQuery CDuckConnectionEngine::ExecSqlQueryFromFile(const QString& filePath, QSqlError* sqlErrorPtr, bool isForwardOnly) const
 {
 	QFile sqlQueryFile(filePath);
 	if (!sqlQueryFile.open(QFile::ReadOnly)){
@@ -131,7 +158,7 @@ QSqlQuery CDuckReadConnectionEngine::ExecSqlQueryFromFile(const QString& filePat
 }
 
 
-QSqlQuery CDuckReadConnectionEngine::ExecSqlQueryFromFile(
+QSqlQuery CDuckConnectionEngine::ExecSqlQueryFromFile(
 			const QString& filePath,
 			const QVariantMap& bindValues,
 			QSqlError* sqlErrorPtr,

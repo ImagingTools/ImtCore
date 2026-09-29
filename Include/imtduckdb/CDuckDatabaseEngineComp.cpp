@@ -8,7 +8,8 @@
 // ImtCore includes
 #include <imtdb/imtdb.h>
 #include <imtduckdb/CDuckAppender.h>
-#include <imtduckdb/CDuckReadConnectionEngine.h>
+#include <imtduckdb/CDuckConnectionEngine.h>
+#include <imtduckdb/CDuckTableOperations.h>
 #include <imtduckdb/CDuckSqlResult.h>
 
 
@@ -184,7 +185,7 @@ std::unique_ptr<IDuckAppender> CDuckDatabaseEngineComp::CreateAppender(const QSt
 }
 
 
-std::unique_ptr<imtdb::IDatabaseEngine> CDuckDatabaseEngineComp::CreateReadConnection() const
+std::unique_ptr<IDuckConnection> CDuckDatabaseEngineComp::CreateConnection() const
 {
 	if (!EnsureDatabaseOpen()){
 		return nullptr;
@@ -193,10 +194,10 @@ std::unique_ptr<imtdb::IDatabaseEngine> CDuckDatabaseEngineComp::CreateReadConne
 	std::lock_guard<std::recursive_mutex> lock(m_connectionMutex);
 
 	try{
-		return std::make_unique<CDuckReadConnectionEngine>(*m_databasePtr);
+		return std::make_unique<CDuckConnectionEngine>(*m_databasePtr);
 	}
 	catch (const std::exception& exception){
-		SendErrorMessage(0, QStringLiteral("DuckDB read connection could not be created. Error: %1")
+		SendErrorMessage(0, QStringLiteral("DuckDB connection could not be created. Error: %1")
 							 .arg(QString::fromUtf8(exception.what())), __FILE__);
 
 		return nullptr;
@@ -217,66 +218,7 @@ bool CDuckDatabaseEngineComp::SwapTable(const QString& liveTableName, const QStr
 	// Keeps the whole swap atomic for other threads, including the check of the transaction state.
 	std::lock_guard<std::recursive_mutex> lock(m_connectionMutex);
 
-	// DuckDB has no nested transactions: join the caller's transaction if there is one.
-	const bool ownsTransaction = !m_isTransactionActive;
-	if (ownsTransaction && !BeginTransaction()){
-		if (errorMessagePtr != nullptr){
-			*errorMessagePtr = QStringLiteral("Unable to begin transaction");
-		}
-
-		return false;
-	}
-
-	const QString liveTableIdentifier = imtdb::QuoteIdentifier(liveTableName);
-	const QString shadowTableIdentifier = imtdb::QuoteIdentifier(shadowTableName);
-
-	QSqlError sqlError;
-	QSqlQuery existsQuery = ExecSqlQuery(
-		QStringLiteral("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '%1' AND table_schema = current_schema())")
-			.arg(imtdb::EscapeSql(liveTableName)).toUtf8(),
-		&sqlError);
-
-	const bool liveTableExists = sqlError.type() == QSqlError::NoError && existsQuery.next() && existsQuery.value(0).toBool();
-
-	if (sqlError.type() == QSqlError::NoError && liveTableExists){
-		// Renaming straight over an existing table is not supported, so park the old one under a backup name first.
-		const QString backupTableIdentifier = imtdb::QuoteIdentifier(liveTableName + QStringLiteral("__shadow_swap_backup"));
-
-		ExecSqlQuery(QStringLiteral("DROP TABLE IF EXISTS %1").arg(backupTableIdentifier).toUtf8(), &sqlError);
-
-		if (sqlError.type() == QSqlError::NoError){
-			ExecSqlQuery(QStringLiteral("ALTER TABLE %1 RENAME TO %2").arg(liveTableIdentifier, backupTableIdentifier).toUtf8(), &sqlError);
-		}
-
-		if (sqlError.type() == QSqlError::NoError){
-			ExecSqlQuery(QStringLiteral("ALTER TABLE %1 RENAME TO %2").arg(shadowTableIdentifier, liveTableIdentifier).toUtf8(), &sqlError);
-		}
-
-		if (sqlError.type() == QSqlError::NoError){
-			ExecSqlQuery(QStringLiteral("DROP TABLE %1").arg(backupTableIdentifier).toUtf8(), &sqlError);
-		}
-	}
-	else if (sqlError.type() == QSqlError::NoError){
-		ExecSqlQuery(QStringLiteral("ALTER TABLE %1 RENAME TO %2").arg(shadowTableIdentifier, liveTableIdentifier).toUtf8(), &sqlError);
-	}
-
-	if (sqlError.type() != QSqlError::NoError){
-		if (errorMessagePtr != nullptr){
-			*errorMessagePtr = sqlError.text();
-		}
-
-		if (ownsTransaction){
-			CancelTransaction();
-		}
-
-		return false;
-	}
-
-	if (ownsTransaction){
-		return FinishTransaction();
-	}
-
-	return true;
+	return imtduckdb::SwapTable(*this, m_isTransactionActive, liveTableName, shadowTableName, errorMessagePtr);
 }
 
 

@@ -21,7 +21,7 @@
 #include <imtdb/IDatabaseEngine.h>
 #include <imtdb/IMigrationController.h>
 #include <imtduckdb/CDuckSqlDriver.h>
-#include <imtduckdb/CDuckReadConnectionEngine.h>
+#include <imtduckdb/CDuckConnectionEngine.h>
 #include <imtduckdb/IDuckDatabaseMaintenance.h>
 
 
@@ -87,14 +87,12 @@ public:
 	std::unique_ptr<IDuckAppender> CreateAppender(const QString& tableName, const QString& schemaName = QString(), QString* errorMessagePtr = nullptr) const override;
 
 	/**
-		Creates a new imtdb::IDatabaseEngine backed by its own duckdb::Connection against this
-		component's database, so callers can run queries concurrently with each other and with this
-		component's own connection (DuckDB's MVCC does not block readers against writers). Intended for
-		one-per-request use, e.g. one per GraphQL request; the returned engine is not thread-safe by
-		itself and must not outlive this component.
+		Creates an exclusively-owned connection to this component's database, able to run queries,
+		DDL, bulk appends and table swaps concurrently with this component's shared connection.
+		Intended for one-per-request reads and for cache builders running off-thread.
 		\return nullptr if the database could not be opened.
 	*/
-	std::unique_ptr<imtdb::IDatabaseEngine> CreateReadConnection() const override;
+	std::unique_ptr<IDuckConnection> CreateConnection() const override;
 
 	/**
 		Atomically replaces \a liveTableName with \a shadowTableName using ALTER TABLE ... RENAME

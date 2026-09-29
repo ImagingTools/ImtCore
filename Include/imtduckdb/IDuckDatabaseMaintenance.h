@@ -14,6 +14,7 @@
 // ImtCore includes
 #include <imtdb/IDatabaseEngine.h>
 #include <imtduckdb/IDuckAppender.h>
+#include <imtduckdb/IDuckConnection.h>
 
 
 namespace imtduckdb
@@ -34,6 +35,9 @@ public:
 		Creates a bulk row-appender for \a tableName (optionally schema-qualified via \a
 		schemaName), backed by duckdb::Appender. Use this instead of ExecSqlQuery() for
 		high-volume inserts, e.g. full cache rebuilds - row-at-a-time INSERT is far too slow.
+		\note The returned appender drives this component's shared connection, so it must only be used
+			  from the component's own thread. Off-thread writers must take their own connection via
+			  CreateConnection() and call IDuckConnection::CreateAppender() on it instead.
 		\return nullptr if the database could not be opened or the appender could not be created
 				(e.g. unknown table); in that case, \a errorMessagePtr (if not null) is filled with
 				the error text.
@@ -44,14 +48,15 @@ public:
 				QString* errorMessagePtr = nullptr) const = 0;
 
 	/**
-		Creates a new imtdb::IDatabaseEngine backed by its own duckdb::Connection against this
-		component's database, so callers can run queries concurrently with each other and with
-		this component's own connection (DuckDB's MVCC does not block readers against writers).
-		Intended for one-per-request use; the returned engine is not thread-safe by itself and must
-		not outlive this component.
+		Creates an exclusively-owned connection to this component's database, able to run queries,
+		DDL, bulk appends and table swaps independently of - and concurrently with - this component's
+		shared connection (DuckDB's MVCC does not block readers against writers).
+
+		This is the only safe way to work off-thread: the appender returned by CreateAppender() below
+		drives the shared connection and is therefore usable only from the component's own thread.
 		\return nullptr if the database could not be opened.
 	*/
-	virtual std::unique_ptr<imtdb::IDatabaseEngine> CreateReadConnection() const = 0;
+	virtual std::unique_ptr<IDuckConnection> CreateConnection() const = 0;
 
 	/**
 		Atomically replaces \a liveTableName with \a shadowTableName using ALTER TABLE ... RENAME
