@@ -402,9 +402,25 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
 	stream << QStringLiteral("if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){");
 	FeedStream(stream, 1, false);
 
-	// get top-level request. Usually it always one => we need only first
+	// The parser stores the selection set of the command directly; accept a command-name wrapper as well
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(gqlRequest.GetFields().GetFieldIds().constFirst());");
+	stream << QStringLiteral("requestedFieldsObjectPtr = &gqlRequest.GetFields();");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("const QByteArrayList topFieldIds = gqlRequest.GetFields().GetFieldIds();");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("if (topFieldIds.count() == 1 && topFieldIds.constFirst() == gqlRequest.GetCommandId()){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(topFieldIds.constFirst());");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents + 1);
