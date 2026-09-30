@@ -473,6 +473,17 @@ sdl::V1_0::imtbase::CUndoInfo CCollectionDocumentServiceControllerComp::OnGetUnd
 		}
 
 		retVal.isDirty = undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
+
+		// The undo state alone says nothing about a document that was never saved; the service's own
+		// flag covers that case too.
+		const imtdoc::IDocumentService::DocumentList documentList = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+		for (const imtdoc::IDocumentService::DocumentListItem& info : documentList){
+			if (info.documentId == *documentId->id){
+				retVal.isDirty = info.isDirty;
+				break;
+			}
+		}
+
 		retVal.status.emplace().status = sdl::V1_0::imtbase::EUndoStatus::Success;
 
 		int count = undoManagerPtr->GetAvailableUndoSteps();

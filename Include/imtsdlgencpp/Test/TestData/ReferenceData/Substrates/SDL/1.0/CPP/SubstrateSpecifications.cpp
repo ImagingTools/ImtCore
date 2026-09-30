@@ -1115,6 +1115,11 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::WriteToModel(::imtbas
 		::imtbase::CTreeItemModel* newItemsModelPtr = model.AddTreeModel("items", modelIndex);
 		newItemsModelPtr->setIsArray(true);
 		for (qsizetype itemsIndex = 0; itemsIndex < items->size(); ++itemsIndex){
+			if (!items->at(itemsIndex)){
+				newItemsModelPtr->InsertNewItem();
+				newItemsModelPtr->SetData(QByteArray(), QVariant(), itemsIndex);
+				continue;
+			}
 			newItemsModelPtr->InsertNewItem();
 			if (!(items->at(itemsIndex)->WriteToModel(*newItemsModelPtr, itemsIndex))){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
@@ -1122,6 +1127,9 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::WriteToModel(::imtbas
 				return false;
 			}
 		}
+	}
+	else if (items.IsNull()){
+		model.SetData("items", QVariant(), modelIndex);
 	}
 
 	return true;
@@ -1131,10 +1139,17 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::WriteToModel(::imtbas
 bool V1_0::substrate::CSubstrateSpecificationListResponse::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* itemsModel = model.GetTreeItemModel("items", modelIndex);
+	if (model.ContainsKey("items", modelIndex) && itemsModel == nullptr){
+		items.SetNull();
+	}
 	if (itemsModel != nullptr){
 		int itemsCount = itemsModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::substrate::CSubstrateSpecificationListItem> itemsList;
 		for (int itemsIndex = 0; itemsIndex < itemsCount; ++itemsIndex){
+			if (itemsModel->ContainsKey(QByteArray(), itemsIndex) && !itemsModel->GetData(QByteArray(), itemsIndex).isValid()){
+				itemsList.AppendNull();
+				continue;
+			}
 			V1_0::substrate::CSubstrateSpecificationListItem t_items;
 			if (!t_items.ReadFromModel(*itemsModel, itemsIndex)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
@@ -1154,10 +1169,17 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::ReadFromModel(const :
 bool V1_0::substrate::CSubstrateSpecificationListResponse::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* itemsModel = model.GetTreeItemModel("items", modelIndex);
+	if (model.ContainsKey("items", modelIndex) && itemsModel == nullptr){
+		items.SetNull();
+	}
 	if (itemsModel != nullptr){
 		int itemsCount = itemsModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::substrate::CSubstrateSpecificationListItem> itemsList;
 		for (int itemsIndex = 0; itemsIndex < itemsCount; ++itemsIndex){
+			if (itemsModel->ContainsKey(QByteArray(), itemsIndex) && !itemsModel->GetData(QByteArray(), itemsIndex).isValid()){
+				itemsList.AppendNull();
+				continue;
+			}
 			V1_0::substrate::CSubstrateSpecificationListItem t_items;
 			if (!t_items.OptReadFromModel(*itemsModel, itemsIndex)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
@@ -1179,6 +1201,10 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::WriteToGraphQlObject(
 	if (items){
 		QList<::imtgql::CGqlParamObject> itemsDataObjectList;
 		for (qsizetype itemsIndex = 0; itemsIndex < items->size(); ++itemsIndex){
+			if (!items->at(itemsIndex)){
+				itemsDataObjectList << ::imtgql::CGqlParamObject::CreateNull();
+				continue;
+			}
 			::imtgql::CGqlParamObject newItemsGqlObject;
 			if (!items->at(itemsIndex)->WriteToGraphQlObject(newItemsGqlObject)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
@@ -1189,6 +1215,9 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::WriteToGraphQlObject(
 		}
 		gqlObject.InsertParam("items", itemsDataObjectList);
 	}
+	else if (items.IsNull()){
+		gqlObject.InsertParam("items", QVariant());
+	}
 
 	gqlObject.InsertParam("__typename", QVariant("SubstrateSpecificationListResponse"));
 
@@ -1198,17 +1227,17 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::WriteToGraphQlObject(
 
 bool V1_0::substrate::CSubstrateSpecificationListResponse::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("items")){
-		items.emplace();
+	if (gqlObject.ContainsParam("items") && gqlObject["items"].isNull()){
+		items.SetNull();
 	}
-	if (gqlObject.ContainsParam("items") && (gqlObject.GetObjectsCount("items") > 0)){
+	if (gqlObject.ContainsParam("items") && !(gqlObject["items"].isNull())){
 		const qsizetype itemsElementsCount = gqlObject.GetObjectsCount("items");
 		items = imtsdl::TElementList<V1_0::substrate::CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsElementsCount; ++itemsIndex){
 			const ::imtgql::CGqlParamObject* itemsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("items", itemsIndex);
-			if (itemsDataObjectPtr == nullptr){
-				qDebug() << "invalid type" << itemsDataObjectPtr;
-				return false;
+			if (itemsDataObjectPtr == nullptr || itemsDataObjectPtr->IsNull()){
+				items->AppendNull();
+				continue;
 			}
 			V1_0::substrate::CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.ReadFromGraphQlObject(*itemsDataObjectPtr)){
@@ -1226,17 +1255,17 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::ReadFromGraphQlObject
 
 bool V1_0::substrate::CSubstrateSpecificationListResponse::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("items")){
-		items.emplace();
+	if (gqlObject.ContainsParam("items") && gqlObject["items"].isNull()){
+		items.SetNull();
 	}
-	if (gqlObject.ContainsParam("items") && (gqlObject.GetObjectsCount("items") > 0)){
+	if (gqlObject.ContainsParam("items") && !(gqlObject["items"].isNull())){
 		const qsizetype itemsElementsCount = gqlObject.GetObjectsCount("items");
 		items = imtsdl::TElementList<V1_0::substrate::CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsElementsCount; ++itemsIndex){
 			const ::imtgql::CGqlParamObject* itemsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("items", itemsIndex);
-			if (itemsDataObjectPtr == nullptr){
-				qDebug() << "invalid type" << itemsDataObjectPtr;
-				return false;
+			if (itemsDataObjectPtr == nullptr || itemsDataObjectPtr->IsNull()){
+				items->AppendNull();
+				continue;
 			}
 			V1_0::substrate::CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.OptReadFromGraphQlObject(*itemsDataObjectPtr)){
@@ -1257,6 +1286,10 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::WriteToJsonObject(QJs
 	if (items){
 		QJsonArray newItemsArray;
 		for (qsizetype itemsIndex = 0; itemsIndex < items->size(); ++itemsIndex){
+			if (!items->at(itemsIndex)){
+				newItemsArray << QJsonValue(QJsonValue::Null);
+				continue;
+			}
 			QJsonObject newItemsJsonObject;
 			if (!items->at(itemsIndex)->WriteToJsonObject(newItemsJsonObject)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
@@ -1267,6 +1300,9 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::WriteToJsonObject(QJs
 		}
 		jsonObject["items"] = newItemsArray;
 	}
+	else if (items.IsNull()){
+		jsonObject["items"] = QJsonValue(QJsonValue::Null);
+	}
 
 	jsonObject["__typename"] = "SubstrateSpecificationListResponse";
 
@@ -1276,11 +1312,18 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::WriteToJsonObject(QJs
 
 bool V1_0::substrate::CSubstrateSpecificationListResponse::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
-	if (jsonObject.contains("items") && jsonObject["items"].isArray()){
+if (jsonObject.contains("items") && jsonObject["items"].isNull()){
+		items.SetNull();
+	}
+		if (jsonObject.contains("items") && jsonObject["items"].isArray()){
 		const QJsonArray itemsJsonArray = jsonObject["items"].toArray();
 		const qsizetype itemsArrayCount = itemsJsonArray.size();
 		items = imtsdl::TElementList<V1_0::substrate::CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsArrayCount; ++itemsIndex){
+			if (itemsJsonArray[itemsIndex].isNull()){
+				items->AppendNull();
+				continue;
+			}
 			V1_0::substrate::CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.ReadFromJsonObject(itemsJsonArray[itemsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
@@ -1297,11 +1340,18 @@ bool V1_0::substrate::CSubstrateSpecificationListResponse::ReadFromJsonObject(co
 
 bool V1_0::substrate::CSubstrateSpecificationListResponse::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
-	if (jsonObject.contains("items") && jsonObject["items"].isArray()){
+if (jsonObject.contains("items") && jsonObject["items"].isNull()){
+		items.SetNull();
+	}
+		if (jsonObject.contains("items") && jsonObject["items"].isArray()){
 		const QJsonArray itemsJsonArray = jsonObject["items"].toArray();
 		const qsizetype itemsArrayCount = itemsJsonArray.size();
 		items = imtsdl::TElementList<V1_0::substrate::CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsArrayCount; ++itemsIndex){
+			if (itemsJsonArray[itemsIndex].isNull()){
+				items->AppendNull();
+				continue;
+			}
 			V1_0::substrate::CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.OptReadFromJsonObject(itemsJsonArray[itemsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
@@ -3234,12 +3284,12 @@ QVariant CSubstrateSpecificationListInputObject::GetViewParams()
 
 void CSubstrateSpecificationListInputObject::SetViewParams(const QVariant& v)
 {
-	if (v.isValid()){
+	if (v.isValid() && !v.isNull()){
 		sdl::V1_0::substrate::CCollectionViewParamsTestObject* itemPtr = v.value<sdl::V1_0::substrate::CCollectionViewParamsTestObject*>();
 		if (itemPtr != nullptr) CSubstrateSpecificationListInput::viewParams = (*itemPtr);
 	}
 	else {
-		CSubstrateSpecificationListInput::viewParams = nullptr;
+		CSubstrateSpecificationListInput::viewParams.SetNull();
 	}
 	m_viewParamsQObjectPtr = v;
 
@@ -3808,6 +3858,7 @@ CSubstrateSpecificationListResponseObject::CSubstrateSpecificationListResponseOb
 
 QVariant CSubstrateSpecificationListResponseObject::GetItems()
 {
+	if (!items) {return {};}
 	if (!m_itemsQObjectPtr.isValid()){
 		m_itemsQObjectPtr = CreateObject("items");
 		auto itemPtr = m_itemsQObjectPtr.value<sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList*>();
@@ -3819,12 +3870,14 @@ QVariant CSubstrateSpecificationListResponseObject::GetItems()
 
 void CSubstrateSpecificationListResponseObject::SetItems(const QVariant& v)
 {
-	if (v.isValid()){
+	if (v.isValid() && !v.isNull()){
 		sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList* itemPtr = v.value<sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList*>();
-		if (itemPtr != nullptr) CSubstrateSpecificationListResponse::items = itemPtr->Version_1_0;
+		if (itemPtr != nullptr){
+			CSubstrateSpecificationListResponse::items = itemPtr->Version_1_0;
+		}
 	}
 	else {
-		CSubstrateSpecificationListResponse::items = nullptr;
+		CSubstrateSpecificationListResponse::items.SetNull();
 	}
 	m_itemsQObjectPtr = v;
 
@@ -4822,7 +4875,7 @@ void CSubstrateSpecificationInputObject::SetItem(const QVariant& v)
 		}
 	}
 	else {
-		CSubstrateSpecificationInput::item = nullptr;
+		CSubstrateSpecificationInput::item.SetNull();
 	}
 	m_itemQObjectPtr = v;
 
@@ -5573,7 +5626,11 @@ CGetSubstrateSpecificationListGqlRequest::CGetSubstrateSpecificationListGqlReque
 	// reading requested fields
 	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
 	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(gqlRequest.GetFields().GetFieldIds().constFirst());
+		requestedFieldsObjectPtr = &gqlRequest.GetFields();
+		const QByteArrayList topFieldIds = gqlRequest.GetFields().GetFieldIds();
+		if (topFieldIds.count() == 1 && topFieldIds.constFirst() == gqlRequest.GetCommandId()){
+			requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(topFieldIds.constFirst());
+		}
 		if (requestedFieldsObjectPtr != nullptr){
 			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
 			if (!requestedIds.isEmpty()){
@@ -5670,7 +5727,11 @@ CGetSubstrateSpecificationGqlRequest::CGetSubstrateSpecificationGqlRequest(const
 	// reading requested fields
 	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
 	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(gqlRequest.GetFields().GetFieldIds().constFirst());
+		requestedFieldsObjectPtr = &gqlRequest.GetFields();
+		const QByteArrayList topFieldIds = gqlRequest.GetFields().GetFieldIds();
+		if (topFieldIds.count() == 1 && topFieldIds.constFirst() == gqlRequest.GetCommandId()){
+			requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(topFieldIds.constFirst());
+		}
 		if (requestedFieldsObjectPtr != nullptr){
 			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
 		}
@@ -5750,7 +5811,11 @@ CGetOptionsListGqlRequest::CGetOptionsListGqlRequest(const ::imtgql::CGqlRequest
 	// reading requested fields
 	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
 	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(gqlRequest.GetFields().GetFieldIds().constFirst());
+		requestedFieldsObjectPtr = &gqlRequest.GetFields();
+		const QByteArrayList topFieldIds = gqlRequest.GetFields().GetFieldIds();
+		if (topFieldIds.count() == 1 && topFieldIds.constFirst() == gqlRequest.GetCommandId()){
+			requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(topFieldIds.constFirst());
+		}
 		if (requestedFieldsObjectPtr != nullptr){
 			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
 			if (!requestedIds.isEmpty()){
@@ -5845,7 +5910,11 @@ CInsertSubstrateSpecificationGqlRequest::CInsertSubstrateSpecificationGqlRequest
 	// reading requested fields
 	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
 	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(gqlRequest.GetFields().GetFieldIds().constFirst());
+		requestedFieldsObjectPtr = &gqlRequest.GetFields();
+		const QByteArrayList topFieldIds = gqlRequest.GetFields().GetFieldIds();
+		if (topFieldIds.count() == 1 && topFieldIds.constFirst() == gqlRequest.GetCommandId()){
+			requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(topFieldIds.constFirst());
+		}
 		if (requestedFieldsObjectPtr != nullptr){
 			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
 			if (!requestedIds.isEmpty()){
@@ -5928,7 +5997,11 @@ CUpdateSubstrateSpecificationGqlRequest::CUpdateSubstrateSpecificationGqlRequest
 	// reading requested fields
 	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
 	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(gqlRequest.GetFields().GetFieldIds().constFirst());
+		requestedFieldsObjectPtr = &gqlRequest.GetFields();
+		const QByteArrayList topFieldIds = gqlRequest.GetFields().GetFieldIds();
+		if (topFieldIds.count() == 1 && topFieldIds.constFirst() == gqlRequest.GetCommandId()){
+			requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(topFieldIds.constFirst());
+		}
 		if (requestedFieldsObjectPtr != nullptr){
 			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
 			if (!requestedIds.isEmpty()){

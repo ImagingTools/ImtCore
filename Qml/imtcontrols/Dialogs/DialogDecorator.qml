@@ -123,6 +123,7 @@ DecoratorBase {
                 visible: !dialogContainer.baseElement ? false : dialogContainer.baseElement.canMove;
                 containerItem: topPanelContainer;
                 movingItem: !dialogContainer.baseElement ? null : dialogContainer.baseElement;
+				globalParent: !baseElement ? ModalDialogManager.activeView : baseElement.dialogManagerView ? baseElement.dialogManagerView : ModalDialogManager.activeView
             }
 
             Loader {

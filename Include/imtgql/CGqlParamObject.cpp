@@ -12,8 +12,19 @@ namespace imtgql
 
 // public methods
 
-CGqlParamObject::CGqlParamObject(): m_parentPtr(nullptr)
+CGqlParamObject::CGqlParamObject():
+	m_parentPtr(nullptr),
+	m_isNull(false)
 {
+}
+
+
+CGqlParamObject CGqlParamObject::CreateNull()
+{
+	CGqlParamObject retVal;
+	retVal.m_isNull = true;
+
+	return retVal;
 }
 
 
@@ -27,6 +38,12 @@ QByteArrayList CGqlParamObject::GetParamIds() const
 }
 
 
+bool CGqlParamObject::IsNull() const
+{
+	return m_isNull;
+}
+
+
 QVariant CGqlParamObject::GetParamArgumentValue(const QByteArray &paramId) const
 {
 	QVariant retVal;
@@ -37,7 +54,9 @@ QVariant CGqlParamObject::GetParamArgumentValue(const QByteArray &paramId) const
 		QVariantList objectList;
 		for (int i = 0; i < m_objectParamsArray[paramId].count(); i++){
 			const CGqlParamObject* gqlObject = m_objectParamsArray[paramId][i].GetPtr();
-			objectList.append(QVariant::fromValue(gqlObject));
+			objectList.append(gqlObject != nullptr && !gqlObject->IsNull()
+				? QVariant::fromValue(gqlObject)
+				: QVariant());
 		}
 		retVal = objectList;
 	}
@@ -66,7 +85,7 @@ const CGqlParamObject* CGqlParamObject::GetParamArgumentObjectPtr(const QByteArr
 	if (m_objectParams.contains(paramId)){
 		retVal = m_objectParams[paramId].GetPtr();
 	}
-	else if (m_objectParamsArray.contains(paramId)){
+	else if (m_objectParamsArray.contains(paramId) && index >= 0 && index < m_objectParamsArray[paramId].size()){
 		retVal = m_objectParamsArray[paramId][index].GetPtr();
 	}
 
@@ -85,6 +104,41 @@ QList<const CGqlParamObject *> CGqlParamObject::GetParamArgumentObjectPtrList(co
 	}
 
 	return retVal;
+}
+
+
+bool CGqlParamObject::IsNullArrayElement(const QByteArray& paramId, qsizetype index) const
+{
+	const auto objectParamsArrayIter = m_objectParamsArray.constFind(paramId);
+	if (objectParamsArrayIter != m_objectParamsArray.cend()){
+		if (index < 0 || index >= objectParamsArrayIter->size()){
+			return true;
+		}
+		const CGqlParamObject* objectPtr = objectParamsArrayIter->at(index).GetPtr();
+
+		return objectPtr == nullptr || objectPtr->IsNull();
+	}
+
+	const auto simpleParamIter = m_simpleParams.constFind(paramId);
+	if (simpleParamIter == m_simpleParams.cend()){
+		return false;
+	}
+	const QVariant& value = simpleParamIter.value();
+	if (value.typeId() == QMetaType::QVariantList){
+		const auto* values = static_cast<const QVariantList*>(value.constData());
+		if (index < 0 || index >= values->size()){
+			return false;
+		}
+
+		return !values->at(index).isValid() || values->at(index).isNull();
+	}
+
+	const QVariantList values = value.toList();
+	if (index < 0 || index >= values.size()){
+		return false;
+	}
+
+	return !values[index].isValid() || values[index].isNull();
 }
 
 
@@ -216,6 +270,7 @@ bool CGqlParamObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 		m_simpleParams = sourcePtr->m_simpleParams;
 		m_objectId = sourcePtr->m_objectId;
 		m_parentPtr = sourcePtr->m_parentPtr;
+		m_isNull = sourcePtr->m_isNull;
 
 		m_objectParams.clear();
 
@@ -276,6 +331,7 @@ bool CGqlParamObject::ResetData(CompatibilityMode /*mode*/)
 	m_simpleParams.clear();
 	m_objectId.clear();
 	m_parentPtr = nullptr;
+	m_isNull = false;
 	m_objectParams.clear();
 	m_objectParamsArray.clear();
 

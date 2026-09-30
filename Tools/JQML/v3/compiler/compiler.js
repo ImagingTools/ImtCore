@@ -1082,7 +1082,7 @@ function compile(options){
 
                         stat.value.add(`{`)
                         for (let d of tree[1]) {
-                            stat.value.add(`${d[0]}:`)
+                            stat.value.add(`${JSON.stringify(d[0])}:`)
                             this.prepare(d[1], stat)
                             stat.value.add(`,`)
                         }
@@ -1684,14 +1684,8 @@ function compile(options){
                         } else {
                             let defineProperty = this.checkDefineProperty(assignName)
                             if(defineProperty){
-                                if(defineProperty.modifiers && defineProperty.modifiers.readonly){
-                                    classCode.add(`${this.name}.${assignName}=()=>{return ${stat.value}}`)
-                                    classCode.add('\n')
-                                } else {
-                                    classCode.add(`${this.name}.${assignName}=${stat.value}`)
-                                    classCode.add('\n')
-                                }
-                                
+                                classCode.add(`${this.name}.${assignName}=${stat.value}`)
+                                classCode.add('\n')
                             } else {
                                 // lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=${stat.value}`)
                                 lazyCode.add(`${this.name}.${assignName}=${stat.value}`)

@@ -298,7 +298,7 @@ class ListView extends Flickable {
         let index = this.currentIndex
 
         if (length <= 0) {
-            index = -1
+            // index = -1
         } else if (index < -1) {
             index = -1
         } else if (index >= length) {

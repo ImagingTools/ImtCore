@@ -4,7 +4,7 @@ const os = require('os');
 const path = require('path');
 const test = require('node:test');
 
-const { prepareOutputRoot, resolveOutputPaths } = require('./output');
+const { prepareOutputRoot, pruneEmptyDirs, resolveOutputPaths } = require('./output');
 
 test('resolves the universal phased output layout', () => {
   const rootDir = path.join('C:', 'suite');
@@ -35,6 +35,20 @@ test('rejects phase names that could escape the output root', () => {
     () => resolveOutputPaths('suite', { PLAYWRIGHT_OUTPUT_PHASE: '../outside' }),
     /Invalid PLAYWRIGHT_OUTPUT_PHASE/
   );
+});
+
+test('prunes empty test folders and keeps the ones holding artifacts', () => {
+  const artifacts = fs.mkdtempSync(path.join(os.tmpdir(), 'gui-test-output-'));
+  fs.mkdirSync(path.join(artifacts, 'passed-test'));
+  fs.mkdirSync(path.join(artifacts, 'nested', 'empty'), { recursive: true });
+  fs.mkdirSync(path.join(artifacts, 'failed-test'));
+  fs.writeFileSync(path.join(artifacts, 'failed-test', 'trace.zip'), 'trace');
+  fs.writeFileSync(path.join(artifacts, '.last-run.json'), '{}');
+
+  pruneEmptyDirs(artifacts);
+
+  assert.deepEqual(fs.readdirSync(artifacts).sort(), ['.last-run.json', 'failed-test']);
+  fs.rmSync(artifacts, { recursive: true, force: true });
 });
 
 test('refuses to clear a directory that is not a test-output root', () => {

@@ -32,6 +32,6 @@ Ctrl+click a property, method, or signal to jump to its declaration (QML or inhe
 | Setting | Purpose |
 | --- | --- |
 | `jqml.enginePath` | Optional live engine root. Empty = bundled engine types. |
-| `jqml.configPath` | Compiler JSON (`dirs` / `includes`). `${workspaceFolder}` and `${env:NAME}` work. `IMTCOREDIR` / `PROLIFEDIR` / `TARGETNAME` are inferred if missing. |
-| `jqml.env` | Extra environment values for `${...}` placeholders in compiler configs. |
+| `jqml.configPath` | Compiler JSON (`dirs` / `includes`). Only this path is loaded. `${workspaceFolder}` and `${env:NAME}` work in the setting. |
+| `jqml.env` | Environment values for `${NAME}` placeholders in the config path and in the JSON. Overrides the process environment. |
 | `jqml.hideInternalMembers` | Hide `JQ*` and geometry internals from completions. Names starting with `__` are always hidden. |

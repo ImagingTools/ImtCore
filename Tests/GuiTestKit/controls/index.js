@@ -216,14 +216,33 @@ class Table {
   /**
    * Screenshot masks ({x,y,width,height}) covering the given columns - use for columns whose value
    * changes across runs/edits (e.g. Added/Last Modified timestamps) so screenshots stay deterministic.
-   * Silently yields no mask for a headerId not currently rendered. Waits for the DOM to settle first so
-   * the rects are sized against the final row extent, not an in-flight reload.
+   * Silently yields no mask for a headerId not currently rendered. Waits for the row set to settle
+   * first so the rects are sized against the final row extent, not an in-flight reload.
    */
   async columnMasks(headerIds) {
     await gui.waitForStable(this.page);
+    await this.waitForRowExtent();
     const rects = await gui.dom.columnRects(this.page, Array.isArray(headerIds) ? headerIds : [headerIds]);
     // Pad a little so a stray antialiased edge pixel doesn't fail under maxDiffPixels 0.
     return rects.map((r) => ({ ...r, padding: 3 }));
+  }
+  /**
+   * Block until the visible row count holds steady. columnRects() measures the rows rendered AT THAT
+   * MOMENT, so a mask taken mid-refill spans fewer rows than the screenshot that follows and leaves the
+   * timestamps below it uncovered; waitForStable() does not catch this, a refill being DOM-quiet between
+   * batches. 0 is never accepted as settled, since a view still loading looks exactly like an empty one
+   * - so only ask a page that HAS a collection on it for column masks, or this costs the full timeout.
+   */
+  async waitForRowExtent(settleTimeout = 6000, interval = 150) {
+    const deadline = Date.now() + settleTimeout;
+    let previous = -1;
+    for (;;) {
+      const count = await this.visibleRowCount();
+      if (count > 0 && count === previous) return count;
+      if (Date.now() >= deadline) return count;
+      previous = count;
+      await this.page.waitForTimeout(interval);
+    }
   }
   /** Number of rows currently in the DOM (regardless of visibility). */
   rowCount() {

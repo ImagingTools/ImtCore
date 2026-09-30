@@ -210,16 +210,16 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 		CSdlQmlGenerationResult generationResult;
 		generationResult.SetCreatedAt(QDateTime::currentDateTimeUtc());
 		generationResult.SetGeneratorVersion(QStringLiteral("1.0"));
-		
+
 		// Track the created folders
 		QSet<QString> createdFolders;
 		createdFolders.insert(outputDirectoryPath);
 		generationResult.SetCreatedFolders(createdFolders);
-		
+
 		// Place generation info file next to depfile
 		const QFileInfo depFileInfo(m_argumentParserCompPtr->GetDepFilePath());
 		const QString generationInfoPath = depFileInfo.absolutePath() + QStringLiteral("/generation_info.json");
-		
+
 		if (!CQmlGenTools::UpdateGenerationResult(generationInfoPath, generationResult)){
 			SendWarningMessage(0, QStringLiteral("Unable to create generation info file: '%1'").arg(generationInfoPath));
 		}
@@ -364,7 +364,15 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		ifStream << QStringLiteral(" m_") << GetDecapitalizedValue(sdlField.GetId());
 		ifStream << ':' << ' ';
 		if (sdlField.IsArray() && (!isCustom || isEnum)){
-			ifStream << QStringLiteral("[]");
+			ifStream << (sdlField.IsRequired() ? QStringLiteral("[]") : QStringLiteral("null"));
+		}
+		else if (sdlField.IsArray()){
+			if (sdlField.IsRequired()){
+				ifStream << QStringLiteral("BaseModel { owner: ") << GetDecapitalizedValue(sdlType.GetName()) << QStringLiteral(" }");
+			}
+			else {
+				ifStream << QStringLiteral("null");
+			}
 		}
 		else if (!isCustom || isEnum){
 			if (convertedType == QStringLiteral("int") ||
@@ -425,6 +433,73 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		ifStream << GetDecapitalizedValue(sdlField.GetId());
 		ifStream << QStringLiteral(" !== null)");
 
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << '}';
+		FeedStream(ifStream, 1, false);
+	}
+
+	bool hasRequiredArrays = false;
+	bool hasArraysWithRequiredElements = false;
+	for (const imtsdl::CSdlField& sdlField: typeFieldList){
+		if (sdlField.IsArray() && sdlField.IsRequired()){
+			hasRequiredArrays = true;
+		}
+		if (sdlField.IsArray() && sdlField.AreArrayElementsRequired()){
+			hasArraysWithRequiredElements = true;
+		}
+	}
+
+	if (hasRequiredArrays){
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << QStringLiteral("function isArrayRequired(propertyId){");
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 2);
+		ifStream << QStringLiteral("switch (propertyId){");
+		for (const imtsdl::CSdlField& sdlField: typeFieldList){
+			if (!sdlField.IsArray() || !sdlField.IsRequired()){
+				continue;
+			}
+
+			FeedStream(ifStream, 1, false);
+			FeedStreamHorizontally(ifStream, 3);
+			ifStream << QStringLiteral("case 'm_") << GetDecapitalizedValue(sdlField.GetId()) << QStringLiteral("': return true");
+		}
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 2);
+		ifStream << '}';
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 2);
+		ifStream << QStringLiteral("return false");
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << '}';
+		FeedStream(ifStream, 1, false);
+	}
+
+	if (hasArraysWithRequiredElements){
+		FeedStream(ifStream, 2, false);
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << QStringLiteral("function areArrayElementsRequired(propertyId){");
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 2);
+		ifStream << QStringLiteral("switch (propertyId){");
+		for (const imtsdl::CSdlField& sdlField: typeFieldList){
+			if (!sdlField.IsArray() || !sdlField.AreArrayElementsRequired()){
+				continue;
+			}
+
+			FeedStream(ifStream, 1, false);
+			FeedStreamHorizontally(ifStream, 3);
+			ifStream << QStringLiteral("case 'm_") << GetDecapitalizedValue(sdlField.GetId()) << QStringLiteral("': return true");
+		}
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 2);
+		ifStream << '}';
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 2);
+		ifStream << QStringLiteral("return false");
 		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 1);
 		ifStream << '}';
@@ -596,7 +671,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	FeedStreamHorizontally(ifStream, 2);
 	ifStream << '}'; // end of switch
 	FeedStream(ifStream, 1, false);
-	
+
 	FeedStreamHorizontally(ifStream, 1);
 	ifStream << '}'; // end of function
 

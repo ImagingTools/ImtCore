@@ -38,6 +38,10 @@ void CCollectionDocumentServicePublisherComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
+	if (!IsAutoCloseEnabled()){
+		return;
+	}
+
 	QObject::connect(
 				&m_closeIdleDocumentsTimer,
 				&QTimer::timeout,
@@ -53,6 +57,24 @@ void CCollectionDocumentServicePublisherComp::OnComponentDestroyed()
 	m_closeIdleDocumentsTimer.disconnect();
 
 	BaseClass::OnComponentDestroyed();
+}
+
+
+// reimplemented (imtgql::IGqlSubscriberController)
+
+bool CCollectionDocumentServicePublisherComp::RegisterSubscription(
+			const QByteArray& subscriptionId,
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtrest::IRequest& networkRequest,
+			QString& errorMessage)
+{
+	if (!BaseClass::RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage)){
+		return false;
+	}
+
+	MarkIndividualSubscription(GetSubscriberUserId(gqlRequest), GetSubscribedDocumentId(gqlRequest));
+
+	return true;
 }
 
 
@@ -82,15 +104,7 @@ bool CCollectionDocumentServicePublisherComp::IsRequestSupported(const imtgql::C
 	}
 
 	if (gqlCommandId == sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId()){
-		const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
-		if (inputParamPtr == nullptr){
-			return false;
-		}
-
-		QByteArray requestCollectionId = inputParamPtr->GetParamArgumentValue("collectionId").toByteArray();
-		QByteArray documentId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
-
-		return requestCollectionId == collectionId && !documentId.isEmpty();
+		return !GetSubscribedDocumentId(gqlRequest).isEmpty();
 	}
 
 	return BaseClass::IsRequestSupported(gqlRequest);
@@ -376,11 +390,17 @@ QByteArray CCollectionDocumentServicePublisherComp::ConvertUrlToObjectId(const Q
 }
 
 
+bool CCollectionDocumentServicePublisherComp::IsAutoCloseEnabled() const
+{
+	return m_closeDocumentTimeoutAttrPtr.IsValid() && (*m_closeDocumentTimeoutAttrPtr > 0);
+}
+
+
 void CCollectionDocumentServicePublisherComp::TrackDocument(
 			const QByteArray& userId,
 			const QByteArray& documentId) const
 {
-	if (documentId.isEmpty()){
+	if (documentId.isEmpty() || !IsAutoCloseEnabled()){
 		return;
 	}
 
@@ -388,7 +408,7 @@ void CCollectionDocumentServicePublisherComp::TrackDocument(
 
 	TrackedDocument& trackedDocument = m_trackedDocuments[documentId];
 	trackedDocument.userId = userId;
-	trackedDocument.lastSubscriberSeenMs = QDateTime::currentMSecsSinceEpoch();
+	trackedDocument.lastSubscriberSeenSecs = QDateTime::currentSecsSinceEpoch();
 }
 
 
@@ -400,27 +420,54 @@ void CCollectionDocumentServicePublisherComp::UntrackDocument(const QByteArray& 
 }
 
 
-bool CCollectionDocumentServicePublisherComp::HasActiveSingleDocumentChangedSubscriber(const QByteArray& documentId) const
+void CCollectionDocumentServicePublisherComp::MarkIndividualSubscription(
+			const QByteArray& userId,
+			const QByteArray& documentId) const
 {
-	const QByteArray commandId = sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId();
+	if (documentId.isEmpty() || userId.isEmpty()){
+		return;
+	}
 
+	QMutexLocker locker(&m_trackedDocumentsMutex);
+
+	auto foundIter = m_trackedDocuments.find(documentId);
+	if (foundIter == m_trackedDocuments.end()){
+		return;
+	}
+
+	if (foundIter.value().userId != userId){
+		return;
+	}
+
+	foundIter.value().hasIndividualSubscription = true;
+	foundIter.value().lastSubscriberSeenSecs = QDateTime::currentSecsSinceEpoch();
+}
+
+
+bool CCollectionDocumentServicePublisherComp::HasActiveSingleDocumentChangedSubscriber(
+			const QByteArray& userId,
+			const QByteArray& documentId) const
+{
 	QMutexLocker locker(&m_mutex);
 
-	for (const RequestNetworks& entry : m_registeredSubscribers){
-		if (entry.gqlRequest.GetCommandId() != commandId){
-			continue;
-		}
+	return HasActiveSingleDocumentChangedSubscriberNoLock(userId, documentId);
+}
 
+
+bool CCollectionDocumentServicePublisherComp::HasActiveSingleDocumentChangedSubscriberNoLock(
+			const QByteArray& userId,
+			const QByteArray& documentId) const
+{
+	for (const RequestNetworks& entry : m_registeredSubscribers){
 		if (entry.networkRequests.isEmpty()){
 			continue;
 		}
 
-		const imtgql::CGqlParamObject* inputParamPtr = entry.gqlRequest.GetParamObject("input");
-		if (inputParamPtr == nullptr){
+		if (GetSubscribedDocumentId(entry.gqlRequest) != documentId){
 			continue;
 		}
 
-		if (inputParamPtr->GetParamArgumentValue("id").toByteArray() == documentId){
+		if (GetSubscriberUserId(entry.gqlRequest) == userId){
 			return true;
 		}
 	}
@@ -429,29 +476,73 @@ bool CCollectionDocumentServicePublisherComp::HasActiveSingleDocumentChangedSubs
 }
 
 
+QByteArray CCollectionDocumentServicePublisherComp::GetSubscribedDocumentId(const imtgql::CGqlRequest& gqlRequest) const
+{
+	if (!m_collectionIdAttrPtr.IsValid()){
+		return QByteArray();
+	}
+
+	if (gqlRequest.GetCommandId() != sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId()){
+		return QByteArray();
+	}
+
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	if (inputParamPtr == nullptr){
+		return QByteArray();
+	}
+
+	if (inputParamPtr->GetParamArgumentValue("collectionId").toByteArray() != *m_collectionIdAttrPtr){
+		return QByteArray();
+	}
+
+	return inputParamPtr->GetParamArgumentValue("id").toByteArray();
+}
+
+
+QByteArray CCollectionDocumentServicePublisherComp::GetSubscriberUserId(const imtgql::CGqlRequest& gqlRequest) const
+{
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	if (contextPtr != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
+		if (userInfoPtr != nullptr){
+			return userInfoPtr->GetId();
+		}
+	}
+
+	return QByteArray();
+}
+
+
 void CCollectionDocumentServicePublisherComp::CloseIdleDocuments()
 {
-	if (!m_documentServiceCompPtr.IsValid()){
+	if (!m_documentServiceCompPtr.IsValid() || !IsAutoCloseEnabled()){
 		return;
 	}
 
 	const qint64 timeout = *m_closeDocumentTimeoutAttrPtr;
-	const qint64 now = QDateTime::currentMSecsSinceEpoch();
+	const qint64 now = QDateTime::currentSecsSinceEpoch();
 
 	QList<QPair<QByteArray, QByteArray> > documentsToClose; // userId, documentId
 
 	{
-		QMutexLocker locker(&m_trackedDocumentsMutex);
+		QMutexLocker subscribersLocker(&m_mutex);
+		QMutexLocker trackedDocumentsLocker(&m_trackedDocumentsMutex);
 
 		for (auto it = m_trackedDocuments.begin(); it != m_trackedDocuments.end(); ){
-			if (HasActiveSingleDocumentChangedSubscriber(it.key())){
-				it.value().lastSubscriberSeenMs = now;
+			if (!it.value().hasIndividualSubscription){
 				++it;
 
 				continue;
 			}
 
-			if ((now - it.value().lastSubscriberSeenMs) < timeout){
+			if (HasActiveSingleDocumentChangedSubscriberNoLock(it.value().userId, it.key())){
+				it.value().lastSubscriberSeenSecs = now;
+				++it;
+
+				continue;
+			}
+
+			if ((now - it.value().lastSubscriberSeenSecs) < timeout){
 				++it;
 
 				continue;

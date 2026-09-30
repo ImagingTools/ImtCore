@@ -14,8 +14,8 @@ Dialog {
 	property bool hiddenBackground: true;
 	property bool noMouseArea: true;
 
-	x: ModalDialogManager.activeView.width - contentWidth - Style.marginM;
-	y: ModalDialogManager.activeView.height - height - Style.marginM;
+	x: dialogManagerView ? dialogManagerView.width - contentWidth - Style.marginM : ModalDialogManager.activeView.width - contentWidth - Style.marginM;
+	y: dialogManagerView ? dialogManagerView.height - height - Style.marginM : ModalDialogManager.activeView.height - height - Style.marginM;
 
 	property string text: "";
 	property int contentWidth: Style.sizeHintXS;
