@@ -58,6 +58,12 @@ public:
 	*/
 	QByteArray CreateSchemaNameForTenant(const QByteArray& tenantId) const;
 
+	/**
+		Derive a safe schema name from the given prefix and tenant ID.
+		The tenant ID is sanitized to lowercase [a-z0-9_] characters.
+	*/
+	static QByteArray CreateSchemaName(const QByteArray& prefix, const QByteArray& tenantId);
+
 private:
 	mutable QMutex m_mutex;
 

@@ -147,7 +147,13 @@ QByteArray CTenantStorageRegistry::CreateSchemaNameForTenant(const QByteArray& t
 {
 	QMutexLocker locker(&m_mutex);
 
-	QByteArray retVal = m_schemaNamePrefix;
+	return CreateSchemaName(m_schemaNamePrefix, tenantId);
+}
+
+
+QByteArray CTenantStorageRegistry::CreateSchemaName(const QByteArray& prefix, const QByteArray& tenantId)
+{
+	QByteArray retVal = prefix;
 
 	for (char character: tenantId){
 		char lowerCharacter = char(QChar::fromLatin1(character).toLower().toLatin1());

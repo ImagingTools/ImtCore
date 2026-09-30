@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtauth/ITenantManager.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtdb/ITenantStorageProvisioner.h>
 
 
 namespace imtauth
@@ -25,6 +26,7 @@ public:
 		I_REGISTER_INTERFACE(imtauth::ITenantManager);
 		I_ASSIGN(m_tenantCollectionCompPtr, "TenantCollection", "Tenant collection", true, "TenantCollection");
 		I_ASSIGN(m_tenantFactoryCompPtr, "TenantFactory", "Tenant info factory", true, "TenantInfo");
+		I_ASSIGN(m_storageProvisionerCompPtr, "StorageProvisioner", "Optional provisioner creating the physical storage of a tenant on creation and removing it on tenant removal", false, "TenantStorageProvisioner");
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::ITenantManager)
@@ -42,6 +44,7 @@ public:
 private:
 	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);
 	I_FACT(imtauth::ITenantInfo, m_tenantFactoryCompPtr);
+	I_REF(imtdb::ITenantStorageProvisioner, m_storageProvisionerCompPtr);
 };
 
 

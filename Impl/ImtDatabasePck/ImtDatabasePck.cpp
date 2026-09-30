@@ -136,5 +136,10 @@ I_EXPORT_COMPONENT(
 			"Resolver mapping tenants to their physical storage (schema, database or file)",
 			"Tenant Storage Resolver Multi-Tenant Isolation Schema Database");
 
+I_EXPORT_COMPONENT(
+			TenantStorageProvisioner,
+			"Provisioner creating and removing the physical storage of a tenant",
+			"Tenant Storage Provisioner Multi-Tenant Lifecycle Schema Database");
+
 
 } // namespace ImtDatabasePck
