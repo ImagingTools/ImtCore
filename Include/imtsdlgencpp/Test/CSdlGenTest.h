@@ -27,6 +27,7 @@ private Q_SLOTS:
 	void TestUnion();
 	void TestComplexUnion();
 	void TestArrayNullabilityParsing();
+	void TestImportedEnumArrayQObjectSetter();
 	void TestTreeModelExplicitNullKey();
 	void TestArrayBackendsRoundTrip_data();
 	void TestArrayBackendsRoundTrip();

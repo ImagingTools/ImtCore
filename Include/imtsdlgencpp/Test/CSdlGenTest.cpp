@@ -299,6 +299,29 @@ void CSdlGenTest::TestArrayNullabilityParsing()
 }
 
 
+void CSdlGenTest::TestImportedEnumArrayQObjectSetter()
+{
+	CImtSdlGenTest testSuite;
+	PrepareSuite(testSuite, m_tempOutputDir);
+
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	argParserPtr->SetCppEnabled();
+	argParserPtr->SetGqlEnabled();
+	argParserPtr->SetQmlEnabled();
+
+	ExecuteTest(testSuite, "ImportedEnumArray.sdl");
+
+	QFile generatedSource(m_tempOutputDir.absoluteFilePath(
+		"enumconsumersdl/SDL/1.0/CPP/ImportedEnumArray.cpp"));
+	QVERIFY(generatedSource.open(QIODevice::ReadOnly | QIODevice::Text));
+
+	const QByteArray source = generatedSource.readAll();
+	QVERIFY(source.contains(
+		"istd::TNullableValue<sdl::V1_0::externalenum::ImportedState> tempItem("
+		"static_cast<sdl::V1_0::externalenum::ImportedState>(key));"));
+}
+
+
 void CSdlGenTest::TestTreeModelExplicitNullKey()
 {
 	imtbase::CTreeItemModel model;
