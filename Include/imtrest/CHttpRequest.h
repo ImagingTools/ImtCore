@@ -45,6 +45,10 @@ public:
 	void SetMethodType(const MethodType& methodType);
 	void SetBody(const QByteArray& body);
 	void SetCommandId(const QByteArray& commandId);
+	void SetUrl(const QUrl& url);
+	void SetRemoteAddress(const QHostAddress& remoteAddress);
+	void SetRequestId(const QByteArray& requestId);
+	void SetState(RequestState state);
 
 	static int OnStartMessage(http_parser* httpParser);
 	static int OnUrl(http_parser* httpParser, const char* at, size_t length);
