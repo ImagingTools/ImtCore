@@ -2,6 +2,10 @@
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
 
 
+// ImtCore includes
+#include <imtbase/CTenantContextScope.h>
+
+
 namespace imtservergql
 {
 
@@ -27,6 +31,14 @@ QJsonObject CGqlRequestHandlerCompBase::CreateResponse(const imtgql::CGqlRequest
 
 		return QJsonObject();
 	}
+
+	QByteArray tenantId;
+	const imtgql::IGqlContext* requestContextPtr = gqlRequest.GetRequestContext();
+	if (requestContextPtr != nullptr){
+		tenantId = requestContextPtr->GetTenantId();
+	}
+
+	imtbase::CTenantContextScope tenantContextScope(tenantId);
 
 	return CreateInternalResponse(gqlRequest, errorMessage);
 }

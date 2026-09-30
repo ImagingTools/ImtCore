@@ -5,12 +5,14 @@
 
 #include <QtConcurrent/QtConcurrent>
 #include <QFuture>
+#include <QtCore/QThread>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
 
 #include <imtdb/CTenantStorageDbStore.h>
 #include <imtdb/IDatabaseEngine.h>
+#include <imtbase/CTenantContextScope.h>
 
 
 using imtdb::CTenantStorageRegistry;
@@ -386,6 +388,56 @@ void CTenantStorageResolverTest::testConcurrentRegistrationAndResolution()
 	}
 
 	QCOMPARE(m_registryPtr->GetRegisteredTenantIds().size(), tenantCount);
+}
+
+
+// tenant context scope
+
+void CTenantStorageResolverTest::testTenantContextScopeActivation()
+{
+	QVERIFY(!imtbase::CTenantContextScope::IsActive());
+	QVERIFY(imtbase::CTenantContextScope::GetCurrentTenantId().isEmpty());
+
+	{
+		imtbase::CTenantContextScope scope(QByteArrayLiteral("tenant-a"));
+
+		QVERIFY(imtbase::CTenantContextScope::IsActive());
+		QCOMPARE(imtbase::CTenantContextScope::GetCurrentTenantId(), QByteArrayLiteral("tenant-a"));
+	}
+
+	QVERIFY(!imtbase::CTenantContextScope::IsActive());
+	QVERIFY(imtbase::CTenantContextScope::GetCurrentTenantId().isEmpty());
+}
+
+
+void CTenantStorageResolverTest::testTenantContextScopeNesting()
+{
+	imtbase::CTenantContextScope outerScope(QByteArrayLiteral("tenant-outer"));
+
+	{
+		imtbase::CTenantContextScope innerScope(QByteArrayLiteral("tenant-inner"));
+
+		QCOMPARE(imtbase::CTenantContextScope::GetCurrentTenantId(), QByteArrayLiteral("tenant-inner"));
+	}
+
+	QVERIFY(imtbase::CTenantContextScope::IsActive());
+	QCOMPARE(imtbase::CTenantContextScope::GetCurrentTenantId(), QByteArrayLiteral("tenant-outer"));
+}
+
+
+void CTenantStorageResolverTest::testTenantContextScopeIsThreadLocal()
+{
+	imtbase::CTenantContextScope scope(QByteArrayLiteral("tenant-main"));
+
+	QByteArray workerTenantId = QByteArrayLiteral("not-empty");
+	QScopedPointer<QThread> workerThreadPtr(QThread::create([&workerTenantId](){
+		workerTenantId = imtbase::CTenantContextScope::GetCurrentTenantId();
+	}));
+	workerThreadPtr->start();
+	workerThreadPtr->wait();
+
+	QVERIFY(workerTenantId.isEmpty());
+	QCOMPARE(imtbase::CTenantContextScope::GetCurrentTenantId(), QByteArrayLiteral("tenant-main"));
 }
 
 

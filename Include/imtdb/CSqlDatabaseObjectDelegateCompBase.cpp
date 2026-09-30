@@ -17,6 +17,7 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
+#include <imtbase/CTenantContextScope.h>
 #include <imtdb/CComplexCollectionFilterConverter.h>
 #include <imtdb/imtdb.h>
 
@@ -319,6 +320,34 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetTableName() const
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::GetTableScheme() const
 {
+	if (m_tenantStorageResolverCompPtr.IsValid()){
+		// Fail-closed: without a resolvable tenant context no valid schema is returned,
+		// queries against the sentinel schema will fail instead of leaking shared data
+		static const QByteArray deniedSchemaName = QByteArrayLiteral("imt_tenant_storage_denied");
+
+		QByteArray tenantId = imtbase::CTenantContextScope::GetCurrentTenantId();
+		if (tenantId.isEmpty()){
+			SendErrorMessage(0, QStringLiteral("Tenant storage access denied for table '%1': no tenant context is active").arg(QString(GetTableName())), "CSqlDatabaseObjectDelegateCompBase");
+
+			return deniedSchemaName;
+		}
+
+		imtdb::TenantStorageInfo storageInfo;
+		if (!m_tenantStorageResolverCompPtr->ResolveTenantStorage(tenantId, storageInfo)){
+			SendErrorMessage(0, QStringLiteral("Tenant storage access denied for table '%1': storage of tenant '%2' could not be resolved").arg(QString(GetTableName()), QString(tenantId)), "CSqlDatabaseObjectDelegateCompBase");
+
+			return deniedSchemaName;
+		}
+
+		if (storageInfo.status != imtdb::TSS_ACTIVE && storageInfo.status != imtdb::TSS_MIGRATING){
+			SendErrorMessage(0, QStringLiteral("Tenant storage access denied for table '%1': storage of tenant '%2' is not active").arg(QString(GetTableName()), QString(tenantId)), "CSqlDatabaseObjectDelegateCompBase");
+
+			return deniedSchemaName;
+		}
+
+		return storageInfo.schemaName;
+	}
+
 	if (m_tableSchemaAttrPtr.IsValid()){
 		return *m_tableSchemaAttrPtr;
 	}

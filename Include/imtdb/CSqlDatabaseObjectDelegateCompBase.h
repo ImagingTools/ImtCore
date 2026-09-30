@@ -12,6 +12,7 @@
 #include <imtbase/ITimeFilterParam.h>
 #include <imtdb/ISqlDatabaseObjectDelegate.h>
 #include <imtdb/IDatabaseEngine.h>
+#include <imtdb/ITenantStorageResolver.h>
 
 
 namespace imtdb
@@ -37,6 +38,7 @@ public:
 		I_ASSIGN(m_autoCreateTableAttrPtr, "AutoCreateTable", "Auto create collection table if it does not exist", false, false);
 		I_ASSIGN(m_createTableScriptPathAttrPtr, "CreateTableScriptPath", "QRC path or file name of SQL script used to create collection table", false, "");
 		I_ASSIGN(m_prerequisiteTableScriptPathAttrPtr, "PrerequisiteTableScriptPath", "QRC path or file name of SQL script creating tables the collection table references (executed before CreateTableScriptPath)", false, "");
+		I_ASSIGN(m_tenantStorageResolverCompPtr, "TenantStorageResolver", "Optional resolver mapping the current tenant context to its physical storage schema; if set, the table schema is resolved per request (fail-closed)", false, "TenantStorageResolver");
 	I_END_COMPONENT
 
 	virtual QString SqlEncode(const QString& sqlQuery) const;
@@ -112,6 +114,7 @@ protected:
 
 protected:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
+	I_REF(imtdb::ITenantStorageResolver, m_tenantStorageResolverCompPtr);
 	I_REF(iprm::IOptionsList, m_typesCompPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 	I_ATTR(QByteArray, m_tableSchemaAttrPtr);

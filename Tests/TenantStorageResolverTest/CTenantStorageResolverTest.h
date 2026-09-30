@@ -42,6 +42,11 @@ private Q_SLOTS:
 	// concurrency
 	void testConcurrentRegistrationAndResolution();
 
+	// tenant context scope
+	void testTenantContextScopeActivation();
+	void testTenantContextScopeNesting();
+	void testTenantContextScopeIsThreadLocal();
+
 private:
 	imtdb::CTenantStorageRegistry* m_registryPtr = nullptr;
 };
