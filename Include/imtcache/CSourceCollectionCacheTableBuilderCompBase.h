@@ -40,6 +40,8 @@ public:
 		I_ASSIGN(m_tableNameAttrPtr, "TableName", "Name of the cache table", true, "");
 		I_ASSIGN(m_createTableScriptPathAttrPtr, "CreateTableScriptPath", "QRC path of the SQL script creating the cache table. ${TableName} is substituted", true, "");
 		I_ASSIGN(m_objectIdColumnAttrPtr, "ObjectIdColumn", "Column holding the source document UUID, used as the upsert conflict target", true, "DocumentId");
+		I_ASSIGN(m_modificationTimeFieldAttrPtr, "ModificationTimeField", "Field of the source collection holding the time a row was last changed. Address collections use LastModified, document collections use TimeStamp", true, "LastModified");
+		I_ASSIGN(m_stateFilterParamIdAttrPtr, "StateFilterParamId", "Selection parameter id under which the source collection reads its document state filter. Address collections use State, document collections use DocumentFilter", true, "State");
 	I_END_COMPONENT;
 
 	// reimplemented (imtcache::ICacheTableBuilder)
@@ -87,6 +89,8 @@ private:
 	I_ATTR(QByteArray, m_tableNameAttrPtr);
 	I_ATTR(QByteArray, m_createTableScriptPathAttrPtr);
 	I_ATTR(QByteArray, m_objectIdColumnAttrPtr);
+	I_ATTR(QByteArray, m_modificationTimeFieldAttrPtr);
+	I_ATTR(QByteArray, m_stateFilterParamIdAttrPtr);
 };
 
 

@@ -24,20 +24,19 @@ namespace imtcache
 namespace
 {
 
-const QByteArray LAST_MODIFIED_FIELD = QByteArrayLiteral("LastModified");
 const QString SHADOW_SUFFIX = QStringLiteral("_shadow");
 const QString STAGING_SUFFIX = QStringLiteral("_staging");
 
 
-/// Selects the source rows modified after \a since, or all of them when \a since is not set.
-void FillChangedFilter(imtbase::CComplexCollectionFilter& filter, const QDateTime& since)
+/// Selects the source rows changed after \a since, or all of them when \a since is not set.
+void FillChangedFilter(imtbase::CComplexCollectionFilter& filter, const QByteArray& modificationTimeField, const QDateTime& since)
 {
 	if (!since.isValid()){
 		return;
 	}
 
 	filter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter(
-				LAST_MODIFIED_FIELD,
+				modificationTimeField,
 				since,
 				imtbase::IComplexCollectionFilter::FO_GREATER));
 }
@@ -112,7 +111,7 @@ CSourceCollectionCacheTableBuilderCompBase::BuildResult CSourceCollectionCacheTa
 	}
 
 	imtbase::CComplexCollectionFilter changedFilter;
-	FillChangedFilter(changedFilter, lastSourceUpdateTime);
+	FillChangedFilter(changedFilter, *m_modificationTimeFieldAttrPtr, lastSourceUpdateTime);
 
 	iprm::CParamsSet changedParams;
 	changedParams.SetEditableParameter(QByteArrayLiteral("ComplexFilter"), &changedFilter);
@@ -274,7 +273,7 @@ bool CSourceCollectionCacheTableBuilderCompBase::LoadRows(
 			continue;
 		}
 
-		const QDateTime lastModified = iteratorPtr->GetElementInfo(LAST_MODIFIED_FIELD).toDateTime();
+		const QDateTime lastModified = iteratorPtr->GetElementInfo(*m_modificationTimeFieldAttrPtr).toDateTime();
 		if (lastModified.isValid() && (!result.lastSourceUpdateTime.isValid() || lastModified > result.lastSourceUpdateTime)){
 			result.lastSourceUpdateTime = lastModified;
 		}
@@ -298,16 +297,16 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveDeletedRows(
 			BuildResult& result) const
 {
 	// Deletion is soft - the source row stays and its State becomes 'Disabled' - and that update
-	// bumps LastModified, so the same cutoff that finds edits also finds removals.
+	// bumps the modification time, so the same cutoff that finds edits also finds removals.
 	imtbase::CComplexCollectionFilter changedFilter;
-	FillChangedFilter(changedFilter, lastSourceUpdateTime);
+	FillChangedFilter(changedFilter, *m_modificationTimeFieldAttrPtr, lastSourceUpdateTime);
 
 	imtcol::CDocumentCollectionFilter documentFilter;
 	documentFilter.AddDocumentState(imtcol::IDocumentCollectionFilter::DS_DISABLED);
 
 	iprm::CParamsSet deletedParams;
 	deletedParams.SetEditableParameter(QByteArrayLiteral("ComplexFilter"), &changedFilter);
-	deletedParams.SetEditableParameter(QByteArrayLiteral("State"), &documentFilter);
+	deletedParams.SetEditableParameter(*m_stateFilterParamIdAttrPtr, &documentFilter);
 
 	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> iteratorPtr(
 				m_sourceCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &deletedParams));
@@ -326,7 +325,7 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveDeletedRows(
 
 		deletedIds << QStringLiteral("'%1'").arg(QString::fromUtf8(documentUuid.toByteArray(QUuid::WithoutBraces)));
 
-		const QDateTime lastModified = iteratorPtr->GetElementInfo(LAST_MODIFIED_FIELD).toDateTime();
+		const QDateTime lastModified = iteratorPtr->GetElementInfo(*m_modificationTimeFieldAttrPtr).toDateTime();
 		if (lastModified.isValid() && (!result.lastSourceUpdateTime.isValid() || lastModified > result.lastSourceUpdateTime)){
 			result.lastSourceUpdateTime = lastModified;
 		}
