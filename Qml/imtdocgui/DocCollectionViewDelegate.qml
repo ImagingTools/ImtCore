@@ -232,7 +232,7 @@ CollectionViewCommandsDelegateBase{
 			contentComp: Component{
 				Item{
 					width: selectTypeIdDialog.width
-					height: content.height
+					height: content.height + content.y
 
 					function createDocumentTypesModel(documentTypeIds){
 						documentTypeCbModel.clear()
