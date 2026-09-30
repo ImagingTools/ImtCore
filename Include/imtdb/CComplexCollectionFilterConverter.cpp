@@ -126,11 +126,12 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 			break;
 		case QMetaType::LongLong:
 			filterValue = QString::number(filter.filterValue.toLongLong(&isOk));
-			type = "int";
+			type = "bigint";
 			break;
 		case QMetaType::ULongLong:
 			filterValue = QString::number(filter.filterValue.toULongLong(&isOk));
-			type = "int";
+			// PostgreSQL has no unsigned 64-bit type, and values above INT64_MAX do not fit bigint.
+			type = sqlContext == SC_DUCKDB ? "ubigint" : "numeric";
 			break;
 		case QMetaType::Double:
 			filterValue = QString::number(filter.filterValue.toDouble(&isOk));
