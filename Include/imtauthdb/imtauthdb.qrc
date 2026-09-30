@@ -13,6 +13,7 @@
 	<file alias="CreateOrderRequestsTable.sql">Resources/SQL/Postgres/CreateOrderRequestsTable.sql</file>
 	<file alias="CreateTenantRelationshipsTable.sql">Resources/SQL/Postgres/CreateTenantRelationshipsTable.sql</file>
 	<file alias="CreateTenantEntityBindingsTable.sql">Resources/SQL/Postgres/CreateTenantEntityBindingsTable.sql</file>
+	<file alias="CreateTenantStorageTable.sql">Resources/SQL/Postgres/CreateTenantStorageTable.sql</file>
     </qresource>
     <qresource prefix="/SQL/SQLite">
         <file alias="CreatePersonalAccessTokenTable.sql">Resources/SQL/SQLite/CreatePersonalAccessTokenTable.sql</file>
@@ -28,5 +29,6 @@
 	<file alias="CreateOrderRequestsTable.sql">Resources/SQL/SQLite/CreateOrderRequestsTable.sql</file>
 	<file alias="CreateTenantRelationshipsTable.sql">Resources/SQL/SQLite/CreateTenantRelationshipsTable.sql</file>
 	<file alias="CreateTenantEntityBindingsTable.sql">Resources/SQL/SQLite/CreateTenantEntityBindingsTable.sql</file>
+	<file alias="CreateTenantStorageTable.sql">Resources/SQL/SQLite/CreateTenantStorageTable.sql</file>
     </qresource>
 </RCC>

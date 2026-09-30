@@ -131,5 +131,10 @@ I_EXPORT_COMPONENT(
 			"SQL database transaction manager",
 			"SQL Database Transaction Manager");
 
+I_EXPORT_COMPONENT(
+			TenantStorageResolver,
+			"Resolver mapping tenants to their physical storage (schema, database or file)",
+			"Tenant Storage Resolver Multi-Tenant Isolation Schema Database");
+
 
 } // namespace ImtDatabasePck
