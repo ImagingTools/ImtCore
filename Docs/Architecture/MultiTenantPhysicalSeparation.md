@@ -1,214 +1,218 @@
-# Physische Datentrennung im Multi-Tenant-System (Option C — Hybrid)
+# Физическое разделение данных в мультитенантной системе (вариант C — гибрид)
 
-Status: **Umgesetzt** (Phase 1 bis 5; Lasttests und Connection-Pool-Anbindung als Folgearbeit)
-Bezug: EU Cyber Resilience Act (Verordnung (EU) 2024/2847), DSGVO Art. 17/20/32 — siehe [CRA_COMPLIANCE.md](../../CRA_COMPLIANCE.md)
+Статус: **Реализовано** (фазы 1–5; нагрузочные тесты и интеграция с пулом соединений — последующие работы)
+Основание: EU Cyber Resilience Act (Регламент (ЕС) 2024/2847), GDPR ст. 17/20/32 — см. [CRA_COMPLIANCE.md](../../CRA_COMPLIANCE.md)
 
-## Zielbild
+## Целевая архитектура
 
-Das Multi-Tenant-System wird von rein logischer Trennung (gemeinsame Tabellen mit
-`TenantId`-Spalten und Query-Filterung über `imtauth::ITenantFilterParam`) auf ein
-hybrides Modell mit physischer Trennung umgestellt:
+Мультитенантная система переводится с чисто логического разделения (общие таблицы
+со столбцами `TenantId` и фильтрацией запросов через `imtauth::ITenantFilterParam`)
+на гибридную модель с физическим разделением:
 
-- **Shared-Katalog**: Tenant-übergreifende Tabellen verbleiben in einer zentralen
-  Katalog-Datenbank bzw. dem Shared-Schema:
+- **Общий каталог (shared-каталог)**: кросс-тенантные таблицы остаются в центральной
+  каталожной базе данных или в общей схеме:
   `Tenants`, `TenantMemberships`, `TenantInvitations`, `TenantRelationships`,
   `TenantConnection*`, `TenantPermissions`, `TenantEntityBindings`,
   `CrossTenantMessages`, `Contracts`, `CrossOrgGrants`, `OrderRequests`,
-  `UserSessions` sowie die neue Registry-Tabelle `TenantStorage`.
-- **Tenant-Daten**: Alle tenant-eigenen Nutzdaten (Dokumente, Collections, Rollen,
-  Gruppen, Einstellungen, fachliche Objekte) werden physisch getrennt gespeichert:
-  - Standard: eigenes Postgres-Schema pro Tenant (`tenant_<id>`), bei SQLite eine
-    eigene Datenbankdatei pro Tenant.
-  - Enterprise/Datenresidenz: eigene Datenbank pro Tenant (über dieselbe Abstraktion).
-- **Defense in Depth**: Postgres Row-Level Security auf den verbleibenden
-  Shared-Tabellen mit `TenantId`-Spalte.
+  `UserSessions`, а также новая реестровая таблица `TenantStorage`.
+- **Данные тенантов**: все пользовательские данные, принадлежащие тенанту (документы,
+  коллекции, роли, группы, настройки, предметные объекты), хранятся физически раздельно:
+  - Стандарт: отдельная схема Postgres на тенанта (`tenant_<id>`), для SQLite —
+    отдельный файл базы данных на тенанта.
+  - Enterprise/резидентность данных: отдельная база данных на тенанта (через ту же
+    абстракцию).
+- **Defense in Depth**: Postgres Row-Level Security на оставшихся общих таблицах
+  со столбцом `TenantId`.
 
-## Storage-Registry (Phase 1 — umgesetzt)
+## Реестр хранилищ (фаза 1 — реализовано)
 
-Kernstück ist die Auflösung "Tenant → physischer Speicherort":
+Ядро — разрешение «тенант → физическое место хранения»:
 
-| Baustein | Ort | Zweck |
+| Компонент | Расположение | Назначение |
 |---|---|---|
-| `imtdb::ITenantStorageResolver` | `Include/imtdb/ITenantStorageResolver.h` | Interface: `ResolveTenantStorage`, `RegisterTenantStorage`, `UnregisterTenantStorage`; Datentypen `TenantStorageKind` (SharedSchema/OwnSchema/OwnDatabase/OwnFile), `TenantStorageStatus`, `TenantStorageInfo` |
-| `imtdb::CTenantStorageRegistry` | `Include/imtdb/CTenantStorageRegistry.{h,cpp}` | Thread-sichere Registry mit Fail-Closed-Auflösung und Schema-Namensableitung (Sanitisierung auf `[a-z0-9_]`) |
-| `imtdb::CTenantStorageResolverComp` | `Include/imtdb/CTenantStorageResolverComp.{h,cpp}` | Komponente (`ImtDatabasePck::TenantStorageResolver`) mit Attributen `AllowSharedFallback` (Default: aus), `SharedSchemaName`, `SchemaNamePrefix`; Audit-Logging aller Registrierungen und fehlgeschlagenen Auflösungen |
-| Registry-Tabelle `TenantStorage` | `Include/imtauthdb/Resources/SQL/{Postgres,SQLite}/CreateTenantStorageTable.sql` | Persistente Ablage der Storage-Zuordnungen im Shared-Katalog (`TenantId`, `StorageKind`, `Status`, `SchemaName`, `ConnectionRef`) |
-| Tests | `Tests/TenantStorageResolverTest/` | Fail-Closed-Verhalten, Registrierung/Offboarding, Schema-Namens-Sanitisierung, Nebenläufigkeit, Registry-Persistenz (In-Memory-SQLite) |
+| `imtdb::ITenantStorageResolver` | `Include/imtdb/ITenantStorageResolver.h` | Интерфейс: `ResolveTenantStorage`, `RegisterTenantStorage`, `UnregisterTenantStorage`; типы данных `TenantStorageKind` (SharedSchema/OwnSchema/OwnDatabase/OwnFile), `TenantStorageStatus`, `TenantStorageInfo` |
+| `imtdb::CTenantStorageRegistry` | `Include/imtdb/CTenantStorageRegistry.{h,cpp}` | Потокобезопасный реестр с fail-closed-разрешением и выводом имён схем (санитизация до `[a-z0-9_]`) |
+| `imtdb::CTenantStorageResolverComp` | `Include/imtdb/CTenantStorageResolverComp.{h,cpp}` | Компонент (`ImtDatabasePck::TenantStorageResolver`) с атрибутами `AllowSharedFallback` (по умолчанию выключен), `SharedSchemaName`, `SchemaNamePrefix`; аудит-логирование всех регистраций и неудачных разрешений |
+| Реестровая таблица `TenantStorage` | `Include/imtauthdb/Resources/SQL/{Postgres,SQLite}/CreateTenantStorageTable.sql` | Персистентное хранение назначений хранилищ в общем каталоге (`TenantId`, `StorageKind`, `Status`, `SchemaName`, `ConnectionRef`) |
+| Тесты | `Tests/TenantStorageResolverTest/` | Fail-closed-поведение, регистрация/офбординг, санитизация имён схем, конкурентность, персистентность реестра (in-memory SQLite) |
 
-## Provisionierung & Lifecycle (Phase 2 — umgesetzt)
+## Провижининг и жизненный цикл (фаза 2 — реализовано)
 
-| Baustein | Ort | Zweck |
+| Компонент | Расположение | Назначение |
 |---|---|---|
-| `imtdb::ITenantStorageProvisioner` | `Include/imtdb/ITenantStorageProvisioner.h` | Interface: `ProvisionTenantStorage`, `DeprovisionTenantStorage`, `LoadTenantStorageAssignments` |
-| `imtdb::CTenantStorageDbStore` | `Include/imtdb/CTenantStorageDbStore.{h,cpp}` | Persistenz der Storage-Zuordnungen in der `TenantStorage`-Tabelle (parametrisierte Queries, UPSERT via `ON CONFLICT`) |
-| `imtdb::CTenantStorageProvisionerComp` | `Include/imtdb/CTenantStorageProvisionerComp.{h,cpp}` | Komponente (`ImtDatabasePck::TenantStorageProvisioner`): erstellt bei Postgres ein dediziertes Schema (`CREATE SCHEMA IF NOT EXISTS`), führt die konfigurierten `${TableScheme}`-DDL-Skripte darin aus (`DdlScriptPaths`), persistiert die Zuordnung und registriert sie im Resolver; `DropStorageOnDeprovision` steuert das Löschen des Schemas beim Offboarding (Default: aus) |
-| Anbindung Tenant-Lifecycle | `Include/imtauth/CTenantManagerComp.{h,cpp}` | Optionale Referenz `StorageProvisioner`: `CreateTenant` provisioniert den Storage (bei Fehler wird die Tenant-Anlage zurückgerollt), `RemoveTenant` deprovisioniert |
+| `imtdb::ITenantStorageProvisioner` | `Include/imtdb/ITenantStorageProvisioner.h` | Интерфейс: `ProvisionTenantStorage`, `DeprovisionTenantStorage`, `LoadTenantStorageAssignments` |
+| `imtdb::CTenantStorageDbStore` | `Include/imtdb/CTenantStorageDbStore.{h,cpp}` | Персистентность назначений хранилищ в таблице `TenantStorage` (параметризованные запросы, UPSERT через `ON CONFLICT`) |
+| `imtdb::CTenantStorageProvisionerComp` | `Include/imtdb/CTenantStorageProvisionerComp.{h,cpp}` | Компонент (`ImtDatabasePck::TenantStorageProvisioner`): для Postgres создаёт выделенную схему (`CREATE SCHEMA IF NOT EXISTS`), выполняет в ней сконфигурированные DDL-скрипты с `${TableScheme}` (`DdlScriptPaths`), персистирует назначение и регистрирует его в резолвере; `DropStorageOnDeprovision` управляет удалением схемы при офбординге (по умолчанию выключено) |
+| Интеграция с жизненным циклом тенанта | `Include/imtauth/CTenantManagerComp.{h,cpp}` | Опциональная ссылка `StorageProvisioner`: `CreateTenant` провижинит хранилище (при ошибке создание тенанта откатывается), `RemoveTenant` депровижинит |
 
-Hinweise:
+Примечания:
 
-- Provisionierung ist **idempotent** — ein bereits registrierter Tenant meldet Erfolg.
-- Für Nicht-Postgres-Backends (z. B. SQLite) registriert der Provisioner eine explizite
-  Shared-Schema-Zuordnung; dedizierte Datenbankdateien pro Tenant folgen in einer
-  späteren Phase. Die Fail-Closed-Auflösung bleibt dadurch intakt.
-- `LoadTenantStorageAssignments()` lädt beim Start alle persistierten Zuordnungen aus
-  der `TenantStorage`-Tabelle in den Resolver.
-- Schema-Namen werden ausschließlich aus sanitisierten Tenant-IDs abgeleitet
-  (`CTenantStorageRegistry::CreateSchemaName`), bevor sie in DDL-Anweisungen verwendet
-  werden (SQL-Injection-Schutz; DDL unterstützt keine Parameter-Bindung).
+- Провижининг **идемпотентен** — для уже зарегистрированного тенанта возвращается успех.
+- Для не-Postgres-бэкендов (например SQLite) провижинер регистрирует явное назначение
+  на общую схему; выделенные файлы баз данных на тенанта появятся в более поздней фазе.
+  Fail-closed-разрешение при этом остаётся неизменным.
+- `LoadTenantStorageAssignments()` при старте загружает все персистированные назначения
+  из таблицы `TenantStorage` в резолвер.
+- Имена схем выводятся исключительно из санитизированных идентификаторов тенантов
+  (`CTenantStorageRegistry::CreateSchemaName`) перед использованием в DDL-операторах
+  (защита от SQL-инъекций; DDL не поддерживает привязку параметров).
 
-### Fail-Closed-Semantik
+### Семантика fail-closed
 
-- Auflösung ohne registrierte Zuordnung schlägt fehl (kein stilles Ausweichen auf
-  gemeinsame Daten). Nur wenn `AllowSharedFallback` explizit aktiviert ist
-  (Übergangsbetrieb/Migration), wird auf das Shared-Schema aufgelöst — die Komponente
-  protokolliert dies beim Start als Warnung.
-- Leere Tenant-IDs werden immer abgewiesen.
-- Dedizierte Zuordnungen (`OwnSchema`/`OwnDatabase`/`OwnFile`) ohne Schema-Name und
-  ohne Connection-Referenz werden abgelehnt.
+- Разрешение без зарегистрированного назначения завершается ошибкой (никакого тихого
+  отката на общие данные). Только если `AllowSharedFallback` явно включён
+  (переходный режим/миграция), разрешение выполняется на общую схему — компонент
+  логирует это при старте как предупреждение.
+- Пустые идентификаторы тенантов всегда отклоняются.
+- Выделенные назначения (`OwnSchema`/`OwnDatabase`/`OwnFile`) без имени схемы и
+  без ссылки на соединение отклоняются.
 
-### Audit-Logging (CRA Anhang I Teil I 2(l))
+### Аудит-логирование (CRA, приложение I, часть I, 2(l))
 
-`CTenantStorageResolverComp` protokolliert sicherheitsrelevante Ereignisse über die
-Logger-Infrastruktur (`ilog`):
+`CTenantStorageResolverComp` логирует события, значимые для безопасности, через
+инфраструктуру логирования (`ilog`):
 
-- Registrierung/Aktualisierung einer Storage-Zuordnung (Info, mit Kind/Schema/Connection),
-- Entfernung einer Zuordnung (Tenant-Offboarding, Info),
-- fehlgeschlagene Auflösungen (Warnung — potenzieller Isolations-Verstoß oder
-  Fehlkonfiguration),
-- aktivierter Shared-Fallback (Warnung beim Komponentenstart).
+- регистрация/обновление назначения хранилища (Info, с видом/схемой/соединением),
+- удаление назначения (офбординг тенанта, Info),
+- неудачные разрешения (предупреждение — потенциальное нарушение изоляции или
+  ошибка конфигурации),
+- включённый shared-fallback (предупреждение при старте компонента).
 
-## Request-Pfad absichern (Phase 3 — umgesetzt)
+## Защита пути запроса (фаза 3 — реализовано)
 
-| Baustein | Ort | Zweck |
+| Компонент | Расположение | Назначение |
 |---|---|---|
-| `imtbase::CTenantContextScope` | `Include/imtbase/CTenantContextScope.{h,cpp}` | Thread-lokaler RAII-Scope für den Tenant-Kontext des aktuellen Requests; verschachtelbar, stellt beim Verlassen den vorherigen Kontext wieder her |
-| Scope-Aktivierung im Request-Pfad | `Include/imtservergql/CGqlRequestHandlerCompBase.cpp` | `CreateResponse()` aktiviert den Scope zentral für **alle** GraphQL-Handler mit der `TenantId` aus dem `IGqlContext` |
-| Tenant-bewusstes `GetTableScheme()` | `Include/imtdb/CSqlDatabaseObjectDelegateCompBase.{h,cpp}` | Optionale Referenz `TenantStorageResolver`: wenn gesetzt, wird das Tabellen-Schema pro Request aus dem Tenant-Kontext über den Resolver aufgelöst; ohne Referenz bleibt das bisherige statische `TableSchema`-Attribut unverändert wirksam |
+| `imtbase::CTenantContextScope` | `Include/imtbase/CTenantContextScope.{h,cpp}` | Потоколокальный RAII-scope для контекста тенанта текущего запроса; допускает вложенность, при выходе восстанавливает предыдущий контекст |
+| Активация scope в пути запроса | `Include/imtservergql/CGqlRequestHandlerCompBase.cpp` | `CreateResponse()` централизованно активирует scope для **всех** GraphQL-обработчиков с `TenantId` из `IGqlContext` |
+| Тенант-зависимый `GetTableScheme()` | `Include/imtdb/CSqlDatabaseObjectDelegateCompBase.{h,cpp}` | Опциональная ссылка `TenantStorageResolver`: если задана, схема таблицы разрешается на каждый запрос из контекста тенанта через резолвер; без ссылки продолжает действовать прежний статический атрибут `TableSchema` |
 
-### Fail-Closed im Request-Pfad
+### Fail-closed в пути запроса
 
-Ist die `TenantStorageResolver`-Referenz an einem SQL-Delegate konfiguriert, liefert
-`GetTableScheme()` in folgenden Fällen den Sentinel-Schemanamen
-`imt_tenant_storage_denied` (Queries schlagen dadurch fehl, statt versehentlich auf
-gemeinsame Daten zuzugreifen), jeweils mit Audit-Fehlermeldung:
+Если у SQL-делегата сконфигурирована ссылка `TenantStorageResolver`, `GetTableScheme()`
+в следующих случаях возвращает sentinel-имя схемы `imt_tenant_storage_denied`
+(запросы при этом завершаются ошибкой вместо случайного доступа к общим данным),
+каждый раз с аудит-сообщением об ошибке:
 
-- kein aktiver Tenant-Kontext (fehlende `TenantId` im Request),
-- Tenant-Storage nicht auflösbar (unbekannter Tenant),
-- Storage-Status weder `Active` noch `Migrating` (z. B. `Provisioning`, `Archived`).
+- нет активного контекста тенанта (отсутствует `TenantId` в запросе),
+- хранилище тенанта не разрешается (неизвестный тенант),
+- статус хранилища не `Active` и не `Migrating` (например `Provisioning`, `Archived`).
 
-Hinweise:
+Примечания:
 
-- Delegates mit `TenantStorageResolver`-Referenz sollten `AutoCreateTable` deaktiviert
-  lassen — die DDL-Ausführung pro Tenant-Schema übernimmt der Provisioner (Phase 2).
-- Cross-Tenant-Funktionen (Shared-Katalog: Tenants, Benutzer, Lizenzen) verwenden
-  weiterhin Delegates **ohne** Resolver-Referenz und bleiben unverändert.
-- Row-Level Security auf verbleibenden Shared-Tabellen bleibt als zweite
-  Verteidigungslinie offen (siehe Threat Model) und kann DB-seitig ergänzt werden.
+- У делегатов со ссылкой `TenantStorageResolver` атрибут `AutoCreateTable` следует
+  оставлять выключенным — выполнение DDL в схеме тенанта берёт на себя провижинер
+  (фаза 2).
+- Кросс-тенантные функции (общий каталог: тенанты, пользователи, лицензии) продолжают
+  использовать делегаты **без** ссылки на резолвер и остаются без изменений.
+- Row-Level Security на оставшихся общих таблицах остаётся второй линией обороны
+  (см. модель угроз) и может быть дополнена на стороне БД.
 
-## Datenmigration (Phase 4 — umgesetzt)
+## Миграция данных (фаза 4 — реализовано)
 
-| Baustein | Ort | Zweck |
+| Компонент | Расположение | Назначение |
 |---|---|---|
-| `imtdb::ITenantDataMigrator` | `Include/imtdb/ITenantDataMigrator.h` | Interface: `MigrateTenantData`, `MigrateAllTenants` |
-| `imtdb::CTenantDataMigrator` | `Include/imtdb/CTenantDataMigrator.{h,cpp}` | Kernlogik: kopiert Tenant-Zeilen (`INSERT INTO <tenantSchema>.T SELECT * FROM <sourceSchema>.T WHERE TenantId = :tenantId`), verifiziert Zeilenzahlen, idempotent; Identifier werden validiert und gequotet, Werte ausschließlich parameterisiert |
-| `imtdb::CTenantDataMigratorComp` | `Include/imtdb/CTenantDataMigratorComp.{h,cpp}` | Komponente (`ImtDatabasePck::TenantDataMigrator`): löst das Ziel-Schema über den Resolver auf, setzt den Storage-Status auf `Migrating` (persistiert), migriert alle konfigurierten Tabellen (`TableNames`), setzt bei Erfolg `Active`; optional `PurgeSourceRowsAfterMigration` |
+| `imtdb::ITenantDataMigrator` | `Include/imtdb/ITenantDataMigrator.h` | Интерфейс: `MigrateTenantData`, `MigrateAllTenants` |
+| `imtdb::CTenantDataMigrator` | `Include/imtdb/CTenantDataMigrator.{h,cpp}` | Основная логика: копирует строки тенанта (`INSERT INTO <tenantSchema>.T SELECT * FROM <sourceSchema>.T WHERE TenantId = :tenantId`), сверяет количество строк, идемпотентна; идентификаторы валидируются и заключаются в кавычки, значения передаются исключительно параметрами |
+| `imtdb::CTenantDataMigratorComp` | `Include/imtdb/CTenantDataMigratorComp.{h,cpp}` | Компонент (`ImtDatabasePck::TenantDataMigrator`): разрешает целевую схему через резолвер, устанавливает статус хранилища `Migrating` (персистируется), мигрирует все сконфигурированные таблицы (`TableNames`), при успехе устанавливает `Active`; опционально `PurgeSourceRowsAfterMigration` |
 
-Ablauf pro Tenant:
+Ход выполнения по каждому тенанту:
 
-1. Auflösung über den Resolver — nur Tenants mit dediziertem Schema (`OwnSchema`)
-   und Status `Active`/`Migrating` werden migriert.
-2. Status wird auf `Migrating` gesetzt und persistiert — Phase-3-Guards erlauben
-   in diesem Zustand weiterhin Zugriffe (Dual-Read-Übergang).
-3. Pro Tabelle: Quell-Zeilen zählen → kopieren → Ziel-Zeilen zählen → verifizieren.
-   Bereits vollständig migrierte Tabellen werden übersprungen (idempotenter Re-Run);
-   Teilkopien führen zu einem Fehler mit Abbruch (kein stilles Überschreiben).
-4. Bei Fehler wird der vorherige Status wiederhergestellt; bei Erfolg wird der Status
-   `Active` gesetzt und optional werden die Quell-Zeilen entfernt.
+1. Разрешение через резолвер — мигрируются только тенанты с выделенной схемой
+   (`OwnSchema`) и статусом `Active`/`Migrating`.
+2. Статус устанавливается в `Migrating` и персистируется — guard-механизмы фазы 3
+   в этом состоянии по-прежнему разрешают доступ (переходный режим dual-read).
+3. По каждой таблице: подсчёт исходных строк → копирование → подсчёт целевых строк →
+   верификация. Уже полностью мигрированные таблицы пропускаются (идемпотентный
+   повторный запуск); частичные копии приводят к ошибке с прерыванием (никакой
+   тихой перезаписи).
+4. При ошибке восстанавливается предыдущий статус; при успехе устанавливается статус
+   `Active` и опционально удаляются исходные строки.
 
-Offen: Migration dateibasierter Dokumente nach `<root>/tenants/<tenantId>/...`,
-Checksummen-Verifikation zusätzlich zu Zeilenzahlen.
+Открыто: миграция файловых документов в `<root>/tenants/<tenantId>/...`,
+верификация контрольными суммами в дополнение к количеству строк.
 
-## Härtung (Phase 5 — umgesetzt)
+## Усиление защиты (фаза 5 — реализовано)
 
-| Baustein | Ort | Zweck |
+| Компонент | Расположение | Назначение |
 |---|---|---|
-| `imtdb::CTenantRlsPolicyBuilder` | `Include/imtdb/CTenantRlsPolicyBuilder.{h,cpp}` | Statische Erzeugung validierter RLS-Statements (`ENABLE`/`FORCE ROW LEVEL SECURITY`, `DROP`/`CREATE POLICY`) und der `set_config`-Queries für die Session-Variable; Identifier werden validiert und gequotet, der Tenant-Wert immer als Parameter gebunden |
-| `imtdb::ITenantRlsController` | `Include/imtdb/ITenantRlsController.h` | Interface: `ApplyRowLevelSecurity`, `BindSessionTenant`, `UnbindSessionTenant` |
-| `imtdb::CTenantRlsControllerComp` | `Include/imtdb/CTenantRlsControllerComp.{h,cpp}` | Komponente (`ImtDatabasePck::TenantRlsController`): wendet die Isolation-Policies auf die konfigurierten Shared-Tabellen an (`TableNames`, `TenantIdColumn`, `SessionVariableName`, Default `app.tenant_id`; optional `ApplyOnStartup`); bindet/löst die Tenant-Session-Variable pro DB-Session; Audit-Logging; Postgres-only (Warnung auf anderen Backends) |
-| Verschlüsselte Tablespaces | `Include/imtdb/CTenantStorageProvisionerComp.{h,cpp}` | Neues Attribut `DefaultTablespace`: vor der DDL-Ausführung wird `SET default_tablespace` gesetzt (und danach per `RESET` zurückgesetzt), sodass Tenant-Tabellen auf einem verschlüsselten Volume/Tablespace landen |
+| `imtdb::CTenantRlsPolicyBuilder` | `Include/imtdb/CTenantRlsPolicyBuilder.{h,cpp}` | Статическая генерация валидированных RLS-операторов (`ENABLE`/`FORCE ROW LEVEL SECURITY`, `DROP`/`CREATE POLICY`) и запросов `set_config` для сессионной переменной; идентификаторы валидируются и заключаются в кавычки, значение тенанта всегда передаётся параметром |
+| `imtdb::ITenantRlsController` | `Include/imtdb/ITenantRlsController.h` | Интерфейс: `ApplyRowLevelSecurity`, `BindSessionTenant`, `UnbindSessionTenant` |
+| `imtdb::CTenantRlsControllerComp` | `Include/imtdb/CTenantRlsControllerComp.{h,cpp}` | Компонент (`ImtDatabasePck::TenantRlsController`): применяет политики изоляции к сконфигурированным общим таблицам (`TableNames`, `TenantIdColumn`, `SessionVariableName`, по умолчанию `app.tenant_id`; опционально `ApplyOnStartup`); привязывает/отвязывает сессионную переменную тенанта на сессию БД; аудит-логирование; только Postgres (предупреждение на других бэкендах) |
+| Шифрованные табличные пространства | `Include/imtdb/CTenantStorageProvisionerComp.{h,cpp}` | Новый атрибут `DefaultTablespace`: перед выполнением DDL устанавливается `SET default_tablespace` (после — сбрасывается через `RESET`), чтобы таблицы тенанта размещались на шифрованном томе/табличном пространстве |
 
-### Funktionsweise der RLS-Policies
+### Принцип работы RLS-политик
 
-- Policy pro Tabelle: `USING ("TenantId"::text = current_setting('app.tenant_id', true))`.
-- `current_setting(..., true)` liefert `NULL`, wenn die Variable nicht gesetzt ist —
-  Sessions ohne gebundenen Tenant sehen **keine** Zeilen (fail-closed).
-- `FORCE ROW LEVEL SECURITY` erzwingt die Policy auch für den Tabellen-Eigentümer.
-- `BindSessionTenant` setzt die Variable parameterisiert über `set_config` —
-  keine String-Konkatenation von Tenant-Werten.
-- Wiederholte Anwendung ist idempotent (`DROP POLICY IF EXISTS` vor `CREATE POLICY`).
+- Политика на таблицу: `USING ("TenantId"::text = current_setting('app.tenant_id', true))`.
+- `current_setting(..., true)` возвращает `NULL`, если переменная не установлена —
+  сессии без привязанного тенанта не видят **ни одной** строки (fail-closed).
+- `FORCE ROW LEVEL SECURITY` применяет политику также к владельцу таблицы.
+- `BindSessionTenant` устанавливает переменную параметризованно через `set_config` —
+  никакой конкатенации строк со значениями тенанта.
+- Повторное применение идемпотентно (`DROP POLICY IF EXISTS` перед `CREATE POLICY`).
 
-### Verschlüsselung pro Tenant
+### Шифрование на тенанта
 
-- **Postgres**: `DefaultTablespace` am Provisioner auf einen Tablespace legen, der auf
-  einem verschlüsselten Volume (LUKS/dm-crypt, EBS-Encryption o. ä.) liegt —
-  transparent für den Anwendungscode.
-- **SQLite** (dedizierte Tenant-Dateien): verschlüsselte Container oder
-  SQLCipher-kompatible Backends; Ablage unter `<root>/tenants/<tenantId>/`.
+- **Postgres**: указать в `DefaultTablespace` провижинера табличное пространство,
+  расположенное на шифрованном томе (LUKS/dm-crypt, шифрование EBS и т. п.) —
+  прозрачно для кода приложения.
+- **SQLite** (выделенные файлы тенантов): шифрованные контейнеры или
+  SQLCipher-совместимые бэкенды; размещение в `<root>/tenants/<tenantId>/`.
 
-### Offene Folgearbeiten
+### Открытые последующие работы
 
-- **Lasttests** mit vielen Schemata (Katalog-Größe, Connection-Pooling,
-  Migrations-Durchsatz) vor dem Enterprise-Rollout.
-- Anbindung von `BindSessionTenant` an das Connection-Pooling (Variable muss pro
-  physischer DB-Session gesetzt werden, z. B. beim Ausleihen einer Connection).
+- **Нагрузочные тесты** с большим числом схем (размер каталога, пул соединений,
+  пропускная способность миграции) перед enterprise-развёртыванием.
+- Интеграция `BindSessionTenant` с пулом соединений (переменная должна
+  устанавливаться на каждую физическую сессию БД, например при выдаче соединения
+  из пула).
 
-## Umsetzungsphasen
+## Фазы реализации
 
-1. **Fundament (umgesetzt)** — Resolver-Interface, Registry, Komponente,
-   Registry-Tabelle, Tests, Dokumentation.
-2. **Provisionierung & Lifecycle (umgesetzt)** — Tenant-Anlage erzeugt Schema und führt
-   die vorhandenen `${TableScheme}`-DDL-Skripte aus; Registry-Persistenz über
-   `TenantStorage`-Tabelle; Rollback der Tenant-Anlage bei Provisionierungsfehlern;
-   Offen: Migrations-Controller-Iteration über alle Tenant-Schemata, Backup/Restore
-   pro Tenant.
-3. **Request-Pfad absichern (umgesetzt)** — `GetTableScheme()` dynamisch über den
-   thread-lokalen Tenant-Kontext (`imtbase::CTenantContextScope`, gesetzt aus dem
-   `IGqlContext` in `CGqlRequestHandlerCompBase`) + Resolver; Fail-Closed-Guard
-   (fehlende/unbekannte TenantId → Sentinel-Schema, Query schlägt fehl);
-   Offen: Row-Level Security auf verbleibenden Shared-Tabellen, explizite
-   Cross-Tenant-Pfade (CrossOrgGrants, DelegatedAccess) über den Shared-Katalog.
-4. **Datenmigration (umgesetzt)** — `CTenantDataMigratorComp` kopiert pro Tenant die
-   Zeilen aus den Shared-Tabellen in das Tenant-Schema, verifiziert Zeilenzahlen und
-   schaltet den Status `Migrating` → `Active`; idempotente Re-Runs; optionales
-   Aufräumen der Quell-Zeilen. Offen: dateibasierte Dokumente nach
-   `<root>/tenants/<tenantId>/...`, Checksummen-Verifikation.
-5. **Härtung (umgesetzt)** — Row-Level Security auf Shared-Tabellen via
-   `CTenantRlsControllerComp` (Session-Variable `app.tenant_id`, fail-closed);
-   verschlüsselte Tablespaces über `DefaultTablespace` am Provisioner.
-   Offen: Lasttests mit vielen Schemata, Connection-Pool-Anbindung von
-   `BindSessionTenant`.
+1. **Фундамент (реализовано)** — интерфейс резолвера, реестр, компонент,
+   реестровая таблица, тесты, документация.
+2. **Провижининг и жизненный цикл (реализовано)** — при создании тенанта создаётся
+   схема и выполняются существующие DDL-скрипты с `${TableScheme}`; персистентность
+   реестра через таблицу `TenantStorage`; откат создания тенанта при ошибках
+   провижининга. Открыто: итерация контроллера миграций по всем схемам тенантов,
+   backup/restore на тенанта.
+3. **Защита пути запроса (реализовано)** — `GetTableScheme()` динамически через
+   потоколокальный контекст тенанта (`imtbase::CTenantContextScope`, устанавливается
+   из `IGqlContext` в `CGqlRequestHandlerCompBase`) + резолвер; fail-closed-guard
+   (отсутствующий/неизвестный TenantId → sentinel-схема, запрос завершается ошибкой).
+   Открыто: Row-Level Security на оставшихся общих таблицах, явные кросс-тенантные
+   пути (CrossOrgGrants, DelegatedAccess) через общий каталог.
+4. **Миграция данных (реализовано)** — `CTenantDataMigratorComp` копирует по каждому
+   тенанту строки из общих таблиц в схему тенанта, сверяет количество строк и
+   переключает статус `Migrating` → `Active`; идемпотентные повторные запуски;
+   опциональная очистка исходных строк. Открыто: файловые документы в
+   `<root>/tenants/<tenantId>/...`, верификация контрольными суммами.
+5. **Усиление защиты (реализовано)** — Row-Level Security на общих таблицах через
+   `CTenantRlsControllerComp` (сессионная переменная `app.tenant_id`, fail-closed);
+   шифрованные табличные пространства через `DefaultTablespace` провижинера.
+   Открыто: нагрузочные тесты с большим числом схем, интеграция `BindSessionTenant`
+   с пулом соединений.
 
-## CRA-Mapping (Kurzfassung)
+## Соответствие CRA (кратко)
 
-| CRA-Anforderung (Anhang I) | Umsetzung |
+| Требование CRA (приложение I) | Реализация |
 |---|---|
-| Zugriffskontrolle, Schutz vor unbefugtem Zugriff (2(d)) | Physische Trennung pro Tenant + fail-closed Resolver + RLS |
-| Vertraulichkeit/Integrität (2(e), (f)) | Getrennte Storage-Bereiche, begrenzter Blast-Radius, RLS auf Shared-Tabellen, optionale Verschlüsselung via `DefaultTablespace` (Phase 5) |
-| Datenminimierung (2(g)) | Tenant-Offboarding via `DROP SCHEMA`/Dateilöschung, `UnregisterTenantStorage` |
-| Resilienz (2(h), (i)) | Backup/Restore pro Tenant (Phase 2) |
-| Angriffsflächenminimierung (2(j)) | Shared-Katalog als dokumentiertes Restrisiko (siehe Threat Model) |
-| Security-Logging (2(l)) | Audit-Logging im Resolver; Erweiterung auf Provisionierung/Migration in Phase 2 |
+| Контроль доступа, защита от несанкционированного доступа (2(d)) | Физическое разделение на тенанта + fail-closed-резолвер + RLS |
+| Конфиденциальность/целостность (2(e), (f)) | Раздельные области хранения, ограниченный радиус поражения, RLS на общих таблицах, опциональное шифрование через `DefaultTablespace` (фаза 5) |
+| Минимизация данных (2(g)) | Офбординг тенанта через `DROP SCHEMA`/удаление файлов, `UnregisterTenantStorage` |
+| Устойчивость (2(h), (i)) | Backup/restore на тенанта (фаза 2) |
+| Минимизация поверхности атаки (2(j)) | Общий каталог как документированный остаточный риск (см. модель угроз) |
+| Логирование безопасности (2(l)) | Аудит-логирование в резолвере; расширение на провижининг/миграцию в фазе 2 |
 
-## Threat Model (Restrisiken)
+## Модель угроз (остаточные риски)
 
-- **Shared-Katalog** bleibt gemeinsame Angriffsfläche: Zugriff nur über Delegates mit
-  `TenantId`-Filter; RLS als zweite Verteidigungslinie (Phase 3); minimale Rechte des
-  DB-Benutzers.
-- **Fehlkonfiguration `AllowSharedFallback`**: Aktivierung deaktiviert den
-  Fail-Closed-Schutz; wird deshalb beim Start als Warnung auditiert und ist nur für
-  den Migrations-Übergangsbetrieb vorgesehen.
-- **Schema-Namenskollisionen**: `CreateSchemaNameForTenant` sanitisiert IDs; bei
-  Kollision nach Sanitisierung muss die Provisionierung (Phase 2) eindeutige Namen
-  sicherstellen (z. B. UUID-basierte Tenant-IDs).
-- **Migrations-Laufzeit** skaliert mit Tenant-Anzahl; Migrationen müssen idempotent
-  und pro Tenant wiederaufsetzbar sein.
+- **Общий каталог** остаётся общей поверхностью атаки: доступ только через делегаты
+  с фильтром `TenantId`; RLS как вторая линия обороны (фаза 3); минимальные права
+  пользователя БД.
+- **Ошибка конфигурации `AllowSharedFallback`**: включение отключает
+  fail-closed-защиту; поэтому при старте фиксируется в аудите как предупреждение и
+  предназначено только для переходного режима миграции.
+- **Коллизии имён схем**: `CreateSchemaNameForTenant` санитизирует идентификаторы;
+  при коллизии после санитизации провижининг (фаза 2) должен обеспечивать уникальные
+  имена (например, UUID-идентификаторы тенантов).
+- **Время выполнения миграции** масштабируется с числом тенантов; миграции должны
+  быть идемпотентными и возобновляемыми по каждому тенанту.
