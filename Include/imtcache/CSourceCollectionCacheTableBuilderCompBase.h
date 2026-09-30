@@ -43,6 +43,7 @@ public:
 		I_ASSIGN(m_modificationTimeFieldAttrPtr, "ModificationTimeField", "Field of the source collection holding the time a row was last changed. Address collections use LastModified, document collections use TimeStamp", true, "LastModified");
 		I_ASSIGN(m_stateFilterParamIdAttrPtr, "StateFilterParamId", "Selection parameter id under which the source collection reads its document state filter. Address collections use State, document collections use DocumentFilter", true, "State");
 		I_ASSIGN(m_reconcileDeletionsAttrPtr, "ReconcileDeletions", "Find removed rows by comparing the ids of the active source rows with the cache instead of by modification time. Required when deleting a source row does not change its modification time, and it also catches rows deleted for good. Costs a scan of all active source rows per update", true, false);
+		I_ASSIGN(m_detectDeletionsAttrPtr, "DetectDeletions", "Remove cache rows whose source row was deleted. Turn off when nothing reads a removed row's leftovers and a full rebuild is an acceptable time to drop them, e.g. a collection that is not a document collection and deletes rows outright", false, true);
 	I_END_COMPONENT;
 
 	// reimplemented (imtcache::ICacheTableBuilder)
@@ -105,6 +106,7 @@ private:
 	I_ATTR(QByteArray, m_modificationTimeFieldAttrPtr);
 	I_ATTR(QByteArray, m_stateFilterParamIdAttrPtr);
 	I_ATTR(bool, m_reconcileDeletionsAttrPtr);
+	I_ATTR(bool, m_detectDeletionsAttrPtr);
 };
 
 

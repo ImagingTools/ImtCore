@@ -350,6 +350,10 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveDeletedRows(
 			const QDateTime& lastSourceUpdateTime,
 			BuildResult& result) const
 {
+	if (m_detectDeletionsAttrPtr.IsValid() && !*m_detectDeletionsAttrPtr){
+		return true;
+	}
+
 	if (*m_reconcileDeletionsAttrPtr){
 		return RemoveRowsMissingFromSource(connection, result);
 	}
