@@ -267,6 +267,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 		if(USE_DUCK_DB)
 			add_subdirectory("${INCLUDE_DIR}/imtduckdb/CMake"	"${AUX_INCLUDE_DIR}/imtduckdb")
+			add_subdirectory("${INCLUDE_DIR}/imtcache/CMake"	"${AUX_INCLUDE_DIR}/imtcache")
 		endif()
 
 		if(USE_GEO)
@@ -429,6 +430,10 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 				add_subdirectory("${IMPL_DIR}/ImtDuckDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtDuckDbPck")
 				add_dependencies(ImtDuckDbPck imtduckdb)
 				imt_chain_windeploy_target(ImtDuckDbPck)
+
+				add_subdirectory("${IMPL_DIR}/ImtCachePck/CMake" "${AUX_INCLUDE_DIR}/ImtCachePck")
+				add_dependencies(ImtCachePck imtcache)
+				imt_chain_windeploy_target(ImtCachePck)
 			endif()
 
 			add_subdirectory("${IMPL_DIR}/ImtClientGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtClientGqlPck")
