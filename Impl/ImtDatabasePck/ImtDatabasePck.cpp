@@ -146,5 +146,10 @@ I_EXPORT_COMPONENT(
 			"Migrator copying tenant data from the shared schema into dedicated tenant schemas",
 			"Tenant Data Migrator Multi-Tenant Migration Schema Database");
 
+I_EXPORT_COMPONENT(
+			TenantRlsController,
+			"Controller enforcing tenant Row-Level Security on shared Postgres tables",
+			"Tenant Row-Level Security RLS Multi-Tenant Isolation Policy Database");
+
 
 } // namespace ImtDatabasePck

@@ -54,6 +54,12 @@ private Q_SLOTS:
 	void testRemoveSourceRows();
 	void testQuoteIdentifier();
 
+	// row-level security statement generation
+	void testRlsStatementsGeneration();
+	void testRlsStatementsRejectInvalidIdentifiers();
+	void testRlsSessionVariableValidation();
+	void testRlsBindAndUnbindQueries();
+
 private:
 	imtdb::CTenantStorageRegistry* m_registryPtr = nullptr;
 };

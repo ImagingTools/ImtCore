@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtdb/imtdb.h>
+#include <imtdb/CTenantDataMigrator.h>
 #include <imtdb/CTenantStorageDbStore.h>
 #include <imtdb/CTenantStorageRegistry.h>
 
@@ -46,7 +47,23 @@ bool CTenantStorageProvisionerComp::ProvisionTenantStorage(const QByteArray& ten
 			return false;
 		}
 
-		if (!ExecuteDdlScripts(info.schemaName)){
+		if (!SetDefaultTablespace(*m_defaultTablespaceAttrPtr)){
+			SendErrorMessage(
+						0,
+						QStringLiteral("Failed to set the default tablespace '%1' for tenant '%2'").arg(QString(*m_defaultTablespaceAttrPtr)).arg(QString(tenantId)),
+						"CTenantStorageProvisionerComp");
+
+			return false;
+		}
+
+		bool ddlSucceeded = ExecuteDdlScripts(info.schemaName);
+
+		if (!m_defaultTablespaceAttrPtr->isEmpty()){
+			QSqlError sqlError;
+			m_databaseEngineCompPtr->ExecSqlQuery(QByteArrayLiteral("RESET default_tablespace"), &sqlError);
+		}
+
+		if (!ddlSucceeded){
 			SendErrorMessage(
 						0,
 						QStringLiteral("Failed to execute DDL scripts in schema '%1' for tenant '%2'").arg(QString(info.schemaName)).arg(QString(tenantId)),
@@ -198,6 +215,26 @@ bool CTenantStorageProvisionerComp::IsPostgresDriver() const
 bool CTenantStorageProvisionerComp::CreateTenantSchema(const QByteArray& schemaName) const
 {
 	QByteArray query = QByteArrayLiteral("CREATE SCHEMA IF NOT EXISTS \"") + schemaName + '"';
+
+	QSqlError sqlError;
+	m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+
+	return sqlError.type() == QSqlError::NoError;
+}
+
+
+bool CTenantStorageProvisionerComp::SetDefaultTablespace(const QByteArray& tablespaceName) const
+{
+	if (tablespaceName.isEmpty()){
+		return true;
+	}
+
+	QByteArray quotedTablespace = CTenantDataMigrator::QuoteIdentifier(tablespaceName);
+	if (quotedTablespace.isEmpty()){
+		return false;
+	}
+
+	QByteArray query = QByteArrayLiteral("SET default_tablespace = ") + quotedTablespace;
 
 	QSqlError sqlError;
 	m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);

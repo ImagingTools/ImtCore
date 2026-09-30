@@ -12,6 +12,7 @@
 
 #include <imtdb/CTenantStorageDbStore.h>
 #include <imtdb/CTenantDataMigrator.h>
+#include <imtdb/CTenantRlsPolicyBuilder.h>
 #include <imtdb/IDatabaseEngine.h>
 #include <imtbase/CTenantContextScope.h>
 
@@ -556,6 +557,64 @@ void CTenantStorageResolverTest::testQuoteIdentifier()
 	QCOMPARE(imtdb::CTenantDataMigrator::QuoteIdentifier(QByteArrayLiteral("Items")), QByteArrayLiteral("\"Items\""));
 	QVERIFY(imtdb::CTenantDataMigrator::QuoteIdentifier(QByteArray()).isEmpty());
 	QVERIFY(imtdb::CTenantDataMigrator::QuoteIdentifier(QByteArrayLiteral("bad\"name")).isEmpty());
+}
+
+
+// row-level security statement generation
+
+void CTenantStorageResolverTest::testRlsStatementsGeneration()
+{
+	QByteArrayList statements = imtdb::CTenantRlsPolicyBuilder::CreateEnableRlsStatements(
+				QByteArrayLiteral("public"),
+				QByteArrayLiteral("Items"),
+				QByteArrayLiteral("TenantId"),
+				QByteArrayLiteral("app.tenant_id"));
+
+	QCOMPARE(statements.size(), 4);
+	QCOMPARE(statements[0], QByteArrayLiteral("ALTER TABLE \"public\".\"Items\" ENABLE ROW LEVEL SECURITY"));
+	QCOMPARE(statements[1], QByteArrayLiteral("ALTER TABLE \"public\".\"Items\" FORCE ROW LEVEL SECURITY"));
+	QCOMPARE(statements[2], QByteArrayLiteral("DROP POLICY IF EXISTS \"TenantIsolation_Items\" ON \"public\".\"Items\""));
+	QCOMPARE(statements[3], QByteArrayLiteral("CREATE POLICY \"TenantIsolation_Items\" ON \"public\".\"Items\" USING (\"TenantId\"::text = current_setting('app.tenant_id', true))"));
+}
+
+
+void CTenantStorageResolverTest::testRlsStatementsRejectInvalidIdentifiers()
+{
+	QVERIFY(imtdb::CTenantRlsPolicyBuilder::CreateEnableRlsStatements(
+				QByteArrayLiteral("bad\"schema"), QByteArrayLiteral("Items"), QByteArrayLiteral("TenantId"), QByteArrayLiteral("app.tenant_id")).isEmpty());
+	QVERIFY(imtdb::CTenantRlsPolicyBuilder::CreateEnableRlsStatements(
+				QByteArrayLiteral("public"), QByteArray(), QByteArrayLiteral("TenantId"), QByteArrayLiteral("app.tenant_id")).isEmpty());
+	QVERIFY(imtdb::CTenantRlsPolicyBuilder::CreateEnableRlsStatements(
+				QByteArrayLiteral("public"), QByteArrayLiteral("Items"), QByteArrayLiteral("Tenant\"Id"), QByteArrayLiteral("app.tenant_id")).isEmpty());
+	QVERIFY(imtdb::CTenantRlsPolicyBuilder::CreateEnableRlsStatements(
+				QByteArrayLiteral("public"), QByteArrayLiteral("Items"), QByteArrayLiteral("TenantId"), QByteArrayLiteral("app.tenant'id")).isEmpty());
+}
+
+
+void CTenantStorageResolverTest::testRlsSessionVariableValidation()
+{
+	QVERIFY(imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArrayLiteral("app.tenant_id")));
+	QVERIFY(imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArrayLiteral("imt.tenant2")));
+	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArray()));
+	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArrayLiteral("tenant_id")));
+	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArrayLiteral("app.tenant.id")));
+	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArrayLiteral("App.TenantId")));
+	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArrayLiteral("app.tenant'id")));
+	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArrayLiteral(".tenant_id")));
+	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArrayLiteral("app.")));
+}
+
+
+void CTenantStorageResolverTest::testRlsBindAndUnbindQueries()
+{
+	QCOMPARE(
+				imtdb::CTenantRlsPolicyBuilder::CreateBindSessionTenantQuery(QByteArrayLiteral("app.tenant_id")),
+				QByteArrayLiteral("SELECT set_config('app.tenant_id', :tenantId, false)"));
+	QCOMPARE(
+				imtdb::CTenantRlsPolicyBuilder::CreateUnbindSessionTenantQuery(QByteArrayLiteral("app.tenant_id")),
+				QByteArrayLiteral("SELECT set_config('app.tenant_id', '', false)"));
+	QVERIFY(imtdb::CTenantRlsPolicyBuilder::CreateBindSessionTenantQuery(QByteArrayLiteral("bad name")).isEmpty());
+	QVERIFY(imtdb::CTenantRlsPolicyBuilder::CreateUnbindSessionTenantQuery(QByteArrayLiteral("bad name")).isEmpty());
 }
 
 

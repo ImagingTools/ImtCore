@@ -39,6 +39,7 @@ public:
 		I_ASSIGN(m_registryTableSchemaAttrPtr, "RegistryTableSchema", "Schema containing the TenantStorage registry table", false, "");
 		I_ASSIGN(m_autoCreateRegistryTableAttrPtr, "AutoCreateRegistryTable", "Create the TenantStorage registry table if it does not exist", false, true);
 		I_ASSIGN(m_dropStorageOnDeprovisionAttrPtr, "DropStorageOnDeprovision", "Drop the dedicated tenant schema including all data on deprovisioning", false, false);
+		I_ASSIGN(m_defaultTablespaceAttrPtr, "DefaultTablespace", "Optional Postgres tablespace (e.g. on an encrypted volume) used for the tables of newly provisioned tenant schemas", false, "");
 	I_END_COMPONENT;
 
 	// reimplemented (imtdb::ITenantStorageProvisioner)
@@ -50,6 +51,7 @@ private:
 	bool IsPostgresDriver() const;
 	bool CreateTenantSchema(const QByteArray& schemaName) const;
 	bool ExecuteDdlScripts(const QByteArray& schemaName) const;
+	bool SetDefaultTablespace(const QByteArray& tablespaceName) const;
 	bool PersistAssignment(const QByteArray& tenantId, const TenantStorageInfo& info) const;
 
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
@@ -59,6 +61,7 @@ private:
 	I_ATTR(QByteArray, m_registryTableSchemaAttrPtr);
 	I_ATTR(bool, m_autoCreateRegistryTableAttrPtr);
 	I_ATTR(bool, m_dropStorageOnDeprovisionAttrPtr);
+	I_ATTR(QByteArray, m_defaultTablespaceAttrPtr);
 };
 
 
