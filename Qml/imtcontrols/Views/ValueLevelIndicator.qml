@@ -17,8 +17,8 @@ Rectangle {
 	property int spacing: indicator.continuous ? 0 : Style.spacingXS;
 	property int percent: 0;
 
-	property string colorActive: "red";
-	property string colorDefault: "lightgray";
+	property string colorActive: Style.dangerColor;
+	property string colorDefault: Style.borderColor2;
 
 	property bool constantHeight: continuous;
 	property bool continuous: false;

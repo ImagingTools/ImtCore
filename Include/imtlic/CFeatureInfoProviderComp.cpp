@@ -16,6 +16,17 @@ imtlic::IFeatureInfoSharedPtr CFeatureInfoProviderComp::GetFeatureInfo(const QBy
 		return nullptr;
 	}
 
+	// Old product archives address a sub-feature as "<parent object id>/<sub-feature id>"; only the parent is a collection object.
+	int separatorIndex = featureId.indexOf('/');
+	if (separatorIndex >= 0){
+		IFeatureInfoSharedPtr parentFeaturePtr = GetFeatureInfo(featureId.left(separatorIndex));
+		if (!parentFeaturePtr.IsValid()){
+			return nullptr;
+		}
+
+		return parentFeaturePtr->GetSubFeature(featureId.mid(featureId.lastIndexOf('/') + 1));
+	}
+
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_featureCollectionCompPtr->GetObjectData(featureId, dataPtr)){
 		IFeatureInfoSharedPtr retVal;

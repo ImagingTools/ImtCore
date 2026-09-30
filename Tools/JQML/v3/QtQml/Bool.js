@@ -6,7 +6,7 @@ class Bool extends Property {
     }
 
     static typeCasting(value){
-        // if(value === undefined) throw 'Cannot assign [undefined] to Bool'
+        if(value === undefined) throw 'Cannot assign [undefined] to Bool'
 
         return value ? true : false
     }

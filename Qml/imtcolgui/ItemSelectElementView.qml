@@ -46,9 +46,9 @@ ElementView {
 	property var nonRemovableIds: []
 
 	// Chip colors (matching TicketEditor accent palette)
-	readonly property string accentColor: "#5b8fd6"
-	readonly property string accentBgLight: "#DFECF9"
-	readonly property string accentBorderLight: "#B4D3F2"
+	readonly property string accentColor: Style.linkColor
+	readonly property string accentBgLight: Style.popupInfoBackgroundColor
+	readonly property string accentBorderLight: Style.borderColor
 
 	signal itemRemoved(int index, var itemData)
 	signal selectionChanged(var selectedItems)

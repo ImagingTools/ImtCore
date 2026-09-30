@@ -17,7 +17,6 @@ class UserEditorPage extends BasePage {
     this.confirmPassword = new TextInput(page, ['ConfirmPasswordInput']);
   }
 
-  save() { return this.runCommand('Save'); }
   undo() { return this.runCommand('Undo'); }
   redo() { return this.runCommand('Redo'); }
 
@@ -26,10 +25,6 @@ class UserEditorPage extends BasePage {
   async setEmail(text) { await this.email.fill(text); return this; }
   async setPassword(text) { await this.password.fill(text); return this; }
   async setConfirmPassword(text) { await this.confirmPassword.fill(text); return this; }
-
-  expectFieldVisible(objectName) {
-    return gui.expectVisible(this.page, [objectName]);
-  }
 }
 
 module.exports = { UserEditorPage };

@@ -93,6 +93,7 @@ DocumentViewBase {
 
 	MultiPageView {
 		id: multiPageView
+		objectName: "UserEditorPages"
 		anchors.fill: parent
 		panelWidth: Style.sizeHintXXS
 

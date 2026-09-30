@@ -109,18 +109,9 @@ ViewBase {
 
 		z: 1;
 
-		clip: filterAreaAnimation.running || !collectionViewBaseContainer.filterMenuVisible;
+		clip: !collectionViewBaseContainer.filterMenuVisible;
 
-		readonly property int targetHeight: collectionViewBaseContainer.filterMenuVisible ? (filterMenu_.height + 2 * Style.marginM) : 0;
-
-		height: filterArea.targetHeight;
-
-		onTargetHeightChanged: {
-			filterAreaAnimation.stop();
-			filterAreaAnimation.from = filterArea.height;
-			filterAreaAnimation.to = filterArea.targetHeight;
-			filterAreaAnimation.start();
-		}
+		height: collectionViewBaseContainer.filterMenuVisible ? (filterMenu_.height + 2 * Style.marginM) : 0;
 
 	FilterMenu {
 		id: filterMenu_;
@@ -160,15 +151,6 @@ ViewBase {
 			tableInternal.clearSortingInfo(beQuiet)
 		}
 	}
-	}
-
-	NumberAnimation {
-		id: filterAreaAnimation;
-
-		target: filterArea;
-		property: "height";
-		duration: 160;
-		easing.type: Easing.OutCubic;
 	}
 
 	onHeadersChanged: {
@@ -521,7 +503,7 @@ ViewBase {
 				id: filterHint;
 
 				anchors.right: filterItem.left;
-				anchors.rightMargin: filterHint.slide;
+				anchors.rightMargin: Style.spacingXS;
 				anchors.verticalCenter: filterItem.verticalCenter;
 
 				z: 200;
@@ -529,10 +511,7 @@ ViewBase {
 				width: hintBody.width + Style.spacingS;
 				height: Style.controlHeightM;
 
-				visible: filterHint.opacity > 0;
-				opacity: 0;
-
-				property real slide: 0;
+				visible: filterHint.wanted;
 
 				Rectangle {
 					id: hintArrow;
@@ -576,54 +555,12 @@ ViewBase {
 					}
 				}
 
-				ParallelAnimation {
-					id: filterHintIn;
-
-					NumberAnimation {
-						target: filterHint;
-						property: "opacity";
-						to: 1;
-						duration: 120;
-						easing.type: Easing.OutQuad;
-					}
-
-					NumberAnimation {
-						target: filterHint;
-						property: "slide";
-						to: Style.spacingXS;
-						duration: 120;
-						easing.type: Easing.OutCubic;
-					}
-				}
-
-				NumberAnimation {
-					id: filterHintOut;
-
-					target: filterHint;
-					property: "opacity";
-					to: 0;
-					duration: 90;
-					easing.type: Easing.InQuad;
-				}
-
 				// Bound, not listened for: a mouse area that switches off never
 				// reports the pointer leaving, and a card driven by that signal
 				// alone would stay on screen. Read as a condition it goes as soon
 				// as the button stops being usable.
 				readonly property bool wanted: iconFilter.enabled && iconFilter.visible
 					&& iconFilter.mouseArea && iconFilter.mouseArea.containsMouse;
-
-				onWantedChanged: {
-					if (filterHint.wanted){
-						filterHintOut.stop();
-						filterHint.slide = 0;
-						filterHintIn.restart();
-					}
-					else{
-						filterHintIn.stop();
-						filterHintOut.restart();
-					}
-				}
 			}
 			}
 		}

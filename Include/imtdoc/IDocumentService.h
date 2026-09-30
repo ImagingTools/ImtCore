@@ -14,6 +14,7 @@
 #include <imod/IObserver.h>
 
 // ImtCore includes
+#include <imtdoc/CDocumentMethod.h>
 #include <imtdoc/IDocumentServiceEventHandler.h>
 
 
@@ -272,6 +273,21 @@ public:
 		\return  \c OS_OK on success, or an appropriate error code.
 	*/
 	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) = 0;
+
+	/**
+		\brief Invoke \a method on the live document object, under the service's internal lock.
+
+		Unlike \c GetDocumentData / \c SetDocumentData, this doesn't copy the document out and back in, so
+		\a method's own change notification (if any) reaches observers as-is.
+
+		\return  \c OS_OK on success, or an appropriate error code. \c OS_FAILED also covers the case
+		         where the open document is not of the type \a method was bound to, in which case
+		         \a method was not called.
+	*/
+	virtual OperationStatus ExecuteDocumentMethod(
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				const CDocumentMethod& method) = 0;
 
 	/**
 		\brief Retrieve the undo manager associated with an open document.

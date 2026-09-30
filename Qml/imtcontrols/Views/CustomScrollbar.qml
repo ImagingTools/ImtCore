@@ -34,9 +34,9 @@ Rectangle{
 	// A pill rather than a barely-rounded block: at ten pixels across, a
 	// two-pixel radius reads as a square.
 	property int indicatorRadius: Math.round((vertical ? scrollIndicator.width : scrollIndicator.height) / 2);
-    property string backgroundColor: decorator_ ? "transparent" : Style.scrollBackgroundColor !== undefined ? Style.scrollBackgroundColor  : "#efefef";
-    property string indicatorColor: decorator_ ? "transparent" : Style.scrollIndicatorColor !== undefined ? Style.scrollIndicatorColor : "lightgray";
-    property string highlightColor: decorator_ ? "transparent" : Style.scrollHighlightColor !== undefined ? Style.scrollHighlightColor : "lightgray";
+    property string backgroundColor: decorator_ ? "transparent" : Style.scrollBackgroundColor !== undefined ? Style.scrollBackgroundColor : Style.backgroundColor;
+    property string indicatorColor: decorator_ ? "transparent" : Style.scrollIndicatorColor !== undefined ? Style.scrollIndicatorColor : Style.borderColor2;
+    property string highlightColor: decorator_ ? "transparent" : Style.scrollHighlightColor !== undefined ? Style.scrollHighlightColor : Style.borderColor2;
 
     property bool canFade: false;
     property bool isMoving: false;

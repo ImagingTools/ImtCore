@@ -246,7 +246,7 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 						params.documentTypeId,
 						documentName,
 						QUrl(),
-						false);
+						true);
 			handlerPtr->ProcessEvent(&event);
 		}
 	}
@@ -632,6 +632,28 @@ IDocumentService::OperationStatus CDocumentServiceBase::SetDocumentData(
 }
 
 
+IDocumentService::OperationStatus CDocumentServiceBase::ExecuteDocumentMethod(
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			const CDocumentMethod& method)
+{
+	QMutexLocker locker(&m_mutex);
+
+	OperationStatus validationStatus;
+	if (!ValidateInputParams(userId, documentId, validationStatus)){
+		return validationStatus;
+	}
+
+	WorkingDocument& workingDocument = m_userDocuments[userId][documentId];
+
+	if (workingDocument.isLoading){
+		return OS_FAILED;
+	}
+
+	return method(*workingDocument.objectPtr) ? OS_OK : OS_FAILED;
+}
+
+
 IDocumentService::OperationStatus CDocumentServiceBase::GetDocumentUndoManager(
 			const QByteArray& userId,
 			const QByteArray& documentId,
@@ -854,6 +876,17 @@ QUrl CDocumentServiceBase::ObjectIdToUrl(const QByteArray& objectId)
 }
 
 
+bool CDocumentServiceBase::IsDocumentDirty(const WorkingDocument& document)
+{
+	if (document.objectId.isEmpty()){
+		return true;
+	}
+
+	return document.undoManagerPtr.IsValid()
+				&& document.undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
+}
+
+
 void CDocumentServiceBase::OnDocumentDataLoaded(
 			const QByteArray& userId,
 			const QByteArray& documentId)
@@ -939,7 +972,7 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 					docName = documentPtr->name;
 					docObjectId = documentPtr->objectId;
 					docUndoManagerPtr = documentPtr->undoManagerPtr;
-					newIsDirty = documentPtr->undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
+					newIsDirty = IsDocumentDirty(*documentPtr);
 				}
 
 				{
@@ -996,7 +1029,7 @@ void CDocumentServiceBase::OnUndoManagerChanged(int modelId)
 		docName = documentPtr->name;
 		docObjectId = documentPtr->objectId;
 		docUndoManagerPtr = documentPtr->undoManagerPtr;
-		newIsDirty = documentPtr->undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
+		newIsDirty = IsDocumentDirty(*documentPtr);
 	}
 
 	{

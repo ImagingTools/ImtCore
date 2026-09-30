@@ -925,7 +925,8 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRe
 	Check whether a request was issued by the superuser.
 
 	Only the superuser may change the account state (imtauth::IUserInfo::IsEnabled),
-	so every write path accepting the 'enabled' field guards it with this check.
+	so every write path accepting the 'enabled' field guards it with this check and ignores
+	the field for anyone else.
 	A request without a resolved user info is never treated as superuser.
 */
 inline bool IsSuperuserRequest(const imtgql::CGqlRequest& gqlRequest)

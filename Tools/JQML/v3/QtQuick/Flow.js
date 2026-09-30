@@ -39,11 +39,26 @@ class Flow extends Item {
         return obj
     }
 
+    __updateProperties(){
+        super.__updateProperties()
+        this.__updateGeometry()
+    }
+
+    'SLOT_Component.completed'(){
+        JQApplication.updateLater(this)
+    }
+
     SLOT_paddingChanged(oldValue, newValue){
         this.leftPadding = this.padding
         this.topPadding = this.padding
         this.rightPadding = this.padding
         this.bottomPadding = this.padding
+    }
+
+    SLOT_visibleChanged(oldValue, newValue){
+        JQApplication.beginUpdate()
+        super.SLOT_visibleChanged(oldValue, newValue)
+        JQApplication.endUpdate()
     }
 
     SLOT_leftPaddingChanged(oldValue, newValue){
@@ -100,41 +115,98 @@ class Flow extends Item {
         JQApplication.updateLater(this)
     }
 
+    __layoutChildren(){
+        let children = this.children
+        let spacing = this.spacing
+        let contentWidth = 0
+        let contentHeight = 0
+        let lineSize = 0
+        let pos = 0
+        let count = 0
+        let wrapLimit = 0
+
+        if(this.flow === Flow.LeftToRight){
+            if(this.width__prevent){
+                wrapLimit = this.width - (this.leftPadding + this.rightPadding)
+                if(wrapLimit < 0) wrapLimit = 0
+            }
+        } else if(this.height__prevent){
+            wrapLimit = this.height - (this.topPadding + this.bottomPadding)
+            if(wrapLimit < 0) wrapLimit = 0
+        }
+
+        for(let i = 0; i < children.length; i++){
+            let child = children[i]
+            if(!child || child instanceof Repeater || child.__destroying) continue
+
+            // Positioners skip only explicitly hidden children. Inherited
+            // invisibility (parent.visible === false) must not zero implicit size.
+            let explicitlyVisible = child.visible
+            if(child.__self && child.__self.visible && typeof child.__self.visible === 'object' && 'value' in child.__self.visible){
+                explicitlyVisible = child.__self.visible.value
+            }
+            if(!explicitlyVisible) continue
+
+            let childWidth = child.width
+            let childHeight = child.height
+            if(!Number.isFinite(childWidth)) childWidth = 0
+            if(!Number.isFinite(childHeight)) childHeight = 0
+
+            if(this.flow === Flow.LeftToRight){
+                if(wrapLimit > 0 && pos > 0 && pos + childWidth > wrapLimit){
+                    pos = 0
+                    contentHeight += lineSize + spacing
+                    lineSize = 0
+                }
+
+                pos += childWidth
+                if(pos > contentWidth) contentWidth = pos
+                pos += spacing
+                if(childHeight > lineSize) lineSize = childHeight
+            } else {
+                if(wrapLimit > 0 && pos > 0 && pos + childHeight > wrapLimit){
+                    pos = 0
+                    contentWidth += lineSize + spacing
+                    lineSize = 0
+                }
+
+                pos += childHeight
+                if(pos > contentHeight) contentHeight = pos
+                pos += spacing
+                if(childWidth > lineSize) lineSize = childWidth
+            }
+
+            count += 1
+        }
+
+        if(count > 0){
+            if(this.flow === Flow.LeftToRight){
+                contentHeight += lineSize
+            } else {
+                contentWidth += lineSize
+            }
+        }
+
+        return {
+            width: contentWidth,
+            height: contentHeight,
+        }
+    }
+
     __updateGeometry(){
-        let width = this.width__prevent ? this.width - (this.leftPadding + this.rightPadding) : 0
-        let height = this.height__prevent ? this.height - (this.topPadding + this.bottomPadding) : 0
+        let size = this.__layoutChildren()
 
         this.__setDOMStyle({
-            minWidth: width + 'px',
-            minHeight: height + 'px',
-            width: width + 'px',
-            height: height + 'px',
-
             paddingLeft: this.leftPadding + 'px',
             paddingTop: this.topPadding + 'px',
             paddingRight: this.rightPadding + 'px',
             paddingBottom: this.bottomPadding + 'px',
         })
 
-        width = this.__DOM.scrollWidth - (this.leftPadding + this.rightPadding)
-        height = this.__DOM.scrollHeight - (this.topPadding + this.bottomPadding)
-
-        this.__setDOMStyle({
-            minWidth: width + 'px',
-            minHeight: height + 'px',
-            width: width + 'px',
-            height: height + 'px',
-
-            paddingLeft: this.leftPadding + 'px',
-            paddingTop: this.topPadding + 'px',
-            paddingRight: this.rightPadding + 'px',
-            paddingBottom: this.bottomPadding + 'px',
-        })
-
-        Geometry.setAuto(this.__self, 'width', width + this.leftPadding + this.rightPadding, this.__self.constructor.meta.width)
-        Geometry.setAuto(this.__self, 'height', height + this.topPadding + this.bottomPadding, this.__self.constructor.meta.height)
-        this.implicitWidth = width + this.leftPadding + this.rightPadding
-        this.implicitHeight = height + this.topPadding + this.bottomPadding
+        Geometry.setAuto(this.__self, 'width', size.width + this.leftPadding + this.rightPadding, this.__self.constructor.meta.width)
+        Geometry.setAuto(this.__self, 'height', size.height + this.topPadding + this.bottomPadding, this.__self.constructor.meta.height)
+        this.implicitWidth = size.width + this.leftPadding + this.rightPadding
+        this.implicitHeight = size.height + this.topPadding + this.bottomPadding
         this.positioningComplete()
     }
 

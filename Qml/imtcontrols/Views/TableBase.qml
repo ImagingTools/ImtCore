@@ -80,7 +80,7 @@ Rectangle {
 
 	//
 	property string borderColorHorizontal: "transparent";
-	property string borderColorVertical: Style.baseColorInverted;
+	property string borderColorVertical: Style.borderColor;
 	property int horizontalBorderSize: 0;
 	property int verticalBorderSize: 0;
 	property int verticalBorderHeight: -1;

@@ -46,7 +46,7 @@ typedef imtrest::CHttpHtmlFolderBasedServletComp HttpHtmlFolderBasedServlet;
 typedef imtrest::CHttpRedirectComp HttpRedirectServlet;
 typedef imtrest::CHttpFileProviderBasedServletComp HttpFileProviderBasedServlet;
 typedef imtrest::CHttpFileControllerServletComp HttpFileControllerServlet;
-typedef imtrest::CWorkerManagerComp WorkerManaqer;
+typedef imtrest::CWorkerManagerComp WorkerManager;
 typedef imtrest::CTcpProtocolEngineComp TcpProtocolEngine;
 typedef imtrest::CDelegatedServletComp DelegatedServlet;
 typedef imtrest::CDelegatedBinaryDataProviderComp DelegatedBinaryDataProviders;

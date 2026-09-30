@@ -7,7 +7,7 @@ if(QT_VERSION_MAJOR EQUAL 6)
 	target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core5Compat)
 endif()
 
-set(buildwebdir ${BUILDDIR}/ImtControlsGallery/Bin/web)
+set(buildwebdir ${GALLERYDIR_BUILD}/Bin/web)
 
 # copy local qml sources from source tree to web build dir
 list(APPEND webdirs ${PROJECT_SOURCE_DIR}/..)
@@ -34,6 +34,9 @@ if(DEFINED WEB_COMPILE AND WEB_COMPILE)
 	add_compile_definitions(WEB_COMPILE)
 	set(resname "controlsgallery")
 	if(USE_NEW_WEB)
+		# jq_compile_web derives the Qt resource name from resname, and Q_INIT_RESOURCE
+		# in the application expects ${PROJECT_NAME}Web.
+		set(resname "${PROJECT_NAME}")
 		set(inputjs "${IMTCOREDIR}/Impl/ImtControlsGallery/Qml/controlsgalleryqml/gallery.json")
 		set(appicon "../Icons/GalleryIcon.svg")
 		set(dataroot "/ControlsGallery/Views/")

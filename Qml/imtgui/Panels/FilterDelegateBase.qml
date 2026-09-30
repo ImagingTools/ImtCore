@@ -98,7 +98,7 @@ Item {
 		height: Style.controlHeightM
 		width: Style.marginM + labelRow.width
 			+ (clearArea.visible ? clearArea.width : Style.marginM)
-		radius: height / 2
+		radius: Style.radiusM
 
 		color: !filterDelegateBase.isActive ? (chipArea.containsMouse ? Style.hover : "transparent")
 			: Style.selectedColor

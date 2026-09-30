@@ -21,14 +21,14 @@ ControlBase {
     property string focusColor: Style.textSelectedColor;
 
     property string fontColor: Style.textColor;
-    property string placeHolderFontColor: "gray";
+    property string placeHolderFontColor: Style.placeHolderTextColor;
 
     property color borderColor: textField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
 
     property string borderColorConst: "";
 
-	property int radius: Style.radiusS;
-	property int textSize: Style.fontSizeL;
+	property int radius: Style.textFieldRadius;
+	property int textSize: Style.fontSizeM;
     property int placeHolderTextSize: textSize;
     property int echoMode: TextInput.Normal;
 	property int margin: Style.marginXS;
