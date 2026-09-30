@@ -77,6 +77,9 @@ private:
 
 	bool CreateTable(imtduckdb::IDuckConnection& connection, const QString& tableName, QString& errorMessage) const;
 
+	/// False when the live table's columns differ from GetColumnNames(), i.e. it predates a schema change.
+	bool HasExpectedColumns(imtduckdb::IDuckConnection& connection) const;
+
 	QString GetUpsertQuery(const QString& stagingTableName) const;
 
 private:

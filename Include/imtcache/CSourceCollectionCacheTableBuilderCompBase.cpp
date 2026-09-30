@@ -5,6 +5,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QUuid>
 #include <QtSql/QSqlError>
+#include <QtSql/QSqlQuery>
 
 // ACF includes
 #include <iprm/CParamsSet.h>
@@ -100,6 +101,12 @@ CSourceCollectionCacheTableBuilderCompBase::BuildResult CSourceCollectionCacheTa
 	const QString stagingTableName = tableName + STAGING_SUFFIX;
 	const QString stagingTableIdentifier = imtdb::QuoteIdentifier(stagingTableName);
 
+	// The merge is positional (INSERT ... SELECT *), so a live table from before a schema change cannot
+	// be patched - it would fail on every run. Rebuilding is the only way to bring it forward.
+	if (!HasExpectedColumns(connection)){
+		return Rebuild(connection);
+	}
+
 	if (!CreateTable(connection, stagingTableName, retVal.errorMessage)){
 		return retVal;
 	}
@@ -188,6 +195,39 @@ bool CSourceCollectionCacheTableBuilderCompBase::CreateTable(
 		errorMessage = QStringLiteral("Unable to create %1. Error: %2").arg(tableName, sqlError.text());
 
 		return false;
+	}
+
+	return true;
+}
+
+
+bool CSourceCollectionCacheTableBuilderCompBase::HasExpectedColumns(imtduckdb::IDuckConnection& connection) const
+{
+	QSqlError sqlError;
+	QSqlQuery query = connection.ExecSqlQuery(
+				QStringLiteral("SELECT column_name FROM information_schema.columns WHERE table_name = '%1' AND table_schema = current_schema() ORDER BY ordinal_position")
+					.arg(imtdb::EscapeSql(GetCacheTableName())).toUtf8(),
+				&sqlError);
+
+	if (sqlError.type() != QSqlError::NoError){
+		return false;
+	}
+
+	QStringList actualColumns;
+	while (query.next()){
+		actualColumns << query.value(0).toString();
+	}
+
+	const QStringList expectedColumns = GetColumnNames();
+	if (actualColumns.count() != expectedColumns.count()){
+		return false;
+	}
+
+	for (int i = 0; i < expectedColumns.count(); ++ i){
+		// DuckDB identifiers are case-insensitive, so the script's spelling need not match the constants'.
+		if (actualColumns[i].compare(expectedColumns[i], Qt::CaseInsensitive) != 0){
+			return false;
+		}
 	}
 
 	return true;
