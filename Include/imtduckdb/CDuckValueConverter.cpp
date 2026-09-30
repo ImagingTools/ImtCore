@@ -13,11 +13,6 @@ namespace imtduckdb
 
 duckdb::Value CDuckValueConverter::ToDuckDbValue(const QVariant& value)
 {
-	// A null QString only means "never assigned"; storing it as NULL would violate NOT NULL text columns.
-	if (value.typeId() == QMetaType::QString){
-		return duckdb::Value(value.toString().toStdString());
-	}
-
 	if (value.isNull()){
 		return duckdb::Value();
 	}
