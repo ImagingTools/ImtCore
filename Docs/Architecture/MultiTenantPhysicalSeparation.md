@@ -1,6 +1,6 @@
 # Physische Datentrennung im Multi-Tenant-System (Option C — Hybrid)
 
-Status: **In Umsetzung** (Phase 1 bis 3)
+Status: **In Umsetzung** (Phase 1 bis 4; Phase 5 als Folgearbeit dokumentiert)
 Bezug: EU Cyber Resilience Act (Verordnung (EU) 2024/2847), DSGVO Art. 17/20/32 — siehe [CRA_COMPLIANCE.md](../../CRA_COMPLIANCE.md)
 
 ## Zielbild
@@ -105,6 +105,39 @@ Hinweise:
 - Row-Level Security auf verbleibenden Shared-Tabellen bleibt als zweite
   Verteidigungslinie offen (siehe Threat Model) und kann DB-seitig ergänzt werden.
 
+## Datenmigration (Phase 4 — umgesetzt)
+
+| Baustein | Ort | Zweck |
+|---|---|---|
+| `imtdb::ITenantDataMigrator` | `Include/imtdb/ITenantDataMigrator.h` | Interface: `MigrateTenantData`, `MigrateAllTenants` |
+| `imtdb::CTenantDataMigrator` | `Include/imtdb/CTenantDataMigrator.{h,cpp}` | Kernlogik: kopiert Tenant-Zeilen (`INSERT INTO <tenantSchema>.T SELECT * FROM <sourceSchema>.T WHERE TenantId = :tenantId`), verifiziert Zeilenzahlen, idempotent; Identifier werden validiert und gequotet, Werte ausschließlich parameterisiert |
+| `imtdb::CTenantDataMigratorComp` | `Include/imtdb/CTenantDataMigratorComp.{h,cpp}` | Komponente (`ImtDatabasePck::TenantDataMigrator`): löst das Ziel-Schema über den Resolver auf, setzt den Storage-Status auf `Migrating` (persistiert), migriert alle konfigurierten Tabellen (`TableNames`), setzt bei Erfolg `Active`; optional `PurgeSourceRowsAfterMigration` |
+
+Ablauf pro Tenant:
+
+1. Auflösung über den Resolver — nur Tenants mit dediziertem Schema (`OwnSchema`)
+   und Status `Active`/`Migrating` werden migriert.
+2. Status wird auf `Migrating` gesetzt und persistiert — Phase-3-Guards erlauben
+   in diesem Zustand weiterhin Zugriffe (Dual-Read-Übergang).
+3. Pro Tabelle: Quell-Zeilen zählen → kopieren → Ziel-Zeilen zählen → verifizieren.
+   Bereits vollständig migrierte Tabellen werden übersprungen (idempotenter Re-Run);
+   Teilkopien führen zu einem Fehler mit Abbruch (kein stilles Überschreiben).
+4. Bei Fehler wird der vorherige Status wiederhergestellt; bei Erfolg wird der Status
+   `Active` gesetzt und optional werden die Quell-Zeilen entfernt.
+
+Offen: Migration dateibasierter Dokumente nach `<root>/tenants/<tenantId>/...`,
+Checksummen-Verifikation zusätzlich zu Zeilenzahlen.
+
+## Härtung (Phase 5 — Empfehlung/Folgearbeit)
+
+- **Verschlüsselung pro Tenant**: für Postgres auf Tablespace-/Disk-Ebene
+  (transparent, kein Anwendungscode nötig); für dedizierte SQLite-Dateien
+  verschlüsselte Container oder SQLCipher-kompatible Backends.
+- **Row-Level Security** auf verbleibenden Shared-Tabellen als zweite
+  Verteidigungslinie (Session-Variable, z. B. `app.tenant_id`).
+- **Lasttests** mit vielen Schemata (Katalog-Größe, Connection-Pooling,
+  Migrations-Durchsatz) vor dem Enterprise-Rollout.
+
 ## Umsetzungsphasen
 
 1. **Fundament (umgesetzt)** — Resolver-Interface, Registry, Komponente,
@@ -120,9 +153,11 @@ Hinweise:
    (fehlende/unbekannte TenantId → Sentinel-Schema, Query schlägt fehl);
    Offen: Row-Level Security auf verbleibenden Shared-Tabellen, explizite
    Cross-Tenant-Pfade (CrossOrgGrants, DelegatedAccess) über den Shared-Katalog.
-4. **Datenmigration** — pro Tenant Kopieren aus Shared-Tabellen in Tenant-Schema,
-   Verifikation (Zeilenzahlen/Checksummen), Dual-Read-Übergangsmodus per Feature-Flag;
-   dateibasierte Dokumente nach `<root>/tenants/<tenantId>/...`.
+4. **Datenmigration (umgesetzt)** — `CTenantDataMigratorComp` kopiert pro Tenant die
+   Zeilen aus den Shared-Tabellen in das Tenant-Schema, verifiziert Zeilenzahlen und
+   schaltet den Status `Migrating` → `Active`; idempotente Re-Runs; optionales
+   Aufräumen der Quell-Zeilen. Offen: dateibasierte Dokumente nach
+   `<root>/tenants/<tenantId>/...`, Checksummen-Verifikation.
 5. **Härtung** — optionale Verschlüsselung pro Tenant (Postgres Tablespace-/Disk-Ebene,
    verschlüsselte SQLite-Dateien) für Enterprise-Tenants; Lasttests mit vielen Schemata.
 

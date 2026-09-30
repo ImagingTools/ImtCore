@@ -47,6 +47,13 @@ private Q_SLOTS:
 	void testTenantContextScopeNesting();
 	void testTenantContextScopeIsThreadLocal();
 
+	// data migration (in-memory SQLite with attached tenant schema)
+	void testMigrateTableCopiesAndVerifies();
+	void testMigrateTableIsIdempotent();
+	void testMigrateTableFailsOnPartialCopy();
+	void testRemoveSourceRows();
+	void testQuoteIdentifier();
+
 private:
 	imtdb::CTenantStorageRegistry* m_registryPtr = nullptr;
 };

@@ -141,5 +141,10 @@ I_EXPORT_COMPONENT(
 			"Provisioner creating and removing the physical storage of a tenant",
 			"Tenant Storage Provisioner Multi-Tenant Lifecycle Schema Database");
 
+I_EXPORT_COMPONENT(
+			TenantDataMigrator,
+			"Migrator copying tenant data from the shared schema into dedicated tenant schemas",
+			"Tenant Data Migrator Multi-Tenant Migration Schema Database");
+
 
 } // namespace ImtDatabasePck

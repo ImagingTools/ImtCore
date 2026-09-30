@@ -32,6 +32,7 @@
 #include <imtdb/CSqlDatabaseTransactionManagerComp.h>
 #include <imtdb/CTenantStorageResolverComp.h>
 #include <imtdb/CTenantStorageProvisionerComp.h>
+#include <imtdb/CTenantDataMigratorComp.h>
 #include <imtauth/CTenantFilterParam.h>
 
 
@@ -67,6 +68,7 @@ typedef imtdb::CSqliteXPathExtractorComp SqliteXPathExtractor;
 typedef imtdb::CSqlDatabaseTransactionManagerComp SqlDatabaseTransactionManager;
 typedef icomp::TModelCompWrap<imtdb::CTenantStorageResolverComp> TenantStorageResolver;
 typedef icomp::TModelCompWrap<imtdb::CTenantStorageProvisionerComp> TenantStorageProvisioner;
+typedef icomp::TModelCompWrap<imtdb::CTenantDataMigratorComp> TenantDataMigrator;
 
 
 } // namespace ImtDatabasePck

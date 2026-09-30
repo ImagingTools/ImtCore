@@ -11,6 +11,7 @@
 #include <QtSql/QSqlQuery>
 
 #include <imtdb/CTenantStorageDbStore.h>
+#include <imtdb/CTenantDataMigrator.h>
 #include <imtdb/IDatabaseEngine.h>
 #include <imtbase/CTenantContextScope.h>
 
@@ -438,6 +439,123 @@ void CTenantStorageResolverTest::testTenantContextScopeIsThreadLocal()
 
 	QVERIFY(workerTenantId.isEmpty());
 	QCOMPARE(imtbase::CTenantContextScope::GetCurrentTenantId(), QByteArrayLiteral("tenant-main"));
+}
+
+
+// data migration (in-memory SQLite with attached tenant schema)
+
+namespace
+{
+
+
+void PrepareMigrationTables(const CSqliteTestEngine& engine)
+{
+	QSqlError sqlError;
+	engine.ExecSqlQuery(QByteArrayLiteral("ATTACH ':memory:' AS tenant_alpha"), &sqlError);
+	QVERIFY2(sqlError.type() == QSqlError::NoError, qPrintable(sqlError.text()));
+	engine.ExecSqlQuery(QByteArrayLiteral("CREATE TABLE \"Items\" (\"Id\" TEXT, \"TenantId\" TEXT, \"Payload\" TEXT)"), &sqlError);
+	QVERIFY2(sqlError.type() == QSqlError::NoError, qPrintable(sqlError.text()));
+	engine.ExecSqlQuery(QByteArrayLiteral("CREATE TABLE tenant_alpha.\"Items\" (\"Id\" TEXT, \"TenantId\" TEXT, \"Payload\" TEXT)"), &sqlError);
+	QVERIFY2(sqlError.type() == QSqlError::NoError, qPrintable(sqlError.text()));
+
+	engine.ExecSqlQuery(QByteArrayLiteral("INSERT INTO \"Items\" VALUES ('1', 'alpha', 'a1'), ('2', 'alpha', 'a2'), ('3', 'beta', 'b1')"), &sqlError);
+	QVERIFY2(sqlError.type() == QSqlError::NoError, qPrintable(sqlError.text()));
+}
+
+
+int CountRows(const CSqliteTestEngine& engine, const QByteArray& query)
+{
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = engine.ExecSqlQuery(query, &sqlError, true);
+	if (sqlError.type() != QSqlError::NoError || !sqlQuery.next()){
+		return -1;
+	}
+
+	return sqlQuery.value(0).toInt();
+}
+
+
+} // namespace
+
+
+void CTenantStorageResolverTest::testMigrateTableCopiesAndVerifies()
+{
+	CSqliteTestEngine engine;
+	QVERIFY(engine.IsOpen());
+	PrepareMigrationTables(engine);
+
+	imtdb::CTenantDataMigrator migrator(engine);
+
+	int migratedRowCount = 0;
+	QString errorMessage;
+	QVERIFY2(migrator.MigrateTable(QByteArrayLiteral("Items"), QByteArrayLiteral("alpha"), QByteArrayLiteral("tenant_alpha"), migratedRowCount, errorMessage), qPrintable(errorMessage));
+	QCOMPARE(migratedRowCount, 2);
+
+	QCOMPARE(CountRows(engine, QByteArrayLiteral("SELECT COUNT(*) FROM tenant_alpha.\"Items\"")), 2);
+	QCOMPARE(CountRows(engine, QByteArrayLiteral("SELECT COUNT(*) FROM tenant_alpha.\"Items\" WHERE \"TenantId\" = 'beta'")), 0);
+}
+
+
+void CTenantStorageResolverTest::testMigrateTableIsIdempotent()
+{
+	CSqliteTestEngine engine;
+	QVERIFY(engine.IsOpen());
+	PrepareMigrationTables(engine);
+
+	imtdb::CTenantDataMigrator migrator(engine);
+
+	int migratedRowCount = 0;
+	QString errorMessage;
+	QVERIFY(migrator.MigrateTable(QByteArrayLiteral("Items"), QByteArrayLiteral("alpha"), QByteArrayLiteral("tenant_alpha"), migratedRowCount, errorMessage));
+	QVERIFY2(migrator.MigrateTable(QByteArrayLiteral("Items"), QByteArrayLiteral("alpha"), QByteArrayLiteral("tenant_alpha"), migratedRowCount, errorMessage), qPrintable(errorMessage));
+	QCOMPARE(migratedRowCount, 2);
+
+	QCOMPARE(CountRows(engine, QByteArrayLiteral("SELECT COUNT(*) FROM tenant_alpha.\"Items\"")), 2);
+}
+
+
+void CTenantStorageResolverTest::testMigrateTableFailsOnPartialCopy()
+{
+	CSqliteTestEngine engine;
+	QVERIFY(engine.IsOpen());
+	PrepareMigrationTables(engine);
+
+	QSqlError sqlError;
+	engine.ExecSqlQuery(QByteArrayLiteral("INSERT INTO tenant_alpha.\"Items\" VALUES ('1', 'alpha', 'a1')"), &sqlError);
+	QVERIFY(sqlError.type() == QSqlError::NoError);
+
+	imtdb::CTenantDataMigrator migrator(engine);
+
+	int migratedRowCount = 0;
+	QString errorMessage;
+	QVERIFY(!migrator.MigrateTable(QByteArrayLiteral("Items"), QByteArrayLiteral("alpha"), QByteArrayLiteral("tenant_alpha"), migratedRowCount, errorMessage));
+	QVERIFY(!errorMessage.isEmpty());
+}
+
+
+void CTenantStorageResolverTest::testRemoveSourceRows()
+{
+	CSqliteTestEngine engine;
+	QVERIFY(engine.IsOpen());
+	PrepareMigrationTables(engine);
+
+	imtdb::CTenantDataMigrator migrator(engine);
+
+	int migratedRowCount = 0;
+	QString errorMessage;
+	QVERIFY(migrator.MigrateTable(QByteArrayLiteral("Items"), QByteArrayLiteral("alpha"), QByteArrayLiteral("tenant_alpha"), migratedRowCount, errorMessage));
+	QVERIFY2(migrator.RemoveSourceRows(QByteArrayLiteral("Items"), QByteArrayLiteral("alpha"), errorMessage), qPrintable(errorMessage));
+
+	QCOMPARE(CountRows(engine, QByteArrayLiteral("SELECT COUNT(*) FROM \"Items\"")), 1);
+	QCOMPARE(CountRows(engine, QByteArrayLiteral("SELECT COUNT(*) FROM tenant_alpha.\"Items\"")), 2);
+}
+
+
+void CTenantStorageResolverTest::testQuoteIdentifier()
+{
+	QCOMPARE(imtdb::CTenantDataMigrator::QuoteIdentifier(QByteArrayLiteral("Items")), QByteArrayLiteral("\"Items\""));
+	QVERIFY(imtdb::CTenantDataMigrator::QuoteIdentifier(QByteArray()).isEmpty());
+	QVERIFY(imtdb::CTenantDataMigrator::QuoteIdentifier(QByteArrayLiteral("bad\"name")).isEmpty());
 }
 
 
