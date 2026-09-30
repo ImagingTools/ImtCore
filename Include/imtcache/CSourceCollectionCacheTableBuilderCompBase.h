@@ -42,6 +42,7 @@ public:
 		I_ASSIGN(m_objectIdColumnAttrPtr, "ObjectIdColumn", "Column holding the source document UUID, used as the upsert conflict target", true, "DocumentId");
 		I_ASSIGN(m_modificationTimeFieldAttrPtr, "ModificationTimeField", "Field of the source collection holding the time a row was last changed. Address collections use LastModified, document collections use TimeStamp", true, "LastModified");
 		I_ASSIGN(m_stateFilterParamIdAttrPtr, "StateFilterParamId", "Selection parameter id under which the source collection reads its document state filter. Address collections use State, document collections use DocumentFilter", true, "State");
+		I_ASSIGN(m_reconcileDeletionsAttrPtr, "ReconcileDeletions", "Find removed rows by comparing the ids of the active source rows with the cache instead of by modification time. Required when deleting a source row does not change its modification time, and it also catches rows deleted for good. Costs a scan of all active source rows per update", true, false);
 	I_END_COMPONENT;
 
 	// reimplemented (imtcache::ICacheTableBuilder)
@@ -71,11 +72,23 @@ private:
 				const iprm::IParamsSet* filterParamsPtr,
 				BuildResult& result) const;
 
-	/// Removes cache rows for sources soft-deleted after \a lastSourceUpdateTime.
+	/// Removes cache rows whose source row is gone, using the strategy selected by ReconcileDeletions.
 	bool RemoveDeletedRows(
 				imtduckdb::IDuckConnection& connection,
 				const QDateTime& lastSourceUpdateTime,
 				BuildResult& result) const;
+
+	/// Finds removals as sources soft-deleted after \a lastSourceUpdateTime. Needs deletion to change the modification time.
+	bool RemoveRowsDeletedSince(
+				imtduckdb::IDuckConnection& connection,
+				const QDateTime& lastSourceUpdateTime,
+				BuildResult& result) const;
+
+	/// Finds removals as cache rows whose id is not among the active source rows.
+	bool RemoveRowsMissingFromSource(imtduckdb::IDuckConnection& connection, BuildResult& result) const;
+
+	/// Deletes the cache rows with the given normalized document ids.
+	bool DeleteRowsById(imtduckdb::IDuckConnection& connection, const QStringList& documentIds, BuildResult& result) const;
 
 	bool CreateTable(imtduckdb::IDuckConnection& connection, const QString& tableName, QString& errorMessage) const;
 
@@ -91,6 +104,7 @@ private:
 	I_ATTR(QByteArray, m_objectIdColumnAttrPtr);
 	I_ATTR(QByteArray, m_modificationTimeFieldAttrPtr);
 	I_ATTR(QByteArray, m_stateFilterParamIdAttrPtr);
+	I_ATTR(bool, m_reconcileDeletionsAttrPtr);
 };
 
 

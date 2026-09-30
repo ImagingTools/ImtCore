@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QFile>
+#include <QtCore/QSet>
 #include <QtCore/QUuid>
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
@@ -296,8 +297,21 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveDeletedRows(
 			const QDateTime& lastSourceUpdateTime,
 			BuildResult& result) const
 {
-	// Deletion is soft - the source row stays and its State becomes 'Disabled' - and that update
-	// bumps the modification time, so the same cutoff that finds edits also finds removals.
+	if (*m_reconcileDeletionsAttrPtr){
+		return RemoveRowsMissingFromSource(connection, result);
+	}
+
+	return RemoveRowsDeletedSince(connection, lastSourceUpdateTime, result);
+}
+
+
+bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsDeletedSince(
+			imtduckdb::IDuckConnection& connection,
+			const QDateTime& lastSourceUpdateTime,
+			BuildResult& result) const
+{
+	// This relies on the source delete changing the modification time, so the cutoff that finds edits
+	// finds removals too. That holds for address collections; document collections do not do it.
 	imtbase::CComplexCollectionFilter changedFilter;
 	FillChangedFilter(changedFilter, *m_modificationTimeFieldAttrPtr, lastSourceUpdateTime);
 
@@ -323,7 +337,7 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveDeletedRows(
 			continue;
 		}
 
-		deletedIds << QStringLiteral("'%1'").arg(QString::fromUtf8(documentUuid.toByteArray(QUuid::WithoutBraces)));
+		deletedIds << QString::fromUtf8(documentUuid.toByteArray(QUuid::WithoutBraces));
 
 		const QDateTime lastModified = iteratorPtr->GetElementInfo(*m_modificationTimeFieldAttrPtr).toDateTime();
 		if (lastModified.isValid() && (!result.lastSourceUpdateTime.isValid() || lastModified > result.lastSourceUpdateTime)){
@@ -335,11 +349,77 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveDeletedRows(
 		return true;
 	}
 
+	return DeleteRowsById(connection, deletedIds, result);
+}
+
+
+bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsMissingFromSource(
+			imtduckdb::IDuckConnection& connection,
+			BuildResult& result) const
+{
+	// No filter parameters: the source returns its active rows only.
+	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> iteratorPtr(
+				m_sourceCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, nullptr));
+	if (!iteratorPtr.IsValid()){
+		// Deleting on the strength of a failed read would empty the table.
+		result.errorMessage = QStringLiteral("Unable to read the active rows of %1").arg(GetCacheTableName());
+
+		return false;
+	}
+
+	QSet<QString> activeIds;
+	while (iteratorPtr->Next()){
+		const QUuid documentUuid = QUuid(QString::fromUtf8(iteratorPtr->GetObjectId()));
+		if (!documentUuid.isNull()){
+			activeIds.insert(QString::fromUtf8(documentUuid.toByteArray(QUuid::WithoutBraces)));
+		}
+	}
+
+	QSqlError sqlError;
+	QSqlQuery cachedQuery = connection.ExecSqlQuery(
+				QStringLiteral(R"(SELECT CAST(%1 AS VARCHAR) FROM %2)")
+							.arg(imtdb::QuoteIdentifier(QString::fromUtf8(*m_objectIdColumnAttrPtr)),
+								 imtdb::QuoteIdentifier(GetCacheTableName()))
+							.toUtf8(),
+				&sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		result.errorMessage = QStringLiteral("Unable to list the cached rows of %1. Error: %2").arg(GetCacheTableName(), sqlError.text());
+
+		return false;
+	}
+
+	QStringList removedIds;
+	while (cachedQuery.next()){
+		const QString cachedId = cachedQuery.value(0).toString();
+		if (!activeIds.contains(cachedId)){
+			removedIds << cachedId;
+		}
+	}
+
+	if (removedIds.isEmpty()){
+		return true;
+	}
+
+	return DeleteRowsById(connection, removedIds, result);
+}
+
+
+bool CSourceCollectionCacheTableBuilderCompBase::DeleteRowsById(
+			imtduckdb::IDuckConnection& connection,
+			const QStringList& documentIds,
+			BuildResult& result) const
+{
+	// Ids are UUID text produced by QUuid or read back from a UUID column, so quoting them is enough.
+	QStringList quotedIds;
+	for (const QString& documentId : documentIds){
+		quotedIds << QStringLiteral("'%1'").arg(documentId);
+	}
+
 	QSqlError sqlError;
 	connection.ExecSqlQuery(QStringLiteral(R"(DELETE FROM %1 WHERE %2 IN (%3))")
 								.arg(imtdb::QuoteIdentifier(GetCacheTableName()),
 									 imtdb::QuoteIdentifier(QString::fromUtf8(*m_objectIdColumnAttrPtr)),
-									 deletedIds.join(','))
+									 quotedIds.join(','))
 								.toUtf8(), &sqlError);
 
 	if (sqlError.type() != QSqlError::NoError){
@@ -348,7 +428,7 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveDeletedRows(
 		return false;
 	}
 
-	result.rowsDeleted = deletedIds.count();
+	result.rowsDeleted = documentIds.count();
 
 	return true;
 }
