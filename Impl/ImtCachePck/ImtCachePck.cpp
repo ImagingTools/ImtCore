@@ -22,4 +22,10 @@ I_EXPORT_COMPONENT(
 			"Cache Builder");
 
 
+I_EXPORT_COMPONENT(
+			ViewBuilder,
+			"Keeps a view over cache tables, recreated from a script on every update",
+			"View Builder");
+
+
 } // namespace ImtCachePck
