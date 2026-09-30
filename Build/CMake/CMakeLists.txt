@@ -527,6 +527,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 			add_subdirectory("${TESTS_DIR}/StructureTest/CMake" "${AUX_INCLUDE_DIR}/StructureTest")
 			add_dependencies(StructureTest imtbase imtaccount imtauth imtdb imttest)
+
+			add_subdirectory("${TESTS_DIR}/TenantStorageResolverTest/CMake" "${AUX_INCLUDE_DIR}/TenantStorageResolverTest")
+			add_dependencies(TenantStorageResolverTest imtdb)
 		endif()
 
 		if(USE_MDBX)
