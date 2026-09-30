@@ -1,6 +1,6 @@
 # Physische Datentrennung im Multi-Tenant-System (Option C — Hybrid)
 
-Status: **In Umsetzung** (Phase 1 und 2)
+Status: **In Umsetzung** (Phase 1 bis 3)
 Bezug: EU Cyber Resilience Act (Verordnung (EU) 2024/2847), DSGVO Art. 17/20/32 — siehe [CRA_COMPLIANCE.md](../../CRA_COMPLIANCE.md)
 
 ## Zielbild
@@ -77,6 +77,34 @@ Logger-Infrastruktur (`ilog`):
   Fehlkonfiguration),
 - aktivierter Shared-Fallback (Warnung beim Komponentenstart).
 
+## Request-Pfad absichern (Phase 3 — umgesetzt)
+
+| Baustein | Ort | Zweck |
+|---|---|---|
+| `imtbase::CTenantContextScope` | `Include/imtbase/CTenantContextScope.{h,cpp}` | Thread-lokaler RAII-Scope für den Tenant-Kontext des aktuellen Requests; verschachtelbar, stellt beim Verlassen den vorherigen Kontext wieder her |
+| Scope-Aktivierung im Request-Pfad | `Include/imtservergql/CGqlRequestHandlerCompBase.cpp` | `CreateResponse()` aktiviert den Scope zentral für **alle** GraphQL-Handler mit der `TenantId` aus dem `IGqlContext` |
+| Tenant-bewusstes `GetTableScheme()` | `Include/imtdb/CSqlDatabaseObjectDelegateCompBase.{h,cpp}` | Optionale Referenz `TenantStorageResolver`: wenn gesetzt, wird das Tabellen-Schema pro Request aus dem Tenant-Kontext über den Resolver aufgelöst; ohne Referenz bleibt das bisherige statische `TableSchema`-Attribut unverändert wirksam |
+
+### Fail-Closed im Request-Pfad
+
+Ist die `TenantStorageResolver`-Referenz an einem SQL-Delegate konfiguriert, liefert
+`GetTableScheme()` in folgenden Fällen den Sentinel-Schemanamen
+`imt_tenant_storage_denied` (Queries schlagen dadurch fehl, statt versehentlich auf
+gemeinsame Daten zuzugreifen), jeweils mit Audit-Fehlermeldung:
+
+- kein aktiver Tenant-Kontext (fehlende `TenantId` im Request),
+- Tenant-Storage nicht auflösbar (unbekannter Tenant),
+- Storage-Status weder `Active` noch `Migrating` (z. B. `Provisioning`, `Archived`).
+
+Hinweise:
+
+- Delegates mit `TenantStorageResolver`-Referenz sollten `AutoCreateTable` deaktiviert
+  lassen — die DDL-Ausführung pro Tenant-Schema übernimmt der Provisioner (Phase 2).
+- Cross-Tenant-Funktionen (Shared-Katalog: Tenants, Benutzer, Lizenzen) verwenden
+  weiterhin Delegates **ohne** Resolver-Referenz und bleiben unverändert.
+- Row-Level Security auf verbleibenden Shared-Tabellen bleibt als zweite
+  Verteidigungslinie offen (siehe Threat Model) und kann DB-seitig ergänzt werden.
+
 ## Umsetzungsphasen
 
 1. **Fundament (umgesetzt)** — Resolver-Interface, Registry, Komponente,
@@ -86,10 +114,12 @@ Logger-Infrastruktur (`ilog`):
    `TenantStorage`-Tabelle; Rollback der Tenant-Anlage bei Provisionierungsfehlern;
    Offen: Migrations-Controller-Iteration über alle Tenant-Schemata, Backup/Restore
    pro Tenant.
-3. **Request-Pfad absichern** — `GetTableScheme()` dynamisch über
-   `COperationContext`-TenantId + Resolver; Guard-Schicht (fehlende/fremde TenantId →
-   Fehler); Cross-Tenant-Pfade (CrossOrgGrants, DelegatedAccess) explizit über den
-   Shared-Katalog; Row-Level Security auf Shared-Tabellen.
+3. **Request-Pfad absichern (umgesetzt)** — `GetTableScheme()` dynamisch über den
+   thread-lokalen Tenant-Kontext (`imtbase::CTenantContextScope`, gesetzt aus dem
+   `IGqlContext` in `CGqlRequestHandlerCompBase`) + Resolver; Fail-Closed-Guard
+   (fehlende/unbekannte TenantId → Sentinel-Schema, Query schlägt fehl);
+   Offen: Row-Level Security auf verbleibenden Shared-Tabellen, explizite
+   Cross-Tenant-Pfade (CrossOrgGrants, DelegatedAccess) über den Shared-Katalog.
 4. **Datenmigration** — pro Tenant Kopieren aus Shared-Tabellen in Tenant-Schema,
    Verifikation (Zeilenzahlen/Checksummen), Dual-Read-Übergangsmodus per Feature-Flag;
    dateibasierte Dokumente nach `<root>/tenants/<tenantId>/...`.
