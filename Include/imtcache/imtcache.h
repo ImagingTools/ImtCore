@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QString>
+#include <QtCore/QUuid>
 
 
 namespace imtcache
@@ -64,6 +65,18 @@ inline quint64 DeriveSurrogateId(const QByteArray& documentId)
 	}
 
 	return retVal;
+}
+
+
+/// Surrogate id of the source object \a sourceId refers to, or 0 ("refers to nothing") when it is empty or not a UUID.
+inline quint64 DeriveReferenceId(const QByteArray& sourceId)
+{
+	const QUuid uuid = QUuid::fromString(QString::fromUtf8(sourceId));
+	if (uuid.isNull()){
+		return 0;
+	}
+
+	return DeriveSurrogateId(uuid.toByteArray(QUuid::WithoutBraces));
 }
 
 
