@@ -10,9 +10,7 @@
 
 // ImtCore includes
 #include <imtdb/imtdb.h>
-
-// IotPlatform includes
-#include <imtcache/iotcache.h>
+#include <imtcache/imtcache.h>
 
 
 namespace imtcache
