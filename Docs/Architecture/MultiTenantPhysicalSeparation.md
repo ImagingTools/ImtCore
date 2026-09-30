@@ -1,6 +1,6 @@
 # Physische Datentrennung im Multi-Tenant-System (Option C — Hybrid)
 
-Status: **In Umsetzung** (Phase 1 bis 4; Phase 5 als Folgearbeit dokumentiert)
+Status: **Umgesetzt** (Phase 1 bis 5; Lasttests und Connection-Pool-Anbindung als Folgearbeit)
 Bezug: EU Cyber Resilience Act (Verordnung (EU) 2024/2847), DSGVO Art. 17/20/32 — siehe [CRA_COMPLIANCE.md](../../CRA_COMPLIANCE.md)
 
 ## Zielbild
@@ -128,15 +128,39 @@ Ablauf pro Tenant:
 Offen: Migration dateibasierter Dokumente nach `<root>/tenants/<tenantId>/...`,
 Checksummen-Verifikation zusätzlich zu Zeilenzahlen.
 
-## Härtung (Phase 5 — Empfehlung/Folgearbeit)
+## Härtung (Phase 5 — umgesetzt)
 
-- **Verschlüsselung pro Tenant**: für Postgres auf Tablespace-/Disk-Ebene
-  (transparent, kein Anwendungscode nötig); für dedizierte SQLite-Dateien
-  verschlüsselte Container oder SQLCipher-kompatible Backends.
-- **Row-Level Security** auf verbleibenden Shared-Tabellen als zweite
-  Verteidigungslinie (Session-Variable, z. B. `app.tenant_id`).
+| Baustein | Ort | Zweck |
+|---|---|---|
+| `imtdb::CTenantRlsPolicyBuilder` | `Include/imtdb/CTenantRlsPolicyBuilder.{h,cpp}` | Statische Erzeugung validierter RLS-Statements (`ENABLE`/`FORCE ROW LEVEL SECURITY`, `DROP`/`CREATE POLICY`) und der `set_config`-Queries für die Session-Variable; Identifier werden validiert und gequotet, der Tenant-Wert immer als Parameter gebunden |
+| `imtdb::ITenantRlsController` | `Include/imtdb/ITenantRlsController.h` | Interface: `ApplyRowLevelSecurity`, `BindSessionTenant`, `UnbindSessionTenant` |
+| `imtdb::CTenantRlsControllerComp` | `Include/imtdb/CTenantRlsControllerComp.{h,cpp}` | Komponente (`ImtDatabasePck::TenantRlsController`): wendet die Isolation-Policies auf die konfigurierten Shared-Tabellen an (`TableNames`, `TenantIdColumn`, `SessionVariableName`, Default `app.tenant_id`; optional `ApplyOnStartup`); bindet/löst die Tenant-Session-Variable pro DB-Session; Audit-Logging; Postgres-only (Warnung auf anderen Backends) |
+| Verschlüsselte Tablespaces | `Include/imtdb/CTenantStorageProvisionerComp.{h,cpp}` | Neues Attribut `DefaultTablespace`: vor der DDL-Ausführung wird `SET default_tablespace` gesetzt (und danach per `RESET` zurückgesetzt), sodass Tenant-Tabellen auf einem verschlüsselten Volume/Tablespace landen |
+
+### Funktionsweise der RLS-Policies
+
+- Policy pro Tabelle: `USING ("TenantId"::text = current_setting('app.tenant_id', true))`.
+- `current_setting(..., true)` liefert `NULL`, wenn die Variable nicht gesetzt ist —
+  Sessions ohne gebundenen Tenant sehen **keine** Zeilen (fail-closed).
+- `FORCE ROW LEVEL SECURITY` erzwingt die Policy auch für den Tabellen-Eigentümer.
+- `BindSessionTenant` setzt die Variable parameterisiert über `set_config` —
+  keine String-Konkatenation von Tenant-Werten.
+- Wiederholte Anwendung ist idempotent (`DROP POLICY IF EXISTS` vor `CREATE POLICY`).
+
+### Verschlüsselung pro Tenant
+
+- **Postgres**: `DefaultTablespace` am Provisioner auf einen Tablespace legen, der auf
+  einem verschlüsselten Volume (LUKS/dm-crypt, EBS-Encryption o. ä.) liegt —
+  transparent für den Anwendungscode.
+- **SQLite** (dedizierte Tenant-Dateien): verschlüsselte Container oder
+  SQLCipher-kompatible Backends; Ablage unter `<root>/tenants/<tenantId>/`.
+
+### Offene Folgearbeiten
+
 - **Lasttests** mit vielen Schemata (Katalog-Größe, Connection-Pooling,
   Migrations-Durchsatz) vor dem Enterprise-Rollout.
+- Anbindung von `BindSessionTenant` an das Connection-Pooling (Variable muss pro
+  physischer DB-Session gesetzt werden, z. B. beim Ausleihen einer Connection).
 
 ## Umsetzungsphasen
 
@@ -158,15 +182,18 @@ Checksummen-Verifikation zusätzlich zu Zeilenzahlen.
    schaltet den Status `Migrating` → `Active`; idempotente Re-Runs; optionales
    Aufräumen der Quell-Zeilen. Offen: dateibasierte Dokumente nach
    `<root>/tenants/<tenantId>/...`, Checksummen-Verifikation.
-5. **Härtung** — optionale Verschlüsselung pro Tenant (Postgres Tablespace-/Disk-Ebene,
-   verschlüsselte SQLite-Dateien) für Enterprise-Tenants; Lasttests mit vielen Schemata.
+5. **Härtung (umgesetzt)** — Row-Level Security auf Shared-Tabellen via
+   `CTenantRlsControllerComp` (Session-Variable `app.tenant_id`, fail-closed);
+   verschlüsselte Tablespaces über `DefaultTablespace` am Provisioner.
+   Offen: Lasttests mit vielen Schemata, Connection-Pool-Anbindung von
+   `BindSessionTenant`.
 
 ## CRA-Mapping (Kurzfassung)
 
 | CRA-Anforderung (Anhang I) | Umsetzung |
 |---|---|
 | Zugriffskontrolle, Schutz vor unbefugtem Zugriff (2(d)) | Physische Trennung pro Tenant + fail-closed Resolver + RLS |
-| Vertraulichkeit/Integrität (2(e), (f)) | Getrennte Storage-Bereiche, begrenzter Blast-Radius, optionale Verschlüsselung (Phase 5) |
+| Vertraulichkeit/Integrität (2(e), (f)) | Getrennte Storage-Bereiche, begrenzter Blast-Radius, RLS auf Shared-Tabellen, optionale Verschlüsselung via `DefaultTablespace` (Phase 5) |
 | Datenminimierung (2(g)) | Tenant-Offboarding via `DROP SCHEMA`/Dateilöschung, `UnregisterTenantStorage` |
 | Resilienz (2(h), (i)) | Backup/Restore pro Tenant (Phase 2) |
 | Angriffsflächenminimierung (2(j)) | Shared-Katalog als dokumentiertes Restrisiko (siehe Threat Model) |
