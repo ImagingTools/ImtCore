@@ -3,6 +3,8 @@
 
 // Qt includes
 #include <QtConcurrent/QtConcurrent>
+#include <QtCore/QDebug>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QFile>
 #include <QtCore/QSet>
 #include <QtSql/QSqlError>
@@ -44,7 +46,19 @@ CCacheBuilderComp::UpdateResult CCacheBuilderComp::Update(UpdateMode mode)
 
 	retVal.isOk = true;
 
-	for (const ICacheTableBuilder* tableBuilderPtr : GetOrderedBuilders()){
+	const QList<const ICacheTableBuilder*> orderedBuilders = GetOrderedBuilders();
+	int tableIndex = 0;
+
+	for (const ICacheTableBuilder* tableBuilderPtr : orderedBuilders){
+		++tableIndex;
+
+		const QString tableName = tableBuilderPtr->GetCacheTableName();
+
+		qDebug().noquote() << QStringLiteral("Updating table %1 (%2 of %3)").arg(tableName).arg(tableIndex).arg(orderedBuilders.count());
+
+		QElapsedTimer tableTimer;
+		tableTimer.start();
+
 		const ICacheTableBuilder::BuildResult buildResult = RunTableBuilder(*tableBuilderPtr, *connectionPtr, mode);
 
 		retVal.rowsWritten += buildResult.rowsWritten;
@@ -52,10 +66,19 @@ CCacheBuilderComp::UpdateResult CCacheBuilderComp::Update(UpdateMode mode)
 		retVal.wasFullRebuild = retVal.wasFullRebuild || buildResult.wasFullRebuild;
 
 		if (buildResult.isOk){
-			SetLastSourceUpdateTime(*connectionPtr, tableBuilderPtr->GetCacheTableName(), buildResult.lastSourceUpdateTime);
+			qDebug().noquote() << QStringLiteral("Table %1 updated (%2) in %3: %4 rows written, %5 removed")
+						.arg(tableName,
+							 buildResult.wasFullRebuild ? QStringLiteral("full rebuild") : QStringLiteral("incremental"),
+							 FormatDuration(tableTimer.elapsed()))
+						.arg(buildResult.rowsWritten)
+						.arg(buildResult.rowsDeleted);
+
+			SetLastSourceUpdateTime(*connectionPtr, tableName, buildResult.lastSourceUpdateTime);
 
 			continue;
 		}
+
+		SendErrorMessage(0, QStringLiteral("Table %1 failed after %2. Error: %3").arg(tableName, FormatDuration(tableTimer.elapsed()), buildResult.errorMessage), __func__);
 
 		// One failing table must not discard the tables that did rebuild, so the run continues.
 		retVal.isOk = false;
@@ -200,16 +223,23 @@ void CCacheBuilderComp::OnUpdateFinished()
 
 void CCacheBuilderComp::RunUpdate(UpdateMode mode)
 {
+	QElapsedTimer timer;
+	timer.start();
+
+	SendInfoMessage(0, QStringLiteral("Cache update started (requested %1)").arg(mode == UM_FULL ? QStringLiteral("full rebuild") : QStringLiteral("incremental")), __func__);
+
 	const UpdateResult result = Update(mode);
 
+	const QString duration = FormatDuration(timer.elapsed());
+
 	if (result.isOk){
-		SendInfoMessage(0, QStringLiteral("Cache updated (%1): %2 rows written, %3 removed")
-							 .arg(result.wasFullRebuild ? QStringLiteral("full rebuild") : QStringLiteral("incremental"))
+		SendInfoMessage(0, QStringLiteral("Cache updated (%1) in %2: %3 rows written, %4 removed")
+							 .arg(result.wasFullRebuild ? QStringLiteral("full rebuild") : QStringLiteral("incremental"), duration)
 							 .arg(result.rowsWritten)
 							 .arg(result.rowsDeleted), __func__);
 	}
 	else{
-		SendErrorMessage(0, QStringLiteral("Cache update failed. Error: %1").arg(result.errorMessage), __func__);
+		SendErrorMessage(0, QStringLiteral("Cache update failed after %1. Error: %2").arg(duration, result.errorMessage), __func__);
 	}
 
 	emit updateFinished(result.isOk);

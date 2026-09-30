@@ -2,6 +2,8 @@
 
 
 // Qt includes
+#include <QtCore/QDebug>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QFile>
 #include <QtCore/QSet>
 #include <QtCore/QUuid>
@@ -15,6 +17,8 @@
 // ImtCore includes
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtcol/CDocumentCollectionFilter.h>
+#include <imtcache/CProgressMilestones.h>
+#include <imtcache/imtcache.h>
 #include <imtdb/imtdb.h>
 
 
@@ -27,6 +31,9 @@ namespace
 
 const QString SHADOW_SUFFIX = QStringLiteral("_shadow");
 const QString STAGING_SUFFIX = QStringLiteral("_staging");
+
+const int PROGRESS_STEP_PERCENT = 10;
+const int MIN_ROWS_FOR_PROGRESS = 5000;
 
 
 /// Selects the source rows changed after \a since, or all of them when \a since is not set.
@@ -254,6 +261,10 @@ bool CSourceCollectionCacheTableBuilderCompBase::LoadRows(
 		return false;
 	}
 
+	QElapsedTimer phaseTimer;
+	phaseTimer.start();
+
+	// The SQL iterator reads the whole result set here, so this is the time spent waiting on PostgreSQL.
 	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> iteratorPtr(
 				m_sourceCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, filterParamsPtr));
 	if (!iteratorPtr.IsValid()){
@@ -262,9 +273,41 @@ bool CSourceCollectionCacheTableBuilderCompBase::LoadRows(
 		return false;
 	}
 
+	const qint64 readMs = phaseTimer.elapsed();
+	const int totalCount = iteratorPtr->GetElementsCount();
+
+	// An incremental run usually touches a handful of rows; only a sizeable load is worth reporting on.
+	const bool isProgressLogged = totalCount >= MIN_ROWS_FOR_PROGRESS;
+	if (isProgressLogged){
+		qDebug().noquote() << QStringLiteral("%1: read %2 source rows in %3").arg(tableName).arg(totalCount).arg(FormatDuration(readMs));
+	}
+
+	CProgressMilestones milestones(totalCount, PROGRESS_STEP_PERCENT);
+	int processedCount = 0;
+	int skippedCount = 0;
+
+	phaseTimer.restart();
+
 	while (iteratorPtr->Next()){
+		++processedCount;
+
+		const int milestone = milestones.Advance(processedCount);
+		if (isProgressLogged && milestone >= 0){
+			const qint64 elapsedMs = phaseTimer.elapsed();
+			const qint64 remainingMs = elapsedMs * (totalCount - processedCount) / processedCount;
+
+			qDebug().noquote() << QStringLiteral("%1: %2% (%3 of %4 rows), %5 elapsed, about %6 left")
+						.arg(tableName)
+						.arg(milestone)
+						.arg(processedCount)
+						.arg(totalCount)
+						.arg(FormatDuration(elapsedMs), FormatDuration(remainingMs));
+		}
+
 		QVariantList rowValues;
 		if (!MapRow(*iteratorPtr, rowValues)){
+			++skippedCount;
+
 			continue;
 		}
 
@@ -282,10 +325,20 @@ bool CSourceCollectionCacheTableBuilderCompBase::LoadRows(
 		++result.rowsWritten;
 	}
 
+	const qint64 mapMs = phaseTimer.restart();
+
 	if (!appenderPtr->Close()){
 		result.errorMessage = QStringLiteral("Unable to flush %1. Error: %2").arg(tableName, appenderPtr->GetLastError());
 
 		return false;
+	}
+
+	if (isProgressLogged){
+		qDebug().noquote() << QStringLiteral("%1: loaded %2 rows (%3 skipped): read %4, mapped %5, flushed %6")
+					.arg(tableName)
+					.arg(result.rowsWritten)
+					.arg(skippedCount)
+					.arg(FormatDuration(readMs), FormatDuration(mapMs), FormatDuration(phaseTimer.elapsed()));
 	}
 
 	return true;

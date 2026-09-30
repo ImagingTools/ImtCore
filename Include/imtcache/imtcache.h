@@ -30,6 +30,17 @@ struct CacheRevisionColumn
 inline constexpr quint64 ROOT_PARENT_ID = 0;
 
 
+/// Duration for log lines: tenths of a second below a minute, whole seconds above.
+inline QString FormatDuration(qint64 milliseconds)
+{
+	if (milliseconds < 60000){
+		return QStringLiteral("%1 s").arg(milliseconds / 1000.0, 0, 'f', 1);
+	}
+
+	return QStringLiteral("%1 min %2 s").arg(milliseconds / 60000).arg(milliseconds % 60000 / 1000);
+}
+
+
 /**
 	Deterministically derives a UBIGINT surrogate id from a source object's UUID (\a documentId, as
 	returned by imtbase::IIdentifiable::GetObjectUuid()). Cache tables keep a stable-across-rebuilds
