@@ -1,6 +1,6 @@
 # Physische Datentrennung im Multi-Tenant-System (Option C — Hybrid)
 
-Status: **In Umsetzung** (Phase 1)
+Status: **In Umsetzung** (Phase 1 und 2)
 Bezug: EU Cyber Resilience Act (Verordnung (EU) 2024/2847), DSGVO Art. 17/20/32 — siehe [CRA_COMPLIANCE.md](../../CRA_COMPLIANCE.md)
 
 ## Zielbild
@@ -33,7 +33,28 @@ Kernstück ist die Auflösung "Tenant → physischer Speicherort":
 | `imtdb::CTenantStorageRegistry` | `Include/imtdb/CTenantStorageRegistry.{h,cpp}` | Thread-sichere Registry mit Fail-Closed-Auflösung und Schema-Namensableitung (Sanitisierung auf `[a-z0-9_]`) |
 | `imtdb::CTenantStorageResolverComp` | `Include/imtdb/CTenantStorageResolverComp.{h,cpp}` | Komponente (`ImtDatabasePck::TenantStorageResolver`) mit Attributen `AllowSharedFallback` (Default: aus), `SharedSchemaName`, `SchemaNamePrefix`; Audit-Logging aller Registrierungen und fehlgeschlagenen Auflösungen |
 | Registry-Tabelle `TenantStorage` | `Include/imtauthdb/Resources/SQL/{Postgres,SQLite}/CreateTenantStorageTable.sql` | Persistente Ablage der Storage-Zuordnungen im Shared-Katalog (`TenantId`, `StorageKind`, `Status`, `SchemaName`, `ConnectionRef`) |
-| Tests | `Tests/TenantStorageResolverTest/` | Fail-Closed-Verhalten, Registrierung/Offboarding, Schema-Namens-Sanitisierung, Nebenläufigkeit |
+| Tests | `Tests/TenantStorageResolverTest/` | Fail-Closed-Verhalten, Registrierung/Offboarding, Schema-Namens-Sanitisierung, Nebenläufigkeit, Registry-Persistenz (In-Memory-SQLite) |
+
+## Provisionierung & Lifecycle (Phase 2 — umgesetzt)
+
+| Baustein | Ort | Zweck |
+|---|---|---|
+| `imtdb::ITenantStorageProvisioner` | `Include/imtdb/ITenantStorageProvisioner.h` | Interface: `ProvisionTenantStorage`, `DeprovisionTenantStorage`, `LoadTenantStorageAssignments` |
+| `imtdb::CTenantStorageDbStore` | `Include/imtdb/CTenantStorageDbStore.{h,cpp}` | Persistenz der Storage-Zuordnungen in der `TenantStorage`-Tabelle (parametrisierte Queries, UPSERT via `ON CONFLICT`) |
+| `imtdb::CTenantStorageProvisionerComp` | `Include/imtdb/CTenantStorageProvisionerComp.{h,cpp}` | Komponente (`ImtDatabasePck::TenantStorageProvisioner`): erstellt bei Postgres ein dediziertes Schema (`CREATE SCHEMA IF NOT EXISTS`), führt die konfigurierten `${TableScheme}`-DDL-Skripte darin aus (`DdlScriptPaths`), persistiert die Zuordnung und registriert sie im Resolver; `DropStorageOnDeprovision` steuert das Löschen des Schemas beim Offboarding (Default: aus) |
+| Anbindung Tenant-Lifecycle | `Include/imtauth/CTenantManagerComp.{h,cpp}` | Optionale Referenz `StorageProvisioner`: `CreateTenant` provisioniert den Storage (bei Fehler wird die Tenant-Anlage zurückgerollt), `RemoveTenant` deprovisioniert |
+
+Hinweise:
+
+- Provisionierung ist **idempotent** — ein bereits registrierter Tenant meldet Erfolg.
+- Für Nicht-Postgres-Backends (z. B. SQLite) registriert der Provisioner eine explizite
+  Shared-Schema-Zuordnung; dedizierte Datenbankdateien pro Tenant folgen in einer
+  späteren Phase. Die Fail-Closed-Auflösung bleibt dadurch intakt.
+- `LoadTenantStorageAssignments()` lädt beim Start alle persistierten Zuordnungen aus
+  der `TenantStorage`-Tabelle in den Resolver.
+- Schema-Namen werden ausschließlich aus sanitisierten Tenant-IDs abgeleitet
+  (`CTenantStorageRegistry::CreateSchemaName`), bevor sie in DDL-Anweisungen verwendet
+  werden (SQL-Injection-Schutz; DDL unterstützt keine Parameter-Bindung).
 
 ### Fail-Closed-Semantik
 
@@ -58,12 +79,13 @@ Logger-Infrastruktur (`ilog`):
 
 ## Umsetzungsphasen
 
-1. **Fundament (dieser Stand)** — Resolver-Interface, Registry, Komponente,
+1. **Fundament (umgesetzt)** — Resolver-Interface, Registry, Komponente,
    Registry-Tabelle, Tests, Dokumentation.
-2. **Provisionierung & Lifecycle** — Tenant-Anlage erzeugt Schema/DB-Datei und führt
+2. **Provisionierung & Lifecycle (umgesetzt)** — Tenant-Anlage erzeugt Schema und führt
    die vorhandenen `${TableScheme}`-DDL-Skripte aus; Registry-Persistenz über
-   `TenantStorage`-Tabelle; Migrations-Controller iterieren über alle registrierten
-   Tenant-Schemata; Backup/Restore pro Tenant.
+   `TenantStorage`-Tabelle; Rollback der Tenant-Anlage bei Provisionierungsfehlern;
+   Offen: Migrations-Controller-Iteration über alle Tenant-Schemata, Backup/Restore
+   pro Tenant.
 3. **Request-Pfad absichern** — `GetTableScheme()` dynamisch über
    `COperationContext`-TenantId + Resolver; Guard-Schicht (fehlende/fremde TenantId →
    Fehler); Cross-Tenant-Pfade (CrossOrgGrants, DelegatedAccess) explizit über den

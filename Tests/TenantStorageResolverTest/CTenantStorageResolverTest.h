@@ -33,6 +33,11 @@ private Q_SLOTS:
 
 	// schema name derivation
 	void testCreateSchemaNameForTenantSanitizesId();
+	void testStaticCreateSchemaName();
+
+	// persistence (in-memory SQLite)
+	void testDbStoreSaveLoadRemove();
+	void testDbStoreUpsert();
 
 	// concurrency
 	void testConcurrentRegistrationAndResolution();

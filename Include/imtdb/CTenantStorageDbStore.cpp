@@ -44,8 +44,8 @@ bool CTenantStorageDbStore::SaveAssignment(const QByteArray& tenantId, const Ten
 	bindValues[QStringLiteral(":tenantId")] = QString(tenantId);
 	bindValues[QStringLiteral(":storageKind")] = int(info.storageKind);
 	bindValues[QStringLiteral(":status")] = int(info.status);
-	bindValues[QStringLiteral(":schemaName")] = QString(info.schemaName);
-	bindValues[QStringLiteral(":connectionRef")] = QString(info.connectionRef);
+	bindValues[QStringLiteral(":schemaName")] = info.schemaName.isNull() ? QString(QStringLiteral("")) : QString(info.schemaName);
+	bindValues[QStringLiteral(":connectionRef")] = info.connectionRef.isNull() ? QString(QStringLiteral("")) : QString(info.connectionRef);
 
 	QByteArray query =	QByteArrayLiteral("INSERT INTO ") + GetQualifiedTableName() +
 						QByteArrayLiteral(

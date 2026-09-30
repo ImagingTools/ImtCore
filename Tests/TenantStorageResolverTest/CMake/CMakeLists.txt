@@ -10,6 +10,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	Acf::itest
 	Qt${QT_VERSION_MAJOR}::Test
 	Qt${QT_VERSION_MAJOR}::Concurrent
+	Qt${QT_VERSION_MAJOR}::Sql
 )
 
 deploy_qt(TARGET ${PROJECT_NAME})

@@ -5,10 +5,115 @@
 
 #include <QtConcurrent/QtConcurrent>
 #include <QFuture>
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlError>
+#include <QtSql/QSqlQuery>
+
+#include <imtdb/CTenantStorageDbStore.h>
+#include <imtdb/IDatabaseEngine.h>
 
 
 using imtdb::CTenantStorageRegistry;
 using imtdb::TenantStorageInfo;
+
+
+namespace
+{
+
+
+/**
+	Minimal in-memory SQLite implementation of IDatabaseEngine for the store tests.
+*/
+class CSqliteTestEngine: public imtdb::IDatabaseEngine
+{
+public:
+	CSqliteTestEngine()
+	{
+		m_database = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"), QStringLiteral("TenantStorageResolverTest"));
+		m_database.setDatabaseName(QStringLiteral(":memory:"));
+		m_database.open();
+	}
+
+	~CSqliteTestEngine() override
+	{
+		m_database.close();
+		m_database = QSqlDatabase();
+		QSqlDatabase::removeDatabase(QStringLiteral("TenantStorageResolverTest"));
+	}
+
+	bool IsOpen() const
+	{
+		return m_database.isOpen();
+	}
+
+	// reimplemented (imtdb::IDatabaseEngine)
+	virtual bool BeginTransaction() const override
+	{
+		return m_database.transaction();
+	}
+
+	virtual bool FinishTransaction() const override
+	{
+		return m_database.commit();
+	}
+
+	virtual bool CancelTransaction() const override
+	{
+		return m_database.rollback();
+	}
+
+	virtual QByteArray GetDatabaseDriverId() const override
+	{
+		return QByteArrayLiteral("QSQLITE");
+	}
+
+	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override
+	{
+		return ExecSqlQuery(queryString, QVariantMap(), sqlError, isForwardOnly);
+	}
+
+	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override
+	{
+		QSqlQuery query(m_database);
+		query.setForwardOnly(isForwardOnly);
+		query.prepare(queryString);
+		for (auto iter = bindValues.constBegin(); iter != bindValues.constEnd(); ++iter){
+			query.bindValue(iter.key(), iter.value());
+		}
+		query.exec();
+
+		if (sqlError != nullptr){
+			*sqlError = query.lastError();
+		}
+
+		return query;
+	}
+
+	virtual QSqlQuery ExecSqlQueryFromFile(const QString& /*filePath*/, QSqlError* sqlError = nullptr, bool /*isForwardOnly*/ = false) const override
+	{
+		if (sqlError != nullptr){
+			*sqlError = QSqlError();
+		}
+
+		return QSqlQuery(m_database);
+	}
+
+	virtual QSqlQuery ExecSqlQueryFromFile(const QString& /*filePath*/, const QVariantMap& /*bindValues*/, QSqlError* sqlError = nullptr, bool /*isForwardOnly*/ = false) const override
+	{
+		if (sqlError != nullptr){
+			*sqlError = QSqlError();
+		}
+
+		return QSqlQuery(m_database);
+	}
+
+private:
+	mutable QSqlDatabase m_database;
+};
+
+
+} // namespace
+
 
 
 void CTenantStorageResolverTest::init()
@@ -180,6 +285,75 @@ void CTenantStorageResolverTest::testCreateSchemaNameForTenantSanitizesId()
 	QCOMPARE(
 				m_registryPtr->CreateSchemaNameForTenant(QByteArrayLiteral("6a3f/'; DROP")),
 				QByteArrayLiteral("org_6a3f____drop"));
+}
+
+
+void CTenantStorageResolverTest::testStaticCreateSchemaName()
+{
+	QCOMPARE(
+				CTenantStorageRegistry::CreateSchemaName(QByteArrayLiteral("tenant_"), QByteArrayLiteral("Alpha-42")),
+				QByteArrayLiteral("tenant_alpha_42"));
+}
+
+
+// --- persistence (in-memory SQLite) ---
+
+void CTenantStorageResolverTest::testDbStoreSaveLoadRemove()
+{
+	CSqliteTestEngine engine;
+	QVERIFY(engine.IsOpen());
+
+	imtdb::CTenantStorageDbStore store(engine);
+	QVERIFY(store.EnsureRegistryTable());
+
+	TenantStorageInfo info;
+	info.storageKind = imtdb::TSK_OWN_SCHEMA;
+	info.status = imtdb::TSS_ACTIVE;
+	info.schemaName = QByteArrayLiteral("tenant_alpha");
+	info.connectionRef = QByteArrayLiteral("main-db");
+
+	QVERIFY(store.SaveAssignment(QByteArrayLiteral("alpha"), info));
+	QVERIFY(!store.SaveAssignment(QByteArray(), info));
+
+	imtdb::CTenantStorageDbStore::Assignments assignments;
+	QVERIFY(store.LoadAssignments(assignments));
+	QCOMPARE(assignments.size(), 1);
+	QCOMPARE(assignments[0].first, QByteArrayLiteral("alpha"));
+	QCOMPARE(assignments[0].second.storageKind, imtdb::TSK_OWN_SCHEMA);
+	QCOMPARE(assignments[0].second.status, imtdb::TSS_ACTIVE);
+	QCOMPARE(assignments[0].second.schemaName, QByteArrayLiteral("tenant_alpha"));
+	QCOMPARE(assignments[0].second.connectionRef, QByteArrayLiteral("main-db"));
+
+	QVERIFY(store.RemoveAssignment(QByteArrayLiteral("alpha")));
+
+	assignments.clear();
+	QVERIFY(store.LoadAssignments(assignments));
+	QVERIFY(assignments.isEmpty());
+}
+
+
+void CTenantStorageResolverTest::testDbStoreUpsert()
+{
+	CSqliteTestEngine engine;
+	QVERIFY(engine.IsOpen());
+
+	imtdb::CTenantStorageDbStore store(engine);
+	QVERIFY(store.EnsureRegistryTable());
+
+	TenantStorageInfo info;
+	info.storageKind = imtdb::TSK_OWN_SCHEMA;
+	info.status = imtdb::TSS_PROVISIONING;
+	info.schemaName = QByteArrayLiteral("tenant_beta");
+
+	QVERIFY(store.SaveAssignment(QByteArrayLiteral("beta"), info));
+
+	info.status = imtdb::TSS_ACTIVE;
+	QVERIFY(store.SaveAssignment(QByteArrayLiteral("beta"), info));
+
+	imtdb::CTenantStorageDbStore::Assignments assignments;
+	QVERIFY(store.LoadAssignments(assignments));
+	QCOMPARE(assignments.size(), 1);
+	QCOMPARE(assignments[0].second.status, imtdb::TSS_ACTIVE);
 }
 
 
