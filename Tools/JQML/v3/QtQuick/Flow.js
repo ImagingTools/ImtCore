@@ -194,6 +194,7 @@ class Flow extends Item {
     }
 
     __updateGeometry(){
+        if(!this.__completed) return
         let size = this.__layoutChildren()
 
         this.__setDOMStyle({
