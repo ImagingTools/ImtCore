@@ -4,6 +4,7 @@ import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 
 Rectangle{
+	id: container
 	width: 500
 	height: !expandButton.expanded ? minHeight : maxHeight
 
@@ -26,7 +27,7 @@ Rectangle{
 		id: expandButton
 		anchors.top: parent.top;
 		anchors.right: parent.right
-		anchors.topMargin: parent.buttonMargin
+		anchors.topMargin: (container.minHeight - height)/2
 		anchors.rightMargin: parent.buttonMargin
 
 		width: height;

@@ -382,6 +382,14 @@ Item {
 		tabView.currentIndex = 0
 	}
 
+	function closeAllDocuments(){
+		let documentIds = workspaceView.documentManager.getOpenedDocumentIds()
+
+		for (let i = 0; i < documentIds.length; i++){
+			workspaceView.documentManager.closeDocument(documentIds[i])
+		}
+	}
+
 	Rectangle {
 		anchors.fill: parent
 		color: workspaceView.contentColor
@@ -400,11 +408,7 @@ Item {
 					}
 				}
 				else if (commandId === "CloseAll"){
-					let documentIds = workspaceView.documentManager.getOpenedDocumentIds()
-
-					for (let i = 0; i < documentIds.length; i++){
-						workspaceView.documentManager.closeDocument(documentIds[i])
-					}
+					workspaceView.closeAllDocuments()
 				}
 			}
 		}
