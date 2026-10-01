@@ -4,7 +4,7 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
-#include <imod/CMultiModelDispatcherBase.h>
+#include <imod/CModelUpdateBridge.h>
 #include <iprm/IOptionsList.h>
 
 // ImtCore includes
@@ -21,18 +21,18 @@ namespace imtbase
 */
 class CCollectionInfoAdapterComp:
 			public icomp::CComponentBase,
-			private imod::CMultiModelDispatcherBase,
 			virtual public ICollectionInfo
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
-	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CCollectionInfoAdapterComp);
 		I_REGISTER_INTERFACE(ICollectionInfo);
 		I_ASSIGN(m_optionsListCompPtr, "OptionsList", "List of options used as collection elements", true, "OptionsList");
 		I_ASSIGN_TO(m_optionsListModelCompPtr, m_optionsListCompPtr, false);
 	I_END_COMPONENT;
+
+	CCollectionInfoAdapterComp();
 
 	// reimplemented (imtbase::ICollectionInfo)
 	virtual int GetElementsCount(
@@ -56,9 +56,6 @@ public:
 	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true, ilog::IMessageConsumer* logPtr = nullptr) override;
 
 protected:
-	// reimplemented (imod::CMultiModelDispatcherBase)
-	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
-
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
@@ -69,6 +66,8 @@ private:
 private:
 	I_REF(iprm::IOptionsList, m_optionsListCompPtr);
 	I_REF(imod::IModel, m_optionsListModelCompPtr);
+
+	imod::CModelUpdateBridge m_updateBridge;
 };
 
 

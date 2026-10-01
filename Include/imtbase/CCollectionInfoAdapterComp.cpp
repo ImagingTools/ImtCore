@@ -8,6 +8,12 @@ namespace imtbase
 
 // public methods
 
+CCollectionInfoAdapterComp::CCollectionInfoAdapterComp()
+	:m_updateBridge(this, imod::CModelUpdateBridge::UF_SOURCE)
+{
+}
+
+
 // reimplemented (imtbase::ICollectionInfo)
 
 int CCollectionInfoAdapterComp::GetElementsCount(
@@ -113,14 +119,6 @@ bool CCollectionInfoAdapterComp::SetElementEnabled(const Id& /*elementId*/, bool
 
 // protected methods
 
-// reimplemented (imod::CMultiModelDispatcherBase)
-
-void CCollectionInfoAdapterComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
-{
-	istd::CChangeNotifier notifier(this);
-}
-
-
 // reimplemented (icomp::CComponentBase)
 
 void CCollectionInfoAdapterComp::OnComponentCreated()
@@ -128,14 +126,14 @@ void CCollectionInfoAdapterComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	if (m_optionsListModelCompPtr.IsValid()){
-		RegisterModel(m_optionsListModelCompPtr.GetPtr());
+		m_optionsListModelCompPtr->AttachObserver(&m_updateBridge);
 	}
 }
 
 
 void CCollectionInfoAdapterComp::OnComponentDestroyed()
 {
-	BaseClass2::UnregisterAllModels();
+	m_updateBridge.EnsureModelsDetached();
 
 	BaseClass::OnComponentDestroyed();
 }
