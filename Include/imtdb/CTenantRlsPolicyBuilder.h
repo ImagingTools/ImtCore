@@ -54,6 +54,13 @@ public:
 		Create the name of the tenant isolation policy for a table.
 	*/
 	static QByteArray CreatePolicyName(const QByteArray& tableName);
+
+	/**
+		Check if the table belongs to the shared catalog, whose rows are read across tenant
+		boundaries by design (e.g. all memberships of a user, grants targeting a tenant).
+		A tenant isolation policy on such a table breaks tenant switching and delegated access.
+	*/
+	static bool IsCrossTenantCatalogTable(const QByteArray& tableName);
 };
 
 

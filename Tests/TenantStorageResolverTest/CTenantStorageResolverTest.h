@@ -59,6 +59,7 @@ private Q_SLOTS:
 	void testRlsStatementsRejectInvalidIdentifiers();
 	void testRlsSessionVariableValidation();
 	void testRlsBindAndUnbindQueries();
+	void testRlsCrossTenantCatalogTables();
 
 private:
 	imtdb::CTenantStorageRegistry* m_registryPtr = nullptr;

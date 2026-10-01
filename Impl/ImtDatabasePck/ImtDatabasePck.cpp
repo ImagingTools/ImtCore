@@ -151,5 +151,15 @@ I_EXPORT_COMPONENT(
 			"Controller enforcing tenant Row-Level Security on shared Postgres tables",
 			"Tenant Row-Level Security RLS Multi-Tenant Isolation Policy Database");
 
+I_EXPORT_COMPONENT(
+			TenantSchemaMigrationController,
+			"Migration controller applying the tenant table migrations to every dedicated tenant schema",
+			"Tenant Schema Migration Controller Multi-Tenant Database");
+
+I_EXPORT_COMPONENT(
+			TenantStorageBackup,
+			"Backup and restore of dedicated Postgres tenant schemas",
+			"Tenant Storage Backup Restore Multi-Tenant Schema Database");
+
 
 } // namespace ImtDatabasePck

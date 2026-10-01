@@ -110,4 +110,28 @@ QByteArray CTenantRlsPolicyBuilder::CreatePolicyName(const QByteArray& tableName
 }
 
 
+bool CTenantRlsPolicyBuilder::IsCrossTenantCatalogTable(const QByteArray& tableName)
+{
+	static const QByteArrayList catalogTableNames = {
+				QByteArrayLiteral("tenants"),
+				QByteArrayLiteral("tenantmemberships"),
+				QByteArrayLiteral("tenantinvitations"),
+				QByteArrayLiteral("tenantrelationships"),
+				QByteArrayLiteral("tenantrelationshipproposals"),
+				QByteArrayLiteral("tenantconnections"),
+				QByteArrayLiteral("tenantconnectioncodes"),
+				QByteArrayLiteral("tenantconnectionrequests"),
+				QByteArrayLiteral("tenantpermissions"),
+				QByteArrayLiteral("tenantentitybindings"),
+				QByteArrayLiteral("crosstenantmessages"),
+				QByteArrayLiteral("contracts"),
+				QByteArrayLiteral("crossorggrants"),
+				QByteArrayLiteral("orderrequests"),
+				QByteArrayLiteral("usersessions"),
+				QByteArrayLiteral("tenantstorage")};
+
+	return catalogTableNames.contains(tableName.toLower());
+}
+
+
 } // namespace imtdb

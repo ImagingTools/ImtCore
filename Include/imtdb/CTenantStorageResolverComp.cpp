@@ -2,6 +2,10 @@
 #include <imtdb/CTenantStorageResolverComp.h>
 
 
+// ImtCore includes
+#include <imtdb/CTenantStorageDbStore.h>
+
+
 namespace imtdb
 {
 
@@ -86,16 +90,50 @@ void CTenantStorageResolverComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	m_registry.SetSharedFallbackEnabled(*m_allowSharedFallbackAttrPtr);
-	m_registry.SetSharedSchemaName(*m_sharedSchemaNameAttrPtr);
-	m_registry.SetSchemaNamePrefix(*m_schemaNamePrefixAttrPtr);
+	const bool allowSharedFallback = m_allowSharedFallbackAttrPtr.IsValid() ? *m_allowSharedFallbackAttrPtr : false;
+	const QByteArray sharedSchemaName = m_sharedSchemaNameAttrPtr.IsValid() ? *m_sharedSchemaNameAttrPtr : QByteArrayLiteral("public");
 
-	if (*m_allowSharedFallbackAttrPtr){
+	m_registry.SetSharedFallbackEnabled(allowSharedFallback);
+	m_registry.SetSharedSchemaName(sharedSchemaName);
+	m_registry.SetSchemaNamePrefix(m_schemaNamePrefixAttrPtr.IsValid() ? *m_schemaNamePrefixAttrPtr : QByteArrayLiteral("tenant_"));
+
+	if (allowSharedFallback){
 		SendWarningMessage(
 					0,
-					QStringLiteral("Shared storage fallback is enabled: unregistered tenants resolve to the shared schema '%1'").arg(QString(*m_sharedSchemaNameAttrPtr)),
+					QStringLiteral("Shared storage fallback is enabled: unregistered tenants resolve to the shared schema '%1'").arg(QString(sharedSchemaName)),
 					"CTenantStorageResolverComp");
 	}
+
+	if (m_databaseEngineCompPtr.IsValid()){
+		LoadPersistedAssignments();
+	}
+}
+
+
+// private methods
+
+void CTenantStorageResolverComp::LoadPersistedAssignments()
+{
+	CTenantStorageDbStore store(*m_databaseEngineCompPtr, m_registryTableSchemaAttrPtr.IsValid() ? *m_registryTableSchemaAttrPtr : QByteArray());
+
+	CTenantStorageDbStore::Assignments assignments;
+	if (!store.EnsureRegistryTable() || !store.LoadAssignments(assignments)){
+		SendErrorMessage(0, QStringLiteral("Persisted tenant storage assignments could not be loaded, all tenant storage resolutions will be rejected"), "CTenantStorageResolverComp");
+
+		return;
+	}
+
+	int loadedCount = 0;
+	for (const CTenantStorageDbStore::Assignment& assignment: assignments){
+		if (m_registry.RegisterTenantStorage(assignment.first, assignment.second)){
+			++loadedCount;
+		}
+		else{
+			SendWarningMessage(0, QStringLiteral("Skipped invalid persisted storage assignment for tenant '%1'").arg(QString(assignment.first)), "CTenantStorageResolverComp");
+		}
+	}
+
+	SendInfoMessage(0, QStringLiteral("Loaded %1 persisted tenant storage assignment(s)").arg(loadedCount), "CTenantStorageResolverComp");
 }
 
 

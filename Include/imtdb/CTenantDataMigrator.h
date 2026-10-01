@@ -27,8 +27,15 @@ public:
 	void SetTenantIdColumn(const QByteArray& tenantIdColumn);
 
 	/**
+		Enable the verification of the copied rows by a content checksum in addition to the row count.
+		Only supported for Postgres; with other drivers an enabled verification fails the migration.
+	*/
+	void SetChecksumVerificationEnabled(bool isEnabled);
+
+	/**
 		Copy all rows of the given tenant from the source schema table into the
-		same table inside the target schema and verify the copied row count.
+		same table inside the target schema and verify the copied row count
+		(and the content checksum, if enabled).
 		The operation is idempotent: if the target table already contains exactly
 		the source row count for this tenant, the table is skipped.
 		\param migratedRowCount Receives the number of rows present in the target table.
@@ -55,11 +62,14 @@ public:
 
 private:
 	bool CountTenantRows(const QByteArray& schemaName, const QByteArray& tableName, const QByteArray& tenantId, int& count, QString& errorMessage) const;
+	bool CalculateTenantChecksum(const QByteArray& schemaName, const QByteArray& tableName, const QByteArray& tenantId, QByteArray& checksum, QString& errorMessage) const;
+	bool VerifyChecksums(const QByteArray& tableName, const QByteArray& tenantId, const QByteArray& targetSchema, QString& errorMessage) const;
 	QByteArray CreateQualifiedTableName(const QByteArray& schemaName, const QByteArray& tableName) const;
 
 	const IDatabaseEngine& m_databaseEngine;
 	QByteArray m_sourceSchema;
 	QByteArray m_tenantIdColumn;
+	bool m_isChecksumVerificationEnabled;
 };
 
 

@@ -530,6 +530,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 			add_subdirectory("${TESTS_DIR}/TenantStorageResolverTest/CMake" "${AUX_INCLUDE_DIR}/TenantStorageResolverTest")
 			add_dependencies(TenantStorageResolverTest imtdb)
+
+			add_subdirectory("${TESTS_DIR}/TenantIsolationPostgresTest/CMake" "${AUX_INCLUDE_DIR}/TenantIsolationPostgresTest")
+			add_dependencies(TenantIsolationPostgresTest imtdb)
 		endif()
 
 		if(USE_MDBX)

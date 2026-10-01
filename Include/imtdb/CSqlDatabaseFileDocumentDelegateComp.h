@@ -34,11 +34,25 @@ namespace imtdb
 	blob for the current, not-yet-committed transaction; the collector re-checks the
 	time immediately before deleting, so reuse and reclamation cannot both act on the
 	same blob.
+
+	With a tenant storage resolver, the content of a tenant with a dedicated schema is stored in
+	its own folder (GetTenantStorePath()), so tenants neither share nor deduplicate content.
+	Without a resolvable tenant no store path is produced and the document is neither written nor read.
 */
 class CSqlDatabaseFileDocumentDelegateComp: public imtdb::CSqlDatabaseDocumentDelegateCompBase
 {
 public:
 	typedef imtdb::CSqlDatabaseDocumentDelegateCompBase BaseClass;
+
+	/**
+		Folder below the store root containing the per-tenant stores.
+	*/
+	static const QString s_tenantStoresFolderName;
+
+	/**
+		Store folder of the tenant with the given dedicated schema.
+	*/
+	static QString GetTenantStorePath(const QString& storageRootPath, const QByteArray& schemaName);
 
 	I_BEGIN_COMPONENT(CSqlDatabaseFileDocumentDelegateComp)
 		I_ASSIGN(m_storageRootCompPtr, "StorageRoot", "Root folder of the document file store.\nMust be used exclusively by this collection's table: the garbage collector's liveness scan relies on this", true, "StorageRoot");
@@ -62,10 +76,14 @@ private:
 	// the caller re-writes it.
 	bool RefreshContentLease(const QString& targetFilePath) const;
 
-	QString GetContentFilePath(const QByteArray& contentHashHex) const;
 	const ifile::IDeviceBasedPersistence* GetObjectPersistence(const istd::IChangeable& object, QIODevice& device, int deviceOperation) const;
 
 protected:
+	/**
+		Store path of the content with the given hash; empty if the tenant storage could not be resolved.
+	*/
+	QString GetContentFilePath(const QByteArray& contentHashHex) const;
+
 	/**
 		Root folder of the content-addressed document file store.
 	*/

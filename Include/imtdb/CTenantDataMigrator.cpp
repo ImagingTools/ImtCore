@@ -13,7 +13,8 @@ namespace imtdb
 
 CTenantDataMigrator::CTenantDataMigrator(const IDatabaseEngine& databaseEngine)
 	:m_databaseEngine(databaseEngine),
-	m_tenantIdColumn(QByteArrayLiteral("TenantId"))
+	m_tenantIdColumn(QByteArrayLiteral("TenantId")),
+	m_isChecksumVerificationEnabled(false)
 {
 }
 
@@ -27,6 +28,12 @@ void CTenantDataMigrator::SetSourceSchema(const QByteArray& sourceSchema)
 void CTenantDataMigrator::SetTenantIdColumn(const QByteArray& tenantIdColumn)
 {
 	m_tenantIdColumn = tenantIdColumn;
+}
+
+
+void CTenantDataMigrator::SetChecksumVerificationEnabled(bool isEnabled)
+{
+	m_isChecksumVerificationEnabled = isEnabled;
 }
 
 
@@ -66,6 +73,10 @@ bool CTenantDataMigrator::MigrateTable(
 
 	if (targetRowCount == sourceRowCount){
 		// Already migrated (idempotent re-run)
+		if (m_isChecksumVerificationEnabled && !VerifyChecksums(tableName, tenantId, targetSchema, errorMessage)){
+			return false;
+		}
+
 		migratedRowCount = targetRowCount;
 
 		return true;
@@ -99,6 +110,10 @@ bool CTenantDataMigrator::MigrateTable(
 	if (targetRowCount != sourceRowCount){
 		errorMessage = QStringLiteral("Verification for table '%1' failed: %2 of %3 rows copied").arg(QString(targetTable)).arg(targetRowCount).arg(sourceRowCount);
 
+		return false;
+	}
+
+	if (m_isChecksumVerificationEnabled && !VerifyChecksums(tableName, tenantId, targetSchema, errorMessage)){
 		return false;
 	}
 
@@ -188,6 +203,69 @@ bool CTenantDataMigrator::CountTenantRows(
 	}
 
 	count = query.value(0).toInt();
+
+	return true;
+}
+
+
+bool CTenantDataMigrator::CalculateTenantChecksum(
+			const QByteArray& schemaName,
+			const QByteArray& tableName,
+			const QByteArray& tenantId,
+			QByteArray& checksum,
+			QString& errorMessage) const
+{
+	checksum.clear();
+
+	QByteArray qualifiedTable = CreateQualifiedTableName(schemaName, tableName);
+	QByteArray tenantColumn = QuoteIdentifier(m_tenantIdColumn);
+	if (qualifiedTable.isEmpty() || tenantColumn.isEmpty()){
+		errorMessage = QStringLiteral("Invalid table, schema or column identifier");
+
+		return false;
+	}
+
+	// the text form of a row holds only its values, so equal rows in both schemas give equal input
+	QByteArray checksumQuery = QByteArrayLiteral("SELECT md5(COALESCE(string_agg(t::text, E'\\n' ORDER BY t::text), '')) FROM ") +
+				qualifiedTable + QByteArrayLiteral(" t WHERE t.") + tenantColumn + QByteArrayLiteral(" = :tenantId");
+
+	QVariantMap bindValues;
+	bindValues[QStringLiteral(":tenantId")] = QString(tenantId);
+
+	QSqlError sqlError;
+	QSqlQuery query = m_databaseEngine.ExecSqlQuery(checksumQuery, bindValues, &sqlError, true);
+	if (sqlError.type() != QSqlError::NoError || !query.next()){
+		errorMessage = QStringLiteral("Calculating the checksum of '%1' failed: %2").arg(QString(qualifiedTable), sqlError.text());
+
+		return false;
+	}
+
+	checksum = query.value(0).toByteArray();
+
+	return true;
+}
+
+
+bool CTenantDataMigrator::VerifyChecksums(const QByteArray& tableName, const QByteArray& tenantId, const QByteArray& targetSchema, QString& errorMessage) const
+{
+	if (!m_databaseEngine.GetDatabaseDriverId().startsWith(QByteArrayLiteral("QPSQL"))){
+		errorMessage = QStringLiteral("Checksum verification is only supported for Postgres databases");
+
+		return false;
+	}
+
+	QByteArray sourceChecksum;
+	QByteArray targetChecksum;
+	if (	!CalculateTenantChecksum(m_sourceSchema, tableName, tenantId, sourceChecksum, errorMessage) ||
+			!CalculateTenantChecksum(targetSchema, tableName, tenantId, targetChecksum, errorMessage)){
+		return false;
+	}
+
+	if (sourceChecksum != targetChecksum){
+		errorMessage = QStringLiteral("Checksum verification for table '%1' failed: the content of schema '%2' differs from the source").arg(QString(tableName), QString(targetSchema));
+
+		return false;
+	}
 
 	return true;
 }

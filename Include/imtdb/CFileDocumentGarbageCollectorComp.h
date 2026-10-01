@@ -13,6 +13,7 @@
 
 // ImtCore includes
 #include <imtdb/IDatabaseEngine.h>
+#include <imtdb/ITenantStorageResolver.h>
 
 
 namespace imtdb
@@ -36,6 +37,11 @@ namespace imtdb
 	(integrity audit). With 'AuditOnly' enabled (the default) nothing is ever deleted;
 	candidates are only reported. At the end of a deletion pass, fan-out folders left
 	empty by the sweep are removed as well.
+
+	The per-tenant stores below the store root (see CSqlDatabaseFileDocumentDelegateComp)
+	are never swept against the shared table. With 'TenantStorageResolver' set, every
+	tenant with a dedicated schema gets its own pass: its store folder against the
+	document table in its schema. Folders of unknown tenants are reported, not touched.
 */
 class CFileDocumentGarbageCollectorComp:
 			public QObject,
@@ -53,6 +59,7 @@ public:
 		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "Interval of the collection pass (in msec)", true, 3600000);
 		I_ASSIGN(m_gracePeriodHoursAttrPtr, "GracePeriodHours", "Minimum age of an unreferenced file before it may be deleted.\nMust exceed the longest running transaction and the backup window", true, 168);
 		I_ASSIGN(m_auditOnlyAttrPtr, "AuditOnly", "If true - unreferenced files are only reported, nothing is deleted", true, true);
+		I_ASSIGN(m_tenantStorageResolverCompPtr, "TenantStorageResolver", "Optional tenant storage resolver; if set, the store of every tenant with a dedicated schema is collected against the document table in that schema", false, "TenantStorageResolver");
 	I_END_COMPONENT;
 
 protected:
@@ -72,8 +79,25 @@ private:
 		bool hasForeignContent = false;
 	};
 
-	bool GetLivenessInfo(LivenessInfo& livenessInfo) const;
-	bool SweepStore(const LivenessInfo& livenessInfo, bool isDeletionAllowed);
+	/**
+		One store folder collected against the liveness of its document table.
+	*/
+	struct StorePass
+	{
+		QString storePath;
+		LivenessInfo livenessInfo;
+		bool isDeletionAllowed = false;
+
+		/**
+			Set for the shared store: its per-tenant stores are skipped, folders of unknown tenants reported.
+		*/
+		bool isSharedStore = false;
+		QSet<QString> knownTenantFolders;
+	};
+
+	bool GetLivenessInfo(const QString& schemaPrefix, LivenessInfo& livenessInfo) const;
+	bool SweepStores(const QList<StorePass>& storePasses);
+	bool SweepStore(const StorePass& storePass);
 
 private Q_SLOTS:
 	void OnTimeout();
@@ -89,6 +113,7 @@ protected:
 	I_ATTR(int, m_checkIntervalAttrPtr);
 	I_ATTR(int, m_gracePeriodHoursAttrPtr);
 	I_ATTR(bool, m_auditOnlyAttrPtr);
+	I_REF(imtdb::ITenantStorageResolver, m_tenantStorageResolverCompPtr);
 
 private:
 	QFutureWatcher<bool> m_sweepWatcher;

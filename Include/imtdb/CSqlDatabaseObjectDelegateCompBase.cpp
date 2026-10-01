@@ -102,13 +102,9 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetCountQuery(const iprm::IParams
 		}
 	}
 
-	if (!m_tableSchemaAttrPtr.IsValid()){
-		return QStringLiteral(R"(SELECT COUNT(*) FROM "%1" %2)").arg(*m_tableNameAttrPtr, filterQuery).toUtf8();
-	}
-
-	return QStringLiteral(R"(SELECT COUNT(*) FROM %0."%1" %2)")
+	return QStringLiteral(R"(SELECT COUNT(*) FROM %0"%1" %2)")
 					.arg(
-						*m_tableSchemaAttrPtr,
+						GetTableSchemePrefix(),
 						*m_tableNameAttrPtr,
 						filterQuery
 					).toUtf8();
@@ -122,22 +118,13 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 			const iprm::IParamsSet* paramsPtr) const
 {
 	if (!objectId.isEmpty()){
-		if (m_tableSchemaAttrPtr.IsValid()){
-			return QStringLiteral(R"(SELECT * FROM %1."%2" WHERE "%3" = '%4')")
-						.arg(
-							/*1*/ *m_tableSchemaAttrPtr,
-							/*2*/ *m_tableNameAttrPtr,
-							/*3*/ *m_objectIdColumnAttrPtr,
-							/*4*/ objectId
-						).toUtf8();
-		}
-
-		return QStringLiteral(R"(SELECT * FROM "%1" WHERE "%2" = '%3')")
-						.arg(
-							*m_tableNameAttrPtr,
-							*m_objectIdColumnAttrPtr,
-							objectId
-						).toUtf8();
+		return QStringLiteral(R"(SELECT * FROM %1"%2" WHERE "%3" = '%4')")
+					.arg(
+						/*1*/ GetTableSchemePrefix(),
+						/*2*/ *m_tableNameAttrPtr,
+						/*3*/ *m_objectIdColumnAttrPtr,
+						/*4*/ objectId
+					).toUtf8();
 	}
 
 	QString sortQuery;
@@ -267,12 +254,8 @@ QVariant CSqlDatabaseObjectDelegateCompBase::GetElementInfoFromRecord(const QSql
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::CreateResetQuery(const imtbase::IObjectCollection& /*collection*/) const
 {
-	if (!m_tableSchemaAttrPtr.IsValid()){
-		return QStringLiteral(R"(DELETE FROM "%1";)").arg(*m_tableNameAttrPtr).toUtf8();
-	}
-
-	return QStringLiteral(R"(DELETE FROM %0."%1";)")
-			.arg(*m_tableSchemaAttrPtr, *m_tableNameAttrPtr).toUtf8();
+	return QStringLiteral(R"(DELETE FROM %0"%1";)")
+			.arg(GetTableSchemePrefix(), *m_tableNameAttrPtr).toUtf8();
 }
 
 
@@ -325,23 +308,8 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetTableScheme() const
 		// queries against the sentinel schema will fail instead of leaking shared data
 		static const QByteArray deniedSchemaName = QByteArrayLiteral("imt_tenant_storage_denied");
 
-		QByteArray tenantId = imtbase::CTenantContextScope::GetCurrentTenantId();
-		if (tenantId.isEmpty()){
-			SendErrorMessage(0, QStringLiteral("Tenant storage access denied for table '%1': no tenant context is active").arg(QString(GetTableName())), "CSqlDatabaseObjectDelegateCompBase");
-
-			return deniedSchemaName;
-		}
-
 		imtdb::TenantStorageInfo storageInfo;
-		if (!m_tenantStorageResolverCompPtr->ResolveTenantStorage(tenantId, storageInfo)){
-			SendErrorMessage(0, QStringLiteral("Tenant storage access denied for table '%1': storage of tenant '%2' could not be resolved").arg(QString(GetTableName()), QString(tenantId)), "CSqlDatabaseObjectDelegateCompBase");
-
-			return deniedSchemaName;
-		}
-
-		if (storageInfo.status != imtdb::TSS_ACTIVE && storageInfo.status != imtdb::TSS_MIGRATING){
-			SendErrorMessage(0, QStringLiteral("Tenant storage access denied for table '%1': storage of tenant '%2' is not active").arg(QString(GetTableName()), QString(tenantId)), "CSqlDatabaseObjectDelegateCompBase");
-
+		if (!ResolveCurrentTenantStorage(storageInfo)){
 			return deniedSchemaName;
 		}
 
@@ -378,11 +346,47 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::CreateRestoreObjectSetQuery(
 
 QString CSqlDatabaseObjectDelegateCompBase::GetBaseSelectionQuery() const
 {
-	if (!m_tableSchemaAttrPtr.IsValid()){
-		return QStringLiteral(R"(SELECT * FROM "%1")").arg(*m_tableNameAttrPtr);
+	return QStringLiteral(R"(SELECT * FROM %0"%1")").arg(GetTableSchemePrefix(), *m_tableNameAttrPtr);
+}
+
+
+bool CSqlDatabaseObjectDelegateCompBase::ResolveCurrentTenantStorage(imtdb::TenantStorageInfo& storageInfo) const
+{
+	if (!m_tenantStorageResolverCompPtr.IsValid()){
+		return false;
 	}
 
-	return QStringLiteral(R"(SELECT * FROM %0."%1")").arg(*m_tableSchemaAttrPtr, *m_tableNameAttrPtr);
+	QByteArray tenantId = imtbase::CTenantContextScope::GetCurrentTenantId();
+	if (tenantId.isEmpty()){
+		SendErrorMessage(0, QStringLiteral("Tenant storage access denied for table '%1': no tenant context is active").arg(QString(GetTableName())), "CSqlDatabaseObjectDelegateCompBase");
+
+		return false;
+	}
+
+	if (!m_tenantStorageResolverCompPtr->ResolveTenantStorage(tenantId, storageInfo)){
+		SendErrorMessage(0, QStringLiteral("Tenant storage access denied for table '%1': storage of tenant '%2' could not be resolved").arg(QString(GetTableName()), QString(tenantId)), "CSqlDatabaseObjectDelegateCompBase");
+
+		return false;
+	}
+
+	if (storageInfo.status != imtdb::TSS_ACTIVE && storageInfo.status != imtdb::TSS_MIGRATING){
+		SendErrorMessage(0, QStringLiteral("Tenant storage access denied for table '%1': storage of tenant '%2' is not active").arg(QString(GetTableName()), QString(tenantId)), "CSqlDatabaseObjectDelegateCompBase");
+
+		return false;
+	}
+
+	return true;
+}
+
+
+QString CSqlDatabaseObjectDelegateCompBase::GetTableSchemePrefix() const
+{
+	const QByteArray tableScheme = GetTableScheme();
+	if (tableScheme.isEmpty()){
+		return QString();
+	}
+
+	return QString(tableScheme) + '.';
 }
 
 

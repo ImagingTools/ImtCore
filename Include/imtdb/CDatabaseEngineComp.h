@@ -19,6 +19,7 @@
 
 // std includes
 #include <atomic>
+#include <map>
 #include <set>
 
 
@@ -31,7 +32,11 @@ class CDatabaseEngineAttr: public ilog::CLoggerComponentBase
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 	I_BEGIN_COMPONENT(CDatabaseEngineAttr);
+		I_ASSIGN(m_tenantSessionVariableAttrPtr, "TenantSessionVariable", "Postgres session variable (e.g. 'app.tenant_id') synchronized with the tenant context of the current thread before each statement, used by tenant Row-Level Security policies. Empty disables the binding", false, "");
 	I_END_COMPONENT;
+
+protected:
+	I_ATTR(QByteArray, m_tenantSessionVariableAttrPtr);
 };
 
 
@@ -116,6 +121,14 @@ private:
 	bool EnsureDatabaseConnected(QSqlError* sqlError = nullptr) const;
 
 	/**
+		Bind the tenant of the current thread's context to the tenant session variable of the
+		thread's connection, if it differs from the last bound value.
+		\return \c false if the binding failed; the caller must not execute the statement then.
+	*/
+	bool EnsureTenantSessionBound(QSqlError* sqlError = nullptr) const;
+	void ForgetBoundTenantSession() const;
+
+	/**
 		Ensure that the database is created and ready to use.
 	*/
 	bool EnsureDatabaseCreated() const;
@@ -176,6 +189,11 @@ private:
 
 	mutable std::mutex m_connectedThreadsMutex;
 	mutable std::set<quintptr> m_connectedThreads;
+
+	// validated bind statement; empty if the tenant session binding is disabled
+	QByteArray m_bindTenantSessionQuery;
+	mutable std::mutex m_boundTenantsMutex;
+	mutable std::map<QString, QByteArray> m_boundTenants;
 	mutable std::atomic<bool> m_shuttingDown{false};
 };
 

@@ -48,8 +48,15 @@ public:
 	virtual bool LoadTenantStorageAssignments() override;
 
 private:
+	QByteArray GetSchemaNamePrefix() const;
+	QByteArray GetRegistryTableSchema() const;
+	QByteArray GetDefaultTablespace() const;
+	bool IsAutoCreateRegistryTable() const;
+	bool IsDropStorageOnDeprovision() const;
 	bool IsPostgresDriver() const;
+	bool SchemaExists(const QByteArray& schemaName, bool& exists) const;
 	bool CreateTenantSchema(const QByteArray& schemaName) const;
+	void DropTenantSchema(const QByteArray& schemaName) const;
 	bool ExecuteDdlScripts(const QByteArray& schemaName) const;
 	bool SetDefaultTablespace(const QByteArray& tablespaceName) const;
 	bool PersistAssignment(const QByteArray& tenantId, const TenantStorageInfo& info) const;

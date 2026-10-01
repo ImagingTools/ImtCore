@@ -75,6 +75,11 @@ protected:
 	virtual bool TableExists(const QString& tableName) const;
 	virtual QByteArray CreateOperationDescriptionQuery(const QByteArray& objectId, const imtbase::IOperationContext* operationContextPtr) const;
 
+	/**
+		Quoted name of the document table; qualified with the tenant schema if a tenant storage resolver is set.
+	*/
+	QString GetDocumentTableName() const;
+
 protected:
 	I_ATTR(bool, m_isMultiTypeAttrPtr);
 };

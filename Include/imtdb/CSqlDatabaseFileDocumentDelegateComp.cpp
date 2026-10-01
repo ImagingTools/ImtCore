@@ -31,6 +31,17 @@ namespace
 }
 
 
+const QString CSqlDatabaseFileDocumentDelegateComp::s_tenantStoresFolderName = QStringLiteral("tenants");
+
+
+// public static methods
+
+QString CSqlDatabaseFileDocumentDelegateComp::GetTenantStorePath(const QString& storageRootPath, const QByteArray& schemaName)
+{
+	return QDir(storageRootPath).filePath(s_tenantStoresFolderName + '/' + QString::fromLatin1(schemaName));
+}
+
+
 // reimplemented (imtdb::CSqlDatabaseDocumentDelegateCompBase)
 
 bool CSqlDatabaseFileDocumentDelegateComp::WriteDataToMemory(
@@ -74,6 +85,10 @@ bool CSqlDatabaseFileDocumentDelegateComp::WriteDataToMemory(
 				QCryptographicHash::Sha256).toHex();
 
 	const QString targetFilePath = GetContentFilePath(contentHash);
+	if (targetFilePath.isEmpty()){
+		return false;
+	}
+
 	const QFileInfo targetInfo(targetFilePath);
 
 	// The modification time of stored content is its reuse lease: the garbage
@@ -141,7 +156,12 @@ bool CSqlDatabaseFileDocumentDelegateComp::ReadDataFromMemory(
 		return false;
 	}
 
-	QFile contentFile(GetContentFilePath(expectedHash));
+	const QString contentFilePath = GetContentFilePath(expectedHash);
+	if (contentFilePath.isEmpty()){
+		return false;
+	}
+
+	QFile contentFile(contentFilePath);
 	if (!contentFile.open(QIODevice::ReadOnly)){
 		SendErrorMessage(0, QString("Referenced document content '%1' is missing").arg(contentFile.fileName()),
 					"CSqlDatabaseFileDocumentDelegateComp");
@@ -247,8 +267,22 @@ bool CSqlDatabaseFileDocumentDelegateComp::RefreshContentLease(const QString& ta
 
 QString CSqlDatabaseFileDocumentDelegateComp::GetContentFilePath(const QByteArray& contentHashHex) const
 {
+	QString storePath = m_storageRootCompPtr->GetPath();
+
+	if (m_tenantStorageResolverCompPtr.IsValid()){
+		imtdb::TenantStorageInfo storageInfo;
+		if (!ResolveCurrentTenantStorage(storageInfo)){
+			// fail-closed: without a path no content of another tenant can be written or read
+			return QString();
+		}
+
+		if (storageInfo.storageKind == TSK_OWN_SCHEMA){
+			storePath = GetTenantStorePath(storePath, storageInfo.schemaName);
+		}
+	}
+
 	// Two-character fan-out keeps single folder sizes manageable at scale.
-	return QDir(m_storageRootCompPtr->GetPath()).filePath(
+	return QDir(storePath).filePath(
 				QString("%1/%2%3")
 					.arg(QString::fromLatin1(contentHashHex.left(2)),
 						QString::fromLatin1(contentHashHex),

@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtCore/QFile>
 #include <QtSql/QSqlError>
+#include <QtSql/QSqlQuery>
 
 // ImtCore includes
 #include <imtdb/imtdb.h>
@@ -34,11 +35,15 @@ bool CTenantStorageProvisionerComp::ProvisionTenantStorage(const QByteArray& ten
 	TenantStorageInfo info;
 	info.status = TSS_ACTIVE;
 
+	// set only if the schema did not exist before, so a failure never drops pre-existing tenant data
+	QByteArray createdSchemaName;
+
 	if (IsPostgresDriver()){
 		info.storageKind = TSK_OWN_SCHEMA;
-		info.schemaName = CTenantStorageRegistry::CreateSchemaName(*m_schemaNamePrefixAttrPtr, tenantId);
+		info.schemaName = CTenantStorageRegistry::CreateSchemaName(GetSchemaNamePrefix(), tenantId);
 
-		if (!CreateTenantSchema(info.schemaName)){
+		bool schemaExisted = false;
+		if (!SchemaExists(info.schemaName, schemaExisted) || !CreateTenantSchema(info.schemaName)){
 			SendErrorMessage(
 						0,
 						QStringLiteral("Failed to create schema '%1' for tenant '%2'").arg(QString(info.schemaName)).arg(QString(tenantId)),
@@ -47,18 +52,24 @@ bool CTenantStorageProvisionerComp::ProvisionTenantStorage(const QByteArray& ten
 			return false;
 		}
 
-		if (!SetDefaultTablespace(*m_defaultTablespaceAttrPtr)){
+		if (!schemaExisted){
+			createdSchemaName = info.schemaName;
+		}
+
+		if (!SetDefaultTablespace(GetDefaultTablespace())){
 			SendErrorMessage(
 						0,
-						QStringLiteral("Failed to set the default tablespace '%1' for tenant '%2'").arg(QString(*m_defaultTablespaceAttrPtr)).arg(QString(tenantId)),
+						QStringLiteral("Failed to set the default tablespace '%1' for tenant '%2'").arg(QString(GetDefaultTablespace())).arg(QString(tenantId)),
 						"CTenantStorageProvisionerComp");
+
+			DropTenantSchema(createdSchemaName);
 
 			return false;
 		}
 
 		bool ddlSucceeded = ExecuteDdlScripts(info.schemaName);
 
-		if (!m_defaultTablespaceAttrPtr->isEmpty()){
+		if (!GetDefaultTablespace().isEmpty()){
 			QSqlError sqlError;
 			m_databaseEngineCompPtr->ExecSqlQuery(QByteArrayLiteral("RESET default_tablespace"), &sqlError);
 		}
@@ -68,6 +79,8 @@ bool CTenantStorageProvisionerComp::ProvisionTenantStorage(const QByteArray& ten
 						0,
 						QStringLiteral("Failed to execute DDL scripts in schema '%1' for tenant '%2'").arg(QString(info.schemaName)).arg(QString(tenantId)),
 						"CTenantStorageProvisionerComp");
+
+			DropTenantSchema(createdSchemaName);
 
 			return false;
 		}
@@ -84,12 +97,16 @@ bool CTenantStorageProvisionerComp::ProvisionTenantStorage(const QByteArray& ten
 					QStringLiteral("Failed to persist storage assignment for tenant '%1'").arg(QString(tenantId)),
 					"CTenantStorageProvisionerComp");
 
+		DropTenantSchema(createdSchemaName);
+
 		return false;
 	}
 
 	if (!m_storageResolverCompPtr->RegisterTenantStorage(tenantId, info)){
-		CTenantStorageDbStore store(*m_databaseEngineCompPtr, *m_registryTableSchemaAttrPtr);
+		CTenantStorageDbStore store(*m_databaseEngineCompPtr, GetRegistryTableSchema());
 		store.RemoveAssignment(tenantId);
+
+		DropTenantSchema(createdSchemaName);
 
 		return false;
 	}
@@ -121,7 +138,7 @@ bool CTenantStorageProvisionerComp::DeprovisionTenantStorage(const QByteArray& t
 		return false;
 	}
 
-	if (*m_dropStorageOnDeprovisionAttrPtr && (info.storageKind == TSK_OWN_SCHEMA) && IsPostgresDriver() && !info.schemaName.isEmpty()){
+	if (IsDropStorageOnDeprovision() && (info.storageKind == TSK_OWN_SCHEMA) && IsPostgresDriver() && !info.schemaName.isEmpty()){
 		QByteArray query = QByteArrayLiteral("DROP SCHEMA IF EXISTS \"") + info.schemaName + QByteArrayLiteral("\" CASCADE");
 
 		QSqlError sqlError;
@@ -144,7 +161,7 @@ bool CTenantStorageProvisionerComp::DeprovisionTenantStorage(const QByteArray& t
 					"CTenantStorageProvisionerComp");
 	}
 
-	CTenantStorageDbStore store(*m_databaseEngineCompPtr, *m_registryTableSchemaAttrPtr);
+	CTenantStorageDbStore store(*m_databaseEngineCompPtr, GetRegistryTableSchema());
 	if (!store.RemoveAssignment(tenantId)){
 		SendErrorMessage(
 					0,
@@ -167,9 +184,9 @@ bool CTenantStorageProvisionerComp::DeprovisionTenantStorage(const QByteArray& t
 
 bool CTenantStorageProvisionerComp::LoadTenantStorageAssignments()
 {
-	CTenantStorageDbStore store(*m_databaseEngineCompPtr, *m_registryTableSchemaAttrPtr);
+	CTenantStorageDbStore store(*m_databaseEngineCompPtr, GetRegistryTableSchema());
 
-	if (*m_autoCreateRegistryTableAttrPtr && !store.EnsureRegistryTable()){
+	if (IsAutoCreateRegistryTable() && !store.EnsureRegistryTable()){
 		SendErrorMessage(0, QStringLiteral("Failed to create the TenantStorage registry table"), "CTenantStorageProvisionerComp");
 
 		return false;
@@ -206,9 +223,62 @@ bool CTenantStorageProvisionerComp::LoadTenantStorageAssignments()
 
 // private methods
 
+QByteArray CTenantStorageProvisionerComp::GetSchemaNamePrefix() const
+{
+	return m_schemaNamePrefixAttrPtr.IsValid() ? *m_schemaNamePrefixAttrPtr : QByteArrayLiteral("tenant_");
+}
+
+
+QByteArray CTenantStorageProvisionerComp::GetRegistryTableSchema() const
+{
+	return m_registryTableSchemaAttrPtr.IsValid() ? *m_registryTableSchemaAttrPtr : QByteArray();
+}
+
+
+QByteArray CTenantStorageProvisionerComp::GetDefaultTablespace() const
+{
+	return m_defaultTablespaceAttrPtr.IsValid() ? *m_defaultTablespaceAttrPtr : QByteArray();
+}
+
+
+bool CTenantStorageProvisionerComp::IsAutoCreateRegistryTable() const
+{
+	return m_autoCreateRegistryTableAttrPtr.IsValid() ? *m_autoCreateRegistryTableAttrPtr : true;
+}
+
+
+bool CTenantStorageProvisionerComp::IsDropStorageOnDeprovision() const
+{
+	return m_dropStorageOnDeprovisionAttrPtr.IsValid() ? *m_dropStorageOnDeprovisionAttrPtr : false;
+}
+
+
 bool CTenantStorageProvisionerComp::IsPostgresDriver() const
 {
 	return m_databaseEngineCompPtr->GetDatabaseDriverId().startsWith(QByteArrayLiteral("QPSQL"));
+}
+
+
+bool CTenantStorageProvisionerComp::SchemaExists(const QByteArray& schemaName, bool& exists) const
+{
+	exists = false;
+
+	QVariantMap bindValues;
+	bindValues[QStringLiteral(":schemaName")] = QString(schemaName);
+
+	QSqlError sqlError;
+	QSqlQuery query = m_databaseEngineCompPtr->ExecSqlQuery(
+				QByteArrayLiteral("SELECT 1 FROM information_schema.schemata WHERE schema_name = :schemaName"),
+				bindValues,
+				&sqlError,
+				true);
+	if (sqlError.type() != QSqlError::NoError){
+		return false;
+	}
+
+	exists = query.next();
+
+	return true;
 }
 
 
@@ -220,6 +290,25 @@ bool CTenantStorageProvisionerComp::CreateTenantSchema(const QByteArray& schemaN
 	m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
 
 	return sqlError.type() == QSqlError::NoError;
+}
+
+
+void CTenantStorageProvisionerComp::DropTenantSchema(const QByteArray& schemaName) const
+{
+	if (schemaName.isEmpty()){
+		return;
+	}
+
+	QByteArray query = QByteArrayLiteral("DROP SCHEMA IF EXISTS \"") + schemaName + QByteArrayLiteral("\" CASCADE");
+
+	QSqlError sqlError;
+	m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		SendErrorMessage(
+					0,
+					QStringLiteral("Rollback of the partially provisioned schema '%1' failed: %2").arg(QString(schemaName), sqlError.text()),
+					"CTenantStorageProvisionerComp");
+	}
 }
 
 
@@ -291,9 +380,9 @@ bool CTenantStorageProvisionerComp::ExecuteDdlScripts(const QByteArray& schemaNa
 
 bool CTenantStorageProvisionerComp::PersistAssignment(const QByteArray& tenantId, const TenantStorageInfo& info) const
 {
-	CTenantStorageDbStore store(*m_databaseEngineCompPtr, *m_registryTableSchemaAttrPtr);
+	CTenantStorageDbStore store(*m_databaseEngineCompPtr, GetRegistryTableSchema());
 
-	if (*m_autoCreateRegistryTableAttrPtr && !store.EnsureRegistryTable()){
+	if (IsAutoCreateRegistryTable() && !store.EnsureRegistryTable()){
 		return false;
 	}
 

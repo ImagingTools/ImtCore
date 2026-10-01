@@ -618,4 +618,14 @@ void CTenantStorageResolverTest::testRlsBindAndUnbindQueries()
 }
 
 
+void CTenantStorageResolverTest::testRlsCrossTenantCatalogTables()
+{
+	QVERIFY(imtdb::CTenantRlsPolicyBuilder::IsCrossTenantCatalogTable(QByteArrayLiteral("CrossOrgGrants")));
+	QVERIFY(imtdb::CTenantRlsPolicyBuilder::IsCrossTenantCatalogTable(QByteArrayLiteral("TenantMemberships")));
+	QVERIFY(imtdb::CTenantRlsPolicyBuilder::IsCrossTenantCatalogTable(QByteArrayLiteral("tenantstorage")));
+	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsCrossTenantCatalogTable(QByteArrayLiteral("Documents")));
+	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsCrossTenantCatalogTable(QByteArrayLiteral("TenantsArchive")));
+}
+
+
 I_ADD_TEST(CTenantStorageResolverTest);

@@ -93,6 +93,18 @@ public:
 protected:
 	virtual bool IsSqliteDriver() const;
 	virtual QString GetBaseSelectionQuery() const;
+
+	/**
+		Schema qualifier ("schema.") of the collection table resolved via GetTableScheme(), empty if no schema is set.
+		SQL of tenant-owned tables must be built with it, so the tenant storage resolution applies.
+	*/
+	QString GetTableSchemePrefix() const;
+
+	/**
+		Resolve the active storage of the tenant of the current thread's context (fail-closed, audit-logged).
+		\return \c false if no resolver is set, no tenant context is active, or the storage is unknown or not active.
+	*/
+	bool ResolveCurrentTenantStorage(imtdb::TenantStorageInfo& storageInfo) const;
 	virtual idoc::IDocumentMetaInfo* CreateCollectionItemMetaInfo(const QByteArray& typeId) const;
 	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const;
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const;

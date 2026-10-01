@@ -16,6 +16,9 @@ namespace imtdb
 /**
 	Controller enforcing tenant Row-Level Security on shared database tables
 	as a second line of defense next to the physical schema separation.
+	The tenant session variable read by the policies is bound by the database engine
+	(\c CDatabaseEngineComp attribute \c TenantSessionVariable) before each statement,
+	from the tenant context of the executing thread.
 */
 class ITenantRlsController: virtual public istd::IChangeable
 {
@@ -26,21 +29,6 @@ public:
 		\return \c true if the policies were applied to every table.
 	*/
 	virtual bool ApplyRowLevelSecurity() = 0;
-
-	/**
-		Bind the given tenant ID to the tenant session variable of the current
-		database session, activating the isolation policies for subsequent queries.
-		\param tenantId ID of the tenant. Must not be empty.
-		\return \c true if the session variable was set.
-	*/
-	virtual bool BindSessionTenant(const QByteArray& tenantId) = 0;
-
-	/**
-		Clear the tenant session variable of the current database session.
-		Subsequent queries on protected tables will not match any rows (fail-closed).
-		\return \c true if the session variable was cleared.
-	*/
-	virtual bool UnbindSessionTenant() = 0;
 };
 
 

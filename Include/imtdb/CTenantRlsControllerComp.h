@@ -38,8 +38,6 @@ public:
 
 	// reimplemented (imtdb::ITenantRlsController)
 	virtual bool ApplyRowLevelSecurity() override;
-	virtual bool BindSessionTenant(const QByteArray& tenantId) override;
-	virtual bool UnbindSessionTenant() override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
