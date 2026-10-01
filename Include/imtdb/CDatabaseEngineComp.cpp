@@ -652,7 +652,7 @@ bool CDatabaseEngineComp::ApplyTenantSecurityContext(QSqlDatabase& databaseConne
 	const imtbase::CTenantSecurityContext context = imtbase::CTenantSecurityContext::GetCurrentContext();
 
 	QSqlQuery contextQuery(databaseConnection);
-	contextQuery.prepare(CTenantRlsPolicyBuilder::CreateContextSyncQuery());
+	contextQuery.prepare(QString(CTenantRlsPolicyBuilder::CreateContextSyncQuery()));
 	contextQuery.bindValue(QStringLiteral(":TenantId"), QString(context.GetTenantId()));
 	contextQuery.bindValue(QStringLiteral(":UserId"), QString(context.GetUserId()));
 	contextQuery.bindValue(QStringLiteral(":SystemContext"), context.IsSystemContext() ? QStringLiteral("on") : QStringLiteral("off"));
