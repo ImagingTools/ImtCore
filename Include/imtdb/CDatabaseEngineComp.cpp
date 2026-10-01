@@ -8,6 +8,10 @@
 #include <QtCore/QThread>
 #include <QtCore/QUuid>
 
+// ImtCore includes
+#include <imtbase/CTenantSecurityContextScope.h>
+#include <imtdb/CTenantRlsPolicyBuilder.h>
+
 
 namespace imtdb
 {
@@ -73,6 +77,9 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 	}
 
 	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
+	if (!ApplyTenantSecurityContext(databaseConnection, sqlErrorPtr)){
+		return QSqlQuery();
+	}
 
 	QSqlQuery retVal(databaseConnection);
 
@@ -118,6 +125,9 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(
 	}
 
 	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
+	if (!ApplyTenantSecurityContext(databaseConnection, sqlError)){
+		return QSqlQuery();
+	}
 
 	QSqlQuery retVal(databaseConnection);
 
@@ -345,6 +355,9 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 	if (!m_migrationControllerCompPtr.IsValid()){
 		return false;
 	}
+
+	// Database migrations are trusted administrative operations and must not be restricted by tenant isolation.
+	imtbase::CTenantSecurityContextScope systemContextScope(imtbase::CTenantSecurityContext::CreateSystemContext());
 
 	int newRevision;
 	int databaseVersion = GetDatabaseVersion();
@@ -621,6 +634,41 @@ bool CDatabaseEngineComp::CreateDatabaseMetaInfo() const
 	}
 
 	return true;
+}
+
+
+bool CDatabaseEngineComp::ApplyTenantSecurityContext(QSqlDatabase& databaseConnection, QSqlError* sqlErrorPtr) const
+{
+	if (!*m_tenantSecurityContextEnabledAttrPtr){
+		return true;
+	}
+
+	if (GetDatabaseDriverId().compare(QByteArrayLiteral("QPSQL"), Qt::CaseInsensitive) != 0){
+		return true;
+	}
+
+	// The context is applied before every query (no caching), because session settings changed inside of a rolled back
+	// transaction are reverted by PostgreSQL and a stale context of a previous request could be used otherwise.
+	const imtbase::CTenantSecurityContext context = imtbase::CTenantSecurityContext::GetCurrentContext();
+
+	QSqlQuery contextQuery(databaseConnection);
+	contextQuery.prepare(CTenantRlsPolicyBuilder::CreateContextSyncQuery());
+	contextQuery.bindValue(QStringLiteral(":TenantId"), QString(context.GetTenantId()));
+	contextQuery.bindValue(QStringLiteral(":UserId"), QString(context.GetUserId()));
+	contextQuery.bindValue(QStringLiteral(":SystemContext"), context.IsSystemContext() ? QStringLiteral("on") : QStringLiteral("off"));
+
+	if (contextQuery.exec()){
+		return true;
+	}
+
+	const QSqlError queryError = contextQuery.lastError();
+	if (sqlErrorPtr != nullptr){
+		*sqlErrorPtr = queryError;
+	}
+
+	SendErrorMessage(0, QStringLiteral("Tenant security context could not be applied to the database session: '%1'. Query was not executed").arg(queryError.text()), __FILE__);
+
+	return false;
 }
 
 

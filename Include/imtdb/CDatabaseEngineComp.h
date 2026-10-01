@@ -65,6 +65,7 @@ public:
 		I_ASSIGN(m_autoCreateTablesAttrPtr, "AutoCreateTables", "The property holds behavior to create tables on startup.\n Possible values:\n0 - will not create new tables;\n1 - will create tables once;\n2 - will create tables at each startup", true, 1);
 		I_ASSIGN(m_portAttrPtr, "Port", "The property holds connection's port number", true, 5432);
 		I_ASSIGN(m_migrationControllerCompPtr, "MigrationController", "Migration controller", false, "MigrationController");
+		I_ASSIGN(m_tenantSecurityContextEnabledAttrPtr, "PropagateTenantSecurityContext", "If enabled, the tenant security context of the current thread (see imtbase::CTenantSecurityContext) is passed to the PostgreSQL session before each query. Required for the tenant Row Level Security policies (see imtdb::CTenantRowLevelSecurityControllerComp)", true, false);
 	I_END_COMPONENT;
 
 	CDatabaseEngineComp();
@@ -146,6 +147,12 @@ private:
 
 	QString GetConnectionOptionsString(const QByteArray& databaseDriverId) const;
 
+	/**
+		Pass the tenant security context of the current thread to the database session.
+		\return \c true if the context was applied or no context propagation is required.
+	*/
+	bool ApplyTenantSecurityContext(QSqlDatabase& databaseConnection, QSqlError* sqlErrorPtr) const;
+
 	template <typename Interface>
 	static Interface* ExtractDatabaseAccessSettings(CDatabaseEngineComp& component)
 	{
@@ -169,6 +176,7 @@ private:
 	I_ATTR(int, m_autoCreateTablesAttrPtr);
 	I_ATTR(int, m_portAttrPtr);
 	I_REF(imtdb::IMigrationController, m_migrationControllerCompPtr);
+	I_ATTR(bool, m_tenantSecurityContextEnabledAttrPtr);
 
 	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CDatabaseEngineComp> m_databaseAccessObserver;
 
