@@ -1356,13 +1356,13 @@ QString CSqlDatabaseDocumentDelegateCompBase::GetBaseSelectionQuery() const
 				root.*,
 				root1."%6" as "%7" %5
 			FROM %2"%3" as root
-			-- No LIMIT on the derived table: revision 1 is already one row per document, and
-			-- limiting it to a single row left every other document with a NULL "Added".
+			-- A document can have several revision-1 rows (e.g. inactive leftovers); the earliest one is taken so the join never multiplies rows.
 			LEFT JOIN (
-				SELECT
+				SELECT DISTINCT ON ("%8")
 					"%8", "%6", "%9"
 				FROM %2"%3"
 				WHERE %1 = 1
+				ORDER BY "%8", "%6"
 			) AS root1 ON root1."%8" = root."%8"
 			%4)")
 					.arg(
@@ -2109,10 +2109,11 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::GetObjectSelectionQuery(const Q
 			SELECT root.*, root1."TimeStamp" as "Added"
 			FROM %1 "%2" as root
 			LEFT JOIN (
-				SELECT
+				SELECT DISTINCT ON ("%4")
 					"%4", "%5"
 				FROM %1 "%2"
 				WHERE %7 = 1
+				ORDER BY "%4", "%5"
 			) AS root1 ON root1."%4" = root."%4"
 			WHERE (%3) AND root."%4" = '%6' ORDER BY %8 DESC)")
 			.arg(
