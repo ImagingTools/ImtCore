@@ -39,7 +39,10 @@ ICollectionInfo::Ids CCollectionInfoAdapterComp::GetElementIds(
 		return retVal;
 	}
 
-	int lastIndex = (count >= 0) ? qMin(offset + count, optionsCount) : optionsCount;
+int lastIndex = optionsCount;
+	if (count >= 0){
+		lastIndex = offset + qMin(count, optionsCount - offset);
+	}
 	for (int i = offset; i < lastIndex; i++){
 		retVal += m_optionsListCompPtr->GetOptionId(i);
 	}
