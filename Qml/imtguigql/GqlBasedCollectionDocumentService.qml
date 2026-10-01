@@ -7,7 +7,7 @@ import imtbaseUndoManagerSdl 1.0
 DocumentServiceBase {
 	id: root
 
-	property string context: ""
+	property var permissionPaths: ({})
 	property string collectionId
 
 	property CollectionId collectionIdObj: CollectionId{
@@ -301,7 +301,7 @@ DocumentServiceBase {
 	property UndoRedoInput undoRedoInput: UndoRedoInput {}
 
 	property GqlSdlRequestSender getOpenedDocumentListRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_getOpenedDocumentList
 		sdlObjectComp: Component {
 			DocumentList {
@@ -317,7 +317,7 @@ DocumentServiceBase {
 	}
 
 	property GqlSdlRequestSender openDocumentRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_openDocument
 		requestType: 1
 		sdlObjectComp: Component {
@@ -340,7 +340,7 @@ DocumentServiceBase {
 	}
 
 	property GqlSdlRequestSender createDocumentRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_createNewDocument
 		requestType: 1
 		sdlObjectComp: Component {
@@ -364,7 +364,7 @@ DocumentServiceBase {
 	}
 
 	property GqlSdlRequestSender saveDocumentRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_saveDocument
 		requestType: 1
 		sdlObjectComp: Component {
@@ -387,7 +387,7 @@ DocumentServiceBase {
 	}
 
 	property GqlSdlRequestSender closeDocumentRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_closeDocument
 		requestType: 1
 		sdlObjectComp: Component {
@@ -410,7 +410,7 @@ DocumentServiceBase {
 	}
 
 	property GqlSdlRequestSender doUndoRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_doUndo
 		requestType: 1
 
@@ -434,7 +434,7 @@ DocumentServiceBase {
 	}
 
 	property GqlSdlRequestSender doRedoRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_doRedo
 		requestType: 1
 
@@ -458,7 +458,7 @@ DocumentServiceBase {
 	}
 
 	property GqlSdlRequestSender getUndoInfoRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPaths[gqlCommandId] || ""
 		gqlCommandId: ImtbaseCollectionDocumentServiceSdlCommandIds.s_getUndoInfo
 		sdlObjectComp: Component {
 			UndoInfo {

@@ -10,7 +10,7 @@ import imtcontrols 1.0
 Rectangle{
 	id: treeBody
 
-	property string context: ""
+	property string permissionPath: ""
 	clip: true
 	radius: 20;
 	color: Style.color_menu;
@@ -46,7 +46,7 @@ Rectangle{
 	property Component additionalDelegateComp: Component{Item{}}
 
 	property GqlSdlRequestSender addressTreeRequest : GqlSdlRequestSender {
-		context: treeBody.context
+		permissionPath: treeBody.permissionPath
 		property string parentIds: "";
 		property string idsToOpen: "";
 		property int insertIndex: -1;

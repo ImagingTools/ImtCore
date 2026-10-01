@@ -248,7 +248,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>ViewUsers</Value>
-                                            <Value>ViewOrganizationMembers</Value>
+                                            <Value>/MemberManagement/ViewOrganizationMembers</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -285,7 +285,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>ChangeUser</Value>
-                                            <Value>ChangeOrganizationMember</Value>
+                                            <Value>/MemberManagement/EditOrganizationMember/ChangeOrganizationMember</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

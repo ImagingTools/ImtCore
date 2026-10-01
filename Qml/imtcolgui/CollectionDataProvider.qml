@@ -7,7 +7,7 @@ import imtguigql 1.0
 QtObject {
 	id: container;
 
-	property string context: ""
+	property string permissionPath: ""
 	property TreeItemModel collectionModel: TreeItemModel {};
 	property TreeItemModel notificationModel: TreeItemModel {};
 
@@ -114,7 +114,7 @@ QtObject {
 	}
 
 	property GqlRequestSender itemsInfoModel: GqlRequestSender {
-		context: container.context
+		permissionPath: container.permissionPath
 		requestType: 0; // Query
 		gqlCommandId: container.commandId;
 

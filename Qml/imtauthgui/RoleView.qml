@@ -17,6 +17,8 @@ ViewBase {
 	
 	property string productId: "";
 	property string tenantId: "";
+	// Part of the product this view works in; scopes its permission checks.
+	property string permissionPath: "";
 	property var permissionsProvider: null;
 
 	property bool __permissionsRequested: false
