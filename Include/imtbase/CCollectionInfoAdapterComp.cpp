@@ -45,7 +45,7 @@ ICollectionInfo::Ids CCollectionInfoAdapterComp::GetElementIds(
 		return retVal;
 	}
 
-int lastIndex = optionsCount;
+	int lastIndex = optionsCount;
 	if (count >= 0){
 		lastIndex = offset + qMin(count, optionsCount - offset);
 	}
