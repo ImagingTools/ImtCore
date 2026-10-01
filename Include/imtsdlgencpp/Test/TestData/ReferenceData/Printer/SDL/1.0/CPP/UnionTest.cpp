@@ -2308,7 +2308,7 @@ void CLinkObject::SetStatusList(const QVariant& v)
 		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::LinkStatus>();
 		const int key = metaEnum.keyToValue(tempValue.toString().toUtf8());
 		if (key < 0){continue;}
-		istd::TNullableValue<LinkStatus> tempItem(static_cast<LinkStatus>(key));
+		istd::TNullableValue<sdl::V1_0::modsdl::LinkStatus> tempItem(static_cast<sdl::V1_0::modsdl::LinkStatus>(key));
 		CLink::statusList->append(tempItem);
 	}
 
@@ -3228,7 +3228,11 @@ CGetSpecificationsGqlRequest::CGetSpecificationsGqlRequest(const ::imtgql::CGqlR
 	// reading requested fields
 	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
 	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(gqlRequest.GetFields().GetFieldIds().constFirst());
+		requestedFieldsObjectPtr = &gqlRequest.GetFields();
+		const QByteArrayList topFieldIds = gqlRequest.GetFields().GetFieldIds();
+		if (topFieldIds.count() == 1 && topFieldIds.constFirst() == gqlRequest.GetCommandId()){
+			requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(topFieldIds.constFirst());
+		}
 		if (requestedFieldsObjectPtr != nullptr){
 			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
 		}
