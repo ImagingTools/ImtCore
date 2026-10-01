@@ -269,7 +269,7 @@ QString CSqlDatabaseFileDocumentDelegateComp::GetContentFilePath(const QByteArra
 {
 	QString storePath = m_storageRootCompPtr->GetPath();
 
-	if (m_tenantStorageResolverCompPtr.IsValid()){
+	if (m_tenantStorageResolverCompPtr.IsValid() && !IsSharedStorageAccess()){
 		imtdb::TenantStorageInfo storageInfo;
 		if (!ResolveCurrentTenantStorage(storageInfo)){
 			// fail-closed: without a path no content of another tenant can be written or read

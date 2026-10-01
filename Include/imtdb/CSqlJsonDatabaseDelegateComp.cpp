@@ -636,10 +636,7 @@ imtbase::IRevisionController::RevisionInfoList CSqlJsonDatabaseDelegateComp::Get
 
 QString CSqlJsonDatabaseDelegateComp::GetDocumentTableName() const
 {
-	// these queries were always unqualified, so the static TableSchema is not applied here
-	const QString schemaPrefix = m_tenantStorageResolverCompPtr.IsValid() ? GetTableSchemePrefix() : QString();
-
-	return schemaPrefix + '"' + QString::fromUtf8(*m_tableNameAttrPtr) + '"';
+	return GetTenantTableSchemePrefix() + '"' + QString::fromUtf8(*m_tableNameAttrPtr) + '"';
 }
 
 

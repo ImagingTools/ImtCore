@@ -161,5 +161,10 @@ I_EXPORT_COMPONENT(
 			"Backup and restore of dedicated Postgres tenant schemas",
 			"Tenant Storage Backup Restore Multi-Tenant Schema Database");
 
+I_EXPORT_COMPONENT(
+			TenantStorageAutoProvisioningResolver,
+			"Tenant storage resolver provisioning the storage of a tenant on its first access",
+			"Tenant Storage Resolver Provisioning Multi-Tenant Schema Database");
+
 
 } // namespace ImtDatabasePck

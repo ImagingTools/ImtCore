@@ -15,6 +15,7 @@
 #include <icomp/TSimComponentWrap.h>
 #include <ifile/CFileNameParamComp.h>
 
+#include <imtbase/CSharedStorageScope.h>
 #include <imtbase/CTenantContextScope.h>
 #include <imtdb/CDatabaseAccessSettingsComp.h>
 #include <imtdb/CDatabaseEngineComp.h>
@@ -27,6 +28,7 @@
 #include <imtdb/CTenantRlsControllerComp.h>
 #include <imtdb/CTenantSchemaMigrationControllerComp.h>
 #include <imtdb/CTenantStorageBackupComp.h>
+#include <imtdb/CTenantStorageAutoProvisioningResolverComp.h>
 #include <imtdb/CTenantStorageProvisionerComp.h>
 #include <imtdb/CTenantStorageResolverComp.h>
 
@@ -99,6 +101,7 @@ typedef icomp::TSimComponentWrap<imtdb::CTenantRlsControllerComp> TenantRlsContr
 typedef icomp::TSimComponentWrap<imtdb::CTenantStorageResolverComp> TenantStorageResolver;
 typedef icomp::TSimComponentWrap<imtdb::CTenantStorageProvisionerComp> TenantStorageProvisioner;
 typedef icomp::TSimComponentWrap<imtdb::CTenantDataMigratorComp> TenantDataMigrator;
+typedef icomp::TSimComponentWrap<imtdb::CTenantStorageAutoProvisioningResolverComp> AutoProvisioningResolver;
 typedef icomp::TSimComponentWrap<imtdb::CDatabaseAccessSettingsComp> DatabaseAccessSettings;
 typedef icomp::TSimComponentWrap<imtdb::CTenantStorageBackupComp> TenantStorageBackup;
 typedef icomp::TSimComponentWrap<imtdb::CSqlDatabaseDocumentDelegateComp> DocumentDelegate;
@@ -517,6 +520,54 @@ void CTenantIsolationPostgresTest::testProvisionerRollsBackFailedSchema()
 }
 
 
+void CTenantIsolationPostgresTest::testAutoProvisioningOnFirstAccess()
+{
+	std::shared_ptr<TenantStorageResolver> resolverPtr = CreateLoadedResolver(m_engineCompPtr);
+
+	std::shared_ptr<TenantStorageProvisioner> provisionerPtr = std::make_shared<TenantStorageProvisioner>();
+	provisionerPtr->SetRef("DatabaseEngine", m_engineCompPtr);
+	provisionerPtr->SetRef("StorageResolver", resolverPtr);
+	provisionerPtr->InitComponent();
+
+	std::shared_ptr<AutoProvisioningResolver> autoResolverPtr = std::make_shared<AutoProvisioningResolver>();
+	autoResolverPtr->SetRef("StorageResolver", resolverPtr);
+	autoResolverPtr->SetRef("StorageProvisioner", provisionerPtr);
+	autoResolverPtr->InitComponent();
+
+	// concurrent first accesses of the same tenant provision it exactly once and all succeed
+	QList<QFuture<bool>> accesses;
+	for (int index = 0; index < 8; ++index){
+		accesses.append(QtConcurrent::run([autoResolverPtr](){
+			imtdb::TenantStorageInfo storageInfo;
+			return autoResolverPtr->ResolveTenantStorage(QByteArrayLiteral("zeta"), storageInfo) && (storageInfo.schemaName == QByteArrayLiteral("tenant_zeta"));
+		}));
+	}
+
+	for (QFuture<bool>& access: accesses){
+		QVERIFY(access.result());
+	}
+
+	QCOMPARE(CountRows(QByteArrayLiteral("SELECT 1 FROM information_schema.schemata WHERE schema_name = 'tenant_zeta'")), 1);
+	QCOMPARE(CountRows(QByteArrayLiteral("SELECT 1 FROM \"TenantStorage\" WHERE \"TenantId\" = 'zeta' AND \"StorageKind\" = 1 AND \"Status\" = 2")), 1);
+
+	// a failed provisioning denies access instead of resolving anything
+	std::shared_ptr<TenantStorageProvisioner> failingProvisionerPtr = std::make_shared<TenantStorageProvisioner>();
+	failingProvisionerPtr->SetRef("DatabaseEngine", m_engineCompPtr);
+	failingProvisionerPtr->SetRef("StorageResolver", resolverPtr);
+	failingProvisionerPtr->InsertMultiAttr("DdlScriptPaths", QStringLiteral(":/Missing/CreateTenantTables.sql"));
+	failingProvisionerPtr->InitComponent();
+
+	std::shared_ptr<AutoProvisioningResolver> failingResolverPtr = std::make_shared<AutoProvisioningResolver>();
+	failingResolverPtr->SetRef("StorageResolver", resolverPtr);
+	failingResolverPtr->SetRef("StorageProvisioner", failingProvisionerPtr);
+	failingResolverPtr->InitComponent();
+
+	imtdb::TenantStorageInfo storageInfo;
+	QVERIFY(!failingResolverPtr->ResolveTenantStorage(QByteArrayLiteral("eta"), storageInfo));
+	QCOMPARE(CountRows(QByteArrayLiteral("SELECT 1 FROM information_schema.schemata WHERE schema_name = 'tenant_eta'")), 0);
+}
+
+
 void CTenantIsolationPostgresTest::testDataMigratorSeesRlsProtectedSourceRows()
 {
 	std::shared_ptr<TenantStorageResolver> resolverPtr = CreateLoadedResolver(m_engineCompPtr);
@@ -647,6 +698,15 @@ void CTenantIsolationPostgresTest::testDocumentDelegatesAddressTenantSchema()
 	// fail-closed without a tenant context
 	QVERIFY(deniedTable.match(QString::fromUtf8(documentDelegatePtr->GetCountQuery())).hasMatch());
 	QVERIFY(deniedTable.match(QString::fromUtf8(jsonDelegatePtr->GetCountQuery())).hasMatch());
+
+	{
+		// deliberate shared storage access (e.g. the shared schema migrations); a tenant context inside wins
+		imtbase::CSharedStorageScope sharedStorageScope;
+		QVERIFY(publicTable.match(QString::fromUtf8(documentDelegatePtr->GetCountQuery())).hasMatch());
+
+		imtbase::CTenantContextScope alphaScope(QByteArrayLiteral("alpha"));
+		QVERIFY(alphaTable.match(QString::fromUtf8(documentDelegatePtr->GetCountQuery())).hasMatch());
+	}
 
 	// without a resolver the previous behavior stays: TableSchema for the document delegate, unqualified for the JSON delegate
 	std::shared_ptr<DocumentDelegate> sharedDocumentDelegatePtr = CreateDelegate<DocumentDelegate>(m_engineCompPtr, nullptr, QByteArrayLiteral("public"));

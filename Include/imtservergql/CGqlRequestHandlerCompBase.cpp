@@ -3,7 +3,11 @@
 
 
 // ImtCore includes
+#include <imtbase/CSharedStorageScope.h>
 #include <imtbase/CTenantContextScope.h>
+
+// std includes
+#include <memory>
 
 
 namespace imtservergql
@@ -39,6 +43,12 @@ QJsonObject CGqlRequestHandlerCompBase::CreateResponse(const imtgql::CGqlRequest
 	}
 
 	imtbase::CTenantContextScope tenantContextScope(tenantId);
+
+	// a request explicitly without organization works on the organization-less data of the shared storage
+	std::unique_ptr<imtbase::CSharedStorageScope> sharedStorageScopePtr;
+	if ((requestContextPtr != nullptr) && tenantId.isEmpty()){
+		sharedStorageScopePtr = std::make_unique<imtbase::CSharedStorageScope>();
+	}
 
 	return CreateInternalResponse(gqlRequest, errorMessage);
 }

@@ -1118,7 +1118,8 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingTableInitial
 	QByteArray createTableQuery = scriptFile.readAll();
 	scriptFile.close();
 
-	const QByteArray tableScheme = GetTableScheme();
+	// a shared catalog table: never the tenant schema (see CreateTenantBindingTableName())
+	const QByteArray tableScheme = m_tableSchemaAttrPtr.IsValid() ? *m_tableSchemaAttrPtr : QByteArray();
 	if (!tableScheme.isEmpty()){
 		createTableQuery.replace("${TableScheme}", tableScheme);
 	}

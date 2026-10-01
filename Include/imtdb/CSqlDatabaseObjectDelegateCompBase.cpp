@@ -17,6 +17,7 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
+#include <imtbase/CSharedStorageScope.h>
 #include <imtbase/CTenantContextScope.h>
 #include <imtdb/CComplexCollectionFilterConverter.h>
 #include <imtdb/imtdb.h>
@@ -303,7 +304,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetTableName() const
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::GetTableScheme() const
 {
-	if (m_tenantStorageResolverCompPtr.IsValid()){
+	if (m_tenantStorageResolverCompPtr.IsValid() && !IsSharedStorageAccess()){
 		// Fail-closed: without a resolvable tenant context no valid schema is returned,
 		// queries against the sentinel schema will fail instead of leaking shared data
 		static const QByteArray deniedSchemaName = QByteArrayLiteral("imt_tenant_storage_denied");
@@ -350,6 +351,12 @@ QString CSqlDatabaseObjectDelegateCompBase::GetBaseSelectionQuery() const
 }
 
 
+bool CSqlDatabaseObjectDelegateCompBase::IsSharedStorageAccess() const
+{
+	return imtbase::CSharedStorageScope::IsActive() && imtbase::CTenantContextScope::GetCurrentTenantId().isEmpty();
+}
+
+
 bool CSqlDatabaseObjectDelegateCompBase::ResolveCurrentTenantStorage(imtdb::TenantStorageInfo& storageInfo) const
 {
 	if (!m_tenantStorageResolverCompPtr.IsValid()){
@@ -376,6 +383,12 @@ bool CSqlDatabaseObjectDelegateCompBase::ResolveCurrentTenantStorage(imtdb::Tena
 	}
 
 	return true;
+}
+
+
+QString CSqlDatabaseObjectDelegateCompBase::GetTenantTableSchemePrefix() const
+{
+	return m_tenantStorageResolverCompPtr.IsValid() ? GetTableSchemePrefix() : QString();
 }
 
 

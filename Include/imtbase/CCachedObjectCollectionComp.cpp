@@ -10,9 +10,26 @@
 #include <istd/CChangeNotifier.h>
 #include <iser/CMemoryWriteArchive.h>
 
+// ImtCore includes
+#include <imtbase/CTenantContextScope.h>
+
 
 namespace imtbase
 {
+
+
+namespace
+{
+
+
+// the storage of a tenant is visible only in its own context, so cached data must never be served to another one
+QByteArray CreateScopedCacheKey(const QByteArray& key)
+{
+	return CTenantContextScope::GetCurrentTenantId() + '\x1f' + key;
+}
+
+
+} // namespace
 
 
 // public methods
@@ -146,7 +163,7 @@ bool CCachedObjectCollectionComp::RemoveElements(const Ids& elementIds, const IO
 		QWriteLocker locker(&m_lock);
 		m_cachedCollections.clear();
 		for (int i = 0; i < elementIds.size(); ++i){
-			m_cacheItems.remove(elementIds[i]);
+			m_cacheItems.remove(CreateScopedCacheKey(elementIds[i]));
 		}
 	}
 	else{
@@ -200,7 +217,7 @@ bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dat
 	{
 		QReadLocker locker(&m_lock);
 
-		CacheItemMap::const_iterator it = m_cacheItems.constFind(objectId);
+		CacheItemMap::const_iterator it = m_cacheItems.constFind(CreateScopedCacheKey(objectId));
 		if (it != m_cacheItems.constEnd() && it.value().dataPtr.IsValid()){
 			// Callers modify the returned object in place, so the cached instance is never handed out.
 			istd::IChangeableUniquePtr clonePtr = it.value().dataPtr->CloneMe();
@@ -223,7 +240,7 @@ bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dat
 			if (m_cacheItems.size() >= *m_objectCacheLimitAttrPtr){
 				RemoveOldestObjectFromCache();
 			}
-			m_cacheItems.insert(objectId, {cachedDataPtr, QDateTime::currentMSecsSinceEpoch()});
+			m_cacheItems.insert(CreateScopedCacheKey(objectId), {cachedDataPtr, QDateTime::currentMSecsSinceEpoch()});
 		}
 	}
 
@@ -247,7 +264,7 @@ bool CCachedObjectCollectionComp::SetObjectData(
 
 	QWriteLocker locker(&m_lock);
 	m_cachedCollections.clear();
-	m_cacheItems.remove(objectId);
+	m_cacheItems.remove(CreateScopedCacheKey(objectId));
 	locker.unlock();
 
 	bool retVal = m_objectCollectionCompPtr->SetObjectData(objectId, object, mode, operationContextPtr);
@@ -478,7 +495,7 @@ CCachedObjectCollectionComp::FilteredCollectionPtr CCachedObjectCollectionComp::
 		return nullptr;
 	}
 
-	QByteArray data((char*)archive.GetBuffer(), archive.GetBufferSize());
+	const QByteArray data = CreateScopedCacheKey(QByteArray((char*)archive.GetBuffer(), archive.GetBufferSize()));
 
 	{
 		QReadLocker locker(&m_lock);

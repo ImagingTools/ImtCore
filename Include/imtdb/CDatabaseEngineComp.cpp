@@ -9,6 +9,7 @@
 #include <QtCore/QUuid>
 
 // ImtCore includes
+#include <imtbase/CSharedStorageScope.h>
 #include <imtbase/CTenantContextScope.h>
 #include <imtdb/CTenantRlsPolicyBuilder.h>
 
@@ -356,6 +357,9 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 	if (!m_migrationControllerCompPtr.IsValid()){
 		return false;
 	}
+
+	// the migrations target the shared schema; tenant schema migrations open their own tenant context
+	imtbase::CSharedStorageScope sharedStorageScope;
 
 	int newRevision;
 	int databaseVersion = GetDatabaseVersion();

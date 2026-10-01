@@ -101,10 +101,23 @@ protected:
 	QString GetTableSchemePrefix() const;
 
 	/**
+		Schema qualifier of the tenant storage if a tenant storage resolver is set, empty otherwise.
+		For SQL that historically addressed tables unqualified (e.g. joins of other tenant-owned
+		collections), so the configuration without a resolver keeps its exact previous behavior.
+	*/
+	QString GetTenantTableSchemePrefix() const;
+
+	/**
 		Resolve the active storage of the tenant of the current thread's context (fail-closed, audit-logged).
 		\return \c false if no resolver is set, no tenant context is active, or the storage is unknown or not active.
 	*/
 	bool ResolveCurrentTenantStorage(imtdb::TenantStorageInfo& storageInfo) const;
+
+	/**
+		Check if the current thread deliberately accesses the shared storage
+		(imtbase::CSharedStorageScope active and no tenant context), e.g. during the shared schema migrations.
+	*/
+	bool IsSharedStorageAccess() const;
 	virtual idoc::IDocumentMetaInfo* CreateCollectionItemMetaInfo(const QByteArray& typeId) const;
 	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const;
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const;

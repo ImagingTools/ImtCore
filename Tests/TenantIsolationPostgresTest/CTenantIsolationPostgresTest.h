@@ -32,6 +32,7 @@ private Q_SLOTS:
 	void testSessionBindingIsRestoredAfterRollback();
 	void testRlsRejectsCrossTenantCatalogTables();
 	void testProvisionerRollsBackFailedSchema();
+	void testAutoProvisioningOnFirstAccess();
 	void testDataMigratorSeesRlsProtectedSourceRows();
 	void testDataMigratorDetectsChecksumMismatch();
 	void testBackupAndRestoreTenantSchema();
