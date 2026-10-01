@@ -580,7 +580,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateUpdateMetaInfoQuery(const
 // reimplemented (imtbase::IRevisionController)
 
 imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateCompBase::GetRevisionInfoList(
-			const imtbase::IObjectCollection& /*collection*/,
+			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId) const
 {
 	imtbase::IRevisionController::RevisionInfoList revisionInfoList;
@@ -601,6 +601,10 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateCompB
 	filterParams.SetEditableParameter("DocumentFilter", &documentFilter);
 
 	QByteArray query = GetSelectionQuery(objectId, 0, -1, &filterParams);
+
+	if (!ApplyCollectionTenantStorage(query, collection)){
+		return imtbase::IRevisionController::RevisionInfoList();
+	}
 
 	QSqlError sqlError;
 	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
@@ -689,6 +693,10 @@ bool CSqlDatabaseDocumentDelegateCompBase::RestoreRevision(
 							/*6*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
 							/*7*/ QString::number(revision)).toUtf8();
 
+	if (!ApplyCollectionTenantStorage(query, collection)){
+		return false;
+	}
+
 	QSqlError sqlError;
 	m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
@@ -724,6 +732,10 @@ bool CSqlDatabaseDocumentDelegateCompBase::DeleteRevision(
 							/*3*/ s_documentIdColumn,
 							/*4*/ objectId,
 							/*5*/ s_stateColumn).toUtf8();
+
+	if (!ApplyCollectionTenantStorage(checkCurrentRevisionQuery, collection)){
+		return false;
+	}
 
 	QSqlError sqlError;
 	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(checkCurrentRevisionQuery, &sqlError);
@@ -761,7 +773,11 @@ bool CSqlDatabaseDocumentDelegateCompBase::DeleteRevision(
 							/*5*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
 							/*6*/ QString::number(revision))
 						.toUtf8();
-	
+
+	if (!ApplyCollectionTenantStorage(query, collection)){
+		return false;
+	}
+
 	sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
 		SendErrorMessage(0, sqlError.text(), "Database collection");
@@ -806,7 +822,12 @@ bool CSqlDatabaseDocumentDelegateCompBase::UpdateDependentMetaInfo(const Depende
 	query += jsonbUpdate + QStringLiteral(" WHERE %1 = '%2';").arg(CreateJsonExtractSql(s_dataMetaInfoColumn, metaInfo.dependentKey), metaInfo.objectId);
 
 	QSqlError sqlError;
-	m_databaseEngineCompPtr->ExecSqlQuery(query.toUtf8(), &sqlError);
+	QByteArray updateQuery = query.toUtf8();
+	if (!ApplyTenantStorage(updateQuery, metaInfo.tenantId)){
+		return false;
+	}
+
+	m_databaseEngineCompPtr->ExecSqlQuery(updateQuery, &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
 		SendErrorMessage(0, sqlError.text(), "CSqlDatabaseDocumentDelegateCompBase");
 		qDebug() << "SQL-error" << sqlError.text();
@@ -860,7 +881,12 @@ bool CSqlDatabaseDocumentDelegateCompBase::ClearDependentMetaInfo(const MetaFiel
 				/*5*/ whereClause);
 
 	QSqlError sqlError;
-	m_databaseEngineCompPtr->ExecSqlQuery(fullQuery.toUtf8(), &sqlError);
+	QByteArray cleanupQuery = fullQuery.toUtf8();
+	if (!ApplyTenantStorage(cleanupQuery, metaInfo.tenantId)){
+		return false;
+	}
+
+	m_databaseEngineCompPtr->ExecSqlQuery(cleanupQuery, &sqlError);
 
 	if (sqlError.type() != QSqlError::NoError){
 		SendErrorMessage(0, sqlError.text(), "CSqlDatabaseDocumentDelegateCompBase");
@@ -911,7 +937,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::PrepareInsertNewObjectQuery(
 	const bool useMetaData = m_useDataMetaInfoAttrPtr.IsValid() ? *m_useDataMetaInfoAttrPtr : false;
 	if (useMetaData && m_metaInfoCreatorCompPtr.IsValid() && m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
 		idoc::MetaInfoPtr metaInfoPtr;
-		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(&object, typeId, metaInfoPtr) && metaInfoPtr.IsValid()){
+		if (m_metaInfoCreatorCompPtr->CreateMetaInfoInOperation(&object, typeId, metaInfoPtr, operationContextPtr) && metaInfoPtr.IsValid()){
 			if (!m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr(), metaInfoRepresentation, typeId)){
 				SendWarningMessage(0, QStringLiteral("Unable to create meta info representation for the object '%1' from the table '%2'").arg(objectId, GetTableName()));
 			}

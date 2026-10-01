@@ -17,8 +17,7 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
-#include <imtbase/CSharedStorageScope.h>
-#include <imtbase/CTenantContextScope.h>
+#include <imtbase/ITenantObjectCollection.h>
 #include <imtdb/CComplexCollectionFilterConverter.h>
 #include <imtdb/imtdb.h>
 
@@ -61,8 +60,9 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectTypeId(const QByteArray&
 		return QByteArray();
 	}
 
+	// the delegate addresses the data without organization; a tenant collection reads the type from its own record
 	QByteArray objectSelectionQuery = GetSelectionQuery(objectId, -1, -1, nullptr);
-	if (objectSelectionQuery.isEmpty()){
+	if (objectSelectionQuery.isEmpty() || !ApplyTenantStorage(objectSelectionQuery, QByteArray())){
 		return QByteArray();
 	}
 
@@ -304,24 +304,53 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetTableName() const
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::GetTableScheme() const
 {
-	if (m_tenantStorageResolverCompPtr.IsValid() && !IsSharedStorageAccess()){
-		// Fail-closed: without a resolvable tenant context no valid schema is returned,
-		// queries against the sentinel schema will fail instead of leaking shared data
-		static const QByteArray deniedSchemaName = QByteArrayLiteral("imt_tenant_storage_denied");
-
-		imtdb::TenantStorageInfo storageInfo;
-		if (!ResolveCurrentTenantStorage(storageInfo)){
-			return deniedSchemaName;
-		}
-
-		return storageInfo.schemaName;
-	}
-
 	if (m_tableSchemaAttrPtr.IsValid()){
 		return *m_tableSchemaAttrPtr;
 	}
 
 	return QByteArray();
+}
+
+
+bool CSqlDatabaseObjectDelegateCompBase::HasTenantStorage() const
+{
+	return m_tenantStorageResolverCompPtr.IsValid();
+}
+
+
+bool CSqlDatabaseObjectDelegateCompBase::ApplyTenantStorage(QByteArray& query, const QByteArray& tenantId) const
+{
+	if (!query.contains(s_tenantSchemePrefixPlaceholder)){
+		return true;
+	}
+
+	if (!m_tenantStorageResolverCompPtr.IsValid() || tenantId.isEmpty()){
+		query.replace(s_tenantSchemePrefixPlaceholder, GetSharedSchemePrefix().toUtf8());
+
+		return true;
+	}
+
+	imtdb::TenantStorageInfo storageInfo;
+	if (!m_tenantStorageResolverCompPtr->ResolveTenantStorage(tenantId, storageInfo)){
+		SendErrorMessage(0, QStringLiteral("Tenant storage access denied for table '%1': storage of tenant '%2' could not be resolved").arg(QString(GetTableName()), QString(tenantId)), "CSqlDatabaseObjectDelegateCompBase");
+
+		return false;
+	}
+
+	if (storageInfo.status != imtdb::TSS_ACTIVE && storageInfo.status != imtdb::TSS_MIGRATING){
+		SendErrorMessage(0, QStringLiteral("Tenant storage access denied for table '%1': storage of tenant '%2' is not active").arg(QString(GetTableName()), QString(tenantId)), "CSqlDatabaseObjectDelegateCompBase");
+
+		return false;
+	}
+
+	if (storageInfo.schemaName.isEmpty()){
+		query.replace(s_tenantSchemePrefixPlaceholder, GetSharedSchemePrefix().toUtf8());
+	}
+	else{
+		query.replace(s_tenantSchemePrefixPlaceholder, '"' + storageInfo.schemaName + QByteArrayLiteral("\"."));
+	}
+
+	return true;
 }
 
 
@@ -351,48 +380,19 @@ QString CSqlDatabaseObjectDelegateCompBase::GetBaseSelectionQuery() const
 }
 
 
-bool CSqlDatabaseObjectDelegateCompBase::IsSharedStorageAccess() const
-{
-	return imtbase::CSharedStorageScope::IsActive() && imtbase::CTenantContextScope::GetCurrentTenantId().isEmpty();
-}
-
-
-bool CSqlDatabaseObjectDelegateCompBase::ResolveCurrentTenantStorage(imtdb::TenantStorageInfo& storageInfo) const
-{
-	if (!m_tenantStorageResolverCompPtr.IsValid()){
-		return false;
-	}
-
-	QByteArray tenantId = imtbase::CTenantContextScope::GetCurrentTenantId();
-	if (tenantId.isEmpty()){
-		SendErrorMessage(0, QStringLiteral("Tenant storage access denied for table '%1': no tenant context is active").arg(QString(GetTableName())), "CSqlDatabaseObjectDelegateCompBase");
-
-		return false;
-	}
-
-	if (!m_tenantStorageResolverCompPtr->ResolveTenantStorage(tenantId, storageInfo)){
-		SendErrorMessage(0, QStringLiteral("Tenant storage access denied for table '%1': storage of tenant '%2' could not be resolved").arg(QString(GetTableName()), QString(tenantId)), "CSqlDatabaseObjectDelegateCompBase");
-
-		return false;
-	}
-
-	if (storageInfo.status != imtdb::TSS_ACTIVE && storageInfo.status != imtdb::TSS_MIGRATING){
-		SendErrorMessage(0, QStringLiteral("Tenant storage access denied for table '%1': storage of tenant '%2' is not active").arg(QString(GetTableName()), QString(tenantId)), "CSqlDatabaseObjectDelegateCompBase");
-
-		return false;
-	}
-
-	return true;
-}
-
-
 QString CSqlDatabaseObjectDelegateCompBase::GetTenantTableSchemePrefix() const
 {
-	return m_tenantStorageResolverCompPtr.IsValid() ? GetTableSchemePrefix() : QString();
+	return m_tenantStorageResolverCompPtr.IsValid() ? QString::fromLatin1(s_tenantSchemePrefixPlaceholder) : QString();
 }
 
 
 QString CSqlDatabaseObjectDelegateCompBase::GetTableSchemePrefix() const
+{
+	return m_tenantStorageResolverCompPtr.IsValid() ? QString::fromLatin1(s_tenantSchemePrefixPlaceholder) : GetSharedSchemePrefix();
+}
+
+
+QString CSqlDatabaseObjectDelegateCompBase::GetSharedSchemePrefix() const
 {
 	const QByteArray tableScheme = GetTableScheme();
 	if (tableScheme.isEmpty()){
@@ -403,7 +403,15 @@ QString CSqlDatabaseObjectDelegateCompBase::GetTableSchemePrefix() const
 }
 
 
-idoc::IDocumentMetaInfo* CSqlDatabaseObjectDelegateCompBase::CreateCollectionItemMetaInfo(const QByteArray& /*typeId*/) const
+bool CSqlDatabaseObjectDelegateCompBase::ApplyCollectionTenantStorage(QByteArray& query, const imtbase::IObjectCollection& collection) const
+{
+	const imtbase::ITenantObjectCollection* tenantCollectionPtr = dynamic_cast<const imtbase::ITenantObjectCollection*>(&collection);
+
+	return ApplyTenantStorage(query, (tenantCollectionPtr != nullptr) ? tenantCollectionPtr->GetTenantId() : QByteArray());
+}
+
+
+idoc::IDocumentMetaInfo*CSqlDatabaseObjectDelegateCompBase::CreateCollectionItemMetaInfo(const QByteArray& /*typeId*/) const
 {
 	return new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>;
 }

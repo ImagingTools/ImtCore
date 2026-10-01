@@ -28,6 +28,7 @@
 #include <imtcol/CDocumentIdFilter.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/IUserActionManager.h>
+#include <imtbase/ITenantCollectionProvider.h>
 #include <imtauth/CTenantFilterParam.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection_fwd.h>
 
@@ -69,6 +70,7 @@ public:
 		I_ASSIGN_MULTI_0(m_replaceableFieldsAttrPtr, "ReplaceableFilterFields", "List of filter fields to be replaced", false);
 		I_ASSIGN_MULTI_0(m_replacementFieldsAttrPtr, "ReplacementFilterFields", "List of filter fields to replace with", false);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
+		I_ASSIGN_TO(m_tenantCollectionProviderCompPtr, m_objectCollectionCompPtr, false);
 		I_ASSIGN(m_userActionManagerCompPtr, "UserActionManager", "User action manager", false, "UserActionManager");
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Collection headers provider", false, "HeadersProvider");
 		I_ASSIGN(m_operationContextControllerCompPtr, "OperationContextController", "Operation context controller", false, "OperationContextController");
@@ -219,7 +221,7 @@ protected:
 	virtual int GetObjectTypeIdIndex(const QByteArray& typeId) const;
 	virtual int GetMimeTypeIndex(const QString& mimeType) const;
 	virtual QString GetExtensionFromMimeType(const imtbase::CMimeType& mimeType) const;
-	virtual QString GetExportFileName(const QByteArray& objectId) const;
+	virtual QString GetExportFileName(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const;
 	virtual bool UpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QString& errorMessage) const;
 	virtual QVariant GetInputArgumentFromRequest(const imtgql::CGqlRequest& gqlRequest, const QString& argumentKey) const;
 	virtual imtbase::ICollectionInfo::Ids ExtractObjectIdsForRemoval(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
@@ -302,6 +304,15 @@ protected:
 	*/
 	virtual imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRequest& gqlRequest) const;
 
+	/**
+		Collection of the data of the tenant of the request.
+		For a collection stored separately per tenant (see imtbase::ITenantCollectionProvider) it is the collection
+		bound to the tenant of the request context, otherwise the configured collection.
+		\return \c nullptr if no collection is configured.
+	*/
+	imtbase::IObjectCollection* GetRequestCollection(const imtgql::CGqlRequest& gqlRequest) const;
+	imtbase::IObjectCollection* GetContextCollection(const imtgql::IGqlContext* gqlContextPtr) const;
+
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const;
 	virtual QString GetObjectNameFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
 	virtual bool CreateCollectionFilterFromViewParamsSdl(
@@ -369,6 +380,7 @@ protected:
 		\return True if the history entry was written.
 	*/
 	bool CreateElementAttributeHistoryEntry(
+				imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const QByteArray& operationTypeId,
 				const QByteArray& key,
@@ -409,6 +421,7 @@ protected:
 	I_MULTIATTR(QByteArray, m_replaceableFieldsAttrPtr);
 	I_MULTIATTR(QByteArray, m_replacementFieldsAttrPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
+	I_REF(imtbase::ITenantCollectionProvider, m_tenantCollectionProviderCompPtr);
 	I_REF(imtcol::ICollectionHeadersProvider, m_headersProviderCompPtr);
 	I_REF(imtbase::IOperationContextController, m_operationContextControllerCompPtr);
 	I_REF(imtauth::IUserActionManager, m_userActionManagerCompPtr);

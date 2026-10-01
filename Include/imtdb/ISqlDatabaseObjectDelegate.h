@@ -62,8 +62,28 @@ public:
 
 	/**
 		Get scheme of the collection table in the SQL database.
+		For tenant-owned collections this is the shared schema (e.g. for the shared schema migrations);
+		queries of tenant-owned data address the tenant storage via s_tenantSchemePrefixPlaceholder.
 	*/
 	virtual QByteArray GetTableScheme() const = 0;
+
+	/**
+		Placeholder for the schema qualifier of the tenant storage in queries built by a tenant-owned delegate.
+	*/
+	static constexpr const char* s_tenantSchemePrefixPlaceholder = "${TenantSchemePrefix}";
+
+	/**
+		Check if the data of the collection is stored in the storage of each tenant (tenant-owned collection).
+	*/
+	virtual bool HasTenantStorage() const = 0;
+
+	/**
+		Replace the tenant storage placeholder in a query built by this delegate with the storage of the given tenant.
+		\param tenantId Tenant of the collection the query is executed for (see imtbase::ITenantObjectCollection).
+						An empty ID addresses the data without organization (shared storage).
+		\return \c false if the query addresses tenant-owned data and the tenant storage cannot be resolved (access denied).
+	*/
+	virtual bool ApplyTenantStorage(QByteArray& query, const QByteArray& tenantId) const = 0;
 };
 
 

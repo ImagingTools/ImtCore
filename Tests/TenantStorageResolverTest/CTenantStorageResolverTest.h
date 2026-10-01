@@ -42,24 +42,12 @@ private Q_SLOTS:
 	// concurrency
 	void testConcurrentRegistrationAndResolution();
 
-	// tenant context scope
-	void testTenantContextScopeActivation();
-	void testTenantContextScopeNesting();
-	void testTenantContextScopeIsThreadLocal();
-
 	// data migration (in-memory SQLite with attached tenant schema)
 	void testMigrateTableCopiesAndVerifies();
 	void testMigrateTableIsIdempotent();
 	void testMigrateTableFailsOnPartialCopy();
 	void testRemoveSourceRows();
 	void testQuoteIdentifier();
-
-	// row-level security statement generation
-	void testRlsStatementsGeneration();
-	void testRlsStatementsRejectInvalidIdentifiers();
-	void testRlsSessionVariableValidation();
-	void testRlsBindAndUnbindQueries();
-	void testRlsCrossTenantCatalogTables();
 
 private:
 	imtdb::CTenantStorageRegistry* m_registryPtr = nullptr;

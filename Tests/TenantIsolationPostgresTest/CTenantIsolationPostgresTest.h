@@ -11,8 +11,8 @@
 
 /**
 	Integration tests of the tenant isolation components against a real PostgreSQL server.
-	The tests create a temporary database owned by a temporary non-superuser role (superusers
-	bypass Row-Level Security) and remove both afterwards.
+	The tests create a temporary database owned by a temporary non-superuser role
+	and remove both afterwards.
 	Connection of the administrative account: environment variables IMTCORE_TEST_PG_HOST,
 	IMTCORE_TEST_PG_PORT, IMTCORE_TEST_PG_USER and IMTCORE_TEST_PG_PASSWORD;
 	the tests are skipped if IMTCORE_TEST_PG_PASSWORD is not set.
@@ -27,26 +27,20 @@ private Q_SLOTS:
 	void init();
 
 	void testTenantSchemaMigrationRunsPerTenant();
-	void testSessionBindingFollowsTenantContext();
-	void testSessionBindingIsPerThreadConnection();
-	void testSessionBindingIsRestoredAfterRollback();
-	void testRlsRejectsCrossTenantCatalogTables();
 	void testProvisionerRollsBackFailedSchema();
 	void testAutoProvisioningOnFirstAccess();
-	void testDataMigratorSeesRlsProtectedSourceRows();
+	void testDataMigratorCopiesTenantRows();
 	void testDataMigratorDetectsChecksumMismatch();
 	void testBackupAndRestoreTenantSchema();
 	void testRestoreRejectsArchiveOfOtherTenant();
 	void testDocumentDelegatesAddressTenantSchema();
-	void testFileDocumentStoreIsPerTenant();
-	void testGarbageCollectorKeepsTenantStores();
-	void testDataMigratorCopiesFileDocumentContent();
+	void testTenantCollectionIsBoundToTenant();
+	void testGarbageCollectorKeepsTenantReferencedContent();
 
 private:
 	bool ExecAdmin(const QString& query);
 	bool ExecApp(const QString& query);
 	int CountRows(const QByteArray& query) const;
-	QString GetBoundTenant() const;
 
 	QString m_skipReason;
 	QString m_host;

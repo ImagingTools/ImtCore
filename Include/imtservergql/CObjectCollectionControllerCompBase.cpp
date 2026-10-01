@@ -400,12 +400,13 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 
 sdl::V1_0::imtbase::CDuplicateElementsPayload CObjectCollectionControllerCompBase::OnDuplicateElements(
 			const sdl::V1_0::imtbase::CDuplicateElementsGqlRequest& duplicateElementsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CDuplicateElementsPayload response;
 
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 		return response;
 	}
@@ -428,26 +429,26 @@ sdl::V1_0::imtbase::CDuplicateElementsPayload CObjectCollectionControllerCompBas
 
 	response.success = false;
 
-	istd::CChangeGroup changeGroup(m_objectCollectionCompPtr.GetPtr());
+	istd::CChangeGroup changeGroup(collectionPtr);
 
 	int count = imtbase::narrow_cast<int>(elementIds.size());
 	for (const QByteArray& elementId : elementIds){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(elementId, dataPtr)){
+		if (collectionPtr->GetObjectData(elementId, dataPtr)){
 			istd::IChangeableUniquePtr clonedObjectPtr = dataPtr->CloneMe();
 			if (clonedObjectPtr.IsValid()){
 				QString duplicateName;
-				QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(elementId);
+				QByteArray typeId = collectionPtr->GetObjectTypeId(elementId);
 
 				if (count == 1){
 					duplicateName = name;
 				}
 				else{
-					QString elementName = m_objectCollectionCompPtr->GetElementInfo(elementId, imtbase::ICollectionInfo::EIT_NAME).toString();
+					QString elementName = collectionPtr->GetElementInfo(elementId, imtbase::ICollectionInfo::EIT_NAME).toString();
 					duplicateName = elementName + " Copy";
 				}
 
-				m_objectCollectionCompPtr->InsertNewObject(typeId, duplicateName, "", clonedObjectPtr.GetPtr());
+				collectionPtr->InsertNewObject(typeId, duplicateName, "", clonedObjectPtr.GetPtr());
 			}
 		}
 	}
@@ -460,9 +461,11 @@ sdl::V1_0::imtbase::CDuplicateElementsPayload CObjectCollectionControllerCompBas
 
 sdl::V1_0::imtbase::CVisualStatus CObjectCollectionControllerCompBase::OnGetObjectVisualStatus(
 			const sdl::V1_0::imtbase::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+
 	sdl::V1_0::imtbase::CVisualStatus response;
 
 	sdl::V1_0::imtbase::GetObjectVisualStatusRequestArguments arguments = getObjectVisualStatusRequest.GetRequestedArguments();
@@ -476,8 +479,8 @@ sdl::V1_0::imtbase::CVisualStatus CObjectCollectionControllerCompBase::OnGetObje
 		typeId = *arguments.input->typeId;
 	}
 
-	QString name = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
-	QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+	QString name = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+	QString description = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
 	int index = m_objectTypeIdAttrPtr.FindValue(typeId);
 	if (index >= 0){
@@ -502,6 +505,8 @@ sdl::V1_0::imtbase::CRemoveElementsPayload CObjectCollectionControllerCompBase::
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+
 	sdl::V1_0::imtbase::CRemoveElementsPayload response;
 
 	sdl::V1_0::imtbase::RemoveElementsRequestArguments arguments = removeElementsRequest.GetRequestedArguments();
@@ -520,7 +525,7 @@ sdl::V1_0::imtbase::CRemoveElementsPayload CObjectCollectionControllerCompBase::
 		return sdl::V1_0::imtbase::CRemoveElementsPayload();
 	}
 
-	imtbase::ICollectionInfo::Ids allElementIds = m_objectCollectionCompPtr->GetElementIds();
+	imtbase::ICollectionInfo::Ids allElementIds = collectionPtr->GetElementIds();
 	for (const QByteArray& elementId : elementIds){
 		if (!allElementIds.contains(elementId)){
 			errorMessage = QStringLiteral("Unable to delete object. Object with ID '%1' does not exists").arg(elementId);
@@ -533,14 +538,14 @@ sdl::V1_0::imtbase::CRemoveElementsPayload CObjectCollectionControllerCompBase::
 		return sdl::V1_0::imtbase::CRemoveElementsPayload();
 	}
 
-	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(elementIds[0]);
+	QByteArray typeId = collectionPtr->GetObjectTypeId(elementIds[0]);
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 	if (m_operationContextControllerCompPtr.IsValid()){
 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Remove", elementIds.toList().join(';'));
 	}
 
-	bool ok = m_objectCollectionCompPtr->RemoveElements(elementIds, operationContextPtr.GetPtr());
+	bool ok = collectionPtr->RemoveElements(elementIds, operationContextPtr.GetPtr());
 	if (ok){
 		CreateUserActionLog(elementIds[0], typeId, "Delete", gqlRequest);
 		OnAfterRemoveElements(elementIds, gqlRequest);
@@ -557,6 +562,8 @@ sdl::V1_0::imtbase::CRemoveElementSetPayload CObjectCollectionControllerCompBase
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+
 	sdl::V1_0::imtbase::CRemoveElementSetPayload response;
 
 	sdl::V1_0::imtbase::RemoveElementSetRequestArguments arguments = removeElementSetRequest.GetRequestedArguments();
@@ -571,14 +578,14 @@ sdl::V1_0::imtbase::CRemoveElementSetPayload CObjectCollectionControllerCompBase
 		}
 	}
 
-	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParams);
+	imtbase::ICollectionInfo::Ids elementIds = collectionPtr->GetElementIds(0, -1, &filterParams);
 	if (!OnBeforeRemoveElements(elementIds, gqlRequest, errorMessage)){
 		return sdl::V1_0::imtbase::CRemoveElementSetPayload();
 	}
 
 	QByteArray typeId;
 	if (!elementIds.isEmpty()){
-		typeId = m_objectCollectionCompPtr->GetObjectTypeId(elementIds[0]);
+		typeId = collectionPtr->GetObjectTypeId(elementIds[0]);
 	}
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
@@ -586,7 +593,7 @@ sdl::V1_0::imtbase::CRemoveElementSetPayload CObjectCollectionControllerCompBase
 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Remove", elementIds.toList().join(';'));
 	}
 
-	bool ok = m_objectCollectionCompPtr->RemoveElementSet(&filterParams, operationContextPtr.GetPtr());
+	bool ok = collectionPtr->RemoveElementSet(&filterParams, operationContextPtr.GetPtr());
 	if (ok){
 		if (!elementIds.isEmpty()){
 			CreateUserActionLog(elementIds[0], typeId, "Delete", gqlRequest);
@@ -602,9 +609,11 @@ sdl::V1_0::imtbase::CRemoveElementSetPayload CObjectCollectionControllerCompBase
 
 sdl::V1_0::imtbase::CRestoreObjectsPayload CObjectCollectionControllerCompBase::OnRestoreObjects(
 			const sdl::V1_0::imtbase::CRestoreObjectsGqlRequest& restoreObjectsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+
 	sdl::V1_0::imtbase::CRestoreObjectsPayload response;
 
 	sdl::V1_0::imtbase::RestoreObjectsRequestArguments arguments = restoreObjectsRequest.GetRequestedArguments();
@@ -618,7 +627,7 @@ sdl::V1_0::imtbase::CRestoreObjectsPayload CObjectCollectionControllerCompBase::
 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Restore", objectIds.toList().join(';'));
 	}
 
-	response.success = m_objectCollectionCompPtr->RestoreObjects(imtbase::ICollectionInfo::Ids(objectIds.constBegin(), objectIds.constEnd()), operationContextPtr.GetPtr());
+	response.success = collectionPtr->RestoreObjects(imtbase::ICollectionInfo::Ids(objectIds.constBegin(), objectIds.constEnd()), operationContextPtr.GetPtr());
 
 	return response;
 }
@@ -626,9 +635,11 @@ sdl::V1_0::imtbase::CRestoreObjectsPayload CObjectCollectionControllerCompBase::
 
 sdl::V1_0::imtbase::CRestoreObjectSetPayload CObjectCollectionControllerCompBase::OnRestoreObjectSet(
 			const sdl::V1_0::imtbase::CRestoreObjectSetGqlRequest& restoreObjectSetRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+
 	sdl::V1_0::imtbase::CRestoreObjectSetPayload response;
 
 	sdl::V1_0::imtbase::RestoreObjectSetRequestArguments arguments = restoreObjectSetRequest.GetRequestedArguments();
@@ -643,14 +654,14 @@ sdl::V1_0::imtbase::CRestoreObjectSetPayload CObjectCollectionControllerCompBase
 		}
 	}
 
-	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParams);
+	imtbase::ICollectionInfo::Ids elementIds = collectionPtr->GetElementIds(0, -1, &filterParams);
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 	if (m_operationContextControllerCompPtr.IsValid()){
 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Restore", elementIds.toList().join(';'));
 	}
 
-	response.success = m_objectCollectionCompPtr->RestoreObjectSet(&filterParams, operationContextPtr.GetPtr());
+	response.success = collectionPtr->RestoreObjectSet(&filterParams, operationContextPtr.GetPtr());
 
 	return response;
 }
@@ -661,6 +672,8 @@ sdl::V1_0::imtbase::CSetObjectNamePayload CObjectCollectionControllerCompBase::O
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+
 	sdl::V1_0::imtbase::CSetObjectNamePayload response;
 	response.success = false;
 
@@ -679,14 +692,14 @@ sdl::V1_0::imtbase::CSetObjectNamePayload CObjectCollectionControllerCompBase::O
 		return sdl::V1_0::imtbase::CSetObjectNamePayload();
 	}
 
-	QString oldName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+	QString oldName = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
-	if (!m_objectCollectionCompPtr->SetElementName(objectId, newName)){
+	if (!collectionPtr->SetElementName(objectId, newName)){
 		errorMessage = QStringLiteral("Unable to set name '%1' for element with ID: '%2'").arg(newName, QString::fromUtf8(objectId));
 		return sdl::V1_0::imtbase::CSetObjectNamePayload();
 	}
 
-	CreateElementAttributeHistoryEntry(objectId, "Rename", "Name", QT_TRANSLATE_NOOP("Attribute", "Name"), oldName, newName);
+	CreateElementAttributeHistoryEntry(*collectionPtr, objectId, "Rename", "Name", QT_TRANSLATE_NOOP("Attribute", "Name"), oldName, newName);
 
 	OnAfterSetObjectName(objectId, oldName, newName, gqlRequest);
 
@@ -706,6 +719,8 @@ sdl::V1_0::imtbase::CSetObjectDescriptionPayload CObjectCollectionControllerComp
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+
 	sdl::V1_0::imtbase::CSetObjectDescriptionPayload response;
 	response.success = false;
 
@@ -724,10 +739,10 @@ sdl::V1_0::imtbase::CSetObjectDescriptionPayload CObjectCollectionControllerComp
 		return sdl::V1_0::imtbase::CSetObjectDescriptionPayload();
 	}
 
-	const QString oldDescription = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+	const QString oldDescription = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
-	istd::CChangeGroup changeGroup(m_objectCollectionCompPtr.GetPtr());
-	if (!m_objectCollectionCompPtr->SetElementDescription(objectId, description)){
+	istd::CChangeGroup changeGroup(collectionPtr);
+	if (!collectionPtr->SetElementDescription(objectId, description)){
 		changeGroup.Reset();
 
 		errorMessage = QStringLiteral("Unable to set description '%1' for element with ID: '%2'").arg(description, QString::fromUtf8(objectId));
@@ -735,7 +750,7 @@ sdl::V1_0::imtbase::CSetObjectDescriptionPayload CObjectCollectionControllerComp
 	}
 
 	if (!IsDescriptionStoredInDocument()){
-		CreateElementAttributeHistoryEntry(objectId, "", "Description", QT_TRANSLATE_NOOP("Attribute", "Description"), oldDescription, description);
+		CreateElementAttributeHistoryEntry(*collectionPtr, objectId, "", "Description", QT_TRANSLATE_NOOP("Attribute", "Description"), oldDescription, description);
 	}
 
 	OnAfterSetObjectDescription(objectId, description, gqlRequest);
@@ -753,12 +768,13 @@ sdl::V1_0::imtbase::CSetObjectDescriptionPayload CObjectCollectionControllerComp
 
 sdl::V1_0::imtbase::CExportObjectPayload CObjectCollectionControllerCompBase::OnExportObject(
 			const sdl::V1_0::imtbase::CExportObjectGqlRequest& exportObjectRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CExportObjectPayload response;
 
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
@@ -775,7 +791,7 @@ sdl::V1_0::imtbase::CExportObjectPayload CObjectCollectionControllerCompBase::On
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+	if (!collectionPtr->GetObjectData(objectId, dataPtr)){
 		errorMessage = QStringLiteral("Unable to export the object with ID: '%1'. Error: Object does not exists").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CExportObjectPayload();
@@ -808,7 +824,7 @@ sdl::V1_0::imtbase::CExportObjectPayload CObjectCollectionControllerCompBase::On
 	}
 
 	QString extension = GetExtensionFromMimeType(mime);
-	QString objectName = GetExportFileName(objectId);
+	QString objectName = GetExportFileName(*collectionPtr, objectId);
 
 	QTemporaryDir tempDir;
 	QString fileName = objectName + "." + extension;
@@ -859,13 +875,14 @@ sdl::V1_0::imtbase::CExportObjectPayload CObjectCollectionControllerCompBase::On
 
 sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::OnImportObject(
 			const sdl::V1_0::imtbase::CImportObjectGqlRequest& importObjectRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CImportObjectPayload response;
 	response.success = false;
 
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
@@ -959,7 +976,7 @@ sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::On
 		objectUuid = identifiableObjectPtr->GetObjectUuid();
 	}
 
-	if (m_objectCollectionCompPtr->GetElementIds().contains(objectUuid)){
+	if (collectionPtr->GetElementIds().contains(objectUuid)){
 		errorMessage = QStringLiteral("Unable to import object with ID: '%1' to the collection. Error: The object already exists inside the collection").arg(objectUuid);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
@@ -986,7 +1003,7 @@ sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::On
 		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
-	QByteArray insertRetVal = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, collectionObjectInstancePtr.GetPtr(), objectUuid);
+	QByteArray insertRetVal = collectionPtr->InsertNewObject(typeId, name, description, collectionObjectInstancePtr.GetPtr(), objectUuid);
 	if (insertRetVal.isEmpty()){
 		errorMessage = QStringLiteral("Unable to import object with ID: '%1' to the collection. Error: The object could not be inserted into the collection").arg(objectUuid);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
@@ -1004,10 +1021,11 @@ sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::On
 
 sdl::V1_0::imtbase::CGetObjectTypeIdPayload CObjectCollectionControllerCompBase::OnGetObjectTypeId(
 			const sdl::V1_0::imtbase::CGetObjectTypeIdGqlRequest& getObjectTypeIdRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CGetObjectTypeIdPayload();
 	}
@@ -1020,7 +1038,7 @@ sdl::V1_0::imtbase::CGetObjectTypeIdPayload CObjectCollectionControllerCompBase:
 
 	sdl::V1_0::imtbase::CGetObjectTypeIdPayload response;
 
-	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
+	QByteArray typeId = collectionPtr->GetObjectTypeId(objectId);
 	response.typeId = typeId;
 
 	return response;
@@ -1090,12 +1108,13 @@ sdl::V1_0::imtbase::CGetCollectionHeadersPayload CObjectCollectionControllerComp
 
 sdl::V1_0::imtbase::CGetElementsCountPayload CObjectCollectionControllerCompBase::OnGetElementsCount(
 			const sdl::V1_0::imtbase::CGetElementsCountGqlRequest& getElementsCountRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CGetElementsCountPayload response;
 
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CGetElementsCountPayload();
 	}
@@ -1112,7 +1131,7 @@ sdl::V1_0::imtbase::CGetElementsCountPayload CObjectCollectionControllerCompBase
 		}
 	}
 
-	response.count = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
+	response.count = collectionPtr->GetElementsCount(&filterParams);
 
 	return response;
 }
@@ -1120,12 +1139,13 @@ sdl::V1_0::imtbase::CGetElementsCountPayload CObjectCollectionControllerCompBase
 
 sdl::V1_0::imtbase::CGetElementIdsPayload CObjectCollectionControllerCompBase::OnGetElementIds(
 			const sdl::V1_0::imtbase::CGetElementIdsGqlRequest& getElementIdsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CGetElementIdsPayload response;
 
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CGetElementIdsPayload();
 	}
@@ -1152,7 +1172,7 @@ sdl::V1_0::imtbase::CGetElementIdsPayload CObjectCollectionControllerCompBase::O
 		}
 	}
 
-	imtbase::IObjectCollection::Ids ids = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
+	imtbase::IObjectCollection::Ids ids = collectionPtr->GetElementIds(offset, count, &filterParams);
 	response.elementIds.Emplace();
 	response.elementIds->FromList(ids);
 
@@ -1167,7 +1187,8 @@ sdl::V1_0::imtbase::CInsertNewObjectPayload CObjectCollectionControllerCompBase:
 {
 	sdl::V1_0::imtbase::CInsertNewObjectPayload response;
 
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CInsertNewObjectPayload();
 	}
@@ -1217,7 +1238,7 @@ sdl::V1_0::imtbase::CInsertNewObjectPayload CObjectCollectionControllerCompBase:
 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Create", objectId, objectPtr.GetPtr());
 	}
 
-	QByteArray result = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, objectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
+	QByteArray result = collectionPtr->InsertNewObject(typeId, name, description, objectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
 	if (result.isEmpty()){
 		errorMessage = QStringLiteral("Unable to insert new object to collection '%1'").arg(*m_collectionIdAttrPtr);
 		return sdl::V1_0::imtbase::CInsertNewObjectPayload();
@@ -1237,7 +1258,8 @@ sdl::V1_0::imtbase::CSetObjectDataPayload CObjectCollectionControllerCompBase::O
 {
 	sdl::V1_0::imtbase::CSetObjectDataPayload response;
 
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CSetObjectDataPayload();
 	}
@@ -1253,7 +1275,7 @@ sdl::V1_0::imtbase::CSetObjectDataPayload CObjectCollectionControllerCompBase::O
 		objectData = (*arguments.input->objectData).toUtf8();
 	}
 
-	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
+	QByteArray typeId = collectionPtr->GetObjectTypeId(objectId);
 
 	if (objectData.isEmpty()){
 		errorMessage = QStringLiteral("Unable to set object data to collection '%1'. Error: Object data not provided").arg(*m_collectionIdAttrPtr);
@@ -1276,7 +1298,7 @@ sdl::V1_0::imtbase::CSetObjectDataPayload CObjectCollectionControllerCompBase::O
 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Update", objectId, objectPtr.GetPtr());
 	}
 
-	bool ok = m_objectCollectionCompPtr->SetObjectData(objectId, *objectPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr());
+	bool ok = collectionPtr->SetObjectData(objectId, *objectPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr());
 	if (ok){
 		CreateUserActionLog(objectId, typeId, "Update", gqlRequest);
 	}
@@ -1294,7 +1316,8 @@ sdl::V1_0::imtbase::CGetObjectDataPayload CObjectCollectionControllerCompBase::O
 {
 	sdl::V1_0::imtbase::CGetObjectDataPayload response;
 
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CGetObjectDataPayload();
 	}
@@ -1306,7 +1329,7 @@ sdl::V1_0::imtbase::CGetObjectDataPayload CObjectCollectionControllerCompBase::O
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+	if (!collectionPtr->GetObjectData(objectId, dataPtr)){
 		errorMessage = QStringLiteral("Unable to get object data '%1'. Error: Object does not exists").arg(objectId);
 		return sdl::V1_0::imtbase::CGetObjectDataPayload();
 	}
@@ -1328,12 +1351,13 @@ sdl::V1_0::imtbase::CGetObjectDataPayload CObjectCollectionControllerCompBase::O
 
 sdl::V1_0::imtbase::CGetDataMetaInfoPayload CObjectCollectionControllerCompBase::OnGetDataMetaInfo(
 			const sdl::V1_0::imtbase::CGetDataMetaInfoGqlRequest& getDataMetaInfoRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CGetDataMetaInfoPayload response;
 
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CGetDataMetaInfoPayload();
 	}
@@ -1345,7 +1369,7 @@ sdl::V1_0::imtbase::CGetDataMetaInfoPayload CObjectCollectionControllerCompBase:
 	}
 
 	QByteArray metaInfoData;
-	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
+	idoc::MetaInfoPtr metaInfo = collectionPtr->GetDataMetaInfo(objectId);
 	if (!SerializeObject(*metaInfo.GetPtr(), metaInfoData)){
 		errorMessage = QStringLiteral("Unable to get data meta info for object '%1'. Error: Meta Info serializaion failed").arg(objectId);
 		return sdl::V1_0::imtbase::CGetDataMetaInfoPayload();
@@ -1359,12 +1383,13 @@ sdl::V1_0::imtbase::CGetDataMetaInfoPayload CObjectCollectionControllerCompBase:
 
 sdl::V1_0::imtbase::CGetElementInfoPayload CObjectCollectionControllerCompBase::OnGetElementInfo(
 			const sdl::V1_0::imtbase::CGetElementInfoGqlRequest& getElementInfoRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtbase::CGetElementInfoPayload response;
 
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CGetElementInfoPayload();
 	}
@@ -1378,16 +1403,16 @@ sdl::V1_0::imtbase::CGetElementInfoPayload CObjectCollectionControllerCompBase::
 	sdl::V1_0::imtbase::CParameter parameterInfo;
 	parameterInfo.id = objectId;
 
-	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
+	QByteArray typeId = collectionPtr->GetObjectTypeId(objectId);
 	parameterInfo.typeId = typeId;
 
-	QString name = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toByteArray();
+	QString name = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toByteArray();
 	parameterInfo.name = name;
 
-	QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toByteArray();
+	QString description = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toByteArray();
 	parameterInfo.description = description;
 
-	bool enabled = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_ENABLED).toBool();
+	bool enabled = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_ENABLED).toBool();
 	parameterInfo.enabled = enabled;
 
 	response.elementInfo = parameterInfo;
@@ -1398,12 +1423,13 @@ sdl::V1_0::imtbase::CGetElementInfoPayload CObjectCollectionControllerCompBase::
 
 sdl::V1_0::imtbase::CGetElementMetaInfoPayload CObjectCollectionControllerCompBase::OnGetElementMetaInfo(
 			const sdl::V1_0::imtbase::CGetElementMetaInfoGqlRequest& getElementMetaInfoRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CGetElementMetaInfoPayload response;
 
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 		return sdl::V1_0::imtbase::CGetElementMetaInfoPayload();
 	}
@@ -1414,7 +1440,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CObjectCollectionControllerCompBa
 		objectId = *arguments.input->elementId;
 	}
 
-	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
+	idoc::MetaInfoPtr metaInfo = collectionPtr->GetElementMetaInfo(objectId);
 	if (!metaInfo.IsValid()){
 		errorMessage = QStringLiteral("Unable to get element meta info for object '%1'. Error: Meta Info is invalid").arg(objectId);
 		return sdl::V1_0::imtbase::CGetElementMetaInfoPayload();
@@ -1446,11 +1472,12 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CObjectCollectionControllerCompBa
 
 sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompBase::OnCreateSubCollection(
 			const sdl::V1_0::imtbase::CCreateSubCollectionGqlRequest& createSubCollectionRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 
 		return {};
@@ -1483,7 +1510,7 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompB
 		return {};
 	}
 
-	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> objectCollectionIterator = m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams);
+	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> objectCollectionIterator = collectionPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams);
 	if(!objectCollectionIterator.IsValid()){
 		errorMessage = QStringLiteral("Unable to create sub-collection '%1'. Error: failed to create an iterator on collection.").arg(*m_collectionIdAttrPtr);
 
@@ -1508,7 +1535,7 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompB
 			if (requestInfo.items.itemInfo.isTypeIdRequested){
 				QByteArray typeId = objectCollectionIterator->GetObjectTypeId();
 				if (typeId.isEmpty()){
-					typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
+					typeId = collectionPtr->GetObjectTypeId(objectId);
 				}
 				parameterInfo.typeId = typeId;
 			}
@@ -1753,7 +1780,8 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to get data object. Error: Attribute 'm_objectCollectionCompPtr' was not set").toUtf8();
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
@@ -1772,7 +1800,7 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectFromRequest(
 	QByteArray objectTypeId = GetObjectTypeIdFromRequest(gqlRequest);
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+	if (!collectionPtr->GetObjectData(objectId, dataPtr)){
 		errorMessage = QStringLiteral("Unable to get document. Error: Document does not exists");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
@@ -1801,7 +1829,8 @@ QJsonObject CObjectCollectionControllerCompBase::InsertObject(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Internal error");
 		SendErrorMessage(0, "Internal error", "Object collection controller");
 
@@ -1842,7 +1871,7 @@ QJsonObject CObjectCollectionControllerCompBase::InsertObject(
 		objectId = objectIdFromRepresentation;
 	}
 
-	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
+	imtbase::ICollectionInfo::Ids elementIds = collectionPtr->GetElementIds();
 	if (elementIds.contains(objectId)){
 		errorMessage = QStringLiteral("Object with ID: '%1' already exists").arg(objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -1855,7 +1884,7 @@ QJsonObject CObjectCollectionControllerCompBase::InsertObject(
 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Create", objectId, newObjectPtr.GetPtr());
 	}
 
-	QByteArray newObjectId = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, newObjectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
+	QByteArray newObjectId = collectionPtr->InsertNewObject(typeId, name, description, newObjectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
 	if (newObjectId.isEmpty()){
 		errorMessage = QStringLiteral("Error when creating a new object. Object-ID: '%1'.").arg(objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -1886,7 +1915,8 @@ QJsonObject CObjectCollectionControllerCompBase::UpdateObject(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to update an object. Internal error.");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
@@ -1912,7 +1942,7 @@ QJsonObject CObjectCollectionControllerCompBase::UpdateObject(
 	QString description = inputParamPtr->GetParamArgumentValue("description").toString();
 
 	imtbase::IObjectCollection::DataPtr savedObjectPtr;
-	if (!m_objectCollectionCompPtr->GetObjectData(objectId, savedObjectPtr)){
+	if (!collectionPtr->GetObjectData(objectId, savedObjectPtr)){
 		errorMessage = QStringLiteral("Unable to find object with id '%1'").arg(objectId);
 
 		return QJsonObject();
@@ -1933,7 +1963,7 @@ QJsonObject CObjectCollectionControllerCompBase::UpdateObject(
 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Update", objectId, savedObjectPtr.GetPtr());
 	}
 
-	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObjectPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
+	if (!collectionPtr->SetObjectData(objectId, *savedObjectPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
 		errorMessage = QStringLiteral("Can not update object: '%1'").arg(objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
@@ -1941,22 +1971,22 @@ QJsonObject CObjectCollectionControllerCompBase::UpdateObject(
 	}
 
 	if (name.length() > 0){
-		QString currentName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+		QString currentName = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 		if (currentName != name){
-			if (m_objectCollectionCompPtr->SetElementName(objectId, name)){
-				CreateElementAttributeHistoryEntry(objectId, "Rename", "Name", QT_TRANSLATE_NOOP("Attribute", "Name"), currentName, name);
+			if (collectionPtr->SetElementName(objectId, name)){
+				CreateElementAttributeHistoryEntry(*collectionPtr, objectId, "Rename", "Name", QT_TRANSLATE_NOOP("Attribute", "Name"), currentName, name);
 			}
 		}
 	}
 
-	QString currentDescription = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+	QString currentDescription = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 	if (currentDescription != description){
-		if (m_objectCollectionCompPtr->SetElementDescription(objectId, description) && !IsDescriptionStoredInDocument()){
-			CreateElementAttributeHistoryEntry(objectId, "", "Description", QT_TRANSLATE_NOOP("Attribute", "Description"), currentDescription, description);
+		if (collectionPtr->SetElementDescription(objectId, description) && !IsDescriptionStoredInDocument()){
+			CreateElementAttributeHistoryEntry(*collectionPtr, objectId, "", "Description", QT_TRANSLATE_NOOP("Attribute", "Description"), currentDescription, description);
 		}
 	}
 
-	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
+	QByteArray typeId = collectionPtr->GetObjectTypeId(objectId);
 	CreateUserActionLog(objectId, typeId, "Update", gqlRequest);
 
 	sdl::V1_0::imtbase::CUpdatedNotificationPayload response;
@@ -1979,7 +2009,8 @@ QJsonObject CObjectCollectionControllerCompBase::RenameObject(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to rename object. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
@@ -1997,16 +2028,16 @@ QJsonObject CObjectCollectionControllerCompBase::RenameObject(
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
 	QString newName = inputParamPtr->GetParamArgumentValue("newName").toString();
 
-	const QString oldName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+	const QString oldName = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
-	if (!m_objectCollectionCompPtr->SetElementName(objectId, newName)){
+	if (!collectionPtr->SetElementName(objectId, newName)){
 		errorMessage = QStringLiteral("Unable to set name '%1' for element with ID: '%2'").arg(newName, objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return QJsonObject();
 	}
 
-	CreateElementAttributeHistoryEntry(objectId, "Rename", "Name", QT_TRANSLATE_NOOP("Attribute", "Name"), oldName, newName);
+	CreateElementAttributeHistoryEntry(*collectionPtr, objectId, "Rename", "Name", QT_TRANSLATE_NOOP("Attribute", "Name"), oldName, newName);
 
 	QJsonObject rootObj;
 	QJsonObject dataObj;
@@ -2023,7 +2054,8 @@ QJsonObject CObjectCollectionControllerCompBase::SetObjectDescription(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to set the object description. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
@@ -2041,9 +2073,9 @@ QJsonObject CObjectCollectionControllerCompBase::SetObjectDescription(
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
 	QString description = inputParamPtr->GetParamArgumentValue("description").toString();
 
-	const QString oldDescription = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+	const QString oldDescription = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
-	if (!m_objectCollectionCompPtr->SetElementDescription(objectId, description)){
+	if (!collectionPtr->SetElementDescription(objectId, description)){
 		errorMessage = QStringLiteral("Unable to set description '%1' for element with ID: '%2'").arg(description, objectId);
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
@@ -2051,7 +2083,7 @@ QJsonObject CObjectCollectionControllerCompBase::SetObjectDescription(
 	}
 
 	if (!IsDescriptionStoredInDocument()){
-		CreateElementAttributeHistoryEntry(objectId, "", "Description", QT_TRANSLATE_NOOP("Attribute", "Description"), oldDescription, description);
+		CreateElementAttributeHistoryEntry(*collectionPtr, objectId, "", "Description", QT_TRANSLATE_NOOP("Attribute", "Description"), oldDescription, description);
 	}
 
 	QJsonObject rootObj;
@@ -2069,7 +2101,8 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectListFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to list objects. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
@@ -2110,7 +2143,7 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectListFromRequest(
 	}
 
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
-		m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
+		collectionPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
 	if (objectCollectionIterator == nullptr){
 		errorMessage = QStringLiteral("Object collection iterator creation failed");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
@@ -2158,7 +2191,8 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectListFromRequest(
 
 QJsonObject CObjectCollectionControllerCompBase::GetElementsCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to get the element count. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
@@ -2185,7 +2219,7 @@ QJsonObject CObjectCollectionControllerCompBase::GetElementsCount(const imtgql::
 		}
 	}
 
-	int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
+	int elementsCount = collectionPtr->GetElementsCount(&filterParams);
 
 	QJsonObject rootObj;
 	QJsonObject dataObj;
@@ -2200,7 +2234,8 @@ QJsonObject CObjectCollectionControllerCompBase::DeleteObject(
 	const imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to remove the object from the collection. Component reference 'ObjectCollection' was not set");
 		SendCriticalMessage(0, errorMessage);
 
@@ -2212,7 +2247,7 @@ QJsonObject CObjectCollectionControllerCompBase::DeleteObject(
 		return QJsonObject();
 	}
 
-	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
+	imtbase::ICollectionInfo::Ids elementIds = collectionPtr->GetElementIds();
 	for (const QByteArray& objectId : objectIds){
 		if (!elementIds.contains(objectId)){
 			errorMessage = QStringLiteral("Unable to delete object. Object with ID '%1' does not exists").arg(objectId);
@@ -2226,7 +2261,7 @@ QJsonObject CObjectCollectionControllerCompBase::DeleteObject(
 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Remove", objectIds.toList().join(';'));
 	}
 
-	if (!m_objectCollectionCompPtr->RemoveElements(objectIds, operationContextPtr.GetPtr())){
+	if (!collectionPtr->RemoveElements(objectIds, operationContextPtr.GetPtr())){
 		errorMessage = QStringLiteral("Can't remove object with ID: '%1'").arg(objectIds.toList().join(';'));
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
@@ -2277,7 +2312,8 @@ QJsonObject CObjectCollectionControllerCompBase::GetDataMetaInfo(
 
 QJsonObject CObjectCollectionControllerCompBase::GetObjectTypeId(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 		return QJsonObject();
 	}
@@ -2291,7 +2327,7 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectTypeId(const imtgql::C
 
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
 
-	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
+	QByteArray typeId = collectionPtr->GetObjectTypeId(objectId);
 
 	QJsonObject rootObj;
 	rootObj.insert(QStringLiteral("typeId"), QJsonValue::fromVariant(typeId));
@@ -2302,7 +2338,8 @@ QJsonObject CObjectCollectionControllerCompBase::GetObjectTypeId(const imtgql::C
 
 QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 		return QJsonObject();
 	}
@@ -2382,7 +2419,7 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 		objectUuid = identifiableObjectPtr->GetObjectUuid();
 	}
 
-	if (m_objectCollectionCompPtr->GetElementIds().contains(objectUuid)){
+	if (collectionPtr->GetElementIds().contains(objectUuid)){
 		errorMessage = QStringLiteral("Unable to import object with ID: '%1' to the collection. Error: The object already exists inside the collection").arg(objectUuid);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
@@ -2410,7 +2447,7 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 		return QJsonObject();
 	}
 
-	QByteArray retVal = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, collectionObjectInstancePtr.GetPtr(), objectUuid);
+	QByteArray retVal = collectionPtr->InsertNewObject(typeId, name, description, collectionObjectInstancePtr.GetPtr(), objectUuid);
 	if (retVal.isEmpty()){
 		errorMessage = QStringLiteral("Unable to import object with ID: '%1' to the collection. Error: The object could not be inserted into the collection").arg(objectUuid);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
@@ -2430,7 +2467,8 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 
 QJsonObject CObjectCollectionControllerCompBase::ExportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 		return QJsonObject();
 	}
@@ -2446,7 +2484,7 @@ QJsonObject CObjectCollectionControllerCompBase::ExportObject(const imtgql::CGql
 	QString mimeType = inputParamPtr->GetParamArgumentValue("mimeType").toString();
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+	if (!collectionPtr->GetObjectData(objectId, dataPtr)){
 		errorMessage = QStringLiteral("Unable to export the object with ID: '%1'. Error: Object does not exists").arg(objectId);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
@@ -2482,7 +2520,7 @@ QJsonObject CObjectCollectionControllerCompBase::ExportObject(const imtgql::CGql
 	}
 
 	QString extension = GetExtensionFromMimeType(mime);
-	QString objectName = GetExportFileName(objectId);
+	QString objectName = GetExportFileName(*collectionPtr, objectId);
 
 	QTemporaryDir tempDir;
 	QString fileName = objectName + "." + extension;
@@ -2576,9 +2614,9 @@ QString CObjectCollectionControllerCompBase::GetExtensionFromMimeType(const imtb
 }
 
 
-QString CObjectCollectionControllerCompBase::GetExportFileName(const QByteArray& objectId) const
+QString CObjectCollectionControllerCompBase::GetExportFileName(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const
 {
-	QString objectName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+	QString objectName = collection.GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 	if (objectName.isEmpty()){
 		objectName = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	}
@@ -2666,6 +2704,8 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 			const QByteArray& collectionId,
 			QString& /*errorMessage*/) const
 {
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+
 	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
 	if (informationIds.isEmpty()){
 		return false;
@@ -2680,13 +2720,13 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 			elementInformation = QString(collectionId);
 		}
 		else if(informationId == QByteArrayLiteral("name")){
-			elementInformation = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_NAME);
+			elementInformation = collectionPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_NAME);
 		}
 		else if(informationId == QByteArrayLiteral("description")){
-			elementInformation = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION);
+			elementInformation = collectionPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION);
 		}
 		else{
-			idoc::MetaInfoPtr elementMetaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(collectionId);
+			idoc::MetaInfoPtr elementMetaInfo = collectionPtr->GetElementMetaInfo(collectionId);
 			if (elementMetaInfo.IsValid()){
 				if (informationId == QByteArrayLiteral("added")){
 					elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
@@ -2943,6 +2983,31 @@ imtauth::CTenantFilterParam* CObjectCollectionControllerCompBase::CreateTenantFi
 }
 
 
+imtbase::IObjectCollection* CObjectCollectionControllerCompBase::GetRequestCollection(const imtgql::CGqlRequest& gqlRequest) const
+{
+	return GetContextCollection(gqlRequest.GetRequestContext());
+}
+
+
+imtbase::IObjectCollection* CObjectCollectionControllerCompBase::GetContextCollection(const imtgql::IGqlContext* gqlContextPtr) const
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	if (!m_tenantCollectionProviderCompPtr.IsValid() || !m_tenantCollectionProviderCompPtr->IsTenantSeparated()){
+		return m_objectCollectionCompPtr.GetPtr();
+	}
+
+	const QByteArray tenantId = (gqlContextPtr != nullptr) ? gqlContextPtr->GetTenantId() : QByteArray();
+	if (tenantId.isEmpty()){
+		return m_objectCollectionCompPtr.GetPtr();
+	}
+
+	return m_tenantCollectionProviderCompPtr->GetTenantCollection(tenantId);
+}
+
+
 QString CObjectCollectionControllerCompBase::GetObjectNameFromRequest(const imtgql::CGqlRequest& gqlRequest) const
 {
 	const imtgql::CGqlParamObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
@@ -3181,6 +3246,7 @@ istd::IChangeableUniquePtr CObjectCollectionControllerCompBase::CreateAdaptedObj
 
 
 bool CObjectCollectionControllerCompBase::CreateElementAttributeHistoryEntry(
+			imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
 			const QByteArray& operationTypeId,
 			const QByteArray& key,
@@ -3188,7 +3254,7 @@ bool CObjectCollectionControllerCompBase::CreateElementAttributeHistoryEntry(
 			const QString& oldValue,
 			const QString& newValue) const
 {
-	if (!m_operationContextControllerCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
+	if (!m_operationContextControllerCompPtr.IsValid()){
 		return false;
 	}
 
@@ -3197,7 +3263,7 @@ bool CObjectCollectionControllerCompBase::CreateElementAttributeHistoryEntry(
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr) || !dataPtr.IsValid()){
+	if (!collection.GetObjectData(objectId, dataPtr) || !dataPtr.IsValid()){
 		SendWarningMessage(
 			0,
 			QStringLiteral("Unable to write history entry for object '%1'. Error: Object data is not available").arg(objectId),
@@ -3231,7 +3297,7 @@ bool CObjectCollectionControllerCompBase::CreateElementAttributeHistoryEntry(
 	}
 
 	// Storing the unchanged document body creates the revision that carries the history entry.
-	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *dataPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
+	if (!collection.SetObjectData(objectId, *dataPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
 		SendWarningMessage(
 			0,
 			QStringLiteral("Unable to write history entry for object '%1'. Error: Storing the document revision failed").arg(objectId),
@@ -3324,20 +3390,21 @@ bool CObjectCollectionControllerCompBase::CreateUserActionLog(
 		return false;
 	}
 
-	if (!m_objectCollectionCompPtr.IsValid()){
+	imtbase::IObjectCollection* collectionPtr = GetRequestCollection(gqlRequest);
+	if (collectionPtr == nullptr){
 		return false;
 	}
 
 	imtauth::IUserRecentAction::TargetInfo targetInfo;
 	targetInfo.id = objectId;
 	if (objectTypeId.isEmpty()){
-		targetInfo.typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
+		targetInfo.typeId = collectionPtr->GetObjectTypeId(objectId);
 	}
 	else{
 		targetInfo.typeId = objectTypeId;
 	}
 
-	const iprm::IOptionsList* optionsListPtr = m_objectCollectionCompPtr->GetObjectTypesInfo();
+	const iprm::IOptionsList* optionsListPtr = collectionPtr->GetObjectTypesInfo();
 	if (optionsListPtr != nullptr){
 		int optionsCount = optionsListPtr->GetOptionsCount();
 		for (int i = 0; i < optionsCount; ++i){
@@ -3354,7 +3421,7 @@ bool CObjectCollectionControllerCompBase::CreateUserActionLog(
 	}
 	else{
 		if (targetInfo.name.isEmpty()){
-			targetInfo.name = m_objectCollectionCompPtr->GetElementInfo(targetInfo.id, imtbase::ICollectionInfo::ElementInfoType::EIT_NAME).toString();
+			targetInfo.name = collectionPtr->GetElementInfo(targetInfo.id, imtbase::ICollectionInfo::ElementInfoType::EIT_NAME).toString();
 		}
 
 		if (targetInfo.name.isEmpty()){

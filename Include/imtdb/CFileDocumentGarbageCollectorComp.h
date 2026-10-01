@@ -24,6 +24,9 @@ namespace imtdb
 	Garbage collector and integrity auditor for the content-addressed document file
 	store written by CSqlDatabaseFileDocumentDelegateComp.
 
+	With 'TenantStorageResolver' the document tables of all dedicated tenant schemas are scanned too:
+	the store is shared, a file is alive if any schema references it.
+
 	Liveness is a single scan of the 'Document' column over ALL rows of the collection
 	table - active documents, inactive revision rows and soft-deleted rows alike - which
 	is correct only while the store root is used exclusively by that one table.
@@ -37,11 +40,6 @@ namespace imtdb
 	(integrity audit). With 'AuditOnly' enabled (the default) nothing is ever deleted;
 	candidates are only reported. At the end of a deletion pass, fan-out folders left
 	empty by the sweep are removed as well.
-
-	The per-tenant stores below the store root (see CSqlDatabaseFileDocumentDelegateComp)
-	are never swept against the shared table. With 'TenantStorageResolver' set, every
-	tenant with a dedicated schema gets its own pass: its store folder against the
-	document table in its schema. Folders of unknown tenants are reported, not touched.
 */
 class CFileDocumentGarbageCollectorComp:
 			public QObject,
@@ -59,7 +57,7 @@ public:
 		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "Interval of the collection pass (in msec)", true, 3600000);
 		I_ASSIGN(m_gracePeriodHoursAttrPtr, "GracePeriodHours", "Minimum age of an unreferenced file before it may be deleted.\nMust exceed the longest running transaction and the backup window", true, 168);
 		I_ASSIGN(m_auditOnlyAttrPtr, "AuditOnly", "If true - unreferenced files are only reported, nothing is deleted", true, true);
-		I_ASSIGN(m_tenantStorageResolverCompPtr, "TenantStorageResolver", "Optional tenant storage resolver; if set, the store of every tenant with a dedicated schema is collected against the document table in that schema", false, "TenantStorageResolver");
+		I_ASSIGN(m_tenantStorageResolverCompPtr, "TenantStorageResolver", "Optional tenant storage resolver; if set, the document tables in the dedicated tenant schemas count for the liveness too", false, "TenantStorageResolver");
 	I_END_COMPONENT;
 
 protected:
@@ -79,25 +77,9 @@ private:
 		bool hasForeignContent = false;
 	};
 
-	/**
-		One store folder collected against the liveness of its document table.
-	*/
-	struct StorePass
-	{
-		QString storePath;
-		LivenessInfo livenessInfo;
-		bool isDeletionAllowed = false;
-
-		/**
-			Set for the shared store: its per-tenant stores are skipped, folders of unknown tenants reported.
-		*/
-		bool isSharedStore = false;
-		QSet<QString> knownTenantFolders;
-	};
-
-	bool GetLivenessInfo(const QString& schemaPrefix, LivenessInfo& livenessInfo) const;
-	bool SweepStores(const QList<StorePass>& storePasses);
-	bool SweepStore(const StorePass& storePass);
+	bool GetLivenessInfo(LivenessInfo& livenessInfo) const;
+	bool AddTableLiveness(const QString& schemaPrefix, LivenessInfo& livenessInfo) const;
+	bool SweepStore(const LivenessInfo& livenessInfo, bool isDeletionAllowed);
 
 private Q_SLOTS:
 	void OnTimeout();

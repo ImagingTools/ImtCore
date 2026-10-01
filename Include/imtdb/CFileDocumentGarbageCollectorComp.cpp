@@ -13,7 +13,6 @@
 
 // ImtCore includes
 #include <imtdb/CSqlDatabaseDocumentDelegateCompBase.h>
-#include <imtdb/CSqlDatabaseFileDocumentDelegateComp.h>
 
 
 namespace imtdb
@@ -111,7 +110,7 @@ void CFileDocumentGarbageCollectorComp::OnComponentDestroyed()
 
 // private methods
 
-bool CFileDocumentGarbageCollectorComp::GetLivenessInfo(const QString& schemaPrefix, LivenessInfo& livenessInfo) const
+bool CFileDocumentGarbageCollectorComp::GetLivenessInfo(LivenessInfo& livenessInfo) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		SendErrorMessage(0, "Attribute 'DatabaseEngine' was not set", "CFileDocumentGarbageCollectorComp");
@@ -119,6 +118,50 @@ bool CFileDocumentGarbageCollectorComp::GetLivenessInfo(const QString& schemaPre
 		return false;
 	}
 
+	QString schemaPrefix;
+	if (m_tableSchemaAttrPtr.IsValid() && !(*m_tableSchemaAttrPtr).isEmpty()){
+		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
+	}
+
+	if (!AddTableLiveness(schemaPrefix, livenessInfo)){
+		return false;
+	}
+
+	// tenant tables reference content of the same store: a file is alive if any schema references it
+	if (m_tenantStorageResolverCompPtr.IsValid()){
+		const QByteArrayList tenantIds = m_tenantStorageResolverCompPtr->GetRegisteredTenantIds();
+		for (const QByteArray& tenantId: tenantIds){
+			TenantStorageInfo storageInfo;
+			if (!m_tenantStorageResolverCompPtr->ResolveTenantStorage(tenantId, storageInfo) || (storageInfo.storageKind != TSK_OWN_SCHEMA)){
+				continue;
+			}
+
+			const QString tenantSchemaPrefix = QStringLiteral("\"%1\".").arg(QString::fromLatin1(storageInfo.schemaName));
+
+			// a tenant schema without the document table references nothing; any other failure stops the pass
+			QVariantMap bindValues;
+			bindValues[QStringLiteral(":tableName")] = tenantSchemaPrefix + '"' + QString::fromUtf8(*m_tableNameAttrPtr) + '"';
+
+			QSqlError sqlError;
+			QSqlQuery existsQuery = m_databaseEngineCompPtr->ExecSqlQuery(QByteArrayLiteral("SELECT to_regclass(:tableName) IS NOT NULL"), bindValues, &sqlError, true);
+			if ((sqlError.type() != QSqlError::NoError) || !existsQuery.next()){
+				SendErrorMessage(0, sqlError.text(), "CFileDocumentGarbageCollectorComp");
+
+				return false;
+			}
+
+			if (existsQuery.value(0).toBool() && !AddTableLiveness(tenantSchemaPrefix, livenessInfo)){
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+bool CFileDocumentGarbageCollectorComp::AddTableLiveness(const QString& schemaPrefix, LivenessInfo& livenessInfo) const
+{
 	// All rows, all states: inactive revision rows and soft-deleted rows keep their
 	// content alive - restoring either must always find its file.
 	const QByteArray query = QString("SELECT DISTINCT \"%1\" FROM %2\"%3\";")
@@ -155,34 +198,10 @@ bool CFileDocumentGarbageCollectorComp::GetLivenessInfo(const QString& schemaPre
 }
 
 
-bool CFileDocumentGarbageCollectorComp::SweepStores(const QList<StorePass>& storePasses)
+bool CFileDocumentGarbageCollectorComp::SweepStore(const LivenessInfo& livenessInfo, bool isDeletionAllowed)
 {
-	bool retVal = true;
-	for (const StorePass& storePass: storePasses){
-		retVal = SweepStore(storePass) && retVal;
-	}
-
-	return retVal;
-}
-
-
-bool CFileDocumentGarbageCollectorComp::SweepStore(const StorePass& storePass)
-{
-	const QString& storageRootPath = storePass.storePath;
-	const LivenessInfo& livenessInfo = storePass.livenessInfo;
-	const bool isDeletionAllowed = storePass.isDeletionAllowed;
+	const QString storageRootPath = m_storageRootCompPtr->GetPath();
 	const QDateTime graceLimit = QDateTime::currentDateTimeUtc().addSecs(-qint64(*m_gracePeriodHoursAttrPtr) * 3600);
-
-	const QString tenantStoresPath = QDir(storageRootPath).absoluteFilePath(CSqlDatabaseFileDocumentDelegateComp::s_tenantStoresFolderName);
-	if (storePass.isSharedStore){
-		const QStringList tenantFolders = QDir(tenantStoresPath).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-		for (const QString& tenantFolder: tenantFolders){
-			if (!storePass.knownTenantFolders.contains(tenantFolder)){
-				SendWarningMessage(0, QString("Document store of an unknown tenant, not collected: '%1'").arg(QDir(tenantStoresPath).filePath(tenantFolder)),
-							"CFileDocumentGarbageCollectorComp");
-			}
-		}
-	}
 
 	QSet<QByteArray> foundHashes;
 	int unreferencedCount = 0;
@@ -193,11 +212,6 @@ bool CFileDocumentGarbageCollectorComp::SweepStore(const StorePass& storePass)
 		storeIterator.next();
 		const QFileInfo fileInfo = storeIterator.fileInfo();
 		const QString fileName = fileInfo.fileName();
-
-		// tenant content is only ever judged against the tenant's own table
-		if (storePass.isSharedStore && fileInfo.absoluteFilePath().startsWith(tenantStoresPath + '/')){
-			continue;
-		}
 
 		const bool isContentFile = contentFileNamePattern.match(fileName).hasMatch();
 		if (!isContentFile && !stagingFileNamePattern.match(fileName).hasMatch()){
@@ -273,8 +287,7 @@ bool CFileDocumentGarbageCollectorComp::SweepStore(const StorePass& storePass)
 		}
 	}
 
-	SendInfoMessage(0, QString("Document store pass of '%1' finished: %2 referenced, %3 unreferenced past grace period, %4 deleted, %5 missing, %6 empty folders removed")
-				.arg(storageRootPath)
+	SendInfoMessage(0, QString("Document store pass finished: %1 referenced, %2 unreferenced past grace period, %3 deleted, %4 missing, %5 empty folders removed")
 				.arg(livenessInfo.referencedHashes.count())
 				.arg(unreferencedCount)
 				.arg(deletedCount)
@@ -300,69 +313,25 @@ void CFileDocumentGarbageCollectorComp::OnTimeout()
 		return;
 	}
 
-	const bool isAuditOnly = m_auditOnlyAttrPtr.IsValid() ? *m_auditOnlyAttrPtr : true;
-	const QString storageRootPath = m_storageRootCompPtr->GetPath();
-
-	// The liveness scans run on this thread: the SQL connection of the engine is
+	// The liveness scan runs on this thread: the SQL connection of the engine is
 	// bound to the thread it was created on. Only the file sweep is offloaded.
-	QList<StorePass> storePasses;
-
-	StorePass sharedPass;
-	sharedPass.storePath = storageRootPath;
-	sharedPass.isSharedStore = true;
-
-	QString sharedSchemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid() && !(*m_tableSchemaAttrPtr).isEmpty()){
-		sharedSchemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
-	}
-
-	if (!GetLivenessInfo(sharedSchemaPrefix, sharedPass.livenessInfo)){
+	LivenessInfo livenessInfo;
+	if (!GetLivenessInfo(livenessInfo)){
 		return;
 	}
 
-	if (m_tenantStorageResolverCompPtr.IsValid()){
-		const QByteArrayList tenantIds = m_tenantStorageResolverCompPtr->GetRegisteredTenantIds();
-		for (const QByteArray& tenantId: tenantIds){
-			TenantStorageInfo storageInfo;
-			if (!m_tenantStorageResolverCompPtr->ResolveTenantStorage(tenantId, storageInfo) || (storageInfo.storageKind != TSK_OWN_SCHEMA)){
-				continue;
-			}
-
-			// known even if its liveness scan fails below, so its folder is never reported as foreign
-			sharedPass.knownTenantFolders.insert(QString::fromLatin1(storageInfo.schemaName));
-
-			StorePass tenantPass;
-			tenantPass.storePath = CSqlDatabaseFileDocumentDelegateComp::GetTenantStorePath(storageRootPath, storageInfo.schemaName);
-			if (!QFileInfo::exists(tenantPass.storePath)){
-				continue;
-			}
-
-			if (!GetLivenessInfo(QStringLiteral("\"%1\".").arg(QString::fromLatin1(storageInfo.schemaName)), tenantPass.livenessInfo)){
-				SendWarningMessage(0, QString("Liveness of the document store of tenant '%1' could not be determined, store skipped").arg(QString(tenantId)),
-							"CFileDocumentGarbageCollectorComp");
-
-				continue;
-			}
-
-			storePasses.append(tenantPass);
-		}
+	if (livenessInfo.hasForeignContent){
+		SendWarningMessage(0, "Document table contains non-descriptor content; deletion is disabled for this pass",
+					"CFileDocumentGarbageCollectorComp");
 	}
 
-	storePasses.prepend(sharedPass);
-
-	for (StorePass& storePass: storePasses){
-		if (storePass.livenessInfo.hasForeignContent){
-			SendWarningMessage(0, QString("Document table of store '%1' contains non-descriptor content; deletion is disabled for this pass").arg(storePass.storePath),
-						"CFileDocumentGarbageCollectorComp");
-		}
-
-		storePass.isDeletionAllowed = !isAuditOnly && !storePass.livenessInfo.hasForeignContent;
-	}
+	const bool isAuditOnly = m_auditOnlyAttrPtr.IsValid() ? *m_auditOnlyAttrPtr : true;
+	const bool isDeletionAllowed = !isAuditOnly && !livenessInfo.hasForeignContent;
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-	m_sweepWatcher.setFuture(QtConcurrent::run(this, &CFileDocumentGarbageCollectorComp::SweepStores, storePasses));
+	m_sweepWatcher.setFuture(QtConcurrent::run(this, &CFileDocumentGarbageCollectorComp::SweepStore, livenessInfo, isDeletionAllowed));
 #else
-	m_sweepWatcher.setFuture(QtConcurrent::run(&CFileDocumentGarbageCollectorComp::SweepStores, this, storePasses));
+	m_sweepWatcher.setFuture(QtConcurrent::run(&CFileDocumentGarbageCollectorComp::SweepStore, this, livenessInfo, isDeletionAllowed));
 #endif
 }
 

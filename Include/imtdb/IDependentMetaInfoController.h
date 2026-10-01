@@ -133,6 +133,13 @@ public:
 		 * For example, ["Updated Name", "newemail@example.com"].
 		 */
 		QStringList metaInfoValues;
+
+		/**
+		 * @brief Tenant whose data storage contains the dependent objects
+		 *
+		 * Empty for the data without organization (shared storage).
+		 */
+		QByteArray tenantId;
 	};
 
 	/**
@@ -182,6 +189,13 @@ public:
 		 * Example: ["CustomerName", "CustomerEmail", "CustomerPhone"]
 		 */
 		QStringList metaInfoIds;
+
+		/**
+		 * @brief Tenant whose data storage contains the dependent objects
+		 *
+		 * Empty for the data without organization (shared storage).
+		 */
+		QByteArray tenantId;
 	};
 
 	/**

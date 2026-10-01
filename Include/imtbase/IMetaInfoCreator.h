@@ -6,6 +6,9 @@
 #include <istd/TSmartPtr.h>
 #include <idoc/IDocumentMetaInfo.h>
 
+// ImtCore includes
+#include <imtbase/IOperationContext.h>
+
 
 namespace imtbase
 {
@@ -30,6 +33,20 @@ public:
 		\note if the dataPtr is \c null, an empty meta-info object will be created.
 	*/
 	virtual bool CreateMetaInfo(const istd::IChangeable* dataPtr, const QByteArray& typeId, idoc::MetaInfoPtr& metaInfoPtr) const = 0;
+
+	/**
+		Create meta informations for the data object written by the given operation.
+		The operation context carries e.g. the tenant whose collections a creator reads related objects from.
+		The default implementation ignores the context.
+	*/
+	virtual bool CreateMetaInfoInOperation(
+				const istd::IChangeable* dataPtr,
+				const QByteArray& typeId,
+				idoc::MetaInfoPtr& metaInfoPtr,
+				const IOperationContext* /*operationContextPtr*/) const
+	{
+		return CreateMetaInfo(dataPtr, typeId, metaInfoPtr);
+	}
 };
 
 

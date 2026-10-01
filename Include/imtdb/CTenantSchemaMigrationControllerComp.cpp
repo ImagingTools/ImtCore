@@ -7,7 +7,6 @@
 #include <QtSql/QSqlQuery>
 
 // ImtCore includes
-#include <imtbase/CTenantContextScope.h>
 #include <imtdb/CTenantDataMigrator.h>
 #include <imtdb/CTenantStorageDbStore.h>
 
@@ -46,14 +45,8 @@ bool CTenantSchemaMigrationControllerComp::DoMigration(int& resultRevision, cons
 			continue;
 		}
 
-		if (m_storageResolverCompPtr.IsValid() && !m_storageResolverCompPtr->RegisterTenantStorage(tenantId, storageInfo)){
-			SendErrorMessage(0, QStringLiteral("Tenant schema migration failed: invalid storage assignment of tenant '%1'").arg(QString(tenantId)), "CTenantSchemaMigrationControllerComp");
-
-			return false;
-		}
-
 		int tenantRevision = -1;
-		if (!MigrateTenantSchema(tenantId, storageInfo.schemaName, tenantRevision, subRange)){
+		if (!MigrateTenantSchema(storageInfo.schemaName, tenantRevision, subRange)){
 			SendErrorMessage(
 						0,
 						QStringLiteral("Migration of schema '%1' of tenant '%2' failed, the migration of all tenants is rolled back").arg(QString(storageInfo.schemaName), QString(tenantId)),
@@ -91,15 +84,13 @@ bool CTenantSchemaMigrationControllerComp::IsPostgresDriver() const
 
 
 bool CTenantSchemaMigrationControllerComp::MigrateTenantSchema(
-			const QByteArray& tenantId,
 			const QByteArray& schemaName,
 			int& resultRevision,
 			const istd::CIntRange& subRange) const
 {
-	imtbase::CTenantContextScope tenantContextScope(tenantId);
-
+	// dedicated tenant schemas exist only on Postgres
 	if (!IsPostgresDriver()){
-		return m_tenantMigrationControllerCompPtr->DoMigration(resultRevision, subRange);
+		return false;
 	}
 
 	QByteArray quotedSchema = CTenantDataMigrator::QuoteIdentifier(schemaName);

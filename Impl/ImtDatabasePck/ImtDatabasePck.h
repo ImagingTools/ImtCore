@@ -33,7 +33,6 @@
 #include <imtdb/CTenantStorageResolverComp.h>
 #include <imtdb/CTenantStorageProvisionerComp.h>
 #include <imtdb/CTenantDataMigratorComp.h>
-#include <imtdb/CTenantRlsControllerComp.h>
 #include <imtdb/CTenantSchemaMigrationControllerComp.h>
 #include <imtdb/CTenantStorageBackupComp.h>
 #include <imtdb/CTenantStorageAutoProvisioningResolverComp.h>
@@ -73,7 +72,6 @@ typedef imtdb::CSqlDatabaseTransactionManagerComp SqlDatabaseTransactionManager;
 typedef icomp::TModelCompWrap<imtdb::CTenantStorageResolverComp> TenantStorageResolver;
 typedef icomp::TModelCompWrap<imtdb::CTenantStorageProvisionerComp> TenantStorageProvisioner;
 typedef icomp::TModelCompWrap<imtdb::CTenantDataMigratorComp> TenantDataMigrator;
-typedef icomp::TModelCompWrap<imtdb::CTenantRlsControllerComp> TenantRlsController;
 typedef imtdb::CTenantSchemaMigrationControllerComp TenantSchemaMigrationController;
 typedef imtdb::CTenantStorageBackupComp TenantStorageBackup;
 typedef icomp::TModelCompWrap<imtdb::CTenantStorageAutoProvisioningResolverComp> TenantStorageAutoProvisioningResolver;

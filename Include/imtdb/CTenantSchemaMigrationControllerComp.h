@@ -8,7 +8,6 @@
 // ImtCore includes
 #include <imtdb/IDatabaseEngine.h>
 #include <imtdb/IMigrationController.h>
-#include <imtdb/ITenantStorageResolver.h>
 
 
 namespace imtdb
@@ -36,7 +35,6 @@ public:
 		I_REGISTER_INTERFACE(imtdb::IMigrationController);
 		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine of the shared catalog", true, "DatabaseEngine");
 		I_ASSIGN(m_tenantMigrationControllerCompPtr, "TenantMigrationController", "Migration controller executed for each tenant schema", true, "TenantMigrationController");
-		I_ASSIGN(m_storageResolverCompPtr, "StorageResolver", "Optional tenant storage resolver updated with the persisted assignments before the migration (required if the wrapped controller uses tenant-aware delegates)", false, "TenantStorageResolver");
 		I_ASSIGN(m_registryTableSchemaAttrPtr, "RegistryTableSchema", "Schema containing the TenantStorage registry table", false, "");
 	I_END_COMPONENT;
 
@@ -46,11 +44,10 @@ public:
 
 private:
 	bool IsPostgresDriver() const;
-	bool MigrateTenantSchema(const QByteArray& tenantId, const QByteArray& schemaName, int& resultRevision, const istd::CIntRange& subRange) const;
+	bool MigrateTenantSchema(const QByteArray& schemaName, int& resultRevision, const istd::CIntRange& subRange) const;
 
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 	I_REF(imtdb::IMigrationController, m_tenantMigrationControllerCompPtr);
-	I_REF(imtdb::ITenantStorageResolver, m_storageResolverCompPtr);
 	I_ATTR(QByteArray, m_registryTableSchemaAttrPtr);
 };
 

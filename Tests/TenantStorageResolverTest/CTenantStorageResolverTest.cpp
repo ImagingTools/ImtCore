@@ -12,9 +12,7 @@
 
 #include <imtdb/CTenantStorageDbStore.h>
 #include <imtdb/CTenantDataMigrator.h>
-#include <imtdb/CTenantRlsPolicyBuilder.h>
 #include <imtdb/IDatabaseEngine.h>
-#include <imtbase/CTenantContextScope.h>
 
 
 using imtdb::CTenantStorageRegistry;
@@ -395,54 +393,6 @@ void CTenantStorageResolverTest::testConcurrentRegistrationAndResolution()
 
 // tenant context scope
 
-void CTenantStorageResolverTest::testTenantContextScopeActivation()
-{
-	QVERIFY(!imtbase::CTenantContextScope::IsActive());
-	QVERIFY(imtbase::CTenantContextScope::GetCurrentTenantId().isEmpty());
-
-	{
-		imtbase::CTenantContextScope scope(QByteArrayLiteral("tenant-a"));
-
-		QVERIFY(imtbase::CTenantContextScope::IsActive());
-		QCOMPARE(imtbase::CTenantContextScope::GetCurrentTenantId(), QByteArrayLiteral("tenant-a"));
-	}
-
-	QVERIFY(!imtbase::CTenantContextScope::IsActive());
-	QVERIFY(imtbase::CTenantContextScope::GetCurrentTenantId().isEmpty());
-}
-
-
-void CTenantStorageResolverTest::testTenantContextScopeNesting()
-{
-	imtbase::CTenantContextScope outerScope(QByteArrayLiteral("tenant-outer"));
-
-	{
-		imtbase::CTenantContextScope innerScope(QByteArrayLiteral("tenant-inner"));
-
-		QCOMPARE(imtbase::CTenantContextScope::GetCurrentTenantId(), QByteArrayLiteral("tenant-inner"));
-	}
-
-	QVERIFY(imtbase::CTenantContextScope::IsActive());
-	QCOMPARE(imtbase::CTenantContextScope::GetCurrentTenantId(), QByteArrayLiteral("tenant-outer"));
-}
-
-
-void CTenantStorageResolverTest::testTenantContextScopeIsThreadLocal()
-{
-	imtbase::CTenantContextScope scope(QByteArrayLiteral("tenant-main"));
-
-	QByteArray workerTenantId = QByteArrayLiteral("not-empty");
-	QScopedPointer<QThread> workerThreadPtr(QThread::create([&workerTenantId](){
-		workerTenantId = imtbase::CTenantContextScope::GetCurrentTenantId();
-	}));
-	workerThreadPtr->start();
-	workerThreadPtr->wait();
-
-	QVERIFY(workerTenantId.isEmpty());
-	QCOMPARE(imtbase::CTenantContextScope::GetCurrentTenantId(), QByteArrayLiteral("tenant-main"));
-}
-
-
 // data migration (in-memory SQLite with attached tenant schema)
 
 namespace
@@ -561,71 +511,5 @@ void CTenantStorageResolverTest::testQuoteIdentifier()
 
 
 // row-level security statement generation
-
-void CTenantStorageResolverTest::testRlsStatementsGeneration()
-{
-	QByteArrayList statements = imtdb::CTenantRlsPolicyBuilder::CreateEnableRlsStatements(
-				QByteArrayLiteral("public"),
-				QByteArrayLiteral("Items"),
-				QByteArrayLiteral("TenantId"),
-				QByteArrayLiteral("app.tenant_id"));
-
-	QCOMPARE(statements.size(), 4);
-	QCOMPARE(statements[0], QByteArrayLiteral("ALTER TABLE \"public\".\"Items\" ENABLE ROW LEVEL SECURITY"));
-	QCOMPARE(statements[1], QByteArrayLiteral("ALTER TABLE \"public\".\"Items\" FORCE ROW LEVEL SECURITY"));
-	QCOMPARE(statements[2], QByteArrayLiteral("DROP POLICY IF EXISTS \"TenantIsolation_Items\" ON \"public\".\"Items\""));
-	QCOMPARE(statements[3], QByteArrayLiteral("CREATE POLICY \"TenantIsolation_Items\" ON \"public\".\"Items\" USING (\"TenantId\"::text = current_setting('app.tenant_id', true))"));
-}
-
-
-void CTenantStorageResolverTest::testRlsStatementsRejectInvalidIdentifiers()
-{
-	QVERIFY(imtdb::CTenantRlsPolicyBuilder::CreateEnableRlsStatements(
-				QByteArrayLiteral("bad\"schema"), QByteArrayLiteral("Items"), QByteArrayLiteral("TenantId"), QByteArrayLiteral("app.tenant_id")).isEmpty());
-	QVERIFY(imtdb::CTenantRlsPolicyBuilder::CreateEnableRlsStatements(
-				QByteArrayLiteral("public"), QByteArray(), QByteArrayLiteral("TenantId"), QByteArrayLiteral("app.tenant_id")).isEmpty());
-	QVERIFY(imtdb::CTenantRlsPolicyBuilder::CreateEnableRlsStatements(
-				QByteArrayLiteral("public"), QByteArrayLiteral("Items"), QByteArrayLiteral("Tenant\"Id"), QByteArrayLiteral("app.tenant_id")).isEmpty());
-	QVERIFY(imtdb::CTenantRlsPolicyBuilder::CreateEnableRlsStatements(
-				QByteArrayLiteral("public"), QByteArrayLiteral("Items"), QByteArrayLiteral("TenantId"), QByteArrayLiteral("app.tenant'id")).isEmpty());
-}
-
-
-void CTenantStorageResolverTest::testRlsSessionVariableValidation()
-{
-	QVERIFY(imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArrayLiteral("app.tenant_id")));
-	QVERIFY(imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArrayLiteral("imt.tenant2")));
-	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArray()));
-	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArrayLiteral("tenant_id")));
-	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArrayLiteral("app.tenant.id")));
-	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArrayLiteral("App.TenantId")));
-	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArrayLiteral("app.tenant'id")));
-	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArrayLiteral(".tenant_id")));
-	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsValidSessionVariableName(QByteArrayLiteral("app.")));
-}
-
-
-void CTenantStorageResolverTest::testRlsBindAndUnbindQueries()
-{
-	QCOMPARE(
-				imtdb::CTenantRlsPolicyBuilder::CreateBindSessionTenantQuery(QByteArrayLiteral("app.tenant_id")),
-				QByteArrayLiteral("SELECT set_config('app.tenant_id', :tenantId, false)"));
-	QCOMPARE(
-				imtdb::CTenantRlsPolicyBuilder::CreateUnbindSessionTenantQuery(QByteArrayLiteral("app.tenant_id")),
-				QByteArrayLiteral("SELECT set_config('app.tenant_id', '', false)"));
-	QVERIFY(imtdb::CTenantRlsPolicyBuilder::CreateBindSessionTenantQuery(QByteArrayLiteral("bad name")).isEmpty());
-	QVERIFY(imtdb::CTenantRlsPolicyBuilder::CreateUnbindSessionTenantQuery(QByteArrayLiteral("bad name")).isEmpty());
-}
-
-
-void CTenantStorageResolverTest::testRlsCrossTenantCatalogTables()
-{
-	QVERIFY(imtdb::CTenantRlsPolicyBuilder::IsCrossTenantCatalogTable(QByteArrayLiteral("CrossOrgGrants")));
-	QVERIFY(imtdb::CTenantRlsPolicyBuilder::IsCrossTenantCatalogTable(QByteArrayLiteral("TenantMemberships")));
-	QVERIFY(imtdb::CTenantRlsPolicyBuilder::IsCrossTenantCatalogTable(QByteArrayLiteral("tenantstorage")));
-	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsCrossTenantCatalogTable(QByteArrayLiteral("Documents")));
-	QVERIFY(!imtdb::CTenantRlsPolicyBuilder::IsCrossTenantCatalogTable(QByteArrayLiteral("TenantsArchive")));
-}
-
 
 I_ADD_TEST(CTenantStorageResolverTest);

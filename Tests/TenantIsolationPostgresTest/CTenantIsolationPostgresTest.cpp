@@ -15,17 +15,16 @@
 #include <icomp/TSimComponentWrap.h>
 #include <ifile/CFileNameParamComp.h>
 
-#include <imtbase/CSharedStorageScope.h>
-#include <imtbase/CTenantContextScope.h>
+#include <imtbase/COperationContext.h>
+
 #include <imtdb/CDatabaseAccessSettingsComp.h>
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/CFileDocumentGarbageCollectorComp.h>
-#include <imtdb/CSqlDatabaseFileDocumentDelegateComp.h>
+#include <imtdb/CSqlDatabaseObjectCollectionComp.h>
 #include <imtdb/CSqlDatabaseDocumentDelegateComp.h>
 #include <imtdb/CSqlJsonDatabaseDelegateComp.h>
 #include <imtdb/CTenantDataMigrator.h>
 #include <imtdb/CTenantDataMigratorComp.h>
-#include <imtdb/CTenantRlsControllerComp.h>
 #include <imtdb/CTenantSchemaMigrationControllerComp.h>
 #include <imtdb/CTenantStorageBackupComp.h>
 #include <imtdb/CTenantStorageAutoProvisioningResolverComp.h>
@@ -78,8 +77,7 @@ public:
 		}
 
 		QVariantMap bindValues;
-		bindValues[QStringLiteral(":tenantId")] = QString(imtbase::CTenantContextScope::GetCurrentTenantId());
-		m_databaseEngineCompPtr->ExecSqlQuery(QByteArrayLiteral("INSERT INTO \"Items\" VALUES (:tenantId, 'migrated')"), bindValues, &sqlError);
+		m_databaseEngineCompPtr->ExecSqlQuery(QByteArrayLiteral("INSERT INTO \"Items\" VALUES (current_schema(), 'migrated')"), &sqlError);
 		if (sqlError.type() != QSqlError::NoError){
 			return false;
 		}
@@ -97,7 +95,6 @@ private:
 typedef icomp::TSimComponentWrap<imtdb::CDatabaseEngineComp> DatabaseEngine;
 typedef icomp::TSimComponentWrap<CTenantTableMigrationTestComp> TenantTableMigration;
 typedef icomp::TSimComponentWrap<imtdb::CTenantSchemaMigrationControllerComp> TenantSchemaMigrationController;
-typedef icomp::TSimComponentWrap<imtdb::CTenantRlsControllerComp> TenantRlsController;
 typedef icomp::TSimComponentWrap<imtdb::CTenantStorageResolverComp> TenantStorageResolver;
 typedef icomp::TSimComponentWrap<imtdb::CTenantStorageProvisionerComp> TenantStorageProvisioner;
 typedef icomp::TSimComponentWrap<imtdb::CTenantDataMigratorComp> TenantDataMigrator;
@@ -106,25 +103,14 @@ typedef icomp::TSimComponentWrap<imtdb::CDatabaseAccessSettingsComp> DatabaseAcc
 typedef icomp::TSimComponentWrap<imtdb::CTenantStorageBackupComp> TenantStorageBackup;
 typedef icomp::TSimComponentWrap<imtdb::CSqlDatabaseDocumentDelegateComp> DocumentDelegate;
 typedef icomp::TSimComponentWrap<imtdb::CSqlJsonDatabaseDelegateComp> JsonDocumentDelegate;
+typedef icomp::TSimComponentWrap<imtdb::CSqlDatabaseObjectCollectionComp> SqlCollection;
 typedef icomp::TSimComponentWrap<ifile::CFileNameParamComp> FileNameParam;
 typedef icomp::TSimComponentWrap<imtdb::CFileDocumentGarbageCollectorComp> FileDocumentGarbageCollector;
 
 
-class CFileDocumentDelegateTestComp: public imtdb::CSqlDatabaseFileDocumentDelegateComp
-{
-public:
-	using imtdb::CSqlDatabaseFileDocumentDelegateComp::GetContentFilePath;
-};
-
-
-typedef icomp::TSimComponentWrap<CFileDocumentDelegateTestComp> FileDocumentDelegate;
-
-
 const QByteArray s_hashShared = QByteArray(64, 'a');
-const QByteArray s_hashSharedOrphan = QByteArray(64, 'b');
 const QByteArray s_hashAlphaReferenced = QByteArray(64, 'c');
 const QByteArray s_hashAlphaOrphan = QByteArray(64, 'd');
-const QByteArray s_hashUnknownTenant = QByteArray(64, 'e');
 
 
 std::shared_ptr<FileNameParam> CreateDirectoryParam(const QString& path)
@@ -323,17 +309,10 @@ void CTenantIsolationPostgresTest::initTestCase()
 	enginePtr->SetIntAttr("AutoCreateDatabase", 0);
 	enginePtr->SetIntAttr("AutoCreateTables", 1);
 	enginePtr->SetIntAttr("Port", m_port);
-	enginePtr->SetIdAttr("TenantSessionVariable", QByteArrayLiteral("app.tenant_id"));
 	enginePtr->SetRef("MigrationController", m_schemaMigrationCompPtr);
 
 	// runs the migrations of all tenant schemas
 	enginePtr->InitComponent();
-
-	std::shared_ptr<TenantRlsController> rlsControllerPtr = std::make_shared<TenantRlsController>();
-	rlsControllerPtr->SetRef("DatabaseEngine", m_engineCompPtr);
-	rlsControllerPtr->InsertMultiAttr("TableNames", QByteArrayLiteral("Shared"));
-	rlsControllerPtr->InitComponent();
-	QVERIFY(rlsControllerPtr->ApplyRowLevelSecurity());
 }
 
 
@@ -373,15 +352,15 @@ void CTenantIsolationPostgresTest::testTenantSchemaMigrationRunsPerTenant()
 	imtdb::IDatabaseEngine* enginePtr = dynamic_cast<imtdb::IDatabaseEngine*>(m_engineCompPtr.get());
 	QVERIFY(enginePtr != nullptr);
 
-	// each tenant schema got its own table, created inside the tenant context of that tenant
+	// each tenant schema got its own table; the migration ran with that schema at the head of the search path
 	QSqlQuery alphaQuery = enginePtr->ExecSqlQuery(QByteArrayLiteral("SELECT \"TenantId\" FROM tenant_alpha.\"Items\""));
 	QVERIFY(alphaQuery.next());
-	QCOMPARE(alphaQuery.value(0).toString(), QStringLiteral("alpha"));
+	QCOMPARE(alphaQuery.value(0).toString(), QStringLiteral("tenant_alpha"));
 	QVERIFY(!alphaQuery.next());
 
 	QSqlQuery betaQuery = enginePtr->ExecSqlQuery(QByteArrayLiteral("SELECT \"TenantId\" FROM tenant_beta.\"Items\""));
 	QVERIFY(betaQuery.next());
-	QCOMPARE(betaQuery.value(0).toString(), QStringLiteral("beta"));
+	QCOMPARE(betaQuery.value(0).toString(), QStringLiteral("tenant_beta"));
 	QVERIFY(!betaQuery.next());
 
 	// neither the shared schema nor archived tenants are migrated, and the search path was restored
@@ -392,90 +371,6 @@ void CTenantIsolationPostgresTest::testTenantSchemaMigrationRunsPerTenant()
 	QSqlQuery revisionQuery = enginePtr->ExecSqlQuery(QByteArrayLiteral("SELECT MAX(Revision) FROM \"Revisions\""));
 	QVERIFY(revisionQuery.next());
 	QCOMPARE(revisionQuery.value(0).toInt(), 1);
-}
-
-
-void CTenantIsolationPostgresTest::testSessionBindingFollowsTenantContext()
-{
-	static const QByteArray selectShared = QByteArrayLiteral("SELECT * FROM \"Shared\"");
-
-	// fail-closed: no tenant context, no rows
-	QCOMPARE(CountRows(selectShared), 0);
-
-	{
-		imtbase::CTenantContextScope alphaScope(QByteArrayLiteral("alpha"));
-		QCOMPARE(CountRows(selectShared), 1);
-		QCOMPARE(CountRows(QByteArrayLiteral("SELECT * FROM \"Shared\" WHERE \"TenantId\" = 'alpha'")), 1);
-
-		{
-			imtbase::CTenantContextScope betaScope(QByteArrayLiteral("beta"));
-			QCOMPARE(CountRows(QByteArrayLiteral("SELECT * FROM \"Shared\" WHERE \"TenantId\" = 'beta'")), 1);
-			QCOMPARE(CountRows(QByteArrayLiteral("SELECT * FROM \"Shared\" WHERE \"TenantId\" = 'alpha'")), 0);
-		}
-
-		QCOMPARE(GetBoundTenant(), QStringLiteral("alpha"));
-	}
-
-	// the thread connection is reused by the next request: the previous tenant must be unbound
-	QCOMPARE(CountRows(selectShared), 0);
-	QCOMPARE(GetBoundTenant(), QString());
-}
-
-
-void CTenantIsolationPostgresTest::testSessionBindingIsPerThreadConnection()
-{
-	imtbase::CTenantContextScope alphaScope(QByteArrayLiteral("alpha"));
-	QCOMPARE(GetBoundTenant(), QStringLiteral("alpha"));
-
-	QFuture<QString> future = QtConcurrent::run([this](){
-		imtbase::CTenantContextScope betaScope(QByteArrayLiteral("beta"));
-
-		return GetBoundTenant();
-	});
-
-	QCOMPARE(future.result(), QStringLiteral("beta"));
-	QCOMPARE(GetBoundTenant(), QStringLiteral("alpha"));
-}
-
-
-void CTenantIsolationPostgresTest::testSessionBindingIsRestoredAfterRollback()
-{
-	imtdb::IDatabaseEngine* enginePtr = dynamic_cast<imtdb::IDatabaseEngine*>(m_engineCompPtr.get());
-	QVERIFY(enginePtr != nullptr);
-
-	imtbase::CTenantContextScope alphaScope(QByteArrayLiteral("alpha"));
-	QVERIFY(enginePtr->BeginTransaction());
-
-	{
-		// rebinding inside the transaction, which the rollback reverts to 'alpha'
-		imtbase::CTenantContextScope betaScope(QByteArrayLiteral("beta"));
-		QCOMPARE(GetBoundTenant(), QStringLiteral("beta"));
-
-		QVERIFY(enginePtr->CancelTransaction());
-
-		QCOMPARE(GetBoundTenant(), QStringLiteral("beta"));
-		QCOMPARE(CountRows(QByteArrayLiteral("SELECT * FROM \"Shared\" WHERE \"TenantId\" = 'alpha'")), 0);
-	}
-
-	QCOMPARE(GetBoundTenant(), QStringLiteral("alpha"));
-}
-
-
-void CTenantIsolationPostgresTest::testRlsRejectsCrossTenantCatalogTables()
-{
-	QVERIFY(ExecApp(QStringLiteral("CREATE TABLE \"TenantOwned\" (\"TenantId\" TEXT)")));
-	QVERIFY(ExecApp(QStringLiteral("CREATE TABLE \"TenantMemberships\" (\"TenantId\" TEXT, \"UserId\" TEXT)")));
-
-	std::shared_ptr<TenantRlsController> rlsControllerPtr = std::make_shared<TenantRlsController>();
-	rlsControllerPtr->SetRef("DatabaseEngine", m_engineCompPtr);
-	rlsControllerPtr->InsertMultiAttr("TableNames", QByteArrayLiteral("TenantOwned"));
-	rlsControllerPtr->InsertMultiAttr("TableNames", QByteArrayLiteral("TenantMemberships"));
-	rlsControllerPtr->InitComponent();
-
-	QVERIFY(!rlsControllerPtr->ApplyRowLevelSecurity());
-
-	// nothing applied, not even to the valid table listed first
-	QCOMPARE(CountRows(QByteArrayLiteral("SELECT 1 FROM pg_policies WHERE tablename IN ('TenantOwned', 'TenantMemberships')")), 0);
 }
 
 
@@ -568,7 +463,7 @@ void CTenantIsolationPostgresTest::testAutoProvisioningOnFirstAccess()
 }
 
 
-void CTenantIsolationPostgresTest::testDataMigratorSeesRlsProtectedSourceRows()
+void CTenantIsolationPostgresTest::testDataMigratorCopiesTenantRows()
 {
 	std::shared_ptr<TenantStorageResolver> resolverPtr = CreateLoadedResolver(m_engineCompPtr);
 
@@ -632,7 +527,7 @@ void CTenantIsolationPostgresTest::testBackupAndRestoreTenantSchema()
 
 	QVERIFY(backupPtr->RestoreTenantStorage(QByteArrayLiteral("alpha"), backupFilePath));
 
-	QCOMPARE(CountRows(QByteArrayLiteral("SELECT * FROM tenant_alpha.\"Items\" WHERE \"TenantId\" = 'alpha'")), 1);
+	QCOMPARE(CountRows(QByteArrayLiteral("SELECT * FROM tenant_alpha.\"Items\" WHERE \"TenantId\" = 'tenant_alpha'")), 1);
 	QCOMPARE(CountRows(QByteArrayLiteral("SELECT 1 WHERE to_regclass('tenant_alpha.\"CreatedAfterBackup\"') IS NOT NULL")), 0);
 	QCOMPARE(CountRows(QByteArrayLiteral("SELECT 1 FROM information_schema.schemata WHERE schema_name LIKE 'imt_restore_%'")), 0);
 
@@ -660,118 +555,125 @@ void CTenantIsolationPostgresTest::testRestoreRejectsArchiveOfOtherTenant()
 
 	QVERIFY(!backupPtr->RestoreTenantStorage(QByteArrayLiteral("beta"), backupFilePath));
 
-	QCOMPARE(CountRows(QByteArrayLiteral("SELECT * FROM tenant_beta.\"Items\" WHERE \"TenantId\" = 'beta'")), 1);
-	QCOMPARE(CountRows(QByteArrayLiteral("SELECT * FROM tenant_beta.\"Items\" WHERE \"TenantId\" = 'alpha'")), 0);
+	QCOMPARE(CountRows(QByteArrayLiteral("SELECT * FROM tenant_beta.\"Items\" WHERE \"TenantId\" = 'tenant_beta'")), 1);
+	QCOMPARE(CountRows(QByteArrayLiteral("SELECT * FROM tenant_beta.\"Items\" WHERE \"TenantId\" = 'tenant_alpha'")), 0);
 	QCOMPARE(CountRows(QByteArrayLiteral("SELECT 1 FROM \"TenantStorage\" WHERE \"TenantId\" = 'beta' AND \"Status\" = 2")), 1);
 }
 
 
 void CTenantIsolationPostgresTest::testDocumentDelegatesAddressTenantSchema()
 {
-	static const QRegularExpression alphaTable(QStringLiteral("tenant_alpha\\.\\s*\"Items\""));
-	static const QRegularExpression deniedTable(QStringLiteral("imt_tenant_storage_denied\\.\\s*\"Items\""));
+	static const QRegularExpression alphaTable(QStringLiteral("\"tenant_alpha\"\\.\\s*\"Items\""));
 	static const QRegularExpression publicTable(QStringLiteral("public\\.\\s*\"Items\""));
 	static const QRegularExpression unqualifiedTable(QStringLiteral("(FROM|JOIN|INTO|UPDATE)\\s+\"Items\""));
+
+	const QByteArray alphaTenantId = QByteArrayLiteral("alpha");
+	const QByteArray noOrganization;
 
 	std::shared_ptr<TenantStorageResolver> resolverPtr = CreateLoadedResolver(m_engineCompPtr);
 
 	std::shared_ptr<DocumentDelegate> documentDelegatePtr = CreateDelegate<DocumentDelegate>(m_engineCompPtr, resolverPtr, QByteArrayLiteral("public"));
 	std::shared_ptr<JsonDocumentDelegate> jsonDelegatePtr = CreateDelegate<JsonDocumentDelegate>(m_engineCompPtr, resolverPtr, QByteArray());
 
-	{
-		imtbase::CTenantContextScope alphaScope(QByteArrayLiteral("alpha"));
+	QVERIFY(documentDelegatePtr->HasTenantStorage());
 
-		// the static TableSchema 'public' must not win over the tenant schema
-		for (const QByteArray& query : {
-					documentDelegatePtr->GetSelectionQuery(QByteArrayLiteral("doc-1")),
-					documentDelegatePtr->GetSelectionQuery(QByteArray(), 0, 10),
-					documentDelegatePtr->GetCountQuery(),
-					jsonDelegatePtr->GetSelectionQuery(QByteArray(), 0, 10),
-					jsonDelegatePtr->GetCountQuery()}){
-			const QString queryText = QString::fromUtf8(query);
-			QVERIFY2(alphaTable.match(queryText).hasMatch(), query.constData());
-			QVERIFY2(!publicTable.match(queryText).hasMatch(), query.constData());
-			QVERIFY2(!unqualifiedTable.match(queryText).hasMatch(), query.constData());
-		}
+	const QList<QByteArray> tenantQueries = {
+				documentDelegatePtr->GetSelectionQuery(QByteArrayLiteral("doc-1")),
+				documentDelegatePtr->GetSelectionQuery(QByteArray(), 0, 10),
+				documentDelegatePtr->GetCountQuery(),
+				jsonDelegatePtr->GetSelectionQuery(QByteArray(), 0, 10),
+				jsonDelegatePtr->GetCountQuery()};
+
+	for (const QByteArray& builtQuery : tenantQueries){
+		// a tenant-owned delegate never builds a query against a concrete schema by itself
+		QVERIFY2(builtQuery.contains(imtdb::ISqlDatabaseObjectDelegate::s_tenantSchemePrefixPlaceholder), builtQuery.constData());
+
+		// the tenant of the collection wins over the static TableSchema 'public'
+		QByteArray alphaQuery = builtQuery;
+		QVERIFY(documentDelegatePtr->ApplyTenantStorage(alphaQuery, alphaTenantId));
+		QVERIFY2(alphaTable.match(QString::fromUtf8(alphaQuery)).hasMatch(), alphaQuery.constData());
+		QVERIFY2(!publicTable.match(QString::fromUtf8(alphaQuery)).hasMatch(), alphaQuery.constData());
+		QVERIFY2(!unqualifiedTable.match(QString::fromUtf8(alphaQuery)).hasMatch(), alphaQuery.constData());
 	}
 
-	// fail-closed without a tenant context
-	QVERIFY(deniedTable.match(QString::fromUtf8(documentDelegatePtr->GetCountQuery())).hasMatch());
-	QVERIFY(deniedTable.match(QString::fromUtf8(jsonDelegatePtr->GetCountQuery())).hasMatch());
+	// an unknown tenant is denied; a call without organization addresses the shared schema
+	const QByteArray unknownTenantId = QByteArrayLiteral("unknown");
+	QByteArray unknownQuery = documentDelegatePtr->GetCountQuery();
+	QVERIFY(!documentDelegatePtr->ApplyTenantStorage(unknownQuery, unknownTenantId));
 
-	{
-		// deliberate shared storage access (e.g. the shared schema migrations); a tenant context inside wins
-		imtbase::CSharedStorageScope sharedStorageScope;
-		QVERIFY(publicTable.match(QString::fromUtf8(documentDelegatePtr->GetCountQuery())).hasMatch());
-
-		imtbase::CTenantContextScope alphaScope(QByteArrayLiteral("alpha"));
-		QVERIFY(alphaTable.match(QString::fromUtf8(documentDelegatePtr->GetCountQuery())).hasMatch());
-	}
+	QByteArray noOrganizationQuery = documentDelegatePtr->GetCountQuery();
+	QVERIFY(documentDelegatePtr->ApplyTenantStorage(noOrganizationQuery, noOrganization));
+	QVERIFY2(publicTable.match(QString::fromUtf8(noOrganizationQuery)).hasMatch(), noOrganizationQuery.constData());
 
 	// without a resolver the previous behavior stays: TableSchema for the document delegate, unqualified for the JSON delegate
 	std::shared_ptr<DocumentDelegate> sharedDocumentDelegatePtr = CreateDelegate<DocumentDelegate>(m_engineCompPtr, nullptr, QByteArrayLiteral("public"));
 	std::shared_ptr<JsonDocumentDelegate> sharedJsonDelegatePtr = CreateDelegate<JsonDocumentDelegate>(m_engineCompPtr, nullptr, QByteArrayLiteral("public"));
 
-	QVERIFY(publicTable.match(QString::fromUtf8(sharedDocumentDelegatePtr->GetCountQuery())).hasMatch());
+	QVERIFY(!sharedDocumentDelegatePtr->HasTenantStorage());
+
+	QByteArray sharedQuery = sharedDocumentDelegatePtr->GetCountQuery();
+	QVERIFY(!sharedQuery.contains(imtdb::ISqlDatabaseObjectDelegate::s_tenantSchemePrefixPlaceholder));
+	QVERIFY(sharedDocumentDelegatePtr->ApplyTenantStorage(sharedQuery, QByteArray()));
+	QVERIFY(publicTable.match(QString::fromUtf8(sharedQuery)).hasMatch());
 	QByteArray sharedJsonQuery = sharedJsonDelegatePtr->GetSelectionQuery(QByteArray(), 0, 10);
 	QVERIFY2(unqualifiedTable.match(QString::fromUtf8(sharedJsonQuery)).hasMatch(), sharedJsonQuery.constData());
 	QVERIFY2(!publicTable.match(QString::fromUtf8(sharedJsonQuery)).hasMatch(), sharedJsonQuery.constData());
 }
 
 
-void CTenantIsolationPostgresTest::testFileDocumentStoreIsPerTenant()
+void CTenantIsolationPostgresTest::testTenantCollectionIsBoundToTenant()
 {
-	QTemporaryDir storeDir;
-	QVERIFY(storeDir.isValid());
-
 	std::shared_ptr<TenantStorageResolver> resolverPtr = CreateLoadedResolver(m_engineCompPtr);
+	std::shared_ptr<DocumentDelegate> documentDelegatePtr = CreateDelegate<DocumentDelegate>(m_engineCompPtr, resolverPtr, QByteArrayLiteral("public"));
 
-	std::shared_ptr<FileDocumentDelegate> delegatePtr = std::make_shared<FileDocumentDelegate>();
-	delegatePtr->SetRef("DatabaseEngine", m_engineCompPtr);
-	delegatePtr->SetRef("TenantStorageResolver", resolverPtr);
-	delegatePtr->SetRef("StorageRoot", CreateDirectoryParam(storeDir.path()));
-	delegatePtr->SetIdAttr("TableName", QByteArrayLiteral("FileDocs"));
-	delegatePtr->InitComponent();
+	SqlCollection collection;
+	collection.SetRef("DatabaseEngine", m_engineCompPtr);
+	collection.SetRef("ObjectDelegate", documentDelegatePtr);
+	collection.InitComponent();
 
-	const QString tenantsPath = QDir(storeDir.path()).filePath(QStringLiteral("tenants"));
+	QVERIFY(collection.IsTenantSeparated());
 
-	{
-		imtbase::CTenantContextScope alphaScope(QByteArrayLiteral("alpha"));
-		const QString alphaPath = QDir::cleanPath(delegatePtr->GetContentFilePath(s_hashShared));
-		QCOMPARE(alphaPath, QDir::cleanPath(QDir(tenantsPath).filePath(QStringLiteral("tenant_alpha/aa/") + QString::fromLatin1(s_hashShared) + QStringLiteral(".bin"))));
-	}
+	imtbase::ITenantObjectCollection* alphaCollectionPtr = collection.GetTenantCollection(QByteArrayLiteral("alpha"));
+	QVERIFY(alphaCollectionPtr != nullptr);
+	QCOMPARE(alphaCollectionPtr->GetTenantId(), QByteArrayLiteral("alpha"));
+	QCOMPARE(collection.GetTenantCollection(QByteArrayLiteral("alpha")), alphaCollectionPtr);
 
-	{
-		imtbase::CTenantContextScope betaScope(QByteArrayLiteral("beta"));
-		QVERIFY(QDir::cleanPath(delegatePtr->GetContentFilePath(s_hashShared)).contains(QStringLiteral("/tenants/tenant_beta/")));
-	}
+	// an operation of a tenant is denied on the data of another tenant and on the data without organization
+	imtbase::COperationContext alphaOperation;
+	alphaOperation.SetTenantId(QByteArrayLiteral("alpha"));
 
-	// fail-closed: no path without a tenant context or for an unknown tenant
-	QVERIFY(delegatePtr->GetContentFilePath(s_hashShared).isEmpty());
+	const imtbase::ICollectionInfo::Ids objectIds = {QByteArrayLiteral("doc-1")};
+	QVERIFY(!collection.GetTenantCollection(QByteArrayLiteral("beta"))->RemoveElements(objectIds, &alphaOperation));
+	QVERIFY(!collection.RemoveElements(objectIds, &alphaOperation));
 
-	imtbase::CTenantContextScope unknownScope(QByteArrayLiteral("unknown"));
-	QVERIFY(delegatePtr->GetContentFilePath(s_hashShared).isEmpty());
+	// without a resolver all tenants share the data of the collection
+	std::shared_ptr<DocumentDelegate> sharedDocumentDelegatePtr = CreateDelegate<DocumentDelegate>(m_engineCompPtr, nullptr, QByteArrayLiteral("public"));
+
+	SqlCollection sharedCollection;
+	sharedCollection.SetRef("DatabaseEngine", m_engineCompPtr);
+	sharedCollection.SetRef("ObjectDelegate", sharedDocumentDelegatePtr);
+	sharedCollection.InitComponent();
+
+	QVERIFY(!sharedCollection.IsTenantSeparated());
 }
 
 
-void CTenantIsolationPostgresTest::testGarbageCollectorKeepsTenantStores()
+void CTenantIsolationPostgresTest::testGarbageCollectorKeepsTenantReferencedContent()
 {
 	QTemporaryDir storeDir;
 	QVERIFY(storeDir.isValid());
 	const QString rootPath = storeDir.path();
-	const QString alphaStorePath = imtdb::CSqlDatabaseFileDocumentDelegateComp::GetTenantStorePath(rootPath, QByteArrayLiteral("tenant_alpha"));
-	const QString unknownStorePath = imtdb::CSqlDatabaseFileDocumentDelegateComp::GetTenantStorePath(rootPath, QByteArrayLiteral("tenant_unknown"));
 
 	QVERIFY(ExecApp(QStringLiteral("CREATE TABLE \"FileDocs\" (\"Document\" TEXT)")));
 	QVERIFY(ExecApp(QStringLiteral("CREATE TABLE tenant_alpha.\"FileDocs\" (\"Document\" TEXT)")));
 	QVERIFY(ExecApp(QStringLiteral("INSERT INTO \"FileDocs\" VALUES ('%1')").arg(CreateDescriptor(s_hashShared))));
 	QVERIFY(ExecApp(QStringLiteral("INSERT INTO tenant_alpha.\"FileDocs\" VALUES ('%1')").arg(CreateDescriptor(s_hashAlphaReferenced))));
 
+	// one shared store: a tenant row references content in the same store as a shared row
 	const QString sharedFile = CreateStoreFile(rootPath, s_hashShared);
-	const QString alphaReferencedFile = CreateStoreFile(alphaStorePath, s_hashAlphaReferenced);
-	const QString alphaOrphanFile = CreateStoreFile(alphaStorePath, s_hashAlphaOrphan);
-	const QString unknownTenantFile = CreateStoreFile(unknownStorePath, s_hashUnknownTenant);
-	QVERIFY(!sharedFile.isEmpty() && !alphaReferencedFile.isEmpty() && !alphaOrphanFile.isEmpty() && !unknownTenantFile.isEmpty());
+	const QString alphaReferencedFile = CreateStoreFile(rootPath, s_hashAlphaReferenced);
+	const QString alphaOrphanFile = CreateStoreFile(rootPath, s_hashAlphaOrphan);
+	QVERIFY(!sharedFile.isEmpty() && !alphaReferencedFile.isEmpty() && !alphaOrphanFile.isEmpty());
 
 	auto createCollector = [&](const icomp::IComponentSharedPtr& resolverCompPtr){
 		std::shared_ptr<FileDocumentGarbageCollector> collectorPtr = std::make_shared<FileDocumentGarbageCollector>();
@@ -789,80 +691,15 @@ void CTenantIsolationPostgresTest::testGarbageCollectorKeepsTenantStores()
 		return collectorPtr;
 	};
 
-	{
-		// a collector of the shared store must never judge tenant content against the shared table;
-		// the shared orphan marks a finished pass
-		const QString sharedOrphanFile = CreateStoreFile(rootPath, s_hashSharedOrphan);
-		std::shared_ptr<FileDocumentGarbageCollector> sharedCollectorPtr = createCollector(nullptr);
-
-		QTRY_VERIFY_WITH_TIMEOUT(!QFileInfo::exists(sharedOrphanFile), 10000);
-		sharedCollectorPtr.reset();
-
-		QVERIFY(QFileInfo::exists(sharedFile));
-		QVERIFY(QFileInfo::exists(alphaReferencedFile));
-		QVERIFY(QFileInfo::exists(alphaOrphanFile));
-		QVERIFY(QFileInfo::exists(unknownTenantFile));
-	}
-
-	{
-		std::shared_ptr<TenantStorageResolver> resolverPtr = CreateLoadedResolver(m_engineCompPtr);
-		std::shared_ptr<FileDocumentGarbageCollector> tenantCollectorPtr = createCollector(resolverPtr);
-
-		QTRY_VERIFY_WITH_TIMEOUT(!QFileInfo::exists(alphaOrphanFile), 10000);
-		tenantCollectorPtr.reset();
-
-		QVERIFY(QFileInfo::exists(sharedFile));
-		QVERIFY(QFileInfo::exists(alphaReferencedFile));
-		QVERIFY(QFileInfo::exists(unknownTenantFile));
-	}
-}
-
-
-void CTenantIsolationPostgresTest::testDataMigratorCopiesFileDocumentContent()
-{
-	static const QByteArray contentHash(64, 'f');
-
-	QTemporaryDir storeDir;
-	QVERIFY(storeDir.isValid());
-
-	QVERIFY(ExecApp(QStringLiteral("CREATE TABLE \"MigratedFileDocs\" (\"TenantId\" TEXT, \"Document\" TEXT)")));
-	QVERIFY(ExecApp(QStringLiteral("CREATE TABLE tenant_beta.\"MigratedFileDocs\" (\"TenantId\" TEXT, \"Document\" TEXT)")));
-	QVERIFY(ExecApp(QStringLiteral("INSERT INTO \"MigratedFileDocs\" VALUES ('beta', '%1')").arg(CreateDescriptor(contentHash))));
-	QVERIFY(!CreateStoreFile(storeDir.path(), contentHash).isEmpty());
-
+	// content referenced only from a tenant schema stays alive; the unreferenced file marks a finished pass
 	std::shared_ptr<TenantStorageResolver> resolverPtr = CreateLoadedResolver(m_engineCompPtr);
+	std::shared_ptr<FileDocumentGarbageCollector> collectorPtr = createCollector(resolverPtr);
 
-	std::shared_ptr<TenantDataMigrator> migratorPtr = std::make_shared<TenantDataMigrator>();
-	migratorPtr->SetRef("DatabaseEngine", m_engineCompPtr);
-	migratorPtr->SetRef("StorageResolver", resolverPtr);
-	migratorPtr->SetRef("FileStorageRoot", CreateDirectoryParam(storeDir.path()));
-	migratorPtr->InsertMultiAttr("TableNames", QByteArrayLiteral("MigratedFileDocs"));
-	migratorPtr->InsertMultiAttr("FileDocumentTableNames", QByteArrayLiteral("MigratedFileDocs"));
-	migratorPtr->InitComponent();
+	QTRY_VERIFY_WITH_TIMEOUT(!QFileInfo::exists(alphaOrphanFile), 10000);
+	collectorPtr.reset();
 
-	QVERIFY(migratorPtr->MigrateTenantData(QByteArrayLiteral("beta")));
-
-	const QString tenantFilePath = QDir(imtdb::CSqlDatabaseFileDocumentDelegateComp::GetTenantStorePath(storeDir.path(), QByteArrayLiteral("tenant_beta")))
-				.filePath(QStringLiteral("ff/") + QString::fromLatin1(contentHash) + QStringLiteral(".bin"));
-	QFile tenantFile(tenantFilePath);
-	QVERIFY2(tenantFile.open(QIODevice::ReadOnly), qPrintable(tenantFilePath));
-	QCOMPARE(tenantFile.readAll(), QByteArrayLiteral("content"));
-
-	// a descriptor without its content must fail the migration instead of leaving unreadable documents
-	QVERIFY(ExecApp(QStringLiteral("CREATE TABLE \"BrokenFileDocs\" (\"TenantId\" TEXT, \"Document\" TEXT)")));
-	QVERIFY(ExecApp(QStringLiteral("CREATE TABLE tenant_beta.\"BrokenFileDocs\" (\"TenantId\" TEXT, \"Document\" TEXT)")));
-	QVERIFY(ExecApp(QStringLiteral("INSERT INTO \"BrokenFileDocs\" VALUES ('beta', '%1')").arg(CreateDescriptor(QByteArray(64, '0')))));
-
-	std::shared_ptr<TenantDataMigrator> brokenMigratorPtr = std::make_shared<TenantDataMigrator>();
-	brokenMigratorPtr->SetRef("DatabaseEngine", m_engineCompPtr);
-	brokenMigratorPtr->SetRef("StorageResolver", resolverPtr);
-	brokenMigratorPtr->SetRef("FileStorageRoot", CreateDirectoryParam(storeDir.path()));
-	brokenMigratorPtr->InsertMultiAttr("TableNames", QByteArrayLiteral("BrokenFileDocs"));
-	brokenMigratorPtr->InsertMultiAttr("FileDocumentTableNames", QByteArrayLiteral("BrokenFileDocs"));
-	brokenMigratorPtr->InitComponent();
-
-	QVERIFY(!brokenMigratorPtr->MigrateTenantData(QByteArrayLiteral("beta")));
-	QCOMPARE(CountRows(QByteArrayLiteral("SELECT 1 FROM \"TenantStorage\" WHERE \"TenantId\" = 'beta' AND \"Status\" = 2")), 1);
+	QVERIFY(QFileInfo::exists(sharedFile));
+	QVERIFY(QFileInfo::exists(alphaReferencedFile));
 }
 
 
@@ -901,21 +738,6 @@ int CTenantIsolationPostgresTest::CountRows(const QByteArray& query) const
 	return count;
 }
 
-
-QString CTenantIsolationPostgresTest::GetBoundTenant() const
-{
-	imtdb::IDatabaseEngine* enginePtr = dynamic_cast<imtdb::IDatabaseEngine*>(m_engineCompPtr.get());
-	if (enginePtr == nullptr){
-		return QStringLiteral("<no engine>");
-	}
-
-	QSqlQuery sqlQuery = enginePtr->ExecSqlQuery(QByteArrayLiteral("SELECT COALESCE(current_setting('app.tenant_id', true), '')"), nullptr, true);
-	if (!sqlQuery.next()){
-		return QStringLiteral("<query failed>");
-	}
-
-	return sqlQuery.value(0).toString();
-}
 
 
 I_ADD_TEST(CTenantIsolationPostgresTest);

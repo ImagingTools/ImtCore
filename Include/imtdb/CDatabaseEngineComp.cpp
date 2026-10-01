@@ -8,11 +8,6 @@
 #include <QtCore/QThread>
 #include <QtCore/QUuid>
 
-// ImtCore includes
-#include <imtbase/CSharedStorageScope.h>
-#include <imtbase/CTenantContextScope.h>
-#include <imtdb/CTenantRlsPolicyBuilder.h>
-
 
 namespace imtdb
 {
@@ -38,8 +33,7 @@ CDatabaseEngineComp::CDatabaseEngineComp()
 
 bool CDatabaseEngineComp::BeginTransaction() const
 {
-	// binding before the transaction starts keeps the session variable out of its rollback scope
-	if (!EnsureDatabaseConnected() || !EnsureTenantSessionBound()){
+	if (!EnsureDatabaseConnected()){
 		return false;
 	}
 
@@ -63,9 +57,6 @@ bool CDatabaseEngineComp::CancelTransaction() const
 		return false;
 	}
 
-	// a rollback reverts a set_config() issued inside the transaction
-	ForgetBoundTenantSession();
-
 	return QSqlDatabase::database(GetConnectionName()).rollback();
 }
 
@@ -77,7 +68,7 @@ QByteArray CDatabaseEngineComp::GetDatabaseDriverId() const
 
 QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlErrorPtr, bool isForwardOnly) const
 {
-	if (!EnsureDatabaseConnected(sqlErrorPtr) || !EnsureTenantSessionBound(sqlErrorPtr)){
+	if (!EnsureDatabaseConnected(sqlErrorPtr)){
 		return QSqlQuery();
 	}
 
@@ -122,7 +113,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(
 			QSqlError* sqlError,
 			bool isForwardOnly) const
 {
-	if (!EnsureDatabaseConnected(sqlError) || !EnsureTenantSessionBound(sqlError)){
+	if (!EnsureDatabaseConnected(sqlError)){
 		return QSqlQuery();
 	}
 
@@ -287,9 +278,6 @@ bool CDatabaseEngineComp::OpenDatabase() const
 		databaseConnection.close();
 	}
 
-	// a new physical session starts without any session variables
-	ForgetBoundTenantSession();
-
 	QByteArray databaseDriverTypeId = *m_dbTypeAttrPtr;
 
 	databaseConnection = InitDatabase(databaseDriverTypeId);
@@ -357,9 +345,6 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 	if (!m_migrationControllerCompPtr.IsValid()){
 		return false;
 	}
-
-	// the migrations target the shared schema; tenant schema migrations open their own tenant context
-	imtbase::CSharedStorageScope sharedStorageScope;
 
 	int newRevision;
 	int databaseVersion = GetDatabaseVersion();
@@ -455,21 +440,6 @@ void CDatabaseEngineComp::OnComponentCreated()
 
 	BaseClass::OnComponentCreated();
 
-	m_bindTenantSessionQuery.clear();
-	const QByteArray tenantSessionVariable = m_tenantSessionVariableAttrPtr.IsValid() ? *m_tenantSessionVariableAttrPtr : QByteArray();
-	if (!tenantSessionVariable.isEmpty()){
-		if (!(*m_dbTypeAttrPtr).startsWith(QByteArrayLiteral("QPSQL"))){
-			SendWarningMessage(0, QStringLiteral("Tenant session variable binding is only supported for Postgres databases and was disabled"), "CDatabaseEngineComp");
-		}
-		else{
-			m_bindTenantSessionQuery = CTenantRlsPolicyBuilder::CreateBindSessionTenantQuery(tenantSessionVariable);
-			if (m_bindTenantSessionQuery.isEmpty()){
-				// never bound means the policies see no tenant and match no rows, so this stays fail-closed
-				SendCriticalMessage(0, QStringLiteral("Invalid tenant session variable name '%1', tenant session binding was disabled").arg(QString(tenantSessionVariable)), "CDatabaseEngineComp");
-			}
-		}
-	}
-
 	if (m_databaseAccessSettingsCompPtr.IsValid()){
 		m_databaseAccessObserver.RegisterObject(m_databaseAccessSettingsCompPtr.GetPtr(), &CDatabaseEngineComp::OnDatabaseAccessChanged);
 	}
@@ -526,56 +496,6 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected(QSqlError* sqlError) const
 	}
 
 	return isOpened;
-}
-
-
-bool CDatabaseEngineComp::EnsureTenantSessionBound(QSqlError* sqlError) const
-{
-	if (m_bindTenantSessionQuery.isEmpty()){
-		return true;
-	}
-
-	const QString connectionName = GetConnectionName();
-	const QByteArray tenantId = imtbase::CTenantContextScope::GetCurrentTenantId();
-
-	{
-		std::lock_guard lock(m_boundTenantsMutex);
-
-		auto boundIter = m_boundTenants.find(connectionName);
-		if ((boundIter != m_boundTenants.end()) && (boundIter->second == tenantId)){
-			return true;
-		}
-	}
-
-	// an empty value unbinds the previous tenant of this pooled thread connection
-	QSqlQuery bindQuery(QSqlDatabase::database(connectionName));
-	bindQuery.prepare(m_bindTenantSessionQuery);
-	bindQuery.bindValue(QStringLiteral(":tenantId"), QString(tenantId));
-	if (!bindQuery.exec()){
-		if (sqlError != nullptr){
-			*sqlError = bindQuery.lastError();
-		}
-
-		SendErrorMessage(0, QStringLiteral("Binding the tenant session variable failed, statement rejected: %1").arg(bindQuery.lastError().text()), "CDatabaseEngineComp");
-
-		ForgetBoundTenantSession();
-
-		return false;
-	}
-
-	std::lock_guard lock(m_boundTenantsMutex);
-
-	m_boundTenants[connectionName] = tenantId;
-
-	return true;
-}
-
-
-void CDatabaseEngineComp::ForgetBoundTenantSession() const
-{
-	std::lock_guard lock(m_boundTenantsMutex);
-
-	m_boundTenants.erase(GetConnectionName());
 }
 
 
@@ -937,8 +857,6 @@ void CDatabaseEngineComp::OnThreadFinished()
 	if (m_shuttingDown){
 		return;
 	}
-
-	ForgetBoundTenantSession();
 
 	QString connectionName = GetConnectionName();
 

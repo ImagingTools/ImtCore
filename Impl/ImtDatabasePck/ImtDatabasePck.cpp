@@ -147,11 +147,6 @@ I_EXPORT_COMPONENT(
 			"Tenant Data Migrator Multi-Tenant Migration Schema Database");
 
 I_EXPORT_COMPONENT(
-			TenantRlsController,
-			"Controller enforcing tenant Row-Level Security on shared Postgres tables",
-			"Tenant Row-Level Security RLS Multi-Tenant Isolation Policy Database");
-
-I_EXPORT_COMPONENT(
 			TenantSchemaMigrationController,
 			"Migration controller applying the tenant table migrations to every dedicated tenant schema",
 			"Tenant Schema Migration Controller Multi-Tenant Database");

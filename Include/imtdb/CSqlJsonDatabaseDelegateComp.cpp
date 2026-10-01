@@ -246,7 +246,14 @@ bool CSqlJsonDatabaseDelegateComp::SetCollectionItemMetaInfoFromRecord(const QSq
 		objectId = imtdb::VariantToByteArray(record.value(QString(*m_objectIdColumnAttrPtr)));
 	}
 
-	if (!objectId.isEmpty()){
+	// the selection query delivers the insertion time; a lookup by the record alone cannot address a tenant storage
+	if (record.contains("Added")){
+		QDateTime insertionTime = record.value("Added").toDateTime();
+
+		metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME, insertionTime);
+		metaInfo.SetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME, insertionTime);
+	}
+	else if (!objectId.isEmpty() && !m_tenantStorageResolverCompPtr.IsValid()){
 		QByteArray query = QStringLiteral(R"(SELECT * FROM %1 WHERE "%2" = '%3' AND "RevisionNumber" = 1;)")
 				.arg(GetDocumentTableName())
 				.arg(*m_objectIdColumnAttrPtr)
@@ -580,7 +587,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteArra
 // reimplemented (imtbase::IRevisionController)
 
 imtbase::IRevisionController::RevisionInfoList CSqlJsonDatabaseDelegateComp::GetRevisionInfoList(
-			const imtbase::IObjectCollection& /*collection*/,
+			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId) const
 {
 	imtbase::IRevisionController::RevisionInfoList revisionInfoList;
@@ -591,9 +598,13 @@ imtbase::IRevisionController::RevisionInfoList CSqlJsonDatabaseDelegateComp::Get
 
 	QString schemaPrefix = GetTableSchemePrefix();
 
-	const QByteArray query = QStringLiteral(R"(SELECT * FROM %0"%1" WHERE "DocumentId" = '%2' ORDER BY "RevisionNumber" DESC;)")
+	QByteArray query = QStringLiteral(R"(SELECT * FROM %0"%1" WHERE "DocumentId" = '%2' ORDER BY "RevisionNumber" DESC;)")
 				.arg(schemaPrefix, *m_tableNameAttrPtr, objectId)
 				.toUtf8();
+
+	if (!ApplyCollectionTenantStorage(query, collection)){
+		return revisionInfoList;
+	}
 
 	QSqlError sqlError;
 	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);

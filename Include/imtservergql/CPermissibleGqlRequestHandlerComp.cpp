@@ -11,8 +11,7 @@ namespace imtservergql
 QJsonObject CPermissibleGqlRequestHandlerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if(CheckPermissions(gqlRequest, errorMessage)){
-		// the base opens the tenant context of the request around CreateInternalResponse()
-		return BaseClass::CreateResponse(gqlRequest, errorMessage);
+		return CreateInternalResponse(gqlRequest, errorMessage);
 	}
 
 	QString userName;
