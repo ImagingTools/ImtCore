@@ -24,6 +24,10 @@ ImtCore follows secure development practices:
 - **Type Safety**: Strongly typed parameter interfaces reduce runtime errors
 - **Memory Safety**: Uses Qt framework's memory management features
 - **Code Review**: Changes undergo review process before integration
+- **Tenant Isolation**: Multi-tenant data is physically separated per tenant with a
+  fail-closed storage resolver and audit logging; see
+  [Docs/Architecture/MultiTenantPhysicalSeparation.md](Docs/Architecture/MultiTenantPhysicalSeparation.md)
+  for the architecture, CRA mapping (Annex I) and threat model
 
 #### 1.2 Security Updates
 

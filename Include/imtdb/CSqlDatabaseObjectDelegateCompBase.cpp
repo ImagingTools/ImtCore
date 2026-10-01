@@ -17,6 +17,7 @@
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
+#include <imtbase/ITenantObjectCollection.h>
 #include <imtdb/CComplexCollectionFilterConverter.h>
 #include <imtdb/imtdb.h>
 
@@ -59,8 +60,9 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectTypeId(const QByteArray&
 		return QByteArray();
 	}
 
+	// the delegate addresses the data without organization; a tenant collection reads the type from its own record
 	QByteArray objectSelectionQuery = GetSelectionQuery(objectId, -1, -1, nullptr);
-	if (objectSelectionQuery.isEmpty()){
+	if (objectSelectionQuery.isEmpty() || !ApplyTenantStorage(objectSelectionQuery, QByteArray())){
 		return QByteArray();
 	}
 
@@ -101,13 +103,9 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetCountQuery(const iprm::IParams
 		}
 	}
 
-	if (!m_tableSchemaAttrPtr.IsValid()){
-		return QStringLiteral(R"(SELECT COUNT(*) FROM "%1" %2)").arg(*m_tableNameAttrPtr, filterQuery).toUtf8();
-	}
-
-	return QStringLiteral(R"(SELECT COUNT(*) FROM %0."%1" %2)")
+	return QStringLiteral(R"(SELECT COUNT(*) FROM %0"%1" %2)")
 					.arg(
-						*m_tableSchemaAttrPtr,
+						GetTableSchemePrefix(),
 						*m_tableNameAttrPtr,
 						filterQuery
 					).toUtf8();
@@ -121,22 +119,13 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 			const iprm::IParamsSet* paramsPtr) const
 {
 	if (!objectId.isEmpty()){
-		if (m_tableSchemaAttrPtr.IsValid()){
-			return QStringLiteral(R"(SELECT * FROM %1."%2" WHERE "%3" = '%4')")
-						.arg(
-							/*1*/ *m_tableSchemaAttrPtr,
-							/*2*/ *m_tableNameAttrPtr,
-							/*3*/ *m_objectIdColumnAttrPtr,
-							/*4*/ objectId
-						).toUtf8();
-		}
-
-		return QStringLiteral(R"(SELECT * FROM "%1" WHERE "%2" = '%3')")
-						.arg(
-							*m_tableNameAttrPtr,
-							*m_objectIdColumnAttrPtr,
-							objectId
-						).toUtf8();
+		return QStringLiteral(R"(SELECT * FROM %1"%2" WHERE "%3" = '%4')")
+					.arg(
+						/*1*/ GetTableSchemePrefix(),
+						/*2*/ *m_tableNameAttrPtr,
+						/*3*/ *m_objectIdColumnAttrPtr,
+						/*4*/ objectId
+					).toUtf8();
 	}
 
 	QString sortQuery;
@@ -266,12 +255,8 @@ QVariant CSqlDatabaseObjectDelegateCompBase::GetElementInfoFromRecord(const QSql
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::CreateResetQuery(const imtbase::IObjectCollection& /*collection*/) const
 {
-	if (!m_tableSchemaAttrPtr.IsValid()){
-		return QStringLiteral(R"(DELETE FROM "%1";)").arg(*m_tableNameAttrPtr).toUtf8();
-	}
-
-	return QStringLiteral(R"(DELETE FROM %0."%1";)")
-			.arg(*m_tableSchemaAttrPtr, *m_tableNameAttrPtr).toUtf8();
+	return QStringLiteral(R"(DELETE FROM %0"%1";)")
+			.arg(GetTableSchemePrefix(), *m_tableNameAttrPtr).toUtf8();
 }
 
 
@@ -327,6 +312,48 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetTableScheme() const
 }
 
 
+bool CSqlDatabaseObjectDelegateCompBase::HasTenantStorage() const
+{
+	return m_tenantStorageResolverCompPtr.IsValid();
+}
+
+
+bool CSqlDatabaseObjectDelegateCompBase::ApplyTenantStorage(QByteArray& query, const QByteArray& tenantId) const
+{
+	if (!query.contains(s_tenantSchemePrefixPlaceholder)){
+		return true;
+	}
+
+	if (!m_tenantStorageResolverCompPtr.IsValid() || tenantId.isEmpty()){
+		query.replace(s_tenantSchemePrefixPlaceholder, GetSharedSchemePrefix().toUtf8());
+
+		return true;
+	}
+
+	imtdb::TenantStorageInfo storageInfo;
+	if (!m_tenantStorageResolverCompPtr->ResolveTenantStorage(tenantId, storageInfo)){
+		SendErrorMessage(0, QStringLiteral("Tenant storage access denied for table '%1': storage of tenant '%2' could not be resolved").arg(QString(GetTableName()), QString(tenantId)), "CSqlDatabaseObjectDelegateCompBase");
+
+		return false;
+	}
+
+	if (storageInfo.status != imtdb::TSS_ACTIVE && storageInfo.status != imtdb::TSS_MIGRATING){
+		SendErrorMessage(0, QStringLiteral("Tenant storage access denied for table '%1': storage of tenant '%2' is not active").arg(QString(GetTableName()), QString(tenantId)), "CSqlDatabaseObjectDelegateCompBase");
+
+		return false;
+	}
+
+	if (storageInfo.schemaName.isEmpty()){
+		query.replace(s_tenantSchemePrefixPlaceholder, GetSharedSchemePrefix().toUtf8());
+	}
+	else{
+		query.replace(s_tenantSchemePrefixPlaceholder, '"' + storageInfo.schemaName + QByteArrayLiteral("\"."));
+	}
+
+	return true;
+}
+
+
 QByteArray CSqlDatabaseObjectDelegateCompBase::CreateRestoreObjectsQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const imtbase::ICollectionInfo::Ids& /*objectIds*/,
@@ -349,15 +376,42 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::CreateRestoreObjectSetQuery(
 
 QString CSqlDatabaseObjectDelegateCompBase::GetBaseSelectionQuery() const
 {
-	if (!m_tableSchemaAttrPtr.IsValid()){
-		return QStringLiteral(R"(SELECT * FROM "%1")").arg(*m_tableNameAttrPtr);
-	}
-
-	return QStringLiteral(R"(SELECT * FROM %0."%1")").arg(*m_tableSchemaAttrPtr, *m_tableNameAttrPtr);
+	return QStringLiteral(R"(SELECT * FROM %0"%1")").arg(GetTableSchemePrefix(), *m_tableNameAttrPtr);
 }
 
 
-idoc::IDocumentMetaInfo* CSqlDatabaseObjectDelegateCompBase::CreateCollectionItemMetaInfo(const QByteArray& /*typeId*/) const
+QString CSqlDatabaseObjectDelegateCompBase::GetTenantTableSchemePrefix() const
+{
+	return m_tenantStorageResolverCompPtr.IsValid() ? QString::fromLatin1(s_tenantSchemePrefixPlaceholder) : QString();
+}
+
+
+QString CSqlDatabaseObjectDelegateCompBase::GetTableSchemePrefix() const
+{
+	return m_tenantStorageResolverCompPtr.IsValid() ? QString::fromLatin1(s_tenantSchemePrefixPlaceholder) : GetSharedSchemePrefix();
+}
+
+
+QString CSqlDatabaseObjectDelegateCompBase::GetSharedSchemePrefix() const
+{
+	const QByteArray tableScheme = GetTableScheme();
+	if (tableScheme.isEmpty()){
+		return QString();
+	}
+
+	return QString(tableScheme) + '.';
+}
+
+
+bool CSqlDatabaseObjectDelegateCompBase::ApplyCollectionTenantStorage(QByteArray& query, const imtbase::IObjectCollection& collection) const
+{
+	const imtbase::ITenantObjectCollection* tenantCollectionPtr = dynamic_cast<const imtbase::ITenantObjectCollection*>(&collection);
+
+	return ApplyTenantStorage(query, (tenantCollectionPtr != nullptr) ? tenantCollectionPtr->GetTenantId() : QByteArray());
+}
+
+
+idoc::IDocumentMetaInfo*CSqlDatabaseObjectDelegateCompBase::CreateCollectionItemMetaInfo(const QByteArray& /*typeId*/) const
 {
 	return new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>;
 }

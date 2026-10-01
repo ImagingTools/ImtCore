@@ -276,10 +276,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDeleteObjectsQuery(
 		return QByteArray();
 	}
 
-	QString schemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
-	}
+	QString schemaPrefix = GetTableSchemePrefix();
 
 	const QString quotedIds = objectIds.toList().join(u8"','").append('\'').prepend('\'');
 	QString query = 
@@ -305,10 +302,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDeleteObjectSetQuery(
 			const iprm::IParamsSet* paramsPtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	QString schemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
-	}
+	QString schemaPrefix = GetTableSchemePrefix();
 	QByteArray retVal = QStringLiteral(R"(UPDATE %1 "%2" as root SET "%3" = 'Disabled' WHERE "%3" = 'Active')").arg(schemaPrefix, *m_tableNameAttrPtr, s_stateColumn).toUtf8();
 
 	QByteArrayList conditionList;
@@ -380,10 +374,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateRestoreObjectsQuery(
 
 	const QString quotedIds = objectIds.toList().join(u8"','").append('\'').prepend('\'');
 
-	QString schemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
-	}
+	QString schemaPrefix = GetTableSchemePrefix();
 
 	return QStringLiteral(R"(
 				UPDATE %1 "%2"
@@ -405,10 +396,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateRestoreObjectSetQuery(
 			const iprm::IParamsSet* paramsPtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	QString schemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
-	}
+	QString schemaPrefix = GetTableSchemePrefix();
 	QByteArray retVal = 
 				QStringLiteral(R"(UPDATE %1 "%2" as root SET "%3" = 'Active' WHERE "%3" = 'Disabled')")
 							.arg(schemaPrefix, *m_tableNameAttrPtr, s_stateColumn).toUtf8();
@@ -456,10 +444,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateUpdateObjectQuery(
 			bool /*useExternDelegate*/) const
 {
 	// Get number of the revisions of the document in the database:
-	QString schemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
-	}
+	QString schemaPrefix = GetTableSchemePrefix();
 	QByteArray countRevisionsQuery = 
 				QStringLiteral(R"((SELECT MAX(%1) + 1 FROM %2 "%3" as root WHERE "%4" = '%5'))").arg(
 							/*1*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
@@ -494,10 +479,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateRenameObjectQuery(
 			const QString& newObjectName,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	QString schemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
-	}
+	QString schemaPrefix = GetTableSchemePrefix();
 	// Only the current revision is renamed, older revisions keep the name they were stored with.
 	QByteArray retVal = QStringLiteral(R"(UPDATE %1 "%2" SET "%3" = '%4' WHERE "%5" = '%6' AND "%7" <> 'InActive';)")
 						.arg(
@@ -520,10 +502,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateDescriptionObjectQuery(
 			const QString& description,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	QString schemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
-	}
+	QString schemaPrefix = GetTableSchemePrefix();
 	// Only the current revision is changed, older revisions keep the description they were stored with.
 	QByteArray retVal = QStringLiteral(R"(UPDATE %1 "%2" SET "%3" = '%4' WHERE "%5" = '%6' AND "%7" <> 'InActive';)")
 						.arg(
@@ -544,10 +523,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::GetSelectionByMetaInfoQuery(
 			const QByteArray& metaInfoId,
 			const QVariant& metaInfoValue) const
 {
-	QString schemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
-	}
+	QString schemaPrefix = GetTableSchemePrefix();
 	return QStringLiteral(R"(SELECT * FROM %1 "%2" WHERE ("%3" = 'Active') AND %4 = '%5';)")
 			.arg(
 				/*1*/ schemaPrefix,
@@ -584,10 +560,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateUpdateMetaInfoQuery(const
 		}
 	}
 
-	QString schemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
-	}
+	QString schemaPrefix = GetTableSchemePrefix();
 
 	QByteArray query = QStringLiteral(R"(UPDATE %1 "%2" SET "%3" = '%4' WHERE "%5" = 'Active' AND "%6" = '%7';)")
 						.arg(
@@ -607,7 +580,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateUpdateMetaInfoQuery(const
 // reimplemented (imtbase::IRevisionController)
 
 imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateCompBase::GetRevisionInfoList(
-			const imtbase::IObjectCollection& /*collection*/,
+			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId) const
 {
 	imtbase::IRevisionController::RevisionInfoList revisionInfoList;
@@ -628,6 +601,10 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateCompB
 	filterParams.SetEditableParameter("DocumentFilter", &documentFilter);
 
 	QByteArray query = GetSelectionQuery(objectId, 0, -1, &filterParams);
+
+	if (!ApplyCollectionTenantStorage(query, collection)){
+		return imtbase::IRevisionController::RevisionInfoList();
+	}
 
 	QSqlError sqlError;
 	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
@@ -696,10 +673,7 @@ bool CSqlDatabaseDocumentDelegateCompBase::RestoreRevision(
 
 	istd::CChangeNotifier changeNotifier(&collection, &changeSet);
 
-	QString schemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
-	}
+	QString schemaPrefix = GetTableSchemePrefix();
 
 	QByteArray query = QStringLiteral(R"(UPDATE %1 "%2" SET "%3" = 'InActive' WHERE "%4" = '%5';)")
 			.arg(
@@ -718,6 +692,10 @@ bool CSqlDatabaseDocumentDelegateCompBase::RestoreRevision(
 							/*5*/ objectId,
 							/*6*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
 							/*7*/ QString::number(revision)).toUtf8();
+
+	if (!ApplyCollectionTenantStorage(query, collection)){
+		return false;
+	}
 
 	QSqlError sqlError;
 	m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
@@ -746,10 +724,7 @@ bool CSqlDatabaseDocumentDelegateCompBase::DeleteRevision(
 			const imtbase::ICollectionInfo::Id& objectId,
 			int revision) const
 {
-	QString schemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
-	}
+	QString schemaPrefix = GetTableSchemePrefix();
 	QByteArray checkCurrentRevisionQuery = QStringLiteral(R"(SELECT * FROM %1 "%2" WHERE "%3" = '%4' AND "%5" = 'Active';)")
 				.arg(
 							/*1*/ schemaPrefix,
@@ -757,6 +732,10 @@ bool CSqlDatabaseDocumentDelegateCompBase::DeleteRevision(
 							/*3*/ s_documentIdColumn,
 							/*4*/ objectId,
 							/*5*/ s_stateColumn).toUtf8();
+
+	if (!ApplyCollectionTenantStorage(checkCurrentRevisionQuery, collection)){
+		return false;
+	}
 
 	QSqlError sqlError;
 	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(checkCurrentRevisionQuery, &sqlError);
@@ -794,7 +773,11 @@ bool CSqlDatabaseDocumentDelegateCompBase::DeleteRevision(
 							/*5*/ CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
 							/*6*/ QString::number(revision))
 						.toUtf8();
-	
+
+	if (!ApplyCollectionTenantStorage(query, collection)){
+		return false;
+	}
+
 	sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
 		SendErrorMessage(0, sqlError.text(), "Database collection");
@@ -826,10 +809,7 @@ bool CSqlDatabaseDocumentDelegateCompBase::UpdateDependentMetaInfo(const Depende
 
 	QString tableName = GetTableName();
 
-	QString schemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
-	}
+	QString schemaPrefix = GetTableSchemePrefix();
 
 	QString query = QStringLiteral(R"(UPDATE %1 "%2" SET "%3" = )").arg(schemaPrefix, tableName, s_dataMetaInfoColumn);
 
@@ -842,7 +822,12 @@ bool CSqlDatabaseDocumentDelegateCompBase::UpdateDependentMetaInfo(const Depende
 	query += jsonbUpdate + QStringLiteral(" WHERE %1 = '%2';").arg(CreateJsonExtractSql(s_dataMetaInfoColumn, metaInfo.dependentKey), metaInfo.objectId);
 
 	QSqlError sqlError;
-	m_databaseEngineCompPtr->ExecSqlQuery(query.toUtf8(), &sqlError);
+	QByteArray updateQuery = query.toUtf8();
+	if (!ApplyTenantStorage(updateQuery, metaInfo.tenantId)){
+		return false;
+	}
+
+	m_databaseEngineCompPtr->ExecSqlQuery(updateQuery, &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
 		SendErrorMessage(0, sqlError.text(), "CSqlDatabaseDocumentDelegateCompBase");
 		qDebug() << "SQL-error" << sqlError.text();
@@ -885,10 +870,7 @@ bool CSqlDatabaseDocumentDelegateCompBase::ClearDependentMetaInfo(const MetaFiel
 	QString whereClause = QStringLiteral("%1 IN (%2)")
 		.arg(CreateJsonExtractSql(s_dataMetaInfoColumn, metaInfo.dependentKey), quotedIds.join(", "));
 
-	QString schemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
-	}
+	QString schemaPrefix = GetTableSchemePrefix();
 
 	QString fullQuery = QStringLiteral(R"(UPDATE %1 "%2" SET "%3" = %4 WHERE %5;)")
 		.arg(
@@ -899,7 +881,12 @@ bool CSqlDatabaseDocumentDelegateCompBase::ClearDependentMetaInfo(const MetaFiel
 				/*5*/ whereClause);
 
 	QSqlError sqlError;
-	m_databaseEngineCompPtr->ExecSqlQuery(fullQuery.toUtf8(), &sqlError);
+	QByteArray cleanupQuery = fullQuery.toUtf8();
+	if (!ApplyTenantStorage(cleanupQuery, metaInfo.tenantId)){
+		return false;
+	}
+
+	m_databaseEngineCompPtr->ExecSqlQuery(cleanupQuery, &sqlError);
 
 	if (sqlError.type() != QSqlError::NoError){
 		SendErrorMessage(0, sqlError.text(), "CSqlDatabaseDocumentDelegateCompBase");
@@ -933,10 +920,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::PrepareInsertNewObjectQuery(
 
 	const quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContentJson.constData(), imtbase::narrow_cast<int>(documentContentJson.size()));
 
-	QString schemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
-	}
+	QString schemaPrefix = GetTableSchemePrefix();
 
 	// Insert new entry into the document list table:
 	QString query = QStringLiteral(R"(UPDATE %1 "%2" SET "%3" = 'InActive' WHERE "%4" = '%5';)")
@@ -953,7 +937,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::PrepareInsertNewObjectQuery(
 	const bool useMetaData = m_useDataMetaInfoAttrPtr.IsValid() ? *m_useDataMetaInfoAttrPtr : false;
 	if (useMetaData && m_metaInfoCreatorCompPtr.IsValid() && m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
 		idoc::MetaInfoPtr metaInfoPtr;
-		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(&object, typeId, metaInfoPtr) && metaInfoPtr.IsValid()){
+		if (m_metaInfoCreatorCompPtr->CreateMetaInfoInOperation(&object, typeId, metaInfoPtr, operationContextPtr) && metaInfoPtr.IsValid()){
 			if (!m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr(), metaInfoRepresentation, typeId)){
 				SendWarningMessage(0, QStringLiteral("Unable to create meta info representation for the object '%1' from the table '%2'").arg(objectId, GetTableName()));
 			}
@@ -1160,7 +1144,8 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingTableInitial
 	QByteArray createTableQuery = scriptFile.readAll();
 	scriptFile.close();
 
-	const QByteArray tableScheme = GetTableScheme();
+	// a shared catalog table: never the tenant schema (see CreateTenantBindingTableName())
+	const QByteArray tableScheme = m_tableSchemaAttrPtr.IsValid() ? *m_tableSchemaAttrPtr : QByteArray();
 	if (!tableScheme.isEmpty()){
 		createTableQuery.replace("${TableScheme}", tableScheme);
 	}
@@ -1312,10 +1297,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::CreateTenantBindingDeleteQuery(
 
 QString CSqlDatabaseDocumentDelegateCompBase::GetBaseSelectionQuery() const
 {
-	QString schema;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schema = *m_tableSchemaAttrPtr + '.';
-	}
+	QString schema = GetTableSchemePrefix();
 
 	Q_ASSERT(!(*m_tableNameAttrPtr).isEmpty());
 
@@ -2068,10 +2050,7 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::GetObjectSelectionQuery(const Q
 		documentFilterQuery = QStringLiteral(R"(root."%1" = 'Active')").arg(s_stateColumn);
 	}
 
-	QString schemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
-	}
+	QString schemaPrefix = GetTableSchemePrefix();
 
 	if (IsSQLite()){
 		return QStringLiteral(R"(

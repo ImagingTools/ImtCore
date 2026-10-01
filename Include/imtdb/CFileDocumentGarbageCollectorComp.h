@@ -13,6 +13,7 @@
 
 // ImtCore includes
 #include <imtdb/IDatabaseEngine.h>
+#include <imtdb/ITenantStorageResolver.h>
 
 
 namespace imtdb
@@ -22,6 +23,9 @@ namespace imtdb
 /**
 	Garbage collector and integrity auditor for the content-addressed document file
 	store written by CSqlDatabaseFileDocumentDelegateComp.
+
+	With 'TenantStorageResolver' the document tables of all dedicated tenant schemas are scanned too:
+	the store is shared, a file is alive if any schema references it.
 
 	Liveness is a single scan of the 'Document' column over ALL rows of the collection
 	table - active documents, inactive revision rows and soft-deleted rows alike - which
@@ -53,6 +57,7 @@ public:
 		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "Interval of the collection pass (in msec)", true, 3600000);
 		I_ASSIGN(m_gracePeriodHoursAttrPtr, "GracePeriodHours", "Minimum age of an unreferenced file before it may be deleted.\nMust exceed the longest running transaction and the backup window", true, 168);
 		I_ASSIGN(m_auditOnlyAttrPtr, "AuditOnly", "If true - unreferenced files are only reported, nothing is deleted", true, true);
+		I_ASSIGN(m_tenantStorageResolverCompPtr, "TenantStorageResolver", "Optional tenant storage resolver; if set, the document tables in the dedicated tenant schemas count for the liveness too", false, "TenantStorageResolver");
 	I_END_COMPONENT;
 
 protected:
@@ -73,6 +78,7 @@ private:
 	};
 
 	bool GetLivenessInfo(LivenessInfo& livenessInfo) const;
+	bool AddTableLiveness(const QString& schemaPrefix, LivenessInfo& livenessInfo) const;
 	bool SweepStore(const LivenessInfo& livenessInfo, bool isDeletionAllowed);
 
 private Q_SLOTS:
@@ -89,6 +95,7 @@ protected:
 	I_ATTR(int, m_checkIntervalAttrPtr);
 	I_ATTR(int, m_gracePeriodHoursAttrPtr);
 	I_ATTR(bool, m_auditOnlyAttrPtr);
+	I_REF(imtdb::ITenantStorageResolver, m_tenantStorageResolverCompPtr);
 
 private:
 	QFutureWatcher<bool> m_sweepWatcher;

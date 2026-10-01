@@ -370,10 +370,10 @@ QString CProductCollectionControllerComp::GetExtensionFromMimeType(const imtbase
 }
 
 
-QString CProductCollectionControllerComp::GetExportFileName(const QByteArray& objectId) const
+QString CProductCollectionControllerComp::GetExportFileName(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const
 {
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+	if (collection.GetObjectData(objectId, dataPtr)){
 		imtlic::IProductInfo* productInfoPtr = dynamic_cast<imtlic::IProductInfo*>(dataPtr.GetPtr());
 		if (productInfoPtr != nullptr){
 			return productInfoPtr->GetProductId() + "Features";

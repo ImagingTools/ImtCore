@@ -131,5 +131,35 @@ I_EXPORT_COMPONENT(
 			"SQL database transaction manager",
 			"SQL Database Transaction Manager");
 
+I_EXPORT_COMPONENT(
+			TenantStorageResolver,
+			"Resolver mapping tenants to their physical storage (schema, database or file)",
+			"Tenant Storage Resolver Multi-Tenant Isolation Schema Database");
+
+I_EXPORT_COMPONENT(
+			TenantStorageProvisioner,
+			"Provisioner creating and removing the physical storage of a tenant",
+			"Tenant Storage Provisioner Multi-Tenant Lifecycle Schema Database");
+
+I_EXPORT_COMPONENT(
+			TenantDataMigrator,
+			"Migrator copying tenant data from the shared schema into dedicated tenant schemas",
+			"Tenant Data Migrator Multi-Tenant Migration Schema Database");
+
+I_EXPORT_COMPONENT(
+			TenantSchemaMigrationController,
+			"Migration controller applying the tenant table migrations to every dedicated tenant schema",
+			"Tenant Schema Migration Controller Multi-Tenant Database");
+
+I_EXPORT_COMPONENT(
+			TenantStorageBackup,
+			"Backup and restore of dedicated Postgres tenant schemas",
+			"Tenant Storage Backup Restore Multi-Tenant Schema Database");
+
+I_EXPORT_COMPONENT(
+			TenantStorageAutoProvisioningResolver,
+			"Tenant storage resolver provisioning the storage of a tenant on its first access",
+			"Tenant Storage Resolver Provisioning Multi-Tenant Schema Database");
+
 
 } // namespace ImtDatabasePck

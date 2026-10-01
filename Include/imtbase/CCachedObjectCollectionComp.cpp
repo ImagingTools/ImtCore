@@ -542,6 +542,25 @@ void CCachedObjectCollectionComp::InvalidateCache()
 }
 
 
+// reimplemented (ITenantCollectionProvider)
+
+bool CCachedObjectCollectionComp::IsTenantSeparated() const
+{
+	return m_tenantCollectionProviderCompPtr.IsValid() && m_tenantCollectionProviderCompPtr->IsTenantSeparated();
+}
+
+
+ITenantObjectCollection* CCachedObjectCollectionComp::GetTenantCollection(const QByteArray& tenantId) const
+{
+	// only the data without organization is cached; tenant collections address the base collection directly
+	if (m_tenantCollectionProviderCompPtr.IsValid()){
+		return m_tenantCollectionProviderCompPtr->GetTenantCollection(tenantId);
+	}
+
+	return nullptr;
+}
+
+
 void CCachedObjectCollectionComp::RemoveOldestObjectFromCache() const
 {
 	if (m_cacheItems.isEmpty()){

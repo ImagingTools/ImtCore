@@ -198,10 +198,7 @@ QByteArray CSqliteJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteA
 		stateDocumentFilter = QStringLiteral(R"("IsActive" = true)");
 	}
 
-	QString schemaPrefix;
-	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QStringLiteral("%1.").arg(*m_tableSchemaAttrPtr);
-	}
+	QString schemaPrefix = GetTableSchemePrefix();
 
 	return QStringLiteral(R"(SELECT * FROM %0"%1" WHERE (%2) AND "%3" = '%4' ORDER BY "RevisionNumber" DESC;)")
 		.arg(schemaPrefix)

@@ -2,6 +2,11 @@
 #include <imtdb/CDependentTableMetaInfoControllerComp.h>
 
 
+// ImtCore includes
+#include <imtbase/ITenantObjectCollection.h>
+#include <imtdb/ISqlDatabaseObjectDelegate.h>
+
+
 namespace imtdb
 {
 
@@ -25,6 +30,8 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 		return;
 	}
 
+	const QByteArray tenantId = changeSet.GetChangeInfo(imtbase::ITenantObjectCollection::CN_TENANT_ID).toByteArray();
+
 	if (changeSet.Contains(imtbase::ICollectionInfo::CF_REMOVED)){
 		QVariant changeInfo = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENTS_REMOVED);
 		if (changeInfo.isValid()){
@@ -33,6 +40,7 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 			imtdb::IDependentMetaInfoController::MetaFieldCleanupPlan metaFieldCleanupPlan;
 			metaFieldCleanupPlan.objectIds = info.elementIds;
 			metaFieldCleanupPlan.dependentKey = *m_metaInfoIdAttrPtr;
+			metaFieldCleanupPlan.tenantId = tenantId;
 
 			for (int i = 0; i < m_metaInfoNameAttrPtr.GetCount(); i++){
 				metaFieldCleanupPlan.metaInfoIds << m_metaInfoNameAttrPtr[i];
@@ -71,8 +79,12 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 
 	dependentMetaInfo.objectId = elementId;
 	dependentMetaInfo.dependentKey = *m_metaInfoIdAttrPtr;
+	dependentMetaInfo.tenantId = tenantId;
 
 	bool isDocumentSource = m_isDocumentSourceAttrPtr.IsValid() ? *m_isDocumentSourceAttrPtr : true;
+
+	// the source table lives in the same tenant storage as the dependent table
+	const QString sourceSchemePrefix = tenantId.isEmpty() ? QString() : QString::fromLatin1(imtdb::ISqlDatabaseObjectDelegate::s_tenantSchemePrefixPlaceholder);
 
 	for (int i = 0; i < m_metaInfoNameAttrPtr.GetCount(); i++){
 		QString metaInfoName = m_metaInfoNameAttrPtr[i];
@@ -80,11 +92,12 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 
 		dependentMetaInfo.metaInfoIds << metaInfoName;
 		QString selectValue =
-			QStringLiteral(R"((SELECT "%0"->>'%1' FROM "%2" WHERE "State" = 'Active' AND "DocumentId" = '%3' LIMIT 1)
+			QStringLiteral(R"((SELECT "%0"->>'%1' FROM %4"%2" WHERE "State" = 'Active' AND "DocumentId" = '%3' LIMIT 1)
 					)").arg(isDocumentSource ? "Document" : "DataMetaInfo",
 							dependentMetaInfoName,
 							*m_dependentTableNameAttrPtr,
-							elementId);
+							elementId,
+							sourceSchemePrefix);
 
 		dependentMetaInfo.metaInfoValues << selectValue;
 	}

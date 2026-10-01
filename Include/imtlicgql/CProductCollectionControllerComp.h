@@ -66,7 +66,7 @@ private:
 	*/
 	static imtsdl::TElementList<sdl::V1_0::imtlic::CProductOptionalFeature> CreateOptionalFeaturesRepresentation(
 				const imtlic::IProductInfo& productInfo);
-	virtual QString GetExportFileName(const QByteArray& objectId) const override;
+	virtual QString GetExportFileName(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const override;
 
 private:
 	bool FillObjectFromRepresentation(

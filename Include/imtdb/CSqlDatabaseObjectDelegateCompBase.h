@@ -12,6 +12,7 @@
 #include <imtbase/ITimeFilterParam.h>
 #include <imtdb/ISqlDatabaseObjectDelegate.h>
 #include <imtdb/IDatabaseEngine.h>
+#include <imtdb/ITenantStorageResolver.h>
 
 
 namespace imtdb
@@ -37,6 +38,7 @@ public:
 		I_ASSIGN(m_autoCreateTableAttrPtr, "AutoCreateTable", "Auto create collection table if it does not exist", false, false);
 		I_ASSIGN(m_createTableScriptPathAttrPtr, "CreateTableScriptPath", "QRC path or file name of SQL script used to create collection table", false, "");
 		I_ASSIGN(m_prerequisiteTableScriptPathAttrPtr, "PrerequisiteTableScriptPath", "QRC path or file name of SQL script creating tables the collection table references (executed before CreateTableScriptPath)", false, "");
+		I_ASSIGN(m_tenantStorageResolverCompPtr, "TenantStorageResolver", "Optional resolver of the physical storage of a tenant; if set, the collection is tenant-owned and its queries address the storage of the tenant of the collection (fail-closed)", false, "TenantStorageResolver");
 	I_END_COMPONENT
 
 	virtual QString SqlEncode(const QString& sqlQuery) const;
@@ -79,6 +81,8 @@ public:
 	virtual QByteArray CreateUpdateMetaInfoQuery(const QSqlRecord& record) const override;
 	virtual QByteArray GetTableName() const override;
 	virtual QByteArray GetTableScheme() const override;
+	virtual bool HasTenantStorage() const override;
+	virtual bool ApplyTenantStorage(QByteArray& query, const QByteArray& tenantId) const override;
 	virtual QByteArray CreateRestoreObjectsQuery(
 				const imtbase::IObjectCollection& collection,
 				const imtbase::ICollectionInfo::Ids& objectIds,
@@ -91,6 +95,31 @@ public:
 protected:
 	virtual bool IsSqliteDriver() const;
 	virtual QString GetBaseSelectionQuery() const;
+
+	/**
+		Schema qualifier of the collection table: the tenant storage placeholder for a tenant-owned
+		collection (a TenantStorageResolver is set), otherwise the shared schema qualifier.
+		SQL of the collection table must be built with it, so the tenant storage of the call applies.
+	*/
+	QString GetTableSchemePrefix() const;
+
+	/**
+		Like GetTableSchemePrefix(), but empty instead of the shared schema qualifier.
+		For SQL that historically addressed tables unqualified (e.g. joins of other tenant-owned
+		collections), so the configuration without a resolver keeps its exact previous behavior.
+	*/
+	QString GetTenantTableSchemePrefix() const;
+
+	/**
+		Qualifier ("schema.") of the shared schema (TableSchema), empty if none is set.
+	*/
+	QString GetSharedSchemePrefix() const;
+
+	/**
+		Apply the tenant storage of the given collection (see imtbase::ITenantObjectCollection) to a query executed by the delegate itself.
+	*/
+	bool ApplyCollectionTenantStorage(QByteArray& query, const imtbase::IObjectCollection& collection) const;
+
 	virtual idoc::IDocumentMetaInfo* CreateCollectionItemMetaInfo(const QByteArray& typeId) const;
 	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const;
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const;
@@ -112,6 +141,7 @@ protected:
 
 protected:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
+	I_REF(imtdb::ITenantStorageResolver, m_tenantStorageResolverCompPtr);
 	I_REF(iprm::IOptionsList, m_typesCompPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 	I_ATTR(QByteArray, m_tableSchemaAttrPtr);
