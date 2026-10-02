@@ -38,6 +38,8 @@
 #include <imtbase/CSelectionAdapterComp.h>
 #include <imtbase/CSelectionParamAdapterComp.h>
 #include <imtbase/CCachedObjectCollectionComp.h>
+#include <imtbase/CAccessContextComp.h>
+#include <imtbase/CSystemAccessContextComp.h>
 #include <imtbase/CSelectionIdBinderComp.h>
 #include <imtbase/CTableViewParam.h>
 #include <imtbase/CModelUpdateBridgeComp.h>
@@ -63,6 +65,8 @@ typedef imtbase::TComponentFactoryComp<iinsp::ISupplier> SupplierFactory;
 typedef imtbase::TComponentFactoryComp<iprm::IParamsSet> ParamsSetFactory;
 typedef icomp::TModelCompWrap<imtbase::CObjectCollectionComp> ObjectCollection;
 typedef icomp::TModelCompWrap<imtbase::CCachedObjectCollectionComp> CachedObjectCollection;
+typedef imtbase::CAccessContextComp AccessContext;
+typedef imtbase::CSystemAccessContextComp SystemAccessContext;
 typedef icomp::TModelCompWrap<imtbase::CDelegatedObjectContainerSupplierComp> DelegatedObjectContainerSupplier;
 typedef icomp::TModelCompWrap<imtbase::CMultiStatusManagerComp> MultiStatusManager;
 typedef icomp::TModelCompWrap<imtbase::CStatusManagerComp> StatusManager;

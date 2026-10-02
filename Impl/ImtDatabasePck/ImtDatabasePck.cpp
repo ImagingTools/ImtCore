@@ -131,5 +131,10 @@ I_EXPORT_COMPONENT(
 			"SQL database transaction manager",
 			"SQL Database Transaction Manager");
 
+I_EXPORT_COMPONENT(
+			TenantRowLevelSecurityController,
+			"Installer of PostgreSQL Row Level Security policies for tenant isolation",
+			"Tenant Row Level Security RLS PostgreSQL");
+
 
 } // namespace ImtDatabasePck
