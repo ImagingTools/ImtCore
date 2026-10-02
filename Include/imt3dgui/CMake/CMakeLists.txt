@@ -76,65 +76,49 @@ set(DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR "${AUX_INCLUDE_DIR}/${PROJECT_
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../../Config/CMake/DesignTokenCreator.cmake)
 
 # --- RHI shader compilation (mirrors QMake qsb_compiler in imt3dgui.pro) ---
-# The .qsb files consumed by the .qrc below are build outputs, not source:
-# they are (re)generated into Resources/Shaders/ on every configure/build and
-# are git-ignored there, so rebuilding never dirties the working tree.
-# A known-good fallback copy is committed under Resources/Shaders/Prebuilt/
-# and is copied into place when Qt ShaderTools is unavailable, so builds
-# without ShaderTools still work.
-
-set(RHI_SHADER_DIR "${PROJECT_SOURCE_DIR}/../Resources/Shaders")
-set(RHI_SHADER_PREBUILT_DIR "${RHI_SHADER_DIR}/Prebuilt")
+# The .qsb files and the .qrc that embeds them are generated into AuxInclude.
+set(RHI_SHADER_SRC_DIR "${PROJECT_SOURCE_DIR}/../Resources/Shaders")
+set(RHI_SHADER_OUT_DIR "${AUX_INCLUDE_DIR}/${PROJECT_NAME}")
 
 set(RHI_SHADER_SOURCES
-	${RHI_SHADER_DIR}/vshader_rhi.vert
-	${RHI_SHADER_DIR}/fshader_rhi.frag
+	${RHI_SHADER_SRC_DIR}/vshader_rhi.vert
+	${RHI_SHADER_SRC_DIR}/fshader_rhi.frag
 )
 
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ShaderTools REQUIRED)
+
+set(RHI_QRC_FILES_XML "")
 foreach(SHADER_SRC ${RHI_SHADER_SOURCES})
 	get_filename_component(SHADER_NAME ${SHADER_SRC} NAME)
-	list(APPEND QSB_OUTPUTS "${RHI_SHADER_DIR}/${SHADER_NAME}.qsb")
+	set(QSB_OUTPUT "${RHI_SHADER_OUT_DIR}/${SHADER_NAME}.qsb")
+	list(APPEND QSB_OUTPUTS ${QSB_OUTPUT})
+	string(APPEND RHI_QRC_FILES_XML "<file>${SHADER_NAME}.qsb</file>\n")
+
+	add_custom_command(
+		OUTPUT ${QSB_OUTPUT}
+		COMMAND Qt${QT_VERSION_MAJOR}::qsb
+			--glsl "100 es,120,150" --hlsl 50 --msl 12
+			-o ${QSB_OUTPUT} ${SHADER_SRC}
+		DEPENDS ${SHADER_SRC}
+		COMMENT "[imt3dgui] Compiling RHI shader ${SHADER_NAME} -> ${SHADER_NAME}.qsb"
+		VERBATIM
+	)
 endforeach()
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ShaderTools QUIET)
+# --- Generate the .qrc that references the .qsb files and compile it via rcc ---
+set(IMT3DGUI_RHI_QRC_FILE "${RHI_SHADER_OUT_DIR}/imt3dgui_rhi_shaders.qrc")
+set(IMT3DGUI_RHI_QRC_CPP  "${RHI_SHADER_OUT_DIR}/qrc_imt3dgui_rhi_shaders.cpp")
 
-foreach(SHADER_SRC ${RHI_SHADER_SOURCES})
-	get_filename_component(SHADER_NAME ${SHADER_SRC} NAME)
-	set(QSB_OUTPUT "${RHI_SHADER_DIR}/${SHADER_NAME}.qsb")
-
-	if(TARGET Qt${QT_VERSION_MAJOR}::qsb)
-		add_custom_command(
-			OUTPUT ${QSB_OUTPUT}
-			COMMAND Qt${QT_VERSION_MAJOR}::qsb
-				--glsl "100 es,120,150" --hlsl 50 --msl 12
-				-o ${QSB_OUTPUT} ${SHADER_SRC}
-			DEPENDS ${SHADER_SRC}
-			COMMENT "[imt3dgui] Compiling RHI shader ${SHADER_NAME} -> ${SHADER_NAME}.qsb"
-			VERBATIM
-		)
-	else()
-		add_custom_command(
-			OUTPUT ${QSB_OUTPUT}
-			COMMAND ${CMAKE_COMMAND} -E copy
-				"${RHI_SHADER_PREBUILT_DIR}/${SHADER_NAME}.qsb" ${QSB_OUTPUT}
-			DEPENDS "${RHI_SHADER_PREBUILT_DIR}/${SHADER_NAME}.qsb"
-			COMMENT "[imt3dgui] Qt ShaderTools not found, copying prebuilt ${SHADER_NAME}.qsb"
-			VERBATIM
-		)
-	endif()
-endforeach()
-
-# --- Compile the static .qrc (which references the .qsb files) via rcc ---
-set(IMT3DGUI_QRC_FILE "${PROJECT_SOURCE_DIR}/../imt3dgui.qrc")
-set(IMT3DGUI_QRC_CPP  "${CMAKE_CURRENT_BINARY_DIR}/qrc_imt3dgui.cpp")
+file(WRITE ${IMT3DGUI_RHI_QRC_FILE}
+	"<RCC>\n<qresource prefix=\"/RhiShaders\">\n${RHI_QRC_FILES_XML}</qresource>\n</RCC>\n")
 
 add_custom_command(
-	OUTPUT ${IMT3DGUI_QRC_CPP}
+	OUTPUT ${IMT3DGUI_RHI_QRC_CPP}
 	COMMAND Qt${QT_VERSION_MAJOR}::rcc
-		-name imt3dgui ${IMT3DGUI_QRC_FILE} -o ${IMT3DGUI_QRC_CPP}
-	DEPENDS ${IMT3DGUI_QRC_FILE} ${QSB_OUTPUTS}
-	COMMENT "[imt3dgui] CREATING RES ${IMT3DGUI_QRC_CPP}"
+		-name imt3dgui_rhi_shaders ${IMT3DGUI_RHI_QRC_FILE} -o ${IMT3DGUI_RHI_QRC_CPP}
+	DEPENDS ${IMT3DGUI_RHI_QRC_FILE} ${QSB_OUTPUTS}
+	COMMENT "[imt3dgui] CREATING RES ${IMT3DGUI_RHI_QRC_CPP}"
 	VERBATIM
 )
 
-target_sources(${PROJECT_NAME} PRIVATE ${IMT3DGUI_QRC_CPP})
+target_sources(${PROJECT_NAME} PRIVATE ${IMT3DGUI_RHI_QRC_CPP})

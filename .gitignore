@@ -80,9 +80,6 @@ object_script.*.Debug
 *.jsc
 *.qm
 
-# Generated RHI shader packs (rebuilt from source or copied from Prebuilt/ on every build)
-Include/imt3dgui/Resources/Shaders/*.qsb
-
 # Compiled Object files
 *.o
 *.obj
