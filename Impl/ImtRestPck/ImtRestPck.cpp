@@ -20,6 +20,13 @@ I_EXPORT_COMPONENT(
 			"General TCP-server",
 			"TCP Connection Server");
 
+#ifdef IMTREST_HTTP_SERVER_AVAILABLE
+I_EXPORT_COMPONENT(
+			HttpServer,
+			"HTTP(S) server based on QtHttpServer with WebSocket upgrade on the same port",
+			"HTTP HTTPS WebSocket Connection Server QtHttpServer");
+#endif
+
 I_EXPORT_COMPONENT(
 			WebSocketServer,
 			"General TCP-server",
