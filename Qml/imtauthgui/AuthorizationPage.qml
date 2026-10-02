@@ -104,7 +104,7 @@ Rectangle {
 
 	Rectangle{
 		anchors.fill: parent;
-		color: "gray";
+		color: Style.overlayBackgroundColor;
 		opacity: 0.5;
 	}
 

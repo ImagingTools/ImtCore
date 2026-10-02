@@ -7,6 +7,7 @@ Rectangle {
 
     width: 50;
     height: 60;
+    color: Style.baseColor;
 
 	property int itemHeight: Style.controlHeightS;
 

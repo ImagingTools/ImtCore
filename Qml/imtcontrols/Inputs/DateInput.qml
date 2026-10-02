@@ -345,6 +345,7 @@ Item {
 					width: 50;
 					height: parent.height;
 					radius: input.radius;
+					color: input.color;
 					border.color: Style.borderColor;
 				}
 				Button{
