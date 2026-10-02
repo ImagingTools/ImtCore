@@ -80,6 +80,9 @@
         <Element Id="CrossOrgGrantsDocumentService" PackageId="ImtCollectionVoce" ComponentId="CollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccessContextController" Type="Reference" ExportId="AccessContextController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Collection" Type="Reference" ExportId="CrossOrgGrantRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

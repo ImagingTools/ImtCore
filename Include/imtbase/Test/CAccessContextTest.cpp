@@ -1,31 +1,31 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include "CDatabaseAccessContextTest.h"
+#include "CAccessContextTest.h"
 
 
 // Qt includes
 #include <QtCore/QThread>
 
 // ImtCore includes
-#include <imtdb/CDatabaseAccessContextComp.h>
-#include <imtdb/CSystemDatabaseAccessContextComp.h>
+#include <imtbase/CAccessContextComp.h>
+#include <imtbase/CSystemAccessContextComp.h>
 
 
-void CDatabaseAccessContextTest::NoContextByDefaultTest()
+void CAccessContextTest::NoContextByDefaultTest()
 {
-	imtdb::CDatabaseAccessContextComp accessContext;
+	imtbase::CAccessContextComp accessContext;
 
-	QCOMPARE(accessContext.GetAccessMode(), imtdb::IDatabaseAccessContext::AM_NONE);
+	QCOMPARE(accessContext.GetAccessMode(), imtbase::IAccessContext::AM_NONE);
 	QVERIFY(accessContext.GetTenantId().isEmpty());
 	QVERIFY(accessContext.GetUserId().isEmpty());
 }
 
 
-void CDatabaseAccessContextTest::TenantContextTest()
+void CAccessContextTest::TenantContextTest()
 {
-	imtdb::CDatabaseAccessContextComp accessContext;
+	imtbase::CAccessContextComp accessContext;
 
 	accessContext.SetTenantAccessContext("TenantA", "User1");
-	QCOMPARE(accessContext.GetAccessMode(), imtdb::IDatabaseAccessContext::AM_TENANT);
+	QCOMPARE(accessContext.GetAccessMode(), imtbase::IAccessContext::AM_TENANT);
 	QCOMPARE(accessContext.GetTenantId(), QByteArray("TenantA"));
 	QCOMPARE(accessContext.GetUserId(), QByteArray("User1"));
 
@@ -35,32 +35,32 @@ void CDatabaseAccessContextTest::TenantContextTest()
 
 	// A user without selected tenant still has a tenant access context (user-owned rows only)
 	accessContext.SetTenantAccessContext(QByteArray(), "User3");
-	QCOMPARE(accessContext.GetAccessMode(), imtdb::IDatabaseAccessContext::AM_TENANT);
+	QCOMPARE(accessContext.GetAccessMode(), imtbase::IAccessContext::AM_TENANT);
 	QVERIFY(accessContext.GetTenantId().isEmpty());
 	QCOMPARE(accessContext.GetUserId(), QByteArray("User3"));
 }
 
 
-void CDatabaseAccessContextTest::ResetContextTest()
+void CAccessContextTest::ResetContextTest()
 {
-	imtdb::CDatabaseAccessContextComp accessContext;
+	imtbase::CAccessContextComp accessContext;
 
 	accessContext.SetTenantAccessContext("TenantA", "User1");
 	accessContext.ResetAccessContext();
 
-	QCOMPARE(accessContext.GetAccessMode(), imtdb::IDatabaseAccessContext::AM_NONE);
+	QCOMPARE(accessContext.GetAccessMode(), imtbase::IAccessContext::AM_NONE);
 	QVERIFY(accessContext.GetTenantId().isEmpty());
 	QVERIFY(accessContext.GetUserId().isEmpty());
 }
 
 
-void CDatabaseAccessContextTest::ContextIsPerThreadTest()
+void CAccessContextTest::ContextIsPerThreadTest()
 {
-	imtdb::CDatabaseAccessContextComp accessContext;
+	imtbase::CAccessContextComp accessContext;
 
 	accessContext.SetTenantAccessContext("TenantA", "User1");
 
-	imtdb::IDatabaseAccessContext::AccessMode otherThreadMode = imtdb::IDatabaseAccessContext::AM_TENANT;
+	imtbase::IAccessContext::AccessMode otherThreadMode = imtbase::IAccessContext::AM_TENANT;
 	QByteArray otherThreadTenantId;
 	QThread* threadPtr = QThread::create([&accessContext, &otherThreadMode, &otherThreadTenantId](){
 		otherThreadMode = accessContext.GetAccessMode();
@@ -75,23 +75,23 @@ void CDatabaseAccessContextTest::ContextIsPerThreadTest()
 	delete threadPtr;
 
 	// The context of a thread is neither visible to nor changed by another thread
-	QCOMPARE(otherThreadMode, imtdb::IDatabaseAccessContext::AM_NONE);
+	QCOMPARE(otherThreadMode, imtbase::IAccessContext::AM_NONE);
 	QCOMPARE(otherThreadTenantId, QByteArray("TenantB"));
-	QCOMPARE(accessContext.GetAccessMode(), imtdb::IDatabaseAccessContext::AM_TENANT);
+	QCOMPARE(accessContext.GetAccessMode(), imtbase::IAccessContext::AM_TENANT);
 	QCOMPARE(accessContext.GetTenantId(), QByteArray("TenantA"));
 }
 
 
-void CDatabaseAccessContextTest::SystemContextTest()
+void CAccessContextTest::SystemContextTest()
 {
-	imtdb::CSystemDatabaseAccessContextComp accessContext;
+	imtbase::CSystemAccessContextComp accessContext;
 
-	QCOMPARE(accessContext.GetAccessMode(), imtdb::IDatabaseAccessContext::AM_SYSTEM);
+	QCOMPARE(accessContext.GetAccessMode(), imtbase::IAccessContext::AM_SYSTEM);
 	QVERIFY(accessContext.GetTenantId().isEmpty());
 	QVERIFY(accessContext.GetUserId().isEmpty());
 }
 
 
-I_ADD_TEST(CDatabaseAccessContextTest);
+I_ADD_TEST(CAccessContextTest);
 
 

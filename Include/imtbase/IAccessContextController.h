@@ -3,19 +3,20 @@
 
 
 // ImtCore includes
-#include <imtdb/IDatabaseAccessContext.h>
+#include <imtbase/IAccessContext.h>
 
 
-namespace imtdb
+namespace imtbase
 {
 
 
 /**
 	Controller of the tenant access context of the calling thread.
-	Used by the request entry points to bind the database operations of a request to its tenant and user.
+	Used by the request entry points to bind the data operations of a request to its tenant and user,
+	and by components that continue the work of a request in another thread.
 	System access cannot be set by this interface, it is configured by the component wiring only.
 */
-class IDatabaseAccessContextController: virtual public IDatabaseAccessContext
+class IAccessContextController: virtual public IAccessContext
 {
 public:
 	/**
@@ -30,6 +31,6 @@ public:
 };
 
 
-} // namespace imtdb
+} // namespace imtbase
 
 

@@ -10,7 +10,7 @@
 #include <itest/CStandardTestExecutor.h>
 
 
-class CDatabaseAccessContextTest: public QObject
+class CAccessContextTest: public QObject
 {
 	Q_OBJECT
 

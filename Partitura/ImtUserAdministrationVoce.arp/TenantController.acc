@@ -148,6 +148,9 @@
         <Element Id="TenantConnectionManager" PackageId="ImtUserAdministrationVoce" ComponentId="TenantConnectionManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccessContextController" Type="Reference" ExportId="AccessContextController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -220,6 +223,9 @@
         <Element Id="TenantGrantManager" PackageId="ImtUserAdministrationVoce" ComponentId="TenantGrantManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccessContextController" Type="Reference" ExportId="AccessContextController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CrossOrgGrantRepository" Type="Reference" ExportId="CrossOrgGrantRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

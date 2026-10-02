@@ -185,7 +185,8 @@ void CTenantRowLevelSecurityTest::TenantCannotModifyOtherTenantDataTest()
 	// Rows can't be created for or moved to another tenant
 	QSqlError sqlError;
 	QVERIFY(!ExecuteAppQuery("INSERT INTO " + m_schemaName + R"(."AuditRecords" ("TenantId") VALUES (')" + s_tenantB + "')", &sqlError));
-	QVERIFY(sqlError.text().contains(QStringLiteral("row-level security")));
+	// SQLSTATE 42501 (insufficient_privilege): row-level security violation, independent of the server locale
+	QCOMPARE(sqlError.nativeErrorCode(), QStringLiteral("42501"));
 	QVERIFY(!ExecuteAppQuery("UPDATE " + m_schemaName + R"(."AuditRecords" SET "TenantId" = ')" + s_tenantB + "'"));
 
 	QVERIFY(SetContext(s_tenantB, QByteArray(), false));

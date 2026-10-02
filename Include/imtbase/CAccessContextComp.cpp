@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtdb/CDatabaseAccessContextComp.h>
+#include <imtbase/CAccessContextComp.h>
 
 
 // Qt includes
 #include <QtCore/QThread>
 
 
-namespace imtdb
+namespace imtbase
 {
 
 
-// reimplemented (imtdb::IDatabaseAccessContext)
+// reimplemented (imtbase::IAccessContext)
 
-IDatabaseAccessContext::AccessMode CDatabaseAccessContextComp::GetAccessMode() const
+IAccessContext::AccessMode CAccessContextComp::GetAccessMode() const
 {
 	TenantContext context;
 
@@ -20,7 +20,7 @@ IDatabaseAccessContext::AccessMode CDatabaseAccessContextComp::GetAccessMode() c
 }
 
 
-QByteArray CDatabaseAccessContextComp::GetTenantId() const
+QByteArray CAccessContextComp::GetTenantId() const
 {
 	TenantContext context;
 	GetCurrentContext(context);
@@ -29,7 +29,7 @@ QByteArray CDatabaseAccessContextComp::GetTenantId() const
 }
 
 
-QByteArray CDatabaseAccessContextComp::GetUserId() const
+QByteArray CAccessContextComp::GetUserId() const
 {
 	TenantContext context;
 	GetCurrentContext(context);
@@ -38,9 +38,9 @@ QByteArray CDatabaseAccessContextComp::GetUserId() const
 }
 
 
-// reimplemented (imtdb::IDatabaseAccessContextController)
+// reimplemented (imtbase::IAccessContextController)
 
-void CDatabaseAccessContextComp::SetTenantAccessContext(const QByteArray& tenantId, const QByteArray& userId)
+void CAccessContextComp::SetTenantAccessContext(const QByteArray& tenantId, const QByteArray& userId)
 {
 	QMutexLocker locker(&m_threadContextsMutex);
 
@@ -50,7 +50,7 @@ void CDatabaseAccessContextComp::SetTenantAccessContext(const QByteArray& tenant
 }
 
 
-void CDatabaseAccessContextComp::ResetAccessContext()
+void CAccessContextComp::ResetAccessContext()
 {
 	QMutexLocker locker(&m_threadContextsMutex);
 
@@ -60,7 +60,7 @@ void CDatabaseAccessContextComp::ResetAccessContext()
 
 // private methods
 
-bool CDatabaseAccessContextComp::GetCurrentContext(TenantContext& context) const
+bool CAccessContextComp::GetCurrentContext(TenantContext& context) const
 {
 	QMutexLocker locker(&m_threadContextsMutex);
 
@@ -75,6 +75,6 @@ bool CDatabaseAccessContextComp::GetCurrentContext(TenantContext& context) const
 }
 
 
-} // namespace imtdb
+} // namespace imtbase
 
 

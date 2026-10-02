@@ -136,15 +136,5 @@ I_EXPORT_COMPONENT(
 			"Installer of PostgreSQL Row Level Security policies for tenant isolation",
 			"Tenant Row Level Security RLS PostgreSQL");
 
-I_EXPORT_COMPONENT(
-			DatabaseAccessContext,
-			"Tenant access context of the request processed by the calling thread",
-			"Database Access Context Tenant Request RLS");
-
-I_EXPORT_COMPONENT(
-			SystemDatabaseAccessContext,
-			"Database access context of trusted system operations, not restricted by tenant isolation",
-			"Database Access Context System RLS");
-
 
 } // namespace ImtDatabasePck

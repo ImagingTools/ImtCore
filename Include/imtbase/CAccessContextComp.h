@@ -10,36 +10,36 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtdb/IDatabaseAccessContextController.h>
+#include <imtbase/IAccessContextController.h>
 
 
-namespace imtdb
+namespace imtbase
 {
 
 
 /**
 	Tenant access context of the request processed by the calling thread.
 	The context is set by the request entry point (e.g. imtservergql::CHttpGraphQLServletComp)
-	and read by the database engine. A thread without context gets \c AM_NONE.
+	and read by the database engine and the caches. A thread without context gets \c AM_NONE.
 */
-class CDatabaseAccessContextComp:
+class CAccessContextComp:
 			public icomp::CComponentBase,
-			virtual public IDatabaseAccessContextController
+			virtual public IAccessContextController
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CDatabaseAccessContextComp);
-		I_REGISTER_INTERFACE(IDatabaseAccessContext);
-		I_REGISTER_INTERFACE(IDatabaseAccessContextController);
+	I_BEGIN_COMPONENT(CAccessContextComp);
+		I_REGISTER_INTERFACE(IAccessContext);
+		I_REGISTER_INTERFACE(IAccessContextController);
 	I_END_COMPONENT;
 
-	// reimplemented (imtdb::IDatabaseAccessContext)
+	// reimplemented (imtbase::IAccessContext)
 	virtual AccessMode GetAccessMode() const override;
 	virtual QByteArray GetTenantId() const override;
 	virtual QByteArray GetUserId() const override;
 
-	// reimplemented (imtdb::IDatabaseAccessContextController)
+	// reimplemented (imtbase::IAccessContextController)
 	virtual void SetTenantAccessContext(const QByteArray& tenantId, const QByteArray& userId) override;
 	virtual void ResetAccessContext() override;
 
@@ -58,6 +58,6 @@ private:
 };
 
 
-} // namespace imtdb
+} // namespace imtbase
 
 

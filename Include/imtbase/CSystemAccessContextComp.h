@@ -6,10 +6,10 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtdb/IDatabaseAccessContext.h>
+#include <imtbase/IAccessContext.h>
 
 
-namespace imtdb
+namespace imtbase
 {
 
 
@@ -18,24 +18,24 @@ namespace imtdb
 	A database engine using this context is not restricted by tenant isolation. Use it only for the engine
 	instances of migrations and maintenance components.
 */
-class CSystemDatabaseAccessContextComp:
+class CSystemAccessContextComp:
 			public icomp::CComponentBase,
-			virtual public IDatabaseAccessContext
+			virtual public IAccessContext
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CSystemDatabaseAccessContextComp);
-		I_REGISTER_INTERFACE(IDatabaseAccessContext);
+	I_BEGIN_COMPONENT(CSystemAccessContextComp);
+		I_REGISTER_INTERFACE(IAccessContext);
 	I_END_COMPONENT;
 
-	// reimplemented (imtdb::IDatabaseAccessContext)
+	// reimplemented (imtbase::IAccessContext)
 	virtual AccessMode GetAccessMode() const override;
 	virtual QByteArray GetTenantId() const override;
 	virtual QByteArray GetUserId() const override;
 };
 
 
-} // namespace imtdb
+} // namespace imtbase
 
 

@@ -40,6 +40,9 @@
         <Element Id="PgSqlDatabaseEngine" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccessContext" Type="Reference" ExportId="AccessContext">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="AutoCreateDatabase" Type="Integer" ExportId="AutoCreateDatabase">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

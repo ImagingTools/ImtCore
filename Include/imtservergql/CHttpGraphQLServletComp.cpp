@@ -68,8 +68,8 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	auto cleanup = qScopeGuard([this]() {
 		imtgql::CGqlRequestContextManager::Clear();
 
-		if (m_databaseAccessContextControllerCompPtr.IsValid()){
-			m_databaseAccessContextControllerCompPtr->ResetAccessContext();
+		if (m_accessContextControllerCompPtr.IsValid()){
+			m_accessContextControllerCompPtr->ResetAccessContext();
 		}
 	});
 
@@ -130,8 +130,8 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		}
 
 		// Database operations of the request are restricted to its tenant (tenant Row Level Security).
-		if (m_databaseAccessContextControllerCompPtr.IsValid()){
-			m_databaseAccessContextControllerCompPtr->SetTenantAccessContext(gqlContextPtr->GetTenantId(), gqlContextPtr->GetUserId());
+		if (m_accessContextControllerCompPtr.IsValid()){
+			m_accessContextControllerCompPtr->SetTenantAccessContext(gqlContextPtr->GetTenantId(), gqlContextPtr->GetUserId());
 		}
 
 		m_lastRequest.SetGqlContext(std::move(gqlContextPtr));

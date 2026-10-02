@@ -16,7 +16,7 @@
 #include <imtdb/IDatabaseServerConnectionChecker.h>
 #include <imtdb/CDatabaseAccessSettings.h>
 #include <imtdb/IMigrationController.h>
-#include <imtdb/IDatabaseAccessContext.h>
+#include <imtbase/IAccessContext.h>
 
 // std includes
 #include <atomic>
@@ -36,7 +36,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	I_REF(imtdb::IDatabaseAccessContext, m_accessContextCompPtr);
+	I_REF(imtbase::IAccessContext, m_accessContextCompPtr);
 };
 
 

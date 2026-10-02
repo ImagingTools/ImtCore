@@ -9,16 +9,16 @@
 #include <QtCore/QByteArray>
 
 
-namespace imtdb
+namespace imtbase
 {
 
 
 /**
-	Access context of the database operations executed by the calling thread.
-	The database engine passes it to the database session before each query (see CDatabaseEngineComp, reference \c AccessContext),
-	where it is evaluated by the tenant Row Level Security policies (see CTenantRowLevelSecurityControllerComp).
+	Access context of the data operations executed by the calling thread: on whose behalf the data is accessed.
+	It is passed to the database session before each query (see imtdb::CDatabaseEngineComp, reference \c AccessContext),
+	where it is evaluated by the tenant Row Level Security policies, and keeps caches of such data apart per context.
 */
-class IDatabaseAccessContext: virtual public istd::IPolymorphic
+class IAccessContext: virtual public istd::IPolymorphic
 {
 public:
 	enum AccessMode
@@ -45,6 +45,6 @@ public:
 };
 
 
-} // namespace imtdb
+} // namespace imtbase
 
 

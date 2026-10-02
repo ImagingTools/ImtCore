@@ -645,12 +645,12 @@ bool CDatabaseEngineComp::ApplyAccessContext(QSqlDatabase& databaseConnection, Q
 
 	// The context is applied before every query (no caching), because session settings changed inside of a rolled back
 	// transaction are reverted by PostgreSQL and a stale context of a previous request could be used otherwise.
-	const IDatabaseAccessContext::AccessMode accessMode = m_accessContextCompPtr->GetAccessMode();
+	const imtbase::IAccessContext::AccessMode accessMode = m_accessContextCompPtr->GetAccessMode();
 
 	// Empty strings instead of null strings: a NULL value would reset the setting instead of clearing it.
 	QString tenantId = QStringLiteral("");
 	QString userId = QStringLiteral("");
-	if (accessMode == IDatabaseAccessContext::AM_TENANT){
+	if (accessMode == imtbase::IAccessContext::AM_TENANT){
 		tenantId += QString::fromUtf8(m_accessContextCompPtr->GetTenantId());
 		userId += QString::fromUtf8(m_accessContextCompPtr->GetUserId());
 	}
@@ -659,7 +659,7 @@ bool CDatabaseEngineComp::ApplyAccessContext(QSqlDatabase& databaseConnection, Q
 	contextQuery.prepare(QString(CTenantRlsPolicyBuilder::CreateContextSyncQuery()));
 	contextQuery.bindValue(QStringLiteral(":TenantId"), tenantId);
 	contextQuery.bindValue(QStringLiteral(":UserId"), userId);
-	contextQuery.bindValue(QStringLiteral(":SystemContext"), (accessMode == IDatabaseAccessContext::AM_SYSTEM) ? QStringLiteral("on") : QStringLiteral("off"));
+	contextQuery.bindValue(QStringLiteral(":SystemContext"), (accessMode == imtbase::IAccessContext::AM_SYSTEM) ? QStringLiteral("on") : QStringLiteral("off"));
 
 	if (contextQuery.exec()){
 		return true;

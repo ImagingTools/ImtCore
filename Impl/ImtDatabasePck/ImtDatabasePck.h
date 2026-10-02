@@ -31,8 +31,6 @@
 #include <imtdb/CSqliteXPathExtractorComp.h>
 #include <imtdb/CSqlDatabaseTransactionManagerComp.h>
 #include <imtdb/CTenantRowLevelSecurityControllerComp.h>
-#include <imtdb/CDatabaseAccessContextComp.h>
-#include <imtdb/CSystemDatabaseAccessContextComp.h>
 #include <imtauth/CTenantFilterParam.h>
 
 
@@ -67,8 +65,6 @@ typedef imtdb::CPostgresXPathExtractorComp PostgresXPathExtractor;
 typedef imtdb::CSqliteXPathExtractorComp SqliteXPathExtractor;
 typedef imtdb::CSqlDatabaseTransactionManagerComp SqlDatabaseTransactionManager;
 typedef imtdb::CTenantRowLevelSecurityControllerComp TenantRowLevelSecurityController;
-typedef imtdb::CDatabaseAccessContextComp DatabaseAccessContext;
-typedef imtdb::CSystemDatabaseAccessContextComp SystemDatabaseAccessContext;
 
 
 } // namespace ImtDatabasePck

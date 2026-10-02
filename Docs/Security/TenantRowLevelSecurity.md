@@ -23,18 +23,18 @@ another tenant.
 1. `imtservergql::CAuthenticationManagerComp` resolves the access token (JWT or PAT) and
    stores the user ID and tenant ID in the request context (`imtgql::IGqlContext`).
 2. `imtservergql::CHttpGraphQLServletComp::OnPost` sets the tenant and user of the request
-   through its reference `DatabaseAccessContextController`
-   (`imtdb::IDatabaseAccessContextController`) and resets it when the request is finished.
+   through its reference `AccessContextController`
+   (`imtbase::IAccessContextController`) and resets it when the request is finished.
    GraphQL requests received over WebSocket are processed by the same servlet in the worker
    threads, so they are covered as well. Nested requests executed by the request handlers
    in the same thread use the context of the request.
 3. `imtdb::CDatabaseEngineComp` reads the context through its reference `AccessContext`
-   (`imtdb::IDatabaseAccessContext`) and passes it to PostgreSQL before every query.
+   (`imtbase::IAccessContext`) and passes it to PostgreSQL before every query.
 
-## 2. Database access context
+## 2. Access context
 
-`imtdb::IDatabaseAccessContext` describes on whose behalf the database operations are
-executed:
+`imtbase::IAccessContext` describes on whose behalf the data operations of the calling
+thread are executed:
 
 | Access mode | Database access |
 |-------------|-----------------|
@@ -42,20 +42,34 @@ executed:
 | `AM_TENANT` | Rows of the tenant (plus user-owned rows, if configured) |
 | `AM_SYSTEM` | All rows (if allowed by the policies) |
 
-Implementations (`ImtDatabasePck`):
+Implementations (`ImtCorePck`):
 
 | Component | Description |
 |-----------|-------------|
-| `DatabaseAccessContext` (`imtdb::CDatabaseAccessContextComp`) | Context of the request processed by the calling thread. Implements `IDatabaseAccessContextController`, which can set **only tenant contexts**. A thread without a request gets `AM_NONE` |
-| `SystemDatabaseAccessContext` (`imtdb::CSystemDatabaseAccessContextComp`) | Always `AM_SYSTEM` |
+| `AccessContext` (`imtbase::CAccessContextComp`) | Context of the request processed by the calling thread. Implements `IAccessContextController`, which can set **only tenant contexts**. A thread without a request gets `AM_NONE` |
+| `SystemAccessContext` (`imtbase::CSystemAccessContextComp`) | Always `AM_SYSTEM` |
 
 System access is therefore never switched on in code: it is a property of the database
-engine instance that references `SystemDatabaseAccessContext`, visible in the component
+engine instance that references `SystemAccessContext`, visible in the component
 configuration.
 
-The request context is stored **per thread**: work dispatched to other threads (e.g.
-`QtConcurrent`, background jobs, timers) does not inherit it and runs fail-closed. Such
-components must use an engine instance with an explicit access context (see section 6).
+The request context is stored **per thread**: work dispatched to other threads does not
+inherit it and runs fail-closed. Components that continue a request in another thread pass
+the context explicitly through `IAccessContextController`:
+
+* `imtdoc::CDocumentServiceBase` (reference `AccessContextController` of the document
+  services) captures the context of the request and applies it to the threads that create
+  and load documents.
+
+Other threads (e.g. `QtConcurrent`, background jobs, timers) must use an engine instance with
+an explicit access context (see section 6).
+
+### Caches
+
+Data read under RLS depends on the context, so a cache must not return entries read for
+another tenant. `imtbase::CCachedObjectCollectionComp` keeps its entries per access context
+when its reference `AccessContext` is set. Every cache in front of a protected collection must
+be configured this way, otherwise reads by ID are answered from the cache and bypass RLS.
 
 ## 3. Passing the context to PostgreSQL
 
@@ -78,8 +92,8 @@ SELECT set_config('imt.tenant_id', :TenantId, false),
 * The reference is not set by default, so existing deployments are not affected.
 
 Database migrations use the engine referenced by the migration controller. If they change
-rows of protected tables, that engine must use `SystemDatabaseAccessContext` (see
-section 6); schema changes (DDL) are not restricted by RLS.
+rows of protected tables, that engine must use `SystemAccessContext` (see section 6);
+schema changes (DDL) are not restricted by RLS.
 
 ## 4. RLS policies
 
@@ -180,7 +194,7 @@ protected tables (required by `ALTER TABLE` / `CREATE POLICY`); thanks to
 
 * Trusted internal operations (maintenance jobs, data migrations, cross-tenant
   background processing) get a separate `SqlDatabaseEngine` instance whose `AccessContext`
-  references `SystemDatabaseAccessContext`. Wire only these components to it, e.g. the
+  references `SystemAccessContext`. Wire only these components to it, e.g. the
   `DatabaseEngine` reference of the migration controller. Engine instances of the same
   database share the per-thread connection; the access context is applied per query, so
   each instance keeps its own access mode.
@@ -201,10 +215,13 @@ protected tables (required by `ALTER TABLE` / `CREATE POLICY`); thanks to
 
 1. Create the application role without `SUPERUSER`/`BYPASSRLS` and configure it in the
    database access settings.
-2. Add `DatabaseAccessContext` and reference it as `AccessContext` of `SqlDatabaseEngine`
-   and as `DatabaseAccessContextController` of every `HttpGraphQLServlet`.
-3. Add a second `SqlDatabaseEngine` with `AccessContext` = `SystemDatabaseAccessContext`
+2. Add `AccessContext` and reference it as `AccessContext` of `SqlDatabaseEngine` and of
+   every cache in front of a protected collection, and as `AccessContextController` of every
+   `HttpGraphQLServlet` and of the document services of protected collections.
+3. Add a second `SqlDatabaseEngine` with `AccessContext` = `SystemAccessContext`
    for the migration controller and the maintenance components that need all rows.
+   Create the database in advance with the application role as owner: the engine's
+   `CreateDatabase.sql` uses `OWNER = postgres`, which a non-superuser role cannot do.
 4. Add `TenantRowLevelSecurityController` with `Flags="1"`, reference the table delegates
    and configure `TenantOwnedTables` / `BindingScopedCollections`.
 5. Check the log for critical messages of the controller on start.
@@ -220,8 +237,7 @@ protected tables (required by `ALTER TABLE` / `CREATE POLICY`); thanks to
 
 ## 9. Tests
 
-* `Include/imtdb/Test/CDatabaseAccessContextTest` — access modes, reset, per-thread
-  isolation.
+* `Include/imtbase/Test/CAccessContextTest` — access modes, reset, per-thread isolation.
 * `Include/imtdb/Test/CTenantRlsPolicyBuilderTest` — specification parsing, identifier
   validation, generated SQL.
 * `Include/imtdb/Test/CTenantRowLevelSecurityTest` — integration test on a real PostgreSQL
