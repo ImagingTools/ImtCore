@@ -22,35 +22,46 @@ another tenant.
 
 1. `imtservergql::CAuthenticationManagerComp` resolves the access token (JWT or PAT) and
    stores the user ID and tenant ID in the request context (`imtgql::IGqlContext`).
-2. `imtservergql::CGqlRequestHandlerCompBase::CreateResponse` sets the
-   **tenant security context** of the current thread for the duration of the request
-   (`imtbase::CTenantSecurityContextScope`). Nested requests without own context keep the
-   context of the caller.
-3. `imtdb::CDatabaseEngineComp` passes the context to PostgreSQL before every query
-   (if enabled, see below).
+2. `imtservergql::CHttpGraphQLServletComp::OnPost` sets the tenant and user of the request
+   through its reference `DatabaseAccessContextController`
+   (`imtdb::IDatabaseAccessContextController`) and resets it when the request is finished.
+   GraphQL requests received over WebSocket are processed by the same servlet in the worker
+   threads, so they are covered as well. Nested requests executed by the request handlers
+   in the same thread use the context of the request.
+3. `imtdb::CDatabaseEngineComp` reads the context through its reference `AccessContext`
+   (`imtdb::IDatabaseAccessContext`) and passes it to PostgreSQL before every query.
 
-## 2. Tenant security context
+## 2. Database access context
 
-`imtbase::CTenantSecurityContext` is a thread-local value with three possible states:
+`imtdb::IDatabaseAccessContext` describes on whose behalf the database operations are
+executed:
 
-| State | Created by | Database access |
-|-------|-----------|-----------------|
-| Undefined (default) | no scope | Fail-closed: no tenant-owned rows are visible or writable |
-| Tenant context | `CTenantSecurityContext(tenantId, userId)` | Rows of the tenant (plus user-owned rows, if configured) |
-| System context | `CTenantSecurityContext::CreateSystemContext()` | All rows (if allowed by the policies) |
+| Access mode | Database access |
+|-------------|-----------------|
+| `AM_NONE` | Fail-closed: no tenant-owned rows are visible or writable |
+| `AM_TENANT` | Rows of the tenant (plus user-owned rows, if configured) |
+| `AM_SYSTEM` | All rows (if allowed by the policies) |
 
-Use `imtbase::CTenantSecurityContextScope` (RAII) to set the context. The previous context
-is restored at the end of the scope, so scopes can be nested.
+Implementations (`ImtDatabasePck`):
 
-The context is **thread-local**: work dispatched to other threads (e.g. `QtConcurrent`,
-background jobs, timers) does not inherit it and runs fail-closed unless it opens an own
-scope.
+| Component | Description |
+|-----------|-------------|
+| `DatabaseAccessContext` (`imtdb::CDatabaseAccessContextComp`) | Context of the request processed by the calling thread. Implements `IDatabaseAccessContextController`, which can set **only tenant contexts**. A thread without a request gets `AM_NONE` |
+| `SystemDatabaseAccessContext` (`imtdb::CSystemDatabaseAccessContextComp`) | Always `AM_SYSTEM` |
+
+System access is therefore never switched on in code: it is a property of the database
+engine instance that references `SystemDatabaseAccessContext`, visible in the component
+configuration.
+
+The request context is stored **per thread**: work dispatched to other threads (e.g.
+`QtConcurrent`, background jobs, timers) does not inherit it and runs fail-closed. Such
+components must use an engine instance with an explicit access context (see section 6).
 
 ## 3. Passing the context to PostgreSQL
 
-If the attribute `PropagateTenantSecurityContext` of `imtdb::CDatabaseEngineComp`
-(`SqlDatabaseEngine`) is enabled and the driver is `QPSQL`, the engine executes the
-following statement on the connection of the current thread before **every** query:
+If the reference `AccessContext` of `imtdb::CDatabaseEngineComp` (`SqlDatabaseEngine`) is
+set and the driver is `QPSQL`, the engine executes the following statement on the
+connection of the current thread before **every** query:
 
 ```sql
 SELECT set_config('imt.tenant_id', :TenantId, false),
@@ -64,10 +75,11 @@ SELECT set_config('imt.tenant_id', :TenantId, false),
   a previous request on a pooled per-thread connection.
 * If the context cannot be applied, the actual query is **not executed** and an error is
   returned (fail-closed).
-* The attribute is disabled by default, so existing deployments are not affected.
+* The reference is not set by default, so existing deployments are not affected.
 
-Database migrations executed by the engine (`ExecuteDatabasePatches`) run in the system
-context.
+Database migrations use the engine referenced by the migration controller. If they change
+rows of protected tables, that engine must use `SystemDatabaseAccessContext` (see
+section 6); schema changes (DDL) are not restricted by RLS.
 
 ## 4. RLS policies
 
@@ -84,7 +96,7 @@ are set, so the policies also apply to the table owner.
 
 | Attribute / reference | Description |
 |-----------------------|-------------|
-| `DatabaseEngine` | Database engine (`PropagateTenantSecurityContext` must be enabled) |
+| `DatabaseEngine` | Database engine. Installing the policies is DDL, so no system access context is required |
 | `TableDelegates` | Delegates that create the protected tables. They are instantiated before the policies are installed, so the tables exist |
 | `TenantOwnedTables` | Tables with tenant-owned rows: `[Schema.]Table:TenantColumn[,TenantColumn...][:UserColumn]` |
 | `BindingScopedCollections` | Document collection delegates whose ownership is stored in `TenantEntityBindings` |
@@ -166,17 +178,16 @@ protected tables (required by `ALTER TABLE` / `CREATE POLICY`); thanks to
 
 ## 6. Administrative and system operations
 
-* Run trusted internal operations (maintenance jobs, data migrations, cross-tenant
-  background processing) inside a system scope:
-
-  ```cpp
-  imtbase::CTenantSecurityContextScope scope(imtbase::CTenantSecurityContext::CreateSystemContext());
-  ```
-
-* Never open a system scope based on request data. Request handlers must work in the
-  tenant context of the request; cross-tenant access in requests must be implemented with
-  the existing explicit mechanisms (contracts, cross-org grants) on tables whose policies
-  include both tenants.
+* Trusted internal operations (maintenance jobs, data migrations, cross-tenant
+  background processing) get a separate `SqlDatabaseEngine` instance whose `AccessContext`
+  references `SystemDatabaseAccessContext`. Wire only these components to it, e.g. the
+  `DatabaseEngine` reference of the migration controller. Engine instances of the same
+  database share the per-thread connection; the access context is applied per query, so
+  each instance keeps its own access mode.
+* Request handlers must never use the system engine. They work in the tenant context of
+  the request; cross-tenant access in requests must be implemented with the existing
+  explicit mechanisms (contracts, cross-org grants) on tables whose policies include both
+  tenants.
 * For maximum protection set `AllowSystemContext = false` and execute administrative
   operations through a separate `SqlDatabaseEngine` instance connected with a role that
   has `BYPASSRLS` (e.g. a dedicated administration tool or migration job). Note that
@@ -190,23 +201,26 @@ protected tables (required by `ALTER TABLE` / `CREATE POLICY`); thanks to
 
 1. Create the application role without `SUPERUSER`/`BYPASSRLS` and configure it in the
    database access settings.
-2. Set `PropagateTenantSecurityContext = true` on `SqlDatabaseEngine`.
-3. Add `TenantRowLevelSecurityController` with `Flags="1"`, reference the table delegates
+2. Add `DatabaseAccessContext` and reference it as `AccessContext` of `SqlDatabaseEngine`
+   and as `DatabaseAccessContextController` of every `HttpGraphQLServlet`.
+3. Add a second `SqlDatabaseEngine` with `AccessContext` = `SystemDatabaseAccessContext`
+   for the migration controller and the maintenance components that need all rows.
+4. Add `TenantRowLevelSecurityController` with `Flags="1"`, reference the table delegates
    and configure `TenantOwnedTables` / `BindingScopedCollections`.
-4. Check the log for critical messages of the controller on start.
-5. Verify that background jobs touching protected tables open a tenant or system scope.
+5. Check the log for critical messages of the controller on start.
+6. Verify that background jobs touching protected tables use the system engine.
 
 ## 8. Performance notes
 
 * One additional lightweight statement (`set_config`) is executed per query when
-  propagation is enabled.
+  an access context is configured.
 * Policies on binding-scoped collections execute `EXISTS` sub-queries on
   `TenantEntityBindings`; the existing indexes on `(EntityType, EntityId)` and `TenantId`
   are used.
 
 ## 9. Tests
 
-* `Include/imtbase/Test/CTenantSecurityContextTest` — context states, nested scopes, thread
+* `Include/imtdb/Test/CDatabaseAccessContextTest` — access modes, reset, per-thread
   isolation.
 * `Include/imtdb/Test/CTenantRlsPolicyBuilderTest` — specification parsing, identifier
   validation, generated SQL.

@@ -6,7 +6,6 @@
 #include <QtCore/QSet>
 
 // ImtCore includes
-#include <imtbase/CTenantSecurityContextScope.h>
 #include <imtdb/CTenantRlsPolicyBuilder.h>
 
 
@@ -29,9 +28,6 @@ bool CTenantRowLevelSecurityControllerComp::InstallPolicies() const
 
 		return true;
 	}
-
-	// Installation of the policies is a trusted administrative operation.
-	imtbase::CTenantSecurityContextScope systemContextScope(imtbase::CTenantSecurityContext::CreateSystemContext());
 
 	// Ensure that the delegates are created and the protected tables exist.
 	for (int i = 0; i < m_tableDelegatesCompPtr.GetCount(); ++i){

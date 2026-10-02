@@ -2,10 +2,6 @@
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
 
 
-// ImtCore includes
-#include <imtbase/CTenantSecurityContextScope.h>
-
-
 namespace imtservergql
 {
 
@@ -31,15 +27,6 @@ QJsonObject CGqlRequestHandlerCompBase::CreateResponse(const imtgql::CGqlRequest
 
 		return QJsonObject();
 	}
-
-	// Requests without context (e.g. internal nested requests) keep the security context of the caller.
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	if (gqlContextPtr == nullptr){
-		return CreateInternalResponse(gqlRequest, errorMessage);
-	}
-
-	// All database queries of this request are restricted to the tenant of the request (see imtdb::CTenantRowLevelSecurityControllerComp)
-	imtbase::CTenantSecurityContextScope tenantContextScope(imtbase::CTenantSecurityContext(gqlContextPtr->GetTenantId(), gqlContextPtr->GetUserId()));
 
 	return CreateInternalResponse(gqlRequest, errorMessage);
 }

@@ -23,9 +23,10 @@ namespace imtdb
 	- document collection tables, whose tenant ownership is stored in \c TenantEntityBindings (reference \c BindingScopedCollections),
 	  including the \c TenantEntityBindings table itself.
 
-	The policies only take effect if the database engine passes the tenant security context to PostgreSQL
-	(attribute \c PropagateTenantSecurityContext of CDatabaseEngineComp) and the application connects with a role
+	The policies only take effect if the database engine passes the access context to PostgreSQL
+	(reference \c AccessContext of CDatabaseEngineComp) and the application connects with a role
 	that is neither superuser nor has the \c BYPASSRLS attribute.
+	Installing the policies is DDL and is not restricted by them, so no system access context is required.
 	For other database drivers (e.g. SQLite) no policies are installed.
 */
 class CTenantRowLevelSecurityControllerComp: public ilog::CLoggerComponentBase

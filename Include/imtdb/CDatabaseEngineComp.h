@@ -16,6 +16,7 @@
 #include <imtdb/IDatabaseServerConnectionChecker.h>
 #include <imtdb/CDatabaseAccessSettings.h>
 #include <imtdb/IMigrationController.h>
+#include <imtdb/IDatabaseAccessContext.h>
 
 // std includes
 #include <atomic>
@@ -31,7 +32,11 @@ class CDatabaseEngineAttr: public ilog::CLoggerComponentBase
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 	I_BEGIN_COMPONENT(CDatabaseEngineAttr);
+		I_ASSIGN(m_accessContextCompPtr, "AccessContext", "Access context passed to the PostgreSQL session before each query. Required for the tenant Row Level Security policies (see imtdb::CTenantRowLevelSecurityControllerComp)", false, "AccessContext");
 	I_END_COMPONENT;
+
+protected:
+	I_REF(imtdb::IDatabaseAccessContext, m_accessContextCompPtr);
 };
 
 
@@ -65,7 +70,6 @@ public:
 		I_ASSIGN(m_autoCreateTablesAttrPtr, "AutoCreateTables", "The property holds behavior to create tables on startup.\n Possible values:\n0 - will not create new tables;\n1 - will create tables once;\n2 - will create tables at each startup", true, 1);
 		I_ASSIGN(m_portAttrPtr, "Port", "The property holds connection's port number", true, 5432);
 		I_ASSIGN(m_migrationControllerCompPtr, "MigrationController", "Migration controller", false, "MigrationController");
-		I_ASSIGN(m_tenantSecurityContextEnabledAttrPtr, "PropagateTenantSecurityContext", "If enabled, the tenant security context of the current thread (see imtbase::CTenantSecurityContext) is passed to the PostgreSQL session before each query. Required for the tenant Row Level Security policies (see imtdb::CTenantRowLevelSecurityControllerComp)", true, false);
 	I_END_COMPONENT;
 
 	CDatabaseEngineComp();
@@ -148,10 +152,10 @@ private:
 	QString GetConnectionOptionsString(const QByteArray& databaseDriverId) const;
 
 	/**
-		Pass the tenant security context of the current thread to the database session.
-		\return \c true if the context was applied or no context propagation is required.
+		Pass the access context to the database session.
+		\return \c true if the context was applied or no access context is configured.
 	*/
-	bool ApplyTenantSecurityContext(QSqlDatabase& databaseConnection, QSqlError* sqlErrorPtr) const;
+	bool ApplyAccessContext(QSqlDatabase& databaseConnection, QSqlError* sqlErrorPtr) const;
 
 	template <typename Interface>
 	static Interface* ExtractDatabaseAccessSettings(CDatabaseEngineComp& component)
@@ -176,7 +180,6 @@ private:
 	I_ATTR(int, m_autoCreateTablesAttrPtr);
 	I_ATTR(int, m_portAttrPtr);
 	I_REF(imtdb::IMigrationController, m_migrationControllerCompPtr);
-	I_ATTR(bool, m_tenantSecurityContextEnabledAttrPtr);
 
 	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CDatabaseEngineComp> m_databaseAccessObserver;
 

@@ -9,7 +9,6 @@
 #include <QtCore/QUuid>
 
 // ImtCore includes
-#include <imtbase/CTenantSecurityContextScope.h>
 #include <imtdb/CTenantRlsPolicyBuilder.h>
 
 
@@ -77,7 +76,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 	}
 
 	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
-	if (!ApplyTenantSecurityContext(databaseConnection, sqlErrorPtr)){
+	if (!ApplyAccessContext(databaseConnection, sqlErrorPtr)){
 		return QSqlQuery();
 	}
 
@@ -125,7 +124,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(
 	}
 
 	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
-	if (!ApplyTenantSecurityContext(databaseConnection, sqlError)){
+	if (!ApplyAccessContext(databaseConnection, sqlError)){
 		return QSqlQuery();
 	}
 
@@ -355,9 +354,6 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 	if (!m_migrationControllerCompPtr.IsValid()){
 		return false;
 	}
-
-	// Database migrations are trusted administrative operations and must not be restricted by tenant isolation.
-	imtbase::CTenantSecurityContextScope systemContextScope(imtbase::CTenantSecurityContext::CreateSystemContext());
 
 	int newRevision;
 	int databaseVersion = GetDatabaseVersion();
@@ -637,9 +633,9 @@ bool CDatabaseEngineComp::CreateDatabaseMetaInfo() const
 }
 
 
-bool CDatabaseEngineComp::ApplyTenantSecurityContext(QSqlDatabase& databaseConnection, QSqlError* sqlErrorPtr) const
+bool CDatabaseEngineComp::ApplyAccessContext(QSqlDatabase& databaseConnection, QSqlError* sqlErrorPtr) const
 {
-	if (!*m_tenantSecurityContextEnabledAttrPtr){
+	if (!m_accessContextCompPtr.IsValid()){
 		return true;
 	}
 
@@ -649,13 +645,21 @@ bool CDatabaseEngineComp::ApplyTenantSecurityContext(QSqlDatabase& databaseConne
 
 	// The context is applied before every query (no caching), because session settings changed inside of a rolled back
 	// transaction are reverted by PostgreSQL and a stale context of a previous request could be used otherwise.
-	const imtbase::CTenantSecurityContext context = imtbase::CTenantSecurityContext::GetCurrentContext();
+	const IDatabaseAccessContext::AccessMode accessMode = m_accessContextCompPtr->GetAccessMode();
+
+	// Empty strings instead of null strings: a NULL value would reset the setting instead of clearing it.
+	QString tenantId = QStringLiteral("");
+	QString userId = QStringLiteral("");
+	if (accessMode == IDatabaseAccessContext::AM_TENANT){
+		tenantId += QString::fromUtf8(m_accessContextCompPtr->GetTenantId());
+		userId += QString::fromUtf8(m_accessContextCompPtr->GetUserId());
+	}
 
 	QSqlQuery contextQuery(databaseConnection);
 	contextQuery.prepare(QString(CTenantRlsPolicyBuilder::CreateContextSyncQuery()));
-	contextQuery.bindValue(QStringLiteral(":TenantId"), QString(context.GetTenantId()));
-	contextQuery.bindValue(QStringLiteral(":UserId"), QString(context.GetUserId()));
-	contextQuery.bindValue(QStringLiteral(":SystemContext"), context.IsSystemContext() ? QStringLiteral("on") : QStringLiteral("off"));
+	contextQuery.bindValue(QStringLiteral(":TenantId"), tenantId);
+	contextQuery.bindValue(QStringLiteral(":UserId"), userId);
+	contextQuery.bindValue(QStringLiteral(":SystemContext"), (accessMode == IDatabaseAccessContext::AM_SYSTEM) ? QStringLiteral("on") : QStringLiteral("off"));
 
 	if (contextQuery.exec()){
 		return true;
@@ -666,7 +670,7 @@ bool CDatabaseEngineComp::ApplyTenantSecurityContext(QSqlDatabase& databaseConne
 		*sqlErrorPtr = queryError;
 	}
 
-	SendErrorMessage(0, QStringLiteral("Tenant security context could not be applied to the database session: '%1'. Query was not executed").arg(queryError.text()), __FILE__);
+	SendErrorMessage(0, QStringLiteral("Database access context could not be applied to the database session: '%1'. Query was not executed").arg(queryError.text()), __FILE__);
 
 	return false;
 }

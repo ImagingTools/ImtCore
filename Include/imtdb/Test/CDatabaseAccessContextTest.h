@@ -10,16 +10,16 @@
 #include <itest/CStandardTestExecutor.h>
 
 
-class CTenantSecurityContextTest: public QObject
+class CDatabaseAccessContextTest: public QObject
 {
 	Q_OBJECT
 
 private slots:
-	void DefaultContextIsUndefinedTest();
+	void NoContextByDefaultTest();
 	void TenantContextTest();
+	void ResetContextTest();
+	void ContextIsPerThreadTest();
 	void SystemContextTest();
-	void NestedScopesRestorePreviousContextTest();
-	void ContextIsThreadLocalTest();
 };
 
 

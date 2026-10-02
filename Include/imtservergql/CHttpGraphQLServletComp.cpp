@@ -65,8 +65,12 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	const imtrest::CHttpRequest& request) const
 {
 	// Ensure Clear() is called on every return path
-	auto cleanup = qScopeGuard([]() {
+	auto cleanup = qScopeGuard([this]() {
 		imtgql::CGqlRequestContextManager::Clear();
+
+		if (m_databaseAccessContextControllerCompPtr.IsValid()){
+			m_databaseAccessContextControllerCompPtr->ResetAccessContext();
+		}
 	});
 
 	m_lastRequest.ResetData();
@@ -123,6 +127,11 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 											.arg(maskedToken, QString(gqlCommand), contextError.message),
 						QStringLiteral("GraphQL - servlet"));
 			return GenerateError(StatusCode::SC_INTERNAL_SERVER_ERROR, QStringLiteral("Request context is invalid"), request);
+		}
+
+		// Database operations of the request are restricted to its tenant (tenant Row Level Security).
+		if (m_databaseAccessContextControllerCompPtr.IsValid()){
+			m_databaseAccessContextControllerCompPtr->SetTenantAccessContext(gqlContextPtr->GetTenantId(), gqlContextPtr->GetUserId());
 		}
 
 		m_lastRequest.SetGqlContext(std::move(gqlContextPtr));
