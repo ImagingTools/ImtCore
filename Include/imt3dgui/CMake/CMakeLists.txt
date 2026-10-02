@@ -77,7 +77,9 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../../Config/CMake/DesignTokenCreator.cma
 
 # --- RHI shader compilation (mirrors QMake qsb_compiler in imt3dgui.pro) ---
 # The .qsb files and the .qrc that embeds them are generated into AuxInclude.
+# Without Qt ShaderTools, the committed copies in Resources/Shaders/Prebuilt are used instead.
 set(RHI_SHADER_SRC_DIR "${PROJECT_SOURCE_DIR}/../Resources/Shaders")
+set(RHI_SHADER_PREBUILT_DIR "${RHI_SHADER_SRC_DIR}/Prebuilt")
 set(RHI_SHADER_OUT_DIR "${AUX_INCLUDE_DIR}/${PROJECT_NAME}")
 
 set(RHI_SHADER_SOURCES
@@ -85,7 +87,7 @@ set(RHI_SHADER_SOURCES
 	${RHI_SHADER_SRC_DIR}/fshader_rhi.frag
 )
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ShaderTools REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ShaderTools QUIET)
 
 set(RHI_QRC_FILES_XML "")
 foreach(SHADER_SRC ${RHI_SHADER_SOURCES})
@@ -94,15 +96,26 @@ foreach(SHADER_SRC ${RHI_SHADER_SOURCES})
 	list(APPEND QSB_OUTPUTS ${QSB_OUTPUT})
 	string(APPEND RHI_QRC_FILES_XML "<file>${SHADER_NAME}.qsb</file>\n")
 
-	add_custom_command(
-		OUTPUT ${QSB_OUTPUT}
-		COMMAND Qt${QT_VERSION_MAJOR}::qsb
-			--glsl "100 es,120,150" --hlsl 50 --msl 12
-			-o ${QSB_OUTPUT} ${SHADER_SRC}
-		DEPENDS ${SHADER_SRC}
-		COMMENT "[imt3dgui] Compiling RHI shader ${SHADER_NAME} -> ${SHADER_NAME}.qsb"
-		VERBATIM
-	)
+	if(TARGET Qt${QT_VERSION_MAJOR}::qsb)
+		add_custom_command(
+			OUTPUT ${QSB_OUTPUT}
+			COMMAND Qt${QT_VERSION_MAJOR}::qsb
+				--glsl "100 es,120,150" --hlsl 50 --msl 12
+				-o ${QSB_OUTPUT} ${SHADER_SRC}
+			DEPENDS ${SHADER_SRC}
+			COMMENT "[imt3dgui] Compiling RHI shader ${SHADER_NAME} -> ${SHADER_NAME}.qsb"
+			VERBATIM
+		)
+	else()
+		add_custom_command(
+			OUTPUT ${QSB_OUTPUT}
+			COMMAND ${CMAKE_COMMAND} -E copy
+				"${RHI_SHADER_PREBUILT_DIR}/${SHADER_NAME}.qsb" ${QSB_OUTPUT}
+			DEPENDS "${RHI_SHADER_PREBUILT_DIR}/${SHADER_NAME}.qsb"
+			COMMENT "[imt3dgui] Qt ShaderTools not found, copying prebuilt ${SHADER_NAME}.qsb"
+			VERBATIM
+		)
+	endif()
 endforeach()
 
 # --- Generate the .qrc that references the .qsb files and compile it via rcc ---
