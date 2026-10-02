@@ -5,10 +5,6 @@
 // Qt includes
 #include <QtCore/QDataStream>
 
-// ImtCore includes
-#include <imtrest/IResponse.h>
-#include <imtrest/IProtocolEngine.h>
-
 
 namespace imtrest
 {
@@ -22,41 +18,15 @@ CTcpSender::CTcpSender(QAbstractSocket* tcpSocketPtr)
 }
 
 
-// reimplemented (IRequest)
+// reimplemented (ITransport)
 
-bool CTcpSender::SendResponse(ConstResponsePtr& response) const
+bool CTcpSender::SendData(QByteArray& data) const
 {
-	if (!response.IsValid()){
+	if (m_tcpSocketPtr == nullptr || !m_tcpSocketPtr->isOpen()){
 		return false;
 	}
 
-	int protocolStatusCode = -1;
-	QByteArray statusLiteral;
-
-	bool retVal = response->GetProtocolEngine().GetProtocolStatusCode(response->GetStatusCode(), protocolStatusCode, statusLiteral);
-	if (!retVal){
-		return false;
-	}
-
-	if (m_tcpSocketPtr != nullptr){
-		if (!m_tcpSocketPtr->isOpen()){
-			return false;
-		}
-
-		const QByteArray& contentData = response->GetData();
-
-		retVal = retVal && WriteBody(contentData, *m_tcpSocketPtr);
-
-		return retVal;
-	}
-
-	return false;
-}
-
-
-bool imtrest::CTcpSender::SendRequest(ConstRequestPtr& /*request*/) const
-{
-	return false;
+	return WriteBody(data, *m_tcpSocketPtr);
 }
 
 

@@ -128,27 +128,9 @@ bool CWebSocketClientComp::SendRequestNoWait(GqlRequestPtr requestPtr, imtbase::
 
 // reimplemented (imtrest::ITransport)
 
-bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) const
+bool CWebSocketClientComp::SendData(QByteArray& data) const
 {
-	QByteArray data = response->GetData();
-	imtrest::CHttpResponse* httpResponsePtr = dynamic_cast<imtrest::CHttpResponse*>(const_cast<imtrest::IResponse*>(response.GetPtr()));
-	if (httpResponsePtr != nullptr && !data.isEmpty()){
-		QByteArray body = data;
-		imtrest::IResponse::Headers headers = response->GetHeaders();
-		data = QStringLiteral(R"({"type": "query_data","id": "%1","payload": %2})")
-				   .arg(headers.value("id"), body).toUtf8();
-	}
-
 	EmitSendTextMessage(data);
-
-	return true;
-}
-
-
-bool CWebSocketClientComp::SendRequest(imtrest::ConstRequestPtr& request) const
-{
-	QByteArray message = request->GetBody();
-	EmitSendTextMessage(message);
 
 	return true;
 }
@@ -158,13 +140,24 @@ bool CWebSocketClientComp::SendRequest(imtrest::ConstRequestPtr& request) const
 
 bool CWebSocketClientComp::SendResponse(const QByteArray& /*requestId*/, imtrest::ConstResponsePtr& response) const
 {
-	return SendResponse(response);
+	QByteArray body = response->GetData();
+
+	const imtrest::CHttpResponse* httpResponsePtr = dynamic_cast<const imtrest::CHttpResponse*>(response.GetPtr());
+	if (httpResponsePtr != nullptr && !body.isEmpty()){
+		imtrest::IResponse::Headers headers = response->GetHeaders();
+		body = QStringLiteral(R"({"type": "query_data","id": "%1","payload": %2})")
+				   .arg(headers.value("id"), body).toUtf8();
+	}
+
+	return SendData(body);
 }
 
 
 bool CWebSocketClientComp::SendRequest(const QByteArray& /*requestId*/, imtrest::ConstRequestPtr& request) const
 {
-	return SendRequest(request);
+	QByteArray body = request->GetBody();
+
+	return SendData(body);
 }
 
 

@@ -8,8 +8,8 @@ Item {
 
     property int orientation: Qt.Horizontal; //Qt.Vertical
 
-    property string backgroundColor: "lightgray";
-    property string controlColor: "lightgreen";
+    property string backgroundColor: Style.borderColor;
+    property string controlColor: Style.successColor;
 
     property alias radius: controlRec.radius;
 
