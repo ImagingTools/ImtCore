@@ -1,0 +1,85 @@
+schema {
+	query: Query
+	mutation: Mutation
+	namespace: imttag
+	version: 1.0
+}
+
+import {
+	"../../imtbase/1.0/ImtCollection.sdl"
+}
+
+# --- Tag catalog ---
+# Listing goes through GetSelectableItems (collection "Tags"), deleting through RemoveElements.
+
+type TagData {
+	id: ID
+	name: String
+	color: String
+	description: String
+	isSystem: Boolean
+}
+
+input TagDataInput {
+	id: ID!
+	typeId: ID
+	item: TagData!
+	name: String
+	description: String
+}
+
+# --- Tag assignments ---
+
+input EntityTagsInput {
+	entityType: String!
+	entityIds: [ID]!
+}
+
+type EntityTags {
+	entityId: ID!
+	tags: [TagData]
+}
+
+type EntityTagsPayload {
+	entityType: String
+	items: [EntityTags]
+}
+
+input EntityTagsChangeInput {
+	entityType: String!
+	entityIds: [ID]!
+	tagIds: [ID]
+}
+
+type EntityTagChange {
+	entityId: ID!
+	addedTagIds: [ID]
+	removedTagIds: [ID]
+}
+
+type EntityTagsChangedPayload {
+	entityType: String
+	changes: [EntityTagChange]
+}
+
+type Query {
+	EntityTagsGet (input: EntityTagsInput): EntityTagsPayload!
+}
+
+type Mutation {
+	TagAdd (input: TagDataInput): AddedNotificationPayload!
+	TagUpdate (input: TagDataInput): UpdatedNotificationPayload!
+	EntityTagsAdd (input: EntityTagsChangeInput): EntityTagsChangedPayload!
+	EntityTagRemove (input: EntityTagsChangeInput): EntityTagsChangedPayload!
+}
+
+collectionSchema {
+	type Tag {
+		subtype Tag {
+			operations {
+				update: TagUpdate
+				insert: TagAdd
+			}
+		}
+	}
+}

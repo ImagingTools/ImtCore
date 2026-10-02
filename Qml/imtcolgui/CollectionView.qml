@@ -52,6 +52,11 @@ Item {
 	property bool backgroundUpdatesEnabled: false
 	property int loadingIndicatorDelay: 0
 
+	// Rows that come with a 'tags' list show it as chips after the text of one column:
+	// itemTagsHeaderId, or the first column without its own content that is not a link.
+	property bool showItemTags: true
+	property string itemTagsHeaderId: ""
+
 	property alias canResetFilters: container.canResetFilters;
 	property int metaInfoWidth: Style.sizeHintXXS;
 	property alias contentHeight: container.contentHeight
@@ -191,6 +196,49 @@ Item {
 		}
 	}
 	
+	function installItemTagsCell(){
+		if (!root.showItemTags || !root.table || !root.table.headers || root.table.headers.getItemsCount() === 0){
+			return
+		}
+
+		let contents = root.table.columnContentComps
+		let headerId = root.itemTagsHeaderId
+		if (headerId === ""){
+			for (let i = 0; i < root.table.headers.getItemsCount(); i++){
+				let candidateId = root.table.getHeaderId(i)
+				if (candidateId === "" || candidateId.toLowerCase().endsWith("link")){
+					continue
+				}
+
+				if (!contents[candidateId] || contents[candidateId] === itemTagsCellComp){
+					headerId = candidateId
+					break
+				}
+			}
+		}
+
+		if (headerId !== "" && !contents[headerId]){
+			root.table.setColumnContentById(headerId, itemTagsCellComp)
+		}
+	}
+
+	Timer {
+		id: itemTagsInstallTimer
+
+		interval: 0
+		repeat: false
+
+		onTriggered: {
+			root.installItemTagsCell()
+		}
+	}
+
+	Component {
+		id: itemTagsCellComp
+
+		TableCellTagsDelegate {}
+	}
+
 	function getSelectedIds(){
 		return container.getSelectedIds()
 	}
@@ -238,6 +286,9 @@ Item {
 		
 		function onHeadersChanged(){
 			root.headersChanged();
+
+			// After the consumers have put their own column content in place.
+			itemTagsInstallTimer.restart();
 		}
 
 		function onTableDecoratorChanged(){

@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IObjectCollectionIterator.h>
 #include <imtserverapp/CComplexCollectionFilterRepresentationController.h>
 #include <imtserverapp/IJsonRepresentationController.h>
 #include <imtservergql/IParamsSetJoiner.h>
@@ -38,6 +39,15 @@ protected:
 				const sdl::V1_0::imtbase::CGetSelectableItemsGqlRequest& getSelectableItemsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+
+	/**
+		Called for every returned item; override to fill collection specific fields such as the color.
+		\param iterator	Iterator positioned at the item.
+	*/
+	virtual void OnSelectableItemCreated(
+				const imtbase::IObjectCollectionIterator& iterator,
+				sdl::V1_0::imtbase::CSelectableItemData& itemRepresentation,
+				const ::imtgql::CGqlRequest& gqlRequest) const;
 
 private:
 	imtserverapp::CComplexCollectionFilterRepresentationController m_complexCollectionFilterRepresentationController;

@@ -18,6 +18,7 @@
 // ImtCore includes
 #include <imtbase/imtbase.h>
 #include <imtdb/CComplexCollectionFilterConverter.h>
+#include <imtdb/CTagFilterSqlBuilder.h>
 #include <imtdb/imtdb.h>
 
 
@@ -544,9 +545,10 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const
 {
-	filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(
-				collectionFilter,
-				IsSqliteDriver() ? CComplexCollectionFilterConverter::SC_GENERAL : CComplexCollectionFilterConverter::SC_POSTGRES);
+	const QString idColumn = QStringLiteral(R"("%1"."%2")").arg(QString::fromUtf8(*m_tableNameAttrPtr), QString::fromUtf8(*m_objectIdColumnAttrPtr));
+	const QString entityIdExpression = IsSqliteDriver() ? idColumn : idColumn + QStringLiteral("::text");
+
+	filterQuery = CreateComplexFilterQuery(collectionFilter, entityIdExpression);
 
 	return true;
 }
@@ -715,6 +717,12 @@ void CSqlDatabaseObjectDelegateCompBase::OnComponentCreated()
 	if (!CreateTableIfNeeded()){
 		SendWarningMessage(0, QT_TR_NOOP("Collection table auto-creation failed; see previous errors. Component initialization was stopped"));
 	}
+
+	// The tag filter joins both tables, which may not have been touched by the tag collections yet.
+	if (IsTaggable() && m_databaseEngineCompPtr.IsValid()){
+		ExecuteTableScript(QByteArrayLiteral("CreateTagAssignmentsTable.sql"), QString::fromUtf8(GetTagAssignmentsTableName()));
+		ExecuteTableScript(QByteArrayLiteral("CreateCollectionTable.sql"), QString::fromUtf8(GetTagsTableName()));
+	}
 }
 
 
@@ -817,6 +825,101 @@ bool CSqlDatabaseObjectDelegateCompBase::ExecuteTableScript(const QByteArray& sc
 	}
 
 	return true;
+}
+
+
+bool CSqlDatabaseObjectDelegateCompBase::IsTaggable() const
+{
+	return m_taggableEntityTypeAttrPtr.IsValid() && !(*m_taggableEntityTypeAttrPtr).isEmpty();
+}
+
+
+QString CSqlDatabaseObjectDelegateCompBase::CreateTagsColumnQuery(const QString& entityIdExpression) const
+{
+	if (!IsTaggable()){
+		return QString();
+	}
+
+	const QString assignmentsTable = CreateTagTableReference(GetTagAssignmentsTableName());
+	const QString tagsTable = CreateTagTableReference(GetTagsTableName());
+	const QString entityType = SqlEncode(QString::fromUtf8(*m_taggableEntityTypeAttrPtr));
+
+	if (IsSqliteDriver()){
+		return QStringLiteral(R"sql(
+				(SELECT json_group_array(json_object(
+							'id', tag."DocumentId",
+							'name', json_extract(tag."Document", '$.Name'),
+							'color', json_extract(tag."Document", '$.Color'),
+							'isSystem', json_extract(tag."Document", '$.IsSystem') IN (1, 'true')))
+					FROM %1 AS assignment
+					JOIN %2 AS tag ON tag."DocumentId" = assignment."TagId" AND tag."State" = 'Active'
+					WHERE assignment."EntityType" = '%3' AND assignment."EntityId" = %4) AS "Tags")sql")
+					.arg(assignmentsTable, tagsTable, entityType, entityIdExpression);
+	}
+
+	return QStringLiteral(R"sql(
+			(SELECT json_agg(json_build_object(
+						'id', tag."DocumentId",
+						'name', tag."Document"->>'Name',
+						'color', tag."Document"->>'Color',
+						'isSystem', COALESCE(tag."Document"->>'IsSystem', 'false') = 'true')
+						ORDER BY tag."Document"->>'Name')
+				FROM %1 AS assignment
+				JOIN %2 AS tag ON tag."DocumentId"::text = assignment."TagId" AND tag."State" = 'Active'
+				WHERE assignment."EntityType" = '%3' AND assignment."EntityId" = %4) AS "Tags")sql")
+				.arg(assignmentsTable, tagsTable, entityType, entityIdExpression);
+}
+
+
+QString CSqlDatabaseObjectDelegateCompBase::CreateComplexFilterQuery(
+			const imtbase::IComplexCollectionFilter& collectionFilter,
+			const QString& entityIdExpression,
+			const std::function<void(QString&)>& postProcessor) const
+{
+	if (!IsTaggable()){
+		QString filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(
+					collectionFilter,
+					IsSqliteDriver() ? CComplexCollectionFilterConverter::SC_GENERAL : CComplexCollectionFilterConverter::SC_POSTGRES);
+		if (!filterQuery.isEmpty() && postProcessor){
+			postProcessor(filterQuery);
+		}
+
+		return filterQuery;
+	}
+
+	CTagFilterSqlBuilder::Config config;
+	config.assignmentsTable = CreateTagTableReference(GetTagAssignmentsTableName());
+	config.tagsTable = CreateTagTableReference(GetTagsTableName());
+	config.entityType = QString::fromUtf8(*m_taggableEntityTypeAttrPtr);
+	config.entityIdExpression = entityIdExpression;
+	config.isSqlite = IsSqliteDriver();
+
+	return CTagFilterSqlBuilder::CreateFilterQuery(collectionFilter, config, postProcessor);
+}
+
+
+// private methods
+
+QByteArray CSqlDatabaseObjectDelegateCompBase::GetTagAssignmentsTableName() const
+{
+	// An optional attribute left out of the registry is invalid; its default is not applied.
+	return m_tagAssignmentsTableNameAttrPtr.IsValid() ? *m_tagAssignmentsTableNameAttrPtr : QByteArrayLiteral("TagAssignments");
+}
+
+
+QByteArray CSqlDatabaseObjectDelegateCompBase::GetTagsTableName() const
+{
+	return m_tagsTableNameAttrPtr.IsValid() ? *m_tagsTableNameAttrPtr : QByteArrayLiteral("Tags");
+}
+
+
+QString CSqlDatabaseObjectDelegateCompBase::CreateTagTableReference(const QByteArray& tableName) const
+{
+	if (m_tableSchemaAttrPtr.IsValid() && !(*m_tableSchemaAttrPtr).isEmpty()){
+		return QStringLiteral(R"(%1."%2")").arg(QString::fromUtf8(*m_tableSchemaAttrPtr), QString::fromUtf8(tableName));
+	}
+
+	return QStringLiteral(R"("%1")").arg(QString::fromUtf8(tableName));
 }
 
 

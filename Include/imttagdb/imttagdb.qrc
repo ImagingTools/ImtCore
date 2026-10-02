@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/SQL/Postgres">
+        <file alias="CreateTagAssignmentsTable.sql">Resources/SQL/Postgres/CreateTagAssignmentsTable.sql</file>
+    </qresource>
+    <qresource prefix="/SQL/SQLite">
+        <file alias="CreateTagAssignmentsTable.sql">Resources/SQL/SQLite/CreateTagAssignmentsTable.sql</file>
+    </qresource>
+</RCC>
