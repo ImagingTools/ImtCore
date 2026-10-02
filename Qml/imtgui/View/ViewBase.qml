@@ -163,6 +163,7 @@ onCommandsModelChanged: {
 		anchors.top: separator.bottom
 		anchors.bottom: parent.bottom
 		width: viewBase.hasButtonPanel ? 0.5 * Style.sizeHintBXS : 0
+		color: viewBase.contentColor
 		clip: true
 
 		objectName: "ViewBase";

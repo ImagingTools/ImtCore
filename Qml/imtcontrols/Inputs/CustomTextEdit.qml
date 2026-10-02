@@ -21,7 +21,7 @@ FocusScope {
     //    property alias maximumLength: textEdit.maximumLength;
 
     property string placeHolderText;
-    property string focusColor: Style.textSelected;
+    property string focusColor: Style.textSelectedColor;
 
     property string fontColor: Style.textColor;
     property string placeHolderFontColor: Style.placeHolderTextColor;
@@ -170,7 +170,7 @@ FocusScope {
 
 
             verticalAlignment: TextInput.AlignVCenter;
-            selectionColor: Style.textSelected;
+            selectionColor: Style.textSelectedColor;
             selectByMouse: true;
             wrapMode: TextEdit.WordWrap;
             clip: true;

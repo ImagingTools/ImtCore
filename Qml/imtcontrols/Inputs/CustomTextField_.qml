@@ -20,7 +20,7 @@ FocusScope {
     property alias maximumLength: textField.maximumLength;
 
     property string placeHolderText;
-    property string focusColor: Style.textSelected;
+    property string focusColor: Style.textSelectedColor;
 
     property string fontColor: Style.textColor;
     property string placeHolderFontColor: Style.placeHolderTextColor;
@@ -156,7 +156,7 @@ FocusScope {
         echoMode: containerTextField.echoMode;
 
         verticalAlignment: TextInput.AlignVCenter;
-        selectionColor: Style.textSelected;
+        selectionColor: Style.textSelectedColor;
         selectByMouse: true;
         clip: true;
 
