@@ -176,19 +176,39 @@ code across tenants), `Revisions`.
 Before enabling a table, verify that all code paths accessing it run inside a tenant or
 system context (see section 6).
 
-## 5. Database role requirements
+## 5. Database role and automatic preparation
 
 PostgreSQL never applies RLS to superusers and to roles with `BYPASSRLS`. The application
-must therefore connect with a dedicated role:
+must therefore connect with a restricted role. Such a role cannot prepare its own database
+(create itself, create the database, install extensions, take over objects of other roles),
+so the database engine gets a second, optional login for that:
 
-```sql
-CREATE ROLE imt_app LOGIN NOSUPERUSER NOBYPASSRLS PASSWORD '...';
-```
+| Setting of `SqlDatabaseEngine` | Purpose |
+|---|---|
+| `DatabaseAccessSettings` | Application login used for all queries. With RLS: a role without `SUPERUSER`/`BYPASSRLS` |
+| `AdminDatabaseAccessSettings` | Administrative login (superuser or a role with `CREATEROLE`/`CREATEDB`), used only to prepare the database on start |
+| `RequiredExtensions` | Extensions installed by the administrative login (ProLife: `postgres_fdw`) |
 
-The default user name of `SqlDatabaseEngine` is `postgres` (superuser) — with this account
-the policies are installed but **not enforced**. The installing role has to own the
-protected tables (required by `ALTER TABLE` / `CREATE POLICY`); thanks to
-`FORCE ROW LEVEL SECURITY` the owner is restricted as well.
+If the administrative user is set and differs from the application user, the engine prepares
+the database on every start (idempotent) before it connects:
+
+1. creates the application role (`LOGIN NOSUPERUSER NOBYPASSRLS`) if it does not exist, otherwise
+   sets its password to the configured one;
+2. creates the database with the application role as owner, or passes an existing database to it;
+3. installs the required extensions;
+4. passes the existing objects to the application role (`AdoptDatabaseObjects.sql`: schemas,
+   tables, views, sequences, functions, foreign servers; `USAGE` on foreign data wrappers).
+   This covers restored backups and upgraded installations.
+
+The application role then creates the tables itself and owns them; `FORCE ROW LEVEL SECURITY`
+restricts the owner as well. Without the administrative login nothing changes: the
+application login is used as before (`CreateDatabase.sql` creates the database owned by the
+connecting role).
+
+`TenantRowLevelSecurityController` installs the policies when the start is complete (after the
+migrations, which may recreate tables) and then checks that they are enforced: if the
+application role has `SUPERUSER` or `BYPASSRLS`, a warning "policies are installed but NOT
+enforced" is logged; otherwise "policies are enforced for the database role ...".
 
 ## 6. Administrative and system operations
 
@@ -213,18 +233,18 @@ protected tables (required by `ALTER TABLE` / `CREATE POLICY`); thanks to
 
 ## 7. Enabling RLS (checklist)
 
-1. Create the application role without `SUPERUSER`/`BYPASSRLS` and configure it in the
-   database access settings.
+1. Set the application login (`DatabaseAccessSettings`) to a dedicated role name and
+   password, and the administrative login (`AdminDatabaseAccessSettings`) to a superuser.
+   The server creates the role and prepares the database itself (section 5).
 2. Add `AccessContext` and reference it as `AccessContext` of `SqlDatabaseEngine` and of
    every cache in front of a protected collection, and as `AccessContextController` of every
    `HttpGraphQLServlet` and of the document services of protected collections.
 3. Add a second `SqlDatabaseEngine` with `AccessContext` = `SystemAccessContext`
    for the migration controller and the maintenance components that need all rows.
-   Create the database in advance with the application role as owner: the engine's
-   `CreateDatabase.sql` uses `OWNER = postgres`, which a non-superuser role cannot do.
 4. Add `TenantRowLevelSecurityController` with `Flags="1"`, reference the table delegates
    and configure `TenantOwnedTables` / `BindingScopedCollections`.
-5. Check the log for critical messages of the controller on start.
+5. Check the log on start: "Tenant RLS policies are enforced for the database role ..."
+   and no critical messages of the controller.
 6. Verify that background jobs touching protected tables use the system engine.
 
 ## 8. Performance notes
@@ -236,6 +256,11 @@ protected tables (required by `ALTER TABLE` / `CREATE POLICY`); thanks to
   are used.
 
 ## 9. Tests
+
+The API suites of Puma and ProLife have an RLS mode (`Run-CiTests.ps1 -Rls`): the servers get a
+restricted application role and the administrative login, prepare the databases themselves, the
+suites run, and an isolation check is executed in the database as the application role
+(JUnit report `junit-report-rls.xml`).
 
 * `Include/imtbase/Test/CAccessContextTest` — access modes, reset, per-thread isolation.
 * `Include/imtdb/Test/CTenantRlsPolicyBuilderTest` — specification parsing, identifier

@@ -43,6 +43,9 @@
                     <AttributeInfo Id="AccessContext" Type="Reference" ExportId="AccessContext">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="AdminDatabaseAccessSettings" Type="Reference" ExportId="AdminDatabaseAccessSettings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="AutoCreateDatabase" Type="Integer" ExportId="AutoCreateDatabase">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -78,6 +81,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="Port" Type="Integer" ExportId="PgPort">
                         <Data IsEnabled="true" Value="5432"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequiredExtensions" Type="Id[]" ExportId="RequiredExtensions">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>

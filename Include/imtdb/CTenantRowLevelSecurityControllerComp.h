@@ -2,6 +2,9 @@
 #pragma once
 
 
+// std includes
+#include <memory>
+
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 
@@ -49,10 +52,18 @@ protected:
 	*/
 	virtual bool InstallPolicies() const;
 
+	/**
+		Check that the installed policies are enforced: PostgreSQL does not apply RLS to roles with SUPERUSER or BYPASSRLS.
+		\return \c true if the role of the database connection is restricted by the policies.
+	*/
+	virtual bool CheckEnforcement() const;
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 private:
+	void InstallAndCheckPolicies() const;
 	bool ExecutePolicyQuery(const QByteArray& tableName, const QByteArray& query) const;
 
 private:
@@ -61,6 +72,8 @@ private:
 	I_MULTIATTR(QByteArray, m_tenantOwnedTablesAttrPtr);
 	I_MULTIREF(imtdb::ISqlDatabaseObjectDelegate, m_bindingScopedCollectionsCompPtr);
 	I_ATTR(bool, m_allowSystemContextAttrPtr);
+
+	std::shared_ptr<bool> m_aliveGuardPtr;
 };
 
 

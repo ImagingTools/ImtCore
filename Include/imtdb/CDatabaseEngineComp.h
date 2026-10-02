@@ -33,10 +33,14 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 	I_BEGIN_COMPONENT(CDatabaseEngineAttr);
 		I_ASSIGN(m_accessContextCompPtr, "AccessContext", "Access context passed to the PostgreSQL session before each query. Required for the tenant Row Level Security policies (see imtdb::CTenantRowLevelSecurityControllerComp)", false, "AccessContext");
+		I_ASSIGN(m_adminLoginSettingsCompPtr, "AdminDatabaseAccessSettings", "Optional administrative login (PostgreSQL). If its user is set and differs from the application user, the database is prepared on start for the application role: the role and the database are created, the required extensions are installed and the existing objects are passed to the role", false, "AdminDatabaseAccessSettings");
+		I_ASSIGN_MULTI_0(m_requiredExtensionsAttrPtr, "RequiredExtensions", "PostgreSQL extensions installed by the administrative login (e.g. postgres_fdw)", false);
 	I_END_COMPONENT;
 
 protected:
 	I_REF(imtbase::IAccessContext, m_accessContextCompPtr);
+	I_REF(imtdb::IDatabaseLoginSettings, m_adminLoginSettingsCompPtr);
+	I_MULTIATTR(QByteArray, m_requiredExtensionsAttrPtr);
 };
 
 
@@ -134,6 +138,24 @@ private:
 		Create the database instance (an empty database)
 	*/
 	bool CreateDatabaseInstance() const;
+
+	/**
+		Check if the database has to be prepared for the application role by the administrative login.
+	*/
+	bool IsDatabaseProvisioningEnabled() const;
+
+	/**
+		Prepare the database for the application role with the administrative login (idempotent):
+		create the role and the database, install the required extensions, pass the existing objects to the role.
+		The application role is created without SUPERUSER and BYPASSRLS, so the tenant Row Level Security applies to it.
+	*/
+	bool ProvisionDatabase() const;
+	bool ExecuteAdminQuery(
+				QSqlDatabase& databaseConnection,
+				const QString& description,
+				const QString& query,
+				const QVariantMap& bindValues = QVariantMap(),
+				QSqlQuery* resultPtr = nullptr) const;
 
 	/**
 		Create special meta-info tables for the database (Revision etc.)

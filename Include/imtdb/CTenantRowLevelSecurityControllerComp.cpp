@@ -3,7 +3,9 @@
 
 
 // Qt includes
+#include <QtCore/QCoreApplication>
 #include <QtCore/QSet>
+#include <QtCore/QTimer>
 
 // ImtCore includes
 #include <imtdb/CTenantRlsPolicyBuilder.h>
@@ -94,13 +96,76 @@ void CTenantRowLevelSecurityControllerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (!InstallPolicies()){
-		SendCriticalMessage(0, QStringLiteral("Tenant RLS policies were not installed completely. Tenant isolation on the database level is incomplete"));
+	// The component can be created while the database migrations are running, and a migration may recreate the protected
+	// tables (dropping their policies). The policies are installed when the start is complete.
+	QCoreApplication* applicationPtr = QCoreApplication::instance();
+	if (applicationPtr == nullptr){
+		InstallAndCheckPolicies();
+
+		return;
 	}
+
+	m_aliveGuardPtr = std::make_shared<bool>(true);
+	std::weak_ptr<bool> aliveGuard(m_aliveGuardPtr);
+	QTimer::singleShot(0, applicationPtr, [this, aliveGuard](){
+		if (!aliveGuard.expired()){
+			InstallAndCheckPolicies();
+		}
+	});
+}
+
+
+void CTenantRowLevelSecurityControllerComp::OnComponentDestroyed()
+{
+	m_aliveGuardPtr.reset();
+
+	BaseClass::OnComponentDestroyed();
+}
+
+
+bool CTenantRowLevelSecurityControllerComp::CheckEnforcement() const
+{
+	if (!m_databaseEngineCompPtr.IsValid() || m_databaseEngineCompPtr->GetDatabaseDriverId().compare(QByteArrayLiteral("QPSQL"), Qt::CaseInsensitive) != 0){
+		return false;
+	}
+
+	QSqlError sqlError;
+	QSqlQuery roleQuery = m_databaseEngineCompPtr->ExecSqlQuery(
+				QByteArrayLiteral("SELECT current_user, rolsuper OR rolbypassrls FROM pg_roles WHERE rolname = current_user"),
+				&sqlError);
+	if (sqlError.type() != QSqlError::NoError || !roleQuery.next()){
+		SendWarningMessage(0, QStringLiteral("Enforcement of the tenant RLS policies could not be checked: %1").arg(sqlError.text()));
+
+		return false;
+	}
+
+	const QString roleName = roleQuery.value(0).toString();
+	if (roleQuery.value(1).toBool()){
+		SendWarningMessage(
+					0,
+					QStringLiteral("Tenant RLS policies are installed but NOT enforced: the database role '%1' has SUPERUSER or BYPASSRLS. "
+								"Connect with a restricted role, e.g. by setting the administrative login of the database engine (AdminDatabaseAccessSettings)").arg(roleName));
+
+		return false;
+	}
+
+	SendInfoMessage(0, QStringLiteral("Tenant RLS policies are enforced for the database role '%1'").arg(roleName));
+
+	return true;
 }
 
 
 // private methods
+
+void CTenantRowLevelSecurityControllerComp::InstallAndCheckPolicies() const
+{
+	if (!InstallPolicies()){
+		SendCriticalMessage(0, QStringLiteral("Tenant RLS policies were not installed completely. Tenant isolation on the database level is incomplete"));
+	}
+
+	CheckEnforcement();
+}
+
 
 bool CTenantRowLevelSecurityControllerComp::ExecutePolicyQuery(const QByteArray& tableName, const QByteArray& query) const
 {
