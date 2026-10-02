@@ -1,81 +1,75 @@
-# Tenant Isolation with PostgreSQL Row Level Security (RLS)
+# Изоляция тенантов на уровне PostgreSQL (Row Level Security)
 
-This document describes the tenant security model of ImtCore and the additional
-database-level protection based on PostgreSQL Row Level Security (RLS).
+Документ описывает второй, базоданный уровень изоляции тенантов в ImtCore: как он устроен,
+как его включить, что происходит с существующими данными и установками, почему выбраны именно
+такие решения и какие ограничения остаются.
 
-## 1. Security model
+## 1. Зачем это нужно
 
-Tenant isolation is enforced on two independent levels:
+Изоляция тенантов в ImtCore исторически обеспечивается только приложением:
 
-| Level | Mechanism | Scope |
-|-------|-----------|-------|
-| Application | `TenantFilter` parameter (`imtauth::CTenantFilterParam`) and `TenantEntityBindings` lookups in `imtdb::CSqlDatabaseDocumentDelegateCompBase` | All database drivers (PostgreSQL, SQLite) |
-| Database (new) | PostgreSQL RLS policies installed by `imtdb::CTenantRowLevelSecurityControllerComp` | PostgreSQL only, opt-in |
+* параметр `TenantFilter` (`imtauth::CTenantFilterParam`) в запросах списков;
+* таблица привязок `TenantEntityBindings`, по которой делегат
+  `imtdb::CSqlDatabaseDocumentDelegateCompBase` строит фильтр «документы этого тенанта».
 
-The application-level filters are **kept unchanged**. They are still required for SQLite
-and for deployments without RLS, and they implement the finer-grained UI semantics
-(e.g. the "No organization" view). RLS acts as an upper bound: even if a query is built
-without a tenant filter by mistake, PostgreSQL never returns or changes rows of
-another tenant.
+Если код забыл передать фильтр, ничто не мешает вернуть чужие данные. Реальный пример,
+найденный при интеграции: `AccountItem(id)` в ProLife возвращает документ другого тенанта,
+потому что `TenantFilter` применяется только к спискам, а не к чтению по Id.
 
-### How the current tenant is determined
+PostgreSQL Row Level Security (RLS) добавляет второй уровень: база сама отбрасывает строки
+чужого тенанта, независимо от того, какой SQL построило приложение.
 
-1. `imtservergql::CAuthenticationManagerComp` resolves the access token (JWT or PAT) and
-   stores the user ID and tenant ID in the request context (`imtgql::IGqlContext`).
-2. `imtservergql::CHttpGraphQLServletComp::OnPost` sets the tenant and user of the request
-   through its reference `AccessContextController`
-   (`imtbase::IAccessContextController`) and resets it when the request is finished.
-   GraphQL requests received over WebSocket are processed by the same servlet in the worker
-   threads, so they are covered as well. Nested requests executed by the request handlers
-   in the same thread use the context of the request.
-3. `imtdb::CDatabaseEngineComp` reads the context through its reference `AccessContext`
-   (`imtbase::IAccessContext`) and passes it to PostgreSQL before every query.
+| Уровень | Механизм | Где работает |
+|---|---|---|
+| Приложение | `TenantFilter`, поиск в `TenantEntityBindings` | PostgreSQL и SQLite, всегда |
+| База данных | политики RLS, установленные `imtdb::CTenantRowLevelSecurityControllerComp` | только PostgreSQL, включается настройкой |
 
-## 2. Access context
+Фильтры приложения **не изменены и не удалены**. Они по-прежнему нужны для SQLite, для установок
+без RLS и для точной семантики интерфейса (например, представление «Без организации»).
+RLS работает как верхняя граница: даже ошибочный запрос без фильтра не вернёт и не изменит
+строки чужого тенанта.
 
-`imtbase::IAccessContext` describes on whose behalf the data operations of the calling
-thread are executed:
+## 2. Как это работает
 
-| Access mode | Database access |
-|-------------|-----------------|
-| `AM_NONE` | Fail-closed: no tenant-owned rows are visible or writable |
-| `AM_TENANT` | Rows of the tenant (plus user-owned rows, if configured) |
-| `AM_SYSTEM` | All rows (if allowed by the policies) |
+### 2.1. Путь запроса
 
-Implementations (`ImtCorePck`):
+1. `imtservergql::CAuthenticationManagerComp` проверяет токен (JWT или PAT) и записывает
+   пользователя и тенанта в контекст GraphQL-запроса (`imtgql::IGqlContext`).
+2. `imtservergql::CHttpGraphQLServletComp::OnPost` через ссылку `AccessContextController`
+   (`imtbase::IAccessContextController`) выставляет тенанта и пользователя запроса для текущего
+   потока и сбрасывает их на любом выходе из обработки (`qScopeGuard`). GraphQL-запросы,
+   пришедшие по WebSocket, обрабатываются тем же сервлетом в рабочих потоках, поэтому
+   покрыты так же.
+3. `imtdb::CDatabaseEngineComp` перед **каждым** SQL-запросом читает контекст через ссылку
+   `AccessContext` (`imtbase::IAccessContext`) и передаёт его в сессию PostgreSQL.
+4. Политики RLS в PostgreSQL сравнивают строки таблицы с переданным тенантом.
 
-| Component | Description |
-|-----------|-------------|
-| `AccessContext` (`imtbase::CAccessContextComp`) | Context of the request processed by the calling thread. Implements `IAccessContextController`, which can set **only tenant contexts**. A thread without a request gets `AM_NONE` |
-| `SystemAccessContext` (`imtbase::CSystemAccessContextComp`) | Always `AM_SYSTEM` |
+### 2.2. Контекст доступа (`imtbase`)
 
-System access is therefore never switched on in code: it is a property of the database
-engine instance that references `SystemAccessContext`, visible in the component
-configuration.
+`imtbase::IAccessContext` описывает, от чьего имени выполняются операции с данными в текущем
+потоке:
 
-The request context is stored **per thread**: work dispatched to other threads does not
-inherit it and runs fail-closed. Components that continue a request in another thread pass
-the context explicitly through `IAccessContextController`:
+| Режим | Что видно в защищённых таблицах |
+|---|---|
+| `AM_NONE` | только глобальные строки (fail-closed: строк тенантов не видно, записать их нельзя) |
+| `AM_TENANT` | строки тенанта, глобальные строки и, если настроено, собственные строки пользователя |
+| `AM_SYSTEM` | все строки (если в политиках разрешён системный обход) |
 
-* `imtdoc::CDocumentServiceBase` (reference `AccessContextController` of the document
-  services) captures the context of the request and applies it to the threads that create
-  and load documents.
+Реализации (пакет `ImtCorePck`):
 
-Other threads (e.g. `QtConcurrent`, background jobs, timers) must use an engine instance with
-an explicit access context (see section 6).
+| Компонент | Описание |
+|---|---|
+| `AccessContext` (`imtbase::CAccessContextComp`) | Контекст запроса, который обрабатывает текущий поток. Реализует `IAccessContextController`, который умеет выставлять **только тенантный** контекст. Поток без запроса получает `AM_NONE` |
+| `SystemAccessContext` (`imtbase::CSystemAccessContextComp`) | Всегда `AM_SYSTEM` |
 
-### Caches
+Системный доступ нельзя включить из кода: это свойство отдельного экземпляра движка БД,
+у которого ссылка `AccessContext` указывает на `SystemAccessContext`. Кто имеет системный доступ,
+видно в конфигурации `.acc`.
 
-Data read under RLS depends on the context, so a cache must not return entries read for
-another tenant. `imtbase::CCachedObjectCollectionComp` keeps its entries per access context
-when its reference `AccessContext` is set. Every cache in front of a protected collection must
-be configured this way, otherwise reads by ID are answered from the cache and bypass RLS.
+### 2.3. Передача контекста в PostgreSQL
 
-## 3. Passing the context to PostgreSQL
-
-If the reference `AccessContext` of `imtdb::CDatabaseEngineComp` (`SqlDatabaseEngine`) is
-set and the driver is `QPSQL`, the engine executes the following statement on the
-connection of the current thread before **every** query:
+Если у `SqlDatabaseEngine` задана ссылка `AccessContext` и драйвер — `QPSQL`, движок перед
+каждым запросом выполняет на соединении текущего потока:
 
 ```sql
 SELECT set_config('imt.tenant_id', :TenantId, false),
@@ -83,193 +77,429 @@ SELECT set_config('imt.tenant_id', :TenantId, false),
        set_config('imt.rls_bypass', :SystemContext, false)
 ```
 
-* The values are passed as **bound parameters**, they are never concatenated into SQL.
-* The context is set before every query and not cached: PostgreSQL reverts session
-  settings changed inside a rolled back transaction, so caching could leave the context of
-  a previous request on a pooled per-thread connection.
-* If the context cannot be applied, the actual query is **not executed** and an error is
-  returned (fail-closed).
-* The reference is not set by default, so existing deployments are not affected.
+* Значения передаются **связанными параметрами** и никогда не подставляются в текст SQL.
+* Если контекст выставить не удалось, сам запрос **не выполняется** и возвращается ошибка.
+* Без ссылки `AccessContext` движок работает как раньше.
 
-Database migrations use the engine referenced by the migration controller. If they change
-rows of protected tables, that engine must use `SystemAccessContext` (see section 6);
-schema changes (DDL) are not restricted by RLS.
+### 2.4. Политики
 
-## 4. RLS policies
+Политики устанавливает `imtdb::CTenantRowLevelSecurityControllerComp`
+(`ImtDatabasePck/TenantRowLevelSecurityController`). SQL генерирует `imtdb::CTenantRlsPolicyBuilder`:
+все имена таблиц и колонок проверяются (`[A-Za-z_][A-Za-z0-9_]*`) и экранируются. На каждой
+защищённой таблице включаются `ENABLE ROW LEVEL SECURITY` и `FORCE ROW LEVEL SECURITY`, поэтому
+политики действуют и на владельца таблицы. Установка идемпотентна
+(`DROP POLICY IF EXISTS` + `CREATE POLICY`) и повторяется при каждом старте.
 
-`imtdb::CTenantRowLevelSecurityControllerComp` (`ImtDatabasePck/TenantRowLevelSecurityController`)
-installs the policies when it is created. The installation is idempotent
-(`DROP POLICY IF EXISTS` + `CREATE POLICY`) and is executed on every start. The SQL is
-generated by `imtdb::CTenantRlsPolicyBuilder`; all table and column names are validated
-(`[A-Za-z_][A-Za-z0-9_]*`) and quoted.
+| Атрибут / ссылка | Назначение |
+|---|---|
+| `DatabaseEngine` | Движок БД. Установка политик — это DDL, системный контекст для неё не нужен |
+| `TableDelegates` | Делегаты, создающие защищённые таблицы. Создаются заранее, чтобы таблицы существовали |
+| `TenantOwnedTables` | Таблицы с колонками тенанта: `[Schema.]Table:TenantColumn[,TenantColumn...][:UserColumn]` |
+| `BindingScopedCollections` | Делегаты коллекций документов, чья принадлежность хранится в `TenantEntityBindings` |
+| `AllowSystemContext` | `true` (по умолчанию): системный контекст обходит политики |
 
-For every protected table both `ENABLE ROW LEVEL SECURITY` and `FORCE ROW LEVEL SECURITY`
-are set, so the policies also apply to the table owner.
+Типы политик:
 
-### Component configuration
-
-| Attribute / reference | Description |
-|-----------------------|-------------|
-| `DatabaseEngine` | Database engine. Installing the policies is DDL, so no system access context is required |
-| `TableDelegates` | Delegates that create the protected tables. They are instantiated before the policies are installed, so the tables exist |
-| `TenantOwnedTables` | Tables with tenant-owned rows: `[Schema.]Table:TenantColumn[,TenantColumn...][:UserColumn]` |
-| `BindingScopedCollections` | Document collection delegates whose ownership is stored in `TenantEntityBindings` |
-| `AllowSystemContext` | If `true` (default), the system context bypasses the policies |
-
-The component has no interface, so it has to be configured for automatic instantiation
-(`Flags="1"` in the Partitura element) after the table delegates.
-
-If a policy cannot be installed (e.g. the table does not exist), a critical message is
-logged. Policies for other tables are still installed.
-
-### Policy types
-
-**Tenant-owned tables** (`TenantOwnedTables`), policy `ImtTenantIsolation` (all commands):
+**Таблицы с колонками тенанта** (`TenantOwnedTables`), политика `ImtTenantIsolation`:
 
 ```
-imt.rls_bypass = 'on'                                   -- only if AllowSystemContext
+imt.rls_bypass = 'on'                                   -- только при AllowSystemContext
 OR (imt.tenant_id <> '' AND <TenantColumn>::text = imt.tenant_id [OR ...])
 ```
 
-The same condition is used as `WITH CHECK`, so rows cannot be inserted for or moved to
-another tenant. With several tenant columns (e.g. `SourceTenantId,TargetTenantId`) a row is
-accessible for each of the involved tenants.
+То же условие используется в `WITH CHECK`, поэтому строку нельзя создать за другого тенанта
+или «переместить» к нему. Если колонок тенанта несколько (`SourceTenantId,TargetTenantId`),
+строка доступна каждому участнику. Колонка пользователя добавляет политику только для чтения
+`ImtTenantUserAccess`: пользователь видит свои строки независимо от выбранного тенанта
+(например, свои членства и приглашения до выбора организации).
 
-If a user column is configured, the additional read-only policy `ImtTenantUserAccess`
-allows the user to read own rows independently of the current tenant (needed e.g. to list
-own memberships or invitations before a tenant is selected).
+**Коллекции документов с привязками** (`BindingScopedCollections`), политика `ImtTenantIsolation`.
+Строка документа доступна, если:
 
-**Binding-scoped document collections** (`BindingScopedCollections`), policy
-`ImtTenantIsolation` (all commands). A document row is accessible if
+* документ (`DocumentId`) привязан к текущему тенанту в `TenantEntityBindings`, или
+* документ не привязан ни к одному тенанту (глобальный документ — та же семантика, что у
+  фильтра «Без организации» в приложении).
 
-* the document (`DocumentId`) is bound to the current tenant in `TenantEntityBindings`, or
-* the document is not bound to any tenant (global document, same semantics as the
-  "No organization" filter of the application layer).
+**`TenantEntityBindings`** (ставится автоматически для каждой схемы таких коллекций):
 
-**`TenantEntityBindings`** (installed automatically for every schema of a binding-scoped
-collection):
+* `SELECT` разрешён всем — подзапросам видимости документов нужны все привязки. В привязках
+  только идентификаторы, данных документов там нет.
+* `INSERT`, `UPDATE`, `DELETE` разрешены только для привязок текущего тенанта. Тенант не может
+  привязать документ к другому тенанту и не может удалить чужую привязку (иначе чужой документ
+  стал бы глобальным).
 
-* `SELECT` is allowed for everybody, because the visibility checks of the document tables
-  need all bindings. Bindings contain IDs only, no document data.
-* `INSERT`, `UPDATE`, `DELETE` are allowed only for bindings of the current tenant. A
-  tenant can neither bind documents to another tenant nor remove bindings of another
-  tenant (which would turn a foreign document into a global one).
+### 2.5. Кэши
 
-### Recommended tables
+Под RLS разные тенанты видят разные данные, поэтому кэш не должен отдавать запись, прочитанную
+для другого тенанта. `imtbase::CCachedObjectCollectionComp` с заданной ссылкой `AccessContext`
+хранит объекты и отфильтрованные выборки отдельно для каждого контекста (тенант + пользователь).
+Каждый кэш перед защищённой коллекцией обязан быть так настроен: иначе чтение по Id
+обслуживается из кэша, наполненного другим тенантом, и RLS обходится.
 
-| Table | Specification | Notes |
-|-------|---------------|-------|
-| `TenantPermissions` | `TenantPermissions:TenantId` | |
-| `TenantMemberships` | `TenantMemberships:TenantId:UserId` | user reads own memberships for tenant selection |
-| `TenantInvitations` | `TenantInvitations:TenantId:UserId` | invitee reads own invitations |
-| `OrderRequests`, `CrossTenantMessages`, `Contracts`, `CrossOrgGrants`, `TenantConnectionRequests` | `<Table>:SourceTenantId,TargetTenantId` | both parties have access |
-| `TenantConnections` | `TenantConnections:TenantAId,TenantBId` | |
-| `TenantRelationships` | `TenantRelationships:SourceTenantId,TargetTenantId` | |
-| `TenantRelationshipProposals` | `TenantRelationshipProposals:InitiatorTenantId,CounterpartyTenantId` | |
-| Document collections (users' business data) | `BindingScopedCollections` | via `TenantEntityBindings` |
+### 2.6. Работа в других потоках
 
-Tables that are intentionally **not protected** because they are needed before a tenant
-is known or are global by design: `Tenants`, `Users`, `UserSessions`,
-`PersonalAccessTokens`, `UserSettings`, `TenantConnectionCodes` (lookup by connection
-code across tenants), `Revisions`.
+Контекст привязан к потоку запроса. Работа, продолжающаяся в другом потоке, получает `AM_NONE`
+и видит только глобальные строки (fail-closed). Компоненты, которые продолжают запрос в другом
+потоке, передают контекст явно через `IAccessContextController`:
 
-Before enabling a table, verify that all code paths accessing it run inside a tenant or
-system context (see section 6).
+* `imtdoc::CDocumentServiceBase` (ссылка `AccessContextController` у документных сервисов)
+  запоминает контекст запроса и применяет его в потоках создания и загрузки документов.
+  Без этого документ, открытый под RLS, никогда не загружался.
 
-## 5. Database role and automatic preparation
+Фоновые задачи, `QtConcurrent`, таймеры должны использовать системный движок (раздел 2.7)
+или передавать контекст так же явно.
 
-PostgreSQL never applies RLS to superusers and to roles with `BYPASSRLS`. The application
-must therefore connect with a restricted role. Such a role cannot prepare its own database
-(create itself, create the database, install extensions, take over objects of other roles),
-so the database engine gets a second, optional login for that:
+### 2.7. Системный доступ и миграции
 
-| Setting of `SqlDatabaseEngine` | Purpose |
+Доверенные операции, которым нужны все строки (миграции данных, обслуживание), получают
+отдельный экземпляр `SqlDatabaseEngine` с `AccessContext` = `SystemAccessContext`. Миграционный
+контроллер ссылается на этот движок. Экземпляры движка одной базы используют одно соединение
+потока, но контекст выставляется перед каждым запросом, поэтому каждый экземпляр сохраняет свой
+режим. Обработчики запросов системный движок использовать не должны.
+
+## 3. Подготовка базы и роль приложения
+
+### 3.1. Проблема
+
+PostgreSQL **никогда** не применяет RLS к суперпользователю и к ролям с `BYPASSRLS`. По умолчанию
+продукты подключаются как `postgres` — с таким логином политики стоят, но не действуют.
+Приложение должно работать под ограниченной ролью. Но ограниченная роль не может сама:
+
+* создать себя;
+* создать базу (старый `CreateDatabase.sql` требовал `OWNER = postgres`);
+* поставить расширения вроде `postgres_fdw`;
+* забрать владение таблицами, созданными другой ролью (а политики может ставить только владелец).
+
+### 3.2. Решение: два логина
+
+| Настройка `SqlDatabaseEngine` | Назначение |
 |---|---|
-| `DatabaseAccessSettings` | Application login used for all queries. With RLS: a role without `SUPERUSER`/`BYPASSRLS` |
-| `AdminDatabaseAccessSettings` | Administrative login (superuser or a role with `CREATEROLE`/`CREATEDB`), used only to prepare the database on start |
-| `RequiredExtensions` | Extensions installed by the administrative login (ProLife: `postgres_fdw`) |
+| `DatabaseAccessSettings` | Рабочий логин для всех запросов. При RLS — роль без `SUPERUSER`/`BYPASSRLS` |
+| `AdminDatabaseAccessSettings` | Административный логин, используется **только** при старте для подготовки базы |
+| `RequiredExtensions` | Расширения, которые ставит административный логин (ProLife: `postgres_fdw`) |
 
-If the administrative user is set and differs from the application user, the engine prepares
-the database on every start (idempotent) before it connects:
+Если пользователь административного логина задан и отличается от рабочего, движок при каждом
+старте, до подключения, выполняет идемпотентную подготовку:
 
-1. creates the application role (`LOGIN NOSUPERUSER NOBYPASSRLS`) if it does not exist, otherwise
-   sets its password to the configured one;
-2. creates the database with the application role as owner, or passes an existing database to it;
-3. installs the required extensions;
-4. passes the existing objects to the application role (`AdoptDatabaseObjects.sql`: schemas,
-   tables, views, sequences, functions, foreign servers; `USAGE` on foreign data wrappers).
-   This covers restored backups and upgraded installations.
+1. **Роль.** Если рабочей роли нет — создаёт её: `LOGIN NOSUPERUSER NOBYPASSRLS` с паролем из
+   настроек. Если роль есть — синхронизирует пароль с настройками. Если у существующей роли есть
+   `SUPERUSER`/`BYPASSRLS`, она не меняется, а в лог пишется предупреждение.
+2. **База.** Если базы нет — создаёт её с рабочей ролью в качестве владельца. Если база есть, но
+   принадлежит другой роли — передаёт её рабочей роли.
+3. **Расширения** из `RequiredExtensions` (`CREATE EXTENSION IF NOT EXISTS`).
+4. **Владение объектами** (`Include/imtdb/Resources/SQL/Postgres/AdoptDatabaseObjects.sql`):
+   * схемы, таблицы, представления, последовательности, функции и сторонние серверы, у которых
+     другой владелец, передаются рабочей роли;
+   * объекты расширений не трогаются;
+   * на обёртки сторонних данных выдаётся `USAGE`.
 
-The application role then creates the tables itself and owns them; `FORCE ROW LEVEL SECURITY`
-restricts the owner as well. Without the administrative login nothing changes: the
-application login is used as before (`CreateDatabase.sql` creates the database owned by the
-connecting role).
+Запросы подготовки, содержащие пароль, в лог не пишутся.
 
-`TenantRowLevelSecurityController` installs the policies when the start is complete (after the
-migrations, which may recreate tables) and then checks that they are enforced: if the
-application role has `SUPERUSER` or `BYPASSRLS`, a warning "policies are installed but NOT
-enforced" is logged; otherwise "policies are enforced for the database role ...".
+После этого рабочая роль сама создаёт таблицы (делегаты, миграции) и становится их владельцем.
+`FORCE ROW LEVEL SECURITY` ограничивает и владельца.
 
-## 6. Administrative and system operations
+Требования к административному логину: проще всего суперпользователь. Роли с
+`CREATEROLE`/`CREATEDB` достаточно только для новой пустой установки. Чтобы забрать объекты
+у `postgres` (существующие установки, бэкапы), нужен суперпользователь.
 
-* Trusted internal operations (maintenance jobs, data migrations, cross-tenant
-  background processing) get a separate `SqlDatabaseEngine` instance whose `AccessContext`
-  references `SystemAccessContext`. Wire only these components to it, e.g. the
-  `DatabaseEngine` reference of the migration controller. Engine instances of the same
-  database share the per-thread connection; the access context is applied per query, so
-  each instance keeps its own access mode.
-* Request handlers must never use the system engine. They work in the tenant context of
-  the request; cross-tenant access in requests must be implemented with the existing
-  explicit mechanisms (contracts, cross-org grants) on tables whose policies include both
-  tenants.
-* For maximum protection set `AllowSystemContext = false` and execute administrative
-  operations through a separate `SqlDatabaseEngine` instance connected with a role that
-  has `BYPASSRLS` (e.g. a dedicated administration tool or migration job). Note that
-  migrations of the main engine then cannot read or change rows of protected tables.
-* Session settings can be changed by any SQL executed on the application connection.
-  RLS protects against missing or wrong tenant filters in the application, but not
-  against SQL injection that sets `imt.tenant_id` / `imt.rls_bypass` itself. All queries
-  must keep using parameter binding or `SqlEncode`.
+### 3.3. Момент установки политик и самопроверка
 
-## 7. Enabling RLS (checklist)
+`TenantRowLevelSecurityController` создаётся автоматически (`Flags="1"`), но политики ставит
+**после завершения старта** — на первом проходе цикла событий главного потока. Причина: компонент
+может быть создан во время миграций, а миграция может пересоздать таблицы. Например, миграция 14
+ProLife пересоздаёт таблицы, и на новой базе политики пропадали; это нашла проверка изоляции.
 
-1. Set the application login (`DatabaseAccessSettings`) to a dedicated role name and
-   password, and the administrative login (`AdminDatabaseAccessSettings`) to a superuser.
-   The server creates the role and prepares the database itself (section 5).
-2. Add `AccessContext` and reference it as `AccessContext` of `SqlDatabaseEngine` and of
-   every cache in front of a protected collection, and as `AccessContextController` of every
-   `HttpGraphQLServlet` and of the document services of protected collections.
-3. Add a second `SqlDatabaseEngine` with `AccessContext` = `SystemAccessContext`
-   for the migration controller and the maintenance components that need all rows.
-4. Add `TenantRowLevelSecurityController` with `Flags="1"`, reference the table delegates
-   and configure `TenantOwnedTables` / `BindingScopedCollections`.
-5. Check the log on start: "Tenant RLS policies are enforced for the database role ..."
-   and no critical messages of the controller.
-6. Verify that background jobs touching protected tables use the system engine.
+После установки контроллер проверяет, действуют ли политики, и пишет в лог одно из двух:
 
-## 8. Performance notes
+* `Tenant RLS policies are enforced for the database role '<роль>'` — всё работает;
+* предупреждение `Tenant RLS policies are installed but NOT enforced: the database role '<роль>'
+  has SUPERUSER or BYPASSRLS` — изоляции на уровне БД нет.
 
-* One additional lightweight statement (`set_config`) is executed per query when
-  an access context is configured.
-* Policies on binding-scoped collections execute `EXISTS` sub-queries on
-  `TenantEntityBindings`; the existing indexes on `(EntityType, EntityId)` and `TenantId`
-  are used.
+Ошибка установки отдельной политики пишется как критическое сообщение; остальные политики
+всё равно ставятся.
 
-## 9. Tests
+## 4. Как включить
 
-The API suites of Puma and ProLife have an RLS mode (`Run-CiTests.ps1 -Rls`): the servers get a
-restricted application role and the administrative login, prepare the databases themselves, the
-suites run, and an isolation check is executed in the database as the application role
-(JUnit report `junit-report-rls.xml`).
+### 4.1. В Puma и ProLife
 
-* `Include/imtbase/Test/CAccessContextTest` — access modes, reset, per-thread isolation.
-* `Include/imtdb/Test/CTenantRlsPolicyBuilderTest` — specification parsing, identifier
-  validation, generated SQL.
-* `Include/imtdb/Test/CTenantRowLevelSecurityTest` — integration test on a real PostgreSQL
-  server: cross-tenant read/write denial, fail-closed behavior without context, user-owned
-  rows, cross-tenant tables, binding-scoped collections, system context (allowed and
-  disabled), malicious context values. The test is skipped unless
-  `IMT_TEST_POSTGRES_HOST` is set; further variables: `IMT_TEST_POSTGRES_PORT`,
-  `IMT_TEST_POSTGRES_USER`, `IMT_TEST_POSTGRES_PASSWORD` (administrative account able to
-  create roles and schemas), `IMT_TEST_POSTGRES_DATABASE`. It creates and removes a
-  temporary role and schema.
+Компоненты уже подключены в `.acc`. Включение — только настройками сервера. Административный
+логин пока не показан в окне настроек, его задают в XML-файле настроек сервера
+(`C:\Users\Public\ImagingTools\<Продукт>\<Продукт> Server\<...>Settings.xml`), в параметре
+`Database`:
+
+| Продукт | Рабочий логин | Административный логин |
+|---|---|---|
+| Puma | `<Parameter Id="DatabaseAccessSettings" .../>` | `<Parameter Id="AdminDatabaseAccessSettings" .../>` |
+| ProLife | `<Parameter Id="ProLifeDatabaseSettings" .../>` | `<Parameter Id="AdminDatabaseSettings" .../>` |
+
+Пример (Puma):
+
+```xml
+<Parameter Id="DatabaseAccessSettings" Host="localhost" Port="5432" DatabaseName="puma"
+           UserName="imt_app" Password="<пароль приложения>" DatabasePath="" DatabaseConnectionFlags="noSecurity"/>
+<Parameter Id="AdminDatabaseAccessSettings" Host="localhost" Port="5432" DatabaseName="postgres"
+           UserName="postgres" Password="<пароль администратора>" DatabasePath="" DatabaseConnectionFlags="noSecurity"/>
+```
+
+Пароль можно указать открытым текстом или в обфусцированном виде (`{enc}...`).
+
+После перезапуска сервер сам создаст роль, подготовит базу и поставит политики. Проверка —
+сообщение `Tenant RLS policies are enforced ...` в логе сервера.
+
+### 4.2. В другом продукте на ImtCore
+
+1. `AccessContext` (`ImtCorePck`) подключить:
+   * как `AccessContext` — к `SqlDatabaseEngine` и к каждому кэшу перед защищённой коллекцией;
+   * как `AccessContextController` — к каждому `HttpGraphQLServlet` (через экспорт
+     `StandardGraphQlHandlers`/`ApplicationHandlers`) и к документным сервисам защищённых коллекций.
+2. Второй `SqlDatabaseEngine` с `AccessContext` = `SystemAccessContext` (`AutoCreateDatabase` и
+   `AutoCreateTables` = 0) подключить к миграционному контроллеру.
+3. `TenantRowLevelSecurityController` с `Flags="1"` поместить в композицию, которая создаётся
+   **после** `QCoreApplication` (не на верхний уровень серверной композиции). Указать
+   `TableDelegates` и `TenantOwnedTables` / `BindingScopedCollections`.
+4. Пробросить `AdminDatabaseAccessSettings` (и при необходимости `RequiredExtensions`) движку
+   из параметров настроек сервера.
+5. Проверить лог и прогнать проверку изоляции (раздел 9).
+
+### 4.3. Как выключить
+
+* **Временно:** вернуть рабочему логину суперпользователя (`postgres`). Политики останутся
+  в базе, но действовать перестанут.
+* **Полностью:** убрать из `.acc` ссылки `AccessContext` у движка и `TenantRowLevelSecurityController`,
+  затем в базе выполнить `ALTER TABLE ... DISABLE ROW LEVEL SECURITY` (или удалить политики
+  `ImtTenant*`).
+
+Передача владения объектами назад не требуется: таблицы, принадлежащие рабочей роли, доступны
+суперпользователю как обычно.
+
+## 5. Что происходит с существующими данными и установками
+
+**Установки, где ничего не настраивали** (административный логин пустой, работа под `postgres`):
+
+* подготовка базы не выполняется;
+* политики ставятся, но не действуют — в логе одно предупреждение `... NOT enforced`;
+* добавляется один лёгкий запрос `set_config` на каждый SQL-запрос;
+* поведение приложения не меняется.
+
+Особый случай: если установка уже работает под ролью **без** суперпользователя, которая владеет
+таблицами, изоляция начнёт действовать сразу после обновления. Такие установки нужно проверить
+до выката.
+
+**Существующие строки после включения:**
+
+* Документы без привязки в `TenantEntityBindings` (или с пустым `TenantId`) — **глобальные**:
+  их видят все тенанты и запросы без тенанта. Это совпадает с поведением «Без организации».
+* Документы, привязанные к тенанту, видит только этот тенант.
+* Строки таблиц с колонками тенанта видят только перечисленные в них тенанты. Строки с пустыми
+  колонками тенанта не видит никто, кроме системного доступа.
+* Данные не переписываются и не мигрируются: меняется только то, кто их видит.
+
+**Владение объектами:** таблицы, созданные раньше другой ролью (обычно `postgres`), и базы,
+восстановленные из бэкапа, при первом старте с административным логином переходят к рабочей
+роли. Это повторяется при каждом старте и ничего не делает, если всё уже принадлежит роли.
+
+**Миграции** выполняются через системный движок и видят все строки, поэтому старые миграции
+данных работают как раньше.
+
+## 6. Что защищено в продуктах
+
+| Продукт | Защищённые таблицы | Не защищено и почему |
+|---|---|---|
+| Puma | `TenantConnections` (`TenantAId,TenantBId`), `TenantConnectionRequests`, `TenantRelationships`, `CrossOrgGrants` (`SourceTenantId,TargetTenantId`), `TenantRelationshipProposals` (`InitiatorTenantId,CounterpartyTenantId`) | `Roles`, `UserGroups`, `TenantMemberships`, `TenantInvitations`, `TenantPermissions` — их читает аутентификация до того, как известен тенант запроса (раздел 8, п. 1). `Tenants`, `Users`, `UserSessions`, `TenantConnectionCodes` — глобальные по смыслу |
+| ProLife | `Accounts`, `Devices`, `Orders`, `SoftwareInstances` через `TenantEntityBindings` — коллекции, которые уже используют `TenantFilter` | остальные таблицы не принадлежат тенантам |
+| Lisa | — | у таблиц Lisa (продукты, лицензии, фичи, тикеты, чат) нет ни колонок тенанта, ни привязок; подключение дало бы только лишний запрос на каждый SQL |
+
+Таблиц `Contracts`, `CrossTenantMessages`, `OrderRequests` в базе Puma сейчас нет; когда они
+появятся, их можно добавить в `TenantOwnedTables` со спецификацией `<Table>:SourceTenantId,TargetTenantId`.
+
+## 7. Почему выбраны такие решения
+
+**Контекст через интерфейсы и `.acc`, а не через статическое состояние.** Первая версия хранила
+контекст в статическом `thread_local` и открывала RAII-scope прямо в коде
+(`CTenantSecurityContextScope systemContextScope(CreateSystemContext())`). Такая строка выглядит
+как неиспользуемая переменная, а на деле отключает изоляцию для всего кода ниже по стеку, и
+написать её может любой код в любой библиотеке. Сейчас контекст — компонент с интерфейсом,
+его потребители получают ссылку через `I_REF`, а системный доступ есть только у экземпляра движка,
+явно подключённого к `SystemAccessContext`.
+
+**Интерфейсы в `imtbase`, а не в `imtdb`.** Контекст нужен не только движку БД: его используют
+кэши (`imtbase`) и документный сервис (`imtdoc`, который зависит только от `imtbase`).
+
+**Хранение по потокам, а не явная передача во все методы.** У методов чтения `IObjectCollection` /
+`ICollectionInfo` (`GetObjectData(id)`, `GetElementInfo`, …) нет параметра контекста, а их вызовов
+больше тысячи в ImtCore и ProLife. Добавить параметр — ломающее изменение базовых интерфейсов
+во всех продуктах. Поэтому контекст пока хранится по потокам, а переходы между потоками
+обрабатываются явно (документный сервис). Явная передача — возможное направление развития
+(раздел 8, п. 7).
+
+**`set_config` перед каждым запросом, без кэширования.** PostgreSQL откатывает изменения
+сессионных настроек при откате транзакции. Кэш «контекст уже выставлен» мог бы оставить на
+соединении потока контекст предыдущего запроса другого тенанта. Лишний лёгкий запрос дешевле
+такой ошибки.
+
+**Fail-closed по умолчанию.** Поток без контекста видит только глобальные строки. Ошибка
+конфигурации или забытая передача контекста даёт пустые данные, а не чужие.
+
+**Глобальные документы видны всем.** Это повторяет существующую семантику приложения
+(«Без организации») и позволяет включить RLS без миграции данных.
+
+**`TenantEntityBindings` открыта на чтение.** Политика документа проверяет «нет привязки ни к одному
+тенанту». Если бы тенант видел только свои привязки, чужой документ выглядел бы для него
+непривязанным, то есть глобальным, и стал бы виден — это была бы утечка.
+
+**Административный логин вместо `SET ROLE`.** Можно было бы подключаться суперпользователем
+и для каждой сессии делать `SET ROLE imt_app`. Но любая SQL-инъекция выполнит `RESET ROLE` и
+вернёт права суперпользователя — изоляция была бы мнимой. Административный логин используется
+только при старте на отдельном соединении и в работе не участвует.
+
+**Владелец таблиц — рабочая роль, плюс `FORCE ROW LEVEL SECURITY`.** Таблицы создаются делегатами
+во время работы приложения, то есть рабочей ролью. Политики может ставить только владелец.
+Если бы владельцем был администратор, пришлось бы управлять правами `GRANT` на каждую таблицу.
+`FORCE` распространяет политики и на владельца.
+
+**Передача владения при каждом старте.** Покрывает восстановление из бэкапа и обновление старых
+установок без ручных шагов. Запрос выбирает только объекты с чужим владельцем, поэтому повторный
+запуск почти ничего не стоит.
+
+**Синхронизация пароля роли.** Источник истины — настройки сервера. Иначе после смены пароля
+в настройках сервер не смог бы подключиться.
+
+**Миграции через системный контекст рабочей роли, а не через роль с `BYPASSRLS`.** Таблицы,
+созданные ролью `BYPASSRLS`, принадлежали бы ей, а не рабочей роли. Поэтому миграции идут под
+рабочей ролью с `imt.rls_bypass = on` (`AllowSystemContext = true`). Цена — ограничение 11
+в разделе 8.
+
+**Отложенная установка политик.** Миграции могут пересоздать таблицы после создания контроллера.
+Установка в первом проходе цикла событий и повтор при каждом старте гарантируют, что политики
+стоят на актуальных таблицах.
+
+**Кэш по контексту.** Кэш стоит выше SQL. Без разделения по контексту чтение по Id обслуживалось
+бы из кэша, наполненного другим тенантом, и база вообще не участвовала бы в проверке.
+
+**Защищены только таблицы, которые читаются в контексте запроса.** Таблицы, нужные аутентификации
+до определения тенанта, под RLS лишили бы пользователей прав. Они оставлены под защитой приложения
+до решения из раздела 8, п. 1.
+
+## 8. Ограничения и возможные решения
+
+1. **Аутентификация читает данные до того, как известен тенант запроса.**
+   `CAuthenticationManagerComp::CreateGqlContext` загружает роли, группы и права пользователя
+   (а `CalculateGlobalPermissions` — членства) раньше, чем сервлет выставит контекст. Поэтому
+   в Puma эти таблицы не защищены.
+   * Вариант А: отдельные экземпляры репозиториев аутентификации на системном движке.
+   * Вариант Б: контекст в две фазы — после проверки подписи токена выставить контекст
+     «только пользователь», после создания контекста запроса — полный. Вместе с политиками
+     по колонке пользователя (`TenantMemberships:TenantId:UserId`) это закроет членства
+     и приглашения.
+2. **У пользователей тенантов нет прав в ProLife** (не связано с RLS): в контексте тенанта роли
+   пользователя не применяются. Сквозной API-тест «тенант A против тенанта B» пока невозможен.
+   Решение — подключить в ProLife роли и права организаций (TenantManager).
+3. **Без RLS чтение по Id не фильтруется по тенанту.** Решение — проверка привязки в делегатах
+   для чтения по Id тоже.
+4. **Публикатор подписок выполняет запрос подписчика в потоке автора изменения.**
+   `CGqlQueryBasedPublisherCompBase` вызывает `CreateResponse` для каждого подписчика с контекстом
+   того, кто изменил данные. Подписчик другого тенанта может получить неполные данные, а там, где
+   нет фильтра приложения, — данные автора изменения. Решение — выставлять контекст подписчика
+   через `IAccessContextController` перед выполнением его запроса.
+5. **Вложенная обработка запроса в том же потоке сбрасывает контекст внешнего** (сервлет делает
+   `Reset`, а не восстанавливает предыдущий). Сейчас такого вложения нет. Решение — сохранять
+   и восстанавливать предыдущий контекст.
+6. **Хранение по id потока ОС.** Если поток завершится без сброса, новый поток с тем же id
+   унаследует контекст. Все текущие места сбрасывают контекст на всех путях. Решение —
+   `QThreadStorage` внутри компонента; заодно уйдёт общий мьютекс.
+7. **Работа в других потоках без контекста** (фоновые задачи, `QtConcurrent`, таймеры) видит только
+   глобальные строки. Долгосрочное решение — передавать контекст явно: представления коллекций,
+   привязанные к контексту, и явный контекст в `IDatabaseEngine`.
+8. **Режим single-copy документов обходил бы RLS:** документ, загруженный одним пользователем,
+   отдаётся другим из памяти. Сейчас он выключен во всех сервисах Puma/ProLife. Решение —
+   ключевать общие документы контекстом или запретить режим для защищённых коллекций.
+9. **`TenantEntityBindings` читается всеми тенантами** (только идентификаторы). Решение — проверка
+   видимости в функции `SECURITY DEFINER` и закрытый `SELECT`.
+10. **Один дополнительный запрос на каждый SQL-запрос.** Решение — выставлять контекст один раз
+    на транзакцию (`set_config(..., true)` после `BEGIN`).
+11. **SQL-инъекция может сама выставить переменные сессии**, в том числе `imt.rls_bypass`. RLS защищает
+    от забытых фильтров, но не от инъекций. Все запросы должны использовать связанные параметры
+    или `SqlEncode`. Для строгих установок — `AllowSystemContext = false` и миграции через
+    отдельную роль с `BYPASSRLS`.
+12. **Удаление документа под RLS удаляет только привязки текущего тенанта.** Привязки других
+    тенантов остаются сиротами (безвредно).
+13. **FDW ProLife читает базу Puma своими учётными данными,** поэтому RLS Puma к этим чтениям
+    не применяется.
+14. **Административный логин не показан в окне настроек сервера,** задаётся только в XML.
+    Решение — добавить его в представление настроек.
+15. **Окно на старте.** На совершенно новой базе запросы, пришедшие до первого прохода цикла событий
+    главного потока, ещё не защищены политиками.
+16. **TeamCity запускает обычный режим.** Чтобы RLS проверялся на каждом прогоне, нужен шаг
+    `Run-CiTests.ps1 -Rls` и отчёт `junit-report-rls.xml`.
+
+## 9. Проверка и тесты
+
+### 9.1. RLS-режим API-наборов
+
+Во всех раннерах Puma и ProLife (`Tests/.../Run-CiTests.ps1`) есть флаг `-Rls`:
+
+```powershell
+Run-CiTests.ps1 -BuildConfig Debug_Qt6_VC17_x64 -Rls
+```
+
+Что делает раннер:
+
+1. Записывает в файл настроек тестового сервера рабочий логин `imt_app` и административный
+   логин (`-DbUser`/`-DbPassword`, по умолчанию `postgres`). Копия файла сохраняется.
+2. Запускает серверы; они сами создают роль и готовят базы — новые и восстановленные из бэкапов.
+3. Прогоняет API-набор (и WS-набор, где он есть).
+4. Выполняет проверку изоляции в базе под рабочей ролью и пишет JUnit-отчёт `junit-report-rls.xml`.
+   В ProLife перед проверкой часть Accounts и Devices привязывается к двум тенантам
+   (`Tests/Rls/rls-fixtures.sql`).
+5. Возвращает файл настроек.
+
+Что проверяет проверка изоляции (`Tests/TenantApiPostman/rls/rls-isolation.sql` в Puma,
+`Tests/Rls/rls-isolation.sql` в ProLife):
+
+* у рабочей роли нет `SUPERUSER`/`BYPASSRLS`;
+* владелец каждой защищённой таблицы — рабочая роль, включены `ENABLE` и `FORCE`, есть политики;
+* без контекста видны только глобальные строки;
+* тенант видит ровно свои и глобальные строки, ни одной чужой;
+* `UPDATE`/`DELETE` чужих строк затрагивают 0 строк;
+* чужую привязку нельзя удалить и нельзя создать привязку за другого тенанта (ошибка 42501).
+
+Результаты на 2026-10-02 (Debug, PostgreSQL 18):
+
+| Набор | Обычный режим | `-Rls` | Проверка изоляции |
+|---|---|---|---|
+| Puma TenantApi + WS | 1697/1697, 25/25 | 1697/1697, 25/25 | 11/11 |
+| ProLifeApi + WS | 499/499, 44/44 | 499/499, 44/44 | 29/29 |
+| ProLife DeskTicketApi | 111/111 | 112/112 | 29/29 |
+| ProLife PatTokenApi (новая база) | 675/675 | 675/675 | 9/9 |
+
+Число проверок в TenantApi и DeskTicket меняется от прогона к прогону: наборы опрашивают сервер,
+пока данные не готовы.
+
+### 9.2. Модульные и интеграционные тесты ImtCore
+
+* `Include/imtbase/Test/CAccessContextTest` — режимы доступа, сброс, изоляция между потоками.
+* `Include/imtdb/Test/CTenantRlsPolicyBuilderTest` — разбор спецификаций, проверка идентификаторов,
+  сгенерированный SQL.
+* `Include/imtdb/Test/CTenantRowLevelSecurityTest` — тест на реальном PostgreSQL:
+  * запрет чтения и записи чужих данных;
+  * fail-closed без контекста;
+  * строки пользователя;
+  * межтенантные таблицы;
+  * коллекции с привязками;
+  * системный контекст (разрешён и запрещён);
+  * вредоносные значения контекста.
+
+  Тест пропускается, если не задана `IMT_TEST_POSTGRES_HOST`. Дополнительные переменные:
+  `IMT_TEST_POSTGRES_PORT`, `IMT_TEST_POSTGRES_USER`, `IMT_TEST_POSTGRES_PASSWORD`
+  (административная учётная запись), `IMT_TEST_POSTGRES_DATABASE`. Тест создаёт и удаляет
+  временные роль и схему.
+
+## 10. Производительность
+
+* Один лёгкий запрос `set_config` на каждый SQL-запрос, если у движка задан `AccessContext`.
+* Политики коллекций с привязками выполняют подзапросы `EXISTS` к `TenantEntityBindings`; используются
+  существующие индексы по `(EntityType, EntityId)` и `TenantId`.
+* Кэши с `AccessContext` хранят записи отдельно для каждого тенанта и пользователя, поэтому
+  доля попаданий в кэш ниже, чем у общего кэша.
+* Подготовка базы при старте выполняет несколько запросов администратора; передача владения
+  выбирает только объекты с чужим владельцем.
