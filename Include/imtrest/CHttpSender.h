@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtrest/ITransport.h>
+#include <imtrest/IResponse.h>
 
 namespace imtrest
 {
@@ -18,14 +19,15 @@ class CHttpSender: public QObject, virtual public ITransport
 public:
 	CHttpSender(QAbstractSocket* tcpSocketPtr);
 	// reimplemented (ITransport)
-	virtual bool SendResponse(ConstResponsePtr& response) const override;
-	virtual bool SendRequest(ConstRequestPtr& request) const override;
+	virtual bool SendData(QByteArray& data) const override;
+
+	/*!
+		Assemble the full HTTP wire bytes (status line, headers, Content-Length/Content-Type, body)
+		for the given response. The result can be passed to SendData().
+	*/
+	static bool BuildResponseData(const IResponse& response, QByteArray& data);
 
 protected:
-	virtual bool WriteStatus(int statusCode,const QByteArray& statusCodeLiteral, QAbstractSocket& socket) const;
-	virtual bool WriteHeader(const QByteArray& headerKey, const QByteArray& value, QAbstractSocket& socket) const;
-	virtual bool WriteBody(const QByteArray& data, QAbstractSocket& socket) const;
-
 	QAbstractSocket* m_tcpSocketPtr;
 };
 

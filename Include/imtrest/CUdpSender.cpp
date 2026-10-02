@@ -5,10 +5,6 @@
 // Qt includes
 #include <QtCore/QDataStream>
 
-// ImtCore includes
-#include <imtrest/IResponse.h>
-#include <imtrest/IProtocolEngine.h>
-
 
 namespace imtrest
 {
@@ -25,25 +21,14 @@ CUdpSender::CUdpSender(CUdpRequest* request)
 }
 
 
-// reimplemented (IRequest)
+// reimplemented (ITransport)
 
-bool CUdpSender::SendResponse(ConstResponsePtr& response) const
+bool CUdpSender::SendData(QByteArray& data) const
 {
-	if (!response.IsValid()){
-		return false;
-	}
-
-	const QByteArray& contentData = response->GetData();
-    bool result =m_socket->writeDatagram(contentData,m_address,m_port);
+    bool result = m_socket->writeDatagram(data, m_address, m_port);
     Q_EMIT sended(m_requestId);
 
     return result;
-}
-
-
-bool imtrest::CUdpSender::SendRequest(ConstRequestPtr& /*request*/) const
-{
-	return false;
 }
 
 

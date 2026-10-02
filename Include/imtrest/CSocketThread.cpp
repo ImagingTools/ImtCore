@@ -21,7 +21,6 @@ CSocketThread::CSocketThread(qintptr socketId, bool secureConnection, const QSsl
 	m_isSecureConnection(secureConnection),
 	m_sslConfiguration(sslConfiguration)
 {
-	qRegisterMetaType<ConstResponsePtr>("ConstResponsePtr");
 	this->m_socketDescriptor = socketId;
 
 	m_server = parent;
@@ -141,17 +140,11 @@ ConstResponsePtr CSocketThread::ProcessRequest(const IRequest& request, const QB
 
 // reimplemented (ITransport)
 
-bool CSocketThread::SendResponse(ConstResponsePtr& response) const
+bool CSocketThread::SendData(QByteArray& data) const
 {
-	Q_EMIT OnSendResponse(response);
+	Q_EMIT OnSendResponse(data);
 
 	return true;
-}
-
-
-bool CSocketThread::SendRequest(ConstRequestPtr& /*request*/) const
-{
-	return false;
 }
 
 
