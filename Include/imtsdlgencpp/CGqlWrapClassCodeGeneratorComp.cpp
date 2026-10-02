@@ -85,7 +85,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 
 	imtsdl::CSdlField outputArgument = sdlRequest.GetOutputArgument();
 	// RequestInfo struct props
-	const bool isRequestInfoCreated = GenerateFieldRequestInfo(ifStream, outputArgument);
+	const bool isRequestInfoCreated = GenerateFieldRequestInfo(ifStream, outputArgument, GetCapitalizedValue(sdlRequest.GetName()) + QStringLiteral("RequestInfo"));
 	if (!isRequestInfoCreated){
 		SendErrorMessage(0, QStringLiteral("Unable to create request info for request %1").arg(sdlRequest.GetName()));
 
@@ -286,6 +286,8 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlRe
 bool CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 	QTextStream& stream,
 	const imtsdl::CSdlField& sdlField,
+	const QString& parentStructName,
+	const QStringList& parentTypeIds,
 	uint hIndents,
 	bool createStructDefinition) const
 {
@@ -304,11 +306,19 @@ bool CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 		return false;
 	}
 
+	// a top-level field is written directly into the request info struct
+	QString structName = parentStructName;
+	if (createStructDefinition){
+		structName = sdlField.GetId() + QStringLiteral("RequestInfo");
+		if (structName == parentStructName){
+			structName = sdlField.GetId() + QStringLiteral("FieldRequestInfo");
+		}
+	}
+
 	if (createStructDefinition ){
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("struct ");
-		stream << sdlField.GetId();
-		stream << QStringLiteral("RequestInfo");
+		stream << structName;
 		FeedStream(stream, 1, false);
 		FeedStreamHorizontally(stream, hIndents);
 		stream << '{';
@@ -346,9 +356,10 @@ bool CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 	}
 
 	// and finally create all custom types;
+	const QStringList typeIds = parentTypeIds + QStringList(sdlField.GetType());
 	for (const imtsdl::CSdlField& customType: customTypes){
-		if (customType.GetType() != sdlField.GetType()){
-			const bool isRequestInfoCreated = GenerateFieldRequestInfo(stream, customType, hIndents + 1, true);
+		if (!typeIds.contains(customType.GetType())){
+			const bool isRequestInfoCreated = GenerateFieldRequestInfo(stream, customType, structName, typeIds, hIndents + 1, true);
 			if (!isRequestInfoCreated){
 				SendErrorMessage(0, QStringLiteral("Unable to create request info for type %1").arg(customType.GetType()));
 
@@ -402,25 +413,9 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
 	stream << QStringLiteral("if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){");
 	FeedStream(stream, 1, false);
 
-	// The parser stores the selection set of the command directly; accept a command-name wrapper as well
+	// the request holds the selection set of the command directly
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("requestedFieldsObjectPtr = &gqlRequest.GetFields();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("const QByteArrayList topFieldIds = gqlRequest.GetFields().GetFieldIds();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("if (topFieldIds.count() == 1 && topFieldIds.constFirst() == gqlRequest.GetCommandId()){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(topFieldIds.constFirst());");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << '}';
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents + 1);
@@ -479,7 +474,7 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 
 	// GenerateRequestedFieldsParsing(stream, foundEntry.get(), idListContainerParamName, gqlObjectVarName, complexFieldName, hIndents);
 	if (sdlTypePtr != nullptr){
-		GenerateRequestedFieldsParsing(stream, *sdlTypePtr, idListContainerParamName, gqlObjectVarName, complexFieldName, hIndents);
+		GenerateRequestedFieldsParsing(stream, *sdlTypePtr, idListContainerParamName, gqlObjectVarName, complexFieldName, hIndents, QStringList(sdlField.GetType()));
 	}
 }
 
@@ -490,7 +485,8 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 	const QString& idListContainerParamName,
 	const QString& gqlObjectVarName,
 	const QString& complexFieldName,
-	uint hIndents) const
+	uint hIndents,
+	const QStringList& processedTypeIds) const
 {
 	const imtsdl::SdlFieldList typeFieldList = sdlType.GetFields();
 	if (typeFieldList.isEmpty()){
@@ -555,15 +551,9 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 			return;
 		}
 
-		// check if a type contains itself
-		QStringList processedIdList = complexFieldName.split('.');
-		if (processedIdList.contains(typeField.GetId())){
-
-			FeedStreamHorizontally(stream, hIndents);
-			stream << '}';
-			FeedStream(stream, 1, false);
-
-			return;
+		// a type of an enclosing field has no nested request info (see GenerateFieldRequestInfo)
+		if (processedTypeIds.contains(typeField.GetType())){
+			continue;
 		}
 
 		QString newComplexFieldName = complexFieldName;
@@ -604,16 +594,14 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 		stream << QStringLiteral("->GetFieldIds();");
 		FeedStream(stream, 1, true);
 
-		// then generate field info (self nested is not allowed)
-		if (sdlType != *sdlTypePtr){
-			GenerateRequestedFieldsParsing(
-				stream,
-				*sdlTypePtr,
-				newIdListContainerVarName,
-				newGqlContainerVarName,
-				newComplexFieldName,
-				hIndents + 2);
-		}
+		GenerateRequestedFieldsParsing(
+			stream,
+			*sdlTypePtr,
+			newIdListContainerVarName,
+			newGqlContainerVarName,
+			newComplexFieldName,
+			hIndents + 2,
+			processedTypeIds + QStringList(typeField.GetType()));
 
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << '}';

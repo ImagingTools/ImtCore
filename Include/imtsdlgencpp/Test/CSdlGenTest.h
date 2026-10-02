@@ -42,6 +42,12 @@ private Q_SLOTS:
 	void TestArrayJsonFileRoundTrip();
 	void TestArrayGraphQlRequestFileRoundTrip();
 	void TestNestedFieldNameCollision();
+	void TestRequestedFields_data();
+	void TestRequestedFields();
+	void TestRequestedFieldsWithComplexArguments();
+	void TestRequestedFieldsOfMutation();
+	void TestRequestedFieldsWithFieldNamedAsCommand();
+	void TestRequestedFieldsOfBuiltRequest();
 	void PrinterTest();
 	void SubstrateSpecifications();
 
