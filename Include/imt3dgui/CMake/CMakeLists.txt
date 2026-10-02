@@ -81,6 +81,8 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../../Config/CMake/DesignTokenCreator.cma
 set(RHI_SHADER_SRC_DIR "${PROJECT_SOURCE_DIR}/../Resources/Shaders")
 set(RHI_SHADER_PREBUILT_DIR "${RHI_SHADER_SRC_DIR}/Prebuilt")
 set(RHI_SHADER_OUT_DIR "${AUX_INCLUDE_DIR}/${PROJECT_NAME}")
+set(RHI_SHADER_QSB_OUT_DIR "${RHI_SHADER_OUT_DIR}/Resources/Shaders")
+file(MAKE_DIRECTORY ${RHI_SHADER_QSB_OUT_DIR})
 
 set(RHI_SHADER_SOURCES
 	${RHI_SHADER_SRC_DIR}/vshader_rhi.vert
@@ -92,9 +94,9 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ShaderTools QUIET)
 set(RHI_QRC_FILES_XML "")
 foreach(SHADER_SRC ${RHI_SHADER_SOURCES})
 	get_filename_component(SHADER_NAME ${SHADER_SRC} NAME)
-	set(QSB_OUTPUT "${RHI_SHADER_OUT_DIR}/${SHADER_NAME}.qsb")
+	set(QSB_OUTPUT "${RHI_SHADER_QSB_OUT_DIR}/${SHADER_NAME}.qsb")
 	list(APPEND QSB_OUTPUTS ${QSB_OUTPUT})
-	string(APPEND RHI_QRC_FILES_XML "<file>${SHADER_NAME}.qsb</file>\n")
+	string(APPEND RHI_QRC_FILES_XML "<file alias=\"${SHADER_NAME}.qsb\">Resources/Shaders/${SHADER_NAME}.qsb</file>\n")
 
 	if(TARGET Qt${QT_VERSION_MAJOR}::qsb)
 		add_custom_command(
