@@ -104,6 +104,11 @@ void CApplicationInfoControllerComp::FillWebSocketUrl(ApplicationInfo& applicati
 		return;
 	}
 
+	// Without its own WebSocket port the client connects to the server it already talks to
+	if (!m_webSocketUrlProviderCompPtr->GetSupportedProtocols().contains(imtcom::IServerConnectionInterface::PT_WEBSOCKET)){
+		return;
+	}
+
 	QUrl url;
 	if (!m_webSocketUrlProviderCompPtr->GetUrl(imtcom::IServerConnectionInterface::PT_WEBSOCKET, url)){
 		return;

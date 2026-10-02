@@ -40,6 +40,10 @@ public Q_SLOTS:
 	void OnHandleSslErrors(QList<QSslError> errorList);
 
 private:
+	bool StartWebSocketUpgrade();
+	void HandOverWebSocket();
+
+private:
 	QTimer m_startTimer;
 	CSocketThread* m_rootSocket;
 	QPointer<QTcpSocket> m_socket;

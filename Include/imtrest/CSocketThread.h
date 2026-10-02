@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/ITransport.h>
+#include <imtrest/IWebSocketUpgradeHandler.h>
 #include <imtrest/CSocket.h>
 
 
@@ -38,6 +39,7 @@ public:
 	Status GetSocketStatus();
 	QByteArray GetRequestId();
 	imtrest::IRequestServlet* GetRequestServlet();
+	imtrest::IWebSocketUpgradeHandler* GetWebSocketUpgradeHandler();
 
 	[[nodiscard]] bool IsSecureConnection() const;
 	void EnableSecureConnection(bool isSecureConnection = true);
@@ -66,6 +68,7 @@ private:
 	qintptr m_socketDescriptor;
 	const imtrest::IProtocolEngine* m_enginePtr;
 	imtrest::IRequestServlet* m_requestHandlerPtr;
+	imtrest::IWebSocketUpgradeHandler* m_webSocketUpgradeHandlerPtr;
 	mutable QMutex m_socketDescriptorMutex;
 	mutable QMutex m_statusMutex;
 	Status m_status;
