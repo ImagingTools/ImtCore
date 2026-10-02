@@ -338,6 +338,7 @@ FocusScope{
 
                     width: parent.width;
 					height: Style.controlHeightM;
+                    color: Style.baseColor;
                     border.width: 1;
 					border.color: Style.grayColor;
 					radius: Style.textFieldRadius;

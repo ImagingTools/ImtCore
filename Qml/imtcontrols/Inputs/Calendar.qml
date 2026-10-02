@@ -13,9 +13,10 @@ Rectangle {
 	width: Style.sizeHintM;
 	height: Style.sizeHintL;
 	radius: Style.radiusL;
+	color: Style.baseColor;
 
 	border.width: 1;
-	border.color: Style.dialogBackgroundColor;
+	border.color: Style.borderColor;
 
 	property bool centered: true;
 	property Item root: null;
@@ -126,8 +127,9 @@ Rectangle {
 	property string selectColor: mainColor;
 	property string topPanelColor: mainColor;
 	property string highlightColor: Style.firstColorHighlight;
-	property string fontColor_title: Style.baseColor;
-	property string fontColor_cell: Style.baseColorInverted;
+	property string fontColor_title: Style.highlightedTextColor;
+	property string fontColor_cell: Style.textColor;
+	property string selectedFontColor_cell: Style.highlightedTextColor;
 	property int fontSize_cell: Style.fontSizeM;
 	property int fontSize_title: Style.fontSizeXXL;
 	property bool fontBold_title: false;
