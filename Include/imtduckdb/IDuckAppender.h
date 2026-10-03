@@ -6,6 +6,9 @@
 #include <QtCore/QString>
 #include <QtCore/QVariantList>
 
+// ACF includes
+#include <istd/IPolymorphic.h>
+
 
 namespace imtduckdb
 {
@@ -22,11 +25,9 @@ namespace imtduckdb
 	Not thread-safe; instances are obtained from CDuckDatabaseEngineComp::CreateAppender() and are
 	meant to be used by a single writer (e.g. the cache builder) for the duration of one table load.
 */
-class IDuckAppender
+class IDuckAppender: virtual public istd::IPolymorphic
 {
 public:
-	virtual ~IDuckAppender() = default;
-
 	/**
 		Appends a single row. \a rowValues must have exactly one entry per active column of the
 		target table, in column order.
