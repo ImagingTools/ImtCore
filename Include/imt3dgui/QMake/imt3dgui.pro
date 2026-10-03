@@ -24,20 +24,15 @@ RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 # The .qsb files and the .qrc referencing them are generated into the GeneratedFiles dir.
 QSB_TOOL = $$[QT_HOST_BINS]/qsb
 RHI_SHADER_OUT_DIR = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
-RHI_QRC_CONTENT = \
-    "<RCC>" \
-    "<qresource prefix=\"/RhiShaders\">" \
-    "<file alias=\"vshader_rhi.vert.qsb\">Resources/Shaders/vshader_rhi.vert.qsb</file>" \
-    "<file alias=\"fshader_rhi.frag.qsb\">Resources/Shaders/fshader_rhi.frag.qsb</file>" \
-    "</qresource>" \
-    "</RCC>"
 mkpath($$RHI_SHADER_OUT_DIR/Resources/Shaders)
-write_file($$RHI_SHADER_OUT_DIR/imt3dgui_rhi_shaders.qrc, RHI_QRC_CONTENT)
-RESOURCES += $$RHI_SHADER_OUT_DIR/imt3dgui_rhi_shaders.qrc
 
 QSB_SHADERS = \
     $$_PRO_FILE_PWD_/../Resources/Shaders/vshader_rhi.vert \
     $$_PRO_FILE_PWD_/../Resources/Shaders/fshader_rhi.frag
+
+QSB_OUTPUTS = \
+    $$RHI_SHADER_OUT_DIR/Resources/Shaders/vshader_rhi.vert.qsb \
+    $$RHI_SHADER_OUT_DIR/Resources/Shaders/fshader_rhi.frag.qsb
 
 qsb_compiler.input = QSB_SHADERS
 qsb_compiler.output = $$RHI_SHADER_OUT_DIR/Resources/Shaders/${QMAKE_FILE_IN_BASE}.${QMAKE_FILE_IN_EXT}.qsb
@@ -46,5 +41,15 @@ qsb_compiler.name = QSB ${QMAKE_FILE_IN}
 qsb_compiler.CONFIG += no_link target_predeps
 QMAKE_EXTRA_COMPILERS += qsb_compiler
 
-INCLUDEPATH += ../../
+RHI_QRC_TEMPLATE = $$_PRO_FILE_PWD_/../Resources/Shaders/imt3dgui_rhi_shaders.qrc.in
+rhi_qrc_compiler.input = RHI_QRC_TEMPLATE
+rhi_qrc_compiler.output = $$RHI_SHADER_OUT_DIR/imt3dgui_rhi_shaders.qrc
+rhi_qrc_compiler.commands = $$QMAKE_COPY ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
+rhi_qrc_compiler.name = RHI shader resource collection
+rhi_qrc_compiler.dependency_type = TYPE_QRC
+rhi_qrc_compiler.variable_out = RESOURCES
+rhi_qrc_compiler.CONFIG += target_predeps
+rhi_qrc_compiler.depends = $$QSB_OUTPUTS
+QMAKE_EXTRA_COMPILERS += rhi_qrc_compiler
 
+INCLUDEPATH += ../../

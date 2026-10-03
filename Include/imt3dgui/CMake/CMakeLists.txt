@@ -91,12 +91,10 @@ set(RHI_SHADER_SOURCES
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ShaderTools QUIET)
 
-set(RHI_QRC_FILES_XML "")
 foreach(SHADER_SRC ${RHI_SHADER_SOURCES})
 	get_filename_component(SHADER_NAME ${SHADER_SRC} NAME)
 	set(QSB_OUTPUT "${RHI_SHADER_QSB_OUT_DIR}/${SHADER_NAME}.qsb")
 	list(APPEND QSB_OUTPUTS ${QSB_OUTPUT})
-	string(APPEND RHI_QRC_FILES_XML "<file alias=\"${SHADER_NAME}.qsb\">Resources/Shaders/${SHADER_NAME}.qsb</file>\n")
 
 	if(TARGET Qt${QT_VERSION_MAJOR}::qsb)
 		add_custom_command(
@@ -123,15 +121,22 @@ endforeach()
 # --- Generate the .qrc that references the .qsb files and compile it via rcc ---
 set(IMT3DGUI_RHI_QRC_FILE "${RHI_SHADER_OUT_DIR}/imt3dgui_rhi_shaders.qrc")
 set(IMT3DGUI_RHI_QRC_CPP  "${RHI_SHADER_OUT_DIR}/qrc_imt3dgui_rhi_shaders.cpp")
+set(IMT3DGUI_RHI_QRC_TEMPLATE "${RHI_SHADER_SRC_DIR}/imt3dgui_rhi_shaders.qrc.in")
 
-file(WRITE ${IMT3DGUI_RHI_QRC_FILE}
-	"<RCC>\n<qresource prefix=\"/RhiShaders\">\n${RHI_QRC_FILES_XML}</qresource>\n</RCC>\n")
+add_custom_command(
+	OUTPUT ${IMT3DGUI_RHI_QRC_FILE}
+	COMMAND ${CMAKE_COMMAND} -E copy
+		${IMT3DGUI_RHI_QRC_TEMPLATE} ${IMT3DGUI_RHI_QRC_FILE}
+	DEPENDS ${IMT3DGUI_RHI_QRC_TEMPLATE} ${QSB_OUTPUTS}
+	COMMENT "[imt3dgui] Generating RHI shader resource collection"
+	VERBATIM
+)
 
 add_custom_command(
 	OUTPUT ${IMT3DGUI_RHI_QRC_CPP}
 	COMMAND Qt${QT_VERSION_MAJOR}::rcc
 		-name imt3dgui_rhi_shaders ${IMT3DGUI_RHI_QRC_FILE} -o ${IMT3DGUI_RHI_QRC_CPP}
-	DEPENDS ${IMT3DGUI_RHI_QRC_FILE} ${QSB_OUTPUTS}
+	DEPENDS ${IMT3DGUI_RHI_QRC_FILE}
 	COMMENT "[imt3dgui] CREATING RES ${IMT3DGUI_RHI_QRC_CPP}"
 	VERBATIM
 )
