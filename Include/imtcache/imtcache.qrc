@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/SQL/DuckDb">
+        <file alias="CreateCacheRevisionTable.sql">Resources/SQL/DuckDb/CreateCacheRevisionTable.sql</file>
+    </qresource>
+</RCC>

@@ -427,7 +427,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreatePaginationQuery(int offset, int c
 	paginationQuery.clear();
 
 	if (offset >= 0 && count > 0){
-		if (IsSqliteDriver()){
+		if (IsSqliteDriver() || IsDuckDbDriver()){
 			paginationQuery = QStringLiteral("LIMIT %1 OFFSET %2").arg(QString::number(count), QString::number(offset)).toUtf8();
 		}
 		else{
@@ -544,9 +544,15 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const
 {
-	filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(
-				collectionFilter,
-				IsSqliteDriver() ? CComplexCollectionFilterConverter::SC_GENERAL : CComplexCollectionFilterConverter::SC_POSTGRES);
+	CComplexCollectionFilterConverter::SqlContext sqlContext = CComplexCollectionFilterConverter::SC_POSTGRES;
+	if (IsSqliteDriver()){
+		sqlContext = CComplexCollectionFilterConverter::SC_GENERAL;
+	}
+	else if (IsDuckDbDriver()){
+		sqlContext = CComplexCollectionFilterConverter::SC_DUCKDB;
+	}
+
+	filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter, sqlContext);
 
 	return true;
 }
@@ -661,6 +667,12 @@ bool CSqlDatabaseObjectDelegateCompBase::IsSqliteDriver() const
 }
 
 
+bool CSqlDatabaseObjectDelegateCompBase::IsDuckDbDriver() const
+{
+	return m_databaseEngineCompPtr.IsValid() && m_databaseEngineCompPtr->GetDatabaseDriverId().compare(QByteArrayLiteral("DUCKDB"), Qt::CaseInsensitive) == 0;
+}
+
+
 bool CSqlDatabaseObjectDelegateCompBase::TableExists(const QString& tableName) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
@@ -673,6 +685,13 @@ bool CSqlDatabaseObjectDelegateCompBase::TableExists(const QString& tableName) c
 	if (driverId == QByteArrayLiteral("QPSQL")){
 		const QByteArray tableSchema = GetTableScheme();
 		const QString schemaName = tableSchema.isEmpty() ? QStringLiteral("public") : tableSchema;
+
+		tableExistsQuery = QStringLiteral("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = '%1' AND table_name = '%2');")
+								.arg(schemaName, tableName);
+	}
+	else if (driverId.compare(QByteArrayLiteral("DUCKDB"), Qt::CaseInsensitive) == 0){
+		const QByteArray tableSchema = GetTableScheme();
+		const QString schemaName = tableSchema.isEmpty() ? QStringLiteral("main") : tableSchema;
 
 		tableExistsQuery = QStringLiteral("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = '%1' AND table_name = '%2');")
 								.arg(schemaName, tableName);
