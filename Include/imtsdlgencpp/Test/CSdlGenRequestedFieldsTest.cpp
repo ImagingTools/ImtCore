@@ -60,10 +60,13 @@ void AddItemFlags(FlagMap& flags, const QByteArray& prefix, const ItemRequestInf
 	flags[prefix + "info.tags.color"] = info.info.tags.isColorRequested;
 
 	flags[prefix + "data.data"] = info.data.isDataRequested;
+	flags[prefix + "data.dataField"] = info.data.isDataFieldRequested;
 	flags[prefix + "data.info"] = info.data.isInfoRequested;
 	flags[prefix + "data.label"] = info.data.isLabelRequested;
 	flags[prefix + "data.data.value"] = info.data.data.isValueRequested;
 	flags[prefix + "data.data.note"] = info.data.data.isNoteRequested;
+	flags[prefix + "data.dataField.value"] = info.data.dataField.isValueRequested;
+	flags[prefix + "data.dataField.note"] = info.data.dataField.isNoteRequested;
 	flags[prefix + "data.info.value"] = info.data.info.isValueRequested;
 	flags[prefix + "data.info.note"] = info.data.info.isNoteRequested;
 
@@ -218,6 +221,7 @@ void CSdlGenTest::TestRequestedFields_data()
 	QTest::newRow("same field name on neighbouring levels")
 				<< header + "{items {data {data {value} info {note}}}}}"
 				<< notTopLevelItems + GetUnsetItemFields("items.", {"data"}) + QByteArrayList{
+						"items.data.dataField",
 						"items.data.label",
 						"items.data.data.note",
 						"items.data.info.value"};
@@ -225,7 +229,16 @@ void CSdlGenTest::TestRequestedFields_data()
 	QTest::newRow("same field name on neighbouring levels, inner selected after sibling")
 				<< header + "{items {data {label info {value note} data {note}}}}}"
 				<< notTopLevelItems + GetUnsetItemFields("items.", {"data"}) + QByteArrayList{
+						"items.data.dataField",
 						"items.data.data.value"};
+
+	QTest::newRow("sibling with the fallback name of a nested struct")
+				<< header + "{items {data {data {value} dataField {note}}}}}"
+				<< notTopLevelItems + GetUnsetItemFields("items.", {"data"}) + QByteArrayList{
+						"items.data.info",
+						"items.data.label",
+						"items.data.data.note",
+						"items.data.dataField.value"};
 
 	QTest::newRow("self-nested type")
 				<< header + "{items {node {name childNodes {name childNodes {name}}}}}}"
@@ -310,6 +323,7 @@ void CSdlGenTest::TestRequestedFieldsWithComplexArguments()
 				"totalCount",
 				"notification",
 				"items.data.data",
+				"items.data.dataField",
 				"items.data.info"};
 	const QString errors = CompareFlags(GetFlags(itemsListRequest.GetRequestInfo()), expectedUnsetFlags);
 	QVERIFY2(errors.isEmpty(), qPrintable(errors));
@@ -330,6 +344,7 @@ void CSdlGenTest::TestRequestedFieldsOfMutation()
 
 	const QByteArrayList expectedUnsetFlags = GetUnsetItemFields(QByteArray(), {"name", "data", "node"}) + QByteArrayList{
 				"data.data",
+				"data.dataField",
 				"data.label",
 				"data.info.note",
 				"node.name",
@@ -394,6 +409,7 @@ void CSdlGenTest::TestRequestedFieldsOfBuiltRequest()
 				"items.info.owner.contact.phone",
 				"items.info.owner.contact.address.city",
 				"items.info.owner.contact.address.street",
+				"items.data.dataField",
 				"items.data.info",
 				"items.data.label",
 				"items.data.data.value"};

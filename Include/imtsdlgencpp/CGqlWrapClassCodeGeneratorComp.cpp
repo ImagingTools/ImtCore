@@ -286,7 +286,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlRe
 bool CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 	QTextStream& stream,
 	const imtsdl::CSdlField& sdlField,
-	const QString& parentStructName,
+	const QString& structName,
 	const QStringList& parentTypeIds,
 	uint hIndents,
 	bool createStructDefinition) const
@@ -304,15 +304,6 @@ bool CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 		SendErrorMessage(0, QStringLiteral("Field %1 is not custom. Only cutom field allowed").arg(sdlField.GetType()));
 
 		return false;
-	}
-
-	// a top-level field is written directly into the request info struct
-	QString structName = parentStructName;
-	if (createStructDefinition){
-		structName = sdlField.GetId() + QStringLiteral("RequestInfo");
-		if (structName == parentStructName){
-			structName = sdlField.GetId() + QStringLiteral("FieldRequestInfo");
-		}
 	}
 
 	if (createStructDefinition ){
@@ -357,9 +348,20 @@ bool CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 
 	// and finally create all custom types;
 	const QStringList typeIds = parentTypeIds + QStringList(sdlField.GetType());
+	// a nested struct name must differ from the enclosing struct and from all its siblings
+	QStringList usedStructNames(structName);
 	for (const imtsdl::CSdlField& customType: customTypes){
 		if (!typeIds.contains(customType.GetType())){
-			const bool isRequestInfoCreated = GenerateFieldRequestInfo(stream, customType, structName, typeIds, hIndents + 1, true);
+			QString nestedStructName = customType.GetId() + QStringLiteral("RequestInfo");
+			if (usedStructNames.contains(nestedStructName)){
+				nestedStructName = customType.GetId() + QStringLiteral("FieldRequestInfo");
+			}
+			for (int index = 2; usedStructNames.contains(nestedStructName); ++index){
+				nestedStructName = customType.GetId() + QStringLiteral("FieldRequestInfo") + QString::number(index);
+			}
+			usedStructNames << nestedStructName;
+
+			const bool isRequestInfoCreated = GenerateFieldRequestInfo(stream, customType, nestedStructName, typeIds, hIndents + 1, true);
 			if (!isRequestInfoCreated){
 				SendErrorMessage(0, QStringLiteral("Unable to create request info for type %1").arg(customType.GetType()));
 

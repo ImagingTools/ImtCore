@@ -59,10 +59,12 @@ type Leaf
 }
 
 
-# "data" is used on two neighbouring levels and is followed by a sibling object field
+# "data" is used on two neighbouring levels and is followed by a sibling object field,
+# "dataField" gets the nested struct name that the inner "data" falls back to
 type Wrapper
 {
 	data: Leaf
+	dataField: Leaf
 	info: Leaf
 	label: String
 }
