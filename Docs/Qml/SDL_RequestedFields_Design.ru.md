@@ -75,7 +75,7 @@ Inline components, JS-фабрики на экране и свойства ви�
 
 Правила структуры:
 
-1. Скаляр, enum и массив скаляров/enum представлены `bool <field>Requested: false`.
+1. Скаляр, enum и массив скаляров/enum представлены `bool <field>Requested` с binding к `selection.allScalarFieldsRequested`.
 2. Объект и массив объектов представлены `<ElementType>Fields <field>: null`.
 3. Ненулевая объектная выборка включает ветку. Отдельный `<field>Requested` для неё не нужен.
 4. Пустая вложенная выборка является ошибкой, а не командой запросить все поля.
@@ -83,6 +83,24 @@ Inline components, JS-фабрики на экране и свойства ви�
 6. Флаг `false` означает отсутствие поля в запросе, а не требование вернуть `null`.
 7. Обязательность SDL не включает клиентский флаг автоматически.
 8. Одноимённые типы в разных модулях разрешаются через существующие SDL-импорты.
+9. Общий `allScalarFieldsRequested` по умолчанию `false`; без его изменения скалярные флаги также остаются `false`.
+10. `allScalarFieldsRequested: true` включает все скалярные поля только текущего объекта; явное значение конкретного флага переопределяет его binding.
+
+Классификация определяется SDL-типом поля, а не значением ответа или QML-типом
+контейнера данных. Массив сам по себе не превращает скаляр в объект:
+
+| SDL-поле | Свойство в `Fields` | Действие `allScalarFieldsRequested` |
+| --- | --- | --- |
+| `String`, `ID`, числа, Boolean и поддержанные скалярные типы | `bool <field>Requested` | Включает поле |
+| Enum | `bool <field>Requested` | Включает поле |
+| `[String]`, `[ID]`, `[Enum]` | Один `bool <field>Requested` на массив | Включает поле без дочернего selection set |
+| Объект | `<Type>Fields <field>: null` | Не создаёт и не включает ветку |
+| Массив объектов | `<ElementType>Fields <field>: null` | Не создаёт и не включает ветку |
+| Union или массив union | `<UnionType>Fields <field>: null` | Не выбирает варианты union автоматически |
+
+Вложенные объекты, массивы объектов и варианты union имеют собственные выборки.
+Значение общего флага родителя не распространяется на них. Модификаторы `!` не
+меняют клиентское представление выборки.
 
 Для поля `isActive` имя флага получается `isActiveRequested`, без удвоения `is`.
 Для `GetTenantPayload` не генерируется `idRequested`: у этого типа нет SDL-поля `id`.
@@ -407,6 +425,7 @@ QtObject {
     id: root
 
     property string sdlTypeName: ""
+    property bool allScalarFieldsRequested: false
 
     function getGqlFields(path, ancestors){
         let fieldPath = path === undefined ? root.sdlTypeName : path
@@ -478,7 +497,7 @@ GqlRequestedFields {
     sdlTypeName: "GetTenantPayload"
 
     property TenantDataFields tenant: null
-    property bool errorMessageRequested: false
+    property bool errorMessageRequested: selection.allScalarFieldsRequested
 
     function appendGqlFields(result, path, ancestors){
         selection.addObject(result, "tenant", selection.tenant, path, ancestors)
@@ -500,21 +519,21 @@ GqlRequestedFields {
 
     sdlTypeName: "TenantData"
 
-    property bool idRequested: false
-    property bool nameRequested: false
-    property bool descriptionRequested: false
-    property bool ownerIdRequested: false
-    property bool creatorIdRequested: false
-    property bool isActiveRequested: false
-    property bool createdAtRequested: false
-    property bool updatedAtRequested: false
-    property bool currentUserIdRequested: false
-    property bool currentUserOrganizationPermissionsRequested: false
+    property bool idRequested: selection.allScalarFieldsRequested
+    property bool nameRequested: selection.allScalarFieldsRequested
+    property bool descriptionRequested: selection.allScalarFieldsRequested
+    property bool ownerIdRequested: selection.allScalarFieldsRequested
+    property bool creatorIdRequested: selection.allScalarFieldsRequested
+    property bool isActiveRequested: selection.allScalarFieldsRequested
+    property bool createdAtRequested: selection.allScalarFieldsRequested
+    property bool updatedAtRequested: selection.allScalarFieldsRequested
+    property bool currentUserIdRequested: selection.allScalarFieldsRequested
+    property bool currentUserOrganizationPermissionsRequested: selection.allScalarFieldsRequested
     property TenantMemberEntryFields members: null
     property TenantInvitationEntryFields pendingInvitations: null
-    property bool tenantPermissionsRequested: false
-    property bool parentTenantIdRequested: false
-    property bool isSystemTenantRequested: false
+    property bool tenantPermissionsRequested: selection.allScalarFieldsRequested
+    property bool parentTenantIdRequested: selection.allScalarFieldsRequested
+    property bool isSystemTenantRequested: selection.allScalarFieldsRequested
 
     function appendGqlFields(result, path, ancestors){
         selection.addScalar(result, "id", selection.idRequested)
@@ -547,8 +566,8 @@ GqlRequestedFields {
 
     sdlTypeName: "TenantMemberEntry"
 
-    property bool idRequested: false
-    property bool nameRequested: false
+    property bool idRequested: selection.allScalarFieldsRequested
+    property bool nameRequested: selection.allScalarFieldsRequested
 
     function appendGqlFields(result, path, ancestors){
         selection.addScalar(result, "id", selection.idRequested)
@@ -568,14 +587,14 @@ GqlRequestedFields {
 
     sdlTypeName: "TenantInvitationEntry"
 
-    property bool idRequested: false
-    property bool userIdRequested: false
-    property bool userNameRequested: false
-    property bool statusRequested: false
-    property bool invitedByUserIdRequested: false
-    property bool invitedByNameRequested: false
-    property bool createdAtRequested: false
-    property bool expiresAtRequested: false
+    property bool idRequested: selection.allScalarFieldsRequested
+    property bool userIdRequested: selection.allScalarFieldsRequested
+    property bool userNameRequested: selection.allScalarFieldsRequested
+    property bool statusRequested: selection.allScalarFieldsRequested
+    property bool invitedByUserIdRequested: selection.allScalarFieldsRequested
+    property bool invitedByNameRequested: selection.allScalarFieldsRequested
+    property bool createdAtRequested: selection.allScalarFieldsRequested
+    property bool expiresAtRequested: selection.allScalarFieldsRequested
 
     function appendGqlFields(result, path, ancestors){
         selection.addScalar(result, "id", selection.idRequested)
@@ -735,6 +754,117 @@ GqlSdlRequestSender {
 
 ## 9. Вложенность, динамические флаги и особые типы
 
+### Все скалярные поля без перечисления
+
+Общий флаг позволяет не перечислять десятки однотипных полей. Он объявляется в
+`GqlRequestedFields` один раз, а сгенерированные скалярные bool-свойства привязаны
+к нему через `id` своего объекта. Сборщик по-прежнему читает конечное значение
+каждого флага, а не выполняет `allScalarFieldsRequested || fieldRequested`:
+такое OR-выражение сломало бы явные исключения `false`.
+
+У `TenantMemberEntry` сейчас два скалярных поля, но тот же пример будет работать
+без изменений при добавлении новых скалярных полей в SDL.
+
+Запросить все поля `members`, не раскрывая другие ветки tenant:
+
+```qml
+TenantDataFields {
+    idRequested: true
+    nameRequested: true
+
+    members: TenantMemberEntryFields {
+        allScalarFieldsRequested: true
+    }
+}
+```
+
+Получится:
+
+```graphql
+tenant {
+    id
+    name
+    members { id name }
+}
+```
+
+Вообще не запрашивать `members`:
+
+```qml
+TenantDataFields {
+    idRequested: true
+    nameRequested: true
+}
+```
+
+Это эквивалентно явному `members: null` и формирует `tenant { id name }`.
+`members: TenantMemberEntryFields {}` без выбранных флагов всё ещё является
+ошибкой пустой выборки; для выбора всех полей нужен явный общий флаг.
+
+Все скалярные поля приглашения, кроме дат:
+
+```qml
+TenantInvitationEntryFields {
+    allScalarFieldsRequested: true
+
+    createdAtRequested: false
+    expiresAtRequested: false
+}
+```
+
+Если эта выборка подключена как `pendingInvitations`, получится:
+
+```graphql
+pendingInvitations {
+    id
+    userId
+    userName
+    status
+    invitedByUserId
+    invitedByName
+}
+```
+
+Общий флаг может быть `false`, а отдельный флаг `true`: это обычная точечная
+выборка. Явное значение или binding конкретного поля заменяет его стандартный
+binding к общему флагу. При программном присваивании этот binding тоже снимается;
+для возврата к исходным настройкам можно пересоздать объект выборки. Переключение
+общего флага не должно отменять явно заданные исключения.
+
+Новое скалярное поле SDL автоматически попадёт в выборку с общим флагом `true`.
+Это сознательный контракт «все скалярные поля», а не бесплатная оптимизация:
+скаляр тоже может требовать дорогого вычисления. Для чувствительных списков
+остаётся предпочтительной явная выборка необходимых полей.
+
+### Массивы скаляров и объектов
+
+```qml
+TenantDataFields {
+    allScalarFieldsRequested: true
+    tenantPermissionsRequested: false
+
+    members: TenantMemberEntryFields {
+        allScalarFieldsRequested: true
+    }
+}
+```
+
+Это выбирает все скалярные поля tenant, включая массив
+`currentUserOrganizationPermissions: [ID]`, но исключает массив
+`tenantPermissions`. Поле `members` получает свою выборку всех скаляров,
+а `pendingInvitations` остаётся `null` и не включается в запрос.
+
+Для скалярного массива нет bool-флагов на каждый элемент и нет дочернего блока
+GraphQL. Для массива объектов одна выборка применяется ко всем элементам.
+Размер массива, пустой массив, значение `null` и допустимость nullable-элементов
+ответа не влияют на выборку: она строится до получения данных.
+
+Модификаторы `[Type]`, `[Type!]`, `[Type]!` и `[Type!]!` отличаются требованиями
+к данным, но не способом выбора полей. В существующем генераторе данные массивов
+скаляров/enum представлены `var`, а объектов/union - `BaseModel`; в `Fields`
+модель массива создавать не нужно. Проверки nullable-значений ответа остаются
+ответственностью существующей десериализации, не общего флага выборки.
+
 ### Реактивные флаги
 
 Обычные bool-свойства могут использовать bindings. Например, расширенные сведения
@@ -760,7 +890,8 @@ Sender читает текущее дерево при каждом `send()`. И
 ### Рекурсивные типы
 
 Для SDL `TreeNode { name: String childNodes: [TreeNode] }` генерируется один
-`TreeNodeFields` с `nameRequested: false` и `TreeNodeFields childNodes: null`.
+`TreeNodeFields` с `nameRequested`, привязанным к `allScalarFieldsRequested`,
+и `TreeNodeFields childNodes: null`. Общий флаг по умолчанию `false`.
 Конечная выборка двух уровней описывается обычной вложенностью:
 
 ```qml
@@ -779,6 +910,8 @@ TreeNodeFields {
 это запретило бы корректные запросы конечной глубины. Проверяется цикл объектов
 выборки по идентичности экземпляра на текущем пути, а не повтор имени типа.
 Общий дочерний объект в двух независимых ветках не считается циклом.
+`allScalarFieldsRequested: true` на рекурсивном типе выбирает только его
+скаляры: он не создаёт `childNodes` и не запускает рекурсивное раскрытие.
 
 В #942 серверное `RequestInfo` не раскрывает повтор типа на пути. Следовательно,
 сформировать конечный рекурсивный GraphQL-запрос клиент может, но получить точные
@@ -795,10 +928,10 @@ TreeNodeFields {
 ```qml
 ContentFields {
     textContent: TextContentFields {
-        textRequested: true
+        allScalarFieldsRequested: true
     }
     imageContent: ImageContentFields {
-        urlRequested: true
+        allScalarFieldsRequested: true
     }
 }
 ```
@@ -817,11 +950,42 @@ content {
 выбрать конкретный тип. Отсутствие выбранных вариантов считается ошибкой даже при
 автоматически добавленном `__typename`.
 
+У union нет собственного набора обычных скалярных полей. Его общий флаг не
+выбирает все варианты и не передаётся им. Чтобы запросить все скаляры каждого
+варианта, нужно явно объявить каждый вариант и включить флаг внутри него, как
+в примере. Вложенные объекты этих вариантов по-прежнему выбираются отдельно;
+исключения конкретных скаляров работают так же, как у других `*Fields`.
+
+Для `content: Content` и `content: [Content]` используются один и тот же
+`ContentFields` и одинаковый GraphQL selection set. Во втором случае
+`__typename` нужен для каждого ненулевого элемента ответа, а не для контейнера
+массива. Не объявленный вариант не получает фрагмент; если сервер вернёт такой
+конкретный тип, выборка предоставит только `__typename`, без полей других типов.
+
 В JS-сборщике сейчас нет структурного API для inline fragments. Его надо добавить
 отдельно; нельзя выдавать приведённый union-пример за работающий с текущим runtime.
 И нельзя кодировать фрагмент строкой, подставляемой вместо обычного имени поля.
 Серверный генератор также не строит вложенные bool-флаги вариантов union: выборка
 вариантов не означает, что #942 уже обеспечивает их детальное вычисление по флагам.
+
+### Что уже поддерживается, а что требует доработки
+
+| Часть механизма | Состояние существующей реализации |
+| --- | --- |
+| Классификация enum и массивов | QML-генератор уже различает enum, скалярные массивы и массивы объектов; `Fields` должен использовать SDL-классификацию |
+| Выборка скаляров и вложенных объектов | Текущий JS-сериализатор умеет собирать такие `GqlObject`; генерация `*Fields` и интеграция sender ещё нужны |
+| `allScalarFieldsRequested` и исключения | Новое свойство общего builder и новые bindings сгенерированных флагов; сейчас в runtime этого API нет |
+| Ответы union и массивов union | `BaseClass.fromObject()` и сгенерированные `createComponent()`/`createElement()` используют `__typename` для выбора типа |
+| Inline fragments в C++ | C++-сборщик уже поддерживает `... on Type` |
+| Inline fragments в JS/web | Нужен структурный API фрагментов в `GraphQLRequest.js` |
+| Детальные серверные флаги union | #942 отслеживает само поле, но не создаёт вложенные флаги полей вариантов |
+| Обязательные серверные поля | Их флаги остаются `true` независимо от клиентской выборки |
+| Глубокие рекурсивные серверные флаги | Повтор типа на пути не раскрывается в текущем `RequestInfo` |
+
+Поддержка выбора и десериализации не равна гарантии серверной проекции и
+вычисления только выбранных данных. Union-фрагменты, обязательные поля и
+рекурсивные типы требуют отдельных интеграционных проверок; смену конкретного
+union-типа между ответами тоже нужно проверить с новым жизненным циклом payload.
 
 ### Коллекции с динамическими колонками
 
@@ -851,6 +1015,7 @@ sender и сериализации запроса без объектного se
 7. Обновить списки выходных файлов/зависимостей сборки; новые файлы должны попадать и в Qt, и в web-сборку.
 8. Добавить общий `GqlRequestedFields` в ресурсы и `qmldir` модуля `imtguigql`.
 9. Проверять коллизии имён до записи файлов.
+10. Генерировать binding каждого скалярного флага к общему `allScalarFieldsRequested`, а не константу `false`; объектные ветки оставлять `null`.
 
 Пример новых записей `qmldir` для модуля tenants:
 
@@ -864,7 +1029,8 @@ TenantInvitationEntryFields 1.0 TenantInvitationEntryFields.qml
 Нельзя молча перезаписать настоящий SDL-тип `TenantDataFields`, если он уже есть.
 Аналогично поле `membersRequested` в схеме может столкнуться с флагом, производным
 от другого поля `members`. Коллизия со служебными именами базового builder или
-QML-идентификаторами тоже требует явной ошибки генерации. Автоматический
+общим `allScalarFieldsRequested` или QML-идентификаторами тоже требует явной
+ошибки генерации. Автоматический
 непредсказуемый rename не должен менять публичный API незаметно.
 
 Реализация должна обходить зависимости с учётом типов, общих для нескольких
@@ -888,10 +1054,15 @@ QML-идентификаторами тоже требует явной ошиб
 а не только по числу выбранных скаляров. Предложенные примеры не являются
 бенчмарком и не доказывают конкретный выигрыш времени.
 
+Общий флаг добавляет одно bool-свойство на объект выборки и bindings его
+скалярных флагов. Они существуют только в `*Fields`, а не в каждой строке ответа.
+Нельзя оптимизировать сборку веткой «общий флаг true - вывести все поля» и
+пропустить проверку отдельных флагов: это проигнорирует явные исключения.
+
 Сборку можно ускорять после измерений, но не путём глобального mutable singleton
 выборки: два sender с разными полями не должны влиять друг на друга. Кэширование
-в рамках sender допустимо только с надёжной инвалидизацией при изменении любого
-флага, дочерней ветки и `sdlObjectComp`.
+в рамках sender допустимо только с надёжной инвалидизацией при изменении
+`allScalarFieldsRequested`, любого отдельного флага, дочерней ветки и `sdlObjectComp`.
 
 Для v3 используются обычные внешние QML-типы, `QtObject`, простые свойства,
 методы и явные `id`. Не нужны `component Fields: QtObject`, вложенные имена типов
@@ -900,6 +1071,8 @@ QML-идентификаторами тоже требует явной ошиб
 При этом совместимость нельзя считать проверенной по виду синтаксиса. Нужны
 компиляция и runtime-проверка Qt и v3, особенно для nullable-рекурсивных ссылок,
 импортов сгенерированных типов и вызова переопределённого `appendGqlFields()`.
+Для общего флага отдельно проверяются bindings к унаследованному свойству,
+их явное переопределение на экране и переключение значения между отправками.
 
 ## 12. Миграция и проверки реализации
 
@@ -922,6 +1095,11 @@ QML-идентификаторами тоже требует явной ошиб
 | --- | --- |
 | Несколько корневых полей | Каждый `GqlObject` добавлен отдельно; нет обёртки с именем команды |
 | Только скаляры, enum, массив ID | Выводятся обычные имена полей без дочернего блока |
+| Общий флаг по умолчанию | Все скалярные флаги `false`, все объектные ветки `null` |
+| Общий флаг `true` | Выбраны все скаляры, enum и массивы скаляров/enum текущего типа |
+| Общий флаг с исключением `false` | Исключённое поле отсутствует даже при общем флаге `true` |
+| Общий флаг родителя | Не включает дочерние объекты, массивы объектов и варианты union |
+| Переключение общего флага | Меняет флаги с сохранёнными bindings; не отменяет явные значения и bindings поля |
 | Вложенный объект и массив объектов | Правильные блоки выборки на каждом уровне |
 | Поле с тем же именем, что и родитель | Сборка не обрывается; выбираются и соседние поля |
 | Флаг выключен / ветка `null` | Поле отсутствует в тексте запроса |
@@ -936,6 +1114,9 @@ QML-идентификаторами тоже требует явной ошиб
 | Обработчики payload | `Component.onCompleted` до HTTP, `onFinished` после заполнения ответа |
 | Сериализация/копирование данных | Флаги и вложенные `*Fields` не появляются в JSON данных |
 | Union | `__typename` и inline fragments после отдельного расширения runtime |
+| Массив union | Та же выборка вариантов; правильный конкретный тип каждого элемента по `__typename` |
+| Union с общим флагом вариантов | Все скаляры выбранных вариантов с учётом исключений; вложенные объекты не раскрываются |
+| Рекурсивный тип с общим флагом | Выбраны скаляры текущего уровня без создания рекурсивных веток |
 | Qt и v3 | Одинаковый запрос; корректные импорты, ресурсы и работа bindings |
 
 Клиентские запросы для поддержанных нерекурсивных типов нужно прогнать через
@@ -947,7 +1128,10 @@ QML-идентификаторами тоже требует явной ошиб
 
 Экран объявляет `requestedFields: GetTenantPayloadFields { ... }` внутри
 `GetTenantPayload` в `sdlObjectComp`. Все флаги и вложенность определены SDL и
-задаются короткими обычными QML-свойствами. Данные ответа остаются в `m_*`,
+задаются короткими обычными QML-свойствами. `allScalarFieldsRequested` позволяет
+выбрать все скаляры текущего типа без перечисления с явными исключениями;
+объекты, массивы объектов и варианты union по-прежнему объявляются отдельно.
+Данные ответа остаются в `m_*`,
 выборка живёт отдельно, новые файлы не создают дополнительных моделей на каждую
 строку. Sender собирает выборку до отправки и заполняет тот же pending payload
 после ответа. Документ фиксирует этот целевой контракт, но не заявляет, что он
