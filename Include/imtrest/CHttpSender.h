@@ -19,7 +19,7 @@ class CHttpSender: public QObject, virtual public ITransport
 public:
 	CHttpSender(QAbstractSocket* tcpSocketPtr);
 	// reimplemented (ITransport)
-	virtual bool SendData(QByteArray& data) const override;
+	virtual bool SendData(const QByteArray& data) const override;
 
 	/*!
 		Assemble the full HTTP wire bytes (status line, headers, Content-Length/Content-Type, body)
