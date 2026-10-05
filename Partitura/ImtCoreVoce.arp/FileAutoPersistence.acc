@@ -101,5 +101,7 @@
     <ExportedInterfaces/>
     <ExportedComponents>
         <Component ExportedId="AutoPersistence" ComponentId="AutoPersistence"/>
+        <Component ExportedId="FileLoader" ComponentId="CompactXmlFileSerializer"/>
+        <Component ExportedId="FilePath" ComponentId="PreferencesFilePath"/>
     </ExportedComponents>
 </Acf>

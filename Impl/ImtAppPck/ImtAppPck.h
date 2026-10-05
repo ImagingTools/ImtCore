@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtapp/CBackupSettingsComp.h>
 #include <imtapp/CSchedulerParamsComp.h>
+#include <imtapp/CSettingsFileRestartComp.h>
 
 
 /**
@@ -16,6 +17,7 @@ namespace ImtAppPck
 
 typedef imtapp::CBackupSettingsComp BackupSettings;
 typedef imtapp::CSchedulerParamsComp SchedulerParams;
+typedef imtapp::CSettingsFileRestartComp SettingsFileRestart;
 
 
 } // namespace ImtAppPck

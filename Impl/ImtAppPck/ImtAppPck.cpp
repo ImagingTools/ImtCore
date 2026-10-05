@@ -25,6 +25,11 @@ I_EXPORT_COMPONENT(
 			"Scheduler params",
 			"Scheduler Params");
 
+I_EXPORT_COMPONENT(
+			SettingsFileRestart,
+			"Restarts the application when its settings file was changed by another process",
+			"Settings File Restart Application");
+
 
 } // namespace ImtAppPck
 
