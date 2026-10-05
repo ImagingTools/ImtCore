@@ -34,9 +34,20 @@ Item {
 	*/
 	signal finished(int result);
 	
-	function openDialog(comp, parameters, mode, callback){
+	function openDialog(comp, parameters, mode, callback, parentWindow){
 		let dialogMode = mode !== undefined ? mode : Style.dialogMode !== undefined ? Style.dialogMode: "Internal";
-		
+
+		let dialogModel
+		if(!parentWindow){
+			dialogModel = modalDialogModels
+		}
+		else if(parentWindow.dialogManagerView){
+			dialogModel = parentWindow.dialogManagerView.dialogsModel
+		}
+		else {
+			dialogModel = modalDialogModels
+		}
+
 		/*for Windows style dialogs*/
 		if(dialogMode == "External"){
 			container.openWindow(comp, parameters);
@@ -46,33 +57,59 @@ Item {
 				dialogCallback[comp] = callback;
 			}
 			
-			modalDialogModels.append({"Component": comp, "Parameters": parameters});
+			dialogModel.append({"Component": comp, "Parameters": parameters});
 		}
 	}
+
+	function openDialogInView(comp, parameters, parentWindow){
+		parentWindow.dialogManagerView.dialogsModel.append({"Component": comp, "Parameters": parameters});
+	}
 	
-	function closeDialog(index){
+	function closeDialog(index, parentWindow){
+		let dialogModel
+		if(!parentWindow){
+			dialogModel = modalDialogModels
+		}
+		else if(parentWindow.dialogManagerView){
+			dialogModel = parentWindow.dialogManagerView.dialogsModel
+		}
+		else {
+			dialogModel = modalDialogModels
+		}
+
 		if (!index){
 			index = -1;
-			
-			if (modalDialogModels.count > 0){
-				index = modalDialogModels.count - 1;
+
+			if (dialogModel.count > 0){
+				index = dialogModel.count - 1;
 			}
 		}
 		
-		if (index >= 0 && index < modalDialogModels.count){
-			let c = modalDialogModels.get(index).Component;
+		if (index >= 0 && index < dialogModel.count){
+			let c = dialogModel.get(index).Component;
 			itemUuidList.splice(index,1);
 			delete dialogCallback[c];
 			
-			modalDialogModels.remove(index);
+			dialogModel.remove(index);
 		}
 	}
 	
-	function closeByComp(comp){
-		for (let i = 0; i < modalDialogModels.count; i++){
-			let c = modalDialogModels.get(i).Component;
+	function closeByComp(comp, parentWindow){
+		let dialogModel
+		if(!parentWindow){
+			dialogModel = modalDialogModels
+		}
+		else if(parentWindow.dialogManagerView){
+			dialogModel = parentWindow.dialogManagerView.dialogsModel
+		}
+		else {
+			dialogModel = modalDialogModels
+		}
+
+		for (let i = 0; i < dialogModel.count; i++){
+			let c = dialogModel.get(i).Component;
 			if (c && c === comp){
-				modalDialogModels.remove(i);
+				dialogModel.remove(i);
 				itemUuidList.splice(i,1);
 				delete dialogCallback[c];
 				
@@ -82,12 +119,23 @@ Item {
 		
 		return false;
 	}
-	function closeByUuid(uuid){
+	function closeByUuid(uuid, parentWindow){
+		let dialogModel
+		if(!parentWindow){
+			dialogModel = modalDialogModels
+		}
+		else if(parentWindow.dialogManagerView){
+			dialogModel = parentWindow.dialogManagerView.dialogsModel
+		}
+		else {
+			dialogModel = modalDialogModels
+		}
+
 		for (let i = 0; i < itemUuidList.length; i++){
 			let uuidCurr = itemUuidList[i]
 			if(uuidCurr == uuid){
-				let c = modalDialogModels.get(i).Component;
-				modalDialogModels.remove(i);
+				let c = dialogModel.get(i).Component;
+				dialogModel.remove(i);
 				delete dialogCallback[c];
 				itemUuidList.splice(i,1);
 				return true;
@@ -98,9 +146,20 @@ Item {
 		return false;
 	}
 	
-	function dialogIsOpened(dialogComp){
-		for (let i = 0; i < modalDialogModels.count; i++){
-			let c = modalDialogModels.get(i).Component;
+	function dialogIsOpened(dialogComp, parentWindow){
+		let dialogModel
+		if(!parentWindow){
+			dialogModel = modalDialogModels
+		}
+		else if(parentWindow.dialogManagerView){
+			dialogModel = parentWindow.dialogManagerView.dialogsModel
+		}
+		else {
+			dialogModel = modalDialogModels
+		}
+
+		for (let i = 0; i < dialogModel.count; i++){
+			let c = dialogModel.get(i).Component;
 			if (c && c === dialogComp){
 				return true;
 			}

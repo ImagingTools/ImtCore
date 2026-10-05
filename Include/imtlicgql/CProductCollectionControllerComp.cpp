@@ -4,6 +4,7 @@
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <iprm/CParamsSet.h>
+#include <idoc/IDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
@@ -138,7 +139,12 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isTypeIdRequested){
-		representationObject.typeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
+		QByteArray typeId = objectCollectionIterator.GetObjectTypeId();
+		if (typeId.isEmpty()){
+			typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
+		}
+
+		representationObject.typeId = typeId;
 	}
 
 	if (requestInfo.items.isProductIdRequested){
@@ -154,7 +160,17 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isDescriptionRequested){
-		QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::ElementInfoType::EIT_DESCRIPTION).toString();
+		// Same lookup order as the collection's EIT_DESCRIPTION, but from the already fetched record
+		QString description;
+		idoc::MetaInfoPtr collectionMetaInfoPtr = objectCollectionIterator.GetCollectionMetaInfo();
+		if (collectionMetaInfoPtr.IsValid()){
+			description = collectionMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
+		}
+
+		if (description.isEmpty() && metaInfo.IsValid()){
+			description = metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
+		}
+
 		representationObject.description = description;
 	}
 

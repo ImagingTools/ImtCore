@@ -18,7 +18,7 @@ DecoratorBase {
     Rectangle {
         anchors.fill: parent;
 
-        color: Style.baseColor;
+        color: Style.topPanelBackgroundColor;
     }
 
     Rectangle {
@@ -27,8 +27,7 @@ DecoratorBase {
         anchors.bottom: parent.bottom;
 
         height: 1;
-        opacity: 0.5;
-        color: Style.borderColor;
+        color: Style.topPanelBorderColor;
     }
 
     // The panel is handed down so the corner can measure itself against the bar

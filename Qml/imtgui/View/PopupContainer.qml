@@ -23,6 +23,8 @@ Item {
 		Rectangle {
 			id: defaultDelegateRoot
 
+			objectName: "PopupMessage"
+
 			property string messageId: ""
 			property string messageType: ""
 			property string messageText: ""
@@ -51,7 +53,7 @@ Item {
 
 			width: parent ? parent.width : Style.sizeHintS
 			height: Math.max(Style.sizeHintBXS, contentRow.height + 2 * Style.marginL)
-			radius: Style.radiusM + 2
+			radius: Style.radiusM
 			color: defaultDelegateRoot.panelColor
 			border.width: 1
 			border.color: Style.borderColor

@@ -29,6 +29,13 @@ QtObject {
 	id: root
 
 	property string permissionPath: ""
+	property string context: ""
+
+	// Password policy for the profile's password section (imtauthgui owns no GQL).
+	property GqlBasedPasswordPolicyProvider passwordPolicy: GqlBasedPasswordPolicyProvider {
+		context: root.context
+	}
+
 	readonly property string __userId: AuthorizationController.userTokenProvider.userId
 	readonly property string __productId: AuthorizationController.productId
 

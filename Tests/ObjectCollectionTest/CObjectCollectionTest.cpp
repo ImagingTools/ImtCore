@@ -7,9 +7,9 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtauth/CAccountInfo.h>
-#include <imtauth/CAccountInfoMetaInfo.h>
-#include <imtauth/IAccountInfo.h>
+#include <imtaccount/CAccountInfo.h>
+#include <imtaccount/CAccountInfoMetaInfo.h>
+#include <imtaccount/IAccountInfo.h>
 
 
 void CObjectCollectionTest::initTestCase()
@@ -127,7 +127,7 @@ void CObjectCollectionTest::CheckSerializeTest()
 			// get data from object and compare with input data
 			imtbase::IObjectCollection::DataPtr inputDataPtr;
 			if (objectCollectionPtr->GetObjectData("{98c7bd83-2541-427a-a9d2-2427e1d32618}", inputDataPtr)){
-				imtauth::CAccountInfo* inputImplPtr = dynamic_cast<imtauth::CAccountInfo*>(inputDataPtr.GetPtr());
+				imtaccount::CAccountInfo* inputImplPtr = dynamic_cast<imtaccount::CAccountInfo*>(inputDataPtr.GetPtr());
 				QString nameAccount = inputImplPtr->GetAccountName();
 				QString descriptionAccount = inputImplPtr->GetAccountDescription();
 				QVERIFY2(((nameAccount == "AccountName") && (descriptionAccount == "AccountDescription")), "Serialize data from file in ibject collection is failed");

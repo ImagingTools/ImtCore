@@ -34,7 +34,7 @@ Doc.DocumentCollectionFilter {
 	}
 
 	function isEmpty(){
-		return m_documentId === "" && m_documentStates.length === 0
+		return m_documentId === "" && (!hasDocumentStates() || m_documentStates.length === 0)
 	}
 }
 

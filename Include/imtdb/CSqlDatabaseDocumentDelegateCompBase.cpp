@@ -2080,11 +2080,11 @@ QByteArray CSqlDatabaseDocumentDelegateCompBase::GetObjectSelectionQuery(const Q
 			root1."TimeStamp" AS "Added"
 		FROM %1 "%2" AS root
 		LEFT JOIN %1 "%2" AS root1
-			ON root1."%3" = root."%3"
-		   AND %6 = 1
-		WHERE (%2)
-		  AND root."%3" = '%4'
-		ORDER BY %5 DESC;
+			ON root1."%4" = root."%4"
+		   AND %7 = 1
+		WHERE (%3)
+		  AND root."%4" = '%5'
+		ORDER BY %6 DESC;
 	)")
 				.arg(
 					/*1*/ schemaPrefix,

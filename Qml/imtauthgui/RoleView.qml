@@ -162,6 +162,7 @@ ViewBase {
 
 	MultiPageView {
 		id: multiPageView
+		objectName: "RoleEditorPages"
 		anchors.fill: parent
 		panelWidth: Style.sizeHintXXS
 

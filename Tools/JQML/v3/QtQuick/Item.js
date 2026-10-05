@@ -44,6 +44,7 @@ class Item extends QtObject {
         activeFocus: { type: Bool, value: false},
         clip: { type: Bool, value: false},
         activeFocusOnTab: { type: Bool, value: false},
+        JQOpacityMultiplier: { type: Real, value: 1},
 
         Layout: {type:Layout},
 
@@ -83,6 +84,7 @@ class Item extends QtObject {
         activeFocusChanged: {type:Signal, args:[]},
         clipChanged: {type:Signal, args:[]},
         activeFocusOnTabChanged: {type:Signal, args:[]},
+        JQOpacityMultiplierChanged: {type:Signal, args:[]},
 
         'Keys.asteriskPressed': {type:Signal, args: ['event'] },
         'Keys.backPressed': {type:Signal, args: ['event'] },
@@ -137,6 +139,8 @@ class Item extends QtObject {
 
         dom.qml = obj
         obj.__connectDOM(this.parent)
+
+        obj.JQOpacityMultiplier = ()=>{return obj.parent ? obj.parent.JQOpacityMultiplier * obj.opacity : obj.opacity}
 
         return obj
     }
@@ -281,6 +285,13 @@ class Item extends QtObject {
                 return
             }
 
+            // forceActiveFocus() assigns focus to this item and ancestor
+            // FocusScopes in one batch. Those intermediate assignments must
+            // not claim the focus tree — Qt keeps the original item as owner.
+            if(JQApplication.focusTreeSuppressed){
+                return
+            }
+
             let tree = this.__getTree()
             let accepted = JQApplication.setFocusTree(tree, {
                 owner: this,
@@ -314,12 +325,22 @@ class Item extends QtObject {
     }
 
     forceActiveFocus(){
-        if(this.parent instanceof JQModules.QtQuick.FocusScope){
-            this.parent.focus = true
-        }
+        JQApplication.focusTreeSuppressed++
+        try {
+            // Qt: setFocus(this) first, then ancestor FocusScopes.
+            if(!this.focus){
+                this.focus = true
+            }
 
-        if(!this.focus){
-            this.focus = true
+            let parent = this.parent
+            while(parent){
+                if(parent instanceof JQModules.QtQuick.FocusScope){
+                    parent.focus = true
+                }
+                parent = parent.parent
+            }
+        } finally {
+            JQApplication.focusTreeSuppressed--
         }
 
         JQApplication.setFocusTree(this.__getTree(), {
@@ -338,23 +359,6 @@ class Item extends QtObject {
         }
 
         return tree
-    }
-
-    __setFocusTree(tree){
-        for(let child of this.children){
-            if(tree.indexOf(child) < 0){
-                if(!(typeof child.__isListViewDelegateItem === 'function' && child.__isListViewDelegateItem())){
-                    child.focus = false
-                }
-            }
-
-            // Don't recurse into FocusScopes — they manage their own children's
-            // internal focus state. In Qt, items inside a FocusScope don't fire
-            // focusChanged when the scope loses focus.
-            if(!(child instanceof JQModules.QtQuick.FocusScope)){
-                child.__setFocusTree(tree)
-            }
-        }
     }
 
     SLOT_parentChanged(oldValue, newValue){

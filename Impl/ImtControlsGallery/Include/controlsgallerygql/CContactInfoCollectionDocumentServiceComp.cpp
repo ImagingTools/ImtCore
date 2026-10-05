@@ -6,7 +6,7 @@
 // ImtCore includes
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
 #include <imtbase/IObjectCollectionIterator.h>
-#include <imtauth/IContactInfo.h>
+#include <imtaccount/IContactInfo.h>
 
 // ControlsGallery includes
 #include <controlsgallerysdl/SDL/1.0/CPP/ContactInfoCollectionDocumentService.h>
@@ -38,15 +38,15 @@ sdl::V1_0::controlsgallery::CContactInfoData CContactInfoCollectionDocumentServi
 		return sdl::V1_0::controlsgallery::CContactInfoData();
 	}
 
-	imtauth::IContactInfo* contactInfoPtr = dynamic_cast<imtauth::IContactInfo*>(documentPtr.GetPtr());
+	imtaccount::IContactInfo* contactInfoPtr = dynamic_cast<imtaccount::IContactInfo*>(documentPtr.GetPtr());
 	if (contactInfoPtr == nullptr){
 		return sdl::V1_0::controlsgallery::CContactInfoData();
 	}
 
 	sdl::V1_0::controlsgallery::CContactInfoData response;
 
-	response.firstName = contactInfoPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
-	response.lastName = contactInfoPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME);
+	response.firstName = contactInfoPtr->GetNameField(imtaccount::IContactInfo::NFT_FIRST_NAME);
+	response.lastName = contactInfoPtr->GetNameField(imtaccount::IContactInfo::NFT_LAST_NAME);
 	response.email = contactInfoPtr->GetEmail();
 
 	return response;
@@ -79,7 +79,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CContactInfoCollectionDocumentServi
 		return response;
 	}
 
-	imtauth::IContactInfo* contactInfoPtr = dynamic_cast<imtauth::IContactInfo*>(documentPtr.GetPtr());
+	imtaccount::IContactInfo* contactInfoPtr = dynamic_cast<imtaccount::IContactInfo*>(documentPtr.GetPtr());
 	if (contactInfoPtr == nullptr){
 		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
@@ -88,11 +88,11 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CContactInfoCollectionDocumentServi
 	istd::CChangeGroup changeGroup(contactInfoPtr);
 
 	if (contactInfo.firstName){
-		contactInfoPtr->SetNameField(imtauth::IContactInfo::NFT_FIRST_NAME, *contactInfo.firstName);
+		contactInfoPtr->SetNameField(imtaccount::IContactInfo::NFT_FIRST_NAME, *contactInfo.firstName);
 	}
 
 	if (contactInfo.lastName){
-		contactInfoPtr->SetNameField(imtauth::IContactInfo::NFT_LAST_NAME, *contactInfo.lastName);
+		contactInfoPtr->SetNameField(imtaccount::IContactInfo::NFT_LAST_NAME, *contactInfo.lastName);
 	}
 
 	if (contactInfo.email){
@@ -125,7 +125,7 @@ sdl::V1_0::controlsgallery::CEmailData CContactInfoCollectionDocumentServiceComp
 		return response;
 	}
 
-	imtauth::IContactInfo* contactInfoPtr = dynamic_cast<imtauth::IContactInfo*>(documentPtr.GetPtr());
+	imtaccount::IContactInfo* contactInfoPtr = dynamic_cast<imtaccount::IContactInfo*>(documentPtr.GetPtr());
 	if (contactInfoPtr == nullptr){
 		return response;
 	}
@@ -162,7 +162,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CContactInfoCollectionDocumentServi
 		return response;
 	}
 
-	imtauth::IContactInfo* contactInfoPtr = dynamic_cast<imtauth::IContactInfo*>(documentPtr.GetPtr());
+	imtaccount::IContactInfo* contactInfoPtr = dynamic_cast<imtaccount::IContactInfo*>(documentPtr.GetPtr());
 	if (contactInfoPtr == nullptr){
 		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;

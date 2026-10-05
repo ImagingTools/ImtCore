@@ -14,7 +14,7 @@ DecoratorBase {
 	property int selectedIndex: !baseElement ? -1 : baseElement.selectedIndex;
 	property int shownItemsCount: !baseElement ? 0 : baseElement.shownItemsCount;
 	property int moveToIndex: baseElement && popupMenuListView.count > 0 ? baseElement.moveToIndex : -1
-	property int radius: !baseElement ? Style.buttonRadius : baseElement.radius;
+	property int radius: !baseElement ? Style.radiusL : baseElement.radius;
 
 	property bool moveToEnd: !baseElement ? false : baseElement.moveToEnd;
 	property bool isUpwards: !baseElement ? false: baseElement.isUpwards;

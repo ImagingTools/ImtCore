@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5347" Description="ACF"/>
-            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="6590" Description="ACF"/>
+            <Version Id="1" Number="2454" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="396033" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Base framework for service/damon-based applications</Description>
@@ -66,6 +66,27 @@
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FailureActionTypes" Type="Integer[]" ExportId="FailureActionTypes">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>1</Value>
+                                <Value>1</Value>
+                                <Value>1</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FailureResetPeriodMinutes" Type="Integer" ExportId="FailureResetPeriodMinutes">
+                        <Data IsEnabled="true" Value="10"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FailureRetryDelaysSeconds" Type="Integer[]" ExportId="FailureRetryDelaysSeconds">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>3</Value>
+                                <Value>8</Value>
+                                <Value>30</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ConsoleApplicationFramework/Log"/>

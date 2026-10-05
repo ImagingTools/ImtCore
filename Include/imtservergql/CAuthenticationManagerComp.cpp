@@ -99,6 +99,22 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 		}
 	}
 
+	// Deny access for disabled accounts (IEC 62443-3-3 SR 1.3): tokens and sessions
+	// of a disabled user become unusable immediately, without removing the account.
+	if (m_userCollectionCompPtr.IsValid() && !resolvedUserId.isEmpty()){
+		imtbase::IObjectCollection::DataPtr userDataPtr;
+		if (m_userCollectionCompPtr->GetObjectData(resolvedUserId, userDataPtr)){
+			const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
+			if (userInfoPtr != nullptr && !userInfoPtr->IsEnabled()){
+				SetError(
+							error,
+							imtgql::IGqlContextCreator::CCS_FORBIDDEN,
+							QStringLiteral("User account is disabled."));
+				return nullptr;
+			}
+		}
+	}
+
 	imtgql::CGqlRequestContextManager::SetContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr.GetPtr()));
 
 	if (m_userCollectionCompPtr.IsValid() && !resolvedUserId.isEmpty()){
@@ -150,6 +166,11 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 		}
 	}
 
+	const QByteArray forwardedLanguageId = headers.value(imtbase::s_languageIdHeaderId);
+	if (!forwardedLanguageId.isEmpty()){
+		gqlContextPtr->SetLanguageId(forwardedLanguageId);
+	}
+
 	if (m_userSettingsCollectionCompPtr.IsValid() && !resolvedUserId.isEmpty()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_userSettingsCollectionCompPtr->GetObjectData(resolvedUserId, dataPtr)){
@@ -162,7 +183,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 						const iprm::IOptionsList* optionListPtr = languageParamPtr->GetSelectionConstraints();
 						if (optionListPtr != nullptr){
 							int index = languageParamPtr->GetSelectedOptionIndex();
-							if (index >= 0){
+							if (index >= 0 && forwardedLanguageId.isEmpty()){
 								QByteArray languageId = optionListPtr->GetOptionId(index);
 								gqlContextPtr->SetLanguageId(languageId);
 							}

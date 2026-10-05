@@ -43,6 +43,8 @@ Item {
 
 	property alias contentColor: container.contentColor;
 
+	property alias dialogManagerView: localView
+
 	property bool visibleMetaInfo: false;
 	property bool headerRightClickEnabled: true;
 	property bool commandsPanelVisible: true
@@ -294,15 +296,15 @@ Item {
 			target: container.dataController;
 			
 			function onBeginUpdate(){
-				if (root.loadingIndicatorDelay > 0){
-					loadingIndicatorDelayTimer.restart()
-				}
-				else{
-					container.loading.start()
-				}
+				container.updating = true;
+
+				loadingIndicatorDelayTimer.restart()
 			}
-			
+
 			function onEndUpdate(){
+				container.updating = false;
+				container.contentLoaded = true;
+
 				loadingIndicatorDelayTimer.stop()
 				container.loading.stop();
 
@@ -350,6 +352,11 @@ Item {
 				if (root.loadingDataAfterHeadersReceived){
 					container.doUpdateGui()
 				}
+				else{
+					container.updating = false;
+					loadingIndicatorDelayTimer.stop()
+					container.loading.stop();
+				}
 			}
 
 			function onElementsReceived(elements){
@@ -382,7 +389,9 @@ Item {
 
 		Timer {
 			id: loadingIndicatorDelayTimer
-			interval: root.loadingIndicatorDelay
+			// Zero before the first load so the indicator appears at once, but only on
+			// the next tick - the view may still be unsized while the request goes out.
+			interval: container.contentLoaded ? root.loadingIndicatorDelay : 0
 			repeat: false
 
 			onTriggered: {
@@ -563,6 +572,13 @@ Item {
 			
 			text: qsTr("Please select an item for showing additional informations");
 		}
+	}
+
+	DialogManagerView{
+		id: localView
+		anchors.fill: parent
+		z: 1000
+		isMainView:false
 	}
 }
 

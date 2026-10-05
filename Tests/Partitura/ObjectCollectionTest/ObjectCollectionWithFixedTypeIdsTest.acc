@@ -10,12 +10,12 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="AccountInfo" PackageId="ImtAuthPck" ComponentId="AccountInfo">
+        <Element Id="AccountInfo" PackageId="ImtAccountPck" ComponentId="AccountInfo">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="DefaultAccount1" PackageId="ImtAuthPck" ComponentId="AccountInfo">
+        <Element Id="DefaultAccount1" PackageId="ImtAccountPck" ComponentId="AccountInfo">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
             </Data>

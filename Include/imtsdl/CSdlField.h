@@ -36,6 +36,10 @@ public:
 	bool IsArray() const;
 	void SetIsArray(bool isArray);
 
+	bool AreArrayElementsRequired() const;
+	void SetArrayElementsRequired(bool areArrayElementsRequired);
+
+	// Compatibility aliases for the former, incorrectly named API.
 	bool IsNonEmpty() const;
 	void SetIsNonEmpty(bool isNonEmpty);
 
@@ -62,9 +66,9 @@ private:
 	*/
 	bool m_isArray;
 	/**
-		This only makes sence only for arrays. Defines is array must contain at least one value
+		This only makes sense for arrays. Defines whether array elements may be NULL.
 	*/
-	bool m_isNonEmpty;
+	bool m_areArrayElementsRequired;
 	/**
 		Defines a type of value (int, string, user's custom type)
 	*/

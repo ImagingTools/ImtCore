@@ -133,6 +133,7 @@ Item {
 	}
 	
 	function getCollectionHeaders(){
+		root.beginUpdate();
 		getCollectionHeadersInput.m_collectionId = collectionId
 		getCollectionHeadersRequest.send(getCollectionHeadersInput)
 	}
@@ -456,6 +457,13 @@ Item {
 					root.headersModel = m_headers
 					root.headersReceived(m_headers)
 				}
+			}
+		}
+
+		// Failure only: on success the elements request already began its own cycle.
+		onFinished: {
+			if (status < 0){
+				root.endUpdate();
 			}
 		}
 

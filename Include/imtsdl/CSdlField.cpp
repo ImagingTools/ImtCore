@@ -71,7 +71,7 @@ bool CSdlField::SerializeSdlFieldList(
 CSdlField::CSdlField():
 	m_isRequired(false),
 	m_isArray(false),
-	m_isNonEmpty(false),
+	m_areArrayElementsRequired(false),
 	m_type("<INVALID>")
 {
 }
@@ -109,19 +109,31 @@ void CSdlField::SetIsArray(bool isArray)
 }
 
 
+bool CSdlField::AreArrayElementsRequired() const
+{
+	return m_areArrayElementsRequired;
+}
+
+
+void CSdlField::SetArrayElementsRequired(bool areArrayElementsRequired)
+{
+	if (m_areArrayElementsRequired != areArrayElementsRequired){
+		istd::CChangeNotifier notifier(this);
+
+		m_areArrayElementsRequired = areArrayElementsRequired;
+	}
+}
+
+
 bool CSdlField::IsNonEmpty() const
 {
-	return m_isNonEmpty;
+	return AreArrayElementsRequired();
 }
 
 
 void CSdlField::SetIsNonEmpty(bool isNonEmpty)
 {
-	if (m_isNonEmpty != isNonEmpty){
-		istd::CChangeNotifier notifier(this);
-
-		m_isNonEmpty = isNonEmpty;
-	}
+	SetArrayElementsRequired(isNonEmpty);
 }
 
 
@@ -163,7 +175,7 @@ bool CSdlField::operator==(const CSdlField& other) const
 
 	retVal = retVal && (other.m_isRequired == this->m_isRequired);
 	retVal = retVal && (other.m_isArray == this->m_isArray);
-	retVal = retVal && (other.m_isNonEmpty == this->m_isNonEmpty);
+	retVal = retVal && (other.m_areArrayElementsRequired == this->m_areArrayElementsRequired);
 	retVal = retVal && (other.m_type == this->m_type);
 	retVal = retVal && (other.m_id == this->m_id);
 
@@ -189,10 +201,10 @@ bool CSdlField::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_type);
 	retVal = retVal && archive.EndTag(typeTag);
 
-	static iser::CArchiveTag nonEmptyTag("IsNonEmpty", "", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(nonEmptyTag);
-	retVal = retVal && archive.Process(m_isNonEmpty);
-	retVal = retVal && archive.EndTag(nonEmptyTag);
+	static iser::CArchiveTag arrayElementsRequiredTag("IsNonEmpty", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(arrayElementsRequiredTag);
+	retVal = retVal && archive.Process(m_areArrayElementsRequired);
+	retVal = retVal && archive.EndTag(arrayElementsRequiredTag);
 
 	static iser::CArchiveTag arrayTag("IsArray", "", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(arrayTag);
@@ -202,7 +214,7 @@ bool CSdlField::Serialize(iser::IArchive& archive)
 	static iser::CArchiveTag requireTag("IsRequired", "", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(requireTag);
 	retVal = retVal && archive.Process(m_isRequired);
-	retVal = retVal && archive.BeginTag(requireTag);
+	retVal = retVal && archive.EndTag(requireTag);
 
 	return retVal;
 }

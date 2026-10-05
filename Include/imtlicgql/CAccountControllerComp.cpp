@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
-#include <imtauth/CCompanyInfo.h>
+#include <imtaccount/CCompanyInfo.h>
 
 
 namespace imtlicgql
@@ -31,7 +31,7 @@ QJsonObject CAccountControllerComp::GetObjectFromRequest(const imtgql::CGqlReque
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(accountId, dataPtr)){
-		const imtauth::CCompanyInfo* companyInfoPtr = dynamic_cast<const imtauth::CCompanyInfo*>(dataPtr.GetPtr());
+		const imtaccount::CCompanyInfo* companyInfoPtr = dynamic_cast<const imtaccount::CCompanyInfo*>(dataPtr.GetPtr());
 		if (companyInfoPtr != nullptr){
 			QJsonObject rootObj;
 			QJsonObject dataObj;
@@ -43,11 +43,11 @@ QJsonObject CAccountControllerComp::GetObjectFromRequest(const imtgql::CGqlReque
 
 			std::sort(groups.begin(), groups.end());
 
-			const imtauth::IAddressProvider* addressProviderPtr = companyInfoPtr->GetAddresses();
+			const imtaccount::IAddressProvider* addressProviderPtr = companyInfoPtr->GetAddresses();
 			if (addressProviderPtr != nullptr){
 				imtbase::ICollectionInfo::Ids addressesIds = addressProviderPtr->GetAddressList().GetElementIds();
 				for (const imtbase::ICollectionInfo::Id& addressId : addressesIds){
-					const imtauth::IAddress* addressPtr = addressProviderPtr->GetAddress(addressId);
+					const imtaccount::IAddress* addressPtr = addressProviderPtr->GetAddress(addressId);
 					if (addressPtr != nullptr){
 						dataObj.insert(QStringLiteral("Country"), QJsonValue::fromVariant(addressPtr->GetCountry()));
 						dataObj.insert(QStringLiteral("City"), QJsonValue::fromVariant(addressPtr->GetCity()));
@@ -106,7 +106,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 
 	QByteArray itemData = inputParams.at(0).GetParamArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
-		istd::TUniqueInterfacePtr<imtauth::ICompanyInfo> companyInstancePtr = m_accountInfoFactCompPtr.CreateInstance();
+		istd::TUniqueInterfacePtr<imtaccount::ICompanyInfo> companyInstancePtr = m_accountInfoFactCompPtr.CreateInstance();
 		if (!companyInstancePtr.IsValid()){
 			errorMessage = QStringLiteral("Unable to create an instance of the company object.");
 			SendErrorMessage(0, errorMessage, "CAccountControllerComp");
@@ -114,7 +114,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 			return nullptr;
 		}
 
-		imtauth::CIdentifiableCompanyInfo* companyInfoPtr = dynamic_cast<imtauth::CIdentifiableCompanyInfo*>(companyInstancePtr.GetPtr());
+		imtaccount::CIdentifiableCompanyInfo* companyInfoPtr = dynamic_cast<imtaccount::CIdentifiableCompanyInfo*>(companyInstancePtr.GetPtr());
 		if (companyInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get an account info!");
 			SendErrorMessage(0, errorMessage, "CAccountControllerComp");
@@ -145,7 +145,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 		for (const imtbase::ICollectionInfo::Id& collectionId : collectionIds){
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
-				imtauth::IContactBaseInfo* accountInfoPtr = dynamic_cast<imtauth::IContactBaseInfo*>(dataPtr.GetPtr());
+				imtaccount::IContactBaseInfo* accountInfoPtr = dynamic_cast<imtaccount::IContactBaseInfo*>(dataPtr.GetPtr());
 				if (accountInfoPtr != nullptr){
 					if (collectionId != objectId){
 						QString currentName = accountInfoPtr->GetName();
@@ -174,7 +174,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 			QString companyName = itemModel.GetData("CompanyName").toString();
 		}
 
-		imtauth::CAddress address;
+		imtaccount::CAddress address;
 		if (itemModel.ContainsKey("Country")){
 			QString country = itemModel.GetData("Country").toString();
 			address.SetCountry(country);

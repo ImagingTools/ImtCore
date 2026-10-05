@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtauth/CContactInfo.h>
+#include <imtaccount/CContactInfo.h>
 
 // ControlsGallery includes
 #include <GeneratedFiles/controlsgallerysdl/SDL/1.0/CPP/ContactInfos.h>
@@ -40,10 +40,10 @@ sdl::V1_0::imtbase::CVisualStatus CContactInfoCollectionControllerComp::OnGetObj
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		const imtauth::CContactInfo* contactInfoPtr = dynamic_cast<const imtauth::CContactInfo*>(dataPtr.GetPtr());
+		const imtaccount::CContactInfo* contactInfoPtr = dynamic_cast<const imtaccount::CContactInfo*>(dataPtr.GetPtr());
 		if (contactInfoPtr != nullptr){
-			QString firstName = contactInfoPtr->GetNameField(imtauth::CContactInfo::NFT_FIRST_NAME);
-			QString lastName = contactInfoPtr->GetNameField(imtauth::CContactInfo::NFT_LAST_NAME);
+			QString firstName = contactInfoPtr->GetNameField(imtaccount::CContactInfo::NFT_FIRST_NAME);
+			QString lastName = contactInfoPtr->GetNameField(imtaccount::CContactInfo::NFT_LAST_NAME);
 			
 			response.text = firstName + QStringLiteral(" ") + lastName;
 		}
@@ -68,10 +68,10 @@ bool CContactInfoCollectionControllerComp::CreateRepresentationFromObject(
 	
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
 
-	const imtauth::CContactInfo* contactInfoPtr = nullptr;
+	const imtaccount::CContactInfo* contactInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (objectCollectionIterator.GetObjectData(dataPtr)){
-		contactInfoPtr = dynamic_cast<const imtauth::CContactInfo*>(dataPtr.GetPtr());
+		contactInfoPtr = dynamic_cast<const imtaccount::CContactInfo*>(dataPtr.GetPtr());
 	}
 
 	if (contactInfoPtr == nullptr){
@@ -100,11 +100,11 @@ bool CContactInfoCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isFirstNameRequested){
-		representationObject.firstName = contactInfoPtr->GetNameField(imtauth::CContactInfo::NFT_FIRST_NAME);
+		representationObject.firstName = contactInfoPtr->GetNameField(imtaccount::CContactInfo::NFT_FIRST_NAME);
 	}
 
 	if (requestInfo.items.isLastNameRequested){
-		representationObject.lastName = contactInfoPtr->GetNameField(imtauth::CContactInfo::NFT_LAST_NAME);
+		representationObject.lastName = contactInfoPtr->GetNameField(imtaccount::CContactInfo::NFT_LAST_NAME);
 	}
 
 	if (requestInfo.items.isEmailRequested){
@@ -128,7 +128,7 @@ bool CContactInfoCollectionControllerComp::CreateRepresentationFromObject(
 			sdl::V1_0::controlsgallery::CContactInfoData& representationPayload,
 			QString& errorMessage) const
 {
-	const imtauth::CContactInfo* contactInfoPtr = dynamic_cast<const imtauth::CContactInfo*>(&data);
+	const imtaccount::CContactInfo* contactInfoPtr = dynamic_cast<const imtaccount::CContactInfo*>(&data);
 	if (contactInfoPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to create representation from object. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage, QStringLiteral("CContactInfoCollectionControllerComp"));
@@ -144,17 +144,17 @@ bool CContactInfoCollectionControllerComp::CreateRepresentationFromObject(
 
 	representationPayload.id = id;
 	representationPayload.email = contactInfoPtr->GetEmail();
-	representationPayload.firstName = contactInfoPtr->GetNameField(imtauth::CContactInfo::NFT_FIRST_NAME);
-	representationPayload.lastName = contactInfoPtr->GetNameField(imtauth::CContactInfo::NFT_LAST_NAME);
+	representationPayload.firstName = contactInfoPtr->GetNameField(imtaccount::CContactInfo::NFT_FIRST_NAME);
+	representationPayload.lastName = contactInfoPtr->GetNameField(imtaccount::CContactInfo::NFT_LAST_NAME);
 
-	imtauth::CContactInfo::GenderType genderType = contactInfoPtr->GetGenderType();
+	imtaccount::CContactInfo::GenderType genderType = contactInfoPtr->GetGenderType();
 	switch (genderType){
-	case imtauth::IContactInfo::GT_DIVERSE:
+	case imtaccount::IContactInfo::GT_DIVERSE:
 		representationPayload.genderType = sdl::V1_0::controlsgallery::GenderType::DIVERSE;
 		break;
-	case imtauth::IContactInfo::GT_FEMALE:
+	case imtaccount::IContactInfo::GT_FEMALE:
 		representationPayload.genderType = sdl::V1_0::controlsgallery::GenderType::FEMALE;
-	case imtauth::IContactInfo::GT_MALE:
+	case imtaccount::IContactInfo::GT_MALE:
 		break;
 		representationPayload.genderType = sdl::V1_0::controlsgallery::GenderType::MALE;
 		break;
@@ -189,7 +189,7 @@ istd::IChangeableUniquePtr CContactInfoCollectionControllerComp::CreateObjectFro
 		return nullptr;
 	}
 
-	imtauth::CContactInfo* contactInfoPtr = dynamic_cast<imtauth::CContactInfo*>(contactInstanceInfoPtr.GetPtr());
+	imtaccount::CContactInfo* contactInfoPtr = dynamic_cast<imtaccount::CContactInfo*>(contactInstanceInfoPtr.GetPtr());
 	if (contactInfoPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to cast object to contact info. Error: Invalid object");
 		return nullptr;
@@ -225,7 +225,7 @@ bool CContactInfoCollectionControllerComp::UpdateObjectFromRepresentationRequest
 		return false;
 	}
 
-	imtauth::CContactInfo* contactInfoPtr = dynamic_cast<imtauth::CContactInfo*>(&object);
+	imtaccount::CContactInfo* contactInfoPtr = dynamic_cast<imtaccount::CContactInfo*>(&object);
 	Q_ASSERT(contactInfoPtr != nullptr);
 
 	sdl::V1_0::controlsgallery::CContactInfoData contactInfoData = *inputArguments.input->item;
@@ -247,7 +247,7 @@ bool CContactInfoCollectionControllerComp::FillObjectFromRepresentation(
 			QByteArray& objectId,
 			QString& /*errorMessage*/) const
 {
-	imtauth::CContactInfo* contactInfoPtr = dynamic_cast<imtauth::CContactInfo*>(&object);
+	imtaccount::CContactInfo* contactInfoPtr = dynamic_cast<imtaccount::CContactInfo*>(&object);
 	Q_ASSERT(contactInfoPtr != nullptr);
 
 	if (representation.id){
@@ -259,11 +259,11 @@ bool CContactInfoCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	if (representation.firstName){
-		contactInfoPtr->SetNameField(imtauth::CContactInfo::NFT_FIRST_NAME, *representation.firstName);
+		contactInfoPtr->SetNameField(imtaccount::CContactInfo::NFT_FIRST_NAME, *representation.firstName);
 	}
 
 	if (representation.lastName){
-		contactInfoPtr->SetNameField(imtauth::CContactInfo::NFT_LAST_NAME, *representation.lastName);
+		contactInfoPtr->SetNameField(imtaccount::CContactInfo::NFT_LAST_NAME, *representation.lastName);
 	}
 
 	if (representation.birthday){
@@ -276,13 +276,13 @@ bool CContactInfoCollectionControllerComp::FillObjectFromRepresentation(
 		sdl::V1_0::controlsgallery::GenderType genderType = *representation.genderType;
 		switch (genderType){
 		case sdl::V1_0::controlsgallery::GenderType::DIVERSE:
-			contactInfoPtr->SetGenderType(imtauth::CContactInfo::GT_DIVERSE);
+			contactInfoPtr->SetGenderType(imtaccount::CContactInfo::GT_DIVERSE);
 			break;
 		case sdl::V1_0::controlsgallery::GenderType::MALE:
-			contactInfoPtr->SetGenderType(imtauth::CContactInfo::GT_MALE);
+			contactInfoPtr->SetGenderType(imtaccount::CContactInfo::GT_MALE);
 			break;
 		case sdl::V1_0::controlsgallery::GenderType::FEMALE:
-			contactInfoPtr->SetGenderType(imtauth::CContactInfo::GT_FEMALE);
+			contactInfoPtr->SetGenderType(imtaccount::CContactInfo::GT_FEMALE);
 			break;
 		}
 	}

@@ -236,8 +236,26 @@ class TextEdit extends Item {
         }
     }
 
+    forceActiveFocus(){
+        super.forceActiveFocus()
+        this.__ensureDomFocus()
+    }
+
+    __ensureDomFocus(){
+        if(!this.__impl || !this.enabled || !this.visible) return
+        if(typeof document === 'undefined') return
+        if(document.activeElement !== this.__impl){
+            this.__impl.focus()
+        }
+    }
+
     SLOT_activeFocusChanged(oldValue, newValue){
-        if(!newValue){
+        if(newValue){
+            this.__ensureDomFocus()
+            return
+        }
+
+        if(this.__impl && typeof document !== 'undefined' && document.activeElement === this.__impl){
             this.__impl.blur()
         }
     }

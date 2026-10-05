@@ -9,9 +9,9 @@
 // ImtCore includes
 #include <imtbase/CCollectionFilter.h>
 #include <imtbase/IObjectCollection.h>
-#include <imtauth/CAccountInfo.h>
-#include <imtauth/CAccountInfoMetaInfo.h>
-#include <imtauth/IAccountInfo.h>
+#include <imtaccount/CAccountInfo.h>
+#include <imtaccount/CAccountInfoMetaInfo.h>
+#include <imtaccount/IAccountInfo.h>
 #include <imtrepo/IFileObjectCollection.h>
 #include <imtdb/IDatabaseObjectDelegate.h>
 #include <imtdb/IDatabaseEngine.h>
@@ -267,7 +267,7 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithDataTest()
 			imtbase::IObjectCollection::DataPtr inputDataPtr;
 			imtbase::IObjectCollection::DataPtr referenceDataPtr;
 			if (m_typeIdObjectCollection == "AccountInfo"){
-				inputDataPtr = new imtauth::CAccountInfo();
+				inputDataPtr = new imtaccount::CAccountInfo();
 			}
 			else{
 				inputDataPtr = new imttest::CTestInfo();
@@ -281,7 +281,7 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithDataTest()
 
 			// set values in input data
 			if (m_typeIdObjectCollection == "AccountInfo"){
-				imtauth::CAccountInfo* inputImplPtr = dynamic_cast<imtauth::CAccountInfo*>(inputDataPtr.GetPtr());
+				imtaccount::CAccountInfo* inputImplPtr = dynamic_cast<imtaccount::CAccountInfo*>(inputDataPtr.GetPtr());
 				inputImplPtr->SetAccountName(nameAccount);
 				inputImplPtr->SetAccountDescription(descriptionAccount);
 			}
@@ -300,7 +300,7 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithDataTest()
 
 					// create reference Impl
 					if (m_typeIdObjectCollection == "AccountInfo"){
-						imtauth::CAccountInfo* referenceImplPtr = dynamic_cast<imtauth::CAccountInfo*>(referenceDataPtr.GetPtr());
+						imtaccount::CAccountInfo* referenceImplPtr = dynamic_cast<imtaccount::CAccountInfo*>(referenceDataPtr.GetPtr());
 
 						// get values from reference data
 						setNameAccount = referenceImplPtr->GetAccountName();
@@ -360,12 +360,12 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithMetaObjectTest()
 			if (m_typeIdObjectCollection == "AccountInfo"){
 
 				// input params of meta
-				imtauth::CAccountInfoMetaInfo inputMetaInfo;
+				imtaccount::CAccountInfoMetaInfo inputMetaInfo;
 
 				// set input params of meta
-				inputMetaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_TYPE, QObject::tr("Private"));
-				inputMetaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_NAME, inputName);
-				inputMetaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_DESCRIPTION, inputDescription);
+				inputMetaInfo.SetMetaInfo(imtaccount::IAccountInfo::MIT_ACCOUNT_TYPE, QObject::tr("Private"));
+				inputMetaInfo.SetMetaInfo(imtaccount::IAccountInfo::MIT_ACCOUNT_NAME, inputName);
+				inputMetaInfo.SetMetaInfo(imtaccount::IAccountInfo::MIT_ACCOUNT_DESCRIPTION, inputDescription);
 				idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", nullptr, QByteArray(), &inputMetaInfo);
 			}
 			else{
@@ -382,8 +382,8 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithMetaObjectTest()
 				QString referenceDescription;
 				if (referenceMetaInfoPtr.IsValid()){
 					if (m_typeIdObjectCollection == "AccountInfo"){
-						referenceName = referenceMetaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_NAME).toString();
-						referenceDescription = referenceMetaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_DESCRIPTION).toString();
+						referenceName = referenceMetaInfoPtr->GetMetaInfo(imtaccount::IAccountInfo::MIT_ACCOUNT_NAME).toString();
+						referenceDescription = referenceMetaInfoPtr->GetMetaInfo(imtaccount::IAccountInfo::MIT_ACCOUNT_DESCRIPTION).toString();
 						QVERIFY2(((inputName == referenceName) && (inputDescription == referenceDescription)), "Insert new object with meta data is failed");
 					}
 					else{

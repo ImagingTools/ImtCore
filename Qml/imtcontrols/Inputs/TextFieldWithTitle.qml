@@ -26,7 +26,7 @@ Item {
 
     property alias spacing: contentColumn.spacing;
 
-	property int radius: Style.radiusS;
+	property int radius: Style.textFieldRadius;
 
     property alias readOnly: input.readOnly;
 

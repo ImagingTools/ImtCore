@@ -567,6 +567,7 @@ ViewBase {
 
 						TextInputElementView {
 							id: licenseNameInput
+							objectName: "LicenseNameInput"
 							name: qsTr("License name")
 							placeHolderText: qsTr("Enter the license name")
 							readOnly: !licenseEditor.canEdit
@@ -580,6 +581,7 @@ ViewBase {
 
 						TextInputElementView {
 							id: licenseIdInput
+							objectName: "LicenseIdInput"
 							name: qsTr("License ID")
 							placeHolderText: qsTr("Enter the license ID")
 							readOnly: !licenseEditor.canEdit
@@ -590,6 +592,7 @@ ViewBase {
 
 						TextInputElementView {
 							id: descriptionInput
+							objectName: "DescriptionInput"
 							name: qsTr("Description")
 							placeHolderText: qsTr("Enter the description")
 							readOnly: !licenseEditor.canEdit
@@ -599,6 +602,7 @@ ViewBase {
 
 						ComboBoxElementView {
 							id: productComboBox
+							objectName: "ProductCombo"
 							name: qsTr("Product")
 							model: CachedProductCollection.collectionModel
 							nameId: "productName"
@@ -781,11 +785,13 @@ ViewBase {
 					property var entry: licenseEditor.nodeEntry(rowContent.node)
 
 					Item {
+						objectName: "LicenseFeatureGrantCell"
 						width: featuresPage.columnWidth(0, rowContent.width, rowContent.spacing)
 						height: rowContent.height
 						visible: width > 0
 
 						CheckBox {
+							objectName: "LicenseFeatureCheckBox"
 							anchors.left: parent.left
 							anchors.leftMargin: Style.marginXS
 							anchors.verticalCenter: parent.verticalCenter
@@ -813,6 +819,7 @@ ViewBase {
 						}
 
 						MouseArea {
+							objectName: "MouseArea"
 							anchors.fill: parent
 							enabled: licenseEditor.entryIsChangeable(rowContent.entry)
 							cursorShape: Qt.PointingHandCursor
@@ -820,6 +827,7 @@ ViewBase {
 						}
 					}
 					Item {
+						objectName: "LicenseFeatureNameCell"
 						width: featuresPage.columnWidth(1, rowContent.width, rowContent.spacing)
 						height: rowContent.height
 						visible: width > 0
@@ -836,6 +844,7 @@ ViewBase {
 						}
 					}
 					Item {
+						objectName: "LicenseFeatureIdCell"
 						width: featuresPage.columnWidth(2, rowContent.width, rowContent.spacing)
 						height: rowContent.height
 						visible: width > 0
@@ -851,6 +860,7 @@ ViewBase {
 						}
 					}
 					Item {
+						objectName: "LicenseFeatureDescriptionCell"
 						width: featuresPage.columnWidth(3, rowContent.width, rowContent.spacing)
 						height: rowContent.height
 						visible: width > 0
@@ -869,6 +879,7 @@ ViewBase {
 					}
 					Item {
 						id: subfeaturesCell
+						objectName: "LicenseFeatureSubfeaturesCell"
 						width: featuresPage.columnWidth(4, rowContent.width, rowContent.spacing)
 						height: rowContent.height
 						visible: width > 0
@@ -909,6 +920,7 @@ ViewBase {
 
 						MouseArea {
 							id: subfeaturesMouse
+							objectName: "MouseArea"
 							anchors.fill: parent
 							hoverEnabled: true
 							enabled: subfeaturesCell.openable
@@ -924,6 +936,7 @@ ViewBase {
 			// on the Inherited licenses page.
 			property Component inheritedFeaturesPanelComp: Component {
 				CheckableListPanel {
+					objectName: "InheritedFeaturesPanel"
 					title: qsTr("Inherited features")
 					subtitle: licenseEditor.inheritedEntries.length > 0
 						? qsTr("from %1 licenses").arg(licenseEditor.parentLicenseIds.length) : ""
@@ -950,6 +963,7 @@ ViewBase {
 			}
 			TreeExplorerView {
 				id: treeExplorer
+				objectName: "LicenseFeaturesExplorer"
 				anchors.fill: parent
 				anchors.margins: Style.marginXL
 				model: licenseEditor.featureNodes
@@ -1005,6 +1019,7 @@ ViewBase {
 			// A page of its own rather than a panel beside the features: what a
 			// license inherits is a different question from what it grants.
 			CheckableListPanel {
+				objectName: "InheritedLicensesPanel"
 				anchors.fill: parent
 				anchors.margins: Style.marginXL
 				title: qsTr("Inherited licenses")

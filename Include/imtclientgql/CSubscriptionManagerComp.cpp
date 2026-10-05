@@ -27,6 +27,12 @@ namespace imtclientgql
 
 // public methods
 
+CSubscriptionManagerComp::CSubscriptionManagerComp()
+	:m_accessTokenObserver(*this)
+{
+}
+
+
 // reimplemented (imtgql::IGqlSubscriptionManager)
 
 QByteArray CSubscriptionManagerComp::RegisterSubscription(
@@ -48,9 +54,16 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 
 	QMutexLocker locker(&m_registeredClientsMutex);
 
+	const auto createRegistration = [&subscriptionClient]() {
+		auto registrationPtr = std::make_shared<ClientRegistration>();
+		registrationPtr->clientPtr = &subscriptionClient;
+
+		return registrationPtr;
+	};
+
 	for (QByteArray subscriptionId : m_registeredClients.keys()){
 		if (m_registeredClients[subscriptionId].m_request.IsEqual(subscriptionRequest) && m_registeredClients[subscriptionId].m_clientId == clientId){
-			m_registeredClients[subscriptionId].m_clients.append(&subscriptionClient);
+			m_registeredClients[subscriptionId].m_clients.append(createRegistration());
 
 			return subscriptionId;
 		}
@@ -62,7 +75,7 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 	subscriptionHelper.m_request = *requestImplPtr;
 	subscriptionHelper.m_clientId = clientId;
 	subscriptionHelper.m_status = IGqlSubscriptionClient::SS_IN_REGISTRATION;
-	subscriptionHelper.m_clients.append(&subscriptionClient);
+	subscriptionHelper.m_clients.append(createRegistration());
 	m_registeredClients.insert(subscriptionId, subscriptionHelper);
 
 	locker.unlock();
@@ -93,18 +106,41 @@ bool CSubscriptionManagerComp::UnregisterSubscription(
 			const QByteArray& subscriptionId,
 			const imtclientgql::IGqlSubscriptionClient& subscriptionClient)
 {
-	QMutexLocker locker(&m_registeredClientsMutex);
+	std::shared_ptr<ClientRegistration> registrationPtr;
 
-	if (m_registeredClients.contains(subscriptionId)){
-		m_registeredClients[subscriptionId].m_clients.removeAll(const_cast<imtclientgql::IGqlSubscriptionClient*>(&subscriptionClient));
-		if (m_registeredClients[subscriptionId].m_clients.isEmpty()){
-			m_registeredClients.remove(subscriptionId);
+	{
+		QMutexLocker locker(&m_registeredClientsMutex);
+
+		const auto foundIt = m_registeredClients.find(subscriptionId);
+		if (foundIt == m_registeredClients.end()){
+			return false;
 		}
 
-		return true;
+		for (int index = 0; index < foundIt->m_clients.size(); index++){
+			if (foundIt->m_clients.at(index)->clientPtr == &subscriptionClient){
+				registrationPtr = foundIt->m_clients.takeAt(index);
+
+				break;
+			}
+		}
+
+		if (foundIt->m_clients.isEmpty()){
+			m_registeredClients.erase(foundIt);
+		}
 	}
 
-	return false;
+	if (registrationPtr == nullptr){
+		return false;
+	}
+
+	// Dropping the registration stops new callbacks; taking dispatchMutex waits out one
+	// already running. The registry lock must be released first: dispatch takes
+	// dispatchMutex and may then re-enter this method, so the reverse order would invert
+	// the hierarchy.
+	QMutexLocker dispatchLocker(&registrationPtr->dispatchMutex);
+	registrationPtr->isRegistered = false;
+
+	return true;
 }
 
 
@@ -124,8 +160,10 @@ void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& chan
 	for (const QByteArray& subscriptionId : subscriptionIds){
 		if (changeSet.Contains(imtcom::IConnectionStatusProvider::CF_CONNECTED)){
 			if (m_registeredClients[subscriptionId].m_clientId == clientId){
-				SubscriptionRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
-				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_REGISTERED;
+				const bool isRegistered = SubscriptionRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
+				m_registeredClients[subscriptionId].m_status = isRegistered
+						? IGqlSubscriptionClient::SS_REGISTERED
+						: IGqlSubscriptionClient::SS_IN_REGISTRATION;
 			}
 		}
 		else{
@@ -176,9 +214,16 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		switch (webSocketRequest->GetMethodType())
 		{
 		case imtrest::CWebSocketRequest::MT_CONNECTION_ACK:
+			// keys() is a copy, so it stays valid while the lock is released below;
+			// the map itself must be re-checked on every iteration for the same reason.
 			for (const QByteArray& subscriptionId : m_registeredClients.keys()){
-				if (m_registeredClients[subscriptionId].m_status == IGqlSubscriptionClient::SS_IN_REGISTRATION){
-					istd::IChangeableUniquePtr objectPtr(m_registeredClients[subscriptionId].m_request.CloneMe());
+				const auto foundIt = m_registeredClients.constFind(subscriptionId);
+				if (foundIt == m_registeredClients.constEnd()){
+					continue;
+				}
+
+				if (foundIt->m_status == IGqlSubscriptionClient::SS_IN_REGISTRATION){
+					istd::IChangeableUniquePtr objectPtr(foundIt->m_request.CloneMe());
 					locker.unlock();
 					auto requestPtr = dynamic_cast<imtgql::CGqlRequest*>(objectPtr.GetPtr());
 					if (requestPtr != nullptr){
@@ -191,35 +236,49 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 
 		case imtrest::CWebSocketRequest::MT_START_ACK:{
 			QByteArray subscriptionId = rootObject.value("id").toString().toLocal8Bit();
-			if (m_registeredClients.contains(subscriptionId)){
-				m_registeredClients[subscriptionId].m_status = IGqlSubscriptionClient::SS_REGISTERED;
+			const auto foundIt = m_registeredClients.find(subscriptionId);
+			if (foundIt != m_registeredClients.end()){
+				foundIt->m_status = IGqlSubscriptionClient::SS_REGISTERED;
 
+				// Dispatched outside the lock, like MT_DATA below.
+				locker.unlock();
 				UpdateCustomerSubscriptionStatuses(subscriptionId, message);
+				locker.relock();
 			}
 		}
 		break;
 
 		case imtrest::CWebSocketRequest::MT_DATA:{
 			QByteArray subscriptionId = rootObject.value("id").toString().toLocal8Bit();
-			if (m_registeredClients.contains(subscriptionId)){
-				for (IGqlSubscriptionClient* subscriptionClientPtr : m_registeredClients[subscriptionId].m_clients){
-					if (subscriptionClientPtr != nullptr){
-						if (!rootObject.contains("payload")){
-							break;
-						}
+			if (!rootObject.contains("payload")){
+				break;
+			}
 
-						QJsonObject payloadObject = rootObject.value("payload").toObject().value("data").toObject();
+			const auto foundIt = m_registeredClients.constFind(subscriptionId);
+			if (foundIt != m_registeredClients.constEnd()){
+				// Copied: a callback may re-enter this component and mutate the list. The
+				// shared_ptrs keep the copy valid even if the registry entry goes away.
+				const auto clients = foundIt->m_clients;
 
-						QJsonDocument document;
-						document.setObject(payloadObject);
+				QJsonObject payloadObject = rootObject.value("payload").toObject().value("data").toObject();
 
-						QByteArray payload = document.toJson(QJsonDocument::Compact);
+				QJsonDocument document;
+				document.setObject(payloadObject);
 
-						locker.unlock();
-						subscriptionClientPtr->OnResponseReceived(subscriptionId, payload);
-						locker.relock();
+				QByteArray payload = document.toJson(QJsonDocument::Compact);
+
+				locker.unlock();
+				for (const auto& registrationPtr : clients){
+					// Held across the callback so UnregisterSubscription() blocks until it
+					// returns. The copy can name a client unregistered since it was taken.
+					QMutexLocker dispatchLocker(&registrationPtr->dispatchMutex);
+					if (!registrationPtr->isRegistered || registrationPtr->clientPtr == nullptr){
+						continue;
 					}
+
+					registrationPtr->clientPtr->OnResponseReceived(subscriptionId, payload);
 				}
+				locker.relock();
 			}
 		}
 		break;
@@ -331,6 +390,11 @@ QFuture<CSubscriptionManagerComp::GqlResult> CSubscriptionManagerComp::SendReque
 			if (headerId != "accept-encoding" && headerId != imtbase::s_authenticationTokenHeaderId){
 				headersObject[headerId] = QString(headers.value(headerId));
 			}
+		}
+
+		const QByteArray languageId = contextPtr->GetLanguageId();
+		if (!languageId.isEmpty()){
+			headersObject[QString(imtbase::s_languageIdHeaderId)] = QString(languageId);
 		}
 	}
 	dataObject["headers"] = headersObject;
@@ -446,10 +510,65 @@ bool CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& s
 				headersObject[headerId] = QString(headers.value(headerId));
 			}
 		}
+
+		const QByteArray languageId = contextPtr->GetLanguageId();
+		if (!languageId.isEmpty()){
+			headersObject[QString(imtbase::s_languageIdHeaderId)] = QString(languageId);
+		}
 	}
+
+	// The request context is a clone taken when the subscription was created, so
+	// its token is the one that was current back then. The server authenticates
+	// every registration, so a re-registration after a refresh has to present the
+	// token that is current now, not the captured one.
+if (m_accessTokenProviderCompPtr.IsValid()){
+		const QByteArray accessToken = m_accessTokenProviderCompPtr->GetToken(QByteArray());
+		const QString authenticationTokenHeaderId(imtbase::s_authenticationTokenHeaderId);
+		if (accessToken.isEmpty()){
+			headersObject.remove(authenticationTokenHeaderId);
+		}
+		else{
+			headersObject[authenticationTokenHeaderId] = QString(accessToken);
+		}
+	}
+
 	registerSubscription["headers"] = headersObject;
 
 	QByteArray queryData = QJsonDocument(registerSubscription).toJson(QJsonDocument::Compact);
+
+	imtrest::ConstRequestPtr requestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, "").PopInterfacePtr());
+
+	return SendRequestInternal(subscriptionRequest, requestPtr);
+}
+
+
+bool CSubscriptionManagerComp::SubscriptionUnregister(const imtgql::CGqlRequest& subscriptionRequest, const QByteArray& subscriptionId) const
+{
+	if (!m_engineCompPtr.IsValid()){
+		Q_ASSERT(0);
+
+		return false;
+	}
+
+	QJsonObject unregisterSubscription;
+	unregisterSubscription["id"] = QString(subscriptionId);
+	unregisterSubscription["type"] = "stop";
+	unregisterSubscription["payload"] = QJsonObject();
+
+	QJsonObject headersObject;
+	const imtgql::IGqlContext* contextPtr = subscriptionRequest.GetRequestContext();
+	if (contextPtr != nullptr){
+		imtgql::IGqlContext::Headers headers = contextPtr->GetHeaders();
+		for (const QByteArray& headerId : headers.keys()){
+			if (headerId != "accept-encoding"){
+				headersObject[headerId] = QString(headers.value(headerId));
+			}
+		}
+	}
+
+	unregisterSubscription["headers"] = headersObject;
+
+	QByteArray queryData = QJsonDocument(unregisterSubscription).toJson(QJsonDocument::Compact);
 
 	imtrest::ConstRequestPtr requestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, "").PopInterfacePtr());
 
@@ -505,6 +624,59 @@ void CSubscriptionManagerComp::OnComponentCreated()
 	if (m_connectionStatusProviderModelCompPtr.IsValid()){
 		m_connectionStatusProviderModelCompPtr->AttachObserver(this);
 	}
+
+	if (m_accessTokenProviderModelCompPtr.IsValid()){
+		m_accessTokenProviderModelCompPtr->AttachObserver(&m_accessTokenObserver);
+	}
+}
+
+
+void CSubscriptionManagerComp::ReregisterSubscriptions() const
+{
+	QByteArrayList subscriptionIds;
+	{
+		QMutexLocker locker(&m_registeredClientsMutex);
+		subscriptionIds = m_registeredClients.keys();
+	}
+
+	for (const QByteArray& subscriptionId : subscriptionIds){
+		imtgql::CGqlRequest request;
+		{
+			QMutexLocker locker(&m_registeredClientsMutex);
+			if (!m_registeredClients.contains(subscriptionId)){
+				continue;
+			}
+
+			request = m_registeredClients[subscriptionId].m_request;
+		}
+
+		// Sent outside the lock: registration goes through the transport and
+		// may re-enter this component.
+		// The "stop" is sent first, because server side controllers append a new
+		// registration for a repeated "start" instead of replacing the old one.
+		// The transport keeps the message order, so the server drops the previous
+		// registration before the new one arrives.
+		SubscriptionUnregister(request, subscriptionId);
+		SubscriptionRegister(request, subscriptionId);
+	}
+}
+
+
+// public methods of the embedded class AccessTokenObserver
+
+CSubscriptionManagerComp::AccessTokenObserver::AccessTokenObserver(CSubscriptionManagerComp& parent)
+	:m_parent(parent)
+{
+}
+
+
+// protected methods of the embedded class AccessTokenObserver
+
+// reimplemented (imod::CSingleModelObserverBase)
+
+void CSubscriptionManagerComp::AccessTokenObserver::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	m_parent.ReregisterSubscriptions();
 }
 
 
@@ -512,19 +684,30 @@ void CSubscriptionManagerComp::OnComponentCreated()
 
 void CSubscriptionManagerComp::UpdateCustomerSubscriptionStatuses(const QByteArray& subscriptionId, const QString& message) const
 {
-	QList<IGqlSubscriptionClient*> clients;
+	QList<std::shared_ptr<ClientRegistration>> clients;
+	IGqlSubscriptionClient::SubscriptionStatus status = IGqlSubscriptionClient::SS_UNKNOWN;
 
 	{
-		QMutexLocker lock(&m_pendingAsyncMutex);
-		if (m_registeredClients.contains(subscriptionId)){
-			clients = m_registeredClients[subscriptionId].m_clients;
+		QMutexLocker lock(&m_registeredClientsMutex);
+		const auto foundIt = m_registeredClients.constFind(subscriptionId);
+		if (foundIt == m_registeredClients.constEnd()){
+			return;
 		}
+
+		clients = foundIt->m_clients;
+		status = foundIt->m_status;
 	}
 
-	for (IGqlSubscriptionClient* subscriptionClientPtr : clients){
-		if (subscriptionClientPtr != nullptr){
-			subscriptionClientPtr->OnSubscriptionStatusChanged(subscriptionId, m_registeredClients[subscriptionId].m_status, message);
+	// Dispatched outside the lock: callbacks run arbitrary code, and holding
+	// m_registeredClientsMutex across them would serialise every subscription in the
+	// component behind each one. Callers must not hold it across this call.
+	for (const auto& registrationPtr : clients){
+		QMutexLocker dispatchLocker(&registrationPtr->dispatchMutex);
+		if (!registrationPtr->isRegistered || registrationPtr->clientPtr == nullptr){
+			continue;
 		}
+
+		registrationPtr->clientPtr->OnSubscriptionStatusChanged(subscriptionId, status, message);
 	}
 }
 

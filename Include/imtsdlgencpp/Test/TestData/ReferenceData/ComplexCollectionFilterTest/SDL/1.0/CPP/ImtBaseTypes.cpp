@@ -2230,6 +2230,11 @@ bool V1_0::imtbase::COptionsList::WriteToModel(::imtbase::CTreeItemModel& model,
 		::imtbase::CTreeItemModel* newOptionsModelPtr = model.AddTreeModel("options", modelIndex);
 		newOptionsModelPtr->setIsArray(true);
 		for (qsizetype optionsIndex = 0; optionsIndex < options->size(); ++optionsIndex){
+			if (!options->at(optionsIndex)){
+				newOptionsModelPtr->InsertNewItem();
+				newOptionsModelPtr->SetData(QByteArray(), QVariant(), optionsIndex);
+				continue;
+			}
 			newOptionsModelPtr->InsertNewItem();
 			if (!(options->at(optionsIndex)->WriteToModel(*newOptionsModelPtr, optionsIndex))){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
@@ -2237,6 +2242,9 @@ bool V1_0::imtbase::COptionsList::WriteToModel(::imtbase::CTreeItemModel& model,
 				return false;
 			}
 		}
+	}
+	else if (options.IsNull()){
+		model.SetData("options", QVariant(), modelIndex);
 	}
 
 	return true;
@@ -2256,10 +2264,17 @@ bool V1_0::imtbase::COptionsList::ReadFromModel(const ::imtbase::CTreeItemModel&
 	}
 
 	::imtbase::CTreeItemModel* optionsModel = model.GetTreeItemModel("options", modelIndex);
+	if (model.ContainsKey("options", modelIndex) && optionsModel == nullptr){
+		options.SetNull();
+	}
 	if (optionsModel != nullptr){
 		int optionsCount = optionsModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::imtbase::COption> optionsList;
 		for (int optionsIndex = 0; optionsIndex < optionsCount; ++optionsIndex){
+			if (optionsModel->ContainsKey(QByteArray(), optionsIndex) && !optionsModel->GetData(QByteArray(), optionsIndex).isValid()){
+				optionsList.AppendNull();
+				continue;
+			}
 			V1_0::imtbase::COption t_options;
 			if (!t_options.ReadFromModel(*optionsModel, optionsIndex)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
@@ -2289,10 +2304,17 @@ bool V1_0::imtbase::COptionsList::OptReadFromModel(const ::imtbase::CTreeItemMod
 	}
 
 	::imtbase::CTreeItemModel* optionsModel = model.GetTreeItemModel("options", modelIndex);
+	if (model.ContainsKey("options", modelIndex) && optionsModel == nullptr){
+		options.SetNull();
+	}
 	if (optionsModel != nullptr){
 		int optionsCount = optionsModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::imtbase::COption> optionsList;
 		for (int optionsIndex = 0; optionsIndex < optionsCount; ++optionsIndex){
+			if (optionsModel->ContainsKey(QByteArray(), optionsIndex) && !optionsModel->GetData(QByteArray(), optionsIndex).isValid()){
+				optionsList.AppendNull();
+				continue;
+			}
 			V1_0::imtbase::COption t_options;
 			if (!t_options.OptReadFromModel(*optionsModel, optionsIndex)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
@@ -2322,6 +2344,10 @@ bool V1_0::imtbase::COptionsList::WriteToGraphQlObject(::imtgql::CGqlParamObject
 	if (options){
 		QList<::imtgql::CGqlParamObject> optionsDataObjectList;
 		for (qsizetype optionsIndex = 0; optionsIndex < options->size(); ++optionsIndex){
+			if (!options->at(optionsIndex)){
+				optionsDataObjectList << ::imtgql::CGqlParamObject::CreateNull();
+				continue;
+			}
 			::imtgql::CGqlParamObject newOptionsGqlObject;
 			if (!options->at(optionsIndex)->WriteToGraphQlObject(newOptionsGqlObject)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
@@ -2331,6 +2357,9 @@ bool V1_0::imtbase::COptionsList::WriteToGraphQlObject(::imtgql::CGqlParamObject
 			optionsDataObjectList << newOptionsGqlObject;
 		}
 		gqlObject.InsertParam("options", optionsDataObjectList);
+	}
+	else if (options.IsNull()){
+		gqlObject.InsertParam("options", QVariant());
 	}
 
 	gqlObject.InsertParam("__typename", QVariant("OptionsList"));
@@ -2349,17 +2378,17 @@ bool V1_0::imtbase::COptionsList::ReadFromGraphQlObject(const ::imtgql::CGqlPara
 		offset = gqlObject["offset"].toInt();
 	}
 
-	if (gqlObject.ContainsParam("options")){
-		options.emplace();
+	if (gqlObject.ContainsParam("options") && gqlObject["options"].isNull()){
+		options.SetNull();
 	}
-	if (gqlObject.ContainsParam("options") && (gqlObject.GetObjectsCount("options") > 0)){
+	if (gqlObject.ContainsParam("options") && !(gqlObject["options"].isNull())){
 		const qsizetype optionsElementsCount = gqlObject.GetObjectsCount("options");
 		options = imtsdl::TElementList<V1_0::imtbase::COption>();
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsElementsCount; ++optionsIndex){
 			const ::imtgql::CGqlParamObject* optionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("options", optionsIndex);
-			if (optionsDataObjectPtr == nullptr){
-				qDebug() << "invalid type" << optionsDataObjectPtr;
-				return false;
+			if (optionsDataObjectPtr == nullptr || optionsDataObjectPtr->IsNull()){
+				options->AppendNull();
+				continue;
 			}
 			V1_0::imtbase::COption tempOptions;
 			if (!tempOptions.ReadFromGraphQlObject(*optionsDataObjectPtr)){
@@ -2385,17 +2414,17 @@ bool V1_0::imtbase::COptionsList::OptReadFromGraphQlObject(const ::imtgql::CGqlP
 		offset = gqlObject["offset"].toInt();
 	}
 
-	if (gqlObject.ContainsParam("options")){
-		options.emplace();
+	if (gqlObject.ContainsParam("options") && gqlObject["options"].isNull()){
+		options.SetNull();
 	}
-	if (gqlObject.ContainsParam("options") && (gqlObject.GetObjectsCount("options") > 0)){
+	if (gqlObject.ContainsParam("options") && !(gqlObject["options"].isNull())){
 		const qsizetype optionsElementsCount = gqlObject.GetObjectsCount("options");
 		options = imtsdl::TElementList<V1_0::imtbase::COption>();
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsElementsCount; ++optionsIndex){
 			const ::imtgql::CGqlParamObject* optionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("options", optionsIndex);
-			if (optionsDataObjectPtr == nullptr){
-				qDebug() << "invalid type" << optionsDataObjectPtr;
-				return false;
+			if (optionsDataObjectPtr == nullptr || optionsDataObjectPtr->IsNull()){
+				options->AppendNull();
+				continue;
 			}
 			V1_0::imtbase::COption tempOptions;
 			if (!tempOptions.OptReadFromGraphQlObject(*optionsDataObjectPtr)){
@@ -2424,6 +2453,10 @@ bool V1_0::imtbase::COptionsList::WriteToJsonObject(QJsonObject& jsonObject) con
 	if (options){
 		QJsonArray newOptionsArray;
 		for (qsizetype optionsIndex = 0; optionsIndex < options->size(); ++optionsIndex){
+			if (!options->at(optionsIndex)){
+				newOptionsArray << QJsonValue(QJsonValue::Null);
+				continue;
+			}
 			QJsonObject newOptionsJsonObject;
 			if (!options->at(optionsIndex)->WriteToJsonObject(newOptionsJsonObject)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
@@ -2433,6 +2466,9 @@ bool V1_0::imtbase::COptionsList::WriteToJsonObject(QJsonObject& jsonObject) con
 			newOptionsArray << newOptionsJsonObject;
 		}
 		jsonObject["options"] = newOptionsArray;
+	}
+	else if (options.IsNull()){
+		jsonObject["options"] = QJsonValue(QJsonValue::Null);
 	}
 
 	jsonObject["__typename"] = "OptionsList";
@@ -2451,11 +2487,18 @@ bool V1_0::imtbase::COptionsList::ReadFromJsonObject(const QJsonObject& jsonObje
 		offset = jsonObject["offset"].toInt();
 	}
 
-	if (jsonObject.contains("options") && jsonObject["options"].isArray()){
+if (jsonObject.contains("options") && jsonObject["options"].isNull()){
+		options.SetNull();
+	}
+		if (jsonObject.contains("options") && jsonObject["options"].isArray()){
 		const QJsonArray optionsJsonArray = jsonObject["options"].toArray();
 		const qsizetype optionsArrayCount = optionsJsonArray.size();
 		options = imtsdl::TElementList<V1_0::imtbase::COption>();
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsArrayCount; ++optionsIndex){
+			if (optionsJsonArray[optionsIndex].isNull()){
+				options->AppendNull();
+				continue;
+			}
 			V1_0::imtbase::COption tempOptions;
 			if (!tempOptions.ReadFromJsonObject(optionsJsonArray[optionsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
@@ -2480,11 +2523,18 @@ bool V1_0::imtbase::COptionsList::OptReadFromJsonObject(const QJsonObject& jsonO
 		offset = jsonObject["offset"].toInt();
 	}
 
-	if (jsonObject.contains("options") && jsonObject["options"].isArray()){
+if (jsonObject.contains("options") && jsonObject["options"].isNull()){
+		options.SetNull();
+	}
+		if (jsonObject.contains("options") && jsonObject["options"].isArray()){
 		const QJsonArray optionsJsonArray = jsonObject["options"].toArray();
 		const qsizetype optionsArrayCount = optionsJsonArray.size();
 		options = imtsdl::TElementList<V1_0::imtbase::COption>();
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsArrayCount; ++optionsIndex){
+			if (optionsJsonArray[optionsIndex].isNull()){
+				options->AppendNull();
+				continue;
+			}
 			V1_0::imtbase::COption tempOptions;
 			if (!tempOptions.OptReadFromJsonObject(optionsJsonArray[optionsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
@@ -3561,45 +3611,85 @@ bool V1_0::imtbase::CParamsSet::WriteToModel(::imtbase::CTreeItemModel& model, i
 		::imtbase::CTreeItemModel* newParamIdsModelPtr = model.AddTreeModel("paramIds", modelIndex);
 		newParamIdsModelPtr->setIsArray(true);
 		for (qsizetype paramIdsIndex = 0; paramIdsIndex < paramIds->size(); ++paramIdsIndex){
+			if (!paramIds->at(paramIdsIndex)){
+				newParamIdsModelPtr->InsertNewItem();
+				newParamIdsModelPtr->SetData(QByteArray(), QVariant(), paramIdsIndex);
+				continue;
+			}
 			newParamIdsModelPtr->InsertNewItem();
 			newParamIdsModelPtr->SetData(QByteArray(), *paramIds->at(paramIdsIndex), paramIdsIndex);
 		}
+	}
+	else if (paramIds.IsNull()){
+		model.SetData("paramIds", QVariant(), modelIndex);
 	}
 
 	if (paramTypeIds){
 		::imtbase::CTreeItemModel* newParamTypeIdsModelPtr = model.AddTreeModel("paramTypeIds", modelIndex);
 		newParamTypeIdsModelPtr->setIsArray(true);
 		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIds->size(); ++paramTypeIdsIndex){
+			if (!paramTypeIds->at(paramTypeIdsIndex)){
+				newParamTypeIdsModelPtr->InsertNewItem();
+				newParamTypeIdsModelPtr->SetData(QByteArray(), QVariant(), paramTypeIdsIndex);
+				continue;
+			}
 			newParamTypeIdsModelPtr->InsertNewItem();
 			newParamTypeIdsModelPtr->SetData(QByteArray(), *paramTypeIds->at(paramTypeIdsIndex), paramTypeIdsIndex);
 		}
+	}
+	else if (paramTypeIds.IsNull()){
+		model.SetData("paramTypeIds", QVariant(), modelIndex);
 	}
 
 	if (paramNames){
 		::imtbase::CTreeItemModel* newParamNamesModelPtr = model.AddTreeModel("paramNames", modelIndex);
 		newParamNamesModelPtr->setIsArray(true);
 		for (qsizetype paramNamesIndex = 0; paramNamesIndex < paramNames->size(); ++paramNamesIndex){
+			if (!paramNames->at(paramNamesIndex)){
+				newParamNamesModelPtr->InsertNewItem();
+				newParamNamesModelPtr->SetData(QByteArray(), QVariant(), paramNamesIndex);
+				continue;
+			}
 			newParamNamesModelPtr->InsertNewItem();
 			newParamNamesModelPtr->SetData(QByteArray(), *paramNames->at(paramNamesIndex), paramNamesIndex);
 		}
+	}
+	else if (paramNames.IsNull()){
+		model.SetData("paramNames", QVariant(), modelIndex);
 	}
 
 	if (paramDescriptions){
 		::imtbase::CTreeItemModel* newParamDescriptionsModelPtr = model.AddTreeModel("paramDescriptions", modelIndex);
 		newParamDescriptionsModelPtr->setIsArray(true);
 		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptions->size(); ++paramDescriptionsIndex){
+			if (!paramDescriptions->at(paramDescriptionsIndex)){
+				newParamDescriptionsModelPtr->InsertNewItem();
+				newParamDescriptionsModelPtr->SetData(QByteArray(), QVariant(), paramDescriptionsIndex);
+				continue;
+			}
 			newParamDescriptionsModelPtr->InsertNewItem();
 			newParamDescriptionsModelPtr->SetData(QByteArray(), *paramDescriptions->at(paramDescriptionsIndex), paramDescriptionsIndex);
 		}
+	}
+	else if (paramDescriptions.IsNull()){
+		model.SetData("paramDescriptions", QVariant(), modelIndex);
 	}
 
 	if (parameters){
 		::imtbase::CTreeItemModel* newParametersModelPtr = model.AddTreeModel("parameters", modelIndex);
 		newParametersModelPtr->setIsArray(true);
 		for (qsizetype parametersIndex = 0; parametersIndex < parameters->size(); ++parametersIndex){
+			if (!parameters->at(parametersIndex)){
+				newParametersModelPtr->InsertNewItem();
+				newParametersModelPtr->SetData(QByteArray(), QVariant(), parametersIndex);
+				continue;
+			}
 			newParametersModelPtr->InsertNewItem();
 			newParametersModelPtr->SetData(QByteArray(), *parameters->at(parametersIndex), parametersIndex);
 		}
+	}
+	else if (parameters.IsNull()){
+		model.SetData("parameters", QVariant(), modelIndex);
 	}
 
 
@@ -3610,10 +3700,17 @@ bool V1_0::imtbase::CParamsSet::WriteToModel(::imtbase::CTreeItemModel& model, i
 bool V1_0::imtbase::CParamsSet::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* paramIdsModel = model.GetTreeItemModel("paramIds", modelIndex);
+	if (model.ContainsKey("paramIds", modelIndex) && paramIdsModel == nullptr){
+		paramIds.SetNull();
+	}
 	if (paramIdsModel != nullptr){
 		int paramIdsCount = paramIdsModel->GetItemsCount();
 		imtsdl::TElementList<QByteArray> paramIdsList;
 		for (int paramIdsIndex = 0; paramIdsIndex < paramIdsCount; ++paramIdsIndex){
+			if (!paramIdsModel->GetData(QByteArray(), paramIdsIndex).isValid()){
+				paramIdsList.AppendNull();
+				continue;
+			}
 			QByteArray t_paramIds = paramIdsModel->GetData(QByteArray(), paramIdsIndex).toByteArray();
 			paramIdsList << t_paramIds;
 		}
@@ -3622,10 +3719,17 @@ bool V1_0::imtbase::CParamsSet::ReadFromModel(const ::imtbase::CTreeItemModel& m
 	}
 
 	::imtbase::CTreeItemModel* paramTypeIdsModel = model.GetTreeItemModel("paramTypeIds", modelIndex);
+	if (model.ContainsKey("paramTypeIds", modelIndex) && paramTypeIdsModel == nullptr){
+		paramTypeIds.SetNull();
+	}
 	if (paramTypeIdsModel != nullptr){
 		int paramTypeIdsCount = paramTypeIdsModel->GetItemsCount();
 		imtsdl::TElementList<QByteArray> paramTypeIdsList;
 		for (int paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIdsCount; ++paramTypeIdsIndex){
+			if (!paramTypeIdsModel->GetData(QByteArray(), paramTypeIdsIndex).isValid()){
+				paramTypeIdsList.AppendNull();
+				continue;
+			}
 			QByteArray t_paramTypeIds = paramTypeIdsModel->GetData(QByteArray(), paramTypeIdsIndex).toByteArray();
 			paramTypeIdsList << t_paramTypeIds;
 		}
@@ -3634,10 +3738,17 @@ bool V1_0::imtbase::CParamsSet::ReadFromModel(const ::imtbase::CTreeItemModel& m
 	}
 
 	::imtbase::CTreeItemModel* paramNamesModel = model.GetTreeItemModel("paramNames", modelIndex);
+	if (model.ContainsKey("paramNames", modelIndex) && paramNamesModel == nullptr){
+		paramNames.SetNull();
+	}
 	if (paramNamesModel != nullptr){
 		int paramNamesCount = paramNamesModel->GetItemsCount();
 		imtsdl::TElementList<QString> paramNamesList;
 		for (int paramNamesIndex = 0; paramNamesIndex < paramNamesCount; ++paramNamesIndex){
+			if (!paramNamesModel->GetData(QByteArray(), paramNamesIndex).isValid()){
+				paramNamesList.AppendNull();
+				continue;
+			}
 			QString t_paramNames = paramNamesModel->GetData(QByteArray(), paramNamesIndex).toString();
 			paramNamesList << t_paramNames;
 		}
@@ -3646,10 +3757,17 @@ bool V1_0::imtbase::CParamsSet::ReadFromModel(const ::imtbase::CTreeItemModel& m
 	}
 
 	::imtbase::CTreeItemModel* paramDescriptionsModel = model.GetTreeItemModel("paramDescriptions", modelIndex);
+	if (model.ContainsKey("paramDescriptions", modelIndex) && paramDescriptionsModel == nullptr){
+		paramDescriptions.SetNull();
+	}
 	if (paramDescriptionsModel != nullptr){
 		int paramDescriptionsCount = paramDescriptionsModel->GetItemsCount();
 		imtsdl::TElementList<QString> paramDescriptionsList;
 		for (int paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptionsCount; ++paramDescriptionsIndex){
+			if (!paramDescriptionsModel->GetData(QByteArray(), paramDescriptionsIndex).isValid()){
+				paramDescriptionsList.AppendNull();
+				continue;
+			}
 			QString t_paramDescriptions = paramDescriptionsModel->GetData(QByteArray(), paramDescriptionsIndex).toString();
 			paramDescriptionsList << t_paramDescriptions;
 		}
@@ -3658,10 +3776,17 @@ bool V1_0::imtbase::CParamsSet::ReadFromModel(const ::imtbase::CTreeItemModel& m
 	}
 
 	::imtbase::CTreeItemModel* parametersModel = model.GetTreeItemModel("parameters", modelIndex);
+	if (model.ContainsKey("parameters", modelIndex) && parametersModel == nullptr){
+		parameters.SetNull();
+	}
 	if (parametersModel != nullptr){
 		int parametersCount = parametersModel->GetItemsCount();
 		imtsdl::TElementList<QString> parametersList;
 		for (int parametersIndex = 0; parametersIndex < parametersCount; ++parametersIndex){
+			if (!parametersModel->GetData(QByteArray(), parametersIndex).isValid()){
+				parametersList.AppendNull();
+				continue;
+			}
 			QString t_parameters = parametersModel->GetData(QByteArray(), parametersIndex).toString();
 			parametersList << t_parameters;
 		}
@@ -3676,10 +3801,17 @@ bool V1_0::imtbase::CParamsSet::ReadFromModel(const ::imtbase::CTreeItemModel& m
 bool V1_0::imtbase::CParamsSet::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* paramIdsModel = model.GetTreeItemModel("paramIds", modelIndex);
+	if (model.ContainsKey("paramIds", modelIndex) && paramIdsModel == nullptr){
+		paramIds.SetNull();
+	}
 	if (paramIdsModel != nullptr){
 		int paramIdsCount = paramIdsModel->GetItemsCount();
 		imtsdl::TElementList<QByteArray> paramIdsList;
 		for (int paramIdsIndex = 0; paramIdsIndex < paramIdsCount; ++paramIdsIndex){
+			if (!paramIdsModel->GetData(QByteArray(), paramIdsIndex).isValid()){
+				paramIdsList.AppendNull();
+				continue;
+			}
 			QByteArray t_paramIds = paramIdsModel->GetData(QByteArray(), paramIdsIndex).toByteArray();
 			paramIdsList << t_paramIds;
 		}
@@ -3688,10 +3820,17 @@ bool V1_0::imtbase::CParamsSet::OptReadFromModel(const ::imtbase::CTreeItemModel
 	}
 
 	::imtbase::CTreeItemModel* paramTypeIdsModel = model.GetTreeItemModel("paramTypeIds", modelIndex);
+	if (model.ContainsKey("paramTypeIds", modelIndex) && paramTypeIdsModel == nullptr){
+		paramTypeIds.SetNull();
+	}
 	if (paramTypeIdsModel != nullptr){
 		int paramTypeIdsCount = paramTypeIdsModel->GetItemsCount();
 		imtsdl::TElementList<QByteArray> paramTypeIdsList;
 		for (int paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIdsCount; ++paramTypeIdsIndex){
+			if (!paramTypeIdsModel->GetData(QByteArray(), paramTypeIdsIndex).isValid()){
+				paramTypeIdsList.AppendNull();
+				continue;
+			}
 			QByteArray t_paramTypeIds = paramTypeIdsModel->GetData(QByteArray(), paramTypeIdsIndex).toByteArray();
 			paramTypeIdsList << t_paramTypeIds;
 		}
@@ -3700,10 +3839,17 @@ bool V1_0::imtbase::CParamsSet::OptReadFromModel(const ::imtbase::CTreeItemModel
 	}
 
 	::imtbase::CTreeItemModel* paramNamesModel = model.GetTreeItemModel("paramNames", modelIndex);
+	if (model.ContainsKey("paramNames", modelIndex) && paramNamesModel == nullptr){
+		paramNames.SetNull();
+	}
 	if (paramNamesModel != nullptr){
 		int paramNamesCount = paramNamesModel->GetItemsCount();
 		imtsdl::TElementList<QString> paramNamesList;
 		for (int paramNamesIndex = 0; paramNamesIndex < paramNamesCount; ++paramNamesIndex){
+			if (!paramNamesModel->GetData(QByteArray(), paramNamesIndex).isValid()){
+				paramNamesList.AppendNull();
+				continue;
+			}
 			QString t_paramNames = paramNamesModel->GetData(QByteArray(), paramNamesIndex).toString();
 			paramNamesList << t_paramNames;
 		}
@@ -3712,10 +3858,17 @@ bool V1_0::imtbase::CParamsSet::OptReadFromModel(const ::imtbase::CTreeItemModel
 	}
 
 	::imtbase::CTreeItemModel* paramDescriptionsModel = model.GetTreeItemModel("paramDescriptions", modelIndex);
+	if (model.ContainsKey("paramDescriptions", modelIndex) && paramDescriptionsModel == nullptr){
+		paramDescriptions.SetNull();
+	}
 	if (paramDescriptionsModel != nullptr){
 		int paramDescriptionsCount = paramDescriptionsModel->GetItemsCount();
 		imtsdl::TElementList<QString> paramDescriptionsList;
 		for (int paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptionsCount; ++paramDescriptionsIndex){
+			if (!paramDescriptionsModel->GetData(QByteArray(), paramDescriptionsIndex).isValid()){
+				paramDescriptionsList.AppendNull();
+				continue;
+			}
 			QString t_paramDescriptions = paramDescriptionsModel->GetData(QByteArray(), paramDescriptionsIndex).toString();
 			paramDescriptionsList << t_paramDescriptions;
 		}
@@ -3724,10 +3877,17 @@ bool V1_0::imtbase::CParamsSet::OptReadFromModel(const ::imtbase::CTreeItemModel
 	}
 
 	::imtbase::CTreeItemModel* parametersModel = model.GetTreeItemModel("parameters", modelIndex);
+	if (model.ContainsKey("parameters", modelIndex) && parametersModel == nullptr){
+		parameters.SetNull();
+	}
 	if (parametersModel != nullptr){
 		int parametersCount = parametersModel->GetItemsCount();
 		imtsdl::TElementList<QString> parametersList;
 		for (int parametersIndex = 0; parametersIndex < parametersCount; ++parametersIndex){
+			if (!parametersModel->GetData(QByteArray(), parametersIndex).isValid()){
+				parametersList.AppendNull();
+				continue;
+			}
 			QString t_parameters = parametersModel->GetData(QByteArray(), parametersIndex).toString();
 			parametersList << t_parameters;
 		}
@@ -3744,41 +3904,76 @@ bool V1_0::imtbase::CParamsSet::WriteToGraphQlObject(::imtgql::CGqlParamObject& 
 	if (paramIds){
 		QVariantList paramIdsDataObjectList;
 		for (qsizetype paramIdsIndex = 0; paramIdsIndex < paramIds->size(); ++paramIdsIndex){
+			if (!paramIds->at(paramIdsIndex)){
+				paramIdsDataObjectList << QVariant();
+				continue;
+			}
 			paramIdsDataObjectList << *paramIds->at(paramIdsIndex);
 		}
 		gqlObject.InsertParam("paramIds", paramIdsDataObjectList);
+	}
+	else if (paramIds.IsNull()){
+		gqlObject.InsertParam("paramIds", QVariant());
 	}
 
 	if (paramTypeIds){
 		QVariantList paramTypeIdsDataObjectList;
 		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIds->size(); ++paramTypeIdsIndex){
+			if (!paramTypeIds->at(paramTypeIdsIndex)){
+				paramTypeIdsDataObjectList << QVariant();
+				continue;
+			}
 			paramTypeIdsDataObjectList << *paramTypeIds->at(paramTypeIdsIndex);
 		}
 		gqlObject.InsertParam("paramTypeIds", paramTypeIdsDataObjectList);
+	}
+	else if (paramTypeIds.IsNull()){
+		gqlObject.InsertParam("paramTypeIds", QVariant());
 	}
 
 	if (paramNames){
 		QVariantList paramNamesDataObjectList;
 		for (qsizetype paramNamesIndex = 0; paramNamesIndex < paramNames->size(); ++paramNamesIndex){
+			if (!paramNames->at(paramNamesIndex)){
+				paramNamesDataObjectList << QVariant();
+				continue;
+			}
 			paramNamesDataObjectList << *paramNames->at(paramNamesIndex);
 		}
 		gqlObject.InsertParam("paramNames", paramNamesDataObjectList);
+	}
+	else if (paramNames.IsNull()){
+		gqlObject.InsertParam("paramNames", QVariant());
 	}
 
 	if (paramDescriptions){
 		QVariantList paramDescriptionsDataObjectList;
 		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptions->size(); ++paramDescriptionsIndex){
+			if (!paramDescriptions->at(paramDescriptionsIndex)){
+				paramDescriptionsDataObjectList << QVariant();
+				continue;
+			}
 			paramDescriptionsDataObjectList << *paramDescriptions->at(paramDescriptionsIndex);
 		}
 		gqlObject.InsertParam("paramDescriptions", paramDescriptionsDataObjectList);
+	}
+	else if (paramDescriptions.IsNull()){
+		gqlObject.InsertParam("paramDescriptions", QVariant());
 	}
 
 	if (parameters){
 		QVariantList parametersDataObjectList;
 		for (qsizetype parametersIndex = 0; parametersIndex < parameters->size(); ++parametersIndex){
+			if (!parameters->at(parametersIndex)){
+				parametersDataObjectList << QVariant();
+				continue;
+			}
 			parametersDataObjectList << *parameters->at(parametersIndex);
 		}
 		gqlObject.InsertParam("parameters", parametersDataObjectList);
+	}
+	else if (parameters.IsNull()){
+		gqlObject.InsertParam("parameters", QVariant());
 	}
 
 	gqlObject.InsertParam("__typename", QVariant("ParamsSet"));
@@ -3789,8 +3984,8 @@ bool V1_0::imtbase::CParamsSet::WriteToGraphQlObject(::imtgql::CGqlParamObject& 
 
 bool V1_0::imtbase::CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("paramIds")){
-		paramIds.emplace();
+	if (gqlObject.ContainsParam("paramIds") && gqlObject["paramIds"].isNull()){
+		paramIds.SetNull();
 	}
 	if (gqlObject.ContainsParam("paramIds") && !(gqlObject["paramIds"].isNull())){
 		const QVariant paramIdsData = gqlObject["paramIds"];
@@ -3798,13 +3993,17 @@ bool V1_0::imtbase::CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		const qsizetype paramIdsElementsCount = paramIdsDataList.size();
 		paramIds = imtsdl::TElementList<QByteArray>();
 		for (qsizetype paramIdsIndex = 0; paramIdsIndex < paramIdsElementsCount; ++paramIdsIndex){
+			if (!paramIdsDataList[paramIdsIndex].isValid() || paramIdsDataList[paramIdsIndex].isNull()){
+				paramIds->AppendNull();
+				continue;
+			}
 			QByteArray tempParamIds = paramIdsDataList[paramIdsIndex].toByteArray();
 			paramIds->append(tempParamIds);
 		}
 	}
 
-	if (gqlObject.ContainsParam("paramTypeIds")){
-		paramTypeIds.emplace();
+	if (gqlObject.ContainsParam("paramTypeIds") && gqlObject["paramTypeIds"].isNull()){
+		paramTypeIds.SetNull();
 	}
 	if (gqlObject.ContainsParam("paramTypeIds") && !(gqlObject["paramTypeIds"].isNull())){
 		const QVariant paramTypeIdsData = gqlObject["paramTypeIds"];
@@ -3812,13 +4011,17 @@ bool V1_0::imtbase::CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		const qsizetype paramTypeIdsElementsCount = paramTypeIdsDataList.size();
 		paramTypeIds = imtsdl::TElementList<QByteArray>();
 		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIdsElementsCount; ++paramTypeIdsIndex){
+			if (!paramTypeIdsDataList[paramTypeIdsIndex].isValid() || paramTypeIdsDataList[paramTypeIdsIndex].isNull()){
+				paramTypeIds->AppendNull();
+				continue;
+			}
 			QByteArray tempParamTypeIds = paramTypeIdsDataList[paramTypeIdsIndex].toByteArray();
 			paramTypeIds->append(tempParamTypeIds);
 		}
 	}
 
-	if (gqlObject.ContainsParam("paramNames")){
-		paramNames.emplace();
+	if (gqlObject.ContainsParam("paramNames") && gqlObject["paramNames"].isNull()){
+		paramNames.SetNull();
 	}
 	if (gqlObject.ContainsParam("paramNames") && !(gqlObject["paramNames"].isNull())){
 		const QVariant paramNamesData = gqlObject["paramNames"];
@@ -3826,13 +4029,17 @@ bool V1_0::imtbase::CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		const qsizetype paramNamesElementsCount = paramNamesDataList.size();
 		paramNames = imtsdl::TElementList<QString>();
 		for (qsizetype paramNamesIndex = 0; paramNamesIndex < paramNamesElementsCount; ++paramNamesIndex){
+			if (!paramNamesDataList[paramNamesIndex].isValid() || paramNamesDataList[paramNamesIndex].isNull()){
+				paramNames->AppendNull();
+				continue;
+			}
 			QString tempParamNames = paramNamesDataList[paramNamesIndex].toString();
 			paramNames->append(tempParamNames);
 		}
 	}
 
-	if (gqlObject.ContainsParam("paramDescriptions")){
-		paramDescriptions.emplace();
+	if (gqlObject.ContainsParam("paramDescriptions") && gqlObject["paramDescriptions"].isNull()){
+		paramDescriptions.SetNull();
 	}
 	if (gqlObject.ContainsParam("paramDescriptions") && !(gqlObject["paramDescriptions"].isNull())){
 		const QVariant paramDescriptionsData = gqlObject["paramDescriptions"];
@@ -3840,13 +4047,17 @@ bool V1_0::imtbase::CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		const qsizetype paramDescriptionsElementsCount = paramDescriptionsDataList.size();
 		paramDescriptions = imtsdl::TElementList<QString>();
 		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptionsElementsCount; ++paramDescriptionsIndex){
+			if (!paramDescriptionsDataList[paramDescriptionsIndex].isValid() || paramDescriptionsDataList[paramDescriptionsIndex].isNull()){
+				paramDescriptions->AppendNull();
+				continue;
+			}
 			QString tempParamDescriptions = paramDescriptionsDataList[paramDescriptionsIndex].toString();
 			paramDescriptions->append(tempParamDescriptions);
 		}
 	}
 
-	if (gqlObject.ContainsParam("parameters")){
-		parameters.emplace();
+	if (gqlObject.ContainsParam("parameters") && gqlObject["parameters"].isNull()){
+		parameters.SetNull();
 	}
 	if (gqlObject.ContainsParam("parameters") && !(gqlObject["parameters"].isNull())){
 		const QVariant parametersData = gqlObject["parameters"];
@@ -3854,6 +4065,10 @@ bool V1_0::imtbase::CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		const qsizetype parametersElementsCount = parametersDataList.size();
 		parameters = imtsdl::TElementList<QString>();
 		for (qsizetype parametersIndex = 0; parametersIndex < parametersElementsCount; ++parametersIndex){
+			if (!parametersDataList[parametersIndex].isValid() || parametersDataList[parametersIndex].isNull()){
+				parameters->AppendNull();
+				continue;
+			}
 			QString tempParameters = parametersDataList[parametersIndex].toString();
 			parameters->append(tempParameters);
 		}
@@ -3865,8 +4080,8 @@ bool V1_0::imtbase::CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 
 bool V1_0::imtbase::CParamsSet::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("paramIds")){
-		paramIds.emplace();
+	if (gqlObject.ContainsParam("paramIds") && gqlObject["paramIds"].isNull()){
+		paramIds.SetNull();
 	}
 	if (gqlObject.ContainsParam("paramIds") && !(gqlObject["paramIds"].isNull())){
 		const QVariant paramIdsData = gqlObject["paramIds"];
@@ -3874,13 +4089,17 @@ bool V1_0::imtbase::CParamsSet::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		const qsizetype paramIdsElementsCount = paramIdsDataList.size();
 		paramIds = imtsdl::TElementList<QByteArray>();
 		for (qsizetype paramIdsIndex = 0; paramIdsIndex < paramIdsElementsCount; ++paramIdsIndex){
+			if (!paramIdsDataList[paramIdsIndex].isValid() || paramIdsDataList[paramIdsIndex].isNull()){
+				paramIds->AppendNull();
+				continue;
+			}
 			QByteArray tempParamIds = paramIdsDataList[paramIdsIndex].toByteArray();
 			paramIds->append(tempParamIds);
 		}
 	}
 
-	if (gqlObject.ContainsParam("paramTypeIds")){
-		paramTypeIds.emplace();
+	if (gqlObject.ContainsParam("paramTypeIds") && gqlObject["paramTypeIds"].isNull()){
+		paramTypeIds.SetNull();
 	}
 	if (gqlObject.ContainsParam("paramTypeIds") && !(gqlObject["paramTypeIds"].isNull())){
 		const QVariant paramTypeIdsData = gqlObject["paramTypeIds"];
@@ -3888,13 +4107,17 @@ bool V1_0::imtbase::CParamsSet::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		const qsizetype paramTypeIdsElementsCount = paramTypeIdsDataList.size();
 		paramTypeIds = imtsdl::TElementList<QByteArray>();
 		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIdsElementsCount; ++paramTypeIdsIndex){
+			if (!paramTypeIdsDataList[paramTypeIdsIndex].isValid() || paramTypeIdsDataList[paramTypeIdsIndex].isNull()){
+				paramTypeIds->AppendNull();
+				continue;
+			}
 			QByteArray tempParamTypeIds = paramTypeIdsDataList[paramTypeIdsIndex].toByteArray();
 			paramTypeIds->append(tempParamTypeIds);
 		}
 	}
 
-	if (gqlObject.ContainsParam("paramNames")){
-		paramNames.emplace();
+	if (gqlObject.ContainsParam("paramNames") && gqlObject["paramNames"].isNull()){
+		paramNames.SetNull();
 	}
 	if (gqlObject.ContainsParam("paramNames") && !(gqlObject["paramNames"].isNull())){
 		const QVariant paramNamesData = gqlObject["paramNames"];
@@ -3902,13 +4125,17 @@ bool V1_0::imtbase::CParamsSet::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		const qsizetype paramNamesElementsCount = paramNamesDataList.size();
 		paramNames = imtsdl::TElementList<QString>();
 		for (qsizetype paramNamesIndex = 0; paramNamesIndex < paramNamesElementsCount; ++paramNamesIndex){
+			if (!paramNamesDataList[paramNamesIndex].isValid() || paramNamesDataList[paramNamesIndex].isNull()){
+				paramNames->AppendNull();
+				continue;
+			}
 			QString tempParamNames = paramNamesDataList[paramNamesIndex].toString();
 			paramNames->append(tempParamNames);
 		}
 	}
 
-	if (gqlObject.ContainsParam("paramDescriptions")){
-		paramDescriptions.emplace();
+	if (gqlObject.ContainsParam("paramDescriptions") && gqlObject["paramDescriptions"].isNull()){
+		paramDescriptions.SetNull();
 	}
 	if (gqlObject.ContainsParam("paramDescriptions") && !(gqlObject["paramDescriptions"].isNull())){
 		const QVariant paramDescriptionsData = gqlObject["paramDescriptions"];
@@ -3916,13 +4143,17 @@ bool V1_0::imtbase::CParamsSet::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		const qsizetype paramDescriptionsElementsCount = paramDescriptionsDataList.size();
 		paramDescriptions = imtsdl::TElementList<QString>();
 		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptionsElementsCount; ++paramDescriptionsIndex){
+			if (!paramDescriptionsDataList[paramDescriptionsIndex].isValid() || paramDescriptionsDataList[paramDescriptionsIndex].isNull()){
+				paramDescriptions->AppendNull();
+				continue;
+			}
 			QString tempParamDescriptions = paramDescriptionsDataList[paramDescriptionsIndex].toString();
 			paramDescriptions->append(tempParamDescriptions);
 		}
 	}
 
-	if (gqlObject.ContainsParam("parameters")){
-		parameters.emplace();
+	if (gqlObject.ContainsParam("parameters") && gqlObject["parameters"].isNull()){
+		parameters.SetNull();
 	}
 	if (gqlObject.ContainsParam("parameters") && !(gqlObject["parameters"].isNull())){
 		const QVariant parametersData = gqlObject["parameters"];
@@ -3930,6 +4161,10 @@ bool V1_0::imtbase::CParamsSet::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		const qsizetype parametersElementsCount = parametersDataList.size();
 		parameters = imtsdl::TElementList<QString>();
 		for (qsizetype parametersIndex = 0; parametersIndex < parametersElementsCount; ++parametersIndex){
+			if (!parametersDataList[parametersIndex].isValid() || parametersDataList[parametersIndex].isNull()){
+				parameters->AppendNull();
+				continue;
+			}
 			QString tempParameters = parametersDataList[parametersIndex].toString();
 			parameters->append(tempParameters);
 		}
@@ -3944,41 +4179,76 @@ bool V1_0::imtbase::CParamsSet::WriteToJsonObject(QJsonObject& jsonObject) const
 	if (paramIds){
 		QJsonArray newParamIdsArray;
 		for (qsizetype paramIdsIndex = 0; paramIdsIndex < paramIds->size(); ++paramIdsIndex){
+			if (!paramIds->at(paramIdsIndex)){
+				newParamIdsArray << QJsonValue(QJsonValue::Null);
+				continue;
+			}
 			newParamIdsArray << QString(*paramIds->at(paramIdsIndex));
 		}
 		jsonObject["paramIds"] = newParamIdsArray;
+	}
+	else if (paramIds.IsNull()){
+		jsonObject["paramIds"] = QJsonValue(QJsonValue::Null);
 	}
 
 	if (paramTypeIds){
 		QJsonArray newParamTypeIdsArray;
 		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIds->size(); ++paramTypeIdsIndex){
+			if (!paramTypeIds->at(paramTypeIdsIndex)){
+				newParamTypeIdsArray << QJsonValue(QJsonValue::Null);
+				continue;
+			}
 			newParamTypeIdsArray << QString(*paramTypeIds->at(paramTypeIdsIndex));
 		}
 		jsonObject["paramTypeIds"] = newParamTypeIdsArray;
+	}
+	else if (paramTypeIds.IsNull()){
+		jsonObject["paramTypeIds"] = QJsonValue(QJsonValue::Null);
 	}
 
 	if (paramNames){
 		QJsonArray newParamNamesArray;
 		for (qsizetype paramNamesIndex = 0; paramNamesIndex < paramNames->size(); ++paramNamesIndex){
+			if (!paramNames->at(paramNamesIndex)){
+				newParamNamesArray << QJsonValue(QJsonValue::Null);
+				continue;
+			}
 			newParamNamesArray << *paramNames->at(paramNamesIndex);
 		}
 		jsonObject["paramNames"] = newParamNamesArray;
+	}
+	else if (paramNames.IsNull()){
+		jsonObject["paramNames"] = QJsonValue(QJsonValue::Null);
 	}
 
 	if (paramDescriptions){
 		QJsonArray newParamDescriptionsArray;
 		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptions->size(); ++paramDescriptionsIndex){
+			if (!paramDescriptions->at(paramDescriptionsIndex)){
+				newParamDescriptionsArray << QJsonValue(QJsonValue::Null);
+				continue;
+			}
 			newParamDescriptionsArray << *paramDescriptions->at(paramDescriptionsIndex);
 		}
 		jsonObject["paramDescriptions"] = newParamDescriptionsArray;
+	}
+	else if (paramDescriptions.IsNull()){
+		jsonObject["paramDescriptions"] = QJsonValue(QJsonValue::Null);
 	}
 
 	if (parameters){
 		QJsonArray newParametersArray;
 		for (qsizetype parametersIndex = 0; parametersIndex < parameters->size(); ++parametersIndex){
+			if (!parameters->at(parametersIndex)){
+				newParametersArray << QJsonValue(QJsonValue::Null);
+				continue;
+			}
 			newParametersArray << *parameters->at(parametersIndex);
 		}
 		jsonObject["parameters"] = newParametersArray;
+	}
+	else if (parameters.IsNull()){
+		jsonObject["parameters"] = QJsonValue(QJsonValue::Null);
 	}
 
 	jsonObject["__typename"] = "ParamsSet";
@@ -3989,51 +4259,86 @@ bool V1_0::imtbase::CParamsSet::WriteToJsonObject(QJsonObject& jsonObject) const
 
 bool V1_0::imtbase::CParamsSet::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
-	if (jsonObject.contains("paramIds") && jsonObject["paramIds"].isArray()){
+if (jsonObject.contains("paramIds") && jsonObject["paramIds"].isNull()){
+		paramIds.SetNull();
+	}
+		if (jsonObject.contains("paramIds") && jsonObject["paramIds"].isArray()){
 		const QJsonArray paramIdsJsonArray = jsonObject["paramIds"].toArray();
 		const qsizetype paramIdsArrayCount = paramIdsJsonArray.size();
 		paramIds = imtsdl::TElementList<QByteArray>();
 		for (qsizetype paramIdsIndex = 0; paramIdsIndex < paramIdsArrayCount; ++paramIdsIndex){
+			if (paramIdsJsonArray[paramIdsIndex].isNull()){
+				paramIds->AppendNull();
+				continue;
+			}
 			QByteArray tempParamIds = paramIdsJsonArray[paramIdsIndex].toString().toUtf8();
 			paramIds->append(tempParamIds);
 		}
 	}
 
-	if (jsonObject.contains("paramTypeIds") && jsonObject["paramTypeIds"].isArray()){
+if (jsonObject.contains("paramTypeIds") && jsonObject["paramTypeIds"].isNull()){
+		paramTypeIds.SetNull();
+	}
+		if (jsonObject.contains("paramTypeIds") && jsonObject["paramTypeIds"].isArray()){
 		const QJsonArray paramTypeIdsJsonArray = jsonObject["paramTypeIds"].toArray();
 		const qsizetype paramTypeIdsArrayCount = paramTypeIdsJsonArray.size();
 		paramTypeIds = imtsdl::TElementList<QByteArray>();
 		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIdsArrayCount; ++paramTypeIdsIndex){
+			if (paramTypeIdsJsonArray[paramTypeIdsIndex].isNull()){
+				paramTypeIds->AppendNull();
+				continue;
+			}
 			QByteArray tempParamTypeIds = paramTypeIdsJsonArray[paramTypeIdsIndex].toString().toUtf8();
 			paramTypeIds->append(tempParamTypeIds);
 		}
 	}
 
-	if (jsonObject.contains("paramNames") && jsonObject["paramNames"].isArray()){
+if (jsonObject.contains("paramNames") && jsonObject["paramNames"].isNull()){
+		paramNames.SetNull();
+	}
+		if (jsonObject.contains("paramNames") && jsonObject["paramNames"].isArray()){
 		const QJsonArray paramNamesJsonArray = jsonObject["paramNames"].toArray();
 		const qsizetype paramNamesArrayCount = paramNamesJsonArray.size();
 		paramNames = imtsdl::TElementList<QString>();
 		for (qsizetype paramNamesIndex = 0; paramNamesIndex < paramNamesArrayCount; ++paramNamesIndex){
+			if (paramNamesJsonArray[paramNamesIndex].isNull()){
+				paramNames->AppendNull();
+				continue;
+			}
 			QString tempParamNames = paramNamesJsonArray[paramNamesIndex].toString();
 			paramNames->append(tempParamNames);
 		}
 	}
 
-	if (jsonObject.contains("paramDescriptions") && jsonObject["paramDescriptions"].isArray()){
+if (jsonObject.contains("paramDescriptions") && jsonObject["paramDescriptions"].isNull()){
+		paramDescriptions.SetNull();
+	}
+		if (jsonObject.contains("paramDescriptions") && jsonObject["paramDescriptions"].isArray()){
 		const QJsonArray paramDescriptionsJsonArray = jsonObject["paramDescriptions"].toArray();
 		const qsizetype paramDescriptionsArrayCount = paramDescriptionsJsonArray.size();
 		paramDescriptions = imtsdl::TElementList<QString>();
 		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptionsArrayCount; ++paramDescriptionsIndex){
+			if (paramDescriptionsJsonArray[paramDescriptionsIndex].isNull()){
+				paramDescriptions->AppendNull();
+				continue;
+			}
 			QString tempParamDescriptions = paramDescriptionsJsonArray[paramDescriptionsIndex].toString();
 			paramDescriptions->append(tempParamDescriptions);
 		}
 	}
 
-	if (jsonObject.contains("parameters") && jsonObject["parameters"].isArray()){
+if (jsonObject.contains("parameters") && jsonObject["parameters"].isNull()){
+		parameters.SetNull();
+	}
+		if (jsonObject.contains("parameters") && jsonObject["parameters"].isArray()){
 		const QJsonArray parametersJsonArray = jsonObject["parameters"].toArray();
 		const qsizetype parametersArrayCount = parametersJsonArray.size();
 		parameters = imtsdl::TElementList<QString>();
 		for (qsizetype parametersIndex = 0; parametersIndex < parametersArrayCount; ++parametersIndex){
+			if (parametersJsonArray[parametersIndex].isNull()){
+				parameters->AppendNull();
+				continue;
+			}
 			QString tempParameters = parametersJsonArray[parametersIndex].toString();
 			parameters->append(tempParameters);
 		}
@@ -4045,51 +4350,86 @@ bool V1_0::imtbase::CParamsSet::ReadFromJsonObject(const QJsonObject& jsonObject
 
 bool V1_0::imtbase::CParamsSet::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
-	if (jsonObject.contains("paramIds") && jsonObject["paramIds"].isArray()){
+if (jsonObject.contains("paramIds") && jsonObject["paramIds"].isNull()){
+		paramIds.SetNull();
+	}
+		if (jsonObject.contains("paramIds") && jsonObject["paramIds"].isArray()){
 		const QJsonArray paramIdsJsonArray = jsonObject["paramIds"].toArray();
 		const qsizetype paramIdsArrayCount = paramIdsJsonArray.size();
 		paramIds = imtsdl::TElementList<QByteArray>();
 		for (qsizetype paramIdsIndex = 0; paramIdsIndex < paramIdsArrayCount; ++paramIdsIndex){
+			if (paramIdsJsonArray[paramIdsIndex].isNull()){
+				paramIds->AppendNull();
+				continue;
+			}
 			QByteArray tempParamIds = paramIdsJsonArray[paramIdsIndex].toString().toUtf8();
 			paramIds->append(tempParamIds);
 		}
 	}
 
-	if (jsonObject.contains("paramTypeIds") && jsonObject["paramTypeIds"].isArray()){
+if (jsonObject.contains("paramTypeIds") && jsonObject["paramTypeIds"].isNull()){
+		paramTypeIds.SetNull();
+	}
+		if (jsonObject.contains("paramTypeIds") && jsonObject["paramTypeIds"].isArray()){
 		const QJsonArray paramTypeIdsJsonArray = jsonObject["paramTypeIds"].toArray();
 		const qsizetype paramTypeIdsArrayCount = paramTypeIdsJsonArray.size();
 		paramTypeIds = imtsdl::TElementList<QByteArray>();
 		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIdsArrayCount; ++paramTypeIdsIndex){
+			if (paramTypeIdsJsonArray[paramTypeIdsIndex].isNull()){
+				paramTypeIds->AppendNull();
+				continue;
+			}
 			QByteArray tempParamTypeIds = paramTypeIdsJsonArray[paramTypeIdsIndex].toString().toUtf8();
 			paramTypeIds->append(tempParamTypeIds);
 		}
 	}
 
-	if (jsonObject.contains("paramNames") && jsonObject["paramNames"].isArray()){
+if (jsonObject.contains("paramNames") && jsonObject["paramNames"].isNull()){
+		paramNames.SetNull();
+	}
+		if (jsonObject.contains("paramNames") && jsonObject["paramNames"].isArray()){
 		const QJsonArray paramNamesJsonArray = jsonObject["paramNames"].toArray();
 		const qsizetype paramNamesArrayCount = paramNamesJsonArray.size();
 		paramNames = imtsdl::TElementList<QString>();
 		for (qsizetype paramNamesIndex = 0; paramNamesIndex < paramNamesArrayCount; ++paramNamesIndex){
+			if (paramNamesJsonArray[paramNamesIndex].isNull()){
+				paramNames->AppendNull();
+				continue;
+			}
 			QString tempParamNames = paramNamesJsonArray[paramNamesIndex].toString();
 			paramNames->append(tempParamNames);
 		}
 	}
 
-	if (jsonObject.contains("paramDescriptions") && jsonObject["paramDescriptions"].isArray()){
+if (jsonObject.contains("paramDescriptions") && jsonObject["paramDescriptions"].isNull()){
+		paramDescriptions.SetNull();
+	}
+		if (jsonObject.contains("paramDescriptions") && jsonObject["paramDescriptions"].isArray()){
 		const QJsonArray paramDescriptionsJsonArray = jsonObject["paramDescriptions"].toArray();
 		const qsizetype paramDescriptionsArrayCount = paramDescriptionsJsonArray.size();
 		paramDescriptions = imtsdl::TElementList<QString>();
 		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptionsArrayCount; ++paramDescriptionsIndex){
+			if (paramDescriptionsJsonArray[paramDescriptionsIndex].isNull()){
+				paramDescriptions->AppendNull();
+				continue;
+			}
 			QString tempParamDescriptions = paramDescriptionsJsonArray[paramDescriptionsIndex].toString();
 			paramDescriptions->append(tempParamDescriptions);
 		}
 	}
 
-	if (jsonObject.contains("parameters") && jsonObject["parameters"].isArray()){
+if (jsonObject.contains("parameters") && jsonObject["parameters"].isNull()){
+		parameters.SetNull();
+	}
+		if (jsonObject.contains("parameters") && jsonObject["parameters"].isArray()){
 		const QJsonArray parametersJsonArray = jsonObject["parameters"].toArray();
 		const qsizetype parametersArrayCount = parametersJsonArray.size();
 		parameters = imtsdl::TElementList<QString>();
 		for (qsizetype parametersIndex = 0; parametersIndex < parametersArrayCount; ++parametersIndex){
+			if (parametersJsonArray[parametersIndex].isNull()){
+				parameters->AppendNull();
+				continue;
+			}
 			QString tempParameters = parametersJsonArray[parametersIndex].toString();
 			parameters->append(tempParameters);
 		}
@@ -4133,9 +4473,17 @@ bool V1_0::imtbase::CMimeType::WriteToModel(::imtbase::CTreeItemModel& model, in
 		::imtbase::CTreeItemModel* newTreeModelPtr = model.AddTreeModel("tree", modelIndex);
 		newTreeModelPtr->setIsArray(true);
 		for (qsizetype treeIndex = 0; treeIndex < tree->size(); ++treeIndex){
+			if (!tree->at(treeIndex)){
+				newTreeModelPtr->InsertNewItem();
+				newTreeModelPtr->SetData(QByteArray(), QVariant(), treeIndex);
+				continue;
+			}
 			newTreeModelPtr->InsertNewItem();
 			newTreeModelPtr->SetData(QByteArray(), *tree->at(treeIndex), treeIndex);
 		}
+	}
+	else if (tree.IsNull()){
+		model.SetData("tree", QVariant(), modelIndex);
 	}
 
 	if (!subType){
@@ -4153,9 +4501,17 @@ bool V1_0::imtbase::CMimeType::WriteToModel(::imtbase::CTreeItemModel& model, in
 		::imtbase::CTreeItemModel* newParametersModelPtr = model.AddTreeModel("parameters", modelIndex);
 		newParametersModelPtr->setIsArray(true);
 		for (qsizetype parametersIndex = 0; parametersIndex < parameters->size(); ++parametersIndex){
+			if (!parameters->at(parametersIndex)){
+				newParametersModelPtr->InsertNewItem();
+				newParametersModelPtr->SetData(QByteArray(), QVariant(), parametersIndex);
+				continue;
+			}
 			newParametersModelPtr->InsertNewItem();
 			newParametersModelPtr->SetData(QByteArray(), *parameters->at(parametersIndex), parametersIndex);
 		}
+	}
+	else if (parameters.IsNull()){
+		model.SetData("parameters", QVariant(), modelIndex);
 	}
 
 
@@ -4174,10 +4530,17 @@ bool V1_0::imtbase::CMimeType::ReadFromModel(const ::imtbase::CTreeItemModel& mo
 	type = typeData.toString();
 
 	::imtbase::CTreeItemModel* treeModel = model.GetTreeItemModel("tree", modelIndex);
+	if (model.ContainsKey("tree", modelIndex) && treeModel == nullptr){
+		tree.SetNull();
+	}
 	if (treeModel != nullptr){
 		int treeCount = treeModel->GetItemsCount();
 		imtsdl::TElementList<QString> treeList;
 		for (int treeIndex = 0; treeIndex < treeCount; ++treeIndex){
+			if (!treeModel->GetData(QByteArray(), treeIndex).isValid()){
+				treeList.AppendNull();
+				continue;
+			}
 			QString t_tree = treeModel->GetData(QByteArray(), treeIndex).toString();
 			treeList << t_tree;
 		}
@@ -4199,10 +4562,17 @@ bool V1_0::imtbase::CMimeType::ReadFromModel(const ::imtbase::CTreeItemModel& mo
 	}
 
 	::imtbase::CTreeItemModel* parametersModel = model.GetTreeItemModel("parameters", modelIndex);
+	if (model.ContainsKey("parameters", modelIndex) && parametersModel == nullptr){
+		parameters.SetNull();
+	}
 	if (parametersModel != nullptr){
 		int parametersCount = parametersModel->GetItemsCount();
 		imtsdl::TElementList<QString> parametersList;
 		for (int parametersIndex = 0; parametersIndex < parametersCount; ++parametersIndex){
+			if (!parametersModel->GetData(QByteArray(), parametersIndex).isValid()){
+				parametersList.AppendNull();
+				continue;
+			}
 			QString t_parameters = parametersModel->GetData(QByteArray(), parametersIndex).toString();
 			parametersList << t_parameters;
 		}
@@ -4222,10 +4592,17 @@ bool V1_0::imtbase::CMimeType::OptReadFromModel(const ::imtbase::CTreeItemModel&
 	}
 
 	::imtbase::CTreeItemModel* treeModel = model.GetTreeItemModel("tree", modelIndex);
+	if (model.ContainsKey("tree", modelIndex) && treeModel == nullptr){
+		tree.SetNull();
+	}
 	if (treeModel != nullptr){
 		int treeCount = treeModel->GetItemsCount();
 		imtsdl::TElementList<QString> treeList;
 		for (int treeIndex = 0; treeIndex < treeCount; ++treeIndex){
+			if (!treeModel->GetData(QByteArray(), treeIndex).isValid()){
+				treeList.AppendNull();
+				continue;
+			}
 			QString t_tree = treeModel->GetData(QByteArray(), treeIndex).toString();
 			treeList << t_tree;
 		}
@@ -4244,10 +4621,17 @@ bool V1_0::imtbase::CMimeType::OptReadFromModel(const ::imtbase::CTreeItemModel&
 	}
 
 	::imtbase::CTreeItemModel* parametersModel = model.GetTreeItemModel("parameters", modelIndex);
+	if (model.ContainsKey("parameters", modelIndex) && parametersModel == nullptr){
+		parameters.SetNull();
+	}
 	if (parametersModel != nullptr){
 		int parametersCount = parametersModel->GetItemsCount();
 		imtsdl::TElementList<QString> parametersList;
 		for (int parametersIndex = 0; parametersIndex < parametersCount; ++parametersIndex){
+			if (!parametersModel->GetData(QByteArray(), parametersIndex).isValid()){
+				parametersList.AppendNull();
+				continue;
+			}
 			QString t_parameters = parametersModel->GetData(QByteArray(), parametersIndex).toString();
 			parametersList << t_parameters;
 		}
@@ -4271,9 +4655,16 @@ bool V1_0::imtbase::CMimeType::WriteToGraphQlObject(::imtgql::CGqlParamObject& g
 	if (tree){
 		QVariantList treeDataObjectList;
 		for (qsizetype treeIndex = 0; treeIndex < tree->size(); ++treeIndex){
+			if (!tree->at(treeIndex)){
+				treeDataObjectList << QVariant();
+				continue;
+			}
 			treeDataObjectList << *tree->at(treeIndex);
 		}
 		gqlObject.InsertParam("tree", treeDataObjectList);
+	}
+	else if (tree.IsNull()){
+		gqlObject.InsertParam("tree", QVariant());
 	}
 
 	if (!subType){
@@ -4290,9 +4681,16 @@ bool V1_0::imtbase::CMimeType::WriteToGraphQlObject(::imtgql::CGqlParamObject& g
 	if (parameters){
 		QVariantList parametersDataObjectList;
 		for (qsizetype parametersIndex = 0; parametersIndex < parameters->size(); ++parametersIndex){
+			if (!parameters->at(parametersIndex)){
+				parametersDataObjectList << QVariant();
+				continue;
+			}
 			parametersDataObjectList << *parameters->at(parametersIndex);
 		}
 		gqlObject.InsertParam("parameters", parametersDataObjectList);
+	}
+	else if (parameters.IsNull()){
+		gqlObject.InsertParam("parameters", QVariant());
 	}
 
 	gqlObject.InsertParam("__typename", QVariant("MimeType"));
@@ -4310,8 +4708,8 @@ bool V1_0::imtbase::CMimeType::ReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 	}
 	type = gqlObject["type"].toString();
 
-	if (gqlObject.ContainsParam("tree")){
-		tree.emplace();
+	if (gqlObject.ContainsParam("tree") && gqlObject["tree"].isNull()){
+		tree.SetNull();
 	}
 	if (gqlObject.ContainsParam("tree") && !(gqlObject["tree"].isNull())){
 		const QVariant treeData = gqlObject["tree"];
@@ -4319,6 +4717,10 @@ bool V1_0::imtbase::CMimeType::ReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 		const qsizetype treeElementsCount = treeDataList.size();
 		tree = imtsdl::TElementList<QString>();
 		for (qsizetype treeIndex = 0; treeIndex < treeElementsCount; ++treeIndex){
+			if (!treeDataList[treeIndex].isValid() || treeDataList[treeIndex].isNull()){
+				tree->AppendNull();
+				continue;
+			}
 			QString tempTree = treeDataList[treeIndex].toString();
 			tree->append(tempTree);
 		}
@@ -4335,8 +4737,8 @@ bool V1_0::imtbase::CMimeType::ReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 		suffix = gqlObject["suffix"].toString();
 	}
 
-	if (gqlObject.ContainsParam("parameters")){
-		parameters.emplace();
+	if (gqlObject.ContainsParam("parameters") && gqlObject["parameters"].isNull()){
+		parameters.SetNull();
 	}
 	if (gqlObject.ContainsParam("parameters") && !(gqlObject["parameters"].isNull())){
 		const QVariant parametersData = gqlObject["parameters"];
@@ -4344,6 +4746,10 @@ bool V1_0::imtbase::CMimeType::ReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 		const qsizetype parametersElementsCount = parametersDataList.size();
 		parameters = imtsdl::TElementList<QString>();
 		for (qsizetype parametersIndex = 0; parametersIndex < parametersElementsCount; ++parametersIndex){
+			if (!parametersDataList[parametersIndex].isValid() || parametersDataList[parametersIndex].isNull()){
+				parameters->AppendNull();
+				continue;
+			}
 			QString tempParameters = parametersDataList[parametersIndex].toString();
 			parameters->append(tempParameters);
 		}
@@ -4359,8 +4765,8 @@ bool V1_0::imtbase::CMimeType::OptReadFromGraphQlObject(const ::imtgql::CGqlPara
 		type = gqlObject["type"].toString();
 	}
 
-	if (gqlObject.ContainsParam("tree")){
-		tree.emplace();
+	if (gqlObject.ContainsParam("tree") && gqlObject["tree"].isNull()){
+		tree.SetNull();
 	}
 	if (gqlObject.ContainsParam("tree") && !(gqlObject["tree"].isNull())){
 		const QVariant treeData = gqlObject["tree"];
@@ -4368,6 +4774,10 @@ bool V1_0::imtbase::CMimeType::OptReadFromGraphQlObject(const ::imtgql::CGqlPara
 		const qsizetype treeElementsCount = treeDataList.size();
 		tree = imtsdl::TElementList<QString>();
 		for (qsizetype treeIndex = 0; treeIndex < treeElementsCount; ++treeIndex){
+			if (!treeDataList[treeIndex].isValid() || treeDataList[treeIndex].isNull()){
+				tree->AppendNull();
+				continue;
+			}
 			QString tempTree = treeDataList[treeIndex].toString();
 			tree->append(tempTree);
 		}
@@ -4381,8 +4791,8 @@ bool V1_0::imtbase::CMimeType::OptReadFromGraphQlObject(const ::imtgql::CGqlPara
 		suffix = gqlObject["suffix"].toString();
 	}
 
-	if (gqlObject.ContainsParam("parameters")){
-		parameters.emplace();
+	if (gqlObject.ContainsParam("parameters") && gqlObject["parameters"].isNull()){
+		parameters.SetNull();
 	}
 	if (gqlObject.ContainsParam("parameters") && !(gqlObject["parameters"].isNull())){
 		const QVariant parametersData = gqlObject["parameters"];
@@ -4390,6 +4800,10 @@ bool V1_0::imtbase::CMimeType::OptReadFromGraphQlObject(const ::imtgql::CGqlPara
 		const qsizetype parametersElementsCount = parametersDataList.size();
 		parameters = imtsdl::TElementList<QString>();
 		for (qsizetype parametersIndex = 0; parametersIndex < parametersElementsCount; ++parametersIndex){
+			if (!parametersDataList[parametersIndex].isValid() || parametersDataList[parametersIndex].isNull()){
+				parameters->AppendNull();
+				continue;
+			}
 			QString tempParameters = parametersDataList[parametersIndex].toString();
 			parameters->append(tempParameters);
 		}
@@ -4411,9 +4825,16 @@ bool V1_0::imtbase::CMimeType::WriteToJsonObject(QJsonObject& jsonObject) const
 	if (tree){
 		QJsonArray newTreeArray;
 		for (qsizetype treeIndex = 0; treeIndex < tree->size(); ++treeIndex){
+			if (!tree->at(treeIndex)){
+				newTreeArray << QJsonValue(QJsonValue::Null);
+				continue;
+			}
 			newTreeArray << *tree->at(treeIndex);
 		}
 		jsonObject["tree"] = newTreeArray;
+	}
+	else if (tree.IsNull()){
+		jsonObject["tree"] = QJsonValue(QJsonValue::Null);
 	}
 
 	if (!subType){
@@ -4430,9 +4851,16 @@ bool V1_0::imtbase::CMimeType::WriteToJsonObject(QJsonObject& jsonObject) const
 	if (parameters){
 		QJsonArray newParametersArray;
 		for (qsizetype parametersIndex = 0; parametersIndex < parameters->size(); ++parametersIndex){
+			if (!parameters->at(parametersIndex)){
+				newParametersArray << QJsonValue(QJsonValue::Null);
+				continue;
+			}
 			newParametersArray << *parameters->at(parametersIndex);
 		}
 		jsonObject["parameters"] = newParametersArray;
+	}
+	else if (parameters.IsNull()){
+		jsonObject["parameters"] = QJsonValue(QJsonValue::Null);
 	}
 
 	jsonObject["__typename"] = "MimeType";
@@ -4450,11 +4878,18 @@ bool V1_0::imtbase::CMimeType::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	type = jsonObject["type"].toString();
 
-	if (jsonObject.contains("tree") && jsonObject["tree"].isArray()){
+if (jsonObject.contains("tree") && jsonObject["tree"].isNull()){
+		tree.SetNull();
+	}
+		if (jsonObject.contains("tree") && jsonObject["tree"].isArray()){
 		const QJsonArray treeJsonArray = jsonObject["tree"].toArray();
 		const qsizetype treeArrayCount = treeJsonArray.size();
 		tree = imtsdl::TElementList<QString>();
 		for (qsizetype treeIndex = 0; treeIndex < treeArrayCount; ++treeIndex){
+			if (treeJsonArray[treeIndex].isNull()){
+				tree->AppendNull();
+				continue;
+			}
 			QString tempTree = treeJsonArray[treeIndex].toString();
 			tree->append(tempTree);
 		}
@@ -4471,11 +4906,18 @@ bool V1_0::imtbase::CMimeType::ReadFromJsonObject(const QJsonObject& jsonObject)
 		suffix = jsonObject["suffix"].toString();
 	}
 
-	if (jsonObject.contains("parameters") && jsonObject["parameters"].isArray()){
+if (jsonObject.contains("parameters") && jsonObject["parameters"].isNull()){
+		parameters.SetNull();
+	}
+		if (jsonObject.contains("parameters") && jsonObject["parameters"].isArray()){
 		const QJsonArray parametersJsonArray = jsonObject["parameters"].toArray();
 		const qsizetype parametersArrayCount = parametersJsonArray.size();
 		parameters = imtsdl::TElementList<QString>();
 		for (qsizetype parametersIndex = 0; parametersIndex < parametersArrayCount; ++parametersIndex){
+			if (parametersJsonArray[parametersIndex].isNull()){
+				parameters->AppendNull();
+				continue;
+			}
 			QString tempParameters = parametersJsonArray[parametersIndex].toString();
 			parameters->append(tempParameters);
 		}
@@ -4491,11 +4933,18 @@ bool V1_0::imtbase::CMimeType::OptReadFromJsonObject(const QJsonObject& jsonObje
 		type = jsonObject["type"].toString();
 	}
 
-	if (jsonObject.contains("tree") && jsonObject["tree"].isArray()){
+if (jsonObject.contains("tree") && jsonObject["tree"].isNull()){
+		tree.SetNull();
+	}
+		if (jsonObject.contains("tree") && jsonObject["tree"].isArray()){
 		const QJsonArray treeJsonArray = jsonObject["tree"].toArray();
 		const qsizetype treeArrayCount = treeJsonArray.size();
 		tree = imtsdl::TElementList<QString>();
 		for (qsizetype treeIndex = 0; treeIndex < treeArrayCount; ++treeIndex){
+			if (treeJsonArray[treeIndex].isNull()){
+				tree->AppendNull();
+				continue;
+			}
 			QString tempTree = treeJsonArray[treeIndex].toString();
 			tree->append(tempTree);
 		}
@@ -4509,11 +4958,18 @@ bool V1_0::imtbase::CMimeType::OptReadFromJsonObject(const QJsonObject& jsonObje
 		suffix = jsonObject["suffix"].toString();
 	}
 
-	if (jsonObject.contains("parameters") && jsonObject["parameters"].isArray()){
+if (jsonObject.contains("parameters") && jsonObject["parameters"].isNull()){
+		parameters.SetNull();
+	}
+		if (jsonObject.contains("parameters") && jsonObject["parameters"].isArray()){
 		const QJsonArray parametersJsonArray = jsonObject["parameters"].toArray();
 		const qsizetype parametersArrayCount = parametersJsonArray.size();
 		parameters = imtsdl::TElementList<QString>();
 		for (qsizetype parametersIndex = 0; parametersIndex < parametersArrayCount; ++parametersIndex){
+			if (parametersJsonArray[parametersIndex].isNull()){
+				parameters->AppendNull();
+				continue;
+			}
 			QString tempParameters = parametersJsonArray[parametersIndex].toString();
 			parameters->append(tempParameters);
 		}
@@ -7180,6 +7636,7 @@ bool COptionsListObject::hasOffset()
 
 QVariant COptionsListObject::GetOptions()
 {
+	if (!options) {return {};}
 	if (!m_optionsQObjectPtr.isValid()){
 		m_optionsQObjectPtr = CreateObject("options");
 		auto itemPtr = m_optionsQObjectPtr.value<sdl::V1_0::imtbase::COptionObjectList*>();
@@ -7191,12 +7648,14 @@ QVariant COptionsListObject::GetOptions()
 
 void COptionsListObject::SetOptions(const QVariant& v)
 {
-	if (v.isValid()){
+	if (v.isValid() && !v.isNull()){
 		sdl::V1_0::imtbase::COptionObjectList* itemPtr = v.value<sdl::V1_0::imtbase::COptionObjectList*>();
-		if (itemPtr != nullptr) COptionsList::options = itemPtr->Version_1_0;
+		if (itemPtr != nullptr){
+			COptionsList::options = itemPtr->Version_1_0;
+		}
 	}
 	else {
-		COptionsList::options = nullptr;
+		COptionsList::options.SetNull();
 	}
 	m_optionsQObjectPtr = v;
 
@@ -7454,12 +7913,12 @@ QVariant CSelectionParamObject::GetConstraints()
 
 void CSelectionParamObject::SetConstraints(const QVariant& v)
 {
-	if (v.isValid()){
+	if (v.isValid() && !v.isNull()){
 		sdl::V1_0::imtbase::COptionsListObject* itemPtr = v.value<sdl::V1_0::imtbase::COptionsListObject*>();
 		if (itemPtr != nullptr) CSelectionParam::constraints = (*itemPtr);
 	}
 	else {
-		CSelectionParam::constraints = nullptr;
+		CSelectionParam::constraints.SetNull();
 	}
 	m_constraintsQObjectPtr = v;
 
@@ -7895,12 +8354,12 @@ QVariant CBackupSettingsObject::GetSchedulerParam()
 
 void CBackupSettingsObject::SetSchedulerParam(const QVariant& v)
 {
-	if (v.isValid()){
+	if (v.isValid() && !v.isNull()){
 		sdl::V1_0::imtbase::CSchedulerParamObject* itemPtr = v.value<sdl::V1_0::imtbase::CSchedulerParamObject*>();
 		if (itemPtr != nullptr) CBackupSettings::schedulerParam = (*itemPtr);
 	}
 	else {
-		CBackupSettings::schedulerParam = nullptr;
+		CBackupSettings::schedulerParam.SetNull();
 	}
 	m_schedulerParamQObjectPtr = v;
 
@@ -8659,25 +9118,34 @@ QVariant CParamsSetObject::GetParamIds()
 {
 	if (!paramIds ){return {};}
 
-	QList<QString> tempParamIdsList;
+	QVariantList tempParamIdsList;
 	for (const auto& tempValue: paramIds.value()){
-		tempParamIdsList << *tempValue;
+		tempParamIdsList << (tempValue ? QVariant(QString::fromUtf8(*tempValue)) : QVariant());
 	}
 
-	return QVariant::fromValue(tempParamIdsList);
+	return tempParamIdsList;
 }
 
 
 void CParamsSetObject::SetParamIds(const QVariant& v)
 {
+	if (!v.isValid() || v.isNull()){
+		CParamsSet::paramIds.SetNull();
+		paramIdsChanged();
+		return;
+	}
 	if (!CParamsSet::paramIds){
 		CParamsSet::paramIds.emplace();
 	}
 	else{
 		CParamsSet::paramIds->clear();
 	}
-	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QByteArray> tempItem(tempValue.toUtf8());
+	for (const QVariant& tempValue: v.toList()){
+		if (!tempValue.isValid() || tempValue.isNull()){
+			CParamsSet::paramIds->AppendNull();
+			continue;
+		}
+		istd::TNullableValue<QByteArray> tempItem(tempValue.toString().toUtf8());
 		CParamsSet::paramIds->append(tempItem);
 	}
 
@@ -8695,25 +9163,34 @@ QVariant CParamsSetObject::GetParamTypeIds()
 {
 	if (!paramTypeIds ){return {};}
 
-	QList<QString> tempParamTypeIdsList;
+	QVariantList tempParamTypeIdsList;
 	for (const auto& tempValue: paramTypeIds.value()){
-		tempParamTypeIdsList << *tempValue;
+		tempParamTypeIdsList << (tempValue ? QVariant(QString::fromUtf8(*tempValue)) : QVariant());
 	}
 
-	return QVariant::fromValue(tempParamTypeIdsList);
+	return tempParamTypeIdsList;
 }
 
 
 void CParamsSetObject::SetParamTypeIds(const QVariant& v)
 {
+	if (!v.isValid() || v.isNull()){
+		CParamsSet::paramTypeIds.SetNull();
+		paramTypeIdsChanged();
+		return;
+	}
 	if (!CParamsSet::paramTypeIds){
 		CParamsSet::paramTypeIds.emplace();
 	}
 	else{
 		CParamsSet::paramTypeIds->clear();
 	}
-	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QByteArray> tempItem(tempValue.toUtf8());
+	for (const QVariant& tempValue: v.toList()){
+		if (!tempValue.isValid() || tempValue.isNull()){
+			CParamsSet::paramTypeIds->AppendNull();
+			continue;
+		}
+		istd::TNullableValue<QByteArray> tempItem(tempValue.toString().toUtf8());
 		CParamsSet::paramTypeIds->append(tempItem);
 	}
 
@@ -8731,25 +9208,34 @@ QVariant CParamsSetObject::GetParamNames()
 {
 	if (!paramNames ){return {};}
 
-	QList<QString> tempParamNamesList;
+	QVariantList tempParamNamesList;
 	for (const auto& tempValue: paramNames.value()){
-		tempParamNamesList << *tempValue;
+		tempParamNamesList << (tempValue ? QVariant::fromValue(*tempValue) : QVariant());
 	}
 
-	return QVariant::fromValue(tempParamNamesList);
+	return tempParamNamesList;
 }
 
 
 void CParamsSetObject::SetParamNames(const QVariant& v)
 {
+	if (!v.isValid() || v.isNull()){
+		CParamsSet::paramNames.SetNull();
+		paramNamesChanged();
+		return;
+	}
 	if (!CParamsSet::paramNames){
 		CParamsSet::paramNames.emplace();
 	}
 	else{
 		CParamsSet::paramNames->clear();
 	}
-	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QString> tempItem(tempValue);
+	for (const QVariant& tempValue: v.toList()){
+		if (!tempValue.isValid() || tempValue.isNull()){
+			CParamsSet::paramNames->AppendNull();
+			continue;
+		}
+		istd::TNullableValue<QString> tempItem(tempValue.value<QString>());
 		CParamsSet::paramNames->append(tempItem);
 	}
 
@@ -8767,25 +9253,34 @@ QVariant CParamsSetObject::GetParamDescriptions()
 {
 	if (!paramDescriptions ){return {};}
 
-	QList<QString> tempParamDescriptionsList;
+	QVariantList tempParamDescriptionsList;
 	for (const auto& tempValue: paramDescriptions.value()){
-		tempParamDescriptionsList << *tempValue;
+		tempParamDescriptionsList << (tempValue ? QVariant::fromValue(*tempValue) : QVariant());
 	}
 
-	return QVariant::fromValue(tempParamDescriptionsList);
+	return tempParamDescriptionsList;
 }
 
 
 void CParamsSetObject::SetParamDescriptions(const QVariant& v)
 {
+	if (!v.isValid() || v.isNull()){
+		CParamsSet::paramDescriptions.SetNull();
+		paramDescriptionsChanged();
+		return;
+	}
 	if (!CParamsSet::paramDescriptions){
 		CParamsSet::paramDescriptions.emplace();
 	}
 	else{
 		CParamsSet::paramDescriptions->clear();
 	}
-	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QString> tempItem(tempValue);
+	for (const QVariant& tempValue: v.toList()){
+		if (!tempValue.isValid() || tempValue.isNull()){
+			CParamsSet::paramDescriptions->AppendNull();
+			continue;
+		}
+		istd::TNullableValue<QString> tempItem(tempValue.value<QString>());
 		CParamsSet::paramDescriptions->append(tempItem);
 	}
 
@@ -8803,25 +9298,34 @@ QVariant CParamsSetObject::GetParameters()
 {
 	if (!parameters ){return {};}
 
-	QList<QString> tempParametersList;
+	QVariantList tempParametersList;
 	for (const auto& tempValue: parameters.value()){
-		tempParametersList << *tempValue;
+		tempParametersList << (tempValue ? QVariant::fromValue(*tempValue) : QVariant());
 	}
 
-	return QVariant::fromValue(tempParametersList);
+	return tempParametersList;
 }
 
 
 void CParamsSetObject::SetParameters(const QVariant& v)
 {
+	if (!v.isValid() || v.isNull()){
+		CParamsSet::parameters.SetNull();
+		parametersChanged();
+		return;
+	}
 	if (!CParamsSet::parameters){
 		CParamsSet::parameters.emplace();
 	}
 	else{
 		CParamsSet::parameters->clear();
 	}
-	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QString> tempItem(tempValue);
+	for (const QVariant& tempValue: v.toList()){
+		if (!tempValue.isValid() || tempValue.isNull()){
+			CParamsSet::parameters->AppendNull();
+			continue;
+		}
+		istd::TNullableValue<QString> tempItem(tempValue.value<QString>());
 		CParamsSet::parameters->append(tempItem);
 	}
 
@@ -9052,25 +9556,34 @@ QVariant CMimeTypeObject::GetTree()
 {
 	if (!tree ){return {};}
 
-	QList<QString> tempTreeList;
+	QVariantList tempTreeList;
 	for (const auto& tempValue: tree.value()){
-		tempTreeList << *tempValue;
+		tempTreeList << (tempValue ? QVariant::fromValue(*tempValue) : QVariant());
 	}
 
-	return QVariant::fromValue(tempTreeList);
+	return tempTreeList;
 }
 
 
 void CMimeTypeObject::SetTree(const QVariant& v)
 {
+	if (!v.isValid() || v.isNull()){
+		CMimeType::tree.SetNull();
+		treeChanged();
+		return;
+	}
 	if (!CMimeType::tree){
 		CMimeType::tree.emplace();
 	}
 	else{
 		CMimeType::tree->clear();
 	}
-	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QString> tempItem(tempValue);
+	for (const QVariant& tempValue: v.toList()){
+		if (!tempValue.isValid() || tempValue.isNull()){
+			CMimeType::tree->AppendNull();
+			continue;
+		}
+		istd::TNullableValue<QString> tempItem(tempValue.value<QString>());
 		CMimeType::tree->append(tempItem);
 	}
 
@@ -9126,25 +9639,34 @@ QVariant CMimeTypeObject::GetParameters()
 {
 	if (!parameters ){return {};}
 
-	QList<QString> tempParametersList;
+	QVariantList tempParametersList;
 	for (const auto& tempValue: parameters.value()){
-		tempParametersList << *tempValue;
+		tempParametersList << (tempValue ? QVariant::fromValue(*tempValue) : QVariant());
 	}
 
-	return QVariant::fromValue(tempParametersList);
+	return tempParametersList;
 }
 
 
 void CMimeTypeObject::SetParameters(const QVariant& v)
 {
+	if (!v.isValid() || v.isNull()){
+		CMimeType::parameters.SetNull();
+		parametersChanged();
+		return;
+	}
 	if (!CMimeType::parameters){
 		CMimeType::parameters.emplace();
 	}
 	else{
 		CMimeType::parameters->clear();
 	}
-	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QString> tempItem(tempValue);
+	for (const QVariant& tempValue: v.toList()){
+		if (!tempValue.isValid() || tempValue.isNull()){
+			CMimeType::parameters->AppendNull();
+			continue;
+		}
+		istd::TNullableValue<QString> tempItem(tempValue.value<QString>());
 		CMimeType::parameters->append(tempItem);
 	}
 

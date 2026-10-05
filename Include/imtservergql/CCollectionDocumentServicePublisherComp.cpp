@@ -3,7 +3,18 @@
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
 
 
+// Qt includes
+#include <QtCore/QDateTime>
+#include <QtCore/QList>
+#include <QtCore/QPair>
+
+// STL includes
+#include <functional>
+
 // ImtCore includes
+#include <imtauth/IUserInfo.h>
+#include <imtgql/IGqlContext.h>
+#include <imtgql/CGqlParamObject.h>
 #include <imtdoc/CDocumentChangedEvent.h>
 #include <imtdoc/CDocumentClosedEvent.h>
 #include <imtdoc/CDocumentCreatedEvent.h>
@@ -19,7 +30,52 @@ namespace imtservergql
 {
 
 
-namespace CDM = sdl::V1_0::imtbase;
+// public methods
+
+// reimplemented (icomp::CComponentBase)
+
+void CCollectionDocumentServicePublisherComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	if (!IsAutoCloseEnabled()){
+		return;
+	}
+
+	QObject::connect(
+				&m_closeIdleDocumentsTimer,
+				&QTimer::timeout,
+				this,
+				&CCollectionDocumentServicePublisherComp::CloseIdleDocuments);
+	m_closeIdleDocumentsTimer.start(1000);
+}
+
+
+void CCollectionDocumentServicePublisherComp::OnComponentDestroyed()
+{
+	m_closeIdleDocumentsTimer.stop();
+	m_closeIdleDocumentsTimer.disconnect();
+
+	BaseClass::OnComponentDestroyed();
+}
+
+
+// reimplemented (imtgql::IGqlSubscriberController)
+
+bool CCollectionDocumentServicePublisherComp::RegisterSubscription(
+			const QByteArray& subscriptionId,
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtrest::IRequest& networkRequest,
+			QString& errorMessage)
+{
+	if (!BaseClass::RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage)){
+		return false;
+	}
+
+	MarkIndividualSubscription(GetSubscriberUserId(gqlRequest), GetSubscribedDocumentId(gqlRequest));
+
+	return true;
+}
 
 
 // protected methods
@@ -28,17 +84,27 @@ namespace CDM = sdl::V1_0::imtbase;
 
 bool CCollectionDocumentServicePublisherComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
-	bool isSupported = false;
-	if (m_collectionIdAttrPtr.IsValid()){
-		QByteArray collectionId = *m_collectionIdAttrPtr;
-		QByteArray gqlCommandId = gqlRequest.GetCommandId();
-
-		isSupported = gqlCommandId == QByteArrayLiteral("On") + collectionId + QByteArrayLiteral("DocumentChanged");
-		isSupported = isSupported || gqlCommandId == QByteArrayLiteral("On") + collectionId + QByteArrayLiteral("UndoChanged");
+	if (!m_collectionIdAttrPtr.IsValid()){
+		return BaseClass::IsRequestSupported(gqlRequest);
 	}
 
-	if (isSupported){
-		return true;
+	QByteArray collectionId = *m_collectionIdAttrPtr;
+	QByteArray gqlCommandId = gqlRequest.GetCommandId();
+
+	if (gqlCommandId == sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId() ||
+		gqlCommandId == sdl::V1_0::imtbase::COnUndoRedoChangedGqlRequest::GetCommandId()){
+		const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
+		if (inputParamPtr == nullptr){
+			return false;
+		}
+
+		QByteArray requestCollectionId = inputParamPtr->GetParamArgumentValue("collectionId").toByteArray();
+
+		return requestCollectionId == collectionId;
+	}
+
+	if (gqlCommandId == sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId()){
+		return !GetSubscribedDocumentId(gqlRequest).isEmpty();
 	}
 
 	return BaseClass::IsRequestSupported(gqlRequest);
@@ -76,11 +142,14 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentCreated(imtdoc::CEventBa
 
 	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
+	FillNameProviderFlag(notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, CDM::EDocumentOperation::NewDocumentCreated, sdlNotification);
+	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::NewDocumentCreated, sdlNotification);
 
-	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
+	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
+
+	TrackDocument(notification.userId, notification.documentId);
 
 	return true;
 }
@@ -95,11 +164,14 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentOpened(imtdoc::CEventBas
 
 	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
+	FillNameProviderFlag(notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentOpened, sdlNotification);
+	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentOpened, sdlNotification);
 
-	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
+	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
+
+	TrackDocument(notification.userId, notification.documentId);
 
 	return true;
 }
@@ -116,9 +188,9 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentRenamed(imtdoc::CEventBa
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentRenamed, sdlNotification);
+	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentRenamed, sdlNotification);
 
-	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
+	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
 	return true;
 }
@@ -135,16 +207,16 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentChanged(imtdoc::CEventBa
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentChanged, sdlNotification);
+	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentChanged, sdlNotification);
 
-	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
+	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
+	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
 	return true;
 }
 
 
-bool CCollectionDocumentServicePublisherComp::OnDocumentUndoRedoChanged(
-	imtdoc::CEventBase* eventPtr) const
+bool CCollectionDocumentServicePublisherComp::OnDocumentUndoRedoChanged(imtdoc::CEventBase* eventPtr) const
 {
 	imtdoc::CDocumentUndoRedoChangedEvent* concreteEventPtr = dynamic_cast<imtdoc::CDocumentUndoRedoChangedEvent*>(eventPtr);
 	if (concreteEventPtr == nullptr){
@@ -173,7 +245,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentUndoRedoChanged(
 	}
 
 	PublishRepresentation(
-		QByteArrayLiteral("On") + *m_collectionIdAttrPtr + QByteArrayLiteral("UndoChanged"),
+		sdl::V1_0::imtbase::COnUndoRedoChangedGqlRequest::GetCommandId(),
 		concreteEventPtr->GetUserId(),
 		sdlNotification);
 
@@ -192,9 +264,9 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentSaved(imtdoc::CEventBase
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentSaved, sdlNotification);
+	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentSaved, sdlNotification);
 
-	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
+	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
 	return true;
 }
@@ -211,9 +283,9 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentSavedAs(imtdoc::CEventBa
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentSavedAs, sdlNotification);
+	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentSavedAs, sdlNotification);
 
-	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
+	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
 	return true;
 }
@@ -227,11 +299,13 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentClosed(imtdoc::CEventBas
 	}
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	sdlNotification.documentOperation = CDM::EDocumentOperation::DocumentClosed;
+	sdlNotification.documentOperation = sdl::V1_0::imtbase::EDocumentOperation::DocumentClosed;
 	sdlNotification.documentId = concreteEventPtr->GetDocumentId();
 	sdlNotification.documentName.emplace();
 
-	PublishRepresentation(GetCommandId(), concreteEventPtr->GetUserId(), sdlNotification);
+	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), concreteEventPtr->GetUserId(), sdlNotification);
+
+	UntrackDocument(concreteEventPtr->GetDocumentId());
 
 	return true;
 }
@@ -248,17 +322,17 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentDataLoaded(imtdoc::CEven
 	FillDocumentNotification(concreteEventPtr, notification);
 
 	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
-	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentDataLoaded, sdlNotification);
+	FillSdlNotification(notification, sdl::V1_0::imtbase::EDocumentOperation::DocumentDataLoaded, sdlNotification);
 
-	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
+	PublishRepresentation(sdl::V1_0::imtbase::COnDocumentManagerChangedGqlRequest::GetCommandId(), notification.userId, sdlNotification);
 
 	return true;
 }
 
 
 void CCollectionDocumentServicePublisherComp::FillDocumentNotification(
-	const imtdoc::CEventBase* eventPtr,
-	imtdoc::IDocumentService::DocumentNotification& notification) const
+			const imtdoc::CEventBase* eventPtr,
+			imtdoc::IDocumentService::DocumentNotification& notification) const
 {
 	notification.userId = eventPtr->GetUserId();
 	notification.documentId = eventPtr->GetDocumentId();
@@ -270,15 +344,36 @@ void CCollectionDocumentServicePublisherComp::FillDocumentNotification(
 
 
 void CCollectionDocumentServicePublisherComp::FillSdlNotification(
-	const imtdoc::IDocumentService::DocumentNotification& notification,
-	sdl::V1_0::imtbase::EDocumentOperation operation,
-	sdl::V1_0::imtbase::CDocumentServiceNotification& sdlNotification) const
+			const imtdoc::IDocumentService::DocumentNotification& notification,
+			sdl::V1_0::imtbase::EDocumentOperation operation,
+			sdl::V1_0::imtbase::CDocumentServiceNotification& sdlNotification) const
 {
 	sdlNotification.documentOperation = operation;
 	sdlNotification.documentId = notification.documentId;
 	sdlNotification.documentName = notification.name;
 	sdlNotification.objectId = ConvertUrlToObjectId(notification.url);
+	sdlNotification.objectTypeId = notification.typeId;
 	sdlNotification.isDirty = notification.isDirty;
+	sdlNotification.hasNameProvider = notification.hasNameProvider;
+}
+
+
+void CCollectionDocumentServicePublisherComp::FillNameProviderFlag(
+			imtdoc::IDocumentService::DocumentNotification& notification) const
+{
+	if (!m_documentServiceCompPtr.IsValid()){
+		return;
+	}
+
+	const imtdoc::IDocumentService::DocumentList documentList =
+				m_documentServiceCompPtr->GetOpenedDocumentList(notification.userId);
+	for (const imtdoc::IDocumentService::DocumentListItem& documentInfo: documentList){
+		if (documentInfo.documentId == notification.documentId){
+			notification.hasNameProvider = documentInfo.hasNameProvider;
+
+			return;
+		}
+	}
 }
 
 
@@ -295,11 +390,182 @@ QByteArray CCollectionDocumentServicePublisherComp::ConvertUrlToObjectId(const Q
 }
 
 
-QByteArray CCollectionDocumentServicePublisherComp::GetCommandId() const
+bool CCollectionDocumentServicePublisherComp::IsAutoCloseEnabled() const
 {
-	return QByteArrayLiteral("On") + *m_collectionIdAttrPtr + QByteArrayLiteral("DocumentChanged");
+	return m_closeDocumentTimeoutAttrPtr.IsValid() && (*m_closeDocumentTimeoutAttrPtr > 0);
+}
+
+
+void CCollectionDocumentServicePublisherComp::TrackDocument(
+			const QByteArray& userId,
+			const QByteArray& documentId) const
+{
+	if (documentId.isEmpty() || !IsAutoCloseEnabled()){
+		return;
+	}
+
+	QMutexLocker locker(&m_trackedDocumentsMutex);
+
+	TrackedDocument& trackedDocument = m_trackedDocuments[documentId];
+	trackedDocument.userId = userId;
+	trackedDocument.lastSubscriberSeenSecs = QDateTime::currentSecsSinceEpoch();
+}
+
+
+void CCollectionDocumentServicePublisherComp::UntrackDocument(const QByteArray& documentId) const
+{
+	QMutexLocker locker(&m_trackedDocumentsMutex);
+
+	m_trackedDocuments.remove(documentId);
+}
+
+
+void CCollectionDocumentServicePublisherComp::MarkIndividualSubscription(
+			const QByteArray& userId,
+			const QByteArray& documentId) const
+{
+	if (documentId.isEmpty() || userId.isEmpty()){
+		return;
+	}
+
+	QMutexLocker locker(&m_trackedDocumentsMutex);
+
+	auto foundIter = m_trackedDocuments.find(documentId);
+	if (foundIter == m_trackedDocuments.end()){
+		return;
+	}
+
+	if (foundIter.value().userId != userId){
+		return;
+	}
+
+	foundIter.value().hasIndividualSubscription = true;
+	foundIter.value().lastSubscriberSeenSecs = QDateTime::currentSecsSinceEpoch();
+}
+
+
+bool CCollectionDocumentServicePublisherComp::HasActiveSingleDocumentChangedSubscriber(
+			const QByteArray& userId,
+			const QByteArray& documentId) const
+{
+	QMutexLocker locker(&m_mutex);
+
+	return HasActiveSingleDocumentChangedSubscriberNoLock(userId, documentId);
+}
+
+
+bool CCollectionDocumentServicePublisherComp::HasActiveSingleDocumentChangedSubscriberNoLock(
+			const QByteArray& userId,
+			const QByteArray& documentId) const
+{
+	for (const RequestNetworks& entry : m_registeredSubscribers){
+		if (entry.networkRequests.isEmpty()){
+			continue;
+		}
+
+		if (GetSubscribedDocumentId(entry.gqlRequest) != documentId){
+			continue;
+		}
+
+		if (GetSubscriberUserId(entry.gqlRequest) == userId){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+QByteArray CCollectionDocumentServicePublisherComp::GetSubscribedDocumentId(const imtgql::CGqlRequest& gqlRequest) const
+{
+	if (!m_collectionIdAttrPtr.IsValid()){
+		return QByteArray();
+	}
+
+	if (gqlRequest.GetCommandId() != sdl::V1_0::imtbase::COnDocumentChangedGqlRequest::GetCommandId()){
+		return QByteArray();
+	}
+
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	if (inputParamPtr == nullptr){
+		return QByteArray();
+	}
+
+	if (inputParamPtr->GetParamArgumentValue("collectionId").toByteArray() != *m_collectionIdAttrPtr){
+		return QByteArray();
+	}
+
+	return inputParamPtr->GetParamArgumentValue("id").toByteArray();
+}
+
+
+QByteArray CCollectionDocumentServicePublisherComp::GetSubscriberUserId(const imtgql::CGqlRequest& gqlRequest) const
+{
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	if (contextPtr != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
+		if (userInfoPtr != nullptr){
+			return userInfoPtr->GetId();
+		}
+	}
+
+	return QByteArray();
+}
+
+
+void CCollectionDocumentServicePublisherComp::CloseIdleDocuments()
+{
+	if (!m_documentServiceCompPtr.IsValid() || !IsAutoCloseEnabled()){
+		return;
+	}
+
+	const qint64 timeout = *m_closeDocumentTimeoutAttrPtr;
+	const qint64 now = QDateTime::currentSecsSinceEpoch();
+
+	QList<QPair<QByteArray, QByteArray> > documentsToClose; // userId, documentId
+
+	{
+		QMutexLocker subscribersLocker(&m_mutex);
+		QMutexLocker trackedDocumentsLocker(&m_trackedDocumentsMutex);
+
+		for (auto it = m_trackedDocuments.begin(); it != m_trackedDocuments.end(); ){
+			if (!it.value().hasIndividualSubscription){
+				++it;
+
+				continue;
+			}
+
+			if (HasActiveSingleDocumentChangedSubscriberNoLock(it.value().userId, it.key())){
+				it.value().lastSubscriberSeenSecs = now;
+				++it;
+
+				continue;
+			}
+
+			if ((now - it.value().lastSubscriberSeenSecs) < timeout){
+				++it;
+
+				continue;
+			}
+
+			documentsToClose.append(qMakePair(it.value().userId, it.key()));
+			it = m_trackedDocuments.erase(it);
+		}
+	}
+
+	if (documentsToClose.isEmpty()){
+		return;
+	}
+
+	for (const QPair<QByteArray, QByteArray>& document : documentsToClose){
+		imtdoc::IDocumentService::TaskParams taskParams;
+		taskParams.userId = document.first;
+		taskParams.documentId = document.second;
+
+		QByteArray taskId = m_documentServiceCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, taskParams);
+		m_documentServiceCompPtr->WaitForTaskFinished(taskId);
+	}
 }
 
 
 } // namespace imtservergql
-

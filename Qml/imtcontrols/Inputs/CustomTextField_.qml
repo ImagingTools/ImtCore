@@ -23,14 +23,14 @@ FocusScope {
     property string focusColor: Style.textSelected;
 
     property string fontColor: Style.textColor;
-    property string placeHolderFontColor: "gray";
+    property string placeHolderFontColor: Style.placeHolderTextColor;
 
     property color borderColor: containerTextField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
 
     property string borderColorConst: "";
 
-    property int radius: 3;
-    property int textSize: 15;
+    property int radius: Style.textFieldRadius;
+    property int textSize: Style.fontSizeM;
     property int placeHolderTextSize: textSize;
     property int echoMode: TextInput.Normal;
     property int margin: 5;

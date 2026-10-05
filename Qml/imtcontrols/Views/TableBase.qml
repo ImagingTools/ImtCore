@@ -55,6 +55,7 @@ Rectangle {
 	property alias elementsList: elementsListObj;
 	property alias cacheBuffer: elementsListObj.cacheBuffer;
 	property alias contentHeight: elementsListObj.contentHeight;
+	property real contentHeightTotal: headerHeight + contentHeight + scrollHoriz.visible * (scrollHoriz.secondSize + scrollHoriz.anchors.topMargin)
 	property real contentWidth: elementsListObj.contentWidth;
 	property alias originX: elementsListObj.originX;
 	property alias originY: elementsListObj.originY;
@@ -79,7 +80,7 @@ Rectangle {
 
 	//
 	property string borderColorHorizontal: "transparent";
-	property string borderColorVertical: Style.baseColorInverted;
+	property string borderColorVertical: Style.borderColor;
 	property int horizontalBorderSize: 0;
 	property int verticalBorderSize: 0;
 	property int verticalBorderHeight: -1;

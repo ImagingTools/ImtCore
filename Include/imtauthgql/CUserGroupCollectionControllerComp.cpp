@@ -5,10 +5,15 @@
 
 // ACF includes
 #include <iqt/iqt.h>
+#include <istd/TInterfacePtr.h>
+#include <iprm/CParamsSet.h>
 
 // ImtCore includes
 #include <imtauth/CUserGroupInfo.h>
+#include <imtauth/CUserGroupFilter.h>
 #include <imtauth/IUserInfoProvider.h>
+#include <imtbase/IObjectCollectionIterator.h>
+#include <imtcol/CDocumentCollectionFilter.h>
 
 
 namespace imtauthgql
@@ -432,6 +437,82 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	}
 
 	return FillObjectFromRepresentation(representation, object, objectId, errorMessage);
+}
+
+
+// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
+
+void CUserGroupCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const
+{
+	// Remove the deleted groups from the membership lists of their member users,
+	// so that users no longer reference groups that do not exist anymore.
+	if (!m_userCollectionCompPtr.IsValid() || elementIds.isEmpty()){
+		BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
+
+		return;
+	}
+
+	iprm::CParamsSet filterParams;
+
+	istd::TUniqueInterfacePtr<imtauth::CUserGroupFilter> groupFilterPtr = new imtauth::CUserGroupFilter();
+	groupFilterPtr->SetGroupIds(elementIds);
+	filterParams.SetEditableParameter(QByteArrayLiteral("GroupFilter"), groupFilterPtr.PopPtr(), true);
+
+	// A membership must be dropped in every user document, not only in the active ones:
+	// without this filter the collection defaults to the active state and a restored user
+	// would bring the dangling group id back.
+	imtcol::CDocumentCollectionFilter documentFilter;
+	documentFilter.AddDocumentState(imtcol::IDocumentCollectionFilter::DS_ACTIVE);
+	documentFilter.AddDocumentState(imtcol::IDocumentCollectionFilter::DS_INACTIVE);
+	documentFilter.AddDocumentState(imtcol::IDocumentCollectionFilter::DS_DISABLED);
+	filterParams.SetEditableParameter(QByteArrayLiteral("DocumentFilter"), &documentFilter);
+
+	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> userIteratorPtr =
+				m_userCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &filterParams);
+	if (!userIteratorPtr.IsValid()){
+		SendWarningMessage(
+					0,
+					QStringLiteral("Memberships of the removed groups are kept: the user collection cannot be iterated"),
+					"imtauthgql::CUserGroupCollectionControllerComp");
+
+		BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
+
+		return;
+	}
+
+	while (userIteratorPtr->Next()){
+		imtbase::IObjectCollection::DataPtr userDataPtr;
+		if (!userIteratorPtr->GetObjectData(userDataPtr)){
+			continue;
+		}
+
+		imtauth::IUserInfo* userInfoPtr = userDataPtr.GetPtr<imtauth::IUserInfo>();
+		if (userInfoPtr == nullptr){
+			continue;
+		}
+
+		bool hasChanges = false;
+		for (const QByteArray& groupId : elementIds){
+			if (userInfoPtr->RemoveFromGroup(groupId)){
+				hasChanges = true;
+			}
+		}
+
+		if (!hasChanges){
+			continue;
+		}
+
+		QByteArray userId = userIteratorPtr->GetObjectId();
+		if (!m_userCollectionCompPtr->SetObjectData(userId, *userInfoPtr)){
+			SendWarningMessage(
+						0,
+						QStringLiteral("Memberships of the removed groups are kept in the user '%1': the user could not be stored")
+								.arg(QString::fromUtf8(userId)),
+						"imtauthgql::CUserGroupCollectionControllerComp");
+		}
+	}
+
+	BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
 }
 
 

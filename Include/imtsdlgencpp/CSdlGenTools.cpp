@@ -395,7 +395,7 @@ void CSdlGenTools::AddArrayInternalChecksFail(QTextStream& stream, const imtsdl:
 	imtsdl::CSdlTools::FeedStream(stream, 1, false);
 
 	AddErrorReport(stream, QStringLiteral("Field: '%3' doesn't exist, but required"), 2, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
-	
+
 	imtsdl::CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("return false;\n\t}");
 	imtsdl::CSdlTools::FeedStream(stream, 1, false);
@@ -415,7 +415,7 @@ void CSdlGenTools::AddErrorReport(
 		stream << QStringLiteral("I_IF_DEBUG(");
 	}
 
-	stream << QStringLiteral("qWarning() << QString(\"%1:%2 Error: ");
+	stream << QStringLiteral("qWarning() << QStringLiteral(\"%1:%2 Error: ");
 	stream << errorMessage;
 	stream << QStringLiteral("\")");
 	stream << QStringLiteral(".arg(__FILE__, QString::number(__LINE__)");
@@ -474,7 +474,7 @@ void CSdlGenTools::GenerateIsRequestSupportedMethodImpl(
 		imtsdl::CSdlTools::FeedStream(stream, 1, false);
 	}
 	imtsdl::CSdlTools::FeedStream(stream, 1, false);
-	
+
 	// default call
 
 	imtsdl::CSdlTools::FeedStreamHorizontally(stream);
@@ -596,7 +596,7 @@ std::shared_ptr<imtsdl::CSdlEntryBase> CSdlGenTools::GetCollectionReferenceForDo
 			fieldForType = request.GetOutputArgument();
 			break;
 
-		case CSdlDocumentType::OT_LIST: 
+		case CSdlDocumentType::OT_LIST:
 			fieldForType = GetResponseFieldById(request.GetOutputArgument(), typeList, QStringLiteral("items"));
 			break;
 		case CSdlDocumentType::OT_INSERT:
@@ -640,6 +640,12 @@ std::shared_ptr<imtsdl::CSdlEntryBase> CSdlGenTools::GetCollectionReferenceForDo
 		unionList);
 
 	return typeForField;
+}
+
+
+QString CSdlGenTools::GetValueVariableName(const QString& sdlTypeName)
+{
+	return imtsdl::CSdlTools::GetDecapitalizedValue(sdlTypeName) + QStringLiteral("Val");
 }
 
 

@@ -19,6 +19,9 @@ DocumentViewBase {
 
 	property UserData userData: model;
 	property string productId;
+
+	// PasswordPolicyController instance, injected by the owning api client.
+	property var passwordPolicy: null;
 	
 	property var passwordInput: multiPageView.getPageByIndex(0) ? multiPageView.getPageByIndex(0).passwordInput : null;
 	property var passwordInputConfirm: multiPageView.getPageByIndex(0) ? multiPageView.getPageByIndex(0).passwordInputConfirm : null;
@@ -90,6 +93,7 @@ DocumentViewBase {
 
 	MultiPageView {
 		id: multiPageView
+		objectName: "UserEditorPages"
 		anchors.fill: parent
 		panelWidth: Style.sizeHintXXS
 
@@ -247,6 +251,8 @@ DocumentViewBase {
 						id: userGeneralEditor;
 						width: parent.width;
 						userData: container.userData;
+						showAccountEnabled: true;
+						passwordPolicy: container.passwordPolicy;
 						
 						onEmitUpdateModel: {
 							container.doUpdateModel();

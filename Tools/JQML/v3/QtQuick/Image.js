@@ -146,6 +146,16 @@ class Image extends Item {
         }
     }
 
+    SLOT_opacityChanged(oldValue, newValue){
+
+    }
+
+    SLOT_JQOpacityMultiplierChanged(oldValue, newValue){
+        this.__setDOMStyle({
+            opacity: newValue
+        })
+    }
+
     SLOT_fillModeChanged(oldValue, newValue){
         this.__updateImage()
     }

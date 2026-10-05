@@ -104,6 +104,9 @@
         <Element Id="Subscription" PackageId="ImtClientVoce" ComponentId="SubscriptionManager">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccessTokenProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Rights"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

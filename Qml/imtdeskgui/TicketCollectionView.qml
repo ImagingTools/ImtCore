@@ -91,14 +91,9 @@ RemoteCollectionView {
 		TableCellDelegateBase {
 			id: statusDelegate
 
-			readonly property var _statusIndex: ({
-				"Open": 0,
-				"Closed": 1
-			})
-
 			onReused: {
-				var val = statusDelegate.getValue()
-				statusBadge.value = _statusIndex[val] !== undefined ? _statusIndex[val] : 0
+				var val = String(statusDelegate.getValue())
+				statusBadge.value = val === String("Open") ? 0 : 1
 			}
 
 			TicketBadge {

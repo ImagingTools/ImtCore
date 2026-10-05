@@ -102,18 +102,25 @@ void CTicketCollectionControllerComp::SetAdditionalFilters(
 	}
 
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	if (gqlContextPtr == nullptr){
-		return;
-	}
+	const imtauth::IUserInfo* userInfoPtr = (gqlContextPtr != nullptr) ? gqlContextPtr->GetUserInfo() : nullptr;
 
-	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
-	if (userInfoPtr == nullptr || userInfoPtr->IsAdmin()){
+	// Only a resolved administrator may see the collection unfiltered. Everyone
+	// else - including a request that carries no context or no resolved user, i.e.
+	// an unauthenticated caller - gets the visibility filter. Leaving the filter
+	// out for a missing user meant an anonymous request was served every ticket in
+	// the system while an authenticated user without permissions correctly saw
+	// none. An empty user id makes CSupportTicketDbDelegateComp emit "WHERE 1=0".
+	if (userInfoPtr != nullptr && userInfoPtr->IsAdmin()){
 		return;
 	}
 
 	istd::TDelPtr<imtauth::CUserGroupFilter> groupFilter = new imtauth::CUserGroupFilter();
-	groupFilter->SetUserId(gqlContextPtr->GetUserId());
-	groupFilter->SetGroupIds(userInfoPtr->GetGroups());
+	if (gqlContextPtr != nullptr){
+		groupFilter->SetUserId(gqlContextPtr->GetUserId());
+	}
+	if (userInfoPtr != nullptr){
+		groupFilter->SetGroupIds(userInfoPtr->GetGroups());
+	}
 	filterParamsPtr->SetEditableParameter("GroupFilter", groupFilter.PopPtr(), true);
 }
 

@@ -4,6 +4,9 @@
 
 // Qt includes
 #include <QtCore/QJsonDocument>
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
+#include <QtCore/QTimer>
 
 // ImtCore includes
 #include <imtdoc/IDocumentService.h>
@@ -19,16 +22,31 @@ namespace imtservergql
 
 
 class CCollectionDocumentServicePublisherComp:
+	public QObject,
 	public CGqlPublisherCompBase,
 	virtual public imtdoc::IDocumentServiceEventHandler
 {
+	Q_OBJECT
 public:
 	typedef CGqlPublisherCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCollectionDocumentServicePublisherComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler)
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID", true, "DummyCollection");
+		I_ASSIGN(m_documentServiceCompPtr, "DocumentService", "Document service used to close documents without active subscribers", false, "DocumentService");
+		I_ASSIGN(m_closeDocumentTimeoutAttrPtr, "CloseDocumentTimeout", "Time (in seconds) a document may stay open after its last individual OnDocumentChanged subscriber is gone before it is closed. Values less or equal to zero disable automatic closing", true, 30);
 	I_END_COMPONENT;
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
+
+	// reimplemented (imtgql::IGqlSubscriberController)
+	virtual bool RegisterSubscription(
+				const QByteArray& subscriptionId,
+				const imtgql::CGqlRequest& gqlRequest,
+				const imtrest::IRequest& networkRequest,
+				QString& errorMessage) override;
 
 protected:
 	// reimplemented (imtgql::IGqlSubscriberController)
@@ -50,14 +68,58 @@ protected:
 
 protected:
 	void FillDocumentNotification(
-		const imtdoc::CEventBase* eventPtr,
-		imtdoc::IDocumentService::DocumentNotification& notification) const;
+				const imtdoc::CEventBase* eventPtr,
+				imtdoc::IDocumentService::DocumentNotification& notification) const;
 	void FillSdlNotification(
-		const imtdoc::IDocumentService::DocumentNotification& notification,
-		sdl::V1_0::imtbase::EDocumentOperation operation,
-		sdl::V1_0::imtbase::CDocumentServiceNotification& sdlNotification) const;
+				const imtdoc::IDocumentService::DocumentNotification& notification,
+				sdl::V1_0::imtbase::EDocumentOperation operation,
+				sdl::V1_0::imtbase::CDocumentServiceNotification& sdlNotification) const;
+	/**
+		Resolve \c hasNameProvider for the document referenced by \a notification
+		using the attached document service.
+
+		\note Must only be called from event handlers which are invoked outside of
+		the document service's internal locks (document created / document opened).
+	*/
+	void FillNameProviderFlag(imtdoc::IDocumentService::DocumentNotification& notification) const;
 	QByteArray ConvertUrlToObjectId(const QUrl& url) const;
-	QByteArray GetCommandId() const;
+
+	/**
+		Return \c true when the automatic closing of idle documents is enabled,
+		i.e.\ when a positive CloseDocumentTimeout is configured.
+	*/
+	bool IsAutoCloseEnabled() const;
+	/**
+		Start tracking an open document instance.
+
+		\note The close timeout is not started here. It only becomes active after
+		at least one individual OnDocumentChanged subscription for this document
+		has been registered (see \c MarkIndividualSubscription).
+	*/
+	void TrackDocument(const QByteArray& userId, const QByteArray& documentId) const;
+	/**
+		Stop tracking a document instance (e.g.\ once it has been closed).
+	*/
+	void UntrackDocument(const QByteArray& documentId) const;
+	/**
+		Remember that an individual OnDocumentChanged subscription was made for
+		\a documentId by \a userId. Starting from this moment the document is
+		subject to the close timeout.
+	*/
+	void MarkIndividualSubscription(const QByteArray& userId, const QByteArray& documentId) const;
+	/**
+		Return \c true when at least one registered subscriber listens to the
+		OnDocumentChanged command of this collection for the given
+		(\a userId, \a documentId) pair.
+	*/
+	bool HasActiveSingleDocumentChangedSubscriber(const QByteArray& userId, const QByteArray& documentId) const;
+	bool HasActiveSingleDocumentChangedSubscriberNoLock(const QByteArray& userId, const QByteArray& documentId) const;
+	/**
+		Extract the document ID of an individual OnDocumentChanged subscription
+		of this collection. Returns an empty value for any other request.
+	*/
+	QByteArray GetSubscribedDocumentId(const imtgql::CGqlRequest& gqlRequest) const;
+	QByteArray GetSubscriberUserId(const imtgql::CGqlRequest& gqlRequest) const;
 
 	template<class Representation>
 	void PublishRepresentation(
@@ -65,8 +127,29 @@ protected:
 		const QByteArray& userId,
 		const Representation& representation) const;
 
+protected Q_SLOTS:
+	/**
+		Close every tracked document which had an individual OnDocumentChanged
+		subscription and whose grace period without an active subscriber has elapsed.
+	*/
+	void CloseIdleDocuments();
+
 private:
+	I_REF(imtdoc::IDocumentService, m_documentServiceCompPtr);
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
+	I_ATTR(int, m_closeDocumentTimeoutAttrPtr);
+
+private:
+	struct TrackedDocument
+	{
+		QByteArray userId;
+		bool hasIndividualSubscription = false; ///< \c true after the first individual OnDocumentChanged subscription for this document.
+		qint64 lastSubscriberSeenSecs = 0; ///< Timestamp (in seconds since epoch) of the last moment an active subscriber was observed.
+	};
+
+	mutable QMutex m_trackedDocumentsMutex;
+	mutable QMap<QByteArray, TrackedDocument> m_trackedDocuments; // documentId -> tracking info
+	QTimer m_closeIdleDocumentsTimer; ///< Periodically closes tracked documents without active subscribers.
 };
 
 
@@ -74,9 +157,9 @@ private:
 
 template<class Representation>
 void CCollectionDocumentServicePublisherComp::PublishRepresentation(
-	const QByteArray& commandId,
-	const QByteArray& userId,
-	const Representation& representation) const
+			const QByteArray& commandId,
+			const QByteArray& userId,
+			const Representation& representation) const
 {
 	QJsonObject jsonObject;
 	if (!representation.WriteToJsonObject(jsonObject)){
@@ -111,5 +194,3 @@ void CCollectionDocumentServicePublisherComp::PublishRepresentation(
 
 
 } // namespace imtservergql
-
-

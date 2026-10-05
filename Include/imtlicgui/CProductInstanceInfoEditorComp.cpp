@@ -11,7 +11,7 @@
 #include <istd/CChangeGroup.h>
 
 // ImtCore includes
-#include <imtauth/IAccountInfo.h>
+#include <imtaccount/IAccountInfo.h>
 #include <imtlic/IProductLicensingInfo.h>
 #include <imtlic/ILicenseDefinition.h>
 #include <imtlic/ILicenseInstance.h>
@@ -250,7 +250,7 @@ void CProductInstanceInfoEditorComp::OnCustomersUpdated(
 			for (const QByteArray& customerId : customerIds){
 				imtbase::IObjectCollection::DataPtr dataPtr;
 				if (customerCollectionPtr->GetObjectData(customerId, dataPtr)){
-					imtauth::IAccountInfo* customerPtr = dynamic_cast<imtauth::IAccountInfo*>(dataPtr.GetPtr());
+					imtaccount::IAccountInfo* customerPtr = dynamic_cast<imtaccount::IAccountInfo*>(dataPtr.GetPtr());
 					if (customerPtr != nullptr){
 						QString customerName =  customerPtr->GetAccountName();
 
@@ -412,7 +412,7 @@ QByteArray CProductInstanceInfoEditorComp::GetCustomerId(const QString& customer
 			for (const QByteArray& customerCollectionId : customerCollectionIds){
 				imtbase::IObjectCollection::DataPtr dataPtr;
 				if (customerCollectionPtr->GetObjectData(customerCollectionId, dataPtr)){
-					imtauth::IAccountInfo* customerPtr = dynamic_cast<imtauth::IAccountInfo*>(dataPtr.GetPtr());
+					imtaccount::IAccountInfo* customerPtr = dynamic_cast<imtaccount::IAccountInfo*>(dataPtr.GetPtr());
 					if (customerPtr != nullptr){
 						if (customerPtr->GetAccountName() == customerName){
 							return customerCollectionId;

@@ -56,12 +56,30 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="ParametersDescription" Type="Text[]" ExportId="SettingsParametersDescription">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value></Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="SettingsParametersId">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>DesignSchema</Value>
                                 <Value>Language</Value>
                                 <Value>PageViewParams</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersName" Type="Text[]" ExportId="SettingsParametersName">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Design Schema</Value>
+                                <Value>Language</Value>
+                                <Value>Page View Params</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

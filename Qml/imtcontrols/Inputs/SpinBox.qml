@@ -23,6 +23,8 @@ ControlBase{
     property string icon: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal)
 	property string units: ""
 
+	signal wheel(var wheel)
+
     function increase(){
         if (value + stepSize <= to){
             value += stepSize

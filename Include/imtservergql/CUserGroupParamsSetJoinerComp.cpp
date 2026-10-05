@@ -26,12 +26,12 @@ bool CUserGroupParamsSetJoinerComp::JoinParamsSet(
 			iprm::IParamsSet& paramsSet) const
 {
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	if (gqlContextPtr == nullptr){
-		return false;
-	}
+	const imtauth::IUserInfo* userInfoPtr = (gqlContextPtr != nullptr) ? gqlContextPtr->GetUserInfo() : nullptr;
 
-	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
-	if (userInfoPtr == nullptr || userInfoPtr->IsAdmin()){
+	// Only a resolved administrator is served unfiltered. A request with no context
+	// or no resolved user is an unauthenticated caller and must not be treated like
+	// one: it still gets a filter, and the empty user id in it denies everything.
+	if (userInfoPtr != nullptr && userInfoPtr->IsAdmin()){
 		return false;
 	}
 
@@ -41,8 +41,12 @@ bool CUserGroupParamsSetJoinerComp::JoinParamsSet(
 	}
 
 	istd::TDelPtr<imtauth::CUserGroupFilter> groupFilterPtr = new imtauth::CUserGroupFilter();
-	groupFilterPtr->SetUserId(gqlContextPtr->GetUserId());
-	groupFilterPtr->SetGroupIds(userInfoPtr->GetGroups());
+	if (gqlContextPtr != nullptr){
+		groupFilterPtr->SetUserId(gqlContextPtr->GetUserId());
+	}
+	if (userInfoPtr != nullptr){
+		groupFilterPtr->SetGroupIds(userInfoPtr->GetGroups());
+	}
 	paramsSetPtr->SetEditableParameter("GroupFilter", groupFilterPtr.PopPtr(), true);
 
 	return true;

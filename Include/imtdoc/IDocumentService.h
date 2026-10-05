@@ -14,6 +14,7 @@
 #include <imod/IObserver.h>
 
 // ImtCore includes
+#include <imtdoc/CDocumentMethod.h>
 #include <imtdoc/IDocumentServiceEventHandler.h>
 
 
@@ -109,6 +110,7 @@ public:
 		| url                        |        |    X    |         |          |
 		| documentId                 |        |         |    X    |    X     |
 		| documentName               |        |         |  (opt)  |          |
+		| singleDocumentInstance     |  (opt) |  (opt)  |         |          |
 	*/
 	struct TaskParams
 	{
@@ -121,6 +123,7 @@ public:
 		const imtbase::IOperationContext* operationContextPtr = nullptr; ///< Optional operation context for tenant/owner propagation during save.
 		const istd::IChangeable* defaultDataPtr = nullptr;
 		const iprm::IParamsSet* initParamsPtr = nullptr; ///< Optional initialization parameters passed to the init delegate (TT_NEW only).
+		bool singleDocumentInstance = false; ///< Optional. For \c TT_OPEN, when \c true the document is opened in single-instance mode: opening a second instance of an already-open document URL is forbidden. For \c TT_NEW, when \c true the newly created document is marked as single-instance so that it cannot be opened again elsewhere. Defaults to \c false.
 	};
 
 	/**
@@ -155,6 +158,7 @@ public:
 		bool isDirty = false;     ///< \c true when the document has unsaved changes.
 		bool hasNameProvider = false; ///< \c true when a name provider is registered for this type.
 		bool isLoading = false;   ///< \c true while the document data is still being loaded asynchronously.
+		bool singleDocumentInstance = false; ///< \c true when opened with \c TaskParams::singleDocumentInstance.
 	};
 
 	/**
@@ -271,6 +275,21 @@ public:
 	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) = 0;
 
 	/**
+		\brief Invoke \a method on the live document object, under the service's internal lock.
+
+		Unlike \c GetDocumentData / \c SetDocumentData, this doesn't copy the document out and back in, so
+		\a method's own change notification (if any) reaches observers as-is.
+
+		\return  \c OS_OK on success, or an appropriate error code. \c OS_FAILED also covers the case
+		         where the open document is not of the type \a method was bound to, in which case
+		         \a method was not called.
+	*/
+	virtual OperationStatus ExecuteDocumentMethod(
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				const CDocumentMethod& method) = 0;
+
+	/**
 		\brief Retrieve the undo manager associated with an open document.
 
 		\param undoManagerPtr  Receives a raw (non-owning) pointer to the undo
@@ -323,5 +342,4 @@ public:
 
 
 Q_DECLARE_METATYPE(imtdoc::IDocumentService::DocumentNotification);
-
 

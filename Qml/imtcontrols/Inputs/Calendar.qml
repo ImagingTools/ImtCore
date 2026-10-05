@@ -571,7 +571,7 @@ Rectangle {
 		verticalOffset: 2;
 
 		radius: forShadowRec.radius;
-		color: "lightgray";
+		color: Style.shadowColor;
 
 		source: forShadowRec;
 	}

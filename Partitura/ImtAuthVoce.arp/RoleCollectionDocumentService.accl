@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6435" Description="ACF"/>
-            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6560" Description="ACF"/>
+            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -13,8 +13,10 @@
         <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
         <Element ComponentName="Permissions" X="200" Y="400" Note=""/>
         <Element ComponentName="Role" X="575" Y="375" Note=""/>
+        <Element ComponentName="RoleChangeGenerator" X="850" Y="450" Note=""/>
         <Element ComponentName="RoleCollectionAdapter" X="575" Y="550" Note=""/>
         <Element ComponentName="RoleCollectionDocumentService" X="175" Y="200" Note=""/>
+        <Element ComponentName="RoleDocumentNameProvider" X="900" Y="75" Note=""/>
         <Element ComponentName="RoleDocumentValidator" X="950" Y="200" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>

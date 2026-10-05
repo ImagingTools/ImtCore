@@ -143,6 +143,11 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	// to QWebSocket via setParent(m_socket) in CWebSocketThread, so it can be
 	// cascade-destroyed if the socket disconnects during processing.
 	const QByteArray subscriptionId = webSocketRequest->GetRequestId();
+
+	if (subscriptionId.isEmpty()){
+		return CreateErrorResponse(QByteArrayLiteral("Unable to register subscription with empty subscription-ID"), request);
+	}
+
 	QByteArray body = request.GetBody();
 	const QJsonDocument document = QJsonDocument::fromJson(body);
 	if (document.isNull() || !document.isObject()) {
@@ -170,8 +175,14 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	imtgql::CGqlRequest gqlRequest;
 	qsizetype errorPosition;
 	if (!gqlRequest.ParseQuery(body, errorPosition)){
+		// Chained, not arg(body, errorPosition): that binds the position to the
+		// arg(text, fieldWidth) overload, which pads the message with as many
+		// spaces as the position - hundreds of megabytes of them for a failure
+		// late in a query, built in memory and then written out one message at a
+		// time until the server stops answering anything else.
 		QString errorMessage = QStringLiteral("Error when parsing request: '%1'; Error position: '%2'")
-								.arg(body, errorPosition);
+								.arg(QString::fromUtf8(body))
+								.arg(errorPosition);
 		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
 
@@ -284,10 +295,11 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 		return imtrest::ConstResponsePtr();
 	}
 
+	const QByteArray subscriptionId = webSocketRequest->GetRequestId();
+
 	for (int index = 0; index < m_gqlSubscriberControllersCompPtr.GetCount(); index++){
 		imtgql::IGqlSubscriberController* controllerPtr = m_gqlSubscriberControllersCompPtr[index];
 		if (controllerPtr != nullptr){
-			QByteArray subscriptionId = webSocketRequest->GetRequestId();
 			if (controllerPtr->UnregisterSubscription(subscriptionId)){
 				QByteArray data = QStringLiteral(R"({"type": "complete","id": "%1"})").arg(subscriptionId).toUtf8();
 				return CreateDataResponse(data, request);
@@ -295,8 +307,16 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 		}
 	}
 
-	QByteArray errorMessage = QByteArrayLiteral("Unable to unregister subscription'. Error: Subscription is unregistered");
-	return CreateErrorResponse(errorMessage, request);
+	SendWarningMessage(
+		0,
+		QStringLiteral("Unregister requested for subscription '%1', which is not registered.").arg(subscriptionId),
+		QStringLiteral("CWebSocketServletComp"));
+
+QJsonObject completeObject;
+	completeObject.insert(QStringLiteral("type"), QStringLiteral("complete"));
+	completeObject.insert(QStringLiteral("id"), QString(subscriptionId));
+	const QByteArray data = QJsonDocument(completeObject).toJson(QJsonDocument::Compact);
+	return CreateDataResponse(data, request);
 }
 
 
@@ -327,6 +347,14 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(
 	QJsonDocument document = QJsonDocument::fromJson(requestBody);
 	QJsonObject object = document.object();
 
+	QString subscriptionId = object.value(QStringLiteral("id")).toString();
+	if (subscriptionId.isEmpty()){
+		auto webSocketRequestPtr = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
+		if (webSocketRequestPtr != nullptr){
+			subscriptionId = QString::fromUtf8(webSocketRequestPtr->GetRequestId());
+		}
+	}
+
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
 	// Build JSON via QJsonDocument so quotes/newlines in errorMessage cannot break the frame.
@@ -340,7 +368,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(
 	payloadArr.append(errorObj);
 
 	QJsonObject rootObj;
-	rootObj.insert(QStringLiteral("id"), object.value(QStringLiteral("id")).toString());
+	rootObj.insert(QStringLiteral("id"), subscriptionId);
 	rootObj.insert(QStringLiteral("type"), QStringLiteral("error"));
 	rootObj.insert(QStringLiteral("payload"), payloadArr);
 

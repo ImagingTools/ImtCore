@@ -6,7 +6,7 @@ import imtcontrols 1.0
 Rectangle {
     id: gallery;
 
-	color: Style.baseColorInverted;
+	color: Style.shadowColor;
 
     property TreeItemModel model: TreeItemModel{};
     property string nameId: "Source";
@@ -154,7 +154,7 @@ Rectangle {
 
 		z: 20;
 
-		color: Style.baseColorInverted;
+		color: Style.shadowColor;
 
         MouseArea{
             anchors.fill: parent;
@@ -267,7 +267,7 @@ Rectangle {
             delegate: Rectangle{
                 width: listPreview.delegateWidth;
                 height: listPreview.height;
-                radius: 2;
+                radius: Style.radiusS;
                 color: "transparent";
                 border.color: listPreview.selectedIndex == model.index ? Style.textColor : "transparent";
                 Item{
@@ -372,7 +372,7 @@ Rectangle {
             width: gallery.width-40;
             height: 200;
             hasIcon: false;
-            radius:8;
+            radius: Style.radiusM;
 
             topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
 			title: qsTr("Delete photo");

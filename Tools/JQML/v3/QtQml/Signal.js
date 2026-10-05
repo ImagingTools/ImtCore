@@ -13,13 +13,13 @@ const handler = {
             global.queueFlag.push(false)
             global.signalTargets.push(target)
 
-            // Priority connections (cross-item bindings) fire before SLOT_
-            if(name in target.__connections){
+            const invokeConnections = (match)=>{
+                if(!(name in target.__connections)) return
                 for(let connection of target.__connections[name].slice()){
-                    if(!connection.priority) continue
+                    if(!match(connection)) continue
                     try {
                         if(connection.target){
-                            connection.slot.call(connection.target.__proxy, ...args)  
+                            connection.slot.call(connection.target.__proxy, ...args)
                         } else {
                             connection.slot(...args)
                         }
@@ -28,6 +28,13 @@ const handler = {
                     }
                 }
             }
+
+            // Geometry-style listeners (e.g. Loader size sync) fire before bindings,
+            // matching Qt: itemGeometryChanged runs before width/height notify.
+            invokeConnections(connection => connection.priority === 2)
+
+            // Priority connections (cross-item bindings) fire before SLOT_
+            invokeConnections(connection => connection.priority === true)
 
             if(slotName in target){
                 try {
@@ -37,20 +44,7 @@ const handler = {
                 }  
             }
 
-            if(name in target.__connections){
-                for(let connection of target.__connections[name].slice()){
-                    if(connection.priority) continue
-                    try {
-                        if(connection.target){
-                            connection.slot.call(connection.target.__proxy, ...args)  
-                        } else {
-                            connection.slot(...args)
-                        }
-                    } catch (error) {
-                        if(location.hash === '#jqdebug')console.error(error)
-                    }
-                }
-            }
+            invokeConnections(connection => !connection.priority)
             global.queueFlag.pop()
             global.signalTargets.pop()
             JQApplication.endUpdate()
@@ -97,6 +91,38 @@ const handler = {
 
                 target.__connections[name].push(connection)
 
+                let connectionObj = {
+                    target: target,
+                    name: name,
+                    connection: connection
+                }
+
+                if(connection.slot.meta && !connection.slot.meta.destruction){
+                    let destructionFunc = ()=>{
+                        Signal.removeConnection(connectionObj)
+                    }
+                    destructionFunc.meta = {
+                        name: connection.slot.meta.name,
+                        parent: connection.slot.meta.parent,
+                        destruction: true
+                    }
+                    connection.slot.meta.parent.__proxy['Component.destruction'].connect(destructionFunc)
+                }
+
+                return connectionObj
+            }
+        }
+        if (key === 'connectFirst') return (...args)=>{
+            if(!target.__connections[name]) target.__connections[name] = []
+
+            if(args.length === 1){
+                let connection = {
+                    slot:args[0],
+                    priority: 2
+                }
+
+                target.__connections[name].unshift(connection)
+                
                 let connectionObj = {
                     target: target,
                     name: name,

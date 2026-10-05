@@ -402,9 +402,25 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
 	stream << QStringLiteral("if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){");
 	FeedStream(stream, 1, false);
 
-	// get top-level request. Usually it always one => we need only first
+	// The parser stores the selection set of the command directly; accept a command-name wrapper as well
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(gqlRequest.GetFields().GetFieldIds().constFirst());");
+	stream << QStringLiteral("requestedFieldsObjectPtr = &gqlRequest.GetFields();");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("const QByteArrayList topFieldIds = gqlRequest.GetFields().GetFieldIds();");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("if (topFieldIds.count() == 1 && topFieldIds.constFirst() == gqlRequest.GetCommandId()){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(topFieldIds.constFirst());");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents + 1);
@@ -556,8 +572,10 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 		}
 		newComplexFieldName += typeField.GetId();
 
-		const QString newGqlContainerVarName = GetDecapitalizedValue(typeField.GetId()) + QStringLiteral("RequestedFieldsPtr");
-		const QString newIdListContainerVarName = GetDecapitalizedValue(typeField.GetId()) + QStringLiteral("RequestedIds");
+		// variable names contain a full field path to avoid hiding of variables declared in outer scopes
+		const QString newVariableBaseName = GetVariableBaseName(newComplexFieldName);
+		const QString newGqlContainerVarName = newVariableBaseName + QStringLiteral("RequestedFieldsPtr");
+		const QString newIdListContainerVarName = newVariableBaseName + QStringLiteral("RequestedIds");
 
 		// first create a GQL-info object
 		FeedStreamHorizontally(stream, hIndents + 1);
@@ -605,6 +623,28 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
 	FeedStream(stream, 1, false);
+}
+
+
+QString CGqlWrapClassCodeGeneratorComp::GetVariableBaseName(const QString& complexFieldName)
+{
+	QString retVal;
+
+	const QStringList fieldIdList = complexFieldName.split('.', Qt::SkipEmptyParts);
+	for (const QString& fieldId: fieldIdList){
+		if (!retVal.isEmpty()){
+			retVal += '_';
+		}
+
+		// field names are used unchanged and separators inside of them are escaped,
+		// so that different field paths are always mapped to different variable names
+		QString escapedFieldId = fieldId;
+		escapedFieldId.replace('_', QStringLiteral("__"));
+
+		retVal += escapedFieldId;
+	}
+
+	return retVal;
 }
 
 

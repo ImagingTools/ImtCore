@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
+import Qt.labs.settings 1.0
 
 Rectangle {
 	id: menuPanel;
@@ -10,7 +11,7 @@ Rectangle {
 
 	clip: false;
 
-	color: Style.baseColor;
+	color: Style.menuPanelBackgroundColor;
 	radius: 0;
 
 	property string textColor: Style.textColor;
@@ -21,6 +22,14 @@ Rectangle {
 	property string firstElementImageSources: "";
 
 	property int activePageIndex: -1;
+
+	// Keeps the selected page across a browser reload.
+	property Settings storage: Settings {
+		category: "MenuPanel";
+	}
+
+	// Set while updateGui() falls back to the first page because the stored one is missing.
+	property bool __keepStoredPage: false;
 
 	property TreeItemModel model: TreeItemModel {};
 
@@ -95,10 +104,20 @@ Rectangle {
 		}
 	}
 
-	onWidthChanged: {
-		if (!widthAnimation.running){
-			Events.sendEvent("MenuWidthChanged", width)
+	onActivePageIndexChanged: {
+		if (menuPanel.__keepStoredPage){
+			return;
 		}
+
+		if (menuPanel.activePageIndex < 0 || !menuPanel.model || menuPanel.activePageIndex >= menuPanel.model.getItemsCount()){
+			return;
+		}
+
+		menuPanel.storage.setValue("activePageId", menuPanel.model.getData("id", menuPanel.activePageIndex));
+	}
+
+	onWidthChanged: {
+		Events.sendEvent("MenuWidthChanged", width)
 	}
 
 	Keys.onPressed: {
@@ -211,22 +230,7 @@ Rectangle {
 			menuPanel.autoCollapsed = false;
 		}
 
-		widthAnimation.from = menuPanel.width;
-		widthAnimation.to = menuPanel.collapsed ? menuPanel.collapsedWidth : menuPanel.menuDefaultWidth;
-		widthAnimation.restart();
-	}
-
-	NumberAnimation {
-		id: widthAnimation;
-
-		target: menuPanel;
-		property: "width";
-		duration: 220;
-		easing.type: Easing.InOutQuad;
-
-		onFinished: {
-			Events.sendEvent("MenuWidthChanged", menuPanel.width)
-		}
+		menuPanel.width = menuPanel.collapsed ? menuPanel.collapsedWidth : menuPanel.menuDefaultWidth;
 	}
 
 	function updateGui(){
@@ -234,13 +238,16 @@ Rectangle {
 			return;
 		}
 
-		let savedActivePageId = menuPanel.activePageIndex >= 0 ? menuPanel.activePageId : "";
+		let storedPageId = menuPanel.storage.value("activePageId", "");
+		let savedActivePageId = menuPanel.activePageIndex >= 0 ? menuPanel.activePageId : (storedPageId ? storedPageId : "");
 		let targetIndex = 0;
+		let isPageFound = false;
 		if (savedActivePageId !== "" && model.getItemsCount() > 0){
 			for (let i = 0; i < model.getItemsCount(); i++){
 				let id = model.getData("id", i);
 				if (id === savedActivePageId){
 					targetIndex = i;
+					isPageFound = true;
 					break;
 				}
 			}
@@ -254,8 +261,10 @@ Rectangle {
 		bottomAlignmentPages.model = 0;
 
 		if (model.getItemsCount() > 0){
+			menuPanel.__keepStoredPage = savedActivePageId !== "" && !isPageFound;
 			menuPanel.activePageIndex = targetIndex;
 			menuPanel.activePageId = model.getData("id", targetIndex);
+			menuPanel.__keepStoredPage = false;
 		}
 
 		for (let i = 0; i < model.getItemsCount(); i++){
@@ -505,10 +514,8 @@ Rectangle {
 					sourceSize.width: width
 					sourceSize.height: height
 
-					source: menuPanel.collapsed ? "qrc:/" + Style.getIconPath("Icons/Expand", Icon.State.Off, Icon.Mode.Disabled)
-												: "qrc:/" + Style.getIconPath("Icons/Collapse", Icon.State.Off, Icon.Mode.Disabled)
-
-					opacity: menuButtonArea.containsMouse ? 1.0 : Style.opacityHigh
+					source: menuPanel.collapsed ? "qrc:/" + Style.getIconPath("Icons/Expand", Icon.State.Off, menuButtonArea.containsMouse ? Icon.Mode.Active : Icon.Mode.Normal)
+												: "qrc:/" + Style.getIconPath("Icons/Collapse", Icon.State.Off, menuButtonArea.containsMouse ? Icon.Mode.Active : Icon.Mode.Normal)
 				}
 
 				MouseArea {
@@ -562,17 +569,14 @@ Rectangle {
 	Item {
 		id: hint;
 
-		x: menuPanel.width + hint.slide;
+		x: menuPanel.width + Style.spacingXS;
 		y: menuPanel.hintY - height / 2 + Style.marginXXS;
 		z: 100;
 
 		width: hintBody.width + Style.spacingS;
 		height: Style.controlHeightS + Style.marginXXS;
 
-		visible: hint.opacity > 0;
-		opacity: 0;
-
-		property real slide: 0;
+		visible: menuPanel.hintText !== "";
 
 		Rectangle {
 			id: arrowTip;
@@ -609,48 +613,6 @@ Rectangle {
 				font.pixelSize: Style.fontSizeM;
 				color: Style.baseColor;
 			}
-		}
-
-		ParallelAnimation {
-			id: hintIn;
-
-			NumberAnimation {
-				target: hint;
-				property: "opacity";
-				to: 1;
-				duration: 120;
-				easing.type: Easing.OutQuad;
-			}
-
-			NumberAnimation {
-				target: hint;
-				property: "slide";
-				to: Style.spacingXS;
-				duration: 120;
-				easing.type: Easing.OutCubic;
-			}
-		}
-
-		NumberAnimation {
-			id: hintOut;
-
-			target: hint;
-			property: "opacity";
-			to: 0;
-			duration: 90;
-			easing.type: Easing.InQuad;
-		}
-	}
-
-	onHintTextChanged: {
-		if (menuPanel.hintText === ""){
-			hintIn.stop();
-			hintOut.restart();
-		}
-		else if (hint.opacity < 1){
-			hintOut.stop();
-			hint.slide = 0;
-			hintIn.restart();
 		}
 	}
 }

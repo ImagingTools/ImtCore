@@ -156,6 +156,9 @@ SUBDIRS += imtmail
 imtmail.file = ../../Include/imtmail/QMake/imtmail.pro
 
 
+SUBDIRS += imtaccount
+imtaccount.file = ../../Include/imtaccount/QMake/imtaccount.pro
+
 SUBDIRS += imtauth
 imtauth.file = ../../Include/imtauth/QMake/imtauth.pro
 
@@ -352,13 +355,17 @@ SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
 ImtCorePck.depends = imtbase imtfile
 
+SUBDIRS += ImtAccountPck
+ImtAccountPck.file = ../../Impl/ImtAccountPck/QMake/ImtAccountPck.pro
+ImtAccountPck.depends = imtbase imtaccount
+
 SUBDIRS += ImtAuthPck
 ImtAuthPck.file = ../../Impl/ImtAuthPck/QMake/ImtAuthPck.pro
 ImtAuthPck.depends = imtbase imtauth imtlic imtrest imtserverapp
 
 SUBDIRS += ImtDatabasePck
 ImtDatabasePck.file = ../../Impl/ImtDatabasePck/QMake/ImtDatabasePck.pro
-ImtDatabasePck.depends = imtbase imtdb imtauth imtcol
+ImtDatabasePck.depends = imtbase imtdb imtauth imtaccount imtcol
 
 SUBDIRS += ImtDatabaseGqlPck
 ImtDatabaseGqlPck.file = ../../Impl/ImtDatabaseGqlPck/QMake/ImtDatabaseGqlPck.pro
@@ -366,7 +373,7 @@ ImtDatabaseGqlPck.depends = imtbase imtdb imtdbgql imtgql imtrepo imtcom imtrest
 
 SUBDIRS += ImtAuthGuiPck
 ImtAuthGuiPck.file = ../../Impl/ImtAuthGuiPck/QMake/ImtAuthGuiPck.pro
-ImtAuthGuiPck.depends = imtbase imtauth imtauthgui imtgui
+ImtAuthGuiPck.depends = imtbase imtaccount imtauth imtauthgui imtgui
 
 SUBDIRS += ImtLicensePck
 ImtLicensePck.file = ../../Impl/ImtLicensePck/QMake/ImtLicensePck.pro
@@ -374,7 +381,7 @@ ImtLicensePck.depends = imtbase imtgql imtlic
 
 SUBDIRS += ImtLicenseGqlPck
 ImtLicenseGqlPck.file = ../../Impl/ImtLicenseGqlPck/QMake/ImtLicenseGqlPck.pro
-ImtLicenseGqlPck.depends = imtlicgql imtlicgui imtguigql imtgui imtauth imtdb imtservergql imtserverapp
+ImtLicenseGqlPck.depends = imtlicgql imtlicgui imtguigql imtgui imtaccount imtauth imtdb imtservergql imtserverapp
 
 SUBDIRS += ImtLicenseGuiPck
 ImtLicenseGuiPck.file = ../../Impl/ImtLicenseGuiPck/QMake/ImtLicenseGuiPck.pro
@@ -417,11 +424,11 @@ ImtGuiPck.depends = imt3d imtgui imtloggui
 
 SUBDIRS += ImtGuiGqlPck
 ImtGuiGqlPck.file = ../../Impl/ImtGuiGqlPck/QMake/ImtGuiGqlPck.pro
-ImtGuiGqlPck.depends = imtgui imtguigql imtgql imtservergql imtloggui imtdb imtauth
+ImtGuiGqlPck.depends = imtgui imtguigql imtgql imtservergql imtloggui imtdb imtauth imtaccount
 
 SUBDIRS += ImtQmlPck
 ImtQmlPck.file = ../../Impl/ImtQmlPck/QMake/ImtQmlPck.pro
-ImtQmlPck.depends = imtqml imtgui imtgql imtauth imtdb imtserverapp imtcom imtservergql
+ImtQmlPck.depends = imtqml imtgui imtgql imtauth imtaccount imtdb imtserverapp imtcom imtservergql
 
 SUBDIRS += ImtLogPck
 ImtLogPck.file = ../../Impl/ImtLogPck/QMake/ImtLogPck.pro
@@ -449,11 +456,11 @@ ImtGqlPck.depends = imtgql imtrepo imtcom imtrest imtfile imtbase
 
 SUBDIRS += ImtServerGqlPck
 ImtServerGqlPck.file = ../../Impl/ImtServerGqlPck/QMake/ImtServerGqlPck.pro
-ImtServerGqlPck.depends = imtservergql imtbasesdl imtrepo imtcom imtauth imtrest imtserverapp imtdoc imthype
+ImtServerGqlPck.depends = imtservergql imtbasesdl imtrepo imtcom imtauth imtaccount imtrest imtserverapp imtdoc imthype
 
 SUBDIRS += ImtLicenseDbPck
 ImtLicenseDbPck.file = ../../Impl/ImtLicenseDbPck/QMake/ImtLicenseDbPck.pro
-ImtLicenseDbPck.depends = imtlic imtlicdb imtbase imtdb imtauth imtcol
+ImtLicenseDbPck.depends = imtlic imtlicdb imtbase imtdb imtauth imtaccount imtcol
 
 SUBDIRS += ImtDatabaseGuiPck
 ImtDatabaseGuiPck.file = ../../Impl/ImtDatabaseGuiPck/QMake/ImtDatabaseGuiPck.pro
@@ -473,7 +480,7 @@ ImtMailPck.depends = imtmail imtbase
 
 SUBDIRS += ImtAuthDbPck
 ImtAuthDbPck.file = ../../Impl/ImtAuthDbPck/QMake/ImtAuthDbPck.pro
-ImtAuthDbPck.depends = imtauthdb imtdb imtbase imtauth imtcol
+ImtAuthDbPck.depends = imtauthdb imtdb imtbase imtauth imtaccount imtcol
 
 SUBDIRS += ImtAuthGqlPck
 ImtAuthGqlPck.file = ../../Impl/ImtAuthGqlPck/QMake/ImtAuthGqlPck.pro
@@ -570,11 +577,11 @@ CollectionDocumentServiceTest.depends = imtbase imtdoc
 
 SUBDIRS += ImtCoreFileCollectionTest
 ImtCoreFileCollectionTest.file = ../../Tests/FileCollectionTest/QMake/ImtCoreFileCollectionTest.pro
-ImtCoreFileCollectionTest.depends = imtbase imtauth imtrepo
+ImtCoreFileCollectionTest.depends = imtbase imtaccount imtauth imtrepo
 
 SUBDIRS += ImtCoreObjectCollectionTest
 ImtCoreObjectCollectionTest.file = ../../Tests/ObjectCollectionTest/QMake/ImtCoreObjectCollectionTest.pro
-ImtCoreObjectCollectionTest.depends = imtbase imtauth imtdb imttest
+ImtCoreObjectCollectionTest.depends = imtbase imtaccount imtauth imtdb imttest
 
 
 

@@ -972,6 +972,7 @@ ViewBase {
 
 						TextInputElementView {
 							id: productNameInput
+							objectName: "ProductNameInput"
 							name: qsTr("Product name")
 							placeHolderText: qsTr("Enter the product name")
 							readOnly: !productViewContainer.canEdit
@@ -981,6 +982,7 @@ ViewBase {
 
 						ComboBoxElementView {
 							id: categoryComboBox
+							objectName: "CategoryCombo"
 							name: qsTr("Category")
 							model: categoryModel
 							nameId: "name"
@@ -1184,6 +1186,7 @@ ViewBase {
 					// table.
 					Item {
 						id: featureNameCell
+						objectName: "ProductFeatureNameCell"
 						width: featuresPage.columnWidth(0, rowContent.width, rowContent.spacing)
 						height: rowContent.height
 						visible: width > 0
@@ -1216,6 +1219,7 @@ ViewBase {
 						}
 					}
 					Item {
+						objectName: "ProductFeatureIdCell"
 						width: featuresPage.columnWidth(1, rowContent.width, rowContent.spacing)
 						height: rowContent.height
 						visible: width > 0
@@ -1231,6 +1235,7 @@ ViewBase {
 						}
 					}
 					Item {
+						objectName: "ProductFeatureDescriptionCell"
 						width: featuresPage.columnWidth(2, rowContent.width, rowContent.spacing)
 						height: rowContent.height
 						visible: width > 0
@@ -1252,6 +1257,7 @@ ViewBase {
 					// still a choice - the two numbers the panel on the right details.
 					Item {
 						id: subfeaturesCell
+						objectName: "ProductFeatureSubfeaturesCell"
 						width: featuresPage.columnWidth(3, rowContent.width, rowContent.spacing)
 						height: rowContent.height
 						visible: width > 0
@@ -1290,6 +1296,7 @@ ViewBase {
 					}
 
 					Item {
+						objectName: "ProductFeatureOptionalCell"
 						width: featuresPage.columnWidth(4, rowContent.width, rowContent.spacing)
 						height: rowContent.height
 						visible: width > 0
@@ -1378,6 +1385,7 @@ ViewBase {
 			// and locked; only the optional ones are a decision this product makes.
 			property Component featureContentPanelComp: Component {
 				CheckableListPanel {
+					objectName: "FeatureContentPanel"
 					title: qsTr("Feature content")
 					model: productViewContainer.subFeatureEntries
 					contentActive: productViewContainer.selectedNode !== null
@@ -1407,6 +1415,7 @@ ViewBase {
 
 			TreeExplorerView {
 				id: treeExplorer
+				objectName: "ProductFeaturesExplorer"
 				anchors.fill: parent
 				anchors.margins: Style.marginXL
 				model: productViewContainer.featureTree

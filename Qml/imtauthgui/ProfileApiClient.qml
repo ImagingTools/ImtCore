@@ -27,6 +27,10 @@ QtObject {
 	// A concrete implementation exposes a PermissionsProvider-compatible object.
 	property var permissionsProvider: null
 
+	// Policy used by the password section to check a candidate before sending it.
+	// A concrete implementation exposes a PasswordPolicyController-compatible object.
+	property var passwordPolicy: null
+
 	// --- Profile ---
 	// Cached result of the last successful getProfile() call, so a page that
 	// mounts (or re-mounts) after the fetch already completed can read the

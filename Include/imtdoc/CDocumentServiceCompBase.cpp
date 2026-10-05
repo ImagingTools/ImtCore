@@ -32,10 +32,10 @@ bool CDocumentServiceCompBase::HasDocumentNameProvider(const QByteArray& typeId)
 
 
 bool CDocumentServiceCompBase::ValidateDocumentData(
-	const WorkingDocument& document,
-	OperationStatus& status,
-	QString* errorMessage,
-	const imtbase::IOperationContext* operationContextPtr) const
+			const WorkingDocument& document,
+			OperationStatus& status,
+			QString* errorMessage,
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	status = OS_OK;
 	if (errorMessage != nullptr){
@@ -109,14 +109,20 @@ istd::IChangeableUniquePtr CDocumentServiceCompBase::CreateObject(const QByteArr
 
 idoc::IUndoManagerUniquePtr CDocumentServiceCompBase::CreateUndoManager() const
 {
-	if (m_undoManagerFactPtr.IsValid()){
-		return m_undoManagerFactPtr.CreateInstance();
+	idoc::IUndoManagerUniquePtr retVal;
+
+	if (m_persistUndoManagerFactPtr.IsValid()){
+		retVal = m_persistUndoManagerFactPtr.CreateInstance();
+	}
+	
+	if (!retVal.IsValid() && m_undoManagerFactPtr.IsValid()){
+		retVal = m_undoManagerFactPtr.CreateInstance();
 	}
 
 	const QByteArray errorMessage = QStringLiteral("Factory not found").toUtf8();
-	Q_ASSERT_X(false, "CDocumentServiceCompBase::CreateUndoManager", errorMessage.constData());
+	Q_ASSERT_X(retVal.IsValid(), "CDocumentServiceCompBase::CreateUndoManager", errorMessage.constData());
 
-	return nullptr;
+	return retVal;
 }
 
 

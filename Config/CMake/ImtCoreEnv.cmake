@@ -18,6 +18,11 @@ if(NOT DEFINED IMTCOREDIR_BUILD)
 	endif()
 endif()
 
+# Native separators from the environment break every command that re-parses these
+# paths as CMake code (cmake_parse_arguments in the Sdl generators).
+file(TO_CMAKE_PATH "${IMTCOREDIR}" IMTCOREDIR)
+file(TO_CMAKE_PATH "${IMTCOREDIR_BUILD}" IMTCOREDIR_BUILD)
+
 if(NOT DEFINED OPENSSLDIR)
 	set(OPENSSLDIR "$ENV{OPENSSLDIR}")
 	if(OPENSSLDIR STREQUAL "")
