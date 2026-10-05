@@ -845,19 +845,21 @@ ViewBase {
 							description: qsTr("How this feature is addressed by requirements and permissions")
 
 							controlComp: Component {
-								Item {
-									id: fullPathControl
-									// A Row here would size to the whole path and overflow past the
-									// panel instead of shrinking, so the control gets a hard cap and
-									// the text elides inside it like every other path field does.
-									width: Math.min(implicitWidth, fullPathElement.controlWidth)
-									implicitWidth: fullPathText.implicitWidth + Style.spacingS + copyFullPathButton.width
+								CustomTextField {
+									id: fullPathField
+									objectName: "FullPathField"
+									width: fullPathElement.controlWidth
 									height: Style.controlHeightM
-									clip: true
+									readOnly: true
+									hasActionMenu: false
+									textFieldRightMargin: copyFullPathButton.width + 2 * Style.marginXS
+									text: featureEditor.rootFeaturePath
 
 									ToolButton {
 										id: copyFullPathButton
+										z: fullPathField.z + 2
 										anchors.right: parent.right
+										anchors.rightMargin: Style.marginXS
 										anchors.verticalCenter: parent.verticalCenter
 										width: Style.buttonWidthM
 										height: width
@@ -865,18 +867,6 @@ ViewBase {
 										iconSource: featureEditor.copyIconSource(featureEditor.rootFeaturePath)
 										tooltipText: qsTr("Copy the full path")
 										onClicked: featureEditor.copyFeaturePath(featureEditor.featureData)
-									}
-
-									BaseText {
-										id: fullPathText
-										anchors.left: parent.left
-										anchors.verticalCenter: parent.verticalCenter
-										width: Math.max(0, parent.width - copyFullPathButton.width - Style.spacingS)
-										clip: true
-										elide: Text.ElideLeft
-										text: featureEditor.rootFeaturePath !== "" ? featureEditor.rootFeaturePath : "-"
-										font.family: Style.fontFamilyBold
-										color: featureEditor.rootFeaturePath !== "" ? Style.textColor : Style.inactiveTextColor
 									}
 								}
 							}
@@ -974,28 +964,18 @@ ViewBase {
 			function currentParentNode() { return treeExplorer.currentParentNode() }
 				function commandTargets() { return treeExplorer.commandTargets() }
 
-			// Column geometry, shared by the header and the rows so the two can
-			// never drift. A column whose breakpoint is above the current table
-			// width folds away and its share is handed to the columns that stay.
-			property var columnFractions: [0.20, 0.13, 0.16, 0.07, 0.08, 0.08, 0.16, 0.12]
-			property var columnBreakpoints: [0, 340, 720, 0, 540, 440, 620, 0]
-
-			function columnVisible(index, width) {
-				return width >= subfeaturesPage.columnBreakpoints[index]
+			// Column geometry, shared by the header, the rows and the drag handles
+			// the explorer draws, so none of the three can drift from the others.
+			// A column whose breakpoint is above the current table width folds
+			// away and its share is handed to the columns that stay.
+			TableColumnLayout {
+				id: subfeatureColumns
+				fractions: [0.24, 0.16, 0.22, 0.08, 0.09, 0.09, 0.12]
+				breakpoints: [0, 340, 720, 0, 540, 440, 620]
 			}
 
 			function columnWidth(index, width, spacing) {
-				if (!subfeaturesPage.columnVisible(index, width))
-					return 0
-				let sum = 0
-				let count = 0
-				for (let i = 0; i < subfeaturesPage.columnFractions.length; ++i) {
-					if (!subfeaturesPage.columnVisible(i, width))
-						continue
-					sum += subfeaturesPage.columnFractions[i]
-					++count
-				}
-				return (width - (count - 1) * spacing) * subfeaturesPage.columnFractions[index] / sum
+				return subfeatureColumns.widthOf(index, width, spacing)
 			}
 
 			property Component subfeaturesHeaderComp: Component {
@@ -1101,21 +1081,6 @@ ViewBase {
 							anchors.right: parent.right
 							anchors.verticalCenter: parent.verticalCenter
 							text: qsTr("Requirements")
-							font.family: Style.fontFamilyBold
-							font.pixelSize: Style.fontSizeS
-							color: Style.subtitleColor
-						}
-					}
-					Item {
-						width: subfeaturesPage.columnWidth(7, headerRow.width, headerRow.spacing)
-						height: headerRow.height
-						visible: width > 0
-						BaseText {
-							anchors.left: parent.left
-							anchors.leftMargin: Style.marginXS
-							anchors.right: parent.right
-							anchors.verticalCenter: parent.verticalCenter
-							text: qsTr("Path")
 							font.family: Style.fontFamilyBold
 							font.pixelSize: Style.fontSizeS
 							color: Style.subtitleColor
@@ -1481,54 +1446,6 @@ ViewBase {
 
 					}
 
-					// The path is how this feature is written down elsewhere - in a
-					// requirement, in a permission list, in a configuration file - so it
-					// is offered where the row is rather than only in the panel above.
-					Item {
-						id: pathCell
-						width: subfeaturesPage.columnWidth(7, rowContent.width, rowContent.spacing)
-						height: Style.controlHeightM
-						anchors.verticalCenter: parent.verticalCenter
-						visible: width > 0
-						// Neither child ever paints past this box, however tight the column gets.
-						clip: true
-
-						property string path: featureEditor.featurePath(rowContent.sourceItem)
-						property bool copyable: pathCell.path !== "" && !rowContent.editing
-						// Below this the cell only has room for the path itself.
-						property bool buttonFits: pathCell.width >= Style.buttonWidthS + 3 * Style.marginXS
-
-						ToolButton {
-							id: copyPathButton
-							anchors.right: parent.right
-							anchors.rightMargin: Style.marginXS
-							anchors.verticalCenter: parent.verticalCenter
-							width: Style.buttonWidthS
-							height: width
-							visible: pathCell.buttonFits
-							enabled: pathCell.copyable
-							iconSource: featureEditor.copyIconSource(pathCell.path)
-							tooltipText: pathCell.copyable ? qsTr("Copy %1").arg(pathCell.path) : ""
-							onClicked: featureEditor.copyFeaturePath(rowContent.sourceItem)
-						}
-
-						BaseText {
-							anchors.left: parent.left
-							anchors.leftMargin: Style.marginXS
-							anchors.verticalCenter: parent.verticalCenter
-							// Computed instead of anchored to the button's edge, so the two
-							// can never share a pixel even while the button is toggling away.
-							width: Math.max(0, pathCell.width - Style.marginXS - (pathCell.buttonFits
-								? Style.buttonWidthS + 2 * Style.marginXS : Style.marginXS))
-							clip: true
-							// The tail tells the features apart, so drop the shared prefix first.
-							elide: Text.ElideLeft
-							text: pathCell.path !== "" ? pathCell.path : "-"
-							font.pixelSize: Style.fontSizeXS
-							color: pathCell.path !== "" ? Style.subtitleColor : Style.inactiveTextColor
-						}
-					}
-
 					// Zero-size focus relays: Tab off the last cell or Shift+Tab off the
 					// first lands here and hands editing to the adjacent row.
 					Item {
@@ -1549,6 +1466,23 @@ ViewBase {
 								treeExplorer.moveEditRow(rowContent.node, 1, 0)
 						}
 					}
+				}
+			}
+
+			// Whatever the narrow cells cut short, in full: the name, the path that
+			// requirements and permissions are written in, and the description.
+			property Component subfeatureDetailsComp: Component {
+				TableRowDetails {
+					id: subfeatureDetails
+					objectName: "SubfeatureDetails"
+					title: featureEditor.selectedFeature ? featureEditor.featureName(treeExplorer.selectedNode) : ""
+					keyText: featureEditor.selectedFeature ? featureEditor.featurePath(featureEditor.selectedFeature) : ""
+					description: featureEditor.selectedFeature ? featureEditor.featureDescription(treeExplorer.selectedNode) : ""
+					placeholderText: qsTr("Select a sub-feature to see its full name, path and description")
+					copyVisible: true
+					copyIconSource: featureEditor.copyIconSource(subfeatureDetails.keyText)
+					copyTooltipText: qsTr("Copy the full path")
+					onCopyRequested: featureEditor.copyFeaturePath(featureEditor.selectedFeature)
 				}
 			}
 
@@ -1630,6 +1564,8 @@ ViewBase {
 				rowIconVisible: false
 				headerContentComponent: subfeaturesPage.subfeaturesHeaderComp
 				rowContentComponent: subfeaturesPage.subfeatureRowComp
+				columnLayout: subfeatureColumns
+				detailsComponent: subfeaturesPage.subfeatureDetailsComp
 				sidePanelComponent: subfeaturesPage.requirementsPanelComp
 				// Read through to the live model item rather than the cached node, so
 				// inline renames show up in the breadcrumb and in search right away.

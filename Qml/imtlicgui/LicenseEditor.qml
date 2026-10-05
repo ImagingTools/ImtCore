@@ -666,28 +666,18 @@ ViewBase {
 			function updateModel() {
 			}
 
-			// Column geometry, shared by the header and the rows so the two can
-			// never drift. A column whose breakpoint is above the current table
-			// width folds away and its share is handed to the columns that stay.
-			property var columnFractions: [0.10, 0.28, 0.20, 0.28, 0.14]
-			property var columnBreakpoints: [0, 0, 380, 620, 300]
-
-			function columnVisible(index, width) {
-				return width >= featuresPage.columnBreakpoints[index]
+			// Column geometry, shared by the header, the rows and the drag handles
+			// the explorer draws, so none of the three can drift from the others.
+			// A column whose breakpoint is above the current table width folds
+			// away and its share is handed to the columns that stay.
+			TableColumnLayout {
+				id: featureColumns
+				fractions: [0.10, 0.28, 0.20, 0.28, 0.14]
+				breakpoints: [0, 0, 380, 620, 300]
 			}
 
 			function columnWidth(index, width, spacing) {
-				if (!featuresPage.columnVisible(index, width))
-					return 0
-				let sum = 0
-				let count = 0
-				for (let i = 0; i < featuresPage.columnFractions.length; ++i) {
-					if (!featuresPage.columnVisible(i, width))
-						continue
-					sum += featuresPage.columnFractions[i]
-					++count
-				}
-				return (width - (count - 1) * spacing) * featuresPage.columnFractions[index] / sum
+				return featureColumns.widthOf(index, width, spacing)
 			}
 
 			property Component featuresHeaderComp: Component {
@@ -931,6 +921,21 @@ ViewBase {
 				}
 			}
 
+			// Whatever the narrow cells cut short, in full.
+			property Component featureDetailsComp: Component {
+				TableRowDetails {
+					id: featureDetails
+					objectName: "LicenseFeatureDetails"
+
+					property var entry: licenseEditor.nodeEntry(treeExplorer.selectedNode)
+
+					title: featureDetails.entry ? featureDetails.entry.featureName : ""
+					keyText: featureDetails.entry ? featureDetails.entry.featurePath : ""
+					description: featureDetails.entry ? featureDetails.entry.description : ""
+					placeholderText: qsTr("Select a feature to see its full name, path and description")
+				}
+			}
+
 			// Right-hand table of the page: what this license gets for free from
 			// the licenses it inherits. Read-only - the ticks that produce it are
 			// on the Inherited licenses page.
@@ -987,6 +992,8 @@ ViewBase {
 				rowIconVisible: false
 				headerContentComponent: featuresPage.featuresHeaderComp
 				rowContentComponent: featuresPage.featureRowComp
+				columnLayout: featureColumns
+				detailsComponent: featuresPage.featureDetailsComp
 				sidePanelComponent: featuresPage.inheritedFeaturesPanelComp
 				// Only a granted feature can be opened - there is nothing to
 				// decide inside one that is not granted at all.

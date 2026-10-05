@@ -100,6 +100,11 @@ FocusScope {
 	// what those components space their cells by, because the handles sit in
 	// the gaps rather than on top of the cells.
 	property real columnSpacing: Style.spacingM
+	// Strip under the table for what does not fit into a cell: the full
+	// values of the selected row. Its root item must set its own height.
+	property Component detailsComponent: null
+	// One line under the table about the whole level.
+	property string footerText: ""
 	// Detail pane docked to the right of the table behind a draggable split.
 	// It stays on screen with nothing selected - a panel that comes and goes
 	// makes the whole page jump - and shows its own placeholder instead.
@@ -1136,7 +1141,8 @@ FocusScope {
 			anchors.topMargin: Style.marginXS
 			anchors.left: parent.left
 			anchors.right: parent.right
-			anchors.bottom: parent.bottom
+			anchors.bottom: footerArea.top
+			anchors.bottomMargin: footerArea.height > 0 ? Style.marginS : 0
 			radius: Style.radiusM
 			color: Style.baseColor
 			border.color: Style.borderColor
@@ -1428,6 +1434,34 @@ FocusScope {
 					color: Style.subtitleColor
 					wrapMode: Text.WordWrap
 				}
+			}
+		}
+
+		// Collapses to nothing while there are no details and no footer text.
+		Column {
+			id: footerArea
+			objectName: "ExplorerFooter"
+			anchors.left: parent.left
+			anchors.right: parent.right
+			anchors.bottom: parent.bottom
+			spacing: Style.marginS
+
+			Loader {
+				id: detailsLoader
+				width: parent.width
+				active: root.detailsComponent !== null
+				visible: active
+				sourceComponent: root.detailsComponent
+			}
+
+			BaseText {
+				objectName: "ExplorerFooterText"
+				width: parent.width
+				visible: root.footerText !== ""
+				text: root.footerText
+				font.pixelSize: Style.fontSizeS
+				color: Style.subtitleColor
+				wrapMode: Text.WordWrap
 			}
 		}
 

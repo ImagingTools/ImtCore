@@ -1046,28 +1046,18 @@ ViewBase {
 			function updateModel() {
 			}
 
-			// Column geometry, shared by the header and the rows so the two can
-			// never drift. A column whose breakpoint is above the current table
-			// width folds away and its share is handed to the columns that stay.
-			property var columnFractions: [0.22, 0.14, 0.20, 0.10, 0.14, 0.20]
-			property var columnBreakpoints: [0, 460, 720, 300, 560, 380]
-
-			function columnVisible(index, width) {
-				return width >= featuresPage.columnBreakpoints[index]
+			// Column geometry, shared by the header, the rows and the drag handles
+			// the explorer draws, so none of the three can drift from the others.
+			// A column whose breakpoint is above the current table width folds
+			// away and its share is handed to the columns that stay.
+			TableColumnLayout {
+				id: featureColumns
+				fractions: [0.22, 0.14, 0.20, 0.10, 0.14, 0.20]
+				breakpoints: [0, 460, 720, 300, 560, 380]
 			}
 
 			function columnWidth(index, width, spacing) {
-				if (!featuresPage.columnVisible(index, width))
-					return 0
-				let sum = 0
-				let count = 0
-				for (let i = 0; i < featuresPage.columnFractions.length; ++i) {
-					if (!featuresPage.columnVisible(i, width))
-						continue
-					sum += featuresPage.columnFractions[i]
-					++count
-				}
-				return (width - (count - 1) * spacing) * featuresPage.columnFractions[index] / sum
+				return featureColumns.widthOf(index, width, spacing)
 			}
 
 			property Component productFeaturesHeaderComp: Component {
@@ -1186,6 +1176,7 @@ ViewBase {
 					// table.
 					Item {
 						id: featureNameCell
+
 						objectName: "ProductFeatureNameCell"
 						width: featuresPage.columnWidth(0, rowContent.width, rowContent.spacing)
 						height: rowContent.height
@@ -1380,6 +1371,20 @@ ViewBase {
 				}
 			}
 
+			// Whatever the narrow cells cut short, in full.
+			property Component featureDetailsComp: Component {
+				TableRowDetails {
+					objectName: "ProductFeatureDetails"
+					title: treeExplorer.selectedNode && treeExplorer.selectedNode.data
+						? treeExplorer.selectedNode.data.featureName || qsTr("Untitled feature") : ""
+					keyText: treeExplorer.selectedNode && treeExplorer.selectedNode.data
+						? treeExplorer.selectedNode.data.featureId || "" : ""
+					description: treeExplorer.selectedNode && treeExplorer.selectedNode.data
+						? treeExplorer.selectedNode.data.description || "" : ""
+					placeholderText: qsTr("Select a feature to see its full name, ID and description")
+				}
+			}
+
 			// Right-hand table of the page: everything the selected product feature
 			// brings along, each with its full path. Mandatory parts are shown checked
 			// and locked; only the optional ones are a decision this product makes.
@@ -1450,6 +1455,8 @@ ViewBase {
 				rowIconVisible: false
 				headerContentComponent: featuresPage.productFeaturesHeaderComp
 				rowContentComponent: featuresPage.productFeatureRowComp
+				columnLayout: featureColumns
+				detailsComponent: featuresPage.featureDetailsComp
 				sidePanelComponent: featuresPage.featureContentPanelComp
 				textProvider: function(node) { return node && node.data ? node.data.featureName || qsTr("Untitled feature") : "" }
 				descriptionProvider: function(node) { return node && node.data ? node.data.description || "" : "" }
