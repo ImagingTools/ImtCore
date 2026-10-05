@@ -71,7 +71,7 @@ Rectangle {
 					text: revisionCard.userName.length > 0 ? revisionCard.userName.charAt(0).toUpperCase() : "?";
 					font.family: Style.fontFamilyBold;
 					font.pixelSize: Style.fontSizeM;
-					color: "white";
+					color: Style.highlightedTextColor;
 				}
 			}
 
@@ -120,7 +120,7 @@ Rectangle {
 							text: qsTr("Current");
 							font.family: Style.fontFamilyBold;
 							font.pixelSize: Style.fontSizeS;
-							color: "white";
+							color: Style.highlightedTextColor;
 						}
 					}
 				}

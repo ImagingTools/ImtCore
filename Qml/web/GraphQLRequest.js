@@ -165,7 +165,6 @@ var GqlRequest = function(requestType, commandId){
 		
 		AddObjectFieldPart: function(gqlObject){
 			var retVal = ""
-			retVal += gqlObject.m_objectId
 			
 			var fieldIds = gqlObject.GetFieldIds()
 			
@@ -311,7 +310,11 @@ var GqlRequest = function(requestType, commandId){
 				params = params + ")"
 			}
 			
-			var queryData = "{\"query\": \"" + type + " " + this.m_commandId + " {" + this.m_commandId + params + " {" + fields + "}" + "}\"}"
+			if(!fields || fields == ""){
+				fields = "{}"
+			}
+			var queryData = "{\"query\": \"" + type + " " + this.m_commandId + " {" + this.m_commandId + params + " " + fields + "}\"}"
+
 			return queryData
 		}
 	}

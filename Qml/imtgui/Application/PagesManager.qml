@@ -53,7 +53,7 @@ Item {
 
     function clearModels(){
         pagesData.model = 0;
-        pageModel.clear();
+        pagesProvider.clearModel();
     }
 
     property alias modelState: pagesProvider.modelState;
@@ -97,9 +97,7 @@ Item {
 
         anchors.fill: parent;
 
-        // Keyed on the repeater, not on getItemsCount(): that is a plain call and
-        // a binding on it would never hear the model fill up.
-        visible: container.userIsLoggedIn && pagesData.count === 0 && container.modelState !== "Error";
+        visible: container.userIsLoggedIn && !pagesProvider.pagesReceived && container.modelState !== "Error";
     }
 
     Repeater {
