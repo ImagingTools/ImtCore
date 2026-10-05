@@ -140,7 +140,7 @@ ConstResponsePtr CSocketThread::ProcessRequest(const IRequest& request, const QB
 
 // reimplemented (ITransport)
 
-bool CSocketThread::SendData(QByteArray& data) const
+bool CSocketThread::SendData(const QByteArray& data) const
 {
 	Q_EMIT OnSendResponse(data);
 

@@ -24,7 +24,7 @@ CHttpSender::CHttpSender(QAbstractSocket* tcpSocketPtr)
 
 // reimplemented (ITransport)
 
-bool CHttpSender::SendData(QByteArray& data) const
+bool CHttpSender::SendData(const QByteArray& data) const
 {
 	if (m_tcpSocketPtr == nullptr || !m_tcpSocketPtr->isOpen()){
 		return false;

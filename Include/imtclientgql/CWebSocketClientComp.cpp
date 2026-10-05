@@ -128,7 +128,7 @@ bool CWebSocketClientComp::SendRequestNoWait(GqlRequestPtr requestPtr, imtbase::
 
 // reimplemented (imtrest::ITransport)
 
-bool CWebSocketClientComp::SendData(QByteArray& data) const
+bool CWebSocketClientComp::SendData(const QByteArray& data) const
 {
 	EmitSendTextMessage(data);
 
