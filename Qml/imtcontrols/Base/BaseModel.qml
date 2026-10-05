@@ -55,163 +55,147 @@ ListModel {
 		return false
 	}
 
+	// The full list of an SDL item still contains null properties, they must be validated before skipping
+	function getItemPropertyIds(item){
+		return item.getProperties ? item.getProperties() : getProperties(item)
+	}
+
+	function createGraphQlString(value){
+		if (!/[\\"\r\n\t\b\f]/.test(value)){
+			return '"' + value + '"'
+		}
+
+		return '"' + value.replace(/\\/g, "\\\\").replace(/\"/g, "\\\"").replace(/\r/g, "\\r").replace(/\n/g, "\\n").replace(/\t/g, "\\t").replace(/[\b]/g, "\\b").replace(/\f/g, "\\f") + '"'
+	}
+
+	// Returns '' if a required array of an item is null or has null elements; scalars are not validated
 	function toJson(){
 		let json = '['
-		for(let i = 0; i < count; i++){
-			let item = get(i).item
+		for (let i = 0; i < count; i++){
 			if (i > 0){
 				json += ','
 			}
+
+			let item = get(i).item
 			if (item === null || item === undefined){
 				json += 'null'
 				continue
 			}
 
-			let list = getProperties(item)
-			for (let propertyId of list){
-				if (item.isArrayValueValid && !item.isArrayValueValid(propertyId, item[propertyId])){
-					return ''
-				}
-			}
-			json += '{'
-			for(let j = 0; j < list.length; j++){
-				let key = list[j]
-
-				if (item[key] == null){
-					json += '"' + item.getJSONKeyForProperty(key) + '": null'
-				}
-				else if(typeof item[key] === 'object'){
-					if (Array.isArray(item[key])){
-						json += '"' + item.getJSONKeyForProperty(key) + '":'
-
-						json += "["
-
-						for (let k = 0; k < item[key].length; k++){
-							if (k != 0){
-								json += ", "
-							}
-
-							if (typeof item[key][k] === "string"){
-								json += "\"" + item[key][k] + "\""
-							}
-							else{
-								json += item[key][k]
-							}
-						}
-
-						json += "]"
+			let canValidate = typeof item.isArrayValueValid === "function"
+			let separator = '{'
+			for (let key of getItemPropertyIds(item)){
+				let value = item[key]
+				if (value === null || value === undefined){
+					if (canValidate && !item.isArrayValueValid(key, value)){
+						return ''
 					}
-					else if (typeof item[key].toJson === "function"){
-						let serializedValue = item[key].toJson()
+
+					continue
+				}
+
+				let serializedValue
+				if (typeof value === 'object'){
+					if (canValidate && !item.isArrayValueValid(key, value)){
+						return ''
+					}
+
+					if (Array.isArray(value)){
+						serializedValue = '['
+						for (let k = 0; k < value.length; k++){
+							if (k != 0){
+								serializedValue += ", "
+							}
+
+							serializedValue += (typeof value[k] === "string") ? JSON.stringify(value[k]) : value[k]
+						}
+						serializedValue += ']'
+					}
+					else if (typeof value.toJson === "function"){
+						serializedValue = value.toJson()
 						if (serializedValue === ''){
 							return ''
 						}
-						json += '"' + item.getJSONKeyForProperty(key) + '":' + serializedValue
 					}
-				} else {
-					let value = item[key]
-					if (value === undefined){
-						value = null
+					else{
+						continue
 					}
-					let safeValue = item[key]
-					if (typeof safeValue === 'string'){
-						safeValue = safeValue.replace(/\\/g, '\u005C\u005C')
-						safeValue = safeValue.replace(/\"/g,'\u005C"')
-					}
-
-					json += '"' + item.getJSONKeyForProperty(key) + '":' + (typeof item[key] === 'string' ? '"' + safeValue + '"' : value)
 				}
-				if(j < list.length - 1) json += ','
-			}
-			json +='}'
+				else{
+					serializedValue = (typeof value === 'string') ? JSON.stringify(value) : value
+				}
 
+				json += separator + '"' + item.getJSONKeyForProperty(key) + '":' + serializedValue
+				separator = ','
+			}
+			json += (separator === '{') ? '{}' : '}'
 		}
-		json +=']'
+		json += ']'
+
 		return json
 	}
 
+	// Returns '' if a required array of an item is null or has null elements; scalars are not validated
 	function toGraphQL(){
 		let graphQL = '['
-		for(let i = 0; i < count; i++){
-			let item = get(i).item
+		for (let i = 0; i < count; i++){
 			if (i > 0){
 				graphQL += ','
 			}
+
+			let item = get(i).item
 			if (item === null || item === undefined){
 				graphQL += 'null'
 				continue
 			}
-			let list = getProperties(item)
-			for (let propertyId of list){
-				if (item.isArrayValueValid && !item.isArrayValueValid(propertyId, item[propertyId])){
-					return ''
+
+			let canValidate = typeof item.isArrayValueValid === "function"
+			let separator = '{'
+			for (let key of getItemPropertyIds(item)){
+				let value = item[key]
+				if (value === null || value === undefined){
+					if (canValidate && !item.isArrayValueValid(key, value)){
+						return ''
+					}
+
+					continue
 				}
-			}
 
-			graphQL += '{'
-			for(let j = 0; j < list.length; j++){
-				let key = list[j]
-				if(item[key] === null){
-					graphQL += item.getJSONKeyForProperty(key) + ':null'
-				}
-				else if(typeof item[key] === 'object'){
-					if (Array.isArray(item[key])){
-						graphQL +=  item.getJSONKeyForProperty(key) + ':'
+				let serializedValue
+				if (typeof value === 'object'){
+					if (canValidate && !item.isArrayValueValid(key, value)){
+						return ''
+					}
 
-						graphQL += "["
-
-						for (let k = 0; k < item[key].length; k++){
+					if (Array.isArray(value)){
+						serializedValue = '['
+						for (let k = 0; k < value.length; k++){
 							if (k != 0){
-								graphQL += ", "
+								serializedValue += ", "
 							}
 
-							if (typeof item[key][k] === "string"){
-								let data = item[key][k]
-
-								data = data.replace(/\\/g, "\\\\")
-								data = data.replace(/\"/g, "\\\"")
-								data = data.replace(/\r/g, "\\r")
-								data = data.replace(/\n/g, "\\n")
-								data = data.replace(/\t/g, "\\t")
-
-								graphQL += "\"" + data + "\""
-							}
-							else{
-								graphQL += item[key][k]
-							}
+							serializedValue += (typeof value[k] === "string") ? createGraphQlString(value[k]) : value[k]
 						}
-
-						graphQL += "]"
+						serializedValue += ']'
 					}
 					else{
-						let serializedValue = item[key].toGraphQL()
+						serializedValue = value.toGraphQL()
 						if (serializedValue === ''){
 							return ''
 						}
-						graphQL += item.getJSONKeyForProperty(key) + ':' + serializedValue
 					}
-				} else {
-					let value = item[key]
-
-					if(typeof value === 'string'){
-						value = value.replace(/\\/g, "\\\\")
-						value = value.replace(/\"/g, "\\\"")
-						value = value.replace(/\r/g, "\\r")
-						value = value.replace(/\n/g, "\\n")
-						value = value.replace(/\t/g, "\\t")
-					}
-
-					if (value === undefined){
-						value = null
-					}
-					graphQL += item.getJSONKeyForProperty(key) + ':' + (typeof item[key] === 'string' ? '"' + value + '"' : value)
 				}
-				if(j < list.length - 1) graphQL += ','
-			}
-			graphQL +='}'
+				else{
+					serializedValue = (typeof value === 'string') ? createGraphQlString(value) : value
+				}
 
+				graphQL += separator + item.getJSONKeyForProperty(key) + ':' + serializedValue
+				separator = ','
+			}
+			graphQL += (separator === '{') ? '{}' : '}'
 		}
-		graphQL +=']'
+		graphQL += ']'
+
 		return graphQL
 	}
 
