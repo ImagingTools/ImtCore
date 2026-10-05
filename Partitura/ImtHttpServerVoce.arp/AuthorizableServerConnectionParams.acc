@@ -58,12 +58,30 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="ParametersDescription" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value></Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>PumaConnectionInterface</Value>
                                 <Value>ServerConnectionInterface</Value>
                                 <Value>gRPCConnectionInterface</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersName" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Puma Connection Interface</Value>
+                                <Value>Server Connection Interface</Value>
+                                <Value>gRPC Connection Interface</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

@@ -50,6 +50,17 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="ParametersDescription" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value></Value>
+                                <Value>Select the file with your private key</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -58,6 +69,17 @@
                                 <Value>KeyType</Value>
                                 <Value>KeyPassword</Value>
                                 <Value>FilePath</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersName" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Algorithm</Value>
+                                <Value>Encoding Format</Value>
+                                <Value>Key Type</Value>
+                                <Value>Key Password</Value>
+                                <Value>File Path</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
