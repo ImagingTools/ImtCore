@@ -100,6 +100,10 @@ void CProductInfoFileGeneratorComp::WriteIncludes(QTextStream& textStream) const
 	WriteNewLine(textStream, 1);
 	textStream << QStringLiteral("#include <QtCore/qglobal.h>");
 	WriteNewLine(textStream, 2);
+	textStream << QStringLiteral("// ACF includes");
+	WriteNewLine(textStream, 1);
+	textStream << QStringLiteral("#include <istd/TDelPtr.h>");
+	WriteNewLine(textStream, 2);
 	textStream << QStringLiteral("// ImtCore includes");
 	WriteNewLine(textStream, 1);
 	textStream << QStringLiteral("#include <imtlic/CProductInfo.h>");
