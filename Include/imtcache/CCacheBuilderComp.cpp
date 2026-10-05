@@ -12,6 +12,7 @@
 
 // ImtCore includes
 #include <imtdb/imtdb.h>
+#include <imtcache/CCacheChangeLog.h>
 #include <imtcache/imtcache.h>
 
 
@@ -40,6 +41,13 @@ CCacheBuilderComp::UpdateResult CCacheBuilderComp::Update(UpdateMode mode)
 
 	if (!EnsureRevisionTable(*connectionPtr)){
 		retVal.errorMessage = QStringLiteral("Unable to create the cache revision table");
+
+		return retVal;
+	}
+
+	QString changeLogError;
+	if (!CCacheChangeLog::EnsureTables(*connectionPtr, changeLogError)){
+		retVal.errorMessage = QStringLiteral("Unable to create the cache change log. Error: %1").arg(changeLogError);
 
 		return retVal;
 	}
@@ -85,6 +93,11 @@ CCacheBuilderComp::UpdateResult CCacheBuilderComp::Update(UpdateMode mode)
 		retVal.errorMessage = retVal.errorMessage.isEmpty()
 					? buildResult.errorMessage
 					: retVal.errorMessage + QStringLiteral("; ") + buildResult.errorMessage;
+	}
+
+	// A consumer that failed keeps its cursor, so what it has not read survives.
+	if (!CCacheChangeLog::Purge(*connectionPtr, changeLogError)){
+		SendErrorMessage(0, QStringLiteral("Unable to purge the cache change log. Error: %1").arg(changeLogError), __func__);
 	}
 
 	return retVal;

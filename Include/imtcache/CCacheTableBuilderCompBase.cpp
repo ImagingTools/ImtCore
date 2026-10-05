@@ -7,6 +7,7 @@
 #include <QtSql/QSqlQuery>
 
 // ImtCore includes
+#include <imtcache/CCacheChangeLog.h>
 #include <imtdb/imtdb.h>
 
 
@@ -46,6 +47,10 @@ CCacheTableBuilderCompBase::BuildResult CCacheTableBuilderCompBase::Rebuild(imtd
 	const QString tableName = GetCacheTableName();
 	const QString shadowTableName = tableName + SHADOW_SUFFIX;
 
+	if (!CCacheChangeLog::EnsureTables(connection, retVal.errorMessage)){
+		return retVal;
+	}
+
 	if (!CreateTable(connection, shadowTableName, retVal.errorMessage)){
 		return retVal;
 	}
@@ -57,6 +62,13 @@ CCacheTableBuilderCompBase::BuildResult CCacheTableBuilderCompBase::Rebuild(imtd
 	QString swapError;
 	if (!connection.SwapTable(tableName, shadowTableName, &swapError)){
 		retVal.errorMessage = QStringLiteral("Unable to swap in %1. Error: %2").arg(tableName, swapError);
+
+		return retVal;
+	}
+
+	QString logError;
+	if (!CCacheChangeLog::RecordRebuilt(connection, tableName, logError)){
+		retVal.errorMessage = QStringLiteral("Unable to log the rebuild of %1. Error: %2").arg(tableName, logError);
 
 		return retVal;
 	}
@@ -84,6 +96,10 @@ CCacheTableBuilderCompBase::BuildResult CCacheTableBuilderCompBase::ApplyChanges
 		return Rebuild(connection);
 	}
 
+	if (!CCacheChangeLog::EnsureTables(connection, retVal.errorMessage)){
+		return retVal;
+	}
+
 	if (!CreateTable(connection, stagingTableName, retVal.errorMessage)){
 		return retVal;
 	}
@@ -101,6 +117,14 @@ CCacheTableBuilderCompBase::BuildResult CCacheTableBuilderCompBase::ApplyChanges
 	QSqlError sqlError;
 	if (retVal.rowsWritten > 0){
 		connection.ExecSqlQuery(GetUpsertQuery(stagingTableName).toUtf8(), &sqlError);
+
+		QString logError;
+		if (sqlError.type() == QSqlError::NoError && !CCacheChangeLog::RecordUpserted(connection, tableName, GetKeyColumn(), stagingTableName, logError)){
+			connection.CancelTransaction();
+			retVal.errorMessage = QStringLiteral("Unable to log the %1 changes. Error: %2").arg(tableName, logError);
+
+			return retVal;
+		}
 	}
 
 	if (sqlError.type() == QSqlError::NoError && !RemoveDeletedRows(connection, lastSourceUpdateTime, retVal)){
@@ -150,6 +174,12 @@ QString CCacheTableBuilderCompBase::GetReplaceCondition() const
 QString CCacheTableBuilderCompBase::GetObjectIdColumn() const
 {
 	return QString::fromUtf8(*m_objectIdColumnAttrPtr);
+}
+
+
+QString CCacheTableBuilderCompBase::GetKeyColumn() const
+{
+	return GetColumnNames().value(0);
 }
 
 

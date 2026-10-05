@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/SQL/DuckDb">
         <file alias="CreateCacheRevisionTable.sql">Resources/SQL/DuckDb/CreateCacheRevisionTable.sql</file>
+        <file alias="CreateCacheChangeTable.sql">Resources/SQL/DuckDb/CreateCacheChangeTable.sql</file>
+        <file alias="CreateCacheChangeCursorTable.sql">Resources/SQL/DuckDb/CreateCacheChangeCursorTable.sql</file>
     </qresource>
 </RCC>

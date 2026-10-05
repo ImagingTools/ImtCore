@@ -15,6 +15,7 @@
 // ImtCore includes
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtcol/CDocumentCollectionFilter.h>
+#include <imtcache/CCacheChangeLog.h>
 #include <imtcache/CLoadProgress.h>
 #include <imtdb/imtdb.h>
 
@@ -261,10 +262,18 @@ bool CSourceCollectionCacheTableBuilderCompBase::DeleteRowsById(
 	}
 
 	QSqlError sqlError;
-	connection.ExecSqlQuery(QStringLiteral(R"(DELETE FROM %1 WHERE %2 IN (%3))")
-								.arg(imtdb::QuoteIdentifier(GetCacheTableName()),
-									 imtdb::QuoteIdentifier(GetObjectIdColumn()),
-									 quotedIds.join(','))
+	const QString removedCondition = QStringLiteral(R"(%1 IN (%2))")
+				.arg(imtdb::QuoteIdentifier(GetObjectIdColumn()), quotedIds.join(','));
+
+	QString logError;
+	if (!CCacheChangeLog::RecordRemoved(connection, GetCacheTableName(), GetKeyColumn(), removedCondition, logError)){
+		result.errorMessage = QStringLiteral("Unable to log the removed rows of %1. Error: %2").arg(GetCacheTableName(), logError);
+
+		return false;
+	}
+
+	connection.ExecSqlQuery(QStringLiteral(R"(DELETE FROM %1 WHERE %2)")
+								.arg(imtdb::QuoteIdentifier(GetCacheTableName()), removedCondition)
 								.toUtf8(), &sqlError);
 
 	if (sqlError.type() != QSqlError::NoError){

@@ -43,7 +43,7 @@ public:
 	virtual BuildResult ApplyChanges(imtduckdb::IDuckConnection& connection, const QDateTime& lastSourceUpdateTime) const override;
 
 protected:
-	/// Cache table columns, in the order the create script declares them and a loaded row fills them.
+	/// Cache table columns, in the order the create script declares them and a loaded row fills them. The first one is the surrogate id (UBIGINT) that identifies the row in the change log.
 	virtual QStringList GetColumnNames() const = 0;
 
 	/**
@@ -70,6 +70,9 @@ protected:
 
 	/// Column identifying a row in the source.
 	QString GetObjectIdColumn() const;
+
+	/// Column identifying a row in the change log: the first of GetColumnNames().
+	QString GetKeyColumn() const;
 
 private:
 	bool CreateTable(imtduckdb::IDuckConnection& connection, const QString& tableName, QString& errorMessage) const;

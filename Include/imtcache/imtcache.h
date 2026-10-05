@@ -12,10 +12,42 @@ namespace imtcache
 {
 
 
-/// Bookkeeping table recording how far each cache table has been brought up to date.
+/// Bookkeeping tables of the cache.
 struct CacheTable
 {
 	static const inline QString CACHE_REVISION = QStringLiteral("CacheRevision");
+
+	/// The keys of the rows the mirrors changed, for the tables derived from them.
+	static const inline QString CACHE_CHANGE = QStringLiteral("CacheChange");
+
+	/// How far each consumer of CACHE_CHANGE has read.
+	static const inline QString CACHE_CHANGE_CURSOR = QStringLiteral("CacheChangeCursor");
+};
+
+
+/// Orders the rows of CacheTable::CACHE_CHANGE.
+struct CacheChangeSequence
+{
+	static const inline QString NAME = QStringLiteral("CacheChangeSeq");
+};
+
+
+/// Column names of the CacheTable::CACHE_CHANGE table.
+struct CacheChangeColumn
+{
+	static const inline QString CHANGE_ID	= QStringLiteral("ChangeId");
+	static const inline QString TABLE_NAME	= QStringLiteral("TableName");
+
+	/// Surrogate id of the row; NULL says the whole table was rebuilt, so any row of it may have changed.
+	static const inline QString KEY_ID		= QStringLiteral("KeyId");
+};
+
+
+/// Column names of the CacheTable::CACHE_CHANGE_CURSOR table.
+struct CacheChangeCursorColumn
+{
+	static const inline QString CONSUMER			= QStringLiteral("Consumer");
+	static const inline QString LAST_CHANGE_ID	= QStringLiteral("LastChangeId");
 };
 
 
