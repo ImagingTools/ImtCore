@@ -240,6 +240,30 @@ void CSdlGenTest::TestRequestedFields_data()
 						"items.data.data.note",
 						"items.data.dataField.value"};
 
+	QTest::newRow("sibling with the fallback name, reversed selection order")
+				<< header + "{items {data {dataField {note} data {value}}}}}"
+				<< notTopLevelItems + GetUnsetItemFields("items.", {"data"}) + QByteArrayList{
+						"items.data.info",
+						"items.data.label",
+						"items.data.data.note",
+						"items.data.dataField.value"};
+
+	QTest::newRow("siblings on every level, reversed selection order")
+				<< header + "{items {info {owner {contact {address {street zip} phone} name} tags {color} description} name} notification {level} totalCount}}"
+				<< GetUnsetItemFields("items.", {"name", "info"}) + QByteArrayList{
+						"notification.text",
+						"items.info.tags.name",
+						"items.info.owner.contact.email",
+						"items.info.owner.contact.address.city"};
+
+	QTest::newRow("all fields selected")
+				<< header + "{totalCount notification {text level} items {id name status keywords "
+						"info {description owner {login name contact {email phone address {city street zip}}} tags {name color}} "
+						"data {data {value note} dataField {value note} info {value note} label} "
+						"content {... on TextContent {text} ... on ImageContent {url}} "
+						"node {name parentNode {name} childNodes {name}} cycle {name b {title a {name}}}}}}"
+				<< QByteArrayList();
+
 	QTest::newRow("self-nested type")
 				<< header + "{items {node {name childNodes {name childNodes {name}}}}}}"
 				<< notTopLevelItems + GetUnsetItemFields("items.", {"node"}) + QByteArrayList{
