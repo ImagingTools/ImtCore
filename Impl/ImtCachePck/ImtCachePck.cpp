@@ -23,6 +23,12 @@ I_EXPORT_COMPONENT(
 
 
 I_EXPORT_COMPONENT(
+			MaterializedTableBuilder,
+			"Keeps a table joined from other cache tables, recomputing only the rows a change touched",
+			"Materialized Table Builder");
+
+
+I_EXPORT_COMPONENT(
 			ViewBuilder,
 			"Keeps a view over cache tables, recreated from a script on every update",
 			"View Builder");

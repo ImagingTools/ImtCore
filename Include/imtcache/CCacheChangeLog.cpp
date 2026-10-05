@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtCore/QFile>
 #include <QtSql/QSqlError>
+#include <QtSql/QSqlQuery>
 
 // ImtCore includes
 #include <imtcache/imtcache.h>
@@ -27,6 +28,23 @@ bool Execute(imtduckdb::IDuckConnection& connection, const QString& query, QStri
 
 		return false;
 	}
+
+	return true;
+}
+
+
+/// The first column of the first row of the result.
+bool ReadValue(imtduckdb::IDuckConnection& connection, const QString& query, QVariant& value, QString& errorMessage)
+{
+	QSqlError sqlError;
+	QSqlQuery result = connection.ExecSqlQuery(query.toUtf8(), &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		errorMessage = sqlError.text();
+
+		return false;
+	}
+
+	value = result.next() ? result.value(0) : QVariant();
 
 	return true;
 }
@@ -108,6 +126,106 @@ bool CCacheChangeLog::RecordRebuilt(imtduckdb::IDuckConnection& connection, cons
 						 NextChangeId(),
 						 imtdb::EscapeSql(tableName)),
 				errorMessage);
+}
+
+
+bool CCacheChangeLog::GetLatestChangeId(imtduckdb::IDuckConnection& connection, qint64 fallback, qint64& changeId, QString& errorMessage)
+{
+	QVariant value;
+	if (!ReadValue(connection,
+				QStringLiteral("SELECT COALESCE(max(%1), %2) FROM %3")
+					.arg(imtdb::QuoteIdentifier(CacheChangeColumn::CHANGE_ID),
+						 QString::number(fallback),
+						 imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE)),
+				value,
+				errorMessage)){
+		return false;
+	}
+
+	changeId = value.isValid() ? value.toLongLong() : fallback;
+
+	return true;
+}
+
+
+bool CCacheChangeLog::GetCursor(
+			imtduckdb::IDuckConnection& connection,
+			const QString& consumer,
+			bool& hasCursor,
+			qint64& changeId,
+			QString& errorMessage)
+{
+	QVariant value;
+	if (!ReadValue(connection,
+				QStringLiteral("SELECT %1 FROM %2 WHERE %3 = '%4'")
+					.arg(imtdb::QuoteIdentifier(CacheChangeCursorColumn::LAST_CHANGE_ID),
+						 imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE_CURSOR),
+						 imtdb::QuoteIdentifier(CacheChangeCursorColumn::CONSUMER),
+						 imtdb::EscapeSql(consumer)),
+				value,
+				errorMessage)){
+		return false;
+	}
+
+	hasCursor = value.isValid() && !value.isNull();
+	changeId = hasCursor ? value.toLongLong() : 0;
+
+	return true;
+}
+
+
+bool CCacheChangeLog::SetCursor(imtduckdb::IDuckConnection& connection, const QString& consumer, qint64 changeId, QString& errorMessage)
+{
+	const QString lastChangeId = imtdb::QuoteIdentifier(CacheChangeCursorColumn::LAST_CHANGE_ID);
+
+	return Execute(connection,
+				QStringLiteral("INSERT INTO %1 VALUES ('%2', %3) ON CONFLICT (%4) DO UPDATE SET %5 = excluded.%5")
+					.arg(imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE_CURSOR),
+						 imtdb::EscapeSql(consumer),
+						 QString::number(changeId),
+						 imtdb::QuoteIdentifier(CacheChangeCursorColumn::CONSUMER),
+						 lastChangeId),
+				errorMessage);
+}
+
+
+bool CCacheChangeLog::HasRebuilt(
+			imtduckdb::IDuckConnection& connection,
+			const QStringList& tableNames,
+			qint64 afterChangeId,
+			qint64 upToChangeId,
+			bool& hasRebuilt,
+			QString& errorMessage)
+{
+	hasRebuilt = false;
+
+	if (tableNames.isEmpty()){
+		return true;
+	}
+
+	QStringList quotedNames;
+	for (const QString& tableName : tableNames){
+		quotedNames << QStringLiteral("'%1'").arg(imtdb::EscapeSql(tableName));
+	}
+
+	QVariant value;
+	if (!ReadValue(connection,
+				QStringLiteral("SELECT count(*) FROM %1 WHERE %2 > %3 AND %2 <= %4 AND %5 IS NULL AND %6 IN (%7)")
+					.arg(imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE),
+						 imtdb::QuoteIdentifier(CacheChangeColumn::CHANGE_ID),
+						 QString::number(afterChangeId),
+						 QString::number(upToChangeId),
+						 imtdb::QuoteIdentifier(CacheChangeColumn::KEY_ID),
+						 imtdb::QuoteIdentifier(CacheChangeColumn::TABLE_NAME),
+						 quotedNames.join(',')),
+				value,
+				errorMessage)){
+		return false;
+	}
+
+	hasRebuilt = value.toLongLong() > 0;
+
+	return true;
 }
 
 

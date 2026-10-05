@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 
 // ImtCore includes
 #include <imtduckdb/IDuckConnection.h>
@@ -45,6 +46,23 @@ public:
 
 	/// Logs that \a tableName was rebuilt, which no key can describe.
 	static bool RecordRebuilt(imtduckdb::IDuckConnection& connection, const QString& tableName, QString& errorMessage);
+
+	/// The newest entry, or \a fallback when there is none because they were all purged.
+	static bool GetLatestChangeId(imtduckdb::IDuckConnection& connection, qint64 fallback, qint64& changeId, QString& errorMessage);
+
+	/// How far \a consumer has read. \a hasCursor is false before its first read.
+	static bool GetCursor(imtduckdb::IDuckConnection& connection, const QString& consumer, bool& hasCursor, qint64& changeId, QString& errorMessage);
+
+	static bool SetCursor(imtduckdb::IDuckConnection& connection, const QString& consumer, qint64 changeId, QString& errorMessage);
+
+	/// Whether any of \a tableNames was rebuilt by an entry in (\a afterChangeId, \a upToChangeId].
+	static bool HasRebuilt(
+				imtduckdb::IDuckConnection& connection,
+				const QStringList& tableNames,
+				qint64 afterChangeId,
+				qint64 upToChangeId,
+				bool& hasRebuilt,
+				QString& errorMessage);
 
 	/// Drops the entries every consumer has read, or all of them when there is no consumer.
 	static bool Purge(imtduckdb::IDuckConnection& connection, QString& errorMessage);
