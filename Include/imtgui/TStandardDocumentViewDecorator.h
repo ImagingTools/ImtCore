@@ -475,6 +475,9 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::CreateViewCommands(
 	iqtgui::CHierarchicalCommand& commands,
 	QToolBar* toolBarPtr)
 {
+	Q_UNUSED(toolBarPtr);
+	Q_UNUSED(commands);
+
 	const ibase::IHierarchicalCommand* viewCommandsPtr = commandsProvider.GetCommands();
 	if (viewCommandsPtr != nullptr) {
 		m_commands.JoinLinkFrom(viewCommandsPtr);

@@ -12,7 +12,7 @@ CalendarCellDelegateBase {
 
 		font.family: Style.fontFamily;
 		font.pixelSize: dayDelegate.calendarItem.fontSize_cell;
-		color: dayDelegate.calendarItem.fontColor_cell;
+		color: dayDelegate.isAccented ? dayDelegate.calendarItem.selectedFontColor_cell : dayDelegate.calendarItem.fontColor_cell;
 		opacity: modelData.CurrMonth ? 1: 0.5;
 
 		text: modelData.Day;

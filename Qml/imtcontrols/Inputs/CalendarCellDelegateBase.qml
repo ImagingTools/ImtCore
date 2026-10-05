@@ -38,6 +38,8 @@ Rectangle{
 								   && dayDelegate.calendarItem.lessThanDate(modelData.Year, modelData.Month, modelData.Day, dayDelegate.calendarItem.endYear,dayDelegate.calendarItem.endMonth,dayDelegate.calendarItem.endDay)
 								   ) ? true : false;
 
+	property bool isAccented: dayDelegate.isSelectedDate || dayDelegate.isMidlleDateLR || (dayDelegate.isEndDate && dayDelegate.calendarItem.endDateExist);
+
 
 
 
@@ -47,8 +49,8 @@ Rectangle{
 		anchors.fill: parent;
 
 		color: (dayDelegate.isSelectedDate || (dayDelegate.isEndDate && dayDelegate.calendarItem.endDateExist)) ?
-				   dayDelegate.calendarItem.selectColor : " transparent";
-		radius:  dayDelegate.calendarItem.height/7;
+				   dayDelegate.calendarItem.selectColor : "transparent";
+		radius: Math.min(width, height) / 2;
 		border.color: dayDelegate.calendarItem.mainColor;
 		border.width: (dayDelegate.isToday && dayDelegate.calendarItem.canShowToday) ? 2 :0;
 

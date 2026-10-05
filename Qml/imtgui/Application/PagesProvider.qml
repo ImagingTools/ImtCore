@@ -10,12 +10,16 @@ QtObject {
 
     property TreeItemModel pagesModel: TreeItemModel {};
 
+    // Set on any answer, an empty page list included - the page count alone cannot tell "still loading" from "no pages".
+    property bool pagesReceived: false;
+
     function updateModel(){
         pagesProvider.pagesGqlModel.updateModel();
     }
 
     function clearModel(){
         pagesModel.clear();
+        pagesProvider.pagesReceived = false;
     }
 
     property string modelState: pagesProvider.pagesGqlModel.state;
@@ -49,6 +53,8 @@ QtObject {
                         pagesProvider.pagesModel = dataModelLocal;
                     }
                 }
+
+                pagesProvider.pagesReceived = true;
             }
             else if (this.state === "Error"){
                 PopupManager.addWarningMessage(qsTr("Failed to load application pages. Please try again."), true)
