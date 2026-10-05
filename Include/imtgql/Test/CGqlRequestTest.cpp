@@ -569,6 +569,42 @@ void CGqlRequestTest::ParseArrayEnumTokens()
 }
 
 
+void CGqlRequestTest::ParseNumbers()
+{
+	const char* payload = R"(
+	{
+		"query": "query Numbers { Numbers(input: { integer: -42, float: -0.5, large: 1e+21, small: 1E-7, mantissa: 2.5e3, overflow: 99999999999999999999, enumValue: Pending, values: [7, 1.25, 1e+21, -3e-2, Pending] }) { id } }"
+	}
+	)";
+
+	qsizetype errorPosition = -1;
+	imtgql::CGqlRequest request;
+	QVERIFY(request.ParseQuery(payload, errorPosition));
+	QVERIFY(errorPosition < 0);
+
+	const imtgql::CGqlParamObject* inputObject = request.GetParamObject("input");
+	QVERIFY(inputObject != nullptr);
+
+	QCOMPARE(inputObject->GetParamArgumentValue("integer").typeId(), QMetaType::LongLong);
+	QCOMPARE(inputObject->GetParamArgumentValue("integer").toLongLong(), -42);
+	QCOMPARE(inputObject->GetParamArgumentValue("float").toDouble(), -0.5);
+	QCOMPARE(inputObject->GetParamArgumentValue("large").typeId(), QMetaType::Double);
+	QCOMPARE(inputObject->GetParamArgumentValue("large").toDouble(), 1e21);
+	QCOMPARE(inputObject->GetParamArgumentValue("small").toDouble(), 1e-7);
+	QCOMPARE(inputObject->GetParamArgumentValue("mantissa").toDouble(), 2500.0);
+	QCOMPARE(inputObject->GetParamArgumentValue("overflow").typeId(), QMetaType::QByteArray);
+	QCOMPARE(inputObject->GetParamArgumentValue("enumValue").toString(), QStringLiteral("Pending"));
+
+	const QVariantList values = inputObject->GetParamArgumentValue("values").toList();
+	QCOMPARE(values.size(), 5);
+	QCOMPARE(values[0].toLongLong(), 7);
+	QCOMPARE(values[1].toDouble(), 1.25);
+	QCOMPARE(values[2].toDouble(), 1e21);
+	QCOMPARE(values[3].toDouble(), -0.03);
+	QCOMPARE(values[4].toString(), QStringLiteral("Pending"));
+}
+
+
 void CGqlRequestTest::ParseArrayOfObjectArraysQuery()
 {
 	qsizetype errorPosition = -1;

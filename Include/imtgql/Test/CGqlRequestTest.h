@@ -27,6 +27,7 @@ private slots:
 	void ParseObjectQuery();
 	void ParseArrayQuery();
 	void ParseArrayEnumTokens();
+	void ParseNumbers();
 	void ParseComplexTest();
 	void ParseQueryWithVariables();
 	void ParseQueryWithOperationName();
