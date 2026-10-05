@@ -22,7 +22,7 @@ public:
 	QPointer<QWebSocket> GetSocket() const;
 
 	// reimplemented (ITransport)
-	virtual bool SendData(QByteArray& data) const override;
+	virtual bool SendData(const QByteArray& data) const override;
 
 public Q_SLOTS:
 	void OnSendTextMessage(const QByteArray& data) const;
