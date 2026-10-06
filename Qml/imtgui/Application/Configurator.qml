@@ -73,12 +73,26 @@ Rectangle {
 	
 	Preference {
 		id: preferenceDialog;
-		
+
 		anchors.top: parent.top;
 		anchors.left: parent.left;
 		anchors.right: parent.right;
 		anchors.bottom: buttons.top;
-		
+
+		settingsController: SettingsController {
+			databaseAccessSettingsEditorComp: Component {
+				DatabaseAccessSettingsEditor {
+					id: databaseEditor
+
+					backupComp: Component {
+						DatabaseBackupController {
+							databaseParams: databaseEditor.databaseParams
+						}
+					}
+				}
+			}
+		}
+
 		onEditorModelDataChanged: {
 			window.modelIsDirty = true;
 			buttons.setButtonState(Enums.apply, true);
