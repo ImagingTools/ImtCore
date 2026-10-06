@@ -23,7 +23,7 @@ CUdpSender::CUdpSender(CUdpRequest* request)
 
 // reimplemented (ITransport)
 
-bool CUdpSender::SendData(QByteArray& data) const
+bool CUdpSender::SendData(const QByteArray& data) const
 {
     bool result = m_socket->writeDatagram(data, m_address, m_port);
     Q_EMIT sended(m_requestId);

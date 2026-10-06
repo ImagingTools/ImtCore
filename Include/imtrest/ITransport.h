@@ -22,7 +22,7 @@ public:
 	/*!
 		Send a piece of already-serialized data to the client.
 	*/
-	virtual bool SendData(QByteArray& data) const = 0;
+	virtual bool SendData(const QByteArray& data) const = 0;
 };
 
 
