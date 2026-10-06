@@ -101,6 +101,13 @@ CCacheBuilderComp::UpdateResult CCacheBuilderComp::Update(UpdateMode mode)
 		SendErrorMessage(0, QStringLiteral("Unable to purge the cache change log. Error: %1").arg(changeLogError), __func__);
 	}
 
+	// DuckDB merges its WAL into the database file only at a size threshold or on a clean shutdown, which a killed process skips.
+	QSqlError checkpointError;
+	connectionPtr->ExecSqlQuery(QByteArrayLiteral("CHECKPOINT"), &checkpointError);
+	if (checkpointError.type() != QSqlError::NoError){
+		SendWarningMessage(0, QStringLiteral("Unable to checkpoint the cache database. Error: %1").arg(checkpointError.text()), __func__);
+	}
+
 	return retVal;
 }
 
