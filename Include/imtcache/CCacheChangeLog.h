@@ -32,6 +32,7 @@ public:
 		Logs the key of every row of \a stagingTableName that the merge into \a tableName will change: a row
 		that is new, or differs from the cached one and passes \a replaceCondition (written against excluded
 		and the table, as for the upsert). A row read again unchanged is not logged. Call it before the merge.
+	\a changedCount receives the number of logged rows.
 	*/
 	static bool RecordUpserted(
 				imtduckdb::IDuckConnection& connection,
@@ -39,6 +40,7 @@ public:
 				const QString& keyColumn,
 				const QString& stagingTableName,
 				const QString& replaceCondition,
+				int& changedCount,
 				QString& errorMessage);
 
 	/// Logs the key of every row of \a tableName matching the SQL condition \a removedCondition. Call it before the rows are deleted.

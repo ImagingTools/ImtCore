@@ -7,6 +7,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QFile>
 #include <QtCore/QSet>
+#include <QtCore/QTimeZone>
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
 
@@ -382,7 +383,12 @@ QDateTime CCacheBuilderComp::GetLastSourceUpdateTime(imtduckdb::IDuckConnection&
 		return QDateTime();
 	}
 
-	return query.value(0).toDateTime();
+	// The value is stored as UTC, yet comes back as zone-less text that Qt reads as local time. Left so, the
+	// toUTC() on the next store would shift it back by the local offset on every update.
+	QDateTime lastUpdateTime = query.value(0).toDateTime();
+	lastUpdateTime.setTimeZone(QTimeZone::utc());
+
+	return lastUpdateTime;
 }
 
 

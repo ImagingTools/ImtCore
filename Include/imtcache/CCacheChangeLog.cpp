@@ -87,8 +87,11 @@ bool CCacheChangeLog::RecordUpserted(
 			const QString& keyColumn,
 			const QString& stagingTableName,
 			const QString& replaceCondition,
+			int& changedCount,
 			QString& errorMessage)
 {
+	changedCount = 0;
+
 	// The staging table is named excluded so the replace condition, written for the upsert, reads the same here.
 	QString changedCondition = QStringLiteral("excluded IS DISTINCT FROM %1").arg(imtdb::QuoteIdentifier(tableName));
 	if (!replaceCondition.isEmpty()){
@@ -98,16 +101,26 @@ bool CCacheChangeLog::RecordUpserted(
 	const QString tableIdentifier = imtdb::QuoteIdentifier(tableName);
 	const QString keyIdentifier = imtdb::QuoteIdentifier(keyColumn);
 
-	return Execute(connection,
-				QStringLiteral("INSERT INTO %1 SELECT %2, '%3', CAST(excluded.%4 AS UBIGINT) FROM %5 AS excluded LEFT JOIN %6 ON %6.%4 = excluded.%4 WHERE %6.%4 IS NULL OR (%7)")
+	const QString query = QStringLiteral("INSERT INTO %1 SELECT %2, '%3', CAST(excluded.%4 AS UBIGINT) FROM %5 AS excluded LEFT JOIN %6 ON %6.%4 = excluded.%4 WHERE %6.%4 IS NULL OR (%7)")
 					.arg(imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE),
 						 NextChangeId(),
 						 imtdb::EscapeSql(tableName),
 						 keyIdentifier,
 						 imtdb::QuoteIdentifier(stagingTableName),
 						 tableIdentifier,
-						 changedCondition),
-				errorMessage);
+						 changedCondition);
+
+	QSqlError sqlError;
+	const QSqlQuery result = connection.ExecSqlQuery(query.toUtf8(), &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		errorMessage = sqlError.text();
+
+		return false;
+	}
+
+	changedCount = qMax(0, result.numRowsAffected());
+
+	return true;
 }
 
 

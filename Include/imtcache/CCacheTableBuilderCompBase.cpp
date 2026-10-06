@@ -118,7 +118,8 @@ CCacheTableBuilderCompBase::BuildResult CCacheTableBuilderCompBase::ApplyChanges
 	if (retVal.rowsWritten > 0){
 		// Before the merge, which overwrites what the staged rows are compared with.
 		QString logError;
-		if (!CCacheChangeLog::RecordUpserted(connection, tableName, GetKeyColumn(), stagingTableName, GetReplaceCondition(), logError)){
+		int changedCount = 0;
+		if (!CCacheChangeLog::RecordUpserted(connection, tableName, GetKeyColumn(), stagingTableName, GetReplaceCondition(), changedCount, logError)){
 			connection.CancelTransaction();
 			retVal.errorMessage = QStringLiteral("Unable to log the %1 changes. Error: %2").arg(tableName, logError);
 
@@ -126,6 +127,9 @@ CCacheTableBuilderCompBase::BuildResult CCacheTableBuilderCompBase::ApplyChanges
 		}
 
 		connection.ExecSqlQuery(GetUpsertQuery(stagingTableName).toUtf8(), &sqlError);
+
+		// Rows read again unchanged are not writes.
+		retVal.rowsWritten = changedCount;
 	}
 
 	if (sqlError.type() == QSqlError::NoError && !RemoveDeletedRows(connection, lastSourceUpdateTime, retVal)){
