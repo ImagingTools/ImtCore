@@ -126,6 +126,14 @@ QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QSt
 		return QByteArray();
 	}
 
+	if (m_storageProvisionerCompPtr.IsValid() && !m_storageProvisionerCompPtr->ProvisionTenantStorage(tenantId)){
+		SendErrorMessage(0, QStringLiteral("Failed to provision storage for tenant '%1', rolling back tenant creation").arg(tenantId), "CTenantManagerComp");
+
+		m_tenantCollectionCompPtr->RemoveElements({tenantId});
+
+		return QByteArray();
+	}
+
 	SendInfoMessage(0, QStringLiteral("Created tenant '%1' (id: %2)").arg(tenantName, tenantId), QStringLiteral("CTenantManagerComp"));
 
 	return tenantId;
@@ -144,6 +152,10 @@ bool CTenantManagerComp::RemoveTenant(const QByteArray& tenantId)
 	if (!m_tenantCollectionCompPtr->RemoveElements({tenantId})){
 		SendErrorMessage(0, QStringLiteral("Failed to remove tenant '%1'").arg(tenantId), "CTenantManagerComp");
 		return false;
+	}
+
+	if (m_storageProvisionerCompPtr.IsValid() && !m_storageProvisionerCompPtr->DeprovisionTenantStorage(tenantId)){
+		SendWarningMessage(0, QStringLiteral("Failed to deprovision storage of tenant '%1'").arg(tenantId), "CTenantManagerComp");
 	}
 
 	SendInfoMessage(0, QStringLiteral("Removed tenant '%1'").arg(tenantId), "CTenantManagerComp");

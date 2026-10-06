@@ -29,6 +29,12 @@
 #include <imtdb/CPostgresXPathExtractorComp.h>
 #include <imtdb/CSqliteXPathExtractorComp.h>
 #include <imtdb/CSqlDatabaseTransactionManagerComp.h>
+#include <imtdb/CTenantStorageResolverComp.h>
+#include <imtdb/CTenantStorageProvisionerComp.h>
+#include <imtdb/CTenantDataMigratorComp.h>
+#include <imtdb/CTenantSchemaMigrationControllerComp.h>
+#include <imtdb/CTenantStorageBackupComp.h>
+#include <imtdb/CTenantStorageAutoProvisioningResolverComp.h>
 #include <imtauth/CTenantFilterParam.h>
 
 
@@ -61,6 +67,12 @@ typedef imtdb::CSqlDatabaseDocumentDelegateComp SQLiteDatabaseDocumentDelegate;
 typedef imtdb::CPostgresXPathExtractorComp PostgresXPathExtractor;
 typedef imtdb::CSqliteXPathExtractorComp SqliteXPathExtractor;
 typedef imtdb::CSqlDatabaseTransactionManagerComp SqlDatabaseTransactionManager;
+typedef icomp::TModelCompWrap<imtdb::CTenantStorageResolverComp> TenantStorageResolver;
+typedef icomp::TModelCompWrap<imtdb::CTenantStorageProvisionerComp> TenantStorageProvisioner;
+typedef icomp::TModelCompWrap<imtdb::CTenantDataMigratorComp> TenantDataMigrator;
+typedef imtdb::CTenantSchemaMigrationControllerComp TenantSchemaMigrationController;
+typedef imtdb::CTenantStorageBackupComp TenantStorageBackup;
+typedef icomp::TModelCompWrap<imtdb::CTenantStorageAutoProvisioningResolverComp> TenantStorageAutoProvisioningResolver;
 
 
 } // namespace ImtDatabasePck

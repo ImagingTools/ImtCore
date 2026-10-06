@@ -123,6 +123,45 @@ bool CFileDocumentGarbageCollectorComp::GetLivenessInfo(LivenessInfo& livenessIn
 		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
 	}
 
+	if (!AddTableLiveness(schemaPrefix, livenessInfo)){
+		return false;
+	}
+
+	// tenant tables reference content of the same store: a file is alive if any schema references it
+	if (m_tenantStorageResolverCompPtr.IsValid()){
+		const QByteArrayList tenantIds = m_tenantStorageResolverCompPtr->GetRegisteredTenantIds();
+		for (const QByteArray& tenantId: tenantIds){
+			TenantStorageInfo storageInfo;
+			if (!m_tenantStorageResolverCompPtr->ResolveTenantStorage(tenantId, storageInfo) || (storageInfo.storageKind != TSK_OWN_SCHEMA)){
+				continue;
+			}
+
+			const QString tenantSchemaPrefix = QStringLiteral("\"%1\".").arg(QString::fromLatin1(storageInfo.schemaName));
+
+			// a tenant schema without the document table references nothing; any other failure stops the pass
+			QVariantMap bindValues;
+			bindValues[QStringLiteral(":tableName")] = tenantSchemaPrefix + '"' + QString::fromUtf8(*m_tableNameAttrPtr) + '"';
+
+			QSqlError sqlError;
+			QSqlQuery existsQuery = m_databaseEngineCompPtr->ExecSqlQuery(QByteArrayLiteral("SELECT to_regclass(:tableName) IS NOT NULL"), bindValues, &sqlError, true);
+			if ((sqlError.type() != QSqlError::NoError) || !existsQuery.next()){
+				SendErrorMessage(0, sqlError.text(), "CFileDocumentGarbageCollectorComp");
+
+				return false;
+			}
+
+			if (existsQuery.value(0).toBool() && !AddTableLiveness(tenantSchemaPrefix, livenessInfo)){
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+bool CFileDocumentGarbageCollectorComp::AddTableLiveness(const QString& schemaPrefix, LivenessInfo& livenessInfo) const
+{
 	// All rows, all states: inactive revision rows and soft-deleted rows keep their
 	// content alive - restoring either must always find its file.
 	const QByteArray query = QString("SELECT DISTINCT \"%1\" FROM %2\"%3\";")

@@ -18,6 +18,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IObjectCollectionCacheController.h>
+#include <imtbase/ITenantCollectionProvider.h>
 
 
 namespace imtbase
@@ -32,7 +33,8 @@ class CCachedObjectCollectionComp:
 			public icomp::CComponentBase,
 			private imod::CMultiModelDispatcherBase,
 			virtual public imtbase::IObjectCollection,
-			virtual public imtbase::IObjectCollectionCacheController
+			virtual public imtbase::IObjectCollectionCacheController,
+			virtual public imtbase::ITenantCollectionProvider
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
@@ -43,8 +45,10 @@ public:
 		I_REGISTER_INTERFACE(IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(ICollectionInfo);
 		I_REGISTER_INTERFACE(IObjectCollectionCacheController);
+		I_REGISTER_INTERFACE(ITenantCollectionProvider);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Base collection containing real data", true, "ObjectCollection");
 		I_ASSIGN_TO(m_objectCollectionModelCompPtr, m_objectCollectionCompPtr, true);
+		I_ASSIGN_TO(m_tenantCollectionProviderCompPtr, m_objectCollectionCompPtr, false);
 		I_ASSIGN_MULTI_0(m_invalidationModels, "InvalidationModels", "Additional models to observe; a change in any of them will trigger cache invalidation (the ObjectCollection's model is always observed too)", false);
 		I_ASSIGN(m_metaInfoCacheLimitAttrPtr, "MetaInfoCacheLimit", "Maximal count of filter combinations stored in the ring buffer (meta info cache)", true, 1000);
 		I_ASSIGN(m_objectCacheLimitAttrPtr, "ObjectCacheLimit", "Maximal count of the data objects in the ring buffer (cache)", true, 100);
@@ -96,6 +100,10 @@ public:
 
 	// reimplemented (IObjectCollectionCacheController)
 	virtual void InvalidateCache() override;
+
+	// reimplemented (ITenantCollectionProvider)
+	virtual bool IsTenantSeparated() const override;
+	virtual ITenantObjectCollection* GetTenantCollection(const QByteArray& tenantId) const override;
 
 	// reimplemented (ICollectionInfo)
 	virtual int GetElementsCount(
@@ -150,6 +158,7 @@ protected:
 private:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imod::IModel, m_objectCollectionModelCompPtr);
+	I_REF(ITenantCollectionProvider, m_tenantCollectionProviderCompPtr);
 	I_MULTIREF(imod::IModel, m_invalidationModels);
 	I_ATTR(int, m_metaInfoCacheLimitAttrPtr);
 	I_ATTR(int, m_objectCacheLimitAttrPtr);
