@@ -86,15 +86,27 @@ bool CCacheChangeLog::RecordUpserted(
 			const QString& tableName,
 			const QString& keyColumn,
 			const QString& stagingTableName,
+			const QString& replaceCondition,
 			QString& errorMessage)
 {
+	// The staging table is named excluded so the replace condition, written for the upsert, reads the same here.
+	QString changedCondition = QStringLiteral("excluded IS DISTINCT FROM %1").arg(imtdb::QuoteIdentifier(tableName));
+	if (!replaceCondition.isEmpty()){
+		changedCondition += QStringLiteral(" AND (%1)").arg(replaceCondition);
+	}
+
+	const QString tableIdentifier = imtdb::QuoteIdentifier(tableName);
+	const QString keyIdentifier = imtdb::QuoteIdentifier(keyColumn);
+
 	return Execute(connection,
-				QStringLiteral("INSERT INTO %1 SELECT %2, '%3', CAST(%4 AS UBIGINT) FROM %5")
+				QStringLiteral("INSERT INTO %1 SELECT %2, '%3', CAST(excluded.%4 AS UBIGINT) FROM %5 AS excluded LEFT JOIN %6 ON %6.%4 = excluded.%4 WHERE %6.%4 IS NULL OR (%7)")
 					.arg(imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE),
 						 NextChangeId(),
 						 imtdb::EscapeSql(tableName),
-						 imtdb::QuoteIdentifier(keyColumn),
-						 imtdb::QuoteIdentifier(stagingTableName)),
+						 keyIdentifier,
+						 imtdb::QuoteIdentifier(stagingTableName),
+						 tableIdentifier,
+						 changedCondition),
 				errorMessage);
 }
 

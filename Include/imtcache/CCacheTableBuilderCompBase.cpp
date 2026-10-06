@@ -116,15 +116,16 @@ CCacheTableBuilderCompBase::BuildResult CCacheTableBuilderCompBase::ApplyChanges
 
 	QSqlError sqlError;
 	if (retVal.rowsWritten > 0){
-		connection.ExecSqlQuery(GetUpsertQuery(stagingTableName).toUtf8(), &sqlError);
-
+		// Before the merge, which overwrites what the staged rows are compared with.
 		QString logError;
-		if (sqlError.type() == QSqlError::NoError && !CCacheChangeLog::RecordUpserted(connection, tableName, GetKeyColumn(), stagingTableName, logError)){
+		if (!CCacheChangeLog::RecordUpserted(connection, tableName, GetKeyColumn(), stagingTableName, GetReplaceCondition(), logError)){
 			connection.CancelTransaction();
 			retVal.errorMessage = QStringLiteral("Unable to log the %1 changes. Error: %2").arg(tableName, logError);
 
 			return retVal;
 		}
+
+		connection.ExecSqlQuery(GetUpsertQuery(stagingTableName).toUtf8(), &sqlError);
 	}
 
 	if (sqlError.type() == QSqlError::NoError && !RemoveDeletedRows(connection, lastSourceUpdateTime, retVal)){
