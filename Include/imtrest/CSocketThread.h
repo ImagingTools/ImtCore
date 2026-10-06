@@ -52,7 +52,7 @@ public:
 	virtual ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
 	// reimplemented (ITransport)
-	virtual bool SendData(QByteArray& data) const override;
+	virtual bool SendData(const QByteArray& data) const override;
 
 Q_SIGNALS:
 	void Error(QTcpSocket::SocketError socketerror);

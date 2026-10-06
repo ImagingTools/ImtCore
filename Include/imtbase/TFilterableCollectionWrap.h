@@ -13,6 +13,8 @@
 namespace imtbase
 {
 
+class IObjectCollectionIterator;
+
 
 template <class Base>
 class TFilterableCollectionWrap: public Base
@@ -29,6 +31,13 @@ public:
 			int count = -1,
 			const iprm::IParamsSet* selectionParamsPtr = nullptr,
 			ilog::IMessageConsumer* logPtr = nullptr) const override;
+
+	// pseudo-reimplemented (IObjectCollection)
+	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
+				const QByteArray& objectId = QByteArray(),
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 
 protected:
 	virtual ICollectionInfo::Ids GetFilteredElementIds(const iprm::IParamsSet& filterParams) const;
@@ -87,6 +96,19 @@ ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetElementIds(
 }
 
 
+// pseudo-reimplemented (IObjectCollection)
+
+template <class Base>
+imtbase::IObjectCollectionIterator* TFilterableCollectionWrap<Base>::CreateObjectCollectionIterator(
+			const QByteArray& /*objectId*/,
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+{
+	return nullptr;
+}
+
+
 // protected methods
 
 template <class Base>
@@ -127,6 +149,11 @@ ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetSortedElementIds(
 				idoc::MetaInfoPtr metaInfoPtr;
 				if (relatedIds.contains("Name")){
 					QString metaInfoValue = BaseClass::GetElementInfo(objectId, ICollectionInfo::EIT_NAME).toString();
+					QPair<QString, QByteArray> objectPair = {metaInfoValue, objectId};
+					listObjects.append(objectPair);
+				}
+				else if (relatedIds.contains("Description")){
+					QString metaInfoValue = BaseClass::GetElementInfo(objectId, ICollectionInfo::EIT_DESCRIPTION).toString();
 					QPair<QString, QByteArray> objectPair = {metaInfoValue, objectId};
 					listObjects.append(objectPair);
 				}

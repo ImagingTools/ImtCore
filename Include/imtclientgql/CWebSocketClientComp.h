@@ -94,7 +94,7 @@ public:
 	virtual bool SendRequestNoWait(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
 	// reimplemented (imtrest::ITransport)
-	virtual bool SendData(QByteArray& data) const override;
+	virtual bool SendData(const QByteArray& data) const override;
 
 	// reimplemented (imtrest::IResponseDispatcher)
 	virtual bool SendResponse(const QByteArray& requestId, imtrest::ConstResponsePtr& response) const override;

@@ -213,3 +213,5 @@ QByteArray CSqliteJsonDatabaseDelegateComp::GetObjectSelectionQuery(const QByteA
 
 
 } // namespace imtdb
+
+
