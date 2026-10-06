@@ -602,16 +602,49 @@ imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObje
 		return nullptr;
 	}
 
-	QByteArray baseSelectionQuery =
-			m_objectDelegateCompPtr->GetSelectionQuery(objectId, 0, -1, selectionParamsPtr);
-
+	QByteArray baseSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId, 0, -1, selectionParamsPtr);
 	if (baseSelectionQuery.isEmpty()){
 		return nullptr;
 	}
 
-	QString queryWithTotalCount = QStringLiteral(
-										"SELECT *, COUNT(*) OVER() AS \"TotalCount\" FROM (%1) AS _base")
-										.arg(baseSelectionQuery);
+	const auto execQuery = [this](const QString& query, QSqlQuery& result) -> bool{
+		QSqlError sqlError;
+		result = m_dbEngineCompPtr->ExecSqlQuery(query.toUtf8(), &sqlError, true);
+		if (sqlError.type() != QSqlError::NoError){
+			SendErrorMessage(0, sqlError.text(), "Database collection");
+			qDebug() << "SQL-error" << query;
+
+			return false;
+		}
+
+		return true;
+	};
+
+	const QString selectionQuery = QString::fromUtf8(baseSelectionQuery);
+
+	/**
+		The total is counted by a separate query that wraps the exact selection:
+		- Not COUNT(*) OVER(): a window function can't emit its first row until it has read the whole
+		  selection, so every page would cost as much as reading the entire table. Without it,
+		  OFFSET/LIMIT can stop after the page.
+		- Not GetCountQuery(): it is built apart from GetSelectionQuery, so it can diverge from it
+		  (DISTINCT/GROUP BY, joins that filter or multiply rows, object id etc.),
+		  and the total would then disagree with the pages. Wrapping the selection guarantees they match.
+		The count runs before the page query: the driver drops pending results when a second query runs.
+		-1 makes the iterator use the number of rows it read: exact for lookups by id and unpaged reads.
+	*/
+	int totalCount = -1;
+	if (objectId.isEmpty() && (count > 0 || offset > 0)){
+		QSqlQuery countResult;
+		const QString countQuery = QStringLiteral("SELECT COUNT(*) FROM (%1) AS _counted").arg(selectionQuery);
+		if (!execQuery(countQuery, countResult) || !countResult.next()){
+			return nullptr;
+		}
+
+		totalCount = countResult.value(0).toInt();
+	}
+
+	QString pageQuery = QStringLiteral("SELECT * FROM (%1) AS _base").arg(selectionQuery);
 
 	const QByteArray driverId = m_dbEngineCompPtr->GetDatabaseDriverId();
 	const bool isSQLite = (driverId == "QSQLITE");
@@ -620,31 +653,28 @@ imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObje
 
 	if (count > 0){
 		if (usesLimitOffset){
-			queryWithTotalCount += QStringLiteral(" LIMIT %1 OFFSET %2")
-									.arg(QString::number(count), QString::number(qMax(0, offset)));
+			pageQuery += QStringLiteral(" LIMIT %1 OFFSET %2")
+							.arg(QString::number(count), QString::number(qMax(0, offset)));
 		}
 		else{
-			queryWithTotalCount += QStringLiteral(" OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY")
-									.arg(QString::number(qMax(0, offset)), QString::number(count));
+			pageQuery += QStringLiteral(" OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY")
+							.arg(QString::number(qMax(0, offset)), QString::number(count));
 		}
 	}
 	else if (offset > 0 && usesLimitOffset){
-		queryWithTotalCount += QStringLiteral(" LIMIT -1 OFFSET %1")
-								.arg(offset);
+		pageQuery += QStringLiteral(" LIMIT -1 OFFSET %1")
+						.arg(offset);
 	}
-	
-	QSqlError sqlError;
-	QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(queryWithTotalCount.toUtf8(), &sqlError, true);
 
-	if (sqlError.type() != QSqlError::NoError){
-		SendErrorMessage(0, sqlError.text(), "Database collection");
-		qDebug() << "SQL-error" << queryWithTotalCount;
+	QSqlQuery sqlQuery;
+	if (!execQuery(pageQuery, sqlQuery)){
 		return nullptr;
 	}
 
 	return new CSqlDatabaseObjectCollectionIterator(
-				sqlQuery,
-				m_objectDelegateCompPtr.GetPtr());
+		sqlQuery,
+		m_objectDelegateCompPtr.GetPtr(),
+		totalCount);
 }
 
 
