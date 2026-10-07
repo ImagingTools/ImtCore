@@ -14,6 +14,7 @@ LIBRARIES=(
     "WebCompiler"
     "boost"
     "icu"
+    "libduckdb"
     "libmdbx"
     "mongoc"
     "mongocxx"

@@ -34,6 +34,9 @@
                     <AttributeInfo Id="SuperuserProvider" Type="Reference" ExportId="SuperuserProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TenantsEnabled" Type="Boolean" ExportId="TenantsEnabled">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

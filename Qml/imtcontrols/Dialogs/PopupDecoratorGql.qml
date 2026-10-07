@@ -281,7 +281,7 @@ DecoratorBase {
 
 		Rectangle{
 			width: root ? root.width : 0;
-			height: Style.size_indicatorHeight;
+			height: Style.controlHeightL;
 			radius: itemBody.radius;
 			color: itemBody.color;
 
