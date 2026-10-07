@@ -18373,10 +18373,6 @@ CGetLastProductionResultsGqlRequest::CGetLastProductionResultsGqlRequest(const :
 	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
 	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
 		requestedFieldsObjectPtr = &gqlRequest.GetFields();
-		const QByteArrayList topFieldIds = gqlRequest.GetFields().GetFieldIds();
-		if (topFieldIds.count() == 1 && topFieldIds.constFirst() == gqlRequest.GetCommandId()){
-			requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(topFieldIds.constFirst());
-		}
 		if (requestedFieldsObjectPtr != nullptr){
 			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
 			if (!requestedIds.isEmpty()){
@@ -18558,10 +18554,6 @@ CGetLastProductionResultsCDMGqlRequest::CGetLastProductionResultsCDMGqlRequest(c
 	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
 	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
 		requestedFieldsObjectPtr = &gqlRequest.GetFields();
-		const QByteArrayList topFieldIds = gqlRequest.GetFields().GetFieldIds();
-		if (topFieldIds.count() == 1 && topFieldIds.constFirst() == gqlRequest.GetCommandId()){
-			requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(topFieldIds.constFirst());
-		}
 		if (requestedFieldsObjectPtr != nullptr){
 			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
 			if (!requestedIds.isEmpty()){
