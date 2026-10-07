@@ -14,6 +14,7 @@
 #include <imtbase/CMultiStatusManagerComp.h>
 #include <imtbase/CStatusManagerComp.h>
 #include <imtbase/COptionsListAdapterComp.h>
+#include <imtbase/CCollectionInfoAdapterComp.h>
 #include <imtbase/CLocalizedHelpPathProviderComp.h>
 #include <imtbase/CCompositeObjectPersistenceComp.h>
 #include <imtbase/CParamsManagerAdapterComp.h>
@@ -70,6 +71,7 @@ typedef icomp::TModelCompWrap<imtbase::CDelegatedObjectContainerSupplierComp> De
 typedef icomp::TModelCompWrap<imtbase::CMultiStatusManagerComp> MultiStatusManager;
 typedef icomp::TModelCompWrap<imtbase::CStatusManagerComp> StatusManager;
 typedef icomp::TModelCompWrap<imtbase::COptionsListAdapterComp> OptionsListAdapter;
+typedef icomp::TModelCompWrap<imtbase::CCollectionInfoAdapterComp> CollectionInfoAdapter;
 typedef imtbase::CLocalizedHelpPathProviderComp LocalizedHelpPathProvider;
 typedef imtbase::CCompositeObjectPersistenceComp CompositeObjectPersistence;
 typedef icomp::TModelCompWrap<imtbase::CParamsManagerAdapterComp> ParamsManagerAdapter;

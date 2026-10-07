@@ -36,6 +36,7 @@ Item{
 			for (let seg of bar.segments || []) {
 				if (!map[seg.label]) {
 					map[seg.label] = {
+						id: seg.id || "",
 						color: seg.color || Style.neutralSubtleColor,
 						total: 0
 					}
@@ -47,6 +48,7 @@ Item{
 		let result = []
 		for (let key in map) {
 			result.push({
+				id: map[key].id,
 				label: key,
 				total: map[key].total,
 				color: map[key].color

@@ -13,7 +13,7 @@ Rectangle{
 	property string context: ""
 	clip: true
 	radius: 20;
-	color: Style.color_menu;
+	color: Style.baseColor;
 
 	property string addressListCommandId: "AddressList"
 	property string subscriptionCommandId: "OnAddressCollectionChanged"
@@ -286,7 +286,7 @@ Rectangle{
 		hasSelection: true;
 		scrollSize: 8;
 
-		color: Style.color_menu;
+		color: Style.baseColor;
 		selectionColor: Style.selectedColor
 		hoverColor: Style.selectedColor;
 		textColor: treeBody.textColor

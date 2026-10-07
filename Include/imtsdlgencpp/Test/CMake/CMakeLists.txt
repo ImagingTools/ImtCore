@@ -17,7 +17,8 @@ include(${IMTCOREDIR}/Config/CMake/ImtCoreSdlCustomConfig.cmake)
 include(${ACFDIR}/Config/CMake/DeployQt.cmake)
 
 add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
-	"${CMAKE_CURRENT_LIST_DIR}/../TestData/ArraySerialization.sdl")
+	"${CMAKE_CURRENT_LIST_DIR}/../TestData/ArraySerialization.sdl"
+	"${CMAKE_CURRENT_LIST_DIR}/../TestData/RequestedFields.sdl")
 
 add_library(sdlgentestsdl STATIC)
 
@@ -26,6 +27,14 @@ block()
 	unset(MOC_SOURCES)
 	ImtCoreCustomConfigureSdlCpp(
 		SCHEMA_PATH "${CMAKE_CURRENT_LIST_DIR}/../TestData/ArraySerialization.sdl"
+		VERSION "1.0")
+endblock()
+
+block()
+	set(PROJECT_NAME sdlgentestsdl)
+	unset(MOC_SOURCES)
+	ImtCoreCustomConfigureSdlCpp(
+		SCHEMA_PATH "${CMAKE_CURRENT_LIST_DIR}/../TestData/RequestedFields.sdl"
 		VERSION "1.0")
 endblock()
 

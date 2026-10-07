@@ -53,6 +53,10 @@ Item {
 		function onTenantInvitationRejected(tenantId, membershipId){
 			userPanel.__loadOrganizations();
 		}
+
+		function onTenantsEnabledChanged(){
+			userPanel.__loadOrganizations();
+		}
 	}
 	
 	function setUserPanelEnabled(enabled){
@@ -67,7 +71,7 @@ Item {
 	property var __organizationsList: []
 
 	function __loadOrganizations() {
-		if (!AuthorizationController.userTokenProvider.userId)
+		if (!AuthorizationController.tenantsEnabled || !AuthorizationController.userTokenProvider.userId)
 			return
 		organizationsRequest.send(organizationsInput)
 	}
@@ -122,7 +126,7 @@ Item {
 		font.family: Style.fontFamily;
 		font.pixelSize: Style.fontSizeM;
 		text: AuthorizationController.currentTenantName ? AuthorizationController.currentTenantName : "";
-		visible: text !== "";
+		visible: AuthorizationController.tenantsEnabled && text !== "";
 	}
 
 	Text {
@@ -198,26 +202,29 @@ Item {
 			contextMenuModel.append({"id": "Profile", "name": profileName, "icon": "Icons/Account", "isEnabled": true});
 			contextMenuModel.append({"id": "", "name": "", "Icon": ""});
 
-			for (var i = 0; i < userPanel.__organizationsList.length; i++) {
-				var orgData = userPanel.__organizationsList[i];
-				if (!orgData || !orgData.id)
-					continue;
+			if (AuthorizationController.tenantsEnabled){
+				for (var i = 0; i < userPanel.__organizationsList.length; i++) {
+					var orgData = userPanel.__organizationsList[i];
+					if (!orgData || !orgData.id)
+						continue;
 
-				var isCurrent = orgData.id === currentTenantId;
-				var orgName = orgData.name || "";
-				if (isCurrent)
-					orgName = orgName + " " + qsTr("(current)");
+					var isCurrent = orgData.id === currentTenantId;
+					var orgName = orgData.name || "";
+					if (isCurrent)
+						orgName = orgName + " " + qsTr("(current)");
 
-				contextMenuModel.append({
-					"id": "Organization:" + orgData.id,
-					"name": orgName,
-					"icon": "",
-					"isEnabled": !isCurrent
-				});
+					contextMenuModel.append({
+						"id": "Organization:" + orgData.id,
+						"name": orgName,
+						"icon": "",
+						"isEnabled": !isCurrent
+					});
+				}
+
+				contextMenuModel.append({"id": "NoOrganization", "name": qsTr("No organization"), "icon": "", "isEnabled": currentTenantId !== ""});
+				contextMenuModel.append({"id": "", "name": "", "Icon": ""});
 			}
 
-			contextMenuModel.append({"id": "NoOrganization", "name": qsTr("No organization"), "icon": "", "isEnabled": currentTenantId !== ""});
-			contextMenuModel.append({"id": "", "name": "", "Icon": ""});
 			contextMenuModel.append({"id": "Logout", "name": qsTr("Logout"), "icon": "Icons/Exit", "isEnabled": true});
 		}
 	}

@@ -66,6 +66,11 @@ I_EXPORT_COMPONENT(
 			"Collection List Options Adapter");
 
 I_EXPORT_COMPONENT(
+			CollectionInfoAdapter,
+			"IOptionsList-To-ICollectionInfo adapter",
+			"Collection List Options Adapter");
+
+I_EXPORT_COMPONENT(
 			LocalizedHelpPathProvider,
 			"Localization-dependant help path provider",
 			"Help Path Documentation Localization");

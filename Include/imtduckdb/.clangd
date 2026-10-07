@@ -1,0 +1,9 @@
+# Editor-only: clangd (Clang frontend) rejects dllimport on DuckDB classes that have
+# deleted members ("attribute 'dllimport' cannot be applied to a deleted function").
+# MSVC accepts it, so the real build doesn't need this define and it is not passed there.
+#
+# DUCKDB_STATIC_BUILD is only checked in DuckDB's _WIN32 branch, where it
+# switches the export macro from dllimport to nothing. On Linux/macOS the macro is a
+# visibility attribute either way, so this flag has no effect there and is harmless.
+CompileFlags:
+  Add: [-DDUCKDB_STATIC_BUILD]
