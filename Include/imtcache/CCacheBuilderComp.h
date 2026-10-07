@@ -60,6 +60,8 @@ public:
 	virtual bool IsUpdateRunning() const override;
 	virtual void SuspendUpdates() override;
 	virtual void ResumeUpdates() override;
+	virtual void AttachObserver(IObserver* observerPtr) override;
+	virtual void DetachObserver(IObserver* observerPtr) override;
 
 Q_SIGNALS:
 	void updateFinished(bool isOk);
@@ -104,6 +106,10 @@ private:
 	int m_suspendCount = 0;
 	bool m_hasPendingRequest = false;
 	UpdateMode m_pendingMode = UM_INCREMENTAL;
+
+	// Held while the observers are called, so a detached observer is never called afterwards.
+	QMutex m_observerMutex;
+	QList<IObserver*> m_observers;
 };
 
 
