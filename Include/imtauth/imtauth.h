@@ -42,8 +42,9 @@ inline QString GetUserName(const imtbase::IObjectCollection& userCollection, con
 	stored as the full feature path today ("/Administration/EditUser"). Both
 	forms are answered for, in either direction: a permission stored the old way
 	satisfies a check written the new way, and the other way round. Two full
-	paths, however, are only the same permission when they are equal - the same
-	id under a different parent is a different feature.
+	paths, however, are only the same permission when they are equal or
+	the held permission is a descendant of the requested path. The same id under
+	a different parent is a different feature.
 
 	This is the one place that rule is written down: every check of "does this
 	user hold that permission" is to go through here, whatever container the
@@ -65,6 +66,12 @@ inline bool HasPermission(const PermissionsType& userPermissions, const QByteArr
 
 	for (const QByteArray& userPermission : userPermissions){
 		if (isPath && userPermission.startsWith('/')){
+			if (userPermission.startsWith(permissionId)
+					&& userPermission.size() > permissionId.size()
+					&& userPermission.at(permissionId.size()) == '/'){
+				return true;
+			}
+
 			continue;
 		}
 
@@ -78,5 +85,3 @@ inline bool HasPermission(const PermissionsType& userPermissions, const QByteArr
 
 
 } // namespace imtauth
-
-

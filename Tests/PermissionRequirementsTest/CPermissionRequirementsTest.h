@@ -29,6 +29,8 @@ private Q_SLOTS:
 	void testStoredFeatureIdSatisfiesPathCheck();
 	void testStoredPathSatisfiesFeatureIdCheck();
 	void testSameFeatureIdUnderAnotherParentIsAnotherPermission();
+	void testDescendantPathSatisfiesParentPathCheck();
+	void testDescendantPathDoesNotCrossBranches();
 
 	// Feature data itself
 	void testIsPermissionSurvivesCopy();

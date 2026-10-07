@@ -238,6 +238,29 @@ void CPermissionRequirementsTest::testSameFeatureIdUnderAnotherParentIsAnotherPe
 }
 
 
+void CPermissionRequirementsTest::testDescendantPathSatisfiesParentPathCheck()
+{
+	const QByteArrayList userPermissions{"/ChangeCharacterization/AddMeasurement/AddExistingMeasurement"};
+
+	QVERIFY(imtauth::HasPermission(
+			userPermissions,
+			QByteArrayLiteral("/ChangeCharacterization/AddMeasurement")));
+}
+
+
+void CPermissionRequirementsTest::testDescendantPathDoesNotCrossBranches()
+{
+	const QByteArrayList userPermissions{"/ChangeCharacterization/AddMeasurement/AddExistingMeasurement"};
+
+	QVERIFY(!imtauth::HasPermission(
+			userPermissions,
+			QByteArrayLiteral("/ChangeCharacterization/AddExisting")));
+	QVERIFY(!imtauth::HasPermission(
+			userPermissions,
+			QByteArrayLiteral("/Other/AddMeasurement")));
+}
+
+
 void CPermissionRequirementsTest::testIsPermissionSurvivesCopy()
 {
 	imtlic::CFeatureInfo sellableFeature;
