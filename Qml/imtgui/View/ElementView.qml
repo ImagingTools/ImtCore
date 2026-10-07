@@ -40,6 +40,8 @@ Rectangle {
 	property alias contentWidth: content.width
 	
 	property alias nameWidth: textName.width
+
+	property alias stacked: mainPart.stacked
 	
 	property int controlWidth: Style.sizeHintM
 	property int contentMargin: Style.marginXL
