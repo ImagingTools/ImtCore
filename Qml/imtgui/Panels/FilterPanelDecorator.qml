@@ -247,9 +247,18 @@ DecoratorBase {
 			return
 		}
 
-		if (loader.visible && loader.item.hovered && loader.item.valueIsCropped){
+		// A filter narrowed by another one says so on the same card: its options
+		// change with that filter, and nothing else on the row would tell.
+		let scoped = loader.item.scopeFilter !== null
+		if (loader.visible && loader.item.hovered && (loader.item.valueIsCropped || scoped)){
+			let hintText = scoped ? loader.item.scopeText : ""
+			if (loader.item.valueIsCropped){
+				let valueLine = loader.item.name + ": " + loader.item.valueText
+				hintText = hintText === "" ? valueLine : valueLine + "\n" + hintText
+			}
+
 			valueHint.hintOwner = loader.item
-			valueHint.hintText = loader.item.name + ": " + loader.item.valueText
+			valueHint.hintText = hintText
 			valueHint.anchorX = loader.mapToItem(content, loader.width / 2, 0).x
 		}
 		else if (valueHint.hintOwner === loader.item){
@@ -322,7 +331,7 @@ DecoratorBase {
 
 						item.filterMenu = filterPanelDecorator.baseElement
 
-						filterPanelDecorator.baseElement.filtersModel.setProperty(model.index, "item", item)
+						filterPanelDecorator.baseElement.setFilterDelegate(model.index, item)
 
 						filterPanelDecorator.scheduleRelayout()
 					}

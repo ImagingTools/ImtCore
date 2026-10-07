@@ -23,6 +23,7 @@ QtObject {
 	property string userMode: "";
 	property string superuserStatus: "";
 	property string superuserMessage: "";
+	property bool tenantsEnabled: false;
 
 	signal updated();
 
@@ -64,6 +65,7 @@ QtObject {
 			}
 
 			root.serverApplicationInfo = sdlObject;
+			root.tenantsEnabled = sdlObject.m_tenantsEnabled === true;
 
 			if (sdlObject.m_webSocketUrl){
 				root.webSocketPort = sdlObject.m_webSocketUrl.m_port;
