@@ -8,6 +8,7 @@
 
 // ImtCore includes
 #include <imtcache/CCacheBuilderComp.h>
+#include <imtcache/CCacheCollectionChangeNotifierComp.h>
 #include <imtcache/CMaterializedTableBuilderComp.h>
 #include <imtcache/CViewBuilderComp.h>
 
@@ -20,6 +21,7 @@ namespace ImtCachePck
 
 
 using CacheBuilder = imtcache::CCacheBuilderComp;
+using CacheCollectionChangeNotifier = imtcache::CCacheCollectionChangeNotifierComp;
 using MaterializedTableBuilder = imtcache::CMaterializedTableBuilderComp;
 using ViewBuilder = imtcache::CViewBuilderComp;
 
