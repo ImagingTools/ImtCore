@@ -22,6 +22,8 @@ bool CDuckSqlDriver::hasFeature(DriverFeature feature) const
 {
 	switch (feature){
 	case QuerySize:
+	case PreparedQueries:
+	case NamedPlaceholders:
 		return true;
 	default:
 		return false;

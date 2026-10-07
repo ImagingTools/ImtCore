@@ -33,6 +33,8 @@ public:
 protected:
 	// reimplemented (QSqlResult)
 	virtual bool reset(const QString& sqlQuery) override;
+	virtual bool prepare(const QString& sqlQuery) override;
+	virtual bool exec() override;
 	virtual bool fetch(int index) override;
 	virtual bool fetchFirst() override;
 	virtual bool fetchLast() override;
@@ -40,12 +42,15 @@ protected:
 	virtual bool isNull(int index) override;
 	virtual int size() override;
 	virtual int numRowsAffected() override;
+	virtual QSqlRecord record() const override;
 
 private:
 	static QVariant ConvertValue(const duckdb::Value& value);
+	static QMetaType ConvertMetaType(const duckdb::LogicalType& type);
 
 private:
 	duckdb::Connection& m_connection;
+	std::unique_ptr<duckdb::PreparedStatement> m_preparedStatementPtr;
 	std::unique_ptr<duckdb::MaterializedQueryResult> m_resultPtr;
 };
 
