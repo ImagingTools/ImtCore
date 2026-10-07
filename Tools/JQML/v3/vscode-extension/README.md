@@ -27,7 +27,7 @@ If another QML extension already claims `.qml`, set:
 
 Ctrl+click a property, method, or signal to jump to its declaration (QML or inherited engine file). Names starting with `__` are not offered in completions.
 
-Breakpoints can be set in `.qml` files from the editor gutter.
+Breakpoints can be set in `.qml` files only. The extension does not enable breakpoints for other languages.
 
 ## Settings
 
