@@ -28,6 +28,8 @@ class TreeItemModel extends JSONListModel {
     __parentModel = null
 
     __propogate(){
+        if(this.signalsBlocked()) return
+
         this.dataChanged()
         this.modelChanged()
 
@@ -198,30 +200,69 @@ class TreeItemModel extends JSONListModel {
     }
 
     copyItemDataFromModel(index, externTreeModel, externIndex){
-        this.removeItem(index)
-        this.insertNewItem(index)
+        if(!externTreeModel) return false
+        if(index < 0) return false
 
-        let retVal = true
-        let keys = externTreeModel.getKeys(externIndex)
-
-        for(let key of keys){
-            let value = externTreeModel.getData(key, externIndex)
-
-            if (typeof value === 'object' && value instanceof TreeItemModel){
-                let childModel = this.addTreeModel(key, index)
-
-                retVal = retVal && childModel.copyFrom(value)
-            } else {
-                retVal = retVal && this.setData(key, value, index)
-            }
-
-            if (!retVal){
-                break
-            }
+        let ownBlock = false
+        if(!this.signalsBlocked()){
+            this.blockSignals(true)
+            ownBlock = true
         }
 
-        if (this.isUpdateEnabled){
-            this.dataChanged()
+        let retVal = true
+
+        try {
+            if(index >= this.count){
+                this.insertNewItem(index)
+            }
+
+            let row = this.get(index)
+            if(!row) return false
+
+            let keys = externTreeModel.getKeys(externIndex)
+            let keep = {}
+
+            for(let key of keys){
+                keep[key] = true
+            }
+
+            let raw = row.__self
+            let stale = []
+
+            for(let key in raw){
+                if(!keep[key]) stale.push(key)
+            }
+
+            for(let key of stale){
+                if(raw[key] !== undefined && raw[key] !== null){
+                    this.__recursiveRemoveLink(raw[key])
+                }
+                delete raw[key]
+            }
+
+            for(let key of keys){
+                let value = externTreeModel.getData(key, externIndex)
+
+                if (typeof value === 'object' && value instanceof TreeItemModel){
+                    let childModel = this.addTreeModel(key, index)
+
+                    retVal = retVal && childModel.copyFrom(value)
+                } else {
+                    retVal = retVal && this.setData(key, value, index)
+                }
+
+                if (!retVal){
+                    break
+                }
+            }
+        } finally {
+            if(ownBlock){
+                this.blockSignals(false)
+
+                if (this.isUpdateEnabled){
+                    this.dataChanged()
+                }
+            }
         }
 
         return retVal
@@ -232,12 +273,20 @@ class TreeItemModel extends JSONListModel {
     }
 
     copyFrom(externTreeModel){
-        if(externTreeModel){
+        if(!externTreeModel) return false
+
+        let ownBlock = false
+        if(!this.signalsBlocked()){
+            this.blockSignals(true)
+            ownBlock = true
+        }
+
+        let retVal = true
+
+        try {
             this.clear()
 
             this.setIsArray(externTreeModel.isArray)
-
-            let retVal = true
 
             for(let index = 0; index < externTreeModel.getItemsCount(); index++){
                 this.insertNewItem(index)
@@ -259,12 +308,22 @@ class TreeItemModel extends JSONListModel {
                         break
                     }
                 }
-            }
 
-            return retVal
+                if (!retVal){
+                    break
+                }
+            }
+        } finally {
+            if(ownBlock){
+                this.blockSignals(false)
+
+                if (this.isUpdateEnabled){
+                    this.dataChanged()
+                }
+            }
         }
 
-        return false
+        return retVal
     }
 
     copyItemDataToModel(index, model, externIndex){

@@ -265,7 +265,11 @@ Table{
         let branchIds = branchIds_parent !== "" ? branchIds_parent + "," + innerId_parent: innerId_parent;
 
         let counter = 0;
-        for(let i = 0; i < model_.getItemsCount(); i++){
+        let count = model_.getItemsCount();
+
+        tableTreeView.model.blockSignals(true);
+
+        for(let i = 0; i < count; i++){
             let newIndex =  index + i + 1;
             tableTreeView.model.insertNewItem(newIndex);
             tableTreeView.model.copyItemDataFromModel(newIndex, model_, i);
@@ -277,21 +281,22 @@ Table{
             tableTreeView.model.setData("HasBranch__", false, newIndex);
             tableTreeView.model.setData("InnerId__", String(val + newIndex), newIndex);
             tableTreeView.model.setData("ChildrenCount__", -1, newIndex);
-
-            if(i == 0 && level_ == -1){
-                tableTreeView.setContentHeight(tableTreeView.delegateHeight);
-            }
-            else {
-                let content_height = tableTreeView.getContentHeight();
-                content_height += tableTreeView.delegateHeight;
-                tableTreeView.setContentHeight(content_height);
-            }
             counter++;
         }
 
         if(index >= 0){
-            tableTreeView.model.setData("ChildrenCount__", model_.getItemsCount(), index);
+            tableTreeView.model.setData("ChildrenCount__", count, index);
         }
+
+        if(level_ == -1){
+            tableTreeView.setContentHeight(counter * tableTreeView.delegateHeight);
+        } else {
+            let content_height = tableTreeView.getContentHeight();
+            content_height += counter * tableTreeView.delegateHeight;
+            tableTreeView.setContentHeight(content_height);
+        }
+
+        tableTreeView.model.blockSignals(false);
 
         if(tableTreeView.selectedIndex >=0 && tableTreeView.selectedIndex > index){
             tableTreeView.selectedIndex += counter;

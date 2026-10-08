@@ -40,13 +40,34 @@ class ListModel extends QtObject {
         if(index >= 0) this.__views.splice(index, 1)
     }
 
+    blockSignals(flag){
+        super.blockSignals(flag)
+
+        if(!flag && this.__pendingBlockedUpdate){
+            this.__pendingBlockedUpdate = false
+            JQApplication.updateLater(this)
+        }
+    }
+
+    __reindex(from){
+        if(from < 0) from = 0
+
+        for(let i = from; i < this.data.length; i++){
+            let row = this.data[i]
+            if(row && row.__self) row.__self.__rowIndex = i
+        }
+    }
+
     __beginUpdate(){
         // this.dataChanged.blockSignal(true)
         super.__beginUpdate()
     }
 
     __endUpdate(){
-        if(this.signalsBlocked()) return
+        if(this.signalsBlocked()){
+            this.__pendingBlockedUpdate = true
+            return
+        }
         // this.dataChanged.blockSignal(false)
 
         // let changeSet = this.__changeSet
@@ -150,6 +171,7 @@ class ListModel extends QtObject {
 		}
 
         this.count = this.data.length
+        this.__reindex(index)
 
         this.__updateChangedSet(changeSet)
         JQApplication.updateLater(this)
@@ -179,6 +201,7 @@ class ListModel extends QtObject {
         }
 
         this.count = this.data.length
+        this.__reindex(index)
 
         this.__updateChangedSet(changeSet)
         JQApplication.updateLater(this)
@@ -238,6 +261,9 @@ class ListModel extends QtObject {
 
         let removeChange = [from, from + n, 'remove']
         let insertChange = [insertAt, insertAt + n, 'insert']
+
+        let reindexFrom = from < insertAt ? from : insertAt
+        this.__reindex(reindexFrom)
 
         this.__updateChangedSet(removeChange)
         this.__updateChangedSet(insertChange)

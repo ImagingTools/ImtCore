@@ -439,11 +439,14 @@ Rectangle{
 		let branchIds = branchIds_parent !== "" ? branchIds_parent + "," + innerId_parent: innerId_parent;
 
 		let counter = 0;
-		for(let i = 0; i < treeViewGql.getModelItemsCount(model_); i++){
+		let count = treeViewGql.getModelItemsCount(model_);
+
+		treeViewGql.model.blockSignals(true);
+
+		for(let i = 0; i < count; i++){
 			let newIndex =  index + i + 1;
 			treeViewGql.model.insertNewItem(newIndex);
 
-			//treeViewGql.model.copyItemDataFromModel(newIndex, model_, i);
 			treeViewGql.copyModelItemData(newIndex, model_, i);
 
 			treeViewGql.model.setData("Level__", level_ + 1, newIndex);
@@ -454,19 +457,20 @@ Rectangle{
 			treeViewGql.model.setData("HasBranch__", false, newIndex);
 			treeViewGql.model.setData("InnerId__", String(val + newIndex), newIndex);
 			treeViewGql.model.setData("ChildrenCount__", -1, newIndex);
-
-			if(i == 0 && level_ == -1){
-				listFrame.contentHeight = treeViewGql.delegateHeight;
-			}
-			else {
-				listFrame.contentHeight += treeViewGql.delegateHeight;
-			}
 			counter++;
 		}
-		//console.log("ChildrenCount__", model_.getItemsCount())
+
 		if(index >= 0){
-			treeViewGql.model.setData("ChildrenCount__", treeViewGql.getModelItemsCount(model_), index);
+			treeViewGql.model.setData("ChildrenCount__", count, index);
 		}
+
+		if(level_ == -1){
+			listFrame.contentHeight = counter * treeViewGql.delegateHeight;
+		} else {
+			listFrame.contentHeight += counter * treeViewGql.delegateHeight;
+		}
+
+		treeViewGql.model.blockSignals(false);
 
 		if(treeViewGql.selectedIndex >=0 && treeViewGql.selectedIndex > index){
 			treeViewGql.selectedIndex += counter;
