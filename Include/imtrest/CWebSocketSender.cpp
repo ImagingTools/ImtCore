@@ -31,7 +31,7 @@ bool CWebSocketSender::IsSocketValid() const
 
 // reimplemented (ITransport)
 
-bool CWebSocketSender::SendData(QByteArray& data) const
+bool CWebSocketSender::SendData(const QByteArray& data) const
 {
 	if (!IsSocketValid()){
 		return false;

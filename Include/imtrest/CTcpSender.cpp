@@ -20,7 +20,7 @@ CTcpSender::CTcpSender(QAbstractSocket* tcpSocketPtr)
 
 // reimplemented (ITransport)
 
-bool CTcpSender::SendData(QByteArray& data) const
+bool CTcpSender::SendData(const QByteArray& data) const
 {
 	if (m_tcpSocketPtr == nullptr || !m_tcpSocketPtr->isOpen()){
 		return false;

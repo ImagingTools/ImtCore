@@ -858,6 +858,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 				istd::CChangeNotifier notifier(this);
 
 				workingDocumentPtr->objectId = newObjectId;
+				// The document is now backed by the new object, so GetOpenedDocumentList() must report its URL
+				workingDocumentPtr->url = this->ObjectIdToUrl(newObjectId);
 				workingDocumentPtr->name = resultDocumentName;
 				workingDocumentPtr->isDirty = false;
 				workingDocumentPtr->undoManagerPtr->StoreDocumentState();
@@ -1016,6 +1018,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 		if (workingDocumentPtr != nullptr){
 			istd::CChangeNotifier notifier(this);
 
+			// A new document had no URL; it is now backed by the inserted object
+			workingDocumentPtr->url = this->ObjectIdToUrl(savedObjectId);
 			workingDocumentPtr->name = resultDocumentName;
 			workingDocumentPtr->isDirty = false;
 			workingDocumentPtr->undoManagerPtr->StoreDocumentState();
