@@ -316,6 +316,88 @@ function compile(options){
                     
                 }
             }
+
+            this.defineListElementRoles()
+        }
+
+        // ListElement roles are written as assignments, not `property` declarations.
+        // Promote them to var properties so bindings are evaluated and re-run on dependency changes.
+        defineListElementRoles() {
+            let typeInfo
+            try {
+                typeInfo = this.getTypeInfo(this.extends)
+            } catch {
+                return
+            }
+            if (!typeInfo || !typeInfo.typeBase || !typeInfo.typeBase.isAssignableFrom(QtQml.Models.ListElement)) return
+
+            for (let assignProperty of this.assignProperties) {
+                if (assignProperty.type === 'alias') continue
+
+                let names = this.normalizePathName(assignProperty.name)
+                if (names.length !== 1) continue
+
+                let name = names[0]
+                if (!name || this.checkDefineProperty(name) || this.listElementRoleExists(name)) continue
+
+                let info = assignProperty.value && assignProperty.value.info ? assignProperty.value.info : this.info
+                this.defineProperties.push({
+                    name: name,
+                    type: 'var',
+                    value: undefined,
+                    signalName: name + 'Changed',
+                    info: info,
+                    modifiers: {
+                        default: false,
+                        required: false,
+                        readonly: false,
+                    },
+                })
+
+                let signalName = name + 'Changed'
+                let hasSignal = false
+                for (let defineSignal of this.defineSignals) {
+                    if (defineSignal.name === signalName) {
+                        hasSignal = true
+                        break
+                    }
+                }
+                if (!hasSignal) {
+                    this.defineSignals.push({
+                        name: signalName,
+                        slotName: 'on' + name[0].toUpperCase() + name.slice(1) + 'Changed',
+                        args: []
+                    })
+                }
+            }
+        }
+
+        listElementRoleExists(name) {
+            let typeInfo
+            try {
+                typeInfo = this.getTypeInfo(this.extends)
+            } catch {
+                return false
+            }
+
+            let guard = 0
+            while (typeInfo && guard < 16) {
+                guard++
+                if (typeInfo.type instanceof QmlFile) {
+                    if (typeInfo.type.instruction.checkDefineProperty(name)) return true
+                    try {
+                        typeInfo = typeInfo.type.instruction.getTypeInfo(typeInfo.type.instruction.extends)
+                    } catch {
+                        return false
+                    }
+                    continue
+                }
+
+                if (typeInfo.type && typeInfo.type.meta && Object.prototype.hasOwnProperty.call(typeInfo.type.meta, name)) return true
+                return false
+            }
+
+            return false
         }
         qmldefaultprop(meta) {
             if(typeof this[meta[1][0]] === 'function'){
