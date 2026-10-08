@@ -23,6 +23,12 @@ I_EXPORT_COMPONENT(
 
 
 I_EXPORT_COMPONENT(
+			CacheCollectionChangeNotifier,
+			"Publishes the changes of a collection mirrored into the cache once the cache has them",
+			"Cache Collection Change Notifier");
+
+
+I_EXPORT_COMPONENT(
 			MaterializedTableBuilder,
 			"Keeps a table joined from other cache tables, recomputing only the rows a change touched",
 			"Materialized Table Builder");
