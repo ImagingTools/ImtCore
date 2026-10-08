@@ -360,7 +360,11 @@ Item {
 			}
 
 			function onElementsReceived(elements){
-				container.table.elements = elements
+				let sameModel = container.table.elements === elements;
+				container.table.elements = elements;
+				if (sameModel){
+					container.table.refreshVisibleRows();
+				}
 			}
 
 			function onNotificationModelChanged(){
