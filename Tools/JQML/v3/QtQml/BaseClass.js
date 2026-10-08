@@ -115,8 +115,8 @@ class BaseClass extends QtObject {
 							let component = target.__proxy.createComponent(key)
 			
 							if (component) {
-								target[key] = node.typeTarget.create(target.__proxy)
-								target[key].owner = target.__proxy
+								// Owner is attached only after filling, so a lazy read does not report a model change
+								let model = node.typeTarget.create(target.__proxy)
 
 								for (let _pureData of pureData) {
 									let sourceTypename
@@ -124,14 +124,15 @@ class BaseClass extends QtObject {
 										sourceTypename = _pureData['__typename']
 									}
 									let obj = target.__proxy.createElement(key, sourceTypename).createObject(target.__proxy)
-									
-									target[key].append({ item: obj })
-									obj.owner = target.__proxy
 
 									obj.fromObject(_pureData)
+									model.append({ item: obj })
+									obj.owner = target.__proxy
 								}
 
-								target[key].finished()
+								target[key] = model
+								model.owner = target.__proxy
+								model.finished()
 							}
 							else {
 								target[key] = pureData
@@ -143,10 +144,11 @@ class BaseClass extends QtObject {
 							}	
 							let obj = target.__proxy.createComponent(key, sourceTypename).createObject(target.__proxy)
 
+							// Owner is attached only after filling, so a lazy read does not report a model change
+							obj.fromObject(pureData)
+
 							target[key] = obj
 							obj.owner = target.__proxy
-
-							obj.fromObject(pureData)
 						}
 					} else {
 						target[key] = pureData

@@ -503,24 +503,26 @@ QtObject {
 			else if(typeof sourceObject[key] === "object"){
 				if(Array.isArray(sourceObject[key])){
 					let component = this.createComponent(_key)
+					let model = this[_key]
+					let isNewModel = false
 	
-					if(this[_key]){
-						if(this[_key].clear){
-							this[_key].clear()
+					if(model){
+						if(model.clear){
+							model.clear()
 						}
 					}
 					else{
 						if(component){
-							let obj = Qt.createComponent('BaseModel.qml').createObject(this)
-							obj.owner = this
-							this[_key] = obj
+							// Owner is attached only after filling, so filling does not report a model change
+							model = Qt.createComponent('BaseModel.qml').createObject(this)
+							isNewModel = true
 						}
 					}
 	
 					if(component){
 						for(let sourceObjectInner of sourceObject[key]){
 							if (sourceObjectInner === null){
-								this[_key].append({ item: null })
+								model.append({ item: null })
 								continue
 							}
 							let sourceTypename
@@ -530,12 +532,20 @@ QtObject {
 							let obj = this.createElement(_key, sourceTypename).createObject(this)
 							if (!obj.fromObject(sourceObjectInner)){
 								obj.destroy()
+								if (isNewModel){
+									model.destroy()
+								}
 								endChanges()
 								return false
 							}
-							this[_key].append({ item: obj })
+							model.append({ item: obj })
 							obj.owner = this
 							obj.connectProperties()
+						}
+
+						if (isNewModel){
+							this[_key] = model
+							model.owner = this
 						}
 					}
 					else{

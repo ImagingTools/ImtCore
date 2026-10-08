@@ -183,6 +183,24 @@ QString EscapeSql(const QString& value);
 
 
 /**
+ * \brief Quotes an SQL identifier (e.g. table or column name) for safe use in SQL statements.
+ *
+ * Wraps the identifier in double quotes and doubles any embedded double-quote characters,
+ * which is the standard SQL identifier-quoting rule shared by SQLite, PostgreSQL and DuckDB.
+ *
+ * \param identifier The identifier to quote.
+ * \return The quoted identifier.
+ *
+ * Example:
+ * \code{.cpp}
+ * QString sql = QStringLiteral("SELECT * FROM %1").arg(imtdb::QuoteIdentifier(tableName));
+ * // tableName = "My Table" -> sql = "SELECT * FROM \"My Table\""
+ * \endcode
+ */
+QString QuoteIdentifier(const QString& identifier);
+
+
+/**
  * \brief Safely converts a QVariant to QByteArray, handling QUuid without braces.
  *
  * In Qt 6.11+, database drivers may return UUID columns as QUuid values. When

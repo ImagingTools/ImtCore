@@ -90,6 +90,7 @@ public:
 
 protected:
 	virtual bool IsSqliteDriver() const;
+	virtual bool IsDuckDbDriver() const;
 	virtual QString GetBaseSelectionQuery() const;
 	virtual idoc::IDocumentMetaInfo* CreateCollectionItemMetaInfo(const QByteArray& typeId) const;
 	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const;
