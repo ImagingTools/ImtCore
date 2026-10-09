@@ -479,6 +479,133 @@ TestCase {
 		compare(readySpy.count, 1)
 	}
 
+	// ---- New document, every view requests its representation on create ----
+
+	function createWithOnCreateViews(service, visibility, isDataLoaded){
+		service.registerDocumentViewData(typeId, "V2", viewComp, onCreateControllerComp)
+		service.registerDocumentViewData(typeId, "V3", viewComp, onCreateControllerComp)
+
+		let views = []
+		let createViews = function(documentId){
+			views.push(addView(service, documentId, visibility[0]))
+			views.push(addView(service, documentId, visibility[1], "V2"))
+			views.push(addView(service, documentId, visibility[2], "V3"))
+		}
+		service.documentCreated.connect(createViews)
+		service.handleDocumentCreated("doc", typeId, "", false, "", false, isDataLoaded)
+		service.documentCreated.disconnect(createViews)
+
+		return views
+	}
+
+	function test_onCreateViewsAllVisible(){
+		let service = createService(onCreateControllerComp)
+		let readySpy = createSpy(service, "documentReady")
+		let views = createWithOnCreateViews(service, [true, true, true], true)
+
+		for (let i = 0; i < 3; ++i){
+			compare(controllerOf(service, "doc", i).requestCount, 1, "One request per view")
+			verify(isBlocked(views[i]))
+		}
+
+		controllerOf(service, "doc", 0).respond()
+		controllerOf(service, "doc", 2).respond()
+
+		compare(readySpy.count, 0)
+		verify(isBlocked(views[1]))
+
+		controllerOf(service, "doc", 1).respond()
+
+		compare(readySpy.count, 1)
+		verify(readySpy.signalArguments[0][2], "The document is still new")
+		for (let i = 0; i < 3; ++i){
+			verify(!isBlocked(views[i]))
+		}
+	}
+
+	function test_onCreateViewsPartlyHidden(){
+		let service = createService(onCreateControllerComp)
+		let readySpy = createSpy(service, "documentReady")
+		let views = createWithOnCreateViews(service, [true, false, false], true)
+
+		compare(controllerOf(service, "doc", 0).requestCount, 1)
+		compare(controllerOf(service, "doc", 1).requestCount, 0)
+		compare(controllerOf(service, "doc", 2).requestCount, 0)
+
+		controllerOf(service, "doc", 0).respond()
+
+		compare(readySpy.count, 1, "Hidden views do not hold the document back")
+
+		views[1].visible = true
+
+		compare(controllerOf(service, "doc", 1).requestCount, 1)
+		compare(controllerOf(service, "doc", 2).requestCount, 0)
+		verify(isBlocked(views[1]))
+
+		controllerOf(service, "doc", 1).respond()
+
+		verify(!isBlocked(views[1]))
+		compare(readySpy.count, 1)
+	}
+
+	function test_onCreateViewsAllHidden(){
+		let service = createService(onCreateControllerComp)
+		let readySpy = createSpy(service, "documentReady")
+		let views = createWithOnCreateViews(service, [false, false, false], true)
+
+		compare(readySpy.count, 0)
+
+		views[2].visible = true
+
+		compare(controllerOf(service, "doc", 2).requestCount, 1)
+		compare(readySpy.count, 0)
+
+		controllerOf(service, "doc", 2).respond()
+
+		compare(readySpy.count, 1)
+		compare(controllerOf(service, "doc", 0).requestCount, 0)
+	}
+
+	function test_onCreateViewsRemoteCreated(){
+		let service = createService(onCreateControllerComp)
+		let readySpy = createSpy(service, "documentReady")
+		createWithOnCreateViews(service, [true, true, true], false)
+
+		for (let i = 0; i < 3; ++i){
+			compare(controllerOf(service, "doc", i).requestCount, 0, "The object may not exist on the server yet")
+		}
+
+		service.setDocumentIsLoading("doc", false)
+
+		for (let i = 0; i < 3; ++i){
+			compare(controllerOf(service, "doc", i).requestCount, 1)
+			controllerOf(service, "doc", i).respond()
+		}
+
+		compare(readySpy.count, 1)
+	}
+
+	function test_onCreateViewsRegisteredAfterCreation(){
+		let service = createService(onCreateControllerComp)
+		service.registerDocumentViewData(typeId, "V2", viewComp, onCreateControllerComp)
+		let readySpy = createSpy(service, "documentReady")
+
+		service.handleDocumentCreated("doc", typeId, "", false, "", false, true)
+		addView(service, "doc")
+		addView(service, "doc", true, "V2")
+
+		compare(controllerOf(service, "doc", 0).requestCount, 1)
+		compare(controllerOf(service, "doc", 1).requestCount, 1)
+
+		controllerOf(service, "doc", 0).respond()
+
+		compare(readySpy.count, 0)
+
+		controllerOf(service, "doc", 1).respond()
+
+		compare(readySpy.count, 1)
+	}
+
 	// ---- View registration ----
 
 	function test_viewDataRegistration(){
