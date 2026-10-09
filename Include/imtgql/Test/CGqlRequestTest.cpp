@@ -491,6 +491,21 @@ void CGqlRequestTest::ParseFields()
 }
 
 
+void CGqlRequestTest::ParseFieldsNamedAsObjectMembers()
+{
+	qsizetype errorPosition = -1;
+
+	imtgql::CGqlRequest request;
+	QVERIFY(request.ParseQuery(R"({"query": "query Values {Values {__typename hasOwnProperty constructor toString {valueOf}}}"})", errorPosition));
+
+	const QByteArrayList fieldIds = request.GetFields().GetFieldIds();
+	QVERIFY(fieldIds.contains("hasOwnProperty"));
+	QVERIFY(fieldIds.contains("__typename"));
+	QVERIFY(fieldIds.contains("constructor"));
+	QVERIFY(fieldIds.contains("toString"));
+}
+
+
 void CGqlRequestTest::ParseComplexFields()
 {
 	qsizetype errorPosition = -1;
