@@ -531,11 +531,13 @@ isLoading == false:
 - зарегистрирован хотя бы один view;
 - нет незавершённых запросов representation;
 - representation получена с сервера хотя бы раз (`documentRepresentationUpdated`),
-  если она нужна хотя бы одному view.
+  если она нужна хотя бы одному видимому view. Если видимых view нет, учитываются все.
 
 Порядок событий значения не имеет. Если view невидим, его representation
-запрашивается при показе, и `documentReady` придёт после этого. При ошибке
-`updateRepresentationFailed` сигнал `documentReady` не эмитится.
+запрашивается при показе; готовность перепроверяется при каждом изменении
+видимости view. При ошибке `updateRepresentationFailed` сигнал `documentReady` не эмитится;
+повторить запрос можно через `updateDocumentRepresentation(documentId)` (так делает
+`SingleDocumentWorkspaceShellView.retry()` для уже открытого документа).
 `representationController` — контроллер первого зарегистрированного view (`null`, если его нет).
 
 ### 4.8. Закрытие документа

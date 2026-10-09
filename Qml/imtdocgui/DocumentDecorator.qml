@@ -13,6 +13,7 @@ QtObject {
 	property var registeredRepresentation: []
 
 	signal viewRegistered(var view, var representationController, bool updateRepresentation)
+	signal viewVisibilityChanged(var view, bool visible)
 
 	onViewRegistered: {
 		if (view){
@@ -241,6 +242,8 @@ QtObject {
 					_internal.requestUpdateViews.splice(viewIndex, 1)
 				}
 			}
+
+			viewVisibilityChanged(view, visible)
 		}
 	}
 
@@ -367,7 +370,22 @@ QtObject {
 		return !isNewDocument || registeredRepresentation[viewIndex].requestRepresentationOnCreate
 	}
 
-	function anyRepresentationRequired(isNewDocument){
+	// Hidden views count only while no view is visible: their representation is requested once shown.
+	function isAwaitingRepresentation(isNewDocument){
+		let hasVisibleView = false
+		for (let i = 0; i < registeredViews.length; ++i){
+			if (registeredViews[i].visible){
+				hasVisibleView = true
+				if (representationRequired(i, isNewDocument)){
+					return true
+				}
+			}
+		}
+
+		if (hasVisibleView){
+			return false
+		}
+
 		for (let i = 0; i < registeredViews.length; ++i){
 			if (representationRequired(i, isNewDocument)){
 				return true
