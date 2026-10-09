@@ -376,6 +376,16 @@ sdl::V1_0::imtauth::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 		id = *arguments.input->id;
 	}
 
+	// Only the superuser may change another user's profile.
+	const imtgql::IGqlContext* requestContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray requestUserId = (requestContextPtr != nullptr) ? requestContextPtr->GetUserId() : QByteArray();
+	if ((requestUserId.isEmpty() || requestUserId != id) && !IsSuperuserRequest(gqlRequest)){
+		errorMessage = QStringLiteral("Unable to set a profile info. Error: Only the superuser can change the profile of another user");
+		SendWarningMessage(0, errorMessage, "CProfileControllerComp");
+
+		return sdl::V1_0::imtauth::CSetProfileResponse();
+	}
+
 	imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_userCollectionCompPtr->GetObjectData(id, dataPtr)){

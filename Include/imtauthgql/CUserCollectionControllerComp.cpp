@@ -688,7 +688,8 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 	imtauth::ITenantMembershipManager* membershipPtr = m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr;
 	imtauth::IRoleInfoProvider* roleProviderPtr = m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr;
 
-	istd::IChangeableUniquePtr tenantAdapted = AdaptUserForTenant(
+	// Invalid result means the stored object needs no tenant filtering.
+	istd::IChangeableUniquePtr adaptedPtr = AdaptUserForTenant(
 				objectId,
 				object,
 				currentTenantId,
@@ -698,11 +699,33 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 				membershipPtr,
 				roleProviderPtr);
 
-	if (tenantAdapted.IsValid()){
-		return tenantAdapted;
+	if (currentProductId.isEmpty()){
+		return adaptedPtr;
 	}
 
-	return baseAdaptedPtr;
+	// Remote consumers expand roles through the caller's token, which a PAT cannot do; send the resolved permissions with the object.
+	const imtauth::IUserInfo* sourceUserPtr = adaptedPtr.IsValid()
+				? dynamic_cast<const imtauth::IUserInfo*>(adaptedPtr.GetPtr())
+				: dynamic_cast<const imtauth::IUserInfo*>(&object);
+	if (sourceUserPtr == nullptr){
+		return adaptedPtr;
+	}
+
+	const imtauth::IUserInfo::FeatureIds resolvedPermissions = sourceUserPtr->GetPermissions(currentProductId);
+	if (resolvedPermissions.isEmpty()){
+		return adaptedPtr;
+	}
+
+	if (!adaptedPtr.IsValid()){
+		adaptedPtr = object.CloneMe();
+	}
+
+	imtauth::IUserInfo* resultUserPtr = dynamic_cast<imtauth::IUserInfo*>(adaptedPtr.GetPtr());
+	if (resultUserPtr != nullptr){
+		resultUserPtr->SetLocalPermissions(currentProductId, resolvedPermissions);
+	}
+
+	return adaptedPtr;
 }
 
 
