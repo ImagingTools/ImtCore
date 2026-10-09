@@ -435,10 +435,20 @@ documentManager.createDocument(typeId, proposedSourceDocumentId)
 setAutoNamedTypeId, setDocumentName
 createDocumentData(documentId, objectTypeId, isNew = true)
 if (proposedObjectId) setDocumentObjectId(...)
+setDocumentIsLoading(documentId, true)
 documentCreated(documentId, objectTypeId)
 if (isDirty) setDocumentIsDirty(...)
-setDocumentIsLoading(documentId, false)   // новый документ грузить нечего
+if (isDataLoaded !== false) setDocumentIsLoading(documentId, false)
 ```
+
+Ответ `CreateNewDocument` приходит только после создания объекта на сервере, поэтому
+передаёт `isDataLoaded = true`. `reflectRemoteDocumentCreated` передаёт `false`:
+уведомление `NewDocumentCreated` сервер шлёт до создания объекта, и загрузка
+завершается уведомлением `DocumentDataLoaded`.
+
+По умолчанию view нового документа показывает значения из `representationModel`
+контроллера. Чтобы получить representation нового документа с сервера, в контроллере
+выставляется `requestRepresentationOnCreate: true`.
 
 `openOrCreateByObjectId(typeId, objectId, proposedId)` — единая точка входа:
 пустой `objectId` → `createDocument`, иначе → `openDocument`.
@@ -463,8 +473,10 @@ documentData.addView(viewTypeId, view)
         → representationController = factory.createObject(documentData)
           representationController.documentId = id
           representationController.view       = view
+        → required = !isNew || representationController.requestRepresentationOnCreate
         → documentDecorator.registerView(view, representationController,
-                                         updateRepr = !isNew && !isLoading)
+                                         updateRepr = required && !isLoading)
+        → если !required && !isLoading: documentDecorator.releaseView(index)
 → __internal.maybeEmitDocumentReady(documentId)
 ```
 
@@ -495,7 +507,7 @@ documentData.addView(viewTypeId, view)
 index < 0 :  если isLoading == false -> запомнить в pendingDataLoaded[documentId]
              (уведомление DataLoaded пришло раньше ответа OpenDocument)
 
-docData.isClosing -> выход (документ уже закрывается)
+docData.isClosing или isLoading не изменился -> выход
 
 docData.isLoading = isLoading
 
@@ -503,17 +515,28 @@ isLoading == true и есть pendingDataLoaded[documentId]
    -> удалить запись, немедленно считать isLoading = false
 
 isLoading == false:
-   !isNew : documentDecorator.updateRepresentationForAllViews()
-   isNew  : для каждого зарегистрированного view —
-            если updateCounters[i] <= 0  -> view.setBlockingUpdateModel(false)
-            view.doUpdateGui()
+   для каждого зарегистрированного view —
+      representation нужна (!isNew || requestRepresentationOnCreate)
+         -> documentDecorator.updateRepresentation(i)
+      иначе
+         -> documentDecorator.releaseView(i)   // снять блокировку, doUpdateGui()
    -> signal documentDataLoaded(documentId)
    -> maybeEmitDocumentReady(documentId)
 ```
 
-`maybeEmitDocumentReady` эмитит `documentReady(documentId)` **ровно один раз**, когда
-одновременно выполнено: документ не в состоянии загрузки **и** зарегистрирован хотя бы
-один view. Порядок событий значения не имеет.
+`maybeEmitDocumentReady` эмитит `documentReady(documentId, typeId, isNew, representationController)`
+**ровно один раз**, когда документ полностью готов к работе:
+
+- документ не в состоянии загрузки;
+- зарегистрирован хотя бы один view;
+- нет незавершённых запросов representation;
+- representation получена с сервера хотя бы раз (`documentRepresentationUpdated`),
+  если она нужна хотя бы одному view.
+
+Порядок событий значения не имеет. Если view невидим, его representation
+запрашивается при показе, и `documentReady` придёт после этого. При ошибке
+`updateRepresentationFailed` сигнал `documentReady` не эмитится.
+`representationController` — контроллер первого зарегистрированного view (`null`, если его нет).
 
 ### 4.8. Закрытие документа
 

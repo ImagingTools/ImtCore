@@ -346,7 +346,7 @@ DocumentServiceBase {
 		sdlObjectComp: Component {
 			DocumentInfo {
 				onFinished: {
-					root.handleDocumentCreated(m_documentId, m_objectTypeId, m_documentName, m_hasNameProvider, root.createDocumentRequest.proposedObjectId, m_isDirty)
+					root.handleDocumentCreated(m_documentId, m_objectTypeId, m_documentName, m_hasNameProvider, root.createDocumentRequest.proposedObjectId, m_isDirty, true)
 				}
 			}
 		}
