@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CUserControllerComp.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
+#include <imtauthgql/imtauthgql.h>
 
 
 // ACF includes
@@ -168,7 +169,7 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 
 sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 			const sdl::V1_0::imtauth::CRegisterUserGqlRequest& registerUserRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CRegisterUserPayload response;
@@ -213,6 +214,12 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 	}
 
 	sdl::V1_0::imtauth::CUserData userData = *arguments.input->userData;
+
+	// Self-registration cannot grant access: only the superuser may register a user with roles or groups.
+	if (!IsSuperuserRequest(gqlRequest)){
+		userData.roles = nullptr;
+		userData.groups = nullptr;
+	}
 
 	QByteArray userId;
 	if (arguments.input->userData->id){
@@ -631,11 +638,17 @@ sdl::V1_0::imtauth::CUserObjectId CUserControllerComp::OnGetUserObjectId(
 
 sdl::V1_0::imtauth::CUnlockUserPayload CUserControllerComp::OnUnlockUser(
 			const sdl::V1_0::imtauth::CUnlockUserGqlRequest& unlockUserRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CUnlockUserPayload response;
 	response.success = false;
+
+	if (!IsSuperuserRequest(gqlRequest)){
+		errorMessage = QStringLiteral("Unable to unlock user account. Error: Only the superuser can unlock an account");
+		SendWarningMessage(0, errorMessage, "CUserControllerComp");
+		return response;
+	}
 
 	if (!m_accountLockoutControllerCompPtr.IsValid()){
 		errorMessage = QStringLiteral("Unable to unlock user account. Error: Component 'AccountLockoutController' was not set");
