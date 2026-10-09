@@ -75,13 +75,21 @@ QtObject {
 
 	signal documentAlreadyOpened(string documentId, string typeId)
 
-	// Emitted once per document when both:
-	//   - the document data has finished loading from the server, AND
-	//   - at least one view instance has been registered for the document.
-	// Useful for single-document workspaces that need to switch from a
-	// loading state to a content state regardless of the order in which the
-	// two events happen.
-	signal documentReady(string documentId)
+	// Emitted once per document when it is fully ready for work:
+	//   - the document data has finished loading on the server,
+	//   - at least one view instance has been registered for the document,
+	//   - the representation has been received from the server (unless the
+	//     document is new and no controller has requestRepresentationOnCreate).
+	// representationController belongs to the first registered view (null if it has none).
+	signal documentReady(string documentId, string typeId, bool isNew, var representationController)
+
+	onDocumentRepresentationUpdated: {
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index >= 0){
+			__internal.openedDocuments[index].representationReceived = true
+			__internal.maybeEmitDocumentReady(documentId)
+		}
+	}
 
 	onDocumentSaved: {
 		setDocumentIsNew(documentId, false)
@@ -414,7 +422,7 @@ QtObject {
 		}
 
 		let docData = __internal.openedDocuments[index]
-		if (docData.isClosing){
+		if (docData.isClosing || docData.isLoading === isLoading){
 			return
 		}
 
@@ -429,20 +437,13 @@ QtObject {
 		}
 
 		if (!isLoading){
-			if (!docData.isNew){
-				docData.documentDecorator.updateRepresentationForAllViews()
-			}
-			else{
-				let decorator = docData.documentDecorator
-				for (let i = 0; i < decorator.registeredViews.length; ++i){
-					let cnt = 0
-					if (decorator._internal && decorator._internal.updateCounters && decorator._internal.updateCounters.length > i){
-						cnt = decorator._internal.updateCounters[i] || 0
-					}
-					if (cnt <= 0){
-						decorator.registeredViews[i].setBlockingUpdateModel(false)
-					}
-					decorator.registeredViews[i].doUpdateGui()
+			let decorator = docData.documentDecorator
+			for (let i = 0; i < decorator.registeredViews.length; ++i){
+				if (decorator.representationRequired(i, docData.isNew)){
+					decorator.updateRepresentation(i)
+				}
+				else{
+					decorator.releaseView(i)
 				}
 			}
 			documentDataLoaded(documentId)
@@ -568,7 +569,9 @@ QtObject {
 			setDocumentIsDirty(documentId, true)
 	}
 
-	function handleDocumentCreated(documentId, objectTypeId, documentName, hasNameProvider, proposedObjectId, isDirty){
+	// isDataLoaded === false: the document is still being created on the server,
+	// loading finishes with the DocumentDataLoaded notification.
+	function handleDocumentCreated(documentId, objectTypeId, documentName, hasNameProvider, proposedObjectId, isDirty, isDataLoaded){
 		setAutoNamedTypeId(objectTypeId, hasNameProvider)
 		setDocumentName(documentId, documentName)
 
@@ -579,16 +582,20 @@ QtObject {
 				setDocumentObjectId(documentId, proposedObjectId)
 			if (isDirty)
 				setDocumentIsDirty(documentId, true)
+			if (isDataLoaded !== false)
+				setDocumentIsLoading(documentId, false)
 			return
 		}
 
 		__internal.createDocumentData(documentId, objectTypeId, true)
 		if (proposedObjectId && proposedObjectId !== "")
 			setDocumentObjectId(documentId, proposedObjectId)
+		setDocumentIsLoading(documentId, true)
 		documentCreated(documentId, objectTypeId)
 		if (isDirty)
 			setDocumentIsDirty(documentId, true)
-		setDocumentIsLoading(documentId, false)
+		if (isDataLoaded !== false)
+			setDocumentIsLoading(documentId, false)
 	}
 
 	// Applies a DocumentOpened notification received over the subscription, so
@@ -621,7 +628,7 @@ QtObject {
 
 		let resolvedNameProvider = (hasNameProvider === undefined) ? hasDocumentNameProvider(objectTypeId) : hasNameProvider
 
-		handleDocumentCreated(documentId, objectTypeId, documentName || "", resolvedNameProvider, objectId || "", isDirty === true)
+		handleDocumentCreated(documentId, objectTypeId, documentName || "", resolvedNameProvider, objectId || "", isDirty === true, false)
 	}
 
 	function handleSaveDocumentResult(documentId, status, message, documentName){
@@ -701,6 +708,7 @@ QtObject {
 				property bool isNew: true
 				property bool isLoading: false
 				property bool isClosing: false
+				property bool representationReceived: false
 				property var views: ({})
 				property DocumentDecorator documentDecorator: DocumentDecorator {
 					documentId: documentData.id
@@ -722,7 +730,12 @@ QtObject {
 					representationController.documentId = id
 					representationController.view = view
 
-					documentDecorator.registerView(view, representationController, !isNew && !isLoading)
+					let viewIndex = documentDecorator.registeredViews.length
+					let required = !isNew || representationController.requestRepresentationOnCreate
+					documentDecorator.registerView(view, representationController, required && !isLoading)
+					if (!required && !isLoading){
+						documentDecorator.releaseView(viewIndex)
+					}
 				}
 
 				function addView(viewTypeId, view){
@@ -772,9 +785,9 @@ QtObject {
 			openedDocuments.splice(index, 1)
 		}
 
-		// Emits root.documentReady(documentId) at most once per document, when
-		// the document has finished loading AND at least one view has been
-		// registered for it. Safe to call from multiple code paths.
+		// Emits root.documentReady() at most once per document, when the document
+		// has finished loading, has a view and its representation is received.
+		// Safe to call from multiple code paths.
 		function maybeEmitDocumentReady(documentId){
 			let index = root.getDocumentIndexByDocumentId(documentId)
 			if (index < 0){
@@ -795,8 +808,20 @@ QtObject {
 				return
 			}
 
+			let decorator = docData.documentDecorator
+			if (decorator.isUpdatingRepresentation()){
+				return
+			}
+
+			if (decorator.anyRepresentationRequired(docData.isNew) && !docData.representationReceived){
+				return
+			}
+
 			readyEmitted[documentId] = true
-			root.documentReady(documentId)
+
+			let controllers = decorator.registeredRepresentation
+			let representationController = controllers.length > 0 ? controllers[0] : null
+			root.documentReady(documentId, docData.typeId, docData.isNew, representationController)
 		}
 	}
 }

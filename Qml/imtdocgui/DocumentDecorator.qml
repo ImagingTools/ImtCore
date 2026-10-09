@@ -291,19 +291,52 @@ QtObject {
 		_internal.initiatingView = null
 
 		for (let i = 0; i < registeredViews.length; ++i){
-			if (registeredViews[i] === skipView){
-				continue
-			}
-
-			if (registeredViews[i].visible){
-				registeredRepresentation[i].updateRepresentationFromDocument()
-			}
-			else{
-				if (!_internal.requestUpdateViews.includes(registeredViews[i])){
-					_internal.requestUpdateViews.push(registeredViews[i])
-				}
+			if (registeredViews[i] !== skipView){
+				updateRepresentation(i)
 			}
 		}
+	}
+
+	// Hidden views are updated when they become visible.
+	function updateRepresentation(viewIndex){
+		let view = registeredViews[viewIndex]
+		if (view.visible){
+			registeredRepresentation[viewIndex].updateRepresentationFromDocument()
+		}
+		else if (!_internal.requestUpdateViews.includes(view)){
+			_internal.requestUpdateViews.push(view)
+		}
+	}
+
+	function releaseView(viewIndex){
+		if (_internal.updateCounters[viewIndex] <= 0){
+			registeredViews[viewIndex].setBlockingUpdateModel(false)
+		}
+		registeredViews[viewIndex].doUpdateGui()
+	}
+
+	function representationRequired(viewIndex, isNewDocument){
+		return !isNewDocument || registeredRepresentation[viewIndex].requestRepresentationOnCreate
+	}
+
+	function anyRepresentationRequired(isNewDocument){
+		for (let i = 0; i < registeredViews.length; ++i){
+			if (representationRequired(i, isNewDocument)){
+				return true
+			}
+		}
+
+		return false
+	}
+
+	function isUpdatingRepresentation(){
+		for (let i = 0; i < _internal.updateCounters.length; ++i){
+			if (_internal.updateCounters[i] > 0){
+				return true
+			}
+		}
+
+		return false
 	}
 
 	function updateDocumentForAllViews(){

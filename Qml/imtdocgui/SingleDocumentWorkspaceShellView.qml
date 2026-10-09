@@ -71,7 +71,7 @@ Item {
 	// Last error message (only meaningful in "error" state).
 	readonly property alias lastErrorMessage: _internal.lastErrorMessage
 
-	// Emitted when the document is fully ready (data loaded + view bound).
+	// Emitted when the document is fully ready (data loaded, view bound, representation received).
 	signal documentReady(string documentId)
 
 	// Emitted when the document is closed (either by the user or by a
@@ -264,6 +264,14 @@ Item {
 			}
 			_internal.state = "content"
 			workspaceView.documentReady(documentId)
+		}
+
+		function onUpdateRepresentationFailed(documentId, message){
+			if (documentId !== _internal.documentId || _internal.state !== "loading"){
+				return
+			}
+			_internal.lastErrorMessage = message
+			_internal.state = "error"
 		}
 
 		function onDocumentSaved(documentId){
