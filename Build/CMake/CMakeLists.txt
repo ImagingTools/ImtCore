@@ -595,6 +595,16 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceTest")
 		add_dependencies(CollectionDocumentServiceTest imtbase imtdoc)
 
+		if(USE_QTQML)
+			add_subdirectory("${TESTS_DIR}/QmlTest/CMake" "${AUX_INCLUDE_DIR}/QmlTest")
+			add_dependencies(ImtCoreQmlTest
+				imtbasesdl imtappsdl imtauthsdl imtcolorsdl imt2dsdl
+				imtstylecontrolsqml imtcontrolsqml imtguiqml imtguigqlqml imtcolguiqml imtdocguiqml imtauthguiqml imtlicguiqml
+				imtstyle imtqml imtgql
+			)
+			imt_chain_windeploy_target(ImtCoreQmlTest)
+		endif()
+
 		file(COPY ${TESTS_DIR}/Migrations DESTINATION ${TESTS_DIR}/../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 	endif() # BUILD_TESTING
 endif() # NOT IMT_BUILD_TOOLS_ONLY
