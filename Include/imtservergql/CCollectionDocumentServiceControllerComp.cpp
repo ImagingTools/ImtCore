@@ -312,6 +312,8 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
+		const bool isNewObject = GetCollectionObjectId(userId, *saveDocumentInput->documentId).isEmpty();
+
 		istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
 		operationContextPtr.SetPtr(CreateOperationContextFromGqlRequest(gqlRequest));
 
@@ -337,6 +339,8 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 				if (m_documentManagerCompPtr->GetDocumentName(userId, *saveDocumentInput->documentId, resolvedName) == imtdoc::IDocumentService::OS_OK){
 					retVal.documentName = resolvedName;
 				}
+
+				CreateUserActionLog(userId, *saveDocumentInput->documentId, isNewObject ? imtauth::IUserRecentAction::s_createActionTypeId : imtauth::IUserRecentAction::s_updateActionTypeId, resolvedName, gqlRequest);
 			}
 			break;
 		case imtdoc::IDocumentService::OS_INVALID_USER_ID:
@@ -789,6 +793,58 @@ void CCollectionDocumentServiceControllerComp::GenerateDocumentChanges(
 				operationTypeId, objectId, documentDataPtr, *changesCollectionPtr, errorMessage, nullptr)){
 		SendWarningMessage(0, QStringLiteral("Unable to generate document changes for '%1'. Error: %2")
 					.arg(QString::fromUtf8(objectId), errorMessage));
+	}
+}
+
+
+void CCollectionDocumentServiceControllerComp::CreateUserActionLog(
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			const QByteArray& actionTypeId,
+			const QString& documentName,
+			const ::imtgql::CGqlRequest& gqlRequest) const
+{
+	if (!m_userActionManagerCompPtr.IsValid()){
+		return;
+	}
+
+	imtauth::IUserRecentAction::TargetInfo targetInfo;
+	targetInfo.id = GetCollectionObjectId(userId, documentId);
+	targetInfo.name = documentName.isEmpty() ? QString::fromUtf8(targetInfo.id) : documentName;
+	targetInfo.source = *m_collectionIdAttrPtr;
+
+	const imtdoc::IDocumentService::DocumentList documentList = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+	for (const imtdoc::IDocumentService::DocumentListItem& documentItem : documentList){
+		if (documentItem.documentId == documentId){
+			targetInfo.typeId = documentItem.typeId;
+			targetInfo.typeName = QString::fromUtf8(documentItem.typeId);
+			break;
+		}
+	}
+
+	imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo;
+	actionTypeInfo.id = actionTypeId;
+	if (actionTypeId == imtauth::IUserRecentAction::s_createActionTypeId){
+		actionTypeInfo.name = QStringLiteral("Create");
+		actionTypeInfo.description = QStringLiteral("Object created");
+	}
+	else{
+		actionTypeInfo.name = QStringLiteral("Update");
+		actionTypeInfo.description = QStringLiteral("Object changed");
+	}
+
+	imtauth::IUserRecentAction::UserInfo userInfo;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(gqlContextPtr->GetUserInfo());
+		if (userInfoPtr != nullptr){
+			userInfo.id = userInfoPtr->GetObjectUuid();
+			userInfo.name = userInfoPtr->GetName();
+		}
+	}
+
+	if (!m_userActionManagerCompPtr->CreateUserAction(userInfo, actionTypeInfo, targetInfo)){
+		SendWarningMessage(0, QStringLiteral("Unable to record user action '%1' for document '%2'").arg(QString::fromUtf8(actionTypeId), QString::fromUtf8(targetInfo.id)));
 	}
 }
 

@@ -52,6 +52,7 @@ public:
 		Q_INIT_RESOURCE(imtbaseDocumentCollectionFilterSdl);
 		Q_INIT_RESOURCE(imtbaseComplexCollectionFilterSdl);
 		Q_INIT_RESOURCE(imtbaseDocumentRevisionSdl);
+		Q_INIT_RESOURCE(imtauthAssignmentsSdl);
 		Q_INIT_RESOURCE(imtauthGroupsSdl);
 		Q_INIT_RESOURCE(imtauthRolesSdl);
 		Q_INIT_RESOURCE(imtauthUsersSdl);

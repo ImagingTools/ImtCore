@@ -93,7 +93,8 @@ Row {
 	BaseText {
 		anchors.verticalCenter: parent.verticalCenter;
 
-		text: "(" + (paginationContainer.currentIndex * paginationContainer.countElements + 1) + "-" +
+		text: paginationContainer.countAllElements === 0 ? "(0-0/0)" :
+			  "(" + (paginationContainer.currentIndex * paginationContainer.countElements + 1) + "-" +
 			  ((paginationContainer.pagesSize - 1 != paginationContainer.currentIndex) ?
 				   paginationContainer.currentValue * paginationContainer.countElements :
 				   paginationContainer.countAllElements) + "/" + paginationContainer.countAllElements + ")"

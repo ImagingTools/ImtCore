@@ -1,0 +1,41 @@
+schema {
+	namespace: imtauth
+	version: 1.0
+}
+
+
+# Kind of entity an assignment is inherited through.
+enum AssignmentSourceKind {
+	Group
+	ParentGroup
+	Role
+	ParentRole
+	DelegatedRole
+}
+
+# One step of an inheritance path, outward from the edited object.
+type AssignmentStep {
+	kind: AssignmentSourceKind!
+	id: ID!
+	name: String
+}
+
+type AssignmentPath {
+	steps: [AssignmentStep]
+}
+
+# A role, group, user or permission linked to the edited object.
+# Only direct assignments are stored on update; name and sources are filled by the server.
+type Assignment {
+	id: ID!
+	name: String
+	direct: Boolean
+	sources: [AssignmentPath]
+}
+
+# code: CycleInParentRoles | CycleInParentGroups | RoleNotFound | GroupNotFound
+type AccessWarning {
+	code: String!
+	ids: [ID]
+	message: String
+}

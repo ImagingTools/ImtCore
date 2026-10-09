@@ -12,6 +12,7 @@
 #include <imtauth/CUserGroupInfo.h>
 #include <imtauth/CUserGroupFilter.h>
 #include <imtauth/IUserInfoProvider.h>
+#include <imtauthgql/CAssignmentCollector.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtcol/CDocumentCollectionFilter.h>
 
@@ -74,18 +75,9 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 		userGroupInfoPtr->SetDescription(*groupDataRepresentation.description);
 	}
 
-	QByteArrayList userIds;
-	if (groupDataRepresentation.users){
-		userIds = groupDataRepresentation.users->ToList();
-	}
-	userIds.removeAll("");
-	userGroupInfoPtr->SetUsers(userIds);
+	userGroupInfoPtr->SetUsers(CAssignmentCollector::GetDirectIds(groupDataRepresentation.users));
 
-	QByteArrayList roleIds;
-	if (groupDataRepresentation.roles){
-		roleIds = groupDataRepresentation.roles->ToList();
-	}
-	roleIds.removeAll("");
+	const QByteArrayList roleIds = CAssignmentCollector::GetDirectIds(groupDataRepresentation.roles);
 
 	if (!roleIds.isEmpty()){
 		userGroupInfoPtr->SetRoles(productId, roleIds);
@@ -94,12 +86,10 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 		userGroupInfoPtr->RemoveProduct(productId);
 	}
 
-	if (groupDataRepresentation.parentGroups){
-		QByteArrayList groupIds = groupDataRepresentation.parentGroups->ToList();
-		for (const QByteArray& parentGroupId : groupIds){
-			if (!parentGroupId.isEmpty()){
-				userGroupInfoPtr->AddParentGroup(parentGroupId);
-			}
+	for (const QByteArray& parentGroupId : CAssignmentCollector::GetDirectIds(groupDataRepresentation.parentGroups)){
+		if (!userGroupInfoPtr->AddParentGroup(parentGroupId)){
+			errorMessage = QStringLiteral("Group '%1' cannot be a parent group: it would create a cycle").arg(QString::fromUtf8(parentGroupId));
+			return false;
 		}
 	}
 
@@ -390,14 +380,9 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	representationPayload.description = QString(userGroupInfoPtr->GetDescription());
 	representationPayload.productId = productId;
 
-	imtauth::IUserGroupInfo::UserIds userIds = userGroupInfoPtr->GetUsers();
-	representationPayload.users.Emplace().FromList(userIds);
-
-	imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles(productId);
-	representationPayload.roles.Emplace().FromList(roleIds);
-
-	imtauth::IUserGroupInfo::GroupIds groupIds = userGroupInfoPtr->GetParentGroups();
-	representationPayload.parentGroups.Emplace().FromList(groupIds);
+	CAssignmentCollector collector;
+	collector.CollectGroup(*userGroupInfoPtr, userGroupInfoPtr->GetObjectUuid(), productId);
+	collector.FillGroup(representationPayload);
 
 	return true;
 }

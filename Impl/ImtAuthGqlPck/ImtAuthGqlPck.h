@@ -20,7 +20,6 @@
 #include <imtauthgql/CSessionModelObserverComp.h>
 #include <imtauthgql/CSessionModelSubscriberControllerComp.h>
 #include <imtauthgql/CLdapAuthorizationControllerComp.h>
-#include <imtauthgql/CUserSerializableCollectionControllerComp.h>
 #include <imtauthgql/CUserSettingsControllerComp.h>
 #include <imtauthgql/CProfileControllerComp.h>
 #include <imtauthgql/CRoleRemoteCollectionControllerComp.h>
@@ -90,7 +89,6 @@ typedef imtauthgql::CRemotePermissionCheckerComp RemotePermissionChecker;
 typedef imtauthgql::CSessionModelObserverComp SessionModelObserver;
 typedef imtauthgql::CSessionModelSubscriberControllerComp SessionModelSubscriberController;
 typedef imtauthgql::CLdapAuthorizationControllerComp LdapAuthorizationController;
-typedef imtauthgql::CUserSerializableCollectionControllerComp UserSerializableCollectionController;
 typedef imtauthgql::CUserSettingsControllerComp UserSettingsController;
 typedef imtauthgql::CProfileControllerComp ProfileController;
 typedef imtauthgql::CRoleRemoteCollectionControllerComp RoleRemoteCollectionController;

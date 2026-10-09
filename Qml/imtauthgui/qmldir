@@ -68,4 +68,7 @@ RelationshipView 1.0 RelationshipView.qml
 MessageView 1.0 MessageView.qml
 StatusBadge 1.0 StatusBadge.qml
 TenantCollectionListView 1.0 TenantCollectionListView.qml
+PermissionSourcesPage 1.0 PermissionSourcesPage.qml
+AssignmentsTable 1.0 AssignmentsTable.qml
+AssignmentsRefresher 1.0 AssignmentsRefresher.qml
 

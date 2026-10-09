@@ -476,6 +476,9 @@ macro(getImtAuthQmlWebDirs webdirs buildwebdir)
 	list(APPEND ${webdirs} ${IMTCOREDIR}/Qml/imtauthgui)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthgui)
 
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAssignmentsSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthAssignmentsSdl)
+
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthGroupsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthGroupsSdl)
 

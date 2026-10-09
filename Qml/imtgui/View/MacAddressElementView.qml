@@ -25,7 +25,7 @@ TextInputElementView {
         if (prevText.length < text.length){
             block = true;
 
-            rootElement.text = macAddressValidator.convert(rootElement.text);
+            rootElement.text = macAddressValidator.convert(rootElement.text.replace(/[^0-9A-Fa-f:]/g, ""));
 
             block = false;
         }

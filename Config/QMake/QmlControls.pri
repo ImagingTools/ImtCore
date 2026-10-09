@@ -42,6 +42,7 @@ defineTest(prepareWebQml) {
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imt2dsdl/SDL/1.0/QML/imt2dGeometrySdl, $$buildwebdir/src/imt2dGeometrySdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imt2dsdl/SDL/1.0/QML/imt2dPaintSystemSdl, $$buildwebdir/src/imt2dPaintSystemSdl)
 
+	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthAssignmentsSdl, $$buildwebdir/src/imtauthAssignmentsSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthGroupsSdl, $$buildwebdir/src/imtauthGroupsSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthRolesSdl, $$buildwebdir/src/imtauthRolesSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthUsersSdl, $$buildwebdir/src/imtauthUsersSdl)

@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtauth/CUserGroupInfo.h>
 #include <imtauth/IUserGroupInfo.h>
+#include <imtauthgql/CAssignmentCollector.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/GroupCollectionDocumentService.h>
@@ -57,24 +58,11 @@ sdl::V1_0::imtauth::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroupRe
 	response.name = groupPtr->GetName();
 	response.description = groupPtr->GetDescription();
 
-	response.users.Emplace();
-	for (const QByteArray& userIdInGroup : groupPtr->GetUsers()){
-		response.users->push_back(userIdInGroup);
-	}
-
-	response.parentGroups.Emplace();
-	for (const QByteArray& parentGroupId : groupPtr->GetParentGroups()){
-		response.parentGroups->push_back(parentGroupId);
-	}
-
 	// Roles are productId-scoped on IUserBaseInfo; without a tenant context
-	// here we expose all products' roles concatenated.
-	response.roles.Emplace();
-	for (const QByteArray& productId : groupPtr->GetProducts()){
-		for (const QByteArray& roleId : groupPtr->GetRoles(productId)){
-			response.roles->push_back(roleId);
-		}
-	}
+	// here the roles of all products are collected.
+	CAssignmentCollector collector;
+	collector.CollectGroup(*groupPtr, groupPtr->GetObjectUuid(), QByteArray(), getGroupRepresentationRequest.GetRequestInfo().isUsersRequested);
+	collector.FillGroup(response);
 
 	return response;
 }
@@ -130,13 +118,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 	}
 
 	if (groupData.users){
-		imtauth::IUserGroupInfo::UserIds userIds;
-		for (const auto& userIdPtr : *groupData.users){
-			if (userIdPtr){
-				userIds.append(*userIdPtr);
-			}
-		}
-		groupPtr->SetUsers(userIds);
+		groupPtr->SetUsers(CAssignmentCollector::GetDirectIds(groupData.users));
 	}
 
 	if (groupData.parentGroups){
@@ -145,22 +127,17 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 		for (const QByteArray& parentGroupId : currentParents){
 			groupPtr->RemoveParentGroup(parentGroupId);
 		}
-		for (const auto& parentGroupIdPtr : *groupData.parentGroups){
-			if (parentGroupIdPtr){
-				groupPtr->AddParentGroup(*parentGroupIdPtr);
+		for (const QByteArray& parentGroupId : CAssignmentCollector::GetDirectIds(groupData.parentGroups)){
+			if (!groupPtr->AddParentGroup(parentGroupId)){
+				errorMessage = QStringLiteral("Group '%1' cannot be a parent group: it would create a cycle").arg(QString::fromUtf8(parentGroupId));
+				return response;
 			}
 		}
 	}
 
 	if (groupData.roles && groupData.productId){
 		QByteArray productId = *groupData.productId;
-		imtauth::IUserBaseInfo::RoleIds roleIds;
-		for (const auto& roleIdPtr : *groupData.roles){
-			if (roleIdPtr){
-				roleIds.append(*roleIdPtr);
-			}
-		}
-		groupPtr->SetRoles(productId, roleIds);
+		groupPtr->SetRoles(productId, CAssignmentCollector::GetDirectIds(groupData.roles));
 	}
 
 	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);

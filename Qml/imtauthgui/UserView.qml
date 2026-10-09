@@ -20,6 +20,9 @@ DocumentViewBase {
 	property UserData userData: model;
 	property string productId;
 
+	// Permission tree of the product [{groupId, groupName, entries: [{permissionId, displayName}]}], for display names.
+	property var permissionGroups: []
+
 	// PasswordPolicyController instance, injected by the owning api client.
 	property var passwordPolicy: null;
 	
@@ -42,6 +45,11 @@ DocumentViewBase {
 		var groupsPageInstance = multiPageView.getPageById("Groups")
 		if (groupsPageInstance)
 			groupsPageInstance.updateGui()
+		var permissionsPageInstance = multiPageView.getPageById("Permissions")
+		if (permissionsPageInstance)
+			permissionsPageInstance.updateGui()
+	
+		container.updateBadges()
 	}
 	
 	function updateModel(){
@@ -59,8 +67,43 @@ DocumentViewBase {
 		if (groupsPageInstance)
 			groupsPageInstance.updateModel()
 		userData.m_productId = container.productId;
+	
+		container.updateBadges()
 	}
 	
+	// Emitted after a change of the direct assignments that other ones are inherited through.
+	signal assignmentsChanged()
+
+	// The inherited assignments are being recalculated.
+	property bool assignmentsUpdating: false
+
+	// Shows the recalculated assignment lists on the loaded pages.
+	function updateAssignments(){
+		container.setBlockingUpdateModel(true)
+		var rolesPageInstance = multiPageView.getPageById("Roles")
+		if (rolesPageInstance)
+			rolesPageInstance.updateGui()
+		var groupsPageInstance = multiPageView.getPageById("Groups")
+		if (groupsPageInstance)
+			groupsPageInstance.updateGui()
+		var permissionsPageInstance = multiPageView.getPageById("Permissions")
+		if (permissionsPageInstance)
+			permissionsPageInstance.updateGui()
+		container.updateBadges()
+		container.setBlockingUpdateModel(false)
+	}
+
+	// Item counts next to the page names.
+	function updateBadges(){
+		if (!container.userData){
+			return
+		}
+
+		multiPageView.setPageBadge("Roles", String(container.userData.m_roles ? container.userData.m_roles.count : 0))
+		multiPageView.setPageBadge("Groups", String(container.userData.m_groups ? container.userData.m_groups.count : 0))
+		multiPageView.setPageBadge("Permissions", String(container.userData.m_permissions ? container.userData.m_permissions.count : 0))
+	}
+
 	function getHeaders(){
 		return {}
 	}
@@ -103,12 +146,14 @@ DocumentViewBase {
 			// Labelled by what they are *for this user*, so they don't read as the
 			// identically-named top-level Roles/Groups collections in
 			// AdministrationView. Page ids stay untouched, they are the API.
-			multiPageView.addPage("Roles", qsTr("Assigned Roles"), rolesPageComp, "Icons/Role")
+			multiPageView.addPage("Roles", qsTr("User Roles"), rolesPageComp, "Icons/Role")
 			multiPageView.addPage("Groups", qsTr("Group Membership"), groupsPageComp, "Icons/Organization")
+			multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Key")
 			if (PermissionsController.checkPermission("ViewRevisions")){
 				multiPageView.addPage("History", qsTr("History"), historyPageComp, "Icons/History")
 			}
 			multiPageView.currentIndex = 0
+			container.updateBadges()
 		}
 
 		Component.onCompleted: {
@@ -378,111 +423,147 @@ DocumentViewBase {
 			anchors.fill: parent
 
 			function updateGui(){
-				rolesGroup.updateGui();
+				if (!container.userData){
+					return
+				}
+
+				rolesTable.loadAssignments(container.userData.m_roles)
 			}
 
 			function updateModel(){
-				rolesGroup.updateModel();
+				if (!container.userData){
+					return
+				}
+
+				if (!container.userData.hasRoles()){
+					container.userData.emplaceRoles()
+				}
+
+				var added = rolesTable.syncAssignments(container.userData.m_roles)
+				for (var i = 0; i < added.length; i++){
+					var assignment = container.userData.createRolesArrayElement()
+					assignment.m_id = added[i].id
+					assignment.m_name = added[i].title
+					assignment.m_direct = true
+					container.userData.m_roles.addElement(assignment)
+				}
 			}
 
 			Component.onCompleted: {
 				rolesPage.updateGui();
 			}
 
-			CustomScrollbar {
-				id: scrollbar;
-				z: parent.z + 1;
-				anchors.right: parent.right;
-				anchors.top: flickable.top;
-				anchors.bottom: flickable.bottom;
-				secondSize: 10;
-				targetItem: flickable;
-			}
+			Column {
+				id: rolesHeader
+				anchors.top: parent.top
+				anchors.topMargin: Style.marginXL
+				x: Math.max(0, (rolesPage.width - width) / 2)
+				width: Math.max(0, Math.min(Style.contentWidthMax, rolesPage.width - 2 * Style.marginXL))
+				spacing: Style.marginM
 
-			Flickable {
-				id: flickable;
-				anchors.top: parent.top;
-				anchors.topMargin: Style.marginXL;
-				anchors.bottom: parent.bottom;
-				anchors.bottomMargin: Style.marginXL;
-				anchors.left: parent.left;
-				anchors.leftMargin: Style.marginXL;
-				anchors.right: scrollbar.left;
-				anchors.rightMargin: Style.marginXL;
-				contentHeight: bodyColumn.height + 2 * Style.marginXL;
+				GroupHeaderView {
+					width: parent.width
+					title: qsTr("Roles") + " (" + rolesTable.itemsCount + ")" + (container.assignmentsUpdating ? "   " + qsTr("Updating...") : "")
+					controlComp: Component {
+						Row {
+							anchors.verticalCenter: parent.verticalCenter
+							spacing: Style.marginL
 
-				boundsBehavior: Flickable.StopAtBounds;
-				clip: true;
+							Text {
+								objectName: "RemoveRoleLink"
+								anchors.verticalCenter: parent.verticalCenter
+								text: qsTr("Remove") + " (" + rolesTable.selectedCount + ")"
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: rolesTable.selectedCount > 0 ? Style.linkColor : Style.inactiveTextColor
 
-				Column {
-					id: bodyColumn;
-					anchors.horizontalCenter: parent.horizontalCenter;
-					width: Math.min(parent.width, Style.contentWidthMax);
-					spacing: Style.marginXL;
-
-					GroupHeaderView {
-						width: parent.width;
-						title: qsTr("Assigned Roles");
-						groupView: rolesGroup;
-					}
-
-					GroupElementView {
-						id: rolesGroup;
-
-						width: parent.width;
-
-						CollectionItemSelectElementView {
-							id: roleSelectableCollectionEditor
-							commandId: ImtauthRolesSdlCommandIds.s_rolesList
-							fields: [RoleItemDataTypeMetaInfo.s_id, RoleItemDataTypeMetaInfo.s_roleName]
-							titleField: RoleItemDataTypeMetaInfo.s_roleName
-							textFilterFieldIds: [RoleItemDataTypeMetaInfo.s_roleName]
-							sortByField: RoleItemDataTypeMetaInfo.s_roleName
-							label: qsTr("Roles")
-							addButtonText: qsTr("Add Role")
-							showCount: true
-
-							// The role list is scoped by product, as a header and as an input field.
-							function getHeaders(){
-								let headers = {}
-								headers["productId"] = container.productId
-								return headers
-							}
-
-							function setCustomInputParams(inputParams){
-								if (container.productId){
-									inputParams.InsertField(RoleItemInputTypeMetaInfo.s_productId, container.productId)
+								MouseArea {
+									objectName: "MouseArea"
+									anchors.fill: parent
+									enabled: rolesTable.selectedCount > 0
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: {
+										rolesTable.removeSelected()
+									}
 								}
 							}
 
-							onSelectionChanged: {
-								container.doUpdateModel()
-							}
-						}
+							Text {
+								id: rolesTableAddLink
+								objectName: "AddRoleLink"
+								anchors.verticalCenter: parent.verticalCenter
+								text: "+ " + qsTr("Add Role")
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: Style.linkColor
 
-						function updateGui(){
-							if (!container.userData){
-								return
+								MouseArea {
+									objectName: "MouseArea"
+									anchors.fill: parent
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: {
+										roleSelectableCollectionEditor.items = rolesTable.directItems()
+										roleSelectableCollectionEditor.openSelector(rolesTableAddLink)
+									}
+								}
 							}
-
-							var ids = container.userData.m_roles ? container.userData.m_roles.slice() : []
-							var arr = []
-							for (var i = 0; i < ids.length; i++)
-								arr.push({id: ids[i], name: ids[i]})
-							roleSelectableCollectionEditor.items = arr
-						}
-						
-						function updateModel(){
-							if (!container.userData){
-								return
-							}
-
-							var arr = []
-							for (var i = 0; i < roleSelectableCollectionEditor.items.length; i++)
-								arr.push(roleSelectableCollectionEditor.items[i].id)
-							container.userData.m_roles = arr
 						}
 					}
+				}
+
+				CollectionItemSelectElementView {
+					id: roleSelectableCollectionEditor
+					width: parent.width
+					commandId: ImtauthRolesSdlCommandIds.s_rolesList
+					fields: [RoleItemDataTypeMetaInfo.s_id, RoleItemDataTypeMetaInfo.s_roleName]
+					titleField: RoleItemDataTypeMetaInfo.s_roleName
+					textFilterFieldIds: [RoleItemDataTypeMetaInfo.s_roleName]
+					sortByField: RoleItemDataTypeMetaInfo.s_roleName
+					label: qsTr("Roles")
+					addButtonText: qsTr("Add Role")
+					visible: false
+
+					// The role list is scoped by product, as a header and as an input field.
+					function getHeaders(){
+						let headers = {}
+						headers["productId"] = container.productId
+						return headers
+					}
+
+					function setCustomInputParams(inputParams){
+						if (container.productId){
+							inputParams.InsertField(RoleItemInputTypeMetaInfo.s_productId, container.productId)
+						}
+					}
+
+					onSelectionChanged: {
+						rolesTable.setDirectItems(roleSelectableCollectionEditor.items)
+						container.doUpdateModel()
+						container.assignmentsChanged()
+					}
+				}
+			}
+
+			AssignmentsTable {
+				id: rolesTable
+				anchors.top: rolesHeader.bottom
+				anchors.topMargin: Style.marginM
+				anchors.bottom: parent.bottom
+				anchors.bottomMargin: Style.marginXL
+				x: rolesHeader.x
+				width: rolesHeader.width
+				editable: true
+				navigationPath: "Administration/Roles/Role/"
+				nameTitle: qsTr("Role")
+				emptyText: qsTr("No roles are assigned.")
+				filterPlaceholder: qsTr("Filter roles...")
+
+
+				onRemoved: {
+					container.doUpdateModel()
+					container.assignmentsChanged()
 				}
 			}
 		}
@@ -496,101 +577,149 @@ DocumentViewBase {
 			anchors.fill: parent
 
 			function updateGui(){
-				groupsBlock.updateGui();
+				if (!container.userData){
+					return
+				}
+
+				groupsTable.loadAssignments(container.userData.m_groups)
 			}
 
 			function updateModel(){
-				groupsBlock.updateModel();
+				if (!container.userData){
+					return
+				}
+
+				if (!container.userData.hasGroups()){
+					container.userData.emplaceGroups()
+				}
+
+				var added = groupsTable.syncAssignments(container.userData.m_groups)
+				for (var i = 0; i < added.length; i++){
+					var assignment = container.userData.createGroupsArrayElement()
+					assignment.m_id = added[i].id
+					assignment.m_name = added[i].title
+					assignment.m_direct = true
+					container.userData.m_groups.addElement(assignment)
+				}
 			}
 
 			Component.onCompleted: {
 				groupsPage.updateGui();
 			}
 
-			CustomScrollbar {
-				id: scrollbar;
-				z: parent.z + 1;
-				anchors.right: parent.right;
-				anchors.top: flickable.top;
-				anchors.bottom: flickable.bottom;
-				secondSize: 10;
-				targetItem: flickable;
-			}
+			Column {
+				id: groupsHeader
+				anchors.top: parent.top
+				anchors.topMargin: Style.marginXL
+				x: Math.max(0, (groupsPage.width - width) / 2)
+				width: Math.max(0, Math.min(Style.contentWidthMax, groupsPage.width - 2 * Style.marginXL))
+				spacing: Style.marginM
 
-			Flickable {
-				id: flickable;
-				anchors.top: parent.top;
-				anchors.topMargin: Style.marginXL;
-				anchors.bottom: parent.bottom;
-				anchors.bottomMargin: Style.marginXL;
-				anchors.left: parent.left;
-				anchors.leftMargin: Style.marginXL;
-				anchors.right: scrollbar.left;
-				anchors.rightMargin: Style.marginXL;
-				contentHeight: bodyColumn.height + 2 * Style.marginXL;
+				GroupHeaderView {
+					width: parent.width
+					title: qsTr("Groups") + " (" + groupsTable.itemsCount + ")" + (container.assignmentsUpdating ? "   " + qsTr("Updating...") : "")
+					controlComp: Component {
+						Row {
+							anchors.verticalCenter: parent.verticalCenter
+							spacing: Style.marginL
 
-				boundsBehavior: Flickable.StopAtBounds;
-				clip: true;
+							Text {
+								objectName: "RemoveGroupLink"
+								anchors.verticalCenter: parent.verticalCenter
+								text: qsTr("Remove") + " (" + groupsTable.selectedCount + ")"
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: groupsTable.selectedCount > 0 ? Style.linkColor : Style.inactiveTextColor
 
-				Column {
-					id: bodyColumn;
-					anchors.horizontalCenter: parent.horizontalCenter;
-					width: Math.min(parent.width, Style.contentWidthMax);
-					spacing: Style.marginXL;
-
-					GroupHeaderView {
-						width: parent.width;
-						
-						title: qsTr("Group Membership");
-						groupView: groupsBlock;
-					}
-					
-					GroupElementView {
-						id: groupsBlock;
-						
-						width: parent.width;
-
-						CollectionItemSelectElementView {
-							id: groupSelectableCollectionEditor
-							commandId: ImtauthGroupsSdlCommandIds.s_groupsList
-							fields: [GroupItemDataTypeMetaInfo.s_id, GroupItemDataTypeMetaInfo.s_name]
-							titleField: GroupItemDataTypeMetaInfo.s_name
-							textFilterFieldIds: [GroupItemDataTypeMetaInfo.s_name]
-							sortByField: GroupItemDataTypeMetaInfo.s_name
-							label: qsTr("Groups")
-							addButtonText: qsTr("Add Group")
-							showCount: true
-
-							onSelectionChanged: {
-								container.doUpdateModel()
-							}
-						}
-
-						function updateGui(){
-							if (!container.userData){
-								return
+								MouseArea {
+									objectName: "MouseArea"
+									anchors.fill: parent
+									enabled: groupsTable.selectedCount > 0
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: {
+										groupsTable.removeSelected()
+									}
+								}
 							}
 
-							var ids = container.userData.m_groups ? container.userData.m_groups.slice() : []
-							var arr = []
-							for (var i = 0; i < ids.length; i++)
-								arr.push({id: ids[i], name: ids[i]})
-							groupSelectableCollectionEditor.items = arr
-						}
-						
-						function updateModel(){
-							if (!container.userData){
-								return
-							}
+							Text {
+								id: groupsTableAddLink
+								objectName: "AddGroupLink"
+								anchors.verticalCenter: parent.verticalCenter
+								text: "+ " + qsTr("Add Group")
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: Style.linkColor
 
-							var arr = []
-							for (var i = 0; i < groupSelectableCollectionEditor.items.length; i++)
-								arr.push(groupSelectableCollectionEditor.items[i].id)
-							container.userData.m_groups = arr
+								MouseArea {
+									objectName: "MouseArea"
+									anchors.fill: parent
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: {
+										groupSelectableCollectionEditor.items = groupsTable.directItems()
+										groupSelectableCollectionEditor.openSelector(groupsTableAddLink)
+									}
+								}
+							}
 						}
 					}
 				}
+
+				CollectionItemSelectElementView {
+					id: groupSelectableCollectionEditor
+					width: parent.width
+					commandId: ImtauthGroupsSdlCommandIds.s_groupsList
+					fields: [GroupItemDataTypeMetaInfo.s_id, GroupItemDataTypeMetaInfo.s_name]
+					titleField: GroupItemDataTypeMetaInfo.s_name
+					textFilterFieldIds: [GroupItemDataTypeMetaInfo.s_name]
+					sortByField: GroupItemDataTypeMetaInfo.s_name
+					label: qsTr("Groups")
+					addButtonText: qsTr("Add Group")
+					visible: false
+
+					onSelectionChanged: {
+						groupsTable.setDirectItems(groupSelectableCollectionEditor.items)
+						container.doUpdateModel()
+						container.assignmentsChanged()
+					}
+				}
 			}
+
+			AssignmentsTable {
+				id: groupsTable
+				anchors.top: groupsHeader.bottom
+				anchors.topMargin: Style.marginM
+				anchors.bottom: parent.bottom
+				anchors.bottomMargin: Style.marginXL
+				x: groupsHeader.x
+				width: groupsHeader.width
+				editable: true
+				navigationPath: "Administration/Groups/Group/"
+				nameTitle: qsTr("Group")
+				emptyText: qsTr("The user is not a member of any group.")
+				filterPlaceholder: qsTr("Filter groups...")
+
+
+				onRemoved: {
+					container.doUpdateModel()
+					container.assignmentsChanged()
+				}
+			}
+		}
+	}
+
+	Component {
+		id: permissionsPageComp
+
+		PermissionSourcesPage {
+			anchors.fill: parent
+			permissions: container.userData ? container.userData.m_permissions : null
+			warnings: container.userData ? container.userData.m_accessWarnings : null
+			permissionGroups: container.permissionGroups
+			updating: container.assignmentsUpdating
+			emptyText: qsTr("The user gets no permissions from roles or groups.")
 		}
 	}
 

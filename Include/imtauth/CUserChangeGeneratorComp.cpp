@@ -139,16 +139,6 @@ void CUserChangeGeneratorComp::CompareProductRoles(
 					QT_TRANSLATE_NOOP("Attribute", "Role"),
 					inOld ? oldUserInfo.GetRoles(productId) : QByteArrayList(),
 					inNew ? newUserInfo.GetRoles(productId) : QByteArrayList());
-
-		// Permissions granted directly to the user, independently of the roles.
-		InsertListChanges(
-					documentChangeCollection,
-					"AddPermission",
-					"RemovePermission",
-					"Permission",
-					QT_TRANSLATE_NOOP("Attribute", "Permission"),
-					inOld ? oldUserInfo.GetLocalPermissions(productId) : QByteArrayList(),
-					inNew ? newUserInfo.GetLocalPermissions(productId) : QByteArrayList());
 	}
 
 	InsertListChanges(

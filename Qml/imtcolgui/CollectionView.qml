@@ -570,7 +570,7 @@ Item {
 			wrapMode: Text.WordWrap;
 			color: Style.textColor;
 			
-			text: qsTr("Please select an item for showing additional informations");
+			text: qsTr("Select an item to view additional information");
 		}
 	}
 

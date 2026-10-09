@@ -10,6 +10,8 @@
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
+#include <imtbase/COperationContext.h>
+#include <imtbase/CObjectCollection.h>
 #include <imtlic/IFeatureInfo.h>
 #include <GeneratedFiles/imtlicsdl/SDL/1.0/CPP/Features.h>
 
@@ -140,7 +142,7 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 		// Use the (possibly tenant-adapted) roles list. The adaptation has
 		// already filtered according to tenant bindings and appended any
 		// delegated roles.
-		const QByteArrayList roles = effectiveUserPtr->GetRoles(currentProductId);
+		const QByteArrayList roles = GetEffectiveUserRoles(*effectiveUserPtr, currentProductId);
 
 		for (const QByteArray& roleId : std::as_const(roles)){
 			imtbase::IObjectCollection::DataPtr roleDataPtr;
@@ -191,7 +193,7 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 
 	// Permissions from the adapted user (consistent with the binding-based
 	// tenant adaptation used for user collection views).
-	QByteArrayList permissions = effectiveUserPtr->GetPermissions(currentProductId);
+	QByteArrayList permissions = GetTenantUserPermissions(*effectiveUserPtr, currentTenantId, currentProductId, bindingPtr, roleProvPtr);
 	for (const QByteArray& permissionId : std::as_const(permissions)){
 		sdl::V1_0::imtauth::CPermissionInfo info;
 		info.id = permissionId;
@@ -357,7 +359,7 @@ imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerC
 
 sdl::V1_0::imtauth::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 			const sdl::V1_0::imtauth::CSetProfileGqlRequest& setProfileRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CSetProfileResponse response;
@@ -372,6 +374,16 @@ sdl::V1_0::imtauth::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 	QByteArray id;
 	if (arguments.input->id){
 		id = *arguments.input->id;
+	}
+
+	// Only the superuser may change another user's profile.
+	const imtgql::IGqlContext* requestContextPtr = gqlRequest.GetRequestContext();
+	const QByteArray requestUserId = (requestContextPtr != nullptr) ? requestContextPtr->GetUserId() : QByteArray();
+	if ((requestUserId.isEmpty() || requestUserId != id) && !IsSuperuserRequest(gqlRequest)){
+		errorMessage = QStringLiteral("Unable to set a profile info. Error: Only the superuser can change the profile of another user");
+		SendWarningMessage(0, errorMessage, "CProfileControllerComp");
+
+		return sdl::V1_0::imtauth::CSetProfileResponse();
 	}
 
 	imtauth::IUserInfo* userInfoPtr = nullptr;
@@ -398,7 +410,29 @@ sdl::V1_0::imtauth::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 	userInfoPtr->SetName(name);
 	userInfoPtr->SetMail(email);
 
-	if (!m_userCollectionCompPtr->SetObjectData(id, *userInfoPtr)){
+	imtbase::COperationContext operationContext;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		const imtauth::CIdentifiableUserInfo* requestUserPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(gqlContextPtr->GetUserInfo());
+		if (requestUserPtr != nullptr){
+			imtbase::IOperationContext::IdentifableObjectInfo ownerInfo;
+			ownerInfo.id = requestUserPtr->GetObjectUuid();
+			ownerInfo.name = requestUserPtr->GetName();
+			operationContext.SetOperationOwnerId(ownerInfo);
+		}
+
+		operationContext.SetTenantId(gqlContextPtr->GetTenantId());
+	}
+
+	if (m_userChangeGeneratorCompPtr.IsValid()){
+		imtbase::CObjectCollection* changesCollectionPtr = dynamic_cast<imtbase::CObjectCollection*>(operationContext.GetChangesCollection());
+		QString changesErrorMessage;
+		if (changesCollectionPtr != nullptr && !m_userChangeGeneratorCompPtr->GenerateDocumentChanges("Update", id, userInfoPtr, *changesCollectionPtr, changesErrorMessage, nullptr)){
+			SendWarningMessage(0, QStringLiteral("Unable to generate profile changes for user '%1'. Error: %2").arg(QString::fromUtf8(id), changesErrorMessage));
+		}
+	}
+
+	if (!m_userCollectionCompPtr->SetObjectData(id, *userInfoPtr, istd::IChangeable::CM_WITHOUT_REFS, &operationContext)){
 		errorMessage = QStringLiteral("Unable to set a profile info. Error: User collection cannot to update an object with ID '%1'").arg(id);
 
 		return sdl::V1_0::imtauth::CSetProfileResponse();

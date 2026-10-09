@@ -155,6 +155,12 @@ Item{
 				ctx.fillText(value.toString(), offsetLeft - 6, y)
 			}
 
+			let maxLabelWidth = 0
+			for (let i = 0; i < totalBars; i++){
+				maxLabelWidth = Math.max(maxLabelWidth, ctx.measureText(chart.bars[i].label).width)
+			}
+			let labelStep = Math.max(1, Math.ceil((maxLabelWidth + 6) / (barWidth + spacing)))
+
 			for (let i = 0; i < totalBars; i++){
 				let bar = chart.bars[i]
 				let x = offsetX + i * (barWidth + spacing)
@@ -194,7 +200,9 @@ Item{
 				ctx.font = Style.fontSizeXS + "px " + Style.fontFamily
 				ctx.textAlign = "center"
 				ctx.textBaseline = "top"
-				ctx.fillText(bar.label, x + barWidth / 2, baseY + 6)
+				if (i % labelStep === 0){
+					ctx.fillText(bar.label, x + barWidth / 2, baseY + 6)
+				}
 			}
 
 			ctx.save()

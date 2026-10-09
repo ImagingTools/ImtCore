@@ -21,6 +21,7 @@
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtauth/ITenantInvitation.h>
 #include <imtauth/ISession.h>
+#include <imtauthgql/CAssignmentCollector.h>
 
 
 namespace imtauthgql
@@ -156,20 +157,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 		userInfoPtr->SetEnabled(*representation.enabled);
 	}
 
-	imtauth::IUserInfo::FeatureIds permissions;
-	if (representation.permissions){
-		permissions = representation.permissions->ToList();
-	}
-
-	permissions.removeAll("");
-	userInfoPtr->SetLocalPermissions(productId, permissions);
-
-	QByteArrayList roleIds;
-	if (representation.roles){
-		roleIds = representation.roles->ToList();
-	}
-
-	roleIds.removeAll("");
+	const QByteArrayList roleIds = CAssignmentCollector::GetDirectIds(representation.roles);
 	if (!roleIds.isEmpty()){
 		userInfoPtr->SetRoles(productId, roleIds);
 	}
@@ -177,11 +165,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 		userInfoPtr->RemoveProduct(productId);
 	}
 
-	QByteArrayList groupIds;
-	if (representation.groups){
-		groupIds = representation.groups->ToList();
-	}
-	groupIds.removeAll("");
+	const QByteArrayList groupIds = CAssignmentCollector::GetDirectIds(representation.groups);
 	for (const QByteArray& groupId : groupIds){
 		if (!groupId.isEmpty()){
 			userInfoPtr->AddToGroup(groupId);
@@ -593,17 +577,12 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 
 	representationPayload.enabled = bool(userInfoPtr->IsEnabled());
 
-	QByteArrayList groupList = userInfoPtr->GetGroups();
-	std::sort(groupList.begin(), groupList.end());
-	representationPayload.groups.Emplace().FromList(groupList);
-
 	QByteArrayList roleList = userInfoPtr->GetRoles(productId);
 	std::sort(roleList.begin(), roleList.end());
-	representationPayload.roles.Emplace().FromList(roleList);
 
-	QByteArrayList permissions = userInfoPtr->GetPermissions(productId);
-	std::sort(permissions.begin(), permissions.end());
-	representationPayload.permissions.Emplace().FromList(permissions);
+	CAssignmentCollector collector;
+	collector.CollectUser(*userInfoPtr, roleList, roleList, productId);
+	collector.FillUser(representationPayload);
 
 	imtsdl::TElementList<sdl::V1_0::imtauth::CSystemInfo> list;
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
@@ -709,7 +688,8 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 	imtauth::ITenantMembershipManager* membershipPtr = m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr;
 	imtauth::IRoleInfoProvider* roleProviderPtr = m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr;
 
-	istd::IChangeableUniquePtr tenantAdapted = AdaptUserForTenant(
+	// Invalid result means the stored object needs no tenant filtering.
+	istd::IChangeableUniquePtr adaptedPtr = AdaptUserForTenant(
 				objectId,
 				object,
 				currentTenantId,
@@ -719,29 +699,33 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 				membershipPtr,
 				roleProviderPtr);
 
-	if (tenantAdapted.IsValid()){
-		return tenantAdapted;
+	if (currentProductId.isEmpty()){
+		return adaptedPtr;
 	}
 
-	// AdaptUserForTenant returned invalid meaning no tenant filtering was needed
-	// (e.g. the user only has global / non-tenant-bound roles). The original object
-	// still carries only role IDs, which a provider-less consumer (auth gateway,
-	// client UI) cannot expand into permissions. Materialize the resolved permissions
-	// into local permissions so they survive serialization.
-	const imtauth::IUserInfo* srcUserPtr = dynamic_cast<const imtauth::IUserInfo*>(&object);
-	if (srcUserPtr != nullptr && !currentProductId.isEmpty()){
-		imtauth::IUserInfo::FeatureIds resolvedPermissions = srcUserPtr->GetPermissions(currentProductId);
-		if (!resolvedPermissions.isEmpty()){
-			istd::IChangeableUniquePtr clonedPtr = object.CloneMe();
-			imtauth::IUserInfo* mutableUserPtr = dynamic_cast<imtauth::IUserInfo*>(clonedPtr.GetPtr());
-			if (mutableUserPtr != nullptr){
-				mutableUserPtr->SetLocalPermissions(currentProductId, resolvedPermissions);
-				return clonedPtr;
-			}
-		}
+	// Remote consumers expand roles through the caller's token, which a PAT cannot do; send the resolved permissions with the object.
+	const imtauth::IUserInfo* sourceUserPtr = adaptedPtr.IsValid()
+				? dynamic_cast<const imtauth::IUserInfo*>(adaptedPtr.GetPtr())
+				: dynamic_cast<const imtauth::IUserInfo*>(&object);
+	if (sourceUserPtr == nullptr){
+		return adaptedPtr;
 	}
 
-	return baseAdaptedPtr;
+	const imtauth::IUserInfo::FeatureIds resolvedPermissions = GetTenantUserPermissions(*sourceUserPtr, currentTenantId, currentProductId, bindingPtr, roleProviderPtr);
+	if (resolvedPermissions.isEmpty()){
+		return adaptedPtr;
+	}
+
+	if (!adaptedPtr.IsValid()){
+		adaptedPtr = object.CloneMe();
+	}
+
+	imtauth::IUserInfo* resultUserPtr = dynamic_cast<imtauth::IUserInfo*>(adaptedPtr.GetPtr());
+	if (resultUserPtr != nullptr){
+		resultUserPtr->SetLocalPermissions(currentProductId, resolvedPermissions);
+	}
+
+	return adaptedPtr;
 }
 
 

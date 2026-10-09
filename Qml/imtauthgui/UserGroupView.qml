@@ -16,6 +16,8 @@ ViewBase {
 	contentColor: Style.baseColor
 	property GroupData groupData: model;
 	property string productId;
+	// Permission tree of the product [{groupId, groupName, entries: [{permissionId, displayName}]}], for display names.
+	property var permissionGroups: []
 
 	function updateGui(){
 		var generalPageInstance = multiPageView.getPageByIndex(0)
@@ -30,6 +32,11 @@ ViewBase {
 		var rolesPageInstance = multiPageView.getPageById("Roles")
 		if (rolesPageInstance)
 			rolesPageInstance.updateGui()
+		var permissionsPageInstance = multiPageView.getPageById("Permissions")
+		if (permissionsPageInstance)
+			permissionsPageInstance.updateGui()
+	
+		container.updateBadges()
 	}
 	
 	function updateModel(){
@@ -51,8 +58,44 @@ ViewBase {
 			rolesPageInstance.updateModel()
 		
 		groupData.m_productId = productId;
+	
+		container.updateBadges()
 	}
 	
+	// Emitted after a change of the direct assignments that other ones are inherited through.
+	signal assignmentsChanged()
+
+	// The inherited assignments are being recalculated.
+	property bool assignmentsUpdating: false
+
+	// Shows the recalculated assignment lists on the loaded pages.
+	function updateAssignments(){
+		container.setBlockingUpdateModel(true)
+		var parentGroupsPageInstance = multiPageView.getPageById("ParentGroups")
+		if (parentGroupsPageInstance)
+			parentGroupsPageInstance.updateGui()
+		var rolesPageInstance = multiPageView.getPageById("Roles")
+		if (rolesPageInstance)
+			rolesPageInstance.updateGui()
+		var permissionsPageInstance = multiPageView.getPageById("Permissions")
+		if (permissionsPageInstance)
+			permissionsPageInstance.updateGui()
+		container.updateBadges()
+		container.setBlockingUpdateModel(false)
+	}
+
+	// Item counts next to the page names.
+	function updateBadges(){
+		if (!container.groupData){
+			return
+		}
+
+		multiPageView.setPageBadge("ParentGroups", String(container.groupData.m_parentGroups ? container.groupData.m_parentGroups.count : 0))
+		multiPageView.setPageBadge("Users", String(container.groupData.m_users ? container.groupData.m_users.count : 0))
+		multiPageView.setPageBadge("Roles", String(container.groupData.m_roles ? container.groupData.m_roles.count : 0))
+		multiPageView.setPageBadge("Permissions", String(container.groupData.m_permissions ? container.groupData.m_permissions.count : 0))
+	}
+
 	function getHeaders(){
 		return {}
 	}
@@ -70,11 +113,13 @@ ViewBase {
 			// AdministrationView. Page ids stay untouched, they are the API.
 			multiPageView.addPage("ParentGroups", qsTr("Parent Groups"), parentGroupsPageComp, "Icons/Organization")
 			multiPageView.addPage("Users", qsTr("Members"), usersPageComp, "Icons/MultipleUser")
-			multiPageView.addPage("Roles", qsTr("Assigned Roles"), rolesPageComp, "Icons/Role")
+			multiPageView.addPage("Roles", qsTr("Group Roles"), rolesPageComp, "Icons/Role")
+			multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Key")
 			if (PermissionsController.checkPermission("ViewRevisions")){
 				multiPageView.addPage("History", qsTr("History"), historyPageComp, "Icons/History")
 			}
 			multiPageView.currentIndex = 0
+			container.updateBadges()
 		}
 
 		Component.onCompleted: {
@@ -212,99 +257,138 @@ ViewBase {
 			anchors.fill: parent
 
 			function updateGui(){
-				parentGroupsGroup.updateGui();
+				if (!container.groupData){
+					return
+				}
+
+				parentGroupsTable.loadAssignments(container.groupData.m_parentGroups)
 			}
 
 			function updateModel(){
-				parentGroupsGroup.updateModel();
+				if (!container.groupData){
+					return
+				}
+
+				if (!container.groupData.hasParentGroups()){
+					container.groupData.emplaceParentGroups()
+				}
+
+				var added = parentGroupsTable.syncAssignments(container.groupData.m_parentGroups)
+				for (var i = 0; i < added.length; i++){
+					var assignment = container.groupData.createParentGroupsArrayElement()
+					assignment.m_id = added[i].id
+					assignment.m_name = added[i].title
+					assignment.m_direct = true
+					container.groupData.m_parentGroups.addElement(assignment)
+				}
 			}
 
 			Component.onCompleted: {
 				parentGroupsPage.updateGui();
 			}
 
-			CustomScrollbar {
-				id: scrollbar;
-				z: parent.z + 1;
-				anchors.right: parent.right;
-				anchors.top: flickable.top;
-				anchors.bottom: flickable.bottom;
-				secondSize: 10;
-				targetItem: flickable;
+			Column {
+				id: parentGroupsHeader
+				anchors.top: parent.top
+				anchors.topMargin: Style.marginXL
+				x: Math.max(0, (parentGroupsPage.width - width) / 2)
+				width: Math.max(0, Math.min(Style.contentWidthMax, parentGroupsPage.width - 2 * Style.marginXL))
+				spacing: Style.marginM
+
+				GroupHeaderView {
+					width: parent.width
+					title: qsTr("Parent Groups") + " (" + parentGroupsTable.itemsCount + ")" + (container.assignmentsUpdating ? "   " + qsTr("Updating...") : "")
+					controlComp: Component {
+						Row {
+							anchors.verticalCenter: parent.verticalCenter
+							spacing: Style.marginL
+
+							Text {
+								objectName: "RemoveParentGroupLink"
+								anchors.verticalCenter: parent.verticalCenter
+								text: qsTr("Remove") + " (" + parentGroupsTable.selectedCount + ")"
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: parentGroupsTable.selectedCount > 0 ? Style.linkColor : Style.inactiveTextColor
+
+								MouseArea {
+									objectName: "MouseArea"
+									anchors.fill: parent
+									enabled: parentGroupsTable.selectedCount > 0
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: {
+										parentGroupsTable.removeSelected()
+									}
+								}
+							}
+
+							Text {
+								id: parentGroupsTableAddLink
+								objectName: "AddParentGroupLink"
+								anchors.verticalCenter: parent.verticalCenter
+								text: "+ " + qsTr("Add Parent Group")
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: Style.linkColor
+
+								MouseArea {
+									objectName: "MouseArea"
+									anchors.fill: parent
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: {
+										groupSelectableCollectionEditor.items = parentGroupsTable.directItems()
+										groupSelectableCollectionEditor.openSelector(parentGroupsTableAddLink)
+									}
+								}
+							}
+						}
+					}
+				}
+
+				CollectionItemSelectElementView {
+					id: groupSelectableCollectionEditor
+					width: parent.width
+					commandId: ImtauthGroupsSdlCommandIds.s_groupsList
+					fields: [GroupItemDataTypeMetaInfo.s_id, GroupItemDataTypeMetaInfo.s_name]
+					titleField: GroupItemDataTypeMetaInfo.s_name
+					textFilterFieldIds: [GroupItemDataTypeMetaInfo.s_name]
+					sortByField: GroupItemDataTypeMetaInfo.s_name
+					label: qsTr("Parent Groups")
+					addButtonText: qsTr("Add Parent Group")
+					// A group cannot be its own parent.
+					excludeIds: container.groupData && container.groupData.m_id
+						? [container.groupData.m_id]
+						: []
+					visible: false
+
+					onSelectionChanged: {
+						parentGroupsTable.setDirectItems(groupSelectableCollectionEditor.items)
+						container.doUpdateModel()
+						container.assignmentsChanged()
+					}
+				}
 			}
 
-			Flickable {
-				id: flickable;
-				anchors.top: parent.top;
-				anchors.topMargin: Style.marginXL;
-				anchors.bottom: parent.bottom;
-				anchors.bottomMargin: Style.marginXL;
-				anchors.left: parent.left;
-				anchors.leftMargin: Style.marginXL;
-				anchors.right: scrollbar.left;
-				anchors.rightMargin: Style.marginXL;
-				contentHeight: bodyColumn.height + 2 * Style.marginXL;
+			AssignmentsTable {
+				id: parentGroupsTable
+				anchors.top: parentGroupsHeader.bottom
+				anchors.topMargin: Style.marginM
+				anchors.bottom: parent.bottom
+				anchors.bottomMargin: Style.marginXL
+				x: parentGroupsHeader.x
+				width: parentGroupsHeader.width
+				editable: true
+				navigationPath: "Administration/Groups/Group/"
+				nameTitle: qsTr("Group")
+				emptyText: qsTr("The group has no parent groups.")
+				filterPlaceholder: qsTr("Filter groups...")
 
-				boundsBehavior: Flickable.StopAtBounds;
-				clip: true;
 
-				Column {
-					id: bodyColumn;
-					anchors.horizontalCenter: parent.horizontalCenter;
-					width: Math.min(parent.width, Style.contentWidthMax);
-					spacing: Style.spacingXL;
-
-					GroupHeaderView {
-						width: parent.width;
-						title: qsTr("Parent Groups");
-						groupView: parentGroupsGroup;
-					}
-
-					GroupElementView {
-						id: parentGroupsGroup;
-						width: parent.width;
-
-						CollectionItemSelectElementView {
-							id: groupSelectableCollectionEditor
-							commandId: ImtauthGroupsSdlCommandIds.s_groupsList
-							fields: [GroupItemDataTypeMetaInfo.s_id, GroupItemDataTypeMetaInfo.s_name]
-							titleField: GroupItemDataTypeMetaInfo.s_name
-							textFilterFieldIds: [GroupItemDataTypeMetaInfo.s_name]
-							sortByField: GroupItemDataTypeMetaInfo.s_name
-							label: qsTr("Parent Groups")
-							addButtonText: qsTr("Add Parent Group")
-							// A group cannot be its own parent.
-							excludeIds: container.groupData && container.groupData.m_id
-								? [container.groupData.m_id]
-								: []
-							showCount: true
-
-							onSelectionChanged: {
-								container.doUpdateModel()
-							}
-						}
-
-						function updateGui(){
-							if (!container.groupData){
-								return
-							}
-							var ids = container.groupData.m_parentGroups ? container.groupData.m_parentGroups.slice() : []
-							var arr = []
-							for (var i = 0; i < ids.length; i++)
-								arr.push({id: ids[i], name: ids[i]})
-							groupSelectableCollectionEditor.items = arr
-						}
-						
-						function updateModel(){
-							if (!container.groupData){
-								return
-							}
-							var arr = []
-							for (var i = 0; i < groupSelectableCollectionEditor.items.length; i++)
-								arr.push(groupSelectableCollectionEditor.items[i].id)
-							container.groupData.m_parentGroups = arr
-						}
-					}
+				onRemoved: {
+					container.doUpdateModel()
+					container.assignmentsChanged()
 				}
 			}
 		}
@@ -318,96 +402,131 @@ ViewBase {
 			anchors.fill: parent
 
 			function updateGui(){
-				usersGroup.updateGui();
+				if (!container.groupData){
+					return
+				}
+
+				usersTable.loadAssignments(container.groupData.m_users)
 			}
 
 			function updateModel(){
-				usersGroup.updateModel();
+				if (!container.groupData){
+					return
+				}
+
+				if (!container.groupData.hasUsers()){
+					container.groupData.emplaceUsers()
+				}
+
+				var added = usersTable.syncAssignments(container.groupData.m_users)
+				for (var i = 0; i < added.length; i++){
+					var assignment = container.groupData.createUsersArrayElement()
+					assignment.m_id = added[i].id
+					assignment.m_name = added[i].title
+					assignment.m_direct = true
+					container.groupData.m_users.addElement(assignment)
+				}
 			}
 
 			Component.onCompleted: {
 				usersPage.updateGui();
 			}
 
-			CustomScrollbar {
-				id: scrollbar;
-				z: parent.z + 1;
-				anchors.right: parent.right;
-				anchors.top: flickable.top;
-				anchors.bottom: flickable.bottom;
-				secondSize: 10;
-				targetItem: flickable;
+			Column {
+				id: usersHeader
+				anchors.top: parent.top
+				anchors.topMargin: Style.marginXL
+				x: Math.max(0, (usersPage.width - width) / 2)
+				width: Math.max(0, Math.min(Style.contentWidthMax, usersPage.width - 2 * Style.marginXL))
+				spacing: Style.marginM
+
+				GroupHeaderView {
+					width: parent.width
+					title: qsTr("Members") + " (" + usersTable.itemsCount + ")"
+					controlComp: Component {
+						Row {
+							anchors.verticalCenter: parent.verticalCenter
+							spacing: Style.marginL
+
+							Text {
+								objectName: "RemoveUserLink"
+								anchors.verticalCenter: parent.verticalCenter
+								text: qsTr("Remove") + " (" + usersTable.selectedCount + ")"
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: usersTable.selectedCount > 0 ? Style.linkColor : Style.inactiveTextColor
+
+								MouseArea {
+									objectName: "MouseArea"
+									anchors.fill: parent
+									enabled: usersTable.selectedCount > 0
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: {
+										usersTable.removeSelected()
+									}
+								}
+							}
+
+							Text {
+								id: usersTableAddLink
+								objectName: "AddUserLink"
+								anchors.verticalCenter: parent.verticalCenter
+								text: "+ " + qsTr("Add User")
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: Style.linkColor
+
+								MouseArea {
+									objectName: "MouseArea"
+									anchors.fill: parent
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: {
+										userSelectableCollectionEditor.items = usersTable.directItems()
+										userSelectableCollectionEditor.openSelector(usersTableAddLink)
+									}
+								}
+							}
+						}
+					}
+				}
+
+				CollectionItemSelectElementView {
+					id: userSelectableCollectionEditor
+					width: parent.width
+					commandId: ImtauthUsersSdlCommandIds.s_usersList
+					fields: [UserItemDataTypeMetaInfo.s_id, UserItemDataTypeMetaInfo.s_name]
+					titleField: UserItemDataTypeMetaInfo.s_name
+					textFilterFieldIds: [UserItemDataTypeMetaInfo.s_name]
+					sortByField: UserItemDataTypeMetaInfo.s_name
+					label: qsTr("Users")
+					addButtonText: qsTr("Add User")
+					visible: false
+
+					onSelectionChanged: {
+						usersTable.setDirectItems(userSelectableCollectionEditor.items)
+						container.doUpdateModel()
+					}
+				}
 			}
 
-			Flickable {
-				id: flickable;
-				anchors.top: parent.top;
-				anchors.topMargin: Style.marginXL;
-				anchors.bottom: parent.bottom;
-				anchors.bottomMargin: Style.marginXL;
-				anchors.left: parent.left;
-				anchors.leftMargin: Style.marginXL;
-				anchors.right: scrollbar.left;
-				anchors.rightMargin: Style.marginXL;
-				contentHeight: bodyColumn.height + 2 * Style.marginXL;
+			AssignmentsTable {
+				id: usersTable
+				anchors.top: usersHeader.bottom
+				anchors.topMargin: Style.marginM
+				anchors.bottom: parent.bottom
+				anchors.bottomMargin: Style.marginXL
+				x: usersHeader.x
+				width: usersHeader.width
+				editable: true
+				navigationPath: "Administration/Users/User/"
+				nameTitle: qsTr("User")
+				emptyText: qsTr("The group has no members.")
+				filterPlaceholder: qsTr("Filter users...")
 
-				boundsBehavior: Flickable.StopAtBounds;
-				clip: true;
-
-				Column {
-					id: bodyColumn;
-					anchors.horizontalCenter: parent.horizontalCenter;
-					width: Math.min(parent.width, Style.contentWidthMax);
-					spacing: Style.spacingXL;
-
-					GroupHeaderView {
-						width: parent.width;
-						title: qsTr("Members");
-						groupView: usersGroup;
-					}
-
-					GroupElementView {
-						id: usersGroup;
-						
-						width: parent.width;
-						
-						CollectionItemSelectElementView {
-							id: userSelectableCollectionEditor
-							commandId: ImtauthUsersSdlCommandIds.s_usersList
-							fields: [UserItemDataTypeMetaInfo.s_id, UserItemDataTypeMetaInfo.s_name]
-							titleField: UserItemDataTypeMetaInfo.s_name
-							textFilterFieldIds: [UserItemDataTypeMetaInfo.s_name]
-							sortByField: UserItemDataTypeMetaInfo.s_name
-							label: qsTr("Users")
-							addButtonText: qsTr("Add User")
-							showCount: true
-
-							onSelectionChanged: {
-								container.doUpdateModel()
-							}
-						}
-						
-						function updateGui(){
-							if (!container.groupData){
-								return
-							}
-							var ids = container.groupData.m_users ? container.groupData.m_users.slice() : []
-							var arr = []
-							for (var i = 0; i < ids.length; i++)
-								arr.push({id: ids[i], name: ids[i]})
-							userSelectableCollectionEditor.items = arr
-						}
-						
-						function updateModel(){
-							if (!container.groupData){
-								return
-							}
-							var arr = []
-							for (var i = 0; i < userSelectableCollectionEditor.items.length; i++)
-								arr.push(userSelectableCollectionEditor.items[i].id)
-							container.groupData.m_users = arr
-						}
-					}
+				onRemoved: {
+					container.doUpdateModel()
 				}
 			}
 		}
@@ -421,111 +540,162 @@ ViewBase {
 			anchors.fill: parent
 
 			function updateGui(){
-				rolesGroup.updateGui();
+				if (!container.groupData){
+					return
+				}
+
+				rolesTable.loadAssignments(container.groupData.m_roles)
 			}
 
 			function updateModel(){
-				rolesGroup.updateModel();
+				if (!container.groupData){
+					return
+				}
+
+				if (!container.groupData.hasRoles()){
+					container.groupData.emplaceRoles()
+				}
+
+				var added = rolesTable.syncAssignments(container.groupData.m_roles)
+				for (var i = 0; i < added.length; i++){
+					var assignment = container.groupData.createRolesArrayElement()
+					assignment.m_id = added[i].id
+					assignment.m_name = added[i].title
+					assignment.m_direct = true
+					container.groupData.m_roles.addElement(assignment)
+				}
 			}
 
 			Component.onCompleted: {
 				rolesPage.updateGui();
 			}
 
-			CustomScrollbar {
-				id: scrollbar;
-				z: parent.z + 1;
-				anchors.right: parent.right;
-				anchors.top: flickable.top;
-				anchors.bottom: flickable.bottom;
-				secondSize: 10;
-				targetItem: flickable;
-			}
+			Column {
+				id: rolesHeader
+				anchors.top: parent.top
+				anchors.topMargin: Style.marginXL
+				x: Math.max(0, (rolesPage.width - width) / 2)
+				width: Math.max(0, Math.min(Style.contentWidthMax, rolesPage.width - 2 * Style.marginXL))
+				spacing: Style.marginM
 
-			Flickable {
-				id: flickable;
-				anchors.top: parent.top;
-				anchors.topMargin: Style.marginXL;
-				anchors.bottom: parent.bottom;
-				anchors.bottomMargin: Style.marginXL;
-				anchors.left: parent.left;
-				anchors.leftMargin: Style.marginXL;
-				anchors.right: scrollbar.left;
-				anchors.rightMargin: Style.marginXL;
-				contentHeight: bodyColumn.height + 2 * Style.marginXL;
+				GroupHeaderView {
+					width: parent.width
+					title: qsTr("Roles") + " (" + rolesTable.itemsCount + ")" + (container.assignmentsUpdating ? "   " + qsTr("Updating...") : "")
+					controlComp: Component {
+						Row {
+							anchors.verticalCenter: parent.verticalCenter
+							spacing: Style.marginL
 
-				boundsBehavior: Flickable.StopAtBounds;
-				clip: true;
+							Text {
+								objectName: "RemoveRoleLink"
+								anchors.verticalCenter: parent.verticalCenter
+								text: qsTr("Remove") + " (" + rolesTable.selectedCount + ")"
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: rolesTable.selectedCount > 0 ? Style.linkColor : Style.inactiveTextColor
 
-				Column {
-					id: bodyColumn;
-					anchors.horizontalCenter: parent.horizontalCenter;
-					width: Math.min(parent.width, Style.contentWidthMax);
-					spacing: Style.spacingXL;
-
-					GroupHeaderView {
-						width: parent.width;
-						title: qsTr("Assigned Roles");
-						groupView: rolesGroup;
-					}
-
-					GroupElementView {
-						id: rolesGroup;
-						
-						width: parent.width;
-						
-						CollectionItemSelectElementView {
-							id: roleSelectableCollectionEditor
-							commandId: ImtauthRolesSdlCommandIds.s_rolesList
-							fields: [RoleItemDataTypeMetaInfo.s_id, RoleItemDataTypeMetaInfo.s_roleName]
-							titleField: RoleItemDataTypeMetaInfo.s_roleName
-							textFilterFieldIds: [RoleItemDataTypeMetaInfo.s_roleName]
-							sortByField: RoleItemDataTypeMetaInfo.s_roleName
-							label: qsTr("Roles")
-							addButtonText: qsTr("Add Role")
-							showCount: true
-
-							// The role list is scoped by product, as a header and as an input field.
-							function getHeaders(){
-								let headers = {}
-								headers["productId"] = container.productId
-								return headers
-							}
-
-							function setCustomInputParams(inputParams){
-								if (container.productId){
-									inputParams.InsertField(RoleItemInputTypeMetaInfo.s_productId, container.productId)
+								MouseArea {
+									objectName: "MouseArea"
+									anchors.fill: parent
+									enabled: rolesTable.selectedCount > 0
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: {
+										rolesTable.removeSelected()
+									}
 								}
 							}
 
-							onSelectionChanged: {
-								container.doUpdateModel()
-							}
-						}
+							Text {
+								id: rolesTableAddLink
+								objectName: "AddRoleLink"
+								anchors.verticalCenter: parent.verticalCenter
+								text: "+ " + qsTr("Add Role")
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: Style.linkColor
 
-						function updateGui(){
-							if (!container.groupData){
-								return
+								MouseArea {
+									objectName: "MouseArea"
+									anchors.fill: parent
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: {
+										roleSelectableCollectionEditor.items = rolesTable.directItems()
+										roleSelectableCollectionEditor.openSelector(rolesTableAddLink)
+									}
+								}
 							}
-							var ids = container.groupData.m_roles ? container.groupData.m_roles.slice() : []
-							var arr = []
-							for (var i = 0; i < ids.length; i++)
-								arr.push({id: ids[i], name: ids[i]})
-							roleSelectableCollectionEditor.items = arr
-						}
-						
-						function updateModel(){
-							if (!container.groupData){
-								return
-							}
-							var arr = []
-							for (var i = 0; i < roleSelectableCollectionEditor.items.length; i++)
-								arr.push(roleSelectableCollectionEditor.items[i].id)
-							container.groupData.m_roles = arr
 						}
 					}
 				}
+
+				CollectionItemSelectElementView {
+					id: roleSelectableCollectionEditor
+					width: parent.width
+					commandId: ImtauthRolesSdlCommandIds.s_rolesList
+					fields: [RoleItemDataTypeMetaInfo.s_id, RoleItemDataTypeMetaInfo.s_roleName]
+					titleField: RoleItemDataTypeMetaInfo.s_roleName
+					textFilterFieldIds: [RoleItemDataTypeMetaInfo.s_roleName]
+					sortByField: RoleItemDataTypeMetaInfo.s_roleName
+					label: qsTr("Roles")
+					addButtonText: qsTr("Add Role")
+					visible: false
+
+					// The role list is scoped by product, as a header and as an input field.
+					function getHeaders(){
+						let headers = {}
+						headers["productId"] = container.productId
+						return headers
+					}
+
+					function setCustomInputParams(inputParams){
+						if (container.productId){
+							inputParams.InsertField(RoleItemInputTypeMetaInfo.s_productId, container.productId)
+						}
+					}
+
+					onSelectionChanged: {
+						rolesTable.setDirectItems(roleSelectableCollectionEditor.items)
+						container.doUpdateModel()
+						container.assignmentsChanged()
+					}
+				}
 			}
+
+			AssignmentsTable {
+				id: rolesTable
+				anchors.top: rolesHeader.bottom
+				anchors.topMargin: Style.marginM
+				anchors.bottom: parent.bottom
+				anchors.bottomMargin: Style.marginXL
+				x: rolesHeader.x
+				width: rolesHeader.width
+				editable: true
+				navigationPath: "Administration/Roles/Role/"
+				nameTitle: qsTr("Role")
+				emptyText: qsTr("No roles are assigned.")
+				filterPlaceholder: qsTr("Filter roles...")
+
+
+				onRemoved: {
+					container.doUpdateModel()
+					container.assignmentsChanged()
+				}
+			}
+		}
+	}
+
+	Component {
+		id: permissionsPageComp
+
+		PermissionSourcesPage {
+			anchors.fill: parent
+			permissions: container.groupData ? container.groupData.m_permissions : null
+			warnings: container.groupData ? container.groupData.m_accessWarnings : null
+			permissionGroups: container.permissionGroups
+			updating: container.assignmentsUpdating
+			emptyText: qsTr("The group grants no permissions to its members.")
 		}
 	}
 

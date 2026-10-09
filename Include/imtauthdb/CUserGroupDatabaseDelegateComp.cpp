@@ -27,12 +27,14 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 			const istd::IChangeable* valuePtr,
 			const imtbase::IOperationContext* operationContextPtr) const
 {
-	NewObjectQuery retVal = BaseClass::CreateNewObjectQuery(typeId, proposedObjectId, objectName, objectDescription, valuePtr, operationContextPtr);
-
 	auto groupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(valuePtr);
 	if (groupInfoPtr == nullptr){
 		return NewObjectQuery();
 	}
+
+	// The searchable Name column must follow the group itself, whatever name the caller passed.
+	const QString groupName = groupInfoPtr->GetName().isEmpty() ? objectName : groupInfoPtr->GetName();
+	NewObjectQuery retVal = BaseClass::CreateNewObjectQuery(typeId, proposedObjectId, groupName, objectDescription, valuePtr, operationContextPtr);
 	
 	imtauth::IUserGroupInfo::UserIds userIds = groupInfoPtr->GetUsers();
 	for (const QByteArray& userId : userIds){
@@ -75,6 +77,10 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 	auto newGroupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(&object);
 	if (newGroupInfoPtr == nullptr){
 		return QByteArray();
+	}
+
+	if (!newGroupInfoPtr->GetName().isEmpty()){
+		retVal += CreateRenameObjectQuery(collection, objectId, newGroupInfoPtr->GetName(), operationContextPtr);
 	}
 	
 	if (useExternDelegate){

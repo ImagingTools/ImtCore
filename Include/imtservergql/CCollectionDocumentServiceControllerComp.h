@@ -10,6 +10,7 @@
 #include <imtbase/IOperationContext.h>
 #include <imtbase/IDocumentChangeGenerator.h>
 #include <imtdoc/IDocumentService.h>
+#include <imtauth/IUserActionManager.h>
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService_fwd.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager_fwd.h>
 
@@ -30,6 +31,7 @@ public:
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection-related document manager", true, "CollectionDocumentService");
 		I_ASSIGN(m_documentChangeGeneratorCompPtr, "DocumentChangeGenerator", "Change generator producing the document history entries on save", false, "DocumentChangeGenerator");
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "ID of the underlaying document collection", true, "");
+		I_ASSIGN(m_userActionManagerCompPtr, "UserActionManager", "Records the save of a document as a user action", false, "UserActionManager");
 	I_END_COMPONENT
 
 protected:
@@ -98,11 +100,18 @@ private:
 				const QByteArray& userId,
 				const QByteArray& documentId,
 				imtbase::IOperationContext& operationContext) const;
+	void CreateUserActionLog(
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				const QByteArray& actionTypeId,
+				const QString& documentName,
+				const ::imtgql::CGqlRequest& gqlRequest) const;
 
 private:
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
 	I_REF(imtbase::IDocumentChangeGenerator, m_documentChangeGeneratorCompPtr);
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
+	I_REF(imtauth::IUserActionManager, m_userActionManagerCompPtr);
 };
 
 

@@ -30,6 +30,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QByteArrayList>
 #include <imtauth/IUserInfo.h>
+#include <imtauth/IUserGroupInfoProvider.h>
 
 
 /**
@@ -987,6 +988,47 @@ inline bool ShouldKeepEntityForTenant(
 	return bindingManager->HasBinding(tenantId, entityType, entityId);
 }
 
+
+/**
+	Get the roles a user holds for the product: the directly assigned ones plus
+	the roles of all groups of the user, including their parent groups.
+*/
+inline imtauth::IUserBaseInfo::RoleIds GetEffectiveUserRoles(const imtauth::IUserInfo& userInfo, const QByteArray& productId)
+{
+	imtauth::IUserBaseInfo::RoleIds retVal = userInfo.GetRoles(productId);
+
+	const imtauth::IUserGroupInfoProvider* groupProviderPtr = userInfo.GetUserGroupProvider();
+	if (groupProviderPtr == nullptr){
+		return retVal;
+	}
+
+	QByteArrayList pendingGroupIds = userInfo.GetGroups();
+	QSet<QByteArray> visitedGroupIds;
+	while (!pendingGroupIds.isEmpty()){
+		const QByteArray groupId = pendingGroupIds.takeFirst();
+		if (visitedGroupIds.contains(groupId)){
+			continue;
+		}
+		visitedGroupIds.insert(groupId);
+
+		imtauth::IUserGroupInfoSharedPtr groupPtr = groupProviderPtr->GetUserGroup(groupId);
+		if (!groupPtr.IsValid()){
+			continue;
+		}
+
+		for (const QByteArray& roleId : groupPtr->GetRoles(productId)){
+			if (!retVal.contains(roleId)){
+				retVal << roleId;
+			}
+		}
+
+		pendingGroupIds += groupPtr->GetParentGroups();
+	}
+
+	return retVal;
+}
+
+
 inline istd::IChangeableUniquePtr AdaptUserForTenant(
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
@@ -1009,9 +1051,8 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	// CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery stores
 	// TenantEntityBindings.EntityType as GetTableName(), not the collection ID.
 	const QByteArray groupsEntity = QByteArrayLiteral("UserGroups");
-	const QByteArray permsEntity = QByteArrayLiteral("Permissions");
 
-	// Filter roles/groups/permissions according to tenant context.
+	// Filter roles/groups according to tenant context.
 	// empty tenantId: keep only entities with no tenant bindings at all (globals).
 	// non-empty tenantId: keep only entities bound to this tenant.
 	bool anyFilterChange = false;
@@ -1039,20 +1080,6 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 			filteredGroups.append(gid);
 		} else {
 			anyFilterChange = true;
-		}
-	}
-
-	QByteArrayList filteredPerms;
-	if (!productId.isEmpty()){
-		QByteArrayList userPerms = userInfoPtr->GetPermissions(productId);
-		for (int i = 0; i < userPerms.size(); ++i){
-			const QByteArray pid = userPerms.at(i);
-			if (pid.isEmpty()) continue;
-			if (ShouldKeepEntityForTenant(bindingManager, tenantId, permsEntity, pid)){
-				filteredPerms.append(pid);
-			} else {
-				anyFilterChange = true;
-			}
 		}
 	}
 
@@ -1117,7 +1144,6 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	if (anyFilterChange){
 		if (!productId.isEmpty()){
 			adaptedUserInfoPtr->SetRoles(productId, filteredRoles);
-			adaptedUserInfoPtr->SetLocalPermissions(productId, filteredPerms);
 		}
 		// reset groups to filtered list
 		QByteArrayList currGroups = adaptedUserInfoPtr->GetGroups();
@@ -1144,6 +1170,92 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	}
 
 	return adaptedObjectPtr;
+}
+
+
+/**
+	Get the permissions of a tenant-adapted user: its roles and their parent
+	roles, its groups, their parent groups and the roles of those groups.
+	Parent roles, parent groups and group roles count only when they are
+	visible in the tenant, so an entity of another organization grants nothing.
+	Without a tenant this is IUserBaseInfo::GetPermissions().
+*/
+inline imtauth::IUserBaseInfo::FeatureIds GetTenantUserPermissions(
+				const imtauth::IUserInfo& userInfo,
+				const QByteArray& tenantId,
+				const QByteArray& productId,
+				imtauth::ITenantEntityBindingManager* bindingManager,
+				imtauth::IRoleInfoProvider* roleInfoProvider)
+{
+	const imtauth::IRoleInfoProvider* roleProviderPtr = (roleInfoProvider != nullptr) ? roleInfoProvider : userInfo.GetRoleProvider();
+	if (tenantId.isEmpty() || bindingManager == nullptr || roleProviderPtr == nullptr){
+		return userInfo.GetPermissions(productId);
+	}
+
+	const QByteArray rolesEntity = QByteArrayLiteral("Roles");
+	const QByteArray groupsEntity = QByteArrayLiteral("UserGroups");
+
+	// The user's own roles and groups are already filtered by AdaptUserForTenant.
+	QByteArrayList pendingRoleIds = userInfo.GetRoles(productId);
+
+	const imtauth::IUserGroupInfoProvider* groupProviderPtr = userInfo.GetUserGroupProvider();
+	if (groupProviderPtr != nullptr){
+		QByteArrayList pendingGroupIds = userInfo.GetGroups();
+		QSet<QByteArray> visitedGroupIds;
+		while (!pendingGroupIds.isEmpty()){
+			const QByteArray groupId = pendingGroupIds.takeFirst();
+			if (visitedGroupIds.contains(groupId)){
+				continue;
+			}
+			visitedGroupIds.insert(groupId);
+
+			imtauth::IUserGroupInfoSharedPtr groupPtr = groupProviderPtr->GetUserGroup(groupId);
+			if (!groupPtr.IsValid()){
+				continue;
+			}
+
+			for (const QByteArray& roleId : groupPtr->GetRoles(productId)){
+				if (ShouldKeepEntityForTenant(bindingManager, tenantId, rolesEntity, roleId)){
+					pendingRoleIds << roleId;
+				}
+			}
+
+			for (const QByteArray& parentGroupId : groupPtr->GetParentGroups()){
+				if (ShouldKeepEntityForTenant(bindingManager, tenantId, groupsEntity, parentGroupId)){
+					pendingGroupIds << parentGroupId;
+				}
+			}
+		}
+	}
+
+	imtauth::IUserBaseInfo::FeatureIds permissions = userInfo.GetLocalPermissions(productId);
+	QSet<QByteArray> visitedRoleIds;
+	while (!pendingRoleIds.isEmpty()){
+		const QByteArray roleId = pendingRoleIds.takeFirst();
+		if (visitedRoleIds.contains(roleId)){
+			continue;
+		}
+		visitedRoleIds.insert(roleId);
+
+		imtauth::IRoleUniquePtr rolePtr = roleProviderPtr->GetRole(roleId);
+		if (!rolePtr.IsValid()){
+			continue;
+		}
+
+		for (const QByteArray& permissionId : rolePtr->GetLocalPermissions()){
+			if (!permissions.contains(permissionId)){
+				permissions << permissionId;
+			}
+		}
+
+		for (const QByteArray& parentRoleId : rolePtr->GetIncludedRoles()){
+			if (ShouldKeepEntityForTenant(bindingManager, tenantId, rolesEntity, parentRoleId)){
+				pendingRoleIds << parentRoleId;
+			}
+		}
+	}
+
+	return permissions;
 }
 
 
@@ -1179,14 +1291,15 @@ inline imtauth::IUserBaseInfo::FeatureIds GetEffectiveUserPermissions(
 				delegatedAccess,
 				membershipManager,
 				roleInfoProvider);
+	const imtauth::IUserInfo* effectiveUserPtr = &userInfo;
 	if (adaptedPtr.IsValid()){
 		const imtauth::IUserInfo* adaptedUserPtr = dynamic_cast<const imtauth::IUserInfo*>(adaptedPtr.GetPtr());
 		if (adaptedUserPtr != nullptr){
-			return adaptedUserPtr->GetPermissions(productId);
+			effectiveUserPtr = adaptedUserPtr;
 		}
 	}
 
-	return userInfo.GetPermissions(productId);
+	return GetTenantUserPermissions(*effectiveUserPtr, tenantId, productId, bindingManager, roleInfoProvider);
 }
 
 
