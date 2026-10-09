@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CClientRequestGroupInfoProviderComp.h>
+#include <imtauthgql/CAssignmentCollector.h>
 
 
 // ACF includes
@@ -82,15 +83,15 @@ imtauth::IUserGroupInfoSharedPtr CClientRequestGroupInfoProviderComp::GetUserGro
 	}
 
 	if (payload.roles){
-		userGroupInfoPtr->SetRoles(productId, payload.roles->ToList());
+		userGroupInfoPtr->SetRoles(productId, CAssignmentCollector::GetDirectIds(payload.roles));
 	}
 
 	if (payload.users){
-		userGroupInfoPtr->SetUsers(payload.users->ToList());
+		userGroupInfoPtr->SetUsers(CAssignmentCollector::GetDirectIds(payload.users));
 	}
 
 	if (payload.parentGroups){
-		for (const QByteArray& groupId : payload.parentGroups->ToList()){
+		for (const QByteArray& groupId : CAssignmentCollector::GetDirectIds(payload.parentGroups)){
 			userGroupInfoPtr->AddParentGroup(groupId);
 		}
 	}

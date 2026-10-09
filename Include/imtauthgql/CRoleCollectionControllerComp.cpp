@@ -10,6 +10,8 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
 #include <imtbase/CComplexCollectionFilterHelper.h>
 #include <imtauth/CRole.h>
+#include <imtauthgql/imtauthgql.h>
+#include <imtauthgql/CAssignmentCollector.h>
 
 
 namespace imtauthgql
@@ -82,30 +84,16 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 	}
 	roleInfoPtr->SetRoleDescription(roleDescription);
 
-	QByteArrayList parentRoles;
-	if (roleDataRepresentation.parentRoles){
-		parentRoles = roleDataRepresentation.parentRoles->ToList();
-	}
-	if (!parentRoles.isEmpty()){
-		parentRoles.removeAll("");
+	for (const QByteArray& parentRoleId : CAssignmentCollector::GetDirectIds(roleDataRepresentation.parentRoles)){
+		if (parentRoleId == objectId || !roleInfoPtr->IncludeRole(parentRoleId)){
+			errorMessage = QT_TR_NOOP(QStringLiteral("Unable include role '%1' to the role '%2'. Check the dependencies between them.")
+										.arg(parentRoleId, roleId));
 
-		for (const QByteArray& parentRoleId : parentRoles){
-			if (parentRoleId == objectId || !roleInfoPtr->IncludeRole(parentRoleId)){
-				errorMessage = QT_TR_NOOP(QStringLiteral("Unable include role '%1' to the role '%2'. Check the dependencies between them.")
-											.arg(parentRoleId, roleId));
-
-				return false;
-			}
+			return false;
 		}
 	}
 
-	QByteArray permissions;
-	if (roleDataRepresentation.permissions){
-		permissions = *roleDataRepresentation.permissions;
-	}
-	QByteArrayList permissionIds = permissions.split(';');
-	permissionIds.removeAll("");
-	roleInfoPtr->SetLocalPermissions(permissionIds);
+	roleInfoPtr->SetLocalPermissions(CAssignmentCollector::GetDirectIds(roleDataRepresentation.permissions));
 
 	bool isGuest = bool(roleDataRepresentation.isGuest && *roleDataRepresentation.isGuest);
 	roleInfoPtr->SetGuest(isGuest);
@@ -396,17 +384,12 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 	QString description = roleInfoPtr->GetRoleDescription();
 	representationPayload.description = QString(description);
 
-	QByteArrayList parentsRolesIds = roleInfoPtr->GetIncludedRoles();
-	std::sort(parentsRolesIds.begin(), parentsRolesIds.end());
-	representationPayload.parentRoles.Emplace().FromList(parentsRolesIds);
-
-	imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetLocalPermissions();
-	permissions.removeAll("");
-	std::sort(permissions.begin(), permissions.end());
-	representationPayload.permissions = QByteArray(permissions.join(';'));
-
 	representationPayload.isDefault = bool(roleInfoPtr->IsDefault());
 	representationPayload.isGuest = bool(roleInfoPtr->IsGuest());
+
+	CAssignmentCollector collector;
+	collector.CollectRole(*roleInfoPtr, id, nullptr);
+	collector.FillRole(representationPayload);
 
 	return true;
 }
@@ -439,7 +422,7 @@ bool CRoleCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 		QByteArray productId = gqlContextPtr->GetProductId();
 		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){
-			availableRoleIds = userInfoPtr->GetRoles(productId);
+			availableRoleIds = GetEffectiveUserRoles(*userInfoPtr, productId);
 		}
 	}
 

@@ -197,8 +197,8 @@ ViewBase {
 							}
 
 							Text {
-								text: currentOrgRow.currentOrgData && currentOrgRow.currentOrgData.description !== ""
-									? currentOrgRow.currentOrgData.description
+								text: !currentOrgRow.currentOrgData || currentOrgRow.currentOrgData.id === "" ? ""
+									: currentOrgRow.currentOrgData.description !== "" ? currentOrgRow.currentOrgData.description
 									: qsTr("You are currently working in this organization. Everything you do applies here.")
 								font.pixelSize: Style.fontSizeS
 								font.family: Style.fontFamily

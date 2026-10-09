@@ -542,7 +542,7 @@ sdl::V1_0::imtbase::CRemoveElementsPayload CObjectCollectionControllerCompBase::
 
 	bool ok = m_objectCollectionCompPtr->RemoveElements(elementIds, operationContextPtr.GetPtr());
 	if (ok){
-		CreateUserActionLog(elementIds[0], typeId, "Delete", gqlRequest);
+		CreateUserActionLog(elementIds[0], typeId, imtauth::IUserRecentAction::s_deleteActionTypeId, gqlRequest);
 		OnAfterRemoveElements(elementIds, gqlRequest);
 	}
 
@@ -589,7 +589,7 @@ sdl::V1_0::imtbase::CRemoveElementSetPayload CObjectCollectionControllerCompBase
 	bool ok = m_objectCollectionCompPtr->RemoveElementSet(&filterParams, operationContextPtr.GetPtr());
 	if (ok){
 		if (!elementIds.isEmpty()){
-			CreateUserActionLog(elementIds[0], typeId, "Delete", gqlRequest);
+			CreateUserActionLog(elementIds[0], typeId, imtauth::IUserRecentAction::s_deleteActionTypeId, gqlRequest);
 		}
 		OnAfterRemoveElements(elementIds, gqlRequest);
 	}
@@ -1223,7 +1223,7 @@ sdl::V1_0::imtbase::CInsertNewObjectPayload CObjectCollectionControllerCompBase:
 		return sdl::V1_0::imtbase::CInsertNewObjectPayload();
 	}
 
-	CreateUserActionLog(objectId, typeId, "Create", gqlRequest);
+	CreateUserActionLog(objectId, typeId, imtauth::IUserRecentAction::s_createActionTypeId, gqlRequest);
 	response.objectId = objectId;
 
 	return response;
@@ -1278,7 +1278,7 @@ sdl::V1_0::imtbase::CSetObjectDataPayload CObjectCollectionControllerCompBase::O
 
 	bool ok = m_objectCollectionCompPtr->SetObjectData(objectId, *objectPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr());
 	if (ok){
-		CreateUserActionLog(objectId, typeId, "Update", gqlRequest);
+		CreateUserActionLog(objectId, typeId, imtauth::IUserRecentAction::s_updateActionTypeId, gqlRequest);
 	}
 
 	response.success = ok;
@@ -1863,7 +1863,7 @@ QJsonObject CObjectCollectionControllerCompBase::InsertObject(
 		return QJsonObject();
 	}
 
-	CreateUserActionLog(objectId, typeId, "Create", gqlRequest);
+	CreateUserActionLog(objectId, typeId, imtauth::IUserRecentAction::s_createActionTypeId, gqlRequest);
 
 	sdl::V1_0::imtbase::CAddedNotificationPayload response;
 	response.id = newObjectId;
@@ -1957,7 +1957,7 @@ QJsonObject CObjectCollectionControllerCompBase::UpdateObject(
 	}
 
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
-	CreateUserActionLog(objectId, typeId, "Update", gqlRequest);
+	CreateUserActionLog(objectId, typeId, imtauth::IUserRecentAction::s_updateActionTypeId, gqlRequest);
 
 	sdl::V1_0::imtbase::CUpdatedNotificationPayload response;
 	response.id = objectId;
@@ -3349,7 +3349,7 @@ bool CObjectCollectionControllerCompBase::CreateUserActionLog(
 		}
 	}
 
-	if (actionTypeId == "Delete"){
+	if (actionTypeId == imtauth::IUserRecentAction::s_deleteActionTypeId){
 		targetInfo.name = "";
 	}
 	else{
@@ -3366,15 +3366,15 @@ bool CObjectCollectionControllerCompBase::CreateUserActionLog(
 
 	imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo;
 	actionTypeInfo.id = actionTypeId;
-	if (actionTypeId == "Create"){
+	if (actionTypeId == imtauth::IUserRecentAction::s_createActionTypeId){
 		actionTypeInfo.name = QT_TR_NOOP(QStringLiteral("Create"));
 		actionTypeInfo.description = QT_TR_NOOP(QStringLiteral("Object created"));
 	}
-	else if (actionTypeId == "Update"){
+	else if (actionTypeId == imtauth::IUserRecentAction::s_updateActionTypeId){
 		actionTypeInfo.name = QT_TR_NOOP(QStringLiteral("Update"));
 		actionTypeInfo.description = QT_TR_NOOP(QStringLiteral("Object changed"));
 	}
-	else if (actionTypeId == "Delete"){
+	else if (actionTypeId == imtauth::IUserRecentAction::s_deleteActionTypeId){
 		actionTypeInfo.name = QT_TR_NOOP(QStringLiteral("Delete"));
 		actionTypeInfo.description = QT_TR_NOOP(QStringLiteral("Objects was deleted"));
 	}

@@ -18,6 +18,8 @@ RemoteCollectionView {
 	commandsControllerComp: null
 	collectionId: "UserActions"
 	Component.onCompleted: {
+		registerFieldFilterDelegate("actionTypeId", actionDelegateFilterComp)
+
 		if (PermissionsController.checkPermission("ViewUsers")){
 			registerFieldFilterDelegate("userId", userDelegateFilterComp)
 		}
@@ -34,13 +36,12 @@ RemoteCollectionView {
 		FieldFilterDelegate {
 			id: actionDelegateFilter
 			name: qsTr("Action")
-			defaultFieldFilter.m_fieldId: "actionType"
-			defaultFieldFilter.m_filterValueType: "Integer"
+			defaultFieldFilter.m_fieldId: "actionTypeId"
 
 			Component.onCompleted: {
-				createAndAddOption("1", qsTr("Create"), "", true)
-				createAndAddOption("2", qsTr("Update"), "", true)
-				createAndAddOption("3", qsTr("Delete"), "", true)
+				createAndAddOption("Create", qsTr("Create"), "", true)
+				createAndAddOption("Update", qsTr("Update"), "", true)
+				createAndAddOption("Delete", qsTr("Delete"), "", true)
 			}
 		}
 	}
@@ -48,31 +49,15 @@ RemoteCollectionView {
 	Component {
 		id: userDelegateFilterComp
 		
-		FieldFilterDelegate {
-			id: userDelegateFilter
+		CollectionFieldFilterDelegate {
 			name: qsTr("Users")
-			visibleItemCount: 15
 			defaultFieldFilter.m_fieldId: "userId"
-
-			Component.onCompleted: {
-				userCollectionDataProvider.updateModel()
-			}
-
-			CollectionDataProvider {
-				id: userCollectionDataProvider
-				commandId: "UsersList"
-				fields: ["id", "typeId", "name", "description", "userId"]
-				onCollectionModelChanged: {
-					optionsListAdapter.collectionModel = collectionModel
-				}
-			}
-
-			OptionsListAdapter {
-				id: optionsListAdapter
-				onCollectionModelChanged: {
-					userDelegateFilter.setOptionsList(m_options)
-				}
-			}
+			commandId: ImtauthUsersSdlCommandIds.s_usersList
+			fields: [UserItemDataTypeMetaInfo.s_id, UserItemDataTypeMetaInfo.s_name]
+			titleField: UserItemDataTypeMetaInfo.s_name
+			textFilterFieldIds: [UserItemDataTypeMetaInfo.s_name]
+			sortByField: UserItemDataTypeMetaInfo.s_name
+			filterPlaceholder: qsTr("Search by user name")
 		}
 	}
 	

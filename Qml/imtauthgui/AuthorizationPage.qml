@@ -506,10 +506,24 @@ Rectangle {
 			height: ModalDialogManager.activeView.height - 100;
 			title: qsTr("Sign up");
 			canMove: false;
+			notClosingButtons: Enums.save;
 
 			UserData {
 				id: userDataModel;
 				m_id: UuidGenerator.generateUUID();
+			}
+
+			Connections {
+				target: AuthorizationController;
+
+				function onRegisterSuccessfully(){
+					registerDialog.finished(Enums.close);
+				}
+
+				function onRegisterFailed(message, violatedRules){
+					registerDialog.buttons.setButtonState(Enums.save, true);
+					PopupManager.addErrorMessage(message !== "" ? message : qsTr("Unable to register the user"), true, "RegisterUserError");
+				}
 			}
 
 			Component.onCompleted: {
@@ -565,6 +579,7 @@ Rectangle {
 
 			onFinished: {
 				if (buttonId === Enums.save){
+					registerDialog.buttons.setButtonState(Enums.save, false);
 					authPageContainer.registerUser(userDataModel)
 				}
 			}

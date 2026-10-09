@@ -257,10 +257,11 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 	if (m_passwordPolicyCompPtr.IsValid()){
 		QStringList violatedRuleIds;
 		if (!m_passwordPolicyCompPtr->ValidatePasswordStrength(*userData.username, password, violatedRuleIds)){
-			QString message = QStringLiteral("Unable to register user. Error: The password does not fulfill the password policy (%1)").arg(violatedRuleIds.join(", "));
+			QString message = QStringLiteral("The password does not fulfill the password policy (%1)").arg(violatedRuleIds.join(", "));
 			SendErrorMessage(0, message, "CUserControllerComp");
 
 			sdl::V1_0::imtauth::CRegisterUserPayload failurePayload;
+			failurePayload.id = QByteArray();
 			failurePayload.message = message;
 			failurePayload.violatedRules.emplace();
 			for (const QString& violatedRuleId : violatedRuleIds){

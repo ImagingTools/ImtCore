@@ -173,10 +173,9 @@ var GqlRequest = function(requestType, commandId){
 				
 				for (var i = 0; i < fieldIds.length; ++i){
 					var fieldId = fieldIds[i]
+					retVal += fieldId
 					if (gqlObject.IsObject(fieldId)){
 						retVal += this.AddObjectFieldPart(gqlObject.GetFieldArgumentObjectPtr(fieldId))
-					} else {
-						retVal += fieldId
 					}
 					if (i < fieldIds.length - 1){
 						retVal += " "

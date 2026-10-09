@@ -100,6 +100,7 @@ ViewBase {
 		if (parentRolesPageInstance)
 			parentRolesPageInstance.updateGui()
 		container.doUpdateGuiPermissions()
+		container.updateBadges()
 	}
 	
 	function updateModel(){
@@ -121,8 +122,36 @@ ViewBase {
 		container.doUpdateModelPermissions()
 		
 		roleData.m_productId = container.productId;
+		container.updateBadges()
 	}
-	
+
+	// Emitted after a change of the direct assignments that other ones are inherited through.
+	signal assignmentsChanged()
+
+	// The inherited assignments are being recalculated.
+	property bool assignmentsUpdating: false
+
+	// Shows the recalculated assignment lists on the loaded pages.
+	function updateAssignments(){
+		container.setBlockingUpdateModel(true)
+		var parentRolesPageInstance = multiPageView.getPageById("ParentRoles")
+		if (parentRolesPageInstance)
+			parentRolesPageInstance.updateGui()
+		container.doUpdateGuiPermissions()
+		container.updateBadges()
+		container.setBlockingUpdateModel(false)
+	}
+
+	// Item counts next to the page names.
+	function updateBadges(){
+		if (!container.roleData){
+			return
+		}
+
+		multiPageView.setPageBadge("ParentRoles", String(container.roleData.m_parentRoles ? container.roleData.m_parentRoles.count : 0))
+		multiPageView.setPageBadge("Permission", String(container.roleData.m_permissions ? container.roleData.m_permissions.count : 0))
+	}
+
 	function getHeaders(){
 		return {};
 	}
@@ -132,29 +161,102 @@ ViewBase {
 			return
 		}
 
-		var selectedPermissionsIds = [];
-		var selectedPermissions = container.roleData.m_permissions;
-		if (selectedPermissions !== ""){
-			selectedPermissionsIds = selectedPermissions.split(';');
-		}
-
 		var permissionPageInstance = multiPageView.getPageById("Permission")
 		if (permissionPageInstance && permissionPageInstance.bottomItem){
-			permissionPageInstance.bottomItem.applySelection(selectedPermissionsIds)
+			// Unlock first: unchecking skips locked nodes.
+			permissionPageInstance.bottomItem.setLockedPermissions({})
+			permissionPageInstance.bottomItem.applySelection(container.ownPermissionIds())
+			permissionPageInstance.bottomItem.setLockedPermissions(container.inheritedPermissionSources())
 		}
 	}
-	
+
+	// Ids of the permissions assigned to the role itself.
+	function ownPermissionIds() {
+		var ids = []
+		var permissions = container.roleData ? container.roleData.m_permissions : null
+		for (var i = 0; permissions && i < permissions.count; i++){
+			var item = permissions.get(i).item
+			if (item.m_direct){
+				ids.push(String(item.m_id))
+			}
+		}
+		return ids
+	}
+
+	// Permissions inherited from parent roles {permissionId: "Parent > Grandparent"}.
+	function inheritedPermissionSources() {
+		var result = ({})
+		var permissions = container.roleData ? container.roleData.m_permissions : null
+		for (var i = 0; permissions && i < permissions.count; i++){
+			var item = permissions.get(i).item
+			var sources = item.m_sources
+			var paths = []
+			for (var k = 0; sources && k < sources.count; k++){
+				var steps = sources.get(k).item.m_steps
+				var names = []
+				for (var s = 0; steps && s < steps.count; s++){
+					var step = steps.get(s).item
+					names.push(step.m_name ? String(step.m_name) : String(step.m_id))
+				}
+				if (names.length > 0){
+					paths.push(names.join(" " + String.fromCharCode(0x2192) + " "))
+				}
+			}
+			if (paths.length > 0){
+				result[String(item.m_id)] = paths.join("; ")
+			}
+		}
+		return result
+	}
+
 	function doUpdateModelPermissions() {
 		if (!container.roleData){
 			return
 		}
 
 		var permissionPageInstance = multiPageView.getPageById("Permission")
-		if (permissionPageInstance && permissionPageInstance.bottomItem){
-			// Only leaf permission IDs must be stored (groups/parents are excluded even
-			// when tristate check selected the whole subtree).
-			var selectedPermissionIds = permissionPageInstance.bottomItem.getCheckedIds()
-			container.roleData.m_permissions = selectedPermissionIds.join(';')
+		if (!permissionPageInstance || !permissionPageInstance.bottomItem){
+			return
+		}
+
+		// Only leaf permission IDs are stored. Locked permissions come from parent roles;
+		// the ones the role also owned before stay its own.
+		var ownIds = permissionPageInstance.bottomItem.getCheckedIds(true)
+		var lockedPermissions = permissionPageInstance.bottomItem.lockedPermissions
+		var previousIds = container.ownPermissionIds()
+		for (var i = 0; i < previousIds.length; i++){
+			if (lockedPermissions[previousIds[i]] && ownIds.indexOf(previousIds[i]) < 0){
+				ownIds.push(previousIds[i])
+			}
+		}
+
+		if (!container.roleData.hasPermissions()){
+			container.roleData.emplacePermissions()
+		}
+
+		var permissions = container.roleData.m_permissions
+		var present = []
+		for (var k = permissions.count - 1; k >= 0; k--){
+			var item = permissions.get(k).item
+			var itemId = String(item.m_id)
+			var own = ownIds.indexOf(itemId) >= 0
+			var inherited = item.m_sources && item.m_sources.count > 0
+			if (!own && !inherited){
+				permissions.removeElement(k)
+				continue
+			}
+			item.m_direct = own
+			present.push(itemId)
+		}
+
+		for (var n = 0; n < ownIds.length; n++){
+			if (present.indexOf(ownIds[n]) < 0){
+				var assignment = container.roleData.createPermissionsArrayElement()
+				assignment.m_id = ownIds[n]
+				assignment.m_name = ownIds[n]
+				assignment.m_direct = true
+				permissions.addElement(assignment)
+			}
 		}
 	}
 
@@ -173,6 +275,7 @@ ViewBase {
 				multiPageView.addPage("History", qsTr("History"), historyPageComp, "Icons/History")
 			}
 			multiPageView.currentIndex = 0
+			container.updateBadges()
 		}
 
 		Component.onCompleted: {
@@ -329,115 +432,152 @@ ViewBase {
 			anchors.fill: parent
 
 			function updateGui(){
-				parentRolesGroup.updateGui();
+				if (!container.roleData){
+					return
+				}
+
+				parentRolesTable.loadAssignments(container.roleData.m_parentRoles)
 			}
 
 			function updateModel(){
-				parentRolesGroup.updateModel();
+				if (!container.roleData){
+					return
+				}
+
+				if (!container.roleData.hasParentRoles()){
+					container.roleData.emplaceParentRoles()
+				}
+
+				var added = parentRolesTable.syncAssignments(container.roleData.m_parentRoles)
+				for (var i = 0; i < added.length; i++){
+					var assignment = container.roleData.createParentRolesArrayElement()
+					assignment.m_id = added[i].id
+					assignment.m_name = added[i].title
+					assignment.m_direct = true
+					container.roleData.m_parentRoles.addElement(assignment)
+				}
 			}
 
 			Component.onCompleted: {
 				parentRolesPage.updateGui();
 			}
 
-			CustomScrollbar {
-				id: scrollbar;
-				z: parent.z + 1;
-				anchors.right: parent.right;
-				anchors.top: flickable.top;
-				anchors.bottom: flickable.bottom;
-				secondSize: Style.marginM;
-				targetItem: flickable;
-			}
+			Column {
+				id: parentRolesHeader
+				anchors.top: parent.top
+				anchors.topMargin: Style.marginXL
+				x: Math.max(0, (parentRolesPage.width - width) / 2)
+				width: Math.max(0, Math.min(Style.contentWidthMax, parentRolesPage.width - 2 * Style.marginXL))
+				spacing: Style.marginM
 
-			Flickable {
-				id: flickable;
-				anchors.top: parent.top;
-				anchors.topMargin: Style.marginXL;
-				anchors.bottom: parent.bottom;
-				anchors.bottomMargin: Style.marginXL;
-				anchors.left: parent.left;
-				anchors.leftMargin: Style.marginXL;
-				anchors.right: scrollbar.left;
-				anchors.rightMargin: Style.marginXL;
-				contentHeight: bodyColumn.height + 2 * Style.marginXL;
+				GroupHeaderView {
+					width: parent.width
+					title: qsTr("Parent Roles") + " (" + parentRolesTable.itemsCount + ")" + (container.assignmentsUpdating ? "   " + qsTr("Updating...") : "")
+					controlComp: Component {
+						Row {
+							anchors.verticalCenter: parent.verticalCenter
+							spacing: Style.marginL
 
-				boundsBehavior: Flickable.StopAtBounds;
-				clip: true;
+							Text {
+								objectName: "RemoveParentRoleLink"
+								anchors.verticalCenter: parent.verticalCenter
+								text: qsTr("Remove") + " (" + parentRolesTable.selectedCount + ")"
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: parentRolesTable.selectedCount > 0 ? Style.linkColor : Style.inactiveTextColor
 
-				Column {
-					id: bodyColumn;
-					anchors.horizontalCenter: parent.horizontalCenter;
-					width: Math.min(parent.width, Style.contentWidthMax);
-					spacing: Style.marginXL;
-
-					GroupHeaderView {
-						width: parent.width;
-						title: qsTr("Parent Roles");
-						groupView: parentRolesGroup;
-					}
-
-					GroupElementView {
-						id: parentRolesGroup;
-						width: parent.width;
-
-						CollectionItemSelectElementView {
-							id: roleSelectableCollectionEditor
-							commandId: ImtauthRolesSdlCommandIds.s_rolesList
-							fields: [RoleItemDataTypeMetaInfo.s_id, RoleItemDataTypeMetaInfo.s_roleName]
-							titleField: RoleItemDataTypeMetaInfo.s_roleName
-							textFilterFieldIds: [RoleItemDataTypeMetaInfo.s_roleName]
-							sortByField: RoleItemDataTypeMetaInfo.s_roleName
-							label: qsTr("Parent Roles")
-							addButtonText: qsTr("Add Parent Role")
-							// A role cannot be its own parent, so it is not offered at all.
-							// Deeper cycles are rejected by the server on save.
-							excludeIds: container.roleData && container.roleData.m_id
-								? [container.roleData.m_id]
-								: []
-							showCount: true
-
-							// The role list is scoped by product, as a header and as an input field.
-							function getHeaders(){
-								let headers = {}
-								headers["productId"] = container.productId
-								return headers
-							}
-
-							function setCustomInputParams(inputParams){
-								if (container.productId){
-									inputParams.InsertField(RoleItemInputTypeMetaInfo.s_productId, container.productId)
+								MouseArea {
+									objectName: "MouseArea"
+									anchors.fill: parent
+									enabled: parentRolesTable.selectedCount > 0
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: {
+										parentRolesTable.removeSelected()
+									}
 								}
 							}
 
-							onSelectionChanged: {
-								container.doUpdateModel()
+							Text {
+								id: parentRolesTableAddLink
+								objectName: "AddParentRoleLink"
+								anchors.verticalCenter: parent.verticalCenter
+								text: "+ " + qsTr("Add Parent Role")
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: Style.linkColor
+
+								MouseArea {
+									objectName: "MouseArea"
+									anchors.fill: parent
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: {
+										roleSelectableCollectionEditor.items = parentRolesTable.directItems()
+										roleSelectableCollectionEditor.openSelector(parentRolesTableAddLink)
+									}
+								}
 							}
-						}
-
-						function updateGui(){
-							if (!container.roleData){
-								return
-							}
-
-							var ids = container.roleData.m_parentRoles ? container.roleData.m_parentRoles.slice() : []
-							var arr = []
-							for (var i = 0; i < ids.length; i++)
-								arr.push({id: ids[i], name: ids[i]})
-							roleSelectableCollectionEditor.items = arr
-						}
-
-						function updateModel(){
-							if (!container.roleData){
-								return
-							}
-
-							var arr = []
-							for (var i = 0; i < roleSelectableCollectionEditor.items.length; i++)
-								arr.push(roleSelectableCollectionEditor.items[i].id)
-							container.roleData.m_parentRoles = arr
 						}
 					}
+				}
+
+				CollectionItemSelectElementView {
+					id: roleSelectableCollectionEditor
+					width: parent.width
+					commandId: ImtauthRolesSdlCommandIds.s_rolesList
+					fields: [RoleItemDataTypeMetaInfo.s_id, RoleItemDataTypeMetaInfo.s_roleName]
+					titleField: RoleItemDataTypeMetaInfo.s_roleName
+					textFilterFieldIds: [RoleItemDataTypeMetaInfo.s_roleName]
+					sortByField: RoleItemDataTypeMetaInfo.s_roleName
+					label: qsTr("Parent Roles")
+					addButtonText: qsTr("Add Parent Role")
+					// A role cannot be its own parent, so it is not offered at all.
+					excludeIds: container.roleData && container.roleData.m_id
+						? [container.roleData.m_id]
+						: []
+					visible: false
+
+					// The role list is scoped by product, as a header and as an input field.
+					function getHeaders(){
+						let headers = {}
+						headers["productId"] = container.productId
+						return headers
+					}
+
+					function setCustomInputParams(inputParams){
+						if (container.productId){
+							inputParams.InsertField(RoleItemInputTypeMetaInfo.s_productId, container.productId)
+						}
+					}
+
+					onSelectionChanged: {
+						parentRolesTable.setDirectItems(roleSelectableCollectionEditor.items)
+						container.doUpdateModel()
+						container.assignmentsChanged()
+					}
+				}
+			}
+
+			AssignmentsTable {
+				id: parentRolesTable
+				anchors.top: parentRolesHeader.bottom
+				anchors.topMargin: Style.marginM
+				anchors.bottom: parent.bottom
+				anchors.bottomMargin: Style.marginXL
+				x: parentRolesHeader.x
+				width: parentRolesHeader.width
+				warnings: container.roleData ? container.roleData.m_accessWarnings : null
+				editable: true
+				navigationPath: "Administration/Roles/Role/"
+				nameTitle: qsTr("Role")
+				emptyText: qsTr("The role has no parent roles.")
+				filterPlaceholder: qsTr("Filter roles...")
+
+
+				onRemoved: {
+					container.doUpdateModel()
+					container.assignmentsChanged()
 				}
 			}
 		}
@@ -473,6 +613,33 @@ ViewBase {
 				populatePermissionsTimer.restart();
 			}
 
+			Column {
+				id: permissionsHeader
+				anchors.top: parent.top
+				anchors.topMargin: Style.marginXL
+				x: Math.max(0, (permissionPage.width - width) / 2)
+				width: Math.max(0, Math.min(Style.contentWidthMax, permissionPage.width - 2 * Style.marginXL))
+				spacing: Style.marginM
+
+				GroupHeaderView {
+					width: parent.width
+					title: qsTr("Permissions") + " (" + (permissionPage.bottomItem ? permissionPage.bottomItem.checkedCount : 0) + ")" + (container.assignmentsUpdating ? "   " + qsTr("Updating...") : "")
+					controlComp: Component {
+						CheckBox {
+							objectName: "SelectedPermissionsOnlyCheckBox"
+							anchors.verticalCenter: parent.verticalCenter
+							text: qsTr("Selected only")
+
+							onCheckStateChanged: {
+								if (permissionPage.bottomItem){
+									permissionPage.bottomItem.selectedOnly = checkState === Qt.Checked
+								}
+							}
+						}
+					}
+				}
+			}
+
 			CustomScrollbar {
 				id: scrollbar;
 				z: parent.z + 1;
@@ -485,15 +652,15 @@ ViewBase {
 
 			Flickable {
 				id: flickable;
-				anchors.top: parent.top;
-				anchors.topMargin: Style.marginXL;
+				anchors.top: permissionsHeader.bottom;
+				anchors.topMargin: Style.marginM;
 				anchors.bottom: parent.bottom;
 				anchors.bottomMargin: Style.marginXL;
 				anchors.left: parent.left;
 				anchors.leftMargin: Style.marginXL;
 				anchors.right: scrollbar.left;
 				anchors.rightMargin: Style.marginXL;
-				contentHeight: bodyColumn.height + 2 * Style.marginXL;
+				contentHeight: bodyColumn.height + Style.marginXL;
 
 				boundsBehavior: Flickable.StopAtBounds;
 				clip: true;
@@ -504,16 +671,10 @@ ViewBase {
 					width: Math.min(parent.width, Style.contentWidthMax);
 					spacing: Style.marginXL;
 
-					GroupHeaderView {
-						width: parent.width;
-						title: qsTr("Permissions");
-						groupView: permissionsGroupElement;
-					}
-
 					GroupElementView {
 						id: permissionsGroupElement
 						width: parent.width
-						
+
 						ElementView {
 							id: permissionsTableElementView
 							width: parent.width
@@ -529,11 +690,12 @@ ViewBase {
 									width: parent.width
 									height: preferredHeight
 									showControlPanel: true
+									showSourceColumn: true
 									treeToScrollbarSpacing: 0
 									controlPanelTopMargin: Style.marginL
 									treeTopMargin: Style.marginL
 									treeBottomMargin: Style.marginL
-				
+
 									onSelectionChanged: {
 										container.doUpdateModel()
 									}

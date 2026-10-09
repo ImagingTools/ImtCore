@@ -155,9 +155,12 @@ Item {
 				multiPageView.block = true
 				multiPageView.currentIndex = index
 
-				administrationContainer.closeAllDocumentsForManager(administrationContainer.apiClient.roleDocumentManager)
-				administrationContainer.closeAllDocumentsForManager(administrationContainer.apiClient.userDocumentManager)
-				administrationContainer.closeAllDocumentsForManager(administrationContainer.apiClient.groupDocumentManager)
+				// Navigating to a document (e.g. from one editor to a role it shows) keeps the other editors open.
+				if (restPath.length < 2){
+					administrationContainer.closeAllDocumentsForManager(administrationContainer.apiClient.roleDocumentManager)
+					administrationContainer.closeAllDocumentsForManager(administrationContainer.apiClient.userDocumentManager)
+					administrationContainer.closeAllDocumentsForManager(administrationContainer.apiClient.groupDocumentManager)
+				}
 
 				if (restPath.length >= 2){
 					let documentTypeId = restPath[0]

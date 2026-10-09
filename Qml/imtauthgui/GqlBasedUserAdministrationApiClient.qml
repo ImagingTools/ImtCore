@@ -162,6 +162,78 @@ QtObject {
 		root.__removeGroupSender.send(root.__removeGroupInput)
 	}
 
+	// Ids of the direct assignments of an SDL Assignment list.
+	function __directIds(assignments) {
+		var ids = []
+		for (var i = 0; assignments && i < assignments.count; i++) {
+			var assignment = assignments.get(i).item
+			if (assignment.m_direct)
+				ids.push(String(assignment.m_id))
+		}
+		return ids
+	}
+
+	// Selection of an Assignment list: id, name, direct and the paths it comes through.
+	function __assignmentsField(fieldId) {
+		var steps = Gql.GqlObject("steps")
+		steps.InsertField("kind")
+		steps.InsertField("id")
+		steps.InsertField("name")
+		var sources = Gql.GqlObject("sources")
+		sources.InsertFieldObject(steps)
+		var field = Gql.GqlObject(fieldId)
+		field.InsertField("id")
+		field.InsertField("name")
+		field.InsertField("direct")
+		field.InsertFieldObject(sources)
+		return field
+	}
+
+	// Representation query of an open document that asks only for the given assignment lists and the warnings.
+	function __addAssignmentsQuery(query, documentId, collectionId, fieldIds) {
+		var input = Gql.GqlObject("input")
+		input.InsertField("id", documentId)
+		input.InsertField("collectionId", collectionId)
+		query.AddParam(input)
+
+		var fields = Gql.GqlObject("fields")
+		for (var i = 0; i < fieldIds.length; i++)
+			fields.InsertFieldObject(root.__assignmentsField(fieldIds[i]))
+		var warnings = Gql.GqlObject("accessWarnings")
+		warnings.InsertField("code")
+		warnings.InsertField("ids")
+		warnings.InsertField("message")
+		fields.InsertFieldObject(warnings)
+		query.AddField(fields)
+	}
+
+	// Replaces an SDL list of the representation by a copy of the same list of an answer.
+	function __copyList(target, source, propertyId) {
+		if (!target[propertyId])
+			target["emplace" + propertyId.charAt(2).toUpperCase() + propertyId.slice(3)]()
+		target[propertyId].clear()
+		var items = source[propertyId]
+		for (var i = 0; items && i < items.count; i++) {
+			// Created like fromObject() does: copyMe() resolves its component by a relative path the web build cannot.
+			var element = target.createElement(propertyId).createObject(target)
+			element.fromJSON(items.get(i).item.toJson())
+			// The web BaseModel has no appendElement().
+			target[propertyId].insertElement(target[propertyId].count, element)
+		}
+	}
+
+	// Writes the given lists of an answer into the editor's model and lets the editor show them.
+	function __applyAssignments(controller, data, propertyIds) {
+		var view = controller.view
+		if (!view)
+			return
+		view.setBlockingUpdateModel(true)
+		for (var i = 0; i < propertyIds.length; i++)
+			root.__copyList(controller.representationModel, data, propertyIds[i])
+		view.setBlockingUpdateModel(false)
+		view.updateAssignments()
+	}
+
 	function __handleRoleDataReceived(roleData) {
 		if (!roleData)
 			return
@@ -170,8 +242,8 @@ QtObject {
 			description: roleData.m_description || "",
 			roleId: roleData.m_roleId || "",
 			productId: roleData.m_productId || "",
-			parentRoles: roleData.m_parentRoles || [],
-			permissions: roleData.m_permissions || "",
+			parentRoles: root.__directIds(roleData.m_parentRoles),
+			permissions: root.__directIds(roleData.m_permissions).join(";"),
 			isDefault: roleData.m_isDefault || false,
 			isGuest: roleData.m_isGuest || false
 		}
@@ -185,9 +257,9 @@ QtObject {
 			name: groupData.m_name || "",
 			description: groupData.m_description || "",
 			productId: groupData.m_productId || "",
-			roles: groupData.m_roles || [],
-			users: groupData.m_users || [],
-			parentGroups: groupData.m_parentGroups || []
+			roles: root.__directIds(groupData.m_roles),
+			users: root.__directIds(groupData.m_users),
+			parentGroups: root.__directIds(groupData.m_parentGroups)
 		}
 		root.groupDataReceived(data)
 	}
@@ -201,9 +273,9 @@ QtObject {
 			username: userData.m_username || "",
 			email: userData.m_email || "",
 			productId: userData.m_productId || "",
-			groups: userData.m_groups || [],
-			roles: userData.m_roles || [],
-			permissions: userData.m_permissions || []
+			groups: root.__directIds(userData.m_groups),
+			roles: root.__directIds(userData.m_roles),
+			permissions: root.__directIds(userData.m_permissions)
 		}
 		root.userDataReceived(data)
 	}
@@ -306,6 +378,49 @@ QtObject {
 					roleReprController.updateDocumentFailed(roleReprController.documentId, message)
 				}
 			}
+
+			property AssignmentsRefresher assignmentsRefresher: AssignmentsRefresher {
+				controller: roleReprController
+
+				onBusyChanged: {
+					if (roleReprController.view)
+						roleReprController.view.assignmentsUpdating = busy
+				}
+
+				onSendRequested: {
+					roleReprController.getRoleAssignmentsRequest.send()
+				}
+			}
+
+			property Connections viewConnections: Connections {
+				target: roleReprController.view
+
+				function onAssignmentsChanged(){
+					roleReprController.assignmentsRefresher.request()
+				}
+			}
+
+			property GqlSdlRequestSender getRoleAssignmentsRequest: GqlSdlRequestSender {
+				context: root.context
+				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_getRoleRepresentation
+				sdlObjectComp: Component {
+					RoleData {
+						onFinished: {
+							if (roleReprController.assignmentsRefresher.finished())
+								root.__applyAssignments(roleReprController, this, ["m_parentRoles", "m_permissions", "m_accessWarnings"])
+						}
+					}
+				}
+
+				function createQueryParams(query){
+					root.__addAssignmentsQuery(query, roleReprController.documentId, "Roles", ["parentRoles", "permissions"])
+				}
+
+				function onError(message, type){
+					roleReprController.assignmentsRefresher.failed()
+					PopupManager.addErrorMessage(message, true)
+				}
+			}
 		}
 	}
 
@@ -313,6 +428,13 @@ QtObject {
 	property Component __groupEditorComp: Component {
 		UserGroupView {
 			productId: root.productId
+			permissionGroups: root.allPermissions
+
+			Component.onCompleted: {
+				if (!root.allPermissions || root.allPermissions.length === 0){
+					root.fetchAllPermissions()
+				}
+			}
 			commandsControllerComp: Component {
 				GqlBasedCommandsController {
 					typeId: root.groupObjectTypeId
@@ -393,6 +515,50 @@ QtObject {
 					groupReprController.updateDocumentFailed(groupReprController.documentId, message)
 				}
 			}
+
+			property AssignmentsRefresher assignmentsRefresher: AssignmentsRefresher {
+				controller: groupReprController
+
+				onBusyChanged: {
+					if (groupReprController.view)
+						groupReprController.view.assignmentsUpdating = busy
+				}
+
+				onSendRequested: {
+					groupReprController.getGroupAssignmentsRequest.send()
+				}
+			}
+
+			property Connections viewConnections: Connections {
+				target: groupReprController.view
+
+				function onAssignmentsChanged(){
+					groupReprController.assignmentsRefresher.request()
+				}
+			}
+
+			// Members are not requested: they are edited here and inherit nothing.
+			property GqlSdlRequestSender getGroupAssignmentsRequest: GqlSdlRequestSender {
+				context: root.context
+				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_getGroupRepresentation
+				sdlObjectComp: Component {
+					GroupData {
+						onFinished: {
+							if (groupReprController.assignmentsRefresher.finished())
+								root.__applyAssignments(groupReprController, this, ["m_roles", "m_parentGroups", "m_permissions", "m_accessWarnings"])
+						}
+					}
+				}
+
+				function createQueryParams(query){
+					root.__addAssignmentsQuery(query, groupReprController.documentId, "Groups", ["roles", "parentGroups", "permissions"])
+				}
+
+				function onError(message, type){
+					groupReprController.assignmentsRefresher.failed()
+					PopupManager.addErrorMessage(message, true)
+				}
+			}
 		}
 	}
 
@@ -402,6 +568,13 @@ QtObject {
 			id: userEditor
 			productId: root.productId
 			passwordPolicy: root.passwordPolicy
+			permissionGroups: root.allPermissions
+
+			Component.onCompleted: {
+				if (!root.allPermissions || root.allPermissions.length === 0){
+					root.fetchAllPermissions()
+				}
+			}
 			commandsControllerComp: Component {
 				GqlBasedCommandsController {
 					typeId: root.userObjectTypeId
@@ -499,6 +672,49 @@ QtObject {
 
 				function onError(message, type){
 					userReprController.updateDocumentFailed(userReprController.documentId, message)
+				}
+			}
+
+			property AssignmentsRefresher assignmentsRefresher: AssignmentsRefresher {
+				controller: userReprController
+
+				onBusyChanged: {
+					if (userReprController.view)
+						userReprController.view.assignmentsUpdating = busy
+				}
+
+				onSendRequested: {
+					userReprController.getUserAssignmentsRequest.send()
+				}
+			}
+
+			property Connections viewConnections: Connections {
+				target: userReprController.view
+
+				function onAssignmentsChanged(){
+					userReprController.assignmentsRefresher.request()
+				}
+			}
+
+			property GqlSdlRequestSender getUserAssignmentsRequest: GqlSdlRequestSender {
+				context: root.context
+				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_getUserRepresentation
+				sdlObjectComp: Component {
+					UserData {
+						onFinished: {
+							if (userReprController.assignmentsRefresher.finished())
+								root.__applyAssignments(userReprController, this, ["m_roles", "m_groups", "m_permissions", "m_accessWarnings"])
+						}
+					}
+				}
+
+				function createQueryParams(query){
+					root.__addAssignmentsQuery(query, userReprController.documentId, "Users", ["roles", "groups", "permissions"])
+				}
+
+				function onError(message, type){
+					userReprController.assignmentsRefresher.failed()
+					PopupManager.addErrorMessage(message, true)
 				}
 			}
 		}

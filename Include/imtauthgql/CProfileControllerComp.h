@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IDocumentChangeGenerator.h>
 #include <imtlic/IProductInfo.h>
 #include <imtauth/ITenantMembership.h>
 #include <imtauth/ITenantMembershipManager.h>
@@ -36,6 +37,7 @@ public:
 		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
 		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for tenant-scoped adaptation of user roles/groups/permissions", false, "TenantEntityBindingManager");
 		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider (used for delegated role product validation)", false, "RoleInfoProvider");
+		I_ASSIGN(m_userChangeGeneratorCompPtr, "UserChangeGenerator", "Generates the change description of a profile update", false, "UserChangeGenerator");
 	I_END_COMPONENT;
 
 protected:
@@ -65,6 +67,7 @@ protected:
 	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
 	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
 	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
+	I_REF(imtbase::IDocumentChangeGenerator, m_userChangeGeneratorCompPtr);
 };
 
 

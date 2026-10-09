@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QByteArrayList>
+#include <QtCore/QSet>
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
@@ -101,14 +102,25 @@ IRole::FeatureIds CRole::GetPermissions() const
 	IRole::FeatureIds allPermissions = m_rolePermissions;
 
 	if (m_roleInfoProviderPtr != nullptr){
-		for (const QByteArray& roleId : m_parents){
+		// Walked iteratively with a visited set: a cycle in the parent roles must not recurse forever.
+		QByteArrayList pendingRoleIds = m_parents;
+		QSet<QByteArray> visitedRoleIds;
+		while (!pendingRoleIds.isEmpty()){
+			const QByteArray roleId = pendingRoleIds.takeFirst();
+			if (visitedRoleIds.contains(roleId)){
+				continue;
+			}
+			visitedRoleIds.insert(roleId);
+
 			IRoleUniquePtr roleInfoPtr = m_roleInfoProviderPtr->GetRole(roleId);
 			if (roleInfoPtr.IsValid()){
-				for (const QByteArray& permissionId : roleInfoPtr->GetPermissions()){
+				for (const QByteArray& permissionId : roleInfoPtr->GetLocalPermissions()){
 					if (!allPermissions.contains(permissionId)){
 						allPermissions << permissionId;
 					}
 				}
+
+				pendingRoleIds += roleInfoPtr->GetIncludedRoles();
 			}
 		}
 	}

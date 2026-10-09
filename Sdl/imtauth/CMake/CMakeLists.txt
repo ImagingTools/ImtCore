@@ -23,10 +23,15 @@ add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/UserCollectionDocumentService.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/CrossOrgGrantCollectionDocumentService.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Permissions.sdl
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/Assignments.sdl
 			)
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Permissions.sdl"
+			VERSION		"1.0")
+
+ImtCoreCustomConfigureSdlCppQml(CXX QML
+			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Assignments.sdl"
 			VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML

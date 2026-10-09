@@ -84,7 +84,7 @@ private:
 	QByteArray m_id;
 	QString m_title;
 	QString m_description;
-	TicketType m_ticketType = TT_ACCESS_REQUEST;
+	TicketType m_ticketType = TT_SUPPORT_REQUEST;
 	TicketStatus m_status = TS_OPEN;
 	StateReason m_stateReason = SR_NONE;
 	TicketPriority m_priority = TP_MEDIUM;

@@ -2,6 +2,9 @@
 #include <imtauth/CUserGroupInfo.h>
 
 
+// Qt includes
+#include <QtCore/QSet>
+
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
@@ -126,36 +129,38 @@ const imtauth::IUserInfoProvider* CUserGroupInfo::GetUserProvider() const
 
 // reimplemented (IUserBaseInfo)
 
-imtauth::IUserBaseInfo::RoleIds CUserGroupInfo::GetRoles(const QByteArray& productId) const
-{
-	IUserBaseInfo::RoleIds retVal = BaseClass::GetRoles(productId);
-	if (m_userGroupInfoProviderPtr != nullptr){
-		for (const QByteArray& parentGroupId : m_parentGroupIds){
-			IUserGroupInfoSharedPtr parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
-			if (parentGroupPtr.IsValid()){
-				for (const QByteArray& roleId : parentGroupPtr->GetRoles(productId)){
-					if (!retVal.contains(roleId)){
-						retVal << roleId;
-					}
-				}
-			}
-		}
-	}
-
-	return retVal;
-}
-
-
 IUserBaseInfo::FeatureIds CUserGroupInfo::GetPermissions(const QByteArray& productId) const
 {
 	IUserBaseInfo::FeatureIds allPermissions = BaseClass::GetPermissions(productId);
 
 	if (m_userGroupInfoProviderPtr != nullptr){
-		for (const QByteArray& parentGroupId : m_parentGroupIds){
-			IUserGroupInfoSharedPtr parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
-			if (parentGroupPtr.IsValid()){
-				allPermissions += parentGroupPtr->GetPermissions(productId);
+		// Walked iteratively with a visited set: a cycle in the parent groups must not recurse forever.
+		QByteArrayList pendingGroupIds = m_parentGroupIds;
+		QSet<QByteArray> visitedGroupIds;
+		while (!pendingGroupIds.isEmpty()){
+			const QByteArray groupId = pendingGroupIds.takeFirst();
+			if (visitedGroupIds.contains(groupId)){
+				continue;
 			}
+			visitedGroupIds.insert(groupId);
+
+			IUserGroupInfoSharedPtr parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(groupId);
+			if (!parentGroupPtr.IsValid()){
+				continue;
+			}
+
+			// Only the group's own roles here, its parents are walked by this loop.
+			const CUserBaseInfo* parentBasePtr = dynamic_cast<const CUserBaseInfo*>(parentGroupPtr.GetPtr());
+			const FeatureIds parentPermissions = (parentBasePtr != nullptr)
+						? parentBasePtr->CUserBaseInfo::GetPermissions(productId)
+						: parentGroupPtr->GetPermissions(productId);
+			for (const QByteArray& permissionId : parentPermissions){
+				if (!allPermissions.contains(permissionId)){
+					allPermissions << permissionId;
+				}
+			}
+
+			pendingGroupIds += parentGroupPtr->GetParentGroups();
 		}
 	}
 

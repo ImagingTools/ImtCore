@@ -81,11 +81,6 @@ I_EXPORT_COMPONENT(
 			"LDAP Authorization Controller");
 
 I_EXPORT_COMPONENT(
-			UserSerializableCollectionController,
-			"User serializable collection controller",
-			"User Serializable Collection Controller");
-
-I_EXPORT_COMPONENT(
 			UserSettingsController,
 			"Client settings controller",
 			"GraphQL Controller Model Client User");

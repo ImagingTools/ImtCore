@@ -340,6 +340,7 @@ DecoratorBase {
 					// makes the chip wider and can cost the row its last place.
 					Connections {
 						target: delegateLoader.item
+						ignoreUnknownSignals: true
 
 						function onImplicitWidthChanged(){
 							filterPanelDecorator.scheduleRelayout()

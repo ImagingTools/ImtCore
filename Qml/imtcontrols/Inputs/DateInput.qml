@@ -211,7 +211,7 @@ Item {
 
 		let dayNumber = Number(day);
 
-		if(dayNumber > 31){
+		if(dayNumber < 1 || dayNumber > 31){
 			return false;
 		}
 		if(dayNumber <= 28){
@@ -291,6 +291,7 @@ Item {
 				textInputValidator : RegularExpressionValidator { regularExpression: dateInput.dateRegExp }
 
 				property bool isEmpty: false;
+				autoEditingFinished: false;
 
 				onVisibleChanged: {
 					if(text == ""){
@@ -298,13 +299,11 @@ Item {
 					}
 				}
 
-				onFocusChanged: {
-					if(!focus){
-						dateInput.setDateAsString(input.text);
-					}
+				onEditingFinished: {
+					dateInput.setDateAsString(input.text);
 				}
 				onAccepted: {
-					if(dateInput.setDateAsString(input.text)){
+					if(dateInput.setDateAsString(input.text) && dateInput.tabKeyItem){
 						dateInput.tabKeyItem.forceActiveFocus();
 					}
 				}

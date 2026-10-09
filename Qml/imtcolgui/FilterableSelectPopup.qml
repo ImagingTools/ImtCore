@@ -117,7 +117,29 @@ PopupView {
 	property int maxSelectedGroupItems: 4
 
 	// --- Private: max popup height (screen height minus margins) ---
-	property int __maxPopupHeight: 600
+	property int __maxPopupHeight: ModalDialogManager.activeView ? Math.min(600, ModalDialogManager.activeView.height - 2 * Style.marginL) : 600
+
+	onXChanged: root.__clampToHost()
+	onYChanged: root.__clampToHost()
+	onWidthChanged: root.__clampToHost()
+	onHeightChanged: root.__clampToHost()
+
+	// Callers place the popup at the anchor point; keep it inside the window.
+	function __clampToHost(){
+		if (root.embedded || !ModalDialogManager.activeView){
+			return
+		}
+
+		let maxX = ModalDialogManager.activeView.width - root.width - Style.marginL
+		if (root.x > maxX){
+			root.x = Math.max(Style.marginL, maxX)
+		}
+
+		let maxY = ModalDialogManager.activeView.height - root.height - Style.marginL
+		if (root.y > maxY){
+			root.y = Math.max(Style.marginL, maxY)
+		}
+	}
 
 	// --- Private: fixed height of the list stage ---
 	// Loading / empty / error / results all reserve this SAME height regardless of

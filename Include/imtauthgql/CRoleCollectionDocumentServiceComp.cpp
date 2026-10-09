@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtauth/CRole.h>
+#include <imtauthgql/CAssignmentCollector.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/RoleCollectionDocumentService.h>
@@ -60,17 +61,9 @@ sdl::V1_0::imtauth::CRoleData CRoleCollectionDocumentServiceComp::OnGetRoleRepre
 	response.isDefault = rolePtr->IsDefault();
 	response.isGuest = rolePtr->IsGuest();
 
-	response.parentRoles.Emplace();
-	QByteArrayList includedRoles = rolePtr->GetIncludedRoles();
-	for (const QByteArray& parentRoleId : includedRoles){
-		response.parentRoles->push_back(parentRoleId);
-	}
-
-	// permissions is a flat ID-list of local permissions joined with the
-	// schema-defined separator (kept as a single string field for parity
-	// with the existing RoleData representation).
-	QByteArrayList localPermissions = rolePtr->GetLocalPermissions();
-	response.permissions = localPermissions.join(';');
+	CAssignmentCollector collector;
+	collector.CollectRole(*rolePtr, rolePtr->GetObjectUuid(), nullptr);
+	collector.FillRole(response);
 
 	return response;
 }
@@ -144,20 +137,13 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRoleCollectionDocumentServiceComp:
 		for (const QByteArray& parentRoleId : currentParents){
 			rolePtr->ExcludeRole(parentRoleId);
 		}
-		for (const auto& parentRoleIdPtr : *roleData.parentRoles){
-			if (parentRoleIdPtr){
-				rolePtr->IncludeRole(*parentRoleIdPtr);
-			}
+		for (const QByteArray& parentRoleId : CAssignmentCollector::GetDirectIds(roleData.parentRoles)){
+			rolePtr->IncludeRole(parentRoleId);
 		}
 	}
 
 	if (roleData.permissions){
-		QByteArrayList permissions;
-		QByteArray joined = *roleData.permissions;
-		if (!joined.isEmpty()){
-			permissions = joined.split(';');
-		}
-		rolePtr->SetLocalPermissions(permissions);
+		rolePtr->SetLocalPermissions(CAssignmentCollector::GetDirectIds(roleData.permissions));
 	}
 
 	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);

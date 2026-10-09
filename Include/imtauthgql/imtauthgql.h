@@ -30,6 +30,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QByteArrayList>
 #include <imtauth/IUserInfo.h>
+#include <imtauth/IUserGroupInfoProvider.h>
 
 
 /**
@@ -987,6 +988,47 @@ inline bool ShouldKeepEntityForTenant(
 	return bindingManager->HasBinding(tenantId, entityType, entityId);
 }
 
+
+/**
+	Get the roles a user holds for the product: the directly assigned ones plus
+	the roles of all groups of the user, including their parent groups.
+*/
+inline imtauth::IUserBaseInfo::RoleIds GetEffectiveUserRoles(const imtauth::IUserInfo& userInfo, const QByteArray& productId)
+{
+	imtauth::IUserBaseInfo::RoleIds retVal = userInfo.GetRoles(productId);
+
+	const imtauth::IUserGroupInfoProvider* groupProviderPtr = userInfo.GetUserGroupProvider();
+	if (groupProviderPtr == nullptr){
+		return retVal;
+	}
+
+	QByteArrayList pendingGroupIds = userInfo.GetGroups();
+	QSet<QByteArray> visitedGroupIds;
+	while (!pendingGroupIds.isEmpty()){
+		const QByteArray groupId = pendingGroupIds.takeFirst();
+		if (visitedGroupIds.contains(groupId)){
+			continue;
+		}
+		visitedGroupIds.insert(groupId);
+
+		imtauth::IUserGroupInfoSharedPtr groupPtr = groupProviderPtr->GetUserGroup(groupId);
+		if (!groupPtr.IsValid()){
+			continue;
+		}
+
+		for (const QByteArray& roleId : groupPtr->GetRoles(productId)){
+			if (!retVal.contains(roleId)){
+				retVal << roleId;
+			}
+		}
+
+		pendingGroupIds += groupPtr->GetParentGroups();
+	}
+
+	return retVal;
+}
+
+
 inline istd::IChangeableUniquePtr AdaptUserForTenant(
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
@@ -1009,9 +1051,8 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	// CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery stores
 	// TenantEntityBindings.EntityType as GetTableName(), not the collection ID.
 	const QByteArray groupsEntity = QByteArrayLiteral("UserGroups");
-	const QByteArray permsEntity = QByteArrayLiteral("Permissions");
 
-	// Filter roles/groups/permissions according to tenant context.
+	// Filter roles/groups according to tenant context.
 	// empty tenantId: keep only entities with no tenant bindings at all (globals).
 	// non-empty tenantId: keep only entities bound to this tenant.
 	bool anyFilterChange = false;
@@ -1039,20 +1080,6 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 			filteredGroups.append(gid);
 		} else {
 			anyFilterChange = true;
-		}
-	}
-
-	QByteArrayList filteredPerms;
-	if (!productId.isEmpty()){
-		QByteArrayList userPerms = userInfoPtr->GetPermissions(productId);
-		for (int i = 0; i < userPerms.size(); ++i){
-			const QByteArray pid = userPerms.at(i);
-			if (pid.isEmpty()) continue;
-			if (ShouldKeepEntityForTenant(bindingManager, tenantId, permsEntity, pid)){
-				filteredPerms.append(pid);
-			} else {
-				anyFilterChange = true;
-			}
 		}
 	}
 
@@ -1117,7 +1144,6 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	if (anyFilterChange){
 		if (!productId.isEmpty()){
 			adaptedUserInfoPtr->SetRoles(productId, filteredRoles);
-			adaptedUserInfoPtr->SetLocalPermissions(productId, filteredPerms);
 		}
 		// reset groups to filtered list
 		QByteArrayList currGroups = adaptedUserInfoPtr->GetGroups();

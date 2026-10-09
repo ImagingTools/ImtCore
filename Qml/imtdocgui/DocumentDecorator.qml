@@ -35,6 +35,8 @@ QtObject {
 			representationController.startUpdateRepresentation.connect(onStartUpdateRepresentation)
 			representationController.updateRepresentationFailed.connect(onUpdateRepresentationFailed)
 			representationController.updateDocumentFailed.connect(onUpdateDocumentFailed)
+			representationController.startUpdateDocument.connect(onStartUpdateDocument)
+			representationController.documentUpdated.connect(onDocumentUpdated)
 
 			if (documentManager && view.commandsController){
 				let isDirty = documentManager.documentIsDirty(documentId)
@@ -195,7 +197,30 @@ QtObject {
 			return
 		}
 
+		_internal.pendingDocumentUpdates = Math.max(0, _internal.pendingDocumentUpdates - 1)
+		_internal.saveAfterUpdate = false
+
 		documentManager.updateDocumentFailed(documentId, message)
+	}
+
+	function onStartUpdateDocument(documentId){
+		if (root.documentId !== documentId){
+			return
+		}
+
+		_internal.pendingDocumentUpdates = _internal.pendingDocumentUpdates + 1
+	}
+
+	function onDocumentUpdated(documentId){
+		if (root.documentId !== documentId){
+			return
+		}
+
+		_internal.pendingDocumentUpdates = Math.max(0, _internal.pendingDocumentUpdates - 1)
+		if (_internal.pendingDocumentUpdates === 0 && _internal.saveAfterUpdate){
+			_internal.saveAfterUpdate = false
+			root.doSave()
+		}
 	}
 
 	function onGuiUpdated(view, model){
@@ -274,6 +299,29 @@ QtObject {
 			return
 		}
 
+		// A repeated Save while still waiting is the way out of an update that never reported back.
+		if (_internal.saveAfterUpdate){
+			_internal.saveAfterUpdate = false
+			_internal.pendingDocumentUpdates = 0
+			doSave()
+			return
+		}
+
+		for (let i = 0; i < registeredViews.length; ++i){
+			if (registeredViews[i].visible){
+				registeredViews[i].doUpdateModel()
+			}
+		}
+
+		if (_internal.pendingDocumentUpdates > 0){
+			_internal.saveAfterUpdate = true
+			return
+		}
+
+		doSave()
+	}
+
+	function doSave(){
 		if (documentManager.hasDocumentNameProvider(documentTypeId)){
 			documentManager.saveDocument(documentId, "")
 		}
@@ -318,5 +366,7 @@ QtObject {
 		property bool saveRequested: false
 		property var updateCounters: []
 		property var initiatingView: null
+		property int pendingDocumentUpdates: 0
+		property bool saveAfterUpdate: false
 	}
 }
