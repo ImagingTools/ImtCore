@@ -32,11 +32,14 @@ TestCase {
 		id: controllerComp
 
 		DocumentRepresentationController {
+			property int requestCount: 0
+
 			representationModel: QtObject {
 				signal modelChanged(var changeSet)
 			}
 
 			function updateRepresentationFromDocument(){
+				requestCount++
 				startUpdateRepresentation(documentId, representationModel)
 			}
 
@@ -108,5 +111,24 @@ TestCase {
 
 		compare(shell.state, "error")
 		compare(shell.lastErrorMessage, "Representation failed")
+	}
+
+	function test_retryRequestsRepresentationAgain(){
+		let shell = openShell()
+		let service = shell.documentManager
+
+		service.setDocumentIsLoading("doc", false)
+		let controller = controllerOf(service)
+		controller.updateRepresentationFailed("doc", "Representation failed")
+
+		shell.retry()
+
+		compare(controller.requestCount, 2)
+		compare(shell.state, "loading")
+		compare(shell.lastErrorMessage, "")
+
+		controller.representationUpdated("doc", controller.representationModel)
+
+		compare(shell.state, "content")
 	}
 }

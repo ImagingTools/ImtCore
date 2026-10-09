@@ -78,8 +78,8 @@ QtObject {
 	// Emitted once per document when it is fully ready for work:
 	//   - the document data has finished loading on the server,
 	//   - at least one view instance has been registered for the document,
-	//   - the representation has been received from the server (unless the
-	//     document is new and no controller has requestRepresentationOnCreate).
+	//   - the representation has been received from the server, if a visible view
+	//     needs it (a new document needs it only with requestRepresentationOnCreate).
 	// representationController belongs to the first registered view (null if it has none).
 	signal documentReady(string documentId, string typeId, bool isNew, var representationController)
 
@@ -326,6 +326,13 @@ QtObject {
 	function documentIsOpened(documentId){
 		let index = getDocumentIndexByDocumentId(documentId)
 		return index >= 0
+	}
+
+	function updateDocumentRepresentation(documentId){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index >= 0){
+			__internal.openedDocuments[index].documentDecorator.updateRepresentationForAllViews()
+		}
 	}
 
 	function setDocumentObjectId(documentId, objectId){
@@ -715,6 +722,11 @@ QtObject {
 					documentName: documentData.name
 					documentTypeId: documentData.typeId
 					documentManager: root
+
+					// Emitted after a representation request started on show is already counted.
+					onViewVisibilityChanged: {
+						root.__internal.maybeEmitDocumentReady(documentData.id)
+					}
 				}
 
 				signal viewAdded(string viewTypeId, var view)
@@ -813,7 +825,7 @@ QtObject {
 				return
 			}
 
-			if (decorator.anyRepresentationRequired(docData.isNew) && !docData.representationReceived){
+			if (!docData.representationReceived && decorator.isAwaitingRepresentation(docData.isNew)){
 				return
 			}
 

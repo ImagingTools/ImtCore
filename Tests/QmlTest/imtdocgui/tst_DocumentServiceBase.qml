@@ -99,19 +99,19 @@ TestCase {
 		return createTemporaryObject(spyComp, testCase, {"target": service, "signalName": signalName})
 	}
 
-	function addView(service, documentId, visible){
+	function addView(service, documentId, visible, viewType){
 		// TestCase itself is invisible, views need a visible parent
 		let view = createTemporaryObject(viewComp, testCase.parent, {"visible": visible !== false})
-		service.onViewInstanceCreated(documentId, view, viewTypeId)
+		service.onViewInstanceCreated(documentId, view, viewType || viewTypeId)
 
 		return view
 	}
 
-	function controllerOf(service, documentId){
+	function controllerOf(service, documentId, viewIndex){
 		let index = service.getDocumentIndexByDocumentId(documentId)
 		let controllers = service.__internal.openedDocuments[index].documentDecorator.registeredRepresentation
 
-		return controllers[0]
+		return controllers[viewIndex || 0]
 	}
 
 	function isBlocked(view){
@@ -360,6 +360,61 @@ TestCase {
 		controller.respond()
 
 		compare(controller.requestCount, 2)
+		compare(readySpy.count, 1)
+	}
+
+	function test_hiddenViewRequestingOnCreateDoesNotBlockReady(){
+		let service = createService(controllerComp)
+		service.registerDocumentViewData(typeId, "OnCreateView", viewComp, onCreateControllerComp)
+		let readySpy = createSpy(service, "documentReady")
+
+		service.handleDocumentCreated("doc", typeId, "", false, "", false, true)
+		let visibleView = addView(service, "doc")
+		let hiddenView = addView(service, "doc", false, "OnCreateView")
+
+		compare(readySpy.count, 1, "The visible view does not need a server representation")
+		verify(!isBlocked(visibleView))
+		compare(controllerOf(service, "doc", 1).requestCount, 0)
+
+		hiddenView.visible = true
+
+		compare(controllerOf(service, "doc", 1).requestCount, 1)
+	}
+
+	function test_readyAfterShowingViewThatNeedsNoRepresentation(){
+		let service = createService(controllerComp)
+		service.registerDocumentViewData(typeId, "OnCreateView", viewComp, onCreateControllerComp)
+		let readySpy = createSpy(service, "documentReady")
+
+		service.handleDocumentCreated("doc", typeId, "", false, "", false, true)
+		addView(service, "doc", false, "OnCreateView")
+		let plainView = addView(service, "doc", false)
+
+		compare(readySpy.count, 0, "With no visible view every view counts")
+
+		plainView.visible = true
+
+		compare(readySpy.count, 1)
+	}
+
+	function test_representationRequestedAgainAfterFailure(){
+		let service = createService(controllerComp)
+		let readySpy = createSpy(service, "documentReady")
+
+		service.handleDocumentOpened("doc", "obj", typeId, "Name", false, false)
+		addView(service, "doc")
+		service.setDocumentIsLoading("doc", false)
+
+		let controller = controllerOf(service, "doc")
+		controller.fail()
+
+		service.updateDocumentRepresentation("doc")
+
+		compare(controller.requestCount, 2)
+		compare(readySpy.count, 0)
+
+		controller.respond()
+
 		compare(readySpy.count, 1)
 	}
 }
