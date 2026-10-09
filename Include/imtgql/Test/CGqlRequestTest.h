@@ -19,6 +19,7 @@ private slots:
 	void ParseUnionFields();
 
 	void ParseFields();
+	void ParseFieldsNamedAsObjectMembers();
 	void ParseComplexFields();
 	void ParseSimple();
 	void ParseEmpty();
@@ -27,6 +28,7 @@ private slots:
 	void ParseObjectQuery();
 	void ParseArrayQuery();
 	void ParseArrayEnumTokens();
+	void ParseNumbers();
 	void ParseComplexTest();
 	void ParseQueryWithVariables();
 	void ParseQueryWithOperationName();

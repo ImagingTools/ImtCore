@@ -174,6 +174,24 @@ void CCacheBuilderComp::ResumeUpdates()
 }
 
 
+void CCacheBuilderComp::AttachObserver(IObserver* observerPtr)
+{
+	QMutexLocker locker(&m_observerMutex);
+
+	if (observerPtr != nullptr && !m_observers.contains(observerPtr)){
+		m_observers.append(observerPtr);
+	}
+}
+
+
+void CCacheBuilderComp::DetachObserver(IObserver* observerPtr)
+{
+	QMutexLocker locker(&m_observerMutex);
+
+	m_observers.removeAll(observerPtr);
+}
+
+
 // protected methods
 
 // reimplemented (icomp::CComponentBase)
@@ -244,6 +262,8 @@ void CCacheBuilderComp::OnUpdateFinished()
 
 void CCacheBuilderComp::RunUpdate(UpdateMode mode)
 {
+	const qint64 startedAtMs = QDateTime::currentMSecsSinceEpoch();
+
 	QElapsedTimer timer;
 	timer.start();
 
@@ -264,6 +284,12 @@ void CCacheBuilderComp::RunUpdate(UpdateMode mode)
 	}
 
 	emit updateFinished(result.isOk);
+
+	QMutexLocker observerLocker(&m_observerMutex);
+
+	for (IObserver* observerPtr : std::as_const(m_observers)){
+		observerPtr->OnCacheUpdated(result.isOk, startedAtMs);
+	}
 }
 
 

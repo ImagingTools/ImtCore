@@ -3,10 +3,6 @@
 <file alias="fshader.glsl">Resources/Shaders/fshader.glsl</file>
 <file alias="vshader.glsl">Resources/Shaders/vshader.glsl</file>
 </qresource>
-<qresource prefix="/RhiShaders">
-<file alias="vshader_rhi.vert.qsb">Resources/Shaders/vshader_rhi.vert.qsb</file>
-<file alias="fshader_rhi.frag.qsb">Resources/Shaders/fshader_rhi.frag.qsb</file>
-</qresource>
 <qresource prefix="/Textures">
 <file>Resources/Textures/sample.png</file>
 </qresource>

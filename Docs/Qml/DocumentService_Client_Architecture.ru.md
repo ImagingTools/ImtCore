@@ -435,10 +435,20 @@ documentManager.createDocument(typeId, proposedSourceDocumentId)
 setAutoNamedTypeId, setDocumentName
 createDocumentData(documentId, objectTypeId, isNew = true)
 if (proposedObjectId) setDocumentObjectId(...)
+setDocumentIsLoading(documentId, true)
 documentCreated(documentId, objectTypeId)
 if (isDirty) setDocumentIsDirty(...)
-setDocumentIsLoading(documentId, false)   // новый документ грузить нечего
+if (isDataLoaded !== false) setDocumentIsLoading(documentId, false)
 ```
+
+Ответ `CreateNewDocument` приходит только после создания объекта на сервере, поэтому
+передаёт `isDataLoaded = true`. `reflectRemoteDocumentCreated` передаёт `false`:
+уведомление `NewDocumentCreated` сервер шлёт до создания объекта, и загрузка
+завершается уведомлением `DocumentDataLoaded`.
+
+По умолчанию view нового документа показывает значения из `representationModel`
+контроллера. Чтобы получить representation нового документа с сервера, в контроллере
+выставляется `requestRepresentationOnCreate: true`.
 
 `openOrCreateByObjectId(typeId, objectId, proposedId)` — единая точка входа:
 пустой `objectId` → `createDocument`, иначе → `openDocument`.
@@ -463,8 +473,10 @@ documentData.addView(viewTypeId, view)
         → representationController = factory.createObject(documentData)
           representationController.documentId = id
           representationController.view       = view
+        → required = !isNew || representationController.requestRepresentationOnCreate
         → documentDecorator.registerView(view, representationController,
-                                         updateRepr = !isNew && !isLoading)
+                                         updateRepr = required && !isLoading)
+        → если !required && !isLoading: documentDecorator.releaseView(index)
 → __internal.maybeEmitDocumentReady(documentId)
 ```
 
@@ -495,7 +507,7 @@ documentData.addView(viewTypeId, view)
 index < 0 :  если isLoading == false -> запомнить в pendingDataLoaded[documentId]
              (уведомление DataLoaded пришло раньше ответа OpenDocument)
 
-docData.isClosing -> выход (документ уже закрывается)
+docData.isClosing или isLoading не изменился -> выход
 
 docData.isLoading = isLoading
 
@@ -503,17 +515,34 @@ isLoading == true и есть pendingDataLoaded[documentId]
    -> удалить запись, немедленно считать isLoading = false
 
 isLoading == false:
-   !isNew : documentDecorator.updateRepresentationForAllViews()
-   isNew  : для каждого зарегистрированного view —
-            если updateCounters[i] <= 0  -> view.setBlockingUpdateModel(false)
-            view.doUpdateGui()
+   для каждого зарегистрированного view —
+      representation нужна (!isNew || requestRepresentationOnCreate)
+         -> documentDecorator.updateRepresentation(i)
+      иначе
+         -> documentDecorator.releaseView(i)   // снять блокировку, doUpdateGui()
    -> signal documentDataLoaded(documentId)
    -> maybeEmitDocumentReady(documentId)
 ```
 
-`maybeEmitDocumentReady` эмитит `documentReady(documentId)` **ровно один раз**, когда
-одновременно выполнено: документ не в состоянии загрузки **и** зарегистрирован хотя бы
-один view. Порядок событий значения не имеет.
+`maybeEmitDocumentReady` эмитит `documentReady(documentId, typeId, isNew, representationController)`
+**ровно один раз**, когда документ полностью готов к работе:
+
+- документ не в состоянии загрузки;
+- зарегистрирован хотя бы один view;
+- нет незавершённых запросов representation;
+- representation получена с сервера хотя бы раз (`documentRepresentationUpdated`),
+  если она нужна хотя бы одному видимому view. Если видимых view нет, учитываются все.
+
+Порядок событий значения не имеет. Если view невидим, его representation
+запрашивается при показе; готовность перепроверяется при каждом изменении
+видимости view. При ошибке `updateRepresentationFailed` сигнал `documentReady` не эмитится;
+повторить запрос можно через `updateDocumentRepresentation(documentId)` (так делает
+`SingleDocumentWorkspaceShellView.retry()` для уже открытого документа).
+Ошибка относится только к своему view: декоратор снимает блокировку и счётчик загрузки
+только у него, остальные view продолжают загрузку. Признак ошибки снимается следующим
+запросом representation этого view.
+Уничтоженный view автоматически снимается с регистрации (`DocumentDecorator.unregisterView`).
+`representationController` — контроллер первого зарегистрированного view (`null`, если его нет).
 
 ### 4.8. Закрытие документа
 
@@ -526,7 +555,9 @@ isLoading == false:
     closeFunc(false)
 
 closeFunc(undefined) -> отмена
-closeFunc(true)      -> подписаться на documentSaved/saveDocumentFailed,
+closeFunc(true)      -> commitDocumentChanges(documentId, ...)   // GUI -> документ, ждём Update<X>FromRepresentation
+                        ошибка обновления -> документ остаётся открытым
+                        иначе подписаться на documentSaved/saveDocumentFailed,
                         вызвать saveDocument(documentId);
                         по documentSaved -> closeFunc(false)
 closeFunc(false)     -> startCloseDocument(documentId)
@@ -537,7 +568,9 @@ closeFunc(false)     -> startCloseDocument(documentId)
 
 `DocumentServiceBase.onDocumentClosed → __internal.removeDocumentData(documentId)`:
 удаляются `pendingDataLoaded`, `readyEmitted`, `cachedDocumentObjectIds`,
-`documentSaveNameResolvers` и сама запись из `openedDocuments`.
+`documentSaveNameResolvers` и сама запись из `openedDocuments`; объект документа вместе с
+декоратором и контроллерами уничтожается. `closeDocumentFailed` снимает признак `isClosing`,
+чтобы документ продолжал обрабатывать уведомления о загрузке.
 
 Хост по `documentClosed` убирает вкладку. `MultiDocumentCollectionView` дополнительно
 обрабатывает `closeDocumentFailed`, вызывая свой же `onDocumentClosed`, чтобы вкладка не

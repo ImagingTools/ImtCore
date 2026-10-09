@@ -71,6 +71,21 @@ public:
 	*/
 	virtual void SuspendUpdates() = 0;
 	virtual void ResumeUpdates() = 0;
+
+	/// Told when an update has finished.
+	class IObserver: virtual public istd::IPolymorphic
+	{
+	public:
+		/**
+			Called on the thread that ran the update. \a startedAtMs is when the run began, in milliseconds since
+			the epoch: the run saw every source change committed before that, and may have missed what came later.
+		*/
+		virtual void OnCacheUpdated(bool isOk, qint64 startedAtMs) = 0;
+	};
+
+	/// An observer is called while the controller holds a lock, so it must not attach or detach observers from OnCacheUpdated().
+	virtual void AttachObserver(IObserver* observerPtr) = 0;
+	virtual void DetachObserver(IObserver* observerPtr) = 0;
 };
 
 
