@@ -223,7 +223,9 @@ bool CWebSocketServerComp::StartServer()
 
 bool CWebSocketServerComp::StopServer()
 {
-	m_webSocketServerPtr->close();
+	if (m_webSocketServerPtr.IsValid()){
+		m_webSocketServerPtr->close();
+	}
 
 	return true;
 }
@@ -231,11 +233,38 @@ bool CWebSocketServerComp::StopServer()
 
 IServer::ServerStatus CWebSocketServerComp::GetServerStatus() const
 {
-	if (m_webSocketServerPtr->isListening()){
+	if (m_webSocketServerPtr.IsValid() && m_webSocketServerPtr->isListening()){
 		return SS_LISTENING;
 	}
 
 	return SS_NOT_STARTED;
+}
+
+
+// reimplemented (imtrest::IWebSocketUpgradeHandler)
+
+bool CWebSocketServerComp::HandleWebSocketHandshake(QTcpSocket* socketPtr)
+{
+	if (socketPtr == nullptr){
+		return false;
+	}
+
+	Q_ASSERT(socketPtr->thread() == thread());
+
+	if (!m_webSocketServerPtr.IsValid()){
+		CreateWebSocketServer();
+	}
+
+	if (socketPtr->state() != QAbstractSocket::ConnectedState){
+		socketPtr->deleteLater();
+
+		return false;
+	}
+
+	// The WebSocket server reads the pending upgrade request from the socket and performs the handshake:
+	m_webSocketServerPtr->handleConnection(socketPtr);
+
+	return true;
 }
 
 
@@ -266,6 +295,28 @@ bool CWebSocketServerComp::StartListening(const QHostAddress& address, quint16 p
 		return false;
 	}
 
+	CreateWebSocketServer();
+
+	if (m_listenWebSocketPortAttrPtr.IsValid() && !*m_listenWebSocketPortAttrPtr){
+		SendInfoMessage(0, QStringLiteral("Web socket server does not listen on the own port, only upgraded HTTP connections are handled"));
+
+		return true;
+	}
+
+	if (m_webSocketServerPtr->listen(address, port)){
+		SendInfoMessage(0, QStringLiteral("Web socket server successfully started on port %1").arg(port));
+
+		return true;
+	}
+
+	SendErrorMessage(0, QStringLiteral("Web socket server could not be started on port %1").arg(port));
+
+	return false;
+}
+
+
+void CWebSocketServerComp::CreateWebSocketServer()
+{
 	bool isSecureConnection = false;
 	if (m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
 		QSslConfiguration sslConfiguration;
@@ -305,20 +356,9 @@ bool CWebSocketServerComp::StartListening(const QHostAddress& address, quint16 p
 	}
 #endif
 
-	if (m_webSocketServerPtr->listen(address, port)){
-		SendInfoMessage(0, QStringLiteral("Web socket server successfully started on port %1").arg(port));
-
-		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections);
-		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::acceptError, this, &CWebSocketServerComp::OnAcceptError);
-		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::sslErrors, this, &CWebSocketServerComp::OnSslErrors);
-
-		return true;
-	}
-	else{
-		SendErrorMessage(0, QStringLiteral("Web socket server could not be started on port %1").arg(port));
-	}
-
-	return false;
+	connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections);
+	connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::acceptError, this, &CWebSocketServerComp::OnAcceptError);
+	connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::sslErrors, this, &CWebSocketServerComp::OnSslErrors);
 }
 
 
