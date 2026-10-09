@@ -128,7 +128,10 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 			groupPtr->RemoveParentGroup(parentGroupId);
 		}
 		for (const QByteArray& parentGroupId : CAssignmentCollector::GetDirectIds(groupData.parentGroups)){
-			groupPtr->AddParentGroup(parentGroupId);
+			if (!groupPtr->AddParentGroup(parentGroupId)){
+				errorMessage = QStringLiteral("Group '%1' cannot be a parent group: it would create a cycle").arg(QString::fromUtf8(parentGroupId));
+				return response;
+			}
 		}
 	}
 

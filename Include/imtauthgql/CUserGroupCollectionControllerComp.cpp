@@ -87,7 +87,10 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	for (const QByteArray& parentGroupId : CAssignmentCollector::GetDirectIds(groupDataRepresentation.parentGroups)){
-		userGroupInfoPtr->AddParentGroup(parentGroupId);
+		if (!userGroupInfoPtr->AddParentGroup(parentGroupId)){
+			errorMessage = QStringLiteral("Group '%1' cannot be a parent group: it would create a cycle").arg(QString::fromUtf8(parentGroupId));
+			return false;
+		}
 	}
 
 	return true;

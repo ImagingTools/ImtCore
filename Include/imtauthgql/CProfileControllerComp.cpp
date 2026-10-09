@@ -193,7 +193,7 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 
 	// Permissions from the adapted user (consistent with the binding-based
 	// tenant adaptation used for user collection views).
-	QByteArrayList permissions = effectiveUserPtr->GetPermissions(currentProductId);
+	QByteArrayList permissions = GetTenantUserPermissions(*effectiveUserPtr, currentTenantId, currentProductId, bindingPtr, roleProvPtr);
 	for (const QByteArray& permissionId : std::as_const(permissions)){
 		sdl::V1_0::imtauth::CPermissionInfo info;
 		info.id = permissionId;
