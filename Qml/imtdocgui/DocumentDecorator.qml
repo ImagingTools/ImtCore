@@ -13,7 +13,14 @@ QtObject {
 	property var registeredRepresentation: []
 
 	signal viewRegistered(var view, var representationController, bool updateRepresentation)
+	signal viewUnregistered(var view)
 	signal viewVisibilityChanged(var view, bool visible)
+
+	Component.onDestruction: {
+		while (registeredViews.length > 0){
+			unregisterView(registeredViews[registeredViews.length - 1])
+		}
+	}
 
 	onViewRegistered: {
 		if (view){
@@ -34,10 +41,23 @@ QtObject {
 
 			representationController.representationUpdated.connect(onRepresentationUpdated)
 			representationController.startUpdateRepresentation.connect(onStartUpdateRepresentation)
-			representationController.updateRepresentationFailed.connect(onUpdateRepresentationFailed)
 			representationController.updateDocumentFailed.connect(onUpdateDocumentFailed)
 			representationController.startUpdateDocument.connect(onStartUpdateDocument)
 			representationController.documentUpdated.connect(onDocumentUpdated)
+
+			// The failure signal does not say which representation failed, so it is bound to its view.
+			let registeredView = view
+			let connection = {
+				"representationFailed": function(failedDocumentId, message){
+					root.onUpdateRepresentationFailed(registeredView, failedDocumentId, message)
+				},
+				"viewDestroyed": function(){
+					root.unregisterView(registeredView)
+				}
+			}
+			representationController.updateRepresentationFailed.connect(connection.representationFailed)
+			view.Component.destruction.connect(connection.viewDestroyed)
+			_internal.viewConnections.push(connection)
 
 			if (documentManager && view.commandsController){
 				let isDirty = documentManager.documentIsDirty(documentId)
@@ -152,6 +172,7 @@ QtObject {
 			if (registeredViews[i].model === representation){
 				registeredViews[i].setBlockingUpdateModel(true)
 				_internal.updateCounters[i] = _internal.updateCounters[i] + 1
+				_internal.failedViews[i] = false
 				break
 			}
 		}
@@ -180,14 +201,16 @@ QtObject {
 		documentManager.documentRepresentationUpdated(documentId, representation)
 	}
 
-	function onUpdateRepresentationFailed(documentId, message){
+	function onUpdateRepresentationFailed(view, documentId, message){
 		if (root.documentId !== documentId){
 			return
 		}
 
-		for (let i = 0; i < registeredViews.length; ++i){
-			_internal.updateCounters[i] = 0
-			registeredViews[i].setBlockingUpdateModel(false)
+		let index = registeredViews.indexOf(view)
+		if (index >= 0){
+			_internal.updateCounters[index] = 0
+			_internal.failedViews[index] = true
+			view.setBlockingUpdateModel(false)
 		}
 
 		documentManager.updateRepresentationFailed(documentId, message)
@@ -274,8 +297,49 @@ QtObject {
 		registeredViews.push(view)
 		registeredRepresentation.push(representationController)
 		_internal.updateCounters.push(0)
+		_internal.failedViews.push(false)
 		
 		viewRegistered(view, representationController, updateRepr)
+	}
+
+	function unregisterView(view){
+		let index = registeredViews.indexOf(view)
+		if (index < 0){
+			return
+		}
+
+		let representationController = registeredRepresentation[index]
+		let connection = _internal.viewConnections[index]
+
+		view.commandActivated.disconnect(onCommandActivated)
+		view.modelDataChanged.disconnect(onModelDataChanged)
+		view.guiUpdated.disconnect(onGuiUpdated)
+		view.guiVisibleChanged.disconnect(onGuiVisibleChanged)
+		view.Component.destruction.disconnect(connection.viewDestroyed)
+
+		representationController.representationUpdated.disconnect(onRepresentationUpdated)
+		representationController.startUpdateRepresentation.disconnect(onStartUpdateRepresentation)
+		representationController.updateRepresentationFailed.disconnect(connection.representationFailed)
+		representationController.updateDocumentFailed.disconnect(onUpdateDocumentFailed)
+		representationController.startUpdateDocument.disconnect(onStartUpdateDocument)
+		representationController.documentUpdated.disconnect(onDocumentUpdated)
+
+		registeredViews.splice(index, 1)
+		registeredRepresentation.splice(index, 1)
+		_internal.updateCounters.splice(index, 1)
+		_internal.failedViews.splice(index, 1)
+		_internal.viewConnections.splice(index, 1)
+
+		let requestIndex = _internal.requestUpdateViews.indexOf(view)
+		if (requestIndex >= 0){
+			_internal.requestUpdateViews.splice(requestIndex, 1)
+		}
+
+		if (_internal.initiatingView === view){
+			_internal.initiatingView = null
+		}
+
+		viewUnregistered(view)
 	}
 
 	function onUndo(){
@@ -405,6 +469,11 @@ QtObject {
 		return false
 	}
 
+	// Cleared for a view when its representation is requested again.
+	function hasFailedRepresentation(){
+		return _internal.failedViews.includes(true)
+	}
+
 	function updateDocumentForAllViews(){
 		for (let i = 0; i < registeredViews.length; ++i){
 			registeredViews[i].setBlockingUpdateModel(true)
@@ -416,6 +485,8 @@ QtObject {
 		property var requestUpdateViews: []
 		property bool saveRequested: false
 		property var updateCounters: []
+		property var failedViews: []
+		property var viewConnections: []
 		property var initiatingView: null
 		property int pendingDocumentUpdates: 0
 		property bool saveAfterUpdate: false

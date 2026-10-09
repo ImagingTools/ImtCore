@@ -359,7 +359,7 @@ DocumentServiceBase {
 		}
 
 		function onError(message, type){
-			root.createDocumentFailed("", message)
+			root.createDocumentFailed(root.createDocumentRequest.typeId, message)
 		}
 	}
 
@@ -405,7 +405,7 @@ DocumentServiceBase {
 		}
 
 		function onError(message, type){
-			root.closeDocumentFailed("", message)
+			root.closeDocumentFailed(root.closeDocumentRequest.documentId, message)
 		}
 	}
 

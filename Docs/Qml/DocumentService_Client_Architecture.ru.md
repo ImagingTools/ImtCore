@@ -538,6 +538,10 @@ isLoading == false:
 видимости view. При ошибке `updateRepresentationFailed` сигнал `documentReady` не эмитится;
 повторить запрос можно через `updateDocumentRepresentation(documentId)` (так делает
 `SingleDocumentWorkspaceShellView.retry()` для уже открытого документа).
+Ошибка относится только к своему view: декоратор снимает блокировку и счётчик загрузки
+только у него, остальные view продолжают загрузку. Признак ошибки снимается следующим
+запросом representation этого view.
+Уничтоженный view автоматически снимается с регистрации (`DocumentDecorator.unregisterView`).
 `representationController` — контроллер первого зарегистрированного view (`null`, если его нет).
 
 ### 4.8. Закрытие документа
@@ -562,7 +566,9 @@ closeFunc(false)     -> startCloseDocument(documentId)
 
 `DocumentServiceBase.onDocumentClosed → __internal.removeDocumentData(documentId)`:
 удаляются `pendingDataLoaded`, `readyEmitted`, `cachedDocumentObjectIds`,
-`documentSaveNameResolvers` и сама запись из `openedDocuments`.
+`documentSaveNameResolvers` и сама запись из `openedDocuments`; объект документа вместе с
+декоратором и контроллерами уничтожается. `closeDocumentFailed` снимает признак `isClosing`,
+чтобы документ продолжал обрабатывать уведомления о загрузке.
 
 Хост по `documentClosed` убирает вкладку. `MultiDocumentCollectionView` дополнительно
 обрабатывает `closeDocumentFailed`, вызывая свой же `onDocumentClosed`, чтобы вкладка не

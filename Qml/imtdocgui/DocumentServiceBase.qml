@@ -110,6 +110,13 @@ QtObject {
 		__internal.removeDocumentData(documentId)
 	}
 
+	onCloseDocumentFailed: {
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index >= 0){
+			__internal.openedDocuments[index].isClosing = false
+		}
+	}
+
 	onDocumentCreated: {
 		__internal.createDocumentData(documentId, typeId, true)
 	}
@@ -727,6 +734,15 @@ QtObject {
 					onViewVisibilityChanged: {
 						root.__internal.maybeEmitDocumentReady(documentData.id)
 					}
+
+					onViewUnregistered: {
+						let viewTypeIds = Object.keys(documentData.views)
+						for (let i = 0; i < viewTypeIds.length; ++i){
+							if (documentData.views[viewTypeIds[i]] === view){
+								delete documentData.views[viewTypeIds[i]]
+							}
+						}
+					}
 				}
 
 				signal viewAdded(string viewTypeId, var view)
@@ -794,7 +810,9 @@ QtObject {
 			delete readyEmitted[documentId]
 			delete cachedDocumentObjectIds[documentId]
 			delete documentSaveNameResolvers[documentId]
+			let documentData = openedDocuments[index]
 			openedDocuments.splice(index, 1)
+			documentData.destroy()
 		}
 
 		// Emits root.documentReady() at most once per document, when the document
@@ -821,7 +839,7 @@ QtObject {
 			}
 
 			let decorator = docData.documentDecorator
-			if (decorator.isUpdatingRepresentation()){
+			if (decorator.isUpdatingRepresentation() || decorator.hasFailedRepresentation()){
 				return
 			}
 

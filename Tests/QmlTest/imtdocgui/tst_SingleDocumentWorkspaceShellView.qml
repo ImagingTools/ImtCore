@@ -15,8 +15,28 @@ TestCase {
 		id: serviceComp
 
 		DocumentServiceBase {
+			property string failure: ""
+
 			function openDocument(objectTypeId, objectId){
+				if (failure !== ""){
+					openDocumentFailed("", failure)
+					return
+				}
+
 				handleDocumentOpened("doc", objectId, objectTypeId, "Name", false, false)
+			}
+
+			function createDocument(objectTypeId, proposedSourceDocumentId){
+				if (failure !== ""){
+					createDocumentFailed(objectTypeId, failure)
+					return
+				}
+
+				handleDocumentCreated("doc", objectTypeId, "", false, proposedSourceDocumentId, false, true)
+			}
+
+			function closeDocument(documentId){
+				documentClosed(documentId)
 			}
 		}
 	}
@@ -64,15 +84,22 @@ TestCase {
 		}
 	}
 
-	function openShell(){
-		let service = createTemporaryObject(serviceComp, testCase)
+	function openShell(failure, createNew){
+		let service = createTemporaryObject(serviceComp, testCase, {"failure": failure || ""})
 		service.registerDocumentViewData(typeId, "TestView", viewComp, controllerComp)
 
 		// TestCase itself is invisible, the document view needs a visible parent
 		let shell = createTemporaryObject(shellComp, testCase.parent)
 		shell.objectTypeId = typeId
 		shell.documentManager = service
-		shell.objectId = "obj"
+
+		// The stub service answers synchronously, so the request is triggered only after the shell is bound to it
+		if (createNew === true){
+			shell.createNew = true
+		}
+		else{
+			shell.objectId = "obj"
+		}
 
 		return shell
 	}
@@ -130,5 +157,38 @@ TestCase {
 		controller.representationUpdated("doc", controller.representationModel)
 
 		compare(shell.state, "content")
+	}
+
+	function test_createNewDocument(){
+		let shell = openShell("", true)
+
+		compare(shell.documentId, "doc")
+		compare(shell.state, "content", "A new document needs no server representation")
+		compare(controllerOf(shell.documentManager).requestCount, 0)
+	}
+
+	function test_errorWhenCreateFails(){
+		let shell = openShell("Create failed", true)
+
+		compare(shell.state, "error")
+		compare(shell.lastErrorMessage, "Create failed")
+	}
+
+	function test_errorWhenOpenFails(){
+		let shell = openShell("Open failed")
+
+		compare(shell.state, "error")
+		compare(shell.lastErrorMessage, "Open failed")
+	}
+
+	function test_closedDocumentReturnsToEmpty(){
+		let shell = openShell()
+		let closedSpy = createTemporaryObject(spyComp, testCase, {"target": shell, "signalName": "closed"})
+
+		shell.closeDocument()
+
+		compare(closedSpy.count, 1)
+		compare(shell.state, "empty")
+		compare(shell.documentId, "")
 	}
 }
