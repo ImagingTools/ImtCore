@@ -182,6 +182,12 @@ bool CDocumentServiceCompBase::OnDocumentCreated(const QByteArray& typeId, const
 }
 
 
+imtbase::IAccessContextController* CDocumentServiceCompBase::GetAccessContextController() const
+{
+	return m_accessContextControllerCompPtr.IsValid() ? m_accessContextControllerCompPtr.GetPtr() : nullptr;
+}
+
+
 imtdoc::IDocumentInitDelegate* CDocumentServiceCompBase::GetDocumentInitDelegate(const QByteArray& typeId) const
 {
 	int index = GetObjectFactoryIndex(typeId);

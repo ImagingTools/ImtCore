@@ -20,6 +20,7 @@
 #include <imod/CMultiModelDispatcherBase.h>
 
 // ImtCore includes
+#include <imtbase/IAccessContextController.h>
 #include <imtdoc/IDocumentService.h>
 #include <imtdoc/IDocumentServiceEventHandler.h>
 
@@ -163,6 +164,26 @@ protected:
 		for this task ID.
 	*/
 	void CompleteTask(const QByteArray& taskId, const TaskResult& result);
+
+	/**
+		Access context of the thread that starts a task. It is applied to the background thread of the task,
+		so the data is read with the access rights of the request (see imtbase::IAccessContextController).
+	*/
+	struct AccessContextSnapshot
+	{
+		imtbase::IAccessContextController* controllerPtr = nullptr;
+		bool isTenantContext = false;
+		QByteArray tenantId;
+		QByteArray userId;
+	};
+
+	/**
+		Controller of the access context passed to the background threads. No context is passed if it is not set.
+	*/
+	virtual imtbase::IAccessContextController* GetAccessContextController() const;
+	AccessContextSnapshot CaptureAccessContext() const;
+	static void ApplyAccessContext(const AccessContextSnapshot& snapshot);
+	static void ResetAccessContext(const AccessContextSnapshot& snapshot);
 
 	bool ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const;
 	int GetUndoManagerNextModelId(const QByteArray& userId);
