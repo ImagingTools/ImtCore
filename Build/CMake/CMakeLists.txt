@@ -267,6 +267,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 		if(USE_DUCK_DB)
 			add_subdirectory("${INCLUDE_DIR}/imtduckdb/CMake"	"${AUX_INCLUDE_DIR}/imtduckdb")
+			add_subdirectory("${INCLUDE_DIR}/imtcache/CMake"	"${AUX_INCLUDE_DIR}/imtcache")
 		endif()
 
 		if(USE_GEO)
@@ -429,6 +430,10 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 				add_subdirectory("${IMPL_DIR}/ImtDuckDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtDuckDbPck")
 				add_dependencies(ImtDuckDbPck imtduckdb)
 				imt_chain_windeploy_target(ImtDuckDbPck)
+
+				add_subdirectory("${IMPL_DIR}/ImtCachePck/CMake" "${AUX_INCLUDE_DIR}/ImtCachePck")
+				add_dependencies(ImtCachePck imtcache)
+				imt_chain_windeploy_target(ImtCachePck)
 			endif()
 
 			add_subdirectory("${IMPL_DIR}/ImtClientGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtClientGqlPck")
@@ -589,6 +594,16 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 
 		add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceTest")
 		add_dependencies(CollectionDocumentServiceTest imtbase imtdoc)
+
+		if(USE_QTQML)
+			add_subdirectory("${TESTS_DIR}/QmlTest/CMake" "${AUX_INCLUDE_DIR}/QmlTest")
+			add_dependencies(ImtCoreQmlTest
+				imtbasesdl imtappsdl imtauthsdl imtcolorsdl imt2dsdl
+				imtstylecontrolsqml imtcontrolsqml imtguiqml imtguigqlqml imtcolguiqml imtdocguiqml imtauthguiqml imtlicguiqml
+				imtstyle imtqml imtgql
+			)
+			imt_chain_windeploy_target(ImtCoreQmlTest)
+		endif()
 
 		file(COPY ${TESTS_DIR}/Migrations DESTINATION ${TESTS_DIR}/../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 	endif() # BUILD_TESTING

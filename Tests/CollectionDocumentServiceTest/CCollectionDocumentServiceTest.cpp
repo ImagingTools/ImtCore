@@ -936,6 +936,73 @@ void CCollectionDocumentServiceTest::SaveDocumentSaveAsTest()
 }
 
 
+void CCollectionDocumentServiceTest::SaveDocumentNewDocumentUpdatesUrlTest()
+{
+	// A new document has no backing object and therefore no URL
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+	params.documentName = TEST_DOC_NAME;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_OK);
+
+	const QByteArray insertedId = m_managerPtr->GetMockCollection().GetLastInsertedId();
+	QVERIFY(!insertedId.isEmpty());
+
+	// The opened document list must report the object the document is now backed by
+	bool found = false;
+	for (const auto& document : m_managerPtr->GetOpenedDocumentList(TEST_USER_ID)) {
+		if (document.documentId == docId) {
+			found = true;
+			QCOMPARE(document.url, QUrl("collection:///" + insertedId));
+		}
+	}
+	QVERIFY(found);
+}
+
+
+void CCollectionDocumentServiceTest::SaveDocumentSaveAsUpdatesUrlTest()
+{
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject()));
+
+	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID, TEST_OBJECT_ID, TEST_DOC_NAME);
+	{
+		QMutexLocker locker(&m_managerPtr->m_mutex);
+		m_managerPtr->m_userDocuments[TEST_USER_ID][docId].url = QUrl("collection:///" + TEST_OBJECT_ID);
+	}
+
+	// Saving under another name stores a copy as a new object
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+	params.documentName = "Saved As Copy";
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_OK);
+
+	const QByteArray copyId = m_managerPtr->GetMockCollection().GetLastInsertedId();
+	QVERIFY(!copyId.isEmpty());
+	QVERIFY(copyId != TEST_OBJECT_ID);
+
+	// The opened document now refers to the copy, not to the original object
+	bool found = false;
+	for (const auto& document : m_managerPtr->GetOpenedDocumentList(TEST_USER_ID)) {
+		if (document.documentId == docId) {
+			found = true;
+			QCOMPARE(document.url, QUrl("collection:///" + copyId));
+		}
+	}
+	QVERIFY(found);
+}
+
+
 void CCollectionDocumentServiceTest::SaveDocumentInvalidUserTest()
 {
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
