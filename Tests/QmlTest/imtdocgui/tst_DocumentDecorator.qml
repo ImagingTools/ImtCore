@@ -331,4 +331,30 @@ TestCase {
 
 		compare(controller.requestCount, 2)
 	}
+
+	function test_commitChanges(){
+		let document = openDocument("Name", false)
+		let controller = controllerOf(document.service)
+		let results = []
+
+		document.service.commitDocumentChanges("doc", function(committed){ results.push(committed) })
+
+		compare(controller.updateCount, 1)
+		compare(results, [])
+
+		controller.finishUpdate()
+
+		compare(results, [true])
+
+		document.service.commitDocumentChanges("doc", function(committed){ results.push(committed) })
+		controller.failUpdate()
+
+		compare(results, [true, false])
+
+		document.views[0].hasChanges = false
+		document.service.commitDocumentChanges("doc", function(committed){ results.push(committed) })
+		document.service.commitDocumentChanges("unknown", function(committed){ results.push(committed) })
+
+		compare(results, [true, false, true, true], "Nothing to wait for")
+	}
 }

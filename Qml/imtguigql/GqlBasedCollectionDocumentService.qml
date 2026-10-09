@@ -200,6 +200,7 @@ DocumentServiceBase {
 				let savedFunc = function(savedDocumentId){
 					if (documentId === savedDocumentId){
 						documentSaved.disconnect(savedFunc)
+						saveDocumentFailed.disconnect(savedFailedFunc)
 						closeFunc(false)
 					}
 				}
@@ -211,9 +212,16 @@ DocumentServiceBase {
 					}
 				}
 
-				documentSaved.connect(savedFunc)
-				saveDocumentFailed.connect(savedFailedFunc)
-				saveDocument(documentId)
+				// SaveDocument must not overtake the updates still being sent from the views.
+				commitDocumentChanges(documentId, function(committed){
+					if (!committed){
+						return
+					}
+
+					documentSaved.connect(savedFunc)
+					saveDocumentFailed.connect(savedFailedFunc)
+					saveDocument(documentId)
+				})
 			}
 			else{
 				// Close

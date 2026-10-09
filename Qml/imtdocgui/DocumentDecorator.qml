@@ -222,7 +222,7 @@ QtObject {
 		}
 
 		_internal.pendingDocumentUpdates = Math.max(0, _internal.pendingDocumentUpdates - 1)
-		_internal.saveAfterUpdate = false
+		finishCommit(false)
 
 		documentManager.updateDocumentFailed(documentId, message)
 	}
@@ -241,9 +241,33 @@ QtObject {
 		}
 
 		_internal.pendingDocumentUpdates = Math.max(0, _internal.pendingDocumentUpdates - 1)
-		if (_internal.pendingDocumentUpdates === 0 && _internal.saveAfterUpdate){
-			_internal.saveAfterUpdate = false
-			root.doSave()
+		if (_internal.pendingDocumentUpdates === 0){
+			finishCommit(true)
+		}
+	}
+
+	// Writes the GUI state of the visible views to the document and calls back once the server
+	// has applied all sent updates: callback(true), or callback(false) if an update failed.
+	function commitChanges(callback){
+		for (let i = 0; i < registeredViews.length; ++i){
+			if (registeredViews[i].visible){
+				registeredViews[i].doUpdateModel()
+			}
+		}
+
+		if (_internal.pendingDocumentUpdates === 0){
+			callback(true)
+			return
+		}
+
+		_internal.commitCallbacks.push(callback)
+	}
+
+	function finishCommit(committed){
+		let callbacks = _internal.commitCallbacks
+		_internal.commitCallbacks = []
+		for (let i = 0; i < callbacks.length; ++i){
+			callbacks[i](committed)
 		}
 	}
 
@@ -368,24 +392,18 @@ QtObject {
 
 		// A repeated Save while still waiting is the way out of an update that never reported back.
 		if (_internal.saveAfterUpdate){
-			_internal.saveAfterUpdate = false
 			_internal.pendingDocumentUpdates = 0
-			doSave()
+			finishCommit(true)
 			return
 		}
 
-		for (let i = 0; i < registeredViews.length; ++i){
-			if (registeredViews[i].visible){
-				registeredViews[i].doUpdateModel()
+		_internal.saveAfterUpdate = true
+		commitChanges(function(committed){
+			_internal.saveAfterUpdate = false
+			if (committed){
+				doSave()
 			}
-		}
-
-		if (_internal.pendingDocumentUpdates > 0){
-			_internal.saveAfterUpdate = true
-			return
-		}
-
-		doSave()
+		})
 	}
 
 	function doSave(){
@@ -490,5 +508,6 @@ QtObject {
 		property var initiatingView: null
 		property int pendingDocumentUpdates: 0
 		property bool saveAfterUpdate: false
+		property var commitCallbacks: []
 	}
 }

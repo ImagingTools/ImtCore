@@ -555,7 +555,9 @@ isLoading == false:
     closeFunc(false)
 
 closeFunc(undefined) -> отмена
-closeFunc(true)      -> подписаться на documentSaved/saveDocumentFailed,
+closeFunc(true)      -> commitDocumentChanges(documentId, ...)   // GUI -> документ, ждём Update<X>FromRepresentation
+                        ошибка обновления -> документ остаётся открытым
+                        иначе подписаться на documentSaved/saveDocumentFailed,
                         вызвать saveDocument(documentId);
                         по documentSaved -> closeFunc(false)
 closeFunc(false)     -> startCloseDocument(documentId)

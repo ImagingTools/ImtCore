@@ -342,6 +342,18 @@ QtObject {
 		}
 	}
 
+	// callback(true) once the GUI changes of the document views are applied on the server,
+	// callback(false) if an update failed.
+	function commitDocumentChanges(documentId, callback){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			callback(true)
+			return
+		}
+
+		__internal.openedDocuments[index].documentDecorator.commitChanges(callback)
+	}
+
 	function setDocumentObjectId(documentId, objectId){
 		let index = getDocumentIndexByDocumentId(documentId)
 		if (index < 0){
