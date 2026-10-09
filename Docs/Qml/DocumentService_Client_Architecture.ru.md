@@ -531,11 +531,17 @@ isLoading == false:
 - зарегистрирован хотя бы один view;
 - нет незавершённых запросов representation;
 - representation получена с сервера хотя бы раз (`documentRepresentationUpdated`),
-  если она нужна хотя бы одному view.
+  если она нужна хотя бы одному видимому view. Если видимых view нет, учитываются все.
 
 Порядок событий значения не имеет. Если view невидим, его representation
-запрашивается при показе, и `documentReady` придёт после этого. При ошибке
-`updateRepresentationFailed` сигнал `documentReady` не эмитится.
+запрашивается при показе; готовность перепроверяется при каждом изменении
+видимости view. При ошибке `updateRepresentationFailed` сигнал `documentReady` не эмитится;
+повторить запрос можно через `updateDocumentRepresentation(documentId)` (так делает
+`SingleDocumentWorkspaceShellView.retry()` для уже открытого документа).
+Ошибка относится только к своему view: декоратор снимает блокировку и счётчик загрузки
+только у него, остальные view продолжают загрузку. Признак ошибки снимается следующим
+запросом representation этого view.
+Уничтоженный view автоматически снимается с регистрации (`DocumentDecorator.unregisterView`).
 `representationController` — контроллер первого зарегистрированного view (`null`, если его нет).
 
 ### 4.8. Закрытие документа
@@ -549,7 +555,9 @@ isLoading == false:
     closeFunc(false)
 
 closeFunc(undefined) -> отмена
-closeFunc(true)      -> подписаться на documentSaved/saveDocumentFailed,
+closeFunc(true)      -> commitDocumentChanges(documentId, ...)   // GUI -> документ, ждём Update<X>FromRepresentation
+                        ошибка обновления -> документ остаётся открытым
+                        иначе подписаться на documentSaved/saveDocumentFailed,
                         вызвать saveDocument(documentId);
                         по documentSaved -> closeFunc(false)
 closeFunc(false)     -> startCloseDocument(documentId)
@@ -560,7 +568,9 @@ closeFunc(false)     -> startCloseDocument(documentId)
 
 `DocumentServiceBase.onDocumentClosed → __internal.removeDocumentData(documentId)`:
 удаляются `pendingDataLoaded`, `readyEmitted`, `cachedDocumentObjectIds`,
-`documentSaveNameResolvers` и сама запись из `openedDocuments`.
+`documentSaveNameResolvers` и сама запись из `openedDocuments`; объект документа вместе с
+декоратором и контроллерами уничтожается. `closeDocumentFailed` снимает признак `isClosing`,
+чтобы документ продолжал обрабатывать уведомления о загрузке.
 
 Хост по `documentClosed` убирает вкладку. `MultiDocumentCollectionView` дополнительно
 обрабатывает `closeDocumentFailed`, вызывая свой же `onDocumentClosed`, чтобы вкладка не

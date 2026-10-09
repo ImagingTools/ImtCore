@@ -78,8 +78,8 @@ QtObject {
 	// Emitted once per document when it is fully ready for work:
 	//   - the document data has finished loading on the server,
 	//   - at least one view instance has been registered for the document,
-	//   - the representation has been received from the server (unless the
-	//     document is new and no controller has requestRepresentationOnCreate).
+	//   - the representation has been received from the server, if a visible view
+	//     needs it (a new document needs it only with requestRepresentationOnCreate).
 	// representationController belongs to the first registered view (null if it has none).
 	signal documentReady(string documentId, string typeId, bool isNew, var representationController)
 
@@ -108,6 +108,13 @@ QtObject {
 
 	onDocumentClosed: {
 		__internal.removeDocumentData(documentId)
+	}
+
+	onCloseDocumentFailed: {
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index >= 0){
+			__internal.openedDocuments[index].isClosing = false
+		}
 	}
 
 	onDocumentCreated: {
@@ -326,6 +333,25 @@ QtObject {
 	function documentIsOpened(documentId){
 		let index = getDocumentIndexByDocumentId(documentId)
 		return index >= 0
+	}
+
+	function updateDocumentRepresentation(documentId){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index >= 0){
+			__internal.openedDocuments[index].documentDecorator.updateRepresentationForAllViews()
+		}
+	}
+
+	// callback(true) once the GUI changes of the document views are applied on the server,
+	// callback(false) if an update failed.
+	function commitDocumentChanges(documentId, callback){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			callback(true)
+			return
+		}
+
+		__internal.openedDocuments[index].documentDecorator.commitChanges(callback)
 	}
 
 	function setDocumentObjectId(documentId, objectId){
@@ -715,6 +741,20 @@ QtObject {
 					documentName: documentData.name
 					documentTypeId: documentData.typeId
 					documentManager: root
+
+					// Emitted after a representation request started on show is already counted.
+					onViewVisibilityChanged: {
+						root.__internal.maybeEmitDocumentReady(documentData.id)
+					}
+
+					onViewUnregistered: {
+						let viewTypeIds = Object.keys(documentData.views)
+						for (let i = 0; i < viewTypeIds.length; ++i){
+							if (documentData.views[viewTypeIds[i]] === view){
+								delete documentData.views[viewTypeIds[i]]
+							}
+						}
+					}
 				}
 
 				signal viewAdded(string viewTypeId, var view)
@@ -782,7 +822,9 @@ QtObject {
 			delete readyEmitted[documentId]
 			delete cachedDocumentObjectIds[documentId]
 			delete documentSaveNameResolvers[documentId]
+			let documentData = openedDocuments[index]
 			openedDocuments.splice(index, 1)
+			documentData.destroy()
 		}
 
 		// Emits root.documentReady() at most once per document, when the document
@@ -809,11 +851,11 @@ QtObject {
 			}
 
 			let decorator = docData.documentDecorator
-			if (decorator.isUpdatingRepresentation()){
+			if (decorator.isUpdatingRepresentation() || decorator.hasFailedRepresentation()){
 				return
 			}
 
-			if (decorator.anyRepresentationRequired(docData.isNew) && !docData.representationReceived){
+			if (!docData.representationReceived && decorator.isAwaitingRepresentation(docData.isNew)){
 				return
 			}
 

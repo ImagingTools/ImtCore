@@ -13,6 +13,14 @@ QtObject {
 	property var registeredRepresentation: []
 
 	signal viewRegistered(var view, var representationController, bool updateRepresentation)
+	signal viewUnregistered(var view)
+	signal viewVisibilityChanged(var view, bool visible)
+
+	Component.onDestruction: {
+		while (registeredViews.length > 0){
+			unregisterView(registeredViews[registeredViews.length - 1])
+		}
+	}
 
 	onViewRegistered: {
 		if (view){
@@ -33,10 +41,23 @@ QtObject {
 
 			representationController.representationUpdated.connect(onRepresentationUpdated)
 			representationController.startUpdateRepresentation.connect(onStartUpdateRepresentation)
-			representationController.updateRepresentationFailed.connect(onUpdateRepresentationFailed)
 			representationController.updateDocumentFailed.connect(onUpdateDocumentFailed)
 			representationController.startUpdateDocument.connect(onStartUpdateDocument)
 			representationController.documentUpdated.connect(onDocumentUpdated)
+
+			// The failure signal does not say which representation failed, so it is bound to its view.
+			let registeredView = view
+			let connection = {
+				"representationFailed": function(failedDocumentId, message){
+					root.onUpdateRepresentationFailed(registeredView, failedDocumentId, message)
+				},
+				"viewDestroyed": function(){
+					root.unregisterView(registeredView)
+				}
+			}
+			representationController.updateRepresentationFailed.connect(connection.representationFailed)
+			view.Component.destruction.connect(connection.viewDestroyed)
+			_internal.viewConnections.push(connection)
 
 			if (documentManager && view.commandsController){
 				let isDirty = documentManager.documentIsDirty(documentId)
@@ -151,6 +172,7 @@ QtObject {
 			if (registeredViews[i].model === representation){
 				registeredViews[i].setBlockingUpdateModel(true)
 				_internal.updateCounters[i] = _internal.updateCounters[i] + 1
+				_internal.failedViews[i] = false
 				break
 			}
 		}
@@ -179,14 +201,16 @@ QtObject {
 		documentManager.documentRepresentationUpdated(documentId, representation)
 	}
 
-	function onUpdateRepresentationFailed(documentId, message){
+	function onUpdateRepresentationFailed(view, documentId, message){
 		if (root.documentId !== documentId){
 			return
 		}
 
-		for (let i = 0; i < registeredViews.length; ++i){
-			_internal.updateCounters[i] = 0
-			registeredViews[i].setBlockingUpdateModel(false)
+		let index = registeredViews.indexOf(view)
+		if (index >= 0){
+			_internal.updateCounters[index] = 0
+			_internal.failedViews[index] = true
+			view.setBlockingUpdateModel(false)
 		}
 
 		documentManager.updateRepresentationFailed(documentId, message)
@@ -198,7 +222,7 @@ QtObject {
 		}
 
 		_internal.pendingDocumentUpdates = Math.max(0, _internal.pendingDocumentUpdates - 1)
-		_internal.saveAfterUpdate = false
+		finishCommit(false)
 
 		documentManager.updateDocumentFailed(documentId, message)
 	}
@@ -217,9 +241,33 @@ QtObject {
 		}
 
 		_internal.pendingDocumentUpdates = Math.max(0, _internal.pendingDocumentUpdates - 1)
-		if (_internal.pendingDocumentUpdates === 0 && _internal.saveAfterUpdate){
-			_internal.saveAfterUpdate = false
-			root.doSave()
+		if (_internal.pendingDocumentUpdates === 0){
+			finishCommit(true)
+		}
+	}
+
+	// Writes the GUI state of the visible views to the document and calls back once the server
+	// has applied all sent updates: callback(true), or callback(false) if an update failed.
+	function commitChanges(callback){
+		for (let i = 0; i < registeredViews.length; ++i){
+			if (registeredViews[i].visible){
+				registeredViews[i].doUpdateModel()
+			}
+		}
+
+		if (_internal.pendingDocumentUpdates === 0){
+			callback(true)
+			return
+		}
+
+		_internal.commitCallbacks.push(callback)
+	}
+
+	function finishCommit(committed){
+		let callbacks = _internal.commitCallbacks
+		_internal.commitCallbacks = []
+		for (let i = 0; i < callbacks.length; ++i){
+			callbacks[i](committed)
 		}
 	}
 
@@ -241,6 +289,8 @@ QtObject {
 					_internal.requestUpdateViews.splice(viewIndex, 1)
 				}
 			}
+
+			viewVisibilityChanged(view, visible)
 		}
 	}
 
@@ -271,8 +321,49 @@ QtObject {
 		registeredViews.push(view)
 		registeredRepresentation.push(representationController)
 		_internal.updateCounters.push(0)
+		_internal.failedViews.push(false)
 		
 		viewRegistered(view, representationController, updateRepr)
+	}
+
+	function unregisterView(view){
+		let index = registeredViews.indexOf(view)
+		if (index < 0){
+			return
+		}
+
+		let representationController = registeredRepresentation[index]
+		let connection = _internal.viewConnections[index]
+
+		view.commandActivated.disconnect(onCommandActivated)
+		view.modelDataChanged.disconnect(onModelDataChanged)
+		view.guiUpdated.disconnect(onGuiUpdated)
+		view.guiVisibleChanged.disconnect(onGuiVisibleChanged)
+		view.Component.destruction.disconnect(connection.viewDestroyed)
+
+		representationController.representationUpdated.disconnect(onRepresentationUpdated)
+		representationController.startUpdateRepresentation.disconnect(onStartUpdateRepresentation)
+		representationController.updateRepresentationFailed.disconnect(connection.representationFailed)
+		representationController.updateDocumentFailed.disconnect(onUpdateDocumentFailed)
+		representationController.startUpdateDocument.disconnect(onStartUpdateDocument)
+		representationController.documentUpdated.disconnect(onDocumentUpdated)
+
+		registeredViews.splice(index, 1)
+		registeredRepresentation.splice(index, 1)
+		_internal.updateCounters.splice(index, 1)
+		_internal.failedViews.splice(index, 1)
+		_internal.viewConnections.splice(index, 1)
+
+		let requestIndex = _internal.requestUpdateViews.indexOf(view)
+		if (requestIndex >= 0){
+			_internal.requestUpdateViews.splice(requestIndex, 1)
+		}
+
+		if (_internal.initiatingView === view){
+			_internal.initiatingView = null
+		}
+
+		viewUnregistered(view)
 	}
 
 	function onUndo(){
@@ -301,24 +392,18 @@ QtObject {
 
 		// A repeated Save while still waiting is the way out of an update that never reported back.
 		if (_internal.saveAfterUpdate){
-			_internal.saveAfterUpdate = false
 			_internal.pendingDocumentUpdates = 0
-			doSave()
+			finishCommit(true)
 			return
 		}
 
-		for (let i = 0; i < registeredViews.length; ++i){
-			if (registeredViews[i].visible){
-				registeredViews[i].doUpdateModel()
+		_internal.saveAfterUpdate = true
+		commitChanges(function(committed){
+			_internal.saveAfterUpdate = false
+			if (committed){
+				doSave()
 			}
-		}
-
-		if (_internal.pendingDocumentUpdates > 0){
-			_internal.saveAfterUpdate = true
-			return
-		}
-
-		doSave()
+		})
 	}
 
 	function doSave(){
@@ -367,7 +452,22 @@ QtObject {
 		return !isNewDocument || registeredRepresentation[viewIndex].requestRepresentationOnCreate
 	}
 
-	function anyRepresentationRequired(isNewDocument){
+	// Hidden views count only while no view is visible: their representation is requested once shown.
+	function isAwaitingRepresentation(isNewDocument){
+		let hasVisibleView = false
+		for (let i = 0; i < registeredViews.length; ++i){
+			if (registeredViews[i].visible){
+				hasVisibleView = true
+				if (representationRequired(i, isNewDocument)){
+					return true
+				}
+			}
+		}
+
+		if (hasVisibleView){
+			return false
+		}
+
 		for (let i = 0; i < registeredViews.length; ++i){
 			if (representationRequired(i, isNewDocument)){
 				return true
@@ -387,6 +487,11 @@ QtObject {
 		return false
 	}
 
+	// Cleared for a view when its representation is requested again.
+	function hasFailedRepresentation(){
+		return _internal.failedViews.includes(true)
+	}
+
 	function updateDocumentForAllViews(){
 		for (let i = 0; i < registeredViews.length; ++i){
 			registeredViews[i].setBlockingUpdateModel(true)
@@ -398,8 +503,11 @@ QtObject {
 		property var requestUpdateViews: []
 		property bool saveRequested: false
 		property var updateCounters: []
+		property var failedViews: []
+		property var viewConnections: []
 		property var initiatingView: null
 		property int pendingDocumentUpdates: 0
 		property bool saveAfterUpdate: false
+		property var commitCallbacks: []
 	}
 }

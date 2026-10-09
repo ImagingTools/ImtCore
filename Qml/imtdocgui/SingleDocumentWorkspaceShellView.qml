@@ -112,8 +112,16 @@ Item {
 	}
 
 	// Re-issues the last open/create attempt with the current objectId/typeId.
+	// For an already opened document only the representation is requested again.
 	function retry(){
 		_internal.lastErrorMessage = ""
+
+		if (documentManager && _internal.documentId !== "" && documentManager.documentIsOpened(_internal.documentId)){
+			_internal.state = "loading"
+			documentManager.updateDocumentRepresentation(_internal.documentId)
+			return
+		}
+
 		_tryOpen()
 	}
 
