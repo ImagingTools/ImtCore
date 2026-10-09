@@ -26,7 +26,7 @@ import imtdeskImtDeskSdl 1.0
 FilterableSelectDataProvider {
 	id: root
 
-	property string context: ""
+	property string permissionPath: ""
 	property string entityType: ""
 	property string entityId: ""
 	readonly property bool hasEntityContext: root.entityType !== "" && root.entityId !== ""
@@ -58,7 +58,7 @@ FilterableSelectDataProvider {
 	property EntityContextTicketsInput __input: EntityContextTicketsInput {}
 
 	property GqlSdlRequestSender __request: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtdeskImtDeskSdlCommandIds.s_entityContextTickets
 
 		sdlObjectComp: Component {

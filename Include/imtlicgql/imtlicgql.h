@@ -2,6 +2,17 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QHash>
+#include <QtCore/QSet>
+#include <QtCore/QVector>
+
+// ImtCore includes
+#include <imtbase/IObjectCollection.h>
+#include <imtlic/IFeatureInfo.h>
+#include <imtlic/IProductInfo.h>
+
+
 /**
 	\namespace imtlicgql
 	\brief GraphQL API interface layer for the licensing domain model.
@@ -504,6 +515,236 @@
 */
 namespace imtlicgql
 {
+
+
+/**
+	What a product holds once the requirements of its features have been followed.
+
+	\see CompleteProductFeatures
+*/
+struct ProductFeatureClosure
+{
+	/**
+		Feature document ids: the ones the product was given, in that order,
+		followed by the ones its requirements pulled in.
+	*/
+	QByteArrayList featureIds;
+
+	/**
+		Optional parts the product takes, including the ones a requirement points at.
+	*/
+	imtlic::IProductInfo::OptionalFeatureInfos optionalFeatures;
+
+	/**
+		Requirement paths naming a feature the catalog does not (or no longer) have.
+		A product is still completed around them; they are reported so the caller
+		can say the catalog is inconsistent.
+	*/
+	QByteArrayList unresolvedRequirements;
+};
+
+
+namespace Detail
+{
+
+
+/**
+	One node of the feature catalog, as the requirement resolution needs it.
+	A node is either a feature itself (empty subFeatureId) or a part inside one.
+*/
+struct FeatureCatalogNode
+{
+	QByteArray featureId;
+	QByteArray subFeatureId;
+	bool isOptional = false;
+	QByteArrayList requirements;
+};
+
+
+inline void CollectCatalogNodes(
+			const imtlic::IFeatureInfo& featureInfo,
+			const QByteArray& featureId,
+			const QByteArray& parentPath,
+			bool isRoot,
+			QHash<QByteArray, FeatureCatalogNode>& nodesByPath,
+			QHash<QByteArray, QVector<FeatureCatalogNode>>& nodesByFeatureId)
+{
+	const QByteArray nodeId = featureInfo.GetFeatureId();
+	if (nodeId.isEmpty()){
+		return;
+	}
+
+	// The form requirements are written in (\see imtlic::CalculateFeaturePath):
+	// the ids of the feature and of every part above this node.
+	const QByteArray nodePath = parentPath + '/' + nodeId;
+
+	FeatureCatalogNode node;
+	node.featureId = featureId;
+	node.subFeatureId = isRoot ? QByteArray() : nodeId;
+	node.isOptional = featureInfo.IsOptional();
+	node.requirements = featureInfo.GetRequirements();
+
+	nodesByPath.insert(nodePath, node);
+	nodesByFeatureId[featureId].append(node);
+
+	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
+	for (const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr : subFeatures){
+		if (subFeaturePtr.IsValid()){
+			CollectCatalogNodes(*subFeaturePtr, featureId, nodePath, false, nodesByPath, nodesByFeatureId);
+		}
+	}
+}
+
+
+} // namespace Detail
+
+
+/**
+	Complete the features of a product with everything they require.
+
+	A feature declares what it requires as full feature paths, and a product that
+	takes the feature has to take those as well - transitively, since a required
+	feature requires in turn. This resolves those paths against the feature
+	catalog and answers with what the product must hold:
+
+	- a requirement naming a feature adds that feature to the product;
+	- a requirement naming a mandatory part of a feature adds the feature it
+	  belongs to, because a mandatory part comes with it;
+	- a requirement naming an optional part adds the feature and marks that part
+	  as taken.
+
+	Only the parts a product actually has speak: the requirements of an optional
+	part are followed once the product takes it, never before.
+
+	The result is what the product is to be filled with; nothing is removed from
+	what was given. Which of the features came in this way is not recorded - it
+	follows from the requirements again, so it cannot go stale (\see ProductView.qml,
+	which marks those rows and refuses to drop them while their source stays).
+
+	\param featureCollection The feature catalog: every feature a product may take.
+	\param featureIds Feature document ids the product was given.
+	\param optionalFeatures Optional parts the product was given, per feature.
+*/
+inline ProductFeatureClosure CompleteProductFeatures(
+			const imtbase::IObjectCollection& featureCollection,
+			const QByteArrayList& featureIds,
+			const imtlic::IProductInfo::OptionalFeatureInfos& optionalFeatures)
+{
+	ProductFeatureClosure retVal;
+
+	// The catalog, flattened once: reading an element hands out a deep copy of a
+	// whole feature tree, so it is walked here and answered from the maps below.
+	QHash<QByteArray, Detail::FeatureCatalogNode> nodesByPath;
+	QHash<QByteArray, QVector<Detail::FeatureCatalogNode>> nodesByFeatureId;
+
+	const imtbase::ICollectionInfo::Ids catalogIds = featureCollection.GetElementIds();
+	for (const imtbase::ICollectionInfo::Id& catalogId : catalogIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (!featureCollection.GetObjectData(catalogId, dataPtr)){
+			continue;
+		}
+
+		const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
+		if (featureInfoPtr != nullptr){
+			Detail::CollectCatalogNodes(*featureInfoPtr, catalogId, QByteArray(), true, nodesByPath, nodesByFeatureId);
+		}
+	}
+
+	QSet<QByteArray> knownFeatureIds;
+	QByteArrayList pendingFeatureIds;
+	for (const QByteArray& featureId : featureIds){
+		if (!featureId.isEmpty() && !knownFeatureIds.contains(featureId)){
+			knownFeatureIds.insert(featureId);
+			retVal.featureIds.append(featureId);
+			pendingFeatureIds.append(featureId);
+		}
+	}
+
+	// Parts taken, by the feature they belong to. Entries naming a feature the
+	// product does not hold are dropped: a part is only taken from a feature the
+	// product has.
+	QHash<QByteArray, QSet<QByteArray>> takenSubFeatureIds;
+	for (const imtlic::IProductInfo::OptionalFeatureInfo& optionalFeature : optionalFeatures){
+		if (!knownFeatureIds.contains(optionalFeature.featureId)){
+			continue;
+		}
+
+		for (const QByteArray& subFeatureId : optionalFeature.subFeatureIds){
+			if (!subFeatureId.isEmpty()){
+				takenSubFeatureIds[optionalFeature.featureId].insert(subFeatureId);
+			}
+		}
+	}
+
+	QSet<QByteArray> reportedRequirements;
+
+	while (!pendingFeatureIds.isEmpty()){
+		const QByteArray featureId = pendingFeatureIds.takeFirst();
+
+		const QVector<Detail::FeatureCatalogNode> nodes = nodesByFeatureId.value(featureId);
+		for (const Detail::FeatureCatalogNode& node : nodes){
+			// An optional part the product did not take is not part of it, so
+			// what it requires is none of this product's business.
+			if (!node.subFeatureId.isEmpty()
+						&& node.isOptional
+						&& !takenSubFeatureIds.value(featureId).contains(node.subFeatureId)){
+				continue;
+			}
+
+			for (const QByteArray& requirement : node.requirements){
+				if (requirement.isEmpty()){
+					continue;
+				}
+
+				QHash<QByteArray, Detail::FeatureCatalogNode>::const_iterator requiredIter =
+						nodesByPath.constFind(requirement);
+				if (requiredIter == nodesByPath.constEnd()){
+					if (!reportedRequirements.contains(requirement)){
+						reportedRequirements.insert(requirement);
+						retVal.unresolvedRequirements.append(requirement);
+					}
+
+					continue;
+				}
+
+				const Detail::FeatureCatalogNode& requiredNode = requiredIter.value();
+
+				if (!knownFeatureIds.contains(requiredNode.featureId)){
+					knownFeatureIds.insert(requiredNode.featureId);
+					retVal.featureIds.append(requiredNode.featureId);
+					pendingFeatureIds.append(requiredNode.featureId);
+				}
+
+				// A mandatory part needs nothing beyond its feature; an optional
+				// one has to be taken, and what it requires then counts too.
+				if (!requiredNode.subFeatureId.isEmpty()
+							&& requiredNode.isOptional
+							&& !takenSubFeatureIds.value(requiredNode.featureId).contains(requiredNode.subFeatureId)){
+					takenSubFeatureIds[requiredNode.featureId].insert(requiredNode.subFeatureId);
+					pendingFeatureIds.append(requiredNode.featureId);
+				}
+			}
+		}
+	}
+
+	// Written back in the order of the features, so the same product always
+	// yields the same document.
+	for (const QByteArray& featureId : retVal.featureIds){
+		const QSet<QByteArray> subFeatureIds = takenSubFeatureIds.value(featureId);
+		if (subFeatureIds.isEmpty()){
+			continue;
+		}
+
+		imtlic::IProductInfo::OptionalFeatureInfo optionalFeatureInfo;
+		optionalFeatureInfo.featureId = featureId;
+		optionalFeatureInfo.subFeatureIds = QByteArrayList(subFeatureIds.begin(), subFeatureIds.end());
+		std::sort(optionalFeatureInfo.subFeatureIds.begin(), optionalFeatureInfo.subFeatureIds.end());
+
+		retVal.optionalFeatures << optionalFeatureInfo;
+	}
+
+	return retVal;
+}
 
 
 } // namespace imtlicgql

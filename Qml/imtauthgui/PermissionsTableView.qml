@@ -555,6 +555,54 @@ Item {
 	}
 
 	// --- Tree (flat grouped) ---
+	// One column: a permission's name and its description share a cell, one
+	// above the other, so neither is squeezed by a second column beside it.
+	Component {
+		id: permissionCellComp
+
+		Item {
+			id: permissionCell
+
+			property var cellData: parent ? parent.nodeData : null
+			property bool cellSelected: parent ? parent.selected : false
+			property bool cellEnabled: parent ? parent.nodeEnabled : true
+			property bool isGroup: parent ? parent.hasChildren : false
+			property string title: permissionCell.cellData ? permissionCell.cellData.name || "" : ""
+			property string details: permissionCell.cellData ? permissionCell.cellData.description || "" : ""
+
+			Column {
+				id: permissionTexts
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.verticalCenter: parent.verticalCenter
+				spacing: Style.spacingXXS
+
+				Text {
+					objectName: "PermissionName"
+					width: permissionTexts.width
+					text: permissionCell.title
+					font.family: Style.fontFamily
+					font.pixelSize: Style.fontSizeM
+					font.bold: permissionCell.isGroup
+					color: !permissionCell.cellEnabled ? Style.inactiveTextColor
+						: permissionCell.cellSelected ? Style.textSelectedColor : Style.textColor
+					elide: Text.ElideMiddle
+				}
+
+				Text {
+					objectName: "PermissionDescription"
+					width: permissionTexts.width
+					visible: permissionCell.details !== ""
+					text: permissionCell.details
+					font.family: Style.fontFamily
+					font.pixelSize: Style.fontSizeS
+					color: Style.inactiveTextColor
+					elide: Text.ElideRight
+				}
+			}
+		}
+	}
+
 	BasicTreeView {
 		id: permissionsTreeView
 		anchors.top: root.showControlPanel ? headerArea.bottom : parent.top
@@ -564,11 +612,11 @@ Item {
 		anchors.left: parent.left
 		anchors.right: scrollbar.left
 		anchors.rightMargin: root.treeToScrollbarSpacing
-		showHeader: true
+		showHeader: false
 		tristate: true
+		rowHeight: Style.controlHeightL + Style.marginS
 		columns: [
-			{ id: "name", name: qsTr("Permission"), tree: true },
-			{ id: "description", name: qsTr("Description"), tree: false }
+			{ id: "name", name: qsTr("Permission"), tree: true, delegate: permissionCellComp }
 		]
 		filterRole: ["name", "description"]
 

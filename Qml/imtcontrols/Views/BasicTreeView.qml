@@ -440,6 +440,7 @@ Item {
                             ? root.cellValue(delegateRoot.nodeKey, column) : undefined
                         property string displayText: cellRawValue !== undefined && cellRawValue !== null ? String(cellRawValue) : ""
                         property bool   isBoolColumn: column && (column.type === "bool" || column.type === "checkState")
+                        property bool   hasDelegate: !!(column && column.delegate) && !isBoolColumn
                         property bool   isEditingHere: root.editing && root.__editingKey === delegateRoot.nodeKey && root.__editingColumn === index
                         property string editorType: isEditingHere ? root.__pickEditorType(column, cellRawValue, delegateRoot.nodeKey) : ""
 
@@ -516,7 +517,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: Math.max(0, parent.width - x)
                                 text: cellRoot.displayText
-                                visible: !cellRoot.isEditingHere && !cellRoot.isBoolColumn
+                                visible: !cellRoot.isEditingHere && !cellRoot.isBoolColumn && !cellRoot.hasDelegate
                                 color: !delegateRoot.nodeIsEnabled ? root.disabledTextColor
                                      : delegateRoot.nodeSelected   ? root.selectedTextColor
                                                                    : root.normalTextColor
@@ -524,6 +525,24 @@ Item {
                                     ? cellRoot.column.horizontalAlignment : Text.AlignLeft
                                 elide: Text.ElideRight
                                 verticalAlignment: Text.AlignVCenter
+                            }
+
+                            // Custom cell content from column.delegate, in place of the text above
+                            Loader {
+                                id: cellDelegateLoader
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: Math.max(0, parent.width - x)
+                                height: parent.height
+                                active: cellRoot.hasDelegate
+                                visible: active && !cellRoot.isEditingHere
+                                sourceComponent: cellRoot.hasDelegate ? cellRoot.column.delegate : null
+
+                                property var value: cellRoot.cellRawValue
+                                property var nodeData: delegateRoot.nodeDataTick >= 0 && root.__nodes[delegateRoot.nodeKey]
+                                    ? root.__nodes[delegateRoot.nodeKey].data : null
+                                property bool selected: delegateRoot.nodeSelected
+                                property bool nodeEnabled: delegateRoot.nodeIsEnabled
+                                property bool hasChildren: delegateRoot.nodeHasChildren
                             }
 
                             // Bool / checkState cell renderer (single-click toggles when editable)

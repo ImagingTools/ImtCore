@@ -28,6 +28,8 @@ ViewBase {
 	property var parentLicenseIds: []
 	property string productId: ""
 	property bool canEdit: false
+	// Part of the product this editor works in; scopes its permission checks.
+	property string permissionPath: ""
 
 	Component.onCompleted: {
 		canEdit = PermissionsController.checkPermission("ChangeLicenseDefinition")
@@ -93,6 +95,7 @@ ViewBase {
 		featureIds = ids
 		if (licenseData)
 			licenseData.m_features = ids.join(';')
+		rebuildRequirementIndex()
 		updatePageBadges()
 	}
 
@@ -156,7 +159,8 @@ ViewBase {
 				featureName: FeatureItemTypeMetaInfo.s_featureName,
 				featureId: FeatureItemTypeMetaInfo.s_featureId,
 				description: FeatureItemTypeMetaInfo.s_description,
-				optional: FeatureItemTypeMetaInfo.s_optional
+				optional: FeatureItemTypeMetaInfo.s_optional,
+				requirements: FeatureItemTypeMetaInfo.s_requirements
 			}
 		})
 		let nodes = []
@@ -165,22 +169,25 @@ ViewBase {
 			let id = data.id || ""
 			if (wanted.indexOf(id) < 0)
 				continue
-			nodes.push(buildFeatureNode(tree[i], id, true))
+			nodes.push(buildFeatureNode(tree[i], id, true, ""))
 		}
 		featureNodes = nodes
+		rebuildRequirementIndex()
 		updatePageBadges()
 	}
 
-	function buildFeatureNode(treeNode, rootId, isRoot) {
+	function buildFeatureNode(treeNode, rootId, isRoot, parentPath) {
 		let data = treeNode.data || {}
 		let name = data.featureName || data.featureId || ""
 		// The root of a branch is granted under the feature's document id; a
 		// node inside it under the composite key.
 		let grantId = isRoot ? rootId : rootId + "/" + (data.featureId || "")
+		// Requirements name features by this path, not by the grant id.
+		let featurePath = parentPath + "/" + (data.featureId || "")
 		let sourceChildren = treeNode.children || []
 		let children = []
 		for (let i = 0; i < sourceChildren.length; ++i)
-			children.push(buildFeatureNode(sourceChildren[i], rootId, false))
+			children.push(buildFeatureNode(sourceChildren[i], rootId, false, featurePath))
 		return {
 			"key": grantId,
 			"text": name,
@@ -194,6 +201,8 @@ ViewBase {
 					"isLeaf": children.length === 0,
 					"featureName": name,
 					"featureId": data.featureId || "",
+					"featurePath": featurePath,
+					"requirements": data.requirements || "",
 					"description": data.description || "",
 					"subFeatureCount": children.length
 				}
@@ -201,12 +210,68 @@ ViewBase {
 		}
 	}
 
+	// A feature may require others, written as full feature paths separated by ';'.
+	// One that names a feature this product offers is pointed at in the tree; one
+	// that names a feature from elsewhere can only be listed, because this license
+	// has no row to tick for it.
+	property var requiredByIndex: ({})
+	property var externalRequirements: []
+
+	function rebuildRequirementIndex() {
+		let index = {}
+		let external = []
+		collectRequirements(featureNodes, index, external)
+		requiredByIndex = index
+		externalRequirements = external
+	}
+
+	function collectRequirements(nodes, index, external) {
+		for (let i = 0; i < nodes.length; ++i) {
+			let entry = nodes[i].data.entry
+			if (entryIsSelected(entry)) {
+				let paths = entry.requirements ? entry.requirements.split(';') : []
+				for (let j = 0; j < paths.length; ++j) {
+					let path = paths[j]
+					if (path === "")
+						continue
+					let target = findEntryByFeaturePath(featureNodes, path)
+					if (target) {
+						if (!index[target.id])
+							index[target.id] = []
+						if (index[target.id].indexOf(entry.featureName) < 0)
+							index[target.id].push(entry.featureName)
+					}
+					else if (external.indexOf(path) < 0) {
+						external.push(path)
+					}
+				}
+			}
+			collectRequirements(nodes[i].children || [], index, external)
+		}
+	}
+
+	function findEntryByFeaturePath(nodes, path) {
+		for (let i = 0; i < nodes.length; ++i) {
+			let entry = nodes[i].data.entry
+			if (entry.featurePath === path)
+				return entry
+			let child = findEntryByFeaturePath(nodes[i].children || [], path)
+			if (child)
+				return child
+		}
+		return null
+	}
+
+	function entryRequiredBy(entry) {
+		return entry && requiredByIndex[entry.id] ? requiredByIndex[entry.id] : []
+	}
+
 	// What a tick means, per kind of row:
 	//   a product feature      - granted by this license, on its own id
 	//   a mandatory part       - comes with its feature, nothing to decide
 	//   an optional part       - granted separately, once the feature is granted
 	//   a part that has parts  - a grouping; its children carry the decision
-	function entryIsGranted(entry) {
+	function entryIsSelected(entry) {
 		if (!entry)
 			return false
 		if (entry.isRoot)
@@ -214,6 +279,12 @@ ViewBase {
 		if (!entry.isLeaf || !entry.optional)
 			return featureIsIncluded(entry.rootId)
 		return featureIds.indexOf(entry.id) >= 0
+	}
+
+	// A feature required by one that is granted comes with it, so it reads as
+	// granted here even though nobody ticked it.
+	function entryIsGranted(entry) {
+		return entryIsSelected(entry) || entryRequiredBy(entry).length > 0
 	}
 
 	function entryIsChangeable(entry) {
@@ -242,6 +313,9 @@ ViewBase {
 
 	// Why a row cannot be ticked, in the words the table shows next to it.
 	function entryStateText(entry) {
+		let requiredBy = entryRequiredBy(entry)
+		if (requiredBy.length > 0)
+			return qsTr("Required by %1").arg(requiredBy.join(", "))
 		if (!entry || entry.isRoot)
 			return ""
 		if (!entry.isLeaf)
@@ -592,28 +666,18 @@ ViewBase {
 			function updateModel() {
 			}
 
-			// Column geometry, shared by the header and the rows so the two can
-			// never drift. A column whose breakpoint is above the current table
-			// width folds away and its share is handed to the columns that stay.
-			property var columnFractions: [0.10, 0.28, 0.20, 0.28, 0.14]
-			property var columnBreakpoints: [0, 0, 380, 620, 300]
-
-			function columnVisible(index, width) {
-				return width >= featuresPage.columnBreakpoints[index]
+			// Column geometry, shared by the header, the rows and the drag handles
+			// the explorer draws, so none of the three can drift from the others.
+			// A column whose breakpoint is above the current table width folds
+			// away and its share is handed to the columns that stay.
+			TableColumnLayout {
+				id: featureColumns
+				fractions: [0.10, 0.28, 0.20, 0.28, 0.14]
+				breakpoints: [0, 0, 380, 620, 300]
 			}
 
 			function columnWidth(index, width, spacing) {
-				if (!featuresPage.columnVisible(index, width))
-					return 0
-				let sum = 0
-				let count = 0
-				for (let i = 0; i < featuresPage.columnFractions.length; ++i) {
-					if (!featuresPage.columnVisible(i, width))
-						continue
-					sum += featuresPage.columnFractions[i]
-					++count
-				}
-				return (width - (count - 1) * spacing) * featuresPage.columnFractions[index] / sum
+				return featureColumns.widthOf(index, width, spacing)
 			}
 
 			property Component featuresHeaderComp: Component {
@@ -857,6 +921,21 @@ ViewBase {
 				}
 			}
 
+			// Whatever the narrow cells cut short, in full.
+			property Component featureDetailsComp: Component {
+				TableRowDetails {
+					id: featureDetails
+					objectName: "LicenseFeatureDetails"
+
+					property var entry: licenseEditor.nodeEntry(treeExplorer.selectedNode)
+
+					title: featureDetails.entry ? featureDetails.entry.featureName : ""
+					keyText: featureDetails.entry ? featureDetails.entry.featurePath : ""
+					description: featureDetails.entry ? featureDetails.entry.description : ""
+					placeholderText: qsTr("Select a feature to see its full name, path and description")
+				}
+			}
+
 			// Right-hand table of the page: what this license gets for free from
 			// the licenses it inherits. Read-only - the ticks that produce it are
 			// on the Inherited licenses page.
@@ -900,6 +979,9 @@ ViewBase {
 					? qsTr("Pick a product on the General page first") : ""
 				idleHintText: qsTr("Tick the features this license grants; open one to reach its optional parts")
 				selectedHintText: qsTr("Open a feature to grant its optional parts one by one")
+				footerText: licenseEditor.externalRequirements.length > 0
+					? qsTr("Also required, from outside this product: %1").arg(licenseEditor.externalRequirements.join(", "))
+					: ""
 				editable: licenseEditor.canEdit
 				createVisible: false
 				removeVisible: false
@@ -910,6 +992,8 @@ ViewBase {
 				rowIconVisible: false
 				headerContentComponent: featuresPage.featuresHeaderComp
 				rowContentComponent: featuresPage.featureRowComp
+				columnLayout: featureColumns
+				detailsComponent: featuresPage.featureDetailsComp
 				sidePanelComponent: featuresPage.inheritedFeaturesPanelComp
 				// Only a granted feature can be opened - there is nothing to
 				// decide inside one that is not granted at all.

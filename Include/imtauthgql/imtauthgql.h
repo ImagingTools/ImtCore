@@ -30,6 +30,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QByteArrayList>
 #include <imtauth/IUserInfo.h>
+#include <imtauth/imtauth.h>
 
 
 /**
@@ -632,6 +633,7 @@ namespace imtauthgql
 
 /**
 	Collect flat permission entries from a feature subtree.
+	A permission is identified by the full path of its feature, e.g. "/Administration/EditUser/AddUser".
 	When allowedPermissionsPtr is set, returns only entries reachable from selected nodes.
 */
 template<typename TEntry>
@@ -640,7 +642,7 @@ inline bool CollectPermissionEntries(
 			imtsdl::TElementList<TEntry>& entries,
 			const QByteArray& languageId,
 			const QSet<QByteArray>* allowedPermissionsPtr,
-			const QString& parentPath,
+			const QString& parentName,
 			const iqt::ITranslationManager* translationManagerPtr,
 			bool parentSelected = false)
 {
@@ -648,7 +650,6 @@ inline bool CollectPermissionEntries(
 		return false;
 	}
 
-	QByteArray featureId = featureInfo.GetFeatureId();
 	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
 
 	QString featureName = featureInfo.GetFeatureName();
@@ -656,10 +657,13 @@ inline bool CollectPermissionEntries(
 		featureName = iqt::GetTranslation(translationManagerPtr, featureName.toUtf8(), languageId, QByteArrayLiteral("Feature"));
 	}
 
-	QString displayName = parentPath.isEmpty() ? featureName : (parentPath + QStringLiteral(" / ") + featureName);
+	QString displayName = parentName.isEmpty() ? featureName : (parentName + QStringLiteral(" / ") + featureName);
+	QByteArray currentPath = imtlic::CalculateFeaturePath(featureInfo);
 
 	if (subFeatures.isEmpty()){
-		if (allowedPermissionsPtr != nullptr && !parentSelected && !allowedPermissionsPtr->contains(featureId)){
+		// Held permissions may still be stored by feature id alone, so what the
+		// user holds is matched against the tree by the common rule.
+		if (allowedPermissionsPtr != nullptr && !parentSelected && !imtauth::HasPermission(*allowedPermissionsPtr, currentPath)){
 			return false;
 		}
 
@@ -669,7 +673,7 @@ inline bool CollectPermissionEntries(
 		}
 
 		TEntry entry;
-		entry.permissionId = featureId;
+		entry.permissionId = currentPath;
 		entry.displayName = displayName;
 		entry.description = featureDescription;
 		entries.append(entry);
@@ -679,7 +683,8 @@ inline bool CollectPermissionEntries(
 
 	imtsdl::TElementList<TEntry> childEntries;
 	int childCount = 0;
-	const bool thisNodeSelected = parentSelected || (allowedPermissionsPtr != nullptr && allowedPermissionsPtr->contains(featureId));
+	const bool thisNodeSelected = parentSelected
+				|| (allowedPermissionsPtr != nullptr && imtauth::HasPermission(*allowedPermissionsPtr, currentPath));
 
 	for (int i = 0; i < subFeatures.count(); i++){
 		const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr = subFeatures.at(i);
@@ -762,7 +767,8 @@ inline void BuildPermissionGroups(
 
 		const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
 		bool hasEntries = false;
-		const bool groupSelected = (allowedPermissionsPtr != nullptr && allowedPermissionsPtr->contains(groupId));
+		const bool groupSelected = (allowedPermissionsPtr != nullptr
+					&& imtauth::HasPermission(*allowedPermissionsPtr, imtlic::CalculateFeaturePath(*featureInfoPtr)));
 
 		if (subFeatures.isEmpty()){
 			hasEntries = CollectPermissionEntries<TEntry>(
@@ -846,7 +852,8 @@ inline void BuildPermissionGroupsFromProvider(
 
 		const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
 		bool hasEntries = false;
-		const bool groupSelected = (allowedPermissionsPtr != nullptr && allowedPermissionsPtr->contains(groupId));
+		const bool groupSelected = (allowedPermissionsPtr != nullptr
+					&& imtauth::HasPermission(*allowedPermissionsPtr, imtlic::CalculateFeaturePath(*featureInfoPtr)));
 
 		if (subFeatures.isEmpty()){
 			hasEntries = CollectPermissionEntries<TEntry>(

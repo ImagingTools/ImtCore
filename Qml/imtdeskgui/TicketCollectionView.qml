@@ -16,7 +16,7 @@ import imtbaseComplexCollectionFilterSdl 1.0
 RemoteCollectionView {
 	id: container
 
-	property string context: ""
+	property string permissionPath: ""
 	collectionId: "Tickets"
 	gqlGetListCommandId: ImtdeskImtDeskSdlCommandIds.s_ticketsList
 	documentCollectionFilter: null
@@ -237,7 +237,7 @@ RemoteCollectionView {
 
 					property DocumentId documentIdInput: DocumentId {}
 					property GqlSdlRequestSender getTicketRequest: GqlSdlRequestSender {
-						context: container.context
+						permissionPath: container.permissionPath
 						gqlCommandId: ImtdeskTicketCollectionDocumentServiceSdlCommandIds.s_getTicketRepresentation
 						sdlObjectComp: Component {
 							TicketData {
@@ -255,7 +255,7 @@ RemoteCollectionView {
 
 					property UpdateTicketInput updateTicketInput: UpdateTicketInput {}
 					property GqlSdlRequestSender updateTicketRequest: GqlSdlRequestSender {
-						context: container.context
+						permissionPath: container.permissionPath
 						gqlCommandId: ImtdeskTicketCollectionDocumentServiceSdlCommandIds.s_updateTicketFromRepresentation
 						requestType: 1
 						sdlObjectComp: Component {

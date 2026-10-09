@@ -8,7 +8,7 @@ import imtbaseCommandsSdl 1.0
 CommandsController {
 	id: root;
 	
-	property string context: ""
+	property string permissionPath: ""
 	function getCommands(){
 		commandsRequest.send()
 	}
@@ -18,7 +18,7 @@ CommandsController {
 	}
 	
 	property GqlSdlRequestSender commandsRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtbaseCommandsSdlCommandIds.s_getCommands;
 		inputObjectComp: Component {
 			GetCommandsInput {
