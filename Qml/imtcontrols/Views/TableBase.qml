@@ -256,10 +256,8 @@ Rectangle {
 	}
 
 	onSelectionChanged: {
-		if (selection.length > 0){
-			let maxIndex = selection.sort()[selection.length - 1]
-
-			elementsListObj.positionViewAtIndex(maxIndex, ListView.Contain)
+		if (selection.length > 0 && selectionManager.focusedIndex >= 0){
+			elementsListObj.positionViewAtIndex(selectionManager.focusedIndex, ListView.Contain)
 		}
 	}
 
