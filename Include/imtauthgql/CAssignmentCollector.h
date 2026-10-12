@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QByteArrayList>
+#include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QString>
 
@@ -154,6 +155,9 @@ private:
 	QList<Item> m_users;
 	QList<Item> m_permissions;
 	QList<Warning> m_warnings;
+
+	// Names of the visited roles and groups, for readable warnings.
+	QHash<QByteArray, QString> m_names;
 };
 
 

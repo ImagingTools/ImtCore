@@ -36,6 +36,11 @@ Rectangle {
 	property string filterPlaceholder: qsTr("Filter...")
 	// Explains a locked row; the sources of the row are appended.
 	property string lockedHint: qsTr("Inherited, it cannot be removed here. Remove it from its source:")
+	// Hide the "Inherited from" column where nothing can be inherited, e.g. group members.
+	property bool showSourceColumn: true
+	// Share of the name column; the user changes it by dragging the header divider.
+	property real nameColumnRatio: 0.35
+	readonly property real __nameRatio: container.showSourceColumn ? container.nameColumnRatio : 1
 
 	readonly property int itemsCount: container.__visibleRows.length
 	readonly property int selectedCount: itemsTable.selectionManager.selectedIds.length
@@ -122,6 +127,8 @@ Rectangle {
 			rows.push(row)
 		}
 		container.rows = rows
+		// A re-read refills the warning list in place, so its property does not change.
+		container.updateWarnings()
 	}
 
 	// Direct rows as [{id, name}], e.g. the preselection of a picker.
@@ -250,6 +257,25 @@ Rectangle {
 		return added
 	}
 
+	// Natural order: numbers inside titles compare by value, so "Member 2" goes before "Member 10".
+	function compareTitles(first, second){
+		let firstParts = first.match(/\d+|\D+/g) || []
+		let secondParts = second.match(/\d+|\D+/g) || []
+		let count = Math.min(firstParts.length, secondParts.length)
+		for (let i = 0; i < count; i++){
+			let firstNumber = /^\d/.test(firstParts[i])
+			let secondNumber = /^\d/.test(secondParts[i])
+			let result = firstNumber && secondNumber
+				? Number(firstParts[i]) - Number(secondParts[i])
+				: firstParts[i].localeCompare(secondParts[i])
+			if (result !== 0){
+				return result
+			}
+		}
+
+		return firstParts.length - secondParts.length
+	}
+
 	function updateRows(){
 		let rows = []
 		let filter = container.__filterText.toLowerCase()
@@ -269,20 +295,44 @@ Rectangle {
 			if (a.direct !== b.direct){
 				return a.direct ? -1 : 1
 			}
-			return a.title.localeCompare(b.title)
+			return container.compareTitles(a.title, b.title)
 		})
 
 		container.__visibleRows = rows
 		itemsTable.model = rows
 	}
 
+	// Shows the full text of a cell that does not fit. One tooltip serves the whole table.
+	function showOverflow(textItem, mouseX, mouseY){
+		// Measured apart: the web runtime caps implicitWidth of an eliding Text at its width.
+		overflowMeasure.font.pixelSize = textItem.font.pixelSize
+		overflowMeasure.text = textItem.text
+		if (overflowMeasure.implicitWidth <= textItem.width + 1){
+			return
+		}
+
+		overflowTooltip.hide()
+		// The decorator places the tooltip next to the tooltip item, so put the item over the cut text.
+		let point = textItem.mapToItem(container, 0, 0)
+		overflowTooltip.x = point.x
+		overflowTooltip.y = point.y
+		overflowTooltip.width = textItem.width
+		overflowTooltip.height = textItem.height
+		overflowTooltip.targetItem = textItem
+		overflowTooltip.text = textItem.text
+		overflowTooltip.show(mouseX, mouseY)
+	}
+
+	function hideOverflow(){
+		overflowTooltip.hide()
+	}
+
 	function updateWarnings(){
 		let lines = []
 		let warnings = container.warnings
 		for (let i = 0; warnings && i < warnings.count; i++){
-			let warning = warnings.get(i).item
-			let ids = warning.m_ids ? warning.m_ids : []
-			lines.push(String(warning.m_message) + (ids.length > 0 ? ": " + ids.join(" " + String.fromCharCode(0x2192) + " ") : ""))
+			// The server puts the names of the affected roles or groups into the message.
+			lines.push(String(warnings.get(i).item.m_message))
 		}
 		warningsText.text = lines.join("\n")
 	}
@@ -330,7 +380,7 @@ Rectangle {
 				}
 
 				BaseText {
-					width: headerRow.columnsWidth * 0.35
+					width: headerRow.columnsWidth * container.__nameRatio
 					text: container.nameTitle
 					font.bold: true
 					font.pixelSize: Style.fontSizeS
@@ -338,11 +388,49 @@ Rectangle {
 				}
 
 				BaseText {
-					width: headerRow.columnsWidth * 0.65
+					visible: container.showSourceColumn
+					width: headerRow.columnsWidth * (1 - container.__nameRatio)
 					text: qsTr("Inherited from")
 					font.bold: true
 					font.pixelSize: Style.fontSizeS
 					color: Style.inactiveTextColor
+				}
+			}
+
+			// Column divider: drag it to change the width of the name column.
+			Item {
+				id: columnDivider
+				readonly property real leftOffset: headerRow.x + (container.editable ? container.__checkBoxSize + headerRow.spacing : 0)
+				x: leftOffset + headerRow.columnsWidth * container.__nameRatio + headerRow.spacing / 2 - width / 2
+				width: Style.marginM
+				height: parent.height
+				visible: container.showSourceColumn
+
+				Rectangle {
+					anchors.horizontalCenter: parent.horizontalCenter
+					anchors.verticalCenter: parent.verticalCenter
+					width: dividerMouseArea.containsMouse || dividerMouseArea.pressed ? 2 : 1
+					height: parent.height / 2
+					color: dividerMouseArea.containsMouse || dividerMouseArea.pressed ? Style.linkColor : Style.borderColor
+				}
+
+				MouseArea {
+					id: dividerMouseArea
+					objectName: "ColumnDivider"
+					anchors.fill: parent
+					hoverEnabled: true
+					preventStealing: true
+					cursorShape: Qt.SizeHorCursor
+
+					onPositionChanged: {
+						if (!pressed || headerRow.columnsWidth <= 0){
+							return
+						}
+
+						let point = mapToItem(columnDivider.parent, mouse.x, 0)
+						let ratio = (point.x - columnDivider.leftOffset) / headerRow.columnsWidth
+						container.nameColumnRatio = Math.max(0.15, Math.min(0.85, ratio))
+					}
 				}
 			}
 
@@ -414,25 +502,36 @@ Rectangle {
 							hoverEnabled: true
 
 							onEntered: {
-								lockTooltip.show(mouseX, mouseY)
+								lockTooltipLoader.active = true
+								lockTooltipLoader.item.show(mouseX, mouseY)
 							}
 
 							onExited: {
-								lockTooltip.hide()
+								if (lockTooltipLoader.item){
+									lockTooltipLoader.item.hide()
+								}
 							}
 						}
 
-						CustomTooltip {
-							id: lockTooltip
-							text: container.lockedHint + " " + rowDelegate.sourcesText
-							componentWidth: Style.sizeHintXS
+						// Created on the first hover: a tooltip per row is a large part of building a long table.
+						Loader {
+							id: lockTooltipLoader
+							anchors.fill: parent
+							active: false
+
+							sourceComponent: Component {
+								CustomTooltip {
+									text: container.lockedHint + " " + rowDelegate.sourcesText
+									componentWidth: Style.sizeHintXS
+								}
+							}
 						}
 					}
 				}
 
 				Item {
 					anchors.verticalCenter: parent.verticalCenter
-					width: dataRow.columnsWidth * 0.35
+					width: dataRow.columnsWidth * container.__nameRatio
 					height: nameText.height
 
 					Text {
@@ -441,7 +540,7 @@ Rectangle {
 						width: Math.min(implicitWidth, parent.width)
 						text: rowDelegate.row ? rowDelegate.row.title : ""
 						font.pixelSize: Style.fontSizeM
-						font.underline: nameMouseArea.containsMouse
+						font.underline: nameMouseArea.containsMouse && container.navigationPath !== ""
 						color: container.navigationPath !== "" ? Style.linkColor : Style.textColor
 						elide: Text.ElideRight
 
@@ -449,26 +548,64 @@ Rectangle {
 							id: nameMouseArea
 							objectName: "MouseArea"
 							anchors.fill: parent
-							enabled: container.navigationPath !== ""
 							hoverEnabled: true
-							cursorShape: Qt.PointingHandCursor
+							cursorShape: container.navigationPath !== "" ? Qt.PointingHandCursor : Qt.ArrowCursor
+
+							onEntered: {
+								container.showOverflow(nameText, mouseX, mouseY)
+							}
+
+							onExited: {
+								container.hideOverflow()
+							}
+
 							onClicked: {
-								NavigationController.navigate(container.navigationPath + rowDelegate.row.id)
+								if (container.navigationPath !== ""){
+									container.hideOverflow()
+									NavigationController.navigate(container.navigationPath + rowDelegate.row.id)
+								}
 							}
 						}
 					}
 				}
 
 				Text {
+					id: sourcesText
 					anchors.verticalCenter: parent.verticalCenter
-					width: dataRow.columnsWidth * 0.65
+					visible: container.showSourceColumn
+					width: dataRow.columnsWidth * (1 - container.__nameRatio)
 					text: rowDelegate.sourcesText
 					font.pixelSize: Style.fontSizeM
 					color: Style.inactiveTextColor
 					elide: Text.ElideRight
+
+					MouseArea {
+						anchors.fill: parent
+						hoverEnabled: true
+						acceptedButtons: Qt.NoButton
+
+						onEntered: {
+							container.showOverflow(sourcesText, mouseX, mouseY)
+						}
+
+						onExited: {
+							container.hideOverflow()
+						}
+					}
 				}
 			}
 		}
+	}
+
+	Text {
+		id: overflowMeasure
+		visible: false
+	}
+
+	CustomTooltip {
+		id: overflowTooltip
+		z: 10
+		componentWidth: Style.sizeHintS
 	}
 
 	SimpleCollectionTable {

@@ -513,6 +513,7 @@ ViewBase {
 
 			AssignmentsTable {
 				id: usersTable
+				showSourceColumn: false
 				anchors.top: usersHeader.bottom
 				anchors.topMargin: Style.marginM
 				anchors.bottom: parent.bottom

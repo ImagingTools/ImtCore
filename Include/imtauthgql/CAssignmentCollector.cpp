@@ -31,6 +31,8 @@ void CAssignmentCollector::CollectUser(
 
 void CAssignmentCollector::CollectGroup(const imtauth::IUserGroupInfo& group, const QByteArray& groupId, const QByteArray& productId, bool collectUsers)
 {
+	m_names.insert(groupId, group.GetName());
+
 	const imtauth::IUserInfoProvider* userProviderPtr = group.GetUserProvider();
 	const QByteArrayList userIds = collectUsers ? group.GetUsers() : QByteArrayList();
 	for (const QByteArray& userId : userIds){
@@ -51,6 +53,8 @@ void CAssignmentCollector::CollectGroup(const imtauth::IUserGroupInfo& group, co
 
 void CAssignmentCollector::CollectRole(const imtauth::IRole& role, const QByteArray& roleId, const imtauth::IRoleInfoProvider* roleProviderPtr)
 {
+	m_names.insert(roleId, role.GetRoleName());
+
 	AddPermissions(role.GetLocalPermissions(), Path());
 
 	const imtauth::IRoleInfoProvider* parentProviderPtr = role.GetParentRolesProvider();
@@ -158,7 +162,13 @@ imtsdl::TElementList<sdl::V1_0::imtauth::CAccessWarning> CAssignmentCollector::C
 		sdl::V1_0::imtauth::CAccessWarning sdlWarning;
 		sdlWarning.code = QString::fromUtf8(warning.code);
 		sdlWarning.ids.Emplace().FromList(warning.ids);
-		sdlWarning.message = warning.message;
+
+		QStringList names;
+		for (const QByteArray& id : warning.ids){
+			const QString name = m_names.value(id);
+			names << (name.isEmpty() ? QString::fromUtf8(id) : name);
+		}
+		sdlWarning.message = names.isEmpty() ? warning.message : warning.message + QStringLiteral(": ") + names.join(QStringLiteral(" → "));
 		retVal << sdlWarning;
 	}
 
@@ -239,6 +249,7 @@ void CAssignmentCollector::AddRole(
 	if (roleName.isEmpty()){
 		roleName = QString::fromUtf8(roleId);
 	}
+	m_names.insert(roleId, roleName);
 
 	const Path rolePath = Path(path) << Step{kind, roleId, roleName};
 
@@ -282,6 +293,7 @@ void CAssignmentCollector::AddGroup(
 	if (groupName.isEmpty()){
 		groupName = QString::fromUtf8(groupId);
 	}
+	m_names.insert(groupId, groupName);
 
 	AddItem(m_groups, groupId, groupName, path);
 

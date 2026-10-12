@@ -590,7 +590,7 @@ ViewBase {
 			id: permissionPage
 			anchors.fill: parent
 
-			property alias bottomItem: permissionsTableElementView.bottomItem
+			property alias bottomItem: permissionsTableView
 
 			// Deferred: multiPageView.getPageById() needs the Loader to have
 			// published itemAt().item, which isn't true yet during this page's own completion.
@@ -599,14 +599,6 @@ ViewBase {
 				interval: 0
 				repeat: false
 				onTriggered: container.__populatePermissionsTree()
-			}
-
-			Connections {
-				target: permissionsTableElementView
-
-				function onBottomItemChanged() {
-					populatePermissionsTimer.restart()
-				}
 			}
 
 			Component.onCompleted: {
@@ -640,68 +632,34 @@ ViewBase {
 				}
 			}
 
-			CustomScrollbar {
-				id: scrollbar;
-				z: parent.z + 1;
-				anchors.right: parent.right;
-				anchors.top: flickable.top;
-				anchors.bottom: flickable.bottom;
-				secondSize: Style.marginM;
-				targetItem: flickable;
-			}
+			// The tree gets the page's height and scrolls itself, so only its visible rows are created.
+			Rectangle {
+				id: permissionsFrame
+				anchors.top: permissionsHeader.bottom
+				anchors.topMargin: Style.marginM
+				anchors.bottom: parent.bottom
+				anchors.bottomMargin: Style.marginXL
+				x: permissionsHeader.x
+				width: permissionsHeader.width
+				color: Style.baseColor
+				border.width: 1
+				border.color: Style.borderColor
+				radius: Style.marginXS
 
-			Flickable {
-				id: flickable;
-				anchors.top: permissionsHeader.bottom;
-				anchors.topMargin: Style.marginM;
-				anchors.bottom: parent.bottom;
-				anchors.bottomMargin: Style.marginXL;
-				anchors.left: parent.left;
-				anchors.leftMargin: Style.marginXL;
-				anchors.right: scrollbar.left;
-				anchors.rightMargin: Style.marginXL;
-				contentHeight: bodyColumn.height + Style.marginXL;
+				PermissionsTableView {
+					id: permissionsTableView
+					anchors.fill: parent
+					anchors.leftMargin: Style.marginL
+					anchors.rightMargin: Style.marginL
+					showControlPanel: true
+					showSourceColumn: true
+					treeToScrollbarSpacing: 0
+					controlPanelTopMargin: Style.marginL
+					treeTopMargin: Style.marginL
+					treeBottomMargin: Style.marginL
 
-				boundsBehavior: Flickable.StopAtBounds;
-				clip: true;
-
-				Column {
-					id: bodyColumn;
-					anchors.horizontalCenter: parent.horizontalCenter;
-					width: Math.min(parent.width, Style.contentWidthMax);
-					spacing: Style.marginXL;
-
-					GroupElementView {
-						id: permissionsGroupElement
-						width: parent.width
-
-						ElementView {
-							id: permissionsTableElementView
-							width: parent.width
-							border.width: 0
-							color: "transparent"
-							radius: 0
-							contentMargin: Style.marginL
-							contentSpacing: 0
-							height: contentHeight
-							bottomComp: Component {
-								PermissionsTableView {
-									id: permissionsTableView
-									width: parent.width
-									height: preferredHeight
-									showControlPanel: true
-									showSourceColumn: true
-									treeToScrollbarSpacing: 0
-									controlPanelTopMargin: Style.marginL
-									treeTopMargin: Style.marginL
-									treeBottomMargin: Style.marginL
-
-									onSelectionChanged: {
-										container.doUpdateModel()
-									}
-								}
-							}
-						}
+					onSelectionChanged: {
+						container.doUpdateModel()
 					}
 				}
 			}

@@ -672,7 +672,8 @@ Item {
 		anchors.topMargin: root.showControlPanel ? root.controlPanelTopMargin : 0
 		anchors.left: parent.left
 		anchors.right: parent.right
-		height: contentHeight
+		anchors.bottom: parent.bottom
+		anchors.bottomMargin: root.treeBottomMargin
 		visible: root.selectedOnly
 		plainRows: root.__selectedRows
 		nameTitle: qsTr("Permission")
@@ -683,6 +684,8 @@ Item {
 	// --- Tree (flat grouped) ---
 	BasicTreeView {
 		id: permissionsTreeView
+		// The default buffer realizes every row of a permission tree; keep only a few off-screen rows.
+		cacheBuffer: rowHeight * 4
 		anchors.top: root.showControlPanel ? headerArea.bottom : parent.top
 		anchors.topMargin: root.showControlPanel ? root.treeTopMargin : 0
 		anchors.bottom: parent.bottom
