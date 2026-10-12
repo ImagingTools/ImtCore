@@ -17,7 +17,6 @@
 #include <istd/CChangeNotifier.h>
 
 // ImtCore includes
-#include <imtbase/IIdentifiable.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtdoc/CDocumentServiceBase.h>
 #include <imtdoc/CDocumentClosedEvent.h>
@@ -993,22 +992,6 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 		if (it != m_proposedSourceDocumentIds.end()){
 			proposedElementId = it.value();
 			m_proposedSourceDocumentIds.erase(it);
-		}
-	}
-
-	// An identifiable object is stored under its own UUID: references to it (e.g. memberships) use that UUID.
-	imtbase::IIdentifiable* identifiableSnapshotPtr = dynamic_cast<imtbase::IIdentifiable*>(documentSnapshotPtr.GetPtr());
-	if (identifiableSnapshotPtr != nullptr){
-		if (proposedElementId.isEmpty()){
-			proposedElementId = identifiableSnapshotPtr->GetObjectUuid();
-		}
-		else{
-			identifiableSnapshotPtr->SetObjectUuid(proposedElementId);
-
-			imtbase::IIdentifiable* identifiableWorkingPtr = dynamic_cast<imtbase::IIdentifiable*>(workingDocumentPtr->objectPtr.GetPtr());
-			if (identifiableWorkingPtr != nullptr){
-				identifiableWorkingPtr->SetObjectUuid(proposedElementId);
-			}
 		}
 	}
 
