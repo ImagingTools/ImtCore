@@ -50,8 +50,8 @@ elseif(APPLE)
 	)
 elseif(UNIX)
 	target_link_libraries(${PROJECT_NAME} PUBLIC
-		${OPENSSLDIR}/lib/linux/libssl.so
 		# no compiled lib for v1.1
-		# ${OPENSSLDIR}/lib/linux/libcrypto.so
+		# ${OPENSSLDIR}/lib/linux/libssl.so
+		${OPENSSLDIR}/lib/linux/libcrypto.so
 	)
 endif()
