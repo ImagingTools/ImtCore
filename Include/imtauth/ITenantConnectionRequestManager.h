@@ -36,7 +36,11 @@ public:
 	virtual bool GetAllowConnectionsByCode(const QByteArray& tenantId) = 0;
 	virtual QString RegenerateConnectionCode(const QByteArray& tenantId) = 0;
 	virtual bool SetAllowConnectionsByCode(const QByteArray& tenantId, bool allow) = 0;
-	virtual QByteArray CreateConnectionRequest(const QByteArray& sourceTenantId, const QString& connectionCode, const QString& message = QString()) = 0;
+	/**
+		Create a connection request to the organization with the given connection code.
+		\param errorMessagePtr Receives the reason when the request is refused.
+	*/
+	virtual QByteArray CreateConnectionRequest(const QByteArray& sourceTenantId, const QString& connectionCode, const QString& message = QString(), QString* errorMessagePtr = nullptr) = 0;
 	virtual QByteArray ApproveConnectionRequest(const QByteArray& requestId, const QByteArray& approvingTenantId) = 0;
 	virtual bool RejectConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) = 0;
 	virtual bool CancelConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) = 0;
@@ -50,6 +54,7 @@ public:
 	virtual bool RejectRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) = 0;
 	virtual bool CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) = 0;
 	virtual QByteArrayList GetRelationshipProposalIds(const QByteArray& tenantId) const = 0;
+	virtual ITenantRelationshipProposalInfoUniquePtr GetRelationshipProposal(const QByteArray& proposalId) const = 0;
 	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId) const = 0;
 	virtual ITenantRelationshipInfoUniquePtr GetTenantRelationship(const QByteArray& relationshipId) const = 0;
 	virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId) = 0;

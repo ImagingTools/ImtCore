@@ -83,15 +83,16 @@ protected:
 	// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)
 	bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 
-private:
-	int GetObjectFactoryIndex(const QByteArray& typeId) const;
 	QByteArray GetUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
-	imtbase::IOperationContext* CreateOperationContextFromGqlRequest(const ::imtgql::CGqlRequest& gqlRequest) const;
 	/**
 		Get the ID of the collection element an open document instance is bound to.
 		Returns an empty ID for documents which were never saved before.
 	*/
 	QByteArray GetCollectionObjectId(const QByteArray& userId, const QByteArray& documentId) const;
+
+private:
+	int GetObjectFactoryIndex(const QByteArray& typeId) const;
+	imtbase::IOperationContext* CreateOperationContextFromGqlRequest(const ::imtgql::CGqlRequest& gqlRequest) const;
 	/**
 		Fill the changes collection of \a operationContext with the differences produced by saving
 		the given document instance, so that the collection can store them as history.

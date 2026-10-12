@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CTenantManagerControllerComp.h>
 #include <imtauthgql/imtauthgql.h>
+#include <imtauthgql/TenantAccess.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
@@ -10,6 +11,7 @@
 
 // ImtCore includes
 #include <imtauth/imtauth.h>
+#include <imtauth/IUserInfo.h>
 #include <imtauth/ITenantMembership.h>
 #include <imtauth/ITenantRelationshipInfo.h>
 #include <imtauth/ITenantRelationshipProposalInfo.h>
@@ -20,56 +22,6 @@
 
 namespace
 {
-
-
-bool HasTenantIsolationAccess(
-			const imtauth::ITenantManager& tenantManager,
-			const imtauth::ITenantMembershipManager* membershipManagerPtr,
-			const imtgql::CGqlRequest& gqlRequest,
-			const QByteArray& tenantId,
-			QString& errorMessage)
-{
-	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-	if (contextPtr == nullptr){
-		errorMessage = QStringLiteral("Access denied: request context is missing");
-		return false;
-	}
-
-	const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
-	if (userInfoPtr != nullptr){
-		if (userInfoPtr->IsAdmin()){
-			return true;
-		}
-	}
-
-	const QByteArray contextTenantId = contextPtr->GetTenantId();
-	if (!contextTenantId.isEmpty()){
-		if (contextTenantId == tenantId){
-			return true;
-		}
-
-		errorMessage = QStringLiteral("Access denied: requested tenant does not match current tenant context");
-		return false;
-	}
-
-	const QByteArray userId = contextPtr->GetUserId();
-	if (userId.isEmpty()){
-		errorMessage = QStringLiteral("Access denied: unauthenticated request context");
-		return false;
-	}
-
-	imtauth::ITenantInfoUniquePtr tenantPtr = tenantManager.GetTenant(tenantId);
-	if (tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId){
-		return true;
-	}
-
-	if (membershipManagerPtr != nullptr && membershipManagerPtr->IsMember(userId, tenantId)){
-		return true;
-	}
-
-	errorMessage = QStringLiteral("Access denied: tenant is outside current user scope");
-	return false;
-}
 
 
 QString NormalizeTenantName(const QString& tenantName)
@@ -119,59 +71,6 @@ bool UserExists(const imtbase::IObjectCollection* userCollectionPtr, const QByte
 }
 
 
-bool HasTenantManageAccess(
-			const imtauth::ITenantManager& tenantManager,
-			const imtauth::ITenantMembershipManager* membershipManagerPtr,
-			const imtgql::CGqlRequest& gqlRequest,
-			const QByteArray& tenantId,
-			const QByteArray& requiredOrgPermission,
-			QString& errorMessage)
-{
-	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
-	if (contextPtr == nullptr){
-		errorMessage = QStringLiteral("Access denied: request context is missing");
-		return false;
-	}
-
-	const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
-	if (userInfoPtr != nullptr && userInfoPtr->IsAdmin()){
-		return true;
-	}
-
-	const QByteArray contextTenantId = contextPtr->GetTenantId();
-	if (!contextTenantId.isEmpty() && contextTenantId != tenantId){
-		errorMessage = QStringLiteral("Access denied: requested tenant does not match current tenant context");
-		return false;
-	}
-
-	const QByteArray userId = contextPtr->GetUserId();
-	if (userId.isEmpty()){
-		errorMessage = QStringLiteral("Access denied: unauthenticated request context");
-		return false;
-	}
-
-	imtauth::ITenantInfoUniquePtr tenantPtr = tenantManager.GetTenant(tenantId);
-	if (!tenantPtr.IsValid()){
-		errorMessage = QStringLiteral("Tenant not found");
-		return false;
-	}
-
-	if (tenantPtr->GetOwnerId() == userId || tenantPtr->GetCreatorId() == userId){
-		return true;
-	}
-
-	if (!requiredOrgPermission.isEmpty() && membershipManagerPtr != nullptr){
-		imtauth::ITenantMembershipUniquePtr msPtr = membershipManagerPtr->FindMembership(userId, tenantId);
-		if (msPtr.IsValid() && msPtr->IsActive() && msPtr->GetOrganizationPermissions().contains(requiredOrgPermission)){
-			return true;
-		}
-	}
-
-	errorMessage = QStringLiteral("Access denied: insufficient permissions to manage tenant");
-	return false;
-}
-
-
 } // anonymous namespace
 
 
@@ -184,7 +83,7 @@ namespace imtauthgql
 
 sdl::V1_0::imtauth::CGetTenantIdsPayload CTenantManagerControllerComp::OnGetTenantIds(
 			const sdl::V1_0::imtauth::CGetTenantIdsGqlRequest& /*getTenantIdsRequest*/,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CGetTenantIdsPayload response;
@@ -194,7 +93,31 @@ sdl::V1_0::imtauth::CGetTenantIdsPayload CTenantManagerControllerComp::OnGetTena
 		return response;
 	}
 
-	QByteArrayList ids = m_tenantManagerCompPtr->GetTenantIds();
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	const QByteArray userId = contextPtr != nullptr ? contextPtr->GetUserId() : QByteArray();
+	if (userId.isEmpty()){
+		response.errorMessage = QStringLiteral("Access denied: unauthenticated request context");
+		return response;
+	}
+
+	const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
+	const bool isAdmin = userInfoPtr != nullptr && userInfoPtr->IsAdmin();
+
+	// Users other than administrators learn only the organizations they own or belong to.
+	QByteArrayList ids;
+	for (const QByteArray& tenantId : m_tenantManagerCompPtr->GetTenantIds()){
+		bool isVisible = isAdmin;
+		if (!isVisible){
+			imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+			isVisible = tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId;
+		}
+		if (!isVisible && m_membershipManagerCompPtr.IsValid()){
+			isVisible = m_membershipManagerCompPtr->IsMember(userId, tenantId);
+		}
+		if (isVisible){
+			ids.append(tenantId);
+		}
+	}
 
 	response.tenantIds.Emplace().FromList(ids);
 
@@ -777,7 +700,7 @@ sdl::V1_0::imtauth::CSetTenantActivePayload CTenantManagerControllerComp::OnSetT
 
 sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload CTenantManagerControllerComp::OnRemoveTenantRelationship(
 			const sdl::V1_0::imtauth::CRemoveTenantRelationshipGqlRequest& removeTenantRelationshipRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload response;
@@ -796,6 +719,13 @@ sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload CTenantManagerControllerCom
 	}
 	if (arguments.input->relationshipId){
 		relationshipId = *arguments.input->relationshipId;
+	}
+
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, accessError)){
+		response.success = false;
+		response.errorMessage = accessError;
+		return response;
 	}
 
 	bool success = m_connectionRequestManagerCompPtr->RemoveTenantRelationship(tenantId, relationshipId);
@@ -1016,19 +946,11 @@ sdl::V1_0::imtauth::CRevokeCrossOrgGrantPayload CTenantManagerControllerComp::On
 		grantId = *arguments.input->grantId;
 	}
 
-	// Enforce tenant isolation: the grant must belong to the context tenant
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	QByteArray contextTenantId;
-	if (gqlContextPtr != nullptr){
-		contextTenantId = gqlContextPtr->GetTenantId();
-	}
-	if (!contextTenantId.isEmpty()){
-		imtauth::CrossOrgGrantInfo grantInfo = m_grantManagerCompPtr->GetGrant(grantId);
-		if (grantInfo.sourceTenantId != contextTenantId && grantInfo.targetTenantId != contextTenantId){
-			response.errorMessage = QStringLiteral("Access denied: grant does not belong to the current tenant");
-			response.success = false;
-			return response;
-		}
+	QString accessError;
+	if (!CanManageGrant(gqlRequest, grantId, accessError)){
+		response.errorMessage = accessError;
+		response.success = false;
+		return response;
 	}
 	
 	bool success = m_grantManagerCompPtr->RevokeGrant(grantId);
@@ -1060,23 +982,12 @@ sdl::V1_0::imtauth::CRemoveCrossOrgGrantsPayload CTenantManagerControllerComp::O
 		grantIds = arguments.input->grantIds->ToList();
 	}
 
-	// Enforce tenant isolation: all grants must belong to the context tenant
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	QByteArray contextTenantId;
-	if (gqlContextPtr != nullptr){
-		contextTenantId = gqlContextPtr->GetTenantId();
-	}
-	if (!contextTenantId.isEmpty()){
-		for (const QByteArray& grantId : grantIds){
-			if (grantId.isEmpty()){
-				continue;
-			}
-			imtauth::CrossOrgGrantInfo grantInfo = m_grantManagerCompPtr->GetGrant(grantId);
-			if (grantInfo.sourceTenantId != contextTenantId && grantInfo.targetTenantId != contextTenantId){
-				response.errorMessage = QStringLiteral("Access denied: one or more grants do not belong to the current tenant");
-				response.success = false;
-				return response;
-			}
+	for (const QByteArray& grantId : grantIds){
+		QString accessError;
+		if (!CanManageGrant(gqlRequest, grantId, accessError)){
+			response.errorMessage = accessError;
+			response.success = false;
+			return response;
 		}
 	}
 
@@ -1092,7 +1003,7 @@ sdl::V1_0::imtauth::CRemoveCrossOrgGrantsPayload CTenantManagerControllerComp::O
 
 sdl::V1_0::imtauth::CGetContractsPayload CTenantManagerControllerComp::OnGetContracts(
 		const sdl::V1_0::imtauth::CGetContractsGqlRequest& getContractsRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CGetContractsPayload response;
@@ -1111,6 +1022,12 @@ sdl::V1_0::imtauth::CGetContractsPayload CTenantManagerControllerComp::OnGetCont
 	
 	if (tenantId.isEmpty()){
 		response.errorMessage = QStringLiteral("Tenant ID is required");
+		return response;
+	}
+
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, accessError)){
+		response.errorMessage = accessError;
 		return response;
 	}
 	
@@ -1139,7 +1056,7 @@ sdl::V1_0::imtauth::CGetContractsPayload CTenantManagerControllerComp::OnGetCont
 
 sdl::V1_0::imtauth::CCreateContractPayload CTenantManagerControllerComp::OnCreateContract(
 		const sdl::V1_0::imtauth::CCreateContractGqlRequest& createContractRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CCreateContractPayload response;
@@ -1190,6 +1107,12 @@ sdl::V1_0::imtauth::CCreateContractPayload CTenantManagerControllerComp::OnCreat
 		return response;
 	}
 
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {sourceTenantId}, accessError)){
+		response.errorMessage = accessError;
+		return response;
+	}
+
 	QByteArray contractId = m_contractManagerCompPtr->CreateContract(
 								relationshipId,
 								sourceTenantId,
@@ -1213,7 +1136,7 @@ sdl::V1_0::imtauth::CCreateContractPayload CTenantManagerControllerComp::OnCreat
 
 sdl::V1_0::imtauth::CUpdateContractStatusPayload CTenantManagerControllerComp::OnUpdateContractStatus(
 		const sdl::V1_0::imtauth::CUpdateContractStatusGqlRequest& updateContractStatusRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CUpdateContractStatusPayload response;
@@ -1235,6 +1158,14 @@ sdl::V1_0::imtauth::CUpdateContractStatusPayload CTenantManagerControllerComp::O
 	if (arguments.input->status){
 		status = FromSdlContractStatus(*arguments.input->status);
 	}
+
+	const imtauth::ContractInfo contract = m_contractManagerCompPtr->GetContract(contractId);
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {contract.sourceTenantId, contract.targetTenantId}, accessError)){
+		response.success = false;
+		response.errorMessage = accessError;
+		return response;
+	}
 	
 	bool success = m_contractManagerCompPtr->UpdateContractStatus(contractId, status);
 	response.success = success;
@@ -1248,7 +1179,7 @@ sdl::V1_0::imtauth::CUpdateContractStatusPayload CTenantManagerControllerComp::O
 
 sdl::V1_0::imtauth::CTerminateContractPayload CTenantManagerControllerComp::OnTerminateContract(
 		const sdl::V1_0::imtauth::CTerminateContractGqlRequest& terminateContractRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CTerminateContractPayload response;
@@ -1265,6 +1196,14 @@ sdl::V1_0::imtauth::CTerminateContractPayload CTenantManagerControllerComp::OnTe
 	if (arguments.input->contractId){
 		contractId = *arguments.input->contractId;
 	}
+
+	const imtauth::ContractInfo contract = m_contractManagerCompPtr->GetContract(contractId);
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {contract.sourceTenantId, contract.targetTenantId}, accessError)){
+		response.success = false;
+		response.errorMessage = accessError;
+		return response;
+	}
 	
 	bool success = m_contractManagerCompPtr->TerminateContract(contractId);
 	response.success = success;
@@ -1278,11 +1217,18 @@ sdl::V1_0::imtauth::CTerminateContractPayload CTenantManagerControllerComp::OnTe
 
 sdl::V1_0::imtauth::CEnsureSystemTenantPayload CTenantManagerControllerComp::OnEnsureSystemTenant(
 		const sdl::V1_0::imtauth::CEnsureSystemTenantGqlRequest& /*ensureSystemTenantRequest*/,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CEnsureSystemTenantPayload response;
 	
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	const imtauth::IUserInfo* userInfoPtr = contextPtr != nullptr ? contextPtr->GetUserInfo() : nullptr;
+	if (userInfoPtr == nullptr || !userInfoPtr->IsAdmin()){
+		response.success = false;
+		response.errorMessage = QStringLiteral("Access denied: only a system administrator can ensure the System-Tenant");
+		return response;
+	}
 	
 	if (!m_tenantManagerCompPtr.IsValid()){
 		response.success = false;
@@ -1584,9 +1530,10 @@ sdl::V1_0::imtauth::CCreateConnectionRequestPayload CTenantManagerControllerComp
 		}
 	}
 	
-	QByteArray requestId = m_connectionRequestManagerCompPtr->CreateConnectionRequest(sourceTenantId, connectionCode, message);
+	QString refusalReason;
+	QByteArray requestId = m_connectionRequestManagerCompPtr->CreateConnectionRequest(sourceTenantId, connectionCode, message, &refusalReason);
 	if (requestId.isEmpty()){
-		response.errorMessage = QStringLiteral("Failed to create connection request. The target organization may have disabled connections by code, or a connection already exists.");
+		response.errorMessage = refusalReason.isEmpty() ? QStringLiteral("Failed to create connection request") : refusalReason;
 	} else {
 		response.requestId = requestId;
 	}
@@ -1896,7 +1843,7 @@ sdl::V1_0::imtauth::CRemoveConnectionPayload CTenantManagerControllerComp::OnRem
 
 sdl::V1_0::imtauth::CGetRelationshipProposalsPayload CTenantManagerControllerComp::OnGetRelationshipProposals(
 		const sdl::V1_0::imtauth::CGetRelationshipProposalsGqlRequest& request,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CGetRelationshipProposalsPayload response;
@@ -1915,12 +1862,38 @@ sdl::V1_0::imtauth::CGetRelationshipProposalsPayload CTenantManagerControllerCom
 		response.errorMessage = QStringLiteral("Tenant ID is required");
 		return response;
 	}
+
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, accessError)){
+		response.errorMessage = accessError;
+		return response;
+	}
 	
 	QByteArrayList proposalIds = m_connectionRequestManagerCompPtr->GetRelationshipProposalIds(tenantId);
 	response.proposals.Emplace();
 	for (const QByteArray& pId : proposalIds){
+		imtauth::ITenantRelationshipProposalInfoUniquePtr proposalPtr = m_connectionRequestManagerCompPtr->GetRelationshipProposal(pId);
+		if (!proposalPtr.IsValid()){
+			continue;
+		}
+
 		sdl::V1_0::imtauth::CRelationshipProposal data;
 		data.id = pId;
+		data.connectionId = proposalPtr->GetConnectionId();
+		data.existingRelationshipId = proposalPtr->GetExistingRelationshipId();
+		data.proposalType = ToSdlProposalType(proposalPtr->GetProposalType());
+		data.initiatorTenantId = proposalPtr->GetInitiatorTenantId();
+		data.counterpartyTenantId = proposalPtr->GetCounterpartyTenantId();
+		data.proposedSourceRole = ToSdlRelationshipRole(proposalPtr->GetProposedSourceRole());
+		data.proposedTargetRole = ToSdlRelationshipRole(proposalPtr->GetProposedTargetRole());
+		data.proposedScope = proposalPtr->GetProposedScope();
+		data.proposedDescription = proposalPtr->GetProposedDescription();
+		data.proposedValidFrom = proposalPtr->GetProposedValidFrom();
+		data.proposedValidUntil = proposalPtr->GetProposedValidUntil();
+		data.status = ToSdlProposalStatus(proposalPtr->GetStatus());
+		data.message = proposalPtr->GetMessage();
+		data.createdAt = proposalPtr->GetCreatedAt();
+		data.updatedAt = proposalPtr->GetUpdatedAt();
 		response.proposals->push_back(data);
 	}
 	
@@ -1930,7 +1903,7 @@ sdl::V1_0::imtauth::CGetRelationshipProposalsPayload CTenantManagerControllerCom
 
 sdl::V1_0::imtauth::CCreateRelationshipProposalPayload CTenantManagerControllerComp::OnCreateRelationshipProposal(
 		const sdl::V1_0::imtauth::CCreateRelationshipProposalGqlRequest& request,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CCreateRelationshipProposalPayload response;
@@ -1948,17 +1921,61 @@ sdl::V1_0::imtauth::CCreateRelationshipProposalPayload CTenantManagerControllerC
 	}
 	
 	auto& proposal = *arguments.input->proposal;
-	
+
+	const QByteArray initiatorTenantId = proposal.initiatorTenantId ? *proposal.initiatorTenantId : QByteArray();
+	const QByteArray counterpartyTenantId = proposal.counterpartyTenantId ? *proposal.counterpartyTenantId : QByteArray();
+
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {initiatorTenantId}, accessError)){
+		response.errorMessage = accessError;
+		return response;
+	}
+
+	// The connection has to be the one between exactly these two organizations; without one named, it is looked up.
+	const auto connectsParties = [&](const QByteArray& candidateId){
+		imtauth::ITenantConnectionInfoUniquePtr connectionPtr = m_connectionRequestManagerCompPtr->GetConnection(candidateId);
+		return connectionPtr.IsValid()
+					&& connectionPtr->GetStatus() == imtauth::ITenantConnectionInfo::CS_ACTIVE
+					&& ((connectionPtr->GetTenantAId() == initiatorTenantId && connectionPtr->GetTenantBId() == counterpartyTenantId)
+						|| (connectionPtr->GetTenantAId() == counterpartyTenantId && connectionPtr->GetTenantBId() == initiatorTenantId));
+	};
+
+	QByteArray connectionId = proposal.connectionId ? *proposal.connectionId : QByteArray();
+	if (connectionId.isEmpty()){
+		for (const QByteArray& candidateId : m_connectionRequestManagerCompPtr->GetConnectionIds(initiatorTenantId)){
+			if (connectsParties(candidateId)){
+				connectionId = candidateId;
+				break;
+			}
+		}
+	}
+
+	if (connectionId.isEmpty() || !connectsParties(connectionId)){
+		response.errorMessage = QStringLiteral("The organizations are not connected");
+		return response;
+	}
+
+	// A change or termination may only concern a relationship between these two organizations.
+	if (proposal.proposalType && *proposal.proposalType != sdl::V1_0::imtauth::RelationshipProposalType::Create){
+		const QByteArray existingRelationshipId = proposal.existingRelationshipId ? *proposal.existingRelationshipId : QByteArray();
+		imtauth::ITenantRelationshipInfoUniquePtr relationshipPtr = m_connectionRequestManagerCompPtr->GetTenantRelationship(existingRelationshipId);
+		const bool linksParties = relationshipPtr.IsValid()
+					&& ((relationshipPtr->GetSourceTenantId() == initiatorTenantId && relationshipPtr->GetTargetTenantId() == counterpartyTenantId)
+						|| (relationshipPtr->GetSourceTenantId() == counterpartyTenantId && relationshipPtr->GetTargetTenantId() == initiatorTenantId));
+		if (!linksParties){
+			response.errorMessage = QStringLiteral("The relationship does not exist between these organizations");
+			return response;
+		}
+	}
+
 	// Build a proposal info object from the SDL data
 	imtauth::ITenantRelationshipProposalInfoUniquePtr proposalInfo = m_proposalFactoryCompPtr.CreateInstance();
 	if (!proposalInfo.IsValid()){
 		response.errorMessage = QStringLiteral("Failed to create proposal info instance");
 		return response;
 	}
-	
-	if (proposal.connectionId){
-		proposalInfo->SetConnectionId(*proposal.connectionId);
-	}
+
+	proposalInfo->SetConnectionId(connectionId);
 	if (proposal.initiatorTenantId){
 		proposalInfo->SetInitiatorTenantId(*proposal.initiatorTenantId);
 	}
@@ -2006,7 +2023,7 @@ sdl::V1_0::imtauth::CCreateRelationshipProposalPayload CTenantManagerControllerC
 
 sdl::V1_0::imtauth::CApproveRelationshipProposalPayload CTenantManagerControllerComp::OnApproveRelationshipProposal(
 		const sdl::V1_0::imtauth::CApproveRelationshipProposalGqlRequest& request,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CApproveRelationshipProposalPayload response;
@@ -2025,9 +2042,23 @@ sdl::V1_0::imtauth::CApproveRelationshipProposalPayload CTenantManagerController
 	if (arguments.input->tenantId){
 		tenantId = *arguments.input->tenantId;
 	}
+
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, accessError)){
+		response.errorMessage = accessError;
+		return response;
+	}
 	
+	imtauth::ITenantRelationshipProposalInfoUniquePtr beforePtr = m_connectionRequestManagerCompPtr->GetRelationshipProposal(proposalId);
 	QByteArray relationshipId = m_connectionRequestManagerCompPtr->ApproveRelationshipProposal(proposalId, tenantId);
-	response.success = true;
+	imtauth::ITenantRelationshipProposalInfoUniquePtr afterPtr = m_connectionRequestManagerCompPtr->GetRelationshipProposal(proposalId);
+
+	// Approving a proposal the organization is not waiting for changes nothing.
+	response.success = beforePtr.IsValid() && afterPtr.IsValid() && beforePtr->GetStatus() != afterPtr->GetStatus();
+	if (!*response.success){
+		response.errorMessage = QStringLiteral("The proposal is not waiting for approval by this organization");
+		return response;
+	}
 	if (!relationshipId.isEmpty()){
 		response.relationshipId = relationshipId;
 	}
@@ -2038,7 +2069,7 @@ sdl::V1_0::imtauth::CApproveRelationshipProposalPayload CTenantManagerController
 
 sdl::V1_0::imtauth::CRejectRelationshipProposalPayload CTenantManagerControllerComp::OnRejectRelationshipProposal(
 		const sdl::V1_0::imtauth::CRejectRelationshipProposalGqlRequest& request,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CRejectRelationshipProposalPayload response;
@@ -2057,6 +2088,13 @@ sdl::V1_0::imtauth::CRejectRelationshipProposalPayload CTenantManagerControllerC
 	if (arguments.input->tenantId){
 		tenantId = *arguments.input->tenantId;
 	}
+
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, accessError)){
+		response.success = false;
+		response.errorMessage = accessError;
+		return response;
+	}
 	
 	bool success = m_connectionRequestManagerCompPtr->RejectRelationshipProposal(proposalId, tenantId);
 	response.success = success;
@@ -2070,7 +2108,7 @@ sdl::V1_0::imtauth::CRejectRelationshipProposalPayload CTenantManagerControllerC
 
 sdl::V1_0::imtauth::CCancelRelationshipProposalPayload CTenantManagerControllerComp::OnCancelRelationshipProposal(
 		const sdl::V1_0::imtauth::CCancelRelationshipProposalGqlRequest& request,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CCancelRelationshipProposalPayload response;
@@ -2088,6 +2126,13 @@ sdl::V1_0::imtauth::CCancelRelationshipProposalPayload CTenantManagerControllerC
 	}
 	if (arguments.input->tenantId){
 		tenantId = *arguments.input->tenantId;
+	}
+
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, accessError)){
+		response.success = false;
+		response.errorMessage = accessError;
+		return response;
 	}
 	
 	bool success = m_connectionRequestManagerCompPtr->CancelRelationshipProposal(proposalId, tenantId);
@@ -2160,7 +2205,7 @@ namespace imtauthgql
 
 sdl::V1_0::imtauth::CGetCrossTenantMessagePayload CTenantManagerControllerComp::OnGetCrossTenantMessage(
 		const sdl::V1_0::imtauth::CGetCrossTenantMessageGqlRequest& getCrossTenantMessageRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CGetCrossTenantMessagePayload response;
@@ -2187,6 +2232,12 @@ sdl::V1_0::imtauth::CGetCrossTenantMessagePayload CTenantManagerControllerComp::
 		response.errorMessage = QStringLiteral("Message not found");
 		return response;
 	}
+
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {info.sourceTenantId, info.targetTenantId}, accessError)){
+		response.errorMessage = accessError;
+		return response;
+	}
 	
 	response.message = MessageInfoToData(info);
 	
@@ -2196,7 +2247,7 @@ sdl::V1_0::imtauth::CGetCrossTenantMessagePayload CTenantManagerControllerComp::
 
 sdl::V1_0::imtauth::CGetCrossTenantMessagesPayload CTenantManagerControllerComp::OnGetCrossTenantMessages(
 		const sdl::V1_0::imtauth::CGetCrossTenantMessagesGqlRequest& getCrossTenantMessagesRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CGetCrossTenantMessagesPayload response;
@@ -2224,6 +2275,12 @@ sdl::V1_0::imtauth::CGetCrossTenantMessagesPayload CTenantManagerControllerComp:
 	
 	if (tenantId.isEmpty()){
 		response.errorMessage = QStringLiteral("Tenant ID is required");
+		return response;
+	}
+
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, accessError)){
+		response.errorMessage = accessError;
 		return response;
 	}
 	
@@ -2255,7 +2312,7 @@ sdl::V1_0::imtauth::CGetCrossTenantMessagesPayload CTenantManagerControllerComp:
 
 sdl::V1_0::imtauth::CSendCrossTenantMessagePayload CTenantManagerControllerComp::OnSendCrossTenantMessage(
 		const sdl::V1_0::imtauth::CSendCrossTenantMessageGqlRequest& sendCrossTenantMessageRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CSendCrossTenantMessagePayload response;
@@ -2304,7 +2361,13 @@ sdl::V1_0::imtauth::CSendCrossTenantMessagePayload CTenantManagerControllerComp:
 	if (arguments.input->expiresAt){
 		expiresAt = *arguments.input->expiresAt;
 	}
-	
+
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {sourceTenantId}, accessError)){
+		response.errorMessage = accessError;
+		return response;
+	}
+
 	QByteArray messageId = m_messageBrokerCompPtr->SendMessage(
 							   sourceTenantId,
 							   targetTenantId,
@@ -2329,7 +2392,7 @@ sdl::V1_0::imtauth::CSendCrossTenantMessagePayload CTenantManagerControllerComp:
 
 sdl::V1_0::imtauth::CUpdateCrossTenantMessageStatusPayload CTenantManagerControllerComp::OnUpdateCrossTenantMessageStatus(
 		const sdl::V1_0::imtauth::CUpdateCrossTenantMessageStatusGqlRequest& updateCrossTenantMessageStatusRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CUpdateCrossTenantMessageStatusPayload response;
@@ -2355,6 +2418,14 @@ sdl::V1_0::imtauth::CUpdateCrossTenantMessageStatusPayload CTenantManagerControl
 	if (arguments.input->errorMessage){
 		statusErrorMessage = *arguments.input->errorMessage;
 	}
+
+	const imtauth::CrossTenantMessageInfo message = m_messageBrokerCompPtr->GetMessage(messageId);
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {message.sourceTenantId, message.targetTenantId}, accessError)){
+		response.success = false;
+		response.errorMessage = accessError;
+		return response;
+	}
 	
 	bool success = m_messageBrokerCompPtr->UpdateMessageStatus(messageId, status, statusErrorMessage);
 	response.success = success;
@@ -2368,7 +2439,7 @@ sdl::V1_0::imtauth::CUpdateCrossTenantMessageStatusPayload CTenantManagerControl
 
 sdl::V1_0::imtauth::CGetOrderRequestPayload CTenantManagerControllerComp::OnGetOrderRequest(
 		const sdl::V1_0::imtauth::CGetOrderRequestGqlRequest& getOrderRequestRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CGetOrderRequestPayload response;
@@ -2395,6 +2466,12 @@ sdl::V1_0::imtauth::CGetOrderRequestPayload CTenantManagerControllerComp::OnGetO
 		response.errorMessage = QStringLiteral("Order request not found");
 		return response;
 	}
+
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {info.sourceTenantId, info.targetTenantId}, accessError)){
+		response.errorMessage = accessError;
+		return response;
+	}
 	
 	response.orderRequest = OrderRequestToData(info);
 	
@@ -2404,7 +2481,7 @@ sdl::V1_0::imtauth::CGetOrderRequestPayload CTenantManagerControllerComp::OnGetO
 
 sdl::V1_0::imtauth::CGetOrderRequestsPayload CTenantManagerControllerComp::OnGetOrderRequests(
 		const sdl::V1_0::imtauth::CGetOrderRequestsGqlRequest& getOrderRequestsRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CGetOrderRequestsPayload response;
@@ -2425,6 +2502,12 @@ sdl::V1_0::imtauth::CGetOrderRequestsPayload CTenantManagerControllerComp::OnGet
 		response.errorMessage = QStringLiteral("Tenant ID is required");
 		return response;
 	}
+
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {tenantId}, accessError)){
+		response.errorMessage = accessError;
+		return response;
+	}
 	
 	response.orderRequests.Emplace();
 	
@@ -2439,7 +2522,7 @@ sdl::V1_0::imtauth::CGetOrderRequestsPayload CTenantManagerControllerComp::OnGet
 
 sdl::V1_0::imtauth::CConfirmOrderRequestPayload CTenantManagerControllerComp::OnConfirmOrderRequest(
 		const sdl::V1_0::imtauth::CConfirmOrderRequestGqlRequest& confirmOrderRequestRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CConfirmOrderRequestPayload response;
@@ -2460,6 +2543,13 @@ sdl::V1_0::imtauth::CConfirmOrderRequestPayload CTenantManagerControllerComp::On
 	if (arguments.input->note){
 		note = *arguments.input->note;
 	}
+
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {m_orderRequestManagerCompPtr->GetOrderRequest(orderRequestId).targetTenantId}, accessError)){
+		response.success = false;
+		response.errorMessage = accessError;
+		return response;
+	}
 	
 	bool success = m_orderRequestManagerCompPtr->ConfirmOrderRequest(orderRequestId, note);
 	response.success = success;
@@ -2473,7 +2563,7 @@ sdl::V1_0::imtauth::CConfirmOrderRequestPayload CTenantManagerControllerComp::On
 
 sdl::V1_0::imtauth::CRejectOrderRequestPayload CTenantManagerControllerComp::OnRejectOrderRequest(
 		const sdl::V1_0::imtauth::CRejectOrderRequestGqlRequest& rejectOrderRequestRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CRejectOrderRequestPayload response;
@@ -2494,6 +2584,13 @@ sdl::V1_0::imtauth::CRejectOrderRequestPayload CTenantManagerControllerComp::OnR
 	if (arguments.input->reason){
 		reason = *arguments.input->reason;
 	}
+
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {m_orderRequestManagerCompPtr->GetOrderRequest(orderRequestId).targetTenantId}, accessError)){
+		response.success = false;
+		response.errorMessage = accessError;
+		return response;
+	}
 	
 	bool success = m_orderRequestManagerCompPtr->RejectOrderRequest(orderRequestId, reason);
 	response.success = success;
@@ -2507,7 +2604,7 @@ sdl::V1_0::imtauth::CRejectOrderRequestPayload CTenantManagerControllerComp::OnR
 
 sdl::V1_0::imtauth::CUpdateOrderRequestStatusPayload CTenantManagerControllerComp::OnUpdateOrderRequestStatus(
 		const sdl::V1_0::imtauth::CUpdateOrderRequestStatusGqlRequest& updateOrderRequestStatusRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CUpdateOrderRequestStatusPayload response;
@@ -2532,6 +2629,13 @@ sdl::V1_0::imtauth::CUpdateOrderRequestStatusPayload CTenantManagerControllerCom
 	if (arguments.input->note){
 		note = *arguments.input->note;
 	}
+
+	QString accessError;
+	if (!HasAccessToAnyTenant(gqlRequest, {m_orderRequestManagerCompPtr->GetOrderRequest(orderRequestId).targetTenantId}, accessError)){
+		response.success = false;
+		response.errorMessage = accessError;
+		return response;
+	}
 	
 	bool success = m_orderRequestManagerCompPtr->UpdateOrderRequestStatus(orderRequestId, status, note);
 	response.success = success;
@@ -2540,6 +2644,68 @@ sdl::V1_0::imtauth::CUpdateOrderRequestStatusPayload CTenantManagerControllerCom
 	}
 	
 	return response;
+}
+
+
+// private methods
+
+bool CTenantManagerControllerComp::HasAccessToAnyTenant(
+			const ::imtgql::CGqlRequest& gqlRequest,
+			const QByteArrayList& tenantIds,
+			QString& errorMessage) const
+{
+	if (!m_tenantManagerCompPtr.IsValid()){
+		errorMessage = QStringLiteral("Tenant manager is not configured");
+		return false;
+	}
+
+	for (const QByteArray& tenantId : tenantIds){
+		if (!tenantId.isEmpty()
+					&& HasTenantIsolationAccess(
+								*m_tenantManagerCompPtr.GetPtr(),
+								m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
+								gqlRequest,
+								tenantId,
+								errorMessage)){
+			errorMessage.clear();
+			return true;
+		}
+	}
+
+	if (errorMessage.isEmpty()){
+		errorMessage = QStringLiteral("Access denied: tenant is outside current user scope");
+	}
+
+	return false;
+}
+
+
+bool CTenantManagerControllerComp::CanManageGrant(
+			const ::imtgql::CGqlRequest& gqlRequest,
+			const QByteArray& grantId,
+			QString& errorMessage) const
+{
+	if (!m_tenantManagerCompPtr.IsValid()){
+		errorMessage = QStringLiteral("Tenant manager is not configured");
+		return false;
+	}
+
+	const imtauth::CrossOrgGrantInfo grantInfo = grantId.isEmpty() ? imtauth::CrossOrgGrantInfo() : m_grantManagerCompPtr->GetGrant(grantId);
+	if (grantInfo.grantId.isEmpty()){
+		errorMessage = QStringLiteral("Grant not found");
+		return false;
+	}
+
+	// The grantor withdraws the delegation, the grantee renounces it.
+	const imtauth::ITenantMembershipManager* membershipManagerPtr = m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr;
+	for (const QByteArray& tenantId : {grantInfo.sourceTenantId, grantInfo.targetTenantId}){
+		if (HasTenantManageAccess(*m_tenantManagerCompPtr.GetPtr(), membershipManagerPtr, gqlRequest, tenantId, QByteArrayLiteral("ConnectOrganization"), errorMessage)){
+			errorMessage.clear();
+			return true;
+		}
+	}
+
+	return false;
 }
 
 

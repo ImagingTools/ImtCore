@@ -78,7 +78,10 @@ Item {
 		id: internal
 		property bool registered: false
 		function tryRegister() {
-			if (!registered && root.paths.length > 0) {
+			if (registered) {
+				NavigationController.deliverPending(root)
+			}
+			else if (root.paths.length > 0) {
 				NavigationController.registerNavigableItem(root)
 				registered = true
 			}
@@ -86,6 +89,10 @@ Item {
 	}
 
 	onPathsChanged: {
+		internal.tryRegister()
+	}
+
+	onParentSegmentChanged: {
 		internal.tryRegister()
 	}
 

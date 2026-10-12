@@ -47,9 +47,14 @@ Item {
 
 	NavigableItem {
 		id: navigableItem
+		// The rest of the path is the document id, consumed here.
+		forwardRest: false
 		onActivated: {
 			if (workspaceView.documentManager){
-				if (restPath.length >= 1){
+				if (params && params.createNew){
+					workspaceView.documentManager.createDocument(matchedPath)
+				}
+				else if (restPath.length >= 1){
 					let documentTypeId = matchedPath
 					let documentId = restPath[0]
 					workspaceView.documentManager.openDocument(documentTypeId, documentId)

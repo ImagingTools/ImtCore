@@ -39,8 +39,9 @@ namespace imtauthgql
 	  (new request = ConnectionRequestReceived, approval = ConnectionRequestApproved,
 	  rejection = ConnectionRequestRejected)
 	- Connection removals (ConnectionRemoved)
-	- Relationship proposal lifecycle (RelationshipProposalReceived,
-	  RelationshipProposalApproved, RelationshipProposalRejected)
+	- Relationship proposal lifecycle: the counterparty owner receives a new
+	  proposal (RelationshipProposalReceived), the initiator owner learns about
+	  the answer (RelationshipProposalApproved, RelationshipProposalRejected)
 
 	Notifications are delivered only to subscribers whose authenticated user
 	matches the target userId (tenant owner).
@@ -108,6 +109,7 @@ private:
 				const QByteArray& tenantId,
 				const QByteArray& relatedId) const;
 
+	QMap<QByteArray, CachedRelationshipProposal> ReadProposals() const;
 	QByteArray FindTenantOwnerUserId(const QByteArray& tenantId) const;
 
 	// Cache of requestId → state for change detection.

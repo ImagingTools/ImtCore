@@ -106,6 +106,7 @@ PopupView {
 
 	// --- Filter field placeholder ---
 	property string filterPlaceholder: qsTr("Filter...")
+	property string emptyText: qsTr("No items found")
 
 	// --- Optional header component (rendered above filter field) ---
 	property Component headerComponent: null
@@ -886,9 +887,12 @@ PopupView {
 
 					Text {
 						anchors.centerIn: parent
+						width: parent.width - 2 * Style.marginM
+						horizontalAlignment: Text.AlignHCenter
+						wrapMode: Text.WordWrap
 						font.pixelSize: root.textSize
 						color: root.fontColor
-						text: qsTr("No items found")
+						text: root.emptyText
 					}
 				}
 
