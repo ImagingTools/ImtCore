@@ -56,7 +56,8 @@ public:
 	virtual QByteArray CreateConnectionRequest(
 				const QByteArray& sourceTenantId,
 				const QString& connectionCode,
-				const QString& message = QString()) override;
+				const QString& message = QString(),
+				QString* errorMessagePtr = nullptr) override;
 	virtual QByteArray ApproveConnectionRequest(const QByteArray& requestId, const QByteArray& approvingTenantId) override;
 	virtual bool RejectConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) override;
 	virtual bool CancelConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) override;
@@ -74,6 +75,7 @@ public:
 	virtual bool RejectRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) override;
 	virtual bool CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) override;
 	virtual QByteArrayList GetRelationshipProposalIds(const QByteArray& tenantId) const override;
+	virtual ITenantRelationshipProposalInfoUniquePtr GetRelationshipProposal(const QByteArray& proposalId) const override;
 
 	// ITenantConnectionRequestManager - Relationships
 	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId) const override;

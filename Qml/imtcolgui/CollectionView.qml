@@ -360,7 +360,11 @@ Item {
 			}
 
 			function onElementsReceived(elements){
-				container.table.elements = elements
+				let sameModel = container.table.elements === elements;
+				container.table.elements = elements;
+				if (sameModel){
+					container.table.refreshVisibleRows();
+				}
 			}
 
 			function onNotificationModelChanged(){
@@ -570,7 +574,7 @@ Item {
 			wrapMode: Text.WordWrap;
 			color: Style.textColor;
 			
-			text: qsTr("Please select an item for showing additional informations");
+			text: qsTr("Select an item to view additional information");
 		}
 	}
 

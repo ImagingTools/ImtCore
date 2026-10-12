@@ -8,6 +8,7 @@ schema {
 
 import {
 	"../../imtbase/1.0/ImtCollection.sdl"
+	"Assignments.sdl"
 }
 
 input UsersListInput {
@@ -50,11 +51,14 @@ type UserData {
 	username: ID
 	password: String
 	email: String
-	groups: [ID]
-	roles: [ID]
-	permissions: [ID]
+	groups: [Assignment]
+	roles: [Assignment]
+	# Read-only: permissions granted by the roles and groups.
+	permissions: [Assignment]
 	systemInfos: [SystemInfo]
 	enabled: Bool
+	# Read-only.
+	accessWarnings: [AccessWarning]
 }
 
 input UserDataInput {

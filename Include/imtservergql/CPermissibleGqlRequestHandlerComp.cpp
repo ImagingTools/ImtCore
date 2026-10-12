@@ -57,7 +57,8 @@ bool CPermissibleGqlRequestHandlerComp::CheckPermissions(const imtgql::CGqlReque
 		return true;
 	}
 
-	imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();
+	// Roles of another product must not open this product's commands.
+	imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions(gqlContextPtr->GetProductId());
 
 	QByteArray requestedCommandId = gqlRequest.GetCommandId();
 	QByteArrayList commandIds = m_commandPermissionsCompPtr->GetCommandIds();

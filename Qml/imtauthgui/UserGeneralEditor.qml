@@ -53,6 +53,16 @@ Column {
 		container.updatingGui = false;
 	}
 
+	function passwordAccepted(){
+		if (passwordInput_.text === "" || passwordInput_.text !== confirmPassword.text){
+			return false;
+		}
+
+		let violatedRules = container.passwordPolicy ? container.passwordPolicy.validate(usernameInput_.text, passwordInput_.text) : [];
+
+		return violatedRules.length === 0;
+	}
+
 	function updateModel(){
 		if (!container.userData){
 			return
@@ -61,7 +71,10 @@ Column {
 		container.userData.m_username = usernameInput_.text;
 		container.userData.m_name = nameInput_.text;
 		container.userData.m_email = mailInput_.text;
-		container.userData.m_password = passwordInput_.text;
+		// An unconfirmed or rejected password never reaches the model, so the account cannot be saved with it.
+		if (passwordInput_.visible){
+			container.userData.m_password = container.passwordAccepted() ? passwordInput_.text : "";
+		}
 		if (container.accountEnabledAvailable){
 			container.userData.m_enabled = enabledSwitch_.checked;
 		}

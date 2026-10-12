@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CClientRequestUserManagerComp.h>
+#include <imtauthgql/CAssignmentCollector.h>
 
 
 // ImtCore includes
@@ -216,7 +217,7 @@ bool CClientRequestUserManagerComp::AddRolesToUser(const QByteArray& userId, con
 		return false;
 	}
 
-	QByteArrayList currentRoleIds = userData.roles->ToList();
+	QByteArrayList currentRoleIds = CAssignmentCollector::GetDirectIds(userData.roles);
 
 	QByteArrayList result = currentRoleIds;
 	for (const QByteArray& roleId : roleIds){
@@ -225,7 +226,7 @@ bool CClientRequestUserManagerComp::AddRolesToUser(const QByteArray& userId, con
 		}
 	}
 
-	userData.roles->FromList(result);
+	userData.roles = CAssignmentCollector::CreateDirectAssignments(result);
 
 	return SetUserDataSdl(userId, userData);
 }
@@ -247,7 +248,7 @@ bool CClientRequestUserManagerComp::RemoveRolesFromUser(const QByteArray& userId
 		return false;
 	}
 
-	QByteArrayList currentRoleIds = userData.roles->ToList();
+	QByteArrayList currentRoleIds = CAssignmentCollector::GetDirectIds(userData.roles);
 
 	QByteArrayList result = currentRoleIds;
 	for (const QByteArray& roleId : roleIds){
@@ -256,7 +257,7 @@ bool CClientRequestUserManagerComp::RemoveRolesFromUser(const QByteArray& userId
 		}
 	}
 
-	userData.roles->FromList(result);
+	userData.roles = CAssignmentCollector::CreateDirectAssignments(result);
 
 	return SetUserDataSdl(userId, userData);
 }

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CClientRequestRoleManagerComp.h>
+#include <imtauthgql/CAssignmentCollector.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
 
 
@@ -62,10 +63,7 @@ imtauth::IRoleUniquePtr CClientRequestRoleManagerComp::GetRole(const QByteArray&
 	}
 
 	if (roleData.permissions){
-		QByteArray permissions = *roleData.permissions;
-		if (!permissions.isEmpty()){
-			roleInfoPtr->SetLocalPermissions(permissions.split(';'));
-		}
+		roleInfoPtr->SetLocalPermissions(CAssignmentCollector::GetDirectIds(roleData.permissions));
 	}
 
 	return roleInfoPtr;
@@ -99,7 +97,7 @@ QByteArray CClientRequestRoleManagerComp::CreateRole(
 	roleData.description = roleDescription;
 
 	if (!permissions.isEmpty()){
-		roleData.permissions = permissions.join(';');
+		roleData.permissions = CAssignmentCollector::CreateDirectAssignments(permissions);
 	}
 
 	arguments.input->item = roleData;
@@ -151,7 +149,7 @@ bool CClientRequestRoleManagerComp::AddPermissionsToRole(const QByteArray& roleI
 		return false;
 	}
 
-	QByteArrayList currentPermissions = roleData.permissions->split(';');
+	QByteArrayList currentPermissions = CAssignmentCollector::GetDirectIds(roleData.permissions);
 
 	QByteArrayList result = currentPermissions;
 	for (const QByteArray& permissionId : permissions){
@@ -160,7 +158,7 @@ bool CClientRequestRoleManagerComp::AddPermissionsToRole(const QByteArray& roleI
 		}
 	}
 
-	roleData.permissions = result.join(';');
+	roleData.permissions = CAssignmentCollector::CreateDirectAssignments(result);
 
 	return SetRoleDataSdl(roleId, roleData);
 }
@@ -182,7 +180,7 @@ bool CClientRequestRoleManagerComp::RemovePermissionsFromRole(const QByteArray& 
 		return false;
 	}
 
-	QByteArrayList currentPermissions = roleData.permissions->split(';');
+	QByteArrayList currentPermissions = CAssignmentCollector::GetDirectIds(roleData.permissions);
 
 	QByteArrayList result = currentPermissions;
 	for (const QByteArray& permissionId : permissions){
@@ -191,7 +189,7 @@ bool CClientRequestRoleManagerComp::RemovePermissionsFromRole(const QByteArray& 
 		}
 	}
 
-	roleData.permissions = result.join(';');
+	roleData.permissions = CAssignmentCollector::CreateDirectAssignments(result);
 
 	return SetRoleDataSdl(roleId, roleData);
 }

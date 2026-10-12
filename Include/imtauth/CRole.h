@@ -53,10 +53,6 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	QByteArrayList GetParentRoles(const QByteArray& roleId) const;
-	void GetParentRoleList(const IRole& role, QByteArrayList& roleList) const;
-
-protected:
 	const imtlic::IFeatureInfoProvider* m_permissionProviderPtr;
 
 private:

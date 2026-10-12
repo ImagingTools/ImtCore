@@ -32,8 +32,9 @@ StyleComponents {
 	property string language;//deprecated?
 
 	//Font properties
-	property string mainFontSource: "../../../Fonts/Ubuntu-Light.ttf";
-	property string boldFontSource: "../../../Fonts/Ubuntu-Medium.ttf";
+	// Font files to load, for an application that ships its own fonts; the system fonts below need none.
+	property string mainFontSource: "";
+	property string boldFontSource: "";
 	property string fontFamily: "Segoe UI";
 	property string fontFamilyBold: "Segoe UI";
 	property string fontFamilyMono: "Consolas";

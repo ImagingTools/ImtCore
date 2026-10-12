@@ -73,7 +73,7 @@ ViewBase {
 			}
 
 			Text {
-				text: qsTr("Basic workspace settings and configuration.")
+				text: qsTr("Basic settings of the organization.")
 				font.pixelSize: Style.fontSizeM
 				color: Style.inactiveTextColor
 				wrapMode: Text.WordWrap
@@ -101,7 +101,7 @@ ViewBase {
 						spacing: Style.marginXS
 
 						Text {
-							text: qsTr("Tenant Name")
+							text: qsTr("Organization Name")
 							font.pixelSize: Style.fontSizeS
 							color: Style.inactiveTextColor
 						}
@@ -112,7 +112,7 @@ ViewBase {
 							height: Style.controlHeightM
 							textSize: Style.fontSizeM
 							readOnly: !generalPage.__canEditName
-							placeHolderText: qsTr("Enter the tenant name")
+							placeHolderText: qsTr("Enter the organization name")
 
 							onEditingFinished: {
 								if (generalPage.tenantData && generalPage.tenantData.m_name !== nameInput.text)

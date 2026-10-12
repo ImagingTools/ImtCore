@@ -270,14 +270,14 @@ SimpleCollectionItemDelegateBase {
 								if (row.canChangeMemberRole || row.canManageOrganizationMembers)
 									menuItems.push({ text: qsTr("Manage Organization Permissions"), action: "managePermissions" })
 								if (row.canRemoveMember)
-									menuItems.push({ text: qsTr("Exclude from Tenant"), action: "remove" })
+									menuItems.push({ text: qsTr("Exclude from Organization"), action: "remove" })
 							}
 							if (row.isOwner && !row.isMemberOwner && !row.isMemberCreator) {
 								menuItems.push({ text: qsTr("Transfer Ownership"), action: "transfer" })
 							}
 						}
 						if (row.isCurrentUser && !row.isMemberOwner && !row.isMemberCreator) {
-							menuItems.push({ text: qsTr("Leave Workspace"), action: "leave" })
+							menuItems.push({ text: qsTr("Leave Organization"), action: "leave" })
 						}
 						if (menuItems.length === 0) return
 						row.memberActionsRequested(menuItems,
