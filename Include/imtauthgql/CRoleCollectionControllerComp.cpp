@@ -10,6 +10,7 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
 #include <imtbase/CComplexCollectionFilterHelper.h>
 #include <imtauth/CRole.h>
+#include <imtauth/imtauth.h>
 #include <imtauthgql/imtauthgql.h>
 #include <imtauthgql/CAssignmentCollector.h>
 
@@ -84,13 +85,20 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 	}
 	roleInfoPtr->SetRoleDescription(roleDescription);
 
+	const imtauth::IRoleInfoProvider* roleProviderPtr = roleInfoPtr->GetParentRolesProvider();
 	for (const QByteArray& parentRoleId : CAssignmentCollector::GetDirectIds(roleDataRepresentation.parentRoles)){
-		if (parentRoleId == objectId || !roleInfoPtr->IncludeRole(parentRoleId)){
-			errorMessage = QT_TR_NOOP(QStringLiteral("Unable include role '%1' to the role '%2'. Check the dependencies between them.")
-										.arg(parentRoleId, roleId));
+		if (imtauth::CreatesRoleCycle(roleProviderPtr, objectId, parentRoleId)){
+			QString parentRoleName = QString::fromUtf8(parentRoleId);
+			imtauth::IRoleUniquePtr parentRolePtr = roleProviderPtr != nullptr ? roleProviderPtr->GetRole(parentRoleId) : imtauth::IRoleUniquePtr();
+			if (parentRolePtr.IsValid()){
+				parentRoleName = parentRolePtr->GetRoleName();
+			}
+			errorMessage = QStringLiteral("Role '%1' cannot be a parent role: it would create a cycle").arg(parentRoleName);
 
 			return false;
 		}
+
+		roleInfoPtr->IncludeRole(parentRoleId);
 	}
 
 	roleInfoPtr->SetLocalPermissions(CAssignmentCollector::GetDirectIds(roleDataRepresentation.permissions));

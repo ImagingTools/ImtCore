@@ -600,6 +600,7 @@ QtObject {
 
 			representationModel: UserData {
 				m_id: UuidGenerator.generateUUID()
+				m_enabled: true
 			}
 
 			onDocumentIdChanged: {

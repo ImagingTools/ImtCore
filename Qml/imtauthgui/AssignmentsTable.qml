@@ -39,7 +39,7 @@ Rectangle {
 	// Hide the "Inherited from" column where nothing can be inherited, e.g. group members.
 	property bool showSourceColumn: true
 	// Share of the name column; the user changes it by dragging the header divider.
-	property real nameColumnRatio: 0.35
+	property real nameColumnRatio: 0.7
 	readonly property real __nameRatio: container.showSourceColumn ? container.nameColumnRatio : 1
 
 	readonly property int itemsCount: container.__visibleRows.length

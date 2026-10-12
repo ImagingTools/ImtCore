@@ -12,6 +12,7 @@
 #include <imtauth/CUserGroupInfo.h>
 #include <imtauth/CUserGroupFilter.h>
 #include <imtauth/IUserInfoProvider.h>
+#include <imtauth/imtauth.h>
 #include <imtauthgql/CAssignmentCollector.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtcol/CDocumentCollectionFilter.h>
@@ -87,10 +88,18 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	for (const QByteArray& parentGroupId : CAssignmentCollector::GetDirectIds(groupDataRepresentation.parentGroups)){
-		if (!userGroupInfoPtr->AddParentGroup(parentGroupId)){
-			errorMessage = QStringLiteral("Group '%1' cannot be a parent group: it would create a cycle").arg(QString::fromUtf8(parentGroupId));
+		if (imtauth::CreatesGroupCycle(userGroupInfoPtr->GetUserGroupProvider(), newObjectId, parentGroupId)){
+			QString parentGroupName = QString::fromUtf8(parentGroupId);
+			if (userGroupInfoPtr->GetUserGroupProvider() != nullptr){
+				imtauth::IUserGroupInfoSharedPtr parentGroupPtr = userGroupInfoPtr->GetUserGroupProvider()->GetUserGroup(parentGroupId);
+				if (parentGroupPtr.IsValid()){
+					parentGroupName = parentGroupPtr->GetName();
+				}
+			}
+			errorMessage = QStringLiteral("Group '%1' cannot be a parent group: it would create a cycle").arg(parentGroupName);
 			return false;
 		}
+		userGroupInfoPtr->AddParentGroup(parentGroupId);
 	}
 
 	return true;

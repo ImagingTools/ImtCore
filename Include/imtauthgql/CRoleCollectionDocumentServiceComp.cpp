@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtauth/CRole.h>
+#include <imtauth/imtauth.h>
 #include <imtauthgql/CAssignmentCollector.h>
 
 // Generated includes
@@ -138,6 +139,17 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRoleCollectionDocumentServiceComp:
 			rolePtr->ExcludeRole(parentRoleId);
 		}
 		for (const QByteArray& parentRoleId : CAssignmentCollector::GetDirectIds(roleData.parentRoles)){
+			if (imtauth::CreatesRoleCycle(rolePtr->GetParentRolesProvider(), rolePtr->GetObjectUuid(), parentRoleId)){
+				QString parentRoleName = QString::fromUtf8(parentRoleId);
+				if (rolePtr->GetParentRolesProvider() != nullptr){
+					imtauth::IRoleUniquePtr parentRolePtr = rolePtr->GetParentRolesProvider()->GetRole(parentRoleId);
+					if (parentRolePtr.IsValid()){
+						parentRoleName = parentRolePtr->GetRoleName();
+					}
+				}
+				errorMessage = QStringLiteral("Role '%1' cannot be a parent role: it would create a cycle").arg(parentRoleName);
+				return response;
+			}
 			rolePtr->IncludeRole(parentRoleId);
 		}
 	}

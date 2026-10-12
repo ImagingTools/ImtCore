@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtauth/CUserGroupInfo.h>
 #include <imtauth/IUserGroupInfo.h>
+#include <imtauth/imtauth.h>
 #include <imtauthgql/CAssignmentCollector.h>
 
 // Generated includes
@@ -128,10 +129,18 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 			groupPtr->RemoveParentGroup(parentGroupId);
 		}
 		for (const QByteArray& parentGroupId : CAssignmentCollector::GetDirectIds(groupData.parentGroups)){
-			if (!groupPtr->AddParentGroup(parentGroupId)){
-				errorMessage = QStringLiteral("Group '%1' cannot be a parent group: it would create a cycle").arg(QString::fromUtf8(parentGroupId));
+			if (imtauth::CreatesGroupCycle(groupPtr->GetUserGroupProvider(), groupPtr->GetObjectUuid(), parentGroupId)){
+				QString parentGroupName = QString::fromUtf8(parentGroupId);
+				if (groupPtr->GetUserGroupProvider() != nullptr){
+					imtauth::IUserGroupInfoSharedPtr parentGroupPtr = groupPtr->GetUserGroupProvider()->GetUserGroup(parentGroupId);
+					if (parentGroupPtr.IsValid()){
+						parentGroupName = parentGroupPtr->GetName();
+					}
+				}
+				errorMessage = QStringLiteral("Group '%1' cannot be a parent group: it would create a cycle").arg(parentGroupName);
 				return response;
 			}
+			groupPtr->AddParentGroup(parentGroupId);
 		}
 	}
 

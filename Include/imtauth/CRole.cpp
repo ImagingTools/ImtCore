@@ -187,9 +187,7 @@ void CRole::SetProductId(const QByteArray& productId)
 
 bool CRole::IncludeRole(const QByteArray& roleId)
 {
-	QByteArrayList parentRoles = GetParentRoles(roleId);
-
-	if (parentRoles.contains(m_roleId)){
+	if (m_parents.contains(roleId)){
 		return false;
 	}
 
@@ -359,38 +357,6 @@ bool CRole::ResetData(CompatibilityMode /*mode*/)
 	m_isGuest = false;
 
 	return true;
-}
-
-
-// protected methods
-
-QByteArrayList CRole::GetParentRoles(const QByteArray& roleId) const
-{
-	QByteArrayList retVal;
-	if (m_roleInfoProviderPtr != nullptr){
-		IRoleUniquePtr roleInfoPtr = m_roleInfoProviderPtr->GetRole(roleId);
-		if (roleInfoPtr.IsValid()){
-			GetParentRoleList(*roleInfoPtr, retVal);
-		}
-	}
-
-	return retVal;
-}
-
-
-void CRole::GetParentRoleList(const IRole &role, QByteArrayList& roleList) const
-{
-	QByteArrayList includedRoles = role.GetIncludedRoles();
-
-	roleList += includedRoles;
-	if (m_roleInfoProviderPtr != nullptr){
-		for (const QByteArray& roleId : includedRoles){
-			IRoleUniquePtr roleInfoPtr = m_roleInfoProviderPtr->GetRole(roleId);
-			if (roleInfoPtr.IsValid()){
-				GetParentRoleList(*roleInfoPtr, roleList);
-			}
-		}
-	}
 }
 
 

@@ -50,10 +50,12 @@ Item {
 	property var permissionsTree: null
 	property var selectedIds: []
 	property var lockedPermissions: ({})
-	// Shows where locked (inherited) permissions come from.
-	property bool showSourceColumn: false
+	// Marks locked (inherited) permissions with a lock and tells where they come from in the tooltip.
+	property bool showSource: false
 	// Shows the checked permissions, own and inherited, as a read-only table instead of the tree and its commands.
 	property bool selectedOnly: false
+	// Shown instead of the tree when there is nothing to show.
+	property string emptyText: qsTr("No permissions available.")
 	readonly property int checkedCount: root.__checkedCount
 	property int __checkedCount: 0
 	property var __selectedRows: []
@@ -122,7 +124,7 @@ Item {
 			if (!node)
 				continue
 			if (node.data)
-				node.data.source = lockedMap[id]
+				node.data.source = qsTr("Inherited from:") + " " + lockedMap[id]
 			permissionsTreeView.checkItem(id)
 			permissionsTreeView.setNodeEnabled(id, false)
 			// Cells re-read node data only when its tick changes.
@@ -652,18 +654,6 @@ Item {
 		}
 	}
 
-	// --- Scrollbar ---
-	CustomScrollbar {
-		id: scrollbar
-		z: parent.z + 1
-		anchors.right: parent.right
-		anchors.top: permissionsTreeView.top
-		anchors.topMargin: permissionsTreeView.showHeader ? permissionsTreeView.headerHeight + 1 : 0
-		anchors.bottom: permissionsTreeView.bottom
-		secondSize: Style.marginM
-		targetItem: permissionsTreeView.contentListView
-		visible: !root.selectedOnly
-	}
 
 	// --- Selected only (read-only) ---
 	AssignmentsTable {
@@ -682,37 +672,67 @@ Item {
 	}
 
 	// --- Tree (flat grouped) ---
-	BasicTreeView {
-		id: permissionsTreeView
-		// The default buffer realizes every row of a permission tree; keep only a few off-screen rows.
-		cacheBuffer: rowHeight * 4
+	// The scrollbar sets its own visibility from the content height, so the tree hides it through this parent.
+	Item {
+		id: treeArea
 		anchors.top: root.showControlPanel ? headerArea.bottom : parent.top
 		anchors.topMargin: root.showControlPanel ? root.treeTopMargin : 0
 		anchors.bottom: parent.bottom
 		anchors.bottomMargin: root.treeBottomMargin
 		anchors.left: parent.left
-		anchors.right: scrollbar.left
-		anchors.rightMargin: root.treeToScrollbarSpacing
+		anchors.right: parent.right
 		visible: !root.selectedOnly
-		showHeader: true
-		tristate: true
-		columns: root.showSourceColumn
-			? [
-				{ id: "name", name: qsTr("Permission"), tree: true },
-				{ id: "description", name: qsTr("Description"), tree: false },
-				{ id: "source", name: qsTr("Inherited from"), tree: false }
-			]
-			: [
+
+		CustomScrollbar {
+			id: scrollbar
+			z: 1
+			anchors.right: parent.right
+			anchors.top: parent.top
+			anchors.topMargin: permissionsTreeView.showHeader ? permissionsTreeView.headerHeight + 1 : 0
+			anchors.bottom: parent.bottom
+			secondSize: Style.marginM
+			targetItem: permissionsTreeView.contentListView
+		}
+
+		BasicTreeView {
+			id: permissionsTreeView
+			// The default buffer realizes every row of a permission tree; keep only a few off-screen rows.
+			cacheBuffer: rowHeight * 4
+			anchors.top: parent.top
+			anchors.bottom: parent.bottom
+			anchors.left: parent.left
+			anchors.right: scrollbar.left
+			anchors.rightMargin: root.treeToScrollbarSpacing
+			showHeader: true
+			tristate: true
+			hintRole: root.showSource ? "source" : ""
+			hintIcon: "Icons/Lock"
+			columns: [
 				{ id: "name", name: qsTr("Permission"), tree: true },
 				{ id: "description", name: qsTr("Description"), tree: false }
 			]
-		filterRole: ["name", "description"]
+			filterRole: ["name", "description"]
 
-		onCheckedItemsChanged: {
-			root.__updateLockedParentStates()
-			if (!root.readOnly && root.__selectionUpdateDepth === 0)
-				root.selectionChanged()
-			root.updateSelectedRows()
+			onCheckedItemsChanged: {
+				root.__updateLockedParentStates()
+				if (!root.readOnly && root.__selectionUpdateDepth === 0)
+					root.selectionChanged()
+				root.updateSelectedRows()
+			}
+		}
+
+		Text {
+			anchors.top: parent.top
+			anchors.topMargin: permissionsTreeView.headerHeight + Style.marginXL
+			anchors.left: parent.left
+			anchors.right: parent.right
+			anchors.margins: Style.marginL
+			visible: permissionsTreeView.visibleCount === 0 && !loading.visible
+			text: permissionsTreeView.filterText !== "" ? qsTr("No permissions match the filter.") : root.emptyText
+			horizontalAlignment: Text.AlignHCenter
+			wrapMode: Text.WordWrap
+			font.pixelSize: Style.fontSizeM
+			color: Style.inactiveTextColor
 		}
 	}
 

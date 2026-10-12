@@ -78,6 +78,9 @@ Item {
     property bool   allowColumnResize: true
     // Show the full text of a cell that does not fit, when the pointer rests on it.
     property bool   showOverflowTooltip: true
+    // Node data field with a hint, e.g. why the node is locked: the tree column shows hintIcon and the row tooltip the hint.
+    property string hintRole: ""
+    property string hintIcon: "Icons/Info"
 
     property bool   showHeader: true
     property bool   multiSelect: false
@@ -350,6 +353,7 @@ Item {
             property bool   nodeIsEnabled: model.nodeEnabled
             property string nodeText: model.text
             property int    nodeDataTick: model.dataTick !== undefined ? model.dataTick : 0
+            property string hintText: nodeDataTick >= 0 ? root.nodeHint(nodeKey) : ""
             property int    nodeVisibleRow: index
             property bool   rowHovered: false
 
@@ -377,8 +381,7 @@ Item {
                 }
 
                 onPositionChanged: {
-                    if (root.showOverflowTooltip)
-                        root.__showCellOverflow(cellsRepeater.itemAt(root.__columnAtX(mouse.x)), rowMouseArea, mouse.x, mouse.y)
+                    root.__showCellTooltip(cellsRepeater.itemAt(root.__columnAtX(mouse.x)), delegateRoot.hintText, rowMouseArea, mouse.x, mouse.y)
                 }
 
                 onClicked:{
@@ -534,6 +537,23 @@ Item {
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: root.toggleCheckState(delegateRoot.nodeKey)
                                         }
+                                    }
+                                }
+                            }
+
+                            Loader {
+                                anchors.verticalCenter: parent.verticalCenter
+                                active: cellRoot.treeColumn && delegateRoot.hintText !== ""
+                                visible: active
+
+                                sourceComponent: Component {
+                                    Image {
+                                        objectName: "HintIcon"
+                                        width: Style.iconSizeS
+                                        height: width
+                                        sourceSize.width: width
+                                        sourceSize.height: height
+                                        source: "../../../" + Style.getIconPath(root.hintIcon, Icon.State.On, Icon.Mode.Normal)
                                     }
                                 }
                             }
@@ -2274,26 +2294,47 @@ Item {
         return row === undefined ? -1 : row
     }
 
-    // Tooltip with the full text of the hovered cell, if the cell cuts it.
-    function __showCellOverflow(cell, mouseItem, x, y) {
-        var textItem = cell ? cell.textItem : null
-        // Measured apart: the web runtime caps implicitWidth of an eliding Text at its width.
-        overflowMeasure.text = textItem ? textItem.text : ""
-        if (!textItem || !textItem.visible || overflowMeasure.implicitWidth <= textItem.width + 1) {
+    function nodeHint(keyValue) {
+        var node = __nodes[keyValue]
+        if (hintRole === "" || !node || !node.data || !node.data[hintRole])
+            return ""
+        return String(node.data[hintRole])
+    }
+
+    // Tooltip of the hovered cell: its full text if the cell cuts it, and the hint of the row.
+    function __showCellTooltip(cell, hint, mouseItem, x, y) {
+        if (!cell) {
             __hideCellOverflow()
             return
         }
 
-        if (overflowTooltip.text !== textItem.text || overflowTooltip.targetItem !== mouseItem)
+        var textItem = cell.textItem.visible ? cell.textItem : null
+        var lines = []
+        if (textItem && showOverflowTooltip) {
+            // Measured apart: the web runtime caps implicitWidth of an eliding Text at its width.
+            overflowMeasure.text = textItem.text
+            if (overflowMeasure.implicitWidth > textItem.width + 1)
+                lines.push(textItem.text)
+        }
+        if (hint !== "")
+            lines.push(hint)
+        if (lines.length === 0) {
+            __hideCellOverflow()
+            return
+        }
+
+        var text = lines.join("\n")
+        var anchorItem = textItem ? textItem : cell
+        if (overflowTooltip.text !== text || overflowTooltip.targetItem !== mouseItem)
             overflowTooltip.hide()
-        // The decorator places the tooltip next to the tooltip item, so put the item over the cut text.
-        var point = textItem.mapToItem(root, 0, 0)
+        // The decorator places the tooltip next to the tooltip item, so put the item over the cell.
+        var point = anchorItem.mapToItem(root, 0, 0)
         overflowTooltip.x = point.x
         overflowTooltip.y = point.y
-        overflowTooltip.width = textItem.width
-        overflowTooltip.height = textItem.height
+        overflowTooltip.width = anchorItem.width
+        overflowTooltip.height = anchorItem.height
         overflowTooltip.targetItem = mouseItem
-        overflowTooltip.text = textItem.text
+        overflowTooltip.text = text
         overflowTooltip.show(x, y)
     }
 
