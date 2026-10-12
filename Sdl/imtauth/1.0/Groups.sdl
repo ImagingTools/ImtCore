@@ -9,6 +9,7 @@ schema {
 import {
 	"../../imtbase/1.0/ImtCollection.sdl"
 	"../../imtbase/1.0/ImtBaseTypes.sdl"
+	"Assignments.sdl"
 }
 
 input GroupsListInput {
@@ -38,9 +39,12 @@ type GroupData {
 	productId: ID
 	name: String
 	description: String
-	roles: [ID]
-	users: [ID]
-	parentGroups: [ID]
+	roles: [Assignment]
+	users: [Assignment]
+	parentGroups: [Assignment]
+	# Read-only.
+	permissions: [Assignment]
+	accessWarnings: [AccessWarning]
 }
 
 input GroupDataInput {

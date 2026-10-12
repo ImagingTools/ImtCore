@@ -13,6 +13,7 @@ Item {
 	signal commandActivated(string commandId, var params);
 	
 	property GuiElementContainer commandsModel: GuiElementContainer {};
+	property alias centerCommandsWidth: centerCommands.width;
 	onCommandsModelChanged: {
 		updateGui()
 	}

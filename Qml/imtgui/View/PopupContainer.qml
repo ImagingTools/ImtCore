@@ -257,8 +257,8 @@ Item {
 	}
 
 	function addMessage(type, text, autoClose, id){
-		if (!autoClose){
-			autoClose = false
+		if (autoClose === undefined || autoClose === null){
+			autoClose = type === "success" || type === "info"
 		}
 
 		if (!id || id === ""){
@@ -297,8 +297,8 @@ Item {
 	}
 
 	function replaceMessage(id, type, text, autoClose){
-		if (!autoClose){
-			autoClose = false
+		if (autoClose === undefined || autoClose === null){
+			autoClose = type === "success" || type === "info"
 		}
 
 		let existingIndex = findMessage(id)

@@ -8,6 +8,7 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
 #include <imtauth/ITenantInfo.h>
 #include <imtgql/IGqlContext.h>
+#include <imtauthgql/imtauthgql.h>
 
 
 namespace imtauthgql
@@ -202,14 +203,21 @@ sdl::V1_0::imtauth::CCreateNewSessionPayload CGqlJwtSessionControllerComp::OnCre
 		tenantId = *arguments.input->tenantId;
 	}
 
-	if (!tenantId.isEmpty()){
-		QByteArray authenticatedUserId = GetAuthenticatedUserId(gqlRequest);
-		if (authenticatedUserId.isEmpty()){
-			response.ok = false;
-			response.errorMessage = QStringLiteral("Authenticated user is required to select tenant");
-			return response;
-		}
+	// Only the authenticated user themselves or the superuser may open a session for a user.
+	const QByteArray authenticatedUserId = GetAuthenticatedUserId(gqlRequest);
+	if (authenticatedUserId.isEmpty()){
+		response.ok = false;
+		response.errorMessage = QStringLiteral("Authenticated user is required to create a session");
+		return response;
+	}
 
+	if (userId.isEmpty() || (authenticatedUserId != userId && !IsSuperuserRequest(gqlRequest))){
+		response.ok = false;
+		response.errorMessage = QStringLiteral("Cannot create a session for another user");
+		return response;
+	}
+
+	if (!tenantId.isEmpty()){
 		if (authenticatedUserId != userId){
 			response.ok = false;
 			response.errorMessage = QStringLiteral("Cannot create tenant session for another user");

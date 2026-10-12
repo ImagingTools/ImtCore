@@ -91,21 +91,26 @@ Rectangle {
 		anchors.rightMargin: Style.marginL
 		spacing: Style.marginL
 
-		CheckBox {
-			id: delegateCheckBox
-			visible: root.showCheckBox
+		// Created only when shown: every row pays for it otherwise.
+		Loader {
 			anchors.verticalCenter: parent.verticalCenter
-			height: root.checkBoxSize
-			width: visible ? root.checkBoxSize : 0
-			checkState: root.isSelected ? Qt.Checked : Qt.Unchecked
+			active: root.showCheckBox
+			visible: root.showCheckBox
 
-			MouseArea {
-				anchors.fill: parent
-				visible: root.showCheckBox
-				cursorShape: Qt.PointingHandCursor
-				onClicked: {
-					if (root.selectionManager)
-						root.selectionManager.toggleSelect(root.itemId)
+			sourceComponent: Component {
+				CheckBox {
+					height: root.checkBoxSize
+					width: root.checkBoxSize
+					checkState: root.isSelected ? Qt.Checked : Qt.Unchecked
+
+					MouseArea {
+						anchors.fill: parent
+						cursorShape: Qt.PointingHandCursor
+						onClicked: {
+							if (root.selectionManager)
+								root.selectionManager.toggleSelect(root.itemId)
+						}
+					}
 				}
 			}
 		}
@@ -138,26 +143,29 @@ Rectangle {
 		}
 	}
 
-	ToolButton {
-		id: moreButton
+	Loader {
 		anchors.centerIn: trailingActions
-		width: Style.buttonWidthL
-		height: Style.buttonWidthL
-		iconSource: "qrc:/" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
-		tooltipText: qsTr("Actions")
-		visible: root.showDefaultActionsMenu
-			&& (root.canEdit || root.canDelete)
-			&& !customActionsLoader.visible
-			&& (root.isHovered || root.isSelected)
+		active: root.showDefaultActionsMenu && (root.canEdit || root.canDelete)
+		visible: !customActionsLoader.visible && (root.isHovered || root.isSelected)
 
-		onClicked: {
-			contextMenuModel.fillModel()
-			var point = moreButton.mapToItem(null, 0, moreButton.height)
-			ModalDialogManager.openDialog(itemPopupMenuComp, {
-				"x": point.x,
-				"y": point.y,
-				"model": contextMenuModel
-			})
+		sourceComponent: Component {
+			ToolButton {
+				id: moreButton
+				width: Style.buttonWidthL
+				height: Style.buttonWidthL
+				iconSource: "qrc:/" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
+				tooltipText: qsTr("Actions")
+
+				onClicked: {
+					contextMenuModel.fillModel()
+					var point = moreButton.mapToItem(null, 0, moreButton.height)
+					ModalDialogManager.openDialog(itemPopupMenuComp, {
+						"x": point.x,
+						"y": point.y,
+						"model": contextMenuModel
+					})
+				}
+			}
 		}
 	}
 

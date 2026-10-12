@@ -163,7 +163,8 @@ QtObject {
 			return fallbackMessage;
 		}
 
-		return qsTr("The password must contain %1.").arg(requirements.join(qsTr(", ")));
+		// Unlike requirementsText(), a violated rule can be a whole-password condition such as "different from the login".
+		return qsTr("The password does not meet the requirements: %1.").arg(requirements.join(qsTr(", ")));
 	}
 
 	// Hint shown next to the input, before anything was typed.

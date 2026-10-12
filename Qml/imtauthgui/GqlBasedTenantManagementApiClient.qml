@@ -10,7 +10,6 @@ import imtauthTenantMembershipsSdl 1.0
 import imtauthTenantsSdl 1.0
 import imtbaseImtCollectionSdl 1.0
 import imtbaseCollectionDocumentServiceSdl 1.0
-import imtauthRelationshipCollectionDocumentServiceSdl 1.0
 import imtauthCrossOrgGrantCollectionDocumentServiceSdl 1.0
 import imtauthgui 1.0
 
@@ -46,13 +45,11 @@ QtObject {
 	property alias userObjectTypeId: __userAdminObj.userObjectTypeId
 	property string crossOrgGrantObjectTypeId: "CrossOrgGrant"
 	property string contractObjectTypeId: "Contract"
-	property string relationshipObjectTypeId: "TenantRelationship"
 	property string crossTenantMessageObjectTypeId: "CrossTenantMessage"
 
 	readonly property alias roleDocumentManager: __userAdminObj.roleDocumentManager
 	readonly property alias groupDocumentManager: __userAdminObj.groupDocumentManager
 	readonly property alias userDocumentManager: __userAdminObj.userDocumentManager
-	readonly property var relationshipDocumentManager: __relationshipDocumentService
 	readonly property var crossOrgGrantDocumentManager: __crossOrgGrantDocumentService
 	readonly property alias permissionsProvider: __userAdminObj.permissionsProvider
 
@@ -190,7 +187,7 @@ QtObject {
 			}
 
 			if (notificationType === "MessageReceived" || notificationType === 0) {
-				var tName = notification.tenantName ? notification.tenantName : qsTr("another tenant")
+				var tName = notification.tenantName ? notification.tenantName : qsTr("another organization")
 				PopupManager.addInfoMessage(qsTr("New cross-tenant message from \"%1\"").arg(tName), true)
 				root.subscriptionCrossTenantMessageReceived(notification)
 			} else if (notificationType === "MessageStatusChanged" || notificationType === 1) {
@@ -245,6 +242,19 @@ QtObject {
 		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_revokeTenantInvitation
+
+		sdlObjectComp: Component {
+			RevokeTenantInvitationPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						PopupManager.addErrorMessage(m_errorMessage, true)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.invitationRevoked(root.__revokeInvitationInput.m_invitationId)
+					}
+				}
+			}
+		}
 	}
 
 	property ResendTenantInvitationInput __resendInvitationInput: ResendTenantInvitationInput {}
@@ -252,6 +262,20 @@ QtObject {
 		context: root.context
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_resendTenantInvitation
+
+		sdlObjectComp: Component {
+			ResendTenantInvitationPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						PopupManager.addErrorMessage(m_errorMessage, true)
+						root.requestFailed(m_errorMessage)
+					} else {
+						PopupManager.addSuccessMessage(qsTr("Invitation resent"), true)
+						root.invitationResent(root.__resendInvitationInput.m_invitationId)
+					}
+				}
+			}
+		}
 	}
 
 	property TransferTenantOwnershipInput __transferOwnershipInput: TransferTenantOwnershipInput {}
@@ -286,8 +310,9 @@ QtObject {
 					if (m_errorMessage && m_errorMessage !== "") {
 						PopupManager.addErrorMessage(m_errorMessage, true)
 						root.requestFailed(m_errorMessage)
+					} else {
+						root.userCreated()
 					}
-					root.userCreated()
 				}
 			}
 		}
@@ -319,13 +344,11 @@ QtObject {
 	function revokeInvitation(invitationId) {
 		root.__revokeInvitationInput.m_invitationId = invitationId || ""
 		root.__revokeInvitationSender.send(root.__revokeInvitationInput)
-		root.invitationRevoked(invitationId)
 	}
 
 	function resendInvitation(invitationId) {
 		root.__resendInvitationInput.m_invitationId = invitationId || ""
 		root.__resendInvitationSender.send(root.__resendInvitationInput)
-		root.invitationResent(invitationId)
 	}
 
 	function transferOwnership(tenantId, newOwnerId) {
@@ -1218,15 +1241,18 @@ QtObject {
 		root.__getRelationshipProposalsSender.send(root.__getRelationshipProposalsInput)
 	}
 
-	function createRelationshipProposal(connectionId, initiatorTenantId, proposalType, proposedSourceRole, proposedTargetRole, proposedScope, proposedDescription, message) {
-		root.__createRelationshipProposalData.m_connectionId = connectionId || ""
+	// The server finds the connection between the two organizations.
+	function createRelationshipProposal(initiatorTenantId, counterpartyTenantId, proposalType, existingRelationshipId, proposedSourceRole, proposedTargetRole, proposedScope, proposedDescription) {
+		root.__createRelationshipProposalData.m_connectionId = ""
 		root.__createRelationshipProposalData.m_initiatorTenantId = initiatorTenantId || root.tenantId || ""
+		root.__createRelationshipProposalData.m_counterpartyTenantId = counterpartyTenantId || ""
 		root.__createRelationshipProposalData.m_proposalType = proposalType || RelationshipProposalTypeEnum.s_create
+		root.__createRelationshipProposalData.m_existingRelationshipId = existingRelationshipId || ""
 		root.__createRelationshipProposalData.m_proposedSourceRole = proposedSourceRole || TenantRelationshipRoleEnum.s_partner
 		root.__createRelationshipProposalData.m_proposedTargetRole = proposedTargetRole || TenantRelationshipRoleEnum.s_partner
 		root.__createRelationshipProposalData.m_proposedScope = proposedScope || ""
 		root.__createRelationshipProposalData.m_proposedDescription = proposedDescription || ""
-		root.__createRelationshipProposalData.m_message = message || ""
+		root.__createRelationshipProposalData.m_status = RelationshipProposalStatusEnum.s_pending
 		root.__createRelationshipProposalInput.m_proposal = root.__createRelationshipProposalData
 		root.__createRelationshipProposalSender.send(root.__createRelationshipProposalInput)
 	}
@@ -1610,10 +1636,6 @@ QtObject {
 		}
 	}
 
-	property GqlBasedCollectionDocumentService __relationshipDocumentService: GqlBasedCollectionDocumentService {
-		collectionId: "TenantRelationships"
-	}
-
 	property GqlBasedCollectionDocumentService __crossOrgGrantDocumentService: GqlBasedCollectionDocumentService {
 		collectionId: "CrossOrgGrants"
 	}
@@ -1638,91 +1660,9 @@ QtObject {
 		}
 	}
 
-	// --- Relationship editor + representation controller ---
-	property Component __relationshipEditorComp: Component {
-		RelationshipView {
-			apiClient: root
-			commandsControllerComp: Component {
-				GqlBasedCommandsController {
-					typeId: root.relationshipObjectTypeId
-				}
-			}
-		}
-	}
-
 	property FilterableSelectGqlDataProvider connectionsDataProvider: FilterableSelectGqlDataProvider{
 		collectionId: "TenantConnections"
 		multiSelect: false
-	}
-
-	property Component __relationshipControllerComp: Component {
-		DocumentRepresentationController {
-			id: relationshipReprController
-
-			representationModel: TenantRelationship {
-				m_id: UuidGenerator.generateUUID()
-				m_status: "Active"
-				m_sourceRole: "Partner"
-				m_targetRole: "Partner"
-			}
-
-			function updateRepresentationFromDocument(){
-				startUpdateRepresentation(documentId, representationModel)
-
-				getRelationshipInput.m_id = documentId
-				getRelationshipInput.m_collectionId = "TenantRelationships"
-				getRelationshipRequest.send(getRelationshipInput)
-			}
-
-			function updateDocumentFromRepresentation(){
-				startUpdateDocument(documentId)
-
-				updateRelationshipInput.m_documentId = documentId
-				updateRelationshipInput.m_relationship = representationModel
-				updateRelationshipRequest.send(updateRelationshipInput)
-			}
-
-			property DocumentId getRelationshipInput: DocumentId {}
-			property UpdateRelationshipFromRepresentationInput updateRelationshipInput: UpdateRelationshipFromRepresentationInput {}
-
-			property GqlSdlRequestSender getRelationshipRequest: GqlSdlRequestSender {
-				context: root.context
-				gqlCommandId: ImtauthRelationshipCollectionDocumentServiceSdlCommandIds.s_getRelationshipRepresentation
-				sdlObjectComp: Component {
-					TenantRelationship {
-						onFinished: {
-							relationshipReprController.representationModel.copyFrom(this)
-							relationshipReprController.representationUpdated(
-								relationshipReprController.documentId,
-								relationshipReprController.representationModel)
-						}
-					}
-				}
-
-				function onError(message, type){
-					relationshipReprController.updateRepresentationFailed(relationshipReprController.documentId, message)
-				}
-			}
-
-			property GqlSdlRequestSender updateRelationshipRequest: GqlSdlRequestSender {
-				context: root.context
-				gqlCommandId: ImtauthRelationshipCollectionDocumentServiceSdlCommandIds.s_updateRelationshipFromRepresentation
-				requestType: 1
-				sdlObjectComp: Component {
-					DocumentOperationStatus {
-						onFinished: {
-							if (m_status === "Success"){
-								relationshipReprController.documentUpdated(relationshipReprController.documentId)
-							}
-						}
-					}
-				}
-
-				function onError(message, type){
-					relationshipReprController.updateDocumentFailed(relationshipReprController.documentId, message)
-				}
-			}
-		}
 	}
 
 	// --- CrossOrgGrant editor + representation controller ---
@@ -1807,8 +1747,6 @@ QtObject {
 	Component.onCompleted: {
 		root.__crossOrgGrantDocumentService.registerDocumentViewData(
 			root.crossOrgGrantObjectTypeId, "Editor", root.__crossOrgGrantEditorComp, root.__crossOrgGrantControllerComp)
-		root.__relationshipDocumentService.registerDocumentViewData(
-			root.relationshipObjectTypeId, "Editor", root.__relationshipEditorComp, root.__relationshipControllerComp)
 	}
 }
 

@@ -598,6 +598,11 @@ sdl::V1_0::imtauth::CRemoveMembershipPayload CTenantMembershipManagerControllerC
 			response.errorMessage = QStringLiteral("Insufficient organization permissions to remove other members");
 			return response;
 		}
+		if (IsOwner(*m_tenantManagerCompPtr.GetPtr(), membershipPtr->GetUserId(), tenantId)){
+			response.success = false;
+			response.errorMessage = QStringLiteral("The owner cannot leave or be excluded from the organization. Transfer the ownership first.");
+			return response;
+		}
 	}
 
 	bool success = m_membershipManagerCompPtr->RemoveMembership(membershipId);

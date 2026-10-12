@@ -6,6 +6,7 @@
 // ACF includes
 #include <iprm/CParamsSet.h>
 #include <iprm/CIdParam.h>
+#include <iprm/CEnableableParam.h>
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
@@ -152,15 +153,14 @@ void CTenantCollectionControllerComp::SetAdditionalFilters(
 		return;
 	}
 
-	// System administrators get a global view: do not restrict the tenant list
-	// to the caller's own memberships/ownership.
-	if (userInfoPtr->IsAdmin()){
-		return;
-	}
-
 	iprm::CIdParam* userIdParamPtr = new iprm::CIdParam();
 	userIdParamPtr->SetId(userId);
 	filterParamsPtr->SetEditableParameter("UserId", userIdParamPtr, true);
+
+	// System administrators get a global view, the others see only the tenants they are related to.
+	if (!userInfoPtr->IsAdmin()){
+		filterParamsPtr->SetEditableParameter("RelatedTenantsOnly", new iprm::CEnableableParam(true), true);
+	}
 }
 
 

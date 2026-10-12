@@ -205,7 +205,7 @@ QtObject {
 	// --- Relationship Proposals ---
 	property var relationshipProposalsModel: null
 	function fetchRelationshipProposals(tenantId) {}
-	function createRelationshipProposal(connectionId, initiatorTenantId, proposalType, proposedSourceRole, proposedTargetRole, proposedScope, proposedDescription, message) {}
+	function createRelationshipProposal(initiatorTenantId, counterpartyTenantId, proposalType, existingRelationshipId, proposedSourceRole, proposedTargetRole, proposedScope, proposedDescription) {}
 	function approveRelationshipProposal(proposalId, tenantId) {}
 	function rejectRelationshipProposal(proposalId, tenantId) {}
 	function cancelRelationshipProposal(proposalId, tenantId) {}

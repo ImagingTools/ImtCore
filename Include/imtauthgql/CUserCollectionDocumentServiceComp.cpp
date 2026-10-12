@@ -13,6 +13,7 @@
 #include <imtdoc/CDocumentSavedEvent.h>
 #include <imtgql/IGqlContext.h>
 #include <imtauthgql/imtauthgql.h>
+#include <imtauthgql/CAssignmentCollector.h>
 #include <istd/IChangeable.h>
 
 // Generated includes
@@ -99,26 +100,17 @@ sdl::V1_0::imtauth::CUserData CUserCollectionDocumentServiceComp::OnGetUserRepre
 	response.email = userPtr->GetMail();
 	response.enabled = bool(userPtr->IsEnabled());
 
-	response.groups.Emplace();
-	for (const QByteArray& groupId : effectiveUserPtr->GetGroups()){
-		response.groups->push_back(groupId);
-	}
-
 	// Roles and permissions of the request's product only. Other products are not
 	// just invisible here, they must not round-trip: OnUpdateUserFromRepresentation
-	// writes the returned list back with SetRoles(userData.productId, ...), so a
+	// writes the direct roles back with SetRoles(userData.productId, ...), so a
 	// cross-product list would be re-filed under the current product on the next save.
 	response.productId = currentProductId;
 
-	response.roles.Emplace();
-	for (const QByteArray& roleId : effectiveUserPtr->GetRoles(currentProductId)){
-		response.roles->push_back(roleId);
-	}
-
-	response.permissions.Emplace();
-	for (const QByteArray& permissionId : effectiveUserPtr->GetLocalPermissions(currentProductId)){
-		response.permissions->push_back(permissionId);
-	}
+	// Delegated roles added by the tenant adaptation are not direct, so they do not round-trip.
+	const imtauth::IUserBaseInfo::RoleIds directRoles = userPtr->GetRoles(currentProductId);
+	CAssignmentCollector collector;
+	collector.CollectUser(*effectiveUserPtr, effectiveUserPtr->GetRoles(currentProductId), directRoles, currentProductId);
+	collector.FillUser(response);
 
 	response.systemInfos.Emplace();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userPtr->GetSystemInfos()){
@@ -179,23 +171,12 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	// CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery stores
 	// TenantEntityBindings.EntityType as GetTableName(), not the collection ID.
 	const QByteArray groupsEntity = QByteArrayLiteral("UserGroups");
-	const QByteArray permsEntity = QByteArrayLiteral("Permissions");
 
 	auto shouldKeepForTenant = [&](const QByteArray& entityType, const QByteArray& entityId) -> bool {
 		if (tenantId.isEmpty() || bindingPtr == nullptr || entityId.isEmpty()){
 			return true;
 		}
 		return ShouldKeepEntityForTenant(bindingPtr, tenantId, entityType, entityId);
-	};
-
-	auto shouldKeepPermissionForTenant = [&](const QByteArray& permissionId) -> bool {
-		if (tenantId.isEmpty() || bindingPtr == nullptr || permissionId.isEmpty()){
-			return true;
-		}
-		if (!bindingPtr->HasAnyTenantBinding(permsEntity, permissionId)){
-			return true;
-		}
-		return ShouldKeepEntityForTenant(bindingPtr, tenantId, permsEntity, permissionId);
 	};
 
 	istd::IChangeableSharedPtr documentPtr;
@@ -302,12 +283,9 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		// for the current tenant. Assignments from other tenants are preserved.
 		imtauth::IUserGroupInfo::GroupIds currentGroups = userPtr->GetGroups();
 		QList<QByteArray> newGroupsList;
-		for (const auto& groupIdPtr : *userData.groups){
-			if (groupIdPtr){
-				QByteArray gid = *groupIdPtr;
-				if (shouldKeepForTenant(groupsEntity, gid)){
-					newGroupsList.append(gid);
-				}
+		for (const QByteArray& gid : CAssignmentCollector::GetDirectIds(userData.groups)){
+			if (shouldKeepForTenant(groupsEntity, gid)){
+				newGroupsList.append(gid);
 			}
 		}
 		for (const QByteArray& currentGroupId : currentGroups){
@@ -328,12 +306,9 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 			productId = *userData.productId;
 		}
 		imtauth::IUserBaseInfo::RoleIds incomingRoles;
-		for (const auto& roleIdPtr : *userData.roles){
-			if (roleIdPtr){
-				QByteArray rid = *roleIdPtr;
-				if (shouldKeepForTenant(rolesEntity, rid)){
-					incomingRoles.append(rid);
-				}
+		for (const QByteArray& rid : CAssignmentCollector::GetDirectIds(userData.roles)){
+			if (shouldKeepForTenant(rolesEntity, rid)){
+				incomingRoles.append(rid);
 			}
 		}
 		// Delta update only for tenant-visible roles to avoid overwriting
@@ -353,35 +328,6 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		userPtr->SetRoles(productId, finalRoles);
 	}
 
-	if (userData.permissions){
-		QByteArray productId;
-		if (userData.productId){
-			productId = *userData.productId;
-		}
-		imtauth::IUserBaseInfo::FeatureIds incomingPerms;
-		for (const auto& permissionIdPtr : *userData.permissions){
-			if (permissionIdPtr){
-				QByteArray pid = *permissionIdPtr;
-				if (shouldKeepPermissionForTenant(pid)){
-					incomingPerms.append(pid);
-				}
-			}
-		}
-		// Delta update only for tenant-visible permissions.
-		imtauth::IUserBaseInfo::FeatureIds currentPerms = userPtr->GetLocalPermissions(productId);
-		imtauth::IUserBaseInfo::FeatureIds finalPerms;
-		for (const QByteArray& cp : currentPerms){
-			if (!shouldKeepPermissionForTenant(cp) || incomingPerms.contains(cp)){
-				finalPerms.append(cp);
-			}
-		}
-		for (const QByteArray& np : incomingPerms){
-			if (!finalPerms.contains(np)){
-				finalPerms.append(np);
-			}
-		}
-		userPtr->SetLocalPermissions(productId, finalPerms);
-	}
 
 	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
 
@@ -400,12 +346,14 @@ bool CUserCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* eventP
 		return true;
 	}
 
-	if (!m_membershipManagerCompPtr.IsValid()){
-		return true;
-	}
-
 	QByteArray documentId = savedEventPtr->GetDocumentId();
 	QByteArray userId = savedEventPtr->GetUserId();
+
+	// The saved user is stored under this collection element ID
+	const QByteArray objectId = savedEventPtr->GetDocumentUrl().path().mid(1).toUtf8();
+	if (objectId.isEmpty()){
+		return true;
+	}
 
 	// Retrieve the tenantId that was stored during OnUpdateUserFromRepresentation
 	QByteArray tenantId;
@@ -414,35 +362,39 @@ bool CUserCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* eventP
 		tenantId = m_pendingTenantIds.take(documentId);
 	}
 
-	if (tenantId.isEmpty()){
-		return true;
-	}
-
-	// Get the saved user document to extract the user's objectUuid
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr);
-	if (!documentPtr.IsValid()){
-		return true;
-	}
-
-	const imtauth::CIdentifiableUserInfo* userPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(documentPtr.GetPtr());
+	imtauth::CIdentifiableUserInfo* userPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(documentPtr.GetPtr());
 	if (userPtr == nullptr){
 		return true;
 	}
 
-	QByteArray newUserId = userPtr->GetObjectUuid();
-	if (newUserId.isEmpty()){
+	// A new user is inserted under an ID generated by the collection, not under the UUID sent by the client.
+	// References to the user (e.g. memberships) use its UUID, so it must be the element ID.
+	if (userPtr->GetObjectUuid() != objectId){
+		userPtr->SetObjectUuid(objectId);
+
+		m_documentManagerCompPtr->SetDocumentData(userId, documentId, *documentPtr);
+
+		imtdoc::IDocumentService::TaskParams saveParams;
+		saveParams.userId = userId;
+		saveParams.documentId = documentId;
+		QByteArray saveTaskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, saveParams);
+		m_documentManagerCompPtr->WaitForTaskFinished(saveTaskId);
+	}
+
+	if (tenantId.isEmpty() || !m_membershipManagerCompPtr.IsValid()){
 		return true;
 	}
 
 	// Check if user is already a member of this tenant
-	if (m_membershipManagerCompPtr->IsMember(newUserId, tenantId)){
+	if (m_membershipManagerCompPtr->IsMember(objectId, tenantId)){
 		return true;
 	}
 
-	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(newUserId, tenantId);
+	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(objectId, tenantId);
 	if (membershipId.isEmpty()){
-		SendWarningMessage(0, QStringLiteral("Auto-membership creation failed for user '%1' in tenant '%2'").arg(QString::fromUtf8(newUserId), QString::fromUtf8(tenantId)), "CUserCollectionDocumentServiceComp");
+		SendWarningMessage(0, QStringLiteral("Auto-membership creation failed for user '%1' in tenant '%2'").arg(QString::fromUtf8(objectId), QString::fromUtf8(tenantId)), "CUserCollectionDocumentServiceComp");
 	}
 
 	return true;

@@ -3,11 +3,14 @@
 
 
 // Qt includes
+#include <QtCore/QSet>
 #include <QtCore/QString>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtauth/IUserInfo.h>
+#include <imtauth/IRoleInfoProvider.h>
+#include <imtauth/IUserGroupInfoProvider.h>
 
 
 /**
@@ -32,6 +35,76 @@ inline QString GetUserName(const imtbase::IObjectCollection& userCollection, con
 	}
 
 	return QString();
+}
+
+
+/**
+	Check if including the parent role into the role would close a cycle of parent roles.
+*/
+inline bool CreatesRoleCycle(const IRoleInfoProvider* roleProviderPtr, const QByteArray& roleId, const QByteArray& parentRoleId)
+{
+	if (parentRoleId == roleId){
+		return true;
+	}
+
+	if (roleProviderPtr == nullptr || roleId.isEmpty()){
+		return false;
+	}
+
+	QByteArrayList pendingRoleIds = {parentRoleId};
+	QSet<QByteArray> visitedRoleIds;
+	while (!pendingRoleIds.isEmpty()){
+		const QByteArray currentRoleId = pendingRoleIds.takeFirst();
+		if (currentRoleId == roleId){
+			return true;
+		}
+		if (visitedRoleIds.contains(currentRoleId)){
+			continue;
+		}
+		visitedRoleIds.insert(currentRoleId);
+
+		IRoleUniquePtr rolePtr = roleProviderPtr->GetRole(currentRoleId);
+		if (rolePtr.IsValid()){
+			pendingRoleIds += rolePtr->GetIncludedRoles();
+		}
+	}
+
+	return false;
+}
+
+
+/**
+	Check if adding the parent group to the group would close a cycle of parent groups.
+*/
+inline bool CreatesGroupCycle(const IUserGroupInfoProvider* groupProviderPtr, const QByteArray& groupId, const QByteArray& parentGroupId)
+{
+	if (parentGroupId == groupId){
+		return true;
+	}
+
+	if (groupProviderPtr == nullptr || groupId.isEmpty()){
+		return false;
+	}
+
+	QByteArrayList pendingGroupIds = {parentGroupId};
+	QSet<QByteArray> visitedGroupIds;
+	while (!pendingGroupIds.isEmpty()){
+		const QByteArray currentGroupId = pendingGroupIds.takeFirst();
+		if (currentGroupId == groupId){
+			return true;
+		}
+		if (visitedGroupIds.contains(currentGroupId)){
+			continue;
+		}
+		visitedGroupIds.insert(currentGroupId);
+
+		IUserGroupInfoSharedPtr groupPtr = groupProviderPtr->GetUserGroup(currentGroupId);
+		if (groupPtr.IsValid()){
+			pendingGroupIds += groupPtr->GetParentGroups();
+		}
+	}
+
+	return false;
 }
 
 

@@ -9,6 +9,7 @@
 #include <imtauth/ICrossOrgGrantData.h>
 #include <imtgql/IGqlContext.h>
 #include <imtbase/ICollectionInfo.h>
+#include <imtauthgql/TenantAccess.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/CrossOrgGrantCollectionDocumentService.h>
@@ -18,23 +19,38 @@ namespace imtauthgql
 {
 
 
-QString CCrossOrgGrantCollectionDocumentServiceComp::ComposeDefaultGrantName(const imtauth::CrossOrgGrantInfo& info) const
+QString CCrossOrgGrantCollectionDocumentServiceComp::GetTenantName(const QByteArray& tenantId) const
 {
-	QString targetName;
-	if (m_tenantCollectionCompPtr.IsValid() && !info.targetTenantId.isEmpty()){
-		targetName = m_tenantCollectionCompPtr->GetElementInfo(info.targetTenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
-	}
-	if (targetName.isEmpty()){
-		targetName = QString::fromUtf8(info.targetTenantId);
+	QString tenantName;
+	if (m_tenantCollectionCompPtr.IsValid() && !tenantId.isEmpty()){
+		tenantName = m_tenantCollectionCompPtr->GetElementInfo(tenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
 	}
 
+	return tenantName.isEmpty() ? QString::fromUtf8(tenantId) : tenantName;
+}
+
+
+QStringList CCrossOrgGrantCollectionDocumentServiceComp::GetRoleNames(const QByteArrayList& roleIds) const
+{
 	QStringList roleNames;
-	for (const QByteArray& roleId : info.roleIds){
+	for (const QByteArray& roleId : roleIds){
 		if (!roleId.isEmpty()){
-			roleNames << QString::fromUtf8(roleId);
+			QString roleName;
+			if (m_roleCollectionCompPtr.IsValid()){
+				roleName = m_roleCollectionCompPtr->GetElementInfo(roleId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			}
+			roleNames << (roleName.isEmpty() ? QString::fromUtf8(roleId) : roleName);
 		}
 	}
 
+	return roleNames;
+}
+
+
+QString CCrossOrgGrantCollectionDocumentServiceComp::ComposeDefaultGrantName(const imtauth::CrossOrgGrantInfo& info) const
+{
+	const QString targetName = GetTenantName(info.targetTenantId);
+	const QStringList roleNames = GetRoleNames(info.roleIds);
 	if (roleNames.isEmpty()){
 		return targetName;
 	}
@@ -78,15 +94,15 @@ sdl::V1_0::imtauth::CCrossOrgGrant CCrossOrgGrantCollectionDocumentServiceComp::
 		if (grantPtr != nullptr){
 			imtauth::CrossOrgGrantInfo info = grantPtr->GetGrantInfo();
 
-			// Enforce tenant isolation: grant must belong to the context tenant
+			// Only the grantor and the grantee see a stored grant.
 			const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 			QByteArray contextTenantId;
 			if (gqlContextPtr != nullptr){
 				contextTenantId = gqlContextPtr->GetTenantId();
 			}
-			if (!contextTenantId.isEmpty()
-					&& info.sourceTenantId != contextTenantId
-					&& info.targetTenantId != contextTenantId){
+			const bool isNewGrant = info.grantId.isEmpty() && info.sourceTenantId.isEmpty();
+			if (contextTenantId.isEmpty()
+					|| (!isNewGrant && info.sourceTenantId != contextTenantId && info.targetTenantId != contextTenantId)){
 				errorMessage = QStringLiteral("Access denied: grant does not belong to the current tenant");
 				return sdl::V1_0::imtauth::CCrossOrgGrant();
 			}
@@ -95,25 +111,26 @@ sdl::V1_0::imtauth::CCrossOrgGrant CCrossOrgGrantCollectionDocumentServiceComp::
 			response.id = info.grantId;
 			response.sourceTenantId = info.sourceTenantId;
 			response.targetTenantId = info.targetTenantId;
+			if (!info.sourceTenantId.isEmpty()){
+				response.sourceTenantName = GetTenantName(info.sourceTenantId);
+			}
+			if (!info.targetTenantId.isEmpty()){
+				response.targetTenantName = GetTenantName(info.targetTenantId);
+			}
 			response.name = info.name;
 			response.roleIds.Emplace().FromList(info.roleIds);
+			imtsdl::TElementList<QString> roleNames;
+			for (const QString& roleName : GetRoleNames(info.roleIds)){
+				roleNames << roleName;
+			}
+			response.roleNames = roleNames;
 			response.description = info.description;
 			response.createdAt = info.createdAt;
 			response.expiresAt = info.expiresAt;
 			response.isActive = info.isActive;
 
-			// Mark the grant as read-only when the current tenant is the grantee (target),
-			// not the grantor (source). Only the source tenant may edit the grant.
-			if (!contextTenantId.isEmpty()){
-				response.isReadOnly = (info.sourceTenantId != contextTenantId);
-			} else {
-				response.isReadOnly = false;
-			}
-
-			// Resolve target tenant name
-			if (m_tenantCollectionCompPtr.IsValid() && !info.targetTenantId.isEmpty()){
-				response.targetTenantName = m_tenantCollectionCompPtr->GetElementInfo(info.targetTenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
-			}
+			// The grantee only views the grant.
+			response.isReadOnly = (info.sourceTenantId != contextTenantId) && !isNewGrant;
 
 			return response;
 		}
@@ -179,31 +196,36 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CCrossOrgGrantCollectionDocumentSer
 
 	imtauth::CrossOrgGrantInfo info = grantDataPtr->GetGrantInfo();
 
-	// Enforce tenant isolation: only the source (grantor) tenant may edit the grant.
-	// The target (grantee) tenant can view it but must not modify it.
-	if (!contextTenantId.isEmpty() && !info.grantId.isEmpty()){
-		if (info.sourceTenantId != contextTenantId){
-			errorMessage = QStringLiteral("Access denied: only the grantor tenant can modify this grant");
-			return response;
-		}
+	// The organization of the request context grants its own roles; the grantee cannot modify the grant.
+	if (contextTenantId.isEmpty() || (!info.sourceTenantId.isEmpty() && info.sourceTenantId != contextTenantId)){
+		errorMessage = QStringLiteral("Access denied: only the grantor tenant can modify this grant");
+		return response;
 	}
+	if (!HasTenantManageAccess(
+				*m_tenantManagerCompPtr.GetPtr(),
+				m_membershipManagerCompPtr.GetPtr(),
+				gqlRequest,
+				contextTenantId,
+				QByteArrayLiteral("ConnectOrganization"),
+				errorMessage)){
+		return response;
+	}
+	info.sourceTenantId = contextTenantId;
+
+	// A name equal to the generated one follows the target and the roles.
+	const QString previousDefaultName = ComposeDefaultGrantName(info);
 
 	if (grantRepresentation.id){
 		info.grantId = *grantRepresentation.id;
 	}
-	// The source tenant is the tenant currently acting (owner of the grant).
-	// The client representation does not provide it, so prefer the request
-	// context and never persist an empty source tenant id.
-	if (grantRepresentation.sourceTenantId && !grantRepresentation.sourceTenantId->isEmpty()){
-		info.sourceTenantId = *grantRepresentation.sourceTenantId;
-	}
-	if (info.sourceTenantId.isEmpty()){
-		info.sourceTenantId = contextTenantId;
-	}
 	if (grantRepresentation.targetTenantId){
 		info.targetTenantId = *grantRepresentation.targetTenantId;
 	}
-	if (grantRepresentation.name && !grantRepresentation.name->isEmpty()){
+	if (info.targetTenantId == info.sourceTenantId){
+		errorMessage = QStringLiteral("An organization cannot grant access to itself");
+		return response;
+	}
+	if (grantRepresentation.name){
 		info.name = *grantRepresentation.name;
 	}
 	if (grantRepresentation.roleIds){
@@ -222,9 +244,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CCrossOrgGrantCollectionDocumentSer
 		info.isActive = true;
 	}
 
-	// Auto-generate a human-readable name when one was not provided, based on the
-	// target tenant name and the delegated roles.
-	if (info.name.isEmpty()){
+	if (info.name.isEmpty() || info.name == previousDefaultName){
 		info.name = ComposeDefaultGrantName(info);
 	}
 

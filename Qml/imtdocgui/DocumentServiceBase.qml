@@ -748,6 +748,11 @@ QtObject {
 					}
 
 					onViewUnregistered: {
+						// Closing the document: the web runtime has already destroyed its views map.
+						if (!documentData.views){
+							return
+						}
+
 						let viewTypeIds = Object.keys(documentData.views)
 						for (let i = 0; i < viewTypeIds.length; ++i){
 							if (documentData.views[viewTypeIds[i]] === view){

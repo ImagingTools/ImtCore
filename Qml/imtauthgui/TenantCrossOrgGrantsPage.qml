@@ -21,7 +21,7 @@ SimpleCollectionPage {
 
 	entityName: qsTr("Grant")
 	entityNamePlural: qsTr("Cross Organization Grants")
-	descriptionText: qsTr("Delegate scoped access from this tenant to another tenant.")
+	descriptionText: qsTr("Delegate scoped access from this organization to another organization.")
 	showCreateButton: true
 	documentNameFields: ["m_name", "m_targetTenantName"]
 

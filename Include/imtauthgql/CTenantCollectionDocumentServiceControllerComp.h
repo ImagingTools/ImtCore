@@ -17,7 +17,7 @@ namespace imtauthgql
  * permission checks that enforce:
  * - Creating a new tenant is only allowed when the session has NO active
  *   tenant (tenantId is empty).
- * - Opening/editing a tenant is only allowed when the session's active
+ * - Opening/editing/saving a tenant is only allowed when the session's active
  *   tenantId matches the tenant being accessed (i.e. while authorized in
  *   Tenant A the user cannot open Tenant B).
  */
@@ -42,6 +42,10 @@ protected:
 		QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CDocumentInfo OnOpenDocument(
 		const sdl::V1_0::imtbase::COpenDocumentGqlRequest& openDocumentRequest,
+		const ::imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const override;
+	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnSaveDocument(
+		const sdl::V1_0::imtbase::CSaveDocumentGqlRequest& saveDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
 };
