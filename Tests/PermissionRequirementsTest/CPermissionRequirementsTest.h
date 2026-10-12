@@ -21,6 +21,8 @@ private Q_SLOTS:
 	void testRequirementsOfNestedFeature();
 	void testUnknownPathIsNotResolvedByItsLastSegment();
 	void testRequirementCycleTerminates();
+	void testParentRequirementsApplyToDescendants();
+	void testContainerCannotBeRequirementTarget();
 	void testUnknownPermission();
 	void testNoPermissions();
 

@@ -330,7 +330,8 @@ void CollectFeatureRequirements(
 			const IFeatureInfo& featureInfo,
 			const QByteArray& parentPath,
 			RequirementsByPath& requirementsByPath,
-			PathsByFeatureId& pathsByFeatureId)
+			PathsByFeatureId& pathsByFeatureId,
+			const QByteArrayList& inheritedRequirements = QByteArrayList())
 {
 	const QByteArray featureId = featureInfo.GetFeatureId();
 	if (featureId.isEmpty()){
@@ -339,7 +340,13 @@ void CollectFeatureRequirements(
 
 	const QByteArray featurePath = parentPath + '/' + featureId;
 
-	requirementsByPath.insert(featurePath, featureInfo.GetRequirements());
+	QByteArrayList requirements = inheritedRequirements;
+	for (const QByteArray& requirement : featureInfo.GetRequirements()){
+		if (!requirements.contains(requirement)){
+			requirements.append(requirement);
+		}
+	}
+	requirementsByPath.insert(featurePath, requirements);
 
 	// Permissions stored before paths existed name a feature by its id alone,
 	// and such an id holds for every feature carrying it - that is how the
@@ -350,7 +357,7 @@ void CollectFeatureRequirements(
 	const IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
 	for (const IFeatureInfo::FeatureInfoPtr& subFeaturePtr : subFeatures){
 		if (subFeaturePtr.IsValid()){
-			CollectFeatureRequirements(*subFeaturePtr, featurePath, requirementsByPath, pathsByFeatureId);
+			CollectFeatureRequirements(*subFeaturePtr, featurePath, requirementsByPath, pathsByFeatureId, requirements);
 		}
 	}
 }
@@ -459,5 +466,4 @@ QByteArrayList CollectImpliedPermissions(IProductInfo& productInfo, const QByteA
 
 
 } // namespace imtlic
-
 

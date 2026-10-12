@@ -557,6 +557,7 @@ struct FeatureCatalogNode
 	QByteArray featureId;
 	QByteArray subFeatureId;
 	bool isOptional = false;
+	bool hasSubFeatures = false;
 	QByteArrayList requirements;
 };
 
@@ -582,7 +583,20 @@ inline void CollectCatalogNodes(
 	node.featureId = featureId;
 	node.subFeatureId = isRoot ? QByteArray() : nodeId;
 	node.isOptional = featureInfo.IsOptional();
+	node.hasSubFeatures = !featureInfo.GetSubFeatures().isEmpty();
 	node.requirements = featureInfo.GetRequirements();
+	if (!parentPath.isEmpty()){
+		const QByteArray parentPath = nodePath.left(nodePath.lastIndexOf('/'));
+		const FeatureCatalogNode* parentNodePtr = nodesByPath.contains(parentPath)
+				? &nodesByPath[parentPath] : nullptr;
+		if (parentNodePtr != nullptr){
+			for (const QByteArray& requirement : parentNodePtr->requirements){
+				if (!node.requirements.contains(requirement)){
+					node.requirements.append(requirement);
+				}
+			}
+		}
+	}
 
 	nodesByPath.insert(nodePath, node);
 	nodesByFeatureId[featureId].append(node);
@@ -698,6 +712,9 @@ inline ProductFeatureClosure CompleteProductFeatures(
 
 				QHash<QByteArray, Detail::FeatureCatalogNode>::const_iterator requiredIter =
 						nodesByPath.constFind(requirement);
+				if (requiredIter == nodesByPath.constEnd() && !requirement.startsWith('/')){
+					requiredIter = nodesByPath.constFind(QByteArrayLiteral("/") + requirement);
+				}
 				if (requiredIter == nodesByPath.constEnd()){
 					if (!reportedRequirements.contains(requirement)){
 						reportedRequirements.insert(requirement);
@@ -708,6 +725,14 @@ inline ProductFeatureClosure CompleteProductFeatures(
 				}
 
 				const Detail::FeatureCatalogNode& requiredNode = requiredIter.value();
+				if (requiredNode.hasSubFeatures){
+					if (!reportedRequirements.contains(requirement)){
+						reportedRequirements.insert(requirement);
+						retVal.unresolvedRequirements.append(requirement);
+					}
+
+					continue;
+				}
 
 				if (!knownFeatureIds.contains(requiredNode.featureId)){
 					knownFeatureIds.insert(requiredNode.featureId);
@@ -748,5 +773,3 @@ inline ProductFeatureClosure CompleteProductFeatures(
 
 
 } // namespace imtlicgql
-
-

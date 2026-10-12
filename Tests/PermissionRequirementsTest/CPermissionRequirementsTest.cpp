@@ -9,6 +9,7 @@
 #include <imtauth/imtauth.h>
 #include <imtlic/CFeatureInfo.h>
 #include <imtlic/CProductInfo.h>
+#include <imtlicgql/imtlicgql.h>
 
 
 namespace
@@ -152,6 +153,52 @@ void CPermissionRequirementsTest::testRequirementCycleTerminates()
 			QByteArrayList{"/Administration/First"});
 
 	QCOMPARE(impliedPermissions, QByteArrayList{"/Administration/Second"});
+}
+
+
+void CPermissionRequirementsTest::testParentRequirementsApplyToDescendants()
+{
+	imtlic::CProductInfo productInfo;
+
+	imtlic::CFeatureInfo products;
+	products.SetFeatureId("Products");
+
+	imtlic::IFeatureInfo::FeatureInfoPtr editProducts = CreatePermission(
+			"EditProducts", QByteArrayList{"/Products/ViewProducts"});
+	editProducts->InsertSubFeature(CreatePermission("AddProduct", QByteArrayList()));
+	products.InsertSubFeature(editProducts);
+
+	products.InsertSubFeature(CreatePermission("ViewProducts", QByteArrayList()));
+	productInfo.AddFeature("Products", products);
+
+	const QByteArrayList impliedPermissions = imtlic::CollectImpliedPermissions(
+			productInfo,
+			QByteArrayList{"/Products/EditProducts/AddProduct"});
+
+	QVERIFY(impliedPermissions.contains("/Products/ViewProducts"));
+}
+
+
+void CPermissionRequirementsTest::testContainerCannotBeRequirementTarget()
+{
+	imtlic::CProductInfo productInfo;
+
+	imtlic::CFeatureInfo products;
+	products.SetFeatureId("Products");
+	products.InsertSubFeature(CreatePermission("EditProducts", QByteArrayList()));
+	products.InsertSubFeature(CreatePermission("ViewProducts", QByteArrayList()));
+	productInfo.AddFeature("Products", products);
+
+	imtlic::CFeatureInfo other;
+	other.SetFeatureId("Other");
+	other.InsertSubFeature(CreatePermission("UseProducts", QByteArrayList{"/Products/EditProducts"}));
+	productInfo.AddFeature("Other", other);
+
+	const QByteArrayList impliedPermissions = imtlic::CollectImpliedPermissions(
+			productInfo,
+			QByteArrayList{"/Other/UseProducts"});
+
+	QVERIFY(impliedPermissions.isEmpty());
 }
 
 
