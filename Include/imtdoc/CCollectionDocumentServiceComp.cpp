@@ -264,7 +264,7 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 		return false;
 	}
 
-	imtbase::IObjectCollection::DataPtr objectPtr;
+	istd::IChangeableSharedPtr objectPtr;
 	if (!documentInfo.objectId.isEmpty()){
 		if (!collectionPtr->GetObjectData(documentInfo.objectId, objectPtr) || !objectPtr.IsValid()){
 			return false;
@@ -272,7 +272,7 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 	}
 
 	if (!objectPtr.IsValid()){
-		objectPtr = CreateObject(typeId).PopInterfacePtr();
+		objectPtr.FromUnique(CreateObject(typeId));
 	}
 
 	if (!objectPtr.IsValid()){
