@@ -20,7 +20,7 @@ SimpleCollectionPage {
 
 	entityName: qsTr("User")
 	entityNamePlural: qsTr("Members")
-	descriptionText: qsTr("Manage tenant members. Users created here automatically become members.")
+	descriptionText: qsTr("Manage the members of the organization. Users created here automatically become members.")
 
 	documentManager: apiClient ? apiClient.userDocumentManager : null
 	objectTypeId: apiClient ? apiClient.userObjectTypeId : ""
@@ -67,6 +67,19 @@ SimpleCollectionPage {
 				if (result === Enums.yes && membersPage.apiClient) {
 					var tid = membersPage.model ? membersPage.model.m_id : ""
 					membersPage.apiClient.transferOwnership(tid, memberActionMenu.targetUserId)
+				}
+			}
+		)
+	}
+
+	function confirmLeave() {
+		ModalDialogManager.showConfirmationDialog(
+			qsTr("Leave Organization"),
+			qsTr("Are you sure you want to leave this organization? You will lose access to it."),
+			function(result) {
+				if (result === Enums.yes && membersPage.apiClient) {
+					var tid = membersPage.model ? membersPage.model.m_id : ""
+					membersPage.apiClient.removeMember(tid, memberActionMenu.targetUserId)
 				}
 			}
 		)
@@ -443,13 +456,26 @@ SimpleCollectionPage {
 						if (!membersPage.__canExcludeMember)
 							return
 
-						var count = membersPage.selectionManager.selectedIds.length
+						// The owner, the creator and the current user are not excluded by others.
+						var tenant = membersPage.model
+						var ids = []
+						var selectedIds = membersPage.selectionManager.selectedIds
+						for (var k = 0; k < selectedIds.length; k++) {
+							var selectedId = selectedIds[k]
+							if (tenant && (selectedId === tenant.m_ownerId || selectedId === tenant.m_creatorId || selectedId === tenant.m_currentUserId))
+								continue
+							ids.push(selectedId)
+						}
+						if (ids.length === 0) {
+							PopupManager.addInfoMessage(qsTr("The owner, the creator of the organization and you cannot be excluded here."), true)
+							return
+						}
+
 						ModalDialogManager.showConfirmationDialog(
 									qsTr("Exclude Members"),
-									qsTr("Are you sure you want to exclude %1 selected member(s) from this tenant?").arg(count),
+									qsTr("Are you sure you want to exclude %1 selected member(s) from this organization?").arg(ids.length),
 									function(result) {
 										if (result === Enums.yes) {
-											var ids = membersPage.selectionManager.selectedIds.slice()
 											for (var i = 0; i < ids.length; i++)
 												membersPage.removeItem(ids[i])
 											membersPage.selectionManager.clear()
@@ -624,11 +650,11 @@ SimpleCollectionPage {
 					memberActionContextModel.append({"id": "", "name": "", "icon": ""})
 
 				if (memberActionMenu.showExclude)
-					memberActionContextModel.append({"id": "Exclude", "name": qsTr("Exclude from Tenant"), "icon": "", "isEnabled": true})
+					memberActionContextModel.append({"id": "Exclude", "name": qsTr("Exclude from Organization"), "icon": "", "isEnabled": true})
 				if (memberActionMenu.showTransfer)
 					memberActionContextModel.append({"id": "Transfer", "name": qsTr("Transfer Ownership"), "icon": "", "isEnabled": true})
 				if (memberActionMenu.showLeave)
-					memberActionContextModel.append({"id": "Leave", "name": qsTr("Leave Workspace"), "icon": "", "isEnabled": true})
+					memberActionContextModel.append({"id": "Leave", "name": qsTr("Leave Organization"), "icon": "", "isEnabled": true})
 			}
 		}
 	}
@@ -655,7 +681,7 @@ SimpleCollectionPage {
 
 					ModalDialogManager.showConfirmationDialog(
 						qsTr("Exclude Member"),
-						qsTr("Are you sure you want to exclude \"%1\" from this tenant?").arg(memberActionMenu.targetUserName),
+						qsTr("Are you sure you want to exclude \"%1\" from this organization?").arg(memberActionMenu.targetUserName),
 						function(result) {
 							if (result === Enums.yes && membersPage.apiClient) {
 								var tenantIdExclude = membersPage.model ? membersPage.model.m_id : ""
@@ -669,10 +695,7 @@ SimpleCollectionPage {
 						membersPage.confirmTransferOwnership()
 				}
 				else if (commandId === "Leave") {
-					if (membersPage.apiClient) {
-						var ltid = membersPage.model ? membersPage.model.m_id : ""
-						membersPage.apiClient.removeMember(ltid, memberActionMenu.targetUserId)
-					}
+					membersPage.confirmLeave()
 				}
 			}
 		}
@@ -719,13 +742,13 @@ SimpleCollectionPage {
 		closePolicy: Enums.popupCloseOnEscape | Enums.popupCloseOnPressOutside
 
 		MenuItem {
-			text: qsTr("Exclude from Tenant")
+			text: qsTr("Exclude from Organization")
 			visible: memberActionMenu.showExclude
 			height: visible ? implicitHeight : 0
 			onTriggered: {
 				ModalDialogManager.showConfirmationDialog(
 					qsTr("Exclude Member"),
-					qsTr("Are you sure you want to exclude \"%1\" from this tenant?").arg(memberActionMenu.targetUserName),
+					qsTr("Are you sure you want to exclude \"%1\" from this organization?").arg(memberActionMenu.targetUserName),
 					function(result) {
 						if (result === Enums.yes && membersPage.apiClient) {
 							var tenantId = membersPage.model ? membersPage.model.m_id : ""
@@ -746,14 +769,11 @@ SimpleCollectionPage {
 		}
 
 		MenuItem {
-			text: qsTr("Leave Workspace")
+			text: qsTr("Leave Organization")
 			visible: memberActionMenu.showLeave
 			height: visible ? implicitHeight : 0
 			onTriggered: {
-				if (membersPage.apiClient) {
-					var ltid = membersPage.model ? membersPage.model.m_id : ""
-					membersPage.apiClient.removeMember(ltid, memberActionMenu.targetUserId)
-				}
+				membersPage.confirmLeave()
 			}
 		}
 	}

@@ -27,6 +27,7 @@ ViewBase {
 
 	property string __selectedTargetTenantId: ""
 	property string __selectedTargetTenantName: ""
+	property string __grantorTenantName: ""
 	property string __selectedExpiresAt: ""
 	property bool __isActive: true
 	property bool __loadingGui: false
@@ -56,13 +57,15 @@ ViewBase {
 		}
 		container.__selectedTargetTenantId = container.grantData.m_targetTenantId || ""
 		container.__selectedTargetTenantName = container.grantData.m_targetTenantName || container.grantData.m_targetTenantId || ""
+		container.__grantorTenantName = container.grantData.m_sourceTenantName || container.grantData.m_sourceTenantId || ""
 
 		grantNameInput.text = container.grantData.m_name || ""
 
 		var roleIds = container.grantData.m_roleIds || []
+		var roleNames = container.grantData.m_roleNames || []
 		var arr = []
 		for (var i = 0; i < roleIds.length; i++)
-			arr.push({id: roleIds[i], name: roleIds[i]})
+			arr.push({id: roleIds[i], name: roleNames[i] || roleIds[i]})
 		rolesSelectEditor.items = arr
 
 		grantDescriptionInput.text = container.grantData.m_description || ""
@@ -83,6 +86,7 @@ ViewBase {
 			return
 		}
 		container.grantData.m_targetTenantId = container.__selectedTargetTenantId || ""
+		container.grantData.m_targetTenantName = container.__selectedTargetTenantName || ""
 
 		container.grantData.m_name = grantNameInput.text.trim()
 
@@ -141,7 +145,7 @@ ViewBase {
 				TextInputElementView {
 					id: grantNameInput
 					name: qsTr("Name")
-					placeHolderText: qsTr("Auto-generated from tenant and roles if left empty")
+					placeHolderText: qsTr("Generated from the organization and the roles if left empty")
 					readOnly: container.isReadOnly
 					onEditingFinished: {
 						container.doUpdateModel()
@@ -149,7 +153,21 @@ ViewBase {
 				}
 
 				ElementView {
-					name: qsTr("Target Tenant")
+					name: qsTr("Granting Organization")
+					visible: container.isReadOnly
+
+					controlComp: Component {
+						BaseText {
+							text: container.__grantorTenantName
+							color: Style.textColor
+							font.pixelSize: Style.fontSizeM
+						}
+					}
+				}
+
+				ElementView {
+					name: qsTr("Target Organization")
+					visible: !container.isReadOnly
 
 					controlComp: Component {
 						Row {
@@ -160,7 +178,7 @@ ViewBase {
 								anchors.verticalCenter: parent.verticalCenter
 								text: container.__selectedTargetTenantName
 								  || container.__selectedTargetTenantId
-								  || qsTr("Select tenant...")
+								  || qsTr("Select organization...")
 								color: container.__selectedTargetTenantId
 								   ? Style.textColor : Style.inactiveTextColor
 								font.pixelSize: Style.fontSizeM
@@ -293,7 +311,8 @@ ViewBase {
 
 		FilterableSelectPopup {
 			dataProvider: container.apiClient ? container.apiClient.connectionsDataProvider : null
-			filterPlaceholder: qsTr("Select tenant...")
+			filterPlaceholder: qsTr("Select organization...")
+			emptyText: qsTr("No connected organizations. Connect one under Relationships first.")
 			preselectedIds: container.__selectedTargetTenantId
 				? [container.__selectedTargetTenantId] : []
 

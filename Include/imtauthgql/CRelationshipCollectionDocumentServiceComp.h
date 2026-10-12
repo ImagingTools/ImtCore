@@ -18,8 +18,10 @@ namespace imtauthgql
  * Server-side handler for the Relationship collection's per-document representation
  * GraphQL endpoints (analogous to CRoleCollectionDocumentServiceComp).
  *
- * Reads/writes the ITenantRelationshipInfo working copy that the server-side
- * CollectionDocumentManager holds for a given documentId.
+ * Reads the ITenantRelationshipInfo working copy that the server-side
+ * CollectionDocumentManager holds for a given documentId. Relationships are
+ * never written through a document: they come into force or change only by a
+ * relationship proposal approved by both organizations.
  */
 class CRelationshipCollectionDocumentServiceComp:
 			public sdl::V1_0::imtauth::CRelationshipCollectionDocumentServiceGqlHandlerCompBase
@@ -29,7 +31,6 @@ public:
 
 	I_BEGIN_COMPONENT(CRelationshipCollectionDocumentServiceComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", true, "CollectionDocumentService");
-		I_ASSIGN(m_connectionCollectionCompPtr, "ConnectionCollection", "Tenant connections collection", true, "ConnectionCollection");
 		I_ASSIGN(m_tenantCollectionCompPtr, "TenantCollection", "Tenant collection for name resolution", false, "TenantCollection");
 	I_END_COMPONENT
 
@@ -46,7 +47,6 @@ protected:
 
 private:
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
-	I_REF(imtbase::IObjectCollection, m_connectionCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);
 };
 

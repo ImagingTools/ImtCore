@@ -190,7 +190,7 @@ QtObject {
 			var tenantId = data.containsKey("tenantId") ? data.getData("tenantId") : ""
 			var tenantName = data.containsKey("tenantName") ? data.getData("tenantName") : ""
 			var role = data.containsKey("role") ? data.getData("role") : ""
-			var tName = tenantName ? tenantName : qsTr("a tenant")
+			var tName = tenantName ? tenantName : qsTr("an organization")
 
 			if (notificationType === "InvitationReceived" || notificationType === 0) {
 				PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), false)

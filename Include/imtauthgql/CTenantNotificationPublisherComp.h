@@ -7,6 +7,7 @@
 #include <imod/TSingleModelObserverBase.h>
 
 // Qt includes
+#include <QMap>
 #include <QRecursiveMutex>
 
 // ImtCore includes
@@ -22,17 +23,17 @@ namespace imtauthgql
 
 
 /**
-	Server-side publisher that broadcasts notifications when tenant-related
-	state changes: membership lifecycle, invitation lifecycle, or ownership
-	transfer.
+	Server-side publisher of the membership notifications of a user.
 
-	The component observes:
-	- imtauth::ITenantMembershipManager — membership state changes
-	  (inactive→active = InvitationAccepted, removal of inactive = InvitationRejected)
-	- imtauth::ITenantInvitationManager — invitation lifecycle
-	  (new pending invitation = InvitationReceived, status transitions)
-	- imtauth::ITenantManager — ownership transfers
-	  (owner changed = OwnershipTransferred)
+	Every change of the observed managers is compared with a snapshot of all
+	memberships, invitations and owners, and each transition is announced to
+	the users it concerns:
+	- InvitationReceived: the invited user (also when the invitation is resent)
+	- InvitationAccepted, InvitationRejected: the user who sent the invitation
+	- InvitationRevoked: the invited user
+	- MembershipRoleChanged: the member whose organization permissions changed
+	- MembershipRemoved: the removed member and the owner of the organization
+	- OwnershipTransferred: the previous and the new owner
 
 	Notifications are delivered only to subscribers whose authenticated user
 	matches the target userId.
@@ -77,45 +78,48 @@ protected:
 	I_REF(imod::IModel, m_invitationManagerModelCompPtr);
 
 private:
-	struct CachedMembership
+	struct MembershipState
 	{
 		QByteArray userId;
 		QByteArray tenantId;
-		bool isActive;
+		QByteArrayList organizationPermissions;
 	};
 
-	struct CachedTenantOwner
-	{
-		QByteArray ownerId;
-	};
-
-	struct CachedInvitation
+	struct InvitationState
 	{
 		QByteArray userId;
 		QByteArray tenantId;
 		QByteArray invitedByUserId;
-		imtauth::ITenantInvitation::TenantInvitationStatus status;
+		imtauth::ITenantInvitation::TenantInvitationStatus status = imtauth::ITenantInvitation::TIS_PENDING;
+		QString lastSentAt;
 	};
 
-	void PublishNotification(
-		const QByteArray& targetUserId,
-		sdl::V1_0::imtauth::EMembershipNotificationType notificationType,
-		const QByteArray& membershipId,
-		const QByteArray& userId,
-		const QByteArray& tenantId,
-		const QString& tenantName,
-		const QByteArray& roleId) const;
+	struct Snapshot
+	{
+		QMap<QByteArray, MembershipState> memberships;
+		QMap<QByteArray, InvitationState> invitations;
+		QMap<QByteArray, QByteArray> owners;
+	};
 
-	QByteArray FindTenantOwnerUserId(const QByteArray& tenantId) const;
+	struct Notification
+	{
+		QByteArray targetUserId;
+		sdl::V1_0::imtauth::EMembershipNotificationType notificationType;
+		QByteArray membershipId;
+		QByteArray userId;
+		QByteArray tenantId;
+	};
 
-	// Cache of membershipId → state for change detection.
-	mutable QMap<QByteArray, CachedMembership> m_cachedMemberships;
-	// Cache of tenantId → ownerId for ownership change detection.
-	mutable QMap<QByteArray, CachedTenantOwner> m_cachedTenantOwners;
-	// Cache of invitationId → state for invitation lifecycle detection.
-	mutable QMap<QByteArray, CachedInvitation> m_cachedInvitations;
-	// Protects all caches from concurrent access.
-	mutable QRecursiveMutex m_cacheMutex;
+	Snapshot TakeSnapshot() const;
+	QList<Notification> CompareSnapshots(const Snapshot& before, const Snapshot& after) const;
+
+	void PublishNotification(const Notification& notification) const;
+
+	QString FindTenantName(const QByteArray& tenantId) const;
+
+	Snapshot m_snapshot;
+	// Protects the snapshot from concurrent model notifications.
+	mutable QRecursiveMutex m_snapshotMutex;
 };
 
 

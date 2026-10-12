@@ -443,10 +443,12 @@ type GetRelationshipProposalsPayload {
 type CrossOrgGrant {
 	id: ID!
 	sourceTenantId: ID!
+	sourceTenantName: String
 	targetTenantId: ID!
 	targetTenantName: String
 	name: String
 	roleIds: [ID]
+	roleNames: [String]
 	description: String
 	createdAt: String
 	expiresAt: String

@@ -119,7 +119,7 @@ ViewBase {
 			}
 
 			BaseText {
-				text: qsTr("Select which product features are available for this tenant.")
+				text: qsTr("Select which product features are available for this organization.")
 				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 			}

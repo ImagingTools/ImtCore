@@ -29,7 +29,7 @@ bool CTenantDocumentValidatorComp::ValidateDocumentData(
 
 	const QString tenantName = tenantInfo->GetTenantName().trimmed();
 	if (tenantName.isEmpty()){
-		errorMessage = QStringLiteral("Tenant name must be specified");
+		errorMessage = QStringLiteral("Organization name must be specified");
 		return false;
 	}
 
@@ -52,7 +52,7 @@ bool CTenantDocumentValidatorComp::ValidateDocumentData(
 
 	const imtbase::ICollectionInfo::Ids foundIds = m_tenantCollectionCompPtr->GetElementIds(0, 1, &filterParams);
 	if (!foundIds.isEmpty()){
-		errorMessage = QStringLiteral("Tenant with the same name already exists");
+		errorMessage = QStringLiteral("An organization with the same name already exists");
 		return false;
 	}
 
