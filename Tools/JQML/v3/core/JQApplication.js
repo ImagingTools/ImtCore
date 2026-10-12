@@ -326,6 +326,10 @@ module.exports = {
                 pointer-events: all;
             }
 
+            html.jq-hittest .jq-mouse {
+                pointer-events: all;
+            }
+
             .Window {
                 width: 100vw;
                 height: 100vh;
