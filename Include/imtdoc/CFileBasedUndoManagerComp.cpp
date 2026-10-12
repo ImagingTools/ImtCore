@@ -219,6 +219,12 @@ bool CFileBasedUndoManagerComp::Serialize(iser::IArchive& archive)
 		RestoreObservedObject(*m_currentStatePtr);
 	}
 
+	if (!archive.IsStoring() && !retVal){
+		m_undoList.clear();
+		m_redoList.clear();
+		m_currentStatePtr.reset();
+	}
+
 	return retVal;
 }
 
