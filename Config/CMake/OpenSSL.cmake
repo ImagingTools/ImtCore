@@ -1,42 +1,57 @@
 if (USE_FIND_PACKAGE)
 	find_package(OpenSSL)
 	target_link_libraries(${PROJECT_NAME} PUBLIC OpenSSL::Crypto OpenSSL::SSL)
-else()
 
-	include_directories(${OPENSSLDIR})
-
-	# Cross compile fix for WIN -> *NIX systems
-	if (OPENSSLDIR)
-		string(REPLACE "\\" "/" OPENSSLDIR ${OPENSSLDIR})
-	endif()
-
-	if(WIN32)
-		if(${CMAKE_CL_64} STREQUAL 1)
-			target_link_libraries(${PROJECT_NAME} PUBLIC ${OPENSSLDIR}/lib/x64/libcrypto.lib)
-			target_link_libraries(${PROJECT_NAME} PUBLIC ${OPENSSLDIR}/lib/x64/libssl.lib)
-		else()
-			target_link_libraries(${PROJECT_NAME} PUBLIC ${OPENSSLDIR}/lib/x86/libcrypto.lib)
-			target_link_libraries(${PROJECT_NAME} PUBLIC ${OPENSSLDIR}/lib/x86/libssl.lib)
-		endif()
-	elseif(ANDROID)
-		target_link_libraries(${PROJECT_NAME} PUBLIC ${OPENSSLDIR}/lib/android/libcrypto_1_1.so)
-		target_link_libraries(${PROJECT_NAME} PUBLIC ${OPENSSLDIR}/lib/android/libssl_1_1.so)
-		set(ANDROID_EXTRA_LIBS
-			${OPENSSLDIR}/lib/android/libcrypto_1_1.so
-			${OPENSSLDIR}/lib/android/libssl_1_1.so
-			CACHE INTERNAL "")
-		message("ANDROID_EXTRA_LIBS ${ANDROID_EXTRA_LIBS}")
-	elseif(APPLE)
-		if("${CMAKE_OSX_ARCHITECTURES}" STREQUAL "arm64")
-			target_link_libraries(${PROJECT_NAME} PUBLIC ${OPENSSLDIR}/lib/ClangOSX_arm64/libcrypto.a)
-		else()
-			target_link_libraries(${PROJECT_NAME} PUBLIC ${OPENSSLDIR}/lib/ClangOSX_x64/libcrypto.a)
-		endif()
-
-	elseif(UNIX)
-		# target_link_libraries(${PROJECT_NAME} PUBLIC -lcrypto)
-		target_link_libraries(${PROJECT_NAME} PUBLIC ${OPENSSLDIR}/lib/linux/libcrypto.so)
-	endif()
-
+	return()
 endif()
 
+if (OPENSSLDIR)
+	file(TO_CMAKE_PATH "${OPENSSLDIR}" OPENSSLDIR)
+endif()
+
+include_directories(${OPENSSLDIR})
+
+if(WIN32)
+	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set(OPENSSL_WIN_ARCH x64)
+	else()
+		set(OPENSSL_WIN_ARCH x86)
+	endif()
+
+	target_link_libraries(${PROJECT_NAME} PUBLIC
+		${OPENSSLDIR}/lib/${OPENSSL_WIN_ARCH}/libcrypto.lib
+		${OPENSSLDIR}/lib/${OPENSSL_WIN_ARCH}/libssl.lib
+	)
+elseif(ANDROID)
+	file(GLOB OPENSSL_ANDROID_CRYPTO ${OPENSSLDIR}/lib/android/libcrypto_*.so)
+	file(GLOB OPENSSL_ANDROID_SSL ${OPENSSLDIR}/lib/android/libssl_*.so)
+
+	target_link_libraries(${PROJECT_NAME} PUBLIC 
+		${OPENSSL_ANDROID_CRYPTO} 
+		${OPENSSL_ANDROID_SSL}
+	)
+
+	set(ANDROID_EXTRA_LIBS
+		${OPENSSL_ANDROID_CRYPTO}
+		${OPENSSL_ANDROID_SSL}
+		CACHE INTERNAL ""
+	)
+	message("ANDROID_EXTRA_LIBS ${ANDROID_EXTRA_LIBS}")
+elseif(APPLE)
+	if(CMAKE_OSX_ARCHITECTURES STREQUAL "arm64")
+		set(OPENSSL_OSX_ARCH arm64)
+	else()
+		set(OPENSSL_OSX_ARCH x64)
+	endif()
+
+	target_link_libraries(${PROJECT_NAME} PUBLIC
+		${OPENSSLDIR}/lib/ClangOSX_${OPENSSL_OSX_ARCH}/libssl.a
+		${OPENSSLDIR}/lib/ClangOSX_${OPENSSL_OSX_ARCH}/libcrypto.a
+	)
+elseif(UNIX)
+	target_link_libraries(${PROJECT_NAME} PUBLIC
+		${OPENSSLDIR}/lib/linux/libssl.so
+		# no compiled lib for v1.1
+		# ${OPENSSLDIR}/lib/linux/libcrypto.so
+	)
+endif()
