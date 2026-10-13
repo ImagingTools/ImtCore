@@ -402,10 +402,10 @@ ViewBase {
 		__updateCommandStates()
 	}
 
-	// Requirements belong to the row the user picked in the Subfeatures table;
-	// with nothing selected the requirements panel has no subject and stays hidden.
+	// Requirements belong to the selected row, or to the feature itself when no
+	// sub-feature is selected.
 	function updateActiveFeature() {
-		activeFeature = selectedFeature
+		activeFeature = selectedFeature ? selectedFeature : featureData
 	}
 
 	function activeFeaturePath() {
@@ -563,9 +563,8 @@ ViewBase {
 		return details
 	}
 
-	// A feature that owns sub-features is a grouping, not a capability: what it
-	// grants is whatever its children grant. Requirements, Optional and
-	// Permission therefore only apply to the leaves of the tree.
+	// Optional and Permission apply only to leaves. A feature with sub-features
+	// may still carry requirements which are inherited by its descendants.
 	function isLeafNode(node) {
 		return node !== null && node !== undefined
 			&& (!node.children || node.children.length === 0)
@@ -1436,10 +1435,9 @@ ViewBase {
 							anchors.right: parent.right
 							anchors.rightMargin: Style.marginXS
 							anchors.verticalCenter: parent.verticalCenter
-							text: !rowContent.isLeaf ? qsTr("Set on the sub-features")
-								: requirementsCell.summary !== "" ? requirementsCell.summary : "-"
+							text: requirementsCell.summary !== "" ? requirementsCell.summary : "-"
 							font.italic: !rowContent.isLeaf
-							color: requirementsCell.summary !== "" && rowContent.isLeaf
+							color: requirementsCell.summary !== ""
 								? Style.textColor : Style.inactiveTextColor
 							elide: Text.ElideRight
 						}
@@ -1496,22 +1494,20 @@ ViewBase {
 					objectName: "DependenciesPanel"
 					subtitle: featureEditor.activeFeature ? featureEditor.activeFeature.m_featureName : ""
 					model: featureEditor.requirementEntries
-					// Requirements belong to exactly one feature, and only to one
-					// that has no sub-features of its own: a grouping grants what
-					// its children grant, so its own requirements mean nothing.
+					// A feature with sub-features may carry requirements of its own;
+					// those requirements are inherited by its descendants.
 					contentActive: featureEditor.activeFeature !== null
 						&& treeExplorer.checkedNodes.length < 2
-						&& featureEditor.isLeafNode(treeExplorer.selectedNode)
 					revealKey: featureEditor.activeFeaturePath()
 					placeholderText: treeExplorer.checkedNodes.length > 1
 						? qsTr("More than one row is ticked")
 						: featureEditor.activeFeature !== null
-							? qsTr("This feature has sub-features") : qsTr("No sub-feature selected")
+							? "" : qsTr("No feature selected")
 					placeholderDescription: treeExplorer.checkedNodes.length > 1
 						? qsTr("Requirements belong to a single feature - untick the rest to edit them")
 						: featureEditor.activeFeature !== null
-							? qsTr("A feature that groups others grants whatever they grant, so it carries no requirements of its own. Open it and set them on the sub-features inside.")
-							: qsTr("Pick a row on the left to see and edit what it requires")
+							? qsTr("Select a requirement to apply it to this feature and its descendants")
+							: qsTr("Pick a feature on the left to see and edit what it requires")
 					nameColumnTitle: qsTr("Feature")
 					iconSource: "Icons/Dependencies"
 					searchPlaceholder: qsTr("Search features")
@@ -1557,9 +1553,7 @@ ViewBase {
 				idleHintText: featureEditor.levelAcceptsChildren(treeExplorer.navigationStack)
 					? qsTr("Select a sub-feature, or press New sub-feature to add one")
 					: qsTr("Fill in Feature Name and Feature ID on the General page to add sub-features here")
-				selectedHintText: featureEditor.isLeafNode(treeExplorer.selectedNode)
-					? qsTr("Edit or F2 changes this row; the Sub-features chip opens the level below")
-					: qsTr("This feature groups others - Optional, Permission and requirements are set on the sub-features inside it")
+				selectedHintText: qsTr("Edit or F2 changes this row; the Sub-features chip opens the level below")
 				renameVisible: false
 				rowIconVisible: false
 				headerContentComponent: subfeaturesPage.subfeaturesHeaderComp
