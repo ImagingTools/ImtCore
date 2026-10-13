@@ -204,19 +204,19 @@ void CWebSocketClientComp::OnModelChanged(int modelId, const istd::IChangeable::
 }
 
 
-// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
-
-void CWebSocketClientComp::OnSystemShutdown()
+void CWebSocketClientComp::Shutdown()
 {
 	disconnect(&m_webSocket, &QWebSocket::connected, this, &CWebSocketClientComp::OnWebSocketConnected);
 
-	emit EmitStopTimer();
+	m_refreshTimer.stop();
 
 	m_webSocket.disconnect();
 
 	emit EmitWebSocketClose();
 
 	BaseClass2::UnregisterAllModels();
+
+	m_isShutdown = true;
 }
 
 
@@ -243,6 +243,9 @@ void CWebSocketClientComp::OnComponentCreated()
 
 	connect(&m_refreshTimer, &QTimer::timeout, this, &CWebSocketClientComp::OnTimeout);
 
+	Q_ASSERT(QCoreApplication::instance() != nullptr);
+	connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, this, &CWebSocketClientComp::Shutdown);
+
 	m_refreshTimer.setSingleShot(true);
 	m_refreshTimer.setInterval(4000);
 
@@ -268,10 +271,7 @@ void CWebSocketClientComp::OnComponentCreated()
 
 void CWebSocketClientComp::OnComponentDestroyed()
 {
-	// Fallback (will not work in someb situations)
-	if (!m_runtimeStatusCompPtr.IsValid()){
-		OnSystemShutdown();
-	}
+	Q_ASSERT(m_isShutdown);
 
 	BaseClass::OnComponentDestroyed();
 }
