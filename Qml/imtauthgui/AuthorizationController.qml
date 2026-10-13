@@ -28,9 +28,9 @@ QtObject {
 	signal tenantSelected(string tenantId);
 	signal tenantSelectionFailed(string error);
 	signal changePasswordSuccessfully();
-	signal changePasswordFailed();
+	signal changePasswordFailed(string message, var violatedRules);
 	signal registerSuccessfully();
-	signal registerFailed();
+	signal registerFailed(string message, var violatedRules);
 
 	// --- Tenant membership lifecycle events ---
 	// Emitted by membership-aware views (e.g. TenantCollectionView) so other
@@ -60,14 +60,33 @@ QtObject {
 	property var __pendingRetryQueue: []
 	readonly property string authenticationTokenHeaderId: "x-authentication-token"
 
+	// Set per application in ACC and delivered with GetApplicationInfo; without tenants
+	// no tenant or organization request is sent at all.
+	readonly property bool tenantsEnabled: ApplicationInfoProvider.tenantsEnabled
+
 	// --- Pending invitations tracking ---
 	property int pendingInvitationsCount: 0
 	property var pendingInvitations: []
 
 	function refreshPendingInvitations() {
+		if (!root.tenantsEnabled)
+			return
 		if (!root.userTokenProvider.accessToken || root.userTokenProvider.accessToken === "")
 			return
 		__pendingInvitationsRequest.send(__pendingInvitationsInput)
+	}
+
+	function __startTenantTracking() {
+		if (!root.tenantsEnabled)
+			return
+		root.refreshPendingInvitations()
+		__membershipSubscription.registerSubscription()
+		tenantCollectionListener.registerSubscription()
+	}
+
+	function __stopTenantTracking() {
+		__membershipSubscription.unRegisterSubscription()
+		tenantCollectionListener.unRegisterSubscription()
 	}
 
 	function __updatePendingInvitations(invitationsList) {
@@ -135,15 +154,21 @@ QtObject {
 
 	// Refresh pending invitations on relevant events (including when sender revokes)
 	onLoggedIn: {
-		refreshPendingInvitations()
-		__membershipSubscription.registerSubscription()
-		tenantCollectionListener.registerSubscription()
+		root.__startTenantTracking()
 	}
 	onLoggedOut: {
-		__membershipSubscription.unRegisterSubscription()
-		tenantCollectionListener.unRegisterSubscription()
+		root.__stopTenantTracking()
 		__refreshInProgress = false
 		__pendingRetryQueue = []
+	}
+	// The application info can arrive after a restored session has already logged in.
+	onTenantsEnabledChanged: {
+		if (!root.userTokenProvider.accessToken || root.userTokenProvider.accessToken === "")
+			return
+		if (root.tenantsEnabled)
+			root.__startTenantTracking()
+		else
+			root.__stopTenantTracking()
 	}
 	onTenantInvitationReceived: refreshPendingInvitations()
 	onTenantInvitationAccepted: refreshPendingInvitations()
@@ -165,7 +190,7 @@ QtObject {
 			var tenantId = data.containsKey("tenantId") ? data.getData("tenantId") : ""
 			var tenantName = data.containsKey("tenantName") ? data.getData("tenantName") : ""
 			var role = data.containsKey("role") ? data.getData("role") : ""
-			var tName = tenantName ? tenantName : qsTr("a tenant")
+			var tName = tenantName ? tenantName : qsTr("an organization")
 
 			if (notificationType === "InvitationReceived" || notificationType === 0) {
 				PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), false)
@@ -718,11 +743,16 @@ QtObject {
 						root.registerSuccessfully();
 					}
 					else{
-						root.registerFailed();
+						root.registerFailed(m_message, m_violatedRules);
 					}
 
 				}
 			}
+		}
+
+		function onError(message, type) {
+			console.warn("Auth: registerUser request error:", message, type);
+			root.registerFailed(message, []);
 		}
 	}
 	
@@ -740,13 +770,18 @@ QtObject {
 						root.changePasswordSuccessfully();
 					}
 					else{
-						root.changePasswordFailed();
+						root.changePasswordFailed(m_message, m_violatedRules);
 					}
 				}
 			}
 		}
+
+		function onError(message, type) {
+			console.warn("Auth: changePassword request error:", message, type);
+			root.changePasswordFailed(message, []);
+		}
 	}
-	
+
 	property GqlSdlRequestSender logoutGqlSender: GqlSdlRequestSender {
 		context: root.context
 		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_logout;

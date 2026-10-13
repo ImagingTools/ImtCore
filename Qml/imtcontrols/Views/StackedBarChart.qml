@@ -6,8 +6,8 @@ Item{
 	id: chart
 
 	property var bars: [] // [{ label: "29 Oct", segments: [{label:"Trial", value:10, color:"#4CAF50"}, ...]}]
-	property color axisColor: "#999"
-	property color gridColor: "#ddd"
+	property color axisColor: Style.borderColor2
+	property color gridColor: Style.borderColor
 	property color textColor: Style.textColor
 	property real barWidth: 28
 	property bool showValues: false
@@ -36,7 +36,8 @@ Item{
 			for (let seg of bar.segments || []) {
 				if (!map[seg.label]) {
 					map[seg.label] = {
-						color: seg.color || "#ccc",
+						id: seg.id || "",
+						color: seg.color || Style.neutralSubtleColor,
 						total: 0
 					}
 				}
@@ -47,6 +48,7 @@ Item{
 		let result = []
 		for (let key in map) {
 			result.push({
+				id: map[key].id,
 				label: key,
 				total: map[key].total,
 				color: map[key].color
@@ -153,6 +155,12 @@ Item{
 				ctx.fillText(value.toString(), offsetLeft - 6, y)
 			}
 
+			let maxLabelWidth = 0
+			for (let i = 0; i < totalBars; i++){
+				maxLabelWidth = Math.max(maxLabelWidth, ctx.measureText(chart.bars[i].label).width)
+			}
+			let labelStep = Math.max(1, Math.ceil((maxLabelWidth + 6) / (barWidth + spacing)))
+
 			for (let i = 0; i < totalBars; i++){
 				let bar = chart.bars[i]
 				let x = offsetX + i * (barWidth + spacing)
@@ -166,7 +174,7 @@ Item{
 					if (isHighlighted){
 						ctx.fillStyle = Functions.darkenColor(seg.color,1.4)
 					} else{
-						ctx.fillStyle = seg.color || "#ccc"
+						ctx.fillStyle = seg.color || Style.neutralSubtleColor
 					}
 
 					ctx.fillRect(x, y, barWidth, segHeight)
@@ -192,7 +200,9 @@ Item{
 				ctx.font = Style.fontSizeXS + "px " + Style.fontFamily
 				ctx.textAlign = "center"
 				ctx.textBaseline = "top"
-				ctx.fillText(bar.label, x + barWidth / 2, baseY + 6)
+				if (i % labelStep === 0){
+					ctx.fillText(bar.label, x + barWidth / 2, baseY + 6)
+				}
 			}
 
 			ctx.save()
@@ -238,7 +248,7 @@ Item{
 				Text{
 					id: labelText
 					text: modelData.label + " (" + modelData.total + ")"
-					color: chart.legendClickable ? "#0b5ed7":chart.textColor
+					color: chart.legendClickable ? Style.linkColor:chart.textColor
 					font.pixelSize: Style.fontSizeS
 					anchors.verticalCenter: parent.verticalCenter
 

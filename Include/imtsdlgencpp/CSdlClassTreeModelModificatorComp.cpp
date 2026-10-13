@@ -60,9 +60,9 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSd
 	FeedStream(ofStream, 1, false);
 
 	// Write __typename for the type itself based on typename mode
-	const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode = 
+	const imtsdl::ISdlProcessArgumentsParser::TypenameWriteMode typenameMode =
 		m_argumentParserCompPtr.IsValid() ? m_argumentParserCompPtr->GetTypenameWriteMode() : imtsdl::ISdlProcessArgumentsParser::TWM_IF_REQUIRED;
-	
+
 	if (typenameMode == imtsdl::ISdlProcessArgumentsParser::TWM_ALWAYS){
 		FeedStreamHorizontally(ofStream);
 		ofStream << QStringLiteral("model.SetData(\"__typename\", \"");
@@ -116,6 +116,85 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSd
 
 
 // private methods
+
+void CSdlClassTreeModelModificatorComp::AddArrayElementWriteNullCheck(
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			const QString& modelVariableName,
+			const QString& indexVariableName,
+			quint16 hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (!") << field.GetId() << QStringLiteral("->at(") << indexVariableName << QStringLiteral(")){");
+	FeedStream(stream, 1, false);
+
+	if (field.AreArrayElementsRequired()){
+		AddErrorReport(stream, QStringLiteral("Array field '%3' contains a null element"), hIndents + 1, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("return false;");
+	}
+	else {
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << modelVariableName << QStringLiteral("->InsertNewItem();");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << modelVariableName << QStringLiteral("->SetData(QByteArray(), QVariant(), ") << indexVariableName << QStringLiteral(");");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("continue;");
+	}
+
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+}
+
+
+void CSdlClassTreeModelModificatorComp::AddArrayElementReadNullCheck(
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			const QString& modelVariableName,
+			const QString& indexVariableName,
+			bool isCustom,
+			quint16 hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (");
+	if (isCustom){
+		stream << modelVariableName << QStringLiteral("->ContainsKey(QByteArray(), ") << indexVariableName << QStringLiteral(") && !");
+		stream << modelVariableName << QStringLiteral("->GetData(QByteArray(), ") << indexVariableName << QStringLiteral(").isValid()");
+	}
+	else {
+		stream << QStringLiteral("!") << modelVariableName << QStringLiteral("->GetData(QByteArray(), ") << indexVariableName << QStringLiteral(").isValid()");
+	}
+	stream << QStringLiteral("){");
+	FeedStream(stream, 1, false);
+
+	if (field.AreArrayElementsRequired()){
+		AddErrorReport(stream, QStringLiteral("Array field '%3' contains a null element"), hIndents + 1, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("return false;");
+	}
+	else {
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List.AppendNull();");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("continue;");
+	}
+
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+}
+
 
 void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 			QTextStream& stream,
@@ -682,7 +761,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelImplCode(
 	stream << QStringLiteral("->ReadFromModel(");
 	stream <<  QStringLiteral("*");
 	stream << GetDecapitalizedValue(field.GetId());
-	stream << QStringLiteral("DataModelPtr, modelIndex);");	
+	stream << QStringLiteral("DataModelPtr, modelIndex);");
 	FeedStream(stream, 1, false);
 
 	// reading checks
@@ -713,12 +792,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelCode(
 			bool optional) const
 {
 	if (!optional && field.IsRequired()){
-		if (field.IsArray() && field.IsNonEmpty()){
-			AddArrayInternalChecksFail(stream, field, true);
-		}
-		else if (!optional && (!field.IsArray() || field.IsNonEmpty())){
-			AddArrayInternalChecksFail(stream, field, false);
-		}
+		AddArrayInternalChecksFail(stream, field, false);
 		AddPrimitiveArrayFieldWriteToModelImplCode(stream, field, sdlType, isEnum, isUnion, optional);
 		FeedStream(stream, 1, false);
 	}
@@ -730,6 +804,19 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelCode(
 		FeedStream(stream, 1, false);
 		AddPrimitiveArrayFieldWriteToModelImplCode(stream, field, sdlType, isEnum, isUnion, optional, 2);
 		stream << QStringLiteral("\n\t}");
+		if (!field.IsRequired()){
+			FeedStream(stream, 1, false);
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("else if (") << field.GetId() << QStringLiteral(".IsNull()){");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", QVariant(), modelIndex);");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream);
+			stream << '}';
+		}
 		FeedStream(stream, 1, false);
 	}
 }
@@ -767,6 +854,8 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 	stream << QStringLiteral("->size(); ++") << treeModelIndexVarName;
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
+
+	AddArrayElementWriteNullCheck(stream, field, newTreeModelVarName, treeModelIndexVarName, hIndents + 1);
 
 	if(isEnum){
 		FeedStreamHorizontally(stream, hIndents + 1);
@@ -875,6 +964,21 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelCode(
 		AddPrimitiveArrayFieldReadFromModelImplCode(stream, field, isEnum, isUnion, optional);
 	}
 	else {
+		if (!field.IsRequired()){
+			stream << QStringLiteral("if (model.ContainsKey(\"") << field.GetId() << QStringLiteral("\", modelIndex) && ");
+			stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model == nullptr){");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 2);
+			stream << field.GetId() << QStringLiteral(".SetNull();");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream);
+			stream << '}';
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream);
+		}
 		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model != nullptr){");
 		FeedStream(stream, 1, false);
 
@@ -908,23 +1012,6 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 	const QString variableName = GetTempVariableWrappedValue(field);
 	const QString variableCheckName = QStringLiteral("is%1Read").arg(GetCapitalizedValue(field.GetId()));
 
-	// value checks
-	if (field.IsNonEmpty()){
-		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("if (") << countVariableName << QStringLiteral(" <= 0){");
-		FeedStream(stream, 1, false);
-
-		AddErrorReport(stream, QStringLiteral("Field '%3' is empty"), hIndents + 1, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
-
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("return false;");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, hIndents);
-		stream << '}';
-		FeedStream(stream, 1, false);
-	}
-
 	// declare temp list var
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, true);
 	structNameConverter.addVersion = false;
@@ -947,6 +1034,8 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 	stream << indexVariableName << QStringLiteral(" < ") << countVariableName;
 	stream << QStringLiteral("; ++") << indexVariableName << QStringLiteral("){");
 	FeedStream(stream, 1, false);
+
+	AddArrayElementReadNullCheck(stream, field, GetDecapitalizedValue(field.GetId()) + QStringLiteral("Model"), indexVariableName, isUnion, hIndents + 1);
 
 	// inLoop: declare temp var
 	FeedStreamHorizontally(stream, hIndents + 1);
@@ -1060,9 +1149,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldWriteToModelCode(
 			bool optional) const
 {
 	if (!optional && field.IsRequired()){
-		if (field.IsArray()){
-			AddArrayInternalChecksFail(stream, field, field.IsNonEmpty());
-		}
+		AddArrayInternalChecksFail(stream, field, false);
 		AddCustomArrayFieldWriteToModelImplCode(stream, field, sdlType, optional);
 	}
 	else {
@@ -1073,6 +1160,19 @@ void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldWriteToModelCode(
 		FeedStream(stream, 1, false);
 		AddCustomArrayFieldWriteToModelImplCode(stream, field, sdlType, optional, 2);
 		stream << QStringLiteral("\n\t}");
+		if (!field.IsRequired()){
+			FeedStream(stream, 1, false);
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("else if (") << field.GetId() << QStringLiteral(".IsNull()){");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", QVariant(), modelIndex);");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream);
+			stream << '}';
+		}
 	}
 }
 
@@ -1111,6 +1211,8 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode
 	stream << QStringLiteral("->size(); ++") << treeModelIndexVarName;
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
+
+	AddArrayElementWriteNullCheck(stream, field, newTreeModelVarName, treeModelIndexVarName, hIndents + 1);
 
 	// inLoop: insert ien item to model
 	FeedStreamHorizontally(stream, hIndents + 1);
@@ -1178,6 +1280,21 @@ void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldReadFromModelCode(
 		FeedStream(stream, 1, false);
 	}
 	else {
+		if (!field.IsRequired()){
+			stream << QStringLiteral("if (model.ContainsKey(\"") << field.GetId() << QStringLiteral("\", modelIndex) && ");
+			stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model == nullptr){");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 2);
+			stream << field.GetId() << QStringLiteral(".SetNull();");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream);
+			stream << '}';
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream);
+		}
 		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model != nullptr){");
 		FeedStream(stream, 1, false);
 
@@ -1209,23 +1326,6 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model->GetItemsCount();");
 	FeedStream(stream, 1, false);
 
-	// value checks
-	if (field.IsNonEmpty()){
-		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("if (") << countVariableName << QStringLiteral(" <= 0){");
-		FeedStream(stream, 1, false);
-
-		AddErrorReport(stream, QStringLiteral("Field '%3' is empty"), hIndents, QStringList({QStringLiteral("\"%1\"").arg(field.GetId())}));
-
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("return false;");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, hIndents);
-		stream << '}';
-		FeedStream(stream, 1, false);
-	}
-
 	// declare temp list var
 	const QString listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("List");
 	FeedStreamHorizontally(stream, hIndents);
@@ -1240,6 +1340,8 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 	stream << indexVariableName << QStringLiteral(" < ") << countVariableName;
 	stream << QStringLiteral("; ++") << indexVariableName << QStringLiteral("){");
 	FeedStream(stream, 1, false);
+
+	AddArrayElementReadNullCheck(stream, field, GetDecapitalizedValue(field.GetId()) + QStringLiteral("Model"), indexVariableName, true, hIndents + 1);
 
 	// inLoop: declare temp var
 	const QString variableName = GetTempVariableWrappedValue(field);

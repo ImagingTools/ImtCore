@@ -1,0 +1,28 @@
+{
+  "requiredObjects": [
+    {
+      "value": "required"
+    }
+  ],
+  "nullableObjectsWithRequiredElements": [
+    {
+      "value": "optional-required"
+    }
+  ],
+  "nullableObjects": [
+    null,
+    {
+      "value": "nullable"
+    }
+  ],
+  "requiredScalars": [
+    "alpha"
+  ],
+  "nullableScalarsWithRequiredElements": [
+    "beta"
+  ],
+  "nullableScalars": [
+    null,
+    "omega"
+  ]
+}

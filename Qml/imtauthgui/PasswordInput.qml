@@ -11,23 +11,46 @@ Column {
 	property alias newPassword: newPasswordInput1.text;
 	property bool accepted: false;
 	property bool currentPasswordInputVisible: true;
-	
+	property string login: "";
+	property string errorText: "";
+
+	// PasswordPolicyController instance, injected by the owning view. Without it
+	// only the "passwords match" check applies.
+	property var policy: null;
+
 	onFocusChanged: {
 		if (root.focus){
 			currentPasswordInput.focus = root.focus;
 		}
 	}
-	
+
 	function checkPassword(){
-		root.accepted = newPasswordInput1.text !== "" && newPasswordInput1.text == newPasswordInput2.text;
-		
+		let matching = newPasswordInput1.text !== "" && newPasswordInput1.text == newPasswordInput2.text;
+		let violatedRules = root.policy ? root.policy.validate(root.login, newPasswordInput1.text) : [];
+
+		root.accepted = matching && (violatedRules.length === 0);
+
+		if (!matching){
+			root.errorText = qsTr("Passwords don't match");
+		}
+		else if (violatedRules.length > 0){
+			root.errorText = root.policy.describeFailure(violatedRules, "");
+		}
+		else{
+			root.errorText = "";
+		}
+
 		newPasswordInput1.acceptableInput = root.accepted;
 		newPasswordInput2.acceptableInput = root.accepted;
-		
-		newPasswordInput2.bottomComp = root.accepted ? emptyComp : errorComp;
+
+		newPasswordInput2.bottomComp = (root.errorText === "") ? emptyComp : errorComp;
 	}
-	
+
 	Component.onCompleted: {
+		if (root.policy){
+			root.policy.load();
+		}
+
 		if (currentPasswordInputVisible){
 			currentPasswordInput.forceActiveFocus();
 		}
@@ -35,12 +58,22 @@ Column {
 			oldPasswordGroup.forceActiveFocus();
 		}
 	}
-	
+
+	// The policy usually arrives after the field was built, so re-check what is typed.
+	Connections {
+		target: root.policy ? root.policy : null;
+
+		function onPolicyReceived() {
+			root.checkPassword();
+		}
+	}
+
 	Component {
 		id: errorComp;
-		
+
 		Text {
-			text: qsTr("Passwords don't match");
+			text: root.errorText;
+			wrapMode: Text.WordWrap;
 			color: Style.errorTextColor;
 			font.family: Style.fontFamily;
 			font.pixelSize: Style.fontSizeM;
@@ -103,6 +136,16 @@ Column {
 			KeyNavigation.tab: currentPasswordInput.visible ? currentPasswordInput : newPasswordInput1;
 			KeyNavigation.backtab: newPasswordInput1;
 		}
+	}
+
+	Text {
+		width: parent.width;
+		wrapMode: Text.WordWrap;
+		text: root.policy ? root.policy.requirementsText() : "";
+		visible: (text !== "") && (root.errorText === "");
+		color: Style.inactiveTextColor;
+		font.family: Style.fontFamily;
+		font.pixelSize: Style.fontSizeM;
 	}
 }
 

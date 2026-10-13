@@ -21,16 +21,16 @@ FocusScope {
     //    property alias maximumLength: textEdit.maximumLength;
 
     property string placeHolderText;
-    property string focusColor: Style.textSelected;
+    property string focusColor: Style.textSelectedColor;
 
     property string fontColor: Style.textColor;
-    property string placeHolderFontColor: "gray";
+    property string placeHolderFontColor: Style.placeHolderTextColor;
 
     property color borderColor:  Style.iconColorOnSelected;
     property string borderColorConst: "";
 
-    property int radius: 0;
-	property int textSize: Style.fontSizeLarge;
+    property int radius: Style.textFieldRadius;
+	property int textSize: Style.fontSizeM;
     property int placeHolderTextSize: textSize;
     property int echoMode: TextInput.Normal;
 	property int margin: Style.marginS;
@@ -170,7 +170,7 @@ FocusScope {
 
 
             verticalAlignment: TextInput.AlignVCenter;
-            selectionColor: Style.textSelected;
+            selectionColor: Style.textSelectedColor;
             selectByMouse: true;
             wrapMode: TextEdit.WordWrap;
             clip: true;

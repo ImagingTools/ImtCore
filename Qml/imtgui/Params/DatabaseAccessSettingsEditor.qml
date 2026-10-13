@@ -1,7 +1,6 @@
 import QtQuick 2.0
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import Qt.labs.platform 1.0
 import imtgui 1.0
 import imtbaseImtBaseTypesSdl 1.0
 import imtcontrols 1.0
@@ -10,66 +9,9 @@ ParamEditorBase {
 	id: dbEditor
 	
 	property DatabaseAccessSettings databaseParams: editorModel
+	property Component backupComp: null
 	editorModelComp: Component {
 		DatabaseAccessSettings {}
-	}
-	
-	RemoteFileController {
-		id: remoteFileController;
-		prefix: "/files/";
-		
-		onFileUploaded: {
-			PopupManager.addSuccessMessage(qsTr("Database restore was successful"), true)
-		}
-
-		onFileUploadFailed: {
-			PopupManager.addErrorMessage(qsTr("Error when trying to restore the database"), true)
-		}
-
-		onFileDownloadFailed: {
-			PopupManager.addErrorMessage(qsTr("Error when trying to create a database backup"), true)
-		}
-		
-		onStateChanged: {
-			if (remoteFileController.state === "Loading"){
-				Events.sendEvent("StartLoading");
-			}
-			else{
-				Events.sendEvent("StopLoading");
-			}
-		}
-	}
-	
-	FileDialog {
-		id: fileDialog;
-		title: qsTr("Select backup file");
-		fileMode: FileDialog.OpenFile;
-		nameFilters: ["All files (*)"];
-		
-		onAccepted: {
-			let filePath = fileDialog.file.toString();
-			filePath = filePath.replace('file:///', '')
-			
-			remoteFileController.sendFile(filePath);
-		}
-	}
-	
-	FileDialog {
-		id: fileDialogSave;
-		
-		title: qsTr("Save file");
-		
-		nameFilters: ["License files (*.backup)", "All files (*)"];
-		
-		fileMode: FileDialog.SaveFile;
-		
-		onAccepted: {
-			var pathDir = fileDialogSave.folder.toString();
-			remoteFileController.downloadedFileLocation = pathDir.replace('file:///', '');
-			var fileName = fileDialogSave.file.toString().replace(pathDir + "/", '');
-			
-			remoteFileController.getFile("GetBackupFile", fileName);
-		}
 	}
 	
 	sourceComp: Component {
@@ -178,40 +120,10 @@ ParamEditorBase {
 				}
 			} // GroupElementView
 			
-			GroupHeaderView {
-				id: headerView;
-				width: parent.width;
-				title: qsTr("Backup Information");
-				groupView: group;
-				visible: dbEditor.databaseParams ? dbEditor.databaseParams.m_canBackupRestore : false
+			Loader {
+				width: content.width
+				sourceComponent: dbEditor.backupComp
 			}
-			
-			GroupElementView {
-				id: group;
-				width: parent.width;
-				visible: dbEditor.databaseParams ? dbEditor.databaseParams.m_canBackupRestore : false
-				
-				ButtonElementView {
-					id: backupButton;
-					width: parent.width;
-					name: qsTr("Backup data");
-					description: qsTr("Before performing the operation, check the connection to the server");
-					text: qsTr("Backup");
-					onClicked: {
-						fileDialogSave.open();
-					}
-				}
-				
-				ButtonElementView {
-					width: parent.width;
-					name: qsTr("Restore data from backup");
-					text: qsTr("Restore");
-					description: backupButton.description;
-					onClicked: {
-						fileDialog.open();
-					}
-				}
-			} // GroupElementView
 		}
 	}
 }

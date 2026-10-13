@@ -188,7 +188,7 @@ Item{
 
 			visible: headerDelegate.sortable && headerMa.containsMouse && !headerDelegate.activeSort;
 			color: Style.alternateBaseColor;
-			radius: Style.marginS;
+			radius: Style.radiusM;
 		}
 
 		// The press itself. A wash that deepens under the finger and drains away
@@ -207,7 +207,7 @@ Item{
 
 			color: Style.selectedColor;
 			opacity: 0;
-			radius: Style.marginS;
+			radius: Style.radiusM;
 
 			// Quick to arrive, slower to leave: snapping straight back reads as a
 			// glitch, while a short drain reads as a release.

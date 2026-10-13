@@ -84,7 +84,7 @@ QString CSupportTicketDbDelegateComp::CreateVisibilityCondition(
 			visibilityConditions << QString(
 				"(EXISTS (SELECT 1 FROM \"Users\" AS \"ReporterUser\" "
 				"WHERE \"ReporterUser\".\"State\"='Active' "
-				"AND \"ReporterUser\".\"DocumentId\"::text = \"ReporterId\" "
+				"AND \"ReporterUser\".\"DocumentId\" = \"ReporterId\" "
 				"AND (\"ReporterUser\".\"Document\"->'Groups' ?| %1)) "
 				"OR EXISTS (SELECT 1 FROM \"Users\" AS \"AssigneeUser\" "
 				"WHERE \"AssigneeUser\".\"State\"='Active' "
@@ -275,6 +275,16 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 	const QString assigneeIdsStr = assigneeStrs.join(',');
 
 	QString reporterId = QString::fromUtf8(ticketPtr->GetReporterId());
+	if (reporterId.isEmpty()){
+		// Ticket saved without a preceding update: its creator is the reporter.
+		const imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
+		if (gqlContextPtr != nullptr){
+			reporterId = QString::fromUtf8(gqlContextPtr->GetUserId());
+		}
+	}
+	const QString reporterSql = reporterId.isEmpty()
+			? "NULL"
+			: QStringLiteral("'%1'").arg(imtdb::EscapeSql(reporterId));
 	const QString conversationId = QString::fromUtf8(ticketPtr->GetConversationId());
 	const QString messageId = QString::fromUtf8(ticketPtr->GetMessageId());
 	const QString resolvedAt = ticketPtr->GetResolvedAt();
@@ -301,7 +311,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 		"\"AssigneeIds\", \"ReporterId\", \"ConversationId\", \"MessageId\", "
 		"\"Locked\", \"LockReason\", "
 		"\"ResolvedAt\", \"ClosedAt\", \"CreatedAt\", \"UpdatedAt\") "
-		"VALUES('%1', '%2', '%3', %4, %5, %6, %7, %8, '%9', %10, %11, %12, %13, %14, %15, '%16', '%17');")
+		"VALUES('%1', '%2', '%3', %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15, '%16', '%17');")
 		.arg(ticketId)
 		.arg(imtdb::EscapeSql(title))
 		.arg(imtdb::EscapeSql(ticketPtr->GetDescription()))
@@ -310,7 +320,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSupportTicketDbDelegateComp::Cre
 		.arg(ticketPtr->GetStateReason())
 		.arg(ticketPtr->GetPriority())
 		.arg(assigneesSql)
-		.arg(reporterId)
+		.arg(reporterSql)
 		.arg(convSql)
 		.arg(msgSql)
 		.arg(ticketPtr->IsLocked() ? "TRUE" : "FALSE")

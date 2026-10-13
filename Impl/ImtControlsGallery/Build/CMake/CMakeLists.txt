@@ -18,10 +18,11 @@ if(NOT DEFINED QT_VERSION_MAJOR)
 	endif()
 endif()
 
-if(NOT DEFINED BUILDDIR)
-	get_filename_component(BUILDDIR "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+
+if(NOT DEFINED GALLERYDIR_BUILD)
+	get_filename_component(GALLERYDIR_BUILD "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
 else()
-	get_filename_component(BUILDDIR "${BUILDDIR}" ABSOLUTE)
+	get_filename_component(GALLERYDIR_BUILD "${BUILDDIR}" ABSOLUTE)
 endif()
 
 if(NOT DEFINED IMTCOREDIR)
@@ -39,7 +40,7 @@ imt_core_upgrade_partitura("${CMAKE_CURRENT_LIST_DIR}/../..")
 get_filename_component(INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include" ABSOLUTE)
 get_filename_component(IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl" ABSOLUTE)
 
-set(AUX_INCLUDE_DIR "${BUILDDIR}/ImtControlsGallery/AuxInclude/${TARGETNAME}/GeneratedFiles")
+set(AUX_INCLUDE_DIR "${GALLERYDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles")
 
 include_directories("${AUX_INCLUDE_DIR}/../")
 include_directories("${AUX_INCLUDE_DIR}/")

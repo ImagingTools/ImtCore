@@ -71,14 +71,39 @@ bool CParamSetRepresentationController::GetSdlRepresentationFromDataModel(
 			continue;
 		}
 
-		const IJsonRepresentationController* subControllerPtr = GetRepresentationController(*parameterPtr);
-		if (subControllerPtr == nullptr){
-			continue;
-		}
-
+		QByteArray typeId;
 		QJsonObject parameterRepresentation;
-		if (!subControllerPtr->GetRepresentationFromDataModel(*parameterPtr, parameterRepresentation, paramsPtr)){
-			return false;
+
+		// a registered (e.g. custom) sub-controller for this specific type takes priority over generic nested paramset handling
+		const IJsonRepresentationController* subControllerPtr = GetRepresentationController(*parameterPtr);
+		if (subControllerPtr != nullptr){
+			typeId = subControllerPtr->GetTypeId();
+
+			if (!subControllerPtr->GetRepresentationFromDataModel(*parameterPtr, parameterRepresentation, paramsPtr)){
+				return false;
+			}
+		}
+		else{
+			const iprm::IParamsSet* subParamsSetPtr = dynamic_cast<const iprm::IParamsSet*>(parameterPtr);
+			if (subParamsSetPtr == nullptr){
+				continue;
+			}
+
+			sdl::V1_0::imtbase::CParamsSet subRepresentation;
+			if (!GetSdlRepresentationFromDataModel(subRepresentation, *subParamsSetPtr, paramsPtr)){
+				return false;
+			}
+
+			// a nested set without any representable parameter has nothing to show or edit
+			if (subRepresentation.parameters->isEmpty()){
+				continue;
+			}
+
+			if (!subRepresentation.WriteToJsonObject(parameterRepresentation)){
+				return false;
+			}
+
+			typeId = GetTypeId();
 		}
 
 		sdl::V1_0::imtbase::CParameter parameter;
@@ -87,7 +112,7 @@ bool CParamSetRepresentationController::GetSdlRepresentationFromDataModel(
 		parameter.data = jsonDocument.toJson(QJsonDocument::Compact);
 
 		parameter.id = parameterId;
-		parameter.typeId = subControllerPtr->GetTypeId();
+		parameter.typeId = typeId;
 
 		QString name;
 		QString description;
@@ -158,13 +183,22 @@ bool CParamSetRepresentationController::GetDataModelFromSdlRepresentation(
 			return false;
 		}
 
+		// a registered (e.g. custom) sub-controller for this specific type takes priority over generic nested paramset handling
 		const IJsonRepresentationController* subControllerPtr = GetRepresentationController(*parameterPtr);
-		if (subControllerPtr == nullptr){
-			return false;
+		if (subControllerPtr != nullptr){
+			if (!subControllerPtr->GetDataModelFromRepresentation(document.object(), *parameterPtr)){
+				return false;
+			}
 		}
+		else{
+			iprm::IParamsSet* subParamsSetPtr = dynamic_cast<iprm::IParamsSet*>(parameterPtr);
+			if (subParamsSetPtr == nullptr){
+				return false;
+			}
 
-		if (!subControllerPtr->GetDataModelFromRepresentation(document.object(), *parameterPtr)){
-			return false;
+			if (!GetDataModelFromRepresentation(document.object(), *subParamsSetPtr)){
+				return false;
+			}
 		}
 	}
 

@@ -15,6 +15,7 @@ singleton CachedRoleCollection 1.0 CachedRoleCollection.qml
 singleton CachedUserCollection 1.0 CachedUserCollection.qml
 singleton CachedGroupCollection 1.0 CachedGroupCollection.qml
 
+PasswordPolicyController 1.0 PasswordPolicyController.qml
 PermissionsProvider 1.0 PermissionsProvider.qml
 PermissionsTableView 1.0 PermissionsTableView.qml
 
@@ -60,6 +61,7 @@ TenantContractsPage 1.0 TenantContractsPage.qml
 TenantConnectionCodePage 1.0 TenantConnectionCodePage.qml
 TenantConnectOrganizationPage 1.0 TenantConnectOrganizationPage.qml
 TenantMyConnectionsPage 1.0 TenantMyConnectionsPage.qml
+TenantRelationshipProposalsPage 1.0 TenantRelationshipProposalsPage.qml
 TenantMessagesPage 1.0 TenantMessagesPage.qml
 CrossOrgGrantView 1.0 CrossOrgGrantView.qml
 ContractView 1.0 ContractView.qml
@@ -67,4 +69,7 @@ RelationshipView 1.0 RelationshipView.qml
 MessageView 1.0 MessageView.qml
 StatusBadge 1.0 StatusBadge.qml
 TenantCollectionListView 1.0 TenantCollectionListView.qml
+PermissionSourcesPage 1.0 PermissionSourcesPage.qml
+AssignmentsTable 1.0 AssignmentsTable.qml
+AssignmentsRefresher 1.0 AssignmentsRefresher.qml
 

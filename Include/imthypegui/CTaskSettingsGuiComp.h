@@ -74,10 +74,8 @@ private:
 
 #if QT_VERSION > 0x060000
 	QRegularExpressionValidator m_taskNameValidator;
-	QRegularExpressionValidator m_triggerIdValidator;
 #else
 	QRegExpValidator m_taskNameValidator;
-	QRegExpValidator m_triggerIdValidator;
 #endif
 	mutable QByteArray m_taskId;
 

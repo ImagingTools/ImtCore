@@ -17,6 +17,7 @@
         <file alias="imtauthgui/UserGroupView.qml">UserGroupView.qml</file>
         <file alias="imtauthgui/PermissionsProvider.qml">PermissionsProvider.qml</file>
         <file alias="imtauthgui/PermissionsTableView.qml">PermissionsTableView.qml</file>
+        <file alias="imtauthgui/PasswordPolicyController.qml">PasswordPolicyController.qml</file>
         <file alias="imtauthgui/PermissionsController.qml">PermissionsController.qml</file>
         <file alias="imtauthgui/SuperuserPasswordPage.qml">SuperuserPasswordPage.qml</file>
         <file alias="imtauthgui/ChangePasswordDialog.qml">ChangePasswordDialog.qml</file>
@@ -35,6 +36,9 @@
         <file alias="imtauthgui/ProfileOrganizationsPage.qml">ProfileOrganizationsPage.qml</file>
         <file alias="imtauthgui/ProfileTokensPage.qml">ProfileTokensPage.qml</file>
         <file alias="imtauthgui/ProfileAccessPage.qml">ProfileAccessPage.qml</file>
+        <file alias="imtauthgui/PermissionSourcesPage.qml">PermissionSourcesPage.qml</file>
+        <file alias="imtauthgui/AssignmentsTable.qml">AssignmentsTable.qml</file>
+        <file alias="imtauthgui/AssignmentsRefresher.qml">AssignmentsRefresher.qml</file>
         <file alias="imtauthgui/ProfileNoticeBanner.qml">ProfileNoticeBanner.qml</file>
         <file alias="imtauthgui/UserGeneralEditor.qml">UserGeneralEditor.qml</file>
         <file alias="imtauthgui/PasswordRecoveryDialog.qml">PasswordRecoveryDialog.qml</file>
@@ -57,6 +61,7 @@
 	<file alias="imtauthgui/TenantConnectionCodePage.qml">TenantConnectionCodePage.qml</file>
 	<file alias="imtauthgui/TenantConnectOrganizationPage.qml">TenantConnectOrganizationPage.qml</file>
 	<file alias="imtauthgui/TenantMyConnectionsPage.qml">TenantMyConnectionsPage.qml</file>
+        <file alias="imtauthgui/TenantRelationshipProposalsPage.qml">TenantRelationshipProposalsPage.qml</file>
 	<file alias="imtauthgui/TenantMessagesPage.qml">TenantMessagesPage.qml</file>
 	<file alias="imtauthgui/CrossOrgGrantView.qml">CrossOrgGrantView.qml</file>
 	<file alias="imtauthgui/ContractView.qml">ContractView.qml</file>

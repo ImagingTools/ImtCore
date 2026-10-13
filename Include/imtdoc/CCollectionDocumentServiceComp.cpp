@@ -3,11 +3,7 @@
 
 
 // Qt includes
-#include <QtCore/QDir>
-#include <QtCore/QDirIterator>
-#include <QtCore/QFileInfo>
 #include <QtCore/QSet>
-#include <QtCore/QStringList>
 
 // ImtCore includes
 #include <imtbase/imtbase.h>
@@ -54,39 +50,6 @@ imtbase::IObjectCollection* CCollectionDocumentServiceComp::GetCollection() cons
 bool CCollectionDocumentServiceComp::IsSingleCopyMode() const
 {
 	return m_isSingleCopyModeAttrPtr.IsValid() && *m_isSingleCopyModeAttrPtr;
-}
-
-
-IDocumentService::OperationStatus CCollectionDocumentServiceComp::CloseDocumentInternal(
-			const QByteArray& userId,
-			const QByteArray& documentId)
-{
-	bool shouldRemoveStorageDirectory = false;
-
-	{
-		QMutexLocker locker(&m_mutex);
-		OperationStatus validationStatus;
-		if (!ValidateInputParams(userId, documentId, validationStatus)){
-			return validationStatus;
-		}
-
-		const WorkingDocument& workingDocument = m_userDocuments[userId][documentId];
-
-		shouldRemoveStorageDirectory = true;
-		if (IsSingleCopyMode()
-					&& !workingDocument.objectId.isEmpty()
-					&& m_sharedDocuments.contains(workingDocument.objectId)){
-			shouldRemoveStorageDirectory = m_sharedDocuments[workingDocument.objectId].refCount <= 1;
-		}
-	}
-
-	OperationStatus status = BaseClass::CloseDocumentInternal(userId, documentId);
-
-	if (status == OS_OK && shouldRemoveStorageDirectory){
-		RemoveUndoManagerDocumentDirectory(documentId);
-	}
-
-	return status;
 }
 
 
@@ -377,40 +340,4 @@ void CCollectionDocumentServiceComp::RegisterRestoredDocument(
 	registeredDocument.isDirty = undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
 	registeredDocument.isLoading = false;
 }
-
-
-void CCollectionDocumentServiceComp::RemoveUndoManagerDocumentDirectory(const QByteArray& documentId) const
-{
-	if (!m_undoManagerFolderCompPtr.IsValid() || documentId.isEmpty()){
-		return;
-	}
-
-	const QString rootFolderPath = m_undoManagerFolderCompPtr->GetPath();
-	if (rootFolderPath.isEmpty()){
-		return;
-	}
-
-	QDir rootDirectory(rootFolderPath);
-	if (!rootDirectory.exists()){
-		return;
-	}
-
-	const QString documentDirectoryName(documentId);
-	QStringList directoriesToRemove;
-	QDirIterator it(rootFolderPath, QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-	while (it.hasNext()){
-		const QString directoryPath = it.next();
-		if (QFileInfo(directoryPath).fileName() != documentDirectoryName){
-			continue;
-		}
-
-		directoriesToRemove.push_back(directoryPath);
-	}
-
-	for (const QString& directoryPath : directoriesToRemove){
-		QDir(directoryPath).removeRecursively();
-	}
-}
-
-
 } // namespace imtdoc

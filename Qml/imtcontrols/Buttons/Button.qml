@@ -10,6 +10,8 @@ ControlBase {
 	decorator: Style.buttonDecorator
 
 	property string text: ""
+	// "default" | "primary" | "danger", see ButtonDecorator
+	property string variant: "default"
 	property string iconSource: ""
 	property string tooltipText: "";
 	property color textColor: Style.textColor;

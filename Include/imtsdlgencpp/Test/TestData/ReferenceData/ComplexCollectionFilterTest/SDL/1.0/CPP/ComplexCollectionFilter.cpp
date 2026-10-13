@@ -541,9 +541,19 @@ bool V1_0::imtbase::CFieldFilter::WriteToModel(::imtbase::CTreeItemModel& model,
 	}
 	model.SetData("filterValueType", filterValueTypeStringValue, modelIndex);
 
+	if (!filterOperations){
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "filterOperations").toLocal8Bit().constData();)
+
+		return false;
+	}
 	::imtbase::CTreeItemModel* newFilterOperationsModelPtr = model.AddTreeModel("filterOperations", modelIndex);
 	newFilterOperationsModelPtr->setIsArray(true);
 	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperations->size(); ++filterOperationsIndex){
+		if (!filterOperations->at(filterOperationsIndex)){
+			newFilterOperationsModelPtr->InsertNewItem();
+			newFilterOperationsModelPtr->SetData(QByteArray(), QVariant(), filterOperationsIndex);
+			continue;
+		}
 		QString filterOperationsStringValue;
 		switch (*filterOperations->at(filterOperationsIndex)){
 		case FilterOperation::Not:
@@ -626,6 +636,10 @@ bool V1_0::imtbase::CFieldFilter::ReadFromModel(const ::imtbase::CTreeItemModel&
 	int filterOperationsCount = filterOperationsModel->GetItemsCount();
 	imtsdl::TElementList<V1_0::imtbase::FilterOperation> filterOperationsList;
 	for (int filterOperationsIndex = 0; filterOperationsIndex < filterOperationsCount; ++filterOperationsIndex){
+		if (!filterOperationsModel->GetData(QByteArray(), filterOperationsIndex).isValid()){
+			filterOperationsList.AppendNull();
+			continue;
+		}
 		V1_0::imtbase::FilterOperation filterOperationsData;
 		QString filterOperationsStringValue = filterOperationsModel->GetData(QByteArray(), filterOperationsIndex).toString();
 		if(filterOperationsStringValue == "Not"){
@@ -696,6 +710,10 @@ bool V1_0::imtbase::CFieldFilter::OptReadFromModel(const ::imtbase::CTreeItemMod
 		int filterOperationsCount = filterOperationsModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::imtbase::FilterOperation> filterOperationsList;
 		for (int filterOperationsIndex = 0; filterOperationsIndex < filterOperationsCount; ++filterOperationsIndex){
+			if (!filterOperationsModel->GetData(QByteArray(), filterOperationsIndex).isValid()){
+				filterOperationsList.AppendNull();
+				continue;
+			}
 			V1_0::imtbase::FilterOperation filterOperationsData;
 			QString filterOperationsStringValue = filterOperationsModel->GetData(QByteArray(), filterOperationsIndex).toString();
 			if(filterOperationsStringValue == "Not"){
@@ -770,8 +788,17 @@ bool V1_0::imtbase::CFieldFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject
 	}
 	gqlObject.InsertParam("filterValueType", QVariant(filterValueTypeStringValue));
 
+	if (!filterOperations){
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "filterOperations").toLocal8Bit().constData();)
+
+		return false;
+	}
 	QVariantList filterOperationsDataObjectList;
 	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperations->size(); ++filterOperationsIndex){
+		if (!filterOperations->at(filterOperationsIndex)){
+			filterOperationsDataObjectList << QVariant();
+			continue;
+		}
 		QString filterOperationsStringValue;
 		switch (*filterOperations->at(filterOperationsIndex)){
 		case FilterOperation::Not:
@@ -853,6 +880,10 @@ bool V1_0::imtbase::CFieldFilter::ReadFromGraphQlObject(const ::imtgql::CGqlPara
 	const qsizetype filterOperationsElementsCount = filterOperationsDataList.size();
 	filterOperations = imtsdl::TElementList<V1_0::imtbase::FilterOperation>();
 	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsElementsCount; ++filterOperationsIndex){
+		if (!filterOperationsDataList[filterOperationsIndex].isValid() || filterOperationsDataList[filterOperationsIndex].isNull()){
+			filterOperations->AppendNull();
+			continue;
+		}
 		const QString tempFilterOperations = filterOperationsDataList[filterOperationsIndex].toString();
 		V1_0::imtbase::FilterOperation filterOperationsDataValue;
 		if(tempFilterOperations == "Not"){
@@ -913,15 +944,16 @@ bool V1_0::imtbase::CFieldFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlP
 		}
 	}
 
-	if (gqlObject.ContainsParam("filterOperations")){
-		filterOperations.emplace();
-	}
 	if (gqlObject.ContainsParam("filterOperations") && !(gqlObject["filterOperations"].isNull())){
 		const QVariant filterOperationsData = gqlObject["filterOperations"];
 		const QVariantList filterOperationsDataList = filterOperationsData.toList();
 		const qsizetype filterOperationsElementsCount = filterOperationsDataList.size();
 		filterOperations = imtsdl::TElementList<V1_0::imtbase::FilterOperation>();
 		for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsElementsCount; ++filterOperationsIndex){
+			if (!filterOperationsDataList[filterOperationsIndex].isValid() || filterOperationsDataList[filterOperationsIndex].isNull()){
+				filterOperations->AppendNull();
+				continue;
+			}
 			const QString tempFilterOperations = filterOperationsDataList[filterOperationsIndex].toString();
 			V1_0::imtbase::FilterOperation filterOperationsDataValue;
 			if(tempFilterOperations == "Not"){
@@ -993,8 +1025,17 @@ bool V1_0::imtbase::CFieldFilter::WriteToJsonObject(QJsonObject& jsonObject) con
 	}
 	jsonObject["filterValueType"] = QJsonValue::fromVariant(filterValueTypeStringValue);
 
+	if (!filterOperations){
+		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "filterOperations").toLocal8Bit().constData();)
+
+		return false;
+	}
 	QJsonArray newFilterOperationsArray;
 	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperations->size(); ++filterOperationsIndex){
+		if (!filterOperations->at(filterOperationsIndex)){
+			newFilterOperationsArray << QJsonValue(QJsonValue::Null);
+			continue;
+		}
 		QString filterOperationsStringValue;
 		switch (*filterOperations->at(filterOperationsIndex)){
 		case FilterOperation::Not:
@@ -1075,6 +1116,10 @@ bool V1_0::imtbase::CFieldFilter::ReadFromJsonObject(const QJsonObject& jsonObje
 	const qsizetype filterOperationsArrayCount = filterOperationsJsonArray.size();
 	filterOperations = imtsdl::TElementList<V1_0::imtbase::FilterOperation>();
 	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsArrayCount; ++filterOperationsIndex){
+		if (filterOperationsJsonArray[filterOperationsIndex].isNull()){
+			filterOperations->AppendNull();
+			continue;
+		}
 		const QString tempFilterOperations = filterOperationsJsonArray[filterOperationsIndex].toString();
 		V1_0::imtbase::FilterOperation filterOperationsDataValue;
 		if(tempFilterOperations == "Not"){
@@ -1140,6 +1185,10 @@ bool V1_0::imtbase::CFieldFilter::OptReadFromJsonObject(const QJsonObject& jsonO
 		const qsizetype filterOperationsArrayCount = filterOperationsJsonArray.size();
 		filterOperations = imtsdl::TElementList<V1_0::imtbase::FilterOperation>();
 		for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsArrayCount; ++filterOperationsIndex){
+			if (filterOperationsJsonArray[filterOperationsIndex].isNull()){
+				filterOperations->AppendNull();
+				continue;
+			}
 			const QString tempFilterOperations = filterOperationsJsonArray[filterOperationsIndex].toString();
 			V1_0::imtbase::FilterOperation filterOperationsDataValue;
 			if(tempFilterOperations == "Not"){
@@ -1195,6 +1244,11 @@ bool V1_0::imtbase::CGroupFilter::WriteToModel(::imtbase::CTreeItemModel& model,
 		::imtbase::CTreeItemModel* newFieldFiltersModelPtr = model.AddTreeModel("fieldFilters", modelIndex);
 		newFieldFiltersModelPtr->setIsArray(true);
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFilters->size(); ++fieldFiltersIndex){
+			if (!fieldFilters->at(fieldFiltersIndex)){
+				newFieldFiltersModelPtr->InsertNewItem();
+				newFieldFiltersModelPtr->SetData(QByteArray(), QVariant(), fieldFiltersIndex);
+				continue;
+			}
 			newFieldFiltersModelPtr->InsertNewItem();
 			if (!(fieldFilters->at(fieldFiltersIndex)->WriteToModel(*newFieldFiltersModelPtr, fieldFiltersIndex))){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters").toLocal8Bit().constData();)
@@ -1203,10 +1257,18 @@ bool V1_0::imtbase::CGroupFilter::WriteToModel(::imtbase::CTreeItemModel& model,
 			}
 		}
 	}
+	else if (fieldFilters.IsNull()){
+		model.SetData("fieldFilters", QVariant(), modelIndex);
+	}
 	if (groupFilters){
 		::imtbase::CTreeItemModel* newGroupFiltersModelPtr = model.AddTreeModel("groupFilters", modelIndex);
 		newGroupFiltersModelPtr->setIsArray(true);
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFilters->size(); ++groupFiltersIndex){
+			if (!groupFilters->at(groupFiltersIndex)){
+				newGroupFiltersModelPtr->InsertNewItem();
+				newGroupFiltersModelPtr->SetData(QByteArray(), QVariant(), groupFiltersIndex);
+				continue;
+			}
 			newGroupFiltersModelPtr->InsertNewItem();
 			if (!(groupFilters->at(groupFiltersIndex)->WriteToModel(*newGroupFiltersModelPtr, groupFiltersIndex))){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters").toLocal8Bit().constData();)
@@ -1214,6 +1276,9 @@ bool V1_0::imtbase::CGroupFilter::WriteToModel(::imtbase::CTreeItemModel& model,
 				return false;
 			}
 		}
+	}
+	else if (groupFilters.IsNull()){
+		model.SetData("groupFilters", QVariant(), modelIndex);
 	}
 	if (!logicalOperation){
 		I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "logicalOperation").toLocal8Bit().constData();)
@@ -1242,10 +1307,17 @@ bool V1_0::imtbase::CGroupFilter::WriteToModel(::imtbase::CTreeItemModel& model,
 bool V1_0::imtbase::CGroupFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* fieldFiltersModel = model.GetTreeItemModel("fieldFilters", modelIndex);
+	if (model.ContainsKey("fieldFilters", modelIndex) && fieldFiltersModel == nullptr){
+		fieldFilters.SetNull();
+	}
 	if (fieldFiltersModel != nullptr){
 		int fieldFiltersCount = fieldFiltersModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::imtbase::CFieldFilter> fieldFiltersList;
 		for (int fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersCount; ++fieldFiltersIndex){
+			if (fieldFiltersModel->ContainsKey(QByteArray(), fieldFiltersIndex) && !fieldFiltersModel->GetData(QByteArray(), fieldFiltersIndex).isValid()){
+				fieldFiltersList.AppendNull();
+				continue;
+			}
 			V1_0::imtbase::CFieldFilter t_fieldFilters;
 			if (!t_fieldFilters.ReadFromModel(*fieldFiltersModel, fieldFiltersIndex)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters").toLocal8Bit().constData();)
@@ -1259,10 +1331,17 @@ bool V1_0::imtbase::CGroupFilter::ReadFromModel(const ::imtbase::CTreeItemModel&
 	}
 
 	::imtbase::CTreeItemModel* groupFiltersModel = model.GetTreeItemModel("groupFilters", modelIndex);
+	if (model.ContainsKey("groupFilters", modelIndex) && groupFiltersModel == nullptr){
+		groupFilters.SetNull();
+	}
 	if (groupFiltersModel != nullptr){
 		int groupFiltersCount = groupFiltersModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::imtbase::CGroupFilter> groupFiltersList;
 		for (int groupFiltersIndex = 0; groupFiltersIndex < groupFiltersCount; ++groupFiltersIndex){
+			if (groupFiltersModel->ContainsKey(QByteArray(), groupFiltersIndex) && !groupFiltersModel->GetData(QByteArray(), groupFiltersIndex).isValid()){
+				groupFiltersList.AppendNull();
+				continue;
+			}
 			V1_0::imtbase::CGroupFilter t_groupFilters;
 			if (!t_groupFilters.ReadFromModel(*groupFiltersModel, groupFiltersIndex)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters").toLocal8Bit().constData();)
@@ -1301,10 +1380,17 @@ bool V1_0::imtbase::CGroupFilter::ReadFromModel(const ::imtbase::CTreeItemModel&
 bool V1_0::imtbase::CGroupFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* fieldFiltersModel = model.GetTreeItemModel("fieldFilters", modelIndex);
+	if (model.ContainsKey("fieldFilters", modelIndex) && fieldFiltersModel == nullptr){
+		fieldFilters.SetNull();
+	}
 	if (fieldFiltersModel != nullptr){
 		int fieldFiltersCount = fieldFiltersModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::imtbase::CFieldFilter> fieldFiltersList;
 		for (int fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersCount; ++fieldFiltersIndex){
+			if (fieldFiltersModel->ContainsKey(QByteArray(), fieldFiltersIndex) && !fieldFiltersModel->GetData(QByteArray(), fieldFiltersIndex).isValid()){
+				fieldFiltersList.AppendNull();
+				continue;
+			}
 			V1_0::imtbase::CFieldFilter t_fieldFilters;
 			if (!t_fieldFilters.OptReadFromModel(*fieldFiltersModel, fieldFiltersIndex)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters").toLocal8Bit().constData();)
@@ -1318,10 +1404,17 @@ bool V1_0::imtbase::CGroupFilter::OptReadFromModel(const ::imtbase::CTreeItemMod
 	}
 
 	::imtbase::CTreeItemModel* groupFiltersModel = model.GetTreeItemModel("groupFilters", modelIndex);
+	if (model.ContainsKey("groupFilters", modelIndex) && groupFiltersModel == nullptr){
+		groupFilters.SetNull();
+	}
 	if (groupFiltersModel != nullptr){
 		int groupFiltersCount = groupFiltersModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::imtbase::CGroupFilter> groupFiltersList;
 		for (int groupFiltersIndex = 0; groupFiltersIndex < groupFiltersCount; ++groupFiltersIndex){
+			if (groupFiltersModel->ContainsKey(QByteArray(), groupFiltersIndex) && !groupFiltersModel->GetData(QByteArray(), groupFiltersIndex).isValid()){
+				groupFiltersList.AppendNull();
+				continue;
+			}
 			V1_0::imtbase::CGroupFilter t_groupFilters;
 			if (!t_groupFilters.OptReadFromModel(*groupFiltersModel, groupFiltersIndex)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters").toLocal8Bit().constData();)
@@ -1359,6 +1452,10 @@ bool V1_0::imtbase::CGroupFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject
 	if (fieldFilters){
 		QList<::imtgql::CGqlParamObject> fieldFiltersDataObjectList;
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFilters->size(); ++fieldFiltersIndex){
+			if (!fieldFilters->at(fieldFiltersIndex)){
+				fieldFiltersDataObjectList << ::imtgql::CGqlParamObject::CreateNull();
+				continue;
+			}
 			::imtgql::CGqlParamObject newFieldFiltersGqlObject;
 			if (!fieldFilters->at(fieldFiltersIndex)->WriteToGraphQlObject(newFieldFiltersGqlObject)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters").toLocal8Bit().constData();)
@@ -1369,10 +1466,17 @@ bool V1_0::imtbase::CGroupFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject
 		}
 		gqlObject.InsertParam("fieldFilters", fieldFiltersDataObjectList);
 	}
+	else if (fieldFilters.IsNull()){
+		gqlObject.InsertParam("fieldFilters", QVariant());
+	}
 
 	if (groupFilters){
 		QList<::imtgql::CGqlParamObject> groupFiltersDataObjectList;
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFilters->size(); ++groupFiltersIndex){
+			if (!groupFilters->at(groupFiltersIndex)){
+				groupFiltersDataObjectList << ::imtgql::CGqlParamObject::CreateNull();
+				continue;
+			}
 			::imtgql::CGqlParamObject newGroupFiltersGqlObject;
 			if (!groupFilters->at(groupFiltersIndex)->WriteToGraphQlObject(newGroupFiltersGqlObject)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters").toLocal8Bit().constData();)
@@ -1382,6 +1486,9 @@ bool V1_0::imtbase::CGroupFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject
 			groupFiltersDataObjectList << newGroupFiltersGqlObject;
 		}
 		gqlObject.InsertParam("groupFilters", groupFiltersDataObjectList);
+	}
+	else if (groupFilters.IsNull()){
+		gqlObject.InsertParam("groupFilters", QVariant());
 	}
 
 	if (!logicalOperation){
@@ -1411,17 +1518,17 @@ bool V1_0::imtbase::CGroupFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject
 
 bool V1_0::imtbase::CGroupFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("fieldFilters")){
-		fieldFilters.emplace();
+	if (gqlObject.ContainsParam("fieldFilters") && gqlObject["fieldFilters"].isNull()){
+		fieldFilters.SetNull();
 	}
-	if (gqlObject.ContainsParam("fieldFilters") && (gqlObject.GetObjectsCount("fieldFilters") > 0)){
+	if (gqlObject.ContainsParam("fieldFilters") && !(gqlObject["fieldFilters"].isNull())){
 		const qsizetype fieldFiltersElementsCount = gqlObject.GetObjectsCount("fieldFilters");
 		fieldFilters = imtsdl::TElementList<V1_0::imtbase::CFieldFilter>();
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersElementsCount; ++fieldFiltersIndex){
 			const ::imtgql::CGqlParamObject* fieldFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("fieldFilters", fieldFiltersIndex);
-			if (fieldFiltersDataObjectPtr == nullptr){
-				qDebug() << "invalid type" << fieldFiltersDataObjectPtr;
-				return false;
+			if (fieldFiltersDataObjectPtr == nullptr || fieldFiltersDataObjectPtr->IsNull()){
+				fieldFilters->AppendNull();
+				continue;
 			}
 			V1_0::imtbase::CFieldFilter tempFieldFilters;
 			if (!tempFieldFilters.ReadFromGraphQlObject(*fieldFiltersDataObjectPtr)){
@@ -1433,17 +1540,17 @@ bool V1_0::imtbase::CGroupFilter::ReadFromGraphQlObject(const ::imtgql::CGqlPara
 		}
 	}
 
-	if (gqlObject.ContainsParam("groupFilters")){
-		groupFilters.emplace();
+	if (gqlObject.ContainsParam("groupFilters") && gqlObject["groupFilters"].isNull()){
+		groupFilters.SetNull();
 	}
-	if (gqlObject.ContainsParam("groupFilters") && (gqlObject.GetObjectsCount("groupFilters") > 0)){
+	if (gqlObject.ContainsParam("groupFilters") && !(gqlObject["groupFilters"].isNull())){
 		const qsizetype groupFiltersElementsCount = gqlObject.GetObjectsCount("groupFilters");
 		groupFilters = imtsdl::TElementList<V1_0::imtbase::CGroupFilter>();
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersElementsCount; ++groupFiltersIndex){
 			const ::imtgql::CGqlParamObject* groupFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("groupFilters", groupFiltersIndex);
-			if (groupFiltersDataObjectPtr == nullptr){
-				qDebug() << "invalid type" << groupFiltersDataObjectPtr;
-				return false;
+			if (groupFiltersDataObjectPtr == nullptr || groupFiltersDataObjectPtr->IsNull()){
+				groupFilters->AppendNull();
+				continue;
 			}
 			V1_0::imtbase::CGroupFilter tempGroupFilters;
 			if (!tempGroupFilters.ReadFromGraphQlObject(*groupFiltersDataObjectPtr)){
@@ -1479,17 +1586,17 @@ bool V1_0::imtbase::CGroupFilter::ReadFromGraphQlObject(const ::imtgql::CGqlPara
 
 bool V1_0::imtbase::CGroupFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("fieldFilters")){
-		fieldFilters.emplace();
+	if (gqlObject.ContainsParam("fieldFilters") && gqlObject["fieldFilters"].isNull()){
+		fieldFilters.SetNull();
 	}
-	if (gqlObject.ContainsParam("fieldFilters") && (gqlObject.GetObjectsCount("fieldFilters") > 0)){
+	if (gqlObject.ContainsParam("fieldFilters") && !(gqlObject["fieldFilters"].isNull())){
 		const qsizetype fieldFiltersElementsCount = gqlObject.GetObjectsCount("fieldFilters");
 		fieldFilters = imtsdl::TElementList<V1_0::imtbase::CFieldFilter>();
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersElementsCount; ++fieldFiltersIndex){
 			const ::imtgql::CGqlParamObject* fieldFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("fieldFilters", fieldFiltersIndex);
-			if (fieldFiltersDataObjectPtr == nullptr){
-				qDebug() << "invalid type" << fieldFiltersDataObjectPtr;
-				return false;
+			if (fieldFiltersDataObjectPtr == nullptr || fieldFiltersDataObjectPtr->IsNull()){
+				fieldFilters->AppendNull();
+				continue;
 			}
 			V1_0::imtbase::CFieldFilter tempFieldFilters;
 			if (!tempFieldFilters.OptReadFromGraphQlObject(*fieldFiltersDataObjectPtr)){
@@ -1501,17 +1608,17 @@ bool V1_0::imtbase::CGroupFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlP
 		}
 	}
 
-	if (gqlObject.ContainsParam("groupFilters")){
-		groupFilters.emplace();
+	if (gqlObject.ContainsParam("groupFilters") && gqlObject["groupFilters"].isNull()){
+		groupFilters.SetNull();
 	}
-	if (gqlObject.ContainsParam("groupFilters") && (gqlObject.GetObjectsCount("groupFilters") > 0)){
+	if (gqlObject.ContainsParam("groupFilters") && !(gqlObject["groupFilters"].isNull())){
 		const qsizetype groupFiltersElementsCount = gqlObject.GetObjectsCount("groupFilters");
 		groupFilters = imtsdl::TElementList<V1_0::imtbase::CGroupFilter>();
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersElementsCount; ++groupFiltersIndex){
 			const ::imtgql::CGqlParamObject* groupFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("groupFilters", groupFiltersIndex);
-			if (groupFiltersDataObjectPtr == nullptr){
-				qDebug() << "invalid type" << groupFiltersDataObjectPtr;
-				return false;
+			if (groupFiltersDataObjectPtr == nullptr || groupFiltersDataObjectPtr->IsNull()){
+				groupFilters->AppendNull();
+				continue;
 			}
 			V1_0::imtbase::CGroupFilter tempGroupFilters;
 			if (!tempGroupFilters.OptReadFromGraphQlObject(*groupFiltersDataObjectPtr)){
@@ -1547,6 +1654,10 @@ bool V1_0::imtbase::CGroupFilter::WriteToJsonObject(QJsonObject& jsonObject) con
 	if (fieldFilters){
 		QJsonArray newFieldFiltersArray;
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFilters->size(); ++fieldFiltersIndex){
+			if (!fieldFilters->at(fieldFiltersIndex)){
+				newFieldFiltersArray << QJsonValue(QJsonValue::Null);
+				continue;
+			}
 			QJsonObject newFieldFiltersJsonObject;
 			if (!fieldFilters->at(fieldFiltersIndex)->WriteToJsonObject(newFieldFiltersJsonObject)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters").toLocal8Bit().constData();)
@@ -1557,10 +1668,17 @@ bool V1_0::imtbase::CGroupFilter::WriteToJsonObject(QJsonObject& jsonObject) con
 		}
 		jsonObject["fieldFilters"] = newFieldFiltersArray;
 	}
+	else if (fieldFilters.IsNull()){
+		jsonObject["fieldFilters"] = QJsonValue(QJsonValue::Null);
+	}
 
 	if (groupFilters){
 		QJsonArray newGroupFiltersArray;
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFilters->size(); ++groupFiltersIndex){
+			if (!groupFilters->at(groupFiltersIndex)){
+				newGroupFiltersArray << QJsonValue(QJsonValue::Null);
+				continue;
+			}
 			QJsonObject newGroupFiltersJsonObject;
 			if (!groupFilters->at(groupFiltersIndex)->WriteToJsonObject(newGroupFiltersJsonObject)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters").toLocal8Bit().constData();)
@@ -1570,6 +1688,9 @@ bool V1_0::imtbase::CGroupFilter::WriteToJsonObject(QJsonObject& jsonObject) con
 			newGroupFiltersArray << newGroupFiltersJsonObject;
 		}
 		jsonObject["groupFilters"] = newGroupFiltersArray;
+	}
+	else if (groupFilters.IsNull()){
+		jsonObject["groupFilters"] = QJsonValue(QJsonValue::Null);
 	}
 
 	if (!logicalOperation){
@@ -1599,11 +1720,18 @@ bool V1_0::imtbase::CGroupFilter::WriteToJsonObject(QJsonObject& jsonObject) con
 
 bool V1_0::imtbase::CGroupFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
-	if (jsonObject.contains("fieldFilters") && jsonObject["fieldFilters"].isArray()){
+if (jsonObject.contains("fieldFilters") && jsonObject["fieldFilters"].isNull()){
+		fieldFilters.SetNull();
+	}
+		if (jsonObject.contains("fieldFilters") && jsonObject["fieldFilters"].isArray()){
 		const QJsonArray fieldFiltersJsonArray = jsonObject["fieldFilters"].toArray();
 		const qsizetype fieldFiltersArrayCount = fieldFiltersJsonArray.size();
 		fieldFilters = imtsdl::TElementList<V1_0::imtbase::CFieldFilter>();
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersArrayCount; ++fieldFiltersIndex){
+			if (fieldFiltersJsonArray[fieldFiltersIndex].isNull()){
+				fieldFilters->AppendNull();
+				continue;
+			}
 			V1_0::imtbase::CFieldFilter tempFieldFilters;
 			if (!tempFieldFilters.ReadFromJsonObject(fieldFiltersJsonArray[fieldFiltersIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters").toLocal8Bit().constData();)
@@ -1614,11 +1742,18 @@ bool V1_0::imtbase::CGroupFilter::ReadFromJsonObject(const QJsonObject& jsonObje
 		}
 	}
 
-	if (jsonObject.contains("groupFilters") && jsonObject["groupFilters"].isArray()){
+if (jsonObject.contains("groupFilters") && jsonObject["groupFilters"].isNull()){
+		groupFilters.SetNull();
+	}
+		if (jsonObject.contains("groupFilters") && jsonObject["groupFilters"].isArray()){
 		const QJsonArray groupFiltersJsonArray = jsonObject["groupFilters"].toArray();
 		const qsizetype groupFiltersArrayCount = groupFiltersJsonArray.size();
 		groupFilters = imtsdl::TElementList<V1_0::imtbase::CGroupFilter>();
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersArrayCount; ++groupFiltersIndex){
+			if (groupFiltersJsonArray[groupFiltersIndex].isNull()){
+				groupFilters->AppendNull();
+				continue;
+			}
 			V1_0::imtbase::CGroupFilter tempGroupFilters;
 			if (!tempGroupFilters.ReadFromJsonObject(groupFiltersJsonArray[groupFiltersIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters").toLocal8Bit().constData();)
@@ -1653,11 +1788,18 @@ bool V1_0::imtbase::CGroupFilter::ReadFromJsonObject(const QJsonObject& jsonObje
 
 bool V1_0::imtbase::CGroupFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
-	if (jsonObject.contains("fieldFilters") && jsonObject["fieldFilters"].isArray()){
+if (jsonObject.contains("fieldFilters") && jsonObject["fieldFilters"].isNull()){
+		fieldFilters.SetNull();
+	}
+		if (jsonObject.contains("fieldFilters") && jsonObject["fieldFilters"].isArray()){
 		const QJsonArray fieldFiltersJsonArray = jsonObject["fieldFilters"].toArray();
 		const qsizetype fieldFiltersArrayCount = fieldFiltersJsonArray.size();
 		fieldFilters = imtsdl::TElementList<V1_0::imtbase::CFieldFilter>();
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersArrayCount; ++fieldFiltersIndex){
+			if (fieldFiltersJsonArray[fieldFiltersIndex].isNull()){
+				fieldFilters->AppendNull();
+				continue;
+			}
 			V1_0::imtbase::CFieldFilter tempFieldFilters;
 			if (!tempFieldFilters.OptReadFromJsonObject(fieldFiltersJsonArray[fieldFiltersIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters").toLocal8Bit().constData();)
@@ -1668,11 +1810,18 @@ bool V1_0::imtbase::CGroupFilter::OptReadFromJsonObject(const QJsonObject& jsonO
 		}
 	}
 
-	if (jsonObject.contains("groupFilters") && jsonObject["groupFilters"].isArray()){
+if (jsonObject.contains("groupFilters") && jsonObject["groupFilters"].isNull()){
+		groupFilters.SetNull();
+	}
+		if (jsonObject.contains("groupFilters") && jsonObject["groupFilters"].isArray()){
 		const QJsonArray groupFiltersJsonArray = jsonObject["groupFilters"].toArray();
 		const qsizetype groupFiltersArrayCount = groupFiltersJsonArray.size();
 		groupFilters = imtsdl::TElementList<V1_0::imtbase::CGroupFilter>();
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersArrayCount; ++groupFiltersIndex){
+			if (groupFiltersJsonArray[groupFiltersIndex].isNull()){
+				groupFilters->AppendNull();
+				continue;
+			}
 			V1_0::imtbase::CGroupFilter tempGroupFilters;
 			if (!tempGroupFilters.OptReadFromJsonObject(groupFiltersJsonArray[groupFiltersIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters").toLocal8Bit().constData();)
@@ -1728,6 +1877,11 @@ bool V1_0::imtbase::CComplexCollectionFilter::WriteToModel(::imtbase::CTreeItemM
 		::imtbase::CTreeItemModel* newSortingInfoModelPtr = model.AddTreeModel("sortingInfo", modelIndex);
 		newSortingInfoModelPtr->setIsArray(true);
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfo->size(); ++sortingInfoIndex){
+			if (!sortingInfo->at(sortingInfoIndex)){
+				newSortingInfoModelPtr->InsertNewItem();
+				newSortingInfoModelPtr->SetData(QByteArray(), QVariant(), sortingInfoIndex);
+				continue;
+			}
 			newSortingInfoModelPtr->InsertNewItem();
 			if (!(sortingInfo->at(sortingInfoIndex)->WriteToModel(*newSortingInfoModelPtr, sortingInfoIndex))){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo").toLocal8Bit().constData();)
@@ -1735,6 +1889,9 @@ bool V1_0::imtbase::CComplexCollectionFilter::WriteToModel(::imtbase::CTreeItemM
 				return false;
 			}
 		}
+	}
+	else if (sortingInfo.IsNull()){
+		model.SetData("sortingInfo", QVariant(), modelIndex);
 	}
 
 	if (fieldsFilter){
@@ -1762,9 +1919,17 @@ bool V1_0::imtbase::CComplexCollectionFilter::WriteToModel(::imtbase::CTreeItemM
 		::imtbase::CTreeItemModel* newDistinctFieldsModelPtr = model.AddTreeModel("distinctFields", modelIndex);
 		newDistinctFieldsModelPtr->setIsArray(true);
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFields->size(); ++distinctFieldsIndex){
+			if (!distinctFields->at(distinctFieldsIndex)){
+				newDistinctFieldsModelPtr->InsertNewItem();
+				newDistinctFieldsModelPtr->SetData(QByteArray(), QVariant(), distinctFieldsIndex);
+				continue;
+			}
 			newDistinctFieldsModelPtr->InsertNewItem();
 			newDistinctFieldsModelPtr->SetData(QByteArray(), *distinctFields->at(distinctFieldsIndex), distinctFieldsIndex);
 		}
+	}
+	else if (distinctFields.IsNull()){
+		model.SetData("distinctFields", QVariant(), modelIndex);
 	}
 
 
@@ -1775,10 +1940,17 @@ bool V1_0::imtbase::CComplexCollectionFilter::WriteToModel(::imtbase::CTreeItemM
 bool V1_0::imtbase::CComplexCollectionFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* sortingInfoModel = model.GetTreeItemModel("sortingInfo", modelIndex);
+	if (model.ContainsKey("sortingInfo", modelIndex) && sortingInfoModel == nullptr){
+		sortingInfo.SetNull();
+	}
 	if (sortingInfoModel != nullptr){
 		int sortingInfoCount = sortingInfoModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::imtbase::CFieldSortingInfo> sortingInfoList;
 		for (int sortingInfoIndex = 0; sortingInfoIndex < sortingInfoCount; ++sortingInfoIndex){
+			if (sortingInfoModel->ContainsKey(QByteArray(), sortingInfoIndex) && !sortingInfoModel->GetData(QByteArray(), sortingInfoIndex).isValid()){
+				sortingInfoList.AppendNull();
+				continue;
+			}
 			V1_0::imtbase::CFieldSortingInfo t_sortingInfo;
 			if (!t_sortingInfo.ReadFromModel(*sortingInfoModel, sortingInfoIndex)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo").toLocal8Bit().constData();)
@@ -1814,10 +1986,17 @@ bool V1_0::imtbase::CComplexCollectionFilter::ReadFromModel(const ::imtbase::CTr
 	}
 
 	::imtbase::CTreeItemModel* distinctFieldsModel = model.GetTreeItemModel("distinctFields", modelIndex);
+	if (model.ContainsKey("distinctFields", modelIndex) && distinctFieldsModel == nullptr){
+		distinctFields.SetNull();
+	}
 	if (distinctFieldsModel != nullptr){
 		int distinctFieldsCount = distinctFieldsModel->GetItemsCount();
 		imtsdl::TElementList<QByteArray> distinctFieldsList;
 		for (int distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsCount; ++distinctFieldsIndex){
+			if (!distinctFieldsModel->GetData(QByteArray(), distinctFieldsIndex).isValid()){
+				distinctFieldsList.AppendNull();
+				continue;
+			}
 			QByteArray t_distinctFields = distinctFieldsModel->GetData(QByteArray(), distinctFieldsIndex).toByteArray();
 			distinctFieldsList << t_distinctFields;
 		}
@@ -1832,10 +2011,17 @@ bool V1_0::imtbase::CComplexCollectionFilter::ReadFromModel(const ::imtbase::CTr
 bool V1_0::imtbase::CComplexCollectionFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* sortingInfoModel = model.GetTreeItemModel("sortingInfo", modelIndex);
+	if (model.ContainsKey("sortingInfo", modelIndex) && sortingInfoModel == nullptr){
+		sortingInfo.SetNull();
+	}
 	if (sortingInfoModel != nullptr){
 		int sortingInfoCount = sortingInfoModel->GetItemsCount();
 		imtsdl::TElementList<V1_0::imtbase::CFieldSortingInfo> sortingInfoList;
 		for (int sortingInfoIndex = 0; sortingInfoIndex < sortingInfoCount; ++sortingInfoIndex){
+			if (sortingInfoModel->ContainsKey(QByteArray(), sortingInfoIndex) && !sortingInfoModel->GetData(QByteArray(), sortingInfoIndex).isValid()){
+				sortingInfoList.AppendNull();
+				continue;
+			}
 			V1_0::imtbase::CFieldSortingInfo t_sortingInfo;
 			if (!t_sortingInfo.OptReadFromModel(*sortingInfoModel, sortingInfoIndex)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo").toLocal8Bit().constData();)
@@ -1871,10 +2057,17 @@ bool V1_0::imtbase::CComplexCollectionFilter::OptReadFromModel(const ::imtbase::
 	}
 
 	::imtbase::CTreeItemModel* distinctFieldsModel = model.GetTreeItemModel("distinctFields", modelIndex);
+	if (model.ContainsKey("distinctFields", modelIndex) && distinctFieldsModel == nullptr){
+		distinctFields.SetNull();
+	}
 	if (distinctFieldsModel != nullptr){
 		int distinctFieldsCount = distinctFieldsModel->GetItemsCount();
 		imtsdl::TElementList<QByteArray> distinctFieldsList;
 		for (int distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsCount; ++distinctFieldsIndex){
+			if (!distinctFieldsModel->GetData(QByteArray(), distinctFieldsIndex).isValid()){
+				distinctFieldsList.AppendNull();
+				continue;
+			}
 			QByteArray t_distinctFields = distinctFieldsModel->GetData(QByteArray(), distinctFieldsIndex).toByteArray();
 			distinctFieldsList << t_distinctFields;
 		}
@@ -1891,6 +2084,10 @@ bool V1_0::imtbase::CComplexCollectionFilter::WriteToGraphQlObject(::imtgql::CGq
 	if (sortingInfo){
 		QList<::imtgql::CGqlParamObject> sortingInfoDataObjectList;
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfo->size(); ++sortingInfoIndex){
+			if (!sortingInfo->at(sortingInfoIndex)){
+				sortingInfoDataObjectList << ::imtgql::CGqlParamObject::CreateNull();
+				continue;
+			}
 			::imtgql::CGqlParamObject newSortingInfoGqlObject;
 			if (!sortingInfo->at(sortingInfoIndex)->WriteToGraphQlObject(newSortingInfoGqlObject)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo").toLocal8Bit().constData();)
@@ -1900,6 +2097,9 @@ bool V1_0::imtbase::CComplexCollectionFilter::WriteToGraphQlObject(::imtgql::CGq
 			sortingInfoDataObjectList << newSortingInfoGqlObject;
 		}
 		gqlObject.InsertParam("sortingInfo", sortingInfoDataObjectList);
+	}
+	else if (sortingInfo.IsNull()){
+		gqlObject.InsertParam("sortingInfo", QVariant());
 	}
 
 	if (fieldsFilter){
@@ -1927,9 +2127,16 @@ bool V1_0::imtbase::CComplexCollectionFilter::WriteToGraphQlObject(::imtgql::CGq
 	if (distinctFields){
 		QVariantList distinctFieldsDataObjectList;
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFields->size(); ++distinctFieldsIndex){
+			if (!distinctFields->at(distinctFieldsIndex)){
+				distinctFieldsDataObjectList << QVariant();
+				continue;
+			}
 			distinctFieldsDataObjectList << *distinctFields->at(distinctFieldsIndex);
 		}
 		gqlObject.InsertParam("distinctFields", distinctFieldsDataObjectList);
+	}
+	else if (distinctFields.IsNull()){
+		gqlObject.InsertParam("distinctFields", QVariant());
 	}
 
 	gqlObject.InsertParam("__typename", QVariant("ComplexCollectionFilter"));
@@ -1940,17 +2147,17 @@ bool V1_0::imtbase::CComplexCollectionFilter::WriteToGraphQlObject(::imtgql::CGq
 
 bool V1_0::imtbase::CComplexCollectionFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("sortingInfo")){
-		sortingInfo.emplace();
+	if (gqlObject.ContainsParam("sortingInfo") && gqlObject["sortingInfo"].isNull()){
+		sortingInfo.SetNull();
 	}
-	if (gqlObject.ContainsParam("sortingInfo") && (gqlObject.GetObjectsCount("sortingInfo") > 0)){
+	if (gqlObject.ContainsParam("sortingInfo") && !(gqlObject["sortingInfo"].isNull())){
 		const qsizetype sortingInfoElementsCount = gqlObject.GetObjectsCount("sortingInfo");
 		sortingInfo = imtsdl::TElementList<V1_0::imtbase::CFieldSortingInfo>();
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoElementsCount; ++sortingInfoIndex){
 			const ::imtgql::CGqlParamObject* sortingInfoDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("sortingInfo", sortingInfoIndex);
-			if (sortingInfoDataObjectPtr == nullptr){
-				qDebug() << "invalid type" << sortingInfoDataObjectPtr;
-				return false;
+			if (sortingInfoDataObjectPtr == nullptr || sortingInfoDataObjectPtr->IsNull()){
+				sortingInfo->AppendNull();
+				continue;
 			}
 			V1_0::imtbase::CFieldSortingInfo tempSortingInfo;
 			if (!tempSortingInfo.ReadFromGraphQlObject(*sortingInfoDataObjectPtr)){
@@ -1982,8 +2189,8 @@ bool V1_0::imtbase::CComplexCollectionFilter::ReadFromGraphQlObject(const ::imtg
 		}
 	}
 
-	if (gqlObject.ContainsParam("distinctFields")){
-		distinctFields.emplace();
+	if (gqlObject.ContainsParam("distinctFields") && gqlObject["distinctFields"].isNull()){
+		distinctFields.SetNull();
 	}
 	if (gqlObject.ContainsParam("distinctFields") && !(gqlObject["distinctFields"].isNull())){
 		const QVariant distinctFieldsData = gqlObject["distinctFields"];
@@ -1991,6 +2198,10 @@ bool V1_0::imtbase::CComplexCollectionFilter::ReadFromGraphQlObject(const ::imtg
 		const qsizetype distinctFieldsElementsCount = distinctFieldsDataList.size();
 		distinctFields = imtsdl::TElementList<QByteArray>();
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsElementsCount; ++distinctFieldsIndex){
+			if (!distinctFieldsDataList[distinctFieldsIndex].isValid() || distinctFieldsDataList[distinctFieldsIndex].isNull()){
+				distinctFields->AppendNull();
+				continue;
+			}
 			QByteArray tempDistinctFields = distinctFieldsDataList[distinctFieldsIndex].toByteArray();
 			distinctFields->append(tempDistinctFields);
 		}
@@ -2002,17 +2213,17 @@ bool V1_0::imtbase::CComplexCollectionFilter::ReadFromGraphQlObject(const ::imtg
 
 bool V1_0::imtbase::CComplexCollectionFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("sortingInfo")){
-		sortingInfo.emplace();
+	if (gqlObject.ContainsParam("sortingInfo") && gqlObject["sortingInfo"].isNull()){
+		sortingInfo.SetNull();
 	}
-	if (gqlObject.ContainsParam("sortingInfo") && (gqlObject.GetObjectsCount("sortingInfo") > 0)){
+	if (gqlObject.ContainsParam("sortingInfo") && !(gqlObject["sortingInfo"].isNull())){
 		const qsizetype sortingInfoElementsCount = gqlObject.GetObjectsCount("sortingInfo");
 		sortingInfo = imtsdl::TElementList<V1_0::imtbase::CFieldSortingInfo>();
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoElementsCount; ++sortingInfoIndex){
 			const ::imtgql::CGqlParamObject* sortingInfoDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("sortingInfo", sortingInfoIndex);
-			if (sortingInfoDataObjectPtr == nullptr){
-				qDebug() << "invalid type" << sortingInfoDataObjectPtr;
-				return false;
+			if (sortingInfoDataObjectPtr == nullptr || sortingInfoDataObjectPtr->IsNull()){
+				sortingInfo->AppendNull();
+				continue;
 			}
 			V1_0::imtbase::CFieldSortingInfo tempSortingInfo;
 			if (!tempSortingInfo.OptReadFromGraphQlObject(*sortingInfoDataObjectPtr)){
@@ -2044,8 +2255,8 @@ bool V1_0::imtbase::CComplexCollectionFilter::OptReadFromGraphQlObject(const ::i
 		}
 	}
 
-	if (gqlObject.ContainsParam("distinctFields")){
-		distinctFields.emplace();
+	if (gqlObject.ContainsParam("distinctFields") && gqlObject["distinctFields"].isNull()){
+		distinctFields.SetNull();
 	}
 	if (gqlObject.ContainsParam("distinctFields") && !(gqlObject["distinctFields"].isNull())){
 		const QVariant distinctFieldsData = gqlObject["distinctFields"];
@@ -2053,6 +2264,10 @@ bool V1_0::imtbase::CComplexCollectionFilter::OptReadFromGraphQlObject(const ::i
 		const qsizetype distinctFieldsElementsCount = distinctFieldsDataList.size();
 		distinctFields = imtsdl::TElementList<QByteArray>();
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsElementsCount; ++distinctFieldsIndex){
+			if (!distinctFieldsDataList[distinctFieldsIndex].isValid() || distinctFieldsDataList[distinctFieldsIndex].isNull()){
+				distinctFields->AppendNull();
+				continue;
+			}
 			QByteArray tempDistinctFields = distinctFieldsDataList[distinctFieldsIndex].toByteArray();
 			distinctFields->append(tempDistinctFields);
 		}
@@ -2067,6 +2282,10 @@ bool V1_0::imtbase::CComplexCollectionFilter::WriteToJsonObject(QJsonObject& jso
 	if (sortingInfo){
 		QJsonArray newSortingInfoArray;
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfo->size(); ++sortingInfoIndex){
+			if (!sortingInfo->at(sortingInfoIndex)){
+				newSortingInfoArray << QJsonValue(QJsonValue::Null);
+				continue;
+			}
 			QJsonObject newSortingInfoJsonObject;
 			if (!sortingInfo->at(sortingInfoIndex)->WriteToJsonObject(newSortingInfoJsonObject)){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo").toLocal8Bit().constData();)
@@ -2076,6 +2295,9 @@ bool V1_0::imtbase::CComplexCollectionFilter::WriteToJsonObject(QJsonObject& jso
 			newSortingInfoArray << newSortingInfoJsonObject;
 		}
 		jsonObject["sortingInfo"] = newSortingInfoArray;
+	}
+	else if (sortingInfo.IsNull()){
+		jsonObject["sortingInfo"] = QJsonValue(QJsonValue::Null);
 	}
 
 	if (fieldsFilter){
@@ -2103,9 +2325,16 @@ bool V1_0::imtbase::CComplexCollectionFilter::WriteToJsonObject(QJsonObject& jso
 	if (distinctFields){
 		QJsonArray newDistinctFieldsArray;
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFields->size(); ++distinctFieldsIndex){
+			if (!distinctFields->at(distinctFieldsIndex)){
+				newDistinctFieldsArray << QJsonValue(QJsonValue::Null);
+				continue;
+			}
 			newDistinctFieldsArray << QString(*distinctFields->at(distinctFieldsIndex));
 		}
 		jsonObject["distinctFields"] = newDistinctFieldsArray;
+	}
+	else if (distinctFields.IsNull()){
+		jsonObject["distinctFields"] = QJsonValue(QJsonValue::Null);
 	}
 
 	jsonObject["__typename"] = "ComplexCollectionFilter";
@@ -2116,11 +2345,18 @@ bool V1_0::imtbase::CComplexCollectionFilter::WriteToJsonObject(QJsonObject& jso
 
 bool V1_0::imtbase::CComplexCollectionFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
-	if (jsonObject.contains("sortingInfo") && jsonObject["sortingInfo"].isArray()){
+if (jsonObject.contains("sortingInfo") && jsonObject["sortingInfo"].isNull()){
+		sortingInfo.SetNull();
+	}
+		if (jsonObject.contains("sortingInfo") && jsonObject["sortingInfo"].isArray()){
 		const QJsonArray sortingInfoJsonArray = jsonObject["sortingInfo"].toArray();
 		const qsizetype sortingInfoArrayCount = sortingInfoJsonArray.size();
 		sortingInfo = imtsdl::TElementList<V1_0::imtbase::CFieldSortingInfo>();
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoArrayCount; ++sortingInfoIndex){
+			if (sortingInfoJsonArray[sortingInfoIndex].isNull()){
+				sortingInfo->AppendNull();
+				continue;
+			}
 			V1_0::imtbase::CFieldSortingInfo tempSortingInfo;
 			if (!tempSortingInfo.ReadFromJsonObject(sortingInfoJsonArray[sortingInfoIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo").toLocal8Bit().constData();)
@@ -2151,11 +2387,18 @@ bool V1_0::imtbase::CComplexCollectionFilter::ReadFromJsonObject(const QJsonObje
 		}
 	}
 
-	if (jsonObject.contains("distinctFields") && jsonObject["distinctFields"].isArray()){
+if (jsonObject.contains("distinctFields") && jsonObject["distinctFields"].isNull()){
+		distinctFields.SetNull();
+	}
+		if (jsonObject.contains("distinctFields") && jsonObject["distinctFields"].isArray()){
 		const QJsonArray distinctFieldsJsonArray = jsonObject["distinctFields"].toArray();
 		const qsizetype distinctFieldsArrayCount = distinctFieldsJsonArray.size();
 		distinctFields = imtsdl::TElementList<QByteArray>();
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsArrayCount; ++distinctFieldsIndex){
+			if (distinctFieldsJsonArray[distinctFieldsIndex].isNull()){
+				distinctFields->AppendNull();
+				continue;
+			}
 			QByteArray tempDistinctFields = distinctFieldsJsonArray[distinctFieldsIndex].toString().toUtf8();
 			distinctFields->append(tempDistinctFields);
 		}
@@ -2167,11 +2410,18 @@ bool V1_0::imtbase::CComplexCollectionFilter::ReadFromJsonObject(const QJsonObje
 
 bool V1_0::imtbase::CComplexCollectionFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
-	if (jsonObject.contains("sortingInfo") && jsonObject["sortingInfo"].isArray()){
+if (jsonObject.contains("sortingInfo") && jsonObject["sortingInfo"].isNull()){
+		sortingInfo.SetNull();
+	}
+		if (jsonObject.contains("sortingInfo") && jsonObject["sortingInfo"].isArray()){
 		const QJsonArray sortingInfoJsonArray = jsonObject["sortingInfo"].toArray();
 		const qsizetype sortingInfoArrayCount = sortingInfoJsonArray.size();
 		sortingInfo = imtsdl::TElementList<V1_0::imtbase::CFieldSortingInfo>();
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoArrayCount; ++sortingInfoIndex){
+			if (sortingInfoJsonArray[sortingInfoIndex].isNull()){
+				sortingInfo->AppendNull();
+				continue;
+			}
 			V1_0::imtbase::CFieldSortingInfo tempSortingInfo;
 			if (!tempSortingInfo.OptReadFromJsonObject(sortingInfoJsonArray[sortingInfoIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QStringLiteral("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo").toLocal8Bit().constData();)
@@ -2202,11 +2452,18 @@ bool V1_0::imtbase::CComplexCollectionFilter::OptReadFromJsonObject(const QJsonO
 		}
 	}
 
-	if (jsonObject.contains("distinctFields") && jsonObject["distinctFields"].isArray()){
+if (jsonObject.contains("distinctFields") && jsonObject["distinctFields"].isNull()){
+		distinctFields.SetNull();
+	}
+		if (jsonObject.contains("distinctFields") && jsonObject["distinctFields"].isArray()){
 		const QJsonArray distinctFieldsJsonArray = jsonObject["distinctFields"].toArray();
 		const qsizetype distinctFieldsArrayCount = distinctFieldsJsonArray.size();
 		distinctFields = imtsdl::TElementList<QByteArray>();
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsArrayCount; ++distinctFieldsIndex){
+			if (distinctFieldsJsonArray[distinctFieldsIndex].isNull()){
+				distinctFields->AppendNull();
+				continue;
+			}
 			QByteArray tempDistinctFields = distinctFieldsJsonArray[distinctFieldsIndex].toString().toUtf8();
 			distinctFields->append(tempDistinctFields);
 		}
@@ -2245,12 +2502,12 @@ QVariant CTimeFilterObject::GetTimeRange()
 
 void CTimeFilterObject::SetTimeRange(const QVariant& v)
 {
-	if (v.isValid()){
+	if (v.isValid() && !v.isNull()){
 		sdl::V1_0::imtbase::CTimeRangeObject* itemPtr = v.value<sdl::V1_0::imtbase::CTimeRangeObject*>();
 		if (itemPtr != nullptr) CTimeFilter::timeRange = (*itemPtr);
 	}
 	else {
-		CTimeFilter::timeRange = nullptr;
+		CTimeFilter::timeRange.SetNull();
 	}
 	m_timeRangeQObjectPtr = v;
 
@@ -2808,14 +3065,41 @@ bool CFieldFilterObject::hasFilterValueType()
 
 QVariant CFieldFilterObject::GetFilterOperations()
 {
-	
-	return QVariant();
+	if (!filterOperations) {return {};}
+
+	QVariantList tempFilterOperationsList;
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::imtbase::FilterOperation>();
+	for (const auto& tempValue: filterOperations.value()){
+		tempFilterOperationsList << (tempValue ? QVariant(QString::fromUtf8(metaEnum.valueToKey(int(*tempValue)))) : QVariant());
+	}
+
+	return tempFilterOperationsList;
 }
 
 
 void CFieldFilterObject::SetFilterOperations(const QVariant& v)
 {
-	
+	if (!v.isValid() || v.isNull()){
+		return;
+	}
+	if (!CFieldFilter::filterOperations){
+		CFieldFilter::filterOperations.emplace();
+	}
+	else{
+		CFieldFilter::filterOperations->clear();
+	}
+	for (const QVariant& tempValue: v.toList()){
+		if (!tempValue.isValid() || tempValue.isNull()){
+			CFieldFilter::filterOperations->AppendNull();
+			continue;
+		}
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::imtbase::FilterOperation>();
+		const int key = metaEnum.keyToValue(tempValue.toString().toUtf8());
+		if (key < 0){continue;}
+		istd::TNullableValue<sdl::V1_0::imtbase::FilterOperation> tempItem(static_cast<sdl::V1_0::imtbase::FilterOperation>(key));
+		CFieldFilter::filterOperations->append(tempItem);
+	}
+
 	filterOperationsChanged();
 }
 
@@ -3014,6 +3298,7 @@ CGroupFilterObject::CGroupFilterObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CGroupFilterObject::GetFieldFilters()
 {
+	if (!fieldFilters) {return {};}
 	if (!m_fieldFiltersQObjectPtr.isValid()){
 		m_fieldFiltersQObjectPtr = CreateObject("fieldFilters");
 		auto itemPtr = m_fieldFiltersQObjectPtr.value<sdl::V1_0::imtbase::CFieldFilterObjectList*>();
@@ -3025,12 +3310,14 @@ QVariant CGroupFilterObject::GetFieldFilters()
 
 void CGroupFilterObject::SetFieldFilters(const QVariant& v)
 {
-	if (v.isValid()){
+	if (v.isValid() && !v.isNull()){
 		sdl::V1_0::imtbase::CFieldFilterObjectList* itemPtr = v.value<sdl::V1_0::imtbase::CFieldFilterObjectList*>();
-		if (itemPtr != nullptr) CGroupFilter::fieldFilters = itemPtr->Version_1_0;
+		if (itemPtr != nullptr){
+			CGroupFilter::fieldFilters = itemPtr->Version_1_0;
+		}
 	}
 	else {
-		CGroupFilter::fieldFilters = nullptr;
+		CGroupFilter::fieldFilters.SetNull();
 	}
 	m_fieldFiltersQObjectPtr = v;
 
@@ -3070,6 +3357,7 @@ QVariant CGroupFilterObject::createFieldFiltersArrayElement(const QVariant& v)
 
 QVariant CGroupFilterObject::GetGroupFilters()
 {
+	if (!groupFilters) {return {};}
 	if (!m_groupFiltersQObjectPtr.isValid()){
 		m_groupFiltersQObjectPtr = CreateObject("groupFilters");
 		auto itemPtr = m_groupFiltersQObjectPtr.value<sdl::V1_0::imtbase::CGroupFilterObjectList*>();
@@ -3081,12 +3369,14 @@ QVariant CGroupFilterObject::GetGroupFilters()
 
 void CGroupFilterObject::SetGroupFilters(const QVariant& v)
 {
-	if (v.isValid()){
+	if (v.isValid() && !v.isNull()){
 		sdl::V1_0::imtbase::CGroupFilterObjectList* itemPtr = v.value<sdl::V1_0::imtbase::CGroupFilterObjectList*>();
-		if (itemPtr != nullptr) CGroupFilter::groupFilters = itemPtr->Version_1_0;
+		if (itemPtr != nullptr){
+			CGroupFilter::groupFilters = itemPtr->Version_1_0;
+		}
 	}
 	else {
-		CGroupFilter::groupFilters = nullptr;
+		CGroupFilter::groupFilters.SetNull();
 	}
 	m_groupFiltersQObjectPtr = v;
 
@@ -3342,6 +3632,7 @@ CComplexCollectionFilterObject::CComplexCollectionFilterObject(QObject* parent):
 
 QVariant CComplexCollectionFilterObject::GetSortingInfo()
 {
+	if (!sortingInfo) {return {};}
 	if (!m_sortingInfoQObjectPtr.isValid()){
 		m_sortingInfoQObjectPtr = CreateObject("sortingInfo");
 		auto itemPtr = m_sortingInfoQObjectPtr.value<sdl::V1_0::imtbase::CFieldSortingInfoObjectList*>();
@@ -3353,12 +3644,14 @@ QVariant CComplexCollectionFilterObject::GetSortingInfo()
 
 void CComplexCollectionFilterObject::SetSortingInfo(const QVariant& v)
 {
-	if (v.isValid()){
+	if (v.isValid() && !v.isNull()){
 		sdl::V1_0::imtbase::CFieldSortingInfoObjectList* itemPtr = v.value<sdl::V1_0::imtbase::CFieldSortingInfoObjectList*>();
-		if (itemPtr != nullptr) CComplexCollectionFilter::sortingInfo = itemPtr->Version_1_0;
+		if (itemPtr != nullptr){
+			CComplexCollectionFilter::sortingInfo = itemPtr->Version_1_0;
+		}
 	}
 	else {
-		CComplexCollectionFilter::sortingInfo = nullptr;
+		CComplexCollectionFilter::sortingInfo.SetNull();
 	}
 	m_sortingInfoQObjectPtr = v;
 
@@ -3415,12 +3708,12 @@ QVariant CComplexCollectionFilterObject::GetFieldsFilter()
 
 void CComplexCollectionFilterObject::SetFieldsFilter(const QVariant& v)
 {
-	if (v.isValid()){
+	if (v.isValid() && !v.isNull()){
 		sdl::V1_0::imtbase::CGroupFilterObject* itemPtr = v.value<sdl::V1_0::imtbase::CGroupFilterObject*>();
 		if (itemPtr != nullptr) CComplexCollectionFilter::fieldsFilter = (*itemPtr);
 	}
 	else {
-		CComplexCollectionFilter::fieldsFilter = nullptr;
+		CComplexCollectionFilter::fieldsFilter.SetNull();
 	}
 	m_fieldsFilterQObjectPtr = v;
 
@@ -3471,12 +3764,12 @@ QVariant CComplexCollectionFilterObject::GetTimeFilter()
 
 void CComplexCollectionFilterObject::SetTimeFilter(const QVariant& v)
 {
-	if (v.isValid()){
+	if (v.isValid() && !v.isNull()){
 		sdl::V1_0::imtbase::CTimeFilterObject* itemPtr = v.value<sdl::V1_0::imtbase::CTimeFilterObject*>();
 		if (itemPtr != nullptr) CComplexCollectionFilter::timeFilter = (*itemPtr);
 	}
 	else {
-		CComplexCollectionFilter::timeFilter = nullptr;
+		CComplexCollectionFilter::timeFilter.SetNull();
 	}
 	m_timeFilterQObjectPtr = v;
 
@@ -3511,25 +3804,34 @@ QVariant CComplexCollectionFilterObject::GetDistinctFields()
 {
 	if (!distinctFields ){return {};}
 
-	QList<QString> tempDistinctFieldsList;
+	QVariantList tempDistinctFieldsList;
 	for (const auto& tempValue: distinctFields.value()){
-		tempDistinctFieldsList << *tempValue;
+		tempDistinctFieldsList << (tempValue ? QVariant(QString::fromUtf8(*tempValue)) : QVariant());
 	}
 
-	return QVariant::fromValue(tempDistinctFieldsList);
+	return tempDistinctFieldsList;
 }
 
 
 void CComplexCollectionFilterObject::SetDistinctFields(const QVariant& v)
 {
+	if (!v.isValid() || v.isNull()){
+		CComplexCollectionFilter::distinctFields.SetNull();
+		distinctFieldsChanged();
+		return;
+	}
 	if (!CComplexCollectionFilter::distinctFields){
 		CComplexCollectionFilter::distinctFields.emplace();
 	}
 	else{
 		CComplexCollectionFilter::distinctFields->clear();
 	}
-	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QByteArray> tempItem(tempValue.toUtf8());
+	for (const QVariant& tempValue: v.toList()){
+		if (!tempValue.isValid() || tempValue.isNull()){
+			CComplexCollectionFilter::distinctFields->AppendNull();
+			continue;
+		}
+		istd::TNullableValue<QByteArray> tempItem(tempValue.toString().toUtf8());
 		CComplexCollectionFilter::distinctFields->append(tempItem);
 	}
 

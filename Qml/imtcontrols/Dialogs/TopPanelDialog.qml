@@ -10,7 +10,7 @@ Rectangle {
 
 	width: Style.sizeHintXS;
 	height: Style.controlHeightL;
-	radius: Style.radiusXS;
+	radius: Style.radiusL;
 
 	color: Style.baseColor;
 

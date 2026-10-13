@@ -3,11 +3,9 @@
 
 
 // ACF includes
-#include <ifile/IFileNameParam.h>
-
 // ImtCore includes
 #include <imtdoc/TCollectionDocumentServiceWrap.h>
-#include <imtdoc/CDocumentServiceCompBase.h>
+#include <imtdoc/CDocumentServiceComp.h>
 
 
 namespace imtdoc
@@ -21,7 +19,7 @@ namespace imtdoc
 	\c CCollectionDocumentServiceComp is the standard ready-to-use document
 	service component for server-side multi-user scenarios.  It inherits
 	the full implementation from
-	\c TCollectionDocumentServiceWrap<CDocumentServiceCompBase> and adds only
+	\c TCollectionDocumentServiceWrap<CDocumentServiceComp> and adds only
 	the two ACF component attributes that complete the concrete class:
 
 	- \c "Collection" — reference to the \c IObjectCollection that provides
@@ -29,24 +27,21 @@ namespace imtdoc
 	- \c "IsSingleCopyMode" — when \c true, all users that open the same
 	  collection element share a single in-memory data object and undo
 	  manager (default: \c false).
-	- \c "UndoManagerFolder" — optional root folder used to locate and
-	  remove undo snapshot subfolders by document ID on close.
 
 	Register it in the component descriptor with the interface
 	\c imtdoc::IDocumentService so that clients can obtain it via the ACF
 	service locator.
 */
-class CCollectionDocumentServiceComp: public TCollectionDocumentServiceWrap<CDocumentServiceCompBase>
+class CCollectionDocumentServiceComp: public TCollectionDocumentServiceWrap<CDocumentServiceComp>
 {
 public:
-	typedef TCollectionDocumentServiceWrap<CDocumentServiceCompBase> BaseClass;
+	typedef TCollectionDocumentServiceWrap<CDocumentServiceComp> BaseClass;
 
 	I_BEGIN_COMPONENT(CCollectionDocumentServiceComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentService)
 		I_REGISTER_INTERFACE(iser::ISerializable)
 		I_ASSIGN(m_collectionCompPtr, "Collection", "Document collection containing related documents", true, "Collection");
 		I_ASSIGN(m_isSingleCopyModeAttrPtr, "IsSingleCopyMode", "When enabled, all users share a single copy of each document", false, false);
-		I_ASSIGN(m_undoManagerFolderCompPtr, "UndoManagerFolder", "Root folder for undo manager snapshots", false, "UndoManagerFolder");
 	I_END_COMPONENT
 
 	// reimplemented (iser::ISerializable)
@@ -58,7 +53,6 @@ protected:
 
 	// reimplemented (imtdoc::CDocumentServiceBase)
 	virtual bool IsSingleCopyMode() const override;
-	virtual OperationStatus CloseDocumentInternal(const QByteArray& userId, const QByteArray& documentId) override;
 
 private:
 	struct DocumentInfo
@@ -88,12 +82,10 @@ private:
 				const QByteArray& userId,
 				bool isSingleCopyMode,
 				const idoc::IUndoManagerSharedPtr& undoManagerPtr);
-	void RemoveUndoManagerDocumentDirectory(const QByteArray& documentId) const;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_collectionCompPtr);
 	I_ATTR(bool, m_isSingleCopyModeAttrPtr);
-	I_REF(ifile::IFileNameParam, m_undoManagerFolderCompPtr);
 };
 
 

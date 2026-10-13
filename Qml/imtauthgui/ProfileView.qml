@@ -88,7 +88,8 @@ ViewBase {
 		if (!container.apiClient)
 			return
 		container.apiClient.getProfile()
-		container.apiClient.getOrganizations()
+		if (AuthorizationController.tenantsEnabled)
+			container.apiClient.getOrganizations()
 	}
 
 	Connections {
@@ -223,7 +224,8 @@ ViewBase {
 
 		Component.onCompleted: {
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
-			multiPageView.addPage("Organizations", qsTr("Organizations"), organizationsPageComp, "Icons/Organizations")
+			if (AuthorizationController.tenantsEnabled)
+				multiPageView.addPage("Organizations", qsTr("Organizations"), organizationsPageComp, "Icons/Organizations")
 			multiPageView.addPage("AccessTokens", qsTr("Access Tokens"), tokensPageComp, "Icons/Key")
 			multiPageView.addPage("Access", qsTr("Roles & Permissions"), accessPageComp, "Icons/Role")
 			multiPageView.currentIndex = 0

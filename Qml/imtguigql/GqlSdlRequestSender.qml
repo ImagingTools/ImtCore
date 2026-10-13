@@ -103,6 +103,7 @@ GqlRequest {
 	function send(sdlInputObject){
 		if (gqlCommandId == "" || gqlCommandId === undefined || gqlCommandId == null ){
 			console.error("Unable to send request. Error: GraphQL command-ID is invalid.");
+			root.onError("GraphQL command-ID is invalid", "");
 			return;
 		}
 		
@@ -118,45 +119,63 @@ GqlRequest {
 		}
 		else{
 			console.error("Unable to send request", root.gqlCommandId ,". Error: Request type is unsupported.");
+			root.onError("Request type is unsupported", "");
 			return;
 		}
 
 		var query = Gql.GqlRequest(type, root.gqlCommandId);
+		let gqlQuery = "";
+		try {
+			let gqlObject = Gql.GqlObject("input")
+			if (sdlInputObject){
+				gqlObject.fromObject(sdlInputObject)
+				query.AddParam(gqlObject);
+			}
+			else if (inputObjectComp != null){
+				let inputObject = inputObjectComp.createObject(root);
+				gqlObject.fromObject(inputObject)
+				query.AddParam(gqlObject);
 
-		let gqlObject = Gql.GqlObject("input")
-		if (sdlInputObject){
-			// console.log("sdlInputObject", sdlInputObject.toJson())
-			// gqlObject.fromJson(sdlInputObject.toJson())
-			gqlObject.fromObject(sdlInputObject)
-			query.AddParam(gqlObject);
+				inputObject.destroy()
+			}
+			else{
+				createQueryParams(query);
+			}
+
+			let requestedFields = getRequestedFields();
+			if (requestedFields !== null){
+				let fieldIds = requestedFields.GetFieldIds();
+				for (let i = 0; i < fieldIds.length; i++){
+					let fieldId = fieldIds[i];
+					if (requestedFields.IsObject(fieldId)){
+						query.AddField(requestedFields.GetFieldArgumentObjectPtr(fieldId));
+					}
+					else{
+						query.AddField(Gql.GqlObject(fieldId));
+					}
+				}
+			}
+
+			gqlQuery = query.GetQuery();
 		}
-		else if (inputObjectComp != null){
-			let inputObject = inputObjectComp.createObject(root);
-			gqlObject.fromObject(inputObject)
-			query.AddParam(gqlObject);
-			
-			inputObject.destroy()
-		}
-		else{
-			createQueryParams(query);
+		catch (error){
+			console.error("Unable to create request", root.gqlCommandId, ". Error:", error.message);
+			root.onError(error.message, "Error");
+			return;
 		}
 
-		let requestedFields = getRequestedFields();
-		if(requestedFields !== null){
-			query.AddField(requestedFields);
-		}
-		
 		let headers = root.getHeaders()
 		if (headers && root.context && root.context != "")
 			headers["context"] = root.context
 
-		root.setGqlQuery(query.GetQuery(), headers)
+		root.setGqlQuery(gqlQuery, headers)
 	}
 	
 	function createQueryParams(query){
 		query.AddParam(inputParams);
 	}
 	
+	// Fields of the returned GqlObject are the selection set of the command result, the object itself is not selected
 	function getRequestedFields(){
 		return null;
 	}
@@ -185,13 +204,13 @@ GqlRequest {
 			catch(e){
 				console.error("Unable convert json ", json, " to object", "Warning");
 				console.error(e);
-				root.onError("Unable convert json ", json, " to object", "Warning");
+				root.onError(qsTr("Unable to read the server response"), "");
 				return;
 			}
 			
 			if (!responseObj){
 				console.log("Unable convert json ", json, " to object", "Warning");
-				root.onError("Unable convert json ", json, " to object", "Warning");
+				root.onError(qsTr("Unable to read the server response"), "");
 				return;
 			}
 

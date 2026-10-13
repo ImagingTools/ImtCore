@@ -80,7 +80,7 @@ Rectangle {
 
 	//
 	property string borderColorHorizontal: "transparent";
-	property string borderColorVertical: Style.baseColorInverted;
+	property string borderColorVertical: Style.borderColor;
 	property int horizontalBorderSize: 0;
 	property int verticalBorderSize: 0;
 	property int verticalBorderHeight: -1;
@@ -412,6 +412,30 @@ Rectangle {
 
 	function allVisible(){
 		tableContainer.properties.clearInvisibleItems();
+	}
+
+	function refreshVisibleRows(){
+		let y = elementsListObj.contentY;
+		let bottom = y + elementsListObj.height;
+		let guard = 0;
+
+		while (y < bottom && guard < elementsListObj.count){
+			guard = guard + 1;
+			let row = elementsListObj.itemAt(0, y + 1);
+			if (!row || row.height <= 0){
+				return;
+			}
+
+			if (row.reused){
+				row.reused();
+			}
+
+			let nextY = row.y + row.height;
+			if (nextY <= y){
+				return;
+			}
+			y = nextY;
+		}
 	}
 
 	function getHeaderIndex(headerId){

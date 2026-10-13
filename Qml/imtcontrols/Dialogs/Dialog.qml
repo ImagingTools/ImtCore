@@ -30,6 +30,9 @@ ControlBase {
 	property Item root: null;
 
 	property Item rootItem: null;
+	property var dialogManagerView: parentWindow ? parentWindow.dialogManagerView : undefined;
+	property int modality: Qt.ApplicationModal //Qt.ApplicationModal, Qt.WindowModal, Qt.NonModal
+	property var parentWindow: null
 
 	property ListModel buttonsModel: ListModel{};
 	property int buttonsModelCount: buttonsModel.count;
@@ -37,7 +40,7 @@ ControlBase {
 	property int buttonIds: 0;//81920;
 
 	property string backgroundColor: Style.dialogBackgroundColor;
-	property int radius: 0;
+	property int radius: Style.radiusL;
 
 	property bool canMove: true;
 	property bool canResize: false;
@@ -57,6 +60,10 @@ ControlBase {
 	property Item bodyItem: null;
 	property Item buttons: null;
 
+	property alias focusTargetList: dialogFocusManager.targetList
+	property alias focusManagerButtonsModel: dialogFocusManager.buttonsModel
+	property alias focusManagerEnabled: dialogFocusManager.enabled
+
 	signal finished(int buttonId);
 	signal started();
 	signal localizationChanged(string language);
@@ -72,12 +79,28 @@ ControlBase {
 		}
 	}
 
-	function addButton(id, name, enabled){
+	DialogFocusManager{
+		id: dialogFocusManager
+		buttonsModel: dialogContainer.buttonsModel
+		dialog: dialogContainer
+		enabled: false
+	}
+
+	function addButton(id, name, enabled, active){
 		if (enabled == undefined){
 			enabled = true
 		}
+		if(active == undefined){
+			active = false
+		}
 
-		buttonsModel.append({id: id, name:name, enabled: enabled})
+		buttonsModel.append({id: id, name:name, enabled: enabled, active: active})
+	}
+
+	function setButtonActive(buttonIdArg){
+		for(let i = 0; i < buttonsModel.count; i++){
+			buttonsModel.setProperty(i, "active", buttonsModel.get(i).id == buttonIdArg)
+		}
 	}
 
 	function insertButton(id, name, enabled, index){
@@ -124,6 +147,9 @@ ControlBase {
 			let buttonId = buttonsModel.get(i).id;
 			if (buttonId === id){
 				buttonsModel.setProperty(i, "enabled", enabled);
+				if(!enabled){
+					buttonsModel.setProperty(i, "active", enabled);
+				}
 				break;
 			}
 		}
@@ -150,10 +176,10 @@ ControlBase {
 		if (dialogContainer.root){
 			if(!(dialogContainer.notClosingButtons & buttonId)){
 				if(dialogContainer.selfComp){
-					dialogContainer.root.closeByComp(dialogContainer.selfComp);
+					dialogContainer.root.closeByComp(dialogContainer.selfComp, dialogContainer.parentWindow);
 				}
 				else {
-					dialogContainer.root.closeDialog();
+					dialogContainer.root.closeDialog(undefined, dialogContainer.parentWindow);
 				}
 			}
 		}
@@ -223,16 +249,14 @@ ControlBase {
 			if(dialogContainer.root){
 				dialogContainer.closed()
 				if(dialogContainer.selfComp){
-					dialogContainer.root.closeByComp(dialogContainer.selfComp);
+					dialogContainer.root.closeByComp(dialogContainer.selfComp, dialogContainer.parentWindow);
 				}
 				else {
-					dialogContainer.root.closeDialog();
+					dialogContainer.root.closeDialog(undefined, dialogContainer.parentWindow);
 				}
 
 			}
 		}
-
-
 	}
 
 	ResizeItem{
@@ -241,6 +265,7 @@ ControlBase {
 		visible: dialogContainer.canResize;
 
 		targetItem: dialogContainer;
+		globalParent: dialogContainer.dialogManagerView ? dialogContainer.dialogManagerView : ModalDialogManager.activeView
 		onSizeChanged: {
 			if(dialogContainer.contentItem){
 				if(deltaWidth !== 0){

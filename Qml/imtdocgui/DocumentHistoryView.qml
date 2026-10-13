@@ -207,7 +207,7 @@ Rectangle {
 							text: qsTr("Current")
 							font.pixelSize: Style.fontSizeM
 							font.bold: true
-							color: "white"
+							color: Style.highlightedTextColor
 						}
 					}
 				}
@@ -232,7 +232,7 @@ Rectangle {
 								: ""
 							font.pixelSize: Style.fontSizeS
 							font.bold: true
-							color: "white"
+							color: Style.highlightedTextColor
 						}
 					}
 

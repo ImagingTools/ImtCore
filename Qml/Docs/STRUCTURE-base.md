@@ -9110,6 +9110,8 @@
 - `clear()`
 - `filterChanged()`
 - `clearAllFilters(bool beQuiet)`
+- `filterDependencyAdded(string filterId, string dependsOnFilterId)`
+- `filterDelegateLoaded(string filterId)`
 
 **Функции**
 
@@ -9118,7 +9120,9 @@
 - `registerFieldFilterDelegate(filterId, filterDelegateComp)`
 - `removeFieldFilterDelegate(filterId)`
 - `getFilterDelegate(filterId)`
+- `setFilterDelegate(index, item)`
 - `setFilterDependency(filterId, dependsOnFilterId)`
+- `getDependsOn(filterId)`
 - `hasDependsOn(filterId, dependsOnFilterId)`
 
 <a id="b-imtgui-FilterPanelDecorator"></a>

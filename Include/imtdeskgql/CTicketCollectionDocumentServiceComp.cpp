@@ -342,8 +342,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTicketCollectionDocumentServiceCom
 		}
 	}
 
-	const bool canEditCoreFields = CanLockTicket(gqlRequest.GetRequestContext(), ticketPtr)
-			|| ticketPtr->GetReporterId().isEmpty();
+	const bool canEditCoreFields = CanLockTicket(gqlRequest.GetRequestContext(), ticketPtr);
 	const bool titleChanged = ticketInfo.title && *ticketInfo.title != ticketPtr->GetTitle();
 	const bool descriptionChanged = ticketInfo.description && *ticketInfo.description != ticketPtr->GetDescription();
 	const bool assigneesChanged = ticketInfo.assigneeIds && ticketInfo.assigneeIds->ToList() != ticketPtr->GetAssigneeIds();

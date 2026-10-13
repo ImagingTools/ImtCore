@@ -137,6 +137,60 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateIn
 }
 
 
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAccountDisabledResponse(
+			const QByteArray& login) const
+{
+	// Only reached once the credentials were verified, so naming the account state
+	// discloses nothing the caller has not already proven. Reported through the
+	// payload, not through errorMessage: a non-empty errorMessage makes the
+	// generated handler drop the payload, and with it the flag.
+	SendWarningMessage(0,
+					QStringLiteral("Authorization denied for disabled account. Login: '%1'").arg(login),
+					"imtgql::CAuthorizationControllerComp");
+
+	sdl::V1_0::imtauth::CAuthorizationPayload payload;
+	payload.accountDisabled = true;
+
+	return payload;
+}
+
+
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAccountLockedResponse(
+			const QByteArray& login,
+			QString& errorMessage) const
+{
+	errorMessage = QT_TR_NOOP(QStringLiteral("Account is temporarily locked due to too many invalid access attempts. Login: '%1'").arg(login));
+	SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
+
+	return sdl::V1_0::imtauth::CAuthorizationPayload();
+}
+
+
+bool CAuthorizationControllerComp::IsAccountLocked(const QByteArray& login) const
+{
+	if (!m_accountLockoutControllerCompPtr.IsValid()){
+		return false;
+	}
+
+	return m_accountLockoutControllerCompPtr->IsAccountLocked(login);
+}
+
+
+void CAuthorizationControllerComp::RegisterAccessAttempt(const QByteArray& login, bool successful) const
+{
+	if (!m_accountLockoutControllerCompPtr.IsValid()){
+		return;
+	}
+
+	if (successful){
+		m_accountLockoutControllerCompPtr->RegisterSuccessfulAttempt(login);
+	}
+	else{
+		m_accountLockoutControllerCompPtr->RegisterFailedAttempt(login);
+	}
+}
+
+
 sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAuthorizationSuccessfulResponse(
 			imtauth::CUserInfo& userInfo,
 			const QByteArray& systemId,
@@ -218,6 +272,45 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAu
 }
 
 
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAuthorizationResponseWithLifetimeCheck(
+			imtauth::CUserInfo& userInfo,
+			const QByteArray& systemId,
+			const QByteArray& productId,
+			QString& errorMessage) const
+{
+	int daysUntilExpiration = -1;
+	imtauth::IPasswordPolicy::LifetimeStatus lifetimeStatus = imtauth::IPasswordPolicy::LS_OK;
+
+	// Password lifetime is only evaluated for password-based accounts of the internal system;
+	// externally managed users (e.g. LDAP) are governed by their own system.
+	if (m_passwordPolicyCompPtr.IsValid() && systemId.isEmpty()){
+		lifetimeStatus = m_passwordPolicyCompPtr->GetPasswordLifetimeStatus(userInfo, daysUntilExpiration);
+	}
+
+	if (lifetimeStatus == imtauth::IPasswordPolicy::LS_EXPIRED || lifetimeStatus == imtauth::IPasswordPolicy::LS_CHANGE_REQUIRED){
+		// Reported through the payload, not through errorMessage: a non-empty
+		// errorMessage makes the generated handler drop the payload, and with it the flag.
+		SendErrorMessage(0,
+						QStringLiteral("The password has expired and must be changed. Login: '%1'").arg(userInfo.GetId()),
+						"imtgql::CAuthorizationControllerComp");
+
+		sdl::V1_0::imtauth::CAuthorizationPayload payload;
+		payload.passwordExpired = true;
+
+		return payload;
+	}
+
+	sdl::V1_0::imtauth::CAuthorizationPayload payload = CreateAuthorizationSuccessfulResponse(userInfo, systemId, productId, errorMessage);
+
+	if (lifetimeStatus == imtauth::IPasswordPolicy::LS_EXPIRES_SOON){
+		payload.passwordExpired = false;
+		payload.passwordExpiresInDays = daysUntilExpiration;
+	}
+
+	return payload;
+}
+
+
 // reimplemented (sdl::V1_0::imtauth::CAuthorizationGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthorization(
@@ -251,8 +344,13 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		password = inputArgument->password->toUtf8();
 	}
 
+	if (IsAccountLocked(login)){
+		return CreateAccountLockedResponse(login, errorMessage);
+	}
+
 	QByteArray userObjectId = GetUserObjectId(login);
 	if (userObjectId.isEmpty()){
+		RegisterAccessAttempt(login, false);
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
@@ -263,6 +361,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 	}
 
 	if (userInfoPtr == nullptr){
+		RegisterAccessAttempt(login, false);
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
@@ -278,11 +377,18 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		}
 	}
 
+	RegisterAccessAttempt(login, ok);
+
 	if (!ok){
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
-	return CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
+	// Checked after the credentials, so a wrong password cannot be used to probe account states.
+	if (!userInfoPtr->IsEnabled()){
+		return CreateAccountDisabledResponse(login);
+	}
+
+	return CreateAuthorizationResponseWithLifetimeCheck(*userInfoPtr, activeSystemId, productId, errorMessage);
 }
 
 
@@ -317,8 +423,13 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 		password = inputArgument->password->toUtf8();
 	}
 
+	if (IsAccountLocked(login)){
+		return CreateAccountLockedResponse(login, errorMessage);
+	}
+
 	QByteArray userObjectId = GetUserObjectId(login);
 	if (userObjectId.isEmpty()){
+		RegisterAccessAttempt(login, false);
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
@@ -329,6 +440,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 	}
 
 	if (userInfoPtr == nullptr){
+		RegisterAccessAttempt(login, false);
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
@@ -344,11 +456,18 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 		}
 	}
 
+	RegisterAccessAttempt(login, ok);
+
 	if (!ok){
 		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 	}
 
-	return CreateAuthorizationSuccessfulResponse(*userInfoPtr, activeSystemId, productId, errorMessage);
+	// Checked after the credentials, so a wrong password cannot be used to probe account states.
+	if (!userInfoPtr->IsEnabled()){
+		return CreateAccountDisabledResponse(login);
+	}
+
+	return CreateAuthorizationResponseWithLifetimeCheck(*userInfoPtr, activeSystemId, productId, errorMessage);
 }
 
 

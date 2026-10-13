@@ -9111,8 +9111,8 @@ Input-ID: </source>
     </message>
     <message>
         <location line="+14"/>
-        <source>My tenants</source>
-        <translation>Менің тенанттарым</translation>
+        <source>My organizations</source>
+        <translation>Менің ұйымдарым</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -9131,8 +9131,8 @@ Input-ID: </source>
     </message>
     <message>
         <location line="+43"/>
-        <source>Tenant</source>
-        <translation>Тенант</translation>
+        <source>Organization</source>
+        <translation>Ұйым</translation>
     </message>
 </context>
 <context>
@@ -9185,18 +9185,18 @@ Input-ID: </source>
     </message>
     <message>
         <location line="+7"/>
-        <source>Basic workspace settings and configuration.</source>
-        <translation>Жұмыс кеңістігінің негізгі параметрлері мен конфигурациясы.</translation>
+        <source>Basic settings of the organization.</source>
+        <translation>Ұйымның негізгі параметрлері.</translation>
     </message>
     <message>
         <location line="+18"/>
-        <source>Tenant Name</source>
-        <translation>Тенант атауы</translation>
+        <source>Organization Name</source>
+        <translation>Ұйым атауы</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Enter the tenant name</source>
-        <translation>Тенант атауын енгізіңіз</translation>
+        <source>Enter the organization name</source>
+        <translation>Ұйым атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -9328,8 +9328,8 @@ Input-ID: </source>
     </message>
     <message>
         <location line="+4"/>
-        <source>Leave Workspace</source>
-        <translation>Жұмыс кеңістігінен шығу</translation>
+        <source>Leave Organization</source>
+        <translation>Ұйымнан шығу</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -9366,8 +9366,8 @@ Input-ID: </source>
     </message>
     <message>
         <location line="+34"/>
-        <source>Manage tenant members. Users created here automatically become members.</source>
-        <translation>Тенант мүшелерін басқару. Мұнда жасалған пайдаланушылар автоматты түрде мүше болады.</translation>
+        <source>Manage the members of the organization. Users created here automatically become members.</source>
+        <translation>Ұйым мүшелерін басқару. Мұнда жасалған пайдаланушылар автоматты түрде мүше болады.</translation>
     </message>
     <message>
         <location line="+28"/>
@@ -9426,8 +9426,8 @@ Input-ID: </source>
     </message>
     <message>
         <location line="+7"/>
-        <source>Select which product features are available for this tenant.</source>
-        <translation>Осы тенант үшін қандай өнім мүмкіндіктері қолжетімді екенін таңдаңыз.</translation>
+        <source>Select which product features are available for this organization.</source>
+        <translation>Осы ұйым үшін қандай өнім мүмкіндіктері қолжетімді екенін таңдаңыз.</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -9484,8 +9484,8 @@ Input-ID: </source>
     </message>
     <message>
         <location line="+16"/>
-        <source>Manage tenant roles and assign permissions to team members.</source>
-        <translation>Тенант рөлдерін басқару және мүшелерге рұқсаттар тағайындау.</translation>
+        <source>Manage the roles of the organization and assign permissions to its members.</source>
+        <translation>Ұйым рөлдерін басқару және мүшелерге рұқсаттар тағайындау.</translation>
     </message>
     <message>
         <location line="+28"/>

@@ -9,6 +9,8 @@
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/ITransport.h>
+#include <imtrest/CHttpResponse.h>
+#include <imtrest/CHttpSender.h>
 
 
 namespace imtrest
@@ -88,7 +90,19 @@ bool CMultiThreadServer::SendResponse(const QByteArray& requestId, ConstResponse
 
 	for (CSocketThread* socket : m_threadSocketList){
 		if (socket->GetRequestId() == requestId){
-			return socket->SendResponse(response);
+			QByteArray data;
+
+			const CHttpResponse* httpResponsePtr = dynamic_cast<const CHttpResponse*>(response.GetPtr());
+			if (httpResponsePtr != nullptr){
+				if (!CHttpSender::BuildResponseData(*response, data)){
+					return false;
+				}
+			}
+			else{
+				data = response->GetData();
+			}
+
+			return socket->SendData(data);
 		}
 	}
 
@@ -98,14 +112,11 @@ bool CMultiThreadServer::SendResponse(const QByteArray& requestId, ConstResponse
 
 bool CMultiThreadServer::SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const
 {
-	QReadLocker threadListLock(&m_threadSocketListGuard);
+	Q_UNUSED(requestId)
+	Q_UNUSED(request)
 
-	for (CSocketThread* socket : m_threadSocketList){
-		if (socket->GetRequestId() == requestId){
-			return socket->SendRequest(request);
-		}
-	}
-
+	// Sending outbound requests is not supported over this response-oriented socket transport
+	// (matches the previous behavior, where the underlying transport only ever accepted responses).
 	return false;
 }
 

@@ -18,6 +18,7 @@ Item {
 	property alias tabDelegateDecorator: tabView.tabDelegateDecorator
 	// Fallback icon for document tabs when visual-status does not supply one.
 	property string defaultDocumentIcon: ""
+	property string dirtyPrefix: "* "
 
 	// Nested open/save loads — only this workspace is blocked, not the whole app
 	// (Events StartLoading/StopLoading are listened by Configurator app-wide).
@@ -44,12 +45,7 @@ Item {
 		target: workspaceView.visualStatusProvider ? workspaceView.visualStatusProvider : undefined
 		
 		function onVisualStatusReceived(objectId, icon, text, description){
-			let name = text
-			if (name === ""){
-				name = workspaceView.documentManager.defaultDocumentName
-			}
-
-			tabView.setTabName(objectId, name)
+			workspaceView.setDocumentName(objectId, text)
 			tabView.setTabDescription(objectId, description)
 			if (icon !== ""){
 				tabView.setTabIcon(objectId, icon)
@@ -60,7 +56,7 @@ Item {
 		}
 		
 		function onVisualStatusReceiveFailed(objectId, errorMessage){
-			tabView.setTabName(objectId, workspaceView.documentManager.defaultDocumentName)
+			workspaceView.setDocumentName(objectId, "")
 			tabView.setTabDescription(objectId, "")
 			if (workspaceView.defaultDocumentIcon !== ""){
 				tabView.setTabIcon(objectId, workspaceView.defaultDocumentIcon)
@@ -151,7 +147,7 @@ Item {
 			if (tabIndex < 0){
 				tabView.addTab(
 							documentData.documentId,
-							documentName,
+							workspaceView.tabTitle(documentData.documentId, documentName),
 							documentData.viewComp,
 							workspaceView.defaultDocumentIcon,
 							"",
@@ -177,18 +173,12 @@ Item {
 				return
 			}
 
-			let dirtyPrefix = "* "
-
 			let tabName = tabView.getTabName(documentId)
-			while (tabName.startsWith(dirtyPrefix)){
-				tabName = tabName.slice(dirtyPrefix.length)
+			while (tabName.startsWith(workspaceView.dirtyPrefix)){
+				tabName = tabName.slice(workspaceView.dirtyPrefix.length)
 			}
 
-			if (tabName === ""){
-				tabName = workspaceView.documentManager.defaultDocumentName
-			}
-
-			tabView.setTabName(documentId, isDirty ? dirtyPrefix + tabName : tabName)
+			workspaceView.setDocumentName(documentId, tabName)
 		}
 		
 		function onDocumentOpened(documentId){
@@ -234,7 +224,20 @@ Item {
 	}
 	
 	function setDocumentName(documentId, name){
-		tabView.setTabName(documentId, name)
+		tabView.setTabName(documentId, workspaceView.tabTitle(documentId, name))
+	}
+
+	// Every tab-name writer goes through here, so an async name update cannot drop the dirty marker.
+	function tabTitle(documentId, name){
+		if (name === ""){
+			name = workspaceView.documentManager.defaultDocumentName
+		}
+
+		if (workspaceView.documentManager.documentIsDirty(documentId)){
+			return workspaceView.dirtyPrefix + name
+		}
+
+		return name
 	}
 
 	function addFixedView(viewComp, name, id, forceFocus, pinned, icon){

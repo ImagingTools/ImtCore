@@ -84,6 +84,23 @@ function envFill(source) {
     return result
 }
 
+function getImtCoreRoots() {
+    const scriptImtCoreDir = path.resolve(__dirname, '../../../..')
+    const roots = [
+        process.env.IMTCOREDIR_BUILD,
+        process.env.IMTCOREDIR,
+        process.env.PROLIFEDIR,
+        scriptImtCoreDir,
+    ].filter(Boolean)
+
+    const unique = []
+    for (const root of roots) {
+        const resolved = path.resolve(root)
+        if (unique.indexOf(resolved) < 0) unique.push(resolved)
+    }
+    return unique
+}
+
 function ensureDefaultTargetName() {
     if (!process.env.IMTCOREDIR_BUILD && process.env.IMTCOREDIR) {
         process.env.IMTCOREDIR_BUILD = process.env.IMTCOREDIR
@@ -91,18 +108,33 @@ function ensureDefaultTargetName() {
 
     if (process.env.TARGETNAME && process.env.TARGETNAME.trim()) return
 
-    const roots = [process.env.IMTCOREDIR_BUILD, process.env.IMTCOREDIR, process.env.PROLIFEDIR].filter(Boolean)
-    for (const root of roots) {
+    for (const root of getImtCoreRoots()) {
         const auxIncludePath = path.resolve(root, 'AuxInclude')
-        if (!fs.existsSync(auxIncludePath) || !checkIsDirectorySync(auxIncludePath)) continue
+        if (fs.existsSync(auxIncludePath) && checkIsDirectorySync(auxIncludePath)) {
+            const targets = fs.readdirSync(auxIncludePath)
+                .map(name => path.resolve(auxIncludePath, name))
+                .filter(p => checkIsDirectorySync(p))
+                .map(p => path.basename(p))
 
-        const targets = fs.readdirSync(auxIncludePath)
-            .map(name => path.resolve(auxIncludePath, name))
-            .filter(p => checkIsDirectorySync(p))
-            .map(p => path.basename(p))
+            if (targets.length > 0) {
+                process.env.TARGETNAME = targets[0]
+                return
+            }
+        }
 
-        if (targets.length > 0) {
-            process.env.TARGETNAME = targets[0]
+        const binPath = path.resolve(root, 'Bin')
+        if (!fs.existsSync(binPath) || !checkIsDirectorySync(binPath)) continue
+
+        const binTargets = fs.readdirSync(binPath)
+            .filter(name => checkIsDirectorySync(path.resolve(binPath, name)))
+            .map(name => {
+                const match = String(name).match(/^(?:Debug|Release|RelWithDebInfo)_(.+)$/)
+                return match ? match[1] : ''
+            })
+            .filter(Boolean)
+
+        if (binTargets.length > 0) {
+            process.env.TARGETNAME = binTargets[0]
             return
         }
     }
@@ -140,33 +172,56 @@ function failAndExit(message) {
 
 function resolveDesktopHostExecutable() {
     const executableName = process.platform === 'win32' ? 'JQMLHost.exe' : 'JQMLHost'
-    
     const candidates = []
-    
-    // Относительные пути от корня workspace (JQML v3)
     const workspaceRoot = path.resolve(__dirname, '..')
+    const targetName = (process.env.TARGETNAME || '').trim()
+    const configs = ['Debug', 'RelWithDebInfo', 'Release']
+
     candidates.push(
         path.resolve(workspaceRoot, 'JQMLHost', executableName),
         path.resolve(workspaceRoot, 'bin', executableName),
         path.resolve(workspaceRoot, 'build', executableName)
     )
 
-    // Пути в ImtCore (корень находится на 3 уровня выше текущего скрипта)
-    const imtCoreDir = path.resolve(__dirname, '../../../..')
-    const targetName = (process.env.TARGETNAME || '').trim()
-    candidates.push(
-        path.resolve(imtCoreDir, 'Bin', `Debug_${targetName}`, executableName),
-        path.resolve(imtCoreDir, 'Bin', `Release_${targetName}`, executableName),
-        path.resolve(imtCoreDir, 'Bin', `RelWithDebInfo_${targetName}`, executableName),
-        // Fallback if TARGETNAME not set - try common patterns
-        path.resolve(imtCoreDir, 'Bin', 'Debug_Qt6_VC17_x64', executableName),
-        path.resolve(imtCoreDir, 'Bin', 'Release_Qt6_VC17_x64', executableName),
-        path.resolve(imtCoreDir, 'Bin', 'Debug', executableName),
-        path.resolve(imtCoreDir, 'Bin', 'Release', executableName)
-    )
+    for (const root of getImtCoreRoots()) {
+        if (targetName) {
+            for (const config of configs) {
+                candidates.push(path.resolve(root, 'Bin', `${config}_${targetName}`, executableName))
+            }
+        }
+
+        candidates.push(
+            path.resolve(root, 'Bin', 'Debug', executableName),
+            path.resolve(root, 'Bin', 'Release', executableName)
+        )
+    }
 
     for (const p of candidates) {
         if (fs.existsSync(p)) return p
+    }
+
+    for (const root of getImtCoreRoots()) {
+        const binDir = path.resolve(root, 'Bin')
+        if (!fs.existsSync(binDir) || !checkIsDirectorySync(binDir)) continue
+
+        let entries = []
+        try {
+            entries = fs.readdirSync(binDir)
+        } catch (e) {
+            continue
+        }
+
+        const preferred = []
+        const others = []
+        for (const name of entries) {
+            const exePath = path.resolve(binDir, name, executableName)
+            if (!fs.existsSync(exePath)) continue
+            if (String(name).startsWith('Debug')) preferred.push(exePath)
+            else others.push(exePath)
+        }
+
+        if (preferred.length > 0) return preferred[0]
+        if (others.length > 0) return others[0]
     }
 
     return ''

@@ -22,6 +22,7 @@
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CLdapUserCollectionControllerComp.h>
 #include <imtbase/CComplexCollectionFilter.h>
+#include <imtbase/COperationContext.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
@@ -292,6 +293,11 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 					if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
 						userInfoPtr.MoveCastedPtr(dataPtr.GetPtr()->CloneMe());
 						if (userInfoPtr.IsValid()){
+							// Reached only after CheckCredential succeeded, so naming the account state is safe.
+							if (!userInfoPtr->IsEnabled()){
+								return CreateAccountDisabledResponse(login);
+							}
+
 							bool needsUpdate = false;
 
 							// Update login in case the user logged in with a different format
@@ -323,7 +329,13 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 							}
 
 							if (needsUpdate){
-								if (!m_userCollectionCompPtr->SetObjectData(userObjectId, *userInfoPtr.GetPtr())){
+								imtbase::IOperationContext::IdentifableObjectInfo ownerInfo;
+								ownerInfo.id = userObjectId;
+								ownerInfo.name = userInfoPtr->GetName();
+								imtbase::COperationContext operationContext;
+								operationContext.SetOperationOwnerId(ownerInfo);
+
+								if (!m_userCollectionCompPtr->SetObjectData(userObjectId, *userInfoPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, &operationContext)){
 									SendWarningMessage(
 										0,
 										QStringLiteral("Unable to update user data for user '%1'").arg(userObjectId),

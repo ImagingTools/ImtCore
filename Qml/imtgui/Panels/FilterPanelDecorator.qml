@@ -222,8 +222,6 @@ DecoratorBase {
 				// A chip folded away under the pointer takes its card with it.
 				if (valueHint.hintOwner === loader.item){
 					valueHint.hintOwner = null
-					hintIn.stop()
-					hintOut.restart()
 				}
 			}
 		}
@@ -249,17 +247,22 @@ DecoratorBase {
 			return
 		}
 
-		if (loader.visible && loader.item.hovered && loader.item.valueIsCropped){
+		// A filter narrowed by another one says so on the same card: its options
+		// change with that filter, and nothing else on the row would tell.
+		let scoped = loader.item.scopeFilter !== null
+		if (loader.visible && loader.item.hovered && (loader.item.valueIsCropped || scoped)){
+			let hintText = scoped ? loader.item.scopeText : ""
+			if (loader.item.valueIsCropped){
+				let valueLine = loader.item.name + ": " + loader.item.valueText
+				hintText = hintText === "" ? valueLine : valueLine + "\n" + hintText
+			}
+
 			valueHint.hintOwner = loader.item
-			valueHint.hintText = loader.item.name + ": " + loader.item.valueText
+			valueHint.hintText = hintText
 			valueHint.anchorX = loader.mapToItem(content, loader.width / 2, 0).x
-			hintOut.stop()
-			hintIn.restart()
 		}
 		else if (valueHint.hintOwner === loader.item){
 			valueHint.hintOwner = null
-			hintIn.stop()
-			hintOut.restart()
 		}
 	}
 
@@ -328,7 +331,7 @@ DecoratorBase {
 
 						item.filterMenu = filterPanelDecorator.baseElement
 
-						filterPanelDecorator.baseElement.filtersModel.setProperty(model.index, "item", item)
+						filterPanelDecorator.baseElement.setFilterDelegate(model.index, item)
 
 						filterPanelDecorator.scheduleRelayout()
 					}
@@ -337,6 +340,7 @@ DecoratorBase {
 					// makes the chip wider and can cost the row its last place.
 					Connections {
 						target: delegateLoader.item
+						ignoreUnknownSignals: true
 
 						function onImplicitWidthChanged(){
 							filterPanelDecorator.scheduleRelayout()
@@ -459,8 +463,7 @@ DecoratorBase {
 		width: hintBody.width
 		height: hintTip.height / 2 + hintBody.height
 
-		visible: valueHint.opacity > 0
-		opacity: 0
+		visible: valueHint.hintOwner !== null
 
 		property string hintText: ""
 		property var hintOwner: null
@@ -516,25 +519,6 @@ DecoratorBase {
 			font.pixelSize: hintLabel.font.pixelSize
 		}
 
-		NumberAnimation {
-			id: hintIn
-
-			target: valueHint
-			property: "opacity"
-			to: 1
-			duration: 120
-			easing.type: Easing.OutQuad
-		}
-
-		NumberAnimation {
-			id: hintOut
-
-			target: valueHint
-			property: "opacity"
-			to: 0
-			duration: 90
-			easing.type: Easing.InQuad
-		}
 	}
 
 	// One cascading menu instead of a popup that opens another popup: the
@@ -792,7 +776,7 @@ DecoratorBase {
 			id: resetHint
 
 			anchors.right: parent.left
-			anchors.rightMargin: resetHint.slide
+			anchors.rightMargin: Style.spacingXS
 			anchors.verticalCenter: parent.verticalCenter
 
 			z: 200
@@ -800,10 +784,7 @@ DecoratorBase {
 			width: resetHintBody.width + Style.spacingS
 			height: Style.controlHeightM
 
-			visible: resetHint.opacity > 0
-			opacity: 0
-
-			property real slide: 0
+			visible: resetHint.wanted
 
 			Rectangle {
 				x: resetHintBody.width - width / 2
@@ -841,36 +822,6 @@ DecoratorBase {
 				}
 			}
 
-			ParallelAnimation {
-				id: resetHintIn
-
-				NumberAnimation {
-					target: resetHint
-					property: "opacity"
-					to: 1
-					duration: 120
-					easing.type: Easing.OutQuad
-				}
-
-				NumberAnimation {
-					target: resetHint
-					property: "slide"
-					to: Style.spacingXS
-					duration: 120
-					easing.type: Easing.OutCubic
-				}
-			}
-
-			NumberAnimation {
-				id: resetHintOut
-
-				target: resetHint
-				property: "opacity"
-				to: 0
-				duration: 90
-				easing.type: Easing.InQuad
-			}
-
 			// Bound, not listened for.
 			//
 			// Clearing the filters is the last thing this button is allowed to do
@@ -882,18 +833,6 @@ DecoratorBase {
 			// pointer moved or not.
 			readonly property bool wanted: clearAllButton.enabled && clearAllButton.visible
 				&& clearAllButton.mouseArea && clearAllButton.mouseArea.containsMouse
-
-			onWantedChanged: {
-				if (resetHint.wanted){
-					resetHintOut.stop()
-					resetHint.slide = 0
-					resetHintIn.restart()
-				}
-				else{
-					resetHintIn.stop()
-					resetHintOut.restart()
-				}
-			}
 		}
 	}
 }

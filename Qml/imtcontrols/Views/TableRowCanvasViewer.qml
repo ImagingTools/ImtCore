@@ -85,7 +85,7 @@ Canvas {
 		ctx.clearRect(0, 0, rowDelegate.width, rowDelegate.height);
 
 		let color = (rowDelegate.mouseArea.containsMouse || rowDelegate.selected) ? Style.selectedColor :
-				rowDelegate.tableItem.enableAlternating ? rowDelegate.tableItem.alternatingColor : 'white';
+				rowDelegate.tableItem.enableAlternating ? rowDelegate.tableItem.alternatingColor : Style.tableCellColor;
 		ctx.fillStyle = color
 		ctx.fillRect(x, y, rowDelegate.width, rowDelegate.height)
 

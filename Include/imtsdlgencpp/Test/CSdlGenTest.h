@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QObject>
 #include <QtCore/QDir>
+#include <QtCore/QTemporaryDir>
 
 // ImtCore includes
 #include <imtsdl/ISdlEditableProcessArgumentsParser.h>
@@ -25,6 +26,28 @@ private Q_SLOTS:
 	void TestComplexCollectionFilter();
 	void TestUnion();
 	void TestComplexUnion();
+	void TestArrayNullabilityParsing();
+	void TestImportedEnumArrayQObjectSetter();
+	void TestTreeModelExplicitNullKey();
+	void TestArrayBackendsRoundTrip_data();
+	void TestArrayBackendsRoundTrip();
+	void BenchmarkArrayGraphQlWriteMillionScalars();
+	void BenchmarkArrayGraphQlReadMillionScalars();
+	void TestArrayReadersRejectInvalidValues_data();
+	void TestArrayReadersRejectInvalidValues();
+	void TestArrayWritersRejectInvalidValues_data();
+	void TestArrayWritersRejectInvalidValues();
+	void TestArrayOptionalReadersPreserveMissingFields();
+	void TestArrayQObjectBridge();
+	void TestArrayJsonFileRoundTrip();
+	void TestArrayGraphQlRequestFileRoundTrip();
+	void TestNestedFieldNameCollision();
+	void TestRequestedFields_data();
+	void TestRequestedFields();
+	void TestRequestedFieldsWithComplexArguments();
+	void TestRequestedFieldsOfMutation();
+	void TestRequestedFieldsWithFieldNamedAsCommand();
+	void TestRequestedFieldsOfBuiltRequest();
 	void PrinterTest();
 	void SubstrateSpecifications();
 
@@ -33,6 +56,7 @@ private Q_SLOTS:
 
 private:
 	QDir m_tempOutputDir;
+	QTemporaryDir m_arraySerializationOutputDirectory;
 	bool m_isAllTestsPassed;
 
 };

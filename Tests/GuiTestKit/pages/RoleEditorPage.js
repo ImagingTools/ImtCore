@@ -14,16 +14,11 @@ class RoleEditorPage extends BasePage {
     this.description = new TextInput(page, ['RoleDescriptionInput']);
   }
 
-  save() { return this.runCommand('Save'); }
   undo() { return this.runCommand('Undo'); }
   redo() { return this.runCommand('Redo'); }
 
   async setRoleName(text) { await this.roleName.fill(text); return this; }
   async setDescription(text) { await this.description.fill(text); return this; }
-
-  expectFieldVisible(objectName) {
-    return gui.expectVisible(this.page, [objectName]);
-  }
 }
 
 module.exports = { RoleEditorPage };

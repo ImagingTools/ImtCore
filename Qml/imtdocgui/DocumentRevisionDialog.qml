@@ -40,7 +40,7 @@ Dialog {
 
 	onFinished: {
 		if (buttonId == Enums.save){
-			setRevisionRequest.send();
+			ModalDialogManager.openDialog(setRevisionConfirmDialog, {});
 		}
 		else if (buttonId == Enums.no){
 			ModalDialogManager.openDialog(removeRevisionConfirmDialog, {});
@@ -108,13 +108,27 @@ Dialog {
 		sdlObjectComp: Component { DeleteRevisionResponse {
 				onFinished: {
 					documentRevisionDialog.refresh()
-					PopupManager.addSuccessMessage(qsTr("The document revision has been successfully delete"));
+					PopupManager.addSuccessMessage(qsTr("The document revision has been successfully deleted"));
 				}
 			}
 		}
 
 		function getHeaders(){
 			return documentRevisionDialog.getHeaders();
+		}
+	}
+
+	Component {
+		id: setRevisionConfirmDialog;
+		MessageDialog {
+			width: Style.sizeHintM;
+			title: qsTr("Set revision");
+			message: qsTr("Restore the document to the selected revision ?");
+			onFinished: {
+				if (buttonId == Enums.yes){
+					setRevisionRequest.send()
+				}
+			}
 		}
 	}
 

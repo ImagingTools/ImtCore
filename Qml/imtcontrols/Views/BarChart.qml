@@ -24,7 +24,7 @@ Item {
 
 	property string color_positive: Style.positiveAccentColor;
 	property string color_negative: Style.negativeAccentColor;
-	property string backgroundColor: Style.baseColorInverted;
+	property string backgroundColor: Style.baseColor;
 
 	property bool hasTooltip: true;
 	property bool isPositiveTooltip: true;
@@ -164,7 +164,7 @@ Item {
 		fontPixelSize:  Style.fontSizeM;
 
 		color: Style.buttonColor;
-		fontColor: "#ffffff";
+		fontColor: Style.highlightedTextColor;
 
 		borderColor: Style.borderColor;
 		property string shownValPos: Math.trunc((barChart.positiveValue + barChart.addToValue)*1000)/1000;

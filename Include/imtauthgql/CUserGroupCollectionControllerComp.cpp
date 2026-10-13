@@ -5,10 +5,17 @@
 
 // ACF includes
 #include <iqt/iqt.h>
+#include <istd/TInterfacePtr.h>
+#include <iprm/CParamsSet.h>
 
 // ImtCore includes
 #include <imtauth/CUserGroupInfo.h>
+#include <imtauth/CUserGroupFilter.h>
 #include <imtauth/IUserInfoProvider.h>
+#include <imtauth/imtauth.h>
+#include <imtauthgql/CAssignmentCollector.h>
+#include <imtbase/IObjectCollectionIterator.h>
+#include <imtcol/CDocumentCollectionFilter.h>
 
 
 namespace imtauthgql
@@ -69,18 +76,9 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 		userGroupInfoPtr->SetDescription(*groupDataRepresentation.description);
 	}
 
-	QByteArrayList userIds;
-	if (groupDataRepresentation.users){
-		userIds = groupDataRepresentation.users->ToList();
-	}
-	userIds.removeAll("");
-	userGroupInfoPtr->SetUsers(userIds);
+	userGroupInfoPtr->SetUsers(CAssignmentCollector::GetDirectIds(groupDataRepresentation.users));
 
-	QByteArrayList roleIds;
-	if (groupDataRepresentation.roles){
-		roleIds = groupDataRepresentation.roles->ToList();
-	}
-	roleIds.removeAll("");
+	const QByteArrayList roleIds = CAssignmentCollector::GetDirectIds(groupDataRepresentation.roles);
 
 	if (!roleIds.isEmpty()){
 		userGroupInfoPtr->SetRoles(productId, roleIds);
@@ -89,13 +87,19 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 		userGroupInfoPtr->RemoveProduct(productId);
 	}
 
-	if (groupDataRepresentation.parentGroups){
-		QByteArrayList groupIds = groupDataRepresentation.parentGroups->ToList();
-		for (const QByteArray& parentGroupId : groupIds){
-			if (!parentGroupId.isEmpty()){
-				userGroupInfoPtr->AddParentGroup(parentGroupId);
+	for (const QByteArray& parentGroupId : CAssignmentCollector::GetDirectIds(groupDataRepresentation.parentGroups)){
+		if (imtauth::CreatesGroupCycle(userGroupInfoPtr->GetUserGroupProvider(), newObjectId, parentGroupId)){
+			QString parentGroupName = QString::fromUtf8(parentGroupId);
+			if (userGroupInfoPtr->GetUserGroupProvider() != nullptr){
+				imtauth::IUserGroupInfoSharedPtr parentGroupPtr = userGroupInfoPtr->GetUserGroupProvider()->GetUserGroup(parentGroupId);
+				if (parentGroupPtr.IsValid()){
+					parentGroupName = parentGroupPtr->GetName();
+				}
 			}
+			errorMessage = QStringLiteral("Group '%1' cannot be a parent group: it would create a cycle").arg(parentGroupName);
+			return false;
 		}
+		userGroupInfoPtr->AddParentGroup(parentGroupId);
 	}
 
 	return true;
@@ -385,14 +389,9 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	representationPayload.description = QString(userGroupInfoPtr->GetDescription());
 	representationPayload.productId = productId;
 
-	imtauth::IUserGroupInfo::UserIds userIds = userGroupInfoPtr->GetUsers();
-	representationPayload.users.Emplace().FromList(userIds);
-
-	imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles(productId);
-	representationPayload.roles.Emplace().FromList(roleIds);
-
-	imtauth::IUserGroupInfo::GroupIds groupIds = userGroupInfoPtr->GetParentGroups();
-	representationPayload.parentGroups.Emplace().FromList(groupIds);
+	CAssignmentCollector collector;
+	collector.CollectGroup(*userGroupInfoPtr, userGroupInfoPtr->GetObjectUuid(), productId);
+	collector.FillGroup(representationPayload);
 
 	return true;
 }
@@ -432,6 +431,82 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	}
 
 	return FillObjectFromRepresentation(representation, object, objectId, errorMessage);
+}
+
+
+// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
+
+void CUserGroupCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const
+{
+	// Remove the deleted groups from the membership lists of their member users,
+	// so that users no longer reference groups that do not exist anymore.
+	if (!m_userCollectionCompPtr.IsValid() || elementIds.isEmpty()){
+		BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
+
+		return;
+	}
+
+	iprm::CParamsSet filterParams;
+
+	istd::TUniqueInterfacePtr<imtauth::CUserGroupFilter> groupFilterPtr = new imtauth::CUserGroupFilter();
+	groupFilterPtr->SetGroupIds(elementIds);
+	filterParams.SetEditableParameter(QByteArrayLiteral("GroupFilter"), groupFilterPtr.PopPtr(), true);
+
+	// A membership must be dropped in every user document, not only in the active ones:
+	// without this filter the collection defaults to the active state and a restored user
+	// would bring the dangling group id back.
+	imtcol::CDocumentCollectionFilter documentFilter;
+	documentFilter.AddDocumentState(imtcol::IDocumentCollectionFilter::DS_ACTIVE);
+	documentFilter.AddDocumentState(imtcol::IDocumentCollectionFilter::DS_INACTIVE);
+	documentFilter.AddDocumentState(imtcol::IDocumentCollectionFilter::DS_DISABLED);
+	filterParams.SetEditableParameter(QByteArrayLiteral("DocumentFilter"), &documentFilter);
+
+	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> userIteratorPtr =
+				m_userCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &filterParams);
+	if (!userIteratorPtr.IsValid()){
+		SendWarningMessage(
+					0,
+					QStringLiteral("Memberships of the removed groups are kept: the user collection cannot be iterated"),
+					"imtauthgql::CUserGroupCollectionControllerComp");
+
+		BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
+
+		return;
+	}
+
+	while (userIteratorPtr->Next()){
+		imtbase::IObjectCollection::DataPtr userDataPtr;
+		if (!userIteratorPtr->GetObjectData(userDataPtr)){
+			continue;
+		}
+
+		imtauth::IUserInfo* userInfoPtr = userDataPtr.GetPtr<imtauth::IUserInfo>();
+		if (userInfoPtr == nullptr){
+			continue;
+		}
+
+		bool hasChanges = false;
+		for (const QByteArray& groupId : elementIds){
+			if (userInfoPtr->RemoveFromGroup(groupId)){
+				hasChanges = true;
+			}
+		}
+
+		if (!hasChanges){
+			continue;
+		}
+
+		QByteArray userId = userIteratorPtr->GetObjectId();
+		if (!m_userCollectionCompPtr->SetObjectData(userId, *userInfoPtr)){
+			SendWarningMessage(
+						0,
+						QStringLiteral("Memberships of the removed groups are kept in the user '%1': the user could not be stored")
+								.arg(QString::fromUtf8(userId)),
+						"imtauthgql::CUserGroupCollectionControllerComp");
+		}
+	}
+
+	BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
 }
 
 

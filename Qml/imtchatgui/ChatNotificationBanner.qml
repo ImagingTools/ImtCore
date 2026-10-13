@@ -31,7 +31,7 @@ Rectangle {
 			width: Style.controlHeightL
 			height: Style.controlHeightL
 			radius: width / 2
-			color: "white"
+			color: Style.highlightedTextColor
 			opacity: 0.3
 			anchors.verticalCenter: parent.verticalCenter
 
@@ -39,7 +39,7 @@ Rectangle {
 				anchors.centerIn: parent
 				text: chatNotificationBannerRoot.senderName.charAt(0).toUpperCase()
 				font.pixelSize: Style.fontSizeXS
-				color: "white"
+				color: Style.highlightedTextColor
 				font.bold: true
 			}
 		}
@@ -52,13 +52,13 @@ Rectangle {
 				text: chatNotificationBannerRoot.senderName
 				font.pixelSize: Style.fontSizeXS
 				font.bold: true
-				color: "white"
+				color: Style.highlightedTextColor
 			}
 
 			Text {
 				text: chatNotificationBannerRoot.messagePreview
 				font.pixelSize: Style.fontSizeXS
-				color: "white"
+				color: Style.highlightedTextColor
 				opacity: 0.85
 				elide: Text.ElideRight
 				width: parent.width
@@ -69,7 +69,7 @@ Rectangle {
 			id: dismissBtn
 			text: "×"
 			font.pixelSize: Style.fontSizeM
-			color: "white"
+			color: Style.highlightedTextColor
 			opacity: 0.75
 			anchors.verticalCenter: parent.verticalCenter
 

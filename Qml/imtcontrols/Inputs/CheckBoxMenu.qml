@@ -18,7 +18,7 @@ FocusScope{
     property string currentText;
 	property bool allChecked: false
 
-	property int radius: Style.radiusXS;
+	property int radius: Style.textFieldRadius;
     property int currentIndex: -1;
     property string placeHolderText: "";
     property string multipleChoiceText: "Multiple choice";
@@ -338,6 +338,7 @@ FocusScope{
 
                     width: parent.width;
 					height: Style.controlHeightM;
+                    color: Style.baseColor;
                     border.width: 1;
 					border.color: Style.grayColor;
 					radius: Style.textFieldRadius;
@@ -353,8 +354,8 @@ FocusScope{
 						width: parent.width - Style.marginM;
                         height: parent.height - 2*parent.border.width;
                         radius: parent.radius;
-                        color: "#ffffff";
-                        fontColor: "#000000";
+                        color: Style.baseColor;
+                        fontColor: Style.textColor;
                         textSize: Style.fontSizeM;
                         borderColorConst: "transparent";
                         placeHolderText: "Поиск";

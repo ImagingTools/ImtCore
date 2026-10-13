@@ -661,7 +661,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ListObjects(
 		return QJsonObject();
 	}
 
-	// GetElementsCount() returns the total count across all pages (from COUNT(*) OVER()),
+	// GetElementsCount() returns the total count across all pages,
 	// not just the number of records in the current page.
 	int elementsCount = objectCollectionIterator->GetElementsCount();
 

@@ -7,12 +7,18 @@ ListModel {
 
 	onOwnerChanged: {
 		for (let i = 0; i < count; ++i){
-			get(i).item.owner = owner
+			let item = get(i).item
+			if (item !== null && item !== undefined){
+				item.owner = owner
+			}
 		}
 	}
 
 	function getProperties(item){
 		let list = []
+		if (item === null || item === undefined){
+			return list
+		}
 		if(Qt.platform.os === 'web'){
 			for(let key in item.$properties){
 				if(
@@ -38,130 +44,158 @@ ListModel {
 		return list
 	}
 
+	function hasNullElements(){
+		for (let i = 0; i < count; ++i){
+			let item = get(i).item
+			if (item === null || item === undefined){
+				return true
+			}
+		}
+
+		return false
+	}
+
+	// The full list of an SDL item still contains null properties, they must be validated before skipping
+	function getItemPropertyIds(item){
+		return item.getProperties ? item.getProperties() : getProperties(item)
+	}
+
+	function createGraphQlString(value){
+		if (!/[\\"\r\n\t\b\f]/.test(value)){
+			return '"' + value + '"'
+		}
+
+		return '"' + value.replace(/\\/g, "\\\\").replace(/\"/g, "\\\"").replace(/\r/g, "\\r").replace(/\n/g, "\\n").replace(/\t/g, "\\t").replace(/[\b]/g, "\\b").replace(/\f/g, "\\f") + '"'
+	}
+
+	// Returns '' if a required array of an item is null or has null elements; scalars are not validated
 	function toJson(){
 		let json = '['
-		for(let i = 0; i < count; i++){
-			let item = get(i).item
-
-			let list = getProperties(item)
-			json += '{'
-			for(let j = 0; j < list.length; j++){
-				let key = list[j]
-
-				if (item[key] == null){
-					json += '"' + item.getJSONKeyForProperty(key) + '": null'
-				}
-				else if(typeof item[key] === 'object'){
-					if (Array.isArray(item[key])){
-						json += '"' + item.getJSONKeyForProperty(key) + '":'
-
-						json += "["
-
-						for (let k = 0; k < item[key].length; k++){
-							if (k != 0){
-								json += ", "
-							}
-
-							if (typeof item[key][k] === "string"){
-								json += "\"" + item[key][k] + "\""
-							}
-							else{
-								json += item[key][k]
-							}
-						}
-
-						json += "]"
-					}
-					else if (typeof item[key].toJson === "function"){
-						json += '"' + item.getJSONKeyForProperty(key) + '":' + item[key].toJson()
-					}
-				} else {
-					let value = item[key]
-					if (value === undefined){
-						value = null
-					}
-					let safeValue = item[key]
-					if (typeof safeValue === 'string'){
-						safeValue = safeValue.replace(/\\/g, '\u005C\u005C')
-						safeValue = safeValue.replace(/\"/g,'\u005C"')
-					}
-
-					json += '"' + item.getJSONKeyForProperty(key) + '":' + (typeof item[key] === 'string' ? '"' + safeValue + '"' : value)
-				}
-				if(j < list.length - 1) json += ','
+		for (let i = 0; i < count; i++){
+			if (i > 0){
+				json += ','
 			}
-			json +='}'
 
-			if(i < count - 1) json += ','
+			let item = get(i).item
+			if (item === null || item === undefined){
+				json += 'null'
+				continue
+			}
+
+			let canValidate = typeof item.isArrayValueValid === "function"
+			let separator = '{'
+			for (let key of getItemPropertyIds(item)){
+				let value = item[key]
+				if (value === null || value === undefined){
+					if (canValidate && !item.isArrayValueValid(key, value)){
+						return ''
+					}
+
+					continue
+				}
+
+				let serializedValue
+				if (typeof value === 'object'){
+					if (canValidate && !item.isArrayValueValid(key, value)){
+						return ''
+					}
+
+					if (Array.isArray(value)){
+						serializedValue = '['
+						for (let k = 0; k < value.length; k++){
+							if (k != 0){
+								serializedValue += ", "
+							}
+
+							serializedValue += (typeof value[k] === "string") ? JSON.stringify(value[k]) : value[k]
+						}
+						serializedValue += ']'
+					}
+					else if (typeof value.toJson === "function"){
+						serializedValue = value.toJson()
+						if (serializedValue === ''){
+							return ''
+						}
+					}
+					else{
+						continue
+					}
+				}
+				else{
+					serializedValue = (typeof value === 'string') ? JSON.stringify(value) : value
+				}
+
+				json += separator + '"' + item.getJSONKeyForProperty(key) + '":' + serializedValue
+				separator = ','
+			}
+			json += (separator === '{') ? '{}' : '}'
 		}
-		json +=']'
+		json += ']'
+
 		return json
 	}
 
+	// Returns '' if a required array of an item is null or has null elements; scalars are not validated
 	function toGraphQL(){
 		let graphQL = '['
-		for(let i = 0; i < count; i++){
+		for (let i = 0; i < count; i++){
+			if (i > 0){
+				graphQL += ','
+			}
+
 			let item = get(i).item
-			let list = getProperties(item)
+			if (item === null || item === undefined){
+				graphQL += 'null'
+				continue
+			}
 
-			graphQL += '{'
-			for(let j = 0; j < list.length; j++){
-				let key = list[j]
-				if(typeof item[key] === 'object'){
-					if (Array.isArray(item[key])){
-						graphQL +=  item.getJSONKeyForProperty(key) + ':'
+			let canValidate = typeof item.isArrayValueValid === "function"
+			let separator = '{'
+			for (let key of getItemPropertyIds(item)){
+				let value = item[key]
+				if (value === null || value === undefined){
+					if (canValidate && !item.isArrayValueValid(key, value)){
+						return ''
+					}
 
-						graphQL += "["
+					continue
+				}
 
-						for (let k = 0; k < item[key].length; k++){
+				let serializedValue
+				if (typeof value === 'object'){
+					if (canValidate && !item.isArrayValueValid(key, value)){
+						return ''
+					}
+
+					if (Array.isArray(value)){
+						serializedValue = '['
+						for (let k = 0; k < value.length; k++){
 							if (k != 0){
-								graphQL += ", "
+								serializedValue += ", "
 							}
 
-							if (typeof item[key][k] === "string"){
-								let data = item[key][k]
-
-								data = data.replace(/\\/g, "\\\\")
-								data = data.replace(/\"/g, "\\\"")
-								data = data.replace(/\r/g, "\\r")
-								data = data.replace(/\n/g, "\\n")
-								data = data.replace(/\t/g, "\\t")
-
-								graphQL += "\"" + data + "\""
-							}
-							else{
-								graphQL += item[key][k]
-							}
+							serializedValue += (typeof value[k] === "string") ? createGraphQlString(value[k]) : value[k]
 						}
-
-						graphQL += "]"
+						serializedValue += ']'
 					}
 					else{
-						graphQL += item.getJSONKeyForProperty(key) + ':' + item[key].toGraphQL()
+						serializedValue = value.toGraphQL()
+						if (serializedValue === ''){
+							return ''
+						}
 					}
-				} else {
-					let value = item[key]
-
-					if(typeof value === 'string'){
-						value = value.replace(/\\/g, "\\\\")
-						value = value.replace(/\"/g, "\\\"")
-						value = value.replace(/\r/g, "\\r")
-						value = value.replace(/\n/g, "\\n")
-						value = value.replace(/\t/g, "\\t")
-					}
-
-					if (value === undefined){
-						value = null
-					}
-					graphQL += item.getJSONKeyForProperty(key) + ':' + (typeof item[key] === 'string' ? '"' + value + '"' : value)
 				}
-				if(j < list.length - 1) graphQL += ','
-			}
-			graphQL +='}'
+				else{
+					serializedValue = (typeof value === 'string') ? createGraphQlString(value) : value
+				}
 
-			if(i < count - 1) graphQL += ','
+				graphQL += separator + item.getJSONKeyForProperty(key) + ':' + serializedValue
+				separator = ','
+			}
+			graphQL += (separator === '{') ? '{}' : '}'
 		}
-		graphQL +=']'
+		graphQL += ']'
+
 		return graphQL
 	}
 
@@ -177,6 +211,14 @@ ListModel {
 		for(let i = 0; i < count; i++){
 			let item1 = get(i).item
 			let item2 = model.get(i).item
+			let item1IsNull = item1 === null || item1 === undefined
+			let item2IsNull = item2 === null || item2 === undefined
+			if (item1IsNull !== item2IsNull){
+				return false
+			}
+			if (item1IsNull){
+				continue
+			}
 
 			let list1 = getProperties(item1)
 			let list2 = model.getProperties(item2)
@@ -193,8 +235,13 @@ ListModel {
 				}
 
 				if(typeof item1[key] === 'object'){
-					let ok = item1[key].isEqualWithModel(item2[key])
-					if (!ok){
+					if (item1[key] && item1[key].isEqualWithModel){
+						let ok = item1[key].isEqualWithModel(item2[key])
+						if (!ok){
+							return false
+						}
+					}
+					else if (item1[key] !== item2[key]){
 						return false
 					}
 				} else {
@@ -217,7 +264,7 @@ ListModel {
 		
 		for(let i = 0; i < count; i++){
 			let item = get(i).item
-			retVal.addElement(item.copyMe())
+			retVal.addElement(item === null || item === undefined ? null : item.copyMe())
 		}
 		
 		return retVal
@@ -232,6 +279,10 @@ ListModel {
 
 		let arr = JSON.parse(json)
 		for(let i = 0; i < arr.length; i++){
+			if (arr[i] === null){
+				this.addElement(null)
+				continue
+			}
 			let sourceTypename
 			if (arr[i]['__typename']){
 				sourceTypename = arr[i]['__typename']
@@ -257,12 +308,12 @@ ListModel {
 	}
 
 	function insertElement(index, element){
-		element.owner = this.owner
-		element.connectProperties()
-		this.insert(index, {item: element})
-		if (owner){
-			owner.modelChanged([])
+		if (element !== null && element !== undefined){
+			element.owner = this.owner
+			element.connectProperties()
 		}
+		this.insert(index, {item: element})
+		notifyOwner()
 	}
 
 	function removeElement(index){
@@ -271,7 +322,19 @@ ListModel {
 		}
 
 		this.remove(index)
-		if (owner){
+		notifyOwner()
+	}
+
+	// Inside the owner's beginChanges()/endChanges() the change is reported once, at the end - as in the web runtime.
+	function notifyOwner(){
+		if (!owner){
+			return
+		}
+
+		if (owner._internal && owner._internal.isTransaction){
+			owner._internal.countChanges++
+		}
+		else{
 			owner.modelChanged([])
 		}
 	}
@@ -285,7 +348,8 @@ ListModel {
 			index = 0
 		}
 
-		return this.get(index).item[key] !== undefined;
+		let item = this.get(index).item
+		return item !== null && item !== undefined && item[key] !== undefined;
 	}
 
 	function getData(key, index){
@@ -297,11 +361,15 @@ ListModel {
 			return undefined
 		}
 
-		return this.get(index).item[key];
+		let item = this.get(index).item
+		return item === null || item === undefined ? item : item[key];
 	}
 	
 	function setProperty(index, propName, value){
 		let item = get(index).item
+		if (item === null || item === undefined){
+			return
+		}
 		if (item[propName] !== value){
 			item[propName] = value
 		}
@@ -312,10 +380,16 @@ ListModel {
 			return false
 		}
 		
-		let item1 = this.get(index1).item.copyMe()
-		let item2 = this.get(index2).item.copyMe()
-		item1.owner = this.owner
-		item2.owner = this.owner
+		let sourceItem1 = this.get(index1).item
+		let sourceItem2 = this.get(index2).item
+		let item1 = sourceItem1 === null || sourceItem1 === undefined ? null : sourceItem1.copyMe()
+		let item2 = sourceItem2 === null || sourceItem2 === undefined ? null : sourceItem2.copyMe()
+		if (item1 !== null){
+			item1.owner = this.owner
+		}
+		if (item2 !== null){
+			item2.owner = this.owner
+		}
 
 		this.get(index1).item = item2
 		this.get(index2).item = item1

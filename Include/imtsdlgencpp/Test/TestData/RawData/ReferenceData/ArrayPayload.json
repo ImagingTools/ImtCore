@@ -1,0 +1,32 @@
+{
+  "__typename": "ArrayPayload",
+  "requiredObjects": [
+    {
+      "__typename": "Attribute",
+      "value": "required"
+    }
+  ],
+  "nullableObjectsWithRequiredElements": [
+    {
+      "__typename": "Attribute",
+      "value": "optional-required"
+    }
+  ],
+  "nullableObjects": [
+    null,
+    {
+      "__typename": "Attribute",
+      "value": "nullable"
+    }
+  ],
+  "requiredScalars": [
+    "alpha"
+  ],
+  "nullableScalarsWithRequiredElements": [
+    "beta"
+  ],
+  "nullableScalars": [
+    null,
+    "omega"
+  ]
+}

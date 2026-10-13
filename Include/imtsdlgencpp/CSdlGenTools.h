@@ -133,6 +133,14 @@ public:
 				const imtsdl::SdlTypeList& typeList,
 				const imtsdl::SdlUnionList& unionList,
 				imtsdl::CSdlDocumentType::OperationType operationType);
+
+	/**
+		\brief Creates a unique local variable name for a value of the union type \c sdlTypeName.
+		\note Union alternatives are generated as a chain of conditional blocks. A fixed variable name
+			would hide the declaration of the previous block (MSVC C4456), therefore the name is derived
+			from the type name.
+	 */
+	[[nodiscard]] static QString GetValueVariableName(const QString& sdlTypeName);
 };
 
 

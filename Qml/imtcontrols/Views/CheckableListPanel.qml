@@ -13,6 +13,7 @@ import imtcontrols 1.0
 // so the owner keeps full control over what a row means.
 FocusScope {
 	id: root
+	objectName: "CheckableListPanel"
 
 	// Keyboard-reachable like the table it sits next to: arrows move the cursor,
 	// Space ticks, Home/End and the page keys jump.
@@ -206,6 +207,7 @@ FocusScope {
 
 		BaseText {
 			id: titleText
+			objectName: "PanelTitle"
 			anchors.left: parent.left
 			anchors.verticalCenter: parent.verticalCenter
 			text: root.title
@@ -215,6 +217,7 @@ FocusScope {
 		}
 
 		BaseText {
+			objectName: "PanelSubtitle"
 			anchors.left: titleText.right
 			anchors.leftMargin: Style.marginS
 			anchors.right: actionButton.visible ? actionButton.left : parent.right
@@ -229,6 +232,7 @@ FocusScope {
 
 		ToolbarButton {
 			id: actionButton
+			objectName: "PanelActionButton"
 			anchors.right: parent.right
 			anchors.verticalCenter: parent.verticalCenter
 			visible: root.actionText !== ""
@@ -240,6 +244,7 @@ FocusScope {
 
 	SearchTextInput {
 		id: searchField
+		objectName: "PanelSearchInput"
 		anchors.top: panelHeader.bottom
 		anchors.topMargin: Style.marginM
 		anchors.left: parent.left
@@ -276,6 +281,7 @@ FocusScope {
 
 	Rectangle {
 		id: panelFrame
+		objectName: "PanelTable"
 		anchors.top: columnHeader.bottom
 		anchors.topMargin: Style.marginXS
 		anchors.left: parent.left
@@ -299,6 +305,7 @@ FocusScope {
 
 			delegate: Rectangle {
 				id: entryRow
+				objectName: "PanelRow_" + index
 				width: entriesView.width
 				height: root.rowHeight
 				color: root.currentRow === index ? Style.selectedColor
@@ -311,6 +318,7 @@ FocusScope {
 
 				CheckBox {
 					id: entryCheck
+					objectName: "PanelRowCheckBox"
 					anchors.left: parent.left
 					anchors.leftMargin: Style.marginL
 					anchors.verticalCenter: parent.verticalCenter
@@ -332,6 +340,7 @@ FocusScope {
 						spacing: Style.spacingS
 
 						BaseText {
+							objectName: "PanelRowTitle"
 							anchors.verticalCenter: parent.verticalCenter
 							width: Math.max(0, parent.width - badgeChip.width - parent.spacing)
 							text: root.entryTitle(entryRow.entry)
@@ -354,6 +363,7 @@ FocusScope {
 
 							BaseText {
 								id: badgeText
+								objectName: "PanelRowBadge"
 								anchors.centerIn: parent
 								text: root.entryBadge(entryRow.entry)
 								font.pixelSize: Style.fontSizeS
@@ -363,6 +373,7 @@ FocusScope {
 					}
 
 					BaseText {
+						objectName: "PanelRowSubtitle"
 						width: parent.width
 						visible: text !== ""
 						text: root.entrySubtitle(entryRow.entry)
@@ -374,6 +385,7 @@ FocusScope {
 
 				MouseArea {
 					id: entryMouse
+					objectName: "MouseArea"
 					anchors.fill: parent
 					hoverEnabled: true
 					enabled: entryRow.entryEnabled
@@ -401,6 +413,7 @@ FocusScope {
 		}
 
 		Column {
+			objectName: "PanelPlaceholder"
 			anchors.centerIn: parent
 			width: Math.min(parent.width - 2 * Style.marginXL, Style.sizeHintM)
 			spacing: Style.spacingL
@@ -437,6 +450,7 @@ FocusScope {
 
 	BaseText {
 		id: footerLabel
+		objectName: "PanelFooter"
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.bottom: parent.bottom

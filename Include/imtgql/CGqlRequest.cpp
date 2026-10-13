@@ -19,6 +19,32 @@ namespace imtgql
 {
 
 
+namespace
+{
+
+
+// Unquoted token which is not a number (e.g. an enum value) is kept as text
+QVariant CreateNumberValue(const QByteArray& text)
+{
+	bool ok = false;
+	const qint64 intValue = text.toLongLong(&ok);
+	if (ok && QByteArray::number(intValue) == text){
+		return intValue;
+	}
+
+	const bool isFloat = text.contains('.') || text.contains('e') || text.contains('E');
+	const double doubleValue = text.toDouble(&ok);
+	if (ok && isFloat){
+		return doubleValue;
+	}
+
+	return text;
+}
+
+
+} // namespace
+
+
 const QHash<QByteArray, IGqlRequest::RequestType> CGqlRequest::s_requestNameMap = {
 	{ QByteArrayLiteral("query"), IGqlRequest::RT_QUERY },
 	{ QByteArrayLiteral("mutation"), IGqlRequest::RT_MUTATION },
@@ -726,12 +752,17 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlParamObject& gqlObject) con
 				if (objectIndex > 0){
 					retVal += ',';
 				}
-				retVal.append(' ').append('{');
 				const CGqlParamObject* paramsObject = gqlObject.GetParamArgumentObjectPtr(paramId, objectIndex);
-				if (paramsObject != nullptr){
-					retVal += AddObjectParamPart(*paramsObject);
+				if (paramsObject != nullptr && paramsObject->IsNull()){
+					retVal += QByteArrayLiteral(" null");
 				}
-				retVal += '}';
+				else {
+					retVal.append(' ').append('{');
+					if (paramsObject != nullptr){
+					retVal += AddObjectParamPart(*paramsObject);
+					}
+					retVal += '}';
+				}
 			}
 			retVal.append(' ').append(']');
 		}
@@ -753,6 +784,9 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlParamObject& gqlObject) con
 QByteArray CGqlRequest::AddObjectParamValue(const QVariant& value) const
 {
 	QByteArray retVal;
+	if (!value.isValid() || value.isNull()){
+		return QByteArrayLiteral("null");
+	}
 #if QT_VERSION >= 0x060000
 	int valueType = value.typeId();
 #else
@@ -868,10 +902,14 @@ void CGqlRequest::ParseObjectParamPart(CGqlParamObject& gqlObject, const QJsonOb
 			if (arr.isEmpty()) {
 				gqlObject.InsertParam(paramId, QVariantList{});
 			}
-			else if (std::all_of(arr.begin(), arr.end(), [](const QJsonValue& e){ return e.isObject(); })) {
+			else if (std::all_of(arr.begin(), arr.end(), [](const QJsonValue& e){ return e.isObject() || e.isNull(); })) {
 				QList<CGqlParamObject> objList;
 				objList.reserve(arr.size());
-				for (const QJsonValue& elem : arr) {
+				for (const QJsonValue elem : arr) {
+					if (elem.isNull()){
+						objList.append(CGqlParamObject::CreateNull());
+						continue;
+					}
 					CGqlParamObject child;
 					ParseObjectParamPart(child, elem.toObject());
 					objList.append(std::move(child));
@@ -962,6 +1000,11 @@ void CGqlRequest::SetParseText(const QByteArray& text)
 		lastArrayId = m_activeArrayIds.last();
 	}
 	if (!lastArrayId.isEmpty() && m_startArrayPrimitives){
+		if (text == QByteArrayLiteral("null") && m_activeGqlObjectPtr->IsObjectList(lastArrayId)){
+			m_activeGqlObjectPtr->AppendParamToArray(lastArrayId, CGqlParamObject::CreateNull());
+
+			return;
+		}
 
 		QVariant value = m_activeGqlObjectPtr->GetParamArgumentValue(lastArrayId);
 		QVariantList variantList;
@@ -982,25 +1025,7 @@ void CGqlRequest::SetParseText(const QByteArray& text)
 			variantList.append(QVariant());
 		}
 		else {
-			bool ok = false;
-			if (text.contains('.')){
-				double doubleValue = text.toDouble(&ok);
-				if (ok) {
-					variantList.append(doubleValue);
-				}
-				else {
-					variantList.append(text);
-				}
-			}
-			else{
-				qint64 intValue = text.toLongLong(&ok);
-				if (ok && QString::number(intValue).toUtf8() == text) {
-					variantList.append(intValue);
-				}
-				else {
-					variantList.append(text);
-				}
-			}
+			variantList.append(CreateNumberValue(text));
 		}
 		m_activeGqlObjectPtr->InsertParam(lastArrayId, variantList);
 
@@ -1008,6 +1033,12 @@ void CGqlRequest::SetParseText(const QByteArray& text)
 	}
 
 	if (!lastArrayId.isEmpty() && !m_objectArrayList.isEmpty() && m_objectArrayList.last() == m_activeGqlObjectPtr) {
+		if (text == QByteArrayLiteral("null")){
+			m_activeGqlObjectPtr->AppendParamToArray(lastArrayId, CGqlParamObject::CreateNull());
+			m_currentField.clear();
+
+			return;
+		}
 		CGqlParamObject newObject;
 		m_activeGqlObjectPtr = m_activeGqlObjectPtr->AppendParamToArray(lastArrayId, newObject);
 		m_currentField = text;
@@ -1068,20 +1099,7 @@ void CGqlRequest::SetParseText(const QByteArray& text)
 			value = QVariant();
 		}
 		else {
-			bool ok;
-			if (text.contains('.')){
-				double doubleValue = text.toDouble(&ok);
-				value = doubleValue;
-			}
-			else{
-				qint64 intValue = text.toLongLong(&ok);
-				if (ok && QString::number(intValue).toUtf8() == text) {
-					value = intValue;
-				}
-				else {
-					value = text;
-				}
-			}
+			value = CreateNumberValue(text);
 		}
 
 		if (!m_currentField.isEmpty() && m_activeGqlObjectPtr != nullptr) {

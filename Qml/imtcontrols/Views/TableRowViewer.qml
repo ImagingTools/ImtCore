@@ -11,6 +11,31 @@ Row {
 	property alias model: repeater.model
 	property bool loadDefaultCellDelegate: true;
 
+	function cellComponent(columnIndex){
+		if (!dataList.rowDelegate || !dataList.rowDelegate.tableItem){
+			return null;
+		}
+
+		let tableItem = dataList.rowDelegate.tableItem;
+		let headerId = tableItem.getHeaderId(columnIndex);
+		let contentComp = null;
+
+		if (dataList.loadDefaultCellDelegate){
+			contentComp = tableItem.cellDelegate;
+		}
+
+		if (headerId && headerId.toLowerCase().endsWith("link")){
+			contentComp = objectLinkDelegateComp;
+		}
+
+		let contents = tableItem.columnContentComps;
+		if (contents && Object.keys(contents).includes(headerId) && contents[headerId]){
+			contentComp = contents[headerId];
+		}
+
+		return contentComp;
+	}
+
 	Component {
 		id: objectLinkDelegateComp
 		TextLinkCellDelegate {
@@ -46,7 +71,8 @@ Row {
 			id: cell
 			property bool compl: false;
 			property bool complCompl: dataList.compl && dataList && dataList.rowDelegate && dataList.rowDelegate.tableItem && dataList.rowDelegate.tableItem.columnCount;
-			width: loader.item ? loader.item.width :20
+			property Item contentItem: null;
+			width: cell.contentItem ? cell.contentItem.width : 20
 			height: dataList.height;
 
 			clip: true;
@@ -56,43 +82,22 @@ Row {
 			}
 
 			onComplComplChanged: {
-				if(cell.complCompl && dataList && dataList.rowDelegate && dataList.rowDelegate.tableItem && dataList.rowDelegate.tableItem.headers){
-					let headerId = dataList.rowDelegate.tableItem.getHeaderId(model.index)
-					let contents = dataList.rowDelegate.tableItem.columnContentComps;
-					let contentComp = undefined;
-
-					if (dataList.loadDefaultCellDelegate){
-						contentComp = dataList.rowDelegate.tableItem.cellDelegate;
-					}
-
-					if (headerId.toLowerCase().endsWith("link")){
-						contentComp = objectLinkDelegateComp;
-					}
-
-					if (Object.keys(contents).includes(headerId)){
-						if (contents[headerId]){
-							contentComp = contents[headerId];
-						}
-					}
-
-					loader.sourceComponent = contentComp;
-				}
-			}
-
-			Loader {
-				id: loader;
-				anchors.fill: parent
-				property bool ready: item && dataList.rowDelegate;
-				onReadyChanged: {
-					if(ready){
-						item.columnIndex = model.index
-						item.rowDelegate = dataList.rowDelegate
-						if(typeof item.setCellWidth === 'function'){
-							item.setCellWidth()
-						}
-					}
+				if (!cell.complCompl || cell.contentItem){
+					return;
 				}
 
+				let contentComp = dataList.cellComponent(model.index);
+				if (!contentComp){
+					return;
+				}
+
+				let obj = contentComp.createObject(cell);
+				cell.contentItem = obj;
+				obj.columnIndex = model.index;
+				obj.rowDelegate = dataList.rowDelegate;
+				if (typeof obj.setCellWidth === 'function'){
+					obj.setCellWidth();
+				}
 			}
 		}
 	}

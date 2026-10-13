@@ -53,6 +53,14 @@ QtObject {
             Component {
             AuthorizationPayload {
                 onFinished: {
+                    // Credentials were accepted but the account is deactivated: the payload
+                    // carries no token, so this must not go through setLoginData().
+                    if (m_accountDisabled === true){
+                        container.failed(qsTr("This account has been deactivated. Please contact your administrator."));
+
+                        return;
+                    }
+
                     container.setLoginData(m_refreshToken, m_token, m_userId, m_username, m_systemId, m_permissions.split(';'))
                 }
             }

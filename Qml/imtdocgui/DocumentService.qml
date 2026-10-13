@@ -733,8 +733,22 @@ QtObject {
 				singleDocumentData.modelInitialized = true
 				singleDocumentData.modelConnections.target = singleDocumentData.documentDataController.documentModel
 				singleDocumentData.modelConnections.enabled = true;
+
+				singleDocumentData.syncCommandStates()
 				
 				documentManager.documentOpened(singleDocumentData.documentId)
+			}
+
+			// Otherwise Save/Undo/Redo keep the server defaults until the first change, and arrival order decides the toolbar.
+			function syncCommandStates(){
+				if (!singleDocumentData.view || !singleDocumentData.view.commandsController){
+					return
+				}
+
+				let commandsController = singleDocumentData.view.commandsController
+				commandsController.setCommandIsEnabled("Save", singleDocumentData.isDirty)
+				commandsController.setCommandIsEnabled("Undo", singleDocumentData.undoManager.getAvailableUndoSteps() > 0)
+				commandsController.setCommandIsEnabled("Redo", singleDocumentData.undoManager.getAvailableRedoSteps() > 0)
 			}
 
 			property Connections dataControllerConnections: Connections {

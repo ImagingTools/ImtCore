@@ -26,13 +26,22 @@ DocumentServiceBase {
 			let objectId = data.getData("objectId")
 			let documentId = data.getData("documentId")
 			let documentName = data.getData("documentName")
+			let objectTypeId = data.getData("objectTypeId")
+			let hasNameProvider = data.getData("hasNameProvider")
+			let isDirty = data.getData("isDirty")
 			let operation = data.getData("documentOperation")
 
 			if (objectId !== undefined && objectId !== ""){
 				root.setDocumentObjectId(documentId, objectId)
 			}
 
-			if (operation === "DocumentDataLoaded"){
+			if (operation === "DocumentOpened"){
+				root.reflectRemoteDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty)
+			}
+			else if (operation === "NewDocumentCreated"){
+				root.reflectRemoteDocumentCreated(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty)
+			}
+			else if (operation === "DocumentDataLoaded"){
 				root.setDocumentIsLoading(documentId, false)
 			}
 			else if (operation === "DocumentClosed"){
@@ -104,6 +113,11 @@ DocumentServiceBase {
 			return
 		}
 
+		// One navigation can ask for the same object twice before the first answer arrives.
+		if (root.__openingObjectIds[documentId]){
+			return
+		}
+
 		startOpenDocument(documentId, typeId)
 
 		if (openDocumentOverride){
@@ -111,6 +125,7 @@ DocumentServiceBase {
 			return
 		}
 
+		root.__openingObjectIds[documentId] = true
 		openDocumentRequest.typeId = typeId
 		objectIdInput.m_id = documentId
 		objectIdInput.m_collectionId = collectionId
@@ -191,6 +206,7 @@ DocumentServiceBase {
 				let savedFunc = function(savedDocumentId){
 					if (documentId === savedDocumentId){
 						documentSaved.disconnect(savedFunc)
+						saveDocumentFailed.disconnect(savedFailedFunc)
 						closeFunc(false)
 					}
 				}
@@ -202,9 +218,16 @@ DocumentServiceBase {
 					}
 				}
 
-				documentSaved.connect(savedFunc)
-				saveDocumentFailed.connect(savedFailedFunc)
-				saveDocument(documentId)
+				// SaveDocument must not overtake the updates still being sent from the views.
+				commitDocumentChanges(documentId, function(committed){
+					if (!committed){
+						return
+					}
+
+					documentSaved.connect(savedFunc)
+					saveDocumentFailed.connect(savedFailedFunc)
+					saveDocument(documentId)
+				})
 			}
 			else{
 				// Close
@@ -314,6 +337,7 @@ DocumentServiceBase {
 		sdlObjectComp: Component {
 			DocumentInfo {
 				onFinished: {
+					delete root.__openingObjectIds[m_objectId]
 					root.handleDocumentOpened(m_documentId, m_objectId, m_objectTypeId, m_documentName, m_hasNameProvider, m_isDirty)
 				}
 			}
@@ -326,9 +350,13 @@ DocumentServiceBase {
 		}
 
 		function onError(message, type){
+			root.__openingObjectIds = ({})
 			root.openDocumentFailed("", message)
 		}
 	}
+
+	// Object ids whose OpenDocument request has been sent and not answered yet.
+	property var __openingObjectIds: ({})
 
 	property GqlSdlRequestSender createDocumentRequest: GqlSdlRequestSender {
 		context: root.context
@@ -337,7 +365,7 @@ DocumentServiceBase {
 		sdlObjectComp: Component {
 			DocumentInfo {
 				onFinished: {
-					root.handleDocumentCreated(m_documentId, m_objectTypeId, m_documentName, m_hasNameProvider, root.createDocumentRequest.proposedObjectId, m_isDirty)
+					root.handleDocumentCreated(m_documentId, m_objectTypeId, m_documentName, m_hasNameProvider, root.createDocumentRequest.proposedObjectId, m_isDirty, true)
 				}
 			}
 		}
@@ -350,7 +378,7 @@ DocumentServiceBase {
 		}
 
 		function onError(message, type){
-			root.createDocumentFailed("", message)
+			root.createDocumentFailed(root.createDocumentRequest.typeId, message)
 		}
 	}
 
@@ -396,7 +424,7 @@ DocumentServiceBase {
 		}
 
 		function onError(message, type){
-			root.closeDocumentFailed("", message)
+			root.closeDocumentFailed(root.closeDocumentRequest.documentId, message)
 		}
 	}
 

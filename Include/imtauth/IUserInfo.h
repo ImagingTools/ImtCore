@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QDateTime>
+
 // ImtCore includes
 #include <imtauth/IUserGroupInfo.h>
 #include <imtauth/IUserBaseInfo.h>
@@ -98,6 +101,17 @@ public:
 	virtual bool RemoveFromGroup(const QByteArray& groupId) = 0;
 
 	/**
+		Check if this user account is enabled.
+		Disabled accounts must be denied authorization without being removed (IEC 62443-3-3 SR 1.3).
+	*/
+	virtual bool IsEnabled() const = 0;
+
+	/**
+		Enable or disable this user account.
+	*/
+	virtual void SetEnabled(bool enabled) = 0;
+
+	/**
 		Get information about the system in which this user is located.
 	*/
 	virtual SystemInfoList GetSystemInfos() const = 0;
@@ -111,6 +125,37 @@ public:
 		Remove an user from the system.
 	*/
 	virtual bool RemoveFromSystem(const QByteArray& systemId) = 0;
+
+	/**
+		Get hashes of previously used passwords, ordered from the most recently used one.
+	*/
+	virtual QByteArrayList GetPasswordHistory() const = 0;
+
+	/**
+		Set hashes of previously used passwords, ordered from the most recently used one.
+	*/
+	virtual void SetPasswordHistory(const QByteArrayList& passwordHistory) = 0;
+
+	/**
+		Get timestamp (UTC) of the last password change.
+		An invalid timestamp means that the change time is unknown (legacy user).
+	*/
+	virtual QDateTime GetPasswordChangedAt() const = 0;
+
+	/**
+		Set timestamp (UTC) of the last password change.
+	*/
+	virtual void SetPasswordChangedAt(const QDateTime& passwordChangedAt) = 0;
+
+	/**
+		Check if the user must change the password on the next login.
+	*/
+	virtual bool MustChangePassword() const = 0;
+
+	/**
+		Set flag indicating that the user must change the password on the next login.
+	*/
+	virtual void SetMustChangePassword(bool mustChangePassword) = 0;
 };
 
 

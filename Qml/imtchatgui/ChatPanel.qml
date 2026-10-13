@@ -114,7 +114,7 @@ Rectangle {
 							anchors.centerIn: parent
 							text: model.name ? model.name.charAt(0).toUpperCase() : "?"
 							font.pixelSize: Style.fontSizeS
-							color: "white"
+							color: Style.highlightedTextColor
 							font.bold: true
 						}
 					}
@@ -158,7 +158,7 @@ Rectangle {
 						anchors.centerIn: parent
 						text: model.unreadCount > 99 ? "99+" : model.unreadCount.toString()
 						font.pixelSize: Style.fontSizeXS
-						color: "white"
+						color: Style.highlightedTextColor
 						font.bold: true
 					}
 				}

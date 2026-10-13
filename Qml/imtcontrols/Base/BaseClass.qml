@@ -222,6 +222,35 @@ QtObject {
 	function createElement(propertyId, typename){
 	}
 
+	function isArrayRequired(propertyId){
+		return false
+	}
+
+	function areArrayElementsRequired(propertyId){
+		return false
+	}
+
+	function isArrayValueValid(propertyId, value){
+		if (value === null || value === undefined){
+			return !isArrayRequired(propertyId)
+		}
+		if (!areArrayElementsRequired(propertyId)){
+			return true
+		}
+		if (Array.isArray(value)){
+			for (let element of value){
+				if (element === null || element === undefined){
+					return false
+				}
+			}
+		}
+		else if (value.hasNullElements && value.hasNullElements()){
+			return false
+		}
+
+		return true
+	}
+
 	function getJSONKeyForProperty(propertyId){
 		return propertyId
 	}
@@ -268,6 +297,9 @@ QtObject {
 		let isFirst = true
 		for(let i = 0; i < list.length; i++){
 			let key = list[i]
+			if (!isArrayValueValid(key, this[key])){
+				return ''
+			}
 			if (this[key] == null && this._internal.containsInRemoved(key)){
 				continue
 			}
@@ -297,7 +329,11 @@ QtObject {
 					json += "]"
 				}
 				else if (this[key] !== null){
-					json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].toJson()
+					let serializedValue = this[key].toJson()
+					if (serializedValue === ''){
+						return ''
+					}
+					json += '"' + this.getJSONKeyForProperty(key) + '":' + serializedValue
 				}
 				else{
 					json += '"' + this.getJSONKeyForProperty(key) + '": null'
@@ -327,6 +363,9 @@ QtObject {
 		let isFirst = true
 		for(let i = 0; i < list.length; i++){
 			let key = list[i]
+			if (!isArrayValueValid(key, this[key])){
+				return ''
+			}
 			if (this[key] == null && this._internal.containsInRemoved(key)){
 				continue
 			}
@@ -364,8 +403,15 @@ QtObject {
 
 					graphQL += "]"
 				}
+				else if (this[key] !== null){
+					let serializedValue = this[key].toGraphQL()
+					if (serializedValue === ''){
+						return ''
+					}
+					graphQL += this.getJSONKeyForProperty(key) + ':' + serializedValue
+				}
 				else{
-					graphQL += this.getJSONKeyForProperty(key) + ':' + ((this[key] !== null) ? this[key].toGraphQL() : "null")
+					graphQL += this.getJSONKeyForProperty(key) + ':null'
 				}
 			} else {
 				let value = this[key]
@@ -416,11 +462,21 @@ QtObject {
 	}
 
 	function fromObject(sourceObject){
+		for(let key in sourceObject){
+			let propertyId = "m_" + key[0].toLowerCase() + key.slice(1, key.length)
+			if (!isArrayValueValid(propertyId, sourceObject[key])){
+				return false
+			}
+		}
+
 		beginChanges()
 	
 		for(let objKey of this.getProperties()){
 			let jsonKey = this.getJSONKeyForProperty(objKey)
 			if (jsonKey in sourceObject){
+				continue
+			}
+			if (isArrayRequired(objKey)){
 				continue
 			}
 	
@@ -447,31 +503,49 @@ QtObject {
 			else if(typeof sourceObject[key] === "object"){
 				if(Array.isArray(sourceObject[key])){
 					let component = this.createComponent(_key)
+					let model = this[_key]
+					let isNewModel = false
 	
-					if(this[_key]){
-						if(this[_key].clear){
-							this[_key].clear()
+					if(model){
+						if(model.clear){
+							model.clear()
 						}
 					}
 					else{
 						if(component){
-							let obj = Qt.createComponent('BaseModel.qml').createObject(this)
-							obj.owner = this
-							this[_key] = obj
+							// Owner is attached only after filling, so filling does not report a model change
+							model = Qt.createComponent('BaseModel.qml').createObject(this)
+							isNewModel = true
 						}
 					}
 	
 					if(component){
 						for(let sourceObjectInner of sourceObject[key]){
+							if (sourceObjectInner === null){
+								model.append({ item: null })
+								continue
+							}
 							let sourceTypename
 							if(sourceObjectInner['__typename']){
 								sourceTypename = sourceObjectInner['__typename']
 							}
 							let obj = this.createElement(_key, sourceTypename).createObject(this)
-							obj.fromObject(sourceObjectInner)
-							this[_key].append({ item: obj })
+							if (!obj.fromObject(sourceObjectInner)){
+								obj.destroy()
+								if (isNewModel){
+									model.destroy()
+								}
+								endChanges()
+								return false
+							}
+							model.append({ item: obj })
 							obj.owner = this
 							obj.connectProperties()
+						}
+
+						if (isNewModel){
+							this[_key] = model
+							model.owner = this
 						}
 					}
 					else{
@@ -499,7 +573,10 @@ QtObject {
 					}
 	
 					if(obj){
-						obj.fromObject(sourceObject[key])
+						if (!obj.fromObject(sourceObject[key])){
+							endChanges()
+							return false
+						}
 						this[_key] = obj
 						obj.owner = this
 						obj.connectProperties()
@@ -511,6 +588,8 @@ QtObject {
 					this[_key] = sourceObject[key]
 				}
 			}
+
+			this._internal.removeAt(_key)
 		}
 	
 		endChanges()

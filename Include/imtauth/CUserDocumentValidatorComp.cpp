@@ -39,6 +39,14 @@ bool CUserDocumentValidatorComp::ValidateDocumentData(
 		return false;
 	}
 
+	// An account of the internal system logs in with its password.
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
+		if (systemInfo.enabled && systemInfo.systemId.isEmpty() && userInfoPtr->GetPasswordHash().isEmpty()){
+			errorMessage = QStringLiteral("Password cannot be empty");
+			return false;
+		}
+	}
+
 	if (!m_userCollectionCompPtr.IsValid()){
 		errorMessage = QStringLiteral("User collection is not configured");
 		return false;

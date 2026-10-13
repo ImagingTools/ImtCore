@@ -9,7 +9,9 @@ Dialog {
 	width: Math.max(Style.sizeHintL, Math.min(ModalDialogManager.activeView.width - 100, Style.sizeHintXXL));
 
 	property bool currentPasswordInputVisible: true;
-	
+	property string login: "";
+	property var policy: null;
+
 	Component.onCompleted: {
 		addButton(Enums.save, qsTr("Save"), false)
 		addButton(Enums.cancel, qsTr("Cancel"), true)
@@ -41,7 +43,9 @@ Dialog {
 				anchors.right: parent.right;
 				anchors.rightMargin: Style.marginXL;
 				currentPasswordInputVisible: rootDialog.currentPasswordInputVisible;
-				
+				login: rootDialog.login;
+				policy: rootDialog.policy;
+
 				onAcceptedChanged: {
 					if (rootDialog.buttons){
 						rootDialog.buttons.setButtonState(Enums.save, accepted)

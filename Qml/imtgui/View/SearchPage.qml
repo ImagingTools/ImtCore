@@ -54,6 +54,11 @@ Item {
 			root.tabDataArrays = {}
 		}
 
+		let requestKey = root.makeRequestKey(text, "", 0)
+		if (text === root.currentText && root.pendingRequestKey === requestKey){
+			return
+		}
+
 		if (text === root.currentText && root.categories){
 			// same text, just ensure first tab
 			if (root.activeTabIndex < 0 && root.categories && root.categories.m_searchResults.count > 0){
@@ -75,7 +80,7 @@ Item {
 		searchInput.m_offset = 0
 		searchInput.m_count = root.pageSize
 
-		root.pendingRequestKey = root.makeRequestKey(text, "", 0)
+		root.pendingRequestKey = requestKey
 		searchRequestSender.send(searchInput)
 	}
 
@@ -251,6 +256,7 @@ Item {
 			SearchResults {
 				onFinished: {
 					let key = root.pendingRequestKey
+					root.pendingRequestKey = ""
 					let thisSearchResults = this
 					let resultsList = thisSearchResults && thisSearchResults.m_searchResults
 

@@ -104,7 +104,7 @@ Rectangle {
 
 	Rectangle{
 		anchors.fill: parent;
-		color: "gray";
+		color: Style.overlayBackgroundColor;
 		opacity: 0.5;
 	}
 
@@ -115,7 +115,10 @@ Rectangle {
 
 		onFinished: {
 			authPageContainer.setDecorators();
-			loginTextInput.forceActiveFocus();
+			// Don't steal focus from a field the user (or a test) is already typing into.
+			if (!passwordTextInput.activeFocus){
+				loginTextInput.forceActiveFocus();
+			}
 		}
 	}
 
@@ -503,10 +506,24 @@ Rectangle {
 			height: ModalDialogManager.activeView.height - 100;
 			title: qsTr("Sign up");
 			canMove: false;
+			notClosingButtons: Enums.save;
 
 			UserData {
 				id: userDataModel;
 				m_id: UuidGenerator.generateUUID();
+			}
+
+			Connections {
+				target: AuthorizationController;
+
+				function onRegisterSuccessfully(){
+					registerDialog.finished(Enums.close);
+				}
+
+				function onRegisterFailed(message, violatedRules){
+					registerDialog.buttons.setButtonState(Enums.save, true);
+					PopupManager.addErrorMessage(message !== "" ? message : qsTr("Unable to register the user"), true, "RegisterUserError");
+				}
 			}
 
 			Component.onCompleted: {
@@ -562,6 +579,7 @@ Rectangle {
 
 			onFinished: {
 				if (buttonId === Enums.save){
+					registerDialog.buttons.setButtonState(Enums.save, false);
 					authPageContainer.registerUser(userDataModel)
 				}
 			}

@@ -23,6 +23,7 @@ TableViewParamController 1.0 TableViewParamController.qml
 GqlRequestSender 1.0 GqlRequestSender.qml
 WebSocketConnectionChecker 1.0 WebSocketConnectionChecker.qml
 GqlSdlRequestSender 1.0 GqlSdlRequestSender.qml
+GqlBasedPasswordPolicyProvider 1.0 GqlBasedPasswordPolicyProvider.qml
 GqlBasedPermissionsProvider 1.0 GqlBasedPermissionsProvider.qml
 XmlHttpRequestProxy 1.0 XmlHttpRequestProxy.qml
 GqlBasedCommandsController 1.0 GqlBasedCommandsController.qml

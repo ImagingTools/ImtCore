@@ -17,6 +17,7 @@ Item {
 	property string gqlExportCommandId: collectionId + "Export";
 
 	property TreeItemModel elementsModel: TreeItemModel {}
+	property var elementsSource: null
 	property var headersModel: null
 	property TreeItemModel notificationModel: TreeItemModel {}
 	
@@ -163,6 +164,7 @@ Item {
 			elementsModel.clear()
 			elementsModel = null
 		}
+		elementsSource = null
 		
 		if (notificationModel){
 			notificationModel.clear()
@@ -174,6 +176,82 @@ Item {
 	
 	function getElementsRepresentation(){
 		return root.elementsModel;
+	}
+
+	function publishElements(items){
+		if (!root.canUpdateElementsInPlace(items)){
+			root.elementsModel = items;
+			root.elementsSource = null;
+			root.elementsReceived(root.elementsModel);
+			return;
+		}
+
+		root.elementsModel.setUpdateEnabled(false);
+		let count = items.getItemsCount();
+		for (let i = 0; i < count; i++){
+			root.copyElementRow(i, items);
+		}
+		root.elementsModel.setUpdateEnabled(true);
+		root.elementsSource = items;
+		root.elementsReceived(root.elementsModel);
+	}
+
+	function canUpdateElementsInPlace(items){
+		if (!items || !root.elementsModel || items === root.elementsModel){
+			return false;
+		}
+		if (!items.getItemsCount || !root.elementsModel.getItemsCount){
+			return false;
+		}
+		if (root.elementsModel.getItemsCount() === 0 || root.elementsModel.getItemsCount() !== items.getItemsCount()){
+			return false;
+		}
+		return true;
+	}
+
+	function copyElementRow(index, items){
+		let targetRow = root.elementsModel.get(index);
+		let sourceRow = items.get(index);
+		if (!targetRow || !sourceRow){
+			return;
+		}
+
+		let keys = items.getKeys(index);
+		for (let k = 0; k < keys.length; k++){
+			let key = keys[k];
+			if (key === "item"){
+				continue;
+			}
+			let value = items.getData(key, index);
+			if (value === null || value === undefined || typeof value !== "object"){
+				root.elementsModel.setData(key, value, index);
+			}
+		}
+
+		if (sourceRow.item && targetRow.item){
+			root.copyItemFields(targetRow.item, sourceRow.item);
+		}
+	}
+
+	function copyItemFields(targetItem, sourceItem){
+		let ids = ["id", "name", "typeId"];
+		if (root.headersModel && root.headersModel.getItemsCount){
+			for (let i = 0; i < root.headersModel.getItemsCount(); i++){
+				let header = root.headersModel.get(i);
+				if (header && header.item && header.item.m_id){
+					ids.push(header.item.m_id);
+				}
+			}
+		}
+		for (let i = 0; i < root.additionalFieldIds.length; i++){
+			ids.push(root.additionalFieldIds[i]);
+		}
+		for (let i = 0; i < ids.length; i++){
+			let prop = "m_" + ids[i];
+			if (sourceItem[prop] !== undefined){
+				targetItem[prop] = sourceItem[prop];
+			}
+		}
 	}
 
 	function removeElements(elementIds){
@@ -528,8 +606,7 @@ Item {
 			}
 			
 			if (data.containsKey("items")){
-				root.elementsModel = data.getData("items");
-				root.elementsReceived(root.elementsModel)
+				root.publishElements(data.getData("items"))
 			}
 		}
 		

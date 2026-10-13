@@ -47,7 +47,7 @@ Rectangle {
 						anchors.centerIn: parent
 						text: chatViewContainer.conversationName.charAt(0).toUpperCase()
 						font.pixelSize: Style.fontSizeS
-						color: "white"
+						color: Style.highlightedTextColor
 						font.bold: true
 					}
 				}

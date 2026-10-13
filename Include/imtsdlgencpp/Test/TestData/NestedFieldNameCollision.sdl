@@ -1,0 +1,41 @@
+schema {
+	namespace: collisiontest
+	version: 1.0
+	query: Query
+}
+
+
+type Color
+{
+	value: String
+}
+
+type Labch
+{
+	color: Color
+}
+
+type Bar
+{
+	baz: Color
+}
+
+type Foo
+{
+	barBaz: Color
+}
+
+# the field paths "labch.color" and "labchColor" as well as "foo.barBaz" and "fooBar.baz"
+# must be mapped to different local variable names in the generated code
+type CollisionResult
+{
+	labch: Labch
+	labchColor: Color
+	foo: Foo
+	fooBar: Bar
+}
+
+type Query
+{
+	GetCollisionResult: CollisionResult!
+}

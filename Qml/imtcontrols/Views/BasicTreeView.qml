@@ -76,6 +76,11 @@ Item {
     property int    minColumnWidth: 40
     property int    columnResizeHandleWidth: 8
     property bool   allowColumnResize: true
+    // Show the full text of a cell that does not fit, when the pointer rests on it.
+    property bool   showOverflowTooltip: true
+    // Node data field with a hint, e.g. why the node is locked: the tree column shows hintIcon and the row tooltip the hint.
+    property string hintRole: ""
+    property string hintIcon: "Icons/Info"
 
     property bool   showHeader: true
     property bool   multiSelect: false
@@ -114,7 +119,7 @@ Item {
     property string disabledTextColor:       Style.inactiveTextColor
     property string headerBackgroundColor:   Style.alternateBaseColor
     property string gridLineColor:           Style.borderColor2
-    property string editorErrorColor:        "#d04848"
+    property string editorErrorColor:        Style.dangerColor
 
     // ─── Public readonly state ─────────────────────────────────────────────
 
@@ -348,6 +353,7 @@ Item {
             property bool   nodeIsEnabled: model.nodeEnabled
             property string nodeText: model.text
             property int    nodeDataTick: model.dataTick !== undefined ? model.dataTick : 0
+            property string hintText: nodeDataTick >= 0 ? root.nodeHint(nodeKey) : ""
             property int    nodeVisibleRow: index
             property bool   rowHovered: false
 
@@ -368,7 +374,15 @@ Item {
                 hoverEnabled: true
                 acceptedButtons: Qt.LeftButton
 
-                onContainsMouseChanged: delegateRoot.rowHovered = containsMouse
+                onContainsMouseChanged: {
+                    delegateRoot.rowHovered = containsMouse
+                    if (!containsMouse)
+                        root.__hideCellOverflow()
+                }
+
+                onPositionChanged: {
+                    root.__showCellTooltip(cellsRepeater.itemAt(root.__columnAtX(mouse.x)), delegateRoot.hintText, rowMouseArea, mouse.x, mouse.y)
+                }
 
                 onClicked:{
                     // If we're editing another row, honour focus-out policy
@@ -429,10 +443,13 @@ Item {
                 spacing: 0
 
                 Repeater {
+                    id: cellsRepeater
                     model: root.columnCount()
 
                     delegate: Item {
                         id: cellRoot
+
+                        property alias textItem: cellText
 
                         property var    column: root.columnAt(index)
                         property bool   treeColumn: root.isTreeColumn(column, index)
@@ -452,7 +469,7 @@ Item {
                             color: "transparent"
                             border.width: cellRoot.isEditingHere ? 2 : 0
                             border.color: Style.imaginToolsAccentColor
-                            radius: 2
+                            radius: Style.radiusS
                             z: 10
                         }
 
@@ -469,50 +486,81 @@ Item {
                                 height: parent.height
                                 visible: cellRoot.treeColumn
 
-                                Button {
+                                // Controls are created only where shown: building every row's hidden
+                                // buttons and check boxes made long trees slow to open and to scroll.
+                                Loader {
                                     anchors.centerIn: parent
                                     width: parent.width
                                     height: width
-                                    visible: delegateRoot.nodeHasChildren
-                                    iconSource: delegateRoot.nodeExpanded
-                                        ? "../../../" + Style.getIconPath("Icons/Down",  Icon.State.On, Icon.Mode.Normal)
-                                        : "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal)
-                                    onClicked: root.toggleExpanded(delegateRoot.nodeKey)
+                                    active: cellRoot.treeColumn && delegateRoot.nodeHasChildren
 
-                                    decorator: Component {
-                                        ButtonDecorator {
-                                            color: parent.hovered ? Style.buttonHoverColor : "transparent"
-                                            border.width: 0
+                                    sourceComponent: Component {
+                                        Button {
+                                            iconSource: delegateRoot.nodeExpanded
+                                                ? "../../../" + Style.getIconPath("Icons/Down",  Icon.State.On, Icon.Mode.Normal)
+                                                : "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal)
+                                            onClicked: root.toggleExpanded(delegateRoot.nodeKey)
+
+                                            decorator: Component {
+                                                ButtonDecorator {
+                                                    color: parent.hovered ? Style.buttonHoverColor : "transparent"
+                                                    border.width: 0
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
 
                             // Tri-state checkbox (tree column, checkable nodes)
-                            CheckBox {
-                                // Test instrumentation: matches Table/TableRowDelegateBase's own
-                                // "RowCheckBox" convention for a row's checkbox, nested MouseArea
-                                // named "MouseArea" so click()'s standard nested-MouseArea lookup
-                                // finds it via path ['TreeRow_<i>', 'RowCheckBox']. Inert.
-                                objectName: "RowCheckBox"
-                                visible: cellRoot.treeColumn && delegateRoot.nodeCheckable
+                            Loader {
                                 anchors.verticalCenter: parent.verticalCenter
-                                tristate: root.tristate
-                                checkState: delegateRoot.nodeChecked
-                                isActive: delegateRoot.nodeIsEnabled
+                                active: cellRoot.treeColumn && delegateRoot.nodeCheckable
+                                visible: active
 
-                                MouseArea {
-                                    objectName: "MouseArea"
-                                    anchors.fill: parent
-                                    enabled: delegateRoot.nodeIsEnabled
-                                    visible: delegateRoot.nodeIsEnabled
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: root.toggleCheckState(delegateRoot.nodeKey)
+                                sourceComponent: Component {
+                                    CheckBox {
+                                        // Test instrumentation: matches Table/TableRowDelegateBase's own
+                                        // "RowCheckBox" convention for a row's checkbox, nested MouseArea
+                                        // named "MouseArea" so click()'s standard nested-MouseArea lookup
+                                        // finds it via path ['TreeRow_<i>', 'RowCheckBox']. Inert.
+                                        objectName: "RowCheckBox"
+                                        tristate: root.tristate
+                                        checkState: delegateRoot.nodeChecked
+                                        isActive: delegateRoot.nodeIsEnabled
+
+                                        MouseArea {
+                                            objectName: "MouseArea"
+                                            anchors.fill: parent
+                                            enabled: delegateRoot.nodeIsEnabled
+                                            visible: delegateRoot.nodeIsEnabled
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: root.toggleCheckState(delegateRoot.nodeKey)
+                                        }
+                                    }
+                                }
+                            }
+
+                            Loader {
+                                anchors.verticalCenter: parent.verticalCenter
+                                active: cellRoot.treeColumn && delegateRoot.hintText !== ""
+                                visible: active
+
+                                sourceComponent: Component {
+                                    Image {
+                                        objectName: "HintIcon"
+                                        width: Style.iconSizeS
+                                        height: width
+                                        sourceSize.width: width
+                                        sourceSize.height: height
+                                        source: "../../../" + Style.getIconPath(root.hintIcon, Icon.State.On, Icon.Mode.Normal)
+                                    }
                                 }
                             }
 
                             // Cell text (only when not editing this cell and not a bool column)
                             Text {
+                                id: cellText
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: Math.max(0, parent.width - x)
                                 text: cellRoot.displayText
@@ -527,25 +575,31 @@ Item {
                             }
 
                             // Bool / checkState cell renderer (single-click toggles when editable)
-                            CheckBox {
-                                visible: !cellRoot.isEditingHere && cellRoot.isBoolColumn
+                            Loader {
                                 anchors.verticalCenter: parent.verticalCenter
-                                tristate: cellRoot.column && cellRoot.column.type === "checkState"
-                                isActive: root.isColumnEditable(cellRoot.column) && delegateRoot.nodeIsEnabled
-                                checkState: cellRoot.column && cellRoot.column.type === "checkState"
-                                    ? (cellRoot.cellRawValue !== undefined && cellRoot.cellRawValue !== null ? cellRoot.cellRawValue : Qt.Unchecked)
-                                    : (cellRoot.cellRawValue === true ? Qt.Checked : Qt.Unchecked)
+                                active: !cellRoot.isEditingHere && cellRoot.isBoolColumn
+                                visible: active
 
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    enabled: root.isColumnEditable(cellRoot.column) && delegateRoot.nodeIsEnabled
-                                    onClicked: {
-                                        if (cellRoot.column && cellRoot.column.type === "checkState") {
-                                            var next = cellRoot.cellRawValue === Qt.Checked ? Qt.Unchecked : Qt.Checked
-                                            root.setCellValue(delegateRoot.nodeKey, cellRoot.column, next)
-                                        } else {
-                                            root.setCellValue(delegateRoot.nodeKey, cellRoot.column, cellRoot.cellRawValue !== true)
+                                sourceComponent: Component {
+                                    CheckBox {
+                                        tristate: cellRoot.column && cellRoot.column.type === "checkState"
+                                        isActive: root.isColumnEditable(cellRoot.column) && delegateRoot.nodeIsEnabled
+                                        checkState: cellRoot.column && cellRoot.column.type === "checkState"
+                                            ? (cellRoot.cellRawValue !== undefined && cellRoot.cellRawValue !== null ? cellRoot.cellRawValue : Qt.Unchecked)
+                                            : (cellRoot.cellRawValue === true ? Qt.Checked : Qt.Unchecked)
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            enabled: root.isColumnEditable(cellRoot.column) && delegateRoot.nodeIsEnabled
+                                            onClicked: {
+                                                if (cellRoot.column && cellRoot.column.type === "checkState") {
+                                                    var next = cellRoot.cellRawValue === Qt.Checked ? Qt.Unchecked : Qt.Checked
+                                                    root.setCellValue(delegateRoot.nodeKey, cellRoot.column, next)
+                                                } else {
+                                                    root.setCellValue(delegateRoot.nodeKey, cellRoot.column, cellRoot.cellRawValue !== true)
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -641,7 +695,7 @@ Item {
             color: "transparent"
             border.width: root.__editingError.length > 0 ? 1 : 0
             border.color: root.editorErrorColor
-            radius: 2
+            radius: Style.radiusS
 
             function selectAll() { textEditor.selectAll() }
             function forceEditorFocus() { textEditor.forceActiveFocus() }
@@ -2240,6 +2294,54 @@ Item {
         return row === undefined ? -1 : row
     }
 
+    function nodeHint(keyValue) {
+        var node = __nodes[keyValue]
+        if (hintRole === "" || !node || !node.data || !node.data[hintRole])
+            return ""
+        return String(node.data[hintRole])
+    }
+
+    // Tooltip of the hovered cell: its full text if the cell cuts it, and the hint of the row.
+    function __showCellTooltip(cell, hint, mouseItem, x, y) {
+        if (!cell) {
+            __hideCellOverflow()
+            return
+        }
+
+        var textItem = cell.textItem.visible ? cell.textItem : null
+        var lines = []
+        if (textItem && showOverflowTooltip) {
+            // Measured apart: the web runtime caps implicitWidth of an eliding Text at its width.
+            overflowMeasure.text = textItem.text
+            if (overflowMeasure.implicitWidth > textItem.width + 1)
+                lines.push(textItem.text)
+        }
+        if (hint !== "")
+            lines.push(hint)
+        if (lines.length === 0) {
+            __hideCellOverflow()
+            return
+        }
+
+        var text = lines.join("\n")
+        var anchorItem = textItem ? textItem : cell
+        if (overflowTooltip.text !== text || overflowTooltip.targetItem !== mouseItem)
+            overflowTooltip.hide()
+        // The decorator places the tooltip next to the tooltip item, so put the item over the cell.
+        var point = anchorItem.mapToItem(root, 0, 0)
+        overflowTooltip.x = point.x
+        overflowTooltip.y = point.y
+        overflowTooltip.width = anchorItem.width
+        overflowTooltip.height = anchorItem.height
+        overflowTooltip.targetItem = mouseItem
+        overflowTooltip.text = text
+        overflowTooltip.show(x, y)
+    }
+
+    function __hideCellOverflow() {
+        overflowTooltip.hide()
+    }
+
     function nodeForKey(keyValue)  { return __nodes[keyValue] || null }
     function indexForKey(keyValue) { var n = __nodes[keyValue]; return n ? createIndex(n) : null }
     function keyForIndex(indexObject) { return indexObject && indexObject.key ? indexObject.key : "" }
@@ -2422,4 +2524,15 @@ Item {
             buildVisibleTree()
     }
 
+
+    Text {
+        id: overflowMeasure
+        visible: false
+    }
+
+    CustomTooltip {
+        id: overflowTooltip
+        z: 10
+        componentWidth: Style.sizeHintS
+    }
 }

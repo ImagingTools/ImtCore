@@ -25,7 +25,7 @@ bool CCrossOrgGrantDocumentValidatorComp::ValidateDocumentData(
 	imtauth::CrossOrgGrantInfo info = grantData->GetGrantInfo();
 
 	if (info.targetTenantId.isEmpty()){
-		errorMessage = QStringLiteral("Target tenant must be specified");
+		errorMessage = QStringLiteral("Target organization must be specified");
 		return false;
 	}
 

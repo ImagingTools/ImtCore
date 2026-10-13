@@ -126,17 +126,23 @@ class Text extends Item {
             this.__impl.innerText = this.text.replaceAll('<br>', '\r')
         }
 
-        //temp
-        if(this.wrapMode === Text.NoWrap && this.elide === Text.ElideNone && !isHTML){
+        // Single-line elide is CSS text-overflow. DOM measurement here forces a
+        // layout of the whole page once per Text.
+        let singleLine = this.wrapMode === Text.NoWrap || this.wrapMode === undefined
+        let eliding = this.elide === Text.ElideLeft || this.elide === Text.ElideMiddle || this.elide === Text.ElideRight
+        if(singleLine && !isHTML && (this.elide === Text.ElideNone || this.elide === undefined || eliding)){
             let textMetrics = JQApplication.TextController.measureTextFast(this.text, this.font)
+            let width = textMetrics.width
+            let maxWidth = this.width__prevent ? this.width : 0
+            if(eliding && maxWidth > 0 && width > maxWidth) width = maxWidth
 
-            this.contentWidth = textMetrics.width
+            this.contentWidth = width
             this.contentHeight = textMetrics.height
 
             Geometry.setAuto(this.__self, 'height', textMetrics.height, this.__self.constructor.meta.height)
-            Geometry.setAuto(this.__self, 'width', textMetrics.width, this.__self.constructor.meta.width)
+            Geometry.setAuto(this.__self, 'width', width, this.__self.constructor.meta.width)
 
-            this.implicitWidth = textMetrics.width
+            this.implicitWidth = width
             this.implicitHeight = textMetrics.height
         } else {
             let textMetrics = JQApplication.TextController.measureText(this.text, this.font, !this.width__prevent ? 0 : this.width, this.wrapMode, isHTML, this.elide && this.wrapMode === Text.NoWrap)

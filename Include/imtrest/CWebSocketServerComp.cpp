@@ -75,7 +75,13 @@ void CWebSocketServerComp::SetConnectionStatus(const QByteArray& clientId)
 	loginChangeSet.SetChangeInfo("ClientId", clientId);
 	istd::CChangeNotifier notifier(this, &loginChangeSet);
 
-	m_senderLoginStatusMap.insert(clientId, loginStatus);
+	{
+		// Socket threads insert here while the main thread removes entries in OnSocketDisconnected.
+		// Scoped tighter than the notifier: its observers must not run while this lock is held.
+		QWriteLocker locker(&m_sendersLock);
+
+		m_senderLoginStatusMap.insert(clientId, loginStatus);
+	}
 }
 
 
@@ -113,7 +119,9 @@ bool CWebSocketServerComp::SendResponse(const QByteArray& requestId, ConstRespon
 
 	CWebSocketSender* sender = m_senders.value(requestId).data();
 	if (sender != nullptr){
-		return sender->SendResponse(response);
+		QByteArray data = response->GetData();
+
+		return sender->SendData(data);
 	}
 
 	return false;
@@ -126,7 +134,9 @@ bool CWebSocketServerComp::SendRequest(const QByteArray& requestId, ConstRequest
 
 	CWebSocketSender* sender = m_senders.value(requestId).data();
 	if (sender != nullptr){
-		return sender->SendRequest(request);
+		QByteArray data = request->GetBody();
+
+		return sender->SendData(data);
 	}
 
 	return false;

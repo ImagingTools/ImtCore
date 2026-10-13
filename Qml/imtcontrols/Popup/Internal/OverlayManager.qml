@@ -1,5 +1,6 @@
 pragma Singleton
 import QtQuick 2.12
+import Acf 1.0
 
 /*!
     \qmltype OverlayManager
@@ -45,7 +46,7 @@ QtObject {
                 id: dim
                 objectName: "ImtControlsOverlayDim"
                 anchors.fill: parent
-                color: "#80000000"
+                color: Style.overlayBackgroundColor
                 visible: false
                 opacity: 0
                 z: -1

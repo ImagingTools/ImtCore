@@ -9,12 +9,15 @@ namespace imtqml
 // public methods
 
 CQmlProcess::CQmlProcess()
-	:m_state(QProcess::ProcessState::NotRunning)
+	:m_state(QProcess::ProcessState::NotRunning),
+	m_exitStatus(QProcess::NormalExit),
+	m_exitCode(0)
 {
 	connect(&m_process, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(onStateChanged(QProcess::ProcessState)));
 	connect(&m_process, SIGNAL(readyReadStandardError()), this, SLOT(onReadyReadStandardError()));
 	connect(&m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(onReadyReadStandardOutput()));
 	connect(&m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(onFinished(int, QProcess::ExitStatus)));
+	connect(&m_process, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(onErrorOccurred(QProcess::ProcessError)));
 }
 
 
@@ -59,7 +62,16 @@ void CQmlProcess::terminate()
 
 void CQmlProcess::setEnviroment(QStringList enviroments)
 {
-	m_process.setEnvironment(enviroments);
+	// Variables are added to the system environment: without SystemRoot child processes cannot even resolve host names on Windows.
+	QProcessEnvironment environment = QProcessEnvironment::systemEnvironment();
+	for (const QString& variable : std::as_const(enviroments)){
+		const qsizetype separatorIndex = variable.indexOf(QLatin1Char('='));
+		if (separatorIndex > 0){
+			environment.insert(variable.left(separatorIndex), variable.mid(separatorIndex + 1));
+		}
+	}
+
+	m_process.setProcessEnvironment(environment);
 }
 
 
@@ -143,6 +155,20 @@ void CQmlProcess::onFinished(int exitCode, QProcess::ExitStatus exitStatus)
 	setExitStatus(exitStatus);
 
 	emit finished();
+}
+
+
+void CQmlProcess::onErrorOccurred(QProcess::ProcessError processError)
+{
+	// A process that never started does not emit finished(); report it as a failed run.
+	if (processError == QProcess::FailedToStart){
+		setExitCode(-1);
+		setExitStatus(QProcess::CrashExit);
+
+		emit standardError(m_process.errorString());
+		emit error();
+		emit finished();
+	}
 }
 
 

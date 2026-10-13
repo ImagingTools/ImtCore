@@ -62,15 +62,16 @@ DocumentViewBase {
 			permissionsPage.doUpdateGui()
 	}
 
+	// Runs inside this editor's change transaction on the shared model, so the pages must not open their own.
 	function updateModel() {
 		var generalPage = multiPageView.getPageByIndex(0)
 		if (generalPage)
-			generalPage.doUpdateModel()
+			generalPage.updateModel()
 		if (container.tenantData) {
 			stateManager_.syncMembersToModel()
 			var permissionsPage = multiPageView.getPageById("Permissions")
 			if (permissionsPage)
-				permissionsPage.doUpdateModel()
+				permissionsPage.updateModel()
 		}
 	}
 
@@ -107,6 +108,8 @@ DocumentViewBase {
 						multiPageView.addSubPage("Relationships", "ConnectOrganization", qsTr("Connect Organization"), connectOrganizationPageComp)
 					if (stateManager_.canViewOrganizationConnections)
 						multiPageView.addSubPage("Relationships", "MyRelationships", qsTr("My Relationships"), myConnectionsPageComp)
+					if (stateManager_.canViewOrganizationConnections)
+						multiPageView.addSubPage("Relationships", "RelationshipProposals", qsTr("Proposals"), relationshipProposalsPageComp)
 					// multiPageView.addPage("Messages", qsTr("Messages"), messagesPageComp, "Icons/Message")
 				}
 			}
@@ -368,6 +371,16 @@ DocumentViewBase {
 		id: myConnectionsPageComp
 
 		TenantMyConnectionsPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: relationshipProposalsPageComp
+
+		TenantRelationshipProposalsPage {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient

@@ -115,8 +115,8 @@ class BaseClass extends QtObject {
 							let component = target.__proxy.createComponent(key)
 			
 							if (component) {
-								target[key] = node.typeTarget.create(target.__proxy)
-								target[key].owner = target.__proxy
+								// Owner is attached only after filling, so a lazy read does not report a model change
+								let model = node.typeTarget.create(target.__proxy)
 
 								for (let _pureData of pureData) {
 									let sourceTypename
@@ -124,14 +124,15 @@ class BaseClass extends QtObject {
 										sourceTypename = _pureData['__typename']
 									}
 									let obj = target.__proxy.createElement(key, sourceTypename).createObject(target.__proxy)
-									
-									target[key].append({ item: obj })
-									obj.owner = target.__proxy
 
 									obj.fromObject(_pureData)
+									model.append({ item: obj })
+									obj.owner = target.__proxy
 								}
 
-								target[key].finished()
+								target[key] = model
+								model.owner = target.__proxy
+								model.finished()
 							}
 							else {
 								target[key] = pureData
@@ -143,10 +144,11 @@ class BaseClass extends QtObject {
 							}	
 							let obj = target.__proxy.createComponent(key, sourceTypename).createObject(target.__proxy)
 
+							// Owner is attached only after filling, so a lazy read does not report a model change
+							obj.fromObject(pureData)
+
 							target[key] = obj
 							obj.owner = target.__proxy
-
-							obj.fromObject(pureData)
 						}
 					} else {
 						target[key] = pureData
@@ -408,111 +410,174 @@ class BaseClass extends QtObject {
 		return this.__self.constructor.cachedPoperties
 	}
 
+	isArrayRequired(propertyId) {
+		return false
+	}
+
+	areArrayElementsRequired(propertyId) {
+		return false
+	}
+
+	isArrayValueValid(propertyId, value) {
+		if (value === null || value === undefined) {
+			return !this.isArrayRequired(propertyId)
+		}
+		if (!this.areArrayElementsRequired(propertyId)) {
+			return true
+		}
+		if (Array.isArray(value)) {
+			for (let element of value) {
+				if (element === null || element === undefined) {
+					return false
+				}
+			}
+		}
+		else if (value.hasNullElements && value.hasNullElements()) {
+			return false
+		}
+
+		return true
+	}
+
 	createFromJson(json) {
 		return this.fromJSON(json)
 	}
 
+	// Returns '' if a required array is null or has null elements; scalars are not validated
 	toJson() {
 		let json = '{'
 		let isFirst = true
 		for (let key of this.getProperties()) {
-			if(key === '__typename' && this[key] === '') continue
+			let value = this[key]
+			if(key === '__typename' && value === '') continue
 
-			if (this[key] == null && this._internal.containceInRemoved(key)){
-				continue
+			if (value == null) {
+				if (!this.isArrayValueValid(key, value)) {
+					return ''
+				}
+				if (this._internal.containceInRemoved(key)) {
+					continue
+				}
 			}
 			if (!isFirst) json += ','
 			isFirst = false
-			if (typeof this[key] === 'object') {
-				if (Array.isArray(this[key])) {
+			if (typeof value === 'object') {
+				if (Array.isArray(value)) {
+					if (!this.isArrayValueValid(key, value)) {
+						return ''
+					}
 
 					json += '"' + this.getJSONKeyForProperty(key) + '":'
 
 					json += "["
 
-					for (let j = 0; j < this[key].length; j++) {
-						let value = this[key][j]
+					for (let j = 0; j < value.length; j++) {
+						let element = value[j]
 						if (j != 0) {
 							json += ", "
 						}
 
-						if (typeof value === "string") {
-							value = JSON.stringify(value)
+						if (typeof element === "string") {
+							element = JSON.stringify(element)
 						}
 						
-						json += value
+						json += element
 					}
 
 					json += "]"
 				}
-				else if (this[key] !== null) {
-					json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].toJson()
+				else if (value !== null) {
+					if (!this.isArrayValueValid(key, value)) {
+						return ''
+					}
+					let serializedValue = value.toJson()
+					if (serializedValue === '') {
+						return ''
+					}
+					json += '"' + this.getJSONKeyForProperty(key) + '":' + serializedValue
 				}
 				else{
 					json += '"' + this.getJSONKeyForProperty(key) + '": null'
 				}
 			} else {
-				let value = this[key]
 				if (value === undefined) {
-					value = null
+					json += '"' + this.getJSONKeyForProperty(key) + '":null'
 				}
-				let safeValue = this[key]
-				if (typeof safeValue === 'string') {
-					safeValue = this.escapeSpecialChars(safeValue)
+				else if (typeof value === 'string') {
+					json += '"' + this.getJSONKeyForProperty(key) + '":"' + this.escapeSpecialChars(value) + '"'
 				}
-
-				json += '"' + this.getJSONKeyForProperty(key) + '":' + (typeof this[key] === 'string' ? '"' + safeValue + '"' : value)
+				else {
+					json += '"' + this.getJSONKeyForProperty(key) + '":' + value
+				}
 			}
 		}
 		json += '}'
 		return json
 	}
 
+	// Returns '' if a required array is null or has null elements; scalars are not validated
 	toGraphQL() {
 		let graphQL = '{'
 		let isFirst = true
 		for (let key of this.getProperties()) {
-			if (this[key] == null && this._internal.containceInRemoved(key)){
-				continue
+			let value = this[key]
+			if (value == null) {
+				if (!this.isArrayValueValid(key, value)) {
+					return ''
+				}
+				if (this._internal.containceInRemoved(key)) {
+					continue
+				}
 			}
 			if (!isFirst) graphQL += ','
 			isFirst = false
-			if (typeof this[key] === 'object') {
-				if (Array.isArray(this[key])) {
+			if (typeof value === 'object') {
+				if (Array.isArray(value)) {
+					if (!this.isArrayValueValid(key, value)) {
+						return ''
+					}
+
 					graphQL += this.getJSONKeyForProperty(key) + ':'
 
 					graphQL += "["
 
-					for (let j = 0; j < this[key].length; j++) {
+					for (let j = 0; j < value.length; j++) {
+						let element = value[j]
 						if (j != 0) {
 							graphQL += ", "
 						}
 
-						if (typeof this[key][j] === "string") {
-							graphQL += "\"" + this.escapeSpecialChars(this[key][j]) + "\""
+						if (typeof element === "string") {
+							graphQL += "\"" + this.escapeSpecialChars(element) + "\""
 						}
 						else {
-							graphQL += this[key][j]
+							graphQL += element
 						}
 					}
 
 					graphQL += "]"
 				}
+				else if (value !== null) {
+					if (!this.isArrayValueValid(key, value)) {
+						return ''
+					}
+					let serializedValue = value.toGraphQL()
+					if (serializedValue === '') {
+						return ''
+					}
+					graphQL += this.getJSONKeyForProperty(key) + ':' + serializedValue
+				}
 				else {
-					graphQL += this.getJSONKeyForProperty(key) + ':' + ((this[key] !== null) ? this[key].toGraphQL() : "null")
+					graphQL += this.getJSONKeyForProperty(key) + ':null'
 				}
 			} else {
-				let value = this[key]
-				if (value === undefined) {
-					value = null
-				}
-
 				graphQL += this.getJSONKeyForProperty(key) + ':';
-				if (typeof this[key] === 'string') {
-					let data = this[key];
-					
+				if (value === undefined) {
+					graphQL += 'null'
+				}
+				else if (typeof value === 'string') {
 					graphQL += '"'
-					graphQL += this.escapeSpecialChars(data)
+					graphQL += this.escapeSpecialChars(value)
 					graphQL += '"'
 				}
 				else {

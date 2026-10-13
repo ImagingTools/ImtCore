@@ -19,6 +19,10 @@ Item {
     property bool forceFocus: true;
 	property bool escapeEnabled: false;
 
+	property var dialogManagerView: parentWindow ? parentWindow.dialogManagerView : undefined;
+	property int modality: Qt.ApplicationModal //Qt.ApplicationModal, Qt.WindowModal, Qt.NonModal
+	property var parentWindow: null
+
     Component.onCompleted: {
         Events.subscribeEvent("AppSizeChanged", onAppSizeChanged);
     }

@@ -115,6 +115,7 @@ Dialog {
 			height: Style.sizeHintL
 
 			CheckableListPanel {
+				objectName: "AvailableFeaturesPanel"
 				anchors.fill: parent
 				anchors.margins: Style.marginL
 				title: qsTr("Available features")

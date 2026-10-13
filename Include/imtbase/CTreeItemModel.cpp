@@ -530,7 +530,7 @@ bool CTreeItemModel::SetData(
 
 	Item* item = m_items[index];
 
-	if (item->Value(key) == value){
+	if (item->ContainsKey(key) && item->Value(key) == value){
 		if(m_isUpdateEnabled){
 			EndChanges();
 		}

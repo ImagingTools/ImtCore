@@ -10,6 +10,7 @@ Rectangle {
 	anchors.fill: parent;
 	color: Style.backgroundColor2;
 	property string localSettings;
+	property bool modelIsDirty: false;
 	
 	signal saveSettings(string json);
 	signal settingsSaved();
@@ -25,17 +26,22 @@ Rectangle {
 		preferenceDialog.paramsSet = paramsSet;
 	}
 	
-	onSaveSettings: {
+	function applySettings(){
+		// the C++ observer saves synchronously and may report back before any onSaveSettings handler runs
 		loading.start()
+		window.saveSettings(window.paramsSet.toJson());
 	}
 	
 	onSettingsSaved: {
+		window.modelIsDirty = false;
 		buttons.setButtonState(Enums.apply, false);
 		loading.stop()
+		PopupManager.addSuccessMessage(qsTr("Settings have been saved successfully"), true)
 	}
 	
 	onSettingsSaveFailed: {
 		loading.stop()
+		PopupManager.addErrorMessage(qsTr("Unable to save settings"), true)
 	}
 	
 	Component.onCompleted: {
@@ -43,6 +49,8 @@ Rectangle {
 		Events.subscribeEvent("StopLoading", loading.stop);
 		
 		Style.setDecorators(decorators)
+		
+		PopupManager.popupContainer = popupContainer;
 	}
 	
 	property Decorators decorators: decorators_
@@ -65,13 +73,28 @@ Rectangle {
 	
 	Preference {
 		id: preferenceDialog;
-		
+
 		anchors.top: parent.top;
 		anchors.left: parent.left;
 		anchors.right: parent.right;
 		anchors.bottom: buttons.top;
-		
+
+		settingsController: SettingsController {
+			databaseAccessSettingsEditorComp: Component {
+				DatabaseAccessSettingsEditor {
+					id: databaseEditor
+
+					backupComp: Component {
+						DatabaseBackupController {
+							databaseParams: databaseEditor.databaseParams
+						}
+					}
+				}
+			}
+		}
+
 		onEditorModelDataChanged: {
+			window.modelIsDirty = true;
 			buttons.setButtonState(Enums.apply, true);
 		}
 	}
@@ -87,6 +110,20 @@ Rectangle {
 		Component.onCompleted: {
 			buttons.addButton({"id":Enums.apply, "name": qsTr("Apply"), "enabled": false});
 			buttons.addButton({"id":Enums.close, "name": qsTr("Close"), "enabled": true});
+		}
+		
+		onButtonClicked: {
+			if (buttonId == Enums.apply){
+				window.applySettings();
+			}
+			else if (buttonId == Enums.close){
+				if (window.modelIsDirty){
+					ModalDialogManager.openDialog(saveDialog, {"message": qsTr("Save all changes ?")});
+				}
+				else{
+					Qt.quit();
+				}
+			}
 		}
 	}
 	
@@ -119,6 +156,15 @@ Rectangle {
 		id: loading;
 		anchors.fill: parent;
 		visible: false;
+	}
+	
+	PopupContainer {
+		id: popupContainer;
+		z: 10000
+		anchors.right: parent.right;
+		anchors.rightMargin: Style.marginM;
+		anchors.bottom: buttons.top;
+		anchors.bottomMargin: Style.marginM;
 	}
 }
 

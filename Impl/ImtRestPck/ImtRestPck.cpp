@@ -66,7 +66,7 @@ I_EXPORT_COMPONENT(
 			"FileProvider - based HTTP servlet");
 
 I_EXPORT_COMPONENT(
-			WorkerManaqer,
+			WorkerManager,
 			"The manager of request handlers factory for multi-thread request server",
 			"REST HTTP Handler Request Factory");
 

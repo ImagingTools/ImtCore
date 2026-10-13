@@ -7,8 +7,10 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtcrypt/IHashGenerator.h>
 #include <imtauth/ICredentialController.h>
+#include <imtauth/IAccountLockoutController.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauth/IJwtSessionController.h>
+#include <imtauth/IPasswordPolicy.h>
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
@@ -31,6 +33,7 @@ public:
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", true, "UserCollection");
 		I_ASSIGN(m_userConnectionCollectionCompPtr, "UserConnectionCollection", "User connection collection", false, "UserConnectionCollection");
 		I_ASSIGN_MULTI_0(m_credentialControllersCompPtr, "CredentialControllers", "Credential Controllers", true);
+		I_ASSIGN(m_accountLockoutControllerCompPtr, "AccountLockoutController", "Account lockout controller limiting consecutive invalid access attempts", false, "AccountLockoutController");
 		I_ASSIGN_MULTI_0(m_systemIdsAttrPtr, "SystemIds", "System-IDs", true);
 		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "JWT session controller", false, "JwtSessionController");
 		I_ASSIGN(m_personalAccessTokenManagerCompPtr, "PersonalAccessTokenManager", "Personal access token manager", false, "PersonalAccessTokenManager");
@@ -40,6 +43,7 @@ public:
 		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for tenant-scoped adaptation of user roles/groups/permissions", false, "TenantEntityBindingManager");
 		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
 		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider (used for delegated role product validation)", false, "RoleInfoProvider");
+		I_ASSIGN(m_passwordPolicyCompPtr, "PasswordPolicy", "Password policy for password lifetime checks", false, "PasswordPolicy");
 	I_END_COMPONENT;
 
 protected:
@@ -48,7 +52,20 @@ protected:
 	bool CheckCredential(const QByteArray& systemId, const QByteArray& login, const QByteArray& password) const;
 	QByteArrayList CalculateGlobalPermissions(const imtauth::IUserInfo& userInfo, const QByteArray& userId, const QByteArray& productId) const;
 	sdl::V1_0::imtauth::CAuthorizationPayload CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const;
+	/**
+		Response for an account that is disabled. Only for callers whose credentials were
+		already verified - otherwise it would turn a login attempt into an account-state probe.
+	*/
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateAccountDisabledResponse(const QByteArray& login) const;
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateAccountLockedResponse(const QByteArray& login, QString& errorMessage) const;
+	bool IsAccountLocked(const QByteArray& login) const;
+	void RegisterAccessAttempt(const QByteArray& login, bool successful) const;
 	sdl::V1_0::imtauth::CAuthorizationPayload CreateAuthorizationSuccessfulResponse(
+				imtauth::CUserInfo& userInfo,
+				const QByteArray& systemId,
+				const QByteArray& productId,
+				QString& errorMessage) const;
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateAuthorizationResponseWithLifetimeCheck(
 				imtauth::CUserInfo& userInfo,
 				const QByteArray& systemId,
 				const QByteArray& productId,
@@ -85,7 +102,9 @@ protected:
 	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
 	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
 	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
+	I_REF(imtauth::IPasswordPolicy, m_passwordPolicyCompPtr);
 	I_MULTIREF(imtauth::ICredentialController, m_credentialControllersCompPtr);
+	I_REF(imtauth::IAccountLockoutController, m_accountLockoutControllerCompPtr);
 	I_MULTIATTR(QByteArray, m_systemIdsAttrPtr);
 	I_ATTR(QByteArray, m_patPrefixAttrPtr);
 };

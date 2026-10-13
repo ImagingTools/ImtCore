@@ -79,7 +79,7 @@ DecoratorBase {
         anchors.fill: parent;
 
         color: dialogContainer.baseElement.backgroundColor;
-        radius: 4;
+        radius: Style.radiusL;
     }
 
     DropShadow {
@@ -123,6 +123,7 @@ DecoratorBase {
                 visible: !dialogContainer.baseElement ? false : dialogContainer.baseElement.canMove;
                 containerItem: topPanelContainer;
                 movingItem: !dialogContainer.baseElement ? null : dialogContainer.baseElement;
+				globalParent: !baseElement ? ModalDialogManager.activeView : baseElement.dialogManagerView ? baseElement.dialogManagerView : ModalDialogManager.activeView
             }
 
             Loader {

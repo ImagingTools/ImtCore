@@ -1,0 +1,21 @@
+schema {
+	namespace: arraynullability
+	version: 1.0
+}
+
+
+type Attribute
+{
+	value: String
+}
+
+
+type Entity
+{
+	requiredObjects: [Attribute!]!
+	nullableObjectsWithRequiredElements: [Attribute!]
+	nullableObjects: [Attribute]
+	requiredScalars: [String!]!
+	nullableScalarsWithRequiredElements: [String!]
+	nullableScalars: [String]
+}

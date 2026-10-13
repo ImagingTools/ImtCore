@@ -226,6 +226,16 @@ protected:
 				QString& errorMessage) const override;
 
 private:
+	// True when the caller may act for at least one of the given organizations.
+	bool HasAccessToAnyTenant(
+				const ::imtgql::CGqlRequest& gqlRequest,
+				const QByteArrayList& tenantIds,
+				QString& errorMessage) const;
+	// True when the caller may manage the grantor or the grantee organization of an existing grant.
+	bool CanManageGrant(
+				const ::imtgql::CGqlRequest& gqlRequest,
+				const QByteArray& grantId,
+				QString& errorMessage) const;
 
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);

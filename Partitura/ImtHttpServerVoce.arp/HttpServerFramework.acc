@@ -70,7 +70,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WorkerManager" PackageId="ImtRestPck" ComponentId="WorkerManaqer">
+        <Element Id="WorkerManager" PackageId="ImtRestPck" ComponentId="WorkerManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -99,5 +99,7 @@
         <Interface InterfaceId="imtrest::IServer" ComponentId="TcpServer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="TcpServer"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="WorkerManager" ComponentId="WorkerManager"/>
+    </ExportedComponents>
 </Acf>

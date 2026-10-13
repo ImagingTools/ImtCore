@@ -124,6 +124,7 @@ Rectangle {
 			delegate: Rectangle {
 				width: ticketListView.width
 				height: ticketItemContent.height + Style.paddingS * 2
+				color: Style.baseColor
 
 				Column {
 					id: ticketItemContent
@@ -143,7 +144,7 @@ Rectangle {
 							width: 10
 							height: 10
 							radius: 5
-							color: (model.status || 0) === 0 ? "#1a7f37" : "#8957e5"
+							color: (model.status || 0) === 0 ? Style.successColor : Style.doneColor
 							anchors.verticalCenter: parent.verticalCenter
 						}
 

@@ -24,7 +24,7 @@ ControlBase {
 	
 	property int itemWidth: Style.sizeHintXXS;
 	property int itemHeight: Style.controlHeightM;
-	property int radius: Style.buttonRadius;
+	property int radius: Style.radiusL;
 	property int shownItemsCount: 5;
 	
 	property int textSize: Style.fontSizeM;

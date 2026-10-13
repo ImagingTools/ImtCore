@@ -21,7 +21,6 @@ public:
 
 	I_BEGIN_COMPONENT(CDatabaseAccessSettingsRepresentationControllerComp)
 		I_REGISTER_INTERFACE(IJsonRepresentationController);
-		I_ASSIGN(m_canBackupRestoreAttrPtr, "CanBackupRestore", "Can backup restore in editor", false, true);
 	I_END_COMPONENT;
 
 
@@ -36,9 +35,6 @@ protected:
 	virtual bool GetDataModelFromSdlRepresentation(
 				istd::IChangeable& dataModel,
 				const sdl::V1_0::imtbase::CDatabaseAccessSettings& sdlRepresentation) const override;
-
-protected:
-	I_ATTR(bool, m_canBackupRestoreAttrPtr);
 };
 
 

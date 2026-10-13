@@ -23,6 +23,8 @@ Item {
 		Rectangle {
 			id: defaultDelegateRoot
 
+			objectName: "PopupMessage"
+
 			property string messageId: ""
 			property string messageType: ""
 			property string messageText: ""
@@ -51,7 +53,7 @@ Item {
 
 			width: parent ? parent.width : Style.sizeHintS
 			height: Math.max(Style.sizeHintBXS, contentRow.height + 2 * Style.marginL)
-			radius: Style.radiusM + 2
+			radius: Style.radiusM
 			color: defaultDelegateRoot.panelColor
 			border.width: 1
 			border.color: Style.borderColor
@@ -255,8 +257,8 @@ Item {
 	}
 
 	function addMessage(type, text, autoClose, id){
-		if (!autoClose){
-			autoClose = false
+		if (autoClose === undefined || autoClose === null){
+			autoClose = type === "success" || type === "info"
 		}
 
 		if (!id || id === ""){
@@ -295,8 +297,8 @@ Item {
 	}
 
 	function replaceMessage(id, type, text, autoClose){
-		if (!autoClose){
-			autoClose = false
+		if (autoClose === undefined || autoClose === null){
+			autoClose = type === "success" || type === "info"
 		}
 
 		let existingIndex = findMessage(id)

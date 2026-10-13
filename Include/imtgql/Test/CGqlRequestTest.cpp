@@ -3,6 +3,7 @@
 
 
 // ImtCore includes
+#include <imtgql/CGqlParamObject.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/CGqlFieldFragment.h>
 
@@ -490,6 +491,21 @@ void CGqlRequestTest::ParseFields()
 }
 
 
+void CGqlRequestTest::ParseFieldsNamedAsObjectMembers()
+{
+	qsizetype errorPosition = -1;
+
+	imtgql::CGqlRequest request;
+	QVERIFY(request.ParseQuery(R"({"query": "query Values {Values {__typename hasOwnProperty constructor toString {valueOf}}}"})", errorPosition));
+
+	const QByteArrayList fieldIds = request.GetFields().GetFieldIds();
+	QVERIFY(fieldIds.contains("hasOwnProperty"));
+	QVERIFY(fieldIds.contains("__typename"));
+	QVERIFY(fieldIds.contains("constructor"));
+	QVERIFY(fieldIds.contains("toString"));
+}
+
+
 void CGqlRequestTest::ParseComplexFields()
 {
 	qsizetype errorPosition = -1;
@@ -565,6 +581,42 @@ void CGqlRequestTest::ParseArrayEnumTokens()
 	QCOMPARE(statuses.size(), 2);
 	QCOMPARE(statuses[0].toString(), QStringLiteral("Pending"));
 	QCOMPARE(statuses[1].toString(), QStringLiteral("Accepted"));
+}
+
+
+void CGqlRequestTest::ParseNumbers()
+{
+	const char* payload = R"(
+	{
+		"query": "query Numbers { Numbers(input: { integer: -42, float: -0.5, large: 1e+21, small: 1E-7, mantissa: 2.5e3, overflow: 99999999999999999999, enumValue: Pending, values: [7, 1.25, 1e+21, -3e-2, Pending] }) { id } }"
+	}
+	)";
+
+	qsizetype errorPosition = -1;
+	imtgql::CGqlRequest request;
+	QVERIFY(request.ParseQuery(payload, errorPosition));
+	QVERIFY(errorPosition < 0);
+
+	const imtgql::CGqlParamObject* inputObject = request.GetParamObject("input");
+	QVERIFY(inputObject != nullptr);
+
+	QCOMPARE(inputObject->GetParamArgumentValue("integer").typeId(), QMetaType::LongLong);
+	QCOMPARE(inputObject->GetParamArgumentValue("integer").toLongLong(), -42);
+	QCOMPARE(inputObject->GetParamArgumentValue("float").toDouble(), -0.5);
+	QCOMPARE(inputObject->GetParamArgumentValue("large").typeId(), QMetaType::Double);
+	QCOMPARE(inputObject->GetParamArgumentValue("large").toDouble(), 1e21);
+	QCOMPARE(inputObject->GetParamArgumentValue("small").toDouble(), 1e-7);
+	QCOMPARE(inputObject->GetParamArgumentValue("mantissa").toDouble(), 2500.0);
+	QCOMPARE(inputObject->GetParamArgumentValue("overflow").typeId(), QMetaType::QByteArray);
+	QCOMPARE(inputObject->GetParamArgumentValue("enumValue").toString(), QStringLiteral("Pending"));
+
+	const QVariantList values = inputObject->GetParamArgumentValue("values").toList();
+	QCOMPARE(values.size(), 5);
+	QCOMPARE(values[0].toLongLong(), 7);
+	QCOMPARE(values[1].toDouble(), 1.25);
+	QCOMPARE(values[2].toDouble(), 1e21);
+	QCOMPARE(values[3].toDouble(), -0.03);
+	QCOMPARE(values[4].toString(), QStringLiteral("Pending"));
 }
 
 
@@ -828,6 +880,98 @@ void CGqlRequestTest::TestVariablePrimitivesAndLists()
 }
 
 
+void CGqlRequestTest::TestVariableListsWithNullElements()
+{
+	const char* payload = R"(
+	{
+	  "query": "mutation Update($scalars: [String], $objects: [ItemInput], $allNull: [String]) { update(scalars: $scalars, objects: $objects, allNull: $allNull) { success } }",
+	  "variables": {
+		"scalars": ["first", null, "second"],
+		"objects": [{"code": 1}, null, {"code": 2}],
+		"allNull": [null],
+		"empty": []
+	  }
+	}
+	)";
+
+	imtgql::CGqlRequest request;
+	qsizetype errorPosition = -1;
+	QVERIFY(request.ParseQuery(payload, errorPosition));
+	QVERIFY(errorPosition < 0);
+
+	const imtgql::CGqlParamObject& variables = request.GetVariables();
+	const QVariantList scalars = variables.GetParamArgumentValue("scalars").toList();
+	QCOMPARE(scalars.size(), 3);
+	QCOMPARE(scalars[0].toString(), QStringLiteral("first"));
+	QVERIFY(variables.IsNullArrayElement("scalars", 1));
+	QCOMPARE(scalars[2].toString(), QStringLiteral("second"));
+
+	QCOMPARE(variables.GetObjectsCount("objects"), 3);
+	QVERIFY(variables.IsNullArrayElement("objects", 1));
+	QVERIFY(variables.GetParamArgumentObjectPtr("objects", 0) != nullptr);
+	QVERIFY(variables.GetParamArgumentObjectPtr("objects", 2) != nullptr);
+
+	const QVariantList allNull = variables.GetParamArgumentValue("allNull").toList();
+	QCOMPARE(allNull.size(), 1);
+	QVERIFY(!allNull[0].isValid() || allNull[0].isNull());
+	QVERIFY(variables.IsNullArrayElement("allNull", 0));
+
+	QVERIFY(variables.ContainsParam("empty"));
+	QVERIFY(variables.GetParamArgumentValue("empty").toList().isEmpty());
+}
+
+
+void CGqlRequestTest::CreateArraysWithNullElements()
+{
+	imtgql::CGqlRequest request(imtgql::IGqlRequest::RT_MUTATION);
+	request.SetCommandId("Update");
+	request.AddSimpleField("success");
+
+	imtgql::CGqlParamObject input;
+	input.InsertParam("scalars", QVariantList{QStringLiteral("first"), QVariant(), QStringLiteral("second")});
+
+	imtgql::CGqlParamObject firstObject;
+	firstObject.InsertParam("code", 1);
+	imtgql::CGqlParamObject secondObject;
+	secondObject.InsertParam("code", 2);
+	input.InsertParam("objects", QList<imtgql::CGqlParamObject>{
+		firstObject,
+		imtgql::CGqlParamObject::CreateNull(),
+		secondObject});
+	request.AddParam("input", input);
+
+	const QByteArray query = request.GetQuery();
+	QVERIFY(query.contains(QByteArrayLiteral("scalars: [\\\"first\\\", null, \\\"second\\\"]")));
+	QVERIFY(query.contains(QByteArrayLiteral("objects :[ {code: 1}, null, {code: 2} ]")));
+}
+
+
+void CGqlRequestTest::ParseArraysWithNullElements()
+{
+	const char* payload = R"(
+	{
+	  "query": "mutation Update { Update(input: {objects: [{code: 1}, null, {code: 2}]}) { success } }"
+	}
+	)";
+
+	imtgql::CGqlRequest request;
+	qsizetype errorPosition = -1;
+	QVERIFY(request.ParseQuery(payload, errorPosition));
+	QVERIFY(errorPosition < 0);
+
+	const imtgql::CGqlParamObject* input = request.GetParamObject("input");
+	QVERIFY(input != nullptr);
+	QCOMPARE(input->GetObjectsCount("objects"), 3);
+	QVERIFY(!input->IsNullArrayElement("objects", 0));
+	QVERIFY(input->IsNullArrayElement("objects", 1));
+	QVERIFY(!input->IsNullArrayElement("objects", 2));
+	QCOMPARE(input->GetParamArgumentObjectPtr("objects", 0)->GetParamArgumentValue("code").toInt(), 1);
+	QCOMPARE(input->GetParamArgumentObjectPtr("objects", 2)->GetParamArgumentValue("code").toInt(), 2);
+
+	QVERIFY(request.GetQuery().contains(QByteArrayLiteral("objects :[ {code: 1}, null, {code: 2} ]")));
+}
+
+
 void CGqlRequestTest::ParseStringWithEscapeSequences()
 {
 	// Test that \n, \r, \t escape sequences inside GraphQL string literals
@@ -857,6 +1001,31 @@ void CGqlRequestTest::ParseStringWithEscapeSequences()
 	// \t should be decoded to actual tab (char 9)
 	QString note = inputPtr->GetParamArgumentValue("Note").toString();
 	QCOMPARE(note, QStringLiteral("Tab\there"));
+}
+
+
+void CGqlRequestTest::BenchmarkIsNullArrayElementMillionValues()
+{
+#ifndef IMT_ENABLE_BENCHMARK_TESTS
+	QSKIP("Benchmark test for IsNullArrayElement with a million values.", 1);
+#endif
+
+	static constexpr qsizetype valueCount = 1000000;
+	const QByteArray paramId = QByteArrayLiteral("values");
+	const QVariantList values(valueCount, QVariant(1));
+
+	imtgql::CGqlParamObject paramObject;
+	paramObject.InsertParam(paramId, QVariant::fromValue(values));
+
+	qsizetype nullElementCount = 0;
+	QBENCHMARK_ONCE {
+		for (qsizetype index = 0; index < values.size(); ++index){
+			if (paramObject.IsNullArrayElement(paramId, index)){
+				++nullElementCount;
+			}
+		}
+	}
+	QCOMPARE(nullElementCount, 0);
 }
 
 

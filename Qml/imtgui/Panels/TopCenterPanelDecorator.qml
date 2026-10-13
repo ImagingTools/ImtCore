@@ -129,6 +129,7 @@ DecoratorBase {
 		// contentWidth alone never reached it.
 		SearchTextInput {
 			id: tfc;
+			objectName: "GlobalSearchInput";
 			height: parent.height;
 			width: Math.max(Style.sizeHintXXXS,
 							Math.min(topCenterPanelDecorator.contentWidth, topCenterPanelDecorator.width)

@@ -158,9 +158,23 @@ bool TSdlAbstractListModel<ModelDataType, ModelObjectDataType>::
 		return false;
 	}
 
+	if (!value.isValid() || value.isNull()){
+		this->Version_1_0->ReplaceNull(row);
+		ClearCache();
+
+		return true;
+	}
+	if (!value.canConvert<ModelDataType*>()){
+		return false;
+	}
+
 	ModelDataType* newItemPtr = value.value<ModelDataType*>();
+	if (newItemPtr == nullptr){
+		return false;
+	}
 	istd::TNullableValue<ModelDataType> newItem = *newItemPtr;
-	Version_1_0->insert(row, newItem);
+	Version_1_0->replace(row, newItem);
+	ClearCache();
 
 	return true;
 }

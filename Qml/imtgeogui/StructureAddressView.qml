@@ -372,8 +372,9 @@ Item {
 
 		width: addressColumn.width + 20;
 		height: addressView.count > 0 ? addressColumn.height + 2*addressColumn.anchors.topMargin : 0;
-		radius: Style.size_mainCornerRadius;
-		border.color: Style.color_shadow_light;
+		radius: Style.radiusM;
+		color: Style.baseColor;
+		border.color: Style.borderColor;
 		border.width: 1;
 		visible: addressColumn.currentIndex > -1
 
@@ -423,6 +424,7 @@ Item {
 					height: recWithElement.height + 2 * (recWithElement.anchors.topMargin);
 					property bool selected: addressColumn.currentIndex === model.index;
 					radius: 10;
+					color: Style.baseColor;
 					Column{
 						id: recWithElement;
 
@@ -436,7 +438,7 @@ Item {
 						Text {
 							width: parent.width;
 
-							color: Style.color_dialogText;
+							color: Style.textColor;
 							font.family: Style.fontFamily;
 							font.pixelSize: Style.fontSizeM;
 
@@ -463,7 +465,7 @@ Item {
 
 								width: parent.width - anchors.leftMargin;
 
-								color: Style.color_text_common;
+								color: Style.textColor;
 								font.family: Style.fontFamily;
 								font.pixelSize: Style.fontSizeL;
 
@@ -499,8 +501,9 @@ Item {
 
 		width: buttonsColumn.width + 20;
 		height: buttonsColumn.height + 2*buttonsColumn.anchors.topMargin;
-		radius: Style.size_mainCornerRadius;
-		border.color: Style.color_shadow_light;
+		radius: Style.radiusM;
+		color: Style.baseColor;
+		border.color: Style.borderColor;
 		border.width: 1;
 
 		Column{
@@ -548,7 +551,7 @@ Item {
 				delegate: Button{
 
 					width: 200;
-					height: Style.size_ButtonHeight;
+					height: Style.buttonHeightM;
 
 					text: model.text;
 
@@ -630,8 +633,9 @@ Item {
 
 		width: coordinatesColumn.width + 20;
 		height: coordinatesColumn.height + 2 * Style.marginM;
-		radius: Style.size_mainCornerRadius;
-		border.color: Style.color_shadow_light;
+		radius: Style.radiusM;
+		color: Style.baseColor;
+		border.color: Style.borderColor;
 		border.width: 1;
 		visible: addressColumn.currentIndex > -1;
 
@@ -661,7 +665,7 @@ Item {
 			Text {
 				width: parent.width;
 
-				color: Style.color_dialogText;
+				color: Style.textColor;
 				font.family: Style.fontFamily;
 				font.pixelSize: Style.fontSizeM;
 
@@ -673,7 +677,7 @@ Item {
 			Text {
 				width: parent.width;
 
-				color: Style.color_dialogText;
+				color: Style.textColor;
 				font.family: Style.fontFamily;
 				font.pixelSize: Style.fontSizeM;
 

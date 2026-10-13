@@ -91,9 +91,19 @@ I_EXPORT_COMPONENT(
 			"Credential Controller");
 
 I_EXPORT_COMPONENT(
+			PasswordPolicy,
+			"Password policy",
+			"Password Policy Strength History Lifetime");
+
+I_EXPORT_COMPONENT(
 			LdapCredentialController,
 			"Ldap credential controller",
 			"Ldap Credential Controller");
+
+I_EXPORT_COMPONENT(
+			AccountLockoutController,
+			"Account lockout controller",
+			"Account Lockout Controller");
 
 I_EXPORT_COMPONENT(
 			LdapUserCollectionJoiner,

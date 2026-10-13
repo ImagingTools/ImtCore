@@ -348,6 +348,7 @@ Dialog {
 
 					delegate: Rectangle {
 						id: entryRow;
+						objectName: "ColumnRow_" + index
 
 						width: entriesView.width;
 						height: dialog.rowHeight;
@@ -427,6 +428,7 @@ Dialog {
 
 							CheckBox {
 								id: entryCheck;
+								objectName: "ColumnCheckBox"
 
 								anchors.centerIn: parent;
 
@@ -448,6 +450,8 @@ Dialog {
 						}
 
 						BaseText {
+							objectName: "ColumnRowTitle"
+
 							anchors.left: checkArea.right;
 							anchors.leftMargin: Style.marginS;
 							anchors.right: parent.right;

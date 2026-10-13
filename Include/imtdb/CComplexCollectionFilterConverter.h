@@ -16,7 +16,8 @@ public:
 	enum SqlContext
 	{
 		SC_GENERAL,
-		SC_POSTGRES
+		SC_POSTGRES,
+		SC_DUCKDB
 	};
 
 	static QString CreateSqlSortQuery(const imtbase::IComplexCollectionFilter& filter);
@@ -26,6 +27,7 @@ private:
 	static QString ProcessColumn(const imtbase::IComplexCollectionFilter::FieldFilter& filter, SqlContext sqlContext = SC_GENERAL);
 	static QString ProcessGroup(const imtbase::IComplexCollectionFilter::FilterExpression& filter, SqlContext sqlContext = SC_GENERAL);
 	static QString ToSqlArray(const QVariantList& values);
+	static QString ToDuckDbListLiteral(const QVariantList& values);
 };
 
 

@@ -92,6 +92,8 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 	FillUserMode(applicationInfo);
 	FillSuperuserStatus(applicationInfo);
 
+	applicationInfo.tenantsEnabled = m_tenantsEnabledAttrPtr.IsValid() ? *m_tenantsEnabledAttrPtr : false;
+
 	return applicationInfo;
 }
 

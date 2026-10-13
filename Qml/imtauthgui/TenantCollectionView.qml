@@ -192,20 +192,34 @@ RemoteCollectionView {
 			onReused: {
 				if (rowIndex >= 0 && tenantRelationScopeDelegate && tenantRelationScopeDelegate.rowDelegate && tenantRelationScopeDelegate.rowDelegate.tableItem){
 					let scope = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, rowIndex);
-					if (scope){
-						scopeValue = scope
-					}
+					scopeValue = scope ? scope : ""
 
 					let invitationId = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, rowIndex);
-					if (invitationId){
-						invitationIdValue = invitationId
-					}
+					invitationIdValue = invitationId ? invitationId : ""
 
 					let invitedByName = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitedByName, rowIndex);
-					if (invitedByName){
-						invitedByNameValue = invitedByName
-					}
+					invitedByNameValue = invitedByName ? invitedByName : ""
 				}
+			}
+
+			function scopeText(scope){
+				if (scope === "Owner"){
+					return qsTr("Owner")
+				}
+				if (scope === "Creator"){
+					return qsTr("Creator")
+				}
+				if (scope === "Member"){
+					return qsTr("Member")
+				}
+				if (scope === "Invited"){
+					return qsTr("Invited")
+				}
+				if (scope === "Delegated"){
+					return qsTr("Delegated")
+				}
+
+				return scope
 			}
 
 			Text {
@@ -215,7 +229,7 @@ RemoteCollectionView {
 				anchors.leftMargin: Style.marginM
 				font.pixelSize: Style.fontSizeM
 				color: tenantRelationScopeDelegate.scopeValue === "Invited" ? Style.imaginToolsAccentColor : Style.textColor
-				text: tenantRelationScopeDelegate.scopeValue
+				text: tenantRelationScopeDelegate.scopeText(tenantRelationScopeDelegate.scopeValue)
 				font.underline: tenantRelationScopeDelegate.scopeValue === "Invited"
 
 				MouseArea {
@@ -274,14 +288,14 @@ RemoteCollectionView {
 							width: acceptBtnLabel.contentWidth + 2 * Style.marginL
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: "#3FB950"
+							color: Style.successColor
 
 							Text {
 								id: acceptBtnLabel
 								anchors.centerIn: parent
 								text: qsTr("Accept")
 								font.pixelSize: Style.fontSizeS
-								color: "#FFFFFF"
+								color: Style.highlightedTextColor
 							}
 
 							MouseArea {
@@ -300,14 +314,14 @@ RemoteCollectionView {
 							width: rejectBtnLabel.contentWidth + 2 * Style.marginL
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: "#DA3633"
+							color: Style.dangerColor
 
 							Text {
 								id: rejectBtnLabel
 								anchors.centerIn: parent
 								text: qsTr("Reject")
 								font.pixelSize: Style.fontSizeS
-								color: "#FFFFFF"
+								color: Style.highlightedTextColor
 							}
 
 							MouseArea {
@@ -390,7 +404,7 @@ RemoteCollectionView {
 			onReused: {
 				var val = isActiveDelegate.getValue()
 				isActiveLabel.text = val ? qsTr("Active") : qsTr("Inactive")
-				isActiveIndicator.color = val ? "#3FB950" : "#8C95A6"
+				isActiveIndicator.color = val ? Style.successColor : Style.neutralEmphasisColor
 			}
 
 			Row {
@@ -405,7 +419,7 @@ RemoteCollectionView {
 					width: 10
 					height: 10
 					radius: width / 2
-					color: "#8C95A6"
+					color: Style.neutralEmphasisColor
 				}
 
 				Text {
@@ -435,7 +449,7 @@ RemoteCollectionView {
 	Component {
 		id: tenantRelationDelegateFilterComp
 		FieldFilterDelegate {
-			name: qsTr("My tenants")
+			name: qsTr("My organizations")
 
 			Component.onCompleted: {
 				createAndAddOption("owner", qsTr("I am owner"), "", true)
@@ -508,12 +522,48 @@ RemoteCollectionView {
 
 	function requestOpenTenantDocument(tenantId, tenantName) {
 		if (!tenantId) return
-		if (tenantId !== AuthorizationController.currentTenantId) {
-			PopupManager.addInfoMessage(
-				qsTr("To edit \"%1\", first switch to that organization using the Switch command.").arg(tenantName || tenantId),
-				true)
-		} else {
+		if (tenantId === AuthorizationController.currentTenantId) {
 			openTenantDocument(tenantId)
+			return
+		}
+
+		ModalDialogManager.openDialog(switchToEditDialogComp, {"tenantId": tenantId, "tenantName": tenantName || tenantId})
+	}
+
+	// An organization is edited from inside it, and a new one is created outside of any.
+	// Switching rebuilds this view; the document navigation of the rebuilt one picks up the pending path when it registers.
+	function switchToTenantAndNavigate(tenantId, rest, params) {
+		NavigationController.setPending(container.collectionId, rest, params)
+		container.switchToTenant(tenantId)
+	}
+
+	Component {
+		id: switchToEditDialogComp
+		MessageDialog {
+			property string tenantId: ""
+			property string tenantName: ""
+			width: Style.sizeHintM
+			title: qsTr("Switch organization")
+			message: qsTr("An organization can be edited only while you work in it. Switch to \"%1\" and open it?").arg(tenantName)
+			onFinished: {
+				if (buttonId == Enums.yes) {
+					container.switchToTenantAndNavigate(tenantId, ["Tenant", tenantId], {})
+				}
+			}
+		}
+	}
+
+	Component {
+		id: switchToCreateDialogComp
+		MessageDialog {
+			width: Style.sizeHintM
+			title: qsTr("Switch organization")
+			message: qsTr("A new organization can be created only outside of any organization. Switch to \"No organization\" and continue?")
+			onFinished: {
+				if (buttonId == Enums.yes) {
+					container.switchToTenantAndNavigate("", ["Tenant"], {"createNew": true})
+				}
+			}
 		}
 	}
 
@@ -551,6 +601,10 @@ RemoteCollectionView {
 
 		function onTenantSelected(tenantId){
 			container.closeTenantEditorsForSwitch(tenantId || "")
+		}
+
+		function onTenantSelectionFailed(message){
+			delete NavigationController.pending[container.collectionId]
 		}
 	}
 
@@ -632,9 +686,7 @@ RemoteCollectionView {
 
 			function onNew(){
 				if (AuthorizationController.currentTenantId && AuthorizationController.currentTenantId !== "") {
-					PopupManager.addInfoMessage(
-						qsTr("To create a new organization, first switch to No Organization using the organization switcher."),
-						true)
+					ModalDialogManager.openDialog(switchToCreateDialogComp, {})
 					return
 				}
 
@@ -722,7 +774,7 @@ RemoteCollectionView {
 			}
 
 			Component.onCompleted: {
-				registerDocumentType("Tenant", qsTr("Tenant"))
+				registerDocumentType("Tenant", qsTr("Organization"))
 				addDocumentView("Tenant", "TenantEditor", tenantEditorComp, tenantDataControllerFactory)
 			}
 
@@ -740,9 +792,8 @@ RemoteCollectionView {
 					commandsPanelVisible: isNewTenant
 					onDocumentSaved: {
 						if (isNewTenant){
-							if (tenantEditor.representationController){
-								tenantEditor.representationController.updateRepresentationFromDocument()
-							}
+							let tenantId = tenantCommandsDelegate.documentManager.getDocumentObjectId(tenantEditor.documentId)
+							container.switchToTenantAndNavigate(tenantId, ["Tenant", tenantId], {})
 						}
 					}
 				}

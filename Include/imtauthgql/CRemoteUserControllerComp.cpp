@@ -116,6 +116,24 @@ sdl::V1_0::imtauth::CUserObjectId CRemoteUserControllerComp::OnGetUserObjectId(
 }
 
 
+sdl::V1_0::imtauth::CUnlockUserPayload CRemoteUserControllerComp::OnUnlockUser(
+			const sdl::V1_0::imtauth::CUnlockUserGqlRequest& /*unlockUserRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CUnlockUserPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CPasswordPolicyPayload CRemoteUserControllerComp::OnGetPasswordPolicy(
+			const sdl::V1_0::imtauth::CGetPasswordPolicyGqlRequest& /*getPasswordPolicyRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CPasswordPolicyPayload>(gqlRequest, errorMessage);
+}
+
+
 } // namespace imtauthgql
 
 

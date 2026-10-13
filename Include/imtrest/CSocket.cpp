@@ -5,12 +5,6 @@
 #include <QtNetwork/QSslSocket>
 #include <QtNetwork/QSslKey>
 
-// ImtCore includes
-#include <imtrest/CHttpResponse.h>
-#include <imtrest/CHttpSender.h>
-#include <imtrest/CTcpResponse.h>
-#include <imtrest/CTcpSender.h>
-
 
 namespace imtrest
 {
@@ -162,20 +156,10 @@ void CSocket::Disconnected()
 }
 
 
-void CSocket::OnSendResponse(ConstResponsePtr response)
+void CSocket::OnSendResponse(QByteArray data)
 {
-	CHttpResponse* httpResponsePtr = const_cast<CHttpResponse*>(dynamic_cast<const CHttpResponse*>(response.GetPtr()));
-	CTcpResponse* tcpResponsePtr = const_cast<CTcpResponse*>(dynamic_cast<const CTcpResponse*>(response.GetPtr()));
-
-	if(httpResponsePtr != nullptr){
-		CHttpSender sender(m_socket.data());
-
-		sender.SendResponse(response);
-	}
-	else if(tcpResponsePtr != nullptr){
-		CTcpSender sender(m_socket.data());
-
-		sender.SendResponse(response);
+	if (!m_socket.isNull() && m_socket->isOpen()){
+		m_socket->write(data);
 	}
 }
 

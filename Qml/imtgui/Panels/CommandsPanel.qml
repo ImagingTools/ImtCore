@@ -13,6 +13,7 @@ Item {
 	signal commandActivated(string commandId, var params);
 	
 	property GuiElementContainer commandsModel: GuiElementContainer {};
+	property alias centerCommandsWidth: centerCommands.width;
 	onCommandsModelChanged: {
 		updateGui()
 	}
@@ -181,6 +182,7 @@ Item {
 	
 	ToolButton {
 		id: button;
+		objectName: "MoreCommandsButton"
 		anchors.verticalCenter: parent.verticalCenter;
 		anchors.right: parent.right;
 		width: visible ? Style.controlHeightM : 0;

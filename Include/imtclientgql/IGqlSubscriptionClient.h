@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QMetaType>
+
 // ACF includes
 #include <istd/IChangeable.h>
 
@@ -47,5 +50,9 @@ public:
 
 
 } // namespace imtclientgql
+
+
+// Needed wherever a client relays the status through a queued Qt connection.
+Q_DECLARE_METATYPE(imtclientgql::IGqlSubscriptionClient::SubscriptionStatus)
 
 
