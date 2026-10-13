@@ -16,7 +16,7 @@ namespace imtaccount
 
 QByteArray CCompanyInfo::GetTypeId()
 {
-	return "CompanyInfo";
+	return QByteArrayLiteral("CompanyInfo");
 }
 
 
@@ -84,18 +84,18 @@ bool CCompanyInfo::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-	iser::CArchiveTag legalNameTag("LegalName", "Legal name", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag legalNameTag(QByteArrayLiteral("LegalName"), QByteArrayLiteral("Legal name"), iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(legalNameTag);
 	retVal = retVal && archive.Process(m_legalName);
 	retVal = retVal && archive.EndTag(legalNameTag);
 
-	iser::CArchiveTag contactInfoTag("ContactInfo", "Contact info", iser::CArchiveTag::TT_GROUP);
+	static iser::CArchiveTag contactInfoTag(QByteArrayLiteral("ContactInfo"), QByteArrayLiteral("Contact info"), iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(contactInfoTag);
 	retVal = retVal && m_contactInfo.Serialize(archive);
 	retVal = retVal && archive.EndTag(contactInfoTag);
 
-	iser::CArchiveTag subCompaniesTag("SubCompanies", "Subsidiary companies", iser::CArchiveTag::TT_MULTIPLE);
-	iser::CArchiveTag companyTag("Company", "Company", iser::CArchiveTag::TT_GROUP, &subCompaniesTag);
+	static iser::CArchiveTag subCompaniesTag(QByteArrayLiteral("SubCompanies"), QByteArrayLiteral("Subsidiary companies"), iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag companyTag(QByteArrayLiteral("Company"), QByteArrayLiteral("Company"), iser::CArchiveTag::TT_GROUP, &subCompaniesTag);
 
 	int companyCount = m_companyChildren.GetCount();
 
@@ -128,7 +128,7 @@ bool CCompanyInfo::Serialize(iser::IArchive& archive)
 
 int CCompanyInfo::GetSupportedOperations() const
 {
-	return SO_COPY | SO_CLONE | SO_RESET;
+	return SO_COPY | SO_COMPARE | SO_CLONE | SO_RESET;
 }
 
 
@@ -165,14 +165,41 @@ bool CCompanyInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 }
 
 
+bool CCompanyInfo::IsEqual(const IChangeable& object) const
+{
+	const CCompanyInfo* sourcePtr = dynamic_cast<const CCompanyInfo*>(&object);
+	if (sourcePtr == nullptr){
+		return false;
+	}
+
+	bool retVal = m_legalName == sourcePtr->m_legalName;
+	retVal = retVal && m_parentCompanyPtr == sourcePtr->m_parentCompanyPtr;
+	retVal = retVal && m_contactInfo.IsEqual(sourcePtr->m_contactInfo);
+
+	int childCount = m_companyChildren.GetCount();
+	retVal = retVal && childCount == sourcePtr->m_companyChildren.GetCount();
+	for (int i = 0; retVal && i < childCount; ++i){
+		const istd::IChangeable* childPtr = dynamic_cast<const istd::IChangeable*>(m_companyChildren.GetAt(i));
+		const istd::IChangeable* sourceChildPtr = dynamic_cast<const istd::IChangeable*>(sourcePtr->m_companyChildren.GetAt(i));
+
+		retVal = retVal && childPtr != nullptr && sourceChildPtr != nullptr;
+		if (retVal){
+			retVal = retVal && childPtr->IsEqual(*sourceChildPtr);
+		}
+	}
+
+	return retVal;
+}
+
+
 istd::IChangeableUniquePtr CCompanyInfo::CloneMe(CompatibilityMode mode) const
 {
 	istd::IChangeableUniquePtr clonePtr(new CCompanyInfo);
-	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr;
+	if (!clonePtr->CopyFrom(*this, mode)){
+		return nullptr;
 	}
 
-	return nullptr;
+	return clonePtr;
 }
 
 
@@ -189,3 +216,4 @@ bool CCompanyInfo::ResetData(CompatibilityMode /*mode*/)
 
 
 } // namespace imtaccount
+

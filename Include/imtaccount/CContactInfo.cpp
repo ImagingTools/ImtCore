@@ -16,7 +16,7 @@ namespace imtaccount
 
 QByteArray CContactInfo::GetTypeId()
 {
-	return "ContactInfo";
+	return QByteArrayLiteral("ContactInfo");
 }
 
 
@@ -93,25 +93,25 @@ bool CContactInfo::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-	iser::CArchiveTag emailTag("Email", "Email", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag emailTag(QByteArrayLiteral("Email"), QByteArrayLiteral("Email"), iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(emailTag);
 	retVal = retVal && archive.Process(m_email);
 	retVal = retVal && archive.EndTag(emailTag);
 
-	iser::CArchiveTag phoneTag("Phone", "Phone", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag phoneTag(QByteArrayLiteral("Phone"), QByteArrayLiteral("Phone"), iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(phoneTag);
 	retVal = retVal && archive.Process(m_phone);
 	retVal = retVal && archive.EndTag(phoneTag);
 
-	iser::CArchiveTag webPageTag("WebPage", "Web page", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag webPageTag(QByteArrayLiteral("WebPage"), QByteArrayLiteral("Web page"), iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(webPageTag);
 	retVal = retVal && archive.Process(m_webPage);
 	retVal = retVal && archive.EndTag(webPageTag);
 
-	iser::CArchiveTag addressesTag("Addresses", "Addresses", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(addressesTag);
-	retVal = retVal && m_addresses.Serialize(archive);
-	retVal = retVal && archive.EndTag(addressesTag);
+	// iser::CArchiveTag addressesTag(QByteArrayLiteral("Addresses"), QByteArrayLiteral("Addresses"), iser::CArchiveTag::TT_GROUP);
+	// retVal = retVal && archive.BeginTag(addressesTag);
+	// retVal = retVal && m_addresses.Serialize(archive);
+	// retVal = retVal && archive.EndTag(addressesTag);
 
 	return retVal;
 }
@@ -121,7 +121,7 @@ bool CContactInfo::Serialize(iser::IArchive& archive)
 
 int CContactInfo::GetSupportedOperations() const
 {
-	return SO_COPY | SO_CLONE | SO_RESET;
+	return SO_COPY | SO_COMPARE | SO_CLONE | SO_RESET;
 }
 
 
@@ -142,18 +142,33 @@ bool CContactInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 }
 
 
-istd::IChangeableUniquePtr CContactInfo::CloneMe(CompatibilityMode mode) const
+bool CContactInfo::IsEqual(const IChangeable& object) const
 {
-	istd::IChangeableUniquePtr clonePtr(new CContactInfo);
-	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr;
+	const CContactInfo* sourcePtr = dynamic_cast<const CContactInfo*>(&object);
+	if (sourcePtr == nullptr){
+		return false;
 	}
 
-	return nullptr;
+	bool retVal = m_email == sourcePtr->m_email;
+	retVal = retVal && m_phone == sourcePtr->m_phone;
+	retVal = retVal && m_webPage == sourcePtr->m_webPage;
+
+	return retVal;
 }
 
 
-bool CContactInfo::ResetData(CompatibilityMode /*mode*/)
+istd::IChangeableUniquePtr CContactInfo::CloneMe(CompatibilityMode mode) const
+{
+	istd::IChangeableUniquePtr clonePtr(new CContactInfo);
+	if (!clonePtr->CopyFrom(*this, mode)){
+		return nullptr;
+	}
+
+	return clonePtr;
+}
+
+
+bool CContactInfo::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
@@ -161,8 +176,9 @@ bool CContactInfo::ResetData(CompatibilityMode /*mode*/)
 	m_phone.clear();
 	m_webPage.clear();
 
-	return m_addresses.ResetData();
+	return m_addresses.ResetData(mode);
 }
 
 
 } // namespace imtaccount
+

@@ -20,8 +20,8 @@ namespace imtaccount
 	\ingroup Account
 */
 class ICompanyInfo:
-	virtual public iser::IObject,
-	virtual public IContactInfoProvider
+			virtual public iser::IObject,
+			virtual public IContactInfoProvider
 {
 public:
 	enum MetaInfoTypes
@@ -39,7 +39,8 @@ public:
 };
 
 
-typedef istd::TPointerVector<const ICompanyInfo> CompanyInfoList;
+using CompanyInfoList = istd::TPointerVector<const ICompanyInfo>;
 
 
 } // namespace imtaccount
+

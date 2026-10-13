@@ -37,12 +37,15 @@ public:
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool IsEqual(const IChangeable& object) const override;
 	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
 	GenderType m_genderType;
+
 	QDate m_birthday;
+
 	QString m_firstName;
 	QString m_lastName;
 	QString m_nickName;
@@ -51,7 +54,8 @@ private:
 };
 
 
-typedef imtbase::TIdentifiableWrap<CPersonInfo> CIdentifiablePersonInfo;
+using CIdentifiablePersonInfo = imtbase::TIdentifiableWrap<CPersonInfo>;
 
 
 } // namespace imtaccount
+
