@@ -128,9 +128,6 @@ protected:
 				const QList<QByteArray>& undoLevelDescriptions,
 				const QList<QByteArray>& redoLevelDescriptions,
 				sdl::V1_0::imtbase::CUndoInfo& sdlNotification) const;
-	void SendCachedUndoRedoNotificationsToSubscriber(
-				const QByteArray& subscriptionId,
-				const QByteArray& userId) const;
 
 	template<class Representation>
 	void PublishRepresentation(
@@ -144,6 +141,9 @@ protected Q_SLOTS:
 		subscription and whose grace period without an active subscriber has elapsed.
 	*/
 	void CloseIdleDocuments();
+	void SendCachedUndoRedoNotificationsToSubscriber(
+				const QByteArray& subscriptionId,
+				const QByteArray& userId);
 
 private:
 	I_REF(imtdoc::IDocumentService, m_documentServiceCompPtr);

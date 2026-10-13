@@ -79,11 +79,10 @@ bool CCollectionDocumentServicePublisherComp::RegisterSubscription(
 	if (gqlRequest.GetCommandId() == sdl::V1_0::imtbase::COnUndoRedoChangedGqlRequest::GetCommandId()){
 		QMetaObject::invokeMethod(
 			this,
-			[this, subscriptionId, userId]()
-			{
-				SendCachedUndoRedoNotificationsToSubscriber(subscriptionId, userId);
-			},
-			Qt::QueuedConnection);
+			"SendCachedUndoRedoNotificationsToSubscriber",
+			Qt::QueuedConnection,
+			Q_ARG(QByteArray, subscriptionId),
+			Q_ARG(QByteArray, userId));
 	}
 
 	return true;
@@ -564,7 +563,7 @@ void CCollectionDocumentServicePublisherComp::FillUndoInfoFromCache(
 
 void CCollectionDocumentServicePublisherComp::SendCachedUndoRedoNotificationsToSubscriber(
 			const QByteArray& subscriptionId,
-			const QByteArray& userId) const
+			const QByteArray& userId)
 {
 	if (subscriptionId.isEmpty() || userId.isEmpty()){
 		return;
