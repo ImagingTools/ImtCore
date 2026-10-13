@@ -2133,6 +2133,11 @@ Item {
 
         if (node && column)
             cellEditCanceled(createIndex(node), column)
+
+        treeView.forceActiveFocus()
+        Qt.callLater(function() {
+            treeView.forceActiveFocus()
+        })
     }
 
     function revertCell(indexObject, column) {

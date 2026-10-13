@@ -1052,8 +1052,8 @@ ViewBase {
 			// away and its share is handed to the columns that stay.
 			TableColumnLayout {
 				id: featureColumns
-				fractions: [0.22, 0.14, 0.20, 0.10, 0.14, 0.20]
-				breakpoints: [0, 460, 720, 300, 560, 380]
+				fractions: [0.32, 0.18, 0.32, 0.18]
+				breakpoints: [0, 460, 680, 320]
 			}
 
 			function columnWidth(index, width, spacing) {
@@ -1119,36 +1119,7 @@ ViewBase {
 							anchors.centerIn: parent
 							width: parent.width
 							horizontalAlignment: Text.AlignHCenter
-							text: qsTr("Sub-features")
-							font.family: Style.fontFamilyBold
-							font.pixelSize: Style.fontSizeS
-							color: Style.subtitleColor
-						}
-					}
-					Item {
-						width: featuresPage.columnWidth(4, headerRow.width, headerRow.spacing)
-						height: headerRow.height
-						visible: width > 0
-						BaseText {
-							anchors.centerIn: parent
-							width: parent.width
-							horizontalAlignment: Text.AlignHCenter
 							text: qsTr("Optional parts")
-							font.family: Style.fontFamilyBold
-							font.pixelSize: Style.fontSizeS
-							color: Style.subtitleColor
-						}
-					}
-					Item {
-						width: featuresPage.columnWidth(5, headerRow.width, headerRow.spacing)
-						height: headerRow.height
-						visible: width > 0
-						BaseText {
-							anchors.left: parent.left
-							anchors.leftMargin: Style.marginXS
-							anchors.right: parent.right
-							anchors.verticalCenter: parent.verticalCenter
-							text: qsTr("Requirements")
 							font.family: Style.fontFamilyBold
 							font.pixelSize: Style.fontSizeS
 							color: Style.subtitleColor
@@ -1182,8 +1153,14 @@ ViewBase {
 						height: rowContent.height
 						visible: width > 0
 
+						property string featureId: rowContent.nodeData ? rowContent.nodeData.id || "" : ""
 						property bool locked: rowContent.nodeData
-							? productViewContainer.featureIsRequired(rowContent.nodeData.id || "") : false
+							? productViewContainer.featureIsRequired(featureNameCell.featureId) : false
+						property var requiredBy: productViewContainer.requiredByNames(featureNameCell.featureId)
+						property var requires: productViewContainer.featureRequirementNames(featureNameCell.featureId)
+						property string reqSubtitle: requiredBy.length > 0
+							? qsTr("Required by %1").arg(productViewContainer.namesSummary(requiredBy))
+							: (requires.length > 0 ? qsTr("Requires %1").arg(productViewContainer.namesSummary(requires)) : "")
 
 						Image {
 							id: lockIcon
@@ -1197,16 +1174,45 @@ ViewBase {
 							fillMode: Image.PreserveAspectFit
 						}
 
-						BaseText {
+						Column {
 							anchors.left: lockIcon.visible ? lockIcon.right : parent.left
 							anchors.leftMargin: Style.marginXS
 							anchors.right: parent.right
 							anchors.rightMargin: Style.marginXS
 							anchors.verticalCenter: parent.verticalCenter
-							text: rowContent.nodeData ? rowContent.nodeData.featureName || qsTr("Untitled feature") : ""
-							font.family: Style.fontFamilyBold
-							color: Style.textColor
-							elide: Text.ElideRight
+							spacing: 1
+
+							BaseText {
+								width: parent.width
+								text: rowContent.nodeData ? rowContent.nodeData.featureName || qsTr("Untitled feature") : ""
+								font.family: Style.fontFamilyBold
+								color: Style.textColor
+								elide: Text.ElideRight
+							}
+
+							BaseText {
+								width: parent.width
+								visible: featureNameCell.reqSubtitle !== ""
+								text: featureNameCell.reqSubtitle
+								font.pixelSize: Style.fontSizeXS
+								color: featureNameCell.requiredBy.length > 0 ? Style.firstColor : Style.subtitleColor
+								elide: Text.ElideRight
+							}
+						}
+
+						MouseArea {
+							id: featureNameMouse
+							anchors.fill: parent
+							hoverEnabled: true
+							acceptedButtons: Qt.NoButton
+						}
+
+						CustomTooltip {
+							parent: featureNameCell
+							visible: featureNameMouse.containsMouse && featureNameCell.reqSubtitle !== ""
+							text: featureNameCell.requiredBy.length > 0
+								? qsTr("Required by %1").arg(featureNameCell.requiredBy.join(", "))
+								: qsTr("Requires %1").arg(featureNameCell.requires.join(", "))
 						}
 					}
 					Item {
@@ -1243,52 +1249,9 @@ ViewBase {
 							elide: Text.ElideRight
 						}
 					}
-
-					// How much this feature brings with it, and how much of that is
-					// still a choice - the two numbers the panel on the right details.
-					Item {
-						id: subfeaturesCell
-						objectName: "ProductFeatureSubfeaturesCell"
-						width: featuresPage.columnWidth(3, rowContent.width, rowContent.spacing)
-						height: rowContent.height
-						visible: width > 0
-
-						property int count: productViewContainer.subFeatureCount(rowContent.node)
-						// "needed / total" while only part of this feature was asked
-						// for, so the parts that came along are visible from the row.
-						property bool partlyNeeded: productViewContainer.subFeaturePartlyNeeded(rowContent.node)
-
-						Rectangle {
-							anchors.centerIn: parent
-							width: Math.max(Style.controlHeightS, countText.width + 2 * Style.marginS)
-							height: Style.controlHeightS
-							radius: height / 2
-							visible: subfeaturesCell.count > 0
-							color: Style.backgroundColor2
-							border.color: subfeaturesCell.partlyNeeded ? Style.highlightColor : Style.borderColor
-							border.width: 1
-
-							BaseText {
-								id: countText
-								anchors.centerIn: parent
-								text: productViewContainer.subFeatureSummary(rowContent.node)
-								font.pixelSize: Style.fontSizeS
-								font.family: Style.fontFamilyBold
-								color: subfeaturesCell.partlyNeeded ? Style.highlightColor : Style.titleColor
-							}
-						}
-
-						BaseText {
-							anchors.centerIn: parent
-							visible: subfeaturesCell.count === 0
-							text: "-"
-							color: Style.inactiveTextColor
-						}
-					}
-
 					Item {
 						objectName: "ProductFeatureOptionalCell"
-						width: featuresPage.columnWidth(4, rowContent.width, rowContent.spacing)
+						width: featuresPage.columnWidth(3, rowContent.width, rowContent.spacing)
 						height: rowContent.height
 						visible: width > 0
 						BaseText {
@@ -1300,88 +1263,55 @@ ViewBase {
 							elide: Text.ElideRight
 						}
 					}
-
-					// What ties this feature to the others: the features that
-					// brought it into the product - such a row stays while they do -
-					// and, failing that, what it asks for itself.
-					Item {
-						id: requirementsCell
-						width: featuresPage.columnWidth(5, rowContent.width, rowContent.spacing)
-						height: rowContent.height
-						visible: width > 0
-
-						property string featureId: rowContent.nodeData ? rowContent.nodeData.id || "" : ""
-						property var requiredBy: productViewContainer.requiredByNames(requirementsCell.featureId)
-						property var requires: productViewContainer.featureRequirementNames(requirementsCell.featureId)
-
-						Rectangle {
-							id: requiredByChip
-							anchors.left: parent.left
-							anchors.leftMargin: Style.marginXS
-							anchors.right: parent.right
-							anchors.rightMargin: Style.marginXS
-							anchors.verticalCenter: parent.verticalCenter
-							height: Style.controlHeightS
-							radius: height / 2
-							visible: requirementsCell.requiredBy.length > 0
-							color: Style.backgroundColor2
-							border.color: Style.borderColor
-							border.width: 1
-
-							Row {
-								anchors.left: parent.left
-								anchors.leftMargin: Style.marginS
-								anchors.right: parent.right
-								anchors.rightMargin: Style.marginS
-								anchors.verticalCenter: parent.verticalCenter
-								spacing: Style.spacingXS
-
-								Image {
-									anchors.verticalCenter: parent.verticalCenter
-									width: Style.iconSizeS
-									height: width
-									source: "qrc:/" + Style.getIconPath("Icons/Lock", Icon.State.On, Icon.Mode.Normal)
-									fillMode: Image.PreserveAspectFit
-								}
-
-								BaseText {
-									anchors.verticalCenter: parent.verticalCenter
-									width: requiredByChip.width - Style.iconSizeS - 3 * Style.marginS
-									text: qsTr("Required by %1").arg(productViewContainer.namesSummary(requirementsCell.requiredBy))
-									font.pixelSize: Style.fontSizeS
-									color: Style.titleColor
-									elide: Text.ElideRight
-								}
-							}
-						}
-
-						BaseText {
-							anchors.left: parent.left
-							anchors.leftMargin: Style.marginXS
-							anchors.right: parent.right
-							anchors.rightMargin: Style.marginXS
-							anchors.verticalCenter: parent.verticalCenter
-							visible: !requiredByChip.visible
-							text: requirementsCell.requires.length > 0
-								? qsTr("Requires %1").arg(productViewContainer.namesSummary(requirementsCell.requires)) : "-"
-							color: requirementsCell.requires.length > 0 ? Style.subtitleColor : Style.inactiveTextColor
-							elide: Text.ElideRight
-						}
-					}
 				}
 			}
 
-			// Whatever the narrow cells cut short, in full.
-			property Component featureDetailsComp: Component {
-				TableRowDetails {
-					objectName: "ProductFeatureDetails"
-					title: treeExplorer.selectedNode && treeExplorer.selectedNode.data
-						? treeExplorer.selectedNode.data.featureName || qsTr("Untitled feature") : ""
-					keyText: treeExplorer.selectedNode && treeExplorer.selectedNode.data
-						? treeExplorer.selectedNode.data.featureId || "" : ""
-					description: treeExplorer.selectedNode && treeExplorer.selectedNode.data
-						? treeExplorer.selectedNode.data.description || "" : ""
-					placeholderText: qsTr("Select a feature to see its full name, ID and description")
+			property Component subfeatureRowActionComp: Component {
+				Item {
+					id: subfeatureActionItem
+					width: 36
+					height: Style.controlHeightM
+
+					property var node: parent ? parent.node : null
+					property int count: productViewContainer.subFeatureCount(subfeatureActionItem.node)
+					property bool partlyNeeded: productViewContainer.subFeaturePartlyNeeded(subfeatureActionItem.node)
+
+					visible: subfeatureActionItem.count > 0
+
+					Rectangle {
+						id: countPill
+						anchors.centerIn: parent
+						width: Math.max(Style.controlHeightS, countText.width + 2 * Style.marginS)
+						height: Style.controlHeightS
+						radius: height / 2
+						color: actionMouse.containsMouse ? Style.titleColor : Style.backgroundColor2
+						border.color: subfeatureActionItem.partlyNeeded ? Style.highlightColor : Style.borderColor
+						border.width: 1
+
+						BaseText {
+							id: countText
+							anchors.centerIn: parent
+							text: productViewContainer.subFeatureSummary(subfeatureActionItem.node)
+							font.pixelSize: Style.fontSizeS
+							font.family: Style.fontFamilyBold
+							color: actionMouse.containsMouse ? Style.baseColor
+								: subfeatureActionItem.partlyNeeded ? Style.highlightColor : Style.titleColor
+						}
+					}
+
+					MouseArea {
+						id: actionMouse
+						anchors.fill: parent
+						hoverEnabled: true
+						cursorShape: Qt.PointingHandCursor
+						onClicked: treeExplorer.selectNode(subfeatureActionItem.node)
+					}
+
+					CustomTooltip {
+						parent: countPill
+						text: qsTr("%1 sub-features (click to view in panel)").arg(productViewContainer.subFeatureSummary(subfeatureActionItem.node))
+						visible: actionMouse.containsMouse
+					}
 				}
 			}
 
@@ -1456,7 +1386,8 @@ ViewBase {
 				headerContentComponent: featuresPage.productFeaturesHeaderComp
 				rowContentComponent: featuresPage.productFeatureRowComp
 				columnLayout: featureColumns
-				detailsComponent: featuresPage.featureDetailsComp
+				rowActionExtensionComponent: featuresPage.subfeatureRowActionComp
+				rowActionExtensionWidth: 44
 				sidePanelComponent: featuresPage.featureContentPanelComp
 				textProvider: function(node) { return node && node.data ? node.data.featureName || qsTr("Untitled feature") : "" }
 				descriptionProvider: function(node) { return node && node.data ? node.data.description || "" : "" }

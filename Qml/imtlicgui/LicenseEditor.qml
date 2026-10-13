@@ -672,8 +672,8 @@ ViewBase {
 			// away and its share is handed to the columns that stay.
 			TableColumnLayout {
 				id: featureColumns
-				fractions: [0.10, 0.28, 0.20, 0.28, 0.14]
-				breakpoints: [0, 0, 380, 620, 300]
+				fractions: [0.12, 0.36, 0.22, 0.30]
+				breakpoints: [0, 0, 380, 620]
 			}
 
 			function columnWidth(index, width, spacing) {
@@ -746,20 +746,6 @@ ViewBase {
 							color: Style.subtitleColor
 						}
 					}
-					Item {
-						width: featuresPage.columnWidth(4, headerRow.width, headerRow.spacing)
-						height: headerRow.height
-						visible: width > 0
-						BaseText {
-							anchors.centerIn: parent
-							width: parent.width
-							horizontalAlignment: Text.AlignHCenter
-							text: qsTr("Sub-features")
-							font.family: Style.fontFamilyBold
-							font.pixelSize: Style.fontSizeS
-							color: Style.subtitleColor
-						}
-					}
 				}
 			}
 
@@ -817,20 +803,64 @@ ViewBase {
 						}
 					}
 					Item {
+						id: featureNameCell
 						objectName: "LicenseFeatureNameCell"
 						width: featuresPage.columnWidth(1, rowContent.width, rowContent.spacing)
 						height: rowContent.height
 						visible: width > 0
-						BaseText {
+
+						property var requiredBy: licenseEditor.entryRequiredBy(rowContent.entry)
+						property bool locked: featureNameCell.requiredBy.length > 0
+
+						Image {
+							id: lockIcon
 							anchors.left: parent.left
+							anchors.leftMargin: Style.marginXS
+							anchors.verticalCenter: parent.verticalCenter
+							width: Style.iconSizeS
+							height: width
+							visible: featureNameCell.locked
+							source: "qrc:/" + Style.getIconPath("Icons/Lock", Icon.State.On, Icon.Mode.Normal)
+							fillMode: Image.PreserveAspectFit
+						}
+
+						Column {
+							anchors.left: lockIcon.visible ? lockIcon.right : parent.left
 							anchors.leftMargin: Style.marginXS
 							anchors.right: parent.right
 							anchors.rightMargin: Style.marginXS
 							anchors.verticalCenter: parent.verticalCenter
-							text: rowContent.entry ? rowContent.entry.featureName : ""
-							font.family: Style.fontFamilyBold
-							color: Style.textColor
-							elide: Text.ElideRight
+							spacing: 1
+
+							BaseText {
+								width: parent.width
+								text: rowContent.entry ? rowContent.entry.featureName : ""
+								font.family: Style.fontFamilyBold
+								color: Style.textColor
+								elide: Text.ElideRight
+							}
+
+							BaseText {
+								width: parent.width
+								visible: featureNameCell.locked
+								text: qsTr("Required by %1").arg(featureNameCell.requiredBy.join(", "))
+								font.pixelSize: Style.fontSizeXS
+								color: Style.firstColor
+								elide: Text.ElideRight
+							}
+						}
+
+						MouseArea {
+							id: featureNameMouse
+							anchors.fill: parent
+							hoverEnabled: true
+							acceptedButtons: Qt.NoButton
+						}
+
+						CustomTooltip {
+							parent: featureNameCell
+							visible: featureNameMouse.containsMouse && featureNameCell.locked
+							text: qsTr("Required by %1").arg(featureNameCell.requiredBy.join(", "))
 						}
 					}
 					Item {
@@ -867,72 +897,59 @@ ViewBase {
 							elide: Text.ElideRight
 						}
 					}
-					Item {
-						id: subfeaturesCell
-						objectName: "LicenseFeatureSubfeaturesCell"
-						width: featuresPage.columnWidth(4, rowContent.width, rowContent.spacing)
-						height: rowContent.height
-						visible: width > 0
-
-						property int count: rowContent.entry ? rowContent.entry.subFeatureCount : 0
-						// Opening a feature is how its optional parts are reached,
-						// and there is nothing to reach until it is granted.
-						property bool openable: subfeaturesCell.count > 0
-							&& licenseEditor.entryIsGranted(rowContent.entry)
-
-						Rectangle {
-							anchors.centerIn: parent
-							width: Math.max(Style.controlHeightS, countText.width + 2 * Style.marginS)
-							height: Style.controlHeightS
-							radius: height / 2
-							visible: subfeaturesCell.count > 0
-							color: subfeaturesMouse.containsMouse ? Style.titleColor : Style.backgroundColor2
-							border.color: Style.borderColor
-							border.width: 1
-
-							BaseText {
-								id: countText
-								anchors.centerIn: parent
-								text: subfeaturesCell.count
-								font.pixelSize: Style.fontSizeS
-								font.family: Style.fontFamilyBold
-								color: subfeaturesMouse.containsMouse ? Style.baseColor
-									: subfeaturesCell.openable ? Style.titleColor : Style.inactiveTextColor
-							}
-						}
-
-						BaseText {
-							anchors.centerIn: parent
-							visible: subfeaturesCell.count === 0
-							text: "-"
-							color: Style.inactiveTextColor
-						}
-
-						MouseArea {
-							id: subfeaturesMouse
-							objectName: "MouseArea"
-							anchors.fill: parent
-							hoverEnabled: true
-							enabled: subfeaturesCell.openable
-							cursorShape: Qt.PointingHandCursor
-							onClicked: treeExplorer.navigateInto(rowContent.node)
-						}
-					}
 				}
 			}
 
-			// Whatever the narrow cells cut short, in full.
-			property Component featureDetailsComp: Component {
-				TableRowDetails {
-					id: featureDetails
-					objectName: "LicenseFeatureDetails"
+			property Component subfeatureRowActionComp: Component {
+				Item {
+					id: subfeatureActionItem
+					width: 36
+					height: Style.controlHeightM
 
-					property var entry: licenseEditor.nodeEntry(treeExplorer.selectedNode)
+					property var node: parent ? parent.node : null
+					property var entry: licenseEditor.nodeEntry(subfeatureActionItem.node)
+					property int count: subfeatureActionItem.entry ? subfeatureActionItem.entry.subFeatureCount : 0
+					property bool openable: subfeatureActionItem.count > 0 && licenseEditor.entryIsGranted(subfeatureActionItem.entry)
 
-					title: featureDetails.entry ? featureDetails.entry.featureName : ""
-					keyText: featureDetails.entry ? featureDetails.entry.featurePath : ""
-					description: featureDetails.entry ? featureDetails.entry.description : ""
-					placeholderText: qsTr("Select a feature to see its full name, path and description")
+					visible: subfeatureActionItem.count > 0
+
+					Rectangle {
+						id: countPill
+						anchors.centerIn: parent
+						width: Math.max(Style.controlHeightS, countText.width + 2 * Style.marginS)
+						height: Style.controlHeightS
+						radius: height / 2
+						color: actionMouse.containsMouse ? Style.titleColor : Style.backgroundColor2
+						border.color: Style.borderColor
+						border.width: 1
+
+						BaseText {
+							id: countText
+							anchors.centerIn: parent
+							text: subfeatureActionItem.count
+							font.pixelSize: Style.fontSizeS
+							font.family: Style.fontFamilyBold
+							color: actionMouse.containsMouse ? Style.baseColor
+								: subfeatureActionItem.openable ? Style.titleColor : Style.inactiveTextColor
+						}
+					}
+
+					MouseArea {
+						id: actionMouse
+						anchors.fill: parent
+						hoverEnabled: true
+						enabled: subfeatureActionItem.openable
+						cursorShape: subfeatureActionItem.openable ? Qt.PointingHandCursor : Qt.ArrowCursor
+						onClicked: treeExplorer.navigateInto(subfeatureActionItem.node)
+					}
+
+					CustomTooltip {
+						parent: countPill
+						text: subfeatureActionItem.openable
+							? qsTr("%1 sub-features (click to open)").arg(subfeatureActionItem.count)
+							: qsTr("%1 sub-features (grant feature to open)").arg(subfeatureActionItem.count)
+						visible: actionMouse.containsMouse
+					}
 				}
 			}
 
@@ -993,7 +1010,8 @@ ViewBase {
 				headerContentComponent: featuresPage.featuresHeaderComp
 				rowContentComponent: featuresPage.featureRowComp
 				columnLayout: featureColumns
-				detailsComponent: featuresPage.featureDetailsComp
+				rowActionExtensionComponent: featuresPage.subfeatureRowActionComp
+				rowActionExtensionWidth: 44
 				sidePanelComponent: featuresPage.inheritedFeaturesPanelComp
 				// Only a granted feature can be opened - there is nothing to
 				// decide inside one that is not granted at all.

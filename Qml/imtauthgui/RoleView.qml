@@ -27,6 +27,12 @@ ViewBase {
 
 	property RoleData roleData: model;
 
+	onRoleDataChanged: {
+		if (container.productId === "" && container.roleData && container.roleData.m_productId) {
+			container.productId = container.roleData.m_productId
+		}
+	}
+
 	Component.onCompleted: {
 		container.__completed = true
 		container.__requestPermissionsOnce()
@@ -72,6 +78,8 @@ ViewBase {
 	function __requestPermissionsOnce() {
 		if (!container.permissionsProvider)
 			return
+		if (container.productId === "" && container.roleData && container.roleData.m_productId)
+			container.productId = container.roleData.m_productId
 		if (container.productId === "")
 			return
 		if (container.__permissionsRequested)
@@ -108,6 +116,10 @@ ViewBase {
 	function updateModel(){
 		if (!container.roleData){
 			return
+		}
+
+		if (container.productId === "" && container.roleData.m_productId){
+			container.productId = container.roleData.m_productId
 		}
 
 		if (container.productId === ""){
@@ -166,9 +178,15 @@ ViewBase {
 		var permissionPageInstance = multiPageView.getPageById("Permission")
 		if (permissionPageInstance && permissionPageInstance.bottomItem){
 			// Unlock first: unchecking skips locked nodes.
-			permissionPageInstance.bottomItem.setLockedPermissions({})
-			permissionPageInstance.bottomItem.applySelection(container.ownPermissionIds())
-			permissionPageInstance.bottomItem.setLockedPermissions(container.inheritedPermissionSources())
+			if (typeof permissionPageInstance.bottomItem.setLockedPermissions === "function") {
+				permissionPageInstance.bottomItem.setLockedPermissions({})
+			}
+			if (typeof permissionPageInstance.bottomItem.applySelection === "function") {
+				permissionPageInstance.bottomItem.applySelection(container.ownPermissionIds())
+			}
+			if (typeof permissionPageInstance.bottomItem.setLockedPermissions === "function") {
+				permissionPageInstance.bottomItem.setLockedPermissions(container.inheritedPermissionSources())
+			}
 		}
 	}
 
@@ -223,8 +241,10 @@ ViewBase {
 
 		// Only leaf permission IDs are stored. Locked permissions come from parent roles;
 		// the ones the role also owned before stay its own.
-		var ownIds = permissionPageInstance.bottomItem.getCheckedIds(true)
-		var lockedPermissions = permissionPageInstance.bottomItem.lockedPermissions
+		var ownIds = (typeof permissionPageInstance.bottomItem.getCheckedIds === "function")
+			? permissionPageInstance.bottomItem.getCheckedIds(true)
+			: []
+		var lockedPermissions = permissionPageInstance.bottomItem.lockedPermissions || ({})
 		var previousIds = container.ownPermissionIds()
 		for (var i = 0; i < previousIds.length; i++){
 			if (lockedPermissions[previousIds[i]] && ownIds.indexOf(previousIds[i]) < 0){
@@ -617,7 +637,7 @@ ViewBase {
 
 				GroupHeaderView {
 					width: parent.width
-					title: qsTr("Permissions") + " (" + (permissionPage.bottomItem ? permissionPage.bottomItem.checkedCount : 0) + ")" + (container.assignmentsUpdating ? "   " + qsTr("Updating...") : "")
+					title: qsTr("Permissions") + " (" + (permissionPage.bottomItem && permissionPage.bottomItem.checkedCount !== undefined ? permissionPage.bottomItem.checkedCount : 0) + ")" + (container.assignmentsUpdating ? "   " + qsTr("Updating...") : "")
 					controlComp: Component {
 						CheckBox {
 							objectName: "SelectedPermissionsOnlyCheckBox"

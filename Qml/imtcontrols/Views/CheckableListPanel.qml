@@ -407,27 +407,31 @@ FocusScope {
 						anchors.verticalCenter: parent.verticalCenter
 						spacing: Style.spacingXXS
 
-						Row {
+						Item {
 							width: parent.width
-							spacing: Style.spacingS
+							height: Math.max(titleText.height, badgeChip.visible ? badgeChip.height : 0)
 
 							BaseText {
+								id: titleText
 								objectName: "PanelRowTitle"
+								anchors.left: parent.left
+								anchors.right: badgeChip.visible ? badgeChip.left : parent.right
+								anchors.rightMargin: badgeChip.visible ? Style.spacingS : 0
 								anchors.verticalCenter: parent.verticalCenter
-								width: Math.max(0, parent.width - badgeChip.width - parent.spacing)
 								text: root.entryTitle(entryItem.entry)
 								color: entryItem.entryEnabled || entryItem.entryChecked ? Style.textColor : Style.inactiveTextColor
 								elide: Text.ElideRight
 							}
 
 							// Reason chip: why this entry cannot be picked, or what kind
-							// of entry it is. Sits with the name instead of in a column.
+							// of entry it is. Neatly right-aligned with capped width.
 							Rectangle {
 								id: badgeChip
 								objectName: "PanelRowBadge"
+								anchors.right: parent.right
 								anchors.verticalCenter: parent.verticalCenter
-								width: badgeText.text === "" ? 0 : badgeText.width + 2 * Style.marginS
-								height: Style.controlHeightS
+								width: badgeText.text === "" ? 0 : Math.min(parent.width * 0.4, badgeText.contentWidth + 2 * Style.marginS)
+								height: Style.fontSizeM + 4
 								radius: height / 2
 								visible: badgeText.text !== ""
 								color: badgeChip.tone === "warning" ? Style.popupWarningBackgroundColor
@@ -441,10 +445,13 @@ FocusScope {
 								BaseText {
 									id: badgeText
 									anchors.centerIn: parent
+									width: Math.max(0, badgeChip.width - 2 * Style.marginS)
 									text: root.entryBadge(entryItem.entry)
-									font.pixelSize: Style.fontSizeS
+									font.pixelSize: Style.fontSizeXS
 									color: badgeChip.tone === "warning" ? Style.secondColor
 										: badgeChip.tone === "accent" ? Style.titleColor : Style.subtitleColor
+									horizontalAlignment: Text.AlignHCenter
+									elide: Text.ElideRight
 								}
 							}
 						}

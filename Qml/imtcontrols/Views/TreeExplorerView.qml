@@ -127,7 +127,9 @@ FocusScope {
 		+ (root.rowIconVisible ? Style.iconSizeS + Style.marginM : 0) + Style.marginL
 	// Two slots when rows can be edited - the tick and the cross - reserved
 	// at all times so the columns never shift as a row opens.
-	property real rowRightInset: root.rowEditingEnabled ? 2 * Style.iconSizeM + 3 * Style.marginM : Style.marginL
+	property Component rowActionExtensionComponent: null
+	property real rowActionExtensionWidth: 0
+	property real rowRightInset: (root.rowEditingEnabled ? 2 * Style.iconSizeM + 3 * Style.marginM : Style.marginL) + root.rowActionExtensionWidth
 
 	signal createRequested(var parentNode)
 	signal removeNodesRequested(var nodes, var parentNode)
@@ -445,10 +447,18 @@ FocusScope {
 		commitRequest = commitRequest + 1
 		editingNode = null
 		committingRow = false
+		root.forceActiveFocus()
+		Qt.callLater(function() {
+			root.forceActiveFocus()
+		})
 	}
 
 	function cancelEditRow() {
 		editingNode = null
+		root.forceActiveFocus()
+		Qt.callLater(function() {
+			root.forceActiveFocus()
+		})
 	}
 
 	function endEditRow() {
@@ -583,6 +593,10 @@ FocusScope {
 			else
 				clearSelection()
 			event.accepted = true
+			root.forceActiveFocus()
+			Qt.callLater(function() {
+				root.forceActiveFocus()
+			})
 		}
 		else if (editingNode !== null) {
 			// Every other shortcut here would move or destroy the row being
@@ -1387,6 +1401,18 @@ FocusScope {
 						iconSource: "qrc:/" + Style.getIconPath(entryRow.rowEditing ? "Icons/Ok" : "Icons/Edit",
 							Icon.State.On, Icon.Mode.Normal)
 						onClicked: root.toggleEditRow(entryRow.treeNode)
+					}
+
+					Loader {
+						id: actionExtensionLoader
+						anchors.right: editButton.visible ? editButton.left : (cancelButton.visible ? cancelButton.left : parent.right)
+						anchors.rightMargin: Style.marginS
+						anchors.verticalCenter: parent.verticalCenter
+						active: root.rowActionExtensionComponent !== null
+						sourceComponent: root.rowActionExtensionComponent
+						property var node: entryRow.treeNode
+						property bool editing: entryRow.rowEditing
+						property bool selected: entryRow.selected
 					}
 				}
 			}
