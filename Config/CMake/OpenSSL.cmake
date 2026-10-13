@@ -49,9 +49,11 @@ elseif(APPLE)
 		${OPENSSLDIR}/lib/ClangOSX_${OPENSSL_OSX_ARCH}/libcrypto.a
 	)
 elseif(UNIX)
-	target_link_libraries(${PROJECT_NAME} PUBLIC
-		# no compiled lib for v1.1
-		# ${OPENSSLDIR}/lib/linux/libssl.so
-		${OPENSSLDIR}/lib/linux/libcrypto.so
+	file(GLOB OPENSSL_CRYPTO ${OPENSSLDIR}/lib/linux/libcrypto.so*)
+	file(GLOB OPENSSL_SSL ${OPENSSLDIR}/lib/linux/libssl.so*)
+	
+	target_link_libraries(${PROJECT_NAME} PUBLIC 
+		${OPENSSL_SSL} 
+		${OPENSSL_CRYPTO}
 	)
 endif()
