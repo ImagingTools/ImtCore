@@ -8,7 +8,7 @@ import imtauthUsersSdl 1.0
 
 Rectangle {
 	id: root;
-	property string context: ""
+	property string permissionPath: ""
 	objectName: "SuperuserPasswordPage"
 
 	anchors.fill: parent;
@@ -42,7 +42,7 @@ Rectangle {
 	}
 
 	GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		id: createSuperuserRequest;
 		requestType: 1; // Mutation
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_createSuperuser;

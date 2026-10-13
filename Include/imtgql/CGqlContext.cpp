@@ -7,6 +7,9 @@
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
 
+// ImtCore includes
+#include <imtlic/IProductInfo.h>
+
 
 namespace imtgql
 {
@@ -16,7 +19,9 @@ namespace imtgql
 
 CGqlContext::CGqlContext()
 	:m_userInfoPtr(nullptr)
+	,m_productInfoPtr(nullptr)
 	,m_isTenantOwner(false)
+	,m_areImpliedPermissionsResolved(false)
 {
 }
 
@@ -149,6 +154,8 @@ void CGqlContext::SetUserInfo(const imtauth::IUserInfo* userInfoPtr)
 	if (m_userInfoPtr.GetPtr() != userInfoPtr){
 		istd::CChangeNotifier changeNotifier(this);
 
+		ResetImpliedPermissions();
+
 		if (userInfoPtr != nullptr){
 			istd::IChangeableUniquePtr clonedUserPtr = userInfoPtr->CloneMe();
 			if (clonedUserPtr.IsValid()){
@@ -162,6 +169,42 @@ void CGqlContext::SetUserInfo(const imtauth::IUserInfo* userInfoPtr)
 			m_userInfoPtr.Reset();
 		}
 	}
+}
+
+
+imtlic::IProductInfo* CGqlContext::GetProductInfo() const
+{
+	return m_productInfoPtr;
+}
+
+
+void CGqlContext::SetProductInfo(imtlic::IProductInfo* productInfoPtr)
+{
+	if (m_productInfoPtr != productInfoPtr){
+		istd::CChangeNotifier changeNotifier(this);
+
+		ResetImpliedPermissions();
+
+		m_productInfoPtr = productInfoPtr;
+	}
+}
+
+
+imtauth::IUserInfo::FeatureIds CGqlContext::GetImpliedPermissions() const
+{
+	QMutexLocker locker(&m_impliedPermissionsMutex);
+
+	if (!m_areImpliedPermissionsResolved){
+		m_areImpliedPermissionsResolved = true;
+
+		if ((m_productInfoPtr != nullptr) && m_userInfoPtr.IsValid()){
+			const imtauth::IUserInfo::FeatureIds userPermissions = m_userInfoPtr->GetPermissions();
+
+			m_impliedPermissions = imtlic::CollectImpliedPermissions(*m_productInfoPtr, userPermissions);
+		}
+	}
+
+	return m_impliedPermissions;
 }
 
 
@@ -268,9 +311,14 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_tenantId = sourcePtr->m_tenantId;
 		m_productId = sourcePtr->m_productId;
 		m_headers = sourcePtr->m_headers;
+		m_productInfoPtr = sourcePtr->m_productInfoPtr;
 		m_isTenantOwner = sourcePtr->m_isTenantOwner;
 
 		SetUserInfo(sourcePtr->m_userInfoPtr.GetPtr());
+
+		// Resolved anew for the copy instead of being taken over: the source may
+		// be answering GetImpliedPermissions() on another thread right now.
+		ResetImpliedPermissions();
 
 		return true;
 	}
@@ -302,10 +350,24 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 	m_userId.clear();
 	m_tenantId.clear();
 	m_headers.clear();
+	m_productInfoPtr = nullptr;
 	m_isTenantOwner = false;
 	m_userInfoPtr.Reset();
 
+	ResetImpliedPermissions();
+
 	return true;
+}
+
+
+// private methods
+
+void CGqlContext::ResetImpliedPermissions()
+{
+	QMutexLocker locker(&m_impliedPermissionsMutex);
+
+	m_impliedPermissions.clear();
+	m_areImpliedPermissionsResolved = false;
 }
 
 

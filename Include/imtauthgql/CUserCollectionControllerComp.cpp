@@ -711,7 +711,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 		return adaptedPtr;
 	}
 
-	const imtauth::IUserInfo::FeatureIds resolvedPermissions = GetTenantUserPermissions(*sourceUserPtr, currentTenantId, currentProductId, bindingPtr, roleProviderPtr);
+	const imtauth::IUserInfo::FeatureIds resolvedPermissions = sourceUserPtr->GetPermissions(currentProductId);
 	if (resolvedPermissions.isEmpty()){
 		return adaptedPtr;
 	}

@@ -92,7 +92,7 @@ Item {
 		for (var i = 0; i < keys.length; i++) {
 			if (keys[i].indexOf("__group__:") === 0)
 				continue
-			if (excludeLocked && root.lockedPermissions[keys[i]])
+			if (excludeLocked && root.lockedPermissions && root.lockedPermissions[keys[i]])
 				continue
 			result.push(keys[i])
 		}
@@ -106,6 +106,7 @@ Item {
 	 * keeps the check state, so apply the own selection afterwards.
 	 */
 	function setLockedPermissions(lockedMap) {
+		lockedMap = lockedMap || ({})
 		__beginSelectionUpdate()
 		for (var oldId in root.lockedPermissions) {
 			var oldNode = permissionsTreeView.nodeForKey(oldId)
@@ -177,7 +178,7 @@ Item {
 		var rows = []
 		for (var i = 0; i < ids.length; i++) {
 			var node = permissionsTreeView.nodeForKey(ids[i])
-			var source = root.lockedPermissions[ids[i]]
+			var source = root.lockedPermissions ? root.lockedPermissions[ids[i]] : undefined
 			rows.push({
 				id: ids[i],
 				title: node && node.text ? node.text : ids[i],
@@ -192,6 +193,7 @@ Item {
 		__beginSelectionUpdate()
 		permissionsTreeView.checkAll()
 		__endSelectionUpdate()
+		root.updateSelectedRows()
 		if (!root.readOnly)
 			root.selectionChanged()
 	}
@@ -200,8 +202,10 @@ Item {
 		__beginSelectionUpdate()
 		permissionsTreeView.uncheckAll()
 		// The tree unchecks disabled nodes as well; locked permissions stay checked.
-		for (var id in root.lockedPermissions)
-			permissionsTreeView.setCheckStateSilent(id, Qt.Checked)
+		if (root.lockedPermissions) {
+			for (var id in root.lockedPermissions)
+				permissionsTreeView.setCheckStateSilent(id, Qt.Checked)
+		}
 		root.__updateLockedParentStates()
 		__endSelectionUpdate()
 		root.updateSelectedRows()
@@ -240,6 +244,7 @@ Item {
 		root.permissionsTree = treeData
 		__buildFlatModel()
 		__endSelectionUpdate()
+		root.updateSelectedRows()
 	}
 
 	/**
@@ -276,6 +281,7 @@ Item {
 		var flatGrouped = __flattenTreeNodes(treeNodes)
 		permissionsTreeView.model = flatGrouped
 		__endSelectionUpdate()
+		root.updateSelectedRows()
 	}
 
 	/**
@@ -291,6 +297,7 @@ Item {
 		if (!groups || groups.length === 0) {
 			permissionsTreeView.model = []
 			__endSelectionUpdate()
+			root.updateSelectedRows()
 			__buildSettleTimer.restart()
 			return
 		}
@@ -339,6 +346,7 @@ Item {
 
 		permissionsTreeView.model = result
 		__endSelectionUpdate()
+		root.updateSelectedRows()
 		__buildSettleTimer.restart()
 	}
 
@@ -654,7 +662,6 @@ Item {
 		}
 	}
 
-
 	// --- Selected only (read-only) ---
 	AssignmentsTable {
 		id: selectedTable
@@ -666,12 +673,61 @@ Item {
 		anchors.bottomMargin: root.treeBottomMargin
 		visible: root.selectedOnly
 		plainRows: root.__selectedRows
+		showSourceColumn: root.showSource
 		nameTitle: qsTr("Permission")
 		emptyText: qsTr("No permissions are selected.")
 		filterPlaceholder: qsTr("Filter permissions...")
 	}
 
 	// --- Tree (flat grouped) ---
+	// One column: a permission's name and its description share a cell, one
+	// above the other, so neither is squeezed by a second column beside it.
+	Component {
+		id: permissionCellComp
+
+		Item {
+			id: permissionCell
+
+			property var cellData: parent ? parent.nodeData : null
+			property bool cellSelected: parent ? parent.selected : false
+			property bool cellEnabled: parent ? parent.nodeEnabled : true
+			property bool isGroup: parent ? parent.hasChildren : false
+			property string title: permissionCell.cellData ? permissionCell.cellData.name || "" : ""
+			property string details: permissionCell.cellData ? permissionCell.cellData.description || "" : ""
+
+			Column {
+				id: permissionTexts
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.verticalCenter: parent.verticalCenter
+				spacing: Style.spacingXXS
+
+				Text {
+					objectName: "PermissionName"
+					width: permissionTexts.width
+					text: permissionCell.title
+					font.family: Style.fontFamily
+					font.pixelSize: Style.fontSizeM
+					font.bold: permissionCell.isGroup
+					color: !permissionCell.cellEnabled ? Style.inactiveTextColor
+						: permissionCell.cellSelected ? Style.textSelectedColor : Style.textColor
+					elide: Text.ElideMiddle
+				}
+
+				Text {
+					objectName: "PermissionDescription"
+					width: permissionTexts.width
+					visible: permissionCell.details !== ""
+					text: permissionCell.details
+					font.family: Style.fontFamily
+					font.pixelSize: Style.fontSizeS
+					color: Style.inactiveTextColor
+					elide: Text.ElideRight
+				}
+			}
+		}
+	}
+
 	// The scrollbar sets its own visibility from the content height, so the tree hides it through this parent.
 	Item {
 		id: treeArea
@@ -685,7 +741,7 @@ Item {
 
 		CustomScrollbar {
 			id: scrollbar
-			z: 1
+			z: parent.z + 1
 			anchors.right: parent.right
 			anchors.top: parent.top
 			anchors.topMargin: permissionsTreeView.showHeader ? permissionsTreeView.headerHeight + 1 : 0
@@ -696,20 +752,19 @@ Item {
 
 		BasicTreeView {
 			id: permissionsTreeView
-			// The default buffer realizes every row of a permission tree; keep only a few off-screen rows.
 			cacheBuffer: rowHeight * 4
 			anchors.top: parent.top
 			anchors.bottom: parent.bottom
 			anchors.left: parent.left
 			anchors.right: scrollbar.left
 			anchors.rightMargin: root.treeToScrollbarSpacing
-			showHeader: true
+			showHeader: false
 			tristate: true
+			rowHeight: Style.controlHeightL + Style.marginS
 			hintRole: root.showSource ? "source" : ""
 			hintIcon: "Icons/Lock"
 			columns: [
-				{ id: "name", name: qsTr("Permission"), tree: true },
-				{ id: "description", name: qsTr("Description"), tree: false }
+				{ id: "name", name: qsTr("Permission"), tree: true, delegate: permissionCellComp }
 			]
 			filterRole: ["name", "description"]
 
@@ -723,7 +778,7 @@ Item {
 
 		Text {
 			anchors.top: parent.top
-			anchors.topMargin: permissionsTreeView.headerHeight + Style.marginXL
+			anchors.topMargin: permissionsTreeView.showHeader ? permissionsTreeView.headerHeight + Style.marginXL : Style.marginXL
 			anchors.left: parent.left
 			anchors.right: parent.right
 			anchors.margins: Style.marginL

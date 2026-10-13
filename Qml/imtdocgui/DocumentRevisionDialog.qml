@@ -9,7 +9,7 @@ import imtbaseDocumentRevisionSdl 1.0
 
 Dialog {
 	id: documentRevisionDialog;
-	property string context: ""
+	property string permissionPath: ""
 	title: qsTr("Revisions (%1)").arg(documentRevisionDialog.contentItem ? documentRevisionDialog.contentItem.revisionsCount : 0);
 	canMove: false;
 	backgroundColor: Style.baseColor;
@@ -68,7 +68,7 @@ Dialog {
 	}
 
 	GqlSdlRequestSender {
-		context: documentRevisionDialog.context
+		permissionPath: documentRevisionDialog.permissionPath
 		id: setRevisionRequest;
 		requestType: 1;
 		gqlCommandId: ImtbaseDocumentRevisionSdlCommandIds.s_restoreRevision;
@@ -94,7 +94,7 @@ Dialog {
 	}
 
 	GqlSdlRequestSender {
-		context: documentRevisionDialog.context
+		permissionPath: documentRevisionDialog.permissionPath
 		id: deleteRevisionRequest;
 		gqlCommandId: ImtbaseDocumentRevisionSdlCommandIds.s_deleteRevision;
 		inputObjectComp: Component {

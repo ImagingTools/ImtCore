@@ -430,7 +430,7 @@ bool CRoleCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 		QByteArray productId = gqlContextPtr->GetProductId();
 		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){
-			availableRoleIds = GetEffectiveUserRoles(*userInfoPtr, productId);
+			availableRoleIds = userInfoPtr->GetRoles(productId);
 		}
 	}
 
@@ -532,5 +532,4 @@ void CRoleCollectionControllerComp::OnComponentCreated()
 
 
 } // namespace imtauth
-
 

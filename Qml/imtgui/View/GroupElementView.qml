@@ -114,11 +114,9 @@ Rectangle {
 	}
 
 	Component.onDestruction: {
-		// The web runtime destroys `internal` before this handler runs.
-		if (!internal || !internal.watched){
+		if (!internal.watched){
 			return
 		}
-
 		for (let i = 0; i < internal.watched.length; i++){
 			if (internal.watched[i]){
 				internal.watched[i].visibleChanged.disconnect(container.scheduleRecalc)

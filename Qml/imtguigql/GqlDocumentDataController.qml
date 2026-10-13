@@ -9,10 +9,13 @@ import imtdocgui 1.0
 DocumentDataController {
     id: container;
 
-    property string context: ""
     property string gqlGetCommandId;
     property string gqlAddCommandId;
     property string gqlUpdateCommandId;
+
+    property string getPermissionPath: "";
+    property string addPermissionPath: "";
+    property string updatePermissionPath: "";
 
     property string subscriptionCommandId;
 
@@ -89,7 +92,7 @@ DocumentDataController {
     }
 
     property GqlRequestSender gqlUpdateModel: GqlRequestSender {
-        context: container.context
+        permissionPath: container.updatePermissionPath
         requestType: 1; // Mutation
         gqlCommandId: container.gqlUpdateCommandId;
 
@@ -133,7 +136,7 @@ DocumentDataController {
     }
 
     property GqlRequestSender gqlGetModel: GqlRequestSender {
-        context: container.context
+        permissionPath: container.getPermissionPath
         requestType: 0; // Query
         gqlCommandId: container.gqlGetCommandId;
 
@@ -175,7 +178,7 @@ DocumentDataController {
     }
 
     property GqlRequestSender gqlAddModel: GqlRequestSender {
-        context: container.context
+        permissionPath: container.addPermissionPath
         requestType: 1; // Mutation
         gqlCommandId: container.gqlAddCommandId;
 
