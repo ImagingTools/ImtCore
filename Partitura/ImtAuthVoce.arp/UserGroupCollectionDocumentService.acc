@@ -10,6 +10,42 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="CachedRoleRepository" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectCacheLimit" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="500"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CachedUserGroupRepository" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectCacheLimit" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="500"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserGroupRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CachedUserRepository" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectCacheLimit" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="2000"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="CheckPermissionOr" PackageId="ImtAuthPck" ComponentId="CheckPermissionOr">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
@@ -159,8 +195,8 @@
         <Element Id="RoleCollectionAdapter" PackageId="ImtAuthPck" ComponentId="RoleCollectionAdapter">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleRepository">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CachedRoleRepository"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -168,8 +204,8 @@
         <Element Id="UserCollectionAdapter" PackageId="ImtAuthPck" ComponentId="UserCollectionAdapter">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserRepository">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CachedUserRepository"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -206,8 +242,8 @@
         <Element Id="UserGroupInfoProvider" PackageId="ImtAuthPck" ComponentId="UserGroupInfoProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="UserGroupRepository">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CachedUserGroupRepository"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

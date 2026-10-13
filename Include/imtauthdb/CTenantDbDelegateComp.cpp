@@ -13,6 +13,7 @@
 #include <istd/TOptDelPtr.h>
 #include <imtauth/ITenantInfo.h>
 #include <iprm/IIdParam.h>
+#include <iprm/IEnableableParam.h>
 #include <iprm/ITextParam.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/TParamsPtr.h>
@@ -380,8 +381,9 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 	const bool hasCrossOrgGrantsTable = !grantsTableName.isEmpty() && TableExists(grantsTableName);
 
 	QStringList relationCaseItems;
-	relationCaseItems << QStringLiteral(R"(WHEN "CreatorId"='%1' THEN 'Creator')").arg(escapedUserId);
+	// The current owner reads "Owner"; "Creator" is left for a creator who passed the ownership on.
 	relationCaseItems << QStringLiteral(R"(WHEN "OwnerId"='%1' THEN 'Owner')").arg(escapedUserId);
+	relationCaseItems << QStringLiteral(R"(WHEN "CreatorId"='%1' THEN 'Creator')").arg(escapedUserId);
 
 	if (hasMembershipsTable){
 		relationCaseItems << QString(
@@ -517,10 +519,9 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 	QStringList additionalFilters;
 	const iprm::IParamsSet::Ids filterParamIds = filterParams.GetParamIds();
 
-	QByteArray userId = ExtractUserId(&filterParams);
-	if (!userId.isEmpty()){
-		// With TenantRelationScope as a computed column in the subquery,
-		// only show tenants where the user has a relationship (Owner, Member, Invited, or Delegated)
+	iprm::TParamsPtr<iprm::IEnableableParam> relatedOnlyParamPtr(&filterParams, "RelatedTenantsOnly", false);
+	if (relatedOnlyParamPtr.IsValid() && relatedOnlyParamPtr->IsEnabled() && !ExtractUserId(&filterParams).isEmpty()){
+		// TenantRelationScope is a computed column of the subquery: only the tenants the user is related to.
 		additionalFilters << QStringLiteral(R"("TenantRelationScope" IS NOT NULL)");
 	}
 

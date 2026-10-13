@@ -113,6 +113,11 @@ DocumentServiceBase {
 			return
 		}
 
+		// One navigation can ask for the same object twice before the first answer arrives.
+		if (root.__openingObjectIds[documentId]){
+			return
+		}
+
 		startOpenDocument(documentId, typeId)
 
 		if (openDocumentOverride){
@@ -120,6 +125,7 @@ DocumentServiceBase {
 			return
 		}
 
+		root.__openingObjectIds[documentId] = true
 		openDocumentRequest.typeId = typeId
 		objectIdInput.m_id = documentId
 		objectIdInput.m_collectionId = collectionId
@@ -331,6 +337,7 @@ DocumentServiceBase {
 		sdlObjectComp: Component {
 			DocumentInfo {
 				onFinished: {
+					delete root.__openingObjectIds[m_objectId]
 					root.handleDocumentOpened(m_documentId, m_objectId, m_objectTypeId, m_documentName, m_hasNameProvider, m_isDirty)
 				}
 			}
@@ -343,9 +350,13 @@ DocumentServiceBase {
 		}
 
 		function onError(message, type){
+			root.__openingObjectIds = ({})
 			root.openDocumentFailed("", message)
 		}
 	}
+
+	// Object ids whose OpenDocument request has been sent and not answered yet.
+	property var __openingObjectIds: ({})
 
 	property GqlSdlRequestSender createDocumentRequest: GqlSdlRequestSender {
 		permissionPath: root.permissionPaths[gqlCommandId] || ""

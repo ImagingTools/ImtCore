@@ -17,7 +17,7 @@ SimpleCollectionPage {
 
 	entityName: qsTr("Role")
 	entityNamePlural: qsTr("Roles")
-	descriptionText: qsTr("Manage tenant roles and assign permissions to team members.")
+	descriptionText: qsTr("Manage the roles of the organization and assign permissions to its members.")
 
 	documentManager: apiClient ? apiClient.roleDocumentManager : null
 	objectTypeId: apiClient ? apiClient.roleObjectTypeId : ""

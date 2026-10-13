@@ -9138,8 +9138,8 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+14"/>
-        <source>My tenants</source>
-        <translation>Мои тенанты</translation>
+        <source>My organizations</source>
+        <translation>Мои организации</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -9158,8 +9158,8 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+43"/>
-        <source>Tenant</source>
-        <translation>Тенант</translation>
+        <source>Organization</source>
+        <translation>Организация</translation>
     </message>
 </context>
 <context>
@@ -9212,18 +9212,18 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Basic workspace settings and configuration.</source>
-        <translation>Основные настройки и конфигурация рабочего пространства.</translation>
+        <source>Basic settings of the organization.</source>
+        <translation>Основные настройки организации.</translation>
     </message>
     <message>
         <location line="+18"/>
-        <source>Tenant Name</source>
-        <translation>Название тенанта</translation>
+        <source>Organization Name</source>
+        <translation>Название организации</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Enter the tenant name</source>
-        <translation>Введите название тенанта</translation>
+        <source>Enter the organization name</source>
+        <translation>Введите название организации</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -9355,8 +9355,8 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+4"/>
-        <source>Leave Workspace</source>
-        <translation>Покинуть рабочее пространство</translation>
+        <source>Leave Organization</source>
+        <translation>Покинуть организацию</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -9393,8 +9393,8 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+34"/>
-        <source>Manage tenant members. Users created here automatically become members.</source>
-        <translation>Управление участниками тенанта. Созданные здесь пользователи автоматически становятся участниками.</translation>
+        <source>Manage the members of the organization. Users created here automatically become members.</source>
+        <translation>Управление участниками организации. Созданные здесь пользователи автоматически становятся участниками.</translation>
     </message>
     <message>
         <location line="+28"/>
@@ -9453,8 +9453,8 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Select which product features are available for this tenant.</source>
-        <translation>Выберите, какие возможности продукта доступны для этого тенанта.</translation>
+        <source>Select which product features are available for this organization.</source>
+        <translation>Выберите, какие возможности продукта доступны для этой организации.</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -9511,8 +9511,8 @@ ID входных данных: </translation>
     </message>
     <message>
         <location line="+16"/>
-        <source>Manage tenant roles and assign permissions to team members.</source>
-        <translation>Управление ролями тенанта и назначение прав участникам.</translation>
+        <source>Manage the roles of the organization and assign permissions to its members.</source>
+        <translation>Управление ролями организации и назначение прав участникам.</translation>
     </message>
     <message>
         <location line="+28"/>

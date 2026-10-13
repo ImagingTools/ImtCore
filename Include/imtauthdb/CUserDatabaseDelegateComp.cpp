@@ -28,13 +28,15 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 		const istd::IChangeable* valuePtr,
 		const imtbase::IOperationContext* operationContextPtr) const
 {
-	NewObjectQuery retVal = BaseClass::CreateNewObjectQuery(typeId, proposedObjectId, objectName, objectDescription, valuePtr, operationContextPtr);
-
 	auto userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(valuePtr);
 	if (userInfoPtr == nullptr){
 		return NewObjectQuery();
 	}
-	
+
+	// The searchable Name column must follow the user itself, whatever name the caller passed.
+	const QString userName = userInfoPtr->GetName().isEmpty() ? objectName : userInfoPtr->GetName();
+	NewObjectQuery retVal = BaseClass::CreateNewObjectQuery(typeId, proposedObjectId, userName, objectDescription, valuePtr, operationContextPtr);
+
 	if (m_userGroupCollectionCompPtr.IsValid() && m_userGroupDatabaseDelegateCompPtr.IsValid()){
 		QByteArrayList groupIds = userInfoPtr->GetGroups();
 		for (const QByteArray& groupId : groupIds){
@@ -81,6 +83,11 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 	Q_ASSERT(userInfoPtr != nullptr);
 	if (userInfoPtr == nullptr){
 		return QByteArray();
+	}
+
+	const QString newName = userInfoPtr->GetName();
+	if (!newName.isEmpty() && newName != oldObjectPtr->GetName()){
+		retVal += CreateRenameObjectQuery(collection, objectId, newName, operationContextPtr);
 	}
 
 	if (useExternDelegate){

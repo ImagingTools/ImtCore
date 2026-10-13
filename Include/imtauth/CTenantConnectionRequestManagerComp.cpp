@@ -581,56 +581,55 @@ bool CTenantConnectionRequestManagerComp::SetAllowConnectionsByCode(const QByteA
 QByteArray CTenantConnectionRequestManagerComp::CreateConnectionRequest(
 		const QByteArray& sourceTenantId,
 		const QString& connectionCode,
-		const QString& message)
+		const QString& message,
+		QString* errorMessagePtr)
 {
-	if (sourceTenantId.isEmpty() || connectionCode.isEmpty()){
-		SendErrorMessage(0, "Source tenant and connection code are required", "CTenantConnectionRequestManagerComp");
+	auto refuse = [this, errorMessagePtr](const QString& reason){
+		SendErrorMessage(0, reason, "CTenantConnectionRequestManagerComp");
+		if (errorMessagePtr != nullptr){
+			*errorMessagePtr = reason;
+		}
+
 		return QByteArray();
+	};
+
+	if (sourceTenantId.isEmpty() || connectionCode.isEmpty()){
+		return refuse(QStringLiteral("Source organization and connection code are required"));
 	}
 
 	// Find target tenant by connection code
 	QByteArray targetTenantId = FindTenantByConnectionCode(connectionCode);
 	if (targetTenantId.isEmpty()){
-		SendErrorMessage(0, "Invalid connection code", "CTenantConnectionRequestManagerComp");
-		return QByteArray();
+		return refuse(QStringLiteral("No organization has this connection code"));
 	}
 
 	if (m_tenantManagerCompPtr.IsValid()){
 		ITenantInfoUniquePtr sourceTenantPtr = m_tenantManagerCompPtr->GetTenant(sourceTenantId);
 		if (!sourceTenantPtr.IsValid()){
-			SendErrorMessage(0, "Source tenant not found", "CTenantConnectionRequestManagerComp");
-			return QByteArray();
+			return refuse(QStringLiteral("Source organization not found"));
 		}
 
 		ITenantInfoUniquePtr targetTenantPtr = m_tenantManagerCompPtr->GetTenant(targetTenantId);
 		if (!targetTenantPtr.IsValid()){
-			SendErrorMessage(0, "Target tenant not found", "CTenantConnectionRequestManagerComp");
-			return QByteArray();
+			return refuse(QStringLiteral("Target organization not found"));
 		}
 	}
 
-	// Cannot connect to self
 	if (targetTenantId == sourceTenantId){
-		SendErrorMessage(0, "Cannot create connection request to own organization", "CTenantConnectionRequestManagerComp");
-		return QByteArray();
+		return refuse(QStringLiteral("This is the connection code of your own organization"));
 	}
 
-	// Check if target allows connections by code
 	if (!GetAllowConnectionsByCode(targetTenantId)){
-		SendErrorMessage(0, "Target organization has disabled connections by code", "CTenantConnectionRequestManagerComp");
-		return QByteArray();
+		return refuse(QStringLiteral("The target organization does not accept connections by code"));
 	}
 
-	// Check if connection already exists
 	if (ConnectionExists(sourceTenantId, targetTenantId)){
-		SendErrorMessage(0, "Connection already exists between these organizations", "CTenantConnectionRequestManagerComp");
-		return QByteArray();
+		return refuse(QStringLiteral("The organizations are already connected"));
 	}
 
-	// Check if a pending request already exists between these tenants (in either direction)
+	// In either direction
 	if (PendingRequestExists(sourceTenantId, targetTenantId)){
-		SendErrorMessage(0, "A pending connection request already exists between these organizations", "CTenantConnectionRequestManagerComp");
-		return QByteArray();
+		return refuse(QStringLiteral("A connection request between these organizations is already pending"));
 	}
 
 	istd::CChangeNotifier changeNotifier(this);
@@ -1177,6 +1176,31 @@ QByteArrayList CTenantConnectionRequestManagerComp::GetRelationshipProposalIds(c
 		}
 	}
 	return result;
+}
+
+
+ITenantRelationshipProposalInfoUniquePtr CTenantConnectionRequestManagerComp::GetRelationshipProposal(const QByteArray& proposalId) const
+{
+	if (!m_proposalCollectionCompPtr.IsValid() || !m_proposalFactoryCompPtr.IsValid() || proposalId.isEmpty()){
+		return nullptr;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!m_proposalCollectionCompPtr->GetObjectData(proposalId, dataPtr)){
+		return nullptr;
+	}
+
+	const ITenantRelationshipProposalInfo* proposalPtr = dynamic_cast<const ITenantRelationshipProposalInfo*>(dataPtr.GetPtr());
+	if (proposalPtr == nullptr){
+		return nullptr;
+	}
+
+	ITenantRelationshipProposalInfoUniquePtr clonedProposal = m_proposalFactoryCompPtr.CreateInstance();
+	if (!clonedProposal.IsValid() || !clonedProposal->CopyFrom(*proposalPtr)){
+		return nullptr;
+	}
+
+	return clonedProposal;
 }
 
 

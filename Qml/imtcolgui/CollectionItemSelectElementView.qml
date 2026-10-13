@@ -8,7 +8,7 @@ import imtcolgui 1.0
 	\inqmlmodule imtcolgui
 	\brief ItemSelectElementView backed by a collection list request.
 
-	Same element as \c ItemSelectElementView, but the popup and the name resolution run
+	Same element as \c ItemSelectElementView, but the popup runs
 	over the collection controller (CObjectCollectionControllerCompBase) instead of
 	GetSelectableItems - so the picker inherits the field mapping, the header-driven
 	filtering and the text search the collection views already use.
@@ -58,12 +58,6 @@ ItemSelectElementView {
 	function setCustomInputParams(inputParams){
 	}
 
-	onItemsChanged: {
-		if (!collectionItemSelectView.__resolvingNames && collectionItemSelectView.hasUnresolvedItems()){
-			__nameResolver.fetch("")
-		}
-	}
-
 	// Selection list of the popup.
 	FilterableSelectCollectionDataProvider {
 		id: __itemsProvider
@@ -84,32 +78,6 @@ ItemSelectElementView {
 
 		function setCustomInputParams(inputParams){
 			collectionItemSelectView.setCustomInputParams(inputParams)
-		}
-	}
-
-	// Turns the ids assigned from outside into names, without disturbing the popup list.
-	FilterableSelectCollectionDataProvider {
-		id: __nameResolver
-
-		multiSelect: true
-		pageSize: 100
-		commandId: collectionItemSelectView.commandId
-		fields: collectionItemSelectView.fields
-		idField: collectionItemSelectView.idField
-		titleField: collectionItemSelectView.titleField
-		sortByField: collectionItemSelectView.sortByField
-		orderType: collectionItemSelectView.orderType
-
-		function getHeaders(){
-			return collectionItemSelectView.getHeaders()
-		}
-
-		function setCustomInputParams(inputParams){
-			collectionItemSelectView.setCustomInputParams(inputParams)
-		}
-
-		onDataChanged: {
-			collectionItemSelectView.resolveItemNames(__nameResolver.items)
 		}
 	}
 }

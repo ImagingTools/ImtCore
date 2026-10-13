@@ -313,9 +313,7 @@ ListModel {
 			element.connectProperties()
 		}
 		this.insert(index, {item: element})
-		if (owner){
-			owner.modelChanged([])
-		}
+		notifyOwner()
 	}
 
 	function removeElement(index){
@@ -324,7 +322,19 @@ ListModel {
 		}
 
 		this.remove(index)
-		if (owner){
+		notifyOwner()
+	}
+
+	// Inside the owner's beginChanges()/endChanges() the change is reported once, at the end - as in the web runtime.
+	function notifyOwner(){
+		if (!owner){
+			return
+		}
+
+		if (owner._internal && owner._internal.isTransaction){
+			owner._internal.countChanges++
+		}
+		else{
 			owner.modelChanged([])
 		}
 	}

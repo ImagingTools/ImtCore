@@ -49,6 +49,26 @@ bool HasAnyPermission(const QByteArrayList& userPermissions, const QByteArrayLis
 }
 
 
+// An unsaved organization is edited outside of any organization, a stored one only from inside it.
+bool IsOrganizationContextValid(
+			const imtdoc::IDocumentService& documentService,
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			const QByteArray& contextTenantId)
+{
+	QByteArray storedTenantId;
+	const imtdoc::IDocumentService::DocumentList documentList = documentService.GetOpenedDocumentList(userId);
+	for (const imtdoc::IDocumentService::DocumentListItem& documentItem : documentList){
+		if (documentItem.documentId == documentId){
+			storedTenantId = documentItem.url.path().mid(1).toUtf8();
+			break;
+		}
+	}
+
+	return storedTenantId == contextTenantId;
+}
+
+
 } // anonymous namespace
 
 
@@ -78,6 +98,20 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 		return sdl::V1_0::imtauth::CTenantData();
 	}
 
+	QByteArray userObjectId;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	QByteArray contextTenantId;
+	if (gqlContextPtr != nullptr){
+		contextTenantId = gqlContextPtr->GetTenantId();
+		userObjectId = gqlContextPtr->GetUserId();
+	}
+
+	// A just created organization is still read back outside of any organization before the client switches into it.
+	if (!contextTenantId.isEmpty() && !IsOrganizationContextValid(*m_documentManagerCompPtr, userId, objectId, contextTenantId)){
+		errorMessage = QStringLiteral("An organization can be edited only while you work in it. Switch to the organization first.");
+		return sdl::V1_0::imtauth::CTenantData();
+	}
+
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userId, objectId, documentPtr);
 	if (!documentPtr.IsValid()){
@@ -94,22 +128,7 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 	sdl::V1_0::imtauth::CTenantData response;
 	QByteArray tenantId = tenantPtr->GetTenantId();
 
-	QByteArray userObjectId;
-	// Server-side access control: user can only open TenantEditor if
-	// they have switched to this tenant (current tenant in JWT must match)
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	QByteArray contextTenantId;
-	if (gqlContextPtr != nullptr){
-		contextTenantId = gqlContextPtr->GetTenantId();
-		userObjectId = gqlContextPtr->GetUserId();
-	}
-
 	response.id = tenantId;
-
-	if (!tenantId.isEmpty() && !contextTenantId.isEmpty() && contextTenantId != tenantId){
-		errorMessage = QStringLiteral("Access denied: tenant context mismatch");
-		return sdl::V1_0::imtauth::CTenantData();
-	}
 
 	bool isSystemAdmin = false;
 	if (gqlContextPtr != nullptr){
@@ -303,6 +322,11 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 
 	QByteArray userLogin = GetUserId(gqlRequest);
 
+	if (!IsOrganizationContextValid(*m_documentManagerCompPtr, userLogin, documentId, contextTenantId)){
+		errorMessage = QStringLiteral("An organization can be edited only while you work in it. Switch to the organization first.");
+		return response;
+	}
+
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
@@ -356,11 +380,6 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 				}
 			}
 		}
-	}
-
-	if (!tenantId.isEmpty() && !contextTenantId.isEmpty() && contextTenantId != tenantId){
-		errorMessage = QStringLiteral("Access denied: tenant context mismatch");
-		return response;
 	}
 
 	// Role-based access control for existing tenants

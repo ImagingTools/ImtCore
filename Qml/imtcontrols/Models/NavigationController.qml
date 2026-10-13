@@ -68,18 +68,25 @@ QtObject {
 
 		navigableItems.push(navigableItem)
 
-		// Проверяем, есть ли pending для этого сегмента
+		deliverPending(navigableItem)
+
+		return true
+	}
+
+	/*!
+		Hands a path stored by \c setPending() over to \a navigableItem if it is the item the path was waiting for.
+		Called on registration and again whenever the item's parent segment or paths change.
+	*/
+	function deliverPending(navigableItem){
 		let key = navigableItem.parentSegment
 		if (key && pending[key]) {
 			let p = pending[key]
 			if (navigableItem.paths.includes(p.rest[0])) {
 				console.log("Delivering pending path", p, "to", navigableItem.paths)
-				navigableItem.processSegment(p.rest[0], p.params, p.rest.slice(1))
 				delete pending[key]
+				navigableItem.processSegment(p.rest[0], p.params, p.rest.slice(1))
 			}
 		}
-
-		return true
 	}
 
 	property var pending: ({})

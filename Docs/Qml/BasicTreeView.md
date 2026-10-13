@@ -106,6 +106,8 @@ being edited. Example: the two-line name/description cell of
 | `allowDisabledEditing` | `false` | Allow editing of disabled nodes. |
 | `allowDisabledSelection` | `false` | Allow selecting of disabled nodes. |
 | `tristate` | `false` | Tri-state checkboxes. |
+| `hintRole` | `""` | Node `data` field with a hint (e.g. why the node is locked). Rows with a hint show `hintIcon` in the tree column and the hint in the row tooltip. |
+| `hintIcon` | `"Icons/Info"` | Icon shown next to nodes that have a hint. |
 | `skipDisabledOrNonCheckableOnCheck` | `true` | Exclude disabled / non-checkable nodes from check propagation. |
 | `filterText` | `""` | Filter text (case-insensitive substring). |
 | `filterRole` | `"text"` | Dot-path to the value used for filtering. |
