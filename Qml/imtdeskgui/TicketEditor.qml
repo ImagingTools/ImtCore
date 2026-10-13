@@ -61,7 +61,7 @@ DocumentViewBase {
 	// Pending assignees for multi-select
 	property var pendingAssignees: []
 	property bool _assigneesChanged: false
-	// User name cache: id → name (populated from FilterableSelectPopup and userNameResolver)
+	// User name cache: id → name (populated from representation model and FilterableSelectPopup)
 	property var __userNameCache: ({})
 	// Reply-to message context (null = not replying)
 	property var _replyToMessage: null
@@ -313,7 +313,13 @@ DocumentViewBase {
 		// subsequent doUpdateModel() calls (e.g. assignee change) do not
 		// re-send it as a new message. The server skips comments that
 		// already have an ID set.
+		// Suppress notifications during this assignment to avoid triggering
+		// a second UpdateTicketFromRepresentation request.
+		setBlockingUpdateModel(true)
+		newItem.enableNotifications = false
 		newItem.m_id = "local-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8)
+		newItem.enableNotifications = true
+		setBlockingUpdateModel(false)
 		ticketEditor.commentSubmitted(commentText)
 	}
 
@@ -526,23 +532,34 @@ DocumentViewBase {
 			}
 		}
 		
-		// Load assignees — resolve names from cache, trigger server resolution for uncached
+		// Load assignees from ticket data (carrying id and name directly from server)
 		var assigns = []
-		var aIds = ticketData.m_assigneeIds || []
-		var hasUnresolved = false
-		for (var a = 0; a < aIds.length; a++) {
-			var aId = aIds[a]
-			var cachedName = ticketEditor.__userNameCache[aId]
-			assigns.push({id: aId, name: cachedName || aId})
-			if (!cachedName) hasUnresolved = true
+		if (ticketData.hasAssignees && ticketData.hasAssignees()) {
+			var assigneesModel = ticketData.m_assignees
+			if (assigneesModel) {
+				for (var a = 0; a < assigneesModel.count; a++) {
+					var item = assigneesModel.get(a).item
+					if (item) {
+						var aId = String(item.m_id || "")
+						var aName = String(item.m_name || "")
+						if (aName !== "" && aName !== aId) {
+							ticketEditor.__userNameCache[aId] = aName
+						}
+						assigns.push({id: aId, name: aName || aId})
+					}
+				}
+			}
+		}
+		else if (ticketData.m_assigneeIds) {
+			var aIds = ticketData.m_assigneeIds || []
+			for (var a = 0; a < aIds.length; a++) {
+				var aId = aIds[a]
+				var cachedName = ticketEditor.__userNameCache[aId]
+				assigns.push({id: aId, name: cachedName || aId})
+			}
 		}
 		ticketEditor.pendingAssignees = assigns
 		ticketEditor._assigneesChanged = false
-		
-		// Trigger user name resolution for uncached IDs
-		if (hasUnresolved && aIds.length > 0) {
-			userNameResolver.fetch("")
-		}
 		
 		// Detect assignee removal: if user was an assignee but no longer is, show notification and go readOnly
 		if (wasAssignee) {
@@ -568,7 +585,13 @@ DocumentViewBase {
 		ticketData.m_description = editDescriptionInput.text
 		ticketData.m_locked = editLockedCB.checkState === Qt.Checked
 		ticketData.m_lockReason = editLockReasonInput.text
-		
+		ticketData.emplaceAssignees()
+		for (var a = 0; a < ticketEditor.pendingAssignees.length; a++) {
+			var assigneeItem = ticketData.createAssigneesArrayElement()
+			assigneeItem.m_id = String(ticketEditor.pendingAssignees[a].id || "")
+			assigneeItem.m_name = String(ticketEditor.pendingAssignees[a].name || "")
+			ticketData.m_assignees.addElement(assigneeItem)
+		}
 		ticketData.m_assigneeIds = ticketEditor.pendingAssignees.map(function(a) { return a.id })
 		
 		if (ticketEditor.isNewIssue) {
@@ -648,46 +671,6 @@ DocumentViewBase {
 		interval: 2000
 		repeat: false
 		onTriggered: ticketEditor._exportChatCopiedState = false
-	}
-	
-	// Standalone user name resolver — fetches Users collection to resolve assignee IDs to display names
-	FilterableSelectGqlDataProvider {
-		id: userNameResolver
-		collectionId: "Users"
-		multiSelect: true
-		pageSize: 100
-		
-		onDataChanged: {
-			ticketEditor.__resolveAssigneeNamesFromResolver()
-		}
-	}
-	
-	function __resolveAssigneeNamesFromResolver() {
-		var resolverItems = userNameResolver.items
-		if (!resolverItems || resolverItems.length === 0) return
-		
-		var cacheUpdated = false
-		for (var i = 0; i < resolverItems.length; i++) {
-			var item = resolverItems[i]
-			if (item.id && item.title && item.title !== "") {
-				ticketEditor.__userNameCache[item.id] = item.title
-				cacheUpdated = true
-			}
-		}
-		
-		if (!cacheUpdated) return
-		
-		// Re-build pendingAssignees with resolved names
-		var assigns = []
-		for (var j = 0; j < ticketEditor.pendingAssignees.length; j++) {
-			var a = ticketEditor.pendingAssignees[j]
-			var cachedName = ticketEditor.__userNameCache[a.id]
-			assigns.push({
-				id: a.id,
-				name: cachedName || a.name || a.id
-			})
-		}
-		ticketEditor.pendingAssignees = assigns
 	}
 	
 	TreeItemModel {
