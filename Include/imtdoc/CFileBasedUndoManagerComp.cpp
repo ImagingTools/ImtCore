@@ -277,7 +277,7 @@ void CFileBasedUndoManagerComp::RemoveStoredStepsFromDisk() const
 
 	const QStringList fileNames = directory.entryList(QDir::Files | QDir::NoDotAndDotDot);
 	for (const QString& fileName : fileNames){
-		if (fileName.startsWith("Undo_") || fileName.startsWith("Redo_") || fileName.startsWith("CurrentState")){
+		if (fileName.startsWith(QStringLiteral("Undo_")) || fileName.startsWith(QStringLiteral("Redo_")) || fileName.startsWith(QStringLiteral("CurrentState"))){
 			QFile::remove(directory.filePath(fileName));
 		}
 	}
