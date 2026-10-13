@@ -130,8 +130,7 @@ protected:
 				sdl::V1_0::imtbase::CUndoInfo& sdlNotification) const;
 	void SendCachedUndoRedoNotificationsToSubscriber(
 				const QByteArray& subscriptionId,
-				const QByteArray& userId,
-				const imtrest::IRequest& networkRequest) const;
+				const QByteArray& userId) const;
 
 	template<class Representation>
 	void PublishRepresentation(
