@@ -120,6 +120,18 @@ protected:
 	*/
 	QByteArray GetSubscribedDocumentId(const imtgql::CGqlRequest& gqlRequest) const;
 	QByteArray GetSubscriberUserId(const imtgql::CGqlRequest& gqlRequest) const;
+	void FillUndoInfoFromCache(
+				const QByteArray& documentId,
+				bool isDirty,
+				int availableUndoSteps,
+				int availableRedoSteps,
+				const QList<QByteArray>& undoLevelDescriptions,
+				const QList<QByteArray>& redoLevelDescriptions,
+				sdl::V1_0::imtbase::CUndoInfo& sdlNotification) const;
+	void SendCachedUndoRedoNotificationsToSubscriber(
+				const QByteArray& subscriptionId,
+				const QByteArray& userId,
+				const imtrest::IRequest& networkRequest) const;
 
 	template<class Representation>
 	void PublishRepresentation(
@@ -140,11 +152,22 @@ private:
 	I_ATTR(int, m_closeDocumentTimeoutAttrPtr);
 
 private:
+	struct CachedUndoRedoState
+	{
+		bool isDirty = false;
+		int availableUndoSteps = 0;
+		int availableRedoSteps = 0;
+		QList<QByteArray> undoLevelDescriptions;
+		QList<QByteArray> redoLevelDescriptions;
+	};
+
 	struct TrackedDocument
 	{
 		QByteArray userId;
 		bool hasIndividualSubscription = false; ///< \c true after the first individual OnDocumentChanged subscription for this document.
 		qint64 lastSubscriberSeenSecs = 0; ///< Timestamp (in seconds since epoch) of the last moment an active subscriber was observed.
+		bool hasUndoRedoState = false;
+		CachedUndoRedoState undoRedoState;
 	};
 
 	mutable QMutex m_trackedDocumentsMutex;
