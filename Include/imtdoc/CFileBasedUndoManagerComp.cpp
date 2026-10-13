@@ -220,6 +220,7 @@ bool CFileBasedUndoManagerComp::Serialize(iser::IArchive& archive)
 	}
 
 	if (!archive.IsStoring() && !retVal){
+		SetStepFileAutoRemoveEnabled(false);
 		RemoveStoredStepsFromDisk();
 
 		m_undoList.clear();
