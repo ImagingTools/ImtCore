@@ -6,6 +6,7 @@
 // Qt includes
 #include <QtCore/QDateTime>
 #include <QtCore/QList>
+#include <QtCore/QMetaObject>
 #include <QtCore/QPair>
 
 // STL includes
@@ -76,7 +77,13 @@ bool CCollectionDocumentServicePublisherComp::RegisterSubscription(
 	MarkIndividualSubscription(userId, GetSubscribedDocumentId(gqlRequest));
 
 	if (gqlRequest.GetCommandId() == sdl::V1_0::imtbase::COnUndoRedoChangedGqlRequest::GetCommandId()){
-		SendCachedUndoRedoNotificationsToSubscriber(subscriptionId, userId, networkRequest);
+		QMetaObject::invokeMethod(
+			this,
+			[this, subscriptionId, userId]()
+			{
+				SendCachedUndoRedoNotificationsToSubscriber(subscriptionId, userId);
+			},
+			Qt::QueuedConnection);
 	}
 
 	return true;
@@ -557,8 +564,7 @@ void CCollectionDocumentServicePublisherComp::FillUndoInfoFromCache(
 
 void CCollectionDocumentServicePublisherComp::SendCachedUndoRedoNotificationsToSubscriber(
 			const QByteArray& subscriptionId,
-			const QByteArray& userId,
-			const imtrest::IRequest& networkRequest) const
+			const QByteArray& userId) const
 {
 	if (subscriptionId.isEmpty() || userId.isEmpty()){
 		return;
@@ -586,6 +592,22 @@ void CCollectionDocumentServicePublisherComp::SendCachedUndoRedoNotificationsToS
 		}
 	}
 
+	QMutexLocker locker(&m_mutex);
+	const imtrest::IRequest* networkRequestPtr = nullptr;
+	for (const RequestNetworks& entry : m_registeredSubscribers){
+		auto foundIter = entry.networkRequests.constFind(subscriptionId);
+		if (foundIter == entry.networkRequests.constEnd()){
+			continue;
+		}
+
+		networkRequestPtr = foundIter.value();
+		break;
+	}
+
+	if (networkRequestPtr == nullptr){
+		return;
+	}
+
 	for (const sdl::V1_0::imtbase::CUndoInfo& notification : notifications){
 		QJsonObject jsonObject;
 		if (!notification.WriteToJsonObject(jsonObject)){
@@ -600,7 +622,7 @@ void CCollectionDocumentServicePublisherComp::SendCachedUndoRedoNotificationsToS
 			subscriptionId,
 			sdl::V1_0::imtbase::COnUndoRedoChangedGqlRequest::GetCommandId(),
 			jsonDoc.toJson(QJsonDocument::Compact),
-			networkRequest);
+			*networkRequestPtr);
 	}
 }
 
