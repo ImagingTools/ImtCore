@@ -6,6 +6,7 @@
 // Qt includes
 #include <QtCore/QDateTime>
 #include <QtCore/QList>
+#include <QtCore/QMetaObject>
 #include <QtCore/QPair>
 
 // STL includes
@@ -72,7 +73,17 @@ bool CCollectionDocumentServicePublisherComp::RegisterSubscription(
 		return false;
 	}
 
-	MarkIndividualSubscription(GetSubscriberUserId(gqlRequest), GetSubscribedDocumentId(gqlRequest));
+	const QByteArray userId = GetSubscriberUserId(gqlRequest);
+	MarkIndividualSubscription(userId, GetSubscribedDocumentId(gqlRequest));
+
+	if (gqlRequest.GetCommandId() == sdl::V1_0::imtbase::COnUndoRedoChangedGqlRequest::GetCommandId()){
+		QMetaObject::invokeMethod(
+			this,
+			"SendCachedUndoRedoNotificationsToSubscriber",
+			Qt::QueuedConnection,
+			Q_ARG(QByteArray, subscriptionId),
+			Q_ARG(QByteArray, userId));
+	}
 
 	return true;
 }
@@ -223,26 +234,38 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentUndoRedoChanged(imtdoc::
 		return false;
 	}
 
-	sdl::V1_0::imtbase::CUndoInfo sdlNotification;
-
-	sdlNotification.documentId = concreteEventPtr->GetDocumentId();
-	sdlNotification.status.emplace().status = sdl::V1_0::imtbase::EUndoStatus::Success;
-	sdlNotification.isDirty = concreteEventPtr->IsDocumentDirty();
-
 	const idoc::IUndoManager& undoManager = concreteEventPtr->GetUndoManager();
-	int availableUndoSteps = undoManager.GetAvailableUndoSteps();
-	int availableRedoSteps = undoManager.GetAvailableRedoSteps();
+	CachedUndoRedoState cachedState;
+	cachedState.isDirty = concreteEventPtr->IsDocumentDirty();
+	cachedState.availableUndoSteps = undoManager.GetAvailableUndoSteps();
+	cachedState.availableRedoSteps = undoManager.GetAvailableRedoSteps();
+	cachedState.undoLevelDescriptions.reserve(cachedState.availableUndoSteps);
+	cachedState.redoLevelDescriptions.reserve(cachedState.availableRedoSteps);
+	for (int i = 0; i < cachedState.availableUndoSteps; i++){
+		cachedState.undoLevelDescriptions.append(undoManager.GetUndoLevelDescription(i));
+	}
+	for (int i = 0; i < cachedState.availableRedoSteps; i++){
+		cachedState.redoLevelDescriptions.append(undoManager.GetRedoLevelDescription(i));
+	}
 
-	sdlNotification.availableUndoSteps = availableUndoSteps;
-	sdlNotification.availableRedoSteps = availableRedoSteps;
-	sdlNotification.undoLevelDescriptions.emplace();
-	sdlNotification.redoLevelDescriptions.emplace();
-	for (int i = 0; i < availableUndoSteps; i++){
-		sdlNotification.undoLevelDescriptions->append(undoManager.GetUndoLevelDescription(i));
+	const QByteArray documentId = concreteEventPtr->GetDocumentId();
+	{
+		QMutexLocker locker(&m_trackedDocumentsMutex);
+		TrackedDocument& trackedDocument = m_trackedDocuments[documentId];
+		trackedDocument.userId = concreteEventPtr->GetUserId();
+		trackedDocument.hasUndoRedoState = true;
+		trackedDocument.undoRedoState = cachedState;
 	}
-	for (int i = 0; i < availableRedoSteps; i++){
-		sdlNotification.redoLevelDescriptions->append(undoManager.GetRedoLevelDescription(i));
-	}
+
+	sdl::V1_0::imtbase::CUndoInfo sdlNotification;
+	FillUndoInfoFromCache(
+		documentId,
+		cachedState.isDirty,
+		cachedState.availableUndoSteps,
+		cachedState.availableRedoSteps,
+		cachedState.undoLevelDescriptions,
+		cachedState.redoLevelDescriptions,
+		sdlNotification);
 
 	PublishRepresentation(
 		sdl::V1_0::imtbase::COnUndoRedoChangedGqlRequest::GetCommandId(),
@@ -510,6 +533,96 @@ QByteArray CCollectionDocumentServicePublisherComp::GetSubscriberUserId(const im
 	}
 
 	return QByteArray();
+}
+
+
+void CCollectionDocumentServicePublisherComp::FillUndoInfoFromCache(
+			const QByteArray& documentId,
+			bool isDirty,
+			int availableUndoSteps,
+			int availableRedoSteps,
+			const QList<QString>& undoLevelDescriptions,
+			const QList<QString>& redoLevelDescriptions,
+			sdl::V1_0::imtbase::CUndoInfo& sdlNotification) const
+{
+	sdlNotification.documentId = documentId;
+	sdlNotification.status.emplace().status = sdl::V1_0::imtbase::EUndoStatus::Success;
+	sdlNotification.isDirty = isDirty;
+	sdlNotification.availableUndoSteps = availableUndoSteps;
+	sdlNotification.availableRedoSteps = availableRedoSteps;
+	sdlNotification.undoLevelDescriptions.emplace();
+	sdlNotification.redoLevelDescriptions.emplace();
+	for (const QString& levelDescription : undoLevelDescriptions){
+		sdlNotification.undoLevelDescriptions->append(levelDescription);
+	}
+	for (const QString& levelDescription : redoLevelDescriptions){
+		sdlNotification.redoLevelDescriptions->append(levelDescription);
+	}
+}
+
+
+void CCollectionDocumentServicePublisherComp::SendCachedUndoRedoNotificationsToSubscriber(
+			const QByteArray& subscriptionId,
+			const QByteArray& userId)
+{
+	if (subscriptionId.isEmpty() || userId.isEmpty()){
+		return;
+	}
+
+	QMutexLocker subscribersLocker(&m_mutex);
+	QList<sdl::V1_0::imtbase::CUndoInfo> notifications;
+	{
+		QMutexLocker trackedDocumentsLocker(&m_trackedDocumentsMutex);
+		for (auto it = m_trackedDocuments.constBegin(); it != m_trackedDocuments.constEnd(); ++it){
+			const TrackedDocument& trackedDocument = it.value();
+			if (trackedDocument.userId != userId || !trackedDocument.hasUndoRedoState){
+				continue;
+			}
+
+			sdl::V1_0::imtbase::CUndoInfo notification;
+			FillUndoInfoFromCache(
+				it.key(),
+				trackedDocument.undoRedoState.isDirty,
+				trackedDocument.undoRedoState.availableUndoSteps,
+				trackedDocument.undoRedoState.availableRedoSteps,
+				trackedDocument.undoRedoState.undoLevelDescriptions,
+				trackedDocument.undoRedoState.redoLevelDescriptions,
+				notification);
+			notifications.append(notification);
+		}
+	}
+
+	const imtrest::IRequest* networkRequestPtr = nullptr;
+	for (const RequestNetworks& entry : m_registeredSubscribers){
+		auto foundIter = entry.networkRequests.constFind(subscriptionId);
+		if (foundIter == entry.networkRequests.constEnd()){
+			continue;
+		}
+
+		networkRequestPtr = foundIter.value();
+		break;
+	}
+
+	if (networkRequestPtr == nullptr){
+		return;
+	}
+
+	for (const sdl::V1_0::imtbase::CUndoInfo& notification : notifications){
+		QJsonObject jsonObject;
+		if (!notification.WriteToJsonObject(jsonObject)){
+			Q_ASSERT(false);
+			continue;
+		}
+
+		QJsonDocument jsonDoc;
+		jsonDoc.setObject(jsonObject);
+
+		PushDataToSubscriber(
+			subscriptionId,
+			sdl::V1_0::imtbase::COnUndoRedoChangedGqlRequest::GetCommandId(),
+			jsonDoc.toJson(QJsonDocument::Compact),
+			*networkRequestPtr);
+	}
 }
 
 
