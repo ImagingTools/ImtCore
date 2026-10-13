@@ -569,9 +569,10 @@ void CCollectionDocumentServicePublisherComp::SendCachedUndoRedoNotificationsToS
 		return;
 	}
 
+	QMutexLocker subscribersLocker(&m_mutex);
 	QList<sdl::V1_0::imtbase::CUndoInfo> notifications;
 	{
-		QMutexLocker locker(&m_trackedDocumentsMutex);
+		QMutexLocker trackedDocumentsLocker(&m_trackedDocumentsMutex);
 		for (auto it = m_trackedDocuments.constBegin(); it != m_trackedDocuments.constEnd(); ++it){
 			const TrackedDocument& trackedDocument = it.value();
 			if (trackedDocument.userId != userId || !trackedDocument.hasUndoRedoState){
@@ -591,7 +592,6 @@ void CCollectionDocumentServicePublisherComp::SendCachedUndoRedoNotificationsToS
 		}
 	}
 
-	QMutexLocker locker(&m_mutex);
 	const imtrest::IRequest* networkRequestPtr = nullptr;
 	for (const RequestNetworks& entry : m_registeredSubscribers){
 		auto foundIter = entry.networkRequests.constFind(subscriptionId);
