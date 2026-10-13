@@ -13,7 +13,7 @@ namespace ImtLicenseGqlPck
 I_EXPORT_PACKAGE(
 		"ImtLicenseGqlPck",
 		"ImagingTools license management Gql-component package",
-		IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
+		IM_PROJECT(R"("ImagingTools Core Framework")") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
 			ProductCollectionController,
@@ -34,11 +34,6 @@ I_EXPORT_COMPONENT(
 			LicenseCollectionController,
 			"LicenseCollectionController",
 			"Product License Collection Controller");
-
-I_EXPORT_COMPONENT(
-			AccountController,
-			"AccountController",
-			"Account Controller");
 
 I_EXPORT_COMPONENT(
 			ProductPermissionController,
@@ -87,5 +82,4 @@ I_EXPORT_COMPONENT(
 
 
 } // namespace ImtLicenseGqlPck
-
 
