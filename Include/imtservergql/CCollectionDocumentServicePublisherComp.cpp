@@ -79,11 +79,10 @@ bool CCollectionDocumentServicePublisherComp::RegisterSubscription(
 	if (gqlRequest.GetCommandId() == sdl::V1_0::imtbase::COnUndoRedoChangedGqlRequest::GetCommandId()){
 		QMetaObject::invokeMethod(
 			this,
-			[this, subscriptionId, userId]()
-			{
-				SendCachedUndoRedoNotificationsToSubscriber(subscriptionId, userId);
-			},
-			Qt::QueuedConnection);
+			"SendCachedUndoRedoNotificationsToSubscriber",
+			Qt::QueuedConnection,
+			Q_ARG(QByteArray, subscriptionId),
+			Q_ARG(QByteArray, userId));
 	}
 
 	return true;
@@ -542,8 +541,8 @@ void CCollectionDocumentServicePublisherComp::FillUndoInfoFromCache(
 			bool isDirty,
 			int availableUndoSteps,
 			int availableRedoSteps,
-			const QList<QByteArray>& undoLevelDescriptions,
-			const QList<QByteArray>& redoLevelDescriptions,
+			const QList<QString>& undoLevelDescriptions,
+			const QList<QString>& redoLevelDescriptions,
 			sdl::V1_0::imtbase::CUndoInfo& sdlNotification) const
 {
 	sdlNotification.documentId = documentId;
@@ -553,10 +552,10 @@ void CCollectionDocumentServicePublisherComp::FillUndoInfoFromCache(
 	sdlNotification.availableRedoSteps = availableRedoSteps;
 	sdlNotification.undoLevelDescriptions.emplace();
 	sdlNotification.redoLevelDescriptions.emplace();
-	for (const QByteArray& levelDescription : undoLevelDescriptions){
+	for (const QString& levelDescription : undoLevelDescriptions){
 		sdlNotification.undoLevelDescriptions->append(levelDescription);
 	}
-	for (const QByteArray& levelDescription : redoLevelDescriptions){
+	for (const QString& levelDescription : redoLevelDescriptions){
 		sdlNotification.redoLevelDescriptions->append(levelDescription);
 	}
 }
@@ -564,7 +563,7 @@ void CCollectionDocumentServicePublisherComp::FillUndoInfoFromCache(
 
 void CCollectionDocumentServicePublisherComp::SendCachedUndoRedoNotificationsToSubscriber(
 			const QByteArray& subscriptionId,
-			const QByteArray& userId) const
+			const QByteArray& userId)
 {
 	if (subscriptionId.isEmpty() || userId.isEmpty()){
 		return;

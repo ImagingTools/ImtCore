@@ -125,12 +125,9 @@ protected:
 				bool isDirty,
 				int availableUndoSteps,
 				int availableRedoSteps,
-				const QList<QByteArray>& undoLevelDescriptions,
-				const QList<QByteArray>& redoLevelDescriptions,
+				const QList<QString>& undoLevelDescriptions,
+				const QList<QString>& redoLevelDescriptions,
 				sdl::V1_0::imtbase::CUndoInfo& sdlNotification) const;
-	void SendCachedUndoRedoNotificationsToSubscriber(
-				const QByteArray& subscriptionId,
-				const QByteArray& userId) const;
 
 	template<class Representation>
 	void PublishRepresentation(
@@ -144,6 +141,9 @@ protected Q_SLOTS:
 		subscription and whose grace period without an active subscriber has elapsed.
 	*/
 	void CloseIdleDocuments();
+	void SendCachedUndoRedoNotificationsToSubscriber(
+				const QByteArray& subscriptionId,
+				const QByteArray& userId);
 
 private:
 	I_REF(imtdoc::IDocumentService, m_documentServiceCompPtr);
@@ -156,8 +156,8 @@ private:
 		bool isDirty = false;
 		int availableUndoSteps = 0;
 		int availableRedoSteps = 0;
-		QList<QByteArray> undoLevelDescriptions;
-		QList<QByteArray> redoLevelDescriptions;
+		QList<QString> undoLevelDescriptions;
+		QList<QString> redoLevelDescriptions;
 	};
 
 	struct TrackedDocument
