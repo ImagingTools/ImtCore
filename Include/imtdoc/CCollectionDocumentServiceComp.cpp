@@ -66,7 +66,12 @@ bool CCollectionDocumentServiceComp::LoadFromFile(const QString& filePath)
 		return false;
 	}
 
-	return RestoreDocumentMap(documentMap);
+	// The loaded state must not be written back to the file while it is being restored
+	m_isStateLoading = true;
+	const bool retVal = RestoreDocumentMap(documentMap);
+	m_isStateLoading = false;
+
+	return retVal;
 }
 
 
@@ -80,6 +85,8 @@ bool CCollectionDocumentServiceComp::SaveToFile(const QString& filePath) const
 
 	DocumentMap documentMap;
 	PrepareDocumentMap(documentMap);
+
+	QMutexLocker locker(&m_stateFileMutex);
 
 	const QByteArray fileData = QJsonDocument(DocumentMapToJson(documentMap)).toJson(QJsonDocument::Indented);
 
@@ -155,16 +162,22 @@ void CCollectionDocumentServiceComp::OnComponentCreated()
 }
 
 
-void CCollectionDocumentServiceComp::OnComponentDestroyed()
+// reimplemented (istd::IChangeable)
+
+void CCollectionDocumentServiceComp::OnEndChanges(const ChangeSet& changeSet)
 {
-	if (IsStatePersistenceEnabled()){
-		const QString filePath = GetStateFilePath();
-		if (!filePath.isEmpty()){
-			SaveToFile(filePath);
-		}
+	if (m_isStateLoading || !IsStatePersistenceEnabled()){
+		BaseClass::OnEndChanges(changeSet);
+
+		return;
 	}
 
-	BaseClass::OnComponentDestroyed();
+	const QString filePath = GetStateFilePath();
+	if (!filePath.isEmpty()){
+		SaveToFile(filePath);
+	}
+
+	BaseClass::OnEndChanges(changeSet);
 }
 
 

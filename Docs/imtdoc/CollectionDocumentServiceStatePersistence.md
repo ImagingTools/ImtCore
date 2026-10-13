@@ -17,7 +17,7 @@ documents to/from a JSON file.
 | Attribute | Type | Description |
 |---|---|---|
 | `StateFilePath` | `ifile::IFileNameParam` (optional) | Path of the state file. |
-| `StatePersistenceEnabler` | `iprm::IEnableableParam` (optional) | When enabled, the state is restored from `StateFilePath` on component creation (if the file exists) and saved to it on component destruction. |
+| `StatePersistenceEnabler` | `iprm::IEnableableParam` (optional) | When enabled, the state is restored from `StateFilePath` on component creation (if the file exists) and saved to it after each change of the service data model (`OnEndChanges`: document created/opened/closed/saved/renamed). Changes caused by `LoadFromFile` itself are not written back. |
 
 ## File content
 

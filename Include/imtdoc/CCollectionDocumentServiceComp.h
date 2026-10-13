@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QJsonObject>
+#include <QtCore/QMutex>
 
 // ACF includes
 #include <ifile/IFileNameParam.h>
@@ -37,7 +38,8 @@ namespace imtdoc
 	  \c SaveToFile for persisting the list of opened documents in JSON format.
 	- \c "StatePersistenceEnabler" — optional switch.  When enabled, the
 	  list of opened documents is restored from \c "StateFilePath" on
-	  component creation and saved to it on component destruction.
+	  component creation and saved to it after each change of the service
+	  data model (open/create/close/save/rename of documents).
 
 	The JSON file contains the same information as \c Serialize (user IDs
 	and the metadata of their opened documents); document data is not stored.
@@ -57,7 +59,7 @@ public:
 		I_ASSIGN(m_collectionCompPtr, "Collection", "Document collection containing related documents", true, "Collection");
 		I_ASSIGN(m_isSingleCopyModeAttrPtr, "IsSingleCopyMode", "When enabled, all users share a single copy of each document", false, false);
 		I_ASSIGN(m_stateFilePathCompPtr, "StateFilePath", "File path used to save/restore the list of opened documents", false, "StateFilePath");
-		I_ASSIGN(m_statePersistenceEnablerCompPtr, "StatePersistenceEnabler", "Enables restoring of opened documents on component creation and saving on component destruction", false, "StatePersistenceEnabler");
+		I_ASSIGN(m_statePersistenceEnablerCompPtr, "StatePersistenceEnabler", "Enables restoring of opened documents on component creation and saving on each data model change", false, "StatePersistenceEnabler");
 	I_END_COMPONENT
 
 	/**
@@ -84,7 +86,9 @@ public:
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed() override;
+
+	// reimplemented (istd::IChangeable)
+	virtual void OnEndChanges(const ChangeSet& changeSet) override;
 
 	// reimplemented (imtdoc::TCollectionDocumentServiceWrap)
 	virtual imtbase::IObjectCollection* GetCollection() const override;
@@ -130,6 +134,9 @@ private:
 	I_ATTR(bool, m_isSingleCopyModeAttrPtr);
 	I_REF(ifile::IFileNameParam, m_stateFilePathCompPtr);
 	I_REF(iprm::IEnableableParam, m_statePersistenceEnablerCompPtr);
+
+	bool m_isStateLoading = false;
+	mutable QMutex m_stateFileMutex;
 };
 
 
