@@ -2,15 +2,13 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QDate>
-
 // ACF includes
 #include <imod/CModelUpdateBridge.h>
+#include <imod/TModelWrap.h>
 
-// ImtBase includes
-#include <imtaccount/IContactInfo.h>
+// ImtCore includes
 #include <imtaccount/CAddressCollection.h>
+#include <imtaccount/IContactInfo.h>
 
 
 namespace imtaccount
@@ -27,13 +25,11 @@ public:
 	// reimplemented (IContactInfo)
 	virtual QString GetEmail() const override;
 	virtual void SetEmail(const QString& email) override;
-	virtual GenderType GetGenderType() const override;
-	virtual void SetGenderType(GenderType genderType) override;
-	virtual QDate GetBirthday() const override;
-	virtual void SetBirthday(const QDate& birthday) override;
-	virtual QString GetNameField(NameFieldType fieldType) const override;
-	virtual void SetNameField(NameFieldType fieldType, const QString& value) override;
-	virtual const IAddressProvider* GetAddresses() const override;
+	virtual QString GetPhone() const override;
+	virtual void SetPhone(const QString& phone) override;
+	virtual QString GetWebPage() const override;
+	virtual void SetWebPage(const QString& webPage) override;
+	virtual IAddressProvider* GetAddresses() const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -46,11 +42,8 @@ public:
 
 private:
 	QString m_email;
-	GenderType m_genderType;
-	QDate m_birthday;
-	QString m_firstName;
-	QString m_lastName;
-	QString m_nickName;
+	QString m_phone;
+	QString m_webPage;
 
 	imod::TModelWrap<CAddressCollection> m_addresses;
 
@@ -59,5 +52,3 @@ private:
 
 
 } // namespace imtaccount
-
-
