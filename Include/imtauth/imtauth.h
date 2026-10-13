@@ -26,15 +26,18 @@ inline QString GetUserName(const imtbase::IObjectCollection& userCollection, con
 		return QString();
 	}
 
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (userCollection.GetObjectData(userId, dataPtr)){
-		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
-		if (userInfoPtr != nullptr){
-			return userInfoPtr->GetName();
+	QString userName = userCollection.GetElementInfo(userId, imtbase::ICollectionInfo::EIT_NAME).toString();
+	if (userName.isEmpty()){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (userCollection.GetObjectData(userId, dataPtr)){
+			const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+			if (userInfoPtr != nullptr){
+				userName = userInfoPtr->GetName();
+			}
 		}
 	}
 
-	return QString();
+	return userName;
 }
 
 
