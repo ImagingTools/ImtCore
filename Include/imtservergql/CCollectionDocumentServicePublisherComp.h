@@ -193,6 +193,7 @@ void CCollectionDocumentServicePublisherComp::PublishRepresentation(
 
 	QByteArray data = jsonDoc.toJson(QJsonDocument::Compact);
 
+	QMutexLocker locker(&m_mutex);
 	for (const RequestNetworks& networkRequest : m_registeredSubscribers){
 		if (!userId.isEmpty()){
 			const imtgql::IGqlContext* contextPtr = networkRequest.gqlRequest.GetRequestContext();
