@@ -232,10 +232,14 @@ void CWebSocketClientComp::OnComponentCreated()
 	connect(&m_webSocket, &QWebSocket::binaryMessageReceived, this, &CWebSocketClientComp::OnWebSocketBinaryMessageReceived);
 	connect(this, &CWebSocketClientComp::EmitSendTextMessage, this, &CWebSocketClientComp::OnSendTextMessage);
 	connect(this, &CWebSocketClientComp::EmitWebSocketClose, &m_webSocket, &QWebSocket::close);
-	connect(this, SIGNAL(EmitStartTimer()), &m_refreshTimer, SLOT(start()), Qt::QueuedConnection);
-	connect(this, SIGNAL(EmitStopTimer()), &m_refreshTimer, SLOT(stop()), Qt::QueuedConnection);
-	connect(&m_webSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(OnWebSocketError(QAbstractSocket::SocketError)));
-	connect(&m_webSocket, SIGNAL(sslErrors(const QList<QSslError>&)), this, SLOT(OnSslErrors(const QList<QSslError>&)));
+	connect(this, &CWebSocketClientComp::EmitStartTimer, &m_refreshTimer, qOverload<>(&QTimer::start), Qt::QueuedConnection);
+	connect(this, &CWebSocketClientComp::EmitStopTimer, &m_refreshTimer, &QTimer::stop, Qt::QueuedConnection);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+	connect(&m_webSocket, &QWebSocket::errorOccurred, this, &CWebSocketClientComp::OnWebSocketError);
+#else
+	connect(&m_webSocket, qOverload<QAbstractSocket::SocketError>(&QWebSocket::error), this, &CWebSocketClientComp::OnWebSocketError);
+#endif
+	connect(&m_webSocket, &QWebSocket::sslErrors, this, &CWebSocketClientComp::OnSslErrors);
 
 	connect(&m_refreshTimer, &QTimer::timeout, this, &CWebSocketClientComp::OnTimeout);
 
