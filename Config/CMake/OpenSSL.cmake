@@ -23,8 +23,19 @@ if(WIN32)
 		${OPENSSLDIR}/lib/${OPENSSL_WIN_ARCH}/libssl.lib
 	)
 elseif(ANDROID)
-	file(GLOB OPENSSL_ANDROID_CRYPTO ${OPENSSLDIR}/lib/android/libcrypto_*.so)
-	file(GLOB OPENSSL_ANDROID_SSL ${OPENSSLDIR}/lib/android/libssl_*.so)
+	if(CMAKE_ANDROID_ARCH_ABI)
+		set(OPENSSL_ANDROID_ABI ${CMAKE_ANDROID_ARCH_ABI})
+	else()
+		set(OPENSSL_ANDROID_ABI ${ANDROID_ABI})
+	endif()
+
+	set(OPENSSL_ANDROID_LIB_DIR ${OPENSSLDIR}/lib/android/${OPENSSL_ANDROID_ABI})
+	if(NOT EXISTS ${OPENSSL_ANDROID_LIB_DIR})
+		message(FATAL_ERROR "OpenSSL libraries for Android ABI '${OPENSSL_ANDROID_ABI}' not found in ${OPENSSL_ANDROID_LIB_DIR}")
+	endif()
+
+	file(GLOB OPENSSL_ANDROID_CRYPTO ${OPENSSL_ANDROID_LIB_DIR}/libcrypto_*.so)
+	file(GLOB OPENSSL_ANDROID_SSL ${OPENSSL_ANDROID_LIB_DIR}/libssl_*.so)
 
 	target_link_libraries(${PROJECT_NAME} PUBLIC 
 		${OPENSSL_ANDROID_CRYPTO} 
