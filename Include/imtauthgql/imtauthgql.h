@@ -31,6 +31,7 @@
 #include <QtCore/QByteArrayList>
 #include <imtauth/IUserInfo.h>
 #include <imtauth/IUserGroupInfoProvider.h>
+#include <imtauth/imtauth.h>
 
 
 /**
@@ -633,6 +634,7 @@ namespace imtauthgql
 
 /**
 	Collect flat permission entries from a feature subtree.
+	A permission is identified by the full path of its feature, e.g. "/Administration/EditUser/AddUser".
 	When allowedPermissionsPtr is set, returns only entries reachable from selected nodes.
 */
 template<typename TEntry>
@@ -641,15 +643,15 @@ inline bool CollectPermissionEntries(
 			imtsdl::TElementList<TEntry>& entries,
 			const QByteArray& languageId,
 			const QSet<QByteArray>* allowedPermissionsPtr,
-			const QString& parentPath,
+			const QString& parentName,
 			const iqt::ITranslationManager* translationManagerPtr,
-			bool parentSelected = false)
+			bool parentSelected = false,
+			bool usePath = true)
 {
 	if (!featureInfo.IsPermission()){
 		return false;
 	}
 
-	QByteArray featureId = featureInfo.GetFeatureId();
 	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
 
 	QString featureName = featureInfo.GetFeatureName();
@@ -657,10 +659,13 @@ inline bool CollectPermissionEntries(
 		featureName = iqt::GetTranslation(translationManagerPtr, featureName.toUtf8(), languageId, QByteArrayLiteral("Feature"));
 	}
 
-	QString displayName = parentPath.isEmpty() ? featureName : (parentPath + QStringLiteral(" / ") + featureName);
+	QString displayName = parentName.isEmpty() ? featureName : (parentName + QStringLiteral(" / ") + featureName);
+	QByteArray currentPath = imtlic::CalculateFeaturePath(featureInfo);
 
 	if (subFeatures.isEmpty()){
-		if (allowedPermissionsPtr != nullptr && !parentSelected && !allowedPermissionsPtr->contains(featureId)){
+		// Held permissions may still be stored by feature id alone, so what the
+		// user holds is matched against the tree by the common rule.
+		if (allowedPermissionsPtr != nullptr && !parentSelected && !imtauth::HasPermission(*allowedPermissionsPtr, currentPath)){
 			return false;
 		}
 
@@ -670,7 +675,7 @@ inline bool CollectPermissionEntries(
 		}
 
 		TEntry entry;
-		entry.permissionId = featureId;
+		entry.permissionId = usePath ? currentPath : featureInfo.GetFeatureId();
 		entry.displayName = displayName;
 		entry.description = featureDescription;
 		entries.append(entry);
@@ -680,7 +685,8 @@ inline bool CollectPermissionEntries(
 
 	imtsdl::TElementList<TEntry> childEntries;
 	int childCount = 0;
-	const bool thisNodeSelected = parentSelected || (allowedPermissionsPtr != nullptr && allowedPermissionsPtr->contains(featureId));
+	const bool thisNodeSelected = parentSelected
+				|| (allowedPermissionsPtr != nullptr && imtauth::HasPermission(*allowedPermissionsPtr, currentPath));
 
 	for (int i = 0; i < subFeatures.count(); i++){
 		const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr = subFeatures.at(i);
@@ -700,7 +706,8 @@ inline bool CollectPermissionEntries(
 					allowedPermissionsPtr,
 					displayName,
 					translationManagerPtr,
-					thisNodeSelected)){
+					thisNodeSelected,
+					usePath)){
 			childCount++;
 		}
 	}
@@ -763,7 +770,8 @@ inline void BuildPermissionGroups(
 
 		const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
 		bool hasEntries = false;
-		const bool groupSelected = (allowedPermissionsPtr != nullptr && allowedPermissionsPtr->contains(groupId));
+		const bool groupSelected = (allowedPermissionsPtr != nullptr
+					&& imtauth::HasPermission(*allowedPermissionsPtr, imtlic::CalculateFeaturePath(*featureInfoPtr)));
 
 		if (subFeatures.isEmpty()){
 			hasEntries = CollectPermissionEntries<TEntry>(
@@ -847,7 +855,8 @@ inline void BuildPermissionGroupsFromProvider(
 
 		const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
 		bool hasEntries = false;
-		const bool groupSelected = (allowedPermissionsPtr != nullptr && allowedPermissionsPtr->contains(groupId));
+		const bool groupSelected = (allowedPermissionsPtr != nullptr
+					&& imtauth::HasPermission(*allowedPermissionsPtr, imtlic::CalculateFeaturePath(*featureInfoPtr)));
 
 		if (subFeatures.isEmpty()){
 			hasEntries = CollectPermissionEntries<TEntry>(
@@ -857,7 +866,8 @@ inline void BuildPermissionGroupsFromProvider(
 					allowedPermissionsPtr,
 					QString(),
 					translationManagerPtr,
-					groupSelected);
+					groupSelected,
+					false);
 		}
 		else{
 			for (int i = 0; i < subFeatures.count(); i++){
@@ -872,7 +882,8 @@ inline void BuildPermissionGroupsFromProvider(
 							allowedPermissionsPtr,
 							QString(),
 							translationManagerPtr,
-							groupSelected)){
+							groupSelected,
+							false)){
 						hasEntries = true;
 					}
 				}
@@ -1051,8 +1062,9 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	// CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery stores
 	// TenantEntityBindings.EntityType as GetTableName(), not the collection ID.
 	const QByteArray groupsEntity = QByteArrayLiteral("UserGroups");
+	const QByteArray permsEntity = QByteArrayLiteral("Permissions");
 
-	// Filter roles/groups according to tenant context.
+	// Filter roles/groups/permissions according to tenant context.
 	// empty tenantId: keep only entities with no tenant bindings at all (globals).
 	// non-empty tenantId: keep only entities bound to this tenant.
 	bool anyFilterChange = false;
@@ -1080,6 +1092,20 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 			filteredGroups.append(gid);
 		} else {
 			anyFilterChange = true;
+		}
+	}
+
+	QByteArrayList filteredPerms;
+	if (!productId.isEmpty()){
+		QByteArrayList userPerms = userInfoPtr->GetPermissions(productId);
+		for (int i = 0; i < userPerms.size(); ++i){
+			const QByteArray pid = userPerms.at(i);
+			if (pid.isEmpty()) continue;
+			if (ShouldKeepEntityForTenant(bindingManager, tenantId, permsEntity, pid)){
+				filteredPerms.append(pid);
+			} else {
+				anyFilterChange = true;
+			}
 		}
 	}
 
@@ -1144,6 +1170,7 @@ inline istd::IChangeableUniquePtr AdaptUserForTenant(
 	if (anyFilterChange){
 		if (!productId.isEmpty()){
 			adaptedUserInfoPtr->SetRoles(productId, filteredRoles);
+			adaptedUserInfoPtr->SetLocalPermissions(productId, filteredPerms);
 		}
 		// reset groups to filtered list
 		QByteArrayList currGroups = adaptedUserInfoPtr->GetGroups();

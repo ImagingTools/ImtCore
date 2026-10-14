@@ -16,7 +16,7 @@ import Qt.labs.settings 1.0
 QtObject {
 	id: root;
 	
-	property string context: ""
+	property string permissionPath: ""
 	property string productId: "";
 	
 	signal userModeChanged(string userMode);
@@ -115,7 +115,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender __pendingInvitationsRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_getMyTenantInvitations
 
 		sdlObjectComp: Component {
@@ -731,7 +731,7 @@ QtObject {
 	}
 	
 	property GqlSdlRequestSender registerUserRequestSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1; // Mutation
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_registerUser;
 
@@ -758,7 +758,7 @@ QtObject {
 	
 	property ChangePasswordInput changePasswordInput : ChangePasswordInput {}
 	property GqlSdlRequestSender changePasswordGqlSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		id: changePasswordRequestSender;
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_changePassword;
 		
@@ -783,7 +783,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender logoutGqlSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_logout;
 		inputObjectComp: Component {
 			TokenInput {}
@@ -799,7 +799,7 @@ QtObject {
 
 	property TokenInput getPermissionsInput: TokenInput {}
 	property GqlSdlRequestSender getPermissionsGqlSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1;
 		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_getPermissions;
 
@@ -825,7 +825,7 @@ QtObject {
 	}
 	
 	property GqlSdlRequestSender refreshTokenGqlSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1;
 		gqlCommandId: ImtauthSessionsSdlCommandIds.s_refreshToken;
 		inputObjectComp: Component {
@@ -880,7 +880,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender refreshTokenForLoginGqlSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1;
 		gqlCommandId: ImtauthSessionsSdlCommandIds.s_refreshToken;
 	
@@ -930,7 +930,7 @@ QtObject {
 
 	property SelectTenantInput selectTenantInput: SelectTenantInput {}
 	property GqlSdlRequestSender selectTenantGqlSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1;
 		gqlCommandId: ImtauthSessionsSdlCommandIds.s_selectTenant;
 

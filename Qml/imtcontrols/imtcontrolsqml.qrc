@@ -156,6 +156,8 @@
                 <file alias="imtcontrols/Views/BasicTableView.qml">Views/BasicTableView.qml</file>
                 <file alias="imtcontrols/Views/BasicTreeView.qml">Views/BasicTreeView.qml</file>
                 <file alias="imtcontrols/Views/TreeExplorerView.qml">Views/TreeExplorerView.qml</file>
+                <file alias="imtcontrols/Views/TableColumnLayout.qml">Views/TableColumnLayout.qml</file>
+                <file alias="imtcontrols/Views/TableRowDetails.qml">Views/TableRowDetails.qml</file>
                 <file alias="imtcontrols/Views/CheckableListPanel.qml">Views/CheckableListPanel.qml</file>
                 <file alias="imtcontrols/Views/EditableTableCell.qml">Views/EditableTableCell.qml</file>
                 <file alias="imtcontrols/Views/ToolbarButton.qml">Views/ToolbarButton.qml</file>
@@ -179,6 +181,7 @@
                 <file alias="imtcontrols/Views/SwitchCustom.qml">Views/SwitchCustom.qml</file>
                 <file alias="imtcontrols/Views/TreeItemDelegate.qml">Views/TreeItemDelegate.qml</file>
                 <file alias="imtcontrols/Views/TreeViewGql.qml">Views/TreeViewGql.qml</file>
+                <file alias="imtcontrols/Views/TreeViewPure.qml">Views/TreeViewPure.qml</file>
                 <file alias="imtcontrols/Views/TreeViewSelection.qml">Views/TreeViewSelection.qml</file>
                 <file alias="imtcontrols/Views/ProgressBar.qml">Views/ProgressBar.qml</file>
                 <file alias="imtcontrols/Views/ProgressRoundIndicator.qml">Views/ProgressRoundIndicator.qml</file>

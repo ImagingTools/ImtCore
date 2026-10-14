@@ -592,6 +592,9 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 		add_subdirectory("${TESTS_DIR}/UserAccountStateTest/CMake" "${AUX_INCLUDE_DIR}/UserAccountStateTest")
 		add_dependencies(UserAccountStateTest imtbase imtauth)
 
+		add_subdirectory("${TESTS_DIR}/PermissionRequirementsTest/CMake" "${AUX_INCLUDE_DIR}/PermissionRequirementsTest")
+		add_dependencies(PermissionRequirementsTest imtbase imtauth imtlic)
+
 		add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceTest")
 		add_dependencies(CollectionDocumentServiceTest imtbase imtdoc)
 
@@ -617,4 +620,3 @@ include("${IMTCOREDIR}/Config/CMake/ImtCoreLibraryDependencies.cmake")
 # Export ImtCore libraries as a find_package(ImtCore) package (build + install tree) so
 # downstream modules consume them via ImtCore::<lib> targets instead of env vars/manual paths.
 include("${IMTCOREDIR}/Config/CMake/ImtCorePackageExport.cmake")
-
