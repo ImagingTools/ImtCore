@@ -13,6 +13,9 @@
         <Element Id="CachedObjectCollection" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="InvalidationModels" Type="Reference[]" ExportId="InvalidationModels">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Repository"/>
                     </AttributeInfo>
@@ -22,6 +25,9 @@
         <Element Id="CachedUserCollection" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="InvalidationModels" Type="Reference[]" ExportId="UserInvalidationModels">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectCacheLimit" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="2000"/>
                     </AttributeInfo>

@@ -28,7 +28,6 @@ public:
 		I_ASSIGN(m_userGroupInfoFactCompPtr, "UserGroupFactory", "Factory used for creation of the new group instance", true, "UserGroupFactory");
 		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
-		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Users collection used to remove memberships of deleted groups", false, "UserCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -69,9 +68,6 @@ protected:
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 
-	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
-	virtual void OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const override;
-
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
@@ -82,7 +78,6 @@ protected:
 	I_FACT(imtauth::IUserGroupInfo, m_userGroupInfoFactCompPtr);
 	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
-	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 };
 
 
