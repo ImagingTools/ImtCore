@@ -93,17 +93,22 @@ public:
 	CWebSocketClientComp();
 
 	// reimplemented (imtclientgql::IGqlClient)
+	// Not thread-safe: call only from the component thread.
+	// NOTE: SendRequest() runs a nested event loop while waiting.
 	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 	virtual bool SendRequestNoWait(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParamPtr = nullptr) const override;
 
 	// reimplemented (imtrest::ITransport)
+	// Thread-safe: the request is invoked with the qt auto connection mechanism
 	virtual bool SendData(const QByteArray& data) const override;
 
 	// reimplemented (imtrest::IResponseDispatcher)
+	// Thread-safe: both send through SendData()
 	virtual bool SendResponse(const QByteArray& requestId, imtrest::ConstResponsePtr& response) const override;
 	virtual bool SendRequest(const QByteArray& requestId, imtrest::ConstRequestPtr& request) const override;
 
 	// reimplemented (imtcom::IConnectionController)
+	// Thread-safe: the request is queued to the component thread
 	virtual bool Connect() override;
 	virtual bool Disconnect() override;
 
@@ -126,14 +131,8 @@ protected:
 
 Q_SIGNALS:
 	void EmitQueryDataReceived(int resultCode = 1);
-	void EmitWebSocketClose(
-				QWebSocketProtocol::CloseCode closeCode = QWebSocketProtocol::CloseCodeNormal,
-				const QString &reason = QString());
-	void EmitStopTimer();
-	void EmitStartTimer();
-	void EmitSendTextMessage(const QByteArray message) const;
 
-private Q_SLOTS:
+private:
 	void OnTimeout();
 	void OnWebSocketConnected();
 	void OnWebSocketDisconnected();
@@ -141,14 +140,27 @@ private Q_SLOTS:
 	void OnSslErrors(const QList<QSslError>& sslErrors);
 	void OnWebSocketTextMessageReceived(const QString& message);
 	void OnWebSocketBinaryMessageReceived(const QByteArray& message);
-	void OnSendTextMessage(const QByteArray& message);
 
 protected:
 	virtual void EnsureWebSocketConnection();
 
-	// Drops the current connection and opens a new one with the current settings.
-	// An idle client stays idle; it picks the settings up on its next connect.
-	void Reconnect();
+	// Connection lifecycle, changed only in the component's thread
+	enum State
+	{
+		ST_IDLE,			///< Connection not wanted: ConnectOnCreate is off or Disconnect() was called
+		ST_CONNECTING,		///< Socket opened, waiting for connected()
+		ST_CONNECTED,
+		ST_WAITING_RETRY,	///< Connection lost, the refresh timer opens the next one
+		ST_RECONNECTING,	///< Aborted for new settings, the next connection opens on disconnected()
+		ST_DISCONNECTING,	///< Closed by Disconnect(), becomes idle on disconnected()
+		ST_SHUTDOWN
+	};
+
+	void SetState(State state);
+	void OpenConnection();
+	void ProcessConnectRequest();
+	void ProcessDisconnectRequest();
+	void ProcessSettingsChanged();
 
 	enum ModelId
 	{
@@ -204,15 +216,12 @@ private:
 
 	mutable QWebSocket m_webSocket;
 	QTimer m_refreshTimer;
-	bool m_isReconnectPending = false;
+	State m_state = ST_IDLE;
 	mutable QMap<QString, QByteArray> m_queryDataMap;
 	istd::TPointerVector<imtrest::IRequest> m_startQueries;
 	istd::TPointerVector<imtrest::IRequest> m_cacheQueries;
 	QAbstractSocket::SocketError m_lastSocketError;
 	mutable QReadWriteLock m_queryDataMapLock;
-
-	bool m_isInitialized = false;
-	bool m_isShutdown = false;
 
 	imod::TModelWrap<ConnectionStatusProvider> m_connectionStatusProvider;
 };

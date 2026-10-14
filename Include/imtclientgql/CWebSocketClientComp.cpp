@@ -131,7 +131,8 @@ bool CWebSocketClientComp::SendRequestNoWait(GqlRequestPtr requestPtr, imtbase::
 
 bool CWebSocketClientComp::SendData(const QByteArray& data) const
 {
-	EmitSendTextMessage(data);
+	// Runs directly in the component's thread, queued from any other thread
+	QMetaObject::invokeMethod(const_cast<CWebSocketClientComp*>(this), [this, data](){ m_webSocket.sendTextMessage(data); });
 
 	return true;
 }
@@ -166,7 +167,7 @@ bool CWebSocketClientComp::SendRequest(const QByteArray& /*requestId*/, imtrest:
 
 bool CWebSocketClientComp::Connect()
 {
-	EmitStartTimer();
+	QMetaObject::invokeMethod(this, [this](){ ProcessConnectRequest(); }, Qt::QueuedConnection);
 
 	return true;
 }
@@ -174,8 +175,7 @@ bool CWebSocketClientComp::Connect()
 
 bool CWebSocketClientComp::Disconnect()
 {
-	EmitStopTimer();
-	EmitWebSocketClose();
+	QMetaObject::invokeMethod(this, [this](){ ProcessDisconnectRequest(); }, Qt::QueuedConnection);
 
 	return true;
 }
@@ -197,28 +197,20 @@ QByteArray CWebSocketClientComp::Sign(const QByteArray& message, const QByteArra
 
 void CWebSocketClientComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	// Registering a model notifies too; the initial connection already uses the current settings
-	if (!m_isInitialized){
-		return;
-	}
-
-	Reconnect();
+	ProcessSettingsChanged();
 }
 
 
 void CWebSocketClientComp::Shutdown()
 {
-	disconnect(&m_webSocket, &QWebSocket::connected, this, &CWebSocketClientComp::OnWebSocketConnected);
+	SetState(ST_SHUTDOWN);
 
 	m_refreshTimer.stop();
 
 	m_webSocket.disconnect();
-
-	emit EmitWebSocketClose();
+	m_webSocket.close();
 
 	BaseClass2::UnregisterAllModels();
-
-	m_isShutdown = true;
 }
 
 
@@ -232,10 +224,6 @@ void CWebSocketClientComp::OnComponentCreated()
 	connect(&m_webSocket, &QWebSocket::disconnected, this, &CWebSocketClientComp::OnWebSocketDisconnected, Qt::QueuedConnection);
 	connect(&m_webSocket, &QWebSocket::textMessageReceived, this, &CWebSocketClientComp::OnWebSocketTextMessageReceived);
 	connect(&m_webSocket, &QWebSocket::binaryMessageReceived, this, &CWebSocketClientComp::OnWebSocketBinaryMessageReceived);
-	connect(this, &CWebSocketClientComp::EmitSendTextMessage, this, &CWebSocketClientComp::OnSendTextMessage);
-	connect(this, &CWebSocketClientComp::EmitWebSocketClose, &m_webSocket, &QWebSocket::close);
-	connect(this, &CWebSocketClientComp::EmitStartTimer, &m_refreshTimer, qOverload<>(&QTimer::start), Qt::QueuedConnection);
-	connect(this, &CWebSocketClientComp::EmitStopTimer, &m_refreshTimer, &QTimer::stop, Qt::QueuedConnection);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
 	connect(&m_webSocket, &QWebSocket::errorOccurred, this, &CWebSocketClientComp::OnWebSocketError);
 #else
@@ -267,32 +255,40 @@ void CWebSocketClientComp::OnComponentCreated()
 		BaseClass2::RegisterModel(m_serverConnectionModelCompPtr.GetPtr(), MI_SERVER_CONNECTION);
 	}
 
+	// Registering the models above notifies while idle, which is a no-op
 	if (m_connectOnCreateAttrPtr.IsValid() && *m_connectOnCreateAttrPtr){
-		EnsureWebSocketConnection();
+		OpenConnection();
 	}
-
-	m_isInitialized = true;
 }
 
 
 void CWebSocketClientComp::OnComponentDestroyed()
 {
-	Q_ASSERT(m_isShutdown);
+	Q_ASSERT(m_state == ST_SHUTDOWN);
 
 	BaseClass::OnComponentDestroyed();
 }
 
 
-// private slots
+// private methods
 
 void CWebSocketClientComp::OnTimeout()
 {
-	EnsureWebSocketConnection();
+	if (m_state == ST_WAITING_RETRY){
+		OpenConnection();
+	}
 }
 
 
 void CWebSocketClientComp::OnWebSocketConnected()
 {
+	// The signal is queued: the socket may have been aborted or closed in the meantime
+	if (m_state != ST_CONNECTING){
+		return;
+	}
+
+	SetState(ST_CONNECTED);
+
 	SendInfoMessage(0, "WebSocket connected", "CWebSocketClientComp");
 
 	QString clientId;
@@ -324,13 +320,25 @@ void CWebSocketClientComp::OnWebSocketDisconnected()
 	m_connectionStatusProvider.SetConnectionStatus(imtcom::IConnectionStatusProvider::CS_DISCONNECTED);
 	m_startQueries.Reset();
 
-	if (m_isReconnectPending){
-		m_isReconnectPending = false;
-
-		EnsureWebSocketConnection();
-	}
-	else{
+	switch (m_state){
+	case ST_CONNECTING:
+	case ST_CONNECTED:
+		SetState(ST_WAITING_RETRY);
 		m_refreshTimer.start();
+		break;
+
+	case ST_RECONNECTING:
+		OpenConnection();
+		break;
+
+	case ST_DISCONNECTING:
+		SetState(ST_IDLE);
+		break;
+
+	case ST_IDLE:
+	case ST_WAITING_RETRY:
+	case ST_SHUTDOWN:
+		break;
 	}
 }
 
@@ -463,14 +471,6 @@ void CWebSocketClientComp::OnWebSocketBinaryMessageReceived(const QByteArray& /*
 }
 
 
-void CWebSocketClientComp::OnSendTextMessage(const QByteArray& message)
-{
-	m_webSocket.sendTextMessage(message);
-}
-
-
-// private methods
-
 void CWebSocketClientComp::EnsureWebSocketConnection()
 {
 	QString login;
@@ -557,24 +557,110 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 }
 
 
-void CWebSocketClientComp::Reconnect()
+void CWebSocketClientComp::SetState(State state)
 {
-	// The socket and the timer are used directly, not through queued signals
 	Q_ASSERT(QThread::currentThread() == thread());
 
-	if (m_webSocket.state() != QAbstractSocket::UnconnectedState){
-		// OnWebSocketDisconnected() opens the new connection
-		m_isReconnectPending = true;
-		m_webSocket.abort();
+	m_state = state;
+}
 
-		return;
+
+void CWebSocketClientComp::OpenConnection()
+{
+	SetState(ST_CONNECTING);
+
+	EnsureWebSocketConnection();
+
+	// open() rejects an invalid URL synchronously and emits no disconnected()
+	if (m_webSocket.state() == QAbstractSocket::UnconnectedState){
+		SetState(ST_WAITING_RETRY);
+		m_refreshTimer.start();
 	}
+}
 
-	// Waiting for a retry: connect now instead
-	if (m_refreshTimer.isActive()){
+
+void CWebSocketClientComp::ProcessConnectRequest()
+{
+	switch (m_state){
+	case ST_IDLE:
+		OpenConnection();
+		break;
+
+	case ST_WAITING_RETRY:
 		m_refreshTimer.stop();
+		OpenConnection();
+		break;
 
-		EnsureWebSocketConnection();
+	case ST_DISCONNECTING:
+		// Still closing: OnWebSocketDisconnected() opens the new connection
+		SetState(ST_RECONNECTING);
+		break;
+
+	case ST_CONNECTING:
+	case ST_CONNECTED:
+	case ST_RECONNECTING:
+	case ST_SHUTDOWN:
+		break;
+	}
+}
+
+
+void CWebSocketClientComp::ProcessDisconnectRequest()
+{
+	switch (m_state){
+	case ST_CONNECTING:
+		SetState(ST_DISCONNECTING);
+		m_webSocket.abort();
+		break;
+
+	case ST_CONNECTED:
+		SetState(ST_DISCONNECTING);
+		m_webSocket.close();
+		break;
+
+	case ST_WAITING_RETRY:
+		m_refreshTimer.stop();
+		SetState(ST_IDLE);
+		break;
+
+	case ST_RECONNECTING:
+		// Already aborted: OnWebSocketDisconnected() makes it idle
+		SetState(ST_DISCONNECTING);
+		break;
+
+	case ST_IDLE:
+	case ST_DISCONNECTING:
+	case ST_SHUTDOWN:
+		break;
+	}
+}
+
+
+void CWebSocketClientComp::ProcessSettingsChanged()
+{
+	Q_ASSERT(QThread::currentThread() == thread());
+
+	switch (m_state){
+	case ST_CONNECTING:
+	case ST_CONNECTED:
+		// OnWebSocketDisconnected() will open new connection
+		SetState(ST_RECONNECTING);
+		m_webSocket.abort();
+		break;
+
+	case ST_WAITING_RETRY:
+		m_refreshTimer.stop();
+		OpenConnection();
+		break;
+
+	case ST_IDLE:
+	case ST_RECONNECTING:
+	case ST_DISCONNECTING:
+		// The next connection picks the settings up
+		break;
+
+	case ST_SHUTDOWN:
+		break;
 	}
 }
 
