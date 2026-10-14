@@ -282,8 +282,9 @@ void CWebSocketClientComp::OnTimeout()
 
 void CWebSocketClientComp::OnWebSocketConnected()
 {
-	// The signal is queued: the socket may have been aborted or closed in the meantime
-	if (m_state != ST_CONNECTING){
+	// The signal is queued: the socket may have been aborted or closed in the meantime.
+	// A peer close keeps ST_CONNECTING; the queued disconnected() handles it.
+	if (m_state != ST_CONNECTING || m_webSocket.state() != QAbstractSocket::ConnectedState){
 		return;
 	}
 
