@@ -6,6 +6,7 @@
 #include <QtCore/QMessageAuthenticationCode>
 #include <QtCore/QUrl>
 #include <QtCore/QFile>
+#include <QtCore/QThread>
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
 #include <QtWebSockets/QWebSocketHandshakeOptions>
@@ -194,13 +195,14 @@ QByteArray CWebSocketClientComp::Sign(const QByteArray& message, const QByteArra
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CWebSocketClientComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+void CWebSocketClientComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	Q_ASSERT_X(m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid(), "Update server's SSL configuration", "SSL configuration or manager is not set!");
-
-	if (m_connectOnCreateAttrPtr.IsValid() && *m_connectOnCreateAttrPtr && m_isInitialized){
-		EnsureWebSocketConnection();
+	// Registering a model notifies too; the initial connection already uses the current settings
+	if (!m_isInitialized){
+		return;
 	}
+
+	Reconnect();
 }
 
 
@@ -258,7 +260,11 @@ void CWebSocketClientComp::OnComponentCreated()
 	}
 
 	if (m_sslConfigurationModelCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
-		BaseClass2::RegisterModel(m_sslConfigurationModelCompPtr.GetPtr());
+		BaseClass2::RegisterModel(m_sslConfigurationModelCompPtr.GetPtr(), MI_SSL_CONFIGURATION);
+	}
+
+	if (m_serverConnectionModelCompPtr.IsValid()){
+		BaseClass2::RegisterModel(m_serverConnectionModelCompPtr.GetPtr(), MI_SERVER_CONNECTION);
 	}
 
 	if (m_connectOnCreateAttrPtr.IsValid() && *m_connectOnCreateAttrPtr){
@@ -317,7 +323,15 @@ void CWebSocketClientComp::OnWebSocketDisconnected()
 
 	m_connectionStatusProvider.SetConnectionStatus(imtcom::IConnectionStatusProvider::CS_DISCONNECTED);
 	m_startQueries.Reset();
-	m_refreshTimer.start();
+
+	if (m_isReconnectPending){
+		m_isReconnectPending = false;
+
+		EnsureWebSocketConnection();
+	}
+	else{
+		m_refreshTimer.start();
+	}
 }
 
 
@@ -540,6 +554,28 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 #else
 	m_webSocket.open(url);
 #endif
+}
+
+
+void CWebSocketClientComp::Reconnect()
+{
+	// The socket and the timer are used directly, not through queued signals
+	Q_ASSERT(QThread::currentThread() == thread());
+
+	if (m_webSocket.state() != QAbstractSocket::UnconnectedState){
+		// OnWebSocketDisconnected() opens the new connection
+		m_isReconnectPending = true;
+		m_webSocket.abort();
+
+		return;
+	}
+
+	// Waiting for a retry: connect now instead
+	if (m_refreshTimer.isActive()){
+		m_refreshTimer.stop();
+
+		EnsureWebSocketConnection();
+	}
 }
 
 

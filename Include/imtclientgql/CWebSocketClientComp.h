@@ -42,6 +42,8 @@ public:
 		I_ASSIGN_TO(m_sslConfigurationModelCompPtr, m_sslConfigurationCompPtr, false)
 		I_ASSIGN(m_sslConfigurationManagerCompPtr, "SslConfigurationManager", "SSL configuration manager, used to create an SSL configuration for server", false, "SslConfigurationManager")
 		I_ASSIGN(m_subprotocolListCompPtr, "Subprotocols", "Web Socket subprotocols", false, "Subprotocols");
+		I_ASSIGN(m_serverConnectionCompPtr, "ServerConnectionInterface", "Parameter of the server communication interface", true, "ServerConnectionInterface");
+		I_ASSIGN_TO(m_serverConnectionModelCompPtr, m_serverConnectionCompPtr, false);
 	I_END_COMPONENT;
 		
 protected:
@@ -49,6 +51,8 @@ protected:
 	I_REF(imod::IModel, m_sslConfigurationModelCompPtr);
 	I_REF(imtcom::ISslConfigurationManager, m_sslConfigurationManagerCompPtr);
 	I_REF(iprm::IOptionsList, m_subprotocolListCompPtr);
+	I_REF(imtcom::IServerConnectionInterface, m_serverConnectionCompPtr);
+	I_REF(imod::IModel, m_serverConnectionModelCompPtr);
 };
 
 class CWebSocketClientComp:
@@ -79,7 +83,6 @@ public:
 		I_ASSIGN(m_httpProtocolEngineCompPtr, "HttpProtocolEngine", "Http Protocol engine used in the http client", false, "ProtocolEngine");
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the client", true, "ProtocolEngine");
 		I_ASSIGN(m_connectOnCreateAttrPtr, "ConnectOnCreate", "If enabled, the client will be connect to server on after component creation", true, true);
-		I_ASSIGN(m_serverConnectionCompPtr, "ServerConnectionInterface", "Parameter of the server communication interface", true, "ServerConnectionInterface");
 		I_ASSIGN(m_serverLoginAttrPtr, "ServerLoginParam", "Parameter providing the server login to be connected", false, "");
 		I_ASSIGN(m_serverPasswordAttrPtr, "ServerPasswordParam", "Parameter providing the server password to be connected", false, "");
 		I_ASSIGN(m_clientIdAttrPtr, "ClientId", "ID of the client that needs to be identified on the server", false, "");
@@ -143,6 +146,16 @@ private Q_SLOTS:
 protected:
 	virtual void EnsureWebSocketConnection();
 
+	// Drops the current connection and opens a new one with the current settings.
+	// An idle client stays idle; it picks the settings up on its next connect.
+	void Reconnect();
+
+	enum ModelId
+	{
+		MI_SSL_CONFIGURATION,
+		MI_SERVER_CONNECTION
+	};
+
 	class NetworkOperation
 	{
 	public:
@@ -180,7 +193,6 @@ private:
 	I_REF(imtrest::IRequestServlet, m_clientRequestHandlerCompPtr);
 	I_REF(imtrest::IProtocolEngine, m_protocolEngineCompPtr);
 	I_REF(imtrest::IProtocolEngine, m_httpProtocolEngineCompPtr);
-	I_REF(imtcom::IServerConnectionInterface, m_serverConnectionCompPtr);
 	I_REF(iprm::ITextParam, m_webSocketServerLoginCompPtr);
 	I_REF(iprm::ITextParam, m_webSocketServerPasswordCompPtr);
 	I_REF(iprm::ITextParam, m_clientIdCompPtr);
@@ -192,6 +204,7 @@ private:
 
 	mutable QWebSocket m_webSocket;
 	QTimer m_refreshTimer;
+	bool m_isReconnectPending = false;
 	mutable QMap<QString, QByteArray> m_queryDataMap;
 	istd::TPointerVector<imtrest::IRequest> m_startQueries;
 	istd::TPointerVector<imtrest::IRequest> m_cacheQueries;
