@@ -29,7 +29,7 @@ GqlRequest {
 
 	property string gqlCommandId;
 	property int requestType: 0; // 0 - Query, 1 - Mutation, 2 - Subscription
-	property string context
+	property string permissionPath
 
 	property var result: null;
 
