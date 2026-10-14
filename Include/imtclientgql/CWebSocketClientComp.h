@@ -114,8 +114,8 @@ protected:
 	// reimplemented (imod::CMultiModelDispatcherBase)
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
-	// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
-	virtual void OnSystemShutdown() override;
+	// Closes the connection, called on QCoreApplication::aboutToQuit
+	void Shutdown();
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -199,6 +199,7 @@ private:
 	mutable QReadWriteLock m_queryDataMapLock;
 
 	bool m_isInitialized = false;
+	bool m_isShutdown = false;
 
 	imod::TModelWrap<ConnectionStatusProvider> m_connectionStatusProvider;
 };

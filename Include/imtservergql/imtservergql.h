@@ -49,7 +49,8 @@ inline imtauth::IUserInfo::FeatureIds GetUserPermissions(const imtgql::IGqlConte
 		return imtauth::IUserInfo::FeatureIds();
 	}
 
-	return userInfoPtr->GetPermissions() + gqlContext.GetImpliedPermissions();
+	const QByteArray productId = gqlContext.GetProductId();
+	return (productId.isEmpty() ? userInfoPtr->GetPermissions() : userInfoPtr->GetPermissions(productId)) + gqlContext.GetImpliedPermissions();
 }
 
 

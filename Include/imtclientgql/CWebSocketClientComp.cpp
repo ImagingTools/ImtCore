@@ -204,19 +204,19 @@ void CWebSocketClientComp::OnModelChanged(int modelId, const istd::IChangeable::
 }
 
 
-// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
-
-void CWebSocketClientComp::OnSystemShutdown()
+void CWebSocketClientComp::Shutdown()
 {
 	disconnect(&m_webSocket, &QWebSocket::connected, this, &CWebSocketClientComp::OnWebSocketConnected);
 
-	emit EmitStopTimer();
+	m_refreshTimer.stop();
 
 	m_webSocket.disconnect();
 
 	emit EmitWebSocketClose();
 
 	BaseClass2::UnregisterAllModels();
+
+	m_isShutdown = true;
 }
 
 
@@ -232,12 +232,19 @@ void CWebSocketClientComp::OnComponentCreated()
 	connect(&m_webSocket, &QWebSocket::binaryMessageReceived, this, &CWebSocketClientComp::OnWebSocketBinaryMessageReceived);
 	connect(this, &CWebSocketClientComp::EmitSendTextMessage, this, &CWebSocketClientComp::OnSendTextMessage);
 	connect(this, &CWebSocketClientComp::EmitWebSocketClose, &m_webSocket, &QWebSocket::close);
-	connect(this, SIGNAL(EmitStartTimer()), &m_refreshTimer, SLOT(start()), Qt::QueuedConnection);
-	connect(this, SIGNAL(EmitStopTimer()), &m_refreshTimer, SLOT(stop()), Qt::QueuedConnection);
-	connect(&m_webSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(OnWebSocketError(QAbstractSocket::SocketError)));
-	connect(&m_webSocket, SIGNAL(sslErrors(const QList<QSslError>&)), this, SLOT(OnSslErrors(const QList<QSslError>&)));
+	connect(this, &CWebSocketClientComp::EmitStartTimer, &m_refreshTimer, qOverload<>(&QTimer::start), Qt::QueuedConnection);
+	connect(this, &CWebSocketClientComp::EmitStopTimer, &m_refreshTimer, &QTimer::stop, Qt::QueuedConnection);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+	connect(&m_webSocket, &QWebSocket::errorOccurred, this, &CWebSocketClientComp::OnWebSocketError);
+#else
+	connect(&m_webSocket, qOverload<QAbstractSocket::SocketError>(&QWebSocket::error), this, &CWebSocketClientComp::OnWebSocketError);
+#endif
+	connect(&m_webSocket, &QWebSocket::sslErrors, this, &CWebSocketClientComp::OnSslErrors);
 
 	connect(&m_refreshTimer, &QTimer::timeout, this, &CWebSocketClientComp::OnTimeout);
+
+	Q_ASSERT(QCoreApplication::instance() != nullptr);
+	connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, this, &CWebSocketClientComp::Shutdown);
 
 	m_refreshTimer.setSingleShot(true);
 	m_refreshTimer.setInterval(4000);
@@ -264,10 +271,7 @@ void CWebSocketClientComp::OnComponentCreated()
 
 void CWebSocketClientComp::OnComponentDestroyed()
 {
-	// Fallback (will not work in someb situations)
-	if (!m_runtimeStatusCompPtr.IsValid()){
-		OnSystemShutdown();
-	}
+	Q_ASSERT(m_isShutdown);
 
 	BaseClass::OnComponentDestroyed();
 }

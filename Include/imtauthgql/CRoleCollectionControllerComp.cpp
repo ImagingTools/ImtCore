@@ -430,7 +430,7 @@ bool CRoleCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 		QByteArray productId = gqlContextPtr->GetProductId();
 		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){
-			availableRoleIds = userInfoPtr->GetRoles(productId);
+			availableRoleIds = GetEffectiveUserRoles(*userInfoPtr, productId);
 		}
 	}
 
