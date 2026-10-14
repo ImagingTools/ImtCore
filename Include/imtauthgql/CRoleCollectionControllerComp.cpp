@@ -424,41 +424,22 @@ void CRoleCollectionControllerComp::SetAdditionalFilters(
 bool CRoleCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	QByteArray commandId = gqlRequest.GetCommandId();
+
+	// A role the user holds in the current tenant, delegated ones included, is always readable.
 	QByteArrayList availableRoleIds;
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
-		QByteArray productId = gqlContextPtr->GetProductId();
 		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){
-			availableRoleIds = GetEffectiveUserRoles(*userInfoPtr, productId);
-		}
-	}
-
-	// Add delegated roles if the user is in a delegated tenant
-	if (gqlContextPtr != nullptr && m_delegatedAccessCompPtr.IsValid() && m_membershipManagerCompPtr.IsValid()){
-		QByteArray userId = gqlContextPtr->GetUserId();
-		QByteArray currentTenantId = gqlContextPtr->GetTenantId();
-		if (!userId.isEmpty() && !currentTenantId.isEmpty()){
-			const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
-				m_membershipManagerCompPtr->GetMembershipsByUser(userId);
-			for (const QByteArray& membershipId : membershipIds){
-				imtauth::ITenantMembershipUniquePtr homeMembershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-				if (!homeMembershipPtr.IsValid() || !homeMembershipPtr->IsActive()){
-					continue;
-				}
-				QByteArray homeTenantId = homeMembershipPtr->GetTenantId();
-				if (homeTenantId.isEmpty() || homeTenantId == currentTenantId){
-					continue;
-				}
-				if (m_delegatedAccessCompPtr->IsDelegatedAccess(userId, homeTenantId, currentTenantId)){
-					QByteArrayList delegatedRoles = m_delegatedAccessCompPtr->GetDelegatedRoles(homeTenantId, currentTenantId);
-					for (const QByteArray& roleId : delegatedRoles){
-						if (!availableRoleIds.contains(roleId)){
-							availableRoleIds.append(roleId);
-						}
-					}
-				}
-			}
+			availableRoleIds = GetEffectiveUserRoles(
+						gqlContextPtr->GetUserId(),
+						*userInfoPtr,
+						gqlContextPtr->GetTenantId(),
+						gqlContextPtr->GetProductId(),
+						m_bindingManagerCompPtr.GetPtr(),
+						m_delegatedAccessCompPtr.GetPtr(),
+						m_membershipManagerCompPtr.GetPtr(),
+						nullptr);
 		}
 	}
 
