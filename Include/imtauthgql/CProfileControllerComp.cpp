@@ -142,7 +142,7 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 		// Use the (possibly tenant-adapted) roles list. The adaptation has
 		// already filtered according to tenant bindings and appended any
 		// delegated roles.
-		const QByteArrayList roles = GetEffectiveUserRoles(*effectiveUserPtr, currentProductId, currentTenantId, bindingPtr);
+		const QByteArrayList roles = GetEffectiveUserRoles(*effectiveUserPtr, currentProductId);
 
 		for (const QByteArray& roleId : std::as_const(roles)){
 			imtbase::IObjectCollection::DataPtr roleDataPtr;
