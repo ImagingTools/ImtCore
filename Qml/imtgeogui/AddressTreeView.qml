@@ -45,41 +45,51 @@ Rectangle{
 	property Component addressTreeSdlObjectComp: null
 	property Component additionalDelegateComp: Component{Item{}}
 
-	property GqlSdlRequestSender addressTreeRequest : GqlSdlRequestSender {
+	property GqlPureRequestSender addressTreeRequest : GqlPureRequestSender {
 		context: treeBody.context
 		property string parentIds: "";
 		property string idsToOpen: "";
 		property int insertIndex: -1;
-		property TreeItemModel newTreeModel: TreeItemModel{}
+		traceTiming: true
 
 		gqlCommandId: treeBody.addressListCommandId
-		inputObjectComp: treeBody.addressTreeInputObjectComp
-		sdlObjectComp: treeBody.addressTreeSdlObjectComp
 
 		property var customFinishedCallback: null
 
-		function defaultFinishedCallback(status, sdlObject, insertIndex, newTreeModel, idsToOpen) {
+		function resultItems(){
+			let payload = result;
+			if (!payload){
+				return [];
+			}
+			if (payload.items && payload.items.length !== undefined){
+				return payload.items;
+			}
+			if (payload.length !== undefined){
+				return payload;
+			}
+			return [];
+		}
+
+		function defaultFinishedCallback(status, insertIndex, idsToOpen) {
 			treeLoading.visible = false;
 			if (status !== 1) {
 				return;
 			}
 
-			let items = (sdlObject && sdlObject.m_items !== undefined) ? sdlObject.m_items : null;
-			let isCountZero = !items || items.getItemsCount() === 0;
+			let items = resultItems();
+			let itemCount = items.length;
+			let buildStarted = treeBody.addressTreeRequest.traceNow();
 
-			if (isCountZero && insertIndex === -1) {
+			if (itemCount === 0 && insertIndex === -1) {
 				treeView.model.clear();
 				treeView.selectedIndex = -1;
 			}
 
-			if (!isCountZero) {
-				if (insertIndex === -1) {
-					treeView.model.clear();
-				}
-				newTreeModel.createFromJson(items.toJson());
-				treeView.insertTree(insertIndex, newTreeModel);
-				newTreeModel.clear();
+			if (itemCount > 0) {
+				treeView.insertTree(insertIndex, items);
 			}
+
+			console.log("AddressTree: сборка дерева", Math.round(treeBody.addressTreeRequest.traceNow() - buildStarted), "мс, узлов", itemCount, "index", insertIndex)
 
 			if (treeView.model.getItemsCount() > 0 && idsToOpen !== "") {
 				let ids_ = idsToOpen;
@@ -94,18 +104,51 @@ Rectangle{
 
 		onFinished: {
 			let reqStatus = status;
-			let reqSdlObject = sdlObject;
 			let reqInsertIndex = insertIndex;
-			let reqNewTreeModel = newTreeModel;
 			let reqIdsToOpen = idsToOpen;
+			let responseAt = treeBody.addressTreeRequest.traceResponseAt;
 
 			if (customFinishedCallback) {
-				customFinishedCallback(reqStatus, reqSdlObject, reqInsertIndex, reqNewTreeModel, reqIdsToOpen);
-
+				customFinishedCallback(reqStatus, result, reqInsertIndex, resultItems(), reqIdsToOpen);
 				return;
 			}
 
-			defaultFinishedCallback(reqStatus, reqSdlObject, reqInsertIndex, reqNewTreeModel, reqIdsToOpen);
+			defaultFinishedCallback(reqStatus, reqInsertIndex, reqIdsToOpen);
+
+			if (responseAt > 0){
+				console.log("AddressTree: всего после ответа", Math.round(treeBody.addressTreeRequest.traceNow() - responseAt), "мс")
+			}
+		}
+
+		function createQueryParams(query){
+			if (treeBody.addressTreeInputObjectComp){
+				let inputObject = treeBody.addressTreeInputObjectComp.createObject(addressTreeRequest);
+				let gqlObject = Gql.GqlObject("input");
+				gqlObject.fromObject(inputObject);
+				query.AddParam(gqlObject);
+				inputObject.destroy();
+				return;
+			}
+			query.AddParam(inputParams);
+		}
+
+		function getRequestedFields(){
+			let items = Gql.GqlObject("items");
+			treeBody.addQueryField(items, treeBody.idParam);
+			treeBody.addQueryField(items, treeBody.nameParam);
+			treeBody.addQueryField(items, treeBody.fullAddressParam);
+			treeBody.addQueryField(items, treeBody.latitudeParam);
+			treeBody.addQueryField(items, treeBody.longitudeParam);
+			treeBody.addQueryField(items, treeBody.typeIdParam);
+			treeBody.addQueryField(items, "typeId__");
+			treeBody.addQueryField(items, treeBody.parentIdsParam);
+			treeBody.addQueryField(items, treeBody.hasChildrenParam);
+			treeBody.addQueryField(items, "activeDevCount");
+			treeBody.addQueryField(items, "inactiveDevCount");
+
+			let fields = Gql.GqlObject("");
+			fields.InsertFieldObject(items);
+			return fields;
 		}
 
 		function reset(){
@@ -136,6 +179,13 @@ Rectangle{
 
 	function setCustomFilters(inputParams){
 		return
+	}
+
+	function addQueryField(gqlObject, name){
+		if (!name){
+			return;
+		}
+		gqlObject.InsertField(name);
 	}
 
 	function setExternalAddress(address, parentIds){
@@ -271,7 +321,7 @@ Rectangle{
 		}
 	}
 
-	TreeViewGql{
+	TreeViewPure{
 		id: treeView;
 
 		anchors.top: searchComp.bottom;
