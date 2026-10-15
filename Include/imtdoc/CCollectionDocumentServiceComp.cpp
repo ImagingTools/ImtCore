@@ -121,26 +121,6 @@ bool CCollectionDocumentServiceComp::SaveToFile(const QString& filePath) const
 }
 
 
-// reimplemented (iser::ISerializable)
-
-bool CCollectionDocumentServiceComp::Serialize(iser::IArchive& archive)
-{
-	DocumentMap documentMap;
-
-	if (archive.IsStoring()){
-		PrepareDocumentMap(documentMap);
-
-		return SerializeDocumentMap(archive, documentMap);
-	}
-
-	if (!SerializeDocumentMap(archive, documentMap)){
-		return false;
-	}
-
-	return RestoreDocumentMap(documentMap);
-}
-
-
 // protected methods
 
 // reimplemented (icomp::CComponentBase)
@@ -198,85 +178,6 @@ bool CCollectionDocumentServiceComp::IsSingleCopyMode() const
 
 
 // private methods
-
-bool CCollectionDocumentServiceComp::SerializeDocumentMap(iser::IArchive& archive, DocumentMap& documentMap) const
-{
-	static const iser::CArchiveTag usersTag("Users", "List of users", iser::CArchiveTag::TT_MULTIPLE);
-	static const iser::CArchiveTag userTag("User", "Single user", iser::CArchiveTag::TT_GROUP, &usersTag);
-	static const iser::CArchiveTag userIdTag("UserId", "User ID", iser::CArchiveTag::TT_LEAF, &userTag);
-	static const iser::CArchiveTag documentsTag("Documents", "List of opened documents", iser::CArchiveTag::TT_MULTIPLE, &userTag);
-	static const iser::CArchiveTag documentTag("Document", "Single opened document", iser::CArchiveTag::TT_GROUP, &documentsTag);
-	static const iser::CArchiveTag documentIdTag("DocumentId", "Document ID", iser::CArchiveTag::TT_LEAF, &documentTag);
-	static const iser::CArchiveTag objectIdTag("ObjectId", "Collection object ID", iser::CArchiveTag::TT_LEAF, &documentTag);
-	static const iser::CArchiveTag typeIdTag("TypeId", "Object type ID", iser::CArchiveTag::TT_LEAF, &documentTag);
-	static const iser::CArchiveTag urlTag("Url", "Document URL", iser::CArchiveTag::TT_LEAF, &documentTag);
-	static const iser::CArchiveTag nameTag("Name", "Document name", iser::CArchiveTag::TT_LEAF, &documentTag);
-	static const iser::CArchiveTag singleDocumentInstanceTag(
-				"SingleDocumentInstance",
-				"Single-document-instance mode flag",
-				iser::CArchiveTag::TT_LEAF,
-				&documentTag);
-
-	bool retVal = true;
-	bool isStoring = archive.IsStoring();
-
-	QList<QByteArray> userIds = isStoring ? documentMap.keys() : QList<QByteArray>();
-
-	if (!isStoring){
-		documentMap.clear();
-	}
-
-	int usersCount = isStoring ? imtbase::narrow_cast<int>(userIds.count()) : 0;
-	retVal = retVal && archive.BeginMultiTag(usersTag, userTag, usersCount);
-
-	for (int i = 0; i < usersCount; ++i){
-		QByteArray userId = isStoring ? userIds[i] : QByteArray();
-
-		retVal = retVal && archive.BeginTag(userTag);
-
-		retVal = retVal && archive.TagAndProcess(userIdTag, userId);
-
-		DocumentInfoList documents = isStoring ? documentMap.value(userId) : DocumentInfoList();
-
-		int documentsCount = isStoring ? imtbase::narrow_cast<int>(documents.count()) : 0;
-		retVal = retVal && archive.BeginMultiTag(documentsTag, documentTag, documentsCount);
-
-		for (int j = 0; j < documentsCount; ++j){
-			DocumentInfo doc;
-			if (isStoring){
-				doc = documents[j];
-			}
-
-			retVal = retVal && archive.BeginTag(documentTag);
-
-			retVal = retVal && archive.TagAndProcess(documentIdTag, doc.documentId);
-			retVal = retVal && archive.TagAndProcess(objectIdTag, doc.objectId);
-			retVal = retVal && archive.TagAndProcess(typeIdTag, doc.typeId);
-			retVal = retVal && archive.TagAndProcess(urlTag, doc.url);
-			retVal = retVal && archive.TagAndProcess(nameTag, doc.name);
-			retVal = retVal && archive.TagAndProcess(singleDocumentInstanceTag, doc.singleDocumentInstance);
-
-			retVal = retVal && archive.EndTag(documentTag);
-
-			if (!isStoring){
-				documents.append(doc);
-			}
-		}
-
-		retVal = retVal && archive.EndTag(documentsTag);
-
-		retVal = retVal && archive.EndTag(userTag);
-
-		if (!isStoring){
-			documentMap.insert(userId, documents);
-		}
-	}
-
-	retVal = retVal && archive.EndTag(usersTag);
-
-	return retVal;
-}
-
 
 void CCollectionDocumentServiceComp::PrepareDocumentMap(DocumentMap& documentMap) const
 {

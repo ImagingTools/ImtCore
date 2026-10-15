@@ -41,8 +41,8 @@ namespace imtdoc
 	  component creation and saved to it after each change of the service
 	  data model (open/create/close/save/rename of documents).
 
-	The JSON file contains the same information as \c Serialize (user IDs
-	and the metadata of their opened documents); document data is not stored.
+	The JSON file contains user IDs and the metadata of their opened
+	documents; document data is not stored.
 
 	Register it in the component descriptor with the interface
 	\c imtdoc::IDocumentService so that clients can obtain it via the ACF
@@ -55,7 +55,6 @@ public:
 
 	I_BEGIN_COMPONENT(CCollectionDocumentServiceComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentService)
-		I_REGISTER_INTERFACE(iser::ISerializable)
 		I_ASSIGN(m_collectionCompPtr, "Collection", "Document collection containing related documents", true, "Collection");
 		I_ASSIGN(m_isSingleCopyModeAttrPtr, "IsSingleCopyMode", "When enabled, all users share a single copy of each document", false, false);
 		I_ASSIGN(m_stateFilePathCompPtr, "StateFilePath", "File path used to save/restore the list of opened documents", false, "StateFilePath");
@@ -75,13 +74,10 @@ public:
 	/**
 		\brief Save the list of opened documents to a JSON file.
 
-		The file contains the same information as \c Serialize.
+		The file contains the list of opened documents and their metadata.
 		\return \c true on success.
 	*/
 	bool SaveToFile(const QString& filePath) const;
-
-	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive) override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
@@ -109,7 +105,6 @@ private:
 	typedef QList<DocumentInfo> DocumentInfoList;
 	typedef QMap<QByteArray, DocumentInfoList> DocumentMap;
 
-	bool SerializeDocumentMap(iser::IArchive& archive, DocumentMap& documentMap) const;
 	void PrepareDocumentMap(DocumentMap& documentMap) const;
 	static QJsonObject DocumentMapToJson(const DocumentMap& documentMap);
 	static bool DocumentMapFromJson(const QJsonObject& rootObject, DocumentMap& documentMap);
