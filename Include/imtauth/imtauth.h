@@ -51,12 +51,16 @@ inline QString GetUserName(const imtbase::IObjectCollection& userCollection, con
 	the held permission is a descendant of the requested path. The same id under
 	a different parent is a different feature.
 
+	\param includeDescendants	whether a held descendant of the requested path
+		counts. Without it only the requested node itself is matched, e.g. to tell
+		which nodes of a permission tree are selected.
+
 	This is the one place that rule is written down: every check of "does this
 	user hold that permission" is to go through here, whatever container the
 	held permissions come in (a list, a set of allowed ones, ...).
 */
 template <class PermissionsType>
-inline bool HasPermission(const PermissionsType& userPermissions, const QByteArray& permissionId)
+inline bool HasPermission(const PermissionsType& userPermissions, const QByteArray& permissionId, bool includeDescendants = true)
 {
 	if (permissionId.isEmpty()){
 		return false;
@@ -71,7 +75,8 @@ inline bool HasPermission(const PermissionsType& userPermissions, const QByteArr
 
 	for (const QByteArray& userPermission : userPermissions){
 		if (isPath && userPermission.startsWith('/')){
-			if (userPermission.startsWith(permissionId)
+			if (includeDescendants
+					&& userPermission.startsWith(permissionId)
 					&& userPermission.size() > permissionId.size()
 					&& userPermission.at(permissionId.size()) == '/'){
 				return true;
