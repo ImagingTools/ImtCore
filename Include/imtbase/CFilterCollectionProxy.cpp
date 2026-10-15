@@ -8,6 +8,7 @@
 
 // ImtCore includes
 #include <imtbase/CObjectCollection.h>
+#include <imtbase/ICollectionObjectLink.h>
 
 
 namespace imtbase
@@ -112,11 +113,27 @@ ICollectionInfo::Id CFilterCollectionProxy::InsertNewObject(
 
 bool CFilterCollectionProxy::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
-	if (!m_isObjectProxy){
-		return BaseClass::GetObjectData(objectId, dataPtr);
+	if (m_isObjectProxy){
+		return m_parent.GetObjectData(objectId, dataPtr);
 	}
 
-	return m_parent.GetObjectData(objectId, dataPtr);
+	if (BaseClass::GetObjectData(objectId, dataPtr)){
+		return true;
+	}
+
+	if (dataPtr.IsValid()){
+		return false;
+	}
+
+	const istd::IChangeable* objectPtr = GetObjectPtr(objectId);
+	if (objectPtr == nullptr || dynamic_cast<const ICollectionObjectLink*>(objectPtr) != nullptr){
+		return false;
+	}
+
+	istd::IChangeableUniquePtr clonePtr = objectPtr->CloneMe();
+	dataPtr.FromUnique(std::move(clonePtr));
+
+	return dataPtr.IsValid();
 }
 
 

@@ -75,6 +75,10 @@ protected:
 	QString GetKeyColumn() const;
 
 private:
+	static const inline QString SHADOW_SUFFIX = QStringLiteral("_shadow");
+	static const inline QString STAGING_SUFFIX = QStringLiteral("_staging");
+
+private:
 	bool CreateTable(imtduckdb::IDuckConnection& connection, const QString& tableName, QString& errorMessage) const;
 
 	/// False when the live table's columns differ from GetColumnNames(), i.e. it predates a schema change.

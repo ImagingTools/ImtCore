@@ -66,6 +66,18 @@ private:
 
 	QString GetAffectedTableName() const;
 
+	static bool Execute(imtduckdb::IDuckConnection& connection, const QString& query, QString& errorMessage);
+
+	/// The first column of the first row of the result.
+	static bool ReadValue(imtduckdb::IDuckConnection& connection, const QString& query, QVariant& value, QString& errorMessage);
+
+private:
+	static const inline QString SHADOW_SUFFIX = QStringLiteral("_shadow");
+	static const inline QString AFFECTED_SUFFIX = QStringLiteral("_affected");
+
+	/// Column of the table of affected keys.
+	static const inline QString AFFECTED_KEY_COLUMN = QStringLiteral("KeyId");
+
 private:
 	I_ATTR(QByteArray, m_tableNameAttrPtr);
 	I_ATTR(QByteArray, m_keyColumnAttrPtr);

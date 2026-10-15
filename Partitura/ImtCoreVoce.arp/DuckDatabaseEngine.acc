@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6381" Description="ACF"/>
-            <Version Id="1" Number="2454" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="396032" Description="Qt Framework"/>
+            <Version Id="0" Number="6556" Description="ACF"/>
+            <Version Id="1" Number="2449" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="396033" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -13,7 +13,7 @@
         <Element Id="DatabaseFilePath" PackageId="FilePck" ComponentId="RelativeFileNameParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="DatabaseSqlFilePath">
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="DatabaseFilePath">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathType" Type="Integer" ExportId="">
@@ -28,13 +28,34 @@
         <Element Id="DuckDatabaseEngine" PackageId="ImtDuckDbPck" ComponentId="DuckDatabaseEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="CheckpointThreshold" Type="Id" ExportId="CheckpointThreshold">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DbName" Type="Id" ExportId="DbName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DbPath" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="DatabaseFilePath"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="MemoryLimit" Type="Id" ExportId="MemoryLimit">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="MigrationController" Type="Reference" ExportId="MigrationController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ReadOnly" Type="Boolean" ExportId="ReadOnly">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ThreadCount" Type="Integer" ExportId="ThreadCount">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
@@ -60,6 +81,7 @@
     <ExportedInterfaces>
         <Interface InterfaceId="imtdb::IDatabaseEngine" ComponentId="DuckDatabaseEngine"/>
         <Interface InterfaceId="imtdb::IDatabaseServerConnectionChecker" ComponentId="DatabaseEngine/PgSqlDatabaseEngine"/>
+        <Interface InterfaceId="imtduckdb::IDuckConnectionProvider" ComponentId="DuckDatabaseEngine"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="DuckDatabaseEngine"/>
     </ExportedInterfaces>
     <ExportedComponents/>

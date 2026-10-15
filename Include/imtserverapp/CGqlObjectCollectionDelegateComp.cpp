@@ -552,12 +552,10 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 
 	sdl::V1_0::imtbase::CCreateSubCollectionPayload createSubCollectionPayload;
 	ResponseData responseData = GetResponseData(response);
-	if (!createSubCollectionPayload.ReadFromJsonObject(responseData.data)){
-		return subCollectionPtr.PopPtr();
-	}
-
-	if (!createSubCollectionPayload.items){
-		return subCollectionPtr.PopPtr();
+	// A response without items is a failed request, not an empty collection: callers paging through a
+	// collection would take it for the end of the data.
+	if (!createSubCollectionPayload.ReadFromJsonObject(responseData.data) || !createSubCollectionPayload.items){
+		return nullptr;
 	}
 
 	const imtsdl::TElementList<sdl::V1_0::imtbase::CSubCollectionItem>& subCollectionItems = *createSubCollectionPayload.items;

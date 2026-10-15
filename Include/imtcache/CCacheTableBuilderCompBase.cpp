@@ -15,20 +15,11 @@ namespace imtcache
 {
 
 
-namespace
-{
-
-const QString SHADOW_SUFFIX = QStringLiteral("_shadow");
-const QString STAGING_SUFFIX = QStringLiteral("_staging");
-
-} // anonymous namespace
-
-
 // reimplemented (imtcache::ICacheTableBuilder)
 
 QString CCacheTableBuilderCompBase::GetCacheTableName() const
 {
-	return QString::fromUtf8(*m_tableNameAttrPtr);
+	return *m_tableNameAttrPtr;
 }
 
 

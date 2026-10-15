@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QString>
 #include <QtCore/QStringList>
+#include <QtCore/QVariant>
 
 // ImtCore includes
 #include <imtduckdb/IDuckConnection.h>
@@ -73,6 +74,17 @@ public:
 
 	/// Drops the entries every consumer has read, or all of them when there is no consumer.
 	static bool Purge(imtduckdb::IDuckConnection& connection, QString& errorMessage);
+
+private:
+	static bool Execute(imtduckdb::IDuckConnection& connection, const QString& query, QString& errorMessage);
+
+	/// The first column of the first row of the result.
+	static bool ReadValue(imtduckdb::IDuckConnection& connection, const QString& query, QVariant& value, QString& errorMessage);
+
+	static bool ExecuteScript(imtduckdb::IDuckConnection& connection, const QString& scriptPath, QString& errorMessage);
+
+	/// SQL expression taking the next change id from the sequence.
+	static QString NextChangeId();
 };
 
 
