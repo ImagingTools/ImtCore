@@ -9,6 +9,7 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonParseError>
+#include <QtCore/QMetaObject>
 #include <QtCore/QSaveFile>
 #include <QtCore/QSet>
 
@@ -84,9 +85,11 @@ bool CCollectionDocumentServiceComp::SaveToFile(const QString& filePath) const
 	}
 
 	DocumentMap documentMap;
+	QMutexLocker documentLocker(&m_mutex);
 	PrepareDocumentMap(documentMap);
 
 	QMutexLocker locker(&m_stateFileMutex);
+	documentLocker.unlock();
 
 	const QByteArray fileData = QJsonDocument(DocumentMapToJson(documentMap)).toJson(QJsonDocument::Indented);
 
@@ -154,7 +157,12 @@ void CCollectionDocumentServiceComp::OnEndChanges(const ChangeSet& changeSet)
 
 	const QString filePath = GetStateFilePath();
 	if (!filePath.isEmpty()){
-		SaveToFile(filePath);
+		QMetaObject::invokeMethod(
+			this,
+			[this, filePath] {
+				SaveToFile(filePath);
+			},
+			Qt::QueuedConnection);
 	}
 
 	BaseClass::OnEndChanges(changeSet);
@@ -183,7 +191,6 @@ void CCollectionDocumentServiceComp::PrepareDocumentMap(DocumentMap& documentMap
 {
 	documentMap.clear();
 
-	QMutexLocker locker(&m_mutex);
 	for (auto userIt = m_userDocuments.constBegin(); userIt != m_userDocuments.constEnd(); ++userIt){
 		DocumentInfoList documents;
 		const WorkingDocumentList& docs = userIt.value();
