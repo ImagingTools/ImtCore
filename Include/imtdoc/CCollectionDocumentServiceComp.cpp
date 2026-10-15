@@ -145,6 +145,16 @@ void CCollectionDocumentServiceComp::OnComponentCreated()
 }
 
 
+void CCollectionDocumentServiceComp::OnComponentDestroyed()
+{
+	if (IsStatePersistenceEnabled()){
+		SaveToFile(GetStateFilePath());
+	}
+
+	BaseClass::OnComponentDestroyed();
+}
+
+
 // reimplemented (istd::IChangeable)
 
 void CCollectionDocumentServiceComp::OnEndChanges(const ChangeSet& changeSet)
