@@ -90,7 +90,9 @@ Rectangle {
 
 	SubscriptionClient {
 		id: subscriptionClient
+		deliveryEnabled: container.visible
 		onMessageReceived: container.sendRequest()
+		onRefreshRequired: container.sendRequest()
 	}
 
 	Component {

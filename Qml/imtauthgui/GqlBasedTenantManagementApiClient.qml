@@ -157,12 +157,27 @@ QtObject {
 		function onTenantMembershipRemoved(tenantId, userId) {
 			root.subscriptionMembershipRemoved(tenantId, userId)
 		}
+		function onMembershipNotificationsResumed() {
+			root.__subscriptionsResumedTimer.restart()
+		}
 	}
 
 	// --- Real-time cross-tenant message subscription notifications ---
 	signal subscriptionCrossTenantMessageReceived(var notification)
 	signal subscriptionCrossTenantMessageStatusChanged(var notification)
 	signal subscriptionConnectionCodesChanged(var notification)
+
+	// Notifications were lost while the connection was down: the tenant views re-read their data.
+	signal subscriptionsResumed()
+
+	// The three notification sources resume together after a reconnect; one refresh is enough.
+	property Timer __subscriptionsResumedTimer: Timer {
+		interval: 0
+		repeat: false
+		onTriggered: {
+			root.subscriptionsResumed()
+		}
+	}
 
 	// --- Subscription client for cross-tenant message notifications ---
 	property SubscriptionClient __crossTenantMessageSubscription: SubscriptionClient {
@@ -194,6 +209,10 @@ QtObject {
 				root.subscriptionCrossTenantMessageStatusChanged(notification)
 			}
 		}
+
+		onRefreshRequired: {
+			root.__subscriptionsResumedTimer.restart()
+		}
 	}
 
 	property SubscriptionClient __connectionCodesSubscription: SubscriptionClient {
@@ -209,6 +228,10 @@ QtObject {
 				"requestId": data.containsKey("requestId") ? data.getData("requestId") : ""
 			}
 			root.subscriptionConnectionCodesChanged(notification)
+		}
+
+		onRefreshRequired: {
+			root.__subscriptionsResumedTimer.restart()
 		}
 	}
 

@@ -89,6 +89,11 @@ DocumentDataController {
                 container.hasRemoteChanges = true;
             }
         }
+
+        // Changes made while the connection was down are unknown.
+        onRefreshRequired: {
+            container.hasRemoteChanges = true;
+        }
     }
 
     property GqlRequestSender gqlUpdateModel: GqlRequestSender {
