@@ -210,12 +210,6 @@ Item {
 	}
 
 	function copyElementRow(index, items){
-		let targetRow = root.elementsModel.get(index);
-		let sourceRow = items.get(index);
-		if (!targetRow || !sourceRow){
-			return;
-		}
-
 		let keys = items.getKeys(index);
 		for (let k = 0; k < keys.length; k++){
 			let key = keys[k];
@@ -228,7 +222,14 @@ Item {
 			}
 		}
 
-		if (sourceRow.item && targetRow.item){
+		// Desktop CTreeItemModel has no get(): its rows hold no item objects.
+		if (typeof items.get !== "function" || typeof root.elementsModel.get !== "function"){
+			return;
+		}
+
+		let targetRow = root.elementsModel.get(index);
+		let sourceRow = items.get(index);
+		if (targetRow && sourceRow && targetRow.item && sourceRow.item){
 			root.copyItemFields(targetRow.item, sourceRow.item);
 		}
 	}
