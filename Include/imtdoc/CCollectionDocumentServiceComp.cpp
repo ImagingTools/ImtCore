@@ -12,6 +12,19 @@
 namespace imtdoc
 {
 
+namespace
+{
+template<typename T>
+bool ProcessRequiredTag(iser::IArchive& archive, const iser::CArchiveTag& tag, T& value)
+{
+	bool retVal = archive.BeginTag(tag);
+	retVal = retVal && archive.Process(value);
+	retVal = retVal && archive.EndTag(tag);
+
+	return retVal;
+}
+}
+
 
 // public methods
 
@@ -82,20 +95,26 @@ bool CCollectionDocumentServiceComp::SerializeDocumentMap(iser::IArchive& archiv
 		documentMap.clear();
 	}
 
-	int usersCount = isStoring ? imtbase::narrow_cast<int>(userIds.count()) : 0;
+	int usersCount = isStoring ? imtbase::narrow_cast<int>(userIds.count()) : -1;
 	retVal = retVal && archive.BeginMultiTag(usersTag, userTag, usersCount);
+	if (!isStoring && usersCount < 0){
+		retVal = false;
+	}
 
 	for (int i = 0; i < usersCount; ++i){
 		QByteArray userId = isStoring ? userIds[i] : QByteArray();
 
 		retVal = retVal && archive.BeginTag(userTag);
 
-		retVal = retVal && archive.TagAndProcess(userIdTag, userId);
+		retVal = retVal && ProcessRequiredTag(archive, userIdTag, userId);
 
 		DocumentInfoList documents = isStoring ? documentMap.value(userId) : DocumentInfoList();
 
-		int documentsCount = isStoring ? imtbase::narrow_cast<int>(documents.count()) : 0;
+		int documentsCount = isStoring ? imtbase::narrow_cast<int>(documents.count()) : -1;
 		retVal = retVal && archive.BeginMultiTag(documentsTag, documentTag, documentsCount);
+		if (!isStoring && documentsCount < 0){
+			retVal = false;
+		}
 
 		for (int j = 0; j < documentsCount; ++j){
 			DocumentInfo doc;
@@ -105,12 +124,12 @@ bool CCollectionDocumentServiceComp::SerializeDocumentMap(iser::IArchive& archiv
 
 			retVal = retVal && archive.BeginTag(documentTag);
 
-			retVal = retVal && archive.TagAndProcess(documentIdTag, doc.documentId);
-			retVal = retVal && archive.TagAndProcess(objectIdTag, doc.objectId);
-			retVal = retVal && archive.TagAndProcess(typeIdTag, doc.typeId);
-			retVal = retVal && archive.TagAndProcess(urlTag, doc.url);
-			retVal = retVal && archive.TagAndProcess(nameTag, doc.name);
-			retVal = retVal && archive.TagAndProcess(singleDocumentInstanceTag, doc.singleDocumentInstance);
+			retVal = retVal && ProcessRequiredTag(archive, documentIdTag, doc.documentId);
+			retVal = retVal && ProcessRequiredTag(archive, objectIdTag, doc.objectId);
+			retVal = retVal && ProcessRequiredTag(archive, typeIdTag, doc.typeId);
+			retVal = retVal && ProcessRequiredTag(archive, urlTag, doc.url);
+			retVal = retVal && ProcessRequiredTag(archive, nameTag, doc.name);
+			retVal = retVal && ProcessRequiredTag(archive, singleDocumentInstanceTag, doc.singleDocumentInstance);
 
 			retVal = retVal && archive.EndTag(documentTag);
 
