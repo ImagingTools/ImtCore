@@ -61,24 +61,6 @@ public:
 		I_ASSIGN(m_statePersistenceEnablerCompPtr, "StatePersistenceEnabler", "Enables restoring of opened documents on component creation and saving on each data model change", false, "StatePersistenceEnabler");
 	I_END_COMPONENT
 
-	/**
-		\brief Restore the list of opened documents from a JSON file.
-
-		All currently opened documents are discarded and replaced by the
-		documents described in the file.  Nothing is changed if the file
-		cannot be read or parsed.
-		\return \c true on success.
-	*/
-	bool LoadFromFile(const QString& filePath);
-
-	/**
-		\brief Save the list of opened documents to a JSON file.
-
-		The file contains the list of opened documents and their metadata.
-		\return \c true on success.
-	*/
-	bool SaveToFile(const QString& filePath) const;
-
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -94,6 +76,9 @@ protected:
 	virtual bool IsSingleCopyMode() const override;
 
 private:
+	bool LoadFromFile(const QString& filePath);
+	bool SaveToFile(const QString& filePath) const;
+
 	struct DocumentInfo
 	{
 		QByteArray documentId;

@@ -3,14 +3,12 @@
 `imtdoc::CCollectionDocumentServiceComp` can save and restore the list of opened
 documents to/from a JSON file.
 
-## API
+## Automatic persistence
 
-- `bool SaveToFile(const QString& filePath) const` — writes the list of opened
-  documents to `filePath` (atomically, via `QSaveFile`). Missing directories are created.
-- `bool LoadFromFile(const QString& filePath)` — reads `filePath`, replaces all currently
-  opened documents with the documents described in the file and reloads their data
-  from the `Collection`. If the file cannot be read or parsed, the current state is
-  left unchanged.
+State-file loading and saving are handled internally by the component. The
+`LoadFromFile` and `SaveToFile` helpers are private and are not a public API.
+The state file is written atomically via `QSaveFile`, and missing directories
+are created.
 
 ## Component configuration
 
