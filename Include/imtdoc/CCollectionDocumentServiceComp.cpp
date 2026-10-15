@@ -297,12 +297,13 @@ bool CCollectionDocumentServiceComp::DocumentMapFromJson(const QJsonObject& root
 			}
 
 			const QJsonObject documentObject = documentValue.toObject();
-			if (!documentObject.contains(s_documentIdKey)
-						|| !documentObject.contains(s_objectIdKey)
-						|| !documentObject.contains(s_typeIdKey)
-						|| !documentObject.contains(s_urlKey)
-						|| !documentObject.contains(s_nameKey)
-						|| !documentObject.contains(s_singleDocumentInstanceKey)){
+			if (!documentObject.value(s_documentIdKey).isString()
+						|| documentObject.value(s_documentIdKey).toString().isEmpty()
+						|| !documentObject.value(s_objectIdKey).isString()
+						|| !documentObject.value(s_typeIdKey).isString()
+						|| !documentObject.value(s_urlKey).isString()
+						|| !documentObject.value(s_nameKey).isString()
+						|| !documentObject.value(s_singleDocumentInstanceKey).isBool()){
 				return false;
 			}
 
