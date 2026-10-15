@@ -92,6 +92,9 @@ protected:
 	HeaderMap m_headers;
 
 	QByteArray m_lastHeader;
+	// http_parser reports a header name, a header value or the URL in several parts if they span several reads.
+	bool m_isHeaderFieldParsing = false;
+	QByteArray m_urlData;
 
 	QByteArray m_requestId;
 };

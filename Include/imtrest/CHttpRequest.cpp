@@ -149,6 +149,8 @@ int CHttpRequest::OnStartMessage(http_parser* httpParser)
 	Q_ASSERT(requestPtr != nullptr);
 
 	requestPtr->m_state = CHttpRequest::RS_START_MESSAGE;
+	requestPtr->m_urlData.clear();
+	requestPtr->m_isHeaderFieldParsing = false;
 
 	return 0;
 }
@@ -161,7 +163,8 @@ int CHttpRequest::OnUrl(http_parser* httpParser, const char *at, size_t length)
 	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
 	Q_ASSERT(requestPtr != nullptr);
 
-	CHttpRequest::ParseUrl(at, length, false, requestPtr->m_url);
+	// Parsed in OnHeadersComplete, when all parts of the URL are known.
+	requestPtr->m_urlData.append(at, int(length));
 
 	requestPtr->m_state = CHttpRequest::RS_URL;
 
@@ -189,10 +192,16 @@ int CHttpRequest::OnHeaderField(http_parser* httpParser, const char* at, size_t 
 	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
 	Q_ASSERT(requestPtr != nullptr);
 
-	QByteArray headerKey = QByteArray(at, int(length)).toLower();
-	requestPtr->m_headers[headerKey] = QByteArray();
+	QByteArray headerKeyPart = QByteArray(at, int(length)).toLower();
 
-	requestPtr->m_lastHeader = headerKey;
+	// A name after a value starts a new header field, otherwise it continues the current name.
+	if (requestPtr->m_isHeaderFieldParsing){
+		requestPtr->m_lastHeader.append(headerKeyPart);
+	}
+	else{
+		requestPtr->m_lastHeader = headerKeyPart;
+		requestPtr->m_isHeaderFieldParsing = true;
+	}
 
 	requestPtr->m_state = CHttpRequest::RS_HEADERS;
 
@@ -209,12 +218,16 @@ int CHttpRequest::OnHeaderValue(http_parser* httpParser, const char* at, size_t 
 
 	requestPtr->m_state = CHttpRequest::RS_HEADERS;
 
-	QByteArray headerValue = QByteArray(at, int(length));
-	requestPtr->m_headers[requestPtr->m_lastHeader] = headerValue;
+	QByteArray& headerValue = requestPtr->m_headers[requestPtr->m_lastHeader];
 
-	if (requestPtr->m_lastHeader == "host"){
-		CHttpRequest::ParseUrl(at, length, true,requestPtr->m_url);
+	// Repeated fields are combined into one list (RFC 9110, 5.3), cookies with "; " (RFC 9113, 8.2.3).
+	if (requestPtr->m_isHeaderFieldParsing && (length > 0) && !headerValue.isEmpty()){
+		headerValue.append((requestPtr->m_lastHeader == "cookie") ? "; " : ", ");
 	}
+
+	headerValue.append(at, int(length));
+
+	requestPtr->m_isHeaderFieldParsing = false;
 
 	return 0;
 }
@@ -228,6 +241,15 @@ int CHttpRequest::OnHeadersComplete(http_parser* httpParser)
 	Q_ASSERT(requestPtr != nullptr);
 
 	requestPtr->m_state = CHttpRequest::RS_HEADERS_COMPLETE;
+
+	CHttpRequest::ParseUrl(requestPtr->m_urlData.constData(), size_t(requestPtr->m_urlData.size()), false, requestPtr->m_url);
+
+	HeaderMap::const_iterator hostIter = requestPtr->m_headers.constFind("host");
+	if (hostIter != requestPtr->m_headers.constEnd()){
+		const QByteArray& host = hostIter.value();
+
+		CHttpRequest::ParseUrl(host.constData(), size_t(host.size()), true, requestPtr->m_url);
+	}
 
 	return 0;
 }
@@ -344,6 +366,8 @@ bool CHttpRequest::ResetData(CompatibilityMode /*mode*/)
 	m_body.clear();
 	m_headers.clear();
 	m_lastHeader.clear();
+	m_isHeaderFieldParsing = false;
+	m_urlData.clear();
 	m_url.clear();
 	m_data.clear();
 
@@ -376,7 +400,7 @@ bool CHttpRequest::ExecuteHttpParser(const QByteArray& data, const QObject* sock
 	else{
 		m_url.setScheme(QStringLiteral("http"));
 	}
-	
+
 	const QWebSocket* webSocketPtr = qobject_cast<const QWebSocket*>(socketObjectPtr);
 	if (webSocketPtr != nullptr){
 		m_url.setScheme(QStringLiteral("ws"));
