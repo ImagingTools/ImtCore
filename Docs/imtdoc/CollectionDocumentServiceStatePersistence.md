@@ -25,6 +25,12 @@ The file contains the same information as `Serialize()`: user IDs and the metada
 their opened documents. Document data itself is **not** stored; it is loaded from the
 collection on restore (documents that were never saved are restored as new empty documents).
 
+`LoadFromFile()` validates the JSON strictly:
+- the root object must contain `Users` and it must be an array;
+- each user object must contain both `UserId` and `Documents`;
+- each document object must contain `DocumentId`, `ObjectId`, `TypeId`, `Url`, `Name`,
+  and `SingleDocumentInstance`.
+
 ```json
 {
     "Users": [
