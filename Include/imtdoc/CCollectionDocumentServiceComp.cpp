@@ -278,10 +278,12 @@ bool CCollectionDocumentServiceComp::DocumentMapFromJson(const QJsonObject& root
 			return false;
 		}
 
-		const QByteArray userId = userObject.value(s_userIdKey).toString().toUtf8();
-		if (userId.isEmpty()){
+		const QJsonValue userIdValue = userObject.value(s_userIdKey);
+		if (!userIdValue.isString()){
 			return false;
 		}
+
+		const QByteArray userId = userIdValue.toString().toUtf8();
 
 		const QJsonValue documentsValue = userObject.value(s_documentsKey);
 		if (!documentsValue.isArray()){
