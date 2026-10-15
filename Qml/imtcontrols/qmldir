@@ -162,8 +162,11 @@ TreeViewItemDelegateBase 1.0 ./Views/TreeViewItemDelegateBase.qml
 
 TreeItemDelegate 1.0 ./Views/TreeItemDelegate.qml
 TreeViewColumn 1.0 ./Views/TreeViewColumn.qml
+TreeNodeSdl 1.0 ./Views/TreeNodeSdl.qml
+TreeViewBranch 1.0 ./Views/TreeViewBranch.qml
 TreeViewGql 1.0 ./Views/TreeViewGql.qml
 TreeViewPure 1.0 ./Views/TreeViewPure.qml
+TreeViewSdl 1.0 ./Views/TreeViewSdl.qml
 TreeViewSelection 1.0 ./Views/TreeViewSelection.qml
 
 BarChart 1.0 ./Views/BarChart.qml

@@ -45,51 +45,40 @@ Rectangle{
 	property Component addressTreeSdlObjectComp: null
 	property Component additionalDelegateComp: Component{Item{}}
 
-	property GqlPureRequestSender addressTreeRequest : GqlPureRequestSender {
+	property GqlSdlRequestSender addressTreeRequest : GqlSdlRequestSender {
 		context: treeBody.context
 		property string parentIds: "";
 		property string idsToOpen: "";
 		property int insertIndex: -1;
-		traceTiming: true
 
 		gqlCommandId: treeBody.addressListCommandId
+		inputObjectComp: treeBody.addressTreeInputObjectComp
+		sdlObjectComp: treeBody.addressTreeSdlObjectComp
 
 		property var customFinishedCallback: null
 
-		function resultItems(){
-			let payload = result;
-			if (!payload){
-				return [];
-			}
-			if (payload.items && payload.items.length !== undefined){
-				return payload.items;
-			}
-			if (payload.length !== undefined){
-				return payload;
-			}
-			return [];
-		}
-
-		function defaultFinishedCallback(status, insertIndex, idsToOpen) {
+		function defaultFinishedCallback(status, sdlObject, insertIndex, idsToOpen) {
 			treeLoading.visible = false;
 			if (status !== 1) {
 				return;
 			}
 
-			let items = resultItems();
-			let itemCount = items.length;
-			let buildStarted = treeBody.addressTreeRequest.traceNow();
+			let items = (sdlObject && sdlObject.m_items !== undefined) ? sdlObject.m_items : null;
+			let isCountZero = !items || !items.getItemsCount || items.getItemsCount() === 0;
+			let itemCount = isCountZero ? 0 : items.getItemsCount();
 
-			if (itemCount === 0 && insertIndex === -1) {
+			if (insertIndex === -1) {
 				treeView.model.clear();
 				treeView.selectedIndex = -1;
+				if (!isCountZero) {
+					treeView.showRoot(items);
+				}
+			}
+			else if (!isCountZero) {
+				treeView.showChildren(insertIndex, items);
 			}
 
-			if (itemCount > 0) {
-				treeView.insertTree(insertIndex, items);
-			}
-
-			console.log("AddressTree: сборка дерева", Math.round(treeBody.addressTreeRequest.traceNow() - buildStarted), "мс, узлов", itemCount, "index", insertIndex)
+			console.log("AddressTree: сборка дерева", itemCount, "узлов, index", insertIndex)
 
 			if (treeView.model.getItemsCount() > 0 && idsToOpen !== "") {
 				let ids_ = idsToOpen;
@@ -104,32 +93,17 @@ Rectangle{
 
 		onFinished: {
 			let reqStatus = status;
+			let reqSdlObject = sdlObject;
 			let reqInsertIndex = insertIndex;
 			let reqIdsToOpen = idsToOpen;
-			let responseAt = treeBody.addressTreeRequest.traceResponseAt;
 
 			if (customFinishedCallback) {
-				customFinishedCallback(reqStatus, result, reqInsertIndex, resultItems(), reqIdsToOpen);
+				let items = (reqSdlObject && reqSdlObject.m_items !== undefined) ? reqSdlObject.m_items : null;
+				customFinishedCallback(reqStatus, reqSdlObject, reqInsertIndex, items, reqIdsToOpen);
 				return;
 			}
 
-			defaultFinishedCallback(reqStatus, reqInsertIndex, reqIdsToOpen);
-
-			if (responseAt > 0){
-				console.log("AddressTree: всего после ответа", Math.round(treeBody.addressTreeRequest.traceNow() - responseAt), "мс")
-			}
-		}
-
-		function createQueryParams(query){
-			if (treeBody.addressTreeInputObjectComp){
-				let inputObject = treeBody.addressTreeInputObjectComp.createObject(addressTreeRequest);
-				let gqlObject = Gql.GqlObject("input");
-				gqlObject.fromObject(inputObject);
-				query.AddParam(gqlObject);
-				inputObject.destroy();
-				return;
-			}
-			query.AddParam(inputParams);
+			defaultFinishedCallback(reqStatus, reqSdlObject, reqInsertIndex, reqIdsToOpen);
 		}
 
 		function getRequestedFields(){
@@ -149,6 +123,18 @@ Rectangle{
 			let fields = Gql.GqlObject("");
 			fields.InsertFieldObject(items);
 			return fields;
+		}
+
+		function prepareSdlObject(sdlObject){
+			let raw = sdlObject.__self ? sdlObject.__self : sdlObject;
+			let original = raw.createElement;
+			raw.createElement = function(propertyId, typename){
+				if (propertyId === "m_items"){
+					return treeNodeComp;
+				}
+				return original.call(sdlObject, propertyId, typename);
+			}
+			delete raw.CACHED_FUNC_createElement;
 		}
 
 		function reset(){
@@ -321,7 +307,13 @@ Rectangle{
 		}
 	}
 
-	TreeViewPure{
+	Component {
+		id: treeNodeComp
+		TreeNodeSdl {
+		}
+	}
+
+	TreeViewBranch{
 		id: treeView;
 
 		anchors.top: searchComp.bottom;

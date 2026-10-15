@@ -178,7 +178,10 @@
                 <file alias="imtcontrols/Views/SubMenuPanelButtonDecorator.qml">Views/SubMenuPanelButtonDecorator.qml</file>
                 <file alias="imtcontrols/Views/SwitchCustom.qml">Views/SwitchCustom.qml</file>
                 <file alias="imtcontrols/Views/TreeItemDelegate.qml">Views/TreeItemDelegate.qml</file>
+                <file alias="imtcontrols/Views/TreeNodeSdl.qml">Views/TreeNodeSdl.qml</file>
+                <file alias="imtcontrols/Views/TreeViewBranch.qml">Views/TreeViewBranch.qml</file>
                 <file alias="imtcontrols/Views/TreeViewGql.qml">Views/TreeViewGql.qml</file>
+                <file alias="imtcontrols/Views/TreeViewSdl.qml">Views/TreeViewSdl.qml</file>
                 <file alias="imtcontrols/Views/TreeViewSelection.qml">Views/TreeViewSelection.qml</file>
                 <file alias="imtcontrols/Views/ProgressBar.qml">Views/ProgressBar.qml</file>
                 <file alias="imtcontrols/Views/ProgressRoundIndicator.qml">Views/ProgressRoundIndicator.qml</file>
