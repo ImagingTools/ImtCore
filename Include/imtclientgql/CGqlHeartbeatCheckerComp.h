@@ -30,6 +30,8 @@ namespace imtclientgql
 	Any answer of the server counts as connected, also a GraphQL error. Network errors and timeouts count as disconnected.
 	The server version from the answer is provided by the \c ServerVersion sub-element.
 	The status is reset and the check is repeated immediately when the server connection settings change.
+
+	The \c AsyncClient must have a finite timeout, otherwise a server that never answers keeps the last status.
 */
 class CGqlHeartbeatCheckerComp:
 			public QObject,
@@ -48,7 +50,7 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE_T(ServerVersion, iprm::ITextParam, ExtractServerVersion);
 		I_REGISTER_SUBELEMENT_INTERFACE_T(ServerVersion, istd::IChangeable, ExtractServerVersion);
 		I_REGISTER_SUBELEMENT_INTERFACE_T(ServerVersion, imod::IModel, ExtractServerVersion);
-		I_ASSIGN(m_asyncClientCompPtr, "AsyncClient", "Asynchronous GraphQL client used to send the heartbeat", true, "AsyncClient");
+		I_ASSIGN(m_asyncClientCompPtr, "AsyncClient", "Asynchronous GraphQL client used to send the heartbeat, it must have a finite timeout", true, "AsyncClient");
 		I_ASSIGN(m_serverConnectionCompPtr, "ServerConnectionInterface", "Server connection settings used by the client, the check restarts when they change", false, "ServerConnectionInterface");
 		I_ASSIGN_TO(m_serverConnectionModelCompPtr, m_serverConnectionCompPtr, false);
 		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "Interval between two heartbeats in seconds", true, 5.0);
