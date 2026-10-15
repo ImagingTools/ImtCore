@@ -19,7 +19,7 @@ namespace imtcache
 
 QString CCacheTableBuilderCompBase::GetCacheTableName() const
 {
-	return QString::fromUtf8(*m_tableNameAttrPtr);
+	return *m_tableNameAttrPtr;
 }
 
 

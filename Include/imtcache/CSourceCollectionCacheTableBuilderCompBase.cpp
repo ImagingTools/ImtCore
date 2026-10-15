@@ -83,8 +83,7 @@ bool CSourceCollectionCacheTableBuilderCompBase::LoadLocalRows(
 	readTimer.start();
 
 	// The SQL iterator reads the whole result set here, so this is the time spent waiting on PostgreSQL.
-	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> iteratorPtr(
-				m_sourceCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, filterParamsPtr));
+	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> iteratorPtr(m_sourceCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, filterParamsPtr));
 	if (!iteratorPtr.IsValid()){
 		result.errorMessage = QStringLiteral("Unable to read the source collection for %1").arg(tableName);
 
@@ -96,7 +95,8 @@ bool CSourceCollectionCacheTableBuilderCompBase::LoadLocalRows(
 	while (iteratorPtr->Next()){
 		progress.RowProcessed();
 
-		if (!AppendRow(*iteratorPtr, appender, tableName, iteratorPtr->GetElementInfo(*m_modificationTimeFieldAttrPtr).toDateTime(), result)){
+		const QDateTime modificationTime = iteratorPtr->GetElementInfo(*m_modificationTimeFieldAttrPtr).toDateTime();
+		if (!AppendRow(*iteratorPtr, appender, tableName, modificationTime, result)){
 			progress.RowSkipped();
 		}
 	}
@@ -147,7 +147,8 @@ bool CSourceCollectionCacheTableBuilderCompBase::LoadRemoteRows(
 						progress.RowSkipped();
 					}
 				},
-				readError);
+				readError
+	);
 	if (!isRead){
 		result.errorMessage = QStringLiteral("Unable to read the source collection for %1. Error: %2").arg(tableName, readError);
 
@@ -186,7 +187,10 @@ bool CSourceCollectionCacheTableBuilderCompBase::AppendRow(
 		return false;
 	}
 
-	if (modificationTime.isValid() && (!result.lastSourceUpdateTime.isValid() || modificationTime > result.lastSourceUpdateTime)){
+	const bool isModificationTimeValid	= modificationTime.isValid();
+	const bool isLastUpdateTimeValid	= result.lastSourceUpdateTime.isValid();
+	const bool isNewer					= modificationTime > result.lastSourceUpdateTime;
+	if (isModificationTimeValid && (!isLastUpdateTimeValid || isNewer)){
 		result.lastSourceUpdateTime = modificationTime;
 	}
 
@@ -203,9 +207,10 @@ void CSourceCollectionCacheTableBuilderCompBase::FillChangedFilter(imtbase::CCom
 	}
 
 	filter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter(
-				*m_modificationTimeFieldAttrPtr,
-				since.toString(Qt::ISODateWithMs),
-				imtbase::IComplexCollectionFilter::FO_GREATER));
+		*m_modificationTimeFieldAttrPtr,
+		since.toString(Qt::ISODateWithMs),
+		imtbase::IComplexCollectionFilter::FO_GREATER)
+	);
 }
 
 
@@ -216,8 +221,9 @@ void CSourceCollectionCacheTableBuilderCompBase::FillPageSorting(imtbase::CCompl
 	sortInfo.sortingOrder = imtbase::IComplexCollectionFilter::SO_ASC;
 
 	filter.SetFields({
-			imtbase::IComplexCollectionFilter::FieldInfo(*m_modificationTimeFieldAttrPtr, sortInfo),
-			imtbase::IComplexCollectionFilter::FieldInfo(*m_sourceIdFieldAttrPtr, sortInfo)});
+		imtbase::IComplexCollectionFilter::FieldInfo(*m_modificationTimeFieldAttrPtr, sortInfo),
+		imtbase::IComplexCollectionFilter::FieldInfo(*m_sourceIdFieldAttrPtr, sortInfo)
+	});
 }
 
 
@@ -226,11 +232,11 @@ void CSourceCollectionCacheTableBuilderCompBase::FillAfterCursorFilter(
 			const QString& cursorTime,
 			const QByteArray& cursorId) const
 {
-	using Filter = imtbase::IComplexCollectionFilter;
-
 	if (cursorTime.isEmpty()){
 		return;
 	}
+
+	using Filter = imtbase::IComplexCollectionFilter;
 
 	const Filter::FieldFilter later(*m_modificationTimeFieldAttrPtr, cursorTime, Filter::FO_GREATER);
 	if (cursorId.isEmpty()){
@@ -241,7 +247,7 @@ void CSourceCollectionCacheTableBuilderCompBase::FillAfterCursorFilter(
 
 	Filter::FilterExpression sameTime;
 	sameTime.fieldFilters << Filter::FieldFilter(*m_modificationTimeFieldAttrPtr, cursorTime, Filter::FO_EQUAL);
-	sameTime.fieldFilters << Filter::FieldFilter(*m_sourceIdFieldAttrPtr, QString::fromUtf8(cursorId), Filter::FO_GREATER);
+	sameTime.fieldFilters << Filter::FieldFilter(*m_sourceIdFieldAttrPtr, cursorId, Filter::FO_GREATER);
 
 	Filter::FilterExpression expression;
 	expression.logicalOperation = Filter::LO_OR;
@@ -280,7 +286,7 @@ bool CSourceCollectionCacheTableBuilderCompBase::ReadRemoteRows(
 	QString cursorTime = since.isValid() ? since.toString(Qt::ISODateWithMs) : QString();
 	QByteArray cursorId;
 
-	for (;;){
+	while (true){
 		imtbase::CComplexCollectionFilter pageFilter;
 		FillPageSorting(pageFilter);
 		FillAfterCursorFilter(pageFilter, cursorTime, cursorId);
@@ -317,7 +323,7 @@ bool CSourceCollectionCacheTableBuilderCompBase::ReadRemoteRows(
 
 			const QDateTime modificationTime = GetRemoteModificationTime(*iteratorPtr);
 			if (!modificationTime.isValid()){
-				errorMessage = QStringLiteral("object '%1' has no modification time").arg(QString::fromUtf8(iteratorPtr->GetObjectId()));
+				errorMessage = QStringLiteral("object '%1' has no modification time").arg(iteratorPtr->GetObjectId());
 
 				return false;
 			}
@@ -376,12 +382,12 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsDeletedSince(
 	// finds removals too. That holds for address collections; document collections do not do it.
 	QStringList deletedIds;
 	const auto collectDeleted = [&](const imtbase::IObjectCollectionIterator& iterator, const QDateTime& lastModified){
-		const QUuid documentUuid = QUuid(QString::fromUtf8(iterator.GetObjectId()));
+		const QUuid documentUuid = QUuid(iterator.GetObjectId());
 		if (documentUuid.isNull()){
 			return;
 		}
 
-		deletedIds << QString::fromUtf8(documentUuid.toByteArray(QUuid::WithoutBraces));
+		deletedIds << documentUuid.toByteArray(QUuid::WithoutBraces);
 
 		if (lastModified.isValid() && (!result.lastSourceUpdateTime.isValid() || lastModified > result.lastSourceUpdateTime)){
 			result.lastSourceUpdateTime = lastModified;
@@ -409,8 +415,7 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsDeletedSince(
 	deletedParams.SetEditableParameter(QByteArrayLiteral("ComplexFilter"), &changedFilter);
 	deletedParams.SetEditableParameter(*m_stateFilterParamIdAttrPtr, &documentFilter);
 
-	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> iteratorPtr(
-				m_sourceCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &deletedParams));
+	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> iteratorPtr(m_sourceCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &deletedParams));
 	if (!iteratorPtr.IsValid()){
 		result.errorMessage = QStringLiteral("Unable to read soft-deleted rows for %1").arg(GetCacheTableName());
 
@@ -435,10 +440,12 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsMissingFromSource(
 {
 	QSet<QString> activeIds;
 	const auto collectActive = [&](const imtbase::IObjectCollectionIterator& iterator){
-		const QUuid documentUuid = QUuid(QString::fromUtf8(iterator.GetObjectId()));
-		if (!documentUuid.isNull()){
-			activeIds.insert(QString::fromUtf8(documentUuid.toByteArray(QUuid::WithoutBraces)));
+		const QUuid documentUuid = QUuid(iterator.GetObjectId());
+		if (documentUuid.isNull()){
+			return;
 		}
+
+		activeIds.insert(documentUuid.toByteArray(QUuid::WithoutBraces));
 	};
 
 	if (*m_remoteSourcePageSizeAttrPtr > 0){
@@ -449,7 +456,8 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsMissingFromSource(
 					[&](const imtbase::IObjectCollectionIterator& iterator, const QDateTime&){
 						collectActive(iterator);
 					},
-					readError);
+					readError
+		);
 		if (!isRead){
 			// Deleting on the strength of a failed read would empty the table.
 			result.errorMessage = QStringLiteral("Unable to read the active rows of %1. Error: %2").arg(GetCacheTableName(), readError);
@@ -459,8 +467,7 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsMissingFromSource(
 	}
 	else{
 		// No filter parameters: the source returns its active rows only.
-		istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> iteratorPtr(
-					m_sourceCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, nullptr));
+		istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> iteratorPtr(m_sourceCollectionCompPtr->CreateObjectCollectionIterator());
 		if (!iteratorPtr.IsValid()){
 			// Deleting on the strength of a failed read would empty the table.
 			result.errorMessage = QStringLiteral("Unable to read the active rows of %1").arg(GetCacheTableName());
@@ -473,13 +480,13 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsMissingFromSource(
 		}
 	}
 
+	const QByteArray cachedQuery = QStringLiteral(R"(SELECT CAST(%1 AS VARCHAR) FROM %2)")
+										.arg(
+											imtdb::QuoteIdentifier(GetObjectIdColumn()),
+											imtdb::QuoteIdentifier(GetCacheTableName()))
+										.toUtf8();
 	QSqlError sqlError;
-	QSqlQuery cachedQuery = connection.ExecSqlQuery(
-				QStringLiteral(R"(SELECT CAST(%1 AS VARCHAR) FROM %2)")
-							.arg(imtdb::QuoteIdentifier(GetObjectIdColumn()),
-								 imtdb::QuoteIdentifier(GetCacheTableName()))
-							.toUtf8(),
-				&sqlError);
+	QSqlQuery cachedSqlQuery = connection.ExecSqlQuery(cachedQuery, &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
 		result.errorMessage = QStringLiteral("Unable to list the cached rows of %1. Error: %2").arg(GetCacheTableName(), sqlError.text());
 
@@ -487,11 +494,13 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsMissingFromSource(
 	}
 
 	QStringList removedIds;
-	while (cachedQuery.next()){
-		const QString cachedId = cachedQuery.value(0).toString();
-		if (!activeIds.contains(cachedId)){
-			removedIds << cachedId;
+	while (cachedSqlQuery.next()){
+		const QString cachedId = cachedSqlQuery.value(0).toString();
+		if (activeIds.contains(cachedId)){
+			continue;
 		}
+
+		removedIds << cachedId;
 	}
 
 	if (removedIds.isEmpty()){
@@ -508,15 +517,9 @@ bool CSourceCollectionCacheTableBuilderCompBase::DeleteRowsById(
 			BuildResult& result) const
 {
 	// Ids are UUID text produced by QUuid or read back from a UUID column, so quoting them is enough.
-	QStringList quotedIds;
-	for (const QString& documentId : documentIds){
-		quotedIds << QStringLiteral("'%1'").arg(documentId);
-	}
-
-	QSqlError sqlError;
+	const QString quotedIds = QStringLiteral("'%1'").arg(documentIds.join(QStringLiteral("','")));
 	const QString removedCondition = QStringLiteral(R"(%1 IN (%2))")
-				.arg(imtdb::QuoteIdentifier(GetObjectIdColumn()), quotedIds.join(','));
-
+										 .arg(imtdb::QuoteIdentifier(GetObjectIdColumn()), quotedIds);
 	QString logError;
 	if (!CCacheChangeLog::RecordRemoved(connection, GetCacheTableName(), GetKeyColumn(), removedCondition, logError)){
 		result.errorMessage = QStringLiteral("Unable to log the removed rows of %1. Error: %2").arg(GetCacheTableName(), logError);
@@ -524,10 +527,10 @@ bool CSourceCollectionCacheTableBuilderCompBase::DeleteRowsById(
 		return false;
 	}
 
-	connection.ExecSqlQuery(QStringLiteral(R"(DELETE FROM %1 WHERE %2)")
-								.arg(imtdb::QuoteIdentifier(GetCacheTableName()), removedCondition)
-								.toUtf8(), &sqlError);
-
+	const QString deletionQuery = QStringLiteral(R"(DELETE FROM %1 WHERE %2)")
+									.arg(imtdb::QuoteIdentifier(GetCacheTableName()), removedCondition);
+	QSqlError sqlError;
+	connection.ExecSqlQuery(deletionQuery.toUtf8(), &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
 		result.errorMessage = QStringLiteral("Unable to delete removed rows from %1. Error: %2").arg(GetCacheTableName(), sqlError.text());
 
