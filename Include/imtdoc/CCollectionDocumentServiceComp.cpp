@@ -157,9 +157,15 @@ void CCollectionDocumentServiceComp::OnEndChanges(const ChangeSet& changeSet)
 
 	const QString filePath = GetStateFilePath();
 	if (!filePath.isEmpty()){
+		std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
 		QMetaObject::invokeMethod(
 			this,
-			[this, filePath] {
+			[this, filePath, aliveGuard] {
+				auto isAlive = aliveGuard.lock();
+				if (!isAlive || !isAlive->load()){
+					return;
+				}
+
 				SaveToFile(filePath);
 			},
 			Qt::QueuedConnection);
