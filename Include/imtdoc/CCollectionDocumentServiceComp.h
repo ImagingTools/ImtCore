@@ -130,7 +130,7 @@ private:
 	I_REF(ifile::IFileNameParam, m_stateFilePathCompPtr);
 	I_REF(iprm::IEnableableParam, m_statePersistenceEnablerCompPtr);
 
-	bool m_isStateLoading = false;
+	std::atomic<bool> m_isStateLoading{false};
 	mutable QMutex m_stateFileMutex;
 };
 
