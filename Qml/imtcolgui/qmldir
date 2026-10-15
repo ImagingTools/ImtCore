@@ -32,6 +32,7 @@ MetaInfoViewDelegateBase 1.0 MetaInfoViewDelegateBase.qml
 MetaInfoTextDelegate 1.0 MetaInfoTextDelegate.qml
 MetaInfoDateDelegate 1.0 MetaInfoDateDelegate.qml
 MetaInfoStringListDelegate 1.0 MetaInfoStringListDelegate.qml
+MetaInfoListDelegate 1.0 MetaInfoListDelegate.qml
 
 CollectionDataController 1.0 CollectionDataController.qml
 FilterableSelectDataProvider 1.0 FilterableSelectDataProvider.qml

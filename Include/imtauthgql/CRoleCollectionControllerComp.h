@@ -9,6 +9,7 @@
 #include <imtserverapp/CIdParamRepresentationController.h>
 #include <imtauth/CRole.h>
 #include <imtauth/IDelegatedAccess.h>
+#include <imtauth/ITenantEntityBindingManager.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <imtgql/IGqlRequestProvider.h>
@@ -30,6 +31,7 @@ public:
 		I_ASSIGN(m_roleInfoFactCompPtr, "RoleFactory", "Factory used for creation of the new role instance", true, "RoleFactory");
 		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Delegated access resolver for cross-org grants", false, "DelegatedAccessResolver");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
+		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager, scopes the roles a user holds to the current tenant", false, "TenantEntityBindingManager");
 	I_END_COMPONENT;
 
 protected:
@@ -83,6 +85,7 @@ protected:
 	I_FACT(imtauth::IRole, m_roleInfoFactCompPtr);
 	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
+	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
 
 private:
 	iprm::CIdParam m_idParam;

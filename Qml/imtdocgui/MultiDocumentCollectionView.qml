@@ -166,6 +166,14 @@ Item {
 				let isDirty = documentInfo.m_isDirty
 				let hasNameProvider = documentInfo.m_hasNameProvider
 
+				// Resync: the service refreshes open documents; a missed DocumentDataLoaded must not keep one loading.
+				if (workspaceView.documentManager.documentIsOpened(String(documentId))){
+					if (documentInfo.m_isLoading === false){
+						workspaceView.documentManager.setDocumentIsLoading(String(documentId), false)
+					}
+					continue
+				}
+
 				workspaceView.documentManager.setAutoNamedTypeId(objectTypeId, hasNameProvider)
 
 				if (objectId === ""){
@@ -198,6 +206,7 @@ Item {
 		}
 
 		function onDocumentDataLoaded(documentId){
+			tabView.setTabLoading(documentId, false)
 			workspaceView.stopLoading(documentId)
 		}
 
@@ -210,6 +219,7 @@ Item {
 		}
 
 		function onUpdateRepresentationFailed(documentId, message){
+			tabView.setTabLoading(documentId, false)
 			if(message !==""){
 				PopupManager.addErrorMessage(message, true)
 			}
@@ -247,6 +257,7 @@ Item {
 			}
 
 			tabView.addTab(documentId, "", stackViewComp, "", "", false)
+			tabView.setTabLoading(documentId, workspaceView.documentManager.documentIsLoading(documentId))
 			tabView.currentIndex = tabView.tabModel.count - 1
 			workspaceView.updateTabName(documentId)
 			workspaceView.startLoading(documentId)
@@ -260,6 +271,7 @@ Item {
 		}
 
 		function onOpenDocumentFailed(documentId, message){
+			tabView.setTabLoading(documentId, false)
 			workspaceView.stopLoading(documentId)
 			if(message !==""){
 				PopupManager.addErrorMessage(message, true)
@@ -274,6 +286,10 @@ Item {
 		function onDocumentClosed(documentId){
 			tabView.removeTab(documentId)
 			workspaceView.stopLoading(documentId)
+		}
+
+		function onDocumentLost(documentId, documentName){
+			PopupManager.addInfoMessage(qsTr("The document \"%1\" is no longer open on the server and was closed").arg(documentName), true)
 		}
 
 		function onCloseDocumentFailed(documentId, message){
@@ -316,6 +332,7 @@ Item {
 			}
 
 			tabView.addTab(documentId, "", stackViewComp, "", "", false)
+			tabView.setTabLoading(documentId, workspaceView.documentManager.documentIsLoading(documentId))
 
 			tabView.currentIndex = tabView.tabModel.count - 1
 			workspaceView.updateTabName(documentId)
@@ -461,7 +478,8 @@ Item {
 				// Align overlay state with current document-service state in case
 				// start/stopLoading signals were emitted before this tab was initialized.
 				if (workspaceView.documentManager
-						&& workspaceView.documentManager.documentIsLoading(documentId)){
+						&& workspaceView.documentManager.documentIsLoading(documentId)
+						&& !stackView.skeletonShown()){
 					loading.start()
 				}
 				else{
@@ -513,6 +531,18 @@ Item {
 				}
 			}
 
+			// A view showing its skeleton needs no loading indicator on top of it.
+			function skeletonShown(){
+				for (let viewTypeId in itemViewTypes){
+					let view = itemViewTypes[viewTypeId]
+					if (view.visible && view.skeletonVisible){
+						return true
+					}
+				}
+
+				return false
+			}
+
 			function onCommandActivated(commandId){
 				let viewTypeIds = Object.keys(itemViewTypes)
 				if (!viewTypeIds.includes(commandId)){
@@ -538,7 +568,7 @@ Item {
 			Connections {
 				target: workspaceView
 				function onStartLoading(documentId){
-					if (documentId !== stackView.documentId){
+					if (documentId !== stackView.documentId || stackView.skeletonShown()){
 						return
 					}
 

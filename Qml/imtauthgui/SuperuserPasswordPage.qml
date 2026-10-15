@@ -28,7 +28,7 @@ Rectangle {
 	// Reached before any API client exists, so the policy is instantiated here.
 	GqlBasedPasswordPolicyProvider {
 		id: passwordPolicyProvider;
-		context: root.context;
+		permissionPath: root.permissionPath;
 	}
 
 	Component.onCompleted: {
@@ -222,6 +222,11 @@ Rectangle {
 				nameInput.showErrorWhenInvalid: false;
 				mailInput.showErrorWhenInvalid: false;
 				confirmPasswordInput.showErrorWhenInvalid: false;
+
+				// Without the inline errors the required fields are marked up front instead.
+				mailInput.isRequired: true;
+				passwordInput.isRequired: true;
+				confirmPasswordInput.isRequired: true;
 
 				onEmitUpdateModel: {
 					updateModel();

@@ -288,24 +288,29 @@ ViewBase {
 			}
 			
 			onElementsChanged: {
-				selectionBlock = true
-				resetSelection()
+				tableInternal.restoreSelection()
 
-				let elementsModel = collectionViewBaseContainer.dataController.elementsModel
-				let count = elementsModel.getItemsCount()
+				collectionViewBaseContainer.elementsChanged();
+			}
+
+			function restoreSelection(){
+				let count = !tableInternal.elements ? 0 : tableInternal.elements.getItemsCount()
 				let selectedIndexes = []
 				for (let i = 0; i < count; i++){
-					let elementId = elementsModel.getData("id", i)
+					let elementId = tableInternal.elements.getData("id", i)
 					if (collectionViewBaseContainer.selectionManager.isSelected(elementId)){
 						selectedIndexes.push(i)
 					}
 				}
 
-				selectionManager.selectMultiple(selectedIndexes)
-				
-				selectionBlock = false
+				if (tableInternal.selectionManager.arraysEqual(tableInternal.getSelectedIndexes(), selectedIndexes)){
+					return
+				}
 
-				collectionViewBaseContainer.elementsChanged();
+				tableInternal.selectionBlock = true
+				tableInternal.resetSelection()
+				tableInternal.selectionManager.selectMultiple(selectedIndexes)
+				tableInternal.selectionBlock = false
 			}
 			
 			onHeadersChanged: {

@@ -171,6 +171,9 @@
         <Element Id="RolesDataController" PackageId="ImtAuthGqlPck" ComponentId="RoleCollectionController">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="BindingManager" Type="Reference" ExportId="BindingManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Roles"/>
                     </AttributeInfo>
