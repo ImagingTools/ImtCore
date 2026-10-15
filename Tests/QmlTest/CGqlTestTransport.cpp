@@ -112,9 +112,9 @@ protected:
 			requestHeaders.insert(QString::fromUtf8(headerId).toLower(), QString::fromUtf8(request.rawHeader(headerId)));
 		}
 
-		m_transport.RegisterRequest(requestBody, requestHeaders);
+		const QByteArray responseBody = m_transport.RegisterRequest(requestBody, requestHeaders);
 
-		return new CGqlTestReply(operation, request, m_transport.GetResponseStatus(), m_transport.GetResponseBody().toUtf8(), this);
+		return new CGqlTestReply(operation, request, m_transport.GetResponseStatus(), responseBody, this);
 	}
 
 private:
@@ -277,13 +277,23 @@ void CGqlTestTransport::SetResponseStatus(int responseStatus)
 }
 
 
-void CGqlTestTransport::RegisterRequest(const QByteArray& requestBody, const QVariantMap& requestHeaders)
+QByteArray CGqlTestTransport::RegisterRequest(const QByteArray& requestBody, const QVariantMap& requestHeaders)
 {
 	m_lastRequestBody = requestBody;
 	m_lastRequestHeaders = requestHeaders;
 	++m_requestCount;
 
+	const QString commandId = parseRequest(QString::fromUtf8(requestBody)).value(QStringLiteral("commandId")).toString();
+	m_requestedCommands.append(commandId);
+
+	QByteArray responseBody = m_responseBody;
+	if (!m_queuedResponses.value(commandId).isEmpty()){
+		responseBody = m_queuedResponses[commandId].takeFirst();
+	}
+
 	Q_EMIT requestReceived();
+
+	return responseBody;
 }
 
 
@@ -292,10 +302,24 @@ void CGqlTestTransport::reset()
 	m_requestCount = 0;
 	m_lastRequestBody.clear();
 	m_lastRequestHeaders.clear();
+	m_queuedResponses.clear();
+	m_requestedCommands.clear();
 	Q_EMIT requestReceived();
 
 	SetResponseBody(QString::fromUtf8(s_defaultResponseBody));
 	SetResponseStatus(s_defaultResponseStatus);
+}
+
+
+void CGqlTestTransport::queueResponse(const QString& commandId, const QString& responseBody)
+{
+	m_queuedResponses[commandId].append(responseBody.toUtf8());
+}
+
+
+QStringList CGqlTestTransport::requestedCommands() const
+{
+	return m_requestedCommands;
 }
 
 

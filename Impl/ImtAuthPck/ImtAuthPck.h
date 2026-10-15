@@ -13,6 +13,7 @@
 #include <imtauth/CUserInfoComp.h>
 #include <imtauth/CUserGroupInfoComp.h>
 #include <imtauth/CRoleCollectionAdapterComp.h>
+#include <imtauth/CPermissionPathMigrationComp.h>
 #include <imtauth/CCheckPermissionCompBase.h>
 #include <imtauth/CCheckPermissionOrComp.h>
 #include <imtauth/CUserSettingsComp.h>
@@ -93,6 +94,7 @@ typedef icomp::TModelCompWrap<
 typedef icomp::TModelCompWrap<imtauth::CUserGroupInfoComp> UserGroupInfo;
 typedef imtauth::CUserInfoMetaInfoCreatorComp UserInfoMetaInfoCreator;
 typedef imtauth::CRoleCollectionAdapterComp RoleCollectionAdapter;
+typedef imtauth::CPermissionPathMigrationComp PermissionPathMigration;
 typedef imtauth::CUserCollectionAdapterComp UserCollectionAdapter;
 typedef imtauth::CCheckPermissionCompBase CheckPermissions;
 typedef imtauth::COrganizationsPermissionsProviderComp OrganizationsPermissionsProvider;

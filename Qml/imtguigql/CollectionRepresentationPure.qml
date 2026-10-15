@@ -11,7 +11,7 @@ Item {
 
 	property string collectionId: ""
 	property string gqlGetListCommandId: collectionId + "List"
-	property string context: ""
+	property string permissionPath: ""
 
 	property var additionalFieldIds: ["id", "name"]
 	property var requestedFields: []

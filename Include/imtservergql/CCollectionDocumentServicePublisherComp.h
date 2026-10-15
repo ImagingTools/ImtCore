@@ -120,6 +120,14 @@ protected:
 	*/
 	QByteArray GetSubscribedDocumentId(const imtgql::CGqlRequest& gqlRequest) const;
 	QByteArray GetSubscriberUserId(const imtgql::CGqlRequest& gqlRequest) const;
+	void FillUndoInfoFromCache(
+				const QByteArray& documentId,
+				bool isDirty,
+				int availableUndoSteps,
+				int availableRedoSteps,
+				const QList<QString>& undoLevelDescriptions,
+				const QList<QString>& redoLevelDescriptions,
+				sdl::V1_0::imtbase::CUndoInfo& sdlNotification) const;
 
 	template<class Representation>
 	void PublishRepresentation(
@@ -133,6 +141,9 @@ protected Q_SLOTS:
 		subscription and whose grace period without an active subscriber has elapsed.
 	*/
 	void CloseIdleDocuments();
+	void SendCachedUndoRedoNotificationsToSubscriber(
+				const QByteArray& subscriptionId,
+				const QByteArray& userId);
 
 private:
 	I_REF(imtdoc::IDocumentService, m_documentServiceCompPtr);
@@ -140,11 +151,22 @@ private:
 	I_ATTR(int, m_closeDocumentTimeoutAttrPtr);
 
 private:
+	struct CachedUndoRedoState
+	{
+		bool isDirty = false;
+		int availableUndoSteps = 0;
+		int availableRedoSteps = 0;
+		QList<QString> undoLevelDescriptions;
+		QList<QString> redoLevelDescriptions;
+	};
+
 	struct TrackedDocument
 	{
 		QByteArray userId;
 		bool hasIndividualSubscription = false; ///< \c true after the first individual OnDocumentChanged subscription for this document.
 		qint64 lastSubscriberSeenSecs = 0; ///< Timestamp (in seconds since epoch) of the last moment an active subscriber was observed.
+		bool hasUndoRedoState = false;
+		CachedUndoRedoState undoRedoState;
 	};
 
 	mutable QMutex m_trackedDocumentsMutex;
@@ -171,6 +193,7 @@ void CCollectionDocumentServicePublisherComp::PublishRepresentation(
 
 	QByteArray data = jsonDoc.toJson(QJsonDocument::Compact);
 
+	QMutexLocker locker(&m_mutex);
 	for (const RequestNetworks& networkRequest : m_registeredSubscribers){
 		if (!userId.isEmpty()){
 			const imtgql::IGqlContext* contextPtr = networkRequest.gqlRequest.GetRequestContext();

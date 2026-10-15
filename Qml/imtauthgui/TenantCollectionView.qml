@@ -18,7 +18,7 @@ import imtauthTenantMembershipsSdl 1.0
 RemoteCollectionView {
 	id: container
 
-	property string context: ""
+	property string permissionPath: ""
 	collectionId: "Tenants"
 	gqlGetListCommandId: ImtauthTenantsSdlCommandIds.s_getTenantList
 	documentCollectionFilter: null
@@ -89,6 +89,9 @@ RemoteCollectionView {
 		function onSubscriptionOwnershipTransferred(tenantId) {
 			container.doUpdateGui()
 		}
+		function onSubscriptionsResumed() {
+			container.doUpdateGui()
+		}
 	}
 
 	onHeadersChanged: {
@@ -135,7 +138,7 @@ RemoteCollectionView {
 
 	property AcceptTenantInvitationInput acceptInvitationInput: AcceptTenantInvitationInput {}
 	property GqlSdlRequestSender acceptInvitationSender: GqlSdlRequestSender {
-		context: container.context
+		permissionPath: container.permissionPath
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_acceptTenantInvitation
 		sdlObjectComp: Component {
@@ -159,7 +162,7 @@ RemoteCollectionView {
 
 	property RejectTenantInvitationInput rejectInvitationInput: RejectTenantInvitationInput {}
 	property GqlSdlRequestSender rejectInvitationSender: GqlSdlRequestSender {
-		context: container.context
+		permissionPath: container.permissionPath
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_rejectTenantInvitation
 		sdlObjectComp: Component {
@@ -621,7 +624,7 @@ RemoteCollectionView {
 
 	property FindMembershipInput __findMembershipForLeaveInput: FindMembershipInput {}
 	property GqlSdlRequestSender __findMembershipForLeaveSender: GqlSdlRequestSender {
-		context: container.context
+		permissionPath: container.permissionPath
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_findMembership
 
 		sdlObjectComp: Component {
@@ -644,7 +647,7 @@ RemoteCollectionView {
 
 	property RemoveMembershipInput __removeMembershipForLeaveInput: RemoveMembershipInput {}
 	property GqlSdlRequestSender __removeMembershipForLeaveSender: GqlSdlRequestSender {
-		context: container.context
+		permissionPath: container.permissionPath
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_removeMembership
 
@@ -829,7 +832,7 @@ RemoteCollectionView {
 
 					property DocumentId documentIdInput: DocumentId {}
 					property GqlSdlRequestSender getTenantRequest: GqlSdlRequestSender {
-						context: container.context
+						permissionPath: container.permissionPath
 						gqlCommandId: ImtauthTenantCollectionDocumentServiceSdlCommandIds.s_getTenantRepresentation
 						sdlObjectComp: Component {
 							TenantData {
@@ -847,7 +850,7 @@ RemoteCollectionView {
 
 					property UpdateTenantFromRepresentationInput updateTenantInput: UpdateTenantFromRepresentationInput {}
 					property GqlSdlRequestSender updateTenantRequest: GqlSdlRequestSender {
-						context: container.context
+						permissionPath: container.permissionPath
 						gqlCommandId: ImtauthTenantCollectionDocumentServiceSdlCommandIds.s_updateTenantFromRepresentation
 						requestType: 1
 						sdlObjectComp: Component {

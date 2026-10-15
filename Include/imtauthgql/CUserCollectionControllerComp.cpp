@@ -242,7 +242,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserCollectionControllerComp::On
 	if (m_roleInfoProviderCompPtr.IsValid()){
 		sdl::V1_0::imtbase::CParameter roleParameter;
 		roleParameter.id = QByteArrayLiteral("Roles");
-		roleParameter.typeId = roleParameter.id;
+		roleParameter.typeId = QByteArrayLiteral("TextList");
 		roleParameter.name = QStringLiteral("Roles");
 
 		imtauth::IUserInfo::RoleIds rolesIds = userInfoPtr->GetRoles(productId);
@@ -268,7 +268,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserCollectionControllerComp::On
 	if (m_userGroupInfoProviderCompPtr.IsValid()){
 		sdl::V1_0::imtbase::CParameter groupParameter;
 		groupParameter.id = QByteArrayLiteral("Groups");
-		groupParameter.typeId = groupParameter.id;
+		groupParameter.typeId = QByteArrayLiteral("TextList");
 		groupParameter.name = QStringLiteral("Groups");
 
 		QByteArrayList groupIds = userInfoPtr->GetGroups();

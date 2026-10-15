@@ -79,14 +79,6 @@ TestCase {
 			function respond(){
 				representationUpdated(documentId, representationModel)
 			}
-
-			function finishUpdate(){
-				documentUpdated(documentId)
-			}
-
-			function failUpdate(){
-				updateDocumentFailed(documentId, "Update failed")
-			}
 		}
 	}
 
@@ -144,82 +136,14 @@ TestCase {
 		compare(controllerOf(document.service).updateCount, 0)
 	}
 
-	function test_saveFlushesGuiAndWaitsForUpdate(){
-		let document = openDocument("Name", false)
-		let controller = controllerOf(document.service)
-
-		document.views[0].commandActivated("Save")
-
-		compare(controller.updateCount, 1, "Save first writes the GUI state to the document")
-		compare(document.service.calls, [], "SaveDocument must not overtake the update")
-
-		controller.finishUpdate()
-
-		compare(document.service.calls, [["save", "doc", "Name"]])
-	}
-
-	function test_saveWaitsForEarlierEdit(){
-		let document = openDocument("Name", false)
-		let view = document.views[0]
-		let controller = controllerOf(document.service)
-
-		view.model.modelChanged(null)
-		view.hasChanges = false
-		view.commandActivated("Save")
-
-		compare(controller.updateCount, 1)
-		compare(document.service.calls, [])
-
-		controller.finishUpdate()
-
-		compare(document.service.calls, [["save", "doc", "Name"]])
-	}
-
-	function test_saveWaitsForAllUpdates(){
+	function test_saveFlushesGuiOfAllViews(){
 		let document = openDocument("Name", false, 2)
 
 		document.views[0].commandActivated("Save")
 
-		compare(controllerOf(document.service, 0).updateCount, 1)
+		compare(controllerOf(document.service, 0).updateCount, 1, "Save first writes the GUI state to the document")
 		compare(controllerOf(document.service, 1).updateCount, 1)
-
-		controllerOf(document.service, 0).finishUpdate()
-
-		compare(document.service.calls, [])
-
-		controllerOf(document.service, 1).finishUpdate()
-
 		compare(document.service.calls, [["save", "doc", "Name"]])
-	}
-
-	function test_failedUpdateCancelsSave(){
-		let document = openDocument("Name", false)
-		let failedSpy = createSpy(document.service, "updateDocumentFailed")
-		let controller = controllerOf(document.service)
-
-		document.views[0].commandActivated("Save")
-		controller.failUpdate()
-
-		compare(failedSpy.count, 1)
-		compare(document.service.calls, [])
-
-		document.views[0].hasChanges = false
-		document.views[0].commandActivated("Save")
-
-		compare(document.service.calls, [["save", "doc", "Name"]], "The next Save works normally")
-	}
-
-	function test_repeatedSaveDoesNotWaitAgain(){
-		let document = openDocument("Name", false)
-
-		document.views[0].commandActivated("Save")
-		document.views[0].commandActivated("Save")
-
-		compare(document.service.calls, [["save", "doc", "Name"]])
-
-		controllerOf(document.service).finishUpdate()
-
-		compare(document.service.calls.length, 1, "A late update reply does not save again")
 	}
 
 	function test_saveWithoutNameRequestsName(){
@@ -333,28 +257,14 @@ TestCase {
 	}
 
 	function test_commitChanges(){
-		let document = openDocument("Name", false)
-		let controller = controllerOf(document.service)
-		let results = []
+		let document = openDocument("Name", false, 2)
 
-		document.service.commitDocumentChanges("doc", function(committed){ results.push(committed) })
+		document.views[1].visible = false
+		document.service.commitDocumentChanges("doc")
+		document.service.commitDocumentChanges("unknown")
 
-		compare(controller.updateCount, 1)
-		compare(results, [])
-
-		controller.finishUpdate()
-
-		compare(results, [true])
-
-		document.service.commitDocumentChanges("doc", function(committed){ results.push(committed) })
-		controller.failUpdate()
-
-		compare(results, [true, false])
-
-		document.views[0].hasChanges = false
-		document.service.commitDocumentChanges("doc", function(committed){ results.push(committed) })
-		document.service.commitDocumentChanges("unknown", function(committed){ results.push(committed) })
-
-		compare(results, [true, false, true, true], "Nothing to wait for")
+		compare(controllerOf(document.service, 0).updateCount, 1)
+		compare(controllerOf(document.service, 1).updateCount, 0, "Hidden views are not written")
+		compare(document.service.calls, [])
 	}
 }

@@ -3,7 +3,6 @@
 
 
 // Qt includes
-#include <QtCore/QSet>
 #include <QtCore/QString>
 
 // ImtCore includes
@@ -26,15 +25,72 @@ inline QString GetUserName(const imtbase::IObjectCollection& userCollection, con
 		return QString();
 	}
 
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (userCollection.GetObjectData(userId, dataPtr)){
-		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
-		if (userInfoPtr != nullptr){
-			return userInfoPtr->GetName();
+	QString userName = userCollection.GetElementInfo(userId, imtbase::ICollectionInfo::EIT_NAME).toString();
+	if (userName.isEmpty()){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (userCollection.GetObjectData(userId, dataPtr)){
+			const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+			if (userInfoPtr != nullptr){
+				userName = userInfoPtr->GetName();
+			}
 		}
 	}
 
-	return QString();
+	return userName;
+}
+
+
+/**
+	Tell whether the given permission is among the ones held.
+
+	Permissions used to be stored by feature id alone ("EditUser") and are
+	stored as the full feature path today ("/Administration/EditUser"). Both
+	forms are answered for, in either direction: a permission stored the old way
+	satisfies a check written the new way, and the other way round. Two full
+	paths, however, are only the same permission when they are equal or
+	the held permission is a descendant of the requested path. The same id under
+	a different parent is a different feature.
+
+	\param includeDescendants	whether a held descendant of the requested path
+		counts. Without it only the requested node itself is matched, e.g. to tell
+		which nodes of a permission tree are selected.
+
+	This is the one place that rule is written down: every check of "does this
+	user hold that permission" is to go through here, whatever container the
+	held permissions come in (a list, a set of allowed ones, ...).
+*/
+template <class PermissionsType>
+inline bool HasPermission(const PermissionsType& userPermissions, const QByteArray& permissionId, bool includeDescendants = true)
+{
+	if (permissionId.isEmpty()){
+		return false;
+	}
+
+	if (userPermissions.contains(permissionId)){
+		return true;
+	}
+
+	const bool isPath = permissionId.startsWith('/');
+	const QByteArray featureId = isPath ? permissionId.mid(permissionId.lastIndexOf('/') + 1) : permissionId;
+
+	for (const QByteArray& userPermission : userPermissions){
+		if (isPath && userPermission.startsWith('/')){
+			if (includeDescendants
+					&& userPermission.startsWith(permissionId)
+					&& userPermission.size() > permissionId.size()
+					&& userPermission.at(permissionId.size()) == '/'){
+				return true;
+			}
+
+			continue;
+		}
+
+		if (userPermission.mid(userPermission.lastIndexOf('/') + 1) == featureId){
+			return true;
+		}
+	}
+
+	return false;
 }
 
 
@@ -109,5 +165,3 @@ inline bool CreatesGroupCycle(const IUserGroupInfoProvider* groupProviderPtr, co
 
 
 } // namespace imtauth
-
-

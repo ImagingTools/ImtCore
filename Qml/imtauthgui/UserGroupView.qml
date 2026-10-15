@@ -16,6 +16,8 @@ ViewBase {
 	contentColor: Style.baseColor
 	property GroupData groupData: model;
 	property string productId;
+	// Part of the product this view works in; scopes its permission checks.
+	property string permissionPath: "";
 	// Permission tree of the product [{groupId, groupName, entries: [{permissionId, displayName}]}], for display names.
 	property var permissionGroups: []
 
@@ -102,6 +104,7 @@ ViewBase {
 
 	MultiPageView {
 		id: multiPageView
+		objectName: "GroupEditorPages"
 		anchors.fill: parent
 		panelWidth: Style.sizeHintXXS
 

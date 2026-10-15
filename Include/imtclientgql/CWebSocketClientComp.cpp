@@ -6,6 +6,7 @@
 #include <QtCore/QMessageAuthenticationCode>
 #include <QtCore/QUrl>
 #include <QtCore/QFile>
+#include <QtCore/QThread>
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
 #include <QtWebSockets/QWebSocketHandshakeOptions>
@@ -130,7 +131,8 @@ bool CWebSocketClientComp::SendRequestNoWait(GqlRequestPtr requestPtr, imtbase::
 
 bool CWebSocketClientComp::SendData(const QByteArray& data) const
 {
-	EmitSendTextMessage(data);
+	// Runs directly in the component's thread, queued from any other thread
+	QMetaObject::invokeMethod(const_cast<CWebSocketClientComp*>(this), [this, data](){ m_webSocket.sendTextMessage(data); });
 
 	return true;
 }
@@ -165,7 +167,7 @@ bool CWebSocketClientComp::SendRequest(const QByteArray& /*requestId*/, imtrest:
 
 bool CWebSocketClientComp::Connect()
 {
-	EmitStartTimer();
+	QMetaObject::invokeMethod(this, [this](){ ProcessConnectRequest(); }, Qt::QueuedConnection);
 
 	return true;
 }
@@ -173,8 +175,7 @@ bool CWebSocketClientComp::Connect()
 
 bool CWebSocketClientComp::Disconnect()
 {
-	EmitStopTimer();
-	EmitWebSocketClose();
+	QMetaObject::invokeMethod(this, [this](){ ProcessDisconnectRequest(); }, Qt::QueuedConnection);
 
 	return true;
 }
@@ -194,27 +195,20 @@ QByteArray CWebSocketClientComp::Sign(const QByteArray& message, const QByteArra
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CWebSocketClientComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+void CWebSocketClientComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	Q_ASSERT_X(m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid(), "Update server's SSL configuration", "SSL configuration or manager is not set!");
-
-	if (m_connectOnCreateAttrPtr.IsValid() && *m_connectOnCreateAttrPtr && m_isInitialized){
-		EnsureWebSocketConnection();
-	}
+	ProcessSettingsChanged();
 }
 
 
-// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
-
-void CWebSocketClientComp::OnSystemShutdown()
+void CWebSocketClientComp::Shutdown()
 {
-	disconnect(&m_webSocket, &QWebSocket::connected, this, &CWebSocketClientComp::OnWebSocketConnected);
+	SetState(ST_SHUTDOWN);
 
-	emit EmitStopTimer();
+	m_refreshTimer.stop();
 
 	m_webSocket.disconnect();
-
-	emit EmitWebSocketClose();
+	m_webSocket.close();
 
 	BaseClass2::UnregisterAllModels();
 }
@@ -230,14 +224,17 @@ void CWebSocketClientComp::OnComponentCreated()
 	connect(&m_webSocket, &QWebSocket::disconnected, this, &CWebSocketClientComp::OnWebSocketDisconnected, Qt::QueuedConnection);
 	connect(&m_webSocket, &QWebSocket::textMessageReceived, this, &CWebSocketClientComp::OnWebSocketTextMessageReceived);
 	connect(&m_webSocket, &QWebSocket::binaryMessageReceived, this, &CWebSocketClientComp::OnWebSocketBinaryMessageReceived);
-	connect(this, &CWebSocketClientComp::EmitSendTextMessage, this, &CWebSocketClientComp::OnSendTextMessage);
-	connect(this, &CWebSocketClientComp::EmitWebSocketClose, &m_webSocket, &QWebSocket::close);
-	connect(this, SIGNAL(EmitStartTimer()), &m_refreshTimer, SLOT(start()), Qt::QueuedConnection);
-	connect(this, SIGNAL(EmitStopTimer()), &m_refreshTimer, SLOT(stop()), Qt::QueuedConnection);
-	connect(&m_webSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(OnWebSocketError(QAbstractSocket::SocketError)));
-	connect(&m_webSocket, SIGNAL(sslErrors(const QList<QSslError>&)), this, SLOT(OnSslErrors(const QList<QSslError>&)));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+	connect(&m_webSocket, &QWebSocket::errorOccurred, this, &CWebSocketClientComp::OnWebSocketError);
+#else
+	connect(&m_webSocket, qOverload<QAbstractSocket::SocketError>(&QWebSocket::error), this, &CWebSocketClientComp::OnWebSocketError);
+#endif
+	connect(&m_webSocket, &QWebSocket::sslErrors, this, &CWebSocketClientComp::OnSslErrors);
 
 	connect(&m_refreshTimer, &QTimer::timeout, this, &CWebSocketClientComp::OnTimeout);
+
+	Q_ASSERT(QCoreApplication::instance() != nullptr);
+	connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, this, &CWebSocketClientComp::Shutdown);
 
 	m_refreshTimer.setSingleShot(true);
 	m_refreshTimer.setInterval(4000);
@@ -251,38 +248,48 @@ void CWebSocketClientComp::OnComponentCreated()
 	}
 
 	if (m_sslConfigurationModelCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
-		BaseClass2::RegisterModel(m_sslConfigurationModelCompPtr.GetPtr());
+		BaseClass2::RegisterModel(m_sslConfigurationModelCompPtr.GetPtr(), MI_SSL_CONFIGURATION);
 	}
 
+	if (m_serverConnectionModelCompPtr.IsValid()){
+		BaseClass2::RegisterModel(m_serverConnectionModelCompPtr.GetPtr(), MI_SERVER_CONNECTION);
+	}
+
+	// Registering the models above notifies while idle, which is a no-op
 	if (m_connectOnCreateAttrPtr.IsValid() && *m_connectOnCreateAttrPtr){
-		EnsureWebSocketConnection();
+		OpenConnection();
 	}
-
-	m_isInitialized = true;
 }
 
 
 void CWebSocketClientComp::OnComponentDestroyed()
 {
-	// Fallback (will not work in someb situations)
-	if (!m_runtimeStatusCompPtr.IsValid()){
-		OnSystemShutdown();
-	}
+	Q_ASSERT(m_state == ST_SHUTDOWN);
 
 	BaseClass::OnComponentDestroyed();
 }
 
 
-// private slots
+// private methods
 
 void CWebSocketClientComp::OnTimeout()
 {
-	EnsureWebSocketConnection();
+	if (m_state == ST_WAITING_RETRY){
+		OpenConnection();
+	}
 }
 
 
 void CWebSocketClientComp::OnWebSocketConnected()
 {
+	// The signal is queued: the socket may have been aborted or closed in the meantime.
+	// A peer close keeps ST_CONNECTING; the queued disconnected() handles it.
+	if (m_state != ST_CONNECTING || m_webSocket.state() != QAbstractSocket::ConnectedState){
+		return;
+	}
+
+	SetState(ST_CONNECTED);
+
 	SendInfoMessage(0, "WebSocket connected", "CWebSocketClientComp");
 
 	QString clientId;
@@ -313,7 +320,27 @@ void CWebSocketClientComp::OnWebSocketDisconnected()
 
 	m_connectionStatusProvider.SetConnectionStatus(imtcom::IConnectionStatusProvider::CS_DISCONNECTED);
 	m_startQueries.Reset();
-	m_refreshTimer.start();
+
+	switch (m_state){
+	case ST_CONNECTING:
+	case ST_CONNECTED:
+		SetState(ST_WAITING_RETRY);
+		m_refreshTimer.start();
+		break;
+
+	case ST_RECONNECTING:
+		OpenConnection();
+		break;
+
+	case ST_DISCONNECTING:
+		SetState(ST_IDLE);
+		break;
+
+	case ST_IDLE:
+	case ST_WAITING_RETRY:
+	case ST_SHUTDOWN:
+		break;
+	}
 }
 
 
@@ -445,14 +472,6 @@ void CWebSocketClientComp::OnWebSocketBinaryMessageReceived(const QByteArray& /*
 }
 
 
-void CWebSocketClientComp::OnSendTextMessage(const QByteArray& message)
-{
-	m_webSocket.sendTextMessage(message);
-}
-
-
-// private methods
-
 void CWebSocketClientComp::EnsureWebSocketConnection()
 {
 	QString login;
@@ -536,6 +555,114 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 #else
 	m_webSocket.open(url);
 #endif
+}
+
+
+void CWebSocketClientComp::SetState(State state)
+{
+	Q_ASSERT(QThread::currentThread() == thread());
+
+	m_state = state;
+}
+
+
+void CWebSocketClientComp::OpenConnection()
+{
+	SetState(ST_CONNECTING);
+
+	EnsureWebSocketConnection();
+
+	// open() rejects an invalid URL synchronously and emits no disconnected()
+	if (m_webSocket.state() == QAbstractSocket::UnconnectedState){
+		SetState(ST_WAITING_RETRY);
+		m_refreshTimer.start();
+	}
+}
+
+
+void CWebSocketClientComp::ProcessConnectRequest()
+{
+	switch (m_state){
+	case ST_IDLE:
+		OpenConnection();
+		break;
+
+	case ST_WAITING_RETRY:
+		m_refreshTimer.stop();
+		OpenConnection();
+		break;
+
+	case ST_DISCONNECTING:
+		// Still closing: OnWebSocketDisconnected() opens the new connection
+		SetState(ST_RECONNECTING);
+		break;
+
+	case ST_CONNECTING:
+	case ST_CONNECTED:
+	case ST_RECONNECTING:
+	case ST_SHUTDOWN:
+		break;
+	}
+}
+
+
+void CWebSocketClientComp::ProcessDisconnectRequest()
+{
+	switch (m_state){
+	case ST_CONNECTING:
+		SetState(ST_DISCONNECTING);
+		m_webSocket.abort();
+		break;
+
+	case ST_CONNECTED:
+		SetState(ST_DISCONNECTING);
+		m_webSocket.close();
+		break;
+
+	case ST_WAITING_RETRY:
+		m_refreshTimer.stop();
+		SetState(ST_IDLE);
+		break;
+
+	case ST_RECONNECTING:
+		// Already aborted: OnWebSocketDisconnected() makes it idle
+		SetState(ST_DISCONNECTING);
+		break;
+
+	case ST_IDLE:
+	case ST_DISCONNECTING:
+	case ST_SHUTDOWN:
+		break;
+	}
+}
+
+
+void CWebSocketClientComp::ProcessSettingsChanged()
+{
+	Q_ASSERT(QThread::currentThread() == thread());
+
+	switch (m_state){
+	case ST_CONNECTING:
+	case ST_CONNECTED:
+		// OnWebSocketDisconnected() will open new connection
+		SetState(ST_RECONNECTING);
+		m_webSocket.abort();
+		break;
+
+	case ST_WAITING_RETRY:
+		m_refreshTimer.stop();
+		OpenConnection();
+		break;
+
+	case ST_IDLE:
+	case ST_RECONNECTING:
+	case ST_DISCONNECTING:
+		// The next connection picks the settings up
+		break;
+
+	case ST_SHUTDOWN:
+		break;
+	}
 }
 
 

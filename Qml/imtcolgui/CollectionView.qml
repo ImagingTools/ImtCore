@@ -363,6 +363,7 @@ Item {
 				let sameModel = container.table.elements === elements;
 				container.table.elements = elements;
 				if (sameModel){
+					container.table.restoreSelection();
 					container.table.refreshVisibleRows();
 				}
 			}

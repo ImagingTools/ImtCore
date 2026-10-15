@@ -8,7 +8,7 @@ import imtbaseSettingsSdl 1.0
 StyleBase {
 	id: styleContainer;
 	
-	property string context: ""
+	property string permissionPath: ""
 	function getDesignScheme(theme){
 		getStyleDataInput.m_schemeId = theme
 		getStyleRequest.send(getStyleDataInput)
@@ -23,7 +23,7 @@ StyleBase {
 	}
 	
 	GqlSdlRequestSender {
-		context: styleContainer.context
+		permissionPath: styleContainer.permissionPath
 		id: getStyleRequest
 		gqlCommandId: ImtbaseSettingsSdlCommandIds.s_getStyleData
 		

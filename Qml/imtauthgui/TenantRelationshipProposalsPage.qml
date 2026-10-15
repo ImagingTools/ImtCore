@@ -35,6 +35,23 @@ ViewBase {
 		}
 	}
 
+	// Notifications update the page only while it is shown; a hidden one reloads when shown.
+	property bool __updatePending: false
+
+	function __updateWhenVisible() {
+		if (proposalsPage.visible)
+			proposalsPage.updateGui()
+		else
+			proposalsPage.__updatePending = true
+	}
+
+	onVisibleChanged: {
+		if (proposalsPage.visible && proposalsPage.__updatePending) {
+			proposalsPage.__updatePending = false
+			proposalsPage.updateGui()
+		}
+	}
+
 	Component.onCompleted: {
 		proposalsPage.updateGui()
 	}
@@ -152,7 +169,11 @@ ViewBase {
 		}
 
 		function onSubscriptionConnectionCodesChanged(notification) {
-			proposalsPage.updateGui()
+			proposalsPage.__updateWhenVisible()
+		}
+
+		function onSubscriptionsResumed() {
+			proposalsPage.__updateWhenVisible()
 		}
 	}
 

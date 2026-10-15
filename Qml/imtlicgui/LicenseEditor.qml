@@ -28,6 +28,8 @@ ViewBase {
 	property var parentLicenseIds: []
 	property string productId: ""
 	property bool canEdit: false
+	// Part of the product this editor works in; scopes its permission checks.
+	property string permissionPath: ""
 
 	Component.onCompleted: {
 		canEdit = PermissionsController.checkPermission("ChangeLicenseDefinition")
@@ -93,6 +95,7 @@ ViewBase {
 		featureIds = ids
 		if (licenseData)
 			licenseData.m_features = ids.join(';')
+		rebuildRequirementIndex()
 		updatePageBadges()
 	}
 
@@ -156,7 +159,8 @@ ViewBase {
 				featureName: FeatureItemTypeMetaInfo.s_featureName,
 				featureId: FeatureItemTypeMetaInfo.s_featureId,
 				description: FeatureItemTypeMetaInfo.s_description,
-				optional: FeatureItemTypeMetaInfo.s_optional
+				optional: FeatureItemTypeMetaInfo.s_optional,
+				requirements: FeatureItemTypeMetaInfo.s_requirements
 			}
 		})
 		let nodes = []
@@ -165,22 +169,25 @@ ViewBase {
 			let id = data.id || ""
 			if (wanted.indexOf(id) < 0)
 				continue
-			nodes.push(buildFeatureNode(tree[i], id, true))
+			nodes.push(buildFeatureNode(tree[i], id, true, ""))
 		}
 		featureNodes = nodes
+		rebuildRequirementIndex()
 		updatePageBadges()
 	}
 
-	function buildFeatureNode(treeNode, rootId, isRoot) {
+	function buildFeatureNode(treeNode, rootId, isRoot, parentPath) {
 		let data = treeNode.data || {}
 		let name = data.featureName || data.featureId || ""
 		// The root of a branch is granted under the feature's document id; a
 		// node inside it under the composite key.
 		let grantId = isRoot ? rootId : rootId + "/" + (data.featureId || "")
+		// Requirements name features by this path, not by the grant id.
+		let featurePath = parentPath + "/" + (data.featureId || "")
 		let sourceChildren = treeNode.children || []
 		let children = []
 		for (let i = 0; i < sourceChildren.length; ++i)
-			children.push(buildFeatureNode(sourceChildren[i], rootId, false))
+			children.push(buildFeatureNode(sourceChildren[i], rootId, false, featurePath))
 		return {
 			"key": grantId,
 			"text": name,
@@ -194,6 +201,8 @@ ViewBase {
 					"isLeaf": children.length === 0,
 					"featureName": name,
 					"featureId": data.featureId || "",
+					"featurePath": featurePath,
+					"requirements": data.requirements || "",
 					"description": data.description || "",
 					"subFeatureCount": children.length
 				}
@@ -201,12 +210,68 @@ ViewBase {
 		}
 	}
 
+	// A feature may require others, written as full feature paths separated by ';'.
+	// One that names a feature this product offers is pointed at in the tree; one
+	// that names a feature from elsewhere can only be listed, because this license
+	// has no row to tick for it.
+	property var requiredByIndex: ({})
+	property var externalRequirements: []
+
+	function rebuildRequirementIndex() {
+		let index = {}
+		let external = []
+		collectRequirements(featureNodes, index, external)
+		requiredByIndex = index
+		externalRequirements = external
+	}
+
+	function collectRequirements(nodes, index, external) {
+		for (let i = 0; i < nodes.length; ++i) {
+			let entry = nodes[i].data.entry
+			if (entryIsSelected(entry)) {
+				let paths = entry.requirements ? entry.requirements.split(';') : []
+				for (let j = 0; j < paths.length; ++j) {
+					let path = paths[j]
+					if (path === "")
+						continue
+					let target = findEntryByFeaturePath(featureNodes, path)
+					if (target) {
+						if (!index[target.id])
+							index[target.id] = []
+						if (index[target.id].indexOf(entry.featureName) < 0)
+							index[target.id].push(entry.featureName)
+					}
+					else if (external.indexOf(path) < 0) {
+						external.push(path)
+					}
+				}
+			}
+			collectRequirements(nodes[i].children || [], index, external)
+		}
+	}
+
+	function findEntryByFeaturePath(nodes, path) {
+		for (let i = 0; i < nodes.length; ++i) {
+			let entry = nodes[i].data.entry
+			if (entry.featurePath === path)
+				return entry
+			let child = findEntryByFeaturePath(nodes[i].children || [], path)
+			if (child)
+				return child
+		}
+		return null
+	}
+
+	function entryRequiredBy(entry) {
+		return entry && requiredByIndex[entry.id] ? requiredByIndex[entry.id] : []
+	}
+
 	// What a tick means, per kind of row:
 	//   a product feature      - granted by this license, on its own id
 	//   a mandatory part       - comes with its feature, nothing to decide
 	//   an optional part       - granted separately, once the feature is granted
 	//   a part that has parts  - a grouping; its children carry the decision
-	function entryIsGranted(entry) {
+	function entryIsSelected(entry) {
 		if (!entry)
 			return false
 		if (entry.isRoot)
@@ -214,6 +279,12 @@ ViewBase {
 		if (!entry.isLeaf || !entry.optional)
 			return featureIsIncluded(entry.rootId)
 		return featureIds.indexOf(entry.id) >= 0
+	}
+
+	// A feature required by one that is granted comes with it, so it reads as
+	// granted here even though nobody ticked it.
+	function entryIsGranted(entry) {
+		return entryIsSelected(entry) || entryRequiredBy(entry).length > 0
 	}
 
 	function entryIsChangeable(entry) {
@@ -242,6 +313,9 @@ ViewBase {
 
 	// Why a row cannot be ticked, in the words the table shows next to it.
 	function entryStateText(entry) {
+		let requiredBy = entryRequiredBy(entry)
+		if (requiredBy.length > 0)
+			return qsTr("Required by %1").arg(requiredBy.join(", "))
 		if (!entry || entry.isRoot)
 			return ""
 		if (!entry.isLeaf)
@@ -592,28 +666,18 @@ ViewBase {
 			function updateModel() {
 			}
 
-			// Column geometry, shared by the header and the rows so the two can
-			// never drift. A column whose breakpoint is above the current table
-			// width folds away and its share is handed to the columns that stay.
-			property var columnFractions: [0.10, 0.28, 0.20, 0.28, 0.14]
-			property var columnBreakpoints: [0, 0, 380, 620, 300]
-
-			function columnVisible(index, width) {
-				return width >= featuresPage.columnBreakpoints[index]
+			// Column geometry, shared by the header, the rows and the drag handles
+			// the explorer draws, so none of the three can drift from the others.
+			// A column whose breakpoint is above the current table width folds
+			// away and its share is handed to the columns that stay.
+			TableColumnLayout {
+				id: featureColumns
+				fractions: [0.12, 0.36, 0.22, 0.30]
+				breakpoints: [0, 0, 380, 620]
 			}
 
 			function columnWidth(index, width, spacing) {
-				if (!featuresPage.columnVisible(index, width))
-					return 0
-				let sum = 0
-				let count = 0
-				for (let i = 0; i < featuresPage.columnFractions.length; ++i) {
-					if (!featuresPage.columnVisible(i, width))
-						continue
-					sum += featuresPage.columnFractions[i]
-					++count
-				}
-				return (width - (count - 1) * spacing) * featuresPage.columnFractions[index] / sum
+				return featureColumns.widthOf(index, width, spacing)
 			}
 
 			property Component featuresHeaderComp: Component {
@@ -682,20 +746,6 @@ ViewBase {
 							color: Style.subtitleColor
 						}
 					}
-					Item {
-						width: featuresPage.columnWidth(4, headerRow.width, headerRow.spacing)
-						height: headerRow.height
-						visible: width > 0
-						BaseText {
-							anchors.centerIn: parent
-							width: parent.width
-							horizontalAlignment: Text.AlignHCenter
-							text: qsTr("Sub-features")
-							font.family: Style.fontFamilyBold
-							font.pixelSize: Style.fontSizeS
-							color: Style.subtitleColor
-						}
-					}
 				}
 			}
 
@@ -753,20 +803,64 @@ ViewBase {
 						}
 					}
 					Item {
+						id: featureNameCell
 						objectName: "LicenseFeatureNameCell"
 						width: featuresPage.columnWidth(1, rowContent.width, rowContent.spacing)
 						height: rowContent.height
 						visible: width > 0
-						BaseText {
+
+						property var requiredBy: licenseEditor.entryRequiredBy(rowContent.entry)
+						property bool locked: featureNameCell.requiredBy.length > 0
+
+						Image {
+							id: lockIcon
 							anchors.left: parent.left
+							anchors.leftMargin: Style.marginXS
+							anchors.verticalCenter: parent.verticalCenter
+							width: Style.iconSizeS
+							height: width
+							visible: featureNameCell.locked
+							source: "qrc:/" + Style.getIconPath("Icons/Lock", Icon.State.On, Icon.Mode.Normal)
+							fillMode: Image.PreserveAspectFit
+						}
+
+						Column {
+							anchors.left: lockIcon.visible ? lockIcon.right : parent.left
 							anchors.leftMargin: Style.marginXS
 							anchors.right: parent.right
 							anchors.rightMargin: Style.marginXS
 							anchors.verticalCenter: parent.verticalCenter
-							text: rowContent.entry ? rowContent.entry.featureName : ""
-							font.family: Style.fontFamilyBold
-							color: Style.textColor
-							elide: Text.ElideRight
+							spacing: 1
+
+							BaseText {
+								width: parent.width
+								text: rowContent.entry ? rowContent.entry.featureName : ""
+								font.family: Style.fontFamilyBold
+								color: Style.textColor
+								elide: Text.ElideRight
+							}
+
+							BaseText {
+								width: parent.width
+								visible: featureNameCell.locked
+								text: qsTr("Required by %1").arg(featureNameCell.requiredBy.join(", "))
+								font.pixelSize: Style.fontSizeXS
+								color: Style.firstColor
+								elide: Text.ElideRight
+							}
+						}
+
+						MouseArea {
+							id: featureNameMouse
+							anchors.fill: parent
+							hoverEnabled: true
+							acceptedButtons: Qt.NoButton
+						}
+
+						CustomTooltip {
+							parent: featureNameCell
+							visible: featureNameMouse.containsMouse && featureNameCell.locked
+							text: qsTr("Required by %1").arg(featureNameCell.requiredBy.join(", "))
 						}
 					}
 					Item {
@@ -803,56 +897,58 @@ ViewBase {
 							elide: Text.ElideRight
 						}
 					}
-					Item {
-						id: subfeaturesCell
-						objectName: "LicenseFeatureSubfeaturesCell"
-						width: featuresPage.columnWidth(4, rowContent.width, rowContent.spacing)
-						height: rowContent.height
-						visible: width > 0
+				}
+			}
 
-						property int count: rowContent.entry ? rowContent.entry.subFeatureCount : 0
-						// Opening a feature is how its optional parts are reached,
-						// and there is nothing to reach until it is granted.
-						property bool openable: subfeaturesCell.count > 0
-							&& licenseEditor.entryIsGranted(rowContent.entry)
+			property Component subfeatureRowActionComp: Component {
+				Item {
+					id: subfeatureActionItem
+					width: 36
+					height: Style.controlHeightM
 
-						Rectangle {
-							anchors.centerIn: parent
-							width: Math.max(Style.controlHeightS, countText.width + 2 * Style.marginS)
-							height: Style.controlHeightS
-							radius: height / 2
-							visible: subfeaturesCell.count > 0
-							color: subfeaturesMouse.containsMouse ? Style.titleColor : Style.backgroundColor2
-							border.color: Style.borderColor
-							border.width: 1
+					property var node: parent ? parent.node : null
+					property var entry: licenseEditor.nodeEntry(subfeatureActionItem.node)
+					property int count: subfeatureActionItem.entry ? subfeatureActionItem.entry.subFeatureCount : 0
+					property bool openable: subfeatureActionItem.count > 0 && licenseEditor.entryIsGranted(subfeatureActionItem.entry)
 
-							BaseText {
-								id: countText
-								anchors.centerIn: parent
-								text: subfeaturesCell.count
-								font.pixelSize: Style.fontSizeS
-								font.family: Style.fontFamilyBold
-								color: subfeaturesMouse.containsMouse ? Style.baseColor
-									: subfeaturesCell.openable ? Style.titleColor : Style.inactiveTextColor
-							}
-						}
+					visible: subfeatureActionItem.count > 0
+
+					Rectangle {
+						id: countPill
+						anchors.centerIn: parent
+						width: Math.max(Style.controlHeightS, countText.width + 2 * Style.marginS)
+						height: Style.controlHeightS
+						radius: height / 2
+						color: actionMouse.containsMouse ? Style.titleColor : Style.backgroundColor2
+						border.color: Style.borderColor
+						border.width: 1
 
 						BaseText {
+							id: countText
 							anchors.centerIn: parent
-							visible: subfeaturesCell.count === 0
-							text: "-"
-							color: Style.inactiveTextColor
+							text: subfeatureActionItem.count
+							font.pixelSize: Style.fontSizeS
+							font.family: Style.fontFamilyBold
+							color: actionMouse.containsMouse ? Style.baseColor
+								: subfeatureActionItem.openable ? Style.titleColor : Style.inactiveTextColor
 						}
+					}
 
-						MouseArea {
-							id: subfeaturesMouse
-							objectName: "MouseArea"
-							anchors.fill: parent
-							hoverEnabled: true
-							enabled: subfeaturesCell.openable
-							cursorShape: Qt.PointingHandCursor
-							onClicked: treeExplorer.navigateInto(rowContent.node)
-						}
+					MouseArea {
+						id: actionMouse
+						anchors.fill: parent
+						hoverEnabled: true
+						enabled: subfeatureActionItem.openable
+						cursorShape: subfeatureActionItem.openable ? Qt.PointingHandCursor : Qt.ArrowCursor
+						onClicked: treeExplorer.navigateInto(subfeatureActionItem.node)
+					}
+
+					CustomTooltip {
+						parent: countPill
+						text: subfeatureActionItem.openable
+							? qsTr("%1 sub-features (click to open)").arg(subfeatureActionItem.count)
+							: qsTr("%1 sub-features (grant feature to open)").arg(subfeatureActionItem.count)
+						visible: actionMouse.containsMouse
 					}
 				}
 			}
@@ -900,6 +996,9 @@ ViewBase {
 					? qsTr("Pick a product on the General page first") : ""
 				idleHintText: qsTr("Tick the features this license grants; open one to reach its optional parts")
 				selectedHintText: qsTr("Open a feature to grant its optional parts one by one")
+				footerText: licenseEditor.externalRequirements.length > 0
+					? qsTr("Also required, from outside this product: %1").arg(licenseEditor.externalRequirements.join(", "))
+					: ""
 				editable: licenseEditor.canEdit
 				createVisible: false
 				removeVisible: false
@@ -910,6 +1009,9 @@ ViewBase {
 				rowIconVisible: false
 				headerContentComponent: featuresPage.featuresHeaderComp
 				rowContentComponent: featuresPage.featureRowComp
+				columnLayout: featureColumns
+				rowActionExtensionComponent: featuresPage.subfeatureRowActionComp
+				rowActionExtensionWidth: 44
 				sidePanelComponent: featuresPage.inheritedFeaturesPanelComp
 				// Only a granted feature can be opened - there is nothing to
 				// decide inside one that is not granted at all.

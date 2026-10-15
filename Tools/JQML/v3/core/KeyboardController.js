@@ -33,6 +33,32 @@ module.exports = {
         return false
     },
 
+    // Makes the DOM keyboard event look like a Qt KeyEvent for QML handlers:
+    // adds 'modifiers' and converts letter/digit keys to Qt key codes (Qt.Key_A etc.)
+    __prepareKeyEvent(e){
+        let modifiers = QtEnums.NoModifier
+        if (e.shiftKey) modifiers |= QtEnums.ShiftModifier
+        if (e.ctrlKey) modifiers |= QtEnums.ControlModifier
+        if (e.altKey) modifiers |= QtEnums.AltModifier
+        if (e.metaKey) modifiers |= QtEnums.MetaModifier
+        e.modifiers = modifiers
+
+        if (typeof e.key !== 'string' || e.key.length !== 1) return
+
+        let qtKey = 0
+        let upperKey = e.key.toUpperCase()
+        if ((upperKey >= 'A' && upperKey <= 'Z') || (upperKey >= '0' && upperKey <= '9')) {
+            qtKey = upperKey.charCodeAt(0)
+        } else if ((e.ctrlKey || e.metaKey || e.altKey) && /^Key[A-Z]$/.test(e.code)) {
+            // Non-latin keyboard layouts: shortcuts like Ctrl+A use the physical key
+            qtKey = e.code.charCodeAt(3)
+        }
+
+        if (qtKey) {
+            Object.defineProperty(e, 'key', { value: qtKey, configurable: true })
+        }
+    },
+
     add: function (obj) {
         this.shortcuts.push(obj)
     },
@@ -44,6 +70,8 @@ module.exports = {
     init: function () {
         window.onkeydown = (e) => {
             let elements = JQApplication.focusTree
+            let domKey = e.key
+            this.__prepareKeyEvent(e)
 
             for (let obj of elements) {
                 if (e.key === 'ArrowLeft') {
@@ -137,6 +165,11 @@ module.exports = {
                     obj['Keys.spacePressed'](e)
                     if (e.accepted) return
                 }
+                if (e.key === 'Escape') {
+                    e.accepted = false
+                    obj['Keys.escapePressed'](e)
+                    if (e.accepted) return
+                }
             }
 
             if (e.key === 'Tab') {
@@ -147,8 +180,8 @@ module.exports = {
                 }
             }
 
-            if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return
-            let key = e.key
+            if (domKey === 'Shift' || domKey === 'Control' || domKey === 'Alt') return
+            let key = domKey
             if (e.key === 'ArrowLeft') key = 'Left'
             if (e.key === 'ArrowRight') key = 'Right'
             if (e.key === 'ArrowUp') key = 'Up'

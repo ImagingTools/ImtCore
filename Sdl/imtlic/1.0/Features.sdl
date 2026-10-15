@@ -22,7 +22,7 @@ type FeatureData {
 	description: String
 	optional: Bool
 	isPermission: Bool
-	dependencies: ID
+	requirements: ID
 	subFeatures: [FeatureData]
 }
 
@@ -35,7 +35,7 @@ type FeatureItem {
 	description: String
 	optional: Bool
 	isPermission: Bool
-	dependencies: ID
+	requirements: ID
 	added: String
 	timeStamp: String
 	subFeatures: [FeatureData]

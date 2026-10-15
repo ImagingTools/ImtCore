@@ -15,6 +15,7 @@
         <file alias="imtguigql/ClientStyle.qml">ClientStyle.qml</file>
         <file alias="imtguigql/RemoteCollectionChangeListener.qml">RemoteCollectionChangeListener.qml</file>
         <file alias="imtguigql/CollectionRepresentation.qml">CollectionRepresentation.qml</file>
+        <file alias="imtguigql/CollectionRepresentationPure.qml">CollectionRepresentationPure.qml</file>
         <file alias="imtguigql/RemoteCollectionView.qml">RemoteCollectionView.qml</file>
         <file alias="imtguigql/MetaInfoProvider.qml">MetaInfoProvider.qml</file>
         <file alias="imtguigql/ComboBoxGqlSimpleElementView.qml">ComboBoxGqlSimpleElementView.qml</file>
@@ -23,6 +24,7 @@
         <file alias="imtguigql/GqlRequestSender.qml">GqlRequestSender.qml</file>
         <file alias="imtguigql/WebSocketConnectionChecker.qml">WebSocketConnectionChecker.qml</file>
         <file alias="imtguigql/GqlSdlRequestSender.qml">GqlSdlRequestSender.qml</file>
+        <file alias="imtguigql/GqlPureRequestSender.qml">GqlPureRequestSender.qml</file>
         <file alias="imtguigql/XmlHttpRequestProxy.qml">XmlHttpRequestProxy.qml</file>
         <file alias="imtguigql/GqlBasedCommandsController.qml">GqlBasedCommandsController.qml</file>
         <file alias="imtguigql/GqlBasedCollectionDataController.qml">GqlBasedCollectionDataController.qml</file>

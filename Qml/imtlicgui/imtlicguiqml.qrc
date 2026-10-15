@@ -2,6 +2,7 @@
     <qresource prefix="/qml">
         <file alias="imtlicgui/qmldir">qmldir</file>
         <file alias="imtlicgui/FeaturesDialog.qml">FeaturesDialog.qml</file>
+        <file alias="imtlicgui/RequirementsDialog.qml">RequirementsDialog.qml</file>
         <file alias="imtlicgui/FeatureEditor.qml">FeatureEditor.qml</file>
         <file alias="imtlicgui/FeatureCollectionView.qml">FeatureCollectionView.qml</file>
         <file alias="imtlicgui/FeaturesDependenciesProvider.qml">FeaturesDependenciesProvider.qml</file>

@@ -23,6 +23,7 @@ Rectangle {
 		registerViewDelegate("DateTime", metaInfoViewDateDelegateComp)
 		registerViewDelegate("StringList", metaInfoViewStringListDelegateComp)
 		registerViewDelegate("ByteArrayList", metaInfoViewStringListDelegateComp)
+		registerViewDelegate("TextList", metaInfoViewListDelegateComp)
 	}
 	
 	function startLoading(){
@@ -61,6 +62,12 @@ Rectangle {
 	}
 
 	Component {
+		id: metaInfoViewListDelegateComp
+		MetaInfoListDelegate {
+		}
+	}
+
+	Component {
 		id: metaInfoViewDateDelegateComp
 
 		MetaInfoDateDelegate{
@@ -71,7 +78,7 @@ Rectangle {
 		id: collectionMetaInfo;
 		anchors.fill: parent;
 		contentWidth: width;
-		contentHeight: column.height;
+		contentHeight: column.height + 2 * Style.marginM;
 		boundsBehavior: Flickable.StopAtBounds;
 		
 		Column {
@@ -81,7 +88,7 @@ Rectangle {
 			anchors.left: parent.left;
 			anchors.leftMargin: Style.marginM;
 			anchors.right: parent.right;
-			anchors.rightMargin: Style.marginM;
+			anchors.rightMargin: Style.marginM + metaInfoScrollbar.secondSize;
 			visible: container.contentVisible;
 			spacing: Style.spacingL
 
@@ -119,6 +126,17 @@ Rectangle {
 				}
 			}
 		}//Column main
+	}
+
+	CustomScrollbar {
+		id: metaInfoScrollbar;
+		z: collectionMetaInfo.z + 1;
+		anchors.right: parent.right;
+		anchors.top: collectionMetaInfo.top;
+		anchors.bottom: collectionMetaInfo.bottom;
+		secondSize: Style.marginS;
+		targetItem: collectionMetaInfo;
+		alwaysVisible: false;
 	}
 	
 	Rectangle {
