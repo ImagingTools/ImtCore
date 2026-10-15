@@ -184,6 +184,7 @@ var OPERATORS = array_to_hash([
     "!=",
     "!==",
     "?",
+    "?.",
     "=",
     "+=",
     "-=",
@@ -1434,6 +1435,18 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     };
 
     function subscripts(expr, allow_calls) {
+        if (is("operator", "?.")) {
+            next();
+            if (is("punc", "[")) {
+                next();
+                return subscripts(as_(undefined, "sub", expr, prog1(expression, curry(expect, "]")), true), allow_calls);
+            }
+            if (allow_calls && is("punc", "(")) {
+                next();
+                return subscripts(as_(undefined, "call", expr, expr_list(")"), true), true);
+            }
+            return subscripts(as_(S.token, "dot", expr, as_name(), true), allow_calls);
+        }
         if (is("punc", ".")) {
             next();
             return subscripts(as_(S.token, "dot", expr, as_name()), allow_calls);
@@ -1447,6 +1460,14 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
             return subscripts(as_(undefined, "call", expr, expr_list(")")), true);
         }
         return expr;
+    };
+
+    function is_optional_chain(expr) {
+        while (expr && (expr[0] === "dot" || expr[0] === "sub" || expr[0] === "call")) {
+            if (expr[3] === true) return true;
+            expr = expr[1];
+        }
+        return false;
     };
 
     function maybe_unary(allow_calls) {
@@ -1498,6 +1519,7 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     };
 
     function is_assignable(expr) {
+        if (is_optional_chain(expr)) return false;
         if (!exigent_mode) return true;
         switch (expr[0]+"") {
           case "dot":
@@ -1652,6 +1674,7 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     var info = S.token
     var expr = maybe_assign(no_in);
     if (is("punc", "{")) {
+      if (is_optional_chain(expr)) unexpected();
       var qmlelem_name;
       if (expr[0] === "dot") {
         qmlelem_name = ["dot", expr[1][1], expr[2]];
