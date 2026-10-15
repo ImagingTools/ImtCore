@@ -44,7 +44,7 @@ ViewCommandsDelegateBase {
 	signal descriptionSetted(string id, string description);
 	signal removed(string id);
 	signal selectionChanged(var selectedIds, var selectedIndexes)
-	signal beginImport(string fileName, string filePath, int fileSize);
+	signal beginImport(string fileName, string filePath, real fileSize);
 	signal exportFinished()
 
 	Component.onDestruction: {

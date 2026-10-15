@@ -21,6 +21,7 @@ The `imtservergql` module provides server-side GraphQL and REST API components f
 - **Overlap Handling**: Overlapping or duplicate chunks are automatically merged
 - **Progress Tracking**: Upload progress can be monitored through external mechanisms
 - **Error Reporting**: Detailed status codes indicate success or specific failure reasons
+- **Standard Ranges**: Both positions of a range are inclusive, as in the `Content-Range` header (RFC 9110, section 14.4): `bytes 0-999/5000` is the first 1000 bytes of a file of 5000 bytes and `IFileUploadHandler::ByteRange(0, 999)` in `ReceiveFileChunk()`. The range is 64-bit (`istd::TRange<qint64>`), so there is no limit of 2 GiB
 
 #### Status Codes
 
@@ -87,7 +88,7 @@ qint64 offset = 0;
 
 while (!file.atEnd()) {
     QByteArray chunk = file.read(chunkSize);
-    istd::CIntRange range(offset, offset + chunk.size() - 1);
+    IFileUploadHandler::ByteRange range(offset, offset + chunk.size() - 1);
     
     IFileUploadHandler::FilelUploadStatus status = 
         uploadHandler->ReceiveFileChunk(fileInfo.id, range, chunk);

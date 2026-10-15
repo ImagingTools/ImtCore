@@ -21,6 +21,20 @@ public:
 		I_ASSIGN(m_fileUploadHandlerPtr, "FileUploadHandler", "File upload handler", false, "FileUploadHandlerPtr");
 	I_END_COMPONENT
 
+	/**
+		Get the range of an uploaded chunk from the value of the \c Content-Range header.
+		The positions of the header are inclusive (RFC 9110, section 14.4): the first chunk of 1000 bytes of a file
+		of 5000 bytes is \c bytes \c 0-999/5000. The range of the chunk is returned in the same form, as it is used by
+		imtservergql::IFileUploadHandler.
+		The header is rejected if the size of the file is unknown, if the range does not fit in the file or if the
+		number of bytes of the range differs from the size of the chunk.
+		\param	contentRange	Value of the header.
+		\param	chunkSize		Number of the received bytes.
+		\param	range			Inclusive range of the chunk in the file.
+		\param	fileSize		Size of the file.
+	*/
+	static bool GetChunkRange(const QByteArray& contentRange, qint64 chunkSize, imtservergql::IFileUploadHandler::ByteRange& range, qint64& fileSize);
+
 protected:
 	// reimplemented (imtrest::CHttpServletCompBase)
 	virtual ConstResponsePtr OnPut(
@@ -30,16 +44,6 @@ protected:
 		const imtrest::CHttpRequest& request) const override;
 
 private:
-	struct RangeData
-	{
-		QString units;
-		qsizetype startIndex = -1;
-		qsizetype endIndex = -1;
-		qsizetype totalSize = -1;
-	};
-
-private:
-	RangeData GetRangeDataFromString(const QString& dataString) const;
 	CHttpResponse::Headers GetRequestHeaders(const CHttpRequest& request) const;
 	ConstResponsePtr CreateResponse(
 		const IRequest& request,

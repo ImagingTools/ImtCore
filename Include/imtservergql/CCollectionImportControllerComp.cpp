@@ -121,14 +121,24 @@ bool CCollectionImportControllerComp::CancelCollectionImportSession(const QByteA
 
 IFileUploadHandler::FilelUploadStatus CCollectionImportControllerComp::ReceiveFileChunk(
 			const QByteArray& fileId,
-			const istd::CIntRange& range,
+			const ByteRange& range,
 			const QByteArray& data)
 {
-	QByteArray sessionId = FindSession(fileId);
-
 	if (!m_fileManagerCompPtr.IsValid()){
 		return FUS_FAILED_TO_OPEN;
 	}
+
+	const FileInfo* fileInfoPtr = FindFileInfo(fileId);
+	if (fileInfoPtr == nullptr){
+		return FUS_INVALID_FILE_ID;
+	}
+
+	// The range of the interface is inclusive. It is checked before anything is written to the file:
+	if (!range.IsValid() || range.GetMinValue() < 0 || range.GetMaxValue() >= fileInfoPtr->size || range.GetLength() + 1 != data.size()){
+		return FUS_CHUNK_OUT_OF_RANGE;
+	}
+
+	QByteArray sessionId = FindSession(fileId);
 
 	QString filePath = m_fileManagerCompPtr->GetPath(sessionId, fileId);
 	if (filePath.isEmpty()){
@@ -150,14 +160,8 @@ IFileUploadHandler::FilelUploadStatus CCollectionImportControllerComp::ReceiveFi
 
 	file.close();
 
-	FileInfo* fileInfoPtr = FindFileInfo(fileId);
-	Q_ASSERT(fileInfoPtr != nullptr);
-
-	if (range.GetMinValue() < 0 || range.GetMaxValue() > fileInfoPtr->size){
-		return FUS_CHUNK_OUT_OF_RANGE;
-	}
-
-	FilelUploadStatus retVal = AddFileChunk(fileId, range);
+	// The uploaded chunks are tracked as half-open ranges [first, last + 1):
+	FilelUploadStatus retVal = AddFileChunk(fileId, ByteRange(range.GetMinValue(), range.GetMaxValue() + 1));
 
 	UpdateUploadProgress(fileId);
 
@@ -388,7 +392,7 @@ CCollectionImportControllerComp::WorkingFileInfo* CCollectionImportControllerCom
 }
 
 
-CCollectionImportControllerComp::FilelUploadStatus CCollectionImportControllerComp::AddFileChunk(const QByteArray& fileId, const istd::CIntRange& range)
+CCollectionImportControllerComp::FilelUploadStatus CCollectionImportControllerComp::AddFileChunk(const QByteArray& fileId, const ByteRange& range)
 {
 	QMutexLocker locker(&m_mutex);
 
@@ -404,7 +408,7 @@ CCollectionImportControllerComp::FilelUploadStatus CCollectionImportControllerCo
 	}
 
 	// Unite a chunk with intersecting chunks
-	istd::CIntRange result = range;
+	ByteRange result = range;
 	for (int index : intersectsWith){
 		result.Unite(fileInfoPtr->uploadedChunks[index]);
 	}
@@ -426,12 +430,12 @@ double CCollectionImportControllerComp::GetFileProgress(const QByteArray& fileId
 	WorkingFileInfo* fileInfoPtr = FindFileInfo(fileId);
 	Q_ASSERT(fileInfoPtr != nullptr);
 
-	int size = fileInfoPtr->size;
-	int uploaded = 0;
+	qint64 size = fileInfoPtr->size;
+	qint64 uploaded = 0;
 
 	Q_ASSERT(size != 0);
 
-	for (const istd::CIntRange& chunk : fileInfoPtr->uploadedChunks){
+	for (const ByteRange& chunk : fileInfoPtr->uploadedChunks){
 		uploaded += chunk.GetLength();
 	}
 

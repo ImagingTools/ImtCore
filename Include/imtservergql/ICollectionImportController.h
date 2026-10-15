@@ -19,7 +19,7 @@ public:
 		QByteArray id;
 		QString name;
 		QString path; // Filled by CollectionImportController
-		int size;
+		qint64 size = 0;
 		QByteArray objectTypeId;
 		iprm::IParamsSetSharedPtr additionalParams;
 	};
