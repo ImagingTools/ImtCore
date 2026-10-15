@@ -48,6 +48,8 @@ Rectangle {
 	property int nameMargin: Style.marginXL
 	property int contentHeight: content.height
 	property int controlHeight: Style.controlHeightM
+	// Marks the name with an asterisk, so a required field is visible before it is focused.
+	property bool isRequired: false
 
 	onFocusChanged: {
 		if (controlItem){
@@ -143,12 +145,23 @@ Rectangle {
 				y: mainPart.stacked ? 0 : Math.round((mainPart.height - height) / 2)
 				anchors.left: parent.left
 				anchors.right: mainPart.stacked ? parent.right : controlHolder.left
-				anchors.rightMargin: mainPart.stacked ? 0 : rootElement.nameMargin
+				anchors.rightMargin: (mainPart.stacked ? 0 : rootElement.nameMargin) + (rootElement.isRequired ? requiredMark.width : 0)
 				color: Style.textColor
 				font.family: Style.fontFamilyBold
 				font.pixelSize: rootElement.titleFontSize
 				elide: Text.ElideRight
 				wrapMode: Text.NoWrap
+			}
+
+			Text {
+				id: requiredMark
+				x: textName.x + Math.min(textName.implicitWidth, textName.width)
+				y: textName.y
+				visible: rootElement.isRequired && textName.text !== ""
+				color: Style.errorTextColor
+				font.family: Style.fontFamilyBold
+				font.pixelSize: rootElement.titleFontSize
+				text: " *"
 			}
 
 			// Measures the control instead of being measured by it. The Loader
