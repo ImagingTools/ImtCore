@@ -15,63 +15,6 @@ namespace imtcache
 {
 
 
-namespace
-{
-
-
-bool Execute(imtduckdb::IDuckConnection& connection, const QString& query, QString& errorMessage)
-{
-	QSqlError sqlError;
-	connection.ExecSqlQuery(query.toUtf8(), &sqlError);
-	if (sqlError.type() != QSqlError::NoError){
-		errorMessage = sqlError.text();
-
-		return false;
-	}
-
-	return true;
-}
-
-
-/// The first column of the first row of the result.
-bool ReadValue(imtduckdb::IDuckConnection& connection, const QString& query, QVariant& value, QString& errorMessage)
-{
-	QSqlError sqlError;
-	QSqlQuery result = connection.ExecSqlQuery(query.toUtf8(), &sqlError);
-	if (sqlError.type() != QSqlError::NoError){
-		errorMessage = sqlError.text();
-
-		return false;
-	}
-
-	value = result.next() ? result.value(0) : QVariant();
-
-	return true;
-}
-
-
-bool ExecuteScript(imtduckdb::IDuckConnection& connection, const QString& scriptPath, QString& errorMessage)
-{
-	QFile scriptFile(scriptPath);
-	if (!scriptFile.open(QFile::ReadOnly)){
-		errorMessage = QStringLiteral("Unable to read %1").arg(scriptPath);
-
-		return false;
-	}
-
-	return Execute(connection, QString::fromUtf8(scriptFile.readAll()), errorMessage);
-}
-
-
-QString NextChangeId()
-{
-	return QStringLiteral("nextval('%1')").arg(CacheChangeSequence::NAME);
-}
-
-
-} // anonymous namespace
-
-
 // public methods
 
 bool CCacheChangeLog::EnsureTables(imtduckdb::IDuckConnection& connection, QString& errorMessage)
@@ -266,6 +209,57 @@ bool CCacheChangeLog::Purge(imtduckdb::IDuckConnection& connection, QString& err
 						 imtdb::QuoteIdentifier(CacheChangeCursorColumn::LAST_CHANGE_ID),
 						 imtdb::QuoteIdentifier(CacheTable::CACHE_CHANGE_CURSOR)),
 				errorMessage);
+}
+
+
+// private methods
+
+bool CCacheChangeLog::Execute(imtduckdb::IDuckConnection& connection, const QString& query, QString& errorMessage)
+{
+	QSqlError sqlError;
+	connection.ExecSqlQuery(query.toUtf8(), &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		errorMessage = sqlError.text();
+
+		return false;
+	}
+
+	return true;
+}
+
+
+bool CCacheChangeLog::ReadValue(imtduckdb::IDuckConnection& connection, const QString& query, QVariant& value, QString& errorMessage)
+{
+	QSqlError sqlError;
+	QSqlQuery result = connection.ExecSqlQuery(query.toUtf8(), &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		errorMessage = sqlError.text();
+
+		return false;
+	}
+
+	value = result.next() ? result.value(0) : QVariant();
+
+	return true;
+}
+
+
+bool CCacheChangeLog::ExecuteScript(imtduckdb::IDuckConnection& connection, const QString& scriptPath, QString& errorMessage)
+{
+	QFile scriptFile(scriptPath);
+	if (!scriptFile.open(QFile::ReadOnly)){
+		errorMessage = QStringLiteral("Unable to read %1").arg(scriptPath);
+
+		return false;
+	}
+
+	return Execute(connection, QString::fromUtf8(scriptFile.readAll()), errorMessage);
+}
+
+
+QString CCacheChangeLog::NextChangeId()
+{
+	return QStringLiteral("nextval('%1')").arg(CacheChangeSequence::NAME);
 }
 
 

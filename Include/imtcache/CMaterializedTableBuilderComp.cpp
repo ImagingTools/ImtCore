@@ -16,49 +16,6 @@ namespace imtcache
 {
 
 
-namespace
-{
-
-const QString SHADOW_SUFFIX = QStringLiteral("_shadow");
-const QString AFFECTED_SUFFIX = QStringLiteral("_affected");
-
-/// Column of the table of affected keys.
-const QString AFFECTED_KEY_COLUMN = QStringLiteral("KeyId");
-
-
-bool Execute(imtduckdb::IDuckConnection& connection, const QString& query, QString& errorMessage)
-{
-	QSqlError sqlError;
-	connection.ExecSqlQuery(query.toUtf8(), &sqlError);
-	if (sqlError.type() != QSqlError::NoError){
-		errorMessage = sqlError.text();
-
-		return false;
-	}
-
-	return true;
-}
-
-
-/// The first column of the first row of the result.
-bool ReadValue(imtduckdb::IDuckConnection& connection, const QString& query, QVariant& value, QString& errorMessage)
-{
-	QSqlError sqlError;
-	QSqlQuery result = connection.ExecSqlQuery(query.toUtf8(), &sqlError);
-	if (sqlError.type() != QSqlError::NoError){
-		errorMessage = sqlError.text();
-
-		return false;
-	}
-
-	value = result.next() ? result.value(0) : QVariant();
-
-	return true;
-}
-
-} // anonymous namespace
-
-
 // reimplemented (imtcache::ICacheTableBuilder)
 
 QString CMaterializedTableBuilderComp::GetCacheTableName() const
@@ -357,6 +314,36 @@ bool CMaterializedTableBuilderComp::HasExpectedColumns(imtduckdb::IDuckConnectio
 QString CMaterializedTableBuilderComp::GetAffectedTableName() const
 {
 	return GetCacheTableName() + AFFECTED_SUFFIX;
+}
+
+
+bool CMaterializedTableBuilderComp::Execute(imtduckdb::IDuckConnection& connection, const QString& query, QString& errorMessage)
+{
+	QSqlError sqlError;
+	connection.ExecSqlQuery(query.toUtf8(), &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		errorMessage = sqlError.text();
+
+		return false;
+	}
+
+	return true;
+}
+
+
+bool CMaterializedTableBuilderComp::ReadValue(imtduckdb::IDuckConnection& connection, const QString& query, QVariant& value, QString& errorMessage)
+{
+	QSqlError sqlError;
+	QSqlQuery result = connection.ExecSqlQuery(query.toUtf8(), &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		errorMessage = sqlError.text();
+
+		return false;
+	}
+
+	value = result.next() ? result.value(0) : QVariant();
+
+	return true;
 }
 
 

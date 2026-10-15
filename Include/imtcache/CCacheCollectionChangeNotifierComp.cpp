@@ -11,17 +11,6 @@ namespace imtcache
 {
 
 
-namespace
-{
-
-
-/// A cache that stays behind for this long has bigger problems than lost messages.
-constexpr int MAX_PENDING_MESSAGES = 5000;
-
-
-} // anonymous namespace
-
-
 // protected methods
 
 // reimplemented (imtservergql::CGqlPublisherCompBase)
