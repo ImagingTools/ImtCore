@@ -98,6 +98,8 @@ private:
 	QString GetStateFilePath() const;
 	bool RestoreDocumentMap(const DocumentMap& documentMap);
 	void RemoveAllDocuments();
+	void RequestSaveToFile(const QString& filePath);
+	void ProcessSaveRequests();
 	bool RestoreSharedDocument(const DocumentInfo& documentInfo, const QByteArray& userId);
 	bool RestoreDocument(
 				const DocumentInfo& documentInfo,
@@ -118,6 +120,9 @@ private:
 
 	std::atomic<bool> m_isStateLoading{false};
 	mutable QMutex m_stateFileMutex;
+	mutable QMutex m_saveRequestMutex;
+	QString m_lastRequestedStateFilePath;
+	bool m_isSaveRequestProcessingQueued = false;
 };
 
 

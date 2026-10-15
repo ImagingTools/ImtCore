@@ -10,6 +10,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonParseError>
 #include <QtCore/QMetaObject>
+#include <QtCore/QMutexLocker>
 #include <QtCore/QSaveFile>
 #include <QtCore/QSet>
 
@@ -167,18 +168,7 @@ void CCollectionDocumentServiceComp::OnEndChanges(const ChangeSet& changeSet)
 
 	const QString filePath = GetStateFilePath();
 	if (!filePath.isEmpty()){
-		std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
-		QMetaObject::invokeMethod(
-			this,
-			[this, filePath, aliveGuard] {
-				auto isAlive = aliveGuard.lock();
-				if (!isAlive || !isAlive->load()){
-					return;
-				}
-
-				SaveToFile(filePath);
-			},
-			Qt::QueuedConnection);
+		RequestSaveToFile(filePath);
 	}
 
 	BaseClass::OnEndChanges(changeSet);
@@ -390,6 +380,70 @@ void CCollectionDocumentServiceComp::RemoveAllDocuments()
 
 	m_userDocuments.clear();
 	m_sharedDocuments.clear();
+}
+
+
+void CCollectionDocumentServiceComp::RequestSaveToFile(const QString& filePath)
+{
+	if (filePath.isEmpty()){
+		return;
+	}
+
+	bool shouldQueueProcessing = false;
+	{
+		QMutexLocker locker(&m_saveRequestMutex);
+		m_lastRequestedStateFilePath = filePath;
+		if (!m_isSaveRequestProcessingQueued){
+			m_isSaveRequestProcessingQueued = true;
+			shouldQueueProcessing = true;
+		}
+	}
+
+	if (!shouldQueueProcessing){
+		return;
+	}
+
+	std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
+	QMetaObject::invokeMethod(
+		this,
+		[this, aliveGuard] {
+			auto isAlive = aliveGuard.lock();
+			if (!isAlive || !isAlive->load()){
+				QMutexLocker locker(&m_saveRequestMutex);
+				m_isSaveRequestProcessingQueued = false;
+				m_lastRequestedStateFilePath.clear();
+
+				return;
+			}
+
+			ProcessSaveRequests();
+		},
+		Qt::QueuedConnection);
+}
+
+
+void CCollectionDocumentServiceComp::ProcessSaveRequests()
+{
+	while (true){
+		QString filePath;
+		{
+			QMutexLocker locker(&m_saveRequestMutex);
+			filePath = m_lastRequestedStateFilePath;
+			m_lastRequestedStateFilePath.clear();
+		}
+
+		if (filePath.isEmpty()){
+			QMutexLocker locker(&m_saveRequestMutex);
+			if (m_lastRequestedStateFilePath.isEmpty()){
+				m_isSaveRequestProcessingQueued = false;
+				return;
+			}
+
+			continue;
+		}
+
+		SaveToFile(filePath);
+	}
 }
 
 
