@@ -409,10 +409,6 @@ void CCollectionDocumentServiceComp::RequestSaveToFile(const QString& filePath)
 		[this, aliveGuard] {
 			auto isAlive = aliveGuard.lock();
 			if (!isAlive || !isAlive->load()){
-				QMutexLocker locker(&m_saveRequestMutex);
-				m_isSaveRequestProcessingQueued = false;
-				m_lastRequestedStateFilePath.clear();
-
 				return;
 			}
 
