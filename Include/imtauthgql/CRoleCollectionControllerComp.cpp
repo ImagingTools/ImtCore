@@ -192,7 +192,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CRoleCollectionControllerComp::On
 
 		sdl::V1_0::imtbase::CParameter parentRolesParameter;
 		parentRolesParameter.id = QByteArrayLiteral("ParentRoles");
-		parentRolesParameter.typeId = parentRolesParameter.id;
+		parentRolesParameter.typeId = QByteArrayLiteral("TextList");
 		parentRolesParameter.name = QStringLiteral("Parent Roles");
 
 		QByteArrayList parentRolesIds = roleInfoPtr->GetIncludedRoles();
@@ -219,7 +219,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CRoleCollectionControllerComp::On
 
 		sdl::V1_0::imtbase::CParameter permissionsParameter;
 		permissionsParameter.id = QByteArrayLiteral("Permissions");
-		permissionsParameter.typeId = parentRolesParameter.id;
+		permissionsParameter.typeId = QByteArrayLiteral("TextList");
 		permissionsParameter.name = QStringLiteral("Permissions");
 
 		imtauth::IRole::FeatureIds permissionsIds = roleInfoPtr->GetPermissions();
