@@ -1756,9 +1756,6 @@ QtObject {
 							if (m_status === "Success"){
 								crossOrgGrantReprController.documentUpdated(crossOrgGrantReprController.documentId)
 							}
-							else{
-								crossOrgGrantReprController.updateDocumentFailed(crossOrgGrantReprController.documentId, m_message)
-							}
 						}
 					}
 				}
