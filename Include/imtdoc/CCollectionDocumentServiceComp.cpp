@@ -420,24 +420,15 @@ void CCollectionDocumentServiceComp::RequestSaveToFile(const QString& filePath)
 
 void CCollectionDocumentServiceComp::ProcessSaveRequests()
 {
-	while (true){
-		QString filePath;
-		{
-			QMutexLocker locker(&m_saveRequestMutex);
-			filePath = m_lastRequestedStateFilePath;
-			m_lastRequestedStateFilePath.clear();
-		}
+	QString filePath;
+	{
+		QMutexLocker locker(&m_saveRequestMutex);
+		filePath = m_lastRequestedStateFilePath;
+		m_lastRequestedStateFilePath.clear();
+		m_isSaveRequestProcessingQueued = false;
+	}
 
-		if (filePath.isEmpty()){
-			QMutexLocker locker(&m_saveRequestMutex);
-			if (m_lastRequestedStateFilePath.isEmpty()){
-				m_isSaveRequestProcessingQueued = false;
-				return;
-			}
-
-			continue;
-		}
-
+	if (!filePath.isEmpty()){
 		SaveToFile(filePath);
 	}
 }
