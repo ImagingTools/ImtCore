@@ -599,12 +599,17 @@ class ListView extends Flickable {
 
     // Neighbour follow during insert/realign shoves the displaced row before the
     // new one has its final size, which leaves a gap (PopupContainer insert(0)).
+    // Model rows are reindexed on remove/insert at once, __items only in the batched
+    // __updateView. In between, a row index can make an item its own neighbour, and
+    // the x/y feedback overflows the stack inside __updateView, which leaves the view
+    // frozen with the delegates of removed rows still shown. Only follow from an item
+    // the map still holds at that index: the chain then strictly moves forward.
     __followItemGeometry(item, horizontal) {
         if (this.__aligning) return
         if ((this.orientation === ListView.Horizontal) !== !!horizontal) return
 
         let index = item && item.JQAbstractModel ? item.JQAbstractModel.index : -1
-        if (index < 0 || !this.__items[index + 1]) return
+        if (index < 0 || this.__items[index] !== item || !this.__items[index + 1]) return
 
         let next = this.__items[index + 1]
         if (horizontal) {
