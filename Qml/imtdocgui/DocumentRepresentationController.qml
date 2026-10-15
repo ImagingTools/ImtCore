@@ -12,6 +12,7 @@ QtObject {
 	// Load the representation of a newly created document from the server instead of using representationModel defaults.
 	property bool requestRepresentationOnCreate: false
 
+	// Every startUpdateDocument must be followed by documentUpdated or updateDocumentFailed: a pending save waits for it.
 	signal startUpdateDocument(string documentId)
 	signal updateDocumentFailed(string documentId, string message)
 	signal documentUpdated(string documentId)

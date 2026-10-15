@@ -49,11 +49,23 @@ QtObject {
 				"representationFailed": function(failedDocumentId, message){
 					root.onUpdateRepresentationFailed(registeredView, failedDocumentId, message)
 				},
+				"documentUpdateStarted": function(startedDocumentId){
+					root.onStartUpdateDocument(registeredView, startedDocumentId)
+				},
+				"documentUpdated": function(updatedDocumentId){
+					root.onDocumentUpdateFinished(registeredView, updatedDocumentId, true)
+				},
+				"documentUpdateFailed": function(failedDocumentId, message){
+					root.onDocumentUpdateFinished(registeredView, failedDocumentId, false)
+				},
 				"viewDestroyed": function(){
 					root.unregisterView(registeredView)
 				}
 			}
 			representationController.updateRepresentationFailed.connect(connection.representationFailed)
+			representationController.startUpdateDocument.connect(connection.documentUpdateStarted)
+			representationController.documentUpdated.connect(connection.documentUpdated)
+			representationController.updateDocumentFailed.connect(connection.documentUpdateFailed)
 			view.Component.destruction.connect(connection.viewDestroyed)
 			_internal.viewConnections.push(connection)
 
@@ -101,6 +113,7 @@ QtObject {
 				return
 			}
 			root._internal.saveRequested = false
+			root._internal.saveAfterUpdate = false
 		}
 
 		function onUndoInfoReceived(documentId, availableUndoSteps, availableRedoSteps, isDirty){
@@ -225,6 +238,54 @@ QtObject {
 		documentManager.updateDocumentFailed(documentId, message)
 	}
 
+	function onStartUpdateDocument(view, documentId){
+		if (root.documentId !== documentId){
+			return
+		}
+
+		let index = registeredViews.indexOf(view)
+		if (index >= 0){
+			_internal.documentUpdateCounters[index] = _internal.documentUpdateCounters[index] + 1
+		}
+	}
+
+	// A save requested while the document is being updated from a view is sent only after the update has been applied,
+	// otherwise the server may save the document without the last changes.
+	function onDocumentUpdateFinished(view, documentId, succeeded){
+		if (root.documentId !== documentId){
+			return
+		}
+
+		let index = registeredViews.indexOf(view)
+		if (index >= 0 && _internal.documentUpdateCounters[index] > 0){
+			_internal.documentUpdateCounters[index] = _internal.documentUpdateCounters[index] - 1
+		}
+
+		if (!_internal.saveAfterUpdate){
+			return
+		}
+
+		if (!succeeded){
+			_internal.saveAfterUpdate = false
+			return
+		}
+
+		if (!isUpdatingDocument()){
+			_internal.saveAfterUpdate = false
+			doSave()
+		}
+	}
+
+	function isUpdatingDocument(){
+		for (let i = 0; i < _internal.documentUpdateCounters.length; ++i){
+			if (_internal.documentUpdateCounters[i] > 0){
+				return true
+			}
+		}
+
+		return false
+	}
+
 	// Writes the GUI state of the visible views to the document.
 	function commitChanges(){
 		for (let i = 0; i < registeredViews.length; ++i){
@@ -285,6 +346,7 @@ QtObject {
 		registeredRepresentation.push(representationController)
 		_internal.updateCounters.push(0)
 		_internal.failedViews.push(false)
+		_internal.documentUpdateCounters.push(0)
 		
 		viewRegistered(view, representationController, updateRepr)
 	}
@@ -308,11 +370,15 @@ QtObject {
 		representationController.startUpdateRepresentation.disconnect(onStartUpdateRepresentation)
 		representationController.updateRepresentationFailed.disconnect(connection.representationFailed)
 		representationController.updateDocumentFailed.disconnect(onUpdateDocumentFailed)
+		representationController.startUpdateDocument.disconnect(connection.documentUpdateStarted)
+		representationController.documentUpdated.disconnect(connection.documentUpdated)
+		representationController.updateDocumentFailed.disconnect(connection.documentUpdateFailed)
 
 		registeredViews.splice(index, 1)
 		registeredRepresentation.splice(index, 1)
 		_internal.updateCounters.splice(index, 1)
 		_internal.failedViews.splice(index, 1)
+		_internal.documentUpdateCounters.splice(index, 1)
 		_internal.viewConnections.splice(index, 1)
 
 		let requestIndex = _internal.requestUpdateViews.indexOf(view)
@@ -352,6 +418,13 @@ QtObject {
 		}
 
 		commitChanges()
+
+		if (isUpdatingDocument()){
+			_internal.saveAfterUpdate = true
+			return
+		}
+
+		_internal.saveAfterUpdate = false
 		doSave()
 	}
 
@@ -451,6 +524,8 @@ QtObject {
 	property QtObject _internal: QtObject {
 		property var requestUpdateViews: []
 		property bool saveRequested: false
+		property bool saveAfterUpdate: false
+		property var documentUpdateCounters: []
 		property var updateCounters: []
 		property var failedViews: []
 		property var viewConnections: []

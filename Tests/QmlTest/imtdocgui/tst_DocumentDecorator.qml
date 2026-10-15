@@ -79,6 +79,14 @@ TestCase {
 			function respond(){
 				representationUpdated(documentId, representationModel)
 			}
+
+			function finishUpdate(){
+				documentUpdated(documentId)
+			}
+
+			function failUpdate(){
+				updateDocumentFailed(documentId, "Error")
+			}
 		}
 	}
 
@@ -143,7 +151,60 @@ TestCase {
 
 		compare(controllerOf(document.service, 0).updateCount, 1, "Save first writes the GUI state to the document")
 		compare(controllerOf(document.service, 1).updateCount, 1)
+		compare(document.service.calls, [], "Save waits until the document has been updated")
+
+		controllerOf(document.service, 0).finishUpdate()
+
+		compare(document.service.calls, [])
+
+		controllerOf(document.service, 1).finishUpdate()
+
 		compare(document.service.calls, [["save", "doc", "Name"]])
+	}
+
+	function test_saveWaitsForPendingUpdate(){
+		let document = openDocument("Name", false)
+		let controller = controllerOf(document.service)
+
+		document.views[0].model.modelChanged(null)
+		document.views[0].hasChanges = false
+		document.views[0].commandActivated("Save")
+
+		compare(document.service.calls, [])
+
+		controller.finishUpdate()
+
+		compare(document.service.calls, [["save", "doc", "Name"]])
+
+		controller.finishUpdate()
+
+		compare(document.service.calls, [["save", "doc", "Name"]], "A late update reply does not save again")
+	}
+
+	function test_repeatedSaveWhileUpdatingSavesOnce(){
+		let document = openDocument("Name", false)
+
+		document.views[0].commandActivated("Save")
+		document.views[0].hasChanges = false
+		document.views[0].commandActivated("Save")
+		controllerOf(document.service).finishUpdate()
+
+		compare(document.service.calls, [["save", "doc", "Name"]])
+	}
+
+	function test_failedUpdateCancelsSave(){
+		let document = openDocument("Name", false)
+		let controller = controllerOf(document.service)
+
+		document.views[0].commandActivated("Save")
+		controller.failUpdate()
+
+		compare(document.service.calls, [])
+
+		document.views[0].hasChanges = false
+		document.views[0].commandActivated("Save")
+
+		compare(document.service.calls, [["save", "doc", "Name"]], "The next save is not blocked by the failed update")
 	}
 
 	function test_saveWithoutNameRequestsName(){

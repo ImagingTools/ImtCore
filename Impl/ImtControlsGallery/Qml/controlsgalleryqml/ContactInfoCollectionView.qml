@@ -141,6 +141,9 @@ RemoteCollectionView {
 									if (m_status === "Success"){
 										root.documentUpdated(root.documentId)
 									}
+									else{
+										root.updateDocumentFailed(root.documentId, m_message)
+									}
 								}
 							}
 						}
@@ -202,6 +205,9 @@ RemoteCollectionView {
 								onFinished: {
 									if (m_status === "Success"){
 										root.documentUpdated(root.documentId)
+									}
+									else{
+										root.updateDocumentFailed(root.documentId, m_message)
 									}
 								}
 							}
