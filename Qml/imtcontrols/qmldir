@@ -185,6 +185,8 @@ IntervalBar 1.0 ./Views/IntervalBar.qml
 ValueLevelIndicator 1.0 ./Views/ValueLevelIndicator.qml
 BusyIndicator 1.0 ./Views/BusyIndicator.qml
 Loading 1.0 ./Views/Loading.qml
+SkeletonBlock 1.0 ./Views/SkeletonBlock.qml
+SkeletonFormView 1.0 ./Views/SkeletonFormView.qml
 PaintedCorner 1.0 ./Views/PaintedCorner.qml
 Piechart 1.0 ./Views/Piechart.qml
 Spinner 1.0 ./Views/Spinner.qml

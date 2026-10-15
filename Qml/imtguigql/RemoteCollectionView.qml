@@ -210,6 +210,7 @@ CollectionView {
 		id: collectionChangeListener
 		collectionId: root.collectionId
 		currentUserId: AuthorizationController.getUserId()
+		deliveryEnabled: root.visible
 
 		function getHeaders() {
 			return root.getHeaders()
@@ -218,6 +219,10 @@ CollectionView {
 		onChanged: {
 			root.collectionChanged(changeInfo)
 			root.handleSubscription(rawData, changeInfo)
+		}
+
+		onRefreshRequired: {
+			root.doUpdateGui()
 		}
 
 		onInserted: {

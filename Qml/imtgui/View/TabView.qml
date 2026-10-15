@@ -48,7 +48,17 @@ Item {
 			pinned = false;
 		}
 
-		tabModel.append({id: tabId, name: tabName, sourceComponent: tabComp, icon: icon, description: description, waitName: waitName, pinned: pinned})
+		tabModel.append({id: tabId, name: tabName, sourceComponent: tabComp, icon: icon, description: description, waitName: waitName, pinned: pinned, loading: false})
+	}
+
+	// Shows a skeleton in place of the tab title until the tab content is ready.
+	function setTabLoading(tabId, loading){
+		let index = getIndexById(tabId);
+		if (index < 0){
+			return;
+		}
+
+		tabModel.setProperty(index, "loading", loading);
 	}
 
 	function removeTab(tabId){
@@ -169,17 +179,6 @@ Item {
 		onCloseItem: {
 			root.onCloseTab(index);
 		}
-	}
-
-	Rectangle {
-		id: separator;
-		z: 6;
-		anchors.top: tabPanel.bottom;
-		width: parent.width;
-		height: 1;
-		color: Style.borderColor;
-		opacity: 0.5;
-		visible: root.tabVisible;
 	}
 
 	Rectangle {

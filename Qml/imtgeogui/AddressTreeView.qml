@@ -248,22 +248,30 @@ Rectangle{
 			return;
 		}
 
-		else{
-			treeBody.addressTreeRequest.reset()
-			let openedIdsString = treeView.getOpenedIds()
+		treeBody.reloadTree()
+	}
 
-			treeBody.addressTreeRequest.idsToOpen = openedIdsString
+	// Reloads the tree and keeps the opened branches open.
+	function reloadTree(){
+		treeBody.addressTreeRequest.reset()
+		let openedIdsString = treeView.getOpenedIds()
 
-			treeBody.addressTreeRequest.updateModel();
-		}
+		treeBody.addressTreeRequest.idsToOpen = openedIdsString
+
+		treeBody.addressTreeRequest.updateModel();
 	}
 
 	SubscriptionClient {
 		id: subscriptionClient;
 		gqlCommandId: treeBody.subscriptionCommandId
+		deliveryEnabled: treeBody.visible
 
 		onMessageReceived: {
 			treeBody.handleSubscription(data);
+		}
+
+		onRefreshRequired: {
+			treeBody.reloadTree();
 		}
 	}
 

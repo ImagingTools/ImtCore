@@ -112,6 +112,18 @@
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SQLiteUserRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserDatabaseSqlDelegate" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SQLiteUserRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SQLiteUserGroupRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupDatabaseSqlDelegate" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SQLiteUserGroupRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

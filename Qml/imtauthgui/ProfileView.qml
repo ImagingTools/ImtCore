@@ -92,6 +92,23 @@ ViewBase {
 			container.apiClient.getOrganizations()
 	}
 
+	// Membership notifications update the profile only while it is shown; a hidden one reloads when shown.
+	property bool __reloadPending: false
+
+	function __reloadWhenVisible() {
+		if (container.visible)
+			container.__reload()
+		else
+			container.__reloadPending = true
+	}
+
+	onVisibleChanged: {
+		if (container.visible && container.__reloadPending) {
+			container.__reloadPending = false
+			container.__reload()
+		}
+	}
+
 	Connections {
 		target: container.apiClient ? container.apiClient : null
 
@@ -142,11 +159,12 @@ ViewBase {
 		target: AuthorizationController
 
 		function onTenantSelected(tenantId) { container.__reload() }
-		function onTenantInvitationAccepted(tenantId, membershipId) { container.__reload() }
-		function onTenantInvitationRejected(tenantId, membershipId) { container.__reload() }
-		function onTenantOwnershipTransferred(tenantId) { container.__reload() }
-		function onTenantMembershipRoleChanged(tenantId, userId, role) { container.__reload() }
-		function onTenantMembershipRemoved(tenantId, userId) { container.__reload() }
+		function onTenantInvitationAccepted(tenantId, membershipId) { container.__reloadWhenVisible() }
+		function onTenantInvitationRejected(tenantId, membershipId) { container.__reloadWhenVisible() }
+		function onTenantOwnershipTransferred(tenantId) { container.__reloadWhenVisible() }
+		function onTenantMembershipRoleChanged(tenantId, userId, role) { container.__reloadWhenVisible() }
+		function onTenantMembershipRemoved(tenantId, userId) { container.__reloadWhenVisible() }
+		function onMembershipNotificationsResumed() { container.__reloadWhenVisible() }
 	}
 
 	// --- Identity banner ---

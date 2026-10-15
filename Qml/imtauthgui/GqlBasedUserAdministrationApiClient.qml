@@ -28,11 +28,10 @@ QtObject {
 	id: root
 
 	property string permissionPath: ""
-	property string context: ""
 
 	// Password policy for the user editor's password fields (imtauthgui owns no GQL).
 	property GqlBasedPasswordPolicyProvider passwordPolicy: GqlBasedPasswordPolicyProvider {
-		context: root.context
+		permissionPath: root.permissionPath
 	}
 
 	property string productId: AuthorizationController.productId
@@ -402,7 +401,7 @@ QtObject {
 			}
 
 			property GqlSdlRequestSender getRoleAssignmentsRequest: GqlSdlRequestSender {
-				context: root.context
+				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_getRoleRepresentation
 				sdlObjectComp: Component {
 					RoleData {
@@ -540,7 +539,7 @@ QtObject {
 
 			// Members are not requested: they are edited here and inherit nothing.
 			property GqlSdlRequestSender getGroupAssignmentsRequest: GqlSdlRequestSender {
-				context: root.context
+				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_getGroupRepresentation
 				sdlObjectComp: Component {
 					GroupData {
@@ -699,7 +698,7 @@ QtObject {
 			}
 
 			property GqlSdlRequestSender getUserAssignmentsRequest: GqlSdlRequestSender {
-				context: root.context
+				permissionPath: root.permissionPath
 				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_getUserRepresentation
 				sdlObjectComp: Component {
 					UserData {

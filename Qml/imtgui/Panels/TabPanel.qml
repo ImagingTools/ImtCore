@@ -57,21 +57,31 @@ Rectangle {
 		viewTabInListView(selectedIndex);
 	}
 	
+	// Separates the strip from the page below it.
+	Rectangle {
+		anchors.left: parent.left;
+		anchors.right: parent.right;
+		anchors.bottom: parent.bottom;
+		height: 1;
+		color: Style.borderColor;
+	}
+
 	ListView {
 		id: list;
 		
 		anchors.left: parent.left;
-		width: Math.max(0, Math.min(contentWidth, tabPanelContainer.maxWidth - externButtons.width))
-		
+		anchors.leftMargin: Style.spacingXS;
+		width: Math.max(0, Math.min(contentWidth, tabPanelContainer.maxWidth - externButtons.width - Style.spacingXS))
+
 		height: parent.height;
-		
+
 		clip: true;
-		
+
 		orientation: ListView.Horizontal;
 		boundsBehavior: Flickable.StopAtBounds;
 		interactive: false;
-		
-		spacing: 0;
+
+		spacing: Style.spacingXS;
 		
 		onContentWidthChanged: {
 			tabPanelContainer.viewTabInListView(tabPanelContainer.selectedIndex);

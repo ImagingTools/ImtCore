@@ -380,7 +380,7 @@ Dialog {
 	// Reached before any API client exists, so the policy is instantiated here.
 	GqlBasedPasswordPolicyProvider {
 		id: passwordPolicyProvider;
-		context: passwordRecoveryDialog.context;
+		permissionPath: passwordRecoveryDialog.permissionPath;
 	}
 
 	GqlSdlRequestSender {

@@ -89,6 +89,9 @@ RemoteCollectionView {
 		function onSubscriptionOwnershipTransferred(tenantId) {
 			container.doUpdateGui()
 		}
+		function onSubscriptionsResumed() {
+			container.doUpdateGui()
+		}
 	}
 
 	onHeadersChanged: {
