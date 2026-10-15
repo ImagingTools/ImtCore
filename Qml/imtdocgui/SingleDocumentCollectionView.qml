@@ -140,6 +140,10 @@ Item {
 			PopupManager.addErrorMessage(message, true)
 		}
 
+		function onDocumentLost(documentId, documentName){
+			PopupManager.addInfoMessage(qsTr("The document \"%1\" is no longer open on the server and was closed").arg(documentName), true)
+		}
+
 		function onDocumentGuiUpdated(documentId, representation){
 			if (!workspaceView.documentManager.documentIsLoading(documentId)){
 				workspaceView.stopLoading(documentId)

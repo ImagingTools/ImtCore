@@ -161,7 +161,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserGroupCollectionControllerCom
 
 			sdl::V1_0::imtbase::CParameter parentGroupsParameter;
 			parentGroupsParameter.id = QByteArrayLiteral("ParentGroups");
-			parentGroupsParameter.typeId = parentGroupsParameter.id;
+			parentGroupsParameter.typeId = QByteArrayLiteral("TextList");
 			parentGroupsParameter.name = QStringLiteral("Parent Groups");
 
 			if (m_userGroupInfoProviderCompPtr.IsValid()){
@@ -186,7 +186,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserGroupCollectionControllerCom
 
 			sdl::V1_0::imtbase::CParameter usersParameter;
 			usersParameter.id = QByteArrayLiteral("Users");
-			usersParameter.typeId = usersParameter.id;
+			usersParameter.typeId = QByteArrayLiteral("TextList");
 			usersParameter.name = QStringLiteral("Users");
 
 			if (m_userInfoProviderCompPtr.IsValid()){
@@ -211,7 +211,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserGroupCollectionControllerCom
 
 			sdl::V1_0::imtbase::CParameter rolesParameter;
 			rolesParameter.id = QByteArrayLiteral("Roles");
-			rolesParameter.typeId = rolesParameter.id;
+			rolesParameter.typeId = QByteArrayLiteral("TextList");
 			rolesParameter.name = QStringLiteral("Roles");
 
 			if (m_roleInfoProviderCompPtr.IsValid()){

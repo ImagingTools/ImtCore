@@ -45,6 +45,7 @@ CDM::CDocumentList CCollectionDocumentServiceControllerComp::OnGetOpenedDocument
 			sdlInfo.objectTypeId = info.typeId;
 			sdlInfo.isDirty = info.isDirty;
 			sdlInfo.hasNameProvider = info.hasNameProvider;
+			sdlInfo.isLoading = info.isLoading;
 
 			retVal.documentList->append(sdlInfo);
 		}
@@ -468,7 +469,18 @@ sdl::V1_0::imtbase::CUndoInfo CCollectionDocumentServiceControllerComp::OnGetUnd
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr-> GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK){
+		const imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr);
+
+		// Data, not an error: a resyncing client closes the document. After a restart the user has no entry at all.
+		const bool isDocumentUnknown = !userId.isEmpty()
+					&& (status == imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID || status == imtdoc::IDocumentService::OS_INVALID_USER_ID);
+		if (isDocumentUnknown){
+			retVal.status->status = sdl::V1_0::imtbase::EUndoStatus::InvalidDocumentId;
+
+			return retVal;
+		}
+
+		if (status != imtdoc::IDocumentService::OS_OK){
 			errorMessage = "Undo manager not available";
 
 			retVal.status->status = sdl::V1_0::imtbase::EUndoStatus::Failed;

@@ -42,6 +42,14 @@ Item {
 
 	property alias dialogManagerView: localView
 
+	// Skeleton: after showSkeleton() covers the content until the next GUI update has been laid out.
+	property bool skeletonEnabled: true
+	property Component skeletonComp: Component {
+		SkeletonFormView {}
+	}
+	property bool contentReady: true
+	readonly property bool skeletonVisible: viewBase.skeletonEnabled && !viewBase.contentReady
+
 	signal commandsModelChanged(var commandsModel)
 	signal commandActivated(string commandId)
 	signal commandActivatedWithParams(string commandId, var params)
@@ -253,6 +261,39 @@ onCommandsModelChanged: {
 		color: viewBase.contentColor;
 	}
 
+	Loader {
+		id: skeletonLoader
+		anchors.top: separator.bottom
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.bottom: parent.bottom
+		z: 999
+		objectName: "ViewBase"
+		active: viewBase.skeletonVisible
+		sourceComponent: viewBase.skeletonComp
+	}
+
+	// One more frame so the editor is shown only after it has been laid out.
+	Timer {
+		id: contentReadyTimer
+		interval: 0
+		repeat: false
+
+		onTriggered: {
+			viewBase.contentReady = true
+		}
+	}
+
+	function showContent(){
+		contentReadyTimer.stop()
+		viewBase.contentReady = true
+	}
+
+	function showSkeleton(){
+		contentReadyTimer.stop()
+		viewBase.contentReady = false
+	}
+
 	DialogManagerView{
 		id: localView
 		anchors.fill: parent
@@ -389,6 +430,10 @@ onCommandsModelChanged: {
 		updateGui();
 		
 		viewBase.internal__.blockingUpdateModel = false;
+
+		if (!viewBase.contentReady){
+			contentReadyTimer.restart()
+		}
 
 		guiUpdated(this, model)
 	}

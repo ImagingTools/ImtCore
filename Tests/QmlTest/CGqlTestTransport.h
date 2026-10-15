@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QObject>
+#include <QtCore/QStringList>
 #include <QtCore/QVariantMap>
 #include <QtQml/QQmlNetworkAccessManagerFactory>
 
@@ -39,10 +40,21 @@ public:
 
 	/**
 		Register a request sent by the client.
+		\return body of the response to it: the next one queued for its command, otherwise \c responseBody.
 	*/
-	void RegisterRequest(const QByteArray& requestBody, const QVariantMap& requestHeaders);
+	QByteArray RegisterRequest(const QByteArray& requestBody, const QVariantMap& requestHeaders);
 
 	Q_INVOKABLE void reset();
+
+	/**
+		Answer the next request of \a commandId with \a responseBody; several calls are answered in order.
+	*/
+	Q_INVOKABLE void queueResponse(const QString& commandId, const QString& responseBody);
+
+	/**
+		Command IDs of all requests since the last reset, in the order they were sent.
+	*/
+	Q_INVOKABLE QStringList requestedCommands() const;
 
 	/**
 		Parse a request body with the server-side GraphQL parser.
@@ -61,6 +73,8 @@ private:
 	QVariantMap m_lastRequestHeaders;
 	QByteArray m_responseBody;
 	int m_responseStatus;
+	QMap<QString, QList<QByteArray>> m_queuedResponses;
+	QStringList m_requestedCommands;
 };
 
 

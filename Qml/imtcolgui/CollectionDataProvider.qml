@@ -164,6 +164,11 @@ QtObject {
 			container.itemsInfoModel.send();
 		}
 
+		onRefreshRequired: {
+			container.clearModel();
+			container.itemsInfoModel.send();
+		}
+
 		function getHeaders(){
 			return container.getHeaders()
 		}
