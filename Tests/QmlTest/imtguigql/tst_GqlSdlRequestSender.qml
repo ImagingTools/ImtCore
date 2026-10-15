@@ -186,7 +186,7 @@ TestCase {
 		id: headersSender
 
 		gqlCommandId: "WithHeaders"
-		context: "context-1"
+		permissionPath: "path-1"
 
 		function getHeaders(){
 			let headers = {}
@@ -469,7 +469,7 @@ TestCase {
 
 		compareSentQuery('query WithHeaders {WithHeaders(input: {}) {}}')
 		compare(GqlTestTransport.lastRequestHeaders["x-custom"], "custom value")
-		compare(GqlTestTransport.lastRequestHeaders["context"], "context-1")
+		compare(GqlTestTransport.lastRequestHeaders["permissionpath"], "path-1")
 		compare(GqlTestTransport.lastRequestHeaders["content-type"], "application/x-www-form-urlencoded")
 		waitFinished(-1)
 
@@ -478,7 +478,7 @@ TestCase {
 		pingSender.send()
 
 		compareSentQuery('query Ping {Ping(input: {}) {}}')
-		verify(!("context" in GqlTestTransport.lastRequestHeaders))
+		verify(!("permissionpath" in GqlTestTransport.lastRequestHeaders))
 		waitFinished(-1)
 	}
 

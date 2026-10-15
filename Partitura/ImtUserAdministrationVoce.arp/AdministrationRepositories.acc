@@ -10,6 +10,27 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="PermissionPathMigration" PackageId="ImtAuthPck" ComponentId="PermissionPathMigration">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductInfo" Type="Reference" ExportId="ProductInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleDocumentSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserGroupSqlRepository"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="RoleDocumentSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="RoleRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -22,6 +43,18 @@
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserDatabaseSqlDelegate" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserSqlRepository/SqlDatabaseDocumentDelegate"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserGroupSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupDatabaseSqlDelegate" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserGroupSqlRepository/SqlDatabaseDocumentDelegate"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -33,6 +66,13 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="InvalidationModels" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RoleDocumentSqlRepository</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -48,6 +88,14 @@
                     </AttributeInfo>
                     <AttributeInfo Id="UserDatabaseSqlDelegate" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserSqlRepository/SqlDatabaseDocumentDelegate"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserInvalidationModels" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RoleDocumentSqlRepository</Value>
+                                <Value>UserGroupSqlRepository</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
@@ -96,6 +144,14 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="InvalidationModels" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RoleDocumentSqlRepository</Value>
+                                <Value>UserGroupSqlRepository</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>

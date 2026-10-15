@@ -1,6 +1,24 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
+
+// Qt includes
+#include <QtCore/QByteArrayList>
+#include <QtCore/QStringList>
+
+// ACF includes
+#include <iprm/CParamsSet.h>
+#include <iprm/TParamsPtr.h>
+
+// ImtCore includes
+#include <imtbase/COperationContext.h>
+#include <imtbase/COperationDescription.h>
+#include <imtbase/IObjectCollection.h>
+#include <imtbase/IObjectCollectionIterator.h>
+#include <imtcol/CDocumentIdFilter.h>
+#include <imtdb/ISqlDatabaseObjectDelegate.h>
+#include <imtdb/imtdb.h>
+
 /**
 	\file imtauthdb.h
 	\brief Main header file for the imtauthdb module - Authentication Database Persistence Layer
@@ -670,5 +688,159 @@
 
 namespace imtauthdb
 {
-	// Namespace for authentication database persistence
+
+
+/**
+	Filter parameter (imtcol::IDocumentIdFilter) selecting users or groups holding any of the given roles.
+*/
+static const QByteArray s_roleFilterId = QByteArrayLiteral("RoleFilter");
+
+/**
+	Filter parameter (imtcol::IDocumentIdFilter) selecting roles or groups whose parents include any of the given ids.
+*/
+static const QByteArray s_parentFilterId = QByteArrayLiteral("ParentFilter");
+
+
+inline QString JoinQuotedIds(const QByteArrayList& ids)
+{
+	QStringList quotedIds;
+	for (const QByteArray& id : ids){
+		quotedIds << QStringLiteral("'%1'").arg(imtdb::SqlEncode(QString::fromUtf8(id)));
+	}
+
+	return quotedIds.join(',');
 }
+
+
+/**
+	SQL condition: the JSON array \c arrayKey of the document contains any of the ids.
+*/
+inline QString CreateArrayContainsAnyQuery(bool isSqlite, const QString& arrayKey, const QByteArrayList& ids)
+{
+	if (isSqlite){
+		return QStringLiteral(R"(EXISTS (SELECT 1 FROM json_each(json_extract(root."Document", '$.%1')) AS item WHERE item.value IN (%2)))")
+					.arg(arrayKey, JoinQuotedIds(ids));
+	}
+
+	return QStringLiteral(R"((root."Document"->'%1' ?| array[%2]))").arg(arrayKey, JoinQuotedIds(ids));
+}
+
+
+/**
+	SQL condition: the per-product role lists of a user or a group contain any of the role ids.
+*/
+inline QString CreateProductRolesContainAnyQuery(bool isSqlite, const QByteArrayList& roleIds)
+{
+	if (isSqlite){
+		return QStringLiteral(R"(EXISTS (SELECT 1 FROM json_each(json_extract(root."Document", '$.Products')) AS product, json_each(json_extract(product.value, '$.Roles')) AS role WHERE role.value IN (%1)))")
+					.arg(JoinQuotedIds(roleIds));
+	}
+
+	return QStringLiteral(R"(EXISTS (SELECT 1 FROM jsonb_array_elements(coalesce(root."Document"->'Products', '[]'::jsonb)) AS product WHERE product->'Roles' ?| array[%1]))")
+				.arg(JoinQuotedIds(roleIds));
+}
+
+
+/**
+	Ids of the given document id filter parameter, empty if it is not set.
+*/
+inline QByteArrayList GetFilterIds(const iprm::IParamsSet& filterParams, const QByteArray& filterId)
+{
+	iprm::TParamsPtr<imtcol::IDocumentIdFilter> filterPtr(&filterParams, filterId);
+
+	return filterPtr.IsValid() ? filterPtr->GetDocumentIds() : QByteArrayList();
+}
+
+
+/**
+	Add a document id filter parameter with the given ids.
+*/
+inline void SetFilterIds(iprm::CParamsSet& filterParams, const QByteArray& filterId, const QByteArrayList& ids)
+{
+	istd::TUniqueInterfacePtr<imtcol::CDocumentIdFilter> filterPtr = new imtcol::CDocumentIdFilter();
+	filterPtr->SetDocumentIds(ids);
+	filterParams.SetEditableParameter(filterId, filterPtr.PopPtr(), true);
+}
+
+
+/**
+	A reference dropped from a document, described the way the change generators of the document describe it.
+*/
+struct RemovedReference
+{
+	QByteArray operationTypeId;
+	QByteArray key;
+	QString keyName;
+	QByteArray id;
+};
+
+typedef QList<RemovedReference> RemovedReferences;
+
+
+/**
+	Create the queries storing the active objects selected by \c filterParams after \c removeFunction dropped
+	their references to removed objects. \c removeFunction returns the dropped references; they become the
+	revision description of the stored object, which is attributed to the owner of the removal.
+	The objects in \c skippedIds are removed themselves and left as they are.
+*/
+template<class ObjectInterface, class RemoveFunction>
+QByteArray CreateReferenceRemovalQuery(
+			const imtbase::IObjectCollection& collection,
+			const imtdb::ISqlDatabaseObjectDelegate& objectDelegate,
+			const iprm::IParamsSet& filterParams,
+			const imtbase::ICollectionInfo::Ids& skippedIds,
+			RemoveFunction removeFunction,
+			const imtbase::IOperationContext* operationContextPtr)
+{
+	QByteArray retVal;
+
+	istd::TUniqueInterfacePtr<imtbase::IObjectCollectionIterator> iteratorPtr =
+				collection.CreateObjectCollectionIterator(QByteArray(), 0, -1, &filterParams);
+	if (!iteratorPtr.IsValid()){
+		return retVal;
+	}
+
+	while (iteratorPtr->Next()){
+		const QByteArray objectId = iteratorPtr->GetObjectId();
+		if (skippedIds.contains(objectId)){
+			continue;
+		}
+
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (!iteratorPtr->GetObjectData(dataPtr)){
+			continue;
+		}
+
+		ObjectInterface* objectPtr = dataPtr.GetPtr<ObjectInterface>();
+		if (objectPtr == nullptr){
+			continue;
+		}
+
+		const RemovedReferences removedReferences = removeFunction(*objectPtr);
+		if (removedReferences.isEmpty()){
+			continue;
+		}
+
+		imtbase::COperationContext operationContext;
+		if (operationContextPtr != nullptr){
+			operationContext.SetOperationOwnerId(operationContextPtr->GetOperationOwnerId());
+			operationContext.SetTenantId(operationContextPtr->GetTenantId());
+		}
+
+		for (const RemovedReference& removedReference : removedReferences){
+			imtbase::COperationDescription operationDescription;
+			operationDescription.SetOperationTypeId(removedReference.operationTypeId);
+			operationDescription.SetKey(removedReference.key);
+			operationDescription.SetKeyName(removedReference.keyName);
+			operationDescription.SetOldValue(removedReference.id);
+			operationContext.GetChangesCollection()->InsertNewObject(QByteArrayLiteral("OperationInfo"), QString(), QString(), &operationDescription);
+		}
+
+		retVal += objectDelegate.CreateUpdateObjectQuery(collection, objectId, *dataPtr, &operationContext, false);
+	}
+
+	return retVal;
+}
+
+
+} // namespace imtauthdb

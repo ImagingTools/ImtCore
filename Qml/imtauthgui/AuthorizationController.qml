@@ -43,6 +43,8 @@ QtObject {
 	signal tenantMembershipRoleChanged(string tenantId, string userId, string role);
 	signal tenantMembershipRemoved(string tenantId, string userId);
 	signal tenantInvitationRevoked(string tenantId, string invitationId);
+	// Membership notifications were lost while the connection was down; membership views re-read their data.
+	signal membershipNotificationsResumed();
 
 	// Properties to store remember me state and credentials
 	property bool rememberMe: false
@@ -214,6 +216,11 @@ QtObject {
 				PopupManager.addInfoMessage(qsTr("Invitation to join \"%1\" was revoked").arg(tName), false)
 				root.tenantInvitationRevoked(tenantId, membershipId)
 			}
+		}
+
+		onRefreshRequired: {
+			root.refreshPendingInvitations()
+			root.membershipNotificationsResumed()
 		}
 	}
 

@@ -10,6 +10,7 @@
 #include <imtbase/CComplexCollectionFilterHelper.h>
 #include <imtauth/IUserInfo.h>
 #include <imtauth/IUserGroupFilter.h>
+#include <imtauthdb/imtauthdb.h>
 
 
 namespace imtauthdb
@@ -200,38 +201,34 @@ bool CUserDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& 
 
 QString CUserDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
 {
-	iprm::TParamsPtr<imtauth::IUserGroupFilter> groupFilterParamPtr(&filterParams, QByteArrayLiteral("GroupFilter"));
-	if (!groupFilterParamPtr.IsValid()){
-		return QString();
-	}
-
 	const bool isSqlite = IsSQLite();
 
-	QByteArrayList groupIds = groupFilterParamPtr->GetGroupIds();
-	if (groupIds.isEmpty()){
-		// An empty group list must not widen the selection to the whole collection, so it falls
-		// back to the filter's own user, like CUserActionDatabaseDelegateComp does. An empty user
-		// id then matches nothing.
-		const QString userId = SqlEncode(QString::fromUtf8(groupFilterParamPtr->GetUserId()));
+	QStringList conditions;
 
-		if (isSqlite){
-			return QStringLiteral(R"(json_extract(root."Document", '$.Id') = '%1')").arg(userId);
+	iprm::TParamsPtr<imtauth::IUserGroupFilter> groupFilterParamPtr(&filterParams, QByteArrayLiteral("GroupFilter"));
+	if (groupFilterParamPtr.IsValid()){
+		QByteArrayList groupIds = groupFilterParamPtr->GetGroupIds();
+		if (groupIds.isEmpty()){
+			// An empty group list must not widen the selection to the whole collection, so it falls
+			// back to the filter's own user, like CUserActionDatabaseDelegateComp does. An empty user
+			// id then matches nothing.
+			const QString userId = SqlEncode(QString::fromUtf8(groupFilterParamPtr->GetUserId()));
+
+			conditions << (isSqlite
+						? QStringLiteral(R"(json_extract(root."Document", '$.Id') = '%1')").arg(userId)
+						: QStringLiteral(R"(root."Document"->>'Id' = '%1')").arg(userId));
 		}
-
-		return QStringLiteral(R"(root."Document"->>'Id' = '%1')").arg(userId);
+		else{
+			conditions << CreateArrayContainsAnyQuery(isSqlite, QStringLiteral("Groups"), groupIds);
+		}
 	}
 
-	QStringList quotedGroupIds;
-	for (const QByteArray& groupId : groupIds){
-		quotedGroupIds << QStringLiteral("'%1'").arg(SqlEncode(QString::fromUtf8(groupId)));
+	const QByteArrayList roleIds = GetFilterIds(filterParams, s_roleFilterId);
+	if (!roleIds.isEmpty()){
+		conditions << CreateProductRolesContainAnyQuery(isSqlite, roleIds);
 	}
 
-	if (isSqlite){
-		return QStringLiteral(R"(EXISTS (SELECT 1 FROM json_each(json_extract(root."Document", '$.Groups')) AS userGroup WHERE userGroup.value IN (%1)))")
-				.arg(quotedGroupIds.join(','));
-	}
-
-	return QStringLiteral(R"((root."Document"->'Groups' ?| array[%1]))").arg(quotedGroupIds.join(','));
+	return conditions.join(QStringLiteral(" AND "));
 }
 
 

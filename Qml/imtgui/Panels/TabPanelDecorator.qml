@@ -6,78 +6,81 @@ import imtcontrols 1.0
 DecoratorBase {
 	id: tabPanelDecorator;
 
-	width: content.width + 2 * Style.marginM;
+	width: content.width + 2 * Style.marginS + dividerGap;
 	height: baseElement ? baseElement.height : Style.headerHeight
 
 	property bool textIsCropped: textHelper.text != "" && textHelper.width > text.width;
 
+	property int tabCount: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.listView ? tabPanelDecorator.baseElement.listView.count : 0;
 	property bool isSelected: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected : false;
 	property bool isHovered: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.mouseArea
 			? tabPanelDecorator.baseElement.mouseArea.containsMouse : false;
+	property bool isPinned: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.pinned : false;
+	property bool isLastTab: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.index >= tabPanelDecorator.tabCount - 1 : true;
 	property bool canClose: tabPanelDecorator.baseElement
-			&& !tabPanelDecorator.baseElement.pinned
+			&& !tabPanelDecorator.isPinned
 			&& tabPanelDecorator.baseElement.isCloseEnable;
 	property bool showClose: tabPanelDecorator.canClose && (tabPanelDecorator.isSelected || tabPanelDecorator.isHovered);
 	property int closeSlotSize: Style.iconSizeS;
+	// Room for the divider to the next tab.
+	property int dividerGap: tabPanelDecorator.isLastTab ? 0 : Style.spacingXS + 1;
+
+	property bool signalLoading: false;
+	property bool isLoading: tabPanelDecorator.signalLoading || (tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.contentLoading : false);
 
 	Connections {
 		target: tabPanelDecorator.baseElement;
 
 		function onStartContentLoading(){
-			loading.start();
+			tabPanelDecorator.signalLoading = true;
 		}
 
 		function onStopContentLoading(){
-			loading.stop();
+			tabPanelDecorator.signalLoading = false;
 		}
 	}
 
 	Rectangle {
-		anchors.fill: tabPanelDecorator;
-		anchors.topMargin: Style.marginXS;
-		anchors.bottomMargin: Style.marginXS;
-		anchors.leftMargin: 2;
-		anchors.rightMargin: 2;
-		radius: Style.marginS;
-		color: Style.alternateBaseColor;
-		visible: tabPanelDecorator.isHovered && !tabPanelDecorator.isSelected;
+		id: background;
+
+		anchors.left: tabPanelDecorator.left;
+		anchors.top: tabPanelDecorator.top;
+		anchors.bottom: tabPanelDecorator.bottom;
+		anchors.topMargin: Style.spacingXS;
+		anchors.bottomMargin: Style.spacingXS;
+		width: tabPanelDecorator.width - tabPanelDecorator.dividerGap;
+		radius: Style.radiusM;
+		color: tabPanelDecorator.isSelected ? Style.neutralSubtleColor : (tabPanelDecorator.isHovered ? Style.buttonHoverColor : "transparent");
 	}
 
+	// Same gap on both sides: the list spacing follows it.
 	Rectangle {
-		anchors.right: tabPanelDecorator.right;
+		anchors.left: background.right;
+		anchors.leftMargin: Style.spacingXS;
 		anchors.verticalCenter: tabPanelDecorator.verticalCenter;
-
 		width: 1;
 		height: tabPanelDecorator.height / 2;
-
-		visible: tabPanelDecorator.baseElement
-				 ? tabPanelDecorator.baseElement.index < tabPanelDecorator.baseElement.listView.count - 1 &&
-				   !tabPanelDecorator.baseElement.selected &&
-				   (tabPanelDecorator.baseElement.index + 1) !== tabPanelDecorator.baseElement.selectedIndex
-				 : false;
-
 		color: Style.borderColor;
-		opacity: 0.55;
-	}
-
-	Rectangle {
-		id: selection;
-
-		anchors.bottom: tabPanelDecorator.bottom;
-		anchors.left: tabPanelDecorator.left;
-		anchors.right: tabPanelDecorator.right;
-
-		height: tabPanelDecorator.isSelected ? 2 : 0;
-
-		color: Style.textSelectedColor;
+		visible: !tabPanelDecorator.isLastTab;
 	}
 
 	Row {
 		id: content;
-		anchors.centerIn: tabPanelDecorator;
+		anchors.horizontalCenter: background.horizontalCenter;
 		height: tabPanelDecorator.height;
-		spacing: Style.marginM;
-		visible: !loading.visible;
+		spacing: Style.spacingS;
+
+		Image {
+			id: pinImage;
+			anchors.verticalCenter: parent.verticalCenter;
+			width: Style.iconSizeXS;
+			height: width;
+			visible: tabPanelDecorator.isPinned;
+			source: tabPanelDecorator.isPinned ? "../../../" + Style.getIconPath("Icons/Pin", "On", tabPanelDecorator.isSelected ? "Active" : "Normal") : "";
+			sourceSize.width: width;
+			sourceSize.height: height;
+			fillMode: Image.PreserveAspectFit;
+		}
 
 		Item {
 			id: imagetabDelegate;
@@ -89,10 +92,8 @@ DecoratorBase {
 			Image {
 				id: firsElementImage;
 				anchors.centerIn: imagetabDelegate;
-				width: Style.iconSizeM;
+				width: Style.iconSizeS;
 				height: width;
-				// The tab you are on, or the one under the pointer, takes the full
-				// strength foreground; the rest stay muted. Swapped, not faded.
 				source: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.icon !== "" ? "../../../" + Style.getIconPath(tabPanelDecorator.baseElement.icon, "On", tabPanelDecorator.isSelected || tabPanelDecorator.isHovered ? "Active" : "Normal"): "";
 				sourceSize.width: width;
 				sourceSize.height: height;
@@ -118,8 +119,7 @@ DecoratorBase {
 				visible: false;
 
 				text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
-				font.family: tabPanelDecorator.isSelected || (tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned) ? Style.fontFamilyBold : Style.fontFamily;
-				font.bold: tabPanelDecorator.isSelected || (tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned);
+				font.family: Style.fontFamily;
 				font.pixelSize: Style.fontSizeM;
 			}
 
@@ -127,18 +127,27 @@ DecoratorBase {
 				id: text;
 
 				anchors.verticalCenter: parent.verticalCenter;
-				anchors.horizontalCenter: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned ||
+				anchors.horizontalCenter: tabPanelDecorator.isPinned ||
 										  tabPanelDecorator.baseElement && textHelper.width < tabPanelDecorator.baseElement.minWidth ? parent.horizontalCenter : undefined;
 
-				width: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned ? textHelper.width : parent.width;
+				width: tabPanelDecorator.isPinned ? textHelper.width : parent.width;
+				visible: !tabPanelDecorator.isLoading;
 
-				color: tabPanelDecorator.isSelected ? Style.titleColor : (tabPanelDecorator.isHovered ? Style.textColor : Style.subtitleColor);
-				font.family: tabPanelDecorator.isSelected || (tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned) ? Style.fontFamilyBold : Style.fontFamily;
-				font.bold: tabPanelDecorator.isSelected || (tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.pinned);
+				color: tabPanelDecorator.isSelected || tabPanelDecorator.isHovered ? Style.titleColor : Style.subtitleColor;
+				font.family: Style.fontFamily;
 				font.pixelSize: Style.fontSizeM;
 				text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
 
 				elide: Text.ElideRight;
+			}
+
+			SkeletonBlock {
+				anchors.verticalCenter: parent.verticalCenter;
+				anchors.horizontalCenter: parent.horizontalCenter;
+				width: parent.width - 10;
+				height: Style.iconSizeXXS;
+				visible: tabPanelDecorator.isLoading;
+				animated: visible;
 			}
 		}
 
@@ -172,18 +181,4 @@ DecoratorBase {
 			}
 		}
 	}
-
-	Loading {
-		id: loading;
-		anchors.verticalCenter: tabPanelDecorator.verticalCenter;
-		x: content.x + texttabDelegate.x + (texttabDelegate.width - width) / 2;
-		width: Style.controlHeightS;
-		height: Style.controlHeightS;
-		indicatorSize: Style.iconSizeS;
-		background.color: "transparent";
-		visible: false;
-		z: 5;
-	}
 }
-
-

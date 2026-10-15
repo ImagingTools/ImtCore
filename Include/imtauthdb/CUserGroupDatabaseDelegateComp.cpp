@@ -9,6 +9,8 @@
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
 #include <imtauth/IUserGroupInfo.h>
+#include <imtauth/CUserGroupFilter.h>
+#include <imtauthdb/imtauthdb.h>
 
 
 namespace imtauthdb
@@ -134,12 +136,83 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 }
 
 
+QByteArray CUserGroupDatabaseDelegateComp::CreateDeleteObjectsQuery(
+			const imtbase::IObjectCollection& collection,
+			const imtbase::ICollectionInfo::Ids& objectIds,
+			const imtbase::IOperationContext* operationContextPtr) const
+{
+	QByteArray retVal = BaseClass::CreateDeleteObjectsQuery(collection, objectIds, operationContextPtr);
+	if (retVal.isEmpty()){
+		return retVal;
+	}
+
+	// Users and groups must not keep referencing the removed groups.
+	const QByteArrayList groupIds(objectIds.cbegin(), objectIds.cend());
+
+	iprm::CParamsSet userFilterParams;
+	istd::TUniqueInterfacePtr<imtauth::CUserGroupFilter> groupFilterPtr = new imtauth::CUserGroupFilter();
+	groupFilterPtr->SetGroupIds(groupIds);
+	userFilterParams.SetEditableParameter(QByteArrayLiteral("GroupFilter"), groupFilterPtr.PopPtr(), true);
+
+	retVal += CreateReferenceRemovalQuery<imtauth::IUserInfo>(
+				*m_userCollectionCompPtr,
+				*m_userDatabaseDelegateCompPtr,
+				userFilterParams,
+				imtbase::ICollectionInfo::Ids(),
+				[&groupIds](imtauth::IUserInfo& userInfo){
+					RemovedReferences removedReferences;
+					for (const QByteArray& groupId : groupIds){
+						if (userInfo.RemoveFromGroup(groupId)){
+							removedReferences << RemovedReference{"RemoveGroup", "GroupId", QT_TRANSLATE_NOOP("Attribute", "Group"), groupId};
+						}
+					}
+					return removedReferences;
+				},
+				operationContextPtr);
+
+	iprm::CParamsSet groupFilterParams;
+	SetFilterIds(groupFilterParams, s_parentFilterId, groupIds);
+
+	retVal += CreateReferenceRemovalQuery<imtauth::IUserGroupInfo>(
+				collection,
+				*this,
+				groupFilterParams,
+				objectIds,
+				[&groupIds](imtauth::IUserGroupInfo& groupInfo){
+					RemovedReferences removedReferences;
+					for (const QByteArray& groupId : groupIds){
+						if (groupInfo.RemoveParentGroup(groupId)){
+							removedReferences << RemovedReference{"RemoveParentGroup", "ParentGroupId", QT_TRANSLATE_NOOP("Attribute", "Parent Group"), groupId};
+						}
+					}
+					return removedReferences;
+				},
+				operationContextPtr);
+
+	return retVal;
+}
+
+
 QString CUserGroupDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
 {
+	const bool isSqlite = IsSQLite();
+
+	QStringList conditions;
+
+	const QByteArrayList roleIds = GetFilterIds(filterParams, s_roleFilterId);
+	if (!roleIds.isEmpty()){
+		conditions << CreateProductRolesContainAnyQuery(isSqlite, roleIds);
+	}
+
+	const QByteArrayList parentGroupIds = GetFilterIds(filterParams, s_parentFilterId);
+	if (!parentGroupIds.isEmpty()){
+		conditions << CreateArrayContainsAnyQuery(isSqlite, QStringLiteral("ParentGroups"), parentGroupIds);
+	}
+
 	iprm::TParamsPtr<iprm::IIdParam> idParamPtr(&filterParams, "ParentListFilter");
 	if (idParamPtr.IsValid()){
 		QByteArray targetId = idParamPtr->GetId();
-		return QStringLiteral(R"(
+		conditions << QStringLiteral(R"(
 			NOT EXISTS (
 				WITH RECURSIVE descendants AS (
 					SELECT g."DocumentId"
@@ -160,9 +233,9 @@ QString CUserGroupDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm:
 				WHERE d."DocumentId" = root."DocumentId"
 			)
 					)").arg(targetId);
-					}
+	}
 
-	return QString();
+	return conditions.join(QStringLiteral(" AND "));
 }
 
 
