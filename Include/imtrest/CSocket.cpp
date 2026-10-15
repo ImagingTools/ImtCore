@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtrest/CMultiThreadServer.h>
+#include <imtrest/CSocketTimeoutWatcher.h>
 
 // Qt includes
 #include <QtNetwork/QSslSocket>
@@ -50,9 +51,11 @@ CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, bool secureConnec
 		socketPtr->startServerEncryption();
 	}
 
-	connect(&m_startTimer, &QTimer::timeout, this, QOverload<>::of(&CSocket::TimeOut));
-	m_startTimer.setSingleShot(true);
-	m_startTimer.start(5000);
+	m_timeoutWatcherPtr = new CSocketTimeoutWatcher(
+				*m_socket,
+				m_rootSocket->GetConnectionTimeoutConfig(),
+				CConnectionTimeoutBehavior::CreateForProtocol(m_rootSocket->GetProtocolTypeId()),
+				this);
 
 	connect(m_socket.data(), &QTcpSocket::disconnected, this, &CSocket::Disconnected, Qt::DirectConnection);
 	connect(m_socket.data(), &QTcpSocket::readyRead, this, &CSocket::HandleReadyRead, Qt::DirectConnection);
@@ -77,16 +80,6 @@ void CSocket::Abort()
 }
 
 
-void CSocket::TimeOut()
-{
-	if (m_socket != nullptr){
-		qDebug() << "Connection time out: " << m_socket->socketDescriptor();
-
-		m_socket->abort();
-	}
-}
-
-
 void CSocket::OnHandleSslErrors(QList<QSslError> errorList)
 {
 	for (const QSslError& error : errorList){
@@ -97,6 +90,17 @@ void CSocket::OnHandleSslErrors(QList<QSslError> errorList)
 
 void CSocket::HandleReadyRead()
 {
+	if (m_timeoutWatcherPtr != nullptr){
+		if (m_timeoutWatcherPtr->IsClosing()){
+			// The client should only close the connection after the response of the timeout (RFC 9112, section 9.6).
+			m_socket->readAll();
+
+			return;
+		}
+
+		m_timeoutWatcherPtr->OnDataReceived();
+	}
+
 	imtrest::IRequestServlet* requestHandlerPtr = m_rootSocket->GetRequestServlet();
 	Q_ASSERT(requestHandlerPtr != nullptr);
 
@@ -109,11 +113,7 @@ void CSocket::HandleReadyRead()
 	}
 
 	if (!m_socket->isOpen()){
-		if (m_socket->open(QIODevice::ReadWrite)){
-			m_startTimer.stop();
-			m_startTimer.setInterval(20000);
-			m_startTimer.start();
-		}
+		m_socket->open(QIODevice::ReadWrite);
 	}
 
 	if (!m_socket->isTransactionStarted()){
@@ -143,7 +143,9 @@ void CSocket::HandleReadyRead()
 	// All request data was read:
 	m_socket->commitTransaction();
 
-	m_startTimer.stop();
+	if (m_timeoutWatcherPtr != nullptr){
+		m_timeoutWatcherPtr->OnRequestCompleted();
+	}
 
 	// Start request handler:
 	requestHandlerPtr->ProcessRequest(*m_requestPtr.PopPtr());
@@ -159,7 +161,12 @@ void CSocket::Disconnected()
 void CSocket::OnSendResponse(QByteArray data)
 {
 	if (!m_socket.isNull() && m_socket->isOpen()){
-		m_socket->write(data);
+		if (m_timeoutWatcherPtr != nullptr){
+			m_timeoutWatcherPtr->WriteResponse(data);
+		}
+		else{
+			m_socket->write(data);
+		}
 	}
 }
 

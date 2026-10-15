@@ -50,6 +50,12 @@ imtrest::IProtocolEngine* CMultiThreadServer::GetProtocolEngine()
 }
 
 
+CConnectionTimeoutConfig CMultiThreadServer::GetConnectionTimeoutConfig() const
+{
+	return m_rootServer.GetConnectionTimeoutConfig();
+}
+
+
 bool CMultiThreadServer::IsSecureConnection() const
 {
 	return m_isSecureConnection;

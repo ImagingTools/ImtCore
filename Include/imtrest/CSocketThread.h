@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/ITransport.h>
+#include <imtrest/CConnectionTimeoutTracker.h>
 #include <imtrest/CSocket.h>
 
 
@@ -41,6 +42,17 @@ public:
 
 	[[nodiscard]] bool IsSecureConnection() const;
 	void EnableSecureConnection(bool isSecureConnection = true);
+
+	/**
+		Get the time limits of the connections.
+	*/
+	[[nodiscard]] CConnectionTimeoutConfig GetConnectionTimeoutConfig() const;
+
+	/**
+		Get the type-ID of the protocol of the connection as a text (see IProtocolEngine::GetProtocolTypeId()).
+		The socket classes do not interpret it.
+	*/
+	[[nodiscard]] QByteArray GetProtocolTypeId() const;
 
 	virtual imtrest::IRequestUniquePtr CreateRequest() const;
 

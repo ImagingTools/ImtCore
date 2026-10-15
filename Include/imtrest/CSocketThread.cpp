@@ -82,6 +82,18 @@ void CSocketThread::EnableSecureConnection(bool isSecureConnection)
 }
 
 
+CConnectionTimeoutConfig CSocketThread::GetConnectionTimeoutConfig() const
+{
+	return m_server->GetConnectionTimeoutConfig();
+}
+
+
+QByteArray CSocketThread::GetProtocolTypeId() const
+{
+	return (m_enginePtr != nullptr) ? m_enginePtr->GetProtocolTypeId() : QByteArray();
+}
+
+
 imtrest::IRequestUniquePtr CSocketThread::CreateRequest() const
 {
 	if (m_enginePtr == nullptr){

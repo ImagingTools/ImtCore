@@ -10,7 +10,6 @@
 
 
 // Qt includes
-#include <QtCore/QTimer>
 #include <QtCore/QPointer>
 #include <QtNetwork/QTcpSocket>
 #include <QtNetwork/QSslConfiguration>
@@ -22,6 +21,7 @@ namespace imtrest
 
 class CMultiThreadServer;
 class CSocketThread;
+class CSocketTimeoutWatcher;
 
 
 class CSocket: public QObject
@@ -36,14 +36,15 @@ public Q_SLOTS:
 	void Disconnected();
 	void OnSendResponse(QByteArray data);
 	void Abort();
-	void TimeOut();
 	void OnHandleSslErrors(QList<QSslError> errorList);
 
 private:
-	QTimer m_startTimer;
 	CSocketThread* m_rootSocket;
 	QPointer<QTcpSocket> m_socket;
 	istd::TDelPtr<IRequest> m_requestPtr;
+
+	// Time limits of the connection, it is a child of this object.
+	CSocketTimeoutWatcher* m_timeoutWatcherPtr = nullptr;
 };
 
 
