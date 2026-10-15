@@ -34,6 +34,10 @@ public:
 				const istd::IChangeable& object,
 				const imtbase::IOperationContext* operationContextPtr = nullptr,
 				bool useExternDelegate = true) const override;
+	virtual QByteArray CreateDeleteObjectsQuery(
+				const imtbase::IObjectCollection& collection,
+				const imtbase::ICollectionInfo::Ids& objectIds,
+				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const override;
 
 private:

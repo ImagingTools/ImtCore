@@ -11,6 +11,7 @@ ControlBase {
 	property bool firstElement: model.index === 0;
 	property bool lastElement: listView ? model.index === listView.count - 1 : false;
 	property bool pinned: model.pinned ? model.pinned : false;
+	property bool contentLoading: model.loading ? model.loading : false;
 	property bool autoWidth: true;
 	property bool isCloseEnable: true;
 

@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6531" Description="ACF"/>
+            <Version Id="0" Number="6539" Description="ACF"/>
             <Version Id="1" Number="2438" Description="ACF-Solutions"/>
             <Version Id="1023" Number="396033" Description="Qt Framework"/>
         </VersionInfos>
@@ -37,12 +37,12 @@
                     <AttributeInfo Id="PagePermissions" Type="Id[]" ExportId="AdministrationPagePermissions">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewUsers</Value>
-                                <Value>ViewRoles</Value>
-                                <Value>ViewGroups</Value>
-                                <Value>ChangeUser</Value>
-                                <Value>ChangeRole</Value>
-                                <Value>ChangeGroups</Value>
+                                <Value>/Administration/EditAdministration/EditGroup/AddGroup</Value>
+                                <Value>/Administration/EditAdministration/EditGroup/ChangeGroup</Value>
+                                <Value>/Administration/EditAdministration/EditGroup/RemoveGroup</Value>
+                                <Value>/Administration/EditAdministration/EditRole/AddGroup</Value>
+                                <Value>/Administration/ViewAdministration/ViewGroups</Value>
+                                <Value>/Administration/ViewAdministration/ViewUsers</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

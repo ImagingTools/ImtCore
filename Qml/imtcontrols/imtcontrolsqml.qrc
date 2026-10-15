@@ -156,6 +156,8 @@
                 <file alias="imtcontrols/Views/BasicTableView.qml">Views/BasicTableView.qml</file>
                 <file alias="imtcontrols/Views/BasicTreeView.qml">Views/BasicTreeView.qml</file>
                 <file alias="imtcontrols/Views/TreeExplorerView.qml">Views/TreeExplorerView.qml</file>
+                <file alias="imtcontrols/Views/TableColumnLayout.qml">Views/TableColumnLayout.qml</file>
+                <file alias="imtcontrols/Views/TableRowDetails.qml">Views/TableRowDetails.qml</file>
                 <file alias="imtcontrols/Views/CheckableListPanel.qml">Views/CheckableListPanel.qml</file>
                 <file alias="imtcontrols/Views/EditableTableCell.qml">Views/EditableTableCell.qml</file>
                 <file alias="imtcontrols/Views/ToolbarButton.qml">Views/ToolbarButton.qml</file>
@@ -170,6 +172,8 @@
                 <file alias="imtcontrols/Views/ValueLevelIndicator.qml">Views/ValueLevelIndicator.qml</file>
                 <file alias="imtcontrols/Views/BusyIndicator.qml">Views/BusyIndicator.qml</file>
                 <file alias="imtcontrols/Views/Loading.qml">Views/Loading.qml</file>
+                <file alias="imtcontrols/Views/SkeletonBlock.qml">Views/SkeletonBlock.qml</file>
+                <file alias="imtcontrols/Views/SkeletonFormView.qml">Views/SkeletonFormView.qml</file>
                 <file alias="imtcontrols/Views/PaintedCorner.qml">Views/PaintedCorner.qml</file>
                 <file alias="imtcontrols/Views/Piechart.qml">Views/Piechart.qml</file>
                 <file alias="imtcontrols/Views/Spinner.qml">Views/Spinner.qml</file>

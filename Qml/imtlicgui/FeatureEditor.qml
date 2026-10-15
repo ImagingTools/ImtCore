@@ -6,27 +6,40 @@ import com.imtcore.imtqml 1.0
 import imtauthgui 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtlicgui 1.0
 import imtlicFeaturesSdl 1.0
 
 ViewBase {
 	id: featureEditor
 	contentColor: Style.baseColor
 
-	property TreeItemModel dependenciewViewModel: TreeItemModel {}
+	property TreeItemModel featureCollectionModel: CachedFeatureCollection.collectionModel
 	property string featureId: ""
 	property FeatureData featureData: model
 	property var featureTree: []
-	property var dependencyEntries: []
-	property var dependencyGraph: []
+	property var requirementEntries: []
+	property var rootRequirementEntries: []
+	property var subfeatureRequirementEntries: []
+	property var activeRequirementEntries: subfeatureRequirementEntries
+	property var requirementGraph: []
 	property var selectedFeature: null
-	property var activeFeature: null
+	property var activeFeature: selectedFeature
 	property bool canEdit: false
+	// Part of the product this editor works in; scopes its permission checks and
+	// travels with the requests its data providers send.
+	property string permissionPath: ""
+	// Full path most recently put on the clipboard, so every copy control can
+	// confirm what it did by itself instead of raising a dialog.
+	property string copiedPath: ""
+	// Path of the feature being edited; every sub-feature path grows from it.
+	property string rootFeaturePath: featureData && featureData.m_featureId
+		? "/" + featureData.m_featureId : ""
 
 	Component.onCompleted: {
 		canEdit = PermissionsController.checkPermission("ChangeFeature")
-		dependenciewViewModel.copy(CachedFeatureCollection.collectionModel)
-		rebuildDependencyEntries()
+		rebuildRequirementEntries()
 		CachedFeatureCollection.updateModel()
+		CachedFeatureCollection.modelUpdated.connect(featureEditor.onFeatureCollectionUpdated)
 		__updateCommandStates()
 		multiPageView.updatePages()
 		// Both pages are loaded up-front (rather than lazily on first visit) because
@@ -35,6 +48,71 @@ ViewBase {
 		// only returns a live instance once the page has been loaded.
 		multiPageView.ensurePageLoaded(0)
 		multiPageView.ensurePageLoaded(1)
+	}
+
+	Component.onDestruction: {
+		CachedFeatureCollection.modelUpdated.disconnect(featureEditor.onFeatureCollectionUpdated)
+	}
+
+	function onFeatureCollectionUpdated() {
+		featureEditor.rebuildRequirementEntries()
+	}
+
+	// A feature is addressed by the path of identifiers that leads to it, e.g.
+	// "/Administration/EditUser/AddUser". Requirements and permissions are written
+	// in exactly that form, so nothing has to guess which branch an identifier came from.
+	TextEdit {
+		id: clipboardProxy
+		width: 0
+		height: 0
+		visible: false
+		readOnly: true
+	}
+
+	Timer {
+		id: copiedHintTimer
+		interval: 2000
+		onTriggered: featureEditor.copiedPath = ""
+	}
+
+	function featurePath(item) {
+		if (!item || rootFeaturePath === "")
+			return ""
+		if (item === featureData)
+			return rootFeaturePath
+		return findFeaturePath(featureTree, item, rootFeaturePath)
+	}
+
+	function findFeaturePath(nodes, item, prefix) {
+		for (let i = 0; i < nodes.length; ++i) {
+			let current = sourceItem(nodes[i])
+			if (!current)
+				continue
+			let path = prefix + "/" + (current.m_featureId || "")
+			if (current === item)
+				return path
+			let childPath = findFeaturePath(nodes[i].children || [], item, path)
+			if (childPath !== "")
+				return childPath
+		}
+		return ""
+	}
+
+	function copyFeaturePath(item) {
+		let path = featurePath(item)
+		if (path === "")
+			return
+		clipboardProxy.text = path
+		clipboardProxy.selectAll()
+		clipboardProxy.copy()
+		clipboardProxy.select(0, 0)
+		copiedPath = path
+		copiedHintTimer.restart()
+	}
+
+	function copyIconSource(path) {
+		return "qrc:/" + Style.getIconPath(featureEditor.copiedPath !== "" && featureEditor.copiedPath === path
+			? "Icons/Ok" : "Icons/Copy", Icon.State.On, Icon.Mode.Normal)
 	}
 
 	LocalizationEvent {
@@ -79,10 +157,11 @@ ViewBase {
 				description: "m_description",
 				optional: "m_optional",
 				isPermission: "m_isPermission",
-				dependencies: "m_dependencies"
+				requirements: "m_requirements"
 			}
 		})
 		updatePageBadges()
+		rebuildRequirementEntries()
 		if (itemToSelect) {
 			let node = findNodeBySourceItem(featureTree, itemToSelect)
 			let page = multiPageView.getPageById("Subfeatures")
@@ -131,6 +210,7 @@ ViewBase {
 	function itemIsComplete(item) {
 		return item !== null && item !== undefined
 			&& item.m_featureName !== "" && item.m_featureId !== ""
+			&& isValidId(item.m_featureId)
 	}
 
 	function nodeIsComplete(node) {
@@ -212,6 +292,21 @@ ViewBase {
 				taken.push(item.m_featureId)
 		}
 		return taken
+	}
+
+	// A Feature-ID only has to be unique among the siblings that share its
+	// parent - not across the whole tree - since identity comes from the full
+	// path, and two branches are free to reuse the same leaf id.
+	function siblingIdConflict(parentNode, candidateId, excludeItem) {
+		if (candidateId === "")
+			return false
+		let source = parentNode ? (parentNode.children || []) : featureTree
+		for (let i = 0; i < source.length; ++i) {
+			let sibling = sourceItem(source[i])
+			if (sibling && sibling !== excludeItem && sibling.m_featureId === candidateId)
+				return true
+		}
+		return false
 	}
 
 	// "Feature Name", then "Feature Name (2)", "Feature Name (3)" - the same
@@ -301,6 +396,8 @@ ViewBase {
 		let newModel = childModel(newParentNode)
 		if (!canEdit || !item || !oldModel || !newModel || oldModel === newModel)
 			return
+		if (siblingIdConflict(newParentNode, item.m_featureId, null))
+			return
 		let movedItem = item.copyMe()
 		if (!movedItem || !removeItem(oldModel, item))
 			return
@@ -319,98 +416,347 @@ ViewBase {
 		__updateCommandStates()
 	}
 
-	// Dependencies belong to the row the user picked in the Subfeatures table;
-	// with nothing selected the dependencies panel has no subject and stays hidden.
 	function updateActiveFeature() {
 		activeFeature = selectedFeature
+		rebuildAllRequirementEntries()
 	}
 
-	function rebuildDependencyEntries() {
-		if (!dependenciewViewModel)
-			return
-		let tree = TreeModelBuilder.fromTreeItemModelByFields(dependenciewViewModel, {
-			key: FeatureItemTypeMetaInfo.s_featureId,
-			children: FeatureItemTypeMetaInfo.s_subFeatures,
-			columns: {
-				featureName: FeatureItemTypeMetaInfo.s_featureName,
-				featureId: FeatureItemTypeMetaInfo.s_featureId,
-				dependencies: FeatureItemTypeMetaInfo.s_dependencies
-			}
-		})
-		let graph = []
-		appendDependencyGraphNodes(tree, graph)
-		dependencyGraph = graph
-
-		let leaves = []
-		appendDependencyEntries(tree, [], leaves)
-		dependencyEntries = leaves
+	function activeFeaturePath() {
+		return featurePath(activeFeature)
 	}
 
-	function appendDependencyGraphNodes(nodes, target) {
+	function findItemByPath(targetPath) {
+		return findItemInTree(featureTree, rootFeaturePath, targetPath)
+	}
+
+	function findItemInTree(nodes, currentPrefix, targetPath) {
 		for (let i = 0; i < nodes.length; ++i) {
-			let node = nodes[i]
-			let data = node.data || {}
-			let id = data[FeatureItemTypeMetaInfo.s_featureId] || ""
-			if (id !== "") {
-				target.push({
-					"featureId": id,
-					"dependencies": data[FeatureItemTypeMetaInfo.s_dependencies] || ""
-				})
-			}
-			if (node.children && node.children.length > 0)
-				appendDependencyGraphNodes(node.children, target)
+			let item = sourceItem(nodes[i])
+			if (!item)
+				continue
+			let p = currentPrefix + "/" + (item.m_featureId || "")
+			if (p === targetPath)
+				return item
+			let childFound = findItemInTree(nodes[i].children || [], p, targetPath)
+			if (childFound)
+				return childFound
 		}
+		return null
 	}
 
-	// Flattens the shared feature collection into one flat row per leaf feature,
-	// each carrying the full path it sits at - a plain list reads better here
-	// than a tree, because a dependency is picked by what it is, not by where.
-	function appendDependencyEntries(nodes, pathNames, target) {
-		for (let i = 0; i < nodes.length; ++i) {
-			let node = nodes[i]
-			let data = node.data || {}
-			let name = data[FeatureItemTypeMetaInfo.s_featureName] || data[FeatureItemTypeMetaInfo.s_featureId] || ""
-			let currentPath = pathNames.concat([name])
-			if (node.children && node.children.length > 0) {
-				appendDependencyEntries(node.children, currentPath, target)
-				continue
+	function getDirectRequirementsForPath(path) {
+		if (!path)
+			return []
+		if (path === rootFeaturePath && featureData)
+			return directRequirementsOf(featureData)
+		if (rootFeaturePath !== "" && path.indexOf(rootFeaturePath + "/") === 0) {
+			let localItem = findItemByPath(path)
+			if (localItem)
+				return directRequirementsOf(localItem)
+		}
+		let graphEntry = requirementEntry(path)
+		if (graphEntry && graphEntry.requirements) {
+			let paths = graphEntry.requirements.split(';')
+			let clean = []
+			for (let i = 0; i < paths.length; ++i) {
+				if (paths[i] !== "")
+					clean.push(paths[i])
 			}
-			let id = data[FeatureItemTypeMetaInfo.s_featureId] || ""
-			if (id === "")
+			return clean
+		}
+		return []
+	}
+
+	function resolveRecursiveRequirements(directPaths) {
+		if (!directPaths || directPaths.length === 0)
+			return []
+		let queue = []
+		let visited = ({})
+		let directList = []
+		let transitiveList = []
+
+		for (let i = 0; i < directPaths.length; ++i) {
+			let p = directPaths[i]
+			if (!p || visited[p])
 				continue
-			target.push({
+			let name = requirementName(p)
+			let fullPath = requirementFullPath(p)
+			let item = {
+				"featurePath": p,
 				"featureName": name,
-				"fullPath": currentPath.join(" / "),
-				"featureId": id
+				"fullPath": fullPath,
+				"isDirect": true,
+				"canRemove": true,
+				"sources": [],
+				"sourceName": ""
+			}
+			visited[p] = item
+			directList.push(item)
+			queue.push(p)
+		}
+
+		while (queue.length > 0) {
+			let currentPath = queue.shift()
+			let currentItem = visited[currentPath]
+			let childPaths = getDirectRequirementsForPath(currentPath)
+			for (let j = 0; j < childPaths.length; ++j) {
+				let childPath = childPaths[j]
+				if (!childPath || childPath === currentPath)
+					continue
+				if (!visited[childPath]) {
+					let childName = requirementName(childPath)
+					let childFullPath = requirementFullPath(childPath)
+					let childItem = {
+						"featurePath": childPath,
+						"featureName": childName,
+						"fullPath": childFullPath,
+						"isDirect": false,
+						"canRemove": false,
+						"sources": [currentItem.featureName],
+						"sourceName": currentItem.featureName
+					}
+					visited[childPath] = childItem
+					transitiveList.push(childItem)
+					queue.push(childPath)
+				} else {
+					let existingItem = visited[childPath]
+					if (!existingItem.isDirect) {
+						if (existingItem.sources.indexOf(currentItem.featureName) < 0) {
+							existingItem.sources.push(currentItem.featureName)
+							existingItem.sourceName = existingItem.sources.join(", ")
+						}
+					}
+				}
+			}
+		}
+
+		return directList.concat(transitiveList)
+	}
+
+	function rebuildAllRequirementEntries() {
+		if (featureData)
+			rootRequirementEntries = resolveRecursiveRequirements(directRequirementsOf(featureData))
+		else
+			rootRequirementEntries = []
+
+		if (selectedFeature)
+			subfeatureRequirementEntries = resolveRecursiveRequirements(directRequirementsOf(selectedFeature))
+		else
+			subfeatureRequirementEntries = []
+
+		activeRequirementEntries = subfeatureRequirementEntries
+	}
+
+	function rebuildActiveRequirementEntries() {
+		rebuildAllRequirementEntries()
+	}
+
+	function rebuildRequirementEntries() {
+		let tree = []
+		if (featureCollectionModel) {
+			tree = TreeModelBuilder.fromTreeItemModelByFields(featureCollectionModel, {
+				key: FeatureItemTypeMetaInfo.s_featureId,
+				children: FeatureItemTypeMetaInfo.s_subFeatures,
+				columns: {
+					featureName: FeatureItemTypeMetaInfo.s_featureName,
+					featureId: FeatureItemTypeMetaInfo.s_featureId,
+					optional: FeatureItemTypeMetaInfo.s_optional,
+					requirements: FeatureItemTypeMetaInfo.s_requirements
+				}
 			})
 		}
-	}
 
-	function dependencyName(featureIdValue) {
-		for (let i = 0; i < dependencyEntries.length; ++i) {
-			if (dependencyEntries[i].featureId === featureIdValue)
-				return dependencyEntries[i].featureName
+		if (featureData && featureData.m_featureId) {
+			let currentId = featureData.m_featureId
+			let foundIdx = -1
+			for (let i = 0; i < tree.length; ++i) {
+				let d = tree[i].data || {}
+				if ((d[FeatureItemTypeMetaInfo.s_featureId] || d.featureId) === currentId) {
+					foundIdx = i
+					break
+				}
+			}
+			let localRootNode = {
+				key: currentId,
+				text: featureData.m_featureName || currentId,
+				data: {
+					featureId: currentId,
+					featureName: featureData.m_featureName || currentId,
+					optional: featureData.m_optional === true,
+					requirements: featureData.m_requirements || ""
+				},
+				children: featureTree || []
+			}
+			if (foundIdx >= 0)
+				tree[foundIdx] = localRootNode
+			else
+				tree.push(localRootNode)
 		}
-		return featureIdValue
+
+		let graph = []
+		appendRequirementGraphNodes(tree, [], "", graph)
+		requirementGraph = graph
+
+		let entries = []
+		appendRequirementEntries(tree, [], "", "", "", entries)
+		requirementEntries = entries
+		rebuildMandatoryLeafCounts()
+		rebuildAllRequirementEntries()
 	}
 
-	// Preview for the table's Dependencies column: the first names plus "+N",
-	// which says what a feature pulls in without opening the panel.
-	function dependencySummary(item) {
-		if (!item || !item.m_dependencies)
+	// How many parts of each feature are not optional. A product takes a feature
+	// whole, so requiring any part of one takes all of these along - that is what
+	// the picker warns about before a requirement is written.
+	property var mandatoryLeafCounts: ({})
+
+	function rebuildMandatoryLeafCounts() {
+		let counts = ({})
+		for (let i = 0; i < requirementEntries.length; ++i) {
+			let entry = requirementEntries[i]
+			if (entry.optional || entry.rootPath === entry.featurePath)
+				continue
+			counts[entry.rootPath] = (counts[entry.rootPath] ? counts[entry.rootPath] : 0) + 1
+		}
+		mandatoryLeafCounts = counts
+	}
+
+	function requirementEntryOf(featurePathValue) {
+		for (let i = 0; i < requirementEntries.length; ++i) {
+			if (requirementEntries[i].featurePath === featurePathValue)
+				return requirementEntries[i]
+		}
+		return null
+	}
+
+	// What else a product has to swallow to satisfy this requirement: the parts
+	// of the same feature that are not optional and so cannot be left out.
+	function requirementBringsAlong(featurePathValue) {
+		let entry = requirementEntryOf(featurePathValue)
+		if (!entry || entry.rootPath === entry.featurePath)
+			return 0
+		let mandatory = mandatoryLeafCounts[entry.rootPath] ? mandatoryLeafCounts[entry.rootPath] : 0
+		return entry.optional ? mandatory : mandatory - 1
+	}
+
+	function appendRequirementGraphNodes(nodes, pathNames, parentPath, target) {
+		for (let i = 0; i < nodes.length; ++i) {
+			let node = nodes[i]
+			let data = node.data || {}
+			let id = data[FeatureItemTypeMetaInfo.s_featureId] || data.featureId || data.m_featureId || ""
+			if (id === "")
+				continue
+			let name = data[FeatureItemTypeMetaInfo.s_featureName] || data.featureName || data.m_featureName || id
+			let currentNames = pathNames.concat([name])
+			let path = parentPath + "/" + id
+			target.push({
+				"featurePath": path,
+				"featureName": name,
+				"fullPath": currentNames.join(" / "),
+				"requirements": data[FeatureItemTypeMetaInfo.s_requirements] || data.requirements || data.m_requirements || ""
+			})
+			if (node.children && node.children.length > 0)
+				appendRequirementGraphNodes(node.children, currentNames, path, target)
+		}
+	}
+
+	// Flattens the feature collections into one row per feature, carrying the
+	// full path it sits at. Both root features and their sub-features are included.
+	function appendRequirementEntries(nodes, pathNames, parentPath, rootPath, rootName, target) {
+		for (let i = 0; i < nodes.length; ++i) {
+			let node = nodes[i]
+			let data = node.data || {}
+			let id = data[FeatureItemTypeMetaInfo.s_featureId] || data.featureId || data.m_featureId || ""
+			if (id === "")
+				continue
+			let name = data[FeatureItemTypeMetaInfo.s_featureName] || data.featureName || data.m_featureName || id
+			let currentNames = pathNames.concat([name])
+			let path = parentPath + "/" + id
+			// The feature a part belongs to, which is what a product takes.
+			let currentRootPath = rootPath === "" ? path : rootPath
+			let currentRootName = rootName === "" ? name : rootName
+
+			target.push({
+				"featureName": name,
+				"fullPath": currentNames.join(" / "),
+				"featurePath": path,
+				"optional": (data[FeatureItemTypeMetaInfo.s_optional] === true || data.optional === true || data.m_optional === true),
+				"rootPath": currentRootPath,
+				"rootName": currentRootName
+			})
+
+			if (node.children && node.children.length > 0) {
+				appendRequirementEntries(node.children, currentNames, path, currentRootPath, currentRootName, target)
+			}
+		}
+	}
+
+	function requirementName(featurePathValue) {
+		if (!featurePathValue)
 			return ""
-		let ids = item.m_dependencies.split(';')
+		if (featurePathValue === rootFeaturePath && featureData)
+			return featureData.m_featureName || featureData.m_featureId || featurePathValue
+		let local = findItemByPath(featurePathValue)
+		if (local)
+			return local.m_featureName || local.m_featureId || featurePathValue
+		let g = requirementEntry(featurePathValue)
+		if (g && g.featureName)
+			return g.featureName
+		let entry = requirementEntryOf(featurePathValue)
+		if (entry && entry.featureName)
+			return entry.featureName
+		let parts = featurePathValue.split('/')
+		return parts.length > 0 ? parts[parts.length - 1] : featurePathValue
+	}
+
+	function requirementFullPath(featurePathValue) {
+		if (!featurePathValue)
+			return ""
+		if (featurePathValue === rootFeaturePath && featureData)
+			return featureData.m_featureName || featureData.m_featureId || featurePathValue
+		let local = findItemByPath(featurePathValue)
+		if (local)
+			return featurePathValue
+		let g = requirementEntry(featurePathValue)
+		if (g && g.fullPath)
+			return g.fullPath
+		let entry = requirementEntryOf(featurePathValue)
+		if (entry && entry.fullPath)
+			return entry.fullPath
+		return featurePathValue
+	}
+
+	// Preview for the table's Requirements column: the first names plus "+N",
+	// which says what a feature pulls in without opening the panel.
+	function requirementSummary(item) {
+		if (!item || !item.m_requirements)
+			return ""
+		let paths = item.m_requirements.split(';')
 		let names = []
-		for (let i = 0; i < ids.length && i < 2; ++i)
-			names.push(dependencyName(ids[i]))
-		if (ids.length > 2)
-			return names.join(", ") + "  +" + (ids.length - 2)
+		for (let i = 0; i < paths.length && i < 2; ++i)
+			names.push(requirementName(paths[i]))
+		if (paths.length > 2)
+			return names.join(", ") + "  +" + (paths.length - 2)
 		return names.join(", ")
 	}
 
 	// Feature-ID is derived from the name: keep letters, digits and underscores.
 	function sanitizeId(text) {
 		return text ? text.replace(/[^A-Za-z0-9_]/g, '') : ""
+	}
+
+	function isValidId(text) {
+		return text !== "" && /^[A-Za-z0-9_]+$/.test(text)
+	}
+
+	function rootIdConflict(candidateId) {
+		if (!candidateId || candidateId === "" || !featureCollectionModel)
+			return false
+		for (let i = 0; i < featureCollectionModel.getItemsCount(); ++i) {
+			let id = featureCollectionModel.getData(FeatureItemTypeMetaInfo.s_featureId, i)
+			if (id === candidateId && candidateId !== featureEditor.featureId)
+				return true
+		}
+		return false
 	}
 
 	// Lines for the "N incomplete" hover panel: what is missing, per row.
@@ -425,15 +771,18 @@ ViewBase {
 				details.push(qsTr("Unnamed row - name and Feature ID are missing"))
 			else if (item.m_featureName === "")
 				details.push(qsTr("%1 - name is missing").arg(item.m_featureId))
-			else
+			else if (item.m_featureId === "")
 				details.push(qsTr("%1 - Feature ID is missing").arg(item.m_featureName))
+			else if (!isValidId(item.m_featureId))
+				details.push(qsTr("%1 - Feature ID contains invalid characters").arg(item.m_featureName))
+			else if (siblingIdConflict(treeExplorer.currentParentNode(), item.m_featureId, item))
+				details.push(qsTr("%1 - Feature ID is duplicated").arg(item.m_featureName))
 		}
 		return details
 	}
 
-	// A feature that owns sub-features is a grouping, not a capability: what it
-	// grants is whatever its children grant. Dependencies, Optional and
-	// Permission therefore only apply to the leaves of the tree.
+	// Optional and Permission apply only to leaves. A feature with sub-features
+	// may still carry requirements which are inherited by its descendants.
 	function isLeafNode(node) {
 		return node !== null && node !== undefined
 			&& (!node.children || node.children.length === 0)
@@ -443,106 +792,210 @@ ViewBase {
 		return node && node.children ? node.children.length : 0
 	}
 
-	function directDependencies() {
-		if (!activeFeature || !activeFeature.m_dependencies)
+	function directRequirementsOf(item) {
+		if (!item || !item.m_requirements)
 			return []
-		return activeFeature.m_dependencies.split(';')
-	}
-
-	function isDirectDependency(featureIdValue) {
-		return directDependencies().indexOf(featureIdValue) >= 0
-	}
-
-	function dependencyCount(item) {
-		if (!item || !item.m_dependencies)
-			return 0
-		return item.m_dependencies.split(';').length
-	}
-
-	function isAncestorFeatureId(featureIdValue) {
-		if (featureData && featureData.m_featureId === featureIdValue)
-			return true
-		let page = multiPageView.getPageById("Subfeatures")
-		if (!page)
-			return false
-		for (let i = 0; i < page.navigationStack.length; ++i) {
-			let item = sourceItem(page.navigationStack[i])
-			if (item && item.m_featureId === featureIdValue)
-				return true
+		let paths = item.m_requirements.split(';')
+		let clean = []
+		for (let i = 0; i < paths.length; ++i) {
+			if (paths[i] !== "")
+				clean.push(paths[i])
 		}
-		return false
+		return clean
 	}
 
-	function dependencyEntry(featureIdValue) {
-		for (let i = 0; i < dependencyGraph.length; ++i) {
-			if (dependencyGraph[i].featureId === featureIdValue)
-				return dependencyGraph[i]
+	function directRequirements() {
+		return directRequirementsOf(selectedFeature ? selectedFeature : featureData)
+	}
+
+	function isDirectRequirement(featurePathValue) {
+		return directRequirements().indexOf(featurePathValue) >= 0
+	}
+
+	function allRequirementPathsOf(item) {
+		if (!item)
+			return []
+		let resolved = resolveRecursiveRequirements(directRequirementsOf(item))
+		let paths = []
+		for (let i = 0; i < resolved.length; ++i)
+			paths.push(resolved[i].featurePath)
+		return paths
+	}
+
+	function requirementCount(item) {
+		if (!item || !item.m_requirements)
+			return 0
+		return item.m_requirements.split(';').length
+	}
+
+	// An ancestor is spelled out by the path itself: everything the active
+	// feature hangs below is a prefix of its own path.
+	function isAncestorPath(featurePathValue) {
+		let path = activeFeaturePath()
+		return path !== "" && featurePathValue !== "" && path.indexOf(featurePathValue + "/") === 0
+	}
+
+	function isDescendantPath(featurePathValue) {
+		let path = activeFeaturePath()
+		return path !== "" && featurePathValue !== "" && featurePathValue.indexOf(path + "/") === 0
+	}
+
+	function requirementEntry(featurePathValue) {
+		for (let i = 0; i < requirementGraph.length; ++i) {
+			if (requirementGraph[i].featurePath === featurePathValue)
+				return requirementGraph[i]
 		}
 		return null
 	}
 
-	function dependencyReaches(fromId, targetId, visited) {
-		if (fromId === targetId)
+	function requirementReaches(fromPath, targetPath, visited) {
+		if (fromPath === targetPath)
 			return true
-		if (visited[fromId])
+		if (visited[fromPath])
 			return false
-		visited[fromId] = true
-		let entry = dependencyEntry(fromId)
-		if (!entry || entry.dependencies === "")
+		visited[fromPath] = true
+		let entry = requirementEntry(fromPath)
+		if (!entry || entry.requirements === "")
 			return false
-		let ids = entry.dependencies.split(';')
-		for (let i = 0; i < ids.length; ++i) {
-			if (dependencyReaches(ids[i], targetId, visited))
+		let paths = entry.requirements.split(';')
+		for (let i = 0; i < paths.length; ++i) {
+			if (requirementReaches(paths[i], targetPath, visited))
 				return true
 		}
 		return false
 	}
 
-	function dependencyIsEnabled(featureIdValue) {
-		if (!canEdit || !activeFeature || featureIdValue === activeFeature.m_featureId)
+	function requirementIsEnabled(featurePathValue) {
+		let path = activeFeaturePath()
+		if (!canEdit || path === "" || featurePathValue === path)
 			return false
-		if (isAncestorFeatureId(featureIdValue))
+		if (isAncestorPath(featurePathValue))
 			return false
-		return !dependencyReaches(featureIdValue, activeFeature.m_featureId, {})
+		if (isDescendantPath(featurePathValue))
+			return false
+		return !requirementReaches(featurePathValue, path, {})
 	}
 
-	// Chip next to a dependency row: why the entry cannot be picked.
-	function dependencyBadge(featureIdValue) {
-		if (!activeFeature)
-			return ""
-		if (featureIdValue === activeFeature.m_featureId)
-			return qsTr("Itself")
-		if (isAncestorFeatureId(featureIdValue))
-			return qsTr("Parent")
-		if (dependencyReaches(featureIdValue, activeFeature.m_featureId, {}))
-			return qsTr("Cycle")
-		return ""
-	}
-
-	function toggleDependency(featureIdValue) {
-		if (!dependencyIsEnabled(featureIdValue))
+	function addRequirementsFor(targetItem, pathsToAdd) {
+		if (!canEdit || !targetItem || !pathsToAdd || pathsToAdd.length === 0)
 			return
-		let ids = directDependencies()
-		let index = ids.indexOf(featureIdValue)
+		let targetPath = featurePath(targetItem)
+		let paths = directRequirementsOf(targetItem)
+		for (let i = 0; i < pathsToAdd.length; ++i) {
+			let p = pathsToAdd[i]
+			if (p === "" || paths.indexOf(p) >= 0)
+				continue
+			if (targetPath !== "" && p.indexOf(targetPath + "/") === 0)
+				continue
+			paths.push(p)
+		}
+		targetItem.m_requirements = paths.join(';')
+		if (targetItem === featureData)
+			featureEditor.doUpdateModel()
+		else if (featureData && featureData.modelChanged)
+			featureData.modelChanged([])
+		rebuildAllRequirementEntries()
+		rebuildFeatureTree(selectedFeature)
+	}
+
+	function removeRequirementFor(targetItem, featurePathValue) {
+		if (!canEdit || !targetItem || !featurePathValue)
+			return
+		let paths = directRequirementsOf(targetItem)
+		let index = paths.indexOf(featurePathValue)
+		if (index >= 0) {
+			paths.splice(index, 1)
+			targetItem.m_requirements = paths.join(';')
+			if (targetItem === featureData)
+				featureEditor.doUpdateModel()
+			else if (featureData && featureData.modelChanged)
+				featureData.modelChanged([])
+			rebuildAllRequirementEntries()
+			rebuildFeatureTree(selectedFeature)
+		}
+	}
+
+	function toggleRequirement(featurePathValue) {
+		if (!requirementIsEnabled(featurePathValue))
+			return
+		let paths = directRequirements()
+		let index = paths.indexOf(featurePathValue)
 		if (index >= 0)
-			ids.splice(index, 1)
+			paths.splice(index, 1)
 		else
-			ids.push(featureIdValue)
-		activeFeature.m_dependencies = ids.join(';')
+			paths.push(featurePathValue)
+		let target = selectedFeature ? selectedFeature : featureData
+		target.m_requirements = paths.join(';')
+		if (target === featureData)
+			featureEditor.doUpdateModel()
+		else if (featureData && featureData.modelChanged)
+			featureData.modelChanged([])
+		rebuildAllRequirementEntries()
+		rebuildFeatureTree(selectedFeature)
 	}
 
-	function clearDependencies() {
-		if (!canEdit || !activeFeature)
+	function clearRequirementsFor(targetItem) {
+		if (!canEdit || !targetItem)
 			return
-		activeFeature.m_dependencies = ""
+		targetItem.m_requirements = ""
+		if (targetItem === featureData)
+			featureEditor.doUpdateModel()
+		else if (featureData && featureData.modelChanged)
+			featureData.modelChanged([])
+		rebuildAllRequirementEntries()
+		rebuildFeatureTree(selectedFeature)
+	}
+
+	function addRequirements(pathsToAdd) {
+		addRequirementsFor(selectedFeature ? selectedFeature : featureData, pathsToAdd)
+	}
+
+	function removeRequirement(featurePathValue) {
+		removeRequirementFor(selectedFeature ? selectedFeature : featureData, featurePathValue)
+	}
+
+	function clearRequirements() {
+		clearRequirementsFor(selectedFeature ? selectedFeature : featureData)
+	}
+
+	property var requirementsDialogTarget: null
+
+	function openRequirementsDialogFor(targetItem) {
+		if (!canEdit || !targetItem)
+			return
+		requirementsDialogTarget = targetItem
+		ModalDialogManager.openDialog(requirementsDialogComp, {})
+	}
+
+	function openRequirementsDialog() {
+		openRequirementsDialogFor(selectedFeature ? selectedFeature : featureData)
+	}
+
+	property Component requirementsDialogComp: Component {
+		RequirementsDialog {
+			currentRootPath: featureEditor.rootFeaturePath
+			currentRootName: featureEditor.featureData ? (featureEditor.featureData.m_featureName || featureEditor.featureData.m_featureId || "") : ""
+			targetFeaturePath: featureEditor.featurePath(featureEditor.requirementsDialogTarget)
+			targetFeatureName: featureEditor.requirementsDialogTarget ? (featureEditor.requirementsDialogTarget.m_featureName || "") : ""
+			alreadyRequiredPaths: featureEditor.allRequirementPathsOf(featureEditor.requirementsDialogTarget)
+			requirementEntries: featureEditor.requirementEntries
+			requirementGraph: featureEditor.requirementGraph
+			mandatoryLeafCounts: featureEditor.mandatoryLeafCounts
+
+			onFinished: {
+				if (buttonId !== Enums.ok || checkedPaths.length === 0)
+					return
+				featureEditor.addRequirementsFor(featureEditor.requirementsDialogTarget, checkedPaths)
+			}
+		}
 	}
 
 	function updateGui() {
 		if (!featureData)
 			return
-		var generalPageInstance = multiPageView.getPageByIndex(0)
-		if (generalPageInstance)
-			generalPageInstance.updateGui()
+		var rootFeaturePageInstance = multiPageView.getPageByIndex(0)
+		if (rootFeaturePageInstance)
+			rootFeaturePageInstance.updateGui()
 		rebuildFeatureTree(selectedFeature)
 		updateActiveFeature()
 	}
@@ -550,9 +1003,9 @@ ViewBase {
 	function updateModel() {
 		if (!featureData)
 			return
-		var generalPageInstance = multiPageView.getPageByIndex(0)
-		if (generalPageInstance)
-			generalPageInstance.updateModel()
+		var rootFeaturePageInstance = multiPageView.getPageByIndex(0)
+		if (rootFeaturePageInstance)
+			rootFeaturePageInstance.updateModel()
 	}
 
 	commandsDelegateComp: Component {
@@ -577,25 +1030,213 @@ ViewBase {
 
 		function updatePages() {
 			multiPageView.clear()
-			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
+			multiPageView.addPage("RootFeature", qsTr("Root Feature"), rootFeaturePageComp, "Icons/FeatureList")
 			multiPageView.addPage("Subfeatures", qsTr("Sub-features"), subfeaturesPageComp, "Icons/FeaturePackage")
 			multiPageView.currentIndex = 0
 		}
 	}
 
 	Component {
-		id: generalPageComp
+		id: rootFeaturePageComp
 
 		Item {
-			id: generalPage
+			id: rootFeaturePage
 			anchors.fill: parent
 
 			function updateGui() {
-				generalGroup.updateGui()
+				rootFeatureGroup.updateGui()
 			}
 
 			function updateModel() {
-				generalGroup.updateModel()
+				rootFeatureGroup.updateModel()
+			}
+
+			TableHeaders {
+				id: rootReqHeaders
+				Component.onCompleted: {
+					addHeader("featureName", qsTr("Feature"), false, false)
+					addHeader("fullPath", qsTr("Full path"), false, false)
+					addHeader("source", qsTr("Source"), false, false)
+					addHeader("actions", "", false, false)
+				}
+			}
+
+			Component {
+				id: rootReqNameColComp
+				TableCellDelegateBase {
+					id: nameCellBase
+
+					Item {
+						anchors.fill: parent
+
+						Image {
+							id: reqDepIcon
+							anchors.verticalCenter: parent.verticalCenter
+							anchors.left: parent.left
+							anchors.leftMargin: Style.marginM
+							width: Style.iconSizeS
+							height: width
+							sourceSize.width: width
+							sourceSize.height: height
+							source: "qrc:/" + Style.getIconPath("Icons/Dependencies", Icon.State.On, Icon.Mode.Normal)
+						}
+
+						BaseText {
+							id: nameText
+							anchors.verticalCenter: parent.verticalCenter
+							anchors.left: reqDepIcon.right
+							anchors.leftMargin: Style.marginS
+							anchors.right: parent.right
+							anchors.rightMargin: Style.marginS
+							elide: Text.ElideRight
+							font.family: Style.fontFamilyBold
+							font.pixelSize: Style.fontSizeM
+							color: Style.textColor
+						}
+					}
+
+					onReused: {
+						let item = (nameCellBase.table && nameCellBase.table.elements && nameCellBase.rowIndex >= 0 && nameCellBase.rowIndex < nameCellBase.table.elements.length)
+							? nameCellBase.table.elements[nameCellBase.rowIndex]
+							: (nameCellBase.rowDelegate ? nameCellBase.rowDelegate.dataModel : null)
+						nameText.text = item ? (item.featureName || item.featurePath) : ""
+					}
+				}
+			}
+
+			Component {
+				id: rootReqPathColComp
+				TableCellDelegateBase {
+					id: pathCellBase
+
+					BaseText {
+						id: pathText
+						anchors.verticalCenter: parent.verticalCenter
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginM
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginS
+						elide: Text.ElideRight
+						font.pixelSize: Style.fontSizeS
+						color: Style.subtitleColor
+					}
+
+					onReused: {
+						let item = (pathCellBase.table && pathCellBase.table.elements && pathCellBase.rowIndex >= 0 && pathCellBase.rowIndex < pathCellBase.table.elements.length)
+							? pathCellBase.table.elements[pathCellBase.rowIndex]
+							: (pathCellBase.rowDelegate ? pathCellBase.rowDelegate.dataModel : null)
+						pathText.text = item ? (item.fullPath !== "" ? item.fullPath : item.featurePath) : ""
+					}
+				}
+			}
+
+			Component {
+				id: rootReqSourceColComp
+				TableCellDelegateBase {
+					id: sourceCellBase
+
+					BaseText {
+						id: sourceText
+						anchors.verticalCenter: parent.verticalCenter
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginM
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginS
+						elide: Text.ElideRight
+						font.pixelSize: Style.fontSizeS
+					}
+
+					onReused: {
+						let item = (sourceCellBase.table && sourceCellBase.table.elements && sourceCellBase.rowIndex >= 0 && sourceCellBase.rowIndex < sourceCellBase.table.elements.length)
+							? sourceCellBase.table.elements[sourceCellBase.rowIndex]
+							: (sourceCellBase.rowDelegate ? sourceCellBase.rowDelegate.dataModel : null)
+						if (!item) {
+							sourceText.text = ""
+							return
+						}
+						if (item.isDirect) {
+							sourceText.text = qsTr("Direct")
+							sourceText.color = Style.subtitleColor
+							sourceText.font.family = Style.fontFamily
+						} else {
+							sourceText.text = qsTr("via %1").arg(item.sourceName)
+							sourceText.color = Style.firstColor
+							sourceText.font.family = Style.fontFamilyBold
+						}
+					}
+				}
+			}
+
+			Component {
+				id: rootReqActionsColComp
+				TableCellDelegateBase {
+					id: actionCellBase
+
+					Connections {
+						target: featureEditor
+						function onCanEditChanged() {
+							actionCellBase.reused()
+						}
+					}
+
+					Item {
+						anchors.centerIn: parent
+						width: Style.controlHeightS
+						height: Style.controlHeightS
+
+						ToolButton {
+							id: removeBtn
+							anchors.fill: parent
+							iconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+							tooltipText: qsTr("Remove requirement")
+							onClicked: {
+								let item = (actionCellBase.table && actionCellBase.table.elements && actionCellBase.rowIndex >= 0 && actionCellBase.rowIndex < actionCellBase.table.elements.length)
+									? actionCellBase.table.elements[actionCellBase.rowIndex]
+									: (actionCellBase.rowDelegate ? actionCellBase.rowDelegate.dataModel : null)
+								if (item)
+									featureEditor.removeRequirementFor(featureEditor.featureData, item.featurePath)
+							}
+						}
+
+						Item {
+							id: lockIndicator
+							anchors.fill: parent
+
+							Image {
+								anchors.centerIn: parent
+								width: Style.iconSizeXS
+								height: width
+								sourceSize.width: width
+								sourceSize.height: height
+								source: "qrc:/" + Style.getIconPath("Icons/Lock", Icon.State.On, Icon.Mode.Disabled)
+							}
+
+							MouseArea {
+								id: lockMouse
+								anchors.fill: parent
+								hoverEnabled: true
+							}
+
+							CustomTooltip {
+								id: lockTooltip
+								parent: lockIndicator
+								visible: lockMouse.containsMouse
+							}
+						}
+					}
+
+					onReused: {
+						let item = (actionCellBase.table && actionCellBase.table.elements && actionCellBase.rowIndex >= 0 && actionCellBase.rowIndex < actionCellBase.table.elements.length)
+							? actionCellBase.table.elements[actionCellBase.rowIndex]
+							: (actionCellBase.rowDelegate ? actionCellBase.rowDelegate.dataModel : null)
+						let canRemove = item ? (item.canRemove && featureEditor.canEdit) : false
+						removeBtn.visible = canRemove
+						lockIndicator.visible = item ? !item.canRemove : false
+						if (item && !item.canRemove) {
+							lockTooltip.text = qsTr("Required via %1 (cannot be removed directly)").arg(item.sourceName)
+						}
+					}
+				}
 			}
 
 			CustomScrollbar {
@@ -632,13 +1273,24 @@ ViewBase {
 
 					GroupHeaderView {
 						width: parent.width
-						title: qsTr("General")
-						groupView: generalGroup
+						title: qsTr("Root Feature")
+						groupView: rootFeatureGroup
 					}
 
 					GroupElementView {
-						id: generalGroup
+						id: rootFeatureGroup
 						width: parent.width
+
+						property bool idCustomized: false
+						property string idValidationMessage: {
+							if (featureIdInput.text === "")
+								return qsTr("Required. Filled in from the name if you leave it empty.")
+							if (!featureEditor.isValidId(featureIdInput.text))
+								return qsTr("Invalid identifier. Use only Latin letters, digits and underscores.")
+							if (featureEditor.rootIdConflict(featureIdInput.text))
+								return qsTr("Identifier '%1' is already in use by another feature.").arg(featureIdInput.text)
+							return ""
+						}
 
 						TextInputElementView {
 							id: featureNameInput
@@ -652,9 +1304,14 @@ ViewBase {
 							descriptionColor: Style.errorTextColor
 							placeHolderText: qsTr("Enter the feature name")
 							readOnly: !featureEditor.canEdit
+							onTextEdited: {
+								if (!rootFeatureGroup.idCustomized)
+									featureIdInput.text = featureEditor.sanitizeId(text)
+								featureEditor.doUpdateModel()
+							}
 							onEditingFinished: {
 								if (featureIdInput.text === "")
-									featureIdInput.text = text.replace(/\s+/g, '')
+									featureIdInput.text = featureEditor.sanitizeId(text)
 								featureEditor.doUpdateModel()
 							}
 							KeyNavigation.tab: featureIdInput
@@ -664,10 +1321,15 @@ ViewBase {
 							id: featureIdInput
 							objectName: "FeatureIdInput"
 							name: qsTr("Feature ID") + " *"
-							description: featureIdInput.text === "" ? qsTr("Required. Filled in from the name if you leave it empty.") : ""
-							descriptionColor: Style.errorTextColor
+							description: rootFeatureGroup.idValidationMessage
+							descriptionColor: rootFeatureGroup.idValidationMessage !== "" ? Style.errorTextColor : Style.descriptionColor
+							borderColor: rootFeatureGroup.idValidationMessage !== "" ? Style.errorTextColor : ""
 							placeHolderText: qsTr("Enter the feature ID")
 							readOnly: !featureEditor.canEdit
+							onTextEdited: {
+								rootFeatureGroup.idCustomized = (text !== featureEditor.sanitizeId(featureNameInput.text))
+								featureEditor.doUpdateModel()
+							}
 							onEditingFinished: featureEditor.doUpdateModel()
 							KeyNavigation.tab: descriptionInput
 							KeyNavigation.backtab: featureNameInput
@@ -699,6 +1361,147 @@ ViewBase {
 							onCheckedChanged: featureEditor.doUpdateModel()
 						}
 
+						// The identifier alone does not say which branch it belongs to;
+						// requirements and permissions are written as the whole path, so
+						// the page shows it and hands it over in one click.
+						ElementView {
+							id: fullPathElement
+							width: parent.width
+							name: qsTr("Full path")
+							description: qsTr("How this feature is addressed by requirements and permissions")
+
+							controlComp: Component {
+								CustomTextField {
+									id: fullPathField
+									objectName: "FullPathField"
+									width: fullPathElement.controlWidth
+									height: Style.controlHeightM
+									readOnly: true
+									hasActionMenu: false
+									textFieldRightMargin: copyFullPathButton.width + 2 * Style.marginXS
+									text: featureEditor.rootFeaturePath
+
+									ToolButton {
+										id: copyFullPathButton
+										z: fullPathField.z + 2
+										anchors.right: parent.right
+										anchors.rightMargin: Style.marginXS
+										anchors.verticalCenter: parent.verticalCenter
+										width: Style.buttonWidthM
+										height: width
+										enabled: featureEditor.rootFeaturePath !== ""
+										iconSource: featureEditor.copyIconSource(featureEditor.rootFeaturePath)
+										tooltipText: qsTr("Copy the full path")
+										onClicked: featureEditor.copyFeaturePath(featureEditor.featureData)
+									}
+								}
+							}
+						}
+
+						TableElementView {
+							id: rootRequirementsTableElement
+							width: parent.width
+							name: qsTr("Requirements")
+
+							controlComp: Component {
+								Row {
+									width: implicitWidth
+									height: Style.controlHeightM
+									spacing: Style.spacingS
+
+									ToolbarButton {
+										id: clearRootReqButton
+										anchors.verticalCenter: parent.verticalCenter
+										visible: featureEditor.canEdit && featureEditor.rootRequirementEntries.length > 0
+										active: true
+										text: qsTr("Clear all")
+										onClicked: featureEditor.clearRequirementsFor(featureEditor.featureData)
+									}
+
+									Button {
+										id: addRootReqButton
+										anchors.verticalCenter: parent.verticalCenter
+										height: Style.controlHeightM
+										text: qsTr("Add requirement")
+										iconSource: "qrc:/" + Style.getIconPath("Icons/Add", Icon.State.On, Icon.Mode.Normal)
+										enabled: featureEditor.canEdit && featureEditor.featureData !== null
+										onClicked: featureEditor.openRequirementsDialogFor(featureEditor.featureData)
+									}
+								}
+							}
+
+							bottomComp: Component {
+								Item {
+									id: bottomContainer
+									width: rootRequirementsTableElement.contentWidth
+									height: featureEditor.rootRequirementEntries.length === 0
+										? Style.controlHeightM
+										: (reqTable.contentHeight + reqTable.headerHeight)
+
+									Table {
+										id: reqTable
+										anchors.top: parent.top
+										anchors.left: parent.left
+										anchors.right: parent.right
+										height: contentHeight + headerHeight
+										canMoveColumns: false
+										selectable: false
+										visible: featureEditor.rootRequirementEntries.length > 0
+
+										Component.onCompleted: {
+											rootRequirementsTableElement.table = reqTable
+											reqTable.headers = rootReqHeaders
+											reqTable.setColumnContentById("featureName", rootReqNameColComp)
+											reqTable.setColumnContentById("fullPath", rootReqPathColComp)
+											reqTable.setColumnContentById("source", rootReqSourceColComp)
+											reqTable.setColumnContentById("actions", rootReqActionsColComp)
+											let actionIdx = rootReqHeaders.getHeaderIndex("actions")
+											if (actionIdx >= 0 && reqTable.widthDecorator.getItemsCount() > actionIdx) {
+												reqTable.widthDecorator.setData("Width", Style.buttonWidthM + Style.marginM, actionIdx)
+												reqTable.widthDecorator.setData("WidthPercent", -1, actionIdx)
+												reqTable.setWidth()
+											}
+											reqTable.elements = featureEditor.rootRequirementEntries
+										}
+
+										Connections {
+											target: featureEditor
+											function onRootRequirementEntriesChanged() {
+												reqTable.elements = featureEditor.rootRequirementEntries
+												rootFeatureGroup.scheduleRecalc()
+											}
+										}
+									}
+
+									Item {
+										anchors.fill: parent
+										visible: featureEditor.rootRequirementEntries.length === 0
+
+										Row {
+											anchors.centerIn: parent
+											spacing: Style.spacingS
+
+											Image {
+												anchors.verticalCenter: parent.verticalCenter
+												width: Style.iconSizeXS
+												height: width
+												source: "qrc:/" + Style.getIconPath("Icons/Dependencies", Icon.State.On, Icon.Mode.Disabled)
+												sourceSize.width: width
+												sourceSize.height: height
+											}
+
+											BaseText {
+												anchors.verticalCenter: parent.verticalCenter
+												text: qsTr("No requirements")
+												font.pixelSize: Style.fontSizeS
+												color: Style.inactiveTextColor
+											}
+										}
+									}
+								}
+							}
+						}
+
 						function updateGui() {
 							if (!featureEditor.featureData)
 								return
@@ -707,13 +1510,20 @@ ViewBase {
 							descriptionInput.text = featureEditor.featureData.m_description || ""
 							optionalSwitch.setChecked(featureEditor.featureData.m_optional)
 							permissionSwitch.setChecked(featureEditor.featureData.m_isPermission)
+							rootFeatureGroup.idCustomized = featureIdInput.text !== ""
+								&& featureIdInput.text !== featureEditor.sanitizeId(featureNameInput.text)
 						}
 
 						function updateModel() {
 							if (!featureEditor.featureData)
 								return
-							featureEditor.featureData.m_featureName = featureNameInput.text
-							featureEditor.featureData.m_featureId = featureIdInput.text
+							// A blank name is left as it was rather than saved - the field
+							// itself keeps showing the rejected text and its red "Required"
+							// hint, so nothing here needs to say it twice.
+							if (featureNameInput.text !== "")
+								featureEditor.featureData.m_featureName = featureNameInput.text
+							if (featureIdInput.text !== "" && featureEditor.isValidId(featureIdInput.text) && !featureEditor.rootIdConflict(featureIdInput.text))
+								featureEditor.featureData.m_featureId = featureIdInput.text
 							featureEditor.featureData.m_description = descriptionInput.text
 							featureEditor.featureData.m_optional = optionalSwitch.checked
 							featureEditor.featureData.m_isPermission = permissionSwitch.checked
@@ -787,28 +1597,18 @@ ViewBase {
 			function currentParentNode() { return treeExplorer.currentParentNode() }
 				function commandTargets() { return treeExplorer.commandTargets() }
 
-			// Column geometry, shared by the header and the rows so the two can
-			// never drift. A column whose breakpoint is above the current table
-			// width folds away and its share is handed to the columns that stay.
-			property var columnFractions: [0.20, 0.14, 0.20, 0.07, 0.09, 0.09, 0.21]
-			property var columnBreakpoints: [0, 340, 720, 0, 540, 440, 620]
-
-			function columnVisible(index, width) {
-				return width >= subfeaturesPage.columnBreakpoints[index]
+			// Column geometry, shared by the header, the rows and the drag handles
+			// the explorer draws, so none of the three can drift from the others.
+			// A column whose breakpoint is above the current table width folds
+			// away and its share is handed to the columns that stay.
+			TableColumnLayout {
+				id: subfeatureColumns
+				fractions: [0.32, 0.22, 0.30, 0.08, 0.08]
+				breakpoints: [0, 340, 640, 0, 500]
 			}
 
 			function columnWidth(index, width, spacing) {
-				if (!subfeaturesPage.columnVisible(index, width))
-					return 0
-				let sum = 0
-				let count = 0
-				for (let i = 0; i < subfeaturesPage.columnFractions.length; ++i) {
-					if (!subfeaturesPage.columnVisible(i, width))
-						continue
-					sum += subfeaturesPage.columnFractions[i]
-					++count
-				}
-				return (width - (count - 1) * spacing) * subfeaturesPage.columnFractions[index] / sum
+				return subfeatureColumns.widthOf(index, width, spacing)
 			}
 
 			property Component subfeaturesHeaderComp: Component {
@@ -890,35 +1690,6 @@ ViewBase {
 							color: Style.subtitleColor
 						}
 					}
-					Item {
-						width: subfeaturesPage.columnWidth(5, headerRow.width, headerRow.spacing)
-						height: headerRow.height
-						visible: width > 0
-						BaseText {
-							anchors.centerIn: parent
-							width: parent.width
-							horizontalAlignment: Text.AlignHCenter
-							text: qsTr("Sub-features")
-							font.family: Style.fontFamilyBold
-							font.pixelSize: Style.fontSizeS
-							color: Style.subtitleColor
-						}
-					}
-					Item {
-						width: subfeaturesPage.columnWidth(6, headerRow.width, headerRow.spacing)
-						height: headerRow.height
-						visible: width > 0
-						BaseText {
-							anchors.left: parent.left
-							anchors.leftMargin: Style.marginXS
-							anchors.right: parent.right
-							anchors.verticalCenter: parent.verticalCenter
-							text: qsTr("Dependencies")
-							font.family: Style.fontFamilyBold
-							font.pixelSize: Style.fontSizeS
-							color: Style.subtitleColor
-						}
-					}
 				}
 			}
 
@@ -928,7 +1699,7 @@ ViewBase {
 			// either end carries editing into the neighbouring row.
 			//
 			// The two count cells stay live in both modes: the subfeature chip is how
-			// you descend a level, the dependency preview selects the row so the panel
+			// you descend a level, the requirements preview selects the row so the panel
 			// on the right shows the full list.
 			property Component subfeatureRowComp: Component {
 				Row {
@@ -941,7 +1712,6 @@ ViewBase {
 					property int editColumn: parent ? parent.editColumn : 0
 					property int commitRequest: parent ? parent.commitRequest : 0
 					property var sourceItem: rowContent.node ? featureEditor.sourceItem(rowContent.node) : null
-					property bool isLeaf: featureEditor.isLeafNode(rowContent.node)
 
 					// The row drives itself off the state above rather than being
 					// called into: the view has no reliable handle on a delegate.
@@ -1027,13 +1797,19 @@ ViewBase {
 						let grouped = typeof item.beginChanges === "function"
 						if (grouped)
 							item.beginChanges()
-						item.m_featureName = nameCell.pendingValue()
-						item.m_featureId = idCell.pendingValue()
+						// A blank name is left as it was rather than saved, same as a
+						// duplicate id below.
+						let newFeatureName = nameCell.pendingValue()
+						if (newFeatureName !== "")
+							item.m_featureName = newFeatureName
+						// A sibling using this id already or invalid id is left as-is rather than
+						// applied: the id would collide or be corrupt on save.
+						let newFeatureId = idCell.pendingValue()
+						if (newFeatureId !== "" && featureEditor.isValidId(newFeatureId) && !featureEditor.siblingIdConflict(treeExplorer.currentParentNode(), newFeatureId, item))
+							item.m_featureId = newFeatureId
 						item.m_description = descriptionCell.pendingValue()
-						if (rowContent.isLeaf) {
-							item.m_optional = rowContent.draftOptional
-							item.m_isPermission = rowContent.draftPermission
-						}
+						item.m_optional = rowContent.draftOptional
+						item.m_isPermission = rowContent.draftPermission
 						if (grouped)
 							item.endChanges()
 					}
@@ -1041,6 +1817,10 @@ ViewBase {
 					// Escape belongs to the whole row: the drafts are simply dropped.
 					function cancelEditing() {
 						treeExplorer.cancelEditRow()
+						treeExplorer.forceActiveFocus()
+						Qt.callLater(function() {
+							treeExplorer.forceActiveFocus()
+						})
 					}
 
 					EditableTableCell {
@@ -1086,6 +1866,11 @@ ViewBase {
 						readOnly: !featureEditor.canEdit
 						placeHolderText: qsTr("Identifier")
 						value: rowContent.sourceItem ? rowContent.sourceItem.m_featureId : ""
+						// Flags a sibling with the same id or invalid format while typing; commitEditing()
+						// is what actually keeps the duplicate or invalid id out of the model.
+						invalid: rowContent.editing && (featureEditor.siblingIdConflict(
+								treeExplorer.currentParentNode(), idCell.draft, rowContent.sourceItem)
+								|| (idCell.draft !== "" && !featureEditor.isValidId(idCell.draft)))
 						nextEditor: descriptionCell.editorItem
 						previousEditor: nameCell.editorItem
 						onEditingEndRequested: treeExplorer.commitEditRow()
@@ -1125,19 +1910,13 @@ ViewBase {
 							id: optionalSwitch
 							anchors.centerIn: parent
 							height: Style.controlHeightS
-							visible: rowContent.isLeaf
 							readOnly: !featureEditor.canEdit || !rowContent.editing
+							backgroundColorChecked: readOnly ? Style.inactiveTextColor : Style.lightBlueColor
+							controlColorChecked: Style.firstColor
 							onCheckedChanged: {
 								if (rowContent.editing)
 									rowContent.draftOptional = optionalSwitch.checked
 							}
-						}
-
-						BaseText {
-							anchors.centerIn: parent
-							visible: !rowContent.isLeaf
-							text: "-"
-							color: Style.inactiveTextColor
 						}
 					}
 
@@ -1153,119 +1932,16 @@ ViewBase {
 							id: permissionSwitch
 							anchors.centerIn: parent
 							height: Style.controlHeightS
-							visible: rowContent.isLeaf
 							readOnly: !featureEditor.canEdit || !rowContent.editing
+							backgroundColorChecked: readOnly ? Style.inactiveTextColor : Style.lightBlueColor
+							controlColorChecked: Style.firstColor
 							onCheckedChanged: {
 								if (rowContent.editing)
 									rowContent.draftPermission = permissionSwitch.checked
 							}
 						}
-
-						BaseText {
-							anchors.centerIn: parent
-							visible: !rowContent.isLeaf
-							text: "-"
-							color: Style.inactiveTextColor
-						}
 					}
 
-					// Count chip: how many subfeatures this one has, and the way down
-					// into them - which is why there is no separate open button. It
-					// turns into a warning when something below is still unfinished,
-					// and goes dead when the feature itself has no name or ID, since
-					// an unnamed feature cannot own anything.
-					Item {
-						id: subfeaturesCell
-						objectName: "SubfeatureCountCell"
-						width: subfeaturesPage.columnWidth(5, rowContent.width, rowContent.spacing)
-						height: Style.controlHeightM
-						anchors.verticalCenter: parent.verticalCenter
-						visible: width > 0
-
-						property int count: featureEditor.subFeatureCount(rowContent.node)
-						property bool complete: featureEditor.nodeIsComplete(rowContent.node)
-						property bool hasIssues: featureEditor.subtreeHasIssues(rowContent.node)
-						property bool openable: subfeaturesCell.complete && !rowContent.editing
-
-						Rectangle {
-							anchors.centerIn: parent
-							width: Math.max(Style.controlHeightS,
-								countText.width + warningIcon.width + 2 * Style.marginS)
-							height: Style.controlHeightS
-							radius: height / 2
-							color: subfeaturesMouse.containsMouse ? Style.titleColor
-								: subfeaturesCell.count > 0 ? Style.backgroundColor2 : "transparent"
-							border.color: subfeaturesCell.hasIssues ? Style.errorTextColor
-								: subfeaturesMouse.containsMouse || subfeaturesCell.count > 0
-									? Style.borderColor : "transparent"
-							border.width: 1
-
-							Row {
-								anchors.centerIn: parent
-								spacing: Style.spacingXS
-
-								Image {
-									id: warningIcon
-									anchors.verticalCenter: parent.verticalCenter
-									visible: subfeaturesCell.hasIssues
-									width: visible ? Style.iconSizeXS : 0
-									height: Style.iconSizeXS
-									source: "qrc:/" + Style.getIconPath("Icons/Warning", Icon.State.On, Icon.Mode.Normal)
-								}
-
-								BaseText {
-									id: countText
-									anchors.verticalCenter: parent.verticalCenter
-									text: subfeaturesCell.count > 0 ? subfeaturesCell.count : "-"
-									font.pixelSize: Style.fontSizeS
-									font.family: Style.fontFamilyBold
-									color: subfeaturesMouse.containsMouse ? Style.baseColor
-										: subfeaturesCell.hasIssues ? Style.errorTextColor
-										: subfeaturesCell.count > 0 ? Style.titleColor : Style.inactiveTextColor
-								}
-							}
-						}
-
-						MouseArea {
-							id: subfeaturesMouse
-							objectName: "MouseArea"
-							anchors.fill: parent
-							hoverEnabled: true
-							cursorShape: subfeaturesCell.openable ? Qt.PointingHandCursor : Qt.ArrowCursor
-							onEntered: subfeaturesPage.showPreview(rowContent.node, subfeaturesCell)
-							onExited: subfeaturesPage.hidePreview()
-							onClicked: {
-								if (subfeaturesCell.openable)
-									treeExplorer.navigateInto(rowContent.node)
-							}
-						}
-					}
-
-					Item {
-						id: dependenciesCell
-						objectName: "SubfeatureDependenciesCell"
-						width: subfeaturesPage.columnWidth(6, rowContent.width, rowContent.spacing)
-						height: Style.controlHeightM
-						anchors.verticalCenter: parent.verticalCenter
-						visible: width > 0
-
-						property string summary: featureEditor.dependencySummary(rowContent.sourceItem)
-
-						BaseText {
-							anchors.left: parent.left
-							anchors.leftMargin: Style.marginXS
-							anchors.right: parent.right
-							anchors.rightMargin: Style.marginXS
-							anchors.verticalCenter: parent.verticalCenter
-							text: !rowContent.isLeaf ? qsTr("Set on the sub-features")
-								: dependenciesCell.summary !== "" ? dependenciesCell.summary : "-"
-							font.italic: !rowContent.isLeaf
-							color: dependenciesCell.summary !== "" && rowContent.isLeaf
-								? Style.textColor : Style.inactiveTextColor
-							elide: Text.ElideRight
-						}
-
-					}
 
 					// Zero-size focus relays: Tab off the last cell or Shift+Tab off the
 					// first lands here and hands editing to the adjacent row.
@@ -1290,47 +1966,419 @@ ViewBase {
 				}
 			}
 
-			// Right-hand table of the page: a flat list of every feature that can be
-			// depended on, each with its full path. Entries the selected subfeature
-			// must not depend on (itself, an ancestor, or anything that would close a
-			// cycle) stay disabled and carry a chip saying why.
-			property Component dependenciesPanelComp: Component {
-				CheckableListPanel {
+			// Sub-features indicator & drill-down action positioned next to the Edit button
+			property Component subfeatureRowActionComp: Component {
+				Item {
+					id: subfeatureActionItem
+					width: 36
+					height: Style.controlHeightM
+
+					property var node: parent ? parent.node : null
+					property bool editing: parent ? parent.editing : false
+					property bool rowSelected: parent ? parent.selected : false
+
+					property int count: featureEditor.subFeatureCount(subfeatureActionItem.node)
+					property bool complete: featureEditor.nodeIsComplete(subfeatureActionItem.node)
+					property bool hasIssues: featureEditor.subtreeHasIssues(subfeatureActionItem.node)
+					property bool openable: subfeatureActionItem.complete && !subfeatureActionItem.editing
+
+					visible: !subfeatureActionItem.editing && (subfeatureActionItem.count > 0 || subfeatureActionItem.rowSelected || actionMouse.containsMouse)
+
+					Rectangle {
+						id: countPill
+						anchors.centerIn: parent
+						width: Math.max(Style.controlHeightS, pillRow.width + 2 * Style.marginS)
+						height: Style.controlHeightS
+						radius: height / 2
+						color: actionMouse.containsMouse ? Style.titleColor
+							: subfeatureActionItem.count > 0 ? Style.backgroundColor2 : "transparent"
+						border.color: subfeatureActionItem.hasIssues ? Style.errorTextColor
+							: actionMouse.containsMouse || subfeatureActionItem.count > 0
+								? Style.borderColor : "transparent"
+						border.width: 1
+
+						Row {
+							id: pillRow
+							anchors.centerIn: parent
+							spacing: Style.spacingXS
+
+							Image {
+								id: actionWarningIcon
+								anchors.verticalCenter: parent.verticalCenter
+								visible: subfeatureActionItem.hasIssues
+								width: visible ? Style.iconSizeXS : 0
+								height: Style.iconSizeXS
+								sourceSize.width: width
+								sourceSize.height: height
+								source: "qrc:/" + Style.getIconPath("Icons/Warning", Icon.State.On, Icon.Mode.Normal)
+							}
+
+							BaseText {
+								id: actionCountText
+								anchors.verticalCenter: parent.verticalCenter
+								text: subfeatureActionItem.count > 0 ? subfeatureActionItem.count : ">"
+								font.pixelSize: subfeatureActionItem.count > 0 ? Style.fontSizeS : Style.fontSizeM
+								font.family: Style.fontFamilyBold
+								color: actionMouse.containsMouse ? Style.baseColor
+									: subfeatureActionItem.hasIssues ? Style.errorTextColor
+									: subfeatureActionItem.count > 0 ? Style.titleColor : Style.subtitleColor
+							}
+						}
+					}
+
+					MouseArea {
+						id: actionMouse
+						anchors.fill: parent
+						hoverEnabled: true
+						cursorShape: subfeatureActionItem.openable ? Qt.PointingHandCursor : Qt.ArrowCursor
+						onEntered: subfeaturesPage.showPreview(subfeatureActionItem.node, subfeatureActionItem)
+						onExited: subfeaturesPage.hidePreview()
+						onClicked: {
+							if (subfeatureActionItem.openable)
+								treeExplorer.navigateInto(subfeatureActionItem.node)
+						}
+					}
+
+					CustomTooltip {
+						id: actionTooltip
+						parent: countPill
+						text: subfeatureActionItem.count > 0
+							? qsTr("%1 sub-features (click to open)").arg(subfeatureActionItem.count)
+							: qsTr("Open sub-features")
+						visible: actionMouse.containsMouse
+					}
+				}
+			}
+
+			// Whatever the narrow cells cut short, in full: the name, the path that
+			// requirements and permissions are written in, and the description.
+			property Component subfeatureDetailsComp: Component {
+				TableRowDetails {
+					id: subfeatureDetails
+					objectName: "SubfeatureDetails"
+					title: featureEditor.selectedFeature ? featureEditor.featureName(treeExplorer.selectedNode) : ""
+					keyText: featureEditor.selectedFeature ? featureEditor.featurePath(featureEditor.selectedFeature) : ""
+					description: featureEditor.selectedFeature ? featureEditor.featureDescription(treeExplorer.selectedNode) : ""
+					placeholderText: qsTr("Select a sub-feature to see its full name, path and description")
+					copyVisible: true
+					copyIconSource: featureEditor.copyIconSource(subfeatureDetails.keyText)
+					copyTooltipText: qsTr("Copy the full path")
+					onCopyRequested: featureEditor.copyFeaturePath(featureEditor.selectedFeature)
+				}
+			}
+
+			// Right-hand table of the page: shows only the requirements that have
+			// been added to the active feature. Adding new requirements is done via
+			// the "Add requirement" button which opens RequirementsDialog.
+			property Component requirementsPanelComp: Component {
+				FocusScope {
+					id: requirementsPanel
 					objectName: "DependenciesPanel"
-					title: qsTr("Dependencies")
-					subtitle: featureEditor.activeFeature ? featureEditor.activeFeature.m_featureName : ""
-					model: featureEditor.dependencyEntries
-					// Dependencies belong to exactly one feature, and only to one
-					// that has no sub-features of its own: a grouping grants what
-					// its children grant, so its own dependencies mean nothing.
-					contentActive: featureEditor.activeFeature !== null
-						&& treeExplorer.checkedNodes.length < 2
-						&& featureEditor.isLeafNode(treeExplorer.selectedNode)
-					revealKey: featureEditor.activeFeature ? featureEditor.activeFeature.m_featureId : ""
-					placeholderText: treeExplorer.checkedNodes.length > 1
-						? qsTr("More than one row is ticked")
-						: featureEditor.activeFeature !== null
-							? qsTr("This feature has sub-features") : qsTr("No sub-feature selected")
-					placeholderDescription: treeExplorer.checkedNodes.length > 1
-						? qsTr("Dependencies belong to a single feature - untick the rest to edit them")
-						: featureEditor.activeFeature !== null
-							? qsTr("A feature that groups others grants whatever they grant, so it carries no dependencies of its own. Open it and set them on the sub-features inside.")
-							: qsTr("Pick a row on the left to see and edit what it depends on")
-					nameColumnTitle: qsTr("Feature")
-					iconSource: "Icons/Dependencies"
-					searchPlaceholder: qsTr("Search features")
-					emptyText: qsTr("No features to depend on")
-					emptyDescription: qsTr("Dependencies are picked from the shared feature collection")
-					actionText: qsTr("Clear")
-					actionEnabled: featureEditor.canEdit && featureEditor.directDependencies().length > 0
-					entryTitleProvider: function(entry) { return entry.featureName }
-					entrySubtitleProvider: function(entry) { return entry.fullPath }
-					entryBadgeProvider: function(entry) { return featureEditor.dependencyBadge(entry.featureId) }
-					entrySearchableTextProvider: function(entry) { return entry.fullPath + " " + entry.featureId }
-					entryCheckStateProvider: function(entry) { return featureEditor.isDirectDependency(entry.featureId) ? Qt.Checked : Qt.Unchecked }
-					entryCheckEnabledProvider: function(entry) { return featureEditor.dependencyIsEnabled(entry.featureId) }
-					onToggleRequested: featureEditor.toggleDependency(entry.featureId)
-					onActionRequested: featureEditor.clearDependencies()
+					anchors.fill: parent
+
+					property var selectedEntries: featureEditor.subfeatureRequirementEntries
+					property bool hasSelectedSubfeature: featureEditor.selectedFeature !== null && treeExplorer.checkedNodes.length < 2
+					property string subtitleText: {
+						if (treeExplorer.checkedNodes.length > 1)
+							return ""
+						if (featureEditor.selectedFeature)
+							return featureEditor.selectedFeature.m_featureName || ""
+						return ""
+					}
+
+					Item {
+						id: panelHeader
+						anchors.top: parent.top
+						anchors.left: parent.left
+						anchors.right: parent.right
+						height: Style.controlHeightL
+
+						BaseText {
+							id: titleText
+							objectName: "PanelTitle"
+							anchors.left: parent.left
+							anchors.verticalCenter: parent.verticalCenter
+							text: qsTr("Requirements")
+							font.family: Style.fontFamilyBold
+							font.pixelSize: Style.fontSizeL
+							color: Style.titleColor
+						}
+
+						BaseText {
+							id: subtitleLabel
+							objectName: "PanelSubtitle"
+							anchors.left: titleText.right
+							anchors.leftMargin: Style.marginS
+							anchors.right: clearButton.visible ? clearButton.left : parent.right
+							anchors.rightMargin: Style.marginS
+							anchors.verticalCenter: parent.verticalCenter
+							visible: requirementsPanel.subtitleText !== ""
+							text: requirementsPanel.subtitleText
+							font.pixelSize: Style.fontSizeS
+							color: Style.subtitleColor
+							elide: Text.ElideRight
+						}
+
+						ToolbarButton {
+							id: clearButton
+							objectName: "ClearRequirementsButton"
+							anchors.right: parent.right
+							anchors.verticalCenter: parent.verticalCenter
+							visible: featureEditor.canEdit && requirementsPanel.hasSelectedSubfeature && requirementsPanel.selectedEntries.length > 0
+							active: true
+							text: qsTr("Clear all")
+							onClicked: featureEditor.clearRequirementsFor(featureEditor.selectedFeature)
+						}
+					}
+
+					Item {
+						id: actionsBar
+						anchors.top: panelHeader.bottom
+						anchors.topMargin: Style.marginM
+						anchors.left: parent.left
+						anchors.right: parent.right
+						height: Style.controlHeightM
+
+						Button {
+							id: addReqButton
+							objectName: "AddRequirementButton"
+							anchors.left: parent.left
+							anchors.right: parent.right
+							height: Style.controlHeightM
+							text: qsTr("Add requirement")
+							iconSource: "qrc:/" + Style.getIconPath("Icons/Add", Icon.State.On, Icon.Mode.Normal)
+							enabled: featureEditor.canEdit && requirementsPanel.hasSelectedSubfeature
+							onClicked: featureEditor.openRequirementsDialogFor(featureEditor.selectedFeature)
+						}
+					}
+
+					Item {
+						id: columnHeader
+						anchors.top: actionsBar.bottom
+						anchors.topMargin: Style.marginL
+						anchors.left: parent.left
+						anchors.right: parent.right
+						height: Style.controlHeightS
+
+						BaseText {
+							anchors.left: parent.left
+							anchors.leftMargin: Style.marginL
+							anchors.verticalCenter: parent.verticalCenter
+							text: qsTr("Required features (%1)").arg(requirementsPanel.selectedEntries.length)
+							font.family: Style.fontFamilyBold
+							font.pixelSize: Style.fontSizeS
+							color: Style.subtitleColor
+						}
+					}
+
+					Rectangle {
+						id: panelFrame
+						objectName: "PanelTable"
+						anchors.top: columnHeader.bottom
+						anchors.topMargin: Style.marginXS
+						anchors.left: parent.left
+						anchors.right: parent.right
+						anchors.bottom: parent.bottom
+						radius: Style.radiusM
+						color: Style.baseColor
+						border.color: Style.borderColor
+						border.width: 1
+						clip: true
+
+						ListView {
+							id: entriesView
+							anchors.fill: parent
+							anchors.margins: 1
+							anchors.rightMargin: 1 + Style.marginM
+							visible: requirementsPanel.hasSelectedSubfeature && requirementsPanel.selectedEntries.length > 0
+							model: requirementsPanel.hasSelectedSubfeature ? requirementsPanel.selectedEntries : []
+							clip: true
+							boundsBehavior: Flickable.StopAtBounds
+
+							delegate: Rectangle {
+								id: entryRow
+								width: entriesView.width
+								height: Style.controlHeightL + Style.marginS
+								color: entryMouse.containsMouse ? Style.hover : "transparent"
+
+								MouseArea {
+									id: entryMouse
+									anchors.fill: parent
+									hoverEnabled: true
+								}
+
+								// Clean feature icon
+								Image {
+									id: reqIcon
+									anchors.left: parent.left
+									anchors.leftMargin: Style.marginM
+									anchors.verticalCenter: parent.verticalCenter
+									width: Style.iconSizeS
+									height: width
+									sourceSize.width: width
+									sourceSize.height: height
+									source: "qrc:/" + Style.getIconPath("Icons/Dependencies", Icon.State.On, Icon.Mode.Normal)
+								}
+
+								Column {
+									anchors.left: reqIcon.right
+									anchors.leftMargin: Style.marginS
+									anchors.right: subActionArea.left
+									anchors.rightMargin: Style.marginS
+									anchors.verticalCenter: parent.verticalCenter
+									spacing: Style.spacingXXS
+
+									// Title line: Feature name has full width, never squeezed by badges
+									BaseText {
+										width: parent.width
+										text: modelData.featureName || modelData.featurePath
+										font.family: Style.fontFamilyBold
+										font.pixelSize: Style.fontSizeM
+										color: Style.textColor
+										elide: Text.ElideRight
+									}
+
+									Row {
+										width: parent.width
+										spacing: Style.spacingS
+
+										BaseText {
+											text: modelData.fullPath !== "" ? modelData.fullPath : modelData.featurePath
+											font.pixelSize: Style.fontSizeS
+											color: Style.subtitleColor
+											elide: Text.ElideRight
+											width: Math.min(implicitWidth, parent.width - (subViaText.visible ? subViaText.implicitWidth + Style.spacingS : 0))
+										}
+
+										BaseText {
+											id: subViaText
+											visible: !modelData.isDirect && modelData.sourceName !== ""
+											text: qsTr("via %1").arg(modelData.sourceName)
+											font.pixelSize: Style.fontSizeS
+											font.family: Style.fontFamilyBold
+											color: Style.firstColor
+											elide: Text.ElideRight
+										}
+									}
+								}
+
+								Item {
+									id: subActionArea
+									anchors.right: parent.right
+									anchors.rightMargin: Style.marginM
+									anchors.verticalCenter: parent.verticalCenter
+									width: Style.controlHeightS
+									height: Style.controlHeightS
+
+									ToolButton {
+										id: removeBtn
+										objectName: "RemoveRequirementButton_" + index
+										anchors.fill: parent
+										visible: featureEditor.canEdit && modelData.canRemove
+										iconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+										tooltipText: qsTr("Remove requirement")
+										onClicked: featureEditor.removeRequirementFor(featureEditor.selectedFeature, modelData.featurePath)
+									}
+
+									Item {
+										id: subLockIndicator
+										anchors.fill: parent
+										visible: !modelData.canRemove
+
+										Image {
+											anchors.centerIn: parent
+											width: Style.iconSizeXS
+											height: width
+											sourceSize.width: width
+											sourceSize.height: height
+											source: "qrc:/" + Style.getIconPath("Icons/Lock", Icon.State.On, Icon.Mode.Disabled)
+										}
+
+										MouseArea {
+											id: subLockMouse
+											anchors.fill: parent
+											hoverEnabled: true
+										}
+
+										CustomTooltip {
+											parent: subLockIndicator
+											text: qsTr("Required via %1 (cannot be removed directly)").arg(modelData.sourceName)
+											visible: subLockMouse.containsMouse
+										}
+									}
+								}
+
+								// Clean divider between items
+								Rectangle {
+									anchors.left: parent.left
+									anchors.leftMargin: Style.marginM
+									anchors.right: parent.right
+									anchors.rightMargin: Style.marginM
+									anchors.bottom: parent.bottom
+									height: 1
+									color: Style.borderColor
+									opacity: 0.3
+									visible: index < entriesView.count - 1
+								}
+							}
+						}
+
+						CustomScrollbar {
+							z: entriesView.z + 1
+							anchors.right: parent.right
+							anchors.rightMargin: Style.marginXS
+							anchors.top: entriesView.top
+							anchors.topMargin: Style.marginXS
+							anchors.bottom: entriesView.bottom
+							anchors.bottomMargin: Style.marginXS
+							secondSize: Style.marginS
+							targetItem: entriesView
+							radius: Style.radiusS
+						}
+
+						Column {
+							objectName: "PanelPlaceholder"
+							anchors.centerIn: parent
+							width: Math.min(parent.width - 2 * Style.marginXL, Style.sizeHintM)
+							spacing: Style.spacingL
+							visible: !requirementsPanel.hasSelectedSubfeature || requirementsPanel.selectedEntries.length === 0
+
+							Image {
+								anchors.horizontalCenter: parent.horizontalCenter
+								width: Style.iconSizeL
+								height: width
+								source: "qrc:/" + Style.getIconPath("Icons/Dependencies", Icon.State.On, Icon.Mode.Disabled)
+								sourceSize.width: width
+								sourceSize.height: height
+							}
+
+							BaseText {
+								width: parent.width
+								horizontalAlignment: Text.AlignHCenter
+								text: treeExplorer.checkedNodes.length > 1
+									? qsTr("More than one row is ticked")
+									: !requirementsPanel.hasSelectedSubfeature
+										? qsTr("No sub-feature selected")
+										: qsTr("No requirements")
+								font.pixelSize: Style.fontSizeL
+								color: Style.textColor
+								wrapMode: Text.WordWrap
+							}
+
+							BaseText {
+								width: parent.width
+								horizontalAlignment: Text.AlignHCenter
+								text: treeExplorer.checkedNodes.length > 1
+									? qsTr("Requirements belong to a single sub-feature - untick the rest to edit them")
+									: !requirementsPanel.hasSelectedSubfeature
+										? qsTr("Select a sub-feature to view and edit its requirements")
+										: qsTr("Click 'Add requirement' to select features that this feature depends on")
+								font.pixelSize: Style.fontSizeS
+								color: Style.subtitleColor
+								wrapMode: Text.WordWrap
+							}
+						}
+					}
 				}
 			}
 
@@ -1348,6 +2396,9 @@ ViewBase {
 					? qsTr("Create a sub-feature to start this level")
 					: qsTr("Give this feature a name and an ID before adding sub-features")
 				editable: featureEditor.canEdit
+				// One row at a time: a tick in front of every sub-feature reads as
+				// a decision about the feature, which it is not.
+				multiSelectEnabled: false
 				// A blank feature owns nothing: no new children until it is filled in.
 				createEnabled: featureEditor.levelAcceptsChildren(treeExplorer.navigationStack)
 				levelStatusText: featureEditor.incompleteCount(treeExplorer.currentEntries) > 0
@@ -1357,15 +2408,18 @@ ViewBase {
 				// command out and leaving the reader to guess which page to visit.
 				idleHintText: featureEditor.levelAcceptsChildren(treeExplorer.navigationStack)
 					? qsTr("Select a sub-feature, or press New sub-feature to add one")
-					: qsTr("Fill in Feature Name and Feature ID on the General page to add sub-features here")
-				selectedHintText: featureEditor.isLeafNode(treeExplorer.selectedNode)
-					? qsTr("Edit or F2 changes this row; the Sub-features chip opens the level below")
-					: qsTr("This feature groups others - Optional, Permission and dependencies are set on the sub-features inside it")
+					: qsTr("Fill in Feature Name and Feature ID on the Root Feature page to add sub-features here")
+				selectedHintText: qsTr("Press Edit or F2 to change this row")
 				renameVisible: false
+				moveVisible: false
 				rowIconVisible: false
+				rowActionExtensionComponent: subfeaturesPage.subfeatureRowActionComp
+				rowActionExtensionWidth: 44
 				headerContentComponent: subfeaturesPage.subfeaturesHeaderComp
 				rowContentComponent: subfeaturesPage.subfeatureRowComp
-				sidePanelComponent: subfeaturesPage.dependenciesPanelComp
+				columnLayout: subfeatureColumns
+				detailsComponent: subfeaturesPage.subfeatureDetailsComp
+				sidePanelComponent: subfeaturesPage.requirementsPanelComp
 				// Read through to the live model item rather than the cached node, so
 				// inline renames show up in the breadcrumb and in search right away.
 				textProvider: function(node) { return featureEditor.featureName(node) }
@@ -1457,13 +2511,4 @@ ViewBase {
 			}
 		}
 	}
-
-	Connections {
-		target: CachedFeatureCollection
-		function onModelUpdated() {
-			featureEditor.dependenciewViewModel.copy(CachedFeatureCollection.collectionModel)
-			featureEditor.rebuildDependencyEntries()
-		}
-	}
 }
-

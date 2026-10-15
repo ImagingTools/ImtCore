@@ -3,6 +3,15 @@
 
 
 // Qt includes
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtCore/QFileInfo>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonParseError>
+#include <QtCore/QMetaObject>
+#include <QtCore/QMutexLocker>
+#include <QtCore/QSaveFile>
 #include <QtCore/QSet>
 
 // ImtCore includes
@@ -13,29 +22,158 @@ namespace imtdoc
 {
 
 
+static const QString s_usersKey = QStringLiteral("Users");
+static const QString s_userIdKey = QStringLiteral("UserId");
+static const QString s_documentsKey = QStringLiteral("Documents");
+static const QString s_documentIdKey = QStringLiteral("DocumentId");
+static const QString s_objectIdKey = QStringLiteral("ObjectId");
+static const QString s_typeIdKey = QStringLiteral("TypeId");
+static const QString s_urlKey = QStringLiteral("Url");
+static const QString s_nameKey = QStringLiteral("Name");
+static const QString s_singleDocumentInstanceKey = QStringLiteral("SingleDocumentInstance");
+
+
 // public methods
 
-// reimplemented (iser::ISerializable)
-
-bool CCollectionDocumentServiceComp::Serialize(iser::IArchive& archive)
+bool CCollectionDocumentServiceComp::LoadFromFile(const QString& filePath)
 {
-	DocumentMap documentMap;
+	if (filePath.isEmpty()){
+		SendErrorMessage(0, QStringLiteral("Document service state file path is empty"));
 
-	if (archive.IsStoring()){
-		PrepareDocumentMap(documentMap);
-
-		return SerializeDocumentMap(archive, documentMap);
-	}
-
-	if (!SerializeDocumentMap(archive, documentMap)){
 		return false;
 	}
 
-	return RestoreDocumentMap(documentMap);
+	QFile file(filePath);
+	if (!file.open(QIODevice::ReadOnly)){
+		SendErrorMessage(0, QStringLiteral("Cannot open document service state file '%1': %2").arg(filePath, file.errorString()));
+
+		return false;
+	}
+
+	const QByteArray fileData = file.readAll();
+	file.close();
+
+	QJsonParseError parseError;
+	const QJsonDocument jsonDocument = QJsonDocument::fromJson(fileData, &parseError);
+	if (parseError.error != QJsonParseError::NoError || !jsonDocument.isObject()){
+		SendErrorMessage(0, QStringLiteral("Cannot parse document service state file '%1': %2").arg(filePath, parseError.errorString()));
+
+		return false;
+	}
+
+	DocumentMap documentMap;
+	if (!DocumentMapFromJson(jsonDocument.object(), documentMap)){
+		SendErrorMessage(0, QStringLiteral("Invalid content of document service state file '%1'").arg(filePath));
+
+		return false;
+	}
+
+	// The loaded state must not be written back to the file while it is being restored
+	m_isStateLoading = true;
+	const bool retVal = RestoreDocumentMap(documentMap);
+	m_isStateLoading = false;
+
+	return retVal;
+}
+
+
+bool CCollectionDocumentServiceComp::SaveToFile(const QString& filePath) const
+{
+	if (filePath.isEmpty()){
+		SendErrorMessage(0, QStringLiteral("Document service state file path is empty"));
+
+		return false;
+	}
+
+	DocumentMap documentMap;
+	QMutexLocker documentLocker(&m_mutex);
+	PrepareDocumentMap(documentMap);
+
+	QMutexLocker locker(&m_stateFileMutex);
+	documentLocker.unlock();
+
+	const QByteArray fileData = QJsonDocument(DocumentMapToJson(documentMap)).toJson(QJsonDocument::Indented);
+
+	const QString directoryPath = QFileInfo(filePath).absolutePath();
+	if (!QDir().mkpath(directoryPath)){
+		SendErrorMessage(0, QStringLiteral("Cannot create directory '%1' for document service state file").arg(directoryPath));
+
+		return false;
+	}
+
+	QSaveFile file(filePath);
+	if (!file.open(QIODevice::WriteOnly)){
+		SendErrorMessage(0, QStringLiteral("Cannot open document service state file '%1' for writing: %2").arg(filePath, file.errorString()));
+
+		return false;
+	}
+
+	if (file.write(fileData) != fileData.size()){
+		SendErrorMessage(0, QStringLiteral("Cannot write document service state file '%1': %2").arg(filePath, file.errorString()));
+		file.cancelWriting();
+
+		return false;
+	}
+
+	if (!file.commit()){
+		SendErrorMessage(0, QStringLiteral("Cannot save document service state file '%1': %2").arg(filePath, file.errorString()));
+
+		return false;
+	}
+
+	return true;
 }
 
 
 // protected methods
+
+// reimplemented (icomp::CComponentBase)
+
+void CCollectionDocumentServiceComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	if (!IsStatePersistenceEnabled()){
+		return;
+	}
+
+	const QString filePath = GetStateFilePath();
+	if (filePath.isEmpty() || !QFileInfo::exists(filePath)){
+		return;
+	}
+
+	LoadFromFile(filePath);
+}
+
+
+void CCollectionDocumentServiceComp::OnComponentDestroyed()
+{
+	if (IsStatePersistenceEnabled()){
+		SaveToFile(GetStateFilePath());
+	}
+
+	BaseClass::OnComponentDestroyed();
+}
+
+
+// reimplemented (istd::IChangeable)
+
+void CCollectionDocumentServiceComp::OnEndChanges(const ChangeSet& changeSet)
+{
+	if (m_isStateLoading || !IsStatePersistenceEnabled()){
+		BaseClass::OnEndChanges(changeSet);
+
+		return;
+	}
+
+	const QString filePath = GetStateFilePath();
+	if (!filePath.isEmpty()){
+		RequestSaveToFile(filePath);
+	}
+
+	BaseClass::OnEndChanges(changeSet);
+}
+
 
 // reimplemented (imtdoc::TCollectionDocumentServiceWrap)
 
@@ -55,90 +193,10 @@ bool CCollectionDocumentServiceComp::IsSingleCopyMode() const
 
 // private methods
 
-bool CCollectionDocumentServiceComp::SerializeDocumentMap(iser::IArchive& archive, DocumentMap& documentMap) const
-{
-	static const iser::CArchiveTag usersTag("Users", "List of users", iser::CArchiveTag::TT_MULTIPLE);
-	static const iser::CArchiveTag userTag("User", "Single user", iser::CArchiveTag::TT_GROUP, &usersTag);
-	static const iser::CArchiveTag userIdTag("UserId", "User ID", iser::CArchiveTag::TT_LEAF, &userTag);
-	static const iser::CArchiveTag documentsTag("Documents", "List of opened documents", iser::CArchiveTag::TT_MULTIPLE, &userTag);
-	static const iser::CArchiveTag documentTag("Document", "Single opened document", iser::CArchiveTag::TT_GROUP, &documentsTag);
-	static const iser::CArchiveTag documentIdTag("DocumentId", "Document ID", iser::CArchiveTag::TT_LEAF, &documentTag);
-	static const iser::CArchiveTag objectIdTag("ObjectId", "Collection object ID", iser::CArchiveTag::TT_LEAF, &documentTag);
-	static const iser::CArchiveTag typeIdTag("TypeId", "Object type ID", iser::CArchiveTag::TT_LEAF, &documentTag);
-	static const iser::CArchiveTag urlTag("Url", "Document URL", iser::CArchiveTag::TT_LEAF, &documentTag);
-	static const iser::CArchiveTag nameTag("Name", "Document name", iser::CArchiveTag::TT_LEAF, &documentTag);
-	static const iser::CArchiveTag singleDocumentInstanceTag(
-				"SingleDocumentInstance",
-				"Single-document-instance mode flag",
-				iser::CArchiveTag::TT_LEAF,
-				&documentTag);
-
-	bool retVal = true;
-	bool isStoring = archive.IsStoring();
-
-	QList<QByteArray> userIds = isStoring ? documentMap.keys() : QList<QByteArray>();
-
-	if (!isStoring){
-		documentMap.clear();
-	}
-
-	int usersCount = isStoring ? imtbase::narrow_cast<int>(userIds.count()) : 0;
-	retVal = retVal && archive.BeginMultiTag(usersTag, userTag, usersCount);
-
-	for (int i = 0; i < usersCount; ++i){
-		QByteArray userId = isStoring ? userIds[i] : QByteArray();
-
-		retVal = retVal && archive.BeginTag(userTag);
-
-		retVal = retVal && archive.TagAndProcess(userIdTag, userId);
-
-		DocumentInfoList documents = isStoring ? documentMap.value(userId) : DocumentInfoList();
-
-		int documentsCount = isStoring ? imtbase::narrow_cast<int>(documents.count()) : 0;
-		retVal = retVal && archive.BeginMultiTag(documentsTag, documentTag, documentsCount);
-
-		for (int j = 0; j < documentsCount; ++j){
-			DocumentInfo doc;
-			if (isStoring){
-				doc = documents[j];
-			}
-
-			retVal = retVal && archive.BeginTag(documentTag);
-
-			retVal = retVal && archive.TagAndProcess(documentIdTag, doc.documentId);
-			retVal = retVal && archive.TagAndProcess(objectIdTag, doc.objectId);
-			retVal = retVal && archive.TagAndProcess(typeIdTag, doc.typeId);
-			retVal = retVal && archive.TagAndProcess(urlTag, doc.url);
-			retVal = retVal && archive.TagAndProcess(nameTag, doc.name);
-			retVal = retVal && archive.TagAndProcess(singleDocumentInstanceTag, doc.singleDocumentInstance);
-
-			retVal = retVal && archive.EndTag(documentTag);
-
-			if (!isStoring){
-				documents.append(doc);
-			}
-		}
-
-		retVal = retVal && archive.EndTag(documentsTag);
-
-		retVal = retVal && archive.EndTag(userTag);
-
-		if (!isStoring){
-			documentMap.insert(userId, documents);
-		}
-	}
-
-	retVal = retVal && archive.EndTag(usersTag);
-
-	return retVal;
-}
-
-
 void CCollectionDocumentServiceComp::PrepareDocumentMap(DocumentMap& documentMap) const
 {
 	documentMap.clear();
 
-	QMutexLocker locker(&m_mutex);
 	for (auto userIt = m_userDocuments.constBegin(); userIt != m_userDocuments.constEnd(); ++userIt){
 		DocumentInfoList documents;
 		const WorkingDocumentList& docs = userIt.value();
@@ -155,6 +213,119 @@ void CCollectionDocumentServiceComp::PrepareDocumentMap(DocumentMap& documentMap
 
 		documentMap.insert(userIt.key(), documents);
 	}
+}
+
+
+QJsonObject CCollectionDocumentServiceComp::DocumentMapToJson(const DocumentMap& documentMap)
+{
+	QJsonArray usersArray;
+
+	for (auto userIt = documentMap.constBegin(); userIt != documentMap.constEnd(); ++userIt){
+		QJsonArray documentsArray;
+		for (const DocumentInfo& documentInfo : userIt.value()){
+			QJsonObject documentObject;
+			documentObject.insert(s_documentIdKey, QString(documentInfo.documentId));
+			documentObject.insert(s_objectIdKey, QString(documentInfo.objectId));
+			documentObject.insert(s_typeIdKey, QString(documentInfo.typeId));
+			documentObject.insert(s_urlKey, documentInfo.url);
+			documentObject.insert(s_nameKey, documentInfo.name);
+			documentObject.insert(s_singleDocumentInstanceKey, documentInfo.singleDocumentInstance);
+
+			documentsArray.append(documentObject);
+		}
+
+		QJsonObject userObject;
+		userObject.insert(s_userIdKey, QString(userIt.key()));
+		userObject.insert(s_documentsKey, documentsArray);
+
+		usersArray.append(userObject);
+	}
+
+	QJsonObject rootObject;
+	rootObject.insert(s_usersKey, usersArray);
+
+	return rootObject;
+}
+
+
+bool CCollectionDocumentServiceComp::DocumentMapFromJson(const QJsonObject& rootObject, DocumentMap& documentMap)
+{
+	documentMap.clear();
+
+	const QJsonValue usersValue = rootObject.value(s_usersKey);
+	if (!usersValue.isArray()){
+		return false;
+	}
+
+	const QJsonArray usersArray = usersValue.toArray();
+	for (const QJsonValue& userValue : usersArray){
+		if (!userValue.isObject()){
+			return false;
+		}
+
+		const QJsonObject userObject = userValue.toObject();
+		if (!userObject.contains(s_userIdKey) || !userObject.contains(s_documentsKey)){
+			return false;
+		}
+
+		const QJsonValue userIdValue = userObject.value(s_userIdKey);
+		if (!userIdValue.isString()){
+			return false;
+		}
+
+		const QByteArray userId = userIdValue.toString().toUtf8();
+
+		const QJsonValue documentsValue = userObject.value(s_documentsKey);
+		if (!documentsValue.isArray()){
+			return false;
+		}
+
+		DocumentInfoList documents;
+
+		const QJsonArray documentsArray = documentsValue.toArray();
+		for (const QJsonValue& documentValue : documentsArray){
+			if (!documentValue.isObject()){
+				return false;
+			}
+
+			const QJsonObject documentObject = documentValue.toObject();
+			if (!documentObject.value(s_documentIdKey).isString()
+						|| documentObject.value(s_documentIdKey).toString().isEmpty()
+						|| !documentObject.value(s_objectIdKey).isString()
+						|| !documentObject.value(s_typeIdKey).isString()
+						|| !documentObject.value(s_urlKey).isString()
+						|| !documentObject.value(s_nameKey).isString()
+						|| !documentObject.value(s_singleDocumentInstanceKey).isBool()){
+				return false;
+			}
+
+			DocumentInfo documentInfo;
+			documentInfo.documentId = documentObject.value(s_documentIdKey).toString().toUtf8();
+			documentInfo.objectId = documentObject.value(s_objectIdKey).toString().toUtf8();
+			documentInfo.typeId = documentObject.value(s_typeIdKey).toString().toUtf8();
+			documentInfo.url = documentObject.value(s_urlKey).toString();
+			documentInfo.name = documentObject.value(s_nameKey).toString();
+			documentInfo.singleDocumentInstance = documentObject.value(s_singleDocumentInstanceKey).toBool(false);
+
+			documents.append(documentInfo);
+		}
+
+		documentMap.insert(userId, documents);
+	}
+
+	return true;
+}
+
+
+bool CCollectionDocumentServiceComp::IsStatePersistenceEnabled() const
+{
+	return m_statePersistenceEnablerCompPtr.IsValid() && m_statePersistenceEnablerCompPtr->IsEnabled();
+}
+
+
+QString CCollectionDocumentServiceComp::GetStateFilePath() const
+{
+	return m_stateFilePathCompPtr.IsValid() ? m_stateFilePathCompPtr->GetPath() : QString();
 }
 
 
@@ -212,6 +383,57 @@ void CCollectionDocumentServiceComp::RemoveAllDocuments()
 }
 
 
+void CCollectionDocumentServiceComp::RequestSaveToFile(const QString& filePath)
+{
+	if (filePath.isEmpty()){
+		return;
+	}
+
+	bool shouldQueueProcessing = false;
+	{
+		QMutexLocker locker(&m_saveRequestMutex);
+		m_lastRequestedStateFilePath = filePath;
+		if (!m_isSaveRequestProcessingQueued){
+			m_isSaveRequestProcessingQueued = true;
+			shouldQueueProcessing = true;
+		}
+	}
+
+	if (!shouldQueueProcessing){
+		return;
+	}
+
+	std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
+	QMetaObject::invokeMethod(
+		this,
+		[this, aliveGuard] {
+			auto isAlive = aliveGuard.lock();
+			if (!isAlive || !isAlive->load()){
+				return;
+			}
+
+			ProcessSaveRequests();
+		},
+		Qt::QueuedConnection);
+}
+
+
+void CCollectionDocumentServiceComp::ProcessSaveRequests()
+{
+	QString filePath;
+	{
+		QMutexLocker locker(&m_saveRequestMutex);
+		filePath = m_lastRequestedStateFilePath;
+		m_lastRequestedStateFilePath.clear();
+		m_isSaveRequestProcessingQueued = false;
+	}
+
+	if (!filePath.isEmpty()){
+		SaveToFile(filePath);
+	}
+}
+
+
 bool CCollectionDocumentServiceComp::RestoreSharedDocument(const DocumentInfo& documentInfo, const QByteArray& userId)
 {
 	if (documentInfo.objectId.isEmpty()){
@@ -264,7 +486,7 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 		return false;
 	}
 
-	imtbase::IObjectCollection::DataPtr objectPtr;
+	istd::IChangeableSharedPtr objectPtr;
 	if (!documentInfo.objectId.isEmpty()){
 		if (!collectionPtr->GetObjectData(documentInfo.objectId, objectPtr) || !objectPtr.IsValid()){
 			return false;
@@ -272,7 +494,7 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 	}
 
 	if (!objectPtr.IsValid()){
-		objectPtr = CreateObject(typeId).PopInterfacePtr();
+		objectPtr.FromUnique(CreateObject(typeId));
 	}
 
 	if (!objectPtr.IsValid()){

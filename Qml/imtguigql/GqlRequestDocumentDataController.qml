@@ -21,8 +21,11 @@ QtObject {
 	property string gqlAddCommandId: "";
 	property string gqlUpdateCommandId: "";
 
+	property string getPermissionPath: "";
+	property string addPermissionPath: "";
+	property string updatePermissionPath: "";
+
 	property string subscriptionCommandId;
-	property string context;
 
 	property var getRequestInputParam: Gql.GqlObject("input");
 	property var addRequestInputParam: Gql.GqlObject("input");
@@ -170,6 +173,15 @@ QtObject {
 		return {};
 	}
 
+	function __requestHeaders(permissionPath){
+		let headers = container.getHeaders()
+		if (headers && permissionPath){
+			headers["permissionPath"] = permissionPath
+		}
+
+		return headers
+	}
+
 	property SubscriptionClient subscriptionClient: SubscriptionClient {
 		onMessageReceived: {
 		}
@@ -185,9 +197,7 @@ QtObject {
 			query.AddField(queryFields);
 
 			var gqlData = query.GetQuery();
-			let headers = container.getHeaders()
-			if (headers && container.context && container.context != "")
-				headers["context"] = container.context
+			let headers = container.__requestHeaders(container.updatePermissionPath)
 
 			this.setGqlQuery(gqlData, headers);
 		}
@@ -246,9 +256,7 @@ QtObject {
 			query.AddParam(container.getRequestInputParam);
 
 			var gqlData = query.GetQuery();
-			let headers = container.getHeaders()
-			if (headers && container.context && container.context != "")
-				headers["context"] = container.context
+			let headers = container.__requestHeaders(container.getPermissionPath)
 
 			this.setGqlQuery(gqlData, headers);
 		}
@@ -295,9 +303,7 @@ QtObject {
 			query.AddField(queryFields);
 
 			var gqlData = query.GetQuery();
-			let headers = container.getHeaders()
-			if (headers && container.context && container.context != "")
-				headers["context"] = container.context
+			let headers = container.__requestHeaders(container.addPermissionPath)
 
 			this.setGqlQuery(gqlData, headers);
 		}

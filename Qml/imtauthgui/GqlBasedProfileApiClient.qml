@@ -28,11 +28,11 @@ import imtbaseImtCollectionSdl 1.0
 QtObject {
 	id: root
 
-	property string context: ""
+	property string permissionPath: ""
 
 	// Password policy for the profile's password section (imtauthgui owns no GQL).
 	property GqlBasedPasswordPolicyProvider passwordPolicy: GqlBasedPasswordPolicyProvider {
-		context: root.context
+		permissionPath: root.permissionPath
 	}
 
 	readonly property string __userId: AuthorizationController.userTokenProvider.userId
@@ -79,7 +79,7 @@ QtObject {
 	// =========================================================================
 
 	property GqlSdlRequestSender getProfileRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthProfileSdlCommandIds.s_getProfile
 		sdlObjectComp: Component {
 			ProfileData {
@@ -104,7 +104,7 @@ QtObject {
 
 	property SetProfileInput __setProfileInput: SetProfileInput {}
 	property GqlSdlRequestSender setProfileRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthProfileSdlCommandIds.s_setProfile
 		sdlObjectComp: Component {
 			SetProfileResponse {
@@ -143,7 +143,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender __organizationsRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 0
 		gqlCommandId: ImtauthProfileSdlCommandIds.s_getUserOrganizations
 		sdlObjectComp: Component {
@@ -195,7 +195,7 @@ QtObject {
 
 	property AcceptTenantInvitationInput __acceptInvitationInput: AcceptTenantInvitationInput {}
 	property GqlSdlRequestSender __acceptInvitationSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_acceptTenantInvitation
 		sdlObjectComp: Component {
@@ -217,7 +217,7 @@ QtObject {
 
 	property RejectTenantInvitationInput __rejectInvitationInput: RejectTenantInvitationInput {}
 	property GqlSdlRequestSender __rejectInvitationSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_rejectTenantInvitation
 		sdlObjectComp: Component {
@@ -255,7 +255,7 @@ QtObject {
 
 	property FindMembershipInput __findMembershipForLeaveInput: FindMembershipInput {}
 	property GqlSdlRequestSender __findMembershipForLeaveSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_findMembership
 		sdlObjectComp: Component {
 			FindMembershipPayload {
@@ -276,7 +276,7 @@ QtObject {
 
 	property RemoveMembershipInput __removeMembershipForLeaveInput: RemoveMembershipInput {}
 	property GqlSdlRequestSender __removeMembershipForLeaveSender: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		requestType: 1
 		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_removeMembership
 		sdlObjectComp: Component {
@@ -316,7 +316,7 @@ QtObject {
 	property UserIdInput __userIdInput: UserIdInput {}
 
 	property GqlSdlRequestSender __getTokenListRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_getTokenList
 		sdlObjectComp: Component {
 			PersonalAccessTokenList {
@@ -328,7 +328,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender __createTokenRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_createToken
 		requestType: 1
 		sdlObjectComp: Component {
@@ -346,7 +346,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender __deleteTokenRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_deleteToken
 		requestType: 1
 		sdlObjectComp: Component {
@@ -364,7 +364,7 @@ QtObject {
 	}
 
 	property GqlSdlRequestSender __revokeTokenRequest: GqlSdlRequestSender {
-		context: root.context
+		permissionPath: root.permissionPath
 		gqlCommandId: ImtauthPersonalAccessTokensSdlCommandIds.s_revokeToken
 		requestType: 1
 		sdlObjectComp: Component {

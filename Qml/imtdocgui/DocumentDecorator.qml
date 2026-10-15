@@ -42,8 +42,6 @@ QtObject {
 			representationController.representationUpdated.connect(onRepresentationUpdated)
 			representationController.startUpdateRepresentation.connect(onStartUpdateRepresentation)
 			representationController.updateDocumentFailed.connect(onUpdateDocumentFailed)
-			representationController.startUpdateDocument.connect(onStartUpdateDocument)
-			representationController.documentUpdated.connect(onDocumentUpdated)
 
 			// The failure signal does not say which representation failed, so it is bound to its view.
 			let registeredView = view
@@ -211,6 +209,9 @@ QtObject {
 			_internal.updateCounters[index] = 0
 			_internal.failedViews[index] = true
 			view.setBlockingUpdateModel(false)
+			if (typeof view.showContent === "function"){
+				view.showContent()
+			}
 		}
 
 		documentManager.updateRepresentationFailed(documentId, message)
@@ -221,53 +222,15 @@ QtObject {
 			return
 		}
 
-		_internal.pendingDocumentUpdates = Math.max(0, _internal.pendingDocumentUpdates - 1)
-		finishCommit(false)
-
 		documentManager.updateDocumentFailed(documentId, message)
 	}
 
-	function onStartUpdateDocument(documentId){
-		if (root.documentId !== documentId){
-			return
-		}
-
-		_internal.pendingDocumentUpdates = _internal.pendingDocumentUpdates + 1
-	}
-
-	function onDocumentUpdated(documentId){
-		if (root.documentId !== documentId){
-			return
-		}
-
-		_internal.pendingDocumentUpdates = Math.max(0, _internal.pendingDocumentUpdates - 1)
-		if (_internal.pendingDocumentUpdates === 0){
-			finishCommit(true)
-		}
-	}
-
-	// Writes the GUI state of the visible views to the document and calls back once the server
-	// has applied all sent updates: callback(true), or callback(false) if an update failed.
-	function commitChanges(callback){
+	// Writes the GUI state of the visible views to the document.
+	function commitChanges(){
 		for (let i = 0; i < registeredViews.length; ++i){
 			if (registeredViews[i].visible){
 				registeredViews[i].doUpdateModel()
 			}
-		}
-
-		if (_internal.pendingDocumentUpdates === 0){
-			callback(true)
-			return
-		}
-
-		_internal.commitCallbacks.push(callback)
-	}
-
-	function finishCommit(committed){
-		let callbacks = _internal.commitCallbacks
-		_internal.commitCallbacks = []
-		for (let i = 0; i < callbacks.length; ++i){
-			callbacks[i](committed)
 		}
 	}
 
@@ -345,8 +308,6 @@ QtObject {
 		representationController.startUpdateRepresentation.disconnect(onStartUpdateRepresentation)
 		representationController.updateRepresentationFailed.disconnect(connection.representationFailed)
 		representationController.updateDocumentFailed.disconnect(onUpdateDocumentFailed)
-		representationController.startUpdateDocument.disconnect(onStartUpdateDocument)
-		representationController.documentUpdated.disconnect(onDocumentUpdated)
 
 		registeredViews.splice(index, 1)
 		registeredRepresentation.splice(index, 1)
@@ -390,20 +351,8 @@ QtObject {
 			return
 		}
 
-		// A repeated Save while still waiting is the way out of an update that never reported back.
-		if (_internal.saveAfterUpdate){
-			_internal.pendingDocumentUpdates = 0
-			finishCommit(true)
-			return
-		}
-
-		_internal.saveAfterUpdate = true
-		commitChanges(function(committed){
-			_internal.saveAfterUpdate = false
-			if (committed){
-				doSave()
-			}
-		})
+		commitChanges()
+		doSave()
 	}
 
 	function doSave(){
@@ -506,8 +455,5 @@ QtObject {
 		property var failedViews: []
 		property var viewConnections: []
 		property var initiatingView: null
-		property int pendingDocumentUpdates: 0
-		property bool saveAfterUpdate: false
-		property var commitCallbacks: []
 	}
 }

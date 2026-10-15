@@ -458,7 +458,13 @@ class TestCase extends Item {
 
         // Qt enums are already DOM key strings (e.g. Qt.Key_Left === 'ArrowLeft')
         // Single-char strings like 'a', 'A' are passed through as-is
-        let domKey = String(key)
+        // Numeric Qt key codes of letters/digits (e.g. Qt.Key_A === 0x41) are converted to characters
+        // 'String' is shadowed by the QtQml String type in this module, use the global one
+        let domKey = globalThis.String(key)
+        if(typeof key === 'number' && ((key >= 0x30 && key <= 0x39) || (key >= 0x41 && key <= 0x5a))){
+            domKey = globalThis.String.fromCharCode(key)
+            if(!(modifiers & QtEnums.ShiftModifier)) domKey = domKey.toLowerCase()
+        }
         let shiftKey = !!(modifiers & QtEnums.ShiftModifier)
         let ctrlKey  = !!(modifiers & QtEnums.ControlModifier)
         let altKey   = !!(modifiers & QtEnums.AltModifier)

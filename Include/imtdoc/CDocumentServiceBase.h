@@ -9,6 +9,7 @@
 // Qt includes
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
+#include <QtCore/QObject>
 #include <QtCore/QPointer>
 #include <QtCore/QString>
 #include <QtCore/QThread>
@@ -71,6 +72,7 @@ namespace imtdoc
 	  \c IsSingleCopyMode — optional policy hooks.
 */
 class CDocumentServiceBase:
+			public QObject,
 			protected imod::TMultiModelObserverBase<istd::IChangeable>,
 			public imtdoc::IDocumentService
 {

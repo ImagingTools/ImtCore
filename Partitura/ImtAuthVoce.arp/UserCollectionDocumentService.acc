@@ -25,6 +25,13 @@
         <Element Id="CachedUserGroupRepository" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="InvalidationModels" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CachedRoleRepository</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectCacheLimit" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="500"/>
                     </AttributeInfo>
@@ -272,7 +279,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>ViewUsers</Value>
-                                            <Value>ViewOrganizationMembers</Value>
+                                            <Value>/MemberManagement/ViewOrganizationMembers</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -309,7 +316,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>ChangeUser</Value>
-                                            <Value>ChangeOrganizationMember</Value>
+                                            <Value>/MemberManagement/EditOrganizationMember/ChangeOrganizationMember</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
