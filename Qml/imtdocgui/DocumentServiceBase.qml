@@ -30,6 +30,8 @@ QtObject {
 	signal startCloseDocument(string documentId)
 	signal documentClosed(string documentId)
 	signal closeDocumentFailed(string documentId, string message)
+	// The server no longer has the document; emitted right before documentClosed().
+	signal documentLost(string documentId, string documentName)
 
 	signal startSaveDocument(string documentId)
 	signal saveDocumentFailed(string documentId, string message)
@@ -342,16 +344,14 @@ QtObject {
 		}
 	}
 
-	// callback(true) once the GUI changes of the document views are applied on the server,
-	// callback(false) if an update failed.
-	function commitDocumentChanges(documentId, callback){
+	// Writes the GUI state of the document views to the document.
+	function commitDocumentChanges(documentId){
 		let index = getDocumentIndexByDocumentId(documentId)
 		if (index < 0){
-			callback(true)
 			return
 		}
 
-		__internal.openedDocuments[index].documentDecorator.commitChanges(callback)
+		__internal.openedDocuments[index].documentDecorator.commitChanges()
 	}
 
 	function setDocumentObjectId(documentId, objectId){
@@ -670,6 +670,16 @@ QtObject {
 		}
 	}
 
+	// Closed in another session or the server lost its documents, e.g. after a restart.
+	function handleDocumentLost(documentId){
+		if (!documentIsOpened(documentId)){
+			return
+		}
+
+		documentLost(documentId, getDocumentName(documentId))
+		documentClosed(documentId)
+	}
+
 	function handleCloseDocumentResult(documentId, status){
 		if (status === "Success"){
 			documentClosed(documentId)
@@ -777,6 +787,9 @@ QtObject {
 
 					let viewIndex = documentDecorator.registeredViews.length
 					let required = !isNew || representationController.requestRepresentationOnCreate
+					if ((required || isLoading) && typeof view.showSkeleton === "function"){
+						view.showSkeleton()
+					}
 					documentDecorator.registerView(view, representationController, required && !isLoading)
 					if (!required && !isLoading){
 						documentDecorator.releaseView(viewIndex)
