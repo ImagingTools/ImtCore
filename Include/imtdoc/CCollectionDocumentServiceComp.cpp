@@ -247,10 +247,6 @@ bool CCollectionDocumentServiceComp::DocumentMapFromJson(const QJsonObject& root
 	documentMap.clear();
 
 	const QJsonValue usersValue = rootObject.value(s_usersKey);
-	if (usersValue.isUndefined()){
-		return true;
-	}
-
 	if (!usersValue.isArray()){
 		return false;
 	}
@@ -262,13 +258,17 @@ bool CCollectionDocumentServiceComp::DocumentMapFromJson(const QJsonObject& root
 		}
 
 		const QJsonObject userObject = userValue.toObject();
+		if (!userObject.contains(s_userIdKey) || !userObject.contains(s_documentsKey)){
+			return false;
+		}
+
 		const QByteArray userId = userObject.value(s_userIdKey).toString().toUtf8();
 		if (userId.isEmpty()){
 			return false;
 		}
 
 		const QJsonValue documentsValue = userObject.value(s_documentsKey);
-		if (!documentsValue.isUndefined() && !documentsValue.isArray()){
+		if (!documentsValue.isArray()){
 			return false;
 		}
 
@@ -281,6 +281,14 @@ bool CCollectionDocumentServiceComp::DocumentMapFromJson(const QJsonObject& root
 			}
 
 			const QJsonObject documentObject = documentValue.toObject();
+			if (!documentObject.contains(s_documentIdKey)
+						|| !documentObject.contains(s_objectIdKey)
+						|| !documentObject.contains(s_typeIdKey)
+						|| !documentObject.contains(s_urlKey)
+						|| !documentObject.contains(s_nameKey)
+						|| !documentObject.contains(s_singleDocumentInstanceKey)){
+				return false;
+			}
 
 			DocumentInfo documentInfo;
 			documentInfo.documentId = documentObject.value(s_documentIdKey).toString().toUtf8();
