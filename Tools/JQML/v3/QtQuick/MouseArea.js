@@ -66,6 +66,10 @@ class MouseArea extends Item {
         })
     }
 
+    __acceptsHover(){
+        return this.hoverEnabled && this.enabled && this.visible
+    }
+
     __onMouseCanceled(mouse){
         if(!this.enabled || !this.visible) return
 
