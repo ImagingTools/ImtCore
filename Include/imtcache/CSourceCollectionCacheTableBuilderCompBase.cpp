@@ -27,99 +27,6 @@ namespace imtcache
 {
 
 
-namespace
-{
-
-
-/// Selects the source rows changed after \a since, or all of them when \a since is not set.
-void FillChangedFilter(imtbase::CComplexCollectionFilter& filter, const QByteArray& modificationTimeField, const QDateTime& since)
-{
-	if (!since.isValid()){
-		return;
-	}
-
-	filter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter(
-				modificationTimeField,
-				since,
-				imtbase::IComplexCollectionFilter::FO_GREATER));
-}
-
-
-/// A remote source gets times as text: filter values of other types do not survive the trip.
-QString FormatSourceTime(const QDateTime& time)
-{
-	return time.toString(QStringLiteral("yyyy-MM-ddTHH:mm:ss.zzz"));
-}
-
-
-/// The source keeps UTC without a zone, so a time from it is UTC whatever it came back tagged as.
-QDateTime ToUtcWallClock(const QDateTime& time)
-{
-	return time.isValid() ? QDateTime(time.date(), time.time(), QTimeZone::utc()) : QDateTime();
-}
-
-
-/// The time the remote source row the iterator points at was last changed.
-QDateTime GetRemoteModificationTime(const imtbase::IObjectCollectionIterator& iterator)
-{
-	const idoc::MetaInfoPtr metaInfoPtr = iterator.GetCollectionMetaInfo();
-	if (!metaInfoPtr.IsValid()){
-		return QDateTime();
-	}
-
-	return ToUtcWallClock(metaInfoPtr->GetMetaInfo(imtbase::ICollectionInfo::MIT_LAST_OPERATION_TIME).toDateTime());
-}
-
-
-/// Orders by modification time, then id, so that every row has one place in the sequence.
-void FillPageSorting(imtbase::CComplexCollectionFilter& filter, const QByteArray& modificationTimeField, const QByteArray& idField)
-{
-	imtbase::IComplexCollectionFilter::FieldMetaInfo sortInfo;
-	sortInfo.flags = imtbase::IComplexCollectionFilter::SO_SORT;
-	sortInfo.sortingOrder = imtbase::IComplexCollectionFilter::SO_ASC;
-
-	filter.SetFields({
-			imtbase::IComplexCollectionFilter::FieldInfo(modificationTimeField, sortInfo),
-			imtbase::IComplexCollectionFilter::FieldInfo(idField, sortInfo)});
-}
-
-
-/// Selects the rows after the cursor: changed later than its time, or at its time with a greater id.
-void FillAfterCursorFilter(
-			imtbase::CComplexCollectionFilter& filter,
-			const QByteArray& modificationTimeField,
-			const QByteArray& idField,
-			const QString& cursorTime,
-			const QByteArray& cursorId)
-{
-	using Filter = imtbase::IComplexCollectionFilter;
-
-	if (cursorTime.isEmpty()){
-		return;
-	}
-
-	const Filter::FieldFilter later(modificationTimeField, cursorTime, Filter::FO_GREATER);
-	if (cursorId.isEmpty()){
-		filter.AddFieldFilter(later);
-
-		return;
-	}
-
-	Filter::FilterExpression sameTime;
-	sameTime.fieldFilters << Filter::FieldFilter(modificationTimeField, cursorTime, Filter::FO_EQUAL);
-	sameTime.fieldFilters << Filter::FieldFilter(idField, QString::fromUtf8(cursorId), Filter::FO_GREATER);
-
-	Filter::FilterExpression expression;
-	expression.logicalOperation = Filter::LO_OR;
-	expression.fieldFilters << later;
-	expression.filterExpressions << sameTime;
-
-	filter.SetFilterExpression(expression);
-}
-
-} // anonymous namespace
-
-
 // protected methods
 
 const imtbase::IObjectCollection* CSourceCollectionCacheTableBuilderCompBase::GetSourceCollection() const
@@ -167,7 +74,7 @@ bool CSourceCollectionCacheTableBuilderCompBase::LoadLocalRows(
 	iprm::CParamsSet changedParams;
 	const iprm::IParamsSet* filterParamsPtr = nullptr;
 	if (since.isValid()){
-		FillChangedFilter(changedFilter, *m_modificationTimeFieldAttrPtr, since);
+		FillChangedFilter(changedFilter, since);
 		changedParams.SetEditableParameter(QByteArrayLiteral("ComplexFilter"), &changedFilter);
 		filterParamsPtr = &changedParams;
 	}
@@ -222,7 +129,7 @@ bool CSourceCollectionCacheTableBuilderCompBase::LoadRemoteRows(
 	iprm::CParamsSet countParams;
 	const iprm::IParamsSet* countParamsPtr = nullptr;
 	if (since.isValid()){
-		FillAfterCursorFilter(countFilter, *m_modificationTimeFieldAttrPtr, *m_sourceIdFieldAttrPtr, FormatSourceTime(since), QByteArray());
+		FillAfterCursorFilter(countFilter, since.toString(Qt::ISODateWithMs), QByteArray());
 		countParams.SetEditableParameter(QByteArrayLiteral("ComplexFilter"), &countFilter);
 		countParamsPtr = &countParams;
 	}
@@ -289,6 +196,76 @@ bool CSourceCollectionCacheTableBuilderCompBase::AppendRow(
 }
 
 
+void CSourceCollectionCacheTableBuilderCompBase::FillChangedFilter(imtbase::CComplexCollectionFilter& filter, const QDateTime& since) const
+{
+	if (!since.isValid()){
+		return;
+	}
+
+	filter.AddFieldFilter(imtbase::IComplexCollectionFilter::FieldFilter(
+				*m_modificationTimeFieldAttrPtr,
+				since.toString(Qt::ISODateWithMs),
+				imtbase::IComplexCollectionFilter::FO_GREATER));
+}
+
+
+void CSourceCollectionCacheTableBuilderCompBase::FillPageSorting(imtbase::CComplexCollectionFilter& filter) const
+{
+	imtbase::IComplexCollectionFilter::FieldMetaInfo sortInfo;
+	sortInfo.flags = imtbase::IComplexCollectionFilter::SO_SORT;
+	sortInfo.sortingOrder = imtbase::IComplexCollectionFilter::SO_ASC;
+
+	filter.SetFields({
+			imtbase::IComplexCollectionFilter::FieldInfo(*m_modificationTimeFieldAttrPtr, sortInfo),
+			imtbase::IComplexCollectionFilter::FieldInfo(*m_sourceIdFieldAttrPtr, sortInfo)});
+}
+
+
+void CSourceCollectionCacheTableBuilderCompBase::FillAfterCursorFilter(
+			imtbase::CComplexCollectionFilter& filter,
+			const QString& cursorTime,
+			const QByteArray& cursorId) const
+{
+	using Filter = imtbase::IComplexCollectionFilter;
+
+	if (cursorTime.isEmpty()){
+		return;
+	}
+
+	const Filter::FieldFilter later(*m_modificationTimeFieldAttrPtr, cursorTime, Filter::FO_GREATER);
+	if (cursorId.isEmpty()){
+		filter.AddFieldFilter(later);
+
+		return;
+	}
+
+	Filter::FilterExpression sameTime;
+	sameTime.fieldFilters << Filter::FieldFilter(*m_modificationTimeFieldAttrPtr, cursorTime, Filter::FO_EQUAL);
+	sameTime.fieldFilters << Filter::FieldFilter(*m_sourceIdFieldAttrPtr, QString::fromUtf8(cursorId), Filter::FO_GREATER);
+
+	Filter::FilterExpression expression;
+	expression.logicalOperation = Filter::LO_OR;
+	expression.fieldFilters << later;
+	expression.filterExpressions << sameTime;
+
+	filter.SetFilterExpression(expression);
+}
+
+
+QDateTime CSourceCollectionCacheTableBuilderCompBase::GetRemoteModificationTime(const imtbase::IObjectCollectionIterator& iterator)
+{
+	const idoc::MetaInfoPtr metaInfoPtr = iterator.GetCollectionMetaInfo();
+	if (!metaInfoPtr.IsValid()){
+		return QDateTime();
+	}
+
+	const QDateTime time = metaInfoPtr->GetMetaInfo(imtbase::ICollectionInfo::MIT_LAST_OPERATION_TIME).toDateTime();
+
+	// The source keeps UTC without a zone, so the time is UTC whatever it came back tagged as.
+	return time.isValid() ? QDateTime(time.date(), time.time(), QTimeZone::utc()) : QDateTime();
+}
+
+
 bool CSourceCollectionCacheTableBuilderCompBase::ReadRemoteRows(
 			const QDateTime& since,
 			bool disabledOnly,
@@ -300,13 +277,13 @@ bool CSourceCollectionCacheTableBuilderCompBase::ReadRemoteRows(
 	imtcol::CDocumentCollectionFilter documentFilter;
 	documentFilter.AddDocumentState(imtcol::IDocumentCollectionFilter::DS_DISABLED);
 
-	QString cursorTime = since.isValid() ? FormatSourceTime(since) : QString();
+	QString cursorTime = since.isValid() ? since.toString(Qt::ISODateWithMs) : QString();
 	QByteArray cursorId;
 
 	for (;;){
 		imtbase::CComplexCollectionFilter pageFilter;
-		FillPageSorting(pageFilter, *m_modificationTimeFieldAttrPtr, *m_sourceIdFieldAttrPtr);
-		FillAfterCursorFilter(pageFilter, *m_modificationTimeFieldAttrPtr, *m_sourceIdFieldAttrPtr, cursorTime, cursorId);
+		FillPageSorting(pageFilter);
+		FillAfterCursorFilter(pageFilter, cursorTime, cursorId);
 
 		iprm::CParamsSet pageParams;
 		pageParams.SetEditableParameter(QByteArrayLiteral("ComplexFilter"), &pageFilter);
@@ -347,7 +324,7 @@ bool CSourceCollectionCacheTableBuilderCompBase::ReadRemoteRows(
 
 			onObject(*iteratorPtr, modificationTime);
 
-			cursorTime = FormatSourceTime(modificationTime);
+			cursorTime = modificationTime.toString(Qt::ISODateWithMs);
 			cursorId = iteratorPtr->GetObjectId();
 		}
 
@@ -423,7 +400,7 @@ bool CSourceCollectionCacheTableBuilderCompBase::RemoveRowsDeletedSince(
 	}
 
 	imtbase::CComplexCollectionFilter changedFilter;
-	FillChangedFilter(changedFilter, *m_modificationTimeFieldAttrPtr, lastSourceUpdateTime);
+	FillChangedFilter(changedFilter, lastSourceUpdateTime);
 
 	imtcol::CDocumentCollectionFilter documentFilter;
 	documentFilter.AddDocumentState(imtcol::IDocumentCollectionFilter::DS_DISABLED);

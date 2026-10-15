@@ -9,6 +9,7 @@
 #include <functional>
 
 // ImtCore includes
+#include <imtbase/CComplexCollectionFilter.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtcache/CCacheTableBuilderCompBase.h>
@@ -103,6 +104,18 @@ private:
 				bool disabledOnly,
 				const std::function<void(const imtbase::IObjectCollectionIterator&, const QDateTime&)>& onObject,
 				QString& errorMessage) const;
+
+	/// Selects the source rows changed after \a since, or all of them when \a since is not set.
+	void FillChangedFilter(imtbase::CComplexCollectionFilter& filter, const QDateTime& since) const;
+
+	/// Orders by modification time, then id, so that every row has one place in the sequence.
+	void FillPageSorting(imtbase::CComplexCollectionFilter& filter) const;
+
+	/// Selects the rows after the cursor: changed later than its time, or at its time with a greater id. Times are ISO text.
+	void FillAfterCursorFilter(imtbase::CComplexCollectionFilter& filter, const QString& cursorTime, const QByteArray& cursorId) const;
+
+	/// The time the remote source row the iterator points at was last changed, as UTC. Invalid when it has none.
+	static QDateTime GetRemoteModificationTime(const imtbase::IObjectCollectionIterator& iterator);
 
 	/// Finds removals as sources soft-deleted after \a lastSourceUpdateTime. Needs deletion to change the modification time.
 	bool RemoveRowsDeletedSince(
