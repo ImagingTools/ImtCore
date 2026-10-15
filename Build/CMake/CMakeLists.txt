@@ -199,7 +199,7 @@ if(NOT IMT_BUILD_TOOLS_ONLY)
 	add_subdirectory("${INCLUDE_DIR}/imtzip/CMake"			"${AUX_INCLUDE_DIR}/imtzip")
 
 	add_subdirectory("${INCLUDE_DIR}/imtclientgql/CMake" "${AUX_INCLUDE_DIR}/imtclientgql")
-	add_dependencies(imtclientgql imtbasesdl)
+	add_dependencies(imtclientgql imtbasesdl imtappsdl)
 
 	add_subdirectory("${INCLUDE_DIR}/imtcol/CMake" "${AUX_INCLUDE_DIR}/imtcol")
 	add_dependencies(imtcol imtbasesdl)
