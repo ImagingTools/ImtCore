@@ -32,6 +32,7 @@ namespace imtclientgql
 	Any answer of the server counts as connected, also a GraphQL error. Network errors and timeouts count as disconnected.
 	The server version from the answer is provided by the \c ServerVersion sub-element.
 	The status is reset and the check is repeated immediately when the server connection settings change.
+	A change of the \c RelatedConnectionStatus, e.g. the WebSocket connection to the same server, repeats the check immediately and keeps the last status until the answer.
 
 	The \c AsyncClient must have a finite timeout, otherwise a server that never answers keeps the last status.
 */
@@ -55,6 +56,8 @@ public:
 		I_ASSIGN(m_asyncClientCompPtr, "AsyncClient", "Asynchronous GraphQL client used to send the heartbeat, it must have a finite timeout", true, "AsyncClient");
 		I_ASSIGN(m_serverConnectionCompPtr, "ServerConnectionInterface", "Server connection settings used by the client, the check restarts when they change", false, "ServerConnectionInterface");
 		I_ASSIGN_TO(m_serverConnectionModelCompPtr, m_serverConnectionCompPtr, false);
+		I_ASSIGN(m_relatedConnectionStatusCompPtr, "RelatedConnectionStatus", "Status of another connection to the same server, e.g. the WebSocket, each change sends a heartbeat at once", false, "RelatedConnectionStatus");
+		I_ASSIGN_TO(m_relatedConnectionStatusModelCompPtr, m_relatedConnectionStatusCompPtr, false);
 		I_ASSIGN(m_retryIntervalAttrPtr, "RetryInterval", "Seconds until the next heartbeat while the server is not reachable", true, 5.0);
 		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "Seconds until the next heartbeat while the server is reachable, 0 sends heartbeats only on settings changes", true, 30.0);
 	I_END_COMPONENT;
@@ -71,6 +74,12 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 private:
+	enum ModelId
+	{
+		MI_SERVER_CONNECTION = 0,
+		MI_RELATED_CONNECTION_STATUS
+	};
+
 	void SendHeartbeat();
 	void OnHeartbeatFinished(int heartbeatId, const GqlModelResult<sdl::V1_0::imtapp::CApplicationInfo>& result);
 	void SetStatus(ConnectionStatus status, const QString& serverVersion);
@@ -86,6 +95,8 @@ private:
 	I_REF(IAsyncGqlClient, m_asyncClientCompPtr);
 	I_REF(imtcom::IServerConnectionInterface, m_serverConnectionCompPtr);
 	I_REF(imod::IModel, m_serverConnectionModelCompPtr);
+	I_REF(imtcom::IConnectionStatusProvider, m_relatedConnectionStatusCompPtr);
+	I_REF(imod::IModel, m_relatedConnectionStatusModelCompPtr);
 	I_ATTR(double, m_retryIntervalAttrPtr);
 	I_ATTR(double, m_checkIntervalAttrPtr);
 
@@ -93,7 +104,7 @@ private:
 	imod::TModelWrap<iprm::CTextParam> m_serverVersion;
 	QTimer m_timer;
 
-	// Replies of heartbeats sent before the last settings change are ignored
+	// Only the reply to the last heartbeat sent is used, older replies are ignored
 	int m_lastHeartbeatId = 0;
 };
 
