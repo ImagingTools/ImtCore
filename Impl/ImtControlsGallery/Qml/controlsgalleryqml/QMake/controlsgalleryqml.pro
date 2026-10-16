@@ -20,3 +20,4 @@ DESTDIR = $$OUT_PWD/../../../../Lib/$$COMPILER_DIR
 include($(IMTCOREDIR)/Config/QMake/ImtCore.pri)
 
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
+RESOURCES += $$(IMTCOREDIR)/3rdParty/EjQml/qml/EjEditor/EjEditor.qrc

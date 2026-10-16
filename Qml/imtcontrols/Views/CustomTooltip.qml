@@ -35,6 +35,7 @@ ControlBase {
     property string borderColor: Style.borderColor;
 
     property bool openST: false;
+    property var _leaveHandle: null;
     property int waitingDuration: delay;
     property int delay: 500;
     property int timeout: -1;
@@ -70,6 +71,16 @@ ControlBase {
         }
 
         customTooltip.openST = true;
+        customTooltip._watchPointerLeave();
+    }
+
+    // Close the tooltip when the pointer leaves the browser window (the web
+    // runtime sends no `exited` to the owner in that case).
+    function _watchPointerLeave(){
+        PointerLeaveWatcher.unwatch(customTooltip._leaveHandle);
+        customTooltip._leaveHandle = PointerLeaveWatcher.watch(function(){
+            customTooltip.closeTooltip();
+        });
     }
 
     function openTooltip(xX, yY){
@@ -105,6 +116,9 @@ ControlBase {
     }
 
     function closeTooltip(){
+        PointerLeaveWatcher.unwatch(customTooltip._leaveHandle);
+        customTooltip._leaveHandle = null;
+
         if(customTooltip.openST){
             ModalDialogManager.closeByComp(customTooltip.tooltipContentComp);
 

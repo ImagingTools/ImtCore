@@ -1983,7 +1983,10 @@ function qmlweb_jsparse(source) {
 
     switch (item[0]) {
       case "var":
-        obj.exports.push(item[1][0][0]);
+        // `var a = 1, b = 2` declares several names in one statement
+        for (var j = 0 ; j < item[1].length ; ++j) {
+          obj.exports.push(item[1][j][0]);
+        }
         break ;
       case "defun":
         obj.exports.push(item[1]);

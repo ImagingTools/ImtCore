@@ -122,7 +122,7 @@ ControlBase {
 			}
 		}
 
-		onPositionChanged: {
+		onPositionChanged: (mouse) => {
 			if (baseButton){
 				baseButton.positionChanged(mouse.x, mouse.y);
 			}

@@ -2376,6 +2376,8 @@ function compile(options){
             this.version = version
             this.moduleName = moduleName
             let data = fs.readFileSync(fileName, { encoding: 'utf8', flag: 'r' })
+            // Qt-only `.pragma library` directive: not valid JS once the file is inlined
+            data = data.replace(/^[ \t]*\.pragma[^\r\n]*/gm, '')
 
             parser.parse.nowParsingFile = fileName
 

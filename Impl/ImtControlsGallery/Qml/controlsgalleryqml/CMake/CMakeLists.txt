@@ -3,6 +3,10 @@ project(controlsgalleryqml LANGUAGES CXX)
 include(${IMTCOREDIR}/Config/CMake/WebCompiler.cmake)
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 
+# EjEditor QML module (3rdParty/EjQml) is registered from its own .qrc, which lives next to the sources
+acf_wrap_resources(EJEDITOR_RESOURCES "${IMTCOREDIR}/3rdParty/EjQml/qml/EjEditor/EjEditor.qrc")
+target_sources(${PROJECT_NAME} PRIVATE ${EJEDITOR_RESOURCES})
+
 if(QT_VERSION_MAJOR EQUAL 6)
 	target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core5Compat)
 endif()

@@ -43,6 +43,8 @@ ControlBase {
     signal editingFinished();
 
     onDecoratorChanged: {
+        if (!decorator_) return;
+
         bindText.target = decorator_
 
         if(decorator_.z < 0){
