@@ -139,28 +139,78 @@ Rectangle {
 		alwaysVisible: false;
 	}
 	
+	// Skeleton in the panel's own layout: a name over its value, row after row.
 	Rectangle {
-		anchors.top: parent.top;
-		anchors.bottom: parent.bottom;
-		anchors.left: parent.left;
-		anchors.leftMargin: Style.marginS;
-		anchors.right: parent.right;
-		anchors.rightMargin: Style.marginS;
-		color: parent.color;
-		visible: loading.visible;
-	}
-	
-	Loading {
 		id: loading;
-		anchors.top: parent.top;
-		anchors.left: parent.left;
-		anchors.leftMargin: Style.marginS;
-		anchors.right: parent.right;
-		anchors.rightMargin: Style.marginS;
-		height: Style.sizeHintXXS;
-		indicatorSize: Style.controlHeightS;
-		background.color: container.color;
+
+		property int phase: 0
+
+		anchors.fill: parent;
+		color: container.color;
 		visible: false;
+
+		// Shown only when the answer is slow; a quick one would just flash the skeleton.
+		function start(){
+			loading.phase = 0;
+			showDelayTimer.restart();
+		}
+
+		function stop(){
+			showDelayTimer.stop();
+			loading.visible = false;
+		}
+
+		Timer {
+			id: showDelayTimer;
+			interval: 300;
+			repeat: false;
+
+			onTriggered: {
+				loading.visible = true;
+			}
+		}
+
+		Timer {
+			interval: 80;
+			repeat: true;
+			running: loading.visible;
+
+			onTriggered: {
+				loading.phase = (loading.phase + 1) % 16;
+			}
+		}
+
+		Column {
+			id: skeletonColumn;
+
+			anchors.top: parent.top;
+			anchors.topMargin: Style.marginM;
+			anchors.left: parent.left;
+			anchors.leftMargin: Style.marginM;
+			anchors.right: parent.right;
+			anchors.rightMargin: Style.marginM;
+			spacing: Style.spacingL;
+			opacity: 0.45 + 0.55 * (loading.phase < 8 ? loading.phase / 8 : (16 - loading.phase) / 8);
+
+			Repeater {
+				model: 5;
+
+				delegate: Column {
+					width: skeletonColumn.width;
+					spacing: Style.spacingM;
+
+					SkeletonBlock {
+						width: skeletonColumn.width * (index % 2 === 0 ? 0.35 : 0.5);
+						height: Style.fontSizeM;
+					}
+
+					SkeletonBlock {
+						width: skeletonColumn.width * (index % 3 === 0 ? 0.8 : 0.6);
+						height: Style.iconSizeXS;
+					}
+				}
+			}
+		}
 	}
 }
 

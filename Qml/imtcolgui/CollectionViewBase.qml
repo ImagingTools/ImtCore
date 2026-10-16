@@ -594,7 +594,15 @@ ViewBase {
 		height: !visible ? 0 : Style.controlHeightM;
 		color: pagination_.color;
 		visible: collectionViewBaseContainer.hasPagination
-		
+
+		// Sets the paging footer apart from the rows, like a panel edge in VS Code.
+		Rectangle {
+			anchors.top: parent.top;
+			width: parent.width;
+			height: 1;
+			color: Style.borderColor;
+		}
+
 		Pagination {
 			id: pagination_;
 			anchors.horizontalCenter: parent.horizontalCenter;
@@ -613,14 +621,14 @@ ViewBase {
 		}
 	}
 
-	Loading {
+	// Covers the table only: the filters stay readable and usable while rows load.
+	SkeletonTableView {
 		id: loading_;
-		anchors.top: filterArea.top
+		anchors.top: backgroundTable.top
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.bottom: paginationObj.bottom
-		// baseColor is the Loading default and matches Agents/Services/Messages tables.
-		background.color: Style.baseColor
-		visible: false;
+		rowHeight: tableInternal.itemHeight
+		columnCount: tableInternal.columnCount > 0 ? Math.min(tableInternal.columnCount, 6) : 4
 	}
 }

@@ -10,7 +10,8 @@ Rectangle {
 	property int phase: 0
 
 	radius: Style.radiusS
-	color: Style.neutralSubtleColor
+	// The input border tone: visible on both themes while it pulses, still quieter than real text.
+	color: Style.inputBorderColor
 	opacity: skeletonBlock.animated ? 0.45 + 0.55 * (skeletonBlock.phase < 8 ? skeletonBlock.phase / 8 : (16 - skeletonBlock.phase) / 8) : 1
 
 	Timer {

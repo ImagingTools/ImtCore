@@ -13,9 +13,9 @@ Rectangle {
 	// its own result back into list.width - once the strip measured nothing it stayed
 	// at nothing until a resize re-applied the anchors.
 	implicitWidth: list.width + externButtons.width;
-	height: visible ? Style.controlHeightL : 0;
+	height: visible ? Style.controlHeightM + Style.spacingXXS : 0;
 	
-	color: Style.baseColor;
+	color: Style.tabPanelBackgroundColor;
 
 	property int selectedIndex: 0;
 	property int count: 0;
@@ -57,21 +57,11 @@ Rectangle {
 		viewTabInListView(selectedIndex);
 	}
 	
-	// Separates the strip from the page below it.
-	Rectangle {
-		anchors.left: parent.left;
-		anchors.right: parent.right;
-		anchors.bottom: parent.bottom;
-		height: 1;
-		color: Style.borderColor;
-	}
-
 	ListView {
 		id: list;
 		
 		anchors.left: parent.left;
-		anchors.leftMargin: Style.spacingXS;
-		width: Math.max(0, Math.min(contentWidth, tabPanelContainer.maxWidth - externButtons.width - Style.spacingXS))
+		width: Math.max(0, Math.min(contentWidth, tabPanelContainer.maxWidth - externButtons.width))
 
 		height: parent.height;
 
@@ -81,7 +71,7 @@ Rectangle {
 		boundsBehavior: Flickable.StopAtBounds;
 		interactive: false;
 
-		spacing: Style.spacingXS;
+		spacing: 0;
 		
 		onContentWidthChanged: {
 			tabPanelContainer.viewTabInListView(tabPanelContainer.selectedIndex);
@@ -170,7 +160,7 @@ Rectangle {
 						: ("../../../" + Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled));
 				decorator: Component {
 					ButtonDecorator {
-						color: parent.enabled && parent.hovered ? Style.alternateBaseColor : "transparent";
+						color: parent.enabled && parent.hovered ? Style.toolButtonHoverColor : "transparent";
 						radius: Style.radiusM;
 						border.width: 0;
 						icon.width: Style.iconSizeS;
@@ -196,7 +186,7 @@ Rectangle {
 						: ("../../../" + Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled));
 				decorator: Component {
 					ButtonDecorator {
-						color: parent.enabled && parent.hovered ? Style.alternateBaseColor : "transparent";
+						color: parent.enabled && parent.hovered ? Style.toolButtonHoverColor : "transparent";
 						radius: Style.radiusM;
 						border.width: 0;
 						icon.width: Style.iconSizeS;

@@ -35,6 +35,24 @@ Column {
 
 	property bool updatingGui: false;
 
+	// Validation messages appear only once a field is edited or revealValidationErrors() is called (sign-up form).
+	property bool deferValidationErrors: false;
+
+	function revealValidationErrors(){
+		usernameInput_.revealError();
+		nameInput_.revealError();
+		mailInput_.revealError();
+		if (confirmPassword.visible){
+			confirmPassword.revealError();
+			passwordGroup.checkPassword();
+		}
+	}
+
+	function inputsAcceptable(){
+		return usernameInput_.acceptableInput && nameInput_.acceptableInput && mailInput_.acceptableInput
+				&& (!passwordInput_.visible || container.passwordAccepted());
+	}
+
 	function updateGui(){
 		if (!container.userData){
 			return
@@ -96,6 +114,7 @@ Column {
 			placeHolderText: qsTr("Enter the username");
 			readOnly: container.readOnly;
 			showErrorWhenInvalid: true;
+			deferErrorUntilEdited: container.deferValidationErrors;
 			errorText: qsTr("Please enter the username");
 			textInputValidator: notEmptyRegexp;
 
@@ -126,6 +145,7 @@ Column {
 			placeHolderText: qsTr("Enter the name");
 			readOnly: container.readOnly;
 			showErrorWhenInvalid: true;
+			deferErrorUntilEdited: container.deferValidationErrors;
 			errorText: qsTr("Please enter the name");
 			textInputValidator: notEmptyRegexp;
 
@@ -158,6 +178,7 @@ Column {
 			placeHolderText: qsTr("Enter the email");
 			readOnly: container.readOnly;
 			showErrorWhenInvalid: true;
+			deferErrorUntilEdited: container.deferValidationErrors;
 			errorText: qsTr("Please enter the email");
 			onEditingFinished: {
 				container.emitUpdateModel();
@@ -247,6 +268,12 @@ Column {
 				return;
 			}
 
+			// A sign-up form does not call the passwords different before the confirmation was typed.
+			if (container.deferValidationErrors && confirmPassword.text === "" && !confirmPassword.errorRevealed){
+				confirmPassword.bottomComp = emptyComp;
+				return;
+			}
+
 			if (passwordInput_.text !== confirmPassword.text){
 				confirmPassword.bottomComp = errorComp;
 
@@ -297,6 +324,7 @@ Column {
 			readOnly: container.readOnly;
 			visible: passwordInput_.visible;
 			showErrorWhenInvalid: true;
+			deferErrorUntilEdited: container.deferValidationErrors;
 			errorText: qsTr("Please enter the password");
 			textInputValidator: notEmptyRegexp;
 			onEditingFinished: {

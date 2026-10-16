@@ -337,6 +337,7 @@ Item {
 			}
 			
 			function onHeadersReceived(headers){
+				internal.headersReceived = true
 				container.table.headers = headers
 
 				let filteringIds = []
@@ -407,6 +408,7 @@ Item {
 		QtObject {
 			id: internal;
 			property bool updateGuiRequired: false
+			property bool headersReceived: false
 		}
 		
 		Component.onCompleted: {
@@ -441,6 +443,11 @@ Item {
 		}
 
 		function doUpdateGui(){
+			// The headers reply loads the elements anyway; an earlier request would be thrown away.
+			if (root.loadingDataAfterHeadersReceived && !internal.headersReceived){
+				return
+			}
+
 			if (!root.backgroundUpdatesEnabled && !visible){
 				internal.updateGuiRequired = true
 				return

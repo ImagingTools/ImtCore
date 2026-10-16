@@ -157,22 +157,56 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAc
 
 sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAccountLockedResponse(
 			const QByteArray& login,
+			qint64 remainingLockoutSecs,
 			QString& errorMessage) const
 {
-	errorMessage = QT_TR_NOOP(QStringLiteral("Account is temporarily locked due to too many invalid access attempts. Login: '%1'").arg(login));
-	SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
+	// The user reads this message, so it says when to try again rather than only that the account is locked.
+	QString retryText;
+	if (remainingLockoutSecs < 0){
+		retryText = QStringLiteral("It stays locked until an administrator unlocks it.");
+	}
+	else if (remainingLockoutSecs < 60){
+		retryText = (remainingLockoutSecs <= 1) ? QStringLiteral("Try again in 1 second.") : QStringLiteral("Try again in %1 seconds.").arg(remainingLockoutSecs);
+	}
+	else{
+		qint64 minutes = (remainingLockoutSecs + 59) / 60;
+		if (minutes < 120){
+			retryText = (minutes == 1) ? QStringLiteral("Try again in 1 minute.") : QStringLiteral("Try again in %1 minutes.").arg(minutes);
+		}
+		else{
+			retryText = QStringLiteral("Try again in %1 hours.").arg((minutes + 59) / 60);
+		}
+	}
+
+	errorMessage = QStringLiteral("Too many invalid sign-in attempts. The account is locked. %1").arg(retryText);
+	SendErrorMessage(0, QStringLiteral("%1 Login: '%2'").arg(errorMessage, QString::fromUtf8(login)), "imtgql::CAuthorizationControllerComp");
 
 	return sdl::V1_0::imtauth::CAuthorizationPayload();
 }
 
 
-bool CAuthorizationControllerComp::IsAccountLocked(const QByteArray& login) const
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateFailedAttemptResponse(
+			const QByteArray& login,
+			QString& errorMessage) const
+{
+	RegisterAccessAttempt(login, false);
+
+	qint64 remainingLockoutSecs = 0;
+	if (IsAccountLocked(login, &remainingLockoutSecs)){
+		return CreateAccountLockedResponse(login, remainingLockoutSecs, errorMessage);
+	}
+
+	return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+}
+
+
+bool CAuthorizationControllerComp::IsAccountLocked(const QByteArray& login, qint64* remainingLockoutSecsPtr) const
 {
 	if (!m_accountLockoutControllerCompPtr.IsValid()){
 		return false;
 	}
 
-	return m_accountLockoutControllerCompPtr->IsAccountLocked(login);
+	return m_accountLockoutControllerCompPtr->IsAccountLocked(login, remainingLockoutSecsPtr);
 }
 
 
@@ -344,14 +378,14 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		password = inputArgument->password->toUtf8();
 	}
 
-	if (IsAccountLocked(login)){
-		return CreateAccountLockedResponse(login, errorMessage);
+	qint64 remainingLockoutSecs = 0;
+	if (IsAccountLocked(login, &remainingLockoutSecs)){
+		return CreateAccountLockedResponse(login, remainingLockoutSecs, errorMessage);
 	}
 
 	QByteArray userObjectId = GetUserObjectId(login);
 	if (userObjectId.isEmpty()){
-		RegisterAccessAttempt(login, false);
-		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage);
 	}
 
 	imtauth::CUserInfo* userInfoPtr = nullptr;
@@ -361,8 +395,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 	}
 
 	if (userInfoPtr == nullptr){
-		RegisterAccessAttempt(login, false);
-		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage);
 	}
 
 	QByteArray activeSystemId;
@@ -377,11 +410,11 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		}
 	}
 
-	RegisterAccessAttempt(login, ok);
-
 	if (!ok){
-		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage);
 	}
+
+	RegisterAccessAttempt(login, true);
 
 	// Checked after the credentials, so a wrong password cannot be used to probe account states.
 	if (!userInfoPtr->IsEnabled()){
@@ -423,14 +456,14 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 		password = inputArgument->password->toUtf8();
 	}
 
-	if (IsAccountLocked(login)){
-		return CreateAccountLockedResponse(login, errorMessage);
+	qint64 remainingLockoutSecs = 0;
+	if (IsAccountLocked(login, &remainingLockoutSecs)){
+		return CreateAccountLockedResponse(login, remainingLockoutSecs, errorMessage);
 	}
 
 	QByteArray userObjectId = GetUserObjectId(login);
 	if (userObjectId.isEmpty()){
-		RegisterAccessAttempt(login, false);
-		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage);
 	}
 
 	imtauth::CUserInfo* userInfoPtr = nullptr;
@@ -440,8 +473,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 	}
 
 	if (userInfoPtr == nullptr){
-		RegisterAccessAttempt(login, false);
-		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage);
 	}
 
 	QByteArray activeSystemId;
@@ -456,11 +488,11 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 		}
 	}
 
-	RegisterAccessAttempt(login, ok);
-
 	if (!ok){
-		return CreateInvalidLoginOrPasswordResponse(login, errorMessage);
+		return CreateFailedAttemptResponse(login, errorMessage);
 	}
+
+	RegisterAccessAttempt(login, true);
 
 	// Checked after the credentials, so a wrong password cannot be used to probe account states.
 	if (!userInfoPtr->IsEnabled()){

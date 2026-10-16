@@ -74,7 +74,7 @@ ElementView {
 		SearchAddressComp{
 			id: cb;
 
-			width: comboBoxAddressElementView.controlWidth;
+			width: comboBoxAddressElementView.fittedControlWidth;
 			height: comboBoxAddressElementView.controlHeight;
 			placeHolderText: qsTr("Address");
 

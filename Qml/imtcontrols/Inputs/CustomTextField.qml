@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0;
+import imtcontrols 1.0;
 
 FocusScope {
 	id: containerTextField;
@@ -50,6 +51,24 @@ FocusScope {
 	property int editingFinishedTimerInterval: 700;
 	
 	property real placeHolderOpacity: 1;
+
+	// A password field gets a button that shows what was typed; off where a view draws its own.
+	property bool passwordRevealEnabled: true;
+	// Stays true once the field has been a password field, so revealing it keeps the button.
+	property bool isPasswordField: false;
+	readonly property bool passwordRevealVisible: containerTextField.passwordRevealEnabled && containerTextField.isPasswordField && !containerTextField.readOnly;
+
+	Component.onCompleted: {
+		if (containerTextField.echoMode === TextInput.Password){
+			containerTextField.isPasswordField = true;
+		}
+	}
+
+	onEchoModeChanged: {
+		if (containerTextField.echoMode === TextInput.Password){
+			containerTextField.isPasswordField = true;
+		}
+	}
 	
 	signal accepted();
 	signal cancelled();
@@ -112,13 +131,13 @@ FocusScope {
 		
 		anchors.fill: parent;
 		
-		color: containerTextField.readOnly ? Style.alternateBaseColor : Style.baseColor;
-		
+		color: containerTextField.readOnly ? Style.alternateBaseColor : Style.inputBackgroundColor;
+
 		radius: containerTextField.radius;
-		
+
 		border.color: containerTextField.borderColorConst !== "" ?
 						  containerTextField.borderColorConst: textField.activeFocus ?
-							  containerTextField.borderColor : Style.borderColor;
+							  containerTextField.borderColor : Style.inputBorderColor;
 		
 		border.width: 1;
 	}
@@ -186,7 +205,7 @@ FocusScope {
 		
 		anchors.fill: parent;
 		anchors.leftMargin: containerTextField.textFieldLeftMargin;
-		anchors.rightMargin: containerTextField.textFieldRightMargin;
+		anchors.rightMargin: containerTextField.textFieldRightMargin + (containerTextField.passwordRevealVisible ? passwordRevealButton.width : 0);
 		
 		color: containerTextField.fontColor;
 		font.pixelSize: containerTextField.textSize;
@@ -244,6 +263,30 @@ FocusScope {
 		}
 	}
 	
+	ToolButton {
+		id: passwordRevealButton;
+		objectName: "ShowPasswordButton";
+
+		z: textField.z + 1;
+
+		anchors.right: parent.right;
+		anchors.rightMargin: Style.marginXXS;
+		anchors.verticalCenter: parent.verticalCenter;
+
+		width: Math.max(0, Math.min(containerTextField.height - 2 * Style.marginXXS, Style.buttonWidthL));
+		height: width;
+
+		visible: containerTextField.passwordRevealVisible;
+		tooltipText: containerTextField.echoMode === TextInput.Password ? qsTr("Show password") : qsTr("Hide password");
+		iconSource: containerTextField.echoMode === TextInput.Password
+					? "../../../" + Style.getIconPath("Icons/ShownPassword", Icon.State.On, Icon.Mode.Normal)
+					: "../../../" + Style.getIconPath("Icons/HiddenPassword", Icon.State.On, Icon.Mode.Normal);
+
+		onClicked: {
+			containerTextField.echoMode = containerTextField.echoMode === TextInput.Password ? TextInput.Normal : TextInput.Password;
+		}
+	}
+
 	Timer {
 		id: editingFinishedTimer;
 		interval: containerTextField.editingFinishedTimerInterval;

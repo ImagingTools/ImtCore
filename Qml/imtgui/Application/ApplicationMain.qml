@@ -99,19 +99,27 @@ Item {
 		
 		onTotalStatusChanged: {
 			if (totalStatus == status.TRY_CONNECTING_TO_AUTH_SERVER){
-				internal.errorMessage = qsTr("Try connecting to authorization server ...")
+				internal.errorMessage = qsTr("Connecting to the authorization server...")
+				internal.errorDescription = ""
+				internal.retryVisible = false
 				internal.loadingVisible = true
 			}
 			else if (totalStatus == status.AUTH_SERVER_CONNECTION_ERROR){
-				internal.errorMessage = qsTr("Authorization server connection error")
+				internal.errorMessage = qsTr("The authorization server is unavailable")
+				internal.errorDescription = qsTr("Sign-in, users and permissions come from the authorization server, so the application is paused until it is back. The open pages stay as they are; the server reconnects on its own.")
+				internal.retryVisible = false
 				internal.loadingVisible = false
 			}
 			else if (totalStatus == status.TRY_CONNECTING_TO_APP_SERVER){
-				internal.errorMessage = qsTr("Try connecting to ") + application.getServerUrl() + " ..."
+				internal.errorMessage = qsTr("Connecting to ") + application.getServerUrl() + " ..."
+				internal.errorDescription = ""
+				internal.retryVisible = false
 				internal.loadingVisible = true
 			}
 			else if (totalStatus == status.APP_SERVER_CONNECTION_ERROR){
-				internal.errorMessage = qsTr("Server connection error")
+				internal.errorMessage = qsTr("The connection to the server is lost")
+				internal.errorDescription = qsTr("The application is paused until the connection is back. The open pages stay as they are.")
+				internal.retryVisible = true
 				internal.loadingVisible = false
 				Events.sendEvent("ServerConnectionError");
 			}
@@ -147,6 +155,8 @@ Item {
 	QtObject {
 		id: internal
 		property string errorMessage: "";
+		property string errorDescription: "";
+		property bool retryVisible: false;
 		property bool loadingVisible: false;
 	}
 
@@ -531,9 +541,15 @@ Item {
 		ServerNoConnectionView {
 			z: 5;
 			anchors.fill: parent;
-			anchors.topMargin: thumbnailDecorator.topPanel.height;
+			anchors.topMargin: thumbnailDecorator.topPanel ? thumbnailDecorator.topPanel.height : 0;
 			loadingVisible: internal.loadingVisible;
 			text: internal.errorMessage;
+			description: internal.errorDescription;
+			retryVisible: internal.retryVisible;
+
+			onRetryClicked: {
+				application.reconnect();
+			}
 		}
 	}
 	

@@ -192,13 +192,14 @@ Item {
 																						"../../../../" + Style.getIconPath(element.m_elementItemPath, Icon.State.Off, Icon.Mode.Disabled);
 					decorator: Component {
 						TopButtonDecorator {
-							property string baseColor: !baseElement ? "transparent" : baseElement.checked ? Style.selectedColor : baseElement.mouseArea.containsMouse ? Style.alternateBaseColor : Style.baseColor
+							property string baseColor: !baseElement ? "transparent" : baseElement.checked ? Style.selectedColor : baseElement.mouseArea.containsMouse ? Style.toolButtonHoverColor : "transparent"
 							property string baseTextColor: !baseElement ? "transparent" : baseElement.enabled ? Style.textColor : Style.inactiveTextColor;
 							color: baseColor;
 							textColor: baseTextColor;
 							icon.source: baseElement.iconSource;
 							arrowIconAlias.source: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
-							border.width: baseElement.mouseArea.containsMouse;
+							border.width: 0;
+							radius: Style.buttonRadius;
 						}
 					}
 

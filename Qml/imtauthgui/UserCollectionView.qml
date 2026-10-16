@@ -101,11 +101,9 @@ RemoteCollectionView {
 		
 		TableCellDelegateBase {
 			id: cellDelegate
-			
-			height: Style.controlHeightS;
-			
+
 			clip: true;
-			
+
 			onReused: {
 				if (!rowDelegate){
 					return
@@ -132,9 +130,11 @@ RemoteCollectionView {
 			
 			Text {
 				id: name;
-				
+
 				anchors.verticalCenter: parent.verticalCenter;
-				
+				anchors.left: parent.left;
+				anchors.leftMargin: Style.marginM;
+
 				font.pixelSize: Style.fontSizeM;
 				font.family: Style.fontFamily;
 				color: Style.textColor;

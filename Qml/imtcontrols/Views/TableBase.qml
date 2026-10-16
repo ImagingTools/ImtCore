@@ -24,8 +24,9 @@ Rectangle {
 	property bool scrollbarVisible: true;
 	property bool showHeaders: true;
 
-	property bool enableAlternating: (Style.enableAlternating !== undefined && Style.enableAlternating !== null) ? Style.enableAlternating : false;
-	property color alternatingColor: Style.backgroundColor2;
+	// Tables stripe their rows faintly (VS Code keybindings table); Style.enableTableAlternating turns it off.
+	property bool enableAlternating: (Style.enableAlternating === true) || (Style.enableTableAlternating !== undefined ? Style.enableTableAlternating : false);
+	property color alternatingColor: Style.tableAlternateRowColor !== undefined ? Style.tableAlternateRowColor : Style.backgroundColor2;
 	property color alternatingCellColor: 'transparent';
 	property real alternatingOpacity: Style.alternatingOpacity ? Style.alternatingOpacity : 0.05;
 	property bool hoverEnabled: (Style.enableHoverEffect !== undefined && Style.enableHoverEffect !== null) ? Style.enableHoverEffect : true;
@@ -511,6 +512,19 @@ Rectangle {
 			}
 		}
 
+		// Called on every width, header, element and visibility change; widths that come out the same
+		// are not recomputed, or every cell and header would be resized again for nothing.
+		let widthSignature = tableWidth_ + "|" + tableContainer.isFlickable + "|" + tableContainer.minCellWidth + "|" + tableContainer.defaultColumnWidth + "|" + headersCount;
+		for (let k = 0; k < tableContainer.widthDecorator.getItemsCount(); k++){
+			widthSignature += "|" + getHeaderId(k) + ":" + tableContainer.widthDecorator.getData("Width", k) + ":" + tableContainer.widthDecorator.getData("WidthPercent", k);
+		}
+
+		if (widthSignature === tableContainer.lastWidthSignature && tableContainer.widthDecoratorDynamic.getItemsCount() > 0){
+			return;
+		}
+
+		tableContainer.lastWidthSignature = widthSignature;
+
 		tableContainer.widthDecoratorDynamic.clear();
 		tableContainer.widthDecoratorDynamic.copy(tableContainer.widthDecorator);
 
@@ -635,6 +649,32 @@ Rectangle {
 	}
 
 
+	// Rows fill their cells within a time slice per tick; the rest wait for the next tick,
+	// so a page of rows paints progressively instead of freezing until the last one is built.
+	property string lastWidthSignature: "";
+	property real rowFillSliceStart: 0;
+	property int rowFillSliceMs: 40;
+
+	function takeRowFillSlice(){
+		let now = Date.now();
+		if (tableContainer.rowFillSliceStart === 0){
+			tableContainer.rowFillSliceStart = now;
+			rowFillSliceTimer.restart();
+
+			return true;
+		}
+
+		return now - tableContainer.rowFillSliceStart < tableContainer.rowFillSliceMs;
+	}
+
+	Timer {
+		id: rowFillSliceTimer;
+		interval: 0;
+		onTriggered: {
+			tableContainer.rowFillSliceStart = 0;
+		}
+	}
+
 	PauseAnimation {
 		id: pauseWidth;
 		duration: 100;
@@ -755,10 +795,11 @@ Rectangle {
 			anchors.bottom: parent.bottom;
 
 			height: 1;
+			z: 2;
 
+			// Separates the column titles from the rows, as the header of a VS Code table does.
 			color: Style.borderColor;
-			opacity: 0.5;
-			visible: false;
+			visible: true;
 		}
 	}//headers
 
@@ -846,6 +887,15 @@ Rectangle {
 		onContentWidthChanged: {
 			if(tableContainer.isFlickable){
 				tableContainer.contentWidth = contentWidth;
+			}
+		}
+
+		// Columns are sized from this list's width, which also changes without the table's (the vertical
+		// scrollbar showing or hiding, anchors settling after the table resized). Rows sized to a stale width
+		// left a horizontal scrollbar that never went away.
+		onWidthChanged: {
+			if (tableContainer.visible){
+				tableContainer.setWidth();
 			}
 		}
 

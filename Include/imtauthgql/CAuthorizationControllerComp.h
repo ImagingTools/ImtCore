@@ -57,8 +57,17 @@ protected:
 		already verified - otherwise it would turn a login attempt into an account-state probe.
 	*/
 	sdl::V1_0::imtauth::CAuthorizationPayload CreateAccountDisabledResponse(const QByteArray& login) const;
-	sdl::V1_0::imtauth::CAuthorizationPayload CreateAccountLockedResponse(const QByteArray& login, QString& errorMessage) const;
-	bool IsAccountLocked(const QByteArray& login) const;
+	/**
+		Response for a locked account; the message tells how long the lock lasts.
+		param remainingLockoutSecs negative if the account stays locked until an administrator unlocks it.
+	*/
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateAccountLockedResponse(const QByteArray& login, qint64 remainingLockoutSecs, QString& errorMessage) const;
+	/**
+		Registers a failed attempt and answers it: the lock message when this attempt locked the account,
+		otherwise the invalid login or password message.
+	*/
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateFailedAttemptResponse(const QByteArray& login, QString& errorMessage) const;
+	bool IsAccountLocked(const QByteArray& login, qint64* remainingLockoutSecsPtr = nullptr) const;
 	void RegisterAccessAttempt(const QByteArray& login, bool successful) const;
 	sdl::V1_0::imtauth::CAuthorizationPayload CreateAuthorizationSuccessfulResponse(
 				imtauth::CUserInfo& userInfo,

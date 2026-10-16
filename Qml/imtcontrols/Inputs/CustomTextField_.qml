@@ -84,7 +84,7 @@ FocusScope {
 
         radius: containerTextField.radius;
 
-        border.color: containerTextField.borderColorConst !== "" ? containerTextField.borderColorConst: textField.activeFocus ? containerTextField.borderColor : Style.hover;
+        border.color: containerTextField.borderColorConst !== "" ? containerTextField.borderColorConst: textField.activeFocus ? containerTextField.borderColor : Style.inputBorderColor;
 
         border.width: 1;
     }

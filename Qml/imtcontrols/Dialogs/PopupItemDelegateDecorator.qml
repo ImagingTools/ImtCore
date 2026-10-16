@@ -9,11 +9,15 @@ ItemDelegateDecorator {
 	contentCentered: false;
 	contentLeftMargin: !root.baseElement ? Style.marginM : root.baseElement.contentLeftMargin;
 
+	// VS Code menus: the row under the pointer or keyboard takes the accent with light text; the current value keeps the list selection.
+	readonly property bool active: !root.baseElement ? false : (root.selected || root.baseElement.down) && root.baseElement.enabled && !root.isSeparator;
+
 	color: !baseElement ? "transparent" :
-						  baseElement.highlighted ? Style.selectedColor :
-													baseElement.down || baseElement.checked ?
-														Style.buttonPressedColor : root.selected ?
-															Style.buttonHoverColor : "transparent";
+						  root.active ? Style.buttonPrimaryColor :
+						  baseElement.highlighted || baseElement.checked ? Style.selectedColor : "transparent";
+	textColor: !baseElement ? Style.textColor :
+							  !baseElement.enabled ? Style.inactiveTextColor :
+							  root.active ? Style.buttonPrimaryTextColor : Style.textColor;
 	border.width: 0;
 
 	property bool isSeparator: !root.baseElement ? false : root.baseElement.isSeparator;

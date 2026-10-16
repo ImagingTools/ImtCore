@@ -78,7 +78,9 @@ Item {
 
 		MultiDocumentCollectionView {
 			documentManager: administrationContainer.apiClient.roleDocumentManager;
+			historyPath: "Administration/Roles";
 			contentColor: Style.baseColor;
+			pageIcon: "Icons/Role";
 
 			Component.onCompleted: {
 				setCollectionViewComp(qsTr("Roles"), roleListComp)
@@ -101,7 +103,9 @@ Item {
 
 		MultiDocumentCollectionView {
 			documentManager: administrationContainer.apiClient.userDocumentManager;
+			historyPath: "Administration/Users";
 			contentColor: Style.baseColor;
+			pageIcon: "Icons/Account";
 
 			Component.onCompleted: {
 				setCollectionViewComp(qsTr("Users"), userListComp)
@@ -124,7 +128,9 @@ Item {
 
 		MultiDocumentCollectionView {
 			documentManager: administrationContainer.apiClient.groupDocumentManager;
+			historyPath: "Administration/Groups";
 			contentColor: Style.baseColor;
+			pageIcon: "Icons/MultipleUser";
 
 			Component.onCompleted: {
 				setCollectionViewComp(qsTr("Groups"), userGroupListComp)
@@ -151,18 +157,38 @@ Item {
 		anchors.bottom: parent.bottom;
 
 		NavigableItem {
+			id: adminNavigation
 			parentSegment: "Administration"
 			paths: ["Roles", "Users", "Groups"]
-			onActivated: {
-				let index = paths.indexOf(matchedPath)
-				multiPageView.block = true
-				multiPageView.currentIndex = index
+			// The sub-page a path asked for, applied again when the page model is (re)built. Kept here and not on
+			// the page view: a path delivered while the page is being created arrives before the view sets its defaults.
+			property string requestedPageId: ""
+			// The bare "Administration" entry shows the first sub-page, as the page does when it opens.
+			onParentActivated: {
+				if (restPath.length > 0){
+					return
+				}
 
-				// Navigating to a document (e.g. from one editor to a role it shows) keeps the other editors open.
+				adminNavigation.requestedPageId = ""
+				multiPageView.block = true
+				multiPageView.currentIndex = 0
+				multiPageView.block = false
+			}
+			onActivated: {
+				// By id: sub-pages hidden by permissions shift the indexes. Remembered for a page whose model is not built yet.
+				adminNavigation.requestedPageId = matchedPath
+				let index = multiPageView.getIndexById(matchedPath)
+				multiPageView.block = true
+				if (index >= 0){
+					multiPageView.currentIndex = index
+				}
+
+				// A sub-page path lands on its list; open editors stay open (they used to be closed, losing unsaved edits).
 				if (restPath.length < 2){
-					administrationContainer.closeAllDocumentsForManager(administrationContainer.apiClient.roleDocumentManager)
-					administrationContainer.closeAllDocumentsForManager(administrationContainer.apiClient.userDocumentManager)
-					administrationContainer.closeAllDocumentsForManager(administrationContainer.apiClient.groupDocumentManager)
+					let subPage = multiPageView.getPageById(matchedPath)
+					if (subPage && subPage.setCurrentTabIndex){
+						subPage.setCurrentTabIndex(0)
+					}
 				}
 
 				if (restPath.length >= 2){
@@ -192,6 +218,7 @@ Item {
 			if (currentIndex >= 0 && multiPageView.pagesModel.count > currentIndex){
 				let pageId = multiPageView.pagesModel.get(currentIndex).id
 				if (!block){
+					adminNavigation.requestedPageId = pageId
 					NavigationController.push("Administration/" + pageId)
 				}
 			}
@@ -214,13 +241,17 @@ Item {
 		}
 
 		function updateModel(){
+			multiPageView.block = true;
 			multiPageView.clear();
 
 			addSubPage("Roles", qsTr("Roles"), roleCollectionComp, "Icons/Role")
 			addSubPage("Users", qsTr("Users"), userCollectionComp, "Icons/Account")
 			addSubPage("Groups", qsTr("Groups"), userGroupCollectionComp, "Icons/MultipleUser")
 
-			multiPageView.currentIndex = 0;
+			// The initial sub-page is part of opening the page, not a navigation of its own.
+			let requestedIndex = adminNavigation.requestedPageId !== "" ? multiPageView.getIndexById(adminNavigation.requestedPageId) : -1;
+			multiPageView.currentIndex = requestedIndex >= 0 ? requestedIndex : 0;
+			multiPageView.block = false;
 			administrationContainer.multiPageUpdated();
 		}
 	}
