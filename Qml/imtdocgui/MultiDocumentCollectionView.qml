@@ -15,6 +15,8 @@ Item {
 	property DocumentServiceBase documentManager
 	property string collectionTabId: ""
 	property color contentColor: Style.baseColor
+	// Icon of the page hosting this view; every tab carries it.
+	property string pageIcon: ""
 
 	property bool tabVisible: true
 
@@ -24,6 +26,12 @@ Item {
 	onCollectionViewChanged: {
 		if (collectionView){
 			navigableItem.parentSegment = collectionView.collectionId
+		}
+	}
+
+	onPageIconChanged: {
+		for (let i = 0; i < tabView.tabModel.count; i++){
+			tabView.tabModel.setProperty(i, "icon", workspaceView.pageIcon)
 		}
 	}
 
@@ -67,17 +75,55 @@ Item {
 			documentName = documentManager.getDefaultDocumentName()
 		}
 
-		let isDirty = documentManager.documentIsDirty(documentId)
-		if (isDirty){
-			tabView.setTabName(documentId, "* " + documentName)
-		}
-		else{
-			tabView.setTabName(documentId, documentName)
-		}
+		tabView.setTabName(documentId, documentName)
+		tabView.setTabDirty(documentId, documentManager.documentIsDirty(documentId))
 	}
 
 	function setCurrentTabIndex(index){
 		tabView.currentIndex = index
+	}
+
+	// A tab opens as soon as a document is requested; it is rekeyed to the document id the server assigns.
+	readonly property string openingTabPrefix: "opening:"
+	// Object ids whose placeholder tab was closed before the server answered; the document is closed on arrival.
+	property var cancelledOpenings: ({})
+	function isOpeningTab(tabId){
+		return tabId.indexOf(workspaceView.openingTabPrefix) === 0
+	}
+
+	function addOpeningTab(objectId){
+		let tabId = workspaceView.openingTabPrefix + objectId
+		let index = tabView.getIndexById(tabId)
+		if (index < 0){
+			tabView.addTab(tabId, "", stackViewComp, workspaceView.pageIcon, "", false)
+			tabView.setTabLoading(tabId, true)
+			index = tabView.tabModel.count - 1
+		}
+
+		tabView.currentIndex = index
+	}
+
+	function removeOpeningTabs(){
+		for (let i = tabView.tabModel.count - 1; i >= 0; i--){
+			let tabId = tabView.getTabIdByIndex(i)
+			if (workspaceView.isOpeningTab(tabId)){
+				tabView.removeTab(tabId)
+			}
+		}
+	}
+
+	function closeTab(tabId){
+		if (tabId === workspaceView.collectionTabId){
+			return
+		}
+
+		if (workspaceView.isOpeningTab(tabId)){
+			workspaceView.cancelledOpenings[tabId.slice(workspaceView.openingTabPrefix.length)] = true
+			tabView.removeTab(tabId)
+			return
+		}
+
+		workspaceView.documentManager.closeDocument(tabId)
 	}
 
 	// The opened-document list replays raw create/open signals, which bypass the service's "already open" check.
@@ -247,8 +293,10 @@ Item {
 		}
 
 		// Open document signals
+		// documentId is the object id here: the document id arrives with the answer.
 		function onStartOpenDocument(documentId, typeId){
 			workspaceView.startLoading(documentId)
+			workspaceView.addOpeningTab(documentId)
 		}
 
 		function onDocumentOpened(documentId, typeId){
@@ -256,7 +304,31 @@ Item {
 				return
 			}
 
-			tabView.addTab(documentId, "", stackViewComp, "", "", false)
+			let objectId = workspaceView.documentManager.getDocumentObjectId(documentId)
+			if (workspaceView.cancelledOpenings[objectId]){
+				delete workspaceView.cancelledOpenings[objectId]
+				workspaceView.documentManager.closeDocument(documentId)
+				return
+			}
+
+			let openingTabId = workspaceView.openingTabPrefix + objectId
+			let openingIndex = tabView.getIndexById(openingTabId)
+			if (openingIndex >= 0){
+				tabView.setTabId(openingTabId, documentId)
+				tabView.setTabLoading(documentId, workspaceView.documentManager.documentIsLoading(documentId))
+				tabView.currentIndex = openingIndex
+				workspaceView.updateTabName(documentId)
+
+				let openingItem = tabView.getTabById(documentId)
+				if (openingItem){
+					openingItem.initializeLater(documentId, typeId)
+				}
+
+				workspaceView.startLoading(documentId)
+				return
+			}
+
+			tabView.addTab(documentId, "", stackViewComp, workspaceView.pageIcon, "", false)
 			tabView.setTabLoading(documentId, workspaceView.documentManager.documentIsLoading(documentId))
 			tabView.currentIndex = tabView.tabModel.count - 1
 			workspaceView.updateTabName(documentId)
@@ -271,6 +343,7 @@ Item {
 		}
 
 		function onOpenDocumentFailed(documentId, message){
+			workspaceView.removeOpeningTabs()
 			tabView.setTabLoading(documentId, false)
 			workspaceView.stopLoading(documentId)
 			if(message !==""){
@@ -331,7 +404,7 @@ Item {
 				return
 			}
 
-			tabView.addTab(documentId, "", stackViewComp, "", "", false)
+			tabView.addTab(documentId, "", stackViewComp, workspaceView.pageIcon, "", false)
 			tabView.setTabLoading(documentId, workspaceView.documentManager.documentIsLoading(documentId))
 
 			tabView.currentIndex = tabView.tabModel.count - 1
@@ -395,7 +468,7 @@ Item {
 	function setCollectionViewComp(name, collectionViewComp){
 		let tabId = UuidGenerator.generateUUID()
 		workspaceView.collectionTabId = tabId
-		tabView.addTab(tabId, name, collectionViewComp, "", "", false, true)
+		tabView.addTab(tabId, name, collectionViewComp, workspaceView.pageIcon, "", false, true)
 		tabView.currentIndex = 0
 	}
 
@@ -419,10 +492,7 @@ Item {
 			itemWidth: Style.sizeHintXXS
 			onFinished: {
 				if (commandId === "Close"){
-					let tabId = tabView.getTabIdByIndex(tabView.currentIndex)
-					if (tabId !== workspaceView.collectionTabId){
-						workspaceView.documentManager.closeDocument(tabId)
-					}
+					workspaceView.closeTab(tabView.getTabIdByIndex(tabView.currentIndex))
 				}
 				else if (commandId === "CloseAll"){
 					workspaceView.closeAllDocuments()
@@ -461,8 +531,44 @@ Item {
 
 			property var itemViewTypes: ({}) // ViewTypeId -> Item
 			property var viewTypeIds: []
+			property bool initialized: false
+
+			function initializeLater(id, typeId){
+				documentId = id
+				documentTypeId = typeId
+				initTimer.start()
+			}
+
+			Timer {
+				id: initTimer
+				interval: 0
+				onTriggered: {
+					if (!stackView.initialized){
+						stackView.initialize(stackView.documentId, stackView.documentTypeId)
+					}
+				}
+			}
+
+			// Stands in for the editor until it is built.
+			SkeletonTableView {
+				id: openingSkeleton
+				z: 2
+				anchors.fill: parent
+				headerVisible: false
+				cardRows: true
+				rowSpacing: Style.marginS
+				contentMaxWidth: Style.sizeHintXXL
+				contentTopMargin: Style.marginXL
+				maxRows: 8
+				Component.onCompleted: {
+					openingSkeleton.start()
+				}
+			}
 
 			function initialize(id, typeId){
+				initialized = true
+				openingSkeleton.stop()
+
 				documentId = id
 				documentTypeId = typeId
 
@@ -568,7 +674,7 @@ Item {
 			Connections {
 				target: workspaceView
 				function onStartLoading(documentId){
-					if (documentId !== stackView.documentId || stackView.skeletonShown()){
+					if (documentId !== stackView.documentId || !stackView.initialized || stackView.skeletonShown()){
 						return
 					}
 
@@ -606,10 +712,10 @@ Item {
 			if (tabId === workspaceView.collectionTabId){
 				workspaceView.collectionView = tabItem
 			}
-			else{
-				// Stack View loaded
+			else if (!workspaceView.isOpeningTab(tabId)){
+				// The editor is built on the next tick, so the new tab and its skeleton paint first.
 				let typeId = workspaceView.documentManager.getDocumentTypeId(tabId)
-				tabItem.initialize(tabId, typeId)
+				tabItem.initializeLater(tabId, typeId)
 			}
 		}
 
@@ -628,11 +734,7 @@ Item {
 			if (index >= 0 && index < tabModel.count && tabModel.get(index).pinned){
 				return
 			}
-			let tabId = getTabIdByIndex(index)
-			if (tabId === workspaceView.collectionTabId){
-				return
-			}
-			workspaceView.documentManager.closeDocument(tabId)
+			workspaceView.closeTab(getTabIdByIndex(index))
 		}
 	}
 

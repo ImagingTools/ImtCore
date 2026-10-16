@@ -23,8 +23,9 @@ ControlBase {
 	property string uuid: ""
 	
 	property int itemWidth: Style.sizeHintXXS;
-	property int itemHeight: Style.controlHeightM;
-	property int radius: Style.radiusL;
+	// Compact rows and a small radius, as VS Code menus.
+	property int itemHeight: Style.controlHeightS + Style.spacingXS;
+	property int radius: Style.radiusM;
 	property int shownItemsCount: 5;
 	
 	property int textSize: Style.fontSizeM;

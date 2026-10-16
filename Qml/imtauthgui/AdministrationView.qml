@@ -79,6 +79,7 @@ Item {
 		MultiDocumentCollectionView {
 			documentManager: administrationContainer.apiClient.roleDocumentManager;
 			contentColor: Style.baseColor;
+			pageIcon: "Icons/Role";
 
 			Component.onCompleted: {
 				setCollectionViewComp(qsTr("Roles"), roleListComp)
@@ -102,6 +103,7 @@ Item {
 		MultiDocumentCollectionView {
 			documentManager: administrationContainer.apiClient.userDocumentManager;
 			contentColor: Style.baseColor;
+			pageIcon: "Icons/Account";
 
 			Component.onCompleted: {
 				setCollectionViewComp(qsTr("Users"), userListComp)
@@ -125,6 +127,7 @@ Item {
 		MultiDocumentCollectionView {
 			documentManager: administrationContainer.apiClient.groupDocumentManager;
 			contentColor: Style.baseColor;
+			pageIcon: "Icons/MultipleUser";
 
 			Component.onCompleted: {
 				setCollectionViewComp(qsTr("Groups"), userGroupListComp)

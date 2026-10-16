@@ -36,6 +36,74 @@ Row {
 		return contentComp;
 	}
 
+	// Fills every cell of the row in one pass, so the row is laid out once rather than once per cell.
+	// A table that has spent its time slice gets the row on a later tick, which lets the first rows paint.
+	function fillCells(){
+		if (!dataList.rowDelegate || !dataList.rowDelegate.tableItem){
+			return true;
+		}
+
+		let tableItem = dataList.rowDelegate.tableItem;
+		if (typeof tableItem.takeRowFillSlice === 'function' && !tableItem.takeRowFillSlice()){
+			fillTimer.start();
+			return false;
+		}
+
+		// Inline rather than a function per cell, and contentItem set last: every QML function call is
+		// its own update in the web runtime, so a cell resized inside one re-lays the row and the list out.
+		for (let i = 0; i < repeater.count; i++){
+			let cell = repeater.itemAt(i);
+			if (!cell || !cell.complCompl || cell.contentItem){
+				continue;
+			}
+
+			let contentComp = dataList.cellComponent(i);
+			if (!contentComp){
+				continue;
+			}
+
+			let obj = contentComp.createObject(cell);
+			obj.columnIndex = i;
+			obj.rowDelegate = dataList.rowDelegate;
+			if (typeof obj.setCellWidth === 'function'){
+				obj.setCellWidth();
+			}
+
+			cell.contentItem = obj;
+		}
+
+		return true;
+	}
+
+	// For a cell the Repeater does not list yet: added after the row was built, when the columns arrive late.
+	function fillCell(cell, index){
+		let contentComp = dataList.cellComponent(index);
+		if (!contentComp){
+			return;
+		}
+
+		let obj = contentComp.createObject(cell);
+		obj.columnIndex = index;
+		obj.rowDelegate = dataList.rowDelegate;
+		if (typeof obj.setCellWidth === 'function'){
+			obj.setCellWidth();
+		}
+
+		cell.contentItem = obj;
+	}
+
+	// Repeats until the row is filled: the web runtime stops a timer after its handler, which drops a restart() made inside it.
+	Timer {
+		id: fillTimer
+		interval: 0
+		repeat: true
+		onTriggered: {
+			if (dataList.fillCells()){
+				fillTimer.stop();
+			}
+		}
+	}
+
 	Component {
 		id: objectLinkDelegateComp
 		TextLinkCellDelegate {
@@ -86,17 +154,8 @@ Row {
 					return;
 				}
 
-				let contentComp = dataList.cellComponent(model.index);
-				if (!contentComp){
-					return;
-				}
-
-				let obj = contentComp.createObject(cell);
-				cell.contentItem = obj;
-				obj.columnIndex = model.index;
-				obj.rowDelegate = dataList.rowDelegate;
-				if (typeof obj.setCellWidth === 'function'){
-					obj.setCellWidth();
+				if (dataList.fillCells() && !cell.contentItem){
+					dataList.fillCell(cell, model.index);
 				}
 			}
 		}

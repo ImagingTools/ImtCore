@@ -240,64 +240,6 @@ Item {
 		}
 	}
 
-	//cornerPatches
-	Component{
-		id: leftTopCornerPatch;
-		Rectangle{
-			anchors.left: parent.left;
-			anchors.top: parent.top;
-			width: parent.width/2;
-			height: parent.height/2;
-			color: parent.color;
-			visible: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.tableItem.emptyDecorCell ? true :
-																											  delegateContainer.rowDelegate.cellDecorator.isValidData("LeftTopRound", delegateContainer.columnIndex) ?
-																												  !delegateContainer.rowDelegate.cellDecorator.getData("LeftTopRound", delegateContainer.columnIndex) :true : 0;
-		}
-	}
-
-	Component{
-		id: rightTopCornerPatch;
-		Rectangle{
-			anchors.right: parent.right;
-			anchors.top: parent.top;
-			width: parent.width/2;
-			height: parent.height/2;
-			color: parent.color;
-			visible: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.tableItem.emptyDecorCell ? true :
-																											  delegateContainer.rowDelegate.cellDecorator.isValidData("RightTopRound", delegateContainer.columnIndex) ?
-																												  !delegateContainer.rowDelegate.cellDecorator.getData("RightTopRound", delegateContainer.columnIndex) :true : 0;
-		}
-	}
-
-	Component{
-		id: leftBottomCornerPatch;
-		Rectangle{
-			anchors.left: parent.left;
-			anchors.bottom: parent.bottom;
-			width: parent.width/2;
-			height: parent.height/2;
-			color: parent.color;
-			visible: delegateContainer.rowDelegate ?
-						 delegateContainer.rowDelegate.tableItem.emptyDecorCell ? true :
-																				  delegateContainer.rowDelegate.cellDecorator.isValidData("LeftBottomRound", delegateContainer.columnIndex) ?
-																					  !delegateContainer.rowDelegate.cellDecorator.getData("LeftBottomRound", delegateContainer.columnIndex) :true : 0;
-		}
-	}
-
-	Component{
-		id: rightBottomCornerPatch;
-		Rectangle{
-			anchors.right:  parent.right;
-			anchors.bottom: parent.bottom;
-			width: parent.width/2;
-			height: parent.height/2;
-			color: parent.color;
-			visible: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.tableItem.emptyDecorCell ? true :
-																											  delegateContainer.rowDelegate.cellDecorator.isValidData("RightBottomRound", delegateContainer.columnIndex) ?
-																												  !delegateContainer.rowDelegate.cellDecorator.getData("RightBottomRound", delegateContainer.columnIndex) :true : 0;
-		}
-	}
-
 	function getValue(){
 		if (delegateContainer && delegateContainer.columnIndex >= 0){
 			if(delegateContainer.rowDelegate !== null && delegateContainer.rowDelegate.tableItem !==null && delegateContainer.rowDelegate.dataModel != null){

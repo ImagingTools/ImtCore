@@ -276,7 +276,7 @@ Item {
                         radius: Style.marginS
                         color: navDelegate.__isSelected
                             ? Style.selectedColor
-                            : navMouseArea.containsMouse ? Style.alternateBaseColor : "transparent"
+                            : navMouseArea.containsMouse ? Style.hover : "transparent"
 
                         Row {
                             anchors.fill: parent
@@ -305,8 +305,7 @@ Item {
                                 text: model.name
                                 font.family: Style.fontFamily
                                 font.pixelSize: navDelegate.__isSubpage ? Style.fontSizeS : Style.fontSizeM
-                                font.bold: navDelegate.__isSelected && !navDelegate.__isSubpage
-                                color: navDelegate.__isSelected ? Style.textSelectedColor : Style.textColor
+                                color: Style.textColor
                                 elide: Text.ElideRight
                                 width: parent.width - ((!navDelegate.__isSubpage && model.icon) ? Style.iconSizeS + parent.spacing : 0)
                                     - (navBadge.visible ? navBadge.width + parent.spacing : 0)

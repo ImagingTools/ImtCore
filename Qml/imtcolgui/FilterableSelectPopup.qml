@@ -56,7 +56,8 @@ PopupView {
 
 	// --- Visual ---
 	property int itemWidth: Style.sizeHintXXS
-	property int itemHeight: Style.controlHeightL
+	// Compact rows, as VS Code pickers.
+	property int itemHeight: Style.controlHeightS + Style.spacingXS
 	property int maxVisibleItems: 8
 	property int textSize: Style.fontSizeM
 	property string fontColor: Style.textColor
@@ -579,9 +580,9 @@ PopupView {
 
 		anchors.fill: parent
 		color: Style.baseColor
-		radius: Style.radiusL
+		radius: Style.radiusM
 		border.width: 1
-		border.color: Style.alternateBaseColor
+		border.color: Style.inputBorderColor
 		visible: !root.embedded
 	}
 
@@ -633,7 +634,7 @@ PopupView {
 				textSize: root.textSize
 				fontColor: root.fontColor
 				placeHolderText: root.filterPlaceholder
-				radius: Style.radiusL
+				radius: Style.textFieldRadius
 
 				onTextChanged: {
 					root.focusedIndex = -1
@@ -1027,7 +1028,7 @@ PopupView {
 
 		horizontalOffset: 3
 		verticalOffset: 3
-		radius: Style.radiusL
+		radius: Style.radiusM
 		color: Style.shadowColor
 		source: background
 	}

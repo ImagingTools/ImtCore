@@ -79,7 +79,9 @@ DecoratorBase {
         anchors.fill: parent;
 
         color: dialogContainer.baseElement.backgroundColor;
-        radius: Style.radiusL;
+        radius: Style.radiusM;
+        border.width: 1;
+        border.color: Style.borderColor;
     }
 
     DropShadow {
@@ -87,10 +89,10 @@ DecoratorBase {
 
         anchors.fill: background;
 
-        horizontalOffset: 2;
-        verticalOffset: 2;
+        horizontalOffset: 0;
+        verticalOffset: 4;
 
-        radius: background.radius;
+        radius: 16;
         color: Style.shadowColor;
 
         source: background;
@@ -138,6 +140,10 @@ DecoratorBase {
                         loaderTopPanel.item.title = dialogContainer.baseElement.title;
                     }
 
+                    if(loaderTopPanel.item.hasIcon !== undefined){
+                        loaderTopPanel.item.hasIcon = dialogContainer.baseElement.hasIcon;
+                    }
+
                     loaderTopPanel.width = loaderTopPanel.item.width;
                     loaderTopPanel.height = loaderTopPanel.item.height;
 
@@ -182,7 +188,7 @@ DecoratorBase {
             id: buttonsContainer;
 
             anchors.right: !parent ? undefined : parent.right;
-            anchors.rightMargin: Style.marginM;
+            anchors.rightMargin: Style.marginL;
 
             width: buttonsDialog.width;
 			height: buttonsDialog.height + 2*Style.marginL

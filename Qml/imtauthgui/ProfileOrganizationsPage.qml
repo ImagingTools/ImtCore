@@ -142,8 +142,10 @@ ViewBase {
 
 				Text {
 					text: qsTr("Current organization")
-					font.pixelSize: Style.fontSizeS
-					color: Style.inactiveTextColor
+					font.family: Style.fontFamilyBold
+					font.pixelSize: Style.fontSizeXL
+					font.bold: true
+					color: Style.textColor
 				}
 
 				Rectangle {
@@ -337,8 +339,10 @@ ViewBase {
 
 				Text {
 					text: qsTr("Other organizations")
-					font.pixelSize: Style.fontSizeS
-					color: Style.inactiveTextColor
+					font.family: Style.fontFamilyBold
+					font.pixelSize: Style.fontSizeXL
+					font.bold: true
+					color: Style.textColor
 				}
 
 				Rectangle {

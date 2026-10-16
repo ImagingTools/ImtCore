@@ -48,5 +48,6 @@ PageContainer {
 		id: documentManagerView_
 		anchors.fill: root
 		documentManager: root.documentManager
+		pageIcon: root.pageIcon
 	}
 }

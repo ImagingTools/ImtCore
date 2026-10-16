@@ -100,6 +100,13 @@ Item {
         visible: container.userIsLoggedIn && !pagesProvider.pagesReceived && container.modelState !== "Error";
     }
 
+    SkeletonTableView {
+        id: pageSkeleton;
+
+        anchors.fill: parent;
+        z: 1;
+    }
+
     Repeater {
         id: pagesData;
         anchors.fill: parent;
@@ -115,9 +122,29 @@ Item {
                 }
             }
 
+            // A page opened by a click is built on the next tick, so the menu and a skeleton paint first.
             onVisibleChanged: {
-                if (visible){
-                    load();
+                if (!visible){
+                    return;
+                }
+
+                if (loader.item){
+                    pageSkeleton.stop();
+                }
+                else{
+                    pageSkeleton.start();
+                    deferredLoadTimer.restart();
+                }
+            }
+
+            Timer {
+                id: deferredLoadTimer;
+                interval: 0;
+                onTriggered: {
+                    pagesDeleg.load();
+                    if (pagesDeleg.visible){
+                        pageSkeleton.stop();
+                    }
                 }
             }
 
@@ -131,6 +158,10 @@ Item {
 
                     if (item.pageName !== undefined){
                         item.pageName = model.name;
+                    }
+
+                    if (item.pageIcon !== undefined){
+                        item.pageIcon = model.icon;
                     }
 
                     if (item.startItemSource !== undefined){

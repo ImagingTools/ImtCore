@@ -11,7 +11,7 @@ Row {
 	objectName: "Pagination";
 
 	height: visible ? Style.controlHeightS : 0;
-	spacing: Style.spacingL;
+	spacing: Style.spacingS;
 
 	property int pagesSize: 1;
 	property int currentValue: currentIndex + 1;
@@ -45,12 +45,31 @@ Row {
 		}
 	}
 
+	// Toolbar-style buttons, as in VS Code: no fill at rest, a wash under the pointer.
 	Component {
 		id: buttonDecorator;
 
 		ButtonDecorator {
-			color: "transparent";
+			color: baseElement && baseElement.enabled && baseElement.hovered ? Style.toolButtonHoverColor : "transparent";
 			border.width: 0;
+			radius: Style.buttonRadius;
+			icon.width: Style.iconSizeS;
+			icon.height: Style.iconSizeS;
+		}
+	}
+
+	// A page number: the current page carries the selection wash and a bolder figure.
+	Component {
+		id: pageButtonDecorator;
+
+		ButtonDecorator {
+			color: !baseElement ? "transparent"
+				 : baseElement.isCurrent ? Style.selectedColor
+				 : baseElement.enabled && baseElement.hovered ? Style.toolButtonHoverColor : "transparent";
+			border.width: 0;
+			radius: Style.buttonRadius;
+			textColor: baseElement && (baseElement.enabled || baseElement.isCurrent) ? Style.textColor : Style.subtitleColor;
+			font.bold: baseElement ? baseElement.isCurrent : false;
 		}
 	}
 
@@ -93,11 +112,21 @@ Row {
 	BaseText {
 		anchors.verticalCenter: parent.verticalCenter;
 
-		text: paginationContainer.countAllElements === 0 ? "(0-0/0)" :
-			  "(" + (paginationContainer.currentIndex * paginationContainer.countElements + 1) + "-" +
-			  ((paginationContainer.pagesSize - 1 != paginationContainer.currentIndex) ?
-				   paginationContainer.currentValue * paginationContainer.countElements :
-				   paginationContainer.countAllElements) + "/" + paginationContainer.countAllElements + ")"
+		color: Style.subtitleColor;
+		font.pixelSize: Style.fontSizeS;
+		// Concatenated: chained arg() substitutes only the first placeholder in the web runtime.
+		text: paginationContainer.countAllElements === 0 ? qsTr("No items") :
+			  (paginationContainer.currentIndex * paginationContainer.countElements + 1) + "–"
+			  + ((paginationContainer.pagesSize - 1 != paginationContainer.currentIndex) ?
+					 paginationContainer.currentValue * paginationContainer.countElements :
+					 paginationContainer.countAllElements)
+			  + " " + qsTr("of") + " " + paginationContainer.countAllElements
+	}
+
+	// Gap between the range and the page controls.
+	Item {
+		width: Style.marginS;
+		height: 1;
 	}
 
 	Button {
@@ -126,7 +155,7 @@ Row {
 	Row{
 		anchors.verticalCenter: parent.verticalCenter;
 
-		spacing: Style.marginXS;
+		spacing: Style.spacingXXS;
 
 		Repeater {
 			id: repeaterPagination;
@@ -134,30 +163,24 @@ Row {
 			delegate: Component {Button {
 					id: buttonDelegate;
 
-					width: Math.max(Style.buttonWidthM, helperText.width + 8);
+					property bool isCurrent: model.number !== -1 && paginationContainer.currentIndex === model.number - 1;
+
+					width: Math.max(Style.buttonWidthM, helperText.width + Style.marginM);
 					height: Style.buttonHeightXS;
 
-					decorator: buttonDecorator;
+					decorator: pageButtonDecorator;
 
-					enabled: model.number !== -1 && paginationContainer.currentIndex !== model.number - 1;
-					text: model.number === -1 ? "..." : model.number;
+					enabled: model.number !== -1 && !buttonDelegate.isCurrent;
+					text: model.number === -1 ? "…" : model.number;
 
 					onClicked: {
 						paginationContainer.currentIndex = model.number - 1;
 					}
 
-					Rectangle {
-						anchors.top: buttonDelegate.bottom;
-						width: parent.width;
-						height: 2;
-
-						color: Style.tabSelectedColor;
-						visible: (model.index == undefined ||  model.selected == undefined) ? false : paginationContainer.pagesSize < props.maxElementCount ? model.index === paginationContainer.currentIndex : model.selected;
-					}
-
 					BaseText {
 						id: helperText;
 						text: buttonDelegate.text;
+						font.bold: true;
 						visible: false;
 					}
 				}
@@ -191,12 +214,15 @@ Row {
 	Row {
 		anchors.verticalCenter: parent.verticalCenter;
 
-		spacing: 4;
+		spacing: Style.spacingS;
+		leftPadding: Style.marginS;
 
 		BaseText {
 			visible: paginationContainer.perPageTitleVisible;
 			anchors.verticalCenter: parent.verticalCenter;
-			text: qsTr("Per page: ")
+			color: Style.subtitleColor;
+			font.pixelSize: Style.fontSizeS;
+			text: qsTr("Per page:")
 		}
 		
 		TreeItemModel {

@@ -48,15 +48,16 @@ Item {
 					: messageType === "success"
 					? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
 					: messageType === "info"
-					? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
+					? "../../../" + Style.getIconPath("Icons/Info", Icon.State.On, Icon.Mode.Normal)
 					: ""
 
 			width: parent ? parent.width : Style.sizeHintS
-			height: Math.max(Style.sizeHintBXS, contentRow.height + 2 * Style.marginL)
+			// A VS Code notification: a neutral widget card; only the icon carries the message type.
+			height: Math.max(Style.controlHeightL + Style.marginM, contentRow.height + 2 * Style.marginM)
 			radius: Style.radiusM
-			color: defaultDelegateRoot.panelColor
+			color: Style.baseColor
 			border.width: 1
-			border.color: Style.borderColor
+			border.color: Style.inputBorderColor
 			clip: true
 
 			opacity: 0
@@ -90,7 +91,8 @@ Item {
 				anchors.left: parent.left
 				anchors.top: parent.top
 				anchors.bottom: parent.bottom
-				width: 4
+				width: 0
+				visible: false
 				color: defaultDelegateRoot.accentColor
 			}
 
@@ -99,22 +101,16 @@ Item {
 				anchors.left: parent.left
 				anchors.right: parent.right
 				anchors.verticalCenter: parent.verticalCenter
-				anchors.leftMargin: Style.marginL + accentRail.width
+				anchors.leftMargin: Style.marginM
 				anchors.rightMargin: Style.marginS
 				spacing: Style.marginM
 
 				Item {
 					id: iconArea
-					width: Style.iconSizeMedium
-					height: Style.iconSizeMedium
+					width: Style.iconSizeM
+					height: Style.iconSizeM
 					anchors.verticalCenter: parent.verticalCenter
 
-					Rectangle {
-						anchors.fill: parent
-						radius: width / 2
-						color: defaultDelegateRoot.accentColor
-						opacity: Style.popupIconChipOpacity
-					}
 
 					Image {
 						anchors.centerIn: parent
@@ -133,22 +129,24 @@ Item {
 					text: defaultDelegateRoot.messageText
 					wrapMode: Text.WordWrap
 					color: Style.textColor
-					font.pixelSize: Style.fontSizeNormal
+					font.pixelSize: Style.fontSizeM
 				}
 
 				Rectangle {
 					id: closeButton
-					width: 28
-					height: 28
-					radius: 14
+					width: Style.buttonWidthM
+					height: Style.buttonWidthM
+					radius: Style.buttonRadius
 					anchors.verticalCenter: parent.verticalCenter
-					color: closeMouseArea.containsMouse ? Style.popupCloseHoverColor : Style.popupCloseIdleColor
+					color: closeMouseArea.containsMouse ? Style.toolButtonHoverColor : "transparent"
 
-					BaseText {
+					Image {
 						anchors.centerIn: parent
-						text: "✕"
-						font.pixelSize: Style.fontSizeSmall
-						color: Style.subtitleColor
+						width: Style.iconSizeS
+						height: width
+						sourceSize.width: width
+						sourceSize.height: height
+						source: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 					}
 
 					MouseArea {

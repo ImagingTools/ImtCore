@@ -193,7 +193,7 @@ StyleComponents {
 	property int buttonHeightXXS: 16
 	property int buttonHeightXXXS: 10
 
-	property int buttonRadius: 6
+	property int buttonRadius: 2
 	property int buttonBorderWidth: 1
 
 	//Item sizes
@@ -215,8 +215,12 @@ StyleComponents {
 	property int menuMinWidth: 200
 
 	//table sizes
-	property int tableRowHeight: controlHeightL + marginXS
-	property int tableHeaderHeight: 40
+	// Compact rows and header, closer to VS Code tables.
+	property int tableRowHeight: controlHeightM + spacingXS
+	property int tableHeaderHeight: controlHeightM
+	// Faint stripe on every other table row.
+	property bool enableTableAlternating: true
+	property string tableAlternateRowColor: alternateBaseColor
 
 	//grid cell size
 	property int gridCellSize: 110
@@ -230,8 +234,8 @@ StyleComponents {
 	property int pageMargin: 0;
 
 	//Radius
-	property int textFieldRadius: 6;
-	property int comboBoxRadius: 6;
+	property int textFieldRadius: 2;
+	property int comboBoxRadius: 2;
 	property int menuPanelRadius: radiusL;
 
 	//Other sizes
@@ -287,7 +291,7 @@ StyleComponents {
 	property string errorTextColor: "#d1242f";
 
 		//accent
-	property string imaginToolsAccentColor: "#0969da"
+	property string imaginToolsAccentColor: "#005fb8"
 	property string positiveAccentColor: styleContainer.successColor;
 	property string negativeAccentColor: styleContainer.dangerColor;
 	property string middleAccentColor: styleContainer.attentionColor;
@@ -302,17 +306,17 @@ StyleComponents {
 	property string doneColor: "#8250df";
 	property string doneSubtleColor: "#fbefff";
 	property string severeColor: "#bc4c00";
-	property string neutralEmphasisColor: "#6e7781";
-	property string neutralSubtleColor: "#eaeef2";
+	property string neutralEmphasisColor: "#767676";
+	property string neutralSubtleColor: "#e5e5e5";
 
 		//text
-	property string textColor: "#1f2328";
-	property string titleColor: "#1f2328";
-	property string subtitleColor: "#59636e";
-	property string textSelectedColor: "#0969da";
-	property string inactiveTextColor: "#818b98";
-	property string placeHolderTextColor : "#6e7781"
-	property string linkColor: "#0969da";
+	property string textColor: "#3b3b3b";
+	property string titleColor: "#3b3b3b";
+	property string subtitleColor: "#616161";
+	property string textSelectedColor: "#005fb8";
+	property string inactiveTextColor: "#9e9e9e";
+	property string placeHolderTextColor : "#616161"
+	property string linkColor: "#005fb8";
 	property string selectedLinkFromColor: styleContainer.linkColor;
 	property string selectedLinkToColor: styleContainer.successColor;
 
@@ -330,32 +334,28 @@ StyleComponents {
 	property real popupIconChipOpacity: 0.14;
 
 		//border
-	property string borderColor: "#d1d9e0";
-	property string borderColor2: "#afb8c1";
+	property string borderColor: "#e5e5e5";
+	property string borderColor2: "#c4c4c4";
 
 		//background
-	property string backgroundColor: "#f6f8fa";
+	property string backgroundColor: "#f8f8f8";
 	property string backgroundColor2: "#ffffff";
 
-		//chrome: left menu panel (GitHub sidebar / NavList). Inset as a card on
-		//the page canvas, so it takes the elevated surface rather than the muted
-		//one; selected and hovered rows are neutral washes and the accent is
-		//carried by the bar alone.
-	property string menuPanelBackgroundColor: "#ffffff";
-	property string menuPanelItemSelectedColor: "#26818b98";
-	property string menuPanelItemHoverColor: "#1a818b98";
+		//chrome (VS Code Modern): menu panel and top panel share the muted
+		//backgroundColor surface, separated from the baseColor work area by
+		//borderColor dividers; selected and hovered rows are neutral washes.
+	property string menuPanelBackgroundColor: "#f8f8f8";
+	property string menuPanelItemSelectedColor: "#17000000";
+	property string menuPanelItemHoverColor: "#0b000000";
 
-		//chrome: top panel. GitHub's own header is a dark bar, but ours carries
-		//theme-colored icons that would vanish on one, so the panel stays on the
-		//page surface and is separated by a divider instead.
-	property string topPanelBackgroundColor: "#ffffff";
-	property string topPanelBorderColor: "#d1d9e0";
+	property string topPanelBackgroundColor: "#f8f8f8";
+	property string topPanelBorderColor: "#e5e5e5";
 
 	property string dialogBackgroundColor: "#ffffff";
 		//chrome: modal backdrop. The base color only; callers apply their own
 		//opacity on top of it.
-	property string overlayBackgroundColor: "#c8d1da";
-	property string tabPanelBackgroundColor: backgroundColor;
+	property string overlayBackgroundColor: "#cccccc";
+	property string tabPanelBackgroundColor: "#e5e5e5";
 
 		//highlight
 	property string highlightBackgroundColor: '#000'
@@ -364,31 +364,33 @@ StyleComponents {
 	property string secondaryHighlightColor: linkColor
 
 		//selected
-	property string selectedColor: "#ddf4ff";
-	property string tabSelectedColor: "#fd8c73";
-	property string iconColorOnSelected: "#0969da";
+	property string selectedColor: "#e8e8e8";
+	property string tabSelectedColor: "#005fb8";
+	property string iconColorOnSelected: "#005fb8";
 
 		//button
-	property string buttonColor: "#f6f8fa";
-	property string buttonBorderColor: "#d1d9e0";
-	property string buttonHoverColor: "#eff2f5";
-	property string buttonPressedColor: "#e6eaef";
+	property string buttonColor: "#e5e5e5";
+	property string buttonBorderColor: "#1a000000";
+	property string buttonHoverColor: "#cccccc";
+	property string buttonPressedColor: "#c4c4c4";
+	// Hover behind icon-only buttons on toolbars and tab strips (VS Code toolbar.hoverBackground).
+	property string toolButtonHoverColor: "#50b8b8b8";
 	property string buttonAccentColor: imaginToolsAccentColor;
-	property string buttonInactiveColor: "#eff2f5";
+	property string buttonInactiveColor: "#ebebeb";
 	property string buttonBorderFocusColor: imaginToolsAccentColor;
-	property string buttonBorderInactiveColor: "#1a818b98";
-	property string buttonTextColor: "#1f2328";
-	property string buttonInactiveTextColor: "#818b98";
+	property string buttonBorderInactiveColor: "#1a000000";
+	property string buttonTextColor: "#3b3b3b";
+	property string buttonInactiveTextColor: "#9e9e9e";
 	// Text drawn on top of an accent-colored surface (e.g. a selected/active chip
 	// or badge) - not simply "the opposite of textColor", since an accent fill's
 	// own brightness doesn't track baseColor/backgroundColor at all.
 	property string highlightedTextColor: "#ffffff";
 
 		//button variants ("primary" / "danger"), see ButtonDecorator.variant
-	property string buttonPrimaryColor: "#1f883d";
-	property string buttonPrimaryHoverColor: "#1a7f37";
-	property string buttonPrimaryPressedColor: "#197935";
-	property string buttonPrimaryBorderColor: "#1f883d";
+	property string buttonPrimaryColor: "#005fb8";
+	property string buttonPrimaryHoverColor: "#0258a8";
+	property string buttonPrimaryPressedColor: "#004c93";
+	property string buttonPrimaryBorderColor: "#005fb8";
 	property string buttonPrimaryTextColor: "#ffffff";
 	property string buttonDangerColor: "#cf222e";
 	property string buttonDangerHoverColor: "#a40e26";
@@ -398,15 +400,19 @@ StyleComponents {
 
 		//focus ring drawn outside the control border
 	property string focusRingColor: imaginToolsAccentColor;
-	property int focusRingWidth: 2;
+	property int focusRingWidth: 1;
+
+		//text inputs, combo boxes, check boxes
+	property string inputBackgroundColor: "#ffffff";
+	property string inputBorderColor: "#cecece";
 
 		//Table
-	property string tableHeaderColor: "#f6f8fa";
+	property string tableHeaderColor: "#f8f8f8";
 	property string tableCellColor: "#ffffff";
-	property string tableHeaderBorederColor: "#d1d9e0";
-	property string tableCellBorderColor: "#d1d9e0";
-	property string tableHeaderFontColor: "#59636e";
-	property string tableCellFontColor: "#1f2328";
+	property string tableHeaderBorederColor: "#e5e5e5";
+	property string tableCellBorderColor: "#e5e5e5";
+	property string tableHeaderFontColor: "#616161";
+	property string tableCellFontColor: "#3b3b3b";
 
 		//scroll
 	property string scrollBackgroundColor: styleContainer.backgroundColor2;
@@ -414,17 +420,17 @@ StyleComponents {
 	property string scrollHighlightColor: styleContainer.backgroundColor;
 
 		//shadow, hover
-	property string shadowColor: "#d1d9e0";
-	property string hover: "#eff2f5";
+	property string shadowColor: "#d4d4d4";
+	property string hover: "#f2f2f2";
 
 		//Alternating
 	property color alternatingColor: '#000'
-	property string alternateBaseColor: "#f6f8fa";
+	property string alternateBaseColor: "#f8f8f8";
 
 		//simple colors
 	property string grayColor: styleContainer.borderColor2;
 	property string greenColor: "#1a7f37";
-	property string lightBlueColor: "#54aeff";
+	property string lightBlueColor: "#4daafc";
 
 	//other parameters
 	property real maximumFlickVelocity: 75
@@ -711,6 +717,20 @@ StyleComponents {
 			styleContainer.buttonPressedColor = styleContainer.getThemeColor("ActiveColors", "Mid", dataSource);
 			styleContainer.hover = styleContainer.getThemeColor("ActiveColors", "Midlight", dataSource);
 
+			let itemHoverColor = styleContainer.getThemeColor("ActiveColors", "ItemHover", dataSource);
+			if (itemHoverColor !== ""){
+				styleContainer.hover = itemHoverColor;
+			}
+
+			let toolbarHoverColor = styleContainer.getThemeColor("ActiveColors", "ToolbarHover", dataSource);
+			styleContainer.toolButtonHoverColor = toolbarHoverColor !== "" ? toolbarHoverColor : styleContainer.buttonHoverColor;
+
+			let inputBackgroundColor = styleContainer.getThemeColor("ActiveColors", "InputBackground", dataSource);
+			styleContainer.inputBackgroundColor = inputBackgroundColor !== "" ? inputBackgroundColor : styleContainer.baseColor;
+
+			let inputBorderColor = styleContainer.getThemeColor("ActiveColors", "InputBorder", dataSource);
+			styleContainer.inputBorderColor = inputBorderColor !== "" ? inputBorderColor : styleContainer.borderColor;
+
 			styleContainer.imagingToolsGradient0 = dataSource.getData("ColorPalette").getData("ImagingToolsGradient0");
 			styleContainer.imagingToolsGradient1 = dataSource.getData("ColorPalette").getData("ImagingToolsGradient1");
 			styleContainer.imagingToolsGradient2 = dataSource.getData("ColorPalette").getData("ImagingToolsGradient2");
@@ -721,6 +741,11 @@ StyleComponents {
 			styleContainer.iconColorOnSelected = styleContainer.getThemeColor("ActiveColors", "Highlight", dataSource);
 
 			styleContainer.tabSelectedColor = styleContainer.getThemeColor("ActiveColors", "TabSelected", dataSource);
+
+			let tabBackgroundColor = styleContainer.getThemeColor("ActiveColors", "TabBackground", dataSource);
+			if (tabBackgroundColor !== ""){
+				styleContainer.tabPanelBackgroundColor = tabBackgroundColor;
+			}
 			styleContainer.errorTextColor = styleContainer.getThemeColor("ActiveColors", "ErrorText", dataSource);
 
 			styleContainer.popupErrorBackgroundColor = styleContainer.getThemeColor("ActiveColors", "PopupErrorBackground", dataSource);

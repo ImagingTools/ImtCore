@@ -112,13 +112,13 @@ FocusScope {
 		
 		anchors.fill: parent;
 		
-		color: containerTextField.readOnly ? Style.alternateBaseColor : Style.baseColor;
-		
+		color: containerTextField.readOnly ? Style.alternateBaseColor : Style.inputBackgroundColor;
+
 		radius: containerTextField.radius;
-		
+
 		border.color: containerTextField.borderColorConst !== "" ?
 						  containerTextField.borderColorConst: textField.activeFocus ?
-							  containerTextField.borderColor : Style.borderColor;
+							  containerTextField.borderColor : Style.inputBorderColor;
 		
 		border.width: 1;
 	}
