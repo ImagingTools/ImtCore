@@ -36,7 +36,7 @@ list(APPEND webdirs ${buildwebdir}/src/controlsgalleryParamsSetTestSdl)
 list(APPEND webdirs ${IMTCOREDIR}/3rdParty/EjQml/qml/EjEditor)
 list(APPEND webdirs ${buildwebdir}/src/EjEditor)
 
-option(USE_NEW_WEB"Use new web compilation (jq_compile_web)" OFF)
+option(USE_NEW_WEB "Use new web compilation (jq_compile_web)" OFF)
 
 if(DEFINED WEB_COMPILE AND WEB_COMPILE)
 	add_compile_definitions(WEB_COMPILE)
