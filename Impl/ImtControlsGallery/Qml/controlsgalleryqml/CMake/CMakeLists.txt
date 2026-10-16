@@ -32,7 +32,11 @@ list(APPEND webdirs ${buildwebdir}/src/controlsgalleryContactInfoCollectionDocum
 list(APPEND webdirs ${AUX_INCLUDE_DIR}/controlsgallerysdl/SDL/1.0/QML/controlsgalleryParamsSetTestSdl)
 list(APPEND webdirs ${buildwebdir}/src/controlsgalleryParamsSetTestSdl)
 
-option(USE_NEW_WEB "Use new web compilation (jq_compile_web)" OFF)
+# EjEditor QML module: needed by the default (jqml_compile_web2) web build, which compiles only the copied webdirs
+list(APPEND webdirs ${IMTCOREDIR}/3rdParty/EjQml/qml/EjEditor)
+list(APPEND webdirs ${buildwebdir}/src/EjEditor)
+
+option(USE_NEW_WEB"Use new web compilation (jq_compile_web)" OFF)
 
 if(DEFINED WEB_COMPILE AND WEB_COMPILE)
 	add_compile_definitions(WEB_COMPILE)
