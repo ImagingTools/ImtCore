@@ -218,7 +218,7 @@ Item {
             }
 
             // Keep the click inside the input area so that underlying MouseAreas (e.g. table row) do not take the focus away
-            mouse.accepted = spinBox.editable && mouse.x < numberBlock.width;
+            mouse.accepted = spinBox.editable && mouse.x < buttonColumn.mapToItem(wheelMa, 0, 0).x;
         }
         
         onWheel: {
