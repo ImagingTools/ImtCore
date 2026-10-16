@@ -43,7 +43,6 @@ void CGqlHeartbeatCheckerComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	m_timer.setSingleShot(true);
-	m_timer.setInterval(qRound(*m_checkIntervalAttrPtr * 1000));
 	connect(&m_timer, &QTimer::timeout, this, &CGqlHeartbeatCheckerComp::SendHeartbeat);
 
 	// Registering the model sends the first heartbeat
@@ -115,7 +114,7 @@ void CGqlHeartbeatCheckerComp::OnHeartbeatFinished(int heartbeatId, const GqlMod
 		break;
 	}
 
-	m_timer.start();
+	ScheduleNextHeartbeat();
 }
 
 
@@ -140,6 +139,15 @@ void CGqlHeartbeatCheckerComp::SetStatus(ConnectionStatus status, const QString&
 		istd::CChangeNotifier notifier(this, &changeSet);
 
 		m_status = status;
+	}
+}
+
+
+void CGqlHeartbeatCheckerComp::ScheduleNextHeartbeat()
+{
+	const double interval = (m_status == CS_CONNECTED) ? *m_checkIntervalAttrPtr : *m_retryIntervalAttrPtr;
+	if (interval > 0){
+		m_timer.start(qRound(interval * 1000));
 	}
 }
 
