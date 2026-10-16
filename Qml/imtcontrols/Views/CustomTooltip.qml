@@ -50,6 +50,9 @@ ControlBase {
 
 
     Component.onDestruction: {
+        pauseOpenTooltip.stop();
+        pauseCloseTooltip.stop();
+        customTooltip._unwatchPointerLeave();
         customTooltip.closeTooltip();
     }
 
@@ -129,7 +132,11 @@ ControlBase {
     }
 
     function closeTooltip(){
-        customTooltip._unwatchPointerLeave();
+        // A new opening may already be pending (show() during the close animation): it still
+        // needs the pointer-leave listener to be cancelled.
+        if(!pauseOpenTooltip.running){
+            customTooltip._unwatchPointerLeave();
+        }
 
         if(customTooltip.openST){
             ModalDialogManager.closeByComp(customTooltip.tooltipContentComp);
