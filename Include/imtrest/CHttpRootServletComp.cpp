@@ -51,7 +51,8 @@ imtrest::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& r
 		const CHttpResponse* httpResponseConstPtr = dynamic_cast<const CHttpResponse*>(responsePtr.GetPtr());
 		CHttpResponse* httpResponsePtr = dynamic_cast<CHttpResponse*>(const_cast<CHttpResponse*>(httpResponseConstPtr));
 
-		if (m_autoCompressionAttrPtr->GetValue() == true && httpResponsePtr != nullptr){
+		// An empty body (e.g. 304 Not Modified) must stay empty.
+		if (m_autoCompressionAttrPtr->GetValue() == true && httpResponsePtr != nullptr && !responsePtr->GetData().isEmpty()){
 			EncodingType encodingType = ET_NONE;
 			const CHttpRequest* httprequestPtr = dynamic_cast<const CHttpRequest*>(&request);
 			if (httprequestPtr != nullptr){

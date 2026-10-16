@@ -69,6 +69,8 @@ Item {
 
 	NavigableItem {
 		id: navigableItem
+		// The rest of the path is the document id, consumed here.
+		forwardRest: false
 		onActivated: {
 			if (workspaceView.documentManager){
 				if (restPath.length >= 1){

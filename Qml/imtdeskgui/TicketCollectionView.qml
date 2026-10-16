@@ -239,6 +239,8 @@ RemoteCollectionView {
 				DocumentRepresentationController {
 					id: root
 
+					// The context types a new ticket can link to only come with the server representation.
+					requestRepresentationOnCreate: true
 
 					representationModel: TicketData {
 						m_status: "Open"
