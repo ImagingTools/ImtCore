@@ -55,6 +55,9 @@ endif()
 find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core Concurrent Gui Network PrintSupport Sql Svg Xml WebSockets Widgets REQUIRED)
 if(QT_VERSION_MAJOR EQUAL 6)
 	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core5Compat REQUIRED)
+
+	# HTTP(S)/WebSocket server of imtrest (imtrest::CHttpServerComp), requires Qt 6.8 or newer:
+	find_package("Qt${QT_VERSION_MAJOR}" 6.8 COMPONENTS HttpServer)
 endif()
 
 if(USE_GEO)

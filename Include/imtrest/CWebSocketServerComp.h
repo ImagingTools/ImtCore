@@ -20,6 +20,7 @@
 #include <imtrest/IResponseDispatcher.h>
 #include <imtrest/CWebSocketSender.h>
 #include <imtrest/IServer.h>
+#include <imtrest/IWebSocketUpgradeHandler.h>
 #include <imtcom/IServerConnectionInterface.h>
 #include <imtcom/IConnectionStatusProvider.h>
 #include <imtcom/ISslConfigurationManager.h>
@@ -42,7 +43,8 @@ class CWebSocketServerComp:
 			private imod::CMultiModelDispatcherBase,
 			virtual public IResponseDispatcher,
 			virtual public imtcom::IConnectionStatusProvider,
-			virtual public IServer
+			virtual public IServer,
+			virtual public IWebSocketUpgradeHandler
 {
 	Q_OBJECT
 public:
@@ -53,6 +55,7 @@ public:
 		I_REGISTER_INTERFACE(IResponseDispatcher)
 		I_REGISTER_INTERFACE(imtcom::IConnectionStatusProvider)
 		I_REGISTER_INTERFACE(IServer)
+		I_REGISTER_INTERFACE(IWebSocketUpgradeHandler)
 		I_ASSIGN(m_requestServerHandlerCompPtr, "RequestServerHandler", "Request handler registered for the server", false, "RequestServerHandler");
 		I_ASSIGN(m_requestClientHandlerCompPtr, "RequestClientHandler", "Request handler registered for the client", false, "RequestClientHandler");
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the server", true, "ProtocolEngine");
@@ -65,6 +68,7 @@ public:
 		I_ASSIGN(m_sslConfigurationManagerCompPtr, "SslConfigurationManager", "SSL configuration manager, used to create an SSL configuration for server", false, "SslConfigurationManager")
 		I_ASSIGN(m_productId, "ProductId", "Product-ID used with corresponded GraphQL-requests", false, "");
 		I_ASSIGN(m_subprotocolListCompPtr, "SupportedSubprotocols", "Supported Web Socket subprotocols", false, "SupportedSubprotocols");
+		I_ASSIGN(m_listenWebSocketPortAttrPtr, "ListenWebSocketPort", "If enabled, the server listens on the own WebSocket port. If disabled, only the connections upgraded on the HTTP port (IWebSocketUpgradeHandler) are served", true, true);
 	I_END_COMPONENT
 
 	IProtocolEngine* GetProtocolEngine();
@@ -114,8 +118,12 @@ protected:
 	virtual bool StopServer() override;
 	virtual ServerStatus GetServerStatus() const override;
 
+	// reimplemented (imtrest::IWebSocketUpgradeHandler)
+	virtual bool HandleWebSocketHandshake(QTcpSocket* socketPtr) override;
+
 private:
 	bool EnsureServerStarted();
+	void CreateWebSocketServer();
 	bool StartListening(const QHostAddress& address = QHostAddress::Any, quint16 port = 0);
 
 private Q_SLOTS:
@@ -145,6 +153,7 @@ private:
 	I_REF(IProtocolEngine, m_httpProtocolEngineCompPtr);
 	I_ATTR(QByteArray, m_productId);
 	I_REF(iprm::IOptionsList, m_subprotocolListCompPtr);
+	I_ATTR(bool, m_listenWebSocketPortAttrPtr);
 
 	bool m_isInitialized = false;
 };

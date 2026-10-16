@@ -22,21 +22,15 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SslConfigurationManager" PackageId="ImtComPck" ComponentId="SslConfigurationManager">
+        <Element Id="HttpServer" PackageId="ImtRestPck" ComponentId="HttpServer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                    <AttributeInfo Id="IoThreadCount" Type="Integer" ExportId="IoThreadCount">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                    <AttributeInfo Id="KeepAliveTimeout" Type="Integer" ExportId="KeepAliveTimeout">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TcpServer" PackageId="ImtRestPck" ComponentId="TcpServer">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -45,6 +39,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RequestHandler" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WorkerManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestHeaderTimeout" Type="Integer" ExportId="RequestHeaderTimeout">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
                         <Data IsEnabled="false"/>
@@ -61,8 +58,20 @@
                     <AttributeInfo Id="StartServerOnCreate" Type="Boolean" ExportId="StartServerOnCreate">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="100"/>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebSocketUpgradeHandler" Type="Reference" ExportId="WebSocketUpgradeHandler">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SslConfigurationManager" PackageId="ImtComPck" ComponentId="SslConfigurationManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
@@ -80,7 +89,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TcpServer"/>
+                        <Data IsEnabled="true" Value="HttpServer"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="ThreadsLimit">
                         <Data IsEnabled="true" Value="100"/>
@@ -95,9 +104,9 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtrest::IProtocolEngine" ComponentId="HttpProtocolEngine"/>
-        <Interface InterfaceId="imtrest::IResponseDispatcher" ComponentId="TcpServer"/>
-        <Interface InterfaceId="imtrest::IServer" ComponentId="TcpServer"/>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="TcpServer"/>
+        <Interface InterfaceId="imtrest::IResponseDispatcher" ComponentId="HttpServer"/>
+        <Interface InterfaceId="imtrest::IServer" ComponentId="HttpServer"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="HttpServer"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="WorkerManager" ComponentId="WorkerManager"/>

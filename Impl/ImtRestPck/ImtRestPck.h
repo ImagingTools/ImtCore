@@ -11,6 +11,7 @@
 #include <imtrest/CWebSocketServerComp.h>
 #include <imtrest/CWebSocketProtocolEngineComp.h>
 #include <imtrest/CTcpServerComp.h>
+#include <imtrest/CHttpServerComp.h>
 #include <imtrest/CHttpProtocolEngineComp.h>
 #include <imtrest/CHttpRootServletComp.h>
 #include <imtrest/CHttpFileBasedServletComp.h>
@@ -37,6 +38,9 @@ namespace ImtRestPck
 
 
 typedef imtrest::CTcpServerComp TcpServer;
+#ifdef IMTREST_HTTP_SERVER_AVAILABLE
+typedef imtrest::CHttpServerComp HttpServer;
+#endif
 typedef icomp::TModelCompWrap<imtrest::CWebSocketServerComp> WebSocketServer;
 typedef imtrest::CWebSocketProtocolEngineComp WebSocketProtocolEngine;
 typedef imtrest::CHttpProtocolEngineComp HttpProtocolEngine;

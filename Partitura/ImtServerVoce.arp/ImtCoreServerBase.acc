@@ -64,6 +64,9 @@
                     <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="WebSocketUpgradeHandler" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketServerFramework"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
