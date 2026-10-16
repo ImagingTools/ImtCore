@@ -50,8 +50,6 @@ ControlBase {
 
 
     Component.onDestruction: {
-        pauseOpenTooltip.stop();
-        pauseCloseTooltip.stop();
         customTooltip._unwatchPointerLeave();
         customTooltip.closeTooltip();
     }
@@ -87,8 +85,10 @@ ControlBase {
         }
 
         customTooltip._leaveHandle = PointerLeaveWatcher.watch(function(){
-            pauseOpenTooltip.stop();
-            pauseCloseTooltip.stop();
+            pauseOpenTooltip.stop();
+
+            pauseCloseTooltip.stop();
+
             customTooltip.closeTooltip();
         });
     }
