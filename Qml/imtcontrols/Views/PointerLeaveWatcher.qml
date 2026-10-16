@@ -8,25 +8,25 @@ import QtQuick 2.12
 // No-ops outside a browser (desktop Qt).
 QtObject {
     function watch(callback){
-        if (typeof document === "undefined" || typeof window === "undefined"){
+        if (typeof window === "undefined" || typeof window.document === "undefined"){
             return null;
         }
 
         var handler = function(){
             callback();
         }
-        document.documentElement.addEventListener("mouseleave", handler);
+        window.document.documentElement.addEventListener("mouseleave", handler);
         window.addEventListener("blur", handler);
 
         return handler;
     }
 
     function unwatch(handler){
-        if (!handler || typeof document === "undefined" || typeof window === "undefined"){
+        if (!handler || typeof window === "undefined" || typeof window.document === "undefined"){
             return;
         }
 
-        document.documentElement.removeEventListener("mouseleave", handler);
+        window.document.documentElement.removeEventListener("mouseleave", handler);
         window.removeEventListener("blur", handler);
     }
 }
