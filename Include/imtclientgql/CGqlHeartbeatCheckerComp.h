@@ -11,6 +11,7 @@
 #include <imod/CMultiModelDispatcherBase.h>
 #include <imod/TModelWrap.h>
 #include <iprm/CTextParam.h>
+#include <iprm/IEnableableParam.h>
 
 // ImtCore includes
 #include <imtclientgql/IAsyncGqlClient.h>
@@ -33,6 +34,7 @@ namespace imtclientgql
 	The server version from the answer is provided by the \c ServerVersion sub-element.
 	The status is reset and the check is repeated immediately when the server connection settings change.
 	A change of the \c RelatedConnectionStatus, e.g. the WebSocket connection to the same server, repeats the check immediately and keeps the last status until the answer.
+	While the optional \c CheckEnabler is disabled no heartbeats are sent and the status is unknown, enabling it checks immediately.
 
 	The \c AsyncClient must have a finite timeout, otherwise a server that never answers keeps the last status.
 */
@@ -58,6 +60,8 @@ public:
 		I_ASSIGN_TO(m_serverConnectionModelCompPtr, m_serverConnectionCompPtr, false);
 		I_ASSIGN(m_relatedConnectionStatusCompPtr, "RelatedConnectionStatus", "Status of another connection to the same server, e.g. the WebSocket, each change sends a heartbeat at once", false, "RelatedConnectionStatus");
 		I_ASSIGN_TO(m_relatedConnectionStatusModelCompPtr, m_relatedConnectionStatusCompPtr, false);
+		I_ASSIGN(m_checkEnablerCompPtr, "CheckEnabler", "Turns the heartbeats on and off, e.g. only while the status is shown. Without it they are always on", false, "CheckEnabler");
+		I_ASSIGN_TO(m_checkEnablerModelCompPtr, m_checkEnablerCompPtr, false);
 		I_ASSIGN(m_retryIntervalAttrPtr, "RetryInterval", "Seconds until the next heartbeat while the server is not reachable", true, 5.0);
 		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "Seconds until the next heartbeat while the server is reachable, 0 sends heartbeats only on settings changes", true, 30.0);
 	I_END_COMPONENT;
@@ -77,8 +81,11 @@ private:
 	enum ModelId
 	{
 		MI_SERVER_CONNECTION = 0,
-		MI_RELATED_CONNECTION_STATUS
+		MI_RELATED_CONNECTION_STATUS,
+		MI_CHECK_ENABLER
 	};
+
+	bool IsCheckEnabled() const;
 
 	void SendHeartbeat();
 	void OnHeartbeatFinished(int heartbeatId, const GqlModelResult<sdl::V1_0::imtapp::CApplicationInfo>& result);
@@ -97,6 +104,8 @@ private:
 	I_REF(imod::IModel, m_serverConnectionModelCompPtr);
 	I_REF(imtcom::IConnectionStatusProvider, m_relatedConnectionStatusCompPtr);
 	I_REF(imod::IModel, m_relatedConnectionStatusModelCompPtr);
+	I_REF(iprm::IEnableableParam, m_checkEnablerCompPtr);
+	I_REF(imod::IModel, m_checkEnablerModelCompPtr);
 	I_ATTR(double, m_retryIntervalAttrPtr);
 	I_ATTR(double, m_checkIntervalAttrPtr);
 
