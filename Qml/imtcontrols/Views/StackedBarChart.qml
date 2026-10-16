@@ -338,4 +338,8 @@ Item{
 
 	onWidthChanged: canvas.requestPaint()
 	onHeightChanged: canvas.requestPaint()
+	// A canvas keeps its pixels, so a theme switch repaints it explicitly.
+	onTextColorChanged: canvas.requestPaint()
+	onAxisColorChanged: canvas.requestPaint()
+	onGridColorChanged: canvas.requestPaint()
 }

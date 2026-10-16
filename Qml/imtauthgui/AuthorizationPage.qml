@@ -293,6 +293,8 @@ Rectangle {
 				readOnly: authPageContainer.isAuthenticating;
 				placeHolderText: qsTr("Enter your password");
 				echoMode: TextInput.Password;
+				// The page draws its own show-password button next to the field.
+				passwordRevealEnabled: false;
 
 				KeyNavigation.tab: loginTextInput;
 				KeyNavigation.backtab: loginTextInput;
@@ -502,8 +504,8 @@ Rectangle {
 		id: registerDialogComp;
 		Dialog {
 			id: registerDialog;
-			width: Math.max(Style.sizeHintL, Math.min(ModalDialogManager.activeView.width - 100, Style.sizeHintXXL));
-			height: ModalDialogManager.activeView.height - 100;
+			// Sized to the form: as wide as a compact dialog, as tall as its fields, scrolling only when the window is shorter.
+			width: Math.min(ModalDialogManager.activeView.width - 2 * Style.marginXL, Style.sizeHintXL);
 			title: qsTr("Sign up");
 			canMove: false;
 			notClosingButtons: Enums.save;
@@ -534,7 +536,9 @@ Rectangle {
 			contentComp: Component {
 				Item {
 					width: registerDialog.width;
-					height: registerDialog.height - 100;
+					height: Math.min(userGeneralEditor.height + Style.marginL, ModalDialogManager.activeView.height - 2 * Style.marginXL - 2 * Style.controlHeightL - Style.marginL * 2);
+
+					property alias editor: userGeneralEditor;
 
 					clip: true;
 
@@ -568,6 +572,7 @@ Rectangle {
 							id: userGeneralEditor;
 							width: flickable.width;
 							userData: userDataModel;
+							deferValidationErrors: true;
 
 							onEmitUpdateModel: {
 								userGeneralEditor.updateModel();
@@ -579,6 +584,15 @@ Rectangle {
 
 			onFinished: {
 				if (buttonId === Enums.save){
+					// Shows what is missing instead of sending a form the server would reject.
+					let editor = registerDialog.contentItem ? registerDialog.contentItem.editor : null;
+					if (editor){
+						editor.revealValidationErrors();
+						if (!editor.inputsAcceptable()){
+							return;
+						}
+					}
+
 					registerDialog.buttons.setButtonState(Enums.save, false);
 					authPageContainer.registerUser(userDataModel)
 				}

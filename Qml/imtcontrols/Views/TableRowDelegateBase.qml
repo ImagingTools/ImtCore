@@ -75,6 +75,8 @@ Rectangle {
 	property bool compl: false;
 
 	property string selectedColor: Style.selectedColor;
+	// Off for rows that paint their own selection (e.g. rounded list items).
+	property bool focusOutlineVisible: true;
 	// Solid hover fill (replaces selectedColor * hoverOpacity).
 	property string hoverColor: Style.hover;
 
@@ -325,6 +327,8 @@ Rectangle {
 		anchors.fill: parent
 		z: -1
 		color: tableDelegateContainer.rowBackgroundColor()
+		border.width: tableDelegateContainer.focusOutlineVisible && tableDelegateContainer.selected && tableDelegateContainer.tableItem && tableDelegateContainer.tableItem.selectedIndex === tableDelegateContainer.rowIndex ? 1 : 0
+		border.color: Style.focusRingColor
 	}
 	
 	TableSelectionManager {

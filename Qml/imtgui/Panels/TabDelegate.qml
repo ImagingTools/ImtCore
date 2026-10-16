@@ -6,12 +6,15 @@ import imtcontrols 1.0
 ControlBase {
 	id: tabDelegate;
 	objectName: "Tab" + model.index
+	// The selected tab's concave corners reach over its neighbours.
+	z: selected ? 1 : 0;
 
 	property bool selected: tabPanel ? model.index === tabPanel.selectedIndex : false;
 	property bool firstElement: model.index === 0;
 	property bool lastElement: listView ? model.index === listView.count - 1 : false;
 	property bool pinned: model.pinned ? model.pinned : false;
 	property bool contentLoading: model.loading ? model.loading : false;
+	property bool dirty: model.dirty ? model.dirty : false;
 	property bool autoWidth: true;
 	property bool isCloseEnable: true;
 

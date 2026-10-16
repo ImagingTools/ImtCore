@@ -6,7 +6,7 @@ import imtcontrols 1.0
 ButtonDecorator{
     id: root;
 
-    color: baseElement && baseElement.hovered  ? Style.buttonHoverColor : "transparent";
+    color: baseElement && baseElement.hovered  ? Style.toolButtonHoverColor : "transparent";
     border.width: 0;
 
 	icon.width: icon.visible ? Style.iconSizeM : 0;

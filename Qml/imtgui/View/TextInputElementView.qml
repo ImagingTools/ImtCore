@@ -6,7 +6,7 @@ import imtcontrols 1.0
 
 ElementView {
 	id: root;
-	bottomComp: !acceptableInput && showErrorWhenInvalid ? errorComp : undefined;
+	bottomComp: !acceptableInput && showErrorWhenInvalid && (!deferErrorUntilEdited || errorRevealed) ? errorComp : undefined;
 	
 	property string text;
 	property bool textInputFocus: false;
@@ -21,6 +21,17 @@ ElementView {
 	
 	property string errorText: qsTr("Enter the correct value");
 	property bool showErrorWhenInvalid: false;
+	// Holds the error back until the field is edited or revealError() is called, so an untouched form is not all red.
+	property bool deferErrorUntilEdited: false;
+	property bool errorRevealed: false;
+
+	function revealError(){
+		root.errorRevealed = true;
+	}
+
+	onTextEdited: {
+		root.errorRevealed = true;
+	}
 
 	property int textSize: Style.fontSizeM;
 	property int placeHolderTextSize: textSize;
@@ -89,7 +100,7 @@ ElementView {
 	Component {
 		id: textInputComp;
 		CustomTextField {
-			width: root.controlWidth;
+			width: root.fittedControlWidth;
 			height: root.controlHeight;
 			objectName: "TextField"
 			

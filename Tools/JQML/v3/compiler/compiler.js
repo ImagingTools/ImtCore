@@ -840,7 +840,7 @@ function compile(options){
                         stat.isCompute = true
                         stat.wasDot = true
                         this.prepare(tree[1], stat)
-                        stat.value.add('.')
+                        stat.value.add(tree[3] ? '?.' : '.')
                         stat.value.add(new SourceNode(tree.info.line+1,tree.info.col,this.qmlFile.fileName,tree[2]))
 
                         if (stat.dotObj) {
@@ -904,7 +904,7 @@ function compile(options){
                     }
                     case 'call': {
                         this.prepare(tree[1], stat)
-                        stat.value.add('(')
+                        stat.value.add(tree[3] ? '?.(' : '(')
                         for (let i = 0; i < tree[2].length; i++) {
                             this.prepare(tree[2][i], stat)
                             if (i < tree[2].length - 1) stat.value.add(',')
@@ -1192,7 +1192,7 @@ function compile(options){
                     }
                     case 'sub': {
                         this.prepare(tree[1], stat)
-                        stat.value.add(`[`)
+                        stat.value.add(tree[3] ? '?.[' : `[`)
                         this.prepare(tree[2], stat)
                         stat.value.add(`]\n`)
                         return stat

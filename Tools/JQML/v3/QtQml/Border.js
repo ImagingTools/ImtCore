@@ -24,7 +24,7 @@ class Border extends GroupProperty {
     SLOT_widthChanged(oldValue, newValue){
         if(this.__parent)
         this.__parent.__setDOMStyle({
-            outline: `${newValue}px solid ${this.__proxy.color}`,
+            outline: `${newValue}px solid ${Color.toCss(this.__proxy.color)}`,
             outlineOffset: `-${newValue}px`,
         })
     }
@@ -32,7 +32,7 @@ class Border extends GroupProperty {
     SLOT_colorChanged(oldValue, newValue){
         if(this.__parent)
         this.__parent.__setDOMStyle({
-            outline: `${this.__proxy.width}px solid ${newValue}`,
+            outline: `${this.__proxy.width}px solid ${Color.toCss(newValue)}`,
             outlineOffset: `-${this.__proxy.width}px`,
         })
     }

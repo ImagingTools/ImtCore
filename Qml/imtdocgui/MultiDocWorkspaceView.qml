@@ -13,7 +13,7 @@ Item {
 	property ObjectVisualStatusProvider visualStatusProvider: null
 	// Optional surface overrides (defaults keep the global MultiDoc look).
 	property color contentColor: Style.baseColor
-	property color tabPanelColor: Style.baseColor
+	property color tabPanelColor: Style.tabPanelBackgroundColor
 	// Optional per-instance tab chrome; default is the global Style.tabPanelDecorator.
 	property alias tabDelegateDecorator: tabView.tabDelegateDecorator
 	// Fallback icon for document tabs when visual-status does not supply one.
@@ -69,6 +69,8 @@ Item {
 
 	NavigableItem {
 		id: navigableItem
+		// The rest of the path is the document id, consumed here.
+		forwardRest: false
 		onActivated: {
 			if (workspaceView.documentManager){
 				if (restPath.length >= 1){
@@ -127,6 +129,12 @@ Item {
 		}
 
 		function onDocumentAdded(documentId){
+			if (workspaceView.cancelledOpenings[documentId]){
+				delete workspaceView.cancelledOpenings[documentId]
+				workspaceView.documentManager.closeDocument(documentId, true)
+				return
+			}
+
 			let typeId = workspaceView.documentManager.getDocumentTypeId(documentId)
 			let documentName = workspaceView.documentManager.getDocumentName(documentId)
 
@@ -144,7 +152,14 @@ Item {
 			let documentData = workspaceView.documentManager.getDocumentDataById(documentId)
 
 			let tabIndex = tabView.getIndexById(documentId)
-			if (tabIndex < 0){
+			if (tabIndex >= 0 && workspaceView.openingDocumentIds[documentId]){
+				// The placeholder opened with the request takes the real view now that the data is here.
+				delete workspaceView.openingDocumentIds[documentId]
+				tabView.setTabName(documentId, workspaceView.tabTitle(documentId, documentName))
+				tabView.setTabLoading(documentId, false)
+				tabView.tabModel.setProperty(tabIndex, "sourceComponent", documentData.viewComp)
+			}
+			else if (tabIndex < 0){
 				tabView.addTab(
 							documentData.documentId,
 							workspaceView.tabTitle(documentData.documentId, documentName),
@@ -160,7 +175,7 @@ Item {
 		}
 
 		function onDocumentClosed(documentId){
-			let tabIndex = tabView.getIndexById(documentId)
+			delete workspaceView.openingDocumentIds[documentId]
 			tabView.removeTab(documentId)
 		}
 
@@ -182,15 +197,25 @@ Item {
 		}
 		
 		function onDocumentOpened(documentId){
-			workspaceView.stopLocalLoading()
 		}
 		
+		// A tab with a skeleton opens with the request instead of a busy overlay over the whole workspace.
 		function onDocumentOpeningStarted(documentId){
-			workspaceView.startLocalLoading()
+			if (tabView.getIndexById(documentId) >= 0){
+				return
+			}
+
+			workspaceView.openingDocumentIds[documentId] = true
+			tabView.addTab(documentId, "", openingSkeletonComp, workspaceView.defaultDocumentIcon, "", false)
+			tabView.setTabLoading(documentId, true)
+			tabView.currentIndex = tabView.tabModel.count - 1
 		}
 		
 		function onDocumentOpeningFailed(documentId, message){
-			workspaceView.stopLocalLoading()
+			if (workspaceView.openingDocumentIds[documentId]){
+				delete workspaceView.openingDocumentIds[documentId]
+				tabView.removeTab(documentId)
+			}
 			if (message !== undefined && message !== "")
 				workspaceView.openErrorDialog(message)
 		}
@@ -225,6 +250,7 @@ Item {
 	
 	function setDocumentName(documentId, name){
 		tabView.setTabName(documentId, workspaceView.tabTitle(documentId, name))
+		tabView.setTabDirty(documentId, workspaceView.documentManager.documentIsDirty(documentId))
 	}
 
 	// Every tab-name writer goes through here, so an async name update cannot drop the dirty marker.
@@ -233,11 +259,12 @@ Item {
 			name = workspaceView.documentManager.defaultDocumentName
 		}
 
-		if (workspaceView.documentManager.documentIsDirty(documentId)){
-			return workspaceView.dirtyPrefix + name
-		}
-
+		// Unsaved changes show as a dot on the tab (setTabDirty), not in its title.
 		return name
+	}
+
+	function setTabIcon(tabId, icon){
+		tabView.setTabIcon(tabId, icon)
 	}
 
 	function addFixedView(viewComp, name, id, forceFocus, pinned, icon){
@@ -265,6 +292,31 @@ Item {
 
 		if (forceFocus){
 			tabView.currentIndex = tabView.tabModel.count - 1
+		}
+	}
+
+	// Documents requested but not loaded yet, shown as placeholder tabs.
+	property var openingDocumentIds: ({})
+	// Placeholders closed before the data arrived; the document is closed when it does.
+	property var cancelledOpenings: ({})
+
+	Component {
+		id: openingSkeletonComp
+
+		Item {
+			SkeletonTableView {
+				id: openingSkeleton
+				anchors.fill: parent
+				headerVisible: false
+				cardRows: true
+				rowSpacing: Style.marginS
+				contentMaxWidth: Style.sizeHintXXL
+				contentTopMargin: Style.marginXL
+				maxRows: 8
+				Component.onCompleted: {
+					openingSkeleton.start()
+				}
+			}
 		}
 	}
 
@@ -323,6 +375,10 @@ Item {
 		tabPanelColor: workspaceView.tabPanelColor
 
 		onTabLoaded: {
+			if (workspaceView.openingDocumentIds[tabId]){
+				return
+			}
+
 			workspaceView.documentManager.setupDocumentView(tabId, tabItem)
 			workspaceView.viewLoaded(tabId, tabItem)
 		}
@@ -340,6 +396,13 @@ Item {
 				return
 			}
 			let tabId = getTabIdByIndex(index)
+			if (workspaceView.openingDocumentIds[tabId]){
+				delete workspaceView.openingDocumentIds[tabId]
+				workspaceView.cancelledOpenings[tabId] = true
+				removeTab(tabId)
+				return
+			}
+
 			let documentData = workspaceView.documentManager.getDocumentDataById(tabId)
 			if (documentData){
 				workspaceView.documentManager.closeDocument(tabId)
