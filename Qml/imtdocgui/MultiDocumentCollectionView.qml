@@ -15,6 +15,8 @@ Item {
 	property DocumentServiceBase documentManager
 	property string collectionTabId: ""
 	property color contentColor: Style.baseColor
+	// Path its tabs are recorded under in the navigation history; empty uses the collection id.
+	property string historyPath: ""
 	// Icon of the page hosting this view; every tab carries it.
 	property string pageIcon: ""
 
@@ -42,17 +44,15 @@ Item {
 	}
 
 	NavigableItem {
-		id: firstTabNavigation
+		id: navigableItem
+		// The rest of the path is the document id, consumed here.
 		forwardRest: false
-		onActivated: {
-			if (restPath.length <= 1){
+		// A history entry for the page itself returns to the collection tab.
+		onParentActivated: {
+			if (restPath.length === 0){
 				tabView.currentIndex = 0
 			}
 		}
-	}
-
-	NavigableItem {
-		id: navigableItem
 		onActivated: {
 			if (workspaceView.documentManager){
 				if (restPath.length >= 1){
@@ -87,11 +87,48 @@ Item {
 	readonly property string openingTabPrefix: "opening:"
 	// Object ids whose placeholder tab was closed before the server answered; the document is closed on arrival.
 	property var cancelledOpenings: ({})
+	// Object id -> type id of the placeholder tabs, so their history entry can be written before the document id exists.
+	property var openingTypeIds: ({})
+
+	// Every tab the user lands on is a history entry, as an editor is in VS Code: <page>/<type>/<object id> or <page>.
+	function recordTabHistory(){
+		let segment = workspaceView.historyPath !== "" ? workspaceView.historyPath : navigableItem.parentSegment
+		if (!segment || !workspaceView.visible){
+			return
+		}
+
+		let tabId = tabView.getTabIdByIndex(tabView.currentIndex)
+		if (tabId === ""){
+			return
+		}
+
+		if (tabId === workspaceView.collectionTabId){
+			NavigationController.push(segment)
+			return
+		}
+
+		let objectId = ""
+		let typeId = ""
+		if (workspaceView.isOpeningTab(tabId)){
+			objectId = tabId.slice(workspaceView.openingTabPrefix.length)
+			typeId = workspaceView.openingTypeIds[objectId] || ""
+		}
+		else if (workspaceView.documentManager){
+			objectId = workspaceView.documentManager.getDocumentObjectId(tabId)
+			typeId = workspaceView.documentManager.getDocumentTypeId(tabId)
+		}
+
+		if (objectId && typeId){
+			NavigationController.push(segment + "/" + typeId + "/" + objectId)
+		}
+	}
+
 	function isOpeningTab(tabId){
 		return tabId.indexOf(workspaceView.openingTabPrefix) === 0
 	}
 
-	function addOpeningTab(objectId){
+	function addOpeningTab(objectId, typeId){
+		workspaceView.openingTypeIds[objectId] = typeId
 		let tabId = workspaceView.openingTabPrefix + objectId
 		let index = tabView.getIndexById(tabId)
 		if (index < 0){
@@ -296,7 +333,7 @@ Item {
 		// documentId is the object id here: the document id arrives with the answer.
 		function onStartOpenDocument(documentId, typeId){
 			workspaceView.startLoading(documentId)
-			workspaceView.addOpeningTab(documentId)
+			workspaceView.addOpeningTab(documentId, typeId)
 		}
 
 		function onDocumentOpened(documentId, typeId){
@@ -707,6 +744,10 @@ Item {
 		closable: true
 		tabVisible: workspaceView.tabVisible
 		contentColor: workspaceView.contentColor
+
+		onCurrentIndexChanged: {
+			workspaceView.recordTabHistory()
+		}
 
 		onTabLoaded: {
 			if (tabId === workspaceView.collectionTabId){

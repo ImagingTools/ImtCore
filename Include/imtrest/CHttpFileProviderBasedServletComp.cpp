@@ -6,9 +6,11 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
+#include <QtCore/QCryptographicHash>
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
+#include <imtrest/CHttpResponse.h>
 
 
 namespace imtrest
@@ -160,7 +162,24 @@ ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
 	ConstResponsePtr responsePtr;
 
 	if (isDataLoaded){
-		responsePtr = ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());
+		// Revalidation instead of a full download: the web client is megabytes and only changes with a build.
+		const QByteArray etag = '"' + QCryptographicHash::hash(body, QCryptographicHash::Md5).toHex() + '"';
+		const bool notModified = (request.GetHeaderValue("if-none-match") == etag);
+
+		if (notModified){
+			responsePtr = ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_NOT_MODIFIED, QByteArray(), reponseTypeId).PopInterfacePtr());
+		}
+		else{
+			responsePtr = ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());
+		}
+
+		CHttpResponse* httpResponsePtr = dynamic_cast<CHttpResponse*>(const_cast<IResponse*>(responsePtr.GetPtr()));
+		if (httpResponsePtr != nullptr){
+			IResponse::Headers headers = httpResponsePtr->GetHeaders();
+			headers.insert("etag", etag);
+			headers.insert("cache-control", "no-cache");
+			httpResponsePtr->SetHeaders(headers);
+		}
 	}
 	else{
 		responsePtr = generateErrorResponsePtr(QByteArrayLiteral("Unable to open file ") + commandIdFileName, IProtocolEngine::SC_NOT_FOUND);
