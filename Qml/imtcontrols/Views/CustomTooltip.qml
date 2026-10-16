@@ -89,6 +89,9 @@ ControlBase {
 
             pauseCloseTooltip.stop();
 
+            if(customTooltip.decorator_ && customTooltip.decorator_.hide !== undefined){
+                customTooltip.decorator_.hide();
+            }
             customTooltip.closeTooltip();
         });
     }
