@@ -20,6 +20,9 @@
 #include <imthype/CJobTicket.h>
 #include <imthype/CJobTicketComp.h>
 #include <imthype/CJobTicketMetaInfoCreatorComp.h>
+#include <imthype/CProcessingAgentRegistryComp.h>
+#include <imthype/CLocalProcessingAgentComp.h>
+#include <imthype/CDistributedJobExecutionControllerComp.h>
 
 
 /**
@@ -47,6 +50,9 @@ typedef icomp::TModelCompWrap<
 						istd::IChangeable>> JobTicketInfo;
 typedef icomp::TModelCompWrap<imthype::CJobTicketComp> JobTicket;
 typedef imthype::CJobTicketMetaInfoCreatorComp JobTicketMetaInfoCreator;
+typedef imthype::CProcessingAgentRegistryComp ProcessingAgentRegistry;
+typedef imthype::CLocalProcessingAgentComp LocalProcessingAgent;
+typedef imthype::CDistributedJobExecutionControllerComp DistributedJobExecutionController;
 
 
 } // namespace ImtHypePck
