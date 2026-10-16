@@ -9,6 +9,7 @@
 #include <imtgql/IGqlContextCreator.h>
 #include <imtgql/IGqlRequestProvider.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IAccessContextController.h>
 
 
 namespace imtservergql
@@ -25,6 +26,7 @@ public:
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestProvider);
 		I_ASSIGN_MULTI_0(m_gqlRequestHandlerCompPtr, "GqlRequestHandler", "Handler for GraphQL-request", true);
 		I_ASSIGN(m_gqlContextCreatorCompPtr, "GqlContextCreator", "GraphQL-related context creator", false, "AuthenticationManager");
+		I_ASSIGN(m_accessContextControllerCompPtr, "AccessContextController", "Binds the data operations of the request to its tenant and user (tenant Row Level Security)", false, "AccessContextController");
 	I_END_COMPONENT;
 
 protected:
@@ -55,6 +57,7 @@ private:
 private:
 	I_MULTIREF(imtgql::IGqlRequestHandler, m_gqlRequestHandlerCompPtr);
 	I_REF(imtgql::IGqlContextCreator, m_gqlContextCreatorCompPtr);
+	I_REF(imtbase::IAccessContextController, m_accessContextControllerCompPtr);
 
 private:
 	mutable imtgql::CGqlRequest m_lastRequest;

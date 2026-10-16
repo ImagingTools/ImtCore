@@ -13,6 +13,9 @@
         <Element Id="CollectionDocumentService" PackageId="ImtDocPck" ComponentId="CollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AccessContextController" Type="Reference" ExportId="AccessContextController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Collection" Type="Reference" ExportId="Collection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

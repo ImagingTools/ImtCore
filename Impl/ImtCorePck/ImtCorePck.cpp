@@ -36,6 +36,16 @@ I_EXPORT_COMPONENT(
 			"Object Data Model Cached Collection Container Composition");
 
 I_EXPORT_COMPONENT(
+			AccessContext,
+			"Tenant access context of the request processed by the calling thread",
+			"Access Context Tenant Request Row Level Security RLS");
+
+I_EXPORT_COMPONENT(
+			SystemAccessContext,
+			"Access context of trusted system operations, not restricted by tenant isolation",
+			"Access Context System Row Level Security RLS");
+
+I_EXPORT_COMPONENT(
 			DelegatedObjectContainerSupplier,
 			"Delegated provider of a composite object (object container)",
 			"Delegator Object Data Model Composition Supplier Provider");

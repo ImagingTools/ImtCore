@@ -8,6 +8,9 @@
 #include <QtCore/QThread>
 #include <QtCore/QUuid>
 
+// ImtCore includes
+#include <imtdb/CTenantRlsPolicyBuilder.h>
+
 
 namespace imtdb
 {
@@ -73,6 +76,9 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 	}
 
 	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
+	if (!ApplyAccessContext(databaseConnection, sqlErrorPtr)){
+		return QSqlQuery();
+	}
 
 	QSqlQuery retVal(databaseConnection);
 
@@ -118,6 +124,9 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(
 	}
 
 	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
+	if (!ApplyAccessContext(databaseConnection, sqlError)){
+		return QSqlQuery();
+	}
 
 	QSqlQuery retVal(databaseConnection);
 
@@ -501,6 +510,10 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected(QSqlError* sqlError) const
 
 bool CDatabaseEngineComp::EnsureDatabaseCreated() const
 {
+	if (IsDatabaseProvisioningEnabled() && !ProvisionDatabase()){
+		return false;
+	}
+
 	bool retVal = OpenDatabase();
 	if (!retVal){
 		QString errorMessage;
@@ -608,6 +621,220 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 }
 
 
+bool CDatabaseEngineComp::IsDatabaseProvisioningEnabled() const
+{
+	if (!m_adminLoginSettingsCompPtr.IsValid()){
+		return false;
+	}
+
+	if (GetDatabaseDriverId().compare(QByteArrayLiteral("QPSQL"), Qt::CaseInsensitive) != 0){
+		return false;
+	}
+
+	const QString adminUserName = m_adminLoginSettingsCompPtr->GetUserName();
+
+	return !adminUserName.isEmpty() && (adminUserName != GetUserName());
+}
+
+
+bool CDatabaseEngineComp::ProvisionDatabase() const
+{
+	const QString roleName = GetUserName();
+	const QString databaseName = GetDatabaseName();
+	if (roleName.isEmpty() || databaseName.isEmpty()){
+		SendCriticalMessage(0, QStringLiteral("Database could not be prepared: the application user or the database name is not set"), __FILE__);
+
+		return false;
+	}
+
+	QString hostName = m_adminLoginSettingsCompPtr->GetHost();
+	if (hostName.isEmpty()){
+		hostName = GetHostName();
+	}
+
+	int port = m_adminLoginSettingsCompPtr->GetPort();
+	if (port <= 0){
+		port = GetPort();
+	}
+
+	const QString connectionName = QStringLiteral("DatabaseProvisioning %1").arg(QUuid::createUuid().toString(QUuid::WithoutBraces));
+
+	auto openAdminConnection = [&](const QString& targetDatabaseName) -> QSqlDatabase
+	{
+		QSqlDatabase databaseConnection = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, connectionName);
+		databaseConnection.setConnectOptions(GetConnectionOptionsString(*m_dbTypeAttrPtr));
+		databaseConnection.setHostName(hostName);
+		databaseConnection.setPort(port);
+		databaseConnection.setUserName(m_adminLoginSettingsCompPtr->GetUserName());
+		databaseConnection.setPassword(m_adminLoginSettingsCompPtr->GetPassword());
+		databaseConnection.setDatabaseName(targetDatabaseName);
+
+		if (!databaseConnection.open()){
+			SendCriticalMessage(
+						0,
+						QStringLiteral("Database could not be prepared: administrative login to '%1' failed: %2").arg(targetDatabaseName, databaseConnection.lastError().text()),
+						__FILE__);
+		}
+
+		return databaseConnection;
+	};
+
+	bool retVal = true;
+
+	// Server level: the application role and its database
+	{
+		QSqlDatabase adminConnection = openAdminConnection(*m_maintenanceDatabaseNameAttrPtr);
+		retVal = adminConnection.isOpen();
+		if (retVal){
+			const QString role = adminConnection.driver()->escapeIdentifier(roleName, QSqlDriver::TableName);
+			const QString database = adminConnection.driver()->escapeIdentifier(databaseName, QSqlDriver::TableName);
+
+			QSqlQuery roleQuery;
+			retVal = ExecuteAdminQuery(
+						adminConnection,
+						QStringLiteral("Look up role"),
+						QStringLiteral("SELECT rolsuper OR rolbypassrls FROM pg_roles WHERE rolname = :RoleName"),
+						QVariantMap({{QStringLiteral(":RoleName"), roleName}}),
+						&roleQuery);
+			if (retVal){
+				QString password = GetPassword();
+				password.replace(QLatin1Char('\''), QStringLiteral("''"));
+
+				if (!roleQuery.next()){
+					// Without SUPERUSER and BYPASSRLS the tenant Row Level Security policies apply to the role
+					retVal = ExecuteAdminQuery(
+								adminConnection,
+								QStringLiteral("Create role '%1'").arg(roleName),
+								QStringLiteral("CREATE ROLE %1 LOGIN NOSUPERUSER NOBYPASSRLS PASSWORD '%2'").arg(role, password));
+					if (retVal){
+						SendInfoMessage(0, QStringLiteral("Database role '%1' was created").arg(roleName), __FILE__);
+					}
+				}
+				else if (roleQuery.value(0).toBool()){
+					SendWarningMessage(0, QStringLiteral("Database role '%1' has SUPERUSER or BYPASSRLS, tenant Row Level Security is not enforced for it").arg(roleName), __FILE__);
+				}
+				else{
+					// The configured password is the source of truth for the application role.
+					retVal = ExecuteAdminQuery(
+								adminConnection,
+								QStringLiteral("Update password of role '%1'").arg(roleName),
+								QStringLiteral("ALTER ROLE %1 PASSWORD '%2'").arg(role, password));
+				}
+			}
+
+			QSqlQuery databaseQuery;
+			retVal = retVal && ExecuteAdminQuery(
+						adminConnection,
+						QStringLiteral("Look up database"),
+						QStringLiteral("SELECT pg_get_userbyid(datdba) FROM pg_database WHERE datname = :DatabaseName"),
+						QVariantMap({{QStringLiteral(":DatabaseName"), databaseName}}),
+						&databaseQuery);
+			if (retVal){
+				if (!databaseQuery.next()){
+					retVal = ExecuteAdminQuery(
+								adminConnection,
+								QStringLiteral("Create database '%1'").arg(databaseName),
+								QStringLiteral("CREATE DATABASE %1 OWNER %2 ENCODING 'UTF8'").arg(database, role));
+				}
+				else if (databaseQuery.value(0).toString() != roleName){
+					retVal = ExecuteAdminQuery(
+								adminConnection,
+								QStringLiteral("Pass database '%1' to role '%2'").arg(databaseName, roleName),
+								QStringLiteral("ALTER DATABASE %1 OWNER TO %2").arg(database, role));
+				}
+			}
+		}
+
+		adminConnection.close();
+	}
+	QSqlDatabase::removeDatabase(connectionName);
+
+	if (!retVal){
+		return false;
+	}
+
+	// Database level: extensions and ownership of the existing objects
+	{
+		QSqlDatabase adminConnection = openAdminConnection(databaseName);
+		retVal = adminConnection.isOpen();
+		if (retVal){
+			for (int i = 0; i < m_requiredExtensionsAttrPtr.GetCount(); ++i){
+				const QString extensionName = QString::fromUtf8(m_requiredExtensionsAttrPtr[i]);
+				const QString extension = adminConnection.driver()->escapeIdentifier(extensionName, QSqlDriver::TableName);
+
+				retVal = ExecuteAdminQuery(
+							adminConnection,
+							QStringLiteral("Install extension '%1'").arg(extensionName),
+							QStringLiteral("CREATE EXTENSION IF NOT EXISTS %1").arg(extension)) && retVal;
+			}
+
+			QFile scriptFile(GetSqlResourcePath(GetDatabaseDriverId(), QStringLiteral("AdoptDatabaseObjects.sql")));
+			if (scriptFile.open(QFile::ReadOnly)){
+				const QString adoptQuery = QString::fromUtf8(scriptFile.readAll());
+
+				retVal = ExecuteAdminQuery(
+							adminConnection,
+							QStringLiteral("Set application role"),
+							QStringLiteral("SELECT set_config('imt.provisioned_role', :RoleName, false)"),
+							QVariantMap({{QStringLiteral(":RoleName"), roleName}}))
+						&& ExecuteAdminQuery(
+							adminConnection,
+							QStringLiteral("Pass database objects to role '%1'").arg(roleName),
+							adoptQuery)
+						&& retVal;
+			}
+			else{
+				SendErrorMessage(0, QStringLiteral("Database preparation script '%1' could not be loaded").arg(scriptFile.fileName()), __FILE__);
+
+				retVal = false;
+			}
+		}
+
+		adminConnection.close();
+	}
+	QSqlDatabase::removeDatabase(connectionName);
+
+	return retVal;
+}
+
+
+bool CDatabaseEngineComp::ExecuteAdminQuery(
+			QSqlDatabase& databaseConnection,
+			const QString& description,
+			const QString& query,
+			const QVariantMap& bindValues,
+			QSqlQuery* resultPtr) const
+{
+	QSqlQuery sqlQuery(databaseConnection);
+
+	bool retVal = false;
+	if (bindValues.isEmpty()){
+		retVal = sqlQuery.exec(query);
+	}
+	else{
+		sqlQuery.prepare(query);
+		for (QVariantMap::const_iterator iter = bindValues.cbegin(); iter != bindValues.cend(); ++iter){
+			sqlQuery.bindValue(iter.key(), iter.value());
+		}
+
+		retVal = sqlQuery.exec();
+	}
+
+	// The query itself is not logged, it may contain a password.
+	if (!retVal){
+		SendErrorMessage(0, QStringLiteral("Database preparation failed: %1: %2").arg(description, sqlQuery.lastError().text()), __FILE__);
+
+		return false;
+	}
+
+	if (resultPtr != nullptr){
+		*resultPtr = sqlQuery;
+	}
+
+	return true;
+}
+
+
 bool CDatabaseEngineComp::CreateDatabaseMetaInfo() const
 {
 	QSqlError sqlError;
@@ -621,6 +848,49 @@ bool CDatabaseEngineComp::CreateDatabaseMetaInfo() const
 	}
 
 	return true;
+}
+
+
+bool CDatabaseEngineComp::ApplyAccessContext(QSqlDatabase& databaseConnection, QSqlError* sqlErrorPtr) const
+{
+	if (!m_accessContextCompPtr.IsValid()){
+		return true;
+	}
+
+	if (GetDatabaseDriverId().compare(QByteArrayLiteral("QPSQL"), Qt::CaseInsensitive) != 0){
+		return true;
+	}
+
+	// The context is applied before every query (no caching), because session settings changed inside of a rolled back
+	// transaction are reverted by PostgreSQL and a stale context of a previous request could be used otherwise.
+	const imtbase::IAccessContext::AccessMode accessMode = m_accessContextCompPtr->GetAccessMode();
+
+	// Empty strings instead of null strings: a NULL value would reset the setting instead of clearing it.
+	QString tenantId = QStringLiteral("");
+	QString userId = QStringLiteral("");
+	if (accessMode == imtbase::IAccessContext::AM_TENANT){
+		tenantId += QString::fromUtf8(m_accessContextCompPtr->GetTenantId());
+		userId += QString::fromUtf8(m_accessContextCompPtr->GetUserId());
+	}
+
+	QSqlQuery contextQuery(databaseConnection);
+	contextQuery.prepare(QString(CTenantRlsPolicyBuilder::CreateContextSyncQuery()));
+	contextQuery.bindValue(QStringLiteral(":TenantId"), tenantId);
+	contextQuery.bindValue(QStringLiteral(":UserId"), userId);
+	contextQuery.bindValue(QStringLiteral(":SystemContext"), (accessMode == imtbase::IAccessContext::AM_SYSTEM) ? QStringLiteral("on") : QStringLiteral("off"));
+
+	if (contextQuery.exec()){
+		return true;
+	}
+
+	const QSqlError queryError = contextQuery.lastError();
+	if (sqlErrorPtr != nullptr){
+		*sqlErrorPtr = queryError;
+	}
+
+	SendErrorMessage(0, QStringLiteral("Database access context could not be applied to the database session: '%1'. Query was not executed").arg(queryError.text()), __FILE__);
+
+	return false;
 }
 
 

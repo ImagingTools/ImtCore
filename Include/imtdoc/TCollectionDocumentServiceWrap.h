@@ -570,16 +570,20 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 
 	bool singleCopyMode = this->IsSingleCopyMode();
 	std::weak_ptr<std::atomic<bool>> aliveGuard(this->m_isAlive);
+	const typename Base::AccessContextSnapshot accessContext = this->CaptureAccessContext();
 	QObject::connect(
 		thread,
 		&QThread::started,
 		worker,
-		[this, aliveGuard, singleCopyMode, objectId, userId, documentId, worker](){
+		[this, aliveGuard, accessContext, singleCopyMode, objectId, userId, documentId, worker](){
 			auto isAlive = aliveGuard.lock();
 			if (!isAlive || !isAlive->load()){
 				worker->deleteLater();
 				return;
 			}
+
+			// The document is loaded with the access rights of the request that opened it.
+			Base::ApplyAccessContext(accessContext);
 
 			this->OnOpenDocumentThreadStarted(
 						aliveGuard,
@@ -588,6 +592,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 						userId,
 						documentId,
 						worker);
+
+			Base::ResetAccessContext(accessContext);
 		});
 
 	// Initialize observers and fire events in the main thread after background work completes

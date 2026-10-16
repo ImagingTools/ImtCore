@@ -62,6 +62,7 @@ public:
 		I_ASSIGN_MULTI_0(m_objectFactListCompPtr, "ObjectFactories", "List of object factories related to registered type-IDs ('ObjectTypeIdList')", true);
 		I_ASSIGN_MULTI_0(m_documentValidatorCompPtr, "DocumentValidators", "List of document data validators related to registered type-IDs ('ObjectTypeIdList')", false);
 		I_ASSIGN_MULTI_0(m_documentInitDelegateCompPtr, "DocumentInitDelegates", "List of document initialization delegates related to registered type-IDs ('ObjectTypeIdList')", false);
+		I_ASSIGN(m_accessContextControllerCompPtr, "AccessContextController", "Passes the access context of the request to the background threads loading the documents (tenant Row Level Security)", false, "AccessContextController");
 	I_END_COMPONENT
 
 protected:
@@ -77,6 +78,7 @@ protected:
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const override;
 	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override;
 	virtual bool OnDocumentCreated(const QByteArray& typeId, const iprm::IParamsSet* initParams, istd::IChangeable& document, QString& errorMessage) override;
+	virtual imtbase::IAccessContextController* GetAccessContextController() const override;
 
 private:
 	// Reserve 170000000-170000099 for imtdoc validation warnings to avoid collisions with other message IDs.
@@ -97,6 +99,7 @@ protected:
 	I_MULTIFACT(istd::IChangeable, m_objectFactListCompPtr);
 	I_MULTIREF(imtdoc::IDocumentValidator, m_documentValidatorCompPtr);
 	I_MULTIREF(imtdoc::IDocumentInitDelegate, m_documentInitDelegateCompPtr);
+	I_REF(imtbase::IAccessContextController, m_accessContextControllerCompPtr);
 };
 
 
