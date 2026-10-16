@@ -28,9 +28,17 @@ imtcom::IConnectionStatusProvider::ConnectionStatus CGqlHeartbeatCheckerComp::Ge
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CGqlHeartbeatCheckerComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CGqlHeartbeatCheckerComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
 {
-	SetStatus(CS_UNKNOWN, QString());
+	// Attaching a model notifies with CF_NO_UNDO only, the first heartbeat is sent after all models are registered
+	if (changeSet.ContainsExplicit(istd::IChangeable::CF_NO_UNDO, true)){
+		return;
+	}
+
+	// New settings invalidate the last result, a change of the related connection only asks for a fresh check
+	if (modelId == MI_SERVER_CONNECTION){
+		SetStatus(CS_UNKNOWN, QString());
+	}
 
 	SendHeartbeat();
 }
@@ -45,14 +53,14 @@ void CGqlHeartbeatCheckerComp::OnComponentCreated()
 	m_timer.setSingleShot(true);
 	connect(&m_timer, &QTimer::timeout, this, &CGqlHeartbeatCheckerComp::SendHeartbeat);
 
-	// Registering the model sends the first heartbeat
 	if (m_serverConnectionModelCompPtr.IsValid()){
-		BaseClass2::RegisterModel(m_serverConnectionModelCompPtr.GetPtr());
+		BaseClass2::RegisterModel(m_serverConnectionModelCompPtr.GetPtr(), MI_SERVER_CONNECTION);
+	}
+	if (m_relatedConnectionStatusModelCompPtr.IsValid()){
+		BaseClass2::RegisterModel(m_relatedConnectionStatusModelCompPtr.GetPtr(), MI_RELATED_CONNECTION_STATUS);
 	}
 
-	if (m_lastHeartbeatId == 0){
-		SendHeartbeat();
-	}
+	SendHeartbeat();
 }
 
 
