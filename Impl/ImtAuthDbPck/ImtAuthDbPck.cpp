@@ -81,6 +81,16 @@ I_EXPORT_COMPONENT(
 			"Personal Access Token Database Delegate");
 
 I_EXPORT_COMPONENT(
+			OidcClientDatabaseDelegate,
+			"OIDC client database delegate",
+			"OIDC Client Database Delegate");
+
+I_EXPORT_COMPONENT(
+			OidcTokenDatabaseDelegate,
+			"OIDC token database delegate",
+			"OIDC Token Database Delegate");
+
+I_EXPORT_COMPONENT(
 			TenantDatabaseDelegate,
 			"Tenant database delegate",
 			"Tenant Database Delegate");
@@ -102,6 +112,9 @@ I_EXPORT_COMPONENT(
 			"Tenant Invitation Database Delegate");
 
 I_EXPORT_COMPONENT(
+			ExternalIdentityDatabaseDelegate,
+			"SQL delegate for external identities (hydration, INSERT/UPDATE/DELETE)",
+			"External Identity Database Delegate");
 			CrossOrgGrantDatabaseDelegate,
 			"SQL delegate for cross-org grants (hydration, INSERT/UPDATE/DELETE)",
 			"Cross Org Grant Database Delegate");
