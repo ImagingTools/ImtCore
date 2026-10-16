@@ -356,6 +356,32 @@ module.exports = {
         this.__updateDropAreasForDragTarget(dragTarget)
     },
 
+    // As in Qt Quick, hover goes to the topmost hover-enabled MouseArea under
+    // the cursor (and its ancestors); hover-enabled MouseAreas beneath it, e.g.
+    // rows covered by a dialog overlay, must not react to the cursor.
+    __findHoverBlocker: function(event){
+        for(let obj of event.path){
+            if(!obj || obj.__destroyed || typeof obj.__acceptsHover !== 'function' || !obj.__acceptsHover()) continue
+
+            event.relative(obj)
+            if(event.x >= 0 && event.y >= 0 && event.x < obj.width && event.y < obj.height) return obj
+        }
+
+        return null
+    },
+
+    __isHoverBlocked: function(obj, blocker){
+        if(!blocker || obj === blocker || typeof obj.__acceptsHover !== 'function') return false
+
+        let parent = blocker.parent
+        while(parent){
+            if(parent === obj) return false
+            parent = parent.parent
+        }
+
+        return true
+    },
+
     __finishMouseAreaDrag: function(mouseArea){
         if(!mouseArea || mouseArea.__destroyed) return
 
@@ -395,6 +421,8 @@ module.exports = {
                 if(Math.abs(event.startY - event.originY) > 15) event.wasDragY = true
             }
 
+            let hoverBlocker = event.target ? null : this.__findHoverBlocker(event)
+
             let i = 0
             while(i < this.entered.length){
                 let obj = this.entered[i]
@@ -405,7 +433,7 @@ module.exports = {
                 }
 
                 event.relative(obj)
-                if(event.x < 0 || event.y < 0 || event.x >= obj.width || event.y >= obj.height) {
+                if(event.x < 0 || event.y < 0 || event.x >= obj.width || event.y >= obj.height || this.__isHoverBlocked(obj, hoverBlocker)) {
                     if(typeof obj.__onMouseLeave === 'function') obj.__onMouseLeave(event)
                     this.entered.splice(i, 1)
                     this.enteredSet.delete(obj)
@@ -419,6 +447,11 @@ module.exports = {
                 let obj = event.path[i]
                 if(obj.__destroyed) {
                     event.path.splice(i, 1)
+                    continue
+                }
+
+                if(this.__isHoverBlocked(obj, hoverBlocker)) {
+                    i++
                     continue
                 }
 
