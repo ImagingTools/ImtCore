@@ -56,13 +56,6 @@ bool CAccountInfoMetaInfoCreatorComp::CreateMetaInfo(
 	IContactInfo* contactPtr = const_cast<IContactInfo*>(accountPtr->GetAccountOwner());
 	if (contactPtr != nullptr){
 		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_EMAIL, contactPtr->GetEmail());
-		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_FIRST_NAME, contactPtr->GetNameField(IContactInfo::NFT_FIRST_NAME));
-		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_LAST_NAME, contactPtr->GetNameField(IContactInfo::NFT_LAST_NAME));
-
-		if (accountPtr->GetAccountType() == IAccountInfo::AT_PERSON){
-			metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_BIRTHDAY, contactPtr->GetBirthday());
-			metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_CONTACT_NICKNAME, contactPtr->GetNameField(IContactInfo::NFT_NICKNAME));
-		}
 	}
 
 	return true;
