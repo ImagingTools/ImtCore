@@ -216,7 +216,9 @@ Item {
             if(spinBox.editable){
                 numberTextField.forceActiveFocus();
             }
-            mouse.accepted = false;
+
+            // Keep the click inside the input area so that underlying MouseAreas (e.g. table row) do not take the focus away
+            mouse.accepted = spinBox.editable && mouse.x < numberBlock.width;
         }
         
         onWheel: {
