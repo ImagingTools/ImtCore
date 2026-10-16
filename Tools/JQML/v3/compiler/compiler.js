@@ -2365,6 +2365,16 @@ function compile(options){
     }
 
 
+    // Qt-only `.pragma library` directives are not valid JS once the file is inlined. Like in Qt they are
+    // recognized only in the file header (before the first statement), so a line starting with `.pragma`
+    // elsewhere (e.g. a method call continued on the next line) or inside a string/comment stays untouched.
+    function stripPragmaDirectives(data) {
+        const header = /^(?:\s+|\/\/[^\r\n]*|\/\*[\s\S]*?\*\/|\.pragma[ \t]+[A-Za-z_]\w*[ \t]*;?)*/
+        const prefix = header.exec(data)[0]
+        const cleaned = prefix.replace(/\/\/[^\r\n]*|\/\*[\s\S]*?\*\/|\.pragma[ \t]+[A-Za-z_]\w*[ \t]*;?/g, m => m.startsWith('.pragma') ? '' : m)
+        return cleaned + data.slice(prefix.length)
+    }
+
     class JSFile {
         fileName = ''
         moduleName = ''
@@ -2376,6 +2386,7 @@ function compile(options){
             this.version = version
             this.moduleName = moduleName
             let data = fs.readFileSync(fileName, { encoding: 'utf8', flag: 'r' })
+            data = stripPragmaDirectives(data)
 
             parser.parse.nowParsingFile = fileName
 
