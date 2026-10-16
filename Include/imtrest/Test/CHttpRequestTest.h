@@ -46,6 +46,13 @@ private slots:
 	void SecondRequestOnSameObjectTest();
 	void RequestIdTest();
 	void SettersTest();
+
+	void ConnectionPersistenceTest_data();
+	void ConnectionPersistenceTest();
+	void ConnectionPersistenceSplitTest();
+	void ResponseBodyOmittedTest_data();
+	void ResponseBodyOmittedTest();
+	void TcpRequestIsPersistentTest();
 };
 
 

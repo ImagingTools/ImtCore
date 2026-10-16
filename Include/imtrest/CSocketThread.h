@@ -6,6 +6,9 @@
 #include <QtCore/QThread>
 #include <QtCore/QMutex>
 
+// STL includes
+#include <atomic>
+
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/ITransport.h>
@@ -54,6 +57,23 @@ public:
 	*/
 	[[nodiscard]] QByteArray GetProtocolTypeId() const;
 
+	/**
+		Remember how the response to the request that is being processed should be sent (see IRequest::IsConnectionPersistent()
+		and IRequest::IsResponseBodyOmitted()). It is called by the socket of the thread, the hints are read by the thread that
+		sends the response.
+	*/
+	void SetResponseHints(bool isConnectionClosing, bool isBodyOmitted);
+
+	/**
+		The connection is closed after the response to the request that is being processed.
+	*/
+	[[nodiscard]] bool IsConnectionClosing() const;
+
+	/**
+		The response to the request that is being processed has no content.
+	*/
+	[[nodiscard]] bool IsResponseBodyOmitted() const;
+
 	virtual imtrest::IRequestUniquePtr CreateRequest() const;
 
 	// reimplemented (QThread)
@@ -82,6 +102,8 @@ private:
 	Status m_status;
 	istd::TDelPtr<CSocket> m_socket;
 	bool m_isSecureConnection;
+	std::atomic<bool> m_isConnectionClosing;
+	std::atomic<bool> m_isResponseBodyOmitted;
 	const QSslConfiguration& m_sslConfiguration;
 
 	mutable QByteArray m_requestId;

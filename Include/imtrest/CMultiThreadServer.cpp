@@ -100,7 +100,11 @@ bool CMultiThreadServer::SendResponse(const QByteArray& requestId, ConstResponse
 
 			const CHttpResponse* httpResponsePtr = dynamic_cast<const CHttpResponse*>(response.GetPtr());
 			if (httpResponsePtr != nullptr){
-				if (!CHttpSender::BuildResponseData(*response, data)){
+				CHttpSender::ResponseOptions options;
+				options.isConnectionClosing = socket->IsConnectionClosing();
+				options.isBodyOmitted = socket->IsResponseBodyOmitted();
+
+				if (!CHttpSender::BuildResponseData(*response, data, options)){
 					return false;
 				}
 			}

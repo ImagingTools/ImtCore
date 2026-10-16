@@ -702,6 +702,140 @@ void CSocketTimeoutWatcherTest::DeletedSocketIsHandledTest()
 }
 
 
+void CSocketTimeoutWatcherTest::ConnectionIsClosedAfterResponseTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	// The request has "Connection: close" (RFC 9112, section 9.6):
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+	watcher.CloseAfterResponse();
+
+	QVERIFY(watcher.IsCloseRequested());
+	QVERIFY(!watcher.IsClosing());
+
+	watcher.WriteResponse(s_response);
+
+	QTRY_COMPARE_WITH_TIMEOUT(sockets.GetClient().state(), QAbstractSocket::UnconnectedState, 3000);
+
+	// The whole response is delivered before the closing and it is not a timeout:
+	QCOMPARE(sockets.GetClient().readAll(), s_response);
+	QVERIFY(watcher.IsClosing());
+	QCOMPARE(timedOutSpy.count(), 0);
+}
+
+
+void CSocketTimeoutWatcherTest::ConnectionIsNotClosedBeforeResponseTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 150, 5000), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+	watcher.CloseAfterResponse();
+
+	// The handler works, the connection waits for its response:
+	QTest::qWait(400);
+
+	QCOMPARE(sockets.GetClient().state(), QAbstractSocket::ConnectedState);
+	QCOMPARE(watcher.GetPhase(), Tracker::P_PROCESSING);
+	QCOMPARE(timedOutSpy.count(), 0);
+
+	watcher.WriteResponse(s_response);
+
+	QTRY_COMPARE_WITH_TIMEOUT(sockets.GetClient().state(), QAbstractSocket::UnconnectedState, 3000);
+	QCOMPARE(sockets.GetClient().readAll(), s_response);
+}
+
+
+void CSocketTimeoutWatcherTest::DataAfterCloseRequestIsIgnoredTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(150, 5000, 5000), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+	watcher.CloseAfterResponse();
+
+	// The client should not send anything after such a request, the data are not a new request:
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+
+	QTest::qWait(400);
+
+	QCOMPARE(watcher.GetPhase(), Tracker::P_PROCESSING);
+	QCOMPARE(timedOutSpy.count(), 0);
+
+	// The response is still written and the connection is closed after it:
+	watcher.WriteResponse(s_response);
+
+	QTRY_COMPARE_WITH_TIMEOUT(sockets.GetClient().state(), QAbstractSocket::UnconnectedState, 3000);
+	QCOMPARE(sockets.GetClient().readAll(), s_response);
+}
+
+
+void CSocketTimeoutWatcherTest::ResponsesBeforeClosingRequestKeepConnectionTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	// Two requests are pipelined, the second one has "Connection: close":
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+	watcher.CloseAfterResponse();
+
+	watcher.WriteResponse(s_response);
+
+	// The response to the first request does not close the connection, the second request is not answered yet:
+	QTRY_COMPARE_WITH_TIMEOUT(watcher.GetPhase(), Tracker::P_PROCESSING, 3000);
+	QTest::qWait(200);
+	QCOMPARE(sockets.GetClient().state(), QAbstractSocket::ConnectedState);
+
+	watcher.WriteResponse(s_response);
+
+	QTRY_COMPARE_WITH_TIMEOUT(sockets.GetClient().state(), QAbstractSocket::UnconnectedState, 3000);
+	QCOMPARE(sockets.GetClient().readAll(), s_response + s_response);
+}
+
+
+void CSocketTimeoutWatcherTest::LargeResponseIsDeliveredBeforeClosingTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	const QByteArray response(4 * 1024 * 1024, 'x');
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+	watcher.CloseAfterResponse();
+	watcher.WriteResponse(response);
+
+	// A big response is sent in parts, the connection is closed after the last of them and not at the first one:
+	QByteArray received;
+	QTRY_VERIFY_WITH_TIMEOUT((received += sockets.GetClient().readAll()).size() >= response.size(), 10000);
+
+	QCOMPARE(received.size(), response.size());
+
+	QTRY_COMPARE_WITH_TIMEOUT(sockets.GetClient().state(), QAbstractSocket::UnconnectedState, 3000);
+}
+
+
 I_ADD_TEST(CSocketTimeoutWatcherTest);
 
 

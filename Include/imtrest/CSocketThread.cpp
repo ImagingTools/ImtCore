@@ -19,6 +19,8 @@ CSocketThread::CSocketThread(qintptr socketId, bool secureConnection, const QSsl
 	:QThread(parent),
 	m_status(ST_START),
 	m_isSecureConnection(secureConnection),
+	m_isConnectionClosing(false),
+	m_isResponseBodyOmitted(false),
 	m_sslConfiguration(sslConfiguration)
 {
 	this->m_socketDescriptor = socketId;
@@ -91,6 +93,25 @@ CConnectionTimeoutConfig CSocketThread::GetConnectionTimeoutConfig() const
 QByteArray CSocketThread::GetProtocolTypeId() const
 {
 	return (m_enginePtr != nullptr) ? m_enginePtr->GetProtocolTypeId() : QByteArray();
+}
+
+
+void CSocketThread::SetResponseHints(bool isConnectionClosing, bool isBodyOmitted)
+{
+	m_isConnectionClosing = isConnectionClosing;
+	m_isResponseBodyOmitted = isBodyOmitted;
+}
+
+
+bool CSocketThread::IsConnectionClosing() const
+{
+	return m_isConnectionClosing;
+}
+
+
+bool CSocketThread::IsResponseBodyOmitted() const
+{
+	return m_isResponseBodyOmitted;
 }
 
 

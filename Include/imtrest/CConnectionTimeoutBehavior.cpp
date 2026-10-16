@@ -2,10 +2,8 @@
 #include <imtrest/CConnectionTimeoutBehavior.h>
 
 
-// Qt includes
-#include <QtCore/QLocale>
-
 // ImtCore includes
+#include <imtrest/CHttpDateTools.h>
 #include <imtrest/ProtocolTypeIds.h>
 
 
@@ -32,11 +30,8 @@ CConnectionTimeoutBehavior CConnectionTimeoutBehavior::CreateForProtocol(const Q
 
 QByteArray CConnectionTimeoutBehavior::CreateHttpRequestTimeoutResponse(const QDateTime& dateTime)
 {
-	// IMF-fixdate (RFC 9110, section 5.6.7). The names of the days and months should not be localized.
-	const QString date = QLocale::c().toString(dateTime.toUTC(), QStringLiteral("ddd, dd MMM yyyy HH:mm:ss")) + QStringLiteral(" GMT");
-
 	QByteArray retVal("HTTP/1.1 408 Request Timeout\r\n");
-	retVal += "Date: " + date.toLatin1() + "\r\n";
+	retVal += "Date: " + CHttpDateTools::ToImfFixdate(dateTime) + "\r\n";
 	retVal += "Connection: close\r\n";
 	retVal += "Content-Length: 0\r\n";
 	retVal += "\r\n";

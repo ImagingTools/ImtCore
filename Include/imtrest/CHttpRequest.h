@@ -63,6 +63,17 @@ public:
 	virtual CommandParams GetCommandParams() const override;
 	virtual QByteArray GetRequestId() const override;
 
+	/**
+		The connection is closed after the response if the request is \c HTTP/1.0 without \c Connection: \c keep-alive
+		or has \c Connection: \c close (RFC 9112, section 9.3). It is known after the headers are received.
+	*/
+	virtual bool IsConnectionPersistent() const override;
+
+	/**
+		The response to \c HEAD has no content (RFC 9110, section 9.3.2).
+	*/
+	virtual bool IsResponseBodyOmitted() const override;
+
 	// reimplemented (INetworkObject)
 	virtual const IProtocolEngine& GetProtocolEngine() const override;
 

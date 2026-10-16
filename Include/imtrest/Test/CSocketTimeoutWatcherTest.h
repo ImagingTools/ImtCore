@@ -50,6 +50,13 @@ private slots:
 	void MessageFactoryIsCalledOnlyOnTimeoutTest();
 	void PartialMessageAfterFirstOfOtherProtocolIsNotLimitedTest();
 	void DeletedSocketIsHandledTest();
+
+	// Closing after the response
+	void ConnectionIsClosedAfterResponseTest();
+	void ConnectionIsNotClosedBeforeResponseTest();
+	void DataAfterCloseRequestIsIgnoredTest();
+	void ResponsesBeforeClosingRequestKeepConnectionTest();
+	void LargeResponseIsDeliveredBeforeClosingTest();
 };
 
 

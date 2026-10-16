@@ -53,6 +53,19 @@ public:
 	CConnectionTimeoutTracker::Phase GetPhase() const;
 
 	/**
+		The request that is being processed asks to close the connection after the response (for HTTP \c Connection: \c close
+		or \c HTTP/1.0, RFC 9112, section 9.3). It should be called after OnRequestCompleted() of the request.
+		The connection is closed when the response is written and no other response is waited. The data received
+		afterwards are not a request (the client should not send them) and should be discarded, see IsCloseRequested().
+	*/
+	void CloseAfterResponse();
+
+	/**
+		Returns \c true if the connection will be closed after the response, see CloseAfterResponse().
+	*/
+	bool IsCloseRequested() const;
+
+	/**
 		Data of a request are received from the socket.
 	*/
 	void OnDataReceived();
@@ -84,6 +97,7 @@ private:
 	qint64 GetNow() const;
 	void UpdateTimer();
 	void CompleteResponseIfWritten();
+	void CloseConnection();
 	void PerformAction(CConnectionTimeoutTracker::Action action);
 
 private:
@@ -91,6 +105,7 @@ private:
 	CConnectionTimeoutTracker m_tracker;
 	CConnectionTimeoutBehavior m_behavior;
 	bool m_isFirstRequestCompleted;
+	bool m_isCloseRequested;
 	bool m_isStopped;
 	QElapsedTimer m_clock;
 	QTimer m_timer;

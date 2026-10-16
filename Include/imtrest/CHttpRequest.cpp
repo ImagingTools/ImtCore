@@ -351,6 +351,19 @@ QByteArray CHttpRequest::GetRequestId() const
 	return m_requestId;
 }
 
+
+bool CHttpRequest::IsConnectionPersistent() const
+{
+	return http_should_keep_alive(&m_httpParser) != 0;
+}
+
+
+bool CHttpRequest::IsResponseBodyOmitted() const
+{
+	return m_httpParser.method == HTTP_HEAD;
+}
+
+
 // reimplemented (INetworkObject)
 
 const IProtocolEngine& CHttpRequest::GetProtocolEngine() const

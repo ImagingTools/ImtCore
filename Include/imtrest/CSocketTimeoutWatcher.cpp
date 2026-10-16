@@ -18,6 +18,7 @@ CSocketTimeoutWatcher::CSocketTimeoutWatcher(QAbstractSocket& socket, const CCon
 	m_tracker(config),
 	m_behavior(behavior),
 	m_isFirstRequestCompleted(false),
+	m_isCloseRequested(false),
 	m_isStopped(false)
 {
 	m_clock.start();
@@ -47,9 +48,21 @@ CConnectionTimeoutTracker::Phase CSocketTimeoutWatcher::GetPhase() const
 }
 
 
+void CSocketTimeoutWatcher::CloseAfterResponse()
+{
+	m_isCloseRequested = true;
+}
+
+
+bool CSocketTimeoutWatcher::IsCloseRequested() const
+{
+	return m_isCloseRequested;
+}
+
+
 void CSocketTimeoutWatcher::OnDataReceived()
 {
-	if (IsClosing()){
+	if (IsClosing() || m_isCloseRequested){
 		return;
 	}
 
@@ -61,7 +74,7 @@ void CSocketTimeoutWatcher::OnDataReceived()
 
 void CSocketTimeoutWatcher::OnRequestCompleted()
 {
-	if (IsClosing()){
+	if (IsClosing() || m_isCloseRequested){
 		return;
 	}
 
@@ -167,6 +180,21 @@ void CSocketTimeoutWatcher::CompleteResponseIfWritten()
 {
 	if (!m_socketPtr.isNull() && (m_tracker.GetPhase() == CConnectionTimeoutTracker::P_SENDING) && (m_socketPtr->bytesToWrite() == 0)){
 		m_tracker.OnResponseCompleted(GetNow());
+
+		if (m_isCloseRequested && (m_tracker.GetPhase() != CConnectionTimeoutTracker::P_PROCESSING)){
+			CloseConnection();
+		}
+	}
+}
+
+
+void CSocketTimeoutWatcher::CloseConnection()
+{
+	m_isStopped = true;
+	m_timer.stop();
+
+	if (!m_socketPtr.isNull()){
+		m_socketPtr->disconnectFromHost();
 	}
 }
 
@@ -182,9 +210,7 @@ void CSocketTimeoutWatcher::PerformAction(CConnectionTimeoutTracker::Action acti
 
 	switch (action){
 	case CConnectionTimeoutTracker::A_CLOSE_IDLE:
-		m_isStopped = true;
-		m_timer.stop();
-		m_socketPtr->disconnectFromHost();
+		CloseConnection();
 		break;
 
 	case CConnectionTimeoutTracker::A_REQUEST_TIMEOUT:

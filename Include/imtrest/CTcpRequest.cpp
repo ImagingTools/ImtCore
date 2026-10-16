@@ -30,6 +30,19 @@ CTcpRequest::MethodType CTcpRequest::GetMethodType() const
 
 // reimplemented (IRequest)
 
+bool CTcpRequest::IsConnectionPersistent() const
+{
+	// The messages are not HTTP requests: the connection is a persistent channel
+	return true;
+}
+
+
+bool CTcpRequest::IsResponseBodyOmitted() const
+{
+	return false;
+}
+
+
 IRequest::RequestState CTcpRequest::GetState() const
 {
 	return m_state;

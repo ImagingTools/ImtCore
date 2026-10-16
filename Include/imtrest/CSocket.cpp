@@ -91,8 +91,9 @@ void CSocket::OnHandleSslErrors(QList<QSslError> errorList)
 void CSocket::HandleReadyRead()
 {
 	if (m_timeoutWatcherPtr != nullptr){
-		if (m_timeoutWatcherPtr->IsClosing()){
-			// The client should only close the connection after the response of the timeout (RFC 9112, section 9.6).
+		if (m_timeoutWatcherPtr->IsClosing() || m_timeoutWatcherPtr->IsCloseRequested()){
+			// The client should only close the connection after the response of the timeout (RFC 9112, section 9.6)
+			// and should not send requests after a request that asked to close it (RFC 9112, section 9.6).
 			m_socket->readAll();
 
 			return;
@@ -143,8 +144,15 @@ void CSocket::HandleReadyRead()
 	// All request data was read:
 	m_socket->commitTransaction();
 
+	const bool isConnectionClosing = !m_requestPtr->IsConnectionPersistent();
+	m_rootSocket->SetResponseHints(isConnectionClosing, m_requestPtr->IsResponseBodyOmitted());
+
 	if (m_timeoutWatcherPtr != nullptr){
 		m_timeoutWatcherPtr->OnRequestCompleted();
+
+		if (isConnectionClosing){
+			m_timeoutWatcherPtr->CloseAfterResponse();
+		}
 	}
 
 	// Start request handler:

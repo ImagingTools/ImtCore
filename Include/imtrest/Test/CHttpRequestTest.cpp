@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtrest/CHttpRequest.h>
+#include <imtrest/CTcpRequest.h>
 #include <imtrest/IProtocolEngine.h>
 
 
@@ -631,6 +632,98 @@ void CHttpRequestTest::SettersTest()
 	QCOMPARE(request.GetMethodType(), imtrest::CHttpRequest::MT_GET);
 	request.SetMethodType(imtrest::CHttpRequest::MT_PUT);
 	QCOMPARE(request.GetMethodType(), imtrest::CHttpRequest::MT_PUT);
+}
+
+
+void CHttpRequestTest::ConnectionPersistenceTest_data()
+{
+	QTest::addColumn<QByteArray>("request");
+	QTest::addColumn<bool>("isPersistent");
+
+	// RFC 9112, section 9.3: HTTP/1.1 is persistent unless the client says "close", HTTP/1.0 only with "keep-alive"
+	QTest::newRow("HTTP/1.1") << QByteArray("GET / HTTP/1.1\r\nHost: a\r\n\r\n") << true;
+	QTest::newRow("HTTP/1.1 close") << QByteArray("GET / HTTP/1.1\r\nConnection: close\r\n\r\n") << false;
+	QTest::newRow("HTTP/1.1 Close") << QByteArray("GET / HTTP/1.1\r\nConnection: Close\r\n\r\n") << false;
+	QTest::newRow("HTTP/1.1 keep-alive") << QByteArray("GET / HTTP/1.1\r\nConnection: keep-alive\r\n\r\n") << true;
+	QTest::newRow("HTTP/1.0") << QByteArray("GET / HTTP/1.0\r\n\r\n") << false;
+	QTest::newRow("HTTP/1.0 keep-alive") << QByteArray("GET / HTTP/1.0\r\nConnection: keep-alive\r\n\r\n") << true;
+	QTest::newRow("HTTP/1.0 close") << QByteArray("GET / HTTP/1.0\r\nConnection: close\r\n\r\n") << false;
+	QTest::newRow("POST with body") << QByteArray("POST / HTTP/1.1\r\nContent-Length: 2\r\nConnection: close\r\n\r\nhi") << false;
+}
+
+
+void CHttpRequestTest::ConnectionPersistenceTest()
+{
+	QFETCH(QByteArray, request);
+	QFETCH(bool, isPersistent);
+
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+	imtrest::CHttpRequest httpRequest(servlet, engine);
+
+	QVERIFY(httpRequest.ExecuteHttpParser(request, nullptr));
+	QCOMPARE(httpRequest.GetState(), imtrest::IRequest::RS_MESSAGE_COMPLETE);
+
+	QCOMPARE(httpRequest.IsConnectionPersistent(), isPersistent);
+}
+
+
+void CHttpRequestTest::ConnectionPersistenceSplitTest()
+{
+	const QByteArray request("GET / HTTP/1.1\r\nHost: a\r\nConnection: close\r\n\r\n");
+
+	// The header can be split at any position between the reads:
+	for (qsizetype position = 1; position < request.size(); ++position){
+		CRequestServletStub servlet;
+		CProtocolEngineStub engine;
+		imtrest::CHttpRequest httpRequest(servlet, engine);
+
+		QVERIFY(httpRequest.ExecuteHttpParser(request.left(position), nullptr));
+		QVERIFY(httpRequest.ExecuteHttpParser(request.mid(position), nullptr));
+
+		QVERIFY2(!httpRequest.IsConnectionPersistent(), qPrintable(QString::number(position)));
+	}
+}
+
+
+void CHttpRequestTest::ResponseBodyOmittedTest_data()
+{
+	QTest::addColumn<QByteArray>("request");
+	QTest::addColumn<bool>("isOmitted");
+
+	// RFC 9110, section 9.3.2: the response to HEAD has no content
+	QTest::newRow("HEAD") << QByteArray("HEAD / HTTP/1.1\r\n\r\n") << true;
+	QTest::newRow("GET") << QByteArray("GET / HTTP/1.1\r\n\r\n") << false;
+	QTest::newRow("POST") << QByteArray("POST / HTTP/1.1\r\nContent-Length: 2\r\n\r\nhi") << false;
+	QTest::newRow("OPTIONS") << QByteArray("OPTIONS / HTTP/1.1\r\n\r\n") << false;
+}
+
+
+void CHttpRequestTest::ResponseBodyOmittedTest()
+{
+	QFETCH(QByteArray, request);
+	QFETCH(bool, isOmitted);
+
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+	imtrest::CHttpRequest httpRequest(servlet, engine);
+
+	QVERIFY(httpRequest.ExecuteHttpParser(request, nullptr));
+
+	QCOMPARE(httpRequest.IsResponseBodyOmitted(), isOmitted);
+}
+
+
+void CHttpRequestTest::TcpRequestIsPersistentTest()
+{
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+
+	// A message of the raw TCP channel is not an HTTP request, the channel is never closed by the request:
+	imtrest::CTcpRequest tcpRequest(servlet, engine);
+
+	QVERIFY(tcpRequest.IsConnectionPersistent());
+	QVERIFY(!tcpRequest.IsResponseBodyOmitted());
 }
 
 

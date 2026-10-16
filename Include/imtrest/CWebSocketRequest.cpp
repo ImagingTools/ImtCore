@@ -205,6 +205,19 @@ void CWebSocketRequest::SetCommandId(const QByteArray& commandId)
 
 // reimplemented (IRequest)
 
+bool CWebSocketRequest::IsConnectionPersistent() const
+{
+	// The WebSocket connection is a persistent channel
+	return true;
+}
+
+
+bool CWebSocketRequest::IsResponseBodyOmitted() const
+{
+	return false;
+}
+
+
 IRequest::RequestState CWebSocketRequest::GetState() const
 {
 	return m_state;
