@@ -35,8 +35,9 @@ void CGqlHeartbeatCheckerComp::OnModelChanged(int modelId, const istd::IChangeab
 		return;
 	}
 
-	// New settings invalidate the last result, a change of the related connection only asks for a fresh check
-	if (modelId == MI_SERVER_CONNECTION){
+	// New settings invalidate the last result and while the check is disabled there is none.
+	// A change of the related connection or enabling the check only asks for a fresh check
+	if ((modelId == MI_SERVER_CONNECTION) || !IsCheckEnabled()){
 		SetStatus(CS_UNKNOWN, QString());
 	}
 
@@ -59,6 +60,9 @@ void CGqlHeartbeatCheckerComp::OnComponentCreated()
 	if (m_relatedConnectionStatusModelCompPtr.IsValid()){
 		BaseClass2::RegisterModel(m_relatedConnectionStatusModelCompPtr.GetPtr(), MI_RELATED_CONNECTION_STATUS);
 	}
+	if (m_checkEnablerModelCompPtr.IsValid()){
+		BaseClass2::RegisterModel(m_checkEnablerModelCompPtr.GetPtr(), MI_CHECK_ENABLER);
+	}
 
 	SendHeartbeat();
 }
@@ -76,13 +80,20 @@ void CGqlHeartbeatCheckerComp::OnComponentDestroyed()
 
 // private methods
 
+bool CGqlHeartbeatCheckerComp::IsCheckEnabled() const
+{
+	return !m_checkEnablerCompPtr.IsValid() || m_checkEnablerCompPtr->IsEnabled();
+}
+
+
 void CGqlHeartbeatCheckerComp::SendHeartbeat()
 {
 	m_timer.stop();
 
+	// Also drops the reply of a heartbeat still in flight when the check gets disabled
 	const int heartbeatId = ++m_lastHeartbeatId;
 
-	if (!m_asyncClientCompPtr.IsValid()){
+	if (!IsCheckEnabled() || !m_asyncClientCompPtr.IsValid()){
 		return;
 	}
 
