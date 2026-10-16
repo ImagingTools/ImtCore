@@ -50,7 +50,6 @@ Rectangle{
 		property string parentIds: "";
 		property string idsToOpen: "";
 		property int insertIndex: -1;
-		property TreeItemModel newTreeModel: TreeItemModel{}
 
 		gqlCommandId: treeBody.addressListCommandId
 		inputObjectComp: treeBody.addressTreeInputObjectComp
@@ -58,28 +57,28 @@ Rectangle{
 
 		property var customFinishedCallback: null
 
-		function defaultFinishedCallback(status, sdlObject, insertIndex, newTreeModel, idsToOpen) {
+		function defaultFinishedCallback(status, sdlObject, insertIndex, idsToOpen) {
 			treeLoading.visible = false;
 			if (status !== 1) {
 				return;
 			}
 
 			let items = (sdlObject && sdlObject.m_items !== undefined) ? sdlObject.m_items : null;
-			let isCountZero = !items || items.getItemsCount() === 0;
+			let isCountZero = !items || !items.getItemsCount || items.getItemsCount() === 0;
+			let itemCount = isCountZero ? 0 : items.getItemsCount();
 
-			if (isCountZero && insertIndex === -1) {
+			if (insertIndex === -1) {
 				treeView.model.clear();
 				treeView.selectedIndex = -1;
+				if (!isCountZero) {
+					treeView.showRoot(items);
+				}
+			}
+			else if (!isCountZero) {
+				treeView.showChildren(insertIndex, items);
 			}
 
-			if (!isCountZero) {
-				if (insertIndex === -1) {
-					treeView.model.clear();
-				}
-				newTreeModel.createFromJson(items.toJson());
-				treeView.insertTree(insertIndex, newTreeModel);
-				newTreeModel.clear();
-			}
+			console.log("AddressTree: сборка дерева", itemCount, "узлов, index", insertIndex)
 
 			if (treeView.model.getItemsCount() > 0 && idsToOpen !== "") {
 				let ids_ = idsToOpen;
@@ -96,16 +95,46 @@ Rectangle{
 			let reqStatus = status;
 			let reqSdlObject = sdlObject;
 			let reqInsertIndex = insertIndex;
-			let reqNewTreeModel = newTreeModel;
 			let reqIdsToOpen = idsToOpen;
 
 			if (customFinishedCallback) {
-				customFinishedCallback(reqStatus, reqSdlObject, reqInsertIndex, reqNewTreeModel, reqIdsToOpen);
-
+				let items = (reqSdlObject && reqSdlObject.m_items !== undefined) ? reqSdlObject.m_items : null;
+				customFinishedCallback(reqStatus, reqSdlObject, reqInsertIndex, items, reqIdsToOpen);
 				return;
 			}
 
-			defaultFinishedCallback(reqStatus, reqSdlObject, reqInsertIndex, reqNewTreeModel, reqIdsToOpen);
+			defaultFinishedCallback(reqStatus, reqSdlObject, reqInsertIndex, reqIdsToOpen);
+		}
+
+		function getRequestedFields(){
+			let items = Gql.GqlObject("items");
+			treeBody.addQueryField(items, treeBody.idParam);
+			treeBody.addQueryField(items, treeBody.nameParam);
+			treeBody.addQueryField(items, treeBody.fullAddressParam);
+			treeBody.addQueryField(items, treeBody.latitudeParam);
+			treeBody.addQueryField(items, treeBody.longitudeParam);
+			treeBody.addQueryField(items, treeBody.typeIdParam);
+			treeBody.addQueryField(items, "typeId__");
+			treeBody.addQueryField(items, treeBody.parentIdsParam);
+			treeBody.addQueryField(items, treeBody.hasChildrenParam);
+			treeBody.addQueryField(items, "activeDevCount");
+			treeBody.addQueryField(items, "inactiveDevCount");
+
+			let fields = Gql.GqlObject("");
+			fields.InsertFieldObject(items);
+			return fields;
+		}
+
+		function prepareSdlObject(sdlObject){
+			let raw = sdlObject.__self ? sdlObject.__self : sdlObject;
+			let original = raw.createElement;
+			raw.createElement = function(propertyId, typename){
+				if (propertyId === "m_items"){
+					return treeNodeComp;
+				}
+				return original.call(sdlObject, propertyId, typename);
+			}
+			delete raw.CACHED_FUNC_createElement;
 		}
 
 		function reset(){
@@ -136,6 +165,13 @@ Rectangle{
 
 	function setCustomFilters(inputParams){
 		return
+	}
+
+	function addQueryField(gqlObject, name){
+		if (!name){
+			return;
+		}
+		gqlObject.InsertField(name);
 	}
 
 	function setExternalAddress(address, parentIds){
@@ -279,7 +315,13 @@ Rectangle{
 		}
 	}
 
-	TreeViewGql{
+	Component {
+		id: treeNodeComp
+		TreeNodeSdl {
+		}
+	}
+
+	TreeViewBranch{
 		id: treeView;
 
 		anchors.top: searchComp.bottom;

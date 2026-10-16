@@ -66,6 +66,10 @@ GqlRequest {
 		if (sdlObjectComp){
 			sdlObject = sdlObjectComp.createObject(root)
 		}
+
+		if (sdlObject && root.prepareSdlObject){
+			root.prepareSdlObject(sdlObject)
+		}
 		
 		if (sdlObject){
 			sdlObject.fromObject(data)
