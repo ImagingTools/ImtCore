@@ -76,8 +76,13 @@ ControlBase {
 
     // Close the tooltip when the pointer leaves the browser window (the web
     // runtime sends no `exited` to the owner in that case).
+    // Started when the opening is scheduled (show) or performed directly (open), so a
+    // pending delay is cancelled as well. Already watching: keep the subscription.
     function _watchPointerLeave(){
-        PointerLeaveWatcher.unwatch(customTooltip._leaveHandle);
+        if (customTooltip._leaveHandle){
+            return;
+        }
+
         customTooltip._leaveHandle = PointerLeaveWatcher.watch(function(){
             pauseOpenTooltip.stop();
             pauseCloseTooltip.stop();
@@ -85,9 +90,15 @@ ControlBase {
         });
     }
 
+    function _unwatchPointerLeave(){
+        PointerLeaveWatcher.unwatch(customTooltip._leaveHandle);
+        customTooltip._leaveHandle = null;
+    }
+
     function openTooltip(xX, yY){
         if(!customTooltip.openST){
             if (!ModalDialogManager.activeView){
+                customTooltip._unwatchPointerLeave();
                 return;
             }
 
@@ -118,8 +129,7 @@ ControlBase {
     }
 
     function closeTooltip(){
-        PointerLeaveWatcher.unwatch(customTooltip._leaveHandle);
-        customTooltip._leaveHandle = null;
+        customTooltip._unwatchPointerLeave();
 
         if(customTooltip.openST){
             ModalDialogManager.closeByComp(customTooltip.tooltipContentComp);
@@ -273,11 +283,18 @@ ControlBase {
             pauseCloseTooltip.start();
         }
         pauseOpenTooltip.restart();
+        customTooltip._watchPointerLeave();
     }
 
     function hide(){
         pauseOpenTooltip.stop();
         pauseCloseTooltip.stop();
+
+        // Nothing is displayed yet, so the pending opening is cancelled. An open tooltip
+        // releases the subscription in closeTooltip().
+        if(!customTooltip.openST){
+            customTooltip._unwatchPointerLeave();
+        }
 
         if(customTooltip.decorator_ && customTooltip.decorator_.hide !== undefined){
             customTooltip.decorator_.hide();
