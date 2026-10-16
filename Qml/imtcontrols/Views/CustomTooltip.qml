@@ -79,6 +79,8 @@ ControlBase {
     function _watchPointerLeave(){
         PointerLeaveWatcher.unwatch(customTooltip._leaveHandle);
         customTooltip._leaveHandle = PointerLeaveWatcher.watch(function(){
+            pauseOpenTooltip.stop();
+            pauseCloseTooltip.stop();
             customTooltip.closeTooltip();
         });
     }
