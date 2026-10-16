@@ -42,12 +42,10 @@ elseif(ANDROID)
 		${OPENSSL_ANDROID_SSL}
 	)
 
-	set(ANDROID_EXTRA_LIBS
+	# Pack OpenSSL shared libraries into the APK, otherwise the app fails to start (dlopen: libcrypto_*.so not found).
+	set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY QT_ANDROID_EXTRA_LIBS
 		${OPENSSL_ANDROID_CRYPTO}
-		${OPENSSL_ANDROID_SSL}
-		CACHE INTERNAL ""
-	)
-	message("ANDROID_EXTRA_LIBS ${ANDROID_EXTRA_LIBS}")
+		${OPENSSL_ANDROID_SSL})
 elseif(APPLE)
 	if(CMAKE_OSX_ARCHITECTURES STREQUAL "arm64")
 		set(OPENSSL_OSX_ARCH arm64)
