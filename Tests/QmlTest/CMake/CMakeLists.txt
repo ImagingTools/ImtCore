@@ -36,5 +36,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 set(DEPLOY_QT_QML_DIRS "${IMT_QML_TEST_DIR}" "${IMTCOREDIR}/Qml")
-deploy_qt(TARGET ${PROJECT_NAME} OPTIONS --include-plugins qoffscreen)
+if (APPLE)
+	deploy_qt(TARGET ${PROJECT_NAME})
+else()
+	deploy_qt(TARGET ${PROJECT_NAME} OPTIONS --include-plugins qoffscreen)
+endif()
 

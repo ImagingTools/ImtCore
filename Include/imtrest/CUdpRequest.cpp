@@ -33,6 +33,19 @@ CUdpRequest::MethodType CUdpRequest::GetMethodType() const
 
 // reimplemented (IRequest)
 
+bool CUdpRequest::IsConnectionPersistent() const
+{
+	// The datagrams are not HTTP requests
+	return true;
+}
+
+
+bool CUdpRequest::IsResponseBodyOmitted() const
+{
+	return false;
+}
+
+
 IRequest::RequestState CUdpRequest::GetState() const
 {
 	return m_state;

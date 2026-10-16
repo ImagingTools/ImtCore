@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtrest/CTcpRequest.h>
 #include <imtrest/CTcpResponse.h>
+#include <imtrest/ProtocolTypeIds.h>
 
 
 namespace imtrest
@@ -17,7 +18,7 @@ namespace imtrest
 
 QByteArray CTcpProtocolEngineComp::GetProtocolTypeId() const
 {
-	return "tcp";
+	return ProtocolTypeIds::s_tcp;
 }
 
 

@@ -61,6 +61,22 @@ int CTcpServerComp::GetThreadsLimit()
 }
 
 
+CConnectionTimeoutConfig CTcpServerComp::GetConnectionTimeoutConfig() const
+{
+	CConnectionTimeoutConfig retVal;
+
+	if (m_requestInactivityTimeoutAttrPtr.IsValid()){
+		retVal.requestInactivityMs = *m_requestInactivityTimeoutAttrPtr;
+	}
+
+	if (m_keepAliveTimeoutAttrPtr.IsValid()){
+		retVal.keepAliveMs = *m_keepAliveTimeoutAttrPtr;
+	}
+
+	return retVal;
+}
+
+
 // protected methods
 
 void CTcpServerComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)

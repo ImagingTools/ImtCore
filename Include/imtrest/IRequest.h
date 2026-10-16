@@ -42,6 +42,17 @@ public:
 	virtual QByteArray GetBody() const = 0;
 	virtual QByteArray GetRequestId() const = 0;
 	virtual bool ParseDeviceData(QIODevice& device) = 0;
+
+	/**
+		Returns \c false if the connection should be closed after the response to the request, for example because
+		the client asked for it.
+	*/
+	virtual bool IsConnectionPersistent() const = 0;
+
+	/**
+		Returns \c true if the response to the request should be sent without content, for example the response to \c HEAD.
+	*/
+	virtual bool IsResponseBodyOmitted() const = 0;
 };
 
 

@@ -44,6 +44,8 @@ public:
 	imtrest::IRequestServlet* GetRequestServlet();
 	imtrest::IProtocolEngine* GetProtocolEngine();
 
+	[[nodiscard]] CConnectionTimeoutConfig GetConnectionTimeoutConfig() const;
+
 	[[nodiscard]] bool IsSecureConnection() const;
 	void EnableSecureConnection(bool isSecureConnection = true);
 

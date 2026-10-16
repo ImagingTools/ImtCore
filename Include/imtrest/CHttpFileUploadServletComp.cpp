@@ -2,10 +2,8 @@
 #include <imtrest/CHttpFileUploadServletComp.h>
 
 
-// Qt includes
-#include <QtCore/QRegularExpression>
-
 // ImtCore includes
+#include <imtrest/CHttpRangeTools.h>
 #include <imtrest/IProtocolEngine.h>
 
 
@@ -15,6 +13,26 @@ namespace imtrest
 
 QByteArray CHttpFileUploadServletComp::s_plainTextReponseTypeId = QByteArrayLiteral("text/plain; charset = utf-8");
 QByteArray CHttpFileUploadServletComp::s_octetStreamTypeId = QByteArrayLiteral("application/octet-stream");
+
+
+// public static methods
+
+bool CHttpFileUploadServletComp::GetChunkRange(const QByteArray& contentRange, qint64 chunkSize, imtservergql::IFileUploadHandler::ByteRange& range, qint64& fileSize)
+{
+	CHttpRangeTools::ContentRange parsedRange;
+	if (!CHttpRangeTools::ParseContentRange(contentRange, parsedRange)){
+		return false;
+	}
+
+	if (!parsedRange.IsByteRange() || (parsedRange.completeLength <= 0) || (parsedRange.GetLength() != chunkSize)){
+		return false;
+	}
+
+	range = imtservergql::IFileUploadHandler::ByteRange(parsedRange.first, parsedRange.last);
+	fileSize = parsedRange.completeLength;
+
+	return true;
+}
 
 
 // protected methods
@@ -43,9 +61,8 @@ ConstResponsePtr CHttpFileUploadServletComp::OnPut(
 	}
 
 	QByteArray contentType;
-	istd::CIntRange range(-1, -1);
+	QByteArray contentRange;
 	int length = 0;
-	int fileSize = -1;
 	QString fileName;
 	QByteArray sessionId;
 	QByteArray fileId;
@@ -55,11 +72,7 @@ ConstResponsePtr CHttpFileUploadServletComp::OnPut(
 		QByteArray value = contentType = headers[header];
 
 		if (header.compare(QByteArrayLiteral("content-range"), Qt::CaseInsensitive) == 0){
-			RangeData rangeData = GetRangeDataFromString(value);
-
-			range.SetMinValue(rangeData.startIndex);
-			range.SetMaxValue(rangeData.endIndex);
-			fileSize = rangeData.totalSize;
+			contentRange = value;
 		}
 		else if (header.compare(QByteArrayLiteral("content-length"), Qt::CaseInsensitive) == 0){
 			length = value.toInt();
@@ -77,12 +90,14 @@ ConstResponsePtr CHttpFileUploadServletComp::OnPut(
 
 	CHttpResponse::Headers responseHeaders = GetRequestHeaders(request);
 
+	imtservergql::IFileUploadHandler::ByteRange range;
+	qint64 fileSize = -1;
+	const bool isRangeValid = GetChunkRange(contentRange, fileData.size(), range, fileSize);
+
 	if (		length == 0 ||
-				range.GetMaxValue() < 0 ||
-				range.GetLength() != length ||
+				!isRangeValid ||
 				sessionId.isEmpty() ||
 				fileId.isEmpty() ||
-				fileSize <= 0 ||
 				fileName.isEmpty() ||
 				fileData.size() != length){
 		retVal = CreateResponse(request, IProtocolEngine::SC_BAD_REQUEST, responseHeaders, "Invalid request params", s_plainTextReponseTypeId);
@@ -135,42 +150,6 @@ ConstResponsePtr CHttpFileUploadServletComp::OnPut(
 
 
 // private methods
-
-CHttpFileUploadServletComp::RangeData CHttpFileUploadServletComp::GetRangeDataFromString(const QString& dataString) const
-{
-	static QRegularExpression regExp("^(?<units>\\S{1,}){0,1}\\s+(?<start>\\d{1,})-(?<end>\\d{1,})?(\\/?(?<total>\\d{1,}))?");
-
-	QRegularExpressionMatch regExpMatch = regExp.match(dataString);
-	if (!regExpMatch.hasMatch()){
-		return RangeData();
-	}
-
-	RangeData retVal;
-	retVal.units = regExpMatch.captured("units");
-	QString capturedStartData = regExpMatch.captured("start");
-	if (!capturedStartData.isEmpty()){
-		[[maybe_unused]] bool isNumber = false;
-		retVal.startIndex = capturedStartData.toLongLong(&isNumber);
-		Q_ASSERT(isNumber);
-	}
-
-	QString capturedEndData = regExpMatch.captured("end");
-	if (!capturedEndData.isEmpty()){
-		[[maybe_unused]] bool isNumber = false;
-		retVal.endIndex = capturedEndData.toLongLong(&isNumber);
-		Q_ASSERT(isNumber);
-	}
-
-	QString capturedTotalData = regExpMatch.captured("total");
-	if (!capturedTotalData.isEmpty()){
-		[[maybe_unused]] bool isNumber = false;
-		retVal.totalSize = capturedTotalData.toLongLong(&isNumber);
-		Q_ASSERT(isNumber);
-	}
-
-	return retVal;
-}
-
 
 CHttpResponse::Headers CHttpFileUploadServletComp::GetRequestHeaders(const CHttpRequest& request) const
 {

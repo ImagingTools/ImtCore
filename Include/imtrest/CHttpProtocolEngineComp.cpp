@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtrest/CHttpRequest.h>
 #include <imtrest/CHttpResponse.h>
+#include <imtrest/ProtocolTypeIds.h>
 
 
 namespace imtrest
@@ -17,7 +18,7 @@ namespace imtrest
 
 QByteArray CHttpProtocolEngineComp::GetProtocolTypeId() const
 {
-	return "http";
+	return ProtocolTypeIds::s_http;
 }
 
 

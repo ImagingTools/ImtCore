@@ -72,6 +72,8 @@ public:
 	virtual QByteArray GetBody() const override;
 	virtual QByteArray GetRequestId() const override;
 	virtual bool ParseDeviceData(QIODevice& device) override;
+	virtual bool IsConnectionPersistent() const override;
+	virtual bool IsResponseBodyOmitted() const override;
 
 	// reimplemented (INetworkObject)
 	virtual const IProtocolEngine& GetProtocolEngine() const override;

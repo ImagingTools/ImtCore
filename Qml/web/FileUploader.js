@@ -21,7 +21,11 @@ var FileUploader = {
 
 			setRequestHeader: function(xhr, headers){
 				xhr.setRequestHeader('Content-Type', 'application/octet-stream')
-				xhr.setRequestHeader('Content-Range', this.step === 0 ? `bytes 0-${this.parts[0].size}/${this.file.size}` : `bytes ${this.parts[0].size*this.step}-${Math.min(this.parts[0].size*(this.step+1), file.size)}/${this.file.size}`)
+
+				// Both positions of Content-Range are inclusive (RFC 9110, 14.4)
+				let first = this.parts[0].size * this.step
+				let last = first + this.parts[this.step].size - 1
+				xhr.setRequestHeader('Content-Range', `bytes ${first}-${last}/${this.file.size}`)
 
 
 				for(let key in headers){
