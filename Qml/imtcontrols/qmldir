@@ -178,7 +178,7 @@ ChangeItemSize 1.0 ./Views/ChangeItemSize.qml
 CustomScrollbar 1.0 ./Views/CustomScrollbar.qml
 ScrollIndicator 1.0 ./Views/ScrollIndicator.qml
 CustomTooltip 1.0 ./Views/CustomTooltip.qml
-PointerLeaveWatcher 1.0 ./Views/PointerLeaveWatcher.js
+singleton PointerLeaveWatcher 1.0 ./Views/PointerLeaveWatcher.qml
 Diagram 1.0 ./Views/Diagram.qml
 DiagramIndicator 1.0 ./Views/DiagramIndicator.qml
 IntervalBar 1.0 ./Views/IntervalBar.qml
