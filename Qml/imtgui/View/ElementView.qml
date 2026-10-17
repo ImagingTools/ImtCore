@@ -140,7 +140,7 @@ Rectangle {
 			height: textName.text === "" && !controlLoader.item ? 0
 					: rootElement.flatWide ? Math.max(controlHolder.height, Style.controlHeightM,
 							mainPart.inlineDescription ? inlineDescriptionText.y + inlineDescriptionText.height : textName.y + textName.height)
-					: mainPart.stacked ? controlHolder.y + controlHolder.height
+					: mainPart.stacked ? mainPart.stackedControlY + controlHolder.height
 					: Math.max(Style.controlHeightM, textName.height)
 			visible: textName.text !== "" || controlLoader.item
 
@@ -153,6 +153,8 @@ Rectangle {
 					&& (mainPart.width - controlHolder.width - rootElement.nameMargin) < Style.sizeHintXXXS)
 			// A flat row reads name, description, control; the description moves up between them.
 			readonly property bool inlineDescription: rootElement.flat && textDescription.text !== ""
+			// Not controlHolder.y: in a side-by-side row that depends on this item's height, a binding loop when the row stacks.
+			readonly property int stackedControlY: textName.height + (mainPart.inlineDescription ? Style.spacingXXS + inlineDescriptionText.height : 0) + Style.marginS
 
 			// Placed by y rather than by swapping anchors between verticalCenter
 			// and top: bound through a ternary each of those is set independently,
@@ -191,7 +193,6 @@ Rectangle {
 				y: textName.y + textName.height + Style.spacingXXS
 				width: rootElement.flatWide ? rootElement.labelColumnWidth : parent.width
 				visible: mainPart.inlineDescription
-				height: visible ? implicitHeight : 0
 				text: textDescription.text
 				color: textDescription.color
 				font.family: Style.fontFamily
@@ -208,7 +209,7 @@ Rectangle {
 				id: controlHolder
 
 				y: rootElement.flatWide ? 0
-					: mainPart.stacked ? textName.height + (mainPart.inlineDescription ? Style.spacingXXS + inlineDescriptionText.height : 0) + Style.marginS
+					: mainPart.stacked ? mainPart.stackedControlY
 					: Math.round((mainPart.height - height) / 2)
 				x: mainPart.width - width
 

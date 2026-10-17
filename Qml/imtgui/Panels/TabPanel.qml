@@ -12,7 +12,7 @@ Rectangle {
 	// fought the left/right anchors of a host like TabView and, through maxWidth, fed
 	// its own result back into list.width - once the strip measured nothing it stayed
 	// at nothing until a resize re-applied the anchors.
-	implicitWidth: list.width + externButtons.width;
+	implicitWidth: Math.min(list.contentWidth, list.width) + externButtons.width;
 	height: visible ? Style.controlHeightM + Style.spacingXXS : 0;
 	
 	color: Style.tabPanelBackgroundColor;
@@ -22,7 +22,10 @@ Rectangle {
 	property alias spacing: list.spacing;
 	property bool isCloseEnable: false;
 	property int maxWidth: width
-	
+	// From the tab extent alone: through the chevrons' width it fed back into the strip's own width.
+	readonly property bool overflow: tabPanelContainer.maxWidth > 2 * externButtons.navContentWidth
+			&& list.contentWidth > tabPanelContainer.maxWidth - externButtons.navContentWidth
+
 	property alias model: list.model;
 	property alias tabDelegate: list.delegate
 	// Expose the horizontal tab ListView so custom tabDelegate instances can set
@@ -61,9 +64,13 @@ Rectangle {
 		id: list;
 		
 		anchors.left: parent.left;
-		width: Math.max(0, Math.min(contentWidth, tabPanelContainer.maxWidth - externButtons.width))
+		// Not bound to contentWidth, which a ListView recomputes from its own width; the panel shrinks through implicitWidth.
+		width: Math.max(0, tabPanelContainer.maxWidth - (tabPanelContainer.overflow ? externButtons.navContentWidth : 0))
 
 		height: parent.height;
+
+		// Every tab is built, so contentWidth is their real extent and does not change with this list's width.
+		cacheBuffer: 100000;
 
 		clip: true;
 
@@ -102,11 +109,11 @@ Rectangle {
 		anchors.right: parent.right;
 		anchors.verticalCenter: parent.verticalCenter;
 
-		width: visible ? navContentWidth : 0;
+		width: tabPanelContainer.overflow ? navContentWidth : 0;
 		height: parent.height;
 
 		// Reserve space when tabs overflow the available strip width.
-		visible: list.contentWidth > (tabPanelContainer.maxWidth - navContentWidth);
+		visible: tabPanelContainer.overflow;
 
 		// Soft fade so scrolling tabs do not hard-cut under the nav cluster.
 		Rectangle {

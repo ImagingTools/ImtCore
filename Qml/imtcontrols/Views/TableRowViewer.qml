@@ -93,9 +93,10 @@ Row {
 	}
 
 	// Repeats until the row is filled: the web runtime stops a timer after its handler, which drops a restart() made inside it.
+	// Not 0: Qt never fires a repeating Timer with a zero interval.
 	Timer {
 		id: fillTimer
-		interval: 0
+		interval: 1
 		repeat: true
 		onTriggered: {
 			if (dataList.fillCells()){
