@@ -8,12 +8,11 @@
 
 // ImtCore includes
 #include <imtbase/ICollectionFilter.h>
+#include <imtbase/IObjectCollectionIterator.h>
 
 
 namespace imtbase
 {
-
-class IObjectCollectionIterator;
 
 
 template <class Base>
@@ -45,6 +44,93 @@ protected:
 				const ICollectionInfo::Ids filteredIds,
 				const iprm::IParamsSet& filterParams) const;
 	virtual bool IsAcceptedByFilter(const QByteArray& objectId, const iprm::IParamsSet& filterParams) const;
+
+	class FilteredCollectionIterator: virtual public IObjectCollectionIterator
+	{
+	public:
+		FilteredCollectionIterator(const TFilterableCollectionWrap& parent, const ICollectionInfo::Ids& ids, int elementsCount)
+			:m_parent(parent),
+			m_ids(ids),
+			m_elementsCount(elementsCount),
+			m_index(-1)
+		{
+		}
+
+		// reimplemented (IObjectCollectionIterator)
+		virtual bool Next() const override
+		{
+			if (m_index < m_ids.count() - 1){
+				m_index++;
+
+				return true;
+			}
+
+			return false;
+		}
+
+		virtual bool Previous() const override
+		{
+			if (m_index > 0){
+				m_index--;
+
+				return true;
+			}
+
+			return false;
+		}
+
+		virtual QByteArray GetObjectId() const override
+		{
+			return IsValid() ? m_ids[m_index] : QByteArray();
+		}
+
+		virtual QByteArray GetObjectTypeId() const override
+		{
+			return IsValid() ? m_parent.GetObjectTypeId(m_ids[m_index]) : QByteArray();
+		}
+
+		virtual bool GetObjectData(IObjectCollection::DataPtr& dataPtr) const override
+		{
+			return IsValid() && m_parent.GetObjectData(m_ids[m_index], dataPtr);
+		}
+
+		virtual idoc::MetaInfoPtr GetDataMetaInfo() const override
+		{
+			return IsValid() ? m_parent.GetDataMetaInfo(m_ids[m_index]) : idoc::MetaInfoPtr();
+		}
+
+		virtual int GetElementsCount() const override
+		{
+			return m_elementsCount;
+		}
+
+		virtual idoc::MetaInfoPtr GetCollectionMetaInfo() const override
+		{
+			return IsValid() ? m_parent.GetElementMetaInfo(m_ids[m_index]) : idoc::MetaInfoPtr();
+		}
+
+		virtual QVariant GetElementInfo(int infoType) const override
+		{
+			return IsValid() ? m_parent.GetElementInfo(m_ids[m_index], infoType) : QVariant();
+		}
+
+		virtual QVariant GetElementInfo(QByteArray /*infoId*/) const override
+		{
+			return QVariant();
+		}
+
+	private:
+		bool IsValid() const
+		{
+			return m_index >= 0 && m_index < m_ids.count();
+		}
+
+	private:
+		const TFilterableCollectionWrap& m_parent;
+		ICollectionInfo::Ids m_ids;
+		int m_elementsCount;
+		mutable int m_index;
+	};
 };
 
 
@@ -101,11 +187,15 @@ ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetElementIds(
 template <class Base>
 imtbase::IObjectCollectionIterator* TFilterableCollectionWrap<Base>::CreateObjectCollectionIterator(
 			const QByteArray& /*objectId*/,
-			int /*offset*/,
-			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	return nullptr;
+	// The base iterator ignores offset, count and filters, so iterate over the ids this wrapper selects.
+	return new FilteredCollectionIterator(
+				*this,
+				GetElementIds(offset, count, selectionParamsPtr),
+				GetElementsCount(selectionParamsPtr));
 }
 
 

@@ -175,6 +175,8 @@ Item {
 		anchors.top: parent.top;
 		anchors.left: parent.left;
 		anchors.right: parent.right;
+		// Not the panel's own width, which briefly follows its implicit width and loops through the chevrons.
+		maxWidth: root.width;
 		model: root.tabModel;
 		isCloseEnable: false
 		clip: true;

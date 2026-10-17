@@ -39,8 +39,9 @@ TestCase {
 	}
 
 	function decoratorAt(panel, index){
+		// The strip creates its tabs on its first layout, not when the model changes
+		tryVerify(function(){ return panel.tabsList.itemAtIndex(index) !== null }, 1000, "Tab " + index + " is created")
 		let tab = panel.tabsList.itemAtIndex(index)
-		verify(tab !== null, "Tab " + index + " is created")
 
 		return tab.decorator_
 	}
@@ -71,6 +72,7 @@ TestCase {
 
 	function test_tabsAreAdjacent(){
 		let panel = createPanel(3)
+		decoratorAt(panel, 2)
 
 		for (let i = 1; i < 3; ++i){
 			let previous = panel.tabsList.itemAtIndex(i - 1)

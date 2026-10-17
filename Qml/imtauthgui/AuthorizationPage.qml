@@ -161,8 +161,8 @@ Rectangle {
 				width: loginContainer.width;
 				height: Math.max(80, welcomeText.implicitHeight + 56);
 
-				color: loginContainer.color;
-				radius: loginContainer.radius;
+				// The card paints the background; an opaque header hid the card border along its sides.
+				color: "transparent";
 
 				Text {
 					id: welcomeText;

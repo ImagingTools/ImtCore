@@ -131,12 +131,12 @@ WebSocket {
 	function handleSubscriptionError(subscriptionId, rawMessage) {
 		console.warn("SubscriptionManager: error for id", subscriptionId, rawMessage)
 
-		// Mark matching subscription unregistered so a later AccessTokenRefreshed
-		// (or reconnect) can re-submit it with a fresh token.
+		// Not "unregistered": that one is re-sent with every new registration. A refused
+		// subscription is re-submitted only by AccessTokenRefreshed or a reconnect.
 		for (let index = 0; index < subscriptionModel.length; index++){
 			if (subscriptionModel[index]["subscriptionId"] == subscriptionId){
 				container.markInterrupted(index)
-				subscriptionModel[index]["status"] = "unregistered"
+				subscriptionModel[index]["status"] = "rejected"
 				let subscription = subscriptionModel[index]["subscription"]
 				if (subscription)
 					subscription.state = "Error"
