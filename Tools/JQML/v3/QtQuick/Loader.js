@@ -106,10 +106,15 @@ class Loader extends Item {
         if(newValue instanceof Item){
             if(this.__self.width__prevent || this.__self.AWidth__prevent){
                 newValue.width = this.width
-                let originWidthSlot = this.SLOT_widthChanged?.bind(this)
-                this.SLOT_widthChanged = (o, n) => {
-                    newValue.width = n
-                    if(originWidthSlot) originWidthSlot(o, n)
+                // Wrapped once and aimed at the current item: a wrapper per item kept writing into destroyed ones.
+                if(!this.__forwardsWidth){
+                    this.__forwardsWidth = true
+                    let originWidthSlot = this.SLOT_widthChanged?.bind(this)
+                    this.SLOT_widthChanged = (o, n) => {
+                        let item = this.item
+                        if(item instanceof Item && !item.__destroying && !item.__destroyed) item.width = n
+                        if(originWidthSlot) originWidthSlot(o, n)
+                    }
                 }
             } else {
                 Geometry.setAuto(this.__self, 'width', newValue.width, this.__self.constructor.meta.width)
@@ -124,10 +129,14 @@ class Loader extends Item {
 
             if(this.__self.height__prevent || this.__self.AHeight__prevent){
                 newValue.height = this.height
-                let originHeightSlot = this.SLOT_heightChanged?.bind(this)
-                this.SLOT_heightChanged = (o, n) => {
-                    newValue.height = n
-                    if(originHeightSlot) originHeightSlot(o, n)
+                if(!this.__forwardsHeight){
+                    this.__forwardsHeight = true
+                    let originHeightSlot = this.SLOT_heightChanged?.bind(this)
+                    this.SLOT_heightChanged = (o, n) => {
+                        let item = this.item
+                        if(item instanceof Item && !item.__destroying && !item.__destroyed) item.height = n
+                        if(originHeightSlot) originHeightSlot(o, n)
+                    }
                 }
             } else {
                 Geometry.setAuto(this.__self, 'height', newValue.height, this.__self.constructor.meta.height)

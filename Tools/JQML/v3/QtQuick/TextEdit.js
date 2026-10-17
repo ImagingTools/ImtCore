@@ -93,10 +93,21 @@ class TextEdit extends Item {
         return obj
     }
 
+    __isRich(){
+        return this.textFormat === TextEdit.RichText
+    }
+
     __createImpl(){
         let dom = this.__getDOM()
-        let impl = document.createElement('textarea')
+        // A textarea cannot render markup, so RichText gets a div.
+        let rich = this.__isRich()
+        let impl = document.createElement(rich ? 'div' : 'textarea')
         impl.classList.add('impl')
+        if(this.__impl && this.__impl.parentNode === dom){
+            dom.replaceChild(impl, this.__impl)
+        } else {
+            dom.appendChild(impl)
+        }
         this.__impl = impl
 
         this.__setImplStyle({
@@ -112,10 +123,26 @@ class TextEdit extends Item {
             resize: 'none',
             cursor: 'unset',
         })
-        
+
         impl.setAttribute('spellcheck', "false")
-        impl.setAttribute('rows', "1")
-        dom.appendChild(impl)
+        if(rich){
+            impl.setAttribute('tabindex', "0")
+            impl.contentEditable = this.readOnly ? 'false' : 'true'
+            this.__setImplStyle({
+                display: 'block',
+                whiteSpace: this.wrapMode === TextEdit.NoWrap ? 'pre' : 'pre-wrap',
+                wordBreak: this.wrapMode === TextEdit.WrapAnywhere ? 'break-all' : 'break-word',
+                cursor: 'text',
+            })
+            impl.innerHTML = this.text
+            impl.onmouseup = impl.onkeyup = ()=>{
+                this.__updateRichSelection()
+            }
+        } else {
+            impl.setAttribute('rows', "1")
+            impl.readOnly = this.readOnly
+            impl.value = this.text
+        }
 
         impl.onfocus = ()=>{
             this.forceActiveFocus()
@@ -132,7 +159,10 @@ class TextEdit extends Item {
 
         impl.onkeydown = (e)=>{
             if(e.keyCode === QtEnums.Key_C && e.ctrlKey){
-                e.stopPropagation()
+                // Read-only rich text without a selection: let Keys handlers see Ctrl+C.
+                if(!rich || !this.readOnly || document.getSelection().toString() !== ''){
+                    e.stopPropagation()
+                }
             } else if(e.keyCode === QtEnums.Key_V && e.ctrlKey){
                 e.stopPropagation()
             } else if(e.keyCode === QtEnums.Key_X && e.ctrlKey){
@@ -149,10 +179,36 @@ class TextEdit extends Item {
         }
 
         impl.oninput = (e)=>{
-            this.text = impl.value
+            this.text = rich ? impl.innerHTML : impl.value
         }
 
         return impl
+    }
+
+    __updateRichSelection(){
+        let selection = document.getSelection()
+        let text = ''
+        if(selection && selection.rangeCount && this.__impl.contains(selection.anchorNode)){
+            text = selection.toString()
+        }
+        if(this.selectedText !== text) this.selectedText = text
+    }
+
+    SLOT_textFormatChanged(oldValue, newValue){
+        if(this.__impl && (this.__impl.tagName === 'DIV') !== this.__isRich()){
+            this.__createImpl()
+        }
+        this.__updateGeometry()
+    }
+
+    SLOT_readOnlyChanged(oldValue, newValue){
+        if(!this.__impl) return
+
+        if(this.__isRich()){
+            this.__impl.contentEditable = this.readOnly ? 'false' : 'true'
+        } else {
+            this.__impl.readOnly = this.readOnly
+        }
     }
 
     __onMouseDown(mouse){
@@ -268,7 +324,7 @@ class TextEdit extends Item {
             text = '.'
         }
 
-        let textMetrics = JQApplication.TextController.measureText(text, this.font, !this.width__prevent ? 0 : this.width, this.wrapMode, false, false)
+        let textMetrics = JQApplication.TextController.measureText(text, this.font, !this.width__prevent ? 0 : this.width, this.wrapMode, this.__isRich(), false)
 
         this.contentWidth = textMetrics.width
         this.contentHeight = textMetrics.height
@@ -303,7 +359,12 @@ class TextEdit extends Item {
     }
 
     SLOT_textChanged(oldValue, newValue){
-        this.__impl.value = this.text
+        if(this.__isRich()){
+            // Typing in a contenteditable div already holds this markup; rewriting it would reset the caret.
+            if(this.__impl.innerHTML !== this.text) this.__impl.innerHTML = this.text
+        } else {
+            this.__impl.value = this.text
+        }
 
         this.__updateGeometry()
     }
@@ -389,6 +450,17 @@ class TextEdit extends Item {
         let selection = document.getSelection()
         selection.removeAllRanges()
         let range = new Range()
+        if(this.__isRich()){
+            // Offsets count plain characters, not markup: only whole-content selection is supported.
+            if(end > start){
+                range.selectNodeContents(this.__impl)
+                selection.addRange(range)
+            }
+            this.selectionStart = start
+            this.selectionEnd = end
+            this.selectedText = selection.toString()
+            return
+        }
         if(this.__impl.childNodes.length){
             range.setStart(this.__impl.childNodes[0], start)
             range.setEnd(this.__impl.childNodes[0], end)
