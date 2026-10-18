@@ -64,7 +64,6 @@ BaseClass {
 					case 'FieldFilter': return Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/FieldFilter.qml')
 					case 'ArrayFieldFilter': return Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/ArrayFieldFilter.qml')
 				}
-				return null
 			}
 			case 'm_groupFilters': return Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/GroupFilter.qml')
 		}

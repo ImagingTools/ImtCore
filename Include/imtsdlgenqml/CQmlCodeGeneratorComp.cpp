@@ -656,11 +656,6 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 			ifStream << '}';
 			FeedStream(ifStream, 1, false);
 
-			// An unknown typename must not fall through into the next field's case.
-			FeedStreamHorizontally(ifStream, 4);
-			ifStream << QStringLiteral("return null");
-			FeedStream(ifStream, 1, false);
-
 			FeedStreamHorizontally(ifStream, 3);
 			ifStream << '}';
 			FeedStream(ifStream, 1, false);
@@ -788,10 +783,6 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 
 			FeedStreamHorizontally(ifStream, 4);
 			ifStream << '}';
-			FeedStream(ifStream, 1, false);
-
-			FeedStreamHorizontally(ifStream, 4);
-			ifStream << QStringLiteral("return null");
 			FeedStream(ifStream, 1, false);
 
 			FeedStreamHorizontally(ifStream, 3);
