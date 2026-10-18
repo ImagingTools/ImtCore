@@ -726,7 +726,9 @@
                     <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
                     <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
                 </ExportedInterfaces>
-                <ExportedComponents/>
+                <ExportedComponents>
+                    <Component ExportedId="RemoteAuthorizationController" ComponentId="RemoteAuthorizationController"/>
+                </ExportedComponents>
             </Data>
         </EmbeddedRegistry>
     </EmbeddedRegistriesList>
@@ -743,6 +745,7 @@
         <Component ExportedId="CachedUserCollection" ComponentId="RemoteRepositories/CachedUserCollection"/>
         <Component ExportedId="ConnectionSubscriber" ComponentId="ConnectionSubscriber"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="RemoteRepositories/GroupRemoteRepository"/>
+        <Component ExportedId="RemoteAuthorizationController" ComponentId="RemoteControllers/RemoteAuthorizationController"/>
         <Component ExportedId="RemotePersonalAccessTokenController" ComponentId="RemotePersonalAccessTokenController"/>
         <Component ExportedId="RemoteTenantController" ComponentId="RemoteTenantController/RemoteTenantController"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="RemoteRepositories/RoleRemoteRepository"/>

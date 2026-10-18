@@ -12,6 +12,7 @@
 #include <imtauthdb/CUsersSqlPathExtractorComp.h>
 #include <imtauthdb/CUserActionDatabaseDelegateComp.h>
 #include <imtauthdb/CPersonalAccessTokenDatabaseDelegateComp.h>
+#include <imtauthdb/CExternalIdentityDatabaseDelegateComp.h>
 #include <imtauthdb/CTenantDbDelegateComp.h>
 #include <imtauthdb/CTenantMembershipDbDelegateComp.h>
 #include <imtauthdb/CTenantEntityBindingDbDelegateComp.h>
@@ -46,6 +47,7 @@ typedef imtauthdb::CRoleDatabaseDelegateComp SqliteJsonRoleDatabaseDelegate;
 typedef imtauthdb::CUsersSqlPathExtractorComp UsersSqlPathExtractor;
 typedef imtauthdb::CUserActionDatabaseDelegateComp UserActionDatabaseDelegate;
 typedef imtauthdb::CPersonalAccessTokenDatabaseDelegateComp PersonalAccessTokenDatabaseDelegate;
+typedef imtauthdb::CExternalIdentityDatabaseDelegateComp ExternalIdentityDatabaseDelegate;
 typedef imtauthdb::CTenantDbDelegateComp TenantDatabaseDelegate;
 typedef imtauthdb::CTenantMembershipDbDelegateComp TenantMembershipDatabaseDelegate;
 typedef imtauthdb::CTenantEntityBindingDbDelegateComp TenantEntityBindingDatabaseDelegate;

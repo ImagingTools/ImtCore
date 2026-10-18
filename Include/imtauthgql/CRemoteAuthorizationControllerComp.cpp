@@ -7,6 +7,49 @@ namespace imtauthgql
 {
 
 
+// public methods
+
+// reimplemented (imtauth::IExternalLoginCallbackHandler)
+
+bool CRemoteAuthorizationControllerComp::HandleCallback(
+			const QByteArray& state,
+			const QByteArray& code,
+			const QString& providerError,
+			QString& message) const
+{
+	namespace authsdl = sdl::V1_0::imtauth;
+
+	authsdl::HandleExternalLoginCallbackRequestArguments arguments;
+	arguments.input.emplace();
+	arguments.input->state = state;
+	arguments.input->code = QString::fromUtf8(code);
+	arguments.input->error = providerError;
+
+	imtgql::CGqlRequest gqlRequest;
+	if (!authsdl::CHandleExternalLoginCallbackGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		message = QStringLiteral("The sign-in could not be passed to the authorization server.");
+
+		return false;
+	}
+
+	authsdl::CHandleExternalLoginCallbackGqlRequest callbackRequest(gqlRequest, false);
+
+	QString errorMessage;
+	authsdl::CExternalLoginCallbackPayload payload = OnHandleExternalLoginCallback(callbackRequest, gqlRequest, errorMessage);
+	if (!payload.ok.HasValue()){
+		SendErrorMessage(0, QStringLiteral("External sign-in callback was not accepted by the authorization server: %1").arg(errorMessage));
+
+		message = QStringLiteral("The authorization server is not available. Please try again later.");
+
+		return false;
+	}
+
+	message = payload.message.HasValue() ? *payload.message : QString();
+
+	return *payload.ok;
+}
+
+
 // protected methods
 
 // reimplemented (sdl::V1_0::imtauth::CAuthorizationGqlHandlerCompBase)
@@ -44,6 +87,60 @@ sdl::V1_0::imtauth::CPermissionList CRemoteAuthorizationControllerComp::OnGetPer
 			QString& errorMessage) const
 {
 	return SendModelRequest<sdl::V1_0::imtauth::CPermissionList>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CExternalLoginProviderList CRemoteAuthorizationControllerComp::OnGetExternalLoginProviders(
+			const sdl::V1_0::imtauth::CGetExternalLoginProvidersGqlRequest& /*getExternalLoginProvidersRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CExternalLoginProviderList>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CExternalIdentityList CRemoteAuthorizationControllerComp::OnGetExternalIdentities(
+			const sdl::V1_0::imtauth::CGetExternalIdentitiesGqlRequest& /*getExternalIdentitiesRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CExternalIdentityList>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CBeginExternalLoginPayload CRemoteAuthorizationControllerComp::OnBeginExternalLogin(
+			const sdl::V1_0::imtauth::CBeginExternalLoginGqlRequest& /*beginExternalLoginRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CBeginExternalLoginPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CExternalLoginPayload CRemoteAuthorizationControllerComp::OnCompleteExternalLogin(
+			const sdl::V1_0::imtauth::CCompleteExternalLoginGqlRequest& /*completeExternalLoginRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CExternalLoginPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CExternalLoginCallbackPayload CRemoteAuthorizationControllerComp::OnHandleExternalLoginCallback(
+			const sdl::V1_0::imtauth::CHandleExternalLoginCallbackGqlRequest& /*handleExternalLoginCallbackRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CExternalLoginCallbackPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CUnlinkExternalIdentityPayload CRemoteAuthorizationControllerComp::OnUnlinkExternalIdentity(
+			const sdl::V1_0::imtauth::CUnlinkExternalIdentityGqlRequest& /*unlinkExternalIdentityRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CUnlinkExternalIdentityPayload>(gqlRequest, errorMessage);
 }
 
 
