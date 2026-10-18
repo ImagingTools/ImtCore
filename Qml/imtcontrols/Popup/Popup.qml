@@ -227,10 +227,11 @@ FocusScope {
         PopupRegistry.register(popup);
     }
     Component.onDestruction: {
-        d.destroyed = true;
-        if (d.opened || d.opening) d._teardown(false);
+        // First: the web runtime destroys d before this handler runs, so touching d throws.
         PopupStackController.detach(popup);
         PopupRegistry.unregister(popup);
+        d.destroyed = true;
+        if (d.opened || d.opening) d._teardown(false);
     }
 
     onWidthChanged:  {

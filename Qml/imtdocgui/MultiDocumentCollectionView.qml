@@ -220,12 +220,23 @@ Item {
 		}
 	}
 
+	// Next tick: setting paths delivers a pending path, which must not add a tab while the collection tab is being inserted.
+	Timer {
+		id: pathsUpdateTimer
+		interval: 0
+		onTriggered: {
+			if (workspaceView.documentManager){
+				navigableItem.paths = workspaceView.documentManager.getSupportedDocumentTypeIds()
+			}
+		}
+	}
+
 	Connections {
 		id: connections
 		target: workspaceView.documentManager
 
 		function onDocumentViewRegistered(documentTypeId, viewTypeId){
-			navigableItem.paths = target.getSupportedDocumentTypeIds()
+			pathsUpdateTimer.restart()
 		}
 
 		function onRequestDocumentName(documentId, documentTypeId){

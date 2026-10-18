@@ -675,6 +675,16 @@ Rectangle {
 		}
 	}
 
+	Timer {
+		id: listWidthTimer;
+		interval: 0;
+		onTriggered: {
+			if (tableContainer.visible){
+				tableContainer.setWidth();
+			}
+		}
+	}
+
 	PauseAnimation {
 		id: pauseWidth;
 		duration: 100;
@@ -892,11 +902,10 @@ Rectangle {
 
 		// Columns are sized from this list's width, which also changes without the table's (the vertical
 		// scrollbar showing or hiding, anchors settling after the table resized). Rows sized to a stale width
-		// left a horizontal scrollbar that never went away.
+		// left a horizontal scrollbar that never went away. On the next tick: resizing the columns inside this
+		// change shows or hides the scrollbars, which change this width again - a binding loop.
 		onWidthChanged: {
-			if (tableContainer.visible){
-				tableContainer.setWidth();
-			}
+			listWidthTimer.restart();
 		}
 
 		onContentYChanged: {
