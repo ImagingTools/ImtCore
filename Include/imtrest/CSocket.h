@@ -5,6 +5,7 @@
 #include <istd/TDelPtr.h>
 
 // ImtCore  includes
+#include <imtrest/CConnectionTimeoutBehavior.h>
 #include <imtrest/IRequest.h>
 #include <imtrest/IResponse.h>
 
@@ -39,12 +40,25 @@ public Q_SLOTS:
 	void OnHandleSslErrors(QList<QSslError> errorList);
 
 private:
+	/**
+		The data of the socket are not a valid request: the client gets the message of the protocol (for HTTP \c 400) and
+		the connection is closed.
+	*/
+	void RejectRequest();
+
+private:
 	CSocketThread* m_rootSocket;
 	QPointer<QTcpSocket> m_socket;
 	istd::TDelPtr<IRequest> m_requestPtr;
 
 	// Time limits of the connection, it is a child of this object.
 	CSocketTimeoutWatcher* m_timeoutWatcherPtr = nullptr;
+
+	CConnectionTimeoutBehavior m_behavior;
+
+	// A request is passed to the handler and its response is not written yet. The next request is not parsed meanwhile,
+	// its data wait in the socket (only for the protocols with the cycle of a request and a response).
+	bool m_isRequestInProgress = false;
 };
 
 

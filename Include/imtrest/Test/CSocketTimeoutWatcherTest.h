@@ -57,6 +57,25 @@ private slots:
 	void DataAfterCloseRequestIsIgnoredTest();
 	void ResponsesBeforeClosingRequestKeepConnectionTest();
 	void LargeResponseIsDeliveredBeforeClosingTest();
+
+	// Rejection of data that are not a request
+	void RejectedRequestGetsBadRequestTest();
+	void RejectedConnectionIsAbortedAfterLingeringTest();
+	void RejectedRequestOfOtherProtocolIsAbortedTest();
+	void RejectedRequestGetsMessageOfBehaviorTest();
+	void RejectedConnectionIgnoresEventsTest();
+	void RejectionIsSentOnceTest();
+	void RejectionAfterRequestTimeoutIsIgnoredTest();
+
+	// Processing timeout
+	void ProcessingTimeoutGetsServiceUnavailableTest();
+	void ProcessingTimeoutAbortedAfterLingeringTest();
+	void LateResponseAfterProcessingTimeoutIsIgnoredTest();
+	void ResponseInTimeCancelsProcessingTimeoutTest();
+	void ProcessingTimeoutIsDisabledByDefaultTest();
+	void ProcessingTimeoutWithoutMessageClosesConnectionTest();
+	void ProcessingTimeoutGetsMessageOfBehaviorTest();
+	void ProcessingTimeoutOfPipelinedRequestTest();
 };
 
 

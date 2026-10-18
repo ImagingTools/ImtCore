@@ -2,6 +2,14 @@
 #include "CHttpRequestTest.h"
 
 
+// STL includes
+#include <memory>
+
+// Qt includes
+#include <QtCore/QBuffer>
+#include <QtNetwork/QTcpServer>
+#include <QtNetwork/QTcpSocket>
+
 // ImtCore includes
 #include <imtrest/CHttpRequest.h>
 #include <imtrest/CTcpRequest.h>
@@ -724,6 +732,301 @@ void CHttpRequestTest::TcpRequestIsPersistentTest()
 
 	QVERIFY(tcpRequest.IsConnectionPersistent());
 	QVERIFY(!tcpRequest.IsResponseBodyOmitted());
+}
+
+
+void CHttpRequestTest::RequestStopsAtItsEndTest_data()
+{
+	QTest::addColumn<QByteArray>("request");
+	QTest::addColumn<QByteArray>("body");
+
+	QTest::newRow("no body") << QByteArray("GET /a HTTP/1.1\r\nHost: x\r\n\r\n") << QByteArray();
+	QTest::newRow("body") << QByteArray("POST /a HTTP/1.1\r\nContent-Length: 5\r\n\r\nhello") << QByteArray("hello");
+	QTest::newRow("empty body") << QByteArray("POST /a HTTP/1.1\r\nContent-Length: 0\r\n\r\n") << QByteArray();
+	QTest::newRow("chunked body") << QByteArray("POST /a HTTP/1.1\r\nTransfer-Encoding: chunked\r\n\r\n5\r\nhello\r\n0\r\n\r\n") << QByteArray("hello");
+	QTest::newRow("Connection: close") << QByteArray("GET /a HTTP/1.1\r\nConnection: close\r\n\r\n") << QByteArray();
+	QTest::newRow("HTTP/1.0") << QByteArray("GET /a HTTP/1.0\r\n\r\n") << QByteArray();
+}
+
+
+void CHttpRequestTest::RequestStopsAtItsEndTest()
+{
+	QFETCH(QByteArray, request);
+	QFETCH(QByteArray, body);
+
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+	imtrest::CHttpRequest httpRequest(servlet, engine);
+
+	// The next request follows in the same data:
+	const QByteArray nextRequest("GET /b HTTP/1.1\r\n\r\n");
+
+	qsizetype consumedCount = 0;
+	QVERIFY(httpRequest.ExecuteHttpParser(request + nextRequest, nullptr, consumedCount));
+
+	QCOMPARE(consumedCount, request.size());
+	QCOMPARE(httpRequest.GetState(), imtrest::IRequest::RS_MESSAGE_COMPLETE);
+	QCOMPARE(httpRequest.GetCommandId(), QByteArray("/a"));
+	QCOMPARE(httpRequest.GetBody(), body);
+}
+
+
+void CHttpRequestTest::ConsumedCountOfSingleRequestTest()
+{
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+	imtrest::CHttpRequest httpRequest(servlet, engine);
+
+	qsizetype consumedCount = 0;
+	QVERIFY(httpRequest.ExecuteHttpParser(s_request, nullptr, consumedCount));
+
+	QCOMPARE(consumedCount, s_request.size());
+	QCOMPARE(httpRequest.GetState(), imtrest::IRequest::RS_MESSAGE_COMPLETE);
+}
+
+
+void CHttpRequestTest::ConsumedCountOfIncompleteRequestTest()
+{
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+	imtrest::CHttpRequest httpRequest(servlet, engine);
+
+	// All data of an incomplete request belong to it:
+	const QByteArray part = s_request.left(s_request.size() - 3);
+
+	qsizetype consumedCount = 0;
+	QVERIFY(httpRequest.ExecuteHttpParser(part, nullptr, consumedCount));
+
+	QCOMPARE(consumedCount, part.size());
+	QVERIFY(httpRequest.GetState() != imtrest::IRequest::RS_MESSAGE_COMPLETE);
+}
+
+
+void CHttpRequestTest::CompleteRequestTakesNothingMoreTest()
+{
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+	imtrest::CHttpRequest httpRequest(servlet, engine);
+
+	QVERIFY(httpRequest.ExecuteHttpParser("GET /a HTTP/1.1\r\n\r\n", nullptr));
+
+	// The data of the next request do not change the complete request:
+	qsizetype consumedCount = -1;
+	QVERIFY(httpRequest.ExecuteHttpParser("GET /b HTTP/1.1\r\n\r\n", nullptr, consumedCount));
+
+	QCOMPARE(consumedCount, qsizetype(0));
+	QCOMPARE(httpRequest.GetState(), imtrest::IRequest::RS_MESSAGE_COMPLETE);
+	QCOMPARE(httpRequest.GetCommandId(), QByteArray("/a"));
+}
+
+
+void CHttpRequestTest::NextRequestIsParsedByAnotherObjectTest()
+{
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+	imtrest::CHttpRequest firstRequest(servlet, engine);
+	imtrest::CHttpRequest secondRequest(servlet, engine);
+
+	const QByteArray firstData("POST /a HTTP/1.1\r\nContent-Length: 2\r\n\r\nhi");
+	const QByteArray secondData("GET /b?x=1 HTTP/1.1\r\nAccept: text/plain\r\n\r\n");
+
+	qsizetype consumedCount = 0;
+	QVERIFY(firstRequest.ExecuteHttpParser(firstData + secondData, nullptr, consumedCount));
+	QCOMPARE(consumedCount, firstData.size());
+
+	// The rest of the data is the whole second request:
+	QVERIFY(secondRequest.ExecuteHttpParser((firstData + secondData).mid(consumedCount), nullptr, consumedCount));
+
+	QCOMPARE(consumedCount, secondData.size());
+	QCOMPARE(secondRequest.GetState(), imtrest::IRequest::RS_MESSAGE_COMPLETE);
+	QCOMPARE(secondRequest.GetCommandId(), QByteArray("/b"));
+	QCOMPARE(secondRequest.GetCommandParams().value("x"), QByteArray("1"));
+	QVERIFY(secondRequest.GetBody().isEmpty());
+
+	// The first request is not changed by it:
+	QCOMPARE(firstRequest.GetCommandId(), QByteArray("/a"));
+	QCOMPARE(firstRequest.GetBody(), QByteArray("hi"));
+}
+
+
+void CHttpRequestTest::PipelinedStreamAtEveryChunkSizeTest()
+{
+	const QList<QByteArray> requests = {
+		"GET /a HTTP/1.1\r\nHost: x\r\n\r\n",
+		"POST /b HTTP/1.1\r\nContent-Length: 5\r\n\r\nhello",
+		"POST /c HTTP/1.1\r\nTransfer-Encoding: chunked\r\n\r\n3\r\nabc\r\n0\r\n\r\n",
+		"GET /d HTTP/1.1\r\n\r\n"};
+
+	QByteArray stream;
+	for (const QByteArray& request : requests){
+		stream += request;
+	}
+
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+
+	// The socket collects the data in portions of any size, hands each complete request to the handler and goes on
+	// with the rest of the data:
+	for (qsizetype chunkSize = 1; chunkSize <= stream.size(); ++chunkSize){
+		QList<QByteArray> commands;
+		QList<QByteArray> bodies;
+
+		std::unique_ptr<imtrest::CHttpRequest> requestPtr(new imtrest::CHttpRequest(servlet, engine));
+
+		QByteArray buffer;
+		for (qsizetype position = 0; position < stream.size(); position += chunkSize){
+			buffer += stream.mid(position, chunkSize);
+
+			while (!buffer.isEmpty()){
+				qsizetype consumedCount = 0;
+				QVERIFY2(requestPtr->ExecuteHttpParser(buffer, nullptr, consumedCount), qPrintable(QString::number(chunkSize)));
+
+				buffer.remove(0, consumedCount);
+
+				if (requestPtr->GetState() != imtrest::IRequest::RS_MESSAGE_COMPLETE){
+					QVERIFY(buffer.isEmpty());
+
+					break;
+				}
+
+				commands.append(requestPtr->GetCommandId());
+				bodies.append(requestPtr->GetBody());
+
+				requestPtr.reset(new imtrest::CHttpRequest(servlet, engine));
+			}
+		}
+
+		QVERIFY2(commands == QByteArrayList({"/a", "/b", "/c", "/d"}), qPrintable(QString::number(chunkSize)));
+		QVERIFY2(bodies == QByteArrayList({"", "hello", "abc", ""}), qPrintable(QString::number(chunkSize)));
+	}
+}
+
+
+void CHttpRequestTest::ParseDeviceDataTakesOnlyRequestTest()
+{
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+	imtrest::CHttpRequest firstRequest(servlet, engine);
+	imtrest::CHttpRequest secondRequest(servlet, engine);
+
+	const QByteArray firstData("POST /a HTTP/1.1\r\nContent-Length: 2\r\n\r\nhi");
+	const QByteArray secondData("GET /b HTTP/1.1\r\n\r\n");
+
+	QByteArray data = firstData + secondData;
+	QBuffer device(&data);
+	QVERIFY(device.open(QIODevice::ReadOnly));
+
+	QVERIFY(firstRequest.ParseDeviceData(device));
+
+	// Only the first request is taken from the device:
+	QCOMPARE(firstRequest.GetState(), imtrest::IRequest::RS_MESSAGE_COMPLETE);
+	QCOMPARE(firstRequest.GetCommandId(), QByteArray("/a"));
+	QCOMPARE(firstRequest.GetBody(), QByteArray("hi"));
+	QCOMPARE(device.bytesAvailable(), qint64(secondData.size()));
+
+	QVERIFY(secondRequest.ParseDeviceData(device));
+
+	QCOMPARE(secondRequest.GetState(), imtrest::IRequest::RS_MESSAGE_COMPLETE);
+	QCOMPARE(secondRequest.GetCommandId(), QByteArray("/b"));
+	QCOMPARE(device.bytesAvailable(), qint64(0));
+}
+
+
+void CHttpRequestTest::ParseDeviceDataOfIncompleteRequestTest()
+{
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+	imtrest::CHttpRequest request(servlet, engine);
+
+	QByteArray firstPart("POST /a HTTP/1.1\r\nContent-Length: 5\r\n\r\nhe");
+	QBuffer firstDevice(&firstPart);
+	QVERIFY(firstDevice.open(QIODevice::ReadOnly));
+
+	QVERIFY(request.ParseDeviceData(firstDevice));
+
+	// All data of an incomplete request are taken:
+	QVERIFY(request.GetState() != imtrest::IRequest::RS_MESSAGE_COMPLETE);
+	QCOMPARE(firstDevice.bytesAvailable(), qint64(0));
+
+	QByteArray secondPart("llo");
+	QBuffer secondDevice(&secondPart);
+	QVERIFY(secondDevice.open(QIODevice::ReadOnly));
+
+	QVERIFY(request.ParseDeviceData(secondDevice));
+
+	QCOMPARE(request.GetState(), imtrest::IRequest::RS_MESSAGE_COMPLETE);
+	QCOMPARE(request.GetBody(), QByteArray("hello"));
+}
+
+
+void CHttpRequestTest::ParseDeviceDataOfEmptyDeviceTest()
+{
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+	imtrest::CHttpRequest request(servlet, engine);
+
+	QByteArray data;
+	QBuffer device(&data);
+	QVERIFY(device.open(QIODevice::ReadOnly));
+
+	QVERIFY(request.ParseDeviceData(device));
+	QCOMPARE(request.GetState(), imtrest::IRequest::RS_NON_STARTED);
+}
+
+
+void CHttpRequestTest::ParseDeviceDataOfInvalidRequestTest()
+{
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+	imtrest::CHttpRequest request(servlet, engine);
+
+	QByteArray data("GARBAGE / HTTP/1.1\r\n\r\n");
+	QBuffer device(&data);
+	QVERIFY(device.open(QIODevice::ReadOnly));
+
+	QVERIFY(!request.ParseDeviceData(device));
+	QVERIFY(request.GetState() != imtrest::IRequest::RS_MESSAGE_COMPLETE);
+}
+
+
+void CHttpRequestTest::ParseDeviceDataOfSocketTest()
+{
+	// The socket is the device of the server: the data of the next request stay in its buffer
+	QTcpServer server;
+	QVERIFY(server.listen(QHostAddress::LocalHost, 0));
+
+	QTcpSocket client;
+	client.connectToHost(QHostAddress::LocalHost, server.serverPort());
+	QVERIFY(server.waitForNewConnection(5000));
+
+	QTcpSocket* serverSocketPtr = server.nextPendingConnection();
+	QVERIFY(serverSocketPtr != nullptr);
+
+	const QByteArray firstData("POST /a HTTP/1.1\r\nContent-Length: 2\r\n\r\nhi");
+	const QByteArray secondData("GET /b HTTP/1.1\r\n\r\n");
+
+	QVERIFY(client.waitForConnected(5000));
+	client.write(firstData + secondData);
+	QVERIFY(client.waitForBytesWritten(5000));
+
+	QTRY_VERIFY_WITH_TIMEOUT(serverSocketPtr->bytesAvailable() >= firstData.size() + secondData.size(), 5000);
+
+	CRequestServletStub servlet;
+	CProtocolEngineStub engine;
+	imtrest::CHttpRequest firstRequest(servlet, engine);
+	imtrest::CHttpRequest secondRequest(servlet, engine);
+
+	QVERIFY(firstRequest.ParseDeviceData(*serverSocketPtr));
+
+	QCOMPARE(firstRequest.GetState(), imtrest::IRequest::RS_MESSAGE_COMPLETE);
+	QCOMPARE(firstRequest.GetBody(), QByteArray("hi"));
+	QCOMPARE(serverSocketPtr->bytesAvailable(), qint64(secondData.size()));
+
+	QVERIFY(secondRequest.ParseDeviceData(*serverSocketPtr));
+
+	QCOMPARE(secondRequest.GetState(), imtrest::IRequest::RS_MESSAGE_COMPLETE);
+	QCOMPARE(secondRequest.GetCommandId(), QByteArray("/b"));
+	QCOMPARE(serverSocketPtr->bytesAvailable(), qint64(0));
 }
 
 

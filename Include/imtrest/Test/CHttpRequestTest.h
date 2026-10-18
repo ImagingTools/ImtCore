@@ -53,6 +53,20 @@ private slots:
 	void ResponseBodyOmittedTest_data();
 	void ResponseBodyOmittedTest();
 	void TcpRequestIsPersistentTest();
+
+	// The request takes only its own data
+	void RequestStopsAtItsEndTest_data();
+	void RequestStopsAtItsEndTest();
+	void ConsumedCountOfSingleRequestTest();
+	void ConsumedCountOfIncompleteRequestTest();
+	void CompleteRequestTakesNothingMoreTest();
+	void NextRequestIsParsedByAnotherObjectTest();
+	void PipelinedStreamAtEveryChunkSizeTest();
+	void ParseDeviceDataTakesOnlyRequestTest();
+	void ParseDeviceDataOfIncompleteRequestTest();
+	void ParseDeviceDataOfEmptyDeviceTest();
+	void ParseDeviceDataOfInvalidRequestTest();
+	void ParseDeviceDataOfSocketTest();
 };
 
 

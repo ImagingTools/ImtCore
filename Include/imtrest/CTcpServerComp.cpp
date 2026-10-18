@@ -73,6 +73,10 @@ CConnectionTimeoutConfig CTcpServerComp::GetConnectionTimeoutConfig() const
 		retVal.keepAliveMs = *m_keepAliveTimeoutAttrPtr;
 	}
 
+	if (m_requestProcessingTimeoutAttrPtr.IsValid()){
+		retVal.requestProcessingMs = *m_requestProcessingTimeoutAttrPtr;
+	}
+
 	return retVal;
 }
 

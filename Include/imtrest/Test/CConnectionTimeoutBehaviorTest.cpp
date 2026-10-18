@@ -68,6 +68,9 @@ void CConnectionTimeoutBehaviorTest::DefaultBehaviorTest()
 	const imtrest::CConnectionTimeoutBehavior behavior;
 
 	QVERIFY(!behavior.createRequestTimeoutMessage);
+	QVERIFY(!behavior.createBadRequestMessage);
+	QVERIFY(!behavior.createProcessingTimeoutMessage);
+	QVERIFY(!behavior.createServerErrorMessage);
 	QVERIFY(behavior.isLimitedBeforeFirstMessageOnly);
 }
 
@@ -98,6 +101,19 @@ void CConnectionTimeoutBehaviorTest::HttpBehaviorTest()
 	QVERIFY(message.startsWith("HTTP/1.1 408 Request Timeout\r\n"));
 	QVERIFY(message.contains("\r\nConnection: close\r\n"));
 	QVERIFY(message.endsWith("\r\n\r\n"));
+
+	QVERIFY(bool(behavior.createBadRequestMessage));
+
+	const QByteArray badRequestMessage = behavior.createBadRequestMessage();
+	QVERIFY(badRequestMessage.startsWith("HTTP/1.1 400 Bad Request\r\n"));
+	QVERIFY(badRequestMessage.contains("\r\nConnection: close\r\n"));
+	QVERIFY(badRequestMessage.endsWith("\r\n\r\n"));
+
+	QVERIFY(bool(behavior.createProcessingTimeoutMessage));
+	QVERIFY(behavior.createProcessingTimeoutMessage().startsWith("HTTP/1.1 503 Service Unavailable\r\n"));
+
+	QVERIFY(bool(behavior.createServerErrorMessage));
+	QVERIFY(behavior.createServerErrorMessage().startsWith("HTTP/1.1 500 Internal Server Error\r\n"));
 }
 
 
@@ -115,6 +131,126 @@ void CConnectionTimeoutBehaviorTest::HttpBehaviorCreatesCurrentDateTest()
 	const QByteArray responseAfter = imtrest::CConnectionTimeoutBehavior::CreateHttpRequestTimeoutResponse(after);
 
 	QVERIFY((message == responseBefore) || (message == responseAfter));
+}
+
+
+void CConnectionTimeoutBehaviorTest::CreateHttpBadRequestResponseTest()
+{
+	// The example of RFC 9110, section 5.6.7
+	const QDateTime dateTime = QDateTime::fromSecsSinceEpoch(784111777);
+
+	QCOMPARE(
+				imtrest::CConnectionTimeoutBehavior::CreateHttpBadRequestResponse(dateTime),
+				QByteArray("HTTP/1.1 400 Bad Request\r\n"
+							"Date: Sun, 06 Nov 1994 08:49:37 GMT\r\n"
+							"Connection: close\r\n"
+							"Content-Length: 0\r\n"
+							"\r\n"));
+}
+
+
+void CConnectionTimeoutBehaviorTest::HttpBadRequestMessageIsCreatedAtCallTest()
+{
+	const imtrest::CConnectionTimeoutBehavior behavior = imtrest::CConnectionTimeoutBehavior::CreateForProtocol(imtrest::ProtocolTypeIds::s_http);
+	QVERIFY(bool(behavior.createBadRequestMessage));
+
+	const QDateTime before = QDateTime::currentDateTimeUtc();
+	const QByteArray message = behavior.createBadRequestMessage();
+	const QDateTime after = QDateTime::currentDateTimeUtc();
+
+	const QByteArray responseBefore = imtrest::CConnectionTimeoutBehavior::CreateHttpBadRequestResponse(before);
+	const QByteArray responseAfter = imtrest::CConnectionTimeoutBehavior::CreateHttpBadRequestResponse(after);
+
+	QVERIFY((message == responseBefore) || (message == responseAfter));
+}
+
+
+void CConnectionTimeoutBehaviorTest::CreateHttpProcessingTimeoutResponseTest()
+{
+	// The example of RFC 9110, section 5.6.7
+	const QDateTime dateTime = QDateTime::fromSecsSinceEpoch(784111777);
+
+	// 503 is the status of the server that cannot handle the request now (RFC 9110, section 15.6.4), the connection is closed:
+	QCOMPARE(
+				imtrest::CConnectionTimeoutBehavior::CreateHttpProcessingTimeoutResponse(dateTime),
+				QByteArray("HTTP/1.1 503 Service Unavailable\r\n"
+							"Date: Sun, 06 Nov 1994 08:49:37 GMT\r\n"
+							"Connection: close\r\n"
+							"Content-Length: 0\r\n"
+							"\r\n"));
+}
+
+
+void CConnectionTimeoutBehaviorTest::HttpProcessingTimeoutMessageIsCreatedAtCallTest()
+{
+	const imtrest::CConnectionTimeoutBehavior behavior = imtrest::CConnectionTimeoutBehavior::CreateForProtocol(imtrest::ProtocolTypeIds::s_http);
+	QVERIFY(bool(behavior.createProcessingTimeoutMessage));
+
+	const QDateTime before = QDateTime::currentDateTimeUtc();
+	const QByteArray message = behavior.createProcessingTimeoutMessage();
+	const QDateTime after = QDateTime::currentDateTimeUtc();
+
+	const QByteArray responseBefore = imtrest::CConnectionTimeoutBehavior::CreateHttpProcessingTimeoutResponse(before);
+	const QByteArray responseAfter = imtrest::CConnectionTimeoutBehavior::CreateHttpProcessingTimeoutResponse(after);
+
+	QVERIFY((message == responseBefore) || (message == responseAfter));
+}
+
+
+void CConnectionTimeoutBehaviorTest::CreateHttpInternalServerErrorResponseTest()
+{
+	const QDateTime dateTime = QDateTime::fromSecsSinceEpoch(784111777);
+
+	// The connection is kept, the request was read correctly and the next one can be processed:
+	QCOMPARE(
+				imtrest::CConnectionTimeoutBehavior::CreateHttpInternalServerErrorResponse(dateTime),
+				QByteArray("HTTP/1.1 500 Internal Server Error\r\n"
+							"Date: Sun, 06 Nov 1994 08:49:37 GMT\r\n"
+							"Content-Length: 0\r\n"
+							"\r\n"));
+}
+
+
+void CConnectionTimeoutBehaviorTest::CreateHttpInternalServerErrorResponseClosingTest()
+{
+	const QDateTime dateTime = QDateTime::fromSecsSinceEpoch(784111777);
+
+	QCOMPARE(
+				imtrest::CConnectionTimeoutBehavior::CreateHttpInternalServerErrorResponse(dateTime, true),
+				QByteArray("HTTP/1.1 500 Internal Server Error\r\n"
+							"Date: Sun, 06 Nov 1994 08:49:37 GMT\r\n"
+							"Connection: close\r\n"
+							"Content-Length: 0\r\n"
+							"\r\n"));
+}
+
+
+void CConnectionTimeoutBehaviorTest::HttpServerErrorMessageIsCreatedAtCallTest()
+{
+	const imtrest::CConnectionTimeoutBehavior behavior = imtrest::CConnectionTimeoutBehavior::CreateForProtocol(imtrest::ProtocolTypeIds::s_http);
+	QVERIFY(bool(behavior.createServerErrorMessage));
+
+	const QDateTime before = QDateTime::currentDateTimeUtc();
+	const QByteArray message = behavior.createServerErrorMessage();
+	const QDateTime after = QDateTime::currentDateTimeUtc();
+
+	const QByteArray responseBefore = imtrest::CConnectionTimeoutBehavior::CreateHttpInternalServerErrorResponse(before);
+	const QByteArray responseAfter = imtrest::CConnectionTimeoutBehavior::CreateHttpInternalServerErrorResponse(after);
+
+	QVERIFY((message == responseBefore) || (message == responseAfter));
+}
+
+
+void CConnectionTimeoutBehaviorTest::RequestResponseCycleTest()
+{
+	// Each request of HTTP has a response, so the next request waits for it:
+	QVERIFY(imtrest::CConnectionTimeoutBehavior::CreateForProtocol(imtrest::ProtocolTypeIds::s_http).IsRequestResponseCycle());
+
+	// The messages of the other protocols can be one-way or have many responses:
+	QVERIFY(!imtrest::CConnectionTimeoutBehavior::CreateForProtocol(imtrest::ProtocolTypeIds::s_tcp).IsRequestResponseCycle());
+	QVERIFY(!imtrest::CConnectionTimeoutBehavior::CreateForProtocol(imtrest::ProtocolTypeIds::s_webSocket).IsRequestResponseCycle());
+	QVERIFY(!imtrest::CConnectionTimeoutBehavior::CreateForProtocol(QByteArray()).IsRequestResponseCycle());
+	QVERIFY(!imtrest::CConnectionTimeoutBehavior().IsRequestResponseCycle());
 }
 
 
@@ -138,6 +274,9 @@ void CConnectionTimeoutBehaviorTest::OtherProtocolBehaviorTest()
 
 	// The unknown protocols get the safest behavior: no message, the limit only before the first message:
 	QVERIFY(!behavior.createRequestTimeoutMessage);
+	QVERIFY(!behavior.createBadRequestMessage);
+	QVERIFY(!behavior.createProcessingTimeoutMessage);
+	QVERIFY(!behavior.createServerErrorMessage);
 	QVERIFY(behavior.isLimitedBeforeFirstMessageOnly);
 }
 

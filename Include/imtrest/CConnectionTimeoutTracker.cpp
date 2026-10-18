@@ -24,6 +24,7 @@ CConnectionTimeoutTracker::CConnectionTimeoutTracker(const CConnectionTimeoutCon
 	m_config.requestInactivityMs = qMax(0, config.requestInactivityMs);
 	m_config.keepAliveMs = qMax(0, config.keepAliveMs);
 	m_config.lingeringCloseMs = qMax(0, config.lingeringCloseMs);
+	m_config.requestProcessingMs = qMax(0, config.requestProcessingMs);
 }
 
 
@@ -61,7 +62,7 @@ void CConnectionTimeoutTracker::OnDataReceived(qint64 nowMs)
 }
 
 
-void CConnectionTimeoutTracker::OnRequestCompleted(qint64 /*nowMs*/)
+void CConnectionTimeoutTracker::OnRequestCompleted(qint64 nowMs)
 {
 	if (m_phase == P_CLOSING){
 		return;
@@ -72,6 +73,7 @@ void CConnectionTimeoutTracker::OnRequestCompleted(qint64 /*nowMs*/)
 
 	if (m_phase == P_IDLE || m_phase == P_RECEIVING){
 		m_phase = P_PROCESSING;
+		m_lastActivityMs = nowMs;
 	}
 }
 
@@ -134,7 +136,7 @@ qint64 CConnectionTimeoutTracker::GetDeadline() const
 		return (m_config.requestInactivityMs > 0) ? m_lastActivityMs + m_config.requestInactivityMs : -1;
 
 	case P_PROCESSING:
-		return -1;
+		return (m_config.requestProcessingMs > 0) ? m_lastActivityMs + m_config.requestProcessingMs : -1;
 
 	case P_CLOSING:
 		return m_lastActivityMs + m_config.lingeringCloseMs;
@@ -165,7 +167,7 @@ CConnectionTimeoutTracker::Action CConnectionTimeoutTracker::GetAction(qint64 no
 		return A_ABORT_LINGERING;
 
 	case P_PROCESSING:
-		break;
+		return A_PROCESSING_TIMEOUT;
 	}
 
 	return A_NONE;

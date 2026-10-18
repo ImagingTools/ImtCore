@@ -7,8 +7,36 @@
 #include <imtrest/ProtocolTypeIds.h>
 
 
+namespace
+{
+
+
+// An error response of HTTP without content, after which the connection is closed
+QByteArray CreateHttpClosingErrorResponse(const QByteArray& statusLine, const QDateTime& dateTime)
+{
+	QByteArray retVal("HTTP/1.1 " + statusLine + "\r\n");
+	retVal += "Date: " + imtrest::CHttpDateTools::ToImfFixdate(dateTime) + "\r\n";
+	retVal += "Connection: close\r\n";
+	retVal += "Content-Length: 0\r\n";
+	retVal += "\r\n";
+
+	return retVal;
+}
+
+
+} // namespace
+
+
 namespace imtrest
 {
+
+
+// public methods
+
+bool CConnectionTimeoutBehavior::IsRequestResponseCycle() const
+{
+	return !isLimitedBeforeFirstMessageOnly;
+}
 
 
 // public static methods
@@ -21,6 +49,15 @@ CConnectionTimeoutBehavior CConnectionTimeoutBehavior::CreateForProtocol(const Q
 		retVal.createRequestTimeoutMessage = [](){
 			return CreateHttpRequestTimeoutResponse(QDateTime::currentDateTimeUtc());
 		};
+		retVal.createBadRequestMessage = [](){
+			return CreateHttpBadRequestResponse(QDateTime::currentDateTimeUtc());
+		};
+		retVal.createProcessingTimeoutMessage = [](){
+			return CreateHttpProcessingTimeoutResponse(QDateTime::currentDateTimeUtc());
+		};
+		retVal.createServerErrorMessage = [](){
+			return CreateHttpInternalServerErrorResponse(QDateTime::currentDateTimeUtc());
+		};
 		retVal.isLimitedBeforeFirstMessageOnly = false;
 	}
 
@@ -30,9 +67,31 @@ CConnectionTimeoutBehavior CConnectionTimeoutBehavior::CreateForProtocol(const Q
 
 QByteArray CConnectionTimeoutBehavior::CreateHttpRequestTimeoutResponse(const QDateTime& dateTime)
 {
-	QByteArray retVal("HTTP/1.1 408 Request Timeout\r\n");
+	return CreateHttpClosingErrorResponse("408 Request Timeout", dateTime);
+}
+
+
+QByteArray CConnectionTimeoutBehavior::CreateHttpBadRequestResponse(const QDateTime& dateTime)
+{
+	return CreateHttpClosingErrorResponse("400 Bad Request", dateTime);
+}
+
+
+QByteArray CConnectionTimeoutBehavior::CreateHttpProcessingTimeoutResponse(const QDateTime& dateTime)
+{
+	return CreateHttpClosingErrorResponse("503 Service Unavailable", dateTime);
+}
+
+
+QByteArray CConnectionTimeoutBehavior::CreateHttpInternalServerErrorResponse(const QDateTime& dateTime, bool isConnectionClosing)
+{
+	QByteArray retVal("HTTP/1.1 500 Internal Server Error\r\n");
 	retVal += "Date: " + CHttpDateTools::ToImfFixdate(dateTime) + "\r\n";
-	retVal += "Connection: close\r\n";
+
+	if (isConnectionClosing){
+		retVal += "Connection: close\r\n";
+	}
+
 	retVal += "Content-Length: 0\r\n";
 	retVal += "\r\n";
 

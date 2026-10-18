@@ -60,6 +60,16 @@ bool CSocketTimeoutWatcher::IsCloseRequested() const
 }
 
 
+void CSocketTimeoutWatcher::RejectRequest()
+{
+	if (IsClosing() || m_socketPtr.isNull()){
+		return;
+	}
+
+	CloseWithMessage(m_behavior.createBadRequestMessage ? m_behavior.createBadRequestMessage() : QByteArray());
+}
+
+
 void CSocketTimeoutWatcher::OnDataReceived()
 {
 	if (IsClosing() || m_isCloseRequested){
@@ -188,6 +198,21 @@ void CSocketTimeoutWatcher::CompleteResponseIfWritten()
 }
 
 
+void CSocketTimeoutWatcher::CloseWithMessage(const QByteArray& message)
+{
+	if (!message.isEmpty()){
+		m_tracker.OnClosing(GetNow());
+		m_socketPtr->write(message);
+		UpdateTimer();
+	}
+	else{
+		m_isStopped = true;
+		m_timer.stop();
+		m_socketPtr->abort();
+	}
+}
+
+
 void CSocketTimeoutWatcher::CloseConnection()
 {
 	m_isStopped = true;
@@ -214,19 +239,12 @@ void CSocketTimeoutWatcher::PerformAction(CConnectionTimeoutTracker::Action acti
 		break;
 
 	case CConnectionTimeoutTracker::A_REQUEST_TIMEOUT:
-		{
-			const QByteArray message = m_behavior.createRequestTimeoutMessage ? m_behavior.createRequestTimeoutMessage() : QByteArray();
-			if (!message.isEmpty()){
-				m_tracker.OnClosing(GetNow());
-				m_socketPtr->write(message);
-				UpdateTimer();
-			}
-			else{
-				m_isStopped = true;
-				m_timer.stop();
-				m_socketPtr->abort();
-			}
-		}
+		CloseWithMessage(m_behavior.createRequestTimeoutMessage ? m_behavior.createRequestTimeoutMessage() : QByteArray());
+		break;
+
+	case CConnectionTimeoutTracker::A_PROCESSING_TIMEOUT:
+		// The late response of the handler would be taken for the response to the next request, so the connection is closed
+		CloseWithMessage(m_behavior.createProcessingTimeoutMessage ? m_behavior.createProcessingTimeoutMessage() : QByteArray());
 		break;
 
 	case CConnectionTimeoutTracker::A_ABORT_STALLED_RESPONSE:

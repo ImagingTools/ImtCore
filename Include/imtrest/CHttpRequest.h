@@ -81,8 +81,26 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 public:
+	/**
+		Parse the data of the device. Only the bytes of this request are taken from the device: if the data continue with
+		the next request, they stay in the device.
+	*/
 	virtual bool ParseDeviceData(QIODevice& device) override;
-	virtual bool ExecuteHttpParser(const QByteArray& data, const QObject* socketObjectPtr);
+
+	/**
+		Parse the data of a request.
+		\param	consumedCount	Number of the bytes of the data that belong to this request. It is less than the size of
+								the data if the request is complete (the state is RS_MESSAGE_COMPLETE) and the data continue
+								with the next message, the parsing stops at the end of the request. The next call of the complete
+								request takes nothing, until ResetData().
+		\return \c false if the data are not a valid request. The parser does not recover.
+	*/
+	virtual bool ExecuteHttpParser(const QByteArray& data, const QObject* socketObjectPtr, qsizetype& consumedCount);
+
+	/**
+		The same, the number of the bytes that belong to the request is not needed.
+	*/
+	bool ExecuteHttpParser(const QByteArray& data, const QObject* socketObjectPtr);
 
 private:
 	static bool ParseUrl(const char *at, size_t length, bool connect, QUrl& url);

@@ -77,6 +77,15 @@ imtrest::CConnectionTimeoutConfig CreateConfig(int requestInactivityMs, int keep
 }
 
 
+imtrest::CConnectionTimeoutConfig CreateProcessingConfig(int requestProcessingMs, int lingeringCloseMs = 5000)
+{
+	imtrest::CConnectionTimeoutConfig config = CreateConfig(5000, 5000, lingeringCloseMs);
+	config.requestProcessingMs = requestProcessingMs;
+
+	return config;
+}
+
+
 imtrest::CConnectionTimeoutBehavior CreateHttpBehavior()
 {
 	return imtrest::CConnectionTimeoutBehavior::CreateForProtocol(imtrest::ProtocolTypeIds::s_http);
@@ -833,6 +842,389 @@ void CSocketTimeoutWatcherTest::LargeResponseIsDeliveredBeforeClosingTest()
 	QCOMPARE(received.size(), response.size());
 
 	QTRY_COMPARE_WITH_TIMEOUT(sockets.GetClient().state(), QAbstractSocket::UnconnectedState, 3000);
+}
+
+
+void CSocketTimeoutWatcherTest::RejectedRequestGetsBadRequestTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	// The data of the client are not a request (RFC 9112, section 2.2):
+	watcher.OnDataReceived();
+	watcher.RejectRequest();
+
+	QVERIFY(watcher.IsClosing());
+	QCOMPARE(watcher.GetPhase(), Tracker::P_CLOSING);
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() > 0, 3000);
+	const QByteArray response = sockets.GetClient().readAll();
+
+	QVERIFY(response.startsWith("HTTP/1.1 400 Bad Request\r\n"));
+	QVERIFY(response.contains("\r\nDate: "));
+	QVERIFY(response.contains("\r\nConnection: close\r\n"));
+	QVERIFY(response.contains("\r\nContent-Length: 0\r\n"));
+	QVERIFY(response.endsWith("\r\n\r\n"));
+
+	// The server waits for the closing by the client, as after 408 (RFC 9112, section 9.6):
+	QTest::qWait(100);
+	QCOMPARE(sockets.GetClient().state(), QAbstractSocket::ConnectedState);
+
+	sockets.GetClient().disconnectFromHost();
+
+	QTRY_COMPARE_WITH_TIMEOUT(sockets.GetServerSocket().state(), QAbstractSocket::UnconnectedState, 3000);
+	QCOMPARE(timedOutSpy.count(), 0);
+}
+
+
+void CSocketTimeoutWatcherTest::RejectedConnectionIsAbortedAfterLingeringTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 300), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.RejectRequest();
+
+	// The client does not close the connection after the response:
+	QTRY_COMPARE_WITH_TIMEOUT(timedOutSpy.count(), 1, 3000);
+	QCOMPARE(GetAction(timedOutSpy, 0), int(Tracker::A_ABORT_LINGERING));
+
+	QTRY_COMPARE_WITH_TIMEOUT(sockets.GetClient().state(), QAbstractSocket::UnconnectedState, 3000);
+}
+
+
+void CSocketTimeoutWatcherTest::RejectedRequestOfOtherProtocolIsAbortedTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateTcpBehavior());
+
+	watcher.OnDataReceived();
+	watcher.RejectRequest();
+
+	// The behavior of the protocol has no message, so the connection is just closed:
+	QVERIFY(watcher.IsClosing());
+	QTRY_COMPARE_WITH_TIMEOUT(sockets.GetClient().state(), QAbstractSocket::UnconnectedState, 3000);
+	QVERIFY(sockets.GetClient().readAll().isEmpty());
+}
+
+
+void CSocketTimeoutWatcherTest::RejectedRequestGetsMessageOfBehaviorTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	// A protocol that is unknown to the transport classes describes its own message:
+	imtrest::CConnectionTimeoutBehavior behavior;
+	behavior.createBadRequestMessage = [](){
+		return QByteArray("500 Syntax error\r\n");
+	};
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), behavior);
+
+	watcher.OnDataReceived();
+	watcher.RejectRequest();
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() >= 18, 3000);
+	QCOMPARE(sockets.GetClient().readAll(), QByteArray("500 Syntax error\r\n"));
+	QCOMPARE(watcher.GetPhase(), Tracker::P_CLOSING);
+}
+
+
+void CSocketTimeoutWatcherTest::RejectedConnectionIgnoresEventsTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.RejectRequest();
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() > 0, 3000);
+	QVERIFY(sockets.GetClient().readAll().startsWith("HTTP/1.1 400 "));
+
+	// The rejected connection does not accept new events and does not send anything else:
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+	watcher.WriteResponse(s_response);
+
+	QTest::qWait(200);
+
+	QCOMPARE(watcher.GetPhase(), Tracker::P_CLOSING);
+	QCOMPARE(sockets.GetClient().bytesAvailable(), qint64(0));
+	QCOMPARE(timedOutSpy.count(), 0);
+}
+
+
+void CSocketTimeoutWatcherTest::RejectionIsSentOnceTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	watcher.OnDataReceived();
+	watcher.RejectRequest();
+	watcher.RejectRequest();
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() > 0, 3000);
+	QTest::qWait(200);
+
+	// A second rejection does not send a second response:
+	const QByteArray response = sockets.GetClient().readAll();
+
+	QCOMPARE(response.count("HTTP/1.1 400 "), 1);
+}
+
+
+void CSocketTimeoutWatcherTest::RejectionAfterRequestTimeoutIsIgnoredTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(150, 5000, 5000), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	sockets.GetClient().write("GET / HT");
+	watcher.OnDataReceived();
+
+	// The connection is already being closed with 408, the client gets no other response:
+	QTRY_COMPARE_WITH_TIMEOUT(timedOutSpy.count(), 1, 3000);
+	watcher.RejectRequest();
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() > 0, 3000);
+	QTest::qWait(200);
+
+	const QByteArray response = sockets.GetClient().readAll();
+
+	QVERIFY(response.startsWith("HTTP/1.1 408 "));
+	QVERIFY(!response.contains("HTTP/1.1 400"));
+}
+
+
+void CSocketTimeoutWatcherTest::ProcessingTimeoutGetsServiceUnavailableTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateProcessingConfig(200), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+
+	// The handler does not answer in time:
+	QTRY_COMPARE_WITH_TIMEOUT(timedOutSpy.count(), 1, 3000);
+	QCOMPARE(GetAction(timedOutSpy, 0), int(Tracker::A_PROCESSING_TIMEOUT));
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() > 0, 3000);
+	const QByteArray response = sockets.GetClient().readAll();
+
+	QVERIFY(response.startsWith("HTTP/1.1 503 Service Unavailable\r\n"));
+	QVERIFY(response.contains("\r\nDate: "));
+	QVERIFY(response.contains("\r\nConnection: close\r\n"));
+	QVERIFY(response.contains("\r\nContent-Length: 0\r\n"));
+	QVERIFY(response.endsWith("\r\n\r\n"));
+
+	// As after 408, the server waits for the closing by the client (RFC 9112, section 9.6):
+	QVERIFY(watcher.IsClosing());
+	QCOMPARE(watcher.GetPhase(), Tracker::P_CLOSING);
+	QCOMPARE(sockets.GetClient().state(), QAbstractSocket::ConnectedState);
+
+	sockets.GetClient().disconnectFromHost();
+
+	QTRY_COMPARE_WITH_TIMEOUT(sockets.GetServerSocket().state(), QAbstractSocket::UnconnectedState, 3000);
+	QCOMPARE(timedOutSpy.count(), 1);
+}
+
+
+void CSocketTimeoutWatcherTest::ProcessingTimeoutAbortedAfterLingeringTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateProcessingConfig(150, 300), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+
+	// The client does not close the connection after the response:
+	QTRY_COMPARE_WITH_TIMEOUT(timedOutSpy.count(), 2, 3000);
+
+	QCOMPARE(GetAction(timedOutSpy, 0), int(Tracker::A_PROCESSING_TIMEOUT));
+	QCOMPARE(GetAction(timedOutSpy, 1), int(Tracker::A_ABORT_LINGERING));
+
+	QTRY_COMPARE_WITH_TIMEOUT(sockets.GetClient().state(), QAbstractSocket::UnconnectedState, 3000);
+}
+
+
+void CSocketTimeoutWatcherTest::LateResponseAfterProcessingTimeoutIsIgnoredTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateProcessingConfig(150), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+
+	QTRY_COMPARE_WITH_TIMEOUT(timedOutSpy.count(), 1, 3000);
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() > 0, 3000);
+	QVERIFY(sockets.GetClient().readAll().startsWith("HTTP/1.1 503 "));
+
+	// The handler finishes after the timeout, the client already has the response to this request:
+	watcher.WriteResponse(s_response);
+
+	QTest::qWait(200);
+
+	QCOMPARE(sockets.GetClient().bytesAvailable(), qint64(0));
+	QCOMPARE(watcher.GetPhase(), Tracker::P_CLOSING);
+}
+
+
+void CSocketTimeoutWatcherTest::ResponseInTimeCancelsProcessingTimeoutTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateProcessingConfig(500), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+
+	QTest::qWait(100);
+
+	watcher.WriteResponse(s_response);
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() >= s_response.size(), 3000);
+	QCOMPARE(sockets.GetClient().readAll(), s_response);
+
+	// The time of the handler is over, the connection is waiting for the next request:
+	QTest::qWait(600);
+
+	QCOMPARE(timedOutSpy.count(), 0);
+	QCOMPARE(watcher.GetPhase(), Tracker::P_IDLE);
+	QCOMPARE(sockets.GetClient().state(), QAbstractSocket::ConnectedState);
+}
+
+
+void CSocketTimeoutWatcherTest::ProcessingTimeoutIsDisabledByDefaultTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	// The default configuration does not limit the handler, for example, for long calculations:
+	imtrest::CConnectionTimeoutConfig config = CreateConfig(100, 100, 100);
+	QCOMPARE(imtrest::CConnectionTimeoutConfig().requestProcessingMs, 0);
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), config, CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+
+	QTest::qWait(500);
+
+	QCOMPARE(timedOutSpy.count(), 0);
+	QCOMPARE(watcher.GetPhase(), Tracker::P_PROCESSING);
+
+	// A response after a long handling is delivered:
+	watcher.WriteResponse(s_response);
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() >= s_response.size(), 3000);
+	QCOMPARE(sockets.GetClient().readAll(), s_response);
+}
+
+
+void CSocketTimeoutWatcherTest::ProcessingTimeoutWithoutMessageClosesConnectionTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	// A protocol that is unknown to the transport classes does not describe the message of the timeout:
+	imtrest::CConnectionTimeoutBehavior behavior;
+	behavior.isLimitedBeforeFirstMessageOnly = false;
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateProcessingConfig(150), behavior);
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+
+	QTRY_COMPARE_WITH_TIMEOUT(timedOutSpy.count(), 1, 3000);
+	QCOMPARE(GetAction(timedOutSpy, 0), int(Tracker::A_PROCESSING_TIMEOUT));
+
+	QTRY_COMPARE_WITH_TIMEOUT(sockets.GetClient().state(), QAbstractSocket::UnconnectedState, 3000);
+	QVERIFY(sockets.GetClient().readAll().isEmpty());
+}
+
+
+void CSocketTimeoutWatcherTest::ProcessingTimeoutGetsMessageOfBehaviorTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CConnectionTimeoutBehavior behavior;
+	behavior.isLimitedBeforeFirstMessageOnly = false;
+	behavior.createProcessingTimeoutMessage = [](){
+		return QByteArray("503 Busy\r\n");
+	};
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateProcessingConfig(150), behavior);
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() >= 10, 3000);
+	QCOMPARE(sockets.GetClient().readAll(), QByteArray("503 Busy\r\n"));
+	QCOMPARE(watcher.GetPhase(), Tracker::P_CLOSING);
+}
+
+
+void CSocketTimeoutWatcherTest::ProcessingTimeoutOfPipelinedRequestTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateProcessingConfig(300), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+	watcher.OnDataReceived();
+	watcher.OnRequestCompleted();
+
+	QTest::qWait(200);
+
+	watcher.WriteResponse(s_response);
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() >= s_response.size(), 3000);
+	QCOMPARE(sockets.GetClient().readAll(), s_response);
+
+	// The first response was in time, the time of the second request is counted from its end:
+	QCOMPARE(watcher.GetPhase(), Tracker::P_PROCESSING);
+	QCOMPARE(timedOutSpy.count(), 0);
+
+	QTest::qWait(150);
+	QCOMPARE(timedOutSpy.count(), 0);
+
+	QTRY_COMPARE_WITH_TIMEOUT(timedOutSpy.count(), 1, 3000);
+	QCOMPARE(GetAction(timedOutSpy, 0), int(Tracker::A_PROCESSING_TIMEOUT));
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() > 0, 3000);
+	QVERIFY(sockets.GetClient().readAll().startsWith("HTTP/1.1 503 "));
 }
 
 

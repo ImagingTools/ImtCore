@@ -4,11 +4,13 @@
 
 // Qt includes
 #include <QtCore/QCoreApplication>
+#include <QtCore/QDebug>
 #include <QtCore/QMutableListIterator>
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/ITransport.h>
+#include <imtrest/CConnectionTimeoutBehavior.h>
 #include <imtrest/CHttpResponse.h>
 #include <imtrest/CHttpSender.h>
 
@@ -92,20 +94,28 @@ void CMultiThreadServer::SetSslConfiguration(const QSslConfiguration& sslConfigu
 
 bool CMultiThreadServer::SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const
 {
+	if (!response.IsValid()){
+		return false;
+	}
+
 	QReadLocker threadListLock(&m_threadSocketListGuard);
 
 	for (CSocketThread* socket : m_threadSocketList){
-		if (socket->GetRequestId() == requestId){
+		if ((socket != nullptr) && (socket->GetRequestId() == requestId)){
 			QByteArray data;
 
-			const CHttpResponse* httpResponsePtr = dynamic_cast<const CHttpResponse*>(response.GetPtr());
+			const auto* httpResponsePtr = dynamic_cast<const CHttpResponse*>(response.GetPtr());
 			if (httpResponsePtr != nullptr){
 				CHttpSender::ResponseOptions options;
 				options.isConnectionClosing = socket->IsConnectionClosing();
 				options.isBodyOmitted = socket->IsResponseBodyOmitted();
 
 				if (!CHttpSender::BuildResponseData(*response, data, options)){
-					return false;
+					// The response cannot be built, for example the engine does not know its status. The client still gets
+					// a response, otherwise it waits for it and the connection does not accept the next request.
+					qWarning() << "The response cannot be built, the status code is" << response->GetStatusCode();
+
+					data = CConnectionTimeoutBehavior::CreateHttpInternalServerErrorResponse(QDateTime::currentDateTimeUtc(), options.isConnectionClosing);
 				}
 			}
 			else{

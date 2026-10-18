@@ -283,6 +283,9 @@ int CHttpRequest::OnMessageComplete(http_parser* httpParser)
 
 	requestPtr->m_state = CHttpRequest::RS_MESSAGE_COMPLETE;
 
+	// The parser stops at the end of the request, the next request is parsed by another object
+	http_parser_pause(httpParser, 1);
+
 	return 0;
 }
 
@@ -384,6 +387,11 @@ bool CHttpRequest::ResetData(CompatibilityMode /*mode*/)
 	m_url.clear();
 	m_data.clear();
 
+	// The object can parse the next request
+	if (HTTP_PARSER_ERRNO(&m_httpParser) == HPE_PAUSED){
+		http_parser_pause(&m_httpParser, 0);
+	}
+
 	m_state = RS_NON_STARTED;
 
 	return true;
@@ -394,17 +402,33 @@ bool CHttpRequest::ResetData(CompatibilityMode /*mode*/)
 
 bool CHttpRequest::ParseDeviceData(QIODevice& device)
 {
-	QByteArray data = device.readAll();
-	if (!data.isEmpty()){
-		return ExecuteHttpParser(data, &device);
+	// The data are not taken from the device before it is known how many of them belong to the request.
+	const QByteArray data = device.peek(device.bytesAvailable());
+	if (data.isEmpty()){
+		return true;
 	}
 
-	return true;
+	qsizetype consumedCount = 0;
+	const bool isParsed = ExecuteHttpParser(data, &device, consumedCount);
+
+	device.skip(consumedCount);
+
+	return isParsed;
 }
 
 
 bool CHttpRequest::ExecuteHttpParser(const QByteArray& data, const QObject* socketObjectPtr)
 {
+	qsizetype consumedCount = 0;
+
+	return ExecuteHttpParser(data, socketObjectPtr, consumedCount);
+}
+
+
+bool CHttpRequest::ExecuteHttpParser(const QByteArray& data, const QObject* socketObjectPtr, qsizetype& consumedCount)
+{
+	consumedCount = 0;
+
 #if QT_CONFIG(ssl)
 	const QSslSocket* sslSocketPtr = qobject_cast<const QSslSocket*>(socketObjectPtr);
 	if ((sslSocketPtr != nullptr) && sslSocketPtr->isEncrypted()){
@@ -428,11 +452,18 @@ bool CHttpRequest::ExecuteHttpParser(const QByteArray& data, const QObject* sock
 	}
 #endif
 
-	qsizetype parsedCount = http_parser_execute(
+	const qsizetype parsedCount = qsizetype(http_parser_execute(
 		&m_httpParser,
 		&s_httpParserSettings,
 		data.constData(),
-		size_t(data.size()));
+		size_t(data.size())));
+
+	consumedCount = parsedCount;
+
+	// The request is complete, the parser is paused at its end (see OnMessageComplete()). The rest belongs to the next message.
+	if (HTTP_PARSER_ERRNO(&m_httpParser) == HPE_PAUSED){
+		return true;
+	}
 
 	if (parsedCount < data.size()){
 		QByteArray dataMin = data.left(100);

@@ -19,12 +19,26 @@ private slots:
 	void CreateHttpRequestTimeoutResponseTest();
 	void CreateHttpRequestTimeoutResponseIgnoresTimeZoneTest();
 
+	// 400 response of HTTP
+	void CreateHttpBadRequestResponseTest();
+	void HttpBadRequestMessageIsCreatedAtCallTest();
+
+	// 503 response of HTTP
+	void CreateHttpProcessingTimeoutResponseTest();
+	void HttpProcessingTimeoutMessageIsCreatedAtCallTest();
+
+	// 500 response of HTTP
+	void CreateHttpInternalServerErrorResponseTest();
+	void CreateHttpInternalServerErrorResponseClosingTest();
+	void HttpServerErrorMessageIsCreatedAtCallTest();
+
 	// Behavior of the protocols
 	void ProtocolTypeIdsTest();
 	void DefaultBehaviorTest();
 	void HttpBehaviorTest_data();
 	void HttpBehaviorTest();
 	void HttpBehaviorCreatesCurrentDateTest();
+	void RequestResponseCycleTest();
 	void OtherProtocolBehaviorTest_data();
 	void OtherProtocolBehaviorTest();
 };

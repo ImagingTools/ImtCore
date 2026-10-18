@@ -34,6 +34,16 @@ imtrest::CConnectionTimeoutConfig CreateTestConfig()
 }
 
 
+// The same as CreateTestConfig() with the limit of the request processing
+imtrest::CConnectionTimeoutConfig CreateProcessingConfig(int requestProcessingMs)
+{
+	imtrest::CConnectionTimeoutConfig config = CreateTestConfig();
+	config.requestProcessingMs = requestProcessingMs;
+
+	return config;
+}
+
+
 } // namespace
 
 
@@ -140,6 +150,136 @@ void CConnectionTimeoutTrackerTest::ProcessingHasNoTimeoutTest()
 	QCOMPARE(tracker.GetPhase(), Tracker::P_PROCESSING);
 	QCOMPARE(tracker.GetDeadline(), s_never);
 	QCOMPARE(tracker.GetAction(1000000000), Tracker::A_NONE);
+}
+
+
+void CConnectionTimeoutTrackerTest::DefaultProcessingTimeoutIsDisabledTest()
+{
+	const imtrest::CConnectionTimeoutConfig config;
+
+	// The default is no limit, a long calculation is a normal request:
+	QCOMPARE(config.requestProcessingMs, 0);
+
+	Tracker tracker(config);
+	tracker.OnConnectionOpened(0);
+	tracker.OnDataReceived(10);
+	tracker.OnRequestCompleted(10);
+
+	QCOMPARE(tracker.GetPhase(), Tracker::P_PROCESSING);
+	QCOMPARE(tracker.GetDeadline(), s_never);
+	QCOMPARE(tracker.GetAction(Q_INT64_C(1000000000000)), Tracker::A_NONE);
+}
+
+
+void CConnectionTimeoutTrackerTest::ProcessingTimeoutTest()
+{
+	Tracker tracker(CreateProcessingConfig(3000));
+	tracker.OnConnectionOpened(0);
+	tracker.OnDataReceived(100);
+	tracker.OnRequestCompleted(200);
+
+	QCOMPARE(tracker.GetPhase(), Tracker::P_PROCESSING);
+	QCOMPARE(tracker.GetDeadline(), qint64(3200));
+	QCOMPARE(tracker.GetAction(3199), Tracker::A_NONE);
+	QCOMPARE(tracker.GetAction(3200), Tracker::A_PROCESSING_TIMEOUT);
+	QCOMPARE(tracker.GetAction(100000), Tracker::A_PROCESSING_TIMEOUT);
+}
+
+
+void CConnectionTimeoutTrackerTest::ProcessingTimeoutIsCountedFromRequestEndTest()
+{
+	Tracker tracker(CreateProcessingConfig(3000));
+	tracker.OnConnectionOpened(0);
+
+	// A slow client does not shorten the time of the handler:
+	tracker.OnDataReceived(100);
+	tracker.OnDataReceived(900);
+	tracker.OnRequestCompleted(900);
+
+	QCOMPARE(tracker.GetDeadline(), qint64(3900));
+}
+
+
+void CConnectionTimeoutTrackerTest::ProcessingTimeoutIgnoresDataTest()
+{
+	Tracker tracker(CreateProcessingConfig(3000));
+	tracker.OnConnectionOpened(0);
+	tracker.OnDataReceived(0);
+	tracker.OnRequestCompleted(0);
+
+	// The next request waits for its turn, its data do not postpone the timeout:
+	tracker.OnDataReceived(2000);
+
+	QCOMPARE(tracker.GetPhase(), Tracker::P_PROCESSING);
+	QCOMPARE(tracker.GetDeadline(), qint64(3000));
+}
+
+
+void CConnectionTimeoutTrackerTest::ProcessingTimeoutEndsWithResponseTest()
+{
+	Tracker tracker(CreateProcessingConfig(3000));
+	tracker.OnConnectionOpened(0);
+	tracker.OnDataReceived(0);
+	tracker.OnRequestCompleted(0);
+
+	tracker.OnResponseStarted(2900);
+
+	// The response is in time, now the stall of the sending is watched:
+	QCOMPARE(tracker.GetPhase(), Tracker::P_SENDING);
+	QCOMPARE(tracker.GetDeadline(), qint64(3900));
+	QCOMPARE(tracker.GetAction(3000), Tracker::A_NONE);
+
+	tracker.OnResponseCompleted(2950);
+
+	QCOMPARE(tracker.GetPhase(), Tracker::P_IDLE);
+	QCOMPARE(tracker.GetDeadline(), qint64(3450));
+}
+
+
+void CConnectionTimeoutTrackerTest::ProcessingTimeoutOfPipelinedRequestTest()
+{
+	Tracker tracker(CreateProcessingConfig(3000));
+	tracker.OnConnectionOpened(0);
+	tracker.OnDataReceived(10);
+	tracker.OnRequestCompleted(10);
+	tracker.OnDataReceived(20);
+	tracker.OnRequestCompleted(20);
+
+	tracker.OnResponseStarted(2000);
+	tracker.OnResponseCompleted(2100);
+
+	// The second request is counted from the end of the first response, not from its own arrival:
+	QCOMPARE(tracker.GetPhase(), Tracker::P_PROCESSING);
+	QCOMPARE(tracker.GetDeadline(), qint64(5100));
+	QCOMPARE(tracker.GetAction(5099), Tracker::A_NONE);
+	QCOMPARE(tracker.GetAction(5100), Tracker::A_PROCESSING_TIMEOUT);
+}
+
+
+void CConnectionTimeoutTrackerTest::ProcessingTimeoutClampedTest()
+{
+	Tracker tracker(CreateProcessingConfig(-1));
+	tracker.OnConnectionOpened(0);
+	tracker.OnDataReceived(0);
+	tracker.OnRequestCompleted(0);
+
+	QCOMPARE(tracker.GetDeadline(), s_never);
+}
+
+
+void CConnectionTimeoutTrackerTest::ProcessingTimeoutClosingTest()
+{
+	Tracker tracker(CreateProcessingConfig(3000));
+	tracker.OnConnectionOpened(0);
+	tracker.OnDataReceived(0);
+	tracker.OnRequestCompleted(0);
+
+	// After the timeout the connection is closed and only the lingering close is watched:
+	tracker.OnClosing(3000);
+
+	QCOMPARE(tracker.GetPhase(), Tracker::P_CLOSING);
+	QCOMPARE(tracker.GetDeadline(), qint64(3200));
+	QCOMPARE(tracker.GetAction(3200), Tracker::A_ABORT_LINGERING);
 }
 
 

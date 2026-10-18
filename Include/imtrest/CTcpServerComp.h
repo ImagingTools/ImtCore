@@ -57,6 +57,7 @@ public:
 		I_ASSIGN(m_threadsLimitAttrPtr, "ThreadsLimit", "Limit of threads", true, 5);
 		I_ASSIGN(m_requestInactivityTimeoutAttrPtr, "RequestInactivityTimeoutMs", "Time in milliseconds without any data while a request is received or a response is sent (the incomplete HTTP request is answered with 408). 0 - no limit", true, 30000);
 		I_ASSIGN(m_keepAliveTimeoutAttrPtr, "KeepAliveTimeoutMs", "Time in milliseconds without any activity of an idle connection, before the first request and between the requests. 0 - no limit", true, 15000);
+		I_ASSIGN(m_requestProcessingTimeoutAttrPtr, "RequestProcessingTimeoutMs", "Time in milliseconds that a handler can work on a request. The request that is not answered in time gets 503 and the connection is closed, the handler is not stopped. 0 - no limit (a handler can work long, for example a calculation)", true, 0);
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
 		I_ASSIGN(m_serverConnnectionInterfaceCompPtr, "ServerInterface", "Parameter providing the server connection interface to be listened", true, "ServerInterface");
 		I_ASSIGN(m_sslConfigurationCompPtr, "SslConfiguration", "SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the server to control certain features of that connection.", false, "SslConfiguration")
@@ -113,6 +114,7 @@ private:
 	I_ATTR(int, m_threadsLimitAttrPtr);
 	I_ATTR(int, m_requestInactivityTimeoutAttrPtr);
 	I_ATTR(int, m_keepAliveTimeoutAttrPtr);
+	I_ATTR(int, m_requestProcessingTimeoutAttrPtr);
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);
 	I_ATTR(bool, m_isMultiThreadingAttrPtr);
 

@@ -28,6 +28,14 @@ private slots:
 
 	// Processing and sending of a response
 	void ProcessingHasNoTimeoutTest();
+	void DefaultProcessingTimeoutIsDisabledTest();
+	void ProcessingTimeoutTest();
+	void ProcessingTimeoutIsCountedFromRequestEndTest();
+	void ProcessingTimeoutIgnoresDataTest();
+	void ProcessingTimeoutEndsWithResponseTest();
+	void ProcessingTimeoutOfPipelinedRequestTest();
+	void ProcessingTimeoutClampedTest();
+	void ProcessingTimeoutClosingTest();
 	void SendingStallTimeoutTest();
 	void SendingProgressDelaysTimeoutTest();
 	void ResponseCompletedStartsKeepAliveTest();

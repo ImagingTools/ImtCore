@@ -51,6 +51,12 @@ protected Q_SLOTS:
 	void AboutToQuit();
 
 private:
+	/**
+		Answer a request that cannot be processed with \c 500, so the client does not wait for the response.
+	*/
+	void RespondWithInternalError(const IRequest& request) const;
+
+private:
 	I_FACT(imtrest::IRequestServlet, m_requestHandlerCompPtr);
 	I_REF(imtrest::IResponseDispatcher, m_requestManagerCompPtr);
 	I_ATTR(int, m_threadsLimitAttrPtr);

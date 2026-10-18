@@ -66,6 +66,14 @@ public:
 	bool IsCloseRequested() const;
 
 	/**
+		The received data are not a valid request. The message of the behavior is sent (for HTTP it is \c 400 \c Bad
+		\c Request, RFC 9112, section 2.2) and the connection is closed as after a timeout of an incomplete request:
+		it waits for the closing by the client, the data received meanwhile are discarded, see IsClosing().
+		Without a message the connection is just aborted.
+	*/
+	void RejectRequest();
+
+	/**
 		Data of a request are received from the socket.
 	*/
 	void OnDataReceived();
@@ -98,6 +106,7 @@ private:
 	void UpdateTimer();
 	void CompleteResponseIfWritten();
 	void CloseConnection();
+	void CloseWithMessage(const QByteArray& message);
 	void PerformAction(CConnectionTimeoutTracker::Action action);
 
 private:

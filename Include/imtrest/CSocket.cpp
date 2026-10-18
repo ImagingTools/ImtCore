@@ -51,11 +51,9 @@ CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, bool secureConnec
 		socketPtr->startServerEncryption();
 	}
 
-	m_timeoutWatcherPtr = new CSocketTimeoutWatcher(
-				*m_socket,
-				m_rootSocket->GetConnectionTimeoutConfig(),
-				CConnectionTimeoutBehavior::CreateForProtocol(m_rootSocket->GetProtocolTypeId()),
-				this);
+	m_behavior = CConnectionTimeoutBehavior::CreateForProtocol(m_rootSocket->GetProtocolTypeId());
+
+	m_timeoutWatcherPtr = new CSocketTimeoutWatcher(*m_socket, m_rootSocket->GetConnectionTimeoutConfig(), m_behavior, this);
 
 	connect(m_socket.data(), &QTcpSocket::disconnected, this, &CSocket::Disconnected, Qt::DirectConnection);
 	connect(m_socket.data(), &QTcpSocket::readyRead, this, &CSocket::HandleReadyRead, Qt::DirectConnection);
@@ -90,73 +88,87 @@ void CSocket::OnHandleSslErrors(QList<QSslError> errorList)
 
 void CSocket::HandleReadyRead()
 {
-	if (m_timeoutWatcherPtr != nullptr){
-		if (m_timeoutWatcherPtr->IsClosing() || m_timeoutWatcherPtr->IsCloseRequested()){
-			// The client should only close the connection after the response of the timeout (RFC 9112, section 9.6)
-			// and should not send requests after a request that asked to close it (RFC 9112, section 9.6).
-			m_socket->readAll();
+	if (m_timeoutWatcherPtr->IsClosing() || m_timeoutWatcherPtr->IsCloseRequested()){
+		// The client should only close the connection after the response of the timeout or of the rejection (RFC 9112,
+		// section 9.6) and should not send requests after a request that asked to close it (RFC 9112, section 9.6).
+		m_socket->readAll();
 
-			return;
-		}
+		return;
+	}
 
-		m_timeoutWatcherPtr->OnDataReceived();
+	// The responses go in the order of the requests, so the next request waits for the response to the current one.
+	// Its data stay in the socket and are parsed after the response, see OnSendResponse().
+	if (m_isRequestInProgress){
+		return;
 	}
 
 	imtrest::IRequestServlet* requestHandlerPtr = m_rootSocket->GetRequestServlet();
-	Q_ASSERT(requestHandlerPtr != nullptr);
-
 	if (requestHandlerPtr == nullptr){
+		// The server is not configured: there is nobody to process requests, the data are useless
+		qWarning() << "The server has no request handler";
+
+		m_socket->readAll();
+
 		return;
 	}
+
+	if (m_socket->bytesAvailable() <= 0){
+		return;
+	}
+
+	m_timeoutWatcherPtr->OnDataReceived();
 
 	if (!m_requestPtr.IsValid()){
 		m_requestPtr.SetPtr(m_rootSocket->CreateRequest().PopInterfacePtr());
 	}
 
-	if (!m_socket->isOpen()){
-		m_socket->open(QIODevice::ReadWrite);
+	if (!m_requestPtr.IsValid()){
+		qWarning() << "The request cannot be created";
+
+		m_socket->readAll();
+
+		return;
 	}
 
-	if (!m_socket->isTransactionStarted()){
-		m_socket->startTransaction();
-	}
-
-	if (m_requestPtr->GetState() == IRequest::RS_MESSAGE_COMPLETE){
-		m_requestPtr->ResetData();
-	}
-
-	// Get state of request data:
+	// The request takes only its own data from the socket, so they are not kept twice and the data of the next
+	// request are not mixed with it.
 	if (!m_requestPtr->ParseDeviceData(*m_socket)){
-		qDebug() << "Data parsing failed";
-
-		m_socket->rollbackTransaction();
+		RejectRequest();
 
 		return;
 	}
 
-	// Not all data was read:
+	// Not all data of the request are received:
 	if (m_requestPtr->GetState() != IRequest::RS_MESSAGE_COMPLETE){
-		qDebug() << "Not all data was read";
-
 		return;
 	}
-
-	// All request data was read:
-	m_socket->commitTransaction();
 
 	const bool isConnectionClosing = !m_requestPtr->IsConnectionPersistent();
 	m_rootSocket->SetResponseHints(isConnectionClosing, m_requestPtr->IsResponseBodyOmitted());
 
-	if (m_timeoutWatcherPtr != nullptr){
-		m_timeoutWatcherPtr->OnRequestCompleted();
+	m_timeoutWatcherPtr->OnRequestCompleted();
 
-		if (isConnectionClosing){
-			m_timeoutWatcherPtr->CloseAfterResponse();
-		}
+	if (isConnectionClosing){
+		m_timeoutWatcherPtr->CloseAfterResponse();
 	}
 
-	// Start request handler:
-	requestHandlerPtr->ProcessRequest(*m_requestPtr.PopPtr());
+	// The response comes through OnSendResponse() later, so the flag is set before the handler starts.
+	m_isRequestInProgress = m_behavior.IsRequestResponseCycle();
+
+	// Start request handler. A failure of the handler must not take the connection thread down and must not leave the
+	// client without a response.
+	IRequest* requestPtr = m_requestPtr.PopPtr();
+
+	try{
+		requestHandlerPtr->ProcessRequest(*requestPtr);
+	}
+	catch (...){
+		qWarning() << "The request handler failed";
+
+		if (m_behavior.createServerErrorMessage){
+			OnSendResponse(m_behavior.createServerErrorMessage());
+		}
+	}
 }
 
 
@@ -169,13 +181,30 @@ void CSocket::Disconnected()
 void CSocket::OnSendResponse(QByteArray data)
 {
 	if (!m_socket.isNull() && m_socket->isOpen()){
-		if (m_timeoutWatcherPtr != nullptr){
-			m_timeoutWatcherPtr->WriteResponse(data);
-		}
-		else{
-			m_socket->write(data);
+		m_timeoutWatcherPtr->WriteResponse(data);
+	}
+
+	if (m_isRequestInProgress){
+		m_isRequestInProgress = false;
+
+		// The next request can be already in the socket, no signal will tell about it
+		if (!m_socket.isNull() && (m_socket->bytesAvailable() > 0)){
+			QMetaObject::invokeMethod(this, &CSocket::HandleReadyRead, Qt::QueuedConnection);
 		}
 	}
+}
+
+
+// private methods
+
+void CSocket::RejectRequest()
+{
+	qDebug() << "The data are not a valid request";
+
+	// The rest of the data is not a request, nothing can be done with it
+	m_socket->readAll();
+
+	m_timeoutWatcherPtr->RejectRequest();
 }
 
 

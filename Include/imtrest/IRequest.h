@@ -41,6 +41,13 @@ public:
 	virtual CommandParams GetCommandParams() const = 0;
 	virtual QByteArray GetBody() const = 0;
 	virtual QByteArray GetRequestId() const = 0;
+
+	/**
+		Parse the data that are available in the device.
+		Only the data of this request are taken from the device. If the request is complete and the data continue with
+		the next request, the next request stays in the device.
+		\return \c false if the data are not a valid request.
+	*/
 	virtual bool ParseDeviceData(QIODevice& device) = 0;
 
 	/**

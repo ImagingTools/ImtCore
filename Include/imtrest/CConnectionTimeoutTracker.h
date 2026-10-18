@@ -34,6 +34,15 @@ struct CConnectionTimeoutConfig
 		response before the client reads it (RFC 9112, section 9.6). The value 0 closes the connection at once.
 	*/
 	int lingeringCloseMs = 5000;
+
+	/**
+		Time of the processing of a request by the handler, from the end of the request (or of the response to the previous
+		request of a pipeline) to the beginning of its response, in milliseconds. The request that is not answered in time
+		gets \c 503 \c Service \c Unavailable (RFC 9110, section 15.6.4) and the connection is closed, because the late response
+		would be taken for a response to the next request. The value 0 (default) means no limit: a handler can legitimately
+		work long, for example a calculation.
+	*/
+	int requestProcessingMs = 0;
 };
 
 
@@ -45,7 +54,7 @@ struct CConnectionTimeoutConfig
 	The connection is always in one of the phases:
 	- \c P_IDLE: nothing is received, the keep-alive timeout is running;
 	- \c P_RECEIVING: a request is partially received, the request inactivity timeout is running;
-	- \c P_PROCESSING: a request is passed to the handler. The time of the handler is not limited here;
+	- \c P_PROCESSING: a request is passed to the handler. The time of the handler is limited only if the processing timeout is set;
 	- \c P_SENDING: a response is being written, the request inactivity timeout is running (progress of the writing);
 	- \c P_CLOSING: the connection is going to be closed after the \c 408 response, the lingering timeout is running.
 */
@@ -86,7 +95,12 @@ public:
 		/**
 			Abort the connection: the client did not close it after the \c 408 response.
 		*/
-		A_ABORT_LINGERING
+		A_ABORT_LINGERING,
+
+		/**
+			Answer \c 503 \c Service \c Unavailable and wait for the closing of the connection: the handler did not answer in time.
+		*/
+		A_PROCESSING_TIMEOUT
 	};
 
 	CConnectionTimeoutTracker();
