@@ -43,12 +43,6 @@ module.exports = {
         if (e.metaKey) modifiers |= QtEnums.MetaModifier
         e.modifiers = modifiers
 
-        // Qt KeyEvent.text: the typed character, empty for non-printing keys. Ctrl+key types no
-        // character (Ctrl+Alt is AltGr on Windows and does).
-        let typed = typeof e.key === 'string' && e.key.length === 1
-        let text = typed && !((e.ctrlKey || e.metaKey) && !e.altKey) ? e.key : ''
-        Object.defineProperty(e, 'text', { value: text, configurable: true })
-
         if (typeof e.key !== 'string' || e.key.length !== 1) return
 
         let qtKey = 0

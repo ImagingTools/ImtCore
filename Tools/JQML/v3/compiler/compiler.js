@@ -35,17 +35,6 @@ program.parse(process.argv)
 const options = program.opts()
 
 
-// Body of a template literal holding exactly `text`. Control characters must be escaped:
-// a raw CR inside a template literal is read back as LF.
-function escapeTemplateString(text){
-    return text.replace(/[\\`\x00-\x1f\u2028\u2029]|\$\{/g, (match) => {
-        if (match === '\\') return '\\\\'
-        if (match === '`') return '\\`'
-        if (match === '${') return '\\${'
-        return '\\u' + match.charCodeAt(0).toString(16).padStart(4, '0')
-    })
-}
-
 // A property initializer may only be folded into a static default value when it
 // is a genuine compile-time constant. Deciding this by eval()-ing the source is
 // unsafe: "typeof foo" never throws, so an expression such as
@@ -751,7 +740,7 @@ function compile(options){
                         return stat
                     }
                     case 'string': {
-                        stat.value.add(`\`${escapeTemplateString(tree[1])}\``)
+                        stat.value.add(`\`${tree[1].replaceAll('\u005C', '\u005C\u005C')}\``)
                         return stat
                     }
                     case 'assign': {
@@ -1230,11 +1219,11 @@ function compile(options){
                                 stat.value.add(`default: `)
                                 this.prepare(tree[2][i][1], stat)
                             } else {
-                                // No break of our own: an empty case falls through, as in Qt.
                                 stat.value.add(`case `)
                                 this.prepare(tree[2][i][0], stat)
                                 stat.value.add(`:`)
                                 this.prepare(tree[2][i][1], stat)
+                                stat.value.add(`break;`)
                             }
 
                         }

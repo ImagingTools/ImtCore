@@ -362,10 +362,7 @@ module.exports = {
                 z-index: 1;
                 pointer-events: all;
                 user-select: text;
-            }
-            .TextEdit > .impl * {
-                user-select: text;
-            }
+            }  
             .Image {
                 background-repeat: no-repeat;
                 background-position: center;
