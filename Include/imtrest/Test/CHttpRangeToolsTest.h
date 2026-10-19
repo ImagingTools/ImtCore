@@ -28,6 +28,25 @@ private slots:
 	void CreateContentRangeTest_data();
 	void CreateContentRangeTest();
 	void CreateContentRangeRoundTripTest();
+
+	// Range: parsing
+	void ParseRangeTest_data();
+	void ParseRangeTest();
+	void ParseRangeNotSatisfiableTest_data();
+	void ParseRangeNotSatisfiableTest();
+	void ParseRangeIgnoredTest_data();
+	void ParseRangeIgnoredTest();
+	void ParseRangeIgnoredNegativeLengthTest();
+	void ParseRangeKeepsResultTest();
+	void ParseRangeReplacesResultTest();
+	void ParseRangeMaxCountTest();
+	void ParseRangeContentRangeTest();
+
+	// Range: description and merge of the ranges
+	void ByteRangeLengthTest();
+	void CoalesceRangesTest_data();
+	void CoalesceRangesTest();
+	void CoalesceRangesLargePositionsTest();
 };
 
 
