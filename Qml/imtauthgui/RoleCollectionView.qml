@@ -16,6 +16,7 @@ RemoteCollectionView {
 	additionalFieldIds: [RoleItemDataTypeMetaInfo.s_productId, RoleItemDataTypeMetaInfo.s_parentRoles]
 	
 	commandsDelegateComp: Component {DocCollectionViewDelegate {
+			revisionsPermissionPath: "/Administration/Roles/Revisions";
 			collectionView: roleCollectionViewContainer;
 			documentManager: roleCollectionViewContainer.documentManager;
 

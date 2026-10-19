@@ -39,6 +39,10 @@ protected:
 				const sdl::V1_0::imtauth::CGetPermissionsGqlRequest& getPermissionsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+
+private:
+	// The accounts service knows no product tree, so what the permissions include is added here.
+	void AddImpliedPermissions(const imtgql::CGqlRequest& gqlRequest, sdl::V1_0::imtauth::CAuthorizationPayload& payload) const;
 };
 
 

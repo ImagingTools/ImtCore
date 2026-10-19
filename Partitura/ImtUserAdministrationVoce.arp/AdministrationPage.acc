@@ -358,7 +358,7 @@
                                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewRoles</Value>
+                                            <Value>/Administration/Roles/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -377,7 +377,7 @@
                                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewTenants</Value>
+                                            <Value>/OrganizationManagement/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -396,7 +396,7 @@
                                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewUsers</Value>
+                                            <Value>/Administration/Users/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

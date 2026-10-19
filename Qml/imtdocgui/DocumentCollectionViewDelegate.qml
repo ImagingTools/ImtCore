@@ -14,6 +14,8 @@ CollectionViewCommandsDelegateBase {
 	/*deprecated*/property string viewTypeId;
 
 	property string documentManagerId: collectionId;
+	// Permission area of the revisions of the collection, e.g. "/SensorManagement/Revisions".
+	property string revisionsPermissionPath: "";
 
 	property var documentTypeIds: [];
 	/*deprecated*/property var documentViewTypeIds: [];
@@ -197,6 +199,7 @@ CollectionViewCommandsDelegateBase {
 
 		DocumentRevisionDialog {
 			collectionId: collectionViewCommandsDelegateBase.collectionId
+			revisionsPermissionPath: collectionViewCommandsDelegateBase.revisionsPermissionPath
 			function getHeaders(){
 				return collectionViewCommandsDelegateBase.getHeaders();
 			}

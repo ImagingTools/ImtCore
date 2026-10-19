@@ -32,7 +32,7 @@ ViewBase {
 	property string permissionPath: ""
 
 	Component.onCompleted: {
-		canEdit = PermissionsController.checkPermission("ChangeLicenseDefinition")
+		canEdit = PermissionsController.checkPermission("/LicenseDefinitionManagement/Edit/Change")
 		CachedFeatureCollection.updateModel()
 		CachedProductCollection.updateModel()
 		CachedLicenseCollection.updateModel()

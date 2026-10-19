@@ -166,6 +166,7 @@ type ExportObjectPayload {
 	fileName: String!
 }
 
+## replaceExisting: the import replaces data already in the system that the imported object carries (e.g. the shared features of a product); otherwise that data is kept.
 input ImportObjectInput {
 	collectionId: ID!
 	typeId: ID!
@@ -173,6 +174,7 @@ input ImportObjectInput {
 	description: String
 	fileData: ID!
 	mimeType: String
+	replaceExisting: Boolean
 }
 
 type ImportObjectPayload {

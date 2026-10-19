@@ -25,6 +25,7 @@
 #include <imtauthdb/CTenantRelationshipDbDelegateComp.h>
 #include <imtauthdb/CCrossTenantMessageDbDelegateComp.h>
 #include <imtauthdb/COrderRequestDbDelegateComp.h>
+#include <imtauthdb/CPermissionPathMigrationComp.h>
 
 /**
 	ImtAuthDbPck package
@@ -58,6 +59,7 @@ typedef imtauthdb::CTenantConnectionDbDelegateComp TenantConnectionDatabaseDeleg
 typedef imtauthdb::CTenantRelationshipProposalDbDelegateComp TenantRelationshipProposalDatabaseDelegate;
 typedef imtauthdb::CTenantRelationshipDbDelegateComp TenantRelationshipDatabaseDelegate;
 typedef imtauthdb::CCrossTenantMessageDbDelegateComp CrossTenantMessageDatabaseDelegate;
+typedef imtauthdb::CPermissionPathMigrationComp PermissionPathMigration;
 typedef imtauthdb::COrderRequestDbDelegateComp OrderRequestDatabaseDelegate;
 
 

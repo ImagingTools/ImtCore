@@ -230,7 +230,7 @@ Item {
 				return
 			}
 
-			let accessGranted = PermissionsController.checkPermission("View" + pageId)
+			let accessGranted = PermissionsController.checkPermission("/Administration/" + pageId + "/ViewPage")
 			if (!accessGranted){
 				console.warn("Subpage '" + pageId + "' cannot be displayed. Error: Access denied (check permissions)")
 

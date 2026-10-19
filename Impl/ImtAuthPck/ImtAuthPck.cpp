@@ -46,11 +46,6 @@ I_EXPORT_COMPONENT(
 			"Role Collection Adapter");
 
 I_EXPORT_COMPONENT(
-			PermissionPathMigration,
-			"Rewrites permissions stored by feature id as full feature paths",
-			"Permission Path Migration");
-
-I_EXPORT_COMPONENT(
 			UserCollectionAdapter,
 			"Adapting the collection to the provider",
 			"User Collection Adapter");

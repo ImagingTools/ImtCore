@@ -16,84 +16,84 @@
                     <AttributeInfo Id="CreateSubCollectionPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewUsers</Value>
+                                <Value>/Administration/Users/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ExportObjectPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ExportUser</Value>
+                                <Value>/Administration/Users/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GetCollectionHeadersPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewUsers</Value>
+                                <Value>/Administration/Users/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GetCommandsPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewUsers</Value>
+                                <Value>/Administration/Users/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GetDataMetaInfoPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewUsers</Value>
+                                <Value>/Administration/Users/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GetElementIdsPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewUsers</Value>
+                                <Value>/Administration/Users/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GetElementMetaInfoPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewUsers</Value>
+                                <Value>/Administration/Users/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GetObjectDataPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewUsers</Value>
+                                <Value>/Administration/Users/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GetObjectTypeIdPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewUsers</Value>
+                                <Value>/Administration/Users/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="GetObjectVisualStatusPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewUsers</Value>
+                                <Value>/Administration/Users/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ImportObjectPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ImportUser</Value>
+                                <Value>/Administration/Users/Edit/Add</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="InsertNewObjectPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>AddUser</Value>
+                                <Value>/Administration/Users/Edit/Add</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -103,49 +103,49 @@
                     <AttributeInfo Id="RemoveElementSetPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>RemoveUser</Value>
+                                <Value>/Administration/Users/Edit/Remove</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="RemoveElementsPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>RemoveUser</Value>
+                                <Value>/Administration/Users/Edit/Remove</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="RestoreObjectSetPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>RestoreUser</Value>
+                                <Value>/Administration/Users/Edit/Remove</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="RestoreObjectsPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>RestoreUser</Value>
+                                <Value>/Administration/Users/Edit/Remove</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="SetObjectDataPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ChangeUser</Value>
+                                <Value>/Administration/Users/Edit/Change</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="SetObjectDescriptionPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ChangeUser</Value>
+                                <Value>/Administration/Users/Edit/Change</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="SetObjectNamePermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ChangeUser</Value>
+                                <Value>/Administration/Users/Edit/Change</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -181,7 +181,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewUsers</Value>
+                                <Value>/Administration/Users/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -203,7 +203,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ChangeUser</Value>
+                                <Value>/Administration/Users/Edit/Change</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -225,7 +225,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>AddUser</Value>
+                                <Value>/Administration/Users/Edit/Add</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -247,7 +247,7 @@
                     <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewUsers</Value>
+                                <Value>/Administration/Users/View</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

@@ -488,9 +488,9 @@
                                 <AttributeInfo Id="ClosePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>RemoveUser</Value>
-                                            <Value>ChangeUser</Value>
-                                            <Value>ViewUsers</Value>
+                                            <Value>/Administration/Users/Edit/Remove</Value>
+                                            <Value>/Administration/Users/Edit/Change</Value>
+                                            <Value>/Administration/Users/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -506,18 +506,18 @@
                                 <AttributeInfo Id="RedoPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddUser</Value>
-                                            <Value>RemoveUser</Value>
-                                            <Value>ChangeUser</Value>
+                                            <Value>/Administration/Users/Edit/Add</Value>
+                                            <Value>/Administration/Users/Edit/Remove</Value>
+                                            <Value>/Administration/Users/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SavePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddUser</Value>
-                                            <Value>RemoveUser</Value>
-                                            <Value>ChangeUser</Value>
+                                            <Value>/Administration/Users/Edit/Add</Value>
+                                            <Value>/Administration/Users/Edit/Remove</Value>
+                                            <Value>/Administration/Users/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -533,9 +533,9 @@
                                 <AttributeInfo Id="UndoPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddUser</Value>
-                                            <Value>RemoveUser</Value>
-                                            <Value>ChangeUser</Value>
+                                            <Value>/Administration/Users/Edit/Add</Value>
+                                            <Value>/Administration/Users/Edit/Remove</Value>
+                                            <Value>/Administration/Users/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -561,8 +561,8 @@
                                 <AttributeInfo Id="EditPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewUsers</Value>
-                                            <Value>ChangeUser</Value>
+                                            <Value>/Administration/Users/View</Value>
+                                            <Value>/Administration/Users/Edit/Change</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -575,14 +575,14 @@
                                 <AttributeInfo Id="NewPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddUser</Value>
+                                            <Value>/Administration/Users/Edit/Add</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
                                 <AttributeInfo Id="RemovePermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>RemoveUser</Value>
+                                            <Value>/Administration/Users/Edit/Remove</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -644,7 +644,7 @@
                                 <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ViewRevisions</Value>
+                                            <Value>/Administration/Users/Revisions/View</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

@@ -146,5 +146,10 @@ I_EXPORT_COMPONENT(
 			"SQL delegate for order requests (hydration, INSERT/UPDATE/DELETE)",
 			"Order Request Database Delegate");
 
+I_EXPORT_COMPONENT(
+			PermissionPathMigration,
+			"Database migration step that rewrites permissions stored by feature id as full feature paths",
+			"Permission Path Migration");
+
 } // namespace ImtAuthDbPck
 

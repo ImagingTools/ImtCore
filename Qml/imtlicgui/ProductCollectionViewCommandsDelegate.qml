@@ -11,13 +11,14 @@ import imtguigql 1.0
 
 DocumentCollectionViewDelegate {
 	id: container;
+	revisionsPermissionPath: "/ProductManagement/Revisions";
 	
 	removeDialogTitle: qsTr("Deleting a product");
 	removeMessage: qsTr("Delete the selected product ?");
 	
 	exportFileDialog.nameFilters: ["Xml files (*.xml)", "C++ Header Files (*.h)"];
-	importFileDialog.nameFilters: ["Xml files (*.xml)"];
-	importDialogMimeTypes: ["application/xml"]
+	importFileDialog.nameFilters: ["Xml files (*.xml)", "C++ Header Files (*.h)"];
+	importDialogMimeTypes: ["application/xml", "text/x-c"]
 	exportDialogMimeTypes: ["application/xml", "text/x-c"]
 	exportFileDialog.title: qsTr("Export the product to a file");
 	importFileDialog.title: qsTr("Choose a product file to import");
@@ -60,27 +61,28 @@ DocumentCollectionViewDelegate {
 		ErrorDialog {}
 	}
 	
-	// Shown before the file dialog, because it warns about what importing does at
-	// all rather than about one particular file. Overwriting is not a choice -
-	// CProductCollectionControllerComp::OnImportObject always writes the features
-	// carried in the file into the shared feature collection, creating the ones
-	// that are new and replacing the ones that already exist - so the dialog says
-	// so plainly instead of offering an option that does not exist.
-	//
+	// The choice is made before the file dialog and sent with the import (replaceExisting).
 	// One string literal, not a concatenation: lupdate cannot extract qsTr() when
 	// its argument is built with "+".
+	property bool replaceExistingFeatures: false;
+
 	Component {
 		id: importWarningComp;
 
 		MessageDialog {
 			title: qsTr("Import a product");
-			message: qsTr("Importing overwrites features.\n\nThe product from the file is added to the collection, and every feature it carries is written into the shared feature collection: features that are not there yet are created, and features that already exist are replaced by the version from the file. Other products and licenses that use those features get the replacement as well.\n\nChoose a file and import?");
+			message: qsTr("The product from the file (XML or the C++ header Lisa exports) is added to the collection; a product whose id already exists is not imported. Features the file carries that are not in the system yet are created.\n\nOverwrite the features that already exist with the versions from the file? Other products and licenses that use those features get the new version as well.\n\nYes - overwrite them, No - keep the existing features and ignore their versions in the file.");
+
+			Component.onCompleted: {
+				addButton(Enums.cancel, qsTr("Cancel"), true)
+			}
 
 			onFinished: {
-				if (buttonId !== Enums.yes){
+				if (buttonId !== Enums.yes && buttonId !== Enums.no){
 					return;
 				}
 
+				container.replaceExistingFeatures = buttonId === Enums.yes;
 				container.importFileDialog.open();
 			}
 		}
@@ -88,6 +90,12 @@ DocumentCollectionViewDelegate {
 
 	function onImport(){
 		ModalDialogManager.openDialog(importWarningComp, {});
+	}
+
+	function onImportDialogResult(name, fileData, mimeType){
+		if (container.collectionView && container.collectionView.dataController){
+			container.collectionView.dataController.importObject(importObjectTypeId, name, "", fileData, mimeType, container.replaceExistingFeatures);
+		}
 	}
 	
 	function onRename(){

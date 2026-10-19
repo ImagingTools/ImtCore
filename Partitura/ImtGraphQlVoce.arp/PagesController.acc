@@ -37,12 +37,9 @@
                     <AttributeInfo Id="PagePermissions" Type="Id[]" ExportId="AdministrationPagePermissions">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>/Administration/EditAdministration/EditGroup/AddGroup</Value>
-                                <Value>/Administration/EditAdministration/EditGroup/ChangeGroup</Value>
-                                <Value>/Administration/EditAdministration/EditGroup/RemoveGroup</Value>
-                                <Value>/Administration/EditAdministration/EditRole/AddGroup</Value>
-                                <Value>/Administration/ViewAdministration/ViewGroups</Value>
-                                <Value>/Administration/ViewAdministration/ViewUsers</Value>
+                                <Value>/Administration/Users/ViewPage</Value>
+                                <Value>/Administration/Roles/ViewPage</Value>
+                                <Value>/Administration/Groups/ViewPage</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -271,7 +268,7 @@
                     <AttributeInfo Id="PagePermissions" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ViewWorkspace</Value>
+                                <Value>/WorkspaceManagement/ViewPage</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

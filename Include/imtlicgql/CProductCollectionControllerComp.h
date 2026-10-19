@@ -69,6 +69,18 @@ private:
 	virtual QString GetExportFileName(const QByteArray& objectId) const override;
 
 private:
+	/**
+		Check the product of an import request before it is imported: its product id must be new, and its root
+		features must not be in the feature catalog under another uuid.
+	*/
+	bool CanImportProduct(const sdl::V1_0::imtbase::CImportObjectGqlRequest& importObjectRequest, QString& errorMessage) const;
+
+	/**
+		Put the features of the imported product into the feature catalog. New features are added; a feature already
+		in the catalog is replaced by the imported version, or, without \c replaceExisting, kept and taken into the product.
+	*/
+	void WriteImportedFeatures(const QByteArray& objectId, bool replaceExisting) const;
+
 	bool FillObjectFromRepresentation(
 				const sdl::V1_0::imtlic::CProductData& representation,
 				istd::IChangeable& object,
