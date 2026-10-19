@@ -500,7 +500,7 @@ class TestCase extends Item {
     }
 
 
-    // Type text into a TextInput (contenteditable div) or TextEdit (textarea).
+    // Type text into a TextInput (input) or TextEdit (textarea).
     // On desktop the method is a no-op; use the fallback in the QML test.
     typeText(item, text){
         if(!item || typeof item.__impl === 'undefined') return false
@@ -509,8 +509,7 @@ class TestCase extends Item {
         let impl = item.__impl
         if(!impl) return false
 
-        if(impl.tagName === 'TEXTAREA'){
-            // TextEdit
+        if(impl.tagName === 'TEXTAREA' || impl.tagName === 'INPUT'){
             impl.focus()
             for(let i = 0; i < text.length; i++){
                 let ch = text[i]
@@ -522,7 +521,6 @@ class TestCase extends Item {
                 this.__dispatchKeyEvent('keyup', key)
             }
         } else {
-            // TextInput (contenteditable)
             impl.focus()
             for(let i = 0; i < text.length; i++){
                 let ch = text[i]
@@ -539,7 +537,7 @@ class TestCase extends Item {
         return true
     }
 
-    // Clear text in a TextInput or TextEdit via selectAll + delete event.
+    // Clear text in a TextInput or TextEdit.
     clearText(item){
         if(!item || typeof item.__impl === 'undefined') return false
         if(typeof window === 'undefined') return false
@@ -547,13 +545,11 @@ class TestCase extends Item {
         let impl = item.__impl
         if(!impl) return false
 
-        if(impl.tagName === 'TEXTAREA'){
-            impl.focus()
+        impl.focus()
+        if(impl.tagName === 'TEXTAREA' || impl.tagName === 'INPUT'){
             impl.value = ''
             impl.dispatchEvent(new Event('input', { bubbles: true }))
         } else {
-            // Select all then delete
-            impl.focus()
             item.selectAll()
             impl.dispatchEvent(new InputEvent('input', {
                 bubbles: true,

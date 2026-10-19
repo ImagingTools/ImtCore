@@ -354,7 +354,7 @@ module.exports = {
                 font-size: 14px;
                 font-family: 'Segoe UI';
             }
-            .TextInput > .impl, .TextEdit > .impl {
+            .TextEdit > .impl {
                 display: flex;
                 width: 100%;
                 height: 100%;
@@ -362,7 +362,38 @@ module.exports = {
                 z-index: 1;
                 pointer-events: all;
                 user-select: text;
-            }  
+            }
+            .TextInput > .impl {
+                display: block;
+                box-sizing: border-box;
+                width: 100%;
+                height: 100%;
+                min-width: 0;
+                min-height: 0;
+                margin: 0;
+                border: none;
+                outline: none;
+                background: transparent;
+                border-radius: 0;
+                font: inherit;
+                color: inherit;
+                line-height: normal;
+                z-index: 1;
+                pointer-events: all;
+                user-select: text;
+            }
+            .TextInput > .impl::selection {
+                background: var(--jq-selection-color, #000080);
+                color: var(--jq-selected-text-color, #ffffff);
+            }
+            @keyframes jqml-autofill-start {
+                from {}
+                to {}
+            }
+            .TextInput > .impl:-webkit-autofill {
+                animation-name: jqml-autofill-start;
+                animation-duration: 0.01s;
+            }
             .Image {
                 background-repeat: no-repeat;
                 background-position: center;

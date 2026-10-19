@@ -29,7 +29,7 @@ class TextInput extends Item {
     static NoEcho = 2
     static PasswordEchoOnEdit = 3
 
-    static MaximumUndoDepth = 100
+    static credentialFormId = 'jqml-credential-form'
 
     static meta = Object.assign({}, Item.meta, {
         text: { type: String, value: ''},
@@ -62,6 +62,7 @@ class TextInput extends Item {
         cursorPosition: { type: Int, value: 0},
         canUndo: { type: Bool, value: false},
         canRedo: { type: Bool, value: false},
+        autoComplete: { type: String, value: ''},
 
         textChanged: {type:Signal, args:[]},
         colorChanged: {type:Signal, args:[]},
@@ -93,6 +94,7 @@ class TextInput extends Item {
         cursorPositionChanged: {type:Signal, args:[]},
         canUndoChanged: {type:Signal, args:[]},
         canRedoChanged: {type:Signal, args:[]},
+        autoCompleteChanged: {type:Signal, args:[]},
 
         accepted: {type:Signal, args:[]},
         editingFinished: {type:Signal, args:[]},
@@ -107,16 +109,58 @@ class TextInput extends Item {
         return obj
     }
 
+    static __ensureCredentialForm(){
+        if(typeof document === 'undefined') return null
+
+        let form = document.getElementById(TextInput.credentialFormId)
+        if(form) return form
+
+        form = document.createElement('form')
+        form.id = TextInput.credentialFormId
+        form.setAttribute('autocomplete', 'on')
+        form.noValidate = true
+        form.style.position = 'absolute'
+        form.style.width = '0'
+        form.style.height = '0'
+        form.style.overflow = 'hidden'
+        form.style.border = 'none'
+        form.style.padding = '0'
+        form.style.margin = '0'
+
+        let button = document.createElement('button')
+        button.type = 'submit'
+        button.tabIndex = -1
+        button.setAttribute('aria-hidden', 'true')
+        form.appendChild(button)
+
+        form.addEventListener('submit', (e)=>{
+            e.preventDefault()
+        })
+
+        let parent = document.body || document.documentElement
+        if(parent) parent.appendChild(form)
+        return form
+    }
+
     __createImpl(){
         let dom = this.__getDOM()
-        let impl = document.createElement('div')
+        let impl = document.createElement('input')
         impl.classList.add('impl')
-        impl.innerHTML = '&#8203'
+        impl.type = 'text'
+        impl.spellcheck = false
+        impl.value = this.text || ''
         dom.appendChild(impl)
         this.__impl = impl
-        this.__clearUndoHistory()
 
-        impl.setAttribute('contenteditable', true)
+        this.__applyEchoMode()
+        this.__applyReadOnly()
+        this.__applyEnabled()
+        this.__applyMaximumLength()
+        this.__applyAutoComplete()
+        this.__syncFormAssociation()
+        this.__applyHorizontalAlignment()
+        this.__applyVerticalAlignment()
+        this.__applySelectionColors()
 
         impl.onfocus = ()=>{
             this.forceActiveFocus()
@@ -131,149 +175,104 @@ class TextInput extends Item {
             this.activeFocus = false
         }
 
-        impl.onkeydown = (e)=>{
-            this.__syncSelectionFromDOM()
+        impl.onmousedown = (e)=>{
+            if(!this.activeFocusOnPress) e.preventDefault()
+        }
 
-            if(this.__isShortcutKey(e, QtEnums.Key_Z)){
-                e.preventDefault()
+        impl.onmouseup = ()=>{
+            if(!this.selectByMouse && !this.__programmaticSelect && this.__impl.selectionStart !== this.__impl.selectionEnd){
+                let pos = this.__impl.selectionEnd
+                this.__impl.setSelectionRange(pos, pos)
+            }
+            this.__syncSelectionFromDOM()
+        }
+
+        impl.onkeydown = (e)=>{
+            if(this.__isEditShortcut(e)){
                 e.stopPropagation()
-                if(e.shiftKey){
-                    this.redo()
-                } else {
-                    this.undo()
-                }
-            } else if(this.__isShortcutKey(e, QtEnums.Key_Y) && !e.shiftKey){
-                e.preventDefault()
+                return
+            }
+
+            if(e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Home' || e.key === 'End'){
                 e.stopPropagation()
-                this.redo()
-            } else if(this.__isShortcutKey(e, QtEnums.Key_C) || this.__isShortcutKey(e, QtEnums.Key_V) || this.__isShortcutKey(e, QtEnums.Key_X)){
-                // Handled by the native copy/paste/cut events (see impl.oncopy, impl.onpaste, impl.oncut)
-                e.stopPropagation()
-            } else if(this.__isShortcutKey(e, QtEnums.Key_A)){
-                e.preventDefault()
-                e.stopPropagation()
-                this.selectAll()
-            } else if(e.key === QtEnums.Key_Delete && e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey){
+            }
+
+            if(e.key === 'Delete' && e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey){
                 e.preventDefault()
                 e.stopPropagation()
                 this.cut()
-            } else if(e.key === QtEnums.Key_Backspace){
-                e.preventDefault()
-                e.stopPropagation()
-                if(this.__deleteWithDirection(false, this.selectionStart, this.selectionEnd)) this.textEdited()
-            } else if(e.key === QtEnums.Key_Delete){
-                e.preventDefault()
-                e.stopPropagation()
-                if(this.__deleteWithDirection(true, this.selectionStart, this.selectionEnd)) this.textEdited()
-            } else if(e.key === QtEnums.Key_Enter){
-                e.preventDefault()
-                e.stopPropagation()
+                return
+            }
 
-                if(this.validator){
-                    if(this.validator.validate(this.text)){
-                        this.accepted()
-                        this.editingFinished()
-                        this.acceptableInput = true
-                    } else {
-                        this.acceptableInput = false
-                    }
-                } else {
-                    this.accepted()
-                    this.editingFinished()
-                    this.acceptableInput = true
-                }
+            if(e.key === 'Enter'){
+                e.preventDefault()
+                e.stopPropagation()
+                this.__acceptInput()
             }
         }
 
         impl.oncopy = (e)=>{
+            if(this.echoMode === TextInput.Normal) return
             e.preventDefault()
-            this.__syncSelectionFromDOM()
-            if(this.echoMode !== TextInput.Normal || !e.clipboardData) return
-
-            let text = this.text.slice(this.selectionStart, this.selectionEnd)
-            if(text) e.clipboardData.setData('text/plain', text)
         }
 
         impl.oncut = (e)=>{
+            if(!this.readOnly && this.echoMode === TextInput.Normal) return
             e.preventDefault()
-            this.__syncSelectionFromDOM()
-            if(this.readOnly || this.echoMode !== TextInput.Normal || !e.clipboardData) return
-            if(this.selectionStart === this.selectionEnd) return
-
-            e.clipboardData.setData('text/plain', this.text.slice(this.selectionStart, this.selectionEnd))
-            this.__replaceText(this.selectionStart, this.selectionEnd, '', '')
-            this.textEdited()
-        }
-
-        impl.onpaste = (e)=>{
-            e.preventDefault()
-            if(this.readOnly) return
-
-            this.__syncSelectionFromDOM()
-            let text = e.clipboardData ? e.clipboardData.getData('text/plain') : ''
-            if(this.__pasteText(text, this.selectionStart, this.selectionEnd)) this.textEdited()
-        }
-
-        impl.onbeforeinput = (e)=>{
-            if(e.inputType === 'historyUndo' || e.inputType === 'historyRedo'){
-                e.preventDefault()
-                if(e.inputType === 'historyUndo'){
-                    this.undo()
-                } else {
-                    this.redo()
-                }
-                return
-            }
-
-            this.__syncSelectionFromDOM()
-            this.__beforeInputSelectionStart = this.selectionStart
-            this.__beforeInputSelectionEnd = this.selectionEnd
         }
 
         impl.oninput = (e)=>{
-            let inputSelectionStart = Number.isFinite(this.__beforeInputSelectionStart) ? this.__beforeInputSelectionStart : this.selectionStart
-            let inputSelectionEnd = Number.isFinite(this.__beforeInputSelectionEnd) ? this.__beforeInputSelectionEnd : this.selectionEnd
-            this.__beforeInputSelectionStart = undefined
-            this.__beforeInputSelectionEnd = undefined
+            if(this.__settingImplValue) return
 
-            let selection = document.getSelection()
-            selection.removeAllRanges()
+            let changed = this.__applyDomValue()
+            if(this.__programmaticInput) return
 
-            switch(e.inputType){
-                case 'insertText': {
-                    let insertedText = e.data == null ? '' : e.data
-                    this.__replaceText(inputSelectionStart, inputSelectionEnd, insertedText, 'insert')
-                    break
-                }
-                case 'insertFromPaste': {
-                    let pastedText = e.data
-                    if(pastedText == null && e.dataTransfer) pastedText = e.dataTransfer.getData('text/plain')
-                    this.__replaceText(inputSelectionStart, inputSelectionEnd, this.__normalizeInsertedText(pastedText), '')
-                    break
-                }
-                case 'deleteByCut': {
-                    this.__replaceText(inputSelectionStart, inputSelectionEnd, '', '')
-                    break
-                }
-                case 'deleteContentBackward': {
-                    this.__deleteWithDirection(false, inputSelectionStart, inputSelectionEnd)
-                    break
-                }
-                case 'deleteContentForward': {
-                    this.__deleteWithDirection(true, inputSelectionStart, inputSelectionEnd)
-                    break
-                }
-            }
-
-            this.textEdited()
+            this.__noteUserEdit(e)
+            if(changed) this.textEdited()
         }
+
+        impl.onchange = ()=>{
+            if(this.__applyDomValue()){
+                this.canUndo = true
+                this.canRedo = false
+                this.textEdited()
+            }
+        }
+
+        impl.onanimationstart = (e)=>{
+            if(!e || e.animationName !== 'jqml-autofill-start') return
+            if(this.__applyDomValue()){
+                this.canUndo = true
+                this.canRedo = false
+                this.textEdited()
+            }
+        }
+
+        this.__onSelectionChange = ()=>{
+            if(typeof document === 'undefined') return
+            if(document.activeElement !== this.__impl) return
+            this.__syncSelectionFromDOM()
+        }
+        document.addEventListener('selectionchange', this.__onSelectionChange)
 
         return impl
     }
 
     __onMouseDown(mouse){
-        if(this.activeFocusOnPress && this.enabled && this.visible && this.__impl){
+        if(!this.enabled || !this.visible) return
+
+        if(!mouse.target) mouse.target = this
+
+        if(this.activeFocusOnPress && this.__impl){
             this.__impl.focus()
+        }
+    }
+
+    __onMouseUp(mouse){
+        if(!this.enabled || !this.visible) return
+
+        if(mouse.target === this){
+            mouse.target = null
         }
     }
 
@@ -311,81 +310,20 @@ class TextInput extends Item {
         return maximumLength
     }
 
-    __applyTextInsertWithLimit(start, end, insertedText){
-        let safeStart = Math.max(0, Math.min(start, this.text.length))
-        let safeEnd = Math.max(safeStart, Math.min(end, this.text.length))
-        let maximumLength = this.__getMaximumLength()
-        let availableLength = maximumLength - (this.text.length - (safeEnd - safeStart))
-        if(availableLength < 0) availableLength = 0
-
-        let safeInsertedText = insertedText == null ? '' : insertedText.toString()
-        if(safeInsertedText.length > availableLength){
-            safeInsertedText = safeInsertedText.slice(0, availableLength)
-        }
-
-        let newText = this.text.slice(0, safeStart) + safeInsertedText + this.text.slice(safeEnd)
-        let cursor = safeStart + safeInsertedText.length
-        return { newText, cursor }
-    }
-
-    __syncSelectionFromDOM(){
-        let selection = document.getSelection()
-        if(!selection || !selection.rangeCount){
-            this.selectionStart = 0
-            this.selectionEnd = 0
-            return
-        }
-
-        let range = selection.getRangeAt(0)
-        if(!this.__impl.contains(range.startContainer) || !this.__impl.contains(range.endContainer)){
-            this.selectionStart = 0
-            this.selectionEnd = 0
-            return
-        }
-
-        let start = range.startOffset
-        let end = range.endOffset
-        if(range.startContainer === this.__impl){
-            start = range.startOffset === 0 ? 0 : this.text.length
-        }
-        if(range.endContainer === this.__impl){
-            end = range.endOffset === 0 ? 0 : this.text.length
-        }
-
-        this.selectionStart = Math.max(0, Math.min(start, this.text.length))
-        this.selectionEnd = Math.max(this.selectionStart, Math.min(end, this.text.length))
-    }
-
-    __deleteWithDirection(isForward, start, end){
-        if(start === end){
-            if(isForward){
-                if(start >= this.text.length){
-                    this.__renderImplText()
-                    this.select(start, start)
-                    return false
-                }
-                end = start + 1
-            } else {
-                if(start === 0){
-                    this.__renderImplText()
-                    this.select(0, 0)
-                    return false
-                }
-                start = start - 1
-            }
-        }
-
-        let previousText = this.text
-        this.__replaceText(start, end, '', isForward ? 'deleteForward' : 'deleteBackward')
-        return this.text !== previousText
-    }
-
     __isShortcutKey(e, qtKey){
         if(!(e.ctrlKey || e.metaKey) || e.altKey) return false
         if(e.keyCode === qtKey) return true
 
-        // Non-latin keyboard layouts: shortcuts use the physical key
         return typeof e.code === 'string' && /^Key[A-Z]$/.test(e.code) && e.code.charCodeAt(3) === qtKey
+    }
+
+    __isEditShortcut(e){
+        return this.__isShortcutKey(e, QtEnums.Key_Z)
+            || (this.__isShortcutKey(e, QtEnums.Key_Y) && !e.shiftKey)
+            || this.__isShortcutKey(e, QtEnums.Key_A)
+            || this.__isShortcutKey(e, QtEnums.Key_C)
+            || this.__isShortcutKey(e, QtEnums.Key_V)
+            || this.__isShortcutKey(e, QtEnums.Key_X)
     }
 
     __normalizeInsertedText(text){
@@ -393,26 +331,294 @@ class TextInput extends Item {
         return text.toString().replace(/\r\n|\r|\n/g, ' ')
     }
 
-    __replaceText(start, end, insertedText, undoMergeKind){
-        let result = this.__applyTextInsertWithLimit(start, end, insertedText)
-        if(result.newText !== this.text){
-            this.__pushUndoState(undoMergeKind)
-            this.__setTextInternal(result.newText)
-        } else {
-            this.__renderImplText()
-        }
-        this.__restoreCursorAfterEdit(result)
-        this.__undoMergeCursor = this.selectionEnd
-        return result
+    __isPasswordEcho(){
+        return this.echoMode === TextInput.Password || this.echoMode === TextInput.PasswordEchoOnEdit
     }
 
-    __pasteText(text, start, end){
-        let insertedText = this.__normalizeInsertedText(text)
-        if(!insertedText && start === end) return false
+    __usesCredentialForm(){
+        if(this.__isPasswordEcho()) return true
+        return !!(this.autoComplete && this.autoComplete.length)
+    }
 
-        let previousText = this.text
-        this.__replaceText(start, end, insertedText, '')
-        return this.text !== previousText
+    __applyEchoMode(){
+        let impl = this.__impl
+        if(!impl) return
+
+        let value = this.text || ''
+        let start = impl.selectionStart
+        let end = impl.selectionEnd
+        let nextType = this.__isPasswordEcho() ? 'password' : 'text'
+
+        impl.style.color = ''
+        impl.style.caretColor = ''
+
+        if(impl.type !== nextType) impl.type = nextType
+
+        if(this.echoMode === TextInput.NoEcho){
+            impl.style.color = 'transparent'
+            impl.style.caretColor = this.__caretColor || 'black'
+        }
+
+        if(impl.type === 'password'){
+            impl.setAttribute('autocapitalize', 'off')
+            impl.setAttribute('autocorrect', 'off')
+        } else {
+            impl.removeAttribute('autocapitalize')
+            impl.removeAttribute('autocorrect')
+        }
+
+        if(impl.value !== value){
+            this.__settingImplValue = true
+            try {
+                impl.value = value
+            } finally {
+                this.__settingImplValue = false
+            }
+        }
+
+        if(this.activeFocus && Number.isFinite(start) && Number.isFinite(end)){
+            try {
+                impl.setSelectionRange(start, end)
+            } catch (e) {}
+        }
+    }
+
+    __applyReadOnly(){
+        if(this.__impl) this.__impl.readOnly = !!this.readOnly
+    }
+
+    __applyEnabled(){
+        if(this.__impl) this.__impl.disabled = !this.enabled
+    }
+
+    __applyMaximumLength(){
+        if(!this.__impl) return
+        this.__impl.maxLength = this.__getMaximumLength()
+    }
+
+    __applyAutoComplete(){
+        let impl = this.__impl
+        if(!impl) return
+
+        let hint = this.autoComplete ? this.autoComplete.toString() : ''
+        if(hint){
+            impl.setAttribute('autocomplete', hint)
+            impl.name = hint
+            this.__autoName = hint
+            return
+        }
+
+        impl.removeAttribute('autocomplete')
+        if(this.__isPasswordEcho()){
+            impl.name = 'password'
+            this.__autoName = 'password'
+            return
+        }
+
+        if(this.__autoName && impl.name === this.__autoName){
+            impl.removeAttribute('name')
+            this.__autoName = ''
+        }
+    }
+
+    __syncFormAssociation(){
+        let impl = this.__impl
+        if(!impl) return
+
+        if(!this.__usesCredentialForm()){
+            impl.removeAttribute('form')
+            return
+        }
+
+        let form = TextInput.__ensureCredentialForm()
+        if(form) impl.setAttribute('form', form.id)
+    }
+
+    __applyHorizontalAlignment(){
+        let textAlign = 'left'
+        switch(this.horizontalAlignment){
+            case TextInput.AlignRight: {
+                textAlign = 'right'
+                break
+            }
+            case TextInput.AlignHCenter: {
+                textAlign = 'center'
+                break
+            }
+            case TextInput.AlignJustify: {
+                textAlign = 'justify'
+                break
+            }
+        }
+        this.__setImplStyle({ textAlign: textAlign })
+    }
+
+    __applyVerticalAlignment(){
+        if(!this.__impl) return
+
+        let height = this.height || 0
+        let fontSize = this.font && this.font.pixelSize ? this.font.pixelSize : 14
+        let extra = Math.max(0, height - fontSize)
+        let paddingTop = 0
+        let paddingBottom = extra
+
+        if(this.verticalAlignment === TextInput.AlignBottom){
+            paddingTop = extra
+            paddingBottom = 0
+        } else if(this.verticalAlignment === TextInput.AlignVCenter || this.verticalAlignment === TextInput.AlignJustify){
+            paddingTop = Math.floor(extra / 2)
+            paddingBottom = extra - paddingTop
+        }
+
+        this.__setImplStyle({
+            paddingTop: paddingTop + 'px',
+            paddingBottom: paddingBottom + 'px',
+        })
+    }
+
+    __applySelectionColors(){
+        if(!this.__impl) return
+
+        let selection = Color.getRGBA(this.__proxy, 'selectionColor', this.__self.constructor.meta.selectionColor)
+        let selectedText = Color.getRGBA(this.__proxy, 'selectedTextColor', this.__self.constructor.meta.selectedTextColor)
+        this.__impl.style.setProperty('--jq-selection-color', `rgba(${selection.r},${selection.g},${selection.b},${selection.a})`)
+        this.__impl.style.setProperty('--jq-selected-text-color', `rgba(${selectedText.r},${selectedText.g},${selectedText.b},${selectedText.a})`)
+    }
+
+    __applyDomValue(){
+        if(!this.__impl || this.__settingImplValue) return false
+
+        let value = this.__normalizeInsertedText(this.__impl.value)
+        if(value === this.text){
+            this.__syncSelectionFromDOM()
+            return false
+        }
+
+        this.__fromDom = true
+        try {
+            this.text = value
+        } finally {
+            this.__fromDom = false
+        }
+        this.__syncSelectionFromDOM()
+        return true
+    }
+
+    __noteUserEdit(e){
+        let inputType = e && e.inputType
+        if(inputType === 'historyUndo'){
+            this.canRedo = true
+            return
+        }
+        if(inputType === 'historyRedo'){
+            this.canUndo = true
+            return
+        }
+        this.canUndo = true
+        this.canRedo = false
+    }
+
+    __setImplValue(value, moveCursorToEnd){
+        let impl = this.__impl
+        if(!impl) return
+
+        this.__settingImplValue = true
+        try {
+            impl.value = value
+        } finally {
+            this.__settingImplValue = false
+        }
+
+        if(!moveCursorToEnd) return
+
+        let pos = value.length
+        try {
+            impl.setSelectionRange(pos, pos)
+        } catch (e) {}
+
+        this.__syncingSelection = true
+        try {
+            this.cursorPosition = pos
+            this.selectionStart = pos
+            this.selectionEnd = pos
+            this.selectedText = ''
+        } finally {
+            this.__syncingSelection = false
+        }
+    }
+
+    __syncSelectionFromDOM(){
+        if(!this.__impl || this.__syncingSelection) return
+
+        let start = this.__impl.selectionStart
+        let end = this.__impl.selectionEnd
+        if(!Number.isFinite(start) || !Number.isFinite(end)) return
+        if(start > end){
+            let tmp = start
+            start = end
+            end = tmp
+        }
+
+        start = Math.max(0, Math.min(start, this.text.length))
+        end = Math.max(start, Math.min(end, this.text.length))
+
+        this.__syncingSelection = true
+        try {
+            this.selectionStart = start
+            this.selectionEnd = end
+            this.selectedText = this.text.substring(start, end)
+            this.cursorPosition = end
+        } finally {
+            this.__syncingSelection = false
+        }
+    }
+
+    __replaceRange(start, end, text){
+        let impl = this.__impl
+        if(!impl) return
+
+        let current = impl.value || ''
+        let safeStart = Math.max(0, Math.min(start, current.length))
+        let safeEnd = Math.max(safeStart, Math.min(end, current.length))
+        let maximumLength = this.__getMaximumLength()
+        let availableLength = maximumLength - (current.length - (safeEnd - safeStart))
+        if(availableLength < 0) availableLength = 0
+
+        let inserted = this.__normalizeInsertedText(text)
+        if(inserted.length > availableLength) inserted = inserted.slice(0, availableLength)
+
+        this.__programmaticInput = true
+        try {
+            if(typeof impl.setRangeText === 'function'){
+                impl.setRangeText(inserted, safeStart, safeEnd, 'end')
+            } else {
+                impl.value = current.slice(0, safeStart) + inserted + current.slice(safeEnd)
+                let pos = safeStart + inserted.length
+                impl.setSelectionRange(pos, pos)
+                impl.dispatchEvent(new Event('input', { bubbles: true }))
+            }
+        } finally {
+            this.__programmaticInput = false
+        }
+
+        if(impl.value !== this.text){
+            this.__fromDom = true
+            try {
+                this.text = impl.value
+            } finally {
+                this.__fromDom = false
+            }
+        }
+        this.__syncSelectionFromDOM()
+    }
+
+    __insertAtSelection(text){
+        if(!this.__impl) return
+        let start = this.__impl.selectionStart
+        let end = this.__impl.selectionEnd
+        if(!Number.isFinite(start)) start = this.text.length
+        if(!Number.isFinite(end)) end = start
+        this.__replaceRange(start, end, text)
     }
 
     __writeClipboardText(text){
@@ -421,7 +627,6 @@ class TextInput extends Item {
             return
         }
 
-        // Fallback for non-secure contexts where navigator.clipboard is not available
         let handler = (e)=>{
             e.preventDefault()
             e.stopImmediatePropagation()
@@ -436,60 +641,47 @@ class TextInput extends Item {
         }
     }
 
-    __setTextInternal(text){
-        this.__internalTextChange = true
+    __acceptInput(){
+        if(this.validator){
+            if(!this.validator.validate(this.text)){
+                this.acceptableInput = false
+                return
+            }
+            this.acceptableInput = true
+        } else {
+            this.acceptableInput = true
+        }
+
+        this.accepted()
+        this.editingFinished()
+        this.__submitCredentialForm()
+    }
+
+    __submitCredentialForm(){
+        if(!this.__impl || !this.__usesCredentialForm()) return
+        if(typeof document === 'undefined') return
+
+        let form = document.getElementById(this.__impl.getAttribute('form'))
+        if(!form || typeof form.requestSubmit !== 'function') return
+
         try {
-            this.text = text
-        } finally {
-            this.__internalTextChange = false
-        }
+            form.requestSubmit()
+        } catch (e) {}
     }
 
-    __pushUndoState(undoMergeKind){
-        if(!this.__undoStack) this.__clearUndoHistory()
-
-        let canMerge = undoMergeKind
-            && undoMergeKind === this.__undoMergeKind
-            && this.__undoStack.length > 0
-            && this.selectionStart === this.selectionEnd
-            && this.selectionStart === this.__undoMergeCursor
-
-        if(!canMerge){
-            this.__undoStack.push({ text: this.text, selectionStart: this.selectionStart, selectionEnd: this.selectionEnd })
-            if(this.__undoStack.length > TextInput.MaximumUndoDepth) this.__undoStack.shift()
-        }
-
-        this.__redoStack = []
-        this.__undoMergeKind = undoMergeKind
-        this.__updateUndoRedoState()
-    }
-
-    __applyHistoryState(state){
-        this.__setTextInternal(state.text)
-        let start = Math.max(0, Math.min(state.selectionStart, this.text.length))
-        let end = Math.max(start, Math.min(state.selectionEnd, this.text.length))
-        this.select(start, end)
-        this.__undoMergeKind = ''
-        this.__updateUndoRedoState()
-    }
-
-    __clearUndoHistory(){
-        this.__undoStack = []
-        this.__redoStack = []
-        this.__undoMergeKind = ''
-        this.__undoMergeCursor = -1
-        this.__updateUndoRedoState()
-    }
-
-    __updateUndoRedoState(){
-        let canUndo = this.__undoStack.length > 0
-        let canRedo = this.__redoStack.length > 0
-        if(this.canUndo !== canUndo) this.canUndo = canUndo
-        if(this.canRedo !== canRedo) this.canRedo = canRedo
+    __colorCss(name){
+        let rgba = Color.getRGBA(this.__proxy, name, this.__self.constructor.meta[name])
+        let alpha = this.__proxy[name] === 'transparent' ? 0 : rgba.a
+        return `rgba(${rgba.r},${rgba.g},${rgba.b},${alpha})`
     }
 
     SLOT_readOnlyChanged(oldValue, newValue){
-        this.__impl.setAttribute('contenteditable', !newValue)
+        this.__applyReadOnly()
+    }
+
+    SLOT_enabledChanged(oldValue, newValue){
+        super.SLOT_enabledChanged(oldValue, newValue)
+        this.__applyEnabled()
     }
 
     SLOT_validatorChanged(oldValue, newValue){
@@ -497,6 +689,7 @@ class TextInput extends Item {
     }
 
     SLOT_maximumLengthChanged(oldValue, newValue){
+        this.__applyMaximumLength()
         let maximumLength = this.__getMaximumLength()
         if(this.text.length > maximumLength){
             this.text = this.text.slice(0, maximumLength)
@@ -504,66 +697,46 @@ class TextInput extends Item {
         }
     }
 
+    SLOT_autoCompleteChanged(oldValue, newValue){
+        this.__applyAutoComplete()
+        this.__syncFormAssociation()
+    }
+
+    SLOT_echoModeChanged(oldValue, newValue){
+        this.__applyEchoMode()
+        this.__applyAutoComplete()
+        this.__syncFormAssociation()
+    }
+
     SLOT_focusChanged(oldValue, newValue){
         super.SLOT_focusChanged(oldValue, newValue)
     }
 
     SLOT_horizontalAlignmentChanged(oldValue, newValue){
-        switch(this.horizontalAlignment){
-            case TextInput.AlignLeft: {
-                this.__setImplStyle({
-                    alignItems: 'flex-start'
-                })
-                break
-            }
-            case TextInput.AlignRight: {
-                this.__setImplStyle({
-                    alignItems: 'flex-end'
-                })
-                break
-            }
-            case TextInput.AlignHCenter: {
-                this.__setImplStyle({
-                    alignItems: 'center'
-                })
-                break
-            }
-            case TextInput.AlignJustify: {
-                this.__setImplStyle({
-                    alignItems: 'normal'
-                })
-                break
-            }
-        }
+        this.__applyHorizontalAlignment()
     }
 
     SLOT_verticalAlignmentChanged(oldValue, newValue){
-        switch(this.verticalAlignment){
-            case TextInput.AlignTop: {
-                this.__setImplStyle({
-                    justifyContent: 'flex-start'
-                })
-                break
-            }
-            case TextInput.AlignBottom: {
-                this.__setImplStyle({
-                    justifyContent: 'flex-end'
-                })
-                break
-            }
-            case TextInput.AlignVCenter: {
-                this.__setImplStyle({
-                    justifyContent: 'center'
-                })
-                break
-            }
-            case TextInput.AlignJustify: {
-                this.__setImplStyle({
-                    justifyContent: 'normal'
-                })
-                break
-            }
-        }
+        this.__applyVerticalAlignment()
+    }
+
+    SLOT_selectionColorChanged(oldValue, newValue){
+        this.__applySelectionColors()
+    }
+
+    SLOT_selectedTextColorChanged(oldValue, newValue){
+        this.__applySelectionColors()
+    }
+
+    SLOT_cursorPositionChanged(oldValue, newValue){
+        if(this.__syncingSelection || !this.__impl) return
+        let pos = Math.max(0, Math.min(Number(newValue) || 0, this.text.length))
+        this.select(pos, pos)
+    }
+
+    SLOT_heightChanged(oldValue, newValue){
+        super.SLOT_heightChanged(oldValue, newValue)
+        this.__applyVerticalAlignment()
     }
 
     forceActiveFocus(){
@@ -603,51 +776,6 @@ class TextInput extends Item {
         }
     }
 
-    SLOT_echoModeChanged(oldValue, newValue){
-        if(this.text === ''){
-            this.__impl.innerHTML = '&#8203'
-            return
-        }
-
-        if(this.echoMode === TextInput.Password){
-            this.__impl.innerText = this.text.replaceAll(/./g, this.passwordCharacter.length ? this.passwordCharacter[0] : '●')
-        } else {
-            this.__impl.innerText = this.text
-        }
-    }
-
-    __renderImplText(){
-        if(this.text === ''){
-            this.__impl.innerHTML = '&#8203'
-            return
-        }
-
-        if(this.echoMode === TextInput.Password){
-            this.__impl.innerText = this.text.replaceAll(/./g, this.passwordCharacter.length ? this.passwordCharacter[0] : '●')
-        } else {
-            this.__impl.innerText = this.text
-        }
-    }
-
-    __syncCursorToEnd(){
-        let pos = this.text.length
-        this.cursorPosition = pos
-        this.selectionStart = pos
-        this.selectionEnd = pos
-        this.selectedText = ''
-
-        if(!this.__impl) return
-        if(!this.activeFocus && typeof document !== 'undefined' && document.activeElement !== this.__impl) return
-
-        this.select(pos, pos)
-    }
-
-    __restoreCursorAfterEdit(result){
-        let cursor = result && this.text === result.newText ? result.cursor : this.text.length
-        cursor = Math.max(0, Math.min(cursor, this.text.length))
-        this.select(cursor, cursor)
-    }
-
     SLOT_textChanged(oldValue, newValue){
         let maximumLength = this.__getMaximumLength()
         if(this.text.length > maximumLength){
@@ -655,21 +783,26 @@ class TextInput extends Item {
             return
         }
 
-        if(!this.__internalTextChange) this.__clearUndoHistory()
-
-        this.__renderImplText()
-        this.__syncCursorToEnd()
+        if(this.__impl && this.__impl.value !== this.text){
+            this.__setImplValue(this.text, true)
+            if(!this.__fromDom){
+                this.canUndo = false
+                this.canRedo = false
+            }
+        }
 
         this.__checkValidator()
-
         this.__updateGeometry()
     }
 
     SLOT_colorChanged(oldValue, newValue){
-        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
+        this.__caretColor = this.__colorCss('color')
         this.__setDOMStyle({
-            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+            color: this.__caretColor
         })
+        if(this.echoMode === TextInput.NoEcho && this.__impl){
+            this.__impl.style.caretColor = this.__caretColor
+        }
     }
 
     SLOT_visibleChanged(oldValue, newValue){
@@ -688,6 +821,7 @@ class TextInput extends Item {
             textDecoration: this.font.underline == true ? 'underline' : 'unset',
         })
 
+        this.__applyVerticalAlignment()
         this.__updateGeometry()
     }
 
@@ -697,22 +831,26 @@ class TextInput extends Item {
     copy(){
         if(this.echoMode !== TextInput.Normal) return
 
+        this.__syncSelectionFromDOM()
         let text = this.text.slice(this.selectionStart, this.selectionEnd)
         if(text) this.__writeClipboardText(text)
     }
     cut(){
         if(this.readOnly || this.echoMode !== TextInput.Normal) return
 
+        this.__syncSelectionFromDOM()
         let start = this.selectionStart
         let end = this.selectionEnd
         if(start === end) return
 
         this.__writeClipboardText(this.text.slice(start, end))
-        this.__replaceText(start, end, '', '')
-        this.textEdited()
+        let previousText = this.text
+        this.__replaceRange(start, end, '')
+        if(this.text !== previousText) this.textEdited()
     }
     deselect(){
-        document.getSelection().removeAllRanges()
+        let pos = this.__impl && Number.isFinite(this.__impl.selectionEnd) ? this.__impl.selectionEnd : this.cursorPosition
+        this.select(pos, pos)
     }
     ensureVisible(position){
 
@@ -721,11 +859,7 @@ class TextInput extends Item {
         return this.text.slice(start, end)
     }
     insert(position, text){
-        let result = this.__applyTextInsertWithLimit(position, position, text)
-        if(result.newText === this.text) return
-
-        this.__pushUndoState('')
-        this.__setTextInternal(result.newText)
+        this.__replaceRange(position, position, text)
     }
     isRightToLeft(start, end){
 
@@ -737,10 +871,10 @@ class TextInput extends Item {
         if(this.readOnly) return
         if(typeof navigator === 'undefined' || !navigator.clipboard || !navigator.clipboard.readText) return
 
-        let start = this.selectionStart
-        let end = this.selectionEnd
+        let previousText = this.text
         navigator.clipboard.readText().then((text) => {
-            if(this.__pasteText(text, start, end)) this.textEdited()
+            this.__insertAtSelection(text)
+            if(this.text !== previousText) this.textEdited()
         }).catch(()=>{})
     }
     positionAt(x, y, position){
@@ -750,65 +884,77 @@ class TextInput extends Item {
 
     }
     redo(){
-        if(this.readOnly || !this.__redoStack || !this.__redoStack.length) return
+        if(this.readOnly || !this.__impl) return
+        if(typeof document === 'undefined' || typeof document.execCommand !== 'function') return
 
-        this.__undoStack.push({ text: this.text, selectionStart: this.selectionStart, selectionEnd: this.selectionEnd })
-        this.__applyHistoryState(this.__redoStack.pop())
-        this.textEdited()
+        if(document.activeElement !== this.__impl) this.__impl.focus()
+        let changed = false
+        try {
+            changed = document.execCommand('redo')
+        } catch (e) {}
+        if(!changed) this.canRedo = false
     }
     remove(start, end){
-        let newText = this.text.slice(0, start) + this.text.slice(end, this.text.length)
-        if(newText === this.text) return
-
-        this.__pushUndoState('')
-        this.__setTextInternal(newText)
+        this.__replaceRange(start, end, '')
     }
     select(start, end){
-        let selection = document.getSelection()
-        selection.removeAllRanges()
-        let range = new Range()
-        if(this.__impl.childNodes.length){
-            range.setStart(this.__impl.childNodes[0], start)
-            range.setEnd(this.__impl.childNodes[0], end)
-        } else {
-            range.setStart(this.__impl, 0)
-            range.setEnd(this.__impl, 0)
+        let length = this.text.length
+        start = Math.max(0, Math.min(Math.floor(Number(start)) || 0, length))
+        end = Math.max(start, Math.min(Math.floor(Number(end)) || 0, length))
+
+        if(this.__impl){
+            this.__programmaticSelect = true
+            try {
+                this.__impl.setSelectionRange(start, end)
+            } catch (e) {
+            }
+            this.__programmaticSelect = false
         }
-        selection.addRange(range)
-        this.selectionStart = start
-        this.selectionEnd = end
-        this.selectedText = this.text.substring(start, end)
+
+        this.__syncingSelection = true
+        try {
+            this.selectionStart = start
+            this.selectionEnd = end
+            this.selectedText = this.text.substring(start, end)
+            this.cursorPosition = end
+        } finally {
+            this.__syncingSelection = false
+        }
     }
     selectAll(){
+        if(this.__impl && typeof this.__impl.select === 'function'){
+            this.__programmaticSelect = true
+            try {
+                this.__impl.select()
+            } catch (e) {}
+            this.__programmaticSelect = false
+            this.__syncSelectionFromDOM()
+            if(this.selectionStart !== 0 || this.selectionEnd !== this.text.length){
+                this.select(0, this.text.length)
+            }
+            return
+        }
         this.select(0, this.text.length)
     }
     selectWord(){
 
     }
     undo(){
-        if(this.readOnly || !this.__undoStack || !this.__undoStack.length) return
+        if(this.readOnly || !this.__impl) return
+        if(typeof document === 'undefined' || typeof document.execCommand !== 'function') return
 
-        this.__redoStack.push({ text: this.text, selectionStart: this.selectionStart, selectionEnd: this.selectionEnd })
-        this.__applyHistoryState(this.__undoStack.pop())
-        this.textEdited()
-    }
-
-    __onMouseDown(mouse){
-        if(!this.enabled || !this.visible) return
-
-        if(!mouse.target){
-            mouse.target = this
-        }
-    }
-    __onMouseUp(mouse){
-        if(!this.enabled || !this.visible) return
-
-        if(mouse.target === this){
-            mouse.target = null
-        }
+        if(document.activeElement !== this.__impl) this.__impl.focus()
+        let changed = false
+        try {
+            changed = document.execCommand('undo')
+        } catch (e) {}
+        if(!changed) this.canUndo = false
     }
 
     __destroy(){
+        if(this.__onSelectionChange && typeof document !== 'undefined'){
+            document.removeEventListener('selectionchange', this.__onSelectionChange)
+        }
         JQApplication.MouseController.remove(this)
         super.__destroy()
     }
