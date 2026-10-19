@@ -78,13 +78,12 @@ Item {
 		return selectionParams
 	}
 
-	function importObject(typeId, name, description, b64encoded, mimeType, replaceExisting){
+	function importObject(typeId, name, description, b64encoded, mimeType){
 		importObjectInput.m_typeId = typeId
 		importObjectInput.m_name = name
 		importObjectInput.m_description = description
 		importObjectInput.m_fileData = b64encoded
 		importObjectInput.m_mimeType = mimeType
-		importObjectInput.m_replaceExisting = replaceExisting === true
 		importObjectRequest.send(importObjectInput)
 	}
 	

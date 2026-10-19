@@ -61,28 +61,22 @@ DocumentCollectionViewDelegate {
 		ErrorDialog {}
 	}
 	
-	// The choice is made before the file dialog and sent with the import (replaceExisting).
+	// Shown before the file dialog: importing always writes the features the file carries
+	// into the shared feature collection (CProductCollectionControllerComp::OnImportObject).
 	// One string literal, not a concatenation: lupdate cannot extract qsTr() when
 	// its argument is built with "+".
-	property bool replaceExistingFeatures: false;
-
 	Component {
 		id: importWarningComp;
 
 		MessageDialog {
 			title: qsTr("Import a product");
-			message: qsTr("The product from the file (XML or the C++ header Lisa exports) is added to the collection; a product whose id already exists is not imported. Features the file carries that are not in the system yet are created.\n\nOverwrite the features that already exist with the versions from the file? Other products and licenses that use those features get the new version as well.\n\nYes - overwrite them, No - keep the existing features and ignore their versions in the file.");
-
-			Component.onCompleted: {
-				addButton(Enums.cancel, qsTr("Cancel"), true)
-			}
+			message: qsTr("Importing overwrites features.\n\nThe product from the file (XML or the C++ header Lisa exports) is added to the collection; a product whose id already exists is not imported. Every feature it carries is written into the shared feature collection: features that are not there yet are created, and features that already exist are replaced by the version from the file. Other products and licenses that use those features get the replacement as well.\n\nChoose a file and import?");
 
 			onFinished: {
-				if (buttonId !== Enums.yes && buttonId !== Enums.no){
+				if (buttonId !== Enums.yes){
 					return;
 				}
 
-				container.replaceExistingFeatures = buttonId === Enums.yes;
 				container.importFileDialog.open();
 			}
 		}
@@ -90,12 +84,6 @@ DocumentCollectionViewDelegate {
 
 	function onImport(){
 		ModalDialogManager.openDialog(importWarningComp, {});
-	}
-
-	function onImportDialogResult(name, fileData, mimeType){
-		if (container.collectionView && container.collectionView.dataController){
-			container.collectionView.dataController.importObject(importObjectTypeId, name, "", fileData, mimeType, container.replaceExistingFeatures);
-		}
 	}
 	
 	function onRename(){

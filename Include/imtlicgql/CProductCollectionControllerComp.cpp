@@ -44,17 +44,14 @@ sdl::V1_0::imtbase::CImportObjectPayload CProductCollectionControllerComp::OnImp
 
 	sdl::V1_0::imtbase::CImportObjectPayload response = BaseClass::OnImportObject(importObjectRequest, gqlRequest, errorMessage);
 	if (response.success && *response.success && response.objectId){
-		sdl::V1_0::imtbase::ImportObjectRequestArguments arguments = importObjectRequest.GetRequestedArguments();
-		const bool replaceExisting = arguments.input && arguments.input->replaceExisting && *arguments.input->replaceExisting;
-
-		WriteImportedFeatures(*response.objectId, replaceExisting);
+		WriteImportedFeatures(*response.objectId);
 	}
 
 	return response;
 }
 
 
-void CProductCollectionControllerComp::WriteImportedFeatures(const QByteArray& objectId, bool replaceExisting) const
+void CProductCollectionControllerComp::WriteImportedFeatures(const QByteArray& objectId) const
 {
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	imtlic::IProductInfo* productInfoPtr = nullptr;
@@ -68,7 +65,6 @@ void CProductCollectionControllerComp::WriteImportedFeatures(const QByteArray& o
 	}
 
 	const imtbase::ICollectionInfo::Ids catalogFeatureIds = m_featureCollectionCompPtr->GetElementIds();
-	bool productChanged = false;
 	for (const imtbase::ICollectionInfo::Id& productFeatureId : featureCollectionPtr->GetElementIds()){
 		imtbase::IObjectCollection::DataPtr productFeatureDataPtr;
 		if (!featureCollectionPtr->GetObjectData(productFeatureId, productFeatureDataPtr)){
@@ -85,26 +81,9 @@ void CProductCollectionControllerComp::WriteImportedFeatures(const QByteArray& o
 				SendWarningMessage(0, QStringLiteral("Unable to insert new feature with ID '%1' from product serialization").arg(productFeatureId), "CProductCollectionControllerComp");
 			}
 		}
-		else if (replaceExisting){
-			if (!m_featureCollectionCompPtr->SetObjectData(productFeatureId, *featureInfoPtr)){
-				SendWarningMessage(0, QStringLiteral("Unable to update feature with ID '%1' from product serialization").arg(productFeatureId), "CProductCollectionControllerComp");
-			}
+		else if (!m_featureCollectionCompPtr->SetObjectData(productFeatureId, *featureInfoPtr)){
+			SendWarningMessage(0, QStringLiteral("Unable to update feature with ID '%1' from product serialization").arg(productFeatureId), "CProductCollectionControllerComp");
 		}
-		else{
-			// The feature in the system is kept, and the product takes it instead of the version from the file.
-			imtbase::IObjectCollection::DataPtr catalogFeatureDataPtr;
-			if (m_featureCollectionCompPtr->GetObjectData(productFeatureId, catalogFeatureDataPtr)
-						&& featureCollectionPtr->SetObjectData(productFeatureId, *catalogFeatureDataPtr)){
-				productChanged = true;
-			}
-			else{
-				SendWarningMessage(0, QStringLiteral("Unable to take the existing feature with ID '%1' into the imported product").arg(productFeatureId), "CProductCollectionControllerComp");
-			}
-		}
-	}
-
-	if (productChanged && !m_objectCollectionCompPtr->SetObjectData(objectId, *productInfoPtr)){
-		SendWarningMessage(0, QStringLiteral("Unable to store the imported product '%1' with the existing features").arg(QString::fromUtf8(objectId)), "CProductCollectionControllerComp");
 	}
 }
 

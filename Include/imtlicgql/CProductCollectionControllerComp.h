@@ -76,10 +76,10 @@ private:
 	bool CanImportProduct(const sdl::V1_0::imtbase::CImportObjectGqlRequest& importObjectRequest, QString& errorMessage) const;
 
 	/**
-		Put the features of the imported product into the feature catalog. New features are added; a feature already
-		in the catalog is replaced by the imported version, or, without \c replaceExisting, kept and taken into the product.
+		Put the features of the imported product into the feature catalog: new features are added, a feature already
+		in the catalog is replaced by the imported version.
 	*/
-	void WriteImportedFeatures(const QByteArray& objectId, bool replaceExisting) const;
+	void WriteImportedFeatures(const QByteArray& objectId) const;
 
 	bool FillObjectFromRepresentation(
 				const sdl::V1_0::imtlic::CProductData& representation,
