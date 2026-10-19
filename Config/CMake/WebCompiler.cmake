@@ -314,23 +314,25 @@ function(jq_compile_web)
 
 	message(VERBOSE "DIRS_COUNT ${DIRS_COUNT}")
 
-	while(INDEX LESS DIRS_COUNT)
-		list(GET webdirs ${INDEX} _FOLDER)
-		if(NOT _jqml_list_ok)
+	# Folder walk is only the fallback. When qmldir files are the dependencies,
+	# translation dirs are not collected from folders whose qml is not in that list.
+	if(NOT _jqml_list_ok)
+		while(INDEX LESS DIRS_COUNT)
+			list(GET webdirs ${INDEX} _FOLDER)
 			file(GLOB_RECURSE FOUND_FILES "${_FOLDER}/*.qml")
 			list(APPEND DEPEND_LIST ${FOUND_FILES})
-		endif()
 
-		# QML sources are compiled directly from ${_FOLDER}; a folder is a translation source if it
-		# contains .ts files, regardless of what it (or its destination) is named
-		file(GLOB FOUND_TS_FILES "${_FOLDER}/*.ts")
-		if(FOUND_TS_FILES)
-			list(APPEND TRANSLATION_SRC_DIRS ${_FOLDER})
-		endif()
+			# QML sources are compiled directly from ${_FOLDER}; a folder is a translation source if it
+			# contains .ts files, regardless of what it (or its destination) is named
+			file(GLOB FOUND_TS_FILES "${_FOLDER}/*.ts")
+			if(FOUND_TS_FILES)
+				list(APPEND TRANSLATION_SRC_DIRS ${_FOLDER})
+			endif()
 
-		math(EXPR INDEX "${INDEX} + 2")
-		set(INDEX ${INDEX})
-	endwhile()
+			math(EXPR INDEX "${INDEX} + 2")
+			set(INDEX ${INDEX})
+		endwhile()
+	endif()
 
 	message(VERBOSE "QRC_CPP_WEB_FILE ${QRC_CPP_WEB_FILE}")
 	list(APPEND webdirs_n ${IMTCOREDIR}/Tools/JQML/v3/dist)
