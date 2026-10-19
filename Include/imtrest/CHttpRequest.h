@@ -6,8 +6,12 @@
 #include <QtCore/QUrl>
 #include <QtNetwork/QHostAddress>
 
+// STL includes
+#include <functional>
+
 // ImtCore includes
 #include <imtrest/IRequest.h>
+#include <imtrest/IHttpRequestBodyPolicy.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/http_parser.h>
 
@@ -46,6 +50,31 @@ public:
 	void SetBody(const QByteArray& body);
 	void SetCommandId(const QByteArray& commandId);
 
+	/**
+		Set the policy that decides about the body after the headers are received (see IHttpRequestBodyPolicy). Without a policy
+		the body is received with the limit of SetDefaultMaxBodySize().
+		\warning	The request does not own the policy and does not check that it is alive: the request keeps a reference to it.
+					The policy must live longer than the request, otherwise the call of the destroyed policy is undefined behavior
+					(most likely a crash). The requests live in the threads of the connections, so the owner of the policy must
+					stop the connections (or call ResetBodyPolicy() of every request) before it destroys the policy.
+		\warning	The policy is called from the thread of the connection, it must be thread-safe and must not change its state.
+		\note		It has an effect only before the headers are received, the decision of the request that is already received
+					is not changed.
+		\sa			ResetBodyPolicy()
+	*/
+	void SetBodyPolicy(const IHttpRequestBodyPolicy& policy);
+
+	/**
+		Return to the policy that is used by default: all bodies are received with the limit of SetDefaultMaxBodySize().
+		It should be called if the policy that was set by SetBodyPolicy() is going to be destroyed before the request.
+	*/
+	void ResetBodyPolicy();
+
+	/**
+		Set the limit of the body in bytes that is used if the policy does not set its own limit, 0 - no limit.
+	*/
+	void SetDefaultMaxBodySize(qint64 maxBodySize);
+
 	static int OnStartMessage(http_parser* httpParser);
 	static int OnUrl(http_parser* httpParser, const char* at, size_t length);
 	static int OnStatus(http_parser* httpParser, const char *at, size_t length);
@@ -73,6 +102,14 @@ public:
 		The response to \c HEAD has no content (RFC 9110, section 9.3.2).
 	*/
 	virtual bool IsResponseBodyOmitted() const override;
+
+	/**
+		For \c HA_REJECT the message is the final response (the status of the policy, \c 413 for a too big body or \c 417 for
+		an unknown expectation) with \c Connection: \c close. For \c HA_SEND_INTERIM the message is \c 100 \c Continue (RFC 9110,
+		section 10.1.1): the client expects it if the request has a body, the version is \c HTTP/1.1 (RFC 9110, section 15.2) and
+		none of the body is received yet.
+	*/
+	virtual HeadAction TakeHeadAction(QByteArray& message) override;
 
 	// reimplemented (INetworkObject)
 	virtual const IProtocolEngine& GetProtocolEngine() const override;
@@ -105,6 +142,18 @@ public:
 private:
 	static bool ParseUrl(const char *at, size_t length, bool connect, QUrl& url);
 
+	/**
+		Decide how to receive the body, when the headers are complete.
+	*/
+	void DecideBody();
+
+	/**
+		Refuse the request: the parser stops, the body is not received.
+	*/
+	void Reject(int statusCode, const IResponse::Headers& headers);
+
+	QByteArray CreateRejectMessage() const;
+
 protected:
 	http_parser m_httpParser;
 	QHostAddress m_remoteAddress;
@@ -124,6 +173,16 @@ protected:
 	// http_parser reports a header name, a header value or the URL in several parts if they span several reads.
 	bool m_isHeaderFieldParsing = false;
 	QByteArray m_urlData;
+
+	// Not owned, it must live longer than the request (see SetBodyPolicy()).
+	std::reference_wrapper<const IHttpRequestBodyPolicy> m_bodyPolicy;
+	qint64 m_defaultMaxBodySize = 0;
+	qint64 m_maxBodySize = 0;
+
+	// The request is refused with this status (a value of IProtocolEngine::StatusCode), 0 - it is not refused.
+	int m_rejectStatusCode = 0;
+	IResponse::Headers m_rejectHeaders;
+	bool m_isContinueExpected = false;
 
 	QByteArray m_requestId;
 };

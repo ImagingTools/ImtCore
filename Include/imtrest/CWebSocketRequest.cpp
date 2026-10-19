@@ -218,6 +218,15 @@ bool CWebSocketRequest::IsResponseBodyOmitted() const
 }
 
 
+IRequest::HeadAction CWebSocketRequest::TakeHeadAction(QByteArray& message)
+{
+	// A WebSocket message has no head that should be answered before the message is received
+	message.clear();
+
+	return HA_NONE;
+}
+
+
 IRequest::RequestState CWebSocketRequest::GetState() const
 {
 	return m_state;

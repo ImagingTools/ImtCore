@@ -74,6 +74,7 @@ public:
 	virtual bool ParseDeviceData(QIODevice& device) override;
 	virtual bool IsConnectionPersistent() const override;
 	virtual bool IsResponseBodyOmitted() const override;
+	virtual HeadAction TakeHeadAction(QByteArray& message) override;
 
 	// reimplemented (INetworkObject)
 	virtual const IProtocolEngine& GetProtocolEngine() const override;

@@ -36,6 +36,11 @@ I_EXPORT_COMPONENT(
 			"TCP Connection Server HTTP REST");
 
 I_EXPORT_COMPONENT(
+			HttpBodyPolicyRouter,
+			"Chooses the policy of the request body by the path of the request",
+			"HTTP REST Request Body Policy Limit Route");
+
+I_EXPORT_COMPONENT(
 			HttpRootServlet,
 			"HTTP root servlet",
 			"HTTP REST Root Protocol");

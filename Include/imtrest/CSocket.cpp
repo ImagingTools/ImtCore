@@ -138,6 +138,22 @@ void CSocket::HandleReadyRead()
 		return;
 	}
 
+	// The client can wait for the reaction to the head of the request before it sends the body
+	QByteArray headMessage;
+	switch (m_requestPtr->TakeHeadAction(headMessage)){
+	case IRequest::HA_REJECT:
+		RejectRequest(headMessage);
+
+		return;
+
+	case IRequest::HA_SEND_INTERIM:
+		m_timeoutWatcherPtr->WriteInterim(headMessage);
+		break;
+
+	case IRequest::HA_NONE:
+		break;
+	}
+
 	// Not all data of the request are received:
 	if (m_requestPtr->GetState() != IRequest::RS_MESSAGE_COMPLETE){
 		return;
@@ -205,6 +221,16 @@ void CSocket::RejectRequest()
 	m_socket->readAll();
 
 	m_timeoutWatcherPtr->RejectRequest();
+}
+
+
+void CSocket::RejectRequest(const QByteArray& message)
+{
+	// The rest of the request is not needed and is not handled
+	m_socket->readAll();
+	m_requestPtr.Reset();
+
+	m_timeoutWatcherPtr->RejectRequest(message);
 }
 
 

@@ -36,6 +36,30 @@ public:
 
 	typedef QMap<QByteArray, QByteArray> CommandParams;
 
+	/**
+		Reaction of the server to the head of a request (for HTTP the request line and the headers) before the rest
+		of the request is received.
+	*/
+	enum HeadAction
+	{
+		/**
+			The request is received as usual.
+		*/
+		HA_NONE,
+
+		/**
+			The client waits for the permission to send the rest of the request. The message should be sent to the client
+			as it is, the request is still received (for HTTP \c 100 \c Continue).
+		*/
+		HA_SEND_INTERIM,
+
+		/**
+			The request is refused. The message is the final response, it should be sent to the client and the connection
+			should be closed. The request should not be handled.
+		*/
+		HA_REJECT
+	};
+
 	virtual RequestState GetState() const = 0;
 	virtual QByteArray GetCommandId() const = 0;
 	virtual CommandParams GetCommandParams() const = 0;
@@ -60,6 +84,13 @@ public:
 		Returns \c true if the response to the request should be sent without content, for example the response to \c HEAD.
 	*/
 	virtual bool IsResponseBodyOmitted() const = 0;
+
+	/**
+		Get the reaction to the head of the request, it should be called after each parsing of the data. The action is taken
+		once: the next call returns \c HA_NONE for an interim message.
+		\param	message	Data to send to the client for \c HA_SEND_INTERIM and \c HA_REJECT, empty otherwise.
+	*/
+	virtual HeadAction TakeHeadAction(QByteArray& message) = 0;
 };
 
 

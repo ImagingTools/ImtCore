@@ -70,6 +70,16 @@ void CSocketTimeoutWatcher::RejectRequest()
 }
 
 
+void CSocketTimeoutWatcher::RejectRequest(const QByteArray& message)
+{
+	if (IsClosing() || m_socketPtr.isNull()){
+		return;
+	}
+
+	CloseWithMessage(message);
+}
+
+
 void CSocketTimeoutWatcher::OnDataReceived()
 {
 	if (IsClosing() || m_isCloseRequested){
@@ -120,6 +130,16 @@ void CSocketTimeoutWatcher::WriteResponse(const QByteArray& data)
 	CompleteResponseIfWritten();
 
 	UpdateTimer();
+}
+
+
+void CSocketTimeoutWatcher::WriteInterim(const QByteArray& data)
+{
+	if (m_socketPtr.isNull() || IsClosing()){
+		return;
+	}
+
+	m_socketPtr->write(data);
 }
 
 

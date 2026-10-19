@@ -74,6 +74,12 @@ public:
 	void RejectRequest();
 
 	/**
+		The request is refused after its head (for HTTP the policy of the body, for example \c 413). The same as RejectRequest(),
+		but the given message is sent instead of the message of the behavior. Without a message the connection is just aborted.
+	*/
+	void RejectRequest(const QByteArray& message);
+
+	/**
 		Data of a request are received from the socket.
 	*/
 	void OnDataReceived();
@@ -88,6 +94,12 @@ public:
 		Data are ignored if the connection is closing.
 	*/
 	void WriteResponse(const QByteArray& data);
+
+	/**
+		Write an interim message that is not a response to the request (for HTTP \c 100 \c Continue). The request is still
+		received, so the phase of the connection does not change. Data are ignored if the connection is closing.
+	*/
+	void WriteInterim(const QByteArray& data);
 
 Q_SIGNALS:
 	/**

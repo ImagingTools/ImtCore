@@ -21,6 +21,8 @@ typedef imtrest::CConnectionTimeoutTracker Tracker;
 
 
 const QByteArray s_response("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
+const QByteArray s_interimMessage("HTTP/1.1 100 Continue\r\n\r\n");
+const QByteArray s_refusalMessage("HTTP/1.1 413 Payload Too Large\r\nConnection: close\r\nContent-Length: 0\r\n\r\n");
 
 
 /**
@@ -1225,6 +1227,186 @@ void CSocketTimeoutWatcherTest::ProcessingTimeoutOfPipelinedRequestTest()
 
 	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() > 0, 3000);
 	QVERIFY(sockets.GetClient().readAll().startsWith("HTTP/1.1 503 "));
+}
+
+
+void CSocketTimeoutWatcherTest::InterimMessageIsWrittenTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	watcher.OnDataReceived();
+	watcher.WriteInterim(s_interimMessage);
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() >= s_interimMessage.size(), 3000);
+	QCOMPARE(sockets.GetClient().readAll(), s_interimMessage);
+}
+
+
+void CSocketTimeoutWatcherTest::InterimMessageKeepsPhaseTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	watcher.OnDataReceived();
+	watcher.WriteInterim(s_interimMessage);
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() >= s_interimMessage.size(), 3000);
+	QTest::qWait(100);
+
+	// The request is still received, 100 is not a response to it
+	QCOMPARE(watcher.GetPhase(), Tracker::P_RECEIVING);
+	QVERIFY(!watcher.IsClosing());
+}
+
+
+void CSocketTimeoutWatcherTest::InterimMessageDoesNotStartKeepAliveTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 150, 5000), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.WriteInterim(s_interimMessage);
+
+	// If 100 were taken for a response, the connection would be idle and closed by the keep-alive timeout
+	QTest::qWait(500);
+
+	QCOMPARE(timedOutSpy.count(), 0);
+	QCOMPARE(watcher.GetPhase(), Tracker::P_RECEIVING);
+	QCOMPARE(sockets.GetClient().state(), QAbstractSocket::ConnectedState);
+}
+
+
+void CSocketTimeoutWatcherTest::InterimMessageIsIgnoredWhileClosingTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	watcher.OnDataReceived();
+	watcher.RejectRequest();
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() > 0, 3000);
+
+	watcher.WriteInterim(s_interimMessage);
+
+	QTest::qWait(200);
+
+	const QByteArray response = sockets.GetClient().readAll();
+
+	QVERIFY(response.startsWith("HTTP/1.1 400 "));
+	QVERIFY(!response.contains("100 Continue"));
+}
+
+
+void CSocketTimeoutWatcherTest::InterimMessageBeforeResponseKeepsOrderTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	watcher.OnDataReceived();
+	watcher.WriteInterim(s_interimMessage);
+	watcher.OnRequestCompleted();
+	watcher.WriteResponse(s_response);
+
+	const QByteArray expected = s_interimMessage + s_response;
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() >= expected.size(), 3000);
+	QCOMPARE(sockets.GetClient().readAll(), expected);
+	QCOMPARE(watcher.GetPhase(), Tracker::P_IDLE);
+}
+
+
+void CSocketTimeoutWatcherTest::RefusalWithMessageTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.RejectRequest(s_refusalMessage);
+
+	QVERIFY(watcher.IsClosing());
+	QCOMPARE(watcher.GetPhase(), Tracker::P_CLOSING);
+
+	// The message of the caller is sent instead of 400
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() >= s_refusalMessage.size(), 3000);
+	QCOMPARE(sockets.GetClient().readAll(), s_refusalMessage);
+
+	// The server waits for the closing by the client, as after 400 (RFC 9112, section 9.6)
+	QTest::qWait(100);
+	QCOMPARE(sockets.GetClient().state(), QAbstractSocket::ConnectedState);
+
+	sockets.GetClient().disconnectFromHost();
+
+	QTRY_COMPARE_WITH_TIMEOUT(sockets.GetServerSocket().state(), QAbstractSocket::UnconnectedState, 3000);
+	QCOMPARE(timedOutSpy.count(), 0);
+}
+
+
+void CSocketTimeoutWatcherTest::RefusalWithMessageIsAbortedAfterLingeringTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 300), CreateHttpBehavior());
+	QSignalSpy timedOutSpy(&watcher, &imtrest::CSocketTimeoutWatcher::TimedOut);
+
+	watcher.OnDataReceived();
+	watcher.RejectRequest(s_refusalMessage);
+
+	// The client does not close the connection and goes on sending the body
+	QTRY_COMPARE_WITH_TIMEOUT(timedOutSpy.count(), 1, 3000);
+	QCOMPARE(GetAction(timedOutSpy, 0), int(Tracker::A_ABORT_LINGERING));
+
+	QTRY_COMPARE_WITH_TIMEOUT(sockets.GetClient().state(), QAbstractSocket::UnconnectedState, 3000);
+}
+
+
+void CSocketTimeoutWatcherTest::RefusalWithEmptyMessageAbortsConnectionTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	watcher.OnDataReceived();
+	watcher.RejectRequest(QByteArray());
+
+	QVERIFY(watcher.IsClosing());
+	QTRY_COMPARE_WITH_TIMEOUT(sockets.GetClient().state(), QAbstractSocket::UnconnectedState, 3000);
+	QVERIFY(sockets.GetClient().readAll().isEmpty());
+}
+
+
+void CSocketTimeoutWatcherTest::RefusalWithMessageIsSentOnceTest()
+{
+	CConnectedSockets sockets;
+	QVERIFY(sockets.Open());
+
+	imtrest::CSocketTimeoutWatcher watcher(sockets.GetServerSocket(), CreateConfig(5000, 5000, 5000), CreateHttpBehavior());
+
+	watcher.OnDataReceived();
+	watcher.RejectRequest(s_refusalMessage);
+	watcher.RejectRequest(s_refusalMessage);
+	watcher.RejectRequest();
+
+	QTRY_VERIFY_WITH_TIMEOUT(sockets.GetClient().bytesAvailable() >= s_refusalMessage.size(), 3000);
+	QTest::qWait(200);
+
+	QCOMPARE(sockets.GetClient().readAll(), s_refusalMessage);
 }
 
 

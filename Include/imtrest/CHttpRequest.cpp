@@ -2,6 +2,9 @@
 #include <imtrest/CHttpRequest.h>
 
 
+// STL includes
+#include <climits>
+
 // Qt includes
 #include <QtCore/QUrlQuery>
 #include <QtCore/QUuid>
@@ -10,9 +13,48 @@
 #endif
 #include <QtWebSockets/QWebSocket>
 
+// ImtCore includes
+#include <imtrest/CConnectionTimeoutBehavior.h>
+#include <imtrest/CHttpResponse.h>
+#include <imtrest/CHttpSender.h>
+#include <imtrest/IProtocolEngine.h>
+
 
 namespace imtrest
 {
+
+
+// The size of the body is announced by the client, so the memory is not reserved for more than this at once
+static const quint64 s_maxBodyReserveSize = Q_UINT64_C(16) * 1024 * 1024;
+
+static const QByteArray s_continueMessage("HTTP/1.1 100 Continue\r\n\r\n");
+
+
+namespace
+{
+
+
+// The policy of a request without its own policy: the body is received with the limit of the server
+class CDefaultBodyPolicy: virtual public IHttpRequestBodyPolicy
+{
+public:
+	// reimplemented (IHttpRequestBodyPolicy)
+	BodyDecision DecideBody(const CHttpRequest& /*requestHead*/) const override
+	{
+		return {};
+	}
+};
+
+
+const IHttpRequestBodyPolicy& GetDefaultBodyPolicy()
+{
+	static const CDefaultBodyPolicy policy;
+
+	return policy;
+}
+
+
+} // namespace
 
 
 static http_parser_settings s_httpParserSettings
@@ -35,7 +77,8 @@ static http_parser_settings s_httpParserSettings
 CHttpRequest::CHttpRequest(const IRequestServlet& handler, const IProtocolEngine& engine)
 	:m_state(RS_NON_STARTED),
 	m_requestHandler(handler),
-	m_engine(engine)
+	m_engine(engine),
+	m_bodyPolicy(GetDefaultBodyPolicy())
 {
 	m_requestId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 
@@ -138,6 +181,25 @@ void CHttpRequest::SetCommandId(const QByteArray& commandId)
 {
 	m_url.setPath(commandId);
 }
+
+
+void CHttpRequest::SetBodyPolicy(const IHttpRequestBodyPolicy& policy)
+{
+	m_bodyPolicy = policy;
+}
+
+
+void CHttpRequest::ResetBodyPolicy()
+{
+	m_bodyPolicy = GetDefaultBodyPolicy();
+}
+
+
+void CHttpRequest::SetDefaultMaxBodySize(qint64 maxBodySize)
+{
+	m_defaultMaxBodySize = maxBodySize;
+}
+
 
 // public static methods
 
@@ -251,6 +313,9 @@ int CHttpRequest::OnHeadersComplete(http_parser* httpParser)
 		CHttpRequest::ParseUrl(host.constData(), size_t(host.size()), true, requestPtr->m_url);
 	}
 
+	// The body is not read yet, so a request can be refused without it
+	requestPtr->DecideBody();
+
 	return 0;
 }
 
@@ -264,8 +329,17 @@ int CHttpRequest::OnBody(http_parser* httpParser, const char *at, size_t length)
 
 	requestPtr->m_state = CHttpRequest::RS_BODY;
 
+	if ((requestPtr->m_maxBodySize > 0) && (qint64(requestPtr->m_body.size()) + qint64(length) > requestPtr->m_maxBodySize)){
+		// The length of a chunked body is not known in advance, so it is checked while the body is received
+		requestPtr->Reject(IProtocolEngine::SC_PAYLOAD_TOO_LARGE, IResponse::Headers());
+
+		return 0;
+	}
+
 	if (requestPtr->m_body.isEmpty()){
-		requestPtr->m_body.reserve(static_cast<int>(httpParser->content_length) + static_cast<int>(length));
+		const quint64 announcedSize = (httpParser->content_length == ULLONG_MAX) ? 0 : httpParser->content_length;
+
+		requestPtr->m_body.reserve(qsizetype(qMin<quint64>(announcedSize, s_maxBodyReserveSize)) + qsizetype(length));
 	}
 
 	requestPtr->m_body.append(at, int(length));
@@ -367,6 +441,31 @@ bool CHttpRequest::IsResponseBodyOmitted() const
 }
 
 
+IRequest::HeadAction CHttpRequest::TakeHeadAction(QByteArray& message)
+{
+	message.clear();
+
+	if (m_rejectStatusCode != 0){
+		message = CreateRejectMessage();
+
+		return HA_REJECT;
+	}
+
+	if (m_isContinueExpected){
+		m_isContinueExpected = false;
+
+		// If a part of the body is received already, the client does not wait (RFC 9110, section 10.1.1)
+		if (m_state == RS_HEADERS_COMPLETE){
+			message = s_continueMessage;
+
+			return HA_SEND_INTERIM;
+		}
+	}
+
+	return HA_NONE;
+}
+
+
 // reimplemented (INetworkObject)
 
 const IProtocolEngine& CHttpRequest::GetProtocolEngine() const
@@ -386,6 +485,19 @@ bool CHttpRequest::ResetData(CompatibilityMode /*mode*/)
 	m_urlData.clear();
 	m_url.clear();
 	m_data.clear();
+
+	m_maxBodySize = 0;
+	m_rejectHeaders.clear();
+	m_isContinueExpected = false;
+
+	if (m_rejectStatusCode != 0){
+		// The parser was stopped in the middle of the request, it cannot go on with the next one
+		m_rejectStatusCode = 0;
+
+		http_parser_init(&m_httpParser, HTTP_REQUEST);
+
+		m_httpParser.data = this;
+	}
 
 	// The object can parse the next request
 	if (HTTP_PARSER_ERRNO(&m_httpParser) == HPE_PAUSED){
@@ -473,6 +585,95 @@ bool CHttpRequest::ExecuteHttpParser(const QByteArray& data, const QObject* sock
 	}
 
 	return true;
+}
+
+
+// private methods
+
+void CHttpRequest::DecideBody()
+{
+	const IHttpRequestBodyPolicy::BodyDecision decision = m_bodyPolicy.get().DecideBody(*this);
+
+	if (decision.mode == IHttpRequestBodyPolicy::BM_REJECT){
+		// The status is required for the refusal, a policy without it is a mistake of the server
+		const int statusCode = (decision.rejectStatusCode != IProtocolEngine::SC_NONE) ? decision.rejectStatusCode : int(IProtocolEngine::SC_INTERNAL_SERVER_ERROR);
+
+		Reject(statusCode, decision.rejectHeaders);
+
+		return;
+	}
+
+	m_maxBodySize = (decision.maxBodySize < 0) ? m_defaultMaxBodySize : decision.maxBodySize;
+
+	const bool isChunked = (m_httpParser.flags & F_CHUNKED) != 0;
+	const bool isLengthKnown = m_httpParser.content_length != ULLONG_MAX;
+
+	if ((m_maxBodySize > 0) && isLengthKnown && (m_httpParser.content_length > quint64(m_maxBodySize))){
+		Reject(IProtocolEngine::SC_PAYLOAD_TOO_LARGE, IResponse::Headers());
+
+		return;
+	}
+
+	const QByteArray expectation = GetHeaderValue("expect").trimmed();
+	if (expectation.isEmpty()){
+		return;
+	}
+
+	// The only expectation of HTTP is 100-continue, other expectations cannot be met (RFC 9110, section 10.1.1)
+	if (expectation.compare("100-continue", Qt::CaseInsensitive) != 0){
+		Reject(IProtocolEngine::SC_EXPECTATION_FAILED, IResponse::Headers());
+
+		return;
+	}
+
+	// A server does not send 1xx responses to HTTP/1.0 and ignores the expectation (RFC 9110, sections 10.1.1 and 15.2),
+	// a client does not wait for 100 if there is no body
+	const bool isHttp11 = (m_httpParser.http_major > 1) || ((m_httpParser.http_major == 1) && (m_httpParser.http_minor >= 1));
+	const bool isBodyExpected = isChunked || (isLengthKnown && (m_httpParser.content_length > 0));
+
+	m_isContinueExpected = isHttp11 && isBodyExpected;
+}
+
+
+void CHttpRequest::Reject(int statusCode, const IResponse::Headers& headers)
+{
+	m_rejectStatusCode = statusCode;
+	m_rejectHeaders = headers;
+	m_isContinueExpected = false;
+
+	// The parser stops, the rest of the request is not needed
+	http_parser_pause(&m_httpParser, 1);
+}
+
+
+QByteArray CHttpRequest::CreateRejectMessage() const
+{
+	IResponseUniquePtr responsePtr = m_engine.CreateResponse(*this, m_rejectStatusCode, QByteArray(), QByteArray());
+	if (responsePtr.IsValid()){
+		auto* httpResponsePtr = dynamic_cast<CHttpResponse*>(responsePtr.GetPtr());
+		if (httpResponsePtr != nullptr){
+			IResponse::Headers headers = httpResponsePtr->GetHeaders();
+			for (IResponse::Headers::const_iterator iter = m_rejectHeaders.constBegin(); iter != m_rejectHeaders.constEnd(); ++iter){
+				headers.insert(iter.key(), iter.value());
+			}
+
+			httpResponsePtr->SetHeaders(headers);
+		}
+
+		// The rest of the request is not received, so the connection is closed after the response
+		CHttpSender::ResponseOptions options;
+		options.isConnectionClosing = true;
+		options.isBodyOmitted = IsResponseBodyOmitted();
+
+		QByteArray data;
+		if (CHttpSender::BuildResponseData(*responsePtr.GetPtr(), data, options)){
+			return data;
+		}
+	}
+
+	qWarning() << "The response with the status" << m_rejectStatusCode << "cannot be built";
+
+	return CConnectionTimeoutBehavior::CreateHttpInternalServerErrorResponse(QDateTime::currentDateTimeUtc(), true);
 }
 
 

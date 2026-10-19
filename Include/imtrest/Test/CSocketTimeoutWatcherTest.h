@@ -76,6 +76,17 @@ private slots:
 	void ProcessingTimeoutWithoutMessageClosesConnectionTest();
 	void ProcessingTimeoutGetsMessageOfBehaviorTest();
 	void ProcessingTimeoutOfPipelinedRequestTest();
+
+	// Interim message and refusal after the head of a request
+	void InterimMessageIsWrittenTest();
+	void InterimMessageKeepsPhaseTest();
+	void InterimMessageDoesNotStartKeepAliveTest();
+	void InterimMessageIsIgnoredWhileClosingTest();
+	void InterimMessageBeforeResponseKeepsOrderTest();
+	void RefusalWithMessageTest();
+	void RefusalWithMessageIsAbortedAfterLingeringTest();
+	void RefusalWithEmptyMessageAbortsConnectionTest();
+	void RefusalWithMessageIsSentOnceTest();
 };
 
 

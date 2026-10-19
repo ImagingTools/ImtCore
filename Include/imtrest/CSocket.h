@@ -46,6 +46,12 @@ private:
 	*/
 	void RejectRequest();
 
+	/**
+		The request is refused after its head, before its body is received (for HTTP \c 413 or \c 401): the client gets the
+		message and the connection is closed. The request is not handled.
+	*/
+	void RejectRequest(const QByteArray& message);
+
 private:
 	CSocketThread* m_rootSocket;
 	QPointer<QTcpSocket> m_socket;
