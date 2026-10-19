@@ -314,6 +314,67 @@ void CRevisionControllerPartituraTestBase::RestoreRevisionWithIncorrectParamsTes
 }
 
 
+void CRevisionControllerPartituraTestBase::GetRevisionDataWithCorrectParamsTest()
+{
+	initTestCase();
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
+	if (!compositePtr.IsValid()) {
+		QFAIL("Component is not initialized");
+	}
+
+	imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+	QVERIFY(objectCollectionPtr != nullptr);
+	objectCollectionPtr->ResetData();
+
+	const imtbase::IRevisionController* revisionControllerPtr = objectCollectionPtr->GetRevisionController();
+	QVERIFY(revisionControllerPtr != nullptr);
+
+	imtbase::IObjectCollection::DataPtr inputDataPtr = new imtaccount::CAccountInfo();
+	auto* inputAccountPtr = dynamic_cast<imtaccount::CAccountInfo*>(inputDataPtr.GetPtr());
+	QVERIFY(inputAccountPtr != nullptr);
+	inputAccountPtr->SetAccountName("OriginalName");
+	inputAccountPtr->SetAccountDescription("OriginalDescription");
+
+	const QByteArray objectId = objectCollectionPtr->InsertNewObject(
+		m_typeIdObjectCollection, "TestName", "TestDescription", inputDataPtr.GetPtr());
+	QVERIFY(!objectId.isEmpty());
+
+	const int firstRevision = revisionControllerPtr->BackupRevision(*objectCollectionPtr, objectId, "first");
+	QVERIFY(firstRevision > 0);
+
+	inputAccountPtr->SetAccountName("CurrentName");
+	inputAccountPtr->SetAccountDescription("CurrentDescription");
+	QVERIFY(objectCollectionPtr->SetObjectData(objectId, *inputDataPtr));
+	QVERIFY(revisionControllerPtr->BackupRevision(*objectCollectionPtr, objectId, "current") > 0);
+
+	imtbase::IObjectCollection::DataPtr historicalDataPtr;
+	idoc::MetaInfoPtr historicalMetaInfoPtr;
+	QVERIFY(revisionControllerPtr->GetRevisionData(
+		*objectCollectionPtr, objectId, firstRevision, historicalDataPtr, historicalMetaInfoPtr));
+	QVERIFY(historicalDataPtr.IsValid());
+	QVERIFY(!historicalMetaInfoPtr.IsValid());
+	auto* historicalAccountPtr = dynamic_cast<imtaccount::CAccountInfo*>(historicalDataPtr.GetPtr());
+	QVERIFY(historicalAccountPtr != nullptr);
+	QCOMPARE(historicalAccountPtr->GetAccountName(), QStringLiteral("OriginalName"));
+	QCOMPARE(historicalAccountPtr->GetAccountDescription(), QStringLiteral("OriginalDescription"));
+
+	imtbase::IObjectCollection::DataPtr currentDataPtr;
+	QVERIFY(objectCollectionPtr->GetObjectData(objectId, currentDataPtr));
+	auto* currentAccountPtr = dynamic_cast<imtaccount::CAccountInfo*>(currentDataPtr.GetPtr());
+	QVERIFY(currentAccountPtr != nullptr);
+	QCOMPARE(currentAccountPtr->GetAccountName(), QStringLiteral("CurrentName"));
+	QCOMPARE(currentAccountPtr->GetAccountDescription(), QStringLiteral("CurrentDescription"));
+
+	imtbase::IObjectCollection::DataPtr missingDataPtr;
+	idoc::MetaInfoPtr missingMetaInfoPtr;
+	QVERIFY(!revisionControllerPtr->GetRevisionData(
+		*objectCollectionPtr, objectId, firstRevision + 100, missingDataPtr, missingMetaInfoPtr));
+	QVERIFY(!revisionControllerPtr->GetRevisionData(
+		*objectCollectionPtr, objectId, 0, missingDataPtr, missingMetaInfoPtr));
+}
+
+
 void CRevisionControllerPartituraTestBase::ExportObjectWithCorrectParamsTest()
 {
 	// get component object collection
