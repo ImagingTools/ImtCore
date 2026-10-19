@@ -8,6 +8,7 @@
 
 // STL includes
 #include <functional>
+#include <memory>
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
@@ -38,12 +39,23 @@ public:
 
 	CHttpRequest(const IRequestServlet& requestHandler, const IProtocolEngine& engine);
 
+	/**
+		The receiver of the body that is not finished yet is aborted, see IHttpRequestBodySink::Abort().
+	*/
+	virtual ~CHttpRequest();
+
 	QByteArrayList GetHeaders() const;
 	QByteArray GetHeaderValue(const QByteArray& headerType) const;
 	QUrl GetUrl() const;
 	virtual MethodType GetMethodType() const;
 	virtual QByteArray GetBody() const override;
 	QHostAddress GetRemoteAddress() const;
+
+	/**
+		Get the receiver of the body if the policy chose IHttpRequestBodyPolicy::BM_STREAM, otherwise \c nullptr. The body of such
+		a request is empty (see GetBody()), it is in the receiver.
+	*/
+	std::shared_ptr<IHttpRequestBodySink> GetBodySink() const;
 
 	void SetHeader(const QByteArray& headerId, const QByteArray& value);
 	void SetMethodType(const MethodType& methodType);
@@ -152,6 +164,12 @@ private:
 	*/
 	void Reject(int statusCode, const IResponse::Headers& headers);
 
+	/**
+		Tell the receiver of the body that the body is not received to the end. It does nothing if the receiver is not set or is
+		finished already, so it can be called many times.
+	*/
+	void AbortBodySink();
+
 	QByteArray CreateRejectMessage() const;
 
 protected:
@@ -178,6 +196,14 @@ protected:
 	std::reference_wrapper<const IHttpRequestBodyPolicy> m_bodyPolicy;
 	qint64 m_defaultMaxBodySize = 0;
 	qint64 m_maxBodySize = 0;
+
+	// Size of the received body, it is the size of m_body if the body is not passed to the receiver.
+	qint64 m_receivedBodySize = 0;
+
+	std::shared_ptr<IHttpRequestBodySink> m_bodySinkPtr;
+
+	// Finish() or Abort() of the receiver is called, it gets no more calls.
+	bool m_isBodySinkDone = false;
 
 	// The request is refused with this status (a value of IProtocolEngine::StatusCode), 0 - it is not refused.
 	int m_rejectStatusCode = 0;

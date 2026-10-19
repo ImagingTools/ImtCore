@@ -5,7 +5,11 @@
 // ACF includes
 #include <istd/IPolymorphic.h>
 
+// STL includes
+#include <memory>
+
 // ImtCore includes
+#include <imtrest/IHttpRequestBodySink.h>
 #include <imtrest/IResponse.h>
 
 
@@ -32,6 +36,12 @@ public:
 		BM_BUFFER,
 
 		/**
+			The body is not kept in the request, its parts are passed to BodyDecision::sinkPtr while the request is received.
+			The request has an empty body. The limit BodyDecision::maxBodySize applies to the whole body.
+		*/
+		BM_STREAM,
+
+		/**
 			The request is answered at once with BodyDecision::rejectStatusCode without receiving of the body.
 			The connection is closed after the response.
 		*/
@@ -52,6 +62,12 @@ public:
 			Status of the response for BM_REJECT, a value of IProtocolEngine::StatusCode.
 		*/
 		int rejectStatusCode = 0;
+
+		/**
+			Receiver of the body for BM_STREAM, it is created for the request. It is shared: the request and the owner of the
+			receiver (the policy or the handler that reads the result) keep it. Without it the request is refused with \c 500.
+		*/
+		std::shared_ptr<IHttpRequestBodySink> sinkPtr;
 
 		/**
 			Additional headers of the response for BM_REJECT, for example \c WWW-Authenticate for \c 401.

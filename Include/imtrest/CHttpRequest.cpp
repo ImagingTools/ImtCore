@@ -88,6 +88,12 @@ CHttpRequest::CHttpRequest(const IRequestServlet& handler, const IProtocolEngine
 }
 
 
+CHttpRequest::~CHttpRequest()
+{
+	AbortBodySink();
+}
+
+
 QByteArrayList CHttpRequest::GetHeaders() const
 {
 	return m_headers.keys();
@@ -142,6 +148,12 @@ QByteArray CHttpRequest::GetBody() const
 QHostAddress CHttpRequest::GetRemoteAddress() const
 {
 	return m_remoteAddress;
+}
+
+
+std::shared_ptr<IHttpRequestBodySink> CHttpRequest::GetBodySink() const
+{
+	return m_bodySinkPtr;
 }
 
 
@@ -324,14 +336,26 @@ int CHttpRequest::OnBody(http_parser* httpParser, const char *at, size_t length)
 {
 	Q_ASSERT(httpParser != nullptr);
 
-	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
+	auto* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
 	Q_ASSERT(requestPtr != nullptr);
 
 	requestPtr->m_state = CHttpRequest::RS_BODY;
 
-	if ((requestPtr->m_maxBodySize > 0) && (qint64(requestPtr->m_body.size()) + qint64(length) > requestPtr->m_maxBodySize)){
+	if ((requestPtr->m_maxBodySize > 0) && (requestPtr->m_receivedBodySize + qint64(length) > requestPtr->m_maxBodySize)){
 		// The length of a chunked body is not known in advance, so it is checked while the body is received
 		requestPtr->Reject(IProtocolEngine::SC_PAYLOAD_TOO_LARGE, IResponse::Headers());
+
+		return 0;
+	}
+
+	if (requestPtr->m_bodySinkPtr){
+		if (!requestPtr->m_bodySinkPtr->Write(at, qint64(length))){
+			requestPtr->Reject(IProtocolEngine::SC_INTERNAL_SERVER_ERROR, IResponse::Headers());
+
+			return 0;
+		}
+
+		requestPtr->m_receivedBodySize += qint64(length);
 
 		return 0;
 	}
@@ -343,6 +367,7 @@ int CHttpRequest::OnBody(http_parser* httpParser, const char *at, size_t length)
 	}
 
 	requestPtr->m_body.append(at, int(length));
+	requestPtr->m_receivedBodySize += qint64(length);
 
 	return 0;
 }
@@ -352,13 +377,22 @@ int CHttpRequest::OnMessageComplete(http_parser* httpParser)
 {
 	Q_ASSERT(httpParser != nullptr);
 
-	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
+	auto* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
 	Q_ASSERT(requestPtr != nullptr);
 
 	requestPtr->m_state = CHttpRequest::RS_MESSAGE_COMPLETE;
 
 	// The parser stops at the end of the request, the next request is parsed by another object
 	http_parser_pause(httpParser, 1);
+
+	if (requestPtr->m_bodySinkPtr && !requestPtr->m_isBodySinkDone){
+		// The receiver is not aborted after Finish(), even if it fails
+		requestPtr->m_isBodySinkDone = true;
+
+		if (!requestPtr->m_bodySinkPtr->Finish()){
+			requestPtr->Reject(IProtocolEngine::SC_INTERNAL_SERVER_ERROR, IResponse::Headers());
+		}
+	}
 
 	return 0;
 }
@@ -368,7 +402,7 @@ int CHttpRequest::OnChunkHeader(http_parser* httpParser)
 {
 	Q_ASSERT(httpParser != nullptr);
 
-	CHttpRequest* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
+	auto* requestPtr = static_cast<CHttpRequest*>(httpParser->data);
 	Q_ASSERT(requestPtr != nullptr);
 
 	requestPtr->m_state = CHttpRequest::RS_CHUNK_HEADER;
@@ -478,6 +512,11 @@ const IProtocolEngine& CHttpRequest::GetProtocolEngine() const
 
 bool CHttpRequest::ResetData(CompatibilityMode /*mode*/)
 {
+	AbortBodySink();
+	m_bodySinkPtr.reset();
+	m_isBodySinkDone = false;
+	m_receivedBodySize = 0;
+
 	m_body.clear();
 	m_headers.clear();
 	m_lastHeader.clear();
@@ -603,6 +642,19 @@ void CHttpRequest::DecideBody()
 		return;
 	}
 
+	if (decision.mode == IHttpRequestBodyPolicy::BM_STREAM){
+		if (!decision.sinkPtr){
+			// A policy that streams the body has to give the receiver, it is a mistake of the server
+			Reject(IProtocolEngine::SC_INTERNAL_SERVER_ERROR, IResponse::Headers());
+
+			return;
+		}
+
+		// The receiver is set before the other checks, so it is aborted if the request is refused
+		m_bodySinkPtr = decision.sinkPtr;
+		m_isBodySinkDone = false;
+	}
+
 	m_maxBodySize = (decision.maxBodySize < 0) ? m_defaultMaxBodySize : decision.maxBodySize;
 
 	const bool isChunked = (m_httpParser.flags & F_CHUNKED) != 0;
@@ -637,12 +689,24 @@ void CHttpRequest::DecideBody()
 
 void CHttpRequest::Reject(int statusCode, const IResponse::Headers& headers)
 {
+	AbortBodySink();
+
 	m_rejectStatusCode = statusCode;
 	m_rejectHeaders = headers;
 	m_isContinueExpected = false;
 
 	// The parser stops, the rest of the request is not needed
 	http_parser_pause(&m_httpParser, 1);
+}
+
+
+void CHttpRequest::AbortBodySink()
+{
+	if (m_bodySinkPtr && !m_isBodySinkDone){
+		m_isBodySinkDone = true;
+
+		m_bodySinkPtr->Abort();
+	}
 }
 
 
