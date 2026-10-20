@@ -527,6 +527,107 @@ void CCollectionDocumentServiceTest::OpenDocumentMultiplePathSegmentsTest()
 }
 
 
+void CCollectionDocumentServiceTest::OpenDocumentHostObjectIdWithRevisionTest()
+{
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("currentData")));
+	m_managerPtr->GetMockCollection().SetRevisionControllerEnabled(true);
+	m_managerPtr->GetMockCollection().AddRevisionData(
+		TEST_OBJECT_ID,
+		7,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("revisionData")));
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection://" + QString(TEST_OBJECT_ID) + "/7");
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(!taskId.isEmpty(), "BeginDocumentTask should start with host-based objectId and revision");
+
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QVERIFY2(!result.documentId.isEmpty(), "OpenDocument should succeed for host-based URL with revision");
+}
+
+
+void CCollectionDocumentServiceTest::OpenDocumentWithRevisionWithoutRevisionControllerFailsTest()
+{
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("currentData")));
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection:///" + QString(TEST_OBJECT_ID) + "/3");
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(!taskId.isEmpty(), "BeginDocumentTask should start and fail when revision controller is missing");
+
+	imtdoc::IDocumentService::TaskResult result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_FAILED);
+	QVERIFY2(result.documentId.isEmpty(), "OpenDocument should fail without revision controller");
+}
+
+
+void CCollectionDocumentServiceTest::OpenDocumentWithUnknownRevisionFailsTest()
+{
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("currentData")));
+	m_managerPtr->GetMockCollection().SetRevisionControllerEnabled(true);
+	m_managerPtr->GetMockCollection().AddRevisionData(
+		TEST_OBJECT_ID,
+		2,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("revision2Data")));
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection:///" + QString(TEST_OBJECT_ID) + "/5");
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(!taskId.isEmpty(), "BeginDocumentTask should start and fail for unknown revision");
+
+	imtdoc::IDocumentService::TaskResult result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_FAILED);
+	QVERIFY2(result.documentId.isEmpty(), "OpenDocument should fail for unknown revision");
+}
+
+
+void CCollectionDocumentServiceTest::OpenDocumentWithRevisionLoadsRevisionDataTest()
+{
+	m_managerPtr->GetMockCollection().AddObject(
+		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("currentData")));
+	m_managerPtr->GetMockCollection().SetRevisionControllerEnabled(true);
+	m_managerPtr->GetMockCollection().AddRevisionData(
+		TEST_OBJECT_ID,
+		4,
+		istd::IChangeableSharedPtr(new CMockDocumentObject("revision4Data")));
+
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection:///" + QString(TEST_OBJECT_ID) + "/4");
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(!taskId.isEmpty(), "BeginDocumentTask should start with revision URL");
+
+	imtdoc::IDocumentService::TaskResult result = m_managerPtr->WaitForTaskFinished(taskId);
+	QVERIFY2(!result.documentId.isEmpty(), "OpenDocument should succeed with available revision");
+
+	QTRY_VERIFY_WITH_TIMEOUT([this, &result]() {
+		const istd::IChangeable* ptr = m_managerPtr->GetDocumentPtr(TEST_USER_ID, result.documentId);
+		return ptr != nullptr;
+	}(), 1000);
+
+	const istd::IChangeable* ptr = m_managerPtr->GetDocumentPtr(TEST_USER_ID, result.documentId);
+	QVERIFY2(ptr != nullptr, "Document pointer should be available after revision load");
+
+	const CMockDocumentObject* mockPtr = dynamic_cast<const CMockDocumentObject*>(ptr);
+	QVERIFY2(mockPtr != nullptr, "Loaded document should be CMockDocumentObject");
+	QCOMPARE(mockPtr->GetData(), QByteArray("revision4Data"));
+}
+
+
 void CCollectionDocumentServiceTest::OpenDocumentWithoutSingleInstanceModeFailsWhenSingleInstanceAlreadyOpenedTest()
 {
 	m_managerPtr->GetMockCollection().AddObject(

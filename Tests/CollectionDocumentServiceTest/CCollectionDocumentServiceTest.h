@@ -17,6 +17,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IRevisionController.h>
 #include <imtdoc/CCollectionDocumentServiceBase.h>
 #include <imtdoc/IDocumentServiceEventHandler.h>
 #include <imtdoc/IPersistentUndoManager.h>
@@ -175,12 +176,98 @@ public:
 		istd::IChangeableSharedPtr dataPtr;
 	};
 
+	class CMockRevisionController : public imtbase::IRevisionController
+	{
+	public:
+		void SetRevisionData(
+					const QByteArray& objectId,
+					int revision,
+					istd::IChangeableSharedPtr dataPtr)
+		{
+			m_revisionDataByObjectAndRevision[qMakePair(objectId, revision)] = dataPtr;
+		}
+
+		virtual RevisionInfoList GetRevisionInfoList(
+					const IObjectCollection& /*collection*/,
+					const ICollectionInfo::Id& objectId) const override
+		{
+			RevisionInfoList revisionInfoList;
+			for (auto it = m_revisionDataByObjectAndRevision.constBegin(); it != m_revisionDataByObjectAndRevision.constEnd(); ++it){
+				if (it.key().first != objectId){
+					continue;
+				}
+
+				RevisionInfo info;
+				info.revision = it.key().second;
+				info.isRevisionAvailable = it.value().IsValid();
+				revisionInfoList.append(info);
+			}
+			return revisionInfoList;
+		}
+
+		virtual int BackupRevision(
+					const IObjectCollection& /*collection*/,
+					const ICollectionInfo::Id& /*objectId*/,
+					const QString& /*userComment*/ = QString()) const override
+		{
+			return -1;
+		}
+
+		virtual bool RestoreRevision(
+					IObjectCollection& /*collection*/,
+					const ICollectionInfo::Id& /*objectId*/,
+					int /*revision*/) const override
+		{
+			return false;
+		}
+
+		virtual bool ExportRevision(
+					const IObjectCollection& /*collection*/,
+					const ICollectionInfo::Id& /*objectId*/,
+					int /*revision*/,
+					const QString& /*filePath*/) const override
+		{
+			return false;
+		}
+
+		virtual bool GetRevisionData(
+					const IObjectCollection& /*collection*/,
+					const ICollectionInfo::Id& objectId,
+					int revision,
+					istd::IChangeableSharedPtr& dataPtr,
+					idoc::MetaInfoPtr& dataMetaInfoPtr) const override
+		{
+			dataPtr = istd::IChangeableSharedPtr();
+			dataMetaInfoPtr = idoc::MetaInfoPtr();
+
+			auto it = m_revisionDataByObjectAndRevision.constFind(qMakePair(objectId, revision));
+			if (it == m_revisionDataByObjectAndRevision.constEnd() || !it.value().IsValid()){
+				return false;
+			}
+
+			dataPtr = istd::IChangeableSharedPtr(it.value()->CloneMe().PopInterfacePtr());
+			return dataPtr.IsValid();
+		}
+
+		virtual bool DeleteRevision(
+					IObjectCollection& /*collection*/,
+					const ICollectionInfo::Id& /*objectId*/,
+					int /*revision*/) const override
+		{
+			return false;
+		}
+
+	private:
+		QMap<QPair<QByteArray, int>, istd::IChangeableSharedPtr> m_revisionDataByObjectAndRevision;
+	};
+
 	CMockObjectCollection()
 		: m_insertShouldFail(false)
 		, m_setObjectDataShouldFail(false)
 		, m_getObjectDataShouldFail(false)
 		, m_setElementNameShouldFail(false)
 		, m_blockGetObjectData(false)
+		, m_revisionControllerEnabled(false)
 	{
 	}
 
@@ -190,6 +277,11 @@ public:
 	void SetGetObjectDataShouldFail(bool fail) { m_getObjectDataShouldFail = fail; }
 	void SetSetElementNameShouldFail(bool fail) { m_setElementNameShouldFail = fail; }
 	void SetBlockGetObjectData(bool block) { m_blockGetObjectData = block; }
+	void SetRevisionControllerEnabled(bool enabled) { m_revisionControllerEnabled = enabled; }
+	void AddRevisionData(const QByteArray& objectId, int revision, istd::IChangeableSharedPtr dataPtr)
+	{
+		m_revisionController.SetRevisionData(objectId, revision, dataPtr);
+	}
 	bool WaitForGetObjectData(int timeout) { return m_getObjectDataStarted.tryAcquire(1, timeout); }
 	void ContinueGetObjectData() { m_continueGetObjectData.release(); }
 
@@ -301,7 +393,10 @@ public:
 	}
 
 	// reimplemented (imtbase::IObjectCollection)
-	virtual const imtbase::IRevisionController* GetRevisionController() const override { return nullptr; }
+	virtual const imtbase::IRevisionController* GetRevisionController() const override
+	{
+		return m_revisionControllerEnabled ? &m_revisionController : nullptr;
+	}
 	virtual const imtbase::ICollectionDataController* GetDataController() const override { return nullptr; }
 
 	virtual int GetOperationFlags(const Id& /*elementId*/ = Id()) const override
@@ -437,6 +532,8 @@ private:
 	bool m_getObjectDataShouldFail;
 	bool m_setElementNameShouldFail;
 	bool m_blockGetObjectData;
+	CMockRevisionController m_revisionController;
+	bool m_revisionControllerEnabled;
 	mutable QSemaphore m_getObjectDataStarted;
 	mutable QSemaphore m_continueGetObjectData;
 };
@@ -694,6 +791,10 @@ private slots:
 	void OpenDocumentDataLoadFailClosesDocumentTest();
 	void OpenDocumentWithHostTest();
 	void OpenDocumentMultiplePathSegmentsTest();
+	void OpenDocumentHostObjectIdWithRevisionTest();
+	void OpenDocumentWithRevisionWithoutRevisionControllerFailsTest();
+	void OpenDocumentWithUnknownRevisionFailsTest();
+	void OpenDocumentWithRevisionLoadsRevisionDataTest();
 	void OpenDocumentWithoutSingleInstanceModeFailsWhenSingleInstanceAlreadyOpenedTest();
 
 	// GetDocumentName tests

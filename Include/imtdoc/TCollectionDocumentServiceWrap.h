@@ -114,6 +114,8 @@ private:
 	void OnOpenDocumentThreadStarted(
 				const std::weak_ptr<std::atomic<bool>>& aliveGuard,
 				bool singleCopyMode,
+				bool hasRequestedRevision,
+				int requestedRevision,
 				const QByteArray& objectId,
 				const QByteArray& userId,
 				const QByteArray& documentId,
@@ -169,6 +171,8 @@ template<class Base>
 inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
 			const std::weak_ptr<std::atomic<bool>>& aliveGuard,
 			bool singleCopyMode,
+			bool hasRequestedRevision,
+			int requestedRevision,
 			const QByteArray& objectId,
 			const QByteArray& userId,
 			const QByteArray& documentId,
@@ -203,7 +207,16 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	bool success = collPtr->GetObjectData(objectId, dataPtr);
+	bool success = false;
+	if (hasRequestedRevision){
+		const imtbase::IRevisionController* revisionControllerPtr = collPtr->GetRevisionController();
+		idoc::MetaInfoPtr dataMetaInfoPtr;
+		success = revisionControllerPtr != nullptr
+				&& revisionControllerPtr->GetRevisionData(*collPtr, objectId, requestedRevision, dataPtr, dataMetaInfoPtr);
+	}
+	else{
+		success = collPtr->GetObjectData(objectId, dataPtr);
+	}
 	isAlive = aliveGuard.lock();
 	if (!isAlive || !isAlive->load()){
 		worker->deleteLater();
@@ -360,20 +373,64 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 	const QUrl& url = params.url;
 	const QByteArray& userId = params.userId;
 
-	if (url.scheme() != "collection" || !url.host().isEmpty()){
+	if (url.scheme() != "collection"){
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL scheme")});
 		return;
 	}
 
-	QString path = url.path();
+	QString objectIdString;
+	QString revisionPart;
 
-	QStringList parts = path.split('/', Qt::SkipEmptyParts);
-	if (parts.count() != 1){
+	if (!url.host().isEmpty()){
+		objectIdString = url.host();
+		QStringList hostFormatParts = url.path().split('/', Qt::SkipEmptyParts);
+		if (hostFormatParts.count() > 1){
+			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL path")});
+			return;
+		}
+		if (hostFormatParts.count() == 1){
+			revisionPart = hostFormatParts.first();
+		}
+	}
+	else{
+		QStringList pathParts = url.path().split('/', Qt::SkipEmptyParts);
+		if (pathParts.count() < 1 || pathParts.count() > 2){
+			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL path")});
+			return;
+		}
+
+		objectIdString = pathParts.first();
+		if (pathParts.count() == 2){
+			revisionPart = pathParts.last();
+		}
+	}
+
+	if (objectIdString.isEmpty()){
 		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid URL path")});
 		return;
 	}
 
-	QByteArray objectId = parts.first().toUtf8();
+	bool hasRequestedRevision = false;
+	int requestedRevision = 0;
+	if (!revisionPart.isEmpty()){
+		for (QChar symbol : revisionPart){
+			if (!symbol.isDigit()){
+				this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid revision number")});
+				return;
+			}
+		}
+
+		bool conversionOk = false;
+		requestedRevision = revisionPart.toInt(&conversionOk);
+		if (!conversionOk){
+			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Invalid revision number")});
+			return;
+		}
+
+		hasRequestedRevision = true;
+	}
+
+	QByteArray objectId = objectIdString.toUtf8();
 	QByteArray documentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	// Single-instance constraints (per user/object):
@@ -426,8 +483,32 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		return;
 	}
 
+	if (hasRequestedRevision){
+		const imtbase::IRevisionController* revisionControllerPtr = collectionPtr->GetRevisionController();
+		if (revisionControllerPtr == nullptr){
+			this->ClearReservedOpen(userId, documentId);
+			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Revision controller is not available")});
+			return;
+		}
+
+		const imtbase::IRevisionController::RevisionInfoList revisionInfoList = revisionControllerPtr->GetRevisionInfoList(*collectionPtr, objectId);
+		bool hasRequestedRevisionInList = false;
+		for (const imtbase::IRevisionController::RevisionInfo& revisionInfo : revisionInfoList){
+			if (revisionInfo.revision == requestedRevision){
+				hasRequestedRevisionInList = true;
+				break;
+			}
+		}
+
+		if (!hasRequestedRevisionInList){
+			this->ClearReservedOpen(userId, documentId);
+			this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, QByteArray(), QStringLiteral("Unknown object revision")});
+			return;
+		}
+	}
+
 	// Single-copy mode: check if this object is already opened by any user
-	if (this->IsSingleCopyMode()){
+	if (this->IsSingleCopyMode() && !hasRequestedRevision){
 		bool isSharedDocument = false;
 		QByteArray sharedTypeId;
 		QString sharedName;
@@ -532,7 +613,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		doc.isLoading = true;
 		doc.singleDocumentInstance = params.singleDocumentInstance;
 
-		if (this->IsSingleCopyMode()){
+		if (this->IsSingleCopyMode() && !hasRequestedRevision){
 			SharedDocumentData& shared = this->m_sharedDocuments[objectId];
 			shared.typeId = objectTypeId;
 			shared.name = documentName;
@@ -568,13 +649,13 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		this->m_workerThreads.append(QPointer<QThread>(thread));
 	}
 
-	bool singleCopyMode = this->IsSingleCopyMode();
+	bool singleCopyMode = this->IsSingleCopyMode() && !hasRequestedRevision;
 	std::weak_ptr<std::atomic<bool>> aliveGuard(this->m_isAlive);
 	QObject::connect(
 		thread,
 		&QThread::started,
 		worker,
-		[this, aliveGuard, singleCopyMode, objectId, userId, documentId, worker](){
+		[this, aliveGuard, singleCopyMode, hasRequestedRevision, requestedRevision, objectId, userId, documentId, worker](){
 			auto isAlive = aliveGuard.lock();
 			if (!isAlive || !isAlive->load()){
 				worker->deleteLater();
@@ -584,6 +665,8 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 			this->OnOpenDocumentThreadStarted(
 						aliveGuard,
 						singleCopyMode,
+						hasRequestedRevision,
+						requestedRevision,
 						objectId,
 						userId,
 						documentId,
