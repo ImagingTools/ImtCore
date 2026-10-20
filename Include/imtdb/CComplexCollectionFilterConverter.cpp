@@ -31,7 +31,8 @@ QMap<imtbase::IComplexCollectionFilter::FieldOperation, QString> stringOperation
 	{imtbase::IComplexCollectionFilter::FO_GREATER, ">"},
 	{imtbase::IComplexCollectionFilter::FO_NOT_LESS, ">="},
 	{imtbase::IComplexCollectionFilter::FO_NOT_GREATER, "<="},
-	{imtbase::IComplexCollectionFilter::FO_CONTAINS, "LIKE"}});
+	{imtbase::IComplexCollectionFilter::FO_CONTAINS, "LIKE"},
+	{imtbase::IComplexCollectionFilter::FO_STARTS_WITH, "LIKE"}});
 
 QSet<int> boolTypes({ QMetaType::Bool });
 QMap<imtbase::IComplexCollectionFilter::FieldOperation, QString> boolOperations({
@@ -158,8 +159,11 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 		QString filterValue = SqlEncode(filter.filterValue.toString());
 
 		QString typeCast;
-		if (filter.filterOperation == imtbase::IComplexCollectionFilter::FO_CONTAINS){
-			filterValue.prepend("%");
+		if (filter.filterOperation == imtbase::IComplexCollectionFilter::FO_CONTAINS
+					|| filter.filterOperation == imtbase::IComplexCollectionFilter::FO_STARTS_WITH){
+			if (filter.filterOperation == imtbase::IComplexCollectionFilter::FO_CONTAINS){
+				filterValue.prepend("%");
+			}
 			filterValue.append("%");
 
 			switch (sqlContext){
