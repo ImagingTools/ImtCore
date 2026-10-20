@@ -899,6 +899,9 @@ private slots:
 	void SingleCopyCloseBothUsersTest();
 	void SingleCopySaveUpdatesAllTest();
 	void SingleCopySetDocumentNameUpdatesAllTest();
+	void SingleCopyRevisionOpenedBeforeCurrentIsIsolatedTest();
+	void SingleCopyClosingRevisionKeepsCurrentSharedTest();
+	void SingleCopyFailedCurrentLoadDoesNotCloseRevisionTest();
 
 private:
 	/**
@@ -918,6 +921,11 @@ private:
 		CTestableDocumentService& manager,
 		const QByteArray& userId,
 		const QByteArray& objectId);
+	QByteArray OpenDocumentUrlAndWaitForLoad(
+		CTestableDocumentService& manager,
+		const QByteArray& userId,
+		const QUrl& url,
+		bool singleDocumentInstance = false);
 
 	/**
 		Helper: directly sets up a document in the manager for synchronous testing.

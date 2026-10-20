@@ -191,7 +191,7 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
 			QMutexLocker locker(&this->m_mutex);
 			if (singleCopyMode && this->m_sharedDocuments.contains(objectId)){
 				this->m_sharedDocuments[objectId].isLoading = false;
-				docsToClose = this->FindDocumentsByObjectId(objectId);
+				docsToClose = this->FindSharedDocumentsByObjectId(objectId);
 			}
 			else{
 				docsToClose.append(qMakePair(userId, documentId));
@@ -232,7 +232,7 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
 					this->m_sharedDocuments[objectId].objectPtr = dataPtr;
 				}
 
-				UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
+				UserDocumentPairList docs = this->FindSharedDocumentsByObjectId(objectId);
 				for (const UserDocumentPair& pair : docs){
 					WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
 					if (dp != nullptr){
@@ -245,7 +245,7 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadStarted(
 					this->m_sharedDocuments[objectId].isLoading = false;
 				}
 
-				UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
+				UserDocumentPairList docs = this->FindSharedDocumentsByObjectId(objectId);
 				for (const UserDocumentPair& pair : docs){
 					WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
 					if (dp != nullptr){
@@ -298,7 +298,7 @@ inline void TCollectionDocumentServiceWrap<Base>::OnOpenDocumentThreadFinished(
 					shared.isLoading = false;
 
 					bool observersInitialized = false;
-					UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
+					UserDocumentPairList docs = this->FindSharedDocumentsByObjectId(objectId);
 					for (const UserDocumentPair& pair : docs){
 						WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
 						if (dp != nullptr && dp->isLoading){
@@ -429,7 +429,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		if (userDocsIt != this->m_userDocuments.constEnd()){
 			const WorkingDocumentList& userDocuments = userDocsIt.value();
 			for (auto it = userDocuments.constBegin(); it != userDocuments.constEnd(); ++it){
-				if (it.value().objectId != objectId){
+				if (it.value().objectId != objectId || it.value().url.path() != url.path()){
 					continue;
 				}
 
@@ -534,6 +534,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 					doc.isDirty = docIsDirty;
 					doc.isLoading = shared.isLoading;
 					doc.singleDocumentInstance = params.singleDocumentInstance;
+					doc.isShared = true;
 					doc.undoManagerModelId = -1;
 				}
 			}
@@ -606,6 +607,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 			shared.undoManagerPtr = undoManagerPtr;
 			shared.refCount = 1;
 			shared.isLoading = true;
+			doc.isShared = true;
 		}
 	}
 
@@ -694,6 +696,7 @@ TCollectionDocumentServiceWrap<Base>::SetDocumentName(
 	QByteArray objectId;
 	QByteArray typeId;
 	bool isDirty = false;
+	bool isShared = false;
 
 	{
 		QMutexLocker locker(&this->m_mutex);
@@ -712,6 +715,7 @@ TCollectionDocumentServiceWrap<Base>::SetDocumentName(
 		objectId = workingDocumentPtr->objectId;
 		typeId = workingDocumentPtr->typeId;
 		isDirty = workingDocumentPtr->isDirty;
+		isShared = workingDocumentPtr->isShared;
 	}
 
 	if (!objectId.isEmpty()){
@@ -728,14 +732,14 @@ TCollectionDocumentServiceWrap<Base>::SetDocumentName(
 	istd::CChangeNotifier notifier(this);
 
 	// Shared docs: rename and notify each user sharing this object
-	if (this->IsSingleCopyMode() && !objectId.isEmpty()){
+	if (this->IsSingleCopyMode() && isShared && !objectId.isEmpty()){
 		UserDocumentPairList sharedDocs;
 		{
 			QMutexLocker locker(&this->m_mutex);
 			if (this->m_sharedDocuments.contains(objectId)){
 				this->m_sharedDocuments[objectId].name = documentName;
 			}
-			sharedDocs = this->FindDocumentsByObjectId(objectId);
+			sharedDocs = this->FindSharedDocumentsByObjectId(objectId);
 		}
 
 		for (const UserDocumentPair& pair : sharedDocs){
@@ -892,7 +896,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 			}
 
 			// In single-copy mode, detach from shared document before changing objectId
-			if (this->IsSingleCopyMode() && this->m_sharedDocuments.contains(oldObjectId)){
+			if (this->IsSingleCopyMode() && workingDocumentPtr->isShared && this->m_sharedDocuments.contains(oldObjectId)){
 				SharedDocumentData& shared = this->m_sharedDocuments[oldObjectId];
 				shared.refCount--;
 				bool isLastUser = (shared.refCount <= 0);
@@ -914,6 +918,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 
 				workingDocumentPtr->objectPtr = newObjectPtr;
 				workingDocumentPtr->undoManagerPtr = newUndoManagerPtr;
+				workingDocumentPtr->isShared = false;
 
 				this->InitializeDocumentObservers(*workingDocumentPtr, userId, documentId);
 			}
@@ -968,7 +973,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 
 			istd::CChangeNotifier notifier(this);
 
-			if (this->IsSingleCopyMode() && !workingDocumentPtr->objectId.isEmpty()){
+			if (this->IsSingleCopyMode() && workingDocumentPtr->isShared && !workingDocumentPtr->objectId.isEmpty()){
 				// Update all users sharing this document
 				QByteArray sharedObjectId = workingDocumentPtr->objectId;
 
@@ -976,7 +981,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 					this->m_sharedDocuments[sharedObjectId].name = updatedName;
 				}
 
-				UserDocumentPairList docs = this->FindDocumentsByObjectId(sharedObjectId);
+				UserDocumentPairList docs = this->FindSharedDocumentsByObjectId(sharedObjectId);
 				for (const UserDocumentPair& pair : docs){
 					WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
 					if (dp == nullptr){
@@ -1107,6 +1112,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 				shared.undoManagerModelId = workingDocumentPtr->undoManagerModelId;
 
 				this->m_sharedDocuments[savedObjectId] = shared;
+				workingDocumentPtr->isShared = true;
 			}
 		}
 
