@@ -38,6 +38,13 @@
 #include <imtauth/CPersonalAccessToken.h>
 #include <imtauth/CPersonalAccessTokenManagerComp.h>
 #include <imtauth/CPersonalAccessTokenMetaInfoCreatorComp.h>
+#include <imtauth/CExternalIdentity.h>
+#include <imtauth/CExternalIdentityManagerComp.h>
+#include <imtauth/CExternalLoginControllerComp.h>
+#include <imtauth/CGoogleOidcProviderComp.h>
+#include <imtauth/CAppleOidcProviderComp.h>
+#include <imtauth/CFacebookOidcProviderComp.h>
+#include <imtauth/CGenericOidcProviderComp.h>
 #include <imtauth/CUserRecentActionComp.h>
 #include <imtauth/CTenantInfoComp.h>
 #include <imtauth/CTenantManagerComp.h>
@@ -134,6 +141,18 @@ typedef icomp::TModelCompWrap<
 						istd::IChangeable>> PersonalAccessToken;
 typedef imtauth::CPersonalAccessTokenManagerComp PersonalAccessTokenManager;
 typedef imtauth::CPersonalAccessTokenMetaInfoCreatorComp PersonalAccessTokenMetaInfoCreator;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap <
+						imtauth::CExternalIdentity,
+						imtauth::IExternalIdentity,
+						iser::ISerializable,
+						istd::IChangeable>> ExternalIdentity;
+typedef imtauth::CExternalIdentityManagerComp ExternalIdentityManager;
+typedef imtauth::CExternalLoginControllerComp ExternalLoginController;
+typedef imtauth::CGoogleOidcProviderComp GoogleOidcProvider;
+typedef imtauth::CAppleOidcProviderComp AppleOidcProvider;
+typedef imtauth::CFacebookOidcProviderComp FacebookOidcProvider;
+typedef imtauth::CGenericOidcProviderComp GenericOidcProvider;
 typedef icomp::TModelCompWrap<imtauth::CUserRecentActionComp> UserRecentAction;
 typedef icomp::TModelCompWrap<imtauth::CTenantInfoComp> TenantInfo;
 typedef icomp::TModelCompWrap<imtauth::CTenantManagerComp> TenantManager;

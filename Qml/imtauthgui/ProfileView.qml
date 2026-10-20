@@ -241,7 +241,34 @@ ViewBase {
 				multiPageView.addPage("Organizations", qsTr("Organizations"), organizationsPageComp, "Icons/Organizations")
 			multiPageView.addPage("AccessTokens", qsTr("Access Tokens"), tokensPageComp, "Icons/Key")
 			multiPageView.addPage("Access", qsTr("Roles & Permissions"), accessPageComp, "Icons/Role")
+			container.__addLinkedAccountsPage()
 			multiPageView.currentIndex = 0
+
+			AuthorizationController.loadExternalLoginProviders()
+		}
+	}
+
+	// The tab exists only when the server offers sign-in providers.
+	function __addLinkedAccountsPage() {
+		if (AuthorizationController.externalLoginProviders.length === 0)
+			return
+		if (multiPageView.getIndexById("LinkedAccounts") >= 0)
+			return
+		multiPageView.addPage("LinkedAccounts", qsTr("Linked Accounts"), linkedAccountsPageComp, "Icons/Link")
+	}
+
+	Connections {
+		target: AuthorizationController
+
+		function onExternalLoginProvidersLoaded() {
+			container.__addLinkedAccountsPage()
+		}
+	}
+
+	Component {
+		id: linkedAccountsPageComp
+		ProfileLinkedAccountsPage {
+			apiClient: container.apiClient
 		}
 	}
 

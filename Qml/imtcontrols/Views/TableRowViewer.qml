@@ -36,17 +36,32 @@ Row {
 		return contentComp;
 	}
 
-	// Fills every cell of the row in one pass, so the row is laid out once rather than once per cell.
-	// A table that has spent its time slice gets the row on a later tick, which lets the first rows paint.
+	Component.onDestruction: {
+		if (dataList.rowDelegate && dataList.rowDelegate.tableItem && typeof dataList.rowDelegate.tableItem.cancelRowFill === 'function'){
+			dataList.rowDelegate.tableItem.cancelRowFill(dataList);
+		}
+	}
+
+	// A table that has spent its time slice queues the row and fills it on a later tick, which lets the first rows paint.
 	function fillCells(){
 		if (!dataList.rowDelegate || !dataList.rowDelegate.tableItem){
 			return true;
 		}
 
 		let tableItem = dataList.rowDelegate.tableItem;
-		if (typeof tableItem.takeRowFillSlice === 'function' && !tableItem.takeRowFillSlice()){
-			fillTimer.start();
+		if (typeof tableItem.takeRowFillSlice === 'function' && !tableItem.takeRowFillSlice(dataList)){
 			return false;
+		}
+
+		dataList.fillRowCells();
+
+		return true;
+	}
+
+	// Fills every cell of the row in one pass, so the row is laid out once rather than once per cell.
+	function fillRowCells(){
+		if (!dataList.rowDelegate || !dataList.rowDelegate.tableItem){
+			return;
 		}
 
 		// Inline rather than a function per cell, and contentItem set last: every QML function call is
@@ -62,6 +77,8 @@ Row {
 				continue;
 			}
 
+			// Not as createObject initial properties: the web runtime takes an object passed there for a new child,
+			// re-completes it and leaves the cell's rowDelegate null.
 			let obj = contentComp.createObject(cell);
 			obj.columnIndex = i;
 			obj.rowDelegate = dataList.rowDelegate;
@@ -71,8 +88,6 @@ Row {
 
 			cell.contentItem = obj;
 		}
-
-		return true;
 	}
 
 	// For a cell the Repeater does not list yet: added after the row was built, when the columns arrive late.
@@ -90,19 +105,6 @@ Row {
 		}
 
 		cell.contentItem = obj;
-	}
-
-	// Repeats until the row is filled: the web runtime stops a timer after its handler, which drops a restart() made inside it.
-	// Not 0: Qt never fires a repeating Timer with a zero interval.
-	Timer {
-		id: fillTimer
-		interval: 1
-		repeat: true
-		onTriggered: {
-			if (dataList.fillCells()){
-				fillTimer.stop();
-			}
-		}
 	}
 
 	Component {

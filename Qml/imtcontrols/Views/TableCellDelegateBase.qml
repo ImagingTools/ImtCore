@@ -1,7 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtcontrols 1.0
 
 
 Item {
@@ -13,7 +12,8 @@ Item {
 	// TableRowDelegateBase "TableRow_<index>" and TableHeaderDelegate "<headerId>" instrumentation.
 	objectName: delegateContainer.cellHeaderId;
 
-	property TableRowDelegateBase rowDelegate: null;
+	// A TableRowDelegateBase. Untyped, so this file needs no imtcontrols import, which makes every cell instance costlier.
+	property var rowDelegate: null;
 	property var table: rowDelegate && rowDelegate.tableItem ? rowDelegate.tableItem : null
 
 	height: rowDelegate ? rowDelegate.contentHeight : 0;
