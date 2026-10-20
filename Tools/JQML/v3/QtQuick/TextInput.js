@@ -29,8 +29,6 @@ class TextInput extends Item {
     static NoEcho = 2
     static PasswordEchoOnEdit = 3
 
-    static credentialFormId = 'jqml-credential-form'
-
     static meta = Object.assign({}, Item.meta, {
         text: { type: String, value: ''},
         color: { type: Color, value: 'black'},
@@ -62,7 +60,6 @@ class TextInput extends Item {
         cursorPosition: { type: Int, value: 0},
         canUndo: { type: Bool, value: false},
         canRedo: { type: Bool, value: false},
-        autoComplete: { type: String, value: ''},
 
         textChanged: {type:Signal, args:[]},
         colorChanged: {type:Signal, args:[]},
@@ -94,7 +91,6 @@ class TextInput extends Item {
         cursorPositionChanged: {type:Signal, args:[]},
         canUndoChanged: {type:Signal, args:[]},
         canRedoChanged: {type:Signal, args:[]},
-        autoCompleteChanged: {type:Signal, args:[]},
 
         accepted: {type:Signal, args:[]},
         editingFinished: {type:Signal, args:[]},
@@ -107,39 +103,6 @@ class TextInput extends Item {
         obj.__createImpl()
         JQApplication.MouseController.add(obj)
         return obj
-    }
-
-    static __ensureCredentialForm(){
-        if(typeof document === 'undefined') return null
-
-        let form = document.getElementById(TextInput.credentialFormId)
-        if(form) return form
-
-        form = document.createElement('form')
-        form.id = TextInput.credentialFormId
-        form.setAttribute('autocomplete', 'on')
-        form.noValidate = true
-        form.style.position = 'absolute'
-        form.style.width = '0'
-        form.style.height = '0'
-        form.style.overflow = 'hidden'
-        form.style.border = 'none'
-        form.style.padding = '0'
-        form.style.margin = '0'
-
-        let button = document.createElement('button')
-        button.type = 'submit'
-        button.tabIndex = -1
-        button.setAttribute('aria-hidden', 'true')
-        form.appendChild(button)
-
-        form.addEventListener('submit', (e)=>{
-            e.preventDefault()
-        })
-
-        let parent = document.body || document.documentElement
-        if(parent) parent.appendChild(form)
-        return form
     }
 
     __createImpl(){
@@ -156,8 +119,6 @@ class TextInput extends Item {
         this.__applyReadOnly()
         this.__applyEnabled()
         this.__applyMaximumLength()
-        this.__applyAutoComplete()
-        this.__syncFormAssociation()
         this.__applyHorizontalAlignment()
         this.__applyVerticalAlignment()
         this.__applySelectionColors()
@@ -335,11 +296,6 @@ class TextInput extends Item {
         return this.echoMode === TextInput.Password || this.echoMode === TextInput.PasswordEchoOnEdit
     }
 
-    __usesCredentialForm(){
-        if(this.__isPasswordEcho()) return true
-        return !!(this.autoComplete && this.autoComplete.length)
-    }
-
     __applyEchoMode(){
         let impl = this.__impl
         if(!impl) return
@@ -394,44 +350,6 @@ class TextInput extends Item {
     __applyMaximumLength(){
         if(!this.__impl) return
         this.__impl.maxLength = this.__getMaximumLength()
-    }
-
-    __applyAutoComplete(){
-        let impl = this.__impl
-        if(!impl) return
-
-        let hint = this.autoComplete ? this.autoComplete.toString() : ''
-        if(hint){
-            impl.setAttribute('autocomplete', hint)
-            impl.name = hint
-            this.__autoName = hint
-            return
-        }
-
-        impl.removeAttribute('autocomplete')
-        if(this.__isPasswordEcho()){
-            impl.name = 'password'
-            this.__autoName = 'password'
-            return
-        }
-
-        if(this.__autoName && impl.name === this.__autoName){
-            impl.removeAttribute('name')
-            this.__autoName = ''
-        }
-    }
-
-    __syncFormAssociation(){
-        let impl = this.__impl
-        if(!impl) return
-
-        if(!this.__usesCredentialForm()){
-            impl.removeAttribute('form')
-            return
-        }
-
-        let form = TextInput.__ensureCredentialForm()
-        if(form) impl.setAttribute('form', form.id)
     }
 
     __applyHorizontalAlignment(){
@@ -654,19 +572,6 @@ class TextInput extends Item {
 
         this.accepted()
         this.editingFinished()
-        this.__submitCredentialForm()
-    }
-
-    __submitCredentialForm(){
-        if(!this.__impl || !this.__usesCredentialForm()) return
-        if(typeof document === 'undefined') return
-
-        let form = document.getElementById(this.__impl.getAttribute('form'))
-        if(!form || typeof form.requestSubmit !== 'function') return
-
-        try {
-            form.requestSubmit()
-        } catch (e) {}
     }
 
     __colorCss(name){
@@ -697,15 +602,8 @@ class TextInput extends Item {
         }
     }
 
-    SLOT_autoCompleteChanged(oldValue, newValue){
-        this.__applyAutoComplete()
-        this.__syncFormAssociation()
-    }
-
     SLOT_echoModeChanged(oldValue, newValue){
         this.__applyEchoMode()
-        this.__applyAutoComplete()
-        this.__syncFormAssociation()
     }
 
     SLOT_focusChanged(oldValue, newValue){
