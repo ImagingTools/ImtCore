@@ -6,6 +6,8 @@
 #include <QtCore/QDateTime>
 
 // ACF includes
+#include <idoc/IDocumentMetaInfo.h>
+#include <istd/IChangeable.h>
 #include <istd/IPolymorphic.h>
 
 // ImtCore includes
@@ -76,6 +78,16 @@ public:
 				const ICollectionInfo::Id& objectId,
 				int revision,
 				const QString& filePath) const = 0;
+
+	/**
+		Load a stored revision without changing the collection; outputs reset on failure and meta info is invalid if unavailable.
+	*/
+	virtual bool GetRevisionData(
+				const IObjectCollection& collection,
+				const ICollectionInfo::Id& objectId,
+				int revision,
+				istd::IChangeableSharedPtr& dataPtr,
+				idoc::MetaInfoPtr& dataMetaInfoPtr) const = 0;
 
 	/**
 		Deleting object data of a given revision from a collection
