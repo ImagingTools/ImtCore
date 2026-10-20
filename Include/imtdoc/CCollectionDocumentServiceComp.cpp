@@ -520,7 +520,7 @@ bool CCollectionDocumentServiceComp::RestoreDocument(
 			const imtbase::IRevisionController::RevisionInfoList revisionInfoList =
 					revisionControllerPtr->GetRevisionInfoList(*collectionPtr, documentInfo.objectId);
 			for (const imtbase::IRevisionController::RevisionInfo& revisionInfo : revisionInfoList){
-				if (revisionInfo.revision == requestedRevision && revisionInfo.isRevisionAvailable){
+				if (revisionInfo.revision == requestedRevision){
 					hasAvailableRevision = true;
 					break;
 				}
