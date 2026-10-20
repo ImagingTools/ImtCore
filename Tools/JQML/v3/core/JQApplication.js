@@ -7,6 +7,7 @@ const MemoryController = require('./MemoryController')
 module.exports = {
     rootPath: '',
     root: null,
+    embeddedTranslations: null,
 
     init: function(){ 
         global.queueFlag = []
@@ -51,20 +52,33 @@ module.exports = {
                 return obj
             }
 
+            __translationPrefixes(){
+                if(typeof this.application === 'string') return [this.application]
+                if(Array.isArray(this.application)) return this.application
+                return []
+            }
+
+            __applyEmbeddedTranslations(){
+                let embedded = module.exports.embeddedTranslations
+                if(!embedded || !this.language || this.__languages[this.language]) return
+                this.__languages[this.language] = embedded[this.language] || {}
+            }
+
             translate(sourceText){
+                this.__applyEmbeddedTranslations()
                 let translatedText = this.__languages[this.language]
                 let result = translatedText ? translatedText[sourceText] : sourceText
                 return result ? result : sourceText
             }
 
             SLOT_languageChanged(oldValue, newValue){
-                if(this.application && this.language && !this.__languages[this.language]){
-                    let langPrefixList = []
-                    if(typeof this.application === 'string'){
-                        langPrefixList.push(this.application)
-                    } else if(Array.isArray(this.application)){
-                        langPrefixList = this.application
+                if(this.language && !this.__languages[this.language]){
+                    if(module.exports.embeddedTranslations){
+                        this.__applyEmbeddedTranslations()
+                        return
                     }
+                    if(!this.application) return
+                    let langPrefixList = this.__translationPrefixes()
                     for(let langPrefix of langPrefixList){
                         let xhr = new XMLHttpRequest()
                         if(langPrefix){
